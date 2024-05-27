@@ -1,127 +1,173 @@
-Return-Path: <netdev+bounces-98112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B41488CF705
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 02:33:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F5B48CF70D
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 02:44:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F64028174A
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 00:33:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15A23B211E4
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 00:44:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5292E9460;
-	Mon, 27 May 2024 00:33:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867C710E4;
+	Mon, 27 May 2024 00:44:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31EE944D
-	for <netdev@vger.kernel.org>; Mon, 27 May 2024 00:33:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E946163D
+	for <netdev@vger.kernel.org>; Mon, 27 May 2024 00:44:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716770009; cv=none; b=ZiDdei2rQW9yyNJP13uqTtOWvCuffFb904eMil8TNf124+Oz9dYYSSrQOzaVe7SKEM8Zug1fq9qMMk30zor7yS6rSy1hKHT/wIEGij8CSn7ZQvGv7vGquzd/93t2MDH9zcpcdGUKT8+iO1MnGq0ZNcK1L8IEsVJVUYwyTT8EyQ8=
+	t=1716770666; cv=none; b=asEFLFlbPsqScoj1tGH087SnICv5qRtU/ubHSePM6k6g5JQDONQk89cEyDTzL3oSzfs96E+p5LMof3EdwemookfaN0FxYCUPaAoQ/mjn+7+P7ecB5vav09vYYiXMxuYn2dmFIFmSouympiWkq0TmM5I6sHKxgHL4MrM7/i0YhlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716770009; c=relaxed/simple;
-	bh=doHX4PzDqiSxtfhzMJePbVvn4Mof4IBeekCuJEcLnV4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=cdXywXi4R5QoX+ATqQZfdVyCxZUpNOmDOqwvyPpk2JyPk4J1OO/xFtid/MBwJ1q8O6K2n7bgtilRyRsNmrpwnEByo9SCzK9e4uga0h6y43xUM5hkkAp5AEO0LDt3BzriQZWOybyKAKm44ZB+HW+WLpqy8+CgMX+rA9giNgmb0Sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+	s=arc-20240116; t=1716770666; c=relaxed/simple;
+	bh=YLLNooDN0/HSLN7Bhkuq2J+Ulv9x3CHF8Y6DFTcgCJ0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Vz45F+RrMqRWcps0yUDBL+gDLvzOEuT20EeOhWI++Mws/uQpo5cUgFu7jWpDOag+nRQ1ldU7IT1AJVhrkDPEi8Bz8pE/vD45Vf7xoQvzYjb2NXU3a/7rwtzJJ+RbO1YUN+NTrKboBOIczDJrSAMYNPQujiBgTNIgz7puriX+Qpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-36da6da1d98so50541335ab.2
-        for <netdev@vger.kernel.org>; Sun, 26 May 2024 17:33:27 -0700 (PDT)
+Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-7eac3b73a53so116866139f.0
+        for <netdev@vger.kernel.org>; Sun, 26 May 2024 17:44:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716770007; x=1717374807;
+        d=1e100.net; s=20230601; t=1716770664; x=1717375464;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=j328NClK9+hNcB/FJGTyXY5OlSxScTEKHfRs1xB643s=;
-        b=wUGAtJEqb5aMY0WA2khyMkePkZ0MqR+HJE0AnUEcfNq0r/BFWFi/Q1EFUO9fM/Se0A
-         PUcuLNUidRzHEh+NQ3Z1NPddhkE9OcmsmkU3akmoejxjuVp/am2IMg0Du+bwSykx+jyL
-         PZNJe2KT3nVLHW3yO6114NZdMq74qRl9D7M0KYN+FlcoIKG7SsLGRFUWCJ6+Wp6OImsQ
-         81TA7+JUh6MOqoFBjyi0HcShTx9EoyrZiD3ioZu8bs1Gtn9viMilVvcMlxPvRClLrjDm
-         3ew5N7edBGMGd1W7q91MQ6LkE0Ug65ZQNTk9lWgWguljPb9CNPo5CibuKstuGQ3RuF0M
-         U1Ew==
-X-Forwarded-Encrypted: i=1; AJvYcCWd5Wlh2vpih/HiyuJAISIyHXqpq8BJC6BHebAOXYSQq/6+gvDZzorFAXd0Cw2B8ubI2ecco21t2nZLo6B5Xw0VUumKDDNl
-X-Gm-Message-State: AOJu0YwoJlsYdyY2V/Gui1WXCDnhklxD47OW2eWX1bKGhg2KbbXi59OG
-	ajsfsiqbx75IfdXrvaN/cWACBfE/h4ylD0WfkbhRxdy9z+Jaz2tjnnO39/Xrb35gYB8KjY3wUdU
-	UGsDgD4Nea/W5pbLd0vrRKiwkZCSHfwmFcDif2n56PAW2Q1Ja4NCfmp8=
-X-Google-Smtp-Source: AGHT+IEk5bcL3ZtXmZCksvX+fwWAYTQWg+Q0ZV9NkG7ADcuQmCo/JbD0Tx7yMV6vc++KMoUXf172C2sb9n0dNuLAMApNpKNHZEIT
+        bh=fZ9DVVzJCjcM9K5tX8UBkpT2XOidm8OOyTP+Gai07qA=;
+        b=cMyOPUqcLlBybeWlRPk0FcSwR0VEVUqlE7KvxocPWCwBXKK3jgmVHUT9Bd5wEwydNC
+         WGWOR1kHKaQ+WiJ10+pxPqj5ejun//XGIUDO0dUf27TU2CLRN1ObOGNP8d7yUYuuhWnK
+         Gj+KQTcc+XJswKI4GLfFv5j+qTrq/d/dyHoqycBc0wEH1gveYvP9yGiYY5cWXQineXFt
+         mBm2xZjsoyiQY20XOxQTMk8HLzagcNxTsUYa20bv08nbqxMttu5NjJd8JJ3TPef8iBb9
+         TaTCxZH6O0MkW7SysOzgjivc8GUJeyqbBGVUPjifNm4fSrjG1IDihqG3nLmhQh0j/2CV
+         efmg==
+X-Forwarded-Encrypted: i=1; AJvYcCUS16meXTFV/3CAWoKelWZ+YumCLzuANXMzGtNMBc1OCEZ+7GfoUoPhIYvemo0rBmlY3wjlJIEzeIMG3uBm9w5HCoug+0zd
+X-Gm-Message-State: AOJu0YzT2ahPmnnNNNlXXn92Zta9xj/sW2UDT0uk3S7MXJkphJ1KtCfd
+	+45BdOO8CRc5ZBdKn9Q6iUNtoab1pxXJwpZb5sYWUw1K6H+gm9rPOJMrARkhFI4KSlbC+bv/ZfQ
+	KUPwZE9/b+RBaCsW0mLWJB1Yr8OtNXlnstk7iBg17tC5bxhTtQU7Y/r0=
+X-Google-Smtp-Source: AGHT+IHMlVRdAWGtoNpjOKcE4YDn0zSO/EMtUtMcJLJnv+K2DPvBDguh57Z07+BRVKH7F0Mwgv4E/eDPvo6mchXNV683oFBTta6F
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cb0c:0:b0:373:8b9c:66cd with SMTP id
- e9e14a558f8ab-3738b9c8a05mr2245325ab.0.1716770007155; Sun, 26 May 2024
- 17:33:27 -0700 (PDT)
-Date: Sun, 26 May 2024 17:33:27 -0700
+X-Received: by 2002:a05:6638:2c83:b0:488:d489:3963 with SMTP id
+ 8926c6da1cb9f-4b03f6329b1mr173553173.1.1716770664201; Sun, 26 May 2024
+ 17:44:24 -0700 (PDT)
+Date: Sun, 26 May 2024 17:44:24 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007018c0061964aa67@google.com>
-Subject: [syzbot] [nfc?] [net?] KMSAN: uninit-value in nci_ntf_packet (2)
-From: syzbot <syzbot+71bfed2b2bcea46c98f2@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, krzk@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
+Message-ID: <00000000000099cf25061964d113@google.com>
+Subject: [syzbot] [bpf?] [net?] general protection fault in dev_map_enqueue (2)
+From: syzbot <syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    614da38e2f7a Merge tag 'hid-for-linus-2024051401' of git:/..
+HEAD commit:    8f6a15f095a6 Merge tag 'cocci-for-6.10' of git://git.kerne..
 git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=160b7244980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f5d2cbf33633f507
-dashboard link: https://syzkaller.appspot.com/bug?extid=71bfed2b2bcea46c98f2
+console output: https://syzkaller.appspot.com/x/log.txt?x=136bd8fc980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6be91306a8917025
+dashboard link: https://syzkaller.appspot.com/bug?extid=cca39e6e84a367a7e6f6
 compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1065f33f180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13113a34980000
+
+Unfortunately, I don't have any reproducer for this issue yet.
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/89eafb874b71/disk-614da38e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/356000512ad9/vmlinux-614da38e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/839c73939115/bzImage-614da38e.xz
+disk image: https://storage.googleapis.com/syzbot-assets/02867060d65d/disk-8f6a15f0.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/4bb75fbf6fb1/vmlinux-8f6a15f0.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/fd38cadddf33/bzImage-8f6a15f0.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+71bfed2b2bcea46c98f2@syzkaller.appspotmail.com
+Reported-by: syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com
 
-=====================================================
-BUG: KMSAN: uninit-value in nci_rf_intf_activated_ntf_packet net/nfc/nci/ntf.c:620 [inline]
-BUG: KMSAN: uninit-value in nci_ntf_packet+0x27f4/0x39c0 net/nfc/nci/ntf.c:802
- nci_rf_intf_activated_ntf_packet net/nfc/nci/ntf.c:620 [inline]
- nci_ntf_packet+0x27f4/0x39c0 net/nfc/nci/ntf.c:802
- nci_rx_work+0x288/0x5d0 net/nfc/nci/core.c:1532
- process_one_work kernel/workqueue.c:3267 [inline]
- process_scheduled_works+0xa81/0x1bd0 kernel/workqueue.c:3348
- worker_thread+0xea5/0x1560 kernel/workqueue.c:3429
- kthread+0x3e2/0x540 kernel/kthread.c:389
- ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:3877 [inline]
- slab_alloc_node mm/slub.c:3918 [inline]
- kmem_cache_alloc_node+0x622/0xc90 mm/slub.c:3961
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
- __alloc_skb+0x35b/0x7a0 net/core/skbuff.c:668
- alloc_skb include/linux/skbuff.h:1319 [inline]
- virtual_ncidev_write+0x6d/0x290 drivers/nfc/virtual_ncidev.c:120
- vfs_write+0x497/0x14d0 fs/read_write.c:588
- ksys_write+0x20f/0x4c0 fs/read_write.c:643
- __do_sys_write fs/read_write.c:655 [inline]
- __se_sys_write fs/read_write.c:652 [inline]
- __x64_sys_write+0x93/0xe0 fs/read_write.c:652
- x64_sys_call+0x3062/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:2
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-CPU: 1 PID: 3730 Comm: kworker/u8:19 Not tainted 6.9.0-syzkaller-02707-g614da38e2f7a #0
+Oops: general protection fault, probably for non-canonical address 0xdffffc000000003b: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x00000000000001d8-0x00000000000001df]
+CPU: 0 PID: 12830 Comm: syz-executor.1 Not tainted 6.9.0-syzkaller-10323-g8f6a15f095a6 #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-Workqueue: nfc2_nci_rx_wq nci_rx_work
-=====================================================
+RIP: 0010:__xdp_enqueue kernel/bpf/devmap.c:484 [inline]
+RIP: 0010:dev_map_enqueue+0x70/0x3e0 kernel/bpf/devmap.c:541
+Code: c5 18 48 89 e8 48 c1 e8 03 42 80 3c 30 00 74 08 48 89 ef e8 b2 10 3a 00 48 8b 5d 00 49 8d af d8 01 00 00 48 89 e8 48 c1 e8 03 <42> 0f b6 04 30 84 c0 0f 85 3a 02 00 00 8b 6d 00 89 ee 83 e6 04 31
+RSP: 0018:ffffc900031ff678 EFLAGS: 00010202
+RAX: 000000000000003b RBX: ffff888023efa078 RCX: 0000000000040000
+RDX: ffffc90015e01000 RSI: 0000000000000ba1 RDI: 0000000000000ba2
+RBP: 00000000000001d9 R08: ffffffff895b0946 R09: ffffffff895b0903
+R10: 0000000000000004 R11: ffff888020d73c00 R12: ffff888058f06000
+R13: ffff888021fff070 R14: dffffc0000000000 R15: 0000000000000001
+FS:  00007f9f791576c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b30823000 CR3: 000000002e298000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __xdp_do_redirect_frame net/core/filter.c:4397 [inline]
+ xdp_do_redirect_frame+0x2a6/0x660 net/core/filter.c:4451
+ xdp_test_run_batch net/bpf/test_run.c:336 [inline]
+ bpf_test_run_xdp_live+0xe60/0x1e60 net/bpf/test_run.c:384
+ bpf_prog_test_run_xdp+0x80e/0x11b0 net/bpf/test_run.c:1275
+ bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4291
+ __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5705
+ __do_sys_bpf kernel/bpf/syscall.c:5794 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5792 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5792
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f9f7847cee9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f9f791570c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007f9f785ac050 RCX: 00007f9f7847cee9
+RDX: 0000000000000048 RSI: 00000000200000c0 RDI: 000000000000000a
+RBP: 00007f9f784c949e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000006e R14: 00007f9f785ac050 R15: 00007ffc7dc03298
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__xdp_enqueue kernel/bpf/devmap.c:484 [inline]
+RIP: 0010:dev_map_enqueue+0x70/0x3e0 kernel/bpf/devmap.c:541
+Code: c5 18 48 89 e8 48 c1 e8 03 42 80 3c 30 00 74 08 48 89 ef e8 b2 10 3a 00 48 8b 5d 00 49 8d af d8 01 00 00 48 89 e8 48 c1 e8 03 <42> 0f b6 04 30 84 c0 0f 85 3a 02 00 00 8b 6d 00 89 ee 83 e6 04 31
+RSP: 0018:ffffc900031ff678 EFLAGS: 00010202
+RAX: 000000000000003b RBX: ffff888023efa078 RCX: 0000000000040000
+RDX: ffffc90015e01000 RSI: 0000000000000ba1 RDI: 0000000000000ba2
+RBP: 00000000000001d9 R08: ffffffff895b0946 R09: ffffffff895b0903
+R10: 0000000000000004 R11: ffff888020d73c00 R12: ffff888058f06000
+R13: ffff888021fff070 R14: dffffc0000000000 R15: 0000000000000001
+FS:  00007f9f791576c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b30823000 CR3: 000000002e298000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess), 1 bytes skipped:
+   0:	18 48 89             	sbb    %cl,-0x77(%rax)
+   3:	e8 48 c1 e8 03       	call   0x3e8c150
+   8:	42 80 3c 30 00       	cmpb   $0x0,(%rax,%r14,1)
+   d:	74 08                	je     0x17
+   f:	48 89 ef             	mov    %rbp,%rdi
+  12:	e8 b2 10 3a 00       	call   0x3a10c9
+  17:	48 8b 5d 00          	mov    0x0(%rbp),%rbx
+  1b:	49 8d af d8 01 00 00 	lea    0x1d8(%r15),%rbp
+  22:	48 89 e8             	mov    %rbp,%rax
+  25:	48 c1 e8 03          	shr    $0x3,%rax
+* 29:	42 0f b6 04 30       	movzbl (%rax,%r14,1),%eax <-- trapping instruction
+  2e:	84 c0                	test   %al,%al
+  30:	0f 85 3a 02 00 00    	jne    0x270
+  36:	8b 6d 00             	mov    0x0(%rbp),%ebp
+  39:	89 ee                	mov    %ebp,%esi
+  3b:	83 e6 04             	and    $0x4,%esi
+  3e:	31                   	.byte 0x31
 
 
 ---
@@ -134,10 +180,6 @@ https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
 If the report is already addressed, let syzbot know by replying with:
 #syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
 If you want to overwrite report's subsystems, reply with:
 #syz set subsystems: new-subsystem
