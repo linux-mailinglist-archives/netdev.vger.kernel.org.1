@@ -1,128 +1,113 @@
-Return-Path: <netdev+bounces-98168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6A098CFDEE
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 12:13:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7770E8CFE36
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 12:37:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5691DB225E9
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 10:13:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 091371F2344D
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 10:37:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A51C13AA5D;
-	Mon, 27 May 2024 10:12:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1C8613B5B9;
+	Mon, 27 May 2024 10:37:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E1HxK6NS"
+	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="nLsveh6t"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB5513AA59
-	for <netdev@vger.kernel.org>; Mon, 27 May 2024 10:12:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1CF313B285
+	for <netdev@vger.kernel.org>; Mon, 27 May 2024 10:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716804767; cv=none; b=BtEMtEs3OyYqbWWHVjWZajMgeus/ZAYA2c/3v1joiaU5VcCSNQ/Yz4Lvont07FfAA4hxLUogMmhdS6R+OZX5EHZcOy6TlYgVVgC8XCDvPZi+/LcWm/rSeTRaxMdlieT214UhMZHy5aT0Jy6EKFJ1Q8koJ7Tp3O1BEU4iLsWJG24=
+	t=1716806241; cv=none; b=j2+4YvJqIRmxPiWndM3mRHjrWb7QyqxlCaTW/6pcqoYFwUeLhW8NTz5I8tVkP16ZomwW8sZnalPmzUuDs1q1J8mg0CwKQFSjE1CLf7r5YTyiUJooS6UGynWBXQuQwXUvbV3pGMKfAZUJXFutimBxuPiHWSoabxhOigxFB8t8Pn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716804767; c=relaxed/simple;
-	bh=GVKEQ5KvHL0BvlosmrRkHhxCBFOcf6coLrUa7awJo1U=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=eZ2mKjI5xHiPp96olLiuQn4itEKooHmvEVAtS5pR64cl0EAaQdk3wVmoKBgvGp5agyDQJNqQxE/PWmwpWs8mCho47fOg8zSm1wc0IlNiescZoGMf9+MJ5Kg5m1O9EG2nHkv7ecKON+fEzNb8pfT1yicH67Oz05thygQQRwJAG9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E1HxK6NS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716804764;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=yFs1a7vmIrV2pTiZ1T4Vg4ah+/rq3SlJ7qHTWkFMw50=;
-	b=E1HxK6NSH+4lEdjX7Lq7+ZZjkT8GW7xWbAE8kPxcPPxh5+zKQgO1LTdOohfx/Gsjc0ud3H
-	TiXkY77ZZOwHa68iU5lTxl1qpZA95RD5sNlRXYetMIo5Soie/ljkdVYT1adNBwToKRCcfh
-	AAe+jn/zw6GioUoSJja+HQiC4iOMq78=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-653-ADEvqrZ0OY-rPkKvDExEyQ-1; Mon, 27 May 2024 06:12:43 -0400
-X-MC-Unique: ADEvqrZ0OY-rPkKvDExEyQ-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-358193f81aeso224149f8f.2
-        for <netdev@vger.kernel.org>; Mon, 27 May 2024 03:12:42 -0700 (PDT)
+	s=arc-20240116; t=1716806241; c=relaxed/simple;
+	bh=BGmd38XxGSdKDMMcN3G3XiQIcyOv9DXSluGqtKQy9+M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SHfjLroHXQdPcOCQHE+dn7qymcb08g31ikHzc/IzIH+EvRwPJhi2snreCXrhz+exifRQa4mu5ELjVKx0Y5aj8dLCzIcouAtnJy3IuPJhwJ3vtpchdrD2dYSKcH7tjF6tb6wYep1QvQmtSWIRftlfu3n+cyRiiFhi7MGLN5T15Bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=nLsveh6t; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-578626375ffso2790085a12.3
+        for <netdev@vger.kernel.org>; Mon, 27 May 2024 03:37:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1716806237; x=1717411037; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dO0AvFL5QwePC2QZ3gqTYDM4BcsHQKgOykoeZh92DyU=;
+        b=nLsveh6tAbZJL4bicjOJ+RVpjPLj4fH507GnAWwY2BdwXg/C4CtH7brjzp/AE4ISLM
+         OAZwBDKo354WnSasjw+SVTevql+5gTWy655tiuou0W9EPqpQLpjXRyl29/bRaxNY6+PZ
+         oqoJpGHQ8epYzwZ/Skcd0KhZeiRR8WPbt7FdRiI1fGrLpZSCwEHluYME3PnsQjm0NZPc
+         Gz6i5Ucv9WwjZvmB9uxWIFHTl8l5p2GXWloug08NtpcqVlSjE7fZitPH24gp3lIh+5BC
+         /y1MIk2IzmmcebQ+OC8VEDfG1RUzecul+Dubj0kxINx0vP17x9Ir8/1BhHVWO/MAPFgt
+         f1KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716804761; x=1717409561;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yFs1a7vmIrV2pTiZ1T4Vg4ah+/rq3SlJ7qHTWkFMw50=;
-        b=UqrqnPK9J6E9iiDnX1SAu3qLvCVd2/bxj0arhC1FKauEp2+TGX5KbQvLhchbyd6Q+x
-         xU4hfonn74mw5yUmOrkiOb19TR9o0PXLnpD3j7Y9CO/RfSHNYNa3UFTGBrfaCgpUOprE
-         CoRRHKR5LsEM8mRBqwcLf3m3Y13DwPfMagocD7+H95dL5wiOlMktnEcYmHg5hv8h7dFp
-         5k4DKXVPFqNLBqsMuxVyOxInXY6Iq0KoKD/8r8E3Z51mpgdumDj53agxxFFVR5xRZpdr
-         ry2IU+stNzIZVdH1z7oFH0vhltOm+Sq9YW5PmZ/74CwOVYEu0LtOeb/xxqHijgcxorFE
-         hbgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU2gRlgeNDfWPbNzs4dIChWwntNu+YEpa/aUvRN0llx75hpjYaOiUbmy6dRUPmZqbp7MrhnZtGSakSVq1BJfkbJHU3576jI
-X-Gm-Message-State: AOJu0YzgfA26B3ewQcZgWvRescohbv14V4yi8qsSTjC+pe4MsY1ix4Z0
-	HCv1PaQK/K6RogUoK+nAqaP50XLpcAqWh2zxC46JwPkoEL7O1vknX9xe+O+O3M61LerqjksEK51
-	p7ueX12hATmUtqWadGlYqq+eI/OX5gDRTfJ3uPwq65wKcXIUthcpSi7aPC8J+mw==
-X-Received: by 2002:a05:600c:1d09:b0:41a:3150:cc83 with SMTP id 5b1f17b1804b1-42108a1a56emr66807725e9.2.1716804761669;
-        Mon, 27 May 2024 03:12:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFtKk1j0MypUIzbvdYiIGjcwsjF/Ak/vvrtvDjTdhMmPUKFjM/xKUQZaMgfjUucFI5lNbLnOA==
-X-Received: by 2002:a05:600c:1d09:b0:41a:3150:cc83 with SMTP id 5b1f17b1804b1-42108a1a56emr66807555e9.2.1716804761236;
-        Mon, 27 May 2024 03:12:41 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3341:b094:ab10:29ae:cdc:4db4:a22a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42100ee7edbsm137456965e9.5.2024.05.27.03.12.40
+        d=1e100.net; s=20230601; t=1716806237; x=1717411037;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dO0AvFL5QwePC2QZ3gqTYDM4BcsHQKgOykoeZh92DyU=;
+        b=PgM0DKfOAY8LU5FBFJTvXSS2z9Qz624IFHhCF87MFxzynat476GkRB1H/Hu3/K8a6l
+         YnXG3MB4Uw9KkNvvLLd3NiK5JWfbY6tVTRHY2/JCEYE2xn+2h7BXq2BOQy2vEwtADl0g
+         LVejFfXy21xcsO/VStSszNIA7rFkcJBcIocOetxX3jQ9ZiuIMakW1kIzZeRI8OMEM0L9
+         NtX/CeDyz9aOU1Y5vDCPPEQDLvIUoRI42/0s7aoaZilNSrvmvk69DnfgUwbn5SAXJ9A/
+         jgyOhD30YDgDp4jAe9aA3PrX0zQxW8TxZMBAKwOIeaDLH1LV7L3dAtiPoVMkMTYgXN6g
+         62Wg==
+X-Gm-Message-State: AOJu0YyBXDAmXxWd1vSjH1RwHGuNaZaRyOiOS7qb1P1XzZZ+vQemnQTV
+	4RnraazCQo2GshWUc4W4Ae+7WPVQwQ1Pbxv5aXIhKJeuuAA0SRGzjYcDaqkXMoo=
+X-Google-Smtp-Source: AGHT+IGxcPe6uT4yc9jWNU7ehZJr1E6b4aaoClrPA8u7hsmcPOTrwWBbPYZS8ijvvtGcf2XiujMAjA==
+X-Received: by 2002:a50:ab5a:0:b0:578:6c19:4801 with SMTP id 4fb4d7f45d1cf-5786c195f95mr4162253a12.22.1716806237244;
+        Mon, 27 May 2024 03:37:17 -0700 (PDT)
+Received: from fedora.fritz.box (aftr-62-216-208-100.dynamic.mnet-online.de. [62.216.208.100])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-578f47126f0sm3208478a12.91.2024.05.27.03.37.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 May 2024 03:12:40 -0700 (PDT)
-Message-ID: <63b7281b10c5491fbb02ba3f01328765b88a6271.camel@redhat.com>
-Subject: Re: [PATCH net 0/6,v2] Netfilter fixes for net
-From: Paolo Abeni <pabeni@redhat.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org, 
-	edumazet@google.com, fw@strlen.de
-Date: Mon, 27 May 2024 12:12:39 +0200
-In-Reply-To: <57354e03b78f382e48b3bbc1eeec9dd14c3e940f.camel@redhat.com>
-References: <20240523162019.5035-1-pablo@netfilter.org>
-	 <ZlJYT2-sjA8gypwO@calendula>
-	 <57354e03b78f382e48b3bbc1eeec9dd14c3e940f.camel@redhat.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        Mon, 27 May 2024 03:37:16 -0700 (PDT)
+From: Thorsten Blum <thorsten.blum@toblux.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: netdev@vger.kernel.org,
+	workflows@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Thorsten Blum <thorsten.blum@toblux.com>
+Subject: [PATCH net] docs: netdev: Fix typo in Signed-off-by tag
+Date: Mon, 27 May 2024 12:36:19 +0200
+Message-ID: <20240527103618.265801-2-thorsten.blum@toblux.com>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, 2024-05-27 at 11:59 +0200, Paolo Abeni wrote:
-> On Sat, 2024-05-25 at 23:29 +0200, Pablo Neira Ayuso wrote:
-> > Hi,
-> >=20
-> > On Thu, May 23, 2024 at 06:20:13PM +0200, Pablo Neira Ayuso wrote:
-> > > v2: fixes sparse warnings due to incorrect endianness in vlan manglin=
-g fix
-> > >     reported by kbuild robot and Paolo Abeni.
-> >=20
-> > I realized checkpatch complains on use of spaces instead of
-> > indentation in patch 4/6.
-> >=20
-> > I can repost the series as v3. Apologies for this comestic issue.
->=20
-> I think the overhead of a repost would offset the benefit of cleaning-
-> up that minor format issue.
+s/of/off/
 
-I'm sorry for being so self-contradictory in a very short period of
-time, but before I misread the report.
+Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
+---
+ Documentation/process/maintainer-netdev.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I think this specific format violation is worth fixing. Could you
-please send a v3?
-
-Thanks!
-
-Paolo
+diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
+index fd96e4a3cef9..5e1fcfad1c4c 100644
+--- a/Documentation/process/maintainer-netdev.rst
++++ b/Documentation/process/maintainer-netdev.rst
+@@ -227,7 +227,7 @@ preferably including links to previous postings, for example::
+   The amount of mooing will depend on packet rate so should match
+   the diurnal cycle quite well.
+ 
+-  Signed-of-by: Joe Defarmer <joe@barn.org>
++  Signed-off-by: Joe Defarmer <joe@barn.org>
+   ---
+   v3:
+     - add a note about time-of-day mooing fluctuation to the commit message
+-- 
+2.45.1
 
 
