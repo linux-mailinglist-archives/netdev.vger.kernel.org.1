@@ -1,62 +1,64 @@
-Return-Path: <netdev+bounces-98197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AB088D02EE
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:14:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97D578D02F6
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:15:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAED829BB3E
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 14:14:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AAD41F2150A
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 14:15:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 977F5161904;
-	Mon, 27 May 2024 14:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13E6416C445;
+	Mon, 27 May 2024 14:12:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nUPV86Hd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rCjH7ER+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D86215F306;
-	Mon, 27 May 2024 14:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE52715F3E1;
+	Mon, 27 May 2024 14:12:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716819151; cv=none; b=RkcEgSf8n3xpLDdGYoizJj0avETYT5aO7W33Gps8cmuMqLW2dix8wTQecESgM6I6Mg3cF7rfLfi5c5SpLb0JxokThRRa0p/i2zALbl0n3Iw9kucHGXj6lx6v6u9x5N+vE49l3UVut5ko+5uJauVBmo6wFqGXv5hIdvIlFfN8jgQ=
+	t=1716819158; cv=none; b=A+NxxYBwT/hiK3yePaPZBMiIVwDSbWqUBrHjpEjek7ZKuvAaXdZxAdtntccykMC58GSkMVfNF2qdMJ35Tqd6c31A7cxRMawYsby34RZPY3fz4ECjnMM4P8ZzOBlFLS/hGLIvofiwYvSdG/dQrnkC54UThV1D9FH+eKf2FJ1aHXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716819151; c=relaxed/simple;
-	bh=eM1G5cPfDPG4q4wc0zKWCZzc2b2OiE56DwIDja4stPw=;
+	s=arc-20240116; t=1716819158; c=relaxed/simple;
+	bh=ipdVRS8ScoHWmhSb3/7HjtF4soPF3OSter9BKeL3Jeo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RpzHHxClHmmvpJ7ObKXnd9yImm6Zxit/Jgy+VAZ+jJVNNbGgL81mt6O6AIYdfDCdDuQHXOhehbdtiYC4yhS/TxNxvynoDCk0CbspbBst4jo4WrMSrUCzs43npJxNZ+uyVp0soi5TNHo+oWKUNo9kdVmjjx9J3atlFDFpLMod7hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nUPV86Hd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F082BC2BBFC;
-	Mon, 27 May 2024 14:12:29 +0000 (UTC)
+	 MIME-Version:Content-Type; b=VZGOpqtfPFharAwPy9IjYW+/yu1QRexTHrBD6qkZXpK8AT1bycRA2xdrNGHmv6QPgM5F4VzCQeHawRkeNAMKibr/yWVvMT5O1Js3j2iMKRXxqs7/OMs6nyM080RINX9vDIxxQxqojPKzxOQBZu8WKDzBocS9U6GBrIEDzAl9W1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rCjH7ER+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6BD3C2BBFC;
+	Mon, 27 May 2024 14:12:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716819151;
-	bh=eM1G5cPfDPG4q4wc0zKWCZzc2b2OiE56DwIDja4stPw=;
+	s=k20201202; t=1716819157;
+	bh=ipdVRS8ScoHWmhSb3/7HjtF4soPF3OSter9BKeL3Jeo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nUPV86HdiaRb4Y/m6+T3QdVIrboTzGkkdvhXmJDe8RaxWTNwPt8JaEDoOuvqdEzIp
-	 kW7yqn83BZBrM6HwebcbSYQnz8ldISrIy6yX15jKDVyu+jOtmLxnYvAKqxuqZwSeef
-	 fsnN8eh6KpoJxapEDswsOvkmkl5Gf+sGZ9YE045EI6ihotvP8DX9ghSJdS5xHuNIOx
-	 9D+opXYesX+bY54DzG3B+0N/n5fX6qorY+4XS0D0jKnzHcOoFERjRBJtV5aV/+ItS2
-	 M+SbIcndO2EO5HhBNXxerrH+59gMtBr3TbyrLwPK8DEnmM/bYct6Gy6ZigiR9WyMq/
-	 vSGeuEyLu5qfw==
+	b=rCjH7ER++bsw683Z0e8weZZcfLnj17sSFpc4EZIDTJXLLFK/AUICJqgkStGXBlyRM
+	 SMd8YZO6xuW15x1sI2m0rd7ZoD/R7G2lBQY5U0O556o7NXnFqAS4e4l+hzWqt6QaLg
+	 9N/wqP2mEUxztAVYSopPraBkI5usBfCkOIrEXuXgpdIDkT1MV7NQiGr2JprMHmyCmm
+	 5RygfcLvRDbYKaKoTGx/v4rAVRFbvrWSl5joPIRdVvrQSdREXseAoUL7kq1fj3rFyT
+	 ThQHwczC9PWMEnlDZbUJbWsLPlmxeYdvNsOekmhGL3Q0NWT279g5CJ4VRTWramimGL
+	 XXnE5hxR1qsCA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	syzbot <syzkaller@googlegroups.com>,
-	Kees Cook <keescook@chromium.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Willem de Bruijn <willemb@google.com>,
+Cc: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Eric Woudstra <ericwouds@gmail.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
 	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
+	linux@armlinux.org.uk,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.9 09/35] af_packet: avoid a false positive warning in packet_setsockopt()
-Date: Mon, 27 May 2024 10:11:14 -0400
-Message-ID: <20240527141214.3844331-9-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.9 12/35] net: sfp: add quirk for another multigig RollBall transceiver
+Date: Mon, 27 May 2024 10:11:17 -0400
+Message-ID: <20240527141214.3844331-12-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240527141214.3844331-1-sashal@kernel.org>
 References: <20240527141214.3844331-1-sashal@kernel.org>
@@ -66,84 +68,41 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.9.2
 Content-Transfer-Encoding: 8bit
 
-From: Eric Dumazet <edumazet@google.com>
+From: Marek Behún <kabel@kernel.org>
 
-[ Upstream commit 86d43e2bf93ccac88ef71cee36a23282ebd9e427 ]
+[ Upstream commit 1c77c721916ae108c2c5865986735bfe92000908 ]
 
-Although the code is correct, the following line
+Add quirk for another RollBall copper transceiver: Turris RTSFP-2.5G,
+containing 2.5g capable RTL8221B PHY.
 
-	copy_from_sockptr(&req_u.req, optval, len));
+Signed-off-by: Marek Behún <kabel@kernel.org>
+Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
 
-triggers this warning :
-
-memcpy: detected field-spanning write (size 28) of single field "dst" at include/linux/sockptr.h:49 (size 16)
-
-Refactor the code to be more explicit.
-
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Reviewed-by: Kees Cook <keescook@chromium.org>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/packet/af_packet.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+ drivers/net/phy/sfp.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index 18f616f487eaa..8c6d3fbb4ed87 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -3800,28 +3800,30 @@ packet_setsockopt(struct socket *sock, int level, int optname, sockptr_t optval,
- 	case PACKET_TX_RING:
- 	{
- 		union tpacket_req_u req_u;
--		int len;
- 
-+		ret = -EINVAL;
- 		lock_sock(sk);
- 		switch (po->tp_version) {
- 		case TPACKET_V1:
- 		case TPACKET_V2:
--			len = sizeof(req_u.req);
-+			if (optlen < sizeof(req_u.req))
-+				break;
-+			ret = copy_from_sockptr(&req_u.req, optval,
-+						sizeof(req_u.req)) ?
-+						-EINVAL : 0;
- 			break;
- 		case TPACKET_V3:
- 		default:
--			len = sizeof(req_u.req3);
-+			if (optlen < sizeof(req_u.req3))
-+				break;
-+			ret = copy_from_sockptr(&req_u.req3, optval,
-+						sizeof(req_u.req3)) ?
-+						-EINVAL : 0;
- 			break;
- 		}
--		if (optlen < len) {
--			ret = -EINVAL;
--		} else {
--			if (copy_from_sockptr(&req_u.req, optval, len))
--				ret = -EFAULT;
--			else
--				ret = packet_set_ring(sk, &req_u, 0,
--						    optname == PACKET_TX_RING);
--		}
-+		if (!ret)
-+			ret = packet_set_ring(sk, &req_u, 0,
-+					      optname == PACKET_TX_RING);
- 		release_sock(sk);
- 		return ret;
- 	}
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index f75c9eb3958ef..6e7639fc64ddc 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -506,6 +506,7 @@ static const struct sfp_quirk sfp_quirks[] = {
+ 	SFP_QUIRK_M("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
+ 	SFP_QUIRK_F("OEM", "RTSFP-10", sfp_fixup_rollball_cc),
+ 	SFP_QUIRK_F("OEM", "RTSFP-10G", sfp_fixup_rollball_cc),
++	SFP_QUIRK_F("Turris", "RTSFP-2.5G", sfp_fixup_rollball),
+ 	SFP_QUIRK_F("Turris", "RTSFP-10", sfp_fixup_rollball),
+ 	SFP_QUIRK_F("Turris", "RTSFP-10G", sfp_fixup_rollball),
+ };
 -- 
 2.43.0
 
