@@ -1,118 +1,172 @@
-Return-Path: <netdev+bounces-98172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE6438CFE6F
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 12:56:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABEBD8CFE79
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 12:59:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99E2B282A0E
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 10:56:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24403B22F02
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 10:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D99813B783;
-	Mon, 27 May 2024 10:56:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="KGfrfms1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF5813B7A9;
+	Mon, 27 May 2024 10:59:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE14013B5A8
-	for <netdev@vger.kernel.org>; Mon, 27 May 2024 10:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DE126AFA
+	for <netdev@vger.kernel.org>; Mon, 27 May 2024 10:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716807398; cv=none; b=VTbhaLhEd04A4sAanjVjon8Nki1X85rjlpMLCgbq3eqSctUaR2PMMZbfxcpbR7aLRPGp+3HnPncB1KGRLf29C92Mlyw8RnSstdNK2QasEN51R2o8kiraxeMwQSEkArb9a5UC230yYswiPH+8U1n3gzGqcO7ff50kbOhA+XgZm0s=
+	t=1716807568; cv=none; b=Z0zJFWMJ0QqYQ871uYLyPumFnuDevrA+FSv+bcJXhiV71wquT++PZknqsSOtzlQKXkxb29EYtWuQQ3ovclHlXRR+g4JGWirPJGkAPUdfK387vpA4N2lO90GaeLlwRGngeOxj9Ef87CcGub6lji2eMw0B8keFc0Hc7/D1fPV1VjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716807398; c=relaxed/simple;
-	bh=XLoTvNeTfS0Z+Xmo5LFQXXdmRX9EJkbbxeer+BFVM1Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YrDXlG7TqLDNt8lWfLZ3MHVj5mtnaXb3bndNyPn+k8Nw1ahWSndW76fVz+HbjaQJjT3nH8idXpx1K0U0Dn/8/8YQCvuLaSCypdvuWZIcZTJ+lDuCi7cRDdQSRFstJY9xD/vkuyXfueMWxfAMX4EjcJcpyy+Vs67NRZVapie0TzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=KGfrfms1; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5785d466c82so3274695a12.3
-        for <netdev@vger.kernel.org>; Mon, 27 May 2024 03:56:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1716807395; x=1717412195; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jw0FtTciCXQX3h6CcIOAWgqPfMRJPygWAg+dmYzhfxo=;
-        b=KGfrfms1X+UnFUNtYLi7jq0LzIB6HwvfbrnrsNhHzO2IefNMb+LXLDt4+d9uQqUmht
-         GrmD2no50wAJHFO8h5JHJDq4MGcfuO3fzz6LdZEyTzZ5me7z3ZNeJRj78wv3JoArZiig
-         bG3exEjYdmQmFh7SAOVJFkgATQ3YCYLvMXmWSjWqmYiLhFUgqDd6qv0b7z4IldTxTJ41
-         sdnTEPLRW7eShK+v+KxqEySx8O9O3fnc/2QKJqJ66fpSK99syNKX21adnVilgg8q80dS
-         v+R774ONG0lF3BdRLiAbQwZMSJ+gy0ubEXAh+bG1nekEgedbqAS0mE4FksYVYlPy5lv6
-         ovwA==
+	s=arc-20240116; t=1716807568; c=relaxed/simple;
+	bh=94YhgNzljuvU7uRcV7vtpb7xMFTqrqVEIqZc1oHhq5k=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=bIDZZY/It70YNROU7C0SEKT0CzEdXc/KUwciOFJ9ZBjaBIXQVPV+1+dmH220tSpKC1aWM33WgtFlLNALvoiQY0Tvzb5E63bxM3Xw3HkT8nnNkWf26YqA0lImbryrNwQJn7PnrOOMZjGJQHZP5UXs23en5dnqcM96MVWGYwJz1yY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-7e8e2ea7b4bso428558039f.0
+        for <netdev@vger.kernel.org>; Mon, 27 May 2024 03:59:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716807395; x=1717412195;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jw0FtTciCXQX3h6CcIOAWgqPfMRJPygWAg+dmYzhfxo=;
-        b=QsZx6tpsltO4Ynl91bkaJUHBHKqiz7WSdJ2o4lwtN+Eh/AIb0L/6XRANZCz6PpTjRl
-         fvRDgPAQlPtoCyvqXuUhxJ9/tHWiDBAElpqSLkIVEfIqEcjWWvDlDmasQaOSKcoW4dLl
-         kZ7llk+dhW6vh1LNhBFrpDTBHAogwIFvxkUDLF66MVHiYHc4ETWdAkTrPG/RoVKzDcMM
-         UfrDbNuLAx/8A+X0oqzaTVxAXxOdTDSSZUoQzqq/fa1GWzqa/tPWHyVvG5ue6do/Ja12
-         UPW1wL1L26/kImxuR4wYXs+FE1hoZwXNDWV/xytCumZgquMYlLMBC1AsJj3Hn1D/GUg5
-         UpHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVNQoXrkGtuEVkTh4/mv7R5U8sn2LvaEmC0A4NheCZincN9WuuPx9UMyOUjTPmXkuTrQvFHz0/QekrFDRm+2ySMlP6eYYG5
-X-Gm-Message-State: AOJu0YxNcgpplV4uZYdaJUgDu1fibhkrMwOhf2O4gOReAHv5V3KWgMb8
-	ExyEZaC5ZoTcr8aEw/N+VHeGZqUL32zn+NikmA0NomgoPzavzcyTTOqP9soJsIM=
-X-Google-Smtp-Source: AGHT+IGlBr+lrKmneJwsXJDybFQCF1UdYP1AaUzjy+aTvC1Qzbd1hN/9MnflALOBxAmHv0rcPKwLZQ==
-X-Received: by 2002:a50:9e4d:0:b0:578:5105:5ecc with SMTP id 4fb4d7f45d1cf-578519b7ee2mr5364221a12.37.1716807395099;
-        Mon, 27 May 2024 03:56:35 -0700 (PDT)
-Received: from fedora.fritz.box (aftr-62-216-208-100.dynamic.mnet-online.de. [62.216.208.100])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-578524bc547sm5624412a12.96.2024.05.27.03.56.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 May 2024 03:56:34 -0700 (PDT)
-From: Thorsten Blum <thorsten.blum@toblux.com>
-To: Nicolas Pitre <nico@fluxnic.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	Breno Leitao <leitao@debian.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Thorsten Blum <thorsten.blum@toblux.com>
-Subject: [PATCH net] net: smc91x: Remove commented out code
-Date: Mon, 27 May 2024 12:55:58 +0200
-Message-ID: <20240527105557.266833-2-thorsten.blum@toblux.com>
-X-Mailer: git-send-email 2.45.1
+        d=1e100.net; s=20230601; t=1716807566; x=1717412366;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QlarJWCrMY/qWkUS+Linikag5znfwaOPRNlhqnwBFnM=;
+        b=TcLQ54XgzJJv9lcOK/hFf2GhY2E929cxuGiOPp3qT5vxgT3Rn8msfWO3aSdJmt4TAj
+         LIDTWtHtOXm5pNR3FRzhJTEtRCE7ePcgCKxB04k23Roj4lvY36Uu8mnP3S7YUhDloaYu
+         448HOFAQJnyy3qVEj2OQhc5ZpzCEmCZ8c4PrOR8Qx9FWKHGfASDFF8P+hwcs92PCjPXn
+         tVqRnrarPy7XjYiZavdmyFCcAFcmRdZkX3hYmG5JDgT+PCqbxvfwGbHH35AOCSdDtUew
+         heiL2qHt9KwyMXj2ay2fduEzf2BYI0tEQ14vPn1IILvATH9v3g15hg/rgdtbgYAtGJ5Q
+         kguQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXdoFBy5Zl81UC7BRvfMCu+sVkTCKDzdeA+WKHl8KozQ0qeTqItMQHdiEwD7bBi0kkuttyfm7O2zKZGWDEyivJN2uxCMGBL
+X-Gm-Message-State: AOJu0Yz5AbcGGtelNp3csctnrjcw9jccPHvu4YuQ70fzjod0TN5hmhbX
+	2GyeSbQLmCDQL+n5eBDNyiI4rHlH+QSINYoNOPrxjxSYqHP6AzWH/IvY81wCAiFbdYliOI9FQ8t
+	OkkpQeiWiq2Q+hKMi5FZurOKcLUm0HeFmip9vah69USv4JDzIOuYm7qc=
+X-Google-Smtp-Source: AGHT+IG/QPXR4IHrIJSsY3j5x3NB2UWwan6p1oCg29ULQe8EmqX4ej73KmFSMr8Cwbz+35hp1kPPkB7xZPmkVIr9S+0YeWylvL6d
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6638:832a:b0:4b0:a7f3:fc21 with SMTP id
+ 8926c6da1cb9f-4b0a7f3fe55mr241332173.3.1716807566156; Mon, 27 May 2024
+ 03:59:26 -0700 (PDT)
+Date: Mon, 27 May 2024 03:59:26 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000020f77306196d696c@google.com>
+Subject: [syzbot] [net?] WARNING in __ip6_make_skb (2)
+From: syzbot <syzbot+d7b227731ec589e7f4f0@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, quic_abchauha@quicinc.com, 
+	syzkaller-bugs@googlegroups.com, willemb@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Remove commented out code
+Hello,
 
-Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
+syzbot found the following issue on:
+
+HEAD commit:    2c1713a8f1c9 bpf: constify member bpf_sysctl_kern:: Table
+git tree:       bpf-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1056ba0c980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=17ffd15f654c98ba
+dashboard link: https://syzkaller.appspot.com/bug?extid=d7b227731ec589e7f4f0
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1050742c980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14fd6b1a980000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/2cad2c60a177/disk-2c1713a8.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/0c8a5f440db5/vmlinux-2c1713a8.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/53bcec8870e5/bzImage-2c1713a8.xz
+
+The issue was bisected to:
+
+commit 1693c5db6ab8262e6f5263f9d211855959aa5acd
+Author: Abhishek Chauhan <quic_abchauha@quicinc.com>
+Date:   Thu May 9 21:18:33 2024 +0000
+
+    net: Add additional bit to support clockid_t timestamp type
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14eeacb2980000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=16eeacb2980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=12eeacb2980000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d7b227731ec589e7f4f0@syzkaller.appspotmail.com
+Fixes: 1693c5db6ab8 ("net: Add additional bit to support clockid_t timestamp type")
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 5089 at include/linux/skbuff.h:4226 skb_set_delivery_type_by_clockid include/linux/skbuff.h:4226 [inline]
+WARNING: CPU: 1 PID: 5089 at include/linux/skbuff.h:4226 __ip6_make_skb+0x14f8/0x2470 net/ipv6/ip6_output.c:1930
+Modules linked in:
+CPU: 1 PID: 5089 Comm: syz-executor227 Not tainted 6.9.0-syzkaller-08561-g2c1713a8f1c9 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+RIP: 0010:skb_set_delivery_type_by_clockid include/linux/skbuff.h:4226 [inline]
+RIP: 0010:__ip6_make_skb+0x14f8/0x2470 net/ipv6/ip6_output.c:1930
+Code: c0 0f 85 94 0a 00 00 41 8b 5d 00 4d 85 f6 74 0d e8 dd 50 6e f7 83 e3 fc 44 09 e3 eb 79 e8 d0 50 6e f7 eb 6f e8 c9 50 6e f7 90 <0f> 0b 90 48 8b 5c 24 08 48 8d 7b 20 48 89 f8 48 c1 e8 03 42 80 3c
+RSP: 0018:ffffc9000345f400 EFLAGS: 00010293
+RAX: ffffffff8a27e107 RBX: 00000000000000ff RCX: ffff888025a99e00
+RDX: 0000000000000000 RSI: ffffffff8f6e8f20 RDI: 00000000000000ff
+RBP: ffffc9000345f610 R08: 0000000000000001 R09: ffffffff8a27e049
+R10: 0000000000000003 R11: ffff888025a99e00 R12: ffff88807ab76730
+R13: dffffc0000000000 R14: 0000000000000000 R15: ffffc9000345f6a0
+FS:  000055556e2a2380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000000045ad50 CR3: 000000007e9e2000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ip6_make_skb+0x48b/0x530 net/ipv6/ip6_output.c:2046
+ udpv6_sendmsg+0x237f/0x3270 net/ipv6/udp.c:1584
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0xef/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fe6cfe18ab9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe2f15e328 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fe6cfe18ab9
+RDX: 0000000000000000 RSI: 0000000020000400 RDI: 0000000000000003
+RBP: 00007fe6cfe8b5f0 R08: 0000000000000006 R09: 0000000000000006
+R10: 0000000000000008 R11: 0000000000000246 R12: 0000000000000001
+R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+
+
 ---
- drivers/net/ethernet/smsc/smc91x.c | 4 ----
- 1 file changed, 4 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/smsc/smc91x.c b/drivers/net/ethernet/smsc/smc91x.c
-index 78ff3af7911a..907498848028 100644
---- a/drivers/net/ethernet/smsc/smc91x.c
-+++ b/drivers/net/ethernet/smsc/smc91x.c
-@@ -1574,12 +1574,8 @@ smc_ethtool_set_link_ksettings(struct net_device *dev,
- 		    (cmd->base.port != PORT_TP && cmd->base.port != PORT_AUI))
- 			return -EINVAL;
- 
--//		lp->port = cmd->base.port;
- 		lp->ctl_rfduplx = cmd->base.duplex == DUPLEX_FULL;
- 
--//		if (netif_running(dev))
--//			smc_set_port(dev);
--
- 		ret = 0;
- 	}
- 
--- 
-2.45.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
