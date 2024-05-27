@@ -1,164 +1,200 @@
-Return-Path: <netdev+bounces-98188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F00818D0134
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 15:20:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 286B58D0142
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 15:22:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4B61281AFA
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 13:20:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B7381F21803
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 13:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F09A15E5DD;
-	Mon, 27 May 2024 13:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="YWLM28g0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C3315ECFF;
+	Mon, 27 May 2024 13:22:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F43E4EB55
-	for <netdev@vger.kernel.org>; Mon, 27 May 2024 13:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E495C43AC1
+	for <netdev@vger.kernel.org>; Mon, 27 May 2024 13:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716816052; cv=none; b=olBW0oOHuRlMdHUa2iFdinqJtvBmOcs4Kg5Qq4Qr3ibhnUD7Ke1sfNcQzjVMtShr3mjnbBdouEk9AQLUDgaDYuXetkcIZbawodiV3A7MX8ynnpPcydkr7GwlyAs7pK1GOw22vptt+/6uPeZqoR8MGIXn7kEQz8RMvZ9OtFTSqu0=
+	t=1716816150; cv=none; b=HGVKmfulQ7zKxvh0KLPaqjRW9EfCI8A8D75tACKsUqIdOfEuNC6J3qw4tb9nmFUS0pfxhWg39jKsC+u7v1mIg56dUgTBF+dCf4sXyEC94/DYDUePG2OKiChBO094FPLGfjgFV+Xf8lS60GdBFbt1gGfzX+NACdO2GHHLzjo4HoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716816052; c=relaxed/simple;
-	bh=3MkKkpmrskRT0NF+eJzt1tmnBR8XJm29Y5ePAg/pC44=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WScWTFBwWyqwt86GX6GAN3bQ9hbgheuy3+dQri/4m5/hLFnlbVaRYJhSEIROeDCKGRGVt8jpNHDMNksPsdQsiDWj35HC9oAWeazMfWRuKvjGTEDx5SLTzI4ryHP378tsYW1j360gGRXdkVguTyUtR0H36ZQxEmLoMt5lmQp9uXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=YWLM28g0; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=oYvyGuL3FYNlT2/HXT/HMIfkTEQHXwOW5dyOd97dqms=; b=YW
-	LM28g0Rj5s1wMmNsRCQHZSBQa7LOpZH61kBbLWe+jOmdLSyZ/GTSNh+In8WYSzL0Nw/FermcJmRiz
-	gbaTUrGa6rgQ1nfPZuz2EDbAWLkJF8JaznezNJsrwjded3XZ2ybfwKTJgXmVNInBSqi1xzsAVmEfU
-	1yqMAJUSvZqKbsU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sBaHH-00G4aH-NU; Mon, 27 May 2024 15:20:39 +0200
-Date: Mon, 27 May 2024 15:20:39 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Kamil =?iso-8859-1?B?SG9y4Wss?= 2N <kamilh@axis.com>
-Cc: netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH v3 1/3] net: phy: bcm54811: New link mode for BroadR-Reach
-Message-ID: <79af2fc0-7439-4c6d-9059-048440c3a406@lunn.ch>
-References: <20240506144015.2409715-1-kamilh@axis.com>
- <20240506144015.2409715-2-kamilh@axis.com>
- <25798e60-d1cc-40ce-b081-80afdb182dd6@lunn.ch>
- <96a99806-624c-4fa4-aa08-0d5c306cff25@axis.com>
- <b5c6b65b-d4be-4ebc-a529-679d42e56c39@lunn.ch>
- <c39dd894-bd63-430b-a60c-402c04f5dbf7@axis.com>
- <1188b119-1191-4afa-8381-d022d447086c@lunn.ch>
- <ed59ba76-ea86-4007-9b53-ebeb02951b34@axis.com>
- <44c85449-1a9b-4a5e-8962-1d2c37138f97@lunn.ch>
- <b9ce037f-8720-4a6c-8cfe-01bffee230c1@axis.com>
+	s=arc-20240116; t=1716816150; c=relaxed/simple;
+	bh=JWtt6Abdjck7XIpEK9UwFhE+Pqmzep9TYpawW/MOpSA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Q3T9s67oCwE1rKxp3O/9aEC0Kwx6EwIoOnTO1a+0ACNXlkl+MmKboScwU0Ze7C4dxaW0ZSMbpuO5gR8ImvZ2zZweeHfQkqNrxWAnQpPKgPOEq7AWVuaEc4UOXLrmJQt7Gdz+9NgIo2faWcVcX9u7tWBXyUiykv9UQHaK+7tjU80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3745fb76682so3644255ab.2
+        for <netdev@vger.kernel.org>; Mon, 27 May 2024 06:22:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716816148; x=1717420948;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7WZIq4G9PtxcmkzMzsJUrrOotpdeCmbsOBz+DCbbDC4=;
+        b=VfoMw1ve+foo6r/GoLD3HHm0NOufOW/0qnfxjAUrXgdL5lupgZcoAu5tVvCtZuxMLC
+         XwEuQkwN08zp7DfnokQTzjBWfR63bfk0HFDFyPUDQvI/KGg52DrIX/PNk7Rogw+Fz4SO
+         qoe1cs4QXK+AdByqdO/mZiDMnV0VWuOfbNOZ0fNKJRDVVkH2WUg4Lx4uviPB5vntilEO
+         dmLIUiMGBKcb0j3CtDFucxP3SQfQ034TqeM/eMF99vBdNX8sPXU9LBOdBVHxp+Iv+mRL
+         5HayROStGC2QyQVa8U7haasfVjM6KZj3VqBXpDrM9QBz0YcY0BRSb/5st5sA22DP/ac+
+         Z/sg==
+X-Forwarded-Encrypted: i=1; AJvYcCUyBbadU2ZICndIH6SLXs6WGN3KmEgnhEfzq+XTW0RkWz59D/bXDU56VsTMOY+bOIzRQX6KDouRrS8Juov+bMWtWK4XmXIT
+X-Gm-Message-State: AOJu0Ywkoj9oB4TLid0Gqo/xs3pN52p6uaJ59n1re90d8rUDAmT7Acmn
+	U+uVtnz+iFSlbvA9jorej1TCMTAr0F3Y749WhyIO8yXvqNCqZAW09/aKLT9UJMd0MSsB8qQ1tjX
+	l2hoJjZNGU6CZo6Gp7kPK27GbMwV92E4ZViyNM1II2/zzAQrM0oADi/U=
+X-Google-Smtp-Source: AGHT+IFiWnPYmjdm2RumhlqnAvIc6i8X7o4JX9hPFntNVse2StehRurPUlpwZ49d6cXFfVIK/zrPQ8sqyhs59oml4q1WMusuwZZH
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b9ce037f-8720-4a6c-8cfe-01bffee230c1@axis.com>
+X-Received: by 2002:a05:6e02:1a41:b0:36d:d38e:3520 with SMTP id
+ e9e14a558f8ab-3737b33d769mr8047805ab.4.1716816148086; Mon, 27 May 2024
+ 06:22:28 -0700 (PDT)
+Date: Mon, 27 May 2024 06:22:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a6d9f506196f6826@google.com>
+Subject: [syzbot] [net?] divide error in taprio_update_queue_max_sdu
+From: syzbot <syzbot+233e6e0ea2ba2c86fa79@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com, 
+	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	vinicius.gomes@intel.com, xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-> > So IEEE and BRR autoneg are mutually exclusive. It would be good to
-> > see if 802.3 actually says or implies that. Generic functions like
-> > ksetting_set/get should be based on 802.3, so when designing the API
-> > we should focus on that, not what the particular devices you are
-> > interested in support.
-> I am not sure about how to determine whether IEEE 802.3 says anything about
-> the IEEE and BRR modes auto-negotiation mutual exclusivity - it is purely
-> question of the implementation, in our case in the Broadcom PHYs.
+Hello,
 
-CLause 22 and clause 45 might say something. e.g. the documentation
-about BMSR_ANEGCAPABLE might indicate what link modes it covers.
+syzbot found the following issue on:
 
-> One of the
-> BRR modes (1BR100) is direct equivalent of 100Base-T1 as specified in IEEE
-> 802.3bw. As it requests different hardware to be connected, I doubt there is
-> any (even theoretical) possibility to negotiate with a set of supported
-> modes including let's say 100Base-T1 and 100Base-T.
-> > 
-> > We probably want phydev->supports listing all modes, IEEE and BRR. Is
-> > there a bit equivalent to BMSR_ANEGCAPABLE indicating the hardware can
-> > do BRR autoneg? If there is, we probably want to add a
-> > ETHTOOL_LINK_MODE_Autoneg_BRR_BIT.
-> There is "LDS Ability" (LRESR_LDSABILITY) bit in the LRE registers set of
-> BCM54810, which is equivalent to BMSR_ANEGCAPABLE and it is at same position
-> (bit 3 of the status register), so that just this could work.
-> 
-> But just in our case, the LDS Ability bit is "reserved" and "reads as 1"
-> (BCM54811, BCM54501). So at least for these two it cannot be used as an
-> indication of aneg capability.
-> 
-> LDS is "long-distance signaling" int he Broadcom's terminology, "a special
-> new type of auto-negotiation"....
+HEAD commit:    4b377b4868ef kprobe/ftrace: fix build error due to bad fun..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=11ab31a4980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=17ffd15f654c98ba
+dashboard link: https://syzkaller.appspot.com/bug?extid=233e6e0ea2ba2c86fa79
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-For generic code, we should go from what 802.3 says. Does clause 22 or
-clause 45 define anything like LDS Ability? If you look at how 802.3
-C22/C45 works, it is mostly self describing. You can read registers to
-determine what the PHY supports. So it is possible to have generic
-genphy_read_abilities() and genphy_c45_pma_read_abilities which does
-most of the work. Ideally we just want to extend them to cover BBR
-link modes.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-> > ksetting_set should enforce this mutual exclusion. So
-> > phydev->advertise should never be set containing invalid combination,
-> > ksetting_set() should return an error.
-> > 
-> > I guess we need to initialize phydev->advertise to IEEE link modes in
-> > order to not cause regressions. However, if the PHY does not support
-> > any IEEE modes, it can then default to BRR link modes. It would also
-> > make sense to have a standardized DT property to indicate BRR should
-> > be used by default.
-> 
-> With device tree property it would be about the same situation as with phy
-> tunable, wouldn't? The tunable was already in the first version of this
-> patch and it (or DT property) is same type of solution, one knows in advance
-> which set of link modes to use. I personally feel the DT as better method,
-> because the IEEE/BRR selection is of hardware nature and cannot be easily
-> auto-detected - exactly what the DT is for.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6f4c61bc9252/disk-4b377b48.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/841f1b24d3a1/vmlinux-4b377b48.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/017b655dca3d/bzImage-4b377b48.xz
 
-If we decide IEEE and BRR are mutually exclusive because of the
-coupling, then this is clearly a hardware property. So DT, and maybe
-sometime in the future ACPI, is the correct way to describe this.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+233e6e0ea2ba2c86fa79@syzkaller.appspotmail.com
 
-> There is description of the LDS negotioation in BCM54810 datasheet saying
-> that if the PHY detects standard Ethernet link pulses on a wire pair, it
-> transitions automatically from BRR-LDS to Clause 28 auto-negotioation mode.
-> Thus, at least the 54810 can be set so that it starts in BRR mode and if
-> there is no BRR PHY at the other end and the other end is also set to
-> auto-negotiate (Clause-28), the auto-negotiation continues in IEEE mode and
-> potentially results in the PHY in IEEE mode. In this case, it would make
-> sense to have both BRR and IEEE link modes in same list and just start with
-> BRR, leaving on the PHY itself the decision to fall back to IEEE. The
-> process would be sub-optimal in most use cases - who would use BRR PHY in
-> hardwired IEEE circuit..?
-> 
-> However, I cannot promise to do such a driver because I do not have the
-> BCM54810 available nor it is my task here.
+Oops: divide error: 0000 [#1] PREEMPT SMP KASAN PTI
+CPU: 1 PID: 15391 Comm: syz-executor.0 Not tainted 6.9.0-syzkaller-08544-g4b377b4868ef #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+RIP: 0010:div_u64_rem include/linux/math64.h:29 [inline]
+RIP: 0010:div_u64 include/linux/math64.h:130 [inline]
+RIP: 0010:duration_to_length net/sched/sch_taprio.c:259 [inline]
+RIP: 0010:taprio_update_queue_max_sdu+0x287/0x870 net/sched/sch_taprio.c:288
+Code: be 08 00 00 00 e8 99 5b 6a f8 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 13 59 6a f8 48 8b 03 89 c1 48 89 e8 31 d2 <48> f7 f1 48 89 c5 48 83 7c 24 50 00 4c 8b 74 24 30 74 47 e8 c1 19
+RSP: 0018:ffffc9000506eb38 EFLAGS: 00010246
+RAX: 0000000000001f40 RBX: ffff88802f3562e0 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffff88802f3562e0
+RBP: 0000000000001f40 R08: ffff88802f3562e7 R09: 1ffff11005e6ac5c
+R10: dffffc0000000000 R11: ffffed1005e6ac5d R12: 00000000ffffffff
+R13: dffffc0000000000 R14: ffff88801ef59400 R15: 00000000003f0008
+FS:  00007fee340bf6c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b2c524000 CR3: 0000000024a52000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ taprio_change+0x2dce/0x42d0 net/sched/sch_taprio.c:1911
+ taprio_init+0x9da/0xc80 net/sched/sch_taprio.c:2112
+ qdisc_create+0x9d4/0x11a0 net/sched/sch_api.c:1355
+ tc_modify_qdisc+0xa26/0x1e40 net/sched/sch_api.c:1777
+ rtnetlink_rcv_msg+0x89b/0x10d0 net/core/rtnetlink.c:6595
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2564
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fee3327cee9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fee340bf0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fee333abf80 RCX: 00007fee3327cee9
+RDX: 0000000000000000 RSI: 00000000200007c0 RDI: 000000000000000e
+RBP: 00007fee332c949e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007fee333abf80 R15: 00007fff3d596598
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:div_u64_rem include/linux/math64.h:29 [inline]
+RIP: 0010:div_u64 include/linux/math64.h:130 [inline]
+RIP: 0010:duration_to_length net/sched/sch_taprio.c:259 [inline]
+RIP: 0010:taprio_update_queue_max_sdu+0x287/0x870 net/sched/sch_taprio.c:288
+Code: be 08 00 00 00 e8 99 5b 6a f8 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 13 59 6a f8 48 8b 03 89 c1 48 89 e8 31 d2 <48> f7 f1 48 89 c5 48 83 7c 24 50 00 4c 8b 74 24 30 74 47 e8 c1 19
+RSP: 0018:ffffc9000506eb38 EFLAGS: 00010246
+RAX: 0000000000001f40 RBX: ffff88802f3562e0 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffff88802f3562e0
+RBP: 0000000000001f40 R08: ffff88802f3562e7 R09: 1ffff11005e6ac5c
+R10: dffffc0000000000 R11: ffffed1005e6ac5d R12: 00000000ffffffff
+R13: dffffc0000000000 R14: ffff88801ef59400 R15: 00000000003f0008
+FS:  00007fee340bf6c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b31424000 CR3: 0000000024a52000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	be 08 00 00 00       	mov    $0x8,%esi
+   5:	e8 99 5b 6a f8       	call   0xf86a5ba3
+   a:	48 89 d8             	mov    %rbx,%rax
+   d:	48 c1 e8 03          	shr    $0x3,%rax
+  11:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1)
+  16:	74 08                	je     0x20
+  18:	48 89 df             	mov    %rbx,%rdi
+  1b:	e8 13 59 6a f8       	call   0xf86a5933
+  20:	48 8b 03             	mov    (%rbx),%rax
+  23:	89 c1                	mov    %eax,%ecx
+  25:	48 89 e8             	mov    %rbp,%rax
+  28:	31 d2                	xor    %edx,%edx
+* 2a:	48 f7 f1             	div    %rcx <-- trapping instruction
+  2d:	48 89 c5             	mov    %rax,%rbp
+  30:	48 83 7c 24 50 00    	cmpq   $0x0,0x50(%rsp)
+  36:	4c 8b 74 24 30       	mov    0x30(%rsp),%r14
+  3b:	74 47                	je     0x84
+  3d:	e8                   	.byte 0xe8
+  3e:	c1                   	.byte 0xc1
+  3f:	19                   	.byte 0x19
 
-That is fine. At the moment, we are just trying to explore all the
-corners before we decide how this should work. 802.3 should be our
-main guide, but also look at real hardware.
 
-> OK so back to the proposed new parameter for ethtool, the "linkmode" would
-> mean forced setting of  given link mode - so use the link_mode_masks as 1 of
-> N or just pass the link mode number as another parameter?
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-The autoneg off should be enough to indicate what the passed link mode
-means. However, it could also be placed into a new property it that
-seems more logical for the API. When it comes to the internal API, i
-think it will be a new member anyway.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-	Andrew
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
