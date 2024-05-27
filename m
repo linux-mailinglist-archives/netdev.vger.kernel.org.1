@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-98128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BFF78CF8E4
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 07:53:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 856B88CF8E7
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 07:54:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 415AD281DA3
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 05:53:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA5B61C20C06
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 05:54:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A1FDF60;
-	Mon, 27 May 2024 05:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 037D517BA7;
+	Mon, 27 May 2024 05:53:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="tlEGctGq"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Jk+BpbRB"
 X-Original-To: netdev@vger.kernel.org
 Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 005958F6B;
-	Mon, 27 May 2024 05:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4523FC08;
+	Mon, 27 May 2024 05:53:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716789220; cv=none; b=tDQ/YQgT7QAy5AbAhIsaChs/jw2UBX1kAygO8lUui13NtBVoUgSnpoBUV8hrjlfX5IZtFVN/saPajiNMroryayhAcgUzR5qJiB4rWgobp452C5IUV95ZghiUJjExL+UYwposq5WLCcOBnWG5Sn3v4uTW6dsLO6XIymZnaWWGuTc=
+	t=1716789222; cv=none; b=ZFXWxhYZBzq7shIKJ4qLYhIOqbkWyOuwlpU3BsDejBK/KNKkrLV8KS2woUZ+aAWHXbRqO3V1zBx68YHogAeBwxnoCCqXc53H20pIJVdcPxjuRgzB96aDuY2wiQehWYtqPQQuzymdSd1ADgMYAF01rHzO1wbPny7ueDBnD1yUpUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716789220; c=relaxed/simple;
-	bh=kKPPVUMD2TYcS5ShO5J9SKYPjEvVUGyhNEAlBK3Z70A=;
+	s=arc-20240116; t=1716789222; c=relaxed/simple;
+	bh=KPhHNNZwqVQu7mkUoXnmnzLCXc/FGDDcCdk5h4xswOw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Su0IRmPWVyJ7cokwYddjpcsXjZx1UcDWEse4f8ZwVlKslaLi/04LoIOPWNHlYPPwUjiwAUThJUOMXR9eW1Lsdk4SvbaC8DOpIgfNWzQ3ao51Aauom0l5YHPHtZq541G47PqQylFw8j41Fqq/EbVd2kMxUR4kvi7+Yi4Or8CFJUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=tlEGctGq; arc=none smtp.client-ip=198.47.19.141
+	 MIME-Version:Content-Type; b=IrBKjoG+Hyv7w6uDXb4uoqIRut5aJafF7kUywA6/MW0/sNkgiV9SooCc5yA1iSVFNtDvmU4SBXrGCKFxFygcwnFowg5tYQqlKT4laobjrUZuG30jeSw0Al8dDmQJXfKvJQzcLQnOaFX1Ks2fyG+a0Q/yAaksP1Vk+scSw/ukVTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Jk+BpbRB; arc=none smtp.client-ip=198.47.19.141
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44R5r6i7008513;
-	Mon, 27 May 2024 00:53:06 -0500
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44R5r83S008519;
+	Mon, 27 May 2024 00:53:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1716789186;
-	bh=7MgOY9kdreM+vPTMIhw2c2Lnd4ERhmEO9KYfTGuQAmc=;
+	s=ti-com-17Q1; t=1716789188;
+	bh=/Y0XRpFbrkYTG0zk/C1ky4FXffBmDpBKgqxDDQ2kDqs=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=tlEGctGqIr+xPrR0sONZQod0fE3Z+bOeqK7lcSPZeFhY6jDvVJ8qmuks6ZuKr2NyQ
-	 U4FQq9xrf87CuWSeG6QbJC6pI1Rd5fSOeeoHwNPk8gVgYEZWNcVEOnGLwyZtlfkmZF
-	 7OzcaVc/mchlny7Kdh4NNn0ICqwOhqwKITE8ZDFo=
-Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44R5r6XK073758
+	b=Jk+BpbRBWJTXNV/G2zOb8n97vmEsmy6epbnF9Dl+s9F0p31Rrf+e0kbox31AHV85F
+	 rvyuM1AFUwa5XEe4YMBI4GyyJnBihy9hM2nhQJObKhyFUhFm18kuvF5jsjAhATCj0+
+	 a/qLPyJBNuin8BCWfFMVx4OQbt0Rrsi+LE7QWDE8=
+Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44R5r8MN073780
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 27 May 2024 00:53:06 -0500
-Received: from DFLE100.ent.ti.com (10.64.6.21) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+	Mon, 27 May 2024 00:53:08 -0500
+Received: from DFLE106.ent.ti.com (10.64.6.27) by DFLE103.ent.ti.com
+ (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 27
- May 2024 00:53:06 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ May 2024 00:53:08 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE106.ent.ti.com
+ (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 27 May 2024 00:53:05 -0500
+ Frontend Transport; Mon, 27 May 2024 00:53:08 -0500
 Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44R5r6gl029843;
-	Mon, 27 May 2024 00:53:06 -0500
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44R5r8we065845;
+	Mon, 27 May 2024 00:53:08 -0500
 Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 44R5r5vm024844;
-	Mon, 27 May 2024 00:53:05 -0500
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 44R5r7JS024850;
+	Mon, 27 May 2024 00:53:07 -0500
 From: MD Danish Anwar <danishanwar@ti.com>
 To: Jan Kiszka <jan.kiszka@siemens.com>,
         Dan Carpenter
@@ -83,10 +83,12 @@ To: Jan Kiszka <jan.kiszka@siemens.com>,
         "David S.
  Miller" <davem@davemloft.net>
 CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>
-Subject: [PATCH net-next v7 1/2] net: ti: icssg: Move icss_iep structure
-Date: Mon, 27 May 2024 11:22:59 +0530
-Message-ID: <20240527055300.154563-2-danishanwar@ti.com>
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
+        Roger Quadros <rogerq@ti.com>,
+        Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Subject: [PATCH net-next v7 2/2] net: ti: icssg_prueth: add TAPRIO offload support
+Date: Mon, 27 May 2024 11:23:00 +0530
+Message-ID: <20240527055300.154563-3-danishanwar@ti.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240527055300.154563-1-danishanwar@ti.com>
 References: <20240527055300.154563-1-danishanwar@ti.com>
@@ -96,216 +98,527 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Move icss_iep structure definition and prueth_iep_gettime to icss_iep.h
-and icssg_prueth.h file respectively so that they can be used / accessed
-by all icssg driver files.
+From: Roger Quadros <rogerq@ti.com>
 
+ICSSG dual-emac f/w supports Enhanced Scheduled Traffic (EST – defined
+in P802.1Qbv/D2.2 that later got included in IEEE 802.1Q-2018)
+configuration. EST allows express queue traffic to be scheduled
+(placed) on the wire at specific repeatable time intervals. In
+Linux kernel, EST configuration is done through tc command and
+the taprio scheduler in the net core implements a software only
+scheduler (SCH_TAPRIO). If the NIC is capable of EST configuration,
+user indicate "flag 2" in the command which is then parsed by
+taprio scheduler in net core and indicate that the command is to
+be offloaded to h/w. taprio then offloads the command to the
+driver by calling ndo_setup_tc() ndo ops. This patch implements
+ndo_setup_tc() to offload EST configuration to ICSSG.
+
+Signed-off-by: Roger Quadros <rogerq@ti.com>
+Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 ---
- drivers/net/ethernet/ti/icssg/icss_iep.c     | 72 -------------------
- drivers/net/ethernet/ti/icssg/icss_iep.h     | 73 +++++++++++++++++++-
- drivers/net/ethernet/ti/icssg/icssg_prueth.c |  2 +-
- drivers/net/ethernet/ti/icssg/icssg_prueth.h |  2 +
- 4 files changed, 75 insertions(+), 74 deletions(-)
+Cc: Roger Quadros <rogerq@ti.com>
+Cc: Andrew Lunn <andrew@lunn.ch>
+Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
-index 3025e9c18970..915cd4fda53c 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.c
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
-@@ -52,78 +52,6 @@
- #define IEP_CAP_CFG_CAPNR_1ST_EVENT_EN(n)	BIT(LATCH_INDEX(n))
- #define IEP_CAP_CFG_CAP_ASYNC_EN(n)		BIT(LATCH_INDEX(n) + 10)
+ drivers/net/ethernet/ti/Kconfig              |   1 +
+ drivers/net/ethernet/ti/Makefile             |   3 +-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c |   3 +
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h |   3 +
+ drivers/net/ethernet/ti/icssg/icssg_qos.c    | 288 +++++++++++++++++++
+ drivers/net/ethernet/ti/icssg/icssg_qos.h    | 113 ++++++++
+ 6 files changed, 410 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.h
+
+diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
+index 1729eb0e0b41..3716d585f9a3 100644
+--- a/drivers/net/ethernet/ti/Kconfig
++++ b/drivers/net/ethernet/ti/Kconfig
+@@ -190,6 +190,7 @@ config TI_ICSSG_PRUETH
+ 	depends on PRU_REMOTEPROC
+ 	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
+ 	depends on PTP_1588_CLOCK_OPTIONAL
++	depends on NET_SCH_TAPRIO
+ 	help
+ 	  Support dual Gigabit Ethernet ports over the ICSSG PRU Subsystem.
+ 	  This subsystem is available starting with the AM65 platform.
+diff --git a/drivers/net/ethernet/ti/Makefile b/drivers/net/ethernet/ti/Makefile
+index 6e086b4c0384..28e794a8ecd1 100644
+--- a/drivers/net/ethernet/ti/Makefile
++++ b/drivers/net/ethernet/ti/Makefile
+@@ -39,7 +39,8 @@ icssg-prueth-y := icssg/icssg_prueth.o \
+ 		  icssg/icssg_config.o \
+ 		  icssg/icssg_mii_cfg.o \
+ 		  icssg/icssg_stats.o \
+-		  icssg/icssg_ethtool.o
++		  icssg/icssg_ethtool.o \
++		  icssg/icssg_qos.o
+ obj-$(CONFIG_TI_ICSSG_PRUETH_SR1) += icssg-prueth-sr1.o
+ icssg-prueth-sr1-y := icssg/icssg_prueth_sr1.o \
+ 		      icssg/icssg_common.o \
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+index 3bd5caf26851..e5d90534f5b8 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+@@ -685,6 +685,7 @@ static const struct net_device_ops emac_netdev_ops = {
+ 	.ndo_eth_ioctl = emac_ndo_ioctl,
+ 	.ndo_get_stats64 = emac_ndo_get_stats64,
+ 	.ndo_get_phys_port_name = emac_ndo_get_phys_port_name,
++	.ndo_setup_tc = icssg_qos_ndo_setup_tc,
+ };
  
--enum {
--	ICSS_IEP_GLOBAL_CFG_REG,
--	ICSS_IEP_GLOBAL_STATUS_REG,
--	ICSS_IEP_COMPEN_REG,
--	ICSS_IEP_SLOW_COMPEN_REG,
--	ICSS_IEP_COUNT_REG0,
--	ICSS_IEP_COUNT_REG1,
--	ICSS_IEP_CAPTURE_CFG_REG,
--	ICSS_IEP_CAPTURE_STAT_REG,
--
--	ICSS_IEP_CAP6_RISE_REG0,
--	ICSS_IEP_CAP6_RISE_REG1,
--
--	ICSS_IEP_CAP7_RISE_REG0,
--	ICSS_IEP_CAP7_RISE_REG1,
--
--	ICSS_IEP_CMP_CFG_REG,
--	ICSS_IEP_CMP_STAT_REG,
--	ICSS_IEP_CMP0_REG0,
--	ICSS_IEP_CMP0_REG1,
--	ICSS_IEP_CMP1_REG0,
--	ICSS_IEP_CMP1_REG1,
--
--	ICSS_IEP_CMP8_REG0,
--	ICSS_IEP_CMP8_REG1,
--	ICSS_IEP_SYNC_CTRL_REG,
--	ICSS_IEP_SYNC0_STAT_REG,
--	ICSS_IEP_SYNC1_STAT_REG,
--	ICSS_IEP_SYNC_PWIDTH_REG,
--	ICSS_IEP_SYNC0_PERIOD_REG,
--	ICSS_IEP_SYNC1_DELAY_REG,
--	ICSS_IEP_SYNC_START_REG,
--	ICSS_IEP_MAX_REGS,
--};
--
--/**
-- * struct icss_iep_plat_data - Plat data to handle SoC variants
-- * @config: Regmap configuration data
-- * @reg_offs: register offsets to capture offset differences across SoCs
-- * @flags: Flags to represent IEP properties
-- */
--struct icss_iep_plat_data {
--	struct regmap_config *config;
--	u32 reg_offs[ICSS_IEP_MAX_REGS];
--	u32 flags;
--};
--
--struct icss_iep {
--	struct device *dev;
--	void __iomem *base;
--	const struct icss_iep_plat_data *plat_data;
--	struct regmap *map;
--	struct device_node *client_np;
--	unsigned long refclk_freq;
--	int clk_tick_time;	/* one refclk tick time in ns */
--	struct ptp_clock_info ptp_info;
--	struct ptp_clock *ptp_clock;
--	struct mutex ptp_clk_mutex;	/* PHC access serializer */
--	spinlock_t irq_lock; /* CMP IRQ vs icss_iep_ptp_enable access */
--	u32 def_inc;
--	s16 slow_cmp_inc;
--	u32 slow_cmp_count;
--	const struct icss_iep_clockops *ops;
--	void *clockops_data;
--	u32 cycle_time_ns;
--	u32 perout_enabled;
--	bool pps_enabled;
--	int cap_cmp_irq;
--	u64 period;
--	u32 latch_enable;
--};
--
- /**
-  * icss_iep_get_count_hi() - Get the upper 32 bit IEP counter
-  * @iep: Pointer to structure representing IEP.
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.h b/drivers/net/ethernet/ti/icssg/icss_iep.h
-index 803a4b714893..ca84bfc56185 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.h
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.h
-@@ -12,7 +12,78 @@
- #include <linux/ptp_clock_kernel.h>
- #include <linux/regmap.h>
+ static int prueth_netdev_init(struct prueth *prueth,
+@@ -819,6 +820,8 @@ static int prueth_netdev_init(struct prueth *prueth,
+ 	emac->rx_hrtimer.function = &emac_rx_timer_callback;
+ 	prueth->emac[mac] = emac;
  
--struct icss_iep;
-+enum {
-+	ICSS_IEP_GLOBAL_CFG_REG,
-+	ICSS_IEP_GLOBAL_STATUS_REG,
-+	ICSS_IEP_COMPEN_REG,
-+	ICSS_IEP_SLOW_COMPEN_REG,
-+	ICSS_IEP_COUNT_REG0,
-+	ICSS_IEP_COUNT_REG1,
-+	ICSS_IEP_CAPTURE_CFG_REG,
-+	ICSS_IEP_CAPTURE_STAT_REG,
++	icssg_qos_tas_init(ndev);
 +
-+	ICSS_IEP_CAP6_RISE_REG0,
-+	ICSS_IEP_CAP6_RISE_REG1,
+ 	return 0;
+ 
+ free:
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+index 208fb78fb71f..7aa34345b865 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+@@ -37,6 +37,7 @@
+ #include "icssg_config.h"
+ #include "icss_iep.h"
+ #include "icssg_switch_map.h"
++#include "icssg_qos.h"
+ 
+ #define PRUETH_MAX_MTU          (2000 - ETH_HLEN - ETH_FCS_LEN)
+ #define PRUETH_MIN_PKT_SIZE     (VLAN_ETH_ZLEN)
+@@ -186,6 +187,8 @@ struct prueth_emac {
+ 
+ 	struct pruss_mem_region dram;
+ 
++	struct prueth_qos qos;
 +
-+	ICSS_IEP_CAP7_RISE_REG0,
-+	ICSS_IEP_CAP7_RISE_REG1,
+ 	struct delayed_work stats_work;
+ 	u64 stats[ICSSG_NUM_STATS];
+ 
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_qos.c b/drivers/net/ethernet/ti/icssg/icssg_qos.c
+new file mode 100644
+index 000000000000..5e93b1b9ca43
+--- /dev/null
++++ b/drivers/net/ethernet/ti/icssg/icssg_qos.c
+@@ -0,0 +1,288 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Texas Instruments ICSSG PRUETH QoS submodule
++ * Copyright (C) 2023 Texas Instruments Incorporated - http://www.ti.com/
++ */
 +
-+	ICSS_IEP_CMP_CFG_REG,
-+	ICSS_IEP_CMP_STAT_REG,
-+	ICSS_IEP_CMP0_REG0,
-+	ICSS_IEP_CMP0_REG1,
-+	ICSS_IEP_CMP1_REG0,
-+	ICSS_IEP_CMP1_REG1,
++#include <linux/printk.h>
++#include "icssg_prueth.h"
++#include "icssg_switch_map.h"
 +
-+	ICSS_IEP_CMP8_REG0,
-+	ICSS_IEP_CMP8_REG1,
-+	ICSS_IEP_SYNC_CTRL_REG,
-+	ICSS_IEP_SYNC0_STAT_REG,
-+	ICSS_IEP_SYNC1_STAT_REG,
-+	ICSS_IEP_SYNC_PWIDTH_REG,
-+	ICSS_IEP_SYNC0_PERIOD_REG,
-+	ICSS_IEP_SYNC1_DELAY_REG,
-+	ICSS_IEP_SYNC_START_REG,
-+	ICSS_IEP_MAX_REGS,
++static void tas_update_fw_list_pointers(struct prueth_emac *emac)
++{
++	struct tas_config *tas = &emac->qos.tas.config;
++
++	if ((readb(tas->active_list)) == TAS_LIST0) {
++		tas->fw_active_list = emac->dram.va + TAS_GATE_MASK_LIST0;
++		tas->fw_shadow_list = emac->dram.va + TAS_GATE_MASK_LIST1;
++	} else {
++		tas->fw_active_list = emac->dram.va + TAS_GATE_MASK_LIST1;
++		tas->fw_shadow_list = emac->dram.va + TAS_GATE_MASK_LIST0;
++	}
++}
++
++static void tas_update_maxsdu_table(struct prueth_emac *emac)
++{
++	struct tas_config *tas = &emac->qos.tas.config;
++	u16 __iomem *max_sdu_tbl_ptr;
++	u8 gate_idx;
++
++	/* update the maxsdu table */
++	max_sdu_tbl_ptr = emac->dram.va + TAS_QUEUE_MAX_SDU_LIST;
++
++	for (gate_idx = 0; gate_idx < TAS_MAX_NUM_QUEUES; gate_idx++)
++		writew(tas->max_sdu_table.max_sdu[gate_idx], &max_sdu_tbl_ptr[gate_idx]);
++}
++
++static void tas_reset(struct prueth_emac *emac)
++{
++	struct tas_config *tas = &emac->qos.tas.config;
++	int i;
++
++	for (i = 0; i < TAS_MAX_NUM_QUEUES; i++)
++		tas->max_sdu_table.max_sdu[i] = 2048;
++
++	tas_update_maxsdu_table(emac);
++
++	writeb(TAS_LIST0, tas->active_list);
++
++	memset_io(tas->fw_active_list, 0, sizeof(*tas->fw_active_list));
++	memset_io(tas->fw_shadow_list, 0, sizeof(*tas->fw_shadow_list));
++}
++
++static int tas_set_state(struct prueth_emac *emac, enum tas_state state)
++{
++	struct tas_config *tas = &emac->qos.tas.config;
++	int ret;
++
++	if (tas->state == state)
++		return 0;
++
++	switch (state) {
++	case TAS_STATE_RESET:
++		tas_reset(emac);
++		ret = emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_RESET);
++		tas->state = TAS_STATE_RESET;
++		break;
++	case TAS_STATE_ENABLE:
++		ret = emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_ENABLE);
++		tas->state = TAS_STATE_ENABLE;
++		break;
++	case TAS_STATE_DISABLE:
++		ret = emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_DISABLE);
++		tas->state = TAS_STATE_DISABLE;
++		break;
++	default:
++		netdev_err(emac->ndev, "%s: unsupported state\n", __func__);
++		ret = -EINVAL;
++		break;
++	}
++
++	if (ret)
++		netdev_err(emac->ndev, "TAS set state failed %d\n", ret);
++	return ret;
++}
++
++static int tas_set_trigger_list_change(struct prueth_emac *emac)
++{
++	struct tc_taprio_qopt_offload *admin_list = emac->qos.tas.taprio_admin;
++	struct tas_config *tas = &emac->qos.tas.config;
++	struct ptp_system_timestamp sts;
++	u32 change_cycle_count;
++	u32 cycle_time;
++	u64 base_time;
++	u64 cur_time;
++
++	/* IEP clock has a hardware errata due to which it wraps around exactly
++	 * once every taprio cycle. To compensate for that, adjust cycle time
++	 * by the wrap around time which is stored in emac->iep->def_inc
++	 */
++	cycle_time = admin_list->cycle_time - emac->iep->def_inc;
++	base_time = admin_list->base_time;
++	cur_time = prueth_iep_gettime(emac, &sts);
++
++	if (base_time > cur_time)
++		change_cycle_count = DIV_ROUND_UP_ULL(base_time - cur_time, cycle_time);
++	else
++		change_cycle_count = 1;
++
++	writel(cycle_time, emac->dram.va + TAS_ADMIN_CYCLE_TIME);
++	writel(change_cycle_count, emac->dram.va + TAS_CONFIG_CHANGE_CYCLE_COUNT);
++	writeb(admin_list->num_entries, emac->dram.va + TAS_ADMIN_LIST_LENGTH);
++
++	/* config_change cleared by f/w to ack reception of new shadow list */
++	writeb(1, &tas->config_list->config_change);
++	/* config_pending cleared by f/w when new shadow list is copied to active list */
++	writeb(1, &tas->config_list->config_pending);
++
++	return emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_TRIGGER);
++}
++
++static int tas_update_oper_list(struct prueth_emac *emac)
++{
++	struct tc_taprio_qopt_offload *admin_list = emac->qos.tas.taprio_admin;
++	struct tas_config *tas = &emac->qos.tas.config;
++	u32 tas_acc_gate_close_time = 0;
++	u8 idx, gate_idx, val;
++	int ret;
++
++	if (admin_list->cycle_time > TAS_MAX_CYCLE_TIME)
++		return -EINVAL;
++
++	tas_update_fw_list_pointers(emac);
++
++	for (idx = 0; idx < admin_list->num_entries; idx++) {
++		writeb(admin_list->entries[idx].gate_mask,
++		       &tas->fw_shadow_list->gate_mask_list[idx]);
++		tas_acc_gate_close_time += admin_list->entries[idx].interval;
++
++		/* extend last entry till end of cycle time */
++		if (idx == admin_list->num_entries - 1)
++			writel(admin_list->cycle_time,
++			       &tas->fw_shadow_list->win_end_time_list[idx]);
++		else
++			writel(tas_acc_gate_close_time,
++			       &tas->fw_shadow_list->win_end_time_list[idx]);
++	}
++
++	/* clear remaining entries */
++	for (idx = admin_list->num_entries; idx < TAS_MAX_CMD_LISTS; idx++) {
++		writeb(0, &tas->fw_shadow_list->gate_mask_list[idx]);
++		writel(0, &tas->fw_shadow_list->win_end_time_list[idx]);
++	}
++
++	/* update the Array of gate close time for each queue in each window */
++	for (idx = 0 ; idx < admin_list->num_entries; idx++) {
++		/* On Linux, only PRUETH_MAX_TX_QUEUES are supported per port */
++		for (gate_idx = 0; gate_idx < PRUETH_MAX_TX_QUEUES; gate_idx++) {
++			u8 gate_mask_list_idx = readb(&tas->fw_shadow_list->gate_mask_list[idx]);
++			u32 gate_close_time = 0;
++
++			if (gate_mask_list_idx & BIT(gate_idx))
++				gate_close_time = readl(&tas->fw_shadow_list->win_end_time_list[idx]);
++
++			writel(gate_close_time,
++			       &tas->fw_shadow_list->gate_close_time_list[idx][gate_idx]);
++		}
++	}
++
++	/* tell f/w to swap active & shadow list */
++	ret = tas_set_trigger_list_change(emac);
++	if (ret) {
++		netdev_err(emac->ndev, "failed to swap f/w config list: %d\n", ret);
++		return ret;
++	}
++
++	/* Wait for completion */
++	ret = readb_poll_timeout(&tas->config_list->config_change, val, !val,
++				 USEC_PER_MSEC, 10 * USEC_PER_MSEC);
++	if (ret) {
++		netdev_err(emac->ndev, "TAS list change completion time out\n");
++		return ret;
++	}
++
++	tas_update_fw_list_pointers(emac);
++
++	return 0;
++}
++
++static int emac_taprio_replace(struct net_device *ndev,
++			       struct tc_taprio_qopt_offload *taprio)
++{
++	struct prueth_emac *emac = netdev_priv(ndev);
++	int ret;
++
++	if (taprio->cycle_time_extension) {
++		NL_SET_ERR_MSG_MOD(taprio->extack, "Cycle time extension not supported");
++		return -EOPNOTSUPP;
++	}
++
++	if (taprio->cycle_time < TAS_MIN_CYCLE_TIME) {
++		NL_SET_ERR_MSG_FMT_MOD(taprio->extack, "cycle_time %llu is less than min supported cycle_time %d",
++				       taprio->cycle_time, TAS_MIN_CYCLE_TIME);
++		return -EINVAL;
++	}
++
++	if (taprio->num_entries > TAS_MAX_CMD_LISTS) {
++		NL_SET_ERR_MSG_FMT_MOD(taprio->extack, "num_entries %lu is more than max supported entries %d",
++				       taprio->num_entries, TAS_MAX_CMD_LISTS);
++		return -EINVAL;
++	}
++
++	if (emac->qos.tas.taprio_admin)
++		taprio_offload_free(emac->qos.tas.taprio_admin);
++
++	emac->qos.tas.taprio_admin = taprio_offload_get(taprio);
++	ret = tas_update_oper_list(emac);
++	if (ret)
++		goto clear_taprio;
++
++	ret = tas_set_state(emac, TAS_STATE_ENABLE);
++	if (ret)
++		goto clear_taprio;
++
++clear_taprio:
++	emac->qos.tas.taprio_admin = NULL;
++	taprio_offload_free(taprio);
++
++	return ret;
++}
++
++static int emac_taprio_destroy(struct net_device *ndev,
++			       struct tc_taprio_qopt_offload *taprio)
++{
++	struct prueth_emac *emac = netdev_priv(ndev);
++	int ret;
++
++	taprio_offload_free(taprio);
++
++	ret = tas_set_state(emac, TAS_STATE_RESET);
++	if (ret)
++		return ret;
++
++	return tas_set_state(emac, TAS_STATE_DISABLE);
++}
++
++static int emac_setup_taprio(struct net_device *ndev, void *type_data)
++{
++	struct tc_taprio_qopt_offload *taprio = type_data;
++	int ret;
++
++	switch (taprio->cmd) {
++	case TAPRIO_CMD_REPLACE:
++		ret = emac_taprio_replace(ndev, taprio);
++		break;
++	case TAPRIO_CMD_DESTROY:
++		ret = emac_taprio_destroy(ndev, taprio);
++		break;
++	default:
++		ret = -EOPNOTSUPP;
++	}
++
++	return ret;
++}
++
++int icssg_qos_ndo_setup_tc(struct net_device *ndev, enum tc_setup_type type,
++			   void *type_data)
++{
++	switch (type) {
++	case TC_SETUP_QDISC_TAPRIO:
++		return emac_setup_taprio(ndev, type_data);
++	default:
++		return -EOPNOTSUPP;
++	}
++}
++
++void icssg_qos_tas_init(struct net_device *ndev)
++{
++	struct prueth_emac *emac = netdev_priv(ndev);
++	struct tas_config *tas;
++
++	tas = &emac->qos.tas.config;
++
++	tas->config_list = emac->dram.va + TAS_CONFIG_CHANGE_TIME;
++	tas->active_list = emac->dram.va + TAS_ACTIVE_LIST_INDEX;
++
++	tas_update_fw_list_pointers(emac);
++
++	tas_set_state(emac, TAS_STATE_RESET);
++}
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_qos.h b/drivers/net/ethernet/ti/icssg/icssg_qos.h
+new file mode 100644
+index 000000000000..25baccdd1ce5
+--- /dev/null
++++ b/drivers/net/ethernet/ti/icssg/icssg_qos.h
+@@ -0,0 +1,113 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (C) 2023 Texas Instruments Incorporated - http://www.ti.com/
++ */
++
++#ifndef __NET_TI_ICSSG_QOS_H
++#define __NET_TI_ICSSG_QOS_H
++
++#include <linux/atomic.h>
++#include <linux/netdevice.h>
++#include <net/pkt_sched.h>
++
++/* Maximum number of gate command entries in each list. */
++#define TAS_MAX_CMD_LISTS   (16)
++
++/* Maximum number of transmit queues supported by implementation */
++#define TAS_MAX_NUM_QUEUES  (8)
++
++/* Minimum cycle time supported by implementation (in ns) */
++#define TAS_MIN_CYCLE_TIME  (1000000)
++
++/* Minimum cycle time supported by implementation (in ns) */
++#define TAS_MAX_CYCLE_TIME  (4000000000)
++
++/* Minimum TAS window duration supported by implementation (in ns) */
++#define TAS_MIN_WINDOW_DURATION  (10000)
++
++/**
++ * enum tas_list_num - TAS list number
++ * @TAS_LIST0: TAS list number is 0
++ * @TAS_LIST1: TAS list number is 1
++ */
++enum tas_list_num {
++	TAS_LIST0 = 0,
++	TAS_LIST1 = 1
 +};
 +
 +/**
-+ * struct icss_iep_plat_data - Plat data to handle SoC variants
-+ * @config: Regmap configuration data
-+ * @reg_offs: register offsets to capture offset differences across SoCs
-+ * @flags: Flags to represent IEP properties
++ * enum tas_state - State of TAS in firmware
++ * @TAS_STATE_DISABLE: TAS state machine is disabled.
++ * @TAS_STATE_ENABLE: TAS state machine is enabled.
++ * @TAS_STATE_RESET: TAS state machine is reset.
 + */
-+struct icss_iep_plat_data {
-+	struct regmap_config *config;
-+	u32 reg_offs[ICSS_IEP_MAX_REGS];
-+	u32 flags;
++enum tas_state {
++	TAS_STATE_DISABLE = 0,
++	TAS_STATE_ENABLE = 1,
++	TAS_STATE_RESET = 2,
 +};
 +
-+struct icss_iep {
-+	struct device *dev;
-+	void __iomem *base;
-+	const struct icss_iep_plat_data *plat_data;
-+	struct regmap *map;
-+	struct device_node *client_np;
-+	unsigned long refclk_freq;
-+	int clk_tick_time;	/* one refclk tick time in ns */
-+	struct ptp_clock_info ptp_info;
-+	struct ptp_clock *ptp_clock;
-+	struct mutex ptp_clk_mutex;	/* PHC access serializer */
-+	spinlock_t irq_lock; /* CMP IRQ vs icss_iep_ptp_enable access */
-+	u32 def_inc;
-+	s16 slow_cmp_inc;
-+	u32 slow_cmp_count;
-+	const struct icss_iep_clockops *ops;
-+	void *clockops_data;
-+	u32 cycle_time_ns;
-+	u32 perout_enabled;
-+	bool pps_enabled;
-+	int cap_cmp_irq;
-+	u64 period;
-+	u32 latch_enable;
++/**
++ * struct tas_config_list - Config state machine variables
++ * @config_change_time: New list is copied at this time
++ * @config_change_error_counter: Incremented if admin->BaseTime < current time
++ *				 and TAS_enabled is true
++ * @config_pending: True if list update is pending
++ * @config_change: Set to true when application trigger updating of admin list
++ *		   to active list, cleared when configChangeTime is updated
++ */
++struct tas_config_list {
++	u64 config_change_time;
++	u32 config_change_error_counter;
++	u8 config_pending;
++	u8 config_change;
 +};
 +
- extern const struct icss_iep_clockops prueth_iep_clockops;
- 
- /* Firmware specific clock operations */
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 1ea3fbd5e954..3bd5caf26851 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -284,7 +284,7 @@ static int emac_phy_connect(struct prueth_emac *emac)
- 	return 0;
- }
- 
--static u64 prueth_iep_gettime(void *clockops_data, struct ptp_system_timestamp *sts)
-+u64 prueth_iep_gettime(void *clockops_data, struct ptp_system_timestamp *sts)
- {
- 	u32 hi_rollover_count, hi_rollover_count_r;
- 	struct prueth_emac *emac = clockops_data;
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index a78c5eb75fb8..208fb78fb71f 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -320,6 +320,8 @@ void emac_stats_work_handler(struct work_struct *work);
- void emac_update_hardware_stats(struct prueth_emac *emac);
- int emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name);
- 
-+u64 prueth_iep_gettime(void *clockops_data, struct ptp_system_timestamp *sts);
++/* Max SDU table. See IEEE Std 802.1Q-2018 12.29.1.1 */
++struct tas_max_sdu_table {
++	u16 max_sdu[TAS_MAX_NUM_QUEUES];
++};
 +
- /* Common functions */
- void prueth_cleanup_rx_chns(struct prueth_emac *emac,
- 			    struct prueth_rx_chn *rx_chn,
++/**
++ * struct tas_firmware_list - TAS List Structure based on firmware memory map
++ * @gate_mask_list: Window gate mask list
++ * @win_end_time_list: Window end time list
++ * @gate_close_time_list: Array of gate close time for each queue in each window
++ */
++struct tas_firmware_list {
++	u8 gate_mask_list[TAS_MAX_CMD_LISTS];
++	u32 win_end_time_list[TAS_MAX_CMD_LISTS];
++	u32 gate_close_time_list[TAS_MAX_CMD_LISTS][TAS_MAX_NUM_QUEUES];
++};
++
++/**
++ * struct tas_config - Main Time Aware Shaper Handle
++ * @state: TAS state
++ * @max_sdu_table: Max SDU table
++ * @config_list: Config change variables
++ * @active_list: Current operating list operating list
++ * @fw_active_list: Active List pointer, used by firmware
++ * @fw_shadow_list: Shadow List pointer, used by driver
++ */
++struct tas_config {
++	enum tas_state state;
++	struct tas_max_sdu_table max_sdu_table;
++	struct tas_config_list __iomem *config_list;
++	u8 __iomem *active_list;
++	struct tas_firmware_list __iomem *fw_active_list;
++	struct tas_firmware_list __iomem *fw_shadow_list;
++};
++
++struct prueth_qos_tas {
++	struct tc_taprio_qopt_offload *taprio_admin;
++	struct tc_taprio_qopt_offload *taprio_oper;
++	struct tas_config config;
++};
++
++struct prueth_qos {
++	struct prueth_qos_tas tas;
++};
++
++void icssg_qos_tas_init(struct net_device *ndev);
++int icssg_qos_ndo_setup_tc(struct net_device *ndev, enum tc_setup_type type,
++			   void *type_data);
++#endif /* __NET_TI_ICSSG_QOS_H */
 -- 
 2.34.1
 
