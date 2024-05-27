@@ -1,200 +1,198 @@
-Return-Path: <netdev+bounces-98189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 286B58D0142
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 15:22:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40AD88D0170
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 15:27:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B7381F21803
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 13:22:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC0D7281CBF
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 13:27:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C3315ECFF;
-	Mon, 27 May 2024 13:22:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAA3D15ECF9;
+	Mon, 27 May 2024 13:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kwQT7jWa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E495C43AC1
-	for <netdev@vger.kernel.org>; Mon, 27 May 2024 13:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25B315ECE7;
+	Mon, 27 May 2024 13:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716816150; cv=none; b=HGVKmfulQ7zKxvh0KLPaqjRW9EfCI8A8D75tACKsUqIdOfEuNC6J3qw4tb9nmFUS0pfxhWg39jKsC+u7v1mIg56dUgTBF+dCf4sXyEC94/DYDUePG2OKiChBO094FPLGfjgFV+Xf8lS60GdBFbt1gGfzX+NACdO2GHHLzjo4HoM=
+	t=1716816461; cv=none; b=dl0pO2EGpGhKW/XEALB3aAk2CXUNQ/Xdb/TYfqoOAvyQH7WOS2uhP4KkR3lsRNL3S73TpHNU7XERrriuSaQPTf/k82/ahc4ry3dvIvnLECluIlILlfQcThpc4N9SlL2eyWLnZJAQVIdw5Php6AZ0zA6LlyUEa+5Cd48gUYFU6cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716816150; c=relaxed/simple;
-	bh=JWtt6Abdjck7XIpEK9UwFhE+Pqmzep9TYpawW/MOpSA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Q3T9s67oCwE1rKxp3O/9aEC0Kwx6EwIoOnTO1a+0ACNXlkl+MmKboScwU0Ze7C4dxaW0ZSMbpuO5gR8ImvZ2zZweeHfQkqNrxWAnQpPKgPOEq7AWVuaEc4UOXLrmJQt7Gdz+9NgIo2faWcVcX9u7tWBXyUiykv9UQHaK+7tjU80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3745fb76682so3644255ab.2
-        for <netdev@vger.kernel.org>; Mon, 27 May 2024 06:22:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716816148; x=1717420948;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7WZIq4G9PtxcmkzMzsJUrrOotpdeCmbsOBz+DCbbDC4=;
-        b=VfoMw1ve+foo6r/GoLD3HHm0NOufOW/0qnfxjAUrXgdL5lupgZcoAu5tVvCtZuxMLC
-         XwEuQkwN08zp7DfnokQTzjBWfR63bfk0HFDFyPUDQvI/KGg52DrIX/PNk7Rogw+Fz4SO
-         qoe1cs4QXK+AdByqdO/mZiDMnV0VWuOfbNOZ0fNKJRDVVkH2WUg4Lx4uviPB5vntilEO
-         dmLIUiMGBKcb0j3CtDFucxP3SQfQ034TqeM/eMF99vBdNX8sPXU9LBOdBVHxp+Iv+mRL
-         5HayROStGC2QyQVa8U7haasfVjM6KZj3VqBXpDrM9QBz0YcY0BRSb/5st5sA22DP/ac+
-         Z/sg==
-X-Forwarded-Encrypted: i=1; AJvYcCUyBbadU2ZICndIH6SLXs6WGN3KmEgnhEfzq+XTW0RkWz59D/bXDU56VsTMOY+bOIzRQX6KDouRrS8Juov+bMWtWK4XmXIT
-X-Gm-Message-State: AOJu0Ywkoj9oB4TLid0Gqo/xs3pN52p6uaJ59n1re90d8rUDAmT7Acmn
-	U+uVtnz+iFSlbvA9jorej1TCMTAr0F3Y749WhyIO8yXvqNCqZAW09/aKLT9UJMd0MSsB8qQ1tjX
-	l2hoJjZNGU6CZo6Gp7kPK27GbMwV92E4ZViyNM1II2/zzAQrM0oADi/U=
-X-Google-Smtp-Source: AGHT+IFiWnPYmjdm2RumhlqnAvIc6i8X7o4JX9hPFntNVse2StehRurPUlpwZ49d6cXFfVIK/zrPQ8sqyhs59oml4q1WMusuwZZH
+	s=arc-20240116; t=1716816461; c=relaxed/simple;
+	bh=PG17aG7jguWncrVjP8NipYKQkmc8tXJesn99NtwIu78=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QIx9/yn174eJJ93JI6VVzXKOU2jPdpE4c3+ZQMbFn5b5aPJbtJ6dXf7utRq1/MqPpbj7F+q6FbD30QkBge/KMU6Pi86mRkfvT6uX4hNyKGadGPd6hchskdDa0ps/JkoV+YZlUJkh5fLzsgSO4UkVSnxnd3/NnrMf9jxSQNopGRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kwQT7jWa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0480FC32781;
+	Mon, 27 May 2024 13:27:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716816461;
+	bh=PG17aG7jguWncrVjP8NipYKQkmc8tXJesn99NtwIu78=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kwQT7jWa4lQAXzmuLAM8NsQpZnd7dQc1YKLJaF0bJxQEQNwkAXksUPF+wjxY1mQP6
+	 mOkX5pw1P5aTzweCbh9XDLsARtxT8nNzWQsXzDD52KS0V6yT5xGLcAMq1qPyPh4re+
+	 XYuTl6h3mxIXhvRQAFg5Yii5DM4ncMfpQHqdJ0g0N77ZoqRzPSJOPBGwhXec+1KhJb
+	 3pA9T+klo0dfrmV2kwYkqR8XtluBIz+8NdaD9z27sEVP7Ed2coNhtQq/6cmg5PFfMF
+	 8kZcXs6qvKyWACPmMCPl79C0SrDBfivPiP/mP8hSgrlDnN0pLcJoit1lVhKkoeJy0f
+	 g31LDGZjMVoIw==
+Date: Mon, 27 May 2024 16:25:54 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, linux-mm@kvack.org,
+	Andrew Morton <akpm@linux-foundation.org>, bpf@vger.kernel.org,
+	Cong Wang <cong.wang@bytedance.com>,
+	Luis Chamberlain <mcgrof@kernel.org>
+Subject: Re: [Patch bpf] vmalloc: relax is_vmalloc_or_module_addr() check
+Message-ID: <ZlSJ4jl6-t02Us3i@kernel.org>
+References: <20240526230648.188550-1-xiyou.wangcong@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a41:b0:36d:d38e:3520 with SMTP id
- e9e14a558f8ab-3737b33d769mr8047805ab.4.1716816148086; Mon, 27 May 2024
- 06:22:28 -0700 (PDT)
-Date: Mon, 27 May 2024 06:22:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a6d9f506196f6826@google.com>
-Subject: [syzbot] [net?] divide error in taprio_update_queue_max_sdu
-From: syzbot <syzbot+233e6e0ea2ba2c86fa79@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com, 
-	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	vinicius.gomes@intel.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240526230648.188550-1-xiyou.wangcong@gmail.com>
 
-Hello,
+On Sun, May 26, 2024 at 04:06:48PM -0700, Cong Wang wrote:
+> From: Cong Wang <cong.wang@bytedance.com>
+> 
+> After commit 2c9e5d4a0082 ("bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of")
+> CONFIG_BPF_JIT does not depend on CONFIG_MODULES any more and bpf jit
+> also uses the MODULES_VADDR ~ MODULES_END memory region. But
+> is_vmalloc_or_module_addr() still checks CONFIG_MODULES, which then
+> returns false for a bpf jit memory region when CONFIG_MODULES is not
+> defined. It leads to the following kernel BUG:
+> 
+> [    1.567023] ------------[ cut here ]------------
+> [    1.567883] kernel BUG at mm/vmalloc.c:745!
+> [    1.568477] Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN NOPTI
+> [    1.569367] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.9.0+ #448
+> [    1.570247] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+> [    1.570786] RIP: 0010:vmalloc_to_page+0x48/0x1ec
+> [    1.570786] Code: 0f 00 00 e8 eb 1a 05 00 b8 37 00 00 00 48 ba fe ff ff ff ff 1f 00 00 4c 03 25 76 49 c6 02 48 c1 e0 28 48 01 e8 48 39 d0 76 02 <0f> 0b 4c 89 e7 e8 bf 1a 05 00 49 8b 04 24 48 a9 9f ff ff ff 0f 84
+> [    1.570786] RSP: 0018:ffff888007787960 EFLAGS: 00010212
+> [    1.570786] RAX: 000036ffa0000000 RBX: 0000000000000640 RCX: ffffffff8147e93c
+> [    1.570786] RDX: 00001ffffffffffe RSI: dffffc0000000000 RDI: ffffffff840e32c8
+> [    1.570786] RBP: ffffffffa0000000 R08: 0000000000000000 R09: 0000000000000000
+> [    1.570786] R10: ffff888007787a88 R11: ffffffff8475d8e7 R12: ffffffff83e80ff8
+> [    1.570786] R13: 0000000000000640 R14: 0000000000000640 R15: 0000000000000640
+> [    1.570786] FS:  0000000000000000(0000) GS:ffff88806cc00000(0000) knlGS:0000000000000000
+> [    1.570786] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [    1.570786] CR2: ffff888006a01000 CR3: 0000000003e80000 CR4: 0000000000350ef0
+> [    1.570786] Call Trace:
+> [    1.570786]  <TASK>
+> [    1.570786]  ? __die_body+0x1b/0x58
+> [    1.570786]  ? die+0x31/0x4b
+> [    1.570786]  ? do_trap+0x9d/0x138
+> [    1.570786]  ? vmalloc_to_page+0x48/0x1ec
+> [    1.570786]  ? do_error_trap+0xcd/0x102
+> [    1.570786]  ? vmalloc_to_page+0x48/0x1ec
+> [    1.570786]  ? vmalloc_to_page+0x48/0x1ec
+> [    1.570786]  ? handle_invalid_op+0x2f/0x38
+> [    1.570786]  ? vmalloc_to_page+0x48/0x1ec
+> [    1.570786]  ? exc_invalid_op+0x2b/0x41
+> [    1.570786]  ? asm_exc_invalid_op+0x16/0x20
+> [    1.570786]  ? vmalloc_to_page+0x26/0x1ec
+> [    1.570786]  ? vmalloc_to_page+0x48/0x1ec
+> [    1.570786]  __text_poke+0xb6/0x458
+> [    1.570786]  ? __pfx_text_poke_memcpy+0x10/0x10
+> [    1.570786]  ? __pfx___mutex_lock+0x10/0x10
+> [    1.570786]  ? __pfx___text_poke+0x10/0x10
+> [    1.570786]  ? __pfx_get_random_u32+0x10/0x10
+> [    1.570786]  ? srso_return_thunk+0x5/0x5f
+> [    1.570786]  text_poke_copy_locked+0x70/0x84
+> [    1.570786]  text_poke_copy+0x32/0x4f
+> [    1.570786]  bpf_arch_text_copy+0xf/0x27
+> [    1.570786]  bpf_jit_binary_pack_finalize+0x26/0x5a
+> [    1.570786]  bpf_int_jit_compile+0x576/0x8ad
+> [    1.570786]  ? __pfx_bpf_int_jit_compile+0x10/0x10
+> [    1.570786]  ? srso_return_thunk+0x5/0x5f
+> [    1.570786]  ? __kmalloc_node_track_caller+0x2b5/0x2e0
+> [    1.570786]  bpf_prog_select_runtime+0x7c/0x199
+> [    1.570786]  bpf_prepare_filter+0x1e9/0x25b
+> [    1.570786]  ? __pfx_bpf_prepare_filter+0x10/0x10
+> [    1.570786]  ? srso_return_thunk+0x5/0x5f
+> [    1.570786]  ? _find_next_bit+0x29/0x7e
+> [    1.570786]  bpf_prog_create+0xb8/0xe0
+> [    1.570786]  ptp_classifier_init+0x75/0xa1
+> [    1.570786]  ? __pfx_ptp_classifier_init+0x10/0x10
+> [    1.570786]  ? srso_return_thunk+0x5/0x5f
+> [    1.570786]  ? register_pernet_subsys+0x36/0x42
+> [    1.570786]  ? srso_return_thunk+0x5/0x5f
+> [    1.570786]  sock_init+0x99/0xa3
+> [    1.570786]  ? __pfx_sock_init+0x10/0x10
+> [    1.570786]  do_one_initcall+0x104/0x2c4
+> [    1.570786]  ? __pfx_do_one_initcall+0x10/0x10
+> [    1.570786]  ? parameq+0x25/0x2d
+> [    1.570786]  ? rcu_is_watching+0x1c/0x3c
+> [    1.570786]  ? trace_kmalloc+0x81/0xb2
+> [    1.570786]  ? srso_return_thunk+0x5/0x5f
+> [    1.570786]  ? __kmalloc+0x29c/0x2c7
+> [    1.570786]  ? srso_return_thunk+0x5/0x5f
+> [    1.570786]  do_initcalls+0xf9/0x123
+> [    1.570786]  kernel_init_freeable+0x24f/0x289
+> [    1.570786]  ? __pfx_kernel_init+0x10/0x10
+> [    1.570786]  kernel_init+0x19/0x13a
+> [    1.570786]  ret_from_fork+0x24/0x41
+> [    1.570786]  ? __pfx_kernel_init+0x10/0x10
+> [    1.570786]  ret_from_fork_asm+0x1a/0x30
+> [    1.570786]  </TASK>
+> [    1.570819] ---[ end trace 0000000000000000 ]---
+> [    1.571463] RIP: 0010:vmalloc_to_page+0x48/0x1ec
+> [    1.572111] Code: 0f 00 00 e8 eb 1a 05 00 b8 37 00 00 00 48 ba fe ff ff ff ff 1f 00 00 4c 03 25 76 49 c6 02 48 c1 e0 28 48 01 e8 48 39 d0 76 02 <0f> 0b 4c 89 e7 e8 bf 1a 05 00 49 8b 04 24 48 a9 9f ff ff ff 0f 84
+> [    1.574632] RSP: 0018:ffff888007787960 EFLAGS: 00010212
+> [    1.575129] RAX: 000036ffa0000000 RBX: 0000000000000640 RCX: ffffffff8147e93c
+> [    1.576097] RDX: 00001ffffffffffe RSI: dffffc0000000000 RDI: ffffffff840e32c8
+> [    1.577084] RBP: ffffffffa0000000 R08: 0000000000000000 R09: 0000000000000000
+> [    1.578077] R10: ffff888007787a88 R11: ffffffff8475d8e7 R12: ffffffff83e80ff8
+> [    1.578810] R13: 0000000000000640 R14: 0000000000000640 R15: 0000000000000640
+> [    1.579823] FS:  0000000000000000(0000) GS:ffff88806cc00000(0000) knlGS:0000000000000000
+> [    1.580992] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [    1.581869] CR2: ffff888006a01000 CR3: 0000000003e80000 CR4: 0000000000350ef0
+> [    1.582800] Kernel panic - not syncing: Fatal exception
+> [    1.583765] ---[ end Kernel panic - not syncing: Fatal exception ]---
+> 
+> Fixes: 2c9e5d4a0082 ("bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of")
+> Cc: Luis Chamberlain <mcgrof@kernel.org>
+> Cc: Mike Rapoport (IBM) <rppt@kernel.org>
+> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+> ---
+>  mm/vmalloc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/mm/vmalloc.c b/mm/vmalloc.c
+> index 125427cbdb87..168a5c7c2fdf 100644
+> --- a/mm/vmalloc.c
+> +++ b/mm/vmalloc.c
+> @@ -714,7 +714,7 @@ int is_vmalloc_or_module_addr(const void *x)
+>  	 * and fall back on vmalloc() if that fails. Others
+>  	 * just put it in the vmalloc space.
+>  	 */
+> -#if defined(CONFIG_MODULES) && defined(MODULES_VADDR)
+> +#if defined(MODULES_VADDR)
 
-syzbot found the following issue on:
+Let's make it 
 
-HEAD commit:    4b377b4868ef kprobe/ftrace: fix build error due to bad fun..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=11ab31a4980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=17ffd15f654c98ba
-dashboard link: https://syzkaller.appspot.com/bug?extid=233e6e0ea2ba2c86fa79
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+#if defined(CONFIG_EXECMEM) && defined(MODULES_VADDR)
 
-Unfortunately, I don't have any reproducer for this issue yet.
+to avoid increasing kernel size on systems that don't use modules and BPF
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6f4c61bc9252/disk-4b377b48.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/841f1b24d3a1/vmlinux-4b377b48.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/017b655dca3d/bzImage-4b377b48.xz
+>  	unsigned long addr = (unsigned long)kasan_reset_tag(x);
+>  	if (addr >= MODULES_VADDR && addr < MODULES_END)
+>  		return 1;
+> -- 
+> 2.34.1
+> 
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+233e6e0ea2ba2c86fa79@syzkaller.appspotmail.com
-
-Oops: divide error: 0000 [#1] PREEMPT SMP KASAN PTI
-CPU: 1 PID: 15391 Comm: syz-executor.0 Not tainted 6.9.0-syzkaller-08544-g4b377b4868ef #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-RIP: 0010:div_u64_rem include/linux/math64.h:29 [inline]
-RIP: 0010:div_u64 include/linux/math64.h:130 [inline]
-RIP: 0010:duration_to_length net/sched/sch_taprio.c:259 [inline]
-RIP: 0010:taprio_update_queue_max_sdu+0x287/0x870 net/sched/sch_taprio.c:288
-Code: be 08 00 00 00 e8 99 5b 6a f8 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 13 59 6a f8 48 8b 03 89 c1 48 89 e8 31 d2 <48> f7 f1 48 89 c5 48 83 7c 24 50 00 4c 8b 74 24 30 74 47 e8 c1 19
-RSP: 0018:ffffc9000506eb38 EFLAGS: 00010246
-RAX: 0000000000001f40 RBX: ffff88802f3562e0 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffff88802f3562e0
-RBP: 0000000000001f40 R08: ffff88802f3562e7 R09: 1ffff11005e6ac5c
-R10: dffffc0000000000 R11: ffffed1005e6ac5d R12: 00000000ffffffff
-R13: dffffc0000000000 R14: ffff88801ef59400 R15: 00000000003f0008
-FS:  00007fee340bf6c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b2c524000 CR3: 0000000024a52000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- taprio_change+0x2dce/0x42d0 net/sched/sch_taprio.c:1911
- taprio_init+0x9da/0xc80 net/sched/sch_taprio.c:2112
- qdisc_create+0x9d4/0x11a0 net/sched/sch_api.c:1355
- tc_modify_qdisc+0xa26/0x1e40 net/sched/sch_api.c:1777
- rtnetlink_rcv_msg+0x89b/0x10d0 net/core/rtnetlink.c:6595
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2564
- netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
- netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
- netlink_sendmsg+0x8e1/0xcb0 net/netlink/af_netlink.c:1905
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:745
- ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
- ___sys_sendmsg net/socket.c:2638 [inline]
- __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fee3327cee9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fee340bf0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fee333abf80 RCX: 00007fee3327cee9
-RDX: 0000000000000000 RSI: 00000000200007c0 RDI: 000000000000000e
-RBP: 00007fee332c949e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007fee333abf80 R15: 00007fff3d596598
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:div_u64_rem include/linux/math64.h:29 [inline]
-RIP: 0010:div_u64 include/linux/math64.h:130 [inline]
-RIP: 0010:duration_to_length net/sched/sch_taprio.c:259 [inline]
-RIP: 0010:taprio_update_queue_max_sdu+0x287/0x870 net/sched/sch_taprio.c:288
-Code: be 08 00 00 00 e8 99 5b 6a f8 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df e8 13 59 6a f8 48 8b 03 89 c1 48 89 e8 31 d2 <48> f7 f1 48 89 c5 48 83 7c 24 50 00 4c 8b 74 24 30 74 47 e8 c1 19
-RSP: 0018:ffffc9000506eb38 EFLAGS: 00010246
-RAX: 0000000000001f40 RBX: ffff88802f3562e0 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffff88802f3562e0
-RBP: 0000000000001f40 R08: ffff88802f3562e7 R09: 1ffff11005e6ac5c
-R10: dffffc0000000000 R11: ffffed1005e6ac5d R12: 00000000ffffffff
-R13: dffffc0000000000 R14: ffff88801ef59400 R15: 00000000003f0008
-FS:  00007fee340bf6c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b31424000 CR3: 0000000024a52000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	be 08 00 00 00       	mov    $0x8,%esi
-   5:	e8 99 5b 6a f8       	call   0xf86a5ba3
-   a:	48 89 d8             	mov    %rbx,%rax
-   d:	48 c1 e8 03          	shr    $0x3,%rax
-  11:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1)
-  16:	74 08                	je     0x20
-  18:	48 89 df             	mov    %rbx,%rdi
-  1b:	e8 13 59 6a f8       	call   0xf86a5933
-  20:	48 8b 03             	mov    (%rbx),%rax
-  23:	89 c1                	mov    %eax,%ecx
-  25:	48 89 e8             	mov    %rbp,%rax
-  28:	31 d2                	xor    %edx,%edx
-* 2a:	48 f7 f1             	div    %rcx <-- trapping instruction
-  2d:	48 89 c5             	mov    %rax,%rbp
-  30:	48 83 7c 24 50 00    	cmpq   $0x0,0x50(%rsp)
-  36:	4c 8b 74 24 30       	mov    0x30(%rsp),%r14
-  3b:	74 47                	je     0x84
-  3d:	e8                   	.byte 0xe8
-  3e:	c1                   	.byte 0xc1
-  3f:	19                   	.byte 0x19
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+Sincerely yours,
+Mike.
 
