@@ -1,353 +1,168 @@
-Return-Path: <netdev+bounces-98334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FD488D0EB5
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 22:40:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BE8D8D0EC6
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 22:52:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A2741F2238A
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 20:40:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 393A31F21ABB
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 20:52:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315D4161337;
-	Mon, 27 May 2024 20:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD8D41C62;
+	Mon, 27 May 2024 20:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iu/hZoti"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VcbWi//G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB591667C5
-	for <netdev@vger.kernel.org>; Mon, 27 May 2024 20:40:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319EC20DC5
+	for <netdev@vger.kernel.org>; Mon, 27 May 2024 20:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716842410; cv=none; b=i8UTQNr+tYwDdnLssUJgNyR1vLH7vREZIbJnFrg/W5kU/D58jmR3bfniJS8DXt5EWgLO9zCwk6cIBuB8KzwEH2ltDINaONb4vYHFeJnopHUY13Rw3vZU565qWLY0gaf6+faI01SX52UZruMBvsKc9SYN8vlFbITvDU3ML7JOT9k=
+	t=1716843156; cv=none; b=F/wNJZZC0k+EVqOHhPFuCRAOcaPgse48+NenLbRzZMaZj6Y/Sn+/p/iEyRwq9WbHQ5u4gGZP/6d4AHY9dy+i6rSvJuLouFZzucc4r2/D0OVu/v8mDfO/YJwXDz2bMilZw4c9dnViRz2ruhDr2VH9+3KR63wfuf5OyW/D7XQEGlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716842410; c=relaxed/simple;
-	bh=QEDUcXLYPod3TCeqVzw6odR8z8ucrBXzxst8km6ZMv8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tpNgHbeeVGIVSrJaal2VDvi8OfSyQxdv30umvkYyXj9hs9FDvrgjIXlGGHAg9qxhOL3JxiquN1Qy0IVqrlj9MjtAA+RwY8S1p04CFcPbNs6hZz19Be28PMcxqpSnFvI081zV4keHgVyDZfGb5kPM0rMKqYzCLXUoCLK+793keVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Iu/hZoti; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2bf5baa5b76so24357a91.0
-        for <netdev@vger.kernel.org>; Mon, 27 May 2024 13:40:08 -0700 (PDT)
+	s=arc-20240116; t=1716843156; c=relaxed/simple;
+	bh=wudtqjXegGU2LtEgfC5Ee2aj9ydGYtWtwEHcvXo/4S0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=q6AlBhQfpWGZM8vQZUq898+/xFZS0my25pCkA3Zj2d1a+fLRC5WSCMY+sG+NZ6Mc4eWHKYrZIx5UBLlLD8XgVnALScXQ6TVX6+Yhs8g4M3/QdQkyKSbkb4qBIwQDVKI8NIsUfNMxfIUkleEu9mCHc4n6YqX+d6iH93MEQXpGSIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VcbWi//G; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-df789a425d3so184990276.2
+        for <netdev@vger.kernel.org>; Mon, 27 May 2024 13:52:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716842407; x=1717447207; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p9SYB0nj4wIAdX2Hiz3uUFFrcpPBpW84SfgnlGhZvmg=;
-        b=Iu/hZotiM3n0gt0J7vboTYRpas34B68T6KFxtQhmWiGB2Rf1rGLKoazrw9bTx0/EyG
-         50JIVOCPMdHhpwfiv5BiU/XSjlVqejXUXwNj2cJpiZTfed0iOgQQT//NzWO+eglWET4e
-         4WAeQgxyKi6Ed5K+fj2yiSSXCU/heToCJbiDEAiXT/Owo0yR4/lnxAIgHEX/EJYHJZ5d
-         4rA9j3XK05rylynSth1c0lrKH2F0yp8HrWO9MQIYO9k9tnLPyYjUAu9vKWRpVmHYT2fj
-         Ikg0/GArjGBUckmmGAM5PU1C1n/rRdV8Y6nyvOcF7S0ocJoooLaCq8xU2JT283ERqlkc
-         JjDQ==
+        d=google.com; s=20230601; t=1716843154; x=1717447954; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bdSWbeuLkDTbi8rWZxWdxrTiYH7VS1P/CmuJ+z7yq7o=;
+        b=VcbWi//GhbGv/psMmJLARTlU7QOQVYkrDvHl9GhF36Qs8bmMpqPbvGF6QTbQuatn/c
+         Gn+BFhA5duxUdP6+EOHXzcBHowiQxDzoq4faeSiJTQRr6Ao0FNLyFqS/bpNwvCNqPsVw
+         M6f/AV+L4KKuGellOYL1KZs5GHLH6nJx4sZ8Lt6JPlwvzof/J/S4NIzSEdfFaIVne3Rf
+         By/Hzlknqj0L41sS0rMZik5jcuxoucULuBPpLkFZPNoaGhSpo5jLMoQtBTjPpVpu6xVg
+         mxYuBVs72E4r0ePDm3NqtigcAi7L2ev1FO3vItUjlxhuFMpv4niCtT41icMVP6ZD+M5E
+         whwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716842407; x=1717447207;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=p9SYB0nj4wIAdX2Hiz3uUFFrcpPBpW84SfgnlGhZvmg=;
-        b=XCsyTZw+zrEq80rAPZYZ4PeMD5JFgZlRRnDzJOkPzQ8te08VeT9nmDb39iwJABapgg
-         qa2ZSOxvtlGMncBCSyWsLp8pLie/TbkwJCwdtRQTfTv+R81q5s6+AULFKTZzLre/ojjE
-         LhzUQvYhwy0eryCHRIELas/pxG+XJqEGNeLtc1wiYJ7kN2kNZu+CJwr/adMINAi0m+wQ
-         bkzHDb+WMtFN3Z8o8Y/7vq2lKYtFnJ1syv7MOVQysQQ1gBrEVQqFELlMsw8foPIzYaUf
-         xW7ScM/S7JLDvqwHhySkPrijEOQPZ4JRtNCHjDEdZ+Xsxfj7G6A4T8r45EbL4ivaZxYz
-         hkfQ==
-X-Gm-Message-State: AOJu0Yyas8eTKGGcV7NCS89DgyuR0eL9qiPIpMAt/YBLXjI1+Gm6Cdsi
-	lGvBcMdHlbLdNPq3B/aFUk1tKTYtSbMbz5wAdRROkRNLcF/gcdGoBdmP4apD
-X-Google-Smtp-Source: AGHT+IE+VZvcSq8p5g38Q0ugTu/QlqHQ6eVwWGwdwuu93ND+2UBxOSRisWIExkhiKXXmmKGRat+2vg==
-X-Received: by 2002:a17:902:db11:b0:1f4:5ad1:b659 with SMTP id d9443c01a7336-1f45ad1c3ecmr100212305ad.3.1716842407572;
-        Mon, 27 May 2024 13:40:07 -0700 (PDT)
-Received: from rpi.. (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f4960ca3f6sm26502925ad.164.2024.05.27.13.40.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 May 2024 13:40:07 -0700 (PDT)
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-To: netdev@vger.kernel.org
-Cc: andrew@lunn.ch,
-	horms@kernel.org,
-	kuba@kernel.org,
-	jiri@resnulli.us,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	hfdevel@gmx.net,
-	naveenm@marvell.com,
-	jdamato@fastly.com
-Subject: [PATCH net-next v7 6/6] net: tn40xx: add phylink support
-Date: Tue, 28 May 2024 05:39:28 +0900
-Message-Id: <20240527203928.38206-7-fujita.tomonori@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240527203928.38206-1-fujita.tomonori@gmail.com>
-References: <20240527203928.38206-1-fujita.tomonori@gmail.com>
+        d=1e100.net; s=20230601; t=1716843154; x=1717447954;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bdSWbeuLkDTbi8rWZxWdxrTiYH7VS1P/CmuJ+z7yq7o=;
+        b=H5/1a7MkwkJ+rVW6ufzaY9amLrptH7FRQ8cZLv6sbn8lacn45Kox4CtD8Em5uJXuPT
+         /RBvXo8kA31DDkeUfMsiR9Rhw+XLScliSiNTA0Ye6vJF94eeNkvN5CiPSlC4Pe5miPkx
+         cgmfgqx3GdZUrtLjNAYOohTmJ90eNlev2XPIzIkjVEm+s6ykihomVyvpBoWEWBcRgPgg
+         q7jo4/pGKlif0P+Z5+sl3LmmBPuM/Ed98bXYBzvMbX97wa4+5DD9bjjEaCg5DmD3jMkH
+         iJYjJ+bb3VJCpeulBzqCTthp/SkT8g5Rfk1W6pCwzmHAeRIJXGoiMpT51MiYii7TGjvM
+         RJvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWf9HQ/VYhigdmKyZK7UGcdLlKFp4sjhmAvTB25Pqnd5kSGbVFNb+dFloI1pMltAujpgt4Cp6mJzyeiT+t3M+T1sy3Q+5mX
+X-Gm-Message-State: AOJu0YymhK6pocqaKpMX+m1cJUXVoTCiWrjBtNaKlC0JT9fYagAMJg6r
+	6re2HL2OW2vFSrzGkUtt5lb2iSEf2CYqqXmsO3jIZr7MO8x4n8XeJdFvsfvZdZCAfu5AyyTtWgE
+	1HQ==
+X-Google-Smtp-Source: AGHT+IHDLacknHXmGIL0fTHZIViFSMUziqkpSLS4ou7PKscFtSM39cprVmoLrkxlA8wxM5OY6SXv9Fa4dTU=
+X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
+ (user=gnoack job=sendgmr) by 2002:a25:943:0:b0:dce:5218:c89b with SMTP id
+ 3f1490d57ef6-df77217397cmr911644276.5.1716843154243; Mon, 27 May 2024
+ 13:52:34 -0700 (PDT)
+Date: Mon, 27 May 2024 22:52:31 +0200
+In-Reply-To: <20240524093015.2402952-5-ivanov.mikhail1@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20240524093015.2402952-1-ivanov.mikhail1@huawei-partners.com> <20240524093015.2402952-5-ivanov.mikhail1@huawei-partners.com>
+Message-ID: <ZlTyj_0g-E4oM22G@google.com>
+Subject: Re: [RFC PATCH v2 04/12] selftests/landlock: Add protocol.socket_access_rights
+ to socket tests
+From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-This patch adds supports for multiple PHY hardware with phylink. The
-adapters with TN40xx chips use multiple PHY hardware; AMCC QT2025, TI
-TLK10232, Aqrate AQR105, and Marvell 88X3120, 88X3310, and MV88E2010.
+Hello!
 
-For now, the PCI ID table of this driver enables adapters using only
-QT2025 PHY. I've tested this driver and the QT2025 PHY driver (SFP+
-10G SR) with Edimax EN-9320 10G adapter.
+I see that this test is adapted from the network_access_rights test in
+net_test.c, and some of the subsequent are similarly copied from there.  It
+makes it hard to criticize the code, because being a little bit consistent =
+is
+probably a good thing.  Have you found any opportunities to extract
+commonalities into common.h?
 
-Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
----
- drivers/net/ethernet/tehuti/Kconfig    |  1 +
- drivers/net/ethernet/tehuti/Makefile   |  2 +-
- drivers/net/ethernet/tehuti/tn40.c     | 35 ++++++++++--
- drivers/net/ethernet/tehuti/tn40.h     |  8 +++
- drivers/net/ethernet/tehuti/tn40_phy.c | 73 ++++++++++++++++++++++++++
- 5 files changed, 115 insertions(+), 4 deletions(-)
- create mode 100644 drivers/net/ethernet/tehuti/tn40_phy.c
+On Fri, May 24, 2024 at 05:30:07PM +0800, Mikhail Ivanov wrote:
+> Add test that checks possibility of adding rule with every possible
+> access right.
+>=20
+> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+> ---
+>=20
+> Changes since v1:
+> * Formats code with clang-format.
+> * Refactors commit message.
+> ---
+>  .../testing/selftests/landlock/socket_test.c  | 28 +++++++++++++++++++
+>  1 file changed, 28 insertions(+)
+>=20
+> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testi=
+ng/selftests/landlock/socket_test.c
+> index 4c51f89ed578..eb5d62263460 100644
+> --- a/tools/testing/selftests/landlock/socket_test.c
+> +++ b/tools/testing/selftests/landlock/socket_test.c
+> @@ -178,4 +178,32 @@ TEST_F(protocol, create)
+>  	ASSERT_EQ(EAFNOSUPPORT, test_socket(&self->unspec_srv0));
+>  }
+> =20
+> +TEST_F(protocol, socket_access_rights)
+> +{
+> +	const struct landlock_ruleset_attr ruleset_attr =3D {
+> +		.handled_access_socket =3D ACCESS_ALL,
+> +	};
+> +	struct landlock_socket_attr protocol =3D {
+> +		.family =3D self->srv0.protocol.family,
+> +		.type =3D self->srv0.protocol.type,
+> +	};
+> +	int ruleset_fd;
+> +	__u64 access;
+> +
+> +	ruleset_fd =3D
+> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
+> +	ASSERT_LE(0, ruleset_fd);
+> +
+> +	for (access =3D 1; access <=3D ACCESS_LAST; access <<=3D 1) {
+> +		protocol.allowed_access =3D access;
+> +		EXPECT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
+> +					       &protocol, 0))
+> +		{
+> +			TH_LOG("Failed to add rule with access 0x%llx: %s",
+> +			       access, strerror(errno));
+> +		}
+> +	}
+> +	EXPECT_EQ(0, close(ruleset_fd));
 
-diff --git a/drivers/net/ethernet/tehuti/Kconfig b/drivers/net/ethernet/tehuti/Kconfig
-index 2b3b5a8c7fbf..6db2c9817445 100644
---- a/drivers/net/ethernet/tehuti/Kconfig
-+++ b/drivers/net/ethernet/tehuti/Kconfig
-@@ -28,6 +28,7 @@ config TEHUTI_TN40
- 	depends on PCI
- 	select PAGE_POOL
- 	select FW_LOADER
-+	select PHYLINK
- 	help
- 	  This driver supports 10G Ethernet adapters using Tehuti Networks
- 	  TN40xx chips. Currently, adapters with Applied Micro Circuits
-diff --git a/drivers/net/ethernet/tehuti/Makefile b/drivers/net/ethernet/tehuti/Makefile
-index 7a0fe586a243..0d4f4d63a65c 100644
---- a/drivers/net/ethernet/tehuti/Makefile
-+++ b/drivers/net/ethernet/tehuti/Makefile
-@@ -5,5 +5,5 @@
- 
- obj-$(CONFIG_TEHUTI) += tehuti.o
- 
--tn40xx-y := tn40.o tn40_mdio.o
-+tn40xx-y := tn40.o tn40_mdio.o tn40_phy.o
- obj-$(CONFIG_TEHUTI_TN40) += tn40xx.o
-diff --git a/drivers/net/ethernet/tehuti/tn40.c b/drivers/net/ethernet/tehuti/tn40.c
-index a41718f552ed..1584f5f5db97 100644
---- a/drivers/net/ethernet/tehuti/tn40.c
-+++ b/drivers/net/ethernet/tehuti/tn40.c
-@@ -7,6 +7,7 @@
- #include <linux/if_vlan.h>
- #include <linux/netdevice.h>
- #include <linux/pci.h>
-+#include <linux/phylink.h>
- #include <linux/vmalloc.h>
- #include <net/page_pool/helpers.h>
- 
-@@ -944,7 +945,7 @@ static void tn40_tx_push_desc_safe(struct tn40_priv *priv, void *data, int size)
- 	}
- }
- 
--static int tn40_set_link_speed(struct tn40_priv *priv, u32 speed)
-+int tn40_set_link_speed(struct tn40_priv *priv, u32 speed)
- {
- 	u32 val;
- 	int i;
-@@ -1082,6 +1083,10 @@ static void tn40_link_changed(struct tn40_priv *priv)
- 				 TN40_REG_MAC_LNK_STAT) & TN40_MAC_LINK_STAT;
- 
- 	netdev_dbg(priv->ndev, "link changed %u\n", link);
-+	if (link)
-+		phylink_mac_change(priv->phylink, true);
-+	else
-+		phylink_mac_change(priv->phylink, false);
- }
- 
- static void tn40_isr_extra(struct tn40_priv *priv, u32 isr)
-@@ -1366,6 +1371,9 @@ static int tn40_close(struct net_device *ndev)
- {
- 	struct tn40_priv *priv = netdev_priv(ndev);
- 
-+	phylink_stop(priv->phylink);
-+	phylink_disconnect_phy(priv->phylink);
-+
- 	napi_disable(&priv->napi);
- 	netif_napi_del(&priv->napi);
- 	tn40_disable_interrupts(priv);
-@@ -1381,10 +1389,17 @@ static int tn40_open(struct net_device *dev)
- 	struct tn40_priv *priv = netdev_priv(dev);
- 	int ret;
- 
-+	ret = phylink_connect_phy(priv->phylink, priv->phydev);
-+	if (ret)
-+		return ret;
-+
- 	tn40_sw_reset(priv);
-+	phylink_start(priv->phylink);
- 	ret = tn40_start(priv);
- 	if (ret) {
- 		netdev_err(dev, "failed to start %d\n", ret);
-+		phylink_stop(priv->phylink);
-+		phylink_disconnect_phy(priv->phylink);
- 		return ret;
- 	}
- 	napi_enable(&priv->napi);
-@@ -1664,6 +1679,12 @@ static int tn40_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_unset_drvdata;
- 	}
- 
-+	ret = tn40_mdiobus_init(priv);
-+	if (ret) {
-+		dev_err(&pdev->dev, "failed to initialize mdio bus.\n");
-+		goto err_free_irq;
-+	}
-+
- 	priv->stats_flag =
- 		((tn40_read_reg(priv, TN40_FPGA_VER) & 0xFFF) != 308);
- 
-@@ -1672,19 +1693,26 @@ static int tn40_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		TN40_IR_TMR1;
- 
- 	tn40_mac_init(priv);
-+	ret = tn40_phy_register(priv);
-+	if (ret) {
-+		dev_err(&pdev->dev, "failed to set up PHY.\n");
-+		goto err_free_irq;
-+	}
- 
- 	ret = tn40_priv_init(priv);
- 	if (ret) {
- 		dev_err(&pdev->dev, "failed to initialize tn40_priv.\n");
--		goto err_free_irq;
-+		goto err_unregister_phydev;
- 	}
- 
- 	ret = register_netdev(ndev);
- 	if (ret) {
- 		dev_err(&pdev->dev, "failed to register netdev.\n");
--		goto err_free_irq;
-+		goto err_unregister_phydev;
- 	}
- 	return 0;
-+err_unregister_phydev:
-+	tn40_phy_unregister(priv);
- err_free_irq:
- 	pci_free_irq_vectors(pdev);
- err_unset_drvdata:
-@@ -1705,6 +1733,7 @@ static void tn40_remove(struct pci_dev *pdev)
- 
- 	unregister_netdev(ndev);
- 
-+	tn40_phy_unregister(priv);
- 	pci_free_irq_vectors(priv->pdev);
- 	pci_set_drvdata(pdev, NULL);
- 	iounmap(priv->regs);
-diff --git a/drivers/net/ethernet/tehuti/tn40.h b/drivers/net/ethernet/tehuti/tn40.h
-index 05a9adf9fe5a..fbdc62612f1f 100644
---- a/drivers/net/ethernet/tehuti/tn40.h
-+++ b/drivers/net/ethernet/tehuti/tn40.h
-@@ -143,6 +143,9 @@ struct tn40_priv {
- 	char *b0_va; /* Virtual address of buffer */
- 
- 	struct mii_bus *mdio;
-+	struct phy_device *phydev;
-+	struct phylink *phylink;
-+	struct phylink_config phylink_config;
- };
- 
- /* RX FREE descriptor - 64bit */
-@@ -220,6 +223,11 @@ static inline void tn40_write_reg(struct tn40_priv *priv, u32 reg, u32 val)
- 	writel(val, priv->regs + reg);
- }
- 
-+int tn40_set_link_speed(struct tn40_priv *priv, u32 speed);
-+
- int tn40_mdiobus_init(struct tn40_priv *priv);
- 
-+int tn40_phy_register(struct tn40_priv *priv);
-+void tn40_phy_unregister(struct tn40_priv *priv);
-+
- #endif /* _TN40XX_H */
-diff --git a/drivers/net/ethernet/tehuti/tn40_phy.c b/drivers/net/ethernet/tehuti/tn40_phy.c
-new file mode 100644
-index 000000000000..73791b260fc5
---- /dev/null
-+++ b/drivers/net/ethernet/tehuti/tn40_phy.c
-@@ -0,0 +1,73 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/* Copyright (c) Tehuti Networks Ltd. */
-+
-+#include <linux/netdevice.h>
-+#include <linux/pci.h>
-+#include <linux/phylink.h>
-+
-+#include "tn40.h"
-+
-+static void tn40_link_up(struct phylink_config *config, struct phy_device *phy,
-+			 unsigned int mode, phy_interface_t interface,
-+			 int speed, int duplex, bool tx_pause, bool rx_pause)
-+{
-+	struct net_device *ndev = to_net_dev(config->dev);
-+	struct tn40_priv *priv = netdev_priv(ndev);
-+
-+	tn40_set_link_speed(priv, speed);
-+	netif_wake_queue(priv->ndev);
-+}
-+
-+static void tn40_link_down(struct phylink_config *config, unsigned int mode,
-+			   phy_interface_t interface)
-+{
-+	struct net_device *ndev = to_net_dev(config->dev);
-+	struct tn40_priv *priv = netdev_priv(ndev);
-+
-+	tn40_set_link_speed(priv, 0);
-+	netif_stop_queue(priv->ndev);
-+}
-+
-+static void tn40_mac_config(struct phylink_config *config, unsigned int mode,
-+			    const struct phylink_link_state *state)
-+{
-+}
-+
-+static const struct phylink_mac_ops tn40_mac_ops = {
-+	.mac_config = tn40_mac_config,
-+	.mac_link_up = tn40_link_up,
-+	.mac_link_down = tn40_link_down,
-+};
-+
-+int tn40_phy_register(struct tn40_priv *priv)
-+{
-+	struct phylink_config *config;
-+	struct phy_device *phydev;
-+	struct phylink *phylink;
-+
-+	phydev = phy_find_first(priv->mdio);
-+	if (!phydev) {
-+		dev_err(&priv->pdev->dev, "PHY isn't found\n");
-+		return -1;
-+	}
-+
-+	config = &priv->phylink_config;
-+	config->dev = &priv->ndev->dev;
-+	config->type = PHYLINK_NETDEV;
-+	config->mac_capabilities = MAC_10000FD | MLO_AN_PHY;
-+	__set_bit(PHY_INTERFACE_MODE_XAUI, config->supported_interfaces);
-+
-+	phylink = phylink_create(config, NULL, PHY_INTERFACE_MODE_XAUI,
-+				 &tn40_mac_ops);
-+	if (IS_ERR(phylink))
-+		return PTR_ERR(phylink);
-+
-+	priv->phydev = phydev;
-+	priv->phylink = phylink;
-+	return 0;
-+}
-+
-+void tn40_phy_unregister(struct tn40_priv *priv)
-+{
-+	phylink_destroy(priv->phylink);
-+}
--- 
-2.34.1
+Reviewed-by: G=C3=BCnther Noack <gnoack@google.com>
 
+P.S. We are inconsistent with our use of EXPECT/ASSERT for test teardown.  =
+The
+fs_test.c uses ASSERT_EQ in these places whereas net_test.c and your new te=
+sts
+use EXPECT_EQ.
+
+It admittedly does not make much of a difference for close(), so should be =
+OK.
+Some other selftests are even ignoring the result for close().  If we want =
+to
+make it consistent in the Landlock tests again, we can also do it in an
+independent sweep.
+
+I filed a small cleanup task as a reminder:
+https://github.com/landlock-lsm/linux/issues/31
+
+=E2=80=94G=C3=BCnther
 
