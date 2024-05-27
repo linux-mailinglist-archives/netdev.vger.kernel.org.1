@@ -1,92 +1,111 @@
-Return-Path: <netdev+bounces-98348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44FE28D108F
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 01:40:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C50088D1091
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 01:42:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A034A28321C
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 23:40:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F448283142
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 23:42:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454333CF73;
-	Mon, 27 May 2024 23:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E92360269;
+	Mon, 27 May 2024 23:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="snj5yicf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CZszdni2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B38917E8F8;
-	Mon, 27 May 2024 23:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D255F17E8F8;
+	Mon, 27 May 2024 23:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716853231; cv=none; b=uM2h6dBjrYGVpsSqcvdLbf/AQbp/a7v5cex3Kfx6B+LF930qglgkdahEjJF2QjkLuAuJxxx6Ike5RUJ5akaWVGtFMItEZp+O9HXHWcTTXsi9Viuw15PeirFaYkNWscqk1IhLaFGkHC5rXZBbIokwQCujxMVgKvYnB4PJYTReqU0=
+	t=1716853371; cv=none; b=fdmPb9mvJ9IBeLkjyqlQVmrcCY9reUzNDLmD442fl2aYPWyDm2Zly1x4UdjV+frRbjKawgeDkh4Q2CUKmP+u7qBdUcZz8HeL1EaPGxc2WV2s3nYEKUwWkwYM1WSmBVyqIPgkhNzAvuOlR/He0deVdw1M0eoYPuPGRlkxFS9+ixU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716853231; c=relaxed/simple;
-	bh=eVNrLMG28WOiOibWqhaJNSVh/c7sWLRah+D1WWSxeSo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kFbPOtgrYtPMj4XKSRGohsMrHB7kDTVXm7Lpx120ZcIOg9KvcbdWABylhWZAANdVgnGmZwnbmvjxoGDo+A7gDa9erT25qN4OrPutb390WTetgUvujQ0mLqk0BD1+D+8K/TLPnJhR7BbWJyKd6hFZaYN4F3gkFDuPrSip3s3k2pM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=snj5yicf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 749C7C32786;
-	Mon, 27 May 2024 23:40:30 +0000 (UTC)
+	s=arc-20240116; t=1716853371; c=relaxed/simple;
+	bh=XUGNe4Vne0m7pN3CMpt65nY5zW6n4Cua0wTpgEl0dxI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nQ+TtfVWVwypkQiZNTdIskpaJFn/Z6Iq0VC2H/dtflIx5ek3oDGNaXgCnjNtksrCsjO+cQUs5B2oVNQi3jC1Oqf4hQOZf5aywi6WeErp8U6qHjdajjqdcIP9nYhfOmH7BufXQu63kwSDMauEOEmrj1oQYi/whvs3/whCPCMJoAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CZszdni2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B19FAC2BBFC;
+	Mon, 27 May 2024 23:42:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716853230;
-	bh=eVNrLMG28WOiOibWqhaJNSVh/c7sWLRah+D1WWSxeSo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=snj5yicfOz5l/k3hSVwmzUv9D7pvsAUlcZBqS7TShCZjUdMxN4oRGzCZnxLeWF8Zx
-	 I3tvgEVhIwO5WAFrleIcANZNBMxZq/81NrzUVSiTvOBcbYlLiFv1eSdJone/Bj5MWa
-	 5GevvIGI0Ti+m0ob9DOB3RtTFxmo7/u4ZglR1p/fowiFWkspzZ6Z1Lwg0zfjcyETQ+
-	 UPeNXeXBKK5g7ne2Q6AjRuWao/jhvwswf6YaB8Kr33gsAnIPygWWk9s4o95iKd/Pas
-	 6khd5HTARaf0d2b055WETXT8DzSGvXd/Gx/hOx9zbRtO4XKjiW6M+KImny6f3zxh4Z
-	 N2J08ct3QORfg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 56F49D40190;
-	Mon, 27 May 2024 23:40:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1716853371;
+	bh=XUGNe4Vne0m7pN3CMpt65nY5zW6n4Cua0wTpgEl0dxI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CZszdni2CFdUNNsdaZQSdg5xyv2aQogk6pGHNwOc4uqLYLDCvOQmcSZ0kn8u+298X
+	 KpbX3qLNsRuXhWknHdCEkOhfPUtWjkSFsPv/EU9WtIAbyPTgRe8GoGqQGAY1AbHeOY
+	 hoXeHswPUOoGseVhJFFKmOC+BI2hk7/79aLxRobZfrbKEi4twNZOdHpv1gAu11jS90
+	 zMPOTHWY7nd4og9A93W8OF0excwX1wAEgcksaNMyiyOH4tkk7veTAP6UflJz42ir9a
+	 jzw7zUJf2XnF1tK81SpynefzpwVwhNpFffDHLDKLMEIz9rLTl+jpUEMu8qwWUqE2nj
+	 eKslG/W+wlbcQ==
+Date: Mon, 27 May 2024 16:42:49 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Chen Ni <nichen@iscas.ac.cn>
+Cc: nbd@nbd.name, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+ lorenzo@kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v2] net: ethernet: mtk_eth_soc: add missing
+ check for rhashtable_init
+Message-ID: <20240527164249.4aafd105@kernel.org>
+In-Reply-To: <20240517023922.362327-1-nichen@iscas.ac.cn>
+References: <20240517023922.362327-1-nichen@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf 2024-05-27
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171685323035.16232.14533245018227338013.git-patchwork-notify@kernel.org>
-Date: Mon, 27 May 2024 23:40:30 +0000
-References: <20240527203551.29712-1-daniel@iogearbox.net>
-In-Reply-To: <20240527203551.29712-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 17 May 2024 10:39:22 +0800 Chen Ni wrote:
+> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> index cae46290a7ae..f9b8956a8726 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> @@ -4957,7 +4957,7 @@ static int mtk_probe(struct platform_device *pdev)
+>  
+>  			eth->ppe[i] = mtk_ppe_init(eth, eth->base + ppe_addr, i);
+>  
+> -			if (!eth->ppe[i]) {
+> +			if (IS_ERR_OR_NULL(eth->ppe[i])) {
+>  				err = -ENOMEM;
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+You still discard the real error here.
 
-On Mon, 27 May 2024 22:35:51 +0200 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
-> 
-> The following pull-request contains BPF updates for your *net* tree.
-> 
-> We've added 15 non-merge commits during the last 7 day(s) which contain
-> a total of 18 files changed, 583 insertions(+), 55 deletions(-).
-> 
-> [...]
+>  				goto err_deinit_ppe;
+>  			}
+> diff --git a/drivers/net/ethernet/mediatek/mtk_ppe.c b/drivers/net/ethernet/mediatek/mtk_ppe.c
+> index 0acee405a749..4895c6febaf8 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_ppe.c
+> +++ b/drivers/net/ethernet/mediatek/mtk_ppe.c
+> @@ -884,12 +884,15 @@ struct mtk_ppe *mtk_ppe_init(struct mtk_eth *eth, void __iomem *base, int index)
+>  	struct mtk_ppe *ppe;
+>  	u32 foe_flow_size;
+>  	void *foe;
+> +	int ret;
+>  
+>  	ppe = devm_kzalloc(dev, sizeof(*ppe), GFP_KERNEL);
+>  	if (!ppe)
+>  		return NULL;
 
-Here is the summary with links:
-  - pull-request: bpf 2024-05-27
-    https://git.kernel.org/netdev/net/c/2786ae339ef5
+Please convert the return NULL in this function to 
+return ERR_PTR(-ENOMEM) and use the error code in mtk_probe()
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> -	rhashtable_init(&ppe->l2_flows, &mtk_flow_l2_ht_params);
+> +	ret = rhashtable_init(&ppe->l2_flows, &mtk_flow_l2_ht_params);
+> +	if (ret)
+> +		return ERR_PTR(ret);
 
+Also there are two direct return NULLs without calling rhashtable_destroy()
+later in this function. Please fix that in a separate patch.
 
+>  	/* need to allocate a separate device, since it PPE DMA access is
+>  	 * not coherent.
 
