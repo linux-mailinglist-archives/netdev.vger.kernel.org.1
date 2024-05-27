@@ -1,117 +1,152 @@
-Return-Path: <netdev+bounces-98290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C6848D08A8
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 18:32:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BE1A8D0922
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 19:05:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B91D31C232B4
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:32:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD47C1C22196
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 17:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBBFB61FE5;
-	Mon, 27 May 2024 16:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C6D15FA96;
+	Mon, 27 May 2024 17:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="hsooxw4X"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="lykB7CEV"
 X-Original-To: netdev@vger.kernel.org
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30BC47347D;
-	Mon, 27 May 2024 16:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1BCF15A870;
+	Mon, 27 May 2024 17:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716827484; cv=none; b=PkpBA27OaJpFLszFOqtgMKJSmjiIz/sOb89DFQTDWarr1Z4txMp73IyLldVGIRU4ePx3XPJdj3Abxbrm8Rn/1SnPVy7rh3OwyLzuNWmAISsG0VuFM4DHtGvI1pIscPwJVxJENJyjNxDrXnNb0qAJPC+iAqZ66p/qq3/I+Atbt1I=
+	t=1716829480; cv=none; b=gr9m070DRQ60oowKbSCgbRLQYNPCDe1fZAm8fVzSp9H3EXvfWbF8RZT/rDQTGAK9fJQa5weYRJdu1JaWMrRk2iHsKFp6XobITPZ0kC0CuQuVl4JiOVlFu/4P4to1k43LGvldp1sqBwA33mrjYAC8crT8B5yvmxrO5nNzVhioL0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716827484; c=relaxed/simple;
-	bh=UHzdji3b5jtbCYVY1FtiERZjN+yzMm4hP5v6zc+XiWM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PE/Hk9iqTgo+PpRTXARgV1gFjnELWpB3FKMPwqtEE84h7vTGwnfA7UuiCkEGOcizy4z8tC8cE1ssSvJ1NyOJFI48hZq8FUpM/PikAhxbd2L4X2PQV8p4CjQE7bvP9Ig9HT8j1XnqTMj0JqT63281qmHd0BlBnTqhZoQ4nWLigUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=hsooxw4X; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=x5hSgktQC4VekqZNvnHHeOTEWH8AryjJrdKbAnEOFp8=; b=hsooxw4X1wEt53LXSYt/42FL6N
-	xCUdpx8KVh/3S2lTEQ63zWmx+pTkZr/+CzKvaXs3Fpb9pbLHUOHC4z9G0aF/3DiZ2d+X6MGf5diNd
-	+QxXsD16EnrA8odJKZ7HFqhqproNi1rcVtsPoQ/U8wjMdptoWbrGZrDeT3vn0qZ4HUylL6qT9MuQN
-	rrwOtAwkfzYQYfBVRq/4MPpX6J6G/+5phQxmX+LAZuJ3ZW4gSZLK99N62jyYDz10Jsw8Djzybqtw0
-	LCIe6NjS+bXi/HVMBa0XZYbKrsI7O5/v1wFv32zdYHMKN15PBcSzdS0rVDu7CYNzbLSUYg3oHVBWv
-	bP63xZEw==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1sBdFk-00DoOO-36;
-	Mon, 27 May 2024 16:31:17 +0000
-Date: Mon, 27 May 2024 17:31:16 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH][CFT][experimental] net/socket.c: use straight
- fdget/fdput (resend)
-Message-ID: <20240527163116.GD2118490@ZenIV>
-References: <20240526034506.GZ2118490@ZenIV>
- <CAHk-=wjWFM9iPa8a+0apgvBoLv5PsYeQPViuf-zmkLiCGVQEww@mail.gmail.com>
- <20240526192721.GA2118490@ZenIV>
- <CAHk-=wixYUyQcS9tDNVvnCvEi37puqqpQ=CN+zP=a9Q9Fp5e-Q@mail.gmail.com>
- <20240526231641.GB2118490@ZenIV>
+	s=arc-20240116; t=1716829480; c=relaxed/simple;
+	bh=H80RF2inJH8hQaBcuvduDFgfzcA+VjplAQ5kFQmL1Po=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=IBSJPBC9pT1sJ1+iCGITJAeIs/LjcZGyEXEIaVdiz4GZUeYY6XxXrTNZkOkgIxCZ3m9Iz8a1JLEiuwFh+TWKdom6/2HL0LJ9tBuT1t/PAfpRSny91Mb14pusV/aEmChCPWZP8iH/HLwxOkyDxb2kuxK/qxBHX34DZuDSUjv7xhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=lykB7CEV; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1716829474;
+	bh=H80RF2inJH8hQaBcuvduDFgfzcA+VjplAQ5kFQmL1Po=;
+	h=From:Subject:Date:To:Cc:From;
+	b=lykB7CEVDVoVA59YXs49BpHm+KO0HE1bRyCr4QnyY6p6dzahJubclXYE9w2KFZxsN
+	 nlJ/Ak7Ll+fbij3g1EMOHNWJlC1HrhJjcvSJ2Zu87gAUibw+czUOOMaKfG62gaM9BI
+	 Wxh1XNdhsZGUQ887OBq5Gcem/Mnr1f+g7bkN71l4=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Subject: [PATCH net-next 0/5] net: constify ctl_table arguments of utility
+ functions
+Date: Mon, 27 May 2024 19:04:18 +0200
+Message-Id: <20240527-sysctl-const-handler-net-v1-0-16523767d0b2@weissschuh.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240526231641.GB2118490@ZenIV>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIABK9VGYC/x2MQQrDIBAAvxL2nAVjFEq/EnIQ3bYLYS2uhATJ3
+ 2N7HJiZBkqFSeE5NCi0s3KWDtM4QPwEeRNy6gzWWGe8nVFPjXXDmEUrdiNtVFCo4sO65ELyYfI
+ Bev4t9OLjv17gJwgdFdbrugFryPDjdAAAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+ Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>, 
+ Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: Joel Granados <j.granados@samsung.com>, 
+ Luis Chamberlain <mcgrof@kernel.org>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, lvs-devel@vger.kernel.org, 
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1716829474; l=3222;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=H80RF2inJH8hQaBcuvduDFgfzcA+VjplAQ5kFQmL1Po=;
+ b=f4dtzPRwq7hYsYkNlNaMAgNAjPEchqO7TPLED6v0BvG/ikf1UG8uMn/l+V1i+txS4gPhKQtp4
+ 8/NtVLwuqwXDNf8sY091gbCsbUzHVD6WB09Nf02qaGf7uLoKHjT1P9b
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-On Mon, May 27, 2024 at 12:16:41AM +0100, Al Viro wrote:
-> > What would make more sense is if you make the "fd_empty()" test be
-> > about the _flags_, and then both the fp_empty() test and the test
-> > inside fdput() would be testing the same things.
-> 
-> Umm...  What encoding would you use?
+The sysctl core is preparing to only expose instances of
+struct ctl_table as "const".
+This will also affect the ctl_table argument of sysctl handlers.
 
-FWIW, _if_ we go for replacement of struct fd with struct-wrapped
-unsigned long and actually steal another bit from pointer, we could
-actually use that to encode errors as well...
+As the function prototype of all sysctl handlers throughout the tree
+needs to stay consistent that change will be done in one commit.
 
-If bit 0 is clear for file reference and set for an error, we could
-use bit 1 to represent borrowed vs. cloned and bit 2 for need to
-unlock...
+To reduce the size of that final commit, switch utility functions which
+are not bound by "typedef proc_handler" to "const struct ctl_table".
 
-overlayfs would be happier that way - we could have those functions
-return struct fd directly, and pass the error value that way.
-fdget() would report EBADF explicitly on empty slot - not a big
-deal.  Hmm...
+No functional change.
 
-Let me play with that a bit and see if I can come up with something
-tolerable.
+This patch(set) is meant to be applied through your subsystem tree.
+Or at your preference through the sysctl tree.
 
-We could add that in parallel to existing struct fd; we'd need a name
-for replacement, though - anything like "rawfd" is asking for confusion
-around fdget_raw(), and we'd need replacements for fdget() et.al.
-that would yield those.
+Motivation
+==========
 
-Alternatively, with a sane set of helpers we could actually _replace_
-struct fd definition without a huge flagday commit - start with adding
-#define fd_file(fd) ((fd).file)
-#define fd_valid(fd) (fd_file(fd) != NULL)
-convert the current users, one by one (fairly mechanical patches),
-then change the definition of struct fd.  The last step would affect
-	* definitions of helpers
-	* adding fd-constructing macros (ERR_FD, etc.)
-	* converting the few places that really construct those
-suckers (fdget() et.al., overlayfs, a couple of explicit
-initializers to {NULL, 0}).
+Moving structures containing function pointers into unmodifiable .rodata
+prevents attackers or bugs from corrupting and diverting those pointers.
 
-It's not a huge amount of work and the flagday step would be fairly
-small, but we'd probably need to split that over a couple of cycles -
-helpers in one, along with renaming fd.file to e.g.
-fd.__file_use_the_damn_helpers, then in the next cycle do the
-switchover.
+Also the "struct ctl_table" exposed by the sysctl core were never meant
+to be mutated by users.
 
-Hell knows; let me play with that a bit and let's see what falls out...
+For this goal changes to both the sysctl core and "const" qualifiers for
+various sysctl APIs are necessary.
+
+Full Process
+============
+
+* Drop ctl_table modifications from the sysctl core ([0], in mainline)
+* Constify arguments to ctl_table_root::{set_ownership,permissions}
+  ([1], in mainline)
+* Migrate users of "ctl_table_header::ctl_table_arg" to "const".
+  (in mainline)
+* Afterwards convert "ctl_table_header::ctl_table_arg" itself to const.
+  (in mainline)
+* Prepare helpers used to implement proc_handlers throughout the tree to
+  use "const struct ctl_table *". ([2], in progress, this patch)
+* Afterwards switch over all proc_handlers callbacks to use
+  "const struct ctl_table *" in one commit. ([2], in progress)
+  Only custom handlers will be affected, the big commit avoids a
+  disruptive and messy transition phase.
+* Switch over the internals of the sysctl core to "const struct ctl_table *" (to be done)
+* Switch include/linux/sysctl.h to "const struct ctl_table *" (to be done)
+* Transition instances of "struct ctl_table" through the tree to const (to be done)
+
+A work-in-progress view containing all the outlined changes can be found at
+https://git.sr.ht/~t-8ch/linux sysctl-constfy
+
+[0] https://lore.kernel.org/lkml/20240322-sysctl-empty-dir-v2-0-e559cf8ec7c0@weissschuh.net/
+[1] https://lore.kernel.org/lkml/20240315-sysctl-const-ownership-v3-0-b86680eae02e@weissschuh.net/
+[2] https://lore.kernel.org/lkml/20240423-sysctl-const-handler-v3-0-e0beccb836e2@weissschuh.net/
+
+---
+Thomas Weißschuh (5):
+      net/neighbour: constify ctl_table arguments of utility function
+      net/ipv4/sysctl: constify ctl_table arguments of utility functions
+      net/ipv6/addrconf: constify ctl_table arguments of utility functions
+      net/ipv6/ndisc: constify ctl_table arguments of utility function
+      ipvs: constify ctl_table arguments of utility functions
+
+ net/core/neighbour.c           | 2 +-
+ net/ipv4/sysctl_net_ipv4.c     | 6 ++++--
+ net/ipv6/addrconf.c            | 8 ++++----
+ net/ipv6/ndisc.c               | 2 +-
+ net/netfilter/ipvs/ip_vs_ctl.c | 7 ++++---
+ 5 files changed, 14 insertions(+), 11 deletions(-)
+---
+base-commit: 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
+change-id: 20240523-sysctl-const-handler-net-824d4ad5a15a
+
+Best regards,
+-- 
+Thomas Weißschuh <linux@weissschuh.net>
+
 
