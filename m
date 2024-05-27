@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-98345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9BDB8D101D
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 00:15:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B01C88D1027
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 00:16:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 843312831E5
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 22:15:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BF29280FB6
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 22:16:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D4281667EE;
-	Mon, 27 May 2024 22:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E9F22208E;
+	Mon, 27 May 2024 22:16:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ifvxj+uF"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BLNQIN8O"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2467252F6D;
-	Mon, 27 May 2024 22:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD40217E8EF;
+	Mon, 27 May 2024 22:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716848092; cv=none; b=CdhsvY34TJNLAqw0TnPAo7w7JLQPwu3NGjwX4phQIGTtL40dyvw81Cxtsjb+FLyTZWIgS+eIsFjGMukCKgqpmDM8hSSMOqfWJf4PXqWnrl9QP72sSda3B/R7RvDsGDN4mcuLpub2HPpFS9O8tgL3/UxeXZxYgUPcQaX0+3EZiyA=
+	t=1716848214; cv=none; b=jV5KqjxBv1voAvroeHMMhumYkqtgZhqsWIOgwAgZ2k1FrWFYcHlkMIpO0odWDzI4+tIEPiYMp257HEk5XBvM61mkSpmYWWoTzjn6n4dHUfnRHQ5PvIFv7woZlZkGQmAt81EGM075mVTp0fP709jB5scSaUu0QH0voXGPuQn35n8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716848092; c=relaxed/simple;
-	bh=aaFgdQAdOzX4wdwXTMpoJicnNbjCMX9iIPAoAWjz+Z4=;
+	s=arc-20240116; t=1716848214; c=relaxed/simple;
+	bh=T7j1+5j4XXrl86er3G4Mvu1GdfBJVXcGFioamjVXWUM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TqrmXr5phFDzrS2ZTbETzbI+eOXEk0OYdJDPPKfo/5KnCqDndZqkva8ym/KqeUl1Thg8KDT7Gp2JTW4qNMn/oAIaJMZSxvusUs/WODx9ZnggepN4yGjWKNW0EQX6FR6nevbQyvEvzelaVzYynBhLMX7tRE1evol87OqF32ReXXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ifvxj+uF; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=gwIgDGHU8KfJrX11PYM8RKXBPN2xdOnePgwNt0KNrmVjBIpLbSgk9w3vD3yV4uaE/feGjaxei61xn7c8xF5j9ZA7xekVmj767iv4RWDwIbi1O/V0UB678v4E3aHe/0db2JEwjRv+FbOuXj/XjG+ikurUgnFOi8RU2m0yVUvLCZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BLNQIN8O; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,34 +36,34 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=TjkH2PgIRV3+xAaq85xY8qqg6XRzK9pvPOKeajwlTek=; b=Ifvxj+uFOQMbcLROT38af4Xaod
-	bGcWlIwE1IjwVPpPHJkV8KcoApMn2DgqjwKg77Exc2dv9WAK9LDXF3ui+vX0sfkPQI533vxBfzUid
-	lOkMqJrJrlHGkxTKRgAbMZ1ZJAcUPWabbnrJnuPMToVSrJ6mkdumD7cQGB6w6s1+YJzw=;
+	bh=hKS4kDhpGM7nfRkS7MgrVHJ6ZRbC/gLbDfkWBa/zlhs=; b=BLNQIN8OuijtmaEFw+vy96KSVa
+	QW9AVBFhkIRM1+6LDRqpKdVY4Cpoc/jhrYzgigbwdmkKAdfe8FbmAdhRkSLEO2s+lHf6MuMwGuAq3
+	59uuvo8IR4c1IA8kVOVv0dNrvhNtvfQ1BrEm5WDYJfKZywzazFdpZ2Fivxp+gv1z8fEA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sBic1-00G6oW-Gi; Tue, 28 May 2024 00:14:37 +0200
-Date: Tue, 28 May 2024 00:14:37 +0200
+	id 1sBidw-00G6qp-4i; Tue, 28 May 2024 00:16:36 +0200
+Date: Tue, 28 May 2024 00:16:36 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>,
-	Jan Kiszka <jan.kiszka@siemens.com>,
-	Simon Horman <horms@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
+Cc: Jan Kiszka <jan.kiszka@siemens.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Simon Horman <horms@kernel.org>, Diogo Ivo <diogo.ivo@siemens.com>,
 	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
 	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>, Diogo Ivo <diogo.ivo@siemens.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Richard Cochran <richardcochran@gmail.com>,
 	Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, srk@ti.com,
-	Vignesh Raghavendra <vigneshr@ti.com>
-Subject: Re: [PATCH net-next v5 2/3] net: ti: icssg-switch: Add switchdev
- based driver for ethernet switch support
-Message-ID: <372a9f0c-7758-4942-b71e-a959d5f11efc@lunn.ch>
-References: <20240527052738.152821-1-danishanwar@ti.com>
- <20240527052738.152821-3-danishanwar@ti.com>
+	linux-kernel@vger.kernel.org, srk@ti.com
+Subject: Re: [PATCH net-next v7 0/2] Add TAPRIO offload support for ICSSG
+ driver
+Message-ID: <57f6ed32-65cd-49e4-bfe6-c8d320e8de53@lunn.ch>
+References: <20240527055300.154563-1-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,18 +72,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240527052738.152821-3-danishanwar@ti.com>
+In-Reply-To: <20240527055300.154563-1-danishanwar@ti.com>
 
-On Mon, May 27, 2024 at 10:57:37AM +0530, MD Danish Anwar wrote:
-> ICSSG can operating in switch mode with 2 ext port and 1 host port with
-> VLAN/FDB/MDB and STP offloading. Add switchdev based driver to
-> support the same.
+On Mon, May 27, 2024 at 11:22:58AM +0530, MD Danish Anwar wrote:
+> This series adds taprio offload support for ICSSG driver.
 > 
-> Driver itself will be integrated with icssg_prueth in future commits
+> Patch [1/2] of the series moves some structures and API definition to .h
+> files so that these can be accessed by taprio (icssg_qos.c) file.
 > 
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> Patch [2/2] of the series intoduces the taprio support for icssg driver.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+What is the dependency between these patches and switchdev support? It
+is good to make that clear in the cover note, especially if this code
+will not apply without some other patches first.
 
-    Andrew
+     Andrew
 
