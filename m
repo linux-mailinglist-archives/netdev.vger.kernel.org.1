@@ -1,152 +1,128 @@
-Return-Path: <netdev+bounces-98167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2F938CFDDF
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 12:09:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6A098CFDEE
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 12:13:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D8FC1F24644
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 10:09:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5691DB225E9
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 10:13:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F22913AA4E;
-	Mon, 27 May 2024 10:09:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A51C13AA5D;
+	Mon, 27 May 2024 10:12:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PBLBgknR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E1HxK6NS"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE778DF60
-	for <netdev@vger.kernel.org>; Mon, 27 May 2024 10:09:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB5513AA59
+	for <netdev@vger.kernel.org>; Mon, 27 May 2024 10:12:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716804547; cv=none; b=BeqP9Rj70gCUPXJQGRqKyZVA91RahYd70JIFui7baaQKs+KF1UEo99wzdcB4DblTVpT3wnos4gYSqPz4IuxWOslns4EyXoSCZdx71yBeEhJrQ7b3Icrvh/T+Swh37Lrw/aLJfj8PhIFU28Rpk78+blu0iAVp29h8jjWZXkr6qYg=
+	t=1716804767; cv=none; b=BtEMtEs3OyYqbWWHVjWZajMgeus/ZAYA2c/3v1joiaU5VcCSNQ/Yz4Lvont07FfAA4hxLUogMmhdS6R+OZX5EHZcOy6TlYgVVgC8XCDvPZi+/LcWm/rSeTRaxMdlieT214UhMZHy5aT0Jy6EKFJ1Q8koJ7Tp3O1BEU4iLsWJG24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716804547; c=relaxed/simple;
-	bh=24i1icgCqIm/LqDImedZx4ia4O6w7c8WgVNOrUyaMbY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=hz60VVVczspsbzPLVghMOjELKf1bJ9jiubqhlfUt1vGkxC8Lmh0hUYqH5sergYgBKFxnqm8VoQHbirbIC+kEl4hAwGQ5EH/rKL6x6FYStUJ7crReKLS2tdRVXEhtT1Xc4gC8Qfq1KHp2ohpJwmb/dqCVezSwf3/6pSY5TsxN2M8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PBLBgknR; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1716804767; c=relaxed/simple;
+	bh=GVKEQ5KvHL0BvlosmrRkHhxCBFOcf6coLrUa7awJo1U=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=eZ2mKjI5xHiPp96olLiuQn4itEKooHmvEVAtS5pR64cl0EAaQdk3wVmoKBgvGp5agyDQJNqQxE/PWmwpWs8mCho47fOg8zSm1wc0IlNiescZoGMf9+MJ5Kg5m1O9EG2nHkv7ecKON+fEzNb8pfT1yicH67Oz05thygQQRwJAG9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E1HxK6NS; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716804545;
+	s=mimecast20190719; t=1716804764;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=24i1icgCqIm/LqDImedZx4ia4O6w7c8WgVNOrUyaMbY=;
-	b=PBLBgknR0hp9axtZ/B5zxbwtjZDr2VKl1BJCH9ZkNsU97/cVg8BH0oScyS+j9F9eEexooz
-	eYjFYKHmqkJLtFKoaDlXaGwaRgRHMd6x4tinzUqdLmEdflgZiIujKz5VUD4I+sW9hMlVIG
-	6HtYlxMTd4lY3mIbcMgf0nbJpsWPhzg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=yFs1a7vmIrV2pTiZ1T4Vg4ah+/rq3SlJ7qHTWkFMw50=;
+	b=E1HxK6NSH+4lEdjX7Lq7+ZZjkT8GW7xWbAE8kPxcPPxh5+zKQgO1LTdOohfx/Gsjc0ud3H
+	TiXkY77ZZOwHa68iU5lTxl1qpZA95RD5sNlRXYetMIo5Soie/ljkdVYT1adNBwToKRCcfh
+	AAe+jn/zw6GioUoSJja+HQiC4iOMq78=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-471-aNaK88GpO1aBjwNG0ENnSw-1; Mon, 27 May 2024 06:09:03 -0400
-X-MC-Unique: aNaK88GpO1aBjwNG0ENnSw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42109a85f5cso16315245e9.2
-        for <netdev@vger.kernel.org>; Mon, 27 May 2024 03:09:03 -0700 (PDT)
+ us-mta-653-ADEvqrZ0OY-rPkKvDExEyQ-1; Mon, 27 May 2024 06:12:43 -0400
+X-MC-Unique: ADEvqrZ0OY-rPkKvDExEyQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-358193f81aeso224149f8f.2
+        for <netdev@vger.kernel.org>; Mon, 27 May 2024 03:12:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716804542; x=1717409342;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=24i1icgCqIm/LqDImedZx4ia4O6w7c8WgVNOrUyaMbY=;
-        b=lAbKeR72V37caTOt4j8nyxUHb/C3nZ9Izq4U5MAbxM49IYMGj83XV0jL/KO6GODiTw
-         g7y3SPKeTa7rtMXZrds0P8EB/6uaJFIsO36SscLJy7i6eG1r5cShcaOlIR0fKf/TsHdy
-         RRbGkPj84fGvax/fT8FGyGpfodUI5AdIg0hkm/i7Aksa81Gtd4024xMyObPqIverZ9cv
-         ywZM14KRZmJZ0cvjH+Vmj8NGzCOhT9HalKtphMfx6Bp/gJADxN6lLrGVld5gWfCFnua+
-         gndFp3crVrl4TBSh+X0OMDX50Il0wblURGi8+T8ORzq8F/UKE5m/i8U1C+ZQGMbi4QR7
-         rAmw==
-X-Gm-Message-State: AOJu0YyMqmtpaY08JCCNUzJfBchYGGYEtou8IzBSYMHNFYT9IAA4x8Ci
-	nYBGN698dxxds73div3QcKOO+N7UN77/E3GvBvHdU4W7W/sKuSDDUs/BVa41AfNBUspaXm67z0r
-	3omA8/oWlK+aYS8F70JktngEde/PfGW0iLfyx8b/vzgbV77Kl8R9Frg==
-X-Received: by 2002:a05:600c:138e:b0:41b:fa34:9e48 with SMTP id 5b1f17b1804b1-42108a99ea9mr80582325e9.30.1716804542219;
-        Mon, 27 May 2024 03:09:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF46MLR1xgTvyNSsOonGW+IyREjsf7Dja3odnB9Qj15CzRLFqVZba935xFZQk8uG6wuks/Hrw==
-X-Received: by 2002:a05:600c:138e:b0:41b:fa34:9e48 with SMTP id 5b1f17b1804b1-42108a99ea9mr80582125e9.30.1716804541736;
-        Mon, 27 May 2024 03:09:01 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42100f163a8sm136110825e9.13.2024.05.27.03.09.01
+        d=1e100.net; s=20230601; t=1716804761; x=1717409561;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yFs1a7vmIrV2pTiZ1T4Vg4ah+/rq3SlJ7qHTWkFMw50=;
+        b=UqrqnPK9J6E9iiDnX1SAu3qLvCVd2/bxj0arhC1FKauEp2+TGX5KbQvLhchbyd6Q+x
+         xU4hfonn74mw5yUmOrkiOb19TR9o0PXLnpD3j7Y9CO/RfSHNYNa3UFTGBrfaCgpUOprE
+         CoRRHKR5LsEM8mRBqwcLf3m3Y13DwPfMagocD7+H95dL5wiOlMktnEcYmHg5hv8h7dFp
+         5k4DKXVPFqNLBqsMuxVyOxInXY6Iq0KoKD/8r8E3Z51mpgdumDj53agxxFFVR5xRZpdr
+         ry2IU+stNzIZVdH1z7oFH0vhltOm+Sq9YW5PmZ/74CwOVYEu0LtOeb/xxqHijgcxorFE
+         hbgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU2gRlgeNDfWPbNzs4dIChWwntNu+YEpa/aUvRN0llx75hpjYaOiUbmy6dRUPmZqbp7MrhnZtGSakSVq1BJfkbJHU3576jI
+X-Gm-Message-State: AOJu0YzgfA26B3ewQcZgWvRescohbv14V4yi8qsSTjC+pe4MsY1ix4Z0
+	HCv1PaQK/K6RogUoK+nAqaP50XLpcAqWh2zxC46JwPkoEL7O1vknX9xe+O+O3M61LerqjksEK51
+	p7ueX12hATmUtqWadGlYqq+eI/OX5gDRTfJ3uPwq65wKcXIUthcpSi7aPC8J+mw==
+X-Received: by 2002:a05:600c:1d09:b0:41a:3150:cc83 with SMTP id 5b1f17b1804b1-42108a1a56emr66807725e9.2.1716804761669;
+        Mon, 27 May 2024 03:12:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFtKk1j0MypUIzbvdYiIGjcwsjF/Ak/vvrtvDjTdhMmPUKFjM/xKUQZaMgfjUucFI5lNbLnOA==
+X-Received: by 2002:a05:600c:1d09:b0:41a:3150:cc83 with SMTP id 5b1f17b1804b1-42108a1a56emr66807555e9.2.1716804761236;
+        Mon, 27 May 2024 03:12:41 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3341:b094:ab10:29ae:cdc:4db4:a22a])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42100ee7edbsm137456965e9.5.2024.05.27.03.12.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 May 2024 03:09:01 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id DD70E12F79BF; Mon, 27 May 2024 12:09:00 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>, Amery Hung <ameryhung@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@kernel.org,
- sinquersw@gmail.com, jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com,
- xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
-Subject: Re: [RFC PATCH v8 18/20] selftests: Add a bpf fq qdisc to selftest
-In-Reply-To: <d178f981-a4fe-443f-b8d0-4a86aaea026b@linux.dev>
-References: <20240510192412.3297104-1-amery.hung@bytedance.com>
- <20240510192412.3297104-19-amery.hung@bytedance.com>
- <6ad06909-7ef4-4f8c-be97-fe5c73bc14a3@linux.dev> <87fru7ody3.fsf@toke.dk>
- <d178f981-a4fe-443f-b8d0-4a86aaea026b@linux.dev>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 27 May 2024 12:09:00 +0200
-Message-ID: <87o78rh8hv.fsf@toke.dk>
+        Mon, 27 May 2024 03:12:40 -0700 (PDT)
+Message-ID: <63b7281b10c5491fbb02ba3f01328765b88a6271.camel@redhat.com>
+Subject: Re: [PATCH net 0/6,v2] Netfilter fixes for net
+From: Paolo Abeni <pabeni@redhat.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org, 
+	edumazet@google.com, fw@strlen.de
+Date: Mon, 27 May 2024 12:12:39 +0200
+In-Reply-To: <57354e03b78f382e48b3bbc1eeec9dd14c3e940f.camel@redhat.com>
+References: <20240523162019.5035-1-pablo@netfilter.org>
+	 <ZlJYT2-sjA8gypwO@calendula>
+	 <57354e03b78f382e48b3bbc1eeec9dd14c3e940f.camel@redhat.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-Martin KaFai Lau <martin.lau@linux.dev> writes:
+On Mon, 2024-05-27 at 11:59 +0200, Paolo Abeni wrote:
+> On Sat, 2024-05-25 at 23:29 +0200, Pablo Neira Ayuso wrote:
+> > Hi,
+> >=20
+> > On Thu, May 23, 2024 at 06:20:13PM +0200, Pablo Neira Ayuso wrote:
+> > > v2: fixes sparse warnings due to incorrect endianness in vlan manglin=
+g fix
+> > >     reported by kbuild robot and Paolo Abeni.
+> >=20
+> > I realized checkpatch complains on use of spaces instead of
+> > indentation in patch 4/6.
+> >=20
+> > I can repost the series as v3. Apologies for this comestic issue.
+>=20
+> I think the overhead of a repost would offset the benefit of cleaning-
+> up that minor format issue.
 
-> On 5/24/24 12:40 AM, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> I think behaviour like this is potentially quite interesting and will
->> allow some neat optimisations (skipping a redirect to a different
->> interface and just directly enqueueing it to a different place comes to
->
-> hmm... I am not sure it is a good/safe optimization. From looking at
-> skb_do_redirect, there are quite a few things bypassed from
-> __dev_queue_xmit upto the final dequeue of the redirected dev. I don't
-> know if all of them is not dev dependent.
+I'm sorry for being so self-contradictory in a very short period of
+time, but before I misread the report.
 
-There are certainly footguns, but as long as they are of the "break the
-data path" variety and not the "immediately crash the kernel" variety
-that may be OK. After all, you can already do plenty of convoluted
-things with BPF that will break things. And glancing through the
-redirect code, nothing immediately jumps out as something that will
-definitely crash, AFAICT.
+I think this specific format violation is worth fixing. Could you
+please send a v3?
 
-However, it does feel a bit risky, so I am also totally fine with
-disallowing this until someone comes up with a concrete use case where
-it would be beneficial :)
+Thanks!
 
->> mind). However, as you point out it may lead to weird things like a
->> mismatched skb->dev, so if we allow this we should make sure that the
->> kernel will disallow (or fix) such behaviour.
->
-> Have been thinking about the skb->dev "fix" but the thought is originally=
- for=20
-> the bpf_skb_set_dev() use case in patch 14.
->
-> Note that the struct_ops ".dequeue" is actually realized by a fentry tram=
-poline=20
-> (call it fentry ".dequeue"). May be using an extra fexit ".dequeue" here.=
- The=20
-> fexit ".dequeue" will be called after the fentry ".dequeue". The fexit=20
-> ".dequeue" has the function arguments (sch here that has the correct dev)=
- and=20
-> the return value (skb) from the fentry ".dequeue". This will be an extra =
-call=20
-> (to the fexit ".dequeue") and very specific to this use case but may be t=
-he less=20
-> evil solution I can think of now...
-
-That's an interesting idea, certainly! Relying on fexit functions
-to do specific sanity checks/fixups after a BPF program has run
-(enforcing/checking post-conditions, basically) does not seem totally
-crazy to me, and may have other applications :)
-
--Toke
+Paolo
 
 
