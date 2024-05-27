@@ -1,101 +1,152 @@
-Return-Path: <netdev+bounces-98166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69DD88CFDA4
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 12:00:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2F938CFDDF
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 12:09:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25FC8280C81
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 10:00:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D8FC1F24644
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 10:09:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A6913AA22;
-	Mon, 27 May 2024 10:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F22913AA4E;
+	Mon, 27 May 2024 10:09:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PrRjYfVv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PBLBgknR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398D81755A;
-	Mon, 27 May 2024 10:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE778DF60
+	for <netdev@vger.kernel.org>; Mon, 27 May 2024 10:09:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716804028; cv=none; b=Ch4YCjWFxBP3XI0kfwZT0WmrLXvnjl4rCpoanZUe8jID8JNNtKQhaY6xI+9Xfu1SeydOLoMqaSywlraT8MbJZATOrn00V//dTYjhtwU5/dxvOp5flemClWrNuSgjEGRQXtCpE4Iov0Wwxz78cc9YkHURlJcUbeqgD3CABrdK2GE=
+	t=1716804547; cv=none; b=BeqP9Rj70gCUPXJQGRqKyZVA91RahYd70JIFui7baaQKs+KF1UEo99wzdcB4DblTVpT3wnos4gYSqPz4IuxWOslns4EyXoSCZdx71yBeEhJrQ7b3Icrvh/T+Swh37Lrw/aLJfj8PhIFU28Rpk78+blu0iAVp29h8jjWZXkr6qYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716804028; c=relaxed/simple;
-	bh=TYzY/jG5bEF0qerxvadO3ZjWnJoBMCqkrRNX0LtFqTU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SyC3JbRtLi7fiJ/SNAreuUSzizWQaH54ujCq+tjugZj66Zl8+OacnQ+GDG/PgejHfIQ0zx8OpJBJJZnTqatB3rcrLeOc1Knc+Y+liMyJT0YBfxYZGY52lBKZF52wRtoizRINbRfNVj+F8i9/vufO33qzoTt9edN5YMHgmQwjzIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PrRjYfVv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 87C27C32781;
-	Mon, 27 May 2024 10:00:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716804027;
-	bh=TYzY/jG5bEF0qerxvadO3ZjWnJoBMCqkrRNX0LtFqTU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PrRjYfVvF5DoY7aFDjdPA9qj3LyT5z23MAGeyaPoejjGEDOHgCeeUx8fFA6RAM422
-	 EFkOGmYxaZ57Vrws4q5MWxZ5jBwj3M8wywMXuc2mbtK6fYCnDt9DwQ37XqK+l6HvhP
-	 paLTXX2M4Ipf3Wf0Cmi+Nuf0lBYdvFQBn7GTafG8n7ReVNR3VQz1uAD7bl0RIPbXOU
-	 05N5k4QoE4sltl4Wst2ur4HrPt2wxKl/DhWfWQiQGj2P35/PaXzCA89hptCt8p98FL
-	 LvkRhuDNCJ0x0ml/4NDLCUqYX5jBGQyPAVQf7/lN4zKVhEyYl4l/9I6HX/z9mth3NQ
-	 StQCtNblGCxyA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 74CA2D40190;
-	Mon, 27 May 2024 10:00:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1716804547; c=relaxed/simple;
+	bh=24i1icgCqIm/LqDImedZx4ia4O6w7c8WgVNOrUyaMbY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=hz60VVVczspsbzPLVghMOjELKf1bJ9jiubqhlfUt1vGkxC8Lmh0hUYqH5sergYgBKFxnqm8VoQHbirbIC+kEl4hAwGQ5EH/rKL6x6FYStUJ7crReKLS2tdRVXEhtT1Xc4gC8Qfq1KHp2ohpJwmb/dqCVezSwf3/6pSY5TsxN2M8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PBLBgknR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716804545;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=24i1icgCqIm/LqDImedZx4ia4O6w7c8WgVNOrUyaMbY=;
+	b=PBLBgknR0hp9axtZ/B5zxbwtjZDr2VKl1BJCH9ZkNsU97/cVg8BH0oScyS+j9F9eEexooz
+	eYjFYKHmqkJLtFKoaDlXaGwaRgRHMd6x4tinzUqdLmEdflgZiIujKz5VUD4I+sW9hMlVIG
+	6HtYlxMTd4lY3mIbcMgf0nbJpsWPhzg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-471-aNaK88GpO1aBjwNG0ENnSw-1; Mon, 27 May 2024 06:09:03 -0400
+X-MC-Unique: aNaK88GpO1aBjwNG0ENnSw-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42109a85f5cso16315245e9.2
+        for <netdev@vger.kernel.org>; Mon, 27 May 2024 03:09:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716804542; x=1717409342;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=24i1icgCqIm/LqDImedZx4ia4O6w7c8WgVNOrUyaMbY=;
+        b=lAbKeR72V37caTOt4j8nyxUHb/C3nZ9Izq4U5MAbxM49IYMGj83XV0jL/KO6GODiTw
+         g7y3SPKeTa7rtMXZrds0P8EB/6uaJFIsO36SscLJy7i6eG1r5cShcaOlIR0fKf/TsHdy
+         RRbGkPj84fGvax/fT8FGyGpfodUI5AdIg0hkm/i7Aksa81Gtd4024xMyObPqIverZ9cv
+         ywZM14KRZmJZ0cvjH+Vmj8NGzCOhT9HalKtphMfx6Bp/gJADxN6lLrGVld5gWfCFnua+
+         gndFp3crVrl4TBSh+X0OMDX50Il0wblURGi8+T8ORzq8F/UKE5m/i8U1C+ZQGMbi4QR7
+         rAmw==
+X-Gm-Message-State: AOJu0YyMqmtpaY08JCCNUzJfBchYGGYEtou8IzBSYMHNFYT9IAA4x8Ci
+	nYBGN698dxxds73div3QcKOO+N7UN77/E3GvBvHdU4W7W/sKuSDDUs/BVa41AfNBUspaXm67z0r
+	3omA8/oWlK+aYS8F70JktngEde/PfGW0iLfyx8b/vzgbV77Kl8R9Frg==
+X-Received: by 2002:a05:600c:138e:b0:41b:fa34:9e48 with SMTP id 5b1f17b1804b1-42108a99ea9mr80582325e9.30.1716804542219;
+        Mon, 27 May 2024 03:09:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF46MLR1xgTvyNSsOonGW+IyREjsf7Dja3odnB9Qj15CzRLFqVZba935xFZQk8uG6wuks/Hrw==
+X-Received: by 2002:a05:600c:138e:b0:41b:fa34:9e48 with SMTP id 5b1f17b1804b1-42108a99ea9mr80582125e9.30.1716804541736;
+        Mon, 27 May 2024 03:09:01 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42100f163a8sm136110825e9.13.2024.05.27.03.09.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 May 2024 03:09:01 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id DD70E12F79BF; Mon, 27 May 2024 12:09:00 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>, Amery Hung <ameryhung@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn,
+ daniel@iogearbox.net, andrii@kernel.org, martin.lau@kernel.org,
+ sinquersw@gmail.com, jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com,
+ xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+Subject: Re: [RFC PATCH v8 18/20] selftests: Add a bpf fq qdisc to selftest
+In-Reply-To: <d178f981-a4fe-443f-b8d0-4a86aaea026b@linux.dev>
+References: <20240510192412.3297104-1-amery.hung@bytedance.com>
+ <20240510192412.3297104-19-amery.hung@bytedance.com>
+ <6ad06909-7ef4-4f8c-be97-fe5c73bc14a3@linux.dev> <87fru7ody3.fsf@toke.dk>
+ <d178f981-a4fe-443f-b8d0-4a86aaea026b@linux.dev>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Mon, 27 May 2024 12:09:00 +0200
+Message-ID: <87o78rh8hv.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net] Octeontx2-pf: Free send queue buffers incase of leaf to inner
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171680402747.13407.7062644706315340440.git-patchwork-notify@kernel.org>
-Date: Mon, 27 May 2024 10:00:27 +0000
-References: <20240523073626.4114-1-hkelam@marvell.com>
-In-Reply-To: <20240523073626.4114-1-hkelam@marvell.com>
-To: Hariprasad Kelam <hkelam@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
- kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
- sbhatta@marvell.com, gakula@marvell.com, sgoutham@marvell.com,
- naveenm@marvell.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Martin KaFai Lau <martin.lau@linux.dev> writes:
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+> On 5/24/24 12:40 AM, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> I think behaviour like this is potentially quite interesting and will
+>> allow some neat optimisations (skipping a redirect to a different
+>> interface and just directly enqueueing it to a different place comes to
+>
+> hmm... I am not sure it is a good/safe optimization. From looking at
+> skb_do_redirect, there are quite a few things bypassed from
+> __dev_queue_xmit upto the final dequeue of the redirected dev. I don't
+> know if all of them is not dev dependent.
 
-On Thu, 23 May 2024 13:06:26 +0530 you wrote:
-> There are two type of classes. "Leaf classes" that are  the
-> bottom of the class hierarchy. "Inner classes" that are neither
-> the root class nor leaf classes. QoS rules can only specify leaf
-> classes as targets for traffic.
-> 
-> 			 Root
-> 		        /  \
-> 		       /    \
->                       1      2
->                              /\
->                             /  \
->                            4    5
->                classes 1,4 and 5 are leaf classes.
->                class 2 is a inner class.
-> 
-> [...]
+There are certainly footguns, but as long as they are of the "break the
+data path" variety and not the "immediately crash the kernel" variety
+that may be OK. After all, you can already do plenty of convoluted
+things with BPF that will break things. And glancing through the
+redirect code, nothing immediately jumps out as something that will
+definitely crash, AFAICT.
 
-Here is the summary with links:
-  - [net] Octeontx2-pf: Free send queue buffers incase of leaf to inner
-    https://git.kernel.org/netdev/net/c/168484214767
+However, it does feel a bit risky, so I am also totally fine with
+disallowing this until someone comes up with a concrete use case where
+it would be beneficial :)
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>> mind). However, as you point out it may lead to weird things like a
+>> mismatched skb->dev, so if we allow this we should make sure that the
+>> kernel will disallow (or fix) such behaviour.
+>
+> Have been thinking about the skb->dev "fix" but the thought is originally=
+ for=20
+> the bpf_skb_set_dev() use case in patch 14.
+>
+> Note that the struct_ops ".dequeue" is actually realized by a fentry tram=
+poline=20
+> (call it fentry ".dequeue"). May be using an extra fexit ".dequeue" here.=
+ The=20
+> fexit ".dequeue" will be called after the fentry ".dequeue". The fexit=20
+> ".dequeue" has the function arguments (sch here that has the correct dev)=
+ and=20
+> the return value (skb) from the fentry ".dequeue". This will be an extra =
+call=20
+> (to the fexit ".dequeue") and very specific to this use case but may be t=
+he less=20
+> evil solution I can think of now...
 
+That's an interesting idea, certainly! Relying on fexit functions
+to do specific sanity checks/fixups after a BPF program has run
+(enforcing/checking post-conditions, basically) does not seem totally
+crazy to me, and may have other applications :)
+
+-Toke
 
 
