@@ -1,266 +1,158 @@
-Return-Path: <netdev+bounces-98186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 662018D006E
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 14:50:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC1BE8D0067
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 14:50:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89BD71C222C2
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 12:50:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8390C283F14
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 12:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60B615E5C8;
-	Mon, 27 May 2024 12:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mCI2GK0w"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DBE615E5BE;
+	Mon, 27 May 2024 12:50:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C7215E5C4
-	for <netdev@vger.kernel.org>; Mon, 27 May 2024 12:50:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4C615E5C4
+	for <netdev@vger.kernel.org>; Mon, 27 May 2024 12:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716814245; cv=none; b=pvNka7+ipz8096AKRIrzTfbO42ayGCwznEhx514kBdU2q1xioiaxkpQEk+2Z73XPa2sDDt9jGL3J8LCB49Kk3MlxCwaF6pWtruR0a0hpD7PRMBTZSiCDbTRM71fKwmqT7grqaqtlvXPSxe34BZRvV2qUDzS7XRotpERYzwg3o10=
+	t=1716814226; cv=none; b=hLhMEMk3gC39whKE3wqXBx4AaIeuciAR5RxxI+8cqR1R6GoR4B/uGUiSqsjfHXn8o0fXKkVqM7TdDq9dT4BBx8JFsa3dDZ58rY96wtpiQctes4qG785b7cbzcYDEwv5PA2EQAuJEyZbFnVAxAdI0LSoEzHQ1PCFKsz0dz3qLv6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716814245; c=relaxed/simple;
-	bh=vIMNeX9GKFvbyS4rTW4bLJO5HoE5A/V6ecUXqz77XTg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QjaqS9YAia/Vsbd9LsbTdhE4hRwQmsgJTKa89A5P3RBvYwXqt4n7P+LURBg8e8iV/Rk8G7bbpNiubFPDqYxI8vtO30ed2sZNZsREty7JR8OhmQLE+vkLhDEb5J4XmSFicIrxn5W1NtPH8AWAqnm/1W7Gh2WwvJ5nb0TC//RNhZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mCI2GK0w; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a5dcb5a0db4so1074556466b.2
-        for <netdev@vger.kernel.org>; Mon, 27 May 2024 05:50:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716814242; x=1717419042; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DFEFo3GrC1jzPN7J07FVdwJDcVI8JBxo+Phwdhu9yYk=;
-        b=mCI2GK0wpnKj4f0Pu4GjnUFm34yA9FWVHLFvs9M43TzopjFggpjXltmqwLE2UOmk1i
-         +/NkM2ORzE2tC6udzRZsO7ly+KqM/HC/X4kkUk2hyFaptHfpPRGDGDIKMaxijZpnK7rt
-         jSdoT0fHkQRPkc4vVGaTUCNQPMYy8t/prEWY6zriRoG/Zl/cyqwbBrCUb63ByKquhcJ/
-         QfgNZfcYwtXHxAslhsZKseRq3tbo+XDajBb8Nol0jZUGrJwJyEt2HMQm2G8MzK7a+sXU
-         Ut2CFZUfgBJp+0tTeXUUNipmDbrCQpHwtWerSSSDrWaunWmgBEmvkusVFw7WyimdJZsm
-         hWSg==
+	s=arc-20240116; t=1716814226; c=relaxed/simple;
+	bh=ggQLRdvyIp6N/f80ZonFwGJ3sy3mjFhzvaUS6XQMFKc=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=SuZdQ5XzTPHLYDpyIjGne6Dh/LuwuFNXisHQ5LfZHVkEH8FPCNQNJxpCp2molbJEOuO8Icy8fBRm6Af21Tfq/PRjJjtlGVg7vleu6fOpl25RCgUb1+J66aL5I5f5EV2KWKsr3nx9/m6ZgP4zQANVzqt5S1ucfW8UxKtf/ChU20M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-7e6e4a83282so616832739f.2
+        for <netdev@vger.kernel.org>; Mon, 27 May 2024 05:50:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716814242; x=1717419042;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DFEFo3GrC1jzPN7J07FVdwJDcVI8JBxo+Phwdhu9yYk=;
-        b=Q3JwdOnFuWXaDlAIUxR8EaXZuCqKACOcB4NHr1L+rO6wiuk3aFdVzQRbh5LD1f7v0P
-         4KN+s2nRujgThmcyoBX4ZIpskp414vEQa+qklBJ+20HuhWYdkOs8ef6KJegzr/mhcJNI
-         +h2ok2sp3zPEg11RdWMpE+JqN4jqN2posRUeZel4TvocrMoHWg5/Zb8kd4g0dqYDvtcP
-         AsKjF90ns5BvjZX7uvmCXPQpCcq8j4rzT+wigTzGSxrBD67tf2fDxWKXTwkFtHv0jbfs
-         uSD2SL3BEw9EaSuaSIxhPcxow4i1a2ljCW9pkO2DFrnfjgeililo9O+XsJSBBoqYSTtr
-         MLNA==
-X-Forwarded-Encrypted: i=1; AJvYcCWj2Yst3HnBTPqJpHTocSVAs2RiQGcfqaNFsAWnEd9fnx9y2DGKaVfirfRtzepWc7HwCDatJwJ+gWP7Sh8WAlShYXZjGt3s
-X-Gm-Message-State: AOJu0YzQ0tc+gEb6SjTA8I+1172B4MZM/wAjnn9Dr5ttMiuq/zEQe0eE
-	evY47OeqYXQSYb0W4uI6UWXqH//EOBisTniw/8hhvK4pRhYLl/XhdKofy4zLN3NixLwO6LEs4Dg
-	NHblIKuEQaqmFSCaAUZBXT9mdQk4=
-X-Google-Smtp-Source: AGHT+IH7JZVkLaY4LSELkGX0lEEz4bZ+5smrFkM3hN2TOky0izW8uLX+ncdU8VVmMKIVyZPL+lZd0mh8qNPLNhpyUcw=
-X-Received: by 2002:a17:906:c110:b0:a62:c500:50ba with SMTP id
- a640c23a62f3a-a62c5005179mr410270866b.75.1716814241886; Mon, 27 May 2024
- 05:50:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716814224; x=1717419024;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=F4rr0TG+i5LX4PfU3talh8egAEvYin6Xr/tjehsK1oU=;
+        b=ZTqqPxJDACNMv3q1mAhAGEFRSr6NDsJGlmYhtXo/zK4YD7bELnsRlgdS+odGdI1fdE
+         3xN5Gxf99dl9dq60iQ0omumBxva5ZRJVBXi7rJAWJSy9CO7HaW2oCYFCqt4NZbkfu5v+
+         Y6OFD3VgCPMN56w74QRNLZnbdE52bfUiVAUAgHMqvpLllSXIYHxHqbX5lnLDPsy6WjZB
+         mDB2bNo3NO81IL9mGnVcZgSGu3Ao7kPRq1rxox6fNQ6OrXlmnDcGfxrLWZzCWuyxDmhe
+         5W+VPdQRIt6Q76adK4PGNRx2KBQgKJA5wDSbgsspYniOan7QGiMpxQvnoJUm9cBh23M/
+         asag==
+X-Forwarded-Encrypted: i=1; AJvYcCUVUOjhqjk9bhSKBTY6r2SiKU5uQaPl4++znyCZCln4SgTarZeeaCegxkxc+E3gW8SatLQPmfBF91bdzcJUoMvAT8+ePDlt
+X-Gm-Message-State: AOJu0YyurMtaSI7GMPP/IczEy0ZvvipARlo7sKFT1pp/V3oNuzv2ZRUY
+	Azfl3OaMxipsST7emaWBAe76nv6/e50wGvtWJzv03rcGT6SyGUpd0DnawgJvUsDyUieT7mJyDa7
+	tnt/wrqsb6+I1EAj1rG/wLjN2U8lRgTc/9ENgA1340OyuUGhYo/aVXOA=
+X-Google-Smtp-Source: AGHT+IHrYCSzjwuIz4BBsit2eZXeQ2IdrTlMXtkUa8A3f0AhpBCRjRDBUykINqGYUHrizzMmMr5Q9DWGdwRA6o34VHCqddlMi+2n
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240524193630.2007563-1-edumazet@google.com> <20240524193630.2007563-2-edumazet@google.com>
- <CADVnQyk6CkWU-mETm9yM65Me91aVRr5ngXi2hkD6aETakB+c2w@mail.gmail.com>
- <CAL+tcoDq5G_KU3jJ2=kedHz9OvmLRD5sKf_KLrw3mg-yKrhtkw@mail.gmail.com> <CANn89iL_OL4RpLdg7GwWJt0jgMaW0jCHUKEHjxpydf-Dx2Zzcw@mail.gmail.com>
-In-Reply-To: <CANn89iL_OL4RpLdg7GwWJt0jgMaW0jCHUKEHjxpydf-Dx2Zzcw@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 27 May 2024 20:50:05 +0800
-Message-ID: <CAL+tcoAo3vW0mTJkxKfTYa=EJgiE1Qr=4GDCqtDPd5FCQAr1QA@mail.gmail.com>
-Subject: Re: [PATCH net 1/4] tcp: add tcp_done_with_error() helper
-To: Eric Dumazet <edumazet@google.com>
-Cc: Neal Cardwell <ncardwell@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
+X-Received: by 2002:a05:6e02:1d8a:b0:374:5b18:28c8 with SMTP id
+ e9e14a558f8ab-3745b182b34mr2012815ab.3.1716814224113; Mon, 27 May 2024
+ 05:50:24 -0700 (PDT)
+Date: Mon, 27 May 2024 05:50:24 -0700
+In-Reply-To: <0000000000004096100617c58d54@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000f9561b06196ef5b3@google.com>
+Subject: Re: [syzbot] [mm?] kernel BUG in __vma_reservation_common
+From: syzbot <syzbot+d3fe2dc5ffe9380b714b@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, muchun.song@linux.dev, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 27, 2024 at 4:56=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Mon, May 27, 2024 at 10:07=E2=80=AFAM Jason Xing <kerneljasonxing@gmai=
-l.com> wrote:
-> >
-> > Hi Neal,
-> >
-> > On Sat, May 25, 2024 at 10:14=E2=80=AFPM Neal Cardwell <ncardwell@googl=
-e.com> wrote:
-> > >
-> > > On Fri, May 24, 2024 at 3:36=E2=80=AFPM Eric Dumazet <edumazet@google=
-.com> wrote:
-> > > >
-> > > > tcp_reset() ends with a sequence that is carefuly ordered.
-> > > >
-> > > > We need to fix [e]poll bugs in the following patches,
-> > > > it makes sense to use a common helper.
-> > > >
-> > > > Suggested-by: Neal Cardwell <ncardwell@google.com>
-> > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > > ---
-> > > >  include/net/tcp.h    |  1 +
-> > > >  net/ipv4/tcp.c       |  2 +-
-> > > >  net/ipv4/tcp_input.c | 25 +++++++++++++++++--------
-> > > >  3 files changed, 19 insertions(+), 9 deletions(-)
-> > > >
-> > > > diff --git a/include/net/tcp.h b/include/net/tcp.h
-> > > > index 060e95b331a286ad7c355be11dc03250d2944920..2e7150f6755a5f5bf7b=
-45454da0b33c5fac78183 100644
-> > > > --- a/include/net/tcp.h
-> > > > +++ b/include/net/tcp.h
-> > > > @@ -677,6 +677,7 @@ void tcp_skb_collapse_tstamp(struct sk_buff *sk=
-b,
-> > > >  /* tcp_input.c */
-> > > >  void tcp_rearm_rto(struct sock *sk);
-> > > >  void tcp_synack_rtt_meas(struct sock *sk, struct request_sock *req=
-);
-> > > > +void tcp_done_with_error(struct sock *sk);
-> > > >  void tcp_reset(struct sock *sk, struct sk_buff *skb);
-> > > >  void tcp_fin(struct sock *sk);
-> > > >  void tcp_check_space(struct sock *sk);
-> > > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > > > index 681b54e1f3a64387787738ab6495531b8abe1771..2a8f8d8676ff1d30ea9=
-f8cd47ccf9236940eb299 100644
-> > > > --- a/net/ipv4/tcp.c
-> > > > +++ b/net/ipv4/tcp.c
-> > > > @@ -598,7 +598,7 @@ __poll_t tcp_poll(struct file *file, struct soc=
-ket *sock, poll_table *wait)
-> > > >                  */
-> > > >                 mask |=3D EPOLLOUT | EPOLLWRNORM;
-> > > >         }
-> > > > -       /* This barrier is coupled with smp_wmb() in tcp_reset() */
-> > > > +       /* This barrier is coupled with smp_wmb() in tcp_done_with_=
-error() */
-> > > >         smp_rmb();
-> > > >         if (READ_ONCE(sk->sk_err) ||
-> > > >             !skb_queue_empty_lockless(&sk->sk_error_queue))
-> > > > diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> > > > index 9c04a9c8be9dfaa0ec2437b3748284e57588b216..5af716f1bc74e095d22=
-f64d605624decfe27cefe 100644
-> > > > --- a/net/ipv4/tcp_input.c
-> > > > +++ b/net/ipv4/tcp_input.c
-> > > > @@ -4436,6 +4436,22 @@ static enum skb_drop_reason tcp_sequence(con=
-st struct tcp_sock *tp,
-> > > >         return SKB_NOT_DROPPED_YET;
-> > > >  }
-> > > >
-> > > > +
-> > > > +void tcp_done_with_error(struct sock *sk)
-> > > > +{
-> > > > +       /* Our caller wrote a value into sk->sk_err.
-> > > > +        * This barrier is coupled with smp_rmb() in tcp_poll()
-> > > > +        */
-> > > > +       smp_wmb();
-> > > > +
-> > > > +       tcp_write_queue_purge(sk);
-> > > > +       tcp_done(sk);
-> > > > +
-> > > > +       if (!sock_flag(sk, SOCK_DEAD))
-> > > > +               sk_error_report(sk);
-> > > > +}
-> > > > +EXPORT_SYMBOL(tcp_done_with_error);
-> > > > +
-> > > >  /* When we get a reset we do this. */
-> > > >  void tcp_reset(struct sock *sk, struct sk_buff *skb)
-> > > >  {
-> > > > @@ -4460,14 +4476,7 @@ void tcp_reset(struct sock *sk, struct sk_bu=
-ff *skb)
-> > > >         default:
-> > > >                 WRITE_ONCE(sk->sk_err, ECONNRESET);
-> > > >         }
-> > > > -       /* This barrier is coupled with smp_rmb() in tcp_poll() */
-> > > > -       smp_wmb();
-> > > > -
-> > > > -       tcp_write_queue_purge(sk);
-> > > > -       tcp_done(sk);
-> > > > -
-> > > > -       if (!sock_flag(sk, SOCK_DEAD))
-> > > > -               sk_error_report(sk);
-> > > > +       tcp_done_with_error(sk);
-> > > >  }
-> > > >
-> > > >  /*
-> > > > --
-> > >
-> > > Thanks, Eric!
-> > >
-> > > Thinking about this more, I wonder if there is another aspect to this=
- issue.
-> > >
-> > > I am thinking about this part of tcp_done():
-> > >
-> > > void tcp_done(struct sock *sk)
-> > > {
-> > > ...
-> > >         sk->sk_shutdown =3D SHUTDOWN_MASK;
-> > >
-> > >         if (!sock_flag(sk, SOCK_DEAD))
-> > >                 sk->sk_state_change(sk);
-> > >
-> > > The tcp_poll() code reads sk->sk_shutdown to decide whether to set
-> > > EPOLLHUP and other bits. However, sk->sk_shutdown is not set until
-> > > here in tcp_done(). And in the tcp_done() code there is no smp_wmb()
-> > > to ensure that the sk->sk_shutdown is visible to other CPUs before
-> > > tcp_done() calls sk->sk_state_change() to wake up threads sleeping on
-> > > sk->sk_wq.
-> > >
-> > > So AFAICT we could have cases where this sk->sk_state_change() (or th=
-e
-> > > later sk_error_report()?) wakes a thread doing a tcp_poll() on anothe=
-r
-> > > CPU, and the tcp_poll() code may correctly see the sk->sk_err because
-> > > it was updated before the smp_wmb() in tcp_done_with_error(), but may
-> > > fail to see the "sk->sk_shutdown =3D SHUTDOWN_MASK" write because tha=
-t
-> > > happened after the smp_wmb() in tcp_done_with_error().
-> >
-> > I agree. Accessing sk_shutdown with a pair of smp operations makes
-> > sure that another cpu can see the consistency of both sk_shutdown and
-> > sk_err in tcp_poll().
-> >
-> > >
-> > > So AFAICT  maybe we need two changes?
-> > >
-> > > (1) AFAICT the call to smp_wmb() should actually instead be inside
-> > > tcp_done(), after we set sk->sk_shutdown?
-> > >
-> > > void tcp_done(struct sock *sk)
-> > > {
-> > >         ...
-> > >         sk->sk_shutdown =3D SHUTDOWN_MASK;
-> > >
-> > >         /* Ensure previous writes to sk->sk_err, sk->sk_state,
-> > >          * sk->sk_shutdown are visible to others.
-> > >          * This barrier is coupled with smp_rmb() in tcp_poll()
-> > >          */
-> > >         smp_wmb();
-> >
-> > I wonder if it would affect those callers who have no interest in
-> > pairing smp operations, like tcp_v4_syn_recv_sock()? For those
-> > callers, WRITE_ONCE/READ_ONCE() is enough to protect itself only.
->
-> WRITE_ONCE()/READ_ONCE() and smp_rmb()/smp_wmb() have different purposes.
->
-> smp_rmb()/smp_wmb() are order of magnitude more expensive than
-> WRITE_ONCE()/READ_ONCE()
->
-> You should use them only when absolutely needed.
+syzbot has found a reproducer for the following issue on:
 
-Sure, I know them. What I was trying to say is putting a smp_wmb()
-into tcp_done() is not appropriate because other callers don't want
-this expansive protection for sk_shutdown which can be protected with
-WRITE/READ_ONCE.
+HEAD commit:    66ad4829ddd0 Merge tag 'net-6.10-rc1' of git://git.kernel...
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=15c114aa980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=48c05addbb27f3b0
+dashboard link: https://syzkaller.appspot.com/bug?extid=d3fe2dc5ffe9380b714b
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17770d72980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10db1592980000
 
-Thanks,
-Jason
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/05c6f2231ef8/disk-66ad4829.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/5f4fc63b22e3/vmlinux-66ad4829.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/67f5c4c88729/bzImage-66ad4829.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d3fe2dc5ffe9380b714b@syzkaller.appspotmail.com
+
+RBP: 0000000000000001 R08: 00000000ffffffff R09: 0000000000000000
+R10: 0000000000028031 R11: 0000000000000246 R12: 0000000000000001
+R13: 431bde82d7b634db R14: 00007f64830b0035 R15: 0000000000000001
+ </TASK>
+------------[ cut here ]------------
+kernel BUG at mm/hugetlb.c:813!
+Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
+CPU: 0 PID: 5089 Comm: syz-executor179 Not tainted 6.9.0-syzkaller-12071-g66ad4829ddd0 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+RIP: 0010:region_abort mm/hugetlb.c:813 [inline]
+RIP: 0010:__vma_reservation_common+0x795/0x7d0 mm/hugetlb.c:2835
+Code: 21 65 8e 09 e8 8c a3 9e ff 90 0f 0b e8 84 a3 9e ff 90 0f 0b e8 7c a3 9e ff 90 0f 0b e8 74 a3 9e ff 90 0f 0b e8 6c a3 9e ff 90 <0f> 0b e8 64 a3 9e ff 90 0f 0b e8 5c a3 9e ff 90 0f 0b e8 54 a3 9e
+RSP: 0018:ffffc900035ff1c0 EFLAGS: 00010293
+RAX: ffffffff81f77114 RBX: 0000000000000000 RCX: ffff88801ff90000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc900035ff290 R08: ffffffff81f76c26 R09: fffff520006bfe28
+R10: dffffc0000000000 R11: fffff520006bfe28 R12: 0000000000000000
+R13: dffffc0000000000 R14: ffff88802ce84c08 R15: ffff88802ce84c00
+FS:  00005555950a7380(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f6483099c40 CR3: 00000000746f4000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ vma_add_reservation mm/hugetlb.c:2898 [inline]
+ __unmap_hugepage_range+0x125d/0x2350 mm/hugetlb.c:5772
+ unmap_vmas+0x3cc/0x5f0 mm/memory.c:1891
+ unmap_region+0x1ec/0x350 mm/mmap.c:2355
+ do_vmi_align_munmap+0x1122/0x18c0 mm/mmap.c:2673
+ do_vmi_munmap+0x24e/0x2d0 mm/mmap.c:2741
+ mmap_region+0x72f/0x2070 mm/mmap.c:2792
+ do_mmap+0x8ad/0xfa0 mm/mmap.c:1387
+ vm_mmap_pgoff+0x1dd/0x3d0 mm/util.c:573
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f6483066d39
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff7dc97c58 EFLAGS: 00000246 ORIG_RAX: 0000000000000009
+RAX: ffffffffffffffda RBX: 00007fff7dc97c80 RCX: 00007f6483066d39
+RDX: 0000000000000000 RSI: 00000000001fffff RDI: 0000000020000000
+RBP: 0000000000000001 R08: 00000000ffffffff R09: 0000000000000000
+R10: 0000000000028031 R11: 0000000000000246 R12: 0000000000000001
+R13: 431bde82d7b634db R14: 00007f64830b0035 R15: 0000000000000001
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:region_abort mm/hugetlb.c:813 [inline]
+RIP: 0010:__vma_reservation_common+0x795/0x7d0 mm/hugetlb.c:2835
+Code: 21 65 8e 09 e8 8c a3 9e ff 90 0f 0b e8 84 a3 9e ff 90 0f 0b e8 7c a3 9e ff 90 0f 0b e8 74 a3 9e ff 90 0f 0b e8 6c a3 9e ff 90 <0f> 0b e8 64 a3 9e ff 90 0f 0b e8 5c a3 9e ff 90 0f 0b e8 54 a3 9e
+RSP: 0018:ffffc900035ff1c0 EFLAGS: 00010293
+RAX: ffffffff81f77114 RBX: 0000000000000000 RCX: ffff88801ff90000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc900035ff290 R08: ffffffff81f76c26 R09: fffff520006bfe28
+R10: dffffc0000000000 R11: fffff520006bfe28 R12: 0000000000000000
+R13: dffffc0000000000 R14: ffff88802ce84c08 R15: ffff88802ce84c00
+FS:  00005555950a7380(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f6483099c40 CR3: 00000000746f4000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
