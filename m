@@ -1,148 +1,117 @@
-Return-Path: <netdev+bounces-98289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 516CA8D08A1
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 18:31:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C6848D08A8
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 18:32:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 857B928B6D4
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:31:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B91D31C232B4
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91FA155CA3;
-	Mon, 27 May 2024 16:31:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBBFB61FE5;
+	Mon, 27 May 2024 16:31:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gxLEH86g"
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="hsooxw4X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC93A73473;
-	Mon, 27 May 2024 16:31:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30BC47347D;
+	Mon, 27 May 2024 16:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716827461; cv=none; b=T/Uzq31ixP8j+x4V9h1x73LYNK8HIehnNAEFClY8xzZIG8hCbgcAmFlscsgQP8R8agpE6KA3Ljiz7KMeEXePIRRfToKY5KjaqqGl/R8MuBirwda0Z7bO31rBx2pVEcck5YXyrR3ijxq/16FjmWDyZAwOk6V4AJ/WIGstM9B9GRA=
+	t=1716827484; cv=none; b=PkpBA27OaJpFLszFOqtgMKJSmjiIz/sOb89DFQTDWarr1Z4txMp73IyLldVGIRU4ePx3XPJdj3Abxbrm8Rn/1SnPVy7rh3OwyLzuNWmAISsG0VuFM4DHtGvI1pIscPwJVxJENJyjNxDrXnNb0qAJPC+iAqZ66p/qq3/I+Atbt1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716827461; c=relaxed/simple;
-	bh=wFzYxv0fxA4PHm+U+RUFutGQw4gMcFRHBJORjFR0yQE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XBPEOEuifJknY1+ikpGbShiG8K4+dr9u58qqnuKI7lbe63eaf5xK+1eEbnDAoMfQHShoIrYOziMADuy31NhWXpKWEY/JsCYYYlWSERlQ/o1LSOmUlR9Eys7Omwr1Fn2hrxd82jW9a6hk130RxYV2qOzo+eYFdQAT5pfk1YLhMKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gxLEH86g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3878FC32781;
-	Mon, 27 May 2024 16:31:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716827461;
-	bh=wFzYxv0fxA4PHm+U+RUFutGQw4gMcFRHBJORjFR0yQE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gxLEH86gxe7ZfAK5zKlZ/j7jD2Y0eX49YH9bXtJxDjJg5jP6FjDrRKuCrhqX6jHoP
-	 9nKNjpFKFfOmGWTLoQNuwgxsIsk3PIaej0kvKEkhtZbpKOv/fmvoil6O1QhbRo8DYI
-	 k1YIa3xSM0SMMvpYrkZXuaRNZVmoSkcqU0oeohtoNQPVP0DXYYWpz8DxvkjRJ5jSYk
-	 r9pryL0aDrWu3OeaX8ObokDTvhHWbcsNDAnwVWVr8nq6rwaDRaQQjAr+tATZ5QToqG
-	 P2UVj1e49JdccaR4g4zSZfqr4Lk+GDVudiRA72rKEv6EGw+S4VWeRQGY8+cLP/H/pq
-	 n0kCv9ZIrLVVQ==
-Date: Mon, 27 May 2024 09:30:59 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: Danielle Ratson <danieller@nvidia.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>,
- "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "sdf@google.com"
- <sdf@google.com>, "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
- "maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
- "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
- "przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
- "ahmed.zaki@intel.com" <ahmed.zaki@intel.com>, "richardcochran@gmail.com"
- <richardcochran@gmail.com>, "shayagr@amazon.com" <shayagr@amazon.com>,
- "paul.greenwalt@intel.com" <paul.greenwalt@intel.com>, "jiri@resnulli.us"
- <jiri@resnulli.us>, "linux-doc@vger.kernel.org"
- <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, mlxsw <mlxsw@nvidia.com>, Petr Machata
- <petrm@nvidia.com>
-Subject: Re: [PATCH net-next v5 04/10] ethtool: Add flashing transceiver
- modules' firmware notifications ability
-Message-ID: <20240527093059.7e6e17ba@kernel.org>
-In-Reply-To: <ZlSwbTwRF6KjPfJ5@shredder>
-References: <20240424133023.4150624-5-danieller@nvidia.com>
-	<20240429201130.5fad6d05@kernel.org>
-	<DM6PR12MB45168DC7D9D9D7A5AE3E2B2DD81A2@DM6PR12MB4516.namprd12.prod.outlook.com>
-	<20240430130302.235d612d@kernel.org>
-	<ZjH1DCu0rJTL_RYz@shredder>
-	<20240501073758.3da76601@kernel.org>
-	<DM6PR12MB451687C3C54323473716621ED8EB2@DM6PR12MB4516.namprd12.prod.outlook.com>
-	<20240522064519.3e980390@kernel.org>
-	<DM6PR12MB451677DBA41EA8A622D3D446D8EB2@DM6PR12MB4516.namprd12.prod.outlook.com>
-	<20240522072212.7a21c84b@kernel.org>
-	<ZlSwbTwRF6KjPfJ5@shredder>
+	s=arc-20240116; t=1716827484; c=relaxed/simple;
+	bh=UHzdji3b5jtbCYVY1FtiERZjN+yzMm4hP5v6zc+XiWM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PE/Hk9iqTgo+PpRTXARgV1gFjnELWpB3FKMPwqtEE84h7vTGwnfA7UuiCkEGOcizy4z8tC8cE1ssSvJ1NyOJFI48hZq8FUpM/PikAhxbd2L4X2PQV8p4CjQE7bvP9Ig9HT8j1XnqTMj0JqT63281qmHd0BlBnTqhZoQ4nWLigUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=hsooxw4X; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=x5hSgktQC4VekqZNvnHHeOTEWH8AryjJrdKbAnEOFp8=; b=hsooxw4X1wEt53LXSYt/42FL6N
+	xCUdpx8KVh/3S2lTEQ63zWmx+pTkZr/+CzKvaXs3Fpb9pbLHUOHC4z9G0aF/3DiZ2d+X6MGf5diNd
+	+QxXsD16EnrA8odJKZ7HFqhqproNi1rcVtsPoQ/U8wjMdptoWbrGZrDeT3vn0qZ4HUylL6qT9MuQN
+	rrwOtAwkfzYQYfBVRq/4MPpX6J6G/+5phQxmX+LAZuJ3ZW4gSZLK99N62jyYDz10Jsw8Djzybqtw0
+	LCIe6NjS+bXi/HVMBa0XZYbKrsI7O5/v1wFv32zdYHMKN15PBcSzdS0rVDu7CYNzbLSUYg3oHVBWv
+	bP63xZEw==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1sBdFk-00DoOO-36;
+	Mon, 27 May 2024 16:31:17 +0000
+Date: Mon, 27 May 2024 17:31:16 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH][CFT][experimental] net/socket.c: use straight
+ fdget/fdput (resend)
+Message-ID: <20240527163116.GD2118490@ZenIV>
+References: <20240526034506.GZ2118490@ZenIV>
+ <CAHk-=wjWFM9iPa8a+0apgvBoLv5PsYeQPViuf-zmkLiCGVQEww@mail.gmail.com>
+ <20240526192721.GA2118490@ZenIV>
+ <CAHk-=wixYUyQcS9tDNVvnCvEi37puqqpQ=CN+zP=a9Q9Fp5e-Q@mail.gmail.com>
+ <20240526231641.GB2118490@ZenIV>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240526231641.GB2118490@ZenIV>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On Mon, 27 May 2024 19:10:55 +0300 Ido Schimmel wrote:
-> On Wed, May 22, 2024 at 07:22:12AM -0700, Jakub Kicinski wrote:
-> > On Wed, 22 May 2024 13:56:11 +0000 Danielle Ratson wrote: =20
-> > > The event should match the below:
-> > > event =3D=3D NETLINK_URELEASE && notify->protocol =3D=3D NETLINK_GENE=
-RIC
-> > >=20
-> > > Then iterate over the list to look for work that matches the dev and =
-portid.
-> > > The socket doesn=E2=80=99t close until the work is done in that case.=
-  =20
-> >=20
-> > Okay, good, yes. I think you can use one of the callbacks I mentioned
-> > below to achieve the same thing with less complexity than the notifier.=
- =20
->=20
-> Danielle already has a POC with the notifier and it's not that
-> complicated. I wasn't aware of the netlink notifier, but we found it
-> when we tried to understand how other netlink families get notified
-> about a socket being closed.
->=20
-> Which advantages do you see in the sock_priv_destroy() approach? Are you
-> against the notifier approach?
+On Mon, May 27, 2024 at 12:16:41AM +0100, Al Viro wrote:
+> > What would make more sense is if you make the "fd_empty()" test be
+> > about the _flags_, and then both the fp_empty() test and the test
+> > inside fdput() would be testing the same things.
+> 
+> Umm...  What encoding would you use?
 
-Notifier is not incorrect, but I worry it will result in more code,
-and basically duplication of what genl_sk_priv* does. Perhaps you
-managed to code it up very neatly - if so feel free to send the v6
-and we can discuss further if needed?
+FWIW, _if_ we go for replacement of struct fd with struct-wrapped
+unsigned long and actually steal another bit from pointer, we could
+actually use that to encode errors as well...
 
-> > > > Easiest way to "notice" the socket got closed would probably be to =
-add some
-> > > > info to genl_sk_priv_*(). ->sock_priv_destroy() will get called. Bu=
-t you can also
-> > > > get a close notification in the family   =20
-> > > > ->unbind callback.   =20
->=20
-> Isn't the unbind callback only for multicast (whereas we are using
-> unicast)?
+If bit 0 is clear for file reference and set for an error, we could
+use bit 1 to represent borrowed vs. cloned and bit 2 for need to
+unlock...
 
-True, should work in practice, I think. But sock_priv is much better.
+overlayfs would be happier that way - we could have those functions
+return struct fd directly, and pass the error value that way.
+fdget() would report EBADF explicitly on empty slot - not a big
+deal.  Hmm...
 
-> > > Is there a scenario that we hit this event and won't intend to cancel=
- the work?  =20
-> >=20
-> > I think it's up to us. I don't see any legit reason for user space to
-> > intentionally cancel the flashing. So the only option is that user space
-> > is either buggy or has crashed, and the socket got closed before
-> > flashing finished. Right? =20
->=20
-> We don't think that closing the socket / killing the process mid
-> flashing is a legitimate scenario. We looked into it in order to avoid
-> sending unicast notifications to a socket that did not ask for them but
-> gets them because it was bound to the port ID that was used by the old
-> socket.
->=20
-> I agree that we don't need to cancel the work and can simply have the
-> work item stop sending notifications. User space will get an error if it
-> tries to flash a module that is already being flashed in the background.
-> WDYT?
+Let me play with that a bit and see if I can come up with something
+tolerable.
 
-SGTM!
+We could add that in parallel to existing struct fd; we'd need a name
+for replacement, though - anything like "rawfd" is asking for confusion
+around fdget_raw(), and we'd need replacements for fdget() et.al.
+that would yield those.
+
+Alternatively, with a sane set of helpers we could actually _replace_
+struct fd definition without a huge flagday commit - start with adding
+#define fd_file(fd) ((fd).file)
+#define fd_valid(fd) (fd_file(fd) != NULL)
+convert the current users, one by one (fairly mechanical patches),
+then change the definition of struct fd.  The last step would affect
+	* definitions of helpers
+	* adding fd-constructing macros (ERR_FD, etc.)
+	* converting the few places that really construct those
+suckers (fdget() et.al., overlayfs, a couple of explicit
+initializers to {NULL, 0}).
+
+It's not a huge amount of work and the flagday step would be fairly
+small, but we'd probably need to split that over a couple of cycles -
+helpers in one, along with renaming fd.file to e.g.
+fd.__file_use_the_damn_helpers, then in the next cycle do the
+switchover.
+
+Hell knows; let me play with that a bit and let's see what falls out...
 
