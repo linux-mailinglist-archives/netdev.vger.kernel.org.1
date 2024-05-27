@@ -1,61 +1,65 @@
-Return-Path: <netdev+bounces-98230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF2268D0416
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:38:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCA2C8D041B
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:39:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD6A31C211BD
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 14:38:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F1E22A8012
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 14:39:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 921121C9EAD;
-	Mon, 27 May 2024 14:17:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D2C1CB319;
+	Mon, 27 May 2024 14:17:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J9AUOU68"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ekSrYCbQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649CF1C9EA9;
-	Mon, 27 May 2024 14:17:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37E71CB313;
+	Mon, 27 May 2024 14:17:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716819458; cv=none; b=hOGlx8zjFSVNbHSheaEdn3bg/QkxzP2eRdQA+YWQt0GFFk4xmFrTtUkw2Ny7RqM+72VAxuaTdnfe6r+ZF4RwOT3Is5PnVUaINz8jIXGCKDolxdc8U28AIgUAbzRXk+CmlCbVMus81lvTaHtIV3pUx7Yw/rN3GTTlSSu/7ZMUyZw=
+	t=1716819462; cv=none; b=MIZIIfcwMYvzzPQFMVWrIwD+3Y6TiyH/lGUU/hbCRTtvMewsqVLmmSVgsBfqZGlYdWm4YnMSEZU4rMuRziAbhUekGYA7YxXGM+aWXNxq4Tr5YeFqiYt0N8DFYiimMaZu3V00QjSZ771adjT1YL1aX0xXFCcdWLDk/l8O98sybl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716819458; c=relaxed/simple;
-	bh=UznEczMmCON4EV0nn8oRbk5D+kUl+n2ZbJihfTVTcBI=;
+	s=arc-20240116; t=1716819462; c=relaxed/simple;
+	bh=GAJ0spvR+9Hfp8WiqceJyAQZOHpZP+lvUabgRhVtrGo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Dhge0DNIMI/7yT4iRWEFu7ndrLdrkKbDRdVYaWJmdf+wp2El83nxsU2ydvhYQEkEEUTzVD3zmrZSJaIUjtsNh61yewTk6pudnYTm0RBZSj97QNvBBL03ze4WRMqLksUAJ03qUKJdvdTE8xbnoKgK8Rz3IHfWid84pYKRewL/Bl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J9AUOU68; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA208C32789;
-	Mon, 27 May 2024 14:17:36 +0000 (UTC)
+	 MIME-Version; b=UhkvzNkfiZROFYyTxVEeDoiregsuWTbsxZ1SLkFiioKEYtciKT0JalAOaROCle86g9QPUyxquApgKsZDMZWm9HTyqJxLCOmri6bjLvMa25LPEbk0ZZqhzzzafrG6dcdNiMZyvfVPtKUs/HY7wQR9smDqC57LYYCwBjV1LHqLVgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ekSrYCbQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 483E8C32781;
+	Mon, 27 May 2024 14:17:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716819457;
-	bh=UznEczMmCON4EV0nn8oRbk5D+kUl+n2ZbJihfTVTcBI=;
+	s=k20201202; t=1716819461;
+	bh=GAJ0spvR+9Hfp8WiqceJyAQZOHpZP+lvUabgRhVtrGo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=J9AUOU68Fe/JZHRZQR/HEYglCSa9dM6eNhmiBqsG/YBWj33hVKuqfG7ILTL/F5NR4
-	 ui57lFutTItR/pq8ElAbimSJ/m6HccAe8srDq7J1FX6pg/JcLM/8Iika2fivgYcq7W
-	 tRRytim3pGmUuAYwMhlapncozm7rphn5MTEv2YfcKZuYIrZgUMGYGhpDr811Fo+rz+
-	 LBE/4d3RfUgt5Mu3+QXxXQ8bLuxS/XIqZ/tkIjCu3aN04IJdKSFp73W56+6prj7jyO
-	 9+YajrzeUdDM1Y2tJ490ySWU/6aPKYTOwGy16bi6IvvA9MkKjWazLm5PCTfPW+t7Va
-	 dqYi1SIwEfoqg==
+	b=ekSrYCbQYjLTZrF/uBz2jt7OYV8kRn0xheXt4spVf4m3RXdwz3HxlNDOGhBS21tjO
+	 x0CO+2e7nnhZr9duKLcveyD1+SG6h4T9ajHca+c9Qy5yDDQmonavVCPplWDxcO+wrS
+	 YIc4GS3dJBUhxR2BU48lE/ycHzUSMNmvk40KLlnWHtpVR0ekc/GOa8vXDG2LEh6/uo
+	 YMQAfUO4REdUYD1yRr7iqU/wIxJRnVu0xz4xM2D+vfMai6EnDa1bRKLLRumgOMq8wU
+	 9oiq9BeWvyYvNvAyjYV3A9odmZ9x4iDymVcOZkfSDnHLYzQgwrNdmEMAgoRup6SDXt
+	 KQbHrFoVTQWSQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Wander Lairson Costa <wander@redhat.com>,
-	Hu Chunyu <chuhu@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Davide Caratti <dcaratti@redhat.com>,
+	Maxim Mikityanskiy <maxim@isovalent.com>,
+	Xiumei Mu <xmu@redhat.com>,
+	Christoph Paasch <cpaasch@apple.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	nhorman@tuxdriver.com,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 07/17] drop_monitor: replace spin_lock by raw_spin_lock
-Date: Mon, 27 May 2024 10:16:44 -0400
-Message-ID: <20240527141712.3853988-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 09/17] net/sched: fix false lockdep warning on qdisc root lock
+Date: Mon, 27 May 2024 10:16:46 -0400
+Message-ID: <20240527141712.3853988-9-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240527141712.3853988-1-sashal@kernel.org>
 References: <20240527141712.3853988-1-sashal@kernel.org>
@@ -70,153 +74,190 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.92
 Content-Transfer-Encoding: 8bit
 
-From: Wander Lairson Costa <wander@redhat.com>
+From: Davide Caratti <dcaratti@redhat.com>
 
-[ Upstream commit f1e197a665c2148ebc25fe09c53689e60afea195 ]
+[ Upstream commit af0cb3fa3f9ed258d14abab0152e28a0f9593084 ]
 
-trace_drop_common() is called with preemption disabled, and it acquires
-a spin_lock. This is problematic for RT kernels because spin_locks are
-sleeping locks in this configuration, which causes the following splat:
+Xiumei and Christoph reported the following lockdep splat, complaining of
+the qdisc root lock being taken twice:
 
-BUG: sleeping function called from invalid context at kernel/locking/spinlock_rt.c:48
-in_atomic(): 1, irqs_disabled(): 1, non_block: 0, pid: 449, name: rcuc/47
-preempt_count: 1, expected: 0
-RCU nest depth: 2, expected: 2
-5 locks held by rcuc/47/449:
- #0: ff1100086ec30a60 ((softirq_ctrl.lock)){+.+.}-{2:2}, at: __local_bh_disable_ip+0x105/0x210
- #1: ffffffffb394a280 (rcu_read_lock){....}-{1:2}, at: rt_spin_lock+0xbf/0x130
- #2: ffffffffb394a280 (rcu_read_lock){....}-{1:2}, at: __local_bh_disable_ip+0x11c/0x210
- #3: ffffffffb394a160 (rcu_callback){....}-{0:0}, at: rcu_do_batch+0x360/0xc70
- #4: ff1100086ee07520 (&data->lock){+.+.}-{2:2}, at: trace_drop_common.constprop.0+0xb5/0x290
-irq event stamp: 139909
-hardirqs last  enabled at (139908): [<ffffffffb1df2b33>] _raw_spin_unlock_irqrestore+0x63/0x80
-hardirqs last disabled at (139909): [<ffffffffb19bd03d>] trace_drop_common.constprop.0+0x26d/0x290
-softirqs last  enabled at (139892): [<ffffffffb07a1083>] __local_bh_enable_ip+0x103/0x170
-softirqs last disabled at (139898): [<ffffffffb0909b33>] rcu_cpu_kthread+0x93/0x1f0
-Preemption disabled at:
-[<ffffffffb1de786b>] rt_mutex_slowunlock+0xab/0x2e0
-CPU: 47 PID: 449 Comm: rcuc/47 Not tainted 6.9.0-rc2-rt1+ #7
-Hardware name: Dell Inc. PowerEdge R650/0Y2G81, BIOS 1.6.5 04/15/2022
-Call Trace:
- <TASK>
- dump_stack_lvl+0x8c/0xd0
- dump_stack+0x14/0x20
- __might_resched+0x21e/0x2f0
- rt_spin_lock+0x5e/0x130
- ? trace_drop_common.constprop.0+0xb5/0x290
- ? skb_queue_purge_reason.part.0+0x1bf/0x230
- trace_drop_common.constprop.0+0xb5/0x290
- ? preempt_count_sub+0x1c/0xd0
- ? _raw_spin_unlock_irqrestore+0x4a/0x80
- ? __pfx_trace_drop_common.constprop.0+0x10/0x10
- ? rt_mutex_slowunlock+0x26a/0x2e0
- ? skb_queue_purge_reason.part.0+0x1bf/0x230
- ? __pfx_rt_mutex_slowunlock+0x10/0x10
- ? skb_queue_purge_reason.part.0+0x1bf/0x230
- trace_kfree_skb_hit+0x15/0x20
- trace_kfree_skb+0xe9/0x150
- kfree_skb_reason+0x7b/0x110
- skb_queue_purge_reason.part.0+0x1bf/0x230
- ? __pfx_skb_queue_purge_reason.part.0+0x10/0x10
- ? mark_lock.part.0+0x8a/0x520
-...
+ ============================================
+ WARNING: possible recursive locking detected
+ 6.7.0-rc3+ #598 Not tainted
+ --------------------------------------------
+ swapper/2/0 is trying to acquire lock:
+ ffff888177190110 (&sch->q.lock){+.-.}-{2:2}, at: __dev_queue_xmit+0x1560/0x2e70
 
-trace_drop_common() also disables interrupts, but this is a minor issue
-because we could easily replace it with a local_lock.
+ but task is already holding lock:
+ ffff88811995a110 (&sch->q.lock){+.-.}-{2:2}, at: __dev_queue_xmit+0x1560/0x2e70
 
-Replace the spin_lock with raw_spin_lock to avoid sleeping in atomic
-context.
+ other info that might help us debug this:
+  Possible unsafe locking scenario:
 
-Signed-off-by: Wander Lairson Costa <wander@redhat.com>
-Reported-by: Hu Chunyu <chuhu@redhat.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+        CPU0
+        ----
+   lock(&sch->q.lock);
+   lock(&sch->q.lock);
+
+  *** DEADLOCK ***
+
+  May be due to missing lock nesting notation
+
+ 5 locks held by swapper/2/0:
+  #0: ffff888135a09d98 ((&in_dev->mr_ifc_timer)){+.-.}-{0:0}, at: call_timer_fn+0x11a/0x510
+  #1: ffffffffaaee5260 (rcu_read_lock){....}-{1:2}, at: ip_finish_output2+0x2c0/0x1ed0
+  #2: ffffffffaaee5200 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x209/0x2e70
+  #3: ffff88811995a110 (&sch->q.lock){+.-.}-{2:2}, at: __dev_queue_xmit+0x1560/0x2e70
+  #4: ffffffffaaee5200 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x209/0x2e70
+
+ stack backtrace:
+ CPU: 2 PID: 0 Comm: swapper/2 Not tainted 6.7.0-rc3+ #598
+ Hardware name: Red Hat KVM, BIOS 1.13.0-2.module+el8.3.0+7353+9de0a3cc 04/01/2014
+ Call Trace:
+  <IRQ>
+  dump_stack_lvl+0x4a/0x80
+  __lock_acquire+0xfdd/0x3150
+  lock_acquire+0x1ca/0x540
+  _raw_spin_lock+0x34/0x80
+  __dev_queue_xmit+0x1560/0x2e70
+  tcf_mirred_act+0x82e/0x1260 [act_mirred]
+  tcf_action_exec+0x161/0x480
+  tcf_classify+0x689/0x1170
+  prio_enqueue+0x316/0x660 [sch_prio]
+  dev_qdisc_enqueue+0x46/0x220
+  __dev_queue_xmit+0x1615/0x2e70
+  ip_finish_output2+0x1218/0x1ed0
+  __ip_finish_output+0x8b3/0x1350
+  ip_output+0x163/0x4e0
+  igmp_ifc_timer_expire+0x44b/0x930
+  call_timer_fn+0x1a2/0x510
+  run_timer_softirq+0x54d/0x11a0
+  __do_softirq+0x1b3/0x88f
+  irq_exit_rcu+0x18f/0x1e0
+  sysvec_apic_timer_interrupt+0x6f/0x90
+  </IRQ>
+
+This happens when TC does a mirred egress redirect from the root qdisc of
+device A to the root qdisc of device B. As long as these two locks aren't
+protecting the same qdisc, they can be acquired in chain: add a per-qdisc
+lockdep key to silence false warnings.
+This dynamic key should safely replace the static key we have in sch_htb:
+it was added to allow enqueueing to the device "direct qdisc" while still
+holding the qdisc root lock.
+
+v2: don't use static keys anymore in HTB direct qdiscs (thanks Eric Dumazet)
+
+CC: Maxim Mikityanskiy <maxim@isovalent.com>
+CC: Xiumei Mu <xmu@redhat.com>
+Reported-by: Christoph Paasch <cpaasch@apple.com>
+Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/451
+Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+Link: https://lore.kernel.org/r/7dc06d6158f72053cf877a82e2a7a5bd23692faa.1713448007.git.dcaratti@redhat.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/drop_monitor.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ include/net/sch_generic.h |  1 +
+ net/sched/sch_generic.c   |  3 +++
+ net/sched/sch_htb.c       | 22 +++-------------------
+ 3 files changed, 7 insertions(+), 19 deletions(-)
 
-diff --git a/net/core/drop_monitor.c b/net/core/drop_monitor.c
-index 8e0a90b45df22..522657b597d9f 100644
---- a/net/core/drop_monitor.c
-+++ b/net/core/drop_monitor.c
-@@ -72,7 +72,7 @@ struct net_dm_hw_entries {
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index b3e3128402961..aefdb080ad3d2 100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -126,6 +126,7 @@ struct Qdisc {
+ 
+ 	struct rcu_head		rcu;
+ 	netdevice_tracker	dev_tracker;
++	struct lock_class_key	root_lock_key;
+ 	/* private data */
+ 	long privdata[] ____cacheline_aligned;
  };
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index a5693e25b2482..d4b4e32aa0e06 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -942,7 +942,9 @@ struct Qdisc *qdisc_alloc(struct netdev_queue *dev_queue,
+ 	__skb_queue_head_init(&sch->gso_skb);
+ 	__skb_queue_head_init(&sch->skb_bad_txq);
+ 	gnet_stats_basic_sync_init(&sch->bstats);
++	lockdep_register_key(&sch->root_lock_key);
+ 	spin_lock_init(&sch->q.lock);
++	lockdep_set_class(&sch->q.lock, &sch->root_lock_key);
  
- struct per_cpu_dm_data {
--	spinlock_t		lock;	/* Protects 'skb', 'hw_entries' and
-+	raw_spinlock_t		lock;	/* Protects 'skb', 'hw_entries' and
- 					 * 'send_timer'
- 					 */
- 	union {
-@@ -166,9 +166,9 @@ static struct sk_buff *reset_per_cpu_data(struct per_cpu_dm_data *data)
- err:
- 	mod_timer(&data->send_timer, jiffies + HZ / 10);
- out:
--	spin_lock_irqsave(&data->lock, flags);
-+	raw_spin_lock_irqsave(&data->lock, flags);
- 	swap(data->skb, skb);
--	spin_unlock_irqrestore(&data->lock, flags);
-+	raw_spin_unlock_irqrestore(&data->lock, flags);
+ 	if (ops->static_flags & TCQ_F_CPUSTATS) {
+ 		sch->cpu_bstats =
+@@ -1062,6 +1064,7 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
+ 	if (ops->destroy)
+ 		ops->destroy(qdisc);
  
- 	if (skb) {
- 		struct nlmsghdr *nlh = (struct nlmsghdr *)skb->data;
-@@ -223,7 +223,7 @@ static void trace_drop_common(struct sk_buff *skb, void *location)
++	lockdep_unregister_key(&qdisc->root_lock_key);
+ 	module_put(ops->owner);
+ 	netdev_put(qdisc_dev(qdisc), &qdisc->dev_tracker);
  
- 	local_irq_save(flags);
- 	data = this_cpu_ptr(&dm_cpu_data);
--	spin_lock(&data->lock);
-+	raw_spin_lock(&data->lock);
- 	dskb = data->skb;
- 
- 	if (!dskb)
-@@ -257,7 +257,7 @@ static void trace_drop_common(struct sk_buff *skb, void *location)
- 	}
- 
- out:
--	spin_unlock_irqrestore(&data->lock, flags);
-+	raw_spin_unlock_irqrestore(&data->lock, flags);
+diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
+index 67b1879ea8e10..d23f8ea630820 100644
+--- a/net/sched/sch_htb.c
++++ b/net/sched/sch_htb.c
+@@ -1036,13 +1036,6 @@ static void htb_work_func(struct work_struct *work)
+ 	rcu_read_unlock();
  }
  
- static void trace_kfree_skb_hit(void *ignore, struct sk_buff *skb,
-@@ -312,9 +312,9 @@ net_dm_hw_reset_per_cpu_data(struct per_cpu_dm_data *hw_data)
- 		mod_timer(&hw_data->send_timer, jiffies + HZ / 10);
- 	}
- 
--	spin_lock_irqsave(&hw_data->lock, flags);
-+	raw_spin_lock_irqsave(&hw_data->lock, flags);
- 	swap(hw_data->hw_entries, hw_entries);
--	spin_unlock_irqrestore(&hw_data->lock, flags);
-+	raw_spin_unlock_irqrestore(&hw_data->lock, flags);
- 
- 	return hw_entries;
- }
-@@ -446,7 +446,7 @@ net_dm_hw_trap_summary_probe(void *ignore, const struct devlink *devlink,
- 		return;
- 
- 	hw_data = this_cpu_ptr(&dm_hw_cpu_data);
--	spin_lock_irqsave(&hw_data->lock, flags);
-+	raw_spin_lock_irqsave(&hw_data->lock, flags);
- 	hw_entries = hw_data->hw_entries;
- 
- 	if (!hw_entries)
-@@ -475,7 +475,7 @@ net_dm_hw_trap_summary_probe(void *ignore, const struct devlink *devlink,
- 	}
- 
- out:
--	spin_unlock_irqrestore(&hw_data->lock, flags);
-+	raw_spin_unlock_irqrestore(&hw_data->lock, flags);
- }
- 
- static const struct net_dm_alert_ops net_dm_alert_summary_ops = {
-@@ -1658,7 +1658,7 @@ static struct notifier_block dropmon_net_notifier = {
- 
- static void __net_dm_cpu_data_init(struct per_cpu_dm_data *data)
+-static void htb_set_lockdep_class_child(struct Qdisc *q)
+-{
+-	static struct lock_class_key child_key;
+-
+-	lockdep_set_class(qdisc_lock(q), &child_key);
+-}
+-
+ static int htb_offload(struct net_device *dev, struct tc_htb_qopt_offload *opt)
  {
--	spin_lock_init(&data->lock);
-+	raw_spin_lock_init(&data->lock);
- 	skb_queue_head_init(&data->drop_queue);
- 	u64_stats_init(&data->stats.syncp);
- }
+ 	return dev->netdev_ops->ndo_setup_tc(dev, TC_SETUP_QDISC_HTB, opt);
+@@ -1129,7 +1122,6 @@ static int htb_init(struct Qdisc *sch, struct nlattr *opt,
+ 			return -ENOMEM;
+ 		}
+ 
+-		htb_set_lockdep_class_child(qdisc);
+ 		q->direct_qdiscs[ntx] = qdisc;
+ 		qdisc->flags |= TCQ_F_ONETXQUEUE | TCQ_F_NOPARENT;
+ 	}
+@@ -1465,7 +1457,6 @@ static int htb_graft(struct Qdisc *sch, unsigned long arg, struct Qdisc *new,
+ 	}
+ 
+ 	if (q->offload) {
+-		htb_set_lockdep_class_child(new);
+ 		/* One ref for cl->leaf.q, the other for dev_queue->qdisc. */
+ 		qdisc_refcount_inc(new);
+ 		old_q = htb_graft_helper(dev_queue, new);
+@@ -1728,11 +1719,8 @@ static int htb_delete(struct Qdisc *sch, unsigned long arg,
+ 		new_q = qdisc_create_dflt(dev_queue, &pfifo_qdisc_ops,
+ 					  cl->parent->common.classid,
+ 					  NULL);
+-		if (q->offload) {
+-			if (new_q)
+-				htb_set_lockdep_class_child(new_q);
++		if (q->offload)
+ 			htb_parent_to_leaf_offload(sch, dev_queue, new_q);
+-		}
+ 	}
+ 
+ 	sch_tree_lock(sch);
+@@ -1946,13 +1934,9 @@ static int htb_change_class(struct Qdisc *sch, u32 classid,
+ 		new_q = qdisc_create_dflt(dev_queue, &pfifo_qdisc_ops,
+ 					  classid, NULL);
+ 		if (q->offload) {
+-			if (new_q) {
+-				htb_set_lockdep_class_child(new_q);
+-				/* One ref for cl->leaf.q, the other for
+-				 * dev_queue->qdisc.
+-				 */
++			/* One ref for cl->leaf.q, the other for dev_queue->qdisc. */
++			if (new_q)
+ 				qdisc_refcount_inc(new_q);
+-			}
+ 			old_q = htb_graft_helper(dev_queue, new_q);
+ 			/* No qdisc_put needed. */
+ 			WARN_ON(!(old_q->flags & TCQ_F_BUILTIN));
 -- 
 2.43.0
 
