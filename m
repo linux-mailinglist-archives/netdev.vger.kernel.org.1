@@ -1,59 +1,61 @@
-Return-Path: <netdev+bounces-98205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71C3D8D0320
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:19:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8D128D033A
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:21:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A0A41F25436
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 14:19:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 058A01C21345
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 14:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5014316EBE7;
-	Mon, 27 May 2024 14:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4967916F90B;
+	Mon, 27 May 2024 14:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UY0cZgor"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="swWb++BR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E3716EBE3;
-	Mon, 27 May 2024 14:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1577716F905;
+	Mon, 27 May 2024 14:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716819185; cv=none; b=HcYxDrCio7uICjZkAwcYWqQ8Jj4h+ZlVEsKi6g4LJWJxy9FvAQ6ypoB18s7qj5Jh9QTZYTyYZkZHd6T4LAIUDAuh4Fae3TcnPbs26vXq+2nWLdhO6U0SHTjNmnAIucgQviJgcTme+oDtvCA+mjavHb+EYPjv8b/JZ6P9jiv5HhM=
+	t=1716819210; cv=none; b=kzyUsXPpx0H5oz1CdQxbhdymxtcF9s4bclDAy4XHkjhRg0LqoVtTJJXNoQzHTmNJozXDyVwmw5xiQhu3Kh9W2BTjvGgRTgXKuJzEauaq4vtYh2Ms2Snp+d3e+LJqSQSFreq1mIY/6hP97maH8etlW7jvlMSPgJz7SSKFyig5tsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716819185; c=relaxed/simple;
-	bh=gT3PUxRsUL+n6n4zrXENoJgzxNiIqZwJ8cCv7JfCF08=;
+	s=arc-20240116; t=1716819210; c=relaxed/simple;
+	bh=s+lIrPPcCGvUZL3PbI5a5ZKTRpmk/nMe5exqy1s372s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sKabxNcD0kX2tLorc/fWHrIpNPs53Ta9w5xU8oaqY5x5+vLSiclJtLuP+PMt4VhfKNB14SFGrSCZVLq7fLWLjd6P5QhmBKB9IPqzXmHmvF3kPEcAP3t25/bndLIwqQJw5xrhGAiGNfsvl6uqrehtCtmHUgG4A+3xG1qzTuf1tvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UY0cZgor; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1A12C32789;
-	Mon, 27 May 2024 14:13:03 +0000 (UTC)
+	 MIME-Version; b=jw1AmECHK6n5yw5IbbP8wJb8aNx5Ja+ez8a69nv6jAB2JzDUzM6yC9ndN1xXUaH7G93N/mJLskU5YQdRkqxVr9D6fxEhgML4f3zJ0+wc81d+ukil68xdfpzYuXVnF5AyEQRVWHs98WMAQ1QjDiC6LTg2po0JsBkWmrntHKG30QA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=swWb++BR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA6ABC4AF07;
+	Mon, 27 May 2024 14:13:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716819185;
-	bh=gT3PUxRsUL+n6n4zrXENoJgzxNiIqZwJ8cCv7JfCF08=;
+	s=k20201202; t=1716819209;
+	bh=s+lIrPPcCGvUZL3PbI5a5ZKTRpmk/nMe5exqy1s372s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UY0cZgorTHnzQpnYN41e+Eb9ZJgpDMjxLI3IW1IqfHuZp4lHQe8RF4tNEHGSpnxcO
-	 37zI8sdUibYM45mul9UjzHqbDFdfnR4r3pvY57CoM37E5Z9boWQ+cZD4sJ+jfd5wUV
-	 NIWns8gZVUJll8fvvexv0N1TLo8APh9AXSKUnSnjt4NrpIjMqX3t8LWVukSzulj+Bu
-	 CEvAf7ZNniE4FJnS8OMzg12FwX0EuDzs4m/AMzAVxlhZ/0J6r08luMddBRHW7BFC1o
-	 rYtavUyoZyeVgU8G6TAbrdyI4IsGLKYmL2zgQaoRiWyXugg9Qvu3barIdLtjD5vR3h
-	 KAChQN7/FZ14A==
+	b=swWb++BRCkHO09pbzSQrLJX85vpNXpIQkV2YahdQuyQEsi26+n2T4bKtwhVspiEkb
+	 Hvl+a1jYuu215MpNVpn/Zeoe3l0sjuki2ClyvCtZmnoRBw4rOkflum7hfu/zTn6W52
+	 wukpV0hRqs2hFpUm46IDwhGDX7CFBrk2XdJ0qPg4ZYaA0b2K4Dw1fhxigPJFWESYGy
+	 YlwFT3NBS1GlWGWudBdcebIr/iU6zqo3MZY4LhKlRkj2by4CAPbXc6NboARuITxrGt
+	 eU7vT/NNe56G68IdEQM0182haidst4KGuXZkvdj+++mmIUIrwACqmj51Y4poysWsuT
+	 8NEMFKVhwKj6g==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Breno Leitao <leitao@debian.org>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
 	Sasha Levin <sashal@kernel.org>,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.9 25/35] netpoll: Fix race condition in netpoll_owner_active
-Date: Mon, 27 May 2024 10:11:30 -0400
-Message-ID: <20240527141214.3844331-25-sashal@kernel.org>
+	shuah@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.9 33/35] selftests: net: fix timestamp not arriving in cmsg_time.sh
+Date: Mon, 27 May 2024 10:11:38 -0400
+Message-ID: <20240527141214.3844331-33-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240527141214.3844331-1-sashal@kernel.org>
 References: <20240527141214.3844331-1-sashal@kernel.org>
@@ -68,50 +70,85 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.9.2
 Content-Transfer-Encoding: 8bit
 
-From: Breno Leitao <leitao@debian.org>
+From: Jakub Kicinski <kuba@kernel.org>
 
-[ Upstream commit c2e6a872bde9912f1a7579639c5ca3adf1003916 ]
+[ Upstream commit 2d3b8dfd82d76b1295167c6453d683ab99e50794 ]
 
-KCSAN detected a race condition in netpoll:
+On slow machines the SND timestamp sometimes doesn't arrive before
+we quit. The test only waits as long as the packet delay, so it's
+easy for a race condition to happen.
 
-	BUG: KCSAN: data-race in net_rx_action / netpoll_send_skb
-	write (marked) to 0xffff8881164168b0 of 4 bytes by interrupt on cpu 10:
-	net_rx_action (./include/linux/netpoll.h:90 net/core/dev.c:6712 net/core/dev.c:6822)
-<snip>
-	read to 0xffff8881164168b0 of 4 bytes by task 1 on cpu 2:
-	netpoll_send_skb (net/core/netpoll.c:319 net/core/netpoll.c:345 net/core/netpoll.c:393)
-	netpoll_send_udp (net/core/netpoll.c:?)
-<snip>
-	value changed: 0x0000000a -> 0xffffffff
+Double the wait but do a bit of polling, once the SND timestamp
+arrives there's no point to wait any longer.
 
-This happens because netpoll_owner_active() needs to check if the
-current CPU is the owner of the lock, touching napi->poll_owner
-non atomically. The ->poll_owner field contains the current CPU holding
-the lock.
+This fixes the "TXTIME abs" failures on debug kernels, like:
 
-Use an atomic read to check if the poll owner is the current CPU.
+   Case ICMPv4  - TXTIME abs returned '', expected 'OK'
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Link: https://lore.kernel.org/r/20240429100437.3487432-1-leitao@debian.org
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Link: https://lore.kernel.org/r/20240510005705.43069-1-kuba@kernel.org
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/netpoll.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/net/cmsg_sender.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index 543007f159f99..55bcacf67df3b 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -316,7 +316,7 @@ static int netpoll_owner_active(struct net_device *dev)
- 	struct napi_struct *napi;
+diff --git a/tools/testing/selftests/net/cmsg_sender.c b/tools/testing/selftests/net/cmsg_sender.c
+index c79e65581dc37..161db24e3c409 100644
+--- a/tools/testing/selftests/net/cmsg_sender.c
++++ b/tools/testing/selftests/net/cmsg_sender.c
+@@ -333,16 +333,17 @@ static const char *cs_ts_info2str(unsigned int info)
+ 	return "unknown";
+ }
  
- 	list_for_each_entry_rcu(napi, &dev->napi_list, dev_list) {
--		if (napi->poll_owner == smp_processor_id())
-+		if (READ_ONCE(napi->poll_owner) == smp_processor_id())
- 			return 1;
+-static void
++static unsigned long
+ cs_read_cmsg(int fd, struct msghdr *msg, char *cbuf, size_t cbuf_sz)
+ {
+ 	struct sock_extended_err *see;
+ 	struct scm_timestamping *ts;
++	unsigned long ts_seen = 0;
+ 	struct cmsghdr *cmsg;
+ 	int i, err;
+ 
+ 	if (!opt.ts.ena)
+-		return;
++		return 0;
+ 	msg->msg_control = cbuf;
+ 	msg->msg_controllen = cbuf_sz;
+ 
+@@ -396,8 +397,11 @@ cs_read_cmsg(int fd, struct msghdr *msg, char *cbuf, size_t cbuf_sz)
+ 			printf(" %5s ts%d %lluus\n",
+ 			       cs_ts_info2str(see->ee_info),
+ 			       i, rel_time);
++			ts_seen |= 1 << see->ee_info;
+ 		}
  	}
- 	return 0;
++
++	return ts_seen;
+ }
+ 
+ static void ca_set_sockopts(int fd)
+@@ -509,10 +513,16 @@ int main(int argc, char *argv[])
+ 	err = ERN_SUCCESS;
+ 
+ 	if (opt.ts.ena) {
+-		/* Make sure all timestamps have time to loop back */
+-		usleep(opt.txtime.delay);
++		unsigned long seen;
++		int i;
+ 
+-		cs_read_cmsg(fd, &msg, cbuf, sizeof(cbuf));
++		/* Make sure all timestamps have time to loop back */
++		for (i = 0; i < 40; i++) {
++			seen = cs_read_cmsg(fd, &msg, cbuf, sizeof(cbuf));
++			if (seen & (1 << SCM_TSTAMP_SND))
++				break;
++			usleep(opt.txtime.delay / 20);
++		}
+ 	}
+ 
+ err_out:
 -- 
 2.43.0
 
