@@ -1,249 +1,126 @@
-Return-Path: <netdev+bounces-98151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B0B08CFC3F
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 10:56:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1407F8CFC84
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 11:11:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D6011C21823
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 08:56:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD3F628396A
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 09:11:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 096F969953;
-	Mon, 27 May 2024 08:56:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD627763F8;
+	Mon, 27 May 2024 09:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ta3mN27P"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G08Hz/yn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26CFB44C68
-	for <netdev@vger.kernel.org>; Mon, 27 May 2024 08:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C0343AC1
+	for <netdev@vger.kernel.org>; Mon, 27 May 2024 09:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716800186; cv=none; b=cqJq609weem22lM0VVKwktrH+nuR1894iOxnMUTgZMNZhpk0ZhUTGsTQOos5vZQCxV3vrGnwukTbJTcxPvyaIvEkeou3w3KbwsF6OjdyyuU3NwXJ+aEgxcnCK0pwZ9WQK8KdHR1UnvgECp41pXqyRDNoN79zMcjmuy2R0vhDIjk=
+	t=1716801094; cv=none; b=QTVTb84n0MiqeSAKt9aV5pU4KQ5+CGK52lGIGerfjfL+uD8kTzsQlEZqJqaNACO9VDyLgXTEULZYnlk+DoTkEitMgSRa63DTymg7FWvgfrr11nUP8kTDUkwCKI6ft/1LfvfmfmeifKSnpcZwz+mWZIZ/+mD2wWWUnve1AQGXE7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716800186; c=relaxed/simple;
-	bh=CQ4dVtJiEqmi1AtZ9jRpPIaUmF2zzpX8vKDkr0nxPwk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I9tuprQp7B4VmGd/OjP1pTPCc3XQMoHQkXjNq+F1DnlGZ0x9foetWAr5obERbZngLk9FZfe0QVXM3hRbeMaqi7JDxBaodZJk2ZtCYgesFn1KFCFJjwIAHIHiMU29TYbzm0KWvpuARH02jDl0WMuoqpoO7M8JGaper1VWDFspJ1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ta3mN27P; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5750a8737e5so13256a12.0
-        for <netdev@vger.kernel.org>; Mon, 27 May 2024 01:56:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716800183; x=1717404983; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=laaN59m1dCaBjkd8cuIwRQ2bvmrHIxVQwGOs4NuJ++g=;
-        b=Ta3mN27PY2gZlxREoscDlWjYz6BYyax2SBg5Ckp5eyfhNv7uAW8VnEz8W6r0azHBDO
-         b2Qe78P6K4GJfQKlaiQpTNcPpigf8pLKScrbtQPrvI2hpNOD02ng7iOVXIESFL/ClPf9
-         HXUVcs0dZ4ojnlkXZmKAsPeccyAgsRm4smXpT0eLtjVvDrzexpe8AsRK5skn88pBHtpR
-         iMn1xaJXi83MOpUjOLrzdJJTMdrYmyRMWNaxBGAyfTu1qopUhdzoZLohf+Vbs1GcQ511
-         xLkjmp1Q82NAGqL5oX/HCb0HTUArcFiLC6BCEYmH1XeSu+QkApQ4MNYdJaPRIruXKlcb
-         viqA==
+	s=arc-20240116; t=1716801094; c=relaxed/simple;
+	bh=FX8CUXOjKuY0njjjxY7QGNcRoFXxTO7KWKilkbWSobE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=aLRgogIdld1PuMfRbaerTPRWw1yQtKpWEcO2LxN6hBdkYXfj0IlitgqXfMHvNn2ovqB+PAXHX7UY8WfGctViHp/LraYKprVlX8ltEwYN44Op94rZqwR1e9RsASCEBTxvPG9twsVMK4NHrcPF1sFTMFpKuQQedMptLyz4LsMBR3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G08Hz/yn; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716801092;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=FX8CUXOjKuY0njjjxY7QGNcRoFXxTO7KWKilkbWSobE=;
+	b=G08Hz/ynNKf7M6FGmR+KQT1XxjTgwWPphNX1mBOGydXQK3g5TqNoC1iIgNLB467N+Q6QGc
+	L4kjgCGESzRsYPJ1r7mQQwSyDlq527JLU2/ZqXjvWrQiV/X+8/UpDgv/gAPsyTc2EsbK1P
+	9neU6hEd4/6wrP5r6pmMD6gayabecOs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-549-i818EvFAOAK5db2WWkOLTw-1; Mon, 27 May 2024 05:11:30 -0400
+X-MC-Unique: i818EvFAOAK5db2WWkOLTw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42110b33fecso1110105e9.0
+        for <netdev@vger.kernel.org>; Mon, 27 May 2024 02:11:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716800183; x=1717404983;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=laaN59m1dCaBjkd8cuIwRQ2bvmrHIxVQwGOs4NuJ++g=;
-        b=s89TrEosIBAF2DxrK9nLLissdMAc3ujfLF1qo7aV0k3G1nel3ah1jLOqrCRLxNe2Ik
-         rwRvChH2NRgm5ctXhu3TjSJVcILkcfQ0hFSVq64BlIOPowPMzCD6ifkFaUvGUidDnOVW
-         wb4b/uK+zFtHAYQc6DKkXitV9HLlkTFuRql1dcePkzfyn+C7gFiTzi/QimipV3mcSbH2
-         jHjcDNAO7uYenmETIYzxcnL2ufTBWWYf3QyCYcGpEQQOjEGmv1/U5Q+wjDlQ3BzRDFh1
-         lhjlw03ldmq82GzWVLTPHTwoy5w782Qg+fNIyUMrQCERtBpEJ6dbWtOOeNxB4nSJYxrt
-         nAlA==
-X-Forwarded-Encrypted: i=1; AJvYcCXrfCnyDIR4j9Zic6GiPPKpnXpvZTCW6jkyal5UU0lrh/MF4Icq0vMET9gGzLDzM4g8yNxdJW5CzEj+2JVZD3WH6HesYa2B
-X-Gm-Message-State: AOJu0YxwEZ53fhbn3l3bXTd4TL0buzKnP3mqW/uNrEotOlQ964XgLWY9
-	4wCDGrol9GsPFTbbQ3+Vj/YiiNfFLUS/4O08gpFOl39DokgjQN4UZm7sQAk0qMrZE1tH0/LxBDQ
-	T7faa8LprusrWud1PYzvUXARCMJdmRcBqPKgg
-X-Google-Smtp-Source: AGHT+IEnfD+XusTMBMOjMzMuy11H8H9KGKpXjHeJcLLB7kxvsvzpb0EVB2mneRYROtJoRTgnGSR4A6M1nDL1hSpehLs=
-X-Received: by 2002:a05:6402:1803:b0:574:e7e1:35bf with SMTP id
- 4fb4d7f45d1cf-57869bd661cmr178977a12.7.1716800183125; Mon, 27 May 2024
- 01:56:23 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716801089; x=1717405889;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FX8CUXOjKuY0njjjxY7QGNcRoFXxTO7KWKilkbWSobE=;
+        b=hpS212hlRwjVKHnGqiC5AhKYPcveUsyikKmFGYs3aFyZ79BKNp6whgoj3+jfzHOmmg
+         4/ElEPQpqPA4tSSQifH6hGOJorhc5TSYFDX+qbc/47MpXoq+z3Xn55EYw5O+DzcsNUjO
+         3DQkC8Kyc9FbrtqY+XVCfmnowYcHtyxiFG66YDYzhdWvRczw4KvK4pG0H0lCRotECvwo
+         nG+c9M7Pj/oqcnMmn7WTlnIctnVxWNiXmjmyIRlBQH5hEHw+vbmwR8xpGRKAk3l/cAnc
+         d7GfRZqDJq05ne3syoo4da8FBAYKWMKftJX5Lt+hRWRa8S1OrAn6v9e4fRGaFdyWI5bh
+         STtg==
+X-Gm-Message-State: AOJu0Yzscgv0BgCnlPZIeXnMdYpxspRdxt2vB6UVzd8Jqdjia/Zw9jqq
+	LhsFqdH2BlEeAZgixhYL2jjHGq6gqnYRJqIP0xzFGCJZL65H8DXzIDKLW4bnImsiEGckL2+imlb
+	2LEwIRteEGrrwypvnTHy/0SihTUzMHOmQxv0QVgc8AdzMTDp1a0UENQ==
+X-Received: by 2002:a05:600c:3c8e:b0:41c:a98:b217 with SMTP id 5b1f17b1804b1-42108a18d32mr73657865e9.4.1716801088984;
+        Mon, 27 May 2024 02:11:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGEf9dprPL4bvNkNzDX6mG0B4lvF/NL9LfIb63/5RwgpuHNN1/UYkv9mKBT4/75V3nrk1uA1w==
+X-Received: by 2002:a05:600c:3c8e:b0:41c:a98:b217 with SMTP id 5b1f17b1804b1-42108a18d32mr73657725e9.4.1716801088497;
+        Mon, 27 May 2024 02:11:28 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3341:b094:ab10:29ae:cdc:4db4:a22a])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42108966682sm102307015e9.2.2024.05.27.02.11.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 May 2024 02:11:28 -0700 (PDT)
+Message-ID: <9bb0e47adf20c5524b45712fc92a37f2dae568be.camel@redhat.com>
+Subject: Re: [PATCH v2] net/ncsi: Fix the multi thread manner of NCSI driver
+From: Paolo Abeni <pabeni@redhat.com>
+To: DelphineCCChiu <delphine_cc_chiu@wiwynn.com>, patrick@stwcx.xyz, Samuel
+ Mendoza-Jonas <sam@mendozajonas.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Mon, 27 May 2024 11:11:25 +0200
+In-Reply-To: <20240522012537.2485027-1-delphine_cc_chiu@wiwynn.com>
+References: <20240522012537.2485027-1-delphine_cc_chiu@wiwynn.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240524193630.2007563-1-edumazet@google.com> <20240524193630.2007563-2-edumazet@google.com>
- <CADVnQyk6CkWU-mETm9yM65Me91aVRr5ngXi2hkD6aETakB+c2w@mail.gmail.com> <CAL+tcoDq5G_KU3jJ2=kedHz9OvmLRD5sKf_KLrw3mg-yKrhtkw@mail.gmail.com>
-In-Reply-To: <CAL+tcoDq5G_KU3jJ2=kedHz9OvmLRD5sKf_KLrw3mg-yKrhtkw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 27 May 2024 10:56:12 +0200
-Message-ID: <CANn89iL_OL4RpLdg7GwWJt0jgMaW0jCHUKEHjxpydf-Dx2Zzcw@mail.gmail.com>
-Subject: Re: [PATCH net 1/4] tcp: add tcp_done_with_error() helper
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Neal Cardwell <ncardwell@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 27, 2024 at 10:07=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
->
-> Hi Neal,
->
-> On Sat, May 25, 2024 at 10:14=E2=80=AFPM Neal Cardwell <ncardwell@google.=
-com> wrote:
-> >
-> > On Fri, May 24, 2024 at 3:36=E2=80=AFPM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > tcp_reset() ends with a sequence that is carefuly ordered.
-> > >
-> > > We need to fix [e]poll bugs in the following patches,
-> > > it makes sense to use a common helper.
-> > >
-> > > Suggested-by: Neal Cardwell <ncardwell@google.com>
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > ---
-> > >  include/net/tcp.h    |  1 +
-> > >  net/ipv4/tcp.c       |  2 +-
-> > >  net/ipv4/tcp_input.c | 25 +++++++++++++++++--------
-> > >  3 files changed, 19 insertions(+), 9 deletions(-)
-> > >
-> > > diff --git a/include/net/tcp.h b/include/net/tcp.h
-> > > index 060e95b331a286ad7c355be11dc03250d2944920..2e7150f6755a5f5bf7b45=
-454da0b33c5fac78183 100644
-> > > --- a/include/net/tcp.h
-> > > +++ b/include/net/tcp.h
-> > > @@ -677,6 +677,7 @@ void tcp_skb_collapse_tstamp(struct sk_buff *skb,
-> > >  /* tcp_input.c */
-> > >  void tcp_rearm_rto(struct sock *sk);
-> > >  void tcp_synack_rtt_meas(struct sock *sk, struct request_sock *req);
-> > > +void tcp_done_with_error(struct sock *sk);
-> > >  void tcp_reset(struct sock *sk, struct sk_buff *skb);
-> > >  void tcp_fin(struct sock *sk);
-> > >  void tcp_check_space(struct sock *sk);
-> > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > > index 681b54e1f3a64387787738ab6495531b8abe1771..2a8f8d8676ff1d30ea9f8=
-cd47ccf9236940eb299 100644
-> > > --- a/net/ipv4/tcp.c
-> > > +++ b/net/ipv4/tcp.c
-> > > @@ -598,7 +598,7 @@ __poll_t tcp_poll(struct file *file, struct socke=
-t *sock, poll_table *wait)
-> > >                  */
-> > >                 mask |=3D EPOLLOUT | EPOLLWRNORM;
-> > >         }
-> > > -       /* This barrier is coupled with smp_wmb() in tcp_reset() */
-> > > +       /* This barrier is coupled with smp_wmb() in tcp_done_with_er=
-ror() */
-> > >         smp_rmb();
-> > >         if (READ_ONCE(sk->sk_err) ||
-> > >             !skb_queue_empty_lockless(&sk->sk_error_queue))
-> > > diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> > > index 9c04a9c8be9dfaa0ec2437b3748284e57588b216..5af716f1bc74e095d22f6=
-4d605624decfe27cefe 100644
-> > > --- a/net/ipv4/tcp_input.c
-> > > +++ b/net/ipv4/tcp_input.c
-> > > @@ -4436,6 +4436,22 @@ static enum skb_drop_reason tcp_sequence(const=
- struct tcp_sock *tp,
-> > >         return SKB_NOT_DROPPED_YET;
-> > >  }
-> > >
-> > > +
-> > > +void tcp_done_with_error(struct sock *sk)
-> > > +{
-> > > +       /* Our caller wrote a value into sk->sk_err.
-> > > +        * This barrier is coupled with smp_rmb() in tcp_poll()
-> > > +        */
-> > > +       smp_wmb();
-> > > +
-> > > +       tcp_write_queue_purge(sk);
-> > > +       tcp_done(sk);
-> > > +
-> > > +       if (!sock_flag(sk, SOCK_DEAD))
-> > > +               sk_error_report(sk);
-> > > +}
-> > > +EXPORT_SYMBOL(tcp_done_with_error);
-> > > +
-> > >  /* When we get a reset we do this. */
-> > >  void tcp_reset(struct sock *sk, struct sk_buff *skb)
-> > >  {
-> > > @@ -4460,14 +4476,7 @@ void tcp_reset(struct sock *sk, struct sk_buff=
- *skb)
-> > >         default:
-> > >                 WRITE_ONCE(sk->sk_err, ECONNRESET);
-> > >         }
-> > > -       /* This barrier is coupled with smp_rmb() in tcp_poll() */
-> > > -       smp_wmb();
-> > > -
-> > > -       tcp_write_queue_purge(sk);
-> > > -       tcp_done(sk);
-> > > -
-> > > -       if (!sock_flag(sk, SOCK_DEAD))
-> > > -               sk_error_report(sk);
-> > > +       tcp_done_with_error(sk);
-> > >  }
-> > >
-> > >  /*
-> > > --
-> >
-> > Thanks, Eric!
-> >
-> > Thinking about this more, I wonder if there is another aspect to this i=
-ssue.
-> >
-> > I am thinking about this part of tcp_done():
-> >
-> > void tcp_done(struct sock *sk)
-> > {
-> > ...
-> >         sk->sk_shutdown =3D SHUTDOWN_MASK;
-> >
-> >         if (!sock_flag(sk, SOCK_DEAD))
-> >                 sk->sk_state_change(sk);
-> >
-> > The tcp_poll() code reads sk->sk_shutdown to decide whether to set
-> > EPOLLHUP and other bits. However, sk->sk_shutdown is not set until
-> > here in tcp_done(). And in the tcp_done() code there is no smp_wmb()
-> > to ensure that the sk->sk_shutdown is visible to other CPUs before
-> > tcp_done() calls sk->sk_state_change() to wake up threads sleeping on
-> > sk->sk_wq.
-> >
-> > So AFAICT we could have cases where this sk->sk_state_change() (or the
-> > later sk_error_report()?) wakes a thread doing a tcp_poll() on another
-> > CPU, and the tcp_poll() code may correctly see the sk->sk_err because
-> > it was updated before the smp_wmb() in tcp_done_with_error(), but may
-> > fail to see the "sk->sk_shutdown =3D SHUTDOWN_MASK" write because that
-> > happened after the smp_wmb() in tcp_done_with_error().
->
-> I agree. Accessing sk_shutdown with a pair of smp operations makes
-> sure that another cpu can see the consistency of both sk_shutdown and
-> sk_err in tcp_poll().
->
-> >
-> > So AFAICT  maybe we need two changes?
-> >
-> > (1) AFAICT the call to smp_wmb() should actually instead be inside
-> > tcp_done(), after we set sk->sk_shutdown?
-> >
-> > void tcp_done(struct sock *sk)
-> > {
-> >         ...
-> >         sk->sk_shutdown =3D SHUTDOWN_MASK;
-> >
-> >         /* Ensure previous writes to sk->sk_err, sk->sk_state,
-> >          * sk->sk_shutdown are visible to others.
-> >          * This barrier is coupled with smp_rmb() in tcp_poll()
-> >          */
-> >         smp_wmb();
->
-> I wonder if it would affect those callers who have no interest in
-> pairing smp operations, like tcp_v4_syn_recv_sock()? For those
-> callers, WRITE_ONCE/READ_ONCE() is enough to protect itself only.
+Hi,
 
-WRITE_ONCE()/READ_ONCE() and smp_rmb()/smp_wmb() have different purposes.
+On Wed, 2024-05-22 at 09:25 +0800, DelphineCCChiu wrote:
+> Currently NCSI driver will send several NCSI commands back to back withou=
+t
+> waiting the response of previous NCSI command or timeout in some state
+> when NIC have multi channel. This operation against the single thread
+> manner defined by NCSI SPEC(section 6.3.2.3 in DSP0222_1.1.1)
+>=20
+> According to NCSI SPEC(section 6.2.13.1 in DSP0222_1.1.1), we should prob=
+e
+> one channel at a time by sending NCSI commands (Clear initial state, Get
+> version ID, Get capabilities...), than repeat this steps until the max
+> number of channels which we got from NCSI command (Get capabilities) has
+> been probed.
+>=20
+> Signed-off-by: DelphineCCChiu <delphine_cc_chiu@wiwynn.com>
 
-smp_rmb()/smp_wmb() are order of magnitude more expensive than
-WRITE_ONCE()/READ_ONCE()
+As noted by Jakub, this looks like a fix. Please include a suitable
+Fixes tag in the tag area and the target tree 'net' inside the subject
+prefix.
 
-You should use them only when absolutely needed.
+Thanks!
+
+Paolo
+
 
