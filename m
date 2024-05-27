@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-98322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71B468D0C2F
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 21:17:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84E2B8D0C7E
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 21:20:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25BE4282C8F
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 19:17:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A79C51C20C0A
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 19:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD1315A84C;
-	Mon, 27 May 2024 19:17:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DBB815EFC3;
+	Mon, 27 May 2024 19:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cfWm4qDV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QGv4NzVQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667E6155C81
-	for <netdev@vger.kernel.org>; Mon, 27 May 2024 19:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC35C168C4
+	for <netdev@vger.kernel.org>; Mon, 27 May 2024 19:20:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716837420; cv=none; b=GKxF2vdMoTMbC+29+f3fy8JJjYkWhK43d3N2xvYL+K2AwB+QRYRdUlqvsdI5MSVHjzljKBpOt9OJ9Tu+M1x5k+mZo+XhBjwhHd96buRjPiCdSMniu47tqDqAFc6Y2av48P27576vEQptZHAYIJ6QV4fjXIedEx8zP3kXyAYV0uU=
+	t=1716837618; cv=none; b=TVMxOiHGW7DxZiu+HKroqNU4kbkjCPM6tbvlj18QIfOyy5vabcQg7kDQxSATvxOl/sC1g93EPxh6kCGRRMM5m7Aw/VuokTcSKtJEj8IPwdWPxAMEJgYbWNp0elme9zdMivJLchXcvim454ZUaE0r+4ZDTwXhS3S0Y6iUAk3K2FU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716837420; c=relaxed/simple;
-	bh=mUhLReAzBoHAVwvCNiBNUqeQxx2m5zsY0SDLKZ7NA9o=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=AURXxscKRq6+ND2DSNlYip4HF+zo/zk0OGS/HcVaKxhocoWbZPUNvVTyp/4tUZoBxG0qPmXCPEEADsnJbMjhxqwKXb+xa3OCo6iHCQgOrqapJu47kXN6XDDKCZWjxqm6xr8GEgxm7GoLJv5kOLAsXXzqcVjCf+U3f9PYbJ7raMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cfWm4qDV; arc=none smtp.client-ip=209.85.167.48
+	s=arc-20240116; t=1716837618; c=relaxed/simple;
+	bh=vPrjk3xt3qv/9vSJN6Wu8JgS7KcAUx2St8BUSs9zLyA=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=ZRmioqSxHkz3Bk7wsiuaJGtFs/WhUtkjxAYSlNEC5Kdgy8yezVFmx3QcN/c0LO31WEEIEGXJjD8e4yczKED0cpvarfeCybW5ZUTimDv2d1X6c4eRyiYv300Qi84XcIONkrJT/doPJEFAWY3IV9nvSn+BemV8mtVzwER4182sVMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QGv4NzVQ; arc=none smtp.client-ip=209.85.208.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5238b5c07efso93383e87.3
-        for <netdev@vger.kernel.org>; Mon, 27 May 2024 12:16:58 -0700 (PDT)
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-579cd80450fso2295397a12.0
+        for <netdev@vger.kernel.org>; Mon, 27 May 2024 12:20:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716837416; x=1717442216; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1716837615; x=1717442415; darn=vger.kernel.org;
         h=content-transfer-encoding:autocrypt:subject:from:cc:to
          :content-language:user-agent:mime-version:date:message-id:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lWROCAlQQPfcnWUcN8joPw0lduThFEXq+hWBhxaA7cE=;
-        b=cfWm4qDVb3SN0pNwmhjQ7c8mPykzZ4ZJQkT/iMCUhFXBT23wJuTRxXRJgrwBBzJfyx
-         gwNMU3Ei9FYKoHAyCRsaqTJq1ycuKiztl/nWVpbjJnSJekGlFVCth0arVuLwOTvv+Ptg
-         GkZE8r6m1+qiQqAeJeEDVuaoo4kxcckqvGsUVGmxz11CJtGYAkk8UNXbC7sUR5B/aRfV
-         pO0WZLuDYOg4+qXOputPFdcW+sQYr3hvY91KMTVdrz72AUL6LC1/wHMfOQUxcfrLWBYd
-         /DOCEztU5NOnSnibqfMlhTCMdD/oINPU80iQCfdQwWK/9T0zd55L8t0IdasR01+3vAGe
-         Sz1g==
+        bh=22dodccdaRs0TyL0zfUCi5IqM7zFVZ/oXehQJqvvx9c=;
+        b=QGv4NzVQBNpMJSdVqJc9EGuMATQTh76ppAinxaoxHS5vgcqIZNFgJ09GPmRZNr55xm
+         akaMymLXcGjN2SfMxncqz0z/CchKV8qV7Y7qsxnMgNkRKDdt4IL327FX47IaNDs+5iFm
+         SBe0mqw9jFu9D/L045aebi4cCysrz8AgDwRoiSbjFOg9VCjS+h/bnb8EDnazDPqk3YoU
+         tw8tMoCRMgJPzqwohmzAdiFV2rfrl1JC06z1dbbFCHUDMojhrrjx5vRWcYC7fQooHMJC
+         2IO5krvaqCw+sKnUr+5lw062R9cXJ0qmtZ1/gxPjIIccQ+ktgd00b2tKUqoWBqrWhNde
+         wdFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716837416; x=1717442216;
+        d=1e100.net; s=20230601; t=1716837615; x=1717442415;
         h=content-transfer-encoding:autocrypt:subject:from:cc:to
          :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lWROCAlQQPfcnWUcN8joPw0lduThFEXq+hWBhxaA7cE=;
-        b=wqyHbteY6Bck0dC0Gp6KQjOuGDrviSq1tYxiutOyydCaNW8vxKr3XmXz5QVGs1br6k
-         qCiPyHHIpTdTzW4bF8eCmyR2bXptErOhkH+ulLmTpIuRqb/6I6F0B2Nk41z4mf/WF40V
-         U1yfOVyJbob+E3v05AFW+a6AgE/k8FVszfqesurfiTQ6MpgwdWv+Ucp2WtJMCqYoZlaS
-         MM1wtz5a5Cts7mEal3d6Ntt4ekKmx23DeU+6sSCOhXgGiMqbMRAPppMtC4CKvFU4HJ2V
-         8CEzR5yxxNt5iZrJQGilX4ITu87h9Dgn8gi7t+6gk7NYFAQ2cy+9qD2Hn/CP+LsAZ6cn
-         zKxw==
-X-Gm-Message-State: AOJu0Yxe1XOB8PHwNBllk41ukM626n/FbkQYN9s3ycpOJhREXHmZlD1l
-	jG+cGQ2awU5e1jX4r8dOd38AqcTXvdmLuOHjseWrgfB6FXH4Os4d
-X-Google-Smtp-Source: AGHT+IH6Ja8k+mNO0PXS4QspcERBuR/NBW+t5ORloK3vCxEqpgewuvy4+OIb13MnC19TLwQN7WAuUQ==
-X-Received: by 2002:a19:a401:0:b0:523:b7ec:a222 with SMTP id 2adb3069b0e04-529667cfceemr5844992e87.51.1716837416195;
-        Mon, 27 May 2024 12:16:56 -0700 (PDT)
+        bh=22dodccdaRs0TyL0zfUCi5IqM7zFVZ/oXehQJqvvx9c=;
+        b=V8cR5wJFlh8AMsZ9Be/gzk+KjrcOpgrB1SIsDViSPBh+cU1Z8ZgjCLmuIC2P5uV8Gt
+         Iq1CSpJU0j10j/psvbiftOuHs1/zpPrZIUYdCAkVTWPkccaa/CgP3yXg+g1tvvOgwaXE
+         /c9ErsfoEO07WVrkKyatnCEI7CbqqDAJ9LPq7BnJretUWcTkOgkwcq6x/3qfPkoMw+dG
+         /3g+WRK2pa1c1+yFMugqG1u/J5WD6d6zMbTI8orugdcC4q0liUuD2amyFQ4CPf1Zxp5Y
+         VTzyYoSd85FYwroFY6jAYyRHNC/Bdrc9ByTEJ/R1jSlOUYrmCatpWxsfNtJpDgUwjDlW
+         Gyeg==
+X-Gm-Message-State: AOJu0YzF270WGMItbmiaTThmOdHhH49Z+r5zEz21ZMJUGt/oqQpzstrC
+	Hr1Hxjd3NsWM5PHXX09irLCRIYZrHTIlkEIdvb80MHPVrk82dWAh
+X-Google-Smtp-Source: AGHT+IGyRQ3XsJXQEE9EqUfHIi4Ib8zHy2ESDQbcUJTa8pTv8u9GGnsonY2+GAXbuW9o5BlrZFbb6A==
+X-Received: by 2002:a17:906:37c6:b0:a59:a3ad:c3f6 with SMTP id a640c23a62f3a-a62616def98mr846340566b.3.1716837614839;
+        Mon, 27 May 2024 12:20:14 -0700 (PDT)
 Received: from ?IPV6:2a01:c22:7ab0:9500:7d65:1ddd:73ae:5b49? (dynamic-2a01-0c22-7ab0-9500-7d65-1ddd-73ae-5b49.c22.pool.telefonica.de. [2a01:c22:7ab0:9500:7d65:1ddd:73ae:5b49])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-578524bb5ddsm6090710a12.93.2024.05.27.12.16.55
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a6286457089sm428681166b.64.2024.05.27.12.20.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 May 2024 12:16:55 -0700 (PDT)
-Message-ID: <9b2054b2-0548-4f48-bf91-b646572093b4@gmail.com>
-Date: Mon, 27 May 2024 21:16:56 +0200
+        Mon, 27 May 2024 12:20:14 -0700 (PDT)
+Message-ID: <875cdcf4-843c-420a-ad5d-417447b68572@gmail.com>
+Date: Mon, 27 May 2024 21:20:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,11 +76,12 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Content-Language: en-US
 To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
  Realtek linux nic maintainers <nic_swsd@realtek.com>
 Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] r8169: disable interrupt source RxOverflow
+Subject: [PATCH net-next] r8169: remove detection of chip version 11 (early
+ RTL8168b)
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
  sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
@@ -127,34 +128,32 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Vendor driver calls this bit RxDescUnavail. All we do in the interrupt
-handler in this case is scheduling NAPI. If we should be out of
-RX descriptors, then NAPI is scheduled anyway. Therefore remove this
-interrupt source. Tested on RTL8168h.
+This early RTL8168b version was the first PCIe chip version, and it's
+quite quirky. Last sign of life is from more than 15 yrs ago.
+Let's remove detection of this chip version, we'll see whether anybody
+complains. If not, support for this chip version can be removed a few
+kernel versions later.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index e8f90a8fa..e9f5185e4 100644
+index e9f5185e4..9be254373 100644
 --- a/drivers/net/ethernet/realtek/r8169_main.c
 +++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -5085,12 +5085,10 @@ static void rtl_set_irq_mask(struct rtl8169_private *tp)
- 	tp->irq_mask = RxOK | RxErr | TxOK | TxErr | LinkChg;
+@@ -2274,7 +2274,9 @@ static enum mac_version rtl8169_get_mac_version(u16 xid, bool gmii)
  
- 	if (tp->mac_version <= RTL_GIGA_MAC_VER_06)
--		tp->irq_mask |= SYSErr | RxOverflow | RxFIFOOver;
-+		tp->irq_mask |= SYSErr | RxFIFOOver;
- 	else if (tp->mac_version == RTL_GIGA_MAC_VER_11)
- 		/* special workaround needed */
- 		tp->irq_mask |= RxFIFOOver;
--	else
--		tp->irq_mask |= RxOverflow;
- }
+ 		/* 8168B family. */
+ 		{ 0x7c8, 0x380,	RTL_GIGA_MAC_VER_17 },
+-		{ 0x7c8, 0x300,	RTL_GIGA_MAC_VER_11 },
++		/* This one is very old and rare, let's see if anybody complains.
++		 * { 0x7c8, 0x300,	RTL_GIGA_MAC_VER_11 },
++		 */
  
- static int rtl_alloc_irq(struct rtl8169_private *tp)
+ 		/* 8101 family. */
+ 		{ 0x7c8, 0x448,	RTL_GIGA_MAC_VER_39 },
 -- 
 2.45.1
 
