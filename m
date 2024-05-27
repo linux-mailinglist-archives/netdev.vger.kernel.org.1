@@ -1,117 +1,76 @@
-Return-Path: <netdev+bounces-98257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B0F48D0596
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 17:13:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F39078D05A3
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 17:14:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B0F41C215B6
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 15:13:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A09DD287873
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 15:14:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D0C15EFC1;
-	Mon, 27 May 2024 14:54:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oe4kgmTI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97151161336;
+	Mon, 27 May 2024 14:57:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7EE15EFAE;
-	Mon, 27 May 2024 14:54:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF9315F309;
+	Mon, 27 May 2024 14:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716821687; cv=none; b=VzCUEHGe5HVKm+VKjlHXY8kprTw1OoBfKeOAw/ozmnGMdnGn4mIdOb4QgXRJ6Yjd7f6zU8UaQ0KOOw1iTX1GWyP0AilUPctPSiNGJFolzjBaazAlg/P7ynX4a2vmGhSIdFfWFLHkbf8Ti108/oSQuCK9HdRobMtu6M3YmEhBr3g=
+	t=1716821830; cv=none; b=bOD/r2cWjj2t7cNHo0WAdgsm20UexrG68xRsZbR8PNh+LEAZpPqFtX4u0LgzZh3+wIZmhVCDaZXdWoM6Oy2BoOKuZ/c/pjaY6PR5sGlAOOoUhjmes/w1fo0fEaCV1JaZafrG/I3OMfePgD5d+IQZKWWHFMpr8/8F+QvDHWdfaUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716821687; c=relaxed/simple;
-	bh=4xj/rMp795VJ8/WUQaQhFExsGLZLPZOia5IoxkqhSvY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N0bEn7n33a3o+lUkn3DSpLHQP0WLASirS2ce0IounSoEip+ZcokJIhulztA2JwRYRVLPCDDfC/V2K6P/M4XfOdgfNv1wJaBovsa8nuPD+NCnpov+jMnox7GjMZ9+JmdurG+tAgPTk5Ly5ivLCiHVruCJiEbEMmrMc0RVywRVCqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oe4kgmTI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2384C2BBFC;
-	Mon, 27 May 2024 14:54:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716821687;
-	bh=4xj/rMp795VJ8/WUQaQhFExsGLZLPZOia5IoxkqhSvY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Oe4kgmTIPvDetWrECerAh6AODF0QPzEu8znSjprVX/Qw234hajLABOpEpu7tA11gr
-	 oAkctYszlt1OxW/ILDSrC7IaiH81bc5xbi0mfTMN35fheBO/pUGryGfcU4dFzF66hQ
-	 7+ipQdSi6ipXbIBjFexRuX0U5iDHbRVI4hACoqdqX7/pTg3avV7sfDVRlX21yjY6SY
-	 WWRxSmt3ZC3pW29dSnDGskA/zMWAtgreerkJJ3gvitTOVIEkhDnaYbK4OGYInV3MT3
-	 cYclWCuJK+5fIa7T0KP+RQhHPaJFHRGI0JjJVY8IWv75aMW5QBe4uOIA5ivqX5p8zf
-	 LrEnR58Sn9j2Q==
-Date: Mon, 27 May 2024 16:54:41 +0200
-From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Sasha Levin <sashal@kernel.org>
-Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org, Eric Woudstra
- <ericwouds@gmail.com>, Russell King <rmk+kernel@armlinux.org.uk>, "David S
- . Miller" <davem@davemloft.net>, linux@armlinux.org.uk, andrew@lunn.ch,
- hkallweit1@gmail.com, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 6.9 12/35] net: sfp: add quirk for another
- multigig RollBall transceiver
-Message-ID: <20240527165441.2c5516c9@dellmb>
-In-Reply-To: <20240527141214.3844331-12-sashal@kernel.org>
-References: <20240527141214.3844331-1-sashal@kernel.org>
-	<20240527141214.3844331-12-sashal@kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1716821830; c=relaxed/simple;
+	bh=b4utjzmZdkWdzfxNrECx4ATh8uEdmBG28Y4/P1O57VE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uwB5gpPQbVDr6z2wK6FyVfag5CUQnsN5NXZHlWpb13IRh77DNvL4l5+mlgIvGCAPJMp+qMJIWVx606k0Sgfug4LhQY0oodU7ei0CQqR9GPvrBSh+zD8RaMgmYfFQbaIRb5olT71iEVp8DkBsXBSUajcnkQPfzFcybOox7MT0f4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Date: Mon, 27 May 2024 16:56:57 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+	netdev@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
+	fw@strlen.de
+Subject: Re: [PATCH net 0/6,v2] Netfilter fixes for net
+Message-ID: <ZlSfOTdWzbDGBgsj@calendula>
+References: <20240523162019.5035-1-pablo@netfilter.org>
+ <ZlJYT2-sjA8gypwO@calendula>
+ <57354e03b78f382e48b3bbc1eeec9dd14c3e940f.camel@redhat.com>
+ <63b7281b10c5491fbb02ba3f01328765b88a6271.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <63b7281b10c5491fbb02ba3f01328765b88a6271.camel@redhat.com>
 
-Sasha,
+On Mon, May 27, 2024 at 12:12:39PM +0200, Paolo Abeni wrote:
+> On Mon, 2024-05-27 at 11:59 +0200, Paolo Abeni wrote:
+> > On Sat, 2024-05-25 at 23:29 +0200, Pablo Neira Ayuso wrote:
+> > > Hi,
+> > > 
+> > > On Thu, May 23, 2024 at 06:20:13PM +0200, Pablo Neira Ayuso wrote:
+> > > > v2: fixes sparse warnings due to incorrect endianness in vlan mangling fix
+> > > >     reported by kbuild robot and Paolo Abeni.
+> > > 
+> > > I realized checkpatch complains on use of spaces instead of
+> > > indentation in patch 4/6.
+> > > 
+> > > I can repost the series as v3. Apologies for this comestic issue.
+> > 
+> > I think the overhead of a repost would offset the benefit of cleaning-
+> > up that minor format issue.
+> 
+> I'm sorry for being so self-contradictory in a very short period of
+> time, but before I misread the report.
+> 
+> I think this specific format violation is worth fixing. Could you
+> please send a v3?
 
-This requires the whole series from which it came:
-
-  https://lore.kernel.org/netdev/20240409073016.367771-1-ericwouds@gmail.co=
-m/
-
-It was merged in
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit=
-/?id=3Dc31bd5b6ff6f70f016e66c0617e0b91fd7aafca4
-
-I don't think this can be easily applied to older kernels, the series
-has some dependencies.
-
-Marek
-
-On Mon, 27 May 2024 10:11:17 -0400
-Sasha Levin <sashal@kernel.org> wrote:
-
-> From: Marek Beh=C3=BAn <kabel@kernel.org>
->=20
-> [ Upstream commit 1c77c721916ae108c2c5865986735bfe92000908 ]
->=20
-> Add quirk for another RollBall copper transceiver: Turris RTSFP-2.5G,
-> containing 2.5g capable RTL8221B PHY.
->=20
-> Signed-off-by: Marek Beh=C3=BAn <kabel@kernel.org>
-> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
->=20
-> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> Signed-off-by: David S. Miller <davem@davemloft.net>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
-> ---
->  drivers/net/phy/sfp.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-> index f75c9eb3958ef..6e7639fc64ddc 100644
-> --- a/drivers/net/phy/sfp.c
-> +++ b/drivers/net/phy/sfp.c
-> @@ -506,6 +506,7 @@ static const struct sfp_quirk sfp_quirks[] =3D {
->  	SFP_QUIRK_M("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
->  	SFP_QUIRK_F("OEM", "RTSFP-10", sfp_fixup_rollball_cc),
->  	SFP_QUIRK_F("OEM", "RTSFP-10G", sfp_fixup_rollball_cc),
-> +	SFP_QUIRK_F("Turris", "RTSFP-2.5G", sfp_fixup_rollball),
->  	SFP_QUIRK_F("Turris", "RTSFP-10", sfp_fixup_rollball),
->  	SFP_QUIRK_F("Turris", "RTSFP-10G", sfp_fixup_rollball),
->  };
-
+Sure, preparing a v3. Thanks
 
