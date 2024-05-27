@@ -1,126 +1,148 @@
-Return-Path: <netdev+bounces-98288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 317828D085F
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 18:26:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 516CA8D08A1
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 18:31:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F5B41C21B98
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:26:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 857B928B6D4
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F43F16EC1A;
-	Mon, 27 May 2024 16:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91FA155CA3;
+	Mon, 27 May 2024 16:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hZGkBaDT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gxLEH86g"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5538616EBF7;
-	Mon, 27 May 2024 16:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC93A73473;
+	Mon, 27 May 2024 16:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716826536; cv=none; b=kkI4jVjVzahOTwC5j8aIa64QRCU2/pEl+RRn5NLaK8KFBSiruw4gzUHNIO9Kr9In9aKzvcoqgppzTTbnBXoM27ET2GzzvM1WLfgUZkltk3Isf9U0rP1Z3kNSFw3j7py+6b0CAVj4FfwsTwNSZfj+02ndzmvhmhVludJoaNpqlDE=
+	t=1716827461; cv=none; b=T/Uzq31ixP8j+x4V9h1x73LYNK8HIehnNAEFClY8xzZIG8hCbgcAmFlscsgQP8R8agpE6KA3Ljiz7KMeEXePIRRfToKY5KjaqqGl/R8MuBirwda0Z7bO31rBx2pVEcck5YXyrR3ijxq/16FjmWDyZAwOk6V4AJ/WIGstM9B9GRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716826536; c=relaxed/simple;
-	bh=chCtCkqI/NY4Vy2ffwwkDxwHFQRfFlMjA49T/JZ0V2I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r27VkhrCUxcO9+BNg6x5fcj6XWTsTiSNHju+p33+epUdJ70tV9yImdKBKJdRU+wVbg/IVn/08uyiZubi+r44uEO/5XYKGerI+6h0mE23gql7LtrV0LDvKX1k/6BDmAcCTObScGm/4b7bSU4E6tYjFVf7w0yOchHyGQjJq3aKuiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hZGkBaDT; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPA id 7A5E0FF80E;
-	Mon, 27 May 2024 16:15:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1716826533;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S5EWnWVm8Boacgm88RxHxweJ58Kbq8GGMqtCde3uKZI=;
-	b=hZGkBaDT6XPUEKAWzhUuB2+uCGFMlArWDpCILqxRuPBbHcghizqQZSlO6wFCsZiI1gmal1
-	qJix31+53cvT67bFzT2JMWd2PWAYeSdFM1JBSybqfgMBH9ymCqyP6eNoMY5TS+PA0UvHr5
-	JP5evTTr7etsXnKUux/tPEQ/0JRsRD1zp8al+pZvukRpuvvTQUMs1ewOkEV/nbBaYldyXb
-	OdwNsy9IevypTwYfC/wG2jQvoCEMvMe81wNzeCXH//bQZkxfHBHW/lg+ax8mQk+C3xk030
-	GUKfOk8LDGvsh2bB27tPwafLEVhic2aBVX0Eu7S8iViYTvAmW7o8yOs4jNpA4Q==
-From: Herve Codina <herve.codina@bootlin.com>
-To: Simon Horman <horms@kernel.org>,
-	Sai Krishna Gajula <saikrishnag@marvell.com>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Lee Jones <lee@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>
-Cc: linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Allan Nielsen <allan.nielsen@microchip.com>,
-	Steen Hegelund <steen.hegelund@microchip.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: [PATCH v2 19/19] MAINTAINERS: Add the Microchip LAN966x PCI driver entry
-Date: Mon, 27 May 2024 18:14:46 +0200
-Message-ID: <20240527161450.326615-20-herve.codina@bootlin.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240527161450.326615-1-herve.codina@bootlin.com>
-References: <20240527161450.326615-1-herve.codina@bootlin.com>
+	s=arc-20240116; t=1716827461; c=relaxed/simple;
+	bh=wFzYxv0fxA4PHm+U+RUFutGQw4gMcFRHBJORjFR0yQE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XBPEOEuifJknY1+ikpGbShiG8K4+dr9u58qqnuKI7lbe63eaf5xK+1eEbnDAoMfQHShoIrYOziMADuy31NhWXpKWEY/JsCYYYlWSERlQ/o1LSOmUlR9Eys7Omwr1Fn2hrxd82jW9a6hk130RxYV2qOzo+eYFdQAT5pfk1YLhMKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gxLEH86g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3878FC32781;
+	Mon, 27 May 2024 16:31:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716827461;
+	bh=wFzYxv0fxA4PHm+U+RUFutGQw4gMcFRHBJORjFR0yQE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gxLEH86gxe7ZfAK5zKlZ/j7jD2Y0eX49YH9bXtJxDjJg5jP6FjDrRKuCrhqX6jHoP
+	 9nKNjpFKFfOmGWTLoQNuwgxsIsk3PIaej0kvKEkhtZbpKOv/fmvoil6O1QhbRo8DYI
+	 k1YIa3xSM0SMMvpYrkZXuaRNZVmoSkcqU0oeohtoNQPVP0DXYYWpz8DxvkjRJ5jSYk
+	 r9pryL0aDrWu3OeaX8ObokDTvhHWbcsNDAnwVWVr8nq6rwaDRaQQjAr+tATZ5QToqG
+	 P2UVj1e49JdccaR4g4zSZfqr4Lk+GDVudiRA72rKEv6EGw+S4VWeRQGY8+cLP/H/pq
+	 n0kCv9ZIrLVVQ==
+Date: Mon, 27 May 2024 09:30:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: Danielle Ratson <danieller@nvidia.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>,
+ "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "sdf@google.com"
+ <sdf@google.com>, "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
+ "maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
+ "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
+ "przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
+ "ahmed.zaki@intel.com" <ahmed.zaki@intel.com>, "richardcochran@gmail.com"
+ <richardcochran@gmail.com>, "shayagr@amazon.com" <shayagr@amazon.com>,
+ "paul.greenwalt@intel.com" <paul.greenwalt@intel.com>, "jiri@resnulli.us"
+ <jiri@resnulli.us>, "linux-doc@vger.kernel.org"
+ <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, mlxsw <mlxsw@nvidia.com>, Petr Machata
+ <petrm@nvidia.com>
+Subject: Re: [PATCH net-next v5 04/10] ethtool: Add flashing transceiver
+ modules' firmware notifications ability
+Message-ID: <20240527093059.7e6e17ba@kernel.org>
+In-Reply-To: <ZlSwbTwRF6KjPfJ5@shredder>
+References: <20240424133023.4150624-5-danieller@nvidia.com>
+	<20240429201130.5fad6d05@kernel.org>
+	<DM6PR12MB45168DC7D9D9D7A5AE3E2B2DD81A2@DM6PR12MB4516.namprd12.prod.outlook.com>
+	<20240430130302.235d612d@kernel.org>
+	<ZjH1DCu0rJTL_RYz@shredder>
+	<20240501073758.3da76601@kernel.org>
+	<DM6PR12MB451687C3C54323473716621ED8EB2@DM6PR12MB4516.namprd12.prod.outlook.com>
+	<20240522064519.3e980390@kernel.org>
+	<DM6PR12MB451677DBA41EA8A622D3D446D8EB2@DM6PR12MB4516.namprd12.prod.outlook.com>
+	<20240522072212.7a21c84b@kernel.org>
+	<ZlSwbTwRF6KjPfJ5@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-After contributing the driver, add myself as the maintainer for the
-Microchip LAN966x PCI driver.
+On Mon, 27 May 2024 19:10:55 +0300 Ido Schimmel wrote:
+> On Wed, May 22, 2024 at 07:22:12AM -0700, Jakub Kicinski wrote:
+> > On Wed, 22 May 2024 13:56:11 +0000 Danielle Ratson wrote: =20
+> > > The event should match the below:
+> > > event =3D=3D NETLINK_URELEASE && notify->protocol =3D=3D NETLINK_GENE=
+RIC
+> > >=20
+> > > Then iterate over the list to look for work that matches the dev and =
+portid.
+> > > The socket doesn=E2=80=99t close until the work is done in that case.=
+  =20
+> >=20
+> > Okay, good, yes. I think you can use one of the callbacks I mentioned
+> > below to achieve the same thing with less complexity than the notifier.=
+ =20
+>=20
+> Danielle already has a POC with the notifier and it's not that
+> complicated. I wasn't aware of the netlink notifier, but we found it
+> when we tried to understand how other netlink families get notified
+> about a socket being closed.
+>=20
+> Which advantages do you see in the sock_priv_destroy() approach? Are you
+> against the notifier approach?
 
-Signed-off-by: Herve Codina <herve.codina@bootlin.com>
----
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+Notifier is not incorrect, but I worry it will result in more code,
+and basically duplication of what genl_sk_priv* does. Perhaps you
+managed to code it up very neatly - if so feel free to send the v6
+and we can discuss further if needed?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index baeb307344cd..c84ec27ccbe4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -14733,6 +14733,12 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/interrupt-controller/microchip,lan966x-oic.yaml
- F:	drivers/irqchip/irq-lan966x-oic.c
- 
-+MICROCHIP LAN966X PCI DRIVER
-+M:	Herve Codina <herve.codina@bootlin.com>
-+S:	Maintained
-+F:	drivers/mfd/lan966x_pci.c
-+F:	drivers/mfd/lan966x_pci.dtso
-+
- MICROCHIP LCDFB DRIVER
- M:	Nicolas Ferre <nicolas.ferre@microchip.com>
- L:	linux-fbdev@vger.kernel.org
--- 
-2.45.0
+> > > > Easiest way to "notice" the socket got closed would probably be to =
+add some
+> > > > info to genl_sk_priv_*(). ->sock_priv_destroy() will get called. Bu=
+t you can also
+> > > > get a close notification in the family   =20
+> > > > ->unbind callback.   =20
+>=20
+> Isn't the unbind callback only for multicast (whereas we are using
+> unicast)?
 
+True, should work in practice, I think. But sock_priv is much better.
+
+> > > Is there a scenario that we hit this event and won't intend to cancel=
+ the work?  =20
+> >=20
+> > I think it's up to us. I don't see any legit reason for user space to
+> > intentionally cancel the flashing. So the only option is that user space
+> > is either buggy or has crashed, and the socket got closed before
+> > flashing finished. Right? =20
+>=20
+> We don't think that closing the socket / killing the process mid
+> flashing is a legitimate scenario. We looked into it in order to avoid
+> sending unicast notifications to a socket that did not ask for them but
+> gets them because it was bound to the port ID that was used by the old
+> socket.
+>=20
+> I agree that we don't need to cancel the work and can simply have the
+> work item stop sending notifications. User space will get an error if it
+> tries to flash a module that is already being flashed in the background.
+> WDYT?
+
+SGTM!
 
