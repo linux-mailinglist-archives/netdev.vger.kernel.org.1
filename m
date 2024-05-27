@@ -1,130 +1,141 @@
-Return-Path: <netdev+bounces-98114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A99E68CF760
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 04:00:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 450F08CF77B
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 04:55:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41ECA1F21BFB
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 02:00:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 776571C20E52
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 02:55:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C35AF65C;
-	Mon, 27 May 2024 02:00:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDC954C96;
+	Mon, 27 May 2024 02:55:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ekaRMcxg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BDwY940h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55134653;
-	Mon, 27 May 2024 02:00:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87EDD2107;
+	Mon, 27 May 2024 02:55:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716775247; cv=none; b=KQnu+T12oDCS4MNcwNqm0W/4+4Pkg2P4YejureJfJWwPO5Cim3bhYJ89QEqlrV30qtCxp6mh5ZBmu9/FESJYFeSuPead9ishpzBybqrREISvX8fyrWdEsvzHq+qqKg0Uvrk+5mC7idABsWQ03+fpWVyUCihuq/IAPsf5lyHwfu4=
+	t=1716778511; cv=none; b=gX74mgT2F9YFruY2W5wQwIXLIhrHrUeCp8ppW9rJUSNe2qpF0Xlc6Pk5K4ziXhfHW8dSwgqkNNS0iKrmMiQKdBIMcBAiY0TyK0xt2ZfNpwhdacGKobUG7CwzjiWUGD+MigZyEq89Hv213Ax/IAEjiWxWu2bNKfyRh2PgjX/TGbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716775247; c=relaxed/simple;
-	bh=ctWiv0pC9SqzWM/MujflPIZFnUTSkuqfQfgBDXVtC2U=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=TD7eueNnez5em44Ot6LxFPJB1s9xohw10Iabxkgi2IGNG6ZpWIfXpL3D8HEf6HaGCQ1apZQfriWzFeyeDkWiEd71JRT204sf51mnmG6xnDIpl0uZ0uF+rq5OCVMEW/XXdz60NrDaOIp8gvgXDOTaF1TaPwl5G3AtpZejS+vHuBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ekaRMcxg; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-64f12fc9661so482096a12.3;
-        Sun, 26 May 2024 19:00:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716775244; x=1717380044; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ctWiv0pC9SqzWM/MujflPIZFnUTSkuqfQfgBDXVtC2U=;
-        b=ekaRMcxgoE0YqR9kWb2MXRnkH5JdqezjvmIQGzGl9syXy2ifTOmuh2vpXVnkran2xR
-         Xu5q/WhvZWYayQgVvr66ASJxzqAWsFmDdHum2PuEUn+CaYr2rdADUEbesuceLL1bzKbZ
-         F453XmLRF3DsOKpj1RgYFvhYQN68/ZQifYYQgNnm2DYzIjAVS97DX7VBxlQktW4hQcpc
-         VMIVJ+hBswKHIhsh6DYKpKjRdYlIuq9PNPj2N3BkMv6TJ0iUfRAB0AefJ0cMRkiqGf1d
-         fLmnGp4YQs6xTA1fb+mTgom1KGH3mMd14lKrn686LYlF5gLDwKrgs/SzrjHH2G6XZBSG
-         PC/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716775244; x=1717380044;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ctWiv0pC9SqzWM/MujflPIZFnUTSkuqfQfgBDXVtC2U=;
-        b=IM1zA3xy3oulBIxnWLY0vV9310QeseKDLcB51aMmTbAZEqbswdv4/e9Gg7p8SUdf3I
-         Eu+sFMa+fSR1W0f51pLqnXwtAv6stWZLRZBj77mm9/6MQkXWtfloZhahqyKaTadZIxcX
-         5fPPoKcdr9rPxiSTxIuzBn6ggknRoQDXQf9xqFjXYhmE9XwcfggU5q6SDu413Y5nazf6
-         ddLnx7O1EUfpQJX189epGh71F+4hMV7a4ZNDsEnDmU3NIHf9hhhvaVS8tY/V5WRcO7lP
-         wvSpD/dEqonb7JBzG6LAxYNCoqlT3qT+IjZk7qOX9yJ1iKDuLrfDiY1rFFYQXg95A1Xt
-         5IZw==
-X-Forwarded-Encrypted: i=1; AJvYcCUJ3BRPzeCc0hZ88nyPhVnZLcrNn9xs/44qzfsDE19zx8+P1n8k0b+gnVwzce+wzED8ZhN6Lu07nEs4wJ4VIvOuXNCV90ltOTr2NSFsixhEvYvWtnbm8TOAwxpj+Jf1x8odUXlxxow=
-X-Gm-Message-State: AOJu0Yye30tOPFB3XHc+t1GcPvlAugnaEzaKSizJ1Qr2EvhSoOZ1BSE0
-	cNk6t0rpmSD+Qzo/TBWF0Fl6U1KNSS/icFsJIbEosm+kTE0Mi34I
-X-Google-Smtp-Source: AGHT+IH7uATPGo5J3aTuTT6u6sgX24Pe5Wvj4QbKJ3mNR6pTXaIq76ucFsy8wzD3LWBs45E9126kLw==
-X-Received: by 2002:a05:6a21:81a7:b0:1ad:8f18:8621 with SMTP id adf61e73a8af0-1b212f7af7cmr7629417637.6.1716775244525;
-        Sun, 26 May 2024 19:00:44 -0700 (PDT)
-Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f481c24d13sm17910495ad.202.2024.05.26.19.00.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 May 2024 19:00:44 -0700 (PDT)
-Date: Mon, 27 May 2024 11:00:31 +0900 (JST)
-Message-Id: <20240527.110031.1543730602683806299.fujita.tomonori@gmail.com>
-To: tmgross@umich.edu
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch,
- rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH net-next v1 2/4] rust: net::phy support C45 helpers
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <CALNs47t0FDS59xckUV0QkozbX-RAs8U3woN_sBc0TVm8d=dKNA@mail.gmail.com>
-References: <20240415104701.4772-1-fujita.tomonori@gmail.com>
-	<20240415104701.4772-3-fujita.tomonori@gmail.com>
-	<CALNs47t0FDS59xckUV0QkozbX-RAs8U3woN_sBc0TVm8d=dKNA@mail.gmail.com>
+	s=arc-20240116; t=1716778511; c=relaxed/simple;
+	bh=07xiRVvLKBl9zaXa91uX9if9n5xwXqYEaruyBFZ/F9Y=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ijYQpBr/MTIBL12eRlqAH8dxLh3Vs7uCwzI+G3fv64va63Z/p0hpwmyEov9Kb8W0/byI+y+Iivsh4dZq7msI5a1q62J26DOzfxH8bMyQqabCt4iICwmBhibrr51+sDel94R8Q0RZs+3eCgaRDm1PY1UGjI4KLZIEb/TQCZ4psfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BDwY940h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 11B24C4AF07;
+	Mon, 27 May 2024 02:55:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716778511;
+	bh=07xiRVvLKBl9zaXa91uX9if9n5xwXqYEaruyBFZ/F9Y=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BDwY940hrIlTRYiSvrV7DjcF4WViK6Bz1m2nENogiX/jsjoQpTU53nLAayvGYxmRx
+	 S8//D8w3WCl7LtC6JkCFKIpeQ+sGhWcLEsA9upx10X5fKSdByT5SqokNfq/RXqmvVK
+	 gsFMHZJUKdKBdzAAYnzGkq3gnq2Fj6v5GZ+We6POjWPgnktgdq1ziwE5sPUPsV6BOl
+	 WhYVqo0n83pBClfBABUg1sMmXYUlg9E7ek8WCtt2B6ZfPB/QRtb0OlTnGOKhMx4Ngl
+	 impThOLXRXTjIpr17ItzyT1X7U3yyBEFKHpEQycQ3UDKacT/ZfU1byIffZ/Yp49udQ
+	 bcZ/XyHmDMi0A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EFFE4CF21E0;
+	Mon, 27 May 2024 02:55:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 00/19] ACPI: store owner from modules with
+ acpi_bus_register_driver()
+From: patchwork-bot+chrome-platform@kernel.org
+Message-Id: 
+ <171677851097.1901.11162373197607812420.git-patchwork-notify@kernel.org>
+Date: Mon, 27 May 2024 02:55:10 +0000
+References: <20240328-b4-module-owner-acpi-v2-0-1e5552c2c69f@linaro.org>
+In-Reply-To: <20240328-b4-module-owner-acpi-v2-0-1e5552c2c69f@linaro.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: rafael@kernel.org, lenb@kernel.org, robert.moore@intel.com,
+ dmitry.torokhov@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, bleung@chromium.org, tzungbi@kernel.org,
+ corentin.chary@gmail.com, luke@ljones.dev, hdegoede@redhat.com,
+ ilpo.jarvinen@linux.intel.com, cascardo@holoscopio.com, pali@kernel.org,
+ matan@svgalib.org, malattia@linux.it, coproscefalo@gmail.com,
+ akaher@vmware.com, amakhalov@vmware.com, pv-drivers@vmware.com,
+ richardcochran@gmail.com, tytso@mit.edu, Jason@zx2c4.com,
+ linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
+ acpica-devel@lists.linux.dev, linux-input@vger.kernel.org,
+ netdev@vger.kernel.org, chrome-platform@lists.linux.dev,
+ platform-driver-x86@vger.kernel.org, rafael.j.wysocki@intel.com
 
-SGksDQpTb3JyeSBhYm91dCB0aGUgbG9uZyBkZWxheSwNCg0KT24gTW9uLCAxNSBBcHIgMjAyNCAy
-MzoyNToyMiAtMDQwMA0KVHJldm9yIEdyb3NzIDx0bWdyb3NzQHVtaWNoLmVkdT4gd3JvdGU6DQoN
-Cj4gT24gTW9uLCBBcHIgMTUsIDIwMjQgYXQgNjo0N+KAr0FNIEZVSklUQSBUb21vbm9yaQ0KPiA8
-ZnVqaXRhLnRvbW9ub3JpQGdtYWlsLmNvbT4gd3JvdGU6DQo+PiArICAgIC8vLyBSZWFkcyBhIGdp
-dmVuIEM0NSBQSFkgcmVnaXN0ZXIuDQo+PiArICAgIC8vLyBUaGlzIGZ1bmN0aW9uIHJlYWRzIGEg
-aGFyZHdhcmUgcmVnaXN0ZXIgYW5kIHVwZGF0ZXMgdGhlIHN0YXRzIHNvIHRha2VzIGAmbXV0IHNl
-bGZgLg0KPj4gKyAgICBwdWIgZm4gYzQ1X3JlYWQoJm11dCBzZWxmLCBkZXZhZDogdTgsIHJlZ251
-bTogdTE2KSAtPiBSZXN1bHQ8dTE2PiB7DQo+PiArICAgICAgICBsZXQgcGh5ZGV2ID0gc2VsZi4w
-LmdldCgpOw0KPj4gKyAgICAgICAgLy8gU0FGRVRZOiBgcGh5ZGV2YCBpcyBwb2ludGluZyB0byBh
-IHZhbGlkIG9iamVjdCBieSB0aGUgdHlwZSBpbnZhcmlhbnQgb2YgYFNlbGZgLg0KPj4gKyAgICAg
-ICAgLy8gU28gaXQncyBqdXN0IGFuIEZGSSBjYWxsLg0KPiANCj4gRGVwZW5kaW5nIG9uIHRoZSBy
-ZXNwb25zZSB0byBBbmRyZXcncyBub3RlcywgdGhlc2UgU0FGRVRZIGNvbW1lbnRzDQo+IHdpbGwg
-cHJvYmFibHkgbmVlZCB0byBiZSB1cGRhdGVkIHRvIHNheSB3aHkgd2Uga25vdyBDNDUgaXMgc3Vw
-cG9ydGVkLg0KDQpJZiBhIGRyaXZlciB1c2VzIG9ubHktYzQ1IEFQSSAoUmVnQzQ1RGlyZWN0IGlu
-IHRoZSBuZXcgcGF0Y2gpLCBpdCByZXR1cm5zDQphbiBlcnJvci4gV2UgbmVlZCB0byB3cml0ZSBz
-b21ldGhpbmcgaW4gU0FGRVRZPw0KDQoNCj4+ICsgICAgICAgIGxldCByZXQgPSB1bnNhZmUgew0K
-Pj4gKyAgICAgICAgICAgIGJpbmRpbmdzOjptZGlvYnVzX2M0NV9yZWFkKA0KPj4gKyAgICAgICAg
-ICAgICAgICAoKnBoeWRldikubWRpby5idXMsDQo+PiArICAgICAgICAgICAgICAgICgqcGh5ZGV2
-KS5tZGlvLmFkZHIsDQo+PiArICAgICAgICAgICAgICAgIGRldmFkIGFzIGkzMiwNCj4gDQo+IFRo
-aXMgY291bGQgcHJvYmFibHkgYWxzbyBiZSBmcm9tLy5pbnRvKCkNCg0KRml4ZWQuDQoNCj4+ICsg
-ICAgICAgICAgICAgICAgcmVnbnVtLmludG8oKSwNCj4+ICsgICAgICAgICAgICApDQo+PiArICAg
-ICAgICB9Ow0KPj4gKyAgICAgICAgaWYgcmV0IDwgMCB7DQo+PiArICAgICAgICAgICAgRXJyKEVy
-cm9yOjpmcm9tX2Vycm5vKHJldCkpDQo+PiArICAgICAgICB9IGVsc2Ugew0KPj4gKyAgICAgICAg
-ICAgIE9rKHJldCBhcyB1MTYpDQo+PiArICAgICAgICB9DQo+IA0KPiBDb3VsZCB0aGlzIGJlIHNp
-bXBsaWZpZWQgd2l0aCB0b19yZXN1bHQ/DQoNCnRvX3Jlc3VsdCByZXR1cm5zIE9rKCgpKS4gU28g
-SSB0aGluayB0aGF0IHdlIG5lZWQgc29tZXRoaW5nDQp0b19yZXN1bHRfd2l0aF92YWx1ZSgpLg0K
-DQpJIHRoaW5rIHRoYXQgd2UgZGlzY3Vzc2VkIHNvbWV0aGluZyBsaWtlIHRoYXQgYWdvOg0KDQpo
-dHRwczovL2xvcmUua2VybmVsLm9yZy9hbGwvQ0FOaXE3Mj1WYU50Wl9CMGppOTR4RmZ0YjRQY3Rm
-ZXArNGMyY05Xa21DY0tocFpZMmtRQG1haWwuZ21haWwuY29tLw0KDQpBIG5ldyBmdW5jdGlvbiB3
-YXMgaW50cm9kdWNlZCwgd2hpY2ggSSBtaXNzZWQ/DQoNCg0KPj4gKyAgICB9DQo+PiArDQo+PiAr
-ICAgIC8vLyBXcml0ZXMgYSBnaXZlbiBDNDUgUEhZIHJlZ2lzdGVyLg0KPj4gKyAgICBwdWIgZm4g
-YzQ1X3dyaXRlKCZtdXQgc2VsZiwgZGV2YWQ6IHU4LCByZWdudW06IHUxNiwgdmFsOiB1MTYpIC0+
-IFJlc3VsdCB7DQo+PiArICAgICAgICBsZXQgcGh5ZGV2ID0gc2VsZi4wLmdldCgpOw0KPj4gKyAg
-ICAgICAgLy8gU0FGRVRZOiBgcGh5ZGV2YCBpcyBwb2ludGluZyB0byBhIHZhbGlkIG9iamVjdCBi
-eSB0aGUgdHlwZSBpbnZhcmlhbnQgb2YgYFNlbGZgLg0KPj4gKyAgICAgICAgLy8gU28gaXQncyBq
-dXN0IGFuIEZGSSBjYWxsLg0KPj4gKyAgICAgICAgdG9fcmVzdWx0KHVuc2FmZSB7DQo+PiArICAg
-ICAgICAgICAgYmluZGluZ3M6Om1kaW9idXNfYzQ1X3dyaXRlKA0KPj4gKyAgICAgICAgICAgICAg
-ICAoKnBoeWRldikubWRpby5idXMsDQo+PiArICAgICAgICAgICAgICAgICgqcGh5ZGV2KS5tZGlv
-LmFkZHIsDQo+PiArICAgICAgICAgICAgICAgIGRldmFkIGFzIGkzMiwNCj4gDQo+IFNhbWUgYXMg
-YWJvdmUNCg0KRml4ZWQuDQo=
+Hello:
+
+This series was applied to chrome-platform/linux.git (for-kernelci)
+by Rafael J. Wysocki <rafael.j.wysocki@intel.com>:
+
+On Thu, 28 Mar 2024 20:49:10 +0100 you wrote:
+> Changes in v2:
+> - Correct input and platform/chrome subjects.
+> - Add acks.
+> - Link to v1: https://lore.kernel.org/r/20240327-b4-module-owner-acpi-v1-0-725241a2d224@linaro.org
+> 
+> Merging
+> =======
+> All further patches depend on the first amba patch, therefore one way is
+> to ack and take it via one tree, e.g. ACPI.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,01/19] ACPI: store owner from modules with acpi_bus_register_driver()
+    https://git.kernel.org/chrome-platform/c/48b9c4862bd3
+  - [v2,02/19] Input: atlas - drop owner assignment
+    https://git.kernel.org/chrome-platform/c/726c149e0798
+  - [v2,03/19] net: fjes: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/3bdef399d00e
+  - [v2,04/19] platform/chrome: wilco_ec: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/245d97ff3473
+  - [v2,05/19] platform: asus-laptop: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/eda8304c74f0
+  - [v2,06/19] platform: classmate-laptop: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/be24e9a09337
+  - [v2,07/19] platform/x86/dell: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/1baad72e9026
+  - [v2,08/19] platform/x86/eeepc: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/4313188f8128
+  - [v2,09/19] platform/x86/intel/rst: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/68370cc2e32a
+  - [v2,10/19] platform/x86/intel/smartconnect: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/e84a761f1215
+  - [v2,11/19] platform/x86/lg-laptop: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/2929a735d92e
+  - [v2,12/19] platform/x86/sony-laptop: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/562231f34cea
+  - [v2,13/19] platform/x86/toshiba_acpi: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/b655cda9f089
+  - [v2,14/19] platform/x86/toshiba_bluetooth: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/ce69eeb2ccb7
+  - [v2,15/19] platform/x86/toshiba_haps: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/eb22f3ba0c2e
+  - [v2,16/19] platform/x86/wireless-hotkey: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/d49c09ddfbd5
+  - [v2,17/19] ptp: vmw: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/cd3eda2e3508
+  - [v2,18/19] virt: vmgenid: drop owner assignment
+    https://git.kernel.org/chrome-platform/c/00e8b52bf9f9
+  - [v2,19/19] ACPI: drop redundant owner from acpi_driver
+    https://git.kernel.org/chrome-platform/c/cc85f9c05bba
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
