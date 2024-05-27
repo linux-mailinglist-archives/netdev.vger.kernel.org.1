@@ -1,135 +1,82 @@
-Return-Path: <netdev+bounces-98316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A83C28D0A94
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 21:02:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69D508D0A87
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 21:01:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29254B20BED
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 19:02:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24EF3283371
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 19:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C17161313;
-	Mon, 27 May 2024 19:01:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 987941607B1;
+	Mon, 27 May 2024 19:00:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OB5XT4Rd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 640E2DDA9;
-	Mon, 27 May 2024 19:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD46A1607AF;
+	Mon, 27 May 2024 19:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716836460; cv=none; b=eqvzIcwDiJz0xtlVOQa93kiyPIrsST8ukI0XGjW/+S/xzdAWRPImSsQojKidZ5ehvgYy7Z9p6c1gOe7lxZEQCZmxM4dO1+pRtxw2stywG0FID/YgCL92AsvTSYZT48fantUkEadqGJzWGPLvlhDXg7FiUEGFbIgImUcRojyT4eY=
+	t=1716836444; cv=none; b=IWcvg1aUrwfdJEd+3LeWffn07z2GM7Cv0GMQ1TwxZz7T2hu+nRjE3XRjcboShNwKUtyXQv7UKH2kIhrPIR6U/J1AwC8Op6+lqKBKixmvRI/DRFeVYkTGfm3Cj13JTqzIBCn5Y8B6SZzNkZFju7iOFzNWaX5IJ5yoCncSA/PN/fU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716836460; c=relaxed/simple;
-	bh=c0wTFKp9XQXRgUFgtFgR9AuRbrYxnV5EJTEpQx/c25k=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tXY+bOM+fcbmjSZ+nTpcjKxwxNsCdfUeujQKNbIqGGcnWYJ0AvO+UNd4McGNwmkI8EHwhUhdjwzPUha4Q/EXnPYUMU8wO7h1KudVILUvwd9fH6+KSL5hHfrMqLoC1hmgK5+BYIwBDe0DiAfnQ8ACndFY7mbriX5wjWoqfKmj/QA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44RIQb8T007199;
-	Mon, 27 May 2024 12:00:24 -0700
-DKIM-Signature: =?UTF-8?Q?v=3D1;_a=3Drsa-sha256;_c=3Drelaxed/relaxed;_d=3Dmeta.com;_h=3Dc?=
- =?UTF-8?Q?c:content-transfer-encoding:content-type:date:from:in-reply-to:?=
- =?UTF-8?Q?message-id:mime-version:references:subject:to;_s=3Ds2048-2021-q?=
- =?UTF-8?Q?4;_bh=3D7geuP4fh0kfWIQEG10bAFf8y5oNk1kPaQirayNWOM44=3D;_b=3DPP/?=
- =?UTF-8?Q?8OkqGURhdvgDRtEzPLuATNDLoKjQCiuN0jBlXEOkW2gdyt1fh2C6yjcssjnADwn?=
- =?UTF-8?Q?1H_IULvEAgv4H8H/gOzJjc1XGyEr9t+zt9k1YSbjIbEfOHLD7z8t6cFNJ2rARa2?=
- =?UTF-8?Q?ozVfw+kd_w2iuOFxmx0TPVQD9XgNtCjYhesqxx7fcGLmuZ4hhAdh2EWxNHKm1ty?=
- =?UTF-8?Q?LJRpMSfosGhiu1_6mTZkq+JZ6rCaMny0LGiNWLK0pqc/gzL+HibYTH5MDi4GrHp?=
- =?UTF-8?Q?cw0CDMNPmW8npEdIy6nL_zi4+Owe8ET9xd6qAp93vmxGq7Zoo5gu6IWkQf3ASYk?=
- =?UTF-8?Q?xdziDv6dJg5OdI4AZJ3VQwEOlA_uA=3D=3D_?=
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3ybdr3234w-3
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Mon, 27 May 2024 12:00:24 -0700
-Received: from devvm4158.cln0.facebook.com (2620:10d:c0a8:1b::30) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server id
- 15.2.1544.11; Mon, 27 May 2024 19:00:22 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Martin KaFai Lau
-	<martin.lau@linux.dev>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        "Alexei
- Starovoitov" <ast@kernel.org>,
-        Mykola Lysenko <mykolal@fb.com>, Jakub
- Kicinski <kuba@kernel.org>
-CC: Vadim Fedorenko <vadfed@meta.com>, <bpf@vger.kernel.org>,
-        <netdev@vger.kernel.org>
-Subject: [PATCH bpf-next v3 2/2] selftests: bpf: validate CHECKSUM_COMPLETE option
-Date: Mon, 27 May 2024 11:59:28 -0700
-Message-ID: <20240527185928.1871649-2-vadfed@meta.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240527185928.1871649-1-vadfed@meta.com>
-References: <20240527185928.1871649-1-vadfed@meta.com>
+	s=arc-20240116; t=1716836444; c=relaxed/simple;
+	bh=2uBLw2Sx6UBiIag7jcLM/uRvSK9uqL6b3mrS6Z7KwuM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n0b/RHnSXqrgTGh+ZRd4MgrGNDElXRxhQgPBXiUAwN5KqCBvEt2RWGWz54oQ2Qo31eNGw+QpXc7vmAMd9CE2EifyTsY+slnsar9oKn6DBmQmdAw88xO/xJvVl+cHaK7yUtkERVR0GoyjK63BT8JaoerEZULs/5LCz4Msn+KDcM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OB5XT4Rd; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=37lIg3s+t3b4qmG4nLG2iDBlAi6+bbFulGijMGLbRU8=; b=OB5XT4RdOZy8fOvjvk2d6piuRk
+	vfd0+RlJFNNtKH3IcMqZSirlvjb7mPXlqD4ZBtm4zyaObwAl/ngWfAL5icsMY63lGMjF/cndhR4vd
+	oXlofZe+OnC8ok7jw5WG6OZIedTtxK9tY5ZYnywUU8j7hK1egDHtQKw4JejCqXuxvLYc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sBfZq-00G69n-52; Mon, 27 May 2024 21:00:10 +0200
+Date: Mon, 27 May 2024 21:00:10 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Boon Khai Ng <boon.khai.ng@intel.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Tien Sung Ang <tien.sung.ang@intel.com>,
+	G Thomas Rohan <rohan.g.thomas@intel.com>,
+	Looi Hong Aun <hong.aun.looi@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Ilpo Jarvinen <ilpo.jarvinen@linux.intel.com>
+Subject: Re: [Enable Designware XGMAC VLAN Stripping Feature v2 1/1] net:
+ stmmac: dwxgmac2: Add support for HW-accelerated VLAN Stripping
+Message-ID: <48176576-e1d2-4c45-967a-91cabb982a21@lunn.ch>
+References: <20240527093339.30883-1-boon.khai.ng@intel.com>
+ <20240527093339.30883-2-boon.khai.ng@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: N8rjF6Oi7ZTwtRAAQkoqWuYf5bPMlzjO
-X-Proofpoint-ORIG-GUID: N8rjF6Oi7ZTwtRAAQkoqWuYf5bPMlzjO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-27_04,2024-05-27_01,2024-05-17_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240527093339.30883-2-boon.khai.ng@intel.com>
 
-Adjust skb program test to run with checksum validation.
+> This implementation was ported from the dwmac4 driver.
 
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
- .../selftests/bpf/prog_tests/test_skb_pkt_end.c       |  1 +
- tools/testing/selftests/bpf/progs/skb_pkt_end.c       | 11 ++++++++++-
- 2 files changed, 11 insertions(+), 1 deletion(-)
+How does it differ from dwmac4? Can the dwmac4 implementation just be
+used, rather than duplicating all the code/bugs.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_skb_pkt_end.c b/tools/testing/selftests/bpf/prog_tests/test_skb_pkt_end.c
-index ae93411fd582..09ca13bdf6ca 100644
---- a/tools/testing/selftests/bpf/prog_tests/test_skb_pkt_end.c
-+++ b/tools/testing/selftests/bpf/prog_tests/test_skb_pkt_end.c
-@@ -11,6 +11,7 @@ static int sanity_run(struct bpf_program *prog)
- 		.data_in = &pkt_v4,
- 		.data_size_in = sizeof(pkt_v4),
- 		.repeat = 1,
-+		.flags = BPF_F_TEST_SKB_CHECKSUM_COMPLETE,
- 	);
- 
- 	prog_fd = bpf_program__fd(prog);
-diff --git a/tools/testing/selftests/bpf/progs/skb_pkt_end.c b/tools/testing/selftests/bpf/progs/skb_pkt_end.c
-index db4abd2682fc..3bb4451524a1 100644
---- a/tools/testing/selftests/bpf/progs/skb_pkt_end.c
-+++ b/tools/testing/selftests/bpf/progs/skb_pkt_end.c
-@@ -33,6 +33,8 @@ int main_prog(struct __sk_buff *skb)
- 	struct iphdr *ip = NULL;
- 	struct tcphdr *tcp;
- 	__u8 proto = 0;
-+	int urg_ptr;
-+	u32 offset;
- 
- 	if (!(ip = get_iphdr(skb)))
- 		goto out;
-@@ -48,7 +50,14 @@ int main_prog(struct __sk_buff *skb)
- 	if (!tcp)
- 		goto out;
- 
--	return tcp->urg_ptr;
-+	urg_ptr = tcp->urg_ptr;
-+
-+	/* Checksum validation part */
-+	proto++;
-+	offset = sizeof(struct ethhdr) + offsetof(struct iphdr, protocol);
-+	bpf_skb_store_bytes(skb, offset, &proto, sizeof(proto), BPF_F_RECOMPUTE_CSUM);
-+
-+	return urg_ptr;
- out:
- 	return -1;
- }
--- 
-2.43.0
-
+	Andrew
 
