@@ -1,63 +1,62 @@
-Return-Path: <netdev+bounces-98209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7173C8D0356
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:23:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 068BB8D036E
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:24:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFD981F28491
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 14:23:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B66252A3A17
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 14:24:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE84B171098;
-	Mon, 27 May 2024 14:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B3D2171E7A;
+	Mon, 27 May 2024 14:14:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RTeuwda5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h4KbzEoR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850E3171090;
-	Mon, 27 May 2024 14:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA69C171E72;
+	Mon, 27 May 2024 14:14:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716819268; cv=none; b=LdcukOJY/EDHhVUGPCo790Bz4jJEw3rkenF6MT8+jz+AQXBfHjqx3yrMtjjdGEYuYD/k48TsrU8xf521KgaUUSdJnFgc5TADT957kkOCEIhL+X50+Vob8fV+CmxQ+3cF2aOOrjMxMoSgLqEDbA8qQZEHyUINN0KHma5uKKOPu68=
+	t=1716819274; cv=none; b=Qzs7ATzdOAB1GSd/ZR2XpkgqzMhcYsMuQv1qGb7CIuY+ud+Qb0/po/pxKuhTgOQDZP0SpurosGL/GTfM9oWB38lHs+9aFBNrILgQDII9AdfPN969JQ9RKwMitq5t1zLVU5EqKN4ML8lX4mYZMURYShBqjeQwpJ9pIPO7w0bvrbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716819268; c=relaxed/simple;
-	bh=qzdnVBNDG9392ll1ROAf5CYfJzq9O8zBKlbs18HMd7M=;
+	s=arc-20240116; t=1716819274; c=relaxed/simple;
+	bh=SV6qtfU/+d4z44hjkPenfsRMaU8QjujnfZcfHZCustU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=n5mawIYEWiUkIWKBjOX2FimxZPT1ICikw3D5QR8v642hLuhODRRBWs9ZbwzD2SrIrNF1mweP7/czdvqLUFcCbLT6qB0LC7r8j89VRndFQgU+uuMhE0V7meKUUZw9QGM48BZb5oBXVP1Pb6wmSN/J1u3NCNK5Qn3h1BAvPMBQaaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RTeuwda5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF94EC2BBFC;
-	Mon, 27 May 2024 14:14:26 +0000 (UTC)
+	 MIME-Version; b=jyCL6uCTsUzLcb8mI521aypNssGeBW8lU3CK4MQHr4SpJLORkd2QLtEJqmpJdPJeFPi5+kLbmKqbNRLG+5xSgDXYmswK8/EKlSzgmSMavHuVBNpZHZhxEdn+OHnnHsMn7Xxg6bpUIy/B4crHk2xv3yOsoMyger1q2RyPqkXA5SY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h4KbzEoR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B1CFC2BBFC;
+	Mon, 27 May 2024 14:14:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716819268;
-	bh=qzdnVBNDG9392ll1ROAf5CYfJzq9O8zBKlbs18HMd7M=;
+	s=k20201202; t=1716819273;
+	bh=SV6qtfU/+d4z44hjkPenfsRMaU8QjujnfZcfHZCustU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RTeuwda59peQXDdDwKzfr5apDNLAb6xq2Ud2KmCt8LR2JhchDtkyESzSn8thPnrXK
-	 0tjtdXeDMvipiREnC62lpCC5htseTG4/bH2N/GEv0iOfRynNKi6h/mhRbSFOKx7Urs
-	 oLeSZ0TOFvJDFjVCeFQ0Ngf7G3TBbFf/t6RpHmbAno0ek+4yjb3iRMy3H0kChEnLz0
-	 7JtnbDo455Dj2mQu8/LWSwNOsC/eIEJgKc5vihZdR31vvrBGJPpikJbLuP1y6WVXsu
-	 3+5lhy3b7B2TvluM0g97B5U6luU511OSmIGHbYEObH+U0b+WSCkGJNjKu/nFggpLno
-	 LWgb+0nqsdAIg==
+	b=h4KbzEoR7RA4bQ+41hJ94S3DpDqdGOBqrSvNo86FtAjysbO/Iu20rKtcoR/lbwRD/
+	 t/EdtE18tFvy9hcB5nUW1leRXpMed1lp5Jc+P2TCM8SkAHNVBmkMVpLmp6Uh6LXaPb
+	 NVR36BetY1f3n+Htm421f0M2EnqamifgO17qjbKGyMaG5gucJWLLtihv7EFnsX36T6
+	 8iNi/a+PINKJ0sUkH0AwxGLdNU7qhiwv/HpaqYLhyF2mgCefYca8iGEfkflos6Bb1e
+	 PJr9F897quc0bFBLunyW0H/9Rs8J6zdIaoFdDbFbgmIQczuDPbbuY2Nbnvq7Ag5HDZ
+	 gETA+rBFWE6kw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
 Cc: Eric Dumazet <edumazet@google.com>,
-	Sven Eckelmann <sven@narfation.org>,
-	Simon Wunderlich <sw@simonwunderlich.de>,
+	syzbot <syzkaller@googlegroups.com>,
+	Kees Cook <keescook@chromium.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	mareklindner@neomailbox.ch,
-	a@unstable.cc,
-	davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	b.a.t.m.a.n@lists.open-mesh.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.8 05/30] batman-adv: bypass empty buckets in batadv_purge_orig_ref()
-Date: Mon, 27 May 2024 10:13:14 -0400
-Message-ID: <20240527141406.3852821-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.8 08/30] af_packet: avoid a false positive warning in packet_setsockopt()
+Date: Mon, 27 May 2024 10:13:17 -0400
+Message-ID: <20240527141406.3852821-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240527141406.3852821-1-sashal@kernel.org>
 References: <20240527141406.3852821-1-sashal@kernel.org>
@@ -74,106 +73,77 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit 40dc8ab605894acae1473e434944924a22cfaaa0 ]
+[ Upstream commit 86d43e2bf93ccac88ef71cee36a23282ebd9e427 ]
 
-Many syzbot reports are pointing to soft lockups in
-batadv_purge_orig_ref() [1]
+Although the code is correct, the following line
 
-Root cause is unknown, but we can avoid spending too much
-time there and perhaps get more interesting reports.
+	copy_from_sockptr(&req_u.req, optval, len));
 
-[1]
+triggers this warning :
 
-watchdog: BUG: soft lockup - CPU#0 stuck for 27s! [kworker/u4:6:621]
-Modules linked in:
-irq event stamp: 6182794
- hardirqs last  enabled at (6182793): [<ffff8000801dae10>] __local_bh_enable_ip+0x224/0x44c kernel/softirq.c:386
- hardirqs last disabled at (6182794): [<ffff80008ad66a78>] __el1_irq arch/arm64/kernel/entry-common.c:533 [inline]
- hardirqs last disabled at (6182794): [<ffff80008ad66a78>] el1_interrupt+0x24/0x68 arch/arm64/kernel/entry-common.c:551
- softirqs last  enabled at (6182792): [<ffff80008aab71c4>] spin_unlock_bh include/linux/spinlock.h:396 [inline]
- softirqs last  enabled at (6182792): [<ffff80008aab71c4>] batadv_purge_orig_ref+0x114c/0x1228 net/batman-adv/originator.c:1287
- softirqs last disabled at (6182790): [<ffff80008aab61dc>] spin_lock_bh include/linux/spinlock.h:356 [inline]
- softirqs last disabled at (6182790): [<ffff80008aab61dc>] batadv_purge_orig_ref+0x164/0x1228 net/batman-adv/originator.c:1271
-CPU: 0 PID: 621 Comm: kworker/u4:6 Not tainted 6.8.0-rc7-syzkaller-g707081b61156 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-Workqueue: bat_events batadv_purge_orig
-pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
- pc : should_resched arch/arm64/include/asm/preempt.h:79 [inline]
- pc : __local_bh_enable_ip+0x228/0x44c kernel/softirq.c:388
- lr : __local_bh_enable_ip+0x224/0x44c kernel/softirq.c:386
-sp : ffff800099007970
-x29: ffff800099007980 x28: 1fffe00018fce1bd x27: dfff800000000000
-x26: ffff0000d2620008 x25: ffff0000c7e70de8 x24: 0000000000000001
-x23: 1fffe00018e57781 x22: dfff800000000000 x21: ffff80008aab71c4
-x20: ffff0001b40136c0 x19: ffff0000c72bbc08 x18: 1fffe0001a817bb0
-x17: ffff800125414000 x16: ffff80008032116c x15: 0000000000000001
-x14: 1fffe0001ee9d610 x13: 0000000000000000 x12: 0000000000000003
-x11: 0000000000000000 x10: 0000000000ff0100 x9 : 0000000000000000
-x8 : 00000000005e5789 x7 : ffff80008aab61dc x6 : 0000000000000000
-x5 : 0000000000000000 x4 : 0000000000000001 x3 : 0000000000000000
-x2 : 0000000000000006 x1 : 0000000000000080 x0 : ffff800125414000
-Call trace:
-  __daif_local_irq_enable arch/arm64/include/asm/irqflags.h:27 [inline]
-  arch_local_irq_enable arch/arm64/include/asm/irqflags.h:49 [inline]
-  __local_bh_enable_ip+0x228/0x44c kernel/softirq.c:386
-  __raw_spin_unlock_bh include/linux/spinlock_api_smp.h:167 [inline]
-  _raw_spin_unlock_bh+0x3c/0x4c kernel/locking/spinlock.c:210
-  spin_unlock_bh include/linux/spinlock.h:396 [inline]
-  batadv_purge_orig_ref+0x114c/0x1228 net/batman-adv/originator.c:1287
-  batadv_purge_orig+0x20/0x70 net/batman-adv/originator.c:1300
-  process_one_work+0x694/0x1204 kernel/workqueue.c:2633
-  process_scheduled_works kernel/workqueue.c:2706 [inline]
-  worker_thread+0x938/0xef4 kernel/workqueue.c:2787
-  kthread+0x288/0x310 kernel/kthread.c:388
-  ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 PID: 0 Comm: swapper/1 Not tainted 6.8.0-rc7-syzkaller-g707081b61156 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
- pc : arch_local_irq_enable+0x8/0xc arch/arm64/include/asm/irqflags.h:51
- lr : default_idle_call+0xf8/0x128 kernel/sched/idle.c:103
-sp : ffff800093a17d30
-x29: ffff800093a17d30 x28: dfff800000000000 x27: 1ffff00012742fb4
-x26: ffff80008ec9d000 x25: 0000000000000000 x24: 0000000000000002
-x23: 1ffff00011d93a74 x22: ffff80008ec9d3a0 x21: 0000000000000000
-x20: ffff0000c19dbc00 x19: ffff8000802d0fd8 x18: 1fffe00036804396
-x17: ffff80008ec9d000 x16: ffff8000802d089c x15: 0000000000000001
-x14: 1fffe00036805f10 x13: 0000000000000000 x12: 0000000000000003
-x11: 0000000000000001 x10: 0000000000000003 x9 : 0000000000000000
-x8 : 00000000000ce8d1 x7 : ffff8000804609e4 x6 : 0000000000000000
-x5 : 0000000000000001 x4 : 0000000000000001 x3 : ffff80008ad6aac0
-x2 : 0000000000000000 x1 : ffff80008aedea60 x0 : ffff800125436000
-Call trace:
-  __daif_local_irq_enable arch/arm64/include/asm/irqflags.h:27 [inline]
-  arch_local_irq_enable+0x8/0xc arch/arm64/include/asm/irqflags.h:49
-  cpuidle_idle_call kernel/sched/idle.c:170 [inline]
-  do_idle+0x1f0/0x4e8 kernel/sched/idle.c:312
-  cpu_startup_entry+0x5c/0x74 kernel/sched/idle.c:410
-  secondary_start_kernel+0x198/0x1c0 arch/arm64/kernel/smp.c:272
-  __secondary_switched+0xb8/0xbc arch/arm64/kernel/head.S:404
+memcpy: detected field-spanning write (size 28) of single field "dst" at include/linux/sockptr.h:49 (size 16)
 
+Refactor the code to be more explicit.
+
+Reported-by: syzbot <syzkaller@googlegroups.com>
 Signed-off-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Sven Eckelmann <sven@narfation.org>
-Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/batman-adv/originator.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/packet/af_packet.c | 26 ++++++++++++++------------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
 
-diff --git a/net/batman-adv/originator.c b/net/batman-adv/originator.c
-index 71c143d4b6d05..ac74f6ead62d5 100644
---- a/net/batman-adv/originator.c
-+++ b/net/batman-adv/originator.c
-@@ -1266,6 +1266,8 @@ void batadv_purge_orig_ref(struct batadv_priv *bat_priv)
- 	/* for all origins... */
- 	for (i = 0; i < hash->size; i++) {
- 		head = &hash->table[i];
-+		if (hlist_empty(head))
-+			continue;
- 		list_lock = &hash->list_locks[i];
+diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+index e6a8701a38dbe..59ca1e321db16 100644
+--- a/net/packet/af_packet.c
++++ b/net/packet/af_packet.c
+@@ -3800,28 +3800,30 @@ packet_setsockopt(struct socket *sock, int level, int optname, sockptr_t optval,
+ 	case PACKET_TX_RING:
+ 	{
+ 		union tpacket_req_u req_u;
+-		int len;
  
- 		spin_lock_bh(list_lock);
++		ret = -EINVAL;
+ 		lock_sock(sk);
+ 		switch (po->tp_version) {
+ 		case TPACKET_V1:
+ 		case TPACKET_V2:
+-			len = sizeof(req_u.req);
++			if (optlen < sizeof(req_u.req))
++				break;
++			ret = copy_from_sockptr(&req_u.req, optval,
++						sizeof(req_u.req)) ?
++						-EINVAL : 0;
+ 			break;
+ 		case TPACKET_V3:
+ 		default:
+-			len = sizeof(req_u.req3);
++			if (optlen < sizeof(req_u.req3))
++				break;
++			ret = copy_from_sockptr(&req_u.req3, optval,
++						sizeof(req_u.req3)) ?
++						-EINVAL : 0;
+ 			break;
+ 		}
+-		if (optlen < len) {
+-			ret = -EINVAL;
+-		} else {
+-			if (copy_from_sockptr(&req_u.req, optval, len))
+-				ret = -EFAULT;
+-			else
+-				ret = packet_set_ring(sk, &req_u, 0,
+-						    optname == PACKET_TX_RING);
+-		}
++		if (!ret)
++			ret = packet_set_ring(sk, &req_u, 0,
++					      optname == PACKET_TX_RING);
+ 		release_sock(sk);
+ 		return ret;
+ 	}
 -- 
 2.43.0
 
