@@ -1,191 +1,164 @@
-Return-Path: <netdev+bounces-98187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA8C48D0100
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 15:12:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F00818D0134
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 15:20:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24498B21482
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 13:12:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4B61281AFA
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 13:20:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB451E89C;
-	Mon, 27 May 2024 13:12:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F09A15E5DD;
+	Mon, 27 May 2024 13:20:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="g0pdTC18"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="YWLM28g0"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2897D405;
-	Mon, 27 May 2024 13:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F43E4EB55
+	for <netdev@vger.kernel.org>; Mon, 27 May 2024 13:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716815522; cv=none; b=sdlVKRTF5f5Z7gqMdqQwjEeVsVRKWWLF6zoo8AU2AGuRKV8UVOYfetKlOEQC+6RnvSsK0e7uNTmyM60DXY22jfhVlmDoH784XtIzuFwnQyD8K7ulKx8ZgKp8DDhVach3dAEJNzJYRCEyDJa1GTT8rLwNxR+mCfWkr+lmJAWtFcY=
+	t=1716816052; cv=none; b=olBW0oOHuRlMdHUa2iFdinqJtvBmOcs4Kg5Qq4Qr3ibhnUD7Ke1sfNcQzjVMtShr3mjnbBdouEk9AQLUDgaDYuXetkcIZbawodiV3A7MX8ynnpPcydkr7GwlyAs7pK1GOw22vptt+/6uPeZqoR8MGIXn7kEQz8RMvZ9OtFTSqu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716815522; c=relaxed/simple;
-	bh=yAjc/CRBIyHBMERfH9pfmqQKiZyxBnW8DCsCRsUh0h8=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=JwBb76XXcr5RUjDV2gJow0+ceku8f+Dg6fsXKb+QZhJdLJ52vrAuSdDcHDvRzUfsalBrIVSODf3arDMvJRdOdbylwxhKebOsufc8EZz0xhWlPpadeJdkYRbLxaB3fBXx400W09cMonPf6snrsT6D6xf9NRAe1FLDHw48NtSzZb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=g0pdTC18; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=oZjVcx9f2W1nJX3ekNr5Flk/1LEdQ2H2XBF9DSGsQok=; b=g0pdTC18j9Kli9oqXG14Kk2ese
-	nMEBl72DupxfG0XKyaOFY/l6QFZuUBMG8UlFXX0hOjkH6yNOI2N2wrXe1sYOYys9aHFfLH/JH0rkN
-	jOuAtzMpFDnFXGvMVaPtjBkFbDLusUas+KCMv5/UXK/SYCP4XqbGEE/9QD+p1FybRqHpJBYj4zlAE
-	LYgHcZTiUAPuxxe7TrjX6RbYF+LJH9Zfmhuz4U0CFKr2lJ2IVctbimMe0dy7EV5v1l2h8e2kj9tB1
-	RKRil/8sCa6SNXqE+gO//kiocGf7aU+4ivWaPvr04iAR/vSVBVcacja3/sxLUxu9R3Khq3G2jDh+B
-	6SIY+EiQ==;
-Received: from sslproxy06.your-server.de ([78.46.172.3])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sBa8l-000FpF-FC; Mon, 27 May 2024 15:11:51 +0200
-Received: from [178.197.248.14] (helo=linux.home)
-	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sBa8k-000AIM-2A;
-	Mon, 27 May 2024 15:11:50 +0200
-Subject: Re: [Patch bpf] vmalloc: relax is_vmalloc_or_module_addr() check
-To: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org
-Cc: linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>,
- bpf@vger.kernel.org, Cong Wang <cong.wang@bytedance.com>,
- Luis Chamberlain <mcgrof@kernel.org>, Mike Rapoport <rppt@kernel.org>
-References: <20240526230648.188550-1-xiyou.wangcong@gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <1f39f888-989f-658b-a107-90ffe1347d0f@iogearbox.net>
-Date: Mon, 27 May 2024 15:11:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1716816052; c=relaxed/simple;
+	bh=3MkKkpmrskRT0NF+eJzt1tmnBR8XJm29Y5ePAg/pC44=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WScWTFBwWyqwt86GX6GAN3bQ9hbgheuy3+dQri/4m5/hLFnlbVaRYJhSEIROeDCKGRGVt8jpNHDMNksPsdQsiDWj35HC9oAWeazMfWRuKvjGTEDx5SLTzI4ryHP378tsYW1j360gGRXdkVguTyUtR0H36ZQxEmLoMt5lmQp9uXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=YWLM28g0; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=oYvyGuL3FYNlT2/HXT/HMIfkTEQHXwOW5dyOd97dqms=; b=YW
+	LM28g0Rj5s1wMmNsRCQHZSBQa7LOpZH61kBbLWe+jOmdLSyZ/GTSNh+In8WYSzL0Nw/FermcJmRiz
+	gbaTUrGa6rgQ1nfPZuz2EDbAWLkJF8JaznezNJsrwjded3XZ2ybfwKTJgXmVNInBSqi1xzsAVmEfU
+	1yqMAJUSvZqKbsU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sBaHH-00G4aH-NU; Mon, 27 May 2024 15:20:39 +0200
+Date: Mon, 27 May 2024 15:20:39 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kamil =?iso-8859-1?B?SG9y4Wss?= 2N <kamilh@axis.com>
+Cc: netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH v3 1/3] net: phy: bcm54811: New link mode for BroadR-Reach
+Message-ID: <79af2fc0-7439-4c6d-9059-048440c3a406@lunn.ch>
+References: <20240506144015.2409715-1-kamilh@axis.com>
+ <20240506144015.2409715-2-kamilh@axis.com>
+ <25798e60-d1cc-40ce-b081-80afdb182dd6@lunn.ch>
+ <96a99806-624c-4fa4-aa08-0d5c306cff25@axis.com>
+ <b5c6b65b-d4be-4ebc-a529-679d42e56c39@lunn.ch>
+ <c39dd894-bd63-430b-a60c-402c04f5dbf7@axis.com>
+ <1188b119-1191-4afa-8381-d022d447086c@lunn.ch>
+ <ed59ba76-ea86-4007-9b53-ebeb02951b34@axis.com>
+ <44c85449-1a9b-4a5e-8962-1d2c37138f97@lunn.ch>
+ <b9ce037f-8720-4a6c-8cfe-01bffee230c1@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240526230648.188550-1-xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27288/Mon May 27 10:29:01 2024)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b9ce037f-8720-4a6c-8cfe-01bffee230c1@axis.com>
 
-On 5/27/24 1:06 AM, Cong Wang wrote:
-> From: Cong Wang <cong.wang@bytedance.com>
+> > So IEEE and BRR autoneg are mutually exclusive. It would be good to
+> > see if 802.3 actually says or implies that. Generic functions like
+> > ksetting_set/get should be based on 802.3, so when designing the API
+> > we should focus on that, not what the particular devices you are
+> > interested in support.
+> I am not sure about how to determine whether IEEE 802.3 says anything about
+> the IEEE and BRR modes auto-negotiation mutual exclusivity - it is purely
+> question of the implementation, in our case in the Broadcom PHYs.
+
+CLause 22 and clause 45 might say something. e.g. the documentation
+about BMSR_ANEGCAPABLE might indicate what link modes it covers.
+
+> One of the
+> BRR modes (1BR100) is direct equivalent of 100Base-T1 as specified in IEEE
+> 802.3bw. As it requests different hardware to be connected, I doubt there is
+> any (even theoretical) possibility to negotiate with a set of supported
+> modes including let's say 100Base-T1 and 100Base-T.
+> > 
+> > We probably want phydev->supports listing all modes, IEEE and BRR. Is
+> > there a bit equivalent to BMSR_ANEGCAPABLE indicating the hardware can
+> > do BRR autoneg? If there is, we probably want to add a
+> > ETHTOOL_LINK_MODE_Autoneg_BRR_BIT.
+> There is "LDS Ability" (LRESR_LDSABILITY) bit in the LRE registers set of
+> BCM54810, which is equivalent to BMSR_ANEGCAPABLE and it is at same position
+> (bit 3 of the status register), so that just this could work.
 > 
-> After commit 2c9e5d4a0082 ("bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of")
-> CONFIG_BPF_JIT does not depend on CONFIG_MODULES any more and bpf jit
-> also uses the MODULES_VADDR ~ MODULES_END memory region. But
-> is_vmalloc_or_module_addr() still checks CONFIG_MODULES, which then
-> returns false for a bpf jit memory region when CONFIG_MODULES is not
-> defined. It leads to the following kernel BUG:
+> But just in our case, the LDS Ability bit is "reserved" and "reads as 1"
+> (BCM54811, BCM54501). So at least for these two it cannot be used as an
+> indication of aneg capability.
 > 
-> [    1.567023] ------------[ cut here ]------------
-> [    1.567883] kernel BUG at mm/vmalloc.c:745!
-> [    1.568477] Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN NOPTI
-> [    1.569367] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.9.0+ #448
-> [    1.570247] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
-> [    1.570786] RIP: 0010:vmalloc_to_page+0x48/0x1ec
-> [    1.570786] Code: 0f 00 00 e8 eb 1a 05 00 b8 37 00 00 00 48 ba fe ff ff ff ff 1f 00 00 4c 03 25 76 49 c6 02 48 c1 e0 28 48 01 e8 48 39 d0 76 02 <0f> 0b 4c 89 e7 e8 bf 1a 05 00 49 8b 04 24 48 a9 9f ff ff ff 0f 84
-> [    1.570786] RSP: 0018:ffff888007787960 EFLAGS: 00010212
-> [    1.570786] RAX: 000036ffa0000000 RBX: 0000000000000640 RCX: ffffffff8147e93c
-> [    1.570786] RDX: 00001ffffffffffe RSI: dffffc0000000000 RDI: ffffffff840e32c8
-> [    1.570786] RBP: ffffffffa0000000 R08: 0000000000000000 R09: 0000000000000000
-> [    1.570786] R10: ffff888007787a88 R11: ffffffff8475d8e7 R12: ffffffff83e80ff8
-> [    1.570786] R13: 0000000000000640 R14: 0000000000000640 R15: 0000000000000640
-> [    1.570786] FS:  0000000000000000(0000) GS:ffff88806cc00000(0000) knlGS:0000000000000000
-> [    1.570786] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    1.570786] CR2: ffff888006a01000 CR3: 0000000003e80000 CR4: 0000000000350ef0
-> [    1.570786] Call Trace:
-> [    1.570786]  <TASK>
-> [    1.570786]  ? __die_body+0x1b/0x58
-> [    1.570786]  ? die+0x31/0x4b
-> [    1.570786]  ? do_trap+0x9d/0x138
-> [    1.570786]  ? vmalloc_to_page+0x48/0x1ec
-> [    1.570786]  ? do_error_trap+0xcd/0x102
-> [    1.570786]  ? vmalloc_to_page+0x48/0x1ec
-> [    1.570786]  ? vmalloc_to_page+0x48/0x1ec
-> [    1.570786]  ? handle_invalid_op+0x2f/0x38
-> [    1.570786]  ? vmalloc_to_page+0x48/0x1ec
-> [    1.570786]  ? exc_invalid_op+0x2b/0x41
-> [    1.570786]  ? asm_exc_invalid_op+0x16/0x20
-> [    1.570786]  ? vmalloc_to_page+0x26/0x1ec
-> [    1.570786]  ? vmalloc_to_page+0x48/0x1ec
-> [    1.570786]  __text_poke+0xb6/0x458
-> [    1.570786]  ? __pfx_text_poke_memcpy+0x10/0x10
-> [    1.570786]  ? __pfx___mutex_lock+0x10/0x10
-> [    1.570786]  ? __pfx___text_poke+0x10/0x10
-> [    1.570786]  ? __pfx_get_random_u32+0x10/0x10
-> [    1.570786]  ? srso_return_thunk+0x5/0x5f
-> [    1.570786]  text_poke_copy_locked+0x70/0x84
-> [    1.570786]  text_poke_copy+0x32/0x4f
-> [    1.570786]  bpf_arch_text_copy+0xf/0x27
-> [    1.570786]  bpf_jit_binary_pack_finalize+0x26/0x5a
-> [    1.570786]  bpf_int_jit_compile+0x576/0x8ad
-> [    1.570786]  ? __pfx_bpf_int_jit_compile+0x10/0x10
-> [    1.570786]  ? srso_return_thunk+0x5/0x5f
-> [    1.570786]  ? __kmalloc_node_track_caller+0x2b5/0x2e0
-> [    1.570786]  bpf_prog_select_runtime+0x7c/0x199
-> [    1.570786]  bpf_prepare_filter+0x1e9/0x25b
-> [    1.570786]  ? __pfx_bpf_prepare_filter+0x10/0x10
-> [    1.570786]  ? srso_return_thunk+0x5/0x5f
-> [    1.570786]  ? _find_next_bit+0x29/0x7e
-> [    1.570786]  bpf_prog_create+0xb8/0xe0
-> [    1.570786]  ptp_classifier_init+0x75/0xa1
-> [    1.570786]  ? __pfx_ptp_classifier_init+0x10/0x10
-> [    1.570786]  ? srso_return_thunk+0x5/0x5f
-> [    1.570786]  ? register_pernet_subsys+0x36/0x42
-> [    1.570786]  ? srso_return_thunk+0x5/0x5f
-> [    1.570786]  sock_init+0x99/0xa3
-> [    1.570786]  ? __pfx_sock_init+0x10/0x10
-> [    1.570786]  do_one_initcall+0x104/0x2c4
-> [    1.570786]  ? __pfx_do_one_initcall+0x10/0x10
-> [    1.570786]  ? parameq+0x25/0x2d
-> [    1.570786]  ? rcu_is_watching+0x1c/0x3c
-> [    1.570786]  ? trace_kmalloc+0x81/0xb2
-> [    1.570786]  ? srso_return_thunk+0x5/0x5f
-> [    1.570786]  ? __kmalloc+0x29c/0x2c7
-> [    1.570786]  ? srso_return_thunk+0x5/0x5f
-> [    1.570786]  do_initcalls+0xf9/0x123
-> [    1.570786]  kernel_init_freeable+0x24f/0x289
-> [    1.570786]  ? __pfx_kernel_init+0x10/0x10
-> [    1.570786]  kernel_init+0x19/0x13a
-> [    1.570786]  ret_from_fork+0x24/0x41
-> [    1.570786]  ? __pfx_kernel_init+0x10/0x10
-> [    1.570786]  ret_from_fork_asm+0x1a/0x30
-> [    1.570786]  </TASK>
-> [    1.570819] ---[ end trace 0000000000000000 ]---
-> [    1.571463] RIP: 0010:vmalloc_to_page+0x48/0x1ec
-> [    1.572111] Code: 0f 00 00 e8 eb 1a 05 00 b8 37 00 00 00 48 ba fe ff ff ff ff 1f 00 00 4c 03 25 76 49 c6 02 48 c1 e0 28 48 01 e8 48 39 d0 76 02 <0f> 0b 4c 89 e7 e8 bf 1a 05 00 49 8b 04 24 48 a9 9f ff ff ff 0f 84
-> [    1.574632] RSP: 0018:ffff888007787960 EFLAGS: 00010212
-> [    1.575129] RAX: 000036ffa0000000 RBX: 0000000000000640 RCX: ffffffff8147e93c
-> [    1.576097] RDX: 00001ffffffffffe RSI: dffffc0000000000 RDI: ffffffff840e32c8
-> [    1.577084] RBP: ffffffffa0000000 R08: 0000000000000000 R09: 0000000000000000
-> [    1.578077] R10: ffff888007787a88 R11: ffffffff8475d8e7 R12: ffffffff83e80ff8
-> [    1.578810] R13: 0000000000000640 R14: 0000000000000640 R15: 0000000000000640
-> [    1.579823] FS:  0000000000000000(0000) GS:ffff88806cc00000(0000) knlGS:0000000000000000
-> [    1.580992] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    1.581869] CR2: ffff888006a01000 CR3: 0000000003e80000 CR4: 0000000000350ef0
-> [    1.582800] Kernel panic - not syncing: Fatal exception
-> [    1.583765] ---[ end Kernel panic - not syncing: Fatal exception ]---
+> LDS is "long-distance signaling" int he Broadcom's terminology, "a special
+> new type of auto-negotiation"....
+
+For generic code, we should go from what 802.3 says. Does clause 22 or
+clause 45 define anything like LDS Ability? If you look at how 802.3
+C22/C45 works, it is mostly self describing. You can read registers to
+determine what the PHY supports. So it is possible to have generic
+genphy_read_abilities() and genphy_c45_pma_read_abilities which does
+most of the work. Ideally we just want to extend them to cover BBR
+link modes.
+
+> > ksetting_set should enforce this mutual exclusion. So
+> > phydev->advertise should never be set containing invalid combination,
+> > ksetting_set() should return an error.
+> > 
+> > I guess we need to initialize phydev->advertise to IEEE link modes in
+> > order to not cause regressions. However, if the PHY does not support
+> > any IEEE modes, it can then default to BRR link modes. It would also
+> > make sense to have a standardized DT property to indicate BRR should
+> > be used by default.
 > 
-> Fixes: 2c9e5d4a0082 ("bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of")
-> Cc: Luis Chamberlain <mcgrof@kernel.org>
-> Cc: Mike Rapoport (IBM) <rppt@kernel.org>
-> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+> With device tree property it would be about the same situation as with phy
+> tunable, wouldn't? The tunable was already in the first version of this
+> patch and it (or DT property) is same type of solution, one knows in advance
+> which set of link modes to use. I personally feel the DT as better method,
+> because the IEEE/BRR selection is of hardware nature and cannot be easily
+> auto-detected - exactly what the DT is for.
 
-Thanks for the fix!
+If we decide IEEE and BRR are mutually exclusive because of the
+coupling, then this is clearly a hardware property. So DT, and maybe
+sometime in the future ACPI, is the correct way to describe this.
 
-Mike/Luis, do you plan to pick this up or rather prefer if we route it to
-Linus (with your Ack assuming it looks good to you)?
+> There is description of the LDS negotioation in BCM54810 datasheet saying
+> that if the PHY detects standard Ethernet link pulses on a wire pair, it
+> transitions automatically from BRR-LDS to Clause 28 auto-negotioation mode.
+> Thus, at least the 54810 can be set so that it starts in BRR mode and if
+> there is no BRR PHY at the other end and the other end is also set to
+> auto-negotiate (Clause-28), the auto-negotiation continues in IEEE mode and
+> potentially results in the PHY in IEEE mode. In this case, it would make
+> sense to have both BRR and IEEE link modes in same list and just start with
+> BRR, leaving on the PHY itself the decision to fall back to IEEE. The
+> process would be sub-optimal in most use cases - who would use BRR PHY in
+> hardwired IEEE circuit..?
+> 
+> However, I cannot promise to do such a driver because I do not have the
+> BCM54810 available nor it is my task here.
 
-Thanks,
-Daniel
+That is fine. At the moment, we are just trying to explore all the
+corners before we decide how this should work. 802.3 should be our
+main guide, but also look at real hardware.
+
+> OK so back to the proposed new parameter for ethtool, the "linkmode" would
+> mean forced setting of  given link mode - so use the link_mode_masks as 1 of
+> N or just pass the link mode number as another parameter?
+
+The autoneg off should be enough to indicate what the passed link mode
+means. However, it could also be placed into a new property it that
+seems more logical for the API. When it comes to the internal API, i
+think it will be a new member anyway.
+
+	Andrew
 
