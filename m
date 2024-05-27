@@ -1,65 +1,64 @@
-Return-Path: <netdev+bounces-98215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 290038D0385
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:26:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AE678D038D
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:27:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4E0E2A57B0
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 14:26:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 500AA2A59C1
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 14:27:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54CE178CC1;
-	Mon, 27 May 2024 14:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EFC8179970;
+	Mon, 27 May 2024 14:14:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hmrK5nay"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KNXId8Oc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4CB1779BB;
-	Mon, 27 May 2024 14:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 353C917967A;
+	Mon, 27 May 2024 14:14:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716819289; cv=none; b=JA34DX98CrMx4i9xbVeExpNerzD2Fe11KSe5Ysonqwml6kfrrcYjw5mtOMvrSS9LVvheRiOC2csVRNkX1t3CeVRUJT+NpqZN/cMPSJef2suOYWZ4RH63hCLkMWGo7k5tEOxtdTKWmYrNUcBnO1n/yre45zS/EY42hQHw9m0ROLo=
+	t=1716819299; cv=none; b=iefDUSJUcSp3dsE6T53OVNuDHP8wt+2yFokF5AhZHt+gMz10LoLhXp+ka7sRjv16qIFW9NGmR/q0pxla52pwwl/m0SSnIkXBiCERGZN0g+ztp+hYTN1WfvMrj9WVx0hOyh3g8nvv2C561bSGgvMD3AUjqimAjgFNBsP3O7WzIwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716819289; c=relaxed/simple;
-	bh=kSIQWxMW+5ATjLlcp7PiWc0aIQ8iIko0XVX0k4Svgtg=;
+	s=arc-20240116; t=1716819299; c=relaxed/simple;
+	bh=XniSZaceh5RFPJfvfIIlb+sEa2AMpBB45Vf8zq5nxHM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JQF6YYjqAecoVcyAZOT1mSniRcJz+qOJhCbTNN978+W66FCIo8TOG4rMdc6I349sq2DumDgBLUKTsMtq5nnauUhwkkwFz1S6nLJ5NUdlWsDUH62DZEeV5syN6E0xPQea+9c5PtxwLIv0K/z82aFnf5gPqP09Ir2UPTAGRJckqAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hmrK5nay; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE220C2BBFC;
-	Mon, 27 May 2024 14:14:47 +0000 (UTC)
+	 MIME-Version; b=HfW4H1xaRZIkB2O56lVJfN4UcUDo1fkbq6j1rcS8zMEmMXqjfAHOvYST+tICxQ0aTFYPlFWwGvPIKs19vyeeD6h3xpFbGkVybd/s/1zVjOiq4dAt+G8BDAOVRdb+9IH3MCvpvPYAwbGpUQ4WWXaEl3Mc57a/o0116+8J9VnPsY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KNXId8Oc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9732BC4AF08;
+	Mon, 27 May 2024 14:14:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716819289;
-	bh=kSIQWxMW+5ATjLlcp7PiWc0aIQ8iIko0XVX0k4Svgtg=;
+	s=k20201202; t=1716819299;
+	bh=XniSZaceh5RFPJfvfIIlb+sEa2AMpBB45Vf8zq5nxHM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hmrK5nay6mP2AfXSjizCwvWCyzFzXEtcFhQiTng/aNAqX1bec7J6yFX4kCU9nIfjM
-	 MOchoql/ycXAj/ffYo4exWzes6MjzqYdetGSBHh3Bl2js2VwLgN+i5CvpSg9B32SfY
-	 69s0TULt/64kklPV5xpCEbyW9G/aTZRAezNtGDvjTeDNt1cQk/X2Mok8nk40YByDKU
-	 eSPeBuj02mxRzpb6u1zigstuYTHCZ6SdBc9xzht5vAv4RYsvzOjJQh6ZKFeydDWprV
-	 PKSE7rSQRDs23JmFiU8R3GukFSM4FKgEVo/1KvPRMg4ZTUSIw3/xzqlGhvGG0WrzGO
-	 qaj3dFD6fz6uA==
+	b=KNXId8OcpL3rN8MUGfeW/ZAK8zr/BNNjxffTAvpeRTKRpZ7KY9Qa6NpjswTsvkzhm
+	 GO4kDNmD32r1XtcnqU7JK7to60k9z0Y1ew/cdiXMFFjGwNyXBfBgsVRQ5NfN7dnpgP
+	 pb5c6sOAze+RvJxaUYb6Sd3N5wjspUYoGNly6nAFoWy8ersgKvAnLoLLUy9k3SdGPj
+	 s7P78t5WLFKtb8i3D3K7fh8UBMxMEU4pErVDIO5rcEVBdi31I1IRlgW35h268kfuy0
+	 uDetif0i87JvUM+OEUsc5nTC5Y7JfvuMuwEi7nMiTm2rnG1N6aUNDeL8dF1IgsNtDd
+	 VoFft7kHZGfNQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Davide Caratti <dcaratti@redhat.com>,
-	Maxim Mikityanskiy <maxim@isovalent.com>,
-	Xiumei Mu <xmu@redhat.com>,
-	Christoph Paasch <cpaasch@apple.com>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
+	alsi@bang-olufsen.dk,
+	andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
 	edumazet@google.com,
 	kuba@kernel.org,
-	jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.8 16/30] net/sched: fix false lockdep warning on qdisc root lock
-Date: Mon, 27 May 2024 10:13:25 -0400
-Message-ID: <20240527141406.3852821-16-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.8 19/30] net: dsa: realtek: keep default LED state in rtl8366rb
+Date: Mon, 27 May 2024 10:13:28 -0400
+Message-ID: <20240527141406.3852821-19-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240527141406.3852821-1-sashal@kernel.org>
 References: <20240527141406.3852821-1-sashal@kernel.org>
@@ -74,190 +73,191 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.8.11
 Content-Transfer-Encoding: 8bit
 
-From: Davide Caratti <dcaratti@redhat.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 
-[ Upstream commit af0cb3fa3f9ed258d14abab0152e28a0f9593084 ]
+[ Upstream commit 5edc6585aafefa3d44fb8a84adf241d90227f7a3 ]
 
-Xiumei and Christoph reported the following lockdep splat, complaining of
-the qdisc root lock being taken twice:
+This switch family supports four LEDs for each of its six ports. Each
+LED group is composed of one of these four LEDs from all six ports. LED
+groups can be configured to display hardware information, such as link
+activity, or manually controlled through a bitmap in registers
+RTL8366RB_LED_0_1_CTRL_REG and RTL8366RB_LED_2_3_CTRL_REG.
 
- ============================================
- WARNING: possible recursive locking detected
- 6.7.0-rc3+ #598 Not tainted
- --------------------------------------------
- swapper/2/0 is trying to acquire lock:
- ffff888177190110 (&sch->q.lock){+.-.}-{2:2}, at: __dev_queue_xmit+0x1560/0x2e70
+After a reset, the default LED group configuration for groups 0 to 3
+indicates, respectively, link activity, link at 1000M, 100M, and 10M, or
+RTL8366RB_LED_CTRL_REG as 0x5432. These configurations are commonly used
+for LED indications. However, the driver was replacing that
+configuration to use manually controlled LEDs (RTL8366RB_LED_FORCE)
+without providing a way for the OS to control them. The default
+configuration is deemed more useful than fixed, uncontrollable turned-on
+LEDs.
 
- but task is already holding lock:
- ffff88811995a110 (&sch->q.lock){+.-.}-{2:2}, at: __dev_queue_xmit+0x1560/0x2e70
+The driver was enabling/disabling LEDs during port_enable/disable.
+However, these events occur when the port is administratively controlled
+(up or down) and are not related to link presence. Additionally, when a
+port N was disabled, the driver was turning off all LEDs for group N,
+not only the corresponding LED for port N in any of those 4 groups. In
+such cases, if port 0 was brought down, the LEDs for all ports in LED
+group 0 would be turned off. As another side effect, the driver was
+wrongly warning that port 5 didn't have an LED ("no LED for port 5").
+Since showing the administrative state of ports is not an orthodox way
+to use LEDs, it was not worth it to fix it and all this code was
+dropped.
 
- other info that might help us debug this:
-  Possible unsafe locking scenario:
+The code to disable LEDs was simplified only changing each LED group to
+the RTL8366RB_LED_OFF state. Registers RTL8366RB_LED_0_1_CTRL_REG and
+RTL8366RB_LED_2_3_CTRL_REG are only used when the corresponding LED
+group is configured with RTL8366RB_LED_FORCE and they don't need to be
+cleaned. The code still references an LED controlled by
+RTL8366RB_INTERRUPT_CONTROL_REG, but as of now, no test device has
+actually used it. Also, some magic numbers were replaced by macros.
 
-        CPU0
-        ----
-   lock(&sch->q.lock);
-   lock(&sch->q.lock);
-
-  *** DEADLOCK ***
-
-  May be due to missing lock nesting notation
-
- 5 locks held by swapper/2/0:
-  #0: ffff888135a09d98 ((&in_dev->mr_ifc_timer)){+.-.}-{0:0}, at: call_timer_fn+0x11a/0x510
-  #1: ffffffffaaee5260 (rcu_read_lock){....}-{1:2}, at: ip_finish_output2+0x2c0/0x1ed0
-  #2: ffffffffaaee5200 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x209/0x2e70
-  #3: ffff88811995a110 (&sch->q.lock){+.-.}-{2:2}, at: __dev_queue_xmit+0x1560/0x2e70
-  #4: ffffffffaaee5200 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x209/0x2e70
-
- stack backtrace:
- CPU: 2 PID: 0 Comm: swapper/2 Not tainted 6.7.0-rc3+ #598
- Hardware name: Red Hat KVM, BIOS 1.13.0-2.module+el8.3.0+7353+9de0a3cc 04/01/2014
- Call Trace:
-  <IRQ>
-  dump_stack_lvl+0x4a/0x80
-  __lock_acquire+0xfdd/0x3150
-  lock_acquire+0x1ca/0x540
-  _raw_spin_lock+0x34/0x80
-  __dev_queue_xmit+0x1560/0x2e70
-  tcf_mirred_act+0x82e/0x1260 [act_mirred]
-  tcf_action_exec+0x161/0x480
-  tcf_classify+0x689/0x1170
-  prio_enqueue+0x316/0x660 [sch_prio]
-  dev_qdisc_enqueue+0x46/0x220
-  __dev_queue_xmit+0x1615/0x2e70
-  ip_finish_output2+0x1218/0x1ed0
-  __ip_finish_output+0x8b3/0x1350
-  ip_output+0x163/0x4e0
-  igmp_ifc_timer_expire+0x44b/0x930
-  call_timer_fn+0x1a2/0x510
-  run_timer_softirq+0x54d/0x11a0
-  __do_softirq+0x1b3/0x88f
-  irq_exit_rcu+0x18f/0x1e0
-  sysvec_apic_timer_interrupt+0x6f/0x90
-  </IRQ>
-
-This happens when TC does a mirred egress redirect from the root qdisc of
-device A to the root qdisc of device B. As long as these two locks aren't
-protecting the same qdisc, they can be acquired in chain: add a per-qdisc
-lockdep key to silence false warnings.
-This dynamic key should safely replace the static key we have in sch_htb:
-it was added to allow enqueueing to the device "direct qdisc" while still
-holding the qdisc root lock.
-
-v2: don't use static keys anymore in HTB direct qdiscs (thanks Eric Dumazet)
-
-CC: Maxim Mikityanskiy <maxim@isovalent.com>
-CC: Xiumei Mu <xmu@redhat.com>
-Reported-by: Christoph Paasch <cpaasch@apple.com>
-Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/451
-Signed-off-by: Davide Caratti <dcaratti@redhat.com>
-Link: https://lore.kernel.org/r/7dc06d6158f72053cf877a82e2a7a5bd23692faa.1713448007.git.dcaratti@redhat.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- include/net/sch_generic.h |  1 +
- net/sched/sch_generic.c   |  3 +++
- net/sched/sch_htb.c       | 22 +++-------------------
- 3 files changed, 7 insertions(+), 19 deletions(-)
+ drivers/net/dsa/realtek/rtl8366rb.c | 87 +++++++----------------------
+ 1 file changed, 20 insertions(+), 67 deletions(-)
 
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index 41ca14e81d55f..0014b9ee5e381 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -128,6 +128,7 @@ struct Qdisc {
+diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
+index e3b6a470ca67f..874e04cf2e0d2 100644
+--- a/drivers/net/dsa/realtek/rtl8366rb.c
++++ b/drivers/net/dsa/realtek/rtl8366rb.c
+@@ -182,7 +182,12 @@
+ #define RTL8366RB_LED_BLINKRATE_222MS		0x0004
+ #define RTL8366RB_LED_BLINKRATE_446MS		0x0005
  
- 	struct rcu_head		rcu;
- 	netdevice_tracker	dev_tracker;
-+	struct lock_class_key	root_lock_key;
- 	/* private data */
- 	long privdata[] ____cacheline_aligned;
- };
-diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-index a498b5d7c5d60..7fd0167aa7ee1 100644
---- a/net/sched/sch_generic.c
-+++ b/net/sched/sch_generic.c
-@@ -944,7 +944,9 @@ struct Qdisc *qdisc_alloc(struct netdev_queue *dev_queue,
- 	__skb_queue_head_init(&sch->gso_skb);
- 	__skb_queue_head_init(&sch->skb_bad_txq);
- 	gnet_stats_basic_sync_init(&sch->bstats);
-+	lockdep_register_key(&sch->root_lock_key);
- 	spin_lock_init(&sch->q.lock);
-+	lockdep_set_class(&sch->q.lock, &sch->root_lock_key);
++/* LED trigger event for each group */
+ #define RTL8366RB_LED_CTRL_REG			0x0431
++#define RTL8366RB_LED_CTRL_OFFSET(led_group)	\
++	(4 * (led_group))
++#define RTL8366RB_LED_CTRL_MASK(led_group)	\
++	(0xf << RTL8366RB_LED_CTRL_OFFSET(led_group))
+ #define RTL8366RB_LED_OFF			0x0
+ #define RTL8366RB_LED_DUP_COL			0x1
+ #define RTL8366RB_LED_LINK_ACT			0x2
+@@ -199,6 +204,11 @@
+ #define RTL8366RB_LED_LINK_TX			0xd
+ #define RTL8366RB_LED_MASTER			0xe
+ #define RTL8366RB_LED_FORCE			0xf
++
++/* The RTL8366RB_LED_X_X registers are used to manually set the LED state only
++ * when the corresponding LED group in RTL8366RB_LED_CTRL_REG is
++ * RTL8366RB_LED_FORCE. Otherwise, it is ignored.
++ */
+ #define RTL8366RB_LED_0_1_CTRL_REG		0x0432
+ #define RTL8366RB_LED_1_OFFSET			6
+ #define RTL8366RB_LED_2_3_CTRL_REG		0x0433
+@@ -998,28 +1008,20 @@ static int rtl8366rb_setup(struct dsa_switch *ds)
+ 	 */
+ 	if (priv->leds_disabled) {
+ 		/* Turn everything off */
+-		regmap_update_bits(priv->map,
+-				   RTL8366RB_LED_0_1_CTRL_REG,
+-				   0x0FFF, 0);
+-		regmap_update_bits(priv->map,
+-				   RTL8366RB_LED_2_3_CTRL_REG,
+-				   0x0FFF, 0);
+ 		regmap_update_bits(priv->map,
+ 				   RTL8366RB_INTERRUPT_CONTROL_REG,
+ 				   RTL8366RB_P4_RGMII_LED,
+ 				   0);
+-		val = RTL8366RB_LED_OFF;
+-	} else {
+-		/* TODO: make this configurable per LED */
+-		val = RTL8366RB_LED_FORCE;
+-	}
+-	for (i = 0; i < 4; i++) {
+-		ret = regmap_update_bits(priv->map,
+-					 RTL8366RB_LED_CTRL_REG,
+-					 0xf << (i * 4),
+-					 val << (i * 4));
+-		if (ret)
+-			return ret;
++
++		for (i = 0; i < RTL8366RB_NUM_LEDGROUPS; i++) {
++			val = RTL8366RB_LED_OFF << RTL8366RB_LED_CTRL_OFFSET(i);
++			ret = regmap_update_bits(priv->map,
++						 RTL8366RB_LED_CTRL_REG,
++						 RTL8366RB_LED_CTRL_MASK(i),
++						 val);
++			if (ret)
++				return ret;
++		}
+ 	}
  
- 	if (ops->static_flags & TCQ_F_CPUSTATS) {
- 		sch->cpu_bstats =
-@@ -1067,6 +1069,7 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
- 	if (ops->destroy)
- 		ops->destroy(qdisc);
- 
-+	lockdep_unregister_key(&qdisc->root_lock_key);
- 	module_put(ops->owner);
- 	netdev_put(dev, &qdisc->dev_tracker);
- 
-diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
-index 7349233eaa9b6..19a578c31a91f 100644
---- a/net/sched/sch_htb.c
-+++ b/net/sched/sch_htb.c
-@@ -1039,13 +1039,6 @@ static void htb_work_func(struct work_struct *work)
- 	rcu_read_unlock();
+ 	ret = rtl8366_reset_vlan(priv);
+@@ -1166,52 +1168,6 @@ rtl8366rb_mac_link_down(struct dsa_switch *ds, int port, unsigned int mode,
+ 	}
  }
  
--static void htb_set_lockdep_class_child(struct Qdisc *q)
+-static void rb8366rb_set_port_led(struct realtek_priv *priv,
+-				  int port, bool enable)
 -{
--	static struct lock_class_key child_key;
+-	u16 val = enable ? 0x3f : 0;
+-	int ret;
 -
--	lockdep_set_class(qdisc_lock(q), &child_key);
+-	if (priv->leds_disabled)
+-		return;
+-
+-	switch (port) {
+-	case 0:
+-		ret = regmap_update_bits(priv->map,
+-					 RTL8366RB_LED_0_1_CTRL_REG,
+-					 0x3F, val);
+-		break;
+-	case 1:
+-		ret = regmap_update_bits(priv->map,
+-					 RTL8366RB_LED_0_1_CTRL_REG,
+-					 0x3F << RTL8366RB_LED_1_OFFSET,
+-					 val << RTL8366RB_LED_1_OFFSET);
+-		break;
+-	case 2:
+-		ret = regmap_update_bits(priv->map,
+-					 RTL8366RB_LED_2_3_CTRL_REG,
+-					 0x3F, val);
+-		break;
+-	case 3:
+-		ret = regmap_update_bits(priv->map,
+-					 RTL8366RB_LED_2_3_CTRL_REG,
+-					 0x3F << RTL8366RB_LED_3_OFFSET,
+-					 val << RTL8366RB_LED_3_OFFSET);
+-		break;
+-	case 4:
+-		ret = regmap_update_bits(priv->map,
+-					 RTL8366RB_INTERRUPT_CONTROL_REG,
+-					 RTL8366RB_P4_RGMII_LED,
+-					 enable ? RTL8366RB_P4_RGMII_LED : 0);
+-		break;
+-	default:
+-		dev_err(priv->dev, "no LED for port %d\n", port);
+-		return;
+-	}
+-	if (ret)
+-		dev_err(priv->dev, "error updating LED on port %d\n", port);
 -}
 -
- static int htb_offload(struct net_device *dev, struct tc_htb_qopt_offload *opt)
- {
- 	return dev->netdev_ops->ndo_setup_tc(dev, TC_SETUP_QDISC_HTB, opt);
-@@ -1132,7 +1125,6 @@ static int htb_init(struct Qdisc *sch, struct nlattr *opt,
- 			return -ENOMEM;
- 		}
+ static int
+ rtl8366rb_port_enable(struct dsa_switch *ds, int port,
+ 		      struct phy_device *phy)
+@@ -1225,7 +1181,6 @@ rtl8366rb_port_enable(struct dsa_switch *ds, int port,
+ 	if (ret)
+ 		return ret;
  
--		htb_set_lockdep_class_child(qdisc);
- 		q->direct_qdiscs[ntx] = qdisc;
- 		qdisc->flags |= TCQ_F_ONETXQUEUE | TCQ_F_NOPARENT;
- 	}
-@@ -1468,7 +1460,6 @@ static int htb_graft(struct Qdisc *sch, unsigned long arg, struct Qdisc *new,
- 	}
+-	rb8366rb_set_port_led(priv, port, true);
+ 	return 0;
+ }
  
- 	if (q->offload) {
--		htb_set_lockdep_class_child(new);
- 		/* One ref for cl->leaf.q, the other for dev_queue->qdisc. */
- 		qdisc_refcount_inc(new);
- 		old_q = htb_graft_helper(dev_queue, new);
-@@ -1733,11 +1724,8 @@ static int htb_delete(struct Qdisc *sch, unsigned long arg,
- 		new_q = qdisc_create_dflt(dev_queue, &pfifo_qdisc_ops,
- 					  cl->parent->common.classid,
- 					  NULL);
--		if (q->offload) {
--			if (new_q)
--				htb_set_lockdep_class_child(new_q);
-+		if (q->offload)
- 			htb_parent_to_leaf_offload(sch, dev_queue, new_q);
--		}
- 	}
+@@ -1240,8 +1195,6 @@ rtl8366rb_port_disable(struct dsa_switch *ds, int port)
+ 				 BIT(port));
+ 	if (ret)
+ 		return;
+-
+-	rb8366rb_set_port_led(priv, port, false);
+ }
  
- 	sch_tree_lock(sch);
-@@ -1947,13 +1935,9 @@ static int htb_change_class(struct Qdisc *sch, u32 classid,
- 		new_q = qdisc_create_dflt(dev_queue, &pfifo_qdisc_ops,
- 					  classid, NULL);
- 		if (q->offload) {
--			if (new_q) {
--				htb_set_lockdep_class_child(new_q);
--				/* One ref for cl->leaf.q, the other for
--				 * dev_queue->qdisc.
--				 */
-+			/* One ref for cl->leaf.q, the other for dev_queue->qdisc. */
-+			if (new_q)
- 				qdisc_refcount_inc(new_q);
--			}
- 			old_q = htb_graft_helper(dev_queue, new_q);
- 			/* No qdisc_put needed. */
- 			WARN_ON(!(old_q->flags & TCQ_F_BUILTIN));
+ static int
 -- 
 2.43.0
 
