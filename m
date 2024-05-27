@@ -1,136 +1,176 @@
-Return-Path: <netdev+bounces-98326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5236A8D0DF4
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 21:35:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 385568D0EA5
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 22:36:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E3C8281048
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 19:35:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EB8F1C214C3
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 20:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B5F1607A4;
-	Mon, 27 May 2024 19:35:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2516F16078F;
+	Mon, 27 May 2024 20:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="LjxmE6kq"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="adnR//DZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A41417727
-	for <netdev@vger.kernel.org>; Mon, 27 May 2024 19:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9375338D;
+	Mon, 27 May 2024 20:35:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716838534; cv=none; b=tabJj23i5tVAh76o49K1OGrREsPpV9QPEFykljdlAJzgfIf6tyE533MCLlJ0wJdH5qinui31C6t2XLP9cMlA53vfQjKq7zdPCcACv4k2uM2hHvT06ToSl1YGHMEWadfD+Pcuz95l+S/ux1/cNeOikcVK9VOfU5gdiB+N2WG4n9M=
+	t=1716842158; cv=none; b=sm/2VdWZTzM2ePv5KhS/MjGAHrTRjxxDNRZONniuTkv/E+Wf1xd0w90MlkCEWOR8Mi8FTYcANwxOd7vVqUPXgBlpwQr73899VK+fZiFTYMmU8VkGAHGGbtilRNZfdPJIyaqLiucvDpYXsjEgscnWtnyZhwJppSTokzHvVgvAgLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716838534; c=relaxed/simple;
-	bh=ZAC9dibzZkUV27AOfCm+HmzKUnlE6D9L0M0AmO6yPKo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QK3WUTECvDN3RN/4wCupnFXIDxn9NVwBVXnAJGO+SSBvXPCDEszHSxgYVUeXc0IiX8zorfbWCT+10nzfTJ4ww6Lcy8XoyVmRBLWa2UAz17ZwEUgiVJmYA9yri8zVaxEDtNTTem6KQezt+Za0vSDA8mpz6Fit/+olzUDrNBZarHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=LjxmE6kq; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2e95a74d51fso391941fa.2
-        for <netdev@vger.kernel.org>; Mon, 27 May 2024 12:35:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1716838530; x=1717443330; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=YkZYHxtJS2xHnOCsSRDKNUe9pZJf/wZ8lc/xWYyje1g=;
-        b=LjxmE6kqLHwFEJ091HnhXeOMbBXkl8JChT2fW1woYY7kN03fF7wVF2FVETAZJB26vM
-         yjkgEgpSm3v8Q22XHnrB62iZWQlQ5QHmBvQmlSFmma3L6+sYyPIWWGWXoC3BomNxzs/t
-         HyiWLGX0A2XY6c2omgWIQQ7XPfRGb8eSWz85s=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716838530; x=1717443330;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YkZYHxtJS2xHnOCsSRDKNUe9pZJf/wZ8lc/xWYyje1g=;
-        b=oqOyo31geOr/BguR8tzKi6XTa4cDvAtzmSOKOxbd04UbW15vG8a3XQq1sQs5Fl/fmM
-         hQdMR2bkFC0UJmQRve1pMFg27HSzsHnpLsjM0IPG3mVcBpT1zYdU+HKcl3b5nyBWku7t
-         CbjCqwhWHFHDylAINAcvCxiiWIKSkhXQ+KSBOfAWU+XqKHnBwYifLvisxlD54nuRRNi6
-         4Yaxcey54l/6JRSI9KUtacNn1e+fEwudStl/TEu+8LN+ndMDW4/nf/6ZIRGwR6ua4jO2
-         0o+ghN12qt7b92GkaTEQv7FraIoO5dRA5cBKUlXDgbl/GWp/Va930eQW7Opc8+f5pst/
-         GNtw==
-X-Gm-Message-State: AOJu0YwgOgaitUXufj4ddiXWtOWrCI9C5eI86wZUyaXhoUZy18zWso0j
-	nMFhiuBFEUuJts3Wipc1rEgfPp1Y1P7SyMSjygbRz05a7mtcPAWiAKM8Q2ZQWxl6jkOrdhNbdP/
-	4JYp4Gw==
-X-Google-Smtp-Source: AGHT+IEj9KtwmuRpkFlWb9Jms4RyDKyGvnbEJipFAFzv5/7FFsScRxTPYuexbRAYsy8TMMoR5cY+HQ==
-X-Received: by 2002:a2e:9d91:0:b0:2e9:821a:82fb with SMTP id 38308e7fff4ca-2e9821a837cmr13455721fa.6.1716838529771;
-        Mon, 27 May 2024 12:35:29 -0700 (PDT)
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com. [209.85.221.54])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-578523d3967sm6220713a12.42.2024.05.27.12.35.29
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 May 2024 12:35:29 -0700 (PDT)
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-354f51ac110so86683f8f.0
-        for <netdev@vger.kernel.org>; Mon, 27 May 2024 12:35:29 -0700 (PDT)
-X-Received: by 2002:a05:6000:1742:b0:34f:41e7:eb37 with SMTP id
- ffacd0b85a97d-3552fda7295mr8768323f8f.30.1716838528781; Mon, 27 May 2024
- 12:35:28 -0700 (PDT)
+	s=arc-20240116; t=1716842158; c=relaxed/simple;
+	bh=hAOz+EzzqUvjMkMNKEG6qGZenmSoJkzQa7zoXY5SR6Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pvXgmSr9W+v81ZfCGFwAaKwm/EsbMtUQBZuL2gqlGEwf+fCQp6PU8WXAz8WNTWdNOAo9J9XRVGkm9JsrZBgv4XPoQviHNFtcZRpmWlLvrqG5cNSbEYZOkpxVWGUt8VRSlhp/QhmQL9b/f+sZ7R73c/1pCCs8rPJdImkbYT4sPKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=adnR//DZ; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=VSD+0BKNQsrtH6j3YR1cQCSm45GZTcfbAbU1ZjT2e9M=; b=adnR//DZl2mx6nhVxrnvxOAIx9
+	8Rr6kmDeS13Yr8I0j4rxAJ/2qspqiqAIHPCY+ANmgDiCOyk36qklRxB6zLNVKW45CApSxKzNHUpKT
+	0GAVjD6LnUGjVoYYrXJjxm30C6y7acg/32LsCtvsnNIrIiruhRl5qTS260i4zPP5aDUyPbAj49ua8
+	N6E6CPXs6sWp7/pkwRQ0pmVBlHkFDON270f2kqyGVi1jquBo/9y3X/z93kZoD8DCXP//qlzPVzjsS
+	2U7QDKBdPaQFohH8lwy/iR0MxYxUrHE9cLrcQ/GgIDCxglnwm/4WImNNl6YBLNY4LebzErqeySylE
+	oB/EtzEQ==;
+Received: from 14.248.197.178.dynamic.dsl-lte-bonding.zhbmb00p-msn.res.cust.swisscom.ch ([178.197.248.14] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sBh4S-000CZt-1U; Mon, 27 May 2024 22:35:52 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf 2024-05-27
+Date: Mon, 27 May 2024 22:35:51 +0200
+Message-Id: <20240527203551.29712-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240526034506.GZ2118490@ZenIV> <CAHk-=wjWFM9iPa8a+0apgvBoLv5PsYeQPViuf-zmkLiCGVQEww@mail.gmail.com>
- <20240526192721.GA2118490@ZenIV> <CAHk-=wixYUyQcS9tDNVvnCvEi37puqqpQ=CN+zP=a9Q9Fp5e-Q@mail.gmail.com>
- <20240526231641.GB2118490@ZenIV> <20240527163116.GD2118490@ZenIV> <CAHk-=wj2VS-ZYPGARrdYVKdexcC1DsERgG1duPojtc0R92w7CA@mail.gmail.com>
-In-Reply-To: <CAHk-=wj2VS-ZYPGARrdYVKdexcC1DsERgG1duPojtc0R92w7CA@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Mon, 27 May 2024 12:35:12 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjojZuj_it97tBRZiHm-9bP1zUbmVs-g=M2+=DP-kF8EQ@mail.gmail.com>
-Message-ID: <CAHk-=wjojZuj_it97tBRZiHm-9bP1zUbmVs-g=M2+=DP-kF8EQ@mail.gmail.com>
-Subject: Re: [PATCH][CFT][experimental] net/socket.c: use straight fdget/fdput (resend)
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27288/Mon May 27 10:29:01 2024)
 
-On Mon, 27 May 2024 at 12:20, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> With just a couple of helpers it would be mostly a cleanup.
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-Looking around, I think we could even take four bits. Without any
-debugging, 'struct file' is 160 bytes on 32-bit, it would not hurt at
-all to just force a 16-byte alignment.
+The following pull-request contains BPF updates for your *net* tree.
 
-In fact, in practice it is aligned more than that - we already use
-SLAB_HWCACHE_ALIGN, which in most cases means that it's 64-byte
-aligned.
+We've added 15 non-merge commits during the last 7 day(s) which contain
+a total of 18 files changed, 583 insertions(+), 55 deletions(-).
 
-But to be safe, we should specify the 16 bytes in the
-kmem_cache_create() call, and we should just make this all very
-explicit:
+The main changes are:
 
-  --- a/fs/file_table.c
-  +++ b/fs/file_table.c
-  @@ -512,7 +512,7 @@ EXPORT_SYMBOL(__fput_sync);
+1) Fix broken BPF multi-uprobe PID filtering logic which filtered by thread while
+   the promise was to filter by process, from Andrii Nakryiko.
 
-   void __init files_init(void)
-   {
-  -     filp_cachep = kmem_cache_create("filp", sizeof(struct file), 0,
-  +     filp_cachep = kmem_cache_create("filp", sizeof(struct file), 16,
-                                SLAB_TYPESAFE_BY_RCU | SLAB_HWCACHE_ALIGN |
-                                SLAB_PANIC | SLAB_ACCOUNT, NULL);
-        percpu_counter_init(&nr_files, 0, GFP_KERNEL);
-  --- a/include/linux/fs.h
-  +++ b/include/linux/fs.h
-  @@ -1025,7 +1025,7 @@ struct file {
-        errseq_t                f_wb_err;
-        errseq_t                f_sb_err; /* for syncfs */
-   } __randomize_layout
-  -  __attribute__((aligned(4)));       /* lest something weird
-decides that 2 is OK */
-  +  __attribute__((aligned(16))); /* Up to four tag bits */
+2) Fix the recent influx of syzkaller reports to sockmap which triggered a
+   locking rule violation by performing a map_delete, from Jakub Sitnicki.
 
-   struct file_handle {
-        __u32 handle_bytes;
+3) Fixes to netkit driver in particular on skb->pkt_type override upon pass
+   verdict, from Daniel Borkmann.
 
-and while four tag bits isn't something to waste, it looks pretty
-reasonable here.
+4) Fix an integer overflow in resolve_btfids which can wrongly trigger build
+   failures, from Friedrich Vock.
 
-               Linus
+5) Follow-up fixes for ARC JIT reported by static analyzers, from Shahab Vahedi.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Daniel Borkmann, Hengqi Chen, Jiri Olsa, John Fastabend, kernel test 
+robot, Nikolay Aleksandrov, Stanislav Fomichev, Tetsuo Handa
+
+----------------------------------------------------------------
+
+The following changes since commit 30a92c9e3d6b073932762bef2ac66f4ee784c657:
+
+  openvswitch: Set the skbuff pkt_type for proper pmtud support. (2024-05-21 15:34:04 +0200)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+for you to fetch changes up to a63bf556160fb19591183383da6757f52119981d:
+
+  selftests/bpf: Cover verifier checks for mutating sockmap/sockhash (2024-05-27 19:34:26 +0200)
+
+----------------------------------------------------------------
+bpf-for-netdev
+
+----------------------------------------------------------------
+Alexei Starovoitov (1):
+      Merge branch 'fix-bpf-multi-uprobe-pid-filtering-logic'
+
+Andrii Nakryiko (5):
+      bpf: fix multi-uprobe PID filtering logic
+      bpf: remove unnecessary rcu_read_{lock,unlock}() in multi-uprobe attach logic
+      libbpf: detect broken PID filtering logic for multi-uprobe
+      selftests/bpf: extend multi-uprobe tests with child thread case
+      selftests/bpf: extend multi-uprobe tests with USDTs
+
+Daniel Borkmann (4):
+      netkit: Fix setting mac address in l2 mode
+      netkit: Fix pkt_type override upon netkit pass verdict
+      selftests/bpf: Add netkit tests for mac address
+      selftests/bpf: Add netkit test for pkt_type
+
+Friedrich Vock (1):
+      bpf: Fix potential integer overflow in resolve_btfids
+
+Jakub Sitnicki (3):
+      bpf: Allow delete from sockmap/sockhash only if update is allowed
+      Revert "bpf, sockmap: Prevent lock inversion deadlock in map delete elem"
+      selftests/bpf: Cover verifier checks for mutating sockmap/sockhash
+
+Shahab Vahedi (1):
+      ARC, bpf: Fix issues reported by the static analyzers
+
+Xu Kuohai (1):
+      MAINTAINERS: Add myself as reviewer of ARM64 BPF JIT
+
+ MAINTAINERS                                        |   1 +
+ arch/arc/net/bpf_jit.h                             |   2 +-
+ arch/arc/net/bpf_jit_arcv2.c                       |  10 +-
+ arch/arc/net/bpf_jit_core.c                        |  22 +--
+ drivers/net/netkit.c                               |  30 +++-
+ include/linux/etherdevice.h                        |   8 +
+ kernel/bpf/verifier.c                              |  10 +-
+ kernel/trace/bpf_trace.c                           |  10 +-
+ net/core/sock_map.c                                |   6 -
+ net/ethernet/eth.c                                 |   4 +-
+ tools/bpf/resolve_btfids/main.c                    |   2 +-
+ tools/lib/bpf/features.c                           |  31 +++-
+ tools/testing/selftests/bpf/prog_tests/tc_netkit.c |  94 +++++++++++
+ .../selftests/bpf/prog_tests/uprobe_multi_test.c   | 134 ++++++++++++++-
+ tools/testing/selftests/bpf/prog_tests/verifier.c  |   2 +
+ tools/testing/selftests/bpf/progs/test_tc_link.c   |  35 +++-
+ tools/testing/selftests/bpf/progs/uprobe_multi.c   |  50 +++++-
+ .../selftests/bpf/progs/verifier_sockmap_mutate.c  | 187 +++++++++++++++++++++
+ 18 files changed, 583 insertions(+), 55 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/verifier_sockmap_mutate.c
 
