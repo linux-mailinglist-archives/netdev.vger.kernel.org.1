@@ -1,64 +1,59 @@
-Return-Path: <netdev+bounces-98204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0717D8D0319
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:18:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71C3D8D0320
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 16:19:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 941A21F24CB6
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 14:18:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A0A41F25436
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 14:19:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABC5D16E861;
-	Mon, 27 May 2024 14:13:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5014316EBE7;
+	Mon, 27 May 2024 14:13:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tSRaJL9W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UY0cZgor"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC4616DEDB;
-	Mon, 27 May 2024 14:13:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E3716EBE3;
+	Mon, 27 May 2024 14:13:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716819181; cv=none; b=fiyK4rxUvs+gm26Jkcxd6vFeXbgSdgeWX2IcKJqF/OAEk/Fpy9Z4rVQM/V3VkuVEZQdwPXPY3o1bjf/7Biyc1KZGnTWQ/Wm7wRihX+0/KZvVoIN1hTKol6PmOUt36LJdbHzNWVOJZpLjHXjkOaPUiKm+maxIyMWxjP2C/8u3Us0=
+	t=1716819185; cv=none; b=HcYxDrCio7uICjZkAwcYWqQ8Jj4h+ZlVEsKi6g4LJWJxy9FvAQ6ypoB18s7qj5Jh9QTZYTyYZkZHd6T4LAIUDAuh4Fae3TcnPbs26vXq+2nWLdhO6U0SHTjNmnAIucgQviJgcTme+oDtvCA+mjavHb+EYPjv8b/JZ6P9jiv5HhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716819181; c=relaxed/simple;
-	bh=AMK0Y8oxG0m+uOtoW2x5sJMwUmv2BQL30RmhLfMRe/U=;
+	s=arc-20240116; t=1716819185; c=relaxed/simple;
+	bh=gT3PUxRsUL+n6n4zrXENoJgzxNiIqZwJ8cCv7JfCF08=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c2FVHZrcYvvT9fLwRYLRC1s99a3/eJcVLOF7GXuj0zsBlisB5OCN+HbS1dOTGVFLEQ+uSDrIjZFD+F8x/WE7Z387manHAnGsGJsk8yVYwjf5gmCI5N433g7bEaE+pCUu8U2Cg1bQC5kiriqpM5nbWAHd8GvifP+FZ9RrCLkzKXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tSRaJL9W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87F7FC2BBFC;
-	Mon, 27 May 2024 14:12:59 +0000 (UTC)
+	 MIME-Version; b=sKabxNcD0kX2tLorc/fWHrIpNPs53Ta9w5xU8oaqY5x5+vLSiclJtLuP+PMt4VhfKNB14SFGrSCZVLq7fLWLjd6P5QhmBKB9IPqzXmHmvF3kPEcAP3t25/bndLIwqQJw5xrhGAiGNfsvl6uqrehtCtmHUgG4A+3xG1qzTuf1tvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UY0cZgor; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1A12C32789;
+	Mon, 27 May 2024 14:13:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716819181;
-	bh=AMK0Y8oxG0m+uOtoW2x5sJMwUmv2BQL30RmhLfMRe/U=;
+	s=k20201202; t=1716819185;
+	bh=gT3PUxRsUL+n6n4zrXENoJgzxNiIqZwJ8cCv7JfCF08=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tSRaJL9Wl7Q0l6NhFPIMzxR+6+uTshLlLDX8t6oZ5jgwN30ihpufqh8h1Tj0NG4fc
-	 eK3exe71NICwnhCHg7K7YkhQ5GuJQL/PQgJlKdo2GF6GD59DkU9aOwEVl/38THrnjj
-	 nmCGS1td85posttQtg2cKoLXsy1L0vozPYK2dupSLKbraqIsJVZiAHe4m3AT2EcOdT
-	 y3FQXB+o5OvcNqov4TCdgWe/v9OyheQVLDcAjodmR2l2n4IFCJ8YLSHPZptAhMNXa6
-	 gRETmsOAWVrvtBgXQ5QzykFLdY5+mKWfJ7jBJd9dlqkKQTXmOrVua4Lvm6D0H92c9i
-	 LqzhmS42hxcCw==
+	b=UY0cZgorTHnzQpnYN41e+Eb9ZJgpDMjxLI3IW1IqfHuZp4lHQe8RF4tNEHGSpnxcO
+	 37zI8sdUibYM45mul9UjzHqbDFdfnR4r3pvY57CoM37E5Z9boWQ+cZD4sJ+jfd5wUV
+	 NIWns8gZVUJll8fvvexv0N1TLo8APh9AXSKUnSnjt4NrpIjMqX3t8LWVukSzulj+Bu
+	 CEvAf7ZNniE4FJnS8OMzg12FwX0EuDzs4m/AMzAVxlhZ/0J6r08luMddBRHW7BFC1o
+	 rYtavUyoZyeVgU8G6TAbrdyI4IsGLKYmL2zgQaoRiWyXugg9Qvu3barIdLtjD5vR3h
+	 KAChQN7/FZ14A==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Breno Leitao <leitao@debian.org>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	alsi@bang-olufsen.dk,
-	andrew@lunn.ch,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com,
+	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.9 23/35] net: dsa: realtek: do not assert reset on remove
-Date: Mon, 27 May 2024 10:11:28 -0400
-Message-ID: <20240527141214.3844331-23-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.9 25/35] netpoll: Fix race condition in netpoll_owner_active
+Date: Mon, 27 May 2024 10:11:30 -0400
+Message-ID: <20240527141214.3844331-25-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240527141214.3844331-1-sashal@kernel.org>
 References: <20240527141214.3844331-1-sashal@kernel.org>
@@ -73,53 +68,50 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.9.2
 Content-Transfer-Encoding: 8bit
 
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+From: Breno Leitao <leitao@debian.org>
 
-[ Upstream commit 4f580e9aced1816398c1c64f178302a22b8ea6e2 ]
+[ Upstream commit c2e6a872bde9912f1a7579639c5ca3adf1003916 ]
 
-The necessity of asserting the reset on removal was previously
-questioned, as DSA's own cleanup methods should suffice to prevent
-traffic leakage[1].
+KCSAN detected a race condition in netpoll:
 
-When a driver has subdrivers controlled by devres, they will be
-unregistered after the main driver's .remove is executed. If it asserts
-a reset, the subdrivers will be unable to communicate with the hardware
-during their cleanup. For LEDs, this means that they will fail to turn
-off, resulting in a timeout error.
+	BUG: KCSAN: data-race in net_rx_action / netpoll_send_skb
+	write (marked) to 0xffff8881164168b0 of 4 bytes by interrupt on cpu 10:
+	net_rx_action (./include/linux/netpoll.h:90 net/core/dev.c:6712 net/core/dev.c:6822)
+<snip>
+	read to 0xffff8881164168b0 of 4 bytes by task 1 on cpu 2:
+	netpoll_send_skb (net/core/netpoll.c:319 net/core/netpoll.c:345 net/core/netpoll.c:393)
+	netpoll_send_udp (net/core/netpoll.c:?)
+<snip>
+	value changed: 0x0000000a -> 0xffffffff
 
-[1] https://lore.kernel.org/r/20240123215606.26716-9-luizluca@gmail.com/
+This happens because netpoll_owner_active() needs to check if the
+current CPU is the owner of the lock, touching napi->poll_owner
+non atomically. The ->poll_owner field contains the current CPU holding
+the lock.
 
-Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Use an atomic read to check if the poll owner is the current CPU.
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+Link: https://lore.kernel.org/r/20240429100437.3487432-1-leitao@debian.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/dsa/realtek/rtl83xx.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ net/core/netpoll.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/dsa/realtek/rtl83xx.c b/drivers/net/dsa/realtek/rtl83xx.c
-index d2e876805393b..a9c1702431efb 100644
---- a/drivers/net/dsa/realtek/rtl83xx.c
-+++ b/drivers/net/dsa/realtek/rtl83xx.c
-@@ -290,16 +290,13 @@ EXPORT_SYMBOL_NS_GPL(rtl83xx_shutdown, REALTEK_DSA);
-  * rtl83xx_remove() - Cleanup a realtek switch driver
-  * @priv: realtek_priv pointer
-  *
-- * If a method is provided, this function asserts the hard reset of the switch
-- * in order to avoid leaking traffic when the driver is gone.
-+ * Placehold for common cleanup procedures.
-  *
-- * Context: Might sleep if priv->gdev->chip->can_sleep.
-+ * Context: Any
-  * Return: nothing
-  */
- void rtl83xx_remove(struct realtek_priv *priv)
- {
--	/* leave the device reset asserted */
--	rtl83xx_reset_assert(priv);
- }
- EXPORT_SYMBOL_NS_GPL(rtl83xx_remove, REALTEK_DSA);
+diff --git a/net/core/netpoll.c b/net/core/netpoll.c
+index 543007f159f99..55bcacf67df3b 100644
+--- a/net/core/netpoll.c
++++ b/net/core/netpoll.c
+@@ -316,7 +316,7 @@ static int netpoll_owner_active(struct net_device *dev)
+ 	struct napi_struct *napi;
  
+ 	list_for_each_entry_rcu(napi, &dev->napi_list, dev_list) {
+-		if (napi->poll_owner == smp_processor_id())
++		if (READ_ONCE(napi->poll_owner) == smp_processor_id())
+ 			return 1;
+ 	}
+ 	return 0;
 -- 
 2.43.0
 
