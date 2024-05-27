@@ -1,122 +1,237 @@
-Return-Path: <netdev+bounces-98297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 045748D0926
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 19:07:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD60D8D093F
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 19:15:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAF8C1F22506
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 17:06:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0073DB212FF
+	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 17:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3971649B3;
-	Mon, 27 May 2024 17:04:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD280139D1B;
+	Mon, 27 May 2024 17:15:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="IqE+RzwB"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="UqEHkVvt"
 X-Original-To: netdev@vger.kernel.org
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF177160787;
-	Mon, 27 May 2024 17:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648EF1DA58;
+	Mon, 27 May 2024 17:15:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716829482; cv=none; b=Yn5Tfn/wKubTtFkyyGWyp8+iAgMkBfv6ZncYNuXxkDRVDT2tyjFjWCUxMNHN6t8MZKxh5K4lgperCML6SgNj+vzx8O5hf8OaU/6Vz+7XwcT2pUV92DygMVlwfkcd/CuZIjBnsHb+VsuajoUOI8CIcjSBtvQvHPcheto0ckcjAsw=
+	t=1716830142; cv=none; b=Na84P9U1yQR9rtAVzuZPKhfLkZjJUB7GjOuB3eWMYkBDZboOgfmQuaPSGmNwnChxkB49HYEQF1pJA8IJ65HxBVOtQkZj2Ycnchx8jpfidio6BmfEK6rDS4r46YgKLQl4OcK4fJviVf3axrO3zqFb8ACFfDBBS0ozUrFwoc7/gcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716829482; c=relaxed/simple;
-	bh=ailtByMMrVQJn27XJsDw/nbP0vGnYMWIFcr3PmJgg44=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=UrV8bZcbWKtrPB4B7A5NBO7sFlbkZzuCc56Ioq3Egt6h4O7abZde1z/a3u9S2JNVGwc3EphtOA5OZMsK7o1vRI3RW4iIBpv7c3G9qp0SMsQ6BlSZyslayPdK/9TfWBNX8sjEpv/zvMjJ1cqYIQBAcsisVf8meHGuVD0GhZMpuX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=IqE+RzwB; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1716829475;
-	bh=ailtByMMrVQJn27XJsDw/nbP0vGnYMWIFcr3PmJgg44=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=IqE+RzwBivIpCk4R98n5wU8NbdtFNA+FjTy44Dg0QoHNpAZkUfkT06AVDH6iZpljW
-	 OqnVmISUXO7mrkDbigqPFtiBZ4xFpfvQUu54F6B4C413eo8GTozbD0/fHz9Zs9es3Q
-	 oPyeOuQ6tKb+jjN5c+wgRUvpbiTwi/LGmQ+dzq4E=
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Mon, 27 May 2024 19:04:23 +0200
-Subject: [PATCH net-next 5/5] ipvs: constify ctl_table arguments of utility
- functions
+	s=arc-20240116; t=1716830142; c=relaxed/simple;
+	bh=pt31EGsdEkZo53lwke3HcCRzxGGuWyxitKe94ccVdnc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aqwtRQGWtsX2y7Hd5szTU0/3skq47uNHB+JFgz0/ToGtqYHrQJASBDf3lvw3e+GmXQPAJSCuGforz9TghXWpUBUEcLcr6Mwh36o2SOzZ9J9WWkxKCy/NU/2zffDm/m+oIqMckJfAR0stL/taGZ0lQANWDdC2Jgy/i3u9KYP+Ouc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=UqEHkVvt; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 4533540E01E8;
+	Mon, 27 May 2024 17:08:10 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id bimxyUlM5shO; Mon, 27 May 2024 17:08:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1716829686; bh=zzMPJ6U6LHHCwo8zSeCN578JvIc5clkBHFvMwav3ulA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UqEHkVvtmndf7yBXhPjClvB23jAwbCH2y9mrqWuQVDLzPL5LKRkma5X0WAIXAslDI
+	 OWVmIJ6/GQh6MyHgNXH12gJzDPwF0OdhwM57t/S13aSva8RZqSNOaZBXycdRifKOfv
+	 0nvKCVZHTyaWAw7nHg6JeCT936cjd8IHWbDZetP9R64GkqGGbhn/Rq2o5O1lyk3xV/
+	 nYbgRJAb6ONjxRmC5hUl9xcu+okxrmSuyhHurHx00V4k20COwpr6rwpzQwAnyXHLMV
+	 m+czfkJWEL1NjV2TVhDcJ7mBL7mIdcM1fI5dycnLvxv1o9EI8YpByQh6R2sDWMk4An
+	 cyNP5dzV8x2tieKXMH4ReySNhZogLEwuhTGWdRnt928uQUmNRt4zprDoIAHQL2n21X
+	 lXVQ8ULIoVGrW3v4XqisVCko5CYOCA7b7kJ3zZKQ0w+pU8jRgndQBA4PekevN9v4C/
+	 w3YVJhZ84GxfQ2Jik3lPfedBlRPhMRAq2l2f+Vcoqu4HBD5/+MgUTgLY61H9GyG6+u
+	 foPRRlYX+NMMmBytfFA9fURUfzSdFIQaPgb/IPIcecIx2VtLoNK4Odm8q386PsdDba
+	 yPB0wl/TmUP+FPiUpIIrpy1wELmaq/xXv7yeZPb769FOhG57ozS+Z17YhfsAIYc+rJ
+	 8LVjMkN2N08NqOt51W4fqTAo=
+Received: from zn.tnic (p5de8ee85.dip0.t-ipconnect.de [93.232.238.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2CF0E40E016A;
+	Mon, 27 May 2024 17:07:41 +0000 (UTC)
+Date: Mon, 27 May 2024 19:07:34 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Alexey Makhalov <alexey.makhalov@broadcom.com>
+Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com,
+	tglx@linutronix.de, x86@kernel.org, netdev@vger.kernel.org,
+	richardcochran@gmail.com, linux-input@vger.kernel.org,
+	dmitry.torokhov@gmail.com, zackr@vmware.com,
+	linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
+	timothym@vmware.com, akaher@vmware.com,
+	dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
+	tzimmermann@suse.de, mripard@kernel.org,
+	maarten.lankhorst@linux.intel.com, horms@kernel.org,
+	kirill.shutemov@linux.intel.com
+Subject: Re: [PATCH v10 1/8] x86/vmware: Introduce VMware hypercall API
+Message-ID: <20240527170734.GCZlS91uXD68HRN1na@fat_crate.local>
+References: <20240523191446.54695-1-alexey.makhalov@broadcom.com>
+ <20240523191446.54695-2-alexey.makhalov@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20240527-sysctl-const-handler-net-v1-5-16523767d0b2@weissschuh.net>
-References: <20240527-sysctl-const-handler-net-v1-0-16523767d0b2@weissschuh.net>
-In-Reply-To: <20240527-sysctl-const-handler-net-v1-0-16523767d0b2@weissschuh.net>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
- Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>, 
- Pablo Neira Ayuso <pablo@netfilter.org>, 
- Jozsef Kadlecsik <kadlec@netfilter.org>
-Cc: Joel Granados <j.granados@samsung.com>, 
- Luis Chamberlain <mcgrof@kernel.org>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, lvs-devel@vger.kernel.org, 
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1716829474; l=1608;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=ailtByMMrVQJn27XJsDw/nbP0vGnYMWIFcr3PmJgg44=;
- b=Ru62T8Y5h2w0VlL5uxRe86TKAf0NyNrErX+coxsEOXiZxsk2X1m5Z125qR4GW1qsgvz6opeXk
- Ute+fsbkP1mCkvqzSYzyYHVbtm+V4CfChBn24ke9FiCqBONYI60ePzj
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240523191446.54695-2-alexey.makhalov@broadcom.com>
 
-The sysctl core is preparing to only expose instances of
-struct ctl_table as "const".
-This will also affect the ctl_table argument of sysctl handlers.
+On Thu, May 23, 2024 at 12:14:39PM -0700, Alexey Makhalov wrote:
+> +#define VMWARE_HYPERCALL						\
+> +	ALTERNATIVE_3("",						\
+> +		      "jmp .Lport_call%=", X86_FEATURE_HYPERVISOR,	\
+> +		      "jmp .Lvmcall%=", X86_FEATURE_VMCALL,		\
+> +		      "vmmcall\n\t"					\
+> +		      "jmp .Lend%=", X86_FEATURE_VMW_VMMCALL)		\
+> +		      "cmpb $"						\
+> +			__stringify(CPUID_VMWARE_FEATURES_ECX_VMMCALL)	\
+> +			", %[mode]\n\t"					\
+> +		      "jg .Lvmcall%=\n\t"				\
+> +		      "je .Lvmmcall%=\n\t"				\
+> +		      ".Lport_call%=: movw %[port], %%dx\n\t"		\
+> +		      "inl (%%dx), %%eax\n\t"				\
+> +		      "jmp .Lend%=\n\t"					\
+> +		      ".Lvmmcall%=: vmmcall\n\t"			\
+> +		      "jmp .Lend%=\n\t"					\
+> +		      ".Lvmcall%=: vmcall\n\t"				\
+> +		      ".Lend%=:"
 
-As the function prototype of all sysctl handlers throughout the tree
-needs to stay consistent that change will be done in one commit.
+So applied (and with minor fixups for the proper indentation, see end of
+this mail) this looks like this:
 
-To reduce the size of that final commit, switch utility functions which
-are not bound by "typedef proc_handler" to "const struct ctl_table".
+.pushsection .altinstructions,"a"
+ .long 661b - .
+ .long 6641f - .
+ .4byte ( 4*32+31)
+ .byte 663b-661b
+ .byte 6651f-6641f
+ .long 661b - .
+ .long 6642f - .
+ .4byte ( 8*32+18)
+ .byte 663b-661b
+ .byte 6652f-6642f
+ .long 661b - .
+ .long 6643f - .
+ .4byte ( 8*32+19)
+ .byte 663b-661b
+ .byte 6653f-6643f
+.popsection
+.pushsection .altinstr_replacement, "ax"
+# ALT: replacement 1
+6641:
+        jmp .Lport_call72
+6651:
+# ALT: replacement 2
+6642:
+        jmp .Lvmcall72
+6652:
+# ALT: replacement 3
+6643:
+        vmmcall
+        jmp .Lend72
+6653:
+.popsection
+        cmpb $((((1UL))) << (0)), vmware_hypercall_mode(%rip)   # vmware_hypercall_mode
+        jg .Lvmcall72
+        je .Lvmmcall72
+.Lport_call72:
+        movw $22104, %dx        #
+        inl (%dx), %eax
+        jmp .Lend72
+.Lvmmcall72:
+        vmmcall
+        jmp .Lend72 
+.Lvmcall72:
+        vmcall
+.Lend72:
 
-No functional change.
-
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
 ---
- net/netfilter/ipvs/ip_vs_ctl.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-index b6d0dcf3a5c3..78a1cc72dc38 100644
---- a/net/netfilter/ipvs/ip_vs_ctl.c
-+++ b/net/netfilter/ipvs/ip_vs_ctl.c
-@@ -1924,7 +1924,8 @@ proc_do_sync_ports(struct ctl_table *table, int write,
- 	return rc;
- }
+so AFAICT, you want three things:
+
+1. X86_FEATURE_HYPERVISOR - that is always set when running as a guest.
+   For that it should do:
+
+        movw $22104, %dx        #
+        inl (%dx), %eax
+
+2. X86_FEATURE_VMCALL:
+
+	vmcall
+
+3. X86_FEATURE_VMW_VMMCALL:
+
+	vmmcall
+
+So why don't you simply do that?
+
+vmware_set_capabilities() sets vmware_hypercall_mode *and* those feature
+flags at the same time.
+
+And you either support VMCALL or VMMCALL so the first thing should be the
+fallback for some ancient crap.
+
+IOW, your hypercall alternative should simply be:
+
+	ALTERNATIVE_2("vmcall", "vmmcall", X86_FEATURE_VMW_VMMCALL, "movw %[port], %%dx; "inl (%%dx), %%eax", X86_FEATURE_HYPERVISOR);
+
+without any more silly dance?
+
+Hmmm?
+
+---
+
+Fixup indentation for proper .s output:
+
+diff --git a/arch/x86/include/asm/vmware.h b/arch/x86/include/asm/vmware.h
+index 5114f4c75c54..8be877d8bb7c 100644
+--- a/arch/x86/include/asm/vmware.h
++++ b/arch/x86/include/asm/vmware.h
+@@ -70,17 +70,18 @@ extern u8 vmware_hypercall_mode;
+ 		      "jmp .Lvmcall%=", X86_FEATURE_VMCALL,		\
+ 		      "vmmcall\n\t"					\
+ 		      "jmp .Lend%=", X86_FEATURE_VMW_VMMCALL)		\
+-		      "cmpb $"						\
+-			__stringify(CPUID_VMWARE_FEATURES_ECX_VMMCALL)	\
+-			", %[mode]\n\t"					\
++		      "\tcmpb $" __stringify(CPUID_VMWARE_FEATURES_ECX_VMMCALL) ", %[mode]\n\t" \
+ 		      "jg .Lvmcall%=\n\t"				\
+-		      "je .Lvmmcall%=\n\t"				\
+-		      ".Lport_call%=: movw %[port], %%dx\n\t"		\
++		      "je .Lvmmcall%=\n"				\
++		      ".Lport_call%=:\n\t"				\
++		      "movw %[port], %%dx\n\t"				\
+ 		      "inl (%%dx), %%eax\n\t"				\
+-		      "jmp .Lend%=\n\t"					\
+-		      ".Lvmmcall%=: vmmcall\n\t"			\
+-		      "jmp .Lend%=\n\t"					\
+-		      ".Lvmcall%=: vmcall\n\t"				\
++		      "jmp .Lend%=\n"					\
++		      ".Lvmmcall%=:\n\t"				\
++		      "vmmcall\n\t"					\
++		      "jmp .Lend%=\n"					\
++		      ".Lvmcall%=:\n\t"					\
++		      "vmcall\n"					\
+ 		      ".Lend%=:"
  
--static int ipvs_proc_est_cpumask_set(struct ctl_table *table, void *buffer)
-+static int ipvs_proc_est_cpumask_set(const struct ctl_table *table,
-+				     void *buffer)
- {
- 	struct netns_ipvs *ipvs = table->extra2;
- 	cpumask_var_t *valp = table->data;
-@@ -1962,8 +1963,8 @@ static int ipvs_proc_est_cpumask_set(struct ctl_table *table, void *buffer)
- 	return ret;
- }
- 
--static int ipvs_proc_est_cpumask_get(struct ctl_table *table, void *buffer,
--				     size_t size)
-+static int ipvs_proc_est_cpumask_get(const struct ctl_table *table,
-+				     void *buffer, size_t size)
- {
- 	struct netns_ipvs *ipvs = table->extra2;
- 	cpumask_var_t *valp = table->data;
+ static inline
+
 
 -- 
-2.45.1
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
 
