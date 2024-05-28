@@ -1,305 +1,138 @@
-Return-Path: <netdev+bounces-98504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F4798D19A9
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:35:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7F3C8D1964
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:28:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 015111F22692
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 11:35:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0A75281F90
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 11:28:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25AB16C6BA;
-	Tue, 28 May 2024 11:34:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82ED16C684;
+	Tue, 28 May 2024 11:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VBjMnP9N"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2k2eeg6O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC5F16C6AF
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 11:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30DE4182B3
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 11:27:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716896070; cv=none; b=sn0W5AN1MxHRS+BYMQhtkbEt2L+52iBKI9Iv+u4pUG+e5Dj9/orhmJhB3g37NJErxDXz4ov4q+GEFzVZxpoKerXUWC/9ntYVV524eM+UjSdYAz5+ekJsmb8YyTrb8BC0Z5oRlMWxuQ8LkVlKo75XZn7ZCAspXz5ktiGc3T6TI34=
+	t=1716895681; cv=none; b=qZ/Kz4hvzbkbFija+8mHPv4Ze3z1g7XRzspMPm0ffRUT6e/TiYhoqG/ZmA0cmIwO2y2XZKUpHGqwXeRHJM9VsN8TfMrrxdt7RXB7hugtqN1xVE2W0y4A7C2SO47nETbn5IkiI8ImWM5DR+uRtkiK1NfYqQ1LwvyL92uLSOsV3HE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716896070; c=relaxed/simple;
-	bh=OmufVhkzXUYWSvhWBnDI6cjbPZVWKo5VxudqOa8D7t0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qsOXo8dOYBDev31BVaeUo+UQhVkGUGYbh9p2ZzDPhB1X1rJm5l6s+NvZWRdeajv7KpBce3z1N0GTY3lx7XyQzwzHuF3qcw1gf0TDbFs8Z2qnCIGZE8jLC2mn1Qfn/PUb7NGPKEkQOlWQSS9bEBUrJg3FaH4UrUdMX/Z7SznvFRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VBjMnP9N; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716896069; x=1748432069;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=OmufVhkzXUYWSvhWBnDI6cjbPZVWKo5VxudqOa8D7t0=;
-  b=VBjMnP9NuM7hbhnHCUMtAEAiBS74MHknglyqymL/DJToRhRSMBPoAYlJ
-   4sRBTvOn1hIftbU9dOnXAxcaSFhpJm9Ds/PqW0nIP9DlY9bBoW0EeLe1a
-   tvsCKu/SZjGFBVq7+GCbY0//AyCiRT0HO5gGWqXReaw0IoV43JDOM4M5W
-   wnxpKPxP0j150k6HivwdmzHXA9IQK+9kfa1MirEVdFqvfMRE+gaXo8Peh
-   eMtdr6tRWFt49fUBAGYVQ6/K8vQFovLqLJ3p8UTxQQPhlwIiTUJI/0lfm
-   5QBbtk4QDLpRJiT/5dZkrOs+TB39/fXfojRfIgbW+Ba3k4Wnt9MeyCzLb
-   Q==;
-X-CSE-ConnectionGUID: 3wjQBtBKSCyVzrphM3JNcg==
-X-CSE-MsgGUID: jSopRxbmRjG/Zr+gm1Iw7g==
-X-IronPort-AV: E=McAfee;i="6600,9927,11085"; a="38616976"
-X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
-   d="scan'208";a="38616976"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 04:34:13 -0700
-X-CSE-ConnectionGUID: ade70cJoSGqVWlPql9EH9Q==
-X-CSE-MsgGUID: VJRfu8BmRt2Aweqw5iE9RQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
-   d="scan'208";a="35544237"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa008.jf.intel.com with ESMTP; 28 May 2024 04:34:09 -0700
-Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 0C01227BB5;
-	Tue, 28 May 2024 12:34:05 +0100 (IST)
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-next v6 12/12] iavf: add support for Rx timestamps to hotpath
-Date: Tue, 28 May 2024 07:23:01 -0400
-Message-Id: <20240528112301.5374-13-mateusz.polchlopek@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20240528112301.5374-1-mateusz.polchlopek@intel.com>
-References: <20240528112301.5374-1-mateusz.polchlopek@intel.com>
+	s=arc-20240116; t=1716895681; c=relaxed/simple;
+	bh=gT0wOBcsnBOHm+12Oq9ERzURyIX2UV+/gv+87nNwFaU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NrzbVKy7xR1hE0xcKIMS6nOJ+f3x6RRL3xmKVy55cry4ptiaem89a7Prr+swn8tQxjhNwUl1XGDSefvChv56NmMOh2h0UylKRJDNGWZ0+UxieW9WWC0hliSfuX3Wb5oEbffkznnuxkO4/6x/YYDDbXwGnbQ34GYoHOB+vW/sFeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2k2eeg6O; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5750a8737e5so27327a12.0
+        for <netdev@vger.kernel.org>; Tue, 28 May 2024 04:27:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716895678; x=1717500478; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XcOs7aWhKuWkRGBu1QsCf2UxmMDJEzNbk4usBhwm4V4=;
+        b=2k2eeg6Oe0LgO4ovAU7SEwlJCMhkyESm/cYIJG2Rs5XCI+CIoc7cnwqI8DbyK83GC8
+         hr4Z/jKrixvQmK+dUhxA8A7cSQEve9jFTfJnfHvLGDefLxu+rHIBPnFPgC3+RAlFGVbe
+         9GAPWiVFWJWwmO8sXcEyvDFTrKb92YVJVplxWwupMEkuHVeblOPjsg4nqPrq3GDh6iYG
+         yM3bn24QKCQw5TxBJLy4h0CPKF/wdvfaJySk6rr6vf47NHSYiwfJ0v+surVYiKR1IwwV
+         G4QzVHE4C2mWDClg+vHRbm5kFOYvDEzHc8YAVvcX1msDUod0KGv/Ojv/2fKR6yGW79qk
+         wVeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716895678; x=1717500478;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XcOs7aWhKuWkRGBu1QsCf2UxmMDJEzNbk4usBhwm4V4=;
+        b=b7N2qyGjWMFitvChMYv+0hsBONICQBR5n6+kgn2f33OszYU3hf5menszQfdNFDwSHr
+         yjcCHJv+7Kek745hXettRaALHUC+6KTmNiY7c7BM2bgirYCgYa/nL+zzt8oa/od9229U
+         DHjSsz6ow0/In7VSQsUf7S7K44/FZ97k/+u9d70kTn5grNC3lG25A9wM6JUs4gqVoyL8
+         6RdOc8Db7PP9a280A5kt5iX8LRsn5f2T4IDbD3bNVncbtWJ/Xcz3Gslsam7hZreWA68v
+         QwW0zYjwsOqTzV6lXv1WZlNtnmZEWncIS2dWFM2Zj3BttUVFOTrzC/pnXsdEHZBfWPa6
+         E5ZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCULEGNQouBS4ybyybfDW/Yh9iiZ+UAbwjnTcD20jDwAzOfEeIL6Ue6msxbhwhlX4FcqvQ761lLYQs7Ya9zqsfxVVfZkMgPq
+X-Gm-Message-State: AOJu0YyetoT0G4BsWLYpLmIChVDKyhYWYSnVzKu9vy+sbPJUDRrlbPd1
+	B3fhE91UzP4DHOuBJ5BylbcZCBOGr40nuG2dZ32YE6ISoy6HOaiujRCg4brmbLZP4ZPqjLYayad
+	P3DpMOmTfkXV2EbuJpi1JruyovR1AviLNNlbn
+X-Google-Smtp-Source: AGHT+IG06KbD8naAgTu55ochegQJ8gBMdkWhz6xZEfoPqExKgRsF/Mj3tDaI8P2gIlruGZhC/FvntKGthICO+K2duug=
+X-Received: by 2002:aa7:c58b:0:b0:579:c2f3:f826 with SMTP id
+ 4fb4d7f45d1cf-579c2f3fa49mr317219a12.4.1716895677997; Tue, 28 May 2024
+ 04:27:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240524193630.2007563-1-edumazet@google.com> <20240524193630.2007563-3-edumazet@google.com>
+ <889fbe3feae042ada8d75a8a2184dbaa@AcuMS.aculab.com>
+In-Reply-To: <889fbe3feae042ada8d75a8a2184dbaa@AcuMS.aculab.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 28 May 2024 13:27:42 +0200
+Message-ID: <CANn89iJikmmxMVs5oYT=ZV0ae_tydYHpft99mkNWEhyWkjMM0g@mail.gmail.com>
+Subject: Re: [PATCH net 2/4] tcp: fix race in tcp_write_err()
+To: David Laight <David.Laight@aculab.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "eric.dumazet@gmail.com" <eric.dumazet@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+On Tue, May 28, 2024 at 11:20=E2=80=AFAM David Laight <David.Laight@aculab.=
+com> wrote:
+>
+> From: Eric Dumazet
+> > Sent: 24 May 2024 20:36
+> >
+> > I noticed flakes in a packetdrill test, expecting an epoll_wait()
+> > to return EPOLLERR | EPOLLHUP on a failed connect() attempt,
+> > after multiple SYN retransmits. It sometimes return EPOLLERR only.
+> >
+> > The issue is that tcp_write_err():
+> >  1) writes an error in sk->sk_err,
+> >  2) calls sk_error_report(),
+> >  3) then calls tcp_done().
+> >
+> > tcp_done() is writing SHUTDOWN_MASK into sk->sk_shutdown,
+> > among other things.
+> >
+> > Problem is that the awaken user thread (from 2) sk_error_report())
+> > might call tcp_poll() before tcp_done() has written sk->sk_shutdown.
+> >
+> > tcp_poll() only sees a non zero sk->sk_err and returns EPOLLERR.
+> >
+> > This patch fixes the issue by making sure to call sk_error_report()
+> > after tcp_done().
+>
+> Isn't there still the potential for a program to call poll() at
+> 'just the wrong time' and still see an unexpected status?
 
-Add support for receive timestamps to the Rx hotpath. This support only
-works when using the flexible descriptor format, so make sure that we
-request this format by default if we have receive timestamp support
-available in the PTP capabilities.
+This patch does not cope with poll() results being volatile.
 
-In order to report the timestamps to userspace, we need to perform
-timestamp extension. The Rx descriptor does actually contain the "40
-bit" timestamp. However, upper 32 bits which contain nanoseconds are
-conveniently stored separately in the descriptor. We could extract the
-32bits and lower 8 bits, then perform a bitwise OR to calculate the
-40bit value. This makes no sense, because the timestamp extension
-algorithm would simply discard the lower 8 bits anyways.
+Only epoll, because epoll logic intercepts sk_error_report() and wakes
+up a thread,
+this thread is calling back tcp_poll() shortly after.
 
-Thus, implement timestamp extension as iavf_ptp_extend_32b_timestamp(),
-and extract and forward only the 32bits of nominal nanoseconds.
+The 'after' starts really at sk_error_report().
 
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Reviewed-by: Sunil Goutham <sgoutham@marvell.com>
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
----
- drivers/net/ethernet/intel/iavf/iavf_main.c |  9 +++
- drivers/net/ethernet/intel/iavf/iavf_ptp.c  | 69 +++++++++++++++++++++
- drivers/net/ethernet/intel/iavf/iavf_ptp.h  |  4 ++
- drivers/net/ethernet/intel/iavf/iavf_txrx.c | 43 +++++++++++++
- 4 files changed, 125 insertions(+)
+>
+> ...
+> >       WRITE_ONCE(sk->sk_err, READ_ONCE(sk->sk_err_soft) ? : ETIMEDOUT);
+> > -     sk_error_report(sk);
+> >
+> > -     tcp_write_queue_purge(sk);
+> > -     tcp_done(sk);
+> > +     tcp_done_with_error(sk);
+>
+> Is there scope for moving the write to sk->sk_err inside the function?
+> Looks like it'll need a larger change to tcp_reset().
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index f403d27fb7ee..ed0919c09f82 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -730,6 +730,15 @@ static u8 iavf_select_rx_desc_format(struct iavf_adapter *adapter)
- 	if (!RXDID_ALLOWED(adapter))
- 		return VIRTCHNL_RXDID_1_32B_BASE;
- 
-+	/* Rx timestamping requires the use of flexible NIC descriptors */
-+	if (iavf_ptp_cap_supported(adapter, VIRTCHNL_1588_PTP_CAP_RX_TSTAMP)) {
-+		if (supported_rxdids & BIT(VIRTCHNL_RXDID_2_FLEX_SQ_NIC))
-+			return VIRTCHNL_RXDID_2_FLEX_SQ_NIC;
-+
-+		dev_dbg(&adapter->pdev->dev,
-+			"Unable to negotiate flexible descriptor format.\n");
-+	}
-+
- 	/* Warn if the PF does not list support for the default legacy
- 	 * descriptor format. This shouldn't happen, as this is the format
- 	 * used if VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC is not supported. It is
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.c b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-index 8882a7b83a2a..6d17a2defa5a 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-@@ -445,6 +445,9 @@ void iavf_ptp_release(struct iavf_adapter *adapter)
- 	}
- 	adapter->aq_required &= ~IAVF_FLAG_AQ_SEND_PTP_CMD;
- 	spin_unlock(&adapter->ptp.aq_cmd_lock);
-+
-+	adapter->ptp.hwtstamp_config.rx_filter = HWTSTAMP_FILTER_NONE;
-+	iavf_ptp_disable_rx_tstamp(adapter);
- }
- 
- /**
-@@ -477,3 +480,69 @@ void iavf_ptp_process_caps(struct iavf_adapter *adapter)
- 		iavf_ptp_disable_rx_tstamp(adapter);
- 	}
- }
-+
-+/**
-+ * iavf_ptp_extend_32b_timestamp - Convert a 32b nanoseconds timestamp to 64b
-+ * nanoseconds
-+ * @cached_phc_time: recently cached copy of PHC time
-+ * @in_tstamp: Ingress/egress 32b nanoseconds timestamp value
-+ *
-+ * Hardware captures timestamps which contain only 32 bits of nominal
-+ * nanoseconds, as opposed to the 64bit timestamps that the stack expects.
-+ *
-+ * Extend the 32bit nanosecond timestamp using the following algorithm and
-+ * assumptions:
-+ *
-+ * 1) have a recently cached copy of the PHC time
-+ * 2) assume that the in_tstamp was captured 2^31 nanoseconds (~2.1
-+ *    seconds) before or after the PHC time was captured.
-+ * 3) calculate the delta between the cached time and the timestamp
-+ * 4) if the delta is smaller than 2^31 nanoseconds, then the timestamp was
-+ *    captured after the PHC time. In this case, the full timestamp is just
-+ *    the cached PHC time plus the delta.
-+ * 5) otherwise, if the delta is larger than 2^31 nanoseconds, then the
-+ *    timestamp was captured *before* the PHC time, i.e. because the PHC
-+ *    cache was updated after the timestamp was captured by hardware. In this
-+ *    case, the full timestamp is the cached time minus the inverse delta.
-+ *
-+ * This algorithm works even if the PHC time was updated after a Tx timestamp
-+ * was requested, but before the Tx timestamp event was reported from
-+ * hardware.
-+ *
-+ * This calculation primarily relies on keeping the cached PHC time up to
-+ * date. If the timestamp was captured more than 2^31 nanoseconds after the
-+ * PHC time, it is possible that the lower 32bits of PHC time have
-+ * overflowed more than once, and we might generate an incorrect timestamp.
-+ *
-+ * This is prevented by (a) periodically updating the cached PHC time once
-+ * a second, and (b) discarding any Tx timestamp packet if it has waited for
-+ * a timestamp for more than one second.
-+ *
-+ * Return: extended timestamp (to 64b)
-+ */
-+u64 iavf_ptp_extend_32b_timestamp(u64 cached_phc_time, u32 in_tstamp)
-+{
-+	const u64 mask = GENMASK_ULL(31, 0);
-+	u32 delta;
-+	u64 ns;
-+
-+	/* Calculate the delta between the lower 32bits of the cached PHC
-+	 * time and the in_tstamp value
-+	 */
-+	delta = (in_tstamp - (u32)(cached_phc_time & mask));
-+
-+	/* Do not assume that the in_tstamp is always more recent than the
-+	 * cached PHC time. If the delta is large, it indicates that the
-+	 * in_tstamp was taken in the past, and should be converted
-+	 * forward.
-+	 */
-+	if (delta > (mask / 2)) {
-+		/* reverse the delta calculation here */
-+		delta = ((u32)(cached_phc_time & mask) - in_tstamp);
-+		ns = cached_phc_time - delta;
-+	} else {
-+		ns = cached_phc_time + delta;
-+	}
-+
-+	return ns;
-+}
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.h b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-index 337bf184a7ea..66e113ae27f5 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-@@ -6,6 +6,9 @@
- 
- #include <linux/ptp_clock_kernel.h>
- 
-+/* bit indicating whether a 40bit timestamp is valid */
-+#define IAVF_PTP_40B_TSTAMP_VALID	BIT(0)
-+
- /* structure used to queue PTP commands for processing */
- struct iavf_ptp_aq_cmd {
- 	struct list_head list;
-@@ -38,5 +41,6 @@ void iavf_virtchnl_send_ptp_cmd(struct iavf_adapter *adapter);
- long iavf_ptp_do_aux_work(struct ptp_clock_info *ptp);
- int iavf_ptp_get_ts_config(struct iavf_adapter *adapter, struct ifreq *ifr);
- int iavf_ptp_set_ts_config(struct iavf_adapter *adapter, struct ifreq *ifr);
-+u64 iavf_ptp_extend_32b_timestamp(u64 cached_phc_time, u32 in_tstamp);
- 
- #endif /* _IAVF_PTP_H_ */
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.c b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-index 78da3b2e81a7..1d20cd559f7d 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-@@ -1131,6 +1131,48 @@ static void iavf_flex_rx_hash(struct iavf_ring *ring,
- 	}
- }
- 
-+/**
-+ * iavf_flex_rx_tstamp - Capture Rx timestamp from the descriptor
-+ * @rx_ring: descriptor ring
-+ * @rx_desc: specific descriptor
-+ * @skb: skb currently being received
-+ *
-+ * Read the Rx timestamp value from the descriptor and pass it to the stack.
-+ *
-+ * This function only operates on the VIRTCHNL_RXDID_2_FLEX_SQ_NIC flexible
-+ * descriptor writeback format.
-+ */
-+static void iavf_flex_rx_tstamp(struct iavf_ring *rx_ring,
-+				union iavf_rx_desc *rx_desc,
-+				struct sk_buff *skb)
-+{
-+	struct skb_shared_hwtstamps *skb_tstamps;
-+	struct iavf_adapter *adapter;
-+	u32 tstamp;
-+	u64 ns;
-+
-+	/* Skip processing if timestamps aren't enabled */
-+	if (!(rx_ring->flags & IAVF_TXRX_FLAGS_HW_TSTAMP))
-+		return;
-+
-+	/* Check if this Rx descriptor has a valid timestamp */
-+	if (!(rx_desc->flex_wb.ts_low & IAVF_PTP_40B_TSTAMP_VALID))
-+		return;
-+
-+	adapter = netdev_priv(rx_ring->netdev);
-+
-+	/* the ts_low field only contains the valid bit and sub-nanosecond
-+	 * precision, so we don't need to extract it.
-+	 */
-+	tstamp = le32_to_cpu(rx_desc->flex_wb.flex_ts.ts_high);
-+	ns = iavf_ptp_extend_32b_timestamp(adapter->ptp.cached_phc_time,
-+					   tstamp);
-+
-+	skb_tstamps = skb_hwtstamps(skb);
-+	memset(skb_tstamps, 0, sizeof(*skb_tstamps));
-+	skb_tstamps->hwtstamp = ns_to_ktime(ns);
-+}
-+
- /**
-  * iavf_process_skb_fields - Populate skb header fields from Rx descriptor
-  * @rx_ring: rx descriptor ring packet is being transacted on
-@@ -1152,6 +1194,7 @@ static void iavf_process_skb_fields(struct iavf_ring *rx_ring,
- 	} else {
- 		iavf_flex_rx_hash(rx_ring, rx_desc, skb, rx_ptype);
- 		iavf_flex_rx_csum(rx_ring->vsi, skb, rx_desc);
-+		iavf_flex_rx_tstamp(rx_ring, rx_desc, skb);
- 	}
- 
- 	skb_record_rx_queue(skb, rx_ring->queue_index);
--- 
-2.38.1
-
+This seems feasible, yes.
 
