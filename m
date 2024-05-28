@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-98644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D80448D1EF4
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:36:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8B8A8D1EF6
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:36:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 784881F2365A
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 14:36:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FCFA1F23670
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 14:36:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55F316F84F;
-	Tue, 28 May 2024 14:36:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D0EE16F8FD;
+	Tue, 28 May 2024 14:36:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J7zIbEPY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MxGE/I9q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89B7973475;
-	Tue, 28 May 2024 14:36:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A4A73475;
+	Tue, 28 May 2024 14:36:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716906967; cv=none; b=U79Wm7bR7dqLio3dulnZgpPvu9csVMuw29oHJlCKm+Xx3ohBeeeeYze3E6bYZb+fsolJO+Ie44wHsXeVddeMdvbHxTE0AR+mMIhkeigtCJgAdA1miTKyWJmeDDIxlua3baHFi4pC7uJWaA9AHmvyObye+ojWB7qPZEG762UJX4o=
+	t=1716906989; cv=none; b=Mlhry5+fe5MtCpRhFJLl7bYi/f6YragNS7hQvMHt9F2kThwVy+Rjp+gTZqwePWE8Z9qGVxTtk7u5Ub28VwdcPNICSwLgDFKUyRIdX2lC0wJ4roihAyKvpA89JrnOhsh8WXI8uu6yPhbrmkQUWTYAvODSgpO47jTqNkDr5VFBKTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716906967; c=relaxed/simple;
-	bh=eStcKtnRUgBQH91cs25NOHkiPbdLsG6QszMcija7Ifk=;
+	s=arc-20240116; t=1716906989; c=relaxed/simple;
+	bh=mOByn1i4Bf+ftqDIy4D+VH/lNSiVIlwYcT5TfV6l6tg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mC7WGzVLGKw33E3/8wLrAzR+LIM/mHU1dTD8GehpcQC3Vr03j4cUQW2GQ4nSEaBZzT3/zhdqhdwVQ386CyGVfweznuOz+BLNcGEuq7XP4diP9mPREXV7xQZ9UXJt0FjJpQ5EFFIxhaczK+bkcEjKDqAcr+GSWFBZUUUfF9S1dX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J7zIbEPY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68B06C3277B;
-	Tue, 28 May 2024 14:36:04 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=qyMDd0Une2YgGC1G/V/hSNVkDEze4c98PZUIpLJn+hqp2S23masdVImKZkQBR6EL+wiFKX2QN/iTo3/gDjcwLhu56pOYM2NmcWTvYApYuq7QUPGIu9FtsBimstEdLo1RAVwe6ipecDls2tc0kELREAA6hEL56nkxxYUj1dKb8t8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MxGE/I9q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9045CC3277B;
+	Tue, 28 May 2024 14:36:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716906967;
-	bh=eStcKtnRUgBQH91cs25NOHkiPbdLsG6QszMcija7Ifk=;
+	s=k20201202; t=1716906989;
+	bh=mOByn1i4Bf+ftqDIy4D+VH/lNSiVIlwYcT5TfV6l6tg=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=J7zIbEPYJQcJrHDHSY1Zc11kJvUxpXgZB9v/GUTbSXPqbpk7t7DJ+U6C/VJuH820E
-	 wfmnDkVPyEZfQ4FGQJTPTBDlMbEMC+Pvjy8Pl+BqP1ZsqaKSZYu4CMyuKOwXyLBWdn
-	 RSaebK+FmxFnOts1laAFbjzSnaeTXGEHOh+16ncw7YO92+EmHrj7uF+dTfXE6SVGDh
-	 qjzrNGqaxA6YHsfPG/JyyWISuvNSq+dlDZqzj/nZbSwoBsKdbVqH7ly8lrZAmif23v
-	 z4w+oh61xAAIXfSPKJvv23/3RXvvPt79rQQiOSiddPe+ttu4XbM+eEQINrgAQPEuWx
-	 UgU/gxHamvJSg==
-Message-ID: <b1b4c98f-a101-4d3e-8720-736159bc2feb@kernel.org>
-Date: Tue, 28 May 2024 16:36:02 +0200
+	b=MxGE/I9qv5AnA9DmlgCZ0mNMrBxYx9ciBZl2wR5MLPJm0nzjoNl+q0NT/uXxwswW/
+	 FroiiMRQM4q19NO8wJD38m6ApgJ0ySk0NK1bEbdNhAtJ43RA1xO6lpK88a6v+ACcoC
+	 xAaMSj/RIcVxFv06zFn9Qv1Na2pZMcu/haNsC/VbymK5Nx+vZlyemJkjcwEw+uzHnT
+	 Eeyc3dyfF472vHtDj/6Bv21br/MBVdZm87o9QNssx0oimtlAsQEbUITMW3tzVVdn2Z
+	 NZyH4kWKEgDKpu8hjhAgkxpKODYFlz4S6kUyH5G6j0LXJ+muJgkdJsGX/4wsnu/mol
+	 EbjHp9OKZBZxQ==
+Message-ID: <e4a337be-7ebd-43b2-b2ca-a8577afb4bf7@kernel.org>
+Date: Tue, 28 May 2024 16:36:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,16 +50,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/1] dt-bindings: net: rfkill-gpio: document
+Subject: Re: [PATCH v2 0/1] dt-bindings: net: rfkill-gpio: document
  reset-gpios
-To: Chukun Pan <amadeus@jmu.edu.cn>, Philipp Zabel <p.zabel@pengutronix.de>,
- Johannes Berg <johannes@sipsolutions.net>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- devicetree@vger.kernel.org, netdev@vger.kernel.org
+To: Chukun Pan <amadeus@jmu.edu.cn>
+Cc: conor+dt@kernel.org, devicetree@vger.kernel.org,
+ johannes@sipsolutions.net, krzk+dt@kernel.org, netdev@vger.kernel.org,
+ p.zabel@pengutronix.de, robh@kernel.org
 References: <20240528143009.1033247-1-amadeus@jmu.edu.cn>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+ <20240528143505.1033662-1-amadeus@jmu.edu.cn>
 Content-Language: en-US
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
  cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
@@ -103,26 +103,18 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240528143009.1033247-1-amadeus@jmu.edu.cn>
+In-Reply-To: <20240528143505.1033662-1-amadeus@jmu.edu.cn>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 28/05/2024 16:30, Chukun Pan wrote:
-> Some 5G WWAN modems have multiple gpio controls. When using rfkill command
-
-Which ones? Can we see the dastasheet or schematics? People claim
-various things (like device reset-gpios being part of controller...).
-
-> to manage it, we need to at least change the status of reset and shutdown
-> gpios at the same time. Also, it might be incorrect to put the reset gpio
-> at usb when the module is connected via USB M2 slot, there may be other
-> devices connected under some USB node, but the reset gpio is only used for
-> the WWAN module. So document the reset-gpios to rfkill-gpio as an optional
-> property and add it to a new example.
+On 28/05/2024 16:35, Chukun Pan wrote:
+> Changes in v2:
+>   Update commit message.
+>   Add new example for WWAN modem.
 > 
-> For example:
->   - reset: modem Reset#
 
+
+??? Changelog goes to --- section.
 
 Best regards,
 Krzysztof
