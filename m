@@ -1,142 +1,161 @@
-Return-Path: <netdev+bounces-98711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A1418D226A
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 19:24:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5535A8D2276
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 19:28:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8F76281996
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 17:24:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 098E12854A1
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 17:28:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32FA1173342;
-	Tue, 28 May 2024 17:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31DE0173355;
+	Tue, 28 May 2024 17:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mok5sHVq"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vqz2m5Qj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5B97D07D;
-	Tue, 28 May 2024 17:24:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6BC21DA4C;
+	Tue, 28 May 2024 17:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716917079; cv=none; b=maui89gzaBihvKVQ6LZnStWFRMiu83n9P54orIOdWUYsTTH0YKEmSX6l/VC0zqfsieFE6MX/n81L/fjIZGOQbkKSBgAFzAKXycrkCCbqFWqzGmjsjKWBtLnyJ5Jmt72uuQVrmDEXTcOJopF99XdNOK+aBmm1htpdigbDrNHDwLw=
+	t=1716917310; cv=none; b=W9Cmc5Y01lC2H6qiJKjs0VeBHQrCj0DURgS9Bkm71cyVrxDyEK06g28fSYqjyt2qi/2MvGHPJrc0sG4LzK0lKyvGnzLYAfqb6GOczzBDyQdCLVzn12OYeZZsuR7TG3ywCS/gA2G1X1sLDETMVYP9BKoE62HMKW64+c6AtbNl4EI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716917079; c=relaxed/simple;
-	bh=JpfOrfm/RN6ZNydj18l4u8gIZn6ywPDO/Ii8ISAxU9g=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=JNeIB/LRvk4rimzHQwPK34YoX9IBUPra9/atBWDSAVQ8/6Xh6oKdlz0Qoxu69Ay9r8gK+VdniCwq9v0uZp9mzKsIQ1rfH40AMrvt7AyeYXhMhUq2t22tKXXpW2ZC/93Lc9Gbmd3K5jfpHFkwIVTLSitJ9sBhiZVJtEKSUjr90RQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mok5sHVq; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-43fb094da40so297991cf.0;
-        Tue, 28 May 2024 10:24:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716917076; x=1717521876; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ThOVm46gYp9/Cn7ASNZ0mQAfmQpKcIWWQc+98ymb318=;
-        b=Mok5sHVqgQRDScxstnDJJladEh+s+Hgi9F7K+UcKsm4+c0CCtlAIvVaB7mlH6MljXl
-         GRH7ISpBI6cRao3nrXJWUgPdGuIFjGZgde9OZBMsbsaCFyp7gxvT8Wl7m77Iu4pIxfWS
-         5yUnOPJOuQdjnHv99FTPV09R5QBaxMEWPjaSTnPS7blSvmOi/dscHTG7Rfk8w6CGPzle
-         sHEqEDXufY09efL5D2AY0PWUJLzl1kohW3AVZE1/TL4cZ8g/1Rw+w8eWDTDpMLdxTPK5
-         3v0q1m3XphWnS3oar5UxG74fEMF2ink+suib3w5dURhqJ1cj/1UPfWodF7kbnNaGOi1l
-         TVoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716917076; x=1717521876;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ThOVm46gYp9/Cn7ASNZ0mQAfmQpKcIWWQc+98ymb318=;
-        b=rnku5NdqDYxdA86Eda/FR7n9q2pnN26rW9QbJQfagdF9KUcbi2rYiGw9ITbpjOUp8M
-         0x/S3nQAYLSPH2EPzS/ABvvLv5Mk2dQByX0Ov8a9pFjbJgIL85xAAqvSlwtj0nfsJ7aW
-         UI6jugaiaSS+tGWSUUmmHEd8HiOywDRI7so/JRfuUEednmS6c42Pgc6S0a1E1RmU4QsR
-         dauQZ7mNKCs3XF8L3Rcqbis01/6biri06fnREf9bk+dB68elrcsGqQblWmz498nCzBoj
-         EpFUrfRlmnR+DMwk3Up8vZHb/qQR4liS6Mcc4cgLU3htOLy19PHM0ksVPoutdCUImm+V
-         g63Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX4EQnptR0KGOKDvepvOK0RsvKKbknRtyh1aiMK3ZnL+inlshb1cKu4Ixfg+J+xhuIzUzvCr+DYqYBGP4XuhxAHsjq3kcJ7vQmegjJbFsT8bIYJNBdRC2bxQ7WSuicc4Nw23bv25MQAECm2i2BUaKfs+IrBy4hwgs4q
-X-Gm-Message-State: AOJu0YytZaukA/uvgOBVqgptJGCkvrDQp9+VwtpEIgYf4pukgb9v0kgr
-	KPlUuLIIzi71aRN6to1XEdXj4wqfLvh2lIAP9BFwbKjiJgyz6nBu
-X-Google-Smtp-Source: AGHT+IHmE7KwWW/A6BnWKuk+2M8Ye5aS8UEuzeJBkO8gGRyfB9v09wmMfK5BrpYl8vMuNh2Iux6GXg==
-X-Received: by 2002:a05:622a:1346:b0:43c:7755:961c with SMTP id d75a77b69052e-43fa7431750mr305065511cf.5.1716917076577;
-        Tue, 28 May 2024 10:24:36 -0700 (PDT)
-Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43fd54f4a5dsm11821051cf.97.2024.05.28.10.24.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 May 2024 10:24:35 -0700 (PDT)
-Date: Tue, 28 May 2024 13:24:35 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Andrew Halaney <ahalaney@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Martin KaFai Lau <martin.lau@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- bpf <bpf@vger.kernel.org>
-Cc: kernel@quicinc.com, 
- Willem de Bruijn <willemb@google.com>
-Message-ID: <665613536e82e_2a1fb929437@willemb.c.googlers.com.notmuch>
-In-Reply-To: <6bdba7b6-fd22-4ea5-a356-12268674def1@quicinc.com>
-References: <20240509211834.3235191-1-quic_abchauha@quicinc.com>
- <20240509211834.3235191-2-quic_abchauha@quicinc.com>
- <6bdba7b6-fd22-4ea5-a356-12268674def1@quicinc.com>
-Subject: Re: [PATCH bpf-next v8 1/3] net: Rename mono_delivery_time to
- tstamp_type for scalabilty
+	s=arc-20240116; t=1716917310; c=relaxed/simple;
+	bh=keLiBMxhiaQ84iw6aj4l2f4RxD/rNX/UUq7Sb/E08Q8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qxNDWYoJO0HQvSofUfW63AHLfIGeeM1JCdIqwhGv1UItQn7EEJXK03IDfTaAZIO84SboCXqyaT8E1+ig//E2VK8wN/IebZQFd+tiIRuibxixs9PmI9M33qQjTDrXAYMDye1fGuWdolFff4NjGdGdSJ60+at258uqXEU8x7oE9LQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vqz2m5Qj; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=u1o6iJOkpHwS/LOclFozOycTaolR6RFkB/DiALrvffQ=; b=vqz2m5QjcFshj08py6ocf/DX7w
+	YSPS4Mq8/FpLSvjqJE1qJR+qwxfTIMcdJYgAAyRbrKyaQIpJzpVyYBQISlQfQ5XQashHqZLf9YoyN
+	RnbCtNNk/bcD1c89YlVN1EvJnnWqK4Epz5y3X/4OsMTnA/RVOjkMQZ1IC9l7TM5kdaWVaY6+5XCvx
+	MS/7VGTPV7HLB6NBSYIqkVxxzHOgQPcSD97Q96i8COP7+SXzJzThqaxijkwWDtohCQCUmilQv/Z8H
+	HACaoccR+NKzv80GB5g98DAJrXNbR9hZHCXuU+vpEWBwLAy1UUVp3RaoB6qo3hbLtLnYWmphC/owK
+	rozAQ3MA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44962)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sC0cV-000583-2F;
+	Tue, 28 May 2024 18:28:19 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sC0cW-0003Q7-8H; Tue, 28 May 2024 18:28:20 +0100
+Date: Tue, 28 May 2024 18:28:20 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andi Shyti <andi.shyti@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	linux-i2c@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [BUG] SFP I2C timeout forces link down with PHY_ERROR
+Message-ID: <ZlYUNCRroM0up0xk@shell.armlinux.org.uk>
+References: <ec7907f1-cb5a-41ab-824c-aa0b02440ada@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ec7907f1-cb5a-41ab-824c-aa0b02440ada@linux.dev>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Abhishek Chauhan (ABC) wrote:
+First, note that phylib's policy is if it loses comms with the PHY,
+then the link will be forced down. This is out of control of the SFP
+or phylink code.
 
-> > +static inline void skb_set_delivery_type_by_clockid(struct sk_buff *skb,
-> > +						    ktime_t kt, clockid_t clockid)
-> > +{
-> > +	u8 tstamp_type = SKB_CLOCK_REALTIME;
-> > +
-> > +	switch (clockid) {
-> > +	case CLOCK_REALTIME:
-> > +		break;
-> > +	case CLOCK_MONOTONIC:
-> > +		tstamp_type = SKB_CLOCK_MONOTONIC;
-> > +		break;
-> > +	default:
+I've seen bugs with the I2C emulation on some modules resulting in
+problems with various I2C controllers.
+
+Sometimes the problem is due to a bad I2C level shifter. Some I2C
+level shifter manufacturers will swear blind that their shifter
+doesn't lock up, but strangely, one can prove with an osciloscope
+that it _does_ lock up - and in a way that the only way to recover
+was to possibly unplug the module or poewr cycle the platform.
+
+My advice would be to investigate the hardware in the first instance.
+
+On Tue, May 28, 2024 at 12:57:25PM -0400, Sean Anderson wrote:
+> Hi,
 > 
-> Willem and Martin, I was thinking we should remove this warn_on_once from below line. Some systems also use panic on warn. 
-> So i think this might result in unnecessary crashes. 
+> I saw the following warning [1] twice when testing 1000Base-T SFP
+> modules:
 > 
-> Let me know what you think. 
+> [ 1481.682501] cdns-i2c ff030000.i2c: timeout waiting on completion
+> [ 1481.692010] Marvell 88E1111 i2c:sfp-ge3:16: Master/Slave resolution failed
+> [ 1481.699910] ------------[ cut here ]------------
+> [ 1481.705459] phy_check_link_status+0x0/0xe8: returned: -67
+> [ 1481.711448] WARNING: CPU: 2 PID: 67 at drivers/net/phy/phy.c:1233 phy_state_machine+0xac/0x2ec
+> <snip>
+> [ 1481.904544] macb ff0c0000.ethernet net1: Link is Down
 > 
-> Logs which are complaining. 
-> https://syzkaller.appspot.com/x/log.txt?x=118c3ae8980000
+> and a second time with some other errors too:
+> 
+> [   64.972751] cdns-i2c ff030000.i2c: xfer_size reg rollover. xfer aborted!
+> [   64.979478] cdns-i2c ff030000.i2c: xfer_size reg rollover. xfer aborted!
 
-I received reports too. Agreed that we need to fix these reports.
+I2C driver bug? From what I can see, this occurs when there is further
+data to be read, and id->recv_count hits zero. The I2C controller is
+entirely in control of how many bytes are transferred from the remote
+device, and it should raise a NAK on the last byte before signalling a
+STOP condition during a read.
 
-The alternative is to limit sk_clockid to supported ones, by failing
-setsockopt SO_TXTIME on an unsupported clock.
+> I think some part of the stack should implement a retry mechanism, but
+> I'm not sure which part. One idea could be to have mdio-i2c propagate
+> negative errors instead of converting them to successful reads of
+> 0xffff.
 
-That changes established ABI behavior. But I don't see how another
-clock can be used in any realistic way anyway.
+That would unfortunately break phylib's PHY probing.
 
-Putting it out there as an option. It's riskier, but in the end I
-believe a better fix than just allowing this state to continue.
+> - Are I2C bus drivers supposed to be flaky like this? That is, are callers of
+>   i2c_transfer expected to handle the occasional spurious error?
 
-A third option would be to not fail the system call, but silently
-fall back to CLOCK_REALTIME. Essentially what happens in the datapath
-in skb_set_delivery_type_by_clockid now. That is surprising behavior,
-we should not do that.
+I2C transfers - to some extent - are supposed to have a number of
+retries, but that's for the I2C device not responding to its address.
+Otherwise, the bus is supposed to be reliable (there is no form of
+error detection however - there's no CRCs or similar.)
+
+The problem with merely retrying the transaction is a register read
+from a PHY may have side-effects (such as the BMSR's LSTATUS bit
+which is latched in link-fail state until the next read. Or a
+register pointer could be incremented. So it's not simple to solve
+at bus level.
+
+> - Similarly, are MDIO bus drivers allowed to be flaky?
+
+No.
+
+I think the only realistic method would be for phylib to attempt to
+reprogram the PHY, but that would need lots of changes to phylib.
+
+Many drivers now do not check whether the PHY accesses they are
+performing succeeded or not, and rely on the failure being permanent.
+
+> Of course, the best option would be to fix cdns-i2c to not be buggy, but
+> the hardware itself is buggy in at least one of the above cases so that
+> may not be practical.
+
+Well, I don't think there's much option. If I2C drivers are flakey maybe
+its better to use GPIOs instead of the broken "inteligent" hardware.
+
+Maybe Andrew has a different view however.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
