@@ -1,202 +1,143 @@
-Return-Path: <netdev+bounces-98445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD5D58D172D
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 11:21:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9AC18D173C
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 11:26:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77AFC2860F6
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 09:21:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CE20283B65
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 09:26:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B2B913D8A1;
-	Tue, 28 May 2024 09:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC788153BD7;
+	Tue, 28 May 2024 09:26:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="uK+xa0IR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E166B757FF;
-	Tue, 28 May 2024 09:21:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.178.238
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716888077; cv=fail; b=d/9gzg9xI6J9i5AUik7Nyu7jAaKAnZvqsJi0S2e+IY9rgM2+vJCnHTB8L9QgCs9axGNyv7qcOqNaaav7idTP1nzI45HbrJxgphItaRRl1ren96/LtOkqlHXWE3Umoi26piTCgQaZuGk3N3nGAcuzRn5QPHdf59PiZJ5i3LA4I1c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716888077; c=relaxed/simple;
-	bh=/wr9dEGSyFY5Ec8P+iRMtcdxy/3xwHC+dnxEUqboew8=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=TrPW2xMLiOjr1DIUVPbaBawPZCqHlmVvNzLiwRPRRX90CQLuyfB8lr7EBbz09MDs8HHf6Q5cHf4a58sI2XTFKX0epgMpLCtogYFAwOsdI4fKe1D2UtXVElYbTc9i4M/BlLGz4IZdp0Wr4CiFWpCy0Z1ZFXhS8UqkrZPRffEEMt4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=fail smtp.client-ip=205.220.178.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44S7osWE024273;
-	Tue, 28 May 2024 09:20:32 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2100.outbound.protection.outlook.com [104.47.55.100])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3yb56xatk2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 May 2024 09:20:32 +0000 (GMT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CkKknr9LOwu/xy1Eds/ns//kxczXrZFaALP/JIvIN0Xvwascax4ft/FyuHm+MVAtfwqsq/XKQR0lDTDGKc5h/QrFEshzeEGSo2wxooptZtWFdMppTg5jk3lDP6Ow6tEhwR1664zSRbZlDcwoAVCMcyGAUYjW3BbcE6S+e49XhtlfZ4uSEs5jbLteQkPV8h/KdGxrWROuFrBnmTbx8+Xg/hHO7PIQ7PmpO8rB+BxJTr+qWKW5dDKRnW7TneO4xCNRaEeuDcrBM9zh15umP59peZSNJvcGmbxk3kmjhzK41LdKp0/QH0SazU22fUcIspbR+BmzHTQNwkWg1nr7ey3c6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lUp+53SPKeCuGz7fLAVdGKkiKH8oJgol1upT06qOa2g=;
- b=PQcT6941SyPsb0fkTHExZV3L/4ptCzfCq0PSTxTD/TqCXYBGlndnRCyxy5WpLa1+0UD66UtJolOVAAO875+Svt81kYSWBHaRQKJnINVy0gcZ+O8mn23s3/RAiYehEHWpJSr8LFP28TjjupfNRkIc2wpH6YxoGiH9R+mNKzRi0Oc81ekYNMwyQ6xHPkGyhyijA9w3G4zfkTNKBQRyf7UCz/nNnosVXq7cs+cqvnbZXnNxvieRdECODiUosp8aybDpGN6YBbv2P1zDfunNEZsl0uoVWRsnSn0FODPJGshY34MjZwHHS7wVmFYYm38USttBZh0PeNy7NI7J/MYV8/prhA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=windriver.com; dmarc=pass action=none
- header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
-Received: from MW5PR11MB5764.namprd11.prod.outlook.com (2603:10b6:303:197::8)
- by BL3PR11MB6385.namprd11.prod.outlook.com (2603:10b6:208:3b5::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.30; Tue, 28 May
- 2024 09:20:28 +0000
-Received: from MW5PR11MB5764.namprd11.prod.outlook.com
- ([fe80::3c2c:a17f:2516:4dc8]) by MW5PR11MB5764.namprd11.prod.outlook.com
- ([fe80::3c2c:a17f:2516:4dc8%4]) with mapi id 15.20.7611.030; Tue, 28 May 2024
- 09:20:28 +0000
-From: Xiaolei Wang <xiaolei.wang@windriver.com>
-To: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        mcoquelin.stm32@gmail.com
-Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: [net PATCH] net: stmmac: update priv->speed to SPEED_UNKNOWN when link down
-Date: Tue, 28 May 2024 17:20:10 +0800
-Message-Id: <20240528092010.439089-1-xiaolei.wang@windriver.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TYCP286CA0070.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:400:31a::14) To MW5PR11MB5764.namprd11.prod.outlook.com
- (2603:10b6:303:197::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E521C153BFC
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 09:26:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716888366; cv=none; b=EHJsaya4iz3g/6TrDD2GXky64Hfba8ZM/UPL9KeJN+eneL0NSYRoMB+Wmo/VUIGkwObdzGy68oxpNyWtNHFeQ0qbralPsO/nAC2J+Mt3/iCqeoaZy10KA+3IJxxw0JCG6AZeRRBNGzQVt5wJFixrsNam6qq1/+JezXiH6KRArS4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716888366; c=relaxed/simple;
+	bh=H/XcOBCNM6XY9zVSkoufzpBzv9seDAyd8I3Eg+jKJNw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RZG59uK6/s2JZhaMcvLvxwG+/BBRqNBCbb8yShsGCNgD1N683jZiKqDin3MfcPrxRlXmCmeSFzOuwt5CqKk7y/uVgi4cEPgyMD2T2KxfEal1wPfKDRSWsZ2hyN+hGvUxlx/YoN/6itH45/dPxQR3MOLccps77xDa1zU9Ngv/VJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=uK+xa0IR; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id D94EC2065A;
+	Tue, 28 May 2024 11:26:01 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id MVSAyQSEidwd; Tue, 28 May 2024 11:26:01 +0200 (CEST)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 5564420184;
+	Tue, 28 May 2024 11:26:01 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 5564420184
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1716888361;
+	bh=IRC8GMQ4Xf9euYnpQBUoHoHxLL71dV1kiZXtLQuLN94=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=uK+xa0IRK8kG5D5vlQfhFcetfnjWZuBWPN0SRr/mVOUr6hBhgXkzfCojwOuFCgvw4
+	 ZRdbE46z2rQek1J74gwgxzZC+jklhSSFEO62tQcOXxEFH8pRPTMHg+2vCaaGsqmJLm
+	 BJxOxnXgP/DRsuP7LbZ7kfAM01iBEfMSYAbBRwFY6kMvhmhZpc5bzoxs8s74GyEN07
+	 0gFqIlw1/LiS+EIYktdydUqYAID8+QLfLqo4OKobbxRyjRn7+Z92N59yAlXhCMA6qR
+	 +rSI6gI7w/cG5Y5/qZOEK03ouBNePWFgTV4q7FpUSRQ7EjJ5FKsV4QAVBRwmyHBBFf
+	 B7bsHHGCLjTwg==
+Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
+	by mailout2.secunet.com (Postfix) with ESMTP id 4912780004A;
+	Tue, 28 May 2024 11:26:01 +0200 (CEST)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 28 May 2024 11:26:01 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 28 May
+ 2024 11:26:00 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 6FE44318295D; Tue, 28 May 2024 11:26:00 +0200 (CEST)
+Date: Tue, 28 May 2024 11:26:00 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Jianbo Liu <jianbol@nvidia.com>
+CC: Leon Romanovsky <leonro@nvidia.com>, "edumazet@google.com"
+	<edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"fw@strlen.de" <fw@strlen.de>
+Subject: Re: [PATCH net] net: drop secpath extension before skb deferral free
+Message-ID: <ZlWjKHseiI+cfHiR@gauss3.secunet.de>
+References: <14d383ebd61980ecf07430255a2de730257d3dde.camel@nvidia.com>
+ <Zk28Lg9/n59Kdsp1@gauss3.secunet.de>
+ <4d6e7b9c11c24eb4d9df593a9cab825549dd02c2.camel@nvidia.com>
+ <Zk7l6MChwKkjbTJx@gauss3.secunet.de>
+ <d81de210f0f4a37f07cc5b990c41c11eb5281780.camel@nvidia.com>
+ <Zk8TqcngSL8aqNGI@gauss3.secunet.de>
+ <405dc0bc3c4217575f89142df2dabc6749795149.camel@nvidia.com>
+ <ZlQ455Vg0HfGbkzT@gauss3.secunet.de>
+ <ZlWZYOMaiAUE8a3+@gauss3.secunet.de>
+ <e6f70384717d85fb1604566530afd02a594f427f.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW5PR11MB5764:EE_|BL3PR11MB6385:EE_
-X-MS-Office365-Filtering-Correlation-Id: 14e59872-43a4-4009-0870-08dc7ef76a17
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: 
-	BCL:0;ARA:13230031|7416005|376005|366007|1800799015|52116005|38350700005;
-X-Microsoft-Antispam-Message-Info: 
-	=?us-ascii?Q?upk4/b5svlGRPBHZBNZbP5zxBW+P9uyvDHSiqca+eeAUPdydNLp/OJxQFqXz?=
- =?us-ascii?Q?4ql+UCVesAHPDo5CTNEN6B4It+Hgm5s1Gry9mBar6JukDoclOvVzRBerDJDj?=
- =?us-ascii?Q?xqTdcPNmw+eOhqpCd3jbHNE14cnCTaVxtXzEQIxl/rrdrs2NySwjmMS2Sst6?=
- =?us-ascii?Q?yyiooBE2PmTZjas9oU+RPd0rTGNS9V9oDAuaCEFyEhv7qzUrTSrbvtxfQlFc?=
- =?us-ascii?Q?iFMIrUn8jJSUYGJ/+iSQwl7U/DCUN+7j8059Dp8zcGO3HRqQC/geQoZGAVPE?=
- =?us-ascii?Q?A2z4n/wpM6sFwdnMaK4pezSninKwUk0iVKIImK8KAD6JkUvR4/I+okKOmcdc?=
- =?us-ascii?Q?cmaMoFp3A9VlG7dgYXX/cDwYoAny2eKTt8spk8yrrpw1JbYymQPy/1KW77fq?=
- =?us-ascii?Q?qBItH2cIIUEPpd1GcF1Iu1Urv66EPnOBXPF/karhbtKFyndqLFHoEO9q82Jx?=
- =?us-ascii?Q?qK9TU0MkXMv/UlDXILMI7+5DoHXUzd6mApDhthl85AAon7bEBwsEaSC2ZoZ3?=
- =?us-ascii?Q?kV+1Y7Hd4a6yRsSjIAKZVMgnFURfnYyEkIV3z5xeDVuvlIIJWKqpsTPzUnaV?=
- =?us-ascii?Q?rwfEeod1IYje8rINU2+sUiGQ9Hm5WNOTnywXhVtuCAFq/PCxEr2uDw+lLKTJ?=
- =?us-ascii?Q?xq8HdHe27j99k5JA5ojYqBiFuv0vDBlhSmxpZXvlcZPlFLuVtS2QspXEgoyA?=
- =?us-ascii?Q?JXMJZDWkqksA2BotRtw+z+2bxmxRbblaIPr3E/DY3o0wjG8DOpkl+EcsorZ5?=
- =?us-ascii?Q?Mwt0/l23dVq8gzlAtSaoxX7oyPov4ykj64lXcN8/HlHSEUqbTcQgv/A10I/l?=
- =?us-ascii?Q?qUBNl0ZZuBtLonvvHnzcINeNxI9CihEOTYbko0I1iXhRx6ntbr6qQJh4wfdW?=
- =?us-ascii?Q?fS/oRpONdJ4hic+qScrOl6obAFLUaeWTGAQngf6BXrb5FiuJhbkdn1//MicV?=
- =?us-ascii?Q?4OY8ztwh6sgucv7b38FX6baqBZ5ujHRYEVilIWhiBcl28NUaCF/h3htULkVu?=
- =?us-ascii?Q?cGC2SOvcSOh3vPtwQ0PDaLibvlsb7aJn2cQvvhMuhMSp023ODFWlHA7dzYKc?=
- =?us-ascii?Q?5zxBDS5nEnuPFhG73vD3vFZHYf1F7EzsGjjXOBy3wfnYm7zWVnfy8ncG20l0?=
- =?us-ascii?Q?O2/haIhNNjrdgVub2rEb3d5OWAvNAr63kDxr1r1l7vaoXalC5MfmLbBgAVm+?=
- =?us-ascii?Q?1z+sd+ReFcR3bOn9umsts3i7jLTMOP1vYWpiOpTl750tKyvhd01Iw4rMXj3b?=
- =?us-ascii?Q?7T4tff+4qccmaCw65saJnSybS3WDrQHSgSo8O++tPBZcIoSc3vO8jPJFLfX+?=
- =?us-ascii?Q?gH4Eefs+5u1ZHcDLDld7FQfHWdzz8F/8/2S1awteNR2BOg=3D=3D?=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR11MB5764.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(376005)(366007)(1800799015)(52116005)(38350700005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?XmycGIsKuRoNnB4jNipsPyX2OAbz1plMOK1iVKxlEd4JhsCukXHxJC2DJb+u?=
- =?us-ascii?Q?0PBCi8ZhpVP39NNWAMLmlYZmQm1mnmvHcaVvftboKjNNebMjeoo2VcZrHgmd?=
- =?us-ascii?Q?dgZUCgBd7Nl+EKkeT/TDBT10kAfn4K9P5IzjLC+4+k0xVeKQb0qGpbpm/MKi?=
- =?us-ascii?Q?h8bpvFtliqV9GfbBx8xJq/0AtNv3nLLSdPflBslSkdp2VL/AmIV2UdAu3S0/?=
- =?us-ascii?Q?/5nzY8vND3rVWK3B5sHDvcYpXrYJ9fYHjZUxiXRZficPL671YQ5ARERe0ji3?=
- =?us-ascii?Q?6KpO6tgTBZ44gRBBMYHEDtR1VWCTdCY9xowz0NrlHxZUH62TgszkZ2sBRiUT?=
- =?us-ascii?Q?qQszYoS6vVb1qlQJbBdpZCn70hXyKmrn+uFrIQFl1RGgPUF5RTOywWo75yFj?=
- =?us-ascii?Q?erXJL/JibMJLTrGdYLO6O8TNfUNONEhMKikSsRQXv/90CVyt22YS5PD8wrII?=
- =?us-ascii?Q?YJvzX0KC+AuB9pBHK3tTg+vISoPoOH1LTeEzvaGC7wNa1dunsHlrApT5RR+H?=
- =?us-ascii?Q?Crn8xFSWiDtyS6Z0qUgCC562LrTKokSyjjkZkjbpX0yb2mKz9bzfZTgXtsG0?=
- =?us-ascii?Q?M5KCtAcxIp41+ob0/tUeduJMtqNJNv6QioUwg5GIYtiwZQ5KZt+cCvDy7SgZ?=
- =?us-ascii?Q?rIIQyfKYs6cJOJmkovYpEPEuXnagVpIto90fI1yuFN26+ZbFcWmFUK/NDLto?=
- =?us-ascii?Q?w1BH1Bj3A+d/nthL+RNzT9nfgpOdUY5aLwHl+gyFmD6cFjqj74JnkS8A84mI?=
- =?us-ascii?Q?Fg7GmlbNQQkaNARzQh2vJvC/alZF40mNJGy7RekFnG9Y/aXXjoMMk8W2Kn6F?=
- =?us-ascii?Q?bAVsw1YKumWuX2PnS/p8ewQlK2rKtJLK9nbLkbg/XZWfiBwrF4+P4sSY3d/W?=
- =?us-ascii?Q?5nfqmf/K2/vAZY8XbufPCVZVd/CoGfQol0qoyU1w2+nx6zs/8FrcWSpfge3N?=
- =?us-ascii?Q?vG885P+SoX+WJmMpArvWvyfrMsoKcaapr2WHfHUr9B2U8lvFAMYSOjaPtZ8P?=
- =?us-ascii?Q?Hrv7BIBtdHXwDL9Et1vmY0l9PV0epVYhoIAXoOtLnP4vLXex3Cb9UKxZYG4k?=
- =?us-ascii?Q?wKvnA+wgc2ZRICQY2XwU7B2FUFRBBNE7ghP8mXc6jPbaWkeIvfoq8+fAsAxe?=
- =?us-ascii?Q?DxJxZvjcjUWWxltS83hcfFH3d3koa3z3GHJ2syviXdxCp/pxZ2KEmUp7pXR4?=
- =?us-ascii?Q?X8pa/dXfNQgR5WMxMnsuEZdXl59ROIIYsoK/D1dwmEjXFsksueeGDdV2rDXl?=
- =?us-ascii?Q?Yfe7PZU2MjjIKZ5CqWlf/0ZbYfg1xSE+XPKELShgFohZX9M1IHWjQlpoKNUu?=
- =?us-ascii?Q?i3m05fN3OQOkGuWQlaoc4NFqchtFpWJdkA5H8mY9t78ZHKzVimTPODJBcmFd?=
- =?us-ascii?Q?gObVv8p1RztTTXxbVHr7NGnZdQQ3kRhPCF5JNh2YFuxq6fKcGBtZjA8Ht209?=
- =?us-ascii?Q?1C0jhF6ixtDXC6w7fvR1XE5d8hvXcoiqt8hr/c4s/I6SpEfhO5/TtSyqTXL7?=
- =?us-ascii?Q?NeCzKbN+sV74A6TmUA4+2JrB63KWVa/EjmCnOAtoo8RAx3EenN4mcr/j4idl?=
- =?us-ascii?Q?vBH/qdj2h5fnla6cF8mffc4zOys2LYFBZBj0ZMqhv/hibpbwWWLU54NXyEZx?=
- =?us-ascii?Q?7g=3D=3D?=
-X-OriginatorOrg: windriver.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 14e59872-43a4-4009-0870-08dc7ef76a17
-X-MS-Exchange-CrossTenant-AuthSource: MW5PR11MB5764.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 May 2024 09:20:28.3280
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vqjoHqtk8rx3N3MH3anzX9aF4UWo94n0Y7MHVMMkI+j0TeDqiqJxPZZwJrkR5UaUrz6uYSiZWZuCWmqbbrUiSaIMZLir9RZkrSlTyS4ANDA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6385
-X-Proofpoint-ORIG-GUID: KX2Mui1xtmH99k-_Pu95itSaJ1Fx8uN4
-X-Proofpoint-GUID: KX2Mui1xtmH99k-_Pu95itSaJ1Fx8uN4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-28_05,2024-05-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
- priorityscore=1501 suspectscore=0 spamscore=0 phishscore=0 malwarescore=0
- lowpriorityscore=0 adultscore=0 impostorscore=0 bulkscore=0
- mlxlogscore=999 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2405280069
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e6f70384717d85fb1604566530afd02a594f427f.camel@nvidia.com>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-The CBS parameter can still be configured when the port is
-currently disconnected and link down. This is unreasonable.
-The current speed_div and ptr parameters depend on the negotiated
-speed after uplinking. So When the link is down, update priv->speed
-to SPEED_UNKNOWN and an error log should be added.
+On Tue, May 28, 2024 at 09:02:49AM +0000, Jianbo Liu wrote:
+> On Tue, 2024-05-28 at 10:44 +0200, Steffen Klassert wrote:
+> > On Mon, May 27, 2024 at 09:40:23AM +0200, Steffen Klassert wrote:
+> > > On Thu, May 23, 2024 at 03:26:22PM +0000, Jianbo Liu wrote:
+> > > > On Thu, 2024-05-23 at 12:00 +0200, Steffen Klassert wrote:
+> > > > > 
+> > > > > Hm, interesting.
+> > > > > 
+> > > > > Can you check if xfrm_dev_state_free() is triggered in that
+> > > > > codepath
+> > > > > and if it actually removes the device from the states?
+> > > > > 
+> > > > 
+> > > > xfrm_dev_state_free is not triggered. I think it's because I did
+> > > > "ip x
+> > > > s delall" before unregister netdev.
+> > > 
+> > > Yes, likely. So we can't defer the device removal to the state free
+> > > functions, we always need to do that on state delete.
+> > 
+> > The only (not too complicated) solution I see so far is to
+> > free the device early, along with the state delete function:
+> > 
+> > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> > index 649bb739df0d..bfc71d2daa6a 100644
+> > --- a/net/xfrm/xfrm_state.c
+> > +++ b/net/xfrm/xfrm_state.c
+> > @@ -721,6 +721,7 @@ int __xfrm_state_delete(struct xfrm_state *x)
+> >                         sock_put(rcu_dereference_raw(x->encap_sk));
+> >  
+> >                 xfrm_dev_state_delete(x);
+> > +               xfrm_dev_state_free(x);
+> >  
+> 
+> Still hit "scheduling while atomic" issue because __xfrm_state_delete
+> is called in state's spin lock. 
 
-Signed-off-by: Xiaolei Wang <xiaolei.wang@windriver.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 1 +
- drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c   | 1 +
- 2 files changed, 2 insertions(+)
+Grmpf. Yes, apparently.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index b3afc7cb7d72..604e2e053852 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -995,6 +995,7 @@ static void stmmac_mac_link_down(struct phylink_config *config,
- 	priv->tx_lpi_enabled = false;
- 	priv->eee_enabled = stmmac_eee_init(priv);
- 	stmmac_set_eee_pls(priv, priv->hw, false);
-+	priv->speed = SPEED_UNKNOWN;
- 
- 	if (priv->dma_cap.fpesel)
- 		stmmac_fpe_link_state_handle(priv, false);
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-index 222540b55480..1e60033c6fbb 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-@@ -378,6 +378,7 @@ static int tc_setup_cbs(struct stmmac_priv *priv,
- 		speed_div = 100000;
- 		break;
- 	default:
-+		dev_err(priv->device, "Link speed is not known");
- 		return -EOPNOTSUPP;
- 	}
- 
--- 
-2.25.1
+Unfortunately I don't have a NIC to test installed currently.
 
 
