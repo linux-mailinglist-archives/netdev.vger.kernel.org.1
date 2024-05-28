@@ -1,198 +1,198 @@
-Return-Path: <netdev+bounces-98715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2397F8D22BF
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 19:45:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4702D8D22CA
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 19:51:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CCA11F226D5
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 17:45:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A7351C22E61
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 17:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02179376E1;
-	Tue, 28 May 2024 17:45:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B27A3FB87;
+	Tue, 28 May 2024 17:51:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e0c3Cjwx"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UyQRSNez"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A54D31B806
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 17:45:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6483A8F7;
+	Tue, 28 May 2024 17:51:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716918340; cv=none; b=oDwbdzlT0GZjK1fiBdxbkmFlzc8/NlYx4MNYyOooKj7RhViBSYadDsniiGcN7qY0dR5+1dZK0TYy7PDKCKn64kPLTgsUwqWoq9ghI06QDhGef0HzYi4YL5+cn+ijg0WawSQNxItzB77N1ti8QdMxeRYKKZQNkccJEsSWhbwfMjI=
+	t=1716918666; cv=none; b=NP40CRTB/UmD8B5tbBtAIR+bVF9CxwomqIL5iG2SIaOsl/L78NjBSHC3uh1kBsM2sJ0ceZJUABCJw5bfuLYaEHNSG75tnlLbd1MwL0egUtKCrXxRx8MjA+0/EgrLtpCeSaHEGPm5gM/VH8DrZ2XQ+dTX1HYEZIkJqr90dycF9U0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716918340; c=relaxed/simple;
-	bh=9vOcETVh+eilOe61R58LgMPUxUJOYEm8medA2diVors=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jXyAhQNh3m+Rw101pCjOwfZyg8Oerv8xBsIjeDkHuEV2eEpc0Le2ZWBzxQvcNgOWBqkSC/fKZxvFd/kg4exY8xEb6ncNNTorM1PESHRAw6ZKlBFY86ZrPGllQ3gQXJrbsTD9o7EiaEWVGnyffoS/gioYZ+DLcoNwrn00bT5DpZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e0c3Cjwx; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716918339; x=1748454339;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9vOcETVh+eilOe61R58LgMPUxUJOYEm8medA2diVors=;
-  b=e0c3Cjwx3dEdFhUoFZQSHJqVzOR3vuybGYkzFhaBxOvdZ99RE4A0RNjV
-   GR8zqSFXLN6zYpAsKlhNcr0lJgSZ4AMdpUBoniLpqzo/30ZzWc1Bfs+q7
-   U7a3AODhlhN+GxQt8FIHad3LVlJob6ilvcfusiqC0j/fqfKVMbAijOTNp
-   i4XsweBp/FAsc0ZkM1X9PNdALGrulcxyKn/9rwxYFUwm4QYoU9wrxlAIi
-   FCEHW3ZBsdJ9x+mDnk/NSg5IczncHLjP3MEfbeEk+XHzv6rF3ZXfWl9jA
-   FppiYHltfvF3Awb0w4MJWcgpDIDrdwpblZCcWIevbHlNX8e+YbBUsEGpA
-   g==;
-X-CSE-ConnectionGUID: 4I4syBUdSkqDo8YusA+X8A==
-X-CSE-MsgGUID: Kpa3WiQ0TWmTCvHBGTpIwQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11085"; a="13505882"
-X-IronPort-AV: E=Sophos;i="6.08,196,1712646000"; 
-   d="scan'208";a="13505882"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 10:45:38 -0700
-X-CSE-ConnectionGUID: x3/T6SLIRtCoYgVeoKLVUA==
-X-CSE-MsgGUID: fhQL5Qx1StCvGMJZkuVQMQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,196,1712646000"; 
-   d="scan'208";a="39564722"
-Received: from unknown (HELO 0610945e7d16) ([10.239.97.151])
-  by fmviesa005.fm.intel.com with ESMTP; 28 May 2024 10:45:35 -0700
-Received: from kbuild by 0610945e7d16 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sC0tB-000CYt-2R;
-	Tue, 28 May 2024 17:45:33 +0000
-Date: Wed, 29 May 2024 01:44:58 +0800
-From: kernel test robot <lkp@intel.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Cc: oe-kbuild-all@lists.linux.dev,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	larysa.zaremba@intel.com, netdev@vger.kernel.org,
-	michal.kubiak@intel.com, anthony.l.nguyen@intel.com,
-	magnus.karlsson@intel.com
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net 06/11] ice: improve updating
- ice_{t, r}x_ring::xsk_pool
-Message-ID: <202405290101.PV6Uluyq-lkp@intel.com>
-References: <20240528131429.3012910-7-maciej.fijalkowski@intel.com>
+	s=arc-20240116; t=1716918666; c=relaxed/simple;
+	bh=T0eh8dh1LRF9aUu0bJPzJkjy2d/eWYqU9XQ4xnA7ItA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C47aAQxLaqa1z96XTSwkAJspgEGxTxom/GVvUAnKsT42Vf1DtVoK/3fQHTQ1eHYyt5Z5vB4CJg+INwjJCysNAJzM8O9Fu82yAqU+yEpv4qWWhfDAOqPAbgiX5MT/Mh12M0kqr0ODx/39gmtMYrvMVRlgk6x5m8/XBfwQnaxf1rE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UyQRSNez; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: linux@armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1716918659;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E4hwheoFrQ7bdjpnORVmrs5FpZ2wpl7LAQHlp/QppDc=;
+	b=UyQRSNezUnHzdfcYU9YCUSRni+xPKZswLtYch39yEostjSju6y2qjYr+eoZL6R7/VnvxZM
+	523HyRHaxLFcu4fpQ5Nyg8fiWaXR5sACZOeO47/aO+krvW4qCkDn/Ux2y609398mCAbM+M
+	R2t8Z3tlTW5w+CaMddiTH+X7Vfl2AZY=
+X-Envelope-To: andrew@lunn.ch
+X-Envelope-To: andi.shyti@kernel.org
+X-Envelope-To: netdev@vger.kernel.org
+X-Envelope-To: linux-i2c@vger.kernel.org
+X-Envelope-To: michal.simek@amd.com
+X-Envelope-To: hkallweit1@gmail.com
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+Message-ID: <90873b78-13ba-445e-890a-0b90a653721b@linux.dev>
+Date: Tue, 28 May 2024 13:50:54 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240528131429.3012910-7-maciej.fijalkowski@intel.com>
+Subject: Re: [BUG] SFP I2C timeout forces link down with PHY_ERROR
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andi Shyti <andi.shyti@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ linux-i2c@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <ec7907f1-cb5a-41ab-824c-aa0b02440ada@linux.dev>
+ <ZlYUNCRroM0up0xk@shell.armlinux.org.uk>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <ZlYUNCRroM0up0xk@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Maciej,
+On 5/28/24 13:28, Russell King (Oracle) wrote:
+> First, note that phylib's policy is if it loses comms with the PHY,
+> then the link will be forced down. This is out of control of the SFP
+> or phylink code.
+> 
+> I've seen bugs with the I2C emulation on some modules resulting in
+> problems with various I2C controllers.
+> 
+> Sometimes the problem is due to a bad I2C level shifter. Some I2C
+> level shifter manufacturers will swear blind that their shifter
+> doesn't lock up, but strangely, one can prove with an osciloscope
+> that it _does_ lock up - and in a way that the only way to recover
+> was to possibly unplug the module or poewr cycle the platform.
 
-kernel test robot noticed the following build warnings:
+Well, I haven't seen any case where the bus locks up. I've been able to
+recover just by doing
 
-[auto build test WARNING on tnguy-net-queue/dev-queue]
+	ip link set net0 down
+	ip link set net0 up
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Maciej-Fijalkowski/ice-respect-netif-readiness-in-AF_XDP-ZC-related-ndo-s/20240528-211914
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue.git dev-queue
-patch link:    https://lore.kernel.org/r/20240528131429.3012910-7-maciej.fijalkowski%40intel.com
-patch subject: [Intel-wired-lan] [PATCH iwl-net 06/11] ice: improve updating ice_{t, r}x_ring::xsk_pool
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20240529/202405290101.PV6Uluyq-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240529/202405290101.PV6Uluyq-lkp@intel.com/reproduce)
+which suggests that this is just a transient problem.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405290101.PV6Uluyq-lkp@intel.com/
+> My advice would be to investigate the hardware in the first instance.
 
-All warnings (new ones prefixed by >>):
+I'll try to keep this in mind, but it's pretty infrequent and I probably
+won't be able to test anything until I can reproduce it better.
 
->> drivers/net/ethernet/intel/ice/ice_xsk.c:476: warning: Function parameter or struct member 'xsk_pool' not described in '__ice_alloc_rx_bufs_zc'
->> drivers/net/ethernet/intel/ice/ice_xsk.c:525: warning: Function parameter or struct member 'xsk_pool' not described in 'ice_alloc_rx_bufs_zc'
->> drivers/net/ethernet/intel/ice/ice_xsk.c:980: warning: Function parameter or struct member 'xsk_pool' not described in 'ice_xmit_pkt'
->> drivers/net/ethernet/intel/ice/ice_xsk.c:1005: warning: Function parameter or struct member 'xsk_pool' not described in 'ice_xmit_pkt_batch'
->> drivers/net/ethernet/intel/ice/ice_xsk.c:1038: warning: Function parameter or struct member 'xsk_pool' not described in 'ice_fill_tx_hw_ring'
+> On Tue, May 28, 2024 at 12:57:25PM -0400, Sean Anderson wrote:
+>> Hi,
+>> 
+>> I saw the following warning [1] twice when testing 1000Base-T SFP
+>> modules:
+>> 
+>> [ 1481.682501] cdns-i2c ff030000.i2c: timeout waiting on completion
+>> [ 1481.692010] Marvell 88E1111 i2c:sfp-ge3:16: Master/Slave resolution failed
+>> [ 1481.699910] ------------[ cut here ]------------
+>> [ 1481.705459] phy_check_link_status+0x0/0xe8: returned: -67
+>> [ 1481.711448] WARNING: CPU: 2 PID: 67 at drivers/net/phy/phy.c:1233 phy_state_machine+0xac/0x2ec
+>> <snip>
+>> [ 1481.904544] macb ff0c0000.ethernet net1: Link is Down
+>> 
+>> and a second time with some other errors too:
+>> 
+>> [   64.972751] cdns-i2c ff030000.i2c: xfer_size reg rollover. xfer aborted!
+>> [   64.979478] cdns-i2c ff030000.i2c: xfer_size reg rollover. xfer aborted!
+> 
+> I2C driver bug? From what I can see, this occurs when there is further
+> data to be read, and id->recv_count hits zero. The I2C controller is
+> entirely in control of how many bytes are transferred from the remote
+> device, and it should raise a NAK on the last byte before signalling a
+> STOP condition during a read.
 
+Commit bbf967b223b3 ("i2c: cadence: Handle transfer_size rollover")
+makes it seem like a hardware error. E.g. Linux thinks we're done but
+the hardware thinks there's still more data. I've added Alex to CC;
+maybe he can comment.
 
-vim +476 drivers/net/ethernet/intel/ice/ice_xsk.c
+>> I think some part of the stack should implement a retry mechanism, but
+>> I'm not sure which part. One idea could be to have mdio-i2c propagate
+>> negative errors instead of converting them to successful reads of
+>> 0xffff.
+> 
+> That would unfortunately break phylib's PHY probing.
+> 
+>> - Are I2C bus drivers supposed to be flaky like this? That is, are callers of
+>>   i2c_transfer expected to handle the occasional spurious error?
+> 
+> I2C transfers - to some extent - are supposed to have a number of
+> retries, but that's for the I2C device not responding to its address.
+> Otherwise, the bus is supposed to be reliable (there is no form of
+> error detection however - there's no CRCs or similar.)
+> 
+> The problem with merely retrying the transaction is a register read
+> from a PHY may have side-effects (such as the BMSR's LSTATUS bit
+> which is latched in link-fail state until the next read. Or a
+> register pointer could be incremented. So it's not simple to solve
+> at bus level.
 
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  462  
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  463  /**
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  464   * __ice_alloc_rx_bufs_zc - allocate a number of Rx buffers
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  465   * @rx_ring: Rx ring
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  466   * @count: The number of buffers to allocate
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  467   *
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  468   * Place the @count of descriptors onto Rx ring. Handle the ring wrap
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  469   * for case where space from next_to_use up to the end of ring is less
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  470   * than @count. Finally do a tail bump.
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  471   *
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  472   * Returns true if all allocations were successful, false if any fail.
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  473   */
-290b7dad8f9f257 Maciej Fijalkowski     2024-05-28  474  static bool __ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring,
-290b7dad8f9f257 Maciej Fijalkowski     2024-05-28  475  				   struct xsk_buff_pool *xsk_pool,  u16 count)
-3876ff525de70ae Maciej Fijalkowski     2022-01-25 @476  {
-d1fc4c6feac18f8 Maciej Fijalkowski     2022-03-17  477  	u32 nb_buffs_extra = 0, nb_buffs = 0;
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  478  	union ice_32b_rx_flex_desc *rx_desc;
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  479  	u16 ntu = rx_ring->next_to_use;
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  480  	u16 total_count = count;
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  481  	struct xdp_buff **xdp;
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  482  
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  483  	rx_desc = ICE_RX_DESC(rx_ring, ntu);
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  484  	xdp = ice_xdp_buf(rx_ring, ntu);
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  485  
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  486  	if (ntu + count >= rx_ring->count) {
-290b7dad8f9f257 Maciej Fijalkowski     2024-05-28  487  		nb_buffs_extra = ice_fill_rx_descs(xsk_pool, xdp, rx_desc,
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  488  						   rx_ring->count - ntu);
-d1fc4c6feac18f8 Maciej Fijalkowski     2022-03-17  489  		if (nb_buffs_extra != rx_ring->count - ntu) {
-d1fc4c6feac18f8 Maciej Fijalkowski     2022-03-17  490  			ntu += nb_buffs_extra;
-d1fc4c6feac18f8 Maciej Fijalkowski     2022-03-17  491  			goto exit;
-d1fc4c6feac18f8 Maciej Fijalkowski     2022-03-17  492  		}
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  493  		rx_desc = ICE_RX_DESC(rx_ring, 0);
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  494  		xdp = ice_xdp_buf(rx_ring, 0);
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  495  		ntu = 0;
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  496  		count -= nb_buffs_extra;
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  497  		ice_release_rx_desc(rx_ring, 0);
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  498  	}
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  499  
-290b7dad8f9f257 Maciej Fijalkowski     2024-05-28  500  	nb_buffs = ice_fill_rx_descs(xsk_pool, xdp, rx_desc, count);
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  501  
-db804cfc21e969a Magnus Karlsson        2021-09-22  502  	ntu += nb_buffs;
-8b51a13c37c24c0 Maciej Fijalkowski     2021-12-13  503  	if (ntu == rx_ring->count)
-2d4238f55697221 Krzysztof Kazimierczak 2019-11-04  504  		ntu = 0;
-2d4238f55697221 Krzysztof Kazimierczak 2019-11-04  505  
-d1fc4c6feac18f8 Maciej Fijalkowski     2022-03-17  506  exit:
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  507  	if (rx_ring->next_to_use != ntu)
-2d4238f55697221 Krzysztof Kazimierczak 2019-11-04  508  		ice_release_rx_desc(rx_ring, ntu);
-2d4238f55697221 Krzysztof Kazimierczak 2019-11-04  509  
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  510  	return total_count == (nb_buffs_extra + nb_buffs);
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  511  }
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  512  
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  513  /**
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  514   * ice_alloc_rx_bufs_zc - allocate a number of Rx buffers
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  515   * @rx_ring: Rx ring
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  516   * @count: The number of buffers to allocate
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  517   *
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  518   * Wrapper for internal allocation routine; figure out how many tail
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  519   * bumps should take place based on the given threshold
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  520   *
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  521   * Returns true if all calls to internal alloc routine succeeded
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  522   */
-290b7dad8f9f257 Maciej Fijalkowski     2024-05-28  523  bool ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring,
-290b7dad8f9f257 Maciej Fijalkowski     2024-05-28  524  			  struct xsk_buff_pool *xsk_pool, u16 count)
-3876ff525de70ae Maciej Fijalkowski     2022-01-25 @525  {
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  526  	u16 rx_thresh = ICE_RING_QUARTER(rx_ring);
-b3056ae2b57858b Maciej Fijalkowski     2022-09-01  527  	u16 leftover, i, tail_bumps;
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  528  
-b3056ae2b57858b Maciej Fijalkowski     2022-09-01  529  	tail_bumps = count / rx_thresh;
-b3056ae2b57858b Maciej Fijalkowski     2022-09-01  530  	leftover = count - (tail_bumps * rx_thresh);
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  531  
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  532  	for (i = 0; i < tail_bumps; i++)
-290b7dad8f9f257 Maciej Fijalkowski     2024-05-28  533  		if (!__ice_alloc_rx_bufs_zc(rx_ring, xsk_pool, rx_thresh))
-3876ff525de70ae Maciej Fijalkowski     2022-01-25  534  			return false;
-290b7dad8f9f257 Maciej Fijalkowski     2024-05-28  535  	return __ice_alloc_rx_bufs_zc(rx_ring, xsk_pool, leftover);
-2d4238f55697221 Krzysztof Kazimierczak 2019-11-04  536  }
-2d4238f55697221 Krzysztof Kazimierczak 2019-11-04  537  
+OK...
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>> - Similarly, are MDIO bus drivers allowed to be flaky?
+> 
+> No.
+> 
+> I think the only realistic method would be for phylib to attempt to
+> reprogram the PHY, but that would need lots of changes to phylib.
+
+Would it? Maybe we just need something like
+
+if (err == -ENOLINK) {
+	phy_init_hw(phydev);
+	needs_aneg = true;
+	phydev->state = PHY_UP;
+	err = 0;
+}
+
+in the phy_state_machine switch statement under PHY_NOLINK and
+PHY_RUNNING. The phy_init_hw wouldn't even be necessary for this case
+(but would probably be a good idea in the general case where
+master/slave resolution fails).
+
+> Many drivers now do not check whether the PHY accesses they are
+> performing succeeded or not, and rely on the failure being permanent.
+
+Well, this driver does, which is how the error gets propagated all the
+way up to phy_state_machine. 
+
+>> Of course, the best option would be to fix cdns-i2c to not be buggy, but
+>> the hardware itself is buggy in at least one of the above cases so that
+>> may not be practical.
+> 
+> Well, I don't think there's much option. If I2C drivers are flakey maybe
+> its better to use GPIOs instead of the broken "inteligent" hardware.
+
+The CPU on this device is already underpowered, so I'd rather not resort
+to bitbanging.
+
+--Sean
 
