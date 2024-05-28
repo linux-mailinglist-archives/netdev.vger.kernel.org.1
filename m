@@ -1,111 +1,94 @@
-Return-Path: <netdev+bounces-98349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C50088D1091
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 01:42:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 311228D10B8
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 02:01:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F448283142
-	for <lists+netdev@lfdr.de>; Mon, 27 May 2024 23:42:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFFFA281E5B
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 00:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E92360269;
-	Mon, 27 May 2024 23:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B41A17BCE;
+	Tue, 28 May 2024 00:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CZszdni2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j1loUf65"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D255F17E8F8;
-	Mon, 27 May 2024 23:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1293713C807;
+	Tue, 28 May 2024 00:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716853371; cv=none; b=fdmPb9mvJ9IBeLkjyqlQVmrcCY9reUzNDLmD442fl2aYPWyDm2Zly1x4UdjV+frRbjKawgeDkh4Q2CUKmP+u7qBdUcZz8HeL1EaPGxc2WV2s3nYEKUwWkwYM1WSmBVyqIPgkhNzAvuOlR/He0deVdw1M0eoYPuPGRlkxFS9+ixU=
+	t=1716854431; cv=none; b=bNYxJYzvRDvoNmZw378haFGNzjV0u95GHENu3ng5ZxtZhRPvK455y+k6n2ywqjv4WF3GFV0Tuz3Ywa5OafXxKCgB6f5ElMeKFjq9f7w0TJnwjiZZL0CT8Wn8CWMtg6r6HUsVuyWOWf+7+WCQgImXgCY4j6aQyD5canPsMmTuGH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716853371; c=relaxed/simple;
-	bh=XUGNe4Vne0m7pN3CMpt65nY5zW6n4Cua0wTpgEl0dxI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nQ+TtfVWVwypkQiZNTdIskpaJFn/Z6Iq0VC2H/dtflIx5ek3oDGNaXgCnjNtksrCsjO+cQUs5B2oVNQi3jC1Oqf4hQOZf5aywi6WeErp8U6qHjdajjqdcIP9nYhfOmH7BufXQu63kwSDMauEOEmrj1oQYi/whvs3/whCPCMJoAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CZszdni2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B19FAC2BBFC;
-	Mon, 27 May 2024 23:42:50 +0000 (UTC)
+	s=arc-20240116; t=1716854431; c=relaxed/simple;
+	bh=KnOCp2qhtwB51yC8a+Iale1moRumwnl3EQ9O+oTkxCM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ejSmpyC0ci+1Stvmswg2c7CAl78wKgqDj6sOJAfIepU9r1O3O176+BUJYuDuQBJi5wiNnZFbl00LJc7kjOidBy5A93AriGGwClokgQNGD1Kly5X9DppEj2FutxVCu3fjIdpuYPIfDDpbbG/QWJhp9FKLrS1ExSZQyoq6dy0589w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j1loUf65; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 57F70C32789;
+	Tue, 28 May 2024 00:00:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716853371;
-	bh=XUGNe4Vne0m7pN3CMpt65nY5zW6n4Cua0wTpgEl0dxI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CZszdni2CFdUNNsdaZQSdg5xyv2aQogk6pGHNwOc4uqLYLDCvOQmcSZ0kn8u+298X
-	 KpbX3qLNsRuXhWknHdCEkOhfPUtWjkSFsPv/EU9WtIAbyPTgRe8GoGqQGAY1AbHeOY
-	 hoXeHswPUOoGseVhJFFKmOC+BI2hk7/79aLxRobZfrbKEi4twNZOdHpv1gAu11jS90
-	 zMPOTHWY7nd4og9A93W8OF0excwX1wAEgcksaNMyiyOH4tkk7veTAP6UflJz42ir9a
-	 jzw7zUJf2XnF1tK81SpynefzpwVwhNpFffDHLDKLMEIz9rLTl+jpUEMu8qwWUqE2nj
-	 eKslG/W+wlbcQ==
-Date: Mon, 27 May 2024 16:42:49 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Chen Ni <nichen@iscas.ac.cn>
-Cc: nbd@nbd.name, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
- lorenzo@kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2] net: ethernet: mtk_eth_soc: add missing
- check for rhashtable_init
-Message-ID: <20240527164249.4aafd105@kernel.org>
-In-Reply-To: <20240517023922.362327-1-nichen@iscas.ac.cn>
-References: <20240517023922.362327-1-nichen@iscas.ac.cn>
+	s=k20201202; t=1716854430;
+	bh=KnOCp2qhtwB51yC8a+Iale1moRumwnl3EQ9O+oTkxCM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=j1loUf655B/12OXxmz6XPk1DzVfz+SJQkxtzId1vXSOuCaGKIj2udpntUcyywQc3E
+	 NpqrQEfcE3rCVGqHE/mWnUeXUWuyModqdUSEA7JYsAs89XnMMjcm+0koEuMYDKRNcY
+	 oofkqkWTsJS5LFtMZOaHCBa+iv7ZWvPIcfJptNU/3twSW8cqDLJzN6zEaVmNJ9b2XI
+	 bwyFW7AWZuhbJAT5N/7cwjg18bLpjy03WgPpeh/NmFsuPffmWYe1nSgZ1ZjUgasPyo
+	 3AZKaqkVwnt9wv31KK36JyjVOIMCp+DE3jCY1GxFxPuw19uywQddfBCUEFiVFXGQM5
+	 75uT42PW+voVQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 41836D40196;
+	Tue, 28 May 2024 00:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] dt-bindings: net: pse-pd: ti,tps23881: Fix missing
+ "additionalProperties" constraints
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171685443026.27081.17116209068347534643.git-patchwork-notify@kernel.org>
+Date: Tue, 28 May 2024 00:00:30 +0000
+References: <20240523171750.2837331-1-robh@kernel.org>
+In-Reply-To: <20240523171750.2837331-1-robh@kernel.org>
+To: Rob Herring (Arm) <robh@kernel.org>
+Cc: o.rempel@pengutronix.de, kory.maincent@bootlin.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, krzk+dt@kernel.org,
+ conor+dt@kernel.org, andrew@lunn.ch, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, 17 May 2024 10:39:22 +0800 Chen Ni wrote:
-> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> index cae46290a7ae..f9b8956a8726 100644
-> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> @@ -4957,7 +4957,7 @@ static int mtk_probe(struct platform_device *pdev)
->  
->  			eth->ppe[i] = mtk_ppe_init(eth, eth->base + ppe_addr, i);
->  
-> -			if (!eth->ppe[i]) {
-> +			if (IS_ERR_OR_NULL(eth->ppe[i])) {
->  				err = -ENOMEM;
+Hello:
 
-You still discard the real error here.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
->  				goto err_deinit_ppe;
->  			}
-> diff --git a/drivers/net/ethernet/mediatek/mtk_ppe.c b/drivers/net/ethernet/mediatek/mtk_ppe.c
-> index 0acee405a749..4895c6febaf8 100644
-> --- a/drivers/net/ethernet/mediatek/mtk_ppe.c
-> +++ b/drivers/net/ethernet/mediatek/mtk_ppe.c
-> @@ -884,12 +884,15 @@ struct mtk_ppe *mtk_ppe_init(struct mtk_eth *eth, void __iomem *base, int index)
->  	struct mtk_ppe *ppe;
->  	u32 foe_flow_size;
->  	void *foe;
-> +	int ret;
->  
->  	ppe = devm_kzalloc(dev, sizeof(*ppe), GFP_KERNEL);
->  	if (!ppe)
->  		return NULL;
+On Thu, 23 May 2024 12:17:50 -0500 you wrote:
+> The child nodes are missing "additionalProperties" constraints which
+> means any undocumented properties or child nodes are allowed. Add the
+> constraints and all the undocumented properties exposed by the fix.
+> 
+> Fixes: f562202fedad ("dt-bindings: net: pse-pd: Add bindings for TPS23881 PSE controller")
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> 
+> [...]
 
-Please convert the return NULL in this function to 
-return ERR_PTR(-ENOMEM) and use the error code in mtk_probe()
+Here is the summary with links:
+  - [net] dt-bindings: net: pse-pd: ti,tps23881: Fix missing "additionalProperties" constraints
+    https://git.kernel.org/netdev/net/c/12f86b9af96a
 
-> -	rhashtable_init(&ppe->l2_flows, &mtk_flow_l2_ht_params);
-> +	ret = rhashtable_init(&ppe->l2_flows, &mtk_flow_l2_ht_params);
-> +	if (ret)
-> +		return ERR_PTR(ret);
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Also there are two direct return NULLs without calling rhashtable_destroy()
-later in this function. Please fix that in a separate patch.
 
->  	/* need to allocate a separate device, since it PPE DMA access is
->  	 * not coherent.
 
