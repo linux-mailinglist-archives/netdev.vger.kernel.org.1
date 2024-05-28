@@ -1,227 +1,314 @@
-Return-Path: <netdev+bounces-98428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 356148D1649
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 10:33:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD4BB8D1654
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 10:34:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 582151C21D68
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 08:33:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44EC0B2324F
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 08:34:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58022E3E5;
-	Tue, 28 May 2024 08:33:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A86761FE6;
+	Tue, 28 May 2024 08:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="s99MCZ+D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bgTU6VOY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BAB217E8FB
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 08:33:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716885181; cv=fail; b=dw8O28FC7eSFJjbM8udAai3uk8Lw1leuTWdALLQN/4RZkC0OdLufFBFZyFS7EfcNuEb2onlGz2QrCCPNLZ5yqYxhxzxKqmiGg/7diRO0PaIEBcBAyn1ZS4maJgks1ImanuMk2oORQMxYnu+FqHq6GcmCc/wc0kh6O6nQJ2QpkCo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716885181; c=relaxed/simple;
-	bh=ohwh5ah9sXF6G8l/ewzsguL64O9UktK3C/H7RhdhdAE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Jz2zWayNOsJeoPbnJSV5JHoVOr4qkXnk3eIbE1R5xP2rjZTdEvY2z9uLgxx1usmlYg7TfmNsyTQLc0307vQSxDc9Z43iwcdMVyayvW462qTffBexEqHINnGEtDO8sry/Kv+pWb/TI9YLLOSrm/3hN+piuGyG1mozplL8D5Qc8QM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=s99MCZ+D; arc=fail smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44RMxVNK001836;
-	Tue, 28 May 2024 01:32:43 -0700
-Received: from nam02-bn1-obe.outbound.protection.outlook.com (mail-bn1nam02lp2040.outbound.protection.outlook.com [104.47.51.40])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3ycqpym1tx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 May 2024 01:32:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HPrbwz77GmOhcZcMBxyf24GC97G8WCg/UIgVgXfCjusydb12gFXGZCDs+A4C2ok6JjC5qlJl3znt2YE3nbkhKZy01DIKM7b0AlwMh27nuH8i72f62wbcCFnnaTWbEBYvV0JNQxKAocsThNw7+V/LfDEtCTOtjDPxQf0XeymjaqDCkz+ECOJZ08kbQM6ZkWBtCkRrKQbId7+T4N7tzvdVDa3vnQCDd2oEYFvV5ev/ZtzUxgZw/z33QXbN3sBZJ6bK9Nnu03sueBPOOAAnSsrw4Er5Ipyhcbu6e02L/X9VfpdDZ2sMP6iXxYNVs6PIl9JSEUpyAvevLptYdyvfK4DF/w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rfut32F1bUoqc9MI6NbaYewQQ3AkmSWMa4bERrb6ZS8=;
- b=iUa4Dm8l8DBC13O5yosJi005PtU+hoCfj/+fRuTMo83dfoK+7Q2w31RmqjQvHjxOpL4cypO1eRn3sEdtexyA3pUl+VEJmFkYJqGRJz9QdXauiVXSoYdRtE1Sik4hi5dXBhHXKLCLAFKA72azgjzyb64z8rv8ZjylPP95w+oPWn0QHLJfwIwtBQu1pG/HuhjJbub4cDRPn+zmFKFsA7/S5wekW6T0LANAvyERN6QADSNcPOugcq/THNm1jIpS4PvdkM7LwVqyAVuQhdHAQKe3kZVZu/pxdmqYpz8TZKz6fvJybgiVm47xqH8LFnWY9c8zifskyVYOoJ1rrYWzOT1OhQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rfut32F1bUoqc9MI6NbaYewQQ3AkmSWMa4bERrb6ZS8=;
- b=s99MCZ+DnhsR5zNoRXh2enyKFi92OgS9NCr4QnPvB3vHpVkRI5FZBv7Hmmv3vrCcWBjQQzkCQknDnApL1Wfbr2pH4h/7655fdnasmYZiuQRUzwMds8bpsDRkDHmJkbONGzn2tZneTCM2dSsljPenGA2O3cgrQVSX+0rqN0BrOcg=
-Received: from PH0PR18MB4474.namprd18.prod.outlook.com (2603:10b6:510:ea::22)
- by MW4PR18MB5232.namprd18.prod.outlook.com (2603:10b6:303:1b6::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.30; Tue, 28 May
- 2024 08:32:40 +0000
-Received: from PH0PR18MB4474.namprd18.prod.outlook.com
- ([fe80::eeed:4f:2561:f916]) by PH0PR18MB4474.namprd18.prod.outlook.com
- ([fe80::eeed:4f:2561:f916%5]) with mapi id 15.20.7452.049; Tue, 28 May 2024
- 08:32:39 +0000
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: Heng Qi <hengqi@linux.alibaba.com>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "virtualization@lists.linux.dev"
-	<virtualization@lists.linux.dev>
-CC: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-        =?iso-8859-1?Q?Eugenio_P=E9rez?=
-	<eperezma@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
-        Daniel Jurgens
-	<danielj@nvidia.com>
-Subject: [PATCH net 2/2] virtio_net: fix missing lock protection on
- control_buf access
-Thread-Topic: [PATCH net 2/2] virtio_net: fix missing lock protection on
- control_buf access
-Thread-Index: AQHasNmZaBBL5V2Fu0GzqSyJI9Fung==
-Date: Tue, 28 May 2024 08:32:39 +0000
-Message-ID: 
- <PH0PR18MB4474628EC0E1A9A4FAA4E59EDEF12@PH0PR18MB4474.namprd18.prod.outlook.com>
-References: <20240528075226.94255-1-hengqi@linux.alibaba.com>
- <20240528075226.94255-3-hengqi@linux.alibaba.com>
-In-Reply-To: <20240528075226.94255-3-hengqi@linux.alibaba.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR18MB4474:EE_|MW4PR18MB5232:EE_
-x-ms-office365-filtering-correlation-id: 3544b29e-502a-4b74-a9ca-08dc7ef0bc2c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: 
- BCL:0;ARA:13230031|366007|376005|7416005|1800799015|38070700009;
-x-microsoft-antispam-message-info: 
- =?iso-8859-1?Q?tWUk5jV+lQsNHoIbSS3XCDMyRIw0lKJEsbdQIPyhwtJO83AF5K2JYDUlsg?=
- =?iso-8859-1?Q?X38+BYxA78O0ywi9qMn/a8mYtz0Lko19dRA2xWO7H6L+v54Oyxfi6muODr?=
- =?iso-8859-1?Q?HGEBW5CMEhmesL78cUCcC1X45og6vogVTJaLQ1VGwukp3tiJLKH96eyvag?=
- =?iso-8859-1?Q?x0Cas6N0CTGEw6rV2/P4aZCYL7gVEjj0jjoQ3jZtKizn2uJduOjZYcdKGk?=
- =?iso-8859-1?Q?k93ZfoTvs5homyolvFskozrahRHt/DfCZeDjaJo6U5zvI92F7wtpQVCibs?=
- =?iso-8859-1?Q?ZwWS74b7XsXh6BsGTylpMmX2LfyL3OVKGYUWQqhKXK1pqXWoXZmChP2y0C?=
- =?iso-8859-1?Q?fH6iUmlJGODyGuIs8Xq6INfzfHuhIHjfR7h9+/ftO2pEOAorGhKtWY5+qJ?=
- =?iso-8859-1?Q?DLbZQxHcex0ml/DAsa4dYWyEMoHIVnDveqc23df/ZDDkqzVLLLLV+NTGpg?=
- =?iso-8859-1?Q?j3fmF+w16EbfLvgWk7n9YiFLhRJMOZFsGL/J9P2zsbUOgkPHapP90PvhuX?=
- =?iso-8859-1?Q?O/PPM/ChPrIHp+E/diEOs3+/YH0tpHJGUr4iQrUDYAhE6D/GlS7foJAHW0?=
- =?iso-8859-1?Q?8SWs5SoIpLB3Jg55qBgrcrDXRupFIhXcVu7E/SJdIieSOCNM60dIKh/E6T?=
- =?iso-8859-1?Q?Vsc9QfxBSPRTEI4zqOgA19kkWyWzppnxfVgnRhFe9WZ1cWQibJw+K6SQO6?=
- =?iso-8859-1?Q?o7AxiJUhv9LWeSOP12+PcqtXFEsZzPpW7Cj5vbgXb3lFfg3sClvQVBP4Mt?=
- =?iso-8859-1?Q?Kyt5iu7yXNENIRu+hRuHU61tfhHBRBq6ISV51GfAVrtRoqGzWZW4obokho?=
- =?iso-8859-1?Q?/c/6cOAYvUZtXf3NnFbpnAFfJhJa1DSyxy903biDJsd3cy/Vla50lbZMxy?=
- =?iso-8859-1?Q?HvwIX8KmpfLG5Bo1K8KNaoDIyN6tV2PyW/QyNLbQFX9AARZ+TTW39l0Qf5?=
- =?iso-8859-1?Q?Lwxt1Poxci7YDotnnYE10PGOwCmDDAkf8PXNKi6m+SXlGwktkejd4aY6FH?=
- =?iso-8859-1?Q?uxUgMXLCGLIxrCk7t5l97MZNGoUQevLjtkivx7l1AcfhE1axqf/Ma2vXy3?=
- =?iso-8859-1?Q?waV/lzEEQv4idQmx3C8h7I5YHlpEoGyEmHIUEQtSycPFEb9mS4OqpElAk7?=
- =?iso-8859-1?Q?eyFuCqOFVp5VRpApNHN4rFz5zQl5KouJDVe+nKY+3ZBEYvRaZ2k2SZjaEX?=
- =?iso-8859-1?Q?67nOn1yOaVZVUFcUl7GYLdfMzonz+rKYZbgrvO6xNgrY9OgxJx1pNuAU6h?=
- =?iso-8859-1?Q?tG3un9Ks30xG6v/XI4EtvFCGUpdRPsAgMm5HCQNlqK4ZFjdEzgwgGojsmL?=
- =?iso-8859-1?Q?Lo1wxl29NYNo3iktQouAWuRNbCwEUrtOU4lP+RT3Sukg08OutH9/XahnY1?=
- =?iso-8859-1?Q?irn334UzZ9mrDbRET/jPXeWiYJrOCXvQ=3D=3D?=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4474.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(7416005)(1800799015)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?iso-8859-1?Q?Qmv883b5o2FlcdKNrLxsLrjRVW3MSF20jNkNHqyq9Pzd5o1+GVNtY9vo7q?=
- =?iso-8859-1?Q?7G05vxwdlymjIFJq0PWWkCU/VjOJCA4N6FDVacbTJjzuHWekQGCSJS3mf0?=
- =?iso-8859-1?Q?01ZhSsCajTfUchfEDJozq9V6CIuAb1b3TllhPc+Amljao86U6lOeXNqnz9?=
- =?iso-8859-1?Q?WsuQzt2LbJK9/GXZT8Gu65GpWej7UEg2gIGx6NP4qrnwBDfJdKEVj7pLhf?=
- =?iso-8859-1?Q?ER848r7PXAqIJrEIvo46kxyS1NmOC9CBxfd8I5EPxzujmbEyua+J3tLu7q?=
- =?iso-8859-1?Q?STSH2+m/Sz/UOjFWuzUGOWgZXRqx0D6LUDO7xxcmKhxCIoo5UYngB+cWF6?=
- =?iso-8859-1?Q?rLwLG0ADklDptZokZ/oUVxyoHH0PErz2eQwAKuhKzvJzVyDE3a8Ogt98RF?=
- =?iso-8859-1?Q?Y1Lo1VQqnuf0WKkszua6dOXvCvMXJ5oW3bxT4+Ql03c/b1j0cdETMed1CP?=
- =?iso-8859-1?Q?c+x7BmtlJBOoLN/LXHwZ9mtTmoAF1vREnk28zn7G2l2rU/jZrqlFmnFEaQ?=
- =?iso-8859-1?Q?IkTFfKoZl+f7b7S5+TdAeKwgzhevQbhRL0DL5CbyR4LhjI9wQQeQmlh4JM?=
- =?iso-8859-1?Q?dySZU4dhW73ctYgodfvzOyBxI1UXYN87jBKCENi7rXqZNSXDSdt/UvEkQQ?=
- =?iso-8859-1?Q?V2/IpDKgZaR6W6U2wAe5jwrhY9qnohAnNbRS3RC7CeNEmXNXfriSWDI6ar?=
- =?iso-8859-1?Q?2PY7QjOa5LUTlCoCh1DGYtA27hVoVnQUjxP8cuKgM8sgXwpvau/NMD4rLA?=
- =?iso-8859-1?Q?YKDy9dxOjQ88wdnSMGiDc/+j9myU9gKkgqHFwscyXlZKz+Fc0YdbDtluJN?=
- =?iso-8859-1?Q?ovZi5UVWR0os8UYT2LexwwGIZSRDU2zw2x8tN6cY636dueYDvaAJO1WXYu?=
- =?iso-8859-1?Q?2Gy7ARntvIRt6WTd1FrIvpKNWTF1idvu9Vw5Ppn1b4w8UoY3tR0grVnxhL?=
- =?iso-8859-1?Q?OMKr8+aRyTPapxlnq0ldbV7XywUDDQA97js6RgfVMOF9P3teqph8PfAL6Z?=
- =?iso-8859-1?Q?wL5FOnYwyF+jHjkn32vNkqhik8e++NDiCC928e8Yx8LccrvG61E7iXxjOc?=
- =?iso-8859-1?Q?GxuoER4sY4UV5epHmLHMQClQrHfUhtqC/lVVobs97SAFIofoitWi59cC7m?=
- =?iso-8859-1?Q?KE3ayDS/5/D3r+DfKJCc4nhUOYvEN9HpjQIuizd1nRJn6vJdf6dmb8sM/5?=
- =?iso-8859-1?Q?eIp8MvVxvcFrp6XEs1kPBqrfmSRoRwCDWhio+cCl0pPs6CjmR47GhzD/hN?=
- =?iso-8859-1?Q?sz9Kq0ixeAM+ays9qIucSXznqDHKhU0b6klXKC2GWLMEK0hFYXJJJkNMQO?=
- =?iso-8859-1?Q?Bpn/Y+42PVodNoj2daRWTxI65WRPcnktzgzK4VWm/ozgENLJw/cWhWrBWa?=
- =?iso-8859-1?Q?efDsvk0Kh3JdeaY0PI02/VwI3pQ34MBerg4ty1kh/GF+lsz0slgZENlKE8?=
- =?iso-8859-1?Q?2V1WxoVL+lu/0G85pGBa4079CkorsPdumwMN8ABxMIC5NSLXtMghXtF6zX?=
- =?iso-8859-1?Q?5uECcf5kvn4DVjlJJTE4NWkb/C5A34GbOQzNOfmsoT8FnyT98TW35yIKds?=
- =?iso-8859-1?Q?ec9EHdSdk6Lha3uzqA1C1Keb2L2KuyDgrTTN3Zc3KiiTNAwx0U21CU0ngb?=
- =?iso-8859-1?Q?5H84gnnpNkyJs=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9199A6EB64
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 08:34:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716885287; cv=none; b=CU5Mk9ZzfM91T7jE+ZqS7K3+3IVM82zyrV/q3Of88aVzjxZl+E763O+K3RSZWxQjSXzgr+jLIZNivEy8N0rIg9iqWtbbwywzsxq4JZo9diasEI1vt8S+1PuXFfWZj6BqBni7EjTS5v4c6OKsbmspKRLCdbBrGFFDOPKlAtRgsOU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716885287; c=relaxed/simple;
+	bh=q9eEZSPGNmGn7FdG4B9iOtpUZAgzD7O2Yh+xU1WYfYA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o6IWKl5D+yVOJ0BW5s8WboILNj0HahibpmCb+7Qoea5oK/zkxKBlSitaI1K15nGePvFnyTOLvR3RXd1QU1ykOgqjFk+qcW/5jr9TL8/FkGK2vmq38u1U+R4tr4QXPxEaVmdJrkZhniL9/oZxP7RTTEHNmn9nESnBZCY5WOIGjjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bgTU6VOY; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a626777f74eso64927666b.3
+        for <netdev@vger.kernel.org>; Tue, 28 May 2024 01:34:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716885284; x=1717490084; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cU7QsruyoFno25bdI/sc+T4+/uF8tCDflsgKNhyrsZU=;
+        b=bgTU6VOYFZSnCVo/dEsQ1Ja4+4yVEXaIy65mya9PRkjy5WK8tu2K8B4Ery5TEaVt+c
+         xUjlOX1oSC6FnxEvc0Vl+lxzz0umoZDTHVkZtZ3tNjPXZAHXMLin9/OhRgxczpdQQaAK
+         aJEEaJ8QY27cOQuY9Z6ky6Xfs5LtZjyCx3wQRnr3Ly+ydz+7GtML7BaSGOBROrD1lcPP
+         MiO7g8PXeePlHu2VjFF3238Ib8o6S6ktHWN+GIENH4TRW1rfiL5/rPnFJKaXFQNgqto/
+         b/V/IQxowY8qhSRyvsts6i83bwPzJ98268LKFwp/k+2GEExvVfH4z3RnwXTs0LWPeKc6
+         MP4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716885284; x=1717490084;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cU7QsruyoFno25bdI/sc+T4+/uF8tCDflsgKNhyrsZU=;
+        b=suKZ9aVEMQuNRTOfIMVlqMakIiTnSC87ZppaBpvl1elDEBh8dm1w7ZB3XyZeltblDw
+         qmrDMvDe5sSX9N0Grk10O72+p3SmW4Bv1WgUCDQgD9Sl14EZ1VYhvvkIy4mEpFcUd1Yx
+         UDOOYW3JVZ7lfgBRCPPnmuZ24StuAsl2dEENp7m4OCTldSYEvm0XdSJdLRtKjbqQt56x
+         P142pP0gz/+5gK+WORQvLki16hLQaNufSepM2QfOufObonnylfbDX+rFEGG6rcjiVqsT
+         XQ4e1+Pfky78yEWivTo1k3lrZHWW7p4WBOaSmyD1EQGMj85CHsM2HleeBbAco3gYoH1r
+         wCGA==
+X-Forwarded-Encrypted: i=1; AJvYcCWsSMeov6qOME6XWfvrC51zzdKCYDKvCXzFAw5++1t6UbBQ8NuaL/bB5d5ycCOzsMdypAndUkj3Ca23lpe1NMiRG42htvQz
+X-Gm-Message-State: AOJu0YynXwfuWtPfCLi9hlAk78947BoEWE6/7YLZ+XthEhicXU5T9MLG
+	37w7wNAwob7C4vAl0BTVZtBFbouY0uUesuM1/914YqgJocEEh8okhFViPGLv1D9qTToMVG9i7gW
+	GFxAO5a3upipaSGDqa0/lUp18deBOMsRR
+X-Google-Smtp-Source: AGHT+IEsPLrFhJLYN39qQIpJfo74Gm82+ZbvGRc1RnFp+C1FM1g+NlF6QJKgtS3So0abOF7FV/Pc8tJCMn1GDN1fGE0=
+X-Received: by 2002:a17:906:3095:b0:a59:d527:4339 with SMTP id
+ a640c23a62f3a-a62635a3d8bmr1096978866b.0.1716885283649; Tue, 28 May 2024
+ 01:34:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4474.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3544b29e-502a-4b74-a9ca-08dc7ef0bc2c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 May 2024 08:32:39.3909
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: SF0dLrcvt2LSkMjsZ7SIE7ojj9SV+d09xrIsNwnbjIw0oqKVGpbGVQBH3S2Eg7KXzMb5MEOg0CcDZd9A2NxTcw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR18MB5232
-X-Proofpoint-GUID: xQnfZtKBGQlwVejPibco18SOVkjR1P0m
-X-Proofpoint-ORIG-GUID: xQnfZtKBGQlwVejPibco18SOVkjR1P0m
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-28_05,2024-05-27_01,2024-05-17_01
+References: <20240528021149.6186-1-kerneljasonxing@gmail.com>
+ <CANn89iJQWj75y+QpLGQKZ6jBgSgpi0ZtPf4830O8S0Ld2PpqEg@mail.gmail.com>
+ <CAL+tcoCSJrZPvNCW28UWb4HoB905EJpDzovst6oQu-f0JKdhxA@mail.gmail.com> <CANn89i+zbXNOJtxJjMDVKEFt2LnjSW9xGG71bMBRc_YimuqKLA@mail.gmail.com>
+In-Reply-To: <CANn89i+zbXNOJtxJjMDVKEFt2LnjSW9xGG71bMBRc_YimuqKLA@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 28 May 2024 16:34:06 +0800
+Message-ID: <CAL+tcoAO2aqoGLV7ixL=M-Fi7GU6juD-RQhtn7YASoe5_tjxZw@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: introduce a new MIB for CLOSE-WAIT sockets
+To: Eric Dumazet <edumazet@google.com>
+Cc: dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	davem@davemloft.net, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, Yongming Liu <yomiliu@tencent.com>, 
+	Wangzi Yong <curuwang@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, May 28, 2024 at 3:36=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Tue, May 28, 2024 at 8:48=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > Hello Eric,
+> >
+> > On Tue, May 28, 2024 at 1:13=E2=80=AFPM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > On Tue, May 28, 2024 at 4:12=E2=80=AFAM Jason Xing <kerneljasonxing@g=
+mail.com> wrote:
+> > > >
+> > > > From: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > CLOSE-WAIT is a relatively special state which "represents waiting =
+for
+> > > > a connection termination request from the local user" (RFC 793). So=
+me
+> > > > issues may happen because of unexpected/too many CLOSE-WAIT sockets=
+,
+> > > > like user application mistakenly handling close() syscall.
+> > > >
+> > > > We want to trace this total number of CLOSE-WAIT sockets fastly and
+> > > > frequently instead of resorting to displaying them altogether by us=
+ing:
+> > > >
+> > > >   netstat -anlp | grep CLOSE_WAIT
+> > >
+> > > This is horribly expensive.
+> >
+> > Yes.
+> >
+> > > Why asking af_unix and program names ?
+> > > You want to count some TCP sockets in a given state, right ?
+> > > iproute2 interface (inet_diag) can do the filtering in the kernel,
+> > > saving a lot of cycles.
+> > >
+> > > ss -t state close-wait
+> >
+> > Indeed, it is much better than netstat but not that good/fast enough
+> > if we've already generated a lot of sockets. This command is suitable
+> > for debug use, but not for frequent sampling, say, every 10 seconds.
+> > More than this, RFC 1213 defines CurrEstab which should also include
+> > close-wait sockets, but we don't have this one.
+>
+> "we don't have this one."
+> You mean we do not have CurrEstab ?
+> That might be user space decision to not display it from nstat
+> command, in useless_number()
+> (Not sure why. If someone thought it was useless, then CLOSE_WAIT
+> count is even more useless...)
 
+It has nothing to do with user applications.
 
-> Refactored the handling of control_buf to be within the cvq_lock critical
-> section, mitigating race conditions between reading device responses and
-> new command submissions.
->=20
-> Fixes: 6f45ab3e0409 ("virtio_net: Add a lock for the command VQ.")
-> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-> ---
->  drivers/net/virtio_net.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c index
-> 6b0512a628e0..3d8407d9e3d2 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2686,6 +2686,7 @@ static bool virtnet_send_command_reply(struct
-> virtnet_info *vi, u8 class, u8 cmd  {
->  	struct scatterlist *sgs[5], hdr, stat;
->  	u32 out_num =3D 0, tmp, in_num =3D 0;
-> +	bool ret;
->  	int err;
->=20
->  	/* Caller should know better */
-> @@ -2731,8 +2732,9 @@ static bool virtnet_send_command_reply(struct
-> virtnet_info *vi, u8 class, u8 cmd
->  	}
->=20
->  unlock:
-> +	ret =3D vi->ctrl->status =3D=3D VIRTIO_NET_OK;
->  	mutex_unlock(&vi->cvq_lock);
-> -	return vi->ctrl->status =3D=3D VIRTIO_NET_OK;
-> +	return ret;
->  }
->=20
->  static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 c=
-md,
-> --
-> 2.32.0.3.g01195cf9f
->=20
-Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
+Let me give one example, ss -s can show the value of 'estab' which is
+derived from /proc/net/snmp file.
+
+What the corresponding CurrEstab implemented in the kernel is only
+counting established sockets not including close-wait sockets in
+tcp_set_state().
+
+The reason why it does not count close-wait sockets like RFC says is unknow=
+n.
+
+>
+> > I have no intention to
+> > change the CurrEstab in Linux because it has been used for a really
+> > long time. So I chose to introduce a new counter in linux mib
+> > definitions.
+> >
+> > >
+> > > >
+> > > > or something like this, which does harm to the performance especial=
+ly in
+> > > > heavy load. That's the reason why I chose to introduce this new MIB=
+ counter
+> > > > like CurrEstab does. It do help us diagnose/find issues in producti=
+on.
+> > > >
+> > > > Besides, in the group of TCP_MIB_* defined by RFC 1213, TCP_MIB_CUR=
+RESTAB
+> > > > should include both ESTABLISHED and CLOSE-WAIT sockets in theory:
+> > > >
+> > > >   "tcpCurrEstab OBJECT-TYPE
+> > > >    ...
+> > > >    The number of TCP connections for which the current state
+> > > >    is either ESTABLISHED or CLOSE- WAIT."
+> > > >
+> > > > Apparently, at least since 2005, we don't count CLOSE-WAIT sockets.=
+ I think
+> > > > there is a need to count it separately to avoid polluting the exist=
+ing
+> > > > TCP_MIB_CURRESTAB counter.
+> > > >
+> > > > After this patch, we can see the counter by running 'cat /proc/net/=
+netstat'
+> > > > or 'nstat -s | grep CloseWait'
+> > >
+> > > I find this counter quite not interesting.
+> > > After a few days of uptime, let say it is 52904523
+> > > What can you make of this value exactly ?
+> > > How do you make any correlation ?
+> >
+> > There are two ways of implementing this counter:
+> > 1) like the counters in 'linux mib definitions', we have to 'diff' the
+> > counter then we can know how many close-wait sockets generated in a
+> > certain period.
+>
+> And what do you make of this raw information ?
+>
+> if it is 10000 or 20000 in a 10-second period, what conclusion do you get=
+ ?
+
+Some buggy/stupid user applications cannot handle taking care of
+finishing a socket (by using close()), which is a very classic and
+common problem in production. If it happens, many weird things could
+happen.
+
+If we cannot reproduce the issue easily, we have to trace the monitor
+history that collects the close-wait sockets in history.
+
+With this counter implemented, we can record/observe the normal
+changes of this counter all the time. It can help us:
+1) We are able to know in advance if the counter changes drastically.
+2) If some users report some issues happening, we will particularly
+pay more attention to it.
+
+>
+> Receiving FIN packets is a fact of life, I see no reason to worry.
+>
+> > 2) like what CurrEstab does, then we have to introduce a new helper
+> > (for example, NET_DEC_STATS) to decrement the counter if the state of
+> > the close-wait socket changes in tcp_set_state().
+> >
+> > After thinking more about your question, the latter is better because
+> > it can easily reflect the current situation, right? What do you think?
+>
+> I think you are sending not tested patches.
+
+No.
+
+Honestly, what I've done in our private kernel is different from this patch=
+:
+I added a new counter in 'tcp mib definitions' (see diff patch [1]).
+You know, it is not good to submit such a patch to the kernel
+community because 'tcp mib definitions' enjoys a long history and not
+touched more than 10 years. If I do so, I can imagine you might
+question/challenge me. I can picture it. :(
+
+Then I decided to re-implement it in 'linux mib definitions'. This
+file is touched in these years.
+
+[1]:
+diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
+index adf5fd78dd50..27beab1002ce 100644
+--- a/include/uapi/linux/snmp.h
++++ b/include/uapi/linux/snmp.h
+@@ -144,6 +144,7 @@ enum
+  TCP_MIB_INERRS, /* InErrs */
+  TCP_MIB_OUTRSTS, /* OutRsts */
+  TCP_MIB_CSUMERRORS, /* InCsumErrors */
++ TCP_MIB_CURRCLOSEWAIT, /* CurrCloseWait */
+  __TCP_MIB_MAX
+ };
+
+diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
+index 6c4664c681ca..5d2a175a6d35 100644
+--- a/net/ipv4/proc.c
++++ b/net/ipv4/proc.c
+@@ -157,6 +157,7 @@ static const struct snmp_mib snmp4_tcp_list[] =3D {
+  SNMP_MIB_ITEM("InErrs", TCP_MIB_INERRS),
+  SNMP_MIB_ITEM("OutRsts", TCP_MIB_OUTRSTS),
+  SNMP_MIB_ITEM("InCsumErrors", TCP_MIB_CSUMERRORS),
++ SNMP_MIB_ITEM("CurrCloseWait", TCP_MIB_CURRCLOSEWAIT),
+  SNMP_MIB_SENTINEL
+ };
+
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 681b54e1f3a6..f1bbbd477cda 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -2659,6 +2659,10 @@ void tcp_set_state(struct sock *sk, int state)
+  default:
+  if (oldstate =3D=3D TCP_ESTABLISHED)
+  TCP_DEC_STATS(sock_net(sk), TCP_MIB_CURRESTAB);
++ if (state =3D=3D TCP_CLOSE_WAIT)
++ TCP_INC_STATS(sock_net(sk), TCP_MIB_CURRCLOSEWAIT);
++ if (oldstate =3D=3D TCP_CLOSE_WAIT)
++ TCP_DEC_STATS(sock_net(sk), TCP_MIB_CURRCLOSEWAIT);
+  }
+
+  /* Change state AFTER socket is unhashed to avoid closed
+--
+2.37.3
+
+>
+> I suggest you use your patches first, and send tests so that we can all s=
+ee
+> the intent, how this is supposed to work in the first place.
+
+This patch is not proposed out of thin air.
+
+Normally, we have two kinds of issue/bug reports:
+1) we can easily reproduce, so the issue can be easily diagnosed.
+2) It happens in history, say, last night, which cannot be traced
+easily. We have to implement a monitor or an agent to know what
+happened last night. What I'm doing is like this.
+
+A few years ago, I worked at another company and cooperated with some
+guys in Google. We all find it is hard to get to the root cause of
+this kind of issue (like spike) as above, so the only thing we can do
+is to trace/record more useful information which helps us narrow down
+the issue. I'm just saying. It's not effortless to deal with all kinds
+of possible issues daily.
+
+And finishing the work of counting close-wait sockets according to RFC
+is one of reasons but not that important.
+
+Thanks for your patience and review and suggestions :)
+
+Thanks,
+Jason
 
