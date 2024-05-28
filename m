@@ -1,114 +1,121 @@
-Return-Path: <netdev+bounces-98530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CE138D1AEB
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 14:17:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 066D48D1AFB
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 14:20:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB0EF1F23EB0
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 12:17:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B523D282441
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 12:20:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1050E16D324;
-	Tue, 28 May 2024 12:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEB316D313;
+	Tue, 28 May 2024 12:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l+Gr6dzq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DUJcofve"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29A079F5
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 12:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 320FE79F5;
+	Tue, 28 May 2024 12:20:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716898666; cv=none; b=rWewepo3crqBHIQjiBiJ7ZP5jAajQsqxeVeGJy2ZN6K/lYKlVewZImIJhmi77FB3qk7Ow94wlGZ6BRjuMU8PayNWyVYdpQAyihdt6mMpV886vfo6+zW4DhqJHhnB5/sZ7k1g8uJKm2BFXxlyvqobjOS+UpcYxIVvnf9sggHY/cs=
+	t=1716898815; cv=none; b=NKn84Ybn3Y5vh63LtQ73uPdUHzWqUqkl1Q718U+e9sEJZwGGifDHdydOpALLis2nobYUQZxsk4zYo6MneM956koqZ2Th0UHTDtyXPfB2p8DfID4Quj1KwqLO59B0uCfe0OgenJSOa52DxGxQ3/pvGm8RwWKr+P+5R5vmK2k9iRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716898666; c=relaxed/simple;
-	bh=PI3B8JAnrwoddvWTVgBZJ1muYwpegH+idzo35ur6rg8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YNdxxEcq05+u8o5+hv2HrvlJ8NRE62o6SnSmlQXx9+9fh+oJWFLkDA8NYMlaiKQNpPx3l4bxf9hZ/be6RIEs55Ke18+0Bd+VyDWISLDOLMa8O643RlxFdypHiP0mxiW/TcU98iMMhVlVfGeSkP2jucEqyUgwtstO8V9fIeAsVt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=l+Gr6dzq; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-df7c1a7d745so595876276.1
-        for <netdev@vger.kernel.org>; Tue, 28 May 2024 05:17:43 -0700 (PDT)
+	s=arc-20240116; t=1716898815; c=relaxed/simple;
+	bh=L3WhHmiorW7MFOt+LyYCXDut/bcUzwlL0rlxJZmGid8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dMqlrXUfHYqWUuWHDFSrTc/r+iWDX0bjYwZ0DMlhTQSgQI7uWkbBORnBEoanGReIj1YoPBW/IxaosfNxRbKoiTKF5OO4zftsYZ7wD33fReslsOXZ+ADgFsf+HPoF2F+qFnhGZVGx7UIxMAn1H/lOzaaLoo8i79K4yt1u9xxLhbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DUJcofve; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-529be98ad96so484665e87.0;
+        Tue, 28 May 2024 05:20:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1716898663; x=1717503463; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PI3B8JAnrwoddvWTVgBZJ1muYwpegH+idzo35ur6rg8=;
-        b=l+Gr6dzq/bhxV/uSJAjMJihPC4VabgY9kkj6okgApPO7VzWqctC1UEatWd71WkADy6
-         djmWNOG0jKx80T280ePL4kQlazXZSiq5M7hxfVPbQna5SsVqpXM0ZVcWe9gm7P/5wnMC
-         4v92C1Manb5o/a3G5EGJ1orQWin6np0anfo8BPHzim/a9KmrYLsRkJaqg+3MPsIvVY5+
-         f77nlQodTqqdL17VZ+4V2dMakE+IW8dmXZeYM3BcUre5Rf/aTs1EVTXapGtnJX9qPori
-         FlZ15hUPStDv5V1MesXTL9xVYjHT3R5ZzI2OX/xYw0XJ6xHwTEv87G9dB5t1fAc7EE38
-         alRA==
+        d=gmail.com; s=20230601; t=1716898812; x=1717503612; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BPKynHoA1RZiJcMOYXRI1Hw3OSBgUrOAHrq/dZgZeTk=;
+        b=DUJcofve7x1gVYa7W5Yq8u1PbsxQYicZOxlefmMP9EYneGDCb3i4bQzdRQCjQBNxAV
+         vtsEUODP36nQqRgQGb6S8uPK89bkKemasPVxXDOTLYrRpxFI3TKmG7xxfp9r5USGVPtw
+         3DYFNshfhCGWFqfZAjqkQnPlJ5pcTzvq9psrcXgxtiMj4j2dn6oznn2KkHvXAq1eVKCs
+         z8THXV7KNwPlSJSsWzp84nqN2BelvFqSJKsvILTvZwWqYOLlHpcUsLzLa6Dx2rcWG2zN
+         oztXuiuLm0nP49LsFntDBS6+z8bd6sxpJTF9NwOTY7C2cVaWBXURPJdRXkog4Qf+KeNj
+         hi9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716898663; x=1717503463;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PI3B8JAnrwoddvWTVgBZJ1muYwpegH+idzo35ur6rg8=;
-        b=BxsS3GZOTlfHvB5UAtmRmvQX5+RCbM6V1IGSfy7WT21EkhPhoQEP19cP/kREVGmw2E
-         jsA1dH4Yt9cXavdnpx26RgZ2v6ZXj+4o/nQelp/wh8jPFq0CmSJ21wHro30ZC1DGexZg
-         Um0w2NvqXLY+SDVq2XqveHMbomiUkWYHU/kr5ZuWge1yXgelm4MXzXjtaq+631WpCkZV
-         8lIZBY2Bgzhs1h5vM754aauV1aVPXrWsJ4SBVpoFlWDeTwvshBM7QwquarZ39BUpMNl8
-         PFBYrshAxFmt+2qQAX2bZ9lFqxW7lxurHJ7Ssnd7gO0Q+SKmZez2gWQqqOlgue+eAT4J
-         +WOA==
-X-Forwarded-Encrypted: i=1; AJvYcCUkur1PFnifLRzJq1t8Que2XjMUag9qSsx7JrHC02Tgo6krjkvRdI8oEW/EecvIBTIk/fKnmsJblGXEXVIJ57WMIZiF67S5
-X-Gm-Message-State: AOJu0YwaLo379P0o63puwDjHvIU0DRlUTERSHVidQS3N4O0mCSeBIwvz
-	zt0t4UOy5kaf89inikTFVNMTiEmk61skyRmtel96OUleKWYbzsTCh9KXcjo8yp3YMH4JiiBUYvx
-	QoRnY5hkT6JF2E+EeB3R1Y4CwezNi4sQitf/22g==
-X-Google-Smtp-Source: AGHT+IGvsFoMYbnYzlrb/IviX0m6kKqlmur3ghtnR8h0iN8Ytd3BwhIi9utxvp0TVkhi0U0AYD2Xq7u0TY+PDcGFpRA=
-X-Received: by 2002:a25:8446:0:b0:df1:cdf5:d2c1 with SMTP id
- 3f1490d57ef6-df770815db9mr8598857276.0.1716898662695; Tue, 28 May 2024
- 05:17:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716898812; x=1717503612;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BPKynHoA1RZiJcMOYXRI1Hw3OSBgUrOAHrq/dZgZeTk=;
+        b=E8eeoWcBRqR9T7Va2e6MC/8mGOOwknSUDTDEtJlDRhskpy4Z++VGBc9oULc6wk3WWS
+         9xlDILkIz7WWVUSG30esrl96svJLNKN1uAqMOHPQElhpZfAE+YFFAhNIYV2tj0FAKwD9
+         ftbSR461MWNPAl89yTGxqAXplNPvCErddcy5WhduJ8ikAb0og7rsxbH26U0bxhsQOJ5H
+         hTXS5jqgkU/toZxoKvmsZppeeszCjjt1VKWWi+B3Dqc+ig/RqKFni632IkF3fezfzpZ1
+         +5JUn2omO9MZQjiAVopFTEoksOVFsDf2VKCYitl2Qv8Sfvzlb8LS93PHZyZcK0AGpUA5
+         /Ekw==
+X-Forwarded-Encrypted: i=1; AJvYcCUY6AMVbFg8Pod3TeUy3kFl2jVEJO96rT4ZTt2GPj/mg0svOPp8MQP2St2fm+dYLrG+KuNI3Hk+1eLHHRoQB+lqRTJqFkOmx6+N7qdq0Bgk0bsuY+4pCMPXFDw6+lUCmx3U0jMR5dVCEHrF8BtD6spwq756j7Q4fhDe
+X-Gm-Message-State: AOJu0YyL7RxtDwOGN196g6tOephA+UW/BVn1+crfa66OFoyuh+Svq2Wy
+	fkzcDtsueIT5mkR/5Jlvz5DQIjJTzAkKUSNm0qygU04cSeCn1GLh
+X-Google-Smtp-Source: AGHT+IFd9FmeuCiizQK6KkHMRIGCvCqTEl6HKh6TZkn0NQYapBUStdMJunq8pk+wjXVdH5HQ+5qNng==
+X-Received: by 2002:a19:ca44:0:b0:51f:5872:dd8c with SMTP id 2adb3069b0e04-529651991afmr6873605e87.39.1716898811701;
+        Tue, 28 May 2024 05:20:11 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5296ee4bfabsm937711e87.84.2024.05.28.05.20.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 May 2024 05:20:11 -0700 (PDT)
+Date: Tue, 28 May 2024 15:20:08 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 1/3] net: stmmac: Prevent RGSMIIIS IRQs flood
+Message-ID: <fg7ib32lqeeuzef4eoskdnwrufwpdm6cdm2bdjlro7e3gtmp4u@mrni2hltc32o>
+References: <ZkDuJAx7atDXjf5m@shell.armlinux.org.uk>
+ <20240524210304.9164-1-fancer.lancer@gmail.com>
+ <ZlWw3hJdOARzdl2S@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240528120424.3353880-1-arnd@kernel.org>
-In-Reply-To: <20240528120424.3353880-1-arnd@kernel.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 28 May 2024 14:17:31 +0200
-Message-ID: <CACRpkdYsFBw907rH4pmgmA6R=0FsOac7-_2xzqP8vu=aVS5JJQ@mail.gmail.com>
-Subject: Re: [PATCH] net: dsa: realtek: add LEDS_CLASS dependency
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Arnd Bergmann <arnd@arndb.de>, 
-	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZlWw3hJdOARzdl2S@shell.armlinux.org.uk>
 
-On Tue, May 28, 2024 at 2:04=E2=80=AFPM Arnd Bergmann <arnd@kernel.org> wro=
-te:
+On Tue, May 28, 2024 at 11:24:30AM +0100, Russell King (Oracle) wrote:
+> On Sat, May 25, 2024 at 12:02:57AM +0300, Serge Semin wrote:
+> > Without reading the GMAC_RGSMIIIS/MAC_PHYIF_Control_Status the IRQ line
+> > won't be de-asserted causing interrupt handler executed over and over. As
+> > a quick-fix let's just dummy-read the CSR for now.
+> > 
+> > Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
+> 
+> I think it would make sense to merge these into the patches that do the
+> conversion to avoid a git bisect hitting on a patch that causes an
+> interrupt storm. Any objection?
 
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> This driver fails to link when LED support is disabled:
->
-> ERROR: modpost: "led_init_default_state_get" [drivers/net/dsa/realtek/rtl=
-8366.ko] undefined!
-> ERROR: modpost: "devm_led_classdev_register_ext" [drivers/net/dsa/realtek=
-/rtl8366.ko] undefined!
->
-> Add a dependency that prevents this configuration.
->
-> Fixes: 32d617005475 ("net: dsa: realtek: add LED drivers for rtl8366rb")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Of course, no objection. This patch content was intended to be merged
+into yours.
 
-The QCA driver in drivers/net/dsa/qca/* instead makes the feature
-optional on LED class, so it is in a separate file with stubs if the
-LED class is not selected.
+-Serge(y)
 
-Luiz do you wanna try this or should I make a patch like that?
-
-Yours,
-Linus Walleij
+> 
+> (I'm now converting these two in separate patches, so would need to
+> split this patch...)
+> 
+> Thanks.
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
