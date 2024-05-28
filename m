@@ -1,83 +1,50 @@
-Return-Path: <netdev+bounces-98465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E93D18D1844
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 12:17:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A08298D1855
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 12:20:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 230041C22BF0
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 10:17:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4089B1F23DE6
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 10:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4516916C44D;
-	Tue, 28 May 2024 10:16:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A2D1667FE;
+	Tue, 28 May 2024 10:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=smtpcorp.com header.i=@smtpcorp.com header.b="hxAJPure";
-	dkim=pass (2048-bit key) header.d=asem.it header.i=@asem.it header.b="g8IJ0b2R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HPEFKegA"
 X-Original-To: netdev@vger.kernel.org
-Received: from e2i187.smtp2go.com (e2i187.smtp2go.com [103.2.140.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95BB716B753
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 10:16:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.2.140.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A406015E96;
+	Tue, 28 May 2024 10:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716891390; cv=none; b=Wh6pEyyzbHqDoyUYhlrBBWIbocV0caQ1VvoQwrFA84RjVoTRU6CXDNiQf33+MaPmazlAuMgeF90ewalu/OgekZpcWW4szxrCNs85d6XHN1EedxRM14EmS4P/BvPubkBmoU/6iN+C6S1BcUPnxWob5zES0wga/i79fzQ+KUHMf2k=
+	t=1716891630; cv=none; b=LizhnNC3oHFvi460WOYAwQlHDr6hewK+QslakA1Ewrt80B7+YZpSqhOl1rOAD6r5q3kTosjNM7eaq48ePjW+6AW3SNmnI2wQUGkwvPhi9a01kzQKmqelLTvM+ECakcGzBmsTXBodXmihkUPETiNDI8OGu3CC714HhauX719MHqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716891390; c=relaxed/simple;
-	bh=5F+iDYpbnmnqiU4VSKO2K0zkALQApme+Wow4A9DBOo0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sCeSYuU+omq33vUcvn4yLlKcWaYLppo4GKhroWPyLtGqv6QO2YVXRRfVpROz1rwfbAB+K7FRc09URZETVW6opGdOoF1+PbvVwymnUqQRjBNgFcNKNRWf8EjQ7fPLxL7ErCw/TB/fF8ORX9kp1vGCui68xokev2vKS+ND2HkUeJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asem.it; spf=pass smtp.mailfrom=em1174574.asem.it; dkim=pass (2048-bit key) header.d=smtpcorp.com header.i=@smtpcorp.com header.b=hxAJPure; dkim=pass (2048-bit key) header.d=asem.it header.i=@asem.it header.b=g8IJ0b2R; arc=none smtp.client-ip=103.2.140.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asem.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=em1174574.asem.it
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=smtpcorp.com; s=a1-4; h=Feedback-ID:X-Smtpcorp-Track:Message-Id:Date:
-	Subject:To:From:Reply-To:Sender:List-Unsubscribe:List-Unsubscribe-Post;
-	bh=oa6h68qDDGHy9Qw+YR/L3ULv9tToF4ZR16++RM2seHg=; b=hxAJPureUjtNeU/zcfTATX+YjL
-	mw5JY75O00fPG0NTw2QYpf0Wd3zZUX15YChtYbyJ6OIMdhWZXOS/4dgIsoVOgGsDwIiFdRO5OqFFa
-	DaLIq18S+ahUwYNSnCStgV1pi+xkduzHJL1GD7a9PfSEV4ntp5XU7+pgzceQc0j1syaXXr+xL0S8c
-	mhxQ117fnXAga+WIOfRr6+mBMJ8q/xfRY+DfST53TnJhh6Ne8IKc25uFA3B3hmogM00uexmx4cnnY
-	Q0mC4+rcRKrQvbSmQz7wc60ob+tRBg1OAl1lJDOmm1aZ18cl2cvKYkxm8Z/TkBmAJ6SareVsWb1Qc
-	hzLttwGg==;
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=asem.it;
- i=@asem.it; q=dns/txt; s=s1174574; t=1716891388; h=from : subject : to
- : message-id : date; bh=oa6h68qDDGHy9Qw+YR/L3ULv9tToF4ZR16++RM2seHg=;
- b=g8IJ0b2RnNnm/jOAPNczKMzI0yGWua6mu7peNiZiNhkcudBtw7Ov2XhtmGbATlME6N/OV
- vcyVNwSpAA4secrK20z6xpRY9wZtZC93fZEM+7/l78ZiR2JBc+AS4+SC67HYrKrvWXTW6im
- rIcD984PaQTalUGqRzDTj7Ib21kuBNvxD3rPi1JJn/ZZvKQZPlmYzuFSxvIPMWmlAP+NEU4
- Q54EsPxnRuL4NhMiNyBmTT8gCozW7FVIXXiA+T7+JjLYISAAz5iVnYqCWFlKiBQkixcpfnp
- IxM9cYs6fgzKWavqXxfeJX2C4DdWQhFlsBY9exIr0gG7MJLfhqEtMbIZ14lg==
-Received: from [10.45.56.87] (helo=SmtpCorp) by smtpcorp.com with esmtpsa
- (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
- (Exim 4.94.2-S2G) (envelope-from <f.suligoi@asem.it>)
- id 1sBtsY-Y8PCtQ-Ux; Tue, 28 May 2024 10:16:26 +0000
-Received: from [10.86.249.198] (helo=asas054.asem.intra)
- by smtpcorp.com with esmtpa (Exim 4.97-S2G)
- (envelope-from <f.suligoi@asem.it>) id 1sBtsW-FnQW0hPuHwL-fPMb;
- Tue, 28 May 2024 10:16:25 +0000
-Received: from flavio-x.asem.intra ([172.16.18.47]) by asas054.asem.intra with
- Microsoft SMTPSVC(10.0.14393.4169); Tue, 28 May 2024 12:16:14 +0200
-From: Flavio Suligoi <f.suligoi@asem.it>
-To: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Jose Abreu <joabreu@synopsys.com>, Adam Ford <aford173@gmail.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Flavio Suligoi <f.suligoi@asem.it>,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH v4 5/5] arm64: dts: qcom: sa8775p-ride: remove tx-sched-sp
- property
-Date: Tue, 28 May 2024 12:15:53 +0200
-Message-Id: <20240528101553.339214-6-f.suligoi@asem.it>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240528101553.339214-1-f.suligoi@asem.it>
-References: <20240528101553.339214-1-f.suligoi@asem.it>
+	s=arc-20240116; t=1716891630; c=relaxed/simple;
+	bh=XPE9r6ln1qemfRDv7biBuJ2KZj87/YszG/QpHYmPiNY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Ha4ONcm6W2tiblEHb0NEosYGsoKzxMwYmurWswYgRbfHO65LZvapo/o1RYjZJxvy+Y4eqDbQqu3D2DIVqc3WbO53W1XLTVPuUJgS2NMIW9xPibXaVStd/+tV7jbbuGGidV3hBTjebsCvdsfh1NbtyfBA8frOsbXgk8StTup0M/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HPEFKegA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1485AC32782;
+	Tue, 28 May 2024 10:20:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716891630;
+	bh=XPE9r6ln1qemfRDv7biBuJ2KZj87/YszG/QpHYmPiNY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=HPEFKegAwY7IRVEcryFyvVjtAsGYv02kcQvFjCcUAC943Y4fZrRMnIwiz/sK7+xUb
+	 4B+SdbwagxDnlsxMsqKRkSrI0+VHCo2YxBT4SbcqzkayRGTHYNdojKCQm3UI2c83Ad
+	 fix2n7LJdxM5xvIiAoQwWMUE9hl21noG0j/qk55AjFKUQAHRvZtWdfNxSht+vpA77D
+	 hPgy23b/rVYGLgRplIQ/2ho2YYy01yizluFlMMg8U+mh04QUr2uxh6rvm39h4VMzeb
+	 fnCdBgp9EJKaDJWvezEx3rlW2KAFWwSZS8TGMwWHoLNeJkH3ZvfM+day0e3hYyMdyF
+	 lkVfbEtRJMG5g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EEF2CC4361B;
+	Tue, 28 May 2024 10:20:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,60 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-OriginalArrivalTime: 28 May 2024 10:16:14.0341 (UTC)
- FILETIME=[12197350:01DAB0E8]
-X-Smtpcorp-Track: MNdoBk2fGo78.9CDehDn3zfds.E3UoIQ_B9qR
-Feedback-ID: 1174574m:1174574aXfMg4B:1174574sUnubbTcW2
-X-Report-Abuse: Please forward a copy of this message, including all headers,
- to <abuse-report@smtp2go.com>
+Subject: Re: [PATCH net v2] sock_map: avoid race between sock_map_close and
+ sk_psock_put
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171689162997.24184.10361719946392416490.git-patchwork-notify@kernel.org>
+Date: Tue, 28 May 2024 10:20:29 +0000
+References: <20240524144702.1178377-1-cascardo@igalia.com>
+In-Reply-To: <20240524144702.1178377-1-cascardo@igalia.com>
+To: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
+Cc: netdev@vger.kernel.org, cong.wang@bytedance.com, jakub@cloudflare.com,
+ edumazet@google.com, daniel@iogearbox.net, john.fastabend@gmail.com,
+ davem@davemloft.net, kuba@kernel.org, ast@kernel.org, pabeni@redhat.com,
+ bpf@vger.kernel.org, kernel-dev@igalia.com,
+ syzbot+07a2e4a1a57118ef7355@syzkaller.appspotmail.com, stable@vger.kernel.org
 
-Strict priority for the tx scheduler is by default in Linux driver, so the
-tx-sched-sp property was removed in commit aed6864035b1 ("net: stmmac:
-platform: Delete a redundant condition branch").
+Hello:
 
-So we can safely remove this property from this device-tree.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Signed-off-by: Flavio Suligoi <f.suligoi@asem.it>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
+On Fri, 24 May 2024 11:47:02 -0300 you wrote:
+> sk_psock_get will return NULL if the refcount of psock has gone to 0, which
+> will happen when the last call of sk_psock_put is done. However,
+> sk_psock_drop may not have finished yet, so the close callback will still
+> point to sock_map_close despite psock being NULL.
+> 
+> This can be reproduced with a thread deleting an element from the sock map,
+> while the second one creates a socket, adds it to the map and closes it.
+> 
+> [...]
 
-v4 - Resend after some weeks.
-     Added the tag "Reviewed-by: Krzysztof Kozlowski
-     <krzysztof.kozlowski@linaro.org>"
-v3 - Removed the tag "Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>"
-     (it was added by mistake).
-     Added history, as well as in the cover-letter.
-v2 - This patch is the 2nd version of a previous patch, where both the DTS
-     and the yaml files were included toghether. Then I split this 1st patch
-     series in two, as suggested by Krzysztof.
-v1 - Original version of the patch where, in addition to this DTS patch,
-     there was also the one related to the correspondent snps,dwmac.yaml
-     dt_binding file.
+Here is the summary with links:
+  - [net,v2] sock_map: avoid race between sock_map_close and sk_psock_put
+    https://git.kernel.org/netdev/net/c/4b4647add7d3
 
- arch/arm64/boot/dts/qcom/sa8775p-ride.dts | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/arch/arm64/boot/dts/qcom/sa8775p-ride.dts b/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-index 26ad05bd3b3f..2e1770e07f45 100644
---- a/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-+++ b/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-@@ -334,7 +334,6 @@ queue3 {
- 
- 	mtl_tx_setup: tx-queues-config {
- 		snps,tx-queues-to-use = <4>;
--		snps,tx-sched-sp;
- 
- 		queue0 {
- 			snps,dcb-algorithm;
-@@ -404,7 +403,6 @@ queue3 {
- 
- 	mtl_tx_setup1: tx-queues-config {
- 		snps,tx-queues-to-use = <4>;
--		snps,tx-sched-sp;
- 
- 		queue0 {
- 			snps,dcb-algorithm;
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
