@@ -1,108 +1,118 @@
-Return-Path: <netdev+bounces-98533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D66148D1B04
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 14:22:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EAC268D1B07
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 14:22:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EA661F23439
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 12:22:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD9961F2198A
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 12:22:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E6A216D339;
-	Tue, 28 May 2024 12:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAE3316D339;
+	Tue, 28 May 2024 12:22:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SNRCXPQO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P+XluGIG"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08581667F7;
-	Tue, 28 May 2024 12:22:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6AE16D312
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 12:22:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716898944; cv=none; b=OU3GTVAJ2edIzAxgJusnMN7PrYqZlns0TM808yUOvCKvOg2jfwHaT9MJkdarPw/gDRUesdaovmXl8xkbJdgiE6+TM9bzy5MLCnRdVDIiMrfkZ25prcHy/zvmsDO3pldV3dYSWKvpO2pX1Ht1szKIzVg2CjM4dM81Dd01WOQ0/bo=
+	t=1716898956; cv=none; b=usjMz9NKta0PKUZ2KKZcIpOpoeqbp7pVbR5tY688H7dGymetKBcXDtBZqjdx0Rf+NX4ENpeULT2ulercwbRGUOcgQRn9RmPnTTXXx3G6NWNFQn2c12wrhblSpRomCEMyy+CX3N43Vy8bVNcxL4Yf1iS8sPmwsRe9Zsm3m0DSRdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716898944; c=relaxed/simple;
-	bh=WjJZBwHR+fahMg+Yy5ffjCSPaSygEhqXKeccSEhaJrQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dFvvhzG2m8mcVwtvWDw7QGHfWR8w7ETwXi6NglYkVMTmr12uJp61Z1DXzR54PgG+nMyrohFzi0dONVjATzl+kkpDTCYQc8M6SmhOFSW1o8f0eL4A3DLmVChc1Qw8Ot13MjG+g996ygI81z/zb0anGiXzY2d9wb5Fwx4WKL7Cis0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SNRCXPQO; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=yW/FU7UpcM+jJM7bEDl1D2hvUGQXB3YbQSi0AdGiRPI=; b=SNRCXPQOce3q69sRwG/yFHSyl+
-	lbYw4S9Iu8RWmJ1MCSjYOyfChAQYmlaM07R3zJN4DW0QlEiT/Fik0RzUtklYuEHpw8OsGrb37HVI6
-	kr5EXnQcSp0GEIlxeZQ75b85fSk6ke4/owGEGO4XrVFtEqKYgdS9Mkea7Z/4kTEDDFFk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sBvpr-00G9Tx-76; Tue, 28 May 2024 14:21:47 +0200
-Date: Tue, 28 May 2024 14:21:47 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Ng, Boon Khai" <boon.khai.ng@intel.com>
-Cc: Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Ang, Tien Sung" <tien.sung.ang@intel.com>,
-	"G Thomas, Rohan" <rohan.g.thomas@intel.com>,
-	"Looi, Hong Aun" <hong.aun.looi@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Ilpo Jarvinen <ilpo.jarvinen@linux.intel.com>
-Subject: Re: [Enable Designware XGMAC VLAN Stripping Feature v2 1/1] net:
- stmmac: dwxgmac2: Add support for HW-accelerated VLAN Stripping
-Message-ID: <cf5ad64e-c9c3-426f-a262-3f03964b90fe@lunn.ch>
-References: <20240527093339.30883-1-boon.khai.ng@intel.com>
- <20240527093339.30883-2-boon.khai.ng@intel.com>
- <BY3PR18MB47372537A64134BCE2A4F589C6F02@BY3PR18MB4737.namprd18.prod.outlook.com>
- <DM8PR11MB5751CE01703FFF7CB62DAF9BC1F02@DM8PR11MB5751.namprd11.prod.outlook.com>
- <BY3PR18MB4737DAE0AD482B9660676F6BC6F02@BY3PR18MB4737.namprd18.prod.outlook.com>
- <DM8PR11MB5751118297FB966DA95F55DFC1F12@DM8PR11MB5751.namprd11.prod.outlook.com>
- <BY3PR18MB4737D071F3F747B6ECB15BF2C6F12@BY3PR18MB4737.namprd18.prod.outlook.com>
- <DM8PR11MB57515E89D10F06644155DA11C1F12@DM8PR11MB5751.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1716898956; c=relaxed/simple;
+	bh=KV6XpCQHbohETVAnE3VjdWEmGWB3TWOcp6uyiJ/bZnk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t8URyWP7OGYZ0rF7bG7s7s8Su1lhKcigpdG3ibQ+Sa3IMMtRjXQSxhOWnvZpM+omhb+BklmZTNeT+pFqERC/o0fh9jzVl2BnGRv+xf0xzkuLXR6QEnM9/IyhGaGCzJuA3nOiB/geVD8rulUhNGRg1iRtRhgaZjcJsQAfaJFNEwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P+XluGIG; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-57863da0ac8so25612a12.1
+        for <netdev@vger.kernel.org>; Tue, 28 May 2024 05:22:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716898954; x=1717503754; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KV6XpCQHbohETVAnE3VjdWEmGWB3TWOcp6uyiJ/bZnk=;
+        b=P+XluGIGPVaMeMhqrbf3Ki7XsxLqVGDYNdZRly8JoWtPQ8ftnLlrUdvPf2helKCec7
+         /ft8jPBX1W5+4aKM4PZVLTmi6kKk1q+oIp6Kl81u3T0M8UfcqrDNtVyUDJwgI1fkgR3g
+         J6yIBKSYQongZsA+S5bZfG6O4HlIjHvbakJ5P65IebsbypxMfnOaEjMvATLdMbcEQHoD
+         GFUweKSCs2XPElPXbz8D1harsvB+qXFn3FHNqNyYk9m470g5lxUW7d+XCAsoNAsx/xYB
+         gqhUNFV5pR/Ge45XJuK2pjj5yYPvoDP+0oyQvQ4y8XUttNtThDEvErZ8bHZYVaSWh6Yh
+         vxTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716898954; x=1717503754;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KV6XpCQHbohETVAnE3VjdWEmGWB3TWOcp6uyiJ/bZnk=;
+        b=XBMKGD5jn+k32Wb8Igy4bDuMI6aFeq+ggNFYaLeSRKQ68DDAOEbf8OsCHuMtuVvtB2
+         KBO8J1G2zNByg6EUCwcxpJOe34OMlXA/wCSRBTLTzrsfrocIUprfDwR7o+olTDNGYi5y
+         tcv7fC28FSx5JqgoDGKvsU23IVHIUJ5FNMoXVK791D0y8GtWQtVt/WYRO0TQ2yq9I/Uu
+         3VLZsVx0Mq2j9/gze7jNk0M4Fpunvtxr6YTwYMEZrheukmip3m7brvZ2S7l86cJOW1SD
+         40Hbm87xyj05B4AXSjN0WwOTHABNkACWUJak6iPT+jHbNLVSnFTRqGQfqB0Pi42nmon9
+         42xw==
+X-Forwarded-Encrypted: i=1; AJvYcCX4/4dYFR3o4bWVJQPUq5pOOs2xKi7XYu68jd56JWl2V07E+9eadsVOCoIfzmRBZeYadG5prIyawM4hFHwGcdV5aCBgpeXb
+X-Gm-Message-State: AOJu0Yx0ZChcwf0l613itUUQ7Lpwfc8vbx6BDloOEKd3AIkmt9Nw+wph
+	om6BmPDuPrAKE2okSzcsVKGoh9xPOyW9gomdjHok9Gw6qOMY0PC6f/HSKThD12OyFDsmPKrn1ja
+	teerkpUTrs31LstMw49OauKTpeRrHlqjYEmmR
+X-Google-Smtp-Source: AGHT+IH1Gtm5F59Lm5I2SXsUJhjdETo+vxRbDjTlwIUhJpsam6VH9uP+WsbKqG+qCOz/gk2BSvwxdv7mmrEx1YLvFns=
+X-Received: by 2002:a05:6402:1803:b0:574:e7e1:35bf with SMTP id
+ 4fb4d7f45d1cf-57869bd661cmr341506a12.7.1716898953322; Tue, 28 May 2024
+ 05:22:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM8PR11MB57515E89D10F06644155DA11C1F12@DM8PR11MB5751.namprd11.prod.outlook.com>
+References: <20240524193630.2007563-1-edumazet@google.com> <20240524193630.2007563-2-edumazet@google.com>
+ <CADVnQyk6CkWU-mETm9yM65Me91aVRr5ngXi2hkD6aETakB+c2w@mail.gmail.com>
+ <CANn89i+ZMf8-9989owQSmk_LM7BJavdg7eApJ1nTG6pGwvLFHA@mail.gmail.com>
+ <cace7de5c60b1bc963326524b986c720369b0f1d.camel@redhat.com>
+ <CANn89iK=oYdC=ezujf+QOWsbVEXDx1vLLV4Cbd8bJH+oU+RDiw@mail.gmail.com> <4f0819a7032c52349bba22ea767eda103be650c1.camel@redhat.com>
+In-Reply-To: <4f0819a7032c52349bba22ea767eda103be650c1.camel@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 28 May 2024 14:22:19 +0200
+Message-ID: <CANn89iLKJ=-Ng6fUgr1LW+5+Y=kEsY2VM0VUgLMP-NicyCdAcA@mail.gmail.com>
+Subject: Re: [PATCH net 1/4] tcp: add tcp_done_with_error() helper
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Neal Cardwell <ncardwell@google.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > > Checked the link it is just a photo saying "come in we're open" is
-> > > that mean the net-next is currently open now?
-> > >
-> > >
-> > >
-> > Yes, it's open now.
-> 
-> Hi Sunil, thanks for confirming, should I straight away submit another change,
-> with the correct subject prefix on "net-next"? Or I should wait for others to
-> comments, and fix them all in v3?
+On Tue, May 28, 2024 at 1:50=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
+te:
 >
+> On Tue, 2024-05-28 at 13:31 +0200, Eric Dumazet wrote:
+> > On Tue, May 28, 2024 at 12:41=E2=80=AFPM Paolo Abeni <pabeni@redhat.com=
+> wrote:
+> > >
+> > >
+> > > Waiting for Neal's ack.
+> > >
+> > > FTR I think the new helper introduction is worthy even just for the
+> > > consistency it brings.
+> > >
+> > > IIRC there is some extra complexity in the MPTCP code to handle
+> > > correctly receiving the sk_error_report sk_state_change cb pair in bo=
+th
+> > > possible orders.
+> >
+> > Would you prefer me to base the series on net-next then ?
+>
+> Now that you make me thing about it, net-next will be preferable to
+> handle possible mptcp follow-up (if any). And the addressed issue
+> itself are so old it should not make difference in practice, right?
+>
+> So if it's not a problem for you move the patches on a different tree,
+> net-next would be good option, thanks!
 
-Please trim replies to what it just relevant.
-
-You probably should read:
-
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-
-You might also want to read out to other Intel developers in Jesse
-Brandeburg group and ask them to do an internal review before you post
-to the list.
-
-	Andrew
+Sure, these are minor changes I think, only nice to have.
 
