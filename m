@@ -1,86 +1,116 @@
-Return-Path: <netdev+bounces-98650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E346C8D1F32
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:47:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 084688D1F3A
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:48:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AFC2286318
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 14:47:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2C64283CD3
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 14:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45BAC16FF29;
-	Tue, 28 May 2024 14:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E11816F291;
+	Tue, 28 May 2024 14:48:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="OE6HDbwT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ntoVgzX/"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2088.outbound.protection.outlook.com [40.107.7.88])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B237107A0
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 14:47:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.7.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED6D107A0;
+	Tue, 28 May 2024 14:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716907641; cv=fail; b=Na7Cp60oHZTMee7bojeZN9URPFPLioolGDX2g0cEePg4YOdd8BdCkY+kiEHnCv0qMUKecxd4Lru/1XDxJrY6e2EMiaaX5W10Zs75IOTKBe69CXaWxJbT8EtqFTfUfODFw0XXGvFurd/awmYf4iX4zGnboALpEDSBTdBHToCmsbw=
+	t=1716907691; cv=fail; b=BZoeZUNG+f5+lkwYrtLqEAqzzJ08G6rN6zyAAXKSUfEVpbDuIJE/m4mTppreSjut9BUsytPdRFVCNFT/GeZC9tB+si7UOkXAJcOhNtDIuVgX2/NFbNS0lwKenaSYyNArlxvfNyMEkzkCDY3QpaWt3xj0My1nbmy/42PLxzA370Q=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716907641; c=relaxed/simple;
-	bh=QH5SWn0K9JUI2SpmQOu+4CuGt6FqO2bdhb3/2Vi8ikM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=bQaL7EYQJSkqCBH1yIX3Ks6W7eVwPorp0poi4FpXqAbkixXKl4TGz8DYs0/sYmObuVnvn4nznibq5X2vXzbFQtQU8ClP3Xo0v9tAgo7IFvggRkdzo21waSI2sABPokJAt1sm0ZT+YeMJjstXkNi8Omumr79IEeSFNAExv5G7WSo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=2n.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=OE6HDbwT; arc=fail smtp.client-ip=40.107.7.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=2n.com
+	s=arc-20240116; t=1716907691; c=relaxed/simple;
+	bh=LVTySbcDA1mmGpvvE4JAgw6CVthj1Z2cMTToFFzREhU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Em2QYj8Ys/pCMoas8VPvKBP3DwLOQe9m6tQ12WDL36NGGMj9quujwdHLCEZtFzjpiNAOqczkuGe9pgJTb4CbwcakvEPkq0+H6ue/OSqfsHkj6KTyhRdPA3YdylW8gVC7hTktoAnAuPoqCwFnlGMbkOYFpTGW79qDVJfks4pYhLQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ntoVgzX/; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716907690; x=1748443690;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=LVTySbcDA1mmGpvvE4JAgw6CVthj1Z2cMTToFFzREhU=;
+  b=ntoVgzX/6I1EfSeUQ2v/qU9tnjVEy+53QLuwdT75XpMj0Q5bYfx9naLW
+   RaHeBg/Y6hop93jF/riTlYcELk/NfSnDYwGgENM4ZjNfXz0+28KRKmFKN
+   oRdhsafQgby9IzyOea++OGa7JQt4nGUkyTSVl2YaIc7Ja1jmM/fZN4Xi8
+   QoL5NO2bEFxDC5x8Ltsi7HsSZbdxIexYfHVeiva0mRAZNH0etFay9B579
+   D9ue6FdY3iPgriWt7JUE5i89XuCDEszMWHXFdcLJzIs5+ChZfIDzCgMbC
+   JhUoGH7+ExKGxbrbVGo02pSTWjWs8tp1pawr0264rbEhRZduuuV6h4DHo
+   A==;
+X-CSE-ConnectionGUID: XKFAVfxdRzGCMNkmWfxsDA==
+X-CSE-MsgGUID: Nlz6AbGJR0adaVRb+7ISoA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11085"; a="13098963"
+X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
+   d="scan'208";a="13098963"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 07:48:09 -0700
+X-CSE-ConnectionGUID: zudUWsQxTwqDgjw86mANvw==
+X-CSE-MsgGUID: nMquBLaLSWOCW1KXoexOOQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
+   d="scan'208";a="40058294"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 May 2024 07:48:09 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 28 May 2024 07:48:08 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 28 May 2024 07:48:08 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 28 May 2024 07:48:08 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G4Vp68P/XJU9C+XoMxkPiVw9OyVeoqkYdfmPAM1s/ERlEVrFyq+p4CPXeHGF+eQgawyiTDLy7yTigmbYM3/GpGGNo5w4eF0m5NOlnr9AplUTlffdtNt1s36fX5or78vdbZIsoKznsJD/QK5gtiJne9V173nBdMC/pcLBnz1ab8CYqdcBuERiqHikJBURyGp0wgkzRXgcqahz/DDtUfV1UDxdMmR8ROkz9pEM29f1fT+eIEbOyCQxOy3eTjiRm2qbsRY9OBJKNNakURZNHn6bFvxCOLQlJ8+ZTdAztSJ6jNOUf043EyE/wQO1ckhalmrX+Rj59xcVIDOMrXtAJ3kP7g==
+ b=SHsvQTxizStNj9ZvvTz49YK8Nd8X2L5zuhMfpkNsfRwQk+Sg5W/Z/mD+AnTDyCDKBdK3viCF5RMq9rLL9iKYG3Mq4KdSuOUsokuZlXLqwx0y23Sz6+mXxG3DfvpFBTwuSTvOrOc/ipnOq495TzccB7tP1ogRWDdVeq/FFm37e7+j6vLIzpRdwRtCV2EgXKW0WipG+9LiwogR+cUhe01roqjMU8EjFoaPoCMW6Y5tF/ES59MSM0MQGgvlvCrINR1DBut6mkCtk4LS+P6gAX++2UKEupbvB5aLxcjFk4dBKY22/oLCYAKa4IJZpaTo7/ZmPGhBOzRbDupf8mmSqxWlzQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RhCYtlUKFykbbdBoABO344w+Nn6vyQDr2V7dbH14tJY=;
- b=ggKMrgp90HShJL9cjMGXJLXS4wJLFPN6VA2+a9Bs7D0IluAZwvJ60DgWbnxb0MMEvP8fzh3wKyeJfC7oHnETvJXBWAHHfDBqRV1eB5clcs2RP7VE+hjSstzNK87x1Jsn9gJRew2AlP8d0nCgrV3eNaA3fcbfUICRsHq+nmdvlUFEmmFGSMCCBk0w94cYu9EmHa5l1WTAH1NQUt+H/IpSE/BkpuXwnxKWa/btCx1Tprn9n9DqG+XrOHTlj4wJFcsPNUO+0R2X65dcZtTjOFUBKJd7rBfxNf7Bycp9pxxJRvWzcWh1aQ3CFqZqtkK1RBkDUoXClSVTyPrUAUFwpbLmjA==
+ bh=dWuiqkWTxJLohERTjRBTD1GbvZe+hbGDYpyut1H9xYI=;
+ b=gJBw7WFhrulK8221jmvdFSnH38s5uR8XQTnyLOtj0Ad9m870+LwKZ9upiJbiQgyKhzcVNwsNsQnGw289lSzXAv9D8HMfnNT1Y3OPSq7jQQQWbOzSB3SwfEyoVoJfjBtTHg9SZWmk1J7T2f2u64v7VGWxnZSOAVaBdbjrvcrfT3kKQ00rvi/b+1tkm/rmDOLEehpmzbLZh70RpqV5KF+mC8k23lqkpwuUYAURv76T5dtDSxjIV58988rf2lUpBuRy01ezATwce0fsuBtkOY8ry1fcm0v0ZNdi7f1rwRzYvKImdp1vxzsKL3/CW8OsCKkSVYTGbpgUW/nAnJREnd0NCA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=2n.com; dmarc=pass action=none header.from=axis.com; dkim=pass
- header.d=axis.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RhCYtlUKFykbbdBoABO344w+Nn6vyQDr2V7dbH14tJY=;
- b=OE6HDbwTKG5QYo27KcW7lcTVAplGtPwzxfusMTfDHdFU1hk5A+tfZO01k2q0quURifNKbaspWWJ6tDigPuNjt8NRobWxpiP73Ur8kqwcsjR75l3TLz7poX76H3mvZq5XJQCcz2ctUjOdYVhOCK+imvopBeYsJ9IzNwO4Tgm07rE=
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=axis.com;
-Received: from DB5PR02MB10093.eurprd02.prod.outlook.com (2603:10a6:10:488::13)
- by VI1PR02MB5901.eurprd02.prod.outlook.com (2603:10a6:803:134::10) with
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by SJ2PR11MB8568.namprd11.prod.outlook.com (2603:10b6:a03:56c::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.30; Tue, 28 May
- 2024 14:47:14 +0000
-Received: from DB5PR02MB10093.eurprd02.prod.outlook.com
- ([fe80::2a25:783c:e73a:a81d]) by DB5PR02MB10093.eurprd02.prod.outlook.com
- ([fe80::2a25:783c:e73a:a81d%4]) with mapi id 15.20.7611.030; Tue, 28 May 2024
- 14:47:14 +0000
-Message-ID: <18725214-4419-4822-8e16-1d47a3decd3a@axis.com>
-Date: Tue, 28 May 2024 16:47:01 +0200
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.29; Tue, 28 May
+ 2024 14:48:06 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%5]) with mapi id 15.20.7611.025; Tue, 28 May 2024
+ 14:48:06 +0000
+Message-ID: <fb037803-0002-4d91-9c9f-bbb233490acb@intel.com>
+Date: Tue, 28 May 2024 16:48:00 +0200
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/3] net: phy: bcm54811: New link mode for BroadR-Reach
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev <netdev@vger.kernel.org>
-References: <20240506144015.2409715-1-kamilh@axis.com>
- <20240506144015.2409715-2-kamilh@axis.com>
- <25798e60-d1cc-40ce-b081-80afdb182dd6@lunn.ch>
- <96a99806-624c-4fa4-aa08-0d5c306cff25@axis.com>
- <b5c6b65b-d4be-4ebc-a529-679d42e56c39@lunn.ch>
- <c39dd894-bd63-430b-a60c-402c04f5dbf7@axis.com>
- <1188b119-1191-4afa-8381-d022d447086c@lunn.ch>
- <ed59ba76-ea86-4007-9b53-ebeb02951b34@axis.com>
- <44c85449-1a9b-4a5e-8962-1d2c37138f97@lunn.ch>
- <b9ce037f-8720-4a6c-8cfe-01bffee230c1@axis.com>
- <79af2fc0-7439-4c6d-9059-048440c3a406@lunn.ch>
+Subject: Re: [PATCH net-next v5 2/2] net/mlx5: Expose SFs IRQs
+To: Shay Drory <shayd@nvidia.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<edumazet@google.com>, <gregkh@linuxfoundation.org>,
+	<david.m.ertman@intel.com>
+CC: <rafael@kernel.org>, <ira.weiny@intel.com>, <linux-rdma@vger.kernel.org>,
+	<leon@kernel.org>, <tariqt@nvidia.com>, Parav Pandit <parav@nvidia.com>
+References: <20240528091144.112829-1-shayd@nvidia.com>
+ <20240528091144.112829-3-shayd@nvidia.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Content-Language: en-US
-From: =?UTF-8?Q?Kamil_Hor=C3=A1k=2C_2N?= <kamilh@axis.com>
-In-Reply-To: <79af2fc0-7439-4c6d-9059-048440c3a406@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MM0P280CA0051.SWEP280.PROD.OUTLOOK.COM
- (2603:10a6:190:b::35) To DB5PR02MB10093.eurprd02.prod.outlook.com
- (2603:10a6:10:488::13)
+In-Reply-To: <20240528091144.112829-3-shayd@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR03CA0057.eurprd03.prod.outlook.com
+ (2603:10a6:803:50::28) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,232 +118,155 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB5PR02MB10093:EE_|VI1PR02MB5901:EE_
-X-MS-Office365-Filtering-Correlation-Id: cfac44fc-ddf4-4744-1f3c-08dc7f251052
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SJ2PR11MB8568:EE_
+X-MS-Office365-Filtering-Correlation-Id: 82681d2b-7f1f-47c4-ac04-08dc7f252eff
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|1800799015|376005;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Q3hmd1creEUxRGJVNFBZS3BoYnFQZTJGenB0dmlqcWY5a3JkeFdCTklRNS80?=
- =?utf-8?B?d0VKYlFXdUFuaGcxTTZ6Mm94UzJocTFJNE9uREYwTjhXdTNTVnFBQjROeGdt?=
- =?utf-8?B?NjZqOXBmcmEzeGt4dVRhWE9va0tWYUNTYlFCMkxscUFLTWVoUkVuK3Rkcnd3?=
- =?utf-8?B?QUZvMHhHNWkwTkc5YXg5UUY0RStJYkNHWHBQSVZWY3VSZjI2UWkyQXhqOTJY?=
- =?utf-8?B?elMwZm5zSlhTa05ubFlMZVhtQ29UWUVaOVhKNjJobFJoN0UxTWVadUtFZmsv?=
- =?utf-8?B?dElJMTJ4VFlFRGZ3OS9CYXpsM3VLQ0hxTGRMSGFuY0RIRW9FOWRLS3dScHJC?=
- =?utf-8?B?L2ZqeU9ibWszMjV4UVd3VEc3dXZiS3p1Y2NSdG5SN1lpR0pvZ1lmRjF2VFFR?=
- =?utf-8?B?d0dwamZwbHpJRzBWYXYyZ3FKVU42ZDRNMnlxcFJ4UmVPcjEyR0s1MkZnUFJ4?=
- =?utf-8?B?V2R5SEYvbzAyVmhHQUJDc044Z0I4Rkg4ZWJ1TFJqd0dnMlo4bUx3NTNTaWk3?=
- =?utf-8?B?ME9GbDVCdkpSV3NyUk1LSlRoZGVoVlBORzlnYSttTUdaeTVTbFBQT2UwYVFq?=
- =?utf-8?B?SVRTZUR1MkZJekFJbk1BL0kyR3k0czNUNXNJZnA2N0RtRko5RFNjaGxOZVpL?=
- =?utf-8?B?TGhpRUYxVm9kdzhkcXJqR0dEMGs3RW9Na090SGhaczF0NjdtQWVQMTJndE91?=
- =?utf-8?B?MzBEVmNPbGNuNG4rQVFFQUVjbmw4VEwxR21PelRLQUxLOWN2cWFtcGRyRDJu?=
- =?utf-8?B?SmpFbG9NNUlra2dWR2dNeWhHOVE4Yk83LzZ4bFNXcWt6SHJkZzdER3E3TjZU?=
- =?utf-8?B?TitSV2VJTC8vWG5pa3ZTZ2dNcjZBUXRZOUdlczNnd2ljY1JGY2hCOWZWSFc5?=
- =?utf-8?B?VkxjcXJUZmdXQm9pYWVlY05RSXZwdVU3OEc0MFlLRUNwQVdya2pMYTdnaFJW?=
- =?utf-8?B?R3Fzbi94dHRMTXFVOVJROWo5RFMrRXBnNEo2MGVUOS9JWHVaMlhSa21JY1hV?=
- =?utf-8?B?NUZoaVNOMlo0VGV5YnJiYXFNV0lkVXhNV1p6WWp1R2xBdTF0a0ZwZ1dPS0lu?=
- =?utf-8?B?Mmp1eG9IWkUzMG0vbmR1U0xKcXBHbWpwamlXVWRTckJ5NmdkMmpLQ2JXRGtC?=
- =?utf-8?B?ck5qSXgvbVpQSTV0eXFmN2c2eHFJbHl6QTZqdFlpRCtVZ2NlOUp5Y2dOWEIv?=
- =?utf-8?B?SGgwY1JKa296VkUvcHFDbktSOGlnUjVGQWRybWRtbEwwcUlzL05iVmVpUi9S?=
- =?utf-8?B?SFpVdmluQUdBOSs5c3hvZG1SS1ZCV2s3TGFXU1JQRWovaWovN2ltczByZVZq?=
- =?utf-8?B?VXF1cWFYNDBOOHQzdWF6Q0gwS3l3RHBEY3lUWUFYTmJmMUowRkxjZ20wbHN3?=
- =?utf-8?B?eUNTbEE1bmNSdXZKSUVJNmFCeHBEd0U1d1ZqWXV6UHAvVTE3NUR5eVFud3lP?=
- =?utf-8?B?VzgyQ2pkSGZyR2s5OHB2bTEvSjU0Y1U3UkoyeUMzay9rRGNzYXFLWkp5b0JL?=
- =?utf-8?B?emVUdUYrNmFFVG9sSjBrc0pVcytTdDdpbGhZZS9SdVBCYzJKbE1keWlHSmNF?=
- =?utf-8?B?VmgyU1pzR2luQ0JyUXd2cjJCd2NrNFpFeGhZVTVQKzBaYVFtUFFiRE51ME43?=
- =?utf-8?B?eE15Y01JSDZrV3JZWWE2OEd6NndsZ3RlVXJzVHB2eFI1SlcvQmVzRVFUQUhX?=
- =?utf-8?B?cjBzazNmUGRxR0IrRXVrNmpmalRuTjlrVEp0Nkg2dzBndnJNTnhYTXVnPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB5PR02MB10093.eurprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|7416005|1800799015|376005;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?Z3A1VTZ5bHI2eThzTmpqZ0hHeDhTYWVzd3ZDM2RwTXVtczFKbUF4TnFFMnEy?=
+ =?utf-8?B?TEFBajgwUjJlVUFMcE42Y2daWTU4dElGVmpleVpVWHFiQjREQTE4eVRHOTJT?=
+ =?utf-8?B?bFRzdmdhS3NkOE1SOUhUZmZnaldFeU1TdVAwWStIKzJOMmJWTmRsY2dkSjJl?=
+ =?utf-8?B?YzJFT2hsZTliczE5Tm5lb3BGempua1dSRkJyT0dFYWFjMGZZc1dIbFdZbURq?=
+ =?utf-8?B?NGkvcTZhNk45WG04cjI2b1JkNUcxaWxYaEhiOUZkczFXSWtsRktKdVNmS0Vn?=
+ =?utf-8?B?dVg1MmJPbkhkdXQ5TTZSK25HckpMUW1DbHdKUzA1empUTmxjN3NxVW1iT0dz?=
+ =?utf-8?B?MjhhaFZIUkJqS25ycndEN0JENmR6WUFvOGpSYUgzOUdtYmVlUTZqYmRzMDVr?=
+ =?utf-8?B?enB6anV0SHR6QWxtMWhqSDROUFU4cURUeHRGOUxhZFhiRWthcnBWeTdHdXdW?=
+ =?utf-8?B?WHNQN1Q2dDhRMXUzZE84QXNRTkp2d3RZZ1dZRk9xZnhQQUdOdyt5OTJtTm9h?=
+ =?utf-8?B?RmVjeWF0VjErczcwemFsUGZNOW1zVEo2NHVPT1M3M0tGVGVadlJNbHIrWVdS?=
+ =?utf-8?B?blFYVDlNOWxqdFhuRDRXdW1ZQ2t3RWhEQ3ArYkwrL0FqSlB5ZFVKZnBjejVn?=
+ =?utf-8?B?MmJLNFJIVmFVY2JOYlFrSnBDcUVJZGVSMXdZT0tPQTE4V213ejY1WkJ5K29y?=
+ =?utf-8?B?TTNweVhEWWMvM0tDaU5qNnNtMks0ZHErTE9sbk56TnIwYTd1Ui9QaUF5K29r?=
+ =?utf-8?B?SWdBVVI1Wklrenl0RXJRWTJKaU5BMlYwWGZkcEFEa2xMdWc5bzlSakJ2ODds?=
+ =?utf-8?B?cllGYkU1Z0pxS2c2SXJiZzMyNFl3Um81VDdNVmpCZXZNcE5RTHJXRkJJcmR6?=
+ =?utf-8?B?Vkp0QWFQc1d4RDN2dm5EU1M4VTZUTGF2VU9iZkU2NkFQVWNla2lWL3dLREht?=
+ =?utf-8?B?dU9mWGNMQVZmNnkxdDJjbzVkWXdyUmhOdG9BZUc2RGo1RmdXeS9YSTUzRVhQ?=
+ =?utf-8?B?ckVuY0pLTWlrUEpEMmxQVm9iVGlRKy93clYvUzFrdk4xT3JVREtoalBZVWtr?=
+ =?utf-8?B?RTNKWXJJN2VLajR3V1dpMC8zam1DUlZScmVzeFFJbTZSSkhBOGh6a3AxNWxC?=
+ =?utf-8?B?QTFTSDY1b3J6RWNjUnBnWlYzc012c1h5aERnTTZqMVVhY3pqZGhUcS8zOWlK?=
+ =?utf-8?B?bHMyQnUrdnpQNW1kRnhsT21pMzFrMEt1VHBlQ05WbkdCRWR1dXdIMVN5WkNQ?=
+ =?utf-8?B?ek9BVG1uQXBPWUtsT2JqNmllS0hpcU5pY3BybFNVbzV4SFVobXR0RDNZMDc5?=
+ =?utf-8?B?R1NLMkZkRGhDeGRsZXdNeUlGU3NtNmkvdmlnN1c4aVR2V3RxNUhVMkFqSVBY?=
+ =?utf-8?B?SHdxQlZQUC9qY3AvM2JwdnVmR00wR2pGY2ZaTmRnVUwzTitRSDdHOU1uKy9i?=
+ =?utf-8?B?aXVqeHh5Snhva2djZDE5aUR5b0VrVnN5MHBzZmNqc3UvVWhIZEw5c1R5Yith?=
+ =?utf-8?B?NEdwbG83T2hpb0tXZmNEdkhBMFhBOVFQVERKVjlVUk9JVFBKSjlMRmRrczgy?=
+ =?utf-8?B?YnFKU3JCQXJpb3FHZS9VVEVNbDNpbjNISis3M0hPWm9DazRLeXZ4VzNxOE1C?=
+ =?utf-8?B?TzVqQWpSNG00UG44RUFiZ1JnT25XV3NmYVF6c2pwZmYrYk5EN2k4b3ZRbEpL?=
+ =?utf-8?B?NVJSaG5hVklOeUdFSFM1REY2K21qZloxblRKaWVERG54QVVEdWlJYW1BPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(7416005)(1800799015)(376005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SXIyOWFqTzkybTlOK094ZzQ3QkEyL3M5NjdnLzA1ckd2Zk5wRGczRDVOdlhO?=
- =?utf-8?B?VTdxL2JMUEZOMm1USHRRdWVFbEtZcTI0WVRUcVdnb2VLenBicmJtSTFMSWlM?=
- =?utf-8?B?a21PUy91YzBaTGFZM2h6V2hGVHFnZ1ppR0NvTXpMVy8vYW5LSW0wV1hBaGk3?=
- =?utf-8?B?WlBlQWdZenlZM3Y4YzdxZ3dCaS9NOW53ait2U2U0alI3NDQvc0FIWllTaEMy?=
- =?utf-8?B?b1RzZm8remNaa21nWVl5Z1orQkMwMmF5V1FVWFJweWdoMllWUjVWZW5JWUlH?=
- =?utf-8?B?WjNhclBvcFpRQklpSHB0TmFwMG9Ldkx2SmRMZEU3dHJ1TUhSWEE1MXhXNTZK?=
- =?utf-8?B?bmJYeml3Qk9pY2MyblFUK0YxcktNcWxpUS9qRk9pdzZPSjA2WmFzUllCclV6?=
- =?utf-8?B?N2ZVUFdBYTFibjVpYzJsRFEwYUlDYzM5TDdRaDFhemdwd1NJTDRUallLSktx?=
- =?utf-8?B?QnpMMWVtMGFTaE02UGxoNU9sVUEvYU5oVHJRMitUNmdYcTA5c2RFOVJOZGVn?=
- =?utf-8?B?akxESXBIcGlINFhKdTFZMlJnTjd4QjB2eGhvaVdoV2daeThrZ25FN25WRnlk?=
- =?utf-8?B?dTBrcG5CekdNQ1h6bDhkZzUzNmJJU094SVhwMlkrRkJDZGJyZFBwZ1ZOWlNE?=
- =?utf-8?B?THZ3V1piN1hUcjk1dm5NaVBBZGxwTll2V0JCRDg5T1l6L1hpOURqa1hFempa?=
- =?utf-8?B?a2ZDc0VlMjJxbGhzSXJ1TEx4V1BvTk5ZMjNLcVpwR0p3ME5xdjJSZVVPRzl5?=
- =?utf-8?B?MW9pUmRMb1dIUWtaZG4rTFJVRXMwZ29kcTZLSHVjSFk5VmpqNmtKTmNjS2pV?=
- =?utf-8?B?WGRGYXpXVFN5MzltdXVJQzE4RUZWM3Bjc2lTbnRyUThZZktZNHVFMlhIZG5J?=
- =?utf-8?B?dlRVS2J3QnBkdjJCeG1lZEM0aWlyazZsRUZjUGxiMjNmTnhkTk1CM1hEd0lM?=
- =?utf-8?B?azVpMWNkT2FvdzdSdStEWUdhTkU5ajdncnRTbVBrK1ZQdG12VUlnQk5RY1B4?=
- =?utf-8?B?cG1QZmhaVEx4VTZ3c3hJaVB3YWk3ckRaT2Mwb2ZESSt1QXhVOXQ0bklJMXpx?=
- =?utf-8?B?WlkyVCtYZXg2N3h2cHBUeDVFc3BHSExzajVDTjVTZDE0SkpUN0VtK1hFWVVO?=
- =?utf-8?B?bnVuaXFEek9raUpwUkordnRkeUFUbHViNmtXKzBadEZZVGd3c1p4VVBHSVNn?=
- =?utf-8?B?T0llTHJhUU0yUUtvYjhvWnBad3laS1VCcWRya0pCZGJNT3dNelFWaTBQWE00?=
- =?utf-8?B?WjJUelFEdXhEZkprS1FpV09mKzhSeDdmSWo1ZFdjSWRESHhQSTJ1Z21Ha1JF?=
- =?utf-8?B?aHlFNDdyQ3NkTjNVd3psaXRPeDU5Qytpc0tHbVRjdFlpTnZMMVJ4bXQ2TWln?=
- =?utf-8?B?NE5hNzduOG1na0FKMDdwYmtmUVlodzhmQU1MTFdiT2Z2cGdwbFM1NVJCTWdN?=
- =?utf-8?B?aHlDK1BMMlB0NjVyV0tBcjNxVVlzSGlPcmVkMGRIWmRLSm5hSEhaWHA0dDRO?=
- =?utf-8?B?K29aTERnbVhpWWFLTGorY1E3MzIxOERDSGJhL3liUzc0SGZsOGRRYWN4dHh6?=
- =?utf-8?B?RDlqcm5UdjhCdUdpZm82RVozbkExQ1M0d2t2T0V5NVNqR0MrMFlFcE55dWxk?=
- =?utf-8?B?eFFVT3p3RGJIcVF5MFdZbWNTSTlMdW1aemtLTk5nTHNjSTRvU05YWmNBcGUz?=
- =?utf-8?B?UGtyNTJuaFZBQ0ZEam9PTnpOM1gvc25Gck10SGhtb3g4akRhR0NUT0JPK0F4?=
- =?utf-8?B?dGR1aE9Mcjc0T2djeG91WWtaQmExS0JYajc5bU8vcXZxMVdOY1JaOU1PYzdj?=
- =?utf-8?B?d2pHQmFUYlpqSWU1elI4WlFRVEczN3lWTGJOMzFDN005aVh4NlI3QVdSSlg5?=
- =?utf-8?B?Yk5CdXFBSjZTb2NjRDMzNjF0Q3FEdVA3angzaEZLUVZJWEIzU2tteUFkYzB4?=
- =?utf-8?B?a2d6VEQ2MXZ5MlJoWWIvNG9sSVB1RlUvalZ4QUszWE1DNFgvdzdPVm5IY2pq?=
- =?utf-8?B?Z1FIYjBrRTNHOEdKNHJYTUhiU1pUL2ZmRXVZbzB0dU0yL1pOd29UVllLVWR6?=
- =?utf-8?B?WVZkYm02TDk1dkJXWHNwaFE4cEpNTTJiZy9DR1FxWGRQZ0FvZkdZR1dJMDVJ?=
- =?utf-8?Q?9UAzDnclLmKmsBtS4a2Pq+8rJ?=
-X-OriginatorOrg: axis.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cfac44fc-ddf4-4744-1f3c-08dc7f251052
-X-MS-Exchange-CrossTenant-AuthSource: DB5PR02MB10093.eurprd02.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y1dOeGxQZUx1Nzk4RVdyRlNhTmpQRnc4Snc1blMydllWLzY2NkIvdjR5aXcw?=
+ =?utf-8?B?T2F6YkRSdHQ1dTZ5NDdwbDl0Ung3UXV4anBPejBJYkdmS0xEbEFvRVNGUVlD?=
+ =?utf-8?B?OFk3bjErT0RDVXdyM1grMVJBa0J4YkhWSEQ0OEkrNW5kMkxGZ25Qa2RGcW1S?=
+ =?utf-8?B?Z21Yd21MTGZMRlpKRE5ZWkkwL1lHY2tmN0pGWjVJV1ZlV2pJejJBeTZGQi96?=
+ =?utf-8?B?T1NoUldacG9DSHR2dnBhRWhtQmhZRWhhU1NZZDI4NEZIREZxMUl4ZHM1Si8v?=
+ =?utf-8?B?dStPR3RXcGJFTERPWkovQThFNk9ZbzQvdW1LV0tMYk9CUTUvQ213ZmR1MmZ1?=
+ =?utf-8?B?UzlLUy9ob2xqRFh4S2lVZTV1TjFsU3dTaGJGSTVUTzlFdEpOTG5jcVM1WURE?=
+ =?utf-8?B?VWJycng1dzMyVjRhNU5kaThVc3Fzd01hTURWUmYrT1pPbDFSRWE5eFJ4UVpp?=
+ =?utf-8?B?QzR3eUNicHdqSW5LdjVlUnlkSjRkQW11MVNlNk42MUdXd0UvR2xlbVNkVlp6?=
+ =?utf-8?B?RGc4dWVzUWVMc2RnYXlYT25CU2dyYWNJKzB6VXpKeGxURnpMNCsyRjgxWWdR?=
+ =?utf-8?B?R0Z3Z2I1YmpZM05RVWFqdWg5cXVVa0xVRmlTR09iV0UwZVB6ZTI3YU1lcEhi?=
+ =?utf-8?B?QTNyNmtTdGtobms5bmlPNFVIcEMzSkVpUTh5NTNTRmVMZFdtNWo0VW12SVBu?=
+ =?utf-8?B?RDU5UzJnZ2hCVGRBZ2NHenpncWpjMTdCWUpuU0ZiWDI1cTRvWVM2ajlBRjgz?=
+ =?utf-8?B?QXN1UFlxcDk5U285SzcrNEZsZklxaE85L0J1QkVEMStqK1JvN29ndjhpZ09j?=
+ =?utf-8?B?ZGRWNWxDcWM1T2FpSkhQQjBVRytSNGhhQUlOelg4Y0ZJV0twaFBDaHlrcE11?=
+ =?utf-8?B?SlE5Z1ZnZnREc0lNR2RESTdSSDNyOGYrU0JyelJhRll5bTVzRmJ4WXpHV2Zs?=
+ =?utf-8?B?dTJEbWFyRVd6VldpQk9mR3prNnhrWWR3VmFveHBHNDRNbC8vQlc3dlFyOTFz?=
+ =?utf-8?B?bjdDMWRDbDlUNTFaL09kak9TL2pZUHI4RFFyaTNwUlZ6OEg3YlZTbHZ3Z1Q2?=
+ =?utf-8?B?aHFuSHBvOHhTbmM0d3hQcUtWY2hxM1EzV0xUNkFXc1ZxS1dONHlZa3JET0xC?=
+ =?utf-8?B?OE14TVBzMGQyQk11VzJkaVMyNDdVU2ZCelo1WGNtUlVmWHlvbkJVM0hmcVM2?=
+ =?utf-8?B?WGpFb05UbXdyRHN3N3hOeVBwaHVUYmRWQmxzdmxJR2hmbVVhMTVOOTNHZTl0?=
+ =?utf-8?B?M0Vabk1vWWViMEN2QWdObWY2dG5SdFZQaEt3dlVJbjZjTHFTREhnL1AzVjh3?=
+ =?utf-8?B?OFkzY3dEcHBEMkc5cE50bVJRTVlscGJHbFB4Y1EzOXZxbHc2OWdhUHcyMi9y?=
+ =?utf-8?B?STdYMzdyUEl1ZjhpaG5iQllaQzkwczFuMTg3dEFXSDNYVUlEMSsybGg0Qmox?=
+ =?utf-8?B?N1JZd2c5dmVId3ZVS0wyUWF2R0J1TXBXd21QMjMwWGtYTkQxTkI5c20vazJU?=
+ =?utf-8?B?cFBsUzdaaWxYSS9KWUx5VDkxOFRSekZpVkt4Tm5yZEcvUXZnRWttVTlTVHJl?=
+ =?utf-8?B?NmlWeGZGZnh5ZEFaYllDUS9iQkNKOVlOM2s5dUFoc3I4UzZ1ZUxUenEzNjdD?=
+ =?utf-8?B?dnVFOGZ0WVR5K3lyTHhIb0hDUC9HY2tiRHV1R3BlRFRKUFdHSFdMNERtZFpz?=
+ =?utf-8?B?aHUwemtnb2lLK2d3WkhncVZ3N1UvVTlhaU1udXp1WE5vcWpmaG5NZWVCVE9E?=
+ =?utf-8?B?ejFRanhMYjVLUnNVY1dJbmVIaXV0RnhvRmJaSS83b0xTTERXeVA0WGUvSmNO?=
+ =?utf-8?B?OTYrYVlEbGxMZEZXcXRXNmd3cWN5VnFnbjBIUFBhdndXN3VXem5VcjFVU09Y?=
+ =?utf-8?B?dURrK2N2TTk0L0xwM2EwcTlndUh0bnd0L09vNEdTd1g2RTAzbjdWZDhNMFZu?=
+ =?utf-8?B?L0t0Njg5aW1XOWVOeVZ4TWwwNGI0T2xtd2VQa0tmZkZYZzY3Z2hLYU9Sb1Vw?=
+ =?utf-8?B?bVFNSVd5S3kyamZxcVZjbmJMWXVmc2JXcnNXYmRTN0t2ZER0aFVuOUExSWZX?=
+ =?utf-8?B?SVUyRE1Vd012K3JkclZ5Q3VCcUFOVy9FMFV6YlJ5R0J0aXBRN3VpQkZKenE1?=
+ =?utf-8?B?TVpWTkxTWE9yZ25BOVE2S2tTZkM4L2I2MWRwTE91UUh4SVdlWmdybUc2T2NO?=
+ =?utf-8?B?eUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 82681d2b-7f1f-47c4-ac04-08dc7f252eff
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 May 2024 14:47:14.5738
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 May 2024 14:48:05.9729
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zUGLTwQjUMxE0L2TkEAU6Bb2Pm5MnhtwUdYPqvoHQj06gHWVpdSCidKiMzcPVLg9
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR02MB5901
+X-MS-Exchange-CrossTenant-UserPrincipalName: NyMiYOVQrblBIenlF2tfCVf5QLpDmpI5oKTmGR3QHVx1cIYBTm0ctR820fhcbi7BI3AIfcS6BT4Gm9v2lKdwJ6fJmo1UxqYFAyYaGa81k/Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8568
+X-OriginatorOrg: intel.com
 
+On 5/28/24 11:11, Shay Drory wrote:
+> Expose the sysfs files for the IRQs that the mlx5 PCI SFs are using.
+> These entries are similar to PCI PFs and VFs in 'msi_irqs' directory.
+> 
+> Reviewed-by: Parav Pandit <parav@nvidia.com>
+> Signed-off-by: Shay Drory <shayd@nvidia.com>
+> 
+> ---
+> v2->v3:
+> - fix mlx5 sfnum SF sysfs
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/eq.c     |  6 +++---
+>   .../ethernet/mellanox/mlx5/core/irq_affinity.c   | 15 ++++++++++++++-
+>   .../net/ethernet/mellanox/mlx5/core/mlx5_core.h  |  6 ++++++
+>   .../net/ethernet/mellanox/mlx5/core/mlx5_irq.h   | 12 ++++++++----
+>   .../net/ethernet/mellanox/mlx5/core/pci_irq.c    | 12 +++++++++---
+>   .../net/ethernet/mellanox/mlx5/core/sf/dev/dev.c | 16 +++++++---------
+>   6 files changed, 47 insertions(+), 20 deletions(-)
+> 
 
-On 5/27/24 15:20, Andrew Lunn wrote:
->>> So IEEE and BRR autoneg are mutually exclusive. It would be good to
->>> see if 802.3 actually says or implies that. Generic functions like
->>> ksetting_set/get should be based on 802.3, so when designing the API
->>> we should focus on that, not what the particular devices you are
->>> interested in support.
->> I am not sure about how to determine whether IEEE 802.3 says anything about
->> the IEEE and BRR modes auto-negotiation mutual exclusivity - it is purely
->> question of the implementation, in our case in the Broadcom PHYs.
-> CLause 22 and clause 45 might say something. e.g. the documentation
-> about BMSR_ANEGCAPABLE might indicate what link modes it covers.
-There is nothing new in IEEE 802.3 clause 22, compared to what can be 
-found in a datasheet of any PHY complying the standard... As for Clause 
-45, I'd say that it does not handle the BRR case, nor the 100Base-T1 aka 
-1BR100.
->
->> One of the
->> BRR modes (1BR100) is direct equivalent of 100Base-T1 as specified in IEEE
->> 802.3bw. As it requests different hardware to be connected, I doubt there is
->> any (even theoretical) possibility to negotiate with a set of supported
->> modes including let's say 100Base-T1 and 100Base-T.
->>> We probably want phydev->supports listing all modes, IEEE and BRR. Is
->>> there a bit equivalent to BMSR_ANEGCAPABLE indicating the hardware can
->>> do BRR autoneg? If there is, we probably want to add a
->>> ETHTOOL_LINK_MODE_Autoneg_BRR_BIT.
->> There is "LDS Ability" (LRESR_LDSABILITY) bit in the LRE registers set of
->> BCM54810, which is equivalent to BMSR_ANEGCAPABLE and it is at same position
->> (bit 3 of the status register), so that just this could work.
->>
->> But just in our case, the LDS Ability bit is "reserved" and "reads as 1"
->> (BCM54811, BCM54501). So at least for these two it cannot be used as an
->> indication of aneg capability.
->>
->> LDS is "long-distance signaling" int he Broadcom's terminology, "a special
->> new type of auto-negotiation"....
-> For generic code, we should go from what 802.3 says. Does clause 22 or
-> clause 45 define anything like LDS Ability? If you look at how 802.3
-> C22/C45 works, it is mostly self describing. You can read registers to
-> determine what the PHY supports. So it is possible to have generic
-> genphy_read_abilities() and genphy_c45_pma_read_abilities which does
-> most of the work. Ideally we just want to extend them to cover BBR
-> link modes.
->
-This sounds to me like we should not rely on common properties of IEEE 
-and BRR register sets and rather implement it separately for the 
-BroadR-Reach mode.
+[...]
 
-In other words, on initialization, decide whether there will be IEEE or 
-BRR mode and behave according to that. The IEEE mode is already 
-implemented in current state of Broadcom PHY library and broadcom.c and 
-it does not nothing special in addition to make sure that the BRR mode 
-is off. The rest is IEEE compatible.
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
+> index 612e666ec263..5c36aa3c57e0 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
+> @@ -112,15 +112,18 @@ irq_pool_find_least_loaded(struct mlx5_irq_pool *pool, const struct cpumask *req
+>   
+>   /**
+>    * mlx5_irq_affinity_request - request an IRQ according to the given mask.
+> + * @dev: mlx5 core device which is requesting the IRQ.
+>    * @pool: IRQ pool to request from.
+>    * @af_desc: affinity descriptor for this IRQ.
+>    *
+>    * This function returns a pointer to IRQ, or ERR_PTR in case of error.
+>    */
+>   struct mlx5_irq *
+> -mlx5_irq_affinity_request(struct mlx5_irq_pool *pool, struct irq_affinity_desc *af_desc)
+> +mlx5_irq_affinity_request(struct mlx5_core_dev *dev, struct mlx5_irq_pool *pool,
+> +			  struct irq_affinity_desc *af_desc)
+>   {
+>   	struct mlx5_irq *least_loaded_irq, *new_irq;
+> +	int ret;
+>   
+>   	mutex_lock(&pool->lock);
+>   	least_loaded_irq = irq_pool_find_least_loaded(pool, &af_desc->mask);
+> @@ -152,6 +155,13 @@ mlx5_irq_affinity_request(struct mlx5_irq_pool *pool, struct irq_affinity_desc *
+>   					     mlx5_irq_get_index(least_loaded_irq)), pool->name,
+>   			      mlx5_irq_read_locked(least_loaded_irq) / MLX5_EQ_REFS_PER_IRQ);
+>   unlock:
+> +	if (mlx5_irq_pool_is_sf_pool(pool)) {
+> +		ret = auxiliary_device_sysfs_irq_add(mlx5_sf_coredev_to_adev(dev),
+> +						     mlx5_irq_get_irq(least_loaded_irq));
+> +		if (ret)
+> +			mlx5_core_err(dev, "Failed to create sysfs entry for irq %d, ret = %d\n",
+> +				      mlx5_irq_get_irq(least_loaded_irq), ret);
 
-If there were fully separated handling of IEEE and BRR, it would be 
-difficult to do IEEE/BRR auto-detection or even try to issue aneg start 
-command in both modes at once then check which one succeeds. However, 
-this is not I would like to implement anyway (also for lack of hardware 
-capable of doing so).
+you are handling the error by logging a message, then ignoring it
+this is clearly not an ERROR, just a WARN or INFO.
 
-All code in bcm-phy-lib should handle PHY in LRE (or BRR) mode. For 
-example, bcm54811_config_aneg in my last patch version basically calls 
-bcm_config_aneg or genphy_config_aneg based on whether the PHY is in BRR 
-or IEEE mode. The bcm_config_aneg then calls some genphy_... functions 
-and thus relies on the fact that the LRE (BRR mode) registers do mostly 
-the same as IEEE. This should probably be avoided and all control that 
-can be done in the LRE register set only be done there and of course use 
-the register definitions from brcmphy.h (LRECR_RESET to reset the chip, 
-although it is same bit 15 as BMCR_RESET in Basic mode control register 
-etc.). Only this shall be a pure solution.
+> +	}
+>   	mutex_unlock(&pool->lock);
+>   	return least_loaded_irq;
+>   }
 
-For example, regarding the auto-negotiation, in BRR mode it shall mean 
-LDS, in IEEE mode the usual auto-negotiation as described in IEEE802.3.
-
->>> ksetting_set should enforce this mutual exclusion. So
->>> phydev->advertise should never be set containing invalid combination,
->>> ksetting_set() should return an error.
->>>
->>> I guess we need to initialize phydev->advertise to IEEE link modes in
->>> order to not cause regressions. However, if the PHY does not support
->>> any IEEE modes, it can then default to BRR link modes. It would also
->>> make sense to have a standardized DT property to indicate BRR should
->>> be used by default.
->> With device tree property it would be about the same situation as with phy
->> tunable, wouldn't? The tunable was already in the first version of this
->> patch and it (or DT property) is same type of solution, one knows in advance
->> which set of link modes to use. I personally feel the DT as better method,
->> because the IEEE/BRR selection is of hardware nature and cannot be easily
->> auto-detected - exactly what the DT is for.
-> If we decide IEEE and BRR are mutually exclusive because of the
-> coupling, then this is clearly a hardware property. So DT, and maybe
-> sometime in the future ACPI, is the correct way to describe this.
-
-yes, see previous paragraph - IEEE and BRR to be mutually exclusive, 
-neglect the possibility existing in some chips to do kind of 
-super-auto-negotiation and thus make the chip to detect the type of 
-connected physical network. I cannot test it and anyway, the BCM54810 
-(with BRR aneg) seems to be deprecated in favor of BCM54811 (no BRR 
-aneg, or at least not documented).
-
-For our use case this is irrelevant, we have fixed master-slave and 
-speed selection.
-
->
->> There is description of the LDS negotioation in BCM54810 datasheet saying
->> that if the PHY detects standard Ethernet link pulses on a wire pair, it
->> transitions automatically from BRR-LDS to Clause 28 auto-negotioation mode.
->> Thus, at least the 54810 can be set so that it starts in BRR mode and if
->> there is no BRR PHY at the other end and the other end is also set to
->> auto-negotiate (Clause-28), the auto-negotiation continues in IEEE mode and
->> potentially results in the PHY in IEEE mode. In this case, it would make
->> sense to have both BRR and IEEE link modes in same list and just start with
->> BRR, leaving on the PHY itself the decision to fall back to IEEE. The
->> process would be sub-optimal in most use cases - who would use BRR PHY in
->> hardwired IEEE circuit..?
->>
->> However, I cannot promise to do such a driver because I do not have the
->> BCM54810 available nor it is my task here.
-> That is fine. At the moment, we are just trying to explore all the
-> corners before we decide how this should work. 802.3 should be our
-> main guide, but also look at real hardware.
->
->> OK so back to the proposed new parameter for ethtool, the "linkmode" would
->> mean forced setting of  given link mode - so use the link_mode_masks as 1 of
->> N or just pass the link mode number as another parameter?
-> The autoneg off should be enough to indicate what the passed link mode
-> means. However, it could also be placed into a new property it that
-> seems more logical for the API. When it comes to the internal API, i
-> think it will be a new member anyway.
-OK then the only change to ethtool itself would be adding the 
-possibility of eg. "linkmode 100BaseT1/Full", let the other end process 
-it together with other parameters such as master-slave etc.
->
-> 	Andrew
-
-So now, maybe it's time to try to implement the solution discussed above 
-and try another patch version...?
-
-
-Kamil
-
+[...]
 
