@@ -1,125 +1,126 @@
-Return-Path: <netdev+bounces-98687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05C478D2103
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:01:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF2D28D217C
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:19:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EB771C234D8
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:01:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68F06288A6A
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:19:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 593A4171E53;
-	Tue, 28 May 2024 16:01:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C172117279E;
+	Tue, 28 May 2024 16:19:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fU28puj3"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="kkkr3ulj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA1E17165A;
-	Tue, 28 May 2024 16:01:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE8D172799
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 16:19:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716912107; cv=none; b=cdj+TyHbHDTIGKqE/RWKLVU/R5dk7cCkLXCr6myIVpE7NyC4HaMph1k/arksVlhW2C7cOshbzbACIdxIUz6h5B0ZnsTyb0BWrfLMPUNl6uNonj+h+U0GO6fazSQWIhqm1a6xxIdp1yd68yiREHWRWLvKTJH8mhG2ihHPTkG0xxk=
+	t=1716913149; cv=none; b=bUFeCAb6qM+y5Y8BTwV2ZtEr4kH7g7rwccX6sv8gftIXLIqHT0lrOFuBE3J7yx65PH/EiJAtxqs7ACIWgwiEnzFwK2sMViMqg7j1UO5EfZFxB63nEAr+8FiexpS8q6lXC7CxxS0oqVYNfs7VReBgtpUASQ6K2+ykZkFxPNIkYIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716912107; c=relaxed/simple;
-	bh=t2gPO9E5KDV8DBOTS9kzpjKMHp5fMYSAzFQD5O4E4x8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r/UqNTst7Ancf25sY8169IH1tL+phg0aLwom4EStuwcADv/lnC1ZjA7AImSY4vRDvoycdJ0Upho36awRA3w58skiH6NH2Gu/h11lUA8cd6Cooi/+x4pcclgmgoRVnee8wCkmjRK1gOT4UK4B/aFFZcp2J+7vdczHaheYioPE/GU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fU28puj3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABF75C3277B;
-	Tue, 28 May 2024 16:01:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716912105;
-	bh=t2gPO9E5KDV8DBOTS9kzpjKMHp5fMYSAzFQD5O4E4x8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fU28puj30jDFw0Ya/9BJ3AfsoDRrbPcuK5sVZyKdXrft/YFsSrDsp0xcQIkQkVch7
-	 mjhBRLEp+qrSCGY8szjUG4DRaTj/owZVrc9vi97QX+oQTGZJ20ag229aJHiMlY97+Z
-	 xRqQD6w94qqPPy3C/Ka/IFdp1EsrW0f5hj3edtaakzcvKIXEBoKQdqEpzWQHw0+7vm
-	 H25QfnBrMSB7j5e+dFn3As1vqczb7RspV8KlzRYwTSirfNbPA5+zIhJZegF/SbvMDg
-	 6sVjg0o6f6//w643qsYaCq/6l83o+7QyGc8T3Qsz4Kd+Ag/egdmN2ejA1Gaf9LFLla
-	 tLp/oKraXQH4w==
-Message-ID: <47b633a2-e5c5-49ba-a36d-0e1354899db3@kernel.org>
-Date: Tue, 28 May 2024 18:01:40 +0200
+	s=arc-20240116; t=1716913149; c=relaxed/simple;
+	bh=aFJE0xOfrdA+IhWVa3bl7TWEo1rOmvHpNsX5DdYQOa8=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=lfT1Lp8giQIN+HJmo1wLiPOYUh+r0FkQtz4dyceh5moZ3vuSx81jR2Wr+5I8xJIqxVR3bR0ft4z1gNc90wK3Hwepk2XAo5E7kkKZWU/b3TbTDNgGmEvDcLf6axAFeblk9zmatNCI9mG/wFgwH+OzfDQ0UxE5KmgIyogtqdP+N/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=kkkr3ulj; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1716913143; h=Message-ID:Subject:Date:From:To;
+	bh=CKy1yn8mfMmdEgP+e0Xom04ZDQhZifO2CQTZV/20VI8=;
+	b=kkkr3ulj9AHFURhlagP7S+tdWSkuysjVFXORoITotseAFiHd1nP+gkdroPsQDhGny99+wjW8rrdigPiaoBOFKfVsRYFMHkPvjamNnln4ACwIB/yBgceQRYfsGWNluRFh42nUhEAq8qJ7M1aYYDqCUgU5KTcI9P7rWeVvjcYNfew=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W7Q4PRA_1716913142;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W7Q4PRA_1716913142)
+          by smtp.aliyun-inc.com;
+          Wed, 29 May 2024 00:19:02 +0800
+Message-ID: <1716912105.4028382-1-hengqi@linux.alibaba.com>
+Subject: Re: [PATCH net 2/2] virtio_net: fix missing lock protection on control_buf access
+Date: Wed, 29 May 2024 00:01:45 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org,
+ virtualization@lists.linux.dev,
+ Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Daniel Jurgens <danielj@nvidia.com>
+References: <20240528075226.94255-1-hengqi@linux.alibaba.com>
+ <20240528075226.94255-3-hengqi@linux.alibaba.com>
+ <20240528114547-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240528114547-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dt-bindings: net: wireless: ath11k: Drop
- "qcom,ipq8074-wcss-pil" from example
-To: "Rob Herring (Arm)" <robh@kernel.org>, Kalle Valo <kvalo@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Jeff Johnson <jjohnson@kernel.org>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, ath11k@lists.infradead.org,
- linux-kernel@vger.kernel.org
-References: <20240528134610.4075204-1-robh@kernel.org>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240528134610.4075204-1-robh@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 28/05/2024 15:46, Rob Herring (Arm) wrote:
-> Convention for examples is to only show what's covered by the binding,
-> so drop the provider "qcom,ipq8074-wcss-pil". It is also not documented
-> by a schema which caused a warning.
+On Tue, 28 May 2024 11:46:28 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Tue, May 28, 2024 at 03:52:26PM +0800, Heng Qi wrote:
+> > Refactored the handling of control_buf to be within the cvq_lock
+> > critical section, mitigating race conditions between reading device
+> > responses and new command submissions.
+> > 
+> > Fixes: 6f45ab3e0409 ("virtio_net: Add a lock for the command VQ.")
+> > Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
 > 
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> 
+> I don't get what does this change. status can change immediately
+> after you drop the mutex, can it not? what exactly is the
+> race conditions you are worried about?
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+See the following case:
 
-Best regards,
-Krzysztof
+1. Command A is acknowledged and successfully executed by the device.
+2. After releasing the mutex (mutex_unlock), process P1 gets preempted before
+   it can read vi->ctrl->status, *which should be VIRTIO_NET_OK*.
+3. A new command B (like the DIM command) is issued.
+4. Post vi->ctrl->status being set to VIRTIO_NET_ERR by
+   virtnet_send_command_reply(), process P2 gets preempted.
+5. Process P1 resumes, reads *vi->ctrl->status as VIRTIO_NET_ERR*, and reports
+   this error back for Command A. <-- Race causes incorrect results to be read.
 
+Thanks.
+
+> 
+> > ---
+> >  drivers/net/virtio_net.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index 6b0512a628e0..3d8407d9e3d2 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -2686,6 +2686,7 @@ static bool virtnet_send_command_reply(struct virtnet_info *vi, u8 class, u8 cmd
+> >  {
+> >  	struct scatterlist *sgs[5], hdr, stat;
+> >  	u32 out_num = 0, tmp, in_num = 0;
+> > +	bool ret;
+> >  	int err;
+> >  
+> >  	/* Caller should know better */
+> > @@ -2731,8 +2732,9 @@ static bool virtnet_send_command_reply(struct virtnet_info *vi, u8 class, u8 cmd
+> >  	}
+> >  
+> >  unlock:
+> > +	ret = vi->ctrl->status == VIRTIO_NET_OK;
+> >  	mutex_unlock(&vi->cvq_lock);
+> > -	return vi->ctrl->status == VIRTIO_NET_OK;
+> > +	return ret;
+> >  }
+> >  
+> >  static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
+> > -- 
+> > 2.32.0.3.g01195cf9f
+> 
 
