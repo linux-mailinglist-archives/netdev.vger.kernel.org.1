@@ -1,132 +1,135 @@
-Return-Path: <netdev+bounces-98702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 991FE8D21E3
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:47:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1558A8D2212
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:57:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C99571C22F98
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:47:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C613C28A748
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:57:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1178F172BD5;
-	Tue, 28 May 2024 16:47:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058B8173328;
+	Tue, 28 May 2024 16:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FMaIWg8Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD571DA4C;
-	Tue, 28 May 2024 16:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49553171E44
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 16:57:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716914854; cv=none; b=AJ6k6o30bLBuFV69AZ1zaiks1NfudmzIt//TqGW11OZDmJhSfHuNJ/hJpU9WIBovR49YhR8XAnt8hKArMnSHtDP1TLAXu+1XEDLX4HKk99MysG5f/Ytv4hv6r+cCXdXXZzXd9M11DqZDXvfB03m10K5vooQL9HdbwfTSj5EFbps=
+	t=1716915453; cv=none; b=PWg5m1/38TjfvEXHfALvNfCMjhGeZ6hG3KXxlOoN2pqaXP4Shht8yQ5ud2N4Ja8v7lOSabXqTXY2QMROEz1D4K/lqgfAoZtCgTUTrya/p13n+dyngQIelwZOeneKSA1mjgyocog5oUk0q2LRTbP3lhPnrm3Txy9dPN4Prz8m/Ws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716914854; c=relaxed/simple;
-	bh=eJm+vTHiJ203ALe26R4OEnK0aj/nRJRzqy/wm+frgt0=;
-	h=Subject:From:To:CC:References:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=qTgzVjDkmHGyoiVGwYOmJgxr1gLAj0XeK+WGkfyrVmP68ofGJ9W1AtyrVGMhEjLziQAwbnwjJeikzn+3UaQyoyS69PeiJtJK5v6FnWm5ROr1a/BcFX0ixN/DieeA51rd0omHRdq1BfqX2LMoruwYbzeLSqqeFQl2gsIsw8NKLVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.78.2) by msexch01.omp.ru (10.188.4.12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 28 May
- 2024 19:47:21 +0300
-Subject: Re: [net-next PATCH v4 2/7] net: ravb: Consider busypolling status
- when re-enabling interrupts
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-CC: Biju Das <biju.das.jz@bp.renesas.com>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
-	<yoshihiro.shimoda.uh@renesas.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240528150339.6791-1-paul.barker.ct@bp.renesas.com>
- <20240528150339.6791-3-paul.barker.ct@bp.renesas.com>
- <669d3b51-d068-8816-37d1-dab2ffadb250@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <6bf07bb1-76c5-db5b-423b-a4c94bdf1ee3@omp.ru>
-Date: Tue, 28 May 2024 19:47:20 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1716915453; c=relaxed/simple;
+	bh=20lWxuyncauYpRPdcIP2qeiyq8Pn90Gk/tUHOS/51sw=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=YhCWmrKTRoCJpfaVBfh1T1+aHQcxQULk37RGyUxoG27Vq6FkRqS3cn2UXPNmX6wdo1NOvGq6OTzKMFG30kOBMlUbH5zFBBIMjHFKUWyiyqmp3zde9tX4McRvM6IUgzacT5E9si7xG3JNGY5wjJ7dnEjNt/Sp0GCKVxgrQLRlp/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FMaIWg8Z; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: andrew@lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1716915449;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=jNceAp37GB1si/9T0wIzhGZuQRX1PlheHnoihJOZ330=;
+	b=FMaIWg8ZBt2go1CkaZdykQtMyRQWLzUq8vG5dX1s/BuhqoUK8kYWDN//VMNuJzplplQ8KU
+	UotCwJMPUUHD+HUaf9QEb2kc1h/ThDL6i7kDh6wJxiHjxpl2L3ogNkU2MsEjKKGVo61l9D
+	gfJpYBIKAlfY//vWE3msD2JkVLYGo3c=
+X-Envelope-To: linux@armlinux.org.uk
+X-Envelope-To: andi.shyti@kernel.org
+X-Envelope-To: netdev@vger.kernel.org
+X-Envelope-To: linux-i2c@vger.kernel.org
+X-Envelope-To: michal.simek@amd.com
+X-Envelope-To: hkallweit1@gmail.com
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+Message-ID: <ec7907f1-cb5a-41ab-824c-aa0b02440ada@linux.dev>
+Date: Tue, 28 May 2024 12:57:25 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <669d3b51-d068-8816-37d1-dab2ffadb250@omp.ru>
-Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+Subject: [BUG] SFP I2C timeout forces link down with PHY_ERROR
+To: Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
+ Andi Shyti <andi.shyti@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, linux-i2c@vger.kernel.org
+Cc: Michal Simek <michal.simek@amd.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 05/28/2024 16:29:31
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 185551 [May 28 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 20 0.3.20
- 743589a8af6ec90b529f2124c2bbfc3ce1d2f20f
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_arrow_text}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.2 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.2 in (user) dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.78.2
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 05/28/2024 16:33:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 5/28/2024 12:09:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-Migadu-Flow: FLOW_OUT
 
-On 5/28/24 7:44 PM, Sergey Shtylyov wrote:
+Hi,
 
->> Make use of the busypolling status returned from NAPI complete to decide
-> 
->    My spellchecker/translator trip over "busypolling" -- consider using
-> "busy-polling"?
->    And did you actually mean napi_complete_done()?
+I saw the following warning [1] twice when testing 1000Base-T SFP
+modules:
 
-   Ah, napi_complete() also returns a result... maybe this should be reworded
-as "NAPI completion"?
+[ 1481.682501] cdns-i2c ff030000.i2c: timeout waiting on completion
+[ 1481.692010] Marvell 88E1111 i2c:sfp-ge3:16: Master/Slave resolution failed
+[ 1481.699910] ------------[ cut here ]------------
+[ 1481.705459] phy_check_link_status+0x0/0xe8: returned: -67
+[ 1481.711448] WARNING: CPU: 2 PID: 67 at drivers/net/phy/phy.c:1233 phy_state_machine+0xac/0x2ec
+<snip>
+[ 1481.904544] macb ff0c0000.ethernet net1: Link is Down
 
->> if interrupts shall be re-enabled or not. This is useful to reduce the
->> interrupt overhead.
->>
->> While at it switch to using napi_complete_done() as it take into account
-> 
->    Takes.
-> 
->> the work done when providing the busypolling status.
-> 
->    Again, "busy-polling"?
->  
->> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+and a second time with some other errors too:
 
-[...]
+[   64.972751] cdns-i2c ff030000.i2c: xfer_size reg rollover. xfer aborted!
+[   64.979478] cdns-i2c ff030000.i2c: xfer_size reg rollover. xfer aborted!
+[   65.998108] cdns-i2c ff030000.i2c: timeout waiting on completion
+[   66.010558] Marvell 88E1111 i2c:sfp-ge3:16: Master/Slave resolution failed
+[   66.017856] ------------[ cut here ]------------
+[   66.022786] phy_check_link_status+0x0/0xcc: returned: -67
+[   66.028255] WARNING: CPU: 0 PID: 70 at drivers/net/phy/phy.c:1233 phy_state_machine+0xa4/0x2b8
+<snip>
+[   66.339533] macb ff0c0000.ethernet net1: Link is Down
 
-MBR, Sergey
+The chain of events is:
+
+- The I2C transaction times out for some reason (in the latter case due
+  to a known hardware bug).
+- mdio-i2c converts the error response to a 0xffff return value
+- genphy_read_lpa sees that LPA_1000MSFAIL is set in MII_STAT1000 and
+  returns -ENOLINK. This propagates up the calls stack.
+- phy_check_link_status returns -ENOLINK
+- phy_error_precise forces the link down with state = PHY_ERROR.
+
+The problem with this is that although the register read fails due to a
+temporary condition, the link goes down permanently (or at least until
+the admin cycles the interface state).
+
+I think some part of the stack should implement a retry mechanism, but
+I'm not sure which part. One idea could be to have mdio-i2c propagate
+negative errors instead of converting them to successful reads of
+0xffff. But we would still need to handle that in the phy driver or in
+phy_state_machine.
+
+- Are I2C bus drivers supposed to be flaky like this? That is, are callers of
+  i2c_transfer expected to handle the occasional spurious error?
+- Similarly, are MDIO bus drivers allowed to be flaky?
+- Is ETIMEDOUT even supposed to be recoverable? Maybe we should have
+  cdns-i2c return EAGAIN instead so it gets retried by the bus
+  arbitration logic in __i2c_transfer.
+- ENOLINK really seems like something which we could recover from by
+  resetting the phy (or even just waiting a bit). Maybe we should have
+  the phy state machine just switch to PHY_NOLINK?
+
+Of course, the best option would be to fix cdns-i2c to not be buggy, but
+the hardware itself is buggy in at least one of the above cases so that
+may not be practical.
+
+--Sean
 
