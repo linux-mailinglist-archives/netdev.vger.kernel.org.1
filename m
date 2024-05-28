@@ -1,90 +1,117 @@
-Return-Path: <netdev+bounces-98424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2DE98D15FD
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 10:12:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4F7A8D15E0
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 10:09:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17E63B234A1
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 08:12:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73B981F214E5
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 08:09:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4924D13C67B;
-	Tue, 28 May 2024 08:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A7813AA32;
+	Tue, 28 May 2024 08:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="oIZxSF2n"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WVAgzJ9l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-65-228.siemens.flowmailer.net (mta-65-228.siemens.flowmailer.net [185.136.65.228])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AD9B13E3E7
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 08:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.228
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0A750297;
+	Tue, 28 May 2024 08:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716883822; cv=none; b=kiru+lXBuVudoXEPDMZ3xsbHOrcnEbFZ+JqXK7RVXZNFGuLmCnGgsooI0MP500UYeGOCYWytPKs7ufg9OqtTkzVc9p6xAQ0FyVU85gSWBpSFmIqOvZCxlxGDEuH/eVK6dLooVOJOngGA3vIK6wdDEwlCWtRo0PdY00O9ukKE4hc=
+	t=1716883789; cv=none; b=ROJumOfvMG0dv3qBf4XgMPSXA3EzsPVq0z7BG3MMe7RXAZbB/9qex1TGP8Kw5WAaKrtMJeHAbhrDdokKPDZC/d9zfMumoFE7xfolbiY8qWiQbIZaFBPwm19K2hSFcWlAwRZhCP4wpXNxXF8YTigngFFG5Q6Gw9xQjD+15HQnmWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716883822; c=relaxed/simple;
-	bh=Fkfxzan7+VVwhR+E/zceZ23cnz/laoCua2izY7sFQ7c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Aq0puVA8+fehGxKx+edVamL/imHi9WvWa2JlHh9lYdcGZPpAFEKNxr2EvXvHybyRjw77Q+KYcdVQrKD7rTC5sEi5WifnGj3GlU0u235ZCojydQT2rkVm+TIyxjCzodoxMATVPaVCyx5RhcnF/qqO910OdYUNtACSecD19+hRo2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=oIZxSF2n; arc=none smtp.client-ip=185.136.65.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-65-228.siemens.flowmailer.net with ESMTPSA id 20240528080003b093467aa0a089ed85
-        for <netdev@vger.kernel.org>;
-        Tue, 28 May 2024 10:00:03 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
- d=siemens.com; i=alexander.sverdlin@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=O62xt/3Aofzu+/EkdK/euWUcYEIO0V7gvSFJT7IyUSI=;
- b=oIZxSF2nZGYE/I5IjDM3SbTHWKs5hTqoU+tjKm+3ZiTW+tBCfK0OSS8/E21ud1Xec19hb9
- 0qfxon//A9XLaOXze5r+wvzV0u8+YWc674HXcVeYrSvUk+zWV7lHC2rHnmHeAFdkDp1BKEF0
- 4vonubOlGLoQ+zZQuFvMxyoqmUjUI=;
-From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
-To: netdev@vger.kernel.org
-Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	Grygorii Strashko <grygorii.strashko@ti.com>,
-	Chintan Vankar <c-vankar@ti.com>
-Subject: [PATCH net-next 2/2] net: ethernet: ti: am65-cpsw-nuss: populate netdev of_node
-Date: Tue, 28 May 2024 09:59:50 +0200
-Message-ID: <20240528075954.3608118-3-alexander.sverdlin@siemens.com>
-In-Reply-To: <20240528075954.3608118-1-alexander.sverdlin@siemens.com>
-References: <20240528075954.3608118-1-alexander.sverdlin@siemens.com>
+	s=arc-20240116; t=1716883789; c=relaxed/simple;
+	bh=mfCXTipakAtKBu2HlqtTfmD9G3DkotUs8mWBAKIrBfo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=TvYv4JHX65YAiDq63UmdssJ8zkOmEi8FrjVYDK96nQ0o9icgbSY4BxSjhrTk5j+35h6nHNvqCQqhl0c8UW0mtLRUBblGfhBSeU1ljdAUriDctbUFDiPptPQ9RNgxlkL1/H+Rhy6UX62aRuDVhv9+1eMc6PM0VuXIPo2N5jVIAo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WVAgzJ9l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DA96C3277B;
+	Tue, 28 May 2024 08:09:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716883788;
+	bh=mfCXTipakAtKBu2HlqtTfmD9G3DkotUs8mWBAKIrBfo=;
+	h=From:Subject:Date:To:Cc:From;
+	b=WVAgzJ9l/5CET0C7yY6cYwVgvAU7f0NwkqnupqGJZsz+PepD7VrX4kiU20Un9EQff
+	 yn/DhCOcQatFN5FaDCauX5WxkbC/6GjHKw0ZdLnxYqxVtPmxHIFuYArzsHCZewcPNP
+	 ZR4hy60p9kZwWz4hD5Cy61hz7RtQ5+0RqgYcsW5T/B/8t9e7Zo+Py6Gm2DwdvCEB64
+	 5ZgX0fDgBmNwwvqFrUbqijP/fniVin1sRLui0TZQZ0oLJjZlJcT2TFxSaubIWMcElX
+	 N47g4dnjzufvLTYiu7pI960BYZfQ1nbyd73LTOk3X5aEI0TgoBgq38r88biOJXS0YG
+	 w0mpqom4L+i7g==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next v2 0/3] doc: mptcp: new general doc and fixes
+Date: Tue, 28 May 2024 10:09:15 +0200
+Message-Id: <20240528-upstream-net-20240520-mptcp-doc-v2-0-47f2d5bc2ef3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-456497:519-21489:flowmailer
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACuRVWYC/42NzQ6CMBCEX4Xs2TVlgfhz8j0Mh1pWaJS22VaCI
+ by7lYNnj99MZr4FIovlCOdiAeHJRutdBtoVYAbtekbbZQZSVKuGFL5CTMJ6RMcJf+kYkgnYeYP
+ cHLSpiLjWBvJLEL7beTNc4btxPCdoczPYmLy8N/VUbv3flqlEhVzpjk51dSRzuzxYHD/3Xnpo1
+ 3X9ABbBtQvZAAAA
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+ Gregory Detal <gregory.detal@gmail.com>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1240; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=mfCXTipakAtKBu2HlqtTfmD9G3DkotUs8mWBAKIrBfo=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmVZFJ1irTJZ1WHShreyDzueOQqLttvCuXjxnOh
+ HJqQ9VyOLCJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZlWRSQAKCRD2t4JPQmmg
+ cxZhD/0XTr+lhW/wk+9hBFu11PVQFvcXxsM7LEdWqMKGIzP/dErTC6zFtrczKM/JZ5w3Zz3oSMS
+ Qjz8B+nqC0WdiZCuY0/HniMKhQPX/8uGyUoZJideLydTi8L2T+jbHG450cINAUO1bQjt0+27F+E
+ wkSEGEvWtOlZpeKtdDiq+uy/W8Dih/CFSFuB/tepAJxc4Qj4r01dIl4d6ggGY/Cz2QxnGysLS1L
+ OHGzI+tw+2WYAClPXO/76u2G/mcR9t0IVXJWwMAEULF2VGEJuwQWI5Mjxq5eLruCiYrSZbLztSG
+ ugpwxSG/F+yLQG3o8tu4/ksSRiEkjZjser2/h/8nRBbTNnJRwbeFWCQvPiJgfKfeZ5F4qibTpep
+ UvltrmrBaGzI/7RIPn9lgd5iQ+Ne0PH2VrPae/R5BOPn+oXzw5qpoUJQssZVdOR8o1hTfWdjswD
+ rOSK89UZXZ0H2zVU8hxQe5bKGpk4I0V5VRHDABrqtXNkiKGV2oCERt4YyEHdO9U5JzLDE+c3CNq
+ h8647pmycUGSNNpgrf3LNZw760rHKXz4Lv4jMJl3/YV7bLs3omJAZiY8r/5o0XgnirJZy243aoF
+ +c/VWIYWDe1xfmgg+sHViYqpa36dgCHC9yRyI6LePOe8IZtnh6vQ0RDoISduU6iczoe0/6+L8bq
+ p+U6QcbnrZMPNQw==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+A general documentation about MPTCP was missing since its introduction
+in v5.6. The last patch adds a new 'mptcp' page in the 'networking'
+documentation.
 
-So that of_find_net_device_by_node() can find cpsw-nuss ports and other DSA
-switches can be stacked downstream.
+The first patch is a fix for a missing sysctl entry introduced in v6.10
+rc0, and the second one reorder the sysctl entries.
 
-Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 1 +
- 1 file changed, 1 insertion(+)
+Changes in v2:
+- Patch 3/3: fixed mptcp.dev link syntax.
+- Rebased on top of net-next (Paolo).
+- Link to v1: https://lore.kernel.org/r/20240520-upstream-net-20240520-mptcp-doc-v1-0-e3ad294382cb@kernel.org
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index eaadf8f09c401..e6f87ac394fe6 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -2703,6 +2703,7 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common *common, u32 port_idx)
- 	mutex_init(&ndev_priv->mm_lock);
- 	port->qos.link_speed = SPEED_UNKNOWN;
- 	SET_NETDEV_DEV(port->ndev, dev);
-+	port->ndev->dev.of_node = port->slave.port_np;
- 
- 	eth_hw_addr_set(port->ndev, port->slave.mac_addr);
- 
+---
+Matthieu Baerts (NGI0) (3):
+      doc: mptcp: add missing 'available_schedulers' entry
+      doc: mptcp: alphabetical order
+      doc: new 'mptcp' page in 'networking'
+
+ Documentation/networking/index.rst        |   1 +
+ Documentation/networking/mptcp-sysctl.rst |  74 +++++++-------
+ Documentation/networking/mptcp.rst        | 156 ++++++++++++++++++++++++++++++
+ MAINTAINERS                               |   2 +-
+ 4 files changed, 197 insertions(+), 36 deletions(-)
+---
+base-commit: 5233a55a5254ea38dcdd8d836a0f9ee886c3df51
+change-id: 20240520-upstream-net-20240520-mptcp-doc-e57ac322e4ac
+
+Best regards,
 -- 
-2.45.0
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
