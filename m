@@ -1,164 +1,108 @@
-Return-Path: <netdev+bounces-98779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4C0E8D2711
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 23:33:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D1E88D270A
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 23:31:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D8DC1F26FBB
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 21:33:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 153361F23EC4
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 21:31:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D11A17DE07;
-	Tue, 28 May 2024 21:33:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 780507345A;
+	Tue, 28 May 2024 21:31:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eKKTTVsO";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="/F8BJdjs";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eKKTTVsO";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="/F8BJdjs"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="g5TU9e63"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4BF17E8EB;
-	Tue, 28 May 2024 21:33:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B912FB2;
+	Tue, 28 May 2024 21:31:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716931982; cv=none; b=RvOQllArNdxJtmd53xXz/GDPwvvT6me6WbkXclEeZ/o+HkZBo+TM3/l8ChYIVVfoLOs7dvWThclvpjTeG2lNCa7XMZWdnFQ+J1twHdpBeWVhuxMDBLEI/A2w433Bk9BR/vo+cTK37IKbcFJ6G60/e53iel54nQxp8oX+/pjNkrY=
+	t=1716931874; cv=none; b=BN4DECeJGtnFvGF5X1hcflaMH1PHTOP6TzNFgKNeZzO03tb8S3wdNbBKwJoz5tu+Gx/fUiBbW7ugJTLgX28jKiwUlQeBb9ppvuiESFkrvxn9sETpuMEZhH9peLuWbr4+dOofIL2C6x2Nk+SnUIr2NAWGCWi6EFmEAp7sJTKlESI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716931982; c=relaxed/simple;
-	bh=N/F1cQTv+lmMXzChgNuNTRRn1ZHxZm+fiOMR2NPxtaE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ti5ZnX/PMEbySxdlNQ24jmMhw1xN44lT2gVH5JssRokOboIaGE5qFtMdoNUGJK35h2vb+usRzr5LM3xtors4dR+Ei3AcJTtFB3TDnCyb7xq1WpA1f4/V909CDbptgcTPlRyCJ7dXuqYRX29EteSItNxydwUFoVLBeZ+6LqPu0R8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=eKKTTVsO; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=/F8BJdjs; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=eKKTTVsO; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=/F8BJdjs; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id D3A0D2045D;
-	Tue, 28 May 2024 21:32:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1716931978;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y271KPi+tCyRmzKrDCwqISkFoY5mXolXM/ZhCYK6JPs=;
-	b=eKKTTVsOye+aPNKRzZ122169aw7bdpQ6y9COLPAXegCVrG5iSFsKe8NmabTrtfzVmJzDv5
-	Ne2IuD4WBUJ9KFI2/n+OeUSe50fsuI871CPGI9BXPcJJwGF3yCfpaEpNu/AstvRM8I1NMM
-	jJQ5ZoiYnmImiq61l3/GUCVuppLSong=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1716931978;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y271KPi+tCyRmzKrDCwqISkFoY5mXolXM/ZhCYK6JPs=;
-	b=/F8BJdjswiKMjas+DwonGKmjEG3HjzGZ3ZDNGxX+svqxoF5eTGLjTUR3XiAExDuzESXHh8
-	mDMDQki+foK9VsAA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1716931978;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y271KPi+tCyRmzKrDCwqISkFoY5mXolXM/ZhCYK6JPs=;
-	b=eKKTTVsOye+aPNKRzZ122169aw7bdpQ6y9COLPAXegCVrG5iSFsKe8NmabTrtfzVmJzDv5
-	Ne2IuD4WBUJ9KFI2/n+OeUSe50fsuI871CPGI9BXPcJJwGF3yCfpaEpNu/AstvRM8I1NMM
-	jJQ5ZoiYnmImiq61l3/GUCVuppLSong=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1716931978;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y271KPi+tCyRmzKrDCwqISkFoY5mXolXM/ZhCYK6JPs=;
-	b=/F8BJdjswiKMjas+DwonGKmjEG3HjzGZ3ZDNGxX+svqxoF5eTGLjTUR3XiAExDuzESXHh8
-	mDMDQki+foK9VsAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id AB93113A5D;
-	Tue, 28 May 2024 21:32:58 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id jMu/KYpNVmbCTwAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Tue, 28 May 2024 21:32:58 +0000
-Date: Tue, 28 May 2024 23:32:49 +0200
-From: David Sterba <dsterba@suse.cz>
-To: kernel test robot <lkp@intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	amd-gfx@lists.freedesktop.org, bpf@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-	intel-xe@lists.freedesktop.org, linux-btrfs@vger.kernel.org,
-	linux-hardening@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-pm@vger.kernel.org, netdev@vger.kernel.org,
-	nouveau@lists.freedesktop.org
-Subject: Re: [linux-next:master] BUILD REGRESSION
- 6dc544b66971c7f9909ff038b62149105272d26a
-Message-ID: <20240528213249.GH8631@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <202405290242.YsJ4ENkU-lkp@intel.com>
+	s=arc-20240116; t=1716931874; c=relaxed/simple;
+	bh=qhikkG0+J3ao9eUj/gAqD8DTEQECSMaXK+bVgpJ4E1s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=i7ujkgUQyQsmmGWGQtKr5mG1g7njwxWXL1qzf69Zi0A8rurTGMCW5Noih2F+W8n2vfn+2OrQOwF7N9ibGcYJKBoWMZlw0RkSeY+1qfl9y7TGGV+suMa6YVz+KAXLIkmikWq3/MxT+2HxANk2yH4SUVu1hHWX8EJ4XFwa/Sp0Pw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=g5TU9e63; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1716931873; x=1748467873;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=qhikkG0+J3ao9eUj/gAqD8DTEQECSMaXK+bVgpJ4E1s=;
+  b=g5TU9e639SuOhYJRrE0Oe3L7LRtXLPVlb7OM4JjqED83PPTl9MtGw6wN
+   +K3SR/mYDl55KFrj4LBstIOz4Oly4Mxmr0JQFeA+DGgeeVTSiJbhCtoXz
+   KDFb/rLTDY2Yc88z+Jz0ldyNC8EX4rCOyy51AsClMnfLQK0yq2I8nyGZw
+   ctWImbjVAE4B3QEQV7KXm7cDTyTxFMfcwcOgMXLbpcFHSILZkHJs24Oz4
+   /+RY2EXgshujKpfWNWDiG/TAc4FlDkxaPl1nssShzeu8hN9UvBb4vwLj9
+   LB84M+fw69ywm11Nds6gbkvhVpQ4cu/G9k28xfQUBtEkEZILGbseN2bwO
+   A==;
+X-CSE-ConnectionGUID: /9I5zD/kRmu9YPlRbLYtAg==
+X-CSE-MsgGUID: Oe2pBzO0RKiwpp5fvrsyVw==
+X-IronPort-AV: E=Sophos;i="6.08,196,1712646000"; 
+   d="scan'208";a="26625587"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 May 2024 14:31:07 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 28 May 2024 14:31:05 -0700
+Received: from hat-linux.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Tue, 28 May 2024 14:31:04 -0700
+From: <Tristram.Ha@microchip.com>
+To: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+	Vivien Didelot <vivien.didelot@gmail.com>, Florian Fainelli
+	<f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Tristram Ha
+	<tristram.ha@microchip.com>
+Subject: [PATCH net] net: dsa: microchip: fix RGMII error in KSZ DSA driver
+Date: Tue, 28 May 2024 14:34:26 -0700
+Message-ID: <1716932066-3342-1-git-send-email-Tristram.Ha@microchip.com>
+X-Mailer: git-send-email 1.9.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202405290242.YsJ4ENkU-lkp@intel.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.58 / 50.00];
-	BAYES_HAM(-2.58)[98.11%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.cz:replyto]
-X-Spam-Score: -3.58
-X-Spam-Flag: NO
+Content-Type: text/plain
 
-On Wed, May 29, 2024 at 02:19:47AM +0800, kernel test robot wrote:
-> tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-> branch HEAD: 6dc544b66971c7f9909ff038b62149105272d26a  Add linux-next specific files for 20240528
-> 
-> Error/Warning reports:
-> 
-> https://lore.kernel.org/oe-kbuild-all/202405282036.maEDO54Q-lkp@intel.com
-> https://lore.kernel.org/oe-kbuild-all/202405282148.jaF0FLhu-lkp@intel.com
-> https://lore.kernel.org/oe-kbuild-all/202405282308.UEzt6hqC-lkp@intel.com
-> 
-> Error/Warning: (recently discovered and may have been fixed)
-> 
-> drivers/dma-buf/udmabuf.c:45:(.text+0x140): undefined reference to `vmf_insert_pfn'
-> fs/btrfs/fiemap.c:822:26: warning: 'last_extent_end' may be used uninitialized [-Wmaybe-uninitialized]
+From: Tristram Ha <tristram.ha@microchip.com>
 
-The report says it's gcc 13.2, that one I use (and expect others as well
-as it's a recent one) and we also have -Wmaybe-uninitialized enabled in
-fs/btrfs/ to catch such warnings. Yet this is reported on mips64, is
-there something special about that compiler+architecture?
+The driver should return RMII interface when XMII is running in RMII mode.
 
-The warning is IMO a false positive, the maybe-uninitialized variable is
-passed as pointer but initialized on success and never used on failure.
-We can safely silence the warning by initializing the variable to 0 but
-this may be pointing to a problem with mips64+gcc namely because other
-compiler+host combinations do not warn abou that.
+Fixes: 0ab7f6bf1675 ("net: dsa: microchip: ksz9477: use common xmii function")
+Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
+Acked-by: Jerry Ray <jerry.ray@microchip.com>
+---
+ drivers/net/dsa/microchip/ksz_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 1e0085cd9a9a..2818e24e2a51 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -3142,7 +3142,7 @@ phy_interface_t ksz_get_xmii(struct ksz_device *dev, int port, bool gbit)
+ 		else
+ 			interface = PHY_INTERFACE_MODE_MII;
+ 	} else if (val == bitval[P_RMII_SEL]) {
+-		interface = PHY_INTERFACE_MODE_RGMII;
++		interface = PHY_INTERFACE_MODE_RMII;
+ 	} else {
+ 		interface = PHY_INTERFACE_MODE_RGMII;
+ 		if (data8 & P_RGMII_ID_EG_ENABLE)
+-- 
+2.34.1
+
 
