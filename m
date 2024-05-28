@@ -1,165 +1,265 @@
-Return-Path: <netdev+bounces-98474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B5A68D18BB
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 12:38:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E20238D18C8
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 12:41:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16119288EEC
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 10:38:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 517401F2311D
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 10:41:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 549C416A39F;
-	Tue, 28 May 2024 10:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A396216B72B;
+	Tue, 28 May 2024 10:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fEeh+qcA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c8IkBRVa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A271213AD3E;
-	Tue, 28 May 2024 10:38:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBAE139D11
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 10:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716892684; cv=none; b=YF8Ns+rFOCZdIFBTSFRAlTRZ7UyTkQQIPC04nrLHUi3sXanO6mJ+1/Zlqs/RHn/sx5Kj163FdYygi51yhTuotSEm+tXr7L9iL+EM+VgoQrrFL0z9ubMmeBQjYwgE3nKCv0RtAFMBjJC/+/4u2iBGLDJZNcSZS5ezOfJkEi9S6mQ=
+	t=1716892867; cv=none; b=FgpRTlnqZKPyYMF4Sm3IRrO2je5oKYH9+JQAIixI1QVbzDNRNLAPyCColuqV4L2dfV9mYBbnJ1lz92bYLOkTEc4Aw+lXbioUw5Y5sYQL8l6fWU6ixQOWL9Z6LqyfCqBEgJWVePIx6UEJehAX7t4WQEfi3g6bgXPBhtQX4Cw2oHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716892684; c=relaxed/simple;
-	bh=njMzUdklFAgR1CDylaANJn2ylbIfnSH2z+YX6LG6nDw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a8Gww7GMJcpj6wA3e2Z97QpF64lopi+CMboT/TOQEOFFgkZ5BeKzgxRqEzJDtZTLGgowrahGnyrHoNcTK5aoF40AoqECq8ZAvNFTrFG1D6QBrNyggQcsqdhsgGmfCjtnNbB3LAOFWCbXS37/R8uj/8lBBij9cr6MWeA/p8ky+IM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fEeh+qcA; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4211b3c21d6so5097285e9.2;
-        Tue, 28 May 2024 03:38:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716892681; x=1717497481; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ql27cNbGhklYG0AOxTSVuwH0LBMbqLIuM9XupnBo33Y=;
-        b=fEeh+qcAl+Cxmq1y1vYjbuLSlVD3tsa/LlOAs3JGaQG8VJhhqUCP8qbjuKXHaaKeLh
-         c//ILEknxRcFNf1LIgSFMY3tSKq0iRZUst3SLyY7cEOMHhrCAJv48H7QUUtofZmXhpqv
-         +M/e9f2ILimmnNNzmBUntgCTFFUNzFMeGHaiJ20MX4HKtR1USVerBRh9OjS7Bq4iPqst
-         etvo2M611+LohGZvE+hnSQDhMURCHDD5Z3sY0AMESIYJJs5nE9405XjAWdFVcE0cdHrM
-         tZ6wZDVQGQ/RKK808ncya4xu9IIzZACyCu7SkX6wO5+XDBhW6MPaGs0AvEzSGqb9SrPS
-         jgDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716892681; x=1717497481;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ql27cNbGhklYG0AOxTSVuwH0LBMbqLIuM9XupnBo33Y=;
-        b=pYLiPp/Az8vvlh4Yyj9Q2f+CbRrkhAcRCfVfqJk8BglC9sGM22+hbGzK0GQ3OKydO1
-         AwhZ1mU1fgqtVFh0TvGkZ2boQdFSACqC1e6erjUUpecda3Fgpzz+5AKVzpTajX/Jo9EV
-         ehrJtI+9VwOb+I9IqZLwUOR7/KgzhA9FEp8Pw7APnAyDqBx+7JpTCa8VKePPOTK2J8E7
-         1iuWzCAzIeEdY84QIEEdunBUK8rW0m0fifW5O4ShZTwQzzVwQAG7GHNlPlGP43aHW9gs
-         lguzXVnRbp5mtsDmO1cjvmjBCPSfLHtWzc1M/UysdgYSo71OMnir3cyAjaWMQboovBkZ
-         iQ+w==
-X-Forwarded-Encrypted: i=1; AJvYcCVfkHYFe5HlpCdR0r3y0cimQhmTIOKLl+QkW8/IRB3D5BUbYR/B0fEvt/UgK+sdHISeePKC5QI7vEcYWYrquO2C/kNk/lPXHMCKoBUwb1bO
-X-Gm-Message-State: AOJu0YxNrOkfkUWHPVteHjLwI9CHnvsOq7FjnasIiJASiMWAXJq9aUO6
-	9N473Ox+crq2osBqRTafptV0JP4zH7x0FTeEbLd6nGqda6dqQBH7CO9vx/je
-X-Google-Smtp-Source: AGHT+IHT92tkGMi5yl96vQYpYgHd0WKtZOzkStR3uqcb5pT0b0wH/0QCv5SHBuGdygRBdgAXPd/loA==
-X-Received: by 2002:a05:600c:1c04:b0:41c:2313:da92 with SMTP id 5b1f17b1804b1-421089ebd32mr86880945e9.4.1716892680429;
-        Tue, 28 May 2024 03:38:00 -0700 (PDT)
-Received: from imac.fritz.box ([2a02:8010:60a0:0:68e9:662a:6a81:de0a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3579354abd1sm7984751f8f.59.2024.05.28.03.37.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 May 2024 03:37:59 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	netfilter-devel@vger.kernel.org
-Cc: donald.hunter@redhat.com,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1] netfilter: nfnetlink: convert kfree_skb to consume_skb
-Date: Tue, 28 May 2024 11:37:54 +0100
-Message-ID: <20240528103754.98985-1-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1716892867; c=relaxed/simple;
+	bh=nxdU+VENU/erFXbdsBxA1qWDuwfs5LOt+I/fApCoaek=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ba36BUO5PRn9xhR8IhZb4o2cTskIfDBiuaOF6LWegNZcsuzswkI/r7i19wsNpDZpmls7KBhvo3K2Ykx8EHWb6Vkaq3D1ldtoVsa8YwIyxBaQQtnOTP3J/w6lQR3rY14YZtSYst0jceKeLuH/GE5DuPIVok56A2pr0M5ufpUo9dM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c8IkBRVa; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716892865; x=1748428865;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=nxdU+VENU/erFXbdsBxA1qWDuwfs5LOt+I/fApCoaek=;
+  b=c8IkBRVaY+8mwHLoP4FEqkchabV95+p1/Ng/u+pHYe6puFRT8L9oLhVQ
+   yI6RdAGV72R0He+UgnlIbwZkpZa66ItPs4bv0sDkOwjdImo9g3I6Itowl
+   hTQBC7dJ1ImScK+CxrZ0iTqW0KFnyc6JCVF+jdHLF8veugpljlyY6IkR6
+   JuDKH1iBsetE0LihC0B+5DYNSyrYvSMaShPUmoawhCa36qppQ0lD0JyM4
+   ixdNuE7y85AIenuubRLc/lZkv4iohjfrYC7FTlzHL1OjsEhWp0oNRlbgN
+   eACtAP02aRDhhtccxS/RdHBj+plN1tYR1z9PCst8uxHE4wSpcAL1MmI8C
+   w==;
+X-CSE-ConnectionGUID: tcu3K4fGSUOGXsYWouTuaA==
+X-CSE-MsgGUID: 3YYiesLqQvqIPICCmUEcFQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11085"; a="13102217"
+X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
+   d="scan'208";a="13102217"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 03:41:04 -0700
+X-CSE-ConnectionGUID: mAEjigb4THeBy6MqwAD+sg==
+X-CSE-MsgGUID: dIrYKWfERP2/s4X2Ty4/xA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
+   d="scan'208";a="34967932"
+Received: from unknown (HELO mev-dev) ([10.237.112.144])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 03:41:01 -0700
+Date: Tue, 28 May 2024 12:40:13 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	jacob.e.keller@intel.com, michal.kubiak@intel.com,
+	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
+	wojciech.drewek@intel.com, pio.raczynski@gmail.com, jiri@nvidia.com,
+	mateusz.polchlopek@intel.com, shayd@nvidia.com,
+	kalesh-anakkur.purayil@broadcom.com
+Subject: Re: [iwl-next v3 05/15] ice: allocate devlink for subfunction
+Message-ID: <ZlW0jYW/yY/qe+jN@mev-dev>
+References: <20240528043813.1342483-1-michal.swiatkowski@linux.intel.com>
+ <20240528043813.1342483-6-michal.swiatkowski@linux.intel.com>
+ <b938506f-953f-477b-9496-8ff948824a56@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <b938506f-953f-477b-9496-8ff948824a56@intel.com>
 
-Use consume_skb in the batch code path to avoid generating spurious
-NOT_SPECIFIED skb drop reasons.
+On Tue, May 28, 2024 at 09:11:09AM +0200, Przemek Kitszel wrote:
+> On 5/28/24 06:38, Michal Swiatkowski wrote:
+> > From: Piotr Raczynski <piotr.raczynski@intel.com>
+> > 
+> > Make devlink allocation function generic to use it for PF and for SF.
+> > 
+> > Add function for SF devlink port creation. It will be used in next
+> > patch.
+> > 
+> > Create header file for subfunction device. Define subfunction device
+> > structure there as it is needed for devlink allocation and port
+> > creation.
+> > 
+> > Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
+> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> > ---
+> >   .../net/ethernet/intel/ice/devlink/devlink.c  | 33 +++++++++++++++
+> >   .../net/ethernet/intel/ice/devlink/devlink.h  |  1 +
+> >   .../ethernet/intel/ice/devlink/devlink_port.c | 41 +++++++++++++++++++
+> >   .../ethernet/intel/ice/devlink/devlink_port.h |  3 ++
+> >   drivers/net/ethernet/intel/ice/ice_sf_eth.h   | 21 ++++++++++
+> >   5 files changed, 99 insertions(+)
+> >   create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.h
+> 
+> just two minor nitpicks, so:
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> 
+> > 
+> > diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+> > index bfb3d5b59a62..58196c170b1b 100644
+> > --- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
+> > +++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+> > @@ -10,6 +10,7 @@
+> >   #include "ice_eswitch.h"
+> >   #include "ice_fw_update.h"
+> >   #include "ice_dcb_lib.h"
+> > +#include "ice_sf_eth.h"
+> >   /* context for devlink info version reporting */
+> >   struct ice_info_ctx {
+> > @@ -1282,6 +1283,8 @@ static const struct devlink_ops ice_devlink_ops = {
+> >   	.port_new = ice_devlink_port_new,
+> >   };
+> > +static const struct devlink_ops ice_sf_devlink_ops;
+> > +
+> >   static int
+> >   ice_devlink_enable_roce_get(struct devlink *devlink, u32 id,
+> >   			    struct devlink_param_gset_ctx *ctx)
+> > @@ -1422,6 +1425,7 @@ static void ice_devlink_free(void *devlink_ptr)
+> >    * Allocate a devlink instance for this device and return the private area as
+> >    * the PF structure. The devlink memory is kept track of through devres by
+> >    * adding an action to remove it when unwinding.
+> > + *
+> >    */
+> >   struct ice_pf *ice_allocate_pf(struct device *dev)
+> >   {
+> > @@ -1438,6 +1442,35 @@ struct ice_pf *ice_allocate_pf(struct device *dev)
+> >   	return devlink_priv(devlink);
+> >   }
+> > +/**
+> > + * ice_allocate_sf - Allocate devlink and return SF structure pointer
+> > + * @dev: the device to allocate for
+> > + * @pf: pointer to the PF structure
+> > + *
+> > + * Allocate a devlink instance for SF.
+> > + *
+> > + * Return: void pointer to allocated memory
+> 
+> nit: it's not void; you could add "or ERR_PTR in case of error"
+> 
 
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
----
- net/netfilter/nfnetlink.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+Right, will fix
 
-diff --git a/net/netfilter/nfnetlink.c b/net/netfilter/nfnetlink.c
-index 4abf660c7baf..c164abcc326b 100644
---- a/net/netfilter/nfnetlink.c
-+++ b/net/netfilter/nfnetlink.c
-@@ -402,27 +402,27 @@ static void nfnetlink_rcv_batch(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		{
- 			nfnl_unlock(subsys_id);
- 			netlink_ack(oskb, nlh, -EOPNOTSUPP, NULL);
--			return kfree_skb(skb);
-+			return consume_skb(skb);
- 		}
- 	}
- 
- 	if (!ss->valid_genid || !ss->commit || !ss->abort) {
- 		nfnl_unlock(subsys_id);
- 		netlink_ack(oskb, nlh, -EOPNOTSUPP, NULL);
--		return kfree_skb(skb);
-+		return consume_skb(skb);
- 	}
- 
- 	if (!try_module_get(ss->owner)) {
- 		nfnl_unlock(subsys_id);
- 		netlink_ack(oskb, nlh, -EOPNOTSUPP, NULL);
--		return kfree_skb(skb);
-+		return consume_skb(skb);
- 	}
- 
- 	if (!ss->valid_genid(net, genid)) {
- 		module_put(ss->owner);
- 		nfnl_unlock(subsys_id);
- 		netlink_ack(oskb, nlh, -ERESTART, NULL);
--		return kfree_skb(skb);
-+		return consume_skb(skb);
- 	}
- 
- 	nfnl_unlock(subsys_id);
-@@ -565,7 +565,7 @@ static void nfnetlink_rcv_batch(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (status & NFNL_BATCH_REPLAY) {
- 		ss->abort(net, oskb, NFNL_ABORT_AUTOLOAD);
- 		nfnl_err_reset(&err_list);
--		kfree_skb(skb);
-+		consume_skb(skb);
- 		module_put(ss->owner);
- 		goto replay;
- 	} else if (status == NFNL_BATCH_DONE) {
-@@ -590,7 +590,7 @@ static void nfnetlink_rcv_batch(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		err = ss->abort(net, oskb, abort_action);
- 		if (err == -EAGAIN) {
- 			nfnl_err_reset(&err_list);
--			kfree_skb(skb);
-+			consume_skb(skb);
- 			module_put(ss->owner);
- 			status |= NFNL_BATCH_FAILURE;
- 			goto replay_abort;
-@@ -598,7 +598,7 @@ static void nfnetlink_rcv_batch(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	}
- 
- 	nfnl_err_deliver(&err_list, oskb);
--	kfree_skb(skb);
-+	consume_skb(skb);
- 	module_put(ss->owner);
- }
- 
--- 
-2.44.0
+> > + */
+> > +struct ice_sf_priv *ice_allocate_sf(struct device *dev, struct ice_pf *pf)
+> > +{
+> > +	struct devlink *devlink;
+> > +	int err;
+> > +
+> > +	devlink = devlink_alloc_ns(&ice_sf_devlink_ops,
+> > +				   sizeof(struct ice_sf_priv),
+> > +				   devlink_net(priv_to_devlink(pf)), dev);
+> > +	if (!devlink)
+> > +		return NULL;
+> 
+> ERR_PTR(-ENOMEM) would be more consistent with the other error exit path
+>
 
+Ok
+
+> > +
+> > +	err = devl_nested_devlink_set(priv_to_devlink(pf), devlink);
+> > +	if (err) {
+> > +		devlink_free(devlink);
+> > +		return ERR_PTR(err);
+> > +	}
+> > +
+> > +	return devlink_priv(devlink);
+> > +}
+> > +
+> >   /**
+> >    * ice_devlink_register - Register devlink interface for this PF
+> >    * @pf: the PF to register the devlink for.
+> > diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.h b/drivers/net/ethernet/intel/ice/devlink/devlink.h
+> > index d291c0e2e17b..1af3b0763fbb 100644
+> > --- a/drivers/net/ethernet/intel/ice/devlink/devlink.h
+> > +++ b/drivers/net/ethernet/intel/ice/devlink/devlink.h
+> > @@ -5,6 +5,7 @@
+> >   #define _ICE_DEVLINK_H_
+> >   struct ice_pf *ice_allocate_pf(struct device *dev);
+> > +struct ice_sf_priv *ice_allocate_sf(struct device *dev, struct ice_pf *pf);
+> >   void ice_devlink_register(struct ice_pf *pf);
+> >   void ice_devlink_unregister(struct ice_pf *pf);
+> > diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
+> > index 5d1fe08e4bab..f06baabd0112 100644
+> > --- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
+> > +++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
+> > @@ -489,6 +489,47 @@ void ice_devlink_destroy_vf_port(struct ice_vf *vf)
+> >   	devl_port_unregister(&vf->devlink_port);
+> >   }
+> > +/**
+> > + * ice_devlink_create_sf_dev_port - Register virtual port for a subfunction
+> > + * @sf_dev: the subfunction device to create a devlink port for
+> > + *
+> > + * Register virtual flavour devlink port for the subfunction auxiliary device
+> > + * created after activating a dynamically added devlink port.
+> > + *
+> > + * Return: zero on success or an error code on failure.
+> > + */
+> > +int ice_devlink_create_sf_dev_port(struct ice_sf_dev *sf_dev)
+> > +{
+> > +	struct devlink_port_attrs attrs = {};
+> > +	struct ice_dynamic_port *dyn_port;
+> > +	struct devlink_port *devlink_port;
+> > +	struct devlink *devlink;
+> > +	struct ice_vsi *vsi;
+> > +
+> > +	dyn_port = sf_dev->dyn_port;
+> > +	vsi = dyn_port->vsi;
+> > +
+> > +	devlink_port = &sf_dev->priv->devlink_port;
+> > +
+> > +	attrs.flavour = DEVLINK_PORT_FLAVOUR_VIRTUAL;
+> 
+> (just comment, not an issue)
+> we have (among others):
+> 198│ enum devlink_port_flavour {
+> 199│         DEVLINK_PORT_FLAVOUR_PHYSICAL, /* Any kind of a port physically
+> 200│                                         * facing the user.
+> 201│                                         */
+> 210│         DEVLINK_PORT_FLAVOUR_PCI_VF, /* Represents eswitch port
+> 211│                                       * for the PCI VF. It is an
+> internal
+> 212│                                       * port that faces the PCI VF.
+> 213│                                       */
+> 214│         DEVLINK_PORT_FLAVOUR_VIRTUAL, /* Any virtual port facing the
+> user. */
+> 216│                                       * is not used in any way.
+> 217│                                       */
+> 218│         DEVLINK_PORT_FLAVOUR_PCI_SF, /* Represents eswitch port
+> 219│                                       * for the PCI SF. It is an
+> internal
+> 220│                                       * port that faces the PCI SF.
+> 221│                                       */
+> 
+> from that I conclude that _PCI_ ones are internal, and you are adding
+> user-facing port, so your choice is good, even if there is one with SF
+> in the name. Perhaps the enum should have this piece of documentation ;)
+>
+
+DEVLINK_PORT_FLAVOUR_PCI_SF is created during port representor creation
+and linked with his netdev.
+
+According to the documentation:
+Documentation/networking/devlink/devlink-port.rst
+
+Thanks,
+Michal
+
+[...]
 
