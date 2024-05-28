@@ -1,188 +1,200 @@
-Return-Path: <netdev+bounces-98708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00B5E8D223B
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 19:14:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D6598D2250
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 19:18:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F04A91C21D30
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 17:14:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D087C284667
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 17:18:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F03175560;
-	Tue, 28 May 2024 17:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4440172791;
+	Tue, 28 May 2024 17:18:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cBRs2T64"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WVu93Ewv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E54175546
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 17:14:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE9717082D
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 17:18:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716916443; cv=none; b=HXpsg/H7z36LwEoHOAFMKTImpXQO54dY31684kkDA/FUfjAHfTF8C0NlFfp0e/cTPzyLGSOW99HPQnxarpxKNu2J/m3KAlxhxa+1j1wnxNcsGb75NVq6y6OuEyCGl0CreJDYuN18YLJphTpclmGFm04xK4cnapnM/wvEIodsNLU=
+	t=1716916727; cv=none; b=peymioeEGDfTYH3fhppk+t38OTF3Whh0snUr4lgiVbNBv/1etOyB/99C/XXdhk0awAEXaz0L7iie5PHpJc9knVwUjpfXb+WmSbfvWkcNfu/csrauLAY9sN9584AsC/BxfAgMzmf5+JFQVBNNK7gAGt1CAcc5Z4GC0WNOZELKYR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716916443; c=relaxed/simple;
-	bh=BG05HNPHUE7ZV/HGaIIAYlcS9yYK4QMdfVqoHoq3Vek=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AOQ0K1xq0w89pZOfA+32WWqjWPaI2WeWu3oNOuN9uLIJttbDZDt7L6guipqzCEsjO7brEenG3VXiRGVuuhtnqrf0wzD8o2tUFdpIwMOQMiajrfVc1iZQr3HTl8PgPeh7y1or+Y8kpFnh6ImTPuGsdP1f3RPq1Or7tbkQRVHziro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yyd.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cBRs2T64; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yyd.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-62a0841402aso16820947b3.2
-        for <netdev@vger.kernel.org>; Tue, 28 May 2024 10:14:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716916440; x=1717521240; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HUIgxr3cugz00o2P8UW4WNCAcffInCJnKK0N0bifgRM=;
-        b=cBRs2T64NR67GUQf6rT7YLsx28p9BY2pQOxthC3o6P3kBMvVG5UMLgfdj++g8Al9rI
-         4FL65U+a/6eWo0oKp2r65HltK0SUNGSn9yNHLSGU/9YcGX3HmMhTCYqWcLzoQphoBm0O
-         ZhL3FC8uVF606+NM8LMhDCppMN2EPuo/7vdyhPbRpc2FWRL/WcNfWgPaZpvCJIdrx4rv
-         ma56EPgSowtl5UTNE6FQuysnyW0o/W/M+SIqqD35zw5VxtPqMv1XQtKDDJ6VhRlVt+fN
-         UMQmmkmDEvRTfIirBNEjqTN/fKsaeNxy6XQr8OvPd0gLGAKYYZuo4c5FghIgC/Ev3P9l
-         oa9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716916440; x=1717521240;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HUIgxr3cugz00o2P8UW4WNCAcffInCJnKK0N0bifgRM=;
-        b=YSMZWzylV1RTc3dEYhRNwT6tQlvE2q4uoVdFQtFpiDUOMV9xFsTqHbp9lI9WRBRauS
-         ECfKIprwV+ACSXt7xF/kLeIIpP1qh3iEbDsllKunpCj8wldKwSAkt90Tv/nuIqVl6A9D
-         Kw4OyEGqZLml89KBfHzIQ+UiZNf6WP5ZNjIg38EiaWDit8eSTfv+rKCHZ4lVKkoz2sjq
-         p7Co+cJQtnLfCCAp0jnCOPclleA3XU0WOyKXDsaDfro6+BgcuhE6SMmUzTcc4IB5403Z
-         5sskpbfmzYnBM07d8lPTL+pmjo5pe8r2aoszH+WmGjUtAXEW+9Q87M5dfDNVsGz/hEvC
-         OnFg==
-X-Gm-Message-State: AOJu0YxdT7UJB4OGjkOyxcjBbJ9mnhB7EbD91ZKpci4o9YgdTvJt6tkD
-	6PqWSwOF1rY3I8SvC+2aWeRfEpCtMZkK500SKer4n9v6xxuFrAGCUzWrmuuZcM2kTQ==
-X-Google-Smtp-Source: AGHT+IGpm6OxWm2vObRufDyJxKXm2pd2DwHqBC41tbwVOxAifiK5CiciS+cys1RgkRa264CcRcd+YWs=
-X-Received: from yyd.c.googlers.com ([fda3:e722:ac3:cc00:dc:567e:c0a8:13c9])
- (user=yyd job=sendgmr) by 2002:a5b:812:0:b0:df9:20a2:228e with SMTP id
- 3f1490d57ef6-df920a224bfmr108857276.5.1716916440711; Tue, 28 May 2024
- 10:14:00 -0700 (PDT)
-Date: Tue, 28 May 2024 17:13:20 +0000
-In-Reply-To: <20240528171320.1332292-1-yyd@google.com>
+	s=arc-20240116; t=1716916727; c=relaxed/simple;
+	bh=RZhCgosNSDDiBFuNlEmZo0/asrIiXziscLxhdpFRUOI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=a27VqsWJJ5t/RQaN4v52TdMqoNpDoQC+nCLJLheLzmAiZFiyT2DvDgH6pG1r56MyGnvaqwJbidrZhyvPu/Df5/dJa4egE5ox0f6wF/FGOIlWC7knZ/5KFAsxIaQVv3lttMFJo9CdN+Hz0CKklh/n3OTlAgWD/1YPNU9LriDHHE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WVu93Ewv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1661C3277B;
+	Tue, 28 May 2024 17:18:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716916727;
+	bh=RZhCgosNSDDiBFuNlEmZo0/asrIiXziscLxhdpFRUOI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WVu93Ewvs+n86KuZ3fyBopNEYoFTtXTswwA7D4RqDeo7kf7TeBpOy86yfbtwnZSDP
+	 aqzJPEaItIkjiynTJPf/JcqeMKXn8RCNkIXWZ687ECKgUuJF+Q0naFo6EachUNM+0N
+	 DTzprRGdiX2oa/XxXVpNFC2JGfN/BongwfWHB+chHykURKXwoR8DYmGNweNv2qJbvp
+	 SPJNW3Y9qlAbCdhgtkPbF4OOaRFo33tIoAwxwiSUVHyLdsO3WhVi0BIq/c2m5q/P5C
+	 dEITi/mg5Fqtbll3zgEeUCEkfWejnJC4jjP5GT0AT0hnV6OJz3sb2vDbxh/ZU1NzTw
+	 3c5MtJbz//lmA==
+Date: Tue, 28 May 2024 10:18:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
+ <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
+ <jhs@mojatatu.com>
+Subject: Re: [RFC PATCH] net: introduce HW Rate Limiting Driver API
+Message-ID: <20240528101845.414cff22@kernel.org>
+In-Reply-To: <3d1e2d945904a0fb55258559eb7322d7e11066b6.1715199358.git.pabeni@redhat.com>
+References: <3d1e2d945904a0fb55258559eb7322d7e11066b6.1715199358.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240528171320.1332292-1-yyd@google.com>
-X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
-Message-ID: <20240528171320.1332292-3-yyd@google.com>
-Subject: [PATCH net-next 2/2] tcp: add sysctl_tcp_rto_min_us
-From: Kevin Yang <yyd@google.com>
-To: David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Kevin Yang <yyd@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Adding a sysctl knob to allow user to specify a default
-rto_min at socket init time, other than using the hard
-coded 200ms default rto_min.
+On Wed,  8 May 2024 22:20:51 +0200 Paolo Abeni wrote:
+> +/**
+> + * struct net_shaper_info - represents a shaping node on the NIC H/W
+> + * @metric: Specify if the bw limits refers to PPS or BPS
+> + * @bw_min: Minimum guaranteed rate for this shaper
+> + * @bw_max: Maximum peak bw allowed for this shaper
+> + * @burst: Maximum burst for the peek rate of this shaper
+> + * @priority: Scheduling priority for this shaper
+> + * @weight: Scheduling weight for this shaper
+> + */
+> +struct net_shaper_info {
+> +	enum net_shaper_metric metric;
+> +	u64 bw_min;	/* minimum guaranteed bandwidth, according to metric */
+> +	u64 bw_max;	/* maximum allowed bandwidth */
+> +	u32 burst;	/* maximum burst in bytes for bw_max */
 
-Note that the rto_min route option has the highest precedence
-for configuring this setting, followed by the TCP_BPF_RTO_MIN
-socket option, followed by the tcp_rto_min_us sysctl.
+Burst is burst, either we need two or we assume it's for both bw_min
+and bw_max, but it most certainly can't be just for bw_max.
 
-Signed-off-by: Kevin Yang <yyd@google.com>
-Reviewed-by: Neal Cardwell <ncardwell@google.com>
-Reviewed-by: Yuchung Cheng <ycheng@google.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
----
- Documentation/networking/ip-sysctl.rst | 13 +++++++++++++
- include/net/netns/ipv4.h               |  1 +
- net/ipv4/sysctl_net_ipv4.c             |  8 ++++++++
- net/ipv4/tcp.c                         |  3 ++-
- net/ipv4/tcp_ipv4.c                    |  1 +
- 5 files changed, 25 insertions(+), 1 deletion(-)
+Also presumably not just bytes - if "metric" is pps, burst is pps?
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index bd50df6a5a42..6e99eccdb837 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -1196,6 +1196,19 @@ tcp_pingpong_thresh - INTEGER
- 
- 	Default: 1
- 
-+tcp_rto_min_us - INTEGER
-+	Minimal TCP retransmission timeout (in microseconds). Note that the
-+	rto_min route option has the highest precedence for configuring this
-+	setting, followed by the TCP_BPF_RTO_MIN socket option, followed by
-+	this tcp_rto_min_us sysctl.
-+
-+	The recommended practice is to use a value less or equal to 200000
-+	microseconds.
-+
-+	Possible Values: 1 - INT_MAX
-+
-+	Default: 200000
-+
- UDP variables
- =============
- 
-diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-index c356c458b340..a91bb971f901 100644
---- a/include/net/netns/ipv4.h
-+++ b/include/net/netns/ipv4.h
-@@ -170,6 +170,7 @@ struct netns_ipv4 {
- 	u8 sysctl_tcp_sack;
- 	u8 sysctl_tcp_window_scaling;
- 	u8 sysctl_tcp_timestamps;
-+	int sysctl_tcp_rto_min_us;
- 	u8 sysctl_tcp_recovery;
- 	u8 sysctl_tcp_thin_linear_timeouts;
- 	u8 sysctl_tcp_slow_start_after_idle;
-diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-index 162a0a3b6ba5..58be05f8812c 100644
---- a/net/ipv4/sysctl_net_ipv4.c
-+++ b/net/ipv4/sysctl_net_ipv4.c
-@@ -1501,6 +1501,14 @@ static struct ctl_table ipv4_net_table[] = {
- 		.proc_handler	= proc_dou8vec_minmax,
- 		.extra1		= SYSCTL_ONE,
- 	},
-+	{
-+		.procname	= "tcp_rto_min_us",
-+		.data		= &init_net.ipv4.sysctl_tcp_rto_min_us,
-+		.maxlen		= sizeof(int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dointvec_minmax,
-+		.extra1		= SYSCTL_ONE,
-+	},
- };
- 
- static __net_init int ipv4_sysctl_init_net(struct net *net)
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 06aab937d60a..8e91b60ac1ce 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -428,7 +428,8 @@ void tcp_init_sock(struct sock *sk)
- 	INIT_LIST_HEAD(&tp->tsorted_sent_queue);
- 
- 	icsk->icsk_rto = TCP_TIMEOUT_INIT;
--	icsk->icsk_rto_min = TCP_RTO_MIN;
-+	icsk->icsk_rto_min = usecs_to_jiffies(READ_ONCE(sock_net(sk)->
-+					      ipv4.sysctl_tcp_rto_min_us));
- 	icsk->icsk_delack_max = TCP_DELACK_MAX;
- 	tp->mdev_us = jiffies_to_usecs(TCP_TIMEOUT_INIT);
- 	minmax_reset(&tp->rtt_min, tcp_jiffies32, ~0U);
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 108a438dc247..da005a197ca1 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -3511,6 +3511,7 @@ static int __net_init tcp_sk_init(struct net *net)
- 	net->ipv4.sysctl_tcp_shrink_window = 0;
- 
- 	net->ipv4.sysctl_tcp_pingpong_thresh = 1;
-+	net->ipv4.sysctl_tcp_rto_min_us = jiffies_to_usecs(TCP_RTO_MIN);
- 
- 	return 0;
- }
--- 
-2.45.1.288.g0e0cd299f1-goog
+> +	u32 priority;	/* scheduling strict priority */
+> +	u32 weight;	/* scheduling WRR weight*/
 
+I wonder if we should somehow more clearly specify what a node can do.
+Like Andrew pointed out, if we have a WRR node, presumably the weights
+go on the children, since there's only one weigh param. But then the
+WRR node itself is either empty (no params) or has rate params... which
+is odd.
+
+Maybe shaping nodes and RR nodes should be separate node classes,
+somehow?
+
+> +};
+> +
+> +/**
+> + * enum net_shaper_scope - the different scopes where a shaper could be =
+attached
+> + * @NET_SHAPER_SCOPE_PORT:   The root shaper for the whole H/W.
+> + * @NET_SHAPER_SCOPE_NETDEV: The main shaper for the given network devic=
+e.
+> + * @NET_SHAPER_SCOPE_VF:     The shaper is attached to the given virtual
+> + * function.
+> + * @NET_SHAPER_SCOPE_QUEUE_GROUP: The shaper groups multiple queues unde=
+r the
+> + * same device.
+> + * @NET_SHAPER_SCOPE_QUEUE:  The shaper is attached to the given device =
+queue.
+
+I wonder if we need traffic class? Some devices may have two schedulers,
+one from the host interfaces (PCIe) into the device buffer. And then
+from the device buffer independently into the wire.
+
+> + * NET_SHAPER_SCOPE_PORT and NET_SHAPER_SCOPE_VF are only available on
+> + * PF devices, usually inside the host/hypervisor.
+> + * NET_SHAPER_SCOPE_NETDEV, NET_SHAPER_SCOPE_QUEUE_GROUP and
+> + * NET_SHAPER_SCOPE_QUEUE are available on both PFs and VFs devices.
+> + */
+> +enum net_shaper_scope {
+> +	NET_SHAPER_SCOPE_PORT,
+> +	NET_SHAPER_SCOPE_NETDEV,
+> +	NET_SHAPER_SCOPE_VF,
+
+I realized now that we do indeed need this VF node (if we want to
+internally express the legacy SRIOV NDOs in this API), as much=20
+as I hate it. Could you annotate somehow my nack on ever exposing
+the ability to hook on the VF to user space?
+
+> +	NET_SHAPER_SCOPE_QUEUE_GROUP,
+
+We may need a definition for a queue group. Did I suggest this?
+Isn't queue group just a bunch of queues feeding a trivial RR node?
+Why does it need to be a "scope"?
+
+> +	NET_SHAPER_SCOPE_QUEUE,
+> +};
+> +
+> +/**
+> + * struct net_shaper_ops - Operations on device H/W shapers
+> + * @add: Creates a new shaper in the specified scope.
+
+"in a scope"? Isn't the scope just defining the ingress and egress
+points of the scheduling hierarchy?
+
+Also your example moves schedulers from queue scope to queue group
+scope.
+
+> + * @set: Modify the existing shaper.
+> + * @delete: Delete the specified shaper.
+> + * @move: Move an existing shaper under a different parent.
+> + *
+> + * The initial shaping configuration ad device initialization is empty/
+
+and
+
+> + * a no-op/does not constraint the b/w in any way.
+> + * The network core keeps track of the applied user-configuration in
+> + * per device storage.
+
+"keeps track .. per device" -- "storage" may make people think NVM.
+
+> + * Each shaper is uniquely identified within the device with an 'handle',
+> + * dependent on the shaper scope and other data, see @shaper_make_handle=
+()
+> + */
+> +struct net_shaper_ops {
+> +	/** add - Add a shaper inside the shaper hierarchy
+> +	 * @dev: netdevice to operate on
+> +	 * @handle: the shaper indetifier
+> +	 * @shaper: configuration of shaper
+> +	 * @extack: Netlink extended ACK for reporting errors.
+> +	 *
+> +	 * Return:
+> +	 * * 0 on success
+> +	 * * %-EOPNOTSUPP - Operation is not supported by hardware, driver,
+> +	 *                  or core for any reason. @extack should be set to
+> +	 *                  text describing the reason.
+> +	 * * Other negative error values on failure.
+> +	 *
+> +	 * Examples or reasons this operation may fail include:
+> +	 * * H/W resources limits.
+> +	 * * Can=E2=80=99t respect the requested bw limits.
+> +	 */
+> +	int (*add)(struct net_device *dev, u32 handle,
+> +		   const struct net_shaper_info *shaper,
+> +		   struct netlink_ext_ack *extack);
+> +
+> +	/** set - Update the specified shaper, if it exists
+
+Why "if it exists" ? Core should make sure it exists, no?
+
+In addition to ops and state, the device will likely need to express
+capabilities of some sort. So that the core can do some work for the
+drivers and in due course we can expose them to user space for
+discoverability.
 
