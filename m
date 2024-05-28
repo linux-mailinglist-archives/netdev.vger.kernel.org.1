@@ -1,109 +1,137 @@
-Return-Path: <netdev+bounces-98561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91D9A8D1C20
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 15:05:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BF658D1C77
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 15:17:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35A4C1F24844
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:05:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E6351C2256C
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:17:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4891116C680;
-	Tue, 28 May 2024 13:04:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F30FD16FF5F;
+	Tue, 28 May 2024 13:15:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KuxyHWTp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nrjuBCMj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A071616ABC2;
-	Tue, 28 May 2024 13:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4F716F0EA
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 13:15:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716901449; cv=none; b=F0dB6Yke/TtWdSuW73MhLy5RL6XWfSqlvJVatvUz1l2MhRxii2eRlmofhEcpYePuaAqmvExRPnrXEyiPbWcwTTr4jr3EKUGbgthgqpe633x+yxgBeb0675gY85l84j03eyOesK3ENFDgEzbyXajoZhr3IO0Iumt+DPeEQBSYlHk=
+	t=1716902130; cv=none; b=P94OHzhCbRMMZeTp/Q9EOVbIhQfdvWu2UKQXAu7tVr12jHvDuc/XQAQiobUd8gk32c61TOi73Yee3eLoe8/8mWM4hPBV4gFZk7wy8ZMjocGNveUtK4x+QGt51DJx8z+KXBxJLBj3RYZS7FDfo5ug8gPTkKmoNkbTPGiC9Yvbuzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716901449; c=relaxed/simple;
-	bh=gAEKf8Z+F5p2sZQPDJyxTDvSbnaMUp24oyvKsHM14oQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lfSJCOk1deY66dVAJI1jZQXhxjC/bLXZwxM9Hn6Z4SxlRJiqa8y9eN4AGKBUyAK4wXYGEoc4uw87bWaOGWK54z768yyN7rgpex5tGsQhFDDI9qcrrDafon5X0maH6qkkNdUmtMoZOp/qMJKspPPYlYLhAIPxWvpxlQa7BIuri28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KuxyHWTp; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-578972defb3so981771a12.2;
-        Tue, 28 May 2024 06:04:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716901446; x=1717506246; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dXOIV4+qVuK991jOKcYp0npCSTU6GZlvpKHpXDNtUgc=;
-        b=KuxyHWTpsCFWMz4HVl2j3J9qxfpiYqc/N/U1IJmn8XnhtFEnKcBonSbRgu3Tk1xqis
-         xF+77MtOsIsEYaCepVgtJm0L2WOEPobxArHcqJ9HqXgN7nc9SFyC9V/UAHoPZpgULFhg
-         EI+gNLMnQBcrNJf7VU4X/Dr/+crkgOY8VZM1nITMe1vFwCaw30YZSht4lUomLldRGZJH
-         tD2NRxMei/bl8o0vuwlEpNHoxL9nGTtvp6Y3J261+ROGCQCZdoNz7fEM74Ebqqb+87bO
-         AOOYc7ovaBkIqNr/f8sMv0duesCkcXSY4rbATB7T0N8vq5mNNDhOdHGDbKjmduz+EK9E
-         pEnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716901446; x=1717506246;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dXOIV4+qVuK991jOKcYp0npCSTU6GZlvpKHpXDNtUgc=;
-        b=o7xpDczlwTU/CHTMAP4x6zix6eG29pN25pDzWt3hswtlYn4mhCMuj8uHi6CipzChC1
-         w8zy8cDuj1s5yR7u/l53NJzMxD196jcJK0r7WFblmGtQhfffFGC1/x2rCrTzf9SRYMg3
-         irasEo93IgjIeS/0hk22huyPssGiZyH/LVbAEONK/d8q/xGfAiRkaEYkVvi3bDWoy7+8
-         z56uw5lKhw9s8rA+pQJoUIW4FDWvz3KjlR2svVpEi9o2gUIsODf86U1y4ALxcJ0hQgBZ
-         9YXMCOcSUsSYhWJE+qcNyOTDln5SecvPYu9owfIU5Jw8e26LCKokkCBxWdsfTT4361NE
-         pmvA==
-X-Forwarded-Encrypted: i=1; AJvYcCWp7dYumSD9L0jvWZG6uNMjwp7BVrhzlMfd+3TzPypAds5O0C6ZJIDKFzeY4FAXVoS2AujaN4KaN8ltIVlytFpVvKsPxmDL6Fc4CZs2UaJ0DtiygMt9euR15iMmAQRmhon0ldDW
-X-Gm-Message-State: AOJu0Yxpt17qOH+J/12EFL7c8KFwo2YXWQIawa4+p4q9zBH1anu+CnUt
-	zR88hdfX7BtrffKCOgCOqPb77850pVwmxMguMyOK3jiGuvTTDWr/
-X-Google-Smtp-Source: AGHT+IESrdIhLtzVi/G2Tg9eE5yLlAyPb2ZszMAvl2LCkGOLnB/QQlFURAPT0PzaWcJARBUchF9oew==
-X-Received: by 2002:a50:ccd3:0:b0:573:4f61:ca9c with SMTP id 4fb4d7f45d1cf-57862e12a13mr6381459a12.4.1716901445833;
-        Tue, 28 May 2024 06:04:05 -0700 (PDT)
-Received: from LPPLJK6X5M3.. (dynamic-78-8-96-206.ssp.dialog.net.pl. [78.8.96.206])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57997181419sm4708805a12.54.2024.05.28.06.04.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 May 2024 06:04:05 -0700 (PDT)
-From: Radoslaw Zielonek <radoslaw.zielonek@gmail.com>
-To: vladimir.oltean@nxp.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	radoslaw.zielonek@gmail.com,
-	syzbot+a7d2b1d5d1af83035567@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com,
-	vinicius.gomes@intel.com,
-	willemdebruijn.kernel@gmail.com
-Subject: Re: [syzbot] [net?] INFO: rcu detected stall in packet_release
-Date: Tue, 28 May 2024 15:03:25 +0200
-Message-ID: <20240528130331.21904-2-radoslaw.zielonek@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240528125526.qwskv756uya3zaqb@skbuf>
-References: <20240528125526.qwskv756uya3zaqb@skbuf>
+	s=arc-20240116; t=1716902130; c=relaxed/simple;
+	bh=6biWVuxMhZ/tEyLZWM2lpwUSsb0yPNVnUuWvv4Y3Hoo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OqPWaRqwhbNHpV2h1Nuc0SJ2+anhhSsI7rfpDNo/VFgeHlZD3NJaAIHZYLfKKNMNfF623nvZ05OGySh6rADGw0voY+M0WPBQYAOXN87zAcVvmfhDtarBV6LWilHSV2nNnVCoTU5uzZjRGmw7xB2kxNeoeWoZ6E1DMHrzyDrjLoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nrjuBCMj; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716902129; x=1748438129;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=6biWVuxMhZ/tEyLZWM2lpwUSsb0yPNVnUuWvv4Y3Hoo=;
+  b=nrjuBCMjFwkxeE+H2f6zwdr1XyTn/x+5t8fchnQXmOC7hc7ChS/gS9MG
+   QHXvgzvdNROOTENYIHcIZYp5MnZ19a8zxuWD7ejsB0Tgp0Y+So3/cXy+J
+   mRr+TkH6O4b/nnrRIcMITM56gz74aA1O59bLImzj580Bc7kABxswTFQIz
+   QNDCiGzUew7upQPsUT+MqsW9wH8BnwWVaoKtT42HToXaKJSev461qbz47
+   viXh+yJWgYnvMmR5R+BNwe3QcndQkGBW6y+3W+J3GGVnSeuzAn2yJP87p
+   tuLNWOLri2XtthD36mew8vsDP5vrBu3wyNLp8W6weFIt8KZkxJVP7RqzQ
+   A==;
+X-CSE-ConnectionGUID: yi8Upy1LQj2cWX/FnSyDAA==
+X-CSE-MsgGUID: q2cLLRggQbCqau/3qriL4w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11085"; a="13193523"
+X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
+   d="scan'208";a="13193523"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 06:15:29 -0700
+X-CSE-ConnectionGUID: jB5T4MqqRAOO4jlBHV4a/A==
+X-CSE-MsgGUID: BN4OeRSTQ8G4vBpYNbBWTw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
+   d="scan'208";a="39891097"
+Received: from boxer.igk.intel.com ([10.102.20.173])
+  by orviesa003.jf.intel.com with ESMTP; 28 May 2024 06:15:27 -0700
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	magnus.karlsson@intel.com,
+	michal.kubiak@intel.com,
+	larysa.zaremba@intel.com,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: [PATCH iwl-net 00/11] ice: fix AF_XDP ZC timeout and concurrency issues
+Date: Tue, 28 May 2024 15:14:18 +0200
+Message-Id: <20240528131429.3012910-1-maciej.fijalkowski@intel.com>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hello,
+Hi,
 
-Ah, sorry. I didn't notice that.
-The PoC has been tested by syzbot
-	[https://syzkaller.appspot.com/bug?extid=c4c6c3dc10cc96bcf723]
-	
-The full link:
-	[https://lore.kernel.org/all/00000000000089427c0614c18cf4@google.com/T/]
+changes included in this patchset address an issue that customer has
+been facing when AF_XDP ZC Tx sockets were used in combination with flow
+control and regular Tx traffic.
 
-Radosław.
+After executing:
+ethtool --set-priv-flags $dev link-down-on-close on
+ethtool -A $dev rx on tx on
+
+launching multiple ZC Tx sockets on $dev + pinging remote interface (so
+that regular Tx traffic is present) and then going through down/up of
+$dev, Tx timeout occured and then most of the time ice driver was unable
+to recover from that state.
+
+Patches 1-8 combined together solve the described above issue on
+customer side. Main focus here is to forbid producing Tx descriptors
+when either carrier is not yet initialized or process of bringing
+interface down has already started.
+
+On top of that, Larysa goes further with fixing XSK pool setup issues
+and race condition when Tx timeout strikes at the same time as
+ndo_bpf().
+
+Thanks,
+Maciej
+
+
+Larysa Zaremba (3):
+  ice: move locking outside of ice_qp_ena and ice_qp_dis
+  ice: lock with PF state instead of VSI state in ice_xsk_pool_setup()
+  ice: protect ring configuration with a mutex
+
+Maciej Fijalkowski (7):
+  ice: don't busy wait for Rx queue disable in ice_qp_dis()
+  ice: replace synchronize_rcu with synchronize_net
+  ice: modify error handling when setting XSK pool in ndo_bpf
+  ice: toggle netif_carrier when setting up XSK pool
+  ice: improve updating ice_{t,r}x_ring::xsk_pool
+  ice: add missing WRITE_ONCE when clearing ice_rx_ring::xdp_prog
+  ice: xsk: fix txq interrupt mapping
+
+Michal Kubiak (1):
+  ice: respect netif readiness in AF_XDP ZC related ndo's
+
+ drivers/net/ethernet/intel/ice/ice.h      |   8 +-
+ drivers/net/ethernet/intel/ice/ice_base.c |   4 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c  |  23 +++-
+ drivers/net/ethernet/intel/ice/ice_main.c |  41 +++++-
+ drivers/net/ethernet/intel/ice/ice_txrx.c |   6 +-
+ drivers/net/ethernet/intel/ice/ice_xsk.c  | 154 ++++++++++++----------
+ drivers/net/ethernet/intel/ice/ice_xsk.h  |   4 +-
+ 7 files changed, 151 insertions(+), 89 deletions(-)
+
+-- 
+2.34.1
 
 
