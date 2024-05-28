@@ -1,243 +1,377 @@
-Return-Path: <netdev+bounces-98484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69EDC8D1911
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 12:59:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 776298D191A
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:03:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2007528C09D
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 10:59:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D44FB1F211BB
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 11:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292B916C438;
-	Tue, 28 May 2024 10:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57EBF4E1B3;
+	Tue, 28 May 2024 11:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Ql2R6Eke"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HEpbtIgM"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85F317E8F0;
-	Tue, 28 May 2024 10:59:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C3F2745B
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 11:03:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716893973; cv=none; b=L9FdjFGSD+lLgG8kOsj4Jwq/fuayxwFZmMAHa8dpudLWSmfMTYpWwK/KrCvXz7wOGK3Y2XBA8TFrihDPuTSxBrR8g5qSoBWXRKlGMw/VnrTXZeD3lX4HKHwgNIHqiPHG0QGS1IIm47G1251SzKh5HMwzAz7QdPyXbcDnSzMtubo=
+	t=1716894226; cv=none; b=ExwR38qOtns4un2wyspcmEzFSYBhVfjnNDFEulJ2UCyOzXVfWmzEhpMCHKu2AOOko/eeO88w9tAET5tOmU2gcyY+PQSqltxXGOwC0Eu83+4hyZdNqvUL5OHtZqxTNdspH24cQ+xlFfcFVKJUsa0JWw669Ihq2fmruZZ/qz5Vguo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716893973; c=relaxed/simple;
-	bh=Zwclxo8uDsIen+bm06C2VqVRVoKofqDRrV5Zmus/3qc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=bo9pKw0Zb6PdY/kAxTaHTlPXtE8gsN+1AsHpUxKIgjOPdBSuCjBtICY+DJB4DKNYdp9qcTs6uOE2B4buw2wqMA4VqwiTe1LSpDT/5eJeaA6JrB/eYRLCJqrblSIBbpe/+58Yj0nhDe8P5RctR3kZYyR31XJtZiUMYhU72OmFkJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=Ql2R6Eke; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=q8Xuv5FaJiM2/quKX6bmmqnQXAi2Tg4XwUL9n+IdHWQ=; b=Ql2R6EkeFG0ZFimtB4nrx5IA6h
-	EVvJzIMT9PQK3r8GuardqxsTC3kcDjXs9JHtzdzIMot5K8OVcrruPYJXEkqEYz9vDxnaLdEPFEv9g
-	dlapy05LcWAGt97nNs1HqjZ3x22cGRjcD8ozGEFz7E0ljCj8U70m4V9VcZ2PC2q55BT720kcbHH0J
-	j9G2pxENut9P1HRJVMSW7S/qZhiwLDzIf3LpjrcLSEz/H4DT0+/1jBGhCFEjZT28go2i1AEE8hkKL
-	PaEH1Fud9BND97wF3K1MDT4Fsw+LNJDKL9EaHX/cqilxqFGaOCBSwcut0AtKPL5Qbl8uWYv176Qhm
-	LYGRGk+w==;
-Received: from 14.248.197.178.dynamic.dsl-lte-bonding.zhbmb00p-msn.res.cust.swisscom.ch ([178.197.248.14] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sBuY9-0007ga-0Q; Tue, 28 May 2024 12:59:25 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf-next 2024-05-28
-Date: Tue, 28 May 2024 12:59:24 +0200
-Message-Id: <20240528105924.30905-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	s=arc-20240116; t=1716894226; c=relaxed/simple;
+	bh=F56FR537ACHFPq6qOmlN0653RumzM1Fbn47wyVWWsDw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Xd9HiAHiSgport9fJhUzGf+ZgmSTZW2SGDYXTVhoWs2W2R0p46az0YIf6RkE58YrX5UlnFQTGKc0rmIbS19ONlryhesYI5HClUODDqgZrQgc9Nim/aySiDEiFbo6OPvPiYQoZA6U6NUOJ0oz3GiirEjjXHCDph8yB3CLi6hN9bM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HEpbtIgM; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716894224; x=1748430224;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=F56FR537ACHFPq6qOmlN0653RumzM1Fbn47wyVWWsDw=;
+  b=HEpbtIgMAc6qUutfIjehDSB7DamUfC1Z/hf3TPZhM6L3rdIrDVEwKV13
+   7g8lCTTBWo1sD/BOJ0BeNIWoJ4K5PxR9wLbGnitQxJpfwvdoFjvhfCscY
+   WEPqT9EtkmvNkplM9sgo42uVScuGwGyahvoSXUz0Q5XU8+B0ku1i7sS76
+   Jddr/ah3dQIRp4CsLmxKlPVUCGPp2FByRmCSVYpKnt4vvTnZhaFX2D9sp
+   l0Mc5ib29nXr33R4c/nVioWxTuSib+xCmPGdlbkMdIZav/EeKwPhZuXCM
+   kLPx+k+cKiGpH4Ew+b+UbYb8fwpiV/DzC/QNIfMwtHSDH/y2bYjmWzXAi
+   Q==;
+X-CSE-ConnectionGUID: HTcATGXhQ4uEzRXEj/VTDQ==
+X-CSE-MsgGUID: sGqzZAMzQD6ewWbJGr9ZEA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11085"; a="13352219"
+X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
+   d="scan'208";a="13352219"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 04:03:43 -0700
+X-CSE-ConnectionGUID: qDp8PiQMTaWGR3HsBrhPNg==
+X-CSE-MsgGUID: 0i45qUapRnq30uJaKOiExA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
+   d="scan'208";a="39871109"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa005.jf.intel.com with ESMTP; 28 May 2024 04:03:40 -0700
+Received: from rozewie.igk.intel.com (unknown [10.211.8.69])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id BFAD772;
+	Tue, 28 May 2024 12:03:38 +0100 (IST)
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+To: netdev@vger.kernel.org
+Cc: intel-wired-lan@lists.osuosl.org,
+	jiri@resnulli.us
+Subject: [PATCH iwl-net v2] ice: Add support for devlink loopback param.
+Date: Tue, 28 May 2024 13:01:32 +0200
+Message-Id: <20240528110132.483447-1-wojciech.drewek@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27289/Tue May 28 10:30:59 2024)
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+From: Pawel Kaminski <pawel.kaminski@intel.com>
 
-The following pull-request contains BPF updates for your *net-next* tree.
+Add support for driver-specific devlink loopback param. Supported values
+are "enabled", "disabled" and "prioritized". Default configuration is
+set to "enabled".
 
-We've added 23 non-merge commits during the last 11 day(s) which contain
-a total of 45 files changed, 696 insertions(+), 277 deletions(-).
+Add documentation in networking/devlink/ice.rst.
 
-The main changes are:
+In previous generations of Intel NICs the trasmit scheduler was only
+limited by PCIe bandwidth when scheduling/assigning hairpin-badwidth
+between VFs. Changes to E810 HW design introduced scheduler limitation,
+so that available hairpin-bandwidth is bound to external port speed.
+In order to address this limitation and enable NFV services such as
+"service chaining" a knob to adjust the scheduler config was created.
+Driver can send a configuration message to the FW over admin queue and
+internal FW logic will reconfigure HW to prioritize and add more BW to
+VF to VF traffic. As end result for example 10G port will no longer limit
+hairpin-badwith to 10G and much higher speeds can be achieved.
 
-1) Rename skb's mono_delivery_time to tstamp_type for extensibility and add
-   SKB_CLOCK_TAI type support to bpf_skb_set_tstamp(), from Abhishek Chauhan.
+Devlink loopback param set to "prioritized" enables higher
+hairpin-badwitdh on related PFs. Configuration is applicable only to
+8x10G and 4x25G cards.
 
-2) Add netfilter CT zone ID and direction to bpf_ct_opts so that arbitrary CT zones
-   can be used from XDP/tc BPF netfilter CT helper functions, from Brad Cowie.
+Changing loopback configuration will trigger CORER reset in order to take
+effect.
 
-3) Several tweaks to the instruction-set.rst IETF doc to address the Last Call
-   review comments, from Dave Thaler.
+Example command to change current value:
+devlink dev param set pci/0000:b2:00.3 name loopback value prioritized \
+        cmode runtime
 
-4) Small batch of riscv64 BPF JIT optimizations in order to emit more compressed
-   instructions to the JITed image for better icache efficiency, from Xiao Wang.
+Co-developed-by: Michal Wilczynski <michal.wilczynski@intel.com>
+Signed-off-by: Michal Wilczynski <michal.wilczynski@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Pawel Kaminski <pawel.kaminski@intel.com>
+Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+---
+v2: Extend documentation
+---
+ Documentation/networking/devlink/ice.rst      |  23 ++++
+ .../net/ethernet/intel/ice/devlink/devlink.c  | 125 ++++++++++++++++++
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  11 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   |   4 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ 5 files changed, 163 insertions(+), 1 deletion(-)
 
-5) Sort bpftool C dump output from BTF, aiming to simplify vmlinux.h diffing and
-   forcing more natural type definitions ordering, from Mykyta Yatsenko.
+diff --git a/Documentation/networking/devlink/ice.rst b/Documentation/networking/devlink/ice.rst
+index 830c04354222..f1000bedc24a 100644
+--- a/Documentation/networking/devlink/ice.rst
++++ b/Documentation/networking/devlink/ice.rst
+@@ -11,6 +11,7 @@ Parameters
+ ==========
+ 
+ .. list-table:: Generic parameters implemented
++   :widths: 5 5 90
+ 
+    * - Name
+      - Mode
+@@ -68,6 +69,28 @@ Parameters
+ 
+        To verify that value has been set:
+        $ devlink dev param show pci/0000:16:00.0 name tx_scheduling_layers
++.. list-table:: Driver specific parameters implemented
++    :widths: 5 5 90
++
++    * - Name
++      - Mode
++      - Description
++    * - ``loopback``
++      - runtime
++      - Controls loopback behavior by tuning scheduler bandwidth.
++        Supported values are:
++
++        ``enabled`` - loopback traffic is not allowed on port
++
++        ``disabled`` - loopback traffic is allowed on this port
++
++        ``prioritized`` - loopback traffic is prioritized on this port
++
++        Default value of ``loopback`` parameter is ``enabled``.
++        ``prioritized`` provides ability to adjust loopback rate to increase
++        one port capacity at cost of the another. User needs to disable
++        loopback on one of the ports in order have increased capacity
++        on the ``prioritized`` port.
+ 
+ Info versions
+ =============
+diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+index f774781ab514..c0be85e62687 100644
+--- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
++++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+@@ -1381,9 +1381,128 @@ ice_devlink_enable_iw_validate(struct devlink *devlink, u32 id,
+ 	return 0;
+ }
+ 
++#define DEVLINK_LPBK_DISABLED_STR "disabled"
++#define DEVLINK_LPBK_ENABLED_STR "enabled"
++#define DEVLINK_LPBK_PRIORITIZED_STR "prioritized"
++
++/**
++ * ice_devlink_loopback_mode_to_str - Get string for loopback mode.
++ * @mode: Loopback mode used in port_info struct.
++ *
++ * Return: Mode respective string or "Invalid".
++ */
++static const char *ice_devlink_loopback_mode_to_str(enum ice_loopback_mode mode)
++{
++	switch (mode) {
++	case ICE_LOOPBACK_MODE_ENABLED:
++		return DEVLINK_LPBK_ENABLED_STR;
++	case ICE_LOOPBACK_MODE_PRIORITIZED:
++		return DEVLINK_LPBK_PRIORITIZED_STR;
++	case ICE_LOOPBACK_MODE_DISABLED:
++		return DEVLINK_LPBK_DISABLED_STR;
++	}
++
++	return "Invalid";
++}
++
++/**
++ * ice_devlink_loopback_str_to_mode - Get loopback mode from string name.
++ * @mode_str: Loopback mode string.
++ *
++ * Return: Mode value or negative number if invalid.
++ */
++static int ice_devlink_loopback_str_to_mode(const char *mode_str)
++{
++	if (!strcmp(mode_str, DEVLINK_LPBK_ENABLED_STR))
++		return ICE_LOOPBACK_MODE_ENABLED;
++	else if (!strcmp(mode_str, DEVLINK_LPBK_PRIORITIZED_STR))
++		return ICE_LOOPBACK_MODE_PRIORITIZED;
++	else if (!strcmp(mode_str, DEVLINK_LPBK_DISABLED_STR))
++		return ICE_LOOPBACK_MODE_DISABLED;
++
++	return -EINVAL;
++}
++
++/**
++ * ice_devlink_loopback_get - Get loopback parameter.
++ * @devlink: Pointer to the devlink instance.
++ * @id: The parameter ID to set.
++ * @ctx: Context to store the parameter value.
++ *
++ * Return: Zero.
++ */
++static int ice_devlink_loopback_get(struct devlink *devlink, u32 id,
++				    struct devlink_param_gset_ctx *ctx)
++{
++	struct ice_pf *pf = devlink_priv(devlink);
++	struct ice_port_info *pi;
++	const char *mode_str;
++
++	pi = pf->hw.port_info;
++	mode_str = ice_devlink_loopback_mode_to_str(pi->loopback_mode);
++	snprintf(ctx->val.vstr, sizeof(ctx->val.vstr), "%s", mode_str);
++
++	return 0;
++}
++
++/**
++ * ice_devlink_loopback_set - Set loopback parameter.
++ * @devlink: Pointer to the devlink instance.
++ * @id: The parameter ID to set.
++ * @ctx: Context to get the parameter value.
++ * @extack: Netlink extended ACK structure.
++ *
++ * Return: Zero.
++ */
++static int ice_devlink_loopback_set(struct devlink *devlink, u32 id,
++				    struct devlink_param_gset_ctx *ctx,
++				    struct netlink_ext_ack *extack)
++{
++	int new_loopback_mode = ice_devlink_loopback_str_to_mode(ctx->val.vstr);
++	struct ice_pf *pf = devlink_priv(devlink);
++	struct device *dev = ice_pf_to_dev(pf);
++	struct ice_port_info *pi;
++
++	pi = pf->hw.port_info;
++	if (pi->loopback_mode != new_loopback_mode) {
++		pi->loopback_mode = new_loopback_mode;
++		dev_info(dev, "Setting loopback to %s\n", ctx->val.vstr);
++		ice_schedule_reset(pf, ICE_RESET_CORER);
++	}
++
++	return 0;
++}
++
++/**
++ * ice_devlink_loopback_validate - Validate passed loopback parameter value.
++ * @devlink: Unused pointer to devlink instance.
++ * @id: The parameter ID to validate.
++ * @val: Value to validate.
++ * @extack: Netlink extended ACK structure.
++ *
++ * Supported values are:
++ * "enabled" - loopback is enabled, "disabled" - loopback is disabled
++ * "prioritized" - loopback traffic is prioritized in scheduling.
++ *
++ * Return: Zero when passed parameter value is supported. Negative value on
++ * error.
++ */
++static int ice_devlink_loopback_validate(struct devlink *devlink, u32 id,
++					 union devlink_param_value val,
++					 struct netlink_ext_ack *extack)
++{
++	if (ice_devlink_loopback_str_to_mode(val.vstr) < 0) {
++		NL_SET_ERR_MSG_MOD(extack, "Error: Requested value is not supported.");
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
+ enum ice_param_id {
+ 	ICE_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
+ 	ICE_DEVLINK_PARAM_ID_TX_SCHED_LAYERS,
++	ICE_DEVLINK_PARAM_ID_LOOPBACK,
+ };
+ 
+ static const struct devlink_param ice_dvl_rdma_params[] = {
+@@ -1405,6 +1524,12 @@ static const struct devlink_param ice_dvl_sched_params[] = {
+ 			     ice_devlink_tx_sched_layers_get,
+ 			     ice_devlink_tx_sched_layers_set,
+ 			     ice_devlink_tx_sched_layers_validate),
++	DEVLINK_PARAM_DRIVER(ICE_DEVLINK_PARAM_ID_LOOPBACK,
++			     "loopback", DEVLINK_PARAM_TYPE_STRING,
++			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
++			     ice_devlink_loopback_get,
++			     ice_devlink_loopback_set,
++			     ice_devlink_loopback_validate),
+ };
+ 
+ static void ice_devlink_free(void *devlink_ptr)
+diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+index 621a2ca7093e..10f437ec79a0 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+@@ -232,6 +232,13 @@ struct ice_aqc_get_sw_cfg_resp_elem {
+ #define ICE_AQC_GET_SW_CONF_RESP_IS_VF		BIT(15)
+ };
+ 
++/* Loopback port parameter mode values. */
++enum ice_loopback_mode {
++	ICE_LOOPBACK_MODE_ENABLED = 0,
++	ICE_LOOPBACK_MODE_DISABLED = 1,
++	ICE_LOOPBACK_MODE_PRIORITIZED = 2,
++};
++
+ /* Set Port parameters, (direct, 0x0203) */
+ struct ice_aqc_set_port_params {
+ 	__le16 cmd_flags;
+@@ -240,7 +247,9 @@ struct ice_aqc_set_port_params {
+ 	__le16 swid;
+ #define ICE_AQC_PORT_SWID_VALID			BIT(15)
+ #define ICE_AQC_PORT_SWID_M			0xFF
+-	u8 reserved[10];
++	u8 loopback_mode;
++#define ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_VALID BIT(2)
++	u8 reserved[9];
+ };
+ 
+ /* These resource type defines are used for all switch resource
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 9ae61cd8923e..f98bd7da9f77 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -1086,6 +1086,7 @@ int ice_init_hw(struct ice_hw *hw)
+ 		goto err_unroll_cqinit;
+ 	}
+ 
++	hw->port_info->loopback_mode = ICE_LOOPBACK_MODE_ENABLED;
+ 	/* set the back pointer to HW */
+ 	hw->port_info->hw = hw;
+ 
+@@ -3070,6 +3071,9 @@ ice_aq_set_port_params(struct ice_port_info *pi, bool double_vlan,
+ 		cmd_flags |= ICE_AQC_SET_P_PARAMS_DOUBLE_VLAN_ENA;
+ 	cmd->cmd_flags = cpu_to_le16(cmd_flags);
+ 
++	cmd->loopback_mode = pi->loopback_mode |
++				ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_VALID;
++
+ 	return ice_aq_send_cmd(hw, &desc, NULL, 0, cd);
+ }
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index aac59c85a911..30c8ecc1e36b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -730,6 +730,7 @@ struct ice_port_info {
+ 	u16 sw_id;			/* Initial switch ID belongs to port */
+ 	u16 pf_vf_num;
+ 	u8 port_state;
++	u8 loopback_mode;
+ #define ICE_SCHED_PORT_STATE_INIT	0x0
+ #define ICE_SCHED_PORT_STATE_READY	0x1
+ 	u8 lport;
+-- 
+2.40.1
 
-6) Use DEV_STATS_INC() macro in BPF redirect helpers to silence a syzbot/KCSAN
-   race report for the tx_errors counter, from Jiang Yunshui.
-
-7) Un-constify bpf_func_info in bpftool to fix compilation with LLVM 17+ which
-   started treating const structs as constants and thus breaking full BTF program
-   name resolution, from Ivan Babrou.
-
-8) Fix up BPF program numbers in test_sockmap selftest in order to reduce some
-   of the test-internal array sizes, from Geliang Tang.
-
-9) Small cleanup in Makefile.btf script to use test-ge check for v1.25-only
-   pahole, from Alan Maguire.
-
-10) Fix bpftool's make dependencies for vmlinux.h in order to avoid needless
-    rebuilds in some corner cases, from Artem Savkov.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Andrew Jones, Andrii Nakryiko, Björn Töpel, Christoph Hellwig, David 
-Vernet, Joel Granados, Martin KaFai Lau, Nick Desaulniers, Pu Lehui, 
-Quentin Monnet, syzbot, Willem de Bruijn, Yonghong Song
-
-----------------------------------------------------------------
-
-The following changes since commit 4b377b4868ef17b040065bd468668c707d2477a5:
-
-  kprobe/ftrace: fix build error due to bad function definition (2024-05-17 19:17:55 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-for you to fetch changes up to d9cbd8343b010016fcaabc361c37720dcafddcbe:
-
-  bpf, net: Use DEV_STAT_INC() (2024-05-28 12:04:11 +0200)
-
-----------------------------------------------------------------
-bpf-next-for-netdev
-
-----------------------------------------------------------------
-Abhishek Chauhan (3):
-      net: Rename mono_delivery_time to tstamp_type for scalabilty
-      net: Add additional bit to support clockid_t timestamp type
-      selftests/bpf: Handle forwarding of UDP CLOCK_TAI packets
-
-Alan Maguire (1):
-      kbuild, bpf: Use test-ge check for v1.25-only pahole
-
-Artem Savkov (1):
-      bpftool: Fix make dependencies for vmlinux.h
-
-Brad Cowie (2):
-      net: netfilter: Make ct zone opts configurable for bpf ct helpers
-      selftests/bpf: Update tests for new ct zone opts for nf_conntrack kfuncs
-
-Dave Thaler (6):
-      bpf, docs: Move sentence about returning R0 to abi.rst
-      bpf, docs: Use RFC 2119 language for ISA requirements
-      bpf, docs: clarify sign extension of 64-bit use of 32-bit imm
-      bpf, docs: Add table captions
-      bpf, docs: Clarify call local offset
-      bpf, docs: Fix instruction.rst indentation
-
-Geliang Tang (1):
-      selftests/bpf: Fix prog numbers in test_sockmap
-
-Ivan Babrou (1):
-      bpftool: Un-const bpf_func_info to fix it for llvm 17 and newer
-
-Martin KaFai Lau (1):
-      Merge branch 'Replace mono_delivery_time with tstamp_type'
-
-Mohammad Shehar Yaar Tausif (1):
-      bpf: Fix order of args in call to bpf_map_kvcalloc
-
-Mykyta Yatsenko (1):
-      bpftool: Introduce btf c dump sorting
-
-Thomas Weißschuh (1):
-      bpf: constify member bpf_sysctl_kern:: Table
-
-Xiao Wang (3):
-      riscv, bpf: Optimize zextw insn with Zba extension
-      riscv, bpf: Use STACK_ALIGN macro for size rounding up
-      riscv, bpf: Try RVC for reg move within BPF_CMPXCHG JIT
-
-Ying Zhang (1):
-      bpf: Remove unused variable "prev_state"
-
-yunshui (1):
-      bpf, net: Use DEV_STAT_INC()
-
- Documentation/bpf/standardization/abi.rst          |   3 +
- .../bpf/standardization/instruction-set.rst        | 261 ++++++++++++---------
- arch/riscv/Kconfig                                 |  12 +
- arch/riscv/net/bpf_jit.h                           |  18 ++
- arch/riscv/net/bpf_jit_comp64.c                    |  12 +-
- include/linux/filter.h                             |   2 +-
- include/linux/skbuff.h                             |  68 ++++--
- include/net/inet_frag.h                            |   4 +-
- include/uapi/linux/bpf.h                           |  15 +-
- kernel/bpf/bpf_local_storage.c                     |   4 +-
- net/bridge/netfilter/nf_conntrack_bridge.c         |   6 +-
- net/core/dev.c                                     |   2 +-
- net/core/filter.c                                  |  62 ++---
- net/ieee802154/6lowpan/reassembly.c                |   2 +-
- net/ipv4/inet_fragment.c                           |   2 +-
- net/ipv4/ip_fragment.c                             |   2 +-
- net/ipv4/ip_output.c                               |  14 +-
- net/ipv4/raw.c                                     |   2 +-
- net/ipv4/tcp_ipv4.c                                |   2 +
- net/ipv4/tcp_output.c                              |  14 +-
- net/ipv6/ip6_output.c                              |  11 +-
- net/ipv6/netfilter.c                               |   6 +-
- net/ipv6/netfilter/nf_conntrack_reasm.c            |   2 +-
- net/ipv6/raw.c                                     |   2 +-
- net/ipv6/reassembly.c                              |   2 +-
- net/ipv6/tcp_ipv6.c                                |  12 +-
- net/netfilter/nf_conntrack_bpf.c                   |  68 +++++-
- net/packet/af_packet.c                             |   7 +-
- net/sched/act_bpf.c                                |   4 +-
- net/sched/cls_bpf.c                                |   4 +-
- samples/bpf/cpustat_kern.c                         |   3 +-
- scripts/Makefile.btf                               |   4 +-
- tools/bpf/bpftool/Documentation/bpftool-btf.rst    |   6 +-
- tools/bpf/bpftool/Makefile                         |   3 +-
- tools/bpf/bpftool/bash-completion/bpftool          |   3 +
- tools/bpf/bpftool/btf.c                            | 138 ++++++++++-
- tools/bpf/bpftool/common.c                         |   2 +-
- tools/include/uapi/linux/bpf.h                     |  15 +-
- tools/testing/selftests/bpf/config                 |   1 +
- tools/testing/selftests/bpf/prog_tests/bpf_nf.c    |   7 +
- .../testing/selftests/bpf/prog_tests/ctx_rewrite.c |  10 +-
- .../testing/selftests/bpf/prog_tests/tc_redirect.c |   3 -
- tools/testing/selftests/bpf/progs/test_bpf_nf.c    | 108 +++++++++
- tools/testing/selftests/bpf/progs/test_tc_dtime.c  |  39 ++-
- tools/testing/selftests/bpf/test_sockmap.c         |   6 +-
- 45 files changed, 696 insertions(+), 277 deletions(-)
 
