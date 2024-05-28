@@ -1,105 +1,360 @@
-Return-Path: <netdev+bounces-98697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7948C8D21CA
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:40:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 828778D21D1
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:42:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA2291C22C73
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:40:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A9C31C225D9
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:42:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05855172BCE;
-	Tue, 28 May 2024 16:40:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="dgPbYLq1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5912172BA6;
+	Tue, 28 May 2024 16:42:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E5817106A
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 16:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D140061FC5
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 16:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716914418; cv=none; b=KGd6UesgVpWCHVrNYd5jnxtuw9+3DV7S7+CnAIvyleJpvFqAgURNKABM0N1kBMYGOylsv5hqxpvAm6bQnAjZpir3iMTDK+mJ0YN8X5tr8FdRyYuToouCWwhxDaBUUq1RWiwp2/pmnTj4jiGG7lEeT1NNK+pTMO7BJ8SCXJmdSNQ=
+	t=1716914547; cv=none; b=L3H0HMLxTGbuvhTAuibUHLiUCCiFudnZBJ4TXmPlHjIyUNImq2WFL9e1+HPB154F/8QzidinX+pXFLTZ8LJKU4bNCrK26TMH/gGz4flhzPIG+5vaJuWLdcNigReVd6TAKo12lRM54xnpJC4aGmZKn1XBqu8q3YiNVK4aGP7uDN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716914418; c=relaxed/simple;
-	bh=GhRez4Fx0Z0cdleXvJ6KlvooAZU3mXVtsJ2Oxo6UkJ0=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uN8kgHM0BXtYzN4rLj8SM0adqN9uNATMi4AHwYynCmVvPfSqVUNV+c1lHINKUdwVaXNJCEwQMSNDYjP+r33NTc5f2g1jndOTckXRb1w7W5LVXEiSQAYtmlkuRzr6/M5kpSNy/1ymvqqjTH7GJs1szLN2KasrlGHaY3TOJALAZHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=dgPbYLq1; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4202ca70270so12072685e9.3
-        for <netdev@vger.kernel.org>; Tue, 28 May 2024 09:40:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1716914415; x=1717519215; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0+bE3y23Y2jc/sZ470W5Ehr4+nLRjpDlijTRzceXpdw=;
-        b=dgPbYLq1OryBxByTEdk0sqznQOsBsd0eIDmd68uTGSYJXEv0thY5vM4mQql4nUEZJR
-         vO4mGy9VWUszHRwwZFOSePvh/PEv6U5DqixX79HIVxVH5s0EFn87VxDoj+tjEThI0aGl
-         UQsQ7YPLzF/PsNTBIi5YzCtZSFu/aAzJ/7leBoiKG1sfT2wa5w73qX/4xD/WTP1f6xFv
-         TKT0C9OgiBSTWs8nS3njwxRtYtFM+722Ehi/Cb4sE/Bu9yTLTQyW0qz3ZWCFdmXxbdPa
-         UYE2DrRVoBjIva1VMCPb0GJvcWYqhX1ecM83R7nqeWXX4br3e4qbWZkED5QhUk8CJVQn
-         yyvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716914415; x=1717519215;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0+bE3y23Y2jc/sZ470W5Ehr4+nLRjpDlijTRzceXpdw=;
-        b=KMKkDgq0WAQNuHTWTL3NLPTU44kiAqmBtFG8IWnab1b0Xpc0PQdBgMFbluyPrpXjSY
-         4udQOI8sBBi0bwka5UnsgN8jTi+LtQo4i0xci+PV6OaWWtrl1zlUmNEOd1r5x8mZD/7r
-         WzeJQNhyoDmfH6iEX1sfxNqLf/1A9oCiTVMmWL8/SnBlKaJZuR9yNrcdiJpgMZ9JczER
-         XPSivPtJJvuY+wWETHahrvIGepH3G2LeqzKGMvFxPT1XzeLpu9DsRNKjaMmaBuKooXp8
-         QpRRDgTFbdMPbEJwXxRXnsiyBHMZSGqzK1i4749ku3Yx4tPfnD2Lbccf6H9wPPajqFC/
-         v1Ow==
-X-Forwarded-Encrypted: i=1; AJvYcCU09kv38cZYPVxEo1ADrvjCw9f0LR+ipOztT9oWiIBSLSbDPbK6ExNDNgoAxeoa+H+VBwM8JCgtaGanF3VB7tksHmpMXFve
-X-Gm-Message-State: AOJu0Yx7rtJryM1S1GD9SKMMc14wMVIKKlVj5TXf/JNRjqr6LgNuOVWt
-	0gavXdWbJx74RWti8zsZJHh8BfjZMfODBkwWQln1514f7lwi28mNiT5aby+7FB0=
-X-Google-Smtp-Source: AGHT+IGzWjnSFkB1ANBs2PNdU87HLzoQjdhoU8WSS6pgUppme/s6M+LhP97xyCLiBusTlbckGHkTMA==
-X-Received: by 2002:a05:600c:4f96:b0:421:10ce:8aff with SMTP id 5b1f17b1804b1-42110ce8bf2mr86779085e9.19.1716914415293;
-        Tue, 28 May 2024 09:40:15 -0700 (PDT)
-Received: from localhost.localdomain (62.83.84.125.dyn.user.ono.com. [62.83.84.125])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-421089667fbsm148191035e9.9.2024.05.28.09.40.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 May 2024 09:40:14 -0700 (PDT)
-From: Oscar Salvador <osalvador@suse.com>
-X-Google-Original-From: Oscar Salvador <osalvador@suse.de>
-Date: Tue, 28 May 2024 18:40:12 +0200
-To: syzbot <syzbot+d3fe2dc5ffe9380b714b@syzkaller.appspotmail.com>
-Cc: akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, muchun.song@linux.dev, netdev@vger.kernel.org,
-	osalvador@suse.com, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [mm?] kernel BUG in __vma_reservation_common
-Message-ID: <ZlYI7BjSgxOy7dbg@localhost.localdomain>
-References: <ZlXAFvEdT96k5iAQ@localhost.localdomain>
- <0000000000007cc41d0619857dd4@google.com>
+	s=arc-20240116; t=1716914547; c=relaxed/simple;
+	bh=r77EEZQHNk+zUic2RqBuNB6TM41RA9kTkcOsRrDZtss=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=g2UTpLIunvIStWA51XCcBci+7PNHfrMnYYW+soO0ABcXVqKkORteaTjUVhar0fckbSsjGd7xEgH5Oft56m1doYfI/ujafX5k1M8dI6s794m6hiZv0KraRlJCPTDSEJr5PzxIW93Cy2MhVDGdafNXjmpHZu7N1dPFKdYwvwSUjqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-210-ocEPECmUNj2NoymEZeie6Q-1; Tue,
+ 28 May 2024 12:42:19 -0400
+X-MC-Unique: ocEPECmUNj2NoymEZeie6Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7ECDC29AA382;
+	Tue, 28 May 2024 16:42:18 +0000 (UTC)
+Received: from hog (unknown [10.39.192.53])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 43A702026D68;
+	Tue, 28 May 2024 16:42:17 +0000 (UTC)
+Date: Tue, 28 May 2024 18:42:16 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, Esben Haabendal <esben@geanix.com>
+Subject: Re: [PATCH net-next v3 15/24] ovpn: implement peer lookup logic
+Message-ID: <ZlYJaIvXY3nuNd98@hog>
+References: <20240506011637.27272-1-antonio@openvpn.net>
+ <20240506011637.27272-16-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20240506011637.27272-16-antonio@openvpn.net>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
 Content-Disposition: inline
-In-Reply-To: <0000000000007cc41d0619857dd4@google.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 28, 2024 at 08:43:06AM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot tried to test the proposed patch but the build/boot failed:
-> 
-> mm/hugetlb.c:5772:51: error: expected ';' at end of declaration
-> mm/hugetlb.c:5782:4: error: expected expression
+2024-05-06, 03:16:28 +0200, Antonio Quartulli wrote:
+> +static struct in6_addr ovpn_nexthop_from_skb6(struct sk_buff *skb)
+> +{
+> +=09struct rt6_info *rt =3D (struct rt6_info *)skb_rtable(skb);
 
-Heh, silly me, I should have compile-tested, but was confident.
-Anyway, now pushed a fixed version.
- 
+skb_rt6_info?
 
--- 
-Oscar Salvador
-SUSE Labs
+> +
+> +=09if (!rt || !(rt->rt6i_flags & RTF_GATEWAY))
+> +=09=09return ipv6_hdr(skb)->daddr;
+> +
+> +=09return rt->rt6i_gateway;
+> +}
+> +
+> +/**
+> + * ovpn_peer_get_by_vpn_addr4 - retrieve peer by its VPN IPv4 address
+> + * @head: list head to search
+> + * @addr: VPN IPv4 to use as search key
+> + *
+> + * Return: the peer if found or NULL otherwise
+
+The doc for all those ovpn_peer_get_* functions could indicate that on
+success, a reference on the peer is held.
+
+
+[...]
+> +static struct ovpn_peer *ovpn_peer_get_by_vpn_addr6(struct hlist_head *h=
+ead,
+> +=09=09=09=09=09=09    struct in6_addr *addr)
+> +{
+> +=09struct ovpn_peer *tmp, *peer =3D NULL;
+> +=09int i;
+> +
+> +=09rcu_read_lock();
+> +=09hlist_for_each_entry_rcu(tmp, head, hash_entry_addr6) {
+> +=09=09for (i =3D 0; i < 4; i++) {
+> +=09=09=09if (addr->s6_addr32[i] !=3D
+> +=09=09=09    tmp->vpn_addrs.ipv6.s6_addr32[i])
+> +=09=09=09=09continue;
+> +=09=09}
+
+ipv6_addr_equal
+
+[...]
+> +=09default:
+> +=09=09return NULL;
+> +=09}
+> +
+> +=09index =3D ovpn_peer_index(ovpn->peers.by_transp_addr, &ss, sa_len);
+> +=09head =3D &ovpn->peers.by_transp_addr[index];
+
+Maybe worth adding a get_bucket helper (with a better name :)) instead
+of ovpn_peer_index, since all uses of ovpn_peer_index are followed by
+a "head =3D TBL[index]" (or direct use in some hlist iterator), but the
+index itself is not used later on, only the bucket.
+
+> +
+> +=09rcu_read_lock();
+> +=09hlist_for_each_entry_rcu(tmp, head, hash_entry_transp_addr) {
+> +=09=09found =3D ovpn_peer_transp_match(tmp, &ss);
+> +=09=09if (!found)
+
+nit: call ovpn_peer_transp_match directly and drop the found variable
+
+> +=09=09=09continue;
+> +
+> +=09=09if (!ovpn_peer_hold(tmp))
+> +=09=09=09continue;
+> +
+> +=09=09peer =3D tmp;
+> +=09=09break;
+> +=09}
+> +=09rcu_read_unlock();
+> =20
+>  =09return peer;
+>  }
+> @@ -303,10 +427,28 @@ static struct ovpn_peer *ovpn_peer_get_by_id_p2p(st=
+ruct ovpn_struct *ovpn,
+> =20
+>  struct ovpn_peer *ovpn_peer_get_by_id(struct ovpn_struct *ovpn, u32 peer=
+_id)
+>  {
+> -=09struct ovpn_peer *peer =3D NULL;
+> +=09struct ovpn_peer *tmp, *peer =3D NULL;
+> +=09struct hlist_head *head;
+> +=09u32 index;
+> =20
+>  =09if (ovpn->mode =3D=3D OVPN_MODE_P2P)
+> -=09=09peer =3D ovpn_peer_get_by_id_p2p(ovpn, peer_id);
+> +=09=09return ovpn_peer_get_by_id_p2p(ovpn, peer_id);
+> +
+> +=09index =3D ovpn_peer_index(ovpn->peers.by_id, &peer_id, sizeof(peer_id=
+));
+> +=09head =3D &ovpn->peers.by_id[index];
+> +
+> +=09rcu_read_lock();
+> +=09hlist_for_each_entry_rcu(tmp, head, hash_entry_id) {
+> +=09=09if (tmp->id !=3D peer_id)
+> +=09=09=09continue;
+> +
+> +=09=09if (!ovpn_peer_hold(tmp))
+> +=09=09=09continue;
+
+Can there ever be multiple peers with the same id? (ie, is it worth
+continuing the loop if this fails? the same question probably applies
+to ovpn_peer_get_by_transp_addr as well)
+
+
+> +=09=09peer =3D tmp;
+> +=09=09break;
+> +=09}
+> +=09rcu_read_unlock();
+> =20
+>  =09return peer;
+>  }
+> @@ -328,6 +470,11 @@ struct ovpn_peer *ovpn_peer_get_by_dst(struct ovpn_s=
+truct *ovpn,
+>  =09=09=09=09       struct sk_buff *skb)
+>  {
+>  =09struct ovpn_peer *tmp, *peer =3D NULL;
+> +=09struct hlist_head *head;
+> +=09sa_family_t sa_fam;
+> +=09struct in6_addr addr6;
+> +=09__be32 addr4;
+> +=09u32 index;
+> =20
+>  =09/* in P2P mode, no matter the destination, packets are always sent to
+>  =09 * the single peer listening on the other side
+> @@ -338,15 +485,123 @@ struct ovpn_peer *ovpn_peer_get_by_dst(struct ovpn=
+_struct *ovpn,
+>  =09=09if (likely(tmp && ovpn_peer_hold(tmp)))
+>  =09=09=09peer =3D tmp;
+>  =09=09rcu_read_unlock();
+> +=09=09return peer;
+> +=09}
+> +
+> +=09sa_fam =3D skb_protocol_to_family(skb);
+> +
+> +=09switch (sa_fam) {
+> +=09case AF_INET:
+> +=09=09addr4 =3D ovpn_nexthop_from_skb4(skb);
+> +=09=09index =3D ovpn_peer_index(ovpn->peers.by_vpn_addr, &addr4,
+> +=09=09=09=09=09sizeof(addr4));
+> +=09=09head =3D &ovpn->peers.by_vpn_addr[index];
+> +
+> +=09=09peer =3D ovpn_peer_get_by_vpn_addr4(head, &addr4);
+> +=09=09break;
+> +=09case AF_INET6:
+> +=09=09addr6 =3D ovpn_nexthop_from_skb6(skb);
+> +=09=09index =3D ovpn_peer_index(ovpn->peers.by_vpn_addr, &addr6,
+> +=09=09=09=09=09sizeof(addr6));
+> +=09=09head =3D &ovpn->peers.by_vpn_addr[index];
+> +
+> +=09=09peer =3D ovpn_peer_get_by_vpn_addr6(head, &addr6);
+
+The index -> head -> peer code is identical in get_by_dst and
+get_by_src, it could be stuffed into ovpn_peer_get_by_vpn_addr{4,6}.
+
+> +=09=09break;
+>  =09}
+> =20
+>  =09return peer;
+>  }
+
+
+[snip the _rt4 variant, comments apply to both]
+> +/**
+> + * ovpn_nexthop_from_rt6 - look up the IPv6 nexthop for the given destin=
+ation
+
+I'm a bit confused by this talk about "destination" when those two
+functions are then used with the source address from the packet, from
+a function called "get_by_src".
+
+> + * @ovpn: the private data representing the current VPN session
+> + * @dst: the destination to be looked up
+> + *
+> + * Looks up in the IPv6 system routing table the IO of the nexthop to be=
+ used
+
+"the IO"?
+
+> + * to reach the destination passed as argument. IF no nexthop can be fou=
+nd, the
+> + * destination itself is returned as it probably has to be used as nexth=
+op.
+> + *
+> + * Return: the IP of the next hop if found or the dst itself otherwise
+
+"the dst" tends to refer to a dst_entry, maybe "or @dst otherwise"?
+(though I'm not sure that's valid kdoc)
+
+(also for ovpn_nexthop_from_rt4)
+
+> + */
+> +static struct in6_addr ovpn_nexthop_from_rt6(struct ovpn_struct *ovpn,
+> +=09=09=09=09=09     struct in6_addr dst)
+> +{
+> +#if IS_ENABLED(CONFIG_IPV6)
+> +=09struct dst_entry *entry;
+> +=09struct rt6_info *rt;
+> +=09struct flowi6 fl =3D {
+> +=09=09.daddr =3D dst,
+> +=09};
+> +
+> +=09entry =3D ipv6_stub->ipv6_dst_lookup_flow(dev_net(ovpn->dev), NULL, &=
+fl,
+> +=09=09=09=09=09=09NULL);
+> +=09if (IS_ERR(entry)) {
+> +=09=09net_dbg_ratelimited("%s: no route to host %pI6c\n", __func__,
+> +=09=09=09=09    &dst);
+> +=09=09/* if we end up here this packet is probably going to be
+> +=09=09 * thrown away later
+> +=09=09 */
+> +=09=09return dst;
+> +=09}
+> +
+> +=09rt =3D container_of(entry, struct rt6_info, dst);
+
+dst_rt6_info(entry)
+
+> +
+> +=09if (!(rt->rt6i_flags & RTF_GATEWAY))
+> +=09=09goto out;
+> +
+> +=09dst =3D rt->rt6i_gateway;
+> +out:
+> +=09dst_release((struct dst_entry *)rt);
+> +#endif
+> +=09return dst;
+> +}
+> +
+>  struct ovpn_peer *ovpn_peer_get_by_src(struct ovpn_struct *ovpn,
+>  =09=09=09=09       struct sk_buff *skb)
+>  {
+>  =09struct ovpn_peer *tmp, *peer =3D NULL;
+> +=09struct hlist_head *head;
+> +=09sa_family_t sa_fam;
+> +=09struct in6_addr addr6;
+> +=09__be32 addr4;
+> +=09u32 index;
+> =20
+>  =09/* in P2P mode, no matter the destination, packets are always sent to
+>  =09 * the single peer listening on the other side
+> @@ -357,6 +612,28 @@ struct ovpn_peer *ovpn_peer_get_by_src(struct ovpn_s=
+truct *ovpn,
+>  =09=09if (likely(tmp && ovpn_peer_hold(tmp)))
+>  =09=09=09peer =3D tmp;
+>  =09=09rcu_read_unlock();
+> +=09=09return peer;
+> +=09}
+> +
+> +=09sa_fam =3D skb_protocol_to_family(skb);
+> +
+> +=09switch (sa_fam) {
+
+nit:
+=09switch (skb_protocol_to_family(skb))
+seems a bit more readable to me (also in ovpn_peer_get_by_dst) - and
+saves you from reverse xmas tree complaints (sa_fam should have been
+after addr6)
+
+> +=09case AF_INET:
+> +=09=09addr4 =3D ovpn_nexthop_from_rt4(ovpn, ip_hdr(skb)->saddr);
+> +=09=09index =3D ovpn_peer_index(ovpn->peers.by_vpn_addr, &addr4,
+> +=09=09=09=09=09sizeof(addr4));
+> +=09=09head =3D &ovpn->peers.by_vpn_addr[index];
+> +
+> +=09=09peer =3D ovpn_peer_get_by_vpn_addr4(head, &addr4);
+> +=09=09break;
+> +=09case AF_INET6:
+> +=09=09addr6 =3D ovpn_nexthop_from_rt6(ovpn, ipv6_hdr(skb)->saddr);
+> +=09=09index =3D ovpn_peer_index(ovpn->peers.by_vpn_addr, &addr6,
+> +=09=09=09=09=09sizeof(addr6));
+> +=09=09head =3D &ovpn->peers.by_vpn_addr[index];
+> +
+> +=09=09peer =3D ovpn_peer_get_by_vpn_addr6(head, &addr6);
+> +=09=09break;
+>  =09}
+> =20
+>  =09return peer;
+> --=20
+> 2.43.2
+>=20
+>=20
+
+--=20
+Sabrina
+
 
