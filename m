@@ -1,165 +1,166 @@
-Return-Path: <netdev+bounces-98782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B5D68D271B
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 23:34:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 773DC8D27BA
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 00:06:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B0B01F24952
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 21:34:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6D8B1C216D9
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 22:06:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944A617B4EC;
-	Tue, 28 May 2024 21:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F1513DBBC;
+	Tue, 28 May 2024 22:06:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="SroBXdpL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B/k8/9Qm"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313BF17E8EB;
-	Tue, 28 May 2024 21:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0C113DBA8
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 22:06:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716932065; cv=none; b=kIOUszLm2CsnrV4NTHfm+/P3IEdM6L/K3nITqS/SSo9tsL0SePIZjlwhMCTcvIp+8JNiTYabX75zoG6gE43ue8v7SG0Omi2ZGGGnhtgPn7edCiNYZNAK7oGdfu8m76knYbAtEqKGQXdXPgMNiuD8uHh2B0oQ2xGGGzOMwPSQLqA=
+	t=1716933980; cv=none; b=IZDibOEKCZDQoV+UEbvUwUoNQjD2LC4hDTBI0m0UQq6TKV1HbkJGVPmTd83WAdsS5SRbyrYIrFC1r6Gp0mBtg07rSrLa6M739VTnIoPi6pFXIIYhxd0dH7meWHRndICHbkt2GWcUX74ViL5cnlVnRVaPFLTbgVM8xvqW8x8M0cg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716932065; c=relaxed/simple;
-	bh=66jCgIAfVLYODIuS69ZJMzNLkJBlcRvktHQeAOpY69I=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iTWvjptikYnTVa4KNVZPGOKxxC6e4up3uM+WQWFKAdChaXTTQ5uwOYwW/8omqAJhZwyoMGl/ZolBcI3cgStNgd9wMY9e6FHy+DQUmFcTzgGTIfQKVd8w3YBH+wjLA1VxwhnshxTeiJtsyUWWb8p9s3y/sjIpdJIG5UMMElOBzcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=SroBXdpL; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	s=arc-20240116; t=1716933980; c=relaxed/simple;
+	bh=X8/XSgipI+hKgmdTNwjmfbt7DhDPve0g7MKKcLxFI9s=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=r6iVUTbEKIH6hYbxMUg8RCauJYlu5FrnQZR+IlX49CT3znqXhcnEb2rv385Nhc+Uxf24Do/B+NV56eOLDCAIjjmn5xfYSUmwU+Hnk6jEpw52066XeMLgf1dQRprI1Ql6uMUK9OQUVvQzeBuwQgpfiOb3NQdKUjNlMUQJ/yl/oyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B/k8/9Qm; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1716932064; x=1748468064;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=66jCgIAfVLYODIuS69ZJMzNLkJBlcRvktHQeAOpY69I=;
-  b=SroBXdpLIpi11zC9ZpxyjgfwKFea/lX1mpyepsj6qi45H2kOfji0FKze
-   +QChXWp3h7IXLXGrp6AtOBPk04wy0gGlKxVjPdQLzpZp21Q1u9rkXDZ62
-   uEQcwf+Pd5cRnCKgpAlIdRpQCWSx5+l8/HUzCwoygzlQyexPYeJzr7426
-   LfTimYA3Xos8WawSR/sgYpBeM9qAXeUWsz1CPsAfeK9LPXSQRqjisKMAV
-   zE0D6sclxXk5fhTYLCradv2mGB4t0L/T8S+LhXorVOnhlWVDmKoAjI4uj
-   QndOqDPVO77T19AnFXrVthmctnTYjVtM7SA+O0ugR74j3r0qSt8G3SA+V
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716933979; x=1748469979;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=X8/XSgipI+hKgmdTNwjmfbt7DhDPve0g7MKKcLxFI9s=;
+  b=B/k8/9QmWinZbkHpgPKasqU3vsxVp7G9qHDadoud2W66GKf5NDgejU+W
+   hYUeIDidB9tDeIism5DJGcEAPMVQCp9IYht1Db4zXqXRcmzDz/X7MUkP/
+   WGgKaqMzKaeHU44FGPD5+UewzP0i06Pbn2zHYfiX+tjhU7UyqdjxXr87W
+   oknj2kRgv7/HeU7HQ2GTzNug2c35lOssAeI8Km0rU9BoArL54VL0T0fYN
+   fub2IlgvmA3RBbIYOsUZgXZW+9HOrS9M4tQixexAtMP3Tw/aDulPb1Xhx
+   H3xBU/2VIDjodVE4BR7bFu/diqtg0zyto8+JQYUJWIpDMxljCMuAS+bQZ
    w==;
-X-CSE-ConnectionGUID: 7btE8S4STMGx7zw2VOaPVA==
-X-CSE-MsgGUID: RsSuqp3LTHakwHagEdfHUw==
+X-CSE-ConnectionGUID: P+iSVayFSjivstgFCOz1iA==
+X-CSE-MsgGUID: +apI1bVMQp6Z2uvX6qWV8Q==
+X-IronPort-AV: E=McAfee;i="6600,9927,11085"; a="13439592"
 X-IronPort-AV: E=Sophos;i="6.08,196,1712646000"; 
-   d="scan'208";a="28964721"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 May 2024 14:34:23 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 28 May 2024 14:34:12 -0700
-Received: from hat-linux.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Tue, 28 May 2024 14:34:12 -0700
-From: <Tristram.Ha@microchip.com>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Tristram Ha
-	<tristram.ha@microchip.com>
-Subject: [PATCH net] net: phy: Micrel KSZ8061: fix errata solution not taking effect problem
-Date: Tue, 28 May 2024 14:37:34 -0700
-Message-ID: <1716932254-3703-1-git-send-email-Tristram.Ha@microchip.com>
-X-Mailer: git-send-email 1.9.1
+   d="scan'208";a="13439592"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 15:06:18 -0700
+X-CSE-ConnectionGUID: 36b4xg0iSB2uLO0OPVuFVw==
+X-CSE-MsgGUID: RkZyKNVbSIqbu5zFNqZURQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,196,1712646000"; 
+   d="scan'208";a="40087510"
+Received: from jekeller-desk.amr.corp.intel.com ([10.166.241.1])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 15:06:17 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net 0/8] Intel Wired LAN Driver Updates 2024-05-28 (e1000e,
+ i40e, ice)
+Date: Tue, 28 May 2024 15:06:03 -0700
+Message-Id: <20240528-net-2024-05-28-intel-net-fixes-v1-0-dc8593d2bbc6@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEtVVmYC/x3M3QpAQBQE4FfRuXZqbRZ5FbnwMzilpV1Jybs7X
+ H4z09wUEQSR6uSmgFOibF6RpQkNS+dnsIxqssbmxtmKPQ7+wMaxUvyB9Q8nuRC5GJ1BBVv2ZUF
+ 6sgf8hX40pDNqn+cF8HgDrHUAAAA=
+To: Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>, 
+ netdev <netdev@vger.kernel.org>
+Cc: Jacob Keller <jacob.e.keller@intel.com>, 
+ Hui Wang <hui.wang@canonical.com>, 
+ Vitaly Lifshits <vitaly.lifshits@intel.com>, 
+ Naama Meir <naamax.meir@linux.intel.com>, Simon Horman <horms@kernel.org>, 
+ Paul Menzel <pmenzel@molgen.mpg.de>, 
+ Tony Nguyen <anthony.l.nguyen@intel.com>, Zhang Rui <rui.zhang@intel.com>, 
+ Thinh Tran <thinhtr@linux.ibm.com>, Robert Thomas <rob.thomas@ibm.com>, 
+ Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>, 
+ Michal Kubiak <michal.kubiak@intel.com>, 
+ Wojciech Drewek <wojciech.drewek@intel.com>, 
+ George Kuruvinakunnel <george.kuruvinakunnel@intel.com>, 
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+ Paul Greenwalt <paul.greenwalt@intel.com>, 
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, 
+ Brett Creeley <brett.creeley@amd.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Dave Ertman <david.m.ertman@intel.com>, 
+ Lukasz Czapnik <lukasz.czapnik@intel.com>
+X-Mailer: b4 0.13.0
 
-From: Tristram Ha <tristram.ha@microchip.com>
+This series includes a variety of fixes that have been accumulating on the
+Intel Wired LAN dev-queue.
 
-KSZ8061 needs to write to a MMD register at driver initialization to fix
-an errata.  This worked in 4.14 kernel but not in newer kernels.  The
-issue is the main phylib code no longer resets PHY at the very beginning.
-Calling phy resuming code later will reset the chip if it is already
-powered down at the beginning.  This wipes out the MMD register write.
-Solution is to implement a phy resume function for KSZ8061 to take care
-of this problem.
+Hui Wang provides a fix for suspend/resume on e1000e due to failure
+to correctly setup the SMBUS in enable_ulp().
 
-Fixes: 232ba3a51cc2 ("net: phy: Micrel KSZ8061: link failure after cable connect")
-Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+Thinh Tran provides a fix for EEH I/O suspend/resume on i40e to
+ensure that I/O operations can continue after a resume. To avoid duplicate
+code, the common logic is factored out of i40e_suspend and i40e_resume.
+
+Michal Kubiak provides a fix for i40e XDP in if the user tries to rmmod the
+i40e driver while an XDP program is loaded.
+
+Paul Greenwalt provides a fix to correctly map the 200G PHY types to link
+speeds in the ice driver.
+
+Wojciech Drewek provides a fix to ice to resolve sporadic issues with
+downloading the firmware package over the Admin queue.
+
+Jacob provides a fix for the ice driver to correct reading the Shadow RAM
+portion of the NVM for some of the newer devices including E830 and E825-C
+devices.
+
+Dave Ertman provides a fix correcting devlink parameter unregistration in
+the event that the driver loads in safe mode and some of the parameters
+were not registered.
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/phy/micrel.c | 42 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 41 insertions(+), 1 deletion(-)
+Dave Ertman (1):
+      ice: check for unregistering correct number of devlink params
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 2b8f8b7f1517..618e532ee5d7 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -866,6 +866,17 @@ static int ksz8061_config_init(struct phy_device *phydev)
- {
- 	int ret;
- 
-+	/* Chip can be powered down by the bootstrap code. */
-+	ret = phy_read(phydev, MII_BMCR);
-+	if (ret < 0)
-+		return ret;
-+	if (ret & BMCR_PDOWN) {
-+		ret = phy_write(phydev, MII_BMCR, ret & ~BMCR_PDOWN);
-+		if (ret < 0)
-+			return ret;
-+		usleep_range(1000, 2000);
-+	}
-+
- 	ret = phy_write_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_DEVID1, 0xB61A);
- 	if (ret)
- 		return ret;
-@@ -2085,6 +2096,35 @@ static int kszphy_resume(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int ksz8061_resume(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* This function can be called twice when the Ethernet device is on. */
-+	ret = phy_read(phydev, MII_BMCR);
-+	if (ret < 0)
-+		return ret;
-+	if (!(ret & BMCR_PDOWN))
-+		return 0;
-+
-+	genphy_resume(phydev);
-+	usleep_range(1000, 2000);
-+
-+	/* Re-program the value after chip is reset. */
-+	ret = phy_write_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_DEVID1, 0xB61A);
-+	if (ret)
-+		return ret;
-+
-+	/* Enable PHY Interrupts */
-+	if (phy_interrupt_is_valid(phydev)) {
-+		phydev->interrupts = PHY_INTERRUPT_ENABLED;
-+		if (phydev->drv->config_intr)
-+			phydev->drv->config_intr(phydev);
-+	}
-+
-+	return 0;
-+}
-+
- static int kszphy_probe(struct phy_device *phydev)
- {
- 	const struct kszphy_type *type = phydev->drv->driver_data;
-@@ -5339,7 +5379,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.config_intr	= kszphy_config_intr,
- 	.handle_interrupt = kszphy_handle_interrupt,
- 	.suspend	= kszphy_suspend,
--	.resume		= kszphy_resume,
-+	.resume		= ksz8061_resume,
- }, {
- 	.phy_id		= PHY_ID_KSZ9021,
- 	.phy_id_mask	= 0x000ffffe,
+Hui Wang (1):
+      e1000e: move force SMBUS near the end of enable_ulp function
+
+Jacob Keller (1):
+      ice: fix reads from NVM Shadow RAM on E830 and E825-C devices
+
+Michal Kubiak (1):
+      i40e: Fix XDP program unloading while removing the driver
+
+Paul Greenwalt (1):
+      ice: fix 200G PHY types to link speed mapping
+
+Thinh Tran (2):
+      i40e: factoring out i40e_suspend/i40e_resume
+      i40e: Fully suspend and resume IO operations in EEH case
+
+Wojciech Drewek (1):
+      ice: implement AQ download pkg retry
+
+ drivers/net/ethernet/intel/e1000e/ich8lan.c      |  22 ++
+ drivers/net/ethernet/intel/e1000e/netdev.c       |  18 --
+ drivers/net/ethernet/intel/i40e/i40e_main.c      | 277 +++++++++++++----------
+ drivers/net/ethernet/intel/ice/devlink/devlink.c |  31 ++-
+ drivers/net/ethernet/intel/ice/ice_common.c      |  10 +
+ drivers/net/ethernet/intel/ice/ice_ddp.c         |  19 +-
+ drivers/net/ethernet/intel/ice/ice_nvm.c         |  88 ++++++-
+ drivers/net/ethernet/intel/ice/ice_type.h        |  14 +-
+ 8 files changed, 319 insertions(+), 160 deletions(-)
+---
+base-commit: 56a5cf538c3f2d935b0d81040a8303b6e7fc5fd8
+change-id: 20240528-net-2024-05-28-intel-net-fixes-6d50e8e27b76
+
+Best regards,
 -- 
-2.34.1
+Jacob Keller <jacob.e.keller@intel.com>
 
 
