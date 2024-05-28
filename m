@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-98787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD5408D27BE
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 00:06:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24E298D27BF
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 00:06:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2BDDCB23238
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 22:06:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5616E1C22286
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 22:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A1313E040;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABB313E05F;
 	Tue, 28 May 2024 22:06:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kWL3jxUz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iNYusU5k"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFC613DDB1
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 22:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3615713DDC7
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 22:06:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716933983; cv=none; b=WrYnUC3aKmZp3MIZ8w+MLVOQRB00/Yu84auDJjWu1C7wOU0bGs7n3UbcchnPICXK6BpPwbfPddXGnYVa4161bCHC+U6ZvaLtuL3xcmNnDrCURaf5sTNfCRkbxGndsrK1bQy0l4G2mEeao6C6NwMJfItAyFkTGVIAfRfHBxLDNDc=
+	t=1716933983; cv=none; b=a9oAnx7MaN/7xERRXxJDBQ666vcgwB2OpLIpTNQrUb926kxaNx0ZuNg7m+04+r4L3n11vkBtxHVFZe2K+I9ce7cgHamAY78tFb+w9cLnTvLb7JGa8zwHosTs8tqOAmWPSVS/r0VVzHVGbCFHj0DNbAM3f4wkhCX8OD5+nMn6g1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1716933983; c=relaxed/simple;
-	bh=UJ2E3Y583GVGQdVc9Myzhcn/k2Ye5fuzb5OUxNbziCA=;
+	bh=LUSg/BcqkKtZ3DblQ0iY1meBW43bgd//ZMzLCkYZHUU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=pC47rvrLIXTI2VTB6Dq9oNeCXtIQGV3dp5NmE+3t4u2PscjMxX9AJS4FZ5LJ+nkDpvrIWcpqkHahtcVhG8DdE5+a1rCmItE9pX5Ug6QKl1ePC5exhOJs8+yzQ6zo/eB4IgIkcaDur3y9Hxtz8Vjt04xMz2aeps7xEuEf8TXQvMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kWL3jxUz; arc=none smtp.client-ip=198.175.65.17
+	 In-Reply-To:To:Cc; b=qrRPFT4uI6YwxtED3FdlVThrafkVBSI8Ln/hs0Uk6Dk3G5vIB6KzyvUKkkfNwSgfU31TalkEv4IaQsbChpRZ2V8pn1HdVUMEXFudAQTWPXk7Gd2lFPWdQ4lehwOLequdCaYGuCYV2zex6F9cOaSOQXOG2XC1DOgled6/CRZAuhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iNYusU5k; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716933982; x=1748469982;
+  t=1716933983; x=1748469983;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=UJ2E3Y583GVGQdVc9Myzhcn/k2Ye5fuzb5OUxNbziCA=;
-  b=kWL3jxUzaN0Wwpl9GMMHCiVAfcz7NFnTyIy82YJ1/ircCCeXDR9Z8hMv
-   asZyGAjTBrFU9KKhMfTpyc55Mr6IFHJt+OOAAW6D3BT3H6DwsJzP8PsiQ
-   cHCbg0k3LL4KN1rO2I1My91lIFjdcSfXqbNjh1q6K79eWoQ1xw3oxOuH3
-   SISS6xvcAZdS5XHsKaCh3tnR0Vx7uG4jWGevddNhQGqt/exrFdnV7H8y2
-   UEV4ta9D9TyUGNZ6C32A/84Wlea4DQENL4rt6fo+fMkFQ96M2jpSbsE6M
-   ffM/b+UhKuoCPH9/AfVfmK8gr560RdNBxBTB3pZnTMcD8AwhiGZW6cniS
-   g==;
-X-CSE-ConnectionGUID: 3807aX7PSUiqs7Tqi3+o8g==
-X-CSE-MsgGUID: PvhU5GrZSfqrHXkGWPTf1w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11085"; a="13439614"
+  bh=LUSg/BcqkKtZ3DblQ0iY1meBW43bgd//ZMzLCkYZHUU=;
+  b=iNYusU5k9JXNljS7gWEIw+PEC202eQvrXzf6hnEieYpQtcUUxOLfjqBz
+   7vSxgs/KRZhsuXW34o0pN7MsRQs+BkmNlE85nK95mKw5XQ9MB5OZkNjdB
+   wVDowYxyk0pNfMqMwccoQRRoQQcWPWvRK+tUEKIl6brntZSnRSK8N5cXM
+   5/3N1Zez54gS84mV1Gr8QGHtnu89Ns/Z+nyjR3obYqZN6rR4RHT5ukdT7
+   G+JQnRca7C9azmPh+hqm4OwXDIt1tdUgNZ0owW6twAV04R7JNkA8vfnXH
+   GT7CW9qm4ClWAP1mrT+cwG0KovnoGz3FILpcYhIs+DaCVfepPNLIZxuL6
+   w==;
+X-CSE-ConnectionGUID: Z+vBKvRLRKirN1QZaXVoQg==
+X-CSE-MsgGUID: aDjMM9/zTKCj0PWXoAtIPg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11085"; a="13439618"
 X-IronPort-AV: E=Sophos;i="6.08,196,1712646000"; 
-   d="scan'208";a="13439614"
+   d="scan'208";a="13439618"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
   by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 15:06:19 -0700
-X-CSE-ConnectionGUID: 2PsHNT7KRd6agUdaZkvXAA==
-X-CSE-MsgGUID: Cm19ZucnThWP6GiX3iEA7w==
+X-CSE-ConnectionGUID: CEk/c6icQySaFTKh9XpMGQ==
+X-CSE-MsgGUID: 7F8q0eOGQ1mx5RvGOsqjfQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,196,1712646000"; 
-   d="scan'208";a="40087519"
+   d="scan'208";a="40087522"
 Received: from jekeller-desk.amr.corp.intel.com ([10.166.241.1])
   by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 15:06:18 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Tue, 28 May 2024 15:06:06 -0700
-Subject: [PATCH net 3/8] i40e: Fully suspend and resume IO operations in
- EEH case
+Date: Tue, 28 May 2024 15:06:07 -0700
+Subject: [PATCH net 4/8] i40e: Fix XDP program unloading while removing the
+ driver
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,85 +70,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240528-net-2024-05-28-intel-net-fixes-v1-3-dc8593d2bbc6@intel.com>
+Message-Id: <20240528-net-2024-05-28-intel-net-fixes-v1-4-dc8593d2bbc6@intel.com>
 References: <20240528-net-2024-05-28-intel-net-fixes-v1-0-dc8593d2bbc6@intel.com>
 In-Reply-To: <20240528-net-2024-05-28-intel-net-fixes-v1-0-dc8593d2bbc6@intel.com>
 To: Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>, 
  netdev <netdev@vger.kernel.org>
 Cc: Jacob Keller <jacob.e.keller@intel.com>, 
- Thinh Tran <thinhtr@linux.ibm.com>, Robert Thomas <rob.thomas@ibm.com>, 
- Simon Horman <horms@kernel.org>, 
- Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+ Michal Kubiak <michal.kubiak@intel.com>, 
+ Wojciech Drewek <wojciech.drewek@intel.com>, 
+ George Kuruvinakunnel <george.kuruvinakunnel@intel.com>, 
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 X-Mailer: b4 0.13.0
 
-From: Thinh Tran <thinhtr@linux.ibm.com>
+From: Michal Kubiak <michal.kubiak@intel.com>
 
-When EEH events occurs, the callback functions in the i40e, which are
-managed by the EEH driver, will completely suspend and resume all IO
-operations.
+The commit 6533e558c650 ("i40e: Fix reset path while removing
+the driver") introduced a new PF state "__I40E_IN_REMOVE" to block
+modifying the XDP program while the driver is being removed.
+Unfortunately, such a change is useful only if the ".ndo_bpf()"
+callback was called out of the rmmod context because unloading the
+existing XDP program is also a part of driver removing procedure.
+In other words, from the rmmod context the driver is expected to
+unload the XDP program without reporting any errors. Otherwise,
+the kernel warning with callstack is printed out to dmesg.
 
-- In the PCI error detected callback, replaced i40e_prep_for_reset()
-  with i40e_io_suspend(). The change is to fully suspend all I/O
-  operations
-- In the PCI error slot reset callback, replaced pci_enable_device_mem()
-  with pci_enable_device(). This change enables both I/O and memory of
-  the device.
-- In the PCI error resume callback, replaced i40e_handle_reset_warning()
-  with i40e_io_resume(). This change allows the system to resume I/O
-  operations
+Example failing scenario:
+ 1. Load the i40e driver.
+ 2. Load the XDP program.
+ 3. Unload the i40e driver (using "rmmod" command).
 
-Fixes: a5f3d2c17b07 ("powerpc/pseries/pci: Add MSI domains")
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Tested-by: Robert Thomas <rob.thomas@ibm.com>
-Signed-off-by: Thinh Tran <thinhtr@linux.ibm.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Fix this by improving checks in ".ndo_bpf()" to determine if that
+callback was called from the removing context and if the kernel
+wants to unload the XDP program. Allow for unloading the XDP program
+in such a case.
+
+Fixes: 6533e558c650 ("i40e: Fix reset path while removing the driver")
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
+Tested-by: George Kuruvinakunnel <george.kuruvinakunnel@intel.com>
+Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e_main.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index d5f25ea304bf..284c3fad5a6e 100644
+index 284c3fad5a6e..2f478edb9f9f 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
 +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -11171,6 +11171,8 @@ static void i40e_reset_and_rebuild(struct i40e_pf *pf, bool reinit,
- 	ret = i40e_reset(pf);
- 	if (!ret)
- 		i40e_rebuild(pf, reinit, lock_acquired);
-+	else
-+		dev_err(&pf->pdev->dev, "%s: i40e_reset() FAILED", __func__);
- }
+@@ -13293,6 +13293,20 @@ static int i40e_xdp_setup(struct i40e_vsi *vsi, struct bpf_prog *prog,
+ 	bool need_reset;
+ 	int i;
  
- /**
-@@ -16491,7 +16493,7 @@ static pci_ers_result_t i40e_pci_error_detected(struct pci_dev *pdev,
++	/* Called from netdev unregister context. Unload the XDP program. */
++	if (vsi->netdev->reg_state == NETREG_UNREGISTERING) {
++		xdp_features_clear_redirect_target(vsi->netdev);
++		old_prog = xchg(&vsi->xdp_prog, NULL);
++		if (old_prog)
++			bpf_prog_put(old_prog);
++
++		return 0;
++	}
++
++	/* VSI shall be deleted in a moment, just return EINVAL */
++	if (test_bit(__I40E_IN_REMOVE, pf->state))
++		return -EINVAL;
++
+ 	/* Don't allow frames that span over multiple buffers */
+ 	if (vsi->netdev->mtu > frame_size - I40E_PACKET_HDR_PAD) {
+ 		NL_SET_ERR_MSG_MOD(extack, "MTU too large for linear frames and XDP prog does not support frags");
+@@ -13301,14 +13315,9 @@ static int i40e_xdp_setup(struct i40e_vsi *vsi, struct bpf_prog *prog,
  
- 	/* shutdown all operations */
- 	if (!test_bit(__I40E_SUSPENDED, pf->state))
--		i40e_prep_for_reset(pf);
-+		i40e_io_suspend(pf);
+ 	/* When turning XDP on->off/off->on we reset and rebuild the rings. */
+ 	need_reset = (i40e_enabled_xdp_vsi(vsi) != !!prog);
+-
+ 	if (need_reset)
+ 		i40e_prep_for_reset(pf);
  
- 	/* Request a slot reset */
- 	return PCI_ERS_RESULT_NEED_RESET;
-@@ -16513,7 +16515,8 @@ static pci_ers_result_t i40e_pci_error_slot_reset(struct pci_dev *pdev)
- 	u32 reg;
+-	/* VSI shall be deleted in a moment, just return EINVAL */
+-	if (test_bit(__I40E_IN_REMOVE, pf->state))
+-		return -EINVAL;
+-
+ 	old_prog = xchg(&vsi->xdp_prog, prog);
  
- 	dev_dbg(&pdev->dev, "%s\n", __func__);
--	if (pci_enable_device_mem(pdev)) {
-+	/* enable I/O and memory of the device  */
-+	if (pci_enable_device(pdev)) {
- 		dev_info(&pdev->dev,
- 			 "Cannot re-enable PCI device after reset.\n");
- 		result = PCI_ERS_RESULT_DISCONNECT;
-@@ -16576,7 +16579,7 @@ static void i40e_pci_error_resume(struct pci_dev *pdev)
- 	if (test_bit(__I40E_SUSPENDED, pf->state))
- 		return;
- 
--	i40e_handle_reset_warning(pf, false);
-+	i40e_io_resume(pf);
- }
- 
- /**
+ 	if (need_reset) {
 
 -- 
 2.44.0.53.g0f9d4d28b7e6
