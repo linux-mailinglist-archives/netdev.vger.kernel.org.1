@@ -1,77 +1,99 @@
-Return-Path: <netdev+bounces-98576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA5318D1CD0
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 15:23:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D82078D1CFE
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 15:30:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4823E1F23645
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:23:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D3511F2442C
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A8416F282;
-	Tue, 28 May 2024 13:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4F316DEDB;
+	Tue, 28 May 2024 13:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="f5L6pwjZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r3zK10yf"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3A116F0F4;
-	Tue, 28 May 2024 13:21:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FD216C68B;
+	Tue, 28 May 2024 13:30:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716902484; cv=none; b=SUB3gcpWLQK4eqfavhNIyPLUyiAGVSrKG/7KTEq4T+5UM8AvAzM0xVN4QLfv6MHUlJypGl+5UMslrshOs/NOwt85E3alWcStOMC4ThCN8A+O58jEl/WCqEbhwjGE/gVOPZ66nbUVo4aWFL7BXwQA8rV0DwIpJBERcnZgWy+1zig=
+	t=1716903032; cv=none; b=gxA5QA/bHu6jDEdlz+2VKUP9881daqEX78CCZ+BJK4Lt0OS0ko9c54Mbrg9Yp8EPHjiEiYQkVO+7wyiNKaxJ2pAeuRNHKapjh3IiYj4piS9EnJtwknpsGWia5igj3OQ7SWJ0wGlv1RcKZqN6VrEgBMoaC/pmEKYwLauWUBCHz8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716902484; c=relaxed/simple;
-	bh=xN17DrOG0FDUje+V37rDrgEQBArqB1WqYIU/EaCXBN0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mEqbonxFNDJrGXtdU7LZJMydvHk+1txq42N4XpUWfaCNM1Id6BxFQjdQm3aPJUXJy+oA0hQ1wWzZSD/X/MaZd7eHsujSYnPEv7Auag8chamRje7cdLaOeB2NFDxRp6LrD1pGG15mPGKdRkEG08cM7NdWl/eplScK3cCBewWhV1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=f5L6pwjZ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=czokYyi0W54VxyNcd6w6h3/QqzXqnKZPzDpLPxCZmeM=; b=f5L6pwjZ7szzMMd61aNL9N3pOa
-	7jw/7ztZTkCBUebQSy5i2gdXOPkpAcEySvQYdOBIze4bWKy53CiAgWr+AJUyov57gZhHnjpkfs9cD
-	WS8HR5V9Ea7XcKjrAFM0uxn88y3KFYAYpvwHJnWKdq6t8NYk9W42Bcgk0d1fzosFOnDU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sBwl3-00G9s8-Mq; Tue, 28 May 2024 15:20:53 +0200
-Date: Tue, 28 May 2024 15:20:53 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Xiaolei Wang <xiaolei.wang@windriver.com>
-Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [net PATCH] net: stmmac: update priv->speed to SPEED_UNKNOWN
- when link down
-Message-ID: <775f3274-69b4-4beb-84f3-a796343fc095@lunn.ch>
-References: <20240528092010.439089-1-xiaolei.wang@windriver.com>
+	s=arc-20240116; t=1716903032; c=relaxed/simple;
+	bh=MEnlAMANldkFFgFaW2dPY9k/vDKMcxv7qLE2ki50xZI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=B7Uqm59vdnonkMNiKAu0cNrOWDgwbvVuG4Hn3HmaGUYsVQioq7G30zMAupcLkAe4VagZopb8hgbmbpEi9a8LITmVCdBtEowquogbT5itV/YhuyEh8AI58fbD2m/9HdwJhu/ALgc2nKJx/CDmZYAYF9LU7JYedtMpU2Ed/g3p0L4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r3zK10yf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AE976C32782;
+	Tue, 28 May 2024 13:30:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716903031;
+	bh=MEnlAMANldkFFgFaW2dPY9k/vDKMcxv7qLE2ki50xZI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=r3zK10yf3Ifkfjfm0XilwW/eGTy7OWjNS1rMvVOiA2ti9qwvarr6E7Ym3Z9ty7AHA
+	 ndBZ/RLWdWdgMdrxrey3d9q4M7KCqhmAGf5PGNk+lxRfloIBSe2VnJh+16z/D1ioMX
+	 uC7cEOWT2aGcEg38YOBZ44t8zkvxR/3St5wvXuxRC8Uh8v/0f8mj7J6zRlmCVk5n8u
+	 vW8h0FFyTLvDq4RhZ3VNS+BnEbI90wLPYTTdUEWU4p0PSS2AR+hswj6+gLMQBSrQUQ
+	 Bu2d9g24Ktx3nvaVS5S22VZ4A9xS7hpW9NE622F2pRHqaVUmUMJzbRT94NMDVHgBQ4
+	 862AVCkAtnsdw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 98A36C4361C;
+	Tue, 28 May 2024 13:30:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240528092010.439089-1-xiaolei.wang@windriver.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 0/4] net: ethernet: dead struct removals
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171690303161.16079.15088419887819972158.git-patchwork-notify@kernel.org>
+Date: Tue, 28 May 2024 13:30:31 +0000
+References: <20240526172428.134726-1-linux@treblig.org>
+In-Reply-To: <20240526172428.134726-1-linux@treblig.org>
+To: Dr. David Alan Gilbert <linux@treblig.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ionut@badula.org, tariqt@nvidia.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, May 28, 2024 at 05:20:10PM +0800, Xiaolei Wang wrote:
-> The CBS parameter can still be configured when the port is
-> currently disconnected and link down. This is unreasonable.
+Hello:
 
-This sounds like a generic problem. Can the core check the carrier
-status and error out there? Maybe return a useful extack message.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-If you do need to return an error code, ENETDOWN seems more
-appropriate.
+On Sun, 26 May 2024 18:24:24 +0100 you wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> 
+> Hi,
+>   This removes a bunch of dead struct's from drivers/net/ethernet.
+> Note the ne2k-pci one is marked obsolete so you might not want
+> to apply it; but since I'd already done it by the time checkpatch
+> told me, I included it on the end of the set.
+> 
+> [...]
 
-       Andrew
+Here is the summary with links:
+  - [1/4] net: ethernet: starfire: remove unused structs
+    https://git.kernel.org/netdev/net-next/c/b2ff2698508f
+  - [2/4] net: ethernet: liquidio: remove unused structs
+    https://git.kernel.org/netdev/net-next/c/a09892f6e281
+  - [3/4] net: ethernet: mlx4: remove unused struct 'mlx4_port_config'
+    https://git.kernel.org/netdev/net-next/c/ef7f9febb33d
+  - [4/4] net: ethernet: 8390: ne2k-pci: remove unused struct 'ne2k_pci_card'
+    https://git.kernel.org/netdev/net-next/c/18ae4c093cd2
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
