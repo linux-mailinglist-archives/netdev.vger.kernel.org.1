@@ -1,109 +1,248 @@
-Return-Path: <netdev+bounces-98713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32CF28D2279
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 19:28:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92CAC8D2289
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 19:37:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A53F7B22890
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 17:28:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E5831F24834
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 17:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1193174EC0;
-	Tue, 28 May 2024 17:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A70FE208B6;
+	Tue, 28 May 2024 17:36:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nYQ6jRRn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F4p6t/tW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD518173342
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 17:28:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A723429402
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 17:36:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716917319; cv=none; b=Qb1OxYYHIZaaoxGtdq8mQuvOQGjThGsunJfGYmj86H5PpQ4eF/HBMlhKIgsUqcw1uC3UnuxOK54eW85K0gcRZFGmwtlSI9Z/yBUpLczAJaCnwT/4YqZi/ykXRKPgKmPN0JZLw22wTTA5wCsI+2X4CUoKklNEjqaJIikJnmifES4=
+	t=1716917816; cv=none; b=mrwpeXdaNOT3UGwx8Nhu3aZL2ncfNswa+74yWOEKaWXza0ve+IOCeCMCGJJpreo3pEzsLZS2oeGChouWwk4w3ExVUkqc7opk6AuLsbMZ4C9z8NW0M21Q0wkIXCbJUmtPwe6UQhl+qixGs1ncz+YgDPbAJoWXQ8mmKxii0Dqtm+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716917319; c=relaxed/simple;
-	bh=ypISCf5PSJfxhEXAEpQE6XM2s49bpxhhDEfY7X6NrJc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JLD7H+Duwy/uZW7FANZ3/PMIE0CCshPrphVLt/oFsxi4l7vrtf8uxfR+HLnY2SoJ4xh2zG5r8IMxZdroar/RX0clFuY1Kng0gqkhlLLU82TYqIlCvfVaaPhbdDvdELtBu4FZ6z/5EumfQKlmEX1iFx4Oio38J/8JkqvWBVk2YKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nYQ6jRRn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB57FC3277B;
-	Tue, 28 May 2024 17:28:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716917319;
-	bh=ypISCf5PSJfxhEXAEpQE6XM2s49bpxhhDEfY7X6NrJc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nYQ6jRRnmYLUS7Ltspld09QAJAaBF/n1FRdWPXoLG9SkUZW7ZxWg8dL1uWgNvhf/0
-	 M0fvY+Y0DMXaYEWnURDvkHcBITZsB3BRTdfhahLyMXhkdRMOtvuepaEmYD4HWZj8HS
-	 +ysrXJSOoiv6dlk7radPsesKUg1JHP9BatuotCvBNqCD5XLNeJfbZ0loECa8cHF2pm
-	 h2R760z3f1Khu/D54x8sXD9m3pgtrWMOLlZkhFQ/J1MQM10bGnIhIfkz3tLB1Vx+nW
-	 6YynmTPeK+WTebNCBa8JJ3Nf78HvNATgYAwkg+1aBQqlC9KunT50QUz0Mj/Cgh9JzR
-	 uJi8BsLNHwinQ==
-Date: Tue, 28 May 2024 10:28:38 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, Jiri Pirko
- <jiri@resnulli.us>, Madhu Chittim <madhu.chittim@intel.com>, Sridhar
- Samudrala <sridhar.samudrala@intel.com>, Simon Horman <horms@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Sunil Kovvuri Goutham
- <sgoutham@marvell.com>, Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [RFC PATCH] net: introduce HW Rate Limiting Driver API
-Message-ID: <20240528102838.68d774aa@kernel.org>
-In-Reply-To: <db51b7ccff835dd5a96293fb84d527be081de062.camel@redhat.com>
-References: <3d1e2d945904a0fb55258559eb7322d7e11066b6.1715199358.git.pabeni@redhat.com>
-	<f6d15624-cd25-4484-9a25-86f08b5efd51@lunn.ch>
-	<e2cbbbc416700486e0b4dd5bc9d80374b53aaf79.camel@redhat.com>
-	<9dd818dc-1fef-4633-b388-6ce7272f9cb4@lunn.ch>
-	<f7fa91a89f16e45de56c1aa8d2c533c6f94648ba.camel@redhat.com>
-	<a0ada382-105a-4994-ad0f-1a485cef12c4@lunn.ch>
-	<db51b7ccff835dd5a96293fb84d527be081de062.camel@redhat.com>
+	s=arc-20240116; t=1716917816; c=relaxed/simple;
+	bh=5jqpjWDjCYeF0iZMmfNh1F02B5hbFSGCHFwvks87kGw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jcYQxVMeEG4QJxAIABkVwo7pclp+KhlRiX1A23iiu4p6O5tWqBK0F7sr+u1I0+wm03aidNm68xzmZ7fOPSjV2e5mHYsxrOd7Nz3UjevPFFTurgw+6rJ4SknORLYqAM+IkYL82HY32Hjcdyai0oB7xK6PbUenlP8TJNvwytJzmkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F4p6t/tW; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a630ff4ac84so128607466b.1
+        for <netdev@vger.kernel.org>; Tue, 28 May 2024 10:36:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716917813; x=1717522613; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h1nTYMe9Sz2kd146CNINlSxaoddIUqGPBCQrAMYzjnQ=;
+        b=F4p6t/tWtjSOVYylJbwcLVV6UTyM4sNrgf29x/I2qiaXmlzGuSs/libx4uluVN+nqU
+         Q1wu6ZyJ+t/J5G4TTactfmH72bg+9gQMI6XUV/JPUvIcgZPTSklK6xODqYbVvKUruZsd
+         qGcZJqKk9SLen5tkhgx7pjnVQN79mjH/J3XY5cJYmSYfwEdHgeAgZgJLCWfItyd1aUlo
+         m8SST44+ucTlAuYiprzs7++Q4aRuTHjVObQuxYwumcTSK42endimDnDiRHgNYuUyIKni
+         X0y60pnKnN3oBLyeEGWlqJk5sfZxG3gqEzLBOt9HDhyBsgJwOczZkJZdgWzCHvs7ja5e
+         tsGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716917813; x=1717522613;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=h1nTYMe9Sz2kd146CNINlSxaoddIUqGPBCQrAMYzjnQ=;
+        b=IRiSPIG3LuT29I+4K2ewolmtv6PIISeq9jbI7CIPh35s7h8+gGLp1/+9ZDMhJ9cRfu
+         XTIn0ZFjN8CBVlZ4+QQo5gm/EihFwsUfjZvpDhpX8zlS0KEI4OaFApQ+z/R+3lNpe3vS
+         qLEBfi3z4lx18QOWwOrj9H0Y645RAZ0onep9LQt0xtY+c4fgVG5vmaaCdCwkyNbl83J8
+         Dfxps0DXoW3v32FlSiZoZJ+lwASVDgvIu59rzCOZ+8zkR9JvwT+dUqYxQWzVklURZdx2
+         AzD3sx9F3TzK44DZz0Y7pIjg3gm8v7EJACu1P4TuuU6htY5YL2vd9hqy/7y0Vt8r2aAk
+         RacA==
+X-Gm-Message-State: AOJu0Ywt+z1YGLHdOqiX+k/KpGply8Tpf2vzd+QnhhvThplosJ/66HN6
+	HPRASiECj0+sED6fKLNe8wXTMa6bSDsyS0A3G+RKam6/ZipHLxTz9VYfaxINzFEHFfsXE7Rzbz6
+	2On/bJmHYa1ETZRtTwNbnbeM7gty5Si4GewTT
+X-Google-Smtp-Source: AGHT+IFf32eXkuapluEvlBEyoJKJxifsmiVKQ0AvF4ow+8ygeGf1col+Xo1abUwIXzRnUJhSc+Yk6CUkl0RPaD3UYic=
+X-Received: by 2002:a17:906:3c1a:b0:a63:42b6:1976 with SMTP id
+ a640c23a62f3a-a6342b619f5mr156681366b.68.1716917812713; Tue, 28 May 2024
+ 10:36:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240510232128.1105145-1-almasrymina@google.com>
+ <20240510232128.1105145-12-almasrymina@google.com> <9097e78d-0e7d-43bd-bafd-e53a4872a4d1@davidwei.uk>
+In-Reply-To: <9097e78d-0e7d-43bd-bafd-e53a4872a4d1@davidwei.uk>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 28 May 2024 10:36:40 -0700
+Message-ID: <CAHS8izOe-uYjm0ttQgHOFpvp_Tj4_oRHV6d1Y1sWJAZJdCdCBA@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 11/14] tcp: RX path for devmem TCP
+To: David Wei <dw@davidwei.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Pavel Begunkov <asml.silence@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 10 May 2024 13:05:41 +0200 Paolo Abeni wrote:
-> And the latter looks IMHO the simple/better. At that point I would
-> probably drop the 'add' op and would rename 'delete' as
-> 'reset':
-> 
-> int (*set)(struct net_device *dev, int how_many, const u32 *handles,
-> 	   const struct net_shaper_info *shapers,
->            struct netlink_ext_ack *extack);
-> int (*reset)(struct net_device *dev, int how_many, const u32 *handles,
->              struct netlink_ext_ack *extack);
-> int (*move)(struct net_device *dev, int how_many, const u32 *handles,
->             const u32 *new_parent_handles,
-> 	    struct netlink_ext_ack *extack);
-> 
-> An NIC with 'static' shapers can implement a dummy move always
-> returning EOPNOTSUPP and eventually filling a detailed extack.
-> 
-> NIC without any constraints on mixing and matching different kind of
-> shapers could implement the above as a loop over whatever they will do
-> for the corresponding 'single shaper op'
-> 
-> NIC with constrains alike the one you pointed out could validate the
-> final state before atomically applying the specified operation.
-> 
-> After a successful  'reset' operation, the kernel could drop any data
-> it retains/caches for the relevant shapers - the current idea is to
-> keep a copy of all successfully configured shaper_info in a xarray,
-> using the 'handle' as the index.
+On Wed, May 22, 2024 at 11:02=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+>
+> On 2024-05-10 16:21, Mina Almasry wrote:
+> > +/* On error, returns the -errno. On success, returns number of bytes s=
+ent to the
+> > + * user. May not consume all of @remaining_len.
+> > + */
+> > +static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *s=
+kb,
+> > +                           unsigned int offset, struct msghdr *msg,
+> > +                           int remaining_len)
+> > +{
+> > +     struct dmabuf_cmsg dmabuf_cmsg =3D { 0 };
+> > +     struct tcp_xa_pool tcp_xa_pool;
+> > +     unsigned int start;
+> > +     int i, copy, n;
+> > +     int sent =3D 0;
+> > +     int err =3D 0;
+> > +
+> > +     tcp_xa_pool.max =3D 0;
+> > +     tcp_xa_pool.idx =3D 0;
+> > +     do {
+> > +             start =3D skb_headlen(skb);
+> > +
+> > +             if (skb_frags_readable(skb)) {
+> > +                     err =3D -ENODEV;
+> > +                     goto out;
+> > +             }
+> > +
+> > +             /* Copy header. */
+> > +             copy =3D start - offset;
+> > +             if (copy > 0) {
+> > +                     copy =3D min(copy, remaining_len);
+> > +
+> > +                     n =3D copy_to_iter(skb->data + offset, copy,
+> > +                                      &msg->msg_iter);
+> > +                     if (n !=3D copy) {
+> > +                             err =3D -EFAULT;
+> > +                             goto out;
+> > +                     }
+> > +
+> > +                     offset +=3D copy;
+> > +                     remaining_len -=3D copy;
+> > +
+> > +                     /* First a dmabuf_cmsg for # bytes copied to user
+> > +                      * buffer.
+> > +                      */
+> > +                     memset(&dmabuf_cmsg, 0, sizeof(dmabuf_cmsg));
+> > +                     dmabuf_cmsg.frag_size =3D copy;
+> > +                     err =3D put_cmsg(msg, SOL_SOCKET, SO_DEVMEM_LINEA=
+R,
+> > +                                    sizeof(dmabuf_cmsg), &dmabuf_cmsg)=
+;
+> > +                     if (err || msg->msg_flags & MSG_CTRUNC) {
+> > +                             msg->msg_flags &=3D ~MSG_CTRUNC;
+> > +                             if (!err)
+> > +                                     err =3D -ETOOSMALL;
+> > +                             goto out;
+> > +                     }
+> > +
+> > +                     sent +=3D copy;
+> > +
+> > +                     if (remaining_len =3D=3D 0)
+> > +                             goto out;
+> > +             }
+> > +
+> > +             /* after that, send information of dmabuf pages through a
+> > +              * sequence of cmsg
+> > +              */
+> > +             for (i =3D 0; i < skb_shinfo(skb)->nr_frags; i++) {
+> > +                     skb_frag_t *frag =3D &skb_shinfo(skb)->frags[i];
+> > +                     struct net_iov *niov;
+> > +                     u64 frag_offset;
+> > +                     int end;
+> > +
+> > +                     /* !skb_frags_readable() should indicate that ALL=
+ the
+> > +                      * frags in this skb are dmabuf net_iovs. We're c=
+hecking
+> > +                      * for that flag above, but also check individual=
+ frags
+> > +                      * here. If the tcp stack is not setting
+> > +                      * skb_frags_readable() correctly, we still don't=
+ want
+> > +                      * to crash here.
+> > +                      */
+> > +                     if (!skb_frag_net_iov(frag)) {
+> > +                             net_err_ratelimited("Found non-dmabuf skb=
+ with net_iov");
+> > +                             err =3D -ENODEV;
+> > +                             goto out;
+> > +                     }
+> > +
+> > +                     niov =3D skb_frag_net_iov(frag);
+>
+> Sorry if we've already discussed this.
+>
+> We have this additional hunk:
+>
+> + if (niov->pp->mp_ops !=3D &dmabuf_devmem_ops) {
+> +       err =3D -ENODEV;
+> +       goto out;
+> + }
+>
+> In case one of our skbs end up here, skb_frag_is_net_iov() and
+> !skb_frags_readable(). Does this even matter? And if so then is there a
+> better way to distinguish between our two types of net_iovs?
 
-IMHO this is more confusing that the current API, maybe we just need
-better driver-facing documentation? Deleting a node from the hierarchy
-doesn't delete the HW, same as deleting a TCAM entry doesn't chisel off
-a part of the chip. If you want to switch from WRR to SP you'd need to
-delete all the weight nodes and insert SP nodes as children.
+Thanks for bringing this up, yes, maybe we do need a way to
+distinguish, but it's not 100% critical, no? It's mostly for debug
+checking?
 
-If we modeled mux nodes as multi-entry nodes explicitly it may be
-easier. Meaning make the scheduling and weights part of the mux node,
-not its children.
+I would say add a helper, like net_iov_is_dmabuf() or net_iov_is_io_uring()=
+.
+
+Checking for niov->pp->mp_ops seems a bit hacky to me, and may be
+outright broken. IIRC niov's can be disconnected from the page_pool
+via page_pool_clear_pp_info(), and niov->pp may be null. Abstractly
+speaking the niov type maybe should be a property of the niov itself,
+and not the pp the niov is attached to.
+
+It is not immediately obvious to me what the best thing to do here is,
+maybe it's best to add a flag to niov or to use niov->pp_magic for
+this.
+
+I would humbly ask that your follow up patchset takes care of this
+bit, if possible. I think mine is doing quite a bit of heavy lifting
+as is (and I think may be close to ready?), when it comes to concerns
+of devmem + io_uring coexisting if you're able to take care, awesome,
+if not, I can look into squashing some fix.
+
+--=20
+Thanks,
+Mina
 
