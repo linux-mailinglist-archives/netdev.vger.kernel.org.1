@@ -1,121 +1,133 @@
-Return-Path: <netdev+bounces-98531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 066D48D1AFB
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 14:20:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D6358D1AFD
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 14:20:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B523D282441
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 12:20:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E35541F21ED0
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 12:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEB316D313;
-	Tue, 28 May 2024 12:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A4316D4C7;
+	Tue, 28 May 2024 12:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DUJcofve"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OA3htDSU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 320FE79F5;
-	Tue, 28 May 2024 12:20:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB77616D339;
+	Tue, 28 May 2024 12:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716898815; cv=none; b=NKn84Ybn3Y5vh63LtQ73uPdUHzWqUqkl1Q718U+e9sEJZwGGifDHdydOpALLis2nobYUQZxsk4zYo6MneM956koqZ2Th0UHTDtyXPfB2p8DfID4Quj1KwqLO59B0uCfe0OgenJSOa52DxGxQ3/pvGm8RwWKr+P+5R5vmK2k9iRo=
+	t=1716898816; cv=none; b=h4cRCY5268FIFC7dni7eWg4dUGJu+IPhj06cFB4+JRanjfw0pFzjpM/QQWx34Gh9hK/JXdBIfpN0etAfDUeWWSMHaf7htKWZZ5fCYzW3vnAJWqQP8HeddPUSQjQI27erAGnJg49k3fEtrNgVk2C3R0Z6X5zKw8SYCybYN0cqgUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716898815; c=relaxed/simple;
-	bh=L3WhHmiorW7MFOt+LyYCXDut/bcUzwlL0rlxJZmGid8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dMqlrXUfHYqWUuWHDFSrTc/r+iWDX0bjYwZ0DMlhTQSgQI7uWkbBORnBEoanGReIj1YoPBW/IxaosfNxRbKoiTKF5OO4zftsYZ7wD33fReslsOXZ+ADgFsf+HPoF2F+qFnhGZVGx7UIxMAn1H/lOzaaLoo8i79K4yt1u9xxLhbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DUJcofve; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-529be98ad96so484665e87.0;
-        Tue, 28 May 2024 05:20:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716898812; x=1717503612; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BPKynHoA1RZiJcMOYXRI1Hw3OSBgUrOAHrq/dZgZeTk=;
-        b=DUJcofve7x1gVYa7W5Yq8u1PbsxQYicZOxlefmMP9EYneGDCb3i4bQzdRQCjQBNxAV
-         vtsEUODP36nQqRgQGb6S8uPK89bkKemasPVxXDOTLYrRpxFI3TKmG7xxfp9r5USGVPtw
-         3DYFNshfhCGWFqfZAjqkQnPlJ5pcTzvq9psrcXgxtiMj4j2dn6oznn2KkHvXAq1eVKCs
-         z8THXV7KNwPlSJSsWzp84nqN2BelvFqSJKsvILTvZwWqYOLlHpcUsLzLa6Dx2rcWG2zN
-         oztXuiuLm0nP49LsFntDBS6+z8bd6sxpJTF9NwOTY7C2cVaWBXURPJdRXkog4Qf+KeNj
-         hi9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716898812; x=1717503612;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BPKynHoA1RZiJcMOYXRI1Hw3OSBgUrOAHrq/dZgZeTk=;
-        b=E8eeoWcBRqR9T7Va2e6MC/8mGOOwknSUDTDEtJlDRhskpy4Z++VGBc9oULc6wk3WWS
-         9xlDILkIz7WWVUSG30esrl96svJLNKN1uAqMOHPQElhpZfAE+YFFAhNIYV2tj0FAKwD9
-         ftbSR461MWNPAl89yTGxqAXplNPvCErddcy5WhduJ8ikAb0og7rsxbH26U0bxhsQOJ5H
-         hTXS5jqgkU/toZxoKvmsZppeeszCjjt1VKWWi+B3Dqc+ig/RqKFni632IkF3fezfzpZ1
-         +5JUn2omO9MZQjiAVopFTEoksOVFsDf2VKCYitl2Qv8Sfvzlb8LS93PHZyZcK0AGpUA5
-         /Ekw==
-X-Forwarded-Encrypted: i=1; AJvYcCUY6AMVbFg8Pod3TeUy3kFl2jVEJO96rT4ZTt2GPj/mg0svOPp8MQP2St2fm+dYLrG+KuNI3Hk+1eLHHRoQB+lqRTJqFkOmx6+N7qdq0Bgk0bsuY+4pCMPXFDw6+lUCmx3U0jMR5dVCEHrF8BtD6spwq756j7Q4fhDe
-X-Gm-Message-State: AOJu0YyL7RxtDwOGN196g6tOephA+UW/BVn1+crfa66OFoyuh+Svq2Wy
-	fkzcDtsueIT5mkR/5Jlvz5DQIjJTzAkKUSNm0qygU04cSeCn1GLh
-X-Google-Smtp-Source: AGHT+IFd9FmeuCiizQK6KkHMRIGCvCqTEl6HKh6TZkn0NQYapBUStdMJunq8pk+wjXVdH5HQ+5qNng==
-X-Received: by 2002:a19:ca44:0:b0:51f:5872:dd8c with SMTP id 2adb3069b0e04-529651991afmr6873605e87.39.1716898811701;
-        Tue, 28 May 2024 05:20:11 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5296ee4bfabsm937711e87.84.2024.05.28.05.20.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 May 2024 05:20:11 -0700 (PDT)
-Date: Tue, 28 May 2024 15:20:08 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 1/3] net: stmmac: Prevent RGSMIIIS IRQs flood
-Message-ID: <fg7ib32lqeeuzef4eoskdnwrufwpdm6cdm2bdjlro7e3gtmp4u@mrni2hltc32o>
-References: <ZkDuJAx7atDXjf5m@shell.armlinux.org.uk>
- <20240524210304.9164-1-fancer.lancer@gmail.com>
- <ZlWw3hJdOARzdl2S@shell.armlinux.org.uk>
+	s=arc-20240116; t=1716898816; c=relaxed/simple;
+	bh=HRtOs1qBPixzN2owk9VyLlvwRd7BvYaMPXaD5mtiP8s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Rc4iH15V/iS2JRwHV+CMkiS3tAYVwujO4D88Afp/xA2Gi4pLSkQ5woXDCoOtEebLziHT+dnaiXgGuFBrUQ1YUjUPT7SFcJ4xiWgF0mI3o2oDXIIVuAl+rGm2DZHZe7UwHghOWi5x1qLmEDiNszn2tdJO+0g8QkWQBj5qowwy3vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OA3htDSU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89396C3277B;
+	Tue, 28 May 2024 12:20:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716898815;
+	bh=HRtOs1qBPixzN2owk9VyLlvwRd7BvYaMPXaD5mtiP8s=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=OA3htDSUMEETkQHavjH40fqF2rsPWf3pnTE7Xv3SPVmWokWK9Cf/Cbi1vhqj6T12e
+	 Q3NaCitZ1JJ/XObzjLLsH8vlUcY5Y3GZkjz5v0GPZBxf51QPktAKQq+GJPHtncjlcc
+	 bzKA5+Qq9yeGCk2m0Is74oFg1uDlSwGdb1xSMcLPWoehQXf6oGEl7pws6ZCEgjo8pS
+	 PYQqUMJe75h0/54RAz54xdVEmj9vRwlgfcIqek/SyyXJUpidFLLW9+zBGrFMasg6bi
+	 ncu7GT1fwtNEIRRyz1b2maCPAJao8LNhTp3W3ep9RTh4YksFhZAn9Oi3VLtKPFNpJ2
+	 R5eLvzWy0oCHA==
+Message-ID: <6e6f8de6-ebb0-4cf1-a922-09989afdf123@kernel.org>
+Date: Tue, 28 May 2024 14:20:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZlWw3hJdOARzdl2S@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/1] dt-bindings: net: rfkill-gpio: document reset-gpios
+To: Chukun Pan <amadeus@jmu.edu.cn>
+Cc: conor+dt@kernel.org, devicetree@vger.kernel.org,
+ johannes@sipsolutions.net, krzk+dt@kernel.org, netdev@vger.kernel.org,
+ p.zabel@pengutronix.de, robh@kernel.org
+References: <35400cd9-176b-4a87-94d5-f3400628f19b@kernel.org>
+ <20240528120040.1021052-1-amadeus@jmu.edu.cn>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240528120040.1021052-1-amadeus@jmu.edu.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 28, 2024 at 11:24:30AM +0100, Russell King (Oracle) wrote:
-> On Sat, May 25, 2024 at 12:02:57AM +0300, Serge Semin wrote:
-> > Without reading the GMAC_RGSMIIIS/MAC_PHYIF_Control_Status the IRQ line
-> > won't be de-asserted causing interrupt handler executed over and over. As
-> > a quick-fix let's just dummy-read the CSR for now.
-> > 
-> > Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
+On 28/05/2024 14:00, Chukun Pan wrote:
+>> Please focus instead on why.
+>>
+>> https://lore.kernel.org/all/d096d9ea-39db-4a15-9c4d-ae228db970cb@linaro.org/
 > 
-> I think it would make sense to merge these into the patches that do the
-> conversion to avoid a git bisect hitting on a patch that causes an
-> interrupt storm. Any objection?
+> Thanks for the link, I missed it.
+> But for the 4/5G modules, it usually has multiple gpio connections
+> and cannot be controlled through just one gpio. For example, when
+> rfkill unblock, if the module is not reset again, it will not work.
 
-Of course, no objection. This patch content was intended to be merged
-into yours.
+Please send a patch with proper hardware description used as rationale.
+Your argument - driver has it - is not correct for the bindings.
+Bindings do not describe drivers.
 
--Serge(y)
+Read the old v1 (which had reset GPIO) and the arguments presented
+there. Include your counter-arguments to that old v1 arguments in your
+patch.
+> In this case, can rfkill-gpio be allowed to use reset-gpios property?
 
-> 
-> (I'm now converting these two in separate patches, so would need to
-> split this patch...)
-> 
-> Thanks.
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
+
+Best regards,
+Krzysztof
+
 
