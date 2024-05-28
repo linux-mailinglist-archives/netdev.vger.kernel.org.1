@@ -1,82 +1,68 @@
-Return-Path: <netdev+bounces-98688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A29E8D2147
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:09:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDBC08D2169
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:16:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B9AA1F2457D
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:09:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D92BB1C23826
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:16:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B961F172BA7;
-	Tue, 28 May 2024 16:08:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64C08172796;
+	Tue, 28 May 2024 16:16:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bkYKukLi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X7fvxDUv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27FFA172760;
-	Tue, 28 May 2024 16:08:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D58E172762;
+	Tue, 28 May 2024 16:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716912530; cv=none; b=tcp6zKZV9qBdC7YwuSachJg8meCAXGyANq+9RN2lm/ZbKQP0S0vKoiVF0Uoj6vwsvim9E3HdHlx/2MxaWon6LFqonCk1UBUldzNBNNWuvAzCt5ny7nskCIUJ6MwmSFku40unka1Q5CKUNQq6df0OoxBrNT+5RL8SQP0TxDigBgM=
+	t=1716912971; cv=none; b=fYZ7DPke4LQ6lMkPrDVCioe6K6RSH8m05shj/ARWUpUbp6LnPZAxDnD5Rmiz1sRr3gLHdCedP8zmOEwdsN9g+1kMefdnwewM+A8OVksYtPu+62khXk6JFkDdGZBd0MEeTDeQmpcR+EttPRpd0OIqgU4pe8JoqrO5jnQMjtwc1bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716912530; c=relaxed/simple;
-	bh=hXddvfGqhlLKH6cMC/0laTQwh4l6A0/KXLh+1XqV7Mw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QPeg9/oSyUJWQ5UnXbFnE8Rr2HrYhinvPl9YiCi8Zg7Xglyip92hxFEx1qXHEYQwtx5ZWhv7XCa8rJPLAs+kZigtxnL6IgTsXWYi0AR4ze5jvUiml+M8veQNrrgfqoZZQuOV2Uh85QJj6VxG5EIkt42n00SdKpfEaTZtQSs6/LU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bkYKukLi; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1f4a52b9413so7147455ad.2;
-        Tue, 28 May 2024 09:08:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716912528; x=1717517328; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WAox75IIgSzwGSYAeqpeiicjX43UD6J0twhIIEPQ7Ao=;
-        b=bkYKukLiXyv5/6Glr33Dmr918GVKHcVS44pneA00/yf4L6ewLirsGz9B5JQ/5o4oGF
-         vK8s2hWaOGagwG6J6UvvnNLrlk/Wi8EHhw8t+mchpbpGygekYdZ7TttKeFg7Gjo24s7Z
-         PWn0zFY9CDp9Xez4sWZvFkIpvybBjEvdA7nUJ20qOWgCGzTGltC/jiBCeE7j6BPT1vYz
-         0cZHjv/v+45w2dBlkguitL3M/Ajc7AVcbdXdOuM4Ks3gFMWmS1YyqbJaFwPczEwCHagq
-         n+BhyVQSf+thSLPtRO0KyKzInhRLfjZQBJLYGa7SQhe8JNfsvbhFqrpwZu0UUGJDOsXY
-         rqJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716912528; x=1717517328;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WAox75IIgSzwGSYAeqpeiicjX43UD6J0twhIIEPQ7Ao=;
-        b=lpTtnuqh3Wgh1O/NhzGA9mZT4MGJ+gSwG5b1SSTSio5/J3Y/cALGDmQRtS5Llb+QF3
-         y7Ga/MD66/I5CdDuBoe/QcmmxTe4FuZ7/7XhdvvVb0fAw5emdOGlOP7RU5aCR0H1P4xy
-         xfx4pkom4tEm2Km5xU1JRtS5GWNXJG8tXlKN+oHEFh6mBKqEDxbq0iwbi0UIyEfExJts
-         k/H/e+4Qlio/Epvizk/Qa9DFpvJIij4zAheh+OSgFokG2x34GwEo4ic6Fi9D2gNlnyZU
-         xfGWI++EIhUppoQph2iRymhDEQT2TpB+6k4Hx5jy0iiUseQYK3k1gIKNTahUWdrIiLrp
-         Nz5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX5xNBhx5szAy+rQ3yop3VfW/TBXG0U1bydZQW41mC3djup2cvMrvpyp7lpIa+gUFO1zbVeo87woi/LSp5HGRhwNpL7
-X-Gm-Message-State: AOJu0YyGxvgB+g0QDlFkGsfpkz70rcuc0JeMw57M4Hik9SRhh3cfdmTj
-	0Utu758llNx5/2XDlOBJpaRPeV7+Jx2cqO26RL6ZD1rEYTZMaqoO4ddLaw==
-X-Google-Smtp-Source: AGHT+IGtXJ5eygw6R6aqf0iZ3n8x0DytS1qBS+zt7uZNr3Wd2f/dxw3TFojl/eBsLGxpMeDXri3EEQ==
-X-Received: by 2002:a17:902:fd08:b0:1f3:f5c:cd80 with SMTP id d9443c01a7336-1f4486fcd8dmr106041525ad.5.1716912527847;
-        Tue, 28 May 2024 09:08:47 -0700 (PDT)
-Received: from pop-os.hsd1.ca.comcast.net ([2601:647:6881:9060:d51a:c304:18b5:645e])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f44c99e3bdsm81839145ad.211.2024.05.28.09.08.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 May 2024 09:08:46 -0700 (PDT)
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linux-mm@kvack.org,
-	akpm@linux-foundation.org,
-	bpf@vger.kernel.org,
-	Cong Wang <cong.wang@bytedance.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Mike Rapoport <rppt@kernel.org>
-Subject: [Patch v2] vmalloc: check CONFIG_EXECMEM in is_vmalloc_or_module_addr()
-Date: Tue, 28 May 2024 09:08:38 -0700
-Message-Id: <20240528160838.102223-1-xiyou.wangcong@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1716912971; c=relaxed/simple;
+	bh=Iz7vkRaP4qUtarjEYxIic7Ot0cHaaKtheqV7WuJvym8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=raqapiWMKCPdgA2cr6pS/Sm2DDZbvSev1voT0klUY6EIRI5OIhrsiFn9GKEQomt9ETPTPBvelwm2iDWL2uNMHUtRsG6uJKO/hYpZJ70afRKNPohEHb1G28ry6mBRhQPZVDSs0hot1sD1yldplepIBahYSjQx7ongjmT4PwCzgAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X7fvxDUv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F06ACC4AF09;
+	Tue, 28 May 2024 16:16:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716912970;
+	bh=Iz7vkRaP4qUtarjEYxIic7Ot0cHaaKtheqV7WuJvym8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=X7fvxDUv5LIu9xkIINhS27/8+f/SLncSVMcucmnmjEA0vzec6ew1xyMWGXZiHeY7S
+	 AwsqdnTCF2IPnXQqxUrWNAUsVuDGVzWDVO3MPllYciuSlA2A2cZ+jt5s0jj+oYHAPD
+	 NloX7L895z8iaE3AXPbnAbGW3aa2bLf5ZfPVf3YH4QIlRM3r2nsj6NroDqVZaN844Z
+	 VuCq5LUF3ubBObFRheI3+6twwiYFPa1Oiq0TXPYspsi01Hcvo/libvLCcvqlstxKJt
+	 lJEqOE3QSb9Hyh0JDyrvanxwzpGtSGH13YsFGFUOrxR3kD3+WSgxKeV5GZxyWsG5mw
+	 +IZ/gZ+lmzIew==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Hao Lan <lanhao@huawei.com>,
+	Peiyang Wang <wangpeiyang1@huawei.com>,
+	Jie Wang <wangjie125@huawei.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
+	Guangbin Huang <huangguangbin2@huawei.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] hns3: avoid linking objects into multiple modules
+Date: Tue, 28 May 2024 18:15:25 +0200
+Message-Id: <20240528161603.2443125-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,128 +71,266 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Cong Wang <cong.wang@bytedance.com>
+From: Arnd Bergmann <arnd@arndb.de>
 
-After commit 2c9e5d4a0082 ("bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of")
-CONFIG_BPF_JIT does not depend on CONFIG_MODULES any more and bpf jit
-also uses the [MODULES_VADDR, MODULES_END] memory region. But
-is_vmalloc_or_module_addr() still checks CONFIG_MODULES, which then
-returns false for a bpf jit memory region when CONFIG_MODULES is not
-defined. It leads to the following kernel BUG:
+Each object file contains information about which module it gets linked
+into, so linking the same file into multiple modules now causes a warning:
 
-[    1.567023] ------------[ cut here ]------------
-[    1.567883] kernel BUG at mm/vmalloc.c:745!
-[    1.568477] Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN NOPTI
-[    1.569367] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.9.0+ #448
-[    1.570247] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
-[    1.570786] RIP: 0010:vmalloc_to_page+0x48/0x1ec
-[    1.570786] Code: 0f 00 00 e8 eb 1a 05 00 b8 37 00 00 00 48 ba fe ff ff ff ff 1f 00 00 4c 03 25 76 49 c6 02 48 c1 e0 28 48 01 e8 48 39 d0 76 02 <0f> 0b 4c 89 e7 e8 bf 1a 05 00 49 8b 04 24 48 a9 9f ff ff ff 0f 84
-[    1.570786] RSP: 0018:ffff888007787960 EFLAGS: 00010212
-[    1.570786] RAX: 000036ffa0000000 RBX: 0000000000000640 RCX: ffffffff8147e93c
-[    1.570786] RDX: 00001ffffffffffe RSI: dffffc0000000000 RDI: ffffffff840e32c8
-[    1.570786] RBP: ffffffffa0000000 R08: 0000000000000000 R09: 0000000000000000
-[    1.570786] R10: ffff888007787a88 R11: ffffffff8475d8e7 R12: ffffffff83e80ff8
-[    1.570786] R13: 0000000000000640 R14: 0000000000000640 R15: 0000000000000640
-[    1.570786] FS:  0000000000000000(0000) GS:ffff88806cc00000(0000) knlGS:0000000000000000
-[    1.570786] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    1.570786] CR2: ffff888006a01000 CR3: 0000000003e80000 CR4: 0000000000350ef0
-[    1.570786] Call Trace:
-[    1.570786]  <TASK>
-[    1.570786]  ? __die_body+0x1b/0x58
-[    1.570786]  ? die+0x31/0x4b
-[    1.570786]  ? do_trap+0x9d/0x138
-[    1.570786]  ? vmalloc_to_page+0x48/0x1ec
-[    1.570786]  ? do_error_trap+0xcd/0x102
-[    1.570786]  ? vmalloc_to_page+0x48/0x1ec
-[    1.570786]  ? vmalloc_to_page+0x48/0x1ec
-[    1.570786]  ? handle_invalid_op+0x2f/0x38
-[    1.570786]  ? vmalloc_to_page+0x48/0x1ec
-[    1.570786]  ? exc_invalid_op+0x2b/0x41
-[    1.570786]  ? asm_exc_invalid_op+0x16/0x20
-[    1.570786]  ? vmalloc_to_page+0x26/0x1ec
-[    1.570786]  ? vmalloc_to_page+0x48/0x1ec
-[    1.570786]  __text_poke+0xb6/0x458
-[    1.570786]  ? __pfx_text_poke_memcpy+0x10/0x10
-[    1.570786]  ? __pfx___mutex_lock+0x10/0x10
-[    1.570786]  ? __pfx___text_poke+0x10/0x10
-[    1.570786]  ? __pfx_get_random_u32+0x10/0x10
-[    1.570786]  ? srso_return_thunk+0x5/0x5f
-[    1.570786]  text_poke_copy_locked+0x70/0x84
-[    1.570786]  text_poke_copy+0x32/0x4f
-[    1.570786]  bpf_arch_text_copy+0xf/0x27
-[    1.570786]  bpf_jit_binary_pack_finalize+0x26/0x5a
-[    1.570786]  bpf_int_jit_compile+0x576/0x8ad
-[    1.570786]  ? __pfx_bpf_int_jit_compile+0x10/0x10
-[    1.570786]  ? srso_return_thunk+0x5/0x5f
-[    1.570786]  ? __kmalloc_node_track_caller+0x2b5/0x2e0
-[    1.570786]  bpf_prog_select_runtime+0x7c/0x199
-[    1.570786]  bpf_prepare_filter+0x1e9/0x25b
-[    1.570786]  ? __pfx_bpf_prepare_filter+0x10/0x10
-[    1.570786]  ? srso_return_thunk+0x5/0x5f
-[    1.570786]  ? _find_next_bit+0x29/0x7e
-[    1.570786]  bpf_prog_create+0xb8/0xe0
-[    1.570786]  ptp_classifier_init+0x75/0xa1
-[    1.570786]  ? __pfx_ptp_classifier_init+0x10/0x10
-[    1.570786]  ? srso_return_thunk+0x5/0x5f
-[    1.570786]  ? register_pernet_subsys+0x36/0x42
-[    1.570786]  ? srso_return_thunk+0x5/0x5f
-[    1.570786]  sock_init+0x99/0xa3
-[    1.570786]  ? __pfx_sock_init+0x10/0x10
-[    1.570786]  do_one_initcall+0x104/0x2c4
-[    1.570786]  ? __pfx_do_one_initcall+0x10/0x10
-[    1.570786]  ? parameq+0x25/0x2d
-[    1.570786]  ? rcu_is_watching+0x1c/0x3c
-[    1.570786]  ? trace_kmalloc+0x81/0xb2
-[    1.570786]  ? srso_return_thunk+0x5/0x5f
-[    1.570786]  ? __kmalloc+0x29c/0x2c7
-[    1.570786]  ? srso_return_thunk+0x5/0x5f
-[    1.570786]  do_initcalls+0xf9/0x123
-[    1.570786]  kernel_init_freeable+0x24f/0x289
-[    1.570786]  ? __pfx_kernel_init+0x10/0x10
-[    1.570786]  kernel_init+0x19/0x13a
-[    1.570786]  ret_from_fork+0x24/0x41
-[    1.570786]  ? __pfx_kernel_init+0x10/0x10
-[    1.570786]  ret_from_fork_asm+0x1a/0x30
-[    1.570786]  </TASK>
-[    1.570819] ---[ end trace 0000000000000000 ]---
-[    1.571463] RIP: 0010:vmalloc_to_page+0x48/0x1ec
-[    1.572111] Code: 0f 00 00 e8 eb 1a 05 00 b8 37 00 00 00 48 ba fe ff ff ff ff 1f 00 00 4c 03 25 76 49 c6 02 48 c1 e0 28 48 01 e8 48 39 d0 76 02 <0f> 0b 4c 89 e7 e8 bf 1a 05 00 49 8b 04 24 48 a9 9f ff ff ff 0f 84
-[    1.574632] RSP: 0018:ffff888007787960 EFLAGS: 00010212
-[    1.575129] RAX: 000036ffa0000000 RBX: 0000000000000640 RCX: ffffffff8147e93c
-[    1.576097] RDX: 00001ffffffffffe RSI: dffffc0000000000 RDI: ffffffff840e32c8
-[    1.577084] RBP: ffffffffa0000000 R08: 0000000000000000 R09: 0000000000000000
-[    1.578077] R10: ffff888007787a88 R11: ffffffff8475d8e7 R12: ffffffff83e80ff8
-[    1.578810] R13: 0000000000000640 R14: 0000000000000640 R15: 0000000000000640
-[    1.579823] FS:  0000000000000000(0000) GS:ffff88806cc00000(0000) knlGS:0000000000000000
-[    1.580992] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    1.581869] CR2: ffff888006a01000 CR3: 0000000003e80000 CR4: 0000000000350ef0
-[    1.582800] Kernel panic - not syncing: Fatal exception
-[    1.583765] ---[ end Kernel panic - not syncing: Fatal exception ]---
+scripts/Makefile.build:254: drivers/net/ethernet/hisilicon/hns3/Makefile: hns3_common/hclge_comm_cmd.o is added to multiple modules: hclge hclgevf
+scripts/Makefile.build:254: drivers/net/ethernet/hisilicon/hns3/Makefile: hns3_common/hclge_comm_rss.o is added to multiple modules: hclge hclgevf
+scripts/Makefile.build:254: drivers/net/ethernet/hisilicon/hns3/Makefile: hns3_common/hclge_comm_tqp_stats.o is added to multiple modules: hclge hclgevf
 
-Fix this by checking CONFIG_EXECMEM instead.
+Change the way that hns3 is built by moving the three common files into a
+separate module with exported symbols instead.
 
-Fixes: 2c9e5d4a0082 ("bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of")
-Cc: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Mike Rapoport (IBM) <rppt@kernel.org>
-Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+Fixes: 5f20be4e90e6 ("net: hns3: refactor hns3 makefile to support hns3_common module")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- mm/vmalloc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/hisilicon/hns3/Makefile       | 11 +++++------
+ .../hisilicon/hns3/hns3_common/hclge_comm_cmd.c    | 11 +++++++++++
+ .../hisilicon/hns3/hns3_common/hclge_comm_rss.c    | 14 ++++++++++++++
+ .../hns3/hns3_common/hclge_comm_tqp_stats.c        |  5 +++++
+ 4 files changed, 35 insertions(+), 6 deletions(-)
 
-diff --git a/mm/vmalloc.c b/mm/vmalloc.c
-index 6641be0ca80b..94e1d2dbdec0 100644
---- a/mm/vmalloc.c
-+++ b/mm/vmalloc.c
-@@ -722,7 +722,7 @@ int is_vmalloc_or_module_addr(const void *x)
- 	 * and fall back on vmalloc() if that fails. Others
- 	 * just put it in the vmalloc space.
- 	 */
--#if defined(CONFIG_MODULES) && defined(MODULES_VADDR)
-+#if defined(CONFIG_EXECMEM) && defined(MODULES_VADDR)
- 	unsigned long addr = (unsigned long)kasan_reset_tag(x);
- 	if (addr >= MODULES_VADDR && addr < MODULES_END)
- 		return 1;
+diff --git a/drivers/net/ethernet/hisilicon/hns3/Makefile b/drivers/net/ethernet/hisilicon/hns3/Makefile
+index 8e9293e57bfd..e8af26da1fc1 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/Makefile
++++ b/drivers/net/ethernet/hisilicon/hns3/Makefile
+@@ -15,15 +15,14 @@ hns3-objs = hns3_enet.o hns3_ethtool.o hns3_debugfs.o
+ 
+ hns3-$(CONFIG_HNS3_DCB) += hns3_dcbnl.o
+ 
+-obj-$(CONFIG_HNS3_HCLGEVF) += hclgevf.o
++obj-$(CONFIG_HNS3_HCLGEVF) += hclgevf.o hclge-common.o
+ 
+-hclgevf-objs = hns3vf/hclgevf_main.o hns3vf/hclgevf_mbx.o  hns3vf/hclgevf_devlink.o hns3vf/hclgevf_regs.o \
+-		hns3_common/hclge_comm_cmd.o hns3_common/hclge_comm_rss.o hns3_common/hclge_comm_tqp_stats.o
++hclge-common-objs += hns3_common/hclge_comm_cmd.o hns3_common/hclge_comm_rss.o hns3_common/hclge_comm_tqp_stats.o
+ 
+-obj-$(CONFIG_HNS3_HCLGE) += hclge.o
++hclgevf-objs = hns3vf/hclgevf_main.o hns3vf/hclgevf_mbx.o  hns3vf/hclgevf_devlink.o hns3vf/hclgevf_regs.o
++
++obj-$(CONFIG_HNS3_HCLGE) += hclge.o hclge-common.o
+ hclge-objs = hns3pf/hclge_main.o hns3pf/hclge_mdio.o hns3pf/hclge_tm.o hns3pf/hclge_regs.o \
+ 		hns3pf/hclge_mbx.o hns3pf/hclge_err.o  hns3pf/hclge_debugfs.o hns3pf/hclge_ptp.o hns3pf/hclge_devlink.o \
+-		hns3_common/hclge_comm_cmd.o hns3_common/hclge_comm_rss.o hns3_common/hclge_comm_tqp_stats.o
+-
+ 
+ hclge-$(CONFIG_HNS3_DCB) += hns3pf/hclge_dcb.o
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c
+index ea40b594dbac..4ad4e8ab2f1f 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c
+@@ -48,6 +48,7 @@ void hclge_comm_cmd_reuse_desc(struct hclge_desc *desc, bool is_read)
+ 	else
+ 		desc->flag &= cpu_to_le16(~HCLGE_COMM_CMD_FLAG_WR);
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_cmd_reuse_desc);
+ 
+ static void hclge_comm_set_default_capability(struct hnae3_ae_dev *ae_dev,
+ 					      bool is_pf)
+@@ -72,6 +73,7 @@ void hclge_comm_cmd_setup_basic_desc(struct hclge_desc *desc,
+ 	if (is_read)
+ 		desc->flag |= cpu_to_le16(HCLGE_COMM_CMD_FLAG_WR);
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_cmd_setup_basic_desc);
+ 
+ int hclge_comm_firmware_compat_config(struct hnae3_ae_dev *ae_dev,
+ 				      struct hclge_comm_hw *hw, bool en)
+@@ -517,6 +519,7 @@ int hclge_comm_cmd_send(struct hclge_comm_hw *hw, struct hclge_desc *desc,
+ 
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_cmd_send);
+ 
+ static void hclge_comm_cmd_uninit_regs(struct hclge_comm_hw *hw)
+ {
+@@ -553,6 +556,7 @@ void hclge_comm_cmd_uninit(struct hnae3_ae_dev *ae_dev,
+ 	hclge_comm_free_cmd_desc(&cmdq->csq);
+ 	hclge_comm_free_cmd_desc(&cmdq->crq);
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_cmd_uninit);
+ 
+ int hclge_comm_cmd_queue_init(struct pci_dev *pdev, struct hclge_comm_hw *hw)
+ {
+@@ -591,6 +595,7 @@ int hclge_comm_cmd_queue_init(struct pci_dev *pdev, struct hclge_comm_hw *hw)
+ 	hclge_comm_free_cmd_desc(&hw->cmq.csq);
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_cmd_queue_init);
+ 
+ void hclge_comm_cmd_init_ops(struct hclge_comm_hw *hw,
+ 			     const struct hclge_comm_cmq_ops *ops)
+@@ -602,6 +607,7 @@ void hclge_comm_cmd_init_ops(struct hclge_comm_hw *hw,
+ 		cmdq->ops.trace_cmd_get = ops->trace_cmd_get;
+ 	}
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_cmd_init_ops);
+ 
+ int hclge_comm_cmd_init(struct hnae3_ae_dev *ae_dev, struct hclge_comm_hw *hw,
+ 			u32 *fw_version, bool is_pf,
+@@ -672,3 +678,8 @@ int hclge_comm_cmd_init(struct hnae3_ae_dev *ae_dev, struct hclge_comm_hw *hw,
+ 
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_cmd_init);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("HNS3: Hisilicon Ethernet PF/VF Common Library");
++MODULE_AUTHOR("Huawei Tech. Co., Ltd.");
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_rss.c b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_rss.c
+index b4ae2160aff4..4e2bb6556b1c 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_rss.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_rss.c
+@@ -62,6 +62,7 @@ int hclge_comm_rss_init_cfg(struct hnae3_handle *nic,
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_rss_init_cfg);
+ 
+ void hclge_comm_get_rss_tc_info(u16 rss_size, u8 hw_tc_map, u16 *tc_offset,
+ 				u16 *tc_valid, u16 *tc_size)
+@@ -78,6 +79,7 @@ void hclge_comm_get_rss_tc_info(u16 rss_size, u8 hw_tc_map, u16 *tc_offset,
+ 		tc_offset[i] = (hw_tc_map & BIT(i)) ? rss_size * i : 0;
+ 	}
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_get_rss_tc_info);
+ 
+ int hclge_comm_set_rss_tc_mode(struct hclge_comm_hw *hw, u16 *tc_offset,
+ 			       u16 *tc_valid, u16 *tc_size)
+@@ -113,6 +115,7 @@ int hclge_comm_set_rss_tc_mode(struct hclge_comm_hw *hw, u16 *tc_offset,
+ 
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_set_rss_tc_mode);
+ 
+ int hclge_comm_set_rss_hash_key(struct hclge_comm_rss_cfg *rss_cfg,
+ 				struct hclge_comm_hw *hw, const u8 *key,
+@@ -143,6 +146,7 @@ int hclge_comm_set_rss_hash_key(struct hclge_comm_rss_cfg *rss_cfg,
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_set_rss_hash_key);
+ 
+ int hclge_comm_set_rss_tuple(struct hnae3_ae_dev *ae_dev,
+ 			     struct hclge_comm_hw *hw,
+@@ -185,11 +189,13 @@ int hclge_comm_set_rss_tuple(struct hnae3_ae_dev *ae_dev,
+ 	rss_cfg->rss_tuple_sets.ipv6_fragment_en = req->ipv6_fragment_en;
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_set_rss_tuple);
+ 
+ u32 hclge_comm_get_rss_key_size(struct hnae3_handle *handle)
+ {
+ 	return HCLGE_COMM_RSS_KEY_SIZE;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_get_rss_key_size);
+ 
+ int hclge_comm_parse_rss_hfunc(struct hclge_comm_rss_cfg *rss_cfg,
+ 			       const u8 hfunc, u8 *hash_algo)
+@@ -217,6 +223,7 @@ void hclge_comm_rss_indir_init_cfg(struct hnae3_ae_dev *ae_dev,
+ 	for (i = 0; i < ae_dev->dev_specs.rss_ind_tbl_size; i++)
+ 		rss_cfg->rss_indirection_tbl[i] = i % rss_cfg->rss_size;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_rss_indir_init_cfg);
+ 
+ int hclge_comm_get_rss_tuple(struct hclge_comm_rss_cfg *rss_cfg, int flow_type,
+ 			     u8 *tuple_sets)
+@@ -250,6 +257,7 @@ int hclge_comm_get_rss_tuple(struct hclge_comm_rss_cfg *rss_cfg, int flow_type,
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_get_rss_tuple);
+ 
+ static void
+ hclge_comm_append_rss_msb_info(struct hclge_comm_rss_ind_tbl_cmd *req,
+@@ -304,6 +312,7 @@ int hclge_comm_set_rss_indir_table(struct hnae3_ae_dev *ae_dev,
+ 	}
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_set_rss_indir_table);
+ 
+ int hclge_comm_set_rss_input_tuple(struct hclge_comm_hw *hw,
+ 				   struct hclge_comm_rss_cfg *rss_cfg)
+@@ -332,6 +341,7 @@ int hclge_comm_set_rss_input_tuple(struct hclge_comm_hw *hw,
+ 			"failed to configure rss input, ret = %d.\n", ret);
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_set_rss_input_tuple);
+ 
+ void hclge_comm_get_rss_hash_info(struct hclge_comm_rss_cfg *rss_cfg, u8 *key,
+ 				  u8 *hfunc)
+@@ -355,6 +365,7 @@ void hclge_comm_get_rss_hash_info(struct hclge_comm_rss_cfg *rss_cfg, u8 *key,
+ 	if (key)
+ 		memcpy(key, rss_cfg->rss_hash_key, HCLGE_COMM_RSS_KEY_SIZE);
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_get_rss_hash_info);
+ 
+ void hclge_comm_get_rss_indir_tbl(struct hclge_comm_rss_cfg *rss_cfg,
+ 				  u32 *indir, u16 rss_ind_tbl_size)
+@@ -367,6 +378,7 @@ void hclge_comm_get_rss_indir_tbl(struct hclge_comm_rss_cfg *rss_cfg,
+ 	for (i = 0; i < rss_ind_tbl_size; i++)
+ 		indir[i] = rss_cfg->rss_indirection_tbl[i];
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_get_rss_indir_tbl);
+ 
+ int hclge_comm_set_rss_algo_key(struct hclge_comm_hw *hw, const u8 hfunc,
+ 				const u8 *key)
+@@ -408,6 +420,7 @@ int hclge_comm_set_rss_algo_key(struct hclge_comm_hw *hw, const u8 hfunc,
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_set_rss_algo_key);
+ 
+ static u8 hclge_comm_get_rss_hash_bits(struct ethtool_rxnfc *nfc)
+ {
+@@ -502,3 +515,4 @@ u64 hclge_comm_convert_rss_tuple(u8 tuple_sets)
+ 
+ 	return tuple_data;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_convert_rss_tuple);
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.c b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.c
+index 618f66d9586b..2b31188ff555 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.c
+@@ -26,6 +26,7 @@ u64 *hclge_comm_tqps_get_stats(struct hnae3_handle *handle, u64 *data)
+ 
+ 	return buff;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_tqps_get_stats);
+ 
+ int hclge_comm_tqps_get_sset_count(struct hnae3_handle *handle)
+ {
+@@ -33,6 +34,7 @@ int hclge_comm_tqps_get_sset_count(struct hnae3_handle *handle)
+ 
+ 	return kinfo->num_tqps * HCLGE_COMM_QUEUE_PAIR_SIZE;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_tqps_get_sset_count);
+ 
+ u8 *hclge_comm_tqps_get_strings(struct hnae3_handle *handle, u8 *data)
+ {
+@@ -56,6 +58,7 @@ u8 *hclge_comm_tqps_get_strings(struct hnae3_handle *handle, u8 *data)
+ 
+ 	return buff;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_tqps_get_strings);
+ 
+ int hclge_comm_tqps_update_stats(struct hnae3_handle *handle,
+ 				 struct hclge_comm_hw *hw)
+@@ -99,6 +102,7 @@ int hclge_comm_tqps_update_stats(struct hnae3_handle *handle,
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_tqps_update_stats);
+ 
+ void hclge_comm_reset_tqp_stats(struct hnae3_handle *handle)
+ {
+@@ -113,3 +117,4 @@ void hclge_comm_reset_tqp_stats(struct hnae3_handle *handle)
+ 		memset(&tqp->tqp_stats, 0, sizeof(tqp->tqp_stats));
+ 	}
+ }
++EXPORT_SYMBOL_GPL(hclge_comm_reset_tqp_stats);
 -- 
-2.34.1
+2.39.2
 
 
