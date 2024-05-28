@@ -1,288 +1,238 @@
-Return-Path: <netdev+bounces-98573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FFFD8D1CB7
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 15:21:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F05288D1CC9
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 15:23:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC6E4B238CF
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:21:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A763F284459
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4565E178381;
-	Tue, 28 May 2024 13:16:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2641E170846;
+	Tue, 28 May 2024 13:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lzDm7NVX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DpVGcXQg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F9D616F836
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 13:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34232170840;
+	Tue, 28 May 2024 13:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716902166; cv=none; b=rJ+paFl/v+9P96i44dR64SoFFI3AyQGDW5+TbxuSxrEsFfOXN30emmIoGY4c5wo1dcfT/Zril24PDj/dPmJK/bREh7yIaCRUHz20bKJdkelcmoi2jxhrVhQ6UEY5mEUlPOFADZOVnTYR80mv5tTcp6qRPtE3OV/daFi+V5zkd6A=
+	t=1716902397; cv=none; b=dGTNp++K2zHALQRly8OtNyYclG8NJZ1r0ZJ6aDN7dCOjwMCFaljRnpIwft4kPhv0uhuRRZBbK2mCv5AAp4Ru82S+WRbpADGuvRhiiRm5ytaIq4GjNAnObCshC/FL6ykmRjgr9z33AMUE2vMTF1ulCp5//Yf67wj0P+ouGiOOY/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716902166; c=relaxed/simple;
-	bh=PiHcrt4MpBpN05Srlg+JhvwjicgYE6GmVyjVgxZdXqU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=H84pDbMk3Nr5/IbXWuwepZp4I30QUW4AuPnNiiSrDDrl+EIL0K+c3EMVSkTj9DnFRCeLbqNFOZariViSORs+bdSOZnb/a5cC9AgLmr3RTl8Ttgw19itCyynY6sv5RqDzfT+A+n/jVRiIZ/pp02sBP5e/oA04NKuqs5vbk+FZB0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lzDm7NVX; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716902165; x=1748438165;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=PiHcrt4MpBpN05Srlg+JhvwjicgYE6GmVyjVgxZdXqU=;
-  b=lzDm7NVXC3o76ROiwXylScNhQqLerVRtXK8Uj2gFPOLkj83ltf+bs9+j
-   pOmyeAPpsK3/3/mVdjSTRqAMvKDUQId8iIJfKD+ifMgjoY2hA0CJfvSW3
-   w522dZXb0OyIRUUgrmjlCBuR6kXXKzNu15jKXP4T4n57cia6ZCJhRu6eU
-   /TXGwfW9cqxUE9r2g3BYHDehivg3vux/F641/N+8rba1ni6cU1VB9RPpT
-   y4HrFlU6zVf5axuHdPy3gZBQhVzNynpnDwGJw8KlTlkAlC00SnmsEbnPt
-   DQYzcJ1eXGep8Y0cIUYVVAxA0GouM97k9DiaCm/Di0GIEMV9lKzhhW1rX
-   g==;
-X-CSE-ConnectionGUID: reTfTlbMQXeWYNQuir+KbA==
-X-CSE-MsgGUID: lGfCzs+eQUWFnwfWt+KMhQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11085"; a="13193589"
-X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
-   d="scan'208";a="13193589"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 06:15:52 -0700
-X-CSE-ConnectionGUID: UHB0bFdaQ6mUWy/OIdKRJA==
-X-CSE-MsgGUID: eaDjYtd+SpWsHAwPorLzzQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
-   d="scan'208";a="39891182"
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by orviesa003.jf.intel.com with ESMTP; 28 May 2024 06:15:50 -0700
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	magnus.karlsson@intel.com,
-	michal.kubiak@intel.com,
-	larysa.zaremba@intel.com
-Subject: [PATCH iwl-net 11/11] ice: protect ring configuration with a mutex
-Date: Tue, 28 May 2024 15:14:29 +0200
-Message-Id: <20240528131429.3012910-12-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20240528131429.3012910-1-maciej.fijalkowski@intel.com>
-References: <20240528131429.3012910-1-maciej.fijalkowski@intel.com>
+	s=arc-20240116; t=1716902397; c=relaxed/simple;
+	bh=bKuZ5xm3ArcCR8+/y1nP3L+xonKgXzP8+7tYddFCFkM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zba3BhdtHYB0Y0hsy124MvnMSI/xJSge0o47kmLCWU4uXr4vKsK/icxgD1UZlXMJ4cY8HmTgeLMcsBqjXH31HKygTmgnhrZnBGs5H0QLO7E5XKMktD6Snca7+PYHHHZL31zQlVThXGvqIIrYWIMt2c/ZqlpBrelZeu1gI7uFmhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DpVGcXQg; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2e95b03e0d6so37465951fa.1;
+        Tue, 28 May 2024 06:19:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716902393; x=1717507193; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4lsS6UWs3Vq43Zsc//O5k/DxSvkmM/xM5dPhYo3OcQk=;
+        b=DpVGcXQgxSkM+JC2lL8TXdBLPuVBLmAw6wvMv/hXUS/YyxvbqlWslDKM2ntm/pEj6R
+         eNe8xa89sx336H8quDG056JbmxYOkxdrFXXxYBLwh33mSmsYNfIzFyQe+pxuAd5l2rUI
+         megKMJlDahOJIDNHi9eZVOyCJ7uzEH5Qe4Nv93wAsf5p4oZs8ScVaBAW/nGVgayUPDrZ
+         AkFKoJh5dwfSDuAuC9MW3FNSuquh/lX/nbsvTbLwmYE4HiRZTdmiP82lOU4BM9cD9Shh
+         H4A+ihBjVsR5egy+YgCy9bQ2COyk1Izmm8//O3/s+QvDNb1dTuMNQ49t2lGR/+O9N5pr
+         pudQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716902393; x=1717507193;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4lsS6UWs3Vq43Zsc//O5k/DxSvkmM/xM5dPhYo3OcQk=;
+        b=deXOI0ZR22QKH89TfbkWJ0SvgAWznsYKh2iTGoROD0zzFoqlszh4fWzstSqe1IcFZs
+         UWrSlhueJdzs+lZCi5OgWliaOttNQv7+knJzVenF0DcGcrXaXuUGtKJ8VFUmk/7LJRUi
+         LV/jmhhgt7WOLtfpF1rhhMxseHwDtt8rFLV748OL1+i6xw3xa4Q/+OAMCbQMrBsWTP0N
+         s6Y4vhzz+wjvOS+PFALs/PjbGBTFAgoBSmLrz8K0rGUQjOElpZdAw1iX6VoYffE4dZnt
+         x1DTHlGkq6Yoahs7IobHSUc/rKw6IMQ4Q/BT7cNAqWNVLPdRDDYJZRMJjeIX10c24PQS
+         jPUg==
+X-Forwarded-Encrypted: i=1; AJvYcCUFN2Jey7gx3Fdw1I1XBt4CUpzZi865i7vAcsAZ8KPWjYA9n9PvrghwL+2Q1ZrMGC9rNtU6eP6Y3fLtYuIk0/JM7HM7lQhhzaXCyk0KHBnRPdw90xLcdmgn5UXUoFWEeLwUVQtaHy19uf82uPUQ6QbLL+hwQq2L8m4w
+X-Gm-Message-State: AOJu0Yya4mwKq6B58a237BcP5w0vvLgOKYCzb6lVHKL0LG9EfqOYIE1q
+	DHO5+O38JqpAW4bJ41zQ2UgJvsjekIKu5AV4OnjSdEOirnRl65Ci
+X-Google-Smtp-Source: AGHT+IHZcnC5BdWmLAQ1pEXAqgf9x+btzizPqon18tqiGfOweOD0mKmJiT+90UQPwurV17XYK8aGGg==
+X-Received: by 2002:a2e:a3d2:0:b0:2d4:535a:e7a with SMTP id 38308e7fff4ca-2e95a1058e2mr38060261fa.24.1716902393172;
+        Tue, 28 May 2024 06:19:53 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2e95bcc4aa9sm22543531fa.9.2024.05.28.06.19.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 May 2024 06:19:52 -0700 (PDT)
+Date: Tue, 28 May 2024 16:19:49 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Byungho An <bh74.an@samsung.com>, Giuseppe CAVALLARO <peppe.cavallaro@st.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 2/3] net: stmmac: Activate Inband/PCS flag
+ based on the selected iface
+Message-ID: <ukszpirecb3pwnz5bbmy7wl44ujh6t2ewrnodmrye5kjmonsz2@pgf5b2oy5n3p>
+References: <ZkDuJAx7atDXjf5m@shell.armlinux.org.uk>
+ <20240524210304.9164-1-fancer.lancer@gmail.com>
+ <20240524210304.9164-2-fancer.lancer@gmail.com>
+ <ZlNoLHoHjt3BsFde@shell.armlinux.org.uk>
+ <ZlN4tkY8fNM8/D8p@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZlN4tkY8fNM8/D8p@shell.armlinux.org.uk>
 
-From: Larysa Zaremba <larysa.zaremba@intel.com>
+On Sun, May 26, 2024 at 07:00:22PM +0100, Russell King (Oracle) wrote:
+> On Sun, May 26, 2024 at 05:49:48PM +0100, Russell King (Oracle) wrote:
+> > On Sat, May 25, 2024 at 12:02:58AM +0300, Serge Semin wrote:
+> > > The HWFEATURE.PCSSEL flag is set if the PCS block has been synthesized
+> > > into the DW GMAC controller. It's always done if the controller supports
+> > > at least one of the SGMII, TBI, RTBI PHY interfaces. If none of these
+> > > interfaces support was activated during the IP-core synthesize the PCS
+> > > block won't be activated either and the HWFEATURE.PCSSEL flag won't be
+> > > set. Based on that the RGMII in-band status detection procedure
+> > > implemented in the driver hasn't been working for the devices with the
+> > > RGMII interface support and with none of the SGMII, TBI, RTBI PHY
+> > > interfaces available in the device.
+> > > 
+> > > Fix that just by dropping the dma_cap.pcs flag check from the conditional
+> > > statement responsible for the In-band/PCS functionality activation. If the
+> > > RGMII interface is supported by the device then the in-band link status
+> > > detection will be also supported automatically (it's always embedded into
+> > > the RGMII RTL code). If the SGMII interface is supported by the device
+> > > then the PCS block will be supported too (it's unconditionally synthesized
+> > > into the controller). The later is also correct for the TBI/RTBI PHY
+> > > interfaces.
+> > > 
+> > > Note while at it drop the netdev_dbg() calls since at the moment of the
+> > > stmmac_check_pcs_mode() invocation the network device isn't registered. So
+> > > the debug prints will be for the unknown/NULL device.
+> > 
+> > Thanks. As this is a fix, shouldn't it be submitted for the net tree as
+> > it seems to be fixing a bug in the driver as it stands today?
+> > 
+> > Also, a build fix is required here:
+> > 
+> > > -	if (priv->dma_cap.pcs) {
+> > > -		if ((interface == PHY_INTERFACE_MODE_RGMII) ||
+> > > -		    (interface == PHY_INTERFACE_MODE_RGMII_ID) ||
+> > > -		    (interface == PHY_INTERFACE_MODE_RGMII_RXID) ||
+> > > -		    (interface == PHY_INTERFACE_MODE_RGMII_TXID)) {
+> > > -			netdev_dbg(priv->dev, "PCS RGMII support enabled\n");
+> > > -			priv->hw->pcs = STMMAC_PCS_RGMII;
+> > > -		} else if (interface == PHY_INTERFACE_MODE_SGMII) {
+> > > -			netdev_dbg(priv->dev, "PCS SGMII support enabled\n");
+> > > -			priv->hw->pcs = STMMAC_PCS_SGMII;
+> > > -		}
+> > > -	}
+> > > +	if (phy_interface_mode_is_rgmii(interface))
+> > > +		priv->hw.pcs = STMMAC_PCS_RGMII;
+> > > +	else if (interface == PHY_INTERFACE_MODE_SGMII)
+> > > +		priv->hw.pcs = STMMAC_PCS_SGMII;
+> > 
+> > Both of these assignments should be priv->hw->pcs not priv->hw.pcs.
+> > 
+> > I think there's also another bug that needs fixing along with this.
+> > See stmmac_ethtool_set_link_ksettings(). Note that this denies the
+> > ability to disable autoneg, which (a) doesn't make sense for RGMII
+> > with an attached PHY, and (b) this code should be passing the
+> > ethtool op to phylink for it to pass on to phylib so the PHY can
+> > be appropriately configured for the users desired autoneg and
+> > link mode settings.
+> > 
+> > I also don't think it makes any sense for the STMMAC_PCS_SGMII case
+> > given that it means Cisco SGMII - which implies that there is also
+> > a PHY (since Cisco SGMII with inband is designed to be coupled with
+> > something that looks like a PHY to send the inband signalling
+> > necessary to configure e.g. the SGMII link symbol replication.
+> > 
+> > In both of these cases, even if the user requests autoneg to be
+> > disabled, that _shouldn't_ affect internal network driver links.
+> > This ethtool op is about configuring the externally visible media
+> > side of the network driver, not the internal links.
+> 
 
-Add a ring_lock mutex to protect sections, where software rings are
-affected. Particularly, to prevent system crash, when tx_timeout
-and .ndo_bpf() happen at the same time.
+> I have a concern about this patch. Have you considered dwmac-intel with
+> its XPCS support, where the XPCS is used for Cisco SGMII and 1000base-X
+> support. Does the dwmac-intel version of the core set
+> priv->dma_cap.pcs? If it doesn't, then removing the test on this will
+> cause a regression, since in Cisco SGMII mode, we end up setting
+> priv->hw->pcs to SYMMAC_PCS_SGMII where we didn't before. As
+> priv->flags will not have STMMAC_FLAG_HAS_INTEGRATED_PCS, this will
+> enable all the "integrated PCS" code paths despite XPCS clearly
+> intending to be used for Cisco SGMII.
+> 
+> I'm also wondering whether the same applies to the lynx PCS as well,
+> or in the general case if we have any kind of external PCS.
+> 
+> Hence, I think this probably needs to be:
+> 
+> 	if (phy_interface_mode_is_rgmii(interface))
+> 		priv->hw->pcs = STMMAC_PCS_RGMII;
+> 	else if (interface == PHY_INTERFACE_MODE_SGMII && priv->dma_cap.pcs)
+> 		priv->hw->pcs = STMMAC_PCS_SGMII;
+> 
+> At least this is what unpicking the awful stmmac code suggests (and I
+> do feel that my point about the shocking state of this driver is proven
+> as details like this are extremely difficult to unpick, and not
+> unpicking them correctly will lead to regressions.) Therefore, I would
+> suggest that it would be wise if you also double-checked this.
 
-Fixes: 2d4238f55697 ("ice: Add support for AF_XDP")
-Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
----
- drivers/net/ethernet/intel/ice/ice.h      |  2 ++
- drivers/net/ethernet/intel/ice/ice_lib.c  | 23 ++++++++++---
- drivers/net/ethernet/intel/ice/ice_main.c | 39 ++++++++++++++++++++---
- drivers/net/ethernet/intel/ice/ice_xsk.c  | 13 ++------
- 4 files changed, 57 insertions(+), 20 deletions(-)
+Double-checked that part. Indeed this is what I forgot to take into
+account. (Just realized I had a glimpse thought about checking the DW
+xGMAC/XPCS for supporting the SGMII interface, but the thought got
+away from my mind forgotten.) DW XPCS can be synthesized with having
+the GMII/MII interface connected to the MAC and SGMII downstream
+interface over a single 1000Base-X lane.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 701a61d791dd..7c1e24afa34b 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -307,6 +307,7 @@ enum ice_pf_state {
- 	ICE_PHY_INIT_COMPLETE,
- 	ICE_FD_VF_FLUSH_CTX,		/* set at FD Rx IRQ or timeout */
- 	ICE_AUX_ERR_PENDING,
-+	ICE_RTNL_WAITS_FOR_RESET,
- 	ICE_STATE_NBITS		/* must be last */
- };
- 
-@@ -941,6 +942,7 @@ int ice_prepare_xdp_rings(struct ice_vsi *vsi, struct bpf_prog *prog,
- 			  enum ice_xdp_cfg cfg_type);
- int ice_destroy_xdp_rings(struct ice_vsi *vsi, enum ice_xdp_cfg cfg_type);
- void ice_map_xdp_rings(struct ice_vsi *vsi);
-+bool ice_rebuild_pending(struct ice_vsi *vsi);
- int
- ice_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
- 	     u32 flags);
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 7629b0190578..a5dc6fc6e63d 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -2426,7 +2426,10 @@ void ice_vsi_decfg(struct ice_vsi *vsi)
- 		dev_err(ice_pf_to_dev(pf), "Failed to remove RDMA scheduler config for VSI %u, err %d\n",
- 			vsi->vsi_num, err);
- 
--	if (ice_is_xdp_ena_vsi(vsi))
-+	/* xdp_rings can be absent, if program was attached amid reset,
-+	 * VSI rebuild is supposed to create them later
-+	 */
-+	if (ice_is_xdp_ena_vsi(vsi) && vsi->xdp_rings)
- 		/* return value check can be skipped here, it always returns
- 		 * 0 if reset is in progress
- 		 */
-@@ -2737,12 +2740,24 @@ ice_queue_set_napi(struct ice_vsi *vsi, unsigned int queue_index,
- 	if (current_work() == &pf->serv_task ||
- 	    test_bit(ICE_PREPARED_FOR_RESET, pf->state) ||
- 	    test_bit(ICE_DOWN, pf->state) ||
--	    test_bit(ICE_SUSPENDED, pf->state))
-+	    test_bit(ICE_SUSPENDED, pf->state)) {
-+		bool rtnl_held_here = true;
-+
-+		while (!rtnl_trylock()) {
-+			if (test_bit(ICE_RTNL_WAITS_FOR_RESET, pf->state)) {
-+				rtnl_held_here = false;
-+				break;
-+			}
-+			usleep_range(1000, 2000);
-+		}
- 		__ice_queue_set_napi(vsi->netdev, queue_index, type, napi,
--				     false);
--	else
-+				     true);
-+		if (rtnl_held_here)
-+			rtnl_unlock();
-+	} else {
- 		__ice_queue_set_napi(vsi->netdev, queue_index, type, napi,
- 				     true);
-+	}
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 15a6805ac2a1..7724ed8fc1b1 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -2986,6 +2986,20 @@ static int ice_max_xdp_frame_size(struct ice_vsi *vsi)
- 		return ICE_RXBUF_3072;
- }
- 
-+/**
-+ * ice_rebuild_pending - ice_vsi_rebuild will be performed, when locks are released
-+ * @vsi: VSI to setup XDP for
-+ *
-+ * ice_vsi_close() in the reset path is called under rtnl_lock(),
-+ * so it happened strictly before or after .ndo_bpf().
-+ * In case it has happened before, we do not have anything attached to rings
-+ */
-+bool ice_rebuild_pending(struct ice_vsi *vsi)
-+{
-+	return ice_is_reset_in_progress(vsi->back->state) &&
-+	       !vsi->rx_rings[0]->desc;
-+}
-+
- /**
-  * ice_xdp_setup_prog - Add or remove XDP eBPF program
-  * @vsi: VSI to setup XDP for
-@@ -3009,7 +3023,7 @@ ice_xdp_setup_prog(struct ice_vsi *vsi, struct bpf_prog *prog,
- 	}
- 
- 	/* hot swap progs and avoid toggling link */
--	if (ice_is_xdp_ena_vsi(vsi) == !!prog) {
-+	if (ice_is_xdp_ena_vsi(vsi) == !!prog || ice_rebuild_pending(vsi)) {
- 		ice_vsi_assign_bpf_prog(vsi, prog);
- 		return 0;
- 	}
-@@ -3081,21 +3095,33 @@ static int ice_xdp(struct net_device *dev, struct netdev_bpf *xdp)
- {
- 	struct ice_netdev_priv *np = netdev_priv(dev);
- 	struct ice_vsi *vsi = np->vsi;
-+	struct ice_pf *pf = vsi->back;
-+	int ret;
- 
- 	if (vsi->type != ICE_VSI_PF) {
- 		NL_SET_ERR_MSG_MOD(xdp->extack, "XDP can be loaded only on PF VSI");
- 		return -EINVAL;
- 	}
- 
-+	while (test_and_set_bit(ICE_CFG_BUSY, pf->state)) {
-+		set_bit(ICE_RTNL_WAITS_FOR_RESET, pf->state);
-+		usleep_range(1000, 2000);
-+	}
-+	clear_bit(ICE_RTNL_WAITS_FOR_RESET, pf->state);
-+
- 	switch (xdp->command) {
- 	case XDP_SETUP_PROG:
--		return ice_xdp_setup_prog(vsi, xdp->prog, xdp->extack);
-+		ret = ice_xdp_setup_prog(vsi, xdp->prog, xdp->extack);
-+		break;
- 	case XDP_SETUP_XSK_POOL:
--		return ice_xsk_pool_setup(vsi, xdp->xsk.pool,
--					  xdp->xsk.queue_id);
-+		ret = ice_xsk_pool_setup(vsi, xdp->xsk.pool, xdp->xsk.queue_id);
-+		break;
- 	default:
--		return -EINVAL;
-+		ret = -EINVAL;
- 	}
-+
-+	clear_bit(ICE_CFG_BUSY, pf->state);
-+	return ret;
- }
- 
- /**
-@@ -7672,7 +7698,10 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- 		ice_gnss_init(pf);
- 
- 	/* rebuild PF VSI */
-+	while (test_and_set_bit(ICE_CFG_BUSY, pf->state))
-+		usleep_range(1000, 2000);
- 	err = ice_vsi_rebuild_by_type(pf, ICE_VSI_PF);
-+	clear_bit(ICE_CFG_BUSY, pf->state);
- 	if (err) {
- 		dev_err(dev, "PF VSI rebuild failed: %d\n", err);
- 		goto err_vsi_rebuild;
-diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
-index 225d027d3d7a..962af14f9fd5 100644
---- a/drivers/net/ethernet/intel/ice/ice_xsk.c
-+++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
-@@ -370,7 +370,6 @@ int ice_xsk_pool_setup(struct ice_vsi *vsi, struct xsk_buff_pool *pool, u16 qid)
- {
- 	bool if_running, pool_present = !!pool;
- 	int ret = 0, pool_failure = 0;
--	struct ice_pf *pf = vsi->back;
- 
- 	if (qid >= vsi->num_rxq || qid >= vsi->num_txq) {
- 		netdev_err(vsi->netdev, "Please use queue id in scope of combined queues count\n");
-@@ -378,18 +377,11 @@ int ice_xsk_pool_setup(struct ice_vsi *vsi, struct xsk_buff_pool *pool, u16 qid)
- 		goto failure;
- 	}
- 
--	if_running = netif_running(vsi->netdev) && ice_is_xdp_ena_vsi(vsi);
-+	if_running = !ice_rebuild_pending(vsi) &&
-+		     (netif_running(vsi->netdev) && ice_is_xdp_ena_vsi(vsi));
- 
- 	if (if_running) {
- 		struct ice_rx_ring *rx_ring = vsi->rx_rings[qid];
--		int timeout = 50;
--
--		while (test_and_set_bit(ICE_CFG_BUSY, pf->state)) {
--			timeout--;
--			if (!timeout)
--				return -EBUSY;
--			usleep_range(1000, 2000);
--		}
- 
- 		ret = ice_qp_dis(vsi, qid);
- 		if (ret) {
-@@ -412,7 +404,6 @@ int ice_xsk_pool_setup(struct ice_vsi *vsi, struct xsk_buff_pool *pool, u16 qid)
- 			napi_schedule(&vsi->rx_rings[qid]->xdp_ring->q_vector->napi);
- 		else if (ret)
- 			netdev_err(vsi->netdev, "ice_qp_ena error = %d\n", ret);
--		clear_bit(ICE_CFG_BUSY, pf->state);
- 	}
- 
- failure:
--- 
-2.34.1
+In anyway AFAICS that case has nothing to do with the PCS embedded
+into the DW GMAC or DW QoS Eth synthesized with the SGMII support. DW
+XGMAC has no embedded PCS, but could be attached to the separate DW
+XPCS device.
 
+About the correct implementation. Right, priv->dma_cap.pcs indicates
+that there is an embedded PCS and the flag can be set for DW GMAC or DW
+QoS Eth only. Although I would change the order:
+
+       if (phy_interface_mode_is_rgmii(interface))
+               priv->hw->pcs = STMMAC_PCS_RGMII;
+       else if (priv->dma_cap.pcs && interface == PHY_INTERFACE_MODE_SGMII)
+               priv->hw->pcs = STMMAC_PCS_SGMII;
+
+since priv->dma_cap.pcs is a primary flag. If it isn't set the
+interface will be irrelevant.
+
+Alternative solution could be to use the has_gmac/has_gmac4 flags
+instead. That will emphasize that the embedded PCS is expected to be
+specific for the DW GMAC and DW QoS Eth IP-cores:
+
+       if (phy_interface_mode_is_rgmii(interface))
+               priv->hw->pcs = STMMAC_PCS_RGMII;
+       else if ((priv->plat.has_gmac || priv->plat.has_gmac4) &&
+		interface == PHY_INTERFACE_MODE_SGMII)
+               priv->hw->pcs = STMMAC_PCS_SGMII;
+
+-Serge(y)
+
+> 
+> If my analysis is correct, then my changes to stmmac_mac_select_pcs()
+> are also wrong.
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
