@@ -1,231 +1,109 @@
-Return-Path: <netdev+bounces-98560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 126588D1C19
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 15:05:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91D9A8D1C20
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 15:05:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3544E1C23383
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:05:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35A4C1F24844
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:05:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46E6D16DEDB;
-	Tue, 28 May 2024 13:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4891116C680;
+	Tue, 28 May 2024 13:04:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="6V1EhJmy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KuxyHWTp"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881F316DEA0;
-	Tue, 28 May 2024 13:02:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A071616ABC2;
+	Tue, 28 May 2024 13:04:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716901370; cv=none; b=KoE7mCatbBJXN9RHBHOcKXMf7nw+Kh07cbPm/OyLRE0vDpT9BXR5shT7y4Upqhnt/XCJQbQZwryBHYia1pdPRcoOapZvBu3Ho7xXQ3ajBEXckUiiapcN3mSpKz8Kp4FONWWLY+xMC71KP2JZhoX2HGQxR0EKYWgx7S5UmJsjyG4=
+	t=1716901449; cv=none; b=F0dB6Yke/TtWdSuW73MhLy5RL6XWfSqlvJVatvUz1l2MhRxii2eRlmofhEcpYePuaAqmvExRPnrXEyiPbWcwTTr4jr3EKUGbgthgqpe633x+yxgBeb0675gY85l84j03eyOesK3ENFDgEzbyXajoZhr3IO0Iumt+DPeEQBSYlHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716901370; c=relaxed/simple;
-	bh=BlS+RNoJZf7uRqH8yZdZgXZub+cVsj79b4zET2aARhg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L63zuDOHKdshXj0GrTi93p+DJIcyUQQK+PC3BmTgZkLrPyZzDNK/Hn1TqmtEeNlngCAdCT8QwsB9ol95GKyI3D540CdoX0Ytphv7dYHxI+W/gRJZ2swiwq2NQrbEVzobBfZIZjTywPx6UBcwGgM0ZuGFSRUey4YGYiM6Nodc2bE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=6V1EhJmy; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+woYX1uxkRDOXtBX1F1Aj3xr5QPBx2mr8y8wsI+bzIE=; b=6V1EhJmyF5HfLnX+zuf7uLpRue
-	nlyqWF2L8F2B3o2iUCjLTwVrj9Gr6/QiCMSZmIJpMa/0oaAZQ2K96tk7ylb+MYbuE+XJjAzlezgkF
-	dSa55z+3D/HDINRKUK0OZS/AsebKBWHMMOlEm+MINfSyPY+d/VuH9uqfbJJu+5xWLlNU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sBwT3-00G9k6-EI; Tue, 28 May 2024 15:02:17 +0200
-Date: Tue, 28 May 2024 15:02:17 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Ng, Boon Khai" <boon.khai.ng@intel.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Ang, Tien Sung" <tien.sung.ang@intel.com>,
-	"G Thomas, Rohan" <rohan.g.thomas@intel.com>,
-	"Looi, Hong Aun" <hong.aun.looi@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Ilpo Jarvinen <ilpo.jarvinen@linux.intel.com>
-Subject: Re: [Enable Designware XGMAC VLAN Stripping Feature v2 1/1] net:
- stmmac: dwxgmac2: Add support for HW-accelerated VLAN Stripping
-Message-ID: <48673551-cada-4194-865f-bc04c1e19c29@lunn.ch>
-References: <20240527093339.30883-1-boon.khai.ng@intel.com>
- <20240527093339.30883-2-boon.khai.ng@intel.com>
- <48176576-e1d2-4c45-967a-91cabb982a21@lunn.ch>
- <DM8PR11MB5751469FAA2B01EB6CEB7B50C1F12@DM8PR11MB5751.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1716901449; c=relaxed/simple;
+	bh=gAEKf8Z+F5p2sZQPDJyxTDvSbnaMUp24oyvKsHM14oQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lfSJCOk1deY66dVAJI1jZQXhxjC/bLXZwxM9Hn6Z4SxlRJiqa8y9eN4AGKBUyAK4wXYGEoc4uw87bWaOGWK54z768yyN7rgpex5tGsQhFDDI9qcrrDafon5X0maH6qkkNdUmtMoZOp/qMJKspPPYlYLhAIPxWvpxlQa7BIuri28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KuxyHWTp; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-578972defb3so981771a12.2;
+        Tue, 28 May 2024 06:04:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716901446; x=1717506246; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dXOIV4+qVuK991jOKcYp0npCSTU6GZlvpKHpXDNtUgc=;
+        b=KuxyHWTpsCFWMz4HVl2j3J9qxfpiYqc/N/U1IJmn8XnhtFEnKcBonSbRgu3Tk1xqis
+         xF+77MtOsIsEYaCepVgtJm0L2WOEPobxArHcqJ9HqXgN7nc9SFyC9V/UAHoPZpgULFhg
+         EI+gNLMnQBcrNJf7VU4X/Dr/+crkgOY8VZM1nITMe1vFwCaw30YZSht4lUomLldRGZJH
+         tD2NRxMei/bl8o0vuwlEpNHoxL9nGTtvp6Y3J261+ROGCQCZdoNz7fEM74Ebqqb+87bO
+         AOOYc7ovaBkIqNr/f8sMv0duesCkcXSY4rbATB7T0N8vq5mNNDhOdHGDbKjmduz+EK9E
+         pEnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716901446; x=1717506246;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dXOIV4+qVuK991jOKcYp0npCSTU6GZlvpKHpXDNtUgc=;
+        b=o7xpDczlwTU/CHTMAP4x6zix6eG29pN25pDzWt3hswtlYn4mhCMuj8uHi6CipzChC1
+         w8zy8cDuj1s5yR7u/l53NJzMxD196jcJK0r7WFblmGtQhfffFGC1/x2rCrTzf9SRYMg3
+         irasEo93IgjIeS/0hk22huyPssGiZyH/LVbAEONK/d8q/xGfAiRkaEYkVvi3bDWoy7+8
+         z56uw5lKhw9s8rA+pQJoUIW4FDWvz3KjlR2svVpEi9o2gUIsODf86U1y4ALxcJ0hQgBZ
+         9YXMCOcSUsSYhWJE+qcNyOTDln5SecvPYu9owfIU5Jw8e26LCKokkCBxWdsfTT4361NE
+         pmvA==
+X-Forwarded-Encrypted: i=1; AJvYcCWp7dYumSD9L0jvWZG6uNMjwp7BVrhzlMfd+3TzPypAds5O0C6ZJIDKFzeY4FAXVoS2AujaN4KaN8ltIVlytFpVvKsPxmDL6Fc4CZs2UaJ0DtiygMt9euR15iMmAQRmhon0ldDW
+X-Gm-Message-State: AOJu0Yxpt17qOH+J/12EFL7c8KFwo2YXWQIawa4+p4q9zBH1anu+CnUt
+	zR88hdfX7BtrffKCOgCOqPb77850pVwmxMguMyOK3jiGuvTTDWr/
+X-Google-Smtp-Source: AGHT+IESrdIhLtzVi/G2Tg9eE5yLlAyPb2ZszMAvl2LCkGOLnB/QQlFURAPT0PzaWcJARBUchF9oew==
+X-Received: by 2002:a50:ccd3:0:b0:573:4f61:ca9c with SMTP id 4fb4d7f45d1cf-57862e12a13mr6381459a12.4.1716901445833;
+        Tue, 28 May 2024 06:04:05 -0700 (PDT)
+Received: from LPPLJK6X5M3.. (dynamic-78-8-96-206.ssp.dialog.net.pl. [78.8.96.206])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57997181419sm4708805a12.54.2024.05.28.06.04.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 May 2024 06:04:05 -0700 (PDT)
+From: Radoslaw Zielonek <radoslaw.zielonek@gmail.com>
+To: vladimir.oltean@nxp.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	radoslaw.zielonek@gmail.com,
+	syzbot+a7d2b1d5d1af83035567@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	vinicius.gomes@intel.com,
+	willemdebruijn.kernel@gmail.com
+Subject: Re: [syzbot] [net?] INFO: rcu detected stall in packet_release
+Date: Tue, 28 May 2024 15:03:25 +0200
+Message-ID: <20240528130331.21904-2-radoslaw.zielonek@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240528125526.qwskv756uya3zaqb@skbuf>
+References: <20240528125526.qwskv756uya3zaqb@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM8PR11MB5751469FAA2B01EB6CEB7B50C1F12@DM8PR11MB5751.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-> So, for this XGMAC VLAN patch, the idea of getting the VLAN id from the descriptor is the same, but 
-> The register bit filed of getting the VLAN packet VALID is different. Thus, it need to be implemented separately. 
+Hello,
 
-Please wrap your emails to around 78 characters.
+Ah, sorry. I didn't notice that.
+The PoC has been tested by syzbot
+	[https://syzkaller.appspot.com/bug?extid=c4c6c3dc10cc96bcf723]
+	
+The full link:
+	[https://lore.kernel.org/all/00000000000089427c0614c18cf4@google.com/T/]
 
-It is well know this driver is a mess. I just wanted to check you are
-not adding to be mess by simply cut/pasting rather than refactoring
-code.
+Radosław.
 
-Lets look at the code. From your patch:
-
-+static void dwxgmac2_rx_hw_vlan(struct mac_device_info *hw,
-+				struct dma_desc *rx_desc, struct sk_buff *skb)
-+{
-+	if (hw->desc->get_rx_vlan_valid(rx_desc)) {
-+		u16 vid = hw->desc->get_rx_vlan_tci(rx_desc);
-+
-+		__vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q), vid);
-+	}
-+}
-+
-
-and
-
-static void dwmac4_rx_hw_vlan(struct mac_device_info *hw,
-                              struct dma_desc *rx_desc, struct sk_buff *skb)
-{
-        if (hw->desc->get_rx_vlan_valid(rx_desc)) {
-                u16 vid = hw->desc->get_rx_vlan_tci(rx_desc);
-
-                __vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q), vid);
-        }
-}
-
-Looks identical to me.
-
-From your patch:
-
-static void dwxgmac2_set_hw_vlan_mode(struct mac_device_info *hw)
-+{
-+	void __iomem *ioaddr = hw->pcsr;
-+	u32 val = readl(ioaddr + XGMAC_VLAN_TAG);
-+
-+	val &= ~XGMAC_VLAN_TAG_CTRL_EVLS_MASK;
-+
-+	if (hw->hw_vlan_en)
-+		/* Always strip VLAN on Receive */
-+		val |= XGMAC_VLAN_TAG_STRIP_ALL;
-+	else
-+		/* Do not strip VLAN on Receive */
-+		val |= XGMAC_VLAN_TAG_STRIP_NONE;
-+
-+	/* Enable outer VLAN Tag in Rx DMA descriptro */
-+	val |= XGMAC_VLAN_TAG_CTRL_EVLRXS;
-+	writel(val, ioaddr + XGMAC_VLAN_TAG);
-+}
-
-static void dwmac4_set_hw_vlan_mode(struct mac_device_info *hw)
-{
-        void __iomem *ioaddr = hw->pcsr;
-        u32 value = readl(ioaddr + GMAC_VLAN_TAG);
-
-        value &= ~GMAC_VLAN_TAG_CTRL_EVLS_MASK;
-
-        if (hw->hw_vlan_en)
-                /* Always strip VLAN on Receive */
-                value |= GMAC_VLAN_TAG_STRIP_ALL;
-        else
-                /* Do not strip VLAN on Receive */
-                value |= GMAC_VLAN_TAG_STRIP_NONE;
-
-        /* Enable outer VLAN Tag in Rx DMA descriptor */
-        value |= GMAC_VLAN_TAG_CTRL_EVLRXS;
-        writel(value, ioaddr + GMAC_VLAN_TAG);
-}
-
-The basic flow is the same. Lets look at the #defines:
-
-#define XGMAC_VLAN_TAG			0x00000050
-#define GMAC_VLAN_TAG			0x00000050
-
-#define GMAC_VLAN_TAG_CTRL_EVLS_MASK	GENMASK(22, 21)
-#define GMAC_VLAN_TAG_CTRL_EVLS_SHIFT	21
-+#define XGMAC_VLAN_TAG_CTRL_EVLS_MASK	GENMASK(22, 21)
-+#define XGMAC_VLAN_TAG_CTRL_EVLS_SHIFT	21
-
-+#define XGMAC_VLAN_TAG_STRIP_NONE	FIELD_PREP(XGMAC_VLAN_TAG_CTRL_EVLS_MASK, 0x0)
-+#define XGMAC_VLAN_TAG_STRIP_PASS	FIELD_PREP(XGMAC_VLAN_TAG_CTRL_EVLS_MASK, 0x1)
-+#define XGMAC_VLAN_TAG_STRIP_FAIL	FIELD_PREP(XGMAC_VLAN_TAG_CTRL_EVLS_MASK, 0x2)
-+#define XGMAC_VLAN_TAG_STRIP_ALL	FIELD_PREP(XGMAC_VLAN_TAG_CTRL_EVLS_MASK, 0x3)
-#define GMAC_VLAN_TAG_STRIP_NONE        (0x0 << GMAC_VLAN_TAG_CTRL_EVLS_SHIFT)
-#define GMAC_VLAN_TAG_STRIP_PASS        (0x1 << GMAC_VLAN_TAG_CTRL_EVLS_SHIFT)
-#define GMAC_VLAN_TAG_STRIP_FAIL        (0x2 << GMAC_VLAN_TAG_CTRL_EVLS_SHIFT)
-#define GMAC_VLAN_TAG_STRIP_ALL         (0x3 << GMAC_VLAN_TAG_CTRL_EVLS_SHIFT)
-
-This is less obvious a straight cut/paste, but they are in fact
-identical.
-
-#define GMAC_VLAN_TAG_CTRL_EVLRXS       BIT(24)
-#define XGMAC_VLAN_TAG_CTRL_EVLRXS	BIT(24)
-
-So this also looks identical to me, but maybe i'm missing something
-subtle.
-
-+static inline u16 dwxgmac2_wrback_get_rx_vlan_tci(struct dma_desc *p)
-+{
-+	return le32_to_cpu(p->des0) & XGMAC_RDES0_VLAN_TAG_MASK;
-+}
-+
-
-static u16 dwmac4_wrback_get_rx_vlan_tci(struct dma_desc *p)
-{
-        return (le32_to_cpu(p->des0) & RDES0_VLAN_TAG_MASK);
-}
-
-#define RDES0_VLAN_TAG_MASK		GENMASK(15, 0)
-#define XGMAC_RDES0_VLAN_TAG_MASK	GENMASK(15, 0)
-
-More identical code.
-
-+static inline bool dwxgmac2_wrback_get_rx_vlan_valid(struct dma_desc *p)
-+{
-+	u32 et_lt;
-+
-+	et_lt = FIELD_GET(XGMAC_RDES3_ET_LT, le32_to_cpu(p->des3));
-+
-+	return et_lt >= XGMAC_ET_LT_VLAN_STAG &&
-+	       et_lt <= XGMAC_ET_LT_DVLAN_STAG_CTAG;
-+}
-
-static bool dwmac4_wrback_get_rx_vlan_valid(struct dma_desc *p)
-{
-        return ((le32_to_cpu(p->des3) & RDES3_LAST_DESCRIPTOR) &&
-                (le32_to_cpu(p->des3) & RDES3_RDES0_VALID));
-}
-
-#define RDES3_RDES0_VALID		BIT(25)
-#define RDES3_LAST_DESCRIPTOR		BIT(28)
-
-#define XGMAC_RDES3_ET_LT		GENMASK(19, 16)
-+#define XGMAC_ET_LT_VLAN_STAG		8
-+#define XGMAC_ET_LT_VLAN_CTAG		9
-+#define XGMAC_ET_LT_DVLAN_CTAG_CTAG	10
-
-This does actually look different.
-
-Please take a step back and see if you can help clean up some of the
-mess in this driver by refactoring bits of identical code, rather than
-copy/pasting it.
-
-	Andrew
 
