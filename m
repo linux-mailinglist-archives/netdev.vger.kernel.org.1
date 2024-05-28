@@ -1,133 +1,116 @@
-Return-Path: <netdev+bounces-98695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 329548D21C3
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:38:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF22A8D21C7
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:39:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7D60B2414F
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:38:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94D4F289756
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:39:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6DA16D4FF;
-	Tue, 28 May 2024 16:38:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B0DA172BC9;
+	Tue, 28 May 2024 16:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S2vVLlGU"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="FKd0jzub"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2AA170821
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 16:38:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F2F170821
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 16:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716914322; cv=none; b=f/0nn3c+2+bWrs0qAqYgwWbHHD5bj2gnHz3Sn16A6nJFr1KldsCTfb3CIY3ME98gbUJoq9wGtPwtAozgPc/Xw2vEGcAX9n4zYe+Zt1TgmFNHkAbOvjwcZbyzo1BnwyunIIdZzBJL/sNn5q8Cl7BhM3iOHpfWonMT5lLTxxgDkE8=
+	t=1716914344; cv=none; b=dy/e4rJ8lKFTUqB5l8IjiqW9Ns/CZfVeQcSjAX8k0h5mz8UHA/iO9HGGw0JuZk6IQODpPiJ6H6oqyl/tdkciq5YU/7tcMr9gOmkzhvVj/o/HqFapbCjkGgOf/oTsii11BLMK830abZIOtXCGMH8jDSsQLNaLFnUQqIxpxvP3Pgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716914322; c=relaxed/simple;
-	bh=vLN2BaDwrlAwuwEYjaJlHgtpy0dmxixTxudu2ogMhPg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FHvU5iO9vc2m+1vAQS8kl+FjTeDJmGD+V23635/P1wy8SIs3xRuOG5atzEMme0RH6qdfmjPyTYmtnRD6kW3zQk6jelt+5qa7tPwihfWLOnI7KoFSeJfJpojybVOoOzzr8MdfywMKmPCH8XLawxPeZb/F0L7JHLuA0WCxwLF2+Ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S2vVLlGU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716914319;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vLN2BaDwrlAwuwEYjaJlHgtpy0dmxixTxudu2ogMhPg=;
-	b=S2vVLlGUBcUvPxAcmmGYJn5rZdg1Z4Fg/TJhu+bsoIz0N8G3B//JAZZ8IgJsYH/ioRM68z
-	YwdJrXBj2ENOl6BPnVoLZeqQzNP4iYekpybjcrrAzkLRxvyIw7uTlGBgA5MnIde8cWCP9A
-	qV672IizqfCYpS45m4zHmXOquY/4K70=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-497-bqPmeFAFMRiti5hu7jRhjw-1; Tue, 28 May 2024 12:38:38 -0400
-X-MC-Unique: bqPmeFAFMRiti5hu7jRhjw-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-354fc05816dso635502f8f.1
-        for <netdev@vger.kernel.org>; Tue, 28 May 2024 09:38:38 -0700 (PDT)
+	s=arc-20240116; t=1716914344; c=relaxed/simple;
+	bh=Nw71NudQFvADv7Bhi1iggO+PhwrkQU+67xNone5Hy5g=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rlbEJVDDaNKAYFxNpLTrfkb1achMbnDnSySElk9EquXzkSdBRs/naG8TODqIJS4onloGBesMJhw0vFmDP74wyeHTRDEG6ipubLBuaDcvdn9JLCvo7hW1PpZauwu/6z8JFkheVp95A1NzT9fAyFUrB40UrUY18yUe5I6wOBcACCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=FKd0jzub; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-35507a3a038so635615f8f.0
+        for <netdev@vger.kernel.org>; Tue, 28 May 2024 09:39:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1716914340; x=1717519140; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=v5tCjk/1mXFG8ICJoXb/9fn8uz0vdilIBJSVF/91XJA=;
+        b=FKd0jzub8kIVR3/Z/s1Xpf/2ylEVZ4DMbb8y+jTwQUtFFykMKSuvX7KeM+9MqodSLf
+         THgfxgxjTPhw1GIjVeCjN3nvyOrf4ayrrwcto8NFqrsqVn/C5sXBPbuWCn7//cWMVzjY
+         K0q5J+88G1/HxivvpJhodn4hcO1ox7r9QF0iLj7kcuhBA1EX8xBUoshdse3qSirYysFj
+         jDIsilJbyQ1eGPZAqEKqxFDmo9Oy9KlD1ZGqcBXiR0InM27ItfDs+PQjt/MDPu5tdiqc
+         zk77djvbppg5g7aWZnKgn3hPn9mne9b37sJEbD1wiVPFwR02eeJQJLSulrdmd9q/w6mw
+         Ftdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716914317; x=1717519117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vLN2BaDwrlAwuwEYjaJlHgtpy0dmxixTxudu2ogMhPg=;
-        b=gbAZsRIMR3cDM/hDp3EcZD/CkP4tV5pMYThI+GrPb6+6aABo+ejpIIRyvSywCxnAMy
-         Xs8VvzSRH5qcmOAbgqK4F1IvTEAw5zEMPZvEDRyDaOyJyw+nXeMYkdALYjOsa8vM0AeS
-         v0KvINOXauFeF8rQH7SZTJTdvOdCmZXjWOEgguGRvUUXmhW7JZCNMyjDMaGrOPe7lNaB
-         a8TM87dYq1UVPQqAI3KFx+Md70vUxtT0sOT/AIpVp5hihjqJuUlo7eyGrsve/gCdmGXX
-         CFa2py5rCvFqY9ZOg76xDoaj5TjNKVfgFQrz1WprmzbGFBsndUxb5DeE/3pmoEM6ydFU
-         ORpw==
-X-Forwarded-Encrypted: i=1; AJvYcCWu2eOJc0WMYXPwiobzSmVwLqr/KwHJlL/txaYLE85FwyDeYAEKnJVBPd99fGmWPR/H1i7xhuXAENHgCj8qFpN5OaRZo2H0
-X-Gm-Message-State: AOJu0YzI0nxsrbWQbmTrhlRzng3d5hbNIbs0xh+sn++zWkYG2gMlZpn0
-	D5VropD25yrwvXUBHhGdGskR9SfFCrjVPS93p1ZsxH2lr3/F3tEBIzmbZviEUggVbOjGzAp/0p8
-	LVe1cYiVpaOKFYRQjUOs+yNQECJ+atTm8mtqjfbb8NjAA2Kufa4JAMlPFCPLUDHjWBKKX+VUFG3
-	tblo0tQgOYpoiwIqqW5DmBJhuT44aR
-X-Received: by 2002:a5d:4485:0:b0:357:7ae3:2de4 with SMTP id ffacd0b85a97d-3577ae3329dmr6214041f8f.26.1716914317210;
-        Tue, 28 May 2024 09:38:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFk5arn3m/7l032st6t5757/0oqsN6ZwCY+wuS7zQHVrYlAnd9RQ4SAOuKxztBIeXVlao5+naAjeWSM6dN+80M=
-X-Received: by 2002:a5d:4485:0:b0:357:7ae3:2de4 with SMTP id
- ffacd0b85a97d-3577ae3329dmr6214023f8f.26.1716914316802; Tue, 28 May 2024
- 09:38:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716914340; x=1717519140;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v5tCjk/1mXFG8ICJoXb/9fn8uz0vdilIBJSVF/91XJA=;
+        b=Q2CW+8hDDLse9KFur5PNqNrdxfnGtVYFrZlpfo0KIVDyf+yoJr7lB+iHdZLQp1MdQM
+         6DwbwhuId1Uvk9/b8lnuAJoT59T2IUTaRVwAsV4sfcmVpZe/Uzy6gHmBTD1fvEcHLylH
+         Y3jQ2k8Np0eayUc+xdzObVdH1ZrWncxnZ0AolDfS3vHJOmbSRV0lpjB+a1WoGdDoDHuG
+         LLxI/HejktnMdI0C9Q/oa8jCHS00xDM2/Zd0JE83NwGksiXnzqlX0K62nZbT8atiYGlK
+         olfJjlw3BixO+I5Yj5EiwlTiu/URbhREof+cpx8M68MmIP1/WmZSsuYjagB4ELFjzIim
+         lIWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWXdyKIUk0Ylc7lxthb0NPccoanKvnHs7Ey36q8Y04aBlICN43/UL7AqSes5kVe0ofXboYVnBKNLEMrNHuHwwsOhSxFd/0k
+X-Gm-Message-State: AOJu0YwlQFteL/oRuWIF278aMvFSTk/TTzD9+bsYCs0sx4BtRN/UyaZm
+	TYxBXO9V4U6Wwy5xqNz5D2K9q9xVb70bt2zYEwFmoSQszlq5S3Eopx1B3g/pCeY=
+X-Google-Smtp-Source: AGHT+IF8DHQjXjm4+wKe0ifxlTmxWtxEXH6QUsVsSV1wjDskW/0w+Mv9jPx+FLRiy5/C3+ovHz3OfA==
+X-Received: by 2002:adf:f38f:0:b0:354:f536:31d1 with SMTP id ffacd0b85a97d-35526c37b5dmr11901454f8f.25.1716914339930;
+        Tue, 28 May 2024 09:38:59 -0700 (PDT)
+Received: from localhost.localdomain (62.83.84.125.dyn.user.ono.com. [62.83.84.125])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3579354abd1sm8852837f8f.59.2024.05.28.09.38.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 May 2024 09:38:59 -0700 (PDT)
+From: Oscar Salvador <osalvador@suse.com>
+X-Google-Original-From: Oscar Salvador <osalvador@suse.de>
+Date: Tue, 28 May 2024 18:38:56 +0200
+To: syzbot <syzbot+d3fe2dc5ffe9380b714b@syzkaller.appspotmail.com>
+Cc: akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, muchun.song@linux.dev, netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [mm?] kernel BUG in __vma_reservation_common
+Message-ID: <ZlYIoPEq7avOkjCW@localhost.localdomain>
+References: <0000000000004096100617c58d54@google.com>
+ <000000000000f9561b06196ef5b3@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAFfO_h7xsn7Gsy7tFZU2UKcg_LCHY3M26iTuSyhFG-k-24h6_g@mail.gmail.com>
- <4i525r6irzjgibqqtrs3qzofqfifws2k3fmzotg37pyurs5wkd@js54ugamyyin>
- <CAFfO_h7iNYc3jrDvnAxTyaGWMxM9YK29DAGYux9s1ve32tuEBw@mail.gmail.com>
- <3a62a9d1-5864-4f00-bcf0-2c64552ee90c@csgraf.de> <6wn6ikteeanqmds2i7ar4wvhgj42pxpo2ejwbzz5t2i5cw3kov@omiadvu6dv6n>
- <5b3b1b08-1dc2-4110-98d4-c3bb5f090437@amazon.com> <554ae947-f06e-4b69-b274-47e8a78ae962@amazon.com>
- <14e68dd8-b2fa-496f-8dfc-a883ad8434f5@redhat.com> <c5wziphzhyoqb2mwzd2rstpotjqr3zky6hrgysohwsum4wvgi7@qmboatooyddd>
- <CABgObfasyA7U5Fg5r0gGoFAw73nwGJnWBYmG8vqf0hC2E8SPFw@mail.gmail.com> <sejux5gvpakaopre6mk3fyudi2f56hiuxuevfzay3oohg773kd@5odm3x3fryuq>
-In-Reply-To: <sejux5gvpakaopre6mk3fyudi2f56hiuxuevfzay3oohg773kd@5odm3x3fryuq>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 28 May 2024 18:38:24 +0200
-Message-ID: <CABgObfb-KrmJzr4YBtuN3+_HLm3S1hmjO7uEy0+AxSDeWE3uWg@mail.gmail.com>
-Subject: Re: How to implement message forwarding from one CID to another in
- vhost driver
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Alexander Graf <graf@amazon.com>, Alexander Graf <agraf@csgraf.de>, 
-	Dorjoy Chowdhury <dorjoychy111@gmail.com>, virtualization@lists.linux.dev, 
-	kvm@vger.kernel.org, netdev@vger.kernel.org, stefanha@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <000000000000f9561b06196ef5b3@google.com>
 
-On Tue, May 28, 2024 at 5:53=E2=80=AFPM Stefano Garzarella <sgarzare@redhat=
-.com> wrote:
->
-> On Tue, May 28, 2024 at 05:49:32PM GMT, Paolo Bonzini wrote:
-> >On Tue, May 28, 2024 at 5:41=E2=80=AFPM Stefano Garzarella <sgarzare@red=
-hat.com> wrote:
-> >> >I think it's either that or implementing virtio-vsock in userspace
-> >> >(https://lore.kernel.org/qemu-devel/30baeb56-64d2-4ea3-8e53-6a5c50999=
-979@redhat.com/,
-> >> >search for "To connect host<->guest").
-> >>
-> >> For in this case AF_VSOCK can't be used in the host, right?
-> >> So it's similar to vhost-user-vsock.
-> >
-> >Not sure if I understand but in this case QEMU knows which CIDs are
-> >forwarded to the host (either listen on vsock and connect to the host,
-> >or vice versa), so there is no kernel and no VMADDR_FLAG_TO_HOST
-> >involved.
->
-> I meant that the application in the host that wants to connect to the
-> guest cannot use AF_VSOCK in the host, but must use the one where QEMU
-> is listening (e.g. AF_INET, AF_UNIX), right?
->
-> I think one of Alex's requirements was that the application in the host
-> continue to use AF_VSOCK as in their environment.
+On Mon, May 27, 2024 at 05:50:24AM -0700, syzbot wrote:
+> syzbot has found a reproducer for the following issue on:
+> 
+> HEAD commit:    66ad4829ddd0 Merge tag 'net-6.10-rc1' of git://git.kernel...
+> git tree:       net-next
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=15c114aa980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=48c05addbb27f3b0
+> dashboard link: https://syzkaller.appspot.com/bug?extid=d3fe2dc5ffe9380b714b
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17770d72980000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10db1592980000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/05c6f2231ef8/disk-66ad4829.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/5f4fc63b22e3/vmlinux-66ad4829.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/67f5c4c88729/bzImage-66ad4829.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+d3fe2dc5ffe9380b714b@syzkaller.appspotmail.com
 
-Can the host use VMADDR_CID_LOCAL for host-to-host communication? If
-so, the proposed "-object vsock-forward" syntax can connect to it and
-it should work as long as the application on the host does not assume
-that it is on CID 3.
+#syz test https://github.com/leberus/linux.git hugetlb-vma_resv-enomem
+ 
 
-Paolo
-
+-- 
+Oscar Salvador
+SUSE Labs
 
