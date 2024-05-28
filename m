@@ -1,82 +1,44 @@
-Return-Path: <netdev+bounces-98794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BE268D2837
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 00:50:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5A038D2852
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 00:55:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 473372872E0
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 22:50:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C06B28150A
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 22:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E6113D8BF;
-	Tue, 28 May 2024 22:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hnMf/AG8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27AB213E41C;
+	Tue, 28 May 2024 22:55:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB98517E8F3;
-	Tue, 28 May 2024 22:49:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA99A8F49;
+	Tue, 28 May 2024 22:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716936601; cv=none; b=hYuJCgDlRoCRpVWaiManOuDIyeRKc7cEFkDdRB5ZG3noake4aQOqB8LenFYcyWvOHyGExYStPv/MD1PYVrOGDrUWHNrgw1UI2jtR8Bq5aTPBZXnSEUMBzs9hdmLKRBPeVPtsynmU45Cxlc3gbC3WsxbgTry6NEkWFSsnVk3rNuU=
+	t=1716936930; cv=none; b=D3LUFv30YM9Q7nY3vp3s5hkv5EE2RGWq17+bXqqSz6ppnmzyxGSVEkWBqIgc4ay+h4RsdSmyVF16rKAHDjn8EvEfjrb+Iw4xcqkbUb9oOeruSmrIpcj/jhYbhMppnG96aNk0RVNj4JAJLBsCuxfL5c5T5c4pWA328RuEOSOCXGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716936601; c=relaxed/simple;
-	bh=HVjwQji1/JSYOgzcTRTitZ6Txsm6oHkimP7gpL4FetY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HOydRwh8QHu7foCcTNJftdB0ekeG9PJ6CrZJPoA0yiD5OfZqd/JOfBXhITZu0iT/eFMgn2c0uwQjEdVLhDs9urD1WS2rfXQffic8tsYCMXPuBznCxXC9M66olZ4OB6isDCzgMnZLTfl0TdswRwcFYL2ESf32P6pti/umstcxEF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hnMf/AG8; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44SMZorS023663;
-	Tue, 28 May 2024 22:49:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=NsdqQeT1UR+7rNbM816y0Mg+ijPLk+fw56v
-	3sT9xdZ4=; b=hnMf/AG8fdQqIiE9JuRjHJipfkgbFdFoFmkWAxAYYzgQkBSG5kO
-	RoUAIZrH01bcAMak22hdoIwjsNeG6GJNAGvtvpy3II3Ee690t4icCVYGX02zGgsj
-	XzbLH4vpF6MJQE/Ojl6iDFbL5A8HK/5fDmUMBkNoSVcQDnxKvaVmjmukTkY/Wxtu
-	pSHNthfwiSfg3QbX4njNepyoHKIOcZszPKsbPHbOIun8EAPwlBNn68W32IzMadKQ
-	3zXFYtnibH1ml3bE6f22zONcGNPwK7GzaqkUoNWK42TKmEXwf1nlZ3wEf0XnO8Ep
-	u3sGtBNRUdGK8M5lOYfsI9hVXZXg2Yuge1w==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yba2pqhcs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 May 2024 22:49:38 +0000 (GMT)
-Received: from pps.filterd (NALASPPMTA03.qualcomm.com [127.0.0.1])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 44SMnbRn028559;
-	Tue, 28 May 2024 22:49:37 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 3ydm24snq6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 May 2024 22:49:37 +0000
-Received: from NALASPPMTA03.qualcomm.com (NALASPPMTA03.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44SMnb5J028552;
-	Tue, 28 May 2024 22:49:37 GMT
-Received: from hu-devc-lv-u20-a-new.qualcomm.com (hu-abchauha-lv.qualcomm.com [10.81.25.35])
-	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 44SMnaHL028547
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 28 May 2024 22:49:37 +0000
-Received: by hu-devc-lv-u20-a-new.qualcomm.com (Postfix, from userid 214165)
-	id 9E1AC220EE; Tue, 28 May 2024 15:49:35 -0700 (PDT)
-From: Abhishek Chauhan <quic_abchauha@quicinc.com>
-To: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        Martin KaFai Lau <martin.lau@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>
-Cc: kernel@quicinc.com, syzbot+d7b227731ec589e7f4f0@syzkaller.appspotmail.com,
-        syzbot+30a35a2e9c5067cc43fa@syzkaller.appspotmail.com
-Subject: [PATCH net] net: validate SO_TXTIME clockid coming from  userspace
-Date: Tue, 28 May 2024 15:49:35 -0700
-Message-Id: <20240528224935.1020828-1-quic_abchauha@quicinc.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1716936930; c=relaxed/simple;
+	bh=f7NcCWVoW/042CNhA7DgggRDBuBV1seISr10Qu1IlHc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jXrJKAaLj0h8DDZsqbo/50WaLQi12/dTdA27FiIVktkQ+N90R7zPGZFeuV4Fw3oD3qgBUc6KboaF1VbOw0FiJJURpScNJ++n0WIrsR4iMdhaDdD7mj4cNkOzqR6LTuHfw1OWWa5TNXiviJU0/AQWsfwUUY+PYGbJtVtof+dtTPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	kadlec@netfilter.org
+Subject: [PATCH net 0/6,v3] Netfilter fixes for net
+Date: Wed, 29 May 2024 00:55:13 +0200
+Message-Id: <20240528225519.1155786-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,76 +46,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: EGWJLU9TFkbIRV3A3z9Zb-IzLC_f9TYE
-X-Proofpoint-ORIG-GUID: EGWJLU9TFkbIRV3A3z9Zb-IzLC_f9TYE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-28_14,2024-05-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 spamscore=0 adultscore=0 clxscore=1011 bulkscore=0
- mlxscore=0 suspectscore=0 priorityscore=1501 phishscore=0 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2405280169
 
-Currently there are no strict checks while setting SO_TXTIME
-from userspace. With the recent development in skb->tstamp_type
-clockid with unsupported clocks results in warn_on_once, which causes
-unnecessary aborts in some systems which enables panic on warns.
+v3: fixes checkpatch warning in 4/6 on use of space instead of indentation.
 
-Add validation in setsockopt to support only CLOCK_REALTIME,
-CLOCK_MONOTONIC and CLOCK_TAI to be set from userspace.
+-o-
 
-Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
-Link: https://lore.kernel.org/lkml/20240509211834.3235191-1-quic_abchauha@quicinc.com/
-Fixes: 1693c5db6ab8 ("net: Add additional bit to support clockid_t timestamp type")
-Reported-by: syzbot+d7b227731ec589e7f4f0@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=d7b227731ec589e7f4f0
-Reported-by: syzbot+30a35a2e9c5067cc43fa@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=30a35a2e9c5067cc43fa
-Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
----
- net/core/sock.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Hi,
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 8629f9aecf91..f8374be9d8c9 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1083,6 +1083,17 @@ bool sockopt_capable(int cap)
- }
- EXPORT_SYMBOL(sockopt_capable);
- 
-+static int sockopt_validate_clockid(int value)
-+{
-+	switch (value) {
-+	case CLOCK_REALTIME:
-+	case CLOCK_MONOTONIC:
-+	case CLOCK_TAI:
-+		return 0;
-+	}
-+	return -EINVAL;
-+}
-+
- /*
-  *	This is meant for all protocols to use and covers goings on
-  *	at the socket level. Everything here is generic.
-@@ -1497,6 +1508,11 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 			ret = -EPERM;
- 			break;
- 		}
-+
-+		ret = sockopt_validate_clockid(sk_txtime.clockid);
-+		if (ret)
-+			break;
-+
- 		sock_valbool_flag(sk, SOCK_TXTIME, true);
- 		sk->sk_clockid = sk_txtime.clockid;
- 		sk->sk_txtime_deadline_mode =
--- 
-2.25.1
+The following patchset contains Netfilter fixes for net:
 
+Patch #1 syzbot reports that nf_reinject() could be called without
+         rcu_read_lock() when flushing pending packets at nfnetlink
+         queue removal, from Eric Dumazet.
+
+Patch #2 flushes ipset list:set when canceling garbage collection to
+         reference to other lists to fix a race, from Jozsef Kadlecsik.
+
+Patch #3 restores q-in-q matching with nft_payload by reverting
+         f6ae9f120dad ("netfilter: nft_payload: add C-VLAN support").
+
+Patch #4 fixes vlan mangling in skbuff when vlan offload is present
+         in skbuff, without this patch nft_payload corrupts packets
+         in this case.
+
+Patch #5 fixes possible nul-deref in tproxy no IP address is found in
+         netdevice, reported by syzbot and patch from Florian Westphal.
+
+Patch #6 removes a superfluous restriction which prevents loose fib
+         lookups from input and forward hooks, from Eric Garver.
+
+My assessment is that patches #1, #2 and #5 address possible kernel
+crash, anything else in this batch fixes broken features.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-05-29
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 4b377b4868ef17b040065bd468668c707d2477a5:
+
+  kprobe/ftrace: fix build error due to bad function definition (2024-05-17 19:17:55 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-24-05-29
+
+for you to fetch changes up to e8ded22ef0f4831279c363c264cd41cd9d59ca9e:
+
+  netfilter: nft_fib: allow from forward/input without iif selector (2024-05-29 00:37:51 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 24-05-29
+
+----------------------------------------------------------------
+Alexander Maltsev (1):
+      netfilter: ipset: Add list flush to cancel_gc
+
+Eric Dumazet (1):
+      netfilter: nfnetlink_queue: acquire rcu_read_lock() in instance_destroy_rcu()
+
+Eric Garver (1):
+      netfilter: nft_fib: allow from forward/input without iif selector
+
+Florian Westphal (1):
+      netfilter: tproxy: bail out if IP has been disabled on the device
+
+Pablo Neira Ayuso (2):
+      netfilter: nft_payload: restore vlan q-in-q match support
+      netfilter: nft_payload: skbuff vlan metadata mangle support
+
+ net/ipv4/netfilter/nf_tproxy_ipv4.c   |  2 +
+ net/netfilter/ipset/ip_set_list_set.c |  3 ++
+ net/netfilter/nfnetlink_queue.c       |  2 +
+ net/netfilter/nft_fib.c               |  8 ++-
+ net/netfilter/nft_payload.c           | 95 ++++++++++++++++++++++++++---------
+ 5 files changed, 82 insertions(+), 28 deletions(-)
 
