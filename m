@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-98740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99FE18D2420
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 21:10:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC3138D2424
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 21:10:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F14ECB24CFE
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 19:10:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF5631C25285
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 19:10:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758F518133B;
-	Tue, 28 May 2024 19:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91795181B9C;
+	Tue, 28 May 2024 19:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="FlOOkGUh"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="R38BqZDh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA58D1802D7
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 19:04:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE7A180A88
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 19:04:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716923049; cv=none; b=HJPKb3s4dfO0k0vmCMnKFcv0/ijNn2k0UFaPFwMmRUbicC/4UVy0UK2PUGvByt2ewrE445tbNUBtDelQ9PxdWwb41es2W8SbMLM+7avU3DUXInsDv+jt+0X5A12d1lNX0rSFscoOqAv4JWywtjTnyEyqjI7k6n3CujvqsKJWpOo=
+	t=1716923050; cv=none; b=sBUFoZKveeWqaOlszx14TbO5GNnlDolOO9akJ1FYJgTSNw28ROBVSvRXeuI1+HEs2Np5HYb8hfoXtpE5WrLbXdpigusS0/ilEn/FNQQbKbCEn/DqV7hb+1Vo7ZQqFITfkbz1YkRDXlo/wlvL+KPLU9l4dbvpmGtP+TCDKxElo2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716923049; c=relaxed/simple;
-	bh=BartmT5DS1lK4pSuVnVPX89bmS0yHe5OtotDQg/RFUY=;
+	s=arc-20240116; t=1716923050; c=relaxed/simple;
+	bh=oGqCjZoMtSrCwf8xbipdg0QeegidLEYbNGeloSkNMkY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=D8EGMZTBS2EU9EuCoKxOdX5hX/zgaukOcT0Y3pIWA6CoNZgVwGurm7+NZxr7D9TCUwX1hETiIon5pw5JzBUx5/mA17bK2jPV3FMNxki8sieTv3YtBpwHciVmyhcaIxfJ9yxF0YbMnUBK1/w6WfljUaKPGr/RVCdUFmYnI2FowdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=FlOOkGUh; arc=none smtp.client-ip=209.85.128.45
+	 In-Reply-To:To:Cc; b=tp9UUZXd++bY6ETRsqpjwhXGVp0mMb8E03dOTfUhz+PmndKnEZe5njla2E4CsbcckBiyZVxpfG/IyXS+4fT+Rz3JKQDgBpcerb6AojyfVdTe5CUxUbj3hiwgkmsWW1tsIfxUS4Mt6j4jN91XHq5aVcyWJ0nw7dzsg9TVDyAx3k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=R38BqZDh; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-421140314d5so8988595e9.0
-        for <netdev@vger.kernel.org>; Tue, 28 May 2024 12:04:04 -0700 (PDT)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4210c9d1df6so10136575e9.2
+        for <netdev@vger.kernel.org>; Tue, 28 May 2024 12:04:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1716923043; x=1717527843; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1716923044; x=1717527844; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=PThX05e0onCRUDI2ppsB5pScWa50ElSFSb2Z5rSSYFE=;
-        b=FlOOkGUhU6zUvD1oC3CFg5JSBkTkazihS4dWHGa9V3FSAdAZx9/yIGJKHtWZxhS0Pm
-         efMiik8oHzXr2BuwhFXzAdvNUbzEQIu3fqXoV0u4n3LDIsud0kTLMqI9PtKV7GT6uazQ
-         /Ztw8YcqzhiEEYdQIkQyF80ZBvgCyI2HZl9IDYKqsLrtOk5W1elHMIHF+VjFzj5S+8N6
-         t/bjJLdcFveJmyWL3FlkgOn16Ws9uYHKsK8EuqiSSPEyz6qxYnNQ3vDtHnVhlx+P2p8j
-         eEYJd4dW0sZqepnZwvL9gv5vaVH0MyTjcDLdGzX5sxgrDSy+RgVDCK0vpVRcFSd8Pb4U
-         XWjg==
+        bh=gFU0fFDLXBVTpEVhQ1putOMYxJzP0S29Lv1LacuJjZ8=;
+        b=R38BqZDhYNvR2rKNSmV0hLmvuMnuSYa1+tsiCVZyA63IxmjdJzuvLuqQuFtzLNn+XE
+         wEcngCulIRJz1lVeu0uMvJFkv0qngFax3d9huS2AsegvZ9yuPjYKvhUzNtK2jNWv1aCh
+         Tm35LZsDIce8vGMRm6JyYZjD0YQRk48MeqgQuX+eEe02UlrEwt+oMMfuTNc5VL9KlfX0
+         xoIFM/zUreqABkUuMexDadEtMHymoD8YleZ7VmyOo0CDl5GXG8c3UDouIBbqAylMdrwd
+         8Iv47hoF7h+whHEwp+CqNie1vidWQoWhgG0vSYEPiiuD6NWtDGchZMkaQ7PCpar4HP2o
+         FkPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716923043; x=1717527843;
+        d=1e100.net; s=20230601; t=1716923044; x=1717527844;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PThX05e0onCRUDI2ppsB5pScWa50ElSFSb2Z5rSSYFE=;
-        b=iM1n0xlqRCbI6IAU0z4rhd7DrWt5nmwB68SV0wcy2ehXDJrJjsebJzU4IYeJiZi1n4
-         cgcbq+F8EgHW1w3HmJI9ioC3vqesq+TFqeYKSLBxXaWVR9WJUwfSisRKJYtBh6HyucTW
-         PfPJRCzabb9Ei4eHIFdBgRSB//J5xkt6qrd3C/n9PT64pX06zPzAWRX1jGVQid8GafLN
-         ZHU/LNNwkzxgaYUJsY1stCxl/D0hX9LMLpUswz9K3PGHxE62T3oETerC5wBfrq2o8mJq
-         UAIse/YMo7elIv/C8qyfD27/6cF7zNu6gYMJBKS0flisx5T4Qay3M9e1qQ++eQ1xR68k
-         Mhcg==
-X-Forwarded-Encrypted: i=1; AJvYcCUnXj2IYn0sl6fxYDDNlGFJTiY9Q7/f50QTiO9iTxS0/U0uQ5IY7Zzd3z/kvwCb6GNGpDP4PT2I3yMNtT5pzkk4OtVbYjl6
-X-Gm-Message-State: AOJu0Yzsz14I1CQCgJZSDquB8CPDxDxTVjM+/eIQibmrXbXS3Gh9BuVN
-	lhZaR+bTGxGt2rgRjb/H8iIjCOViHRNTiteHJ5V87ZipDRpZGOEeVSCJrRGukXs=
-X-Google-Smtp-Source: AGHT+IFpoXv7JorC2vTGqWNHK6g6+zlkSpic0MX9ZzGWibakpIDlfQJPr1zxcWJkA/TKU4S3H+Am8g==
-X-Received: by 2002:a1c:7902:0:b0:41b:c024:8e88 with SMTP id 5b1f17b1804b1-42108a0dc79mr83136375e9.33.1716923042886;
-        Tue, 28 May 2024 12:04:02 -0700 (PDT)
+        bh=gFU0fFDLXBVTpEVhQ1putOMYxJzP0S29Lv1LacuJjZ8=;
+        b=B8zoJR8IMdYt7WujZUUjVaEitjMceevy3DnB87IA+5h1yxr61sZzCzTKv3bHYiwFO/
+         emX3x7Z/vDhsTyXsiaU4g6h6Y60SeI6044MVZs2YpAjo16HNBDYXPshAXLVF96C1y/Yk
+         NHrzXOEkhQtA16Orx3I+i0JOHhTkx8qS9n5nPpDfSMqJNKqREovn6Z2RhO8Bob+OJUdZ
+         s0p7e2kjcG9SnUzyY4kD61PIE0LZLOjfvJMNc/HRVOP+wOBhyvxemJmZbBw6wi8dbfzt
+         MCqTvcuJRJnl7LkR6+iw2ZM4NWQUt5l8V1QjmHiutv/Opx2RyTICUisKfK8TJ8vU9oaJ
+         XtlA==
+X-Forwarded-Encrypted: i=1; AJvYcCVCGoLJ7ZIHrVh8MJnsvo3v3I14FzTf8iy6zKMIVjNGedIW/ep3Fz+hcBcZ2cdtfCqvht2Me/8CfbMMP0ecx1B6zREzY/WI
+X-Gm-Message-State: AOJu0Yzm8YUUM6wf7fh7KSRngXaLnLPw59sm8bI9PTrUj2zCT3ssKvCr
+	67reJ2NtHMYOp14Xfy3BVyMT820HtMk6x1hVKWsyVOlUbc6k2rW5c6yoqOK4IbM=
+X-Google-Smtp-Source: AGHT+IG6B6kXReUvfOK7G13iUYw63mXLE+oQ5Xs7Zu/A92odTJ2Gt2f1pgs9Npx0RVH6n2yeZy3ueQ==
+X-Received: by 2002:a05:600c:5719:b0:420:173f:e1e9 with SMTP id 5b1f17b1804b1-421089e97bcmr91269195e9.21.1716923044209;
+        Tue, 28 May 2024 12:04:04 -0700 (PDT)
 Received: from [127.0.1.1] ([2a01:cb1d:75a:e000:93eb:927a:e851:8a2f])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42100ee954bsm183895415e9.4.2024.05.28.12.04.01
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42100ee954bsm183895415e9.4.2024.05.28.12.04.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 May 2024 12:04:02 -0700 (PDT)
+        Tue, 28 May 2024 12:04:03 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Tue, 28 May 2024 21:03:19 +0200
-Subject: [PATCH v8 11/17] power: pwrseq: add a driver for the PMU module on
- the QCom WCN chipsets
+Date: Tue, 28 May 2024 21:03:20 +0200
+Subject: [PATCH v8 12/17] PCI: hold the rescan mutex when scanning for the
+ first time
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,7 +79,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240528-pwrseq-v8-11-d354d52b763c@linaro.org>
+Message-Id: <20240528-pwrseq-v8-12-d354d52b763c@linaro.org>
 References: <20240528-pwrseq-v8-0-d354d52b763c@linaro.org>
 In-Reply-To: <20240528-pwrseq-v8-0-d354d52b763c@linaro.org>
 To: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
@@ -108,415 +108,51 @@ Cc: linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
  Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, kernel@quicinc.com, 
  Amit Pundir <amit.pundir@linaro.org>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=11550;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=914;
  i=bartosz.golaszewski@linaro.org; h=from:subject:message-id;
- bh=jLEALkdDV1rMFyF3hb6prlpC46U0AXMWBYqXGRzvM60=;
- b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBmViqPZHnQ6znFCNA9zNL4I2daI5VJTNDumNKK3
- jsLc8+T6T+JAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCZlYqjwAKCRARpy6gFHHX
- ckEkEACc6cecRaH2U1qD2v7W+Cm8zYrg+VJFjDkbD8dDq90jdku2XGxTWb6MVdekiSdmbAqhhOe
- DcaQYnchSI+VPfJQScGNKlROVDF4eRi74lKfuq8jzRdBSjHcef4ogfo0pWrzuONXUXjYyzr6r85
- PNhpIxEyTaVLDvVgYThfM6GkMn5EU0d92lV0zQEBzwzNpM35ERkgBHBQx41odITrImjSX0F3YnX
- wxmob1QbxEEdbuaamXxvwYjhWAmXY8R1Q+cB1w+zM90YilzGM5o0H1Eh1seHKOZncMzxdoLXcgc
- LrG7KhxopVBkz/x5gOcFQoMW02darZfh0ACHU+3Aq842PmZ/pF5hrqDhcT8HPUBP7lWSG9wIJfR
- MfqpVwUd6WQVek8WsIqbDXggJOPvhUWDwiXj95YF5pzbuBbJnOG61qfMXFlaktNm+v7Onhece2c
- Kut7jX6mjNCAIddlbjLQNuOvKET7YxCDch0YPc5aBXIwaTagq6xzgwZTcjo0DEOWxMAYFPLDHJX
- EjAIc05OlKc6+EWDFa8GXH+KwtNUBXHZ3cWpTGR7jQHtfRgokY+gRsKrPCj38VgiDRSMGQpDzBd
- 50w/ClXU72/0a3R0BtESm0jukRvIW1tBaA+jQRDqYnBwSCOHeSWGrKil/U5xTol9K5VgHQ64Xu4
- RZRVK2jbl7Rs+gg==
+ bh=kuyJTCA9fdYhUGDXvoePXqDSaNb9NruStgSbf5wa/1E=;
+ b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBmViqP/eY7rIuS/eQw4O3UlON8rwdGRoMGUP7rz
+ yzNVdBe65WJAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCZlYqjwAKCRARpy6gFHHX
+ cvKjD/9WKJ6xrPFHjBRP7ktzwHOQmaTfICHaHJtV3PV0foF3NVt3xBjv/3MfTIoDHxKL/27sUbX
+ AX0c1HDDrhyg+xUEwP3Ldeoi+bmJKHTPpBgTuLU0F9ax8+nQsFBoHyOQwaIFebtMFB0f8GE+xA0
+ jsxo/VePbSMksuxs1v066MNDPpVjKPx/BS6ZmdWbZU/Fhw/PA83vcPyKHyS+gSwR+/a6naEoIDG
+ /r4rQ1fIQMD+/LMFzTJYgTkk5dh96SRuGfQ0HgYSfbWr42EdZUbFyMDhgUiqQceMOBwexPlqd0J
+ BOASeFIGFOYM7lyG+0RBjDGGbtg9P3D8EF5EbrI5IMHMJGEPlOdEEHydvZ3irbtN/FdyTQcps60
+ W3h5F7J/GEci3w5eTef3u2+nLFBD7+v/IzE/U+e/ISniyUz+HOqEMZ2cfKGAqvzBXOFxzAONnzI
+ GUn45522td18GWGJ2IQq6PWkohJhco7ANiMaK/pwgGkemTt34e2f56iqSkaw2hhTnzrI1oaIP7K
+ SsLgff5wn0FMZqpU/xOqN1gUJ6dCL9fQiFa32Acmjqlhp9qs/MVZY6ri19ncKXCEPITAp6Qv/Rm
+ AK96m/GOCFcx5h2BnodJx318PL5gOmyFiDLn7oaEdmqmPq2rpC9akype843qdeE5gZ0F8jt0z/I
+ Tu7x3hngIac7MMA==
 X-Developer-Key: i=bartosz.golaszewski@linaro.org; a=openpgp;
  fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-This adds the power sequencing driver for the PMU modules present on the
-Qualcomm WCN Bluetooth and Wifi chipsets. It uses the pwrseq subsystem
-and knows how to match the sequencer to the consumer device by verifying
-the relevant properties and DT layout.
+With the introduction of PCI device power control drivers that will be
+able to trigger the port rescan when probing, we need to hold the rescan
+mutex during the initial pci_host_probe() too or the two could get in
+each other's way.
 
 Tested-by: Amit Pundir <amit.pundir@linaro.org>
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 ---
- drivers/power/sequencing/Kconfig           |  16 ++
- drivers/power/sequencing/Makefile          |   2 +
- drivers/power/sequencing/pwrseq-qcom-wcn.c | 336 +++++++++++++++++++++++++++++
- 3 files changed, 354 insertions(+)
+ drivers/pci/probe.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/power/sequencing/Kconfig b/drivers/power/sequencing/Kconfig
-index ba5732b1dbf8..f969374792f5 100644
---- a/drivers/power/sequencing/Kconfig
-+++ b/drivers/power/sequencing/Kconfig
-@@ -10,3 +10,19 @@ menuconfig POWER_SEQUENCING
- 	  during power-up.
+diff --git a/drivers/pci/probe.c b/drivers/pci/probe.c
+index 8e696e547565..604fc96b1098 100644
+--- a/drivers/pci/probe.c
++++ b/drivers/pci/probe.c
+@@ -3072,7 +3072,9 @@ int pci_host_probe(struct pci_host_bridge *bridge)
+ 	struct pci_bus *bus, *child;
+ 	int ret;
  
- 	  If unsure, say no.
-+
-+if POWER_SEQUENCING
-+
-+config POWER_SEQUENCING_QCOM_WCN
-+	tristate "Qualcomm WCN family PMU driver"
-+	default m if ARCH_QCOM
-+	help
-+	  Say Y here to enable the power sequencing driver for Qualcomm
-+	  WCN Bluetooth/WLAN chipsets.
-+
-+	  Typically, a package from the Qualcomm WCN family contains the BT
-+	  and WLAN modules whose power is controlled by the PMU module. As the
-+	  former two share the power-up sequence which is executed by the PMU,
-+	  this driver is needed for correct power control.
-+
-+endif
-diff --git a/drivers/power/sequencing/Makefile b/drivers/power/sequencing/Makefile
-index dcdf8c0c159e..2eec2df7912d 100644
---- a/drivers/power/sequencing/Makefile
-+++ b/drivers/power/sequencing/Makefile
-@@ -2,3 +2,5 @@
- 
- obj-$(CONFIG_POWER_SEQUENCING)		+= pwrseq-core.o
- pwrseq-core-y				:= core.o
-+
-+obj-$(CONFIG_POWER_SEQUENCING_QCOM_WCN)	+= pwrseq-qcom-wcn.o
-diff --git a/drivers/power/sequencing/pwrseq-qcom-wcn.c b/drivers/power/sequencing/pwrseq-qcom-wcn.c
-new file mode 100644
-index 000000000000..7e6391e1b33f
---- /dev/null
-+++ b/drivers/power/sequencing/pwrseq-qcom-wcn.c
-@@ -0,0 +1,336 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2024 Linaro Ltd.
-+ */
-+
-+#include <linux/clk.h>
-+#include <linux/delay.h>
-+#include <linux/device.h>
-+#include <linux/gpio/consumer.h>
-+#include <linux/jiffies.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/platform_device.h>
-+#include <linux/regulator/consumer.h>
-+#include <linux/pwrseq/provider.h>
-+#include <linux/string.h>
-+#include <linux/types.h>
-+
-+struct pwrseq_qcom_wcn_pdata {
-+	const char *const *vregs;
-+	size_t num_vregs;
-+	unsigned int pwup_delay_msec;
-+	unsigned int gpio_enable_delay;
-+};
-+
-+struct pwrseq_qcom_wcn_ctx {
-+	struct pwrseq_device *pwrseq;
-+	struct device_node *of_node;
-+	const struct pwrseq_qcom_wcn_pdata *pdata;
-+	struct regulator_bulk_data *regs;
-+	struct gpio_desc *bt_gpio;
-+	struct gpio_desc *wlan_gpio;
-+	struct clk *clk;
-+	unsigned long last_gpio_enable;
-+};
-+
-+static void pwrseq_qcom_wcn_ensure_gpio_delay(struct pwrseq_qcom_wcn_ctx *ctx)
-+{
-+	unsigned long diff_jiffies;
-+	unsigned int diff_msecs;
-+
-+	if (!ctx->pdata->gpio_enable_delay)
-+		return;
-+
-+	diff_jiffies = jiffies - ctx->last_gpio_enable;
-+	diff_msecs = jiffies_to_msecs(diff_jiffies);
-+
-+	if (diff_msecs < ctx->pdata->gpio_enable_delay)
-+		msleep(ctx->pdata->gpio_enable_delay - diff_msecs);
-+}
-+
-+static int pwrseq_qcom_wcn_vregs_enable(struct pwrseq_device *pwrseq)
-+{
-+	struct pwrseq_qcom_wcn_ctx *ctx = pwrseq_device_get_drvdata(pwrseq);
-+
-+	return regulator_bulk_enable(ctx->pdata->num_vregs, ctx->regs);
-+}
-+
-+static int pwrseq_qcom_wcn_vregs_disable(struct pwrseq_device *pwrseq)
-+{
-+	struct pwrseq_qcom_wcn_ctx *ctx = pwrseq_device_get_drvdata(pwrseq);
-+
-+	return regulator_bulk_disable(ctx->pdata->num_vregs, ctx->regs);
-+}
-+
-+static const struct pwrseq_unit_data pwrseq_qcom_wcn_vregs_unit_data = {
-+	.name = "regulators-enable",
-+	.enable = pwrseq_qcom_wcn_vregs_enable,
-+	.disable = pwrseq_qcom_wcn_vregs_disable,
-+};
-+
-+static int pwrseq_qcom_wcn_clk_enable(struct pwrseq_device *pwrseq)
-+{
-+	struct pwrseq_qcom_wcn_ctx *ctx = pwrseq_device_get_drvdata(pwrseq);
-+
-+	return clk_prepare_enable(ctx->clk);
-+}
-+
-+static int pwrseq_qcom_wcn_clk_disable(struct pwrseq_device *pwrseq)
-+{
-+	struct pwrseq_qcom_wcn_ctx *ctx = pwrseq_device_get_drvdata(pwrseq);
-+
-+	clk_disable_unprepare(ctx->clk);
-+
-+	return 0;
-+}
-+
-+static const struct pwrseq_unit_data pwrseq_qcom_wcn_clk_unit_data = {
-+	.name = "clock-enable",
-+	.enable = pwrseq_qcom_wcn_clk_enable,
-+	.disable = pwrseq_qcom_wcn_clk_disable,
-+};
-+
-+static const struct pwrseq_unit_data *pwrseq_qcom_wcn_unit_deps[] = {
-+	&pwrseq_qcom_wcn_vregs_unit_data,
-+	&pwrseq_qcom_wcn_clk_unit_data,
-+	NULL
-+};
-+
-+static int pwrseq_qcom_wcn_bt_enable(struct pwrseq_device *pwrseq)
-+{
-+	struct pwrseq_qcom_wcn_ctx *ctx = pwrseq_device_get_drvdata(pwrseq);
-+
-+	pwrseq_qcom_wcn_ensure_gpio_delay(ctx);
-+	gpiod_set_value_cansleep(ctx->bt_gpio, 1);
-+	ctx->last_gpio_enable = jiffies;
-+
-+	return 0;
-+}
-+
-+static int pwrseq_qcom_wcn_bt_disable(struct pwrseq_device *pwrseq)
-+{
-+	struct pwrseq_qcom_wcn_ctx *ctx = pwrseq_device_get_drvdata(pwrseq);
-+
-+	gpiod_set_value_cansleep(ctx->bt_gpio, 0);
-+
-+	return 0;
-+}
-+
-+static const struct pwrseq_unit_data pwrseq_qcom_wcn_bt_unit_data = {
-+	.name = "bluetooth-enable",
-+	.deps = pwrseq_qcom_wcn_unit_deps,
-+	.enable = pwrseq_qcom_wcn_bt_enable,
-+	.disable = pwrseq_qcom_wcn_bt_disable,
-+};
-+
-+static int pwrseq_qcom_wcn_wlan_enable(struct pwrseq_device *pwrseq)
-+{
-+	struct pwrseq_qcom_wcn_ctx *ctx = pwrseq_device_get_drvdata(pwrseq);
-+
-+	pwrseq_qcom_wcn_ensure_gpio_delay(ctx);
-+	gpiod_set_value_cansleep(ctx->wlan_gpio, 1);
-+	ctx->last_gpio_enable = jiffies;
-+
-+	return 0;
-+}
-+
-+static int pwrseq_qcom_wcn_wlan_disable(struct pwrseq_device *pwrseq)
-+{
-+	struct pwrseq_qcom_wcn_ctx *ctx = pwrseq_device_get_drvdata(pwrseq);
-+
-+	gpiod_set_value_cansleep(ctx->wlan_gpio, 0);
-+
-+	return 0;
-+}
-+
-+static const struct pwrseq_unit_data pwrseq_qcom_wcn_wlan_unit_data = {
-+	.name = "wlan-enable",
-+	.deps = pwrseq_qcom_wcn_unit_deps,
-+	.enable = pwrseq_qcom_wcn_wlan_enable,
-+	.disable = pwrseq_qcom_wcn_wlan_disable,
-+};
-+
-+static int pwrseq_qcom_wcn_pwup_delay(struct pwrseq_device *pwrseq)
-+{
-+	struct pwrseq_qcom_wcn_ctx *ctx = pwrseq_device_get_drvdata(pwrseq);
-+
-+	if (ctx->pdata->pwup_delay_msec)
-+		msleep(ctx->pdata->pwup_delay_msec);
-+
-+	return 0;
-+}
-+
-+static const struct pwrseq_target_data pwrseq_qcom_wcn_bt_target_data = {
-+	.name = "bluetooth",
-+	.unit = &pwrseq_qcom_wcn_bt_unit_data,
-+	.post_enable = pwrseq_qcom_wcn_pwup_delay,
-+};
-+
-+static const struct pwrseq_target_data pwrseq_qcom_wcn_wlan_target_data = {
-+	.name = "wlan",
-+	.unit = &pwrseq_qcom_wcn_wlan_unit_data,
-+	.post_enable = pwrseq_qcom_wcn_pwup_delay,
-+};
-+
-+static const struct pwrseq_target_data *pwrseq_qcom_wcn_targets[] = {
-+	&pwrseq_qcom_wcn_bt_target_data,
-+	&pwrseq_qcom_wcn_wlan_target_data,
-+	NULL
-+};
-+
-+static const char *const pwrseq_qca6390_vregs[] = {
-+	"vddio",
-+	"vddaon",
-+	"vddpmu",
-+	"vddrfa0p95",
-+	"vddrfa1p3",
-+	"vddrfa1p9",
-+	"vddpcie1p3",
-+	"vddpcie1p9",
-+};
-+
-+static const struct pwrseq_qcom_wcn_pdata pwrseq_qca6390_of_data = {
-+	.vregs = pwrseq_qca6390_vregs,
-+	.num_vregs = ARRAY_SIZE(pwrseq_qca6390_vregs),
-+	.pwup_delay_msec = 60,
-+	.gpio_enable_delay = 100,
-+};
-+
-+static const char *const pwrseq_wcn7850_vregs[] = {
-+	"vdd",
-+	"vddio",
-+	"vddio1p2",
-+	"vddaon",
-+	"vdddig",
-+	"vddrfa1p2",
-+	"vddrfa1p8",
-+};
-+
-+static const struct pwrseq_qcom_wcn_pdata pwrseq_wcn7850_of_data = {
-+	.vregs = pwrseq_wcn7850_vregs,
-+	.num_vregs = ARRAY_SIZE(pwrseq_wcn7850_vregs),
-+	.pwup_delay_msec = 50,
-+};
-+
-+static int pwrseq_qcom_wcn_match(struct pwrseq_device *pwrseq,
-+				 struct device *dev)
-+{
-+	struct pwrseq_qcom_wcn_ctx *ctx = pwrseq_device_get_drvdata(pwrseq);
-+	struct device_node *dev_node = dev->of_node;
-+
-+	/*
-+	 * The PMU supplies power to the Bluetooth and WLAN modules. both
-+	 * consume the PMU AON output so check the presence of the
-+	 * 'vddaon-supply' property and whether it leads us to the right
-+	 * device.
-+	 */
-+	if (!of_property_present(dev_node, "vddaon-supply"))
-+		return 0;
-+
-+	struct device_node *reg_node __free(device_node) =
-+			of_parse_phandle(dev_node, "vddaon-supply", 0);
-+	if (!reg_node)
-+		return 0;
-+
-+	/*
-+	 * `reg_node` is the PMU AON regulator, its parent is the `regulators`
-+	 * node and finally its grandparent is the PMU device node that we're
-+	 * looking for.
-+	 */
-+	if (!reg_node->parent || !reg_node->parent->parent ||
-+	    reg_node->parent->parent != ctx->of_node)
-+		return 0;
-+
-+	return 1;
-+}
-+
-+static int pwrseq_qcom_wcn_probe(struct platform_device *pdev)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct pwrseq_qcom_wcn_ctx *ctx;
-+	struct pwrseq_config config;
-+	int i, ret;
-+
-+	ctx = devm_kzalloc(dev, sizeof(*ctx), GFP_KERNEL);
-+	if (!ctx)
-+		return -ENOMEM;
-+
-+	ctx->of_node = dev->of_node;
-+
-+	ctx->pdata = of_device_get_match_data(dev);
-+	if (!ctx->pdata)
-+		return dev_err_probe(dev, -ENODEV,
-+				     "Failed to obtain platform data\n");
-+
-+	ctx->regs = devm_kcalloc(dev, ctx->pdata->num_vregs,
-+				 sizeof(*ctx->regs), GFP_KERNEL);
-+	if (!ctx->regs)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < ctx->pdata->num_vregs; i++)
-+		ctx->regs[i].supply = ctx->pdata->vregs[i];
-+
-+	ret = devm_regulator_bulk_get(dev, ctx->pdata->num_vregs, ctx->regs);
-+	if (ret < 0)
-+		return dev_err_probe(dev, ret,
-+				     "Failed to get all regulators\n");
-+
-+	ctx->bt_gpio = devm_gpiod_get_optional(dev, "bt-enable", GPIOD_OUT_LOW);
-+	if (IS_ERR(ctx->bt_gpio))
-+		return dev_err_probe(dev, PTR_ERR(ctx->bt_gpio),
-+				     "Failed to get the Bluetooth enable GPIO\n");
-+
-+	ctx->wlan_gpio = devm_gpiod_get_optional(dev, "wlan-enable",
-+						 GPIOD_OUT_LOW);
-+	if (IS_ERR(ctx->wlan_gpio))
-+		return dev_err_probe(dev, PTR_ERR(ctx->wlan_gpio),
-+				     "Failed to get the WLAN enable GPIO\n");
-+
-+	ctx->clk = devm_clk_get_optional(dev, NULL);
-+	if (IS_ERR(ctx->clk))
-+		return dev_err_probe(dev, PTR_ERR(ctx->clk),
-+				     "Failed to get the reference clock\n");
-+
-+	memset(&config, 0, sizeof(config));
-+
-+	config.parent = dev;
-+	config.owner = THIS_MODULE;
-+	config.drvdata = ctx;
-+	config.match = pwrseq_qcom_wcn_match;
-+	config.targets = pwrseq_qcom_wcn_targets;
-+
-+	ctx->pwrseq = devm_pwrseq_device_register(dev, &config);
-+	if (IS_ERR(ctx->pwrseq))
-+		return dev_err_probe(dev, PTR_ERR(ctx->pwrseq),
-+				     "Failed to register the power sequencer\n");
-+
-+	return 0;
-+}
-+
-+static const struct of_device_id pwrseq_qcom_wcn_of_match[] = {
-+	{
-+		.compatible = "qcom,qca6390-pmu",
-+		.data = &pwrseq_qca6390_of_data,
-+	},
-+	{
-+		.compatible = "qcom,wcn7850-pmu",
-+		.data = &pwrseq_wcn7850_of_data,
-+	},
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, pwrseq_qcom_wcn_of_match);
-+
-+static struct platform_driver pwrseq_qcom_wcn_driver = {
-+	.driver = {
-+		.name = "pwrseq-qcom_wcn",
-+		.of_match_table = pwrseq_qcom_wcn_of_match,
-+	},
-+	.probe = pwrseq_qcom_wcn_probe,
-+};
-+module_platform_driver(pwrseq_qcom_wcn_driver);
-+
-+MODULE_AUTHOR("Bartosz Golaszewski <bartosz.golaszewski@linaro.org>");
-+MODULE_DESCRIPTION("Qualcomm WCN PMU power sequencing driver");
-+MODULE_LICENSE("GPL");
++	pci_lock_rescan_remove();
+ 	ret = pci_scan_root_bus_bridge(bridge);
++	pci_unlock_rescan_remove();
+ 	if (ret < 0) {
+ 		dev_err(bridge->dev.parent, "Scanning root bridge failed");
+ 		return ret;
 
 -- 
 2.43.0
