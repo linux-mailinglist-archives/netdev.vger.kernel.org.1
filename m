@@ -1,118 +1,156 @@
-Return-Path: <netdev+bounces-98534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAC268D1B07
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 14:22:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE4948D1B0A
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 14:22:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD9961F2198A
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 12:22:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E19FF1C222A6
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 12:22:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAE3316D339;
-	Tue, 28 May 2024 12:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6206F16D4D0;
+	Tue, 28 May 2024 12:22:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P+XluGIG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XiWP9to7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6AE16D312
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 12:22:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A013E74409;
+	Tue, 28 May 2024 12:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716898956; cv=none; b=usjMz9NKta0PKUZ2KKZcIpOpoeqbp7pVbR5tY688H7dGymetKBcXDtBZqjdx0Rf+NX4ENpeULT2ulercwbRGUOcgQRn9RmPnTTXXx3G6NWNFQn2c12wrhblSpRomCEMyy+CX3N43Vy8bVNcxL4Yf1iS8sPmwsRe9Zsm3m0DSRdU=
+	t=1716898967; cv=none; b=mdFuct3OPkXk8hu5OBKAcGmCWymaS67GRkTw9ruA+QLmugpPINe4QiFxA3Sz53O2tfpfxfkdYf2wPxVd+Nu7muZYBNo4X+y0aWyTarQlkA+/VwZw4ejw0/jDAnLkQ3OEC7FDBUF8ZqXqNzR66j3dpkj8wartGs6xwhCd99Azctc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716898956; c=relaxed/simple;
-	bh=KV6XpCQHbohETVAnE3VjdWEmGWB3TWOcp6uyiJ/bZnk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t8URyWP7OGYZ0rF7bG7s7s8Su1lhKcigpdG3ibQ+Sa3IMMtRjXQSxhOWnvZpM+omhb+BklmZTNeT+pFqERC/o0fh9jzVl2BnGRv+xf0xzkuLXR6QEnM9/IyhGaGCzJuA3nOiB/geVD8rulUhNGRg1iRtRhgaZjcJsQAfaJFNEwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P+XluGIG; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-57863da0ac8so25612a12.1
-        for <netdev@vger.kernel.org>; Tue, 28 May 2024 05:22:35 -0700 (PDT)
+	s=arc-20240116; t=1716898967; c=relaxed/simple;
+	bh=1bxpJkJTAuic/fEmME52PUTrYmhkNBSpSDXr2ojsc7M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mnTPmw8YojPaamICGBVj9NOcTwy7RhzUEWNkLbgoiZlLdNj2YWj5IReuik3tvkr6BFYKg/qFmTYG9MaP1hLnBUmhN6AbZYKZqIOrASj1WjcuO5Z9FuwZZCOD3qWGcsMCQ47ef0poJav78bwOVf/u1znA/pmsJiTN+5K3PJqdXCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XiWP9to7; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-529661f2552so969003e87.2;
+        Tue, 28 May 2024 05:22:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716898954; x=1717503754; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KV6XpCQHbohETVAnE3VjdWEmGWB3TWOcp6uyiJ/bZnk=;
-        b=P+XluGIGPVaMeMhqrbf3Ki7XsxLqVGDYNdZRly8JoWtPQ8ftnLlrUdvPf2helKCec7
-         /ft8jPBX1W5+4aKM4PZVLTmi6kKk1q+oIp6Kl81u3T0M8UfcqrDNtVyUDJwgI1fkgR3g
-         J6yIBKSYQongZsA+S5bZfG6O4HlIjHvbakJ5P65IebsbypxMfnOaEjMvATLdMbcEQHoD
-         GFUweKSCs2XPElPXbz8D1harsvB+qXFn3FHNqNyYk9m470g5lxUW7d+XCAsoNAsx/xYB
-         gqhUNFV5pR/Ge45XJuK2pjj5yYPvoDP+0oyQvQ4y8XUttNtThDEvErZ8bHZYVaSWh6Yh
-         vxTQ==
+        d=gmail.com; s=20230601; t=1716898964; x=1717503764; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=30d0TTe0qu/2T+a0CP2Ht/sekYc/5hfNw/7/ZEtYxu8=;
+        b=XiWP9to7IFMPMEwMVWyuNamCW2AhljULMH0OE+mg44H7qr4kpYnUL08Tp+FXTE8Lbp
+         B+1Y4SEEG+UlBlUORgIf7onkSfpLIjQrGPh8HHjmfmM0dNefHmQvnZH3nwji55WaLBAf
+         +Oipm+gNzKC6c503rRe1C96Y4EfpHJ5OqCAcdlpF/mEuFmTv8UKNZodz4u0BZ2xfecfq
+         8eaEGHh8RQrC0hRXRJgGbZx3YdBVnKhdxr1HUuTuJ+y1wpzyGm0ex1llAMqh669qJqhF
+         //MbFxY4EgNUEoQ8LuFoVHPBBrNdKQTrGsvEGnk8gxnG6+AvRNiTJj6Me+S4e9tpv7c9
+         zI0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716898954; x=1717503754;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KV6XpCQHbohETVAnE3VjdWEmGWB3TWOcp6uyiJ/bZnk=;
-        b=XBMKGD5jn+k32Wb8Igy4bDuMI6aFeq+ggNFYaLeSRKQ68DDAOEbf8OsCHuMtuVvtB2
-         KBO8J1G2zNByg6EUCwcxpJOe34OMlXA/wCSRBTLTzrsfrocIUprfDwR7o+olTDNGYi5y
-         tcv7fC28FSx5JqgoDGKvsU23IVHIUJ5FNMoXVK791D0y8GtWQtVt/WYRO0TQ2yq9I/Uu
-         3VLZsVx0Mq2j9/gze7jNk0M4Fpunvtxr6YTwYMEZrheukmip3m7brvZ2S7l86cJOW1SD
-         40Hbm87xyj05B4AXSjN0WwOTHABNkACWUJak6iPT+jHbNLVSnFTRqGQfqB0Pi42nmon9
-         42xw==
-X-Forwarded-Encrypted: i=1; AJvYcCX4/4dYFR3o4bWVJQPUq5pOOs2xKi7XYu68jd56JWl2V07E+9eadsVOCoIfzmRBZeYadG5prIyawM4hFHwGcdV5aCBgpeXb
-X-Gm-Message-State: AOJu0Yx0ZChcwf0l613itUUQ7Lpwfc8vbx6BDloOEKd3AIkmt9Nw+wph
-	om6BmPDuPrAKE2okSzcsVKGoh9xPOyW9gomdjHok9Gw6qOMY0PC6f/HSKThD12OyFDsmPKrn1ja
-	teerkpUTrs31LstMw49OauKTpeRrHlqjYEmmR
-X-Google-Smtp-Source: AGHT+IH1Gtm5F59Lm5I2SXsUJhjdETo+vxRbDjTlwIUhJpsam6VH9uP+WsbKqG+qCOz/gk2BSvwxdv7mmrEx1YLvFns=
-X-Received: by 2002:a05:6402:1803:b0:574:e7e1:35bf with SMTP id
- 4fb4d7f45d1cf-57869bd661cmr341506a12.7.1716898953322; Tue, 28 May 2024
- 05:22:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716898964; x=1717503764;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=30d0TTe0qu/2T+a0CP2Ht/sekYc/5hfNw/7/ZEtYxu8=;
+        b=gmNgGZ7wZRvi6A+m+m9CGZWDd9n+TcY21SWNWLyD/oQC03M9oL5AEHjVvDAhAsWPUu
+         8MXJjXn5/PtIF+kLVI70I9G7+PsbYAM7f4Euq+5vkWAmHAbEGvCnnOeSuzjVA4n7ML7N
+         kSlMTIcP4eWDhRBZUMhLqxqhtxZaP6X2Netm9wBJBlT8dSdtSaVStLaYfdvPE8ZjIU9q
+         mSrWpUsuqL7Eb+FmCZWu2vVIVVE4Yo4ZZf6PmsMvpUm7KgmQtQ1l5EVim6jgFArlMcZg
+         BMfcpXnqkQ87G0QYbQ1K8FI2vUyDe+4MO9fojwQ+pipsX9TU7zLdPHLj8OOq11yI9ymf
+         9iyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXn3zJE10QsQoGBesvH4wriei/+TDF/3AsG6hSSeZ9Hda3CBaGW8egTjkixFtpCa+VRERTnYGTBOfFfxjiP6wnKYacETDi2Llwv0n/PfLMUO/5TuYF+zfVKYhiKGzcgBwRrWmM+ORXE1EG+eYWdNSC+nPq/znfZxint
+X-Gm-Message-State: AOJu0YwI3+frBebg8wUClyNI3SCs/7LNl8JM0KNKTLB8O+etbD2+Fn6u
+	G5AryOLLA3Rt25I4leysEZ6WsT88ndDGbOC6S4ZxGMvs0vd+R3tO
+X-Google-Smtp-Source: AGHT+IEFpxm72+ZufBEpOzTdYaIOWqK1qFRYEzUeMkVy/VVpK/unVesitw9GPmLNPR4IWW5XCaPpGg==
+X-Received: by 2002:a19:5e04:0:b0:51a:f84d:1188 with SMTP id 2adb3069b0e04-52964e93a0dmr7396162e87.19.1716898963461;
+        Tue, 28 May 2024 05:22:43 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5296e888b33sm920102e87.8.2024.05.28.05.22.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 May 2024 05:22:43 -0700 (PDT)
+Date: Tue, 28 May 2024 15:22:40 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Byungho An <bh74.an@samsung.com>, Giuseppe CAVALLARO <peppe.cavallaro@st.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 2/3] net: stmmac: Activate Inband/PCS flag
+ based on the selected iface
+Message-ID: <mflda2pvhiilceh4qkyq43jedgx3fxeo7mbs2cfa5c44veygg2@muhwd4gj5mth>
+References: <ZkDuJAx7atDXjf5m@shell.armlinux.org.uk>
+ <20240524210304.9164-1-fancer.lancer@gmail.com>
+ <20240524210304.9164-2-fancer.lancer@gmail.com>
+ <ZlNoLHoHjt3BsFde@shell.armlinux.org.uk>
+ <fvjrnunu4lriegq3z7xkefsts6ybn2vkxmve6xzi73krjgvcj6@bhf4b4xx3x72>
+ <ZlWwMzMZrwb5fscN@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240524193630.2007563-1-edumazet@google.com> <20240524193630.2007563-2-edumazet@google.com>
- <CADVnQyk6CkWU-mETm9yM65Me91aVRr5ngXi2hkD6aETakB+c2w@mail.gmail.com>
- <CANn89i+ZMf8-9989owQSmk_LM7BJavdg7eApJ1nTG6pGwvLFHA@mail.gmail.com>
- <cace7de5c60b1bc963326524b986c720369b0f1d.camel@redhat.com>
- <CANn89iK=oYdC=ezujf+QOWsbVEXDx1vLLV4Cbd8bJH+oU+RDiw@mail.gmail.com> <4f0819a7032c52349bba22ea767eda103be650c1.camel@redhat.com>
-In-Reply-To: <4f0819a7032c52349bba22ea767eda103be650c1.camel@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 28 May 2024 14:22:19 +0200
-Message-ID: <CANn89iLKJ=-Ng6fUgr1LW+5+Y=kEsY2VM0VUgLMP-NicyCdAcA@mail.gmail.com>
-Subject: Re: [PATCH net 1/4] tcp: add tcp_done_with_error() helper
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Neal Cardwell <ncardwell@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZlWwMzMZrwb5fscN@shell.armlinux.org.uk>
 
-On Tue, May 28, 2024 at 1:50=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On Tue, 2024-05-28 at 13:31 +0200, Eric Dumazet wrote:
-> > On Tue, May 28, 2024 at 12:41=E2=80=AFPM Paolo Abeni <pabeni@redhat.com=
-> wrote:
-> > >
-> > >
-> > > Waiting for Neal's ack.
-> > >
-> > > FTR I think the new helper introduction is worthy even just for the
-> > > consistency it brings.
-> > >
-> > > IIRC there is some extra complexity in the MPTCP code to handle
-> > > correctly receiving the sk_error_report sk_state_change cb pair in bo=
-th
-> > > possible orders.
-> >
-> > Would you prefer me to base the series on net-next then ?
->
-> Now that you make me thing about it, net-next will be preferable to
-> handle possible mptcp follow-up (if any). And the addressed issue
-> itself are so old it should not make difference in practice, right?
->
-> So if it's not a problem for you move the patches on a different tree,
-> net-next would be good option, thanks!
+On Tue, May 28, 2024 at 11:21:39AM +0100, Russell King (Oracle) wrote:
+> On Mon, May 27, 2024 at 12:57:02AM +0300, Serge Semin wrote:
+> > On Sun, May 26, 2024 at 05:49:48PM +0100, Russell King (Oracle) wrote:
+> > > On Sat, May 25, 2024 at 12:02:58AM +0300, Serge Semin wrote:
+> > > > The HWFEATURE.PCSSEL flag is set if the PCS block has been synthesized
+> > > > into the DW GMAC controller. It's always done if the controller supports
+> > > > at least one of the SGMII, TBI, RTBI PHY interfaces. If none of these
+> > > > interfaces support was activated during the IP-core synthesize the PCS
+> > > > block won't be activated either and the HWFEATURE.PCSSEL flag won't be
+> > > > set. Based on that the RGMII in-band status detection procedure
+> > > > implemented in the driver hasn't been working for the devices with the
+> > > > RGMII interface support and with none of the SGMII, TBI, RTBI PHY
+> > > > interfaces available in the device.
+> > > > 
+> > > > Fix that just by dropping the dma_cap.pcs flag check from the conditional
+> > > > statement responsible for the In-band/PCS functionality activation. If the
+> > > > RGMII interface is supported by the device then the in-band link status
+> > > > detection will be also supported automatically (it's always embedded into
+> > > > the RGMII RTL code). If the SGMII interface is supported by the device
+> > > > then the PCS block will be supported too (it's unconditionally synthesized
+> > > > into the controller). The later is also correct for the TBI/RTBI PHY
+> > > > interfaces.
+> > > > 
+> > > > Note while at it drop the netdev_dbg() calls since at the moment of the
+> > > > stmmac_check_pcs_mode() invocation the network device isn't registered. So
+> > > > the debug prints will be for the unknown/NULL device.
+> > > 
+> > 
+> > > Thanks. As this is a fix, shouldn't it be submitted for the net tree as
+> > > it seems to be fixing a bug in the driver as it stands today?
+> > 
+> > From one point of view it could be submitted for the net tree indeed,
+> > but on the second thought are you sure we should be doing that seeing
+> > it will activate the RGMII-inband detection and the code with the
+> > netif-carrier toggling behind the phylink back? Who knows what new
+> > regressions the activated PCS-code can cause?..
+> 
+> If it's not a fix that is suitable without the remainder of the patch
+> set, this should be stated in the commit description and it shouldn't
+> have a Fixes: tag.
+> 
+> The reason is because it wouldn't be stable kernel material without the
+> other patches - if stable picks it up without the other patches then
+> it could end up being applied without the other patches resulting in
+> the situation you mention above.
+> 
+> Shall I remove the Fixes: tag?
 
-Sure, these are minor changes I think, only nice to have.
+Let's drop it then, so not to cause confusion for the maintainers.
+
+-Serge(y)
+
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
