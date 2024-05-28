@@ -1,135 +1,105 @@
-Return-Path: <netdev+bounces-98703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1558A8D2212
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:57:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 590BF8D2217
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:59:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C613C28A748
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:57:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECC22B23003
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058B8173328;
-	Tue, 28 May 2024 16:57:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24FD1172BAE;
+	Tue, 28 May 2024 16:59:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FMaIWg8Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bqBZTFYd"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49553171E44
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 16:57:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 002BF16EBE2
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 16:59:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716915453; cv=none; b=PWg5m1/38TjfvEXHfALvNfCMjhGeZ6hG3KXxlOoN2pqaXP4Shht8yQ5ud2N4Ja8v7lOSabXqTXY2QMROEz1D4K/lqgfAoZtCgTUTrya/p13n+dyngQIelwZOeneKSA1mjgyocog5oUk0q2LRTbP3lhPnrm3Txy9dPN4Prz8m/Ws=
+	t=1716915571; cv=none; b=K7VYhOiddGQM9C7u+YbnqlUd8mqSuGk6rlBY8hixHA+XT8urDpbZ3TGRMKO1pKYX/xC9rt8fw+LFyocmQxRFkSevFWTlcKlwQPwBs7NBsLr57a3sSWEWjkybACjYjz3dlsIQBPKXywbfLw13jPHLjSCqz2U8lA1pnXMi8EXkpwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716915453; c=relaxed/simple;
-	bh=20lWxuyncauYpRPdcIP2qeiyq8Pn90Gk/tUHOS/51sw=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=YhCWmrKTRoCJpfaVBfh1T1+aHQcxQULk37RGyUxoG27Vq6FkRqS3cn2UXPNmX6wdo1NOvGq6OTzKMFG30kOBMlUbH5zFBBIMjHFKUWyiyqmp3zde9tX4McRvM6IUgzacT5E9si7xG3JNGY5wjJ7dnEjNt/Sp0GCKVxgrQLRlp/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FMaIWg8Z; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: andrew@lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1716915449;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=jNceAp37GB1si/9T0wIzhGZuQRX1PlheHnoihJOZ330=;
-	b=FMaIWg8ZBt2go1CkaZdykQtMyRQWLzUq8vG5dX1s/BuhqoUK8kYWDN//VMNuJzplplQ8KU
-	UotCwJMPUUHD+HUaf9QEb2kc1h/ThDL6i7kDh6wJxiHjxpl2L3ogNkU2MsEjKKGVo61l9D
-	gfJpYBIKAlfY//vWE3msD2JkVLYGo3c=
-X-Envelope-To: linux@armlinux.org.uk
-X-Envelope-To: andi.shyti@kernel.org
-X-Envelope-To: netdev@vger.kernel.org
-X-Envelope-To: linux-i2c@vger.kernel.org
-X-Envelope-To: michal.simek@amd.com
-X-Envelope-To: hkallweit1@gmail.com
-X-Envelope-To: linux-arm-kernel@lists.infradead.org
-X-Envelope-To: linux-kernel@vger.kernel.org
-Message-ID: <ec7907f1-cb5a-41ab-824c-aa0b02440ada@linux.dev>
-Date: Tue, 28 May 2024 12:57:25 -0400
+	s=arc-20240116; t=1716915571; c=relaxed/simple;
+	bh=Ko9Tb+DUh5NRlOqeb3jzZFwSz5J9GQMrYOHK2NuLhqY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WX+oPo12FUfpQDGasLB2/pwbL2aXJ9bVZ4j7LgyOpncKivHHIHL1oGIg3X2edjR4Mh7BpVPPVIWxljEVRqCaGv3YGqgYl5fBBu53dQiu1fC5Q8n8DGQX7o4IcW05aEo8SabouIxJTkkflh5WsJHHnhveFc5tLFZ5tzvM9rI9K+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bqBZTFYd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B5A6C3277B;
+	Tue, 28 May 2024 16:59:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716915570;
+	bh=Ko9Tb+DUh5NRlOqeb3jzZFwSz5J9GQMrYOHK2NuLhqY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=bqBZTFYd4ppz4N6BeS9UCNo1viGR7KuDAnGQb3p8O8VsUI1eyVAGKpMVElVb1Q0Wj
+	 LPb/myiWOXaw1oJ1wUO/oUFxS7daGT+dhGlq4mBt14VcNJSXwbx93OFlKaffOCqjon
+	 iAL71kDTqAAasQFotEL54egD3nV7Uk+I7xnHlUPAvpB9ncCNx9p5EJNAxUxNy8fnBb
+	 0MciPdFlGiKtNwdeguKvLttlWwJHl42YShupLNAvUgZYDGJvbptSl9h1yn1RjE90Nz
+	 bphAKw+h+JomeEawhOjM/CY1ofoGDjUF/McNZ/nhzpQaIHT4PFMh0/our/SjZaETyU
+	 orSBg6cRFTYkg==
+Message-ID: <b5619a44-c8d5-4bb5-9c98-223e3adec3e4@kernel.org>
+Date: Tue, 28 May 2024 10:59:28 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: fix __dst_negative_advice() race
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ Clement Lecigne <clecigne@google.com>, Tom Herbert <tom@herbertland.com>
+References: <20240528114353.1794151-1-edumazet@google.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-Subject: [BUG] SFP I2C timeout forces link down with PHY_ERROR
-To: Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
- Andi Shyti <andi.shyti@kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, linux-i2c@vger.kernel.org
-Cc: Michal Simek <michal.simek@amd.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240528114353.1794151-1-edumazet@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-Hi,
+On 5/28/24 5:43 AM, Eric Dumazet wrote:
+> __dst_negative_advice() does not enforce proper RCU rules when
+> sk->dst_cache must be cleared, leading to possible UAF.
+> 
+> RCU rules are that we must first clear sk->sk_dst_cache,
+> then call dst_release(old_dst).
+> 
+> Note that sk_dst_reset(sk) is implementing this protocol correctly,
+> while __dst_negative_advice() uses the wrong order.
+> 
+> Given that ip6_negative_advice() has special logic
+> against RTF_CACHE, this means each of the three ->negative_advice()
+> existing methods must perform the sk_dst_reset() themselves.
+> 
+> Note the check against NULL dst is centralized in
+> __dst_negative_advice(), there is no need to duplicate
+> it in various callbacks.
+> 
+> Many thanks to Clement Lecigne for tracking this issue.
+> 
+> This old bug became visible after the blamed commit, using UDP sockets.
+> 
+> Fixes: a87cb3e48ee8 ("net: Facility to report route quality of connected sockets")
+> Reported-by: Clement Lecigne <clecigne@google.com>
+> Diagnosed-by: Clement Lecigne <clecigne@google.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Tom Herbert <tom@herbertland.com>
+> ---
+>  include/net/dst_ops.h  |  2 +-
+>  include/net/sock.h     | 13 +++----------
+>  net/ipv4/route.c       | 22 ++++++++--------------
+>  net/ipv6/route.c       | 29 +++++++++++++++--------------
+>  net/xfrm/xfrm_policy.c | 11 +++--------
+>  5 files changed, 30 insertions(+), 47 deletions(-)
+> 
 
-I saw the following warning [1] twice when testing 1000Base-T SFP
-modules:
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-[ 1481.682501] cdns-i2c ff030000.i2c: timeout waiting on completion
-[ 1481.692010] Marvell 88E1111 i2c:sfp-ge3:16: Master/Slave resolution failed
-[ 1481.699910] ------------[ cut here ]------------
-[ 1481.705459] phy_check_link_status+0x0/0xe8: returned: -67
-[ 1481.711448] WARNING: CPU: 2 PID: 67 at drivers/net/phy/phy.c:1233 phy_state_machine+0xac/0x2ec
-<snip>
-[ 1481.904544] macb ff0c0000.ethernet net1: Link is Down
 
-and a second time with some other errors too:
-
-[   64.972751] cdns-i2c ff030000.i2c: xfer_size reg rollover. xfer aborted!
-[   64.979478] cdns-i2c ff030000.i2c: xfer_size reg rollover. xfer aborted!
-[   65.998108] cdns-i2c ff030000.i2c: timeout waiting on completion
-[   66.010558] Marvell 88E1111 i2c:sfp-ge3:16: Master/Slave resolution failed
-[   66.017856] ------------[ cut here ]------------
-[   66.022786] phy_check_link_status+0x0/0xcc: returned: -67
-[   66.028255] WARNING: CPU: 0 PID: 70 at drivers/net/phy/phy.c:1233 phy_state_machine+0xa4/0x2b8
-<snip>
-[   66.339533] macb ff0c0000.ethernet net1: Link is Down
-
-The chain of events is:
-
-- The I2C transaction times out for some reason (in the latter case due
-  to a known hardware bug).
-- mdio-i2c converts the error response to a 0xffff return value
-- genphy_read_lpa sees that LPA_1000MSFAIL is set in MII_STAT1000 and
-  returns -ENOLINK. This propagates up the calls stack.
-- phy_check_link_status returns -ENOLINK
-- phy_error_precise forces the link down with state = PHY_ERROR.
-
-The problem with this is that although the register read fails due to a
-temporary condition, the link goes down permanently (or at least until
-the admin cycles the interface state).
-
-I think some part of the stack should implement a retry mechanism, but
-I'm not sure which part. One idea could be to have mdio-i2c propagate
-negative errors instead of converting them to successful reads of
-0xffff. But we would still need to handle that in the phy driver or in
-phy_state_machine.
-
-- Are I2C bus drivers supposed to be flaky like this? That is, are callers of
-  i2c_transfer expected to handle the occasional spurious error?
-- Similarly, are MDIO bus drivers allowed to be flaky?
-- Is ETIMEDOUT even supposed to be recoverable? Maybe we should have
-  cdns-i2c return EAGAIN instead so it gets retried by the bus
-  arbitration logic in __i2c_transfer.
-- ENOLINK really seems like something which we could recover from by
-  resetting the phy (or even just waiting a bit). Maybe we should have
-  the phy state machine just switch to PHY_NOLINK?
-
-Of course, the best option would be to fix cdns-i2c to not be buggy, but
-the hardware itself is buggy in at least one of the above cases so that
-may not be practical.
-
---Sean
 
