@@ -1,173 +1,145 @@
-Return-Path: <netdev+bounces-98407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B6618D14AE
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 08:49:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A46F8D14D2
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 08:59:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D664C1F241E1
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 06:49:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55F4F1C221B6
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 06:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12FF56EB5C;
-	Tue, 28 May 2024 06:49:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3034F71B40;
+	Tue, 28 May 2024 06:59:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YWq7goex"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="tBV6bLoE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BF21BDD3
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 06:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC3A71748;
+	Tue, 28 May 2024 06:59:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716878940; cv=none; b=BxgCjLMPXXkdJJMFEczTypsFHrwOUbOm3WM6/El51FDzHponoExAf5clCL4PfKzgEHbLkMEBjlpemBCQC++Fqb6T1HSkodWg9lBkPtU4lYOl7my+902/HWiSxUtQ8ShI+fzpdmLVgXTowUlER+WclFCV8YMgImYofd98LHM6Sa0=
+	t=1716879559; cv=none; b=pPwwPZp/glfXSWAecYp74c0l6Te0BdtyXaD7ug7JbXi8+wZblBIsncyOxWGowo/tlAcoRLcfXvZUN/LZtG2fftD+1VRRL4UBQlByj6II/GulSu9Px664ZzJ7nLhK3QBfEQP+FdCneEyLy0aDn/voWMvP5hIqji81Kx1VwIT0SoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716878940; c=relaxed/simple;
-	bh=Nsp68rVAWZLMrCblRzN41IGaqc1qqdovnQ05kfrVD8g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K37W04JbkQq8ZG7FOVw9QE0hsY4sexrgn0PoJziECDNnKBaThAGhRwxAtaDa391eHrrHHXnodR/9UhpV0vZJ2U+stR+FbqSn9ck3C/P9YzfDuu/x8Fd9fQ5e3wAbDWmQkatpiLgaVoSb2fDuRjNQSGSLn+dXZn0jIB9UMHw9sYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YWq7goex; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-529682e013dso507862e87.3
-        for <netdev@vger.kernel.org>; Mon, 27 May 2024 23:48:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716878936; x=1717483736; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K2y3qumDVDkg8QQb5n+WQFqPp0biLKN1OZGmTtCMCoE=;
-        b=YWq7goex1eQdkmXvSV+dBeUwng3cHswGQtjPOGVNTMjBZ2eFJRUgc943zzT+KeeOtm
-         h/JPuIkkg+AAXpfa0fiLlsAPCj3PX1nIgZcKS+NHKEIvEXu4iEd1reTK8f+2P5hVZ2nj
-         1uwPFMWsihOx45Ck92drtLK1Hu1Nxd11Uk5DHzqgZtJgvYTP97HXgn9hXTTeEfUMMj1c
-         TFxQyUKwng5L15npEnQ8IPuCtWZiSjy9MmIawhs7cgU4V6S/wsY2kXGnJQqL3oyKWFuW
-         QkmGDF7VbAtg0WzhBhlcGab7n7TCzELBcM2Eqik8g3pdrK+ce0m0tCsTGKDOQEGMLdD6
-         HyoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716878936; x=1717483736;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=K2y3qumDVDkg8QQb5n+WQFqPp0biLKN1OZGmTtCMCoE=;
-        b=GQyPA0E/rOdGoyOqgfFLXlFFIZ4KOA4J9t2qJMpwi/OU8cnArMZEp1/NHXX62283vN
-         Ox4+w3+wVG+4A1LSk6gSgvD5Zz2dr+3ikZLHZ5747Y87yeFY3KL6bz8X9liVKILG9BL+
-         T1n9bVssDvlZTCYlJ/JcEY1ZxbNTJiGOfS/1kTTApjR3/WH54Q4rfLANcEDVqMbeHriA
-         cbFzR3knVKRPvNMpKqzQHJ4rOFTVkI0NOxboNdfMqHM4dvAhJ0rE7AkNk2bCu18xFvvy
-         MSpfiw8FgZ3mp4RPuhn6i7+hU0S0rHPsSAsJ6CFqzqJ4Qz6YuLhci5Sz/tRxnurGQHXa
-         +O/w==
-X-Forwarded-Encrypted: i=1; AJvYcCUIA3jaUj3y7IsGi5UandPNIXdwnuSthDBgpVTiuRoT1Hop3KW2YsJFhU4gcC6MqTpmhVlQfFXysMH47LQhmhiW74FRiorj
-X-Gm-Message-State: AOJu0Yz8uTeot7WNRgGobiLF7jRfnY27yyAW+4fTL5798un+Ut36qTZZ
-	sV7+NoN9VcBsA4Yu/5YhQSKT/qTBxVhRO9Hc/ZmIAXLuq++I9o1Kg2SoUHfldFYo2Dbx89sKZ4Q
-	xDCaoEXV4dm+90ps6Pr7bBO2ATvxr8Ogr
-X-Google-Smtp-Source: AGHT+IEOaGHPfvXlk7twqrFAtpsbfqeVJ1H3FaO6u9vJgeE61K+gqq+HNXxR9gNS7RoiA3OnjdqX6FJEFvvQWSR5jdM=
-X-Received: by 2002:a05:6512:29b:b0:523:8e17:444f with SMTP id
- 2adb3069b0e04-529650a425emr7370550e87.29.1716878935884; Mon, 27 May 2024
- 23:48:55 -0700 (PDT)
+	s=arc-20240116; t=1716879559; c=relaxed/simple;
+	bh=/Yf0JW8LDSFnss/0AtKBiH9oDph8w4srLwrP3mK8GV8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DNfzvt4c17BhjJQGS+bMrevVHsp5ov+tLYk3CQnixRkMBm9lPV0jmJzDSiugi0n1R+VMEd9Wcv/rL8vH23+dfmolpbx+v3ecG1U0pLiecK/HADaaDoO4kFuacT5EIi0SSpcmmTLJ5jD9j9MlqSJBcEJpRZx3BeH9xGkrECT+8+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=tBV6bLoE; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1716879553; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=lGfdc1RsIqK8uE57Ip0a1BffAQvQcBg5SDFMlNn4XIM=;
+	b=tBV6bLoENcZBaUATwZkvWn23ci1Oxb1aC1yku1QO4bocaEVRgZsgTNnaZRuexEc2ojzZfvMi01cvocA1749t3a2ckhWewHBznVJNts2M7eRga4BJr9aHtsejj3A0JVm5an9TCexi7Kj/RtaTFNzdOiNhPpn7arcVqDpTw38gEkM=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033022160150;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0W7OoVNI_1716879551;
+Received: from 30.221.100.241(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0W7OoVNI_1716879551)
+          by smtp.aliyun-inc.com;
+          Tue, 28 May 2024 14:59:13 +0800
+Message-ID: <0560e117-6f2c-4dbc-a1a9-4df7164ab129@linux.alibaba.com>
+Date: Tue, 28 May 2024 14:59:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240528021149.6186-1-kerneljasonxing@gmail.com> <CANn89iJQWj75y+QpLGQKZ6jBgSgpi0ZtPf4830O8S0Ld2PpqEg@mail.gmail.com>
-In-Reply-To: <CANn89iJQWj75y+QpLGQKZ6jBgSgpi0ZtPf4830O8S0Ld2PpqEg@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 28 May 2024 14:48:18 +0800
-Message-ID: <CAL+tcoCSJrZPvNCW28UWb4HoB905EJpDzovst6oQu-f0JKdhxA@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: introduce a new MIB for CLOSE-WAIT sockets
-To: Eric Dumazet <edumazet@google.com>
-Cc: dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>, Yongming Liu <yomiliu@tencent.com>, 
-	Wangzi Yong <curuwang@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: some questions about restrictions in SMC-R v2's implementation
+To: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, jaka@linux.ibm.com, kgraul@linux.ibm.com
+References: <6d6e870a-3fbf-4802-9818-32ff46489448@linux.alibaba.com>
+ <c3c13531-f8be-4159-b8df-b316adb2d3fc@linux.ibm.com>
+ <38c8a10a-339f-402e-836b-baf38994c7b2@linux.alibaba.com>
+ <9be5a19c-1641-4b2e-8dac-d2d715cadd42@linux.ibm.com>
+Content-Language: en-US
+From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+In-Reply-To: <9be5a19c-1641-4b2e-8dac-d2d715cadd42@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hello Eric,
 
-On Tue, May 28, 2024 at 1:13=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Tue, May 28, 2024 at 4:12=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
-> >
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > CLOSE-WAIT is a relatively special state which "represents waiting for
-> > a connection termination request from the local user" (RFC 793). Some
-> > issues may happen because of unexpected/too many CLOSE-WAIT sockets,
-> > like user application mistakenly handling close() syscall.
-> >
-> > We want to trace this total number of CLOSE-WAIT sockets fastly and
-> > frequently instead of resorting to displaying them altogether by using:
-> >
-> >   netstat -anlp | grep CLOSE_WAIT
->
-> This is horribly expensive.
 
-Yes.
+On 2024/5/27 22:57, Wenjia Zhang wrote:
+> 
+> 
+> On 21.05.24 12:52, Guangguan Wang wrote:
+>>
+>>
+>> On 2024/5/17 15:41, Wenjia Zhang wrote:
+>>>
+>>>
+>>> On 07.05.24 07:54, Guangdong Wang wrote:
+>>>> Hi, Wenjia and Jan,
+>>>>
+>>>> When testing SMC-R v2, I found some scenarios where SMC-R v2 should be worked, but due to some restrictions in SMC-R v2's implementation,
+>>>> fallback happened. I want to know why these restrictions exist and what would happen if these restrictions were removed.
+>>>>
+>>>
+>>> Hi Guangguan and Wen,
+>>>
+>>> please see my answer below.
+>>>> The first is in the function smc_ib_determine_gid_rcu, where restricts the subnet matching between smcrv2->saddr and the RDMA related netdev.
+>>>> ...
+>>>>
+>>> The purpose of the restriction is to simplify the IP routing topology allowing IP routing to use the destination host's subnet route. Because each host must also have a valid IP route to the peer’s RoCE IP address to create RC QP. If the IP route used is the same IP Route as the associated TCP/IP connection, the reuse of the IP routing topology could be achieved. I think it is what the following sentence means in the doc https://www.ibm.com/support/pages/system/files/inline-files/IBM%20Shared%20Memory%20Communications%20Version%202_2.pdf
+>>>
+>>> "
+>>> For HA, multiple RoCE adapters should be provisioned along with multiple equal cost IP routes to the peer host (i.e., reusing the TCP/IP routing topology).
+>>> "
+>>> And the "Figure 19. SMC-Rv2 with RoCEv2 Connectivity" in the doc also mentions the restriction.
+>>>
+>>> The SMCRv2 on linux is indeed implemented with this purpose. Please see the function smc_ib_modify_qp_rtr(). During the first contact processing, the Mac address of the next hop IP address for the IP route is resolved by performing e.g. ARP and used to create the RoCEv2 RC QP. If the route is not usable for the RoCE IP address to reach the peer's RoCE IP address i.e. without this restriction, the UDP/IP packets would not be transported in a right way.
+>>>
+>>
+>> Hi, Wenjia
+>>
+>> Thanks for the answer.
+>>
+>> I am clear about the restriction of subnet matching.
+>>
+>>> BTW, the fallback would still happen without the restriction. Because at the end of the CLC handshake(TCP/IP traffic), the first link will be created by sending and receiving LLC confirm message (SMCRv2 traffic). If one peer can just send but not receive the LLC confirm message, he will send CLC decline message with the reason "Time Out".
+>>>
+>>> Now let's have a look at your examples above. Both of your RDMA related device have another IP route as the TCP/IP connection, so that the reuse of the IP routing topology is not possible.
+>>>
+>>> Any thought still?
+>>>
+>>>> The other is in the function smc_connect_rdma_v2_prepare, where restricts the symmetric configuration of routing between client and server. codes here:
+>>>> ...
+>>>> In my testing environment, server's ip is 192.168.0.3/24, client's ip 192.168.0.4/24, regarding how many netdev in server or client. Server has special
+>>>> route setting due to some other reasons, which results in indirect route from 192.168.0.3/24 to 192.168.0.4/24. Thus, when CLC handshake, client will
+>>>> get fce->v2_direct==false, but client has no special routing setting and will find direct route from 192.168.0.4/24 to 192.168.0.3/24. Due to the above
+>>>> symmetric configuration of routing restriction, we got fallback connection, rsn is 0x030f0000. But I think SMC-R should work in this scenario.
+>>>> And more, why check the symmetric configuration of routing only when server is indirect route?
+>>>>
+>>> That is to check if the IP routing topology is the same on both sides. Then I'd like to ask why you use asymmetric routing for your connection? From the perspective of Networking set up, does it make any sense that the peers communicate with each other with different IP routing topology?
+>>
+>> I have looked into the configuration of my testing environment's routing table and found that the configuration can be optimized.
+>> And the sketch in the attachment used to describe the topology and route configuration of my testing environment.
+>> After optimizing the route setting, the fallback disappear.
+>>
+>> But why check the symmetric configuration of routing only when server is indirect route is still not clear.
+>>
+>>
+>> Thanks,
+>> Guangguan Wang
+> 
+> The optimized configuration looks much more reasonable to me. Thus, why do we need to do the symmetric check when the server is direct route? Don't we expect for a direct route on the client's side? If not, I have to repeat my question: does it make any sense that the peers communicate with each other with different IP routing topology structures, like your first version of configuration? If yes, I need convincing argument.
 
-> Why asking af_unix and program names ?
-> You want to count some TCP sockets in a given state, right ?
-> iproute2 interface (inet_diag) can do the filtering in the kernel,
-> saving a lot of cycles.
->
-> ss -t state close-wait
+I agree it is more reasonable that peers communicate with each other in same IP routing topology structures.
 
-Indeed, it is much better than netstat but not that good/fast enough
-if we've already generated a lot of sockets. This command is suitable
-for debug use, but not for frequent sampling, say, every 10 seconds.
-
-More than this, RFC 1213 defines CurrEstab which should also include
-close-wait sockets, but we don't have this one. I have no intention to
-change the CurrEstab in Linux because it has been used for a really
-long time. So I chose to introduce a new counter in linux mib
-definitions.
-
->
-> >
-> > or something like this, which does harm to the performance especially i=
-n
-> > heavy load. That's the reason why I chose to introduce this new MIB cou=
-nter
-> > like CurrEstab does. It do help us diagnose/find issues in production.
-> >
-> > Besides, in the group of TCP_MIB_* defined by RFC 1213, TCP_MIB_CURREST=
-AB
-> > should include both ESTABLISHED and CLOSE-WAIT sockets in theory:
-> >
-> >   "tcpCurrEstab OBJECT-TYPE
-> >    ...
-> >    The number of TCP connections for which the current state
-> >    is either ESTABLISHED or CLOSE- WAIT."
-> >
-> > Apparently, at least since 2005, we don't count CLOSE-WAIT sockets. I t=
-hink
-> > there is a need to count it separately to avoid polluting the existing
-> > TCP_MIB_CURRESTAB counter.
-> >
-> > After this patch, we can see the counter by running 'cat /proc/net/nets=
-tat'
-> > or 'nstat -s | grep CloseWait'
->
-> I find this counter quite not interesting.
-> After a few days of uptime, let say it is 52904523
-> What can you make of this value exactly ?
-> How do you make any correlation ?
-
-There are two ways of implementing this counter:
-1) like the counters in 'linux mib definitions', we have to 'diff' the
-counter then we can know how many close-wait sockets generated in a
-certain period.
-2) like what CurrEstab does, then we have to introduce a new helper
-(for example, NET_DEC_STATS) to decrement the counter if the state of
-the close-wait socket changes in tcp_set_state().
-
-After thinking more about your question, the latter is better because
-it can easily reflect the current situation, right? What do you think?
+My question is that when server is direct routing, why do not check the route configuration in client side?
+For routing configuration, I think it is equal for both sides, either server or client can be misconfigured.
 
 Thanks,
-Jason
+Guangguan Wang
+
+> 
+> Thanks,
+> Wenjia
 
