@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-98505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2099A8D19C8
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:38:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E29978D19CA
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:38:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0F8F1F234FB
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 11:38:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 965FA28AFE2
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 11:38:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D6BC16D304;
-	Tue, 28 May 2024 11:38:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105B916D324;
+	Tue, 28 May 2024 11:38:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="u+x0QwAp"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Hf7UpYUz"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20EF216C6BA;
-	Tue, 28 May 2024 11:38:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E5C16C879;
+	Tue, 28 May 2024 11:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716896287; cv=none; b=HafRInYrHjPX7XrdmGbe7yJO2EF07FofSSRyeEht6QDTS4XBrSPQ4Lv5+hK3ZmDFr9h/+MFpKrXN5VWxt2M2340qfuGVCN5qPHHx1fDr0N5jBzi5PK6OB52d2bIRoCclGvpY2ka0q03DXOUbCQ+wvo8umt5qEINPeF/xMqWitAo=
+	t=1716896289; cv=none; b=IgvYGU65QRR7l/ZLWxKP/l5FQ1grTvlUYm1esvEvVvrEB6B/+YqOyS4QdmpMr1a00XWrxTHIyncz2+L6kgNn/rgMlunjTimyeHBb0H9tmUY0gT/aIQEu2T+nxzaSaxptqKO6KP8dEOfxxcu6O0FRdQ3lIinFsSxrdgvylD8WhL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716896287; c=relaxed/simple;
-	bh=1GOs0V5vkUAru8HsFj4lU5eksk/gcq+KKbo6Dw+VDTg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=S35BVszDl9olm/DUCRCeAPhs3gOO7CqBH2jDVkKtameHeOBXTK+kK0a8AX9dDFrsuY++CMigUfpwv28stMtMfdGTUzh6NESB1RbjnrdOnvrUk/8Rg0dZaqahFDiG8VSL5wHoKlIikU9SsXmHczmxkYHW4jkVfZ2Q9eOrMpxXMis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=u+x0QwAp; arc=none smtp.client-ip=198.47.23.249
+	s=arc-20240116; t=1716896289; c=relaxed/simple;
+	bh=4s6NK/4ZBVZHRx8WRkEtVI/nPn39ElabPoxGFAHt4VA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aAcOkI2LTllfWqIi1grSMohcC5rKanOyUJ+lixiLgOX6ZfG4+mC1DqXxs7Ne47/NIU3yjBBphY6vi0G+H5wi32lcIlmdFNwy8461cQ3oM2zqYd64P4DE/6mK0jIb++oIrG/YayiTBcBUaOeuwkYHQvUCFj25SU2j3Ezz4Hihglc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Hf7UpYUz; arc=none smtp.client-ip=198.47.19.142
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44SBbcBn029369;
-	Tue, 28 May 2024 06:37:38 -0500
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44SBbewn063336;
+	Tue, 28 May 2024 06:37:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1716896258;
-	bh=PlMtN9GGldukZUavhgPKY/mk0lJcI85tsEjsfxAERq8=;
-	h=From:To:CC:Subject:Date;
-	b=u+x0QwApDHsMHZy7SScnRt4M4WtaOSPczTbTGe5HCuxdGTHgLV50jdZ013oTDE5GU
-	 N2JdR/GleUmOTWs7t6unJHlV9bKSlDdkoMyAAiieBdvgOJ6nfqmPQCUmzlXjzNCRFN
-	 I+iycxSWBytdbZnHZrJfuwODuhI71Pvnh3zSVR8o=
-Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44SBbcqL055021
+	s=ti-com-17Q1; t=1716896260;
+	bh=4w+gLPcpT7Zs9abAlXzoZ7CVqQFn/bkXnPwaZqWYoOo=;
+	h=From:To:CC:Subject:Date:In-Reply-To:References;
+	b=Hf7UpYUzhS5DImlt1J/FoFAzajyqL7HN8XbY+jqidZanD5ggKSLrPiow4ajK0fWDN
+	 AwCzxiEpTlmeHZOXC1h/pA/JpGBZoV6/HHUKjwLpxUgiwgYjF0qzDVGMpRRFTkVZum
+	 Min1CstXUho1xZQEGxyVZw5XLDKR+/61su7lZQeE=
+Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44SBbeKA119860
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 28 May 2024 06:37:38 -0500
-Received: from DLEE102.ent.ti.com (157.170.170.32) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+	Tue, 28 May 2024 06:37:40 -0500
+Received: from DLEE108.ent.ti.com (157.170.170.38) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 28
- May 2024 06:37:37 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE102.ent.ti.com
- (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
+ May 2024 06:37:39 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE108.ent.ti.com
+ (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 28 May 2024 06:37:37 -0500
+ Frontend Transport; Tue, 28 May 2024 06:37:39 -0500
 Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44SBbbsA083802;
-	Tue, 28 May 2024 06:37:37 -0500
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44SBbduR083819;
+	Tue, 28 May 2024 06:37:39 -0500
 Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 44SBbaC7007889;
-	Tue, 28 May 2024 06:37:37 -0500
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 44SBbc5w007896;
+	Tue, 28 May 2024 06:37:39 -0500
 From: MD Danish Anwar <danishanwar@ti.com>
 To: Dan Carpenter <dan.carpenter@linaro.org>,
         Jan Kiszka
@@ -80,10 +81,12 @@ CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <srk@ti.com>,
         Vignesh Raghavendra
 	<vigneshr@ti.com>
-Subject: [PATCH net-next v6 0/3] Introduce switch mode support for ICSSG driver
-Date: Tue, 28 May 2024 17:07:31 +0530
-Message-ID: <20240528113734.379422-1-danishanwar@ti.com>
+Subject: [PATCH net-next v6 1/3] net: ti: icssg-prueth: Add helper functions to configure FDB
+Date: Tue, 28 May 2024 17:07:32 +0530
+Message-ID: <20240528113734.379422-2-danishanwar@ti.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240528113734.379422-1-danishanwar@ti.com>
+References: <20240528113734.379422-1-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,122 +97,268 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-This series adds support for switch-mode for ICSSG driver. This series
-also introduces helper APIs to configure firmware maintained FDB
-(Forwarding Database) and VLAN tables. These APIs are later used by ICSSG
-driver in switch mode.
+Introduce helper functions to configure firmware FDB tables, VLAN tables
+and Port VLAN ID settings to aid adding Switch mode support.
 
-Now the driver will boot by default in dual EMAC mode. When first ICSSG
-interface is added to bridge driver will still be in EMAC mode. As soon as
-second ICSSG interface is added to same bridge, switch-mode will be
-enabled and switch firmwares will be loaded to PRU cores. The driver will
-remain in dual EMAC mode if ICSSG interfaces are added to two different
-bridges or if two different interfaces (One ICSSG, one other) is added to
-the same bridge. We'll only enable is_switch_mode flag when two ICSSG
-interfaces are added to same bridge.
+Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+---
+ drivers/net/ethernet/ti/icssg/icssg_config.c | 170 +++++++++++++++++++
+ drivers/net/ethernet/ti/icssg/icssg_config.h |  19 +++
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h |  12 ++
+ 3 files changed, 201 insertions(+)
 
-We start in dual MAC mode. Let's say lan0 and lan1 are ICSSG interfaces
-
-ip link add name br0 type bridge
-ip link set lan0 master br0
-
-At this point, we get a CHANGEUPPER event. Only one port is a member of
-the bridge, so we will still be in dual MAC mode.
-
-ip link set lan1 master br0
-
-We get a second CHANGEUPPER event, the second interface lan1 is also ICSSG
-interface so we will set the is_switch_mode flag and when interfaces are
-brought up again, ICSSG switch firmwares will be loaded to PRU Cores.
-
-There are some other cases to consider as well. 
-
-ip link add name br0 type bridge
-ip link add name br1 type bridge
-
-ip link set lan0 master br0
-ip link set ppp0 master br0
-
-Here we are adding lan0 (ICSSG) and ppp0 (non ICSSG) to same bridge, as
-they both are not ICSSG, we will still be running in dual EMAC mode.
-
-ip link set lan1 master br1
-ip link set vpn0 master br1
-
-Here we are adding lan1 (ICSSG) and vpn0 (non ICSSG) to same bridge, as
-they both are not ICSSG, we will still be running in dual EMAC mode.
-
-This is v6 of the series.
-
-Changes from v5 to v6:
-*) Removed __packed from structures in icssg_config.h file. 
-*) Added RB tags of Andrew Lunn <andrew@lunn.ch> to patch 2/3 and patch
-   3/3 of this series.
-
-Changes from v4 to v5:
-*) Rebased on 6.10-rc1.
-*) Dropped the RFC tag.
-
-Changes from v3 to v4:
-*) Added RFC tag as net-next is closed now.
-*) Modified the driver to remove the need of bringing interfaces up / down
-   for enabling / disabling switch mode. Now switch mode can be enabled
-   without bringig interfaces up / down as requested by Andrew Lunn
-   <andrew@lunn.ch>
-*) Modified commit message of patch 3/3.
-
-Changes from v2 to v3:
-*) Dropped RFC tag.
-*) Used ether_addr_copy() instead of manually copying mac address using
-   for loop in patch 1/3 as suggested by Andrew Lunn <andrew@lunn.ch>
-*) Added helper API icssg_fdb_setup() in patch 1/3 to reduce code
-   duplication as suggested by Andrew Lunn <andrew@lunn.ch>
-*) In prueth_switchdev_stp_state_set() removed BR_STATE_LEARNING as
-   learning without forwarding is not supported by ICSSG firmware.
-*) Used ether_addr_equal() wherever possible in patch 2/3 as suggested
-   by Andrew Lunn <andrew@lunn.ch>
-*) Fixed typo "nit: s/prueth_switchdevice_nb/prueth_switchdev_nb/" in
-   patch 2/3 as suggested by Simon Horman <horms@kernel.org>
-*) Squashed "#include "icssg_mii_rt.h" to patch 2/3 from patch 3/3 as
-   suggested by Simon Horman <horms@kernel.org>
-*) Rebased on latest net-next/main.
-
-Changes from v1 to v2:
-*) Removed TAPRIO support patch from this series.
-*) Stopped using devlink for enabling switch-mode as suggested by Andrew L
-*) Added read_poll_timeout() in patch 1 / 3 as suggested by Andrew L.
-
-v1 https://lore.kernel.org/all/20230830110847.1219515-4-danishanwar@ti.com/
-v2 https://lore.kernel.org/all/20240118071005.1514498-1-danishanwar@ti.com/
-v3 https://lore.kernel.org/all/20240327114054.1907278-1-danishanwar@ti.com/
-v4 https://lore.kernel.org/all/20240515060320.2783244-1-danishanwar@ti.com/
-v5 https://lore.kernel.org/all/20240527052738.152821-1-danishanwar@ti.com/
-
-Thanks and Regards,
-Md Danish Anwar
-
-MD Danish Anwar (3):
-  net: ti: icssg-prueth: Add helper functions to configure FDB
-  net: ti: icssg-switch: Add switchdev based driver for ethernet switch
-    support
-  net: ti: icssg-prueth: Add support for ICSSG switch firmware
-
- drivers/net/ethernet/ti/Kconfig               |   1 +
- drivers/net/ethernet/ti/Makefile              |   3 +-
- .../net/ethernet/ti/icssg/icssg_classifier.c  |   2 +-
- drivers/net/ethernet/ti/icssg/icssg_common.c  |   2 +
- drivers/net/ethernet/ti/icssg/icssg_config.c  | 322 +++++++++++-
- drivers/net/ethernet/ti/icssg/icssg_config.h  |  26 +
- drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 250 ++++++++-
- drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  36 ++
- .../net/ethernet/ti/icssg/icssg_switchdev.c   | 477 ++++++++++++++++++
- .../net/ethernet/ti/icssg/icssg_switchdev.h   |  13 +
- 10 files changed, 1113 insertions(+), 19 deletions(-)
- create mode 100644 drivers/net/ethernet/ti/icssg/icssg_switchdev.c
- create mode 100644 drivers/net/ethernet/ti/icssg/icssg_switchdev.h
-
-
-base-commit: 5233a55a5254ea38dcdd8d836a0f9ee886c3df51
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
+index 15f2235bf90f..2213374d4d45 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_config.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
+@@ -477,3 +477,173 @@ void icssg_config_set_speed(struct prueth_emac *emac)
+ 
+ 	writeb(fw_speed, emac->dram.va + PORT_LINK_SPEED_OFFSET);
+ }
++
++int icssg_send_fdb_msg(struct prueth_emac *emac, struct mgmt_cmd *cmd,
++		       struct mgmt_cmd_rsp *rsp)
++{
++	struct prueth *prueth = emac->prueth;
++	int slice = prueth_emac_slice(emac);
++	int addr, ret;
++
++	addr = icssg_queue_pop(prueth, slice == 0 ?
++			       ICSSG_CMD_POP_SLICE0 : ICSSG_CMD_POP_SLICE1);
++	if (addr < 0)
++		return addr;
++
++	/* First 4 bytes have FW owned buffer linking info which should
++	 * not be touched
++	 */
++	memcpy_toio(prueth->shram.va + addr + 4, cmd, sizeof(*cmd));
++	icssg_queue_push(prueth, slice == 0 ?
++			 ICSSG_CMD_PUSH_SLICE0 : ICSSG_CMD_PUSH_SLICE1, addr);
++	ret = read_poll_timeout(icssg_queue_pop, addr, addr >= 0,
++				2000, 20000000, false, prueth, slice == 0 ?
++				ICSSG_RSP_POP_SLICE0 : ICSSG_RSP_POP_SLICE1);
++	if (ret) {
++		netdev_err(emac->ndev, "Timedout sending HWQ message\n");
++		return ret;
++	}
++
++	memcpy_fromio(rsp, prueth->shram.va + addr, sizeof(*rsp));
++	/* Return buffer back for to pool */
++	icssg_queue_push(prueth, slice == 0 ?
++			 ICSSG_RSP_PUSH_SLICE0 : ICSSG_RSP_PUSH_SLICE1, addr);
++
++	return 0;
++}
++
++static void icssg_fdb_setup(struct prueth_emac *emac, struct mgmt_cmd *fdb_cmd,
++			    const unsigned char *addr, u8 fid, int cmd)
++{
++	int slice = prueth_emac_slice(emac);
++	u8 mac_fid[ETH_ALEN + 2];
++	u16 fdb_slot;
++
++	ether_addr_copy(mac_fid, addr);
++
++	/* 1-1 VID-FID mapping is already setup */
++	mac_fid[ETH_ALEN] = fid;
++	mac_fid[ETH_ALEN + 1] = 0;
++
++	fdb_slot = bitrev32(crc32_le(0, mac_fid, 8)) & PRUETH_SWITCH_FDB_MASK;
++
++	fdb_cmd->header = ICSSG_FW_MGMT_CMD_HEADER;
++	fdb_cmd->type   = ICSSG_FW_MGMT_FDB_CMD_TYPE;
++	fdb_cmd->seqnum = ++(emac->prueth->icssg_hwcmdseq);
++	fdb_cmd->param  = cmd;
++	fdb_cmd->param |= (slice << 4);
++
++	memcpy(&fdb_cmd->cmd_args[0], addr, 4);
++	memcpy(&fdb_cmd->cmd_args[1], &addr[4], 2);
++	fdb_cmd->cmd_args[2] = fdb_slot;
++
++	netdev_dbg(emac->ndev, "MAC %pM slot %X FID %X\n", addr, fdb_slot, fid);
++}
++
++int icssg_fdb_add_del(struct prueth_emac *emac, const unsigned char *addr,
++		      u8 vid, u8 fid_c2, bool add)
++{
++	struct mgmt_cmd_rsp fdb_cmd_rsp = { 0 };
++	struct mgmt_cmd fdb_cmd = { 0 };
++	u8 fid = vid;
++	int ret;
++
++	icssg_fdb_setup(emac, &fdb_cmd, addr, fid, add ? ICSS_CMD_ADD_FDB : ICSS_CMD_DEL_FDB);
++
++	fid_c2 |= ICSSG_FDB_ENTRY_VALID;
++	fdb_cmd.cmd_args[1] |= ((fid << 16) | (fid_c2 << 24));
++
++	ret = icssg_send_fdb_msg(emac, &fdb_cmd, &fdb_cmd_rsp);
++	if (ret)
++		return ret;
++
++	WARN_ON(fdb_cmd.seqnum != fdb_cmd_rsp.seqnum);
++	if (fdb_cmd_rsp.status == 1)
++		return 0;
++
++	return -EINVAL;
++}
++
++int icssg_fdb_lookup(struct prueth_emac *emac, const unsigned char *addr,
++		     u8 vid)
++{
++	struct mgmt_cmd_rsp fdb_cmd_rsp = { 0 };
++	struct mgmt_cmd fdb_cmd = { 0 };
++	struct prueth_fdb_slot *slot;
++	u8 fid = vid;
++	int ret, i;
++
++	icssg_fdb_setup(emac, &fdb_cmd, addr, fid, ICSS_CMD_GET_FDB_SLOT);
++
++	fdb_cmd.cmd_args[1] |= fid << 16;
++
++	ret = icssg_send_fdb_msg(emac, &fdb_cmd, &fdb_cmd_rsp);
++	if (ret)
++		return ret;
++
++	WARN_ON(fdb_cmd.seqnum != fdb_cmd_rsp.seqnum);
++
++	slot = (struct prueth_fdb_slot __force *)(emac->dram.va + FDB_CMD_BUFFER);
++	for (i = 0; i < 4; i++) {
++		if (ether_addr_equal(addr, slot->mac) && vid == slot->fid)
++			return (slot->fid_c2 & ~ICSSG_FDB_ENTRY_VALID);
++		slot++;
++	}
++
++	return 0;
++}
++
++void icssg_vtbl_modify(struct prueth_emac *emac, u8 vid, u8 port_mask,
++		       u8 untag_mask, bool add)
++{
++	struct prueth *prueth = emac->prueth;
++	struct prueth_vlan_tbl *tbl;
++	u8 fid_c1;
++
++	tbl = prueth->vlan_tbl;
++	fid_c1 = tbl[vid].fid_c1;
++
++	/* FID_C1: bit0..2 port membership mask,
++	 * bit3..5 tagging mask for each port
++	 * bit6 Stream VID (not handled currently)
++	 * bit7 MC flood (not handled currently)
++	 */
++	if (add) {
++		fid_c1 |= (port_mask | port_mask << 3);
++		fid_c1 &= ~(untag_mask << 3);
++	} else {
++		fid_c1 &= ~(port_mask | port_mask << 3);
++	}
++
++	tbl[vid].fid_c1 = fid_c1;
++}
++
++u16 icssg_get_pvid(struct prueth_emac *emac)
++{
++	struct prueth *prueth = emac->prueth;
++	u32 pvid;
++
++	if (emac->port_id == PRUETH_PORT_MII0)
++		pvid = readl(prueth->shram.va + EMAC_ICSSG_SWITCH_PORT1_DEFAULT_VLAN_OFFSET);
++	else
++		pvid = readl(prueth->shram.va + EMAC_ICSSG_SWITCH_PORT2_DEFAULT_VLAN_OFFSET);
++
++	pvid = pvid >> 24;
++
++	return pvid;
++}
++
++void icssg_set_pvid(struct prueth *prueth, u8 vid, u8 port)
++{
++	u32 pvid;
++
++	/* only 256 VLANs are supported */
++	pvid = (u32 __force)cpu_to_be32((ETH_P_8021Q << 16) | (vid & 0xff));
++
++	if (port == PRUETH_PORT_MII0)
++		writel(pvid, prueth->shram.va + EMAC_ICSSG_SWITCH_PORT1_DEFAULT_VLAN_OFFSET);
++	else if (port == PRUETH_PORT_MII1)
++		writel(pvid, prueth->shram.va + EMAC_ICSSG_SWITCH_PORT2_DEFAULT_VLAN_OFFSET);
++	else
++		writel(pvid, prueth->shram.va + EMAC_ICSSG_SWITCH_PORT0_DEFAULT_VLAN_OFFSET);
++}
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.h b/drivers/net/ethernet/ti/icssg/icssg_config.h
+index cf2ea4bd22a2..4a9721aa6057 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_config.h
++++ b/drivers/net/ethernet/ti/icssg/icssg_config.h
+@@ -35,6 +35,8 @@ struct icssg_flow_cfg {
+ 	(2 * (PRUETH_EMAC_BUF_POOL_SIZE * PRUETH_NUM_BUF_POOLS + \
+ 	 PRUETH_EMAC_RX_CTX_BUF_SIZE * 2))
+ 
++#define PRUETH_SWITCH_FDB_MASK ((SIZE_OF_FDB / NUMBER_OF_FDB_BUCKET_ENTRIES) - 1)
++
+ struct icssg_rxq_ctx {
+ 	__le32 start[3];
+ 	__le32 end;
+@@ -202,6 +204,23 @@ struct icssg_setclock_desc {
+ #define ICSSG_TS_PUSH_SLICE0	40
+ #define ICSSG_TS_PUSH_SLICE1	41
+ 
++struct mgmt_cmd {
++	u8 param;
++	u8 seqnum;
++	u8 type;
++	u8 header;
++	u32 cmd_args[3];
++};
++
++struct mgmt_cmd_rsp {
++	u32 reserved;
++	u8 status;
++	u8 seqnum;
++	u8 type;
++	u8 header;
++	u32 cmd_args[3];
++};
++
+ /* FDB FID_C2 flag definitions */
+ /* Indicates host port membership.*/
+ #define ICSSG_FDB_ENTRY_P0_MEMBERSHIP         BIT(0)
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+index a78c5eb75fb8..82bdad9702c3 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+@@ -232,6 +232,7 @@ struct icssg_firmwares {
+  * @emacs_initialized: num of EMACs/ext ports that are up/running
+  * @iep0: pointer to IEP0 device
+  * @iep1: pointer to IEP1 device
++ * @vlan_tbl: VLAN-FID table pointer
+  */
+ struct prueth {
+ 	struct device *dev;
+@@ -256,6 +257,7 @@ struct prueth {
+ 	int emacs_initialized;
+ 	struct icss_iep *iep0;
+ 	struct icss_iep *iep1;
++	struct prueth_vlan_tbl *vlan_tbl;
+ };
+ 
+ struct emac_tx_ts_response {
+@@ -313,6 +315,16 @@ int icssg_queue_pop(struct prueth *prueth, u8 queue);
+ void icssg_queue_push(struct prueth *prueth, int queue, u16 addr);
+ u32 icssg_queue_level(struct prueth *prueth, int queue);
+ 
++int icssg_send_fdb_msg(struct prueth_emac *emac, struct mgmt_cmd *cmd,
++		       struct mgmt_cmd_rsp *rsp);
++int icssg_fdb_add_del(struct prueth_emac *emac,  const unsigned char *addr,
++		      u8 vid, u8 fid_c2, bool add);
++int icssg_fdb_lookup(struct prueth_emac *emac, const unsigned char *addr,
++		     u8 vid);
++void icssg_vtbl_modify(struct prueth_emac *emac, u8 vid, u8 port_mask,
++		       u8 untag_mask, bool add);
++u16 icssg_get_pvid(struct prueth_emac *emac);
++void icssg_set_pvid(struct prueth *prueth, u8 vid, u8 port);
+ #define prueth_napi_to_tx_chn(pnapi) \
+ 	container_of(pnapi, struct prueth_tx_chn, napi_tx)
+ 
 -- 
 2.34.1
 
