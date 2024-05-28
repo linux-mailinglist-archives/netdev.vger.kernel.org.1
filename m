@@ -1,126 +1,99 @@
-Return-Path: <netdev+bounces-98617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AAE98D1DE7
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:07:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 385C88D1E06
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:10:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A37A1F21D50
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 14:07:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6983E1C22B4A
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 14:10:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E3F16F858;
-	Tue, 28 May 2024 14:07:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S2HbvMn8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61DAC16E895;
+	Tue, 28 May 2024 14:10:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9EC16F844
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 14:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E972316F831
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 14:10:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716905233; cv=none; b=VGphN7tGuCMwlS+R1L31Z2Yb7nRNy+XsrDCt1HmQXpoz9xvF6bUINGFSoUve87GmwtyZ8uPlK+ugsj8b1JVnpowjetNBCyEKoEbgAsAEbFoaLI4I2sc7PMViRUcrbzuq6w20g17Fas+7KGNUpeog4upecEzoOVz00gFGbAj2kNk=
+	t=1716905406; cv=none; b=sWMJ0U1hMqxXYz+xbGGBZlMiDVG/SIHclJ6JVss3hSw+yEmSTXdZyb1Bmx/CWysN0ltDetxRiNTwwNrf9I6rGspUTUiO4z/4YtD9xirLplAl6uIOfG5iyhh/EGp+wLMrcdxnU/2jIgNgihW28V0wWdFyjUkHoyBBJReFVvPQis0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716905233; c=relaxed/simple;
-	bh=7AWlqIz31VH+2auWG19awNf9Ol79+gqyQMhVO5xC260=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fWbZvp25goGs2rNCGFVrtXyXhyH+xW6/sL51X7eG17hEAZWIWKjoI5Fwxa1odv8C04U3GHTIFI87p3fOPTJFbwJ1ysnUomti29bcHV8Z5lHlM/SnKm5HSwhxCZleFYGXO3qrhIqp35ViYf1zLy/rX2Hx0XEH1reYrMCdp5SK4SU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S2HbvMn8; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-356c4e926a3so674652f8f.1
-        for <netdev@vger.kernel.org>; Tue, 28 May 2024 07:07:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716905230; x=1717510030; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p/eRqqpRId2hU8uhh2VGbfYucEQw3R2tB8HH0TtVdKk=;
-        b=S2HbvMn8Z+HOmzw1V9TCdk5e8+Ql+RJtxCpqWrJX/46J2tG+KkIylY5kxk9ryjRtbZ
-         DX1DO7LIDKLhb61FvNOTO+hLWOzFDUOPCSUFV0k8BSf2NfH3pLMLw9Ecd0nxhOfwqvai
-         P2dQvztJ9XcpsMskRVAfy4mwGEuJVEPSCidma4iuT0KHdGrGvz8xnOEr8tK53jhZ889p
-         uGupSpIE9jBf2lSOlzcFC3kY6OF8NhQe71t/YaONx6KDth8LyZGMfVWG7AQWf0YZBumY
-         WH22cGr0vVxVboJ6M1oGWf5zR1C9/tex96kt4tRg2xRQkxhXicPdBpABllnRP5TJrHxY
-         HWOA==
+	s=arc-20240116; t=1716905406; c=relaxed/simple;
+	bh=h/gURcyiroXERc30tAsjPBSZVuF3pg0jAqJbgtbiT0k=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=nt8Y91yabYxZHp5mBzptNoce/APV+FXZBlPhEMK09RCXbIS+rOnQ8EbLuMPCHhx7vVw5joZRfDwvyoGmbPYyM8MHzYcnFe+jjRwreC6FHFHFCfqJE2tWX9WUVt5+rweTTL/DnKA79qHqev2r0AET4L0y6OZButBIRiMcBi6dOYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3742c0af134so7060255ab.1
+        for <netdev@vger.kernel.org>; Tue, 28 May 2024 07:10:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716905230; x=1717510030;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=p/eRqqpRId2hU8uhh2VGbfYucEQw3R2tB8HH0TtVdKk=;
-        b=Gxssjw79UNxzuGW0FECGZMRR6sByLuEyYTThj3WytSs1lUHW/DK2RgTPPfx0YTBcXO
-         7QF0V5fNKg7vpwzbGZAbfLQQrRwqOkhdvl/GgEidD4tcCCyO9ojG13AfQxV5FdlBAQbr
-         H5OWIFe9MCtiNjKHsLLpqAsoAK+ALuDcxdCWqUKqJVRZXHV3I7UhIILzuZd3mGSJUOT/
-         6poxU3kix9FaRyNnvMSd4j+/ajO/TGbyQGiNDztT4J0KVM2/CkCjsAn1sVuz/BC0sQP2
-         ZWWzq/cg3Itl6bc+G0OHEdTol5QiPRVwaSkS9jKYBhWmudK8JEJpvgmXwaEM0AkX5TWn
-         cKpA==
-X-Gm-Message-State: AOJu0Yz555HyhzhXvTydL2s9Y1v+hApVReiJQ1xqyG1Pg7pHceFW6yhE
-	VND70nqxOq51dboWJeYGQGNN1RKp98Sh0VCBYHJ3Rtav2Pz71mUY2EEthST7
-X-Google-Smtp-Source: AGHT+IHidcE/qhSjftJB9oR4DkKrzsL4D5WztX9yJYsc7j0RFawFNV/ukEEkH6RMcqad3eBdXT3CUA==
-X-Received: by 2002:a5d:4f8b:0:b0:34f:5d07:ebd1 with SMTP id ffacd0b85a97d-3552fdf2397mr8705503f8f.56.1716905230391;
-        Tue, 28 May 2024 07:07:10 -0700 (PDT)
-Received: from imac.fritz.box ([2a02:8010:60a0:0:68e9:662a:6a81:de0a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-359efaf5402sm4534599f8f.78.2024.05.28.07.07.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 May 2024 07:07:10 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Breno Leitao <leitao@debian.org>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: donald.hunter@redhat.com,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1 4/4] doc: netlink: Fix op pre and post fields in generated .rst
-Date: Tue, 28 May 2024 15:06:52 +0100
-Message-ID: <20240528140652.9445-5-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240528140652.9445-1-donald.hunter@gmail.com>
-References: <20240528140652.9445-1-donald.hunter@gmail.com>
+        d=1e100.net; s=20230601; t=1716905404; x=1717510204;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WelPM0YOgva6j7b8RyCxFfD+qVIUmvNqXXrqPoDhdgY=;
+        b=qonlXN2CmtH83KKamC2hmB1H+GfpvAS/2bBVKZ5LnKAnBoiHE97nGAPc0hVNB6y6Fj
+         riU2SKfQLOV6x3DJnGIwM8JRnBy6B8PnSDJ+kYuorXfjGSRTNt0IKBn1c8ZBMsnhVz8u
+         Feaf7e9te6hTS+CCziXSHs8YEMY+x0eG157CpEMRIJ23xYYttqc8OWa/d7vcfiVvnMeh
+         SABf83SjbvMQqNEogK9ZT4Tv2qgJ1vBe/8aHLjLKFi7jpWhgnWD6kkkWUfc4IjCldj23
+         TA1ec8KG/yfEC2V4H51vIiEvtuSnfiHRGHvIpUtsxK1PKsKiMfGrnFo8chtxc8AxpVpn
+         tBPg==
+X-Forwarded-Encrypted: i=1; AJvYcCWBcR/QyuqXKane+jyQquulxmd+G5SPffJycexiOzelIRB+6eU8ZxKxbSY077Z16l7/t/BnXqf8RtOE/i4T2kJQCb1Vy8x3
+X-Gm-Message-State: AOJu0Yyxhl0YiR9bVYlCec9z0fPbwSPNoSH7xB4jpLx+c+reoGnsxCIZ
+	PijVXk/NLH5GsymK9wOCjle8PVf66I4r0AznQDyvpbitQx38uPSjNlBCErfrrqVsQ9wvXeO5ZGB
+	8cvuCUkvCBeWuUoJPfqmVOnmWEZ6TEXcPLNXDz7D+73nlcEQdYpXTeIM=
+X-Google-Smtp-Source: AGHT+IGYxSLRdYdSIj6V1X50DGPsuaMd0GZg6XGsMCIH/LkK6jYr0HVeJzFN9W0DOKbFyaxhbmGnpo9uLKXYNy7mw6IEfD9syljH
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:2188:b0:374:491c:654a with SMTP id
+ e9e14a558f8ab-374491c6dd3mr3454075ab.1.1716905404172; Tue, 28 May 2024
+ 07:10:04 -0700 (PDT)
+Date: Tue, 28 May 2024 07:10:04 -0700
+In-Reply-To: <0000000000004fa7ab061966d1b3@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ba9d9b06198430d3@google.com>
+Subject: Re: [syzbot] [bpf?] possible deadlock in __lock_task_sighand (3)
+From: syzbot <syzbot+f2ed7d5888894fedf676@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	clang-built-linux@googlegroups.com, daniel@iogearbox.net, davem@davemloft.net, 
+	eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kafai@fb.com, kpsingh@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	mingo@redhat.com, nathan@kernel.org, ndesaulniers@google.com, 
+	netdev@vger.kernel.org, rostedt@goodmis.org, sdf@google.com, song@kernel.org, 
+	songliubraving@fb.com, syzkaller-bugs@googlegroups.com, yhs@fb.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-The generated .rst has pre and post headings without any values, e.g.
-here:
+syzbot has bisected this issue to:
 
-https://docs.kernel.org/6.9/networking/netlink_spec/dpll.html#device-id-get
+commit fbd94c7afcf99c9f3b1ba1168657ecc428eb2c8d
+Author: Alexei Starovoitov <ast@kernel.org>
+Date:   Wed Dec 1 18:10:28 2021 +0000
 
-Emit keys and values in the generated .rst
+    bpf: Pass a set of bpf_core_relo-s to prog_load command.
 
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
----
- tools/net/ynl/ynl-gen-rst.py | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=149b9a2c980000
+start commit:   30a92c9e3d6b openvswitch: Set the skbuff pkt_type for prop..
+git tree:       net
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=169b9a2c980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=129b9a2c980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=17ffd15f654c98ba
+dashboard link: https://syzkaller.appspot.com/bug?extid=f2ed7d5888894fedf676
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16c203f0980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12046634980000
 
-diff --git a/tools/net/ynl/ynl-gen-rst.py b/tools/net/ynl/ynl-gen-rst.py
-index a957725b20dc..6c56d0d726b4 100755
---- a/tools/net/ynl/ynl-gen-rst.py
-+++ b/tools/net/ynl/ynl-gen-rst.py
-@@ -156,7 +156,10 @@ def parse_do(do_dict: Dict[str, Any], level: int = 0) -> str:
-     lines = []
-     for key in do_dict.keys():
-         lines.append(rst_paragraph(bold(key), level + 1))
--        lines.append(parse_do_attributes(do_dict[key], level + 1) + "\n")
-+        if key in ['request', 'reply']:
-+            lines.append(parse_do_attributes(do_dict[key], level + 1) + "\n")
-+        else:
-+            lines.append(headroom(level + 2) + do_dict[key] + "\n")
- 
-     return "\n".join(lines)
- 
--- 
-2.44.0
+Reported-by: syzbot+f2ed7d5888894fedf676@syzkaller.appspotmail.com
+Fixes: fbd94c7afcf9 ("bpf: Pass a set of bpf_core_relo-s to prog_load command.")
 
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
