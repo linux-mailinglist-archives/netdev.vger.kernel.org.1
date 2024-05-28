@@ -1,138 +1,171 @@
-Return-Path: <netdev+bounces-98488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7F3C8D1964
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:28:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 517E18D196C
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:29:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0A75281F90
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 11:28:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D21D41F2336D
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 11:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82ED16C684;
-	Tue, 28 May 2024 11:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C85C16C69D;
+	Tue, 28 May 2024 11:29:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2k2eeg6O"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="HHQYcMfl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30DE4182B3
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 11:27:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A215316C684
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 11:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716895681; cv=none; b=qZ/Kz4hvzbkbFija+8mHPv4Ze3z1g7XRzspMPm0ffRUT6e/TiYhoqG/ZmA0cmIwO2y2XZKUpHGqwXeRHJM9VsN8TfMrrxdt7RXB7hugtqN1xVE2W0y4A7C2SO47nETbn5IkiI8ImWM5DR+uRtkiK1NfYqQ1LwvyL92uLSOsV3HE=
+	t=1716895773; cv=none; b=ri8B/YoRx/OkoUyiUPatsi02obDAWOdZK+S6wgfA1vUWcfY6ogBqGLX0O/mkEBvnnmr5P2UlTNUIloN9ZustRCzOqP1oPqfCp7J253VHpNC6SBKNi00nb6uyDw/uon6zEyKaHWa98Cfffvv6Ka7vN7392KQJcBWv5ZgYMwUr7nU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716895681; c=relaxed/simple;
-	bh=gT0wOBcsnBOHm+12Oq9ERzURyIX2UV+/gv+87nNwFaU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NrzbVKy7xR1hE0xcKIMS6nOJ+f3x6RRL3xmKVy55cry4ptiaem89a7Prr+swn8tQxjhNwUl1XGDSefvChv56NmMOh2h0UylKRJDNGWZ0+UxieW9WWC0hliSfuX3Wb5oEbffkznnuxkO4/6x/YYDDbXwGnbQ34GYoHOB+vW/sFeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2k2eeg6O; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5750a8737e5so27327a12.0
-        for <netdev@vger.kernel.org>; Tue, 28 May 2024 04:27:59 -0700 (PDT)
+	s=arc-20240116; t=1716895773; c=relaxed/simple;
+	bh=Fhx6TTOqibqI01CNB0tq59za6TZyBibaHI3P84V+iE8=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cjg0zHfR1X5G7BfWfdEw6zifC/qu/F82AcVrkLmImikB8x1WV9nmzpX9K+RPvo/xmLX3DPAivGmIJ1vAf4lnOIcRQ5pbQueKICxugAK8rsvlE6120vSlf7+bHTkMoTU7Z2BMYFAEkIwto8i+k4fC9nkclYmJozgLukokLlXDFUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=HHQYcMfl; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3588cb76276so1155892f8f.0
+        for <netdev@vger.kernel.org>; Tue, 28 May 2024 04:29:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716895678; x=1717500478; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XcOs7aWhKuWkRGBu1QsCf2UxmMDJEzNbk4usBhwm4V4=;
-        b=2k2eeg6Oe0LgO4ovAU7SEwlJCMhkyESm/cYIJG2Rs5XCI+CIoc7cnwqI8DbyK83GC8
-         hr4Z/jKrixvQmK+dUhxA8A7cSQEve9jFTfJnfHvLGDefLxu+rHIBPnFPgC3+RAlFGVbe
-         9GAPWiVFWJWwmO8sXcEyvDFTrKb92YVJVplxWwupMEkuHVeblOPjsg4nqPrq3GDh6iYG
-         yM3bn24QKCQw5TxBJLy4h0CPKF/wdvfaJySk6rr6vf47NHSYiwfJ0v+surVYiKR1IwwV
-         G4QzVHE4C2mWDClg+vHRbm5kFOYvDEzHc8YAVvcX1msDUod0KGv/Ojv/2fKR6yGW79qk
-         wVeQ==
+        d=suse.com; s=google; t=1716895769; x=1717500569; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=d5oY5QDj/F2VjFpREI5FnfmpEsPpu1JW9qQI7HQyBXo=;
+        b=HHQYcMflVg+OtmBs1SqR7Lzq+2HtlGvu7h2cPgb9t8GSsriHxCgP0BINbIUHfP8AhL
+         IkbKxLxoZSYIMcaOq0c3jaU/7wAUppJEXuuLBJjomkm44xUXb1MFNrEX2ySSS+v/W7oM
+         IwcM++5Z01QH5z3o+M1UbaWOKzpDb2MKP1BapgzGVkUXp07UmfN7XcV0f2TFEk7Tkow0
+         rpkgaQpNafIgoJ4hRXza24dH6TjSw4enPuoLu0Rg2tNsu4gFsp29od8YavJLUaZFYC/u
+         BH8kqxmo0VQ9408RAOVlWkFWRfbQA4TSCwZjUjt2K2QR8dz+j2OV+HvwwJ6UFlDhs9OP
+         AeUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716895678; x=1717500478;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XcOs7aWhKuWkRGBu1QsCf2UxmMDJEzNbk4usBhwm4V4=;
-        b=b7N2qyGjWMFitvChMYv+0hsBONICQBR5n6+kgn2f33OszYU3hf5menszQfdNFDwSHr
-         yjcCHJv+7Kek745hXettRaALHUC+6KTmNiY7c7BM2bgirYCgYa/nL+zzt8oa/od9229U
-         DHjSsz6ow0/In7VSQsUf7S7K44/FZ97k/+u9d70kTn5grNC3lG25A9wM6JUs4gqVoyL8
-         6RdOc8Db7PP9a280A5kt5iX8LRsn5f2T4IDbD3bNVncbtWJ/Xcz3Gslsam7hZreWA68v
-         QwW0zYjwsOqTzV6lXv1WZlNtnmZEWncIS2dWFM2Zj3BttUVFOTrzC/pnXsdEHZBfWPa6
-         E5ZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCULEGNQouBS4ybyybfDW/Yh9iiZ+UAbwjnTcD20jDwAzOfEeIL6Ue6msxbhwhlX4FcqvQ761lLYQs7Ya9zqsfxVVfZkMgPq
-X-Gm-Message-State: AOJu0YyetoT0G4BsWLYpLmIChVDKyhYWYSnVzKu9vy+sbPJUDRrlbPd1
-	B3fhE91UzP4DHOuBJ5BylbcZCBOGr40nuG2dZ32YE6ISoy6HOaiujRCg4brmbLZP4ZPqjLYayad
-	P3DpMOmTfkXV2EbuJpi1JruyovR1AviLNNlbn
-X-Google-Smtp-Source: AGHT+IG06KbD8naAgTu55ochegQJ8gBMdkWhz6xZEfoPqExKgRsF/Mj3tDaI8P2gIlruGZhC/FvntKGthICO+K2duug=
-X-Received: by 2002:aa7:c58b:0:b0:579:c2f3:f826 with SMTP id
- 4fb4d7f45d1cf-579c2f3fa49mr317219a12.4.1716895677997; Tue, 28 May 2024
- 04:27:57 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716895769; x=1717500569;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d5oY5QDj/F2VjFpREI5FnfmpEsPpu1JW9qQI7HQyBXo=;
+        b=pQ85o0nE7AFfDlDRHTd1aBiMv96kFpkFBiNAN3Q33lIA4uAyGRbCQYjVw6flxRv39a
+         deJcYPcRsr8jdL4IeyE8WzHk2BEGanMlkDRINypP4nQRfNINmVpMEmqMp5lN5ZifQCTD
+         ItIqfNgBvgeC/lt+uFQhLRUbWy0MC+OqLj+Poj/YboDtITyQXmq3ylvuViwI0W16KOH1
+         98MucUQresh6UOA7Ez2Iy+zuuiuxgs/7z3182p4bHKlsKna0GgjD0kR9iySnJFYgjcIU
+         2G8P8zijpbRzxvze8/nAJSU99Cw+iGEGmVsaJPC+y3nwJa5iaTKpx1F4T7Wc+PMNCdJP
+         zNUg==
+X-Forwarded-Encrypted: i=1; AJvYcCVDah8PV5r5R5wdRwEYZfYNRzPM98N4UwYTNZfxEyVRKe+P4PxAjlkfgMjAeFLFZd92L2aXbbHQQ91NpyHfIWgS9AGVZ8MT
+X-Gm-Message-State: AOJu0YzxnmNDTKXEzvzHqFbc+O231ZAUTWNROt4cLKiVmT+HOa7rcqyF
+	ohpbM5mbrA4SgF60hwz23N0HwJHJnXWgxdiBAywfOB+JmVCWpj4a1A/bN3K8Q4s=
+X-Google-Smtp-Source: AGHT+IHEhP3H8xEy5lW4Agk2rSDU8yNaHdbHbk2CspUGWoXeNFtS8ar0NeKjZ/WLL0Q89fYZoR3UBQ==
+X-Received: by 2002:a5d:47ab:0:b0:357:a6e3:8748 with SMTP id ffacd0b85a97d-357a6e3877emr7780899f8f.1.1716895768949;
+        Tue, 28 May 2024 04:29:28 -0700 (PDT)
+Received: from localhost.localdomain (62.83.84.125.dyn.user.ono.com. [62.83.84.125])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3557a08a8bcsm11458124f8f.44.2024.05.28.04.29.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 May 2024 04:29:28 -0700 (PDT)
+From: Oscar Salvador <osalvador@suse.com>
+X-Google-Original-From: Oscar Salvador <osalvador@suse.de>
+Date: Tue, 28 May 2024 13:29:26 +0200
+To: syzbot <syzbot+d3fe2dc5ffe9380b714b@syzkaller.appspotmail.com>
+Cc: akpm@linux-foundation.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, muchun.song@linux.dev, netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [mm?] kernel BUG in __vma_reservation_common
+Message-ID: <ZlXAFvEdT96k5iAQ@localhost.localdomain>
+References: <0000000000004096100617c58d54@google.com>
+ <000000000000f9561b06196ef5b3@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240524193630.2007563-1-edumazet@google.com> <20240524193630.2007563-3-edumazet@google.com>
- <889fbe3feae042ada8d75a8a2184dbaa@AcuMS.aculab.com>
-In-Reply-To: <889fbe3feae042ada8d75a8a2184dbaa@AcuMS.aculab.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 28 May 2024 13:27:42 +0200
-Message-ID: <CANn89iJikmmxMVs5oYT=ZV0ae_tydYHpft99mkNWEhyWkjMM0g@mail.gmail.com>
-Subject: Re: [PATCH net 2/4] tcp: fix race in tcp_write_err()
-To: David Laight <David.Laight@aculab.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "eric.dumazet@gmail.com" <eric.dumazet@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <000000000000f9561b06196ef5b3@google.com>
 
-On Tue, May 28, 2024 at 11:20=E2=80=AFAM David Laight <David.Laight@aculab.=
-com> wrote:
->
-> From: Eric Dumazet
-> > Sent: 24 May 2024 20:36
-> >
-> > I noticed flakes in a packetdrill test, expecting an epoll_wait()
-> > to return EPOLLERR | EPOLLHUP on a failed connect() attempt,
-> > after multiple SYN retransmits. It sometimes return EPOLLERR only.
-> >
-> > The issue is that tcp_write_err():
-> >  1) writes an error in sk->sk_err,
-> >  2) calls sk_error_report(),
-> >  3) then calls tcp_done().
-> >
-> > tcp_done() is writing SHUTDOWN_MASK into sk->sk_shutdown,
-> > among other things.
-> >
-> > Problem is that the awaken user thread (from 2) sk_error_report())
-> > might call tcp_poll() before tcp_done() has written sk->sk_shutdown.
-> >
-> > tcp_poll() only sees a non zero sk->sk_err and returns EPOLLERR.
-> >
-> > This patch fixes the issue by making sure to call sk_error_report()
-> > after tcp_done().
->
-> Isn't there still the potential for a program to call poll() at
-> 'just the wrong time' and still see an unexpected status?
+On Mon, May 27, 2024 at 05:50:24AM -0700, syzbot wrote:
+> syzbot has found a reproducer for the following issue on:
+> 
+> HEAD commit:    66ad4829ddd0 Merge tag 'net-6.10-rc1' of git://git.kernel...
+> git tree:       net-next
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=15c114aa980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=48c05addbb27f3b0
+> dashboard link: https://syzkaller.appspot.com/bug?extid=d3fe2dc5ffe9380b714b
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17770d72980000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10db1592980000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/05c6f2231ef8/disk-66ad4829.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/5f4fc63b22e3/vmlinux-66ad4829.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/67f5c4c88729/bzImage-66ad4829.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+d3fe2dc5ffe9380b714b@syzkaller.appspotmail.com
 
-This patch does not cope with poll() results being volatile.
+#syz test
 
-Only epoll, because epoll logic intercepts sk_error_report() and wakes
-up a thread,
-this thread is calling back tcp_poll() shortly after.
+From 917fa54481422c650425c8b0330439f8a3308479 Mon Sep 17 00:00:00 2001
+From: Oscar Salvador <osalvador@suse.de>
+Date: Tue, 28 May 2024 10:43:14 +0200
+Subject: [PATCH] mm/hugetlb: Do not call vma_add_reservation upon ENOMEM
 
-The 'after' starts really at sk_error_report().
+sysbot reported a splat [1] on __unmap_hugepage_range().
+This is because vma_needs_reservation() can return -ENOMEM if
+allocate_file_region_entries() fails to allocate the file_region struct for
+the reservation.
+Check for that and do not call vma_add_reservation() if that is the case,
+otherwise region_abort() and region_del() will see that we do not have any
+file_regions.
 
->
-> ...
-> >       WRITE_ONCE(sk->sk_err, READ_ONCE(sk->sk_err_soft) ? : ETIMEDOUT);
-> > -     sk_error_report(sk);
-> >
-> > -     tcp_write_queue_purge(sk);
-> > -     tcp_done(sk);
-> > +     tcp_done_with_error(sk);
->
-> Is there scope for moving the write to sk->sk_err inside the function?
-> Looks like it'll need a larger change to tcp_reset().
+If we detect that vma_needs_reservation returned -ENOMEM, we clear the
+hugetlb_restore_reserve flag as if this reservation was still consumed,
+so free_huge_folio will not increment the resv count.
 
-This seems feasible, yes.
+[1] https://lore.kernel.org/linux-mm/0000000000004096100617c58d54@google.com/T/#ma5983bc1ab18a54910da83416b3f89f3c7ee43aa
+
+Reported-by: syzbot+d3fe2dc5ffe9380b714b@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/linux-mm/0000000000004096100617c58d54@google.com/
+Signed-off-by: Oscar Salvador <osalvador@suse.de>
+---
+ mm/hugetlb.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/mm/hugetlb.c b/mm/hugetlb.c
+index 6be78e7d4f6e..a178e4bcca1b 100644
+--- a/mm/hugetlb.c
++++ b/mm/hugetlb.c
+@@ -5768,8 +5768,20 @@ void __unmap_hugepage_range(struct mmu_gather *tlb, struct vm_area_struct *vma,
+ 		 * do_exit() will not see it, and will keep the reservation
+ 		 * forever.
+ 		 */
+-		if (adjust_reservation && vma_needs_reservation(h, vma, address))
+-			vma_add_reservation(h, vma, address);
++		if (adjust_reservation) {
++			int rc = vma_needs_reservation(h, vma, address)
++
++			if (rc < 0)
++				/* Pressumably allocate_file_region_entries failed
++				 * to allocate a file_region struct. Clear
++				 * hugetlb_restore_reserve so that global reserve
++				 * count will not be incremented by free_huge_folio.
++				 * Act as if we consumed the reservation.
++				 */
++				folio_clear_hugetlb_restore_reserve(folio);
++			else if (rc)
++				vma_add_reservation(h, vma, address);
++		}
+ 
+ 		tlb_remove_page_size(tlb, page, huge_page_size(h));
+ 		/*
+-- 
+2.45.1
+
+-- 
+Oscar Salvador
+SUSE Labs
 
