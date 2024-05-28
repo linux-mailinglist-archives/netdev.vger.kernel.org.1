@@ -1,113 +1,82 @@
-Return-Path: <netdev+bounces-98719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAD6B8D22E2
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 20:00:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ACDB8D230B
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 20:09:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B0F41F24AD1
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:00:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25899282A32
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:09:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6FB945C14;
-	Tue, 28 May 2024 18:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4D347F60;
+	Tue, 28 May 2024 18:09:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="GGdW0yBJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZmIe6gV0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ECD044C7E;
-	Tue, 28 May 2024 18:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B612D45C14
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 18:09:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716919207; cv=none; b=eo4kR8O2eto7gKsM/ZMu7NOD7VDtQ2PkNYyZr/ChKcbxDklOni/RwcAyjbTvqFhECNfBzteHMaaFkBxcQJrnSkz4eOOqzBsBBxRz4Hx5hpgfZmmPBIA4U/bB5OPqUEQ8vf86w4CEb0IDrSJKTlxXibPDFq+kRoFR6uP9RCpKB9A=
+	t=1716919765; cv=none; b=dilS2F1Aa4Kx5t13T8LDXeuUEioo+p2IXnQUAH9Zj1zcjxKFXeo622IGtY1uBqZuVtmQ2zkKoXk/Nn1ZlrVyyFftqc+JbKi/5AcJhgcAzC2gz3YW8wHWhBL6wx5bZe8rVe+CYxJ10UIUZsBIUonDCEU0dceVbicTjAu/mr3u4D8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716919207; c=relaxed/simple;
-	bh=EBpocNbTbdzrhYBqZxwCzCJlT995g3wl4iXLBSp+0/4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TO8WLelbZ/k1XswD3B01k8K+wLfQEZ6kyomeiC4Cx1U0Tj4s2jivHMiDC/vbPhae2P0QCoSpHCsspEmLjLgirFUK39gDXnrP+VueCtzoMfoI+EaO6uQcnMAaJEV+2EwuTEY0/oL1nCVflW5U+Jnp4m96twdAq/cKAb/5+yjGHP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=GGdW0yBJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 801BFC3277B;
-	Tue, 28 May 2024 18:00:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1716919207;
-	bh=EBpocNbTbdzrhYBqZxwCzCJlT995g3wl4iXLBSp+0/4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GGdW0yBJWNpktuyt6n6bS0lqmmJqPep6iUcO4NhJN7sA8nuG76z1M0pPWce3ibnUR
-	 5/0I3884KBEm+4xE7yfco4RoKezOHyHSw16IpC66CrVV5bA1Aa5aYzZKXp9neYJnv+
-	 mtts4/XorANFbDt8ru44/b//inGU0t5AyC4sknko=
-Date: Tue, 28 May 2024 20:00:11 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Shay Drory <shayd@nvidia.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	kuba@kernel.org, edumazet@google.com, david.m.ertman@intel.com,
-	rafael@kernel.org, ira.weiny@intel.com, linux-rdma@vger.kernel.org,
-	leon@kernel.org, tariqt@nvidia.com, Parav Pandit <parav@nvidia.com>
-Subject: Re: [PATCH net-next v5 1/2] driver core: auxiliary bus: show
- auxiliary device IRQs
-Message-ID: <2024052829-pretended-dad-ac9b@gregkh>
-References: <20240528091144.112829-1-shayd@nvidia.com>
- <20240528091144.112829-2-shayd@nvidia.com>
+	s=arc-20240116; t=1716919765; c=relaxed/simple;
+	bh=KD34xdxulxYzo/NvLrf29jnx01FFfXdsTgBJFdiXof8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sgt5GNbExUsJIVyg4zuKOOm4iyH7q1o3kc+uCa3cilPAFD//mIAEtCyDx2LWO193IAOUc/Wva6mbMSNTybD6eXwiaOUVx8q00lJJeDq0tsv62wYVZ711/1HM7hreYEVPnJbJZ6aFswR6yvsvl9X2WthrumdoJp6irwb5sy11F4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZmIe6gV0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04438C3277B;
+	Tue, 28 May 2024 18:09:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716919765;
+	bh=KD34xdxulxYzo/NvLrf29jnx01FFfXdsTgBJFdiXof8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZmIe6gV0Pz6RcH1//xpQqK65TMyi0uQVTUuU+r+3nuuVfpoVUoRPygKsZbs3fCpt+
+	 5CQWRNNuseLM9iI4OOqFt/mOr7KfaJuOSu1dnNVeD2L4/q4qR3yZhRTobSNkpyCf0n
+	 IkghrG2sOHVarTREeY0CFFv8ClBz6+qfbfA5YR3n5mJOOGFTsbeeY3NUiLFxh35S1b
+	 or3tyk9unSEk+59CjrO83JxB+b8BnG4Wo48GqcCwujcApx1dc4+JWDQyPLmDiipS8d
+	 C3Y+wUcZcR7alF7AFl/sanEphhtKXxZ4e8y5WMDpHDW2RQozEdM74h0Er8HH2qhGW+
+	 V7aF2eEEsX7SQ==
+Date: Tue, 28 May 2024 11:09:24 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paul Wouters <paul@nohats.ca>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Steffen Klassert
+ <steffen.klassert@secunet.com>, netdev@vger.kernel.org, pabeni@redhat.com,
+ borisp@nvidia.com, gal@nvidia.com, cratiu@nvidia.com,
+ rrameshbabu@nvidia.com, tariqt@nvidia.com
+Subject: Re: [RFC net-next 00/15] add basic PSP encryption for TCP
+ connections
+Message-ID: <20240528110924.0f131264@kernel.org>
+In-Reply-To: <81646030-00b9-10ad-abed-a7a78f0c511e@nohats.ca>
+References: <1da873f4-7d9b-1bb3-0c44-0c04923bf3ab@nohats.ca>
+	<ZlWm/rt2OGfOCiZR@gauss3.secunet.de>
+	<6655e0eecb33a_29176f29427@willemb.c.googlers.com.notmuch>
+	<81646030-00b9-10ad-abed-a7a78f0c511e@nohats.ca>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240528091144.112829-2-shayd@nvidia.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 28, 2024 at 12:11:43PM +0300, Shay Drory wrote:
-> +#ifdef CONFIG_SYSFS
-> +/* Xarray of irqs to determine if irq is exclusive or shared. */
-> +static DEFINE_XARRAY(irqs);
-> +/* Protects insertions into the irqs xarray. */
-> +static DEFINE_MUTEX(irqs_lock);
+On Tue, 28 May 2024 11:33:33 -0400 (EDT) Paul Wouters wrote:
+> > It makes sense to work to get to an IETF standard protocol that
+> > captures the same benefits. But that is independent from enabling what
+> > is already implemented.  
+> 
+> How many different packet encryption methods should the linux kernel
+> have? There are good reasons to go through standard bodies. Doing your
+> own thing and then saying "but we did it already" to me does not feel
+> like a strong argument. That's how we got wireguard with all of its
+> issues of being written for a single use case, and now being unfit for
+> generic use cases.
 
-You access the irq xarray without grabbing the lock in places :(
-
-But again, I fail to see why the xarray is needed at all, why isn't the
-needed information here:
-
-> +struct auxiliary_irq_info {
-> +	struct device_attribute sysfs_attr;
-> +	int irq;
-> +};
-
-Right there^ should contain everything you need, NOT a global array and
-lock at all.
-
-> +/* Auxiliary devices can share IRQs. Expose to user whether the provided IRQ is
-> + * shared or exclusive.
-
-Why are you using networking comment style here?  :)
-
-> diff --git a/include/linux/auxiliary_bus.h b/include/linux/auxiliary_bus.h
-> index de21d9d24a95..760fadb26620 100644
-> --- a/include/linux/auxiliary_bus.h
-> +++ b/include/linux/auxiliary_bus.h
-> @@ -58,6 +58,7 @@
->   *       in
->   * @name: Match name found by the auxiliary device driver,
->   * @id: unique identitier if multiple devices of the same name are exported,
-> + * @irqs: irqs xarray contains irq indices which are used by the device,
->   *
->   * An auxiliary_device represents a part of its parent device's functionality.
->   * It is given a name that, combined with the registering drivers
-> @@ -138,6 +139,7 @@
->  struct auxiliary_device {
->  	struct device dev;
->  	const char *name;
-> +	struct xarray irqs;
-
-wait, why is an xarray added here too?  That feels wrong, or odd, or
-something as you seem to have multiple xarrays here when it feels like
-you need none.
-
-confused,
-
-greg k-h
+Now you made me curious. What's wrong with wireguard?
+I have only heard good things.
 
