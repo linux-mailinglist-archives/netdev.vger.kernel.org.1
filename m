@@ -1,870 +1,138 @@
-Return-Path: <netdev+bounces-98600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6216B8D1D8D
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 15:53:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AABD28D1D7A
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 15:50:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0946B2845FD
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:53:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD0361C2263B
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BD36172BDB;
-	Tue, 28 May 2024 13:50:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2448D16FF4B;
+	Tue, 28 May 2024 13:49:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NBMLdfzx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h8qOwrkn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E1F172BD3;
-	Tue, 28 May 2024 13:49:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D8616F297
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 13:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716904201; cv=none; b=W/5jxys2bIZZSiYfGXCWfgXtL+zdJOXI/7gcczjaWbNZ5UDw62D/c+Ahmpw+EhkqxIO6Z2A7tKtx1O6thJOaXMPuX73kFf87DqfI8RS3uiQ0jdeq8ik4IIpSx+R/ni30ALk/dW+6kdslRGYqRmwJg1ePrYRt0Ai9jYPQrR0HyVM=
+	t=1716904178; cv=none; b=sVBOTJHk6r3mbYT64j59XbUDKCVofiYBwWDiAhkeCpH4Lsb6xxkB5bHP9IgFCBlWmX7aunhcjOVQ7yXMgXNDDHZxifOVnZlq6rJ7H3YoCJPJn96DpR0JX56qiifEvHDYgC7WH/ppWqvtSuFLJ40kOo+3oFTmqHaMr/Yhmx4OMeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716904201; c=relaxed/simple;
-	bh=Soax0P3HLYOIxgutC3tDwzK24X7AQM/uD7TmVwfCnNY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D87+/6K4UakQMj+imWR7UlrSpO8Rl5L0nP962U4ziOr9OZesZ7SThUgnuSKWpbRDKSyWU3sa6FGN5KbfjB7BN/VLWRRG78UGNvIqsjtLJRYBn9/dbw0PIG6p9e+ysk+uMPMyF8hrO4PH8DfmgmyNM+O0STZ3Oqb4x+8FwfGu6fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NBMLdfzx; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716904199; x=1748440199;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Soax0P3HLYOIxgutC3tDwzK24X7AQM/uD7TmVwfCnNY=;
-  b=NBMLdfzxxy0taMCqUG0tppPxi2sijOrcOP+uZ7CuncPY6ZrL2Mt3tOVU
-   BtmTrEIwiyR8pZ84R0Flgat8Ybw/E3EE1vSKGDo3lMHmOeHnDjkk7X3hC
-   o99mSn1pH0BwJnRtOP1+BB+TTYYCqyu4qUDNoF7GLapqG69tweKuNNwLs
-   p7Wqoj5iLkQMhNy+FlDAbsu+rdXUJFLbifVSnp5uD+p4spD6uJqKwsDap
-   IvoiYkpFHvsCL0mJBK7NF2FRlK0cHbNVAC0Gx3tvcpSFPJ3md8QGkWgEk
-   mhUzH8nI9AjLwt+0POB7k4aZwkbBS+DY2V5jMSSwJtv4J/+tRfKvwqgY1
-   A==;
-X-CSE-ConnectionGUID: 74CPWFTzQpigm3CEANEmQA==
-X-CSE-MsgGUID: Z6GdKWu3RIC4mgtwWot++A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11085"; a="13437079"
-X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
-   d="scan'208";a="13437079"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 06:49:59 -0700
-X-CSE-ConnectionGUID: RLVG5yUvT6ibJNRb+skt8g==
-X-CSE-MsgGUID: AJob/DPMSc6SIArMEkEhVw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
-   d="scan'208";a="35577462"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by orviesa008.jf.intel.com with ESMTP; 28 May 2024 06:49:56 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Mina Almasry <almasrymina@google.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-next 12/12] idpf: use libeth Rx buffer management for payload buffer
-Date: Tue, 28 May 2024 15:48:46 +0200
-Message-ID: <20240528134846.148890-13-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240528134846.148890-1-aleksander.lobakin@intel.com>
-References: <20240528134846.148890-1-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1716904178; c=relaxed/simple;
+	bh=ob+67oZoR+LhCy2C5rQAiZ4cUz83q/sv/8ktLGOp+gE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=rQp9kBRIAtXxBShQ0dYx4McqORUeqw683grlBIrSg/cA3Ju67hnFygeBQHN9YKsnAexgkzBWtxgvW/FgmEYRlXLRbkXSYea1EQgqSPPjsxpX/LBSacGltUbx2uJS5wwGB1iDRni9sfUmnGOqBBiV6p2pSze6Y6B9bS4O6Y5MXDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h8qOwrkn; arc=none smtp.client-ip=209.85.160.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-24c91c46d00so370654fac.2
+        for <netdev@vger.kernel.org>; Tue, 28 May 2024 06:49:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716904175; x=1717508975; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DYuDoH/shZ39efiGoLr1Jha6aMlkiQiMeeZMvOvScUA=;
+        b=h8qOwrknVVG65rkL+30GUPifw9tR3T/lyVp3rLaN18+SoAl3H1NZ0hack9FSe4Hu7J
+         Hg2cnip/Zs/VLqE1d8zZLfR5Dmhps5GC7i3QHEBJzSUEwtzOEfz+draYS5cbbt6hn+Rq
+         D4ZQg28PZrRJOWjctfC5oDUzpM4fo8sObEVDcGrXm8PKcT7pSjXny1tl7eGiWkgC92ny
+         dyGjvOYbXhfJRvqADHA7+ipCW9XMUbDMr1vfHQ67PxmePLG8kjIBPMUCIP98FeTrrU0Y
+         KJZHlYF+wb6z9vGvPGBU5GIolfx6QPp5+x9/FJ4VoSThz8Wkjc3Q3oTcVBOB82h1Vopv
+         mAsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716904175; x=1717508975;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=DYuDoH/shZ39efiGoLr1Jha6aMlkiQiMeeZMvOvScUA=;
+        b=In0LJd0u9K9NAw/BbtICfqT6+Rbf1E3gZUc8L9QIHHfw/a8jhIEkik064RrlZcoqNz
+         PMPrNaNHgeKP25Agfv8xgBjNSB8/xFfAWIQkjbTuiFWeN3NVhWhFSMRUzf8zD6ArTtCL
+         QQXT7BGuOEsIslZVYoJC6vLgkdkwlpFBGUMsnmqnj13qVMAx7gc4qAoZhRVYbv4pYreW
+         GDllzWwobsjMlzZnnswo1zTKLfR4hfxKAZ1EDOTSiygCQIYQL31ydvK5f3YuKAs8Vznd
+         k7shsYeh4XZ7NkbvdoaazWS9phh7HDKEpbOoDqF3CVFckXMc/830tIGa5dybLv/thbF7
+         5M3w==
+X-Forwarded-Encrypted: i=1; AJvYcCW6uRFsgTRpzL62uH3cpriymLqEL0InIihOdUI/AvyFak0bfwAVC9eQQXA9B7kM2mkrrE3ko4Nc/3Wv6sh/Q7h/KSMi6Nz2
+X-Gm-Message-State: AOJu0YyQCPHCnl44o7akckiLxjxr/oxITLVZNIN8pSrQOnlkpZHrKvCj
+	ipR10fVqzwAkfNe5TWERP2l5qhg2IP90AksRRzajIJ4yQXbSRMlB
+X-Google-Smtp-Source: AGHT+IFm1FiMSDg2/Np99KVw/LvGQI1cqNHtff6boYCn9TSgmgwnNb84jdda85ADEJUB1sQYGwsAHA==
+X-Received: by 2002:a05:6870:718f:b0:24f:e8f1:6774 with SMTP id 586e51a60fabf-24fe8f1cb22mr7261987fac.44.1716904175498;
+        Tue, 28 May 2024 06:49:35 -0700 (PDT)
+Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43fb18b0e3bsm42686261cf.68.2024.05.28.06.49.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 May 2024 06:49:35 -0700 (PDT)
+Date: Tue, 28 May 2024 09:49:34 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>, 
+ Paul Wouters <paul@nohats.ca>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com, 
+ willemdebruijn.kernel@gmail.com, 
+ borisp@nvidia.com, 
+ gal@nvidia.com, 
+ cratiu@nvidia.com, 
+ rrameshbabu@nvidia.com, 
+ tariqt@nvidia.com
+Message-ID: <6655e0eecb33a_29176f29427@willemb.c.googlers.com.notmuch>
+In-Reply-To: <ZlWm/rt2OGfOCiZR@gauss3.secunet.de>
+References: <1da873f4-7d9b-1bb3-0c44-0c04923bf3ab@nohats.ca>
+ <ZlWm/rt2OGfOCiZR@gauss3.secunet.de>
+Subject: Re: [RFC net-next 00/15] add basic PSP encryption for TCP connections
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-idpf uses Page Pool for data buffers with hardcoded buffer lengths of
-4k for "classic" buffers and 2k for "short" ones. This is not flexible
-and does not ensure optimal memory usage. Why would you need 4k buffers
-when the MTU is 1500?
-Use libeth for the data buffers and don't hardcode any buffer sizes. Let
-them be calculated from the MTU for "classics" and then divide the
-truesize by 2 for "short" ones. The memory usage is now greatly reduced
-and 2 buffer queues starts make sense: on frames <= 1024, you'll recycle
-(and resync) a page only after 4 HW writes rather than two.
+Steffen Klassert wrote:
+> On Wed, May 22, 2024 at 08:56:02AM -0400, Paul Wouters wrote:
+> > Jakub Kicinski wrote:
+> > 
+> > > Add support for PSP encryption of TCP connections.
+> > > 
+> > > PSP is a protocol out of Google:
+> > > https://github.com/google/psp/blob/main/doc/PSP_Arch_Spec.pdf
+> > > which shares some similarities with IPsec. I added some more info
+> > > in the first patch so I'll keep it short here.
+> > 
+> > Speaking as an IETF contributor, I am little surprised here. I know
+> > the google people reached out at IETF and were told their stuff is
+> > so similar to IPsec, maybe they should talk to the IPsecME Working
+> > Group. There, I believe Steffen Klassert started working on supporting
+> > the PSP features requested using updates to the ESP/WESP IPsec protocol,
+> > such as support for encryption offset to reveal protocol/ports for
+> > routing encrypted traffic.
+> 
+> This was somewhat semipublic information, so I did not talk about
+> it on the lists yet. Today we published the draft, it can be found here:
+> 
+> https://datatracker.ietf.org/doc/draft-klassert-ipsecme-wespv2/
+> 
+> Please note that the packet format specification is portable to other
+> protocol use cases, such as PSP. It uses IKEv2 as a negotiation
+> protocol and does not define any key derivation etc. as PSP does.
+> But it can be also used with other protocols for key negotiation
+> and key derivation.
 
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- drivers/net/ethernet/intel/idpf/Kconfig       |   1 -
- drivers/net/ethernet/intel/idpf/idpf.h        |   2 -
- drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  86 +------
- .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  25 +-
- drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 240 ++++++------------
- .../net/ethernet/intel/idpf/idpf_virtchnl.c   |   8 +-
- 6 files changed, 118 insertions(+), 244 deletions(-)
+Very nice. Thanks for posting, Steffen.
 
-diff --git a/drivers/net/ethernet/intel/idpf/Kconfig b/drivers/net/ethernet/intel/idpf/Kconfig
-index 1f071143d992..1addd663acad 100644
---- a/drivers/net/ethernet/intel/idpf/Kconfig
-+++ b/drivers/net/ethernet/intel/idpf/Kconfig
-@@ -6,7 +6,6 @@ config IDPF
- 	depends on PCI_MSI
- 	select DIMLIB
- 	select LIBETH
--	select PAGE_POOL
- 	help
- 	  This driver supports Intel(R) Infrastructure Data Path Function
- 	  devices.
-diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-index 078340a01757..2c31ad87587a 100644
---- a/drivers/net/ethernet/intel/idpf/idpf.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf.h
-@@ -264,7 +264,6 @@ struct idpf_port_stats {
-  *		    the worst case.
-  * @num_bufqs_per_qgrp: Buffer queues per RX queue in a given grouping
-  * @bufq_desc_count: Buffer queue descriptor count
-- * @bufq_size: Size of buffers in ring (e.g. 2K, 4K, etc)
-  * @num_rxq_grp: Number of RX queues in a group
-  * @rxq_grps: Total number of RX groups. Number of groups * number of RX per
-  *	      group will yield total number of RX queues.
-@@ -308,7 +307,6 @@ struct idpf_vport {
- 	u32 rxq_desc_count;
- 	u8 num_bufqs_per_qgrp;
- 	u32 bufq_desc_count[IDPF_MAX_BUFQS_PER_RXQ_GRP];
--	u32 bufq_size[IDPF_MAX_BUFQS_PER_RXQ_GRP];
- 	u16 num_rxq_grp;
- 	struct idpf_rxq_group *rxq_grps;
- 	u32 rxq_model;
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 86a1efc24caf..e0a2ad1edfc6 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -7,7 +7,6 @@
- #include <linux/dim.h>
- 
- #include <net/libeth/cache.h>
--#include <net/libeth/rx.h>
- #include <net/tcp.h>
- #include <net/netdev_queues.h>
- 
-@@ -97,14 +96,10 @@ do {								\
- 		idx = 0;					\
- } while (0)
- 
--#define IDPF_RX_HDR_SIZE			256
--#define IDPF_RX_BUF_2048			2048
--#define IDPF_RX_BUF_4096			4096
- #define IDPF_RX_BUF_STRIDE			32
- #define IDPF_RX_BUF_POST_STRIDE			16
- #define IDPF_LOW_WATERMARK			64
--#define IDPF_PACKET_HDR_PAD	\
--	(ETH_HLEN + ETH_FCS_LEN + VLAN_HLEN * 2)
-+
- #define IDPF_TX_TSO_MIN_MSS			88
- 
- /* Minimum number of descriptors between 2 descriptors with the RE bit set;
-@@ -540,7 +535,7 @@ struct idpf_txq_stash {
-  * @desc_ring: virtual descriptor ring address
-  * @bufq_sets: Pointer to the array of buffer queues in splitq mode
-  * @napi: NAPI instance corresponding to this queue (splitq)
-- * @rx_buf: See struct idpf_rx_buf
-+ * @rx_buf: See struct &libeth_fqe
-  * @pp: Page pool pointer in singleq mode
-  * @netdev: &net_device corresponding to this queue
-  * @tail: Tail offset. Used for both queue models single and split.
-@@ -555,6 +550,7 @@ struct idpf_txq_stash {
-  * @next_to_clean: Next descriptor to clean
-  * @next_to_alloc: RX buffer to allocate at
-  * @skb: Pointer to the skb
-+ * @truesize: data buffer truesize in singleq
-  * @stats_sync: See struct u64_stats_sync
-  * @q_stats: See union idpf_rx_queue_stats
-  * @cold: CL group with fields no touched on hotpath
-@@ -581,7 +577,7 @@ struct idpf_rx_queue {
- 				struct napi_struct *napi;
- 			};
- 			struct {
--				struct idpf_rx_buf *rx_buf;
-+				struct libeth_fqe *rx_buf;
- 				struct page_pool *pp;
- 			};
- 		};
-@@ -601,6 +597,7 @@ struct idpf_rx_queue {
- 		u16 next_to_alloc;
- 
- 		struct sk_buff *skb;
-+		u32 truesize;
- 
- 		struct u64_stats_sync stats_sync;
- 		struct idpf_rx_queue_stats q_stats;
-@@ -619,7 +616,7 @@ struct idpf_rx_queue {
- 	);
- };
- libeth_cacheline_set_assert(struct idpf_rx_queue, 64,
--			    72 + sizeof(struct u64_stats_sync),
-+			    80 + sizeof(struct u64_stats_sync),
- 			    32);
- 
- /**
-@@ -748,16 +745,17 @@ libeth_cacheline_set_assert(struct idpf_tx_queue, 64,
-  * @split_buf: buffer descriptor array
-  * @hdr_buf: &libeth_fqe for header buffers
-  * @hdr_pp: &page_pool for header buffers
-- * @buf: &idpf_rx_buf for data buffers
-+ * @buf: &libeth_fqe for data buffers
-  * @pp: &page_pool for data buffers
-  * @tail: Tail offset
-  * @flags: See enum idpf_queue_flags_t
-  * @desc_count: Number of descriptors
-- * @hdr_truesize: truesize for buffer headers
-  * @read_write: CL group with both read/write hot fields
-  * @next_to_use: Next descriptor to use
-  * @next_to_clean: Next descriptor to clean
-  * @next_to_alloc: RX buffer to allocate at
-+ * @hdr_truesize: truesize for buffer headers
-+ * @truesize: truesize for data buffers
-  * @cold: CL group with fields no touched on hotpath
-  * @q_id: Queue id
-  * @size: Length of descriptor ring in bytes
-@@ -772,19 +770,20 @@ struct idpf_buf_queue {
- 		struct virtchnl2_splitq_rx_buf_desc *split_buf;
- 		struct libeth_fqe *hdr_buf;
- 		struct page_pool *hdr_pp;
--		struct idpf_rx_buf *buf;
-+		struct libeth_fqe *buf;
- 		struct page_pool *pp;
- 		void __iomem *tail;
- 
- 		DECLARE_BITMAP(flags, __IDPF_Q_FLAGS_NBITS);
- 		u32 desc_count;
--
--		u32 hdr_truesize;
- 	);
- 	libeth_cacheline_group(read_write,
- 		u32 next_to_use;
- 		u32 next_to_clean;
- 		u32 next_to_alloc;
-+
-+		u32 hdr_truesize;
-+		u32 truesize;
- 	);
- 	libeth_cacheline_group(cold,
- 		u32 q_id;
-@@ -798,7 +797,7 @@ struct idpf_buf_queue {
- 		u16 rx_buf_size;
- 	);
- };
--libeth_cacheline_set_assert(struct idpf_buf_queue, 64, 16, 32);
-+libeth_cacheline_set_assert(struct idpf_buf_queue, 64, 24, 32);
- 
- /**
-  * struct idpf_compl_queue - software structure representing a completion queue
-@@ -1040,60 +1039,6 @@ static inline void idpf_tx_splitq_build_desc(union idpf_tx_flex_desc *desc,
- 		idpf_tx_splitq_build_flow_desc(desc, params, td_cmd, size);
- }
- 
--/**
-- * idpf_alloc_page - Allocate a new RX buffer from the page pool
-- * @pool: page_pool to allocate from
-- * @buf: metadata struct to populate with page info
-- * @buf_size: 2K or 4K
-- *
-- * Returns &dma_addr_t to be passed to HW for Rx, %DMA_MAPPING_ERROR otherwise.
-- */
--static inline dma_addr_t idpf_alloc_page(struct page_pool *pool,
--					 struct idpf_rx_buf *buf,
--					 unsigned int buf_size)
--{
--	if (buf_size == IDPF_RX_BUF_2048)
--		buf->page = page_pool_dev_alloc_frag(pool, &buf->offset,
--						     buf_size);
--	else
--		buf->page = page_pool_dev_alloc_pages(pool);
--
--	if (!buf->page)
--		return DMA_MAPPING_ERROR;
--
--	buf->truesize = buf_size;
--
--	return page_pool_get_dma_addr(buf->page) + buf->offset +
--	       pool->p.offset;
--}
--
--/**
-- * idpf_rx_put_page - Return RX buffer page to pool
-- * @rx_buf: RX buffer metadata struct
-- */
--static inline void idpf_rx_put_page(struct idpf_rx_buf *rx_buf)
--{
--	page_pool_put_page(rx_buf->page->pp, rx_buf->page,
--			   rx_buf->truesize, true);
--	rx_buf->page = NULL;
--}
--
--/**
-- * idpf_rx_sync_for_cpu - Synchronize DMA buffer
-- * @rx_buf: RX buffer metadata struct
-- * @len: frame length from descriptor
-- */
--static inline void idpf_rx_sync_for_cpu(struct idpf_rx_buf *rx_buf, u32 len)
--{
--	struct page *page = rx_buf->page;
--	struct page_pool *pp = page->pp;
--
--	dma_sync_single_range_for_cpu(pp->p.dev,
--				      page_pool_get_dma_addr(page),
--				      rx_buf->offset + pp->p.offset, len,
--				      page_pool_get_dma_dir(pp));
--}
--
- int idpf_vport_singleq_napi_poll(struct napi_struct *napi, int budget);
- void idpf_vport_init_num_qs(struct idpf_vport *vport,
- 			    struct virtchnl2_create_vport *vport_msg);
-@@ -1116,9 +1061,6 @@ void idpf_deinit_rss(struct idpf_vport *vport);
- int idpf_rx_bufs_init_all(struct idpf_vport *vport);
- void idpf_rx_add_frag(struct idpf_rx_buf *rx_buf, struct sk_buff *skb,
- 		      unsigned int size);
--struct sk_buff *idpf_rx_construct_skb(const struct idpf_rx_queue *rxq,
--				      struct idpf_rx_buf *rx_buf,
--				      unsigned int size);
- struct sk_buff *idpf_rx_build_skb(const struct libeth_fqe *buf, u32 size);
- void idpf_tx_buf_hw_update(struct idpf_tx_queue *tx_q, u32 val,
- 			   bool xmit_more);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-index cde768082fc4..631a882c563a 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-@@ -858,20 +858,24 @@ bool idpf_rx_singleq_buf_hw_alloc_all(struct idpf_rx_queue *rx_q,
- 				      u16 cleaned_count)
- {
- 	struct virtchnl2_singleq_rx_buf_desc *desc;
-+	const struct libeth_fq_fp fq = {
-+		.pp		= rx_q->pp,
-+		.fqes		= rx_q->rx_buf,
-+		.truesize	= rx_q->truesize,
-+		.count		= rx_q->desc_count,
-+	};
- 	u16 nta = rx_q->next_to_alloc;
--	struct idpf_rx_buf *buf;
- 
- 	if (!cleaned_count)
- 		return false;
- 
- 	desc = &rx_q->single_buf[nta];
--	buf = &rx_q->rx_buf[nta];
- 
- 	do {
- 		dma_addr_t addr;
- 
--		addr = idpf_alloc_page(rx_q->pp, buf, rx_q->rx_buf_size);
--		if (unlikely(addr == DMA_MAPPING_ERROR))
-+		addr = libeth_rx_alloc(&fq, nta);
-+		if (addr == DMA_MAPPING_ERROR)
- 			break;
- 
- 		/* Refresh the desc even if buffer_addrs didn't change
-@@ -881,11 +885,9 @@ bool idpf_rx_singleq_buf_hw_alloc_all(struct idpf_rx_queue *rx_q,
- 		desc->hdr_addr = 0;
- 		desc++;
- 
--		buf++;
- 		nta++;
- 		if (unlikely(nta == rx_q->desc_count)) {
- 			desc = &rx_q->single_buf[0];
--			buf = rx_q->rx_buf;
- 			nta = 0;
- 		}
- 
-@@ -1005,24 +1007,22 @@ static int idpf_rx_singleq_clean(struct idpf_rx_queue *rx_q, int budget)
- 		idpf_rx_singleq_extract_fields(rx_q, rx_desc, &fields);
- 
- 		rx_buf = &rx_q->rx_buf[ntc];
--		if (!fields.size) {
--			idpf_rx_put_page(rx_buf);
-+		if (!libeth_rx_sync_for_cpu(rx_buf, fields.size))
- 			goto skip_data;
--		}
- 
--		idpf_rx_sync_for_cpu(rx_buf, fields.size);
- 		if (skb)
- 			idpf_rx_add_frag(rx_buf, skb, fields.size);
- 		else
--			skb = idpf_rx_construct_skb(rx_q, rx_buf, fields.size);
-+			skb = idpf_rx_build_skb(rx_buf, fields.size);
- 
- 		/* exit if we failed to retrieve a buffer */
- 		if (!skb)
- 			break;
- 
- skip_data:
--		IDPF_SINGLEQ_BUMP_RING_IDX(rx_q, ntc);
-+		rx_buf->page = NULL;
- 
-+		IDPF_SINGLEQ_BUMP_RING_IDX(rx_q, ntc);
- 		cleaned_count++;
- 
- 		/* skip if it is non EOP desc */
-@@ -1063,6 +1063,7 @@ static int idpf_rx_singleq_clean(struct idpf_rx_queue *rx_q, int budget)
- 
- 	rx_q->next_to_clean = ntc;
- 
-+	page_pool_nid_changed(rx_q->pp, numa_mem_id());
- 	if (cleaned_count)
- 		failure = idpf_rx_singleq_buf_hw_alloc_all(rx_q, cleaned_count);
- 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 689668e0ca51..097926f7a10a 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -417,6 +417,11 @@ static void idpf_rx_hdr_buf_rel_all(struct idpf_buf_queue *bufq)
-  */
- static void idpf_rx_buf_rel_bufq(struct idpf_buf_queue *bufq)
- {
-+	struct libeth_fq fq = {
-+		.fqes	= bufq->buf,
-+		.pp	= bufq->pp,
-+	};
-+
- 	/* queue already cleared, nothing to do */
- 	if (!bufq->buf)
- 		return;
-@@ -428,11 +433,9 @@ static void idpf_rx_buf_rel_bufq(struct idpf_buf_queue *bufq)
- 	if (idpf_queue_has(HSPLIT_EN, bufq))
- 		idpf_rx_hdr_buf_rel_all(bufq);
- 
--	page_pool_destroy(bufq->pp);
--	bufq->pp = NULL;
--
--	kfree(bufq->buf);
-+	libeth_rx_fq_destroy(&fq);
- 	bufq->buf = NULL;
-+	bufq->pp = NULL;
- }
- 
- /**
-@@ -441,17 +444,20 @@ static void idpf_rx_buf_rel_bufq(struct idpf_buf_queue *bufq)
-  */
- static void idpf_rx_buf_rel_all(struct idpf_rx_queue *rxq)
- {
-+	struct libeth_fq fq = {
-+		.fqes	= rxq->rx_buf,
-+		.pp	= rxq->pp,
-+	};
-+
- 	if (!rxq->rx_buf)
- 		return;
- 
- 	for (u32 i = 0; i < rxq->desc_count; i++)
- 		idpf_rx_page_rel(&rxq->rx_buf[i]);
- 
--	page_pool_destroy(rxq->pp);
--	rxq->pp = NULL;
--
--	kfree(rxq->rx_buf);
-+	libeth_rx_fq_destroy(&fq);
- 	rxq->rx_buf = NULL;
-+	rxq->pp = NULL;
- }
- 
- /**
-@@ -633,11 +639,9 @@ static bool idpf_rx_post_buf_desc(struct idpf_buf_queue *bufq, u16 buf_id)
- 		.count	= bufq->desc_count,
- 	};
- 	u16 nta = bufq->next_to_alloc;
--	struct idpf_rx_buf *buf;
- 	dma_addr_t addr;
- 
- 	splitq_rx_desc = &bufq->split_buf[nta];
--	buf = &bufq->buf[buf_id];
- 
- 	if (idpf_queue_has(HSPLIT_EN, bufq)) {
- 		fq.pp = bufq->hdr_pp;
-@@ -651,8 +655,12 @@ static bool idpf_rx_post_buf_desc(struct idpf_buf_queue *bufq, u16 buf_id)
- 		splitq_rx_desc->hdr_addr = cpu_to_le64(addr);
- 	}
- 
--	addr = idpf_alloc_page(bufq->pp, buf, bufq->rx_buf_size);
--	if (unlikely(addr == DMA_MAPPING_ERROR))
-+	fq.pp = bufq->pp;
-+	fq.fqes = bufq->buf;
-+	fq.truesize = bufq->truesize;
-+
-+	addr = libeth_rx_alloc(&fq, buf_id);
-+	if (addr == DMA_MAPPING_ERROR)
- 		return false;
- 
- 	splitq_rx_desc->pkt_addr = cpu_to_le64(addr);
-@@ -689,30 +697,6 @@ static bool idpf_rx_post_init_bufs(struct idpf_buf_queue *bufq,
- 	return true;
- }
- 
--/**
-- * idpf_rx_create_page_pool - Create a page pool
-- * @napi: NAPI of the associated queue vector
-- * @count: queue descriptor count
-- *
-- * Returns &page_pool on success, casted -errno on failure
-- */
--static struct page_pool *idpf_rx_create_page_pool(struct napi_struct *napi,
--						  u32 count)
--{
--	struct page_pool_params pp = {
--		.flags		= PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
--		.order		= 0,
--		.pool_size	= count,
--		.nid		= NUMA_NO_NODE,
--		.dev		= napi->dev->dev.parent,
--		.max_len	= PAGE_SIZE,
--		.dma_dir	= DMA_FROM_DEVICE,
--		.offset		= 0,
--	};
--
--	return page_pool_create(&pp);
--}
--
- /**
-  * idpf_rx_buf_alloc_singleq - Allocate memory for all buffer resources
-  * @rxq: queue for which the buffers are allocated
-@@ -721,11 +705,6 @@ static struct page_pool *idpf_rx_create_page_pool(struct napi_struct *napi,
-  */
- static int idpf_rx_buf_alloc_singleq(struct idpf_rx_queue *rxq)
- {
--	rxq->rx_buf = kcalloc(rxq->desc_count, sizeof(*rxq->rx_buf),
--			      GFP_KERNEL);
--	if (!rxq->rx_buf)
--		return -ENOMEM;
--
- 	if (idpf_rx_singleq_buf_hw_alloc_all(rxq, rxq->desc_count - 1))
- 		goto err;
- 
-@@ -745,13 +724,21 @@ static int idpf_rx_buf_alloc_singleq(struct idpf_rx_queue *rxq)
-  */
- static int idpf_rx_bufs_init_singleq(struct idpf_rx_queue *rxq)
- {
--	struct page_pool *pool;
-+	struct libeth_fq fq = {
-+		.count	= rxq->desc_count,
-+		.type	= LIBETH_FQE_MTU,
-+		.nid	= idpf_q_vector_to_mem(rxq->q_vector),
-+	};
-+	int ret;
- 
--	pool = idpf_rx_create_page_pool(&rxq->q_vector->napi, rxq->desc_count);
--	if (IS_ERR(pool))
--		return PTR_ERR(pool);
-+	ret = libeth_rx_fq_create(&fq, &rxq->q_vector->napi);
-+	if (ret)
-+		return ret;
- 
--	rxq->pp = pool;
-+	rxq->pp = fq.pp;
-+	rxq->rx_buf = fq.fqes;
-+	rxq->truesize = fq.truesize;
-+	rxq->rx_buf_size = fq.buf_len;
- 
- 	return idpf_rx_buf_alloc_singleq(rxq);
- }
-@@ -766,14 +753,6 @@ static int idpf_rx_buf_alloc_all(struct idpf_buf_queue *rxbufq)
- {
- 	int err = 0;
- 
--	/* Allocate book keeping buffers */
--	rxbufq->buf = kcalloc(rxbufq->desc_count, sizeof(*rxbufq->buf),
--			      GFP_KERNEL);
--	if (!rxbufq->buf) {
--		err = -ENOMEM;
--		goto rx_buf_alloc_all_out;
--	}
--
- 	if (idpf_queue_has(HSPLIT_EN, rxbufq)) {
- 		err = idpf_rx_hdr_buf_alloc_all(rxbufq);
- 		if (err)
-@@ -794,19 +773,30 @@ static int idpf_rx_buf_alloc_all(struct idpf_buf_queue *rxbufq)
- /**
-  * idpf_rx_bufs_init - Initialize page pool, allocate rx bufs, and post to HW
-  * @bufq: buffer queue to create page pool for
-+ * @type: type of Rx buffers to allocate
-  *
-  * Returns 0 on success, negative on failure
-  */
--static int idpf_rx_bufs_init(struct idpf_buf_queue *bufq)
-+static int idpf_rx_bufs_init(struct idpf_buf_queue *bufq,
-+			     enum libeth_fqe_type type)
- {
--	struct page_pool *pool;
-+	struct libeth_fq fq = {
-+		.truesize	= bufq->truesize,
-+		.count		= bufq->desc_count,
-+		.type		= type,
-+		.hsplit		= idpf_queue_has(HSPLIT_EN, bufq),
-+		.nid		= idpf_q_vector_to_mem(bufq->q_vector),
-+	};
-+	int ret;
- 
--	pool = idpf_rx_create_page_pool(&bufq->q_vector->napi,
--					bufq->desc_count);
--	if (IS_ERR(pool))
--		return PTR_ERR(pool);
-+	ret = libeth_rx_fq_create(&fq, &bufq->q_vector->napi);
-+	if (ret)
-+		return ret;
- 
--	bufq->pp = pool;
-+	bufq->pp = fq.pp;
-+	bufq->buf = fq.fqes;
-+	bufq->truesize = fq.truesize;
-+	bufq->rx_buf_size = fq.buf_len;
- 
- 	return idpf_rx_buf_alloc_all(bufq);
- }
-@@ -819,14 +809,15 @@ static int idpf_rx_bufs_init(struct idpf_buf_queue *bufq)
-  */
- int idpf_rx_bufs_init_all(struct idpf_vport *vport)
- {
--	struct idpf_rxq_group *rx_qgrp;
-+	bool split = idpf_is_queue_model_split(vport->rxq_model);
- 	int i, j, err;
- 
- 	for (i = 0; i < vport->num_rxq_grp; i++) {
--		rx_qgrp = &vport->rxq_grps[i];
-+		struct idpf_rxq_group *rx_qgrp = &vport->rxq_grps[i];
-+		u32 truesize = 0;
- 
- 		/* Allocate bufs for the rxq itself in singleq */
--		if (!idpf_is_queue_model_split(vport->rxq_model)) {
-+		if (!split) {
- 			int num_rxq = rx_qgrp->singleq.num_rxq;
- 
- 			for (j = 0; j < num_rxq; j++) {
-@@ -843,12 +834,19 @@ int idpf_rx_bufs_init_all(struct idpf_vport *vport)
- 
- 		/* Otherwise, allocate bufs for the buffer queues */
- 		for (j = 0; j < vport->num_bufqs_per_qgrp; j++) {
-+			enum libeth_fqe_type type;
- 			struct idpf_buf_queue *q;
- 
- 			q = &rx_qgrp->splitq.bufq_sets[j].bufq;
--			err = idpf_rx_bufs_init(q);
-+			q->truesize = truesize;
-+
-+			type = truesize ? LIBETH_FQE_SHORT : LIBETH_FQE_MTU;
-+
-+			err = idpf_rx_bufs_init(q, type);
- 			if (err)
- 				return err;
-+
-+			truesize = q->truesize >> 1;
- 		}
- 	}
- 
-@@ -1160,17 +1158,11 @@ void idpf_vport_init_num_qs(struct idpf_vport *vport,
- 	/* Adjust number of buffer queues per Rx queue group. */
- 	if (!idpf_is_queue_model_split(vport->rxq_model)) {
- 		vport->num_bufqs_per_qgrp = 0;
--		vport->bufq_size[0] = IDPF_RX_BUF_2048;
- 
- 		return;
- 	}
- 
- 	vport->num_bufqs_per_qgrp = IDPF_MAX_BUFQS_PER_RXQ_GRP;
--	/* Bufq[0] default buffer size is 4K
--	 * Bufq[1] default buffer size is 2K
--	 */
--	vport->bufq_size[0] = IDPF_RX_BUF_4096;
--	vport->bufq_size[1] = IDPF_RX_BUF_2048;
- }
- 
- /**
-@@ -1507,7 +1499,6 @@ static int idpf_rxq_group_alloc(struct idpf_vport *vport, u16 num_rxq)
- 
- 			q = &rx_qgrp->splitq.bufq_sets[j].bufq;
- 			q->desc_count = vport->bufq_desc_count[j];
--			q->rx_buf_size = vport->bufq_size[j];
- 			q->rx_buffer_low_watermark = IDPF_LOW_WATERMARK;
- 
- 			idpf_queue_assign(HSPLIT_EN, q, hs);
-@@ -1560,14 +1551,9 @@ static int idpf_rxq_group_alloc(struct idpf_vport *vport, u16 num_rxq)
- 			q->netdev = vport->netdev;
- 			q->bufq_sets = rx_qgrp->splitq.bufq_sets;
- 			q->idx = (i * num_rxq) + j;
--			/* In splitq mode, RXQ buffer size should be
--			 * set to that of the first buffer queue
--			 * associated with this RXQ
--			 */
--			q->rx_buf_size = vport->bufq_size[0];
- 			q->rx_buffer_low_watermark = IDPF_LOW_WATERMARK;
- 			q->rx_max_pkt_size = vport->netdev->mtu +
--							IDPF_PACKET_HDR_PAD;
-+							LIBETH_RX_LL_LEN;
- 			idpf_rxq_set_descids(vport, q);
- 		}
- 	}
-@@ -3145,69 +3131,10 @@ idpf_rx_process_skb_fields(struct idpf_rx_queue *rxq, struct sk_buff *skb,
- void idpf_rx_add_frag(struct idpf_rx_buf *rx_buf, struct sk_buff *skb,
- 		      unsigned int size)
- {
--	skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, rx_buf->page,
--			rx_buf->offset, size, rx_buf->truesize);
--
--	rx_buf->page = NULL;
--}
--
--/**
-- * idpf_rx_construct_skb - Allocate skb and populate it
-- * @rxq: Rx descriptor queue
-- * @rx_buf: Rx buffer to pull data from
-- * @size: the length of the packet
-- *
-- * This function allocates an skb. It then populates it with the page
-- * data from the current receive descriptor, taking care to set up the
-- * skb correctly.
-- */
--struct sk_buff *idpf_rx_construct_skb(const struct idpf_rx_queue *rxq,
--				      struct idpf_rx_buf *rx_buf,
--				      unsigned int size)
--{
--	unsigned int headlen;
--	struct sk_buff *skb;
--	void *va;
--
--	va = page_address(rx_buf->page) + rx_buf->offset;
--
--	/* prefetch first cache line of first page */
--	net_prefetch(va);
--	/* allocate a skb to store the frags */
--	skb = napi_alloc_skb(rxq->napi, IDPF_RX_HDR_SIZE);
--	if (unlikely(!skb)) {
--		idpf_rx_put_page(rx_buf);
--
--		return NULL;
--	}
-+	u32 hr = rx_buf->page->pp->p.offset;
- 
--	skb_mark_for_recycle(skb);
--
--	/* Determine available headroom for copy */
--	headlen = size;
--	if (headlen > IDPF_RX_HDR_SIZE)
--		headlen = eth_get_headlen(skb->dev, va, IDPF_RX_HDR_SIZE);
--
--	/* align pull length to size of long to optimize memcpy performance */
--	memcpy(__skb_put(skb, headlen), va, ALIGN(headlen, sizeof(long)));
--
--	/* if we exhaust the linear part then add what is left as a frag */
--	size -= headlen;
--	if (!size) {
--		idpf_rx_put_page(rx_buf);
--
--		return skb;
--	}
--
--	skb_add_rx_frag(skb, 0, rx_buf->page, rx_buf->offset + headlen,
--			size, rx_buf->truesize);
--
--	/* Since we're giving the page to the stack, clear our reference to it.
--	 * We'll get a new one during buffer posting.
--	 */
--	rx_buf->page = NULL;
--
--	return skb;
-+	skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, rx_buf->page,
-+			rx_buf->offset + hr, size, rx_buf->truesize);
- }
- 
- /**
-@@ -3413,24 +3340,24 @@ static int idpf_rx_splitq_clean(struct idpf_rx_queue *rxq, int budget)
- 		hdr->page = NULL;
- 
- payload:
--		if (pkt_len) {
--			idpf_rx_sync_for_cpu(rx_buf, pkt_len);
--			if (skb)
--				idpf_rx_add_frag(rx_buf, skb, pkt_len);
--			else
--				skb = idpf_rx_construct_skb(rxq, rx_buf,
--							    pkt_len);
--		} else {
--			idpf_rx_put_page(rx_buf);
--		}
-+		if (!libeth_rx_sync_for_cpu(rx_buf, pkt_len))
-+			goto skip_data;
-+
-+		if (skb)
-+			idpf_rx_add_frag(rx_buf, skb, pkt_len);
-+		else
-+			skb = idpf_rx_build_skb(rx_buf, pkt_len);
- 
- 		/* exit if we failed to retrieve a buffer */
- 		if (!skb)
- 			break;
- 
--		idpf_rx_post_buf_refill(refillq, buf_id);
-+skip_data:
-+		rx_buf->page = NULL;
- 
-+		idpf_rx_post_buf_refill(refillq, buf_id);
- 		IDPF_RX_BUMP_NTC(rxq, ntc);
-+
- 		/* skip if it is non EOP desc */
- 		if (!idpf_rx_splitq_is_eop(rx_desc))
- 			continue;
-@@ -3483,15 +3410,15 @@ static int idpf_rx_update_bufq_desc(struct idpf_buf_queue *bufq, u32 buf_id,
- 				    struct virtchnl2_splitq_rx_buf_desc *buf_desc)
- {
- 	struct libeth_fq_fp fq = {
-+		.pp		= bufq->pp,
-+		.fqes		= bufq->buf,
-+		.truesize	= bufq->truesize,
- 		.count		= bufq->desc_count,
- 	};
--	struct idpf_rx_buf *buf;
- 	dma_addr_t addr;
- 
--	buf = &bufq->buf[buf_id];
--
--	addr = idpf_alloc_page(bufq->pp, buf, bufq->rx_buf_size);
--	if (unlikely(addr == DMA_MAPPING_ERROR))
-+	addr = libeth_rx_alloc(&fq, buf_id);
-+	if (addr == DMA_MAPPING_ERROR)
- 		return -ENOMEM;
- 
- 	buf_desc->pkt_addr = cpu_to_le64(addr);
-@@ -3590,6 +3517,7 @@ static void idpf_rx_clean_refillq_all(struct idpf_buf_queue *bufq, int nid)
- 	struct idpf_bufq_set *bufq_set;
- 	int i;
- 
-+	page_pool_nid_changed(bufq->pp, nid);
- 	if (bufq->hdr_pp)
- 		page_pool_nid_changed(bufq->hdr_pp, nid);
- 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index 50dcb3ab02b1..70986e12da28 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -1615,6 +1615,12 @@ static int idpf_send_config_rx_queues_msg(struct idpf_vport *vport)
- 			rxq = &rx_qgrp->splitq.rxq_sets[j]->rxq;
- 			sets = rxq->bufq_sets;
- 
-+			/* In splitq mode, RXQ buffer size should be
-+			 * set to that of the first buffer queue
-+			 * associated with this RXQ.
-+			 */
-+			rxq->rx_buf_size = sets[0].bufq.rx_buf_size;
-+
- 			qi[k].rx_bufq1_id = cpu_to_le16(sets[0].bufq.q_id);
- 			if (vport->num_bufqs_per_qgrp > IDPF_SINGLE_BUFQ_PER_RXQ_GRP) {
- 				qi[k].bufq2_ena = IDPF_BUFQ2_ENA;
-@@ -3167,7 +3173,7 @@ void idpf_vport_init(struct idpf_vport *vport, struct idpf_vport_max_q *max_q)
- 	rss_data->rss_lut_size = le16_to_cpu(vport_msg->rss_lut_size);
- 
- 	ether_addr_copy(vport->default_mac_addr, vport_msg->default_mac_addr);
--	vport->max_mtu = le16_to_cpu(vport_msg->max_mtu) - IDPF_PACKET_HDR_PAD;
-+	vport->max_mtu = le16_to_cpu(vport_msg->max_mtu) - LIBETH_RX_LL_LEN;
- 
- 	/* Initialize Tx and Rx profiles for Dynamic Interrupt Moderation */
- 	memcpy(vport->rx_itr_profile, rx_itr, IDPF_DIM_PROFILE_SLOTS);
--- 
-2.45.1
+One point about why PSP is that the exact protocol and packet format
+is already in use and supported by hardware.
+
+It makes sense to work to get to an IETF standard protocol that
+captures the same benefits. But that is independent from enabling what
+is already implemented.
+
 
 
