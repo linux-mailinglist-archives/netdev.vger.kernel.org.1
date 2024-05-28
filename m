@@ -1,228 +1,277 @@
-Return-Path: <netdev+bounces-98509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A5138D19E1
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:41:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13CE98D19F0
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 13:44:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 075ACB20BA4
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 11:41:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83BD61F23162
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 11:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EA2116ABCC;
-	Tue, 28 May 2024 11:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA0016D318;
+	Tue, 28 May 2024 11:43:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bfSinQYE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kE99TfrW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAFBB13CABD
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 11:40:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716896456; cv=fail; b=VVx40IzzehUIQFStlOWmIbqJ60RKVrTz0MsfN5wJkvAwW7F1NF8COTyqy3a1WR8NeIJX1P4vF2m115HyN+h/jWB+rK6DcvmgQfFvolpX6FVmkYuZ0F4MPbZZYJIcyCSSGifFQtD/mnjmeKQQRAv66pCNoAhc+h4r/3f3z78ba20=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716896456; c=relaxed/simple;
-	bh=9zjedeNmQPc5bt2Bh3AQoekGaWhdCKxs9Hvr4lO1Mww=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=JepOpbuEpqMxWDAr6fydOBpZ1GomaaNLPvmpqd/YjcR0nA9IGCulYO5AfXu5fqRs+fo0zP8AZ8mMT+yBJ1Il2f/ecNhpF+/mULfP6QDWc6aNMSHtsi3kV902/ZEZXj/bWNmVvPrEAY8+MxknYv8kApHrmoWQaC6h9n143XdP1fY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bfSinQYE; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716896455; x=1748432455;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=9zjedeNmQPc5bt2Bh3AQoekGaWhdCKxs9Hvr4lO1Mww=;
-  b=bfSinQYEMM13bYLJlnqSG741L2MUg1mZ1uB/gyxtg3mflqxIF88LTpKP
-   +6XhnpaePax+d/aPJIkQxwlaFFvDea2TQvdeOMsyeopdSoua97fOlL3qA
-   ArWFapGt1DhtZuaI4oaEjtBCKZqk3PEH7DCR0brGyZzLMI0RrQ1p4c4xc
-   wqPte7qs574h7+xqRjzOgbEPBZSQmizETAe/L5nidtdXU4kz0ibBBDV8S
-   oGf33EaNStyJUeltwpiFw+NV/Mvbpsn+jOMkx75bImjjHu8Np+iFapJHM
-   Y6MTg5ITgq/8xg3e4bGMBDyPwtpAT4p9YqhVLCdLhlq51LpP3rvQw48oz
-   w==;
-X-CSE-ConnectionGUID: b3+PqGA7S3mAcfHmV/W0MQ==
-X-CSE-MsgGUID: GdVY7OSiTjCovW3g6KT0Og==
-X-IronPort-AV: E=McAfee;i="6600,9927,11085"; a="30758845"
-X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
-   d="scan'208";a="30758845"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 04:40:54 -0700
-X-CSE-ConnectionGUID: 1xoDXO0GQkGveJFN/CotLA==
-X-CSE-MsgGUID: YLmOiUfwS9WXn0w+Fw0K8g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
-   d="scan'208";a="40011173"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 May 2024 04:40:54 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 28 May 2024 04:40:53 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 28 May 2024 04:40:53 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 28 May 2024 04:40:52 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QV2Z+9kYJgosKAqGYwTPRNWVmtMM2sJPyJfNrdF2ns1FxT4W1uMLwL3ClrsminxaEgT3yIznpv1aCvowXoT1vpVsP/r/8d2Th1uQMxgYNxFjkTivFsgpeM2d1b+RkSLeDLQRFiFy7+dzapWZVN97zTs3hw4uTQrYzW7s0GJaqmMVr2bDRxQZd18aXE60O7+Yl0nQkQ8cvUSSDp60UsyKDkHzV8GGeKFzs0pCE+8pP7eOlLDWq0+TzlABYMbAcnvU4pCnJCjYTmTQI0hfKO9KGqQLuhDbkRzk/fzCbCbWIzV00M92ObGVn+OP+NcS+woD72w2OPrp4c3W2RB0tilnOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aD5Y6TM83U7BG2YhhRNf7cDmrA0w2v+gGQP4XMFbfQY=;
- b=XlyYoW4CQNeosGPx7R9/y0kAhqbCJX4LCrhwk+Wrz15nlcfU1Z5L1eOGpNuumUftSUd9sQY/KOrFgxlRI0DAbXkTHGruqMoTfwJfaLUZkY0NOToQuuICC4uJcUfoXw1g5Zptk5dK8dKBp/Jnm5wtBqZny8gLOA8F1R8w6sZcGIZAJP0Y0OvcH5KNwvR8jf5weICwDB7El/zjo6ifvWka+QmLw9H1/qYjLVVgKcMHSy86MUgQQpODa+sbypOuw7sO9XyZ1XNIjvzwCTyaUIB/weKgLQxXBM8LrH5KdQUAnp5Lny5bgbYHvWxaNrqoqdH1rDtxRKRaePJFeqTfNtXG2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL1PR11MB5399.namprd11.prod.outlook.com (2603:10b6:208:318::12)
- by SJ2PR11MB8372.namprd11.prod.outlook.com (2603:10b6:a03:539::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.29; Tue, 28 May
- 2024 11:40:50 +0000
-Received: from BL1PR11MB5399.namprd11.prod.outlook.com
- ([fe80::b8f1:4502:e77d:e2dc]) by BL1PR11MB5399.namprd11.prod.outlook.com
- ([fe80::b8f1:4502:e77d:e2dc%5]) with mapi id 15.20.7611.016; Tue, 28 May 2024
- 11:40:50 +0000
-Message-ID: <ab859328-21e3-470d-b444-1bc505094ea6@intel.com>
-Date: Tue, 28 May 2024 13:40:46 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net v2] ice: Add support for devlink loopback param.
-To: Wojciech Drewek <wojciech.drewek@intel.com>, <netdev@vger.kernel.org>
-CC: <intel-wired-lan@lists.osuosl.org>, <jiri@resnulli.us>
-References: <20240528110132.483447-1-wojciech.drewek@intel.com>
-Content-Language: en-US
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Organization: Intel
-In-Reply-To: <20240528110132.483447-1-wojciech.drewek@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DUZPR01CA0309.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4ba::9) To BL1PR11MB5399.namprd11.prod.outlook.com
- (2603:10b6:208:318::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4806F16C87F
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 11:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716896637; cv=none; b=emBV29tHrhht+3rYGkweRu4nAX/8q0/4wa6rrAm38+CTKricVBwpPgbAtynWZz+oZ/PbwUhhH8uTKG7Tx9xmceWVvNymYG4mRFNFhaQHOsQqjonv4x5BMo91ZyHWeU51f2MJEcnGpMieWndVW5ulIrVf1RTbPvBltOITvLaJbMw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716896637; c=relaxed/simple;
+	bh=8fliDQRqgtEuDJiDyMRolR67H+St0pqpZxRBdrqbr/8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=EqIceSj0XC81Zr7djcTXQ3gVslYCLC9Eta5JqnisN3EPn9n4mJRkSZGgxDcksg5nbq08hFi78ueQQLWs7Ph6+tVrpEMRCu8m68G8n1CazWmQjAqyyt+UBWDQbTDqDnTxRts5HyUkyuwOfgYGydbp/t+6ldXc9OnHHOGX/CLMRuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kE99TfrW; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-df4954aa0d0so1081445276.3
+        for <netdev@vger.kernel.org>; Tue, 28 May 2024 04:43:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716896635; x=1717501435; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zgBCamCm4HmhHTNIDkIsT9fHinOMnf1NGAZRZu89Jok=;
+        b=kE99TfrWQMVvdpCx8ZvTtn/3IsowvIqln6l2IACR/5K/itYtjIgcu+8h71nlomFC30
+         XfY/zHWldi1/WvR4RiCgoFetmFRFnThFbxRpl8XruUkFG3ECkcUgNsakPsWiIMU/rdEv
+         qQY48+iGv9XnfpHLXotgBgCY5iPvPkgLW6VTP4g/w2B2eM6uKyIChfVKcenzV0wVOZRB
+         E0fSu/H8GJwhcSqnfirovIF85rRM1od/VsYJ1qKKfbblBIA5tcOe+HqmWO1tQ6RaorTT
+         KoZlRG98S/+rjrKLuYaSAOuNxLTRCNAHeMv6t+pevV+W6pLlt+MHoyppJx7C8UYObG4C
+         2D/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716896635; x=1717501435;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zgBCamCm4HmhHTNIDkIsT9fHinOMnf1NGAZRZu89Jok=;
+        b=UwY6njIxk26PwfyqcxBqfbOXND8xnrIB9xxgzYiGNxXXEHZHtcVUuzyqrhDv7kBZrW
+         sQUwFRiCHo3TyUZ7WCKlrtI2hDFnECVmwA2FyJmx8qCVPfKwkMI1b/ZSnaQOcGJduYCD
+         VeF3k7ULHfuHO+AZMDSz/1IUKpB5rSqcYbvDrUSMBfrJfCbjbzNfottvoKHemNNzAxYk
+         le+rYK8dpxLjkhRPKVwyms3gY1wXJa13MYY7OHdp2MYWrhk849t6pgLtdQL7RCWACZJe
+         VsZRb6spLcGo4OW7o93/UZI4euZIDS1WeccDKQUhe/sR6cMAgrAFPkslMM2SWwg36MBC
+         ypww==
+X-Forwarded-Encrypted: i=1; AJvYcCW2eHqfYOVpXAglgWDzspm3r1Jrzlw/BmKa+BvbL13n6eU1rXFerYGAAtg0yr2tlApHzKRKGnvmh67OCwsjjLfnoO8oe8l+
+X-Gm-Message-State: AOJu0YxyC2ePxGOseRbo+LoTVImDnHoP78yBUTPnasUugIUHOJyzbgAS
+	cd6Gaal4u9LcYXnEIlxLGnIAEmODy36HjQo9/S9sCaHn0fD8lQCERUjaXrW+r9+5WW5cPSTpGVE
+	wixK/57MTgg==
+X-Google-Smtp-Source: AGHT+IEq3Dbzs9oWWI/SyZecA6LIm6kOV6pvhKmEN79M9pcx13Be1/uTYTUluq3+efWW4go8fhx2CLd05TXRTg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1102:b0:dee:7db6:1109 with SMTP
+ id 3f1490d57ef6-df77205166cmr848514276.0.1716896635194; Tue, 28 May 2024
+ 04:43:55 -0700 (PDT)
+Date: Tue, 28 May 2024 11:43:53 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5399:EE_|SJ2PR11MB8372:EE_
-X-MS-Office365-Filtering-Correlation-Id: f250070f-2486-499b-71f8-08dc7f0b0642
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|1800799015|376005;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?Mjlka0ZwMmVCcyt0YjZKbzEwZnE1ejZkdlMwSTU4WWVsaTZLR1QzQVYvekhy?=
- =?utf-8?B?Y2c2S1NVdVVONDladlczZk41clNieDlsSWthVWlzdUl4TzZKMG9jYjd5dVNp?=
- =?utf-8?B?bkthdXVVOCtQZ21DMWVwbXRmUFVYK2VoNDJWTWNScm1BZWtwYzh2cjU2MGVm?=
- =?utf-8?B?b1NmS3JrdTlFWGFCeU8zZlFGcDV3cXljY0U3d1FTN0dQQWhhQlZIZ2NxR3Jp?=
- =?utf-8?B?SzR3TmpjVzlHWmZvVHRGOVpoSXYxK2puS2RsVFNKdmtIT3p4UHV3NUxFMHZK?=
- =?utf-8?B?cUZqVno0aE5ZUzl4d0s0bFUyTmpSTnpLa1dvM0lhYUxmaysyUFpDVmdPTkVz?=
- =?utf-8?B?d05PVzNqVzRqblRVQVVjSnB5YnN3ZVI5cGRwd3dhRmJuQ1ZpZXRGblZBeTZx?=
- =?utf-8?B?ZTZZU0V2dTZlMjNNRFUrTEQ3R3dnbGcvcWpwU0UwVlcwZm1pU1Y5UzVNN1lh?=
- =?utf-8?B?cStIN21mN0VkZy9EMTRSSDVNSUQwbExZWTRzZkREenhManl2SUI5aXdOMGU5?=
- =?utf-8?B?K1JGUk1yUlh3Y1RxYnRLVnAzaU4rbkNlQlNIUGFXR2tTQzBmWEI2ekR2WTVI?=
- =?utf-8?B?L01sNUhMNEF1eURPdFdtWnZIMVI3Mk5zSEZGM2lCM2ZFNlJVeGh5QzJkVWVO?=
- =?utf-8?B?SWRSdEp5Y0ZiWWhuZTc0UWVWZFRLWXVFaFdDSkI1dG9vVGdkWHM1cEJTYlQ2?=
- =?utf-8?B?OTN6ZHVXcXdkaVN0Uyt1clJuVWgxd0h4TXpPbk1ybnQ0dSt2NEdERGo0eGpB?=
- =?utf-8?B?VCtNWEE3T20xMXAraG5TclZvV1JoQytpeEtxTm55TExhY1poN0FLa0lEU2xq?=
- =?utf-8?B?eVgzdStSUzk4V05IM0NqYVE5TnllNFZMeWhEOTczVHJ2OGRRVzc5TlRYdXVt?=
- =?utf-8?B?V0RMRlcrT3hEUFBoTmI5N3E3M1hlVG1tMmFZcWxRWFZNR3VNbFV1d2UxYTVO?=
- =?utf-8?B?Z0pNQkY5U2JGR2JsS25wdnBjMzhMd1ljUlNRckxnaXRKZWF1aTNQTURYUkZz?=
- =?utf-8?B?WTlpNmJZeWthOTI1RkF3cGtYOVJZd3VJcG9vUE5kUFlRYWVKNE1NRE5rQ2dm?=
- =?utf-8?B?TWxrenJLb3Yxak1tMWl5Um9xU21mLzJZdEY5QzVIc3BSNzZ4bGVNZlZwcVkz?=
- =?utf-8?B?Y1liNVdQSVhYbzlPTzc2SUxnTXdIYWxIS3M4c3o3OVhxL2Q1QjZqMXhvUmNh?=
- =?utf-8?B?Z1NnVkQ4NDc4V2hUdk9GbUYzbTY4VjRra1JLbUphOUFGemFUa1hqdlNTaUE4?=
- =?utf-8?B?Q3BFNjc2ZzBaYkNMaFd2VEc2SWM0TEdjcy9URW02Mkw1cjBZV0tiSy9LY1cz?=
- =?utf-8?B?VTlob2wwZGgyY3dFSU51aUw2UnlpUzVUZHBjOHdIanNzdGtjT3QrQ3dvQ2gw?=
- =?utf-8?B?bFNvNE9sVWtONEJlTmxKaEppR3NvNzdVVUVDS24xdEpuWTVEbEkyR0xtSDNE?=
- =?utf-8?B?UmNzT2RyNExlS09SY1pleExnaytoNHlnS2JXTHpDZkhubi9WajEzSFE2OXNE?=
- =?utf-8?B?OU45blBBSHRFaHpObmprUENtamtZdk9TeGZkNFNtb1h5V2lVZkthWU9QWGxt?=
- =?utf-8?B?aXJnZmZsTWlHcG5LeWxCZnZ1QnBBRVRDUGdIaXRjQ05nWE1wQXFxV3ZJdWRK?=
- =?utf-8?B?cmhkVk94NUduNkNkMFhLWTZsdHQ4OVFVYlB2QTREaDBCUjJBdEExU1JLRzhz?=
- =?utf-8?B?TlpGQWtEVEFlNmhLMFI4RWRpajJlY2NUcHk5ZDhPZm45dGErQmQrS3V3PT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5399.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Q0V1am1KR3NKWXJtTmpVWEdPQTREZUxwY0duVk9JZzRsdWJaM2NBcExIZzNV?=
- =?utf-8?B?a1V0N1hlS0xRUnV3QmxpU0g4a2JPMkd3RUd6cEx1STMvMHorUVRMUEpBcndp?=
- =?utf-8?B?Y2l1d3JJbWs4Qm9iRm5TNFpaVWFsSG9KTVVyQ055dFgzUnl6b0xSbVcyQjht?=
- =?utf-8?B?ZDk1WlRTbm50VGhJL0RDSk9wN0FTcjRjZG5wbnB1d2xtSVN6eUMra0ZmL1Fm?=
- =?utf-8?B?cFoxclZ2RDFVNkJBUmloeXdpeE4xUUtMNnpFVWN3Zlg2NXg5bTlBSzJQazVE?=
- =?utf-8?B?ZXNBVVgrTXlnWEhDVUhpd0hmUFFJdFptSk81RTNBbC91K2M5VmNwWkIwdTJY?=
- =?utf-8?B?dlpNSnNSanVjMm9DN3BJc0RCQTNEYStmbzluNFRkUjdwbVZ3bnhRZzZoVTFE?=
- =?utf-8?B?b0l0cFdMV00wcE9ZUWZyVHVWWUFxeTJLL3VRLzBVY3UzQmhmdVhydWpZMmNR?=
- =?utf-8?B?TGZOVWJ1eERYdlhic3lOYVhFTVM1b3pOeDlLZ3U2c2pHbmFxVGxOQVIyVTE0?=
- =?utf-8?B?dzBjcHVub0ZxNFdTdmFHdjIxRy9rMnhZYUczcGpmNGxIdFo1NkpkMVlHNTZq?=
- =?utf-8?B?Zk93R0ptK1RtOUF5ak9XMkZXU3RGcEVSMDN5ZHdZZVFFS1lPcGJ2cEhMR3kw?=
- =?utf-8?B?V1NrNmVKcjJwTlVjMTV5bTZqaUhtYkVORURxM2lDdWhEMUtYWFR1aTQ5TFh5?=
- =?utf-8?B?dlhrTm9scmwwQm5Tb1N5UHM1VmR1aG5ub2hDRUk3VGNKb0dCS0wrWm9iZ3B4?=
- =?utf-8?B?OUZCVW8zNDlPNFRYYUF0MlFnSlRlYUYrYVZVUjdNT2FUSjJ5V0xlL2pNSHB4?=
- =?utf-8?B?NGkvc3o5N1AyUnF4enJod1ZISWFKb1NQeklJQXlZWGptd0FGMlNPOU5nb3Vz?=
- =?utf-8?B?OHNTZ084YWlIYkJRbTIxYTZvT05LMDU2a0dRK0pBZ2YyZE5jS1FXVWN5ODQ5?=
- =?utf-8?B?T3BKRWRKbnJ6TEYxUmRJS3NJUjE1Zm1vY2xrNU9JNnpuT3Z3WXZaL0ZLRXdI?=
- =?utf-8?B?NTRqTk9YdHYzQXhtNG5hdWpLZ2g5L1FqNEZWM2Y0Wm13dnp6Sjg5Z0JiZEhK?=
- =?utf-8?B?NjZpYk4zSTIzZGU3R0szdVoxVlB1ZW5VSFlHTXpIS0xDVmpUdWRERjRoSEFM?=
- =?utf-8?B?V1VWcGlCT3ZQdHYwMGF3bXhBNEVjSXpBUmQ0VXcvcEREZ1pHSXVmUSsxRHRn?=
- =?utf-8?B?Nmt3K1BuWnloWTRJSWp1bjh1RzU2ZUVaSm9DTWh5d1dGdnoya2JvZjIzVEZa?=
- =?utf-8?B?Z0h6aFAzVnk1RTdjS1BnbUpnL0t2NXI5dHkwekFjbitENFlLZmVYYUZQL00y?=
- =?utf-8?B?M1pGTGxIMmUxSkRLcjB2OENJSlFxNndpQ25BR0lzRllpd3hFWXY4VFNFY1Y1?=
- =?utf-8?B?QU9rSWx1RUxVZUlpd1M0ODhBTlE1TUdYVTJ6WURXMEErLzZmRGlIMEp6dm9B?=
- =?utf-8?B?b1BaVkM0bnpZcFB5ZFpVVGw1RkR3VzI1MmdyeUgvTisvbEFLNmpNYllrek0y?=
- =?utf-8?B?VEYrN1pXKzlMeThrYmo0RWcyRW1OT0dKR1c4bzZEbUFEVGlLMHc0bStVNXJU?=
- =?utf-8?B?UjAzSDJhcElsUmNQUmhYTmV5QS8vZnBwcWR5WEJJYkdMdjhTS0pxRjNpNWNa?=
- =?utf-8?B?RGQwM3UxTGxJVkRpK2RSRW03NmRtUmdRc3V3d2FKY2lFdTlnNzduZ0dGNXRs?=
- =?utf-8?B?bS8weUhnZ0hvYlVUWkNnTDMxRExFUXFEY3VRZDYxUDNKVCtXT281RGVwb0sz?=
- =?utf-8?B?SXlmaFNMdTZHNlZ3K2Q5THZaYkVoWjczNUpadGt2L1R4TWFFK2xNZHdWTDlh?=
- =?utf-8?B?Y2s4RkJaTy90amgyS3dkQWNGYkwrR2pHRVZjY0tKYlp5OFRzZm80WmZvdHFQ?=
- =?utf-8?B?MDRtNXpjbmp4Q0ZqL2NUR0F1OGFwNEZtK3dVQ2VEWGJneEtHT2RjWkc5L3BI?=
- =?utf-8?B?QjBVbkYyNWYwK3Vma3F0S0owMmhwMHV3YXRya0pMSlNHaVpDOTVkT1BnSVdm?=
- =?utf-8?B?clNtbllUZk9Hb3d4OFV0bFB2YUJSbnpkMHFDd0w2R0ZRS3oyd1pVMGJVbHJW?=
- =?utf-8?B?U211eUExdjBBblNuRTE5d1YyT0FhTWN4TC9BU3VCRGFUUElZQjhEV0k0RmVh?=
- =?utf-8?B?RDRxRi9CUmFKR2JLcXc2akFzazdPQzMrS01jUmlUVVdvdks0VmVMT3czRU5w?=
- =?utf-8?B?NkE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f250070f-2486-499b-71f8-08dc7f0b0642
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5399.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 May 2024 11:40:50.7443
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0zJmeSmJXkH2CIgfoutJMiiMz5Y6WSzMLJjY3cUyTehetqDFWSu4kLKao+D9/zATG4YsQqYpHM2c7RCmOu9KtA4gRAvEgBf8xHeA9okQOww=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8372
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
+Message-ID: <20240528114353.1794151-1-edumazet@google.com>
+Subject: [PATCH net] net: fix __dst_negative_advice() race
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Clement Lecigne <clecigne@google.com>, 
+	Tom Herbert <tom@herbertland.com>
+Content-Type: text/plain; charset="UTF-8"
 
+__dst_negative_advice() does not enforce proper RCU rules when
+sk->dst_cache must be cleared, leading to possible UAF.
 
+RCU rules are that we must first clear sk->sk_dst_cache,
+then call dst_release(old_dst).
 
-On 5/28/2024 1:01 PM, Wojciech Drewek wrote:
-> From: Pawel Kaminski <pawel.kaminski@intel.com>
-> 
-> Add support for driver-specific devlink loopback param. Supported values
-> are "enabled", "disabled" and "prioritized". Default configuration is
-> set to "enabled".
-> 
-> Add documentation in networking/devlink/ice.rst.
-> 
-> In previous generations of Intel NICs the trasmit scheduler was only
+Note that sk_dst_reset(sk) is implementing this protocol correctly,
+while __dst_negative_advice() uses the wrong order.
 
-Typo: trasmit
+Given that ip6_negative_advice() has special logic
+against RTF_CACHE, this means each of the three ->negative_advice()
+existing methods must perform the sk_dst_reset() themselves.
 
-> limited by PCIe bandwidth when scheduling/assigning hairpin-badwidth
-> between VFs. Changes to E810 HW design introduced scheduler limitation,
-> so that available hairpin-bandwidth is bound to external port speed.
-> In order to address this limitation and enable NFV services such as
-> "service chaining" a knob to adjust the scheduler config was created.
-> Driver can send a configuration message to the FW over admin queue and
-> internal FW logic will reconfigure HW to prioritize and add more BW to
-> VF to VF traffic. As end result for example 10G port will no longer limit
-> hairpin-badwith to 10G and much higher speeds can be achieved.
+Note the check against NULL dst is centralized in
+__dst_negative_advice(), there is no need to duplicate
+it in various callbacks.
 
-<snip>
+Many thanks to Clement Lecigne for tracking this issue.
+
+This old bug became visible after the blamed commit, using UDP sockets.
+
+Fixes: a87cb3e48ee8 ("net: Facility to report route quality of connected sockets")
+Reported-by: Clement Lecigne <clecigne@google.com>
+Diagnosed-by: Clement Lecigne <clecigne@google.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Tom Herbert <tom@herbertland.com>
+---
+ include/net/dst_ops.h  |  2 +-
+ include/net/sock.h     | 13 +++----------
+ net/ipv4/route.c       | 22 ++++++++--------------
+ net/ipv6/route.c       | 29 +++++++++++++++--------------
+ net/xfrm/xfrm_policy.c | 11 +++--------
+ 5 files changed, 30 insertions(+), 47 deletions(-)
+
+diff --git a/include/net/dst_ops.h b/include/net/dst_ops.h
+index 6d1c8541183dbe7bd6d3e5bd6c57174de9524a50..3a9001a042a5c392a79cfc59af528ef410a28668 100644
+--- a/include/net/dst_ops.h
++++ b/include/net/dst_ops.h
+@@ -24,7 +24,7 @@ struct dst_ops {
+ 	void			(*destroy)(struct dst_entry *);
+ 	void			(*ifdown)(struct dst_entry *,
+ 					  struct net_device *dev);
+-	struct dst_entry *	(*negative_advice)(struct dst_entry *);
++	void			(*negative_advice)(struct sock *sk, struct dst_entry *);
+ 	void			(*link_failure)(struct sk_buff *);
+ 	void			(*update_pmtu)(struct dst_entry *dst, struct sock *sk,
+ 					       struct sk_buff *skb, u32 mtu,
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 5f4d0629348f3fcb7b8d5e5e0796a35a9b913101..953c8dc4e259e84b927cc77edc0e55cdde654e94 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2063,17 +2063,10 @@ sk_dst_get(const struct sock *sk)
+ 
+ static inline void __dst_negative_advice(struct sock *sk)
+ {
+-	struct dst_entry *ndst, *dst = __sk_dst_get(sk);
++	struct dst_entry *dst = __sk_dst_get(sk);
+ 
+-	if (dst && dst->ops->negative_advice) {
+-		ndst = dst->ops->negative_advice(dst);
+-
+-		if (ndst != dst) {
+-			rcu_assign_pointer(sk->sk_dst_cache, ndst);
+-			sk_tx_queue_clear(sk);
+-			WRITE_ONCE(sk->sk_dst_pending_confirm, 0);
+-		}
+-	}
++	if (dst && dst->ops->negative_advice)
++		dst->ops->negative_advice(sk, dst);
+ }
+ 
+ static inline void dst_negative_advice(struct sock *sk)
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 5fd54103174f72d24d8015ad69029cebdd50740f..b3073d1c8f8f71c88dc525eefb2b03be8f1f2945 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -129,7 +129,8 @@ struct dst_entry	*ipv4_dst_check(struct dst_entry *dst, u32 cookie);
+ static unsigned int	 ipv4_default_advmss(const struct dst_entry *dst);
+ INDIRECT_CALLABLE_SCOPE
+ unsigned int		ipv4_mtu(const struct dst_entry *dst);
+-static struct dst_entry *ipv4_negative_advice(struct dst_entry *dst);
++static void		ipv4_negative_advice(struct sock *sk,
++					     struct dst_entry *dst);
+ static void		 ipv4_link_failure(struct sk_buff *skb);
+ static void		 ip_rt_update_pmtu(struct dst_entry *dst, struct sock *sk,
+ 					   struct sk_buff *skb, u32 mtu,
+@@ -825,22 +826,15 @@ static void ip_do_redirect(struct dst_entry *dst, struct sock *sk, struct sk_buf
+ 	__ip_do_redirect(rt, skb, &fl4, true);
+ }
+ 
+-static struct dst_entry *ipv4_negative_advice(struct dst_entry *dst)
++static void ipv4_negative_advice(struct sock *sk,
++				 struct dst_entry *dst)
+ {
+ 	struct rtable *rt = dst_rtable(dst);
+-	struct dst_entry *ret = dst;
+ 
+-	if (rt) {
+-		if (dst->obsolete > 0) {
+-			ip_rt_put(rt);
+-			ret = NULL;
+-		} else if ((rt->rt_flags & RTCF_REDIRECTED) ||
+-			   rt->dst.expires) {
+-			ip_rt_put(rt);
+-			ret = NULL;
+-		}
+-	}
+-	return ret;
++	if ((dst->obsolete > 0) ||
++	    (rt->rt_flags & RTCF_REDIRECTED) ||
++	    rt->dst.expires)
++		sk_dst_reset(sk);
+ }
+ 
+ /*
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index bbc2a0dd931429e7f8c68df0df48bce6d604fb56..a504b88ec06b5aec6b0f915c3ff044cd98f864ab 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -87,7 +87,8 @@ struct dst_entry	*ip6_dst_check(struct dst_entry *dst, u32 cookie);
+ static unsigned int	 ip6_default_advmss(const struct dst_entry *dst);
+ INDIRECT_CALLABLE_SCOPE
+ unsigned int		ip6_mtu(const struct dst_entry *dst);
+-static struct dst_entry *ip6_negative_advice(struct dst_entry *);
++static void		ip6_negative_advice(struct sock *sk,
++					    struct dst_entry *dst);
+ static void		ip6_dst_destroy(struct dst_entry *);
+ static void		ip6_dst_ifdown(struct dst_entry *,
+ 				       struct net_device *dev);
+@@ -2770,24 +2771,24 @@ INDIRECT_CALLABLE_SCOPE struct dst_entry *ip6_dst_check(struct dst_entry *dst,
+ }
+ EXPORT_INDIRECT_CALLABLE(ip6_dst_check);
+ 
+-static struct dst_entry *ip6_negative_advice(struct dst_entry *dst)
++static void ip6_negative_advice(struct sock *sk,
++				struct dst_entry *dst)
+ {
+ 	struct rt6_info *rt = dst_rt6_info(dst);
+ 
+-	if (rt) {
+-		if (rt->rt6i_flags & RTF_CACHE) {
+-			rcu_read_lock();
+-			if (rt6_check_expired(rt)) {
+-				rt6_remove_exception_rt(rt);
+-				dst = NULL;
+-			}
+-			rcu_read_unlock();
+-		} else {
+-			dst_release(dst);
+-			dst = NULL;
++	if (rt->rt6i_flags & RTF_CACHE) {
++		rcu_read_lock();
++		if (rt6_check_expired(rt)) {
++			/* counteract the dst_release() in sk_dst_reset() */
++			dst_hold(dst);
++			sk_dst_reset(sk);
++
++			rt6_remove_exception_rt(rt);
+ 		}
++		rcu_read_unlock();
++		return;
+ 	}
+-	return dst;
++	sk_dst_reset(sk);
+ }
+ 
+ static void ip6_link_failure(struct sk_buff *skb)
+diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+index 475b904fe68b8fa0c4e06f265309a52332a582e8..66e07de2de35cd1b5d3b4b5771e152dde6660b0d 100644
+--- a/net/xfrm/xfrm_policy.c
++++ b/net/xfrm/xfrm_policy.c
+@@ -3910,15 +3910,10 @@ static void xfrm_link_failure(struct sk_buff *skb)
+ 	/* Impossible. Such dst must be popped before reaches point of failure. */
+ }
+ 
+-static struct dst_entry *xfrm_negative_advice(struct dst_entry *dst)
++static void xfrm_negative_advice(struct sock *sk, struct dst_entry *dst)
+ {
+-	if (dst) {
+-		if (dst->obsolete) {
+-			dst_release(dst);
+-			dst = NULL;
+-		}
+-	}
+-	return dst;
++	if (dst->obsolete)
++		sk_dst_reset(sk);
+ }
+ 
+ static void xfrm_init_pmtu(struct xfrm_dst **bundle, int nr)
+-- 
+2.45.1.288.g0e0cd299f1-goog
+
 
