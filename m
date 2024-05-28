@@ -1,295 +1,173 @@
-Return-Path: <netdev+bounces-98421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E6988D15E9
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 10:10:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38CE38D1601
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 10:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92B8DB22BAC
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 08:10:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA5361F22A31
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 08:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F375213D60D;
-	Tue, 28 May 2024 08:09:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W35IUspS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E3D13AD0D;
+	Tue, 28 May 2024 08:12:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C229C13D509;
-	Tue, 28 May 2024 08:09:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA1F14CB2B
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 08:12:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716883798; cv=none; b=Hkv3gVY8diotrhJyEeIqdgHLzQgCPL9MEvyZTxnEig74z+aatG3hykQMvRkFe3hhQiWZ1Gs/aXN30cK/+otwUqKRI/zkQUKge2MGmSCeP9gdjxcsYyBONuyTg3POhaPQtYrQwT+XPFxw6/dt3mrzTJrC5w9XZTTem0HeKWmJjws=
+	t=1716883951; cv=none; b=VcHWPwfiF/KRkoPD4N38Ni2Kh6S31Zl5I4Q1+EsM0d24Qy/MgX/mPhznepCBbCS/EDRUElvpRtumEdCXL6EeDl+YqQeurFZZFndC+GAsvZpYpvRw+g4SK+clhnLIUOP5g9rq9b6A2E04ekwtv14BGpXbnOA55YZJIESfUR3YDWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716883798; c=relaxed/simple;
-	bh=qKXzA71iQazzuaFwaRvE/GV0og5PaxKwQ3vjJNhpXjE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=KGvq2cNr7Mea9B4H75LctpXaHkqXtVrJssRhQZq9tOtI+dLq7EvX6GHazvW+wLcJYUmAtSru6oIVXW0J8Hr2r3t+meX9LyrNXI8mo41sWJk/RmqmD+/w/eF+aHP/RrHzzmRukrgEKLAoXc6ZzHfsuhmuB6zrZ1h1l++t1tx06kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W35IUspS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94BCCC4AF11;
-	Tue, 28 May 2024 08:09:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716883798;
-	bh=qKXzA71iQazzuaFwaRvE/GV0og5PaxKwQ3vjJNhpXjE=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=W35IUspSwyuF49bxl1m5dcTOkoeHnbXPJ3p9muwi4d4kcF9r/pgB5Ri8i+btv10iw
-	 GUBjeZVdikxX8DuobP9ePw/nWC0xIqrLlkqOyiE5YomEB4V/ItlZ8XQzuAwbwfKVLI
-	 FJfNz0RSxJ125oVtddeqjcFYcwBTWvHZTW6PFrNZ7ZE0z44c5fDSE6CwHXBezhF/Nc
-	 qgD5djV1g1+4AVt5IvuPYgJ5wnEq8hg4ERzKLG4xLTHbHQtfLWwURyvfft3q9tj/Fe
-	 cdsyQ1nt7unpHQ/GEC1tgQMuDfOwfaXw8GcUM00H8TfBXzshB3/zkEmrztb7iiTMFn
-	 plSc4SNzLPyDA==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Tue, 28 May 2024 10:09:18 +0200
-Subject: [PATCH net-next v2 3/3] doc: new 'mptcp' page in 'networking'
+	s=arc-20240116; t=1716883951; c=relaxed/simple;
+	bh=E5wpARPOeWcZieWnbOuZFu6eAepgeitTQOwRq5hBp3Y=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=fOkqLFe25Px9UBe2rrFokXTxe0QySPy2jJbBN29+iJwVxdbC8/W6Gn/G9xmhZ+x9KBD8qQZfnyx4bi6cR/c7jfdF68hVPj19ZNF3ITR5aYTCKpaRl4wSRQYO5pQ8OTLFfMLWWg3sUwG4aOAxeEwcZso6CbUq5txbUeYvWR67jqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-7ead5f29d93so47144739f.3
+        for <netdev@vger.kernel.org>; Tue, 28 May 2024 01:12:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716883949; x=1717488749;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nHXvlX7qAyTn+H51EMXOxrRoGdZhF+XnYUadlZmocHE=;
+        b=t+mZleF8bY2K8HCjfHJ6uIKCYOQbFrKOC+7omsKThIruyvmyIzfBZqmgctCM1lRe/N
+         Sm9HRuAkLUHEcSS4djGgS7Fa9gnGXpYDzyus/OwV0By9ZbYHWcEjQM8nqTShrpQwZr+Y
+         n9399S/yCocwzL1q6uxX0p8uuw5BwxCjeI6KiicEnnPovBnDXaH8JXSsbE3brNVwiIsc
+         C/L4opQjuvPlYO3N65IKLd7m+TXOwS8NlCfgQk3w2wyoQ7MMiAvr/5XIRmCaElHG5ukb
+         O0BxMyWCODvDfuBrfjbqyKgzPHyTdSZfhihruTnbQ2mSmbkspWEkDOfOBK+ufv1BgNxB
+         sqPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUL5YF9Xh9oWU0ffmg6tj40n+eMcgVRb9uiBZ9yJDjA/pLK1ZpZ/HYZmoqEGy0GfmCaNVRrOFTntVYM40dKrVa4J3NapNv3
+X-Gm-Message-State: AOJu0YyteEgqt3fdz20BCZLyhx4XotZLj8ewO5dCzMgU83CZrmM3USOq
+	H7blfOpFK8xWDOg7Q100C4W3DCqZUQCoplIyTJ8U3I393X3AjJgBmjeHThVIyQvptg281tYz1vl
+	mfqyBCraqIEMCBETcvmaTzoiKsJbxFxld3gKKb54Gds5JL87LQPl8BO0=
+X-Google-Smtp-Source: AGHT+IF1aY6wXkcH0AVuwQqpdzip/3mGvajVyF0qU2zn2qnC6b/UOTHc5r63xQTD9fuWTbAItUHIQcTuhlQGUmXTvdkMCQoIcd3r
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240528-upstream-net-20240520-mptcp-doc-v2-3-47f2d5bc2ef3@kernel.org>
-References: <20240528-upstream-net-20240520-mptcp-doc-v2-0-47f2d5bc2ef3@kernel.org>
-In-Reply-To: <20240528-upstream-net-20240520-mptcp-doc-v2-0-47f2d5bc2ef3@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
- Gregory Detal <gregory.detal@gmail.com>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=8617; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=qKXzA71iQazzuaFwaRvE/GV0og5PaxKwQ3vjJNhpXjE=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmVZFJFGQixHB6d3jeu0DsGyE7HJqOJjptlAB5J
- WRZ01yikteJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZlWRSQAKCRD2t4JPQmmg
- cxm3EACBfK5oHE9qdXvOHHqk5OMxscBfnKth+55JAtsGifWCH69VD+nCLOaT+V9INOKOBfHptCP
- vQIcaFMzcu2DZXhM6xU0dsc/F3jQxp9Y/SO1FsXsW9ktsak8m6r9AOYWBgCS34aOSD2ptGk4PGX
- Wqu7YbY8FHFAzJHWSP3lE+Pllx99cK5OTGVAYEbhq+TOirPeXxTlj+lOpjN8qdMs/W9pc1w/5mm
- 1HqkbuSGMtJdRBisActQhuJUCSQAMZJSCqcEY/1m8NasXkbUt2gXwqBA2snYFqzI0801X79lWt8
- Bh343rI5VB1yN4fKs8hxca5TXby5kDIU/l4OKeaScUoSE2NEqVXlgOQS3dox501MMEXIeJ7VCGj
- CXxhrAjlKhWsTzzgFY+i/HZkEWDu+d1efM1v/LpZr1hSPkxzdxY9y4cHw46wYeM94r/3I0jsfEd
- tdBmOwJPlTKNvphQsT0uMnXP/IV+wjGhf7padDtLVQW+jBPOYQFAmm4Ocswd/QgAtf6vqZgvcpI
- AeOdV961eTWCIVytsB6XICzIhVCEGl8ced1voP4W/ZcCvGlQh1eCTU4CMFvxQP6PBDGUVtUvL12
- QM8rvNinP6ICHqgjizU0h8z38yFUNz0fJGOzR7ZdQ4bROSpH1C9peOManvgUnWO9b9/qtcAg/YZ
- oCdyGXpZh44XLCA==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+X-Received: by 2002:a05:6602:6d05:b0:7de:e2d3:20ba with SMTP id
+ ca18e2360f4ac-7e8c1ada968mr58944939f.0.1716883948971; Tue, 28 May 2024
+ 01:12:28 -0700 (PDT)
+Date: Tue, 28 May 2024 01:12:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e635ba06197f31f2@google.com>
+Subject: [syzbot] [net?] [virt?] upstream boot error: KMSAN: uninit-value in receive_buf
+From: syzbot <syzbot+c5336dcd1b741349d27a@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, jasowang@redhat.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, mst@redhat.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com
+Content-Type: text/plain; charset="UTF-8"
 
-A general documentation about MPTCP was missing since its introduction
-in v5.6.
+Hello,
 
-Most of what is there comes from our recently updated mptcp.dev website,
-with additional links to resources from the kernel documentation.
+syzbot found the following issue on:
 
-This is a first version, mainly targeting app developers and users.
+HEAD commit:    8f6a15f095a6 Merge tag 'cocci-for-6.10' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1526be58980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d66c5ffb962c9d5b
+dashboard link: https://syzkaller.appspot.com/bug?extid=c5336dcd1b741349d27a
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-Link: https://www.mptcp.dev
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/b89e8eae93a7/disk-8f6a15f0.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/b4e90ba9ba00/vmlinux-8f6a15f0.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/534e2e1e43eb/bzImage-8f6a15f0.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c5336dcd1b741349d27a@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in receive_mergeable drivers/net/virtio_net.c:1839 [inline]
+BUG: KMSAN: uninit-value in receive_buf+0x25e3/0x5fd0 drivers/net/virtio_net.c:1955
+ receive_mergeable drivers/net/virtio_net.c:1839 [inline]
+ receive_buf+0x25e3/0x5fd0 drivers/net/virtio_net.c:1955
+ virtnet_receive drivers/net/virtio_net.c:2259 [inline]
+ virtnet_poll+0xd1c/0x23c0 drivers/net/virtio_net.c:2362
+ __napi_poll+0xe7/0x980 net/core/dev.c:6721
+ napi_poll net/core/dev.c:6790 [inline]
+ net_rx_action+0x82a/0x1850 net/core/dev.c:6906
+ handle_softirqs+0x1d8/0x810 kernel/softirq.c:554
+ __do_softirq kernel/softirq.c:588 [inline]
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu+0x68/0x120 kernel/softirq.c:637
+ irq_exit_rcu+0x12/0x20 kernel/softirq.c:649
+ common_interrupt+0x94/0xa0 arch/x86/kernel/irq.c:278
+ asm_common_interrupt+0x2b/0x40 arch/x86/include/asm/idtentry.h:693
+ native_safe_halt arch/x86/include/asm/irqflags.h:48 [inline]
+ arch_safe_halt arch/x86/include/asm/irqflags.h:86 [inline]
+ acpi_safe_halt+0x25/0x30 drivers/acpi/processor_idle.c:112
+ acpi_idle_do_entry+0x22/0x40 drivers/acpi/processor_idle.c:573
+ acpi_idle_enter+0xa1/0xc0 drivers/acpi/processor_idle.c:707
+ cpuidle_enter_state+0xcb/0x250 drivers/cpuidle/cpuidle.c:267
+ cpuidle_enter+0x7f/0xf0 drivers/cpuidle/cpuidle.c:388
+ call_cpuidle kernel/sched/idle.c:155 [inline]
+ cpuidle_idle_call kernel/sched/idle.c:236 [inline]
+ do_idle+0x551/0x750 kernel/sched/idle.c:332
+ cpu_startup_entry+0x65/0x80 kernel/sched/idle.c:430
+ rest_init+0x1e8/0x260 init/main.c:747
+ start_kernel+0x92c/0xa70 init/main.c:1103
+ x86_64_start_reservations+0x2e/0x30 arch/x86/kernel/head64.c:507
+ x86_64_start_kernel+0x98/0xa0 arch/x86/kernel/head64.c:488
+ common_startup_64+0x12c/0x137
+
+Uninit was created at:
+ __alloc_pages_noprof+0x9d6/0xe70 mm/page_alloc.c:4683
+ alloc_pages_mpol_noprof+0x299/0x990 mm/mempolicy.c:2265
+ alloc_pages_noprof+0x1bf/0x1e0 mm/mempolicy.c:2336
+ skb_page_frag_refill+0x2bf/0x7c0 net/core/sock.c:2920
+ virtnet_rq_alloc+0x43/0xbb0 drivers/net/virtio_net.c:882
+ add_recvbuf_mergeable drivers/net/virtio_net.c:2110 [inline]
+ try_fill_recv+0x3f0/0x2f50 drivers/net/virtio_net.c:2155
+ virtnet_open+0x1cc/0xb00 drivers/net/virtio_net.c:2434
+ __dev_open+0x546/0x6f0 net/core/dev.c:1472
+ __dev_change_flags+0x309/0x9a0 net/core/dev.c:8780
+ dev_change_flags+0x8e/0x1d0 net/core/dev.c:8852
+ devinet_ioctl+0x13ec/0x22c0 net/ipv4/devinet.c:1177
+ inet_ioctl+0x4bd/0x6d0 net/ipv4/af_inet.c:1001
+ sock_do_ioctl+0xb7/0x540 net/socket.c:1222
+ sock_ioctl+0x727/0xd70 net/socket.c:1341
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl+0x261/0x450 fs/ioctl.c:893
+ __x64_sys_ioctl+0x96/0xe0 fs/ioctl.c:893
+ x64_sys_call+0x1883/0x3b50 arch/x86/include/generated/asm/syscalls_64.h:17
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.9.0-syzkaller-10323-g8f6a15f095a6 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+=====================================================
+
+
 ---
-Notes:
-  - v2:
-    - Fix mptcp.dev link syntax.
----
- Documentation/networking/index.rst |   1 +
- Documentation/networking/mptcp.rst | 156 +++++++++++++++++++++++++++++++++++++
- MAINTAINERS                        |   2 +-
- 3 files changed, 158 insertions(+), 1 deletion(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 7664c0bfe461..a6443851a142 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -72,6 +72,7 @@ Contents:
-    mac80211-injection
-    mctp
-    mpls-sysctl
-+   mptcp
-    mptcp-sysctl
-    multiqueue
-    multi-pf-netdev
-diff --git a/Documentation/networking/mptcp.rst b/Documentation/networking/mptcp.rst
-new file mode 100644
-index 000000000000..ee0ae68ca271
---- /dev/null
-+++ b/Documentation/networking/mptcp.rst
-@@ -0,0 +1,156 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=====================
-+Multipath TCP (MPTCP)
-+=====================
-+
-+Introduction
-+============
-+
-+Multipath TCP or MPTCP is an extension to the standard TCP and is described in
-+`RFC 8684 (MPTCPv1) <https://www.rfc-editor.org/rfc/rfc8684.html>`_. It allows a
-+device to make use of multiple interfaces at once to send and receive TCP
-+packets over a single MPTCP connection. MPTCP can aggregate the bandwidth of
-+multiple interfaces or prefer the one with the lowest latency, it also allows a
-+fail-over if one path is down, and the traffic is seamlessly reinjected on other
-+paths.
-+
-+For more details about Multipath TCP in the Linux kernel, please see the
-+official website: `mptcp.dev <https://www.mptcp.dev>`_.
-+
-+
-+Use cases
-+=========
-+
-+Thanks to MPTCP, being able to use multiple paths in parallel or simultaneously
-+brings new use-cases, compared to TCP:
-+
-+- Seamless handovers: switching from one path to another while preserving
-+  established connections, e.g. to be used in mobility use-cases, like on
-+  smartphones.
-+- Best network selection: using the "best" available path depending on some
-+  conditions, e.g. latency, losses, cost, bandwidth, etc.
-+- Network aggregation: using multiple paths at the same time to have a higher
-+  throughput, e.g. to combine fixed and mobile networks to send files faster.
-+
-+
-+Concepts
-+========
-+
-+Technically, when a new socket is created with the ``IPPROTO_MPTCP`` protocol
-+(Linux-specific), a *subflow* (or *path*) is created. This *subflow* consists of
-+a regular TCP connection that is used to transmit data through one interface.
-+Additional *subflows* can be negotiated later between the hosts. For the remote
-+host to be able to detect the use of MPTCP, a new field is added to the TCP
-+*option* field of the underlying TCP *subflow*. This field contains, amongst
-+other things, a ``MP_CAPABLE`` option that tells the other host to use MPTCP if
-+it is supported. If the remote host or any middlebox in between does not support
-+it, the returned ``SYN+ACK`` packet will not contain MPTCP options in the TCP
-+*option* field. In that case, the connection will be "downgraded" to plain TCP,
-+and it will continue with a single path.
-+
-+This behavior is made possible by two internal components: the path manager, and
-+the packet scheduler.
-+
-+Path Manager
-+------------
-+
-+The Path Manager is in charge of *subflows*, from creation to deletion, and also
-+address announcements. Typically, it is the client side that initiates subflows,
-+and the server side that announces additional addresses via the ``ADD_ADDR`` and
-+``REMOVE_ADDR`` options.
-+
-+Path managers are controlled by the ``net.mptcp.pm_type`` sysctl knob -- see
-+mptcp-sysctl.rst. There are two types: the in-kernel one (type ``0``) where the
-+same rules are applied for all the connections (see: ``ip mptcp``) ; and the
-+userspace one (type ``1``), controlled by a userspace daemon (i.e. `mptcpd
-+<https://mptcpd.mptcp.dev/>`_) where different rules can be applied for each
-+connection. The path managers can be controlled via a Netlink API, see
-+netlink_spec/mptcp_pm.rst.
-+
-+To be able to use multiple IP addresses on a host to create multiple *subflows*
-+(paths), the default in-kernel MPTCP path-manager needs to know which IP
-+addresses can be used. This can be configured with ``ip mptcp endpoint`` for
-+example.
-+
-+Packet Scheduler
-+----------------
-+
-+The Packet Scheduler is in charge of selecting which available *subflow(s)* to
-+use to send the next data packet. It can decide to maximize the use of the
-+available bandwidth, only to pick the path with the lower latency, or any other
-+policy depending on the configuration.
-+
-+Packet schedulers are controlled by the ``net.mptcp.scheduler`` sysctl knob --
-+see mptcp-sysctl.rst.
-+
-+
-+Sockets API
-+===========
-+
-+Creating MPTCP sockets
-+----------------------
-+
-+On Linux, MPTCP can be used by selecting MPTCP instead of TCP when creating the
-+``socket``:
-+
-+.. code-block:: C
-+
-+    int sd = socket(AF_INET(6), SOCK_STREAM, IPPROTO_MPTCP);
-+
-+Note that ``IPPROTO_MPTCP`` is defined as ``262``.
-+
-+If MPTCP is not supported, ``errno`` will be set to:
-+
-+- ``EINVAL``: (*Invalid argument*): MPTCP is not available, on kernels < 5.6.
-+- ``EPROTONOSUPPORT`` (*Protocol not supported*): MPTCP has not been compiled,
-+  on kernels >= v5.6.
-+- ``ENOPROTOOPT`` (*Protocol not available*): MPTCP has been disabled using
-+  ``net.mptcp.enabled`` sysctl knob, see mptcp-sysctl.rst.
-+
-+MPTCP is then opt-in: applications need to explicitly request it. Note that
-+applications can be forced to use MPTCP with different techniques, e.g.
-+``LD_PRELOAD`` (see ``mptcpize``), eBPF (see ``mptcpify``), SystemTAP,
-+``GODEBUG`` (``GODEBUG=multipathtcp=1``), etc.
-+
-+Switching to ``IPPROTO_MPTCP`` instead of ``IPPROTO_TCP`` should be as
-+transparent as possible for the userspace applications.
-+
-+Socket options
-+--------------
-+
-+MPTCP supports most socket options handled by TCP. It is possible some less
-+common options are not supported, but contributions are welcome.
-+
-+Generally, the same value is propagated to all subflows, including the ones
-+created after the calls to ``setsockopt()``. eBPF can be used to set different
-+values per subflow.
-+
-+There are some MPTCP specific socket options at the ``SOL_MPTCP`` (284) level to
-+retrieve info. They fill the ``optval`` buffer of the ``getsockopt()`` system
-+call:
-+
-+- ``MPTCP_INFO``: Uses ``struct mptcp_info``.
-+- ``MPTCP_TCPINFO``: Uses ``struct mptcp_subflow_data``, followed by an array of
-+  ``struct tcp_info``.
-+- ``MPTCP_SUBFLOW_ADDRS``: Uses ``struct mptcp_subflow_data``, followed by an
-+  array of ``mptcp_subflow_addrs``.
-+- ``MPTCP_FULL_INFO``: Uses ``struct mptcp_full_info``, with one pointer to an
-+  array of ``struct mptcp_subflow_info`` (including the
-+  ``struct mptcp_subflow_addrs``), and one pointer to an array of
-+  ``struct tcp_info``, followed by the content of ``struct mptcp_info``.
-+
-+Note that at the TCP level, ``TCP_IS_MPTCP`` socket option can be used to know
-+if MPTCP is currently being used: the value will be set to 1 if it is.
-+
-+
-+Design choices
-+==============
-+
-+A new socket type has been added for MPTCP for the userspace-facing socket. The
-+kernel is in charge of creating subflow sockets: they are TCP sockets where the
-+behavior is modified using TCP-ULP.
-+
-+MPTCP listen sockets will create "plain" *accepted* TCP sockets if the
-+connection request from the client didn't ask for MPTCP, making the performance
-+impact minimal when MPTCP is enabled by default.
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 27367ad339ea..1a65444adb21 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -15753,7 +15753,7 @@ B:	https://github.com/multipath-tcp/mptcp_net-next/issues
- T:	git https://github.com/multipath-tcp/mptcp_net-next.git export-net
- T:	git https://github.com/multipath-tcp/mptcp_net-next.git export
- F:	Documentation/netlink/specs/mptcp_pm.yaml
--F:	Documentation/networking/mptcp-sysctl.rst
-+F:	Documentation/networking/mptcp*.rst
- F:	include/net/mptcp.h
- F:	include/trace/events/mptcp.h
- F:	include/uapi/linux/mptcp*.h
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
--- 
-2.43.0
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
