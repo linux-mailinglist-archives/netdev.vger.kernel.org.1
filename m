@@ -1,205 +1,119 @@
-Return-Path: <netdev+bounces-98717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C6758D22D0
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 19:53:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C8D608D22DB
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 19:57:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE89E2857D9
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 17:53:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 829AD2869CC
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 17:57:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D73D45945;
-	Tue, 28 May 2024 17:53:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE87E45957;
+	Tue, 28 May 2024 17:57:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XH3ubCZ6"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="IvMn314Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8FA4501E
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 17:53:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9551C48781;
+	Tue, 28 May 2024 17:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716918785; cv=none; b=eJoSSNwdnfoZMhyrGwVjjrG5EmCxOQ+DpGCA3uqEpYsfhLqFT9Jz1LdbUdc+NJPSz5koEjqq6tun7lgb88LLusXGGhWu6zU+deixWlE0PTU9nHuLupw2d+1Iv2gRtDfIlAkpTrpKWOVwy+yov6USUOpP7XgU5QZDv3ZY5Gv5Wvg=
+	t=1716919038; cv=none; b=Dc/hIM4fuEdkuVzI8U7IlKbd0bHqhlo3r9Jn+P5tO150zTP+R3Mcj9BushBSZpD1YHhemtSiBhsvqB/xPz4rLwKCLO3rb1gjCgYy8xGIkpagYyHGs0HDMz1ZLeUEe1gj2Z0Y0JFnGl0CCP8Ao+KM2TukVettqWBjqhEW6vhneYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716918785; c=relaxed/simple;
-	bh=eUdSdQ9cdw8tBxu4pJAWUaOjnZMDsr/CJl22+nf6t0Q=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=pYyqLycLnEkY4UkVDAtPyD86nmMQiw+GyctpIMH8MNMb8lqXS5h9KrsR+06t5o9+IsnS8KwMXdTVd0SuaiaWRcApmPsE5AwlYGax4T/0Yj96NgW8LNiTdYhxNlaj+kx7YdeZnslZ87ZFnVG44BqKRgthL/i/m3qqVvJGgzn/K4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XH3ubCZ6; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: linux@armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1716918780;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kIXY6m78aF06Wj1IhD21/vXPn+0spKIAiHBeBQ4dyJs=;
-	b=XH3ubCZ6cSON2X8geqtFXGpyqBmynD9m+0Dh+zIa8PyLufNGeVszFN2fi/B1QGjyhyjkA4
-	dunPHc15ZxPn4i+Hs4M1yoECffhVGEMGbijgYV7qIpJuned3ZVXdEGS4F85HlXkodi7/pU
-	wHXJbKBhgMI40tG04o2qKNs3DSelm+E=
-X-Envelope-To: alex.williams@ni.com
-X-Envelope-To: andrew@lunn.ch
-X-Envelope-To: andi.shyti@kernel.org
-X-Envelope-To: netdev@vger.kernel.org
-X-Envelope-To: linux-i2c@vger.kernel.org
-X-Envelope-To: michal.simek@amd.com
-X-Envelope-To: hkallweit1@gmail.com
-X-Envelope-To: linux-arm-kernel@lists.infradead.org
-X-Envelope-To: linux-kernel@vger.kernel.org
-Message-ID: <ebf93967-81d0-46bc-baf5-b20f9336cfa8@linux.dev>
-Date: Tue, 28 May 2024 13:52:56 -0400
+	s=arc-20240116; t=1716919038; c=relaxed/simple;
+	bh=UElZkq4qpCK3zCVRc9jcd5OyfnQZO4JqaDi62I4WnCA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IV60/mAht673CQbM7Op5mXOvGjqYVMyrkoGLO/9MisFurbK7U+nvZmwnEAtV+RXOPUh5c5pBeGj9ecJiGBENCs4QBZwO8JCGDfElCS5iede+s6aoJOQvtB3RrkSx/GzgnYESbGIf0bwvhgLIVDntzXSrDZpcXqfTqEqcy+Ot/FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=IvMn314Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B78E9C3277B;
+	Tue, 28 May 2024 17:57:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1716919038;
+	bh=UElZkq4qpCK3zCVRc9jcd5OyfnQZO4JqaDi62I4WnCA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IvMn314Qln82wrUv3HDPSK2V81ZLxf3kUcFpYYXnlCfHRczm+0cRVlw1cyfZ+CKgw
+	 52iLC+vBKdjki5740l3YNVatv6byjLre+TbCxC1a9HrAaoysMKZ6eY3xuOJLCfZSyt
+	 7fe2mHJSXhckADrCnchfGdJd/Z3QCc22t8g6aXcs=
+Date: Tue, 28 May 2024 19:57:22 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Shay Drory <shayd@nvidia.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	kuba@kernel.org, edumazet@google.com, david.m.ertman@intel.com,
+	rafael@kernel.org, ira.weiny@intel.com, linux-rdma@vger.kernel.org,
+	leon@kernel.org, tariqt@nvidia.com
+Subject: Re: [PATCH net-next v5 0/2] Introduce auxiliary bus IRQs sysfs
+Message-ID: <2024052806-armadillo-mournful-6b23@gregkh>
+References: <20240528091144.112829-1-shayd@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [BUG] SFP I2C timeout forces link down with PHY_ERROR
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Alex Williams <alex.williams@ni.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andi Shyti <andi.shyti@kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- linux-i2c@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <ec7907f1-cb5a-41ab-824c-aa0b02440ada@linux.dev>
- <ZlYUNCRroM0up0xk@shell.armlinux.org.uk>
- <90873b78-13ba-445e-890a-0b90a653721b@linux.dev>
-Content-Language: en-US
-In-Reply-To: <90873b78-13ba-445e-890a-0b90a653721b@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240528091144.112829-1-shayd@nvidia.com>
 
-(forgot to CC Alex)
+On Tue, May 28, 2024 at 12:11:42PM +0300, Shay Drory wrote:
+> Today, PCI PFs and VFs, which are anchored on the PCI bus, display their
+> IRQ information in the <pci_device>/msi_irqs/<irq_num> sysfs files. PCI
+> subfunctions (SFs) are similar to PFs and VFs and these SFs are anchored
+> on the auxiliary bus. However, these PCI SFs lack such IRQ information
+> on the auxiliary bus, leaving users without visibility into which IRQs
+> are used by the SFs. This absence makes it impossible to debug
+> situations and to understand the source of interrupts/SFs for
+> performance tuning and debug.
 
-On 5/28/24 13:50, Sean Anderson wrote:
-> On 5/28/24 13:28, Russell King (Oracle) wrote:
->> First, note that phylib's policy is if it loses comms with the PHY,
->> then the link will be forced down. This is out of control of the SFP
->> or phylink code.
->> 
->> I've seen bugs with the I2C emulation on some modules resulting in
->> problems with various I2C controllers.
->> 
->> Sometimes the problem is due to a bad I2C level shifter. Some I2C
->> level shifter manufacturers will swear blind that their shifter
->> doesn't lock up, but strangely, one can prove with an osciloscope
->> that it _does_ lock up - and in a way that the only way to recover
->> was to possibly unplug the module or poewr cycle the platform.
-> 
-> Well, I haven't seen any case where the bus locks up. I've been able to
-> recover just by doing
-> 
-> 	ip link set net0 down
-> 	ip link set net0 up
-> 
-> which suggests that this is just a transient problem.
-> 
->> My advice would be to investigate the hardware in the first instance.
-> 
-> I'll try to keep this in mind, but it's pretty infrequent and I probably
-> won't be able to test anything until I can reproduce it better.
-> 
->> On Tue, May 28, 2024 at 12:57:25PM -0400, Sean Anderson wrote:
->>> Hi,
->>> 
->>> I saw the following warning [1] twice when testing 1000Base-T SFP
->>> modules:
->>> 
->>> [ 1481.682501] cdns-i2c ff030000.i2c: timeout waiting on completion
->>> [ 1481.692010] Marvell 88E1111 i2c:sfp-ge3:16: Master/Slave resolution failed
->>> [ 1481.699910] ------------[ cut here ]------------
->>> [ 1481.705459] phy_check_link_status+0x0/0xe8: returned: -67
->>> [ 1481.711448] WARNING: CPU: 2 PID: 67 at drivers/net/phy/phy.c:1233 phy_state_machine+0xac/0x2ec
->>> <snip>
->>> [ 1481.904544] macb ff0c0000.ethernet net1: Link is Down
->>> 
->>> and a second time with some other errors too:
->>> 
->>> [   64.972751] cdns-i2c ff030000.i2c: xfer_size reg rollover. xfer aborted!
->>> [   64.979478] cdns-i2c ff030000.i2c: xfer_size reg rollover. xfer aborted!
->> 
->> I2C driver bug? From what I can see, this occurs when there is further
->> data to be read, and id->recv_count hits zero. The I2C controller is
->> entirely in control of how many bytes are transferred from the remote
->> device, and it should raise a NAK on the last byte before signalling a
->> STOP condition during a read.
-> 
-> Commit bbf967b223b3 ("i2c: cadence: Handle transfer_size rollover")
-> makes it seem like a hardware error. E.g. Linux thinks we're done but
-> the hardware thinks there's still more data. I've added Alex to CC;
-> maybe he can comment.
-> 
->>> I think some part of the stack should implement a retry mechanism, but
->>> I'm not sure which part. One idea could be to have mdio-i2c propagate
->>> negative errors instead of converting them to successful reads of
->>> 0xffff.
->> 
->> That would unfortunately break phylib's PHY probing.
->> 
->>> - Are I2C bus drivers supposed to be flaky like this? That is, are callers of
->>>   i2c_transfer expected to handle the occasional spurious error?
->> 
->> I2C transfers - to some extent - are supposed to have a number of
->> retries, but that's for the I2C device not responding to its address.
->> Otherwise, the bus is supposed to be reliable (there is no form of
->> error detection however - there's no CRCs or similar.)
->> 
->> The problem with merely retrying the transaction is a register read
->> from a PHY may have side-effects (such as the BMSR's LSTATUS bit
->> which is latched in link-fail state until the next read. Or a
->> register pointer could be incremented. So it's not simple to solve
->> at bus level.
-> 
-> OK...
-> 
->>> - Similarly, are MDIO bus drivers allowed to be flaky?
->> 
->> No.
->> 
->> I think the only realistic method would be for phylib to attempt to
->> reprogram the PHY, but that would need lots of changes to phylib.
-> 
-> Would it? Maybe we just need something like
-> 
-> if (err == -ENOLINK) {
-> 	phy_init_hw(phydev);
-> 	needs_aneg = true;
-> 	phydev->state = PHY_UP;
-> 	err = 0;
-> }
-> 
-> in the phy_state_machine switch statement under PHY_NOLINK and
-> PHY_RUNNING. The phy_init_hw wouldn't even be necessary for this case
-> (but would probably be a good idea in the general case where
-> master/slave resolution fails).
-> 
->> Many drivers now do not check whether the PHY accesses they are
->> performing succeeded or not, and rely on the failure being permanent.
-> 
-> Well, this driver does, which is how the error gets propagated all the
-> way up to phy_state_machine. 
-> 
->>> Of course, the best option would be to fix cdns-i2c to not be buggy, but
->>> the hardware itself is buggy in at least one of the above cases so that
->>> may not be practical.
->> 
->> Well, I don't think there's much option. If I2C drivers are flakey maybe
->> its better to use GPIOs instead of the broken "inteligent" hardware.
-> 
-> The CPU on this device is already underpowered, so I'd rather not resort
-> to bitbanging.
-> 
-> --Sean
+Wait, again, this feels wrong.  You should be able to walk back up the
+tree see the irq for the device, and vf, right?  Why would the value be
+different down in the aux device?  Does the msi irq somehow not actually
+show anywhere for the real pci device in sysfs at all today?
 
+What does sysfs look like today exactly for this information?
+
+And what about /proc/irq/ and /proc/interrupts/ doesn't that show you
+the needed information?  Why are aux devices somehow "special" here?
+
+> Additionally, the SFs are multifunctional devices supporting RDMA,
+> network devices, clocks, and more, similar to their peer PCI PFs and
+> VFs. Therefore, it is desirable to have SFs' IRQ information available
+> at the bus/device level.
+
+But it should be as part of the pci device, as that's where that
+information lives and is "bound" to, not the aux device on its own.
+
+> To overcome the above limitations, this short series extends the
+> auxiliary bus to display IRQ information in sysfs, similar to that of
+> PFs and VFs.
+
+Again, examples of what it looks like today, and what it will look like
+with this patch set is needed in order to justify why this really is
+needed as it seems that the information should already be there for you.
+
+> It adds an 'irqs' directory under the auxiliary device and includes an
+> <irq_num> sysfs file within it. Sometimes, the PCI SF auxiliary devices
+> share the IRQ with other SFs, a detail that is also not available to the
+> users. Consequently, this <irq_num> file indicates whether the IRQ is
+> 'exclusive' or 'shared'.  This 'irqs' directory extenstion is optional,
+> i.e. only for PCI SFs the sysfs irq information is optionally exposed.
+
+Why does userspace care about "shared" or not?  What can they do with
+that, and why?
+
+> For example:
+> $ ls /sys/bus/auxiliary/devices/mlx5_core.sf.1/irqs/
+> 50  51  52  53  54  55  56  57  58
+> $ cat /sys/bus/auxiliary/devices/mlx5_core.sf.1/irqs/52
+> exclusive
+
+"exclusive" for now, but again, why?  Who cares?  These are msi irqs it
+shouldn't matter if they are shared or not.
+
+thanks,
+
+greg k-h
 
