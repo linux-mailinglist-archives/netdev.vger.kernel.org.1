@@ -1,286 +1,204 @@
-Return-Path: <netdev+bounces-98669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 148FE8D2037
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 17:19:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E71F8D204E
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 17:25:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37EB61C22AE9
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 15:19:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F3591C22BF0
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 15:25:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF5F16F904;
-	Tue, 28 May 2024 15:19:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4026D16F260;
+	Tue, 28 May 2024 15:25:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RdH2Y8gr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RnWFw6U0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D325282FA
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 15:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1890D1E507;
+	Tue, 28 May 2024 15:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716909585; cv=none; b=fKwWVPzJjfA7XwKnZp7ma0jAMEtMTSgadh0YYMU5/2kiXfQ/HLSDCG7WfhS9h8wLgAnyUfDl20qVXtYDhKc4RKdkRrqBZllF24gDLTIpwaigD2f3vX2HQR75WAG8AfIJZoPitofOgz0De9ZwneGRNSjVmTKer18kVNZIjG6M/rY=
+	t=1716909934; cv=none; b=JqciKMx+LbN4tESplFZHvpErHh4L3jC7/7GtU+vT1gU5bqY1q+C/gWbHrjmOQmWDvCRX12X+tdBAoR8Xj1zSj7/gD9OF/LL0OO/o61bd7AfGlQ1R3T9qy+H0xSu9ko+/A/aHfnFqw8UMrfAoW4wirJQaWL7g+7fSdRNlKzRxLCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716909585; c=relaxed/simple;
-	bh=swH47NzLIrWmNG5Dq5kPKHjN8HHyRyCcrtbFdlo9EWc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sLzBw2/2z8LPzrbv6x67kGJhJSqgj3Q97vJtjkSzeudbNrifXxt4l89G8+SUFyVau71HzRbUU9mji0CK7B7IBsAHJTPRRcEeOAjbbB/gZvLrLBrtylgzLsj61BlLAI0DSxGNdA442RK4BSvjV4ielVDmoA13NYP+60Ma8UyfGwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RdH2Y8gr; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716909582;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=vsaiDIPGuDsuYpLn1cPcKBqTvdjJak0yaX0MA31ltAg=;
-	b=RdH2Y8groe8q/xbmRhgYCFUY20dn6NKogTSL5LlClg94UHROviP/TlrN65j/UCvEsY43tG
-	JWo74XUfpqZMT8FkcNMbbTqXmTv8IKnrTHB8xDR4igCfQ8PKYhbvh5tJwEJEmdhe7wLCl9
-	iOXSpZmbBXQ3xw37k9vvTCFowoK8CUs=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-333-UNKfgYHpOkSARYPvFEGqxA-1; Tue, 28 May 2024 11:19:39 -0400
-X-MC-Unique: UNKfgYHpOkSARYPvFEGqxA-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5785f7b847cso868448a12.0
-        for <netdev@vger.kernel.org>; Tue, 28 May 2024 08:19:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716909578; x=1717514378;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vsaiDIPGuDsuYpLn1cPcKBqTvdjJak0yaX0MA31ltAg=;
-        b=CIH4ANpOil8uuTl1FiF/HAVXFHks0yP5fzVRmaI2e9zNJYCblIoZfaL+cFlNDEXMQB
-         tdn4SKhYWbwNHdOKuu8O8v0TSt1AlGUxYz7VkUdzAIRMdZEPe3a6qgr6tEx/JcgMN9Zc
-         Mz9slPc4mBiYyXvz6OzyBD2ME/ZQYk2dhVoy/NKx+usNvJHJVsW1z838h793IbLRN+wy
-         KN0awHGkK0JuSnlghlKk7aptMpyCbJTjvKjlD64fsIop1qYjOMo3t+UHCnerdKQPapvP
-         HG1qyncoYV7f686wPqvORABI8mWX3JriMz0wakJhekt+s59j2HuUGhb60ErcnNoHfScO
-         JAPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW72XkGJ9Xb98RIc+KnPsc+aTDnI6MQ5JSlFtI8BJr65SMZQTK+/xwuDtzky+nCpg5DFCZrlV6ZdgESGkdr5QWPsjIcA4Iz
-X-Gm-Message-State: AOJu0YxFCCQJu4Pdyym7ylclqQAWnnOxP9sEOZxE0iITk2Fo7xifKDqe
-	CuApzzxzce2CknS9cHu5b5V9O9Olhv74xkMjtrwXxdv4gWTYnF9IJ+k+424yCmd3/bh3O0eNmlG
-	HtBNLJOubHSnSTRUlyJGiv1G3TbzuhSB7db4GJbgzZLXnEOrZxo14nw==
-X-Received: by 2002:a50:f60d:0:b0:574:c3e4:1fa3 with SMTP id 4fb4d7f45d1cf-57857e0f3a5mr8638101a12.20.1716909577995;
-        Tue, 28 May 2024 08:19:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFnuWIkISeq3N/UOY4U5xmXRTy3oOBrZnKO4yXJDBoC7X5FT2/X7div/OaN+ItViOMh/FOQmQ==
-X-Received: by 2002:a50:f60d:0:b0:574:c3e4:1fa3 with SMTP id 4fb4d7f45d1cf-57857e0f3a5mr8638078a12.20.1716909577559;
-        Tue, 28 May 2024 08:19:37 -0700 (PDT)
-Received: from [192.168.10.48] ([151.95.155.52])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-579c3fac836sm4424676a12.89.2024.05.28.08.19.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 May 2024 08:19:37 -0700 (PDT)
-Message-ID: <14e68dd8-b2fa-496f-8dfc-a883ad8434f5@redhat.com>
-Date: Tue, 28 May 2024 17:19:34 +0200
+	s=arc-20240116; t=1716909934; c=relaxed/simple;
+	bh=rV0FQQkoN6OTfyaN7zr8uhjf73DI7J/djMv8xhRNln8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ny0H32COgkYQY5fV7PiTv671d9jzwBiQs0aPLPy0sGygDGqOTNjDUs2zkkRUnb0Qe5qaxniikRXhVWiT8Smj6pqjePlPvPAMkkMg3BkdWXBtQKaO7kx4tZ62qK/y3acmysUgTbfFRLm0x8SHupOpj0pg++ZwT3viYfqfrqmABJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RnWFw6U0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13B0AC3277B;
+	Tue, 28 May 2024 15:25:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716909933;
+	bh=rV0FQQkoN6OTfyaN7zr8uhjf73DI7J/djMv8xhRNln8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=RnWFw6U0WV/NV7iDJUiO6eBWhe0qig7B7ILDW0iK7MoBBMxioQ2cHEnauXhbqID4Z
+	 3IrtKOvjlYGRyLH0q9056W4dNAwIDRlqgR1Ys6eI5A5b9Jsq41Rm8p6eH1LyWpeVYn
+	 MxluOtPorgwryg15U/muYS46kU1nzCX/xVsxcpMFzHsvt2zXo529g81LAIl4sQxzUb
+	 HKP+4NT1IOB32fnM7HJ0PJJGkA47d667+8+UuyA3psLx+NaDDhJ7OoXIT265Twqx8l
+	 1waphiJmjw6uuEBYcWKvNuh4fB6rA24MQv8ntOgOpIjTosXlU+YU48TtYaYbt0+7Pw
+	 LhAssghVg+uvQ==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	hariprasad <hkelam@marvell.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Suman Ghosh <sumang@marvell.com>,
+	Simon Horman <horms@kernel.org>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] ethernet: octeontx2: avoid linking objects into multiple modules
+Date: Tue, 28 May 2024 17:25:05 +0200
+Message-Id: <20240528152527.2148092-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: How to implement message forwarding from one CID to another in
- vhost driver
-To: Alexander Graf <graf@amazon.com>, Stefano Garzarella
- <sgarzare@redhat.com>, Alexander Graf <agraf@csgraf.de>
-Cc: Dorjoy Chowdhury <dorjoychy111@gmail.com>,
- virtualization@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org,
- stefanha@redhat.com
-References: <CAFfO_h7xsn7Gsy7tFZU2UKcg_LCHY3M26iTuSyhFG-k-24h6_g@mail.gmail.com>
- <4i525r6irzjgibqqtrs3qzofqfifws2k3fmzotg37pyurs5wkd@js54ugamyyin>
- <CAFfO_h7iNYc3jrDvnAxTyaGWMxM9YK29DAGYux9s1ve32tuEBw@mail.gmail.com>
- <3a62a9d1-5864-4f00-bcf0-2c64552ee90c@csgraf.de>
- <6wn6ikteeanqmds2i7ar4wvhgj42pxpo2ejwbzz5t2i5cw3kov@omiadvu6dv6n>
- <5b3b1b08-1dc2-4110-98d4-c3bb5f090437@amazon.com>
- <554ae947-f06e-4b69-b274-47e8a78ae962@amazon.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <554ae947-f06e-4b69-b274-47e8a78ae962@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 5/27/24 09:54, Alexander Graf wrote:
-> 
-> On 27.05.24 09:08, Alexander Graf wrote:
->> Hey Stefano,
->>
->> On 23.05.24 10:45, Stefano Garzarella wrote:
->>> On Tue, May 21, 2024 at 08:50:22AM GMT, Alexander Graf wrote:
->>>> Howdy,
->>>>
->>>> On 20.05.24 14:44, Dorjoy Chowdhury wrote:
->>>>> Hey Stefano,
->>>>>
->>>>> Thanks for the reply.
->>>>>
->>>>>
->>>>> On Mon, May 20, 2024, 2:55 PM Stefano Garzarella 
->>>>> <sgarzare@redhat.com> wrote:
->>>>>> Hi Dorjoy,
->>>>>>
->>>>>> On Sat, May 18, 2024 at 04:17:38PM GMT, Dorjoy Chowdhury wrote:
->>>>>>> Hi,
->>>>>>>
->>>>>>> Hope you are doing well. I am working on adding AWS Nitro Enclave[1]
->>>>>>> emulation support in QEMU. Alexander Graf is mentoring me on this 
->>>>>>> work. A v1
->>>>>>> patch series has already been posted to the qemu-devel mailing 
->>>>>>> list[2].
->>>>>>>
->>>>>>> AWS nitro enclaves is an Amazon EC2[3] feature that allows 
->>>>>>> creating isolated
->>>>>>> execution environments, called enclaves, from Amazon EC2 
->>>>>>> instances, which are
->>>>>>> used for processing highly sensitive data. Enclaves have no 
->>>>>>> persistent storage
->>>>>>> and no external networking. The enclave VMs are based on 
->>>>>>> Firecracker microvm
->>>>>>> and have a vhost-vsock device for communication with the parent 
->>>>>>> EC2 instance
->>>>>>> that spawned it and a Nitro Secure Module (NSM) device for 
->>>>>>> cryptographic
->>>>>>> attestation. The parent instance VM always has CID 3 while the 
->>>>>>> enclave VM gets
->>>>>>> a dynamic CID. The enclave VMs can communicate with the parent 
->>>>>>> instance over
->>>>>>> various ports to CID 3, for example, the init process inside an 
->>>>>>> enclave sends a
->>>>>>> heartbeat to port 9000 upon boot, expecting a heartbeat reply, 
->>>>>>> letting the
->>>>>>> parent instance know that the enclave VM has successfully booted.
->>>>>>>
->>>>>>> The plan is to eventually make the nitro enclave emulation in 
->>>>>>> QEMU standalone
->>>>>>> i.e., without needing to run another VM with CID 3 with proper vsock
->>>>>> If you don't have to launch another VM, maybe we can avoid 
->>>>>> vhost-vsock
->>>>>> and emulate virtio-vsock in user-space, having complete control 
->>>>>> over the
->>>>>> behavior.
->>>>>>
->>>>>> So we could use this opportunity to implement virtio-vsock in QEMU 
->>>>>> [4]
->>>>>> or use vhost-user-vsock [5] and customize it somehow.
->>>>>> (Note: vhost-user-vsock already supports sibling communication, so 
->>>>>> maybe
->>>>>> with a few modifications it fits your case perfectly)
->>>>>>
->>>>>> [4] https://gitlab.com/qemu-project/qemu/-/issues/2095
->>>>>> [5] 
->>>>>> https://github.com/rust-vmm/vhost-device/tree/main/vhost-device-vsock
->>>>>
->>>>>
->>>>> Thanks for letting me know. Right now I don't have a complete picture
->>>>> but I will look into them. Thank you.
->>>>>>
->>>>>>
->>>>>>> communication support. For this to work, one approach could be to 
->>>>>>> teach the
->>>>>>> vhost driver in kernel to forward CID 3 messages to another CID N
->>>>>> So in this case both CID 3 and N would be assigned to the same QEMU
->>>>>> process?
->>>>>
->>>>>
->>>>> CID N is assigned to the enclave VM. CID 3 was supposed to be the
->>>>> parent VM that spawns the enclave VM (this is how it is in AWS, where
->>>>> an EC2 instance VM spawns the enclave VM from inside it and that
->>>>> parent EC2 instance always has CID 3). But in the QEMU case as we
->>>>> don't want a parent VM (we want to run enclave VMs standalone) we
->>>>> would need to forward the CID 3 messages to host CID. I don't know if
->>>>> it means CID 3 and CID N is assigned to the same QEMU process. Sorry.
->>>>
->>>>
->>>> There are 2 use cases here:
->>>>
->>>> 1) Enclave wants to treat host as parent (default). In this scenario,
->>>> the "parent instance" that shows up as CID 3 in the Enclave doesn't
->>>> really exist. Instead, when the Enclave attempts to talk to CID 3, it
->>>> should really land on CID 0 (hypervisor). When the hypervisor tries to
->>>> connect to the Enclave on port X, it should look as if it originates
->>>> from CID 3, not CID 0.
->>>>
->>>> 2) Multiple parent VMs. Think of an actual cloud hosting scenario.
->>>> Here, we have multiple "parent instances". Each of them thinks it's
->>>> CID 3. Each can spawn an Enclave that talks to CID 3 and reach the
->>>> parent. For this case, I think implementing all of virtio-vsock in
->>>> user space is the best path forward. But in theory, you could also
->>>> swizzle CIDs to make random "real" CIDs appear as CID 3.
->>>>
->>>
->>> Thank you for clarifying the use cases!
->>>
->>> Also for case 1, vhost-vsock doesn't support CID 0, so in my opinion
->>> it's easier to go into user-space with vhost-user-vsock or the built-in
->>> device.
->>
->>
->> Sorry, I believe I meant CID 2. Effectively for case 1, when a process 
->> on the hypervisor listens on port 1234, it should be visible as 3:1234 
->> from the VM and when the hypervisor process connects to <VM CID>:1234, 
->> it should look as if that connection came from CID 3.
-> 
-> 
-> Now that I'm thinking about my message again: What if we just introduce 
-> a sysfs/sysctl file for vsock that indicates the "host CID" (default: 
-> 2)? Users that want vhost-vsock to behave as if the host is CID 3 can 
-> just write 3 to it.
-> 
-> It means we'd need to change all references to VMADDR_CID_HOST to 
-> instead refer to a global variable that indicates the new "host CID". 
-> It'd need some more careful massaging to not break number namespace 
-> assumptions (<= CID_HOST no longer works), but the idea should fly.
+From: Arnd Bergmann <arnd@arndb.de>
 
-Forwarding one or more ports of a given CID to CID 2 (the host) should 
-be doable with a dummy vhost client that listens to CID 3, connects to 
-CID 2 and send data back and forth.  Not hard enough to justify changing 
-all references to VMADDR_CID_HOST (and also I am not sure if vsock 
-supports network namespaces?  then the sysctl/sysfs way is not feasible 
-because you cannot set it per-netns, can you?).  It also has the 
-disadvantages that different QEMU instances are not insulated.
+Each object file contains information about which module it gets linked
+into, so linking the same file into multiple modules now causes a warning:
 
-I think it's either that or implementing virtio-vsock in userspace 
-(https://lore.kernel.org/qemu-devel/30baeb56-64d2-4ea3-8e53-6a5c50999979@redhat.com/, 
-search for "To connect host<->guest").
+scripts/Makefile.build:254: drivers/net/ethernet/marvell/octeontx2/nic/Makefile: otx2_devlink.o is added to multiple modules: rvu_nicpf rvu_nicvf
 
-Paolo
+Change the way that octeontx2 ethernet is built by moving the common
+file into a separate module with exported symbols instead.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ .../net/ethernet/marvell/octeontx2/nic/Makefile    | 14 ++++++++------
+ .../ethernet/marvell/octeontx2/nic/otx2_dcbnl.c    | 11 +++++++++++
+ .../ethernet/marvell/octeontx2/nic/otx2_devlink.c  |  6 ++++++
+ 3 files changed, 25 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/Makefile b/drivers/net/ethernet/marvell/octeontx2/nic/Makefile
+index 5664f768cb0c..e4c5dc46dd42 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/Makefile
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/Makefile
+@@ -3,16 +3,18 @@
+ # Makefile for Marvell's RVU Ethernet device drivers
+ #
+ 
+-obj-$(CONFIG_OCTEONTX2_PF) += rvu_nicpf.o otx2_ptp.o
+-obj-$(CONFIG_OCTEONTX2_VF) += rvu_nicvf.o otx2_ptp.o
++obj-$(CONFIG_OCTEONTX2_PF) += rvu_nicpf.o otx2_ptp.o otx2_devlink.o
++obj-$(CONFIG_OCTEONTX2_VF) += rvu_nicvf.o otx2_ptp.o otx2_devlink.o
+ 
+ rvu_nicpf-y := otx2_pf.o otx2_common.o otx2_txrx.o otx2_ethtool.o \
+                otx2_flows.o otx2_tc.o cn10k.o otx2_dmac_flt.o \
+-               otx2_devlink.o qos_sq.o qos.o
+-rvu_nicvf-y := otx2_vf.o otx2_devlink.o
++               qos_sq.o qos.o
++rvu_nicvf-y := otx2_vf.o
+ 
+-rvu_nicpf-$(CONFIG_DCB) += otx2_dcbnl.o
+-rvu_nicvf-$(CONFIG_DCB) += otx2_dcbnl.o
++ifdef CONFIG_DCB
++obj-$(CONFIG_OCTEONTX2_PF) += otx2_dcbnl.o
++obj-$(CONFIG_OCTEONTX2_VF) += otx2_dcbnl.o
++endif
+ rvu_nicpf-$(CONFIG_MACSEC) += cn10k_macsec.o
+ 
+ ccflags-y += -I$(srctree)/drivers/net/ethernet/marvell/octeontx2/af
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
+index 28fb643d2917..0d7e611d9a05 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c
+@@ -54,6 +54,7 @@ int otx2_pfc_txschq_config(struct otx2_nic *pfvf)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(otx2_pfc_txschq_config);
+ 
+ static int otx2_pfc_txschq_alloc_one(struct otx2_nic *pfvf, u8 prio)
+ {
+@@ -122,6 +123,7 @@ int otx2_pfc_txschq_alloc(struct otx2_nic *pfvf)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(otx2_pfc_txschq_alloc);
+ 
+ static int otx2_pfc_txschq_stop_one(struct otx2_nic *pfvf, u8 prio)
+ {
+@@ -260,6 +262,7 @@ int otx2_pfc_txschq_update(struct otx2_nic *pfvf)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(otx2_pfc_txschq_update);
+ 
+ int otx2_pfc_txschq_stop(struct otx2_nic *pfvf)
+ {
+@@ -282,6 +285,7 @@ int otx2_pfc_txschq_stop(struct otx2_nic *pfvf)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(otx2_pfc_txschq_stop);
+ 
+ int otx2_config_priority_flow_ctrl(struct otx2_nic *pfvf)
+ {
+@@ -321,6 +325,7 @@ int otx2_config_priority_flow_ctrl(struct otx2_nic *pfvf)
+ 	mutex_unlock(&pfvf->mbox.lock);
+ 	return err;
+ }
++EXPORT_SYMBOL_GPL(otx2_config_priority_flow_ctrl);
+ 
+ void otx2_update_bpid_in_rqctx(struct otx2_nic *pfvf, int vlan_prio, int qidx,
+ 			       bool pfc_enable)
+@@ -385,6 +390,7 @@ void otx2_update_bpid_in_rqctx(struct otx2_nic *pfvf, int vlan_prio, int qidx,
+ 			 "Updating BPIDs in CQ and Aura contexts of RQ%d failed with err %d\n",
+ 			 qidx, err);
+ }
++EXPORT_SYMBOL_GPL(otx2_update_bpid_in_rqctx);
+ 
+ static int otx2_dcbnl_ieee_getpfc(struct net_device *dev, struct ieee_pfc *pfc)
+ {
+@@ -472,3 +478,8 @@ int otx2_dcbnl_set_ops(struct net_device *dev)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_GPL(otx2_dcbnl_set_ops);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Marvell RVU dcbnl");
++MODULE_AUTHOR("Sunil Goutham <sgoutham@marvell.com>");
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
+index 99ddf31269d9..440f574d1195 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
+@@ -113,6 +113,7 @@ int otx2_register_dl(struct otx2_nic *pfvf)
+ 	devlink_free(dl);
+ 	return err;
+ }
++EXPORT_SYMBOL_GPL(otx2_register_dl);
+ 
+ void otx2_unregister_dl(struct otx2_nic *pfvf)
+ {
+@@ -124,3 +125,8 @@ void otx2_unregister_dl(struct otx2_nic *pfvf)
+ 				  ARRAY_SIZE(otx2_dl_params));
+ 	devlink_free(dl);
+ }
++EXPORT_SYMBOL_GPL(otx2_unregister_dl);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Marvell RVU PF/VF Netdev Devlink");
++MODULE_AUTHOR("Sunil Goutham <sgoutham@marvell.com>");
+-- 
+2.39.2
 
 
