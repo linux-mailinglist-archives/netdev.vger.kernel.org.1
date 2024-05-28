@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-98423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FE588D15FC
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 10:12:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2DE98D15FD
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 10:12:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EDB21C22772
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 08:12:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17E63B234A1
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 08:12:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E14B313F01A;
-	Tue, 28 May 2024 08:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4924D13C67B;
+	Tue, 28 May 2024 08:10:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="O8M/ObzG"
+	dkim=pass (1024-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="oIZxSF2n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-65-227.siemens.flowmailer.net (mta-65-227.siemens.flowmailer.net [185.136.65.227])
+Received: from mta-65-228.siemens.flowmailer.net (mta-65-228.siemens.flowmailer.net [185.136.65.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB0413E3E4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AD9B13E3E7
 	for <netdev@vger.kernel.org>; Tue, 28 May 2024 08:10:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.227
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716883821; cv=none; b=AN5cpmudkZuZi8vuMztxDKSjEWPp1rGenfD+b7PlYmvm13zG16c+z0+ssC3WdbxqtXwiFNPo03HyDgQgFM085YRAqMuiQV2OWDaeTAMI7HuKJWbj9Qppm6nanLl+9Bj0kGUiS5qScbvXzKFdm6eSP3/Tb+LFkK2qscBLLqb2+mI=
+	t=1716883822; cv=none; b=kiru+lXBuVudoXEPDMZ3xsbHOrcnEbFZ+JqXK7RVXZNFGuLmCnGgsooI0MP500UYeGOCYWytPKs7ufg9OqtTkzVc9p6xAQ0FyVU85gSWBpSFmIqOvZCxlxGDEuH/eVK6dLooVOJOngGA3vIK6wdDEwlCWtRo0PdY00O9ukKE4hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716883821; c=relaxed/simple;
-	bh=hUGxzWZCbG9CgUPPS8GRGisRvmeTyw0DaMqtBsfarVI=;
+	s=arc-20240116; t=1716883822; c=relaxed/simple;
+	bh=Fkfxzan7+VVwhR+E/zceZ23cnz/laoCua2izY7sFQ7c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l5s/YxG/5It0H1+0i/GKMOWIG1aLdHWHCdQLQ5ctZIgfVJXV2KtIZfvdi7B+MpDrAarBI9Q20z+qtZYXajOTWOm49XgkngB1XXCtfXveHigJQsWCsKM8sLjLoY6YpCT5f85aEKARawsK4CEWkbAHiOhCoVxbuVnaKEGEQnXFwbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=O8M/ObzG; arc=none smtp.client-ip=185.136.65.227
+	 MIME-Version; b=Aq0puVA8+fehGxKx+edVamL/imHi9WvWa2JlHh9lYdcGZPpAFEKNxr2EvXvHybyRjw77Q+KYcdVQrKD7rTC5sEi5WifnGj3GlU0u235ZCojydQT2rkVm+TIyxjCzodoxMATVPaVCyx5RhcnF/qqO910OdYUNtACSecD19+hRo2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=oIZxSF2n; arc=none smtp.client-ip=185.136.65.228
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-65-227.siemens.flowmailer.net with ESMTPSA id 20240528080002b06c9ad8b24f583cf0
+Received: by mta-65-228.siemens.flowmailer.net with ESMTPSA id 20240528080003b093467aa0a089ed85
         for <netdev@vger.kernel.org>;
-        Tue, 28 May 2024 10:00:02 +0200
+        Tue, 28 May 2024 10:00:03 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
  d=siemens.com; i=alexander.sverdlin@siemens.com;
  h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=9J++/nxeAwRJ3UV5r58wtBtkNiUMu/M5NJncIt+/vBM=;
- b=O8M/ObzGoE7sSRlPCnulYX0xNpxa6pbFjRQqsvyNZ7+otapAHqW00NbptqFqM2ICTjpciT
- vuweg6aRk2KLN/T49EhlWVAWRLn1CNrkJSmK3PNJVcsSY6X65k7aZuIDVOWgdeOXSInNpeEY
- BPjbKm68iuudPoOh9fefOH7cDiR4s=;
+ bh=O62xt/3Aofzu+/EkdK/euWUcYEIO0V7gvSFJT7IyUSI=;
+ b=oIZxSF2nZGYE/I5IjDM3SbTHWKs5hTqoU+tjKm+3ZiTW+tBCfK0OSS8/E21ud1Xec19hb9
+ 0qfxon//A9XLaOXze5r+wvzV0u8+YWc674HXcVeYrSvUk+zWV7lHC2rHnmHeAFdkDp1BKEF0
+ 4vonubOlGLoQ+zZQuFvMxyoqmUjUI=;
 From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
 To: netdev@vger.kernel.org
 Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
 	Roger Quadros <rogerq@kernel.org>,
 	Grygorii Strashko <grygorii.strashko@ti.com>,
 	Chintan Vankar <c-vankar@ti.com>
-Subject: [PATCH net-next 1/2] net: ethernet: ti: am65-cpsw-nuss: rename phy_node -> port_np
-Date: Tue, 28 May 2024 09:59:49 +0200
-Message-ID: <20240528075954.3608118-2-alexander.sverdlin@siemens.com>
+Subject: [PATCH net-next 2/2] net: ethernet: ti: am65-cpsw-nuss: populate netdev of_node
+Date: Tue, 28 May 2024 09:59:50 +0200
+Message-ID: <20240528075954.3608118-3-alexander.sverdlin@siemens.com>
 In-Reply-To: <20240528075954.3608118-1-alexander.sverdlin@siemens.com>
 References: <20240528075954.3608118-1-alexander.sverdlin@siemens.com>
 Precedence: bulk
@@ -64,60 +64,26 @@ Feedback-ID: 519:519-456497:519-21489:flowmailer
 
 From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 
-Rename phy_node to port_np to better reflect what it actually is,
-because the new phylink API takes netdev node (or DSA port node),
-and resolves the phandle internally.
+So that of_find_net_device_by_node() can find cpsw-nuss ports and other DSA
+switches can be stacked downstream.
 
 Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 ---
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 6 +++---
- drivers/net/ethernet/ti/am65-cpsw-nuss.h | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 4e50b37928885..eaadf8f09c401 100644
+index eaadf8f09c401..e6f87ac394fe6 100644
 --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
 +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -896,7 +896,7 @@ static int am65_cpsw_nuss_ndo_slave_open(struct net_device *ndev)
- 	/* mac_sl should be configured via phy-link interface */
- 	am65_cpsw_sl_ctl_reset(port);
+@@ -2703,6 +2703,7 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common *common, u32 port_idx)
+ 	mutex_init(&ndev_priv->mm_lock);
+ 	port->qos.link_speed = SPEED_UNKNOWN;
+ 	SET_NETDEV_DEV(port->ndev, dev);
++	port->ndev->dev.of_node = port->slave.port_np;
  
--	ret = phylink_of_phy_connect(port->slave.phylink, port->slave.phy_node, 0);
-+	ret = phylink_of_phy_connect(port->slave.phylink, port->slave.port_np, 0);
- 	if (ret)
- 		goto error_cleanup;
+ 	eth_hw_addr_set(port->ndev, port->slave.mac_addr);
  
-@@ -2611,7 +2611,7 @@ static int am65_cpsw_nuss_init_slave_ports(struct am65_cpsw_common *common)
- 				of_property_read_bool(port_np, "ti,mac-only");
- 
- 		/* get phy/link info */
--		port->slave.phy_node = port_np;
-+		port->slave.port_np = port_np;
- 		ret = of_get_phy_mode(port_np, &port->slave.phy_if);
- 		if (ret) {
- 			dev_err(dev, "%pOF read phy-mode err %d\n",
-@@ -2760,7 +2760,7 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common *common, u32 port_idx)
- 	}
- 
- 	phylink = phylink_create(&port->slave.phylink_config,
--				 of_node_to_fwnode(port->slave.phy_node),
-+				 of_node_to_fwnode(port->slave.port_np),
- 				 port->slave.phy_if,
- 				 &am65_cpsw_phylink_mac_ops);
- 	if (IS_ERR(phylink))
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.h b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-index d8ce88dc9c89a..e2ce2be320bd6 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-@@ -30,7 +30,7 @@ struct am65_cpts;
- struct am65_cpsw_slave_data {
- 	bool				mac_only;
- 	struct cpsw_sl			*mac_sl;
--	struct device_node		*phy_node;
-+	struct device_node		*port_np;
- 	phy_interface_t			phy_if;
- 	struct phy			*ifphy;
- 	struct phy			*serdes_phy;
 -- 
 2.45.0
 
