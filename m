@@ -1,121 +1,98 @@
-Return-Path: <netdev+bounces-98443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9B1D8D1727
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 11:20:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DFBD8D172C
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 11:21:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35B47B2544B
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 09:20:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FC701C22FD5
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 09:21:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B3013DDDF;
-	Tue, 28 May 2024 09:18:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cmG7vbLp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971824EB2E;
+	Tue, 28 May 2024 09:20:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8D517BA2
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 09:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E971DA5F
+	for <netdev@vger.kernel.org>; Tue, 28 May 2024 09:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716887921; cv=none; b=HZ/+Lpa+xF2R/Z89zQIJyPtSrKAEhIhLeL+ZJ1Eg2Hs5Lc1+LFR9NINCFxtcKwjkv/IevEATtPeHvGvhrgmJ+6IB7PlMtmC1yuz8nX84DjwCuQBp5mwMXRfiLZ2S0sPgmPghY0BADDiCZul27RJwhN/1H8kUzkJa848yYkT13hM=
+	t=1716888032; cv=none; b=QdMY9Zm4rwMiwLhb8m2m5NsoMECZerpzMXQVwFakscEfj7TD0ihutVWOLkONnRs5hML7rcOkrXftHE1DmDMAxujF/Ul9WSPfHjBdlbEubUAOKTVofE7skCeuAmVaLiHsSiQt+Bth5K7sE4QpYrS97aV5peU0tsv8LkgRQYCdiz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716887921; c=relaxed/simple;
-	bh=2F/mo2WDzaQW6C2ZAM3/M+Fb/tJqcO0PUGS4DUgpA4Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KYdg3IYvke4W/Hqdc65H9AXCvUg6bw5EE8CxCv6OkfZcQw5nDzLoIup3jDGzBCXD3ETPdWDhfJBfU4b57/gB/aay7iYjR9kM0QXqI76Ssc4fdvlg3WtRMH26ogYk2rnfaNdzy9NyStTmcX2bIIZRmWV+c9bw1gTMkFWnm3Vsd+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cmG7vbLp; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716887918;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SF2VHywssduunP+Z6gsdQkqjFggocJO3TA5NC7P5wKE=;
-	b=cmG7vbLpTxa9raCpqzfDatkF7ZxzSGCVxHpKciP14EPj99Guz9VuRZ9wGATvc2pJMlaHH2
-	C9SNe5rVcoIYdVbUkN058XPinUBH+uyiyuko6BKYElI0lpckXulcd7R55+HZtfBc7kDOHT
-	m3oer5MI07njJVg0n5scbcbOUxbcBUk=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-655-s57wUi4qOM6ElkWW8y4R_w-1; Tue,
- 28 May 2024 05:18:35 -0400
-X-MC-Unique: s57wUi4qOM6ElkWW8y4R_w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 51F4829AA382;
-	Tue, 28 May 2024 09:18:35 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.39.193.5])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C59032026D68;
-	Tue, 28 May 2024 09:18:32 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: yongqin.liu@linaro.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	inventor500@vivaldi.net,
-	jtornosm@redhat.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] net: usb: ax88179_178a: fix link status when link is set to down/up
-Date: Tue, 28 May 2024 11:18:30 +0200
-Message-ID: <20240528091831.13674-1-jtornosm@redhat.com>
-In-Reply-To: <CAMSo37UyC-JRfZjd83Vx2+W-K-WqxAN9sHJ88Jev67Fnwci_pg@mail.gmail.com>
-References: <CAMSo37UyC-JRfZjd83Vx2+W-K-WqxAN9sHJ88Jev67Fnwci_pg@mail.gmail.com>
+	s=arc-20240116; t=1716888032; c=relaxed/simple;
+	bh=Mf973evFBc27A+X/AnjFiPuMYdHGobo5IDxMnK62xRk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=H/jvxW3mxAU3zKKWQKCCT58o+1wHmaZnQ9ufaD7FSwt4ogBkNoeq9R0st/C3NyRtEfbXkspPKsRnDJ+fLydNM8QpB9IB5KKP2ev8j7sPpOSJMTaZEIihKtISo6UQNNQZGVmCtD9HZYa1meHVZuJFQ94/CVhus4OGVWUpy8uuoPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-275-hg5oxRZuP2yS-5OxNQA6Kw-1; Tue, 28 May 2024 10:20:24 +0100
+X-MC-Unique: hg5oxRZuP2yS-5OxNQA6Kw-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 28 May
+ 2024 10:19:52 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Tue, 28 May 2024 10:19:52 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Eric Dumazet' <edumazet@google.com>, "David S . Miller"
+	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Neal Cardwell <ncardwell@google.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "eric.dumazet@gmail.com" <eric.dumazet@gmail.com>
+Subject: RE: [PATCH net 2/4] tcp: fix race in tcp_write_err()
+Thread-Topic: [PATCH net 2/4] tcp: fix race in tcp_write_err()
+Thread-Index: AQHarhG4UVZJa4qebkuglJvcfSTwvrGsYx8A
+Date: Tue, 28 May 2024 09:19:51 +0000
+Message-ID: <889fbe3feae042ada8d75a8a2184dbaa@AcuMS.aculab.com>
+References: <20240524193630.2007563-1-edumazet@google.com>
+ <20240524193630.2007563-3-edumazet@google.com>
+In-Reply-To: <20240524193630.2007563-3-edumazet@google.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+Content-Transfer-Encoding: base64
 
-Hello Yongqin,
-
-> When I tried the down and up operations manually from the command line,
-> it worked.
-> But it only worked after I ran the down and up operations after the boot.
-> It fails to work by default after the boot for both the fresh deployment,
-> and for the later reboot
-Ok, so it works as well for you after the initialization.
-
-> One thing I noticed is that the following message was printed twice
->     "ax88179_178a 2-3:1.0 eth0: ax88179 - Link status is: 1"
-> after I ran the up operation,
->
-> Is that expected?
-> 
-> For details, please check the log here:
-> https://gist.github.com/liuyq/be8f5305d538067a344001f1d35f677b
-That is another thing that I am analyzing, to clean those spurious.
-But they are appearing in my case too, and I am not modifying anything at
-boot time.
-
-> The scripts are simple, here are the two scripts for Android build:
->    https://android.googlesource.com/device/linaro/dragonboard/+/refs/heads/main/shared/utils/ethaddr/ethaddr.rc
->    https://android.googlesource.com/device/linaro/dragonboard/+/refs/heads/main/shared/utils/ethaddr/set_ethaddr.sh
->
-> Is the one to run the down/change mac/up operations script.
->
-> Not sure why the up in the script does not work, but works when run manually.
-Ok, I am not working with Android but it doesn't seem spscial, the only
-doubt is when the script is executed, if the driver initialization is
-complete, ...
-Anyway, I will try to reproduce here and analyze it.
-
-Best regards
-José Ignacio
+RnJvbTogRXJpYyBEdW1hemV0DQo+IFNlbnQ6IDI0IE1heSAyMDI0IDIwOjM2DQo+IA0KPiBJIG5v
+dGljZWQgZmxha2VzIGluIGEgcGFja2V0ZHJpbGwgdGVzdCwgZXhwZWN0aW5nIGFuIGVwb2xsX3dh
+aXQoKQ0KPiB0byByZXR1cm4gRVBPTExFUlIgfCBFUE9MTEhVUCBvbiBhIGZhaWxlZCBjb25uZWN0
+KCkgYXR0ZW1wdCwNCj4gYWZ0ZXIgbXVsdGlwbGUgU1lOIHJldHJhbnNtaXRzLiBJdCBzb21ldGlt
+ZXMgcmV0dXJuIEVQT0xMRVJSIG9ubHkuDQo+IA0KPiBUaGUgaXNzdWUgaXMgdGhhdCB0Y3Bfd3Jp
+dGVfZXJyKCk6DQo+ICAxKSB3cml0ZXMgYW4gZXJyb3IgaW4gc2stPnNrX2VyciwNCj4gIDIpIGNh
+bGxzIHNrX2Vycm9yX3JlcG9ydCgpLA0KPiAgMykgdGhlbiBjYWxscyB0Y3BfZG9uZSgpLg0KPiAN
+Cj4gdGNwX2RvbmUoKSBpcyB3cml0aW5nIFNIVVRET1dOX01BU0sgaW50byBzay0+c2tfc2h1dGRv
+d24sDQo+IGFtb25nIG90aGVyIHRoaW5ncy4NCj4gDQo+IFByb2JsZW0gaXMgdGhhdCB0aGUgYXdh
+a2VuIHVzZXIgdGhyZWFkIChmcm9tIDIpIHNrX2Vycm9yX3JlcG9ydCgpKQ0KPiBtaWdodCBjYWxs
+IHRjcF9wb2xsKCkgYmVmb3JlIHRjcF9kb25lKCkgaGFzIHdyaXR0ZW4gc2stPnNrX3NodXRkb3du
+Lg0KPiANCj4gdGNwX3BvbGwoKSBvbmx5IHNlZXMgYSBub24gemVybyBzay0+c2tfZXJyIGFuZCBy
+ZXR1cm5zIEVQT0xMRVJSLg0KPiANCj4gVGhpcyBwYXRjaCBmaXhlcyB0aGUgaXNzdWUgYnkgbWFr
+aW5nIHN1cmUgdG8gY2FsbCBza19lcnJvcl9yZXBvcnQoKQ0KPiBhZnRlciB0Y3BfZG9uZSgpLg0K
+DQpJc24ndCB0aGVyZSBzdGlsbCB0aGUgcG90ZW50aWFsIGZvciBhIHByb2dyYW0gdG8gY2FsbCBw
+b2xsKCkgYXQNCidqdXN0IHRoZSB3cm9uZyB0aW1lJyBhbmQgc3RpbGwgc2VlIGFuIHVuZXhwZWN0
+ZWQgc3RhdHVzPw0KDQouLi4NCj4gIAlXUklURV9PTkNFKHNrLT5za19lcnIsIFJFQURfT05DRShz
+ay0+c2tfZXJyX3NvZnQpID8gOiBFVElNRURPVVQpOw0KPiAtCXNrX2Vycm9yX3JlcG9ydChzayk7
+DQo+IA0KPiAtCXRjcF93cml0ZV9xdWV1ZV9wdXJnZShzayk7DQo+IC0JdGNwX2RvbmUoc2spOw0K
+PiArCXRjcF9kb25lX3dpdGhfZXJyb3Ioc2spOw0KDQpJcyB0aGVyZSBzY29wZSBmb3IgbW92aW5n
+IHRoZSB3cml0ZSB0byBzay0+c2tfZXJyIGluc2lkZSB0aGUgZnVuY3Rpb24/DQpMb29rcyBsaWtl
+IGl0J2xsIG5lZWQgYSBsYXJnZXIgY2hhbmdlIHRvIHRjcF9yZXNldCgpLg0KDQoJRGF2aWQNCg0K
+LQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0s
+IE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdh
+bGVzKQ0K
 
 
