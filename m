@@ -1,104 +1,132 @@
-Return-Path: <netdev+bounces-98701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE5A18D21DD
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:46:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 991FE8D21E3
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 18:47:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 590B1B216A3
-	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:45:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C99571C22F98
+	for <lists+netdev@lfdr.de>; Tue, 28 May 2024 16:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97D3C172BC2;
-	Tue, 28 May 2024 16:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bAklmNzF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1178F172BD5;
+	Tue, 28 May 2024 16:47:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D93173339
-	for <netdev@vger.kernel.org>; Tue, 28 May 2024 16:45:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD571DA4C;
+	Tue, 28 May 2024 16:47:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716914753; cv=none; b=TgzYk6OLVlWF+/rvxy/mdTUuQU0++yrgA+9UZQjC4DPBZOFlZrQx/eq4LI8zkRcOas4ZKwbBwkig1Lx/AIwIXTgVUsopr2Cramfj9QqCGid7Ss8cekkC+rxzaOiCKxMvoUmn5IUK2VVG75fGJ9FYvI2sZ6wZP7zoJsHlA8syxno=
+	t=1716914854; cv=none; b=AJ6k6o30bLBuFV69AZ1zaiks1NfudmzIt//TqGW11OZDmJhSfHuNJ/hJpU9WIBovR49YhR8XAnt8hKArMnSHtDP1TLAXu+1XEDLX4HKk99MysG5f/Ytv4hv6r+cCXdXXZzXd9M11DqZDXvfB03m10K5vooQL9HdbwfTSj5EFbps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716914753; c=relaxed/simple;
-	bh=WZloa0ayjO3bBzOlxz/OylG36/iO/3Oe0r0x/QDGpTQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HmrKg0woN5LM72XtSpbNvQxlcr9tv/rDVrD+TpondYXBbWSN+8u2BYKV3zW6OjbzFBSNKzlhS2xyvc/OGvyr/d76b89emEQQOQbSr45Jb/jzng30BtIOcQllypXTUoGNaLE5LP+TsrBL27fkdljg7CAZ61O6hfJv9S5BuuJSD4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bAklmNzF; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1f4a52b9589so9504075ad.3
-        for <netdev@vger.kernel.org>; Tue, 28 May 2024 09:45:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716914751; x=1717519551; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Q2DnNuYG7Sjbq6oiWffLP+yNQNt0+96lDSUHoEoDRcE=;
-        b=bAklmNzFO/0AFEylbqNMtP59E/PIeJdaJ6twyCzFcaCImpzsqdHMnuPrdNqhGTg0ma
-         DYoQq/0uERev0fT20XjPs3RUqocdeu6LoRjZrqoJsh+BSXgu0eriSEHexTOoj/IRKr7Q
-         E4xI1bA7ureXBnGqQnPTIoe1PPEyF236/A2kZ8EEBNcwnF7jZDwNroGJPepG3cTmIMBK
-         RKpU0bxj/8p+0SlQEOBF4aUdOvSR4V5dLUy1dHtuaTXANuB0H2TB/7VQrgPddOQ8qwZm
-         YxafrnzHkH6G0NaPZTcUj8DrbQ4Kj1Edwoa6BHDHuQPprcGmEBVmbMc3EL7xeOwNVN2A
-         KzRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716914751; x=1717519551;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q2DnNuYG7Sjbq6oiWffLP+yNQNt0+96lDSUHoEoDRcE=;
-        b=pZajsTsVcZDLxXgmkiBcUvHgIaCJlbUkl3thwEuZe1G6PP9giLXbwyblZE5XC3emOx
-         QWG1hrJ4mLgnckyw7SFs8gJVHfeQTYG1HSnEOTcm+7rpcyDx/K2ARIekbAVtxeAp7xea
-         uR8yLPQmVr3/5PeyZ0vmU6kjNbZTqYNcWZa/zrG5jT9rM5caLgMamV2RLasZN/HwTQOt
-         ZquuAFAXCFMB1MVnAbiXzHwK4gkcdcD/kTpvPcArTw0A2f3l3HQ12DYGw5ceZNiqjyAk
-         AVNj1/RUSFFQIGk96rKpiX0u1tAiS4T2j10ssxJmWKCpSjU8F+I4HYCKi8oG2zDC6f1x
-         NNmA==
-X-Forwarded-Encrypted: i=1; AJvYcCVLmj96s8aRXAaDeqE+JTKbFCSmEgxMLAwxXHTEMKAMPFNiM0WplUmFxMKm2sr28liVZIEf21vmmT+SRO8pysu2g3CXcleF
-X-Gm-Message-State: AOJu0Yy5tndHhIQy16YczJcINhIHoRmNx9o7dkHR7SwjdrKN0vzMb8cF
-	ViIys5Y25SevJ+/ARcWkTYHqlhmd57/BwXC8btS6WtJgJlPU81sq
-X-Google-Smtp-Source: AGHT+IEsHz1SFt7MVS5Mlh4UloUgsjx4Q/hbGrRQw+ioV4j1eY0dqniRsVGV91pZj9bU/KLSlqN+XA==
-X-Received: by 2002:a17:902:f788:b0:1f4:26e1:56d2 with SMTP id d9443c01a7336-1f4497d7a4emr126520265ad.45.1716914751318;
-        Tue, 28 May 2024 09:45:51 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-1f4724a47e1sm60887145ad.194.2024.05.28.09.45.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 May 2024 09:45:50 -0700 (PDT)
-Message-ID: <2b4ad941-ab18-42a0-9bb9-cf552a04fd69@gmail.com>
-Date: Tue, 28 May 2024 09:45:48 -0700
+	s=arc-20240116; t=1716914854; c=relaxed/simple;
+	bh=eJm+vTHiJ203ALe26R4OEnK0aj/nRJRzqy/wm+frgt0=;
+	h=Subject:From:To:CC:References:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=qTgzVjDkmHGyoiVGwYOmJgxr1gLAj0XeK+WGkfyrVmP68ofGJ9W1AtyrVGMhEjLziQAwbnwjJeikzn+3UaQyoyS69PeiJtJK5v6FnWm5ROr1a/BcFX0ixN/DieeA51rd0omHRdq1BfqX2LMoruwYbzeLSqqeFQl2gsIsw8NKLVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (178.176.78.2) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 28 May
+ 2024 19:47:21 +0300
+Subject: Re: [net-next PATCH v4 2/7] net: ravb: Consider busypolling status
+ when re-enabling interrupts
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+CC: Biju Das <biju.das.jz@bp.renesas.com>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
+	<yoshihiro.shimoda.uh@renesas.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240528150339.6791-1-paul.barker.ct@bp.renesas.com>
+ <20240528150339.6791-3-paul.barker.ct@bp.renesas.com>
+ <669d3b51-d068-8816-37d1-dab2ffadb250@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <6bf07bb1-76c5-db5b-423b-a4c94bdf1ee3@omp.ru>
+Date: Tue, 28 May 2024 19:47:20 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: dsa: remove mac_prepare()/mac_finish()
- shims
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org
-References: <E1sByNx-00ELW1-Vp@rmk-PC.armlinux.org.uk>
+In-Reply-To: <669d3b51-d068-8816-37d1-dab2ffadb250@omp.ru>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <E1sByNx-00ELW1-Vp@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 05/28/2024 16:29:31
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 185551 [May 28 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 20 0.3.20
+ 743589a8af6ec90b529f2124c2bbfc3ce1d2f20f
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_arrow_text}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.2 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.2 in (user) dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.78.2
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 05/28/2024 16:33:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 5/28/2024 12:09:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 5/28/24 08:05, Russell King (Oracle) wrote:
-> No DSA driver makes use of the mac_prepare()/mac_finish() shimmed
-> operations anymore, so we can remove these.
+On 5/28/24 7:44 PM, Sergey Shtylyov wrote:
+
+>> Make use of the busypolling status returned from NAPI complete to decide
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+>    My spellchecker/translator trip over "busypolling" -- consider using
+> "busy-polling"?
+>    And did you actually mean napi_complete_done()?
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+   Ah, napi_complete() also returns a result... maybe this should be reworded
+as "NAPI completion"?
 
+>> if interrupts shall be re-enabled or not. This is useful to reduce the
+>> interrupt overhead.
+>>
+>> While at it switch to using napi_complete_done() as it take into account
+> 
+>    Takes.
+> 
+>> the work done when providing the busypolling status.
+> 
+>    Again, "busy-polling"?
+>  
+>> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+
+[...]
+
+MBR, Sergey
 
