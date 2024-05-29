@@ -1,112 +1,136 @@
-Return-Path: <netdev+bounces-98927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEAF58D3246
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 10:52:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18CDA8D324F
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 10:53:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C0251F220A4
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 08:52:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA3E61F217D2
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 08:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF99E17B504;
-	Wed, 29 May 2024 08:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D65169361;
+	Wed, 29 May 2024 08:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DXkkWZ0E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AiNB/EY5"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4A817B433;
-	Wed, 29 May 2024 08:48:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B81A168C3B
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 08:50:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716972536; cv=none; b=u2VONaSjqJxFf5psXuFJLF08DFXknGUbe8jqpteX6YsnFrBRPu10pOcdJSOEdwyplfRothrUGaa/pk1osXuZcxLcDNG5Bw7Fly3jk/dw8eo/fXkdSQlHBkkqBYIxwos1INaJIj16axUpYCm5ButGrFr7ExrKGqvRFuVCU01HpYY=
+	t=1716972619; cv=none; b=s1nYjmQ4SrbaAolpGmA0n84HLhZq7TLasNmL8dknQD5GxKtSFKB0qcUTZpKaxRcYCwPcl0u6JpggxwLb4gBpy0ODTE+XxZVH6TDk8dz2UbtmZpJqQ8asBxht9S6EVdUl9dtWK7X7Tjk/m6puuqTk0zws/Ft/4pWNYDRB8BGc5+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716972536; c=relaxed/simple;
-	bh=05mPMURiJUzB68uwZ1AnFCRU9HvmdnaueMsK6PvezjY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bFYJmHZuRDJUg3+OP+JSuPFGJ3tmrD4n0BsB+QlCPT2NK5NQQge3khil1FAxfTLCoumijoutstVyyIMgiOYsx9fywFquHjNOH7oRGj+hJiyqyqw82SymwcdS7zVu0zfZjmkCzThUiLU2o8iLJwcjno0nV87K27jvCOXPwMOKqW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=DXkkWZ0E; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=fy/VN4d93AK58QWLNniu+JNSSAyKTkDFLr45JXQ5Bzs=; b=DXkkWZ0Esh+3Ku43CUqs2kR56L
-	S6ClNqQdm5L+GJn4agj4N/jzOMZFcWU8Z63sliv6R3BbOmaZIT02J4lW10dxZKzutKDSZlejmv0v6
-	TWDISFNFG8xPNlA+SvivbcenRpCITMm7RCgKRUmzAB8qzmP3GZwlvSzhs3TeGj/nLKcLkz3O2keNg
-	x6+Z1FMLu8UGhaXMvpZdGvGBZm7qO03SYsBqTbRvkAYzsy1yoMBdK6v5C5/LzHyWdGbiT5eOO1yLH
-	5IfQ91PmRDXwsaPrF8+aXvmcWB8Nbfqaa72v326Wl+nElipaL2GTnXWbA+PW+4xscr1gt0CxJmT9O
-	eWlU2d0g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38530)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sCEzB-0005qn-1p;
-	Wed, 29 May 2024 09:48:41 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sCEzB-00045O-Pl; Wed, 29 May 2024 09:48:41 +0100
-Date: Wed, 29 May 2024 09:48:41 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: xiaolei wang <xiaolei.wang@windriver.com>, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net PATCH] net: stmmac: update priv->speed to SPEED_UNKNOWN
- when link down
-Message-ID: <Zlbr6ZCI0GZR6FKn@shell.armlinux.org.uk>
-References: <20240528092010.439089-1-xiaolei.wang@windriver.com>
- <775f3274-69b4-4beb-84f3-a796343fc095@lunn.ch>
- <b499cbcd-a3c9-4f38-a69a-ad465e7f8d5a@windriver.com>
- <98e6266f-805c-4da2-b2dc-b25297c53742@lunn.ch>
+	s=arc-20240116; t=1716972619; c=relaxed/simple;
+	bh=LWhapFlrYGlL3YLRtm+zR6NsKskGY0BJuUVe1XxwHE0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BVqJC408IoMVD04VwU4QYe/a0NBRkDTgaxYDY/ODCtp7cLCB0QxMTMMJSG/hgO1SbYfRwA1esM4F+wL3DrSDeKPz5QzsLvr8ZYTNpdhMYBOhqJuuJsVSJx/qD+On6PF6RCjpkw8Tk1rRQdyRBX55MCqir+K4nO6gylh7CjVqzPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AiNB/EY5; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a6302bdb54aso251973666b.0
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 01:50:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716972616; x=1717577416; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K0XUQiMDJ7IOckNnbNQGqUrJQwgDDw+TihOSXEGeG6I=;
+        b=AiNB/EY5BH0PD9OPanQxumwHMLGK9kFjPfyhD2Sy/ZWZf51dQuJLOdDurL/Xbmpuwy
+         Djqy7tdNBEViHHt062V1FTkezRlXOrew8eFfaI74NgI6tCwsujODVAN4D828H3Vv79ae
+         HH38E8+hflGhh6nVw8N9qX58SDxWpYE7tGJk2tevJnGLPZIqcj5czxyu799XygUjqn4S
+         QayXGCR+1PJzTVjAwpDudYAg8QTKtQ4MPm9YKSdW0f4f3Rjgx1ODfYY9TLpPyB2O2YQg
+         DwQPmWegehl4AGdx8pbmUv0yHJi6K90iXMNh5alAnIPbcCSz7Jjsroj4R/a3A9Dzo3oR
+         IE6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716972616; x=1717577416;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K0XUQiMDJ7IOckNnbNQGqUrJQwgDDw+TihOSXEGeG6I=;
+        b=npuz6FZzISWCqmYN6x28QOzq8wbXIaESUTiP/fPX1GIcsCWuQrP1EW9B8u4SIh/Ttq
+         HjNmeCE+wRrnMUJpRgV8IJM2bryGu19JUbiMZh9jBRsoIZrdvpHIdzh5eN3N/ZauZRQ2
+         ieRZR3wncfoo8DVpw0Hwq0LGjs1N5XPpAPvLlxYCKKdzNO2ciMJNxnofmn/V7QqNGEif
+         T1ZYARf0kw8ML+OW+LBnCGY0najk4Sm5L8c2iqReOGEBtMb+CKkGAEw7WR/RCnJSGVkH
+         We+GrKWh26lNj+O7Aw57etpzF1PMRRY4YGwcFEUXDT6emo3Jo733k4sWMEnzydW6iC25
+         d/7g==
+X-Forwarded-Encrypted: i=1; AJvYcCUGPxfvUUMl+mLl/Okq5hE4OVkkAfl7jobjr5XOdXEy9ptISrcaYzsHxTF7uXelRrSkTA+U5gEAwhouhAlPXfPASIYpNWph
+X-Gm-Message-State: AOJu0YyjdI5zPhnJYKkrz711d/nxLmTTunxYttZaCuMM8nMxQaWCfADa
+	ky+OvqgOoOkt8KScsdHbz1J9OGe/gpxNp9dniT2YTaR1UdS96nvJODUbezDlV1dit9vcutyFgem
+	NQWSElb1ugevgszpeblEcwO0+U6s=
+X-Google-Smtp-Source: AGHT+IFI1RPK5glHZ/4EktnJKhtO4T9eVv/b1sv89762iFJZPiMwMDmwNBakhvZE9IA0kSAnVtSiVAs0Pi69qR5sLcA=
+X-Received: by 2002:a17:907:9491:b0:a62:e3b2:6676 with SMTP id
+ a640c23a62f3a-a62e3b267a8mr728862466b.73.1716972616181; Wed, 29 May 2024
+ 01:50:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <98e6266f-805c-4da2-b2dc-b25297c53742@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20240528171320.1332292-1-yyd@google.com> <ZlbXeytf4RkAI40N@TONYMAC-ALIBABA.local>
+In-Reply-To: <ZlbXeytf4RkAI40N@TONYMAC-ALIBABA.local>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 29 May 2024 16:49:39 +0800
+Message-ID: <CAL+tcoDBdRyrzEtkkZ-9orffzts43-0EKajSpu3-dAVYgMECbg@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/2] tcp: add sysctl_tcp_rto_min_us
+To: Tony Lu <tonylu@linux.alibaba.com>
+Cc: Kevin Yang <yyd@google.com>, David Miller <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 29, 2024 at 02:57:27AM +0200, Andrew Lunn wrote:
-> On Wed, May 29, 2024 at 08:22:01AM +0800, xiaolei wang wrote:
-> > 
-> > On 5/28/24 21:20, Andrew Lunn wrote:
-> > > CAUTION: This email comes from a non Wind River email account!
-> > > Do not click links or open attachments unless you recognize the sender and know the content is safe.
-> > > 
-> > > On Tue, May 28, 2024 at 05:20:10PM +0800, Xiaolei Wang wrote:
-> > > > The CBS parameter can still be configured when the port is
-> > > > currently disconnected and link down. This is unreasonable.
-> > > This sounds like a generic problem. Can the core check the carrier
-> > > status and error out there? Maybe return a useful extack message.
-> > > 
-> > > If you do need to return an error code, ENETDOWN seems more
-> > 
-> > Currently cbs does not check link status. If ops->ndo_setup_tc() returns
-> > failure, there will only be an output of "Specified device failed to setup
-> > cbs hardware offload".
-> 
-> So it sounds like we should catch this in the core then, not the
-> driver. And cbs_enable_offload() takes an extack, so you can report a
-> user friendly reason for failing, the at the carrier is off.
+On Wed, May 29, 2024 at 3:21=E2=80=AFPM Tony Lu <tonylu@linux.alibaba.com> =
+wrote:
+>
+> On Tue, May 28, 2024 at 05:13:18PM +0000, Kevin Yang wrote:
+> > Adding a sysctl knob to allow user to specify a default
+> > rto_min at socket init time.
+> >
+> > After this patch series, the rto_min will has multiple sources:
+> > route option has the highest precedence, followed by the
+> > TCP_BPF_RTO_MIN socket option, followed by this new
+> > tcp_rto_min_us sysctl.
+>
+> For series:
+>
+> Reviewed-by: Tony Lu <tonylu@linux.alibaba.com>
+>
+> I strongly support those patches. For those who use cgroup v1 and want
+> to take effect with simple settings, sysctl is a good way.
 
-It's worse than that (see my other reply.) If the link speed changes,
-there's nothing that deals with updating the CBS configuration for the
-new speed. CBS here is basically buggy - unless one reconfigures CBS
-each time the link comes up.
+It's not a good reason to use sysctl.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+If you say so, why not introduce many sysctls to replace setsockopt
+operations. For example, introducing a new sysctl to disable delayed
+ack to improve the speed of transmission in some cases just for ease
+of use? No, it's not right, I believe.
+
+>
+> And reducing it is helpful for latency-sensitive applications such as
+> Redis, net namespace level sysctl knob is enough.
+
+Sure, these key parameters play a big role in the TCP stack.
+
+>
+> >
+> > Kevin Yang (2):
+> >   tcp: derive delack_max with tcp_rto_min helper
+> >   tcp: add sysctl_tcp_rto_min_us
+> >
+> >  Documentation/networking/ip-sysctl.rst | 13 +++++++++++++
+> >  include/net/netns/ipv4.h               |  1 +
+> >  net/ipv4/sysctl_net_ipv4.c             |  8 ++++++++
+> >  net/ipv4/tcp.c                         |  3 ++-
+> >  net/ipv4/tcp_ipv4.c                    |  1 +
+> >  net/ipv4/tcp_output.c                  | 11 ++---------
+> >  6 files changed, 27 insertions(+), 10 deletions(-)
+> >
+> > --
+> > 2.45.1.288.g0e0cd299f1-goog
+> >
+>
 
