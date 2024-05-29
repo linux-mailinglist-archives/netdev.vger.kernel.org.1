@@ -1,219 +1,191 @@
-Return-Path: <netdev+bounces-99149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64F898D3D48
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 19:20:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B6F68D3D67
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 19:29:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E298B1F23EAE
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:20:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E6F01F241FF
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:29:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15C481A38E2;
-	Wed, 29 May 2024 17:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852C31A38C2;
+	Wed, 29 May 2024 17:29:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OahVjF+u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LemeY3a3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CBD1A0B09
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 17:20:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A112181CFC;
+	Wed, 29 May 2024 17:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717003224; cv=none; b=mhWOXA9EsJHAMJ9IPna3ZoIQa7IkfCAgbtMc4276QMWUE4tIeI3qvbM8//5MjQ5bR/FSbDPAi2nugfRjjGs7KxpaHM74Gmv38VahJg0KUQw4aopxcrIbWsrfU//mM0R0pMxCQIosUVGV+lTUGLuhWxVkCc7xnHzSrfA2rQGT7Fo=
+	t=1717003792; cv=none; b=MTX4hSvzOpltleX+m48n6G3eyMu17QppnOFe25rQe/vj1zknKu3yoMJe9sxC42+PXvnYGLJB9j92H1Xf9SuN/TzgPVuh/dj/KEZ2Quom3I2Im1pMZOpDCvkMoBDmIqsaVEzE9r5QHqa0a7G1gwQ1HGJWmHmuihxWvDYQ5jrZYgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717003224; c=relaxed/simple;
-	bh=7Dvlwp3cj9kBhnrZACSLGYw+fDrt3VMF9KkgcqNKF7g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X8+sQ9vTGpfREsUv+7Iz2vfdW6mbNwsZdssIfq+D80eeQzobF5yLakBQQOIwLLIizNTKn69dOzvcv2Oe4hbHO+7yAX1CRqOJyzK+AfGRjt3+sf65fIGNj9ZO2MOU8H8SyXzDe/KgQkQfeBZRjwPbWFbVydPSNnn+us/Se6muZxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OahVjF+u; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a59a609dd3fso37918766b.0
-        for <netdev@vger.kernel.org>; Wed, 29 May 2024 10:20:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717003220; x=1717608020; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T6S92XYKao8zmEwYTt3a/Nczc/mks5grdh4+BnfyPTc=;
-        b=OahVjF+uze/S9Yn0R/e+72J80Eo14Ndb0JX3BX7MdTwFUtnWHqryLwOZV9e/HwNRn/
-         KCzJSttyBaVlcSU8Aii7iGYJnLXOnG/vYNoV9ub7xA++Wb/uaDy335X6NZe/d0MZ4KmA
-         Yemfy5Zcudp9/S6EY/5hs9Z0auOiK+7PZnIHC97KPZtxaRwTe04/w8S7LccXPI7E7tWD
-         PEuSnKcy5PguqBJ+VJOY+H20C1JqxCF7VOzCbyV9PZf5dOwX7ILRV2T4KIDbhzzMEIgf
-         F2HFp+dgVFKGX0yDYiaEGS6Kw/9n2i+uyrYYhyw+0lo+xD51tEUpd0vb5ywrXcox0zmZ
-         d3nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717003220; x=1717608020;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T6S92XYKao8zmEwYTt3a/Nczc/mks5grdh4+BnfyPTc=;
-        b=gYUyvBpLImbcVvUWlpMvUhO+2NWCEwlpvOFFgrnqh0cJxgPEQzerg/hE8R/gbLWGWZ
-         QT1knEbTFU6a87dlo3RfwIU3HCbt1MnIIAoampAFhL9MRM0PWu51IhL3XZV6Jkwa0nfu
-         9TLiK5aaLYU6QoRAB7cZ9L2Loj0XrkdYiQElHJb2P0nVeGrma3+u2E//BSu8KVQXTxVz
-         kI8p0YZVdA5VnLc9/tqIBif5VdoFmT8p+UZO2y1qf4IgjOy6IdwtAzqT1cPUAfehJvMG
-         rdM39pv2V4DtsewDg0vP5If0wPd156Epxh3gmVzaXBcxMTfn0vwpb6H6RibK6kyJX+Cc
-         yQ+g==
-X-Forwarded-Encrypted: i=1; AJvYcCUNqFIL7GCouyalEegUYeDXMZJ5w7esWb929OQQnSZVHPrrr29L4EdR24HDpUaoezOUR7GPn5dot4n6zGZ8AY9K4AvPB4QE
-X-Gm-Message-State: AOJu0Yz9ieSPD7d/2g99gcS4+5jQsEuH1lWcBGf0AE5uNww7PhzbFxp8
-	y8mXvAVz4W67nobkNZyKNgIYFBTxh8JYMkF832nuPYUtZSKDkh6p07otcNPEhXbAKYmYrL9aaF1
-	WIolLgrw4u0UbIVyPbPb7zo0OFGQSMbr/E42G
-X-Google-Smtp-Source: AGHT+IFAhIhHvER4srrkWNvWRV5ZrC6gug/SN6NLXzcRRgpzDjuVBSfERRb5LBk6wrj7S1gKnfcF1nodGURXGds/8UM=
-X-Received: by 2002:a17:906:2dc2:b0:a62:c41d:c25f with SMTP id
- a640c23a62f3a-a642d6b1573mr258384666b.21.1717003219656; Wed, 29 May 2024
- 10:20:19 -0700 (PDT)
+	s=arc-20240116; t=1717003792; c=relaxed/simple;
+	bh=A9UhXtEcisGdQ7S+GoLiZz5Cc4x1PGg5yQCUDuWY1OI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Rr/DGMxOE7FLCUJodtMOnOwPeKRJB52sK8OP070Y5f0xNiT59+5GxjQZ4RERT1olzqogTWPuixzW8WnrIJ7HnDDCJB3VXzZGtGgIFC9sGhEOFLhHS0DGOeB94pDiI01k8ihunIRCvxzvHsPF8evIouNe9YdwK+r3Xzp1aX1dgAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LemeY3a3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D741FC113CC;
+	Wed, 29 May 2024 17:29:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717003791;
+	bh=A9UhXtEcisGdQ7S+GoLiZz5Cc4x1PGg5yQCUDuWY1OI=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=LemeY3a3dkcONAXHujpB1cyh0OwVvJyxJG9LXALeTeRnFCy+709y/PlntMQwguoMC
+	 l1hQRt9eYvIyazkYGA4q2osF5cn4EtBz/X4oq1EuRRfvVymdT9we7xQWYFwx3Xb6K3
+	 zfQ79/6Slv6ErsMDVL8FfAVfi7k62isDe1pv25XIurFcsVIn1RIf1tKgflpU+kg6/M
+	 q6KhdD1mJO+lU1z17M+rL2mHQlbBKlSY8iH0QbDIw+GCRsISDEtsWu/D+uTd/47va/
+	 4ciSEAJQxRXl/bY1hlG7uts2Q2ZtEytrcJ/pyJKlMSZ2tUPY2T7d6BOLx2RNkKACAQ
+	 QOcbOOs7N1rPA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C18CDC25B7C;
+	Wed, 29 May 2024 17:29:51 +0000 (UTC)
+From: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
+Date: Wed, 29 May 2024 18:29:32 +0100
+Subject: [PATCH net] net/tcp: Don't consider TCP_CLOSE in
+ TCP_AO_ESTABLISHED
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240510232128.1105145-1-almasrymina@google.com>
- <20240510232128.1105145-12-almasrymina@google.com> <9097e78d-0e7d-43bd-bafd-e53a4872a4d1@davidwei.uk>
- <CAHS8izOe-uYjm0ttQgHOFpvp_Tj4_oRHV6d1Y1sWJAZJdCdCBA@mail.gmail.com> <29464e46-e196-47aa-9ff5-23173099c95e@gmail.com>
-In-Reply-To: <29464e46-e196-47aa-9ff5-23173099c95e@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 29 May 2024 10:20:03 -0700
-Message-ID: <CAHS8izOnD3J3i+z1nxg=AZQW9dm0w2JBtbg2=oouiER8xqeRPA@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 11/14] tcp: RX path for devmem TCP
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: David Wei <dw@davidwei.uk>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240529-tcp_ao-sk_state-v1-1-d69b5d323c52@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAPtlV2YC/x2M0QrCMAwAf2Xk2UBbugf9FZGR1uiC2I0kDGHs3
+ 60+3sHdDsYqbHAZdlDexGRpHeJpgDpTezLKvTOkkHIY0xm9rhMtaK/JnJwxc0mxhDyGEKFXq/J
+ DPv/jFRo73LosZIxFqdX5N3uTOSscxxdTVVH3fwAAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1717003790; l=4011;
+ i=0x7f454c46@gmail.com; s=20240410; h=from:subject:message-id;
+ bh=41vTCdrciFlE2ucowln/i/qvIHlsHBhkFQcAUL+bxDc=;
+ b=wiHAeqOo3CwmYpFYkuuD0qstxMwV/2lWmg1Q7gCER+fRAP/qC5KJHm1nMJzg+0gZmDrBtBZxUciS
+ pf81NF2oDAMFJ+nbMLEU7mnDq2zw9Cvvrw1C7Yu2d6+KVgpdQRJp
+X-Developer-Key: i=0x7f454c46@gmail.com; a=ed25519;
+ pk=cFSWovqtkx0HrT5O9jFCEC/Cef4DY8a2FPeqP4THeZQ=
+X-Endpoint-Received: by B4 Relay for 0x7f454c46@gmail.com/20240410 with
+ auth_id=152
+X-Original-From: Dmitry Safonov <0x7f454c46@gmail.com>
+Reply-To: 0x7f454c46@gmail.com
 
-On Tue, May 28, 2024 at 7:42=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> On 5/28/24 18:36, Mina Almasry wrote:
-> > On Wed, May 22, 2024 at 11:02=E2=80=AFPM David Wei <dw@davidwei.uk> wro=
-te:
-> ...
-> >>> +                      */
-> >>> +                     if (!skb_frag_net_iov(frag)) {
-> >>> +                             net_err_ratelimited("Found non-dmabuf s=
-kb with net_iov");
-> >>> +                             err =3D -ENODEV;
-> >>> +                             goto out;
-> >>> +                     }
-> >>> +
-> >>> +                     niov =3D skb_frag_net_iov(frag);
-> >>
-> >> Sorry if we've already discussed this.
-> >>
-> >> We have this additional hunk:
-> >>
-> >> + if (niov->pp->mp_ops !=3D &dmabuf_devmem_ops) {
-> >> +       err =3D -ENODEV;
-> >> +       goto out;
-> >> + }
-> >>
-> >> In case one of our skbs end up here, skb_frag_is_net_iov() and
-> >> !skb_frags_readable(). Does this even matter? And if so then is there =
-a
-> >> better way to distinguish between our two types of net_iovs?
-> >
-> > Thanks for bringing this up, yes, maybe we do need a way to
-> > distinguish, but it's not 100% critical, no? It's mostly for debug
-> > checking?
->
-> Not really. io_uring definitely wouldn't want the devmem completion path
-> taking an iov and basically stashing it into a socket (via refcount),
-> that's a lifetime problem. Nor we'd have all the binding/chunk_owner
-> parts you have and probably use there.
->
-> Same the other way around, you don't want io_uring grabbing your iov
-> and locking it up, it won't even be possible to return it back. We
-> also may want to have access to backing pages for different fallback
-> purposes, for which we need to know the iov came from this particular
-> ring.
->
-> It shouldn't happen for a behaving user, but most of it would likely
-> be exploitable one way or another.
->
-> > I would say add a helper, like net_iov_is_dmabuf() or net_iov_is_io_uri=
-ng().
->
-> We're verifying that the context the iov bound to is the current
-> context (e.g. io_uring instance) we're executing from. If we can
-> agree that mp_priv should be a valid pointer, the check would look
-> like:
->
-> if (pp->mp_priv =3D=3D io_uring_ifq)
->
-> > Checking for niov->pp->mp_ops seems a bit hacky to me, and may be
-> > outright broken. IIRC niov's can be disconnected from the page_pool
-> > via page_pool_clear_pp_info(), and niov->pp may be null. Abstractly
->
-> It's called in the release path like page_pool_return_page(),
-> I can't imagine someone can sanely clear it while inflight ...
->
+From: Dmitry Safonov <0x7f454c46@gmail.com>
 
-Ah, yes, I wasn't sure what happens to the inflight pages when the pp
-gets destroyed. I thought maybe the pp would return the inflight
-pages, but it looks to me like the pp just returns the free pages in
-the alloc cache and the ptr_ring, and the pp stays alive until all the
-inflight pages are freed. So indeed niov->pp should always be valid
-while it's in flight. I still prefer to have the memory type to be
-part of the niov itself, but I don't feel strongly at this point; up
-to you.
+TCP_CLOSE may or may not have current/rnext keys and should not be
+considered "established". The fast-path for TCP_CLOSE is
+SKB_DROP_REASON_TCP_CLOSE. This is what tcp_rcv_state_process() does
+anyways. Add an early drop path to not spend any time verifying
+segment signatures for sockets in TCP_CLOSE state.
 
-> > speaking the niov type maybe should be a property of the niov itself,
-> > and not the pp the niov is attached to.
->
-> ... but I can just stash all that in niov->owner,
-> struct dmabuf_genpool_chunk_owner you have. That might be even
-> cleaner. And regardless of it I'll be making some minor changes
-> to the structure to make it generic.
->
-> > It is not immediately obvious to me what the best thing to do here is,
-> > maybe it's best to add a flag to niov or to use niov->pp_magic for
-> > this.
-> >
-> > I would humbly ask that your follow up patchset takes care of this
-> > bit, if possible. I think mine is doing quite a bit of heavy lifting
-> > as is (and I think may be close to ready?), when it comes to concerns
-> > of devmem + io_uring coexisting if you're able to take care, awesome,
-> > if not, I can look into squashing some fix.
->
-> Let it be this way then. It's not a problem while there is
-> only one such a provider.
->
+Cc: stable@vger.kernel.org # v6.7
+Fixes: 0a3a809089eb ("net/tcp: Verify inbound TCP-AO signed segments")
+Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
+---
+ include/net/tcp_ao.h |  7 ++++---
+ net/ipv4/tcp_ao.c    | 13 +++++++++----
+ 2 files changed, 13 insertions(+), 7 deletions(-)
 
-Thank you!
+diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
+index 471e177362b4..5d8e9ed2c005 100644
+--- a/include/net/tcp_ao.h
++++ b/include/net/tcp_ao.h
+@@ -86,7 +86,8 @@ static inline int tcp_ao_sizeof_key(const struct tcp_ao_key *key)
+ struct tcp_ao_info {
+ 	/* List of tcp_ao_key's */
+ 	struct hlist_head	head;
+-	/* current_key and rnext_key aren't maintained on listen sockets.
++	/* current_key and rnext_key are maintained on sockets
++	 * in TCP_AO_ESTABLISHED states.
+ 	 * Their purpose is to cache keys on established connections,
+ 	 * saving needless lookups. Never dereference any of them from
+ 	 * listen sockets.
+@@ -201,9 +202,9 @@ struct tcp6_ao_context {
+ };
+ 
+ struct tcp_sigpool;
++/* Established states are fast-path and there always is current_key/rnext_key */
+ #define TCP_AO_ESTABLISHED (TCPF_ESTABLISHED | TCPF_FIN_WAIT1 | TCPF_FIN_WAIT2 | \
+-			    TCPF_CLOSE | TCPF_CLOSE_WAIT | \
+-			    TCPF_LAST_ACK | TCPF_CLOSING)
++			    TCPF_CLOSE_WAIT | TCPF_LAST_ACK | TCPF_CLOSING)
+ 
+ int tcp_ao_transmit_skb(struct sock *sk, struct sk_buff *skb,
+ 			struct tcp_ao_key *key, struct tcphdr *th,
+diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+index 781b67a52571..37c42b63ff99 100644
+--- a/net/ipv4/tcp_ao.c
++++ b/net/ipv4/tcp_ao.c
+@@ -933,6 +933,7 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
+ 	struct tcp_ao_key *key;
+ 	__be32 sisn, disn;
+ 	u8 *traffic_key;
++	int state;
+ 	u32 sne = 0;
+ 
+ 	info = rcu_dereference(tcp_sk(sk)->ao_info);
+@@ -948,8 +949,9 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
+ 		disn = 0;
+ 	}
+ 
++	state = READ_ONCE(sk->sk_state);
+ 	/* Fast-path */
+-	if (likely((1 << sk->sk_state) & TCP_AO_ESTABLISHED)) {
++	if (likely((1 << state) & TCP_AO_ESTABLISHED)) {
+ 		enum skb_drop_reason err;
+ 		struct tcp_ao_key *current_key;
+ 
+@@ -988,6 +990,9 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
+ 		return SKB_NOT_DROPPED_YET;
+ 	}
+ 
++	if (unlikely(state == TCP_CLOSE))
++		return SKB_DROP_REASON_TCP_CLOSE;
++
+ 	/* Lookup key based on peer address and keyid.
+ 	 * current_key and rnext_key must not be used on tcp listen
+ 	 * sockets as otherwise:
+@@ -1001,7 +1006,7 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
+ 	if (th->syn && !th->ack)
+ 		goto verify_hash;
+ 
+-	if ((1 << sk->sk_state) & (TCPF_LISTEN | TCPF_NEW_SYN_RECV)) {
++	if ((1 << state) & (TCPF_LISTEN | TCPF_NEW_SYN_RECV)) {
+ 		/* Make the initial syn the likely case here */
+ 		if (unlikely(req)) {
+ 			sne = tcp_ao_compute_sne(0, tcp_rsk(req)->rcv_isn,
+@@ -1018,14 +1023,14 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
+ 			/* no way to figure out initial sisn/disn - drop */
+ 			return SKB_DROP_REASON_TCP_FLAGS;
+ 		}
+-	} else if ((1 << sk->sk_state) & (TCPF_SYN_SENT | TCPF_SYN_RECV)) {
++	} else if ((1 << state) & (TCPF_SYN_SENT | TCPF_SYN_RECV)) {
+ 		disn = info->lisn;
+ 		if (th->syn || th->rst)
+ 			sisn = th->seq;
+ 		else
+ 			sisn = info->risn;
+ 	} else {
+-		WARN_ONCE(1, "TCP-AO: Unexpected sk_state %d", sk->sk_state);
++		WARN_ONCE(1, "TCP-AO: Unexpected sk_state %d", state);
+ 		return SKB_DROP_REASON_TCP_AOFAILURE;
+ 	}
+ verify_hash:
 
---=20
-Thanks,
-Mina
+---
+base-commit: e0cce98fe279b64f4a7d81b7f5c3a23d80b92fbc
+change-id: 20240529-tcp_ao-sk_state-4eb21b045001
+
+Best regards,
+-- 
+Dmitry Safonov <0x7f454c46@gmail.com>
+
+
 
