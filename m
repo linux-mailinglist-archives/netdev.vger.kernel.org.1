@@ -1,50 +1,67 @@
-Return-Path: <netdev+bounces-98959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44D098D33AF
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 11:51:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77DDD8D33BF
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 11:56:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BC911C22B76
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 09:51:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D3AF1C21B8D
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 09:56:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B732216E873;
-	Wed, 29 May 2024 09:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFPrX9eX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3362716E89A;
+	Wed, 29 May 2024 09:55:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9263716ABEB
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 09:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C7E16A379;
+	Wed, 29 May 2024 09:55:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716976229; cv=none; b=Dw/ZYl5FZ3a2KasMK9qlgxc2bCm0EmLxTsvljanGnt0vtuqppLLmHG13FS9hgCOb+1+uytNrtZOrtizl1UpCBTqc5H9lnloMoivyeAoiNPdtJb8C2Z80ZihGNnrxgROC4nMf0T9wAX8tRiF1ncWZDuJkJEUGGk0asOfRfs2Y4tI=
+	t=1716976559; cv=none; b=twTeqToEHl9gfn2UWQokaXOvw2bZD0HKkz9HV1lKTQFA77Qf3R1RUB84VyjFR1rGrqxQBmqZrzqWI56lpdSQwW3CovqupD9R6lLtqHUvmmzCRXouzi/eAAygfApfhIUVcAjX/J5jEUfUY2cEZLDCNg9TJB09VaaTSAOD6y99fC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716976229; c=relaxed/simple;
-	bh=gJPfDX/1R89HNnTsnsa45Mav2rz07h/4uZ1oLxMp8oY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gPvn76/nKhkdrWqkctRkW2TEBSp/v0oOcURrvdnz07xWHcmSURJ4CV94O0wPtaZtaQ4w1sT1Yz3P1CvEE5YdaUeDSVSPzNTMyNDofJSZm9JIbYgzjf6YYa4OI0x3lYLPBdVVKbsB0439OdR3J3+BArihBgGse15+lE14ZIQD2nY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFPrX9eX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 21409C32789;
-	Wed, 29 May 2024 09:50:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716976229;
-	bh=gJPfDX/1R89HNnTsnsa45Mav2rz07h/4uZ1oLxMp8oY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EFPrX9eXV3p1SvQhUiqXwAQHbznplVewYTaPOUQtic6NGHOQQ+7QhTEgbaRMCHxZd
-	 AABWhQRNUR9xrWcOebcxIOCvmMRg4eJhpMzUdB83PfB7IxQnWaru5QRYd90A3hLJWA
-	 bJArhanDhy13ZJz1Izs2uj7+mguGiFXB0lLIgPx1TiJjbC2PVE2SpFRhI3twgM4bkp
-	 sXFWrjeaBAuIQ4c6MZa87R1wgrLSaoyBa89+L3KYpflbibRqxXXPcq3WLFVPqzKl4C
-	 7ab7T2I6mCZm6a9ItOLnttq90jCyzDjzeYAz751z8hw1h7C4Tbfjxmavrlqy3kAa62
-	 3fJC9i20gHvWw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0DDC8E6C362;
-	Wed, 29 May 2024 09:50:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1716976559; c=relaxed/simple;
+	bh=aDoySUW0f6x8n5i6pbvRD7e32dK1WDjQkjJh3ud7g7U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EQU6Szn6YtRt1IMBWrGMqqvXUEPMc+RSXwS7vgyPZ16+bT4uz6OcR9n5PRCSB7vM/ugvdiN0Kx9ZKEn/JI6pIvI9c7X+ZUf6+h4Xk6DCE6qWvw24MLAKiMn3jWVXAkYv2NUUhUmWdsBS4IZZmxTJY6ItAGSGavh/fD3RoJdd634=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id D170D1A15AB;
+	Wed, 29 May 2024 11:55:55 +0200 (CEST)
+Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 8111B1A13BE;
+	Wed, 29 May 2024 11:55:55 +0200 (CEST)
+Received: from pe-lt8779.in-pnq01.nxp.com (pe-lt8779.in-pnq01.nxp.com [10.17.104.141])
+	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id 3D05B180222F;
+	Wed, 29 May 2024 17:55:53 +0800 (+08)
+From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	amitkumar.karwar@nxp.com,
+	rohit.fule@nxp.com,
+	neeraj.sanjaykale@nxp.com,
+	sherry.sun@nxp.com,
+	ziniu.wang_1@nxp.com,
+	haibo.chen@nxp.com,
+	LnxRevLi@nxp.com
+Subject: [PATCH v3 0/2] Bluetooth: btnxpuart: Update firmware names
+Date: Wed, 29 May 2024 15:23:45 +0530
+Message-Id: <20240529095347.22186-1-neeraj.sanjaykale@nxp.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,41 +69,28 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4] net: ethernet: cortina: Restore TSO support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171697622905.17150.13034737417147144191.git-patchwork-notify@kernel.org>
-Date: Wed, 29 May 2024 09:50:29 +0000
-References: <20240527-gemini-tso-1-v4-1-1f8103b27d44@linaro.org>
-In-Reply-To: <20240527-gemini-tso-1-v4-1-1f8103b27d44@linaro.org>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: ulli.kroll@googlemail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, netdev@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-Hello:
+This patch series updates the BT firmware file names in BTNXPUART
+driver, and adds a new optional firmware-name device tree property to
+override the firmware file names hardcoded in the driver. This will
+allow user to continue using the older firmware files.
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+This change is necessary as newer firmware releases will have
+standardized naming convention aligned across all newer and legacy
+chipsets.
 
-On Mon, 27 May 2024 21:26:44 +0200 you wrote:
-> An earlier commit deleted the TSO support in the Cortina Gemini
-> driver because the driver was confusing gso_size and MTU,
-> probably because what the Linux kernel calls "gso_size" was
-> called "MTU" in the datasheet.
-> 
-> Restore the functionality properly reading the gso_size from
-> the skbuff.
-> 
-> [...]
+Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
 
-Here is the summary with links:
-  - [net-next,v4] net: ethernet: cortina: Restore TSO support
-    https://git.kernel.org/netdev/net-next/c/2942dfab6304
+Neeraj Sanjay Kale (2):
+  dt-bindings: net: bluetooth: nxp: Add firmware-name property
+  Bluetooth: btnxpuart: Update firmware names
 
-You are awesome, thank you!
+ .../net/bluetooth/nxp,88w8987-bt.yaml         |  4 +++
+ drivers/bluetooth/btnxpuart.c                 | 28 +++++++++++--------
+ 2 files changed, 21 insertions(+), 11 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
