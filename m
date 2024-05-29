@@ -1,222 +1,253 @@
-Return-Path: <netdev+bounces-99147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1146C8D3D33
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 19:10:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9799F8D3D47
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 19:20:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2439A1C20D9B
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:10:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E82A282240
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:20:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF1315B56D;
-	Wed, 29 May 2024 17:09:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fvlhMwHR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDBA2181BA7;
+	Wed, 29 May 2024 17:20:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F341B810
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 17:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717002599; cv=fail; b=n8aeUbfuLfb4ZRo3TIfzrrnH3aUR4YU3QZjbJLDjlfETu+pNHUo2SNRAtq9oDiRNOETqkGN/ZGSh7dKDuj5rzbYaTtfGrYZB0wocK3T0un8xm0z6XcE+VsfmAcp2FPr9qijraUCsWHqX7L5qbNfnnB/sIm+msl11371BehDuyjY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717002599; c=relaxed/simple;
-	bh=b5CFmRh2y1xo9xpxF79q6FPYvei+cUlQE9J5ttRKrAY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=iO59/0WIDmKJoIIutbXXDAmxPSmM50dnNnxcZVyRgLzGB3cqdKUKn7ZRsOFv2GPxF/T/ePONb8R/Y3yT2Rm2f4i0wkW14aKE3i7wySTYh6uMcSdzNEy6F/j+se9jowhBbOTK3hfGRhxoLmyjF6qf52EEYgHyBIm8E3vu2gJT/+I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fvlhMwHR; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717002598; x=1748538598;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=b5CFmRh2y1xo9xpxF79q6FPYvei+cUlQE9J5ttRKrAY=;
-  b=fvlhMwHR5SVxeM2eCHwsT1EqmA/gKD+xP7F1zIU81+wxjXzpD36+Yr09
-   27XxCapnnTcFFiH1KM5sNiqLR0oELrpKz26FA++bF+zF7rybmi96S6hpA
-   Nv+JNHON1xZ7oorKHCSIFPgnxPcsNR+gPWpLcUO1aVMjMja5ptM2HJPjx
-   OQ2Z6FFIJoynb+v4UGnlajUsFeeibsrCVdT+W/QTh/DdHfkZj3RmNo6cO
-   iK1mtv7fKvmcI3oKqYqLWoY1ger14WL3ioRBDD1oRbIEvM6zuxNqba7Xj
-   6R2rqoGZ1RZf96aBjJQKfXAp0eOHPQ0QX6LeDosKEAbI48T9txfhGz00w
-   w==;
-X-CSE-ConnectionGUID: wbb6mGJ9TZe8KGXVaP1hdA==
-X-CSE-MsgGUID: UVVOVCsuQ9e/X6C0s3rXiQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11087"; a="23977697"
-X-IronPort-AV: E=Sophos;i="6.08,199,1712646000"; 
-   d="scan'208";a="23977697"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 May 2024 10:09:57 -0700
-X-CSE-ConnectionGUID: 120u0qfLSLGXzoEwNG01Bg==
-X-CSE-MsgGUID: E/W8SoC1RauT4cBAZDsZSw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,199,1712646000"; 
-   d="scan'208";a="40021149"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 May 2024 10:09:56 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 29 May 2024 10:09:56 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 29 May 2024 10:09:56 -0700
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.40) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 29 May 2024 10:09:56 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P8ONWg6JAFfTir8qcNzA7O28vnzynwZuLWYQ94104+O0qUXSxJ79gyLiSN+CvN1M2A75FP0AYAfcaSogsn20el5ABVKDvPu260IN+4bg7uHQ190AfWUbwFG4WnvmhKM5X/YZdJAF3NDD0893Qfqymjy07T2/SQIQyuU8I0eAMnyidtCjFxC2S3NaBcnyNdjGcAP4Co+Ej1DpwMbGREp4wiH01UrF88mnNETM2dY+ZfGuGQBGDWv6qPZfeVGpXd+so3Uy70E8WL10hmh83kWnO8zDAFo+hYvQjOQItZFLF8n7XxbUykMpPM/mIlTXfcLSi51HpydRm9AJ2K/st0sS5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UYRlOr8MF3NialuEVG9m9K0Ts4z0Zerld36e1eSChx8=;
- b=HYRrb2e7A/T55nCUh3BDANNOiNssP0YLJaKV+HT5uGybF6RlgQfYIekm9ljVddlpvW73VnM/rRFU/0ak4QcYkMWiLKklH5BsrrOKpt8F9QNNF/YWIujKWkqAdJvRkzAQf4V/NhohssK9AhBp6WJCAYRY4QutcBPwoCQWQpHtdv/aQlwN8gaFx+FOggdsrrfAtT6AT1bpffdirDqZjtuNq3sNfBKn5OcVwZ+Opu/A5Ev3KiFeAkH6J67x4GehQLeO8gzxx0hhNUAdj/WzH4yCwzoSKv8g0CCO9vnUMepUoyz4bvooJeNGfRrGMXNfgAZXXkRstsc+GMkVMAJDNBnLag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
- by LV8PR11MB8581.namprd11.prod.outlook.com (2603:10b6:408:1e5::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.17; Wed, 29 May
- 2024 17:09:52 +0000
-Received: from CYYPR11MB8429.namprd11.prod.outlook.com
- ([fe80::4f97:ad9d:79a9:899f]) by CYYPR11MB8429.namprd11.prod.outlook.com
- ([fe80::4f97:ad9d:79a9:899f%6]) with mapi id 15.20.7611.016; Wed, 29 May 2024
- 17:09:52 +0000
-From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-To: "Ostrowska, Karen" <karen.ostrowska@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Joyner, Eric" <eric.joyner@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Ostrowska, Karen"
-	<karen.ostrowska@intel.com>, Michal Swiatkowski
-	<michal.swiatkowski@linux.intel.com>
-Subject: RE: [Intel-wired-lan] [iwl-next v1] ice: Check all ice_vsi_rebuild()
- errors in function
-Thread-Topic: [Intel-wired-lan] [iwl-next v1] ice: Check all ice_vsi_rebuild()
- errors in function
-Thread-Index: AQHasUIzMoVRbgUZCEO/NPq30LJ7xLGucyBA
-Date: Wed, 29 May 2024 17:09:52 +0000
-Message-ID: <CYYPR11MB8429472EDFF52E822D765238BDF22@CYYPR11MB8429.namprd11.prod.outlook.com>
-References: <20240528090140.221964-1-karen.ostrowska@intel.com>
-In-Reply-To: <20240528090140.221964-1-karen.ostrowska@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|LV8PR11MB8581:EE_
-x-ms-office365-filtering-correlation-id: f80822ef-b29a-451e-ef3f-08dc800227fd
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|1800799015|376005|366007|38070700009;
-x-microsoft-antispam-message-info: =?us-ascii?Q?zzMUyTGO+q18QRx9/iImxopBHSTWD48aFfmXWiiEbCMgD8isNrv0+k1hrpc1?=
- =?us-ascii?Q?1wiY6q3W2peAN4MRMnOT7tYOxKAM48xwYUHaK5wbb1VGcUECGJWo6BTSU8Ec?=
- =?us-ascii?Q?VOq7jbL/MdcuGxr+hf3fT/x6CClwGJhzceTveSoDiDVF3Qhw8HXAnGY1ILt6?=
- =?us-ascii?Q?l9QU8rD/OVcpvhQjfxQz0/j7HV9HhnjtzxlbuMKF5PdN0HUYBraDrleb68rF?=
- =?us-ascii?Q?jNGCmS5qgMvUYNVNIHvFtN8JAO61Cih95XzZX/2OVV98751vY/swpVI/pRaR?=
- =?us-ascii?Q?34avbC+1mPyjDlCyiDG/WMtyCxF2OuPbBrvd/5zz9jTsAB1tOxSeQUucE/L7?=
- =?us-ascii?Q?DdtgfJ8XHq9f9+ssx3ru+nT2LHhWr4fEbcbyMiX8ox77AqupBXgbxNhYhT4/?=
- =?us-ascii?Q?gsltalrkhdgt36hGTKOhuXlGNtTUkJMxZx1q+umcF5Ci+KBiRcQKRI2cgGFB?=
- =?us-ascii?Q?InW5lotkEpR2ncve+cISI/h4SAWsPWRqim91IY6vF/6+m3EupCXqLQdCrruM?=
- =?us-ascii?Q?LnGu6XOFg7IctJQllUskTSLYVhGDldIFfHoHBcpew4ePSJv4cxY6QWQB0By2?=
- =?us-ascii?Q?LHk/nOMK8D2to8dvNTSMpl2TK99cQODUO6MqGBrVrOgPXIplmWb/LvUvyigQ?=
- =?us-ascii?Q?jFpeSZt8n8EYl9753It4plF4AZtVhIQj25By4z36teOfBHwzyNqyGv38EwCd?=
- =?us-ascii?Q?l8I4TS8m+bYNriycbwK60luuB9fVk/YiVLhXP2MwKVb7otVcRXX2+c/BR+Ty?=
- =?us-ascii?Q?yoDb8T4wQBJKsoahlEO3O04deayF+NMKE2da3G+Ny+lMrTA5Sn02F2zMb6mp?=
- =?us-ascii?Q?TDMI6N9b7X6GH/z6YKEiGOqEjGEBiq4hYmRLWYpJKodWlbxgcEI/Zi6o41at?=
- =?us-ascii?Q?4INXsgUE4vRgQoCmdQo+BKJKZoyVwhiaeLojygPJOnIvKkDsKIBFDM6m0Uoi?=
- =?us-ascii?Q?4d9rFm5M+Z4FMZsFY+2p6ruYGEy1Y7L87eiVPUMkH9ufH6k1RayTJ1mTqu6w?=
- =?us-ascii?Q?1ybPWiSg91ASQYn7TmfDSYKr9ssGHxjtY32WWdNtI8UVVF332k8LyTGDLdYO?=
- =?us-ascii?Q?w1W3YUu+R3LtQhHYRQNs6uBdju51AO6el7R0+bUZwWZWC35y3uTPtsfSneyi?=
- =?us-ascii?Q?mbu/Q3/V/2Av4bdewQucnyPoWIfTnkNkxrPgIQdJiW46GmM1gOwta8y0W/xU?=
- =?us-ascii?Q?uvvPRzMGLNOnQ8djMPUYoSe8fjlsjih4yACqJlAiz5Z1uEbCntFfbvQjPjwb?=
- =?us-ascii?Q?80pJXgIHiOxhzhLEDUoVjtEjinCa8hqIchr0yI211jXnSMkXTQiw14nCA67z?=
- =?us-ascii?Q?5T9I1TS8WNTcV9bbd7M3Id1DSD+DTQXlr+W8O1FVo2+E2w=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?xbwAS1mGvQ1Ivc6CZAw0QhAQRwIWBhWqc7GAFvacXHT/uKXREYq01pxrcylz?=
- =?us-ascii?Q?9Z1MRLcb02AIBKW/yqs7ZK5vNlHyVQrJAjksHO4pCsDw654/twr9nmeExWlI?=
- =?us-ascii?Q?kSbXtE8T8jG081jBCcuRN4hKtykXXMBrqiZACrQXdeEAi7tj3sr7c+RmzGjg?=
- =?us-ascii?Q?tSJB0ZwWeXcZauicNZlXQz+344O9i937oidoAkgWcBIRVonnZM8qChCcOZDY?=
- =?us-ascii?Q?dEFEv5J6yYNkwjDRXVPS//glDFxMrk0dIApC2u5nEHQ6AsU3E23OamA5+Scw?=
- =?us-ascii?Q?Sj1Uaqiik78iygD0iQEpYn7HMVcAklWxBqaScDfflvj7DBgSiAvFJa4e7SxV?=
- =?us-ascii?Q?1DL5RMuSCT0cSH8yIoFOBdXBO0UlvXvr0ycliLsLUf6+G9WF5gec7d8Aolrh?=
- =?us-ascii?Q?msjh15cxhlet7sPf6HuDqRDWVdA4yTzdRaHXnMD0uoC6fMvmz+CUigkThq0G?=
- =?us-ascii?Q?39YRQoc9GmploHzYitjLa+YqTg3Oa5r/qbRG87yAPLZYvJCJYJ1vGrOgUJxH?=
- =?us-ascii?Q?4kZcPzJHk5oZVle2hae/BlCeV+z1Yw7YVArfpignGRTd2Cioia7uVRKQkQhg?=
- =?us-ascii?Q?FcD5kW9Hx7JEaCXcq44RN/BNM8ZHovIHVWeUUk/U74f0wzYgnjGppaUh0eUU?=
- =?us-ascii?Q?3XTHL2P4KgeuyKymBfNYQ+8h3iD0i91Y9yxm+wKKrDeTqfNUC0moPFBKtLjM?=
- =?us-ascii?Q?k+o2E0aCN6gdR8oBeApXq2Ne22zf6ZvZ5lrWuf85K94f6VrPl5uhgh8w627s?=
- =?us-ascii?Q?Y8Nc8NYk48t3JqKYX8ajZ4CHupnfVQi6KJQBcBKV5q2xD8+ZKNYNDE/IMlJF?=
- =?us-ascii?Q?os0sTfL5rbx2F1kpbsHHYnpk9vy27yDP/3fpZx3exoDFqjpiSZMMYXTymrxz?=
- =?us-ascii?Q?pt/z0KLvMNJ/d99wSIKdt0NfmgujAaDGfCgimj5M4U3JYrXsznXm5UEH7FO1?=
- =?us-ascii?Q?oO56jatQ9qOrJ061a1WvCuIA0YxZiMEd8PMiqdUBX6tmXkJC/FvYI1guHD/6?=
- =?us-ascii?Q?ewl7IoIAC1bOmCflx3IEnDs7/IWBtZb06Y4skmpY1hijo0WMdNCNH05K/Yxb?=
- =?us-ascii?Q?Ri+uRSnNhoOQvwGDIgrCN5DRkjYHc42dmYRWEEA6CQCH112Z4gj+ioGPpt2L?=
- =?us-ascii?Q?exlqUAorWTMMthrbyMXFdgoAG8HWNsEJmVLSvSy2YVs9/crI7ZCxWcb0t5/8?=
- =?us-ascii?Q?kYdxb8eLW9SGczQxGd/RNEmxi2DVph+SrFT2khd+gcNfOWbZor8XBSHS0Lho?=
- =?us-ascii?Q?KMPLHjl1Xoio0907QJ3UmlxH+MFzGkZ+kSgqtaRj3hMnOrEAylFs3Q57PWL1?=
- =?us-ascii?Q?Cio9sZh6IR0hEOdm3rSFK3LZePINmvxzwacSHVBrMK2ntoPaF6Y/BZXaPzFU?=
- =?us-ascii?Q?ihmrYLqNUAAqLulrIJ3J0fPx85nyBh8JsOc3x8UX9s07PeUaYKN+kkaK9Ak7?=
- =?us-ascii?Q?XqwNIvEPrO+IQyt+/fmkuV4YpdtcvcMPGPybZMNa934Oqo7FDk6D0gWZpM/O?=
- =?us-ascii?Q?IPxnCkz2838NKuV9MjA4ajHgvWNprbKLZr0tfyD40U/FxRj7jMQnk/RjqpKD?=
- =?us-ascii?Q?WqNdPouCbHSaBVVANX6QbUmkZd7bsIZX8wvokPgYsvx9wZZySVrtJjyaa9FX?=
- =?us-ascii?Q?HA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EF6839E2
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 17:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717003209; cv=none; b=BqraFXw5V1rQsnj4edfnYNoiABE13fwmJYfphA3rIu6luV9g7r05HUCKPqZvKwEa3pzEnnlAkB2lty891ivTCuVvPkmLifh4pTVjPLIhAE5dii7u+fbkbJ4gyDBv6G9lVxu7zP8RffAlDSiaYUqmk/jLHIgmYlNs8iCwU11ndUQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717003209; c=relaxed/simple;
+	bh=jYnfurIQdytmcl47D3eAttdm770xlabKN2+/V75dwLY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OvpmKRxRfLK63zM/FVw1xx8ib0NebT1DQLBgvQUFRihylv4Xt8JEtR15wF8q193gcZ8xSMuTmY9jQqmHyTnMZvEl4Qj/BTZ4CZPh92jeKiQmSIb4VbqwC7oP5AqDYAVj7psDNiwMnZPRP3mu367cH4VOBEM3JeOAazIvvMbMoMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44TH8o1V006591;
+	Wed, 29 May 2024 10:19:56 -0700
+DKIM-Signature: =?UTF-8?Q?v=3D1;_a=3Drsa-sha256;_c=3Drelaxed/relaxed;_d=3Dmeta.com;_h=3Dc?=
+ =?UTF-8?Q?c:content-transfer-encoding:content-type:date:from:message-id:m?=
+ =?UTF-8?Q?ime-version:subject:to;_s=3Ds2048-2021-q4;_bh=3DZoS9DoAcF8SzocN?=
+ =?UTF-8?Q?9vQceCQQUZUTcyEZwFSp7zF3bdlo=3D;_b=3DVJqer7fkc8d9MHOR5blMaDadI9?=
+ =?UTF-8?Q?fSg8tNWLA8MwKHyrAk+FzoOL90z1oXNnPtKzD9U3RV_PDH0KJIf680P5zlkQCVY?=
+ =?UTF-8?Q?IdVdRoF+qLOfgvVh4/LxpsPDndy69Mbs0AKhbV4JMTulz4A3_eR2XG1FciXp5DL?=
+ =?UTF-8?Q?A+Y8cNUKDeE48sWV0uaQ+62FNciCLhqj4JdkxMpZ2V1YlMv4E899LG_OeuNd+0L?=
+ =?UTF-8?Q?1GTtm/E2jMc2Rb38EGVKeiT5vTHO+K0PvOYZz8HXAqca99wZX253hI0Arc9/_WO?=
+ =?UTF-8?Q?3ouZ7ly8ww7xVm3+3cHrm6MTQVrL9RU08Qw2gvVBXr9iOOii5sj6XhRnWSYTHc+?=
+ =?UTF-8?Q?nA3_dA=3D=3D_?=
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3ye1y8u01a-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 29 May 2024 10:19:56 -0700
+Received: from devvm4158.cln0.facebook.com (2620:10d:c085:208::11) by
+ mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server id
+ 15.2.1544.11; Wed, 29 May 2024 17:19:53 +0000
+From: Vadim Fedorenko <vadfed@meta.com>
+To: Michael Chan <michael.chan@broadcom.com>,
+        Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>
+CC: Richard Cochran <richardcochran@gmail.com>, <netdev@vger.kernel.org>,
+        Vadim Fedorenko <vadfed@meta.com>
+Subject: [PATCH net-next] bnxt_en: add timestamping statistics support
+Date: Wed, 29 May 2024 10:19:46 -0700
+Message-ID: <20240529171946.2866274-1-vadfed@meta.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8429.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f80822ef-b29a-451e-ef3f-08dc800227fd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 May 2024 17:09:52.8490
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 27Hi5pfxO6ZNcDMsdEsEN0f2dUiN4pHs2b1wSRVI1hVDal+ejEVdocMY5ggYV4PiOfZOOH+lOzCRE+pYBPVjdDBUknRG4x26qWNeuDZZvLIkFTPNHA+PEnkwIB1R4w38
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8581
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: wKY8J4KElHyfpz4iYYNVoHSgAXxoyImW
+X-Proofpoint-GUID: wKY8J4KElHyfpz4iYYNVoHSgAXxoyImW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-29_13,2024-05-28_01,2024-05-17_01
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of K=
-aren Ostrowska
-> Sent: Tuesday, May 28, 2024 2:32 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Joyner, Eric <eric.joyner@intel.com>; netdev@vger.kernel.org; Kitszel=
-, Przemyslaw <przemyslaw.kitszel@intel.com>; Ostrowska, Karen <karen.ostrow=
-ska@intel.com>; Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Subject: [Intel-wired-lan] [iwl-next v1] ice: Check all ice_vsi_rebuild()=
- errors in function
->
-> From: Eric Joyner <eric.joyner@intel.com>
->
-> Check the return value from ice_vsi_rebuild() and prevent the usage of in=
-correctly configured VSI.
->
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Eric Joyner <eric.joyner@intel.com>
-> Signed-off-by: Karen Ostrowska <karen.ostrowska@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_main.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
->
+The ethtool_ts_stats structure was introduced earlier this year. Now
+it's time to support this group of counters in more drivers.
+This patch adds support to bnxt driver.
 
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
-ntingent worker at Intel)
+Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c      | 18 +++++++++++++-----
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c  | 18 ++++++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c  | 18 ++++++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h  |  8 ++++++++
+ 4 files changed, 57 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index c437ca1c0fd3..f3db8b0fbbe6 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -512,8 +512,11 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)) {
+ 		struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
+ 
+-		if (ptp && ptp->tx_tstamp_en && !skb_is_gso(skb) &&
+-		    atomic_dec_if_positive(&ptp->tx_avail) >= 0) {
++		if (ptp && ptp->tx_tstamp_en && !skb_is_gso(skb)) {
++			if (!atomic_dec_if_positive(&ptp->tx_avail)) {
++				atomic64_inc(&ptp->stats->ts_err);
++				goto tx_no_ts;
++			}
+ 			if (!bnxt_ptp_parse(skb, &ptp->tx_seqid,
+ 					    &ptp->tx_hdr_off)) {
+ 				if (vlan_tag_flags)
+@@ -526,6 +529,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		}
+ 	}
+ 
++tx_no_ts:
+ 	if (unlikely(skb->no_fcs))
+ 		lflags |= cpu_to_le32(TX_BD_FLAGS_NO_CRC);
+ 
+@@ -732,8 +736,10 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	return NETDEV_TX_OK;
+ 
+ tx_dma_error:
+-	if (BNXT_TX_PTP_IS_SET(lflags))
++	if (BNXT_TX_PTP_IS_SET(lflags)) {
++		atomic64_inc(&bp->ptp_cfg->stats->ts_err);
+ 		atomic_inc(&bp->ptp_cfg->tx_avail);
++	}
+ 
+ 	last_frag = i;
+ 
+@@ -812,10 +818,12 @@ static void __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
+ 		if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_IN_PROGRESS)) {
+ 			if (BNXT_CHIP_P5(bp)) {
+ 				/* PTP worker takes ownership of the skb */
+-				if (!bnxt_get_tx_ts_p5(bp, skb))
++				if (!bnxt_get_tx_ts_p5(bp, skb)) {
+ 					skb = NULL;
+-				else
++				} else {
++					atomic64_inc(&bp->ptp_cfg->stats->ts_err);
+ 					atomic_inc(&bp->ptp_cfg->tx_avail);
++				}
+ 			}
+ 		}
+ 
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index 8763f8a01457..594e9967c591 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -5233,6 +5233,23 @@ static void bnxt_get_rmon_stats(struct net_device *dev,
+ 	*ranges = bnxt_rmon_ranges;
+ }
+ 
++static void bnxt_get_ptp_stats(struct net_device *dev,
++			       struct ethtool_ts_stats *ts_stats)
++{
++	struct bnxt *bp = netdev_priv(dev);
++	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
++
++	if (ptp) {
++		ts_stats->pkts = ptp->stats->ts_pkts;
++		ts_stats->lost = ptp->stats->ts_lost;
++		ts_stats->err = atomic64_read(&ptp->stats->ts_err);
++	} else {
++		ts_stats->pkts = 0;
++		ts_stats->err = 0;
++		ts_stats->lost = 0;
++	}
++}
++
+ static void bnxt_get_link_ext_stats(struct net_device *dev,
+ 				    struct ethtool_link_ext_stats *stats)
+ {
+@@ -5316,4 +5333,5 @@ const struct ethtool_ops bnxt_ethtool_ops = {
+ 	.get_eth_mac_stats	= bnxt_get_eth_mac_stats,
+ 	.get_eth_ctrl_stats	= bnxt_get_eth_ctrl_stats,
+ 	.get_rmon_stats		= bnxt_get_rmon_stats,
++	.get_ts_stats		= bnxt_get_ptp_stats,
+ };
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+index e661ab154d6b..f75bcb8d43c0 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+@@ -696,11 +696,13 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
+ 		spin_unlock_bh(&ptp->ptp_lock);
+ 		timestamp.hwtstamp = ns_to_ktime(ns);
+ 		skb_tstamp_tx(ptp->tx_skb, &timestamp);
++		ptp->stats->ts_pkts++;
+ 	} else {
+ 		if (!time_after_eq(jiffies, ptp->abs_txts_tmo)) {
+ 			ptp->txts_pending = true;
+ 			return;
+ 		}
++		ptp->stats->ts_lost++;
+ 		netdev_warn_once(bp->dev,
+ 				 "TS query for TX timer failed rc = %x\n", rc);
+ 	}
+@@ -979,6 +981,18 @@ int bnxt_ptp_init(struct bnxt *bp, bool phc_cfg)
+ 		rc = err;
+ 		goto out;
+ 	}
++	if (!ptp->stats) {
++		ptp->stats = kzalloc(sizeof(*ptp->stats), GFP_KERNEL);
++		if (!ptp->stats) {
++			rc = -ENOMEM;
++			goto out;
++		}
++		atomic64_set(&ptp->stats->ts_err, 0);
++	} else {
++		ptp->stats->ts_pkts = 0;
++		ptp->stats->ts_lost = 0;
++		atomic64_set(&ptp->stats->ts_err, 0);
++	}
+ 	if (BNXT_CHIP_P5(bp)) {
+ 		spin_lock_bh(&ptp->ptp_lock);
+ 		bnxt_refclk_read(bp, NULL, &ptp->current_time);
+@@ -1013,5 +1027,9 @@ void bnxt_ptp_clear(struct bnxt *bp)
+ 		dev_kfree_skb_any(ptp->tx_skb);
+ 		ptp->tx_skb = NULL;
+ 	}
++
++	kfree(ptp->stats);
++	ptp->stats = NULL;
++
+ 	bnxt_unmap_ptp_regs(bp);
+ }
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+index 2c3415c8fc03..589e093b1608 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
+@@ -79,6 +79,12 @@ struct bnxt_pps {
+ 	struct pps_pin pins[BNXT_MAX_TSIO_PINS];
+ };
+ 
++struct bnxt_ptp_stats {
++	u64		ts_pkts;
++	u64		ts_lost;
++	atomic64_t	ts_err;
++};
++
+ struct bnxt_ptp_cfg {
+ 	struct ptp_clock_info	ptp_info;
+ 	struct ptp_clock	*ptp_clock;
+@@ -125,6 +131,8 @@ struct bnxt_ptp_cfg {
+ 	u32			refclk_mapped_regs[2];
+ 	u32			txts_tmo;
+ 	unsigned long		abs_txts_tmo;
++
++	struct bnxt_ptp_stats	*stats;
+ };
+ 
+ #if BITS_PER_LONG == 32
+-- 
+2.43.0
 
 
