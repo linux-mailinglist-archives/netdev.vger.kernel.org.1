@@ -1,150 +1,96 @@
-Return-Path: <netdev+bounces-99168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 791B28D3E79
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 20:39:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB9248D3E8C
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 20:50:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31078284C16
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:39:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD72E1C21797
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DD301C230F;
-	Wed, 29 May 2024 18:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C89315B139;
+	Wed, 29 May 2024 18:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ouNulVwo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LB3fCxMz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A661C1C2305;
-	Wed, 29 May 2024 18:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 083821386A7
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 18:50:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717007984; cv=none; b=bgR8cNpTBW2ouoSxfYrHfiqmERyCK4K85KIzmCcZg5xlri/8GWYgh9gIcxCjsqVxk7I+yK1w7g9JIN7BZFn1/lFm4mrpkwaSZ+Tqt6g/P90rYszSK7jk2aAstnzK410Zuzx+2r8bIAaEofeirYBcr2rb5+pMLDKgl11q5Rb1QZA=
+	t=1717008634; cv=none; b=HikvkrTPAO9FeoC4zt4krEXFym7bKEsbZj260D+QKBqSCyTOw5ygZIMG7ktGZDuEJPYMTGRbvnEo0v5EpK8bo7s2v460fEXXl9NQ8CQd6ipUo2e69lmch0V4mDN/ooMl2KuYMtUkogsxOo1OafwO5GMR3fo2g9qB3ue7nqvlXRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717007984; c=relaxed/simple;
-	bh=DhNEauDfI97TAmjRWu2qRxUMXDkWyhLuWuOVMey/HyE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=hN3tVcNMpRP9stT6HNMJwqu9V9+6C0fv7n1KtEK9F6ea3TkH9dct8HDld66hqivV4w5BD2tcUtmkTpbNUtxYTPaoefhqYQ221vLpnCZj6AqtcZtNTtJ3jgN9SSsMLvgFqalJEUXQL0w2ADUc3e2deF3aW144eHWqnraljimmqAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ouNulVwo; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44TAEldM017183;
-	Wed, 29 May 2024 18:39:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=q6mgGgupOvxmpqFBBvg9jB
-	QlqS0t6X5bAyhR+6y3Ers=; b=ouNulVwoaMnXsuTCbjYy85bQA8Rpx8A1Xb9Sys
-	h3UpNUvj1MtaxnxtXGPVr1YxEBgAcLtr1syDshx+Y0JpuNBsc+vKm6AIxtq2g7gq
-	FP6twFribyeEGuPaguOEm3AyAvRn1Q5dKCmbx/GWIoDiZP/e7nMI4iWTa7R+hPuL
-	44eDS9qq3K8VoQdG4dF8SEpH7l4HB7wRPQwbP1EKai6rPOTnP77SwMfegt0TcFPB
-	DCLQnXnIBSBXb0nMxGeLeo426WUS2J3BkZ4+WbpLxZRFwEy9oxAuKnlrw5QShTbG
-	WrPPI0AHlz9f66UKFfb3vIxT7927vvNY269wK50XjVTx8/IA==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yba2nj2cq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 May 2024 18:39:16 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 44TIdFue009060
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 May 2024 18:39:15 GMT
-Received: from hu-scheluve-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 29 May 2024 11:39:14 -0700
-From: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Date: Wed, 29 May 2024 11:39:04 -0700
-Subject: [PATCH] net: stmmac: dwmac-qcom-ethqos: Configure host DMA width
+	s=arc-20240116; t=1717008634; c=relaxed/simple;
+	bh=HG2GGsGQpkpTUKw//p2QoG1jCbO3GPUzgAaZm/6PXC8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mLk4MUt1zTy+8L9SuHT28XcjisW7Q0wRJNfoC5k/uvSnFXQbOo+5HbcK4Q3V20oxwO5WRTENui3QItNjsWaJnNe2eEyXxw3eOFRoXf0a8v/BvRFLvJQbSKy580eZOz8QEFqkOSlDaNr+WXgmr+jEkUxhuYWedCg4CkuRcIb7O/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LB3fCxMz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13D94C113CC;
+	Wed, 29 May 2024 18:50:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717008633;
+	bh=HG2GGsGQpkpTUKw//p2QoG1jCbO3GPUzgAaZm/6PXC8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LB3fCxMzP7pQrVstCygdUO9yY0O1GrhFRKVp6TtgmnSDtRzjzTTLl6QLGiFpgkG0z
+	 Zy1RAtR0Xo6ESxb14xOmOY0nC3vlsp8/0+zsRFHtdCsm6xGsi7MFdt3yiFjfTdDHXt
+	 9YRvQndIt0rQXGOGmomjSKL4cz25dLZPmCH2KWwZVmVeopQU7v8P8dXkQx4GCViIHY
+	 6mopDvj6iswm7LOyTX2xFOI45n4HV8/n+v0lCmy4a+p7sCmc/tF+srvKbX6OT3UXt5
+	 3IutqpZeKOotZySVJ8bp7+A4K2r0A1zvDhr3jVbUIrrrWXoKTrl+1zf2vVf7bg0HsW
+	 dGiytTL4Mq75w==
+Date: Wed, 29 May 2024 11:50:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Boris Pismenny <borisp@nvidia.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com,
+ willemdebruijn.kernel@gmail.com, gal@nvidia.com, cratiu@nvidia.com,
+ rrameshbabu@nvidia.com, steffen.klassert@secunet.com, tariqt@nvidia.com,
+ jgg@nvidia.com
+Subject: Re: [RFC net-next 00/15] add basic PSP encryption for TCP
+ connections
+Message-ID: <20240529115032.48d103eb@kernel.org>
+In-Reply-To: <3da2a55d-bb82-47ff-b798-ca28bafd7a7d@nvidia.com>
+References: <20240510030435.120935-1-kuba@kernel.org>
+	<3da2a55d-bb82-47ff-b798-ca28bafd7a7d@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-ID: <20240529-configure_ethernet_host_dma_width-v1-1-3f2707851adf@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIAEh2V2YC/x3NywrDIBBG4VcJs64QpRbsq5QiwfkTZ1Eto71Ay
- LtXuvw25+zUoIJG12knxVua1DJgTxOlvJQNRniY3OzOs7fepFpW2V6KiJ6hBT3m2nrkxxI/wj2
- bdLGBvXchOKbReSpW+f4ft/tx/ADpmka/cwAAAA==
-To: Vinod Koul <vkoul@kernel.org>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Jochen Henneberg <jh@henneberg-systemdesign.com>
-CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        "Sagar Cheluvegowda" <quic_scheluve@quicinc.com>
-X-Mailer: b4 0.13.0
-X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: r19ogSDgF-B-g4W12boA6fUbXRYbygwK
-X-Proofpoint-GUID: r19ogSDgF-B-g4W12boA6fUbXRYbygwK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-29_15,2024-05-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 spamscore=0
- phishscore=0 suspectscore=0 mlxlogscore=999 malwarescore=0 impostorscore=0
- lowpriorityscore=0 adultscore=0 priorityscore=1501 mlxscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2405170001
- definitions=main-2405290129
 
-Fixes: 070246e4674b ("net: stmmac: Fix for mismatched host/device DMA address width")
-Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
----
-Change-Id: Ifdf3490c6f0dd55afc062974c05acce42d5fb6a7
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 4 ++++
- 1 file changed, 4 insertions(+)
+On Wed, 29 May 2024 11:16:12 +0200 Boris Pismenny wrote:
+> Thank you for doing this. I agree that TLS-like socket support
+> is a main use-case. I'd like to hear what you think on a few
+> other use-cases that I think should be considered as well
+> since it may be difficult to add them as an afterthought:
+> - Tunnel mode. What are your plans for tunnel mode? Clearly it
+> is different from the current approach in some aspects, for
+> example, no sockets will be involved.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index e254b21fdb59..65d7370b47d5 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -93,6 +93,7 @@ struct ethqos_emac_driver_data {
- 	bool has_emac_ge_3;
- 	const char *link_clk_name;
- 	bool has_integrated_pcs;
-+	u32 dma_addr_width;
- 	struct dwmac4_addrs dwmac4_addrs;
- };
- 
-@@ -276,6 +277,7 @@ static const struct ethqos_emac_driver_data emac_v4_0_0_data = {
- 	.has_emac_ge_3 = true,
- 	.link_clk_name = "phyaux",
- 	.has_integrated_pcs = true,
-+	.dma_addr_width = 36,
- 	.dwmac4_addrs = {
- 		.dma_chan = 0x00008100,
- 		.dma_chan_offset = 0x1000,
-@@ -845,6 +847,8 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 		plat_dat->flags |= STMMAC_FLAG_RX_CLK_RUNS_IN_LPI;
- 	if (data->has_integrated_pcs)
- 		plat_dat->flags |= STMMAC_FLAG_HAS_INTEGRATED_PCS;
-+	if (data->dma_addr_width)
-+		plat_dat->host_dma_width = data->dma_addr_width;
- 
- 	if (ethqos->serdes_phy) {
- 		plat_dat->serdes_powerup = qcom_ethqos_serdes_powerup;
+The drivers should only decap for known L4 protos, I think that's
+the only catch when we add tunnel support. Otherwise it should be
+fairly straightforward. Open a UDP socket in the kernel. Get a key
++ SPI using existing ops. Demux within the UDP socket using SPI.
 
----
-base-commit: 1b10b390d945a19747d75b34a6e01035ac7b9155
-change-id: 20240515-configure_ethernet_host_dma_width-c619d552992d
+> - RDMA. The ultra ethernet group has mentioned RDMA encryption
+> using PSP. Do you think that RDMA verbs will support PSP in
+> a similar manner to sockets? i.e., using netlink to pass
+> parameters to the device and linking QPs to PSP SAs?
+> - Virtualization. How does PSP work from a VM? is the key
+> shared with the hypervisor or is it private per-VM?
 
-Best regards,
--- 
-Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+Depends on the deployment and security model, really, but I'd
+expect the device key is shared, hypervisor is responsible for
+rotations, and mediates all key ops from the guests.
 
+> and what about containers?
+
+I tried to apply some of the lessons learned from TLS offload and made
+the "PSP device" a separate object. This should make it easy to
+"forward" the offload to software/container netdevs.
 
