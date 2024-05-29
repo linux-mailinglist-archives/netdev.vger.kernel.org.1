@@ -1,111 +1,102 @@
-Return-Path: <netdev+bounces-99119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B98EC8D3BD5
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:06:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46E6F8D3BD9
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:07:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9CB11C23533
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:06:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA82E1F249CA
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 941B619066D;
-	Wed, 29 May 2024 16:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5532F181D1D;
+	Wed, 29 May 2024 16:06:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="V4InFzGM"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nOkzWmVk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-227.siemens.flowmailer.net (mta-64-227.siemens.flowmailer.net [185.136.64.227])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAC5D1836FE
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 16:05:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C9417DE14;
+	Wed, 29 May 2024 16:06:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716998746; cv=none; b=U4cRW1KQBI3zDZxTCpIk9FhATk+g6Bw2xmoBVNh0pYmcOkOaOVDJYEXmO9WSjoVz9icXNbwvlHI4daMMbhcykskACbNZWyN4m98+gHUmb/XAns1bhb09v2YEvf25Ky6mDSoF3YKR8GQ5VfTF5H+JwrE7fiMlzQxG8EGWzTPJABY=
+	t=1716998765; cv=none; b=hCf5BRdB+VZfJbqeElApTHhZdUQBv6KPlhvKL+OmmXD29Uy53/PZlIMiwzkckhWYu+xxSDzeHLAeD/ZjUuGrjKstl0jgn6f9Aoc57uHkTkYZNEnsa2nXS32r7ysEtSPmWP/S6Z0FQJPSahuw924o+L9wG5gDTjsz8hbL/5DluEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716998746; c=relaxed/simple;
-	bh=g50rqN+Tm9GE6hG8Rzf5OPuU0+TursRCfv71e/S09L4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=HpIlZp3f1GWL+Ab17CnfA8oypmBMF/fte5/3vUZry0vTkKFGo4Mq+HWFsM4TcsVuYc8WC5sbiiluX64fks/WAFFNethtTfwALOnpVJrFqHRS1QcTYDPbOYfOb1k+RFkCS6xpfQSZGL8znA7Zbiq/iGvE4M61ZFRLAI1W7Oaz8O4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=V4InFzGM; arc=none smtp.client-ip=185.136.64.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-64-227.siemens.flowmailer.net with ESMTPSA id 202405291605377dedeaa73032ebe4a7
-        for <netdev@vger.kernel.org>;
-        Wed, 29 May 2024 18:05:37 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
- d=siemens.com; i=diogo.ivo@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=TfT54JdgHXhlK7CXHcRDEC9PIR72E7rEaipmJkiIs44=;
- b=V4InFzGM6fHhEJITpqcpNZGvhk9K3K7gs7ZRbL5vIuMhrPl1qMqwDPZEkf3s1cSNoAokoE
- P47WRciE+iHMbzCPxhpwRY169po2/TCQEqBN2lcZnSfJbqzVWPFNuFh42RmnVfh9UIfn1wTt
- bYtCaEpUx31XTjjZfvRZQRHf4eLgA=;
-From: Diogo Ivo <diogo.ivo@siemens.com>
-Date: Wed, 29 May 2024 17:05:12 +0100
-Subject: [PATCH 3/3] arm64: dts: ti: iot2050: Add IEP interrupts for SR1.0
- devices
+	s=arc-20240116; t=1716998765; c=relaxed/simple;
+	bh=CK8OAPbBbXSoOWPUjOyns04q5VfwYNuBKWySKS482EI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TsyGa+U7oIRuQ3/oSY8hvrlZy2k6LiZqsFpLHQfyeaOnbL9xIkgMsiTw85+1lZKvyEwP9U0/6DdASwgflVvKqmgGKtYPU5KUQolXDuxlPrClTukM5DHldASN3dCLZOGakx5jMeqaTY1RNBjsdIHzQCjkcDbnzpVbPAoKHWXGViE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nOkzWmVk; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 84BBB60005;
+	Wed, 29 May 2024 16:05:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1716998759;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=seDn1vi/ugGwlftgDNRlK7URLt36H1AKmJnfJmt6SmQ=;
+	b=nOkzWmVkHiv5suXZbHQNJKWlM24kofPWPIRmyjduQrM9+ukK4C/yJY9l0/nTT0dAU1ZrSl
+	OCcAcu3TnwA2iohmkJfkHAHcrVGPo97acCokRvBoUlVyhPBcFnwaZsOxfex4pbuXyEMEO1
+	Pz27VosTUyOwdWuC3djd10lUeGrLSJl5NwKpV7aweNF3QdS3ciYHigwbFo02TRw8TuXV0P
+	Bebp65AInAGdRbwoECQOrz8yMmd+11GkyShRCaY8Q3BsgJMBmWAvGZ1vLlhO3YKyM5uwxa
+	ongV+jkwxhSJUEJesYbgzFLhN5aC+IedJBJIK+hf54hqHAncfw3qGyubDfgm7g==
+Date: Wed, 29 May 2024 18:05:56 +0200
+From: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: Re: [PATCH net-next v13 09/14] net: Add the possibility to support
+ a selected hwtstamp in netdevice
+Message-ID: <20240529180556.0e500675@windsurf>
+In-Reply-To: <20240529175032.54070c60@kmaincent-XPS-13-7390>
+References: <20240529-feature_ptp_netnext-v13-0-6eda4d40fa4f@bootlin.com>
+	<20240529-feature_ptp_netnext-v13-9-6eda4d40fa4f@bootlin.com>
+	<20240529082111.1a1cbf1e@kernel.org>
+	<20240529175032.54070c60@kmaincent-XPS-13-7390>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240529-iep-v1-3-7273c07592d3@siemens.com>
-References: <20240529-iep-v1-0-7273c07592d3@siemens.com>
-In-Reply-To: <20240529-iep-v1-0-7273c07592d3@siemens.com>
-To: MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, Nishanth Menon <nm@ti.com>, 
- Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Jan Kiszka <jan.kiszka@siemens.com>
-Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
- Diogo Ivo <diogo.ivo@siemens.com>
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1716998732; l=898;
- i=diogo.ivo@siemens.com; s=20240529; h=from:subject:message-id;
- bh=g50rqN+Tm9GE6hG8Rzf5OPuU0+TursRCfv71e/S09L4=;
- b=ez+4KvjIglEVGUOcGVJpiCU75C2K3vojXCXuTE5agPXOB+rX2WZPnCQbyEwHMu3xw/SpOgjYH
- gC6UVyDC2BTDubP2XHfryyKEg9o11nCbYkvJkFd1fr3Ks3GpVU8XWB2
-X-Developer-Key: i=diogo.ivo@siemens.com; a=ed25519;
- pk=BRGXhMh1q5KDlZ9y2B8SodFFY8FGupal+NMtJPwRpUQ=
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-1320519:519-21489:flowmailer
+X-GND-Sasl: thomas.petazzoni@bootlin.com
 
-Add the interrupts needed for PTP Hardware Clock support via IEP
-in SR1.0 devices.
+On Wed, 29 May 2024 17:50:32 +0200
+Kory Maincent <kory.maincent@bootlin.com> wrote:
 
-Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
----
- arch/arm64/boot/dts/ti/k3-am65-iot2050-common-pg1.dtsi | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+> > ERROR: modpost: "ptp_clock_phydev" [drivers/net/phy/libphy.ko] undefined!  
+> 
+> Thanks for the report.
+> Weird, it should be in builtin code.
 
-diff --git a/arch/arm64/boot/dts/ti/k3-am65-iot2050-common-pg1.dtsi b/arch/arm64/boot/dts/ti/k3-am65-iot2050-common-pg1.dtsi
-index ef7897763ef8..0a29ed172215 100644
---- a/arch/arm64/boot/dts/ti/k3-am65-iot2050-common-pg1.dtsi
-+++ b/arch/arm64/boot/dts/ti/k3-am65-iot2050-common-pg1.dtsi
-@@ -73,3 +73,15 @@ &icssg0_eth {
- 		    "rx0", "rx1",
- 		    "rxmgm0", "rxmgm1";
- };
-+
-+&icssg0_iep0 {
-+	interrupt-parent = <&icssg0_intc>;
-+	interrupts = <7 7 7>;
-+	interrupt-names = "iep_cap_cmp";
-+};
-+
-+&icssg0_iep1 {
-+	interrupt-parent = <&icssg0_intc>;
-+	interrupts = <56 8 8>;
-+	interrupt-names = "iep_cap_cmp";
-+};
+Right, but you don't have an EXPORT_SYMBOL() for it, as far as I can see.
 
+Thomas
 -- 
-2.45.1
-
+Thomas Petazzoni, co-owner and CEO, Bootlin
+Embedded Linux and Kernel engineering and training
+https://bootlin.com
 
