@@ -1,102 +1,82 @@
-Return-Path: <netdev+bounces-99120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46E6F8D3BD9
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:07:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C4028D3C2D
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:24:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA82E1F249CA
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:07:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C271F287BF2
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:23:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5532F181D1D;
-	Wed, 29 May 2024 16:06:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B7F1836FA;
+	Wed, 29 May 2024 16:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nOkzWmVk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ifUw8N9z"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C9417DE14;
-	Wed, 29 May 2024 16:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655FF1836F7
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 16:23:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716998765; cv=none; b=hCf5BRdB+VZfJbqeElApTHhZdUQBv6KPlhvKL+OmmXD29Uy53/PZlIMiwzkckhWYu+xxSDzeHLAeD/ZjUuGrjKstl0jgn6f9Aoc57uHkTkYZNEnsa2nXS32r7ysEtSPmWP/S6Z0FQJPSahuw924o+L9wG5gDTjsz8hbL/5DluEc=
+	t=1716999819; cv=none; b=DsLZCcjyVzj7e/fHA7L4SJfONYk67cn7BKiOleSlGmsvIvr5o5cMLWeSePzX00w71zNC3CRQN4AXS6MEhRV7bScB4ztb/rukGpM8Y5qrTPdQbi6AVX1Fidh6rugnciPnOQmj6Kj6kKB7OJiAV73e8OhRaWyD8HYIAsUa3X92k3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716998765; c=relaxed/simple;
-	bh=CK8OAPbBbXSoOWPUjOyns04q5VfwYNuBKWySKS482EI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TsyGa+U7oIRuQ3/oSY8hvrlZy2k6LiZqsFpLHQfyeaOnbL9xIkgMsiTw85+1lZKvyEwP9U0/6DdASwgflVvKqmgGKtYPU5KUQolXDuxlPrClTukM5DHldASN3dCLZOGakx5jMeqaTY1RNBjsdIHzQCjkcDbnzpVbPAoKHWXGViE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nOkzWmVk; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 84BBB60005;
-	Wed, 29 May 2024 16:05:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1716998759;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=seDn1vi/ugGwlftgDNRlK7URLt36H1AKmJnfJmt6SmQ=;
-	b=nOkzWmVkHiv5suXZbHQNJKWlM24kofPWPIRmyjduQrM9+ukK4C/yJY9l0/nTT0dAU1ZrSl
-	OCcAcu3TnwA2iohmkJfkHAHcrVGPo97acCokRvBoUlVyhPBcFnwaZsOxfex4pbuXyEMEO1
-	Pz27VosTUyOwdWuC3djd10lUeGrLSJl5NwKpV7aweNF3QdS3ciYHigwbFo02TRw8TuXV0P
-	Bebp65AInAGdRbwoECQOrz8yMmd+11GkyShRCaY8Q3BsgJMBmWAvGZ1vLlhO3YKyM5uwxa
-	ongV+jkwxhSJUEJesYbgzFLhN5aC+IedJBJIK+hf54hqHAncfw3qGyubDfgm7g==
-Date: Wed, 29 May 2024 18:05:56 +0200
-From: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: Re: [PATCH net-next v13 09/14] net: Add the possibility to support
- a selected hwtstamp in netdevice
-Message-ID: <20240529180556.0e500675@windsurf>
-In-Reply-To: <20240529175032.54070c60@kmaincent-XPS-13-7390>
-References: <20240529-feature_ptp_netnext-v13-0-6eda4d40fa4f@bootlin.com>
-	<20240529-feature_ptp_netnext-v13-9-6eda4d40fa4f@bootlin.com>
-	<20240529082111.1a1cbf1e@kernel.org>
-	<20240529175032.54070c60@kmaincent-XPS-13-7390>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1716999819; c=relaxed/simple;
+	bh=MAo/RtDbAPubySLxRz8L4XClT1s5l342iQrh+2yM7eM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=SbMS2/MAncWlHCxZ/8+auors6ga3Yg6FW4dvWGNQXXXZ023wcx5SeHPUfpOu0UnJAAOzH3cc8ZAj3bxo2T5F6V18fGveqrBkVs5Uq5iGEBVYZg15uSKy81ssJ4UmAVvb5jYHD5n82FqeZcNEbxWksAOW23cnNPEDSDunmQ2H3L4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ifUw8N9z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2190C113CC;
+	Wed, 29 May 2024 16:23:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716999818;
+	bh=MAo/RtDbAPubySLxRz8L4XClT1s5l342iQrh+2yM7eM=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=ifUw8N9zMj6YQf5ds/sNe4HbY//Rfh2m+IJJggaCxFXUifwzKjFmaaf+G3SusnUwJ
+	 LRjDrbgmxkTIcslG0ySLAk3W6xbttwaAB+OEqA1dQQrtMrQyTbQ1VKKFgI+KlMAAIL
+	 Ln5uI/lOE2JSAmB1BXeiXAz1KYomVGuvZd7SPdTSiyA3d8vDE4nGpSqi5dsivdvyNE
+	 afcyCrCJTUcI1Eq4XZP5QuzAQqoeYMCUKaAiNxouhitelCUGSRDew5pUK/ntA028fB
+	 9lv1m0hTPAjeuC13Mn47ZgHYHJG48Az9rNrvDP4anGeqTH47mTqYOfETUCuWeWFkDn
+	 oAoYv7mJSfIYQ==
+Message-ID: <f8dc2692-6a17-431c-95de-ed32c0b82d59@kernel.org>
+Date: Wed, 29 May 2024 10:23:37 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] iproute2: color: default to dark background
+Content-Language: en-US
+To: Gedalya Nie <gedalya@gedalya.net>, netdev@vger.kernel.org
+References: <E1s9tE4-00000006L4I-46tH@ws2.gedalya.net>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <E1s9tE4-00000006L4I-46tH@ws2.gedalya.net>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-GND-Sasl: thomas.petazzoni@bootlin.com
 
-On Wed, 29 May 2024 17:50:32 +0200
-Kory Maincent <kory.maincent@bootlin.com> wrote:
+On 5/22/24 12:43 PM, Gedalya Nie wrote:
+> Since the COLORFGBG environment variable isn't always there, and
+> anyway it seems that terminals and consoles more commonly default
+> to dark backgrounds, make that assumption here.
 
-> > ERROR: modpost: "ptp_clock_phydev" [drivers/net/phy/libphy.ko] undefined!  
+Huge assumption. For example, I have one setup that defaults to dark
+mode and another that defaults to light mode.
+
 > 
-> Thanks for the report.
-> Weird, it should be in builtin code.
+> Currently the iproute2 tools produce output that is hard to read
+> when color is enabled and the background is dark.
 
-Right, but you don't have an EXPORT_SYMBOL() for it, as far as I can see.
+I agree with that statement, but the tools need to figure out the dark
+vs light and adjust. We can't play games and guess what the right
+default is.
 
-Thomas
--- 
-Thomas Petazzoni, co-owner and CEO, Bootlin
-Embedded Linux and Kernel engineering and training
-https://bootlin.com
+
+
+--
+pw-bot: reject
 
