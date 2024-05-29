@@ -1,129 +1,135 @@
-Return-Path: <netdev+bounces-98864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F08F58D2B81
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 05:32:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DDC98D2B94
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 05:59:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5C551F2105A
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 03:32:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0C791F24F23
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 03:59:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB2D015B126;
-	Wed, 29 May 2024 03:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70E715B144;
+	Wed, 29 May 2024 03:59:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ZAMlduDg"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="q0Xx0aQM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286AE273DC;
-	Wed, 29 May 2024 03:32:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9833E2B2CF;
+	Wed, 29 May 2024 03:59:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716953561; cv=none; b=KK2GPsCdA9SJnDjefiuZwXteaJDobaXDwDrD2joIrHO1p+pj/iQv/Y0mmpBo9QPaAkyp4sdHmZxTbrHdIhzItZ+GDV13jkn5EpAxDwj3W/H9Nk3weHx7Id/3KSvRBRM070jVo9DGksO0I/b9KhgBXU6hqRY6m5ok/sG3rd5J2gE=
+	t=1716955158; cv=none; b=KNWvTEgyGidPGZZAcC3FOHp7DnRBOeMj0UD7vxQWf6P7e/CMhK7WHRlmF6dOgqHdDyX50XqGjhcI6M7WG/AC+Ck/yp3fRAoyjpazFmmsveBPhAoiEUwsadB2CZr21K540sKsRNgoad6J06HGdFcVFF+fqZSf//lii1YIPuEpnko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716953561; c=relaxed/simple;
-	bh=mGmvsLYGbl5StfulFfKED3RI+RHo0mK8xf/sBiNNDys=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=b8vAbggc1ey1IdfL/VTG9HhyA0aZJds3dDD84NdAoTU9ATW/bclJ+zEBB2q+ED3XBamTpwSck8AYLFVR6SLgihwOOI+X6HOhyDRMTsh/JoiGXJRQuMZzVJakiGY9pE15tj2OweWFDmUoUqy8WNoOXWCozzXnLLSLYRb5yoW7uwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ZAMlduDg; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44T1TsHn026579;
-	Wed, 29 May 2024 03:32:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	UeX9dqG5LNZnU0NJjRWeuKT/wg9QJproSNKHyt1TmhY=; b=ZAMlduDgGLjvPXJj
-	H8F2s3A6mSb7i2usmMFb0W0dS1bmYdKWI1DtBK+QvQU+P3c3YzqOcU+izDxJM8ei
-	8ZTqY3wK4ElBLJbQfEqLn2I0TNzmRxqOeb7znHG4oQfqIGtuEDRZUrqVVxUtPEDi
-	ty1gJg0ZBvKiL8yU7O1xJcVNxhkBWC2YwyAiDFsSnGsOxL/xtVYnE9LLRKqvyv93
-	6ri8HLjKlNRa7inU3Bv+I5hpjqMs5SXzCmXrRGHEnihybDP+ybOFs3gDnqBJPS4X
-	jQVKdTDXea2jS1qMjJrMAVvOPB+Romdg9Oefowr7bhhyIE1A479Sf9OBVp9QJIkb
-	NcBGJA==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yba0qfv8a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 May 2024 03:32:12 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 44T3WAfB002500
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 May 2024 03:32:10 GMT
-Received: from [10.110.47.143] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 28 May
- 2024 20:32:06 -0700
-Message-ID: <ecac6276-c2e1-43b8-88ad-6ae91cff18cf@quicinc.com>
-Date: Tue, 28 May 2024 20:32:05 -0700
+	s=arc-20240116; t=1716955158; c=relaxed/simple;
+	bh=MzV/RmRZkPTd+jBBOwrHOy3AJmBC0jmJ8OAzoazNJOo=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=pLqB243HhkPvzp1+9mKx+qHfB6WwpZBgeHL2b38myrZ+OCdJUq8xW/szbTsaQW/uwEdJJvhx21c3YhwLFs3ogQcSB0NfAzpQABpWfi2oybCa3CY8k4foSNZ+2rqc+YFKk7fg4Dgmqjr1zxwOV7Pu2OYpKMykZ50iV3cnnEJZqn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=q0Xx0aQM; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1716955153; h=From:To:Subject:Date:Message-Id;
+	bh=fMRDSFI1bkTZ2M21uOVs0FZqSR1jgDwZZ8p12UYIW+I=;
+	b=q0Xx0aQM5Gx0y0LNIIIO45WJ89GU/+a+2SnRHRPzIyHXe6opmx7zkW/KJGpj9wHcOiZgEZbGgntMBuMzZuOKjqfDvtIQJ747/cvAzjbmYdJ8oIPXoInfq+OEt1NLPos+xsei5iMUemr1rnztx9XFa/jHiEEVl0tLxYvyirbuA9Q=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033068173054;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W7RK2wi_1716955147;
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W7RK2wi_1716955147)
+          by smtp.aliyun-inc.com;
+          Wed, 29 May 2024 11:59:12 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	wintera@linux.ibm.com,
+	guwen@linux.alibaba.com
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	tonylu@linux.alibaba.com,
+	pabeni@redhat.com,
+	edumazet@google.com
+Subject: [PATCH net-next v4 0/3] Introduce IPPROTO_SMC
+Date: Wed, 29 May 2024 11:59:04 +0800
+Message-Id: <1716955147-88923-1-git-send-email-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: validate SO_TXTIME clockid coming from userspace
-Content-Language: en-US
-To: Martin KaFai Lau <martin.lau@linux.dev>
-CC: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
-        "Willem
- de Bruijn" <willemdebruijn.kernel@gmail.com>,
-        Martin KaFai Lau
-	<martin.lau@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>, bpf
-	<bpf@vger.kernel.org>,
-        <kernel@quicinc.com>,
-        <syzbot+d7b227731ec589e7f4f0@syzkaller.appspotmail.com>,
-        <syzbot+30a35a2e9c5067cc43fa@syzkaller.appspotmail.com>
-References: <20240528224935.1020828-1-quic_abchauha@quicinc.com>
- <2c363f12-dd52-4163-bbcd-9a017cff6dd4@linux.dev>
-From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-In-Reply-To: <2c363f12-dd52-4163-bbcd-9a017cff6dd4@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: t-qtwwLBKCyK8KaH6i9BfvPBh6cRLmuo
-X-Proofpoint-ORIG-GUID: t-qtwwLBKCyK8KaH6i9BfvPBh6cRLmuo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-28_14,2024-05-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 lowpriorityscore=0 impostorscore=0 clxscore=1015 mlxscore=0
- mlxlogscore=697 malwarescore=0 spamscore=0 adultscore=0 bulkscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2405290021
 
+From: "D. Wythe" <alibuda@linux.alibaba.com>
 
+This patch allows to create smc socket via AF_INET,
+similar to the following code,
 
-On 5/28/2024 6:15 PM, Martin KaFai Lau wrote:
-> On 5/28/24 3:49 PM, Abhishek Chauhan wrote:
->> Currently there are no strict checks while setting SO_TXTIME
->> from userspace. With the recent development in skb->tstamp_type
->> clockid with unsupported clocks results in warn_on_once, which causes
->> unnecessary aborts in some systems which enables panic on warns.
->>
->> Add validation in setsockopt to support only CLOCK_REALTIME,
->> CLOCK_MONOTONIC and CLOCK_TAI to be set from userspace.
->>
->> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
->> Link: https://lore.kernel.org/lkml/20240509211834.3235191-1-quic_abchauha@quicinc.com/
->> Fixes: 1693c5db6ab8 ("net: Add additional bit to support clockid_t timestamp type")
-> 
-> Patch lgtm. This should target for net-next instead of net. The Fixes patch is in net-next only.
-> 
-Thanks Martin. Let me raise a patch on net-next and add your acked-by to it as well. 
+/* create v4 smc sock */
+v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
 
-> Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
-> 
+/* create v6 smc sock */
+v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
+
+There are several reasons why we believe it is appropriate here:
+
+1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
+address. There is no AF_SMC address at all.
+
+2. Create smc socket in the AF_INET(6) path, which allows us to reuse
+the infrastructure of AF_INET(6) path, such as common ebpf hooks.
+Otherwise, smc have to implement it again in AF_SMC path. Such as:
+  1. Replace IPPROTO_TCP with IPPROTO_SMC in the socket() syscall
+     initiated by the user, without the use of LD-PRELOAD.
+  2. Select whether immediate fallback is required based on peer's port/ip
+     before connect().
+
+A very significant result is that we can now use eBPF to implement smc_run
+instead of LD_PRELOAD, who is completely ineffective in scenarios of static
+linking.
+
+Another potential value is that we are attempting to optimize the
+performance of fallback socks, where merging socks is an important part,
+and it relies on the creation of SMC sockets under the AF_INET path. 
+(More information :
+https://lore.kernel.org/netdev/1699442703-25015-1-git-send-email-alibuda@linux.alibaba.com/T/)
+
+v2 -> v1 :
+
+- Code formatting, mainly including alignment and annotation repair.
+- move inet_smc proto ops to inet_smc.c, avoiding af_smc.c becoming too bulky.
+- Fix the issue where refactoring affects the initialization order.
+- Fix compile warning (unused out_inet_prot) while CONFIG_IPV6 was not set.
+
+v3 -> v2 :
+
+- Add Alibaba's copyright information to the newfile
+
+v4 -> v3 :
+
+- Fix some spelling errors
+- Align function naming style with smc_sock_init() to smc_sk_init()
+- Reversing the order of the conditional checks on clcsock to make the code more intuitive
+
+D. Wythe (3):
+  net/smc: refactoring initialization of smc sock
+  net/smc: expose smc proto operations
+  net/smc: Introduce IPPROTO_SMC
+
+ include/uapi/linux/in.h |   2 +
+ net/smc/Makefile        |   2 +-
+ net/smc/af_smc.c        | 182 ++++++++++++++++++++++++++++++------------------
+ net/smc/inet_smc.c      | 108 ++++++++++++++++++++++++++++
+ net/smc/inet_smc.h      |  34 +++++++++
+ net/smc/smc.h           |  38 ++++++++++
+ 6 files changed, 297 insertions(+), 69 deletions(-)
+ create mode 100644 net/smc/inet_smc.c
+ create mode 100644 net/smc/inet_smc.h
+
+-- 
+1.8.3.1
+
 
