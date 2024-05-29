@@ -1,83 +1,75 @@
-Return-Path: <netdev+bounces-99211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B073B8D421A
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 01:47:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C54F58D421E
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 01:48:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E16671C20E86
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 23:47:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80468285FCC
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 23:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 593251779A4;
-	Wed, 29 May 2024 23:47:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I9SWLeMp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACABE200111;
+	Wed, 29 May 2024 23:48:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail114-240.sinamail.sina.com.cn (mail114-240.sinamail.sina.com.cn [218.30.114.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3365E28E8
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 23:47:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47AE161307
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 23:48:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.114.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717026426; cv=none; b=W8bGJu9U40JnEOteQPUFIwZQsQLvfZTT6W2nkNcf5rS1w6xv8AwLiF7tivXhvpqEHtz3j8r6lmtDTkZzixxTHnTkYQz3P4uSgOQnRTHkpd2E/uPPlmi6KaVhm98WbOzMIDj+QeVJFOZ/jnTegj1CkEsr0xAhXI/lZzE64RYGQwY=
+	t=1717026494; cv=none; b=C4JgfUfdgZLzq5wGLTAKG8sZx2/A7RK0FuOgroouXp5HsrA1DaSXSwaHKHKiLMWvsU054+gmxijptAXEbm9rbClOMy3jPtJaTSBOkYOXS8aldRdQ/F6+NmMeDAZ542PqRpY05UtjwSQo0/IB9tnLjN7RhZhG5WHhy7G3fM4BACk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717026426; c=relaxed/simple;
-	bh=SNpYgV5902aNUC4t5lLXfG1o7R0BrlknPBEBgrLaWs4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ks1YyTV0V9NG5bBq+djy1ANCvs1WvHzNohi4vbyfbarSb8WsBIRc+pC4FB3zfSx0DhZlvWx8dbTymVfARpoWXmHEAVgajUbkYU6DHdMYg4Tbhcljq4UNkth+ecidsZTwYg2C02i8lg1tp9pBmyqNYqXG71VRbRq3AP3WpupT/rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I9SWLeMp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7251DC113CC;
-	Wed, 29 May 2024 23:47:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717026425;
-	bh=SNpYgV5902aNUC4t5lLXfG1o7R0BrlknPBEBgrLaWs4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I9SWLeMpdTfJmlAAmQ5dpLoJo2wgWMX3GGogc6+EI3P4hddq8gG9WBPELC9+zCiew
-	 nw4YwkJ+Wtpr/tKdpVZcgQgBm9OpGtLRmD5oR9pNf2VZx6KSo2Ekmr3ynalrCZyyC4
-	 MUbzO+KPepfOtHqtRPvkP9sk0bCxQ/uVkGotpaYlvPCIPPL04BlF6Ypbg7dzGUqSNT
-	 ee8I5EhdSlvJ246K4yUlgaE+kHszt7c3aSQpRJbdqE6veVKMk76ByQEmiqaG7l37rO
-	 x26tt33aKE5ENXe/tx5HzHF5F911W/EJPLmlejSsRj3AuV5xROx1aVb0myax2Wh4hz
-	 L47E0wH049whQ==
-Date: Wed, 29 May 2024 16:47:04 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kevin Yang <yyd@google.com>
-Cc: David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, Yuchung Cheng
- <ycheng@google.com>
-Subject: Re: [PATCH net-next 2/2] tcp: add sysctl_tcp_rto_min_us
-Message-ID: <20240529164704.49b39fb8@kernel.org>
-In-Reply-To: <20240528171320.1332292-3-yyd@google.com>
-References: <20240528171320.1332292-1-yyd@google.com>
-	<20240528171320.1332292-3-yyd@google.com>
+	s=arc-20240116; t=1717026494; c=relaxed/simple;
+	bh=VPP80Y6bX7mpgJ2reko6KRR6cfiu4C/0yZT1T3uduEw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Tf7scDui6tTXD+Yu16vttYqaMV7bdbIbGI01jG9IFuYR0KDvv5eCw9yYOckJiQuWV0EfjjvBXghiwL5DqrCqdE0FJg7BOAKQHxOBrvjfCqLn63kwhKDpepvBrKvPIdIYHcadeF6ew17mTB/vRnPhmZvl7kGgUI83jOTgKtYh4Eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.114.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([116.24.9.5])
+	by sina.com (172.16.235.24) with ESMTP
+	id 6657BEAB0000795F; Wed, 30 May 2024 07:47:57 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 63944445089465
+X-SMAIL-UIID: D3A3C44DE0B44A9891E0D3EAE79B62C1-20240530-074757-1
+From: Hillf Danton <hdanton@sina.com>
+To: syzbot <syzbot+a7d2b1d5d1af83035567@syzkaller.appspotmail.com>
+Cc: edumazet@google.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	radoslaw.zielonek@gmail.com,
+	syzkaller-bugs@googlegroups.com,
+	vinicius.gomes@intel.com,
+	vladimir.oltean@nxp.com
+Subject: Re: [syzbot] [net?] INFO: rcu detected stall in packet_release
+Date: Thu, 30 May 2024 07:47:45 +0800
+Message-Id: <20240529234745.3023-1-hdanton@sina.com>
+In-Reply-To: <000000000000ae4d6e06199fd917@google.com>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 28 May 2024 17:13:20 +0000 Kevin Yang wrote:
-> +	icsk->icsk_rto_min = usecs_to_jiffies(READ_ONCE(sock_net(sk)->
-> +					      ipv4.sysctl_tcp_rto_min_us));
+On Wed, 29 May 2024 16:10:02 -0700
+> syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+> INFO: rcu detected stall in sctp_addr_wq_timeout_handler
 
-This is somewhat awkwardly broken into two lines.
-Could you use a temp variable to save 
+Feel free to read again the root cause [1] Vlad.
 
-	rto_min_us = READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_rto_min_us);
+[1] https://lore.kernel.org/lkml/20240528122610.21393-2-radoslaw.zielonek@gmail.com/
 
-?
-
-Or just go over 80 chars, but preferably not. Chaining 3 calls in one
-line is a bit Java-esque :S
-
-With that feel free to add:
-
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-
-We also carry (a form of) this patch in Meta kernels.. :(
+Adding the tested patch in the net tree now looks like a case of blind landing.
 
