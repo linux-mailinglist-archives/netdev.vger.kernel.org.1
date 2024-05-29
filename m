@@ -1,281 +1,177 @@
-Return-Path: <netdev+bounces-98915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4B0B8D3242
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 10:52:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6BF88D322D
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 10:50:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D677B29161
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 08:44:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C15161C232FB
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 08:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82B58177983;
-	Wed, 29 May 2024 08:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C614169370;
+	Wed, 29 May 2024 08:44:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="oh56RVps"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RDGT5vEK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F924169AD7;
-	Wed, 29 May 2024 08:42:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDEA57317C
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 08:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716972177; cv=none; b=drKVVNVJJGgjZ3ZGnhTY5OReFRTH0ZKJyzB7DLZdwVsqaOZLLcFDraODIAR/66JqTquz58piymvIsr6ZJD9k7kYGIcSJWFhcY4TKwhkqxjmpYpTJVpjOtZDgoEZPCkDc3Gkk1z/xgYJklRFQz69UutcuIF36x5RdD1XcjLTXaD4=
+	t=1716972271; cv=none; b=C4NvkwdqT2S5wyl/MrcbZ5XY8n4lNVYp+U+RrkvyUCprRO78gX/zBzzJbNBjlHwa82SMvfsCkFFycBW/KhJm06i9jNu3VJ2ncfneUM29Q6uJ5zwBgPgMBs6I9qLfDoRvmsK3KAmOaRTxe+qZI76kwq83FJ6GjwUic31vT2OdWt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716972177; c=relaxed/simple;
-	bh=m5v0wlc+z69409+UfsANhJw11e5iBbIOJsr5b/918KA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=utMObqZP5INZukp3+wvc4c44eOO76WNDBswsXptnSSDojZV938JMjJyTRkfXx2r5urNUO7afBFIo9sjicA3BMk5vqnCbPO94NBfurSmJCWoEQ/wA/CIclnXvMIxASsG149wiM29H6y3xqvF7qGIJoHGg0T+2EL2VHwA0vtdyQEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=oh56RVps; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: 6b2d689a1d9711ef8c37dd7afa272265-20240529
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=ZGP8oELGPcLL2K0/k8Qv5hMob1JHaJDVAJcSoqVgo+Y=;
-	b=oh56RVpsgk0kRxwS22BE6exOjXnORnmZw1ET+023wLRs+OJOfxnpm1AEQ58SLmozcN4LiAwzN+JcjilouVotVMP4f1Kl93iVnz3rAQzEPulWdiR2pb7uQtmMkAmXF7Fvvnz4xJjqho+bsW5G+xwj6WC8KrNC2PP/gIxG1EThljo=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.39,REQID:e172bb7e-2741-470d-8534-68f124b30705,IP:0,U
-	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:-25
-X-CID-META: VersionHash:393d96e,CLOUDID:daf35b93-e2c0-40b0-a8fe-7c7e47299109,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
-	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: 6b2d689a1d9711ef8c37dd7afa272265-20240529
-Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw01.mediatek.com
-	(envelope-from <liju-clr.chen@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 80889248; Wed, 29 May 2024 16:42:44 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 29 May 2024 16:42:43 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Wed, 29 May 2024 16:42:42 +0800
-From: Liju-clr Chen <liju-clr.chen@mediatek.com>
-To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	"Catalin Marinas" <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
-	"Steven Rostedt" <rostedt@goodmis.org>, Masami Hiramatsu
-	<mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Richard Cochran <richardcochran@gmail.com>, Matthias Brugger
-	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
-	<angelogioacchino.delregno@collabora.com>, Liju-clr Chen
-	<Liju-clr.Chen@mediatek.com>, Yingshiuan Pan <Yingshiuan.Pan@mediatek.com>,
-	Ze-yu Wang <Ze-yu.Wang@mediatek.com>
-CC: <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-trace-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-mediatek@lists.infradead.org>, David Bradil <dbrazdil@google.com>,
-	Trilok Soni <quic_tsoni@quicinc.com>, Shawn Hsiao <shawn.hsiao@mediatek.com>,
-	PeiLun Suei <PeiLun.Suei@mediatek.com>, Chi-shen Yeh
-	<Chi-shen.Yeh@mediatek.com>, Kevenny Hsieh <Kevenny.Hsieh@mediatek.com>
-Subject: [PATCH v11 21/21] virt: geniezone: Enable PTP for synchronizing time between host and guest VMs
-Date: Wed, 29 May 2024 16:42:39 +0800
-Message-ID: <20240529084239.11478-22-liju-clr.chen@mediatek.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20240529084239.11478-1-liju-clr.chen@mediatek.com>
-References: <20240529084239.11478-1-liju-clr.chen@mediatek.com>
+	s=arc-20240116; t=1716972271; c=relaxed/simple;
+	bh=jK9dw8wBnrvF0Y4BMiNf+6nazyCul2QkD9ufjllYxEA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=al2aNUQe1fErLUCcesQO5xaBaocTi5M+Hhw+QOj65aQliKXvXwHABvxqTX7kZmxSsQX8aUeG/HFEbP0pe4SII/SSdAxse+N32X5nGaoGFdE7BRBm+j078pomKPAAbfdeJPddrYcyF+Q8A15ka4XU3XfA8mBhNOguMLszYk1Z5+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RDGT5vEK; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-57857e0f465so2270148a12.1
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 01:44:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716972268; x=1717577068; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lwhGK/dKKh3bJit0AJ42oTgWIz3Op6s4zx3lBYuYj/0=;
+        b=RDGT5vEKGdBkOAMJxe0M7qTpY6wxWJFtws2nqlgf4HnwngJyYHd5yQudWrhvnoSwxh
+         TLa7yve3d6aoX4brnynxW/MjZBDIBUiPCS/qXK7rBUDYyUvqrJIWfadqPTCV2PS90PKt
+         bZt22OmdD5jKrVjOO0eR5dB9D/8jB46M3S/3CyVg3+osgXj0W44BFv+5XexNdS46zQwh
+         wqgdfAUp6EdxYmQvMeHyPeAGBqUI52+Jv80BKL9f9gkEbUnLHWtN92t/AB49wHJmCR+7
+         vkiUlMspDGArwdpnnw5YEhxNerF3YjS/OUfjHJkNBghYfw8wYHPHA6EyJbc1MTNmYodt
+         bAHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716972268; x=1717577068;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lwhGK/dKKh3bJit0AJ42oTgWIz3Op6s4zx3lBYuYj/0=;
+        b=IdF1tFpRvH/QzDKos5ng9RWsRzfT1i+KUARsm+n76MDv7cWo11VBDKasDU4Oxbmgvv
+         RarPQeynq51cx19JpUGgZdNhrOafrYlQWAQl2fF1wkrgofFF9V2cryQW+hamByFPeCLd
+         hqAV5uGo0IiSnI9qAbv3sdg1lXmf0xhfHOZdujl+fCyYFFwQv3azjiSaI6oYHMRZAf2i
+         BpANYAHmb4629f4D7J6N2iZTOqaH1iekfoCX/lcqo8mXceON5IJOuTY89BALiIaFykFj
+         HwAfEMAOVAAjEWoBUWxG2gxAhNWnbW1nH5mpSJrF2sZSOi5ijWyeS8S+VTCQGIvdM6CI
+         7B2A==
+X-Forwarded-Encrypted: i=1; AJvYcCUT6rnD6AZniLebENzdDfS5NIOXMgMYwrVVPwwpmX23NCZiOXpV/XmodYJY0FRX5P3DaeF49OSkzyQOojkfIwuuqjEHYs1B
+X-Gm-Message-State: AOJu0YxByVDiyCH5s4034+XA9/RxYifTt5b+9uYDwi6fEgFdWKUBKb34
+	gGNfD5DQNTlzmlVAM/CXNVgzEgo+KaajI0RTsFBjIaoGbRRiOg3aGTw7gwLIovQPsrioNLKFm7L
+	XmqrZGz2RvWbIJwWAKOE3yreuOlPX4Q==
+X-Google-Smtp-Source: AGHT+IHvUxZBn6UCO84dMVTjdeZzLWUsNTaiRCHtVcn6zlzzOaMFBZfPmlAJ42vf0yc0Hd3Y21DVxLRTW585Sbs8Q8A=
+X-Received: by 2002:a17:906:f9c9:b0:a5a:f16:32b1 with SMTP id
+ a640c23a62f3a-a62641cfb1dmr1005649266b.31.1716972267877; Wed, 29 May 2024
+ 01:44:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-AS-Result: No-10--10.205400-8.000000
-X-TMASE-MatchedRID: y128Pza/oi5PB4rXagQZ+5LPLrFS265P4Ob1SHQRSIgNqAa+u3rIYNwB
-	sjzU/tkx4ZQqYHZtqxhYo3G+rvxrNao77AcuQhw7A9lly13c/gFozho8K1gAGlwpnAAvAwazG35
-	vfw/rSs3iML0m3w3HQzEptG9SICadGAS4UVZrvja4jAucHcCqnZYcYQ11P5U/xKLCLOyCW5B25K
-	XQ4QIGJr1A4/e8Np0k4I4a/QXu4NCR8u6DOJbzp8nUT+eskUQP7h2RrsKOiu0+gR+s21UkWIEpJ
-	RcbelqdADXE8V3mpEVDNcDXkV4d67bfdDP+zORmdXz3l78F3YmkWoMjFfK3Xpsoi2XrUn/Jn6Kd
-	MrRsL14qtq5d3cxkNZd/mwLf2BVU7XmIj3Q8NGKV/FaFi4vPW8I5R9GaztHqgQZKMf1HUClLDBw
-	YotNgRw==
-X-TM-AS-User-Approved-Sender: No
-X-TM-AS-User-Blocked-Sender: No
-X-TMASE-Result: 10--10.205400-8.000000
-X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-SNTS-SMTP: 139515506FFD2417A89CF598BEB46A38A599400E7E3B732E405FAA2E0D15D1D22000:8
-X-MTK: N
+References: <20240528171320.1332292-1-yyd@google.com> <CAL+tcoCR1Uh1fvVzf5pVyHTv+dHDK1zfbDTtuH_q1CMggUZqkA@mail.gmail.com>
+ <CAL+tcoA0hTvOT2cjri-qBEkDCp8ROeyO4fp9jtSFPpY9pLXsgQ@mail.gmail.com> <CANn89iKb4nWKvByBwGFveLb5KL_F_Eh_7gPpJ-3fPkfQF7Zf0g@mail.gmail.com>
+In-Reply-To: <CANn89iKb4nWKvByBwGFveLb5KL_F_Eh_7gPpJ-3fPkfQF7Zf0g@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 29 May 2024 16:43:51 +0800
+Message-ID: <CAL+tcoCoVTNidWkTm6oUDVPH1cT3292Nqe9WjqTXuQvNYGK+tw@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/2] tcp: add sysctl_tcp_rto_min_us
+To: Eric Dumazet <edumazet@google.com>
+Cc: Kevin Yang <yyd@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Yi-De Wu <yi-de.wu@mediatek.com>
+Hello Eric,
 
-From: "Kevenny Hsieh" <kevenny.hsieh@mediatek.com>
+On Wed, May 29, 2024 at 3:39=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Wed, May 29, 2024 at 9:00=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > On Wed, May 29, 2024 at 2:43=E2=80=AFPM Jason Xing <kerneljasonxing@gma=
+il.com> wrote:
+> > >
+> > > Hello Kevin,
+> > >
+> > > On Wed, May 29, 2024 at 1:13=E2=80=AFAM Kevin Yang <yyd@google.com> w=
+rote:
+> > > >
+> > > > Adding a sysctl knob to allow user to specify a default
+> > > > rto_min at socket init time.
+> > >
+> > > I wonder what the advantage of this new sysctl knob is since we have
+> > > had BPF or something like that to tweak the rto min already?
+> > >
+> > > There are so many places/parameters of the TCP stack that can be
+> > > exposed to the user side and adjusted by new sysctls...
+> > >
+> > > Thanks,
+> > > Jason
+> > >
+> > > >
+> > > > After this patch series, the rto_min will has multiple sources:
+> > > > route option has the highest precedence, followed by the
+> > > > TCP_BPF_RTO_MIN socket option, followed by this new
+> > > > tcp_rto_min_us sysctl.
+> > > >
+> > > > Kevin Yang (2):
+> > > >   tcp: derive delack_max with tcp_rto_min helper
+> > > >   tcp: add sysctl_tcp_rto_min_us
+> > > >
+> > > >  Documentation/networking/ip-sysctl.rst | 13 +++++++++++++
+> > > >  include/net/netns/ipv4.h               |  1 +
+> > > >  net/ipv4/sysctl_net_ipv4.c             |  8 ++++++++
+> > > >  net/ipv4/tcp.c                         |  3 ++-
+> > > >  net/ipv4/tcp_ipv4.c                    |  1 +
+> > > >  net/ipv4/tcp_output.c                  | 11 ++---------
+> > > >  6 files changed, 27 insertions(+), 10 deletions(-)
+> > > >
+> > > > --
+> > > > 2.45.1.288.g0e0cd299f1-goog
+> > > >
+> > > >
+> >
+> > Oh, I think you should have added Paolo as well.
+> >
+> > +Paolo Abeni
+>
+> Many cloud customers do not have any BPF expertise.
+> If they use existing BPF programs (added by a product), they might not
+> have the ability to change it.
+>
+> We tried advising them to use route attributes, after
+> commit bbf80d713fe75cfbecda26e7c03a9a8d22af2f4f ("tcp: derive
+> delack_max from rto_min")
+>
+> Alas, dhcpd was adding its own routes, without the "rto_min 5"
+> attribute, then systemd came...
+> Lots of frustration, lots of wasted time, for something that has been
+> used for more than a decade
+> in Google DC.
+>
+> With a sysctl, we could have saved months of SWE, and helped our
+> customers sooner.
 
-Enabled Precision Time Protocol (PTP) for improved host-guest VM time
-synchronization, optimizing operations needing precise clock sync in
-virtual environment.
+I'm definitely aware of the importance of this kind of sysctl knob.
+Many years ago (around 6 or 7 years ago), we already implemented
+similar things in the private kernel.
 
-Signed-off-by: Kevenny Hsieh <kevenny.hsieh@mediatek.com>
-Signed-off-by: Liju Chen <liju-clr.chen@mediatek.com>
-Signed-off-by: Yi-De Wu <yi-de.wu@mediatek.com>
----
- arch/arm64/geniezone/Makefile           |  2 +-
- arch/arm64/geniezone/gzvm_arch_common.h |  3 +
- arch/arm64/geniezone/hvc.c              | 73 +++++++++++++++++++++++++
- drivers/virt/geniezone/gzvm_exception.c |  3 +-
- include/linux/soc/mediatek/gzvm_drv.h   |  1 +
- include/uapi/linux/gzvm.h               |  1 +
- 6 files changed, 80 insertions(+), 3 deletions(-)
- create mode 100644 arch/arm64/geniezone/hvc.c
+For a long time, netdev guys often proposed the question as I did in
+the previous email. I'm not against it, just repeating the same
+question and asking ourselves again: is it really necessary? We still
+have a lot of places to tune/control by introducing new sysctl.
 
-diff --git a/arch/arm64/geniezone/Makefile b/arch/arm64/geniezone/Makefile
-index 0e4f1087f9de..553a64a926dc 100644
---- a/arch/arm64/geniezone/Makefile
-+++ b/arch/arm64/geniezone/Makefile
-@@ -4,6 +4,6 @@
- #
- include $(srctree)/drivers/virt/geniezone/Makefile
- 
--gzvm-y += vm.o vcpu.o vgic.o
-+gzvm-y += vm.o vcpu.o vgic.o hvc.o
- 
- obj-$(CONFIG_MTK_GZVM) += gzvm.o
-diff --git a/arch/arm64/geniezone/gzvm_arch_common.h b/arch/arm64/geniezone/gzvm_arch_common.h
-index 192d023722e5..8f5d8528ab96 100644
---- a/arch/arm64/geniezone/gzvm_arch_common.h
-+++ b/arch/arm64/geniezone/gzvm_arch_common.h
-@@ -83,6 +83,8 @@ int gzvm_hypcall_wrapper(unsigned long a0, unsigned long a1,
-  * @__pad: add an explicit '__u32 __pad;' in the middle to make it clear
-  *         what the actual layout is.
-  * @lr: The array of LRs(list registers).
-+ * @vtimer_offset: The offset maintained by hypervisor that is host cycle count
-+ *                 when guest VM startup.
-  *
-  * - Keep the same layout of hypervisor data struct.
-  * - Sync list registers back for acking virtual device interrupt status.
-@@ -91,6 +93,7 @@ struct gzvm_vcpu_hwstate {
- 	__le32 nr_lrs;
- 	__le32 __pad;
- 	__le64 lr[GIC_V3_NR_LRS];
-+	__le64 vtimer_offset;
- };
- 
- static inline unsigned int
-diff --git a/arch/arm64/geniezone/hvc.c b/arch/arm64/geniezone/hvc.c
-new file mode 100644
-index 000000000000..3d7f71f20dce
---- /dev/null
-+++ b/arch/arm64/geniezone/hvc.c
-@@ -0,0 +1,73 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2023 MediaTek Inc.
-+ */
-+#include <linux/clocksource.h>
-+#include <linux/kernel.h>
-+#include <linux/timekeeping.h>
-+#include <linux/soc/mediatek/gzvm_drv.h>
-+#include "gzvm_arch_common.h"
-+
-+#define GZVM_PTP_VIRT_COUNTER 0
-+#define GZVM_PTP_PHYS_COUNTER 1
-+/**
-+ * gzvm_handle_ptp_time() - Sync time between host and guest VM
-+ * @vcpu: Pointer to struct gzvm_vcpu_run in userspace
-+ * @counter: Counter type from guest VM
-+ * Return: Always return 0 because there are no cases of failure
-+ *
-+ * The following register values will be passed to the guest VM
-+ * for time synchronization:
-+ * regs->x0 (upper 32 bits) wall clock time
-+ * regs->x1 (lower 32 bits) wall clock time
-+ * regs->x2 (upper 32 bits) cycles
-+ * regs->x3 (lower 32 bits) cycles
-+ */
-+static int gzvm_handle_ptp_time(struct gzvm_vcpu *vcpu, int counter)
-+{
-+	struct system_time_snapshot snapshot;
-+	u64 cycles = 0;
-+
-+	ktime_get_snapshot(&snapshot);
-+
-+	switch (counter) {
-+	case GZVM_PTP_VIRT_COUNTER:
-+		cycles = snapshot.cycles -
-+			 le64_to_cpu(vcpu->hwstate->vtimer_offset);
-+		break;
-+	case GZVM_PTP_PHYS_COUNTER:
-+		cycles = snapshot.cycles;
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	vcpu->run->hypercall.args[0] = upper_32_bits(snapshot.real);
-+	vcpu->run->hypercall.args[1] = lower_32_bits(snapshot.real);
-+	vcpu->run->hypercall.args[2] = upper_32_bits(cycles);
-+	vcpu->run->hypercall.args[3] = lower_32_bits(cycles);
-+
-+	return 0;
-+}
-+
-+/**
-+ * gzvm_arch_handle_guest_hvc() - Handle architecture-related guest hvc
-+ * @vcpu: Pointer to struct gzvm_vcpu_run in userspace
-+ * Return:
-+ * * true - This hvc has been processed, no need to back to VMM.
-+ * * false - This hvc has not been processed, require userspace.
-+ */
-+bool gzvm_arch_handle_guest_hvc(struct gzvm_vcpu *vcpu)
-+{
-+	int ret, counter;
-+
-+	switch (vcpu->run->hypercall.args[0]) {
-+	case GZVM_HVC_PTP:
-+		counter = vcpu->run->hypercall.args[1];
-+		ret = gzvm_handle_ptp_time(vcpu, counter);
-+		return (ret == 0) ? true : false;
-+	default:
-+		break;
-+	}
-+	return false;
-+}
-diff --git a/drivers/virt/geniezone/gzvm_exception.c b/drivers/virt/geniezone/gzvm_exception.c
-index cdfc99d24ded..5ffee863e378 100644
---- a/drivers/virt/geniezone/gzvm_exception.c
-+++ b/drivers/virt/geniezone/gzvm_exception.c
-@@ -56,7 +56,6 @@ bool gzvm_handle_guest_hvc(struct gzvm_vcpu *vcpu)
- 		ret = gzvm_handle_relinquish(vcpu, ipa);
- 		return (ret == 0) ? true : false;
- 	default:
--		break;
-+		return gzvm_arch_handle_guest_hvc(vcpu);
- 	}
--	return false;
- }
-diff --git a/include/linux/soc/mediatek/gzvm_drv.h b/include/linux/soc/mediatek/gzvm_drv.h
-index 7c0ccbcd114f..4518f3b0a69b 100644
---- a/include/linux/soc/mediatek/gzvm_drv.h
-+++ b/include/linux/soc/mediatek/gzvm_drv.h
-@@ -227,6 +227,7 @@ int gzvm_handle_page_fault(struct gzvm_vcpu *vcpu);
- bool gzvm_handle_guest_exception(struct gzvm_vcpu *vcpu);
- int gzvm_handle_relinquish(struct gzvm_vcpu *vcpu, phys_addr_t ipa);
- bool gzvm_handle_guest_hvc(struct gzvm_vcpu *vcpu);
-+bool gzvm_arch_handle_guest_hvc(struct gzvm_vcpu *vcpu);
- 
- int gzvm_arch_create_device(u16 vm_id, struct gzvm_create_device *gzvm_dev);
- int gzvm_arch_inject_irq(struct gzvm *gzvm, unsigned int vcpu_idx,
-diff --git a/include/uapi/linux/gzvm.h b/include/uapi/linux/gzvm.h
-index 5411357ec05e..1cf89213a383 100644
---- a/include/uapi/linux/gzvm.h
-+++ b/include/uapi/linux/gzvm.h
-@@ -197,6 +197,7 @@ enum {
- 
- /* hypercall definitions of GZVM_EXIT_HYPERCALL */
- enum {
-+	GZVM_HVC_PTP = 0x86000001,
- 	GZVM_HVC_MEM_RELINQUISH = 0xc6000009,
- };
- 
--- 
-2.18.0
+For a long time, there have been plenty of papers studying different
+combinations of different parameters in TCP stack so that they can
+serve one particular case well.
 
+Do we also need to expose remaining possible parameters to the user
+side? Just curious...
+
+Thanks,
+Jason
 
