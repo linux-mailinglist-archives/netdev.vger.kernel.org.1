@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-98830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A4D38D293B
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 02:03:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 980188D293C
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 02:03:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A98F1C2403D
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 00:03:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7AE61C22070
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 00:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CAED33D1;
-	Wed, 29 May 2024 00:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3146F4A28;
+	Wed, 29 May 2024 00:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Ocnm2PHj"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="0MYg0YG6"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2053.outbound.protection.outlook.com [40.107.223.53])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2051.outbound.protection.outlook.com [40.107.220.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21DC93232
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 00:03:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BB1366
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 00:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716941020; cv=fail; b=flmK0vBiQAY4A8FAv3torRzYjOGbtczt7h+jTp5GjFKOI2lFJjes2k3AZRZUTeBgs7Ebmeq5kh4TcQuNueE76pNX9ZqiGQqEZ4QHoA0jCl4zEeP58Bezxo9xBZxX6V2lgQ2SZg5jGgjitROOo4HWPFdY0x4xqfnGUXF8EHev4mc=
+	t=1716941021; cv=fail; b=MIpDLMYNYjR2QxiWIc8YL5UQhC9Z018JCAikJDKqxoZTMUZ9rRjThMWMwDmfloc8ckLZLFRPtjn3aYN1jt27HNWuPCW8K9po/d+jvCCtPvHLZYuxEQkE0BZh5WB+14Ly7gj4FtF9JaNvQTsQ99VKOVLna2LNIkxyUhixBl8dIvQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716941020; c=relaxed/simple;
-	bh=IkD0opelpeJCc6EHQX/PVenogqUgm/CdR/eX5s+TO8M=;
+	s=arc-20240116; t=1716941021; c=relaxed/simple;
+	bh=7rljTOg8s/ZdZACSRcOKzkMmSH31sckryK16uGqoQ7k=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O6RjoR8KHhBbhjnjk+rRo0IZU0w/O5U1NmqucyBxh6wXBvERFCIDovMcFDugvLbXwgot0i9vLljQ6RMDY4BAph65xHCzdl1kPYZavN+Q6EPKpf5M5WtUl/Z59D+lVY/peh2+rphRTZ6oErRQZ2jnapMJwwmwRlEiZMgI52nux9s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Ocnm2PHj; arc=fail smtp.client-ip=40.107.223.53
+	 MIME-Version:Content-Type; b=LVubF6qXZbaoL17vGAfl0itytTWS/fOyB1NexTVkvcTnW6/gxd9hvGOfFW5YPjXuKWhlRTR0OXXbQruN4hahWgT0FDqKDfseHCdy78E5CfI6I8jquWQX1xU29BglrPbCX0SXMyrUs5xYO8QshX+cxWaGGsJdQgJRXnnVvaCbdk8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=0MYg0YG6; arc=fail smtp.client-ip=40.107.220.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=III6bHWZp5JP6FbH9mTouuNh1kdGvR8sLgaj7+ClR6XUoMTo9Ua/FWB2RqRUh0qD499jK4bl7QssEQfIBZ3vmeQX4KCgjz9QIZG26SOHrOxraw0Ax7OHRG1hNNrSTj/lxMOiaW3RUu/D/Xj9J+bzSP8c1yoq0XoQKxTYaGHB2V7ToHlekbhlP+SeD2rQ/WHsN62fBYEbQ4VtN5x8zWtxT1pWV2gSbO1L374JlWN3TW2UrszzDp2mL2emq0V87QhGrdk5aPSgIc+6FdK6+otyHun3j1uIXMqvkuZAvzKmIXOf8yLR8s2PKDsDQ3pH2z2CoNM7iq1pPK0fHgR8o0Og8w==
+ b=SI4atIT67ZAEWpye3H/9sq5MiNk6aYFUvUXFnNiyUBMjY8i2g6yt0BAtzo0eJQYLiEB06kCK4+R8CCt5+r3Qvh44/Vl5a/6I4ook1rLHPKmy3A4Dv9vfdRid75Ah4kE4purMw5pJLKt/lhjL2N6TbPPAGgYN+FWqT4ln7hiAl8JscJGxsWcDdr1ZcC01ICHX6mFT8Z4SGOnETKTkC7v2UpgfObUnrLqqHEpv/pampseCjwUfIc8s53biOCtYeo9M5jSTtWeKM21lRlDzZwK0YAy8hyxm7P7h1Xd4E66+yPSkMzjRW1XpEjSykkFwE1ffEK9JAnCRrVtazMkPIi4l4w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gV7QcSZ+rqRkpv0aCROezu8S79Li6hhlQYcl6L38GU0=;
- b=N7s+Cg+AK+bl29HqKagg4bIsTAzr3/5l0wt1A4gAddgRdO/Y0NgxUy73bXckoAT5/3TU8JXgrim71piWJuAXRjn6eRHHaKs9GlDpdvGPjqlkWQDdlQBUFeCjnIUMblT/v8ADrufISg1bBXmLOLnz+FeTa2Cd8U4HwWjVCXGZbRPar60CGEwTRrDhxIZWHYAGt5IGn8q7r5wfh887J6tQz5GCqlok8S8WMcB6SkkQLzVDkmXBuViPLbrMLEP9SrJSRgJuOm+dnIUfwfPnc3g/3tPUSEWr8Zc4ajdJpqDY3eUGZsppGcsPMyBaVVu+ENtXWgmE1EtUXLVq3J6cjC21Pw==
+ bh=GgBik6BrExTsuQgErCaC4jzj+uDBZFFmvtTtRFeEt7I=;
+ b=DFT4EF90IMSCS/g9ZSh8WHrHttR303/9OsH+RCF7shavCbuIxF40L3OaCyJwj18qX5MoyZCF+r+iW8rtn7n208zvNKEntGwvia7UL2aRS13YM4zP2wsDYDrdd9etdAjmW8XHCqckVHDKYK1agvhiSlU364w73Mf37QiMtxy1X/F89d5e0tWgO1HZqqQf0c0wcFfPHSHheQbV7CtB9/2I1gEYu2N5PTMcgJHJv8EF7hJIBZ92UNUgC3ajg9j6P3xdeye6jAzMoBhBM5lil4+T+WhucRA1L/Dsqmy/wnJKp9RFPP6Z69yaxoPGZRMVAA4BeR2PdYU6i9X3QtNPtI/bxQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gV7QcSZ+rqRkpv0aCROezu8S79Li6hhlQYcl6L38GU0=;
- b=Ocnm2PHj+27znCB223JUOmi/sIvC+m8vEcjgquccnhplzEqYVZSFF3h3Xs6AKkGkj0OtRUohI5slBhJb4s4Gw67+AHWj3XVXBnshH9DKiZHqQKAUFZggV21AtBJZ2n8e8N+Av3nFGpj9ROcYjRknGIHsLzLo4W9or6JStzyb/M8=
-Received: from MW4PR04CA0347.namprd04.prod.outlook.com (2603:10b6:303:8a::22)
- by DM4PR12MB6661.namprd12.prod.outlook.com (2603:10b6:8:b7::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7611.29; Wed, 29 May 2024 00:03:36 +0000
+ bh=GgBik6BrExTsuQgErCaC4jzj+uDBZFFmvtTtRFeEt7I=;
+ b=0MYg0YG66+ngLpO5SN3O5l8gtAf4IRP/UwQXxNV1F+Sieei7xwIzdiUIp663LWTOoApQvW+iJD+rb+Mowvgu+TeS4FwL1LKZqlooweb49OragoX7XzfS5IwxV3Tr8iW3XzKe5QQs9nhJDkoFkdbD9owIl572Ie0I+m98edxI1+w=
+Received: from MW4PR04CA0354.namprd04.prod.outlook.com (2603:10b6:303:8a::29)
+ by SA3PR12MB8047.namprd12.prod.outlook.com (2603:10b6:806:31b::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.31; Wed, 29 May
+ 2024 00:03:37 +0000
 Received: from SJ1PEPF00001CE9.namprd03.prod.outlook.com
- (2603:10b6:303:8a:cafe::94) by MW4PR04CA0347.outlook.office365.com
- (2603:10b6:303:8a::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.30 via Frontend
- Transport; Wed, 29 May 2024 00:03:36 +0000
+ (2603:10b6:303:8a:cafe::d2) by MW4PR04CA0354.outlook.office365.com
+ (2603:10b6:303:8a::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.18 via Frontend
+ Transport; Wed, 29 May 2024 00:03:37 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -68,15 +69,15 @@ Received: from SATLEXMB04.amd.com (165.204.84.17) by
 Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 28 May
- 2024 19:03:30 -0500
+ 2024 19:03:31 -0500
 From: Shannon Nelson <shannon.nelson@amd.com>
 To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>, <horms@kernel.org>
 CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
 	<shannon.nelson@amd.com>
-Subject: [PATCH net-next v2 5/7] ionic: Use netdev_name() function instead of netdev->name
-Date: Tue, 28 May 2024 17:02:57 -0700
-Message-ID: <20240529000259.25775-6-shannon.nelson@amd.com>
+Subject: [PATCH net-next v2 6/7] ionic: only sync frag_len in first buffer of xdp
+Date: Tue, 28 May 2024 17:02:58 -0700
+Message-ID: <20240529000259.25775-7-shannon.nelson@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20240529000259.25775-1-shannon.nelson@amd.com>
 References: <20240529000259.25775-1-shannon.nelson@amd.com>
@@ -91,98 +92,73 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE9:EE_|DM4PR12MB6661:EE_
-X-MS-Office365-Filtering-Correlation-Id: 063ac2b2-8f50-40a9-c8a4-08dc7f72c96d
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE9:EE_|SA3PR12MB8047:EE_
+X-MS-Office365-Filtering-Correlation-Id: 56aad48a-df9c-48d0-87db-08dc7f72c9ee
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|36860700004|376005|1800799015|82310400017;
+	BCL:0;ARA:13230031|82310400017|376005|36860700004|1800799015;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?2v5zeKqRDiuNGWeTZawRAhihSO/ean7WaQuBmocfgNp3IEZTwn0FmCr0Inyi?=
- =?us-ascii?Q?cdF3Ww+dFrdizjuK0exUbA3RjSo8Ogk9647plmdXRVwp6IGKMe7Nhxd4oZ8F?=
- =?us-ascii?Q?q0O2ONvnY7xb7/VMZlKZSvNfovhKIWoRU6Zel34F9CdC9MJpF/sw/IHfF16Q?=
- =?us-ascii?Q?P2ePVcyZyGtJbrzr4ZHxV600tmKL6/uMN75jREJW0TKiWKnbRC0h2eFRzxIe?=
- =?us-ascii?Q?EhufqmeQOnOkbrC0WDMAkDUBoj9JLxcXtnRaEMvvpJN2BPi5Eg8vvTAAt7+2?=
- =?us-ascii?Q?DhFdivpTvzXFpl5ehCedXKSkKRUgWBbp7P+fTnnyjbZzFmXZCWl+VNXVqKC8?=
- =?us-ascii?Q?MWrDWsmCYP9+hDIBhKD9GjqSW3QpN7aDE8hDATox1r6aM+UkLq+zMQkvQ72J?=
- =?us-ascii?Q?kh/KAha70BCGsz5HzyiWkEGj010A9hAgXk3apHzPPmTlI0qCYmydj5YflpLF?=
- =?us-ascii?Q?DolmTjU7D5Yfk3B+67tKdLqWbsJJqaSjR7N3be1aLRXxrqacwp7KnVYb4A7u?=
- =?us-ascii?Q?UPEnVALn+WrqwbpDfhtikR3Thwkc4zpWeCc7t3Nb1kY/swHcACdm0nYcHUpP?=
- =?us-ascii?Q?tULPLKUmTv5tKOMy1eoOIbz0iB877kn9XBkv6hyHI3H5ab88z35oV/cNDHL4?=
- =?us-ascii?Q?4vgu4WBzhbvWELQv+anHe7oojkysZOzp8YYBeHRdhiDAANxZdzRNgkQmYlfm?=
- =?us-ascii?Q?t++Z/RCjQ5LOCuzH6w+1eqb6OGcHNG0l3mWQpcvYKzU3AKAQfoq9Rjnnqj5e?=
- =?us-ascii?Q?mFEMoxyTOoD1OkB15a6BoaKxjkAKBk4uLMeLi2FXSSFAXuuFjlb5E3bd9now?=
- =?us-ascii?Q?QkYawx+1ZRCE5L8SqFcEAc/8mOvwrEG5uVzWuPXOfRo1IblbKPO0YYHBT/wP?=
- =?us-ascii?Q?eaKw70tpzYxPE5WPgAn6GYbikMJ83g07isMm0cxq9Sq2UAqrE0AYdTK5oQiR?=
- =?us-ascii?Q?ED6k2XVDl2osQPGblPuQRDXAR4KnbQmZQWwgDtA56cCUt8mT1qPjnVZWPw/1?=
- =?us-ascii?Q?IWu/OVDlBYEGcd1AQrliHwzaUR4a/91eWCvWZezeAl5yvdBJbFbjAXaf2qdf?=
- =?us-ascii?Q?y/PMMfsnomUuWmwVdVmwZF+I5AzRMRdH6as4ck3Suyu4qRlcgSIQypaQo1Fi?=
- =?us-ascii?Q?PHxk2JaAajuf5Rc+2X+Lsh3RXBE39b/0M2aGSGpprUTcwAYxlcbj7p7Zx+lk?=
- =?us-ascii?Q?xDjBqKRgG6kW2gIiZ49aPhG267cdVxDcgAs/D2MJ6Tg0DRWuQqwnDy3ZNUvJ?=
- =?us-ascii?Q?XXyG6vH1S8C67F9wwfM4CSDvARJ710ddBAdmcTCF5vZuG6PDGNVL9isP+X7H?=
- =?us-ascii?Q?gd5vMNlEeOIDFckhtdJIHpVRVl3/7j+iEj0YCnY9PtVcQnj2b/zqizYCsItc?=
- =?us-ascii?Q?nXxNCcM0Zbb/LBOGl/hRPbt76DfO?=
+	=?us-ascii?Q?YGU6nZv2juHf1FsUyyk1zyP0NtJw5/XvgsGvdWycsze1qS+s3jg1nnSP8Oj0?=
+ =?us-ascii?Q?cnSpiR1cpkYdIa9OW9ARIbIzYX7Z+Ao044jalw64OpbsrDfo8R7K1czhxrIf?=
+ =?us-ascii?Q?nBTUasCTM/KF0xgrO8NurgFf/KYp82eIrNMPK2unOTiSmvF/cR+U2zosFbUq?=
+ =?us-ascii?Q?4vdPP5hF0GYQ54Z/JlaiV/G+zZAn5Z4/GbKtckJOHHNSMUIrJOplSok0nMSG?=
+ =?us-ascii?Q?9E87AXfAUd43xSwOD8WrJUknUy81NFCnq/4/r1m4gpVj42MJiKnhqRR0Gsif?=
+ =?us-ascii?Q?W2ljgvOhiPPuQyDIQRLEm4Fnh5juEjtWrswJ/PkT0SknZoyq0rdnmwrwZPNz?=
+ =?us-ascii?Q?Wce0V6aXtMOWQElb/aXMrdk0yj3B3wcrPNw0dlJAfLAjYyKulXzTBXfit8eD?=
+ =?us-ascii?Q?bzZk2uXM8eg5VDmJuTx1+ur2mHmcypMhqH3bOMD9D4a+z1NFoTkJ1P0uxyl7?=
+ =?us-ascii?Q?Ehl74VA7eQvQcrGn7MKjlNJ5KZ9AI3f0dF1yOdU9/xCTuFrSMakHFO4JFM+Z?=
+ =?us-ascii?Q?dvnF4eWPt4gIwhHdPshs99VAi3XpHhtk5MfhkqhysoWT/9oOkO6xbvAp2W+V?=
+ =?us-ascii?Q?v/3e2JYOkUYdX/OclECOsKSPCvnG3sTMopUAaDj3V8/RltASxlp6F9tAJq6f?=
+ =?us-ascii?Q?1HF9mCKNWEAJklwssoIsAQHD7HRUfi0S4HhyFpFjips3i3eoEUdW6wLP0AEd?=
+ =?us-ascii?Q?cAlpvULupCHKduzco/Xf7RABunNpZ9JlsurVbOkXbfZCYwZYQgfqUoIcbhbP?=
+ =?us-ascii?Q?2tMSYjk8PNk6SwYBQLxJjqsU9pbmzUmbxJrk+6x9++93jk3LvCzhAcrE6+IK?=
+ =?us-ascii?Q?es0zPR+VnSEQmudt2gT1c7RKw49ZCAgCl6yIY5yGlzYlY8HpLBFBCCwjao2p?=
+ =?us-ascii?Q?pnzVDsGInRhBpU0N7/RUdJoDabuy1xYcGJ5g/AXI9YtYKM2nz2cEsy1DpT3Q?=
+ =?us-ascii?Q?In9BDykHaTDyv3dYwTUcipCMDclLAZ6Df432yeSPXx1jZFvFT0cMeAJqCSC5?=
+ =?us-ascii?Q?StK/8+mmM99bRdFpAwA+TVJlyCFLj1G2/zlGxKaXk3TSvO6tOoeyxZbQUlS/?=
+ =?us-ascii?Q?Tpm8CNfztu1nUXbqZiUvBscRGcnCeGBVZoTKwSdC5nGdn7MW87/kOnamzFaD?=
+ =?us-ascii?Q?90n8ZrpX2oq6AeQ3MpywGoFvxcxSl78JqwjqPvrC4+arAKmKCLUKYTkEfGy4?=
+ =?us-ascii?Q?jwtB/buvnTGCBMjxuB5GiQQtF/zRk43oddsSTqj2Mymag3VmX+JXCLUDL3dN?=
+ =?us-ascii?Q?trKLRnBLdRbabx6NpJK7OSUywMt9kwU0v4JEOCvl5InZOpWlx4WDXPn9Q2E+?=
+ =?us-ascii?Q?S0flEPd6oaeqIAHqZSO2eW9SwfyJlRW6Rc+xb0aJe4Git0bt4gWUYCJcLcf3?=
+ =?us-ascii?Q?k6kUgx4sAZCxJVci4sl/dwLxXcIP?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(376005)(1800799015)(82310400017);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400017)(376005)(36860700004)(1800799015);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2024 00:03:36.0932
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2024 00:03:36.9369
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 063ac2b2-8f50-40a9-c8a4-08dc7f72c96d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56aad48a-df9c-48d0-87db-08dc7f72c9ee
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	SJ1PEPF00001CE9.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6661
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB8047
 
-From: Brett Creeley <brett.creeley@amd.com>
+We don't want to try to sync more length than might be
+in the first frag of an Rx skb, so make sure to use
+the frag_len rather than the full len.
 
-There is no reason not to use netdev_name() in these places, so do just
-as the title states.
-
-Signed-off-by: Brett Creeley <brett.creeley@amd.com>
 Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 ---
- drivers/net/ethernet/pensando/ionic/ionic_debugfs.c | 2 +-
- drivers/net/ethernet/pensando/ionic/ionic_lif.c     | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/pensando/ionic/ionic_txrx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_debugfs.c b/drivers/net/ethernet/pensando/ionic/ionic_debugfs.c
-index c3ae11a48024..59e5a9f21105 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_debugfs.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_debugfs.c
-@@ -220,7 +220,7 @@ static int netdev_show(struct seq_file *seq, void *v)
- {
- 	struct net_device *netdev = seq->private;
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+index 14aa3844b699..c3a6c4af52f1 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+@@ -502,7 +502,7 @@ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
+ 			 XDP_PACKET_HEADROOM, frag_len, false);
  
--	seq_printf(seq, "%s\n", netdev->name);
-+	seq_printf(seq, "%s\n", netdev_name(netdev));
+ 	dma_sync_single_range_for_cpu(rxq->dev, ionic_rx_buf_pa(buf_info),
+-				      XDP_PACKET_HEADROOM, len,
++				      XDP_PACKET_HEADROOM, frag_len,
+ 				      DMA_FROM_DEVICE);
  
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-index 101cbc088853..23e1f6638b38 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-@@ -237,7 +237,7 @@ static int ionic_request_irq(struct ionic_lif *lif, struct ionic_qcq *qcq)
- 	const char *name;
- 
- 	if (lif->registered)
--		name = lif->netdev->name;
-+		name = netdev_name(lif->netdev);
- 	else
- 		name = dev_name(dev);
- 
-@@ -3732,7 +3732,7 @@ static void ionic_lif_set_netdev_info(struct ionic_lif *lif)
- 		},
- 	};
- 
--	strscpy(ctx.cmd.lif_setattr.name, lif->netdev->name,
-+	strscpy(ctx.cmd.lif_setattr.name, netdev_name(lif->netdev),
- 		sizeof(ctx.cmd.lif_setattr.name));
- 
- 	ionic_adminq_post_wait(lif, &ctx);
+ 	prefetchw(&xdp_buf.data_hard_start);
 -- 
 2.17.1
 
