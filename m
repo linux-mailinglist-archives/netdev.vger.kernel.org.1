@@ -1,124 +1,97 @@
-Return-Path: <netdev+bounces-98884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E8738D2E01
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 09:21:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 458E38D2E05
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 09:21:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F7A71C234C9
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 07:20:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00DCE2827F3
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 07:21:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99BDF1667ED;
-	Wed, 29 May 2024 07:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BED7A1667ED;
+	Wed, 29 May 2024 07:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="InEB0TJ6"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="nIBaTk2p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F381649D9
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 07:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3881E86E
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 07:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716967244; cv=none; b=fyeqMtr7NK685wLZfmwtI0AAFMBZMWoQZg1LUNoFaRrVUyMXj7vJJr0MtN2KrLB3ZxKKYrVhMsR2DgtdX6hgVl0hp+AyuQD5DjutbQp2cztDcewBUKIbaTUs/AK9XvUsC91UE83jT5bpjfbYf9ahpi3iqS9W9ypnkEK42DaiBCA=
+	t=1716967305; cv=none; b=Mc0PCQV94AOje/1JoRB+/BiVPPArO8AG4C/qWSCuULDKh2dSmuG3zVYglgQ7rdPfsYDcMxKUD8U0Uppfa/w835V0CgGFc50ITXNlsmdF/AGrfaEQWUFRHg4gc1OyMhhZqyAea0SflJL6MHp/4zGOeIHR/2h1G/9OqZk9IV1aVAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716967244; c=relaxed/simple;
-	bh=mlvptsq7XkvG6wp3U0Gjq2yqNUa4cp9Vs6EwoVYz544=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Yex+AGaddpkhcUkxuroc21PaXxuU1vmDjJA8LtWqnNL3Rp0/MXuRzunJre2HzPOeksYjyfS2LpE+54YcLqVyidubdWzyN8Tlf6becuHIohXrvwx/sNZA86Sl2SdEPksuv4J2vhJ4kOjWyZGB5IvCCBro/0ke2u1y7Uat8aopyO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=InEB0TJ6; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716967243; x=1748503243;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=mlvptsq7XkvG6wp3U0Gjq2yqNUa4cp9Vs6EwoVYz544=;
-  b=InEB0TJ6EB+naAyv4sK5pBGbxJ2RUkMgW6jO2yTKC27uwPDcsfyIfCfd
-   5qg2YKGUsD2qNSQODdJuEOJJs7Z2RqC7H1PcN4F6bLk9/Y5OukP+x/lGQ
-   o0vyNLlnrnwd6F16DXLslvxqAnVJROWhlX+POBWdDdmUGb66VMY82+moE
-   frFKnOVGfhYstSD3uCjcKnw6Yzl5diT9yEDmqKrlvweC4+ClRKICuOOYJ
-   ulEHBczIJqA6tCi/E3o0cl40rZWALkhgmbC5/dD/V7SfGLypPCIctLxv8
-   JczW06TqeTaHB148DV86pq4s48WcLwh/BNMoMNRMvoMEbS7X61WbPpLRw
-   w==;
-X-CSE-ConnectionGUID: /xTqIovERR+JMGfmoful7Q==
-X-CSE-MsgGUID: 2HC6qX06RLSiYNY8jrPPlg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11085"; a="23908584"
-X-IronPort-AV: E=Sophos;i="6.08,197,1712646000"; 
-   d="scan'208";a="23908584"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 May 2024 00:20:42 -0700
-X-CSE-ConnectionGUID: PujpZo6DTIaqZ8E9ieU4qA==
-X-CSE-MsgGUID: m8YvJwBUQi6vm8EdmM6K3w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,197,1712646000"; 
-   d="scan'208";a="35295623"
-Received: from unknown (HELO os-delivery.igk.intel.com) ([10.123.220.50])
-  by fmviesa007.fm.intel.com with ESMTP; 29 May 2024 00:20:40 -0700
-From: Karen Ostrowska <karen.ostrowska@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Jan Sokolowski <jan.sokolowski@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Karen Ostrowska <karen.ostrowska@intel.com>
-Subject: [PATCH iwl-net v1] ice: Rebuild TC queues on VSI queue reconfiguration
-Date: Wed, 29 May 2024 09:17:36 +0200
-Message-Id: <20240529071736.224973-1-karen.ostrowska@intel.com>
-X-Mailer: git-send-email 2.31.1
+	s=arc-20240116; t=1716967305; c=relaxed/simple;
+	bh=za40URO3XEGGSMZ7qFWEky6i8CVpSqUZNKlLLPfrqI0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n60JHHB93pv+LVSqeYRrzrL0iD4QsmFG7zN948Y4UrACPZpwrd9d77CItt7myhLkfAPAzm6Zf5kdjJ8+Lg+PUP+ZmCa4XERuy80Hzcrj5+zpqzwK4tpWJDLx5oZqr7dLVznCYaHCS6nZ32aNuDU0Nvw3Nw7vi/5iKNS0x1iCqnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=nIBaTk2p; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1716967293; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=PwOkjEKzfovpmUKP0x8U54qXkkToloOTuIoK1p6LPN0=;
+	b=nIBaTk2pqOHOdCwcoNQZfPGSzUHguAwgCZXhk5eslEe6VLfhzA/L91yP31cIXES04lR9Gu9mxUhXCS44Jy/dbVZlNc7sUuoTYaf2SIwe3SG2XSdivy3zgr4jqmNq2h2rW46f3UKH0OKDpRukoBlnZKncj7w4F9EMguO9p3My5Sk=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033022160150;MF=tonylu@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0W7Rsj8i_1716967292;
+Received: from localhost(mailfrom:tonylu@linux.alibaba.com fp:SMTPD_---0W7Rsj8i_1716967292)
+          by smtp.aliyun-inc.com;
+          Wed, 29 May 2024 15:21:33 +0800
+Date: Wed, 29 May 2024 15:21:31 +0800
+From: Tony Lu <tonylu@linux.alibaba.com>
+To: Kevin Yang <yyd@google.com>
+Cc: David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 0/2] tcp: add sysctl_tcp_rto_min_us
+Message-ID: <ZlbXeytf4RkAI40N@TONYMAC-ALIBABA.local>
+Reply-To: Tony Lu <tonylu@linux.alibaba.com>
+References: <20240528171320.1332292-1-yyd@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240528171320.1332292-1-yyd@google.com>
 
-From: Jan Sokolowski <jan.sokolowski@intel.com>
+On Tue, May 28, 2024 at 05:13:18PM +0000, Kevin Yang wrote:
+> Adding a sysctl knob to allow user to specify a default
+> rto_min at socket init time.
+> 
+> After this patch series, the rto_min will has multiple sources:
+> route option has the highest precedence, followed by the
+> TCP_BPF_RTO_MIN socket option, followed by this new
+> tcp_rto_min_us sysctl.
 
-TC queues needs to be correctly updated when the number of queues on
-a VSI is reconfigured, so netdev's queue and TC settings will be
-dynamically adjusted and could accurately represent the underlying
-hardware state after changes to the VSI queue counts.
+For series:
 
-Fixes: 0754d65bd4be ("ice: Add infrastructure for mqprio support via ndo_setup_tc")
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Jan Sokolowski <jan.sokolowski@intel.com>
-Signed-off-by: Karen Ostrowska <karen.ostrowska@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_main.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+Reviewed-by: Tony Lu <tonylu@linux.alibaba.com>
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 1b61ca3a6eb6..a1798ec4d904 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -4136,7 +4136,7 @@ bool ice_is_wol_supported(struct ice_hw *hw)
- int ice_vsi_recfg_qs(struct ice_vsi *vsi, int new_rx, int new_tx, bool locked)
- {
- 	struct ice_pf *pf = vsi->back;
--	int err = 0, timeout = 50;
-+	int i, err = 0, timeout = 50;
- 
- 	if (!new_rx && !new_tx)
- 		return -EINVAL;
-@@ -4162,6 +4162,14 @@ int ice_vsi_recfg_qs(struct ice_vsi *vsi, int new_rx, int new_tx, bool locked)
- 
- 	ice_vsi_close(vsi);
- 	ice_vsi_rebuild(vsi, ICE_VSI_FLAG_NO_INIT);
-+
-+	ice_for_each_traffic_class(i) {
-+		if (vsi->tc_cfg.ena_tc & BIT(i))
-+			netdev_set_tc_queue(vsi->netdev,
-+					    vsi->tc_cfg.tc_info[i].netdev_tc,
-+					    vsi->tc_cfg.tc_info[i].qcount_tx,
-+					    vsi->tc_cfg.tc_info[i].qoffset);
-+	}
- 	ice_pf_dcb_recfg(pf, locked);
- 	ice_vsi_open(vsi);
- done:
--- 
-2.31.1
+I strongly support those patches. For those who use cgroup v1 and want
+to take effect with simple settings, sysctl is a good way.
 
+And reducing it is helpful for latency-sensitive applications such as
+Redis, net namespace level sysctl knob is enough.
+
+> 
+> Kevin Yang (2):
+>   tcp: derive delack_max with tcp_rto_min helper
+>   tcp: add sysctl_tcp_rto_min_us
+> 
+>  Documentation/networking/ip-sysctl.rst | 13 +++++++++++++
+>  include/net/netns/ipv4.h               |  1 +
+>  net/ipv4/sysctl_net_ipv4.c             |  8 ++++++++
+>  net/ipv4/tcp.c                         |  3 ++-
+>  net/ipv4/tcp_ipv4.c                    |  1 +
+>  net/ipv4/tcp_output.c                  | 11 ++---------
+>  6 files changed, 27 insertions(+), 10 deletions(-)
+> 
+> -- 
+> 2.45.1.288.g0e0cd299f1-goog
+> 
 
