@@ -1,122 +1,118 @@
-Return-Path: <netdev+bounces-99030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33F478D379B
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 15:29:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBD628D379C
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 15:29:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8BE61F24543
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 13:29:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F05F1F237DF
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 13:29:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3268711CAB;
-	Wed, 29 May 2024 13:29:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2DF125C0;
+	Wed, 29 May 2024 13:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Irq/mhY9"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="z2/azBst"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D751758B
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 13:29:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C9911CAB
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 13:29:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716989345; cv=none; b=t7mH/xmP5jubgMdflv+RT7oSN6l92lxFUz3MvWxCFtCfCyJcxyXo8+zIOEUbJaeZ4YAm7tektOBhvhr83SHuii6W+JDX1baWMTJsLQBe1M15IDOrUJ+gGHNgar8a/XNNAjasciH3QrHrGH4kVAFd7FPMDSuSyG4NxPiGVOYPMHM=
+	t=1716989369; cv=none; b=bTByLfxpmw8jvxOTiW6OupKZcoifDAwL7vP6v2HNIQZLYZ/Qq2+aTJ6eT470v0gMiOh6L00CjH8H2O26sCG6MjXPaLLstzbEV4g+MwehJhXPcjZshxo6MnceTsHPLrNNRpGqrbXom9dLoWKwJzG4tHqi7WdomjaAHBUvmmdV5dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716989345; c=relaxed/simple;
-	bh=sapcyCU+XXejfsnnHoRwizhR/PrjFhmC5v6KoyeA90I=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=C85QGt54PbJOznu/+1PFMZ8Y8kzq8p/2MpCkcxAXIMwLcbpA3D5ilwHF/iSsaMuALwmVQskjbI0E9EeAL9F+pVAjvaXvdRD56CVtisV6QqANofShu5BXBOZkTnn3sHQOKKvW7nOy9QywrCN6BrpA1Sokx+V6ZapUbGYhReUztaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Irq/mhY9; arc=none smtp.client-ip=78.32.30.218
+	s=arc-20240116; t=1716989369; c=relaxed/simple;
+	bh=0cC26AS9RA8hgkXnPY6c1Jk6MvSh7crAichKJm3IVqU=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=SDZvu2buLaT9CAybPtZ6nG1iegAjw1jrohbzIH723niPNadQheIrfZLl/5bRiNldFeV82mnyUUKpn7yMfN1ET8BrZgSoLpv0k1uPfASIxN3olCr+O/80hQTMZj8rNcGoNswfMS0HnFiHgBhs6O+XjD5pqUPXUfmAHauAQFYTlM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=z2/azBst; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=BDYEhepQA/d2FZ56BctnoAn7J3hrIwALy9fmhbjaYl0=; b=Irq/mhY9oMmIKSYt8KYRcpNoWI
-	Tu6uA1dOIDvk44vXrQbgz8vwQCIxdLVpc9xD9jeJVpUufdEaZhPHp0sIX0wNRrV3HSjWxd/bcQY95
-	2EY0cywXA03kIKmfTlEg0HCDSFH4Xl7C2HjPUCKMveyqJ6cC2XWj+OcHRpj7jLL2lm+n/c3D4UM92
-	spEQw2vcGA/OxQwux39bDI+S3Dmcan0L5hf1Btbam7jZYQx+I4UdZv+8Gw7Dq8D7NWblVSf0il9+d
-	ApbaVENFAL4DHzrWAt3g31qs8kvcLnsEiF9lI5SPqp8cjR/K88jjbkIvF86JuIoVMCjlAPk1CeNBr
-	1X+f/oTQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50668)
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=vn0jH6CU7KHQ/wpW+WUjXbY6CCLADkErWHq5wcQ5KPY=; b=z2/azBstyNEE8fNK9RO/j3URxN
+	/HMqBM8QpLyXTMJbSNeb8o8BQHN0jiih+1BHVS2uc/ULIL/jlUM3h45zbaq3yN6Vo0eYg7pbbcG2o
+	qg0ELOzgeZ7f1MC1jZ/lo2xMhb3stSMTCMxsRElBTyqFQO2MQg7PCuLjOJhMdfPXCuA6c/CSOwQYm
+	y4Il0ybXHByyM3RoIZ5e6O4PNnJTo5nkoM23OQLs4Uc8ueIBA5Ovc3PT+6wgSBCLjQurjoTMKaw8F
+	+ASv9Ok3s6WAog/ESr1UjOjvUmmDYgRaM+5NrYFN+xFeltKi0UYYEt8B+A3yTXxZ0SSjo07ZBB7GX
+	UHvi0hVQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33424 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sCJMC-00069W-2P;
-	Wed, 29 May 2024 14:28:44 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sCJMA-0004Eb-Nb; Wed, 29 May 2024 14:28:42 +0100
-Date: Wed, 29 May 2024 14:28:42 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1sCJMi-00069t-39;
+	Wed, 29 May 2024 14:29:17 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1sCJMl-00Ecqp-K0; Wed, 29 May 2024 14:29:19 +0100
+In-Reply-To: <ZlctinnTT8Xhemsm@shell.armlinux.org.uk>
+References: <ZlctinnTT8Xhemsm@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Halaney <ahalaney@redhat.com>,
+	 Serge Semin <fancer.lancer@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Sean Anderson <sean.anderson@seco.com>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Serge Semin <fancer.lancer@gmail.com>
-Subject: [PATCH net-next 0/6] net: phylink: rearrange ovr_an_inband support
-Message-ID: <ZlctinnTT8Xhemsm@shell.armlinux.org.uk>
+	netdev@vger.kernel.org
+Subject: [PATCH net-next 1/6] net: phylink: rearrange phylink_parse_mode()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1sCJMl-00Ecqp-K0@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 29 May 2024 14:29:19 +0100
 
-Hi,
+Of the two users of phylink_config->ovr_an_inband, both manually check
+for a fixed link before setting this flag (or clearing it if they find
+a fixed link.) This is unnecessary complication.
 
-This series addresses the use of the ovr_an_inband flag, which is used
-by two drivers to indicate to phylink that they wish to use inband mode
-without firmware specifying inband mode.
+Rearrange phylink_parse_mode() a little so we can change how
+phylink_config->ovr_an_inband works. This will allow the flag to be
+tested before checking for the fixed link properties in the next patch.
 
-The issue with ovr_an_inband is that it overrides not only PHY mode,
-but also fixed-link mode. Both of the drivers that set this flag
-contain code to detect when fixed-link mode will be used, and then
-either avoid setting it or explicitly clear the flag. This is
-wasteful when phylink already knows this.
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/phylink.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Therefore, the approach taken in this patch set is to replace the
-ovr_an_inband flag with a default_an_inband flag which means that
-phylink defaults to MLO_AN_INBAND instead of MLO_AN_PHY, and will
-allow that default to be overriden if firmware specifies a fixed-link.
-This allows users of ovr_an_inband to be simplified.
-
-What's more is this requires minimal changes in phylink to allow this
-new mode of operation.
-
-This series changes phylink, and also updates the two drivers
-(fman_memac and stmmac), and then removes the unnecessary complexity
-from the drivers.
-
-This series may depend on the stmmac cleanup series I've posted
-earlier - this is something I have not checked, but I currently have
-these patches on top of that series.
-
- drivers/net/ethernet/freescale/fman/fman_memac.c  | 16 ++++++----------
- drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c | 15 ++-------------
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c |  4 ++--
- drivers/net/phy/phylink.c                         | 11 ++++++++---
- include/linux/phylink.h                           |  5 +++--
- include/linux/stmmac.h                            |  2 +-
- 6 files changed, 22 insertions(+), 31 deletions(-)
-
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 994471fad833..5abd12713598 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -899,12 +899,15 @@ static int phylink_parse_mode(struct phylink *pl,
+ 			return -EINVAL;
+ 		}
+ 
++		pl->cfg_link_an_mode = MLO_AN_INBAND;
++	}
++
++	if (pl->cfg_link_an_mode == MLO_AN_INBAND) {
+ 		linkmode_zero(pl->supported);
+ 		phylink_set(pl->supported, MII);
+ 		phylink_set(pl->supported, Autoneg);
+ 		phylink_set(pl->supported, Asym_Pause);
+ 		phylink_set(pl->supported, Pause);
+-		pl->cfg_link_an_mode = MLO_AN_INBAND;
+ 
+ 		switch (pl->link_config.interface) {
+ 		case PHY_INTERFACE_MODE_SGMII:
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.30.2
+
 
