@@ -1,83 +1,85 @@
-Return-Path: <netdev+bounces-98911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41C888D31E8
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 10:44:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25E168D3250
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 10:53:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC6582849B9
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 08:44:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1EC5B2504E
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 08:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC8E17108D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988C916F293;
 	Wed, 29 May 2024 08:42:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="Idk7nm3E"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="Sa8ibUlR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F2F168C3B;
-	Wed, 29 May 2024 08:42:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57323168C30;
+	Wed, 29 May 2024 08:42:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716972176; cv=none; b=KzIlKh+JTnXEhsWDgKT4OWG6HAC03KIZw5ABKIHCMH2gWXAvTiSnbB1AwH4XxIyaGcZiMbIQibXcVgQlIJEM7AU2y5WJKbI5H484GI0EDSvuwAYziX111TwtP/OsIqdrt5+dhU28Jh9yBApjOjxL/srDirmeka/3K8UBnlSku+g=
+	t=1716972176; cv=none; b=YulJ2h7vXsumHCDv1qbG7/E8Zw+GyHqeAXm6eKEmGanKn8SLxHp3cNwkw8I9O1Bh4C3ui0TY1GCNCBUpg6PcZIQoZNYI208t9PYf3LtslHot7B+S8ZdsKs4S7cfWUj0s1vAyWBUEskLMQHtZqQqns27TXZG7Y87EtOat/qJ6QUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1716972176; c=relaxed/simple;
-	bh=lmQNyju1MdRJn6gsKcH010bY80d0L/HYp58oN/9cEM4=;
+	bh=SqFqxkxMziT4lajTt+DcHCCFQBTQSTWhPMfdmQH0YCc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b5q88de+IbE6shxAmIx56BckvTBGF6wgu9rAsd7WlBVfH2eqYii9yb0iwpiLWCZPqc4wJKR6NJy89Fn46JIt5bV2DC4UuNrRuwuBSq8a73w4zx5GNVUdBpTrg4cbKK9Z9bn1fdUiAtvPI2n39d+7C01jB0moYwlK9hLKktAaTvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=Idk7nm3E; arc=none smtp.client-ip=210.61.82.184
+	 MIME-Version:Content-Type; b=rRGXLR7TV8Z2X4oRFsA0xEVmoEoo46TJ3BP96A7bN/3SWsgXllMFJUwIhG15IMnf+/RlHKi6/IzvWMRyN1mPzEdlnPKE1p0wOjCQBB6r0E49mjWNFSCiga8MqlJMA9i5tZzb9afCpXp3xIia+V6a35AiFLyydFeTuV6ddSJgmcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=Sa8ibUlR; arc=none smtp.client-ip=60.244.123.138
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: 6ac7e02e1d9711efbfff99f2466cf0b4-20240529
+X-UUID: 6b3069141d9711ef8c37dd7afa272265-20240529
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=zutLqdxhHEf3awr2ED7Hzd1AOyt5H3UV0Q9m643dWW8=;
-	b=Idk7nm3EpKNQhVe23SBvofsE9lymf9wGqVKL36p2cYhf+oHvNo7v3EnAitcd3qnNt2b1qyP0Ya0U+YexMg/zUOIeaGGft7K5X25iQGW/c55EXVNtPsUtOa8ZtuahTQZebYThXaHVfVHSzDqf7L7FD/10lULCoiJCsBWwUnmeM0I=;
+	h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=fWn1mnxuGDWLsH0K63lEv6ghtIitI4mKpUWd5Cueyhk=;
+	b=Sa8ibUlRY/o1CBCTF4BsQXIG4FxlNdE5JKB6g9p5Z9KYnHkmy4BcI5Lpw1M6gIW3xJah0jmAz5GdG29seLCu9xprlOvAbLEQ5eiOi7W6DlpCkBYtqYTVF0/YqoF6hFMVy1GPn3Q0GgQtIIft4HfarqCkfd+iEaYNn+dRMs8MUms=;
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.39,REQID:16e51e17-7223-4f5f-ae16-a0d97f51f6cf,IP:0,U
+X-CID-O-INFO: VERSION:1.1.39,REQID:f96f3073-c52b-4f9b-b7e9-8e28ec274d2c,IP:0,U
 	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
 	N:release,TS:-25
-X-CID-META: VersionHash:393d96e,CLOUDID:7877f243-4544-4d06-b2b2-d7e12813c598,B
+X-CID-META: VersionHash:393d96e,CLOUDID:dbf35b93-e2c0-40b0-a8fe-7c7e47299109,B
 	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
-X-UUID: 6ac7e02e1d9711efbfff99f2466cf0b4-20240529
-Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw02.mediatek.com
+	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
+	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 6b3069141d9711ef8c37dd7afa272265-20240529
+Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw01.mediatek.com
 	(envelope-from <liju-clr.chen@mediatek.com>)
 	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 354462791; Wed, 29 May 2024 16:42:44 +0800
+	with ESMTP id 929388137; Wed, 29 May 2024 16:42:44 +0800
 Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 29 May 2024 01:42:42 -0700
+ 15.2.1118.26; Wed, 29 May 2024 16:42:42 +0800
 Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
  mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
  15.2.1118.26 via Frontend Transport; Wed, 29 May 2024 16:42:42 +0800
 From: Liju-clr Chen <liju-clr.chen@mediatek.com>
 To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Catalin
- Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Steven
- Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Richard Cochran
-	<richardcochran@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Liju-clr Chen <Liju-clr.Chen@mediatek.com>, Yingshiuan Pan
-	<Yingshiuan.Pan@mediatek.com>, Ze-yu Wang <Ze-yu.Wang@mediatek.com>
+	Conor Dooley <conor+dt@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	"Catalin Marinas" <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+	"Steven Rostedt" <rostedt@goodmis.org>, Masami Hiramatsu
+	<mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Richard Cochran <richardcochran@gmail.com>, Matthias Brugger
+	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, Liju-clr Chen
+	<Liju-clr.Chen@mediatek.com>, Yingshiuan Pan <Yingshiuan.Pan@mediatek.com>,
+	Ze-yu Wang <Ze-yu.Wang@mediatek.com>
 CC: <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<linux-doc@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<linux-trace-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
 	<linux-mediatek@lists.infradead.org>, David Bradil <dbrazdil@google.com>,
 	Trilok Soni <quic_tsoni@quicinc.com>, Shawn Hsiao <shawn.hsiao@mediatek.com>,
 	PeiLun Suei <PeiLun.Suei@mediatek.com>, Chi-shen Yeh
-	<Chi-shen.Yeh@mediatek.com>, Kevenny Hsieh <Kevenny.Hsieh@mediatek.com>
-Subject: [PATCH v11 19/21] virt: geniezone: Provide individual VM memory statistics within debugfs
-Date: Wed, 29 May 2024 16:42:37 +0800
-Message-ID: <20240529084239.11478-20-liju-clr.chen@mediatek.com>
+	<Chi-shen.Yeh@mediatek.com>, Kevenny Hsieh <Kevenny.Hsieh@mediatek.com>,
+	Liju-clr Chen <liju-clr.chen@mediatek.com>
+Subject: [PATCH v11 20/21] virt: geniezone: Add tracing support for hyp call and vcpu exit_reason
+Date: Wed, 29 May 2024 16:42:38 +0800
+Message-ID: <20240529084239.11478-21-liju-clr.chen@mediatek.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20240529084239.11478-1-liju-clr.chen@mediatek.com>
 References: <20240529084239.11478-1-liju-clr.chen@mediatek.com>
@@ -88,355 +90,204 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
+X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-AS-Result: No-10--12.057800-8.000000
+X-TMASE-MatchedRID: tpf4JaSfoco9S3IiQd+eNcNrWpY804TGLoYOuiLW+uVh2fnHe1cil1mB
+	Y2oLO+3hkVOFsc3HEGn8I8AIZZ2s3pSL8e/MGApZKy67dnbJjn4WnD2CPybLCsXhke5ra0593AG
+	yPNT+2TGM0+ypVXg5IEzyp2gK85W+VJTV35UngiMVglQa/gMvfIfsPVs/8Vw6SSUXkvSVAdwluI
+	Iv8IIdTRyagBEJyc4yUvgoj+bRd81VY7t+zwxALh3EEAbn+GRbwx0jRRxcQfPxCQaCt6X8bibLS
+	tTV0GSXiOUo3zIx595/jtPF2D6Mdii34jbc8Vq/ngIgpj8eDcAZ1CdBJOsoY8RB0bsfrpPIXzYx
+	eQR1DvvSxITrGtEBWVyPrCJBz1RPIZaK+J7yt4S+BDbLKQc376AAPLN8oQEA
+X-TM-AS-User-Approved-Sender: No
+X-TM-AS-User-Blocked-Sender: No
+X-TMASE-Result: 10--12.057800-8.000000
+X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-SNTS-SMTP: 465F3C0EDEB7861008F875B1ACDD7EABE5C35490C3BD40BED4378716F628A8212000:8
 X-MTK: N
 
 From: Yi-De Wu <yi-de.wu@mediatek.com>
 
-From: "Jerry Wang" <ze-yu.wang@mediatek.com>
+Add tracepoints for hypervisor calls and VCPU exit reasons in GenieZone
+driver. It aids performance debugging by providing more information
+about hypervisor operations and VCPU behavior.
 
-Created a dedicated per-VM debugfs folder under gzvm, providing
-user-level programs with easy access to per-VM memory statistics for
-debugging and profiling purposes. This enables users to effectively
-analyze and optimize the memory usage of individual virtual machines.
-
-Two types of information can be obtained:
-
-`cat /sys/kernel/debug/gzvm/<pid>-<vmid>/protected_hyp_mem` shows memory
-used by the hypervisor and the size of the stage 2 table in bytes.
-
-`cat /sys/kernel/debug/gzvm/<pid>-<vmid>/protected_shared_mem` gives
-memory used by the shared resources of the guest and host in bytes.
+Command Usage:
+echo geniezone:* >> /sys/kernel/tracing/set_event
+echo 1 > /sys/kernel/tracing/tracing_on
+echo 0 > /sys/kernel/tracing/tracing_on
+cat /sys/kernel/tracing/trace
 
 For example:
-console:/ # cat /sys/kernel/debug/gzvm/3417-15/protected_hyp_mem
-180328
-console:/ # cat /sys/kernel/debug/gzvm/3417-15/protected_shared_mem
-262144
-console:/ #
+crosvm_vcpu0-4874    [007] .....    94.757349: mtk_hypcall_enter: id=0xfb001005
+crosvm_vcpu0-4874    [007] .....    94.760902: mtk_hypcall_leave: id=0xfb001005 invalid=0
+crosvm_vcpu0-4874    [007] .....    94.760902: mtk_vcpu_exit: vcpu exit_reason=IRQ(0x92920003)
 
-More stats will be added in the future.
+This example tracks a hypervisor function call by an ID (`0xbb001005`)
+from initiation to termination, which is supported (invalid=0). A vCPU
+exit is triggered by an Interrupt Request (IRQ) (exit reason: 0x92920003).
 
-Signed-off-by: Jerry Wang <ze-yu.wang@mediatek.com>
-Signed-off-by: Liju-Clr Chen <liju-clr.chen@mediatek.com>
+/* VM exit reason */
+enum {
+	GZVM_EXIT_UNKNOWN = 0x92920000,
+	GZVM_EXIT_MMIO = 0x92920001,
+	GZVM_EXIT_HYPERCALL = 0x92920002,
+	GZVM_EXIT_IRQ = 0x92920003,
+	GZVM_EXIT_EXCEPTION = 0x92920004,
+	GZVM_EXIT_DEBUG = 0x92920005,
+	GZVM_EXIT_FAIL_ENTRY = 0x92920006,
+	GZVM_EXIT_INTERNAL_ERROR = 0x92920007,
+	GZVM_EXIT_SYSTEM_EVENT = 0x92920008,
+	GZVM_EXIT_SHUTDOWN = 0x92920009,
+	GZVM_EXIT_GZ = 0x9292000a,
+};
+
+Signed-off-by: Liju-clr Chen <liju-clr.chen@mediatek.com>
 Signed-off-by: Yi-De Wu <yi-de.wu@mediatek.com>
 ---
- arch/arm64/geniezone/gzvm_arch_common.h |   2 +
- arch/arm64/geniezone/vm.c               |  13 +++
- drivers/virt/geniezone/gzvm_main.c      |   6 ++
- drivers/virt/geniezone/gzvm_vm.c        | 134 ++++++++++++++++++++++++
- include/linux/soc/mediatek/gzvm_drv.h   |  17 +++
- 5 files changed, 172 insertions(+)
+ arch/arm64/geniezone/vm.c          |  4 ++
+ drivers/virt/geniezone/gzvm_vcpu.c |  3 ++
+ include/trace/events/geniezone.h   | 84 ++++++++++++++++++++++++++++++
+ 3 files changed, 91 insertions(+)
+ create mode 100644 include/trace/events/geniezone.h
 
-diff --git a/arch/arm64/geniezone/gzvm_arch_common.h b/arch/arm64/geniezone/gzvm_arch_common.h
-index 8a082ba808a4..192d023722e5 100644
---- a/arch/arm64/geniezone/gzvm_arch_common.h
-+++ b/arch/arm64/geniezone/gzvm_arch_common.h
-@@ -26,6 +26,7 @@ enum {
- 	GZVM_FUNC_SET_DTB_CONFIG = 16,
- 	GZVM_FUNC_MAP_GUEST = 17,
- 	GZVM_FUNC_MAP_GUEST_BLOCK = 18,
-+	GZVM_FUNC_GET_STATISTICS = 19,
- 	NR_GZVM_FUNC,
- };
- 
-@@ -52,6 +53,7 @@ enum {
- #define MT_HVC_GZVM_SET_DTB_CONFIG	GZVM_HCALL_ID(GZVM_FUNC_SET_DTB_CONFIG)
- #define MT_HVC_GZVM_MAP_GUEST		GZVM_HCALL_ID(GZVM_FUNC_MAP_GUEST)
- #define MT_HVC_GZVM_MAP_GUEST_BLOCK	GZVM_HCALL_ID(GZVM_FUNC_MAP_GUEST_BLOCK)
-+#define MT_HVC_GZVM_GET_STATISTICS	GZVM_HCALL_ID(GZVM_FUNC_GET_STATISTICS)
- 
- #define GIC_V3_NR_LRS			16
- 
 diff --git a/arch/arm64/geniezone/vm.c b/arch/arm64/geniezone/vm.c
-index 1334aae87d2d..62ffb415354c 100644
+index 62ffb415354c..618de2ff9471 100644
 --- a/arch/arm64/geniezone/vm.c
 +++ b/arch/arm64/geniezone/vm.c
-@@ -406,3 +406,16 @@ int gzvm_arch_map_guest_block(u16 vm_id, int memslot_id, u64 gfn, u64 nr_pages)
- 	return gzvm_hypcall_wrapper(MT_HVC_GZVM_MAP_GUEST_BLOCK, vm_id,
- 				    memslot_id, gfn, nr_pages, 0, 0, 0, &res);
- }
-+
-+int gzvm_arch_get_statistics(struct gzvm *gzvm)
-+{
-+	struct arm_smccc_res res;
-+	int ret;
-+
-+	ret = gzvm_hypcall_wrapper(MT_HVC_GZVM_GET_STATISTICS, gzvm->vm_id,
-+				   0, 0, 0, 0, 0, 0, &res);
-+
-+	gzvm->stat.protected_hyp_mem = ((ret == 0) ? res.a1 : 0);
-+	gzvm->stat.protected_shared_mem = ((ret == 0) ? res.a2 : 0);
-+	return ret;
-+}
-diff --git a/drivers/virt/geniezone/gzvm_main.c b/drivers/virt/geniezone/gzvm_main.c
-index f5aae2d121f2..09e303df1f85 100644
---- a/drivers/virt/geniezone/gzvm_main.c
-+++ b/drivers/virt/geniezone/gzvm_main.c
-@@ -109,6 +109,11 @@ static int gzvm_drv_probe(struct platform_device *pdev)
- 	ret = gzvm_drv_irqfd_init();
- 	if (ret)
- 		return ret;
-+
-+	ret = gzvm_drv_debug_init();
-+	if (ret)
-+		return ret;
-+
- 	return 0;
- }
+@@ -7,6 +7,8 @@
+ #include <linux/err.h>
+ #include <linux/uaccess.h>
  
-@@ -117,6 +122,7 @@ static int gzvm_drv_remove(struct platform_device *pdev)
- 	gzvm_drv_irqfd_exit();
- 	gzvm_destroy_all_vms();
- 	misc_deregister(&gzvm_dev);
-+	gzvm_drv_debug_exit();
- 	return 0;
- }
++#define CREATE_TRACE_POINTS
++#include <trace/events/geniezone.h>
+ #include <linux/gzvm.h>
+ #include <linux/soc/mediatek/gzvm_drv.h>
+ #include "gzvm_arch_common.h"
+@@ -44,11 +46,13 @@ int gzvm_hypcall_wrapper(unsigned long a0, unsigned long a1,
+ 		.a6 = a6,
+ 		.a7 = a7,
+ 	};
++	trace_mtk_hypcall_enter(a0);
+ 	arm_smccc_1_2_hvc(&args, &res_1_2);
+ 	res->a0 = res_1_2.a0;
+ 	res->a1 = res_1_2.a1;
+ 	res->a2 = res_1_2.a2;
+ 	res->a3 = res_1_2.a3;
++	trace_mtk_hypcall_leave(a0, (res->a0 != ERR_NOT_SUPPORTED) ? 0 : 1);
  
-diff --git a/drivers/virt/geniezone/gzvm_vm.c b/drivers/virt/geniezone/gzvm_vm.c
-index 4bfa56ef5b8b..3fb212143686 100644
---- a/drivers/virt/geniezone/gzvm_vm.c
-+++ b/drivers/virt/geniezone/gzvm_vm.c
-@@ -11,11 +11,14 @@
+ 	return gzvm_err_to_errno(res->a0);
+ }
+diff --git a/drivers/virt/geniezone/gzvm_vcpu.c b/drivers/virt/geniezone/gzvm_vcpu.c
+index 8741088de479..28bd690e4b7c 100644
+--- a/drivers/virt/geniezone/gzvm_vcpu.c
++++ b/drivers/virt/geniezone/gzvm_vcpu.c
+@@ -10,6 +10,8 @@
+ #include <linux/mm.h>
  #include <linux/platform_device.h>
  #include <linux/slab.h>
++
++#include <trace/events/geniezone.h>
  #include <linux/soc/mediatek/gzvm_drv.h>
-+#include <linux/debugfs.h>
- #include "gzvm_common.h"
  
- static DEFINE_MUTEX(gzvm_list_lock);
- static LIST_HEAD(gzvm_list);
+ /* maximum size needed for holding an integer */
+@@ -103,6 +105,7 @@ static long gzvm_vcpu_run(struct gzvm_vcpu *vcpu, void __user *argp)
  
-+static struct dentry *gzvm_debugfs_dir;
-+
- int gzvm_gfn_to_hva_memslot(struct gzvm_memslot *memslot, u64 gfn,
- 			    u64 *hva_memslot)
- {
-@@ -342,6 +345,12 @@ static void gzvm_destroy_all_ppage(struct gzvm *gzvm)
- 	}
- }
+ 	while (!need_userspace && !signal_pending(current)) {
+ 		gzvm_arch_vcpu_run(vcpu, &exit_reason);
++		trace_mtk_vcpu_exit(exit_reason);
  
-+static int gzvm_destroy_vm_debugfs(struct gzvm *vm)
-+{
-+	debugfs_remove_recursive(vm->debug_dir);
-+	return 0;
-+}
-+
- static void gzvm_destroy_vm(struct gzvm *gzvm)
- {
- 	size_t allocated_size;
-@@ -368,6 +377,8 @@ static void gzvm_destroy_vm(struct gzvm *gzvm)
- 	/* No need to lock here becauese it's single-threaded execution */
- 	gzvm_destroy_all_ppage(gzvm);
- 
-+	gzvm_destroy_vm_debugfs(gzvm);
-+
- 	kfree(gzvm);
- }
- 
-@@ -425,6 +436,108 @@ static void setup_vm_demand_paging(struct gzvm *vm)
- 	}
- }
- 
-+/**
-+ * hyp_mem_read() - Get size of hypervisor-allocated memory and stage 2 table
-+ * @file: Pointer to struct file
-+ * @buf: User space buffer for storing the return value
-+ * @len: Size of @buf, in bytes
-+ * @offset: Pointer to loff_t
-+ *
-+ * Return: Size of hypervisor-allocated memory and stage 2 table, in bytes
+ 		switch (exit_reason) {
+ 		case GZVM_EXIT_MMIO:
+diff --git a/include/trace/events/geniezone.h b/include/trace/events/geniezone.h
+new file mode 100644
+index 000000000000..4fffd826ba67
+--- /dev/null
++++ b/include/trace/events/geniezone.h
+@@ -0,0 +1,84 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (c) 2023 MediaTek Inc.
 + */
-+static ssize_t hyp_mem_read(struct file *file, char __user *buf, size_t len,
-+			    loff_t *offset)
-+{
-+	char tmp_buffer[GZVM_MAX_DEBUGFS_VALUE_SIZE] = {0};
-+	struct gzvm *vm = file->private_data;
-+	int ret;
 +
-+	if (*offset == 0) {
-+		ret = gzvm_arch_get_statistics(vm);
-+		if (ret)
-+			return ret;
-+		snprintf(tmp_buffer, sizeof(tmp_buffer), "%llu\n",
-+			 vm->stat.protected_hyp_mem);
-+		if (copy_to_user(buf, tmp_buffer, sizeof(tmp_buffer)))
-+			return -EFAULT;
-+		*offset += sizeof(tmp_buffer);
-+		return sizeof(tmp_buffer);
-+	}
-+	return 0;
-+}
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM geniezone
 +
-+/**
-+ * shared_mem_read() - Get size of memory shared between host and guest
-+ * @file: Pointer to struct file
-+ * @buf: User space buffer for storing the return value
-+ * @len: Size of @buf, in bytes
-+ * @offset: Pointer to loff_t
-+ *
-+ * Return: Size of memory shared between host and guest, in bytes
-+ */
-+static ssize_t shared_mem_read(struct file *file, char __user *buf, size_t len,
-+			       loff_t *offset)
-+{
-+	char tmp_buffer[GZVM_MAX_DEBUGFS_VALUE_SIZE] = {0};
-+	struct gzvm *vm = file->private_data;
-+	int ret;
++#define _TRACE_GENIEZONE_H
 +
-+	if (*offset == 0) {
-+		ret = gzvm_arch_get_statistics(vm);
-+		if (ret)
-+			return ret;
-+		snprintf(tmp_buffer, sizeof(tmp_buffer), "%llu\n",
-+			 vm->stat.protected_shared_mem);
-+		if (copy_to_user(buf, tmp_buffer, sizeof(tmp_buffer)))
-+			return -EFAULT;
-+		*offset += sizeof(tmp_buffer);
-+		return sizeof(tmp_buffer);
-+	}
-+	return 0;
-+}
++#include <linux/gzvm.h>
++#include <linux/tracepoint.h>
 +
-+static const struct file_operations hyp_mem_fops = {
-+	.open = simple_open,
-+	.read = hyp_mem_read,
-+	.llseek = no_llseek,
-+};
++#define GZVM_EXIT_REASONS \
++EM(UNKNOWN)\
++EM(MMIO)\
++EM(HYPERCALL)\
++EM(IRQ)\
++EM(EXCEPTION)\
++EM(DEBUG)\
++EM(FAIL_ENTRY)\
++EM(INTERNAL_ERROR)\
++EM(SYSTEM_EVENT)\
++EM(SHUTDOWN)\
++EMe(GZ)
 +
-+static const struct file_operations shared_mem_fops = {
-+	.open = simple_open,
-+	.read = shared_mem_read,
-+	.llseek = no_llseek,
-+};
++#undef EM
++#undef EMe
++#define EM(a) TRACE_DEFINE_ENUM(GZVM_EXIT_##a);
++#define EMe(a) TRACE_DEFINE_ENUM(GZVM_EXIT_##a);
 +
-+static int gzvm_create_vm_debugfs(struct gzvm *vm)
-+{
-+	struct dentry *dent;
-+	char dir_name[GZVM_MAX_DEBUGFS_DIR_NAME_SIZE];
++GZVM_EXIT_REASONS
 +
-+	if (!gzvm_debugfs_dir)
-+		return -EFAULT;
++#undef EM
++#undef EMe
 +
-+	if (vm->debug_dir) {
-+		pr_warn("VM debugfs directory is duplicated\n");
-+		return 0;
-+	}
++#define EM(a)       { GZVM_EXIT_##a, #a },
++#define EMe(a)      { GZVM_EXIT_##a, #a }
 +
-+	snprintf(dir_name, sizeof(dir_name), "%d-%d", task_pid_nr(current), vm->vm_id);
++TRACE_EVENT(mtk_hypcall_enter,
++	    TP_PROTO(unsigned long id),
 +
-+	dent = debugfs_lookup(dir_name, gzvm_debugfs_dir);
-+	if (dent) {
-+		pr_warn("Debugfs directory is duplicated\n");
-+		dput(dent);
-+		return 0;
-+	}
-+	dent = debugfs_create_dir(dir_name, gzvm_debugfs_dir);
-+	vm->debug_dir = dent;
++	    TP_ARGS(id),
 +
-+	debugfs_create_file("protected_shared_mem", 0444, dent, vm, &shared_mem_fops);
-+	debugfs_create_file("protected_hyp_mem", 0444, dent, vm, &hyp_mem_fops);
++	    TP_STRUCT__entry(__field(unsigned long, id)),
 +
-+	return 0;
-+}
++	    TP_fast_assign(__entry->id = id;),
 +
- static int setup_mem_alloc_mode(struct gzvm *vm)
- {
- 	int ret;
-@@ -484,6 +597,10 @@ static struct gzvm *gzvm_create_vm(unsigned long vm_type)
- 	list_add(&gzvm->vm_list, &gzvm_list);
- 	mutex_unlock(&gzvm_list_lock);
- 
-+	ret = gzvm_create_vm_debugfs(gzvm);
-+	if (ret)
-+		pr_debug("Failed to create debugfs for VM-%u\n", gzvm->vm_id);
++	    TP_printk("id=0x%lx", __entry->id)
++);
 +
- 	pr_debug("VM-%u is created\n", gzvm->vm_id);
- 
- 	return gzvm;
-@@ -521,3 +638,20 @@ void gzvm_destroy_all_vms(void)
- out:
- 	mutex_unlock(&gzvm_list_lock);
- }
++TRACE_EVENT(mtk_hypcall_leave,
++	    TP_PROTO(unsigned long id, unsigned long invalid),
 +
-+int gzvm_drv_debug_init(void)
-+{
-+	if (!debugfs_initialized())
-+		return 0;
++	    TP_ARGS(id, invalid),
 +
-+	if (!gzvm_debugfs_dir && !debugfs_lookup("gzvm", gzvm_debugfs_dir))
-+		gzvm_debugfs_dir = debugfs_create_dir("gzvm", NULL);
++	    TP_STRUCT__entry(__field(unsigned long, id)
++			     __field(unsigned long, invalid)
++	    ),
 +
-+	return 0;
-+}
++	    TP_fast_assign(__entry->id = id;
++			   __entry->invalid = invalid;
++	    ),
 +
-+void gzvm_drv_debug_exit(void)
-+{
-+	if (gzvm_debugfs_dir && debugfs_lookup("gzvm", gzvm_debugfs_dir))
-+		debugfs_remove_recursive(gzvm_debugfs_dir);
-+}
-diff --git a/include/linux/soc/mediatek/gzvm_drv.h b/include/linux/soc/mediatek/gzvm_drv.h
-index b8cec9717606..7c0ccbcd114f 100644
---- a/include/linux/soc/mediatek/gzvm_drv.h
-+++ b/include/linux/soc/mediatek/gzvm_drv.h
-@@ -47,6 +47,9 @@
- 
- #define GZVM_BLOCK_BASED_DEMAND_PAGE_SIZE	(2 * 1024 * 1024) /* 2MB */
- 
-+#define GZVM_MAX_DEBUGFS_DIR_NAME_SIZE  20
-+#define GZVM_MAX_DEBUGFS_VALUE_SIZE	20
++	    TP_printk("id=0x%lx invalid=%lu", __entry->id, __entry->invalid)
++);
 +
- enum gzvm_demand_paging_mode {
- 	GZVM_FULLY_POPULATED = 0,
- 	GZVM_DEMAND_PAGING = 1,
-@@ -112,6 +115,11 @@ struct gzvm_pinned_page {
- 	u64 ipa;
- };
- 
-+struct gzvm_vm_stat {
-+	u64 protected_hyp_mem;
-+	u64 protected_shared_mem;
-+};
++TRACE_EVENT(mtk_vcpu_exit,
++	    TP_PROTO(unsigned long exit_reason),
 +
- /**
-  * struct gzvm: the following data structures are for data transferring between
-  * driver and hypervisor, and they're aligned with hypervisor definitions.
-@@ -135,6 +143,8 @@ struct gzvm_pinned_page {
-  * @demand_page_buffer: the mailbox for transferring large portion pages
-  * @demand_paging_lock: lock for preventing multiple cpu using the same demand
-  * page mailbox at the same time
-+ * @stat: information for VM memory statistics
-+ * @debug_dir: debugfs directory node for VM memory statistics
-  */
- struct gzvm {
- 	struct gzvm_vcpu *vcpus[GZVM_MAX_VCPUS];
-@@ -166,6 +176,9 @@ struct gzvm {
- 	u32 demand_page_gran;
- 	u64 *demand_page_buffer;
- 	struct mutex  demand_paging_lock;
++	    TP_ARGS(exit_reason),
 +
-+	struct gzvm_vm_stat stat;
-+	struct dentry *debug_dir;
- };
- 
- long gzvm_dev_ioctl_check_extension(struct gzvm *gzvm, unsigned long args);
-@@ -187,6 +200,7 @@ int gzvm_arch_destroy_vm(u16 vm_id);
- int gzvm_arch_map_guest(u16 vm_id, int memslot_id, u64 pfn, u64 gfn,
- 			u64 nr_pages);
- int gzvm_arch_map_guest_block(u16 vm_id, int memslot_id, u64 gfn, u64 nr_pages);
-+int gzvm_arch_get_statistics(struct gzvm *gzvm);
- int gzvm_vm_ioctl_arch_enable_cap(struct gzvm *gzvm,
- 				  struct gzvm_enable_cap *cap,
- 				  void __user *argp);
-@@ -205,6 +219,9 @@ int gzvm_arch_vcpu_run(struct gzvm_vcpu *vcpu, __u64 *exit_reason);
- int gzvm_arch_destroy_vcpu(u16 vm_id, int vcpuid);
- int gzvm_arch_inform_exit(u16 vm_id);
- 
-+int gzvm_drv_debug_init(void);
-+void gzvm_drv_debug_exit(void);
++	    TP_STRUCT__entry(__field(unsigned long, exit_reason)),
 +
- int gzvm_find_memslot(struct gzvm *vm, u64 gpa);
- int gzvm_handle_page_fault(struct gzvm_vcpu *vcpu);
- bool gzvm_handle_guest_exception(struct gzvm_vcpu *vcpu);
++	    TP_fast_assign(__entry->exit_reason = exit_reason;),
++
++	    TP_printk("vcpu exit_reason=%s(0x%lx)",
++		      __print_symbolic(__entry->exit_reason, GZVM_EXIT_REASONS),
++		      __entry->exit_reason)
++
++);
++
++/* This part must be outside protection */
++#include <trace/define_trace.h>
 -- 
 2.18.0
 
