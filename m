@@ -1,166 +1,132 @@
-Return-Path: <netdev+bounces-99088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83E9B8D3B05
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:30:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12D5B8D3B3B
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:42:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A5C6B27C1E
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 15:30:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3AC928A1BE
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 15:42:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 821171386A7;
-	Wed, 29 May 2024 15:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 597FB181B9C;
+	Wed, 29 May 2024 15:42:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="EQioPecm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Eagpz2Qe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9B612E6D;
-	Wed, 29 May 2024 15:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87DC181321
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 15:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716996613; cv=none; b=Px3mZGY0l5/CZUQ/rlgN3SZlFTTbP0khSFRHhZmBuqIcssj7Lib3Lm3rdFnDXOTbEpGLFiethU+o6EORsamqJMMMg1vTyG+Um42gAeD91HJvBvshDGp8YmNmQkLzCEChoSZ8ymWvkbMpAG4MLyPZa8nbF9qiAuNwnvWorJqAaEc=
+	t=1716997362; cv=none; b=COgCDZFnVIyeVVDjxoGuC9Mvrs/bkfg6x9gNEk0cgpTgVLg9XrxHuQ9/Z9+HXefuD4W0ULUGrHZ8vuG06qeSQld13rA6K5Zm0eTPPg9mtP9qH2I8L7dToO1U/1QHIMhRfOd8bJDitEElkRXjivaGkPf5HXKsjAco172UivnlKDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716996613; c=relaxed/simple;
-	bh=fFeFeTx4/whvByelW2t6NQHLEkQwMkDj9Zr3e58ZgAY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aodj7ey5WUtef6PZwS2+DtfNO0N58uKHg/lHpGozfcq2kWrp5Xvq+VVWFZWgQbwbNnmcsFhp1IXvJ3AQY9BN9srvh5rD1XqNloe9UFJbxnSPSIkqAM0XIj7O9R+1vieLb0ooHGCtrGmeUG03nJhfSlpAf05gDXrq9zSzKHj0mFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=EQioPecm; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44T61ORF007699;
-	Wed, 29 May 2024 08:29:51 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	pfpt0220; bh=drVg0/vAG/dCOXINnqroxWPrHKOYYFCNDsNDCM+Q4vI=; b=EQi
-	oPecmHx11eKMs9yKRMwciKd0uCK5NOcrnWEKzU3Q2GRlAyKAHM3fAV0ht0wUybGu
-	nOwORcxaBA3W3GIb3PzfbyIzTUCGF/5LtsT0+CJI8hfgY9w755PfGye0FffZ7bHO
-	8C20mQz5CuJGabsdyGna9E6ER6S230MUWCu+vCmZTeGyKRxGRrHSozFOeoHbXCn/
-	J74hr4W7m10xfwH9qlW/PA/P2kc5KVVJhY4REvf9199r0FOUKbHRlLzc0BxmD6j5
-	fshZeApDaZGFH6YLexjd2KddLXBW9FwLQU/Uk/V3BKapL6jadtSNt+PSMf+IJxOf
-	M6TbkBjf+Kfv9LEysoA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3ydxqq1tbn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 May 2024 08:29:51 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 29 May 2024 08:29:50 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 29 May 2024 08:29:50 -0700
-Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id 089463F7051;
-	Wed, 29 May 2024 08:29:46 -0700 (PDT)
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Subbaraya Sundeep <sbhatta@marvell.com>,
-        Sunil Goutham
-	<sgoutham@marvell.com>,
-        Linu Cherian <lcherian@marvell.com>,
-        Geetha sowjanya
-	<gakula@marvell.com>,
-        Jerin Jacob <jerinj@marvell.com>, hariprasad
-	<hkelam@marvell.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>
-Subject: [net PATCH] octeontx2-af: Always allocate PF entries from low prioriy zone
-Date: Wed, 29 May 2024 20:59:44 +0530
-Message-ID: <1716996584-14470-1-git-send-email-sbhatta@marvell.com>
-X-Mailer: git-send-email 2.7.4
+	s=arc-20240116; t=1716997362; c=relaxed/simple;
+	bh=Sm0A3tOr5Lpr1Y/HFq8SiAXVhPV4YFwkMkerFXc2prk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cJj4SWmRFuKCeiG9hYELFn4rtfPL5cqk2ahhWawewiKN1MMK6zWWnxTRQpn7EGs+psI+avKfHutk20FBSuAdXGMCXqAAMa2Wn8IjLT4Dm3VMJCPMLN/RVS6twjfhqlQk2fj9xAwKe2rsjzn2goHwEZoIvKgN1/jAX44RZEWSLYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Eagpz2Qe; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5750a8737e5so18911a12.0
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 08:42:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716997359; x=1717602159; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MUsLqmE+3pbRuNtRxo5yB/RArJM9ezRE3b0arTtCqls=;
+        b=Eagpz2QeIqZuFMabN/0MU0Mbb7Kv1C9zX3kTIUv3BAWoStoYcvgTzvsEuNZf6fuwxk
+         Py2PWp+di5olJlDVCxahmVkRiVn4686jV7VGKjPilfYSJv+7buCZuE9NRYhN0aFkE1qA
+         k6om9JM7jhLs5Vms9zmHJnJMgBCjVyaMM5Nz9W4Tj8eYAKwHIYcRkhktFZE2UOfDoCVW
+         AN+JcsRcTMPsX9mvTckhyRqdoR2dw0EtNgD01iW1lXZea+4c9FESwrdl4A71VFm62bsl
+         NRWFpQKhxrzky3qfBYx50bbr8jCG5LkipoDiPX4eHXobx9N/Y8tyXZ+2j0iv9T3tMfXX
+         x6IA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716997359; x=1717602159;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MUsLqmE+3pbRuNtRxo5yB/RArJM9ezRE3b0arTtCqls=;
+        b=DCjZBZDo7G1kam8n/QIeRhB1ojYtVx7oCwWjrnvjRx7W7DFBbPZGo9DxB5bVsOcrr3
+         QaeZ8VxwAX1/qxnJ02nGv3cZR0pHA3jklShCtVftPTUdIFMKDnRRa3CHCf5Bf9nrZqRM
+         KrQhGtvjLCUEvwlzyoYO8UWZACLZ7Uqy9BE7pyFFesq+JAvmaJS5mhrRY7uRTzdfmudn
+         1wf3csrx6iMIMpaYB9FqawFbYPocwX+rmh9BHj+SD8jCBceB3RtjJGM0ANLbPWGGp/x1
+         fcBwJ0yRH9PCb0+YiEC2Pq5FRxAbzS3cKrhFbnWtSTZyiBXxBQAl7mglJgaiiAB0tVXd
+         QXZA==
+X-Forwarded-Encrypted: i=1; AJvYcCX3/JtXjCa+CLw+tMCP+R37vCzLY6g3RxcV0wqYO0jQoFGmo2aNB7CNry7ma3Ufo74CqbhsISNxmpbucoRJg4TGkXcnhXIt
+X-Gm-Message-State: AOJu0Yxok0AwVLlseQhUCR0UQ7W61beVvTtcqTVc5nBQcCsrxpRVRj+S
+	xjpUJpdb3CvHhS1m5VKhGT23pzgfbooCv5lPBlPwawMoE6lDcfAFEaj+34pPyqjEyxX8c6+heqN
+	rbQoxoLkprpNDkymCVXFzmo9mmpNpxt3adnDQ
+X-Google-Smtp-Source: AGHT+IEa+j/A03mDh/Kc5FH7+7Vnrk+8M91Hr2cMFkip2QHLgN/VqxyI0Pb7ZAKi9Nrotu1WVrjF60rj3Exj15INSjA=
+X-Received: by 2002:aa7:de18:0:b0:578:647d:a27e with SMTP id
+ 4fb4d7f45d1cf-57a05d1e5admr162097a12.1.1716997358649; Wed, 29 May 2024
+ 08:42:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: rbCyzZKdTZmtsqTFA7pVRBs5Flp211po
-X-Proofpoint-ORIG-GUID: rbCyzZKdTZmtsqTFA7pVRBs5Flp211po
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-29_11,2024-05-28_01,2024-05-17_01
+References: <20240529033104.33882-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20240529033104.33882-1-kerneljasonxing@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 29 May 2024 17:42:27 +0200
+Message-ID: <CANn89iJ93U8mxLXXuk=nT83mox1FHue+OPCkqBJ1FnHM5N9DHQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] tcp: introduce a new MIB for CLOSE-WAIT sockets
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	davem@davemloft.net, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, Yongming Liu <yomiliu@tencent.com>, 
+	Wangzi Yong <curuwang@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-PF mcam entries has to be at low priority always so that VF
-can install longest prefix match rules at higher priority.
-This was taken care currently but when priority allocation
-wrt reference entry is requested then entries are allocated
-from mid-zone instead of low priority zone. Fix this and
-always allocate entries from low priority zone for PFs.
+On Wed, May 29, 2024 at 5:31=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> From: Jason Xing <kernelxing@tencent.com>
+>
+> CLOSE-WAIT is a relatively special state which "represents waiting for
+> a connection termination request from the local user" (RFC 793). Some
+> issues may happen because of unexpected/too many CLOSE-WAIT sockets,
+> like user application mistakenly handling close() syscall. It's a very
+> common issue in the real world.
+>
+> We want to trace this total number of CLOSE-WAIT sockets fastly and
+> frequently instead of resorting to displaying them altogether by using:
+>
+>   ss -s state close-wait
+>
+> or something like this. They need to loop and collect required socket
+> information in kernel and then get back to the userside for print, which
+> does harm to the performance especially in heavy load for frequent
+> sampling.
+>
+> That's the reason why I chose to introduce this new MIB counter like
+> CurrEstab does. With this counter implemented, we can record/observe the
+> normal changes of this counter all the time. It can help us:
+> 1) We are able to be alerted in advance if the counter changes drasticall=
+y.
+> 2) If some users report some issues happening, we will particularly
+> pay more attention to it.
+>
+> Besides, in the group of TCP_MIB_* defined by RFC 1213, TCP_MIB_CURRESTAB
+> should include both ESTABLISHED and CLOSE-WAIT sockets in theory:
+>
 
-Fixes: 7df5b4b260dd ("octeontx2-af: Allocate low priority entries for PF")
-Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
----
- .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 33 ++++++++++++-------
- 1 file changed, 22 insertions(+), 11 deletions(-)
+We (Neal and myself) prefer to fix TCP_MIB_CURRESTAB to include
+CLOSE_WAIT sockets.
+We do not think it will annoy anyone, please change tcp_set_state() accordi=
+ngly.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-index e8b73b9d75e3..97722ce8c4cb 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-@@ -2519,7 +2519,17 @@ static int npc_mcam_alloc_entries(struct npc_mcam *mcam, u16 pcifunc,
- 	 * - when available free entries are less.
- 	 * Lower priority ones out of avaialble free entries are always
- 	 * chosen when 'high vs low' question arises.
-+	 *
-+	 * For a VF base MCAM match rule is set by its PF. And all the
-+	 * further MCAM rules installed by VF on its own are
-+	 * concatenated with the base rule set by its PF. Hence PF entries
-+	 * should be at lower priority compared to VF entries. Otherwise
-+	 * base rule is hit always and rules installed by VF will be of
-+	 * no use. Hence if the request is from PF then allocate low
-+	 * priority entries.
- 	 */
-+	if (!(pcifunc & RVU_PFVF_FUNC_MASK))
-+		goto lprio_alloc;
- 
- 	/* Get the search range for priority allocation request */
- 	if (req->priority) {
-@@ -2528,17 +2538,6 @@ static int npc_mcam_alloc_entries(struct npc_mcam *mcam, u16 pcifunc,
- 		goto alloc;
- 	}
- 
--	/* For a VF base MCAM match rule is set by its PF. And all the
--	 * further MCAM rules installed by VF on its own are
--	 * concatenated with the base rule set by its PF. Hence PF entries
--	 * should be at lower priority compared to VF entries. Otherwise
--	 * base rule is hit always and rules installed by VF will be of
--	 * no use. Hence if the request is from PF and NOT a priority
--	 * allocation request then allocate low priority entries.
--	 */
--	if (!(pcifunc & RVU_PFVF_FUNC_MASK))
--		goto lprio_alloc;
--
- 	/* Find out the search range for non-priority allocation request
- 	 *
- 	 * Get MCAM free entry count in middle zone.
-@@ -2568,6 +2567,18 @@ static int npc_mcam_alloc_entries(struct npc_mcam *mcam, u16 pcifunc,
- 		reverse = true;
- 		start = 0;
- 		end = mcam->bmap_entries;
-+		/* Ensure PF requests are always at bottom and if PF requests
-+		 * for higher/lower priority entry wrt reference entry then
-+		 * honour that criteria and start search for entries from bottom
-+		 * and not in mid zone.
-+		 */
-+		if (!(pcifunc & RVU_PFVF_FUNC_MASK) &&
-+		    req->priority == NPC_MCAM_HIGHER_PRIO)
-+			end = req->ref_entry;
-+
-+		if (!(pcifunc & RVU_PFVF_FUNC_MASK) &&
-+		    req->priority == NPC_MCAM_LOWER_PRIO)
-+			start = req->ref_entry;
- 	}
- 
- alloc:
--- 
-2.17.1
+Rationale is that adoption of a new MIB in documentations and various
+products will take years.
 
+Also make a similar change for mptcp.
+
+Thank you.
 
