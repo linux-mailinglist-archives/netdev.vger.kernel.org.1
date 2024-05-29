@@ -1,253 +1,219 @@
-Return-Path: <netdev+bounces-99148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9799F8D3D47
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 19:20:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64F898D3D48
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 19:20:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E82A282240
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:20:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E298B1F23EAE
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDBA2181BA7;
-	Wed, 29 May 2024 17:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15C481A38E2;
+	Wed, 29 May 2024 17:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OahVjF+u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EF6839E2
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 17:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CBD1A0B09
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 17:20:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717003209; cv=none; b=BqraFXw5V1rQsnj4edfnYNoiABE13fwmJYfphA3rIu6luV9g7r05HUCKPqZvKwEa3pzEnnlAkB2lty891ivTCuVvPkmLifh4pTVjPLIhAE5dii7u+fbkbJ4gyDBv6G9lVxu7zP8RffAlDSiaYUqmk/jLHIgmYlNs8iCwU11ndUQ=
+	t=1717003224; cv=none; b=mhWOXA9EsJHAMJ9IPna3ZoIQa7IkfCAgbtMc4276QMWUE4tIeI3qvbM8//5MjQ5bR/FSbDPAi2nugfRjjGs7KxpaHM74Gmv38VahJg0KUQw4aopxcrIbWsrfU//mM0R0pMxCQIosUVGV+lTUGLuhWxVkCc7xnHzSrfA2rQGT7Fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717003209; c=relaxed/simple;
-	bh=jYnfurIQdytmcl47D3eAttdm770xlabKN2+/V75dwLY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OvpmKRxRfLK63zM/FVw1xx8ib0NebT1DQLBgvQUFRihylv4Xt8JEtR15wF8q193gcZ8xSMuTmY9jQqmHyTnMZvEl4Qj/BTZ4CZPh92jeKiQmSIb4VbqwC7oP5AqDYAVj7psDNiwMnZPRP3mu367cH4VOBEM3JeOAazIvvMbMoMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44TH8o1V006591;
-	Wed, 29 May 2024 10:19:56 -0700
-DKIM-Signature: =?UTF-8?Q?v=3D1;_a=3Drsa-sha256;_c=3Drelaxed/relaxed;_d=3Dmeta.com;_h=3Dc?=
- =?UTF-8?Q?c:content-transfer-encoding:content-type:date:from:message-id:m?=
- =?UTF-8?Q?ime-version:subject:to;_s=3Ds2048-2021-q4;_bh=3DZoS9DoAcF8SzocN?=
- =?UTF-8?Q?9vQceCQQUZUTcyEZwFSp7zF3bdlo=3D;_b=3DVJqer7fkc8d9MHOR5blMaDadI9?=
- =?UTF-8?Q?fSg8tNWLA8MwKHyrAk+FzoOL90z1oXNnPtKzD9U3RV_PDH0KJIf680P5zlkQCVY?=
- =?UTF-8?Q?IdVdRoF+qLOfgvVh4/LxpsPDndy69Mbs0AKhbV4JMTulz4A3_eR2XG1FciXp5DL?=
- =?UTF-8?Q?A+Y8cNUKDeE48sWV0uaQ+62FNciCLhqj4JdkxMpZ2V1YlMv4E899LG_OeuNd+0L?=
- =?UTF-8?Q?1GTtm/E2jMc2Rb38EGVKeiT5vTHO+K0PvOYZz8HXAqca99wZX253hI0Arc9/_WO?=
- =?UTF-8?Q?3ouZ7ly8ww7xVm3+3cHrm6MTQVrL9RU08Qw2gvVBXr9iOOii5sj6XhRnWSYTHc+?=
- =?UTF-8?Q?nA3_dA=3D=3D_?=
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3ye1y8u01a-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 29 May 2024 10:19:56 -0700
-Received: from devvm4158.cln0.facebook.com (2620:10d:c085:208::11) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server id
- 15.2.1544.11; Wed, 29 May 2024 17:19:53 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Michael Chan <michael.chan@broadcom.com>,
-        Vadim Fedorenko
-	<vadim.fedorenko@linux.dev>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Jakub
- Kicinski" <kuba@kernel.org>
-CC: Richard Cochran <richardcochran@gmail.com>, <netdev@vger.kernel.org>,
-        Vadim Fedorenko <vadfed@meta.com>
-Subject: [PATCH net-next] bnxt_en: add timestamping statistics support
-Date: Wed, 29 May 2024 10:19:46 -0700
-Message-ID: <20240529171946.2866274-1-vadfed@meta.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1717003224; c=relaxed/simple;
+	bh=7Dvlwp3cj9kBhnrZACSLGYw+fDrt3VMF9KkgcqNKF7g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=X8+sQ9vTGpfREsUv+7Iz2vfdW6mbNwsZdssIfq+D80eeQzobF5yLakBQQOIwLLIizNTKn69dOzvcv2Oe4hbHO+7yAX1CRqOJyzK+AfGRjt3+sf65fIGNj9ZO2MOU8H8SyXzDe/KgQkQfeBZRjwPbWFbVydPSNnn+us/Se6muZxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OahVjF+u; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a59a609dd3fso37918766b.0
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 10:20:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717003220; x=1717608020; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T6S92XYKao8zmEwYTt3a/Nczc/mks5grdh4+BnfyPTc=;
+        b=OahVjF+uze/S9Yn0R/e+72J80Eo14Ndb0JX3BX7MdTwFUtnWHqryLwOZV9e/HwNRn/
+         KCzJSttyBaVlcSU8Aii7iGYJnLXOnG/vYNoV9ub7xA++Wb/uaDy335X6NZe/d0MZ4KmA
+         Yemfy5Zcudp9/S6EY/5hs9Z0auOiK+7PZnIHC97KPZtxaRwTe04/w8S7LccXPI7E7tWD
+         PEuSnKcy5PguqBJ+VJOY+H20C1JqxCF7VOzCbyV9PZf5dOwX7ILRV2T4KIDbhzzMEIgf
+         F2HFp+dgVFKGX0yDYiaEGS6Kw/9n2i+uyrYYhyw+0lo+xD51tEUpd0vb5ywrXcox0zmZ
+         d3nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717003220; x=1717608020;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=T6S92XYKao8zmEwYTt3a/Nczc/mks5grdh4+BnfyPTc=;
+        b=gYUyvBpLImbcVvUWlpMvUhO+2NWCEwlpvOFFgrnqh0cJxgPEQzerg/hE8R/gbLWGWZ
+         QT1knEbTFU6a87dlo3RfwIU3HCbt1MnIIAoampAFhL9MRM0PWu51IhL3XZV6Jkwa0nfu
+         9TLiK5aaLYU6QoRAB7cZ9L2Loj0XrkdYiQElHJb2P0nVeGrma3+u2E//BSu8KVQXTxVz
+         kI8p0YZVdA5VnLc9/tqIBif5VdoFmT8p+UZO2y1qf4IgjOy6IdwtAzqT1cPUAfehJvMG
+         rdM39pv2V4DtsewDg0vP5If0wPd156Epxh3gmVzaXBcxMTfn0vwpb6H6RibK6kyJX+Cc
+         yQ+g==
+X-Forwarded-Encrypted: i=1; AJvYcCUNqFIL7GCouyalEegUYeDXMZJ5w7esWb929OQQnSZVHPrrr29L4EdR24HDpUaoezOUR7GPn5dot4n6zGZ8AY9K4AvPB4QE
+X-Gm-Message-State: AOJu0Yz9ieSPD7d/2g99gcS4+5jQsEuH1lWcBGf0AE5uNww7PhzbFxp8
+	y8mXvAVz4W67nobkNZyKNgIYFBTxh8JYMkF832nuPYUtZSKDkh6p07otcNPEhXbAKYmYrL9aaF1
+	WIolLgrw4u0UbIVyPbPb7zo0OFGQSMbr/E42G
+X-Google-Smtp-Source: AGHT+IFAhIhHvER4srrkWNvWRV5ZrC6gug/SN6NLXzcRRgpzDjuVBSfERRb5LBk6wrj7S1gKnfcF1nodGURXGds/8UM=
+X-Received: by 2002:a17:906:2dc2:b0:a62:c41d:c25f with SMTP id
+ a640c23a62f3a-a642d6b1573mr258384666b.21.1717003219656; Wed, 29 May 2024
+ 10:20:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: wKY8J4KElHyfpz4iYYNVoHSgAXxoyImW
-X-Proofpoint-GUID: wKY8J4KElHyfpz4iYYNVoHSgAXxoyImW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-29_13,2024-05-28_01,2024-05-17_01
+References: <20240510232128.1105145-1-almasrymina@google.com>
+ <20240510232128.1105145-12-almasrymina@google.com> <9097e78d-0e7d-43bd-bafd-e53a4872a4d1@davidwei.uk>
+ <CAHS8izOe-uYjm0ttQgHOFpvp_Tj4_oRHV6d1Y1sWJAZJdCdCBA@mail.gmail.com> <29464e46-e196-47aa-9ff5-23173099c95e@gmail.com>
+In-Reply-To: <29464e46-e196-47aa-9ff5-23173099c95e@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 29 May 2024 10:20:03 -0700
+Message-ID: <CAHS8izOnD3J3i+z1nxg=AZQW9dm0w2JBtbg2=oouiER8xqeRPA@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 11/14] tcp: RX path for devmem TCP
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: David Wei <dw@davidwei.uk>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The ethtool_ts_stats structure was introduced earlier this year. Now
-it's time to support this group of counters in more drivers.
-This patch adds support to bnxt driver.
+On Tue, May 28, 2024 at 7:42=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.=
+com> wrote:
+>
+> On 5/28/24 18:36, Mina Almasry wrote:
+> > On Wed, May 22, 2024 at 11:02=E2=80=AFPM David Wei <dw@davidwei.uk> wro=
+te:
+> ...
+> >>> +                      */
+> >>> +                     if (!skb_frag_net_iov(frag)) {
+> >>> +                             net_err_ratelimited("Found non-dmabuf s=
+kb with net_iov");
+> >>> +                             err =3D -ENODEV;
+> >>> +                             goto out;
+> >>> +                     }
+> >>> +
+> >>> +                     niov =3D skb_frag_net_iov(frag);
+> >>
+> >> Sorry if we've already discussed this.
+> >>
+> >> We have this additional hunk:
+> >>
+> >> + if (niov->pp->mp_ops !=3D &dmabuf_devmem_ops) {
+> >> +       err =3D -ENODEV;
+> >> +       goto out;
+> >> + }
+> >>
+> >> In case one of our skbs end up here, skb_frag_is_net_iov() and
+> >> !skb_frags_readable(). Does this even matter? And if so then is there =
+a
+> >> better way to distinguish between our two types of net_iovs?
+> >
+> > Thanks for bringing this up, yes, maybe we do need a way to
+> > distinguish, but it's not 100% critical, no? It's mostly for debug
+> > checking?
+>
+> Not really. io_uring definitely wouldn't want the devmem completion path
+> taking an iov and basically stashing it into a socket (via refcount),
+> that's a lifetime problem. Nor we'd have all the binding/chunk_owner
+> parts you have and probably use there.
+>
+> Same the other way around, you don't want io_uring grabbing your iov
+> and locking it up, it won't even be possible to return it back. We
+> also may want to have access to backing pages for different fallback
+> purposes, for which we need to know the iov came from this particular
+> ring.
+>
+> It shouldn't happen for a behaving user, but most of it would likely
+> be exploitable one way or another.
+>
+> > I would say add a helper, like net_iov_is_dmabuf() or net_iov_is_io_uri=
+ng().
+>
+> We're verifying that the context the iov bound to is the current
+> context (e.g. io_uring instance) we're executing from. If we can
+> agree that mp_priv should be a valid pointer, the check would look
+> like:
+>
+> if (pp->mp_priv =3D=3D io_uring_ifq)
+>
+> > Checking for niov->pp->mp_ops seems a bit hacky to me, and may be
+> > outright broken. IIRC niov's can be disconnected from the page_pool
+> > via page_pool_clear_pp_info(), and niov->pp may be null. Abstractly
+>
+> It's called in the release path like page_pool_return_page(),
+> I can't imagine someone can sanely clear it while inflight ...
+>
 
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c      | 18 +++++++++++++-----
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c  | 18 ++++++++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c  | 18 ++++++++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h  |  8 ++++++++
- 4 files changed, 57 insertions(+), 5 deletions(-)
+Ah, yes, I wasn't sure what happens to the inflight pages when the pp
+gets destroyed. I thought maybe the pp would return the inflight
+pages, but it looks to me like the pp just returns the free pages in
+the alloc cache and the ptr_ring, and the pp stays alive until all the
+inflight pages are freed. So indeed niov->pp should always be valid
+while it's in flight. I still prefer to have the memory type to be
+part of the niov itself, but I don't feel strongly at this point; up
+to you.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index c437ca1c0fd3..f3db8b0fbbe6 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -512,8 +512,11 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)) {
- 		struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
- 
--		if (ptp && ptp->tx_tstamp_en && !skb_is_gso(skb) &&
--		    atomic_dec_if_positive(&ptp->tx_avail) >= 0) {
-+		if (ptp && ptp->tx_tstamp_en && !skb_is_gso(skb)) {
-+			if (!atomic_dec_if_positive(&ptp->tx_avail)) {
-+				atomic64_inc(&ptp->stats->ts_err);
-+				goto tx_no_ts;
-+			}
- 			if (!bnxt_ptp_parse(skb, &ptp->tx_seqid,
- 					    &ptp->tx_hdr_off)) {
- 				if (vlan_tag_flags)
-@@ -526,6 +529,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 		}
- 	}
- 
-+tx_no_ts:
- 	if (unlikely(skb->no_fcs))
- 		lflags |= cpu_to_le32(TX_BD_FLAGS_NO_CRC);
- 
-@@ -732,8 +736,10 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	return NETDEV_TX_OK;
- 
- tx_dma_error:
--	if (BNXT_TX_PTP_IS_SET(lflags))
-+	if (BNXT_TX_PTP_IS_SET(lflags)) {
-+		atomic64_inc(&bp->ptp_cfg->stats->ts_err);
- 		atomic_inc(&bp->ptp_cfg->tx_avail);
-+	}
- 
- 	last_frag = i;
- 
-@@ -812,10 +818,12 @@ static void __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 		if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_IN_PROGRESS)) {
- 			if (BNXT_CHIP_P5(bp)) {
- 				/* PTP worker takes ownership of the skb */
--				if (!bnxt_get_tx_ts_p5(bp, skb))
-+				if (!bnxt_get_tx_ts_p5(bp, skb)) {
- 					skb = NULL;
--				else
-+				} else {
-+					atomic64_inc(&bp->ptp_cfg->stats->ts_err);
- 					atomic_inc(&bp->ptp_cfg->tx_avail);
-+				}
- 			}
- 		}
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 8763f8a01457..594e9967c591 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -5233,6 +5233,23 @@ static void bnxt_get_rmon_stats(struct net_device *dev,
- 	*ranges = bnxt_rmon_ranges;
- }
- 
-+static void bnxt_get_ptp_stats(struct net_device *dev,
-+			       struct ethtool_ts_stats *ts_stats)
-+{
-+	struct bnxt *bp = netdev_priv(dev);
-+	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
-+
-+	if (ptp) {
-+		ts_stats->pkts = ptp->stats->ts_pkts;
-+		ts_stats->lost = ptp->stats->ts_lost;
-+		ts_stats->err = atomic64_read(&ptp->stats->ts_err);
-+	} else {
-+		ts_stats->pkts = 0;
-+		ts_stats->err = 0;
-+		ts_stats->lost = 0;
-+	}
-+}
-+
- static void bnxt_get_link_ext_stats(struct net_device *dev,
- 				    struct ethtool_link_ext_stats *stats)
- {
-@@ -5316,4 +5333,5 @@ const struct ethtool_ops bnxt_ethtool_ops = {
- 	.get_eth_mac_stats	= bnxt_get_eth_mac_stats,
- 	.get_eth_ctrl_stats	= bnxt_get_eth_ctrl_stats,
- 	.get_rmon_stats		= bnxt_get_rmon_stats,
-+	.get_ts_stats		= bnxt_get_ptp_stats,
- };
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-index e661ab154d6b..f75bcb8d43c0 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-@@ -696,11 +696,13 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
- 		spin_unlock_bh(&ptp->ptp_lock);
- 		timestamp.hwtstamp = ns_to_ktime(ns);
- 		skb_tstamp_tx(ptp->tx_skb, &timestamp);
-+		ptp->stats->ts_pkts++;
- 	} else {
- 		if (!time_after_eq(jiffies, ptp->abs_txts_tmo)) {
- 			ptp->txts_pending = true;
- 			return;
- 		}
-+		ptp->stats->ts_lost++;
- 		netdev_warn_once(bp->dev,
- 				 "TS query for TX timer failed rc = %x\n", rc);
- 	}
-@@ -979,6 +981,18 @@ int bnxt_ptp_init(struct bnxt *bp, bool phc_cfg)
- 		rc = err;
- 		goto out;
- 	}
-+	if (!ptp->stats) {
-+		ptp->stats = kzalloc(sizeof(*ptp->stats), GFP_KERNEL);
-+		if (!ptp->stats) {
-+			rc = -ENOMEM;
-+			goto out;
-+		}
-+		atomic64_set(&ptp->stats->ts_err, 0);
-+	} else {
-+		ptp->stats->ts_pkts = 0;
-+		ptp->stats->ts_lost = 0;
-+		atomic64_set(&ptp->stats->ts_err, 0);
-+	}
- 	if (BNXT_CHIP_P5(bp)) {
- 		spin_lock_bh(&ptp->ptp_lock);
- 		bnxt_refclk_read(bp, NULL, &ptp->current_time);
-@@ -1013,5 +1027,9 @@ void bnxt_ptp_clear(struct bnxt *bp)
- 		dev_kfree_skb_any(ptp->tx_skb);
- 		ptp->tx_skb = NULL;
- 	}
-+
-+	kfree(ptp->stats);
-+	ptp->stats = NULL;
-+
- 	bnxt_unmap_ptp_regs(bp);
- }
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-index 2c3415c8fc03..589e093b1608 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-@@ -79,6 +79,12 @@ struct bnxt_pps {
- 	struct pps_pin pins[BNXT_MAX_TSIO_PINS];
- };
- 
-+struct bnxt_ptp_stats {
-+	u64		ts_pkts;
-+	u64		ts_lost;
-+	atomic64_t	ts_err;
-+};
-+
- struct bnxt_ptp_cfg {
- 	struct ptp_clock_info	ptp_info;
- 	struct ptp_clock	*ptp_clock;
-@@ -125,6 +131,8 @@ struct bnxt_ptp_cfg {
- 	u32			refclk_mapped_regs[2];
- 	u32			txts_tmo;
- 	unsigned long		abs_txts_tmo;
-+
-+	struct bnxt_ptp_stats	*stats;
- };
- 
- #if BITS_PER_LONG == 32
--- 
-2.43.0
+> > speaking the niov type maybe should be a property of the niov itself,
+> > and not the pp the niov is attached to.
+>
+> ... but I can just stash all that in niov->owner,
+> struct dmabuf_genpool_chunk_owner you have. That might be even
+> cleaner. And regardless of it I'll be making some minor changes
+> to the structure to make it generic.
+>
+> > It is not immediately obvious to me what the best thing to do here is,
+> > maybe it's best to add a flag to niov or to use niov->pp_magic for
+> > this.
+> >
+> > I would humbly ask that your follow up patchset takes care of this
+> > bit, if possible. I think mine is doing quite a bit of heavy lifting
+> > as is (and I think may be close to ready?), when it comes to concerns
+> > of devmem + io_uring coexisting if you're able to take care, awesome,
+> > if not, I can look into squashing some fix.
+>
+> Let it be this way then. It's not a problem while there is
+> only one such a provider.
+>
 
+Thank you!
+
+--=20
+Thanks,
+Mina
 
