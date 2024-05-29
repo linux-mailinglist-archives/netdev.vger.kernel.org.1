@@ -1,90 +1,117 @@
-Return-Path: <netdev+bounces-99085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C94CD8D3AA6
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:21:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC9CB8D3AB8
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:22:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 076F3B24FBF
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 15:21:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C6001F26944
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 15:22:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E9317F390;
-	Wed, 29 May 2024 15:21:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBD00181BAD;
+	Wed, 29 May 2024 15:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VgWn1b0Z"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NFI5yA3J"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992501591EC;
-	Wed, 29 May 2024 15:21:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B87F181B9B
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 15:22:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716996074; cv=none; b=eFTbk5cHBLy0K/zEnuAE/c0Rlx4cdwybOfUxdWBnjX+q2HwIt/1Q6Kwpdn+v5gqVntl7ppN6kWclWeF/IRtY0zZDQVgkroezuwjk0JCVpzJ58l7Jmz7OafkWg3SEbBVzIaCab4yeDcSxYcbxPcWIL++5H4bmZTcPnLjtcW9IPHI=
+	t=1716996148; cv=none; b=Q/O1/0Z18ZNSboD9wCuolHT4fpzMzFVj7Q7mu9EbOKLR7JrmEkiBP66z9aCUzrFsupA67zsuM9IQEoedALLD/hiDD4BDqN8jtkeVVixuZXZL8kBO6ZcrjSIyO1g/iAZLNVReyCjAKGKMW5AlbXJUIp7Yu/yxAqz/aqw67Raae5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716996074; c=relaxed/simple;
-	bh=WpYxKn4ArpMJZTD0XwCdmzZa63Jvde8nqvmjOxxn5hQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KPdhUOrxX1TGlPh3gutahRR5pBOrmaZWaTrc7MhsfSb7ESmgV+0TC1xj/O6ZTOsxjYm+SRwa/aHd7QTSlmZWHCCb+9CRZmgsOu4544m1AWchmsMMCkCpDDFNdJwB8NM5r+dCR96QVyNKKGnyoU2fVLnfIeSnvfJttsekVi1euTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VgWn1b0Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA9DEC113CC;
-	Wed, 29 May 2024 15:21:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716996074;
-	bh=WpYxKn4ArpMJZTD0XwCdmzZa63Jvde8nqvmjOxxn5hQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VgWn1b0Zidz4DDUDL6Yfj3Ly6sL4CKF0qaOXVxxBlYoq5LMcRYbpTUj663VejdRGJ
-	 mclwnr9J6Z2r9649dCYYBkXhSUjsLQ13Gls9SDfGVGHyswOqiMBHij2hwcLKvSvSiN
-	 mqFTIEGGtsgr1bpA5rn5hC6hZClVbTaKvQS15vzGUFFgfmW8lFI5FXsHqv1MqFjlKO
-	 HgqBGgwkGq29LAHTUhyp1aZYjFEcSk+DUTrkqTNFoD/N6q/oG9Imy4gwc+9b0V6INz
-	 JUgJ6AyBZH33CBPveo9/ZcuQC56hS6LMTjj9AekNlQoPrJ4yWAjCLJLYoIM3BE6+l8
-	 FB8Hr4xJvj+lA==
-Date: Wed, 29 May 2024 08:21:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
- kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: Re: [PATCH net-next v13 09/14] net: Add the possibility to support
- a selected hwtstamp in netdevice
-Message-ID: <20240529082111.1a1cbf1e@kernel.org>
-In-Reply-To: <20240529-feature_ptp_netnext-v13-9-6eda4d40fa4f@bootlin.com>
-References: <20240529-feature_ptp_netnext-v13-0-6eda4d40fa4f@bootlin.com>
-	<20240529-feature_ptp_netnext-v13-9-6eda4d40fa4f@bootlin.com>
+	s=arc-20240116; t=1716996148; c=relaxed/simple;
+	bh=w9uIGdxr63VeUkA8E591wi2PpRm+tgEb098idcW+hXg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n1eIbE3osAk0TggNqVpMH+jl62IPzMUpeNMbH5kAFocplS00HnDKXVm7sKrAK3zz7WyYAk17tz2LldLPNVy6zSaTOnVXxnzs/94OVSSh5T7aqFapbGHewIi8W7tCMaUws8Pr/PMHhqslyU4o+fmhUSjb+gHMItecA8LLHvntB0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NFI5yA3J; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52a54d664e3so1205288e87.0
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 08:22:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1716996145; x=1717600945; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8yxc9y0W0aov/2jAGNd4z19XmPaqw8JlICBofmxVn/Q=;
+        b=NFI5yA3JaLbRxUhIfaNJPhQA3B/TvTROxpnCecPOih78x7CB29/ILjxm9GexkhBycC
+         jHB3NZaxc/3gidggWtA8RKgRgVqRylagsrqe4KTi5k62ds8juvqibcRhpTPKfm96izpw
+         WmZWoudIu+pmDNnZzpqnQiGlWdGA9gcJ84ukN83mLIGb04MPiHomhn6Oo/DdSYFzoG1s
+         bALewzsyqvVCqMdDMYMNbE1y6UbHtgYOJmazKRhFeNySO7lhW5iEsKmdkJTaKN+rzZUL
+         iiS4K4YYrkNNi6iaqwasNuvhs0V1edgJ/27m5mPtrfG630y6hflPMeDs5DSrNxMdL8n0
+         FCBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716996145; x=1717600945;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8yxc9y0W0aov/2jAGNd4z19XmPaqw8JlICBofmxVn/Q=;
+        b=MnOul/PYBYZxwlc0GeirXaZelYA+O6NdB2rFKK4lqqwceUox08l9E/MNwpODllAqqZ
+         twFXjm0NVbQohuaTHiKLnwMpUmOkQ0oIA/EBjhF8ZXmuJ30fJV3OvMkOXzXozxavWfwB
+         cldLFP0ahBkfK93f7G5b73yzNnwWY0/35WOd5jL/zLbW3aAgqILQrBeOiqM3fCnYGO2c
+         zNPK4Hro9KFI2RWGfzJIDPMrJpCrGzRKXRNTwazbYrVkyDu23XO7cJM1kK8AL+rkuahi
+         yyo//3erLRgkAOC8Uv4r21FOBWHTkHLJBgOBMykxNxBCoDM+DfAwbbLUMp3rwRuzFMhL
+         m6yA==
+X-Forwarded-Encrypted: i=1; AJvYcCXaBjRsRC2MoON6bNedLOQf90j2Lh7G+ZyToOwdk/27YDta8U4ZWXzJW7+BBeSz4A4Lz3SMBr+pTb33NlnyEGkInRyj2K17
+X-Gm-Message-State: AOJu0Yy5ipzqKN9HWWWoOiusPKiL7sjIkAFOFfdFdfIchjERnhZ4/4d6
+	hQ+u8yPLkKC1jxN0epp2DJ89m6/btlOCFfWAh7Z0oL+DqBG2YYCIipSrA8Ix5Og=
+X-Google-Smtp-Source: AGHT+IGXzXzHE1gb62qsghAk7EzkjM7j8cU/yXt75lIA7Lyz09Yricld2iUuIGNqBwccRTaCNJCDSQ==
+X-Received: by 2002:a05:6512:3d0d:b0:52b:4c20:5cee with SMTP id 2adb3069b0e04-52b4c205e1dmr1234641e87.22.1716996145081;
+        Wed, 29 May 2024 08:22:25 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a626cda46e1sm725394766b.196.2024.05.29.08.22.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 May 2024 08:22:24 -0700 (PDT)
+Date: Wed, 29 May 2024 18:22:20 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: duoming@zju.edu.cn
+Cc: Lars Kellogg-Stedman <lars@oddbit.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-hams@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v4] ax25: Fix refcount imbalance on inbound connections
+Message-ID: <da31ff73-62ab-43c9-a1dd-c62bddbff205@moroto.mountain>
+References: <20240522183133.729159-2-lars@oddbit.com>
+ <8e9a1c59f78a7774268bb6defed46df6f3771cbc.camel@redhat.com>
+ <rkln7v7e5qfcdee6rgoobrz7yzuv7yelzzo7omgsmnprtsplr5@q25qrue4op7e>
+ <962afcda-8f67-400f-b3eb-951bf2e46fb7@moroto.mountain>
+ <3cf699c4.20d18.18fc4df304a.Coremail.duoming@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3cf699c4.20d18.18fc4df304a.Coremail.duoming@zju.edu.cn>
 
-On Wed, 29 May 2024 11:39:41 +0200 Kory Maincent wrote:
-> Introduce the description of a hwtstamp provider which is define with a
-> ptp_clock pointer and a qualifier value.
+On Wed, May 29, 2024 at 11:01:52PM +0800, duoming@zju.edu.cn wrote:
+> On Wed, 29 May 2024 17:34:20 +0300 Dan Carpenter wrote:
+> > 1) The Fixes tag points to the wrong commit, though, right?  The one
+> > you have here doesn't make sense and it doesn't match the bisect.
 > 
-> Add a hwtstamp provider description within the netdev structure to be able
-> to select the hwtstamp we want too use. By default we use the old API that
-> does not support hwtstamp selectability which mean the hwtstamp ptp_clock
-> pointer is unset.
+> I also have tested Lars Kellogg-Stedman`s patch, it works well. I think the Fixes 
+> tag shoud be 9fd75b66b8f6 ("ax25: Fix refcount leaks caused by ax25_cb_del()").
+> 
+> > 2) Can we edit the commitmessage a bit to say include what you wrote
+> > about "but rather bind/accept" being paired.  We increment in bind
+> > and we should increment in accept as well.  It's the same.
+> > 
+> > 3) The other thing that I notice is that Duoming dropped part of his
+> > commit when he resent v6.
+> > https://lore.kernel.org/all/5c61fea1b20f3c1596e4fb46282c3dedc54513a3.1715065005.git.duoming@zju.edu.cn/
+> > That part of the commit was correct.  Maybe it wasn't necessary but it
+> > feels right and it's more readable and it's obviously harmless.  I can
+> > resend that.
+> 
+> I will resend it latter.
 
-ERROR: modpost: "ptp_clock_phydev" [drivers/net/phy/libphy.ko] undefined!
--- 
-pw-bot: cr
+Awesome!  Thanks, and thanks for testing as well.
+
+regards,
+dan carpenter
+
 
