@@ -1,190 +1,367 @@
-Return-Path: <netdev+bounces-99143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 670268D3D05
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:42:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE7A98D3D1D
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:52:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDE84280F91
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:42:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E9221F24644
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:52:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16AC2180A90;
-	Wed, 29 May 2024 16:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F182A18413E;
+	Wed, 29 May 2024 16:52:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E68C1C6B2
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 16:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3071836DB
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 16:52:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717000943; cv=none; b=syEngX4+b8X7o4TbX5u0zwvvF5Ad/dWW9gt+H7ezZJqNS9w+eQpbBHBekhlNXBSOT/HaSazivfN9ZjBWNxdCu6VJKcr94AX1WtqPM56rJ22kRHfMGKlYkV+q8Vt0FgslF+1uRLuF7equxId33TiY2Y/g2O2TSAMB02KY/NTjM94=
+	t=1717001549; cv=none; b=kmbGlGmvhKEhHjdst5yc3R+Qu8yzMV+zn1NTok0tLI+H9bYIBwey2Ckvuim4feS0wNn+DpWnfEGnYmur2gUYHZPwy/80MU1aYzOxRXLBbhnB2LCQEqX7cMk/qFFv7NBOE9zWCOczt120Pb+IRdCFZEj1QmXysYSVr1P4gwDRlDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717000943; c=relaxed/simple;
-	bh=vWH9hSQXnCEAzsKzxpcy0bLy/fvnSoiqPZRq1/X9IEI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=YPNeGwn+Z90Yj9b7Cc6g5sVlUJdlulejyDA8NkRjZsVwbhCexSSJxAM+h+oHqIUDBhIlIa6EP7x3Igft+IBII6PDnuoMLOCOQJoGfXWRJf0H7BEslmJTYG9VlCQyqTwhobG3/4gtHr05PMi70Qr7Cssn5Smz/9T3kZ7s4jdIqxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-407-Lgz0Y3seMiOGtl9ZcwfcNQ-1; Wed, 29 May 2024 12:42:15 -0400
-X-MC-Unique: Lgz0Y3seMiOGtl9ZcwfcNQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4F380800CA2;
-	Wed, 29 May 2024 16:42:14 +0000 (UTC)
-Received: from hog (unknown [10.39.192.53])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3203DC15BB1;
-	Wed, 29 May 2024 16:42:13 +0000 (UTC)
-Date: Wed, 29 May 2024 18:42:12 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>, Esben Haabendal <esben@geanix.com>
-Subject: Re: [PATCH net-next v3 15/24] ovpn: implement peer lookup logic
-Message-ID: <Zlda5GcgKd9Y9O_o@hog>
-References: <20240506011637.27272-1-antonio@openvpn.net>
- <20240506011637.27272-16-antonio@openvpn.net>
- <ZlYJaIvXY3nuNd98@hog>
- <75ff57a6-dcd8-47f7-99bf-f46a1daee4b0@openvpn.net>
+	s=arc-20240116; t=1717001549; c=relaxed/simple;
+	bh=Slhcrvv302EnCSIhqJfoPNA7hpktgf8zQEUdvKzSNcI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=fvixAdORom/c45L3JyGYy0k7ahLzadW5jUNLiJ3XSJIojJzZux12zLFj1egQTbtCDKZRsM6+QirOLhgljx8RU5+Y1Pyil07ZF/6nAZG+FakOAzSODadCfXVBYrmD2a1BLds+rNf2e1UUoI2jZeE6bqHTpt7uQ4NCZ+IeQpbMV/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-7e1ea8608afso279961139f.2
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 09:52:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717001547; x=1717606347;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4sZTA5pQPWMEXkgbdcJ37UQpB/o8YbjkC8POOYah4lU=;
+        b=nwNyLfsH2zSlG6EsJpbrHghhhU2wJK48DExUL7UYLaT30K4TQItPL38YSQf87BqcJI
+         8VOHYH1n0OarGtdr10qp4T3OCr/ccOIxx/wHUigc5oZ02yeCypFgNqq+KhuZYQsIGaps
+         qEBfpikqgqeDrIxK4Cji3K+zc+/wm+MMSoFhKhep+DQ93cnbDmrHO6OjnT6bMfxiVDfR
+         kPPfwhaneksf1zbu1e2+PQpKh2PXoD5LNUEmZSc3ayr6V0OeP9E3FLvtl4Fx4yzlqDn3
+         EqfkkSoKUvJDu4meeHxlkPbU+5lIraDfCpmZIgRmtDLzRNrtIe8VlQJ1MSq3/1UUXE00
+         gzGg==
+X-Forwarded-Encrypted: i=1; AJvYcCVXxi7ipFlALV4MYB3uUsqqPLBxatN8zDwwk9ZgL8kvT14Y27vkttnvvdpP/q4wDWOLeSbVc8NBGgTkVb2QfAkINlrTmC8T
+X-Gm-Message-State: AOJu0YwDCLf6TrU9EccTSSv70KMY/twWYuwj+yP1oIzbjnympMCkTIPQ
+	v2ZI7zGoOQ7x5B/pMFB6bllew4OsfEbjmj0Aom4PrPZoDMmA3garjqhLHt2GM9eyIHTHi86H2Jb
+	EFqacnL6DGwLU+W2zZGL+odhmEtK9mUSWGtqFBsuwfxxT4ya1t/Kmvcg=
+X-Google-Smtp-Source: AGHT+IH3XwZS15k45nnmsowxNeIkYj7USUbdOSEIJt3hAuM8IubBzg1dlestczF+3CZe2IL2stayfWFH4vJDI04WFU6beEaQuPHJ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <75ff57a6-dcd8-47f7-99bf-f46a1daee4b0@openvpn.net>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+X-Received: by 2002:a02:b89a:0:b0:48a:40e5:3ba5 with SMTP id
+ 8926c6da1cb9f-4b03fba9c19mr558930173.5.1717001546276; Wed, 29 May 2024
+ 09:52:26 -0700 (PDT)
+Date: Wed, 29 May 2024 09:52:26 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003eb50e06199a9324@google.com>
+Subject: [syzbot] [bpf?] [net?] possible deadlock in sk_psock_skb_ingress_enqueue
+From: syzbot <syzbot+53cf0afa7b308038a6db@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	jakub@cloudflare.com, john.fastabend@gmail.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-2024-05-28, 22:09:37 +0200, Antonio Quartulli wrote:
-> On 28/05/2024 18:42, Sabrina Dubroca wrote:
-> > 2024-05-06, 03:16:28 +0200, Antonio Quartulli wrote:
-> > > @@ -303,10 +427,28 @@ static struct ovpn_peer *ovpn_peer_get_by_id_p2=
-p(struct ovpn_struct *ovpn,
-> > >   struct ovpn_peer *ovpn_peer_get_by_id(struct ovpn_struct *ovpn, u32=
- peer_id)
-> > >   {
-> > > -=09struct ovpn_peer *peer =3D NULL;
-> > > +=09struct ovpn_peer *tmp, *peer =3D NULL;
-> > > +=09struct hlist_head *head;
-> > > +=09u32 index;
-> > >   =09if (ovpn->mode =3D=3D OVPN_MODE_P2P)
-> > > -=09=09peer =3D ovpn_peer_get_by_id_p2p(ovpn, peer_id);
-> > > +=09=09return ovpn_peer_get_by_id_p2p(ovpn, peer_id);
-> > > +
-> > > +=09index =3D ovpn_peer_index(ovpn->peers.by_id, &peer_id, sizeof(pee=
-r_id));
-> > > +=09head =3D &ovpn->peers.by_id[index];
-> > > +
-> > > +=09rcu_read_lock();
-> > > +=09hlist_for_each_entry_rcu(tmp, head, hash_entry_id) {
-> > > +=09=09if (tmp->id !=3D peer_id)
-> > > +=09=09=09continue;
-> > > +
-> > > +=09=09if (!ovpn_peer_hold(tmp))
-> > > +=09=09=09continue;
-> >=20
-> > Can there ever be multiple peers with the same id? (ie, is it worth
-> > continuing the loop if this fails? the same question probably applies
-> > to ovpn_peer_get_by_transp_addr as well)
->=20
-> Well, not at the same time, but theoretically we could re-use the ID of a
-> peer that is being released (i.e. still in the list but refcnt at 0) beca=
-use
-> it won't be returned by this lookup.
->=20
-> This said, I truly believe it's impossible for a peer to have refcnt 0 an=
-d
-> still being in the list:
-> Either
-> * delete on the peer was not yet called, thus peer is in the list and the
-> last reference wasn't yet dropped
-> * delete on the peer was called, thus peer cannot be in the list anymore =
-and
-> refcnt may or may not be 0...
+Hello,
 
-Ok, thanks. Let's just keep this code.
+syzbot found the following issue on:
+
+HEAD commit:    44382b3ed6b2 bpf: Fix potential integer overflow in resolv..
+git tree:       bpf
+console output: https://syzkaller.appspot.com/x/log.txt?x=1556297c980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=17ffd15f654c98ba
+dashboard link: https://syzkaller.appspot.com/bug?extid=53cf0afa7b308038a6db
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/e2dad9cbbe0c/disk-44382b3e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f67186323c24/vmlinux-44382b3e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/02d46501b164/bzImage-44382b3e.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+53cf0afa7b308038a6db@syzkaller.appspotmail.com
+
+======================================================
+WARNING: possible circular locking dependency detected
+6.9.0-syzkaller-08559-g44382b3ed6b2 #0 Not tainted
+------------------------------------------------------
+syz-executor.3/7164 is trying to acquire lock:
+ffff88804a4d7858 (&ei->socket.wq.wait){..-.}-{2:2}, at: __wake_up_common_lock+0x25/0x1e0 kernel/sched/wait.c:105
+
+but task is already holding lock:
+ffff88801e9623f0 (clock-AF_UNIX){++..}-{2:2}, at: sk_psock_data_ready include/linux/skmsg.h:468 [inline]
+ffff88801e9623f0 (clock-AF_UNIX){++..}-{2:2}, at: sk_psock_skb_ingress_enqueue+0x328/0x450 net/core/skmsg.c:555
+
+which lock already depends on the new lock.
 
 
-> > > +/**
-> > > + * ovpn_nexthop_from_rt6 - look up the IPv6 nexthop for the given de=
-stination
-> >=20
-> > I'm a bit confused by this talk about "destination" when those two
-> > functions are then used with the source address from the packet, from
-> > a function called "get_by_src".
->=20
-> well, in my brain a next hop can exists only when I want to reach a certa=
-in
-> destination. Therefore, at a low level, the terms nextop and destination
-> always need to go hand in hand.
->=20
-> This said, when implementing RPF (Reverse Path Filtering) I need to imagi=
-ne
-> that I want to route to the source IP of the incoming packet. If the next=
-hop
-> I looked up matches the peer the packet came from, then everything is fin=
-e.
->=20
-> makes sense?
+the existing dependency chain (in reverse order) is:
 
-Yeah, that's fair.
+-> #5 (clock-AF_UNIX){++..}-{2:2}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+       __raw_write_lock_bh include/linux/rwlock_api_smp.h:202 [inline]
+       _raw_write_lock_bh+0x35/0x50 kernel/locking/spinlock.c:334
+       sk_psock_drop+0x34/0x500 net/core/skmsg.c:837
+       __sock_map_delete net/core/sock_map.c:435 [inline]
+       sock_map_delete_elem+0x1a2/0x250 net/core/sock_map.c:461
+       0xffffffffa00017f2
+       bpf_dispatcher_nop_func include/linux/bpf.h:1243 [inline]
+       __bpf_prog_run include/linux/filter.h:682 [inline]
+       bpf_prog_run include/linux/filter.h:698 [inline]
+       __bpf_trace_run kernel/trace/bpf_trace.c:2403 [inline]
+       bpf_trace_run8+0x564/0x630 kernel/trace/bpf_trace.c:2450
+       __bpf_trace_jbd2_handle_stats+0x47/0x60 include/trace/events/jbd2.h:210
+       trace_jbd2_handle_stats include/trace/events/jbd2.h:210 [inline]
+       jbd2_journal_stop+0xd0a/0xd80 fs/jbd2/transaction.c:1869
+       __ext4_journal_stop+0xfd/0x1a0 fs/ext4/ext4_jbd2.c:134
+       ext4_create+0x2f9/0x550 fs/ext4/namei.c:2843
+       lookup_open fs/namei.c:3505 [inline]
+       open_last_lookups fs/namei.c:3574 [inline]
+       path_openat+0x1425/0x3240 fs/namei.c:3804
+       do_filp_open+0x235/0x490 fs/namei.c:3834
+       do_sys_openat2+0x13e/0x1d0 fs/open.c:1406
+       do_sys_open fs/open.c:1421 [inline]
+       __do_sys_openat fs/open.c:1437 [inline]
+       __se_sys_openat fs/open.c:1432 [inline]
+       __x64_sys_openat+0x247/0x2a0 fs/open.c:1432
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
->=20
-> [FTR I have already renamed/changed get_by_src into check_by_src, because=
- I
-> don't need to truly extract a peer and get a reference, but I only need t=
-o
-> perform the aforementioned comparison.]
+-> #4 (&stab->lock){+...}-{2:2}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+       _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
+       spin_lock_bh include/linux/spinlock.h:356 [inline]
+       __sock_map_delete net/core/sock_map.c:429 [inline]
+       sock_map_delete_elem+0x175/0x250 net/core/sock_map.c:461
+       bpf_prog_10a0f827fc0335db+0x3/0x21
+       bpf_dispatcher_nop_func include/linux/bpf.h:1243 [inline]
+       __bpf_prog_run include/linux/filter.h:691 [inline]
+       bpf_prog_run include/linux/filter.h:698 [inline]
+       __bpf_trace_run kernel/trace/bpf_trace.c:2403 [inline]
+       bpf_trace_run4+0x334/0x590 kernel/trace/bpf_trace.c:2446
+       trace_mmap_lock_acquire_returned include/trace/events/mmap_lock.h:52 [inline]
+       __mmap_lock_do_trace_acquire_returned+0x5c8/0x630 mm/mmap_lock.c:237
+       __mmap_lock_trace_acquire_returned include/linux/mmap_lock.h:36 [inline]
+       mmap_read_trylock include/linux/mmap_lock.h:166 [inline]
+       get_mmap_lock_carefully mm/memory.c:5628 [inline]
+       lock_mm_and_find_vma+0x213/0x2f0 mm/memory.c:5688
+       do_user_addr_fault arch/x86/mm/fault.c:1355 [inline]
+       handle_page_fault arch/x86/mm/fault.c:1475 [inline]
+       exc_page_fault+0x1a9/0x8a0 arch/x86/mm/fault.c:1533
+       asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:623
+       rep_movs_alternative+0x4a/0x70 arch/x86/lib/copy_user_64.S:65
+       copy_user_generic arch/x86/include/asm/uaccess_64.h:110 [inline]
+       raw_copy_to_user arch/x86/include/asm/uaccess_64.h:131 [inline]
+       copy_to_user_iter lib/iov_iter.c:25 [inline]
+       iterate_ubuf include/linux/iov_iter.h:29 [inline]
+       iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
+       iterate_and_advance include/linux/iov_iter.h:271 [inline]
+       _copy_to_iter+0x26b/0x1960 lib/iov_iter.c:185
+       copy_page_to_iter+0xb1/0x160 lib/iov_iter.c:362
+       pipe_read+0x59c/0x13e0 fs/pipe.c:327
+       call_read_iter include/linux/fs.h:2114 [inline]
+       new_sync_read fs/read_write.c:395 [inline]
+       vfs_read+0x97b/0xb70 fs/read_write.c:476
+       ksys_read+0x1a0/0x2c0 fs/read_write.c:619
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Ok.
+-> #3 (lock#10){+.+.}-{2:2}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+       local_lock_acquire include/linux/local_lock_internal.h:29 [inline]
+       __mmap_lock_do_trace_acquire_returned+0xa8/0x630 mm/mmap_lock.c:237
+       __mmap_lock_trace_acquire_returned include/linux/mmap_lock.h:36 [inline]
+       mmap_read_trylock include/linux/mmap_lock.h:166 [inline]
+       stack_map_get_build_id_offset+0x9b2/0x9d0 kernel/bpf/stackmap.c:141
+       __bpf_get_stack+0x4ad/0x5a0 kernel/bpf/stackmap.c:449
+       ____bpf_get_stack_raw_tp kernel/trace/bpf_trace.c:1994 [inline]
+       bpf_get_stack_raw_tp+0x1a3/0x240 kernel/trace/bpf_trace.c:1984
+       bpf_prog_9dc0996bccb7470f+0x16/0x6c
+       bpf_dispatcher_nop_func include/linux/bpf.h:1243 [inline]
+       __bpf_prog_run include/linux/filter.h:691 [inline]
+       bpf_prog_run include/linux/filter.h:698 [inline]
+       __bpf_trace_run kernel/trace/bpf_trace.c:2403 [inline]
+       bpf_trace_run2+0x2ec/0x540 kernel/trace/bpf_trace.c:2444
+       trace_tlb_flush+0x118/0x140 include/trace/events/tlb.h:38
+       switch_mm_irqs_off+0x7cb/0xae0
+       context_switch kernel/sched/core.c:5392 [inline]
+       __schedule+0x1066/0x4a50 kernel/sched/core.c:6745
+       preempt_schedule_common+0x84/0xd0 kernel/sched/core.c:6924
+       preempt_schedule+0xe1/0xf0 kernel/sched/core.c:6948
+       preempt_schedule_thunk+0x1a/0x30 arch/x86/entry/thunk.S:12
+       __raw_spin_unlock include/linux/spinlock_api_smp.h:143 [inline]
+       _raw_spin_unlock+0x3e/0x50 kernel/locking/spinlock.c:186
+       spin_unlock include/linux/spinlock.h:391 [inline]
+       futex_wake+0x516/0x5c0 kernel/futex/waitwake.c:198
+       do_futex+0x392/0x560 kernel/futex/syscalls.c:107
+       __do_sys_futex kernel/futex/syscalls.c:179 [inline]
+       __se_sys_futex+0x3f9/0x480 kernel/futex/syscalls.c:160
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-> > > + * @ovpn: the private data representing the current VPN session
-> > > + * @dst: the destination to be looked up
-> > > + *
-> > > + * Looks up in the IPv6 system routing table the IO of the nexthop t=
-o be used
-> >=20
-> > "the IO"?
->=20
-> typ0: "the IP"
->=20
-> >=20
-> > > + * to reach the destination passed as argument. IF no nexthop can be=
- found, the
-> > > + * destination itself is returned as it probably has to be used as n=
-exthop.
-> > > + *
-> > > + * Return: the IP of the next hop if found or the dst itself otherwi=
-se
-> >=20
-> > "the dst" tends to refer to a dst_entry, maybe "or @dst otherwise"?
->=20
-> it refers to @dst (the function argument). That's basically the case wher=
-e
-> the destination is "onlink" and thus it is the nexthop (basically the
-> destination is the connected peer).
+-> #2 (&rq->__lock){-.-.}-{2:2}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+       _raw_spin_lock_nested+0x31/0x40 kernel/locking/spinlock.c:378
+       raw_spin_rq_lock_nested+0x2a/0x140 kernel/sched/core.c:559
+       raw_spin_rq_lock kernel/sched/sched.h:1406 [inline]
+       rq_lock kernel/sched/sched.h:1702 [inline]
+       task_fork_fair+0x61/0x1e0 kernel/sched/fair.c:12709
+       sched_cgroup_fork+0x37c/0x410 kernel/sched/core.c:4844
+       copy_process+0x2217/0x3dc0 kernel/fork.c:2499
+       kernel_clone+0x226/0x8f0 kernel/fork.c:2797
+       user_mode_thread+0x132/0x1a0 kernel/fork.c:2875
+       rest_init+0x23/0x300 init/main.c:707
+       start_kernel+0x47a/0x500 init/main.c:1084
+       x86_64_start_reservations+0x2a/0x30 arch/x86/kernel/head64.c:507
+       x86_64_start_kernel+0x99/0xa0 arch/x86/kernel/head64.c:488
+       common_startup_64+0x13e/0x147
 
-I understand that, it's just the wording "the dst" that I'm
-nitpicking. s/dst/addr/ would help easily-confused people like me (for
-both "the dst" and my confusion with source vs destination in
-caller/callee), but I can live with this.
+-> #1 (&p->pi_lock){-.-.}-{2:2}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+       _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
+       class_raw_spinlock_irqsave_constructor include/linux/spinlock.h:553 [inline]
+       try_to_wake_up+0xb0/0x1470 kernel/sched/core.c:4262
+       autoremove_wake_function+0x16/0x110 kernel/sched/wait.c:384
+       __wake_up_common kernel/sched/wait.c:89 [inline]
+       __wake_up_common_lock+0x130/0x1e0 kernel/sched/wait.c:106
+       sock_def_readable+0x20f/0x5b0 net/core/sock.c:3353
+       unix_dgram_sendmsg+0x148e/0x1f80 net/unix/af_unix.c:2113
+       sock_sendmsg_nosec net/socket.c:730 [inline]
+       __sock_sendmsg+0x221/0x270 net/socket.c:745
+       __sys_sendto+0x3a4/0x4f0 net/socket.c:2191
+       __do_sys_sendto net/socket.c:2203 [inline]
+       __se_sys_sendto net/socket.c:2199 [inline]
+       __x64_sys_sendto+0xde/0x100 net/socket.c:2199
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
---=20
-Sabrina
+-> #0 (&ei->socket.wq.wait){..-.}-{2:2}:
+       check_prev_add kernel/locking/lockdep.c:3134 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+       validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
+       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+       _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
+       __wake_up_common_lock+0x25/0x1e0 kernel/sched/wait.c:105
+       sock_def_readable+0x20f/0x5b0 net/core/sock.c:3353
+       sk_psock_skb_ingress_enqueue+0x388/0x450 net/core/skmsg.c:555
+       sk_psock_skb_ingress_self+0x292/0x340 net/core/skmsg.c:606
+       sk_psock_verdict_apply+0x3bd/0x460 net/core/skmsg.c:1008
+       sk_psock_verdict_recv+0x335/0x590 net/core/skmsg.c:1202
+       unix_read_skb+0xd9/0x180 net/unix/af_unix.c:2502
+       sk_psock_verdict_data_ready+0xab/0x390 net/core/skmsg.c:1223
+       unix_dgram_sendmsg+0x148e/0x1f80 net/unix/af_unix.c:2113
+       sock_sendmsg_nosec net/socket.c:730 [inline]
+       __sock_sendmsg+0x221/0x270 net/socket.c:745
+       ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+       ___sys_sendmsg net/socket.c:2638 [inline]
+       __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
+other info that might help us debug this:
+
+Chain exists of:
+  &ei->socket.wq.wait --> &stab->lock --> clock-AF_UNIX
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  rlock(clock-AF_UNIX);
+                               lock(&stab->lock);
+                               lock(clock-AF_UNIX);
+  lock(&ei->socket.wq.wait);
+
+ *** DEADLOCK ***
+
+3 locks held by syz-executor.3/7164:
+ #0: ffffffff8e333d20 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
+ #0: ffffffff8e333d20 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:781 [inline]
+ #0: ffffffff8e333d20 (rcu_read_lock){....}-{1:2}, at: sk_psock_verdict_recv+0x4d/0x590 net/core/skmsg.c:1185
+ #1: ffff88801e9623f0 (clock-AF_UNIX){++..}-{2:2}, at: sk_psock_data_ready include/linux/skmsg.h:468 [inline]
+ #1: ffff88801e9623f0 (clock-AF_UNIX){++..}-{2:2}, at: sk_psock_skb_ingress_enqueue+0x328/0x450 net/core/skmsg.c:555
+ #2: ffffffff8e333d20 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
+ #2: ffffffff8e333d20 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:781 [inline]
+ #2: ffffffff8e333d20 (rcu_read_lock){....}-{1:2}, at: sock_def_readable+0xd7/0x5b0 net/core/sock.c:3350
+
+stack backtrace:
+CPU: 0 PID: 7164 Comm: syz-executor.3 Not tainted 6.9.0-syzkaller-08559-g44382b3ed6b2 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
+ check_prev_add kernel/locking/lockdep.c:3134 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+ validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
+ __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+ _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
+ __wake_up_common_lock+0x25/0x1e0 kernel/sched/wait.c:105
+ sock_def_readable+0x20f/0x5b0 net/core/sock.c:3353
+ sk_psock_skb_ingress_enqueue+0x388/0x450 net/core/skmsg.c:555
+ sk_psock_skb_ingress_self+0x292/0x340 net/core/skmsg.c:606
+ sk_psock_verdict_apply+0x3bd/0x460 net/core/skmsg.c:1008
+ sk_psock_verdict_recv+0x335/0x590 net/core/skmsg.c:1202
+ unix_read_skb+0xd9/0x180 net/unix/af_unix.c:2502
+ sk_psock_verdict_data_ready+0xab/0x390 net/core/skmsg.c:1223
+ unix_dgram_sendmsg+0x148e/0x1f80 net/unix/af_unix.c:2113
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f8f8967cee9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f8f891de0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f8f897ac050 RCX: 00007f8f8967cee9
+RDX: 0000000000000000 RSI: 0000000020000500 RDI: 0000000000000004
+RBP: 00007f8f896c949e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000006e R14: 00007f8f897ac050 R15: 00007ffc340af978
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
