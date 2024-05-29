@@ -1,133 +1,95 @@
-Return-Path: <netdev+bounces-99141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 576AF8D3CF1
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:39:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CB6D8D3CF6
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:40:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 095B41F22DA3
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:39:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A3F51F23065
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:40:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90DBB190675;
-	Wed, 29 May 2024 16:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BABE1A0B16;
+	Wed, 29 May 2024 16:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y1lNlsPJ"
+	dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b="ip9OWK5w"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-in-1.gedalya.net (mail.gedalya.net [170.39.119.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DCBC190683
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 16:35:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A391A0AED
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 16:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.39.119.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717000550; cv=none; b=jurRC09mU/gOPGvYTrmG9/UCPN1b+Yadnpm3CXhagbY3Wn5lJaO1FAAHGvPXZ1vu7w0VaipvZAvCjWilbDhzttwUxKaClx6ywKUpSA7FxeJw6fLJguwfblCv1MGm11jUdmqVk/Riu7Bo5USbfTwOWhjeOD4xCp1QxtAAMPFVy8Q=
+	t=1717000605; cv=none; b=coHGZjtlR9zOH703+/cQCN/jV6oZZAF4m9PyehHbJoEjGf6poxoTlmzK+22+6W6Ju8RBfcCZj+Up+Q/oYx65njxOVEIvSRPPPRJ8E/3a8YwgPM2Nkrt7+5nCX5kvipqwVPnwMktrEV/8PlLoj3auTzAhXAs3N5LRYXgIvn0uMcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717000550; c=relaxed/simple;
-	bh=qgGukKDSkPK9vfHhWqco4OcAy5VASq0kydUQkgHFPr8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SkoQTEb1Jyx0JDfSoBW9iwRM6Cwpanre2iml6Z12ELu26r+BtzGgJ8RMACOs3jANOAp3IScrQqUwMUq6q/bMToI0Dykz1EQy90z5fCXILy/fvPjiNcQJJiLDunijFwh6VxSmNWDh65nT2Rsr1IIAVVKBMhoqbwzh5rztFleyW3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y1lNlsPJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B650AC4AF0A;
-	Wed, 29 May 2024 16:35:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717000550;
-	bh=qgGukKDSkPK9vfHhWqco4OcAy5VASq0kydUQkgHFPr8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Y1lNlsPJrgTfEENcaF6nMYh7SUh21puxCIQl8Apy2qUFgEShGb3Ee0dCrpod4BmbJ
-	 NBrQL7W8c1LjSFXrteci3IjH2kgATqy73tqQekHWXIiBq01j+iH2XELXqKdk8nvWmN
-	 GiCqLPEFO1l0Ufwc3RW4Kt2QQOKfkZX80UqfeSdkfMlabTw9E2W5xzvR0HGRORZp0a
-	 QNRe7NBQ+xtXWFE2OSfa3A4ULDBYu/ZRhy+LuIZU+YgywRxIREo7hp6KxTX+9KXzS1
-	 S5BZsVhVW858CG/Ch9w3/LHVR+vUPI18yL5JKubS2sZqfTev+Zbh4ZVhsZbAuARL+N
-	 /NbubHQMwQedQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	donald.hunter@gmail.com,
-	sdf@google.com,
-	amritha.nambiar@intel.com,
-	hawk@kernel.org,
-	sridhar.samudrala@intel.com,
-	jdamato@fastly.com
-Subject: [PATCH net] netdev: add qstat for csum complete
-Date: Wed, 29 May 2024 09:35:47 -0700
-Message-ID: <20240529163547.3693194-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.45.1
+	s=arc-20240116; t=1717000605; c=relaxed/simple;
+	bh=FwDDMBroZherLDAnHd9LlMyOwagBrnxlKtwM/Qi8Cto=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=JxjH6Z2ra9+aQyH8ERjRbVlhswwKRlQD4Sk8SiaaFFIU40DMAZtJexLeIWpptyYt0rwCAT/psXV4oF7yDyUdMhIRegOrHIHYr70NKyU93ybKJkgu4r9X+eYc6tcoSPw70HJBfjHpNBJ5tudh3P09QZKT6MSkDe3LcauppzP8iAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net; spf=pass smtp.mailfrom=gedalya.net; dkim=pass (2048-bit key) header.d=gedalya.net header.i=@gedalya.net header.b=ip9OWK5w; arc=none smtp.client-ip=170.39.119.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gedalya.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gedalya.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=gedalya.net
+	; s=rsa1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:
+	Content-ID:Content-Description;
+	bh=FwDDMBroZherLDAnHd9LlMyOwagBrnxlKtwM/Qi8Cto=; b=ip9OWK5wlBpAYNjc9RADEswLjH
+	z/DXVjOgbxIUn2wDN9shE/Jw7X+bDkmBH1H0N+yf+BfgtgXbjM+GZuX3gY/lRVV4fikYfgKfAu0H2
+	8mtL2lRIdaKcelGgKYnjNs3HQ08CgmaH/dyrR5lurBUcSZdrRUjQil3CJK95cR+vmK/TqtpEGsDtM
+	H0dhPewuEYqRfzxCD7sLXSbE3DkuztaT3oM/GY5IOAJFexqw/rn5RsXm8RmW+J8cOHne+O11Hxpaq
+	5OrEVzeBlrOJtySDtqujlJL7aoWVedp6c2llBpJJjl+DxYti0drAv1ThPXOt0tBYBHcOD9iuAeC4q
+	VDBmyWAg==;
+Received: from [192.168.9.176]
+	by smtp-in-1.gedalya.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <gedalya@gedalya.net>)
+	id 1sCMHz-000t6N-1t;
+	Wed, 29 May 2024 16:36:35 +0000
+Message-ID: <27cd8235-ac98-46dc-bac8-3a72697281d5@gedalya.net>
+Date: Thu, 30 May 2024 00:36:32 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] iproute2: color: default to dark background
+To: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
+References: <E1s9tE4-00000006L4I-46tH@ws2.gedalya.net>
+ <f8dc2692-6a17-431c-95de-ed32c0b82d59@kernel.org>
+Content-Language: en-US
+From: Gedalya <gedalya@gedalya.net>
+In-Reply-To: <f8dc2692-6a17-431c-95de-ed32c0b82d59@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Recent commit 0cfe71f45f42 ("netdev: add queue stats") added
-a lot of useful stats, but only those immediately needed by virtio.
-Presumably virtio does not support CHECKSUM_COMPLETE,
-so statistic for that form of checksumming wasn't included.
-Other drivers will definitely need it, in fact we expect it
-to be needed in net-next soon (mlx5). So let's add the definition
-of the counter for CHECKSUM_COMPLETE to uAPI in net already,
-so that the counters are in a more natural order (all subsequent
-counters have not been present in any released kernel, yet).
+On 5/30/24 12:23 AM, David Ahern wrote:
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: donald.hunter@gmail.com
-CC: sdf@google.com
-CC: amritha.nambiar@intel.com
-CC: hawk@kernel.org
-CC: sridhar.samudrala@intel.com
-CC: jdamato@fastly.com
----
- Documentation/netlink/specs/netdev.yaml | 4 ++++
- include/uapi/linux/netdev.h             | 1 +
- tools/include/uapi/linux/netdev.h       | 1 +
- 3 files changed, 6 insertions(+)
+> On 5/22/24 12:43 PM, Gedalya Nie wrote:
+>> Since the COLORFGBG environment variable isn't always there, and
+>> anyway it seems that terminals and consoles more commonly default
+>> to dark backgrounds, make that assumption here.
+> Huge assumption. For example, I have one setup that defaults to dark
+> mode and another that defaults to light mode.
 
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index 11a32373365a..959755be4d7f 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -349,6 +349,10 @@ name: netdev
-           Number of packets dropped due to transient lack of resources, such as
-           buffer space, host descriptors etc.
-         type: uint
-+      -
-+        name: rx-csum-complete
-+        doc: Number of packets that were marked as CHECKSUM_COMPLETE.
-+        type: uint
-       -
-         name: rx-csum-unnecessary
-         doc: Number of packets that were marked as CHECKSUM_UNNECESSARY.
-diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index a8188202413e..43742ac5b00d 100644
---- a/include/uapi/linux/netdev.h
-+++ b/include/uapi/linux/netdev.h
-@@ -148,6 +148,7 @@ enum {
- 	NETDEV_A_QSTATS_RX_ALLOC_FAIL,
- 	NETDEV_A_QSTATS_RX_HW_DROPS,
- 	NETDEV_A_QSTATS_RX_HW_DROP_OVERRUNS,
-+	NETDEV_A_QSTATS_RX_CSUM_COMPLETE,
- 	NETDEV_A_QSTATS_RX_CSUM_UNNECESSARY,
- 	NETDEV_A_QSTATS_RX_CSUM_NONE,
- 	NETDEV_A_QSTATS_RX_CSUM_BAD,
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index a8188202413e..43742ac5b00d 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -148,6 +148,7 @@ enum {
- 	NETDEV_A_QSTATS_RX_ALLOC_FAIL,
- 	NETDEV_A_QSTATS_RX_HW_DROPS,
- 	NETDEV_A_QSTATS_RX_HW_DROP_OVERRUNS,
-+	NETDEV_A_QSTATS_RX_CSUM_COMPLETE,
- 	NETDEV_A_QSTATS_RX_CSUM_UNNECESSARY,
- 	NETDEV_A_QSTATS_RX_CSUM_NONE,
- 	NETDEV_A_QSTATS_RX_CSUM_BAD,
--- 
-2.45.1
+The code currently assumes light mode and it's generating complaints. It seems like we need to figure out a way to find some support for whatever is the best assumption.
+
+>> Currently the iproute2 tools produce output that is hard to read
+>> when color is enabled and the background is dark.
+> I agree with that statement, but the tools need to figure out the dark
+> vs light and adjust. We can't play games and guess what the right
+> default is.
+>
+That's not possible.
+
+COLORFGBG won't be allowed through by SSH servers.
+
+If you try to write \e]11;?\a to the PTY you need to establish a timeout. There won't always be a response.
+I'm not aware of any good way to do this, though I'm certainly not an expert. But I don't think that tools "figuring out dark vs light and adjusting" is a thing. If you just so happen to be happy with your results then so was I until Debian changed the way they build iproute2 and I never even used color overrides -- now I do. Tools just throw colors in your face and no, there is no really good and universally working way to be smart about it.
+The fact remains that the code currently makes an assumption and I don't see why it is better than the other way around.
+We need some kind of (possibly crude) way to assess what is more common, light or dark. But as I have pointed out already, as long as graphical terminal emulators are concerned, the reality out there is that people use themes and such and the ANSI color codes don't dictate the actual color displayed. But on a linux vt it is easier to say that the background will be dark, and it's neither simple to change the background nor to override the way ANSI colors are displayed.
 
 
