@@ -1,379 +1,203 @@
-Return-Path: <netdev+bounces-99179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 815168D3F2B
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 21:55:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3F3B8D3F34
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 21:56:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B785FB23613
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 19:55:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E34C2876DB
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 19:56:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89018522A;
-	Wed, 29 May 2024 19:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F48D1C2315;
+	Wed, 29 May 2024 19:56:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bE+r2ZsR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BuYH45Hj"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A4B1C2333
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 19:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C004F15B0EB
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 19:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717012526; cv=none; b=qdjYCKjmMZC2Cm69c4363pQsAJcSSkw9baiFjFWmNuoLRQ7Om3MuDVv/zqPzWI2NErPCbMFusgrWybgTHy9LShdZMUac+UACMnwJC+XemabRsQ6fdVxknLzdGGsKZoLMtgbu5uL2Q6YhCVNi+R8tAGngyOroQVtDseS6plxu4AI=
+	t=1717012589; cv=none; b=PeCk7DZAbEyoXXc0HcMKqta9xqloYmbgYIDV5L2YtrfAzhMuHj1FvUwAwfqd/3uYyKQ3RiYttInCb6KBd36yDekY5m9LI3+ezu+jU55Wq8opQU/uN2YQkxo+oNtEZvJ824KPR6O8foT8I7fjRcTRxbcf06e0S0ADcEqfCP1ayew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717012526; c=relaxed/simple;
-	bh=ApC/B6tLetj4akMNnqYPmA7zf9tPiCWA8EXRP1O5oCo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PUuOkRqJE/AxuhTzOGSSNGYWxHDqwcyaP/SCEjbc43yjrI16kYY+GiRA0NGhqKUWolGSN9FpNvKRw1sX+UJr18lalk0vpvJq5Mgb8Uasn6MAkFjRMZCfCBbASn518qfcSHS2jswKRYKJ7kTx5y3og0WPO8C9qzmGIoACvMjdhbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bE+r2ZsR; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: alibuda@linux.alibaba.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1717012520;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WI2CAVHnGbnZf1U3RKyhNsTNXnXKfjaONqyiBv6AEhw=;
-	b=bE+r2ZsRiUv6D0QUyMLjJtGssNLGe+EPzMAKmWrQ1BGlLHljan/XiR3MMNRB6RE4Rgp0qa
-	AIlCZY5KMuhln2jd+MZW7nJdN21TPaCVsM2vuCnVWWarJFixiLSw/biB+6EMUEAjvwa4WF
-	iYc8/0pbcV6RzuOwdDSrOzpcZ1Arwgk=
-X-Envelope-To: kgraul@linux.ibm.com
-X-Envelope-To: wenjia@linux.ibm.com
-X-Envelope-To: jaka@linux.ibm.com
-X-Envelope-To: wintera@linux.ibm.com
-X-Envelope-To: guwen@linux.alibaba.com
-X-Envelope-To: kuba@kernel.org
-X-Envelope-To: davem@davemloft.net
-X-Envelope-To: netdev@vger.kernel.org
-X-Envelope-To: linux-s390@vger.kernel.org
-X-Envelope-To: linux-rdma@vger.kernel.org
-X-Envelope-To: tonylu@linux.alibaba.com
-X-Envelope-To: pabeni@redhat.com
-X-Envelope-To: edumazet@google.com
-Message-ID: <f7ad8072-a173-4d75-bbdd-775f31f6826f@linux.dev>
-Date: Wed, 29 May 2024 21:55:15 +0200
+	s=arc-20240116; t=1717012589; c=relaxed/simple;
+	bh=v/X1YH1+JJ+/inmNsfdoPo3WJXiBa+BH5PEacKfLScU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AYFPj0Rm6LGWqbQMt4efdbkWbkQOgKoWGIGNHOr/fdL0ndalr5+jjbEbaHad0u399REpJqkGL6DkyS3Dn0PQ3yQymC5DnObKscMnX22bxkl8OfL/7Ru/ObtER0B0BwB/MQpg5Y78ewGvDJoa/Hp0L6jZEvvej8tZ8yUAkkKE2gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BuYH45Hj; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52ab11ecdbaso176260e87.3
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 12:56:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717012586; x=1717617386; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8msXAyJo51zNUxwWZni2kGx5pGiaVinKn9EURRKyG7E=;
+        b=BuYH45HjDZ44DLUj9g9IWyPHIdKLN9n319N4vhGQNOVSKd9S8XVoMRVE585zVc66S/
+         j7XyiWbtXl0Fzzj0z/lUFLJMzbC11wLtOxjt1g36N+7G2bOaQEem76Dw5oxwlDwGx2a2
+         uofBoJdlIWB42DoXa2nJhS5NHZr4GaaRW1voSiAa69ia+B6HOiwzOOvGL9ldh+kEJlnJ
+         Zr83XWksqAgQgd0CRDKucavt7ZCD/JLfkcdvuVzEs5sqEP4hZ+ezz/mu1uwSSrvMeWtE
+         9KPzgPCHGFMyU8vXxwoTIHGFPkZr3TPcYqXXes4EE6Tdoo+9VS7PZcfkeo2wjMV2cQdd
+         ch7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717012586; x=1717617386;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8msXAyJo51zNUxwWZni2kGx5pGiaVinKn9EURRKyG7E=;
+        b=t6zMm9Uu2UjDjQkIrBGzbmpnhKIuKkScJBlPSNzJ7n/HXzSAFnnbXRdQJQfNtwQGz8
+         hQdxrfzVayoRfQemCj1Fy5LQ7CQlD0XhYipdQoV24Qw2G68DFd6ZefB+O4mKA4mpREKZ
+         2c4r2Tw0W9dH6uuXgbS8LTjCzX+WCVu/kLRuPcxBpx4GhMJtTpinAVK9Kf662bxKhMkz
+         Ko2B/jT0Pk5Njv3RF0vniQII554eiy1D+efFRKdACZVKkzrg6Z3UYA0Vt30WhfmZplyY
+         qng5j4G9MA3Pex3DgL3BKXV8IdiPgVR6oRhTFoTiWoTdR01gn+YQu/vhqUXxaP1B2TpH
+         DSSg==
+X-Forwarded-Encrypted: i=1; AJvYcCXawjpdGf2TTg49fWkvdj7EEtEbitvopB6Tmmr5p+EbJMJVmfHyjT00wbEZUeapxThqizk2ODpMLM0Bl20ccqrJLWLvA53B
+X-Gm-Message-State: AOJu0YxeMdAqzCCpqjDKJaJOvCYpaf6L4UfjodJ+8od/PKQgNw6t3ELP
+	D72oG3ZWXUroxdROw/eQIWyXDDirR7Vo2iTEGfEiu2gGFVgydXsyaF6rzToFodghUm2iU5Yd3lv
+	cOTaVneJyBpE41bGHyNhd7fUedTcJiEoAKX13
+X-Google-Smtp-Source: AGHT+IGj+nHwuSADJBi729Usw2X3RNmBU9MG+ajFcKaw6LKX1aWEE1NHFDIT9WF4pOG+xhHGEGrYRGT+GDj4FRDLmWM=
+X-Received: by 2002:a05:6512:358f:b0:51d:1002:520d with SMTP id
+ 2adb3069b0e04-52b7d4905b8mr102462e87.64.1717012585790; Wed, 29 May 2024
+ 12:56:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v4 3/3] net/smc: Introduce IPPROTO_SMC
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
- wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com,
- guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
- tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
-References: <1716955147-88923-1-git-send-email-alibuda@linux.alibaba.com>
- <1716955147-88923-4-git-send-email-alibuda@linux.alibaba.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <1716955147-88923-4-git-send-email-alibuda@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20240528171320.1332292-1-yyd@google.com> <CAL+tcoCR1Uh1fvVzf5pVyHTv+dHDK1zfbDTtuH_q1CMggUZqkA@mail.gmail.com>
+ <CAL+tcoA0hTvOT2cjri-qBEkDCp8ROeyO4fp9jtSFPpY9pLXsgQ@mail.gmail.com>
+ <CANn89iKb4nWKvByBwGFveLb5KL_F_Eh_7gPpJ-3fPkfQF7Zf0g@mail.gmail.com>
+ <CAL+tcoCoVTNidWkTm6oUDVPH1cT3292Nqe9WjqTXuQvNYGK+tw@mail.gmail.com> <CANn89iKhDfP4Nx0xSLsBSTLNuTGds1LGmSnmRC5hhtEbkzUBjQ@mail.gmail.com>
+In-Reply-To: <CANn89iKhDfP4Nx0xSLsBSTLNuTGds1LGmSnmRC5hhtEbkzUBjQ@mail.gmail.com>
+From: Kevin Yang <yyd@google.com>
+Date: Wed, 29 May 2024 15:56:14 -0400
+Message-ID: <CAPREpbY2FbmT77B3s7XtO4UQmuJROtmTShv69Hxb6O7FeAJqcw@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/2] tcp: add sysctl_tcp_rto_min_us
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jason Xing <kerneljasonxing@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
+	David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-在 2024/5/29 5:59, D. Wythe 写道:
-> From: "D. Wythe" <alibuda@linux.alibaba.com>
-> 
-> This patch allows to create smc socket via AF_INET,
-> similar to the following code,
-> 
-> /* create v4 smc sock */
-> v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
-> 
-> /* create v6 smc sock */
-> v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
-> 
-> There are several reasons why we believe it is appropriate here:
-> 
-> 1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
-> address. There is no AF_SMC address at all.
-> 
-> 2. Create smc socket in the AF_INET(6) path, which allows us to reuse
-> the infrastructure of AF_INET(6) path, such as common ebpf hooks.
-> Otherwise, smc have to implement it again in AF_SMC path.
-> 
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> ---
->   include/uapi/linux/in.h |   2 +
->   net/smc/Makefile        |   2 +-
->   net/smc/af_smc.c        |  36 ++++++++++++++++
->   net/smc/inet_smc.c      | 108 ++++++++++++++++++++++++++++++++++++++++++++++++
->   net/smc/inet_smc.h      |  34 +++++++++++++++
->   5 files changed, 181 insertions(+), 1 deletion(-)
->   create mode 100644 net/smc/inet_smc.c
->   create mode 100644 net/smc/inet_smc.h
-> 
-> diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
-> index e682ab6..0c6322b 100644
-> --- a/include/uapi/linux/in.h
-> +++ b/include/uapi/linux/in.h
-> @@ -83,6 +83,8 @@ enum {
->   #define IPPROTO_RAW		IPPROTO_RAW
->     IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
->   #define IPPROTO_MPTCP		IPPROTO_MPTCP
-> +  IPPROTO_SMC = 263,		/* Shared Memory Communications		*/
-> +#define IPPROTO_SMC		IPPROTO_SMC
->     IPPROTO_MAX
->   };
->   #endif
-> diff --git a/net/smc/Makefile b/net/smc/Makefile
-> index 2c510d54..472b9ee 100644
-> --- a/net/smc/Makefile
-> +++ b/net/smc/Makefile
-> @@ -4,6 +4,6 @@ obj-$(CONFIG_SMC)	+= smc.o
->   obj-$(CONFIG_SMC_DIAG)	+= smc_diag.o
->   smc-y := af_smc.o smc_pnet.o smc_ib.o smc_clc.o smc_core.o smc_wr.o smc_llc.o
->   smc-y += smc_cdc.o smc_tx.o smc_rx.o smc_close.o smc_ism.o smc_netlink.o smc_stats.o
-> -smc-y += smc_tracepoint.o
-> +smc-y += smc_tracepoint.o inet_smc.o
->   smc-$(CONFIG_SYSCTL) += smc_sysctl.o
->   smc-$(CONFIG_SMC_LO) += smc_loopback.o
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index 8e3ce76..320624c 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -54,6 +54,7 @@
->   #include "smc_tracepoint.h"
->   #include "smc_sysctl.h"
->   #include "smc_loopback.h"
-> +#include "inet_smc.h"
->   
->   static DEFINE_MUTEX(smc_server_lgr_pending);	/* serialize link group
->   						 * creation on server
-> @@ -3594,9 +3595,31 @@ static int __init smc_init(void)
->   		goto out_lo;
->   	}
->   
-> +	rc = proto_register(&smc_inet_prot, 1);
-> +	if (rc) {
-> +		pr_err("%s: proto_register smc_inet_prot fails with %d\n", __func__, rc);
-> +		goto out_ulp;
-> +	}
-> +	inet_register_protosw(&smc_inet_protosw);
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +	rc = proto_register(&smc_inet6_prot, 1);
-> +	if (rc) {
-> +		pr_err("%s: proto_register smc_inet6_prot fails with %d\n", __func__, rc);
-> +		goto out_inet_prot;
-> +	}
-> +	inet6_register_protosw(&smc_inet6_protosw);
-> +#endif
-> +
->   	static_branch_enable(&tcp_have_smc);
->   	return 0;
->   
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +out_inet_prot:
-> +	inet_unregister_protosw(&smc_inet_protosw);
-> +	proto_unregister(&smc_inet_prot);
-> +#endif
-> +out_ulp:
-> +	tcp_unregister_ulp(&smc_ulp_ops);
->   out_lo:
->   	smc_loopback_exit();
->   out_ib:
-> @@ -3633,6 +3656,10 @@ static int __init smc_init(void)
->   static void __exit smc_exit(void)
->   {
->   	static_branch_disable(&tcp_have_smc);
-> +	inet_unregister_protosw(&smc_inet_protosw);
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +	inet6_unregister_protosw(&smc_inet6_protosw);
-> +#endif
->   	tcp_unregister_ulp(&smc_ulp_ops);
->   	sock_unregister(PF_SMC);
->   	smc_core_exit();
-> @@ -3644,6 +3671,10 @@ static void __exit smc_exit(void)
->   	destroy_workqueue(smc_hs_wq);
->   	proto_unregister(&smc_proto6);
->   	proto_unregister(&smc_proto);
-> +	proto_unregister(&smc_inet_prot);
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +	proto_unregister(&smc_inet6_prot);
-> +#endif
->   	smc_pnet_exit();
->   	smc_nl_exit();
->   	smc_clc_exit();
-> @@ -3660,4 +3691,9 @@ static void __exit smc_exit(void)
->   MODULE_LICENSE("GPL");
->   MODULE_ALIAS_NETPROTO(PF_SMC);
->   MODULE_ALIAS_TCP_ULP("smc");
-> +/* 263 for IPPROTO_SMC and 1 for SOCK_STREAM */
-> +MODULE_ALIAS_NET_PF_PROTO_TYPE(PF_INET, 263, 1);
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +MODULE_ALIAS_NET_PF_PROTO_TYPE(PF_INET6, 263, 1);
-> +#endif
->   MODULE_ALIAS_GENL_FAMILY(SMC_GENL_FAMILY_NAME);
-> diff --git a/net/smc/inet_smc.c b/net/smc/inet_smc.c
-> new file mode 100644
-> index 00000000..1ba73d7
-> --- /dev/null
-> +++ b/net/smc/inet_smc.c
-> @@ -0,0 +1,108 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + *  Shared Memory Communications over RDMA (SMC-R) and RoCE
-> + *
-> + *  Definitions for the IPPROTO_SMC (socket related)
-> + *
-> + *  Copyright IBM Corp. 2016, 2018
-> + *  Copyright (c) 2024, Alibaba Inc.
-> + *
-> + *  Author: D. Wythe <alibuda@linux.alibaba.com>
-> + */
-> +
-> +#include "inet_smc.h"
-> +#include "smc.h"
-> +
-> +struct proto smc_inet_prot = {
-> +	.name		= "INET_SMC",
-> +	.owner		= THIS_MODULE,
-> +	.init		= smc_inet_init_sock,
-> +	.hash		= smc_hash_sk,
-> +	.unhash		= smc_unhash_sk,
-> +	.release_cb	= smc_release_cb,
-> +	.obj_size	= sizeof(struct smc_sock),
-> +	.h.smc_hash	= &smc_v4_hashinfo,
-> +	.slab_flags	= SLAB_TYPESAFE_BY_RCU,
-> +};
-> +
-> +const struct proto_ops smc_inet_stream_ops = {
-> +	.family		= PF_INET,
-> +	.owner		= THIS_MODULE,
-> +	.release	= smc_release,
-> +	.bind		= smc_bind,
-> +	.connect	= smc_connect,
-> +	.socketpair	= sock_no_socketpair,
-> +	.accept		= smc_accept,
-> +	.getname	= smc_getname,
-> +	.poll		= smc_poll,
-> +	.ioctl		= smc_ioctl,
-> +	.listen		= smc_listen,
-> +	.shutdown	= smc_shutdown,
-> +	.setsockopt	= smc_setsockopt,
-> +	.getsockopt	= smc_getsockopt,
-> +	.sendmsg	= smc_sendmsg,
-> +	.recvmsg	= smc_recvmsg,
-> +	.mmap		= sock_no_mmap,
-> +	.splice_read	= smc_splice_read,
-> +};
-> +
-> +struct inet_protosw smc_inet_protosw = {
-> +	.type		= SOCK_STREAM,
-> +	.protocol	= IPPROTO_SMC,
-> +	.prot		= &smc_inet_prot,
-> +	.ops		= &smc_inet_stream_ops,
-> +	.flags		= INET_PROTOSW_ICSK,
-> +};
-> +
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +struct proto smc_inet6_prot = {
-> +	.name		= "INET6_SMC",
-> +	.owner		= THIS_MODULE,
-> +	.init		= smc_inet_init_sock,
-> +	.hash		= smc_hash_sk,
-> +	.unhash		= smc_unhash_sk,
-> +	.release_cb	= smc_release_cb,
-> +	.obj_size	= sizeof(struct smc_sock),
-> +	.h.smc_hash	= &smc_v6_hashinfo,
-> +	.slab_flags	= SLAB_TYPESAFE_BY_RCU,
-> +};
-> +
-> +const struct proto_ops smc_inet6_stream_ops = {
-> +	.family		= PF_INET6,
-> +	.owner		= THIS_MODULE,
-> +	.release	= smc_release,
-> +	.bind		= smc_bind,
-> +	.connect	= smc_connect,
-> +	.socketpair	= sock_no_socketpair,
-> +	.accept		= smc_accept,
-> +	.getname	= smc_getname,
-> +	.poll		= smc_poll,
-> +	.ioctl		= smc_ioctl,
-> +	.listen		= smc_listen,
-> +	.shutdown	= smc_shutdown,
-> +	.setsockopt	= smc_setsockopt,
-> +	.getsockopt	= smc_getsockopt,
-> +	.sendmsg	= smc_sendmsg,
-> +	.recvmsg	= smc_recvmsg,
-> +	.mmap		= sock_no_mmap,
-> +	.splice_read	= smc_splice_read,
-> +};
-> +
-> +struct inet_protosw smc_inet6_protosw = {
-> +	.type		= SOCK_STREAM,
-> +	.protocol	= IPPROTO_SMC,
-> +	.prot		= &smc_inet6_prot,
-> +	.ops		= &smc_inet6_stream_ops,
-> +	.flags		= INET_PROTOSW_ICSK,
-> +};
-> +#endif
-> +
-> +int smc_inet_init_sock(struct sock *sk)
-> +{
-> +	struct net *net = sock_net(sk);
-> +
-> +	/* init common smc sock */
-> +	smc_sk_init(net, sk, IPPROTO_SMC);
-> +	/* create clcsock */
-> +	return smc_create_clcsk(net, sk, sk->sk_family);
-> +}
-> diff --git a/net/smc/inet_smc.h b/net/smc/inet_smc.h
-> new file mode 100644
-> index 00000000..c55345d
-> --- /dev/null
-> +++ b/net/smc/inet_smc.h
-> @@ -0,0 +1,34 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + *  Shared Memory Communications over RDMA (SMC-R) and RoCE
-> + *
-> + *  Definitions for the IPPROTO_SMC (socket related)
-> +
-> + *  Copyright IBM Corp. 2016
-> + *  Copyright (c) 2024, Alibaba Inc.
-> + *
-> + *  Author: D. Wythe <alibuda@linux.alibaba.com>
-> + */
-> +#ifndef __INET_SMC
-> +#define __INET_SMC
-> +
-> +#include <net/protocol.h>
-> +#include <net/sock.h>
-> +#include <net/tcp.h>
-> +
-> +extern struct proto smc_inet_prot;
-> +extern const struct proto_ops smc_inet_stream_ops;
-> +extern struct inet_protosw smc_inet_protosw;
-> +
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +#include <net/ipv6.h>
-> +/* MUST after net/tcp.h or warning */
-> +#include <net/transp_v6.h>
-> +extern struct proto smc_inet6_prot;
-> +extern const struct proto_ops smc_inet6_stream_ops;
-> +extern struct inet_protosw smc_inet6_protosw;
-> +#endif
+Hello Jason,
 
-If we append /* CONFIG_IPV6 */ to #endif to indicate that it is the end 
-of CONFIG_IPV6, it is a good habit. When browsing the source code, it is 
-easy for us to know that it is the end of CONFIG_IPV6.
-Just my 2 cent suggestions. It is a trivial problem. You can ignore it.
-But if you fix it, it can make the source code more readable.
+I guess I don't have anymore to add than what Eric and Tony mentioned.
 
-Zhu Yanjun
+The purpose of this sysctl is to resolve problems in a more straightforward
+way than other existing methods.
 
-> +
-> +int smc_inet_init_sock(struct sock *sk);
-> +
-> +#endif /* __INET_SMC */
+Thanks
+kevin
 
+On Wed, May 29, 2024 at 5:23=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Wed, May 29, 2024 at 10:44=E2=80=AFAM Jason Xing <kerneljasonxing@gmai=
+l.com> wrote:
+> >
+> > Hello Eric,
+> >
+> > On Wed, May 29, 2024 at 3:39=E2=80=AFPM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > On Wed, May 29, 2024 at 9:00=E2=80=AFAM Jason Xing <kerneljasonxing@g=
+mail.com> wrote:
+> > > >
+> > > > On Wed, May 29, 2024 at 2:43=E2=80=AFPM Jason Xing <kerneljasonxing=
+@gmail.com> wrote:
+> > > > >
+> > > > > Hello Kevin,
+> > > > >
+> > > > > On Wed, May 29, 2024 at 1:13=E2=80=AFAM Kevin Yang <yyd@google.co=
+m> wrote:
+> > > > > >
+> > > > > > Adding a sysctl knob to allow user to specify a default
+> > > > > > rto_min at socket init time.
+> > > > >
+> > > > > I wonder what the advantage of this new sysctl knob is since we h=
+ave
+> > > > > had BPF or something like that to tweak the rto min already?
+> > > > >
+> > > > > There are so many places/parameters of the TCP stack that can be
+> > > > > exposed to the user side and adjusted by new sysctls...
+> > > > >
+> > > > > Thanks,
+> > > > > Jason
+> > > > >
+> > > > > >
+> > > > > > After this patch series, the rto_min will has multiple sources:
+> > > > > > route option has the highest precedence, followed by the
+> > > > > > TCP_BPF_RTO_MIN socket option, followed by this new
+> > > > > > tcp_rto_min_us sysctl.
+> > > > > >
+> > > > > > Kevin Yang (2):
+> > > > > >   tcp: derive delack_max with tcp_rto_min helper
+> > > > > >   tcp: add sysctl_tcp_rto_min_us
+> > > > > >
+> > > > > >  Documentation/networking/ip-sysctl.rst | 13 +++++++++++++
+> > > > > >  include/net/netns/ipv4.h               |  1 +
+> > > > > >  net/ipv4/sysctl_net_ipv4.c             |  8 ++++++++
+> > > > > >  net/ipv4/tcp.c                         |  3 ++-
+> > > > > >  net/ipv4/tcp_ipv4.c                    |  1 +
+> > > > > >  net/ipv4/tcp_output.c                  | 11 ++---------
+> > > > > >  6 files changed, 27 insertions(+), 10 deletions(-)
+> > > > > >
+> > > > > > --
+> > > > > > 2.45.1.288.g0e0cd299f1-goog
+> > > > > >
+> > > > > >
+> > > >
+> > > > Oh, I think you should have added Paolo as well.
+> > > >
+> > > > +Paolo Abeni
+> > >
+> > > Many cloud customers do not have any BPF expertise.
+> > > If they use existing BPF programs (added by a product), they might no=
+t
+> > > have the ability to change it.
+> > >
+> > > We tried advising them to use route attributes, after
+> > > commit bbf80d713fe75cfbecda26e7c03a9a8d22af2f4f ("tcp: derive
+> > > delack_max from rto_min")
+> > >
+> > > Alas, dhcpd was adding its own routes, without the "rto_min 5"
+> > > attribute, then systemd came...
+> > > Lots of frustration, lots of wasted time, for something that has been
+> > > used for more than a decade
+> > > in Google DC.
+> > >
+> > > With a sysctl, we could have saved months of SWE, and helped our
+> > > customers sooner.
+> >
+> > I'm definitely aware of the importance of this kind of sysctl knob.
+> > Many years ago (around 6 or 7 years ago), we already implemented
+> > similar things in the private kernel.
+> >
+> > For a long time, netdev guys often proposed the question as I did in
+> > the previous email. I'm not against it, just repeating the same
+> > question and asking ourselves again: is it really necessary? We still
+> > have a lot of places to tune/control by introducing new sysctl.
+> >
+> > For a long time, there have been plenty of papers studying different
+> > combinations of different parameters in TCP stack so that they can
+> > serve one particular case well.
+> >
+> > Do we also need to expose remaining possible parameters to the user
+> > side? Just curious...
+>
+> You know, counting CLOSE_WAIT can be done with  eBPF program just fine.
+>
+> I think long-time TCP maintainers like Eric Dumazet, Neal Cardwell,
+> and Yuchung Cheng know better,
+> you will have to trust us.
+>
+> If you do not want to use the sysctl, this is fine, we do not force you.
 
