@@ -1,237 +1,448 @@
-Return-Path: <netdev+bounces-98871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 220668D2C6C
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 07:31:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BCAD8D2C77
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 07:36:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9820F285167
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 05:31:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FA2928A5A8
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 05:36:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 108A715B10C;
-	Wed, 29 May 2024 05:31:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865D515D5A0;
+	Wed, 29 May 2024 05:36:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="eDl6IyaA"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="iJvSctFb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0179B6AB8
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 05:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A54F15B99F;
+	Wed, 29 May 2024 05:36:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716960675; cv=none; b=oT/JbCTQjw0A6bAQ3Qs0+Bq6kBOfFcNwZShZ97cWQAOMej+m6WF6JLvrN6AwZ/y3RbMPPh77IfFhKurYMpZRWWJVGPtCdTVHd7ohTOFvbh7AGMifz0Nu3arDe8yJsBU7CNho1Rmq1kPxgiVKJpBM7/Iwc8+D4RyZVHM+0JbcoPQ=
+	t=1716960967; cv=none; b=KcMVJfT2SP4I8FNIXmq6yuaOw26ePYK1xiI9aNqUWW668bvredzNxuIjFI7JY+8gG4mXWhOXfuRVqImQg78PObS5v9c/RUhYNXDozRCN8t9SGekBcjE6goUVdOTiRq6MVH/6qcaz5Jh1NIGIVuPgbrcE8M8R0mEuYQFkPqLSlKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716960675; c=relaxed/simple;
-	bh=mekzJS1LTLsELiHCXLLlMbn+ysJZ1zgfjNoQuJf7DJE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aQz3nfR8pWtx7bzIWn6QiB/Yz7Jqhz2nyg8hlUrr/7EBNiBQJgguI6PuVTzM0Hpwzxir/8mM4JfZBRrds2e2IudW8/OlAAxkllvttaONTnmpMVEGkiZPO0UPyXhjUkiMRi9PdugIkqNYmHoon532DZUuPTwIxNd3HIzstzsplvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=eDl6IyaA; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52b4fcbf078so6109e87.0
-        for <netdev@vger.kernel.org>; Tue, 28 May 2024 22:31:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1716960671; x=1717565471; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=lk3zhisLaTjJ3q8JEaetysS2aeLYA/XShpqhByIKieE=;
-        b=eDl6IyaAMhOxbBzrRlkHqQ5wAHuNSpmE7LYP5XUJrGrJChPbYc53lILE61f5PJfGor
-         ZSukHharQCkZmRbP8cn55/IeOQJI6JfgpQv9/rSduClHBzLLOrw/1fxJQf76nCmMBSv2
-         GLcqSQwWSLRhvTF7LsIrGyx8FxYK60+d7A/qI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716960671; x=1717565471;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lk3zhisLaTjJ3q8JEaetysS2aeLYA/XShpqhByIKieE=;
-        b=BTulfXeuwp3ac+oR7ZPW+lj5BfA6rpWrE4wTWxNCX4D8HyKplxbnRoKLtH5OyQBhmK
-         N0jHYxO4K+sepwBmnernJUiGO97XrkaFpBXmDll6akVfHBSwBuHtJe0aO2+NMIF40E7O
-         bAAvNNVFJ01CrLGo1T0AUnrnW+A5NwNN9YO+D2gYnwnfHEJPf36BXhJqqnA269+Tbeik
-         f0ejF16uz9gbn31UmVKOwNARGb1wG1nH1+7wk0dim3wGnU4MHBrmdw63KvD4A/Y/gQfW
-         KsYPa07T+uGS9LnyXstWHv/2fvXQ12nyljNMoSYaBTYRlPQrRWjeXLc9bR1jCgKoLSlu
-         5jsQ==
-X-Gm-Message-State: AOJu0YwVoMhO7Bm/T9uc2xxCFvdeTJHq/Rwsp5YuPzt5mK3xt6ZPUH7u
-	7jIt0OvMq68KGJdeFfLFjTWyCaRxbPdzxgBFNwejzZiGQw/Tftx/CxQ3ZjA1EYWGydapfFRrpW3
-	Q1OUKs1bcxHe4GSgsHayEdM4MJtuW68Y+52M0FRv9xsSoJEgcD5oO
-X-Google-Smtp-Source: AGHT+IE5hQelgnlgziFW0MEJIHkl71W4osHo18McG5W2DL3CS0nRkzwqDpNgLbC/NCt9h6ewki5TfTCC284wKY2uwtY=
-X-Received: by 2002:ac2:47fa:0:b0:52b:4924:5348 with SMTP id
- 2adb3069b0e04-52b49245560mr38933e87.12.1716960671012; Tue, 28 May 2024
- 22:31:11 -0700 (PDT)
+	s=arc-20240116; t=1716960967; c=relaxed/simple;
+	bh=EG+ukCtR5W8c8NJE7zQeVvvVFcYg89gLleqGpiQDV/o=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=IuhlFtpNEhHQ7a5o8KsqxIWB59L919mjji5iPkjSuLq2rAvkgu4PMX2bTw71EaQFsq0oO2sUJmyBncdpTogM9duHhNFFUYLqgamlDSmlVn0if7/fcTaVP5Iya0sMVw5VWnc/fKi3x6YfkwqPyvitGhy+lYePcBEa1za8WeUMAhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=iJvSctFb; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 8358F2067D14; Tue, 28 May 2024 22:35:56 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8358F2067D14
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1716960956;
+	bh=S0zBMLpxe8tPEwPqoPcU2mRWFnZzgoPM64H1p7tmBVc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=iJvSctFbblP6yoW1IC2RkO5ndpdiUK0upODkjwPr36G8PZ8ATy4eCGuCFnJ1JMV8C
+	 9dxiq4E8u6cnRLd+b1vARPW+SxaZV//200ykq4GfVdo7zUf83ApiaHT2I7fm1Wjc7w
+	 Hase1sqsLJGrf3aG04lTZHulf8Cx0STNylwLvEXA=
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: linux-hardening@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Colin Ian King <colin.i.king@gmail.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Kees Cook <keescook@chromium.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dexuan Cui <decui@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: [PATCH net-next v2] net: mana: Allow variable size indirection table
+Date: Tue, 28 May 2024 22:35:55 -0700
+Message-Id: <1716960955-3195-1-git-send-email-shradhagupta@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240529000259.25775-1-shannon.nelson@amd.com> <20240529000259.25775-6-shannon.nelson@amd.com>
-In-Reply-To: <20240529000259.25775-6-shannon.nelson@amd.com>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Wed, 29 May 2024 11:00:58 +0530
-Message-ID: <CAH-L+nPQ016BqhbdwECL+GRT3OJGW2vmzg9wU1MT3_Swd_OPjw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 5/7] ionic: Use netdev_name() function instead
- of netdev->name
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
-	brett.creeley@amd.com, drivers@pensando.io
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000ea4dda0619910ed4"
 
---000000000000ea4dda0619910ed4
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Allow variable size indirection table allocation in MANA instead
+of using a constant value MANA_INDIRECT_TABLE_SIZE.
+The size is now derived from the MANA_QUERY_VPORT_CONFIG and the
+indirection table is allocated dynamically.
 
-On Wed, May 29, 2024 at 5:34=E2=80=AFAM Shannon Nelson <shannon.nelson@amd.=
-com> wrote:
->
-> From: Brett Creeley <brett.creeley@amd.com>
->
-> There is no reason not to use netdev_name() in these places, so do just
-> as the title states.
->
-> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Reviewed-by: Dexuan Cui <decui@microsoft.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+---
+ Changes in v2:
+ * Rebased to latest net-next tree
+ * Rearranged cleanup code in mana_probe_port to avoid extra operations
+---
+ drivers/infiniband/hw/mana/qp.c               | 10 +--
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 68 ++++++++++++++++---
+ .../ethernet/microsoft/mana/mana_ethtool.c    | 20 ++++--
+ include/net/mana/gdma.h                       |  4 +-
+ include/net/mana/mana.h                       |  9 +--
+ 5 files changed, 84 insertions(+), 27 deletions(-)
 
-Looks good to me.
+diff --git a/drivers/infiniband/hw/mana/qp.c b/drivers/infiniband/hw/mana/qp.c
+index ba13c5abf8ef..2d411a16a127 100644
+--- a/drivers/infiniband/hw/mana/qp.c
++++ b/drivers/infiniband/hw/mana/qp.c
+@@ -21,7 +21,7 @@ static int mana_ib_cfg_vport_steering(struct mana_ib_dev *dev,
+ 
+ 	gc = mdev_to_gc(dev);
+ 
+-	req_buf_size = struct_size(req, indir_tab, MANA_INDIRECT_TABLE_SIZE);
++	req_buf_size = struct_size(req, indir_tab, MANA_INDIRECT_TABLE_DEF_SIZE);
+ 	req = kzalloc(req_buf_size, GFP_KERNEL);
+ 	if (!req)
+ 		return -ENOMEM;
+@@ -41,18 +41,18 @@ static int mana_ib_cfg_vport_steering(struct mana_ib_dev *dev,
+ 	if (log_ind_tbl_size)
+ 		req->rss_enable = true;
+ 
+-	req->num_indir_entries = MANA_INDIRECT_TABLE_SIZE;
++	req->num_indir_entries = MANA_INDIRECT_TABLE_DEF_SIZE;
+ 	req->indir_tab_offset = offsetof(struct mana_cfg_rx_steer_req_v2,
+ 					 indir_tab);
+ 	req->update_indir_tab = true;
+ 	req->cqe_coalescing_enable = 1;
+ 
+ 	/* The ind table passed to the hardware must have
+-	 * MANA_INDIRECT_TABLE_SIZE entries. Adjust the verb
++	 * MANA_INDIRECT_TABLE_DEF_SIZE entries. Adjust the verb
+ 	 * ind_table to MANA_INDIRECT_TABLE_SIZE if required
+ 	 */
+ 	ibdev_dbg(&dev->ib_dev, "ind table size %u\n", 1 << log_ind_tbl_size);
+-	for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++) {
++	for (i = 0; i < MANA_INDIRECT_TABLE_DEF_SIZE; i++) {
+ 		req->indir_tab[i] = ind_table[i % (1 << log_ind_tbl_size)];
+ 		ibdev_dbg(&dev->ib_dev, "index %u handle 0x%llx\n", i,
+ 			  req->indir_tab[i]);
+@@ -137,7 +137,7 @@ static int mana_ib_create_qp_rss(struct ib_qp *ibqp, struct ib_pd *pd,
+ 	}
+ 
+ 	ind_tbl_size = 1 << ind_tbl->log_ind_tbl_size;
+-	if (ind_tbl_size > MANA_INDIRECT_TABLE_SIZE) {
++	if (ind_tbl_size > MANA_INDIRECT_TABLE_DEF_SIZE) {
+ 		ibdev_dbg(&mdev->ib_dev,
+ 			  "Indirect table size %d exceeding limit\n",
+ 			  ind_tbl_size);
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index d087cf954f75..851e1b9761b3 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -481,7 +481,7 @@ static int mana_get_tx_queue(struct net_device *ndev, struct sk_buff *skb,
+ 	struct sock *sk = skb->sk;
+ 	int txq;
+ 
+-	txq = apc->indir_table[hash & MANA_INDIRECT_TABLE_MASK];
++	txq = apc->indir_table[hash & (apc->indir_table_sz - 1)];
+ 
+ 	if (txq != old_q && sk && sk_fullsock(sk) &&
+ 	    rcu_access_pointer(sk->sk_dst_cache))
+@@ -962,7 +962,16 @@ static int mana_query_vport_cfg(struct mana_port_context *apc, u32 vport_index,
+ 
+ 	*max_sq = resp.max_num_sq;
+ 	*max_rq = resp.max_num_rq;
+-	*num_indir_entry = resp.num_indirection_ent;
++	if (resp.num_indirection_ent > 0 &&
++	    resp.num_indirection_ent <= MANA_INDIRECT_TABLE_MAX_SIZE &&
++	    is_power_of_2(resp.num_indirection_ent)) {
++		*num_indir_entry = resp.num_indirection_ent;
++	} else {
++		netdev_warn(apc->ndev,
++			    "Setting indirection table size to default %d for vPort %d\n",
++			    MANA_INDIRECT_TABLE_DEF_SIZE, apc->port_idx);
++		*num_indir_entry = MANA_INDIRECT_TABLE_DEF_SIZE;
++	}
+ 
+ 	apc->port_handle = resp.vport;
+ 	ether_addr_copy(apc->mac_addr, resp.mac_addr);
+@@ -1054,14 +1063,13 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
+ 				   bool update_default_rxobj, bool update_key,
+ 				   bool update_tab)
+ {
+-	u16 num_entries = MANA_INDIRECT_TABLE_SIZE;
+ 	struct mana_cfg_rx_steer_req_v2 *req;
+ 	struct mana_cfg_rx_steer_resp resp = {};
+ 	struct net_device *ndev = apc->ndev;
+ 	u32 req_buf_size;
+ 	int err;
+ 
+-	req_buf_size = struct_size(req, indir_tab, num_entries);
++	req_buf_size = struct_size(req, indir_tab, apc->indir_table_sz);
+ 	req = kzalloc(req_buf_size, GFP_KERNEL);
+ 	if (!req)
+ 		return -ENOMEM;
+@@ -1072,7 +1080,7 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
+ 	req->hdr.req.msg_version = GDMA_MESSAGE_V2;
+ 
+ 	req->vport = apc->port_handle;
+-	req->num_indir_entries = num_entries;
++	req->num_indir_entries = apc->indir_table_sz;
+ 	req->indir_tab_offset = offsetof(struct mana_cfg_rx_steer_req_v2,
+ 					 indir_tab);
+ 	req->rx_enable = rx;
+@@ -1111,7 +1119,7 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
+ 	}
+ 
+ 	netdev_info(ndev, "Configured steering vPort %llu entries %u\n",
+-		    apc->port_handle, num_entries);
++		    apc->port_handle, apc->indir_table_sz);
+ out:
+ 	kfree(req);
+ 	return err;
+@@ -2344,11 +2352,33 @@ static int mana_create_vport(struct mana_port_context *apc,
+ 	return mana_create_txq(apc, net);
+ }
+ 
++static int mana_rss_table_alloc(struct mana_port_context *apc)
++{
++	if (!apc->indir_table_sz) {
++		netdev_err(apc->ndev,
++			   "Indirection table size not set for vPort %d\n",
++			   apc->port_idx);
++		return -EINVAL;
++	}
++
++	apc->indir_table = kcalloc(apc->indir_table_sz, sizeof(u32), GFP_KERNEL);
++	if (!apc->indir_table)
++		return -ENOMEM;
++
++	apc->rxobj_table = kcalloc(apc->indir_table_sz, sizeof(mana_handle_t), GFP_KERNEL);
++	if (!apc->rxobj_table) {
++		kfree(apc->indir_table);
++		return -ENOMEM;
++	}
++
++	return 0;
++}
++
+ static void mana_rss_table_init(struct mana_port_context *apc)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++)
++	for (i = 0; i < apc->indir_table_sz; i++)
+ 		apc->indir_table[i] =
+ 			ethtool_rxfh_indir_default(i, apc->num_queues);
+ }
+@@ -2361,7 +2391,7 @@ int mana_config_rss(struct mana_port_context *apc, enum TRI_STATE rx,
+ 	int i;
+ 
+ 	if (update_tab) {
+-		for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++) {
++		for (i = 0; i < apc->indir_table_sz; i++) {
+ 			queue_idx = apc->indir_table[i];
+ 			apc->rxobj_table[i] = apc->rxqs[queue_idx]->rxobj;
+ 		}
+@@ -2466,7 +2496,6 @@ static int mana_init_port(struct net_device *ndev)
+ 	struct mana_port_context *apc = netdev_priv(ndev);
+ 	u32 max_txq, max_rxq, max_queues;
+ 	int port_idx = apc->port_idx;
+-	u32 num_indirect_entries;
+ 	int err;
+ 
+ 	err = mana_init_port_context(apc);
+@@ -2474,7 +2503,7 @@ static int mana_init_port(struct net_device *ndev)
+ 		return err;
+ 
+ 	err = mana_query_vport_cfg(apc, port_idx, &max_txq, &max_rxq,
+-				   &num_indirect_entries);
++				   &apc->indir_table_sz);
+ 	if (err) {
+ 		netdev_err(ndev, "Failed to query info for vPort %d\n",
+ 			   port_idx);
+@@ -2723,6 +2752,10 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+ 	if (err)
+ 		goto free_net;
+ 
++	err = mana_rss_table_alloc(apc);
++	if (err)
++		goto reset_apc;
++
+ 	netdev_lockdep_set_classes(ndev);
+ 
+ 	ndev->hw_features = NETIF_F_SG | NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM;
+@@ -2739,11 +2772,17 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+ 	err = register_netdev(ndev);
+ 	if (err) {
+ 		netdev_err(ndev, "Unable to register netdev.\n");
+-		goto reset_apc;
++		goto free_indir;
+ 	}
+ 
+ 	return 0;
+ 
++free_indir:
++	apc->indir_table_sz = 0;
++	kfree(apc->indir_table);
++	apc->indir_table = NULL;
++	kfree(apc->rxobj_table);
++	apc->rxobj_table = NULL;
+ reset_apc:
+ 	kfree(apc->rxqs);
+ 	apc->rxqs = NULL;
+@@ -2897,6 +2936,7 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ {
+ 	struct gdma_context *gc = gd->gdma_context;
+ 	struct mana_context *ac = gd->driver_data;
++	struct mana_port_context *apc;
+ 	struct device *dev = gc->dev;
+ 	struct net_device *ndev;
+ 	int err;
+@@ -2908,6 +2948,7 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ 
+ 	for (i = 0; i < ac->num_ports; i++) {
+ 		ndev = ac->ports[i];
++		apc = netdev_priv(ndev);
+ 		if (!ndev) {
+ 			if (i == 0)
+ 				dev_err(dev, "No net device to remove\n");
+@@ -2931,6 +2972,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ 		}
+ 
+ 		unregister_netdevice(ndev);
++		apc->indir_table_sz = 0;
++		kfree(apc->indir_table);
++		apc->indir_table = NULL;
++		kfree(apc->rxobj_table);
++		apc->rxobj_table = NULL;
+ 
+ 		rtnl_unlock();
+ 
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+index ab2413d71f6c..1667f18046d2 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+@@ -245,7 +245,9 @@ static u32 mana_get_rxfh_key_size(struct net_device *ndev)
+ 
+ static u32 mana_rss_indir_size(struct net_device *ndev)
+ {
+-	return MANA_INDIRECT_TABLE_SIZE;
++	struct mana_port_context *apc = netdev_priv(ndev);
++
++	return apc->indir_table_sz;
+ }
+ 
+ static int mana_get_rxfh(struct net_device *ndev,
+@@ -257,7 +259,7 @@ static int mana_get_rxfh(struct net_device *ndev,
+ 	rxfh->hfunc = ETH_RSS_HASH_TOP; /* Toeplitz */
+ 
+ 	if (rxfh->indir) {
+-		for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++)
++		for (i = 0; i < apc->indir_table_sz; i++)
+ 			rxfh->indir[i] = apc->indir_table[i];
+ 	}
+ 
+@@ -273,8 +275,8 @@ static int mana_set_rxfh(struct net_device *ndev,
+ {
+ 	struct mana_port_context *apc = netdev_priv(ndev);
+ 	bool update_hash = false, update_table = false;
+-	u32 save_table[MANA_INDIRECT_TABLE_SIZE];
+ 	u8 save_key[MANA_HASH_KEY_SIZE];
++	u32 *save_table;
+ 	int i, err;
+ 
+ 	if (!apc->port_is_up)
+@@ -284,13 +286,17 @@ static int mana_set_rxfh(struct net_device *ndev,
+ 	    rxfh->hfunc != ETH_RSS_HASH_TOP)
+ 		return -EOPNOTSUPP;
+ 
++	save_table = kcalloc(apc->indir_table_sz, sizeof(u32), GFP_KERNEL);
++	if (!save_table)
++		return -ENOMEM;
++
+ 	if (rxfh->indir) {
+-		for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++)
++		for (i = 0; i < apc->indir_table_sz; i++)
+ 			if (rxfh->indir[i] >= apc->num_queues)
+ 				return -EINVAL;
+ 
+ 		update_table = true;
+-		for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++) {
++		for (i = 0; i < apc->indir_table_sz; i++) {
+ 			save_table[i] = apc->indir_table[i];
+ 			apc->indir_table[i] = rxfh->indir[i];
+ 		}
+@@ -306,7 +312,7 @@ static int mana_set_rxfh(struct net_device *ndev,
+ 
+ 	if (err) { /* recover to original values */
+ 		if (update_table) {
+-			for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++)
++			for (i = 0; i < apc->indir_table_sz; i++)
+ 				apc->indir_table[i] = save_table[i];
+ 		}
+ 
+@@ -316,6 +322,8 @@ static int mana_set_rxfh(struct net_device *ndev,
+ 		mana_config_rss(apc, TRI_STATE_TRUE, update_hash, update_table);
+ 	}
+ 
++	kfree(save_table);
++
+ 	return err;
+ }
+ 
+diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+index 27684135bb4d..c547756c4284 100644
+--- a/include/net/mana/gdma.h
++++ b/include/net/mana/gdma.h
+@@ -543,11 +543,13 @@ enum {
+  */
+ #define GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX BIT(2)
+ #define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG BIT(3)
++#define GDMA_DRV_CAP_FLAG_1_VARIABLE_INDIRECTION_TABLE_SUPPORT BIT(5)
+ 
+ #define GDMA_DRV_CAP_FLAGS1 \
+ 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
+ 	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
+-	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG)
++	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG | \
++	 GDMA_DRV_CAP_FLAG_1_VARIABLE_INDIRECTION_TABLE_SUPPORT)
+ 
+ #define GDMA_DRV_CAP_FLAGS2 0
+ 
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 561f6719fb4e..59823901b74f 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -30,8 +30,8 @@ enum TRI_STATE {
+ };
+ 
+ /* Number of entries for hardware indirection table must be in power of 2 */
+-#define MANA_INDIRECT_TABLE_SIZE 64
+-#define MANA_INDIRECT_TABLE_MASK (MANA_INDIRECT_TABLE_SIZE - 1)
++#define MANA_INDIRECT_TABLE_MAX_SIZE 512
++#define MANA_INDIRECT_TABLE_DEF_SIZE 64
+ 
+ /* The Toeplitz hash key's length in bytes: should be multiple of 8 */
+ #define MANA_HASH_KEY_SIZE 40
+@@ -410,10 +410,11 @@ struct mana_port_context {
+ 	struct mana_tx_qp *tx_qp;
+ 
+ 	/* Indirection Table for RX & TX. The values are queue indexes */
+-	u32 indir_table[MANA_INDIRECT_TABLE_SIZE];
++	u32 *indir_table;
++	u32 indir_table_sz;
+ 
+ 	/* Indirection table containing RxObject Handles */
+-	mana_handle_t rxobj_table[MANA_INDIRECT_TABLE_SIZE];
++	mana_handle_t *rxobj_table;
+ 
+ 	/*  Hash key used by the NIC */
+ 	u8 hashkey[MANA_HASH_KEY_SIZE];
+-- 
+2.34.1
 
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-> ---
->  drivers/net/ethernet/pensando/ionic/ionic_debugfs.c | 2 +-
->  drivers/net/ethernet/pensando/ionic/ionic_lif.c     | 4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_debugfs.c b/driver=
-s/net/ethernet/pensando/ionic/ionic_debugfs.c
-> index c3ae11a48024..59e5a9f21105 100644
-> --- a/drivers/net/ethernet/pensando/ionic/ionic_debugfs.c
-> +++ b/drivers/net/ethernet/pensando/ionic/ionic_debugfs.c
-> @@ -220,7 +220,7 @@ static int netdev_show(struct seq_file *seq, void *v)
->  {
->         struct net_device *netdev =3D seq->private;
->
-> -       seq_printf(seq, "%s\n", netdev->name);
-> +       seq_printf(seq, "%s\n", netdev_name(netdev));
->
->         return 0;
->  }
-> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/ne=
-t/ethernet/pensando/ionic/ionic_lif.c
-> index 101cbc088853..23e1f6638b38 100644
-> --- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-> +++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-> @@ -237,7 +237,7 @@ static int ionic_request_irq(struct ionic_lif *lif, s=
-truct ionic_qcq *qcq)
->         const char *name;
->
->         if (lif->registered)
-> -               name =3D lif->netdev->name;
-> +               name =3D netdev_name(lif->netdev);
->         else
->                 name =3D dev_name(dev);
->
-> @@ -3732,7 +3732,7 @@ static void ionic_lif_set_netdev_info(struct ionic_=
-lif *lif)
->                 },
->         };
->
-> -       strscpy(ctx.cmd.lif_setattr.name, lif->netdev->name,
-> +       strscpy(ctx.cmd.lif_setattr.name, netdev_name(lif->netdev),
->                 sizeof(ctx.cmd.lif_setattr.name));
->
->         ionic_adminq_post_wait(lif, &ctx);
-> --
-> 2.17.1
->
->
-
-
---=20
-Regards,
-Kalesh A P
-
---000000000000ea4dda0619910ed4
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIJfB/sdZ1NZH+QCr2pAcfqxSymIg/BYVKDb6YSl5ahupMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDUyOTA1MzExMVowaQYJKoZIhvcNAQkPMVwwWjAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBbbQ+i8svT
-nAdp/37ciC98hTVwbuem5nljWDpU5A6qawmzWCO4zXH+j/8/N5F55N2ZpNwpf0EaiW6BtYsSsR35
-pvZAWp9PgvYopBvl91sXpafvD7LMykfl4wcD1v7K/lcqMatiDZScgTImomSAJ+y0D0bKS1zm0Eqx
-m5k4gQ0GXwh8+TltFdsF8HTxO47SaSLtSHIrIty/XbnLC+Pj42xxOEFfrebWLLjdWrZU5+ZaXbOz
-XVkXM888/kcjzsyFRLpvq2XDrgqKGB4kHkN7Z4851rq7J+2X99b4vP0vSRBRNC+s/4KpSsDhsRB3
-aJKwNd3Dpd2MD9p9UZrXOsw42Ix2
---000000000000ea4dda0619910ed4--
 
