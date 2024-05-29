@@ -1,231 +1,196 @@
-Return-Path: <netdev+bounces-99151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EACD8D3D73
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 19:34:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5024C8D3D74
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 19:35:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F27A72856D5
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:34:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEA9B1F24CAA
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E66C15B57E;
-	Wed, 29 May 2024 17:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A80215B574;
+	Wed, 29 May 2024 17:35:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Hc8zsXM0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYJn4JKg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF8915B99E
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 17:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D7133C0
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 17:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717004058; cv=none; b=Ckp3iemJtWThEQtXKi/b0s+xfojiJpNgRpUwOXMWvUKXQZHBeyBfI3Ji38Ch7JFsSYFF6Q1s7elJMWj4moGoxpJCDuupqUg+6tbbLBZDrTVBjPLwy2zadwBxQfECp+gyUXaRc23G0kp92jDLXo0qoOI9h2KGgq+GWOAVDEhm8gs=
+	t=1717004107; cv=none; b=F99lSc/kLn+Qjs+ALUEL+bcv/R18dbqZAngK0QdBkfBZOx19CSEdd4Rtf/gVxutQMBRiqdH6QbxgWr9YiHiezzrt6m6ocZqPdaS7o1J4tPEOxHqlKuNmu5NRoGDoffDzWW1agwWlFkBnOq1O/YI8LFPF8SNmufwPyLwFT4SgZhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717004058; c=relaxed/simple;
-	bh=f6+DrieOQjjV4/z2nKYkmi0hbOk0KhV/7DRxGHfFF34=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iwCyxz/9cjUbSr6j/CLEPp9kncFR6jMc+tT5d573VzYd3brqu1N5VGwHbO+dAGc+3ke32kYaVMVTWxKicTKkbY1om5pZqoqpztto8Ss9sk23tc1gGR99Cz4XLgQ0VVVdZFRgr6xdcRE3we9LL8K1AtAp+/cyYjBe2s5sMEjZe7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=Hc8zsXM0; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6ae0bf069f3so165146d6.3
-        for <netdev@vger.kernel.org>; Wed, 29 May 2024 10:34:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1717004055; x=1717608855; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=d1R7euPmAU+paAC3yZ2ktdQagAAoR5FIYRR+4rPfkYE=;
-        b=Hc8zsXM0axGk4dZOpcNA3fbQLYfnBxPt5Dnhkop2NfyTclihIJdatrk9gL2rZZd0HW
-         okNAwgTdPLoDyiA/p2VJApMRSjBOCQXiZFjre8OH1NEbOkQqXGvfpbeUnixKHWSW7CpI
-         4lARnMIWyVYdOWvtYspmMcQTecPNO5gnYRea2RIfpkq9Lif/RzCHh0g5JgAWwayjlxe3
-         i84ksiYd0sfRZ+IZJf450Ts57epVALb7wZMC26vVMgwPZFqTeumQ5hxCTNYjHZw8R7tL
-         2qxIFHe4qynMYVkL8SnYXyGnK9Lw9hD4//X5t9zDB4pIC9W82GMtBC1kF3/ezPfjnBib
-         heEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717004055; x=1717608855;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=d1R7euPmAU+paAC3yZ2ktdQagAAoR5FIYRR+4rPfkYE=;
-        b=nTR/IDXHlHElOxIwurweTa+1x6ICkGpvkWKwzagADjQCO5HGJN1+zbzFg/DCXOY9ps
-         eNw2XfbmfrHXZyclxbLhkeMops1OOUMSQaLro4Mq5FnK+zx0Is6Hv4cKex852CCmHd2E
-         rXNCjzuWEuaJCvg4tZKW5IpzTrCxHXv0oNdeqczK9a/cHBwhUW8TUMdNCh6AYbpddoLK
-         izvApBv8OS0h8QxKq5dXmv/CvSmhtohx08pdBdJ16P73UyWvqPyKJP40jJfS+b1oa38R
-         pglxChIUtuFyyY/VUQDDaMsZNQdDbPubT9B+xITEkzhFWBP4jF2EJX89zaXT8ly/hMXv
-         vGzw==
-X-Forwarded-Encrypted: i=1; AJvYcCWqaWr2jCBOVfCdwYy5hB/WLNB7l+0Urs1nK3PUZSTs+nmLtPiLUdVXgUOD8VcthW0A0W2rel1uhCyBOF0Zx91ypKkA6vTI
-X-Gm-Message-State: AOJu0Yyy4DkMw8kJqobwCMLTJP8v5B0sggQ+xsZmUCdx6IxdSBybGWFo
-	L9H6kL/62ryiu5A1Jtvqq7a0lJ3Qv7I0EXTcdfq8XyELgp6HjtyzKOYIGbokPs5X8BD3mAJrtYy
-	D
-X-Google-Smtp-Source: AGHT+IHCuIcBoMWCSHLZfqWJ6YZUV6R0fXud8UoxZ/XUCmJ94L1AxZPv7Le5+pYHhC99b+hzE8KZ3A==
-X-Received: by 2002:a05:6214:390b:b0:6ad:657a:5892 with SMTP id 6a1803df08f44-6ad657a59camr150025186d6.61.1717004054453;
-        Wed, 29 May 2024 10:34:14 -0700 (PDT)
-Received: from [10.200.143.111] (ec2-52-9-159-93.us-west-1.compute.amazonaws.com. [52.9.159.93])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ad77430c57sm38533026d6.38.2024.05.29.10.34.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 May 2024 10:34:14 -0700 (PDT)
-Message-ID: <2c9bffba-d4f9-47a6-9e3c-36aefeb44042@bytedance.com>
-Date: Wed, 29 May 2024 10:34:11 -0700
+	s=arc-20240116; t=1717004107; c=relaxed/simple;
+	bh=ItDmbwLW3q6IRlTRNcDoAhZqwZc1WSjCl3nxhra0VEA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uws87e+exYS/fCD1W2heKUxuydozEeM8xq8KwePj2G0Ht8jfQTyI9GceRw584oX5P4YsUDK1uPMLLUEPRTZXMnsJeI5wNGcwv1u+N02S1hKNIg85jBMXIZA6Vek9CE0B6W6Hot8oyc+6opil5h3gnRCjWUkBT/RYAEek7gT/L9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dYJn4JKg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA87FC113CC;
+	Wed, 29 May 2024 17:35:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717004107;
+	bh=ItDmbwLW3q6IRlTRNcDoAhZqwZc1WSjCl3nxhra0VEA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dYJn4JKgiL1ve/pwx2ejfJOZtF1UrXNsdZGusDa8Y/y/2a7HM1CQ6x8XzZSwq9XDO
+	 Dz+p90Zjykhsxx7kZ/rPJ5MIRlnBEO3qobNwVgZ+CQfHNv9kq3k/q3/3A6qiZu4Pd/
+	 QpjvANyFpdmSP+xCg98xx2gAqzVQHe1BM7zXmWyzWiKmGb8lScwzp7eu5ZX8xCb5ZM
+	 b8X+xkBwInLxNozLrL1a28jI2zCI0TWH5xLG8tvNDNNECIQWRADMH3WJIt70j74F/B
+	 PFTNgBgjO8WCocL6j5BlgWj+diEvEJapJL5wR9AO+3/cC8Krd26qmltTLnN3mQOdmL
+	 bEJPK2/0Tb9LQ==
+Date: Wed, 29 May 2024 10:35:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, borisp@nvidia.com,
+ gal@nvidia.com, cratiu@nvidia.com, rrameshbabu@nvidia.com,
+ steffen.klassert@secunet.com, tariqt@nvidia.com
+Subject: Re: [RFC net-next 01/15] psp: add documentation
+Message-ID: <20240529103505.601872ea@kernel.org>
+In-Reply-To: <66416bc7b2d10_1d6c6729475@willemb.c.googlers.com.notmuch>
+References: <20240510030435.120935-1-kuba@kernel.org>
+	<20240510030435.120935-2-kuba@kernel.org>
+	<66416bc7b2d10_1d6c6729475@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [External] Re: [PATCH net-next v4 0/3] net: A lightweight
- zero-copy notification
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: edumazet@google.com, cong.wang@bytedance.com, xiaochun.lu@bytedance.com
-References: <20240528212103.350767-1-zijianzhang@bytedance.com>
- <665734cce5a6d_31b26729414@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Zijian Zhang <zijianzhang@bytedance.com>
-In-Reply-To: <665734cce5a6d_31b26729414@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 5/29/24 6:59 AM, Willem de Bruijn wrote:
-> zijianzhang@ wrote:
->> From: Zijian Zhang <zijianzhang@bytedance.com>
->>
->> Original title is "net: socket sendmsg MSG_ZEROCOPY_UARG".
->>
->> Original notification mechanism needs poll + recvmmsg which is not
->> easy for applcations to accommodate. And, it also incurs unignorable
->> overhead including extra system calls and usage of socket optmem.
->>
->> While making maximum reuse of the existing MSG_ZEROCOPY related code,
->> this patch set introduces a new zerocopy socket notification mechanism.
->> Users of sendmsg pass a control message as a placeholder for the incoming
->> notifications. Upon returning, kernel embeds notifications directly into
->> user arguments passed in. By doing so, we can significantly reduce the
->> complexity and overhead for managing notifications. In an ideal pattern,
->> the user will keep calling sendmsg with SCM_ZC_NOTIFICATION msg_control,
->> and the notification will be delivered as soon as possible.
->>
->> Users need to pass in a user space address pointing to an array of struct
->> zc_info_elem, and the cmsg_len should be the memory size of the array
->> instead of the size of the pointer itself.
->>
->> As Willem commented,
->>
->>> The main design issue with this series is this indirection, rather
->>> than passing the array of notifications as cmsg.
->>
->>> This trick circumvents having to deal with compat issues and having to
->>> figure out copy_to_user in ____sys_sendmsg (as msg_control is an
->>> in-kernel copy).
->>
->>> This is quite hacky, from an API design PoV.
->>
->>> As is passing a pointer, but expecting msg_controllen to hold the
->>> length not of the pointer, but of the pointed to user buffer.
->>
->>> I had also hoped for more significant savings. Especially with the
->>> higher syscall overhead due to meltdown and spectre mitigations vs
->>> when MSG_ZEROCOPY was introduced and I last tried this optimization.
+On Sun, 12 May 2024 21:24:23 -0400 Willem de Bruijn wrote:
+> Jakub Kicinski wrote:
+> > +PSP Security Protocol (PSP) was defined at Google and published in:
+> > +
+> > +https://raw.githubusercontent.com/google/psp/main/doc/PSP_Arch_Spec.pdf
+> > +
+> > +This section briefly covers protocol aspects crucial for understanding
+> > +the kernel API. Refer to the protocol specification for further details.
+> > +
+> > +Note that the kernel implementation and documentation uses the term
+> > +"secret state" in place of "master key", it is both less confusing
+> > +to an average developer and is less likely to run afoul any naming
+> > +guidelines.  
 > 
-> Thanks for quoting this.
+> There is some value in using the same terminology in the code as in
+> the spec.
 > 
-> This revision does not address either of these concerns, right?
+> And the session keys are derived from a key. That is more precise than
+> state. Specifically, counter-mode KDF from an AES key.
 > 
+> Perhaps device key, instead of master key? 
 
-Right, this revision just fixed some code according to your comments.
+Weak preference towards secret state, but device key works, too.
 
->>
->> Changelog:
->>    v1 -> v2:
->>      - Reuse errormsg queue in the new notification mechanism,
->>        users can actually use these two mechanisms in hybrid way
->>        if they want to do so.
->>      - Update case SCM_ZC_NOTIFICATION in __sock_cmsg_send
->>        1. Regardless of 32-bit, 64-bit program, we will always handle
->>        u64 type user address.
->>        2. The size of data to copy_to_user is precisely calculated
->>        in case of kernel stack leak.
->>      - fix (kbuild-bot)
->>        1. Add SCM_ZC_NOTIFICATION to arch-specific header files.
->>        2. header file types.h in include/uapi/linux/socket.h
->>
->>    v2 -> v3:
->>      - 1. Users can now pass in the address of the zc_info_elem directly
->>        with appropriate cmsg_len instead of the ugly user interface. Plus,
->>        the handler is now compatible with MSG_CMSG_COMPAT and 32-bit
->>        pointer.
->>      - 2. Suggested by Willem, another strategy of getting zc info is
->>        briefly taking the lock of sk_error_queue and move to a private
->>        list, like net_rx_action. I thought sk_error_queue is protected by
->>        sock_lock, so that it's impossible for the handling of zc info and
->>        users recvmsg from the sk_error_queue at the same time.
->>        However, sk_error_queue is protected by its own lock. I am afraid
->>        that during the time it is handling the private list, users may
->>        fail to get other error messages in the queue via recvmsg. Thus,
->>        I don't implement the splice logic in this version. Any comments?
->>
->>    v3 -> v4:
->>      - 1. Change SOCK_ZC_INFO_MAX to 64 to avoid large stack frame size.
->>      - 2. Fix minor typos.
->>      - 3. Change cfg_zerocopy from int to enum in msg_zerocopy.c
->>
->> * Performance
->>
->> I extend the selftests/msg_zerocopy.c to accommodate the new mechanism,
->> test result is as follows,
->>
->> cfg_notification_limit = 1, in this case the original method approximately
->> aligns with the semantics of new one. In this case, the new flag has
->> around 13% cpu savings in TCP and 18% cpu savings in UDP.
->>
->> +---------------------+---------+---------+---------+---------+
->> | Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
->> +---------------------+---------+---------+---------+---------+
->> | ZCopy (MB)          | 5147    | 4885    | 7489    | 7854    |
->> +---------------------+---------+---------+---------+---------+
->> | New ZCopy (MB)      | 5859    | 5505    | 9053    | 9236    |
->> +---------------------+---------+---------+---------+---------+
->> | New ZCopy / ZCopy   | 113.83% | 112.69% | 120.88% | 117.59% |
->> +---------------------+---------+---------+---------+---------+
->>
->>
->> cfg_notification_limit = 32, the new mechanism performs 8% better in TCP.
->> For UDP, no obvious performance gain is observed and sometimes may lead
->> to degradation. Thus, if users don't need to retrieve the notification
->> ASAP in UDP, the original mechanism is preferred.
->>
->> +---------------------+---------+---------+---------+---------+
->> | Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
->> +---------------------+---------+---------+---------+---------+
->> | ZCopy (MB)          | 6272    | 6138    | 12138   | 10055   |
->> +---------------------+---------+---------+---------+---------+
->> | New ZCopy (MB)      | 6774    | 6620    | 11504   | 10355   |
->> +---------------------+---------+---------+---------+---------+
->> | New ZCopy / ZCopy   | 108.00% | 107.85% | 94.78%  | 102.98% |
->> +---------------------+---------+---------+---------+---------+
->>
->> Zijian Zhang (3):
->>    selftests: fix OOM problem in msg_zerocopy selftest
->>    sock: add MSG_ZEROCOPY notification mechanism based on msg_control
->>    selftests: add MSG_ZEROCOPY msg_control notification test
->>
->>   arch/alpha/include/uapi/asm/socket.h        |   2 +
->>   arch/mips/include/uapi/asm/socket.h         |   2 +
->>   arch/parisc/include/uapi/asm/socket.h       |   2 +
->>   arch/sparc/include/uapi/asm/socket.h        |   2 +
->>   include/uapi/asm-generic/socket.h           |   2 +
->>   include/uapi/linux/socket.h                 |  10 ++
->>   net/core/sock.c                             |  68 ++++++++++++
->>   tools/testing/selftests/net/msg_zerocopy.c  | 114 ++++++++++++++++++--
->>   tools/testing/selftests/net/msg_zerocopy.sh |   1 +
->>   9 files changed, 196 insertions(+), 7 deletions(-)
->>
->> -- 
->> 2.20.1
->>
+> > +Derived Rx keys
+> > +---------------
+> > +
+> > +PSP borrows some terms and mechanisms from IPsec. PSP was designed
+> > +with HW offloads in mind. The key feature of PSP is that Rx keys for every
+> > +connection do not have to be stored by the receiver but can be derived
+> > +from secret state and information present in packet headers.  
 > 
+> A second less obvious, but neat, feature is that it supports an
+> encryption offset, such that (say) the L4 ports are integrity
+> protected, but not encrypted, to allow for in-network telemetry.
+
+I know, but the opening paragraph has:
+
+   This section briefly covers protocol aspects crucial for
+   understanding the kernel API. Refer to the protocol specification for further details.
+
+:) .. and I didn't implement the offset, yet. (It's trivial to add and
+ETOOMANYPATCHES.)
+
+> > +This makes it possible to implement receivers which require a constant
+> > +amount of memory regardless of the number of connections (``O(1)`` scaling).
+> > +
+> > +Tx keys have to be stored like with any other protocol,  
 > 
+> Keys can optionally be passed in descriptor.
+
+Added: Preferably, the Tx keys should be provided with the packet (e.g.
+as part of the descriptors).
+
+> > +The expectation is that higher layer protocols will take care of
+> > +protocol and key negotiation. For example one may use TLS key exchange,
+> > +announce the PSP capability, and switch to PSP if both endpoints
+> > +are PSP-capable.  
+> 
+> > +Securing a connection
+> > +---------------------
+> > +
+> > +PSP encryption is currently only supported for TCP connections.
+> > +Rx and Tx keys are allocated separately. First the ``rx-assoc``
+> > +Netlink command needs to be issued, specifying a target TCP socket.
+> > +Kernel will allocate a new PSP Rx key from the NIC and associate it
+> > +with given socket. At this stage socket will accept both PSP-secured
+> > +and plain text TCP packets.
+> > +
+> > +Tx keys are installed using the ``tx-assoc`` Netlink command.
+> > +Once the Tx keys are installed all data read from the socket will
+> > +be PSP-secured. In other words act of installing Tx keys has the secondary
+> > +effect on the Rx direction, requring all received packets to be encrypted.  
+> 
+> Consider clarifying the entire state diagram from when one pair
+> initiates upgrade.
+
+Not sure about state diagram, there are only 3 states. Or do you mean
+extend TCP state diagrams? I think a table may be better:
+
+Event         | Normal TCP      | Rx PSP key present | Tx PSP key present |
+---------------------------------------------------------------------------
+Rx plain text | accept          | accept             | drop               |
+
+Rx PSP (good) | drop            | accept             | accept             |
+
+Rx PSP (bad)  | drop            | drop               | drop               |
+
+Tx            | plain text      | plain text         | encrypted *        |
+
+* data enqueued before Tx key in installed will not be encrypted
+  (either initial send nor retranmissions)
+
+
+What should I add?
+
+> And some edge cases:
+> 
+> - retransmits
+> - TCP fin handshake, if only one peer succeeds
+
+So FIN when one end is "locked down" and the other isn't?
+
+> - TCP control socket response to encrypted pkt
+
+Control sock ignores PSP.
+
+> What is the expectation for data already queued for transmission when
+> the tx assocation is made?
+> 
+> More generally, what happens for data in flight. One possible
+> simplification is to only allow an upgrade sequence (possibly
+> including in-band exchange of keys) when no other data is in
+> flight.
+
+Like TLS offload, the data is annotated "for encryption" when queued.
+So data queued earlier or retransmits of such data will never be
+encrypted.
+
+> > +performed by management daemons, not under application control.
+> > +The PSP netlink family will generate a notification whenever keys
+> > +are rotated. The applications are expected to re-establish connections
+> > +before keys are rotated again.  
+> 
+> Connection key rotation is not supported? I did notice that tx key
+> insertion fails if a key is already present, so this does appear to be
+> the behavior.
+
+Correct, for now connections need to be re-established once a day.
+Rx should be easy, Tx we can make easy by only supporting rotation
+when there's no data queued.
 
