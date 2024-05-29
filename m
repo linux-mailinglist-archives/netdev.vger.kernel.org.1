@@ -1,132 +1,188 @@
-Return-Path: <netdev+bounces-99089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12D5B8D3B3B
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:42:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B59C78D3B5D
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:50:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3AC928A1BE
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 15:42:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19694B268B4
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 15:50:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 597FB181B9C;
-	Wed, 29 May 2024 15:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66D56181CF7;
+	Wed, 29 May 2024 15:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Eagpz2Qe"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="K+awFn/4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87DC181321
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 15:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB2F8181CEF;
+	Wed, 29 May 2024 15:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716997362; cv=none; b=COgCDZFnVIyeVVDjxoGuC9Mvrs/bkfg6x9gNEk0cgpTgVLg9XrxHuQ9/Z9+HXefuD4W0ULUGrHZ8vuG06qeSQld13rA6K5Zm0eTPPg9mtP9qH2I8L7dToO1U/1QHIMhRfOd8bJDitEElkRXjivaGkPf5HXKsjAco172UivnlKDU=
+	t=1716997795; cv=none; b=t5zlgHRJhwLdkyIov6oLYu38jnJt2NXt2rl67NTlO2ssx5q8Lwn/WsLwRIaOMWan0AlZXbpU6Q/4Kh01gYdgi6rDPqtzyw52+UeaT875k+Zh+NIVUEkpDxP5cecpOgK5KlLi3cfJUIlHgKFxLOu59/wSYnO+N95YjzBCnKgj9Hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716997362; c=relaxed/simple;
-	bh=Sm0A3tOr5Lpr1Y/HFq8SiAXVhPV4YFwkMkerFXc2prk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cJj4SWmRFuKCeiG9hYELFn4rtfPL5cqk2ahhWawewiKN1MMK6zWWnxTRQpn7EGs+psI+avKfHutk20FBSuAdXGMCXqAAMa2Wn8IjLT4Dm3VMJCPMLN/RVS6twjfhqlQk2fj9xAwKe2rsjzn2goHwEZoIvKgN1/jAX44RZEWSLYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Eagpz2Qe; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5750a8737e5so18911a12.0
-        for <netdev@vger.kernel.org>; Wed, 29 May 2024 08:42:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716997359; x=1717602159; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MUsLqmE+3pbRuNtRxo5yB/RArJM9ezRE3b0arTtCqls=;
-        b=Eagpz2QeIqZuFMabN/0MU0Mbb7Kv1C9zX3kTIUv3BAWoStoYcvgTzvsEuNZf6fuwxk
-         Py2PWp+di5olJlDVCxahmVkRiVn4686jV7VGKjPilfYSJv+7buCZuE9NRYhN0aFkE1qA
-         k6om9JM7jhLs5Vms9zmHJnJMgBCjVyaMM5Nz9W4Tj8eYAKwHIYcRkhktFZE2UOfDoCVW
-         AN+JcsRcTMPsX9mvTckhyRqdoR2dw0EtNgD01iW1lXZea+4c9FESwrdl4A71VFm62bsl
-         NRWFpQKhxrzky3qfBYx50bbr8jCG5LkipoDiPX4eHXobx9N/Y8tyXZ+2j0iv9T3tMfXX
-         x6IA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716997359; x=1717602159;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MUsLqmE+3pbRuNtRxo5yB/RArJM9ezRE3b0arTtCqls=;
-        b=DCjZBZDo7G1kam8n/QIeRhB1ojYtVx7oCwWjrnvjRx7W7DFBbPZGo9DxB5bVsOcrr3
-         QaeZ8VxwAX1/qxnJ02nGv3cZR0pHA3jklShCtVftPTUdIFMKDnRRa3CHCf5Bf9nrZqRM
-         KrQhGtvjLCUEvwlzyoYO8UWZACLZ7Uqy9BE7pyFFesq+JAvmaJS5mhrRY7uRTzdfmudn
-         1wf3csrx6iMIMpaYB9FqawFbYPocwX+rmh9BHj+SD8jCBceB3RtjJGM0ANLbPWGGp/x1
-         fcBwJ0yRH9PCb0+YiEC2Pq5FRxAbzS3cKrhFbnWtSTZyiBXxBQAl7mglJgaiiAB0tVXd
-         QXZA==
-X-Forwarded-Encrypted: i=1; AJvYcCX3/JtXjCa+CLw+tMCP+R37vCzLY6g3RxcV0wqYO0jQoFGmo2aNB7CNry7ma3Ufo74CqbhsISNxmpbucoRJg4TGkXcnhXIt
-X-Gm-Message-State: AOJu0Yxok0AwVLlseQhUCR0UQ7W61beVvTtcqTVc5nBQcCsrxpRVRj+S
-	xjpUJpdb3CvHhS1m5VKhGT23pzgfbooCv5lPBlPwawMoE6lDcfAFEaj+34pPyqjEyxX8c6+heqN
-	rbQoxoLkprpNDkymCVXFzmo9mmpNpxt3adnDQ
-X-Google-Smtp-Source: AGHT+IEa+j/A03mDh/Kc5FH7+7Vnrk+8M91Hr2cMFkip2QHLgN/VqxyI0Pb7ZAKi9Nrotu1WVrjF60rj3Exj15INSjA=
-X-Received: by 2002:aa7:de18:0:b0:578:647d:a27e with SMTP id
- 4fb4d7f45d1cf-57a05d1e5admr162097a12.1.1716997358649; Wed, 29 May 2024
- 08:42:38 -0700 (PDT)
+	s=arc-20240116; t=1716997795; c=relaxed/simple;
+	bh=PGuq1nWW6Ce4ZkBk0TnI9bG4PCIDGFwjqQ9Xsaj+oGE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=AFfdwB/NbtlIoBN3vpzGN8o0Mt+bqrkqcEC08okuGZSRMrsue+bYXvxBAOgFHePS3/phAPqH+s4PJD4rdbH+J/ED+EuEeJfTPf3vWEAZV2VFJSiKmS9t8xgF/6p/XojemTZbXWzU8f5+Zt+Q1qkXOiJWqMU1MngFv97UEi8fV04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=K+awFn/4; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44TAWqTs027031;
+	Wed, 29 May 2024 15:49:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	92CTHz0UFZuCUoY3V9kybNrLWakvxNbVMDycuT/J+40=; b=K+awFn/4PE5IyE7D
+	369jN0z2sc+kw7TX6tn8RFKIXRlt/NXFaSfifhQjaWgJ4nON7fA8R+ZuMdyQxjFA
+	Nhytn9cYIYRy3fVUebcuBjvApsACqBlEjrpScKCqhWY5J0qCh0wNkRVF/WY/firo
+	vK2rlYISRA5ixkzeu9rrm4RMitkYJNIsV21CfBOXSlKH6lg4wM4KzFJ2kuDSBLpK
+	ZHPorL+w6PAHnKjrAYLLtjn+F7kVE7/5EimsXSIhYQ9Atit+UMt/IKida9BLKSN2
+	eV8/grz6wkoKBgTFPl04HfJr/adFwOpMdM2/VIvwAT5Q0cVG8j56bj8nrP2R6wcI
+	ZqzpWQ==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yba2h9b3v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 May 2024 15:49:27 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 44TFnQKN005363
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 29 May 2024 15:49:26 GMT
+Received: from [10.110.47.143] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 29 May
+ 2024 08:49:22 -0700
+Message-ID: <3d04ff60-c01b-4718-ae3d-70d19ee2019a@quicinc.com>
+Date: Wed, 29 May 2024 08:49:21 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240529033104.33882-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20240529033104.33882-1-kerneljasonxing@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 29 May 2024 17:42:27 +0200
-Message-ID: <CANn89iJ93U8mxLXXuk=nT83mox1FHue+OPCkqBJ1FnHM5N9DHQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] tcp: introduce a new MIB for CLOSE-WAIT sockets
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>, Yongming Liu <yomiliu@tencent.com>, 
-	Wangzi Yong <curuwang@tencent.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: validate SO_TXTIME clockid coming from userspace
+Content-Language: en-US
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
+        "Martin
+ KaFai Lau" <martin.lau@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>
+CC: <kernel@quicinc.com>,
+        <syzbot+d7b227731ec589e7f4f0@syzkaller.appspotmail.com>,
+        <syzbot+30a35a2e9c5067cc43fa@syzkaller.appspotmail.com>
+References: <20240528224935.1020828-1-quic_abchauha@quicinc.com>
+ <665734886e2a9_31b2672946e@willemb.c.googlers.com.notmuch>
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+In-Reply-To: <665734886e2a9_31b2672946e@willemb.c.googlers.com.notmuch>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: TPqcgTNlT5VIe9IKLmb3sa-dxGAbunfC
+X-Proofpoint-ORIG-GUID: TPqcgTNlT5VIe9IKLmb3sa-dxGAbunfC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-29_12,2024-05-28_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ malwarescore=0 priorityscore=1501 impostorscore=0 suspectscore=0
+ phishscore=0 bulkscore=0 mlxscore=0 lowpriorityscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2405290109
 
-On Wed, May 29, 2024 at 5:31=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> CLOSE-WAIT is a relatively special state which "represents waiting for
-> a connection termination request from the local user" (RFC 793). Some
-> issues may happen because of unexpected/too many CLOSE-WAIT sockets,
-> like user application mistakenly handling close() syscall. It's a very
-> common issue in the real world.
->
-> We want to trace this total number of CLOSE-WAIT sockets fastly and
-> frequently instead of resorting to displaying them altogether by using:
->
->   ss -s state close-wait
->
-> or something like this. They need to loop and collect required socket
-> information in kernel and then get back to the userside for print, which
-> does harm to the performance especially in heavy load for frequent
-> sampling.
->
-> That's the reason why I chose to introduce this new MIB counter like
-> CurrEstab does. With this counter implemented, we can record/observe the
-> normal changes of this counter all the time. It can help us:
-> 1) We are able to be alerted in advance if the counter changes drasticall=
-y.
-> 2) If some users report some issues happening, we will particularly
-> pay more attention to it.
->
-> Besides, in the group of TCP_MIB_* defined by RFC 1213, TCP_MIB_CURRESTAB
-> should include both ESTABLISHED and CLOSE-WAIT sockets in theory:
->
 
-We (Neal and myself) prefer to fix TCP_MIB_CURRESTAB to include
-CLOSE_WAIT sockets.
-We do not think it will annoy anyone, please change tcp_set_state() accordi=
-ngly.
 
-Rationale is that adoption of a new MIB in documentations and various
-products will take years.
+On 5/29/2024 6:58 AM, Willem de Bruijn wrote:
+> minor: double space before userspace
+> 
+> Abhishek Chauhan wrote:
+>> Currently there are no strict checks while setting SO_TXTIME
+>> from userspace. With the recent development in skb->tstamp_type
+>> clockid with unsupported clocks results in warn_on_once, which causes
+>> unnecessary aborts in some systems which enables panic on warns.
+>>
+>> Add validation in setsockopt to support only CLOCK_REALTIME,
+>> CLOCK_MONOTONIC and CLOCK_TAI to be set from userspace.
+>>
+>> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
+>> Link: https://lore.kernel.org/lkml/20240509211834.3235191-1-quic_abchauha@quicinc.com/
+> 
+> These discussions can be found directly from the referenced commit?
+> If any, I'd like to the conversation we had that arrived at this
+> approach.
+> 
+Not Directly but from the patch series. 
+1. First link is for why we introduced skb->tstamp_type 
+2. Second link points to the series were we discussed on two approach to solve the problem 
+one being limit the skclockid to just TAI,MONO and REALTIME. 
 
-Also make a similar change for mptcp.
 
-Thank you.
+
+>> Fixes: 1693c5db6ab8 ("net: Add additional bit to support clockid_t timestamp type")
+>> Reported-by: syzbot+d7b227731ec589e7f4f0@syzkaller.appspotmail.com
+>> Closes: https://syzkaller.appspot.com/bug?extid=d7b227731ec589e7f4f0
+>> Reported-by: syzbot+30a35a2e9c5067cc43fa@syzkaller.appspotmail.com
+>> Closes: https://syzkaller.appspot.com/bug?extid=30a35a2e9c5067cc43fa
+>> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
+>> ---
+>>  net/core/sock.c | 16 ++++++++++++++++
+>>  1 file changed, 16 insertions(+)
+>>
+>> diff --git a/net/core/sock.c b/net/core/sock.c
+>> index 8629f9aecf91..f8374be9d8c9 100644
+>> --- a/net/core/sock.c
+>> +++ b/net/core/sock.c
+>> @@ -1083,6 +1083,17 @@ bool sockopt_capable(int cap)
+>>  }
+>>  EXPORT_SYMBOL(sockopt_capable);
+>>  
+>> +static int sockopt_validate_clockid(int value)
+> 
+> sock_txtime.clockid has type __kernel_clockid_t.
+> 
+
+ __kernel_clockid_t is typedef of int.  
+
+>> +{
+>> +	switch (value) {
+>> +	case CLOCK_REALTIME:
+>> +	case CLOCK_MONOTONIC:
+>> +	case CLOCK_TAI:
+>> +		return 0;
+>> +	}
+>> +	return -EINVAL;
+>> +}
+>> +
+>>  /*
+>>   *	This is meant for all protocols to use and covers goings on
+>>   *	at the socket level. Everything here is generic.
+>> @@ -1497,6 +1508,11 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+>>  			ret = -EPERM;
+>>  			break;
+>>  		}
+>> +
+>> +		ret = sockopt_validate_clockid(sk_txtime.clockid);
+>> +		if (ret)
+>> +			break;
+>> +
+>>  		sock_valbool_flag(sk, SOCK_TXTIME, true);
+>>  		sk->sk_clockid = sk_txtime.clockid;
+>>  		sk->sk_txtime_deadline_mode =
+>> -- 
+>> 2.25.1
+>>
+> 
+> 
 
