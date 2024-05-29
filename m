@@ -1,180 +1,126 @@
-Return-Path: <netdev+bounces-99020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 573058D36A0
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 14:44:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CCE58D36B7
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 14:49:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E678C1F219EE
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 12:44:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE53C28602E
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 12:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2189C18131C;
-	Wed, 29 May 2024 12:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B324DDA8;
+	Wed, 29 May 2024 12:49:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="lhTJlA8e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pOmHaU+m"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D7818131A;
-	Wed, 29 May 2024 12:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0332D53E;
+	Wed, 29 May 2024 12:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716986646; cv=none; b=Nxdn7WTIscNhIBMQJ9ej3nqFqCJ2QiGTFJGpQ4AAcFDy+2HQS50byWwZ/b9RJRQuVU3oYkZp3Aq8SHJapVwzaFEBpUqv4XTJyX8uBtRmR2y8VeRMEmLRD/aabR0mw2b+kJYixIu70ceJov5Jtqg77gj2T8Kd8+qUlIk/D80zGWQ=
+	t=1716986977; cv=none; b=IilxQ+yuW4YVQdjkDvQtMo/5D41MYeW3aWEFK85tpdhygfOSovqCSG/cUa8PR4lWGc0urHk1ToEEryvdg0eB0wydxT5BdJK+8pPZnMwv46dsPMNFOO2grWNmY2T/Jc6VpdUbjopDJzGp2GlswY8wSOd+BrwbHMqJ4owk8NBji24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716986646; c=relaxed/simple;
-	bh=HRqov3Sa5/L4s82tqEXJGzJO1GXEAXyDmpW8rtS3pHs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Dc+4Kofh83I/ivREvIt7s6hcHYBkYMBUlSbYOA5/nrDUCaVcWLBLO8zF+cIFmpjk89PnngXEKXV+Rm+5xG2Qh6722fJl+WktLQjkugTK3vUSo8RLwztKJM1Rfj45yyrKARMZUch80xqg68Zhlqps1uhMYEvT64cZ5QfM38DpwgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=lhTJlA8e; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id BDDFF883A1;
-	Wed, 29 May 2024 14:43:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1716986636;
-	bh=HHHH4mjOBme/bWtP6IROpkp0jbobhmqEdOu6R28KqDY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lhTJlA8ebjeFFCnxQW19UjgzypT64S6aGJ/Pm7vqq+OtGOuWHpAWA34vcNUqojvhn
-	 Gyc3lZ0TpslsN7KU+bTq2fnPAB3WqXqrJg+hmUbexwA7iAVrJ45cPi2ED2q7Ws6Wgz
-	 +Bu3PIdo1hkkwEIFYX3rQbjkAzp2I2OGqboTAdv/akBRD+7ZkZKiaqxv4VmObKn9Ma
-	 lv2/CSvJmBV+zvHJ4bG00spVLDNOQjxZ2FtNvlkWmRiZgp7gHHxUu0VN3pRkGcsEQg
-	 qn5hGcEkORogId5c04Jcrp8o532juZ0NAm1PYjLmfIKNO2JVQaHO5jGvv9qat2Td9D
-	 zLGKY2rxnOo+g==
-Date: Wed, 29 May 2024 14:43:51 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Geliang Tang <geliang@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Sebastian Andrzej
- Siewior <bigeasy@linutronix.de>, Hangbin Liu <liuhangbin@gmail.com>,
- Geliang Tang <tanggeliang@kylinos.cn>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net v2] selftests: hsr: Fix "File exists" errors for
- hsr_ping
-Message-ID: <20240529144351.44719939@wsk>
-In-Reply-To: <6485d3005f467758d49f0f313c8c009759ba6b05.1716374462.git.tanggeliang@kylinos.cn>
-References: <6485d3005f467758d49f0f313c8c009759ba6b05.1716374462.git.tanggeliang@kylinos.cn>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1716986977; c=relaxed/simple;
+	bh=vzAvCW4q6qzlrTdD4KXojsK4gde4/L8R6f76OUdDKLU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X83FDbfYAVLfO317yZ4fqljyv01DtqwsszBZFr5TSy51r2KvfXQwYkYwgoC7QTqrgCAix6ZwNTJWqDbK09a8/fepXsSKqJYMc/A2tmQKbbiXSMbV563HmUCLLMNNKE3vajBs9Wgu+JNz9/tKKK910SGihhlllcweYjxSKMFKrbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pOmHaU+m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FE45C2BD10;
+	Wed, 29 May 2024 12:49:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716986976;
+	bh=vzAvCW4q6qzlrTdD4KXojsK4gde4/L8R6f76OUdDKLU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=pOmHaU+mWhuoVFMFs814QEui/mzHzpodKA4OwcOoKBImVLt8HUw+kbYKm3vO1mHL+
+	 wmEME1CW1aqifFjeqr7srvQem8amZ2JjD5ClPfjha7r43jz+dgu25adVopDf45/eK9
+	 VVSr2R0YafIe+hPN+WOBsYpTq3KuSt0N5w0iWZgCaZsye3ri2VSTNWwgSz7K935HYT
+	 Jdjrocki/oOlu5OHbD7TiBOl7LdP01lqniA1CIZyNBUHoEE3M0ss06e+6IE1mOdJ+I
+	 FerwmxVqiNON5IfCH00qjLNmSo799F4vVkuawIQVi6i9TvHKk/pl9GkYZBAlDW43P9
+	 E5i/eljKjrG9w==
+Message-ID: <b0804461-aab0-423d-a61d-7c5be6bd446d@kernel.org>
+Date: Wed, 29 May 2024 14:49:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_//x1Vo1wzjmAzVKYxRf+WmaX";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] dt-bindings: net: ti: icssg_prueth: Add documentation
+ for PA_STATS support
+To: MD Danish Anwar <danishanwar@ti.com>, Conor Dooley <conor+dt@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>
+Cc: linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, srk@ti.com,
+ Vignesh Raghavendra <vigneshr@ti.com>, r-gunasekaran@ti.com,
+ Roger Quadros <rogerq@kernel.org>
+References: <20240529115225.630535-1-danishanwar@ti.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240529115225.630535-1-danishanwar@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---Sig_//x1Vo1wzjmAzVKYxRf+WmaX
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-Hi Geliang,
-
-First of all - thanks for spotting and fixing this error.
-
-> From: Geliang Tang <tanggeliang@kylinos.cn>
->=20
-> The hsr_ping test reports the following errors:
->=20
->  INFO: preparing interfaces for HSRv0.
->  INFO: Initial validation ping.
->  INFO: Longer ping test.
->  INFO: Cutting one link.
->  INFO: Delay the link and drop a few packages.
->  INFO: All good.
->  INFO: preparing interfaces for HSRv1.
->  RTNETLINK answers: File exists
->  RTNETLINK answers: File exists
->  RTNETLINK answers: File exists
->  RTNETLINK answers: File exists
->  RTNETLINK answers: File exists
->  RTNETLINK answers: File exists
->  Error: ipv4: Address already assigned.
->  Error: ipv6: address already assigned.
->  Error: ipv4: Address already assigned.
->  Error: ipv6: address already assigned.
->  Error: ipv4: Address already assigned.
->  Error: ipv6: address already assigned.
-
-Interestingly, on the QEMU setup with -4 switch this error was not
-present.
-
-Instead, the not re-initialized name space caused some subtle errors
-when tc's netns and netem were run (a few packets got dropped).
-
->  INFO: Initial validation ping.
->=20
-> That is because the cleanup code for the 2nd round test before
-> "setup_hsr_interfaces 1" is removed incorrectly in commit 680fda4f6714
-> ("test: hsr: Remove script code already implemented in lib.sh").
->=20
-> This patch fixes it by re-setup the namespaces using
->=20
-> 	setup_ns ns1 ns2 ns3
->=20
-> command before "setup_hsr_interfaces 1". It deletes previous
-> namespaces and create new ones.
->=20
-> Fixes: 680fda4f6714 ("test: hsr: Remove script code already
-> implemented in lib.sh") Reviewed-by: Hangbin Liu
-> <liuhangbin@gmail.com> Signed-off-by: Geliang Tang
-> <tanggeliang@kylinos.cn> ---
-> v2:
->  - re-setup the namespaces as Hangbin suggested.
+On 29/05/2024 13:52, MD Danish Anwar wrote:
+> Add documentation for ti,pa-stats property which is syscon regmap for
+> PA_STATS registers. This will be used to dump statistics maintained by
+> ICSSG firmware.
+> 
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 > ---
->  tools/testing/selftests/net/hsr/hsr_ping.sh | 2 ++
->  1 file changed, 2 insertions(+)
->=20
-> diff --git a/tools/testing/selftests/net/hsr/hsr_ping.sh
-> b/tools/testing/selftests/net/hsr/hsr_ping.sh index
-> 790294c8af83..3684b813b0f6 100755 ---
-> a/tools/testing/selftests/net/hsr/hsr_ping.sh +++
-> b/tools/testing/selftests/net/hsr/hsr_ping.sh @@ -174,6 +174,8 @@
-> trap cleanup_all_ns EXIT setup_hsr_interfaces 0
->  do_complete_ping_test
-> =20
-> +setup_ns ns1 ns2 ns3
-> +
->  setup_hsr_interfaces 1
->  do_complete_ping_test
-> =20
 
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
+Krzysztof
 
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_//x1Vo1wzjmAzVKYxRf+WmaX
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmZXIwcACgkQAR8vZIA0
-zr2JRQf+PBYEqgIH9Dg2V6mOTfPDJF/svHzEnJkf0xZMQw/je4zEvz4Muy+UH8sW
-qgeBAizTxEy6pcCViVJU/vtxNIXgTzUwR8tEboEgO6H0Zd44WunHGY2IsD4JpIRq
-ZnK55Z4REKx5RnaaD1Q4zj/gLQMsi88E86lZGULY7Zft83f9Xx4aIvQdr2KDZLYH
-bvD2whwv5dVemkomM4mKTkAkGfU23YBueYMnRcypxbKPJKablf/y8eMm2/pzExgs
-hqx9p93S8c2IEaabZmmiZUdC3+j2shBPQvkw3RAvIPcbB5EfkoRknCbwQ2f+wtRm
-nVEsppIrQgNM/FO67tpmGC34uL2AQg==
-=q6R/
------END PGP SIGNATURE-----
-
---Sig_//x1Vo1wzjmAzVKYxRf+WmaX--
 
