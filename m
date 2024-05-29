@@ -1,167 +1,306 @@
-Return-Path: <netdev+bounces-99193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B680C8D3FCD
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 22:50:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D51C8D3FE5
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 22:53:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E03528267E
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 20:50:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E26931F2188E
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 20:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9431C8FB4;
-	Wed, 29 May 2024 20:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XHt+MPZ/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D7F1C8FD4;
+	Wed, 29 May 2024 20:52:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C7B1C6887
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 20:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D6C1C8FC3;
+	Wed, 29 May 2024 20:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717015837; cv=none; b=E6tle38uW78swpQV/VpETmIIdmlw0UtGjSWDSfY6ynsHNy11A1Zm9NCeVqSWr1Wltg8FyRycHXGh5JZTllqxWHpTxFTAwH6KH2lGxqNUKBkcV8AqB5hYONtSuPp313ILH3ZjbgDdi6jhY+k5KMHW9UicwR7ESxHIt2MBFBR6ybw=
+	t=1717015965; cv=none; b=H3e6HtjzSYZ2QjujaLDDzw+Q1wBNhB8RdHW+q+xpLIJ6QyWxn5+1FqxHCY1euva6FhUhVfvdLcd/H4UHvnlD6pykJaBIeM3vcOFqTb6vZxBofOSf9oEyMghR7vmrQiTCJBkuQEbocDECAEcJ9MGQSfIZNd3h2SGpHiEMJoGnLgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717015837; c=relaxed/simple;
-	bh=lblQCcvQsEn3C0L7QF+8CmIxKphkimznAVnOBSt1Fq4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U2t0BH4p2mOCksYrmhFyq1V0kno2K8CSSIgRyFQhNMunRJ3NgmwOWlTY1RxHTBt2iCfuowKRorzozG1g1WnjSmFZDVNLEvvB7DHD+Nhja+YgGyQYFjKlh+XrJOn6RzQxqIx0v7sWiNk1KPWh0Bq7jz1odV0qFBmEeCQPWM5Dpxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XHt+MPZ/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717015834;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1G4MuJLfcNe+eQlPR9y6C2DI9izpMDDpafLXltcFND8=;
-	b=XHt+MPZ/lbhv1pMxuZjFaLaYe71ysbNkxUTlNk6IIhgo+su6shYnE27kcESG31w6LfKZ3s
-	tm50fV/SzSzxl3BhP2jMpq734kfQjQUhMhH9jPRWKUz9IuQ/su/umD4uDvy/MBx6AKHVcE
-	WZMIsPtw0f8ueY5g76108wQq8jhn9og=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-349-uDqjP0x9NEmNkONfVMPVIQ-1; Wed, 29 May 2024 16:50:33 -0400
-X-MC-Unique: uDqjP0x9NEmNkONfVMPVIQ-1
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-6f8dfada94aso213926a34.2
-        for <netdev@vger.kernel.org>; Wed, 29 May 2024 13:50:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717015832; x=1717620632;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1G4MuJLfcNe+eQlPR9y6C2DI9izpMDDpafLXltcFND8=;
-        b=GM8fbfXgEVUDgoyMZla4C9bthHDYTXctYv4ZS0/T4mwHYbGK7NiSGPwL65o3GEztzf
-         i2D2CzLccAAK4TpSBgZPR755qLhSLjBH5BWU/T1Ylh59fuQRgagGW6P+tfrOoBQhGT0i
-         80TAqpZWa26Yjlu8tSSgejQZ4llk548gjLMPKthrvJN+0RrebN45rzODHgKaR5EnBlJa
-         cqrMkDhG8m+q9ryU18ZpM4bi/Wf658zLuTO5qdPvWFz4zg2aSuHP38Abakhzca/pAKDx
-         NXeskrlv25OsZXWHenDdUNeqEHyhBPopKcP5+2TZdqaZDEIqYOUxuE89namCyfzpd417
-         OVVA==
-X-Forwarded-Encrypted: i=1; AJvYcCUJ0qe6tQg7ORWDHxf0ElCqgTlRedNogSVXjnXnehyhinnAYRUtCyN5XytRjOHfAz2GdWVjtUa5qxpZXEDXS7ZTlSVP+OxB
-X-Gm-Message-State: AOJu0YynyfsTADShPxYtA8CD2e4Y4pcIwGQkrWI59uJJjIeOhEt+LJ94
-	6sRt8JCNvWvbZ5N50Y8uycT61KVy5v4s/gboRcKqOKJNjESQRuTb1VO4lLHk3Pqeoc9nniC8w0r
-	4GklCCBdMNivLQH+kyCbRtO9RkTRGqkRVCy/3cLpRo2q2HOlMJ6DD1w==
-X-Received: by 2002:a05:6808:1ab0:b0:3d1:c187:15d5 with SMTP id 5614622812f47-3d1dcca93c5mr144666b6e.20.1717015832369;
-        Wed, 29 May 2024 13:50:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFsuJSmbdsoQ85Rq/8DqXZY+yAtM9jIMKwB2wvZYK6VBkogsAWKXFSzfzBTS9dp8U90qeTsfA==
-X-Received: by 2002:a05:6808:1ab0:b0:3d1:c187:15d5 with SMTP id 5614622812f47-3d1dcca93c5mr144646b6e.20.1717015831958;
-        Wed, 29 May 2024 13:50:31 -0700 (PDT)
-Received: from x1gen2nano ([2600:1700:1ff0:d0e0::33])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ad8fa000eesm22065026d6.1.2024.05.29.13.50.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 May 2024 13:50:31 -0700 (PDT)
-Date: Wed, 29 May 2024 15:50:28 -0500
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Jochen Henneberg <jh@henneberg-systemdesign.com>, 
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: stmmac: dwmac-qcom-ethqos: Configure host DMA width
-Message-ID: <7w5bibuejmd5kg3ssozaql4urews26kpj57zvsaoq2pva3vrlo@agfxwq5i65pc>
-References: <20240529-configure_ethernet_host_dma_width-v1-1-3f2707851adf@quicinc.com>
+	s=arc-20240116; t=1717015965; c=relaxed/simple;
+	bh=XrL17gMzC899ukvGXP1nNVuCb5iGiNqOEboHSMDscGw=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Eqjankd5cqMOdXMgH0zLgPoSbMbzKeUtmAya4TdnLyU0RRyU6HrR+N/p6tsHzNVME0+rOOGoefMYzzZdSrSWau04dqPDYQUl6Gmp85DdMMMugbgt6hw9sMp54eUbf5omH1CgkV2ON2wW+eMoF+QfU1q57LJ+qBHm2sTMnAWrHj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (178.176.72.107) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 29 May
+ 2024 23:52:31 +0300
+Subject: Re: [net-next PATCH v4 7/7] net: ravb: Allocate RX buffers via page
+ pool
+To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+CC: Biju Das <biju.das.jz@bp.renesas.com>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
+	<yoshihiro.shimoda.uh@renesas.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240528150339.6791-1-paul.barker.ct@bp.renesas.com>
+ <20240528150339.6791-8-paul.barker.ct@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <eefce0af-2771-a56c-753d-85fe991fdf31@omp.ru>
+Date: Wed, 29 May 2024 23:52:30 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240529-configure_ethernet_host_dma_width-v1-1-3f2707851adf@quicinc.com>
+In-Reply-To: <20240528150339.6791-8-paul.barker.ct@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 05/29/2024 20:36:54
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 185600 [May 29 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 20 0.3.20
+ 743589a8af6ec90b529f2124c2bbfc3ce1d2f20f
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.72.107 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.72.107
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 05/29/2024 20:41:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 5/29/2024 5:02:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-$Subject should be have [PATCH net] since this targets the net tree:
+On 5/28/24 6:03 PM, Paul Barker wrote:
 
-https://docs.kernel.org/process/maintainer-netdev.html
-
-On Wed, May 29, 2024 at 11:39:04AM GMT, Sagar Cheluvegowda wrote:
-> Fixes: 070246e4674b ("net: stmmac: Fix for mismatched host/device DMA address width")
-> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-
-Please, always write a commit body, even if its simple. Just inferring
-from this patch, I am guessing there is some limitation on CPU's DMA
-address width that doesn't match up with the MAC's ability? Paint that
-picture for us here please! We want to know the _why_ in this section.
-
-Also, I think the Fixes: here would be for adding support for this SoC
-in the driver, not what's listed? Might make more sense after you have a
-proper body though.
-
-> ---
-> Change-Id: Ifdf3490c6f0dd55afc062974c05acce42d5fb6a7
-
-I know this is under the ---, so its not actually in the commit, but I'd
-not include that at all when submitting. Someone will complain about it
-looking like this is from / for a downstream fork. At least checkpatch
-doesn't warn about it, but a human probably will :P
-
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> This patch makes multiple changes that can't be separated:
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> index e254b21fdb59..65d7370b47d5 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> @@ -93,6 +93,7 @@ struct ethqos_emac_driver_data {
->  	bool has_emac_ge_3;
->  	const char *link_clk_name;
->  	bool has_integrated_pcs;
-> +	u32 dma_addr_width;
->  	struct dwmac4_addrs dwmac4_addrs;
->  };
+>   1) Allocate plain RX buffers via a page pool instead of allocating
+>      SKBs, then use build_skb() when a packet is received.
+>   2) For GbEth IP, reduce the RX buffer size to 2kB.
+>   3) For GbEth IP, merge packets which span more than one RX descriptor
+>      as SKB fragments instead of copying data.
+> 
+> Implementing (1) without (2) would require the use of an order-1 page
+> pool (instead of an order-0 page pool split into page fragments) for
+> GbEth.
+> 
+> Implementing (2) without (3) would leave us no space to re-assemble
+> packets which span more than one RX descriptor.
+> 
+> Implementing (3) without (1) would not be possible as the network stack
+> expects to use put_page() or page_pool_put_page() to free SKB fragments
+> after an SKB is consumed.
+> 
+> RX checksum offload support is adjusted to handle both linear and
+> nonlinear (fragmented) packets.
+> 
+> This patch gives the following improvements during testing with iperf3.
+> 
+>   * RZ/G2L:
+>     * TCP RX: same bandwidth at -43% CPU load (70% -> 40%)
+>     * UDP RX: same bandwidth at -17% CPU load (88% -> 74%)
+> 
+>   * RZ/G2UL:
+>     * TCP RX: +30% bandwidth (726Mbps -> 941Mbps)
+>     * UDP RX: +417% bandwidth (108Mbps -> 558Mbps)
+> 
+>   * RZ/G3S:
+>     * TCP RX: +64% bandwidth (562Mbps -> 920Mbps)
+>     * UDP RX: +420% bandwidth (90Mbps -> 468Mbps)
+> 
+>   * RZ/Five:
+>     * TCP RX: +217% bandwidth (145Mbps -> 459Mbps)
+>     * UDP RX: +470% bandwidth (20Mbps -> 114Mbps)
+> 
+> There is no significant impact on bandwidth or CPU load in testing on
+> RZ/G2H or R-Car M3N.
+> 
+> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+> ---
+> Changes v3->v4:
+>   * Used a separate page pool for each RX queue.
+>   * Passed struct ravb_rx_desc to ravb_alloc_rx_buffer() so that we can
+>     simplify the calling function.
+>   * Explained the calculation of rx_desc->ds_cc.
+>   * Added handling of nonlinear SKBs in ravb_rx_csum_gbeth().
+> 
+>  drivers/net/ethernet/renesas/ravb.h      |  10 +-
+>  drivers/net/ethernet/renesas/ravb_main.c | 230 ++++++++++++++---------
+>  2 files changed, 146 insertions(+), 94 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
+> index 6a7aa7dd17e6..f2091a17fcf7 100644
+> --- a/drivers/net/ethernet/renesas/ravb.h
+> +++ b/drivers/net/ethernet/renesas/ravb.h
+[...]> @@ -1094,7 +1099,8 @@ struct ravb_private {
+>  	struct ravb_tx_desc *tx_ring[NUM_TX_QUEUE];
+>  	void *tx_align[NUM_TX_QUEUE];
+>  	struct sk_buff *rx_1st_skb;
+> -	struct sk_buff **rx_skb[NUM_RX_QUEUE];
+> +	struct page_pool *rx_pool[NUM_RX_QUEUE];
+
+   Don't we need #include <net/page_pool/types.h>
+
+[...]
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index dd92f074881a..bb7f7d44be6e 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+[...]
+> @@ -317,35 +289,56 @@ static void ravb_ring_free(struct net_device *ndev, int q)
+>  	priv->tx_skb[q] = NULL;
+>  }
 >  
-> @@ -276,6 +277,7 @@ static const struct ethqos_emac_driver_data emac_v4_0_0_data = {
->  	.has_emac_ge_3 = true,
->  	.link_clk_name = "phyaux",
->  	.has_integrated_pcs = true,
-> +	.dma_addr_width = 36,
->  	.dwmac4_addrs = {
->  		.dma_chan = 0x00008100,
->  		.dma_chan_offset = 0x1000,
-> @@ -845,6 +847,8 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->  		plat_dat->flags |= STMMAC_FLAG_RX_CLK_RUNS_IN_LPI;
->  	if (data->has_integrated_pcs)
->  		plat_dat->flags |= STMMAC_FLAG_HAS_INTEGRATED_PCS;
-> +	if (data->dma_addr_width)
-> +		plat_dat->host_dma_width = data->dma_addr_width;
->  
->  	if (ethqos->serdes_phy) {
->  		plat_dat->serdes_powerup = qcom_ethqos_serdes_powerup;
-> 
-> ---
-> base-commit: 1b10b390d945a19747d75b34a6e01035ac7b9155
-> change-id: 20240515-configure_ethernet_host_dma_width-c619d552992d
-> 
-> Best regards,
-> -- 
-> Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-> 
-> 
+> +static int
+> +ravb_alloc_rx_buffer(struct net_device *ndev, int q, u32 entry, gfp_t gfp_mask,
+> +		     struct ravb_rx_desc *rx_desc)
+> +{
+> +	struct ravb_private *priv = netdev_priv(ndev);
+> +	const struct ravb_hw_info *info = priv->info;
+> +	struct ravb_rx_buffer *rx_buff = &priv->rx_buffers[q][entry];
+> +	dma_addr_t dma_addr;
+> +	unsigned int size;
+> +
+> +	size = info->rx_buffer_size;
+> +	rx_buff->page = page_pool_alloc(priv->rx_pool[q], &rx_buff->offset, &size,
+> +					gfp_mask);
+> +	if (unlikely(!rx_buff->page)) {
+> +		/* We just set the data size to 0 for a failed mapping
+> +		 * which should prevent DMA from happening...
+> +		 */
+> +		rx_desc->ds_cc = cpu_to_le16(0);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	dma_addr = page_pool_get_dma_addr(rx_buff->page) + rx_buff->offset;
+> +	dma_sync_single_for_device(ndev->dev.parent, dma_addr,
+> +				   info->rx_buffer_size, DMA_FROM_DEVICE);
 
+   Do we really need this call?
+
+> +	rx_desc->dptr = cpu_to_le32(dma_addr);
+> +
+> +	/* The end of the RX buffer is used to store skb shared data, so we need
+> +	 * to ensure that the hardware leaves enough space for this.
+> +	 */
+> +	rx_desc->ds_cc = cpu_to_le16(info->rx_buffer_size
+> +				     - SKB_DATA_ALIGN(sizeof(struct skb_shared_info))
+
+   Please leave the - operator on the previous line...
+
+> +				     - ETH_FCS_LEN + sizeof(__sum16));
+
+   Here as well...
+
+> +	return 0;
+> +}
+> +
+>  static u32
+>  ravb_rx_ring_refill(struct net_device *ndev, int q, u32 count, gfp_t gfp_mask)
+>  {
+>  	struct ravb_private *priv = netdev_priv(ndev);
+> -	const struct ravb_hw_info *info = priv->info;
+>  	struct ravb_rx_desc *rx_desc;
+> -	dma_addr_t dma_addr;
+>  	u32 i, entry;
+>  
+>  	for (i = 0; i < count; i++) {
+>  		entry = (priv->dirty_rx[q] + i) % priv->num_rx_ring[q];
+>  		rx_desc = ravb_rx_get_desc(priv, q, entry);
+> -		rx_desc->ds_cc = cpu_to_le16(info->rx_max_desc_use);
+>  
+> -		if (!priv->rx_skb[q][entry]) {
+> -			priv->rx_skb[q][entry] = ravb_alloc_skb(ndev, info, gfp_mask);
+> -			if (!priv->rx_skb[q][entry])
+> +		if (!priv->rx_buffers[q][entry].page) {
+> +			if (unlikely(ravb_alloc_rx_buffer(ndev, q, entry,
+
+   Well, IIRC Greg KH is against using unlikely() unless you have actually
+instrumented the code and this gives an improvement... have you? :-)
+
+[...]
+> @@ -727,12 +739,22 @@ static void ravb_rx_csum_gbeth(struct sk_buff *skb)
+>  	if (unlikely(skb->len < sizeof(__sum16) * 2))
+>  		return;
+>  
+> -	hw_csum = skb_tail_pointer(skb) - sizeof(__sum16);
+> +	if (skb_is_nonlinear(skb)) {
+> +		last_frag = &shinfo->frags[shinfo->nr_frags - 1];
+> +		hw_csum = skb_frag_address(last_frag) + skb_frag_size(last_frag) - sizeof(__sum16);
+> +	} else {
+> +		hw_csum = skb_tail_pointer(skb) - sizeof(__sum16);
+> +	}
+
+   We can do the subtraction only once here...
+
+[...]
+> @@ -816,14 +824,26 @@ static int ravb_rx_gbeth(struct net_device *ndev, int budget, int q)
+>  			if (desc_status & MSC_CEEF)
+>  				stats->rx_missed_errors++;
+>  		} else {
+> +			struct ravb_rx_buffer *rx_buff = &priv->rx_buffers[q][entry];
+> +			void *rx_addr = page_address(rx_buff->page) + rx_buff->offset;
+
+   Need an empty line here...
+
+>  			die_dt = desc->die_dt & 0xF0;
+> -			skb = ravb_get_skb_gbeth(ndev, entry, desc);
+> +			dma_sync_single_for_cpu(ndev->dev.parent, le32_to_cpu(desc->dptr),
+> +						desc_len, DMA_FROM_DEVICE);
+> +
+>  			switch (die_dt) {
+>  			case DT_FSINGLE:
+>  			case DT_FSTART:
+>  				/* Start of packet:
+> -				 * Set initial data length.
+> +				 * Prepare an SKB and add initial data.
+
+   I'd prefer calling it skb in the comments...
+
+[...]
+> @@ -865,7 +894,16 @@ static int ravb_rx_gbeth(struct net_device *ndev, int budget, int q)
+>  				stats->rx_bytes += skb->len;
+>  				napi_gro_receive(&priv->napi[q], skb);
+>  				rx_packets++;
+> +
+> +				/* Clear rx_1st_skb so that it will only be
+> +				 * non-NULL when valid.
+> +				 */
+> +				if (die_dt == DT_FEND)
+> +					priv->rx_1st_skb = NULL;
+
+   Hm, can't we do this under *case* DT_FEND above?
+
+[...]
+
+MBR, Sergey
 
