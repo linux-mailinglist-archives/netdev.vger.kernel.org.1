@@ -1,112 +1,111 @@
-Return-Path: <netdev+bounces-99080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D6BB8D3A4B
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:08:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A688D3A68
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:12:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6ADAB2550D
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 15:08:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DF971F22AF1
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 15:12:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3697217F38B;
-	Wed, 29 May 2024 15:08:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ibMzuFMT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16C0F17BB2F;
+	Wed, 29 May 2024 15:12:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F7717F36E
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 15:08:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8711B15A861;
+	Wed, 29 May 2024 15:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716995289; cv=none; b=tlqWz+fdm4rOjCzniVLg2bzScYqgXQrqePSrGOo4LqlS6ixYHzEAD9Okxv5y96y5BoM/izGSwiVy2rSDNFLC+GabjPKWgMw4y3sUdwsZgnXUa7wtV/qTnUsehmbOXp0RNa5FiIjWDQDwSunSa90qiGo6Ndh18cU4BpX9uZyr7ik=
+	t=1716995557; cv=none; b=qaiAvV6lGYMouHy/QafYDgFEzLm7EBt5XZqzHXQR2zG7+7G32k09h2fW4suTZh5BoZ7H/frwnAY6AP1j1GKnFdJ0m1YR5r55n/KD0cKNvzSa19pyBamEG1b2XKT0EUuUF6GEXWAu4+kTtjvRqFH3yGIlOl3LUM/5GQboQoZG9gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716995289; c=relaxed/simple;
-	bh=s7ps87vVMx2pZPlwmX1rES59yV6+9ATQata99PWEn08=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KoS+/V7Nx/TU/p49R1p0E2N3RA9/H4tIITP8D5rAc1SOpMbVlYEZ2goLzKeAgwr5oYYzd6QCGJX3iq6koNdFxohzSN6+SKbstvrNfadLs8yaVorpY0izN2bI2SIOFX4026R728YtyArE2igA6/DWZ6Q36UETH2NQYMPnU/PKEBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ibMzuFMT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80D8FC32782;
-	Wed, 29 May 2024 15:08:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716995288;
-	bh=s7ps87vVMx2pZPlwmX1rES59yV6+9ATQata99PWEn08=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ibMzuFMTCM+AQiG5i8eWDBciUQ23hxUTJF7vdNWCjI8/jV0NK/q9Mehp6YnJuNnZj
-	 0WVcg60MMuEtmDrcbvinf+xjsw4wMjPqOksOzcwSof+CuGb7OS8z7rnBzRo0aYV6ne
-	 l8MvgmfTNFDEMPn/Q/kw3OgTU/ObgQNm6gpp/tOd5vRTGtZLMxO4pqE9oY8m71vx+p
-	 jgPU36T6VROJvWp+SstqHlgmuZVMI6MNoH6xvnKedj+gL06bCtds6VaPzOt/wHl7bj
-	 3PXUMvsy1whjY38Y2+iyAU680EgFI4t2pNZ5Gj17ZtT/1WRFe76bWLxJTUgvemSsHN
-	 4xaaNzKw9jroA==
-Date: Wed, 29 May 2024 17:08:05 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, arinc.unal@arinc9.com, daniel@makrotopia.org,
-	dqfext@gmail.com, sean.wang@mediatek.com, f.fainelli@gmail.com,
-	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	linux-mediatek@lists.infradead.org, lorenzo.bianconi83@gmail.com,
-	nbd@nbd.name
-Subject: Re: [PATCH net-next] net: dsa: mt7530: Add debugfs support
-Message-ID: <ZldE1cBeAk9jw3hs@lore-desk>
-References: <0999545cf558ded50087e174096bb631e59b5583.1716979901.git.lorenzo@kernel.org>
- <9ad6b014-11e1-4def-8217-b1fbeac768c3@lunn.ch>
+	s=arc-20240116; t=1716995557; c=relaxed/simple;
+	bh=CJ5RlxlDLbERx7YGng96bn1B0FuKChH0JxLOQF08Io0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eCu7hznXIY3fnRrwgfyuIJDzK0OoPLHM7rVscDQX+KRTcXp0Lk+94g58Ucmv/g/XX6iM+Ndjec6OY71f0Gf990Y2/xV1CDwALc0rIFHpSNvTUPx0rbJKdl/LDcBM2X5bgydFFikk6YaDGrqsFw3uQSMog6xXzAZaM9Q59Tylxm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2D874339;
+	Wed, 29 May 2024 08:12:59 -0700 (PDT)
+Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A4A6C3F762;
+	Wed, 29 May 2024 08:12:33 -0700 (PDT)
+Message-ID: <5a18f5ac-4e9a-4baf-b720-98eac7b6792f@arm.com>
+Date: Wed, 29 May 2024 16:12:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="OaVPF9wAGqO9CW/o"
-Content-Disposition: inline
-In-Reply-To: <9ad6b014-11e1-4def-8217-b1fbeac768c3@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 13/21] bitmap: make bitmap_{get,set}_value8()
+ use bitmap_{read,write}()
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Yury Norov <yury.norov@gmail.com>, Alexander Potapenko
+ <glider@google.com>, nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240327152358.2368467-1-aleksander.lobakin@intel.com>
+ <20240327152358.2368467-14-aleksander.lobakin@intel.com>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20240327152358.2368467-14-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+Hi Alexander,
 
---OaVPF9wAGqO9CW/o
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 27/03/2024 3:23 pm, Alexander Lobakin wrote:
+> Now that we have generic bitmap_read() and bitmap_write(), which are
+> inline and try to take care of non-bound-crossing and aligned cases
+> to keep them optimized, collapse bitmap_{get,set}_value8() into
+> simple wrappers around the former ones.
+> bloat-o-meter shows no difference in vmlinux and -2 bytes for
+> gpio-pca953x.ko, which says the optimization didn't suffer due to
+> that change. The converted helpers have the value width embedded
+> and always compile-time constant and that helps a lot.
 
-> On Wed, May 29, 2024 at 12:54:37PM +0200, Lorenzo Bianconi wrote:
-> > Introduce debugfs support for mt7530 dsa switch.
-> > Add the capability to read or write device registers through debugfs:
-> >=20
-> > $echo 0x7ffc > regidx
-> > $cat regval
-> > 0x75300000
-> >=20
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
->=20
-> In addition to Vladimirs NACK, you can also take a look at how
-> mv88e6xxx exports registers and tables using devlink regions.
+This change appears to have introduced a build failure for me on arm64
+(with GCC 9.4.0 from Ubuntu 20.04.02) - reverting b44759705f7d makes
+these errors go away again:
 
-ack, right. Anyway in my case (mt7530-mmio) regmap is enough to dump regist=
-er
-values. Thanks for the pointer.
+In file included from drivers/gpio/gpio-pca953x.c:12:
+drivers/gpio/gpio-pca953x.c: In function ‘pca953x_probe’:
+./include/linux/bitmap.h:799:17: error: array subscript [1, 1024] is outside array bounds of ‘long unsigned int[1]’ [-Werror=array-bounds]
+   799 |  map[index + 1] &= BITMAP_FIRST_WORD_MASK(start + nbits);
+       |                 ^~
+In file included from ./include/linux/atomic.h:5,
+                  from drivers/gpio/gpio-pca953x.c:11:
+drivers/gpio/gpio-pca953x.c:1015:17: note: while referencing ‘val’
+  1015 |  DECLARE_BITMAP(val, MAX_LINE);
+       |                 ^~~
+./include/linux/types.h:11:16: note: in definition of macro ‘DECLARE_BITMAP’
+    11 |  unsigned long name[BITS_TO_LONGS(bits)]
+       |                ^~~~
+In file included from drivers/gpio/gpio-pca953x.c:12:
+./include/linux/bitmap.h:800:17: error: array subscript [1, 1024] is outside array bounds of ‘long unsigned int[1]’ [-Werror=array-bounds]
+   800 |  map[index + 1] |= (value >> space);
+       |  ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+In file included from ./include/linux/atomic.h:5,
+                  from drivers/gpio/gpio-pca953x.c:11:
+drivers/gpio/gpio-pca953x.c:1015:17: note: while referencing ‘val’
+  1015 |  DECLARE_BITMAP(val, MAX_LINE);
+       |                 ^~~
+./include/linux/types.h:11:16: note: in definition of macro ‘DECLARE_BITMAP’
+    11 |  unsigned long name[BITS_TO_LONGS(bits)]
+       |                ^~~~
 
-Regards,
-Lorenzo
+I've not dug further since I don't have any interest in the pca953x
+driver - it just happened to be enabled in my config, so for now I've
+turned it off. However I couldn't obviously see any other reports of
+this, so here it is.
 
->=20
->     Andrew
->=20
-> ---
-> pw-bot: cr
-
---OaVPF9wAGqO9CW/o
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZldE1QAKCRA6cBh0uS2t
-rDG1AP9/CYLBt46VeY5RGxfWpNGfr2xd1FICgLMbVOLHU8LZfgD8CN57WIZxzRwa
-/1pgn48IUmvDKL/SrWwzuPMPlYWMfgc=
-=/dg/
------END PGP SIGNATURE-----
-
---OaVPF9wAGqO9CW/o--
+Thanks,
+Robin.
 
