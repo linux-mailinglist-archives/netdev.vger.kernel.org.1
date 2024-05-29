@@ -1,509 +1,298 @@
-Return-Path: <netdev+bounces-98997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF428D3567
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 13:22:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 083878D3569
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 13:22:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B119C1C22741
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 11:22:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A346B26268
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 11:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9288116EBF0;
-	Wed, 29 May 2024 11:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E9C169AD2;
+	Wed, 29 May 2024 11:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="miHTnshf"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="r3mYBPnD"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2051.outbound.protection.outlook.com [40.107.220.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696EE16E89B;
-	Wed, 29 May 2024 11:21:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716981710; cv=fail; b=Ukm1ddDRSBRlGLewDAPjwMJ2clPXG4DnaT9b2JqlIOIi98kDYvZAMkxtaFkOkOUeyU8F4QUIIQJbRYHB2TuyL94zhq/8y4coacl4oWzxW0qmbMX2n/C60ylshI9ayutCan/fwgM5eiKyvsxi1zgkecHcacGSEAL4u919cnEIT/Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716981710; c=relaxed/simple;
-	bh=dHTyDr4TplIayyKkWv5mluQu6AGAz7jAy+hgFtRqvXM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XGeEC6OFpGc0xTYREDbrO23I0jmuDjm73qZg3RbBHGkBh9tYtQAPrcS0cJvsV6H5gc4lTyD2hqerEmhKgPFIu6UhitoxGTuMYnb5t/1OtO0sBFN8TIrBQI/LA1mYCS7ivP0AKiWIYARI5RNbap1wqO9aFG5tmJCxyb0ERxoD1es=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=miHTnshf; arc=fail smtp.client-ip=40.107.220.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NIk2mxKFa4M7LvD3y0BYrw7LP2bbVnghb37GX88GKWXwqos/jT0vg6PdT5NPDvNDH1r37P2I/gXAycr6w0pbK8XzymfGVBJZDrkS4vd1JiLO7dnXcCEHOaX9sqtDf6ZGhIizQGdew3PtyTqolN464Znyv/BAYw/vMQRPIc8H7gAsT86wI/QEHX2pQLcH6ue1oFGvYMCwj2bC0z0d4HcAzyY5MK8s54du5VPXP6kyyfDY2CEDovLPl5gYT4TSUpLlGCacFA3D2CZi0zdNz+FWN+N5bWNs/Ib5KRbzTvh2cmtGc9onhcY65l5GFge3ik4/t5nnDecu/VwZTrozA8DNcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=p5U0+PpsHh78Bp9LTwwLCWRzC3SIk8CvM9kMisVcwaU=;
- b=I/UR94s07k6aS/ENiB9M65rCDTkPO1ux3qKDgRLpQ+3Tq7isPF659BMsEcGiLQs72vbgNzAchg3rWkrVLvTLtVmTwWu7BxGm8+frooIfNI2WIXN35Dkr1Dvlmp2mljDkouKOn2SscvdUr806qFrfksN5GWo9kbvUOJZD5tNQQzCNoYdFPk+/SY/YUF5CTaxa/EcMqAN5I5gHiEdmQog7NNplnlTbEdFjs+kcCkdQO6a4okcQNLwFlvyCgtdNMYVD01wXdKzFjtQ+/TwDeAztYEbshf/pUejroDbjXXMYHl88x2UJt4IuCBMoitXGCERQfIoe6SjnXcfkyPnVUoFxtw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p5U0+PpsHh78Bp9LTwwLCWRzC3SIk8CvM9kMisVcwaU=;
- b=miHTnshfoTiGBgk0HqBvWc1wa4TXIg/1nu+JutJnVCo2+jNRnUbzA+pjFxoRNzsn61r5ZQ1w1Fchpu0vvsOY/+QMd5gMa0IdYwpap+0Woa6KYxoxWqF8n3Dr8+Qr4ovWMSrLIkafq1IOTTzF0FjFjuD+sk/8rfgLZEIQ7HYe3KeC3QfHjceB2Xt197APwHADYMGJm+4LKQtIma7gECAxCqLJZLvEvo5zORBxsYlgFPQFkeATPtYsLEIM8sTM5jyAaOqDY78Tr1rQfKVc6qmETL+kStoPNfRucpdXkw67iqFTHWqN7O/wDn3zJ5UAoTZGqmB0lLgrmVx9cVINNEH+ig==
-Received: from SN4PR0501CA0034.namprd05.prod.outlook.com
- (2603:10b6:803:40::47) by DM6PR12MB4283.namprd12.prod.outlook.com
- (2603:10b6:5:211::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.30; Wed, 29 May
- 2024 11:21:45 +0000
-Received: from SN1PEPF0002BA4C.namprd03.prod.outlook.com
- (2603:10b6:803:40:cafe::45) by SN4PR0501CA0034.outlook.office365.com
- (2603:10b6:803:40::47) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.18 via Frontend
- Transport; Wed, 29 May 2024 11:21:45 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SN1PEPF0002BA4C.mail.protection.outlook.com (10.167.242.69) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7633.15 via Frontend Transport; Wed, 29 May 2024 11:21:45 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 29 May
- 2024 04:21:32 -0700
-Received: from localhost.localdomain (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 29 May
- 2024 04:21:27 -0700
-From: Petr Machata <petrm@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>
-CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "David
- Ahern" <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	<linux-kselftest@vger.kernel.org>
-Subject: [PATCH net-next 4/4] selftests: forwarding: router_mpath_hash: Add a new selftest
-Date: Wed, 29 May 2024 13:18:44 +0200
-Message-ID: <20240529111844.13330-5-petrm@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240529111844.13330-1-petrm@nvidia.com>
-References: <20240529111844.13330-1-petrm@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918A216A379
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 11:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716981718; cv=none; b=LOcLpbWBDSkO0BzCqK2hy7z3nv0j/+b2iuQXyS2u/u9oeWSZ04mRrZuWIGkCET6P3+jQMGYOcBAe/ebxtEf1QisrUHeTcs2wTweJBsFMy//WjoIQ0Q2uDQYKpIcH/CpL4GMhZ0UvMRwX0qdJMFF94WY7XI62M5XMLfqGkKdtixE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716981718; c=relaxed/simple;
+	bh=OUiMt/5TsD7gtyfQ5pOtm920h2sfEbfrG6W/WqxhF08=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=H8dUS24sQqsPPtO/r4CY4AHR/WjpjN1tM5tl976Um42Nv4gnT/a9c/NE/Cc72Ch3S9FIVwXoes63CJjWiXIyV5aLICCMxSXoAI/9kafORXasI3HMgl/ywiZNGl3KmVkk1gJRSRaLQ/mCkjoNJbbiA/clJ/B85vTq2GPYuo0RA38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=r3mYBPnD; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-df481bf6680so1899052276.3
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 04:21:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1716981715; x=1717586515; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZebxViTgSkYhn5X6JtcNSCi1iv3nQW7h0MkUhFzq6EQ=;
+        b=r3mYBPnD5wAyTnIIUtVJJsAEOloamlWWNu6jT+KepPhJh/t5/jYW6W7cHlnIbLQqrG
+         dwk19tsXeflBMG+X3JhdjWCAh55fRe4j9ED4XrCTM5S6RFztmMenS10cUCxyOMtu4P7Q
+         PlO8wzw8KQWE/fMfXfMogS5pwdZ7QslHkCh3Hp396mcIchDcIGm68wo32Q1cFX0nMY2R
+         S7tGRubbVu0Js/TzKyzLknfD7PbQ/7QaUP56CZRH0NMlUBerVa/i8kuuQOLnh2Ceiqs0
+         GII5O28T7FsoFw4FRdXzHpCXr0xpCMthvI+RnW8NGhIxk/1kd7oQB0zKi6XP/uj1iJG4
+         CD5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716981715; x=1717586515;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZebxViTgSkYhn5X6JtcNSCi1iv3nQW7h0MkUhFzq6EQ=;
+        b=sA1H5NpPjAmlbIlVQSi5JqcsWtHduxRFNCRfMhmsY1r9WM9LyB2O2iPv+TASNT1YZc
+         udJcF1pZ0AJxq04MpSwf5yeR2bnzhHNc2+6RLiTew/uj+m4lKKD4yiiZWlWtW00QgYH4
+         0tG3MAYBvt0ez1Q+ilSNC2PK+30kIYblBHexOzWk5RxNQNRXoJEaRz/k01FiEpqL2HrU
+         hZT+7LfUxpPrpNIn27bFyCmdm6+DfKsbpHSiv5uElYF0WIuI3fyesHlkbpI9oywHSXeq
+         7041GRHYCAyCHoO7w/s6XDmak/JUF1DT4Qvw5j+6c/3RseeI9Rm72kul37Jt8Bv3zqxu
+         1nIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXpEx8k4XeYrBgn9sBV8EAKjz9VS7FiE9m3e53mm3Zk0qP+VcYqJTXVZRCO6sYcaxVxJki3xzMuDhCal4u8/4HrYbraH88R
+X-Gm-Message-State: AOJu0YzKIlLQHOYN+ghzS8c1B0C9qvS+t6o4LEyf3PTT9zvBjqiXMKju
+	4/ZhHUtP71wu6PocUX/AiIwUaycqfZ0RxlT7urKTvKQ+03m8Wej/IXpKjEp3NuSWiF7QSoT1fMd
+	Ff2rLiQfSZdfz9cIqRxzAVzAhK/x0LLJm/Ewq
+X-Google-Smtp-Source: AGHT+IFbH1ZV0XKI06pNTp0qcWDOrv19rCK0XvUcaBQxkQqU8UFp/IAB3v3LCGY3OJUFyncdnD65ECNn9EgcJ4kD9tE=
+X-Received: by 2002:a25:ad28:0:b0:de5:5693:4e96 with SMTP id
+ 3f1490d57ef6-df7721b3320mr15088741276.27.1716981715272; Wed, 29 May 2024
+ 04:21:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA4C:EE_|DM6PR12MB4283:EE_
-X-MS-Office365-Filtering-Correlation-Id: c78052de-b3f5-491e-451b-08dc7fd185f0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|1800799015|376005|36860700004|82310400017;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?G3N+tNPzQP6nTEI5c4oRj8mHFwRnUPl2HcQ7tU2c30HIRMTKdMgwFjp4l5ba?=
- =?us-ascii?Q?vOWGgbfvz5t9XJOb/bWkx4JFoafk2vWJVw1Js3hoJ0O7Vq+zKjWnowUgWtmg?=
- =?us-ascii?Q?RMMX3Cp3ZJG01W/PfYxVTFM2G4epCbiEZu6svNzksdELx+vhhyZf14ek74K3?=
- =?us-ascii?Q?hfwvxSlyvzza+nmQghXpJpjuC+3HqFH/wH0sY4vMBmnVxjx3O3E0TL/8xwLe?=
- =?us-ascii?Q?3z3BTyqZmLQMZcY8zNFRp7QtASzzgBXUvTJtYwkeFfi/zcBsuM9chqOwmcbu?=
- =?us-ascii?Q?N3PWkQwqHuwGYVEpIJyuRgEnq5LMPtIvYwcdjq5DB6lD54fYesi+3UWBaKks?=
- =?us-ascii?Q?CgFo/lOZsDMW36a0iKcmF79AMTlkbKw/tUfCv3pNl3SHv3M+d7IB1xYGQzDj?=
- =?us-ascii?Q?vcYiVyPLqTI6euI5JbJlOT+hCj4gw55oGSQJ44/F/qFr8Te+y22cmCxRuX1y?=
- =?us-ascii?Q?/mFvwrvnJrtVEEfBFJBfzTZZuP+Q7ZZdvv4WcYC0AInAD/iCPMISPz1yLFcD?=
- =?us-ascii?Q?5+BkHFTCf0vczpddjfwXrKfh9LmkDopgilLRoJ2qPh/2iEjnUfEpToyKNbNn?=
- =?us-ascii?Q?O4yLmIV+v/SmBeaKAQc5XVdQCTl5i5Wak95xxj3u3Ora0uIgdyhThnnfvK7O?=
- =?us-ascii?Q?bpQCsGDpLLo9EPS8KOGgS7orOSY2Ah5JyuRVFgDiZsJjt4cbKnHd3rxy5SN2?=
- =?us-ascii?Q?cWQP/ImbAwaXPNin1qNG3HFAvIdhJimeaUAJD/9YJWDuBZ+5xopBfg1UruFr?=
- =?us-ascii?Q?Q9HmQe/yW276TY2gj+do6MG8E82gMCJn4POIX45alrHlXdyM23IRN8/Fqu6x?=
- =?us-ascii?Q?mcduO1Zywi45rl7K9i2KveRrWgl1TtH7qLQgoTdnI9fu5Fu3HIqs/jJLVsQs?=
- =?us-ascii?Q?KKtFXfr8HNrV+vHKvwY76QgWREnMXv5HoYb1rdC5zjqOyWWlmMccOQarm8bj?=
- =?us-ascii?Q?PowNWNRQ0O/Gqge33uddJ8vs80+ORKgsqwYMi4xRcX2KOWYcJA+TPDSnIJAK?=
- =?us-ascii?Q?xGqnwP0Cca1YTAM9g2t/lX9NXXwxSXSUlLedVRTcUMc2+kj1dhq2Jrj2fURu?=
- =?us-ascii?Q?rjfDwaWz5QJ5Y3E3Mc9C0G5skZRuIfW5RLxCXQASxdAzDTQDigV+hecazdGb?=
- =?us-ascii?Q?ejM5lQHxn6vmFcgeCVcCve9GEchLpfCFY3UkTPbBY5La0a5mylyhfSjJXYvt?=
- =?us-ascii?Q?FxOWokDe0qhuIN66C0Yr8lP7LlcTsuHKoR6oNUE8ccVdVw8w5EA25Z6g1GLV?=
- =?us-ascii?Q?ZwzANInZX8ItIQICUkvRvSNhKCwUUzJGGJsGlxx/uq0fCyKkVhs7SgPs8xW4?=
- =?us-ascii?Q?TW1m8veNCQrl00kT26udt64Zvife7yOmkufVSgIaj9J2C4BT6fC/43V3jZz4?=
- =?us-ascii?Q?PYG8po4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(1800799015)(376005)(36860700004)(82310400017);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2024 11:21:45.0213
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c78052de-b3f5-491e-451b-08dc7fd185f0
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002BA4C.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4283
+References: <20240410140141.495384-1-jhs@mojatatu.com> <41736ea4e81666e911fee5b880d9430ffffa9a58.camel@redhat.com>
+ <CAM0EoM=982OctjvSQpx0kR7e+JnQLhvZ=sM-tNB4xNiu7nhH5Q@mail.gmail.com>
+ <CAM0EoM=VhVn2sGV40SYttQyaiCn8gKaKHTUqFxB_WzKrayJJfQ@mail.gmail.com>
+ <87cf4830e2e46c1882998162526e108fb424a0f7.camel@redhat.com>
+ <CAM0EoMkJwR0K-fF7qo0PfRw4Sf+=2L0L=rOcH5A2ELwagLrZMw@mail.gmail.com>
+ <CAM0EoMmfDoZ9_ZdK-ZjHjFAjuNN8fVK+R57_UaFqAm=wA0AWVA@mail.gmail.com>
+ <82ee1013ca0164053e9fb1259eaf676343c430e8.camel@redhat.com>
+ <CAADnVQLugkg+ahAapskRaE86=RnwpY8v=Nre8pn=sa4fTEoTyA@mail.gmail.com>
+ <CAM0EoM=2wHem54vTeVq4H1W5pawYuHNt-aS9JyG8iQORbaw5pA@mail.gmail.com>
+ <CAM0EoMmCz5usVSLq_wzR3s7UcaKifa-X58zr6hkPXuSBnwFX3w@mail.gmail.com>
+ <CAM0EoMmsB5jHZ=4oJc_Yzm=RFDUHWh9yexdG6_bPFS4_CFuiog@mail.gmail.com>
+ <20240522151933.6f422e63@kernel.org> <CAM0EoMmFrp5X5OzMbum5i_Bjng7Bhtk1YvWpacW6FV6Oy-3avg@mail.gmail.com>
+ <CO1PR11MB499350FC06A5B87E4C770CCE93F42@CO1PR11MB4993.namprd11.prod.outlook.com>
+ <MW4PR12MB71927C9E4B94871B45F845DF97F52@MW4PR12MB7192.namprd12.prod.outlook.com>
+ <MW4PR12MB719209644426A0F5AE18D2E897F62@MW4PR12MB7192.namprd12.prod.outlook.com>
+ <66563bc85f5d0_2f7f2087@john.notmuch> <CO1PR11MB49932999F5467416D4F7197693F12@CO1PR11MB4993.namprd11.prod.outlook.com>
+ <66566c7c6778d_52e720851@john.notmuch>
+In-Reply-To: <66566c7c6778d_52e720851@john.notmuch>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 29 May 2024 07:21:43 -0400
+Message-ID: <CAM0EoMn3-tpDK7jAgh97ZtA5ME1W=oFxgYwHSZ3LG_HbF93FHA@mail.gmail.com>
+Subject: Re: On the NACKs on P4TC patches
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: "Singhai, Anjali" <anjali.singhai@intel.com>, "Jain, Vipin" <Vipin.Jain@amd.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>, Network Development <netdev@vger.kernel.org>, 
+	"Chatterjee, Deb" <deb.chatterjee@intel.com>, "Limaye, Namrata" <namrata.limaye@intel.com>, 
+	tom Herbert <tom@sipanda.io>, Marcelo Ricardo Leitner <mleitner@redhat.com>, 
+	"Shirshyad, Mahesh" <Mahesh.Shirshyad@amd.com>, "Osinski, Tomasz" <tomasz.osinski@intel.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>, Khalid Manaa <khalidm@nvidia.com>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Victor Nogueira <victor@mojatatu.com>, "Tammela, Pedro" <pctammela@mojatatu.com>, 
+	"Daly, Dan" <dan.daly@intel.com>, Andy Fingerhut <andy.fingerhut@gmail.com>, 
+	"Sommers, Chris" <chris.sommers@keysight.com>, Matty Kadosh <mattyk@nvidia.com>, 
+	bpf <bpf@vger.kernel.org>, "lwn@lwn.net" <lwn@lwn.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add a selftest that exercises the sysctl added in the previous patches.
+On Tue, May 28, 2024 at 7:45=E2=80=AFPM John Fastabend <john.fastabend@gmai=
+l.com> wrote:
+>
+> Singhai, Anjali wrote:
+> > >From: John Fastabend <john.fastabend@gmail.com>
+> > >Sent: Tuesday, May 28, 2024 1:17 PM
+> >
+> > >Jain, Vipin wrote:
+> > >> [AMD Official Use Only - AMD Internal Distribution Only]
+> > >>
+> > >> My apologies, earlier email used html and was blocked by the list...
+> > >> My response at the bottom as "VJ>"
+> > >>
+> > >> ________________________________________
+> >
+> > >Anjali and Vipin is your support for HW support of P4 or a Linux SW im=
+plementation of P4. If its for HW support what drivers would we want to sup=
+port? Can you describe how to program >these devices?
+> >
+> > >At the moment there hasn't been any movement on Linux hardware P4 supp=
+ort side as far as I can tell. Yes there are some SDKs and build kits float=
+ing around for FPGAs. For example >maybe start with what drivers in kernel =
+tree run the DPUs that have this support? I think this would be a productiv=
+e direction to go if we in fact have hardware support in the works.
+> >
+> > >If you want a SW implementation in Linux my opinion is still pushing a=
+ DSL into the kernel datapath via qdisc/tc is the wrong direction. Mapping =
+P4 onto hardware blocks is fundamentally >different architecture from mappi=
+ng
+> > >P4 onto general purpose CPU and registers. My opinion -- to handle thi=
+s you need a per architecture backend/JIT to compile the P4 to native instr=
+uctions.
+> > >This will give you the most flexibility to define new constructs, best=
+ performance, and lowest overhead runtime. We have a P4 BPF backend already=
+ and JITs for most architectures I don't >see the need for P4TC in this con=
+text.
+> >
+> > >If the end goal is a hardware offload control plane I'm skeptical we e=
+ven need something specific just for SW datapath. I would propose a devlink=
+ or new infra to program the device directly >vs overhead and complexity of=
+ abstracting through 'tc'. If you want to emulate your device use BPF or us=
+er space datapath.
+> >
+> > >.John
+> >
+> >
+> > John,
+> > Let me start by saying production hardware exists i think Jamal posted =
+some links but i can point you to our hardware.
+>
+> Maybe more direct what Linux drivers support this? That would be
+> a good first place to start IMO. Similarly what AMD hardware
+> driver supports this. If I have two drivers from two vendors
+> with P4 support this is great.
+>
+> For Intel I assume this is idpf?
+>
+> To be concrete can we start with Linux driver A and P4 program
+> P. Modprobe driver A and push P4 program P so that it does
+> something very simple, and drop a CIDR/Port range into a table.
+> Perhaps this is so obvious in your community the trouble is in
+> the context of a Linux driver its not immediately obvious to me
+> and I would suspect its not obvious to many others.
+>
+> I really think walking through the key steps here would
+> really help?
+>
+>  1. $ p4IntelCompiler p4-dos.p4 -o myp4
+>  2. $ modprobe idpf
+>  3. $ ping -i eth0 10.0.0.1 // good
+>  4. $ p4Load p4-dos.p4
+>  5. -- load cidr into the hardware somehow -- p4rt-ctrl?
+>  6. $ ping -i eth0 10.0.0.1 // dropped
+>
+> This is an honest attempt to help fwiw. Questions would be.
+>
+> For compilation do we need an artifact from Intel it seems
+> so from docs. But maybe a typo not sure. I'm not overly stuck
+> on it but worth mentioning if folks try to follow your docs.
+>
+> For 2 I assume this is just normal every day module load nothing
+> to see. Does it pop something up in /proc or in firmware or...?
+> How do I know its P4 ready?
+>
+> For 4. How does this actually work? Is it a file in a directory
+> the driver pushes into firmware? How does the firmware know
+> I've done this? Does the Linux driver already support this?
+>
+> For 5 (most interesting) how does this work today. How are
+> you currently talking to the driver/firmware to insert rules
+> and discover the tables? And does the idpf driver do this
+> already? Some side channel I guess? This is p4rt-ctrl?
+>
+> I've seen docs for above in ipdk, but they are a bit hard
+> to follow if I'm honest.
+>
+> I assume IPDK is the source folks talk to when we mention there
+> is hardware somewhere. Also it seems there is an IPDK BPF support
+> as well which is interesting.
+>
+> And do you know how the DPDK implementation works? Can we
+> learn from them is it just on top of Flow API which we
+> could easily use in devlink or some other *link I suspect.
+>
+> > The hardware devices under discussion are capable of being abstracted u=
+sing the P4 match-action paradigm so that's why we chose TC.
+> > These devices are programmed using the TC/netlink interface i.e the sta=
+ndard TC control-driver ops apply. While it is clear to us that the P4TC ab=
+straction suffices, we are currently discussing details that will cater for=
+ all vendors in our biweekly meetings.
+> > One big requirement is we want to avoid the flower trap - we dont want =
+to be changing kernel/user/driver code every time we add new datapaths.
+>
+> I think many 1st order and important points have been skipped. How do you
+> program the device is it a firmware blob, a set of firmware commands,
+> something that comes to you on device so only vendor sees this? Maybe
+> I can infer this from some docs and some examples (by the way I ran
+> through some of your DPU docs and such) but its unclear how these
+> map onto Linux networking. Jiri started into this earlier and was
+> cut off because p4tc was not for hardware offload. Now it is apparently.
+>
+> P4 is a good DSL for this sure and it has a runtime already specified
+> which is great.
+>
+> This is not a qdisc/tc its an entire hardware pipeline I don't see
+> the reason to put it in TC at all.
+>
+> > We feel P4TC approach is the path to add Linux kernel support.
+>
+> I disagree with your implementation not your goals to support
+> flexible hardware.
+>
+> >
+> > The s/w path is needed as well for several reasons.
+> > We need the same P4 program to run either in software or hardware or in=
+ both using skip_sw/skip_hw. It could be either in split mode or as an exce=
+ption path as it is done today in flower or u32. Also it is common now in t=
+he P4 community that people define their datapath using their program and w=
+ill write a control application that works for both hardware and software d=
+atapaths. They could be using the software datapath for testing as you said=
+ but also for the split/exception path. Chris can probably add more comment=
+s on the software datapath.
+>
+> None of above requires P4TC. For different architectures you
+> build optimal backend compilers. You have a Xilenx backend,
+> an Intel backend, and a Linux CPU based backend. I see no
+> reason to constrain the software case to map to a pipeline
+> model for example. Software running on a CPU has very different
+> characteristics from something running on a TOR, or FPGA.
+> Trying to push all these into one backend "model" will result
+> in suboptimal result for every target. At the end of the
+> day my .02$, P4 is a DSL it needs a target dependent compiler
+> in front of it. I want to optimize my software pipeline the
+> compiler should compress tables as much as possible and
+> search for a O(1) lookup even if getting that key is somewhat
+> expensive. Conversely a TCAM changes the game. An FPGA is
+> going to be flexible and make lots of tradeoffs here of which
+> I'm not an expert. Also by avoiding loading the DSL into the kernel
+> you leave room for others to build new/better/worse DSLs as they
+> please.
+>
+> The P4 community writes control applicatoins on top of the
+> runtime spec right? p4rt-ctl being the thing I found. This
+> should abstract the endpoint away to work with hardware or
+> software or FPGA or anything else.
+>
 
-Test that set/get works as expected; that across seeds we eventually hit
-all NHs (test_mpath_seed_*); and that a given seed keeps hitting the same
-NHs even across seed changes (test_mpath_seed_stability_*).
+For the record, _every single patchset we have posted_ specified our
+requirements as being s/w + h/w. A simpler version of the requirements
+is listed here:
+https://github.com/p4tc-dev/pushback-patches?tab=3Dreadme-ov-file#summary-o=
+f-our-requirements
 
-Signed-off-by: Petr Machata <petrm@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
----
+John's content variant above is described in:
+https://github.com/p4tc-dev/pushback-patches?tab=3Dreadme-ov-file#summary-o=
+f-our-requirements
+According to him we should not bother with the kernel at all. It's
+what is commonly referred to as a monday-morning quarterbacking or
+arm-chair lawyering "lets just do it my way and it will all be great".
+It's 90% of these discussions and one of the reasons I put up that
+page.
 
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: linux-kselftest@vger.kernel.org
-
- .../testing/selftests/net/forwarding/Makefile |   1 +
- .../net/forwarding/router_mpath_seed.sh       | 322 ++++++++++++++++++
- 2 files changed, 323 insertions(+)
- create mode 100755 tools/testing/selftests/net/forwarding/router_mpath_seed.sh
-
-diff --git a/tools/testing/selftests/net/forwarding/Makefile b/tools/testing/selftests/net/forwarding/Makefile
-index fa7b59ff4029..99576d7ecbf6 100644
---- a/tools/testing/selftests/net/forwarding/Makefile
-+++ b/tools/testing/selftests/net/forwarding/Makefile
-@@ -70,6 +70,7 @@ TEST_PROGS = bridge_fdb_learning_limit.sh \
- 	router_broadcast.sh \
- 	router_mpath_nh_res.sh \
- 	router_mpath_nh.sh \
-+	router_mpath_seed.sh \
- 	router_multicast.sh \
- 	router_multipath.sh \
- 	router_nh.sh \
-diff --git a/tools/testing/selftests/net/forwarding/router_mpath_seed.sh b/tools/testing/selftests/net/forwarding/router_mpath_seed.sh
-new file mode 100755
-index 000000000000..0ef3687da8b2
---- /dev/null
-+++ b/tools/testing/selftests/net/forwarding/router_mpath_seed.sh
-@@ -0,0 +1,322 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# +-------------------------+  +-------------------------+
-+# |  H1                     |  |                      H2 |
-+# |               $h1 +     |  | + $h2                   |
-+# |      192.0.2.1/28 |     |  | | 192.0.2.34/28         |
-+# |  2001:db8:1::1/64 |     |  | | 2001:db8:3::2/64      |
-+# +-------------------|-----+  +-|-----------------------+
-+#                     |          |
-+# +-------------------|-----+  +-|-----------------------+
-+# |  R1               |     |  | |                    R2 |
-+# |             $rp11 +     |  | + $rp21                 |
-+# |      192.0.2.2/28       |  |   192.0.2.33/28         |
-+# |  2001:db8:1::2/64       |  |   2001:db8:3::1/64      |
-+# |                         |  |                         |
-+# |             $rp12 +     |  | + $rp22                 |
-+# |     192.0.2.17/28 |     |  | | 192.0.2.18..27/28     |
-+# | 2001:db8:2::17/64 |     |  | | 2001:db8:2::18..27/64 |
-+# +-------------------|-----+  +-|-----------------------+
-+#                     |          |
-+#                     `----------'
-+
-+ALL_TESTS="
-+	ping_ipv4
-+	ping_ipv6
-+	test_mpath_seed_get
-+	test_mpath_seed_ipv4
-+	test_mpath_seed_ipv6
-+	test_mpath_seed_stability_ipv4
-+	test_mpath_seed_stability_ipv6
-+"
-+NUM_NETIFS=6
-+source lib.sh
-+
-+h1_create()
-+{
-+	simple_if_init $h1 192.0.2.1/28 2001:db8:1::1/64
-+	ip -4 route add 192.0.2.32/28 vrf v$h1 nexthop via 192.0.2.2
-+	ip -6 route add 2001:db8:3::/64 vrf v$h1 nexthop via 2001:db8:1::2
-+}
-+
-+h1_destroy()
-+{
-+	ip -6 route del 2001:db8:3::/64 vrf v$h1 nexthop via 2001:db8:1::2
-+	ip -4 route del 192.0.2.32/28 vrf v$h1 nexthop via 192.0.2.2
-+	simple_if_fini $h1 192.0.2.1/28 2001:db8:1::1/64
-+}
-+
-+h2_create()
-+{
-+	simple_if_init $h2 192.0.2.34/28 2001:db8:3::2/64
-+	ip -4 route add 192.0.2.0/28 vrf v$h2 nexthop via 192.0.2.33
-+	ip -6 route add 2001:db8:1::/64 vrf v$h2 nexthop via 2001:db8:3::1
-+}
-+
-+h2_destroy()
-+{
-+	ip -6 route del 2001:db8:1::/64 vrf v$h2 nexthop via 2001:db8:3::1
-+	ip -4 route del 192.0.2.0/28 vrf v$h2 nexthop via 192.0.2.33
-+	simple_if_fini $h2 192.0.2.34/28 2001:db8:3::2/64
-+}
-+
-+router1_create()
-+{
-+	simple_if_init $rp11 192.0.2.2/28 2001:db8:1::2/64
-+	__simple_if_init $rp12 v$rp11 192.0.2.17/28 2001:db8:2::17/64
-+}
-+
-+router1_destroy()
-+{
-+	__simple_if_fini $rp12 192.0.2.17/28 2001:db8:2::17/64
-+	simple_if_fini $rp11 192.0.2.2/28 2001:db8:1::2/64
-+}
-+
-+router2_create()
-+{
-+	simple_if_init $rp21 192.0.2.33/28 2001:db8:3::1/64
-+	__simple_if_init $rp22 v$rp21 192.0.2.18/28 2001:db8:2::18/64
-+	ip -4 route add 192.0.2.0/28 vrf v$rp21 nexthop via 192.0.2.17
-+	ip -6 route add 2001:db8:1::/64 vrf v$rp21 nexthop via 2001:db8:2::17
-+}
-+
-+router2_destroy()
-+{
-+	ip -6 route del 2001:db8:1::/64 vrf v$rp21 nexthop via 2001:db8:2::17
-+	ip -4 route del 192.0.2.0/28 vrf v$rp21 nexthop via 192.0.2.17
-+	__simple_if_fini $rp22 192.0.2.18/28 2001:db8:2::18/64
-+	simple_if_fini $rp21 192.0.2.33/28 2001:db8:3::1/64
-+}
-+
-+nexthops_create()
-+{
-+	local i
-+	for i in $(seq 10); do
-+		ip nexthop add id $((1000 + i)) via 192.0.2.18 dev $rp12
-+		ip nexthop add id $((2000 + i)) via 2001:db8:2::18 dev $rp12
-+	done
-+
-+	ip nexthop add id 1000 group $(seq -s / 1001 1010) hw_stats on
-+	ip nexthop add id 2000 group $(seq -s / 2001 2010) hw_stats on
-+	ip -4 route add 192.0.2.32/28 vrf v$rp11 nhid 1000
-+	ip -6 route add 2001:db8:3::/64 vrf v$rp11 nhid 2000
-+}
-+
-+nexthops_destroy()
-+{
-+	local i
-+
-+	ip -6 route del 2001:db8:3::/64 vrf v$rp11 nhid 2000
-+	ip -4 route del 192.0.2.32/28 vrf v$rp11 nhid 1000
-+	ip nexthop del id 2000
-+	ip nexthop del id 1000
-+
-+	for i in $(seq 10 -1 1); do
-+		ip nexthop del id $((2000 + i))
-+		ip nexthop del id $((1000 + i))
-+	done
-+}
-+
-+setup_prepare()
-+{
-+	h1=${NETIFS[p1]}
-+	rp11=${NETIFS[p2]}
-+
-+	rp12=${NETIFS[p3]}
-+	rp22=${NETIFS[p4]}
-+
-+	rp21=${NETIFS[p5]}
-+	h2=${NETIFS[p6]}
-+
-+	sysctl_set net.ipv4.fib_multipath_hash_seed 0
-+
-+	vrf_prepare
-+
-+	h1_create
-+	h2_create
-+	router1_create
-+	router2_create
-+
-+	forwarding_enable
-+}
-+
-+cleanup()
-+{
-+	pre_cleanup
-+
-+	forwarding_restore
-+
-+	nexthops_destroy
-+	router2_destroy
-+	router1_destroy
-+	h2_destroy
-+	h1_destroy
-+
-+	vrf_cleanup
-+
-+	sysctl_restore net.ipv4.fib_multipath_hash_seed
-+}
-+
-+ping_ipv4()
-+{
-+	ping_test $h1 192.0.2.34
-+}
-+
-+ping_ipv6()
-+{
-+	ping6_test $h1 2001:db8:3::2
-+}
-+
-+test_mpath_seed_get()
-+{
-+	RET=0
-+
-+	local i
-+	for ((i = 0; i < 100; i++)); do
-+		local seed_w=$((999331 * i))
-+		sysctl -qw net.ipv4.fib_multipath_hash_seed=$seed_w
-+		local seed_r=$(sysctl -n net.ipv4.fib_multipath_hash_seed)
-+		((seed_r == seed_w))
-+		check_err $? "mpath seed written as $seed_w, but read as $seed_r"
-+	done
-+
-+	log_test "mpath seed set/get"
-+}
-+
-+nh_stats_snapshot()
-+{
-+	local group_id=$1; shift
-+
-+	ip -j -s -s nexthop show id $group_id |
-+	    jq -c '[.[].group_stats | sort_by(.id) | .[].packets]'
-+}
-+
-+get_active_nh()
-+{
-+	local s0=$1; shift
-+	local s1=$1; shift
-+
-+	jq -n --argjson s0 "$s0" --argjson s1 "$s1" -f /dev/stdin <<-"EOF"
-+		[range($s0 | length)] |
-+		map($s1[.] - $s0[.]) |
-+		map(if . > 8 then 1 else 0 end) |
-+		index(1)
-+	EOF
-+}
-+
-+probe_seed()
-+{
-+	local group_id=$1; shift
-+	local seed=$1; shift
-+	local -a mz=("$@")
-+
-+	sysctl -qw net.ipv4.fib_multipath_hash_seed=$seed
-+
-+	local s0=$(nh_stats_snapshot $group_id)
-+	"${mz[@]}"
-+	local s1=$(nh_stats_snapshot $group_id)
-+
-+	get_active_nh "$s0" "$s1"
-+}
-+
-+test_mpath_seed()
-+{
-+	local group_id=$1; shift
-+	local what=$1; shift
-+	local -a mz=("$@")
-+	local ii
-+
-+	RET=0
-+
-+	local -a tally=(0 0 0 0 0 0 0 0 0 0)
-+	for ((ii = 0; ii < 100; ii++)); do
-+		local act=$(probe_seed $group_id $((999331 * ii)) "${mz[@]}")
-+		((tally[act]++))
-+	done
-+
-+	local tally_str="${tally[@]}"
-+	for ((ii = 0; ii < ${#tally[@]}; ii++)); do
-+		((tally[ii] > 0))
-+		check_err $? "NH #$ii not hit, tally='$tally_str'"
-+	done
-+
-+	log_test "mpath seed $what"
-+	sysctl -qw net.ipv4.fib_multipath_hash_seed=0
-+}
-+
-+test_mpath_seed_ipv4()
-+{
-+	test_mpath_seed 1000 IPv4 \
-+		$MZ $h1 -A 192.0.2.1 -B 192.0.2.34 -q \
-+			-p 64 -d 0 -c 10 -t udp
-+}
-+
-+test_mpath_seed_ipv6()
-+{
-+	test_mpath_seed 2000 IPv6 \
-+		$MZ -6 $h1 -A 2001:db8:1::1 -B 2001:db8:3::2 -q \
-+			-p 64 -d 0 -c 10 -t udp
-+}
-+
-+check_mpath_seed_stability()
-+{
-+	local seed=$1; shift
-+	local act_0=$1; shift
-+	local act_1=$1; shift
-+
-+	((act_0 == act_1))
-+	check_err $? "seed $seed: active NH moved from $act_0 to $act_1 after seed change"
-+}
-+
-+test_mpath_seed_stability()
-+{
-+	local group_id=$1; shift
-+	local what=$1; shift
-+	local -a mz=("$@")
-+
-+	RET=0
-+
-+	local seed_0=0
-+	local seed_1=3221338814
-+	local seed_2=3735928559
-+
-+	local act_0_0=$(probe_seed $group_id $seed_0 "${mz[@]}")
-+	local act_1_0=$(probe_seed $group_id $seed_1 "${mz[@]}")
-+	local act_2_0=$(probe_seed $group_id $seed_2 "${mz[@]}")
-+
-+	local act_0_1=$(probe_seed $group_id $seed_0 "${mz[@]}")
-+	local act_1_1=$(probe_seed $group_id $seed_1 "${mz[@]}")
-+	local act_2_1=$(probe_seed $group_id $seed_2 "${mz[@]}")
-+
-+	check_mpath_seed_stability $seed_0 $act_0_0 $act_0_1
-+	check_mpath_seed_stability $seed_1 $act_1_0 $act_1_1
-+	check_mpath_seed_stability $seed_2 $act_2_0 $act_2_1
-+
-+	log_test "mpath seed stability $what"
-+	sysctl -qw net.ipv4.fib_multipath_hash_seed=0
-+}
-+
-+test_mpath_seed_stability_ipv4()
-+{
-+	test_mpath_seed_stability 1000 IPv4 \
-+		$MZ $h1 -A 192.0.2.1 -B 192.0.2.34 -q \
-+			-p 64 -d 0 -c 10 -t udp
-+}
-+
-+test_mpath_seed_stability_ipv6()
-+{
-+	test_mpath_seed_stability 2000 IPv6 \
-+		$MZ -6 $h1 -A 2001:db8:1::1 -B 2001:db8:3::2 -q \
-+			-p 64 -d 0 -c 10 -t udp
-+}
-+
-+trap cleanup EXIT
-+
-+setup_prepare
-+setup_wait
-+nexthops_create
-+
-+tests_run
-+
-+exit $EXIT_STATUS
--- 
-2.45.0
-
+cheers,
+jamal
 
