@@ -1,102 +1,122 @@
-Return-Path: <netdev+bounces-99160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 358618D3DCF
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 19:59:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2086F8D3E26
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 20:12:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF606284ABE
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:59:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72057B26279
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E7915B55D;
-	Wed, 29 May 2024 17:59:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4706B1A38F5;
+	Wed, 29 May 2024 18:11:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="XfTDVWrv"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="205YPd3w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE16A1B960
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 17:59:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF3447F7A
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 18:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717005587; cv=none; b=J96+fZOEGqD6ZQPmtFV99XrKcBfO8qkHRTi+tMZml+1zsxFx88ERXleSxalHe1UejvHjIU9giX8KU2VvNrxh1J3zI8zokKrZpoB9p6pamMTChPpUa8q8f7+HJynHUegdec5RMt7OfMDD4ZP/ib7wRSHNetvD0ue7bQuLZekMK4M=
+	t=1717006287; cv=none; b=h4nJW6aLSKiWdptvnlEAHSI8z4lEWXaTHpYeY3q0LfxmOyC/YSeu6qq2qg5Wg4XCL7ogNnDLqe5siN5wF5EarznDhTKDjP/2dha318IFDE8Tn7loSEsLmrf8qbBcQ+EMdxuCvssap5l2LeWuTP3t/g7FYDz1huGJjIPu2wtLz9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717005587; c=relaxed/simple;
-	bh=aWjnhJ+L8LGS2U4kU1C2i4xs1A/WOpmgtQu2/zm7dWU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D8ik4xBjjZSIh4bl9WIB+++t0rPll2bJ/Q7HxFpPgzo5qLEM+yXpr4GHkjVMYKe+kQh+4KZ0smUC682Efp4/h8ut4bU7YNTrl2dh20pliGi6iSD0Rsgjkj1qpJldP0zWDKqqCSP7t+Ct1JSfnj8r7IelipgKS8wZzI8UYFTYCpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=XfTDVWrv; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1f47f07acd3so281775ad.0
-        for <netdev@vger.kernel.org>; Wed, 29 May 2024 10:59:45 -0700 (PDT)
+	s=arc-20240116; t=1717006287; c=relaxed/simple;
+	bh=+qENlzS+uKZu/DE90S37+bSKcPVKI5RM+p9Ueif/OGE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oHicpWMbEb6SoKZ1XDEex2xNdLgDoJmT8wZaptvJJHgTgSxFKvPCgyYCBm40Nvouzo4yEGeCIYgxU62TRRGrNg1yy67dt/JB7mVxDkVOiMLwDjRXCdGhsE3SlSvOUDSuplitVVGzOMJiD7pAioON0YgPOYqFdgtsV8843Zb+Lqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=205YPd3w; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1f32448e8fbso300185ad.1
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 11:11:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1717005585; x=1717610385; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P6G6VshQZvLEBKyNaqbw0vxNTRoxF2g80F27tR0HxSE=;
-        b=XfTDVWrv4k8/hKW7Bnt4OTC3dlHLBfiKXhyS0fL3Pq1MOWsI8fmsSZyq94kCernHGE
-         kMIVIzt6//rA99YfB4GO1bUsLSlg1B9QfA5hws2HB4iXjWiwQEUvG7X/G2+hv8F7/32a
-         w2zskBXP+OqZItlz762UarrNT2xWzwj78An68=
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1717006284; x=1717611084; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a1tmgbbVW6dBMh4b4Dr/IHkG1DsfDFnZhKbjKRbaO34=;
+        b=205YPd3wpuQHjqEjk62Y8+C2310l3G43E/wn3sON8kvi1BpO87kFbPKeSrYQz1ovmT
+         ozYwhN8E8CLtAbpJHxQwGHvXqJBsTHwogW2UtLj/UoTmpYVvH55pK9DVIvhwtpiMbEPy
+         A3K9ZulBce8LpSZHorebipL+hNKv5GGoCpYXQCmiMgIj6TiW8kjeCa4A+xSrEw2Z0cbb
+         UOCAf6NuB+V8yHVYs49akthHLbMDqCZDt+OS33rrwMN+37qipU01wdlUWvIi2ZKdM1Lv
+         GQ+ydZkoD5WPq8VAI23tqJqyGJrGxB5ojR2/6ULfu2+IcuXfW5ASFIJeaiortK3CURee
+         jUeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717005585; x=1717610385;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P6G6VshQZvLEBKyNaqbw0vxNTRoxF2g80F27tR0HxSE=;
-        b=LbmVn393ec+USzPzYO6likkJ0muE+aMAt/BywJJ9NYKRaBIMlpXW2k9RNr0CTYUiuH
-         IGmOCnp/YsOfcHPGxEruSqm/bzhEMFUvdgn/MuGladEiWU7R2CjxCXMZ+i4m8t0dQZV+
-         x6dY/4IseEhaS50dq1DkcKbbTfgtAIO2y1rmIdXgnKu0zJqIPnlBDuFw3g+uzs3CrsJd
-         3WoXnOTte0l3g7iWiC4ZWoQw0LbDFwKs7MuRwMUXQzDzw1VAXtAES1RWz+oX5fqwshlA
-         wHrHJLTfCqChjFkTj7VbwjPm5UgIMHBO1twaUaKAaJ5WlNd1cCUDydgWqzjczEEhJ3T6
-         OkFg==
-X-Forwarded-Encrypted: i=1; AJvYcCU+a1uWW4/zul4aVqSfGK59+W9exGIDWIUd/8yFir2jjNurCcYVAN4HfE/q0q0c2WFNhzzX8I2O742UhgDVnY23N+1tfn9W
-X-Gm-Message-State: AOJu0YwDFNSYzZYlkOq5snG9arddCxLrluUPPQtoOraHjW+BuC3j5DD/
-	Fs7peCChmguxYRrxyM51XcLUztfHwBsBzlz/t3L6iF39NhkP/KQZToqNdyfF5dE=
-X-Google-Smtp-Source: AGHT+IG3wHeucNhJrhqSBDUDAuscAJ80DyUsIl4Xwzn/ERkk9e90W4mpu36QfDHovVqZ5IDoe6A6JA==
-X-Received: by 2002:a17:902:ecc5:b0:1f4:a1b3:1b9d with SMTP id d9443c01a7336-1f4a1b32852mr95440825ad.33.1717005584894;
-        Wed, 29 May 2024 10:59:44 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f44c9a8db7sm102736225ad.222.2024.05.29.10.59.43
+        d=1e100.net; s=20230601; t=1717006284; x=1717611084;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=a1tmgbbVW6dBMh4b4Dr/IHkG1DsfDFnZhKbjKRbaO34=;
+        b=hNEPa3hZnG+f/LalvPp22UsxVgTUj7V6sbHKN13+pW2hoMk4/erXVBr7RfW0BpEBv0
+         EEdXs5uOL7XA2Nbc47iaD4yCxPsQ+UzMEzi0tlf3kTYFTUtCv/djbCG1CPx1wlwoQAE5
+         fd9nTLYGymoAZLGu46kuK02wlwrAEKnnIC9y3PLBjS9kdtRcnfKW3TZ50huKFdmqiuJO
+         a1RFZXbxrf9O4Lr8WWmsZ+fXi/Iil8/ZdYOC21LJvVjzyjeY3F6J1SX0Q24Io61cBCbi
+         r629v3tI3A2FNFpIwHFcG8A2PGahkRVqgRnsFT8copfw97kRIWktxvBPTAacKgpqTwlk
+         uHow==
+X-Forwarded-Encrypted: i=1; AJvYcCXQHlLdj2d4jR0125acAi/13qVt7J1nIZ1j5OnYlnaRE/HgLFRMNg02WCKAaPO2OuBKWliObhxOGw7qmCwdmd7rgmKttlTa
+X-Gm-Message-State: AOJu0Yz+bwrr0p7C2MphPeZGQ33qkAmUv1/XygTziAB53nqRsSqXpZ5y
+	D4JIUSprjGewg1eXvOEYE4Fhzm4fAwnpWUdvyZTCoHwdwNTZrLV0H6b0/aRZGo7ksW7r3l0NsXd
+	4
+X-Google-Smtp-Source: AGHT+IFoKwe5Y/4jWiAsaqXfQCIeSBkcvEeEdnbkkkJmugjs//itzjgGBHpGZ6em39SwAwVQ7p4iAQ==
+X-Received: by 2002:a17:902:d4c8:b0:1f3:1e1e:cbaa with SMTP id d9443c01a7336-1f4486db822mr161392675ad.16.1717006284555;
+        Wed, 29 May 2024 11:11:24 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f48d5c96b9sm67432845ad.85.2024.05.29.11.11.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 May 2024 10:59:44 -0700 (PDT)
-Date: Wed, 29 May 2024 10:59:42 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next] net: qstat: extend kdoc about get_base_stats
-Message-ID: <ZldtDl_COcYhzI4U@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com
-References: <20240529162922.3690698-1-kuba@kernel.org>
+        Wed, 29 May 2024 11:11:24 -0700 (PDT)
+Date: Wed, 29 May 2024 11:11:22 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Edward Cree <ecree.xilinx@gmail.com>
+Cc: Gedalya <gedalya@gedalya.net>, David Ahern <dsahern@kernel.org>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v3] iproute2: color: default to dark background
+Message-ID: <20240529111122.7d384ed9@hermes.local>
+In-Reply-To: <d8b4ae7b-4759-06d0-9624-7edb93caa09f@gmail.com>
+References: <E1s9tE4-00000006L4I-46tH@ws2.gedalya.net>
+	<f8dc2692-6a17-431c-95de-ed32c0b82d59@kernel.org>
+	<27cd8235-ac98-46dc-bac8-3a72697281d5@gedalya.net>
+	<d8b4ae7b-4759-06d0-9624-7edb93caa09f@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240529162922.3690698-1-kuba@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 29, 2024 at 09:29:22AM -0700, Jakub Kicinski wrote:
-> mlx5 has a dedicated queue for PTP packets. Clarify that
-> this sort of queues can also be accounted towards the base.
+On Wed, 29 May 2024 18:51:01 +0100
+Edward Cree <ecree.xilinx@gmail.com> wrote:
+
+> On 29/05/2024 17:36, Gedalya wrote:
+> > That's not possible.  
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> Cc: jdamato@fastly.com
-> ---
->  include/net/netdev_queues.h | 2 ++
->  1 file changed, 2 insertions(+)
+> Then in cases where the tool can't determine the answer, it
+>  should not be using colour at all unless explicitly instructed
+>  to do so, either on the command-line or in runtime
+>  configuration like dotfiles, /etc, or envvars.
+> "In the face of ambiguity, refuse the temptation to guess."[1]
+> 
+> > The fact remains that the code currently makes an
+> > assumption and I don't see why it is better than
+> > the other way around.  
+> 
+> Because changing it would break it for people for whom it
+>  currently works.  That's a regression, and regressions are
+>  worse than existing bugs, ceteris paribus.
+> "Assess[ing] what is more common" won't change that.
+> 
+> -ed
+> 
+> [1]: https://peps.python.org/pep-0020/#the-zen-of-python
+> 
 
-Thanks!
+Debian maintainer decided to enable color by changing source.
+Therefore, they should carry whatever color fixups they want as well.
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+Upstream will stay as default no color.
 
