@@ -1,227 +1,118 @@
-Return-Path: <netdev+bounces-99062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB0DC8D38E9
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:14:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2FC68D3907
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:23:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDFD61C20E2F
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 14:14:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30357B22FF2
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 14:23:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEFD152F96;
-	Wed, 29 May 2024 14:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 755C7157A74;
+	Wed, 29 May 2024 14:22:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ZfdBoOcG"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="BbxHiInL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A2617F5;
-	Wed, 29 May 2024 14:14:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B804157A6B;
+	Wed, 29 May 2024 14:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716992052; cv=none; b=lBQa52qjgl8eysSFJ6ouUJux++rjenF+FyaRjuNC5xhXqAwyu5FF6dYcSYrqOrsKLs7mTp5HbISrbGQZZb6YXEhmm0yJNwuIUvcvRD9QxcqaBSozG+3/W+jU9NQBNLuvnrRBU6nB1bjMlIZX98Xc/uBwmdBNPODJM5Yv1f/MFxU=
+	t=1716992575; cv=none; b=MVcPiVxgXHbNuZi9AuF0otpPW77jC1JqjyUg6Eo2DnDoDHmk4S7Lb0pYXLrdDxw6na6uI6cfRn8+fVXnIn5m5/zeENwC3hySqZcdCHNW7ILP2GigmiolB2bmsYzAREJGxT/Qkchs0CNssxRcnndHlRT3Er1No0ZzFQWc4gkOzrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716992052; c=relaxed/simple;
-	bh=tvhpmBOBi6PpDi7Y2RpMDy0NHTDN0MtqyAIYHLm0Fow=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=P7guf+KlfIPw6YpRfwp5YuoYz/nQZtxiO0N0lOqYW6iyeZSaUC6OQZeO6tSwFpu1s4fisVNO8o1mkoPfFV2e9P4AHdhV7Kd2IcHcOBulst5IElCv2Y/4yixTzOoeOIJzrGXz94axP4bptFc6gt7bz55ciAGzPF+KC2ql4EoN02I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ZfdBoOcG; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44T4wxHx018858;
-	Wed, 29 May 2024 14:13:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	yqfnQWiiXx8zP47bSxhpWvDYUchRl20DVMApVnujf00=; b=ZfdBoOcGmXDl3dZy
-	FPcOpKHlFYvqkW6k5wzPBS3eF4cXY9lBHrjUBQArvYN6+t2E9HS5hlopLDYAL5GG
-	OBFVjRWR8bb9Bz2qE1xg3O75AR3dM+DMx0SuinjQOYT3M3VyhMWm0k1WAgMsqqj1
-	nQO4K5od/lSXDe3nsyzjqCix/xW6jWwEDzsRypKAQhBOl9fHQ1tjt+Qfoz172yjK
-	su4pR+YAZw3Geggt9wd+ea+ghxezvrHPAEilYN+wfMMfA7YHdAFnfIW6hJkn07X2
-	TzrrXOXw7Fk3Qmt1rbdldRDEmcUotE0ARu6Hhy91nKqZY+mZlYjyP38wu8ruMXRB
-	4JwGzQ==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ybadx95jk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 May 2024 14:13:30 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 44TEDTZ4029610
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 May 2024 14:13:29 GMT
-Received: from [10.50.12.173] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 29 May
- 2024 07:13:20 -0700
-Message-ID: <d246bd64-18b3-4002-bc71-eccd67bbd61f@quicinc.com>
-Date: Wed, 29 May 2024 19:43:15 +0530
+	s=arc-20240116; t=1716992575; c=relaxed/simple;
+	bh=i1+W9fRwSuY7cIzxg3UDgG1qLL/tZ34N8qpXL2awnyI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HKBuH1FOYNHQ9qArSybn7xSSRizWsB/6qEoJTQcG763S2nchEj0ZcII+cnbc9L9RmANDaZBwAS42HhLW/l6y4xk/e/IiPe30n8ljOVWRKm9jQzhqK0NH0AW+ABrjBPEqAi31a56a/DAY9gwv+hyMc52GZkhERP39SO9n/l1WSnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=BbxHiInL; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 3D6CA88271;
+	Wed, 29 May 2024 16:22:48 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1716992571;
+	bh=I2oVJcFLXkPCNKP7PqlC/eM5qW7lVm4lSg1L40401TI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BbxHiInLCDYI73Rz+vptL1jC0UDd5SG0btzkGHuWikdKesGmooljxpvLXUtRoRiHi
+	 kzJOVYaTdvr7TJ1ZFEqqD3RWyt8m+60aoMzcjFn03jiqXVtq71jTe4BpGn4b+uf+Ij
+	 9Iw1qdHYnrczTQiDuNfUvtVu9I/pSQz9WA/dk0tLyGfBJzknA3paTa0kISfUCrw6Lg
+	 qTWt5SIayv9SjxxBL9IuAZW9A1L4cjdDTKy3d1yHpX0TUntmvkzfggxI+uveKnMiNq
+	 FsJMyrsZ9Ad50KjQR0mblh5cqpyvUH+H7GMsT8Nea1ZNHl2VNlklA3BoxL2Vxx8fYf
+	 NpPPc6IW2BLFw==
+From: Lukasz Majewski <lukma@denx.de>
+To: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Tristram.Ha@microchip.com,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Ravi Gunasekaran <r-gunasekaran@ti.com>,
+	Simon Horman <horms@kernel.org>,
+	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
+	Murali Karicheri <m-karicheri2@ti.com>,
+	Arvid Brodin <Arvid.Brodin@xdin.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	"Ricardo B. Marliere" <ricardo@marliere.net>,
+	Casper Andersson <casper.casan@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Geliang Tang <tanggeliang@kylinos.cn>,
+	Shuah Khan <shuah@kernel.org>,
+	Lukasz Majewski <lukma@denx.de>
+Subject: [PATCH] selftests: hsr: Extend the hsr_ping.sh test to use fixed MAC addresses
+Date: Wed, 29 May 2024 16:22:31 +0200
+Message-Id: <20240529142232.2625747-1-lukma@denx.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: stmmac: dwmac-qcom-ethqos: Add support for
- 2.5G SGMII
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-CC: Andrew Halaney <ahalaney@redhat.com>, Vinod Koul <vkoul@kernel.org>,
-        Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@quicinc.com>
-References: <20231218071118.21879-1-quic_snehshah@quicinc.com>
- <4zbf5fmijxnajk7kygcjrcusf6tdnuzsqqboh23nr6f3rb3c4g@qkfofhq7jmv6>
- <8b80ab09-8444-4c3d-83b0-c7dbf5e58658@quicinc.com>
- <wvzhz4fmtheculsiag4t2pn2kaggyle2mzhvawbs4m5isvqjto@lmaonvq3c3e7>
- <8f94489d-5f0e-4166-a14e-4959098a5c80@quicinc.com>
- <ZlNi11AsdDpKM6AM@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Sneh Shah <quic_snehshah@quicinc.com>
-In-Reply-To: <ZlNi11AsdDpKM6AM@shell.armlinux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: ju5-ZsrkPL9R1SA-3neuqWKDaOGhTLpO
-X-Proofpoint-GUID: ju5-ZsrkPL9R1SA-3neuqWKDaOGhTLpO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-29_11,2024-05-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- impostorscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
- priorityscore=1501 mlxscore=0 suspectscore=0 spamscore=0
- lowpriorityscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2405170001 definitions=main-2405290097
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
+Fixed MAC addresses help with debugging as last four bytes identify the
+network namespace.
 
+Signed-off-by: Lukasz Majewski <lukma@denx.de>
+---
+ tools/testing/selftests/net/hsr/hsr_ping.sh | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-On 5/26/2024 9:57 PM, Russell King (Oracle) wrote:
-> On Thu, Dec 21, 2023 at 02:23:57PM +0530, Sneh Shah wrote:
->> On 12/20/2023 9:29 PM, Andrew Halaney wrote:
->>> I'd evaluate if you can update that function to clear the ANE bit when
->>> the ane boolean is false. From the usage I see I feel that makes sense,
->>> but correct me if you think I'm wrong.
->>> At the very least let's use the defines from there, and possibly add a
->>> new function if clearing is not acceptable in dwmac_ctrl_ane().
->>>
->>> Stepping back, I was asking in general is the need to muck with ANE here
->>> is a Qualcomm specific problem, or is that a generic thing that should be
->>> handled in the core (and the phy_set_speed() bit stay here)? i.e. would
->>> any dwmac5 based IP need to do something like this for SPEED_2500?
->> I think disabling ANE for SPEED_2500 is generic not specific to qualcomm.
->> Even in dwxgmac2 versions also we need to disable ANE for SPEED_2500.
->> Autoneg clause 37 stadard doesn't support 2500 speed. So we need to
->> disable autoneg for speed 2500
-> 
-> (Going back over the history of this addition)
-> 
-> What 802.3 Clause 37 says is utterly _irrelevant_ when discussing Cisco
-> SGMII. Cisco took 802.3 1000base-X and modified it for their own
-> purposes, changing the format of the 16-bit control word, adding support
-> for symbol replication to support 100Mbps and 10Mbps, changing the link
-> timer, etc. SGMII is *not* 802.3 Clause 37.
-> 
-> I guess you are getting caught up in the widespread crud where
-> manufacturers stupidly abuse "SGMII" to mean maybe "Cisco SGMII" and
-> maybe "802.3 1000base-X" because both are "serial gigabit MII". Yes,
-> both are serial in nature, but Cisco SGMII is not 1000base-X and it
-> also is not 2500base-X.
-> 
-> What makes this even more difficult is that 2500base-X was never
-> standardised by the 802.3 committees until very late, so we've ended
-> up with manufacturers doing their own thing for years. We've ended up
-> with a mess of different implementations described in different ways
-> many of which boil down to being 2500base-X without inband AN. For
-> example, one manufacturer talks about "HS-SGMII", but doesn't permit
-> the interface to operate at the x10 and x100 symbol replications that
-> conventional Cisco SGMII uses for 100M and 10M speeds respectfully,
-> making it in effect no different from 2500base-X.
-> 
-> Now through into this mess various implementations that do not support
-> inband at 2.5G speeds, those that require inband at 2.5G speeds... one
-> can get into the situation where one pairs a PHY that requires inband
-> with a PCS that doesn't support it and the result doesn't work. This
-> is particularly problematical if the PHY is on a hotpluggable module
-> like a SFP.
-> 
-> It's a total trainwreck.
+diff --git a/tools/testing/selftests/net/hsr/hsr_ping.sh b/tools/testing/selftests/net/hsr/hsr_ping.sh
+index 3684b813b0f6..f5d207fc770a 100755
+--- a/tools/testing/selftests/net/hsr/hsr_ping.sh
++++ b/tools/testing/selftests/net/hsr/hsr_ping.sh
+@@ -152,6 +152,15 @@ setup_hsr_interfaces()
+ 	ip -net "$ns3" addr add 100.64.0.3/24 dev hsr3
+ 	ip -net "$ns3" addr add dead:beef:1::3/64 dev hsr3 nodad
+ 
++	ip -net "$ns1" link set address 00:11:22:00:01:01 dev ns1eth1
++	ip -net "$ns1" link set address 00:11:22:00:01:02 dev ns1eth2
++
++	ip -net "$ns2" link set address 00:11:22:00:02:01 dev ns2eth1
++	ip -net "$ns2" link set address 00:11:22:00:02:02 dev ns2eth2
++
++	ip -net "$ns3" link set address 00:11:22:00:03:01 dev ns3eth1
++	ip -net "$ns3" link set address 00:11:22:00:03:02 dev ns3eth2
++
+ 	# All Links up
+ 	ip -net "$ns1" link set ns1eth1 up
+ 	ip -net "$ns1" link set ns1eth2 up
+-- 
+2.20.1
 
-
-
-Qualcomm ethernet HW supports 2.5G speed in overclocked SGMII mode.
-we internally term it as OCSGMII.
-
-End goal of these patches is to enable SGMII with 2.5G speed support.
-The patch in these series enabled up SGMII with 2.5 for cases where we
-don't have external phy. ( mac-to-mac connectivity)
-The new patch posted extends this for the case when the MAC has an
-external phy connected. ( hence we are advertising fr 2.5G speed by adding
-2500BASEX as supported interface in phylink)
-
-
-> 
-> I do have some work-in-progress patches that attempt to sort this out
-> in phylink and identify incompatible situations.
-> 
-> See http://git.armlinux.org.uk/cgit/linux-arm.git/log/?h=net-queue
-> 
-> commits (I think)...
-> 
-> net: phylink: clean up phylink_resolve()
-> 
-> to:
-> 
-> net: phylink: switch to MLO_AN_PHY when PCS uses outband
-> 
-> and since I'm converting stmmac's hacky PCS that bypasses phylink to
-> a real phylink_pcs, the ethqos code as it stands presents a blocker
-> because of this issue. So, I'm intending to post a series in the next
-> few days (after the bank holiday) and will definitely need to be
-> tested on ethqos hardware.
-> 
-
-I am going over the list of these patches.
-
-> However, first we need to get to the bottom of your latest patch that
-> only sets PHY_INTERFACE_MODE_2500BASEX when plat_dat->flags has the
-> STMMAC_FLAG_HAS_INTEGRATED_PCS flag _set_, but the stmmac code very
-> oddly does _not_ use the built-in PCS if this flag is set. See:
-> 
-> 	stmmac_ethtool_get_link_ksettings()
-> 	stmmac_ethtool_set_link_ksettings()
-> 
-> and their use of pcs_link / pcs_duplex / pcs_speed. Also see
-> 
-> 	stmmac_common_interrupt()
-> 
-> and its use of pcs_link to control the carrier, the dwmac1000 and
-> dwmac4 code that reads the status from the GMAC, updating the
-> pcs_link / pcs_duplex / pcs_speed variables.
-
-In this version of qualcomm ethernet, PCS is not an independent HW
-block. It is integrated to MAC block itself. It has very limited
-configuration.Here PCS doesn't have it's own link speed/duplex
-capabities. Hence we are bypassing all this PCS related functionalities.
-
-
-I will update with more details on the integrated PCS block autoneg
-standard.
-> 
 
