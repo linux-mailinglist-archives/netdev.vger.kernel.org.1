@@ -1,130 +1,118 @@
-Return-Path: <netdev+bounces-99064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC5E58D3909
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:23:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5B298D3910
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:24:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A80FB2829F8
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 14:23:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6F0D1C225AF
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 14:24:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559FC157E91;
-	Wed, 29 May 2024 14:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D7E1581E6;
+	Wed, 29 May 2024 14:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="YRhVqDOa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FzEFmOaG"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7066157A48;
-	Wed, 29 May 2024 14:22:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF9FB157E9E
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 14:24:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716992576; cv=none; b=W9IQUOTqwVEG/1kpOhZaTAeOYPqBeQi7EZ+jPjE1jS7R4l7JL1AzLXT1npowCqSZJ0xgzMEsyYGoUq/EKIm2hmfmsgoC2hKMJE+3oQYyS/21igSH1SF2+58PSDvc/GhrfGCJPggAjmGVyQujKTmRImOE9TI+R/PTy607Z8mvymA=
+	t=1716992680; cv=none; b=Jzpsn/muYepR+rp3Cu4PB46Qsc8d1umZw9NILxYFSlSemTI0iieX+jgrqeLbsbhPFbjUKJcS+t7wMsThbZiZxL1/LZTa/GIm9BxczTommcMBmF1+HlccxMiCHiebyUslFrWGjF0w0mDBknbN+XQVE3PjRc5aiovAQULX2JLnEZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716992576; c=relaxed/simple;
-	bh=rtTnp6DNjxdV478Y4SxUq0UJyuySEc8owZ4xpBLB7IY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=djtqnXQZdDkuQ69odhiWN0sf1Y6XhLf5yjmTYE5jV9nWYWKrgSxZF5jN9hm6xoIaDTyj1lMWDdc8fwZ/RTRBMVfWZjED5luMuELB/F5/VX4QsDb9YQ1wlI8zNwXbh8JYxmNE2n9I1hJ5UdCAInjGxL8B/CfydNz77/1w4+ZgE20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=YRhVqDOa; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 8B9EE883F4;
-	Wed, 29 May 2024 16:22:51 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1716992572;
-	bh=yzK/jJThiq2QGD8NcEQ2x+5IClGOW3kK8VcfEbej7CA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YRhVqDOa5ILpGXEkvulDSTLN2eWhxyONzpse+orLOwBEj6Ghfgl2Vo0NoMdezVYA2
-	 oD1/wwjlPAzrmcVGIDfijLlc+6mMR8WvnhAAW7vYghiDYCDQPcVRxCxoiz6Eu+YpUk
-	 isefaqW6hm7c5QvnkzylAjab4n5R7u7QzWVvFSntREeS1C0FlzOpyPLoxqXQUfG7rN
-	 2DH2IrTENFSLzalxyPsLLuwFdZLToEHKJ4leqekuTwKe5MnKmQ3v7ji+46OPBe/Aik
-	 nerVql4rjruGqSm2Y+YZ3QcFJ/V2PF+zQK9zm1JM8EjRr4JGqZig5DSDyFvpDBPQHs
-	 humnfSara3ufQ==
-From: Lukasz Majewski <lukma@denx.de>
-To: Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Tristram.Ha@microchip.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Ravi Gunasekaran <r-gunasekaran@ti.com>,
-	Simon Horman <horms@kernel.org>,
-	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
-	Murali Karicheri <m-karicheri2@ti.com>,
-	Arvid Brodin <Arvid.Brodin@xdin.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	Casper Andersson <casper.casan@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Geliang Tang <tanggeliang@kylinos.cn>,
-	Shuah Khan <shuah@kernel.org>,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [PATCH] selftests: hsr: Extend the hsr_redbox.sh test to use fixed MAC addresses
-Date: Wed, 29 May 2024 16:22:32 +0200
-Message-Id: <20240529142232.2625747-2-lukma@denx.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240529142232.2625747-1-lukma@denx.de>
-References: <20240529142232.2625747-1-lukma@denx.de>
+	s=arc-20240116; t=1716992680; c=relaxed/simple;
+	bh=JAxbuHoQBZ49w41Mn9Exw5TKZvwkktDZUEKmSaoKOFo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Lr/eq6iRnEXIs/Wz9tn5Ay9YNvkO8K7EFO3wt9EdrFIqi2nS7r41N2u2A1cQoPuH+rihoK8xT7+lRjy1DHSTUmQ1VFw5gMQ1y2Q7Bekk/JbAAhL/nDDAiLuS4mXutuUR2X2KXOki2xftQ/TO0p5lZbILiL+ibjBsv0NTFhX322k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FzEFmOaG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716992677;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CaOh1l0Lu41LPYOrXz2nXavJQHgEuj8sHreCoqbxNhY=;
+	b=FzEFmOaGCXkqxhm7fCBba5UnkYALl43qLXF+V8HJ2UrDth5YQTYjXuQolAMSVYHjjTTHaT
+	w3yvTxaAVCZ0LoaeH5SrWYNou439nfpg+/O8y+GsWa1CmeFvXmyMx/mYD6nNL+ZxhMTGpe
+	tTr7q1bivPAkSYBEaoU4aUHX4P1a7PI=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-92-ec3pu3XiN-KEIQq79vxKnQ-1; Wed, 29 May 2024 10:24:36 -0400
+X-MC-Unique: ec3pu3XiN-KEIQq79vxKnQ-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a5a812308daso108176466b.0
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 07:24:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716992675; x=1717597475;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CaOh1l0Lu41LPYOrXz2nXavJQHgEuj8sHreCoqbxNhY=;
+        b=bTb67VrN2iKDtFrEfiwFd7gl0DovaZe3jiQ2oqkJ3V8fI0mPo/nckRvsBJ8JnkcObA
+         usMegA4eOaXKaSQxOrVycq02JXR+0XpDW0xyRzSLRRQSKUZUMqzUkRAZDVsnk0EggjmW
+         W1F7eG5M/IqQRjQge0NFapxemEpqJPBKCvGbDj3t3mS3RQszVfD0WfGE2+VGDm6Bih+d
+         FUliwsG01QWuU8uS5g3p32lT4xThMJ2GoO77YyIWcd6EiC+eu4mCirj2VLdRXjMU9Kox
+         6gh6op0lkLr9RD1CI15E3l1HoV6qlSIC8jT4RsoFHMIeWKLxfa9F/sJORt0Q1700qANQ
+         uDMw==
+X-Gm-Message-State: AOJu0YzZCI4/vElk3ImB7PYR5Z9TO9Wy0uBLzJ0bCHkl/IoLndMdzjXo
+	KSBXA5Cg8lLoUG1xVL/C+YVs3m0UiIBGo4qWHUvJ/gQ9SahNEBsV/QUznCuELpXK2XG01HD19Jf
+	ZRLTc4JQwVDEv0xXMZhlLiEmbN4zoA9+UEJPfL81bvhnOSj/1CF6vsA==
+X-Received: by 2002:a17:906:413:b0:a63:4e95:5639 with SMTP id a640c23a62f3a-a634e95579dmr280208966b.47.1716992675169;
+        Wed, 29 May 2024 07:24:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEoMcMMypUJzk39vMbEP225084t98GDv20PFArbG9E2Gd05mxwJZaA+E/zvafN6DVb5r8Z9aA==
+X-Received: by 2002:a17:906:413:b0:a63:4e95:5639 with SMTP id a640c23a62f3a-a634e95579dmr280206566b.47.1716992674677;
+        Wed, 29 May 2024 07:24:34 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a626c8176e1sm715455666b.8.2024.05.29.07.24.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 May 2024 07:24:34 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id EFBDF12F7EDE; Wed, 29 May 2024 16:24:33 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Thorsten Blum <thorsten.blum@toblux.com>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Thorsten Blum <thorsten.blum@toblux.com>
+Subject: Re: [PATCH] bpf, devmap: Remove unnecessary if check in for loop
+In-Reply-To: <20240529101900.103913-2-thorsten.blum@toblux.com>
+References: <20240529101900.103913-2-thorsten.blum@toblux.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 29 May 2024 16:24:33 +0200
+Message-ID: <874jaghf1a.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Fixed MAC addresses help with debugging as last four bytes identify the
-network namespace.
+Thorsten Blum <thorsten.blum@toblux.com> writes:
 
-Moreover, it allows to mimic the real life setup with for example bridge
-having the same MAC address on each port.
+> The iterator variable dst cannot be NULL and the if check can be
+> removed.
+>
+> Remove it and fix the following Coccinelle/coccicheck warning reported
+> by itnull.cocci:
+>
+> 	ERROR: iterator variable bound on line 762 cannot be NULL
+>
+> Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
 
-Signed-off-by: Lukasz Majewski <lukma@denx.de>
----
- tools/testing/selftests/net/hsr/hsr_redbox.sh | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/tools/testing/selftests/net/hsr/hsr_redbox.sh b/tools/testing/selftests/net/hsr/hsr_redbox.sh
-index 1f36785347c0..998103502d5d 100755
---- a/tools/testing/selftests/net/hsr/hsr_redbox.sh
-+++ b/tools/testing/selftests/net/hsr/hsr_redbox.sh
-@@ -96,6 +96,21 @@ setup_hsr_interfaces()
- 	ip -n "${ns4}" link set ns4eth1 up
- 	ip -n "${ns5}" link set ns5eth1 up
- 
-+	ip -net "$ns1" link set address 00:11:22:00:01:01 dev ns1eth1
-+	ip -net "$ns1" link set address 00:11:22:00:01:02 dev ns1eth2
-+
-+	ip -net "$ns2" link set address 00:11:22:00:02:01 dev ns2eth1
-+	ip -net "$ns2" link set address 00:11:22:00:02:02 dev ns2eth2
-+	ip -net "$ns2" link set address 00:11:22:00:02:03 dev ns2eth3
-+
-+	ip -net "$ns3" link set address 00:11:22:00:03:11 dev ns3eth1
-+	ip -net "$ns3" link set address 00:11:22:00:03:11 dev ns3eth2
-+	ip -net "$ns3" link set address 00:11:22:00:03:11 dev ns3eth3
-+	ip -net "$ns3" link set address 00:11:22:00:03:11 dev ns3br1
-+
-+	ip -net "$ns4" link set address 00:11:22:00:04:01 dev ns4eth1
-+	ip -net "$ns5" link set address 00:11:22:00:05:01 dev ns5eth1
-+
- 	ip -net "${ns1}" link add name hsr1 type hsr slave1 ns1eth1 slave2 ns1eth2 supervision 45 version ${HSRv} proto 0
- 	ip -net "${ns2}" link add name hsr2 type hsr slave1 ns2eth1 slave2 ns2eth2 interlink ns2eth3 supervision 45 version ${HSRv} proto 0
- 
--- 
-2.20.1
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
 
