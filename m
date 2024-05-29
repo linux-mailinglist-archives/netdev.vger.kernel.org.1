@@ -1,136 +1,126 @@
-Return-Path: <netdev+bounces-98928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18CDA8D324F
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 10:53:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22F708D3252
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 10:53:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA3E61F217D2
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 08:53:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 351F71C211CF
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 08:53:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D65169361;
-	Wed, 29 May 2024 08:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF6C2168C1C;
+	Wed, 29 May 2024 08:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AiNB/EY5"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="MQ3ElqNr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B81A168C3B
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 08:50:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657EF1667E7
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 08:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716972619; cv=none; b=s1nYjmQ4SrbaAolpGmA0n84HLhZq7TLasNmL8dknQD5GxKtSFKB0qcUTZpKaxRcYCwPcl0u6JpggxwLb4gBpy0ODTE+XxZVH6TDk8dz2UbtmZpJqQ8asBxht9S6EVdUl9dtWK7X7Tjk/m6puuqTk0zws/Ft/4pWNYDRB8BGc5+I=
+	t=1716972785; cv=none; b=BZyHDdYtcBpBwS2rF8/ytxdhHqoznxnhXJKPVAX5TkXDCwao6Xylnhb8CeLx7shCUMNmDF2Mi0NqGJ9GDXyP4kVn8xDYiSNebHnjkGAefm8hxXyBpHotPLpvFzcHiwlcWithQrlVR2j/p+yrRrGCMXDlimsKzH5knE6lMK3Fexg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716972619; c=relaxed/simple;
-	bh=LWhapFlrYGlL3YLRtm+zR6NsKskGY0BJuUVe1XxwHE0=;
+	s=arc-20240116; t=1716972785; c=relaxed/simple;
+	bh=QCfVXtnCs7WY3k2qMYQ4vLPo1KSeBO4uzrNDFx+BWog=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BVqJC408IoMVD04VwU4QYe/a0NBRkDTgaxYDY/ODCtp7cLCB0QxMTMMJSG/hgO1SbYfRwA1esM4F+wL3DrSDeKPz5QzsLvr8ZYTNpdhMYBOhqJuuJsVSJx/qD+On6PF6RCjpkw8Tk1rRQdyRBX55MCqir+K4nO6gylh7CjVqzPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AiNB/EY5; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a6302bdb54aso251973666b.0
-        for <netdev@vger.kernel.org>; Wed, 29 May 2024 01:50:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716972616; x=1717577416; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K0XUQiMDJ7IOckNnbNQGqUrJQwgDDw+TihOSXEGeG6I=;
-        b=AiNB/EY5BH0PD9OPanQxumwHMLGK9kFjPfyhD2Sy/ZWZf51dQuJLOdDurL/Xbmpuwy
-         Djqy7tdNBEViHHt062V1FTkezRlXOrew8eFfaI74NgI6tCwsujODVAN4D828H3Vv79ae
-         HH38E8+hflGhh6nVw8N9qX58SDxWpYE7tGJk2tevJnGLPZIqcj5czxyu799XygUjqn4S
-         QayXGCR+1PJzTVjAwpDudYAg8QTKtQ4MPm9YKSdW0f4f3Rjgx1ODfYY9TLpPyB2O2YQg
-         DwQPmWegehl4AGdx8pbmUv0yHJi6K90iXMNh5alAnIPbcCSz7Jjsroj4R/a3A9Dzo3oR
-         IE6A==
+	 To:Cc:Content-Type; b=CKEUS/wKE78AuV+So5syS1CdOcg/AgzZeXZS74UZ2uN8DUnf0q2AcBVM7VBbsn3oEqOL8ykUKau944zSAmHS70YSfNvDQ7eR+6HZM1KuUe+FILk1z/Px0mY9aTYfqrOEhk3q1LMduuWU/lARVqXGZrADoC38cthsaSTDHLPYzp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=MQ3ElqNr; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com [209.85.217.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 941443F283
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 08:53:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1716972780;
+	bh=QCfVXtnCs7WY3k2qMYQ4vLPo1KSeBO4uzrNDFx+BWog=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=MQ3ElqNr8PS7NiwHu9Pr6qzQ3kbyjy0FJRaiYDvf5b9/kGro/o9Sq41HTJMjMrCgf
+	 zrR1H5m5c/slKXHundIDzQjbXeif/wh3/lWbIwM86ubl1q6EBgcUoVNm4RLMiCs3R/
+	 NuecBnTZodMyhz3UAJ5DN5DBK16B6ssYVxp3AaQsHu64yFRSbRuX+bjj/WSAZ35TNR
+	 qxccNYxIG4DLOs4EAOrTtCydn1j8NHIoNp+HzDo7+YoRV/S30Iw+ZGd7yCMrTn4bkE
+	 f3dfbc7hx25O9R2/SAYkjjGTv6MbLFn1siddcninKiTDud2nUXiD8M4+PN743F0LdY
+	 d8LzUi4diAD7A==
+Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-48a33435bb5so750605137.0
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 01:53:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716972616; x=1717577416;
+        d=1e100.net; s=20230601; t=1716972779; x=1717577579;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=K0XUQiMDJ7IOckNnbNQGqUrJQwgDDw+TihOSXEGeG6I=;
-        b=npuz6FZzISWCqmYN6x28QOzq8wbXIaESUTiP/fPX1GIcsCWuQrP1EW9B8u4SIh/Ttq
-         HjNmeCE+wRrnMUJpRgV8IJM2bryGu19JUbiMZh9jBRsoIZrdvpHIdzh5eN3N/ZauZRQ2
-         ieRZR3wncfoo8DVpw0Hwq0LGjs1N5XPpAPvLlxYCKKdzNO2ciMJNxnofmn/V7QqNGEif
-         T1ZYARf0kw8ML+OW+LBnCGY0najk4Sm5L8c2iqReOGEBtMb+CKkGAEw7WR/RCnJSGVkH
-         We+GrKWh26lNj+O7Aw57etpzF1PMRRY4YGwcFEUXDT6emo3Jo733k4sWMEnzydW6iC25
-         d/7g==
-X-Forwarded-Encrypted: i=1; AJvYcCUGPxfvUUMl+mLl/Okq5hE4OVkkAfl7jobjr5XOdXEy9ptISrcaYzsHxTF7uXelRrSkTA+U5gEAwhouhAlPXfPASIYpNWph
-X-Gm-Message-State: AOJu0YyjdI5zPhnJYKkrz711d/nxLmTTunxYttZaCuMM8nMxQaWCfADa
-	ky+OvqgOoOkt8KScsdHbz1J9OGe/gpxNp9dniT2YTaR1UdS96nvJODUbezDlV1dit9vcutyFgem
-	NQWSElb1ugevgszpeblEcwO0+U6s=
-X-Google-Smtp-Source: AGHT+IFI1RPK5glHZ/4EktnJKhtO4T9eVv/b1sv89762iFJZPiMwMDmwNBakhvZE9IA0kSAnVtSiVAs0Pi69qR5sLcA=
-X-Received: by 2002:a17:907:9491:b0:a62:e3b2:6676 with SMTP id
- a640c23a62f3a-a62e3b267a8mr728862466b.73.1716972616181; Wed, 29 May 2024
- 01:50:16 -0700 (PDT)
+        bh=QCfVXtnCs7WY3k2qMYQ4vLPo1KSeBO4uzrNDFx+BWog=;
+        b=o5JJYBGHHaq3AOhmPoISaTlSfXbNv7ghD3xzrXkMegnY3gLz8zR/qNPKpxn17snDST
+         mWzg3iypkACDW9mlTZ4LiIuxhsTSUGs5KrhLhvTmhJRFBVsnuguRS/NJop7NRYvQCCuX
+         97BUffvzJcRa3RWY4v5LUTuB76wI+RYsRcsDEe1UutlJwAzLC3pnrXVbeB63FdbEyErI
+         bWVahUppUp5t7WxCmwz1j5sYOnf36Z6fcpM96MDtTn2T+zgbxq/ZfX2dUfZN1yO7q7gF
+         jv5RjYlxfrCLopi6cch/XNQdTNNY7RW4l6zBq3b70RvRQ9qAd+0erQCJru3rfIdNe6Gj
+         kVdw==
+X-Forwarded-Encrypted: i=1; AJvYcCU6ykBafi2EMc4bJXq/D/G6hKGpgNrE7cWntwJqqaEDqhj6VotSiwgBwBQrR+B9kbRHTGBDGNohpRl1UV1Nyjox8ur239D+
+X-Gm-Message-State: AOJu0YzRtHRl+YlceLRNKXK7sYspWKbtsV4ngtpdPgMOrNpu4Fq+wnm6
+	uXJoxI2Hvo3WtEkD/CS9htJuasxq/GvvCkwQ2Js4rqqVak/MnhcJ6KucZ1rRVni0jdKKZ4Jlm7O
+	E7vITkWxUO43mtV6hkzg1urFHYvO/4SrDPXq6E7JEqNcv13uHwaX4oRXUSwIPP1n4/usrSnsVgA
+	XunRORA1/Ixeas+hF8wRxAjTY3Nt5OIP+6Dd7fmgtN4kBH
+X-Received: by 2002:a67:c785:0:b0:47b:9a99:1095 with SMTP id ada2fe7eead31-48a386578a9mr13864465137.22.1716972779559;
+        Wed, 29 May 2024 01:52:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEBU76YpQlFY2UJv0tgEjKDgWppXEyfB71ym+oY7J1c/WWZcbXXSNxBYobvE3FHejzdUgE+u4qAdOFVsGnbUdA=
+X-Received: by 2002:a67:c785:0:b0:47b:9a99:1095 with SMTP id
+ ada2fe7eead31-48a386578a9mr13864453137.22.1716972779220; Wed, 29 May 2024
+ 01:52:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240528171320.1332292-1-yyd@google.com> <ZlbXeytf4RkAI40N@TONYMAC-ALIBABA.local>
-In-Reply-To: <ZlbXeytf4RkAI40N@TONYMAC-ALIBABA.local>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 29 May 2024 16:49:39 +0800
-Message-ID: <CAL+tcoDBdRyrzEtkkZ-9orffzts43-0EKajSpu3-dAVYgMECbg@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/2] tcp: add sysctl_tcp_rto_min_us
-To: Tony Lu <tonylu@linux.alibaba.com>
-Cc: Kevin Yang <yyd@google.com>, David Miller <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+References: <20240528203030.10839-1-aleksandr.mikhalitsyn@canonical.com>
+ <20240529-orchester-abklatsch-2d29bd940e89@brauner> <CANn89iLOqXZO_nD0FBUvJypgTA6NTL2dKvXYDxpMuZReYZXFDQ@mail.gmail.com>
+In-Reply-To: <CANn89iLOqXZO_nD0FBUvJypgTA6NTL2dKvXYDxpMuZReYZXFDQ@mail.gmail.com>
+From: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Date: Wed, 29 May 2024 10:52:48 +0200
+Message-ID: <CAEivzxccCgT17u45c3fRG4=+X-rxLz04L8+B5B4GD=weA5khmQ@mail.gmail.com>
+Subject: Re: [PATCH net] ipv4: correctly iterate over the target netns in inet_dump_ifaddr()
+To: Eric Dumazet <edumazet@google.com>
+Cc: Christian Brauner <brauner@kernel.org>, kuba@kernel.org, dsahern@kernel.org, 
+	pabeni@redhat.com, stgraber@stgraber.org, davem@davemloft.net, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 29, 2024 at 3:21=E2=80=AFPM Tony Lu <tonylu@linux.alibaba.com> =
-wrote:
+On Wed, May 29, 2024 at 10:29=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
+ wrote:
 >
-> On Tue, May 28, 2024 at 05:13:18PM +0000, Kevin Yang wrote:
-> > Adding a sysctl knob to allow user to specify a default
-> > rto_min at socket init time.
+> On Wed, May 29, 2024 at 9:49=E2=80=AFAM Christian Brauner <brauner@kernel=
+.org> wrote:
 > >
-> > After this patch series, the rto_min will has multiple sources:
-> > route option has the highest precedence, followed by the
-> > TCP_BPF_RTO_MIN socket option, followed by this new
-> > tcp_rto_min_us sysctl.
+> > On Tue, May 28, 2024 at 10:30:30PM +0200, Alexander Mikhalitsyn wrote:
+> > > A recent change to inet_dump_ifaddr had the function incorrectly iter=
+ate
+> > > over net rather than tgt_net, resulting in the data coming for the
+> > > incorrect network namespace.
+> > >
+> > > Fixes: cdb2f80f1c10 ("inet: use xa_array iterator to implement inet_d=
+ump_ifaddr()")
+> > > Reported-by: St=C3=A9phane Graber <stgraber@stgraber.org>
+> > > Closes: https://github.com/lxc/incus/issues/892
+> > > Bisected-by: St=C3=A9phane Graber <stgraber@stgraber.org>
+> > > Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical=
+.com>
+> > > Tested-by: St=C3=A9phane Graber <stgraber@stgraber.org>
+> > > ---
+> >
+> > Acked-by: Christian Brauner <brauner@kernel.org>
 >
-> For series:
->
-> Reviewed-by: Tony Lu <tonylu@linux.alibaba.com>
->
-> I strongly support those patches. For those who use cgroup v1 and want
-> to take effect with simple settings, sysctl is a good way.
+> Thanks a lot for the bisection and the fix !
 
-It's not a good reason to use sysctl.
-
-If you say so, why not introduce many sysctls to replace setsockopt
-operations. For example, introducing a new sysctl to disable delayed
-ack to improve the speed of transmission in some cases just for ease
-of use? No, it's not right, I believe.
-
->
-> And reducing it is helpful for latency-sensitive applications such as
-> Redis, net namespace level sysctl knob is enough.
-
-Sure, these key parameters play a big role in the TCP stack.
+Thanks, Eric!
 
 >
-> >
-> > Kevin Yang (2):
-> >   tcp: derive delack_max with tcp_rto_min helper
-> >   tcp: add sysctl_tcp_rto_min_us
-> >
-> >  Documentation/networking/ip-sysctl.rst | 13 +++++++++++++
-> >  include/net/netns/ipv4.h               |  1 +
-> >  net/ipv4/sysctl_net_ipv4.c             |  8 ++++++++
-> >  net/ipv4/tcp.c                         |  3 ++-
-> >  net/ipv4/tcp_ipv4.c                    |  1 +
-> >  net/ipv4/tcp_output.c                  | 11 ++---------
-> >  6 files changed, 27 insertions(+), 10 deletions(-)
-> >
-> > --
-> > 2.45.1.288.g0e0cd299f1-goog
-> >
->
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
 
