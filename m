@@ -1,100 +1,109 @@
-Return-Path: <netdev+bounces-99018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F2AA8D3632
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 14:20:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 607BC8D3661
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 14:28:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AAEA2896F3
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 12:20:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 485201C22080
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 12:28:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5550A17F371;
-	Wed, 29 May 2024 12:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 034DB181301;
+	Wed, 29 May 2024 12:28:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="arF9ebZd"
+	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="Mu5HFaL+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275CA13699A;
-	Wed, 29 May 2024 12:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C71181300
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 12:28:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716985231; cv=none; b=Rv3CED12J0AS7mQoU8ceZQxjjT3tN5zB2a7Ae/iVlD7RjP1uYDmoxi8Xs6+MZHF62ypkhsLYq4UIpTbw32zlmz4wJUn2Xulx4hEd/CGrvR103i9q9lXmOOzSoesen0Yw8tR42kRvqrGV54zGT9syRsPfGZKHclDRSWl6jMTxU58=
+	t=1716985703; cv=none; b=t8u2X7TP/eWqPt7WRKNtdVavicLxow+ur3t3gojWDv1A7VlRoJEWobatYTVg6fIP7c0h9Exdxn+OaqjO0rifH8TEVxjxqnfBXQ2ViFcqRnibywaiuJ94S/Ts5ymLfe39bcCQENWCikYAXeEWXC9O2zMyHAMcbQvutqPZmVMGnBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716985231; c=relaxed/simple;
-	bh=zjr/Vpc8ZTFCMrq5QTgDG0SNTzCLyB69RToX1iQy6pI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RPxLLhBFN8bDWiN2JoH68kag+kUWDYAwotdSFQJySrQWkDar5JsDEXLWZz+8BmMejtDuf0aWfUK6r6ZWTjWXBGw/UzucShThpkWx5oIPyDOImNKtWoxRM5VsXyVeXv0Q6uUja0MWYe1hGjG0sMhu4YbebcB04cDJEuWVzked/74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=arF9ebZd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A0BC6C32789;
-	Wed, 29 May 2024 12:20:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716985230;
-	bh=zjr/Vpc8ZTFCMrq5QTgDG0SNTzCLyB69RToX1iQy6pI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=arF9ebZdTVp5LM2K8ZRf22mDTCKyhPoQ++0dmHnGOzjRvDFSClVkx705QFLFK/+9t
-	 VlJK0w1aMwE8MOHhC9vOn+cR1T/JacYA7j8EJ/mrDqGVQWVDAaqnFD8u+x5dz9mjdC
-	 5/R8dVfHpKewpqd7ea5KCBz/UL16vnZUt754Pc+aofUcWcVOCF7Md+tHXiz9y06M1M
-	 +PAzZfm+n089A/DfSe1ck6Wq1hq9YO0K7S+8yorG7UYBNYh+iy4SDgVuIr8d+8uxno
-	 //HfExEXUMIu82YUwfOU/PZsOq4TnQxWOj2Urn8VtJPS6X0EysmXPLfF/NpPr9KpAR
-	 9XlAkKhKl4OKg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8FBB1CF21E0;
-	Wed, 29 May 2024 12:20:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1716985703; c=relaxed/simple;
+	bh=ySznY15wnrHBfTkbi5EC9eAvvASJDzWbRIEbP5QWD+s=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=YpwHFMgaQBhsoU0DDcCMFdlRGmm6/4ZFU60EFcWN0gxlyF0fwcF0JPYCojnECWjmmFeFc8G23eBMDGYs+x39oZK+3Sq2aOsku+iE6huAcpF13moDFY+QrSICbsv8Cw0snf7xiVnB3OGl8VIYKF+zJTb8unBmThYIIQjdteZgIGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=Mu5HFaL+; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-52b4fcbf078so473927e87.0
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 05:28:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1716985700; x=1717590500; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ySznY15wnrHBfTkbi5EC9eAvvASJDzWbRIEbP5QWD+s=;
+        b=Mu5HFaL+XbDLrI/NqUYLqGXy7E8GuH07LvPvq0mmP4VaTrrXjaIJBJnQ+aRO72F2nx
+         1yeZ5bHelP/9OFNMorIYqiuhgR1hgz22s0rW6kx/2yN8LSWdMYhMWX9i07pafLwSSbZT
+         s+vE5LmhH2fgLwFWWwNsjl4/V4eZ9poTaqZUcxKxIXbrEL0DmXPS0Z3HJ5BgSnHwnm6s
+         kGl5vsf/+/IWDFgPJQO/zt59v8HXAIPqZc7VI5gjWQouTwTGdoeezJmUZGIAIPOXTk+q
+         3gEfSzCVBhKdlBx+SWFtqDx1SZmHptPAzMlSFOssyRzpnhM1xNRxzz1EhFDx9+O9+mDu
+         wflA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716985700; x=1717590500;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ySznY15wnrHBfTkbi5EC9eAvvASJDzWbRIEbP5QWD+s=;
+        b=LVBwyfGOLd9Z4AUYqidcM2+jIcRjHbakwxIy0PqJ3XKDlZzj7welCrD1A52tiy8mnz
+         FVlBMWtZtWFsXrJC0Qxrm/gdFCGm5+QXWq4JxMV692FAJVq0SCleC0WCBdbE20mOp6yV
+         gCMoGV4QYE62uiaQYSiDBZjDBtTuYF0zvSXe14iwJK8jDc2CcRiVToIezXQnVb8H6bBk
+         OAoeHz1r5TZhoFqyd7LK5O36Db8pyq4LYTxJsabH5KQZedbL5skx9rMSLHbnR9xiZ7zo
+         pAt0RX+BettZ0KmS7tJ+37RDYf4imYUy512RNxD0N7zmFk2QBha+EN35DWFg3fyp8Zll
+         Uy6w==
+X-Forwarded-Encrypted: i=1; AJvYcCUopNAIas2RpZcJrrEw88EWzPEuCDgbMueIkyvqr1d1DEgO3te5rrk5m9uwQG8mHhRyrWUjAS4hRgfTRK1DfC4onSsPc4qa
+X-Gm-Message-State: AOJu0YxHixGyePr+bmIJdYv3Vsdc0wvLYEHtfSGWGX0DhdHOnwwePx94
+	aL/VTd2KVfpMSwra9sjU1yqbSshdyJrjZCnUcwV/qgORsJAkXBu9iPBUjRaw/ZM=
+X-Google-Smtp-Source: AGHT+IFrWAzaE8PQPbS1lHEQsHNbjtPO4EvO4xqjbtrm6Bmcj+RR+5EVYRO2id5/xurwQ7KIt7jVaw==
+X-Received: by 2002:a05:6512:1388:b0:51a:c8bb:fcf7 with SMTP id 2adb3069b0e04-5296410a55dmr11510790e87.3.1716985700463;
+        Wed, 29 May 2024 05:28:20 -0700 (PDT)
+Received: from smtpclient.apple ([2001:a61:aa3:5c01:cd2:ba1a:442b:4269])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-578524bb86bsm8025057a12.97.2024.05.29.05.28.19
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 29 May 2024 05:28:20 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/2] net: xilinx_gmii2rgmii: Add clock support 
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171698523058.1887.13954040665462825862.git-patchwork-notify@kernel.org>
-Date: Wed, 29 May 2024 12:20:30 +0000
-References: <20240528062008.1594657-1-vineeth.karumanchi@amd.com>
-In-Reply-To: <20240528062008.1594657-1-vineeth.karumanchi@amd.com>
-To: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
-Cc: git@amd.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- harini.katakam@amd.com, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, michal.simek@amd.com, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
+Subject: Re: [PATCH net] net: smc91x: Remove commented out code
+From: Thorsten Blum <thorsten.blum@toblux.com>
+In-Reply-To: <6f596a8bf3f0ff2c498e7b6cf922fa28bd0dbef4.camel@redhat.com>
+Date: Wed, 29 May 2024 14:28:08 +0200
+Cc: Nicolas Pitre <nico@fluxnic.net>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ =?utf-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ Breno Leitao <leitao@debian.org>,
+ netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <2CDEA048-9955-4822-ADA7-DE4A5E85383C@toblux.com>
+References: <20240527105557.266833-2-thorsten.blum@toblux.com>
+ <6f596a8bf3f0ff2c498e7b6cf922fa28bd0dbef4.camel@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+X-Mailer: Apple Mail (2.3774.600.62)
 
-Hello:
+On 28. May 2024, at 15:36, Paolo Abeni <pabeni@redhat.com> wrote:
+> This is net-next material, please re-submit targeting the correct tree
+> in the subj prefix.
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Hi Paolo, I resubmitted the patch [1] with the correct prefix.
 
-On Tue, 28 May 2024 11:50:06 +0530 you wrote:
-> Add input clock support to gmii_to_rgmii IP.
-> Add "clocks" bindings for the input clock.
-> 
-> Changes in v3:
-> - Added items constraints.
-> 
-> Changes in v2:
-> - removed "clkin" clock name property.
-> v2 link : https://lore.kernel.org/netdev/20240517054745.4111922-1-vineeth.karumanchi@amd.com/
-> 
-> [...]
+Thanks,
+Thorsten
 
-Here is the summary with links:
-  - [net-next,v3,1/2] dt-bindings: net: xilinx_gmii2rgmii: Add clock support
-    https://git.kernel.org/netdev/net-next/c/c1d96671088f
-  - [net-next,v3,2/2] net: phy: xilinx-gmii2rgmii: Adopt clock support
-    https://git.kernel.org/netdev/net-next/c/daab0ac53e77
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+[1] =
+https://lore.kernel.org/linux-kernel/20240528160036.404946-2-thorsten.blum=
+@toblux.com/=
 
