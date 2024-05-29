@@ -1,210 +1,196 @@
-Return-Path: <netdev+bounces-98985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDADF8D34F9
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 12:56:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A68B8D351C
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 13:06:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3814284D0F
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 10:56:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD33D1F24C80
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 11:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E236B17B513;
-	Wed, 29 May 2024 10:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11DFA16DECF;
+	Wed, 29 May 2024 11:06:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EcArVvro"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="QdgR5TAF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FF6517B4FD
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 10:56:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A98167D9C;
+	Wed, 29 May 2024 11:06:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716980170; cv=none; b=k3fsL2fhap7HMJdcyoXhg7lW16QvVCnLEbhkGkW68fXAPULM/wADSJ/3ks72NGLCHHqNheupncOabvGksS4FO7oVHWGOXZq5Ue+wtRl9Ph5k/I11Sa6pMFmEd25WAjMZNAo8TzHFRMckfuYL5M4Gv2UiHsA4iFsxgpYhZCyGKAQ=
+	t=1716980791; cv=none; b=VrxlaqxNO2/ecvjhoRVhzP38zaub6FnzCeET4hh7jPBOP5zpTMfTF0GWNyGXi/Y2iAkzWpao06uW3Sm3Wh43+28YnmmH+58a/H4pHsU4coyWpT/mWvTwbydeDbGXFIIoiBmHiVgxEAmWHqC+prBQo5gsLKoRLBybBSCEzdU/nmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716980170; c=relaxed/simple;
-	bh=2eq9RHpWGnbH5bMsvZ9gjK91MtzdKTlb2oxg+DVHL3U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ozkFOjAfAluC/8XHh93decDjiChwlMnCIM8Vp+3/1rp1x+lyo91ju27bnh0yI9GV6L98bJnNdZuOaYQKGqSSxsFZ3qyjUB5uW76eZTXtfdtLy9YpMF4R2tDOCeELbxtCX2qBjaxyZkvkWZ4A5duMhu+m+LXlkwmzUoHKYVxoJ48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EcArVvro; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716980168;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V/IW4Faf1WCV8kgopnLSo94ttZs/Y2hkDErm/OSdzVk=;
-	b=EcArVvroa6p8EV6aJ2SAiIAN3aVsQlqHPmjCj6HFY8qpGdOlgvMnvorGURGpMBs4zGxKqz
-	+WTUiFjwqXJGyDBEbSqMQWXxnX23N7PnKbRIvFvBTcKk806GsOAkWGWGLZ779TOl3x9+u7
-	cuAnEpxZUtqN25Uv/659iQqiSCAUIXQ=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-589-tyEuEHzLNy6WfCxonqv6oQ-1; Wed, 29 May 2024 06:56:06 -0400
-X-MC-Unique: tyEuEHzLNy6WfCxonqv6oQ-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-43fb0949d28so13091181cf.0
-        for <netdev@vger.kernel.org>; Wed, 29 May 2024 03:56:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716980166; x=1717584966;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V/IW4Faf1WCV8kgopnLSo94ttZs/Y2hkDErm/OSdzVk=;
-        b=gfXlxmMLTWV51yzeDuh+lHED25YGDpaRtIwIxFh6xxyDJRT1OjmMyqukCxyQ52BBaC
-         9r1n6IauPj/tikFwQcn8/pUmHU9YCSUdpOD+t72SOSASniatAUeE2h6+AjHpxdObmsD5
-         dMeqBVeAwT7eSpZdNNdwXwzwagdfXVncd17CyVoV77kMhTYO7J+zIrZS+NhDLCtkghoC
-         yEmeSzBDLoEhBIGT3+sLj11rAnvIcxobYWoEj7saCNiIn8klBw0qS8eW57dxpS/7Q81c
-         ChSxK1TY0rvRfBllLSYLQWWQRxTubWcm97qzU3a57FGrnwgdbwK4auhRDJSA7ZFWtadU
-         G6ZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUmQgC4joJPeOeT2YfN4J7kqiMUBNjY1VUE38V+0UIMTxnTniNsb9lYP0jtHN/p79kh6SCW2KighzutJ1qVcCu4WIP3+fyU
-X-Gm-Message-State: AOJu0YyebTlGpXtllhsebpaPgIMVb62osSlmf5A8seH4MnikHZuFcUz/
-	JXsCNx3bHA0Jmy1bSmIbqDbj9CjX2xNHe3lcdqQZiovsfr93iPctM4fZtvaElF0JFJuFS4XwJkw
-	mjg5IZErdyimB6wnQRNIY9+r7On6xE2N5F0eU4JDN6uC55WbZVdjkkw==
-X-Received: by 2002:ac8:5ad4:0:b0:43a:c0c7:a218 with SMTP id d75a77b69052e-43fe12871b8mr24606881cf.33.1716980166359;
-        Wed, 29 May 2024 03:56:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGYZXr2GVdAp/Ri4KfEP1VHGQ64i7iFk7NFAo87pQluTH/X3DAr8lzSE1WqVCix95BVrkz/+A==
-X-Received: by 2002:ac8:5ad4:0:b0:43a:c0c7:a218 with SMTP id d75a77b69052e-43fe12871b8mr24606671cf.33.1716980165996;
-        Wed, 29 May 2024 03:56:05 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-53-30-109.retail.telecomitalia.it. [79.53.30.109])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43fb1832368sm52838811cf.57.2024.05.29.03.56.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 May 2024 03:56:05 -0700 (PDT)
-Date: Wed, 29 May 2024 12:55:53 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Alexander Graf <graf@amazon.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@csgraf.de>, 
-	Dorjoy Chowdhury <dorjoychy111@gmail.com>, virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	netdev@vger.kernel.org, stefanha@redhat.com
-Subject: Re: How to implement message forwarding from one CID to another in
- vhost driver
-Message-ID: <hyrgztjkjmftnpra2o2skonfs6bwf2sqrncwtec3e4ckupe5ea@76whtcp3zapf>
-References: <6wn6ikteeanqmds2i7ar4wvhgj42pxpo2ejwbzz5t2i5cw3kov@omiadvu6dv6n>
- <5b3b1b08-1dc2-4110-98d4-c3bb5f090437@amazon.com>
- <554ae947-f06e-4b69-b274-47e8a78ae962@amazon.com>
- <14e68dd8-b2fa-496f-8dfc-a883ad8434f5@redhat.com>
- <c5wziphzhyoqb2mwzd2rstpotjqr3zky6hrgysohwsum4wvgi7@qmboatooyddd>
- <CABgObfasyA7U5Fg5r0gGoFAw73nwGJnWBYmG8vqf0hC2E8SPFw@mail.gmail.com>
- <sejux5gvpakaopre6mk3fyudi2f56hiuxuevfzay3oohg773kd@5odm3x3fryuq>
- <CABgObfb-KrmJzr4YBtuN3+_HLm3S1hmjO7uEy0+AxSDeWE3uWg@mail.gmail.com>
- <l5oxnxkg7owmwuadknttnnl2an37wt3u5kgfjb5563f7llbgwj@bvwfv5d7wrq4>
- <3b6a1f23-bf0e-416d-8880-4556b87b5137@amazon.com>
+	s=arc-20240116; t=1716980791; c=relaxed/simple;
+	bh=LFEb5r9tpFH2MXGhiD3uFiu9MuDouEJbXBFwVjXzvow=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HnSuqybpoFAyP1+boUNGzkeJJqBC8H+iylkTlRE9Xygx3SdGOsbmZLFBJstXZickQxWte8BMwFMlX0ybWS/+goOsc2Qjd6lHRqLTeNYn4MZEIFUcT9LXX3aewo30DFc9QE8GvPsP/D3bfm5QppbWDUv5CVYIWo0vMwQFW0Knri8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=QdgR5TAF; arc=none smtp.client-ip=198.47.23.248
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44TB5tBe099912;
+	Wed, 29 May 2024 06:05:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1716980755;
+	bh=imtC2JoljHGjHsHTdzPWpwajqU1EqCw5odY/Mi7dIlE=;
+	h=From:To:CC:Subject:Date;
+	b=QdgR5TAFOQuitXfhSIE3RJU9i2qJUiaB9GxYTxl/STTHKSKoR2D88TixfhmGDAExO
+	 hvGqClArt+hZldrPE2n+LdQrVpKueeN+8vAo8SSCLxH5LxFFLLYbfnwZ8CqU1oWHpk
+	 nsbg/bStOi5M66+JhX3fUYAsLQZmnMZ2c2util7Y=
+Received: from DLEE100.ent.ti.com (dlee100.ent.ti.com [157.170.170.30])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44TB5tO3012379
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 29 May 2024 06:05:55 -0500
+Received: from DLEE108.ent.ti.com (157.170.170.38) by DLEE100.ent.ti.com
+ (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 29
+ May 2024 06:05:54 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE108.ent.ti.com
+ (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 29 May 2024 06:05:54 -0500
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44TB5s2w035943;
+	Wed, 29 May 2024 06:05:54 -0500
+Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 44TB5rJl016488;
+	Wed, 29 May 2024 06:05:54 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Jan Kiszka <jan.kiszka@siemens.com>,
+        Dan Carpenter
+	<dan.carpenter@linaro.org>,
+        Andrew Lunn <andrew@lunn.ch>, Simon Horman
+	<horms@kernel.org>,
+        Diogo Ivo <diogo.ivo@siemens.com>,
+        Wolfram Sang
+	<wsa+renesas@sang-engineering.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Vladimir Oltean
+	<vladimir.oltean@nxp.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Richard
+ Cochran <richardcochran@gmail.com>,
+        Roger Quadros <rogerq@kernel.org>,
+        MD
+ Danish Anwar <danishanwar@ti.com>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub
+ Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S.
+ Miller" <davem@davemloft.net>
+CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>
+Subject: [PATCH net-next v8 0/2] Add TAPRIO offload support for ICSSG driver
+Date: Wed, 29 May 2024 16:35:49 +0530
+Message-ID: <20240529110551.620907-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <3b6a1f23-bf0e-416d-8880-4556b87b5137@amazon.com>
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Wed, May 29, 2024 at 12:43:57PM GMT, Alexander Graf wrote:
->
->On 29.05.24 10:04, Stefano Garzarella wrote:
->>
->>On Tue, May 28, 2024 at 06:38:24PM GMT, Paolo Bonzini wrote:
->>>On Tue, May 28, 2024 at 5:53 PM Stefano Garzarella 
->>><sgarzare@redhat.com> wrote:
->>>>
->>>>On Tue, May 28, 2024 at 05:49:32PM GMT, Paolo Bonzini wrote:
->>>>>On Tue, May 28, 2024 at 5:41 PM Stefano Garzarella 
->>>><sgarzare@redhat.com> wrote:
->>>>>> >I think it's either that or implementing virtio-vsock in userspace
->>>>>> >(https://lore.kernel.org/qemu-devel/30baeb56-64d2-4ea3-8e53-6a5c50999979@redhat.com/,
->>>>>> >search for "To connect host<->guest").
->>>>>>
->>>>>> For in this case AF_VSOCK can't be used in the host, right?
->>>>>> So it's similar to vhost-user-vsock.
->>>>>
->>>>>Not sure if I understand but in this case QEMU knows which CIDs are
->>>>>forwarded to the host (either listen on vsock and connect to the host,
->>>>>or vice versa), so there is no kernel and no VMADDR_FLAG_TO_HOST
->>>>>involved.
->>>>
->>>>I meant that the application in the host that wants to connect to the
->>>>guest cannot use AF_VSOCK in the host, but must use the one where QEMU
->>>>is listening (e.g. AF_INET, AF_UNIX), right?
->>>>
->>>>I think one of Alex's requirements was that the application in the host
->>>>continue to use AF_VSOCK as in their environment.
->>>
->>>Can the host use VMADDR_CID_LOCAL for host-to-host communication?
->>
->>Yep!
->>
->>>If
->>>so, the proposed "-object vsock-forward" syntax can connect to it and
->>>it should work as long as the application on the host does not assume
->>>that it is on CID 3.
->>
->>Right, good point!
->>We can also support something similar in vhost-user-vsock, where instead
->>of using AF_UNIX and firecracker's hybrid vsock, we can redirect
->>everything to VMADDR_CID_LOCAL.
->>
->>Alex what do you think? That would simplify things a lot to do.
->>The only difference is that the application in the host has to talk to
->>VMADDR_CID_LOCAL (1).
->
->
->The application in the host would see an incoming connection from CID 
->1 (which is probably fine) and would still be able to establish 
->outgoing connections to the actual VM's CID as long as the Enclave 
->doesn't check for the peer CID (I haven't seen anyone check yet). So 
->yes, indeed, this should work.
->
->The only case where I can see it breaking is when you run multiple 
->Enclave VMs in parallel. In that case, each would try to listen to CID 
->3 and the second that does would fail. But it's a well solvable 
->problem: We could (in addition to the simple in-QEMU case) build an 
->external daemon that does the proxying and hence owns CID3.
+This series adds taprio offload support for ICSSG driver.
 
-Well, we can modify vhost-user-vsock for that. It's already a daemon, 
-already supports different VMs per single daemon but as of now they have 
-to have different CIDs.
+Patch [1/2] of the series moves some structures and API definition to .h
+files so that these can be accessed by taprio (icssg_qos.c) file.
 
->
->So the immediate plan would be to:
->
->  1) Build a new vhost-vsock-forward object model that connects to 
->vhost as CID 3 and then forwards every packet from CID 1 to the 
->Enclave-CID and every packet that arrives on to CID 3 to CID 2.
+Patch [2/2] of the series introduces the taprio support for icssg driver.
 
-This though requires writing completely from scratch the virtio-vsock 
-emulation in QEMU. If you have time that would be great, otherwise if 
-you want to do a PoC, my advice is to start with vhost-user-vsock which 
-is already there.
+Changes from v7 to v8:
+*) Modified commit message of patch 2/2 to state both ICSSG Switch and
+   dual-emac firmware supports taprio offload as pointed out by
+   Andrew Lunn <andrew@lunn.ch>
+*) Rebased on latest net-next/main
 
-Thanks,
-Stefano
+Changes from v6 to v7:
+*) Rebased on 6.10-rc1.
+*) Removed RFC tag, no functional changes.
 
->  2) Create a machine option for -M nitro-enclave that automatically 
->spawns the vhost-vsock-forward object. (default: off)
->
->
->The above may need some fiddling with object creation times to ensure 
->that the forward object gets CID 3, not the Enclave as auto-assigned 
->CID.
->
->
->Thanks,
->
->Alex
->
->
->
->
->Amazon Web Services Development Center Germany GmbH
->Krausenstr. 38
->10117 Berlin
->Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
->Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
->Sitz: Berlin
->Ust-ID: DE 365 538 597
+Changes from v5 to v6:
+*) Added RFC tag as net-next is closed now.
+*) Created a new patch for "the struct definition move" and made this
+   series instead of single patch as suggested by
+   Paolo Abeni <pabeni@redhat.com>.
+*) Removed est_new structure as that is no longer used.
+*) Freeing qos.tas.taprio_admin using taprio_offload_free() as suggested
+   by Paolo Abeni <pabeni@redhat.com>
+*) Clearing taprio_admin and taprio in error case in emac_taprio_replace()
+   API using goto label taprio_clear.
+*) Added RB tag of Simon Horman <horms@kernel.org> 
+
+Changes from v4 to v5:
+*) Rebased on latest net-next/main [commit 5c4c0edca68a]
+*) Moved icss_iep structure to icss_iep.h file so that iep wraparound time
+   which is stored in iep->def_inc, can be accessed by qos file.
+*) Added comment about IEP wraparound time compensation in icssg_qos.c
+*) Moved icssg_qos_tas_init() to prueth_netdev_init() so that icssg_qos_tas_init()
+   gets called even if interface is down.
+*) Fixed print statements as suggested by Vladimir Oltean <vladimir.oltean@nxp.com>
+*) Added taprio_offload_get() and taprio_offload_free() in emac_taprio_replace()
+   and emac_taprio_destory() respectively.
+
+Changes from v3 to v4:
+*) Rebased on the latest next-20231005 linux-next.
+*) Addressed Roger and Vinicius' comments and moved all the validations to
+   emac_taprio_replace() API.
+*) Modified emac_setup_taprio() API to use switch case based on taprio->cmd
+   and added emac_taprio_destroy() and emac_taprio_replace() APIs.
+*) Modified the documentation of structs / enums in icssg_qos.h by using
+   the correct kdoc format.
+
+Changes from v2 to v3:
+*) Rebased on the latest next-20230928 linux-next.
+*) Retained original authorship of the patch.
+*) Addressed Roger's comments and modified emac_setup_taprio() and
+   emac_set_taprio() APIs accordingly.
+*) Removed netif_running() check from emac_setup_taprio().
+*) Addressed Vinicius' comments and added check for MIN and MAX cycle time.
+*) Added check for allocation failure of est_new in emac_setup_taprio().
+
+Changes from v1 to v2:
+*) Rebased on the latest next-20230921 linux-next.
+*) Dropped the RFC tag as merge window is open now.
+*) Splitted this patch from the switch mode series [v1].
+*) Removed TODO comment as asked by Andrew and Roger.
+*) Changed Copyright to 2023 as asked by Roger.
+
+v7: https://lore.kernel.org/all/20240527055300.154563-1-danishanwar@ti.com/
+v6: https://lore.kernel.org/all/20240515065042.2852877-1-danishanwar@ti.com/
+v5: https://lore.kernel.org/all/20240429103022.808161-1-danishanwar@ti.com/
+v4: https://lore.kernel.org/all/20231006102028.3831341-1-danishanwar@ti.com/
+v3: https://lore.kernel.org/all/20230928103000.186304-1-danishanwar@ti.com/
+v2: https://lore.kernel.org/all/20230921070031.795788-1-danishanwar@ti.com/
+v1: https://lore.kernel.org/all/20230830110847.1219515-1-danishanwar@ti.com/
+
+MD Danish Anwar (1):
+  net: ti: icssg: Move icss_iep structure
+
+Roger Quadros (1):
+  net: ti: icssg_prueth: add TAPRIO offload support
+
+ drivers/net/ethernet/ti/Kconfig              |   1 +
+ drivers/net/ethernet/ti/Makefile             |   3 +-
+ drivers/net/ethernet/ti/icssg/icss_iep.c     |  72 -----
+ drivers/net/ethernet/ti/icssg/icss_iep.h     |  73 ++++-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c |   5 +-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h |   5 +
+ drivers/net/ethernet/ti/icssg/icssg_qos.c    | 288 +++++++++++++++++++
+ drivers/net/ethernet/ti/icssg/icssg_qos.h    | 113 ++++++++
+ 8 files changed, 485 insertions(+), 75 deletions(-)
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.h
+
+
+base-commit: 2942dfab630444d46aaa37fb7d629b620abbf6ba
+-- 
+2.34.1
 
 
