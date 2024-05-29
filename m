@@ -1,172 +1,129 @@
-Return-Path: <netdev+bounces-99115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85E098D3BC2
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:05:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 239C08D3BCD
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:06:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E49971F226B7
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:05:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7D651F2380C
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:06:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03936181D15;
-	Wed, 29 May 2024 16:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 348C318413D;
+	Wed, 29 May 2024 16:05:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="OYadAFve"
+	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="ASnKYqZX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mta-64-228.siemens.flowmailer.net (mta-64-228.siemens.flowmailer.net [185.136.64.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 687AD42044;
-	Wed, 29 May 2024 16:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18BF0139588
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 16:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716998720; cv=none; b=Q7fefEVeGPvvQJgo+DERsqYs5BIHjuutXaGqd7j86T/srMKIDIUDuO2bCunil+eUDbLf3MgPdUNhRzkXO9Ud/8Tv6hmvgYvD+6fVhTePcIH+b8tmRJ9NHbJalnr4Jnms3AVdD0ulk3EnW/SxA9PYQzoXArfA+TrdybBhttqj2lE=
+	t=1716998745; cv=none; b=N25bAgwPZtZUaIW2vpldklQb3GL7EUWPh7cUilv3tKIAPOc6BBzmc7wRYdIpw0wMdyeQ8TzjOdVOHCsr0aeCmkSwiZaTtKHlbfsfB7MrO+p0VyMQbpwwGQpCADOeoOE9IH/C1eItEM2Ge1IPTL5eVvHrWrfbpunc3hp63ZocK/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716998720; c=relaxed/simple;
-	bh=gt5rwrr05fd8R3dFco0BPD0V9ATpbhhRHWZLtS9tMYc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=oa6OeyOJsyuDmmkUOODl6vZGuvINFMBwlSIbPPzVKUyWcfWfy00wzdUERQEAbWmk4hxoueBeihrZAgS1l/7cqy4tLVaE3BdLip5H5kmmAiRFtnYGiIAOkJCoDYDEF5l8lhis6U4t4Gwniw+MrHjNJFcZGc3hW3BqL6OLTcYZ3HI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=OYadAFve; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44TApiKD032629;
-	Wed, 29 May 2024 16:04:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	3y//tl+TCZv9BP/UPxsuXIME5LjiaLN+uQZckGjm1hQ=; b=OYadAFve3Ca9fuee
-	9AtxgvdSj+51mfink7tiLiWLtNhAIqXRaNL/riJ4XBtSh1Q9+0ldwGsYLSiF2Q0i
-	7lxjWBy3rnV5Bklhklo0a+Tn5w21MHyDUoXh0YB56LrIM55o81mGv8ebiwp9LshU
-	HEXMu22zhMzrcf2sIW11wtc/CWfq3nQAR4hqSe3iREN1xba/dPS5QFpAoUdP8NUK
-	tVetDBbhEd6FviEqod+hT27i/ofh9I0vJvyuP3c/zAjgzsi148la6XWSBWJsBHkw
-	E2I/zWcQMPXY1EXafIlU9AZGcd5dGD+5bELGAAk+e+yDruNjdfoLY9sNcLBhse5t
-	ogG7kA==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yba0x9e09-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 May 2024 16:04:53 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 44TG4qCB012594
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 May 2024 16:04:52 GMT
-Received: from [10.110.47.143] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 29 May
- 2024 09:04:47 -0700
-Message-ID: <f27a87dd-52d3-460c-ae07-cf598eebcce4@quicinc.com>
-Date: Wed, 29 May 2024 09:04:46 -0700
+	s=arc-20240116; t=1716998745; c=relaxed/simple;
+	bh=gwX2kkdkZRLairWU2xTI1d16ODW2DyEZw3WNUACnlWk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=GV/Ur+aZzcOeR/R3NrktzPiVbXrCDPc+y3cJxK0lnCuhDRVLSZtE/5/HwVzbmowFhqlbNY2Dq33NqOQRPNB5iMMwWXdYD6FpdUF+dmL3F9WXTMwSlFFtWDS0JVpz8vpdlykMIHRdXZNWXhWRq0uBROjXlDTvQKblEssAcUtNxj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=ASnKYqZX; arc=none smtp.client-ip=185.136.64.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-64-228.siemens.flowmailer.net with ESMTPSA id 2024052916053368880d2b3a43e03d26
+        for <netdev@vger.kernel.org>;
+        Wed, 29 May 2024 18:05:34 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
+ d=siemens.com; i=diogo.ivo@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
+ bh=0Y8mqvn+ASO0qgqEBYkV7o/QyQw+Qg4BOBuSdQRySBU=;
+ b=ASnKYqZXzj31Ew5QmPDwoTZ2XUPiW8iQq1pA7F+DQoOViQJ6Gje+tA1/PTnJYeCSut2YVM
+ qxiHD1L+r8D24Lu06fGqQSwL80xB/eT8Vpe9PX87fbSVGlOJoFsFzJXKFB37bH4HtVCX46iF
+ WpqlFu0u0FN2CH8Uzw8HQLVWLWns8=;
+From: Diogo Ivo <diogo.ivo@siemens.com>
+Subject: [PATCH 0/3] Enable PTP timestamping/PPS for AM65x SR1.0 devices
+Date: Wed, 29 May 2024 17:05:09 +0100
+Message-Id: <20240529-iep-v1-0-7273c07592d3@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: validate SO_TXTIME clockid coming from userspace
-Content-Language: en-US
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
-        "Martin
- KaFai Lau" <martin.lau@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>
-CC: <kernel@quicinc.com>,
-        <syzbot+d7b227731ec589e7f4f0@syzkaller.appspotmail.com>,
-        <syzbot+30a35a2e9c5067cc43fa@syzkaller.appspotmail.com>
-References: <20240528224935.1020828-1-quic_abchauha@quicinc.com>
- <665734886e2a9_31b2672946e@willemb.c.googlers.com.notmuch>
- <3d04ff60-c01b-4718-ae3d-70d19ee2019a@quicinc.com>
- <6657510aa54a4_32016c29461@willemb.c.googlers.com.notmuch>
-From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-In-Reply-To: <6657510aa54a4_32016c29461@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: g2-mAer2FxIIp9H5zv9k4hWYkYH9BIeV
-X-Proofpoint-ORIG-GUID: g2-mAer2FxIIp9H5zv9k4hWYkYH9BIeV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-29_12,2024-05-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
- mlxlogscore=999 priorityscore=1501 clxscore=1015 bulkscore=0 phishscore=0
- malwarescore=0 mlxscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2405170001
- definitions=main-2405290111
+X-B4-Tracking: v=1; b=H4sIADVSV2YC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDUyNL3czUAl2LpCSTROPkJEsDMwsloMqCotS0zAqwKdGxtbUAvyR4M1U
+ AAAA=
+To: MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, Nishanth Menon <nm@ti.com>, 
+ Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Jan Kiszka <jan.kiszka@siemens.com>
+Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
+ Diogo Ivo <diogo.ivo@siemens.com>
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1716998732; l=2334;
+ i=diogo.ivo@siemens.com; s=20240529; h=from:subject:message-id;
+ bh=gwX2kkdkZRLairWU2xTI1d16ODW2DyEZw3WNUACnlWk=;
+ b=p8e2carzdqE3em6oz7uTTHcMm8aNDjPGFGRJ3Bo2Zb2h9cFywKIi20rkffqeBDCUVtOF9/xPQ
+ Gc/l9HZbxmFBp2EKuJyuwknWSs6/LHkP8W2f0PQAhwd3Jkw34/pX/rx
+X-Developer-Key: i=diogo.ivo@siemens.com; a=ed25519;
+ pk=BRGXhMh1q5KDlZ9y2B8SodFFY8FGupal+NMtJPwRpUQ=
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-1320519:519-21489:flowmailer
 
+This patch series enables support for PTP in AM65x SR1.0 devices.
 
+This feature relies heavily on the Industrial Ethernet Peripheral
+(IEP) hardware module, which implements a hardware counter through
+which time is kept. This hardware block is the basis for exposing
+a PTP hardware clock to userspace and for issuing timestamps for
+incoming/outgoing packets, allowing for time synchronization.
 
-On 5/29/2024 9:00 AM, Willem de Bruijn wrote:
-> Abhishek Chauhan (ABC) wrote:
->>
->>
->> On 5/29/2024 6:58 AM, Willem de Bruijn wrote:
->>> minor: double space before userspace
->>>
->>> Abhishek Chauhan wrote:
->>>> Currently there are no strict checks while setting SO_TXTIME
->>>> from userspace. With the recent development in skb->tstamp_type
->>>> clockid with unsupported clocks results in warn_on_once, which causes
->>>> unnecessary aborts in some systems which enables panic on warns.
->>>>
->>>> Add validation in setsockopt to support only CLOCK_REALTIME,
->>>> CLOCK_MONOTONIC and CLOCK_TAI to be set from userspace.
->>>>
->>>> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
->>>> Link: https://lore.kernel.org/lkml/20240509211834.3235191-1-quic_abchauha@quicinc.com/
->>>
->>> These discussions can be found directly from the referenced commit?
->>> If any, I'd like to the conversation we had that arrived at this
->>> approach.
->>>
->> Not Directly but from the patch series. 
->> 1. First link is for why we introduced skb->tstamp_type 
->> 2. Second link points to the series were we discussed on two approach to solve the problem 
->> one being limit the skclockid to just TAI,MONO and REALTIME. 
-> 
-> Ah, I missed that.
-> Perhaps point directly to the start of that follow-up conversation?
-> Thanks Willem, Let me do that when i raise the net-next patch. 
-> https://lore.kernel.org/lkml/6bdba7b6-fd22-4ea5-a356-12268674def1@quicinc.com/
-> 
->>
->>
->>>> Fixes: 1693c5db6ab8 ("net: Add additional bit to support clockid_t timestamp type")
->>>> Reported-by: syzbot+d7b227731ec589e7f4f0@syzkaller.appspotmail.com
->>>> Closes: https://syzkaller.appspot.com/bug?extid=d7b227731ec589e7f4f0
->>>> Reported-by: syzbot+30a35a2e9c5067cc43fa@syzkaller.appspotmail.com
->>>> Closes: https://syzkaller.appspot.com/bug?extid=30a35a2e9c5067cc43fa
->>>> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
->>>> ---
->>>>  net/core/sock.c | 16 ++++++++++++++++
->>>>  1 file changed, 16 insertions(+)
->>>>
->>>> diff --git a/net/core/sock.c b/net/core/sock.c
->>>> index 8629f9aecf91..f8374be9d8c9 100644
->>>> --- a/net/core/sock.c
->>>> +++ b/net/core/sock.c
->>>> @@ -1083,6 +1083,17 @@ bool sockopt_capable(int cap)
->>>>  }
->>>>  EXPORT_SYMBOL(sockopt_capable);
->>>>  
->>>> +static int sockopt_validate_clockid(int value)
->>>
->>> sock_txtime.clockid has type __kernel_clockid_t.
->>>
->>
->>  __kernel_clockid_t is typedef of int.  
->> It is now, but the stricter type definition exists for a reason.
-> Try to keep the strict types where possible. Besides aiding
-> syntactic checks, it also helps self document code.
-Okay i see what you are saying. Makes sense. I will change it to __kernel_clockid_t
+The IEP also has compare registers that fire an interrupt when the
+counter reaches the value stored in a compare register. This feature
+allows us to support PPS events in the kernel.
+
+The changes are separated into three patches:
+ - PATCH 01/03: Register SR1.0 devices with the IEP infrastructure to
+		expose a PHC clock to userspace, allowing time to be
+		adjusted using standard PTP tools. The code for issuing/
+		collecting packet timestamps is already present in the
+		current state of the driver, so only this needs to be
+		done.
+ - PATCH 02/03: Add support for IEP compare event/interrupt handling
+		to enable PPS events.
+ - PATCH 03/03: Add the interrupts to the IOT2050 device tree.
+
+Currently every compare event generates two interrupts, the first
+corresponding to the actual event and the second being a spurious
+but otherwise harmless interrupt. The root cause of this has been
+identified and has been solved in the platform's SDK. A forward port
+of the SDK's patches also fixes the problem in upstream but is not
+included here since it's upstreaming is out of the scope of this
+series. If someone from TI would be willing to chime in and help
+get the interrupt changes upstream that would be great!
+
+Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
+---
+Diogo Ivo (3):
+      net: ti: icssg-prueth: Enable PTP timestamping support for SR1.0 devices
+      net: ti: icss-iep: Enable compare events
+      arm64: dts: ti: iot2050: Add IEP interrupts for SR1.0 devices
+
+ .../boot/dts/ti/k3-am65-iot2050-common-pg1.dtsi    | 12 ++++
+ drivers/net/ethernet/ti/icssg/icss_iep.c           | 71 ++++++++++++++++++++++
+ drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c   | 49 ++++++++++++++-
+ 3 files changed, 131 insertions(+), 1 deletion(-)
+---
+base-commit: 2f0e3f6a6824dfda2759225326d9c69203c06bc8
+change-id: 20240529-iep-8bb4a3cb9068
+
+Best regards,
+-- 
+Diogo Ivo <diogo.ivo@siemens.com>
+
 
