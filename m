@@ -1,154 +1,214 @@
-Return-Path: <netdev+bounces-98983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F30B8D34BF
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 12:44:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D5C58D34F1
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 12:54:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EC3A1F24C65
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 10:44:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C209BB23ADF
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 10:54:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B4AD17B4E7;
-	Wed, 29 May 2024 10:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D804D17B4E7;
+	Wed, 29 May 2024 10:54:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UEs3BvXI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i90DO7cw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D85617B43A;
-	Wed, 29 May 2024 10:44:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3641383A5
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 10:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716979447; cv=none; b=cMYqqE3nGO3CaCSpXqJA0j8TyaUZGG8lHvLsCvPYsvZJA2lZs8JCi3E1UxaTtR0vtb+j00rKolwlQPlTUj90mUHWTlJiEcy7WC+2pULuUlFlk5lpvakA77JYaljc+CtFhzEvdsUycWYAOnlcHRhVYXDZczk7CLt0EDpYd281eSA=
+	t=1716980085; cv=none; b=Ms0ixA62osvJuUeBuqFWnoyjWLvDrGRKlD8Am/tlSmCoIx+vZmrVOaAW55/qpDAscA64k8ywiksw7Ajd4XOp4O8Lyynvn2JWV7ckePNgOu2KixrMknMY7RsJiS3/a8+1iF77ZYWt1/QFK0BL+t21snqkQbUeGP9v7cXEcq8b8nE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716979447; c=relaxed/simple;
-	bh=Xe+KvPT0VlpkIFzdkKtgchm88os6xAuCWXQsegL4ACU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=jdIn+6gMJSldTbko+U0RhklQRf3b2Z3bLVamxamKh2eUhp0CW/4OcskRcbXTJwyymHff4O8tRhoC8gFQCVUVBJ8k3g/aBacVlvj1bNfJpY1YN5F25TZGDctyeamOkQuFnJ4EBW8YXNkUfQdNfKGRi6sO/skMBenD1K9YqX4zNmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UEs3BvXI; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1716979446; x=1748515446;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Xe+KvPT0VlpkIFzdkKtgchm88os6xAuCWXQsegL4ACU=;
-  b=UEs3BvXIYLfuUq2gtT/dMEN5205bebix+cko07/xYRkPQlZD83Eg+Hhg
-   lRKfTWpqFl9F3NQzt/7XTMngEzBJ6PWugd/B+iQ2LZRKS0ELd+2ZIqKWW
-   guBpfG06Gzn9qfANNFjU8Grdqw3CHfMa8CBjkx3qQPkjZvKDecnodY2Km
-   4=;
-X-IronPort-AV: E=Sophos;i="6.08,198,1712620800"; 
-   d="scan'208";a="208246025"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 May 2024 10:44:04 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:44854]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.1.254:2525] with esmtp (Farcaster)
- id 3377ad01-ef86-4b4c-a352-82fbb1b96b24; Wed, 29 May 2024 10:44:02 +0000 (UTC)
-X-Farcaster-Flow-ID: 3377ad01-ef86-4b4c-a352-82fbb1b96b24
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 29 May 2024 10:44:02 +0000
-Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
- (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Wed, 29 May
- 2024 10:43:59 +0000
-Message-ID: <3b6a1f23-bf0e-416d-8880-4556b87b5137@amazon.com>
-Date: Wed, 29 May 2024 12:43:57 +0200
+	s=arc-20240116; t=1716980085; c=relaxed/simple;
+	bh=4V/sresAqPdiTF9fC5C0nQAFIWSRcOBsf41vCnRgJco=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gNR+g3uIF5UUvBYdUVGTszufIDmdz1JNROqu3UWueuq1fjmcsS6kcx6SHYqY31HSnDRIYDlXwiJSqMhXfzRJVbjDE7nyly76sm/ZFlJlcPTWr2yeqPrdXRfE2/KuY7b1iOKq3si+fWybuy9RU27AUzcVNTaJYI8O3ZVfgcZggXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i90DO7cw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00C5AC2BD10;
+	Wed, 29 May 2024 10:54:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716980085;
+	bh=4V/sresAqPdiTF9fC5C0nQAFIWSRcOBsf41vCnRgJco=;
+	h=From:To:Cc:Subject:Date:From;
+	b=i90DO7cwCIp5k/ewVCWkcqRRTWlntjVtb8p1ZdvfOf6PG1cs3WdAZugo/zsfpSeyE
+	 yh639arBGg59p5Vl59jkYew8jqvJKhyTzqOlLc8HxGGH07A21HMEDJoGJILSJgfYRX
+	 qFRBnwmESeyKc+X3k4dsDFCTUO9XTuv6T6N8B95vHwt+oD4zyNwtRaU5gR0dA4A7B8
+	 esEf6ykmGUkeuVX2FysBz0XlPKLuYxhEKJ+X5baV3wPMYOzTIg+Wix5P085Bv9fkVh
+	 /vOE7aX836CuX98SDwr3yzJQBLiR5ig5ORK8eh+V0r4APLOlU4ZCuutpw5HZf7pPYB
+	 lOMxaT2s4Um2A==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: netdev@vger.kernel.org
+Cc: arinc.unal@arinc9.com,
+	daniel@makrotopia.org,
+	dqfext@gmail.com,
+	sean.wang@mediatek.com,
+	andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-mediatek@lists.infradead.org,
+	lorenzo.bianconi83@gmail.com,
+	nbd@nbd.name
+Subject: [PATCH net-next] net: dsa: mt7530: Add debugfs support
+Date: Wed, 29 May 2024 12:54:37 +0200
+Message-ID: <0999545cf558ded50087e174096bb631e59b5583.1716979901.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: How to implement message forwarding from one CID to another in
- vhost driver
-To: Stefano Garzarella <sgarzare@redhat.com>, Paolo Bonzini
-	<pbonzini@redhat.com>
-CC: Alexander Graf <agraf@csgraf.de>, Dorjoy Chowdhury
-	<dorjoychy111@gmail.com>, <virtualization@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <netdev@vger.kernel.org>, <stefanha@redhat.com>
-References: <CAFfO_h7iNYc3jrDvnAxTyaGWMxM9YK29DAGYux9s1ve32tuEBw@mail.gmail.com>
- <3a62a9d1-5864-4f00-bcf0-2c64552ee90c@csgraf.de>
- <6wn6ikteeanqmds2i7ar4wvhgj42pxpo2ejwbzz5t2i5cw3kov@omiadvu6dv6n>
- <5b3b1b08-1dc2-4110-98d4-c3bb5f090437@amazon.com>
- <554ae947-f06e-4b69-b274-47e8a78ae962@amazon.com>
- <14e68dd8-b2fa-496f-8dfc-a883ad8434f5@redhat.com>
- <c5wziphzhyoqb2mwzd2rstpotjqr3zky6hrgysohwsum4wvgi7@qmboatooyddd>
- <CABgObfasyA7U5Fg5r0gGoFAw73nwGJnWBYmG8vqf0hC2E8SPFw@mail.gmail.com>
- <sejux5gvpakaopre6mk3fyudi2f56hiuxuevfzay3oohg773kd@5odm3x3fryuq>
- <CABgObfb-KrmJzr4YBtuN3+_HLm3S1hmjO7uEy0+AxSDeWE3uWg@mail.gmail.com>
- <l5oxnxkg7owmwuadknttnnl2an37wt3u5kgfjb5563f7llbgwj@bvwfv5d7wrq4>
-Content-Language: en-US
-From: Alexander Graf <graf@amazon.com>
-In-Reply-To: <l5oxnxkg7owmwuadknttnnl2an37wt3u5kgfjb5563f7llbgwj@bvwfv5d7wrq4>
-X-ClientProxiedBy: EX19D043UWA003.ant.amazon.com (10.13.139.31) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 
-Ck9uIDI5LjA1LjI0IDEwOjA0LCBTdGVmYW5vIEdhcnphcmVsbGEgd3JvdGU6Cj4KPiBPbiBUdWUs
-IE1heSAyOCwgMjAyNCBhdCAwNjozODoyNFBNIEdNVCwgUGFvbG8gQm9uemluaSB3cm90ZToKPj4g
-T24gVHVlLCBNYXkgMjgsIDIwMjQgYXQgNTo1M+KAr1BNIFN0ZWZhbm8gR2FyemFyZWxsYSAKPj4g
-PHNnYXJ6YXJlQHJlZGhhdC5jb20+IHdyb3RlOgo+Pj4KPj4+IE9uIFR1ZSwgTWF5IDI4LCAyMDI0
-IGF0IDA1OjQ5OjMyUE0gR01ULCBQYW9sbyBCb256aW5pIHdyb3RlOgo+Pj4gPk9uIFR1ZSwgTWF5
-IDI4LCAyMDI0IGF0IDU6NDHigK9QTSBTdGVmYW5vIEdhcnphcmVsbGEgCj4+PiA8c2dhcnphcmVA
-cmVkaGF0LmNvbT4gd3JvdGU6Cj4+PiA+PiA+SSB0aGluayBpdCdzIGVpdGhlciB0aGF0IG9yIGlt
-cGxlbWVudGluZyB2aXJ0aW8tdnNvY2sgaW4gdXNlcnNwYWNlCj4+PiA+PiAKPj4+ID4oaHR0cHM6
-Ly9sb3JlLmtlcm5lbC5vcmcvcWVtdS1kZXZlbC8zMGJhZWI1Ni02NGQyLTRlYTMtOGU1My02YTVj
-NTA5OTk5NzlAcmVkaGF0LmNvbS8sCj4+PiA+PiA+c2VhcmNoIGZvciAiVG8gY29ubmVjdCBob3N0
-PC0+Z3Vlc3QiKS4KPj4+ID4+Cj4+PiA+PiBGb3IgaW4gdGhpcyBjYXNlIEFGX1ZTT0NLIGNhbid0
-IGJlIHVzZWQgaW4gdGhlIGhvc3QsIHJpZ2h0Pwo+Pj4gPj4gU28gaXQncyBzaW1pbGFyIHRvIHZo
-b3N0LXVzZXItdnNvY2suCj4+PiA+Cj4+PiA+Tm90IHN1cmUgaWYgSSB1bmRlcnN0YW5kIGJ1dCBp
-biB0aGlzIGNhc2UgUUVNVSBrbm93cyB3aGljaCBDSURzIGFyZQo+Pj4gPmZvcndhcmRlZCB0byB0
-aGUgaG9zdCAoZWl0aGVyIGxpc3RlbiBvbiB2c29jayBhbmQgY29ubmVjdCB0byB0aGUgaG9zdCwK
-Pj4+ID5vciB2aWNlIHZlcnNhKSwgc28gdGhlcmUgaXMgbm8ga2VybmVsIGFuZCBubyBWTUFERFJf
-RkxBR19UT19IT1NUCj4+PiA+aW52b2x2ZWQuCj4+Pgo+Pj4gSSBtZWFudCB0aGF0IHRoZSBhcHBs
-aWNhdGlvbiBpbiB0aGUgaG9zdCB0aGF0IHdhbnRzIHRvIGNvbm5lY3QgdG8gdGhlCj4+PiBndWVz
-dCBjYW5ub3QgdXNlIEFGX1ZTT0NLIGluIHRoZSBob3N0LCBidXQgbXVzdCB1c2UgdGhlIG9uZSB3
-aGVyZSBRRU1VCj4+PiBpcyBsaXN0ZW5pbmcgKGUuZy4gQUZfSU5FVCwgQUZfVU5JWCksIHJpZ2h0
-Pwo+Pj4KPj4+IEkgdGhpbmsgb25lIG9mIEFsZXgncyByZXF1aXJlbWVudHMgd2FzIHRoYXQgdGhl
-IGFwcGxpY2F0aW9uIGluIHRoZSBob3N0Cj4+PiBjb250aW51ZSB0byB1c2UgQUZfVlNPQ0sgYXMg
-aW4gdGhlaXIgZW52aXJvbm1lbnQuCj4+Cj4+IENhbiB0aGUgaG9zdCB1c2UgVk1BRERSX0NJRF9M
-T0NBTCBmb3IgaG9zdC10by1ob3N0IGNvbW11bmljYXRpb24/Cj4KPiBZZXAhCj4KPj4gSWYKPj4g
-c28sIHRoZSBwcm9wb3NlZCAiLW9iamVjdCB2c29jay1mb3J3YXJkIiBzeW50YXggY2FuIGNvbm5l
-Y3QgdG8gaXQgYW5kCj4+IGl0IHNob3VsZCB3b3JrIGFzIGxvbmcgYXMgdGhlIGFwcGxpY2F0aW9u
-IG9uIHRoZSBob3N0IGRvZXMgbm90IGFzc3VtZQo+PiB0aGF0IGl0IGlzIG9uIENJRCAzLgo+Cj4g
-UmlnaHQsIGdvb2QgcG9pbnQhCj4gV2UgY2FuIGFsc28gc3VwcG9ydCBzb21ldGhpbmcgc2ltaWxh
-ciBpbiB2aG9zdC11c2VyLXZzb2NrLCB3aGVyZSBpbnN0ZWFkCj4gb2YgdXNpbmcgQUZfVU5JWCBh
-bmQgZmlyZWNyYWNrZXIncyBoeWJyaWQgdnNvY2ssIHdlIGNhbiByZWRpcmVjdAo+IGV2ZXJ5dGhp
-bmcgdG8gVk1BRERSX0NJRF9MT0NBTC4KPgo+IEFsZXggd2hhdCBkbyB5b3UgdGhpbms/IFRoYXQg
-d291bGQgc2ltcGxpZnkgdGhpbmdzIGEgbG90IHRvIGRvLgo+IFRoZSBvbmx5IGRpZmZlcmVuY2Ug
-aXMgdGhhdCB0aGUgYXBwbGljYXRpb24gaW4gdGhlIGhvc3QgaGFzIHRvIHRhbGsgdG8KPiBWTUFE
-RFJfQ0lEX0xPQ0FMICgxKS4KCgpUaGUgYXBwbGljYXRpb24gaW4gdGhlIGhvc3Qgd291bGQgc2Vl
-IGFuIGluY29taW5nIGNvbm5lY3Rpb24gZnJvbSBDSUQgMSAKKHdoaWNoIGlzIHByb2JhYmx5IGZp
-bmUpIGFuZCB3b3VsZCBzdGlsbCBiZSBhYmxlIHRvIGVzdGFibGlzaCBvdXRnb2luZyAKY29ubmVj
-dGlvbnMgdG8gdGhlIGFjdHVhbCBWTSdzIENJRCBhcyBsb25nIGFzIHRoZSBFbmNsYXZlIGRvZXNu
-J3QgY2hlY2sgCmZvciB0aGUgcGVlciBDSUQgKEkgaGF2ZW4ndCBzZWVuIGFueW9uZSBjaGVjayB5
-ZXQpLiBTbyB5ZXMsIGluZGVlZCwgdGhpcyAKc2hvdWxkIHdvcmsuCgpUaGUgb25seSBjYXNlIHdo
-ZXJlIEkgY2FuIHNlZSBpdCBicmVha2luZyBpcyB3aGVuIHlvdSBydW4gbXVsdGlwbGUgCkVuY2xh
-dmUgVk1zIGluIHBhcmFsbGVsLiBJbiB0aGF0IGNhc2UsIGVhY2ggd291bGQgdHJ5IHRvIGxpc3Rl
-biB0byBDSUQgMyAKYW5kIHRoZSBzZWNvbmQgdGhhdCBkb2VzIHdvdWxkIGZhaWwuIEJ1dCBpdCdz
-IGEgd2VsbCBzb2x2YWJsZSBwcm9ibGVtOiAKV2UgY291bGQgKGluIGFkZGl0aW9uIHRvIHRoZSBz
-aW1wbGUgaW4tUUVNVSBjYXNlKSBidWlsZCBhbiBleHRlcm5hbCAKZGFlbW9uIHRoYXQgZG9lcyB0
-aGUgcHJveHlpbmcgYW5kIGhlbmNlIG93bnMgQ0lEMy4KClNvIHRoZSBpbW1lZGlhdGUgcGxhbiB3
-b3VsZCBiZSB0bzoKCiDCoCAxKSBCdWlsZCBhIG5ldyB2aG9zdC12c29jay1mb3J3YXJkIG9iamVj
-dCBtb2RlbCB0aGF0IGNvbm5lY3RzIHRvIAp2aG9zdCBhcyBDSUQgMyBhbmQgdGhlbiBmb3J3YXJk
-cyBldmVyeSBwYWNrZXQgZnJvbSBDSUQgMSB0byB0aGUgCkVuY2xhdmUtQ0lEIGFuZCBldmVyeSBw
-YWNrZXQgdGhhdCBhcnJpdmVzIG9uIHRvIENJRCAzIHRvIENJRCAyLgogwqAgMikgQ3JlYXRlIGEg
-bWFjaGluZSBvcHRpb24gZm9yIC1NIG5pdHJvLWVuY2xhdmUgdGhhdCBhdXRvbWF0aWNhbGx5IApz
-cGF3bnMgdGhlIHZob3N0LXZzb2NrLWZvcndhcmQgb2JqZWN0LiAoZGVmYXVsdDogb2ZmKQoKClRo
-ZSBhYm92ZSBtYXkgbmVlZCBzb21lIGZpZGRsaW5nIHdpdGggb2JqZWN0IGNyZWF0aW9uIHRpbWVz
-IHRvIGVuc3VyZSAKdGhhdCB0aGUgZm9yd2FyZCBvYmplY3QgZ2V0cyBDSUQgMywgbm90IHRoZSBF
-bmNsYXZlIGFzIGF1dG8tYXNzaWduZWQgQ0lELgoKClRoYW5rcywKCkFsZXgKCgoKCkFtYXpvbiBX
-ZWIgU2VydmljZXMgRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAz
-OAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBK
-b25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1
-bnRlciBIUkIgMjU3NzY0IEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMzY1IDUzOCA1OTcK
+Introduce debugfs support for mt7530 dsa switch.
+Add the capability to read or write device registers through debugfs:
+
+$echo 0x7ffc > regidx
+$cat regval
+0x75300000
+
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/dsa/mt7530-mmio.c | 12 +++++++++-
+ drivers/net/dsa/mt7530.c      | 41 +++++++++++++++++++++++++++++++++++
+ drivers/net/dsa/mt7530.h      |  5 +++++
+ 3 files changed, 57 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/dsa/mt7530-mmio.c b/drivers/net/dsa/mt7530-mmio.c
+index b74a230a3f13..cedb046ea2a3 100644
+--- a/drivers/net/dsa/mt7530-mmio.c
++++ b/drivers/net/dsa/mt7530-mmio.c
+@@ -60,7 +60,17 @@ mt7988_probe(struct platform_device *pdev)
+ 	if (IS_ERR(priv->regmap))
+ 		return PTR_ERR(priv->regmap);
+ 
+-	return dsa_register_switch(priv->ds);
++	ret = dsa_register_switch(priv->ds);
++	if (ret)
++		return ret;
++
++	ret = mt7530_register_debugfs(priv);
++	if (ret) {
++		dsa_unregister_switch(priv->ds);
++		return ret;
++	}
++
++	return 0;
+ }
+ 
+ static void mt7988_remove(struct platform_device *pdev)
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index 598434d8d6e4..18cb42a771e8 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -3,6 +3,7 @@
+  * Mediatek MT7530 DSA Switch driver
+  * Copyright (C) 2017 Sean Wang <sean.wang@mediatek.com>
+  */
++#include <linux/debugfs.h>
+ #include <linux/etherdevice.h>
+ #include <linux/if_bridge.h>
+ #include <linux/iopoll.h>
+@@ -271,6 +272,28 @@ mt7530_clear(struct mt7530_priv *priv, u32 reg, u32 val)
+ 	mt7530_rmw(priv, reg, val, 0);
+ }
+ 
++static int
++mt7530_reg_set(void *data, u64 val)
++{
++	struct mt7530_priv *priv = data;
++
++	mt7530_write(priv, priv->debugfs_reg, val);
++
++	return 0;
++}
++
++static int
++mt7530_reg_get(void *data, u64 *val)
++{
++	struct mt7530_priv *priv = data;
++
++	*val = mt7530_read(priv, priv->debugfs_reg);
++
++	return 0;
++}
++
++DEFINE_DEBUGFS_ATTRIBUTE(fops, mt7530_reg_get, mt7530_reg_set, "0x%08llx\n");
++
+ static int
+ mt7530_fdb_cmd(struct mt7530_priv *priv, enum mt7530_fdb_cmd cmd, u32 *rsp)
+ {
+@@ -3218,6 +3241,22 @@ const struct mt753x_info mt753x_table[] = {
+ };
+ EXPORT_SYMBOL_GPL(mt753x_table);
+ 
++int
++mt7530_register_debugfs(struct mt7530_priv *priv)
++{
++	priv->debugfs_dir = debugfs_create_dir(KBUILD_MODNAME, NULL);
++	if (IS_ERR(priv->debugfs_dir))
++		return PTR_ERR(priv->debugfs_dir);
++
++	debugfs_create_u32("regidx", 0600, priv->debugfs_dir,
++			   &priv->debugfs_reg);
++	debugfs_create_file_unsafe("regval", 0600, priv->debugfs_dir, priv,
++				   &fops);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(mt7530_register_debugfs);
++
+ int
+ mt7530_probe_common(struct mt7530_priv *priv)
+ {
+@@ -3252,6 +3291,8 @@ EXPORT_SYMBOL_GPL(mt7530_probe_common);
+ void
+ mt7530_remove_common(struct mt7530_priv *priv)
+ {
++	debugfs_remove(priv->debugfs_dir);
++
+ 	if (priv->irq)
+ 		mt7530_free_irq(priv);
+ 
+diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
+index 2ea4e24628c6..b7568c1c6d5e 100644
+--- a/drivers/net/dsa/mt7530.h
++++ b/drivers/net/dsa/mt7530.h
+@@ -798,6 +798,8 @@ struct mt753x_info {
+  * @create_sgmii:	Pointer to function creating SGMII PCS instance(s)
+  * @active_cpu_ports:	Holding the active CPU ports
+  * @mdiodev:		The pointer to the MDIO device structure
++ * @debugfs_dir:	Debugfs entry point
++ * @debugfs_reg:	Selected register to read or write through debugfs
+  */
+ struct mt7530_priv {
+ 	struct device		*dev;
+@@ -825,6 +827,8 @@ struct mt7530_priv {
+ 	int (*create_sgmii)(struct mt7530_priv *priv);
+ 	u8 active_cpu_ports;
+ 	struct mdio_device *mdiodev;
++	struct dentry *debugfs_dir;
++	u32 debugfs_reg;
+ };
+ 
+ struct mt7530_hw_vlan_entry {
+@@ -861,6 +865,7 @@ static inline void INIT_MT7530_DUMMY_POLL(struct mt7530_dummy_poll *p,
+ 	p->reg = reg;
+ }
+ 
++int mt7530_register_debugfs(struct mt7530_priv *priv);
+ int mt7530_probe_common(struct mt7530_priv *priv);
+ void mt7530_remove_common(struct mt7530_priv *priv);
+ 
+-- 
+2.45.1
 
 
