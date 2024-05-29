@@ -1,162 +1,159 @@
-Return-Path: <netdev+bounces-99197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C0028D4036
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 23:21:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C06D8D4011
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 23:10:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D9781C2188A
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 21:21:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D61251F249E9
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 21:10:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 876B91C2334;
-	Wed, 29 May 2024 21:21:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C63C1C8FC7;
+	Wed, 29 May 2024 21:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b="jG9OM9BQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jfpoWjlx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp113.iad3b.emailsrvr.com (smtp113.iad3b.emailsrvr.com [146.20.161.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2564E542
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 21:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=146.20.161.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A22415CD77;
+	Wed, 29 May 2024 21:10:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717017704; cv=none; b=bRu3PKUVIfzRoYQ0LIz/+zdrLRfHjV66dUAOpX68cIW0Lro0QTvzFOl09OL54fW5L5RSLxo104U1xfoWZWvvagcrWUPF76D/QIJ+FXu2IzPRnv5Q86qFsp2RbqsXehqLDvTSWX0yHAGlJCNFI3Wjw3V470zbhktROGliTIBOf3U=
+	t=1717017008; cv=none; b=X6iWkSodRsA+H2lLhNaOd/7PSTjpf8eKllFmp1xDkWFebkqnrZAN3O99RaEV0pIg/wb7tftFrU9BbM2g8YBUVMc1GKEnuN/ws7ETb74vfQwbaOXufkWST9v0gQhkhSLzVABbIhj/6gbd2211GF1PsHVKYBkU+JjDVy8lgHfyHnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717017704; c=relaxed/simple;
-	bh=gZIbqElXbfJoBpohO3oo2x4JxPeULVyaHlE2qTAlEHM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QKvS4nwaTXELj20Cz9LCrDsdWewRcECM6o4rfxBjWkt1354fgQWuJnf+JI48i1f4SHI51NHmumqrELpdxoDc6B/iwaJ/ItsYp8pntovFk/jWVFkhR1KObD0VG9+n0VQbgVnjjkY8lh40AixPkdeapQ+akr6mqacYUlsWATHSFAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com; spf=pass smtp.mailfrom=oddbit.com; dkim=pass (1024-bit key) header.d=oddbit.com header.i=@oddbit.com header.b=jG9OM9BQ; arc=none smtp.client-ip=146.20.161.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oddbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oddbit.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=oddbit.com;
-	s=20180920-g2b7aziw; t=1717016617;
-	bh=gZIbqElXbfJoBpohO3oo2x4JxPeULVyaHlE2qTAlEHM=;
-	h=From:To:Subject:Date:From;
-	b=jG9OM9BQz73vH128qGBihxB8cpYXEvybIcNjn21kyjCvuGwRjCqLJuAE+CKOIvBhm
-	 B35g8ZeaTEJWyHwB3Pnzd3OjvmbMCEu1HA7ZtAiG7B6F/MF3kqhVfWNvMOES4fvx8i
-	 RyGpawWfim8rPCCGbjpSZOw8UfEzLuvHLGA9xbkA=
-X-Auth-ID: lars@oddbit.com
-Received: by smtp23.relay.iad3b.emailsrvr.com (Authenticated sender: lars-AT-oddbit.com) with ESMTPSA id 84CABA0102;
-	Wed, 29 May 2024 17:03:37 -0400 (EDT)
-From: lars@oddbit.com
-To: netdev@vger.kernel.org,
-	linux-hams@vger.kernel.org
-Cc: Lars Kellogg-Stedman <lars@oddbit.com>,
-	Duoming Zhou <duoming@zju.edu.cn>,
-	Dan Cross <crossd@gmail.com>,
-	Chris Maness <christopher.maness@gmail.com>
-Subject: [PATCH v5] ax25: Fix refcount imbalance on inbound connections
-Date: Wed, 29 May 2024 17:02:43 -0400
-Message-ID: <20240529210242.3346844-2-lars@oddbit.com>
-X-Mailer: git-send-email 2.45.1
+	s=arc-20240116; t=1717017008; c=relaxed/simple;
+	bh=nGQy73DAo3leSbrH36Ug7nwnjOODDwttCseobzHsCIM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SBliNspBNfmN9D2/1uo72o1SqLhXLmp6dvWC8SSnXRh9extDDRnXxRQbkeTjId9497FC65iwQic+WWefPJEv1L6hzA8l1T1dON4yJxtKnDU2m567U1PK/ibFgMsczpx+fZnB42MtUX8u9xjFWep0n8SXaB2luhOMmgsqeCKtzQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jfpoWjlx; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-35dc7d0387cso2537f8f.1;
+        Wed, 29 May 2024 14:10:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717017005; x=1717621805; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7C6JZl3C8DroVKk711JXPTj52xkuM6toBFf9Z9aPOBA=;
+        b=jfpoWjlxovwiWgX0uF3sc1DO9LlzRuqlAqbzEXGWEnXdYKtXFiVKowhpdaS9YJwfwV
+         PzATGdGi7zb9fY5Nl+gkI2kMdhJOL+fGP3EBwIpc8outZdClnKCN56MSxIfd/b8osJE8
+         cltTCggJiToR2ebkWFW+oXBWee60XCqJauY8skglqqygBbkd21XGvKGRPjY8yPTBMDme
+         B2YWCYcDO0jJ/rG3rya3jpBOav4GZrN1eDUWJ0WkozYmPsXUTlmrcFxinxUSOMBmnNyH
+         eZBSi/fGpUUDUib00jaSc28LchpjSGJ87WV1ypfQveK0fPkZRWWUnUdavyhNNQyrccwX
+         YogQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717017005; x=1717621805;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7C6JZl3C8DroVKk711JXPTj52xkuM6toBFf9Z9aPOBA=;
+        b=LZP4kXClJWWI/vWPGPKNWTw/OWhwFIudwv6CWeiufOJN6tzytCo1c9qs3NJKrDRUES
+         PaZZXeRLA4+YJnM2Okh/xWTTftHPHLoRkTpY9jG1HyiBAChDLhp5ftO2Oyab05/7XYCp
+         RC2DQiqXllMTtFjNq0JS0UsYpTy5FPB+RaYa6AyQrbnRvBB3ofWqBwg2vQGOXXrwKJdQ
+         bnfhshqyAL1LwTHtfncwiV3f2rqolsGnUkJym44i7vkdhhisMYWNDM42wNVbj1yh5W/t
+         90JeRwYhvAgYjZ+Jt8mwxHBc3Edh/YDwipxwAg1iMzUcBCODs5vEyKRFndLmT2H8JbUB
+         iQPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU6rcwKbt/uT7IZCRW9eH9X5MD+8psxryQ+MM4uquqBoQ8YMAM0LWjfL2vwlzEEXyDmK7KY8AoAzYOR1U7msxHSKPGa3QhkCRfoKYLMbL6wS9j5/7vWryZl6BA1
+X-Gm-Message-State: AOJu0YwBy58ejzPHrGd9TwNFAc9VaaTAkKk5hMpDwiZGloGSuDRPZPu6
+	p8wI/EyTEDlTi8zLmiNRc+W70J4zBrXKIHCe4TKLWVrKFNIAKNUo1nWop6W0BZv/wuC6Oc87gZa
+	xsf6VG7BkkfcJ/Of8Z+16D/L6JCg=
+X-Google-Smtp-Source: AGHT+IEq7fq4OW9x/wy52LRqJ7hU1NbQGIWaqLnwqTFnDA6Df5a+GDkRV3ynogRd29CbZ3vu7vZ4P0f8oX4fR1eyEQ8=
+X-Received: by 2002:adf:e382:0:b0:355:7e4:3cfb with SMTP id
+ ffacd0b85a97d-35dc008d9aemr246101f8f.23.1717017004596; Wed, 29 May 2024
+ 14:10:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Classification-ID: 26658878-d9cb-4c61-a403-7ac0033a3083-1-1
+References: <20240529162927.403425-1-bigeasy@linutronix.de> <20240529162927.403425-15-bigeasy@linutronix.de>
+In-Reply-To: <20240529162927.403425-15-bigeasy@linutronix.de>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 29 May 2024 14:09:52 -0700
+Message-ID: <CAADnVQLvu-in6g9493vovq=RAtTyaV56CUYpNNbEMT9C++ehjg@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next 14/15] net: Reference bpf_redirect_info via
+ task_struct on PREEMPT_RT.
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Boqun Feng <boqun.feng@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Eric Dumazet <edumazet@google.com>, Frederic Weisbecker <frederic@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Hao Luo <haoluo@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Lars Kellogg-Stedman <lars@oddbit.com>
+On Wed, May 29, 2024 at 9:29=E2=80=AFAM Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+>
+> The XDP redirect process is two staged:
+> - bpf_prog_run_xdp() is invoked to run a eBPF program which inspects the
+>   packet and makes decisions. While doing that, the per-CPU variable
+>   bpf_redirect_info is used.
+>
+> - Afterwards xdp_do_redirect() is invoked and accesses bpf_redirect_info
+>   and it may also access other per-CPU variables like xskmap_flush_list.
+>
+> At the very end of the NAPI callback, xdp_do_flush() is invoked which
+> does not access bpf_redirect_info but will touch the individual per-CPU
+> lists.
+>
+> The per-CPU variables are only used in the NAPI callback hence disabling
+> bottom halves is the only protection mechanism. Users from preemptible
+> context (like cpu_map_kthread_run()) explicitly disable bottom halves
+> for protections reasons.
+> Without locking in local_bh_disable() on PREEMPT_RT this data structure
+> requires explicit locking.
+>
+> PREEMPT_RT has forced-threaded interrupts enabled and every
+> NAPI-callback runs in a thread. If each thread has its own data
+> structure then locking can be avoided.
+>
+> Create a struct bpf_net_context which contains struct bpf_redirect_info.
+> Define the variable on stack, use bpf_net_ctx_set() to save a pointer to
+> it. Use the __free() annotation to automatically reset the pointer once
+> function returns.
+> The bpf_net_ctx_set() may nest. For instance a function can be used from
+> within NET_RX_SOFTIRQ/ net_rx_action which uses bpf_net_ctx_set() and
+> NET_TX_SOFTIRQ which does not. Therefore only the first invocations
+> updates the pointer.
+> Use bpf_net_ctx_get_ri() as a wrapper to retrieve the current struct
+> bpf_redirect_info.
+>
+> On PREEMPT_RT the pointer to bpf_net_context is saved task's
+> task_struct. On non-PREEMPT_RT builds the pointer saved in a per-CPU
+> variable (which is always NODE-local memory). Using always the
+> bpf_net_context approach has the advantage that there is almost zero
+> differences between PREEMPT_RT and non-PREEMPT_RT builds.
+>
+> Cc: Alexei Starovoitov <ast@kernel.org>
+> Cc: Andrii Nakryiko <andrii@kernel.org>
+> Cc: Eduard Zingerman <eddyz87@gmail.com>
+> Cc: Hao Luo <haoluo@google.com>
+> Cc: Jesper Dangaard Brouer <hawk@kernel.org>
+> Cc: Jiri Olsa <jolsa@kernel.org>
+> Cc: John Fastabend <john.fastabend@gmail.com>
+> Cc: KP Singh <kpsingh@kernel.org>
+> Cc: Martin KaFai Lau <martin.lau@linux.dev>
+> Cc: Song Liu <song@kernel.org>
+> Cc: Stanislav Fomichev <sdf@google.com>
+> Cc: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> Cc: Yonghong Song <yonghong.song@linux.dev>
+> Cc: bpf@vger.kernel.org
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-When releasing a socket in ax25_release(), we call netdev_put() to
-decrease the refcount on the associated ax.25 device. However, the
-execution path for accepting an incoming connection never calls
-netdev_hold(). This imbalance leads to refcount errors, and ultimately
-to kernel crashes.
-
-A typical call trace for the above situation will start with one of the
-following errors:
-
-    refcount_t: decrement hit 0; leaking memory.
-    refcount_t: underflow; use-after-free.
-
-And will then have a trace like:
-
-    Call Trace:
-    <TASK>
-    ? show_regs+0x64/0x70
-    ? __warn+0x83/0x120
-    ? refcount_warn_saturate+0xb2/0x100
-    ? report_bug+0x158/0x190
-    ? prb_read_valid+0x20/0x30
-    ? handle_bug+0x3e/0x70
-    ? exc_invalid_op+0x1c/0x70
-    ? asm_exc_invalid_op+0x1f/0x30
-    ? refcount_warn_saturate+0xb2/0x100
-    ? refcount_warn_saturate+0xb2/0x100
-    ax25_release+0x2ad/0x360
-    __sock_release+0x35/0xa0
-    sock_close+0x19/0x20
-    [...]
-
-On reboot (or any attempt to remove the interface), the kernel gets
-stuck in an infinite loop:
-
-    unregister_netdevice: waiting for ax0 to become free. Usage count = 0
-
-This patch corrects these issues by ensuring that we call netdev_hold()
-and ax25_dev_hold() for new connections in ax25_accept(). This makes the
-logic leading to ax25_accept() match the logic for ax25_bind(): in both
-cases we increment the refcount, which is ultimately decremented in
-ax25_release().
-
-Fixes: 9fd75b66b8f6 ("ax25: Fix refcount leaks caused by ax25_cb_del()")
-Signed-off-by: Lars Kellogg-Stedman <lars@oddbit.com>
-Tested-by: Duoming Zhou <duoming@zju.edu.cn>
-Tested-by: Dan Cross <crossd@gmail.com>
-Tested-by: Chris Maness <christopher.maness@gmail.com>
----
- net/ax25/af_ax25.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-v3:
-- Address naveenm's comments regarding the ordering of variable declarations
-  (https://lore.kernel.org/netdev/SJ2PR18MB5635B7ADC7339BEDB79B183DA2EA2@SJ2PR18MB5635.namprd18.prod.outlook.com/)
-
-v4:
-- Respond to kuba's comments regarding the Fixes: tag
-  (https://lore.kernel.org/netdev/20240522100701.4d9edf99@kernel.org/)
-
-v5:
-- Respond to pabeni's comments regarding the Fixes: tag and running
-  checkpatch.pl
-  (https://lore.kernel.org/netdev/8e9a1c59f78a7774268bb6defed46df6f3771cbc.camel@redhat.com/)
-- Respond to dan.carpenter's request about rewording the commit message
-  (https://lore.kernel.org/netdev/962afcda-8f67-400f-b3eb-951bf2e46fb7@moroto.mountain/)
-- Accept duoming's suggestion for the Fixes: tag
-  (https://lore.kernel.org/netdev/3cf699c4.20d18.18fc4df304a.Coremail.duoming@zju.edu.cn/)
-
-diff --git a/net/ax25/af_ax25.c b/net/ax25/af_ax25.c
-index 8077cf2ee44..d6f9fae06a9 100644
---- a/net/ax25/af_ax25.c
-+++ b/net/ax25/af_ax25.c
-@@ -1378,8 +1378,10 @@ static int ax25_accept(struct socket *sock, struct socket *newsock,
- {
- 	struct sk_buff *skb;
- 	struct sock *newsk;
-+	ax25_dev *ax25_dev;
- 	DEFINE_WAIT(wait);
- 	struct sock *sk;
-+	ax25_cb *ax25;
- 	int err = 0;
- 
- 	if (sock->state != SS_UNCONNECTED)
-@@ -1434,6 +1436,10 @@ static int ax25_accept(struct socket *sock, struct socket *newsock,
- 	kfree_skb(skb);
- 	sk_acceptq_removed(sk);
- 	newsock->state = SS_CONNECTED;
-+	ax25 = sk_to_ax25(newsk);
-+	ax25_dev = ax25->ax25_dev;
-+	netdev_hold(ax25_dev->dev, &ax25->dev_tracker, GFP_ATOMIC);
-+	ax25_dev_hold(ax25_dev);
- 
- out:
- 	release_sock(sk);
--- 
-2.45.1
-
+lgtm
+Acked-by: Alexei Starovoitov <ast@kernel.org>
 
