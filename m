@@ -1,124 +1,154 @@
-Return-Path: <netdev+bounces-98964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C5DD8D33ED
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 12:02:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C8808D33FC
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 12:06:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA96E2835F9
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 10:02:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 331ED1C23521
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 10:06:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 298A3176FD8;
-	Wed, 29 May 2024 10:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="2E7PjElq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B08017A902;
+	Wed, 29 May 2024 10:06:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38B516ABEB;
-	Wed, 29 May 2024 10:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4CF31A60;
+	Wed, 29 May 2024 10:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716976933; cv=none; b=Q3j2lMNTCtnDlFYmIPVqIXKSRxV7flbpITscvJhgUnENAHDrEHa2zngvDQ1GK/KS1xGtHRBlEbqIzReVMewvtJIO+zkGhyGbezIGMgLohJGZGlQxiSYc0QLGI1GW4Umqr6qVMKhrniVk0OXi3zOuE8N4tlMdmadMLx8jF8SJixI=
+	t=1716977187; cv=none; b=jExvA05/sTJWKShe426qj6C9+QZ2O0x+eZZgYmKauFCg2/O36antdn/+AO5UTjJr7pK3mnfkQBT0hBhCqSmbJmNTM7MAuqRfQMOKHVYhcy2Z53IPuqQATgo7jN+c/REXj5dOaTEYCpK/iSsvF10MEBT0v8n2v7j2gN8Qcmo0/GE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716976933; c=relaxed/simple;
-	bh=DuDw8/yBB2AZVr6AgtJgvvzrp1U7IhFhr0g5CR4Yv7s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kABdbw2L+raZVQx6H1hZZ8rKXIJOhxBdVD+hODo3pAdQxjtuwU35XuCiCQtR6z0hmH8lALnLphIVEizZtXGMjsd8cM0ud2bO0tYmRgf8bb5kHBonYI+F76ZwzvZ7tYR2g6Ftc0YXp+G1bgC9+Nr0+fhmjFaYvQ+1F4c7+MIkt8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=2E7PjElq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 166C8C2BD10;
-	Wed, 29 May 2024 10:02:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1716976932;
-	bh=DuDw8/yBB2AZVr6AgtJgvvzrp1U7IhFhr0g5CR4Yv7s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=2E7PjElqMLhAHLpr0fXD0T9cfdBQ9L+26TbC5AJP5nV1rdOsiwWlw9BlAzqeB7JDj
-	 sXh/85kGFYl0nF6YCVzySxIvl4eSKl7tGf3P4IB344mOE9fKXft9tWFbxAh8vh1XEX
-	 MkVoWWlYd6MVahGOhFq0X2c9gGuI+gbra25un6fo=
-Date: Wed, 29 May 2024 12:02:16 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: shaozhengchao <shaozhengchao@huawei.com>
-Cc: stable@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
-	kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, kuba@kernel.org,
-	edumazet@google.com, kuniyu@amazon.com, weiyongjun1@huawei.com,
-	yuehaibing@huawei.com
-Subject: Re: [PATCH stable,5.15 0/2] Revert the patchset for fix
- CVE-2024-26865
-Message-ID: <2024052936-yelp-panhandle-6a62@gregkh>
-References: <20240506030554.3168143-1-shaozhengchao@huawei.com>
- <2024052355-doze-implicate-236d@gregkh>
- <92bc4c96-9aaa-056c-e59a-4396d19a9f58@huawei.com>
- <2024052511-aflutter-outsider-4917@gregkh>
- <9940d719-ee96-341d-93e6-ffd04b6fddba@huawei.com>
- <2024052526-reference-boney-1c67@gregkh>
- <7430832a-d5ca-da76-6e41-e17ba5b5f190@huawei.com>
+	s=arc-20240116; t=1716977187; c=relaxed/simple;
+	bh=G1Rk+7kEkFD09wELNnRj53zJwtqDGrgnZU8T7fnfjek=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KLQdI1tLIJE2JQiMec2wxw0VHutBTF3Yh0jmsoMNqKamK72U+/K2orPm5/A25o4QXcSg/oHCBvjy1FxIPcH23lUD8De6EtNboIidZmkskBwQ1zroQ7uXc5TADuI/9SkFFH58Zw4ciivK1YrS9/jw42UxVhpLgSygWFo/ciX+jG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.3] (ip5f5af7f7.dynamic.kabel-deutschland.de [95.90.247.247])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id ABB5461E5FE01;
+	Wed, 29 May 2024 12:05:43 +0200 (CEST)
+Message-ID: <52ccf0c1-e5dd-412b-9e47-7829ca0f6ffc@molgen.mpg.de>
+Date: Wed, 29 May 2024 12:05:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7430832a-d5ca-da76-6e41-e17ba5b5f190@huawei.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/2] Bluetooth: btnxpuart: Update firmware names
+To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, amitkumar.karwar@nxp.com, rohit.fule@nxp.com,
+ sherry.sun@nxp.com, ziniu.wang_1@nxp.com, haibo.chen@nxp.com,
+ LnxRevLi@nxp.com, regressions@lists.linux.dev
+References: <20240529095347.22186-1-neeraj.sanjaykale@nxp.com>
+ <20240529095347.22186-3-neeraj.sanjaykale@nxp.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240529095347.22186-3-neeraj.sanjaykale@nxp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 29, 2024 at 03:59:31PM +0800, shaozhengchao wrote:
+[Cc: regressions@]
+
+Dear Neeraj,
+
+
+Am 29.05.24 um 11:53 schrieb Neeraj Sanjay Kale:
+> This updates the firmware names of 3 chipsets: w8987, w8997, w9098.
+> These changes are been done to standardize chip specific firmware
+> file names.
+
+Can you please describe the new naming schema in the commit message?
+
+> To allow user to use older firmware file names, a new device tree
+> property has been introduced called firmware-name, which will override
+> the hardcoded firmware names in the driver.
+
+So users updating the Linux kernel but not updating the devicetree with 
+the new property are going to see a regression, right? I think this 
+violates Linux’ no regression policy. If so, please implement a way to 
+support old and new names.
+
+> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> ---
+> v2: Remove "nxp/" from all firmware name definitions to be inline with
+> firware file name read from device tree file. (Krzysztof)
+
+fir*m*ware
+
+> ---
+>   drivers/bluetooth/btnxpuart.c | 28 +++++++++++++++++-----------
+>   1 file changed, 17 insertions(+), 11 deletions(-)
 > 
-> 
-> On 2024/5/25 18:42, Greg KH wrote:
-> > On Sat, May 25, 2024 at 06:21:08PM +0800, shaozhengchao wrote:
-> > > 
-> > > 
-> > > On 2024/5/25 17:42, Greg KH wrote:
-> > > > On Sat, May 25, 2024 at 05:33:00PM +0800, shaozhengchao wrote:
-> > > > > 
-> > > > > 
-> > > > > On 2024/5/23 19:34, Greg KH wrote:
-> > > > > > On Mon, May 06, 2024 at 11:05:52AM +0800, Zhengchao Shao wrote:
-> > > > > > > There's no "pernet" variable in the struct hashinfo. The "pernet" variable
-> > > > > > > is introduced from v6.1-rc1. Revert pre-patch and post-patch.
-> > > > > > 
-> > > > > > I do not understand, why are these reverts needed?
-> > > > > > 
-> > > > > > How does the code currently build if there is no variable here?
-> > > > > > 
-> > > > > > confused,
-> > > > > > 
-> > > > > > greg k-h
-> > > > > Hi greg:
-> > > > >     If only the first patch is merged, compilation will fail.
-> > > > > There's no "pernet" variable in the struct hashinfo.
-> > > > 
-> > > > But both patches are merged together here.  Does the released kernel
-> > > > versions fail to build somehow?
-> > > > 
-> > > > thanks,
-> > > > 
-> > > > greg k-h
-> > > > 
-> > > Work well, as I know.
-> > 
-> > Ok, then why send these reverts?  Are they needed, or are they not
-> > needed?  And if needed, why?
-> > 
-> > still confused,
-> > 
-> > greg k-h
-> > 
-> Hi greg:
->   If the patchset is merged together, and the compilation is normal. I'm
-> just concerned that some people only put in one of the patchset and forget
-> to put in both of them, which will be a problem.
+> diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+> index 0b93c2ff29e4..4442d911eba8 100644
+> --- a/drivers/bluetooth/btnxpuart.c
+> +++ b/drivers/bluetooth/btnxpuart.c
+> @@ -33,16 +33,16 @@
+>   /* NXP HW err codes */
+>   #define BTNXPUART_IR_HW_ERR		0xb0
+>   
+> -#define FIRMWARE_W8987		"nxp/uartuart8987_bt.bin"
+> -#define FIRMWARE_W8997		"nxp/uartuart8997_bt_v4.bin"
+> -#define FIRMWARE_W9098		"nxp/uartuart9098_bt_v1.bin"
+> -#define FIRMWARE_IW416		"nxp/uartiw416_bt_v0.bin"
+> -#define FIRMWARE_IW612		"nxp/uartspi_n61x_v1.bin.se"
+> -#define FIRMWARE_IW624		"nxp/uartiw624_bt.bin"
+> -#define FIRMWARE_SECURE_IW624	"nxp/uartiw624_bt.bin.se"
+> -#define FIRMWARE_AW693		"nxp/uartaw693_bt.bin"
+> -#define FIRMWARE_SECURE_AW693	"nxp/uartaw693_bt.bin.se"
+> -#define FIRMWARE_HELPER		"nxp/helper_uart_3000000.bin"
+> +#define FIRMWARE_W8987		"uart8987_bt_v0.bin"
+> +#define FIRMWARE_W8997		"uart8997_bt_v4.bin"
+> +#define FIRMWARE_W9098		"uart9098_bt_v1.bin"
+> +#define FIRMWARE_IW416		"uartiw416_bt_v0.bin"
+> +#define FIRMWARE_IW612		"uartspi_n61x_v1.bin.se"
+> +#define FIRMWARE_IW624		"uartiw624_bt.bin"
+> +#define FIRMWARE_SECURE_IW624	"uartiw624_bt.bin.se"
+> +#define FIRMWARE_AW693		"uartaw693_bt.bin"
+> +#define FIRMWARE_SECURE_AW693	"uartaw693_bt.bin.se"
+> +#define FIRMWARE_HELPER		"helper_uart_3000000.bin"
+>   
+>   #define CHIP_ID_W9098		0x5c03
+>   #define CHIP_ID_IW416		0x7201
+> @@ -685,13 +685,19 @@ static bool process_boot_signature(struct btnxpuart_dev *nxpdev)
+>   static int nxp_request_firmware(struct hci_dev *hdev, const char *fw_name)
+>   {
+>   	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
+> +	const char *fw_name_dt;
+>   	int err = 0;
+>   
+>   	if (!fw_name)
+>   		return -ENOENT;
+>   
+>   	if (!strlen(nxpdev->fw_name)) {
+> -		snprintf(nxpdev->fw_name, MAX_FW_FILE_NAME_LEN, "%s", fw_name);
+> +		if (strcmp(fw_name, FIRMWARE_HELPER) &&
+> +		    !device_property_read_string(&nxpdev->serdev->dev,
+> +						 "firmware-name",
+> +						 &fw_name_dt))
+> +			fw_name = fw_name_dt;
+> +		snprintf(nxpdev->fw_name, MAX_FW_FILE_NAME_LEN, "nxp/%s", fw_name);
+>   
+>   		bt_dev_dbg(hdev, "Request Firmware: %s", nxpdev->fw_name);
+>   		err = request_firmware(&nxpdev->fw, nxpdev->fw_name, &hdev->dev);
 
-That's not our responsibility at all.  There is a reason we do releases,
-not just individual commits.  We test and release changes all at the
-same time, and so, you should just take them all please.  Otherwise you
-are on your own and usually end up with a broken system.
 
-good luck!
+Kind regards,
 
-greg k-h
+Paul
 
