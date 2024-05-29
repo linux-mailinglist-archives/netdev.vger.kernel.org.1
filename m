@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-98998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 083878D3569
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 13:22:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC30A8D356A
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 13:23:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A346B26268
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 11:22:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EC4F284FBF
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 11:23:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E9C169AD2;
-	Wed, 29 May 2024 11:21:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D0D16EC03;
+	Wed, 29 May 2024 11:22:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="r3mYBPnD"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="1/vt0g0u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918A216A379
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 11:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9775714B973
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 11:22:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716981718; cv=none; b=LOcLpbWBDSkO0BzCqK2hy7z3nv0j/+b2iuQXyS2u/u9oeWSZ04mRrZuWIGkCET6P3+jQMGYOcBAe/ebxtEf1QisrUHeTcs2wTweJBsFMy//WjoIQ0Q2uDQYKpIcH/CpL4GMhZ0UvMRwX0qdJMFF94WY7XI62M5XMLfqGkKdtixE=
+	t=1716981778; cv=none; b=k3nyIbQZJ3maRx3LFkidecdPhVvxY8z8qqWJftDqa04wWvM0erJlVeTqcXG7SzICPT79Rx6lWgXxYtbmbsNfszS0liAZj0qUrnrqLdriCtEyPbUj3ChkwYm4X5bZMhL+UHdrB/Gfh+8Q/kCy3IuvTnqPfwjslb9X9rhJkAN3tXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716981718; c=relaxed/simple;
-	bh=OUiMt/5TsD7gtyfQ5pOtm920h2sfEbfrG6W/WqxhF08=;
+	s=arc-20240116; t=1716981778; c=relaxed/simple;
+	bh=M/KeBIVWQXIB+c4Rzt2Dv87qGL5hfvWTsnvYrzSF5Hg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H8dUS24sQqsPPtO/r4CY4AHR/WjpjN1tM5tl976Um42Nv4gnT/a9c/NE/Cc72Ch3S9FIVwXoes63CJjWiXIyV5aLICCMxSXoAI/9kafORXasI3HMgl/ywiZNGl3KmVkk1gJRSRaLQ/mCkjoNJbbiA/clJ/B85vTq2GPYuo0RA38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=r3mYBPnD; arc=none smtp.client-ip=209.85.219.176
+	 To:Cc:Content-Type; b=b0OEBFbah+b2ilCRUCbYwzPlo+7wbOQYXlch8AjsHmtvml7RhMiChKkTbNFU1TSLoq3jDn26nWXyCXf6K8gY/Q/sWXuDh47zz1UN5iIHxhxJO2XUvCbgmgrxOOUF1gX0Ov8YziyJLglXCBY10j75x7R8ClXm6aMRA/aVZdmNOgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=1/vt0g0u; arc=none smtp.client-ip=209.85.128.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-df481bf6680so1899052276.3
-        for <netdev@vger.kernel.org>; Wed, 29 May 2024 04:21:56 -0700 (PDT)
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-627ebbefd85so20617887b3.3
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 04:22:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1716981715; x=1717586515; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1716981775; x=1717586575; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZebxViTgSkYhn5X6JtcNSCi1iv3nQW7h0MkUhFzq6EQ=;
-        b=r3mYBPnD5wAyTnIIUtVJJsAEOloamlWWNu6jT+KepPhJh/t5/jYW6W7cHlnIbLQqrG
-         dwk19tsXeflBMG+X3JhdjWCAh55fRe4j9ED4XrCTM5S6RFztmMenS10cUCxyOMtu4P7Q
-         PlO8wzw8KQWE/fMfXfMogS5pwdZ7QslHkCh3Hp396mcIchDcIGm68wo32Q1cFX0nMY2R
-         S7tGRubbVu0Js/TzKyzLknfD7PbQ/7QaUP56CZRH0NMlUBerVa/i8kuuQOLnh2Ceiqs0
-         GII5O28T7FsoFw4FRdXzHpCXr0xpCMthvI+RnW8NGhIxk/1kd7oQB0zKi6XP/uj1iJG4
-         CD5w==
+        bh=2ii8Xw/O+B8r7OWcPd+pODsHRWHZaBD662vQh5LCmiM=;
+        b=1/vt0g0uIvG2dcmJQJCZ9PcIchxs9m8XC+WIDpwt01BwiMbbLOasj1IG4wkYh8nChU
+         yE1WhYa8iyuqvcbe62E+grnD+cSS/1wly/1p9liwQ0uXH7KhPdc0XrNk0DIteoTFRdpJ
+         tU2EzJmRzojDCfmxAPj7LwfgEatNRxQ9Qa/NcHCMdSzhnu1HddAM4T3Do84OMA7YLgks
+         rhPXukijfUAtE47kcw7OB7qNIKLU+MUVlk/ezMZB2pONlveaWumNd3FOIkSncnL+Opwd
+         ftmLNyAjpJUdB62kR3a5teIEbJH9XfMZ8LRkV7/bqVktDsZ/LC/aurqvWts/EDJmyJJU
+         QL6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716981715; x=1717586515;
+        d=1e100.net; s=20230601; t=1716981775; x=1717586575;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZebxViTgSkYhn5X6JtcNSCi1iv3nQW7h0MkUhFzq6EQ=;
-        b=sA1H5NpPjAmlbIlVQSi5JqcsWtHduxRFNCRfMhmsY1r9WM9LyB2O2iPv+TASNT1YZc
-         udJcF1pZ0AJxq04MpSwf5yeR2bnzhHNc2+6RLiTew/uj+m4lKKD4yiiZWlWtW00QgYH4
-         0tG3MAYBvt0ez1Q+ilSNC2PK+30kIYblBHexOzWk5RxNQNRXoJEaRz/k01FiEpqL2HrU
-         hZT+7LfUxpPrpNIn27bFyCmdm6+DfKsbpHSiv5uElYF0WIuI3fyesHlkbpI9oywHSXeq
-         7041GRHYCAyCHoO7w/s6XDmak/JUF1DT4Qvw5j+6c/3RseeI9Rm72kul37Jt8Bv3zqxu
-         1nIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXpEx8k4XeYrBgn9sBV8EAKjz9VS7FiE9m3e53mm3Zk0qP+VcYqJTXVZRCO6sYcaxVxJki3xzMuDhCal4u8/4HrYbraH88R
-X-Gm-Message-State: AOJu0YzKIlLQHOYN+ghzS8c1B0C9qvS+t6o4LEyf3PTT9zvBjqiXMKju
-	4/ZhHUtP71wu6PocUX/AiIwUaycqfZ0RxlT7urKTvKQ+03m8Wej/IXpKjEp3NuSWiF7QSoT1fMd
-	Ff2rLiQfSZdfz9cIqRxzAVzAhK/x0LLJm/Ewq
-X-Google-Smtp-Source: AGHT+IFbH1ZV0XKI06pNTp0qcWDOrv19rCK0XvUcaBQxkQqU8UFp/IAB3v3LCGY3OJUFyncdnD65ECNn9EgcJ4kD9tE=
-X-Received: by 2002:a25:ad28:0:b0:de5:5693:4e96 with SMTP id
- 3f1490d57ef6-df7721b3320mr15088741276.27.1716981715272; Wed, 29 May 2024
- 04:21:55 -0700 (PDT)
+        bh=2ii8Xw/O+B8r7OWcPd+pODsHRWHZaBD662vQh5LCmiM=;
+        b=DCmqEFDFjUQWNli1AbK28QEuDiOwJL8jk/QGZkFsgTOjQZVwJhRyebdaBPJhN5jSuq
+         LbJR9NG/pfQuOSKFXetVSmXuG0Qp64CMKO4eN7uRwD1NfLOxoSGM/mIWMarvfS2s6H9K
+         lrSQLU7bI2PS3khSUjH5w+iHRDMDyD4bvsIejiPFRTcckY2ifyytI2L0ERC/K3/CfQRz
+         8IA2UlThYwhQgU2ebf+qRfdwXPX1fO1qxCOlLr3z8/X5CgIWyaYJ6FMqB6XOnLXJVY8E
+         GA3vCc/rvFVrzgtoQ4N42J+XRFLFcOdWBwSLhk60x/nJxATWLhUiE/k2B2Vd/y04f7jV
+         LRIg==
+X-Forwarded-Encrypted: i=1; AJvYcCWsWt5/oxrizMwnPlt0T5ZtGKbh5cYnQtRedAHodAOf0DfL6B38RpOxnK1+kM8ylrA5VO1YFyO1jAQz6mQP/KMKhXIgIW8g
+X-Gm-Message-State: AOJu0Yw5grL8ENGo8cxEVX9DI4QxLM/cy0ME2K0TASgrq7F9NfCffGV6
+	YxKhuClrAuB1osyNL181iAS+qAOlAzIvxYlSMDUwkD9I3GCbf2qyJsKRHvqow2kb7mfKzUXFob6
+	rsK7HK3t7zo2F+n3BAwDdVOddECdd9H/dadyn
+X-Google-Smtp-Source: AGHT+IHu7NOy6GqbaiT/qrHxhh1gB9rpWWAzkP7undGfgLM1LgZsfwhwQVGxe0I4M2OBnB8Fmg5jLnXh9cpbKa8rcGs=
+X-Received: by 2002:a25:910:0:b0:df4:b780:a5df with SMTP id
+ 3f1490d57ef6-df7bff4726dmr5567748276.24.1716981775485; Wed, 29 May 2024
+ 04:22:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,11 +87,11 @@ References: <20240410140141.495384-1-jhs@mojatatu.com> <41736ea4e81666e911fee5b8
  <MW4PR12MB71927C9E4B94871B45F845DF97F52@MW4PR12MB7192.namprd12.prod.outlook.com>
  <MW4PR12MB719209644426A0F5AE18D2E897F62@MW4PR12MB7192.namprd12.prod.outlook.com>
  <66563bc85f5d0_2f7f2087@john.notmuch> <CO1PR11MB49932999F5467416D4F7197693F12@CO1PR11MB4993.namprd11.prod.outlook.com>
- <66566c7c6778d_52e720851@john.notmuch>
-In-Reply-To: <66566c7c6778d_52e720851@john.notmuch>
+ <66566c7c6778d_52e720851@john.notmuch> <CAM0EoMn3-tpDK7jAgh97ZtA5ME1W=oFxgYwHSZ3LG_HbF93FHA@mail.gmail.com>
+In-Reply-To: <CAM0EoMn3-tpDK7jAgh97ZtA5ME1W=oFxgYwHSZ3LG_HbF93FHA@mail.gmail.com>
 From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 29 May 2024 07:21:43 -0400
-Message-ID: <CAM0EoMn3-tpDK7jAgh97ZtA5ME1W=oFxgYwHSZ3LG_HbF93FHA@mail.gmail.com>
+Date: Wed, 29 May 2024 07:22:44 -0400
+Message-ID: <CAM0EoMnu3DcmBZFwm7fTpk7YGahM5darR+cJkqC2Pdr3OqXu3g@mail.gmail.com>
 Subject: Re: On the NACKs on P4TC patches
 To: John Fastabend <john.fastabend@gmail.com>
 Cc: "Singhai, Anjali" <anjali.singhai@intel.com>, "Jain, Vipin" <Vipin.Jain@amd.com>, 
@@ -111,188 +111,199 @@ Cc: "Singhai, Anjali" <anjali.singhai@intel.com>, "Jain, Vipin" <Vipin.Jain@amd.
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 28, 2024 at 7:45=E2=80=AFPM John Fastabend <john.fastabend@gmai=
-l.com> wrote:
+On Wed, May 29, 2024 at 7:21=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
 >
-> Singhai, Anjali wrote:
-> > >From: John Fastabend <john.fastabend@gmail.com>
-> > >Sent: Tuesday, May 28, 2024 1:17 PM
+> On Tue, May 28, 2024 at 7:45=E2=80=AFPM John Fastabend <john.fastabend@gm=
+ail.com> wrote:
 > >
-> > >Jain, Vipin wrote:
-> > >> [AMD Official Use Only - AMD Internal Distribution Only]
-> > >>
-> > >> My apologies, earlier email used html and was blocked by the list...
-> > >> My response at the bottom as "VJ>"
-> > >>
-> > >> ________________________________________
+> > Singhai, Anjali wrote:
+> > > >From: John Fastabend <john.fastabend@gmail.com>
+> > > >Sent: Tuesday, May 28, 2024 1:17 PM
+> > >
+> > > >Jain, Vipin wrote:
+> > > >> [AMD Official Use Only - AMD Internal Distribution Only]
+> > > >>
+> > > >> My apologies, earlier email used html and was blocked by the list.=
+..
+> > > >> My response at the bottom as "VJ>"
+> > > >>
+> > > >> ________________________________________
+> > >
+> > > >Anjali and Vipin is your support for HW support of P4 or a Linux SW =
+implementation of P4. If its for HW support what drivers would we want to s=
+upport? Can you describe how to program >these devices?
+> > >
+> > > >At the moment there hasn't been any movement on Linux hardware P4 su=
+pport side as far as I can tell. Yes there are some SDKs and build kits flo=
+ating around for FPGAs. For example >maybe start with what drivers in kerne=
+l tree run the DPUs that have this support? I think this would be a product=
+ive direction to go if we in fact have hardware support in the works.
+> > >
+> > > >If you want a SW implementation in Linux my opinion is still pushing=
+ a DSL into the kernel datapath via qdisc/tc is the wrong direction. Mappin=
+g P4 onto hardware blocks is fundamentally >different architecture from map=
+ping
+> > > >P4 onto general purpose CPU and registers. My opinion -- to handle t=
+his you need a per architecture backend/JIT to compile the P4 to native ins=
+tructions.
+> > > >This will give you the most flexibility to define new constructs, be=
+st performance, and lowest overhead runtime. We have a P4 BPF backend alrea=
+dy and JITs for most architectures I don't >see the need for P4TC in this c=
+ontext.
+> > >
+> > > >If the end goal is a hardware offload control plane I'm skeptical we=
+ even need something specific just for SW datapath. I would propose a devli=
+nk or new infra to program the device directly >vs overhead and complexity =
+of abstracting through 'tc'. If you want to emulate your device use BPF or =
+user space datapath.
+> > >
+> > > >.John
+> > >
+> > >
+> > > John,
+> > > Let me start by saying production hardware exists i think Jamal poste=
+d some links but i can point you to our hardware.
 > >
-> > >Anjali and Vipin is your support for HW support of P4 or a Linux SW im=
-plementation of P4. If its for HW support what drivers would we want to sup=
-port? Can you describe how to program >these devices?
+> > Maybe more direct what Linux drivers support this? That would be
+> > a good first place to start IMO. Similarly what AMD hardware
+> > driver supports this. If I have two drivers from two vendors
+> > with P4 support this is great.
 > >
-> > >At the moment there hasn't been any movement on Linux hardware P4 supp=
-ort side as far as I can tell. Yes there are some SDKs and build kits float=
-ing around for FPGAs. For example >maybe start with what drivers in kernel =
-tree run the DPUs that have this support? I think this would be a productiv=
-e direction to go if we in fact have hardware support in the works.
+> > For Intel I assume this is idpf?
 > >
-> > >If you want a SW implementation in Linux my opinion is still pushing a=
- DSL into the kernel datapath via qdisc/tc is the wrong direction. Mapping =
-P4 onto hardware blocks is fundamentally >different architecture from mappi=
-ng
-> > >P4 onto general purpose CPU and registers. My opinion -- to handle thi=
-s you need a per architecture backend/JIT to compile the P4 to native instr=
-uctions.
-> > >This will give you the most flexibility to define new constructs, best=
- performance, and lowest overhead runtime. We have a P4 BPF backend already=
- and JITs for most architectures I don't >see the need for P4TC in this con=
-text.
+> > To be concrete can we start with Linux driver A and P4 program
+> > P. Modprobe driver A and push P4 program P so that it does
+> > something very simple, and drop a CIDR/Port range into a table.
+> > Perhaps this is so obvious in your community the trouble is in
+> > the context of a Linux driver its not immediately obvious to me
+> > and I would suspect its not obvious to many others.
 > >
-> > >If the end goal is a hardware offload control plane I'm skeptical we e=
-ven need something specific just for SW datapath. I would propose a devlink=
- or new infra to program the device directly >vs overhead and complexity of=
- abstracting through 'tc'. If you want to emulate your device use BPF or us=
-er space datapath.
+> > I really think walking through the key steps here would
+> > really help?
 > >
-> > >.John
+> >  1. $ p4IntelCompiler p4-dos.p4 -o myp4
+> >  2. $ modprobe idpf
+> >  3. $ ping -i eth0 10.0.0.1 // good
+> >  4. $ p4Load p4-dos.p4
+> >  5. -- load cidr into the hardware somehow -- p4rt-ctrl?
+> >  6. $ ping -i eth0 10.0.0.1 // dropped
 > >
+> > This is an honest attempt to help fwiw. Questions would be.
 > >
-> > John,
-> > Let me start by saying production hardware exists i think Jamal posted =
-some links but i can point you to our hardware.
->
-> Maybe more direct what Linux drivers support this? That would be
-> a good first place to start IMO. Similarly what AMD hardware
-> driver supports this. If I have two drivers from two vendors
-> with P4 support this is great.
->
-> For Intel I assume this is idpf?
->
-> To be concrete can we start with Linux driver A and P4 program
-> P. Modprobe driver A and push P4 program P so that it does
-> something very simple, and drop a CIDR/Port range into a table.
-> Perhaps this is so obvious in your community the trouble is in
-> the context of a Linux driver its not immediately obvious to me
-> and I would suspect its not obvious to many others.
->
-> I really think walking through the key steps here would
-> really help?
->
->  1. $ p4IntelCompiler p4-dos.p4 -o myp4
->  2. $ modprobe idpf
->  3. $ ping -i eth0 10.0.0.1 // good
->  4. $ p4Load p4-dos.p4
->  5. -- load cidr into the hardware somehow -- p4rt-ctrl?
->  6. $ ping -i eth0 10.0.0.1 // dropped
->
-> This is an honest attempt to help fwiw. Questions would be.
->
-> For compilation do we need an artifact from Intel it seems
-> so from docs. But maybe a typo not sure. I'm not overly stuck
-> on it but worth mentioning if folks try to follow your docs.
->
-> For 2 I assume this is just normal every day module load nothing
-> to see. Does it pop something up in /proc or in firmware or...?
-> How do I know its P4 ready?
->
-> For 4. How does this actually work? Is it a file in a directory
-> the driver pushes into firmware? How does the firmware know
-> I've done this? Does the Linux driver already support this?
->
-> For 5 (most interesting) how does this work today. How are
-> you currently talking to the driver/firmware to insert rules
-> and discover the tables? And does the idpf driver do this
-> already? Some side channel I guess? This is p4rt-ctrl?
->
-> I've seen docs for above in ipdk, but they are a bit hard
-> to follow if I'm honest.
->
-> I assume IPDK is the source folks talk to when we mention there
-> is hardware somewhere. Also it seems there is an IPDK BPF support
-> as well which is interesting.
->
-> And do you know how the DPDK implementation works? Can we
-> learn from them is it just on top of Flow API which we
-> could easily use in devlink or some other *link I suspect.
->
-> > The hardware devices under discussion are capable of being abstracted u=
-sing the P4 match-action paradigm so that's why we chose TC.
-> > These devices are programmed using the TC/netlink interface i.e the sta=
-ndard TC control-driver ops apply. While it is clear to us that the P4TC ab=
-straction suffices, we are currently discussing details that will cater for=
- all vendors in our biweekly meetings.
-> > One big requirement is we want to avoid the flower trap - we dont want =
-to be changing kernel/user/driver code every time we add new datapaths.
->
-> I think many 1st order and important points have been skipped. How do you
-> program the device is it a firmware blob, a set of firmware commands,
-> something that comes to you on device so only vendor sees this? Maybe
-> I can infer this from some docs and some examples (by the way I ran
-> through some of your DPU docs and such) but its unclear how these
-> map onto Linux networking. Jiri started into this earlier and was
-> cut off because p4tc was not for hardware offload. Now it is apparently.
->
-> P4 is a good DSL for this sure and it has a runtime already specified
-> which is great.
->
-> This is not a qdisc/tc its an entire hardware pipeline I don't see
-> the reason to put it in TC at all.
->
-> > We feel P4TC approach is the path to add Linux kernel support.
->
-> I disagree with your implementation not your goals to support
-> flexible hardware.
->
+> > For compilation do we need an artifact from Intel it seems
+> > so from docs. But maybe a typo not sure. I'm not overly stuck
+> > on it but worth mentioning if folks try to follow your docs.
 > >
-> > The s/w path is needed as well for several reasons.
-> > We need the same P4 program to run either in software or hardware or in=
- both using skip_sw/skip_hw. It could be either in split mode or as an exce=
-ption path as it is done today in flower or u32. Also it is common now in t=
-he P4 community that people define their datapath using their program and w=
-ill write a control application that works for both hardware and software d=
-atapaths. They could be using the software datapath for testing as you said=
- but also for the split/exception path. Chris can probably add more comment=
-s on the software datapath.
+> > For 2 I assume this is just normal every day module load nothing
+> > to see. Does it pop something up in /proc or in firmware or...?
+> > How do I know its P4 ready?
+> >
+> > For 4. How does this actually work? Is it a file in a directory
+> > the driver pushes into firmware? How does the firmware know
+> > I've done this? Does the Linux driver already support this?
+> >
+> > For 5 (most interesting) how does this work today. How are
+> > you currently talking to the driver/firmware to insert rules
+> > and discover the tables? And does the idpf driver do this
+> > already? Some side channel I guess? This is p4rt-ctrl?
+> >
+> > I've seen docs for above in ipdk, but they are a bit hard
+> > to follow if I'm honest.
+> >
+> > I assume IPDK is the source folks talk to when we mention there
+> > is hardware somewhere. Also it seems there is an IPDK BPF support
+> > as well which is interesting.
+> >
+> > And do you know how the DPDK implementation works? Can we
+> > learn from them is it just on top of Flow API which we
+> > could easily use in devlink or some other *link I suspect.
+> >
+> > > The hardware devices under discussion are capable of being abstracted=
+ using the P4 match-action paradigm so that's why we chose TC.
+> > > These devices are programmed using the TC/netlink interface i.e the s=
+tandard TC control-driver ops apply. While it is clear to us that the P4TC =
+abstraction suffices, we are currently discussing details that will cater f=
+or all vendors in our biweekly meetings.
+> > > One big requirement is we want to avoid the flower trap - we dont wan=
+t to be changing kernel/user/driver code every time we add new datapaths.
+> >
+> > I think many 1st order and important points have been skipped. How do y=
+ou
+> > program the device is it a firmware blob, a set of firmware commands,
+> > something that comes to you on device so only vendor sees this? Maybe
+> > I can infer this from some docs and some examples (by the way I ran
+> > through some of your DPU docs and such) but its unclear how these
+> > map onto Linux networking. Jiri started into this earlier and was
+> > cut off because p4tc was not for hardware offload. Now it is apparently=
+.
+> >
+> > P4 is a good DSL for this sure and it has a runtime already specified
+> > which is great.
+> >
+> > This is not a qdisc/tc its an entire hardware pipeline I don't see
+> > the reason to put it in TC at all.
+> >
+> > > We feel P4TC approach is the path to add Linux kernel support.
+> >
+> > I disagree with your implementation not your goals to support
+> > flexible hardware.
+> >
+> > >
+> > > The s/w path is needed as well for several reasons.
+> > > We need the same P4 program to run either in software or hardware or =
+in both using skip_sw/skip_hw. It could be either in split mode or as an ex=
+ception path as it is done today in flower or u32. Also it is common now in=
+ the P4 community that people define their datapath using their program and=
+ will write a control application that works for both hardware and software=
+ datapaths. They could be using the software datapath for testing as you sa=
+id but also for the split/exception path. Chris can probably add more comme=
+nts on the software datapath.
+> >
+> > None of above requires P4TC. For different architectures you
+> > build optimal backend compilers. You have a Xilenx backend,
+> > an Intel backend, and a Linux CPU based backend. I see no
+> > reason to constrain the software case to map to a pipeline
+> > model for example. Software running on a CPU has very different
+> > characteristics from something running on a TOR, or FPGA.
+> > Trying to push all these into one backend "model" will result
+> > in suboptimal result for every target. At the end of the
+> > day my .02$, P4 is a DSL it needs a target dependent compiler
+> > in front of it. I want to optimize my software pipeline the
+> > compiler should compress tables as much as possible and
+> > search for a O(1) lookup even if getting that key is somewhat
+> > expensive. Conversely a TCAM changes the game. An FPGA is
+> > going to be flexible and make lots of tradeoffs here of which
+> > I'm not an expert. Also by avoiding loading the DSL into the kernel
+> > you leave room for others to build new/better/worse DSLs as they
+> > please.
+> >
+> > The P4 community writes control applicatoins on top of the
+> > runtime spec right? p4rt-ctl being the thing I found. This
+> > should abstract the endpoint away to work with hardware or
+> > software or FPGA or anything else.
+> >
 >
-> None of above requires P4TC. For different architectures you
-> build optimal backend compilers. You have a Xilenx backend,
-> an Intel backend, and a Linux CPU based backend. I see no
-> reason to constrain the software case to map to a pipeline
-> model for example. Software running on a CPU has very different
-> characteristics from something running on a TOR, or FPGA.
-> Trying to push all these into one backend "model" will result
-> in suboptimal result for every target. At the end of the
-> day my .02$, P4 is a DSL it needs a target dependent compiler
-> in front of it. I want to optimize my software pipeline the
-> compiler should compress tables as much as possible and
-> search for a O(1) lookup even if getting that key is somewhat
-> expensive. Conversely a TCAM changes the game. An FPGA is
-> going to be flexible and make lots of tradeoffs here of which
-> I'm not an expert. Also by avoiding loading the DSL into the kernel
-> you leave room for others to build new/better/worse DSLs as they
-> please.
+> For the record, _every single patchset we have posted_ specified our
+> requirements as being s/w + h/w. A simpler version of the requirements
+> is listed here:
+> https://github.com/p4tc-dev/pushback-patches?tab=3Dreadme-ov-file#summary=
+-of-our-requirements
 >
-> The P4 community writes control applicatoins on top of the
-> runtime spec right? p4rt-ctl being the thing I found. This
-> should abstract the endpoint away to work with hardware or
-> software or FPGA or anything else.
->
-
-For the record, _every single patchset we have posted_ specified our
-requirements as being s/w + h/w. A simpler version of the requirements
-is listed here:
-https://github.com/p4tc-dev/pushback-patches?tab=3Dreadme-ov-file#summary-o=
-f-our-requirements
-
-John's content variant above is described in:
-https://github.com/p4tc-dev/pushback-patches?tab=3Dreadme-ov-file#summary-o=
-f-our-requirements
-According to him we should not bother with the kernel at all. It's
-what is commonly referred to as a monday-morning quarterbacking or
-arm-chair lawyering "lets just do it my way and it will all be great".
-It's 90% of these discussions and one of the reasons I put up that
-page.
+> John's content variant above is described in:
+> https://github.com/p4tc-dev/pushback-patches?tab=3Dreadme-ov-file#summary=
+-of-our-requirements
+Correction: https://github.com/p4tc-dev/pushback-patches?tab=3Dreadme-ov-fi=
+le#3-comment-but-you-did-it-wrong-heres-how-you-do-it
 
 cheers,
 jamal
+> According to him we should not bother with the kernel at all. It's
+> what is commonly referred to as a monday-morning quarterbacking or
+> arm-chair lawyering "lets just do it my way and it will all be great".
+> It's 90% of these discussions and one of the reasons I put up that
+> page.
+>
+> cheers,
+> jamal
 
