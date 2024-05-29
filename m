@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-98828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 190DD8D2939
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 02:03:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 805678D293A
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 02:03:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81F64B22F39
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 00:03:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0ABE1F2617F
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 00:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 465131FA4;
-	Wed, 29 May 2024 00:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A352184;
+	Wed, 29 May 2024 00:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="JHL8MVSF"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2eJ4lb07"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2074.outbound.protection.outlook.com [40.107.95.74])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2048.outbound.protection.outlook.com [40.107.236.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE001ECF
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 00:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CD1320E
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 00:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716941015; cv=fail; b=GDpIh6ooEcxViVnWQIZj/WY1cj5m8W8aOetd5cyl8ovwoWcb1fm5IAJxdgCmXSPlRf1jkV74NKfGk+2T0p7uLHZvqNSP1UTMCIHvGXYqFpLAJJjwjS0CD7Ku7ezXy444BBRKnsTVuYoFG/fa1FxXAPUVyEPWN+eqATqDWhZXCwA=
+	t=1716941019; cv=fail; b=pEg4raYwtzqDgXLoVn8C4SqmIXJu2lqqLJ9d+elm4qT4BtQCcbjS6s9m2unQKMtTfva5RtwvJSB2TyjBEZBUO8iCaLiMtVw42WrA04pbttku5A3sxAd3n0hCukTVnVF3yqcADsE/CSR0wcdcP55lj/42UwSow8HcXq+NAfkzZqo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716941015; c=relaxed/simple;
-	bh=zyflnIWiyfzhZX9X+z5V4wqTRUacXz1GInB+K5XBSKM=;
+	s=arc-20240116; t=1716941019; c=relaxed/simple;
+	bh=tanndi1pw5nqWT2ss945bZtdtDxWSfOrCcFyoGl/r14=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mGda0PSzkXcL8Cb4bsGnROinYp6Jkl+a5VAbz7DOl0D/q5EOXgfYOwxRm6ArRKcFdeNyBoWJs44eWUwFTx2NLMK6tBKhd8KrdTJ5IefnVzF//0wAkG1gwK2Tv9V6+TU9WmQKQyRgA6gkq/5nFwUmZvJZiXrP4YBabodd5MjZ4Iw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=JHL8MVSF; arc=fail smtp.client-ip=40.107.95.74
+	 MIME-Version:Content-Type; b=fG3KqH2Ai+ydqYEm4x5v0qY1a+3CReUa/1q8NVahrG9UvSRZVll4epXrxuHwt3XZUGN368EpOQgRFOB7OvJhXSgnE4MLV8HCz8XmjWVssDBtWyyCOwpkWoEkYZStFPshql3fvv+yhs1aPPrMrbNpI9vpEL1aT4AE0x7plXRRAZ8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2eJ4lb07; arc=fail smtp.client-ip=40.107.236.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZiaT2aUud8GYAC6s5mgAPlLBZ2+SxhHNOLtYP1ioa2y6MGyVfy9OppW1nYldVmaRcjQKNcbuU169uT6mK/3igw6hAiW2h6qDznDUXsycaGj6Bl8G1i4sTTZZNCOJj9ftJHWWa9OFn1KfrLMctn71jhJ18cW/UxgMIcby0G11B9w+7co2bTz84pZbJCEr/w1Try9WQzltK0cxby0hIR9XYgy/k5bIK22quKl3MdjvdNMJhBzOFW2/JQTsj3NPfi/0IV/rv+QCC1s0C3qm1bKIX/hue7vz7eSgY1ZRHXSP9ar6SVqJx2WqQ3dIubJhE2248/4vxVh3VxzlpKBu3g0xrg==
+ b=MK+WEgrqnIG00aO4RR1O/6d31wGKHyIRSbjH8xOfTluNc2Grm0NnKlepzCjyS1xLLOAPKtPDdq9irJxBqngdU8fLQb3j2HxPaohFq09BQcT8S0WH35u3Uxh/U8/ibdaU/u8/XJ8Jc/+rB0jPXuvVI/ujUtVnf2NgJaHH8zZ7TkFghtD1hm8nAwcVF94BueAysBCxFKxaBAAFz7ejr/D9hPF92PGrQDoIlqaLBfCwLnI+bYmSOY0q3VA+GWoW285NVxqPmgCvl56x2lnsQMJkclaPV9vwSHB+cejIXwOVR8hjDVnoHfVtAGKMSVTLIsc9d+Yh7+G/2GRnI1vUN6FbmA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Mv/nlDnC1yF3fNIJFa6MnaBjcAosfg5kXX6Ws13ZGHU=;
- b=hq9z72Msdn/+aJ7op7+JXduONRJa0tTGtb1Z/xv/QFSYxYGTgghtE45DsZSjV3KBqVwDZlQYiORMk0bWiwdTAznNcV7AKxs4yT9jJaBDcRtuGtWLQsOo302nTYdbZMsfg50JZ3MGz6OcAVD0aDLcgh+tiqo+wWF/zVhub5AYepJlOgKwAcRjEv98su5rQ0nhWLmzGVg8u01/BWYWBZLnPRf9JrfdSKf/nh6Jsv4vPAXjXUmpR4KxNLvz67wIHf8ShQ/xz7b2OrbheY61GfAmRdJufb8fv7UZmkmcgOpBuPKNIU3fuG+3sH+szBCgSdcqtN3pIa9Vc6BfWt3/E/bWyQ==
+ bh=CAG816PkrmuRC35ejKpLqFNb3Wvjnq1NvL819BXGASs=;
+ b=aeiASsvN+lxN6qbsbAsNvJ7E/pM6q3dlslAqqXAREVJNlH7PGSewU4HXuZ50xGCfRXCK4lCR5s02UHRseU2ytmAtOYyKwmFcx7h7Xl/++FLU7DX5vU9M4/ag/P7BY4vIjm7uzxy3kmxuc6WAmGG0nBoR4JyaMyu2JGa72w2Dvj44vYZP7u47QrSmDJo0+qYDs/jKqwCk0r/JgNTigyme5P0yv4ZVfJ+z7uZJHwyR9JnkkyFXT3l1wYe9BrE+EJVfcWf3bR+AcHHoDShxGEfZ0HGHF40ncIViIOd9CelbVe6/nOuGt4sJvuuqfjNprAGL8KFQ2h+om8dFk3uINhw2Wg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mv/nlDnC1yF3fNIJFa6MnaBjcAosfg5kXX6Ws13ZGHU=;
- b=JHL8MVSFhJNLDZhZtWmNfLAQn7BFOr0fXrbKz0173Zt2Vaofm1Tunf5/6194cXoAiUSUp1J6pVLHAcQXfzvfy+dU7Foe9ODNZkU6L1S4fMGhbRQriOAJYP8RtjJ4V7n6r08mMCOMrcE/4WUrlB78CTWHagwlxbRoVkOftuhMSIA=
-Received: from MW4PR04CA0352.namprd04.prod.outlook.com (2603:10b6:303:8a::27)
- by SN7PR12MB8771.namprd12.prod.outlook.com (2603:10b6:806:32a::20) with
+ bh=CAG816PkrmuRC35ejKpLqFNb3Wvjnq1NvL819BXGASs=;
+ b=2eJ4lb077LyorXLvHdO+o8MDf+2y4wk/1obqmZdWfR+EKBy/y+qraiZXhz1RxVdRppDchc1bOC+CPaV0MCPs3sEXTrCBxBNWAwDaHdU1SJD2uT7iVGZ39r0LeEJBLXi21bVVu33waJKrwrAEHnTv4EtLUjMKZUfxsqRofsgJ9Bg=
+Received: from MW4PR04CA0332.namprd04.prod.outlook.com (2603:10b6:303:8a::7)
+ by DS7PR12MB5813.namprd12.prod.outlook.com (2603:10b6:8:75::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.36; Wed, 29 May
- 2024 00:03:31 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.30; Wed, 29 May
+ 2024 00:03:34 +0000
 Received: from SJ1PEPF00001CE9.namprd03.prod.outlook.com
- (2603:10b6:303:8a:cafe::92) by MW4PR04CA0352.outlook.office365.com
- (2603:10b6:303:8a::27) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:303:8a:cafe::ad) by MW4PR04CA0332.outlook.office365.com
+ (2603:10b6:303:8a::7) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.30 via Frontend
- Transport; Wed, 29 May 2024 00:03:30 +0000
+ Transport; Wed, 29 May 2024 00:03:34 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,7 +65,7 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  SJ1PEPF00001CE9.mail.protection.outlook.com (10.167.242.25) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7633.15 via Frontend Transport; Wed, 29 May 2024 00:03:30 +0000
+ 15.20.7633.15 via Frontend Transport; Wed, 29 May 2024 00:03:34 +0000
 Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 28 May
@@ -75,9 +75,9 @@ To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>, <horms@kernel.org>
 CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
 	<shannon.nelson@amd.com>
-Subject: [PATCH net-next v2 2/7] ionic: Reset LIF device while restarting LIF
-Date: Tue, 28 May 2024 17:02:54 -0700
-Message-ID: <20240529000259.25775-3-shannon.nelson@amd.com>
+Subject: [PATCH net-next v2 3/7] ionic: Pass ionic_txq_desc to ionic_tx_tso_post
+Date: Tue, 28 May 2024 17:02:55 -0700
+Message-ID: <20240529000259.25775-4-shannon.nelson@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20240529000259.25775-1-shannon.nelson@amd.com>
 References: <20240529000259.25775-1-shannon.nelson@amd.com>
@@ -92,74 +92,98 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE9:EE_|SN7PR12MB8771:EE_
-X-MS-Office365-Filtering-Correlation-Id: d3765d52-88bb-45c6-f008-08dc7f72c609
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE9:EE_|DS7PR12MB5813:EE_
+X-MS-Office365-Filtering-Correlation-Id: d3a0ccc3-8295-40e9-4be6-08dc7f72c84d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|1800799015|36860700004|376005|82310400017;
+	BCL:0;ARA:13230031|36860700004|376005|1800799015|82310400017;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?g1+rczDwkvM9B03OOf92rj2vkPVtBOZNBbxfE3PeWqykmRUKPxyu7w52vjXd?=
- =?us-ascii?Q?FHXNgFmQRS+lG7Kr/vE9py6KYZcYK+2towgxcm6XJvqEWrn/5GVM5YWiHsng?=
- =?us-ascii?Q?bTfG0uOK7G2jHu4UygT8pxNLRseFUGDzI98F7fdEHqXnPktifXNM5ASZTwWO?=
- =?us-ascii?Q?fcO680aHjywh6s73Q2/Gzegsja+jykNQLzjH2DU8UJw09pTSrohbGgGF/+ZJ?=
- =?us-ascii?Q?oMqttPsVYv9fHzCk8zm3sn7wIXiZlrBwjObXtCHspT3sUVevQ7hTmfteuRwy?=
- =?us-ascii?Q?gtrrAzkDvuznBbfIusCMnKFDNCNevPpLixn8LJk4c0m7nl5/jSWmrDUH3ZB8?=
- =?us-ascii?Q?MK8A+BFbu5k5UZIjIX5Amt6rJBb5R/GFD/w1EV+gcN5BBy1OGhrq2ufJ9nyV?=
- =?us-ascii?Q?oZNNYjIsYC1ns6Q56SmfEyVtdHoaSJhhI3C8QnEmgMDKjv24h7+lzo85MAwJ?=
- =?us-ascii?Q?4zDbMgthvq+5eOUULJbGewKk7MG5AfWK3tIoctnXAPcGm84qe7EwUcCL9tLP?=
- =?us-ascii?Q?nT1GAnN8reYmQF+zrUEIdY7B++bsXpOLDOCrc9maLH4HPETaLcH23GH6f6l8?=
- =?us-ascii?Q?xkjD1a/d8Mz7qTucVfyfuS6n8ST+5CLRcQcppxbrzAi/3qTRVa6Wmt9+9nOo?=
- =?us-ascii?Q?7LEL5QLHJRUSuPMe6OfNB09ABjhFJixliU3joKwdERGLdelFqGpyBb6Bc9Ga?=
- =?us-ascii?Q?YP1i+RsQux5vByqfUPhFgR3TDcZw5ZvUr3Apejc6RfWknnraUzWZc60vlF/A?=
- =?us-ascii?Q?id2qUD9EUvRd8rVSjaFyn4zNT9qz29q5HUVPW00Kg9ToFx25emhIhoUG5Xtx?=
- =?us-ascii?Q?xiaZmy2OKMH/DApUueAOYWcue60ekLAVan4a4ud/NA0euR/f+1Mxr2etLr2F?=
- =?us-ascii?Q?DjuBkT7PLhqMfaVZYXGTgkcCUikLEdU2ED2W/aJHxarqhpSfQlFIiIh0yPmp?=
- =?us-ascii?Q?/scPUV2g2kTy3QA6TG5+liSW+DXHMcGPXqFc5nABh9oF6XAfYwsewWnY+Xcl?=
- =?us-ascii?Q?ngemfrazsAwfau8VFV+gjRuVDmLZB6P/PAwElkqUYUlmVfZ1nUj1wvYiH8mr?=
- =?us-ascii?Q?BuH2iYrZzmHcqUZ4VZnn9yWoEWSG6D0ilO5SejO20wC6x83DQhk8zTn+wQp0?=
- =?us-ascii?Q?6CdBHEvsv01pKG65xnrODm3/Z1kPbM8d4jZ9ckksQ8bbshslQcAAfgbd5cdU?=
- =?us-ascii?Q?jzFn5lHdyBi1wC8t+WIxPS56gfmHurUvWv61weHjoS4mKI7UM3bPeIw7We8T?=
- =?us-ascii?Q?i9Y7pq+B82pe9StaVccqx9ANY5ZV3s1g8M8FnhN7Ku5BooD62G8eh18Wnl61?=
- =?us-ascii?Q?cAS5ZFJoy2t8OdY6GamXGzbdzXRMImmqg/PkybjJoAVtGk5mHYgxjQtluymA?=
- =?us-ascii?Q?NI69xYo=3D?=
+	=?us-ascii?Q?lHbaVIQqOySz3lXXP/sjHA9kHBujOaKEHjyEaJkKDxXGycbYw1dnku+4ktR/?=
+ =?us-ascii?Q?xVt/sgnfQLAr21dNogrPE5tGFu65i0IB5dO+lH6eFp+UINtn4d22QcFUCJus?=
+ =?us-ascii?Q?TjHvcafAMU37jIY2nLRubIBgm2P2OIx023qFhFvBEPsdeGe4wqmzIARmaeVw?=
+ =?us-ascii?Q?Cg5GvIgkNT5ipB8JyjsZiFhnph0N1KkR0z8bUyGA4CueL9YhuuBh31JZeC53?=
+ =?us-ascii?Q?bJX73czZzyyiqh4GbSA+SVEXL5sBLZzzkWo9zxXttcE1ANWnv77wrVN40ujD?=
+ =?us-ascii?Q?fysy1MERF74kh1cCwnC2heuCzj3Q3xG4cQjWR21ztozhAHhpuO+5Rz2vJeY0?=
+ =?us-ascii?Q?pU+1WYvOUbVBHHvHJ+X8TDhHr75eeYiTvx1E/KUBJHt3Ihk+LqrAHLz96x3A?=
+ =?us-ascii?Q?zKJ53F2qoWOa6kvT4dTDjqVy8yjMA00cfyMoL94dF2zKQeAIqZgv6wwLCE2v?=
+ =?us-ascii?Q?uUX/Ueq2Iv1Gfgss+lSFryA1K91Ho3EqtmZyXvwucisDwlTqMKgnk83/RuWw?=
+ =?us-ascii?Q?1oNgk4KeK8VChIkqlgh1BkMUkY+2sGiii1Z2sdP6m/SBkk9Xmw/12vXTi9Zc?=
+ =?us-ascii?Q?H8uTacO56f8MiREVmOR6OnOIWfsb9PpRAYiYpC4LBOBKs6+Yo5i4KMQl31DX?=
+ =?us-ascii?Q?tkfGobjWpZvROEyvf2jaWsGYw/dWZCnryG5drvrxED0DAp+hBWQgzHs5JswF?=
+ =?us-ascii?Q?wjxIyba/oet7c4ZEH6hmzObPk2K+H3P8IYUsI1kxFzj6eEfoxbGYZbyxA48U?=
+ =?us-ascii?Q?CF6ILZgxpPSmDtURpW7KPXEyGrs6pU/IVTTyr7Jf1waBrFwZw+4og3YkMf32?=
+ =?us-ascii?Q?xcHcH64aypN/jnI1TJBB9DcXKWSkY8anGumFCQ/LYMxmJnB+qG3fUdohJOgG?=
+ =?us-ascii?Q?dWmqu6g1/JgnVMVtcQZaRxwCEExjQ9Cbc2604h77A/WL5sLlKWnPZh47fydj?=
+ =?us-ascii?Q?QxiE+51quwqj75x7TvLhq4vCi/ouf5FiauEBGTqTxD52WhcNq2jMoBWRAVje?=
+ =?us-ascii?Q?riEQui5L020UR7Zm5Jwu2NlrFc+KJOm0njdWGH7P3q9ZeRrD0Ig2oaYBdvCo?=
+ =?us-ascii?Q?BF1/IMC8gyHXjvVKAtEscSuNUNqYvzzLE0aWDE+5mwMB1nL6N15uS2h7Leax?=
+ =?us-ascii?Q?nLqQCrF6MCHt8/KtndQntaDgiyPmSNjRvTQvQE3Btgz5WXTuwF/QOH//6TIF?=
+ =?us-ascii?Q?0NMf4EGGYcCAepwM/ool2FZn+CfXuszhEcfTDaNUXNtbdQ6kVWSODxxSg8jl?=
+ =?us-ascii?Q?5dO+w3t3gX9/0OHZ+mes351lhd/+nTDUGLYWWrHhS0cxslh+8EkPmgEQcQep?=
+ =?us-ascii?Q?4oHXWhBWu7dnPialvThizx1Km9s14Yu63IWJi8NtDu1D9KCcXoPJ3RhtbsGy?=
+ =?us-ascii?Q?CqRco9pLaTbxems1yAudyHG7hQ2I?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(36860700004)(376005)(82310400017);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(376005)(1800799015)(82310400017);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2024 00:03:30.4057
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2024 00:03:34.1869
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d3765d52-88bb-45c6-f008-08dc7f72c609
+X-MS-Exchange-CrossTenant-Network-Message-Id: d3a0ccc3-8295-40e9-4be6-08dc7f72c84d
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	SJ1PEPF00001CE9.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8771
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5813
 
-Recovery from broken states can be hard.  If the LIF reset in
-the fw_down path didn't work because the PCI link was broken,
-the FW won't be in the right state for proper restart.  We can
-fire another LIF reset in the fw_up path to be sure things
-are clean on restart.
+From: Brett Creeley <brett.creeley@amd.com>
 
+Pass the ionic_txq_desc instead of re-referencing it from the q->txq
+array since the caller to ionic_tx_tso_post will always have the
+current ionic_txq_desc pointer already.
+
+Signed-off-by: Brett Creeley <brett.creeley@amd.com>
 Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 ---
- drivers/net/ethernet/pensando/ionic/ionic_lif.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/pensando/ionic/ionic_txrx.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-index 12fda3b860b9..101cbc088853 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-@@ -3388,6 +3388,7 @@ static void ionic_lif_handle_fw_up(struct ionic_lif *lif)
- 	 * just need to reanimate it.
- 	 */
- 	ionic_init_devinfo(ionic);
-+	ionic_reset(ionic);
- 	err = ionic_identify(ionic);
- 	if (err)
- 		goto err_out;
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+index 5dba6d2d633c..c6aa8fb743be 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+@@ -1357,7 +1357,7 @@ static int ionic_tx_tcp_pseudo_csum(struct sk_buff *skb)
+ }
+ 
+ static void ionic_tx_tso_post(struct net_device *netdev, struct ionic_queue *q,
+-			      struct ionic_tx_desc_info *desc_info,
++			      struct ionic_txq_desc *desc,
+ 			      struct sk_buff *skb,
+ 			      dma_addr_t addr, u8 nsge, u16 len,
+ 			      unsigned int hdrlen, unsigned int mss,
+@@ -1365,7 +1365,6 @@ static void ionic_tx_tso_post(struct net_device *netdev, struct ionic_queue *q,
+ 			      u16 vlan_tci, bool has_vlan,
+ 			      bool start, bool done)
+ {
+-	struct ionic_txq_desc *desc = &q->txq[q->head_idx];
+ 	u8 flags = 0;
+ 	u64 cmd;
+ 
+@@ -1503,10 +1502,9 @@ static int ionic_tx_tso(struct net_device *netdev, struct ionic_queue *q,
+ 		seg_rem = min(tso_rem, mss);
+ 		done = (tso_rem == 0);
+ 		/* post descriptor */
+-		ionic_tx_tso_post(netdev, q, desc_info, skb,
+-				  desc_addr, desc_nsge, desc_len,
+-				  hdrlen, mss, outer_csum, vlan_tci, has_vlan,
+-				  start, done);
++		ionic_tx_tso_post(netdev, q, desc, skb, desc_addr, desc_nsge,
++				  desc_len, hdrlen, mss, outer_csum, vlan_tci,
++				  has_vlan, start, done);
+ 		start = false;
+ 		/* Buffer information is stored with the first tso descriptor */
+ 		desc_info = &q->tx_info[q->head_idx];
 -- 
 2.17.1
 
