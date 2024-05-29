@@ -1,100 +1,155 @@
-Return-Path: <netdev+bounces-99194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85C468D3FE3
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 22:53:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F09138D3FCA
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 22:46:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13A59B25A99
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 20:53:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 916491F22F97
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 20:46:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 291181C8FC9;
-	Wed, 29 May 2024 20:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="23fgMePK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8680F16F29E;
+	Wed, 29 May 2024 20:46:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803321C8FC3
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 20:52:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA8F3D97F
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 20:46:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717015953; cv=none; b=T61MxFoRBJlhX4xeo1Dt2GfBzqHwWGKwu/ZjzvFNaE9vpIbZqIWc1aCf06NcHD5iDum7FyNbv7/4PVJ/9W97XsQpYadOPLyfxFiYE9hUtRhpLSUAsHlYm8jhN7yW21f5e3Y7GvXQRcShb9VrFumO5qaS2IsXL/rUm953LXcx6Ho=
+	t=1717015567; cv=none; b=kC3RFdYwSa1YFAMabpWM4OI5BNcWjaewtnUUVDuNNGx0rRheQlL9VS9hSvzE0GdheldU8ix4UibvTzxcHGAKawA8QHWtjle1f6QKKVKmcqoFYaiwhpIPhzEGiQGc+VgAwW7+FnDDz2sCWIxiZkExWpfaFUUkhiaQWZsOi8om5vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717015953; c=relaxed/simple;
-	bh=rzcqoLBlndbED+EVMQJtLRCaUVohtIiZxEKkdQs5pdQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tqiHxBtVP24RH/dhq1RrF55ipk5NRDWbti06QYH7KvfMkri42qfYpAbKhbUtYsUlTWjgj75Enp/msZc262iSiVV4rd9cr+YjjydNMY3Hn/nySkZq8P0hbPH6tK1Vl20tPlWOY8izKgdTBZyxYy28a/maMhW69f7g6Dvh5sotTe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=23fgMePK; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-57863da0ac8so673a12.1
-        for <netdev@vger.kernel.org>; Wed, 29 May 2024 13:52:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717015950; x=1717620750; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5DcHeTwlboRBzaj6x5OLjiTQ7XlOIaLLgevvW1jm+YQ=;
-        b=23fgMePKCjtSywyxQ+NdEc0BI1f5eLui+t5fYlzI66DZ3Oqp1upAaGv5ItVnIZrwJi
-         j7PlICXBSAQno+uS5LzO/7zLdDCxpPTcvxZ2aP2CzBPBQKTjWSI7ZTqBB+ykxMNxISdg
-         zwNx6LCFRjZ5xLLoKGkwcT5atLE5pH261WHmoJ2/ZohXDtg0KtIOr7CCChhYBH9boT/e
-         l+KOapjNe9D2ywT73nrz27vxeVQqEKmoq+K3tq04ADMC6BszaP/x/LKNEqcCDdL/3O/b
-         uJKup61yJATaQ/XBOsFJHdEHq6xjcC+5J869Y43/iytl9blAJlA6Gdn8qQFNDh0xDIMz
-         8wsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717015950; x=1717620750;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5DcHeTwlboRBzaj6x5OLjiTQ7XlOIaLLgevvW1jm+YQ=;
-        b=Xw5AlnLVN4tUb0WhvQ8bNHpZsisWOTGR8vEpV817Dp6QHonZspupC0EROumIoAwYuW
-         xx086gfMlJlvLB2i9WB2SlQku3Sur6rOhqddyCmsdlxHQoQNrqbIwrPm7WkFXH1sWH44
-         XNFzeAQ17KSNY0UJqXZynzN5ZMAsW2UmHdAMdQi7ZAQDPhTGDs3FRdZ+JY4p/+Uqem+U
-         nQnNUYRCWeiAF6+4vUZaJfupgZT5Zp5wcxSCb3U6q+OhQ3XJAopkSRYWLtc+Coav4XQH
-         zhuTa1eOYv2OKOz4ctwKufFzhDUm59KH2eFFeJ8BdqEd9P4KJ6A7mQwdNNIznTQL5GbH
-         xC4g==
-X-Forwarded-Encrypted: i=1; AJvYcCVDl3L9hfey+chHzB1+LLKdCQDJ+Qh0w1fgd2TWLBQO7lGzVeXkyTGlCu0DwpBvikVa/nUpmVK4eOomfY/fpa3LkH8dFH0/
-X-Gm-Message-State: AOJu0Yyk1aKjQfPJLI05ThXA8q0qTgf+s85+VGMO0vBbBCIS4dUtoDx8
-	bYl03Zd5ibLWPnIBqUzcPVs0NRKGKBcRvh+b4XHNM06PW74cg8wqaCDyN2GD645bWJEKHrL9Skc
-	pvRwRG1DShsK9fUutUR3H6Dy2H8pRuH6+4G0myXnhsE/ddNM0TPHx
-X-Google-Smtp-Source: AGHT+IGr0ou43WxyDSNYEeELUUWUCHHYwEsJlMz4raecWsg4vjarHcMY2VITpUHVkjEgIQpi/jMpG7QV6jJtf+2GejM=
-X-Received: by 2002:a05:6402:c09:b0:574:e7e1:35bf with SMTP id
- 4fb4d7f45d1cf-57a18ca60damr2500a12.7.1717015535896; Wed, 29 May 2024 13:45:35
- -0700 (PDT)
+	s=arc-20240116; t=1717015567; c=relaxed/simple;
+	bh=M5sXVEwxFh4MT1g7z55ZKHKdvceLx+gsGFGXz/8GoLY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=drVMlYM3EnhezSNOaQBc2a25ew1b1X7jBOfTj82StpQnxjqcPlMUqvYuvR0uGve4PF/SnZzUZW1Z7jZVy1XniuB2EJYK7UWCESaUXBPwB5Z5rijMLmAdHIiHDXlC0sQXGXaJ0lxEXbawuVmHk0oIkqp+KiPqOLhZKlcpoxdyU/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-206-jeZe-M8JM8WLMCs9IE5uBQ-1; Wed, 29 May 2024 16:45:55 -0400
+X-MC-Unique: jeZe-M8JM8WLMCs9IE5uBQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4BA0F8058DF;
+	Wed, 29 May 2024 20:45:54 +0000 (UTC)
+Received: from hog (unknown [10.39.192.53])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id ECDF3C15BB9;
+	Wed, 29 May 2024 20:45:52 +0000 (UTC)
+Date: Wed, 29 May 2024 22:45:51 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, Esben Haabendal <esben@geanix.com>
+Subject: Re: [PATCH net-next v3 14/24] ovpn: implement multi-peer support
+Message-ID: <ZleT__qb4fI6_mV8@hog>
+References: <20240506011637.27272-1-antonio@openvpn.net>
+ <20240506011637.27272-15-antonio@openvpn.net>
+ <ZlXtyn2Sgk_W8h92@hog>
+ <de937f69-b5ae-4d4f-b16a-e18fa70a8e7b@openvpn.net>
+ <ZldG5PNlvAkJ4fat@hog>
+ <8252647b-0301-4f14-bdc7-208e9779fc2f@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240418073603.99336-2-kerneljasonxing@gmail.com> <20240529203421.2432481-1-jsperbeck@google.com>
-In-Reply-To: <20240529203421.2432481-1-jsperbeck@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 29 May 2024 22:45:21 +0200
-Message-ID: <CANn89i+rAbZwRR6Lor1f7PFFzQiajFx6a00sehmu4B96KqVhSw@mail.gmail.com>
-Subject: Re: compile error in set_rps_cpu() without CONFIG_RFS_ACCEL?
-To: John Sperbeck <jsperbeck@google.com>
-Cc: kerneljasonxing@gmail.com, davem@davemloft.net, horms@kernel.org, 
-	kernelxing@tencent.com, kuba@kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <8252647b-0301-4f14-bdc7-208e9779fc2f@openvpn.net>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 29, 2024 at 10:34=E2=80=AFPM John Sperbeck <jsperbeck@google.co=
-m> wrote:
->
-> If CONFIG_RFS_ACCEL is off, then I think there will be a compile error wi=
-th this change, since 'head' is used, but no longer defined.
+2024-05-29, 22:15:27 +0200, Antonio Quartulli wrote:
+> On 29/05/2024 17:16, Sabrina Dubroca wrote:
+> > 2024-05-28, 21:41:15 +0200, Antonio Quartulli wrote:
+> > > On 28/05/2024 16:44, Sabrina Dubroca wrote:
+> > > > Hi Antonio, I took a little break but I'm looking at your patches
+> > > > again now.
+> > >=20
+> > > Thanks Sabrina! Meanwhile I have been working on all your suggested c=
+hanges.
+> > > Right now I am familiarizing with the strparser.
+> >=20
+> > Cool :)
+> >=20
+> > > > 2024-05-06, 03:16:27 +0200, Antonio Quartulli wrote:
+> > > > > +=09index =3D ovpn_peer_index(ovpn->peers.by_id, &peer->id, sizeo=
+f(peer->id));
+> > > > > +=09hlist_add_head_rcu(&peer->hash_entry_id, &ovpn->peers.by_id[i=
+ndex]);
+> > > > > +
+> > > > > +=09if (peer->vpn_addrs.ipv4.s_addr !=3D htonl(INADDR_ANY)) {
+> > > > > +=09=09index =3D ovpn_peer_index(ovpn->peers.by_vpn_addr,
+> > > > > +=09=09=09=09=09&peer->vpn_addrs.ipv4,
+> > > > > +=09=09=09=09=09sizeof(peer->vpn_addrs.ipv4));
+> > > > > +=09=09hlist_add_head_rcu(&peer->hash_entry_addr4,
+> > > > > +=09=09=09=09   &ovpn->peers.by_vpn_addr[index]);
+> > > > > +=09}
+> > > > > +
+> > > > > +=09hlist_del_init_rcu(&peer->hash_entry_addr6);
+> > > >=20
+> > > > Why are hash_entry_transp_addr and hash_entry_addr6 getting a
+> > > > hlist_del_init_rcu() call, but not hash_entry_id and hash_entry_add=
+r4?
+> > >=20
+> > > I think not calling del_init_rcu on hash_entry_addr4 was a mistake.
+> > >=20
+> > > Calling del_init_rcu on addr4, addr6 and transp_addr is needed to put=
+ them
+> > > in a known state in case they are not hashed.
+> >=20
+> > hlist_del_init_rcu does nothing if node is not already on a list.
+>=20
+> Mh you're right. I must have got confused for some reason.
+> Those del_init_rcu can go then.
+>=20
+> >=20
+> > > While hash_entry_id always goes through hlist_add_head_rcu, therefore
+> > > del_init_rcu is useless (to my understanding).
+> >=20
+> > I'm probably missing something about how this all fits together. In
+> > patch 19, I see ovpn_nl_set_peer_doit can re-add a peer that is
+> > already added (but I'm not sure why, since you don't allow changing
+> > the addresses, so it won't actually be re-hashed).
+>=20
+> Actually it's not a "re-add", but the intent is to "update" a peer that
+> already exists. However, some fields are forbidden from being updated, li=
+ke
+> the address.
+>=20
+> [NOTE: I found some issue with the "peer update" logic in
+> ovpn_nl_set_peer_doit and it's being changed a bit]
+>=20
+> >=20
+> > I don't think doing a 2nd add of the same element to peers.by_id (or
+> > any of the other hashtables) is correct, so I'd say you need
+> > hlist_del_init_rcu for all of them.
+>=20
+> This is exactly the bug I mentioned above: we should not go through the a=
+dd
+> again. Ideally we should just update the fields and be done with it, with=
+out
+> re-hashing the object.
 
-I assume you are speaking of this commit ?
+Ok, if you only call ovpn_peer_add for new peers, this looks fine and
+the hlist_del_init_rcu can all be removed as you said.
 
-commit 84b6823cd96b38c40b3b30beabbfa48d92990e1a
-Author: Jason Xing <kernelxing@tencent.com>
-Date:   Thu Apr 18 15:36:01 2024 +0800
+Thanks.
 
-    net: rps: protect last_qtail with rps_input_queue_tail_save() helper
+--=20
+Sabrina
+
 
