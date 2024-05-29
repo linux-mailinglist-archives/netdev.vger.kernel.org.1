@@ -1,225 +1,99 @@
-Return-Path: <netdev+bounces-98850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C1CA8D2B2C
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 04:46:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 191AA8D2B33
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 04:57:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA25A287311
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 02:46:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7D6CB2267F
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 02:57:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AA6515ADBB;
-	Wed, 29 May 2024 02:45:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0139215B0F2;
+	Wed, 29 May 2024 02:57:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cr7aLzOu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="stLgc4c9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6113228E8;
-	Wed, 29 May 2024 02:45:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86AE15B0E1;
+	Wed, 29 May 2024 02:56:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716950759; cv=none; b=PIGcwskIuQ+h3+zLUNK0LUBiXet8mmQZWTlcre8CDzFoqnYxU1KK1F3XeakoXnueXyVh7roaknIOrOzhf/sRJZxM+UNfgNh3XtPILcPYOxXhT+eC7KU0w+D+pcWoF5VA3ZPftHK8so51NqlZHNBDksOwX1QmaBO00D7zOpw6YRw=
+	t=1716951419; cv=none; b=tGWYINwhmjuNEUZ01FLBtwl9DHEmIGhGxwCeXsY+e5yVy7Nw9tWr21dVltTx+yEHiSQBU4zi6CdyIR78iAz1/KU24THRxkGlPvW0+/aOhPxJlonRemXynvjTMa8sZ/0XZO/05viavH4EKA4rSFX4X+JF8r+9+E/GlcebfSn2Nes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716950759; c=relaxed/simple;
-	bh=YNB+3eDBjI3xG8Rb1/MLEq3QCHjbZGBsVk7x/zHsfRY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xvl44gfpPylBIN6ATVbsTTJ2UZStW+lrWwLihHLFCpahLD4p2SpA+JA4sKvSDoHGYkVfQOE31ER2RZo3HIwqgPA2o4+hjt0BKVlEfGy3OMyTNMRabQS12f47j4VCbjy34zrR6g9xiT/GYEzCYU7LOnBUgUkDw1rEvCi9f2fHuwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cr7aLzOu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9810FC3277B;
-	Wed, 29 May 2024 02:45:58 +0000 (UTC)
+	s=arc-20240116; t=1716951419; c=relaxed/simple;
+	bh=S5Btife71DgUL3jeAw1NJHV+v5fJxvN8BEX6FGKkdgU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DznpvJVixo6elBE27/tXx//oxnEBDEuBs8YoLlGv6SDzL3HfRoGMErlN767/an0tLHL6SuxDtzeF9NyvWwlziey+4wCc670m/Aq0KD5YOuFit+OBn5LREyoLEaHfde4gVMlZeSMiNvt+HNGkr5UKu1G10OPKBAt4GyQLOWyTSgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=stLgc4c9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 39192C32789;
+	Wed, 29 May 2024 02:56:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716950759;
-	bh=YNB+3eDBjI3xG8Rb1/MLEq3QCHjbZGBsVk7x/zHsfRY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cr7aLzOuZvv9maRdMkD+mou4kKjLCYDyTEGdehFO3Mniifm3DP26fooGwDqSL2FXK
-	 wEF03DlOnkkt2iHPG4hK5/qUz/QRc96yd6JXBHYz8Iz7QU6lpNej1sWc8JK70t9IRU
-	 kvbW8NW2QK3URk929xOEEzLsgRfnCovq0E4ZOpCtMScSyi/Tyl1A8nxmFed37glRSh
-	 lAECehfRSCIu+q7VviTSZOsh7HzHIcZ85xdhjxEgJJ6ukecOOX5VD4XdR/K0zBSs9U
-	 Se4r2TIdvHnps8Zv5Ex5IL0GeKuge9Vg35a5kX33z87cGxhGcVf+VaFF+B32ca6rE8
-	 /kFNA90dKdt1A==
-Date: Tue, 28 May 2024 19:45:57 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: admiyo@os.amperecomputing.com
-Cc: Jeremy Kerr <jk@codeconstruct.com.au>, Matt Johnston
- <matt@codeconstruct.com.au>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] mctp pcc: Implement MCTP over PCC Transport
-Message-ID: <20240528194557.7a8f522d@kernel.org>
-In-Reply-To: <20240528191823.17775-4-admiyo@os.amperecomputing.com>
-References: <20240513173546.679061-1-admiyo@os.amperecomputing.com>
-	<20240528191823.17775-1-admiyo@os.amperecomputing.com>
-	<20240528191823.17775-4-admiyo@os.amperecomputing.com>
+	s=k20201202; t=1716951419;
+	bh=S5Btife71DgUL3jeAw1NJHV+v5fJxvN8BEX6FGKkdgU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=stLgc4c9ZulfUZZg1BNvNqfD2ytgI9Bkrav/OwU3fZvugX0rJjH34WDya2T3M0DMH
+	 B8r9J0+C10uBtNnvX33wN/DsTwTSP7U+gTgKprohEeWbqs0qiABqjHYobtpczao+J2
+	 V8dS1+u9om3DTAIoBFXtta3kNTzRGjSUXiqKK2PJWHgM/f5rz+ZinSIsuwR6Q1eqoI
+	 1hA1d5FltozUCTw4Yzadf+K1VdNMRw4RrZy0THWlotuklBjUJ2YoF/BhZSAtEWVkIh
+	 ZTcsQIlNMa6QB/Yqgez4rBBxRohlwj0RPaKNDewdBxAdvxuaOnIQDCxvkc5HJduBAH
+	 UHevDawVVeAaQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 271A4C4361C;
+	Wed, 29 May 2024 02:56:59 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/2] net/sched: taprio: make q->picos_per_byte available
+ to fill_sched_entry()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171695141915.13406.10629530415930321270.git-patchwork-notify@kernel.org>
+Date: Wed, 29 May 2024 02:56:59 +0000
+References: <20240527153955.553333-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20240527153955.553333-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ vinicius.gomes@intel.com, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, shuah@kernel.org, pctammela@mojatatu.com
 
-On Tue, 28 May 2024 15:18:23 -0400 admiyo@os.amperecomputing.com wrote:
-> From: Adam Young <admiyo@amperecomputing.com>
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 27 May 2024 18:39:54 +0300 you wrote:
+> In commit b5b73b26b3ca ("taprio: Fix allowing too small intervals"), a
+> comparison of user input against length_to_duration(q, ETH_ZLEN) was
+> introduced, to avoid RCU stalls due to frequent hrtimers.
 > 
-> Implementation of DMTF DSP:0292
-> Management Control Transport Protocol(MCTP)  over
-> Platform Communication Channel(PCC)
+> The implementation of length_to_duration() depends on q->picos_per_byte
+> being set for the link speed. The blamed commit in the Fixes: tag has
+> moved this too late, so the checks introduced above are ineffective.
+> The q->picos_per_byte is zero at parse_taprio_schedule() ->
+> parse_sched_list() -> parse_sched_entry() -> fill_sched_entry() time.
 > 
-> MCTP devices are specified by entries in DSDT/SDST and
-> reference channels specified in the PCCT.
-> 
-> Communication with other devices use the PCC based
-> doorbell mechanism.
+> [...]
 
-Missing your SoB, but please wait for more feedback before reposting.
+Here is the summary with links:
+  - [net,1/2] net/sched: taprio: make q->picos_per_byte available to fill_sched_entry()
+    https://git.kernel.org/netdev/net/c/e63413418088
+  - [net,2/2] net/sched: taprio: extend minimum interval restriction to entire cycle too
+    https://git.kernel.org/netdev/net/c/fb66df20a720
 
-> +#include <net/pkt_sched.h>
-
-Hm, what do you need this include for?
-
-> +#define SPDM_VERSION_OFFSET 1
-> +#define SPDM_REQ_RESP_OFFSET 2
-> +#define MCTP_PAYLOAD_LENGTH 256
-> +#define MCTP_CMD_LENGTH 4
-> +#define MCTP_PCC_VERSION     0x1 /* DSP0253 defines a single version: 1 */
-> +#define MCTP_SIGNATURE "MCTP"
-> +#define SIGNATURE_LENGTH 4
-> +#define MCTP_HEADER_LENGTH 12
-> +#define MCTP_MIN_MTU 68
-> +#define PCC_MAGIC 0x50434300
-> +#define PCC_DWORD_TYPE 0x0c
-
-Could you align the values using tabs?
-
-> +static void mctp_pcc_client_rx_callback(struct mbox_client *c, void *buffer)
-> +{
-> +	struct mctp_pcc_ndev *mctp_pcc_dev;
-> +	struct mctp_skb_cb *cb;
-> +	struct sk_buff *skb;
-> +	u32 length_offset;
-> +	u32 flags_offset;
-> +	void *skb_buf;
-> +	u32 data_len;
-> +	u32 flags;
-> +
-> +	mctp_pcc_dev = container_of(c, struct mctp_pcc_ndev, inbox_client);
-> +	length_offset = offsetof(struct mctp_pcc_hdr, length);
-> +	data_len = readl(mctp_pcc_dev->pcc_comm_inbox_addr + length_offset) +
-> +		   MCTP_HEADER_LENGTH;
-> +
-> +	skb = netdev_alloc_skb(mctp_pcc_dev->mdev.dev, data_len);
-> +	if (!skb) {
-> +		mctp_pcc_dev->mdev.dev->stats.rx_dropped++;
-> +		return;
-> +	}
-> +	mctp_pcc_dev->mdev.dev->stats.rx_packets++;
-> +	mctp_pcc_dev->mdev.dev->stats.rx_bytes += data_len;
-
-Please implement ndo_get_stats64, use of the core dev stats in drivers
-is deprecated:
-
- *	@stats:		Statistics struct, which was left as a legacy, use
- *			rtnl_link_stats64 instead
-
-> +	skb->protocol = htons(ETH_P_MCTP);
-> +	skb_buf = skb_put(skb, data_len);
-> +	memcpy_fromio(skb_buf, mctp_pcc_dev->pcc_comm_inbox_addr, data_len);
-> +	skb_reset_mac_header(skb);
-> +	skb_pull(skb, sizeof(struct mctp_pcc_hdr));
-> +	skb_reset_network_header(skb);
-> +	cb = __mctp_cb(skb);
-> +	cb->halen = 0;
-> +	skb->dev =  mctp_pcc_dev->mdev.dev;
-
-netdev_alloc_skb() already sets dev
-
-> +	netif_rx(skb);
-> +
-> +	flags_offset = offsetof(struct mctp_pcc_hdr, flags);
-> +	flags = readl(mctp_pcc_dev->pcc_comm_inbox_addr + flags_offset);
-> +	mctp_pcc_dev->in_chan->ack_rx = (flags & 1) > 0;
-> +}
-> +
-> +static netdev_tx_t mctp_pcc_tx(struct sk_buff *skb, struct net_device *ndev)
-> +{
-> +	struct mctp_pcc_hdr pcc_header;
-> +	struct mctp_pcc_ndev *mpnd;
-> +	void __iomem *buffer;
-> +	unsigned long flags;
-> +	int rc;
-> +
-> +	netif_stop_queue(ndev);
-
-Why?
-
-> +	ndev->stats.tx_bytes += skb->len;
-> +	ndev->stats.tx_packets++;
-> +	mpnd = (struct mctp_pcc_ndev *)netdev_priv(ndev);
-> +
-> +	spin_lock_irqsave(&mpnd->lock, flags);
-> +	buffer = mpnd->pcc_comm_outbox_addr;
-> +	pcc_header.signature = PCC_MAGIC;
-> +	pcc_header.flags = 0x1;
-> +	memcpy(pcc_header.mctp_signature, MCTP_SIGNATURE, SIGNATURE_LENGTH);
-> +	pcc_header.length = skb->len + SIGNATURE_LENGTH;
-> +	memcpy_toio(buffer, &pcc_header, sizeof(struct mctp_pcc_hdr));
-> +	memcpy_toio(buffer + sizeof(struct mctp_pcc_hdr), skb->data, skb->len);
-> +	rc = mpnd->out_chan->mchan->mbox->ops->send_data(mpnd->out_chan->mchan,
-> +							 NULL);
-> +	spin_unlock_irqrestore(&mpnd->lock, flags);
-> +
-> +	dev_consume_skb_any(skb);
-> +	netif_start_queue(ndev);
-> +	if (!rc)
-> +		return NETDEV_TX_OK;
-> +	return NETDEV_TX_BUSY;
-> +}
-> +
-> +static const struct net_device_ops mctp_pcc_netdev_ops = {
-> +	.ndo_start_xmit = mctp_pcc_tx,
-> +	.ndo_uninit = NULL
-
-No need to init things to NULL
-
-> +static void mctp_pcc_driver_remove(struct acpi_device *adev)
-> +{
-> +	struct mctp_pcc_ndev *mctp_pcc_dev = NULL;
-> +	struct list_head *ptr;
-> +	struct list_head *tmp;
-> +
-> +	list_for_each_safe(ptr, tmp, &mctp_pcc_ndevs) {
-> +		struct net_device *ndev;
-> +
-> +		mctp_pcc_dev = list_entry(ptr, struct mctp_pcc_ndev, next);
-> +		if (adev && mctp_pcc_dev->acpi_device == adev)
-> +			continue;
-> +
-> +		mctp_pcc_dev->cleanup_channel(mctp_pcc_dev->out_chan);
-> +		mctp_pcc_dev->cleanup_channel(mctp_pcc_dev->in_chan);
-> +		ndev = mctp_pcc_dev->mdev.dev;
-> +		if (ndev)
-> +			mctp_unregister_netdev(ndev);
-> +		list_del(ptr);
-> +		if (adev)
-> +			break;
-> +	}
-> +};
-
-spurious ;
-
-
-> +	.owner = THIS_MODULE,
-> +
-
-suprious new line
-
-> +};
-> +
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
