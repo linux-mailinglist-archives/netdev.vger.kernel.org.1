@@ -1,172 +1,278 @@
-Return-Path: <netdev+bounces-99166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8F5F8D3E5A
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 20:32:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C9E78D3E74
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 20:39:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 225DAB2212D
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:32:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61B151C21430
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:38:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A3F1A0B1D;
-	Wed, 29 May 2024 18:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362E5181CE2;
+	Wed, 29 May 2024 18:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Usol3I7a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZnD/l12H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D7415B990;
-	Wed, 29 May 2024 18:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F53426286
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 18:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717007526; cv=none; b=uuSs+Bug2iK1WZb9o5h59ou6532j0+EjftMSskry2BEIiyJs3K++UZQ/Icwh9ZkvZdRH72ixNLtjIEDzWMRAQWqbx13d3pRDYXq6R9TpAk+wbEzrUSdFLn72LyqE207wZ7pUmyDXG5LGsO8dno8OYLSv3kqFTDpDVUB+eOl6ZfE=
+	t=1717007936; cv=none; b=Co9urEiXzUpawu+NdShjMeufElwxflDFpLHcX6MPvNElOyIcdXcatQ3qGBrlDPOopA7zq356syaE/O8XHAOjVG6aLgbG3BrTpKsAlZZ3/21+ZRw5soZQ7YXASQO2OBIEQkLILTzdr516vI6l9tWLdFSq+ZtrBDW4LIfu1WBiwuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717007526; c=relaxed/simple;
-	bh=b5KUfmV+0BQDlwndzSzEsRg0XBiTwxcg8iE04GTa7Vg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AFU5vpIKdZdyWW5IhwOi/Q7vvttrDIZHBSo/o3v/8mDu9FfB0nUFpe0YFQBrMCRN2GQ/7VkBQ5ExeLZ8vCpAs1Ac04B43NFoy8D32gzRNDVFv7ivXWnJ2oUwL/UnEP5yUVLvwiItdX+Q9R+tT6zTz0rYOGl7lhznWT0yP7R4gQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Usol3I7a; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44THlM7D015796;
-	Wed, 29 May 2024 18:31:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=Il5puEjjGoo/eUo4Gn88zcACE3zHPOHAVn7
-	nercTcfc=; b=Usol3I7aN2TTS5wvxwxtkFg3Nc+zhPf7Hc4r7g8rExm+ahFjE6u
-	Uuncj2HyH/FTbznYj0JC2m8OU4b8W+3Yvt42HBUaFoHkIhrMVAlJqifs1VHbOUEh
-	+mxASwbQliptGUxzdwHh9IzjDSAjUZiWhUYg7nCN6PhtthyGqZoNATuJvBomnc+1
-	LJQjZ7ho0p8j1c/Ebu7AWbSRMAdzPVRlY3GAKjqdpH5kWZ7Yez7bl0ypmZO5QEJf
-	nFpvNNRDVPoElxvmvTSFXXHxUYYVwKVOObF1BKGx96/d/BLsKzfbQXPi8D73rNeo
-	IqvrEK0dIpEaHqNZSfQYn6aJp7xO1se5SsQ==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ydyws1nsu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 May 2024 18:31:35 +0000 (GMT)
-Received: from pps.filterd (NALASPPMTA05.qualcomm.com [127.0.0.1])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 44TISEq3010782;
-	Wed, 29 May 2024 18:31:34 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by NALASPPMTA05.qualcomm.com (PPS) with ESMTPS id 3ydwwpdr08-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 May 2024 18:31:34 +0000
-Received: from NALASPPMTA05.qualcomm.com (NALASPPMTA05.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44TIQZVJ007931;
-	Wed, 29 May 2024 18:31:33 GMT
-Received: from hu-devc-lv-u20-a-new.qualcomm.com (hu-abchauha-lv.qualcomm.com [10.81.25.35])
-	by NALASPPMTA05.qualcomm.com (PPS) with ESMTPS id 44TIVXKo016136
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 29 May 2024 18:31:33 +0000
-Received: by hu-devc-lv-u20-a-new.qualcomm.com (Postfix, from userid 214165)
-	id 51E84220D3; Wed, 29 May 2024 11:31:30 -0700 (PDT)
-From: Abhishek Chauhan <quic_abchauha@quicinc.com>
-To: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        Martin KaFai Lau <martin.lau@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>
-Cc: kernel@quicinc.com, syzbot+d7b227731ec589e7f4f0@syzkaller.appspotmail.com,
-        syzbot+30a35a2e9c5067cc43fa@syzkaller.appspotmail.com
-Subject: [PATCH net-next v2] net: validate SO_TXTIME clockid coming from  userspace
-Date: Wed, 29 May 2024 11:31:30 -0700
-Message-Id: <20240529183130.1717083-1-quic_abchauha@quicinc.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1717007936; c=relaxed/simple;
+	bh=J//ItsTHjshoBq1fbsvP0grhv7hdfMhV51+cWUKHTDA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IvNdyV1Ndj2ViQFfTt3d1xIgyZq+HTyA1sv0WuHWA+5ezZ4Y/rkK3uzUlZBa0TOxgqPAjcZy72AX9MngV1aEBUs11mUlKX3ixSZuzUnw4nhPrfp4I7XVNlb2E5qro6MpdTv9kVUqrsC1oHXqAJ4OKWTxPJxoojzHJ+sOoedSBeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZnD/l12H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B030C113CC;
+	Wed, 29 May 2024 18:38:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717007935;
+	bh=J//ItsTHjshoBq1fbsvP0grhv7hdfMhV51+cWUKHTDA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZnD/l12Hftq0O7nYJvGQq3/IS39EnwhtBkYiqJ58dUBdUn7D+rmAWg+6NmWjdlG6j
+	 0qQu0SfQKDV4Y4k3d7u6v3hUGDKcsy0US1mHGm8VPPrjfdVm2xRUswiAb/HZUPct5X
+	 DaisZEXcWf7lO42Kj7d0hpQV7Qotk0YUuuh7YCXBASTxEQWmF36gY0HhT2/0L3Wqv7
+	 SbM3j/LstsP7XkCwTKMqXR3vyQkjo5kFW6n7IjXhvuuF2l5tWKSid2BWP4yWI/gNUv
+	 tLJNjnq5i28OR/mL22E+sifwZOmVCkKM0jwypaxj3guUfiKmSrMJxYpq3G1wy1uT57
+	 Bw8827GcI19Pg==
+Date: Wed, 29 May 2024 11:38:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: cratiu@nvidia.com, rrameshbabu@nvidia.com, Raed Salem <raeds@nvidia.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ netdev@vger.kernel.org, pabeni@redhat.com, borisp@nvidia.com,
+ gal@nvidia.com, steffen.klassert@secunet.com, tariqt@nvidia.com
+Subject: Re: [RFC net-next 14/15] net/mlx5e: Add Rx data path offload
+Message-ID: <20240529113854.14fd929e@kernel.org>
+In-Reply-To: <664172ded406f_1d6c6729412@willemb.c.googlers.com.notmuch>
+References: <20240510030435.120935-1-kuba@kernel.org>
+	<20240510030435.120935-15-kuba@kernel.org>
+	<664172ded406f_1d6c6729412@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: nMSxEiVRugjInCAbig439WwEWISOeAKg
-X-Proofpoint-GUID: nMSxEiVRugjInCAbig439WwEWISOeAKg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-29_14,2024-05-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
- malwarescore=0 impostorscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999
- priorityscore=1501 spamscore=0 lowpriorityscore=0 bulkscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2405290129
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Currently there are no strict checks while setting SO_TXTIME
-from userspace. With the recent development in skb->tstamp_type
-clockid with unsupported clocks results in warn_on_once, which causes
-unnecessary aborts in some systems which enables panic on warns.
+On Sun, 12 May 2024 21:54:38 -0400 Willem de Bruijn wrote:
+> > +	/* TBD: report errors as SW counters to ethtool, any further handling ? */
+> > +	switch (MLX5_NISP_METADATA_SYNDROM(nisp_meta_data)) {
+> > +	case MLX5E_NISP_OFFLOAD_RX_SYNDROME_DECRYPTED:
+> > +		if (psp_rcv(skb))
+> > +			netdev_warn_once(netdev, "PSP handling failed");
+> > +		skb->decrypted = 1;  
+> 
+> Do not set skb->decrypted if psp_rcv failed? But drop the packet and
+> account the drop, likely.
 
-Add validation in setsockopt to support only CLOCK_REALTIME,
-CLOCK_MONOTONIC and CLOCK_TAI to be set from userspace.
+nVidia folks does this seem reasonable?
 
-Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
-Link: https://lore.kernel.org/lkml/6bdba7b6-fd22-4ea5-a356-12268674def1@quicinc.com/
-Fixes: 1693c5db6ab8 ("net: Add additional bit to support clockid_t timestamp type")
-Reported-by: syzbot+d7b227731ec589e7f4f0@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=d7b227731ec589e7f4f0
-Reported-by: syzbot+30a35a2e9c5067cc43fa@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=30a35a2e9c5067cc43fa
-Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
-Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
----
-Changes since v1 
-- Moved from net to net-next since 
-  Fixes tag is available only on net-next
-  as mentioned by Martin 
-- Added direct link to design discussion as 
-  mentioned by Willem.
-- Parameter in the sockopt_validate_clockid
-  is of type __kernel_clockid_t so changed it from 
-  int to __kernel_clockid_t as mentioned by 
-  Willem.
-- Added Acked-by tag. 
-
- net/core/sock.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 8629f9aecf91..d497285f283a 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1083,6 +1083,17 @@ bool sockopt_capable(int cap)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nisp_rxtx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nisp_rxtx.c
+index 7ae3e8246d8f..8cf6a8daf721 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nisp_rxtx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nisp_rxtx.c
+@@ -172,22 +172,24 @@ static int psp_rcv(struct sk_buff *skb)
+ 	return 0;
  }
- EXPORT_SYMBOL(sockopt_capable);
  
-+static int sockopt_validate_clockid(__kernel_clockid_t value)
-+{
-+	switch (value) {
-+	case CLOCK_REALTIME:
-+	case CLOCK_MONOTONIC:
-+	case CLOCK_TAI:
-+		return 0;
+-void mlx5e_nisp_offload_handle_rx_skb(struct net_device *netdev, struct sk_buff *skb,
++bool mlx5e_nisp_offload_handle_rx_skb(struct net_device *netdev, struct sk_buff *skb,
+ 				      struct mlx5_cqe64 *cqe)
+ {
+ 	u32 nisp_meta_data = be32_to_cpu(cqe->ft_metadata);
+ 
+ 	/* TBD: report errors as SW counters to ethtool, any further handling ? */
+-	switch (MLX5_NISP_METADATA_SYNDROM(nisp_meta_data)) {
+-	case MLX5E_NISP_OFFLOAD_RX_SYNDROME_DECRYPTED:
+-		if (psp_rcv(skb))
+-			netdev_warn_once(netdev, "PSP handling failed");
+-		skb->decrypted = 1;
+-		break;
+-	default:
+-		WARN_ON_ONCE(true);
+-		break;
+-	}
++	if (MLX5_NISP_METADATA_SYNDROM(nisp_meta_data) != MLX5E_NISP_OFFLOAD_RX_SYNDROME_DECRYPTED)
++		goto drop;
++
++	if (psp_rcv(skb))
++		goto drop;
++
++	skb->decrypted = 1;
++	return false;
++
++drop:
++	kfree_skb(skb);
++	return true;
+ }
+ 
+ void mlx5e_nisp_tx_build_eseg(struct mlx5e_priv *priv, struct sk_buff *skb,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nisp_rxtx.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nisp_rxtx.h
+index 834481232b21..1e13b09b3522 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nisp_rxtx.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nisp_rxtx.h
+@@ -86,7 +86,7 @@ static inline bool mlx5e_nisp_is_rx_flow(struct mlx5_cqe64 *cqe)
+ 	return MLX5_NISP_METADATA_MARKER(be32_to_cpu(cqe->ft_metadata));
+ }
+ 
+-void mlx5e_nisp_offload_handle_rx_skb(struct net_device *netdev, struct sk_buff *skb,
++bool mlx5e_nisp_offload_handle_rx_skb(struct net_device *netdev, struct sk_buff *skb,
+ 				      struct mlx5_cqe64 *cqe);
+ 
+ void mlx5e_nisp_csum_complete(struct net_device *netdev, struct sk_buff *skb);
+@@ -113,10 +113,11 @@ static inline bool mlx5e_nisp_is_rx_flow(struct mlx5_cqe64 *cqe)
+ 	return false;
+ }
+ 
+-static inline void mlx5e_nisp_offload_handle_rx_skb(struct net_device *netdev,
++static inline bool mlx5e_nisp_offload_handle_rx_skb(struct net_device *netdev,
+ 						    struct sk_buff *skb,
+ 						    struct mlx5_cqe64 *cqe)
+ {
++	return false;
+ }
+ 
+ static inline void mlx5e_nisp_csum_complete(struct net_device *netdev, struct sk_buff *skb) { }
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+index ed3c7d8cf99d..22cf1c563844 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+@@ -1552,7 +1552,7 @@ static inline void mlx5e_handle_csum(struct net_device *netdev,
+ 
+ #define MLX5E_CE_BIT_MASK 0x80
+ 
+-static inline void mlx5e_build_rx_skb(struct mlx5_cqe64 *cqe,
++static inline bool mlx5e_build_rx_skb(struct mlx5_cqe64 *cqe,
+ 				      u32 cqe_bcnt,
+ 				      struct mlx5e_rq *rq,
+ 				      struct sk_buff *skb)
+@@ -1566,8 +1566,10 @@ static inline void mlx5e_build_rx_skb(struct mlx5_cqe64 *cqe,
+ 	if (unlikely(get_cqe_tls_offload(cqe)))
+ 		mlx5e_ktls_handle_rx_skb(rq, skb, cqe, &cqe_bcnt);
+ 
+-	if (unlikely(mlx5e_nisp_is_rx_flow(cqe)))
+-		mlx5e_nisp_offload_handle_rx_skb(netdev, skb, cqe);
++	if (unlikely(mlx5e_nisp_is_rx_flow(cqe))) {
++		if (mlx5e_nisp_offload_handle_rx_skb(netdev, skb, cqe))
++			return true;
 +	}
-+	return -EINVAL;
-+}
+ 
+ 	if (unlikely(mlx5_ipsec_is_rx_flow(cqe)))
+ 		mlx5e_ipsec_offload_handle_rx_skb(netdev, skb,
+@@ -1612,9 +1614,11 @@ static inline void mlx5e_build_rx_skb(struct mlx5_cqe64 *cqe,
+ 
+ 	if (unlikely(mlx5e_skb_is_multicast(skb)))
+ 		stats->mcast_packets++;
 +
- /*
-  *	This is meant for all protocols to use and covers goings on
-  *	at the socket level. Everything here is generic.
-@@ -1497,6 +1508,11 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 			ret = -EPERM;
- 			break;
- 		}
++	return false;
+ }
+ 
+-static void mlx5e_shampo_complete_rx_cqe(struct mlx5e_rq *rq,
++static bool mlx5e_shampo_complete_rx_cqe(struct mlx5e_rq *rq,
+ 					 struct mlx5_cqe64 *cqe,
+ 					 u32 cqe_bcnt,
+ 					 struct sk_buff *skb)
+@@ -1626,16 +1630,20 @@ static void mlx5e_shampo_complete_rx_cqe(struct mlx5e_rq *rq,
+ 	stats->bytes += cqe_bcnt;
+ 	stats->gro_bytes += cqe_bcnt;
+ 	if (NAPI_GRO_CB(skb)->count != 1)
+-		return;
+-	mlx5e_build_rx_skb(cqe, cqe_bcnt, rq, skb);
++		return false;
 +
-+		ret = sockopt_validate_clockid(sk_txtime.clockid);
-+		if (ret)
-+			break;
++	if (mlx5e_build_rx_skb(cqe, cqe_bcnt, rq, skb))
++		return true;
 +
- 		sock_valbool_flag(sk, SOCK_TXTIME, true);
- 		sk->sk_clockid = sk_txtime.clockid;
- 		sk->sk_txtime_deadline_mode =
--- 
-2.25.1
-
+ 	skb_reset_network_header(skb);
+ 	if (!skb_flow_dissect_flow_keys(skb, &rq->hw_gro_data->fk, 0)) {
+ 		napi_gro_receive(rq->cq.napi, skb);
+ 		rq->hw_gro_data->skb = NULL;
+ 	}
++	return false;
+ }
+ 
+-static inline void mlx5e_complete_rx_cqe(struct mlx5e_rq *rq,
++static inline bool mlx5e_complete_rx_cqe(struct mlx5e_rq *rq,
+ 					 struct mlx5_cqe64 *cqe,
+ 					 u32 cqe_bcnt,
+ 					 struct sk_buff *skb)
+@@ -1644,7 +1652,7 @@ static inline void mlx5e_complete_rx_cqe(struct mlx5e_rq *rq,
+ 
+ 	stats->packets++;
+ 	stats->bytes += cqe_bcnt;
+-	mlx5e_build_rx_skb(cqe, cqe_bcnt, rq, skb);
++	return mlx5e_build_rx_skb(cqe, cqe_bcnt, rq, skb);
+ }
+ 
+ static inline
+@@ -1858,7 +1866,8 @@ static void mlx5e_handle_rx_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
+ 		goto wq_cyc_pop;
+ 	}
+ 
+-	mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb);
++	if (mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb))
++		goto wq_cyc_pop;
+ 
+ 	if (mlx5e_cqe_regb_chain(cqe))
+ 		if (!mlx5e_tc_update_skb_nic(cqe, skb)) {
+@@ -1905,7 +1914,8 @@ static void mlx5e_handle_rx_cqe_rep(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
+ 		goto wq_cyc_pop;
+ 	}
+ 
+-	mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb);
++	if (mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb))
++		goto wq_cyc_pop;
+ 
+ 	if (rep->vlan && skb_vlan_tag_present(skb))
+ 		skb_vlan_pop(skb);
+@@ -1954,7 +1964,8 @@ static void mlx5e_handle_rx_cqe_mpwrq_rep(struct mlx5e_rq *rq, struct mlx5_cqe64
+ 	if (!skb)
+ 		goto mpwrq_cqe_out;
+ 
+-	mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb);
++	if (mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb))
++		goto mpwrq_cqe_out;
+ 
+ 	mlx5e_rep_tc_receive(cqe, rq, skb);
+ 
+@@ -2375,7 +2386,10 @@ static void mlx5e_handle_rx_cqe_mpwrq_shampo(struct mlx5e_rq *rq, struct mlx5_cq
+ 		mlx5e_fill_skb_data(*skb, rq, frag_page, data_bcnt, data_offset);
+ 	}
+ 
+-	mlx5e_shampo_complete_rx_cqe(rq, cqe, cqe_bcnt, *skb);
++	if (mlx5e_shampo_complete_rx_cqe(rq, cqe, cqe_bcnt, *skb)) {
++		*skb = NULL;
++		goto free_hd_entry;
++	}
+ 	if (flush)
+ 		mlx5e_shampo_flush_skb(rq, cqe, match);
+ free_hd_entry:
+@@ -2429,7 +2443,8 @@ static void mlx5e_handle_rx_cqe_mpwrq(struct mlx5e_rq *rq, struct mlx5_cqe64 *cq
+ 	if (!skb)
+ 		goto mpwrq_cqe_out;
+ 
+-	mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb);
++	if (mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb))
++		goto mpwrq_cqe_out;
+ 
+ 	if (mlx5e_cqe_regb_chain(cqe))
+ 		if (!mlx5e_tc_update_skb_nic(cqe, skb)) {
+@@ -2762,7 +2777,8 @@ static void mlx5e_trap_handle_rx_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe
+ 	if (!skb)
+ 		goto wq_cyc_pop;
+ 
+-	mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb);
++	if (mlx5e_complete_rx_cqe(rq, cqe, cqe_bcnt, skb))
++		goto wq_cyc_pop;
+ 	skb_push(skb, ETH_HLEN);
+ 
+ 	mlx5_devlink_trap_report(rq->mdev, trap_id, skb,
 
