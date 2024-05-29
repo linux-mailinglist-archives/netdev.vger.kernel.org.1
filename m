@@ -1,617 +1,240 @@
-Return-Path: <netdev+bounces-98989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D8D28D351E
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 13:07:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FBE18D3528
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 13:11:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 629752834EA
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 11:07:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 890771F25FF2
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 11:11:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F8C167DA7;
-	Wed, 29 May 2024 11:06:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C8F4167DBD;
+	Wed, 29 May 2024 11:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="E3j1Df0d"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="zfcPeCqu"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A383316729D;
-	Wed, 29 May 2024 11:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C378515DBC0
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 11:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716980799; cv=none; b=AQZf75malLpBB54h6WjLRXuRtG0EVvsLF6JyoFmhHO0Mfo6KJvzPahVNBCHmAWMQ1eFgSMB7AlyeU+MHPl7ZIvMv7/c1H0kYFFv5Gh4SiU7kSOf9evzK9nruuNcVJ4mgNmZLZqdqF/zkfkkpkGt/rvQ0ITV+8LIo4OLMzSAv6kE=
+	t=1716981058; cv=none; b=s1D9U49G+B5YwBRv208nSFlGe3Z3ldhvYc4BXXXD19eIZ84NiFVUuTq9jHLORMM0OxnsJqLn+pccHYVq8qQolgYYzN56MecE0r+7+4YlO+Nsuq+AWykm9uEr83paYZND553ubC8iNEfheNZTvbbKKc4AKn0tD0lIc3nNA/jsnE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716980799; c=relaxed/simple;
-	bh=5E9kgh+TBpO447J41COEOkGJevjhElLDwO62Yspu0so=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XETVgkFW1eRVQJuJZEhI06l4CMK40TKUstf6eUhOlsrEwVUJrkEbk/hfUBtL46Gy+0roqVXDUY0foJQ+9szazCjew06/4HzcLZIdRQuAk3pGIGvKYrDggD1GVWhGAirWhJt68oJxh3yAlUmWPwRc/oBLDE7Sjqi9722ZBKxSooU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=E3j1Df0d; arc=none smtp.client-ip=198.47.19.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 44TB5xEe068843;
-	Wed, 29 May 2024 06:05:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1716980759;
-	bh=S8JVGBrWP70MQIuwMUlfrRG75kq1g3lb8jAyZ89RRDE=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=E3j1Df0dOtxUhz7xyXDUVnZKDrP3slYN3YK5T/1zRjCcBt/jnqZDFHRnqG/pz1OBx
-	 mae+iP32n+QdbEJHPFIY0kl7zuMjDUiN+3IXUTjrKOu8mcUm6AMVXTqrVZ5HqYpEFL
-	 pFkh3GWQesQwQGKFyZ+GEERirpx6SJLeMeQlTYwY=
-Received: from DLEE111.ent.ti.com (dlee111.ent.ti.com [157.170.170.22])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 44TB5xD3107555
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 29 May 2024 06:05:59 -0500
-Received: from DLEE105.ent.ti.com (157.170.170.35) by DLEE111.ent.ti.com
- (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 29
- May 2024 06:05:58 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 29 May 2024 06:05:58 -0500
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 44TB5wvU079060;
-	Wed, 29 May 2024 06:05:58 -0500
-Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 44TB5vF6016501;
-	Wed, 29 May 2024 06:05:58 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Jan Kiszka <jan.kiszka@siemens.com>,
-        Dan Carpenter
-	<dan.carpenter@linaro.org>,
-        Andrew Lunn <andrew@lunn.ch>, Simon Horman
-	<horms@kernel.org>,
-        Diogo Ivo <diogo.ivo@siemens.com>,
-        Wolfram Sang
-	<wsa+renesas@sang-engineering.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Vladimir Oltean
-	<vladimir.oltean@nxp.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Richard
- Cochran <richardcochran@gmail.com>,
-        Roger Quadros <rogerq@kernel.org>,
-        MD
- Danish Anwar <danishanwar@ti.com>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub
- Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S.
- Miller" <davem@davemloft.net>
-CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        Roger Quadros <rogerq@ti.com>
-Subject: [PATCH net-next v8 2/2] net: ti: icssg_prueth: add TAPRIO offload support
-Date: Wed, 29 May 2024 16:35:51 +0530
-Message-ID: <20240529110551.620907-3-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240529110551.620907-1-danishanwar@ti.com>
-References: <20240529110551.620907-1-danishanwar@ti.com>
+	s=arc-20240116; t=1716981058; c=relaxed/simple;
+	bh=nxqTjljCvE3eJeFg1oTQL8Y2pVXJjcEuLsQGIg10+W0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ETTkgRB4xgI1fNAQcGZa2iruiMfB/F97iGs99wtagfFgwqdMaSGMV0HAo5HHQR/OdsQtIgr1WFRULv+uWKflhXG48dXA0+K2e0SN1H2mt8uuf+CmHNJonkm1lhw2NaEPyyzb2GjoEvoQEN9hmv2VXBGSvQc02iuUB/Krgz4mqG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=zfcPeCqu; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-df7719583d0so2108920276.1
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 04:10:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1716981056; x=1717585856; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3yIA3T3nf46uPcBF4Atl1zf/qE/OpogHvRn/CxCLmC8=;
+        b=zfcPeCquJzsSaEPt8v78j9mgmYoRELSb5yQ92pXa449ha/NkDuUN4IwuV3KsigqANg
+         OvpA/qQaj59jFChugKIHCbuy+o3/I49On8nAcfrwrvpg6VY5Z3aBi9Qt05u2G5lv+AFo
+         grV2/pWdIVQ+589AfBqBYHIJfRQQ+V3GznvU+2GTrAyMBDtR0OD9b4Dsgrcak8g/QDp+
+         nN/mxrVpURQ8zHtc9/m66WOge1GKwmvRFIFo0U6k2/EycLV0eteVXaoIcfEGJoADEX1f
+         AVxfV+mu+FL7wbf1s8LcxGKF/IovJ8nHK020O04Jb2byarDw5FBd4hvoIACUxDYciwuY
+         7z/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716981056; x=1717585856;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3yIA3T3nf46uPcBF4Atl1zf/qE/OpogHvRn/CxCLmC8=;
+        b=i6xvCuYBbWHpyf56oMF4b9fyZKIgqIYFXOGRK26TftAwi/S2qKfa0lSgpd/Equ2WKV
+         Q8G4qwGbPiQmWc6Yg1Cf3EMWNK3aBRb0B+64ibKdt9hRRvmLMRlcoG0Gyj5k8qju7FiT
+         CDl4RAG7f/PPK0EFEtOfkaShqC7ohkRMQ6CZyb4hG/ep+FrPOFr66WPdo4/KYJwGoOUL
+         qKb1lHMmZ557nkvK4vcOp5vXh0xMjlSO00h0ILrbhljSZCWyBLEKdMpWDHQl5pUuZLin
+         0bwkgY+1kBmHlK1x0NMTsOJe0wSSUblDRCGZiiAL5cVzUYUN8vZik3CAcB4SSfGSAJOA
+         X4KA==
+X-Forwarded-Encrypted: i=1; AJvYcCXbjzb/j+vWVDehMfWIpWrNYLbLdWhX+YTguFUR0S/v+GpFZ1W7TcrFhs1Kg0PLBYJkzTAaOtviP7hUbTQAXozrPflQSAKJ
+X-Gm-Message-State: AOJu0YyJCityyzyQFCLz53hRwv+TR9pyoDrlR38TM/bpnOQ5SjC9oAQK
+	K7dBERbXeNjW6vbND+/r7tpYbeP0SQ8BILlKVLMTgLKlm2D34GMztqjuu7AeUcx2plnFCShvSXg
+	BiJITNWp55CaMReAh6TsybhOj2onXFwesYvtB
+X-Google-Smtp-Source: AGHT+IETLKHGyzZPvcMvExbdxZ3TTxf3geUv6cGG7dAK3qcjC78hnrHqjk4uuRoPTkooF1H2ROicZCYM7qRFyyiwnK4=
+X-Received: by 2002:a25:8206:0:b0:de5:5706:b958 with SMTP id
+ 3f1490d57ef6-df7721c21demr14375373276.38.1716981055647; Wed, 29 May 2024
+ 04:10:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240410140141.495384-1-jhs@mojatatu.com> <41736ea4e81666e911fee5b880d9430ffffa9a58.camel@redhat.com>
+ <CAM0EoM=982OctjvSQpx0kR7e+JnQLhvZ=sM-tNB4xNiu7nhH5Q@mail.gmail.com>
+ <CAM0EoM=VhVn2sGV40SYttQyaiCn8gKaKHTUqFxB_WzKrayJJfQ@mail.gmail.com>
+ <87cf4830e2e46c1882998162526e108fb424a0f7.camel@redhat.com>
+ <CAM0EoMkJwR0K-fF7qo0PfRw4Sf+=2L0L=rOcH5A2ELwagLrZMw@mail.gmail.com>
+ <CAM0EoMmfDoZ9_ZdK-ZjHjFAjuNN8fVK+R57_UaFqAm=wA0AWVA@mail.gmail.com>
+ <82ee1013ca0164053e9fb1259eaf676343c430e8.camel@redhat.com>
+ <CAADnVQLugkg+ahAapskRaE86=RnwpY8v=Nre8pn=sa4fTEoTyA@mail.gmail.com>
+ <CAM0EoM=2wHem54vTeVq4H1W5pawYuHNt-aS9JyG8iQORbaw5pA@mail.gmail.com>
+ <CAM0EoMmCz5usVSLq_wzR3s7UcaKifa-X58zr6hkPXuSBnwFX3w@mail.gmail.com>
+ <CAM0EoMmsB5jHZ=4oJc_Yzm=RFDUHWh9yexdG6_bPFS4_CFuiog@mail.gmail.com>
+ <20240522151933.6f422e63@kernel.org> <CAM0EoMmFrp5X5OzMbum5i_Bjng7Bhtk1YvWpacW6FV6Oy-3avg@mail.gmail.com>
+ <CO1PR11MB499350FC06A5B87E4C770CCE93F42@CO1PR11MB4993.namprd11.prod.outlook.com>
+ <MW4PR12MB71927C9E4B94871B45F845DF97F52@MW4PR12MB7192.namprd12.prod.outlook.com>
+ <MW4PR12MB719209644426A0F5AE18D2E897F62@MW4PR12MB7192.namprd12.prod.outlook.com>
+ <66563bc85f5d0_2f7f2087@john.notmuch> <CO1PR11MB49932999F5467416D4F7197693F12@CO1PR11MB4993.namprd11.prod.outlook.com>
+ <CAOuuhY8wMG0+WvYx3RC++pebcRF4aW1zAW+vgAb3ap-8Q-139w@mail.gmail.com> <SN6PR17MB211087D7BF4ABCE2A8E4FA3D96F12@SN6PR17MB2110.namprd17.prod.outlook.com>
+In-Reply-To: <SN6PR17MB211087D7BF4ABCE2A8E4FA3D96F12@SN6PR17MB2110.namprd17.prod.outlook.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 29 May 2024 07:10:44 -0400
+Message-ID: <CAM0EoMk3fAn=ULevpo9R9v9rFV3-_JrSUTbBP-X0GWLEWL4M-w@mail.gmail.com>
+Subject: Re: On the NACKs on P4TC patches
+To: Chris Sommers <chris.sommers@keysight.com>
+Cc: Tom Herbert <tom@sipanda.io>, "Singhai, Anjali" <anjali.singhai@intel.com>, 
+	John Fastabend <john.fastabend@gmail.com>, "Jain, Vipin" <Vipin.Jain@amd.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>, Network Development <netdev@vger.kernel.org>, 
+	"Chatterjee, Deb" <deb.chatterjee@intel.com>, "Limaye, Namrata" <namrata.limaye@intel.com>, 
+	Marcelo Ricardo Leitner <mleitner@redhat.com>, "Shirshyad, Mahesh" <Mahesh.Shirshyad@amd.com>, 
+	"Osinski, Tomasz" <tomasz.osinski@intel.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Vlad Buslov <vladbu@nvidia.com>, Simon Horman <horms@kernel.org>, 
+	Khalid Manaa <khalidm@nvidia.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Victor Nogueira <victor@mojatatu.com>, "Tammela, Pedro" <pctammela@mojatatu.com>, 
+	"Daly, Dan" <dan.daly@intel.com>, Andy Fingerhut <andy.fingerhut@gmail.com>, 
+	Matty Kadosh <mattyk@nvidia.com>, bpf <bpf@vger.kernel.org>, "lwn@lwn.net" <lwn@lwn.net>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Transfer-Encoding: quoted-printable
 
-From: Roger Quadros <rogerq@ti.com>
+Not sure why my email was tagged as html and blocked, but here goes again:
 
-The ICSSG dual-emac / switch firmware supports Enhanced Scheduled Traffic
-(EST – defined in P802.1Qbv/D2.2 that later got included in IEEE
-802.1Q-2018) configuration. EST allows express queue traffic to be
-scheduled (placed) on the wire at specific repeatable time intervals. In
-Linux kernel, EST configuration is done through tc command and the taprio
-scheduler in the net core implements a software only scheduler
-(SCH_TAPRIO). If the NIC is capable of EST configuration,user indicate
-"flag 2" in the command which is then parsed by taprio scheduler in net
-core and indicate that the command is to be offloaded to h/w. taprio then
-offloads the command to the driver by calling ndo_setup_tc() ndo ops. This
-patch implements ndo_setup_tc() to offload EST configuration to ICSSG.
+On Tue, May 28, 2024 at 7:43=E2=80=AFPM Chris Sommers
+<chris.sommers@keysight.com> wrote:
+>
+> > On Tue, May 28, 2024 at 3:17=E2=80=AFPM Singhai, Anjali
+> > <anjali.singhai@intel.com> wrote:
+> > >
+> > > >From: John Fastabend <john.fastabend@gmail.com>
+> > > >Sent: Tuesday, May 28, 2024 1:17 PM
+> > >
+> > > >Jain, Vipin wrote:
+> > > >> [AMD Official Use Only - AMD Internal Distribution Only]
+> > > >>
+> > > >> My apologies, earlier email used html and was blocked by the list.=
+..
+> > > >> My response at the bottom as "VJ>"
+> > > >>
+> > > >> ________________________________________
+> > >
+> > > >Anjali and Vipin is your support for HW support of P4 or a Linux SW =
+implementation of P4. If its for HW support what drivers would we want to s=
+upport? Can you describe how to program >these devices?
+> > >
+> > > >At the moment there hasn't been any movement on Linux hardware P4 su=
+pport side as far as I can tell. Yes there are some SDKs and build kits flo=
+ating around for FPGAs. For example >maybe start with what drivers in kerne=
+l tree run the DPUs that have this support? I think this would be a product=
+ive direction to go if we in fact have hardware support in the works.
+> > >
+> > > >If you want a SW implementation in Linux my opinion is still pushing=
+ a DSL into the kernel datapath via qdisc/tc is the wrong direction. Mappin=
+g P4 onto hardware blocks is fundamentally >different architecture from map=
+ping
+> > > >P4 onto general purpose CPU and registers. My opinion -- to handle t=
+his you need a per architecture backend/JIT to compile the P4 to native ins=
+tructions.
+> > > >This will give you the most flexibility to define new constructs, be=
+st performance, and lowest overhead runtime. We have a P4 BPF backend alrea=
+dy and JITs for most architectures I don't >see the need for P4TC in this c=
+ontext.
+> > >
+> > > >If the end goal is a hardware offload control plane I'm skeptical we=
+ even need something specific just for SW datapath. I would propose a devli=
+nk or new infra to program the device directly >vs overhead and complexity =
+of abstracting through 'tc'. If you want to emulate your device use BPF or =
+user space datapath.
+> > >
+> > > >.John
+> > >
+> > >
+> > > John,
+> > > Let me start by saying production hardware exists i think Jamal poste=
+d some links but i can point you to our hardware.
+> > > The hardware devices under discussion are capable of being abstracted=
+ using the P4 match-action paradigm so that's why we chose TC.
+> > > These devices are programmed using the TC/netlink interface i.e the s=
+tandard TC control-driver ops apply. While it is clear to us that the P4TC =
+abstraction suffices, we are currently discussing details that will cater f=
+or all vendors in our biweekly meetings.
+> > > One big requirement is we want to avoid the flower trap - we dont wan=
+t to be changing kernel/user/driver code every time we add new datapaths.
+> > > We feel P4TC approach is the path to add Linux kernel support.
+> > >
+> > > The s/w path is needed as well for several reasons.
+> > > We need the same P4 program to run either in software or hardware or =
+in both using skip_sw/skip_hw. It could be either in split mode or as an ex=
+ception path as it is done today in flower or u32. Also it is common now in=
+ the P4 community that people define their datapath using their program and=
+ will write a control application that works for both hardware and software=
+ datapaths. They could be using the software datapath for testing as you sa=
+id but also for the split/exception path. Chris can probably add more comme=
+nts on the software datapath.
+>
+> Anjali, thanks for asking. Agreed, I like the flexibility of accommodatin=
+g a variety of platforms depending upon performance requirements and intend=
+ed target system. For me, flexibility is important. Some solutions need an =
+inline filter and P4-TC makes it so easy. The fact I will be able to get HW=
+ offload means I'm not performance bound. Some other solutions might need D=
+PDK implementation, so P4-DPDK is a choice there as well, and there are acc=
+eleration options. Keeping much of the dataplane design in one language (P4=
+) makes it easier for more developers to create products without having to =
+be platform-level experts. As someone who's worked with P4 Tofino, P4-TC, b=
+mv2, etc. I can authoritatively state that all have their proper place.
+> >
+> > Hi Anjali,
+> >
+> > Are there any use cases of P4-TC that don't involve P4 hardware? If
+> > someone wanted to write one off datapath code for their deployment and
+> > they didn't have P4 hardware would you suggest that they write they're
+> > code in P4-TC? The reason I ask is because I'm concerned about the
+> > performance of P4-TC. Like John said, this is mapping code that is
+> > intended to run in specialized hardware into a CPU, and it's also
+> > interpreted execution in TC. The performance numbers in
+> > https://urldefense.com/v3/__https://github.com/p4tc-dev/docs/blob/main/=
+p4-conference-2023/2023P4WorkshopP4TC.pdf__;!!I5pVk4LIGAfnvw!mHilz4xBMimnfa=
+pDG8BEgqOuPw_Mn-KiMHb-aNbl8nB8TwfOfSleeIANiNRFQtTc5zfR0aK1TE2J8lT2Fg$
+> > seem to show that P4-TC has about half the performance of XDP. Even
+> > with a lot of work, it's going to be difficult to substantially close
+> > that gap.
+>
+> AFAIK P4-TC can emit XDP or eBPF code depending upon the situation, someo=
+ne more knowledgeable should chime in.
+> However, I don't agree that comparing the speeds of XDP vs. P4-TC should =
+even be a deciding factor.
+> If P4-TC is good enough for a lot of applications, that is fine by me and=
+ over time it'll only get better.
+> If we held back every innovation because it was slower than something els=
+e, progress would suffer.
 
-Signed-off-by: Roger Quadros <rogerq@ti.com>
-Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
- drivers/net/ethernet/ti/Kconfig              |   1 +
- drivers/net/ethernet/ti/Makefile             |   3 +-
- drivers/net/ethernet/ti/icssg/icssg_prueth.c |   3 +
- drivers/net/ethernet/ti/icssg/icssg_prueth.h |   3 +
- drivers/net/ethernet/ti/icssg/icssg_qos.c    | 288 +++++++++++++++++++
- drivers/net/ethernet/ti/icssg/icssg_qos.h    | 113 ++++++++
- 6 files changed, 410 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.c
- create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.h
+Yes, XDP can be emitted based on compiler options (and was a
+motivation factor in considering use of eBPF). Tom's comment above
+seems to confuse the fact that XDP tends to be faster than TC with
+eBPF as the fault of P4TC.
+In any case this statement falls under:
+https://github.com/p4tc-dev/pushback-patches?tab=3Dreadme-ov-file#2b-commen=
+t-but--it-is-not-performant
 
-diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
-index 1729eb0e0b41..3716d585f9a3 100644
---- a/drivers/net/ethernet/ti/Kconfig
-+++ b/drivers/net/ethernet/ti/Kconfig
-@@ -190,6 +190,7 @@ config TI_ICSSG_PRUETH
- 	depends on PRU_REMOTEPROC
- 	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
- 	depends on PTP_1588_CLOCK_OPTIONAL
-+	depends on NET_SCH_TAPRIO
- 	help
- 	  Support dual Gigabit Ethernet ports over the ICSSG PRU Subsystem.
- 	  This subsystem is available starting with the AM65 platform.
-diff --git a/drivers/net/ethernet/ti/Makefile b/drivers/net/ethernet/ti/Makefile
-index 6e086b4c0384..28e794a8ecd1 100644
---- a/drivers/net/ethernet/ti/Makefile
-+++ b/drivers/net/ethernet/ti/Makefile
-@@ -39,7 +39,8 @@ icssg-prueth-y := icssg/icssg_prueth.o \
- 		  icssg/icssg_config.o \
- 		  icssg/icssg_mii_cfg.o \
- 		  icssg/icssg_stats.o \
--		  icssg/icssg_ethtool.o
-+		  icssg/icssg_ethtool.o \
-+		  icssg/icssg_qos.o
- obj-$(CONFIG_TI_ICSSG_PRUETH_SR1) += icssg-prueth-sr1.o
- icssg-prueth-sr1-y := icssg/icssg_prueth_sr1.o \
- 		      icssg/icssg_common.o \
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 3bd5caf26851..e5d90534f5b8 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -685,6 +685,7 @@ static const struct net_device_ops emac_netdev_ops = {
- 	.ndo_eth_ioctl = emac_ndo_ioctl,
- 	.ndo_get_stats64 = emac_ndo_get_stats64,
- 	.ndo_get_phys_port_name = emac_ndo_get_phys_port_name,
-+	.ndo_setup_tc = icssg_qos_ndo_setup_tc,
- };
- 
- static int prueth_netdev_init(struct prueth *prueth,
-@@ -819,6 +820,8 @@ static int prueth_netdev_init(struct prueth *prueth,
- 	emac->rx_hrtimer.function = &emac_rx_timer_callback;
- 	prueth->emac[mac] = emac;
- 
-+	icssg_qos_tas_init(ndev);
-+
- 	return 0;
- 
- free:
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index 208fb78fb71f..7aa34345b865 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -37,6 +37,7 @@
- #include "icssg_config.h"
- #include "icss_iep.h"
- #include "icssg_switch_map.h"
-+#include "icssg_qos.h"
- 
- #define PRUETH_MAX_MTU          (2000 - ETH_HLEN - ETH_FCS_LEN)
- #define PRUETH_MIN_PKT_SIZE     (VLAN_ETH_ZLEN)
-@@ -186,6 +187,8 @@ struct prueth_emac {
- 
- 	struct pruss_mem_region dram;
- 
-+	struct prueth_qos qos;
-+
- 	struct delayed_work stats_work;
- 	u64 stats[ICSSG_NUM_STATS];
- 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_qos.c b/drivers/net/ethernet/ti/icssg/icssg_qos.c
-new file mode 100644
-index 000000000000..5e93b1b9ca43
---- /dev/null
-+++ b/drivers/net/ethernet/ti/icssg/icssg_qos.c
-@@ -0,0 +1,288 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Texas Instruments ICSSG PRUETH QoS submodule
-+ * Copyright (C) 2023 Texas Instruments Incorporated - http://www.ti.com/
-+ */
-+
-+#include <linux/printk.h>
-+#include "icssg_prueth.h"
-+#include "icssg_switch_map.h"
-+
-+static void tas_update_fw_list_pointers(struct prueth_emac *emac)
-+{
-+	struct tas_config *tas = &emac->qos.tas.config;
-+
-+	if ((readb(tas->active_list)) == TAS_LIST0) {
-+		tas->fw_active_list = emac->dram.va + TAS_GATE_MASK_LIST0;
-+		tas->fw_shadow_list = emac->dram.va + TAS_GATE_MASK_LIST1;
-+	} else {
-+		tas->fw_active_list = emac->dram.va + TAS_GATE_MASK_LIST1;
-+		tas->fw_shadow_list = emac->dram.va + TAS_GATE_MASK_LIST0;
-+	}
-+}
-+
-+static void tas_update_maxsdu_table(struct prueth_emac *emac)
-+{
-+	struct tas_config *tas = &emac->qos.tas.config;
-+	u16 __iomem *max_sdu_tbl_ptr;
-+	u8 gate_idx;
-+
-+	/* update the maxsdu table */
-+	max_sdu_tbl_ptr = emac->dram.va + TAS_QUEUE_MAX_SDU_LIST;
-+
-+	for (gate_idx = 0; gate_idx < TAS_MAX_NUM_QUEUES; gate_idx++)
-+		writew(tas->max_sdu_table.max_sdu[gate_idx], &max_sdu_tbl_ptr[gate_idx]);
-+}
-+
-+static void tas_reset(struct prueth_emac *emac)
-+{
-+	struct tas_config *tas = &emac->qos.tas.config;
-+	int i;
-+
-+	for (i = 0; i < TAS_MAX_NUM_QUEUES; i++)
-+		tas->max_sdu_table.max_sdu[i] = 2048;
-+
-+	tas_update_maxsdu_table(emac);
-+
-+	writeb(TAS_LIST0, tas->active_list);
-+
-+	memset_io(tas->fw_active_list, 0, sizeof(*tas->fw_active_list));
-+	memset_io(tas->fw_shadow_list, 0, sizeof(*tas->fw_shadow_list));
-+}
-+
-+static int tas_set_state(struct prueth_emac *emac, enum tas_state state)
-+{
-+	struct tas_config *tas = &emac->qos.tas.config;
-+	int ret;
-+
-+	if (tas->state == state)
-+		return 0;
-+
-+	switch (state) {
-+	case TAS_STATE_RESET:
-+		tas_reset(emac);
-+		ret = emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_RESET);
-+		tas->state = TAS_STATE_RESET;
-+		break;
-+	case TAS_STATE_ENABLE:
-+		ret = emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_ENABLE);
-+		tas->state = TAS_STATE_ENABLE;
-+		break;
-+	case TAS_STATE_DISABLE:
-+		ret = emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_DISABLE);
-+		tas->state = TAS_STATE_DISABLE;
-+		break;
-+	default:
-+		netdev_err(emac->ndev, "%s: unsupported state\n", __func__);
-+		ret = -EINVAL;
-+		break;
-+	}
-+
-+	if (ret)
-+		netdev_err(emac->ndev, "TAS set state failed %d\n", ret);
-+	return ret;
-+}
-+
-+static int tas_set_trigger_list_change(struct prueth_emac *emac)
-+{
-+	struct tc_taprio_qopt_offload *admin_list = emac->qos.tas.taprio_admin;
-+	struct tas_config *tas = &emac->qos.tas.config;
-+	struct ptp_system_timestamp sts;
-+	u32 change_cycle_count;
-+	u32 cycle_time;
-+	u64 base_time;
-+	u64 cur_time;
-+
-+	/* IEP clock has a hardware errata due to which it wraps around exactly
-+	 * once every taprio cycle. To compensate for that, adjust cycle time
-+	 * by the wrap around time which is stored in emac->iep->def_inc
-+	 */
-+	cycle_time = admin_list->cycle_time - emac->iep->def_inc;
-+	base_time = admin_list->base_time;
-+	cur_time = prueth_iep_gettime(emac, &sts);
-+
-+	if (base_time > cur_time)
-+		change_cycle_count = DIV_ROUND_UP_ULL(base_time - cur_time, cycle_time);
-+	else
-+		change_cycle_count = 1;
-+
-+	writel(cycle_time, emac->dram.va + TAS_ADMIN_CYCLE_TIME);
-+	writel(change_cycle_count, emac->dram.va + TAS_CONFIG_CHANGE_CYCLE_COUNT);
-+	writeb(admin_list->num_entries, emac->dram.va + TAS_ADMIN_LIST_LENGTH);
-+
-+	/* config_change cleared by f/w to ack reception of new shadow list */
-+	writeb(1, &tas->config_list->config_change);
-+	/* config_pending cleared by f/w when new shadow list is copied to active list */
-+	writeb(1, &tas->config_list->config_pending);
-+
-+	return emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_TRIGGER);
-+}
-+
-+static int tas_update_oper_list(struct prueth_emac *emac)
-+{
-+	struct tc_taprio_qopt_offload *admin_list = emac->qos.tas.taprio_admin;
-+	struct tas_config *tas = &emac->qos.tas.config;
-+	u32 tas_acc_gate_close_time = 0;
-+	u8 idx, gate_idx, val;
-+	int ret;
-+
-+	if (admin_list->cycle_time > TAS_MAX_CYCLE_TIME)
-+		return -EINVAL;
-+
-+	tas_update_fw_list_pointers(emac);
-+
-+	for (idx = 0; idx < admin_list->num_entries; idx++) {
-+		writeb(admin_list->entries[idx].gate_mask,
-+		       &tas->fw_shadow_list->gate_mask_list[idx]);
-+		tas_acc_gate_close_time += admin_list->entries[idx].interval;
-+
-+		/* extend last entry till end of cycle time */
-+		if (idx == admin_list->num_entries - 1)
-+			writel(admin_list->cycle_time,
-+			       &tas->fw_shadow_list->win_end_time_list[idx]);
-+		else
-+			writel(tas_acc_gate_close_time,
-+			       &tas->fw_shadow_list->win_end_time_list[idx]);
-+	}
-+
-+	/* clear remaining entries */
-+	for (idx = admin_list->num_entries; idx < TAS_MAX_CMD_LISTS; idx++) {
-+		writeb(0, &tas->fw_shadow_list->gate_mask_list[idx]);
-+		writel(0, &tas->fw_shadow_list->win_end_time_list[idx]);
-+	}
-+
-+	/* update the Array of gate close time for each queue in each window */
-+	for (idx = 0 ; idx < admin_list->num_entries; idx++) {
-+		/* On Linux, only PRUETH_MAX_TX_QUEUES are supported per port */
-+		for (gate_idx = 0; gate_idx < PRUETH_MAX_TX_QUEUES; gate_idx++) {
-+			u8 gate_mask_list_idx = readb(&tas->fw_shadow_list->gate_mask_list[idx]);
-+			u32 gate_close_time = 0;
-+
-+			if (gate_mask_list_idx & BIT(gate_idx))
-+				gate_close_time = readl(&tas->fw_shadow_list->win_end_time_list[idx]);
-+
-+			writel(gate_close_time,
-+			       &tas->fw_shadow_list->gate_close_time_list[idx][gate_idx]);
-+		}
-+	}
-+
-+	/* tell f/w to swap active & shadow list */
-+	ret = tas_set_trigger_list_change(emac);
-+	if (ret) {
-+		netdev_err(emac->ndev, "failed to swap f/w config list: %d\n", ret);
-+		return ret;
-+	}
-+
-+	/* Wait for completion */
-+	ret = readb_poll_timeout(&tas->config_list->config_change, val, !val,
-+				 USEC_PER_MSEC, 10 * USEC_PER_MSEC);
-+	if (ret) {
-+		netdev_err(emac->ndev, "TAS list change completion time out\n");
-+		return ret;
-+	}
-+
-+	tas_update_fw_list_pointers(emac);
-+
-+	return 0;
-+}
-+
-+static int emac_taprio_replace(struct net_device *ndev,
-+			       struct tc_taprio_qopt_offload *taprio)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	int ret;
-+
-+	if (taprio->cycle_time_extension) {
-+		NL_SET_ERR_MSG_MOD(taprio->extack, "Cycle time extension not supported");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (taprio->cycle_time < TAS_MIN_CYCLE_TIME) {
-+		NL_SET_ERR_MSG_FMT_MOD(taprio->extack, "cycle_time %llu is less than min supported cycle_time %d",
-+				       taprio->cycle_time, TAS_MIN_CYCLE_TIME);
-+		return -EINVAL;
-+	}
-+
-+	if (taprio->num_entries > TAS_MAX_CMD_LISTS) {
-+		NL_SET_ERR_MSG_FMT_MOD(taprio->extack, "num_entries %lu is more than max supported entries %d",
-+				       taprio->num_entries, TAS_MAX_CMD_LISTS);
-+		return -EINVAL;
-+	}
-+
-+	if (emac->qos.tas.taprio_admin)
-+		taprio_offload_free(emac->qos.tas.taprio_admin);
-+
-+	emac->qos.tas.taprio_admin = taprio_offload_get(taprio);
-+	ret = tas_update_oper_list(emac);
-+	if (ret)
-+		goto clear_taprio;
-+
-+	ret = tas_set_state(emac, TAS_STATE_ENABLE);
-+	if (ret)
-+		goto clear_taprio;
-+
-+clear_taprio:
-+	emac->qos.tas.taprio_admin = NULL;
-+	taprio_offload_free(taprio);
-+
-+	return ret;
-+}
-+
-+static int emac_taprio_destroy(struct net_device *ndev,
-+			       struct tc_taprio_qopt_offload *taprio)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	int ret;
-+
-+	taprio_offload_free(taprio);
-+
-+	ret = tas_set_state(emac, TAS_STATE_RESET);
-+	if (ret)
-+		return ret;
-+
-+	return tas_set_state(emac, TAS_STATE_DISABLE);
-+}
-+
-+static int emac_setup_taprio(struct net_device *ndev, void *type_data)
-+{
-+	struct tc_taprio_qopt_offload *taprio = type_data;
-+	int ret;
-+
-+	switch (taprio->cmd) {
-+	case TAPRIO_CMD_REPLACE:
-+		ret = emac_taprio_replace(ndev, taprio);
-+		break;
-+	case TAPRIO_CMD_DESTROY:
-+		ret = emac_taprio_destroy(ndev, taprio);
-+		break;
-+	default:
-+		ret = -EOPNOTSUPP;
-+	}
-+
-+	return ret;
-+}
-+
-+int icssg_qos_ndo_setup_tc(struct net_device *ndev, enum tc_setup_type type,
-+			   void *type_data)
-+{
-+	switch (type) {
-+	case TC_SETUP_QDISC_TAPRIO:
-+		return emac_setup_taprio(ndev, type_data);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+void icssg_qos_tas_init(struct net_device *ndev)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct tas_config *tas;
-+
-+	tas = &emac->qos.tas.config;
-+
-+	tas->config_list = emac->dram.va + TAS_CONFIG_CHANGE_TIME;
-+	tas->active_list = emac->dram.va + TAS_ACTIVE_LIST_INDEX;
-+
-+	tas_update_fw_list_pointers(emac);
-+
-+	tas_set_state(emac, TAS_STATE_RESET);
-+}
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_qos.h b/drivers/net/ethernet/ti/icssg/icssg_qos.h
-new file mode 100644
-index 000000000000..25baccdd1ce5
---- /dev/null
-+++ b/drivers/net/ethernet/ti/icssg/icssg_qos.h
-@@ -0,0 +1,113 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (C) 2023 Texas Instruments Incorporated - http://www.ti.com/
-+ */
-+
-+#ifndef __NET_TI_ICSSG_QOS_H
-+#define __NET_TI_ICSSG_QOS_H
-+
-+#include <linux/atomic.h>
-+#include <linux/netdevice.h>
-+#include <net/pkt_sched.h>
-+
-+/* Maximum number of gate command entries in each list. */
-+#define TAS_MAX_CMD_LISTS   (16)
-+
-+/* Maximum number of transmit queues supported by implementation */
-+#define TAS_MAX_NUM_QUEUES  (8)
-+
-+/* Minimum cycle time supported by implementation (in ns) */
-+#define TAS_MIN_CYCLE_TIME  (1000000)
-+
-+/* Minimum cycle time supported by implementation (in ns) */
-+#define TAS_MAX_CYCLE_TIME  (4000000000)
-+
-+/* Minimum TAS window duration supported by implementation (in ns) */
-+#define TAS_MIN_WINDOW_DURATION  (10000)
-+
-+/**
-+ * enum tas_list_num - TAS list number
-+ * @TAS_LIST0: TAS list number is 0
-+ * @TAS_LIST1: TAS list number is 1
-+ */
-+enum tas_list_num {
-+	TAS_LIST0 = 0,
-+	TAS_LIST1 = 1
-+};
-+
-+/**
-+ * enum tas_state - State of TAS in firmware
-+ * @TAS_STATE_DISABLE: TAS state machine is disabled.
-+ * @TAS_STATE_ENABLE: TAS state machine is enabled.
-+ * @TAS_STATE_RESET: TAS state machine is reset.
-+ */
-+enum tas_state {
-+	TAS_STATE_DISABLE = 0,
-+	TAS_STATE_ENABLE = 1,
-+	TAS_STATE_RESET = 2,
-+};
-+
-+/**
-+ * struct tas_config_list - Config state machine variables
-+ * @config_change_time: New list is copied at this time
-+ * @config_change_error_counter: Incremented if admin->BaseTime < current time
-+ *				 and TAS_enabled is true
-+ * @config_pending: True if list update is pending
-+ * @config_change: Set to true when application trigger updating of admin list
-+ *		   to active list, cleared when configChangeTime is updated
-+ */
-+struct tas_config_list {
-+	u64 config_change_time;
-+	u32 config_change_error_counter;
-+	u8 config_pending;
-+	u8 config_change;
-+};
-+
-+/* Max SDU table. See IEEE Std 802.1Q-2018 12.29.1.1 */
-+struct tas_max_sdu_table {
-+	u16 max_sdu[TAS_MAX_NUM_QUEUES];
-+};
-+
-+/**
-+ * struct tas_firmware_list - TAS List Structure based on firmware memory map
-+ * @gate_mask_list: Window gate mask list
-+ * @win_end_time_list: Window end time list
-+ * @gate_close_time_list: Array of gate close time for each queue in each window
-+ */
-+struct tas_firmware_list {
-+	u8 gate_mask_list[TAS_MAX_CMD_LISTS];
-+	u32 win_end_time_list[TAS_MAX_CMD_LISTS];
-+	u32 gate_close_time_list[TAS_MAX_CMD_LISTS][TAS_MAX_NUM_QUEUES];
-+};
-+
-+/**
-+ * struct tas_config - Main Time Aware Shaper Handle
-+ * @state: TAS state
-+ * @max_sdu_table: Max SDU table
-+ * @config_list: Config change variables
-+ * @active_list: Current operating list operating list
-+ * @fw_active_list: Active List pointer, used by firmware
-+ * @fw_shadow_list: Shadow List pointer, used by driver
-+ */
-+struct tas_config {
-+	enum tas_state state;
-+	struct tas_max_sdu_table max_sdu_table;
-+	struct tas_config_list __iomem *config_list;
-+	u8 __iomem *active_list;
-+	struct tas_firmware_list __iomem *fw_active_list;
-+	struct tas_firmware_list __iomem *fw_shadow_list;
-+};
-+
-+struct prueth_qos_tas {
-+	struct tc_taprio_qopt_offload *taprio_admin;
-+	struct tc_taprio_qopt_offload *taprio_oper;
-+	struct tas_config config;
-+};
-+
-+struct prueth_qos {
-+	struct prueth_qos_tas tas;
-+};
-+
-+void icssg_qos_tas_init(struct net_device *ndev);
-+int icssg_qos_ndo_setup_tc(struct net_device *ndev, enum tc_setup_type type,
-+			   void *type_data);
-+#endif /* __NET_TI_ICSSG_QOS_H */
--- 
-2.34.1
+On Tom's theory that the vendors are going to push inferior s/w for
+the sake of selling h/w  - I would argues that we are not in the 90s
+anymore and I dont believe there's any vendor conspiracy theory here
+;-> a single port can do 100s of Gbps, and of course if you want to do
+high speed you need to offload, no general purpose CPU will save you.
+And really the arguement that "offload=3Devil" holds no water anymore.
 
+cheers,
+jamal
 
