@@ -1,109 +1,140 @@
-Return-Path: <netdev+bounces-98843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91E718D2A79
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 04:05:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BE478D2A87
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 04:06:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4782D1F25A92
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 02:05:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B9581C23AE7
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 02:06:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEC101667DE;
-	Wed, 29 May 2024 02:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DF2415AD99;
+	Wed, 29 May 2024 02:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M0Z1xAV9"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="IlZJ4xKT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B22C1667CA;
-	Wed, 29 May 2024 02:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B574015B134
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 02:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716948148; cv=none; b=bpUZrlnbS2dbfHUvNnF5jhHtvaQ7cXYeIXVR7uy6WwNE8DNPhblSFmgqTCtnQw3jc/VH8bo/IBqGJSJ12L89AW/W8OqHbOEq+VoZ8AMl7308klGYonFiPh5ML7nG3AzbjBhgslJ+7+DeM96LsOpwmbUjnIv6w9lPaGHcSb1n1bE=
+	t=1716948189; cv=none; b=TzenGx3zZURhEQ3iLZUXQ4n3n9navHsRAOYRvfIXgXrkcMbreN1u7ZsYGN5RoV+RGKJEXs8JdbAt7lhNiW3NIaZo61jrOPPBwQRtrIZrHw9D6zl9jufgFxTy479dVOeOVXqXU8DKgNG1Ib8bFyN7P3FR+0CFeairMTrDfN24nf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716948148; c=relaxed/simple;
-	bh=iYGLZOma106qnbZvlmMVlpIjBuciGFoal0QOxAV2eEU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hNJpOuNYF5zGhpaJWcyZITzfEcx/jQ7cVSQpkQRkKgufuS6JIibUmKH2sMv8Y4EkBeOQEXkIeRmMTiEEZyxYS7I7bXnokWjoZLbUvoVwqJbbFer35xRvIaUW00/iLVtHQLqNukSYdx1FYEgPqAdNy9WZPpfoOx8gIpHlL7pUEUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M0Z1xAV9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4B15C32789;
-	Wed, 29 May 2024 02:02:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716948148;
-	bh=iYGLZOma106qnbZvlmMVlpIjBuciGFoal0QOxAV2eEU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=M0Z1xAV9laRcra1wkkGOiY/ciCzZSo5I0lp1BYJgLbxz7t34qJphhHjf6vJy1x4fG
-	 K81CqGOcLFZQQ2WOc3n4g8ylEM1Vj0m3by8LE8DrFRqK8zOoW201TNOmyMGPoNmI0g
-	 aomOKxFYDYC8DmqweXb18KPAKw9L0nmJmtI9CDrs+VWBkMz+HS+9dxJFBMXP3QOdxT
-	 PvLreKuks2dn6+fFuyvapzeqnevVBuxTmHWaDmeZIJPxGAiJzAvwLnlO603gx1FqJp
-	 L6ar8rZOSRjY+EBGqEdJD0mnaN95TJpk7V+JO2VqGvpLrpCVWK7Tv4EUwB+tkWLlrh
-	 WW8tv8sgen6gg==
-From: Bjorn Andersson <andersson@kernel.org>
-To: Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-Cc: kernel@quicinc.com,
-	linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: (subset) [PATCH v4 0/2] Mark Ethernet devices on sa8775p as DMA-coherent
-Date: Tue, 28 May 2024 21:02:01 -0500
-Message-ID: <171694812085.574781.5963530669426205185.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240514-mark_ethernet_devices_dma_coherent-v4-0-04e1198858c5@quicinc.com>
-References: <20240514-mark_ethernet_devices_dma_coherent-v4-0-04e1198858c5@quicinc.com>
+	s=arc-20240116; t=1716948189; c=relaxed/simple;
+	bh=/jAPqVaAnX6uuaZo5Y8bEOCQ0r8SBj4MRnDEE11nTY4=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=JPmcwtWZ+31r8BDU25ypz7ibyk5xh3N+f7WhHlW0/1TbySM5MSVwX+0ajGzh3mxl8QWEBmM43IKmxnfEDh511V7ZE7EMT2/DhPKsVHsO2pUTf1wQwYJIMJXUIy5feRaQupdmhFG/ViFmHAUEBw3r/AjQ8fjiHUdnrxl6TT2zjdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=IlZJ4xKT; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1716948184; h=Message-ID:Subject:Date:From:To;
+	bh=3SFYi3oG57/P8FL2z66pNqlfbX6wpCMtZY7JLpbe67s=;
+	b=IlZJ4xKTGf6nQ0J7yasv1ebnKdDbGhAVQ8NhKdBcuc40K85uMqOD0oGEDG5xUhnej+lgYsr4kTJD/Qv25eo1Ca2BCYkHrL1MJxgqNe/p8E7ef6aiw/UXSYcyTnPweNBj/1RdIHiT8ZYgnPJn5FYct4BIYwYAe2XY4g+ztmpKFHQ=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045046011;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W7R.lw0_1716948183;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W7R.lw0_1716948183)
+          by smtp.aliyun-inc.com;
+          Wed, 29 May 2024 10:03:03 +0800
+Message-ID: <1716948138.442408-2-hengqi@linux.alibaba.com>
+Subject: Re: [PATCH net 2/2] virtio_net: fix missing lock protection on control_buf access
+Date: Wed, 29 May 2024 10:02:18 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org,
+ virtualization@lists.linux.dev,
+ Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Daniel Jurgens <danielj@nvidia.com>
+References: <20240528075226.94255-1-hengqi@linux.alibaba.com>
+ <20240528075226.94255-3-hengqi@linux.alibaba.com>
+ <20240528114547-mutt-send-email-mst@kernel.org>
+ <1716912105.4028382-1-hengqi@linux.alibaba.com>
+ <20240528124435-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240528124435-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
 
-
-On Tue, 14 May 2024 17:06:50 -0700, Sagar Cheluvegowda wrote:
-> To: Bjorn Andersson <andersson@kernel.org>
-> To: Konrad Dybcio <konrad.dybcio@linaro.org>
-> To: Rob Herring <robh@kernel.org>
-> To: Krzysztof Kozlowski <krzk+dt@kernel.org>
-> To: Conor Dooley <conor+dt@kernel.org>
-> To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> To: Andrew Halaney <ahalaney@redhat.com>
-> To: Vinod Koul <vkoul@kernel.org>
-> To: David S. Miller <davem@davemloft.net>
-> To: Eric Dumazet <edumazet@google.com>
-> To: Jakub Kicinski <kuba@kernel.org>
-> To: Paolo Abeni <pabeni@redhat.com>
-> To: Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> Cc: kernel@quicinc.com
-> Cc: linux-arm-msm@vger.kernel.org
-> Cc: devicetree@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: netdev@vger.kernel.org
+On Tue, 28 May 2024 12:45:32 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Wed, May 29, 2024 at 12:01:45AM +0800, Heng Qi wrote:
+> > On Tue, 28 May 2024 11:46:28 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > On Tue, May 28, 2024 at 03:52:26PM +0800, Heng Qi wrote:
+> > > > Refactored the handling of control_buf to be within the cvq_lock
+> > > > critical section, mitigating race conditions between reading device
+> > > > responses and new command submissions.
+> > > > 
+> > > > Fixes: 6f45ab3e0409 ("virtio_net: Add a lock for the command VQ.")
+> > > > Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> > > 
+> > > 
+> > > I don't get what does this change. status can change immediately
+> > > after you drop the mutex, can it not? what exactly is the
+> > > race conditions you are worried about?
+> > 
+> > See the following case:
+> > 
+> > 1. Command A is acknowledged and successfully executed by the device.
+> > 2. After releasing the mutex (mutex_unlock), process P1 gets preempted before
+> >    it can read vi->ctrl->status, *which should be VIRTIO_NET_OK*.
+> > 3. A new command B (like the DIM command) is issued.
+> > 4. Post vi->ctrl->status being set to VIRTIO_NET_ERR by
+> >    virtnet_send_command_reply(), process P2 gets preempted.
+> > 5. Process P1 resumes, reads *vi->ctrl->status as VIRTIO_NET_ERR*, and reports
+> >    this error back for Command A. <-- Race causes incorrect results to be read.
+> > 
+> > Thanks.
 > 
-> [...]
+> 
+> Why is it important that P1 gets VIRTIO_NET_OK?
+> After all it is no longer the state.
 
-Applied, thanks!
+The driver needs to know whether the command actually executed success.
 
-[1/2] arm64: dts: qcom: sa8775p: mark ethernet devices as DMA-coherent
-      commit: 49cc31f8ab44e60d8109da7e18c0983a917d4d74
+Thanks.
 
-Best regards,
--- 
-Bjorn Andersson <andersson@kernel.org>
+> 
+> > > 
+> > > > ---
+> > > >  drivers/net/virtio_net.c | 4 +++-
+> > > >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > > index 6b0512a628e0..3d8407d9e3d2 100644
+> > > > --- a/drivers/net/virtio_net.c
+> > > > +++ b/drivers/net/virtio_net.c
+> > > > @@ -2686,6 +2686,7 @@ static bool virtnet_send_command_reply(struct virtnet_info *vi, u8 class, u8 cmd
+> > > >  {
+> > > >  	struct scatterlist *sgs[5], hdr, stat;
+> > > >  	u32 out_num = 0, tmp, in_num = 0;
+> > > > +	bool ret;
+> > > >  	int err;
+> > > >  
+> > > >  	/* Caller should know better */
+> > > > @@ -2731,8 +2732,9 @@ static bool virtnet_send_command_reply(struct virtnet_info *vi, u8 class, u8 cmd
+> > > >  	}
+> > > >  
+> > > >  unlock:
+> > > > +	ret = vi->ctrl->status == VIRTIO_NET_OK;
+> > > >  	mutex_unlock(&vi->cvq_lock);
+> > > > -	return vi->ctrl->status == VIRTIO_NET_OK;
+> > > > +	return ret;
+> > > >  }
+> > > >  
+> > > >  static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
+> > > > -- 
+> > > > 2.32.0.3.g01195cf9f
+> > > 
+> 
 
