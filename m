@@ -1,132 +1,111 @@
-Return-Path: <netdev+bounces-99163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CA028D3E2C
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 20:15:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43BA68D3E47
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 20:23:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EFB37B21F23
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:15:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECC5A285DAF
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 18:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761CC15B99D;
-	Wed, 29 May 2024 18:15:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C22215CD55;
+	Wed, 29 May 2024 18:23:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tAzpF/hQ"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="f7fcRBJk"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA3BDDA1
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 18:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14519DDA1
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 18:23:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717006532; cv=none; b=DB8Z4qIocFjO8w3J+cO8GK0nHati+BB4LyAm8IbpwUkrypZKbJ85gvOCjFu+r3Ki+J+oW7qG6ESbICH4Tdmbt3yVuc5w87CKhX+prtLiNzfJwr+850xwXO8YyT+LcgMCtGe/4wmSg+2qShc8ephPMAtqRD0BbQm2Ds1k1GLkPdY=
+	t=1717007034; cv=none; b=jht76WIoPwu2aeV6kqCtti0bEAfH2Ae/iFMTHfWOKD76Ja7KI3qxT5Y/c+MjJ7rOh6wvar+3Vs+IZGXPqz0JZKy3jzajL+Rnc7xiQeJN8tGT5TvdurR0Y5BiOGrRT+yr8648Zq/1TmZRlfE4UrRJEVxLNhClPDYGoqBN0wJCDzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717006532; c=relaxed/simple;
-	bh=HTLg8gpaySDZIn8hsaOA9Fcw46r5Vbl/FIqB2I6xCd4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HWaLIcWTLVsv3RB3PvBtdxJn98s+IYxQX9RUikvZz9NvXxmM9SYDLpd4fVURoXHcF8IVZU44XRbkUbXlVIkq5S/ny0vU4TlJyuwsg1y72Vl0ctRtz6lRprLlkcq9AVXl5tZg252dWB7roc0sxrryLsw+wtwLiJ2dBEsrHIbXCp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tAzpF/hQ; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: michael.chan@broadcom.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1717006527;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mLV8YG90+RW/NZMtQguI4MS1dEUDJxLqJpvYULeqJAM=;
-	b=tAzpF/hQL9CFphPkBeGqG1kZivmYfTc9bbZ3GC7gAljdUcvH0bBh+PoKG71uYh6lx8RSO1
-	u4anr2MS+hl4LyUEnlKUduUnRwDNDB3PH21+qWXtciB2MZva2pcVgzlvMpAiA2lQFkJRTP
-	fUqlst/zpy/xFu6IfkUlUuQ+mVmVv5s=
-X-Envelope-To: vadfed@meta.com
-X-Envelope-To: davem@davemloft.net
-X-Envelope-To: kuba@kernel.org
-X-Envelope-To: richardcochran@gmail.com
-X-Envelope-To: netdev@vger.kernel.org
-Message-ID: <a26d530c-02c7-4e84-b014-561edbe0804e@linux.dev>
-Date: Wed, 29 May 2024 11:15:21 -0700
+	s=arc-20240116; t=1717007034; c=relaxed/simple;
+	bh=P1lQJCCWJB36JtINGvtohFfOKPNJ3aNeC8vHCVYHRpo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KQ8q7ZhfhK/TUD5iBa8qApqS4fafXSNEKPaFHZoKoUBo3DOkrzEnGYDsbsJc/2uWK65eU5nGXm+71N53i2cMvHDG5lHEPsq4xh0PXLwF0hAbh4K0HA7tNXdUAZVHM0w66gWvyuBQBKJ4Yn9WrZtHPcQkQghEJgHdESOQ4cCJ5Q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=f7fcRBJk; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2bff7b9503aso4888a91.1
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 11:23:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1717007032; x=1717611832; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=P1lQJCCWJB36JtINGvtohFfOKPNJ3aNeC8vHCVYHRpo=;
+        b=f7fcRBJkOQ9IfDBoFW/KcqwcEI2BnNqzw8eSZFgIBcVA4R4rXB87rJ77a0IxH08dYV
+         V2bWfrZBauAN0fDk9tpPNCOTnNjIlyY/BzlO1XjMmw2XWjbx4x0vf8BlB+XIpzp4p4td
+         UYELid2htoBuoKaqfaXrTK8Xv57L//SJ+CzTc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717007032; x=1717611832;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P1lQJCCWJB36JtINGvtohFfOKPNJ3aNeC8vHCVYHRpo=;
+        b=OJuXojE2pPO6eic5wspiyOiIlN7vmlGJX2uD4+nIvgKl7UBmfe1/yk9FbgnRx5Nbaq
+         J3/I7wthJUvFfpYiw7+iP/GeJcx54ELxpioNPRec1mmHRvoyXRvRihULytlByZGgfkNl
+         677tsBuZxt+M3WI53exu+7b3LC4FlYp/ci+ivUkqt7vd9BFAKopOoBGSMp59xKdoBBTL
+         w3Bfcd0uNvl9IGOnvjosCdlxYiUwYgyzePknWkiuKJRWG6bXKVgtSMBDvklghrzh3u5h
+         rSgQCnBDjJyORI3NfLK5w8buvLiQ0nf770J/DfX4etVowi0TFk2D4x0S/qaUosj/FDaM
+         tqTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXfPUQ0YHRySSfbCs+A7vXA7lmZ6HexOfL8NusJadnohee49s7DdqqDIRpZ+IyaZeKOj5R1te14qhzxlA5cixoHXJPj3+Sq
+X-Gm-Message-State: AOJu0YxL4akp41Q0klNGFvgnX2PpIdDUO+PZZBDrHq5M6/yacFR7BlGV
+	w4K07nQscyJpX2OkoqGw830AzmYzy1KPNhTEP7hAOB3x7ipXtbH4Zy6sYASZ3xE=
+X-Google-Smtp-Source: AGHT+IEBDluGc8h5PYa0B7js1vxoM5iBpn7Euleu/u6vRiePJYBD6TgQ12d0J+3qjJQMzF2lW1V9aQ==
+X-Received: by 2002:a17:90a:c208:b0:2b4:3659:b3f5 with SMTP id 98e67ed59e1d1-2bf5f407deamr12951488a91.47.1717007032186;
+        Wed, 29 May 2024 11:23:52 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c1a7761d83sm79635a91.2.2024.05.29.11.23.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 May 2024 11:23:51 -0700 (PDT)
+Date: Wed, 29 May 2024 11:23:49 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, donald.hunter@gmail.com, sdf@google.com,
+	amritha.nambiar@intel.com, hawk@kernel.org,
+	sridhar.samudrala@intel.com
+Subject: Re: [PATCH net] netdev: add qstat for csum complete
+Message-ID: <ZldytYTJEU8yAJqA@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	donald.hunter@gmail.com, sdf@google.com, amritha.nambiar@intel.com,
+	hawk@kernel.org, sridhar.samudrala@intel.com
+References: <20240529163547.3693194-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] bnxt_en: add timestamping statistics support
-To: Michael Chan <michael.chan@broadcom.com>,
- Vadim Fedorenko <vadfed@meta.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
- netdev@vger.kernel.org
-References: <20240529171946.2866274-1-vadfed@meta.com>
- <CACKFLi=Mf8o6hxNEEy+hKbNhi7V56hpQrwH+Vpy6SEm8z_3ipA@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <CACKFLi=Mf8o6hxNEEy+hKbNhi7V56hpQrwH+Vpy6SEm8z_3ipA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240529163547.3693194-1-kuba@kernel.org>
 
-On 29/05/2024 18:48, Michael Chan wrote:
-> On Wed, May 29, 2024 at 10:19 AM Vadim Fedorenko <vadfed@meta.com> wrote:
->>
->> The ethtool_ts_stats structure was introduced earlier this year. Now
->> it's time to support this group of counters in more drivers.
->> This patch adds support to bnxt driver.
->>
->> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
->> ---
->>   drivers/net/ethernet/broadcom/bnxt/bnxt.c      | 18 +++++++++++++-----
->>   .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c  | 18 ++++++++++++++++++
->>   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c  | 18 ++++++++++++++++++
->>   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h  |  8 ++++++++
->>   4 files changed, 57 insertions(+), 5 deletions(-)
->>
-> 
->> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
->> index 2c3415c8fc03..589e093b1608 100644
->> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
->> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
->> @@ -79,6 +79,12 @@ struct bnxt_pps {
->>          struct pps_pin pins[BNXT_MAX_TSIO_PINS];
->>   };
->>
->> +struct bnxt_ptp_stats {
->> +       u64             ts_pkts;
->> +       u64             ts_lost;
->> +       atomic64_t      ts_err;
->> +};
->> +
->>   struct bnxt_ptp_cfg {
->>          struct ptp_clock_info   ptp_info;
->>          struct ptp_clock        *ptp_clock;
->> @@ -125,6 +131,8 @@ struct bnxt_ptp_cfg {
->>          u32                     refclk_mapped_regs[2];
->>          u32                     txts_tmo;
->>          unsigned long           abs_txts_tmo;
->> +
->> +       struct bnxt_ptp_stats   *stats;
-> 
-> I think there is no need to allocate this small stats structure
-> separately.  It can just be:
-> 
-> struct bnxt_ptp_stats    stats;
-> 
-> The struct bnxt_ptp_cfg will only be allocated if the device supports
-> PTP.  So the stats can always be a part of struct bnxt_ptp_cfg.
+On Wed, May 29, 2024 at 09:35:47AM -0700, Jakub Kicinski wrote:
+> Recent commit 0cfe71f45f42 ("netdev: add queue stats") added
+> a lot of useful stats, but only those immediately needed by virtio.
+> Presumably virtio does not support CHECKSUM_COMPLETE,
+> so statistic for that form of checksumming wasn't included.
+> Other drivers will definitely need it, in fact we expect it
+> to be needed in net-next soon (mlx5). So let's add the definition
+> of the counter for CHECKSUM_COMPLETE to uAPI in net already,
+> so that the counters are in a more natural order (all subsequent
+> counters have not been present in any released kernel, yet).
 
-Yeah, I was thinking about embedding the struct into bnxt_ptp_cfg.
-Ok, I'll make v2 in 24hr then.
+As you mentioned, the counters are not in any released kernel yet,
+so adding it to the uAPI makes sense to me.
 
-Thanks!
+Are you planning to submit a separate change to add csum_complete to
+struct netdev_queue_stats_rx, as well? Just wanted to double check,
+but I assume that is a net-next thing.
 
-> Other than that, it looks good to me.  Thanks.
-> 
->>   };
->>
-
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
