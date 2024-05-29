@@ -1,112 +1,150 @@
-Return-Path: <netdev+bounces-99091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07A0B8D3B61
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:50:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 077768D3B74
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 17:53:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 382B11C220E1
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 15:50:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 691C6B23E03
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 15:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 818D8180A92;
-	Wed, 29 May 2024 15:50:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 927F015B115;
+	Wed, 29 May 2024 15:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jFBmb0sV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EYwVYtGD"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68E015B115;
-	Wed, 29 May 2024 15:50:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE2D514291E
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 15:53:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716997842; cv=none; b=Ac5ipkSECrdYLpdkAk+ehCTjP9RZNjTu4Nw5g8h75XY8HPJvAB98cZPbJM0KZCwwauyuUX6NJkjd3YihKrjiEeGbLaKqx0cWNgVR6a6kI3vI9yrdNHINvqhmyRnjYOzG2btcMBB9QG6MdoExCdBEGlJUapn6rdBzKsdaQwomizo=
+	t=1716997985; cv=none; b=XYvwUYbCrJlmIZEwKotc//+LAfou6PacH5598Wj5pJISMZDLb8M/QmHvT/Y/zswRZHEMgCu4/UFSaPASYaVig90fdV+KzLgwDl+5UWlNfbPl0/Ev4cKTMhkp8GUudos+U6bYTlEYAgbrBXEhW41os6ZKqSiv25SdRqgl9LfIyfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716997842; c=relaxed/simple;
-	bh=RhAYFzXtfNlXMtgT1RAKcn5Jr1WKF4VqdAZ6qcmROyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oYnuSoWTe5YbG/o1hfQ1vc1u+wexThAjbU3d6jsYp34DRrzDrmgkZk5pNWaGBsoalqcto9xO9yERDZgJj6NrorSgXZwkvxsy2gNkLF+DU7tlAUrroKRmnc4SpsBaTJZIUqyYggvgvqh3KTy1nzxvZPDbryfEsRfk93VLEJ4Ym8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jFBmb0sV; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A102A1BF20A;
-	Wed, 29 May 2024 15:50:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1716997835;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RhAYFzXtfNlXMtgT1RAKcn5Jr1WKF4VqdAZ6qcmROyc=;
-	b=jFBmb0sV0ClEp3mLGt45IXoCfM5VWXz56T/1CJgcB19hyMJYPR0tn+k+k4L/t8wUPiqbd0
-	HO6jk9Em5BHNtc8mQxOfxEWSjY9TIVEvq2c55371PNPbbd324ehX5AMh5cgeKxXhclF65s
-	q2Fxk28Zh3Pjb4iITVVHXtXNp7UuW1sOTF6IJWQKZ0Z9l3441Y8MWoRm+GqME6U0MEc2+E
-	CGH86tTmYZAEU4ugb1ps7Q6HX0f45PPIGftCZ6F9yUwLbWxANOTFc/wC6ny+z9PVEtG3bH
-	Ny1Ce7z00cbHrw6wff/P9F6bSK1yFq9l4PmslSWj3EPXBWXcQZSnBDPdoI7xqw==
-Date: Wed, 29 May 2024 17:50:32 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
- kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: Re: [PATCH net-next v13 09/14] net: Add the possibility to support
- a selected hwtstamp in netdevice
-Message-ID: <20240529175032.54070c60@kmaincent-XPS-13-7390>
-In-Reply-To: <20240529082111.1a1cbf1e@kernel.org>
-References: <20240529-feature_ptp_netnext-v13-0-6eda4d40fa4f@bootlin.com>
-	<20240529-feature_ptp_netnext-v13-9-6eda4d40fa4f@bootlin.com>
-	<20240529082111.1a1cbf1e@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1716997985; c=relaxed/simple;
+	bh=pTXzUY+x5540F/EM1XdqGEAzJ0Mo0QFOIk8WHESo8Go=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AKkfo0s18b+aWDWnTJXfI6kZQwgQOE8jnm93koH8ZQROZLvOIJfjwrrfaoKkbhGLFMuJMqbycDuBS4bascWEKRmYKw3h5Co7rH3wwtQcGPQlZgvGTIdDwAi/LrD7t48ODD2WJVkI8Dlz3ogYqhwxLI6Y/CmXEaWnfs+BWRM4r0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EYwVYtGD; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-52ab11ecdbaso1252762e87.3
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 08:53:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716997982; x=1717602782; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p5xYzN9ZtCnOygYwo3Tn5BQN4a3URtOTpcLJi5hO3zs=;
+        b=EYwVYtGDIF14xM6t5pNTrXFPEQQMJZ7mHwUtYYF9JeUhNOHDCs2roIZV2wmnEgA/87
+         ZUbwTDKcDTxhiknbqeSVgvDd1CvsKGshy8sdj/pD3NtHd3b/7p5MahRd0n/0Wo/ZiWk5
+         mNxWGTBKL6fayELCpK/+c/cwSUEuKYkObZwKFvDCKX16mnt7hOTlAxiWZbBoMuAVCE4H
+         N5/21UhAO8xj/fvA+9JONrWLd7Bx3/a1xUZhZG4n7O8wfT2onfLaoQ18+Hsp5F8zfxdJ
+         GWD0CwffhuCGMyUlXNzcG7EpVeMBGFPn8h2SD6q0TpHxOWDxSnvTCZFr+eo9NSV+/eRi
+         F1qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716997982; x=1717602782;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=p5xYzN9ZtCnOygYwo3Tn5BQN4a3URtOTpcLJi5hO3zs=;
+        b=f7n4YAAVqMdhSYt6ZU8ICodnHwoQo+VXlBqFACmOeOnrdQDyN78/KUakj5BAH6pED5
+         Gwewbr0h2IIQDH+gvvLgUvcy5O0rPw+Ql+q2noNWNSUDhfLyrS2MPs9vy2ex/etGPV9/
+         YWB236lIbj0RvpryPOf5QzPC6qwPQnH8STGNMhYJDol+JEbTwSKhE8flF9GnNqmMPqRR
+         GNH3srS624Epj5W2yGMPcahsWZS0Aa8b9eYZXCezVNxPG9PDBk3+z0p1WeklSAsB/z0+
+         vQCq0e/9/Wpu1X4iS85CrQ8d3Y2NIlhw528k9Dnjmok814kb5eogNMdXuO2hNPA25IL1
+         xSFA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1eSpf+6ykqZ3hweQMF8t33WK3BKgDYz6FAVECRwQe5a7b3y5zEjWoaoCDxC9agXFpF2549gMMjvsG0SkWjznNijwLBfPh
+X-Gm-Message-State: AOJu0YxRBFriGZgbwrRLOi6nxUEI/nRiCK+58ziL3rMTt3rfOk3Bgkxp
+	AO7IgZzRlpnY2aYg6Qi+U8ETNhKA1JK3hTiRPKR5MrdeKVXq6ffR9egCNeU6Ysz2YECOE/8YoDg
+	XQqMZ5hklB+anEs76h5CHxYE9ZoE=
+X-Google-Smtp-Source: AGHT+IHocWeGcVW4GkZh74yu2gXlhWNsA7NeFKQNt/c2hFTNYOM6VyJbCm1xlaykIIS+Pd+VpkOzFXpQEPL+KrHNpno=
+X-Received: by 2002:ac2:4db6:0:b0:529:ac38:a160 with SMTP id
+ 2adb3069b0e04-529ac38a434mr6222738e87.34.1716997981813; Wed, 29 May 2024
+ 08:53:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20240529033104.33882-1-kerneljasonxing@gmail.com> <CANn89iJ93U8mxLXXuk=nT83mox1FHue+OPCkqBJ1FnHM5N9DHQ@mail.gmail.com>
+In-Reply-To: <CANn89iJ93U8mxLXXuk=nT83mox1FHue+OPCkqBJ1FnHM5N9DHQ@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 29 May 2024 23:52:25 +0800
+Message-ID: <CAL+tcoCcNGVkxVapYTVy1yx3OJep5uZaD+yqJGdVoriutUmLqQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] tcp: introduce a new MIB for CLOSE-WAIT sockets
+To: Eric Dumazet <edumazet@google.com>
+Cc: dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	davem@davemloft.net, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, Yongming Liu <yomiliu@tencent.com>, 
+	Wangzi Yong <curuwang@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Wed, 29 May 2024 08:21:11 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+Hello Eric=EF=BC=8C
 
-> On Wed, 29 May 2024 11:39:41 +0200 Kory Maincent wrote:
-> > Introduce the description of a hwtstamp provider which is define with a
-> > ptp_clock pointer and a qualifier value.
-> >=20
-> > Add a hwtstamp provider description within the netdev structure to be a=
-ble
-> > to select the hwtstamp we want too use. By default we use the old API t=
-hat
-> > does not support hwtstamp selectability which mean the hwtstamp ptp_clo=
-ck
-> > pointer is unset. =20
->=20
-> ERROR: modpost: "ptp_clock_phydev" [drivers/net/phy/libphy.ko] undefined!
+On Wed, May 29, 2024 at 11:42=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> On Wed, May 29, 2024 at 5:31=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > CLOSE-WAIT is a relatively special state which "represents waiting for
+> > a connection termination request from the local user" (RFC 793). Some
+> > issues may happen because of unexpected/too many CLOSE-WAIT sockets,
+> > like user application mistakenly handling close() syscall. It's a very
+> > common issue in the real world.
+> >
+> > We want to trace this total number of CLOSE-WAIT sockets fastly and
+> > frequently instead of resorting to displaying them altogether by using:
+> >
+> >   ss -s state close-wait
+> >
+> > or something like this. They need to loop and collect required socket
+> > information in kernel and then get back to the userside for print, whic=
+h
+> > does harm to the performance especially in heavy load for frequent
+> > sampling.
+> >
+> > That's the reason why I chose to introduce this new MIB counter like
+> > CurrEstab does. With this counter implemented, we can record/observe th=
+e
+> > normal changes of this counter all the time. It can help us:
+> > 1) We are able to be alerted in advance if the counter changes drastica=
+lly.
+> > 2) If some users report some issues happening, we will particularly
+> > pay more attention to it.
+> >
+> > Besides, in the group of TCP_MIB_* defined by RFC 1213, TCP_MIB_CURREST=
+AB
+> > should include both ESTABLISHED and CLOSE-WAIT sockets in theory:
+> >
+>
+> We (Neal and myself) prefer to fix TCP_MIB_CURRESTAB to include
+> CLOSE_WAIT sockets.
+> We do not think it will annoy anyone, please change tcp_set_state() accor=
+dingly.
 
-Thanks for the report.
-Weird, it should be in builtin code.
-I will investigate.
+Thanks for your reply. Honestly, I was worried about what you said.
+Now, I'm relieved.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+It seems that I should add a Fixes: tag...
+
+>
+> Rationale is that adoption of a new MIB in documentations and various
+> products will take years.
+>
+> Also make a similar change for mptcp.
+
+I will check that part tomorrow morning, too.
+
+Thank you :)
+
+Jason
 
