@@ -1,47 +1,74 @@
-Return-Path: <netdev+bounces-98848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 836268D2AEB
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 04:36:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A74058D2B25
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 04:43:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED724B22D28
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 02:36:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DF5C284E90
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 02:43:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7FE15ADBB;
-	Wed, 29 May 2024 02:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB62015B15B;
+	Wed, 29 May 2024 02:42:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Bu+hDgvm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ETKXRptG"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4818917E8F0;
-	Wed, 29 May 2024 02:36:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CD315B102;
+	Wed, 29 May 2024 02:42:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716950207; cv=none; b=YIYkjrNNIJBGU9U+te2cfhg2Q/gSDd9tEqgzdfitix+YFIMCMhj59iUFykfqONa1b4rc+3O7Pachc0Or76ej5nl2a44fxz7FTvRn1KmWMIJgZROGLt1ev0G97iFcJfXAHwwzqF2+4ie0arMtCDkavnjuIN6odIQd1CDcIESu2m0=
+	t=1716950568; cv=none; b=JbRPAQBjOhGTIxe57fOBnx+xXYboRh8yNJaQlJ9a4M5zRUCF+yeM5GpWBKjZlMvHosaeT8M9Fnc0uNnTm55zCXWbfRkKu1n7TQlTh3MSU+K6D4HU0xAMC0TfgpDI9UzOHhgzO81cQWQmNNglHPowHfH2z9/i5n/goPt/TF9icv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716950207; c=relaxed/simple;
-	bh=/prjtynIALKef+NidgM/TwteCz1yQxr8kvZyr3UStrk=;
+	s=arc-20240116; t=1716950568; c=relaxed/simple;
+	bh=Jdw6MVrlDfRwAQ4Dvlaenq+UtdPYZrI/GgT7O1G/w1I=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OKI0391PdqOAjQqNfIYLgn/0zVGQhF29frghFzPaRtylir4+TZg9qPIzWjDPeneNmxApp64JcA4LTtKGS7bNQh7CABjIkeTNuoDTv7UeXm5D3llBcm8YNkAekjns1erhZ/Aa/ZlHrCuqmPLuwrGrJA7AkIo46t7NNDINxO/XUrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Bu+hDgvm; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1716950195; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=kTh5iBvwSDqWZxPNhWhI/gl1LaGJ95imBRViouswUz4=;
-	b=Bu+hDgvmthSpldJVDVjLPPBnrUJYBlR4QWV042hurObHkhGzxEBXXqtvELZtiae0zs+jHZPfTF2Vln+HCYkktfa7H0rBMZ4lcKDfoc4vYwB7RFSwmlIFVXpK5jsVO8KURekciZ9QtDre6OSGiuvtbLB/0icI9u1CgObbs7UxTl0=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W7R7OGN_1716950194;
-Received: from 30.221.145.238(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W7R7OGN_1716950194)
-          by smtp.aliyun-inc.com;
-          Wed, 29 May 2024 10:36:35 +0800
-Message-ID: <5bb36a9c-6f2e-4d60-a210-fd2c01da5b60@linux.alibaba.com>
-Date: Wed, 29 May 2024 10:36:33 +0800
+	 In-Reply-To:Content-Type; b=ttxs8XeA4GFa4EEarJMKTAggkpU7mTtZMT+iCbGExkeEABOtDAPp3GcfaCG2LXudUwNQMUxbmO9QUIZFrLNawWKRLb7C1V1ORYrVaouSPUPmGpQFDHbnwuMYpuhLvqmro3rERO0EgUN+MpaI/4QqDpNvZbbQlZKZIsse7POL7J8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ETKXRptG; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-354b722fe81so1229634f8f.3;
+        Tue, 28 May 2024 19:42:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716950565; x=1717555365; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WaUSmZ7PBffPeOQ7gcFKeRJS00p2asbGxa8dHTdLep4=;
+        b=ETKXRptGUP3WRzXGWJruTx4VieKCMCMbbQflyXyagF+8I3xrMhNH8yC+ycGZbob2ho
+         KBm8I8KOuo0z+ndzqqlETXDizzycjvFtL5dVIV9t+pem9DeZykIqViQxT+eVSA3/ewrg
+         R6m9pc7c4LWKiR7lwJjWIlIo04t5jdBSrjfIqG0xv0UeSOlLPK+EJcDBaEJDX+GDbLW4
+         FbEJMdUL2ENe1iJgMZfY5317AQdUY2rUoWkOPVIDMbs8NhivC6cHjujmM8OSsvVe5ac+
+         cSyLJN+RNnW7/1fAHtl7hpGk2KVzADz8X5zcIcyTOg4wYNi1d0ucbeDZ1i+YlL9VQKby
+         hKxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716950565; x=1717555365;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WaUSmZ7PBffPeOQ7gcFKeRJS00p2asbGxa8dHTdLep4=;
+        b=DsgYxP4TrLwNJuC37uaHBHU56LdDDIcCE/k7qZUmHuS+2CcOC/oB6JUhBSLkrWAVE8
+         POubmHZws1uB+kDshLOOzZhJbdRbqP1Hd+Hq1JwZPykuWfM3UA69KEhqmSHxnb+6vrUh
+         3J+oIwqfGJDsRqpn32yWXQpducdT80z19czsBjoZHVtUSN5DdyKT99ddvYalLKSzTji7
+         PmbywfYjaSTCPqxLBvxnd34J3IZXSgBfpYONlsqDWVCqh6ewEqn86XyL0KeROw+MNdX7
+         BLbE+8foVeXtb0VVfFR9X5t0+YfvZL6odufrF5rE2yKlxKfqv02HxGqpyuKMvajM2ZhD
+         zu4w==
+X-Forwarded-Encrypted: i=1; AJvYcCU+xFNTt3yU2m5zHnRtwEABYtR9y5pMx2IkgB560lICrBMPoyq5IQOGmxfExGB6MxxidESn6Vto9dkaJEbPSR4TRCmWeI23ryocsF/Mdsfi67dXF9uDOSAulqIwp+zbYtHkAztn6Vp9JY7fO4tgbWZaFRQjHikFvD0gsGgRkwLOR4+pixgEMmTYFDD9eOKuKmO2TDwAT+jNgcsrTaNsL5Iw4Po9Z+dj8kNTlpuZcUwxMG7vCbU77fFY6qRxAvh3xFi3CkVpOuJHDjrczJsTCRt9SX7x6CJw32P4ZVlQ9mLNGd/3ofjc36EH22iHvZUT6lwgzvxdjZBME2IvHxVfjB3OTvinFpRNFJ4v2BMKZ7rU7Dci9Fyf40PpB8bL98Qwh0+V0/B+/KXVrKRiMTObJzoL0k61zTQ9NKfl/HJZQGZQAY3+162oTKws2w98r145NpprPcmP1PWanc1RUw8wBR0WGWu1juMwWMfdhOWkHw==
+X-Gm-Message-State: AOJu0YwiAWxCGmd0ajxweAkaVndJZKQHhjyPkvemz8iQw2HoJmDaZYaB
+	FXY2tTBmJyj7DR3aZw6etCz22nSa0hDujF5u/hskmOTxhSDpoOB2
+X-Google-Smtp-Source: AGHT+IHY3mIPt+8r+bWSLhyahH3HSb2DqvQP0sw5Fzxjvwkj4ZywRulvtF7xu0QbCHkAVDUw9UJ96A==
+X-Received: by 2002:a05:6000:1841:b0:354:c0a6:2815 with SMTP id ffacd0b85a97d-355245e30f8mr11028033f8f.4.1716950565027;
+        Tue, 28 May 2024 19:42:45 -0700 (PDT)
+Received: from [192.168.42.154] ([185.69.144.120])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35579d7d963sm13608610f8f.21.2024.05.28.19.42.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 May 2024 19:42:44 -0700 (PDT)
+Message-ID: <29464e46-e196-47aa-9ff5-23173099c95e@gmail.com>
+Date: Wed, 29 May 2024 03:42:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,207 +76,136 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/3] net/smc: refatoring initialization of smc
- sock
-To: Tony Lu <tonylu@linux.alibaba.com>
-Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
- wintera@linux.ibm.com, guwen@linux.alibaba.com, kuba@kernel.org,
- davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-rdma@vger.kernel.org, pabeni@redhat.com, edumazet@google.com
-References: <1716863394-112399-1-git-send-email-alibuda@linux.alibaba.com>
- <1716863394-112399-2-git-send-email-alibuda@linux.alibaba.com>
- <ZlVJib8rRvwPJJJi@TONYMAC-ALIBABA.local>
+Subject: Re: [PATCH net-next v9 11/14] tcp: RX path for devmem TCP
+To: Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+ Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
+ <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>,
+ Shailend Chand <shailend@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+References: <20240510232128.1105145-1-almasrymina@google.com>
+ <20240510232128.1105145-12-almasrymina@google.com>
+ <9097e78d-0e7d-43bd-bafd-e53a4872a4d1@davidwei.uk>
+ <CAHS8izOe-uYjm0ttQgHOFpvp_Tj4_oRHV6d1Y1sWJAZJdCdCBA@mail.gmail.com>
 Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <ZlVJib8rRvwPJJJi@TONYMAC-ALIBABA.local>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izOe-uYjm0ttQgHOFpvp_Tj4_oRHV6d1Y1sWJAZJdCdCBA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-
-
-On 5/28/24 11:03 AM, Tony Lu wrote:
-> In subject, refatoring -> refactoring.
-
-Oops... thanks for that.
-
->
-> On Tue, May 28, 2024 at 10:29:52AM +0800, D. Wythe wrote:
->> From: "D. Wythe" <alibuda@linux.alibaba.com>
+On 5/28/24 18:36, Mina Almasry wrote:
+> On Wed, May 22, 2024 at 11:02 PM David Wei <dw@davidwei.uk> wrote:
+...
+>>> +                      */
+>>> +                     if (!skb_frag_net_iov(frag)) {
+>>> +                             net_err_ratelimited("Found non-dmabuf skb with net_iov");
+>>> +                             err = -ENODEV;
+>>> +                             goto out;
+>>> +                     }
+>>> +
+>>> +                     niov = skb_frag_net_iov(frag);
 >>
->> This patch aims to isolate the shared components of SMC socket
->> allocation by introducing smc_sock_init() for sock initialization
->> and __smc_create_clcsk() for the initialization of clcsock.
+>> Sorry if we've already discussed this.
 >>
->> This is in preparation for the subsequent implementation of the
->> AF_INET version of SMC.
+>> We have this additional hunk:
 >>
->> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->> ---
->>   net/smc/af_smc.c | 86 +++++++++++++++++++++++++++++++-------------------------
->>   net/smc/smc.h    |  5 ++++
->>   2 files changed, 53 insertions(+), 38 deletions(-)
+>> + if (niov->pp->mp_ops != &dmabuf_devmem_ops) {
+>> +       err = -ENODEV;
+>> +       goto out;
+>> + }
 >>
->> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->> index 9389f0c..d8c116e 100644
->> --- a/net/smc/af_smc.c
->> +++ b/net/smc/af_smc.c
->> @@ -361,25 +361,15 @@ static void smc_destruct(struct sock *sk)
->>   		return;
->>   }
->>   
->> -static struct sock *smc_sock_alloc(struct net *net, struct socket *sock,
->> -				   int protocol)
->> +void smc_sock_init(struct net *net, struct sock *sk, int protocol)
->              ^^^^                       ^^^^^^^^^^^^^^^^
->
-> Using smc_sk_init to align the others' name style.
+>> In case one of our skbs end up here, skb_frag_is_net_iov() and
+>> !skb_frags_readable(). Does this even matter? And if so then is there a
+>> better way to distinguish between our two types of net_iovs?
+> 
+> Thanks for bringing this up, yes, maybe we do need a way to
+> distinguish, but it's not 100% critical, no? It's mostly for debug
+> checking?
 
-Make sense, I will do it in the next version.
+Not really. io_uring definitely wouldn't want the devmem completion path
+taking an iov and basically stashing it into a socket (via refcount),
+that's a lifetime problem. Nor we'd have all the binding/chunk_owner
+parts you have and probably use there.
 
+Same the other way around, you don't want io_uring grabbing your iov
+and locking it up, it won't even be possible to return it back. We
+also may want to have access to backing pages for different fallback
+purposes, for which we need to know the iov came from this particular
+ring.
 
->>   {
->> -	struct smc_sock *smc;
->> -	struct proto *prot;
->> -	struct sock *sk;
->> -
->> -	prot = (protocol == SMCPROTO_SMC6) ? &smc_proto6 : &smc_proto;
->> -	sk = sk_alloc(net, PF_SMC, GFP_KERNEL, prot, 0);
->> -	if (!sk)
->> -		return NULL;
->> +	struct smc_sock *smc = smc_sk(sk);
->>   
->> -	sock_init_data(sock, sk); /* sets sk_refcnt to 1 */
->>   	sk->sk_state = SMC_INIT;
->>   	sk->sk_destruct = smc_destruct;
->>   	sk->sk_protocol = protocol;
->>   	WRITE_ONCE(sk->sk_sndbuf, 2 * READ_ONCE(net->smc.sysctl_wmem));
->>   	WRITE_ONCE(sk->sk_rcvbuf, 2 * READ_ONCE(net->smc.sysctl_rmem));
->> -	smc = smc_sk(sk);
->>   	INIT_WORK(&smc->tcp_listen_work, smc_tcp_listen_work);
->>   	INIT_WORK(&smc->connect_work, smc_connect_work);
->>   	INIT_DELAYED_WORK(&smc->conn.tx_work, smc_tx_work);
->> @@ -389,6 +379,24 @@ static struct sock *smc_sock_alloc(struct net *net, struct socket *sock,
->>   	sk->sk_prot->hash(sk);
->>   	mutex_init(&smc->clcsock_release_lock);
->>   	smc_init_saved_callbacks(smc);
->> +	smc->limit_smc_hs = net->smc.limit_smc_hs;
->> +	smc->use_fallback = false; /* assume rdma capability first */
->> +	smc->fallback_rsn = 0;
->> +}
->> +
->> +static struct sock *smc_sock_alloc(struct net *net, struct socket *sock,
->> +				   int protocol)
->> +{
->> +	struct proto *prot;
->> +	struct sock *sk;
->> +
->> +	prot = (protocol == SMCPROTO_SMC6) ? &smc_proto6 : &smc_proto;
->> +	sk = sk_alloc(net, PF_SMC, GFP_KERNEL, prot, 0);
->> +	if (!sk)
->> +		return NULL;
->> +
->> +	sock_init_data(sock, sk); /* sets sk_refcnt to 1 */
->> +	smc_sock_init(net, sk, protocol);
->>   
->>   	return sk;
->>   }
->> @@ -3321,6 +3329,31 @@ static ssize_t smc_splice_read(struct socket *sock, loff_t *ppos,
->>   	.splice_read	= smc_splice_read,
->>   };
->>   
->> +int smc_create_clcsk(struct net *net, struct sock *sk, int family)
->> +{
->> +	struct smc_sock *smc = smc_sk(sk);
->> +	int rc;
->> +
->> +	rc = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP,
->> +			      &smc->clcsock);
->> +	if (rc) {
->> +		sk_common_release(sk);
->> +		return rc;
->> +	}
->> +
->> +	/* smc_clcsock_release() does not wait smc->clcsock->sk's
->> +	 * destruction;  its sk_state might not be TCP_CLOSE after
->> +	 * smc->sk is close()d, and TCP timers can be fired later,
->> +	 * which need net ref.
->> +	 */
->> +	sk = smc->clcsock->sk;
->> +	__netns_tracker_free(net, &sk->ns_tracker, false);
->> +	sk->sk_net_refcnt = 1;
->> +	get_net_track(net, &sk->ns_tracker, GFP_KERNEL);
->> +	sock_inuse_add(net, 1);
->> +	return 0;
->> +}
->> +
->>   static int __smc_create(struct net *net, struct socket *sock, int protocol,
->>   			int kern, struct socket *clcsock)
->>   {
->> @@ -3346,35 +3379,12 @@ static int __smc_create(struct net *net, struct socket *sock, int protocol,
->>   
->>   	/* create internal TCP socket for CLC handshake and fallback */
->>   	smc = smc_sk(sk);
->> -	smc->use_fallback = false; /* assume rdma capability first */
->> -	smc->fallback_rsn = 0;
->> -
->> -	/* default behavior from limit_smc_hs in every net namespace */
->> -	smc->limit_smc_hs = net->smc.limit_smc_hs;
->>   
->>   	rc = 0;
->> -	if (!clcsock) {
->> -		rc = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP,
->> -				      &smc->clcsock);
->> -		if (rc) {
->> -			sk_common_release(sk);
->> -			goto out;
->> -		}
->> -
->> -		/* smc_clcsock_release() does not wait smc->clcsock->sk's
->> -		 * destruction;  its sk_state might not be TCP_CLOSE after
->> -		 * smc->sk is close()d, and TCP timers can be fired later,
->> -		 * which need net ref.
->> -		 */
->> -		sk = smc->clcsock->sk;
->> -		__netns_tracker_free(net, &sk->ns_tracker, false);
->> -		sk->sk_net_refcnt = 1;
->> -		get_net_track(net, &sk->ns_tracker, GFP_KERNEL);
->> -		sock_inuse_add(net, 1);
->> -	} else {
->> +	if (!clcsock)
->> +		rc = smc_create_clcsk(net, sk, family);
->> +	else
->>   		smc->clcsock = clcsock;
->> -	}
-> Using if (clcsock) is more intuitive.
+It shouldn't happen for a behaving user, but most of it would likely
+be exploitable one way or another.
 
-Sounds reasonable. I'll take it.
+> I would say add a helper, like net_iov_is_dmabuf() or net_iov_is_io_uring().
 
+We're verifying that the context the iov bound to is the current
+context (e.g. io_uring instance) we're executing from. If we can
+agree that mp_priv should be a valid pointer, the check would look
+like:
 
-Thanks,
-D. Wythe
+if (pp->mp_priv == io_uring_ifq)
 
+> Checking for niov->pp->mp_ops seems a bit hacky to me, and may be
+> outright broken. IIRC niov's can be disconnected from the page_pool
+> via page_pool_clear_pp_info(), and niov->pp may be null. Abstractly
 
->> -
->>   out:
->>   	return rc;
->>   }
->> diff --git a/net/smc/smc.h b/net/smc/smc.h
->> index 18c8b78..a0accb5 100644
->> --- a/net/smc/smc.h
->> +++ b/net/smc/smc.h
->> @@ -34,6 +34,11 @@
->>   extern struct proto smc_proto;
->>   extern struct proto smc_proto6;
->>   
->> +/* smc sock initialization */
->> +void smc_sock_init(struct net *net, struct sock *sk, int protocol);
->> +/* clcsock initialization */
->> +int smc_create_clcsk(struct net *net, struct sock *sk, int family);
->> +
->>   #ifdef ATOMIC64_INIT
->>   #define KERNEL_HAS_ATOMIC64
->>   #endif
->> -- 
->> 1.8.3.1
+It's called in the release path like page_pool_return_page(),
+I can't imagine someone can sanely clear it while inflight ...
 
+> speaking the niov type maybe should be a property of the niov itself,
+> and not the pp the niov is attached to.
+
+... but I can just stash all that in niov->owner,
+struct dmabuf_genpool_chunk_owner you have. That might be even
+cleaner. And regardless of it I'll be making some minor changes
+to the structure to make it generic.
+
+> It is not immediately obvious to me what the best thing to do here is,
+> maybe it's best to add a flag to niov or to use niov->pp_magic for
+> this.
+> 
+> I would humbly ask that your follow up patchset takes care of this
+> bit, if possible. I think mine is doing quite a bit of heavy lifting
+> as is (and I think may be close to ready?), when it comes to concerns
+> of devmem + io_uring coexisting if you're able to take care, awesome,
+> if not, I can look into squashing some fix.
+
+Let it be this way then. It's not a problem while there is
+only one such a provider.
+
+-- 
+Pavel Begunkov
 
