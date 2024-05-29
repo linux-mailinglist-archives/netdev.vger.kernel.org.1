@@ -1,120 +1,206 @@
-Return-Path: <netdev+bounces-99185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE4818D3F6C
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 22:14:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F8778D3F6F
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 22:14:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62D431F21FD9
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 20:14:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43532B24813
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 20:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D36071C6893;
-	Wed, 29 May 2024 20:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D595F1C8FAF;
+	Wed, 29 May 2024 20:14:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="qYza4Rbd"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="SgcnHMoZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCCC426AD3;
-	Wed, 29 May 2024 20:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF361C8FAB
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 20:14:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717013637; cv=none; b=HKNaaHyn2r/MOFPpvDZvyDapuPihly4tDxIe4/BcHX1a6oEbqTw5VzX04G5FVceCiVh9hPsQGvdKt6DbTNglwvQlGv0xCFQANVGj4B0I8sGv4dvnjc6MOqQ05p9iRWSOUriSPrHpzE4JkPpE/9AbcKBWNwyDPv2E8sjxME76HUY=
+	t=1717013642; cv=none; b=jlXD3FSefZK3trDnCztRHRRRPp6S9DLyqdw3Wq/8GiWFxjM5IHppgTKCm+0i6mBUNHVbySrmHIbVeH8YI6lvvP+6oAcHrQgD/VQ/Dpc8bhjiUDwdkSSU2jJwyBK926KhBnYVmDiyvnMj4hG0phg9ciPqGaeoLJd3I4z7mDmXICE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717013637; c=relaxed/simple;
-	bh=8CHIv4RsOjRcg0/LYPFDzPHZMyekDKwfcWoqLpavYC8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PCS3yZvOPdPUrpUA/N+vKi5LcslePR6fEiFArs74lUjrz5demZcRMvFOaIGFq6OGgwzYf6FhEehi+uHCeVBuupskQdOvmo7epD03C/EoAxC2B214HQ9AB5+7/YTXTXMqZARMyKl4vzB9f/hMqQCF+/q82leFacsoEBGnfaJStyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=qYza4Rbd; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=eQFXKnSfwk440wscnRX9cECtvXQvJsH6al9gvAq5Rss=; b=qYza4Rbd8T0Qi9wO8nvW/LXuGl
-	fDAszPm46VwyPttxInXsRB84FuTKZ9Iu+Oyhhedj3Q6B4bpxl6YVwP7egkoUC5DKplO6DK9Emvs88
-	6CpNDvmyIv5mxDI5yfXOaxA1hA8JlC+QYtHNu4QRNIbVKTfrJNaAc1UjvJbUrCoVHcZUDngkKGqWh
-	L19sqtn8cWjJOEmUWL/g2S854UIvlXsPGWaZOFrKc0sKNeoMURyrPTf7rhDG2I6pwy7jNvK4no9NR
-	KEUo+RhIg3QkVYdFxUGSwogACot3hB2ijFK9CgE4014SnI23PFmVgPqcMYH/v2CTfRQz7IezsSE82
-	eIUJgdgA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51848)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sCPg4-0006ct-13;
-	Wed, 29 May 2024 21:13:40 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sCPg4-0004UO-PS; Wed, 29 May 2024 21:13:40 +0100
-Date: Wed, 29 May 2024 21:13:40 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Sneh Shah <quic_snehshah@quicinc.com>,
-	Andrew Halaney <ahalaney@redhat.com>, Vinod Koul <vkoul@kernel.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kernel@quicinc.com
-Subject: Re: [PATCH net-next] net: stmmac: dwmac-qcom-ethqos: Add support for
- 2.5G SGMII
-Message-ID: <ZleMdFsmQzXGp1GM@shell.armlinux.org.uk>
-References: <20231218071118.21879-1-quic_snehshah@quicinc.com>
- <4zbf5fmijxnajk7kygcjrcusf6tdnuzsqqboh23nr6f3rb3c4g@qkfofhq7jmv6>
- <8b80ab09-8444-4c3d-83b0-c7dbf5e58658@quicinc.com>
- <wvzhz4fmtheculsiag4t2pn2kaggyle2mzhvawbs4m5isvqjto@lmaonvq3c3e7>
- <8f94489d-5f0e-4166-a14e-4959098a5c80@quicinc.com>
- <ZlNi11AsdDpKM6AM@shell.armlinux.org.uk>
- <d246bd64-18b3-4002-bc71-eccd67bbd61f@quicinc.com>
- <67553944-5d3f-4641-a719-da84554c0a9f@lunn.ch>
+	s=arc-20240116; t=1717013642; c=relaxed/simple;
+	bh=c7JL/I/graJ+88NBl7jE1by+A2/t12JyNV/q5tOKMxQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kh9W2oJmFrlX24qFghPKUtgU/E1TychZz/E2m3V0OEzuNADSl/CInMQ8rqIsXHjx7OLIbUsAnNqJic0rCS7cXKGM+t0ODBNdXjMPXLIxX9hqoOU12vccAwWw3mQb0jJOJva63uvdBfcxOCnbNpJrxXY6yGl8rvtgdJQSx1q2nEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=SgcnHMoZ; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a59a352bbd9so15715166b.1
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 13:14:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1717013639; x=1717618439; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=w4bWnC/Kv0JT6M7iEoT0TCRj85yFx52hi58rCV4nqWM=;
+        b=SgcnHMoZ3DjlCg0cEWomUVRbE8JmI9o3Tr/RVCCXtum7iUMeICUS85xflY9H2DYwHQ
+         Zn07BR1Lm6dTug2+oRR+WePKsg/M5gKpTm33OdoXaMLUHabec0u0itH75bKnvdylYIzb
+         P8SzCZsNjjtCU04k0LdtlSCfLbX30zfk5FmtOvtQWadbvwTwMmOqt/HbGLKkMIhdeaTQ
+         RsWf7Mn35SLTSQqt59ik5zFJztiUbvtIrheQxqHW3GCuwSqOnMnBI8NhhtlSp+wGUfcW
+         p3PKc5y/wNKWNMjCNaGExSXWRZYL2kFEhAQuLe6hLUfH7Zi+ZqgqL0Ab7E1Q55DwWj1x
+         uHHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717013639; x=1717618439;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w4bWnC/Kv0JT6M7iEoT0TCRj85yFx52hi58rCV4nqWM=;
+        b=wBn8IEfMmcn+EQ0h77qksF6mwMGb3Bb4TOHMmI0a8sgJzDNWj/V1eELr2rGoXh/tuq
+         rFFByDnzKkPN5FvAImU3vT1sx6zM8lTDGWNe+O/9iTRNaOmsyWd86h4PXxGiQE8o0Ojz
+         Ft7XntY5JzU/TJaNJgMlR4lqmv4boORBat4KorkSrQLxloc3CFiCyfA1mzpDzhtB7vCb
+         OeT1MpHjE+a+K21YzUm66VvpUyfqFZX6LA2HDZZu7mPNeLSic5CJ224XWyhVwp/IfuP8
+         K5Hvcmv2+Fc28EGjZu0t5UJGDgxIkjezjTzWB8Irqftp2Etm8vITZr8OMKUmwsHOfmf2
+         P3tA==
+X-Gm-Message-State: AOJu0YyCFJlvzKEOe0GKSmJoRkw8aqJa80oWM5zrqEG75hnkA5iNBzIi
+	pAR7wAG7lr8F4iXgfxtNg+qiA2xiaC6czRIOALvuXSMZRH6YcTgLqWssF/5KHHg=
+X-Google-Smtp-Source: AGHT+IEVrm0SX/N4wdCpIiXmdaj/QShuKjmUiC4CFPngfIZhAXfbJrQ+C1tPPLKkvGF3Y50Nb1/ZhQ==
+X-Received: by 2002:a17:906:48d6:b0:a59:cf0d:d7c8 with SMTP id a640c23a62f3a-a642d37e9cfmr275702666b.15.1717013638805;
+        Wed, 29 May 2024 13:13:58 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:0:a2ed:fbea:c7f7:f383? ([2001:67c:2fbc:0:a2ed:fbea:c7f7:f383])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a644f347fd4sm105638966b.212.2024.05.29.13.13.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 May 2024 13:13:58 -0700 (PDT)
+Message-ID: <8252647b-0301-4f14-bdc7-208e9779fc2f@openvpn.net>
+Date: Wed, 29 May 2024 22:15:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <67553944-5d3f-4641-a719-da84554c0a9f@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 14/24] ovpn: implement multi-peer support
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Sergey Ryazanov <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
+ Esben Haabendal <esben@geanix.com>
+References: <20240506011637.27272-1-antonio@openvpn.net>
+ <20240506011637.27272-15-antonio@openvpn.net> <ZlXtyn2Sgk_W8h92@hog>
+ <de937f69-b5ae-4d4f-b16a-e18fa70a8e7b@openvpn.net> <ZldG5PNlvAkJ4fat@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <ZldG5PNlvAkJ4fat@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 29, 2024 at 04:28:16PM +0200, Andrew Lunn wrote:
-> > Qualcomm ethernet HW supports 2.5G speed in overclocked SGMII mode.
-> > we internally term it as OCSGMII.
+On 29/05/2024 17:16, Sabrina Dubroca wrote:
+> 2024-05-28, 21:41:15 +0200, Antonio Quartulli wrote:
+>> On 28/05/2024 16:44, Sabrina Dubroca wrote:
+>>> Hi Antonio, I took a little break but I'm looking at your patches
+>>> again now.
+>>
+>> Thanks Sabrina! Meanwhile I have been working on all your suggested changes.
+>> Right now I am familiarizing with the strparser.
 > 
-> So it still does SGMII inband signalling? Not 2500BaseX signalling? It
-> is not actually compatible with 2500BaseX?
+> Cool :)
 > 
-> > End goal of these patches is to enable SGMII with 2.5G speed support.
-> > The patch in these series enabled up SGMII with 2.5 for cases where we
-> > don't have external phy. ( mac-to-mac connectivity)
+>>> 2024-05-06, 03:16:27 +0200, Antonio Quartulli wrote:
+>>>> +	index = ovpn_peer_index(ovpn->peers.by_id, &peer->id, sizeof(peer->id));
+>>>> +	hlist_add_head_rcu(&peer->hash_entry_id, &ovpn->peers.by_id[index]);
+>>>> +
+>>>> +	if (peer->vpn_addrs.ipv4.s_addr != htonl(INADDR_ANY)) {
+>>>> +		index = ovpn_peer_index(ovpn->peers.by_vpn_addr,
+>>>> +					&peer->vpn_addrs.ipv4,
+>>>> +					sizeof(peer->vpn_addrs.ipv4));
+>>>> +		hlist_add_head_rcu(&peer->hash_entry_addr4,
+>>>> +				   &ovpn->peers.by_vpn_addr[index]);
+>>>> +	}
+>>>> +
+>>>> +	hlist_del_init_rcu(&peer->hash_entry_addr6);
+>>>
+>>> Why are hash_entry_transp_addr and hash_entry_addr6 getting a
+>>> hlist_del_init_rcu() call, but not hash_entry_id and hash_entry_addr4?
+>>
+>> I think not calling del_init_rcu on hash_entry_addr4 was a mistake.
+>>
+>> Calling del_init_rcu on addr4, addr6 and transp_addr is needed to put them
+>> in a known state in case they are not hashed.
 > 
-> So the other end needs to be an over clocked SGMII MAC, not 2500BaseX?
-> 
-> > The new patch posted extends this for the case when the MAC has an
-> > external phy connected. ( hence we are advertising fr 2.5G speed by adding
-> > 2500BASEX as supported interface in phylink)
-> 
-> And i assume it does not actually work against a true 2500BaseX
-> device, because it is doing SGMII inband signalling?
+> hlist_del_init_rcu does nothing if node is not already on a list.
 
-I really hope the hardware isn't using any SGMII inband signalling
-at 2.5G speeds. Other devices explicitly state that SGMII inband
-signalling while operating the elevated 2.5G speed is *not* supported!
+Mh you're right. I must have got confused for some reason.
+Those del_init_rcu can go then.
+
+> 
+>> While hash_entry_id always goes through hlist_add_head_rcu, therefore
+>> del_init_rcu is useless (to my understanding).
+> 
+> I'm probably missing something about how this all fits together. In
+> patch 19, I see ovpn_nl_set_peer_doit can re-add a peer that is
+> already added (but I'm not sure why, since you don't allow changing
+> the addresses, so it won't actually be re-hashed).
+
+Actually it's not a "re-add", but the intent is to "update" a peer that 
+already exists. However, some fields are forbidden from being updated, 
+like the address.
+
+[NOTE: I found some issue with the "peer update" logic in 
+ovpn_nl_set_peer_doit and it's being changed a bit]
+
+> 
+> I don't think doing a 2nd add of the same element to peers.by_id (or
+> any of the other hashtables) is correct, so I'd say you need
+> hlist_del_init_rcu for all of them.
+
+This is exactly the bug I mentioned above: we should not go through the 
+add again. Ideally we should just update the fields and be done with it, 
+without re-hashing the object.
+
+I hope it makes sense.
+
+Cheers,
+
+> 
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Antonio Quartulli
+OpenVPN Inc.
 
