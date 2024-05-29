@@ -1,448 +1,278 @@
-Return-Path: <netdev+bounces-98872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BCAD8D2C77
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 07:36:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97F4D8D2C99
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 07:38:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FA2928A5A8
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 05:36:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 245631F25C4D
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 05:38:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865D515D5A0;
-	Wed, 29 May 2024 05:36:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45392168C28;
+	Wed, 29 May 2024 05:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="iJvSctFb"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="A9Cgbimb";
+	dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b="gJXohKAq"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A54F15B99F;
-	Wed, 29 May 2024 05:36:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716960967; cv=none; b=KcMVJfT2SP4I8FNIXmq6yuaOw26ePYK1xiI9aNqUWW668bvredzNxuIjFI7JY+8gG4mXWhOXfuRVqImQg78PObS5v9c/RUhYNXDozRCN8t9SGekBcjE6goUVdOTiRq6MVH/6qcaz5Jh1NIGIVuPgbrcE8M8R0mEuYQFkPqLSlKc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716960967; c=relaxed/simple;
-	bh=EG+ukCtR5W8c8NJE7zQeVvvVFcYg89gLleqGpiQDV/o=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=IuhlFtpNEhHQ7a5o8KsqxIWB59L919mjji5iPkjSuLq2rAvkgu4PMX2bTw71EaQFsq0oO2sUJmyBncdpTogM9duHhNFFUYLqgamlDSmlVn0if7/fcTaVP5Iya0sMVw5VWnc/fKi3x6YfkwqPyvitGhy+lYePcBEa1za8WeUMAhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=iJvSctFb; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 8358F2067D14; Tue, 28 May 2024 22:35:56 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8358F2067D14
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1716960956;
-	bh=S0zBMLpxe8tPEwPqoPcU2mRWFnZzgoPM64H1p7tmBVc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=iJvSctFbblP6yoW1IC2RkO5ndpdiUK0upODkjwPr36G8PZ8ATy4eCGuCFnJ1JMV8C
-	 9dxiq4E8u6cnRLd+b1vARPW+SxaZV//200ykq4GfVdo7zUf83ApiaHT2I7fm1Wjc7w
-	 Hase1sqsLJGrf3aG04lTZHulf8Cx0STNylwLvEXA=
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: linux-hardening@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	Colin Ian King <colin.i.king@gmail.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Kees Cook <keescook@chromium.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dexuan Cui <decui@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: [PATCH net-next v2] net: mana: Allow variable size indirection table
-Date: Tue, 28 May 2024 22:35:55 -0700
-Message-Id: <1716960955-3195-1-git-send-email-shradhagupta@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404F816192F;
+	Wed, 29 May 2024 05:36:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=60.244.123.138
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716960981; cv=fail; b=fJq3LdMqBfLNyp/bqMq8Wn87xvN8o/YZxsZtSHZq8385MyBIzID3i4Qj3JvXvL1EyzgtYD10eKGPg7NWs11qhYP+nv4yAdcjdDFk1pZrCCbl3kqI2fNJERwE7rYaYL2gRKPm6H4xCjouXtuTSKJM64wUVbE83oOzX2ku0FHZp9c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716960981; c=relaxed/simple;
+	bh=pSxrvzAJbZxKDRm9gmxxadSs90Jz9Fq17waYFddbVVE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=MfRLvYE9GtzM5FNFdidHebYu16IyrG7xcc6391mnZMMoJXcNb82l6gS1h6c565MwXnGhkYgAUl/gBjpkMtzYmg0F5wivGNf9xxC9aY6VJHo0kdYJNsmRGGqleVIUGUomgKvftijO3/Aoe/0/DrsHDzd3qlVyBbOMxhbTMijjZzI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=A9Cgbimb; dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b=gJXohKAq; arc=fail smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: 5acf24581d7d11ef8c37dd7afa272265-20240529
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=MIME-Version:Content-Transfer-Encoding:Content-ID:Content-Type:In-Reply-To:References:Message-ID:Date:Subject:CC:To:From; bh=pSxrvzAJbZxKDRm9gmxxadSs90Jz9Fq17waYFddbVVE=;
+	b=A9Cgbimbjz+8pyh+aPsVh48Z2O22lcFAbo7X+nh+K3FFabxVusXxxZ9i3lw2t8Iuhe7oscDjbH5qVLSCpYLHswob9OTCorMsPFaZpxauH2nZzkehzScGSsWC0WNnteOYnuuC59rYlQME1VAJvl+luHO7L67slE+pK3wAX38+08s=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.39,REQID:2bdcf115-0601-4c8d-a631-8ea1369abc75,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:393d96e,CLOUDID:6b0af043-4544-4d06-b2b2-d7e12813c598,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
+	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
+X-UUID: 5acf24581d7d11ef8c37dd7afa272265-20240529
+Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw01.mediatek.com
+	(envelope-from <bc-bocun.chen@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1029636943; Wed, 29 May 2024 13:36:10 +0800
+Received: from mtkmbs10n2.mediatek.inc (172.21.101.183) by
+ mtkmbs11n1.mediatek.inc (172.21.101.185) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 29 May 2024 13:36:08 +0800
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (172.21.101.237)
+ by mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Wed, 29 May 2024 13:36:08 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=C+o0S21X22Vzp0yzKxfgowhy5hY/GuCcz5YTcHJNPBikDFkM+mPwTGVzKL9YVhlAI8sL+nvBwCXTvkDWFXG42e8WsBWMf7IcT8M/VIEhVGBQuBRyu5SBI704Lm+e5LFLQB6SMAulydANPhnew7LKR/Lq6eaj66MTDoWYY6IDj+8iaw6l+PYjwoI4mew7AXbJpUcP3Ch7EZVAHWIkf2s817Xpa7l0BACRBUW3GAe46/+uEE1QmfW/xBjTyLI+LI80luIQYgooxbOlcDjB/CJXpwhP9IDhRq1cDU8Fsm5nMoFsZ6Picau7G/Y+j6MYw/JVaKwC+w11qHdjo9kldDMDiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pSxrvzAJbZxKDRm9gmxxadSs90Jz9Fq17waYFddbVVE=;
+ b=bvaB5WzjIBUZbP+ZqoyS9eR5WlHKiBchHQgpwSNm5SOKfE0L/oijpiVzf5xyNThFrce3vR0qz6seGRhIGbKT2WhwEK+dqg/ls6HV582WX9LSOWxpNGvLXAeDHNYtUyw9NrHf8yjtFzyzja0EQ8blTAyvJUDEM0MZPD3uEiG+2o012HJ2qoV7DaLcXNbGlWdggxD5sAUk0n6inqoM1Ai6acDVEqYZqBM9XwvdIUj7zxCvmnTDLsE/VxQ48PybrwkM0jIw0U45Seu+f9xg1V5Jj4J/+RhnLIc3TENLSQq9K1nVEKqTnckYS0QfkpAJdYygfzKe96Gr1fWf+fT+BgA5zQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mediatek.com; dmarc=pass action=none header.from=mediatek.com;
+ dkim=pass header.d=mediatek.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mediateko365.onmicrosoft.com; s=selector2-mediateko365-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pSxrvzAJbZxKDRm9gmxxadSs90Jz9Fq17waYFddbVVE=;
+ b=gJXohKAqAeT4x1etEZDU//9dCJh6GYSrzS6z4jsQ2C4VPk5UuFAhAbWCD+VTm4KzLP9o0CczTQw/msAs9nAc1kHbJg/doCWhTFbv0i36oM3NA1uEoXFK32AyK8JKZJEZWeAw/idhIPsJHKm+k53lJ/V7wNit+k3p08aUo8BGEoA=
+Received: from SEZPR03MB7219.apcprd03.prod.outlook.com (2603:1096:101:ef::15)
+ by SEYPR03MB7892.apcprd03.prod.outlook.com (2603:1096:101:166::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.16; Wed, 29 May
+ 2024 05:36:07 +0000
+Received: from SEZPR03MB7219.apcprd03.prod.outlook.com
+ ([fe80::6198:1b1c:c38e:fae4]) by SEZPR03MB7219.apcprd03.prod.outlook.com
+ ([fe80::6198:1b1c:c38e:fae4%4]) with mapi id 15.20.7633.001; Wed, 29 May 2024
+ 05:36:06 +0000
+From: =?utf-8?B?QmMtYm9jdW4gQ2hlbiAo6Zmz5p+P5p2RKQ==?=
+	<bc-bocun.chen@mediatek.com>
+To: =?utf-8?B?TWFyay1NQyBMZWUgKOadjuaYjuaYjCk=?= <Mark-MC.Lee@mediatek.com>,
+	"linux@fw-web.de" <linux@fw-web.de>, "nbd@nbd.name" <nbd@nbd.name>,
+	"lorenzo@kernel.org" <lorenzo@kernel.org>, Sean Wang
+	<Sean.Wang@mediatek.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"angelogioacchino.delregno@collabora.com"
+	<angelogioacchino.delregno@collabora.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	=?utf-8?B?TWFzb24tY3cgQ2hhbmcgKOW8teWTsue2rSk=?=
+	<Mason-cw.Chang@mediatek.com>, "linux-mediatek@lists.infradead.org"
+	<linux-mediatek@lists.infradead.org>,
+	=?utf-8?B?Q2hhay1rZWkgTGFtICjmnpfmvqTln7op?= <Chak-kei.Lam@mediatek.com>,
+	"john@phrozen.org" <john@phrozen.org>, "frank-w@public-files.de"
+	<frank-w@public-files.de>, =?utf-8?B?TmVhbCBZZW4gKOWatOS7leS9syk=?=
+	<Neal.Yen@mediatek.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "daniel@makrotopia.org"
+	<daniel@makrotopia.org>
+Subject: Re: [net v2] net: ethernet: mtk_eth_soc: handle dma buffer size soc
+ specific
+Thread-Topic: [net v2] net: ethernet: mtk_eth_soc: handle dma buffer size soc
+ specific
+Thread-Index: AQHasXMYNi3xSZU3p0KmKIWq/uy+z7GtsUsA
+Date: Wed, 29 May 2024 05:36:06 +0000
+Message-ID: <67e46c939bb3eb000c6e032b0b49c0ed58bd04a7.camel@mediatek.com>
+References: <20240527142142.126796-1-linux@fw-web.de>
+In-Reply-To: <20240527142142.126796-1-linux@fw-web.de>
+Accept-Language: zh-TW, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=mediatek.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SEZPR03MB7219:EE_|SEYPR03MB7892:EE_
+x-ms-office365-filtering-correlation-id: 070f5588-228a-4173-1499-08dc7fa13cdc
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|376005|366007|1800799015|7416005|38070700009|921011;
+x-microsoft-antispam-message-info: =?utf-8?B?emN6TGRkUUQzTG5DZVBnWmxwMkx5Z0FtRXAzRzcwUlpiS0lVNzJDYlZOWXgv?=
+ =?utf-8?B?L1IrdUZ0V2ZWd0NtMHE5NVhFa3JxQjhtS09FYzZSNVlMVmxQLzVWdytydlEw?=
+ =?utf-8?B?NkxkcXFLV29Gb0U2S0hTSWVvMFZnTGxCK0NNNWJWL2RVTkZmd3ZSOGw0L2gr?=
+ =?utf-8?B?bnJ2R0tkTUxZK0hyMEU0bHoyU2o3QnRGaHJWMXFuOTV5THB2QnJUOFNReFMr?=
+ =?utf-8?B?dW1nb0tzM0NGK0lxZ3I1YVpPNDdjZ2N6UnRCRTNTZkRVZ0xiYjMrSnd1OXBZ?=
+ =?utf-8?B?YkFwZGttMEFxbG1Lbm5vUDVTd09OWGZLOFg4dlNIR2ZESytkU1dVK0h0N2JU?=
+ =?utf-8?B?cWpFSCsxSElLWTJQclZpWGFQWk01T29hdkxqbkxpdW9TUTVSeld4bDl2U3N1?=
+ =?utf-8?B?K0QreURkOUp2dTJqOGhLZHBUb2piZ3VmZHVOWUpCWGxyUnVjbm1lSU1YaHpm?=
+ =?utf-8?B?aXNGVUs4UzlEVWh4Q3V4MlpBWmhCYWhSanhnN09PN1EzSEk2dWZUaFZkTURB?=
+ =?utf-8?B?djNFVysyM0M4dnB5a3ZlYWIzbUQwZzZtTG81TXlZWWtRY0RmL2t5NnFOQWgy?=
+ =?utf-8?B?MS9zaDhBSi9vUHIrNnZ3SUVWL2dsRE5iTGpUUGFQaFZMZ1J6NllFZEhRNHJo?=
+ =?utf-8?B?SEdSRUtuMU1XbDIxSnN5L0xzUXMvRTdESEtKaWVEMjF1MVlld0F3RTllSVZi?=
+ =?utf-8?B?U3JZMC9taGM5QnZyS1ErY2lEYU5BOWlJczNXQU1xaG9xdzcrcDk3NUV1Y25V?=
+ =?utf-8?B?dmloVTZwVjA5WVhYazQ0S2JWVlFEc1B3SDk4WU5ncCtMTHlIVlgxdVdkRmRT?=
+ =?utf-8?B?QjVKK0xzKzh0R2hHSVI2RlNIZVVTUUNLTDhBWjhFUWZrak5Gakx6RjNGVVlP?=
+ =?utf-8?B?NFd6bXhsMHI5Yk5ndTNBd0IxTHYzR2sxRC9CU2tsN0l3L2JMVmNTT3dKRit2?=
+ =?utf-8?B?dmJOek5MYm1DNDN2S0ZQbkJ3dk9MYTBZcS9ZaGtmcDZSdWVuZGIzdHZ3TXF0?=
+ =?utf-8?B?bWpMVmFkSDY2clJtVlNsckRwdWR5L1dVZklCQVQzNGpobE1uMzhINDVKMjZL?=
+ =?utf-8?B?Z2JzeStpWmphTVhuL0YwajJHT2xKeGJ6azkyNDRoUXJncGRQbEdRLzRsT3Fn?=
+ =?utf-8?B?WG9vUVNOUW1WNmZjaS82aVB3cjFhQnNwdDhMNGRzRXNNOERUTk9hRWZURGpp?=
+ =?utf-8?B?Z2p5Y3haK0htQ3U1dHNodjZjYWlaMFZQakdTeXhHZ3ZoeVd5MjB4WW5qSEIw?=
+ =?utf-8?B?b044VDVJRC9mR2lmbjZrNXZ0WXIwTXlwN2EvOVNPMjVDbitUMXRkMGJyY0My?=
+ =?utf-8?B?UVZWZXNlaXpQR3JkaEtKTTJCYjdSWlRFZUIvTVJaR082ekdDam10NnhMT1VM?=
+ =?utf-8?B?T3VoWjMvazlsT2VEZEUyQVR2SWljemVRQUw0Zk9hYlVhZWp4Q1ZuRmJTMzVQ?=
+ =?utf-8?B?SGVhNTMwamFXaE05ZHErelFIbTJTU1pmYkx1dWk5NEJtd1pBbUJEaWYrVW12?=
+ =?utf-8?B?SHg1VUVKbVJvSU41MzlSVG8zd2dUK2hhNFNyMEoxdmN6Y0VEK280N0J5cWNl?=
+ =?utf-8?B?L21JQWlmUVgzalFtZDZKNEFXeHM0WXlySmYrcG9vaWZWUnEreld6NkVtUFJP?=
+ =?utf-8?B?SXpVOGhXdTB0UnJxaGQrNS9xMHNUR0FGSUJoZWRnQ3ozS0xYNUFBSEp6N0lJ?=
+ =?utf-8?B?cEZ4eEZtRng5K0hHMWdYZldzdDZtQm9LMXl0cUNkaUJNNXJ6WFBUaDM2SFZ2?=
+ =?utf-8?Q?Jv1XWhp4X7nXttvNFE=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEZPR03MB7219.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(7416005)(38070700009)(921011);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?U1NXM2h0K0NvWDJTOG41cWhMbEJKRzRaeFdCU2FjTzBjRDZXUVVGVE95Qkpv?=
+ =?utf-8?B?RFE0bDdjODdJWWpldjZFbGs3dVhmZTA5cHV3MnFmYjlFU0VnZ0NyeXFUMzNl?=
+ =?utf-8?B?WmxrR21NaVo0WGZhRHV1RHhzUjlLbmNJWDNDTCt3cDl0UEJ2alVWYW4yemNR?=
+ =?utf-8?B?UThHZWZ3enVIUXNrZWR4MDk2R1ZiZ29pUVN2SkVpZGtvTStkZUJtZHRWVUJx?=
+ =?utf-8?B?NkVxeTc3Mi85bFc0bTdSUXkvRi9McUFuK2hUdzZhVWsrQzh2YVRmVW5wREFJ?=
+ =?utf-8?B?N3lSNmZSV1Izd01vbXNmY0dqaXJJOHNKN2NJUXdpTy85d3hHMmFON243WHdv?=
+ =?utf-8?B?N3ZCeE1JQWE1c3o1VFRXcXB4dDQyYkFpZEoyR08zVnRSR2pDclVJeEl5MVpN?=
+ =?utf-8?B?UE5VSVA5ZW9xZklzTEJERkUzZ2tCaFRkRmNJVTh1ek1QUS9kRFdSUEh2ZnA1?=
+ =?utf-8?B?NGRDc3BBTkhLa0JUMFBjeTAwekJ4Ym1CYmJETHVMU2FOY25Cc3BId1lZVndH?=
+ =?utf-8?B?TDE1Nkw4QkMwVWY5SUlWNlh5S3VEcTg0WFRaWVVZMVM1Z0dSZjVkVmozeENZ?=
+ =?utf-8?B?OS9GckZXQ0Q3citMM0x5dU9CYmpyM040d3pabkYzcWZidUc0blE2RFBGejVF?=
+ =?utf-8?B?OTNpUS83QzYvSjlaQkFrendvRldhWGhRdnBPUkVCMDV6cTFiUEJZUkR3djJL?=
+ =?utf-8?B?djB1QzNTMGd4K0dxR0pycTY1QktMeGxUbTVxOEI3Qm1IOElodVUxOElBTE9F?=
+ =?utf-8?B?SUNSbVBVRG96WmtEcHlEWmdTaUkrS0xUaXQ3eEpuTDFPTjNFdS9ZdUZDbWRn?=
+ =?utf-8?B?amxwNWxLbjROcjlkUlFyTlBYT1Vka2VtTmhRRGNSUzNmV1k5RmM3ODc1MHov?=
+ =?utf-8?B?cTlIVTFVTFhodDduS0NneDlkY3M3YTdFcWFHODY0QTdTalVVd1BpMUFHS0ps?=
+ =?utf-8?B?Uk1sS2VSN05RZy9wT0xOc2U2cFBUVytxaGp4d0FlT0NCdFJ6cGNUa1VxTDN5?=
+ =?utf-8?B?Yno5R2UxeDZiS1JYaDFsNnpoeTFaOEdMUVE5VFFYSGNySXlraVUxdC9VV0dn?=
+ =?utf-8?B?b0FqRCt5aXI0MzBoUmQwYVZVSjB5SGtPV1VqRmpWbVMweDVOVFd1L0RaUHZK?=
+ =?utf-8?B?endSSmp4aXB3OGRLUFJFN2NWOFkwbjkrV2ZVNFhBbXVxVXFGaUxiWjhzeVV5?=
+ =?utf-8?B?S0FCMlQrVVNTWDN6RkxUWWNYa2c3ZUh4U21oZnFjcW0rTmhrTVVYZlp0Z0xE?=
+ =?utf-8?B?NDhMYUdYSFpJRkZMQmo4OWRKL1Q1WFA4OE1UZVZkZXRYanNsNWp0MHYrbWlP?=
+ =?utf-8?B?UDJBVHJXby9qMkk3RStaMGo1akEzLzE1bC80dGdlaFdNaUI4RExEVVJLMmQz?=
+ =?utf-8?B?SjFZUmRrMzhaNW9qZjRtemE0bWJBUDh3TWsvSlV1N3FNMkl5SkNpQ05RRGZr?=
+ =?utf-8?B?U1lKWHZ2NDhKcElBZE9EMmtqaE1hOTlaUUJhN3E1MDdCZ0xWNm9USzcwMCs2?=
+ =?utf-8?B?aVljU1k2SHQ1YXo1WEJBNEVLS2I1SFdGWDZ2VUk2UEVUdVZUWEJ1WWpMSTUr?=
+ =?utf-8?B?Ri8vcC9IRGFIWjBQNEx2ZHdjSGQ0SEVES0JPWHFkM1lJemR4ckJRNExZbk5K?=
+ =?utf-8?B?VWt6dlB1WkZGTTFNN3g4TGcwZG84NmxIQ0xacDJxV3VJSGhRT0RHUDZVbkhj?=
+ =?utf-8?B?N2p1WmVvdDN3SEVTS1E4QU1RVTlWdDRJMTZlV21DSEozbCtod3p0T2E4RThB?=
+ =?utf-8?B?TVNHalM0QUhTMVZyVGszU3B0NU9BbEZrenBNaVQrYlQrN0VMWE9HMUhoUTJm?=
+ =?utf-8?B?eXM3Yi85dDUzTithTUlBdDRwekM4UUVkUk82cFJLYWFVeE9KUHhvNVBNSDZy?=
+ =?utf-8?B?bTVVKys1eXBNNUdsVThjMDdJcUk3bjE4VEJUbnAzZTNhV1NpQUtIUDZGSS9q?=
+ =?utf-8?B?dGJMMW1hVGV6UkIxak1kMGZiUVhHVHpTektJYUh1Q2l6aTdocVhhTFJ6ZmJM?=
+ =?utf-8?B?THVPQzd3Q2phSGFQcmc2aVNRV1pSaTI0d0xiS3Bhd0lpR2ZNYk91RDVFTG4x?=
+ =?utf-8?B?ZmRueHZkVFdHamZsSFQyTDFHT2w1VmFPRkZUNHUyNXNheUdBbFRwUUhPcWcw?=
+ =?utf-8?B?UTFVbGg3V0JaeDIzaW5mMnNKUC9WTkg5RUsyaFpEVFNtNWwwcGlzMWxyL3V6?=
+ =?utf-8?B?U1E9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <885C21BFC7125A4EA05AD3D5231F4ED6@apcprd03.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR03MB7219.apcprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 070f5588-228a-4173-1499-08dc7fa13cdc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 May 2024 05:36:06.7121
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a7687ede-7a6b-4ef6-bace-642f677fbe31
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XFExB55ub57GWknRGkgZL487h7yXFdAIFH3bvogzVlRnAUvMT7p5D56TMoraPv215YMUPMN7tHC912h3USk8N/pOoOTyGds5iB9HnODTat8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEYPR03MB7892
 
-Allow variable size indirection table allocation in MANA instead
-of using a constant value MANA_INDIRECT_TABLE_SIZE.
-The size is now derived from the MANA_QUERY_VPORT_CONFIG and the
-indirection table is allocated dynamically.
-
-Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Reviewed-by: Dexuan Cui <decui@microsoft.com>
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
----
- Changes in v2:
- * Rebased to latest net-next tree
- * Rearranged cleanup code in mana_probe_port to avoid extra operations
----
- drivers/infiniband/hw/mana/qp.c               | 10 +--
- drivers/net/ethernet/microsoft/mana/mana_en.c | 68 ++++++++++++++++---
- .../ethernet/microsoft/mana/mana_ethtool.c    | 20 ++++--
- include/net/mana/gdma.h                       |  4 +-
- include/net/mana/mana.h                       |  9 +--
- 5 files changed, 84 insertions(+), 27 deletions(-)
-
-diff --git a/drivers/infiniband/hw/mana/qp.c b/drivers/infiniband/hw/mana/qp.c
-index ba13c5abf8ef..2d411a16a127 100644
---- a/drivers/infiniband/hw/mana/qp.c
-+++ b/drivers/infiniband/hw/mana/qp.c
-@@ -21,7 +21,7 @@ static int mana_ib_cfg_vport_steering(struct mana_ib_dev *dev,
- 
- 	gc = mdev_to_gc(dev);
- 
--	req_buf_size = struct_size(req, indir_tab, MANA_INDIRECT_TABLE_SIZE);
-+	req_buf_size = struct_size(req, indir_tab, MANA_INDIRECT_TABLE_DEF_SIZE);
- 	req = kzalloc(req_buf_size, GFP_KERNEL);
- 	if (!req)
- 		return -ENOMEM;
-@@ -41,18 +41,18 @@ static int mana_ib_cfg_vport_steering(struct mana_ib_dev *dev,
- 	if (log_ind_tbl_size)
- 		req->rss_enable = true;
- 
--	req->num_indir_entries = MANA_INDIRECT_TABLE_SIZE;
-+	req->num_indir_entries = MANA_INDIRECT_TABLE_DEF_SIZE;
- 	req->indir_tab_offset = offsetof(struct mana_cfg_rx_steer_req_v2,
- 					 indir_tab);
- 	req->update_indir_tab = true;
- 	req->cqe_coalescing_enable = 1;
- 
- 	/* The ind table passed to the hardware must have
--	 * MANA_INDIRECT_TABLE_SIZE entries. Adjust the verb
-+	 * MANA_INDIRECT_TABLE_DEF_SIZE entries. Adjust the verb
- 	 * ind_table to MANA_INDIRECT_TABLE_SIZE if required
- 	 */
- 	ibdev_dbg(&dev->ib_dev, "ind table size %u\n", 1 << log_ind_tbl_size);
--	for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++) {
-+	for (i = 0; i < MANA_INDIRECT_TABLE_DEF_SIZE; i++) {
- 		req->indir_tab[i] = ind_table[i % (1 << log_ind_tbl_size)];
- 		ibdev_dbg(&dev->ib_dev, "index %u handle 0x%llx\n", i,
- 			  req->indir_tab[i]);
-@@ -137,7 +137,7 @@ static int mana_ib_create_qp_rss(struct ib_qp *ibqp, struct ib_pd *pd,
- 	}
- 
- 	ind_tbl_size = 1 << ind_tbl->log_ind_tbl_size;
--	if (ind_tbl_size > MANA_INDIRECT_TABLE_SIZE) {
-+	if (ind_tbl_size > MANA_INDIRECT_TABLE_DEF_SIZE) {
- 		ibdev_dbg(&mdev->ib_dev,
- 			  "Indirect table size %d exceeding limit\n",
- 			  ind_tbl_size);
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index d087cf954f75..851e1b9761b3 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -481,7 +481,7 @@ static int mana_get_tx_queue(struct net_device *ndev, struct sk_buff *skb,
- 	struct sock *sk = skb->sk;
- 	int txq;
- 
--	txq = apc->indir_table[hash & MANA_INDIRECT_TABLE_MASK];
-+	txq = apc->indir_table[hash & (apc->indir_table_sz - 1)];
- 
- 	if (txq != old_q && sk && sk_fullsock(sk) &&
- 	    rcu_access_pointer(sk->sk_dst_cache))
-@@ -962,7 +962,16 @@ static int mana_query_vport_cfg(struct mana_port_context *apc, u32 vport_index,
- 
- 	*max_sq = resp.max_num_sq;
- 	*max_rq = resp.max_num_rq;
--	*num_indir_entry = resp.num_indirection_ent;
-+	if (resp.num_indirection_ent > 0 &&
-+	    resp.num_indirection_ent <= MANA_INDIRECT_TABLE_MAX_SIZE &&
-+	    is_power_of_2(resp.num_indirection_ent)) {
-+		*num_indir_entry = resp.num_indirection_ent;
-+	} else {
-+		netdev_warn(apc->ndev,
-+			    "Setting indirection table size to default %d for vPort %d\n",
-+			    MANA_INDIRECT_TABLE_DEF_SIZE, apc->port_idx);
-+		*num_indir_entry = MANA_INDIRECT_TABLE_DEF_SIZE;
-+	}
- 
- 	apc->port_handle = resp.vport;
- 	ether_addr_copy(apc->mac_addr, resp.mac_addr);
-@@ -1054,14 +1063,13 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
- 				   bool update_default_rxobj, bool update_key,
- 				   bool update_tab)
- {
--	u16 num_entries = MANA_INDIRECT_TABLE_SIZE;
- 	struct mana_cfg_rx_steer_req_v2 *req;
- 	struct mana_cfg_rx_steer_resp resp = {};
- 	struct net_device *ndev = apc->ndev;
- 	u32 req_buf_size;
- 	int err;
- 
--	req_buf_size = struct_size(req, indir_tab, num_entries);
-+	req_buf_size = struct_size(req, indir_tab, apc->indir_table_sz);
- 	req = kzalloc(req_buf_size, GFP_KERNEL);
- 	if (!req)
- 		return -ENOMEM;
-@@ -1072,7 +1080,7 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
- 	req->hdr.req.msg_version = GDMA_MESSAGE_V2;
- 
- 	req->vport = apc->port_handle;
--	req->num_indir_entries = num_entries;
-+	req->num_indir_entries = apc->indir_table_sz;
- 	req->indir_tab_offset = offsetof(struct mana_cfg_rx_steer_req_v2,
- 					 indir_tab);
- 	req->rx_enable = rx;
-@@ -1111,7 +1119,7 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
- 	}
- 
- 	netdev_info(ndev, "Configured steering vPort %llu entries %u\n",
--		    apc->port_handle, num_entries);
-+		    apc->port_handle, apc->indir_table_sz);
- out:
- 	kfree(req);
- 	return err;
-@@ -2344,11 +2352,33 @@ static int mana_create_vport(struct mana_port_context *apc,
- 	return mana_create_txq(apc, net);
- }
- 
-+static int mana_rss_table_alloc(struct mana_port_context *apc)
-+{
-+	if (!apc->indir_table_sz) {
-+		netdev_err(apc->ndev,
-+			   "Indirection table size not set for vPort %d\n",
-+			   apc->port_idx);
-+		return -EINVAL;
-+	}
-+
-+	apc->indir_table = kcalloc(apc->indir_table_sz, sizeof(u32), GFP_KERNEL);
-+	if (!apc->indir_table)
-+		return -ENOMEM;
-+
-+	apc->rxobj_table = kcalloc(apc->indir_table_sz, sizeof(mana_handle_t), GFP_KERNEL);
-+	if (!apc->rxobj_table) {
-+		kfree(apc->indir_table);
-+		return -ENOMEM;
-+	}
-+
-+	return 0;
-+}
-+
- static void mana_rss_table_init(struct mana_port_context *apc)
- {
- 	int i;
- 
--	for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++)
-+	for (i = 0; i < apc->indir_table_sz; i++)
- 		apc->indir_table[i] =
- 			ethtool_rxfh_indir_default(i, apc->num_queues);
- }
-@@ -2361,7 +2391,7 @@ int mana_config_rss(struct mana_port_context *apc, enum TRI_STATE rx,
- 	int i;
- 
- 	if (update_tab) {
--		for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++) {
-+		for (i = 0; i < apc->indir_table_sz; i++) {
- 			queue_idx = apc->indir_table[i];
- 			apc->rxobj_table[i] = apc->rxqs[queue_idx]->rxobj;
- 		}
-@@ -2466,7 +2496,6 @@ static int mana_init_port(struct net_device *ndev)
- 	struct mana_port_context *apc = netdev_priv(ndev);
- 	u32 max_txq, max_rxq, max_queues;
- 	int port_idx = apc->port_idx;
--	u32 num_indirect_entries;
- 	int err;
- 
- 	err = mana_init_port_context(apc);
-@@ -2474,7 +2503,7 @@ static int mana_init_port(struct net_device *ndev)
- 		return err;
- 
- 	err = mana_query_vport_cfg(apc, port_idx, &max_txq, &max_rxq,
--				   &num_indirect_entries);
-+				   &apc->indir_table_sz);
- 	if (err) {
- 		netdev_err(ndev, "Failed to query info for vPort %d\n",
- 			   port_idx);
-@@ -2723,6 +2752,10 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
- 	if (err)
- 		goto free_net;
- 
-+	err = mana_rss_table_alloc(apc);
-+	if (err)
-+		goto reset_apc;
-+
- 	netdev_lockdep_set_classes(ndev);
- 
- 	ndev->hw_features = NETIF_F_SG | NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM;
-@@ -2739,11 +2772,17 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
- 	err = register_netdev(ndev);
- 	if (err) {
- 		netdev_err(ndev, "Unable to register netdev.\n");
--		goto reset_apc;
-+		goto free_indir;
- 	}
- 
- 	return 0;
- 
-+free_indir:
-+	apc->indir_table_sz = 0;
-+	kfree(apc->indir_table);
-+	apc->indir_table = NULL;
-+	kfree(apc->rxobj_table);
-+	apc->rxobj_table = NULL;
- reset_apc:
- 	kfree(apc->rxqs);
- 	apc->rxqs = NULL;
-@@ -2897,6 +2936,7 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
- {
- 	struct gdma_context *gc = gd->gdma_context;
- 	struct mana_context *ac = gd->driver_data;
-+	struct mana_port_context *apc;
- 	struct device *dev = gc->dev;
- 	struct net_device *ndev;
- 	int err;
-@@ -2908,6 +2948,7 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
- 
- 	for (i = 0; i < ac->num_ports; i++) {
- 		ndev = ac->ports[i];
-+		apc = netdev_priv(ndev);
- 		if (!ndev) {
- 			if (i == 0)
- 				dev_err(dev, "No net device to remove\n");
-@@ -2931,6 +2972,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
- 		}
- 
- 		unregister_netdevice(ndev);
-+		apc->indir_table_sz = 0;
-+		kfree(apc->indir_table);
-+		apc->indir_table = NULL;
-+		kfree(apc->rxobj_table);
-+		apc->rxobj_table = NULL;
- 
- 		rtnl_unlock();
- 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-index ab2413d71f6c..1667f18046d2 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-@@ -245,7 +245,9 @@ static u32 mana_get_rxfh_key_size(struct net_device *ndev)
- 
- static u32 mana_rss_indir_size(struct net_device *ndev)
- {
--	return MANA_INDIRECT_TABLE_SIZE;
-+	struct mana_port_context *apc = netdev_priv(ndev);
-+
-+	return apc->indir_table_sz;
- }
- 
- static int mana_get_rxfh(struct net_device *ndev,
-@@ -257,7 +259,7 @@ static int mana_get_rxfh(struct net_device *ndev,
- 	rxfh->hfunc = ETH_RSS_HASH_TOP; /* Toeplitz */
- 
- 	if (rxfh->indir) {
--		for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++)
-+		for (i = 0; i < apc->indir_table_sz; i++)
- 			rxfh->indir[i] = apc->indir_table[i];
- 	}
- 
-@@ -273,8 +275,8 @@ static int mana_set_rxfh(struct net_device *ndev,
- {
- 	struct mana_port_context *apc = netdev_priv(ndev);
- 	bool update_hash = false, update_table = false;
--	u32 save_table[MANA_INDIRECT_TABLE_SIZE];
- 	u8 save_key[MANA_HASH_KEY_SIZE];
-+	u32 *save_table;
- 	int i, err;
- 
- 	if (!apc->port_is_up)
-@@ -284,13 +286,17 @@ static int mana_set_rxfh(struct net_device *ndev,
- 	    rxfh->hfunc != ETH_RSS_HASH_TOP)
- 		return -EOPNOTSUPP;
- 
-+	save_table = kcalloc(apc->indir_table_sz, sizeof(u32), GFP_KERNEL);
-+	if (!save_table)
-+		return -ENOMEM;
-+
- 	if (rxfh->indir) {
--		for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++)
-+		for (i = 0; i < apc->indir_table_sz; i++)
- 			if (rxfh->indir[i] >= apc->num_queues)
- 				return -EINVAL;
- 
- 		update_table = true;
--		for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++) {
-+		for (i = 0; i < apc->indir_table_sz; i++) {
- 			save_table[i] = apc->indir_table[i];
- 			apc->indir_table[i] = rxfh->indir[i];
- 		}
-@@ -306,7 +312,7 @@ static int mana_set_rxfh(struct net_device *ndev,
- 
- 	if (err) { /* recover to original values */
- 		if (update_table) {
--			for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++)
-+			for (i = 0; i < apc->indir_table_sz; i++)
- 				apc->indir_table[i] = save_table[i];
- 		}
- 
-@@ -316,6 +322,8 @@ static int mana_set_rxfh(struct net_device *ndev,
- 		mana_config_rss(apc, TRI_STATE_TRUE, update_hash, update_table);
- 	}
- 
-+	kfree(save_table);
-+
- 	return err;
- }
- 
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 27684135bb4d..c547756c4284 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -543,11 +543,13 @@ enum {
-  */
- #define GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX BIT(2)
- #define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG BIT(3)
-+#define GDMA_DRV_CAP_FLAG_1_VARIABLE_INDIRECTION_TABLE_SUPPORT BIT(5)
- 
- #define GDMA_DRV_CAP_FLAGS1 \
- 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
- 	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
--	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG)
-+	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG | \
-+	 GDMA_DRV_CAP_FLAG_1_VARIABLE_INDIRECTION_TABLE_SUPPORT)
- 
- #define GDMA_DRV_CAP_FLAGS2 0
- 
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index 561f6719fb4e..59823901b74f 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -30,8 +30,8 @@ enum TRI_STATE {
- };
- 
- /* Number of entries for hardware indirection table must be in power of 2 */
--#define MANA_INDIRECT_TABLE_SIZE 64
--#define MANA_INDIRECT_TABLE_MASK (MANA_INDIRECT_TABLE_SIZE - 1)
-+#define MANA_INDIRECT_TABLE_MAX_SIZE 512
-+#define MANA_INDIRECT_TABLE_DEF_SIZE 64
- 
- /* The Toeplitz hash key's length in bytes: should be multiple of 8 */
- #define MANA_HASH_KEY_SIZE 40
-@@ -410,10 +410,11 @@ struct mana_port_context {
- 	struct mana_tx_qp *tx_qp;
- 
- 	/* Indirection Table for RX & TX. The values are queue indexes */
--	u32 indir_table[MANA_INDIRECT_TABLE_SIZE];
-+	u32 *indir_table;
-+	u32 indir_table_sz;
- 
- 	/* Indirection table containing RxObject Handles */
--	mana_handle_t rxobj_table[MANA_INDIRECT_TABLE_SIZE];
-+	mana_handle_t *rxobj_table;
- 
- 	/*  Hash key used by the NIC */
- 	u8 hashkey[MANA_HASH_KEY_SIZE];
--- 
-2.34.1
-
+T24gTW9uLCAyMDI0LTA1LTI3IGF0IDE2OjIxICswMjAwLCBGcmFuayBXdW5kZXJsaWNoIHdyb3Rl
+Og0KPiBGcm9tOiBGcmFuayBXdW5kZXJsaWNoIDxmcmFuay13QHB1YmxpYy1maWxlcy5kZT4NCj4N
+Cj4gVGhlIG1haW5saW5lIE1USyBldGhlcm5ldCBkcml2ZXIgc3VmZmVycyBsb25nIHRpbWUgZnJv
+bSByYXJseSBidXQNCj4gYW5ub3lpbmcgdHggcXVldWUgdGltZW91dHMuIFdlIHRoaW5rIHRoYXQg
+dGhpcyBpcyBjYXVzZWQgYnkgZml4ZWQNCj4gZG1hIHNpemVzIGhhcmRjb2RlZCBmb3IgYWxsIFNv
+Q3MuDQo+DQo+IFVzZSB0aGUgZG1hLXNpemUgaW1wbGVtZW50YXRpb24gZnJvbSBTREsgaW4gYSBw
+ZXIgU29DIG1hbm5lci4NCj4NCj4gRml4ZXM6IDY1NmU3MDUyNDNmZCAoIm5ldC1uZXh0OiBtZWRp
+YXRlazogYWRkIHN1cHBvcnQgZm9yIE1UNzYyMw0KPiBldGhlcm5ldCIpDQo+IFN1Z2dlc3RlZC1i
+eTogRGFuaWVsIEdvbGxlIDxkYW5pZWxAbWFrcm90b3BpYS5vcmc+DQo+IFNpZ25lZC1vZmYtYnk6
+IEZyYW5rIFd1bmRlcmxpY2ggPGZyYW5rLXdAcHVibGljLWZpbGVzLmRlPg0KPiAtLS0NCj4gc29y
+cnkgZm9yIG11bHRpcGxlIHBvc3RpbmcgaW4gZmlyc3QgdmVyc2lvbg0KPg0KPiBiYXNlZCBvbiBT
+REs6DQo+IA0KaHR0cHM6Ly9naXQwMS5tZWRpYXRlay5jb20vcGx1Z2lucy9naXRpbGVzL29wZW53
+cnQvZmVlZHMvbXRrLW9wZW53cnQtZmVlZHMvKy9mYWMxOTRkNjI1M2QzMzllMTVjNjUxYzA1MmI1
+MzJhNDQ5YTA0ZDZlDQo+DQo+IHYyOg0KPiAtIGZpeCB1bnVzZWQgdmFyaWFibGUgJ2FkZHInIGlu
+IDMyYml0IGJ1aWxkDQo+IC0tLQ0KPiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvbWVkaWF0ZWsvbXRr
+X2V0aF9zb2MuYyB8IDEwNSArKysrKysrKysrKysrLS0tLQ0KPiAtLQ0KPiAgZHJpdmVycy9uZXQv
+ZXRoZXJuZXQvbWVkaWF0ZWsvbXRrX2V0aF9zb2MuaCB8ICAgOSArLQ0KPiAgMiBmaWxlcyBjaGFu
+Z2VkLCA3OCBpbnNlcnRpb25zKCspLCAzNiBkZWxldGlvbnMoLSkNCj4NCj4gZGlmZiAtLWdpdCBh
+L2RyaXZlcnMvbmV0L2V0aGVybmV0L21lZGlhdGVrL210a19ldGhfc29jLmMNCj4gYi9kcml2ZXJz
+L25ldC9ldGhlcm5ldC9tZWRpYXRlay9tdGtfZXRoX3NvYy5jDQo+IGluZGV4IGNhZTQ2MjkwYTdh
+ZS4uZjFmZjFiZTczOTI2IDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9tZWRp
+YXRlay9tdGtfZXRoX3NvYy5jDQo+ICsrKyBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L21lZGlhdGVr
+L210a19ldGhfc29jLmMNCi4uLi4uLi4uLi4uLi4uDQo+IEBAIC01MTc2LDYgKzUyMDEsOCBAQCBz
+dGF0aWMgY29uc3Qgc3RydWN0IG10a19zb2NfZGF0YSBtdDc5ODFfZGF0YSA9DQo+IHsNCj4gICAg
+ICAgIC5kZXNjX3NpemUgPSBzaXplb2Yoc3RydWN0IG10a190eF9kbWFfdjIpLA0KPiAgICAgICAg
+LmRtYV9tYXhfbGVuID0gTVRLX1RYX0RNQV9CVUZfTEVOX1YyLA0KPiAgICAgICAgLmRtYV9sZW5f
+b2Zmc2V0ID0gOCwNCj4gKyAgICAgIC5kbWFfc2l6ZSA9IE1US19ETUFfU0laRSg0SyksDQo+ICsg
+ICAgICAuZnFfZG1hX3NpemUgPSBNVEtfRE1BX1NJWkUoMkspLA0KPiAgICB9LA0KPiAgICAucngg
+PSB7DQo+ICAgICAgICAuZGVzY19zaXplID0gc2l6ZW9mKHN0cnVjdCBtdGtfcnhfZG1hKSwNCj4g
+QEAgLTUxODMsNiArNTIxMCw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgbXRrX3NvY19kYXRhIG10
+Nzk4MV9kYXRhID0NCj4gew0KPiAgICAgICAgLmRtYV9sNF92YWxpZCA9IFJYX0RNQV9MNF9WQUxJ
+RF9WMiwNCj4gICAgICAgIC5kbWFfbWF4X2xlbiA9IE1US19UWF9ETUFfQlVGX0xFTiwNCj4gICAg
+ICAgIC5kbWFfbGVuX29mZnNldCA9IDE2LA0KPiArICAgICAgLmRtYV9zaXplID0gTVRLX0RNQV9T
+SVpFKDFLKSwNCj4gICAgfSwNCj4gIH07DQo+ICANCj4gQEAgLTUyMDIsNiArNTIzMCw4IEBAIHN0
+YXRpYyBjb25zdCBzdHJ1Y3QgbXRrX3NvY19kYXRhIG10Nzk4Nl9kYXRhID0NCj4gew0KPiAgICAg
+ICAgLmRlc2Nfc2l6ZSA9IHNpemVvZihzdHJ1Y3QgbXRrX3R4X2RtYV92MiksDQo+ICAgICAgICAu
+ZG1hX21heF9sZW4gPSBNVEtfVFhfRE1BX0JVRl9MRU5fVjIsDQo+ICAgICAgICAuZG1hX2xlbl9v
+ZmZzZXQgPSA4LA0KPiArICAgICAgLmRtYV9zaXplID0gTVRLX0RNQV9TSVpFKDRLKSwNCj4gKyAg
+ICAgIC5mcV9kbWFfc2l6ZSA9IE1US19ETUFfU0laRSgySyksDQo+ICAgIH0sDQo+ICAgIC5yeCA9
+IHsNCj4gICAgICAgIC5kZXNjX3NpemUgPSBzaXplb2Yoc3RydWN0IG10a19yeF9kbWEpLA0KPiBA
+QCAtNTIwOSw2ICs1MjM5LDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBtdGtfc29jX2RhdGEgbXQ3
+OTg2X2RhdGEgPQ0KPiB7DQo+ICAgICAgICAuZG1hX2w0X3ZhbGlkID0gUlhfRE1BX0w0X1ZBTElE
+X1YyLA0KPiAgICAgICAgLmRtYV9tYXhfbGVuID0gTVRLX1RYX0RNQV9CVUZfTEVOLA0KPiAgICAg
+ICAgLmRtYV9sZW5fb2Zmc2V0ID0gMTYsDQo+ICsgICAgICAuZG1hX3NpemUgPSBNVEtfRE1BX1NJ
+WkUoMUspLA0KPiAgICB9LA0KPiAgfTsNCj4gIA0KPiBAQCAtNTIyOCw2ICs1MjU5LDggQEAgc3Rh
+dGljIGNvbnN0IHN0cnVjdCBtdGtfc29jX2RhdGEgbXQ3OTg4X2RhdGEgPQ0KPiB7DQo+ICAgICAg
+ICAuZGVzY19zaXplID0gc2l6ZW9mKHN0cnVjdCBtdGtfdHhfZG1hX3YyKSwNCj4gICAgICAgIC5k
+bWFfbWF4X2xlbiA9IE1US19UWF9ETUFfQlVGX0xFTl9WMiwNCj4gICAgICAgIC5kbWFfbGVuX29m
+ZnNldCA9IDgsDQo+ICsgICAgICAuZG1hX3NpemUgPSBNVEtfRE1BX1NJWkUoNEspLA0KPiArICAg
+ICAgLmZxX2RtYV9zaXplID0gTVRLX0RNQV9TSVpFKDRLKSwNCj4gICAgfSwNCj4gICAgLnJ4ID0g
+ew0KPiAgICAgICAgLmRlc2Nfc2l6ZSA9IHNpemVvZihzdHJ1Y3QgbXRrX3J4X2RtYV92MiksDQo+
+IEBAIC01MjM1LDYgKzUyNjgsNyBAQCBzdGF0aWMgY29uc3Qgc3RydWN0IG10a19zb2NfZGF0YSBt
+dDc5ODhfZGF0YSA9DQo+IHsNCj4gICAgICAgIC5kbWFfbDRfdmFsaWQgPSBSWF9ETUFfTDRfVkFM
+SURfVjIsDQo+ICAgICAgICAuZG1hX21heF9sZW4gPSBNVEtfVFhfRE1BX0JVRl9MRU5fVjIsDQo+
+ICAgICAgICAuZG1hX2xlbl9vZmZzZXQgPSA4LA0KPiArICAgICAgLmRtYV9zaXplID0gTVRLX0RN
+QV9TSVpFKDFLKSwNCj4gICAgfSwNCj4gIH07DQouLi4uLi4uLi4uLi4uLg0KVGhhbmsgeW91IGZv
+ciBhc3Npc3RpbmcgaW4gdXBzdHJlYW1pbmcgdGhpcyBwYXRjaCBmcm9tIHRoZSBtYWlubGluZSBN
+VEsNCmRyaXZlci4NCkN1cnJlbnRseSwgdGhlIFJTUyBmZWF0dXJlIGhhcyBub3QgYmVlbiB1cHN0
+cmVhbWVkLiBJdCBpcyByZWNvbW1hbmRlZA0KdG8gdXNlIDIwNDggRE1BRHMgZm9yIGJvdGggVFgg
+YW5kIFJYIFJpbmdzIG9uIHRoZSBNVDc5ODEvODYvODguDQoNCg0K
 
