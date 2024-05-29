@@ -1,201 +1,108 @@
-Return-Path: <netdev+bounces-98845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DBB48D2AB2
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 04:17:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60F828D2AE1
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 04:33:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41318285016
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 02:17:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF44F282CB8
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 02:33:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E9315ADB3;
-	Wed, 29 May 2024 02:17:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55FE732C85;
+	Wed, 29 May 2024 02:33:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="t7s9lkad"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KjZe8C7H"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95C415AAD7;
-	Wed, 29 May 2024 02:17:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F71A17E8F0
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 02:33:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716949039; cv=none; b=u1JkI20gH6NoLxLNpMb1MihkkQESMxLOHDrNdootNMuh8ib/wNdw/4Ld7JZqyB3+I9VGG5XPaOqNnjxgzOr3ZDWr6WtmCJT+9hCGuX2YVGlB4psCAR4SZ7eSqvIRtmsKf9L366dUWrmGPs8IuHy5NkJ6E3Y5MQFlFMdifgL8V/o=
+	t=1716950006; cv=none; b=LhQvXm5yjNCnYa7J5SErlNGJ1zkktrqyTqXyqiehnKfii4KC0117dJhVZKVXelQRsx044mrJQOkk4/Vha3xjGAw9DSSiAe4BqawMVzB9aEwg8s7vfqVXRP2L28ZJDmaYJq2VUMc0kZmc6dO36TKZlm+YTRNH22d+grHZ8yhbmR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716949039; c=relaxed/simple;
-	bh=34eSlQKHCn8By2FSveem/MuMJRk0WabJBZDj10rsQgY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=brahBvQJbOEoTueIYesNfutiExdrBMhD7FNuc8zhk0RFO2D++v45YylryeiQBeGpOiNmq1U4mELY/8PWKLtDJ0ViHnfwbcReRkSK6p/51qNAxa+K7lsTnTBW8RgIKp3gCr4ZoX8T4IFuIBlWXLtlNOhxIUoCDhbn6p0kYrCID7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=t7s9lkad; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1716949036; x=1748485036;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=34eSlQKHCn8By2FSveem/MuMJRk0WabJBZDj10rsQgY=;
-  b=t7s9lkadrYZUQ+j3XNjAkIMPwXcY+yS9VsszgSfRNdaHVVLNq8Jazesf
-   ctx2DT9XL3mssokFv41Sz1s51NoqsdOSPg4VovAgq0mVzxxWMre6J4GfT
-   1QeWFViXO1/HdyC8Fg+4HeHEGJDmB4UCwY/mYh1iv1fBj+nrUcm40P8w7
-   KWH/iczysin0C/HYJhdsd5AvGGliiYe1gOYuFvf8rIkwnN0rZf+GYGcT7
-   +Slw+lzswebSd86EPm//A7Ida6Y+Ie1qkJkFrSAaAh+Q+2CmSwrcl4vRz
-   efNntNUU01oVKWJz19FHxBf5y850QEDTOo3PfRhK6yeRAGdlYW7MRFWAY
-   g==;
-X-CSE-ConnectionGUID: OFQuk28LRuK+2e1hiRiHpA==
-X-CSE-MsgGUID: 402bAtDKRfqgld3jqBP74Q==
-X-IronPort-AV: E=Sophos;i="6.08,197,1712646000"; 
-   d="scan'208";a="26661639"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 May 2024 19:17:15 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 28 May 2024 19:17:01 -0700
-Received: from hat-linux.microchip.com (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Tue, 28 May 2024 19:17:01 -0700
-From: <Tristram.Ha@microchip.com>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, Robert Hancock
-	<robert.hancock@calian.com>
-CC: Vivien Didelot <vivien.didelot@gmail.com>, Florian Fainelli
-	<f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Tristram Ha <tristram.ha@microchip.com>
-Subject: [PATCH v1 net] net: phy: micrel: fix KSZ9477 PHY issues after suspend/resume
-Date: Tue, 28 May 2024 19:20:23 -0700
-Message-ID: <1716949223-4250-1-git-send-email-Tristram.Ha@microchip.com>
-X-Mailer: git-send-email 1.9.1
+	s=arc-20240116; t=1716950006; c=relaxed/simple;
+	bh=5RBFDHb7CYSETRyLZo9G3Rob1svtNyz2WiH9hLZ4VSw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=N9tTuQUSkQ07BcOvNVwZQ7t55IWm3e9OUqMcf4pxbN4ZV3sHTwfIjc578wqezenkwyS6RWtURaqBih6Hf7gleFVL2L0rYPFVDaDVL7cTRXz7TdeYtMql9t9YhFlN0a/OHjKCWqRRrevpQiVnXq7+lhiTwxDaxSCVk8neMDpkJKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KjZe8C7H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78EBEC3277B;
+	Wed, 29 May 2024 02:33:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716950005;
+	bh=5RBFDHb7CYSETRyLZo9G3Rob1svtNyz2WiH9hLZ4VSw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=KjZe8C7H5kekM1CeCOZBW112So7GYYwrpYIe8ZaWtx4gm2DG0HhwGo2b3wy5phb2a
+	 kCu6IwlNe87sQEf2tIWiX3AZF1oDSo/mD0688Yw6SaUtbl2qwgbk6SOgGkYFYk4dcn
+	 it3CILhPQk25eXfYAUqeXBiVymw9yy+0E3RsE0QcNZTSa1ynyUuVA6/oowXIvOSOUl
+	 i9uxecYej00//L11VpCtgCE0oBgM4AGYAhcU7X2Y7RGbbvrazZfKdltLSyK+SdI6+T
+	 Pr92I9nKX/M76W938u3TUJ6KKwodpfuMqeWPfzjdxpu2VqrSfHjY1Z7qAxmReez456
+	 bQhUjT+TQrihQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next] net: fjes: correct TRACE_INCLUDE_PATH
+Date: Tue, 28 May 2024 19:33:22 -0700
+Message-ID: <20240529023322.3467755-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-From: Tristram Ha <tristram.ha@microchip.com>
+A comment in define_trace.h clearly states:
 
-When the PHY is powered up after powered down most of the registers are
-reset, so the PHY setup code needs to be done again.  In addition the
-interrupt register will need to be setup again so that link status
-indication works again.
+ TRACE_INCLUDE_PATH if the path is something other than core kernel
+                                                           vvvvvvvvvvvvvv
+ include/trace then this macro can define the path to use. Note, the path
+ is relative to define_trace.h, not the file including it. Full path names
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ for out of tree modules must be used.
 
-Fixes: 26dd2974c5b5 ("net: phy: micrel: Move KSZ9477 errata fixes to PHY driver")
-Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+fjes uses path relative to itself. Which (somehow) works most of
+the time. Except when the kernel tree is "nested" in another
+kernel tree, and ../drivers/net/fjes actually exists. In which
+case build will use the header file from the wrong directory.
+
+I've been trying to figure out why net NIPA builder is constantly
+failing for the last 5 days, with:
+
+include/trace/../../../drivers/net/fjes/fjes_trace.h:88:17: error: ‘__assign_str’ undeclared (first use in this function)
+   88 |                 __assign_str(err, err);
+      |                 ^~~~~~~~~~~~
+
+when the line in the tree clearly has only one "err". NIPA does
+indeed have "nested" trees, because it uses git work-trees and
+the tree on the "outside" is not very up to date.
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v1
- - put back genphy_restart_ange() in ksz9477_phy_errata()
- - do not change MMD 0x1c reg 0x8 value
+ drivers/net/fjes/fjes_trace.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- drivers/net/phy/micrel.c | 62 ++++++++++++++++++++++++++++++++++++----
- 1 file changed, 56 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 2b8f8b7f1517..8c20cf937530 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -1939,7 +1939,7 @@ static const struct ksz9477_errata_write ksz9477_errata_writes[] = {
- 	{0x1c, 0x20, 0xeeee},
- };
+diff --git a/drivers/net/fjes/fjes_trace.h b/drivers/net/fjes/fjes_trace.h
+index 6437ddbd7842..2d3f0dddd375 100644
+--- a/drivers/net/fjes/fjes_trace.h
++++ b/drivers/net/fjes/fjes_trace.h
+@@ -358,7 +358,7 @@ TRACE_EVENT(fjes_stop_req_irq_post,
  
--static int ksz9477_config_init(struct phy_device *phydev)
-+static int ksz9477_phy_errata(struct phy_device *phydev)
- {
- 	int err;
- 	int i;
-@@ -1967,16 +1967,30 @@ static int ksz9477_config_init(struct phy_device *phydev)
- 			return err;
- 	}
+ #undef TRACE_INCLUDE_PATH
+ #undef TRACE_INCLUDE_FILE
+-#define TRACE_INCLUDE_PATH ../../../drivers/net/fjes
++#define TRACE_INCLUDE_PATH ../../drivers/net/fjes
+ #define TRACE_INCLUDE_FILE fjes_trace
  
-+	err = genphy_restart_aneg(phydev);
-+	if (err)
-+		return err;
-+
-+	return err;
-+}
-+
-+static int ksz9477_config_init(struct phy_device *phydev)
-+{
-+	int err;
-+
-+	/* Only KSZ9897 family of switches needs this fix. */
-+	if ((phydev->phy_id & 0xf) == 1) {
-+		err = ksz9477_phy_errata(phydev);
-+		if (err)
-+			return err;
-+	}
-+
- 	/* According to KSZ9477 Errata DS80000754C (Module 4) all EEE modes
- 	 * in this switch shall be regarded as broken.
- 	 */
- 	if (phydev->dev_flags & MICREL_NO_EEE)
- 		phydev->eee_broken_modes = -1;
- 
--	err = genphy_restart_aneg(phydev);
--	if (err)
--		return err;
--
- 	return kszphy_config_init(phydev);
- }
- 
-@@ -2085,6 +2099,42 @@ static int kszphy_resume(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int ksz9477_resume(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* No need to initialize registers if not powered down. */
-+	ret = phy_read(phydev, MII_BMCR);
-+	if (ret < 0)
-+		return ret;
-+	if (!(ret & BMCR_PDOWN))
-+		return 0;
-+
-+	genphy_resume(phydev);
-+
-+	/* After switching from power-down to normal mode, an internal global
-+	 * reset is automatically generated. Wait a minimum of 1 ms before
-+	 * read/write access to the PHY registers.
-+	 */
-+	usleep_range(1000, 2000);
-+
-+	/* Only KSZ9897 family of switches needs this fix. */
-+	if ((phydev->phy_id & 0xf) == 1) {
-+		ret = ksz9477_phy_errata(phydev);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	/* Enable PHY Interrupts */
-+	if (phy_interrupt_is_valid(phydev)) {
-+		phydev->interrupts = PHY_INTERRUPT_ENABLED;
-+		if (phydev->drv->config_intr)
-+			phydev->drv->config_intr(phydev);
-+	}
-+
-+	return 0;
-+}
-+
- static int kszphy_probe(struct phy_device *phydev)
- {
- 	const struct kszphy_type *type = phydev->drv->driver_data;
-@@ -5493,7 +5543,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.config_intr	= kszphy_config_intr,
- 	.handle_interrupt = kszphy_handle_interrupt,
- 	.suspend	= genphy_suspend,
--	.resume		= genphy_resume,
-+	.resume		= ksz9477_resume,
- 	.get_features	= ksz9477_get_features,
- } };
- 
+ /* This part must be outside protection */
 -- 
-2.34.1
+2.45.1
 
 
