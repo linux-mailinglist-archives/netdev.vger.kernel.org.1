@@ -1,72 +1,75 @@
-Return-Path: <netdev+bounces-99050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 326E58D38A1
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:05:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 33AA08D38A4
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:05:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0D83B245C4
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 14:05:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB7C4B24A3E
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 14:05:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473EB1CAB0;
-	Wed, 29 May 2024 14:05:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2131210F8;
+	Wed, 29 May 2024 14:05:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="k3+9+r+w"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="hdtXU6nG"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A70C1CABF;
-	Wed, 29 May 2024 14:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9501F95E;
+	Wed, 29 May 2024 14:05:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716991519; cv=none; b=G4DymBSwVKjQZ+t8c0J+dpwv9uwCXGziED9aTiE1PB7gZrkhse4ZGdvPaPABJq7wzoW7hYpl5i6AEQv1vuxo1z4JBL4UwRP1wN3PYVSQTAWz1+v0AanUhSVkhCGC+kPFTFUikqcuAzsM+BMHREgPrWL45QVbNnNmONK0U7+ke3Y=
+	t=1716991522; cv=none; b=dN9kyEviuD8Z5MN/KMUarrdyjKjDAHRUfokN38RQDsHyTRJDOvqU5db+CmvHC9w4f5XUC5OBFYadDRryAzg8qnKXYHouTV2dGvjmFJleY+mDLnF52G1VDl84Ev8pgLL8AviROEC52JBqqi4pcgJgRwwwkEouxuPluxPITqJr8so=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716991519; c=relaxed/simple;
-	bh=8pdtjxaYvnJvGSTuNW0rIboHP2B6PxKFn2ipg5YnrGs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ijX7NE3QPPAUR9JDpbN4yA7SQhn6YEPJx23Yjj1MTWqi+3cM1r1ZB2j0LblflJQWKMxC+M1mcHXBsmDfpU1bOIunVgDPLaWKmMrcQHyqj/pdyNkLGEAHo2j6LkJy4iVDrCnZBguYSZsSaAaI1N6HJEBlurW1WISWOwRb2LTMB6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=k3+9+r+w; arc=none smtp.client-ip=68.232.154.123
+	s=arc-20240116; t=1716991522; c=relaxed/simple;
+	bh=xLXQdWfnM+lZS5GVhD6SBArCWokhO6jmgrkUuYBlHAs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CI4jKBlTfKt2ng8ypeTcAqRvMUpDUXQWDZwF2+2+5GLqdl2wDqGIa3/oO9SeNBlmQhGV4Ogaj0v1PHYI1zTWaRER45vMaTRwk2t3LA2B8XGZYJhCpgVldKI7watPUPeW+j0ify1RqkKEK/Q1FJrE9g48aQswfRXHO19LB0mw3xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=hdtXU6nG; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1716991516; x=1748527516;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=8pdtjxaYvnJvGSTuNW0rIboHP2B6PxKFn2ipg5YnrGs=;
-  b=k3+9+r+wLQz2GwvZ3gSlcOc1sa+jXA2IS6prBQ7MyOrm/1DSA6PhMdYg
-   Se7kjvk4nZPV7etmYnN7qGrDQzD1OiC6cX09yWTxonyrWezq4DYQrWysx
-   OTsjiH/QbzHK1IG2z0zJrpESvpnlioh3JGY06ARZIBSaojO7LiM8SegAh
-   NfXo1SYWnX8sqIqr6VdODjPjzf6Gau2n7ZMJM8GaoAG7pjdhb3KIVWuDJ
-   CQnbNn+MQSUQaPO4ocxGYJEUg+7kKUADbw374PFgo6ApM+M2PhlbAlzzy
-   Gtk5g/U2QdPtuKushGeUFFLkjyZKWtJ35ShtBHbOdMh+//zyGByziSPP9
-   Q==;
-X-CSE-ConnectionGUID: Qz98x/EKR4io2vz4tc77eA==
-X-CSE-MsgGUID: vSzJpDZKSqCYYXaTnc4krA==
+  t=1716991521; x=1748527521;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=xLXQdWfnM+lZS5GVhD6SBArCWokhO6jmgrkUuYBlHAs=;
+  b=hdtXU6nGWER6Yo2w4X3tpixF6XDWZssWqfFvAitcE+iIxh5pmg5uYOT1
+   lFJx59tuZO26jGXFV0kb5D4qmFUBBPfPEyPihC2MlzanvfiIBWNK6ojJ+
+   n9GtXpHLNRQbP0AD5rPDtozpAeNGwArou68Qy9f78ddCZK9JRTfksr6SG
+   8Edm/vlN05VGhU7v3Nij+xzUkOmoFPm4beIPAER0TGzYIIog06ZydxqoG
+   h7gGRUeec6LOVvaQrqY0Im8sZyp2ZWphlyhVKQoUHZzFMoF1xckUBbCep
+   IizBaMRqCe7PUtyzunm7nA2KFpqPhYEVz0k9urQHtL3Y6FKGqKN2QNUkR
+   A==;
+X-CSE-ConnectionGUID: J4E1/ZSyRQW1wK6IW2PL8w==
+X-CSE-MsgGUID: fhosNk4gT+OOU4eVFz4BXw==
 X-IronPort-AV: E=Sophos;i="6.08,198,1712646000"; 
-   d="scan'208";a="26704201"
+   d="scan'208";a="257537345"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 May 2024 07:05:13 -0700
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 May 2024 07:05:20 -0700
 Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 29 May 2024 07:04:28 -0700
+ 15.1.2507.35; Wed, 29 May 2024 07:04:41 -0700
 Received: from che-ld-unglab06.microchip.com (10.10.85.11) by
  chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Wed, 29 May 2024 07:04:25 -0700
+ 15.1.2507.35 via Frontend Transport; Wed, 29 May 2024 07:04:38 -0700
 From: Rengarajan S <rengarajan.s@microchip.com>
 To: <woojung.huh@microchip.com>, <UNGLinuxDriver@microchip.com>,
 	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-usb@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
 CC: <rengarajan.s@microchip.com>
-Subject: [PATCH net-next v3 0/2] lan78xx: Enable 125 MHz CLK and Auto Speed configuration for LAN7801 if NO EEPROM is detected
-Date: Wed, 29 May 2024 19:32:54 +0530
-Message-ID: <20240529140256.1849764-1-rengarajan.s@microchip.com>
+Subject: [PATCH net-next v3 2/2] lan78xx: Enable Auto Speed and Auto Duplex configuration for LAN7801 if NO EEPROM is detected
+Date: Wed, 29 May 2024 19:32:56 +0530
+Message-ID: <20240529140256.1849764-3-rengarajan.s@microchip.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240529140256.1849764-1-rengarajan.s@microchip.com>
+References: <20240529140256.1849764-1-rengarajan.s@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,26 +79,33 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-This patch series adds the support for 125 MHz clock, Auto speed and
-auto duplex configuration for LAN7801 in the absence of EEPROM.
+Enabled ASD/ADD configuration for LAN7801 in the absence of EEPROM.
+After the lite reset these contents go back to defaults where ASD/
+ADD is disabled. The check is already available for LAN7800.
 
-Rengarajan S (2):
-  lan78xx: Enable 125 MHz CLK configuration for LAN7801 if NO EEPROM is
-    detected
-  lan78xx: Enable Auto Speed and Auto Duplex configuration for LAN7801
-    if NO EEPROM is detected
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Rengarajan S <rengarajan.s@microchip.com>
+---
+ drivers/net/usb/lan78xx.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-v3
-Resubmitting the patch. No changes.
-v2
-Split the patches into 125 MHz clock support and Auto speed config
-support for LAN7801.
-v1
-Initial Commit.
-
- drivers/net/usb/lan78xx.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
+diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+index 7ac540cc3686..62dbfff8dad4 100644
+--- a/drivers/net/usb/lan78xx.c
++++ b/drivers/net/usb/lan78xx.c
+@@ -3034,8 +3034,11 @@ static int lan78xx_reset(struct lan78xx_net *dev)
+ 		return ret;
+ 
+ 	/* LAN7801 only has RGMII mode */
+-	if (dev->chipid == ID_REV_CHIP_ID_7801_)
++	if (dev->chipid == ID_REV_CHIP_ID_7801_) {
+ 		buf &= ~MAC_CR_GMII_EN_;
++		/* Enable Auto Duplex and Auto speed */
++		buf |= MAC_CR_AUTO_DUPLEX_ | MAC_CR_AUTO_SPEED_;
++	}
+ 
+ 	if (dev->chipid == ID_REV_CHIP_ID_7800_ ||
+ 	    dev->chipid == ID_REV_CHIP_ID_7850_) {
 -- 
 2.25.1
 
