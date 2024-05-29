@@ -1,214 +1,173 @@
-Return-Path: <netdev+bounces-99040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8B528D386E
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 15:53:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 98A898D387F
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 15:58:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EED01F26444
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 13:53:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03CF21F23AC1
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 13:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F3C81BC23;
-	Wed, 29 May 2024 13:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F226A1BDDB;
+	Wed, 29 May 2024 13:58:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="UtqdTFpc";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ORkpN8SP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EnQ4NVLP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 399BD18EA8;
-	Wed, 29 May 2024 13:53:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E5D1BC2F;
+	Wed, 29 May 2024 13:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716990813; cv=none; b=e6W8IaFsqEb2G+AobPrUmMpd+/IxEAvMrG5k8KJP3vOAMsuSSFPv6eFDrEg1qdtQ7GlfqdcAsAu9/NrKtuiIaSrM5F998l55kSphEHR0y/JTXhoa9U+T/BoMCVBXFQ7OuDmPUrCkZQe//7+kmzWpFtGWNDqawDhiBL6nUEHwfMU=
+	t=1716991115; cv=none; b=I/8Xx1IXzH//O49NRt80pYYY+KX3IDcu9NY2/fbp2yGvtNzwoocmf9MYmD55UmwYnKXnkIytfncBTDnr7SQODRLH2QFR1vv0i3NRaIO0HKoOIJMbl/gcf36In1UeiGARnVYTlC1xauTZe8M9wJozTfOAT1EzPz/872NsfQCcxaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716990813; c=relaxed/simple;
-	bh=LHjrLTqNsBqOI9KQ44N+MxEcyGz5e9gq41v2r5ridhE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gYwC6QTLqRFcHeLYc7M4mm1nFBushsb0xoid6PtZWzPbuyT5/nOat4DstKLxtCVhDRv0gcncrCF+MpZYXOIFwdvHkl0YOmTVOfioShekIpp+Ix9dmwSdZIoGS8ps9oQssmKJ83g+ZURH7JVM3g96HstG07RAW15hrrhePyo6xyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=UtqdTFpc; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=ORkpN8SP; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 2284220569;
-	Wed, 29 May 2024 13:53:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1716990808; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=sPjPzk4wyi7sRXpkeEQyWy4W8LtwOVHoR4RZWeLMTFM=;
-	b=UtqdTFpcW50xt6d+aGWKqNwbhDhPdGPzea6l4M8NIm9/ETNC13rR4/XNJp1cu5PFh7Mcuz
-	nPYk1WaKGhJtznz/UERA4Sa8JRCaP7s3aZUsm5fx6Haq2U+3GGfmzapoAKRH+7uK4IjDcM
-	TU+y5mlgVeyin1mSr1+gRPmZL2eLWHE=
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1716990807; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=sPjPzk4wyi7sRXpkeEQyWy4W8LtwOVHoR4RZWeLMTFM=;
-	b=ORkpN8SPMxxAHj87C4Zf8tXD5By/Q51Jp9wG9ijglfvE2RNLK/oxVc78AnjgbnGXgd37Y4
-	Tu6Qw8KYHGc1p5Ge82xTtdEnenVDka0H8puaENF6h6LFFyWKV2iPR1eEUJI4UtTSs8cpvc
-	gW950GkJ4LHeJLzadPtwXEg4xBKi4ig=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 06CB91372E;
-	Wed, 29 May 2024 13:53:27 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id hncxAVczV2YWVAAAD6G6ig
-	(envelope-from <petr.pavlu@suse.com>); Wed, 29 May 2024 13:53:27 +0000
-From: Petr Pavlu <petr.pavlu@suse.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>
-Cc: Kui-Feng Lee <thinker.li@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Petr Pavlu <petr.pavlu@suse.com>
-Subject: [PATCH net] net/ipv6: Fix the RT cache flush via sysctl using a previous delay
-Date: Wed, 29 May 2024 15:52:51 +0200
-Message-Id: <20240529135251.4074-1-petr.pavlu@suse.com>
-X-Mailer: git-send-email 2.35.3
+	s=arc-20240116; t=1716991115; c=relaxed/simple;
+	bh=WNzkX3kQmAm6xhlUmSgtHXFFi9rlz3l8gFZLSArBK1A=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Y0NWmrrYn4xg84MfknDkVZKV32ik/hcrXiAp+RsIjRc6L+nNDXHssmuLWtXF2iW6vAsXcNiJL2Zu+oVViMGSWK0pBC3lP1SF9BQh0HXDfqPOnWzz7YFZs0rX6VMiz013+C9O0sf0uesupVh6lSk41h3sSUeAwurw3fBNDYKVNKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EnQ4NVLP; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-43fc2ad049aso10849681cf.3;
+        Wed, 29 May 2024 06:58:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716991113; x=1717595913; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jnVsuijST4Uccd/R/BYvy+sfPi8n/4n1QlcexbPNowQ=;
+        b=EnQ4NVLP8rHg2zTx6yOWZHTqkU77zgNxeoH2YmLP2nND3tVPMkwirK7wyqQ1jDi0MQ
+         4wyC4bIZpdjOPR4KZIfyOj1MCS0vcOD5rb8558hLs9Du+csFkBjn2QCnUL6rdkcKsehM
+         n+/bkp4lCdwKpawY7uKV6hAnmX0l9gphzdAN/OywHWtKc6ihsqJe3Y14tPRhzVLMl6nc
+         /yP3xnjyKe9Hos3Zmb3wql8hGNHkjxcCJ1yVZJec+UEtotQ6phAdy+IwSa+Zzy5H5jhN
+         OQB9WcEKxn2AifUnUFz6aQdRmAo92lRbEu56UYx7z4Q1jjMmPm7z5CVmizrXb4C724ZU
+         ECrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716991113; x=1717595913;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jnVsuijST4Uccd/R/BYvy+sfPi8n/4n1QlcexbPNowQ=;
+        b=Yu6cCW9G1IzBS5335BaFlx4WwyJBB+i7iNuvWqDc65GSvEHmioQX41Ee4t2U+rLzf9
+         AcvUDVG39Z0a1w/vt6P4K4uUlv++AFauX4SnylpqIWZ2e41ssiaJZD8MvSeng0kfNlMF
+         GA/syufWuwwa/AQiaSewqxdW4oYU64HPOSgELwBr9pEGMHlWL633w2Xg1Mxde0nEVAOL
+         gmm9dh1jA4OJaljLztxdp6eH90n4CfeCdj6sc31HViiTmw5+x2gYeOYpntr5ttbuPOKY
+         7xV85UmeMV2YHf4aE80WIYkqAiXc3jqTrsjwxKUv3kr2R9hYjwW1tZyukNTQd5+GA8X1
+         9vMA==
+X-Forwarded-Encrypted: i=1; AJvYcCVbsc2Jco+u32WaemIzs1Y5u0JmZxUfHoLWP4F/YnX397ecwZLjv10jDTQmm09ne6TTuuspRYmbPTp2t2IGp6HjOD7jA+aPoK+XULMzcSfxrcWk7CLcVFtDKIyoYTdHyXTn1d/IkJk8dSZ0dg0PyU9K134Yvnn7O3Cn
+X-Gm-Message-State: AOJu0YwmAG+3I8GxfQgcwsgzJdJqbgzdtdfH9oo4mmVeq1wURHmnK9Q5
+	Blgeg9SbMq/uRQZS8yw/RkGCEv1e6NvQrWSf5uU68x/jKHu1BKaW
+X-Google-Smtp-Source: AGHT+IHLX9s5HgTIP5hLEXBAHKuHHJJoB1TTaV997mUIdfzfFpIVnL2kUl2gcpyBUJWz5Ry8BMjC4A==
+X-Received: by 2002:ac8:5892:0:b0:43a:dc29:a219 with SMTP id d75a77b69052e-43fb0e221c9mr166332311cf.2.1716991113113;
+        Wed, 29 May 2024 06:58:33 -0700 (PDT)
+Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43fd9ab321fsm17099551cf.95.2024.05.29.06.58.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 May 2024 06:58:32 -0700 (PDT)
+Date: Wed, 29 May 2024 09:58:32 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Abhishek Chauhan <quic_abchauha@quicinc.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Andrew Halaney <ahalaney@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Martin KaFai Lau <martin.lau@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ bpf <bpf@vger.kernel.org>
+Cc: kernel@quicinc.com, 
+ syzbot+d7b227731ec589e7f4f0@syzkaller.appspotmail.com, 
+ syzbot+30a35a2e9c5067cc43fa@syzkaller.appspotmail.com
+Message-ID: <665734886e2a9_31b2672946e@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240528224935.1020828-1-quic_abchauha@quicinc.com>
+References: <20240528224935.1020828-1-quic_abchauha@quicinc.com>
+Subject: Re: [PATCH net] net: validate SO_TXTIME clockid coming from 
+ userspace
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -1.30
-X-Spam-Level: 
-X-Spamd-Result: default: False [-1.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,lctl.data:url,suse.com:email];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,suse.com];
-	TAGGED_RCPT(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-The net.ipv6.route.flush system parameter takes a value which specifies
-a delay used during the flush operation for aging exception routes. The
-written value is however not used in the currently requested flush and
-instead utilized only in the next one.
+minor: double space before userspace
 
-A problem is that ipv6_sysctl_rtcache_flush() first reads the old value
-of net->ipv6.sysctl.flush_delay into a local delay variable and then
-calls proc_dointvec() which actually updates the sysctl based on the
-provided input.
+Abhishek Chauhan wrote:
+> Currently there are no strict checks while setting SO_TXTIME
+> from userspace. With the recent development in skb->tstamp_type
+> clockid with unsupported clocks results in warn_on_once, which causes
+> unnecessary aborts in some systems which enables panic on warns.
+> 
+> Add validation in setsockopt to support only CLOCK_REALTIME,
+> CLOCK_MONOTONIC and CLOCK_TAI to be set from userspace.
+> 
+> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
+> Link: https://lore.kernel.org/lkml/20240509211834.3235191-1-quic_abchauha@quicinc.com/
 
-Fix the problem by removing net->ipv6.sysctl.flush_delay because the
-value is never actually used after the flush operation and instead use
-a temporary ctl_table in ipv6_sysctl_rtcache_flush() pointing directly
-to the local delay variable.
+These discussions can be found directly from the referenced commit?
+If any, I'd like to the conversation we had that arrived at this
+approach.
 
-Fixes: 4990509f19e8 ("[NETNS][IPV6]: Make sysctls route per namespace.")
-Signed-off-by: Petr Pavlu <petr.pavlu@suse.com>
----
+> Fixes: 1693c5db6ab8 ("net: Add additional bit to support clockid_t timestamp type")
+> Reported-by: syzbot+d7b227731ec589e7f4f0@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=d7b227731ec589e7f4f0
+> Reported-by: syzbot+30a35a2e9c5067cc43fa@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=30a35a2e9c5067cc43fa
+> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
+> ---
+>  net/core/sock.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 8629f9aecf91..f8374be9d8c9 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -1083,6 +1083,17 @@ bool sockopt_capable(int cap)
+>  }
+>  EXPORT_SYMBOL(sockopt_capable);
+>  
+> +static int sockopt_validate_clockid(int value)
 
-Note that when testing this fix, I noticed that an aging exception route
-(created via ICMP redirect) was not getting removed when triggering the
-flush operation unless the associated fib6_info was an expiring route.
-It looks the logic introduced in 5eb902b8e719 ("net/ipv6: Remove expired
-routes with a separated list of routes.") otherwise missed registering
-the fib6_info with the GC. That is potentially a separate issue, just
-adding it here in case someone decides to test this patch and possibly
-run into this problem too.
+sock_txtime.clockid has type __kernel_clockid_t.
 
- include/net/netns/ipv6.h |  1 -
- net/ipv6/route.c         | 13 ++++++-------
- 2 files changed, 6 insertions(+), 8 deletions(-)
+> +{
+> +	switch (value) {
+> +	case CLOCK_REALTIME:
+> +	case CLOCK_MONOTONIC:
+> +	case CLOCK_TAI:
+> +		return 0;
+> +	}
+> +	return -EINVAL;
+> +}
+> +
+>  /*
+>   *	This is meant for all protocols to use and covers goings on
+>   *	at the socket level. Everything here is generic.
+> @@ -1497,6 +1508,11 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+>  			ret = -EPERM;
+>  			break;
+>  		}
+> +
+> +		ret = sockopt_validate_clockid(sk_txtime.clockid);
+> +		if (ret)
+> +			break;
+> +
+>  		sock_valbool_flag(sk, SOCK_TXTIME, true);
+>  		sk->sk_clockid = sk_txtime.clockid;
+>  		sk->sk_txtime_deadline_mode =
+> -- 
+> 2.25.1
+> 
 
-diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
-index 5f2cfd84570a..2ed7659013a4 100644
---- a/include/net/netns/ipv6.h
-+++ b/include/net/netns/ipv6.h
-@@ -20,7 +20,6 @@ struct netns_sysctl_ipv6 {
- 	struct ctl_table_header *frags_hdr;
- 	struct ctl_table_header *xfrm6_hdr;
- #endif
--	int flush_delay;
- 	int ip6_rt_max_size;
- 	int ip6_rt_gc_min_interval;
- 	int ip6_rt_gc_timeout;
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index bbc2a0dd9314..f07f050003c3 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -6335,15 +6335,17 @@ static int rt6_stats_seq_show(struct seq_file *seq, void *v)
- static int ipv6_sysctl_rtcache_flush(struct ctl_table *ctl, int write,
- 			      void *buffer, size_t *lenp, loff_t *ppos)
- {
--	struct net *net;
-+	struct net *net = ctl->extra1;
-+	struct ctl_table lctl;
- 	int delay;
- 	int ret;
-+
- 	if (!write)
- 		return -EINVAL;
- 
--	net = (struct net *)ctl->extra1;
--	delay = net->ipv6.sysctl.flush_delay;
--	ret = proc_dointvec(ctl, write, buffer, lenp, ppos);
-+	lctl = *ctl;
-+	lctl.data = &delay;
-+	ret = proc_dointvec(&lctl, write, buffer, lenp, ppos);
- 	if (ret)
- 		return ret;
- 
-@@ -6368,7 +6370,6 @@ static struct ctl_table ipv6_route_table_template[] = {
- 	},
- 	{
- 		.procname	=	"flush",
--		.data		=	&init_net.ipv6.sysctl.flush_delay,
- 		.maxlen		=	sizeof(int),
- 		.mode		=	0200,
- 		.proc_handler	=	ipv6_sysctl_rtcache_flush
-@@ -6444,7 +6445,6 @@ struct ctl_table * __net_init ipv6_route_sysctl_init(struct net *net)
- 	if (table) {
- 		table[0].data = &net->ipv6.sysctl.ip6_rt_max_size;
- 		table[1].data = &net->ipv6.ip6_dst_ops.gc_thresh;
--		table[2].data = &net->ipv6.sysctl.flush_delay;
- 		table[2].extra1 = net;
- 		table[3].data = &net->ipv6.sysctl.ip6_rt_gc_min_interval;
- 		table[4].data = &net->ipv6.sysctl.ip6_rt_gc_timeout;
-@@ -6521,7 +6521,6 @@ static int __net_init ip6_route_net_init(struct net *net)
- #endif
- #endif
- 
--	net->ipv6.sysctl.flush_delay = 0;
- 	net->ipv6.sysctl.ip6_rt_max_size = INT_MAX;
- 	net->ipv6.sysctl.ip6_rt_gc_min_interval = HZ / 2;
- 	net->ipv6.sysctl.ip6_rt_gc_timeout = 60*HZ;
-
-base-commit: 2bfcfd584ff5ccc8bb7acde19b42570414bf880b
--- 
-2.35.3
 
 
