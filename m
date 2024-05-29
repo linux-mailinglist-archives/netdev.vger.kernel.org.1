@@ -1,91 +1,70 @@
-Return-Path: <netdev+bounces-99011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38A798D35B2
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 13:39:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F8068D35BF
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 13:46:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD37EB22616
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 11:39:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B450282923
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 11:46:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 223DE17F39A;
-	Wed, 29 May 2024 11:39:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F9A414B952;
+	Wed, 29 May 2024 11:46:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ft/nY9Uu"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="CAgrDmOI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B0E13DDB1;
-	Wed, 29 May 2024 11:39:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AAE54CB28;
+	Wed, 29 May 2024 11:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716982757; cv=none; b=tnTkWp4PSc6ucZT6FnyCjj43HqrRfKRUIjMxK4lI3uajPHz0CaTFhgG9nb1KMgbeDZGKFWSbdzDy5K63axROB88SaELszW6Vvc5reb8T/RqWfAgwx+EReqHPDN3W9yea2nZTBQyGdlGJ1TMlby5h7eGCNiGLQ1cHas9MyxpLG2k=
+	t=1716983161; cv=none; b=iYywe0IcFPU/APzpyaW5amTTClUyvHW5ZThuFroCPPMaAPa3bHwRLsqAKhAFiHdHPJe0m48MkLgYS6qUq4WuZo840fITuaoMfCgnvG7WVVkBU+mTQ2ijFYMFjHUhbRjwAr/wnX8Gc6jLzl0yVaCLzWMSv6BE/WXdUgTKK+0c7Hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716982757; c=relaxed/simple;
-	bh=ABNoG0fHjxK7+Y4VtVxmK4PT7HekVb+DSJ6wavwbP0c=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=amKHvUriEYW6I4DLE9hFir1KLRBzgSxGiCVeGj4Sj8LsgqcLxd7KwS/nVGgV04n9Hnb5ywb5V6+5/7+Hj0qd5DMkulgME0cDZMgc/cBMJlkbeF+PLcZwHNp0BFxNLm0zbV9hflrZC2UUwdPea+ihft3JUdZ3fbEWUzhAB/wJmTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ft/nY9Uu; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42011507a54so4845445e9.0;
-        Wed, 29 May 2024 04:39:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716982754; x=1717587554; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bk03fDdTOYoIQcRERwwO8FkerBoy75MUxyZZ7yDSjco=;
-        b=ft/nY9UuxBLkBeStLTjy+s+vQrRnMzKdKWY2px1DGxY9ZumrGW/73wtI8PFsxsXsGj
-         rg0DphCOsCMX+X504tg8/XxMrY8sgtnqheOd5/lCHRN7dqjUmqZuKx3JeeD1jo6yA/cv
-         jkbMe8eIaz8VrQLI/x3P8uJ/SZE57l659lVTVpI7qVFIXWalTPriVpcjgoNiRIye5P1V
-         ycxcwpOqXcAQhxWpX5iMLtRFAxkCv5lr6t71jdwt5+GO6DS3wceUoZkjDzrHdNlZt5MQ
-         1tIX//UHuw9v9pG5rtmowO1omGn31aq47DrNCX4BzmGfitd5WN9U9GofU3iBVOYJG2hK
-         BhuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716982754; x=1717587554;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bk03fDdTOYoIQcRERwwO8FkerBoy75MUxyZZ7yDSjco=;
-        b=F+zGI5crcmmKhv7xUhVYkHN71yT16euCrzXHrqUZRxoUlIIHOP6klbJk74McVgjgl2
-         JRsE9anSkkeT9cpHhCorY4jGGgRCdfEWmkLTv5WViaPrbH9UsVYFDKiqk6lewFyJ1jnD
-         az6yqqWwuk3gutlA+Zuf+Wef0/91K3F/17xtK2tfBGSQAp4XCKEuavCqJNRpH/J+s6XQ
-         IAFf7iw08C270lzokN10erBBUnLfpXKhPTa/GKmFcbiHywpDQDeA+8uOXYrWETrf3Fzm
-         bame3i1x5/ZCTbycAWeI+1lXbypBaWpW1UbARmK98TucNtEMFk0KA+12jRwghiVW8C01
-         J0Gg==
-X-Forwarded-Encrypted: i=1; AJvYcCW2SXuqab+2mrfQ9Ja0xo+1SFbFi9rzZBsle4FGc8nx6XoA3X9J7KJRt+T90tno0TE/QY+GVYRENCZrUHZA3yJydkxOo0FwQmz0nBE1i1vQ05XAW4djaBcRXjskvIsxM0DA814ohscLiynHabeijHfrhpgl266aZ8mG
-X-Gm-Message-State: AOJu0YzrIgnT7mLV+XQxTC6I0lpBMi77MP2oCpdlNyD2BoPHpfnGXXeP
-	aWmPR6dzzC+Yh3GKHvz2TJNByr1Y6tKeLmDCthhRtT1ZXJafgme/
-X-Google-Smtp-Source: AGHT+IF6WzHrnFlmNJFIZx83xbCkK3dZou2bN7NunfW2dAuue/OaAdjIKcXvvyVKhoGiq7rxuh5ukw==
-X-Received: by 2002:a05:600c:3514:b0:415:ff48:59fc with SMTP id 5b1f17b1804b1-42122ae4462mr14441845e9.8.1716982753497;
-        Wed, 29 May 2024 04:39:13 -0700 (PDT)
-Received: from krava (2001-1ae9-1c2-4c00-726e-c10f-8833-ff22.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:726e:c10f:8833:ff22])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-421089cd6f7sm177175905e9.46.2024.05.29.04.39.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 May 2024 04:39:13 -0700 (PDT)
-From: Jiri Olsa <olsajiri@gmail.com>
-X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
-Date: Wed, 29 May 2024 13:39:10 +0200
-To: Thorsten Blum <thorsten.blum@toblux.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] bpf, devmap: Remove unnecessary if check in for loop
-Message-ID: <ZlcT3kSfblBDiaTi@krava>
-References: <20240529101900.103913-2-thorsten.blum@toblux.com>
+	s=arc-20240116; t=1716983161; c=relaxed/simple;
+	bh=IZsIRbka6hFiTImC0U/pupNdosJ64JWjzl9chiZ04wc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hqblx3sj+oJMtt4INJU0spB8JWlr8t6iJSvFee+N+tP43nAu/1pEa2xUILAlZv4/UpyDkc8ITAdPAi3KIFufePgdexmDy7HNE3/VP3dQ8u+w5kBCnPf+d7thuJClPDdXzv/wgRCXNQHWPc1q4acqmPSoHPATftK0LbSfRo4HAZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=CAgrDmOI; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=t9VEsDGggAajKUcBvvIqqFyyn1ptDDc/e1Pdzy7eih8=; b=CAgrDmOI+j7qTDWZBNYH1V2VD2
+	3hgkUKuzCDEe8o1v7blMzcPmjFQpbBFzar2oT/yQAcXE41S6F01fHUvYcba1BfiQ0zLdNx8xooY7Q
+	fZtqlHftT4h43YqNE7VdGtcBb1Jqx9VX1GpL0dJNQY9O1uUXnSS53yC/v8DhRCsET2G8g3HAjJ95g
+	d/htt57vezpzviF6xTJJaYZ3KLyzT+ZGYB9hIEOM8lqvgDwI3GTVsDMkjj8vDc0mDPGcUreX3DTxI
+	eOlSd2rr8v7u+Dy0YcOaJeZyBin9mUey83Mlkq6YdOhHjPRIzehNnwBDccWNbWu8Cyum5Afw22AO0
+	Iva+zk6A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39870)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sCHkT-00063H-1S;
+	Wed, 29 May 2024 12:45:41 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sCHkQ-0004BJ-Fn; Wed, 29 May 2024 12:45:38 +0100
+Date: Wed, 29 May 2024 12:45:38 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: xiaolei wang <xiaolei.wang@windriver.com>
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [net PATCH] net: stmmac: update priv->speed to SPEED_UNKNOWN
+ when link down
+Message-ID: <ZlcVYjOEBGm79Yc9@shell.armlinux.org.uk>
+References: <20240528092010.439089-1-xiaolei.wang@windriver.com>
+ <Zlbrf8ixl9jeTTIv@shell.armlinux.org.uk>
+ <d857ff81-a49c-4dd2-b07d-f17f9019bed1@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,42 +73,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240529101900.103913-2-thorsten.blum@toblux.com>
+In-Reply-To: <d857ff81-a49c-4dd2-b07d-f17f9019bed1@windriver.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, May 29, 2024 at 12:19:01PM +0200, Thorsten Blum wrote:
-> The iterator variable dst cannot be NULL and the if check can be
-> removed.
+On Wed, May 29, 2024 at 06:55:21PM +0800, xiaolei wang wrote:
+> On 5/29/24 16:46, Russell King (Oracle) wrote:
+> > To me, commit 1f705bc61aee ("net: stmmac: Add support for CBS QDISC")
+> > just looks very buggy.
 > 
-> Remove it and fix the following Coccinelle/coccicheck warning reported
-> by itnull.cocci:
+> This makes sense. I think it is necessary to update the parameters after
+> linking up.
 > 
-> 	ERROR: iterator variable bound on line 762 cannot be NULL
-> 
-> Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
+> Does anyone have a better suggestion?
 
-Acked-by: Jiri Olsa <jolsa@kernel.org>
+Any setup that a phylink-based MAC driver does which is dependent on
+the negotiated media parameters (e.g. speed, duplex etc) _should_
+always be done from the .mac_link_up method.
 
-jirka
+So, from a phylink perspective, what you propose is the correct and
+only way.
 
-> ---
->  kernel/bpf/devmap.c | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
-> index 4e2cdbb5629f..7f3b34452243 100644
-> --- a/kernel/bpf/devmap.c
-> +++ b/kernel/bpf/devmap.c
-> @@ -760,9 +760,6 @@ int dev_map_redirect_multi(struct net_device *dev, struct sk_buff *skb,
->  		for (i = 0; i < dtab->n_buckets; i++) {
->  			head = dev_map_index_hash(dtab, i);
->  			hlist_for_each_entry_safe(dst, next, head, index_hlist) {
-> -				if (!dst)
-> -					continue;
-> -
->  				if (is_ifindex_excluded(excluded_devices, num_excluded,
->  							dst->dev->ifindex))
->  					continue;
-> -- 
-> 2.45.1
-> 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
