@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-98852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-98854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C48708D2B37
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 04:57:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AD228D2B38
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 04:57:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5036EB22D54
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 02:57:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCAF8B22FF5
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 02:57:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 424C715B11D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5FA15B122;
 	Wed, 29 May 2024 02:57:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DRmgg0lO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dyghgn/W"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1184A15B0E1;
-	Wed, 29 May 2024 02:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375EE15B10E
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 02:57:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716951422; cv=none; b=qJ/pHaTRbS+moU8MytfJqhkpQ+XYuudjsHitD+6MIWbQQ9NtqxS8YNH5jzoafAlKSxgQfPkpdTN6GFvC9XaWiFE2mHpcJo1p8QZsYv0jh9VJUo3yJd729ZbnxT7BCOxIjt6wWMiAVvVWvMqDqa9MpkZIKFU3z9iULSN9dMd7SW8=
+	t=1716951422; cv=none; b=uczNRcTzXGdfxhgYsphcR3jid/EqO8ksVZbdCaX7pDraFtsDWR0z4w+Yuv71ImBE2T/5V+qIrKKwuVJHtMXddkT17DCVRrML/8w9EtOU5p0IM0FHQSa+W31WVGnLgxBggOSv0DYrIsaFu+6mysS8NE6/bir6efSql1oePCKhSkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1716951422; c=relaxed/simple;
-	bh=kCbn1M2QOr3tg0aboBFXxUAzlVonui9TIyWgU01m2Nk=;
+	bh=qLNYjUMLHSXBceMTED0vsCGYV5YS58ifys4UOWglBWA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QuTaIHQocP6Yw9F+/N3K2Svn81apA8QP048D4EEfibf27YECWq1ZE9ut2OlMM7K/dj84aGIQR5wSM532dWS9l4T0ow0016mzDxVcUIzg/nuBpX5cAefJWWLhxRsNPfnwRq9+eEputW90onxkBwGXexUFI1VfEAto8Hmxx+GvcQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DRmgg0lO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D33A3C3277B;
+	 In-Reply-To:To:Cc; b=hE0hfFIlsvRyz00kAaJpfkVudwiwrIfNr9+6W1H8BH4GZ/CY8vy3QSlPX+BMzYu0wYpYg0K0pFl0WiRcOXd2mpMFK+BDAG8Wvhu1Y/JRzEq3vx/1dgwZqKAVtUKKIEIApRaDYrEAlIWQmfNNFU8wfK1k375ipXoMLLaejmSMbo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dyghgn/W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E1FB5C32789;
 	Wed, 29 May 2024 02:57:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1716951421;
-	bh=kCbn1M2QOr3tg0aboBFXxUAzlVonui9TIyWgU01m2Nk=;
+	bh=qLNYjUMLHSXBceMTED0vsCGYV5YS58ifys4UOWglBWA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DRmgg0lOo0L4ifi/LB0XfpRsqdBtydGjIX7my18yNfwjQcriNscOSRuXWMTpY698I
-	 /IqfHdL1yOtMsed78VDH4bmSQuPwzBjY3mnG9w02jlq3ENJbUhu02IE2EWdJEQ2HvW
-	 /9Wq/al86Tjq0iP/2riknMLNxtywD/lcgRc7EICaMsb1fht8oACq/Q51UFY7BQRwI6
-	 OgcxXl43pCi88QZEfctytaFUFYmkdD6clS8EHbWTH9t4DC5/llQ67cU/1RNCCOx/Ds
-	 1Ld2V11RyMpLP9FFPtKDZz4q30HN5OeFkhRTeIuJxuqhn/ar2XSaceTVsQ7A4ljoxx
-	 uCJHpvVBVXA8A==
+	b=Dyghgn/WJb7ogwRDEtF2Qhou/VzQCXlXkQblKK0/stoB9l3uBDeFzSu25FNuUGkga
+	 N823sN6upl1niWVDmxOoV96cTbGFdLAk+bgVpDeQ2nvZnVcqSgzGQSQrMz7YsAKi06
+	 VYEobqW61DvF8wWmjUro53vLU9xI7oUNb+3m9iLBYWWBbL8nXcalNjDpUXeMra0i0s
+	 xUECVwuUEiPyNapYfxrlYK/98tfwV2VI8WtUZV0KI3Cglzv/B0eoZCoTcUAnKfSKzk
+	 Z/VXZDC1lNCqrIHajMfWsk5PGeQI87PgcKPttYpB85nUmFbzytl/+7pVrhozvgFcM0
+	 JSJIbyVZFtFnQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C79F3C4361C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D3AB3CF21F4;
 	Wed, 29 May 2024 02:57:01 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,48 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/5] net: constify ctl_table arguments of utility
- functions
+Subject: Re: [PATCH net-next] r8169: remove detection of chip version 11 (early
+ RTL8168b)
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171695142181.13406.6878241525958954105.git-patchwork-notify@kernel.org>
+ <171695142186.13406.16181247827334412176.git-patchwork-notify@kernel.org>
 Date: Wed, 29 May 2024 02:57:01 +0000
-References: <20240527-sysctl-const-handler-net-v1-0-16523767d0b2@weissschuh.net>
-In-Reply-To: <20240527-sysctl-const-handler-net-v1-0-16523767d0b2@weissschuh.net>
-To: =?utf-8?q?Thomas_Wei=C3=9Fschuh_=3Clinux=40weissschuh=2Enet=3E?=@codeaurora.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, horms@verge.net.au, ja@ssi.bg,
- pablo@netfilter.org, kadlec@netfilter.org, j.granados@samsung.com,
- mcgrof@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org
+References: <875cdcf4-843c-420a-ad5d-417447b68572@gmail.com>
+In-Reply-To: <875cdcf4-843c-420a-ad5d-417447b68572@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, nic_swsd@realtek.com, netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 27 May 2024 19:04:18 +0200 you wrote:
-> The sysctl core is preparing to only expose instances of
-> struct ctl_table as "const".
-> This will also affect the ctl_table argument of sysctl handlers.
+On Mon, 27 May 2024 21:20:16 +0200 you wrote:
+> This early RTL8168b version was the first PCIe chip version, and it's
+> quite quirky. Last sign of life is from more than 15 yrs ago.
+> Let's remove detection of this chip version, we'll see whether anybody
+> complains. If not, support for this chip version can be removed a few
+> kernel versions later.
 > 
-> As the function prototype of all sysctl handlers throughout the tree
-> needs to stay consistent that change will be done in one commit.
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/5] net/neighbour: constify ctl_table arguments of utility function
-    https://git.kernel.org/netdev/net-next/c/874aa96d78c7
-  - [net-next,2/5] net/ipv4/sysctl: constify ctl_table arguments of utility functions
-    https://git.kernel.org/netdev/net-next/c/551814313f11
-  - [net-next,3/5] net/ipv6/addrconf: constify ctl_table arguments of utility functions
-    https://git.kernel.org/netdev/net-next/c/c55eb03765f4
-  - [net-next,4/5] net/ipv6/ndisc: constify ctl_table arguments of utility function
-    https://git.kernel.org/netdev/net-next/c/7a20cd1e71d8
-  - [net-next,5/5] ipvs: constify ctl_table arguments of utility functions
-    https://git.kernel.org/netdev/net-next/c/0a9f788fdde4
+  - [net-next] r8169: remove detection of chip version 11 (early RTL8168b)
+    https://git.kernel.org/netdev/net-next/c/982300c115d2
 
 You are awesome, thank you!
 -- 
