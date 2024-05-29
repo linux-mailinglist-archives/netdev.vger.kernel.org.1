@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-99209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 961668D41F0
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 01:19:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48FC98D41F1
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 01:19:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B73961C21A11
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 23:19:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D0121C2207B
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 23:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AEDF16EC1A;
-	Wed, 29 May 2024 23:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1321CB32C;
+	Wed, 29 May 2024 23:19:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=labn.onmicrosoft.com header.i=@labn.onmicrosoft.com header.b="nSDomSW1"
+	dkim=pass (1024-bit key) header.d=labn.onmicrosoft.com header.i=@labn.onmicrosoft.com header.b="CC1YH1J9"
 X-Original-To: netdev@vger.kernel.org
 Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2139.outbound.protection.outlook.com [40.107.212.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCCF91607AA
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 23:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C9F178387
+	for <netdev@vger.kernel.org>; Wed, 29 May 2024 23:19:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.139
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717024746; cv=fail; b=SvpXgyLsfVKPA0MMr52tusybOT0+ZCiNELRCu7ShHB8rusrUPpdNZtH4efFbPQ6Eg6djKLXJ4SIUsB6SMGeV4M0+bfshJ2vMfYVZS3fUIRPLqr4+6xlCAWNiTgxAtmY1IpvffROBnklDdehKGSd8LfWYw+69m2nIB9cq7f+xcKI=
+	t=1717024748; cv=fail; b=JDsHXTkA5eloNcCHH9prtGaqhCFWTszRIwW71wQfbVu9iCtyNMgF97NAbaCdwSeH15KPE1rVPzyZ231LtOkIgOXLEROjr44rwoD69Rbadm4BuTQ2adrF/tzi6g0E6efOK15rl3VQ4liUyreJtkSvgQHXQgU8mBGlSYxR4UhzZxE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717024746; c=relaxed/simple;
-	bh=O5Z6AdWLmo/IZqrAAqAzvrcimEorMI1kIYzS/MHgb6w=;
+	s=arc-20240116; t=1717024748; c=relaxed/simple;
+	bh=JcIAn9KTeojfcs4DVTLHUYlLNDGqIwNPNta6I1STXg0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Vt11zvPrR8nBHZtQ+j+4S6VK/6jDno3YQ0nbrErzAec8YdRZRPh25NpnZEIvshi7h+mB6w8LR4crBL1tHk0JTMtLYhwG9eqiMXeaGzbOl6i4zFST8eWf1kU26bSetslBBwDQC5yJ5wBRGs1ZBazDo0vz6havM4CHJHYlkwmzCto=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=labn.net; spf=pass smtp.mailfrom=labn.net; dkim=pass (1024-bit key) header.d=labn.onmicrosoft.com header.i=@labn.onmicrosoft.com header.b=nSDomSW1; arc=fail smtp.client-ip=40.107.212.139
+	 Content-Type:MIME-Version; b=MTTyqkk8xAE2dcvByPoO+JdgK2f7+jj3ODaUDP78fri6DJ58TQXWhG1VaSMn0psuVO+SmHLt40bBXtTpQa0khK7ytpzi3pQ0xjkBjpI11EwWDQ2+8fofGnobEv8CJsCFHrFRfRVn4Q5JtI8RHX0BIGacpod59rlS7korzJnkBLA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=labn.net; spf=pass smtp.mailfrom=labn.net; dkim=pass (1024-bit key) header.d=labn.onmicrosoft.com header.i=@labn.onmicrosoft.com header.b=CC1YH1J9; arc=fail smtp.client-ip=40.107.212.139
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=labn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=labn.net
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fJRdY+VApvPqK+j0oiMKTEOp/TDWLiDOEbZR5Oi5wLo7LMWbTOUdMrKKZejo2BXVEAxuP+vy+zdQGYyp3wv7e+Ts5XUW7OWu6EEd9jVkXOkuIPI4eMq9DNn5efdRyBZoHw87h1ex4JhvOUWglwLdRFSAaj+lI/AlV+LzQWxMKen/KILpJ5HUVAD7D/TBy+Vl5aofEFKUk/7ceSDme0rl9IyqlwEEe+1Cyf6lDFGuFNp5bYYUefHCZWUg79vAB9VfdfvFFgt8EJAleG3lADlFnKMiZaOGP0G8S6njh59ncYEoVQuwiYqfya38rBhdyNAvIf3CUhJrVb8Ulq6ZN03Omw==
+ b=dN/BazTLitQOWJ0KqKO1/c8S/dAvCzPTpgVYam8HnRoAkw3QxTuKJRPQ1uBwy14HxDmQowMGEY+cVXc7/H67zyZ9HqoZeOgiiccrtpEMS83Rw2yGIcCsP4QkL8S1yq0tZYDNNvXNci98uoYwRvFgiJeESQ1uQn4rwaKsLO+rWubmGFkGNa11vFZYna1NlyB53RiKKXuVgDJC6PakVMVbKfn0L/f17DJOMWGlLdYgud0o+p8Pufoe7o7DP9VrFK/5UgDMAP8DuRMSBZcEzpZb3VsKwHzeu9wou5OS3IHvHNMZJYAYJVaAMKYi3ED3oX9nbS5lKWrdFdEdpcciHa3Ilw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yq1ZRoSk5sNoYiE7Ivm8FSXwGTy2d+ZtLW8YPjrg+CU=;
- b=bDbCQuM4bFTGOIL640x9YyolNOQTor7gq/fpLS99O/6CJTyzxaSijxkUzL0IzMCDadk58RaCMx/FzBWCTXI53W+gBD1OeU5IGZCJLWcmG+V+uixrF60jeP4twFdW2/MzEdR8cfSeV4FfhU5s9i6yOSHKQof4QyOhkBP/tYne4g/yQJWgW3i15UUbe20gafA8L5QO/7ZQjCy+EX16o0csv2JDPo5D02ehzKuNobmmSHScy6W4O3K3xftn/88oQfe0+qjSnnmR6G29Q9EMVUHO3nRQdZLchPmctE6PkrUxBCu/DftMxkNlICwzBEiOf18YGm4nUtqHUQ8ldZe4W5dmiA==
+ bh=YRaME/wEKZf50Yfhq+87WRmCxYS72DdLpwUNDbvlzhQ=;
+ b=Vm8OZAK1sUlLlH7rQg0Cz+OoSa22gJTi/1XqbEUk8Siiec76GpnxEXCaJXiUvzqrp5Lob6hxYy4IPysS3PnnT0vm8ZP+ka8I8fZTCsywRYVWs5yIV09dcxG0f0c1D0CbFcjhpgQzKDvxWyY/MtklL49asiq4s9GVf31QnJdnOJgdGg1pTGTPLO3IeoCzJXHBtshc9xRm96t7ZujcBC9RJ7jiFpaS1oq2Tk7ZOyIDxdh9+0mFzMGqq+WRHvqXOla5yTgxyZA0E6ekBJpUNh0hYaHCyZbDcIs9VIflZA1qj1Sc78t3+ChxrhGC47sLpskcu3HH1JfqU6mLgtjkbLpWzA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=labn.net; dmarc=pass action=none header.from=labn.net;
  dkim=pass header.d=labn.net; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=labn.onmicrosoft.com;
  s=selector2-labn-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yq1ZRoSk5sNoYiE7Ivm8FSXwGTy2d+ZtLW8YPjrg+CU=;
- b=nSDomSW1oMLQj1SQbwksp1C+NXQKq6kclb++vj5mvZxaiHfC/O9k+1/x5fgSo3vgHmaoFq3MvfP1PsHaFQoUCeRvYjXWTNX8Fs5gBE13VAVfz/hy+C5B1CKt0CuZCZibXorstXdYkgN8sOfuiOuNgf1FmuGQ1P0GcThW5fh/DRU=
+ bh=YRaME/wEKZf50Yfhq+87WRmCxYS72DdLpwUNDbvlzhQ=;
+ b=CC1YH1J9yYA8VLNyko92cBxJhHas0c4oqB7Rbg+UfSDs0LtPFts9JG+I14KIP/9bXCsD9vWfk3Jxkq/4taJdpfv5+vyhsxh627oyoLTw8F09gUj1hBTvMv3i1RWHvl/hlAPi5pc8wWIK6EI6IAQH/4U+pOw52hmtkWvyD2QM4Zk=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=labn.net;
 Received: from PH7PR14MB5619.namprd14.prod.outlook.com (2603:10b6:510:1f4::21)
  by LV8PR14MB7648.namprd14.prod.outlook.com (2603:10b6:408:269::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.17; Wed, 29 May
- 2024 23:19:01 +0000
+ 2024 23:19:03 +0000
 Received: from PH7PR14MB5619.namprd14.prod.outlook.com
  ([fe80::3b86:8650:ed26:d86a]) by PH7PR14MB5619.namprd14.prod.outlook.com
  ([fe80::3b86:8650:ed26:d86a%4]) with mapi id 15.20.7611.031; Wed, 29 May 2024
- 23:19:01 +0000
+ 23:19:03 +0000
 From: Eric Kinzie <ekinzie@labn.net>
 To: "David S . Miller" <davem@davemloft.net>,
 	David Ahern <dsahern@kernel.org>,
@@ -65,16 +65,16 @@ To: "David S . Miller" <davem@davemloft.net>,
 	Paolo Abeni <pabeni@redhat.com>
 Cc: Eric H Kinzie <ekinzie@labn.net>,
 	netdev@vger.kernel.org
-Subject: [RFC net-next 1/2] net: do not interpret MPLS shim as start of IP header
-Date: Wed, 29 May 2024 19:18:44 -0400
-Message-ID: <20240529231847.16719-2-ekinzie@labn.net>
+Subject: [RFC net-next 2/2] net: mpls: support point-to-multipoint LSPs
+Date: Wed, 29 May 2024 19:18:45 -0400
+Message-ID: <20240529231847.16719-3-ekinzie@labn.net>
 X-Mailer: git-send-email 2.45.1.313.g3a57aa566a
 In-Reply-To: <20240529231847.16719-1-ekinzie@labn.net>
 References: <20240529231847.16719-1-ekinzie@labn.net>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: CH2PR18CA0044.namprd18.prod.outlook.com
- (2603:10b6:610:55::24) To PH7PR14MB5619.namprd14.prod.outlook.com
+X-ClientProxiedBy: CH2PR18CA0041.namprd18.prod.outlook.com
+ (2603:10b6:610:55::21) To PH7PR14MB5619.namprd14.prod.outlook.com
  (2603:10b6:510:1f4::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -84,175 +84,416 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: PH7PR14MB5619:EE_|LV8PR14MB7648:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6bf90362-5816-45d0-2b89-08dc8035b981
+X-MS-Office365-Filtering-Correlation-Id: acfdc8f3-8b5c-424c-40c2-08dc8035bac7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|1800799015|376005;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?C9LO9E5LgBA+Vv2qnNgNqrl3XYyxiURbeAS4vOIK9DAY6VLrTvRbz8iHLN+t?=
- =?us-ascii?Q?eJMShxfPiAc8FbOI6fnFkU/jfOkGWqS9hlIIjeGa5VxkmAJHU88A+u9HtdXv?=
- =?us-ascii?Q?7TCBF/RxVum9dQpmPHzVd7KWHMDNP5aVG9nChfshCoDFY47op0HLXgMf/afs?=
- =?us-ascii?Q?UuY1n1QdZbX5F4jYA8N3z9pcZHABXXaAUvJaktdrubkPoFfupTBCjrcZYy/K?=
- =?us-ascii?Q?QZgbuNBCXigMaULyWo8xAb2iLi6L0CB0GP32q5lmW608lwB+HLhhUI6jAd+Z?=
- =?us-ascii?Q?c+0bVl2vDJkT1cVIoRr18T2mKFRo7lLpikvpZXwGXSXI01mB5ORLj5PdQMfx?=
- =?us-ascii?Q?iiQvzLTMvQZ7IGaW292tU/elunWWJNrZXPK0YYOVw6zt75QDWYoQfLTz4FQr?=
- =?us-ascii?Q?GFZpcV7HzDEqapGfKdMCJLbccSPg3aJeF2yGmGwPjhIVYic3GiuCIv69RnoE?=
- =?us-ascii?Q?I48SpfROWAf+vYgNgx2/FB0K1r6bA2Z9k7LAS84KUOCf2IY1OvVhWyXVZNUa?=
- =?us-ascii?Q?OOymTwnpkv/C9bzwIEwT9rdrtm40syFdMwgspXikOC6iY6fZBjmRRmZCn3c6?=
- =?us-ascii?Q?0IPm4Yf5cFPeqM8Cq/VK7N0wfrxBPHA0jRY2KatM2WNbs1v9FsF0dEHwIpTv?=
- =?us-ascii?Q?1tN6J71N2OoFI9W63/2vcuXxmv/iJmMPX3801a7GI9TrIPNtLnEPsp6G22n6?=
- =?us-ascii?Q?1Ym3476H0AJhScQzkcz/rE5P7L/6lY2h9OHti28QOFPACfcDCUj0drMfZgyj?=
- =?us-ascii?Q?x23y/rTOak9Omd/aYKJ3h6CuBDpcznPhbj9/JTU4bSsowQh1e8Wx9he2WLzz?=
- =?us-ascii?Q?HtLxwCJsdL612sSq2Gm74EjeDelXSTb5miv0nip+BiRXYcVWhHYZq0ifbqyQ?=
- =?us-ascii?Q?WLoOIeLwEkhsOQ9QTUUnId9tP8DYGeLWK2rni5NagpHHxgE0yFL19DXIzAkY?=
- =?us-ascii?Q?j1xwWS5uO630x2HkUgWBoueSaqyU47i/mMvgU347EHiT5GvXkTEJRCFottKM?=
- =?us-ascii?Q?zbQAy8RYRblXa6x6L6IJhm9tjw4ttdafHKXdBSA8U+HWMRsFkLKL/uMwEcU/?=
- =?us-ascii?Q?bixfW4+weqW8xv8HJu/11X+o3RxLadx9A3vKoIyBWiz54X4ydmmk/fKUp3j8?=
- =?us-ascii?Q?JqypFtWw4m9jjOeDlozinCVtZaYcNkyotjAykEqejmVb2U3LLJei+qRkhZju?=
- =?us-ascii?Q?3Q57DMKW+1F49oqftEDTvqGRVsX05Yok/qTpeCiAETLP4M6Ub8blVgzb6LuI?=
- =?us-ascii?Q?gleWbaFFvDE/iHLv+az0FemPlu+REYE+ZkgtDE+cuA=3D=3D?=
+	=?us-ascii?Q?i3OSmezYK5LQa4KXQuywLT7zET7IaxvLBDNQrNVI5wIOYF0IpNc5ABDcQ8Q/?=
+ =?us-ascii?Q?l/c3yxWKP4T/Uo0T0lo74vmnX8A3e5mDgttyWhU2yAUQDg9a3zbxUjQ6TOLn?=
+ =?us-ascii?Q?gqwapsYGJPUUiDxlL3MHwYmMmxfrWur724A/SaBsCdkyRvxNAQ5YXbOrg77j?=
+ =?us-ascii?Q?6mPE3F6AfdSkSxhvhT3y/+xhnJQvBLGE3yIGLDzPkU4q4Fji3ZVoOKBsUgNt?=
+ =?us-ascii?Q?B6/MoqIbannNB3WNfSOe1ZHD8G653bfsswRUIaor7r5I3gNQk44fiDOJcJql?=
+ =?us-ascii?Q?Lhd7XLG4nqamJczHTw57MH2CQTy1ssHGCKk9+fRuZpvMLC7WBQSzSxalNr/z?=
+ =?us-ascii?Q?GGuGq+gk0X0UNnXTtIFjqcP5bx6JdCQPbNhFafukx08l/FyUu9gtBhuZTBMS?=
+ =?us-ascii?Q?YsWnO1Fb+aayrUTrqVP7Uweb7LuGvhvBnUpZ2Rt9LYDJ5CddL6rsgBqXHVih?=
+ =?us-ascii?Q?HOVNq5Th70M8OJF+BlPPEIMb+k82oRAOwZ9bjoCX6wB6D7N4KYR3Edm6+WNr?=
+ =?us-ascii?Q?QMOKeOV6JjVtksdfMjNae5ZsRzfGDlDG+CKEEwhV4tvh95dhMX4PZVQ1O5VL?=
+ =?us-ascii?Q?GWB8u48DSB+QOTReZIZI+oA7nJ1p5QPXQst2Q0J2yL3y//VzIV3S/J6pE5oy?=
+ =?us-ascii?Q?q6iZ+x0g25dWWideHy2ehiT8eKUkhCGvKUAyLNzHM/B/GRf1mFBXyPiXB/mE?=
+ =?us-ascii?Q?YEVsl1lRcp8bsrGk1+kTt1NKPitrjcoQUtnsJFFmtFJyY4ORFC4ktXi4yJG4?=
+ =?us-ascii?Q?XpKslj2wLeHKMZgTPalN710Wsod5113gWMJYG6BVg7NUME9Dbfi6hOidj4KV?=
+ =?us-ascii?Q?SdszFnBm/eDcfnijDEOY/ejNwwBlmXVQnF+ZxoGTF/jwSPjQvh+o7Db9PImA?=
+ =?us-ascii?Q?v+GiFsCufU2QSVVPQ1nCyD3FvSEi0icuIPpDR/DSv1BVrJZ8vDwvrpPeEVLe?=
+ =?us-ascii?Q?Pc88e0LTMqo0wNAzvdalZHRlNNynKIHF+Gp8XCDj89OZYy3bwAjSjT61RKYn?=
+ =?us-ascii?Q?bO99lEBa9slgYEadf7L14lOh3ZZnCSgvlfjiJsaCXm1zfz6Fea/l/+9tnNjd?=
+ =?us-ascii?Q?+DYX9zLhBv9e0Cz77uXZboCVtaC3ICrCZusW9HXJMe8kfmp3ubY6XeZ3pb7d?=
+ =?us-ascii?Q?ngOrd2avYu8y9+VahpzeSgt2DkAJYRIn7yDeWXRH0+VuxY++pIA0JfuDGLN0?=
+ =?us-ascii?Q?eahIld5Q5iAzh6gWYmN+yGPw6fUjZ7UhlCibIODvtBjsRHOnWpUMrpMW2trf?=
+ =?us-ascii?Q?TjKoBQHZUJbY2ZG7XcclnwmjN6Tku9ixrM4wbsxBMQ=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR14MB5619.namprd14.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?zI3WVPgkqhvTGj3+qwM0x5KoDYtqFhK2EFs8QQZl1hrlno/Sbg5DG+iWDDlw?=
- =?us-ascii?Q?ALen86BzxwADEOQJP8DgZ7cLxedica7O087PboJJSl5bJQ0nFbUaLPGv6QNY?=
- =?us-ascii?Q?B7BAMjcO8k5DciYvJPNsl7fzeW/Q1v9nlxJFZZRgbFWyTjpaBMUZEVKCk0lK?=
- =?us-ascii?Q?MflqRW0froSSx1rDTWMONgwqt2xEGHoQ3UAj5UJ2kQsJxbnblqlGHZDsqSf6?=
- =?us-ascii?Q?MRMouevlQdiur8PxFKsnklMGYKTK1PVlODQ/e86zHTd846h8VWNg3mWCef5l?=
- =?us-ascii?Q?aPqjYJ7LwE4kiHeHFJEjTcHcvQ/fY07cuYQtaRrQyC1Xe5wol3uFejMu4iD3?=
- =?us-ascii?Q?heEX/TNQ4LRq20Txb7Ee7u2J2OjRvUStWJ+PX6fhnIUtQHj040pS4KsJuYEZ?=
- =?us-ascii?Q?kVjcBuOzQekHpKV+709ktJBRl9MauTUbbpZPZX9mY8s4N8WCO6m86VVXkpwU?=
- =?us-ascii?Q?4CLWUFTwe/tU0+Mv7kdN7a+CnJh3qa8GEUMmXcN41+EuhecI/HTjI/UHnFRQ?=
- =?us-ascii?Q?MlcvQZdcCOpRVP9kDTV6rIvHk8m7kDRdx3OYSD0vtkU+FCsdCyELlD1UGT8S?=
- =?us-ascii?Q?E0k65MCe5jUyZonfhSidJXWPOEbnaSNpdjB87Vl4tTpM1ADxcf1yuGG30bvt?=
- =?us-ascii?Q?Z57dXhrxTmR+90Nb8pbBI5jCAn80n493DMROCH0dRv4BAmDqHKpu0OdMeegU?=
- =?us-ascii?Q?xh1XHxXNujpIaB6YqqIxoyAB/gM9ImbB4zI+yTKtp2+FHrWczox/a8Jx2OvX?=
- =?us-ascii?Q?yQ3UFrjEaNGuWJX0yCMAzolcJx4rRpx9hDfe0/TYWiMGZUGLaxQ0x5BIGsHR?=
- =?us-ascii?Q?uaXBzAUrI6KqP2RsBd9+02supptpGjPt4Gmg+c4CjUmqiRck36OXSlaT9Yq5?=
- =?us-ascii?Q?+0f9TYdlar6+Sd2TRDae203VXl48rKImXH0461Lh0sImGs3/b3KwR+L2Hz0Z?=
- =?us-ascii?Q?raSYGNYXG5AT3DuAMGpp3EuKypKy3o843JM6qbN33NzQfNJiiY4XIrqtzNfG?=
- =?us-ascii?Q?oA+Jl4rHr26RI1sRbv5jKKXRr3ubF3AhqVw70OVI/V4INTbZX4FLBdX7ZqkD?=
- =?us-ascii?Q?t4X0AYLHjQvkkCKpj0hp+XNy3tWhLXx/X/w0EUdX1RF0TPXr5+MkvRtk9kkS?=
- =?us-ascii?Q?FYHnWuq0tuGYyD//v8Em7e9AWaOXr0HIJ9tyLoEFOmgeMm+LOy7D34Z/Nk8x?=
- =?us-ascii?Q?1lkWUqRDko+68Y3hgIPJY0iT09HHEGuqvR1sMOEVnAtTGSsXsJgLRdkvB6CH?=
- =?us-ascii?Q?4idd/PdQeQUb710864GgwT1urfWzT1PrL5D+UGPnhpRQl/NJnxgY5ruNiYUr?=
- =?us-ascii?Q?hwnVgUh+SY3CnuPgTtDYyQMeyjEqwpM6iU0RKbw6Ft23HjMLNM0uEbJma9Ro?=
- =?us-ascii?Q?qZfstqmOFWPE4Yzsvb/DuKpRiR02JzOqHrXVaYqLY3DxBSXjGWx4raj/jyf9?=
- =?us-ascii?Q?K1hHvm2qJTU0yMf2mRDHqNidJK8va3RJ0aGkL0p7kZYQtKb8jFCPTDTgLysk?=
- =?us-ascii?Q?83X4c/Y+K8F1WGFvkbfRhRUzA50JZDORGaCKN/Q5TH0fquw8RVPPjhWb/dM0?=
- =?us-ascii?Q?nxHmBYGE9pTbCSjoaHcVa3tbdaCfIBvATQ5um1TH?=
+	=?us-ascii?Q?pOtrIlXFsV8Ore1UqmOvfTAni7DDlMVsQUPifFCRk191ZtPKuvyRyVhaZswr?=
+ =?us-ascii?Q?a4Bb3dQAltXdfvi2iNPTJi+4oEH0wH2Hpmwy6+LepxvTMvmDdhyou97zpCx0?=
+ =?us-ascii?Q?m0P8CwbO+BhhCl2HgNZNc7VJG+GSbnYUvoTPDE41u05me01ZeNZTz1Puj+vw?=
+ =?us-ascii?Q?EZiVtQvHKUJzEc2Up34cta2KIsSuNEQcCLl7EzxG8Phlo7bhejl0ur2T0GDf?=
+ =?us-ascii?Q?LsQGoeFfQaYh/XzERN3oDvuYToTbonJYziCmarlWnAavSOLKL7JlLa+zKlZw?=
+ =?us-ascii?Q?Pg58aQnl3Ab4C8sTdPYrDrSpHgltCKiic4RUdX56IKtowgam5pgcRPKlvQCn?=
+ =?us-ascii?Q?fiLLiLxeVBan7pj4Gsp9mO2ht1hRMcM2T40N54L55q5H3XgOUN8D2LgEgHBZ?=
+ =?us-ascii?Q?6wANXBPa6PUJoDoQhkkM6VPdnyFGxL3+wQG8BCVhNjQRSSphjo2gTaWqBkzg?=
+ =?us-ascii?Q?dodDEo74SDH1KJ3Ep4pTQ76xQYS7DJuJNm662EFCpsIjyOaJTFn40YxJSor2?=
+ =?us-ascii?Q?BHgN5qN/9taleBkvBMCHIkYDbNLy+k8CF8eYHcxyHFxkAY6Ou0g17Pi5Vk2l?=
+ =?us-ascii?Q?nYDCvXtB7vZIAc1Ga/7qvyT5J+ekcNU1UqdzCrlxIe3487iO1H92aiGpX43q?=
+ =?us-ascii?Q?myIRA9gbJc8wxNsOVKV1/ijUBj3aXGgubXobonssu1il8gWyA1TZhcdXtRF6?=
+ =?us-ascii?Q?ZKUxGbdbu7ifA+kRBMEjg2a8sR9gzCBodfBkaanhYjI5GEQ3zrPErfXFT3db?=
+ =?us-ascii?Q?bqEF6InsuVOpYCOisRt2tQ8gLBD4szNLfbiOlX8UzzizxWYS22AlhtCdNNj3?=
+ =?us-ascii?Q?39t4qL+xHpRwQoj69KjIHQTzsC30zvqaTiWk/QbqaWqzpuTuc+QIq0cuHhCZ?=
+ =?us-ascii?Q?Y0QSs108T8otYyeZVOlyA2VKM2Lugbe94ee7PmbV64B0jl8FjSvd8NJABFgf?=
+ =?us-ascii?Q?pPRymtw7FWkAnTC5cibrT0CR4TM5UwhcFj+cbdJzBOfOBpGlCE/WIuntuQeQ?=
+ =?us-ascii?Q?9BH70MQBdKVmXj3WKHcYFyXLinJwS8lTqulljrWSp1H2CUB18rdgKlIGANT3?=
+ =?us-ascii?Q?2x6BIOrH2igZl7nI+vFYHi62zH/V00Qe5EcSF3OfPdiDZWIiowJTBiAV01f+?=
+ =?us-ascii?Q?GrZk5ZdfXUmXqEQFaiL2tg/F2V54mKQjv+7uE8GM5MNYHan4u2mxCOcYZ2oP?=
+ =?us-ascii?Q?m6BVXUPVxXAZ3pcNVPuVManodSsfD2OIoAB6rdpEJ8RJOb3L9BC6bwkC+JVJ?=
+ =?us-ascii?Q?P8kApNd8KpdDcXKUhxf1rXsB8NK3rcoZvhQG6MW1SReL9hNkAfpgP22CNChH?=
+ =?us-ascii?Q?qoAT7G/AA+7uMV7NK6/oJxmZkxeXvWothpokcdOvVK1wwyi1ZLf7pIC37F1F?=
+ =?us-ascii?Q?Q93CuK/f9jIUDQkv50bPMuv2XyKboi8jB1r+B3YE0K1c16OkvJU5jtWuhnF0?=
+ =?us-ascii?Q?ZVFxfipl3ByjUwBbWAVqiJi6U4kYyARLveZu0SMDCo0yFPyyQNovUOsSbk62?=
+ =?us-ascii?Q?2hMJkn57dEFy49KWeBxka4CaiXQ5i+LoCrBZTkjDq3JM4Xbq0fwu1zDZFEaN?=
+ =?us-ascii?Q?bIQqqUNxvDLWjOVzOfG5UTl/YFXG/EDu/GM2rOBA?=
 X-OriginatorOrg: labn.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6bf90362-5816-45d0-2b89-08dc8035b981
+X-MS-Exchange-CrossTenant-Network-Message-Id: acfdc8f3-8b5c-424c-40c2-08dc8035bac7
 X-MS-Exchange-CrossTenant-AuthSource: PH7PR14MB5619.namprd14.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2024 23:19:01.4995
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 May 2024 23:19:03.6641
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: eb60ac54-2184-4344-9b60-40c8b2b72561
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: K7wTayrcINUNM6j3bqr8NxoLPzfuS5MX9ByPwwoGLpVoZn9hpbvDsWV9mkF4LWLPaZ+9zou/JE5tZ5YeDMvuWg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: r3MLWJECoyp4JirdSTVcqaFYqG2zaGInn6lRMOeaZVQc7VPxbV9ESEHnl/iM9NnJ9OO3NWrW/Y3/3UahVZIotA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR14MB7648
 
 From: Eric H Kinzie <ekinzie@labn.net>
 
-When one or more MPLS labels are present, the struct sk_buff
-"network_header" offset points to the outermost label, instead of the
-IP header.  This is used by mpls_hdr() to find the outer label.  ip_hdr()
-also uses the network_header offset and unconditionally expects to find
-an IP header there.
+MPLS can multicast packets through point-to-multipoint LSPs.
+The structure mpls_route has space to store multiple next-hops for the
+purposes of multipath forwarding.  Alternatively, use this area to store
+multiple next-hops for p2mp.  This change is consistent with RFC5332
+section 4 for downstream-assigned labels, in that it continues to use
+the unicast ether type (ETH_P_MPLS_UC) for multicast Ethernet frames.
 
-When forwarding an MPLS-encapsulated packet, the data interpreted
-by arp_solicit() as an IP header is offset by at least four bytes.
-For example, with one MPLS label, the IP TTL, protocol and header
-checksum fields are used as the source IP address.  With a TTL of 127,
-the source address is within the prefix assigned to the loopback interface
-(127.0.0.0/8).  This results in ARP requests such as:
-
-10:40:32.131061 ARP, Request who-has 10.0.1.3 tell 127.1.197.239, length 28
-10:40:33.144226 ARP, Request who-has 10.0.1.3 tell 127.1.197.239, length 28
-10:40:34.168224 ARP, Request who-has 10.0.1.3 tell 127.1.197.56, length 28
-
-Examine the inner network header for the source address if the network
-header is not IP, but the inner header is.  Also fix a similar situation
-in IPv6 neighbor discovery.
+p2mp routes are added by declaring a route type to be RTN_MULTICAST.
+For example:
+	ip -f mpls route add multicast 100 \
+	  nexthop as 200 via inet 10.0.2.1 \
+	  nexthop as 300 via inet 10.0.3.1 \
+	  nexthop as 400 via inet 10.0.4.1
 
 Signed-off-by: Eric H Kinzie <ekinzie@labn.net>
 ---
- net/ipv4/arp.c   | 15 ++++++++++++---
- net/ipv6/ndisc.c | 13 +++++++++++--
- 2 files changed, 23 insertions(+), 5 deletions(-)
+ net/mpls/af_mpls.c  | 218 ++++++++++++++++++++++++++++++--------------
+ net/mpls/internal.h |   6 +-
+ 2 files changed, 153 insertions(+), 71 deletions(-)
 
-diff --git a/net/ipv4/arp.c b/net/ipv4/arp.c
-index 11c1519b3699..653394362c80 100644
---- a/net/ipv4/arp.c
-+++ b/net/ipv4/arp.c
-@@ -330,6 +330,15 @@ void arp_send(int type, int ptype, __be32 dest_ip,
+diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
+index 2dc7a908a6bb..e7f39ee05c19 100644
+--- a/net/mpls/af_mpls.c
++++ b/net/mpls/af_mpls.c
+@@ -339,76 +339,18 @@ static bool mpls_egress(struct net *net, struct mpls_route *rt,
+ 	return success;
  }
- EXPORT_SYMBOL(arp_send);
  
-+static __be32 __ip_srcaddr(const struct sk_buff *skb)
-+{
-+	/* Handle cases like MPLS where IP is the inner header */
-+	if (skb->protocol != cpu_to_be16(ETH_P_IP) &&
-+	    skb->inner_protocol == cpu_to_be16(ETH_P_IP))
-+		return inner_ip_hdr(skb)->saddr;
-+	return ip_hdr(skb)->saddr;
-+}
-+
- static void arp_solicit(struct neighbour *neigh, struct sk_buff *skb)
+-static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
+-			struct packet_type *pt, struct net_device *orig_dev)
++static int mpls_forward_finish(struct sk_buff *skb, struct mpls_dev *mdev,
++			       struct mpls_entry_decoded *dec,
++			       struct mpls_route *rt, const struct mpls_nh *nh)
  {
- 	__be32 saddr = 0;
-@@ -350,13 +359,13 @@ static void arp_solicit(struct neighbour *neigh, struct sk_buff *skb)
- 	default:
- 	case 0:		/* By default announce any local IP */
- 		if (skb && inet_addr_type_dev_table(dev_net(dev), dev,
--					  ip_hdr(skb)->saddr) == RTN_LOCAL)
--			saddr = ip_hdr(skb)->saddr;
-+					  __ip_srcaddr(skb)) == RTN_LOCAL)
-+			saddr = __ip_srcaddr(skb);
- 		break;
- 	case 1:		/* Restrict announcements of saddr in same subnet */
- 		if (!skb)
- 			break;
--		saddr = ip_hdr(skb)->saddr;
-+		saddr = __ip_srcaddr(skb);
- 		if (inet_addr_type_dev_table(dev_net(dev), dev,
- 					     saddr) == RTN_LOCAL) {
- 			/* saddr should be known to target */
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index 254b192c5705..16a93798cb00 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -730,6 +730,15 @@ static void ndisc_error_report(struct neighbour *neigh, struct sk_buff *skb)
- 	kfree_skb(skb);
+-	struct net *net = dev_net(dev);
+ 	struct mpls_shim_hdr *hdr;
+-	const struct mpls_nh *nh;
+-	struct mpls_route *rt;
+-	struct mpls_entry_decoded dec;
+ 	struct net_device *out_dev;
+ 	struct mpls_dev *out_mdev;
+-	struct mpls_dev *mdev;
+ 	unsigned int hh_len;
+ 	unsigned int new_header_size;
+ 	unsigned int mtu;
+ 	int err;
+ 
+-	/* Careful this entire function runs inside of an rcu critical section */
+-
+-	mdev = mpls_dev_get(dev);
+-	if (!mdev)
+-		goto drop;
+-
+-	MPLS_INC_STATS_LEN(mdev, skb->len, rx_packets,
+-			   rx_bytes);
+-
+-	if (!mdev->input_enabled) {
+-		MPLS_INC_STATS(mdev, rx_dropped);
+-		goto drop;
+-	}
+-
+-	if (skb->pkt_type != PACKET_HOST)
+-		goto err;
+-
+-	if ((skb = skb_share_check(skb, GFP_ATOMIC)) == NULL)
+-		goto err;
+-
+-	if (!pskb_may_pull(skb, sizeof(*hdr)))
+-		goto err;
+-
+-	skb_dst_drop(skb);
+-
+-	/* Read and decode the label */
+-	hdr = mpls_hdr(skb);
+-	dec = mpls_entry_decode(hdr);
+-
+-	rt = mpls_route_input_rcu(net, dec.label);
+-	if (!rt) {
+-		MPLS_INC_STATS(mdev, rx_noroute);
+-		goto drop;
+-	}
+-
+-	nh = mpls_select_multipath(rt, skb);
+-	if (!nh)
+-		goto err;
+-
+-	/* Pop the label */
+-	skb_pull(skb, sizeof(*hdr));
+-	skb_reset_network_header(skb);
+-
+-	skb_orphan(skb);
+-
+-	if (skb_warn_if_lro(skb))
+-		goto err;
+-
+-	skb_forward_csum(skb);
+-
+-	/* Verify ttl is valid */
+-	if (dec.ttl <= 1)
+-		goto err;
+-
+ 	/* Find the output device */
+ 	out_dev = nh->nh_dev;
+ 	if (!mpls_output_possible(out_dev))
+@@ -431,10 +373,9 @@ static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
+ 	skb->dev = out_dev;
+ 	skb->protocol = htons(ETH_P_MPLS_UC);
+ 
+-	dec.ttl -= 1;
+-	if (unlikely(!new_header_size && dec.bos)) {
++	if (unlikely(!new_header_size && dec->bos)) {
+ 		/* Penultimate hop popping */
+-		if (!mpls_egress(dev_net(out_dev), rt, skb, dec))
++		if (!mpls_egress(dev_net(out_dev), rt, skb, *dec))
+ 			goto err;
+ 	} else {
+ 		bool bos;
+@@ -443,10 +384,10 @@ static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
+ 		skb_reset_network_header(skb);
+ 		/* Push the new labels */
+ 		hdr = mpls_hdr(skb);
+-		bos = dec.bos;
++		bos = dec->bos;
+ 		for (i = nh->nh_labels - 1; i >= 0; i--) {
+ 			hdr[i] = mpls_entry_encode(nh->nh_label[i],
+-						   dec.ttl, 0, bos);
++						   dec->ttl, 0, bos);
+ 			bos = false;
+ 		}
+ 	}
+@@ -477,6 +418,139 @@ static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
+ 	return NET_RX_DROP;
  }
  
-+static struct in6_addr *__ip6_srcaddr(const struct sk_buff *skb)
++static int mpls_forward_p2mp(struct sk_buff *skb, struct mpls_dev *mdev,
++			     struct mpls_entry_decoded *dec,
++			     struct mpls_route *rt)
 +{
-+	/* Handle cases like MPLS where IPv6 is the inner header */
-+	if (skb->protocol != cpu_to_be16(ETH_P_IPV6) &&
-+	    skb->inner_protocol == cpu_to_be16(ETH_P_IPV6))
-+		return &inner_ipv6_hdr(skb)->saddr;
-+	return &ipv6_hdr(skb)->saddr;
++	unsigned int nh_flags;
++	int one_err;
++	int err = 0;
++	u8 alive;
++
++	if (rt->rt_nhn == 1)
++		goto out;
++
++	alive = READ_ONCE(rt->rt_nhn_alive);
++	if (alive == 0)
++		goto drop;
++
++	for_nexthops(rt) {
++		struct sk_buff *clone;
++
++		/* Skip the first next-hop for now and handle this one
++		 * on the way out to avoid one clone.
++		 */
++		if (nhsel == 0)
++			continue;
++
++		nh_flags = READ_ONCE(nh->nh_flags);
++		if (nh_flags & (RTNH_F_DEAD | RTNH_F_LINKDOWN))
++			continue;
++
++		clone = skb_clone(skb, GFP_ATOMIC);
++		if (!clone)
++			goto drop;
++
++		one_err = mpls_forward_finish(clone, mdev, dec, rt, nh);
++		if (one_err)
++			err = one_err;
++	}
++	endfor_nexthops(rt);
++
++out:
++	nh_flags = READ_ONCE(rt->rt_nh->nh_flags);
++	if (nh_flags & (RTNH_F_DEAD | RTNH_F_LINKDOWN)) {
++		kfree_skb(skb);
++		return err;
++	}
++
++	one_err = mpls_forward_finish(skb, mdev, dec, rt, rt->rt_nh);
++	if (one_err)
++		err = one_err;
++	return err;
++drop:
++	kfree_skb(skb);
++	return NET_RX_DROP;
 +}
 +
- /* Called with locked neigh: either read or both */
++static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
++			struct packet_type *pt, struct net_device *orig_dev)
++{
++	struct net *net = dev_net(dev);
++	struct mpls_shim_hdr *hdr;
++	const struct mpls_nh *nh;
++	struct mpls_route *rt;
++	struct mpls_entry_decoded dec;
++	struct mpls_dev *mdev;
++
++	/* Careful this entire function runs inside of an rcu critical section */
++
++	mdev = mpls_dev_get(dev);
++	if (!mdev)
++		goto drop;
++
++	MPLS_INC_STATS_LEN(mdev, skb->len, rx_packets, rx_bytes);
++
++	if (!mdev->input_enabled) {
++		MPLS_INC_STATS(mdev, rx_dropped);
++		goto drop;
++	}
++
++	if (skb->pkt_type != PACKET_HOST)
++		goto err;
++
++	skb = skb_share_check(skb, GFP_ATOMIC);
++	if (!skb)
++		goto err;
++
++	if (!pskb_may_pull(skb, sizeof(*hdr)))
++		goto err;
++
++	skb_dst_drop(skb);
++
++	/* Read and decode the label */
++	hdr = mpls_hdr(skb);
++	dec = mpls_entry_decode(hdr);
++
++	rt = mpls_route_input_rcu(net, dec.label);
++	if (!rt) {
++		MPLS_INC_STATS(mdev, rx_noroute);
++		goto drop;
++	}
++
++	if (!(rt->rt_flags & MPLS_RT_F_P2MP)) {
++		nh = mpls_select_multipath(rt, skb);
++		if (!nh)
++			goto err;
++	}
++
++	/* Pop the label */
++	skb_pull(skb, sizeof(*hdr));
++	skb_reset_network_header(skb);
++
++	skb_orphan(skb);
++
++	if (skb_warn_if_lro(skb))
++		goto err;
++
++	skb_forward_csum(skb);
++
++	/* Verify ttl is valid */
++	if (dec.ttl <= 1)
++		goto err;
++
++	dec.ttl -= 1;
++	if (rt->rt_flags & MPLS_RT_F_P2MP)
++		return mpls_forward_p2mp(skb, mdev, &dec, rt);
++
++	return mpls_forward_finish(skb, mdev, &dec, rt, nh);
++err:
++	MPLS_INC_STATS(mdev, rx_errors);
++drop:
++	kfree_skb(skb);
++	return NET_RX_DROP;
++}
++
+ static struct packet_type mpls_packet_type __read_mostly = {
+ 	.type = cpu_to_be16(ETH_P_MPLS_UC),
+ 	.func = mpls_forward,
+@@ -491,6 +565,7 @@ static const struct nla_policy rtm_mpls_policy[RTA_MAX+1] = {
+ struct mpls_route_config {
+ 	u32			rc_protocol;
+ 	u32			rc_ifindex;
++	u8			rc_flags;
+ 	u8			rc_via_table;
+ 	u8			rc_via_alen;
+ 	u8			rc_via[MAX_VIA_ALEN];
+@@ -1029,6 +1104,7 @@ static int mpls_route_add(struct mpls_route_config *cfg,
+ 	rt->rt_protocol = cfg->rc_protocol;
+ 	rt->rt_payload_type = cfg->rc_payload_type;
+ 	rt->rt_ttl_propagate = cfg->rc_ttl_propagate;
++	rt->rt_flags = cfg->rc_flags;
  
- static void ndisc_solicit(struct neighbour *neigh, struct sk_buff *skb)
-@@ -740,10 +749,10 @@ static void ndisc_solicit(struct neighbour *neigh, struct sk_buff *skb)
- 	struct in6_addr *target = (struct in6_addr *)&neigh->primary_key;
- 	int probes = atomic_read(&neigh->probes);
+ 	if (cfg->rc_mp)
+ 		err = mpls_nh_build_multi(cfg, rt, max_labels, extack);
+@@ -1837,9 +1913,11 @@ static int rtm_to_route_config(struct sk_buff *skb,
+ 			       "Invalid route scope  - MPLS only supports UNIVERSE");
+ 		goto errout;
+ 	}
+-	if (rtm->rtm_type != RTN_UNICAST) {
++	if (rtm->rtm_type == RTN_MULTICAST) {
++		cfg->rc_flags = MPLS_RT_F_P2MP;
++	} else if (rtm->rtm_type != RTN_UNICAST) {
+ 		NL_SET_ERR_MSG(extack,
+-			       "Invalid route type - MPLS only supports UNICAST");
++			       "Invalid route type - MPLS only supports UNICAST and MULTICAST");
+ 		goto errout;
+ 	}
+ 	if (rtm->rtm_flags != 0) {
+@@ -1988,7 +2066,7 @@ static int mpls_dump_route(struct sk_buff *skb, u32 portid, u32 seq, int event,
+ 	rtm->rtm_table = RT_TABLE_MAIN;
+ 	rtm->rtm_protocol = rt->rt_protocol;
+ 	rtm->rtm_scope = RT_SCOPE_UNIVERSE;
+-	rtm->rtm_type = RTN_UNICAST;
++	rtm->rtm_type = rt->rt_flags & MPLS_RT_F_P2MP ? RTN_MULTICAST : RTN_UNICAST;
+ 	rtm->rtm_flags = 0;
  
--	if (skb && ipv6_chk_addr_and_flags(dev_net(dev), &ipv6_hdr(skb)->saddr,
-+	if (skb && ipv6_chk_addr_and_flags(dev_net(dev), __ip6_srcaddr(skb),
- 					   dev, false, 1,
- 					   IFA_F_TENTATIVE|IFA_F_OPTIMISTIC))
--		saddr = &ipv6_hdr(skb)->saddr;
-+		saddr = __ip6_srcaddr(skb);
- 	probes -= NEIGH_VAR(neigh->parms, UCAST_PROBES);
- 	if (probes < 0) {
- 		if (!(READ_ONCE(neigh->nud_state) & NUD_VALID)) {
+ 	if (nla_put_labels(skb, RTA_DST, 1, &label))
+@@ -2386,7 +2464,7 @@ static int mpls_getroute(struct sk_buff *in_skb, struct nlmsghdr *in_nlh,
+ 		goto errout;
+ 	}
+ 
+-	if (rtm->rtm_flags & RTM_F_FIB_MATCH) {
++	if (rtm->rtm_flags & RTM_F_FIB_MATCH || rt->rt_flags & MPLS_RT_F_P2MP) {
+ 		skb = nlmsg_new(lfib_nlmsg_size(rt), GFP_KERNEL);
+ 		if (!skb) {
+ 			err = -ENOBUFS;
+diff --git a/net/mpls/internal.h b/net/mpls/internal.h
+index b9f492ddf93b..585dd9ac1076 100644
+--- a/net/mpls/internal.h
++++ b/net/mpls/internal.h
+@@ -153,10 +153,14 @@ struct mpls_route { /* next hop label forwarding entry */
+ 	u8			rt_nhn_alive;
+ 	u8			rt_nh_size;
+ 	u8			rt_via_offset;
+-	u8			rt_reserved1;
++	u8			rt_flags;
+ 	struct mpls_nh		rt_nh[];
+ };
+ 
++/* rt_flags */
++#define MPLS_RT_F_P2MP                 0x01
++#define MPLS_RT_F_UPSTREAM_ASSIGNED    0x02 /* upstream assigned labels  - rfc5332 */
++
+ #define for_nexthops(rt) {						\
+ 	int nhsel; const struct mpls_nh *nh;				\
+ 	for (nhsel = 0, nh = (rt)->rt_nh;				\
 -- 
 2.43.2
 
