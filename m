@@ -1,118 +1,103 @@
-Return-Path: <netdev+bounces-99065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5B298D3910
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:24:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 136138D3931
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 16:29:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6F0D1C225AF
-	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 14:24:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65F98B26430
+	for <lists+netdev@lfdr.de>; Wed, 29 May 2024 14:29:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D7E1581E6;
-	Wed, 29 May 2024 14:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40F1158844;
+	Wed, 29 May 2024 14:28:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FzEFmOaG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="h7e/Hk65"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF9FB157E9E
-	for <netdev@vger.kernel.org>; Wed, 29 May 2024 14:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990791386C6;
+	Wed, 29 May 2024 14:28:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716992680; cv=none; b=Jzpsn/muYepR+rp3Cu4PB46Qsc8d1umZw9NILxYFSlSemTI0iieX+jgrqeLbsbhPFbjUKJcS+t7wMsThbZiZxL1/LZTa/GIm9BxczTommcMBmF1+HlccxMiCHiebyUslFrWGjF0w0mDBknbN+XQVE3PjRc5aiovAQULX2JLnEZE=
+	t=1716992932; cv=none; b=uAN+guZvqJLfXgRH5MTsklZWRczV+6N+qf7lqyc/aDJ678jvCyMkfh/xbP0e5ZkUcDNUA8mhp1tHYeZqfmw1FEoWncU+NezX5ANaqAYgpRcyny2QRzGohjllYDqi2HfSVJPoXBosuOG1P/QtjlOv1YJpm5Pli/OW0lJj2ptS+2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716992680; c=relaxed/simple;
-	bh=JAxbuHoQBZ49w41Mn9Exw5TKZvwkktDZUEKmSaoKOFo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Lr/eq6iRnEXIs/Wz9tn5Ay9YNvkO8K7EFO3wt9EdrFIqi2nS7r41N2u2A1cQoPuH+rihoK8xT7+lRjy1DHSTUmQ1VFw5gMQ1y2Q7Bekk/JbAAhL/nDDAiLuS4mXutuUR2X2KXOki2xftQ/TO0p5lZbILiL+ibjBsv0NTFhX322k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FzEFmOaG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716992677;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CaOh1l0Lu41LPYOrXz2nXavJQHgEuj8sHreCoqbxNhY=;
-	b=FzEFmOaGCXkqxhm7fCBba5UnkYALl43qLXF+V8HJ2UrDth5YQTYjXuQolAMSVYHjjTTHaT
-	w3yvTxaAVCZ0LoaeH5SrWYNou439nfpg+/O8y+GsWa1CmeFvXmyMx/mYD6nNL+ZxhMTGpe
-	tTr7q1bivPAkSYBEaoU4aUHX4P1a7PI=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-92-ec3pu3XiN-KEIQq79vxKnQ-1; Wed, 29 May 2024 10:24:36 -0400
-X-MC-Unique: ec3pu3XiN-KEIQq79vxKnQ-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a5a812308daso108176466b.0
-        for <netdev@vger.kernel.org>; Wed, 29 May 2024 07:24:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716992675; x=1717597475;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CaOh1l0Lu41LPYOrXz2nXavJQHgEuj8sHreCoqbxNhY=;
-        b=bTb67VrN2iKDtFrEfiwFd7gl0DovaZe3jiQ2oqkJ3V8fI0mPo/nckRvsBJ8JnkcObA
-         usMegA4eOaXKaSQxOrVycq02JXR+0XpDW0xyRzSLRRQSKUZUMqzUkRAZDVsnk0EggjmW
-         W1F7eG5M/IqQRjQge0NFapxemEpqJPBKCvGbDj3t3mS3RQszVfD0WfGE2+VGDm6Bih+d
-         FUliwsG01QWuU8uS5g3p32lT4xThMJ2GoO77YyIWcd6EiC+eu4mCirj2VLdRXjMU9Kox
-         6gh6op0lkLr9RD1CI15E3l1HoV6qlSIC8jT4RsoFHMIeWKLxfa9F/sJORt0Q1700qANQ
-         uDMw==
-X-Gm-Message-State: AOJu0YzZCI4/vElk3ImB7PYR5Z9TO9Wy0uBLzJ0bCHkl/IoLndMdzjXo
-	KSBXA5Cg8lLoUG1xVL/C+YVs3m0UiIBGo4qWHUvJ/gQ9SahNEBsV/QUznCuELpXK2XG01HD19Jf
-	ZRLTc4JQwVDEv0xXMZhlLiEmbN4zoA9+UEJPfL81bvhnOSj/1CF6vsA==
-X-Received: by 2002:a17:906:413:b0:a63:4e95:5639 with SMTP id a640c23a62f3a-a634e95579dmr280208966b.47.1716992675169;
-        Wed, 29 May 2024 07:24:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEoMcMMypUJzk39vMbEP225084t98GDv20PFArbG9E2Gd05mxwJZaA+E/zvafN6DVb5r8Z9aA==
-X-Received: by 2002:a17:906:413:b0:a63:4e95:5639 with SMTP id a640c23a62f3a-a634e95579dmr280206566b.47.1716992674677;
-        Wed, 29 May 2024 07:24:34 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a626c8176e1sm715455666b.8.2024.05.29.07.24.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 May 2024 07:24:34 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id EFBDF12F7EDE; Wed, 29 May 2024 16:24:33 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Thorsten Blum <thorsten.blum@toblux.com>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, "David S.
- Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Jesper
- Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
- KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
- Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, Thorsten Blum <thorsten.blum@toblux.com>
-Subject: Re: [PATCH] bpf, devmap: Remove unnecessary if check in for loop
-In-Reply-To: <20240529101900.103913-2-thorsten.blum@toblux.com>
-References: <20240529101900.103913-2-thorsten.blum@toblux.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 29 May 2024 16:24:33 +0200
-Message-ID: <874jaghf1a.fsf@toke.dk>
+	s=arc-20240116; t=1716992932; c=relaxed/simple;
+	bh=94w/1FYOY49gVJVMW1Je3xGavCevd8pni3hcKGMgcU8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FZyVyTn9a9OtPAMUcEGDY41gshTjBea8brYdL+DOP3c8i7oh9QpPMSxzU3RqO2PSezdkM8TnCpZvoa3CEeHfVv1Y77w5RYprnR24Gp1Ci0JU+IFfcbKm5M8qT80tiHOkJeVsJXIhE6GjP1bo4sXIlU1XgsCCAdrimp8phXX1Mew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=h7e/Hk65; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=A0djHwkTm9IMDtUZ9E1EkFk0NBl4OKR695dw9cvK5k4=; b=h7e/Hk65uFLg0eujXc54qb2QCT
+	en2K+w/W6N1KiOMFBDKWSbFfUcPW4RG9rhZjrfQui7wQzESKkGovHrfP58wSF5/MPeKBeyHGKsy5F
+	pj3+VNpkPfETsP5kxq2X/i+DQ2JXSCTvL73CAgo9Sa1qyixhXRNdRw6p4F6wvdOrLSbE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sCKHo-00GGQZ-Fq; Wed, 29 May 2024 16:28:16 +0200
+Date: Wed, 29 May 2024 16:28:16 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sneh Shah <quic_snehshah@quicinc.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Andrew Halaney <ahalaney@redhat.com>, Vinod Koul <vkoul@kernel.org>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kernel@quicinc.com
+Subject: Re: [PATCH net-next] net: stmmac: dwmac-qcom-ethqos: Add support for
+ 2.5G SGMII
+Message-ID: <67553944-5d3f-4641-a719-da84554c0a9f@lunn.ch>
+References: <20231218071118.21879-1-quic_snehshah@quicinc.com>
+ <4zbf5fmijxnajk7kygcjrcusf6tdnuzsqqboh23nr6f3rb3c4g@qkfofhq7jmv6>
+ <8b80ab09-8444-4c3d-83b0-c7dbf5e58658@quicinc.com>
+ <wvzhz4fmtheculsiag4t2pn2kaggyle2mzhvawbs4m5isvqjto@lmaonvq3c3e7>
+ <8f94489d-5f0e-4166-a14e-4959098a5c80@quicinc.com>
+ <ZlNi11AsdDpKM6AM@shell.armlinux.org.uk>
+ <d246bd64-18b3-4002-bc71-eccd67bbd61f@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d246bd64-18b3-4002-bc71-eccd67bbd61f@quicinc.com>
 
-Thorsten Blum <thorsten.blum@toblux.com> writes:
+> Qualcomm ethernet HW supports 2.5G speed in overclocked SGMII mode.
+> we internally term it as OCSGMII.
 
-> The iterator variable dst cannot be NULL and the if check can be
-> removed.
->
-> Remove it and fix the following Coccinelle/coccicheck warning reported
-> by itnull.cocci:
->
-> 	ERROR: iterator variable bound on line 762 cannot be NULL
->
-> Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
+So it still does SGMII inband signalling? Not 2500BaseX signalling? It
+is not actually compatible with 2500BaseX?
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> End goal of these patches is to enable SGMII with 2.5G speed support.
+> The patch in these series enabled up SGMII with 2.5 for cases where we
+> don't have external phy. ( mac-to-mac connectivity)
 
+So the other end needs to be an over clocked SGMII MAC, not 2500BaseX?
+
+> The new patch posted extends this for the case when the MAC has an
+> external phy connected. ( hence we are advertising fr 2.5G speed by adding
+> 2500BASEX as supported interface in phylink)
+
+And i assume it does not actually work against a true 2500BaseX
+device, because it is doing SGMII inband signalling?
+ 
+Hence Russell frustration with the whole 2.5G mess....
+
+      Andrew
 
