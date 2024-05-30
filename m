@@ -1,217 +1,157 @@
-Return-Path: <netdev+bounces-99481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 278AC8D5044
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 18:55:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C4DE8D504F
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 18:56:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BA461C221B1
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 16:55:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBD681C220DC
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 16:56:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EECCE3B784;
-	Thu, 30 May 2024 16:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F1E42076;
+	Thu, 30 May 2024 16:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vt1b5BwQ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="F6jDcoqx"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A87D3BB2E;
-	Thu, 30 May 2024 16:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D4844375
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 16:56:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717088140; cv=none; b=nIyugSQiXoKOZlwGvv546bF7zEHMA4JLABFylEEC2o0ADCoL6n8Yg/SDiQLy3p4TkYkY3tOBs8v//RwduQEKJ7n/9gZ7jqFLF7iE43dzsPf8GOJEIBwNRYGRylO0pacFVFLdxPGKmJ8HKz26Vfbk0rypy3Cj8huwkQG6SmMAhB8=
+	t=1717088186; cv=none; b=rp8CLMzDR2oUYfbxCbbCwpLpp4OrZ8GF+9s+Q8RdVdEXbobe1A7puBI6cl2lrWDw+gbYwnDHs4mGtoStjYljeNhuGvLsLfJ5cbRlp5FFK1xNF713iNqMmbh6aWrYla/J06oasiurKoNJkO7W8rDwr2LfHAETtUD707CR+RT0cjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717088140; c=relaxed/simple;
-	bh=tCkHJUiWVp34QgTZuninP//WmPuka/jpuBZokKDdlwU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QkWzgiDs6hTufT4c1AWkpxwaVdw6M8CXr+SLMh9yseGr1GI9rPgYiwI/yji3SXdP0MMb6j/fmbtMJHCnyO6HKWyezj68WFC9KJ3xjZYK5pBUH0EEe554ntLfiiKJtOfx7FfqVvUG4OmsmdVReSzrTCybxuC6mHspiS9ObS2lkzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vt1b5BwQ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=E4Et8IsTqKEjB0VKgfn0i10/CIt14tSmicrHni37u2I=; b=vt1b5BwQEsBhb0MJSh/BT73Kob
-	pGD5KZ7UtoJRwdt9gjlUj8jztY4K4pGKr5EvDoixdrgvaw7CbpFKyCZ+rdiQ9PTOz7HfZuOrmtQCN
-	zIV1i5dNDY1ulh+YoaqNoKW8divQ2hc1oIA7joKQA1OsldI3mGB+02GgHb06FPdEbsloO4k9VzjyJ
-	KFF9QGtLFp5kevCXlqIjr9lyr/3Opds0tBqYB+wfUvTnCwvwHSFE9rT19y2zyG+gTWlXJSP13BHkz
-	VPO/55MX0M3JWR+4qGRtA0jF3xfay8wCJ9BlhRw4jXablECkDkVe21W6l9XiwkB09apvqUL+LfIFi
-	JkDS50ew==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34142)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sCj3p-0007dO-0b;
-	Thu, 30 May 2024 17:55:29 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sCj3p-0005IQ-7e; Thu, 30 May 2024 17:55:29 +0100
-Date: Thu, 30 May 2024 17:55:29 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: SkyLake Huang =?utf-8?B?KOm7g+WVn+a+pCk=?= <SkyLake.Huang@mediatek.com>
-Cc: "andrew@lunn.ch" <andrew@lunn.ch>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"dqfext@gmail.com" <dqfext@gmail.com>,
-	Steven Liu =?utf-8?B?KOWKieS6uuixqik=?= <steven.liu@mediatek.com>,
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"daniel@makrotopia.org" <daniel@makrotopia.org>,
-	"angelogioacchino.delregno@collabora.com" <angelogioacchino.delregno@collabora.com>
-Subject: Re: [PATCH net-next v5 5/5] net: phy: add driver for built-in 2.5G
- ethernet PHY on MT7988
-Message-ID: <ZlivgVpycflhLUcl@shell.armlinux.org.uk>
-References: <20240530034844.11176-1-SkyLake.Huang@mediatek.com>
- <20240530034844.11176-6-SkyLake.Huang@mediatek.com>
- <ZlhWfua01SCOor80@shell.armlinux.org.uk>
- <0707897b44cfbc479cd08a092829a8bfc480281b.camel@mediatek.com>
+	s=arc-20240116; t=1717088186; c=relaxed/simple;
+	bh=Yg3EXj5RngxLqTEo9ge9vxA8ConxQueqEBmFRNHCpVY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YeD22WTgAqBDhVN0p1uQSd5sf5fVQ1sZxCqjEL7avOzbY39BfedUcZrQZHpWhEyQd1ySJJylJwaZGnRX+JPcNyBrHgPhXo4Wl6OLsQf9g444Gr5UzaSpmLPb4T/cHHRzdd4ijCtKKOfDBWdRIqPmpsda9QplmEkn0z5vKHa0v6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=F6jDcoqx; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: andrew@lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1717088183;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2ct3hM3Ww+WHMzbbEaPHOdhaeIFR0TgxFOCopIwLsWM=;
+	b=F6jDcoqx6HAHd7R/e3fFvka+K1XKYaWdL46hXt0ONACvxsu8C54cjfGYUqAOmvFFs4zprd
+	io5fsrew2rK0YFbM4Q4fThuW6oY8EtHQfqv2swgJGUMYPWlsVR1P1GiktNTuSUpZXjy/M9
+	3+z9S53UpRvXVYZB1XIScdLDA9DSufQ=
+X-Envelope-To: linux@armlinux.org.uk
+X-Envelope-To: alex.williams@ni.com
+X-Envelope-To: andi.shyti@kernel.org
+X-Envelope-To: netdev@vger.kernel.org
+X-Envelope-To: linux-i2c@vger.kernel.org
+X-Envelope-To: michal.simek@amd.com
+X-Envelope-To: hkallweit1@gmail.com
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+Message-ID: <93e8839d-e712-4708-a2ca-df81051b8360@linux.dev>
+Date: Thu, 30 May 2024 12:56:18 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0707897b44cfbc479cd08a092829a8bfc480281b.camel@mediatek.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Subject: Re: [BUG] SFP I2C timeout forces link down with PHY_ERROR
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Alex Williams <alex.williams@ni.com>, Andi Shyti <andi.shyti@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ linux-i2c@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <ec7907f1-cb5a-41ab-824c-aa0b02440ada@linux.dev>
+ <ZlYUNCRroM0up0xk@shell.armlinux.org.uk>
+ <90873b78-13ba-445e-890a-0b90a653721b@linux.dev>
+ <ebf93967-81d0-46bc-baf5-b20f9336cfa8@linux.dev>
+ <1398a492-95aa-46d9-b52b-a374fd6e9e77@lunn.ch>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <1398a492-95aa-46d9-b52b-a374fd6e9e77@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, May 30, 2024 at 04:25:56PM +0000, SkyLake Huang (黃啟澤) wrote:
-> On Thu, 2024-05-30 at 11:35 +0100, Russell King (Oracle) wrote:
-> >  	 
-> > External email : Please do not click links or open attachments until
-> > you have verified the sender or the content.
-> >  On Thu, May 30, 2024 at 11:48:44AM +0800, Sky Huang wrote:
-> > > +static int mt798x_2p5ge_phy_config_aneg(struct phy_device *phydev)
-> > > +{
-> > > +bool changed = false;
-> > > +u32 adv;
-> > > +int ret;
-> > > +
-> > > +/* In fact, if we disable autoneg, we can't link up correctly:
-> > > + *  2.5G/1G: Need AN to exchange master/slave information.
-> > > + *  100M: Without AN, link starts at half duplex(According to IEEE
-> > 802.3-2018),
-> > > + *        which this phy doesn't support.
-> > > + *   10M: Deprecated in this ethernet phy.
-> > > + */
-> > > +if (phydev->autoneg == AUTONEG_DISABLE)
-> > > +return -EOPNOTSUPP;
-> > 
-> > We have another driver (stmmac) where a platform driver is wanting to
-> > put a hack in the ksettings_set() ethtool path to error out on
-> > disabling AN for 1G speeds. This sounds like something that is
-> > applicable to more than one hardware (and I've been wondering whether
-> > it is universally true that 1G copper links and faster all require
-> > AN to function.)
-> > 
-> > Thus, I'm wondering whether this is something that the core code
-> > should
-> > be doing.
-> > 
-> Yeah..As far as I know, 1G/2.5G/5G/10G speed require AN to decide
-> master/slave role. Actually I can use force mode by calling
-> genphy_c45_pma_set_forced, which will set correspoding C45 registers.
-> However, after that, this 2.5G PHY can't still link up with partners.
+On 5/28/24 14:14, Andrew Lunn wrote:
+> On Tue, May 28, 2024 at 01:52:56PM -0400, Sean Anderson wrote:
+>> (forgot to CC Alex)
+>> 
+>> On 5/28/24 13:50, Sean Anderson wrote:
+>> > On 5/28/24 13:28, Russell King (Oracle) wrote:
+>> >> First, note that phylib's policy is if it loses comms with the PHY,
+>> >> then the link will be forced down. This is out of control of the SFP
+>> >> or phylink code.
+>> >> 
+>> >> I've seen bugs with the I2C emulation on some modules resulting in
+>> >> problems with various I2C controllers.
+>> >> 
+>> >> Sometimes the problem is due to a bad I2C level shifter. Some I2C
+>> >> level shifter manufacturers will swear blind that their shifter
+>> >> doesn't lock up, but strangely, one can prove with an osciloscope
+>> >> that it _does_ lock up - and in a way that the only way to recover
+>> >> was to possibly unplug the module or poewr cycle the platform.
+>> > 
+>> > Well, I haven't seen any case where the bus locks up. I've been able to
+>> > recover just by doing
+>> > 
+>> > 	ip link set net0 down
+>> > 	ip link set net0 up
+>> > 
+>> > which suggests that this is just a transient problem.
 > 
-> I'll leave EOPNOTSUPP here temporarily. Hope phylib can be patched
-> someday.
+> If you look back over the history, i don't think you will find any
+> reports to transient problems with real MDIO busses. Hence any error
+> is considered fatal. Also, when you consider the design of MDIO, it is
+> actually very hard for an error to be detected. It is basically a
+> shift register, shifting out 64 bits for a write, or 48 bits for a
+> read, followed by receiving 16 bits for a read. There is no protocol
+> to indicate any sort of error. If there is no device at the address,
+> the pullup means you receive 1s. End of story.
 
-Please no. "someday" tends to never happen, and you're basically
-throwing the problem over the wall to other people to solve who
-then have to spot your hack and eventually remove it.
+Yes, I would expect the only time there could be transient problems
+would be with external MII (such as if someone jiggled the phy).
 
-We need this solved properly, not by people hacking drivers. This
-is open source, you can propose a patch to phylib to fix this for
-everyone.
+> With MDIO over I2C, it is I2C which has problems, not MDIO. Do you
+> expect transient problems with I2C?
 
-> > > +/* This phy can't handle collision, and neither can (XFI)MAC it's
-> > connected to.
-> > > + * Although it can do HDX handshake, it doesn't support CSMA/CD
-> > that HDX requires.
-> > > + */
-> > 
-> > What the MAC can and can't do really has little bearing on what link
-> > modes the PHY driver should be providing. It is the responsibility of
-> > the MAC driver to appropriately change what is supported when
-> > attaching
-> > to the PHY. If using phylink, this is done by phylink via the MAC
-> > driver
-> > telling phylink what it is capable of via mac_capabilities.
-> > 
-> > > +static int mt798x_2p5ge_phy_get_rate_matching(struct phy_device
-> > *phydev,
-> > > +      phy_interface_t iface)
-> > > +{
-> > > +if (iface == PHY_INTERFACE_MODE_XGMII)
-> > > +return RATE_MATCH_PAUSE;
-> > 
-> > You mention above XFI...
-> > 
-> > XFI is 10GBASE-R protocol to XFP module electrical standards.
-> > SFI is 10GBASE-R protocol to SFP+ module electrical standards.
-> > 
-> > phy_interface_t is interested in the protocol. So, given that you
-> > mention XFI, why doesn't this test for PHY_INTERFACE_MODE_10GBASER?
-> > 
-> We have 2 XFI-MAC on mt7988 platform. One is connected to internal
-> 2.5Gphy(SoC built-in), as we discussed here (We don't test this phy for
-> 10G speed.) Another one is connected to external 10G phy.
+Well, I2C is known to have devices which can get stuck and hang the bus
+(generally requiring some bit-banging from Linux to get things unstuck,
+or a reset of the device). So while I2C (like MDIO) is supposed to be
+completely reliable, there is a history of it being not quite perfect.
 
-I can't parse your response in a meaningful way, to me it doesn't
-address my point.
+That said, I did not expect to see these kinds of errors at all. I'll
+have a closer look at the controller driver when I have the time. Maybe
+there is some errata for this...
 
+> I would also point out that MDIO is not idempotent. Reading an
+> interrupt status register often clears it. Reading the link status
+> clears the latched link status. If you need to retry the read of the
+> interrupt status register, you cannot, the interrupt has been cleared,
+> you have lost it, and probably your hardware no longer works because
+> you don't know what interrupt to handle.... If you need to re-read the
+> link status, you have lost the latched version, and you have missed a
+> up or down event.
+
+Yes. Same thing with I2C.
+
+>> >> My advice would be to investigate the hardware in the first instance.
 > 
-> > > +static int mt798x_2p5ge_phy_probe(struct phy_device *phydev)
-> > > +{
-> > > +struct mtk_i2p5ge_phy_priv *priv;
-> > > +
-> > > +priv = devm_kzalloc(&phydev->mdio.dev,
-> > > +    sizeof(struct mtk_i2p5ge_phy_priv), GFP_KERNEL);
-> > > +if (!priv)
-> > > +return -ENOMEM;
-> > > +
-> > > +switch (phydev->drv->phy_id) {
-> > > +case MTK_2P5GPHY_ID_MT7988:
-> > > +/* The original hardware only sets MDIO_DEVS_PMAPMD */
-> > > +phydev->c45_ids.mmds_present |= (MDIO_DEVS_PCS | MDIO_DEVS_AN |
-> > > + MDIO_DEVS_VEND1 | MDIO_DEVS_VEND2);
-> > 
-> > No need for parens on the RHS. The RHS is an expression in its own
-> > right, and there's no point in putting parens around the expression
-> > to turn it into another expression!
-> > 
-> > -- 
-> > RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> > FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-> 
-> Do you mean these two line?
-> +phydev->c45_ids.mmds_present |= (MDIO_DEVS_PCS | MDIO_DEVS_AN |
-> + MDIO_DEVS_VEND1 | MDIO_DEVS_VEND2);
-> 
-> What do you mean by "RHS is an expression in its own right"?
-> I put parens here to enhance readability so we don't need check
-> operator precedence again.
+> I agree with Russell. Figure out why I2C is flaky. Since this is an
+> SFP it maybe something as trivial as the contacts need cleaning. Or
+> the resistors are wrong, or you have a cheap module which is out of
+> spec.
 
-|= one of the assignment operators, all of which have one of the
-lowest precedence. Only the , operator has a lower precedence.
-Therefore, everything except , has higher precedence. Therefore,
-the parens on the right hand side of |= make no difference.
+OK, I'll try to dig into this a little more...
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+--Sean
 
