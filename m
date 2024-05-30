@@ -1,198 +1,203 @@
-Return-Path: <netdev+bounces-99463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B38258D4FC3
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 18:23:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1927B8D4FCA
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 18:25:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDE381C220B3
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 16:23:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C5871C226FF
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 16:25:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A90521CF94;
-	Thu, 30 May 2024 16:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9884428DBC;
+	Thu, 30 May 2024 16:25:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=sapience.com header.i=@sapience.com header.b="/DkbkW7T";
-	dkim=pass (2048-bit key) header.d=sapience.com header.i=@sapience.com header.b="Vti+mgL7"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b="zXNufaPs"
 X-Original-To: netdev@vger.kernel.org
-Received: from s1.sapience.com (s1.sapience.com [72.84.236.66])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2129.outbound.protection.outlook.com [40.107.93.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F64022EE4;
-	Thu, 30 May 2024 16:23:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=72.84.236.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A702376A;
+	Thu, 30 May 2024 16:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.129
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717086232; cv=fail; b=nQOM/sB38lSKiaEM9bC3zF8Emd7mxpS4cf4GVPlxsSbcQRUPT/9Tyk/jZiAdkb8Wr1CMlIVEc6zq7HZaRUAVow6+9RcIsCxSBXb8K5aYQQUU+N0KrGxJHeEWJ3XAiR3uOvDBy4sbvk2pRmqbuQkTYY69Kbpcc4cp8inCLABFZ8U=
+	t=1717086303; cv=fail; b=Hiu6EwcQTSWYjIpp9YfVaFf4irZHD4GObMrl3YLegf29wu+GwYQs2q7HjZxvWCNfUFymeAoC2yGJuIA5sHRIXsKGdw+YqIlBwnwGrc/EI8TPxMs+hgN5ESqp9ZoMzSxduQC5Sjj1LgZMc1QU2iQsh5rslPAgIQbFL+TKoe2R45c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717086232; c=relaxed/simple;
-	bh=pgv/sBueGj0uNKfB+M0Djeywb+8H0C+WrvypBsXAPEM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KXqH7tUxVkwuVzSB1l+bpw1+6nObsCC5x8X81HLD5Ph06vItDoYZ47tEaol7L0SYpwPB0MFQKlzROYTHCMkM+oK91kIZ4PztBwHrHAK9GazTnii9NGGKbMq61+atlI3y1I3IO9A/anWnvUlzUpEuxiD4bQf3xpu9+78+HkJD/8I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sapience.com; spf=pass smtp.mailfrom=sapience.com; dkim=permerror (0-bit key) header.d=sapience.com header.i=@sapience.com header.b=/DkbkW7T; dkim=pass (2048-bit key) header.d=sapience.com header.i=@sapience.com header.b=Vti+mgL7; arc=fail smtp.client-ip=72.84.236.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sapience.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sapience.com
-Authentication-Results: dkim-srvy7; dkim=pass (Good ed25519-sha256 
-   signature) header.d=sapience.com header.i=@sapience.com 
-   header.a=ed25519-sha256; dkim=pass (Good 2048 bit rsa-sha256 signature) 
-   header.d=sapience.com header.i=@sapience.com header.a=rsa-sha256
-Received: from srv8.sapience.com (srv8.sapience.com [x.x.x.x])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (secp384r1) server-digest SHA384)
-	(No client certificate requested)
-	by s1.sapience.com (Postfix) with ESMTPS id B10AE480A32;
-	Thu, 30 May 2024 12:23:49 -0400 (EDT)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=sapience.com;
- i=@sapience.com; q=dns/txt; s=dk-ed25519-220413; t=1717086229;
- h=message-id : subject : from : to : cc : date : in-reply-to :
- references : content-type : mime-version : from;
- bh=dYO5M/SWP6VTWCO+9ICoA/oxJGt9BK5VSGvf7uIy8bc=;
- b=/DkbkW7TFBSmFsKekzbJJja6XCq5dkQNCaLQDvp1dWYwANzxAC0716JGFC2K2l8IejIwz
- d51zu9L9Amb4+cTAw==
-ARC-Seal: i=1; a=rsa-sha256; d=sapience.com; s=arc6-rsa-220412; t=1717086229;
-	cv=none; b=iB1cd9emc9n5onI2zUhwk8DjlZMTziCi1/Dg9luEFk0NgnW/PrqpdX93atHlebk+woIX9zsrFGgqLwxyTAwdKA58Vb4n6tKN+Wim0e9HQS79XSDjgr6+qc9r+ShjzMhxHBm2pjmWpETTmUT/9PxFoah3RXEqaCmj8yjK7lzbDCFVigviSteDa7nUPwzXFondOGeeDYvIgHhMGq9GacTGb72JFzWqLSebfQldV8IIy3CmJKGtC4c34/MPijKOvR343B/bNbgMjRhgC22E6zfAKpvnW1+EMHrQaJ+3lWjczkwN7wNt8D6eZ40F9K6pVndjiCni9u2K/v9WCBNoJlQP1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; d=sapience.com; s=arc6-rsa-220412;
-	t=1717086229; c=relaxed/simple;
-	bh=pgv/sBueGj0uNKfB+M0Djeywb+8H0C+WrvypBsXAPEM=;
-	h=DKIM-Signature:DKIM-Signature:Message-ID:Subject:From:To:Cc:Date:
-	 In-Reply-To:References:Autocrypt:Content-Type:User-Agent:
-	 MIME-Version; b=IYCYOgQLJx9CCBURcnxT8AQIE3O/hWUgQqL+J3L/4/Ctcy8i5u8pOMHCWthQT51bU4RqcZxwSDmSecv5QcHnd3bJp4ELuayzX48uFXIgCV1v6xbxSJwtuk++DHxH3FAgVLUu+IpeKkQi9KnMatlnT3FMU3vZhrPPIBhzr7Ejk4jcO2pqApcfsjwnvfKqw3bPEAEEIRwvtx6b1C6mCxfAyPMIYHd+oJJCVQv7JgChrT3SHVNxqXhNlrE3mEapG5JHYmiBc4oIK/7y9df3JkXfKjOMxt43qlh8zCwzNmU1H7pLeusiWIoYUWzR+vBiytO6KFa2nK90s+RSSwv3u1ZPJA==
-ARC-Authentication-Results: i=1; arc-srv8.sapience.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sapience.com;
- i=@sapience.com; q=dns/txt; s=dk-rsa-220413; t=1717086229;
- h=message-id : subject : from : to : cc : date : in-reply-to :
- references : content-type : mime-version : from;
- bh=dYO5M/SWP6VTWCO+9ICoA/oxJGt9BK5VSGvf7uIy8bc=;
- b=Vti+mgL7eSBgug5ZK5bUA6iNFjXba5Yv3b/txFC9eYAN91R3i3ZO91/tHG/2Cx4DO5NCr
- Qw1v8ShCt15IzglKOrX3p2rVfmykD85j5Xu5P9s9ui/PSExgFhKwR8J0j8hRylwdUenuqgf
- MM6/AEe1/DFp0c5jvomDmV6dqWGXK2jIBrfYMSDg0i+r9rLegGZDZLuKf5vznP7AwQNJVwY
- Iv2gxhVGJ40F2O+iQETVMrwvMqfeK1ih3Ye4Un1m6GgTq/XAPnxFApjsKmAnq/an8W+tlgp
- eoONbi1eSQ1yoX5MTBYI5j+uF4nyo8Q0xRQXNoa/4OssHTPDJnys+Gv8Mekg==
-Received: from lap7.sapience.com (lap7w.sapience.com [x.x.x.x])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (secp384r1) server-digest SHA384)
-	(No client certificate requested)
-	by srv8.sapience.com (Postfix) with ESMTPS id 7C04228004B;
-	Thu, 30 May 2024 12:23:49 -0400 (EDT)
-Message-ID: <73d37ff63ee7cd88772fc0767f4474317b56a0a8.camel@sapience.com>
-Subject: Re: 6.9.3 Hung tasks
-From: Genes Lists <lists@sapience.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch, 
- hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org,  pabeni@redhat.com, johanneswueller@gmail.com, Thorsten
- Leemhuis <linux@leemhuis.info>
-Date: Thu, 30 May 2024 12:23:48 -0400
-In-Reply-To: <ZliHhebSGQYZ/0S0@shell.armlinux.org.uk>
-References: <9d189ec329cfe68ed68699f314e191a10d4b5eda.camel@sapience.com>
-	 <15a0bbd24cd01bd0b60b7047958a2e3ab556ea6f.camel@sapience.com>
-	 <ZliHhebSGQYZ/0S0@shell.armlinux.org.uk>
-Autocrypt: addr=lists@sapience.com; prefer-encrypt=mutual;
- keydata=mDMEXSY9GRYJKwYBBAHaRw8BAQdAwzFfmp+m0ldl2vgmbtPC/XN7/k5vscpADq3BmRy5R
- 7y0LU1haWwgTGlzdHMgKEwwIDIwMTkwNzEwKSA8bGlzdHNAc2FwaWVuY2UuY29tPoiWBBMWCAA+Ah
- sBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEE5YMoUxcbEgQOvOMKc+dlCv6PxQAFAmPJfooFCRl
- vRHEACgkQc+dlCv6PxQAc/wEA/Dbmg91DOGXll0OW1GKaZQGQDl7fHibMOKRGC6X/emoA+wQR5FIz
- BnV/PrXbao8LS/h0tSkeXgPsYxrzvfZInIAC
-Content-Type: multipart/signed; micalg="pgp-sha384";
-	protocol="application/pgp-signature"; boundary="=-+QEfLFhrShG4Mf1bhoXy"
-User-Agent: Evolution 3.52.2 
+	s=arc-20240116; t=1717086303; c=relaxed/simple;
+	bh=k2mMwNEZ/CZMIab1bN+4+fgyFZdJ4MXUageWlnXYQjM=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=dsx/Km1HjqGryr/16B+YiCJn0UAVcyBaWV18wpU6lbHyXqv4IRMIEmzK/g2bfjnGo5jrigqTMnyiVb4cY5N5O5yXMSe9QJpqCmHEqnVr+ER7Q94aVRBnC7rmQYJPIEY+3FvNHj7coYcSPHALKrzcmYjOh4iP6Nbn4Vzak6kj4fA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=fail (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b=zXNufaPs reason="key not found in DNS"; arc=fail smtp.client-ip=40.107.93.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aWoHymj/vpW+YDWC/HgN81BvWjgeCfZy2//Os/XAMHtJH2coQPp1iz4sOcgqGy4GF2CtfDvW1mtqscMEtNEBBouS7Syj4Jh4jhV0Vjj4GgqGkPvTEQPvoRJJROnOwtMQt3BQGruZBDriTAQvVZTElzHkia/6wQrXBFXM7KZNN4bRFiaSLLKhptNr3LRVuOik9lC5qsn0iaJtOxUp9S9OFs4nlGly7IhVz5SmV+5MAmRuteOLqwVIvX7bQq6VlH6SI/IMdaM3w6SLbELcbe9oxMGg+ZODRutMOAszbhhCHMCf5I1jVaPfa9XY/VqcTxbEPuxs6CglC4aWZlgPt2vygA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Bf31ph3G8MTQTtY2CNUF1gzr3KEbmQOJVdyuh0WNncM=;
+ b=fwIBV0vlQCnjHXPNJn8gW0MRQPdFuiSP46FFoGVsHr8OuAoOkzsBzI9OY0NFYt9OfvB8e5pbxcfr8XLj3Pmz29TW0eMr54CZFy9c8fATZlbXivgctktXbgDpziw66WCZxrwnOTizBKiRTuJj8LR7vZbunFUjudzsK8U5MfkMB9LlbH/TbrIpHaLpHz03zYbrj3WASn207gflDhWNliCo/4bT02wGfSpxMt9gY7gOvoQpdZef1fTuoHe14dFnXtLUffVtZnJXm6ZUMM8HrxWvjeOr0lDun/CPsEkt6Il8w7OgSQrf4Lh6KLVo8ZWlEH4FYQbp+awBZ7lFgCsRoCQDhA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=amperemail.onmicrosoft.com; dkim=pass
+ header.d=amperemail.onmicrosoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Bf31ph3G8MTQTtY2CNUF1gzr3KEbmQOJVdyuh0WNncM=;
+ b=zXNufaPskBz0zAmBtfABJ+OE5/ZokEXIhsB22qqTschetgAYh1C9fffApa6KbgAH2WUIOaSSfASxstGZMMAZlAUHvKU6tN3Pzw3GBPpBvI5i5L8jAXx/zqMF3eY/MkPWz4dpVi9y/8COaqphjXQ50sfRdj649WB/tHqbKgUz8cI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
+Received: from SA0PR01MB6171.prod.exchangelabs.com (2603:10b6:806:e5::16) by
+ PH7PR01MB7680.prod.exchangelabs.com (2603:10b6:510:1d7::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7633.19; Thu, 30 May 2024 16:24:58 +0000
+Received: from SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d]) by SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d%4]) with mapi id 15.20.7611.016; Thu, 30 May 2024
+ 16:24:58 +0000
+Message-ID: <75d4b180-206e-4d48-9506-f0f602b46eca@amperemail.onmicrosoft.com>
+Date: Thu, 30 May 2024 12:24:53 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/3] mctp pcc: Allow PCC Data Type in MCTP resource.
+To: Ratheesh Kannoth <rkannoth@marvell.com>, admiyo@os.amperecomputing.com
+Cc: Robert Moore <robert.moore@intel.com>,
+ "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, Len Brown
+ <lenb@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240513173546.679061-1-admiyo@os.amperecomputing.com>
+ <20240528191823.17775-1-admiyo@os.amperecomputing.com>
+ <20240528191823.17775-3-admiyo@os.amperecomputing.com>
+ <20240529032541.GA2452291@maili.marvell.com>
+Content-Language: en-US
+From: Adam Young <admiyo@amperemail.onmicrosoft.com>
+In-Reply-To: <20240529032541.GA2452291@maili.marvell.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BY5PR04CA0021.namprd04.prod.outlook.com
+ (2603:10b6:a03:1d0::31) To SA0PR01MB6171.prod.exchangelabs.com
+ (2603:10b6:806:e5::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA0PR01MB6171:EE_|PH7PR01MB7680:EE_
+X-MS-Office365-Filtering-Correlation-Id: d4ae5bfa-68ce-4ea1-808a-08dc80c50c33
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|366007|376005;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?cHRxZHVYMUlzZ29kZXBhNzNVWkJqRFBid3h4NEVUODNUaEwwaG5lMS9kV0lh?=
+ =?utf-8?B?b1VteTk1b043UTk1NDJiblVHNysyTGVyaEFHRTZYbjhoc3RTWGlWOTN2N0oz?=
+ =?utf-8?B?bzBhZWU3OTlzclRaOTBIekEyQ2FkaElwWmw4a0JBcDRDU1JNQXovNm14ZFB0?=
+ =?utf-8?B?YVV6eFU1ckNJZjFlWFduWGp0VTIvR2t6MjNUTDRtU2J6NWVhY080Ym1tejVj?=
+ =?utf-8?B?ZDdTRWtsYUlJSnRZbVltQit4RzVldnpXRHhYY3NKZHE2MWMyRVFqdGN0Zys5?=
+ =?utf-8?B?NU9maUZuZFBPUkUvMHVWMjc1QUtqM0dEY0pqUm1iZHJQclFqV3J2S0w1Umdm?=
+ =?utf-8?B?M0wwNTY5eVZYL1grMnFickdUSlM5Y203VVo3ci9iMlJzWXM3WTdXZ01mOVZT?=
+ =?utf-8?B?QVFoSE5oVWw4b3RkZXhkNVlsdUE4bG0vZ0s2Nm5QRXBLanp6R3k1eEx2Ylpp?=
+ =?utf-8?B?V3NzcTRXTWFXSXF5UExaZU1NTDJaWk85YTRsazZIZ2V6VW1xY05UeHpHd3dn?=
+ =?utf-8?B?UElmMENZTEQvekJSWXBldmhveWI3ai9pVE9Wa1VXYmhPRUZQWXJGNHlHcjFL?=
+ =?utf-8?B?azRENDEwWXJuWHYxVWRRaXNpdXFEZ0hQNnBJMy9HcUZndkUyelNVM05nS0wy?=
+ =?utf-8?B?clhsNDdDa2l4WWlsZk9rL0NvVlYzd2dxYWQyT2kzU1VxU1BTNlN4VUdRTndy?=
+ =?utf-8?B?YkNaN2FnSzNhUnl6YWRJWEl5MkFUSTN5dmJtL0czSlcwZ3RzQUo0a3hvd1Q2?=
+ =?utf-8?B?NXAvOEJ1bkZQZlpsWVVPSkhXMXdLVEZrbU10aUp3ZXBTaDAyajRNYmRRd2dq?=
+ =?utf-8?B?WVhma09xYjZlcmRtR05IZzZsSWg3RVpDdjdEc0QxNCtnVG9IdkRmc05raVdS?=
+ =?utf-8?B?OEZYZk1RLzROcjVDRDV4cGhKU2cvOVJVaGVVRmZLcCtEWGdUamYrMEdKbC94?=
+ =?utf-8?B?RUg3UWEvbFhLMmhjbDRGL05VclJnVnNtcGptS0ZURXpvekx3TGszcGhGaTMy?=
+ =?utf-8?B?QVRFUnhNYVlRRGJTT0lkUTdUckhoWW8wQXBLM3ltNEI1NEpubDVSVnNoS2VK?=
+ =?utf-8?B?SGJud3l1Smd3bGpSWHM4cU9uN2g1MHEzZjUxNEVNMExNazRGQUdHSHpaRE5M?=
+ =?utf-8?B?OWxxYldIdW1nVWxOTTBxeDJPNWtETkNNUm12YWpja3ZxTGt3dTRzLzE4YVdV?=
+ =?utf-8?B?cEIxVW93bktpYm15Rk55bGEzM2lrNVdCL21xUTYzY2FLOWMvZ0pjd04yOHFC?=
+ =?utf-8?B?VnY1NXhhTGYxczZVM1Qva0hGVDAza0dLQk5sTEJzdmRaUm40MDRDT3BoZXZY?=
+ =?utf-8?B?REtzVlltUllXZWhhNUVTeHlyeTBGYjBsMEFTaVh4Q3pEQ2FJMzFnTWgvN3Zs?=
+ =?utf-8?B?djFuMGZyRmRFUVM5eDJpN2hkOFRqNi83QlRKYjdkNXhWZDBDS1ExZnlyeEMx?=
+ =?utf-8?B?dWNtaXRzcGFOaFBHb05MZ0ZPeWJ4UUtuRElxeEZkUFV5alFLZ01qNTU2SnFn?=
+ =?utf-8?B?Mm5tSWpqNEwwOW9neHE4Yk5GTTRTQ2pQcGw1RkN3ZWNYRjV1ODhFS3o3bnRs?=
+ =?utf-8?B?cEJPT0RnajB1OEx0dUI1UUV5N0dzRkpKOTZDUys5NGI0aUtyNW9GQ2s5WXpZ?=
+ =?utf-8?B?eGJOMUVTZDhWQk5iUW1xT0c2SENkWFRuZTFmSXRnSjZWRTNZNGhVYUliODZL?=
+ =?utf-8?B?Ly9ZUExoRVMvZFlJR3dIcTlqQjZQTEwxMUVDWWs5M3dZMzZ2UjJ1bjJBPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR01MB6171.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?V1VJekRuYTNDWFpmd1RWSTcvUGxlOWI5bFc4NDBITTIwbDZ6REt6dGFmSTcx?=
+ =?utf-8?B?T1pPR09MdlY5SG80VDZjKzBkZGRJbENmMXo0YWRPVFFxa2hWeFJSeEEvcVJC?=
+ =?utf-8?B?T3VrbGx0Vk9ZYTBpeXVPMUJ0NjNjWlQvS3ByZ1FUblpMOVF1NkNENlR1dm1L?=
+ =?utf-8?B?TGdIMmxSQWRGemNWK1FMdFRSQkpxYjNVSzdidUFzZUxNeE1YTmc4dHVmYUY4?=
+ =?utf-8?B?VkozRkF4ZHlObE5OK3VZSDU0Y3RDaE9nYnVMczlNRW42NGpyVE01NCt0bGtJ?=
+ =?utf-8?B?K3hRcnd1YkRmV3pLZlFaZkNQQXlvYkUvWkhlNUtYS2p1WElSdzZHYno0aGJ0?=
+ =?utf-8?B?NG1FODhjeFB1a3c4RDkySVVvOGJmL1B4VDc2LzY5Rzh5aWZLMjFTd2M1c0hh?=
+ =?utf-8?B?em56OCtzR0N3Y01FZnJkZFFtOWxsVHZxZ0lyRWN3ZzBDbTJCS0FkcGQ1SVEz?=
+ =?utf-8?B?Tms4Q3JUOFliS0Mzc0FySkF3eGdVOUg4c2hNZ2EwaXp4a1RpRkltWU9GbGYy?=
+ =?utf-8?B?M3huTWFWb2ZRVnR0bHltT3lXd1Q2QkxvQzZ5WGphdFJ1TkU0eWU4V1hLdVJo?=
+ =?utf-8?B?VHFwSXRZTXV5aGw4TFdLTXhHL1Rocm4wait5Sy9mY08xRGpVem15cGEyNXpD?=
+ =?utf-8?B?dmJGVGhqaENmYmh4TmpVS2drbi9KVUQxSnV0WmQzVEZGTHpuQ2txOUZRUVJt?=
+ =?utf-8?B?U2FQTk5INkNlc2xiK21GeCtyL3RrSTNUQWV3bllCdnk2WFJSSUpqb0l2bzN1?=
+ =?utf-8?B?YUV2SGV1VGpMYkE1SkhyZlRtT3NwSUFuZVl4VEdTcjdwQ3FhNm9UWTNkSDVO?=
+ =?utf-8?B?VWlRV2dOSHBhUjhvejIyS1RwN1BEZlhBMTQ2eXdoM2xhVldRMXdJUVVqN0w0?=
+ =?utf-8?B?SDBTd1pIWXRiREQ5dWc3SUlJbnFUWitVa05yV3hIazBjYldONFR4QVlNNm5N?=
+ =?utf-8?B?UVNQSVQ5RTE1dGFJUkNrTXFiK3d2RmtYVUZMSTFFRHU2bDdMaHVpbWJqSTNB?=
+ =?utf-8?B?bkhLM0IxOTRZa3BReW8vRldHMDZHVGY5ZG5yc3MzbFh4T0JUNHA1YmtZbnJ2?=
+ =?utf-8?B?Z0J1eFVVanhBZFRKUmc0Mkh3bnpUaFkwNVAwQmJkQ3FJUE9kQ2MrVlBXUTlK?=
+ =?utf-8?B?UEt0T2pHTU9WMFlhbGJkY3NKZFdUSlJoYjhuR0hvTXAvcXNNMHNLbFo0c3NT?=
+ =?utf-8?B?cjNkN3RNbWYreWNLdFI3UEZNdXJKTnRsTWVUMkpmSC9oRUsvUjVyRTZ5Y1JG?=
+ =?utf-8?B?S2JaVW93WUVnZGcwTVFxV3JudkpXRUJpcG9tVTNiQzRLRExKYi9UVFpiNUxn?=
+ =?utf-8?B?cGhVR3JqYUE3cW1aR2drcDVhVEt1RWV1dG9hako1R2o2czVmN3cxWFBibFVF?=
+ =?utf-8?B?aU4xYW5jeGFwSUdaTDd4K0dyVUtmWXd5RnR2emlYN3ZUN05NR3B2UHBYbmx1?=
+ =?utf-8?B?SHJhLzBNSnB2RmE1UVJGVDhMRHhqREFYSHRtemtjVGk2bnI2OTE0bFgxcHJB?=
+ =?utf-8?B?aEVsaFc2bi9EWkI2UUZTaWtreWVNYjI0a2szMk1nMGpPalFFMHFoRmV3dk80?=
+ =?utf-8?B?eTFDcWJaSVFFNVpmbWdjaDFjbDIwTU4wRkZlRnFoVlRkWFJiZE9ZcXpGWS9r?=
+ =?utf-8?B?MWRIM3YvOXR3cEd2RllJUDhtbHhpRk5NN1lWWTRuWUZDdnhEanV5MU9zTnR6?=
+ =?utf-8?B?bmM3cHNkRlJTbWRvQ3VaVHNxS3lOL1NpaUZOcVovZmFjV0hIeVQvRm5LdmpJ?=
+ =?utf-8?B?RUVRelpsaXVQK2g5Vm83cyt4OTBBblJWMitlU1BWZTRqejkyQXdJdzVid0Zp?=
+ =?utf-8?B?SVBwMVJWbndKeHNJWHlYMlI0UXRVMnB5RkdUeXJpM01HcEVPc0p4OFVZc25k?=
+ =?utf-8?B?aGN5Q2czTEg5cldtOW9JME9aQzBDc3FvZzh4YlVLOEswaXVxSndHRDZ3d1o2?=
+ =?utf-8?B?T1JwQlVvWFJtcXRTbUhpbDlLWjgzTC81dGFmY3dsK3pwY1RsNDRseVZwb0xw?=
+ =?utf-8?B?Nmt4NDJhNjVEelc1bnlTVWFlQkZtVGwveUgxNVBrRGRMTE5Ta1JZUjBJRXFT?=
+ =?utf-8?B?c2hXeFpleDhjYm9qcHFuSWVvckM1UzlwTnlrb3VnYmExVUllZnRJVjlhZ1J5?=
+ =?utf-8?B?aUZuODhZMkV4dnF0SFNwcWpkTXpQemNqN2ZJQ1lPQjN3d2QwRzdxMktMZ2Vo?=
+ =?utf-8?B?dThaWXRjclFnVGpHSExYcDhDQ2J2Ry85TDV6eFJvcWgvZUUyd1NYVk9FMTJD?=
+ =?utf-8?Q?0ymStmzYenZhPA8vPHQKNlKK9iGlfiA1jamsDoZQFQ=3D?=
+X-OriginatorOrg: amperemail.onmicrosoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d4ae5bfa-68ce-4ea1-808a-08dc80c50c33
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR01MB6171.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2024 16:24:58.1954
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 76YBSCjZyu8FzfZZK89JU+UbjlXeOkw1oIiO27IoFQzbKG7yvqPWyGnnCrHDc0mi8UnWKzRadA8G5vva/qxMCgDe3XRPxg3EEaUJrGTPRD/bM75q4yqLV3W5GkkgeG+W
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR01MB7680
 
 
---=-+QEfLFhrShG4Mf1bhoXy
-Content-Type: multipart/alternative; boundary="=-2wjINsonf24vl+/OcDje"
+On 5/28/24 23:25, Ratheesh Kannoth wrote:
+> On 2024-05-29 at 00:48:22, admiyo@os.amperecomputing.com (admiyo@os.amperecomputing.com) wrote:
+>> From: Adam Young <admiyo@amperecomputing.com>
+>> --- a/drivers/acpi/acpica/rsaddr.c
+>> +++ b/drivers/acpi/acpica/rsaddr.c
+>> @@ -282,7 +282,7 @@ acpi_rs_get_address_common(struct acpi_resource *resource,
+>>
+>>   	/* Validate the Resource Type */
+>>
+>> -	if ((address.resource_type > 2) && (address.resource_type < 0xC0)) {
+>> +	if ((address.resource_type > 2) && (address.resource_type < 0xC0) && (address.resource_type != 10)) {
+> use macros or enums instead of hard coded numbers. That will improve code readability.
 
---=-2wjINsonf24vl+/OcDje
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, 2024-05-30 at 15:04 +0100, Russell King (Oracle) wrote:
-> ...
-> And then we get to pid 858. This is in set_device_name(), which
-> was called from led_trigger_set() and led_trigger_register().
-> We know from pid 663 that led_trigger_register() can take a read
-> on leds_list_lock, and indeed it does and then calls
-> led_match_default_trigger(), which then goes on to call
-> led_trigger_set(). Bingo, this is why pid 666 is blocked, which
-> then blocks pid 663. pid 663 takes the rtnl lock, which blocks
-> everything else _and_ also blocks pid 858 in set_device_name().
->=20
-> Lockdep would've found this... this is a classic AB-BA deadlock
-> between the leds_list_lock rwsem and the rtnl mutex.
->=20
-> I haven't checked to see how that deadlock got introduced, that's
-> for someone else to do.
->=20
+In general I agree, but this code is generated  from ACPICA and will not 
+be directly commited.  The corresponding patch to acpica has already 
+merged. What you see here is what the code will look like post-process 
+from ACPICA conversion.
 
 
-Thank you for the analysis - hopefully someone can track down the
-culprit.
-
-cc: =C2=A0thorsten
-
---=20
-Gene
-
-
---=-2wjINsonf24vl+/OcDje
-Content-Type: text/html; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-
-<html><head><style>pre,code,address {
-  margin: 0px;
-}
-h1,h2,h3,h4,h5,h6 {
-  margin-top: 0.2em;
-  margin-bottom: 0.2em;
-}
-ol,ul {
-  margin-top: 0em;
-  margin-bottom: 0em;
-}
-blockquote {
-  margin-top: 0em;
-  margin-bottom: 0em;
-}
-</style></head><body><div>On Thu, 2024-05-30 at 15:04 +0100, Russell King (=
-Oracle) wrote:</div><blockquote type=3D"cite" style=3D"margin:0 0 0 .8ex; b=
-order-left:2px #729fcf solid;padding-left:1ex"><div>...</div><div>And then =
-we get to pid 858. This is in set_device_name(), which<br></div><div>was ca=
-lled from led_trigger_set() and led_trigger_register().<br></div><div>We kn=
-ow from pid 663 that led_trigger_register() can take a read<br></div><div>o=
-n leds_list_lock, and indeed it does and then calls<br></div><div>led_match=
-_default_trigger(), which then goes on to call<br></div><div>led_trigger_se=
-t(). Bingo, this is why pid 666 is blocked, which<br></div><div>then blocks=
- pid 663. pid 663 takes the rtnl lock, which blocks<br></div><div>everythin=
-g else _and_ also blocks pid 858 in set_device_name().<br></div><div><br></=
-div><div>Lockdep would've found this... this is a classic AB-BA deadlock<br=
-></div><div>between the leds_list_lock rwsem and the rtnl mutex.<br></div><=
-div><br></div><div>I haven't checked to see how that deadlock got introduce=
-d, that's<br></div><div>for someone else to do.<br></div><div><br></div></b=
-lockquote><div><br></div><blockquote type=3D"cite" style=3D"margin:0 0 0 .8=
-ex; border-left:2px #729fcf solid;padding-left:1ex"></blockquote><div>Thank=
- you for the analysis - hopefully someone can track down the culprit.</div>=
-<div><br></div><div>cc: &nbsp;thorsten</div><div><br></div><div><span><pre>=
--- <br></pre><div><span style=3D"background-color: inherit;">Gene</span></d=
-iv><div><br></div></span></div></body></html>
-
---=-2wjINsonf24vl+/OcDje--
-
---=-+QEfLFhrShG4Mf1bhoXy
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYJAB0WIQRByXNdQO2KDRJ2iXo5BdB0L6Ze2wUCZlioFAAKCRA5BdB0L6Ze
-2ztUAP9jIfYUH867epX9kme9kL3SIae0lnrtM3DSeYE1axiCawD7BDiTCWFUP3i/
-i0ulDQ52DV3I490ratrq6pxYUlXj1w0=
-=Jxt6
------END PGP SIGNATURE-----
-
---=-+QEfLFhrShG4Mf1bhoXy--
+>
+>>   		return (FALSE);
+>>   	}
+>>
+>> --
+>> 2.34.1
+>>
 
