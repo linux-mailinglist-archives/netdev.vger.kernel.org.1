@@ -1,111 +1,124 @@
-Return-Path: <netdev+bounces-99282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 151098D4462
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 05:58:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60C7F8D4470
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 06:08:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7727285647
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 03:58:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73D3E1C20E8C
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 04:08:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A7F5142E73;
-	Thu, 30 May 2024 03:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mJL20TPn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9247142E77;
+	Thu, 30 May 2024 04:08:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD56142E6F
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 03:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53EE541C93
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 04:08:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717041482; cv=none; b=tjka4hrASoqAzJO7979TWVEHUk5GeqUVFNoBV5OTzNYVHkDdfLsXIGCT3yihWDM3iIv9ftcM4srWrdnTJ8Wtoj7+pkW+aN9ow3yIl3UTgPlq0JCWppQLzetLbr103ec/GVJC3dIAkwjb8BlV9zWRLgvMMjvHXijAekbNpgeiJxI=
+	t=1717042126; cv=none; b=pa/kzAVpo/AErHWawr+OS3EB43MC4lSIrveU0Y9V2V4nHRPiQDRqZHoVGMk1PANHxQvruE6SifjBogApssnj2iNbXFrTg+bwS9mMjTzX1WCDaEDfuo0ZvXpU7BFaVNvegzMXuKs2BWvZij7ZMOU6U4542N6wW4O4HBKT/R7j05c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717041482; c=relaxed/simple;
-	bh=uUv6AhNvMx6WlFeofx7ehtpINtZ6aM5IJs0Q+yQFSwc=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=tezqVFFky9bds9whtT3JLYNRZxHmurtIjktnuv7kI8VpQmX5g/BpzubzQUVRvr/ogJ2v1Y6wkBXNByPBrPxO+KOBVpT9rXVXU6LOYcqHpX8plymhSRF9ZlTQ2/l5kLI/tLGimaD9PrqvIAylFGyYgB+EaxxBKOzay2qwIX6adDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mJL20TPn; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1717041477; h=Message-ID:Subject:Date:From:To;
-	bh=ZbZ4Z21lz7ppnxwsjw/Iag0omCFAmUVoOusD/Ck66a0=;
-	b=mJL20TPnMHrcvPqDFCrZEHgPkJ9lfQstVNn3aLypJOHo4XdHYGUX7SHuBS2m9tZBIj8dTpzYyWEfjlrP14FygH4nqlYFaLBx8pj9otcZDnxeCXuBzCgV5iGR1hCBjq/A6rCB4lnLULFvHTSu+/BZF2v82DE2tNcrbgK6VD6GUOM=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R731e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045075189;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W7VeU0._1717041476;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W7VeU0._1717041476)
-          by smtp.aliyun-inc.com;
-          Thu, 30 May 2024 11:57:57 +0800
-Message-ID: <1717041469.8007479-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net v2] virtio_net: fix missing lock protection on control_buf access
-Date: Thu, 30 May 2024 11:57:49 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Daniel Jurgens <danielj@nvidia.com>,
- Hariprasad Kelam <hkelam@marvell.com>,
- netdev@vger.kernel.org,
- virtualization@lists.linux.dev
-References: <20240530034143.19579-1-hengqi@linux.alibaba.com>
-In-Reply-To: <20240530034143.19579-1-hengqi@linux.alibaba.com>
+	s=arc-20240116; t=1717042126; c=relaxed/simple;
+	bh=mGHJkLqPTunZvtG0brlA2e03YrUEf9+p5xpd81ZPbk0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AJQEBR3f3caNs0MNV6GbYk+WwI1NIQfA2RPI/GErGUhstzRUi+aLBm+ejQTcDB7JzxzEUzOc3enp3OfEw9oNA6Xts280x44qj75KKQtmiPQXhe+7hsM+dBKVFHYBqS2PLJA3cnGy8qV1L79ABbAZ3V82zmwwFYtR1BC+Tg3X7fA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44U1MBLH028524;
+	Wed, 29 May 2024 21:08:30 -0700
+DKIM-Signature: =?UTF-8?Q?v=3D1;_a=3Drsa-sha256;_c=3Drelaxed/relaxed;_d=3Dmeta.com;_h=3Dc?=
+ =?UTF-8?Q?c:content-transfer-encoding:content-type:date:from:message-id:m?=
+ =?UTF-8?Q?ime-version:subject:to;_s=3Ds2048-2021-q4;_bh=3Dn57uN2azQyajk8t?=
+ =?UTF-8?Q?HAR9gBFCXBYfYXkRIniVK5OyT5sk=3D;_b=3DmEhKjbzxbNyCGqqYpGIaR3GIr7?=
+ =?UTF-8?Q?lwqjz8w77jvsTLF9QTVi1sEzQKDzKXtJ2zIwRf8ReY_35zxRyicioaUszCf/7kA?=
+ =?UTF-8?Q?/QpqsMTT2U718gMDhLbSHEZkGXc9Ebpva2c++ZavbeyMvFnV_xMfyEgd/wpzadi?=
+ =?UTF-8?Q?ICQGBBhEg4TF+qeR0lplN+JkNmwTig1V6BQlf+XkaIsiaUWKsx5mPz_Sjgy3nUK?=
+ =?UTF-8?Q?DZFMk58Lt/jytkoqMQb1gj6oCG8CeAsUV8qhyipezOe4FQgY7yM53w94BU3d_wU?=
+ =?UTF-8?Q?CYl0HNP6/PtyCLcup2szyZcN6/eVxAtE2fnH3BZ7/qtpGo2wTuw/itGpPe4c4vW?=
+ =?UTF-8?Q?eSD_5w=3D=3D_?=
+Received: from maileast.thefacebook.com ([163.114.130.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3ydkfgtp70-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 29 May 2024 21:08:29 -0700
+Received: from devvm4158.cln0.facebook.com (2620:10d:c0a8:1b::30) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server id
+ 15.2.1544.11; Thu, 30 May 2024 04:08:27 +0000
+From: Vadim Fedorenko <vadfed@meta.com>
+To: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        "Jiri
+ Pirko" <jiri@resnulli.us>,
+        Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+        "Vadim
+ Fedorenko" <vadim.fedorenko@linux.dev>
+CC: <netdev@vger.kernel.org>, Vadim Fedorenko <vadfed@meta.com>
+Subject: [PATCH net] ethtool: init tsinfo stats if requested
+Date: Wed, 29 May 2024 21:08:14 -0700
+Message-ID: <20240530040814.1014446-1-vadfed@meta.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: q5VMYWMMAQUGrsQnqtLiYZzyCEde0O2w
+X-Proofpoint-ORIG-GUID: q5VMYWMMAQUGrsQnqtLiYZzyCEde0O2w
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-29_16,2024-05-28_01,2024-05-17_01
 
-On Thu, 30 May 2024 11:41:43 +0800, Heng Qi <hengqi@linux.alibaba.com> wrote:
-> Refactored the handling of control_buf to be within the cvq_lock
-> critical section, mitigating race conditions between reading device
-> responses and new command submissions.
->
-> Fixes: 6f45ab3e0409 ("virtio_net: Add a lock for the command VQ.")
-> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-> Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
+Statistic values should be set to ETHTOOL_STAT_NOT_SET even if the
+device doesn't support statistics. Otherwise zeros will be returned as
+if they are proper values:
 
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+host# ethtool -I -T lo
+Time stamping parameters for lo:
+Capabilities:
+	software-transmit
+	software-receive
+	software-system-clock
+PTP Hardware Clock: none
+Hardware Transmit Timestamp Modes: none
+Hardware Receive Filter Modes: none
+Statistics:
+  tx_pkts: 0
+  tx_lost: 0
+  tx_err: 0
 
-> ---
-> v1->v2:
->   - Use the ok instead of ret.
->
->  drivers/net/virtio_net.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 4a802c0ea2cb..1ea8e6a24286 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2686,6 +2686,7 @@ static bool virtnet_send_command_reply(struct virtnet_info *vi, u8 class, u8 cmd
->  {
->  	struct scatterlist *sgs[5], hdr, stat;
->  	u32 out_num = 0, tmp, in_num = 0;
-> +	bool ok;
->  	int ret;
->
->  	/* Caller should know better */
-> @@ -2731,8 +2732,9 @@ static bool virtnet_send_command_reply(struct virtnet_info *vi, u8 class, u8 cmd
->  	}
->
->  unlock:
-> +	ok = vi->ctrl->status == VIRTIO_NET_OK;
->  	mutex_unlock(&vi->cvq_lock);
-> -	return vi->ctrl->status == VIRTIO_NET_OK;
-> +	return ok;
->  }
->
->  static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
-> --
-> 2.32.0.3.g01195cf9f
->
+Fixes: 0e9c127729be ("ethtool: add interface to read Tx hardware timestamping statistics")
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+---
+ net/ethtool/tsinfo.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/net/ethtool/tsinfo.c b/net/ethtool/tsinfo.c
+index be2755c8d8fd..57d496287e52 100644
+--- a/net/ethtool/tsinfo.c
++++ b/net/ethtool/tsinfo.c
+@@ -38,11 +38,11 @@ static int tsinfo_prepare_data(const struct ethnl_req_info *req_base,
+ 	ret = ethnl_ops_begin(dev);
+ 	if (ret < 0)
+ 		return ret;
+-	if (req_base->flags & ETHTOOL_FLAG_STATS &&
+-	    dev->ethtool_ops->get_ts_stats) {
++	if (req_base->flags & ETHTOOL_FLAG_STATS) {
+ 		ethtool_stats_init((u64 *)&data->stats,
+ 				   sizeof(data->stats) / sizeof(u64));
+-		dev->ethtool_ops->get_ts_stats(dev, &data->stats);
++		if (dev->ethtool_ops->get_ts_stats)
++			dev->ethtool_ops->get_ts_stats(dev, &data->stats);
+ 	}
+ 	ret = __ethtool_get_ts_info(dev, &data->ts_info);
+ 	ethnl_ops_complete(dev);
+-- 
+2.43.0
+
 
