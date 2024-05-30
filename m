@@ -1,93 +1,90 @@
-Return-Path: <netdev+bounces-99401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DAC68D4C31
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 15:01:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 111D98D4C46
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 15:07:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 685E5B21E0B
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 13:01:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B41B9285AAD
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 13:07:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88DF817CA10;
-	Thu, 30 May 2024 13:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355CF183064;
+	Thu, 30 May 2024 13:07:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SUPmX3Bo"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0OOtwVHB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68AD176183
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 13:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86CBB17C9ED;
+	Thu, 30 May 2024 13:07:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717074080; cv=none; b=NLOE86WYQbvJ1YkHrWdgEbAgMGxVJLPXFY5Qp8qLMZHEs1hwtCAwVSOlUDCJ5WJMsIRJ+u8LND2Re5iJHxJ18F1wwk0tmZjbszABtd8mth8S1nmHo+XRHaxnYO+ogVooin88jCS0GQLmZ1FGIvbFKOL6S4S1YdtVWvaw/8KiclY=
+	t=1717074433; cv=none; b=R0nZE570zG+Gy3X/kVJ5/PFPm8Z9nE2m+5urSV0rILuvUmMlTn/y06KzDBYa9918ZoFo8UgNWWIZPf5v+vcGtLYQOcrLYVQo0O5QXzdh+PkvUUKpMUmmaIndQpruNRXTR6I5GReGM/xqW3i80/3IBLBrQXDV/FBzPnSYZID7oDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717074080; c=relaxed/simple;
-	bh=QbG0ygvFhemxwXbo8UH3vbamKCGJA+4BeTD1i2CVlnk=;
+	s=arc-20240116; t=1717074433; c=relaxed/simple;
+	bh=gzsjYTP3/WlWKHVnMyU/5TNINiOjsAjfhSkIRf8Yo7U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hWBvcNMTfPri7T0RTCpjgyXpb5oAfibQzInbX0cMoaeQMk9ccBdZESvWw628XP1rwciuKFchUXl/ef9W5DNy8wveWG3PA7jbMOwReSz59jIL8y22dNDThNfBZK6OZVeaW/T7ISh0yPh7Z2b0NGt3bY3S9igH0zbiWrmgTw24Xw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SUPmX3Bo; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717074077;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9qH6bqXZWDj2VvkhQa8r0x2CDiDZr/N+uYFn9yj//1U=;
-	b=SUPmX3Boid0aCkLSE0OcFa2/VBaqH9YQC+AVmccm8luvoMxM63+HPyABQaVo+BtAM0bFf2
-	XiFun5xzFzqblZ2tvIZG/dYlht9woF4GrBAZLbbR4fYXaFnSpVjDlQUgEvA7dexiPzgSGU
-	XnONP7m7R3OrZ0TfG6XZ725eJV6qhTI=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-39-BwJVtxVQMuuvxk086aqKLw-1; Thu, 30 May 2024 09:01:07 -0400
-X-MC-Unique: BwJVtxVQMuuvxk086aqKLw-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-43fe0f3bfd6so8076621cf.3
-        for <netdev@vger.kernel.org>; Thu, 30 May 2024 06:01:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717074063; x=1717678863;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9qH6bqXZWDj2VvkhQa8r0x2CDiDZr/N+uYFn9yj//1U=;
-        b=R1tsGr28aAPiK65CBTs4Qd4ev/+uBHcr/aei+9nakeqSjuj1gyR5svcVMZzkCXRuVd
-         JT9OKSMBL54kwe/TghgInaVP1HXin7TDP9GdGDL+CIoHesFlav74/KxUcY87CemufZCG
-         zvZtkSC6LbQ6IRN0bNobVp6Mz7fHLIXdLkCrzDIlukv1O8NE14ZPR3J+T8238X5UVOAd
-         s7Y0gnjZCosUNWYMWJvgtI4WvXOunmU8ZtlBCwd/GdrCRj8k5iPcjth5QVv5JmLSMedZ
-         pbO+HnKdX+CpW88xRBj1c54o933s6sWNwOPSjyp2c9dn8hZLUg8HbjXN56CL4X2q6ouN
-         WqYg==
-X-Forwarded-Encrypted: i=1; AJvYcCW8weBXtDCSMcvqsocOKAFL/Bue+Hy9B6NCIYmO0p0Fo8WhyOFt0VVCpUnHjjymBvbDj+p61gxNdPwbrnuBQO92bCyWpy/i
-X-Gm-Message-State: AOJu0YwAdI/O0h7R62Q/dCUAGFbNC/krQLorwa/kB2VMelBjv0wR3cR5
-	jc8VnJ2bL6RRYVZHVvU4tSZjOm9mp3LkiigkrhFqo87jgazof0UbLbVg2v33J85dJQ46gRbh+2x
-	9UAV0OSkaGrcuxjElAnuTCbHbEhdZCYc1ezh5qv16gCrVmDrp8ZAEYQ==
-X-Received: by 2002:a05:622a:83:b0:43e:3d8b:b6b9 with SMTP id d75a77b69052e-43fe930e9e0mr21742321cf.44.1717074062389;
-        Thu, 30 May 2024 06:01:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHmqMkYgzTY+K+MR+AsBjg7npPdMxiUXyD3C6fsmskBzvTeam+eNVGfcssNbpZMomvAfvLBqQ==
-X-Received: by 2002:a05:622a:83:b0:43e:3d8b:b6b9 with SMTP id d75a77b69052e-43fe930e9e0mr21741561cf.44.1717074061340;
-        Thu, 30 May 2024 06:01:01 -0700 (PDT)
-Received: from x1gen2nano ([2600:1700:1ff0:d0e0::33])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43fb18b0e3bsm65135651cf.68.2024.05.30.06.00.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 May 2024 06:01:00 -0700 (PDT)
-Date: Thu, 30 May 2024 08:00:58 -0500
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Sagar Cheluvegowda <quic_scheluve@quicinc.com>, 
-	Vinod Koul <vkoul@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Jochen Henneberg <jh@henneberg-systemdesign.com>, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: stmmac: dwmac-qcom-ethqos: Configure host DMA width
-Message-ID: <busrdvbjh7eigqgpgwl4k5tergt263gfjcpti7jutdyk37cnse@iotdvflbsca6>
-References: <20240529-configure_ethernet_host_dma_width-v1-1-3f2707851adf@quicinc.com>
- <7w5bibuejmd5kg3ssozaql4urews26kpj57zvsaoq2pva3vrlo@agfxwq5i65pc>
- <d8ad4e59-5725-4a7d-a2ad-ce5d92553525@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y9tWQMFG/VyjKnwsQNvcna35lB+dPNJ7k0bDEYg/TaKH2o+/e1mjXCAiKZTpRopUVdxlnLBCUIAn5B/t/dNmPCJmAnVzJLaK2/NWf7/h1qXOLBRaRKPndF3VyZXeepbqbKgT7NgiJeXHLA/jO2UAgU/b+phW96y2ARdmXibtSzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0OOtwVHB; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=laI44R9CkvkoWL5j55C7oR7usS/DpKOSclK7hV4WnUk=; b=0OOtwVHBs60a+zPox/sQdd+j7R
+	4bmjQkip08Y8wnmyY0Tv1JWfy6VONeDDGxl9RQuZzxekHgjLXZ/SAZY65R0/D0rdvoNud2G/eOYNA
+	nSOfKWU6wfi0ZPgrrNzM1W8NZku2IaiNbGk4OfSMlDlhRKcUnKPKTAQHOcajzcV8CcGs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sCfUb-00GLeo-8d; Thu, 30 May 2024 15:06:53 +0200
+Date: Thu, 30 May 2024 15:06:53 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Piergiorgio Beruto <Pier.Beruto@onsemi.com>
+Cc: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>,
+	"Parthiban.Veerasooran@microchip.com" <Parthiban.Veerasooran@microchip.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"saeedm@nvidia.com" <saeedm@nvidia.com>,
+	"anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"Horatiu.Vultur@microchip.com" <Horatiu.Vultur@microchip.com>,
+	"ruanjinjie@huawei.com" <ruanjinjie@huawei.com>,
+	"Steen.Hegelund@microchip.com" <Steen.Hegelund@microchip.com>,
+	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
+	"UNGLinuxDriver@microchip.com" <UNGLinuxDriver@microchip.com>,
+	"Thorsten.Kummermehr@microchip.com" <Thorsten.Kummermehr@microchip.com>,
+	"Nicolas.Ferre@microchip.com" <Nicolas.Ferre@microchip.com>,
+	"benjamin.bigler@bernformulastudent.ch" <benjamin.bigler@bernformulastudent.ch>,
+	Viliam Vozar <Viliam.Vozar@onsemi.com>,
+	Arndt Schuebel <Arndt.Schuebel@onsemi.com>
+Subject: Re: [PATCH net-next v4 00/12] Add support for OPEN Alliance
+ 10BASE-T1x MACPHY Serial Interface
+Message-ID: <70cf84d1-99ad-4c30-9811-f796f21e6391@lunn.ch>
+References: <2d9f523b-99b7-485d-a20a-80d071226ac9@microchip.com>
+ <6ba7e1c8-5f89-4a0e-931f-3c117ccc7558@lunn.ch>
+ <8b9f8c10-e6bf-47df-ad83-eaf2590d8625@microchip.com>
+ <44cd0dc2-4b37-4e2f-be47-85f4c0e9f69c@lunn.ch>
+ <b941aefd-dbc5-48ea-b9f4-30611354384d@microchip.com>
+ <BYAPR02MB5958A4D667D13071E023B18F83F52@BYAPR02MB5958.namprd02.prod.outlook.com>
+ <6e4c8336-2783-45dd-b907-6b31cf0dae6c@lunn.ch>
+ <BY5PR02MB6786619C0A0FCB2BEDC2F90D9DF52@BY5PR02MB6786.namprd02.prod.outlook.com>
+ <0581b64a-dd7a-43d7-83f7-657ae93cefe5@lunn.ch>
+ <BY5PR02MB6786FC4808B2947CA03977429DF32@BY5PR02MB6786.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,56 +93,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d8ad4e59-5725-4a7d-a2ad-ce5d92553525@lunn.ch>
+In-Reply-To: <BY5PR02MB6786FC4808B2947CA03977429DF32@BY5PR02MB6786.namprd02.prod.outlook.com>
 
-On Thu, May 30, 2024 at 12:22:52AM GMT, Andrew Lunn wrote:
-> On Wed, May 29, 2024 at 03:50:28PM -0500, Andrew Halaney wrote:
-> > $Subject should be have [PATCH net] since this targets the net tree:
-> > 
-> > https://docs.kernel.org/process/maintainer-netdev.html
-> > 
-> > On Wed, May 29, 2024 at 11:39:04AM GMT, Sagar Cheluvegowda wrote:
-> > > Fixes: 070246e4674b ("net: stmmac: Fix for mismatched host/device DMA address width")
-> > > Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+On Thu, May 30, 2024 at 09:43:56AM +0000, Piergiorgio Beruto wrote:
+> Hello Andrew,
 > 
-> > Also, I think the Fixes: here would be for adding support for this SoC
-> > in the driver, not what's listed? Might make more sense after you have a
-> > proper body though.
+> I was reading back into the MACPHY specifications in OPEN Alliance, and it seems like MMS 10 to MMS 15 are actually allowed as vendor specific registers. See page 50.
+> The specifications further say that vendor specific registers of the PHY that would normally be in MMD30-31 (ie, excluding the PLCA registers and the other OPEN standard registers) would go into MMS10 to MMS15.
 > 
-> This is a tricky one. 
-> 
-> Fixes: 070246e4674b ("net: stmmac: Fix for mismatched host/device DMA
-> address width") is when support for different DMA address widths was
-> added. This fix cannot easily be back ported past that.
-> 
-> 070246e4674b first appears in v6.3-rc4.
-> 
-> dwmac-qcom-ethqos.c first appears in v5.1-rc1. However, Qualcomm did
-> not start hacking on it until v6.7-rc6. It is unclear to me without a
-> deep dive when Qualcomm actually started using this driver.
-> 
-> We might actually be looking at this the wrong way, and should in fact
-> be looking at when a DT patch was added that made use of the driver,
-> not the driver itself. If it was not used, it cannot be broken....
-> 
+> So I'm wondering, why is it bad to have vendor specific registers into MMD10 to MMD15?
+> I think the framework should allow non-standard stuff to be mapped into these, no?
 
-I should have been more specific, sorry.
+From an architecture perspicuity, PHY vendor specific registers should
+be in the PHY register address space. MAC vendor specific registers
+should be in the MAC register address space.
 
-I think this should be:
+It seems like the Microchip device has some PHY vendor specific
+registers in the MAC address space. That is bad.
 
-    Fixes: 8c4d92e82d500 ("net: stmmac: dwmac-qcom-ethqos: add support for emac4 on sa8775p platforms")
+Both your and Microchip device is a single piece of silicon. But i
+doubt there is anything in the standard which actually requires
+this. The PHY could be discrete, on the end of an MDIO bus and an MII
+bus. That is the typical design for the last 30 years, and what linux
+is built around. The MAC should not assume anything about the PHY, the
+PHY should not assume anything about the MAC, because they are
+interchangeable.
 
-Which appears after 070246e4674b ("net: stmmac: Fix for mismatched host/device DMA address width").
+The framework does allow you to poke any register anywhere. But i
+would strongly avoid breaking the layering, it is going to cause you
+long term maintenance problems, and is ugly.
 
-Reason being that specifically Sagar's patch is indicating that for the
-SoC's/compatibles that currently use emac_v4_0_0_data structure, the DMA
-address width needs to be specified.
-
-If we were modifying structs that were added prior to 070246e4674b then
-I agree, but at least the change as is I think could indicate the above
-Fixes.
-
-Thanks,
-Andrew
-
+	Andrew
 
