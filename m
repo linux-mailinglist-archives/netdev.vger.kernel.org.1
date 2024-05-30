@@ -1,299 +1,130 @@
-Return-Path: <netdev+bounces-99428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24E608D4D85
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 16:09:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D7528D4D8F
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 16:10:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22E451C2120A
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 14:09:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B10EF1F21696
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 14:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5FAF17D8B0;
-	Thu, 30 May 2024 14:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3DA6176233;
+	Thu, 30 May 2024 14:09:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TC6DJvho"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hLYeVC8E"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7541617D8A9;
-	Thu, 30 May 2024 14:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B189F186E3E;
+	Thu, 30 May 2024 14:09:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717078092; cv=none; b=Sf1wnEizElYArU7Vr6IfX/2m0ARkZa+gINNbAfxj2+B5/G0DVw8zHZRjr3eE+cCD5XCLFsr1O0RXN9DU6qNqsQ36E/8il77jjQx+Mu7kbnYg3J30SseA/Qj1jZhJYZSUKjNjIZOmJY/CflbAn4fAQWCToC0pcA+G7m3HtDxcOaE=
+	t=1717078174; cv=none; b=tAby/oLyfOAk2SKpxN65OlHT2RmxNaC2VHZTxGYnNctKcNUvMzcXG+hBUVQk5ocZq0FaPBrNZcHyNoXuLq/aDszptWRj+Pxw4TrIkyB/Wb12driyWOgqAr/B8uvyJvahVFj5sbCkjZ/ATBLz8m90nuSasankb+rTex1llwDrmn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717078092; c=relaxed/simple;
-	bh=iC5sHTeety2sZO7dIyi8nb8XUzo5F8zKpPMD1PfEHEE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BlNnqLMZnSFa/lXRcxltOJ+qagUxYDTeedY151JEMdu0dUDgJ9CXUP4Xo9xEpzkBdK9WVnMK2xdNpVqwix7iUxTS7htdRBpYeWCO1O4k4+OOPUrq6P73jqNZkhVXGYKJIbg225c8RwnJoXvRUwituwbqoKL/kdgy23sFwzLPXqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TC6DJvho; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37DC9C4AF0E;
-	Thu, 30 May 2024 14:08:09 +0000 (UTC)
+	s=arc-20240116; t=1717078174; c=relaxed/simple;
+	bh=0mLim+N0NZXzzifrzM1f9tix9Oup0SLdlMxf8uGQDO4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Yn730kYlC+kur+UF3YcWzgYDu5zxllI8tW2UOWIPjDi1/kRq6jIU3d+kNxbH/vUl7XA0L/+ZyMUmO3i7IrIf2VStub7+ZnyzId3IUz6bZV4X68+6ddSOYVsnI+5XsYoe/F1YsH0xQv92TpmJQZ5df4RRIuqIsZNRRyZ+zE1/Qc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hLYeVC8E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B288EC2BBFC;
+	Thu, 30 May 2024 14:09:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717078092;
-	bh=iC5sHTeety2sZO7dIyi8nb8XUzo5F8zKpPMD1PfEHEE=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=TC6DJvhomq1RSFkY+le9EBCuzqhNgOBaozNmAKdnUMT97FNHTk2p5NaONwSe0PzZH
-	 kdJXTGQ9ipHukfKGKiNgEYHf4QuNFBgZkc8xUTJTgmQjWWNYB5p1NbZ2bPAPdHVTTk
-	 x8NDPhwWriA6boaqDTBGQE/P66h/b54W2ZXZjsIFBjIWca/cJ/T3ewowiX2D4csT3W
-	 ktz7S3czutmFfm/GDcXST6h/4o6CLZ57Wime07YThqIwttSeCPwbnUe1gqXmWeWgmP
-	 BoXDZPvUuHIlDafDf5ryvMhX1XlKzvrSwLuQm9GWm10TM2/QQedqi8DJZGWZ4JcubS
-	 lAM3wJUXJNAlw==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Thu, 30 May 2024 16:07:32 +0200
-Subject: [PATCH net-next v3 3/3] doc: new 'mptcp' page in 'networking'
+	s=k20201202; t=1717078174;
+	bh=0mLim+N0NZXzzifrzM1f9tix9Oup0SLdlMxf8uGQDO4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=hLYeVC8E5yfVaZZ8IGkMwO7x8cROf0taZhFZkFQlevZy9/aUEvV5+xH5zEzEkIxvv
+	 hSvE/+oo4ENBk/utTU1i4+v8HXZLbgf8YiywK5wPFSA11QM4G+29220m+zVskjZZmM
+	 kKlwzW+tgEvfmNhTRvh9/jU0LLdCVOra+vpWjjtzc7MqTKwUBPv3XgAu0QGiyueSs/
+	 QdpRFss/NfUO2dIHSokoyn9+e2F9w+Hh+yUSx5inayAdjr3Y52rmZ3Be8HdgA5T+hF
+	 pT/0riZYahiPhDhw4D9gZb6WoqBI60rbJr+a3LQrBnIRd32FLQPdzDhVmAifujPE+y
+	 i3GK9l8F4w5UA==
+Message-ID: <1fdae4f8-066e-488a-bf6c-e3f1f4f36984@kernel.org>
+Date: Thu, 30 May 2024 16:09:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next v2 3/3] doc: new 'mptcp' page in 'networking'
+Content-Language: en-GB
+To: Randy Dunlap <rdunlap@infradead.org>, mptcp@lists.linux.dev,
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>, Gregory Detal <gregory.detal@gmail.com>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240528-upstream-net-20240520-mptcp-doc-v2-0-47f2d5bc2ef3@kernel.org>
+ <20240528-upstream-net-20240520-mptcp-doc-v2-3-47f2d5bc2ef3@kernel.org>
+ <9076abad-01f6-4ff4-a176-c2f4a85eb3fc@infradead.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <9076abad-01f6-4ff4-a176-c2f4a85eb3fc@infradead.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240530-upstream-net-20240520-mptcp-doc-v3-3-e94cdd9f2673@kernel.org>
-References: <20240530-upstream-net-20240520-mptcp-doc-v3-0-e94cdd9f2673@kernel.org>
-In-Reply-To: <20240530-upstream-net-20240520-mptcp-doc-v3-0-e94cdd9f2673@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
- Gregory Detal <gregory.detal@gmail.com>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Randy Dunlap <rdunlap@infradead.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=8710; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=iC5sHTeety2sZO7dIyi8nb8XUzo5F8zKpPMD1PfEHEE=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmWIg+Ucr/LYX5c7xdpgI5aODbaKJbnOegw0MbA
- 0jYODn9ZxSJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZliIPgAKCRD2t4JPQmmg
- c6R4D/935EX6shxWOd7UIxAl6CUZuFYePiMfk+rE+aBpvSVNYR14xHvRXbAm+j+1izjtK9v1ARg
- xemOLy6uorTPvs4ON//9oZhXGCuGA27T88XN5iyu9xcGkQ0LwXj3GvkSpa/KAMwrV4Dnz8cyCS3
- Tg0LP42RsHFcjugn/w5zrdYw59WQh8ewzatqmGJd2ekVH6TjKkQHBq6pByJqNhbfRnjvVXV8dik
- 54sSBcHdvooFCtSyIrloc92hAQByeQiMC+G1R5lhjf+UGoskOv/WNIfPtj3X+YMJT8yHYdw9dLO
- MaN2P7500GXV0zE7LHjqkVcK+kJcEom+2q/7nczt6iLCHnphvp664mgWaTICrc2GqileUQGc1am
- vYx73Go1SckP7H98KEu4M8z7KrpbsVR8FTdWev2++OnyP0tDfkKXeEPDMU8ZR6qmvxS06H815Ox
- t5m7NXmFRfi+JjgTtANJ7vkLBbk/ofpUgEY/7lgLOYMhYHmnSqidKwjsxB6P80IwTRAEhd3w8jn
- BcnQHn9nRXfyZCrWJsD1sxm9BHi0TWav5plPsljLohSIGcG95EBr2n2hxK7lddgy19w2x7T22+j
- vxgoyes0S9A9lcBngHshe5AjPOnmlqlkONPyC229WJqj49T8jfZgtRhVu++W7F5dIK9Cx+rutRl
- Kgd02VvZZNtU27w==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-A general documentation about MPTCP was missing since its introduction
-in v5.6.
+Hi Randy,
 
-Most of what is there comes from our recently updated mptcp.dev website,
-with additional links to resources from the kernel documentation.
+On 29/05/2024 18:59, Randy Dunlap wrote:
+> Fix a few run-on sentences:
 
-This is a first version, mainly targeting app developers and users.
+Thank you for the review!
 
-Link: https://www.mptcp.dev
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
-Notes:
-  - v2:
-    - Fix mptcp.dev link syntax.
-  - v3:
-    - Fix a few run-on sentences (Randy)
-Cc: Randy Dunlap <rdunlap@infradead.org>
----
- Documentation/networking/index.rst |   1 +
- Documentation/networking/mptcp.rst | 156 +++++++++++++++++++++++++++++++++++++
- MAINTAINERS                        |   2 +-
- 3 files changed, 158 insertions(+), 1 deletion(-)
+I just applied these modifications in the v3:
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 7664c0bfe461..a6443851a142 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -72,6 +72,7 @@ Contents:
-    mac80211-injection
-    mctp
-    mpls-sysctl
-+   mptcp
-    mptcp-sysctl
-    multiqueue
-    multi-pf-netdev
-diff --git a/Documentation/networking/mptcp.rst b/Documentation/networking/mptcp.rst
-new file mode 100644
-index 000000000000..17f2bab61164
---- /dev/null
-+++ b/Documentation/networking/mptcp.rst
-@@ -0,0 +1,156 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=====================
-+Multipath TCP (MPTCP)
-+=====================
-+
-+Introduction
-+============
-+
-+Multipath TCP or MPTCP is an extension to the standard TCP and is described in
-+`RFC 8684 (MPTCPv1) <https://www.rfc-editor.org/rfc/rfc8684.html>`_. It allows a
-+device to make use of multiple interfaces at once to send and receive TCP
-+packets over a single MPTCP connection. MPTCP can aggregate the bandwidth of
-+multiple interfaces or prefer the one with the lowest latency. It also allows a
-+fail-over if one path is down, and the traffic is seamlessly reinjected on other
-+paths.
-+
-+For more details about Multipath TCP in the Linux kernel, please see the
-+official website: `mptcp.dev <https://www.mptcp.dev>`_.
-+
-+
-+Use cases
-+=========
-+
-+Thanks to MPTCP, being able to use multiple paths in parallel or simultaneously
-+brings new use-cases, compared to TCP:
-+
-+- Seamless handovers: switching from one path to another while preserving
-+  established connections, e.g. to be used in mobility use-cases, like on
-+  smartphones.
-+- Best network selection: using the "best" available path depending on some
-+  conditions, e.g. latency, losses, cost, bandwidth, etc.
-+- Network aggregation: using multiple paths at the same time to have a higher
-+  throughput, e.g. to combine fixed and mobile networks to send files faster.
-+
-+
-+Concepts
-+========
-+
-+Technically, when a new socket is created with the ``IPPROTO_MPTCP`` protocol
-+(Linux-specific), a *subflow* (or *path*) is created. This *subflow* consists of
-+a regular TCP connection that is used to transmit data through one interface.
-+Additional *subflows* can be negotiated later between the hosts. For the remote
-+host to be able to detect the use of MPTCP, a new field is added to the TCP
-+*option* field of the underlying TCP *subflow*. This field contains, amongst
-+other things, a ``MP_CAPABLE`` option that tells the other host to use MPTCP if
-+it is supported. If the remote host or any middlebox in between does not support
-+it, the returned ``SYN+ACK`` packet will not contain MPTCP options in the TCP
-+*option* field. In that case, the connection will be "downgraded" to plain TCP,
-+and it will continue with a single path.
-+
-+This behavior is made possible by two internal components: the path manager, and
-+the packet scheduler.
-+
-+Path Manager
-+------------
-+
-+The Path Manager is in charge of *subflows*, from creation to deletion, and also
-+address announcements. Typically, it is the client side that initiates subflows,
-+and the server side that announces additional addresses via the ``ADD_ADDR`` and
-+``REMOVE_ADDR`` options.
-+
-+Path managers are controlled by the ``net.mptcp.pm_type`` sysctl knob -- see
-+mptcp-sysctl.rst. There are two types: the in-kernel one (type ``0``) where the
-+same rules are applied for all the connections (see: ``ip mptcp``) ; and the
-+userspace one (type ``1``), controlled by a userspace daemon (i.e. `mptcpd
-+<https://mptcpd.mptcp.dev/>`_) where different rules can be applied for each
-+connection. The path managers can be controlled via a Netlink API; see
-+netlink_spec/mptcp_pm.rst.
-+
-+To be able to use multiple IP addresses on a host to create multiple *subflows*
-+(paths), the default in-kernel MPTCP path-manager needs to know which IP
-+addresses can be used. This can be configured with ``ip mptcp endpoint`` for
-+example.
-+
-+Packet Scheduler
-+----------------
-+
-+The Packet Scheduler is in charge of selecting which available *subflow(s)* to
-+use to send the next data packet. It can decide to maximize the use of the
-+available bandwidth, only to pick the path with the lower latency, or any other
-+policy depending on the configuration.
-+
-+Packet schedulers are controlled by the ``net.mptcp.scheduler`` sysctl knob --
-+see mptcp-sysctl.rst.
-+
-+
-+Sockets API
-+===========
-+
-+Creating MPTCP sockets
-+----------------------
-+
-+On Linux, MPTCP can be used by selecting MPTCP instead of TCP when creating the
-+``socket``:
-+
-+.. code-block:: C
-+
-+    int sd = socket(AF_INET(6), SOCK_STREAM, IPPROTO_MPTCP);
-+
-+Note that ``IPPROTO_MPTCP`` is defined as ``262``.
-+
-+If MPTCP is not supported, ``errno`` will be set to:
-+
-+- ``EINVAL``: (*Invalid argument*): MPTCP is not available, on kernels < 5.6.
-+- ``EPROTONOSUPPORT`` (*Protocol not supported*): MPTCP has not been compiled,
-+  on kernels >= v5.6.
-+- ``ENOPROTOOPT`` (*Protocol not available*): MPTCP has been disabled using
-+  ``net.mptcp.enabled`` sysctl knob; see mptcp-sysctl.rst.
-+
-+MPTCP is then opt-in: applications need to explicitly request it. Note that
-+applications can be forced to use MPTCP with different techniques, e.g.
-+``LD_PRELOAD`` (see ``mptcpize``), eBPF (see ``mptcpify``), SystemTAP,
-+``GODEBUG`` (``GODEBUG=multipathtcp=1``), etc.
-+
-+Switching to ``IPPROTO_MPTCP`` instead of ``IPPROTO_TCP`` should be as
-+transparent as possible for the userspace applications.
-+
-+Socket options
-+--------------
-+
-+MPTCP supports most socket options handled by TCP. It is possible some less
-+common options are not supported, but contributions are welcome.
-+
-+Generally, the same value is propagated to all subflows, including the ones
-+created after the calls to ``setsockopt()``. eBPF can be used to set different
-+values per subflow.
-+
-+There are some MPTCP specific socket options at the ``SOL_MPTCP`` (284) level to
-+retrieve info. They fill the ``optval`` buffer of the ``getsockopt()`` system
-+call:
-+
-+- ``MPTCP_INFO``: Uses ``struct mptcp_info``.
-+- ``MPTCP_TCPINFO``: Uses ``struct mptcp_subflow_data``, followed by an array of
-+  ``struct tcp_info``.
-+- ``MPTCP_SUBFLOW_ADDRS``: Uses ``struct mptcp_subflow_data``, followed by an
-+  array of ``mptcp_subflow_addrs``.
-+- ``MPTCP_FULL_INFO``: Uses ``struct mptcp_full_info``, with one pointer to an
-+  array of ``struct mptcp_subflow_info`` (including the
-+  ``struct mptcp_subflow_addrs``), and one pointer to an array of
-+  ``struct tcp_info``, followed by the content of ``struct mptcp_info``.
-+
-+Note that at the TCP level, ``TCP_IS_MPTCP`` socket option can be used to know
-+if MPTCP is currently being used: the value will be set to 1 if it is.
-+
-+
-+Design choices
-+==============
-+
-+A new socket type has been added for MPTCP for the userspace-facing socket. The
-+kernel is in charge of creating subflow sockets: they are TCP sockets where the
-+behavior is modified using TCP-ULP.
-+
-+MPTCP listen sockets will create "plain" *accepted* TCP sockets if the
-+connection request from the client didn't ask for MPTCP, making the performance
-+impact minimal when MPTCP is enabled by default.
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 27367ad339ea..1a65444adb21 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -15753,7 +15753,7 @@ B:	https://github.com/multipath-tcp/mptcp_net-next/issues
- T:	git https://github.com/multipath-tcp/mptcp_net-next.git export-net
- T:	git https://github.com/multipath-tcp/mptcp_net-next.git export
- F:	Documentation/netlink/specs/mptcp_pm.yaml
--F:	Documentation/networking/mptcp-sysctl.rst
-+F:	Documentation/networking/mptcp*.rst
- F:	include/net/mptcp.h
- F:	include/trace/events/mptcp.h
- F:	include/uapi/linux/mptcp*.h
+https://lore.kernel.org/r/20240530-upstream-net-20240520-mptcp-doc-v3-0-e94cdd9f2673@kernel.org
 
+Cheers,
+Matt
 -- 
-2.43.0
+Sponsored by the NGI0 Core fund.
 
 
