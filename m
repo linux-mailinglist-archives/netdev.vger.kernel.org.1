@@ -1,58 +1,84 @@
-Return-Path: <netdev+bounces-99580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87CC38D5638
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:26:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DEB58D563B
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:27:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43F85282B3A
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 23:26:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4AFDB22701
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 23:27:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF99117C7B7;
-	Thu, 30 May 2024 23:26:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 822F317E450;
+	Thu, 30 May 2024 23:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AeGS78uD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ejz6rW9g"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF374D8C3
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 23:26:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE3F4D8C3;
+	Thu, 30 May 2024 23:27:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717111570; cv=none; b=KpJhe2NX90tvR62Rq20OgHh84oNIvfOKH+5ZSilZyg0f04zFIw1O4GLPLRadR3CbSIk8aWB1TNCb7oivLcFlPIpjvgE/UaiX+PGvd6QiDC4VOT/h3LuZMN6ctcUr+xnwoB+oJtTYk73n6XrS2EgHOywN7KkIcvaVjN5QXy+Vyl8=
+	t=1717111656; cv=none; b=Lk/g8XBBX82a3GDONPXemx1jspilSLS02VvLCdX28Cbw9jvyLPhlMpAW+PxXgG71B8XGouLaKNcp9npw6gJAWesleI9CXzEO2owwMP1jskRNeW+Y67sIkz6B3Nmv79rC9RJXKm51l9KEwbSiVIBWPhmI5+A8DN8bJod5LkPCmIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717111570; c=relaxed/simple;
-	bh=y0XU/59H1CEVT1+tFYZG3lHPRnSsqJEGSq2wXQcHgD4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ItPSfNxywmRJ8925gCJndLZp3L+/K9L7I4Rtwj+mEw2GdoYTR4tjA4S5hrFMqSN8nwvo51XDbuqbUpctDGsfT8gAGFOkjpvyeXT9dJUCPQQSnDJpDImhXVfBYUODWVM3OzkQpxK+f8a1lWygGrX36IwFP4Jvy3nj06pPjNi9YLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AeGS78uD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1819C32786;
-	Thu, 30 May 2024 23:26:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717111570;
-	bh=y0XU/59H1CEVT1+tFYZG3lHPRnSsqJEGSq2wXQcHgD4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=AeGS78uDhjk1DUkyx0UeQpnslHcxNooegg3RbbZ9IuloqoMNe2zVAKN84ib2qwlNf
-	 Vooh3q1rdXLKjWQPM+PNcHmc2/WpvMa37ucOw+XHB+AfnR4qD/a7Jday8Iv22C6CTF
-	 zxUHDqaOVb2/6XWtOcKHn2i0SkOLtDf1oEK8Gy/3XPzfWl23EolsRAAS4A+PY42rUr
-	 F2EgpKZNOFvYriq5O5M4wZ6ST9u0Dq6ZnA+1Cio7USs2O4dsiHk1OJAlS3kfEAnfK2
-	 eIasTbhnXpBdXmgpwelRXdU5urZWRCul8CzaIZATqKXUIcggB2Y7V7hWj5SkSEwpwl
-	 qMq83w00NBE+w==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	sd@queasysnail.net,
+	s=arc-20240116; t=1717111656; c=relaxed/simple;
+	bh=J936r+DiOMS3MgFGq6523UYD7iDOXAN2fhSE2VGZZss=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M9qjJlr3+EYbHwY6naMteYIRzRDTj5zgrIKLMQdg8g49fPvsquzhIx6580DLrDBPxEbVRID95iaHboh1mzl8eCiYRoY5KdM/qy6RTCO5Frp8KAMPHqikDMbaFVYENzRov7E8JRtoKoaOf+/iCccwuek6s5W8pdb/LVnHbM2ggeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ejz6rW9g; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2e964acff1aso14759961fa.0;
+        Thu, 30 May 2024 16:27:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717111653; x=1717716453; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=x4p5dezIqTlwyao4nfb4lQwbHXPe29ko3E6Z2p0D7l4=;
+        b=Ejz6rW9gmcDbE3gN8d6v0qyl5ArcGqTaouJxCoUxa1w6j+hLr8bH/gToaT5PAgLfVh
+         G1bcraO0vtvH7Ddt4E2Fhv/ngwbr9jAtZU1jjxLYi7dbyo4/Kfa3Hv/dJUCx6Qdx2hBj
+         v9N0oQTOmjSqahv1UInPEBrwGqna31qQwhknpzIM4DW/upZAdbFjoa8lYCwDQFgFmR/f
+         gjx94pN4rSi5PY8SZKCZyAIwOj3ZYLk2SnwqGraeAe6RqRI5rGpaVm41CdeZYo6GkBAp
+         PnrIvAF/ER9QlHIH/limCn6zDYHR+bNNxkEojMOJg31iiRITvZSaxgzICoLp4jNJEZfL
+         QXsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717111653; x=1717716453;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=x4p5dezIqTlwyao4nfb4lQwbHXPe29ko3E6Z2p0D7l4=;
+        b=T+YLUtoK1pqZ0AUMNk6FnwqYxbDVCAOl9W1u5AmsiD8sPxPoZb8/10C4EJxdywzv+N
+         GOwOAlqr/Y1OSslC8uAl/HCqnEkHLEc/HAg1tqrggo6GzgCXvP1IcUQ0LvS+VXWXSnRQ
+         Ts0ss/64DiI9B6AwfMJ2AVX/YInsXUJJCFpU/J8eyVyfHMhPCv5GtEgCbiJ9VyoFV1Xa
+         BFGgqsOMYHyYhjsxH1XWZTWH1r0vwhMroY/F0V9ITyV/Z2nvoTPo8+Nqv5fA0RcqEVQI
+         gWudHg1M3qqLZdmTN79UALqPvl+3v0nOLO4RIXxtpksZh/JDjwE5NVzr2X6EEBhsc/4O
+         m4QA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDfY5ytEoFomLGGxP2Z8q0z7QSBtSjyVG9lrbSbvRsz8BOdYK/alNFWIqGmjcXKr5jKfcSNaNGpm43oFYiTc23BSYfuFRv87Z/cKEpTGMv4eU1/b2xGb8t0QzZ6SyZs51u4vHF1SAXCm+0f4S5
+X-Gm-Message-State: AOJu0YyvYPlolaK0Dl8UzmvQGcJzr0q6fopVElSnspqcvE91wSVMJPIW
+	w4Z+V6w53MjZXRGyfSHUYc39y0ZsH2oL0TSv2+bHT+gepFWXBxCXBUVMvA==
+X-Google-Smtp-Source: AGHT+IHi05csmUaC/XdePFs1mfj5AfezWi9oiIMwfg2LOseu0xjlzdLecM1APuhYP98qnjfxF4H8SQ==
+X-Received: by 2002:ac2:5b1e:0:b0:52b:8926:9052 with SMTP id 2adb3069b0e04-52b8955b3e8mr78151e87.5.1717111652620;
+        Thu, 30 May 2024 16:27:32 -0700 (PDT)
+Received: from lenovo.. (mob-2-43-182-132.net.vodafone.it. [2.43.182.132])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57a35e86c36sm197223a12.54.2024.05.30.16.27.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 May 2024 16:27:31 -0700 (PDT)
+From: technoboy85@gmail.com
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	dhowells@redhat.com,
-	borisp@nvidia.com,
-	john.fastabend@gmail.com
-Subject: [PATCH net] net: tls: fix marking packets as decrypted
-Date: Thu, 30 May 2024 16:26:07 -0700
-Message-ID: <20240530232607.82686-1-kuba@kernel.org>
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Matteo Croce <teknoraver@meta.com>
+Subject: [PATCH net-next v2 0/2] net: visibility of memory limits in netns
+Date: Fri, 31 May 2024 01:27:20 +0200
+Message-ID: <20240530232722.45255-1-technoboy85@gmail.com>
 X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,40 +88,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For TLS offload we mark packets with skb->decrypted to make sure
-they don't escape the host without getting encrypted first.
-The crypto state lives in the socket, so it may get detached
-by a call to skb_orphan(). As a safety check - the egress path
-drops all packets with skb->decrypted and no "crypto-safe" socket.
+From: Matteo Croce <teknoraver@meta.com>
 
-The skb marking was added to sendpage only (and not sendmsg),
-because tls_device injected data into the TCP stack using sendpage.
-This special case was missed when sendpage got folded into sendmsg.
+Some programs need to know the size of the network buffers to operate
+correctly, export the following sysctls read-only in network namespaces:
 
-Fixes: c5c37af6ecad ("tcp: Convert do_tcp_sendpages() to use MSG_SPLICE_PAGES")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: dhowells@redhat.com
-CC: borisp@nvidia.com
-CC: john.fastabend@gmail.com
----
- net/ipv4/tcp.c | 3 +++
- 1 file changed, 3 insertions(+)
+- net.core.rmem_default
+- net.core.rmem_max
+- net.core.wmem_default
+- net.core.wmem_max
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 681b54e1f3a6..4d8cc2ebb64c 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -1165,6 +1165,9 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
- 
- 			process_backlog++;
- 
-+#ifdef CONFIG_SKB_DECRYPTED
-+			skb->decrypted = !!(flags & MSG_SENDPAGE_DECRYPTED);
-+#endif
- 			tcp_skb_entail(sk, skb);
- 			copy = size_goal;
- 
+Matteo Croce (2):
+  net: make net.core.{r,w}mem_{default,max} namespaced
+  selftests: net: tests net.core.{r,w}mem_{default,max} sysctls in a
+    netns
+
+changes from v1:
+- added SPDX header to test
+- rewrite test with more detailed error messages
+
+ net/core/sysctl_net_core.c                  | 75 ++++++++++++---------
+ tools/testing/selftests/net/Makefile        |  1 +
+ tools/testing/selftests/net/netns-sysctl.sh | 40 +++++++++++
+ 3 files changed, 83 insertions(+), 33 deletions(-)
+ create mode 100755 tools/testing/selftests/net/netns-sysctl.sh
+
 -- 
 2.45.1
 
