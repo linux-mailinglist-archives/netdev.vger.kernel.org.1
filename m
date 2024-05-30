@@ -1,97 +1,108 @@
-Return-Path: <netdev+bounces-99273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF9ED8D4431
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 05:32:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1416C8D4441
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 05:41:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3FD0BB24809
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 03:32:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBE7A1F22F8F
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 03:41:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FAAA139579;
-	Thu, 30 May 2024 03:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18162139CE9;
+	Thu, 30 May 2024 03:41:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y+McAG2P"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ovf3pRF0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE52139566
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 03:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885A8139CE3
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 03:41:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717039945; cv=none; b=BiLT8yHVD7vm7Zya0PLkrX/789OwoBCsCPh52d7l/2pLPzNfRByCxiTq5PW0BB2d3ko7wBGPStJZXTdoodIEBo5qLAz7hxDXNzrH5KaQ81H/7lNDwwrW5XfPnQVH/zRE4Q7WffhZLBquSYOCqlFKSLQQ3aHs2wSQyfTL+fx55Do=
+	t=1717040510; cv=none; b=XolhgVMcamWFm8uF0XM+1uf7vwcG6jHnUgxCmPtFcn/vVvduXort1dRZGKlc4xja7tWYFjELBFGqktLhuCRSES8Z85f6lSRwJ/a9B7rgoMZqSCJcLA5kcqLVCeFzyUYjQOLw9vBi3ruEfqHE+fGzTxLx0HPwJCpSqTeQP+d2vm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717039945; c=relaxed/simple;
-	bh=QdjBA/cGJKxHSqdrkpKs+wmuBb/1Tv41LF2zB1jMHc4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J3p6tZ0yyj3d7hlwoGeQKYmDyvIxSThsBXsn4Z7op6yMpooCiNCOXma1h9wejXy2vSdy4QjkPnmkyHiV13EjNAZ+RGA7yqyuI+DRBMUdgkK456Xygf47aHXES5JZMp6zoiogK2KSS8BiTlzPELwqJcnNdA3a02Xyl2voQPgZ1Bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y+McAG2P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89A1AC116B1;
-	Thu, 30 May 2024 03:32:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717039944;
-	bh=QdjBA/cGJKxHSqdrkpKs+wmuBb/1Tv41LF2zB1jMHc4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y+McAG2PTD0WQnWE89Zy4JvwRY/OYNjFQbYBIG3VyetJDXEAX/dQsD/b6kBKKVron
-	 Ws7jYLLLKUr8qpKdRornTPS0Ypp3nZNHLVZyZUX+beDnet5fCYJjL4rLlVTzH0+os3
-	 aIQZc6+oqT9KW1cWDOzuDUMT6gskaNSoVPG7tPslAiIqAdLm8xqqNdbow59kpC+Uye
-	 s0Nec4PDBePe5JyN6LSuN5S7Mw6vHkE+E1v970Vaa3ph4pztCHb0zmHb3xwD1F5nat
-	 iWxBvqzRVqfJZudxW9If5yXRC6/g1xiKhF7NcRBMrAHTCUCSdBxyXu/pDakapxoKlS
-	 vRwGxkPVqVmWQ==
-Date: Wed, 29 May 2024 20:32:23 -0700
-From: Saeed Mahameed <saeed@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Tariq Toukan <tariqt@nvidia.com>,
+	s=arc-20240116; t=1717040510; c=relaxed/simple;
+	bh=d5IYyCOrENFZuQLW4i8/kTfbF8Kihrp2FFXSsobY8S4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oVgtYlzv81A3aopRwKRzDE8vGyU78if87WitkpRp/19M0xK9r7ydOOwKHo9of4rS0bPSzMcCNspmyplRWwlOTmm2lj8TLHb00W1ArIAS+VK950+SYo/IJZpGGEV3HRHmrC3SokG66mx7IIocrLtcJ4Ln6A6sYmDzAkCR2WES8yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ovf3pRF0; arc=none smtp.client-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1717040504; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=ubSNF7pPhU/p0V/lXsQM6gqp6+odk35S45rtnYfCj5A=;
+	b=ovf3pRF0OqFamAN3E/lGzklhmFgyS75tnp/lmzAbhRF2/Dc+QNYVRf/9Z1GvdAUVi8SBarYwX6rBMP0E7zqjR+lLNyu82HVBDG8u+Yy/LkaCmGxM/w7q0ESuo378sdQ/0Ec3cIB4CN9GYttjLL5Bm4R06TodunToh/46EneE9Nk=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R371e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045046011;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W7VdGrC_1717040503;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W7VdGrC_1717040503)
+          by smtp.aliyun-inc.com;
+          Thu, 30 May 2024 11:41:44 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: netdev@vger.kernel.org,
+	virtualization@lists.linux.dev
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: Re: [PATCH net-next 11/15] net/mlx5e: SHAMPO, Add no-split ethtool
- counters for header/data split
-Message-ID: <ZlfzR_UV9CcCjR99@x130.lan>
-References: <20240528142807.903965-1-tariqt@nvidia.com>
- <20240528142807.903965-12-tariqt@nvidia.com>
- <20240529182208.401b1ecf@kernel.org>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Daniel Jurgens <danielj@nvidia.com>,
+	Hariprasad Kelam <hkelam@marvell.com>
+Subject: [PATCH net v2] virtio_net: fix missing lock protection on control_buf access
+Date: Thu, 30 May 2024 11:41:43 +0800
+Message-Id: <20240530034143.19579-1-hengqi@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240529182208.401b1ecf@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On 29 May 18:22, Jakub Kicinski wrote:
->On Tue, 28 May 2024 17:28:03 +0300 Tariq Toukan wrote:
->> +   * - `rx[i]_hds_nosplit_packets`
->> +     - Number of packets that were not split in modes that do header/data split
->> +       [#accel]_.
->> +     - Informative
->> +
->> +   * - `rx[i]_hds_nosplit_bytes`
->> +     - Number of bytes that were not split in modes that do header/data split
->> +       [#accel]_.
->> +     - Informative
->
->This is too vague. The ethtool HDS feature is for TCP only.
->What does this count? Non-TCP packets basically?
->
+Refactored the handling of control_buf to be within the cvq_lock
+critical section, mitigating race conditions between reading device
+responses and new command submissions.
 
-But this is not the ethtool HDS, this is the mlx5 HW GRO hds.
-On the sane note, are we planning to have different control knobs/stats for
-tcp/udp/ip HDS? ConnectX supports both TCP and UDP on the same queue, 
-the driver has no control on which protocol gets HDS and which doesn't.
+Fixes: 6f45ab3e0409 ("virtio_net: Add a lock for the command VQ.")
+Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
+---
+v1->v2:
+  - Use the ok instead of ret.
 
->Given this is a HW-GRO series, are HDS packets == HW-GRO eligible
->packets?
->
+ drivers/net/virtio_net.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-No, UDP will also get header data split or other TCP packets that don't
-belong to any aggregation context in the HW.
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 4a802c0ea2cb..1ea8e6a24286 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -2686,6 +2686,7 @@ static bool virtnet_send_command_reply(struct virtnet_info *vi, u8 class, u8 cmd
+ {
+ 	struct scatterlist *sgs[5], hdr, stat;
+ 	u32 out_num = 0, tmp, in_num = 0;
++	bool ok;
+ 	int ret;
+ 
+ 	/* Caller should know better */
+@@ -2731,8 +2732,9 @@ static bool virtnet_send_command_reply(struct virtnet_info *vi, u8 class, u8 cmd
+ 	}
+ 
+ unlock:
++	ok = vi->ctrl->status == VIRTIO_NET_OK;
+ 	mutex_unlock(&vi->cvq_lock);
+-	return vi->ctrl->status == VIRTIO_NET_OK;
++	return ok;
+ }
+ 
+ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
+-- 
+2.32.0.3.g01195cf9f
 
 
