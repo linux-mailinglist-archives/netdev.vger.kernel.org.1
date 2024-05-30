@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-99249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 736DB8D433F
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 04:01:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60D1A8D4340
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 04:01:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 908EC1C2313B
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0050BB244F0
 	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 02:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A29C6208DA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E3A8208AD;
 	Thu, 30 May 2024 02:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dDYLIwDu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tmreo7DN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED7D208A9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A186200C1
 	for <netdev@vger.kernel.org>; Thu, 30 May 2024 02:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717034434; cv=none; b=DH9pQfbilOuFVTuFUqYfJIjgC2rx9Etwti7g1DSaADQPkwl/9PVdNJj9FBcAFHv+HPhJ9wGy4rZrUImVTnyTtS/ZeuiT2uNm7uPnLsG/rpAjpNroFoAxXr87OWDEP0gdN/xAOXsnMjiHBL4ZxPy83IoKarLQUyTfT1zr/BMaXDg=
+	t=1717034434; cv=none; b=Mjd03TEkaNpzsjMH2lyAi9OQUqTRHnllCtms4Voroy7wqc5gtR2nfX/vUSBFdq2UjanFMREOOtHDlPhgxmfzCI67KUCwKAwWGZFDodSKaM2txL3hBp7rkptauL0FwBexAmhcvgNIR4nwAeq9stl/KlEuspT9PqsljvZhJQBTP1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717034434; c=relaxed/simple;
-	bh=aVQRNJ63NMlxx9pW/T6v3MxeAtKrtfFn1SPjir+hFI4=;
+	bh=E4P+l2PZq0o8H67f1m5niT+vrJI8McXbI43CalgS1/I=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=AO2sGs7w2whCzob4edpgePTR1m8GKKj8c/G3krStiOQyX/wgjrdax/7u4n7JH+XYPFRxPvwQnLuL37T35leQSvPK8vABEXAcP6+J8Ddtol071QLXt/jg16ZldZqNz+3hP8oBqtGnpMk2MCHFsoUje6G25uxmKFSkIusixwURtUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dDYLIwDu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4A201C4AF0D;
+	 In-Reply-To:To:Cc; b=CiK9Cr6QdxZIirAUf/yAjyZFaIojZfFxum+vqzga7bYftMG43aiXGqO7NvMfrQdR2gMdI8JQq2/5o5TE1JLibzkBolqnl3Ead5jfIy+uIZbJZVqXD883dDiWqYAvc8rsD7XCNFXBlYi1QemaJkoQi6Tf2+RTBgEzShCObaJbOcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tmreo7DN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 40379C32789;
 	Thu, 30 May 2024 02:00:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1717034434;
-	bh=aVQRNJ63NMlxx9pW/T6v3MxeAtKrtfFn1SPjir+hFI4=;
+	bh=E4P+l2PZq0o8H67f1m5niT+vrJI8McXbI43CalgS1/I=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dDYLIwDunq/pEFCbVYIpZwybuJppKMMrEpLQBsnGpzpfyU3PrHbnxF/NVGPW3ZOLd
-	 uQhvgYlhGUW7+sHpF5yeDTrHGWT16nv0iMcGNmFNTKX5LCULNXbot2rFRwO6TDEiRW
-	 vZQ6lswk6cy9FmzUzU4HfUa8xcm/ZG+UCn/tO/YA+TUSBWpToXTXCps7faQ3AgF8LQ
-	 AjsgqBOi8yw/kASBZiwobJn3aZIYfxFG90aWA00FGMRM0KulsnLUbvdPVRaCTirkGD
-	 sA3NZ3SrBDsC3ZMgmQoAUHQ2Cuo8jFlK6gIFIxh7RuahHvQRzT8E3KwATr6TwQt6Ww
-	 IUVP12CWz/TAQ==
+	b=tmreo7DNad47rL8vbi+rfqNDSPHvcMBd0JGFWDSXPVw2r20ZEldEeuIlJu+UZ3Flv
+	 +9QZEylsX19CZ876Mk67fyfFhmf9eyUxa2OkdGjgknpdCPnOpL+BmkSxLZdpzbuumP
+	 1exi2mZaD3GTRl236q/gI0YfA2kz+IzAmn4r9iTfiNLCt9h6c8kUOPa1B0DXuBK/zV
+	 Ub1f+Wl2+Ci6M/HgsXv4e+ZOxlpbvCeCbrdW0/crmZQaHl4yGLrQZfCJi6+DtnZ/Ut
+	 Mlm+TtaxAxR/OWuT1+Db3EoykKYD2ik4OZXzirSFnTLDjTLRLzyd1n+9yl1x3SccYt
+	 R9N5OMSzvo2DQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3E9D6D84BCD;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 34D73D84BCF;
 	Thu, 30 May 2024 02:00:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,47 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1 0/4] doc: netlink: Fixes for ynl doc generator
+Subject: Re: [PATCH net-next] net: dsa: felix: provide own phylink MAC operations
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171703443425.3291.5482505673967760594.git-patchwork-notify@kernel.org>
+ <171703443421.3291.3657268633743130112.git-patchwork-notify@kernel.org>
 Date: Thu, 30 May 2024 02:00:34 +0000
-References: <20240528140652.9445-1-donald.hunter@gmail.com>
-In-Reply-To: <20240528140652.9445-1-donald.hunter@gmail.com>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, jiri@resnulli.us, leitao@debian.org,
- arkadiusz.kubalewski@intel.com, vadim.fedorenko@linux.dev,
- donald.hunter@redhat.com
+References: <E1sByYA-00EM0y-Jn@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1sByYA-00EM0y-Jn@rmk-PC.armlinux.org.uk>
+To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, vladimir.oltean@nxp.com,
+ claudiu.manoil@nxp.com, alexandre.belloni@bootlin.com,
+ UNGLinuxDriver@microchip.com, f.fainelli@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ colin.foster@in-advantage.com, netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 28 May 2024 15:06:48 +0100 you wrote:
-> Several fixes to ynl-gen-rst to resolve issues that can be seen
-> in:
+On Tue, 28 May 2024 16:15:42 +0100 you wrote:
+> Convert felix to provide its own phylink MAC operations, thus
+> avoiding the shim layer in DSA's port.c.
 > 
-> https://docs.kernel.org/6.10-rc1/networking/netlink_spec/dpll.html#device-id-get
-> https://docs.kernel.org/6.10-rc1/networking/netlink_spec/dpll.html#lock-status
-> 
-> In patch 2, by not using 'sanitize' for op docs, any formatting in the
-> .yaml gets passed straight through to the generated .rst which means
-> that basic rst (also markdown compatible) list formatting can be used in
-> the .yaml
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+> Back in the thread for the previous posting
+> https://lore.kernel.org/r/Zh1GvcOTXqb7CpQt@shell.armlinux.org.uk
+> it was identified that two other sub-drivers also needed an update,
+> and through that identical code in each was identified. In the
+> final message of the sub-thread from Vladimir, Vladimir volunteered
+> to pick this up and I agreed. However, I haven't seen anything yet.
+> I guess Vladimir's attention is elsewhere, so I've done the minimal
+> fixup for this driver.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v1,1/4] doc: netlink: Fix generated .rst for multi-line docs
-    https://git.kernel.org/netdev/net-next/c/c697f515b639
-  - [net-next,v1,2/4] doc: netlink: Don't 'sanitize' op docstrings in generated .rst
-    https://git.kernel.org/netdev/net-next/c/ebf9004136c7
-  - [net-next,v1,3/4] doc: netlink: Fix formatting of op flags in generated .rst
-    https://git.kernel.org/netdev/net-next/c/cb7351ac1786
-  - [net-next,v1,4/4] doc: netlink: Fix op pre and post fields in generated .rst
-    https://git.kernel.org/netdev/net-next/c/9104feed4c64
+  - [net-next] net: dsa: felix: provide own phylink MAC operations
+    https://git.kernel.org/netdev/net-next/c/ef0e51dccdc4
 
 You are awesome, thank you!
 -- 
