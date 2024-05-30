@@ -1,101 +1,110 @@
-Return-Path: <netdev+bounces-99301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D81E98D45F7
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 09:22:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A41BC8D45FC
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 09:27:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3734DB2104E
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 07:22:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 172D0B22388
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 07:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC8497316F;
-	Thu, 30 May 2024 07:22:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 414FB142E9F;
+	Thu, 30 May 2024 07:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lmq72Mm8"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="qE7bQ3gK"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400851CD20
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 07:22:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2E6142E7C;
+	Thu, 30 May 2024 07:26:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717053766; cv=none; b=KHzQuFoyw6yqJ2znOgkA/M0wekrpZeGksGcdNljqh+yDvUSp/FjeTnkyqwK6WFX+fiH6qgt2UejYoV7PgFQDMkOKXJJvvjKEuYJjn4wZvfz0zTsAdDVqy4DjVUkwHzVs1WCMw1pNUA8vr4EKHiraCH2z+FtlMNQ6GB1+9/maW9w=
+	t=1717054016; cv=none; b=P1MK9e/HEI3HRA7AJzN/xuhtXw9pSIU2NMFMPe1L8x6WREmBDNY/UzLVfhrmGoeb+A3kiOWw846QsyXjPZm8lSZOmMYJBjauTVl324crU0QAHYEkuoLshG3ZqXbW2UkuaibqaOAGuR80JIYcdA5w45RIRFD7cAfcBQJFf3OAvaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717053766; c=relaxed/simple;
-	bh=ZHMvWcAgW2V4u+BvmrVa8WAs8F/hf3YNFThVq/o6xJU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C8mlEKgmqSnSmJx53MKJjgNH9hyYNeRhA95i5kTGUvI7U7HkfJP4hLugEcVVwIoI0bY5XYGNRpJdviUV0WIG3RniUy9j4cAstyGQsq/ZD+Kcyf14xABzMP8LIJuG8V9hcZO6bNlFqYJmDKTwjKBF9Si/NGHuPSbMXT7VTDJSkHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=lmq72Mm8; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=A/73ebAlsC/3BTmrvK4IFg/WQ37OWh2ZE3F/n1tmBwI=; b=lmq72Mm8NiAK+mUV3kHBmewYb+
-	t25+eQf+oSrqyb7Z3OBhhGAqtv6KbE2ewaOas5OOY1rjZboxbAF8xYQs39/6TuZxWLnunzZ1ZebOA
-	D7nJmfOOzitdS3khvqd6g1F/B1mF5lJJc3eTJUewX1jEBFKSzT7kQnwekSM47JnAM14h8wEjVekBn
-	8qluXnsZNP/YdHfmUf6Z/YglvGfmOoRSSJq551/OXI3gTeEevm93jp1aJY+E9vITl9tQhPkiIoJT+
-	Udth2B6lgAu7mgq7ImjnVBeEBkm4ioLzdHgm60+BgHvrOoEAE7EqJortH6ypt9m8rEElRbRS5uZEL
-	oIuesvGA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34450)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sCa7E-00073A-23;
-	Thu, 30 May 2024 08:22:24 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sCa7C-0004yH-O6; Thu, 30 May 2024 08:22:22 +0100
-Date: Thu, 30 May 2024 08:22:22 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: Yanteng Si <siyanteng@loongson.cn>, andrew@lunn.ch,
-	hkallweit1@gmail.com, peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	fancer.lancer@gmail.com, Jose.Abreu@synopsys.com,
-	guyinggang@loongson.cn, netdev@vger.kernel.org,
-	chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
-Subject: Re: [PATCH net-next v13 12/15] net: stmmac: Fixed failure to set
- network speed to 1000.
-Message-ID: <ZlgpLm3L6EdFO60f@shell.armlinux.org.uk>
-References: <cover.1716973237.git.siyanteng@loongson.cn>
- <e7ae2409f68a2f953ba7c823e248de7d67dfd4e9.1716973237.git.siyanteng@loongson.cn>
- <CAAhV-H6ZJwWQOhAPmoaH4KYr66LCurKq94f87FQ05yEX6XYoNg@mail.gmail.com>
+	s=arc-20240116; t=1717054016; c=relaxed/simple;
+	bh=eYFKnVeN/MPK8jO98yxwGONYZm55s9y/1x4YFrzPaqM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=m1dYHUW6HTZ/3pKZJzOyaVQFrBXozgVxDM2aNh2CiDk5TTALdOinr9zoM8/qIPYt+GOdgYz9wICZ2KEAsHL3AYvY8vHtpKC4X5Ud5xblNUfnvVDZAxlGHoknQFo1CYKVBvF2IGr2773oM/jMp5FUDEdD4/+mgv8bL9httq8ieMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=qE7bQ3gK; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1717054010; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=/i+MUL3pDEawjH7fkUL8OQTa2XOF8nBBeIXATV5rGL4=;
+	b=qE7bQ3gK4coWBlEye+TqgFhcdjW/cmxLs4U8h5lqH7SMjLZzKXQsG1faREdaWgQbgM5ZAbSHrzBE2zHjfGe4hjFy8fdUiZtXm9yP6q3inLvLLmJZL2jUOTMbMRTc9A4+toOzCsRCn71wZ4gky4Bg4+J8w6zfaftqLpDXCIVxD0c=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067113;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0W7WBAvV_1717054009;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W7WBAvV_1717054009)
+          by smtp.aliyun-inc.com;
+          Thu, 30 May 2024 15:26:49 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux.dev,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next v1 0/7] virtnet_net: prepare for af-xdp
+Date: Thu, 30 May 2024 15:26:42 +0800
+Message-Id: <20240530072649.102437-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAhV-H6ZJwWQOhAPmoaH4KYr66LCurKq94f87FQ05yEX6XYoNg@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Git-Hash: 12be1d34ab2c
+Content-Transfer-Encoding: 8bit
 
-On Thu, May 30, 2024 at 10:25:01AM +0800, Huacai Chen wrote:
-> Hi, Yanteng,
-> 
-> The title should be "Fix ....." rather than "Fixed .....", and it is
+This patch set prepares for supporting af-xdp zerocopy.
+There is no feature change in this patch set.
+I just want to reduce the patch num of the final patch set,
+so I split the patch set.
 
-I would avoid the ambiguous "Fix" which for stable folk imply that this
-is a bug fix - but it isn't. It's adding support for requiring 1G
-speeds to always be negotiated.
+#1-#3 add independent directory for virtio-net
+#4-#7 do some refactor, the sub-functions will be used by the subsequent commits
 
-I would like this patch to be held off until more thought can be put
-into how to handle this without having a hack in the driver (stmmac
-has too many hacks and we're going to have to start saying no to
-these.)
+Thanks.
 
-However, I'm completely overloaded right now to have any bandwidth
-to think about this.
+v1:
+    1. resend for the new net-next merge window
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
+Xuan Zhuo (7):
+  virtio_net: independent directory
+  virtio_net: move core structures to virtio_net.h
+  virtio_net: add prefix virtnet to all struct inside virtio_net.h
+  virtio_net: separate virtnet_rx_resize()
+  virtio_net: separate virtnet_tx_resize()
+  virtio_net: separate receive_mergeable
+  virtio_net: separate receive_buf
+
+ MAINTAINERS                                   |   2 +-
+ drivers/net/Kconfig                           |   9 +-
+ drivers/net/Makefile                          |   2 +-
+ drivers/net/virtio/Kconfig                    |  12 +
+ drivers/net/virtio/Makefile                   |   8 +
+ drivers/net/virtio/virtnet.h                  | 248 ++++++++
+ .../{virtio_net.c => virtio/virtnet_main.c}   | 536 ++++++------------
+ 7 files changed, 454 insertions(+), 363 deletions(-)
+ create mode 100644 drivers/net/virtio/Kconfig
+ create mode 100644 drivers/net/virtio/Makefile
+ create mode 100644 drivers/net/virtio/virtnet.h
+ rename drivers/net/{virtio_net.c => virtio/virtnet_main.c} (94%)
+
+--
+2.32.0.3.g01195cf9f
+
 
