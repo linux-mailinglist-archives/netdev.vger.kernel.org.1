@@ -1,158 +1,181 @@
-Return-Path: <netdev+bounces-99361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 671818D49BE
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 12:36:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5833E8D49C3
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 12:36:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97FD71C22A55
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 10:36:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D73DA1F24493
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 10:36:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26781176ADD;
-	Thu, 30 May 2024 10:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3264717B418;
+	Thu, 30 May 2024 10:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Vfjo8Haf"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="X91e4lnQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E89B9176AD8;
-	Thu, 30 May 2024 10:35:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3F3176AD8;
+	Thu, 30 May 2024 10:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717065358; cv=none; b=BkDWZodn69ByQXMpw/X+19EJfAmL4+T8UeO7jD6Mk3EXFyN335YdpDe0ko3fxs3Z8ZNuu3ZMtdb3x72+un5fx4H+hFzO90akWtRSJSClicVDuphfHfXl3xOXkjGdR32g5wQV5n2Xlr69WM7xdo3UKCkpysOzltzXz3CFjKx0/CE=
+	t=1717065409; cv=none; b=JC9mFG0SSJFSZx1BvwMdUHP4DVAsq2oTWm3/zvQX9AQ5Bk7nytjOg0usXdxZ28FXqViuhjTzFOW9f7lJOr7wMZKpBy/Q3P4CaTI6o0sHPB6at89nvVMrb0SSoQrSh85GFrxwR43c231Dsan0pgtoybSoD+7aKzqCdsTl/g7gyrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717065358; c=relaxed/simple;
-	bh=+QaffK0reuDqOh0TT1ydlqjOcVteN5EKkVTcdgLqsNo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lV+qOC42dfnIDQJS+A69K8lqhQhQwAVWX6NfFavLOfA/k2LH3y+v8bJWii/Hx4UkH7TI3HNMap0fweRclRQEMwdv/QZg8Z011aRZKDA4OUJDM9MBxMRt+GH++5ENOfTIAs6BypzUSambCjkJa5nCilfgR2l/E+HP+gZI08ZNr/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Vfjo8Haf; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=7EB7Pfgo7d2NaDQG2bI7LdmS0RfvQbmEUJWLNeSOUPE=; b=Vfjo8HafVgU85X8wT31+ClDAnG
-	yFLvmJ1mBuR7Te0gX5R5ClsSqBm66It75TUU7WdBF/MreijEep3h3W6LOGOcOiHuHcN8L9lCZaZtL
-	cranp4f/nde77Us43ZL3lRXJteXoOjiMCxpQjt1+RKf+LfIEmW9S+6UPVQw7ndtOZ4XYbY0xPedzS
-	h7FCRBF3rpiZ+LzHS8Ga7SBoce/eVohOg08iGSmaFdtncg2fUpbXvCzDOmrJzAUslutJDcA5GWuEO
-	GyIMRn8b4UFTd4X8rkcVoT3Bqnpi/n1L0if6hDboA8jP0s6Re+YCakFmC9pqE0g5fJ/GawGTYlXeK
-	fJMoRYEg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42664)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sCd8I-0007GP-0U;
-	Thu, 30 May 2024 11:35:42 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sCd8J-00054V-0z; Thu, 30 May 2024 11:35:43 +0100
-Date: Thu, 30 May 2024 11:35:42 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Sky Huang <SkyLake.Huang@mediatek.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH net-next v5 5/5] net: phy: add driver for built-in 2.5G
- ethernet PHY on MT7988
-Message-ID: <ZlhWfua01SCOor80@shell.armlinux.org.uk>
-References: <20240530034844.11176-1-SkyLake.Huang@mediatek.com>
- <20240530034844.11176-6-SkyLake.Huang@mediatek.com>
+	s=arc-20240116; t=1717065409; c=relaxed/simple;
+	bh=HtQkjd8HbGFPhLH8WRqqtICqoILT+VZVoC0M3XmXh5I=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=P1aDbA55DYAx169XdaYgKicOlWbDJtJw/iTpkt9waYDm9SfxE/rXnM8BFqM1rUBiQ+h3j53PZ7k3IzrJrsukapCVznA5iannQ56oJez2hY/ZAlOMEkf272yUyswk3PCRZLfyMxmD6VId96Q8mPGAWZBj8Ij74625cDIFoMxOgGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=X91e4lnQ; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44U7EYDx021301;
+	Thu, 30 May 2024 10:36:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=gzOfkFz9gtephlRxc0+JcL
+	G5OjU7gABvXKX433mLQGU=; b=X91e4lnQEJISNSIKvjbX8cP0oxcm10MUW3xuwf
+	CuA3XTW1uwbMID8M094kzSq+pk/A9zk7BkaxlIDBI3ukPOyEYk25BY96MR+gF2G1
+	D1EcP4D97Im/cpPKkN5q++N7zzcMaJ8xaxeA4gvP6o8qBBpbjUBSlC+zzZuUGomk
+	3eky9zdyAmMPw7Rp3fWuBgF4AXnCE9ex9vk7NHrQ73clLd46nBQeXXtduI7wwkTU
+	zuKSIAStluvtwg12eHvzfaG+KFyhk/VP/oavQ28Arbzqj2eB34sF2p/8XKWwcCSD
+	GFwkAlNMeYtiU+/FmlmNdxoJMS9H+btUscnRsX7KgkmEqpNw==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yba0gbve2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 May 2024 10:36:38 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 44UAabsG030467
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 May 2024 10:36:37 GMT
+Received: from hu-sarannya-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Thu, 30 May 2024 03:36:32 -0700
+From: Sarannya S <quic_sarannya@quicinc.com>
+To: <quic_bjorande@quicinc.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-remoteproc@vger.kernel.org>, Chris Lew <quic_clew@quicinc.com>,
+        Sarannya Sasikumar <quic_sarannya@quicinc.com>,
+        Simon Horman
+	<horms@kernel.org>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "open
+ list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: [PATCH V2] net: qrtr: ns: Ignore ENODEV failures in ns
+Date: Thu, 30 May 2024 16:06:17 +0530
+Message-ID: <20240530103617.3536374-1-quic_sarannya@quicinc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240530034844.11176-6-SkyLake.Huang@mediatek.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 1dcE_oZy_82EA_e_phq5Cs11fPc76zGN
+X-Proofpoint-ORIG-GUID: 1dcE_oZy_82EA_e_phq5Cs11fPc76zGN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-30_07,2024-05-28_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ priorityscore=1501 bulkscore=0 phishscore=0 adultscore=0 spamscore=0
+ mlxlogscore=700 malwarescore=0 lowpriorityscore=0 clxscore=1011
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2405300080
 
-On Thu, May 30, 2024 at 11:48:44AM +0800, Sky Huang wrote:
-> +static int mt798x_2p5ge_phy_config_aneg(struct phy_device *phydev)
-> +{
-> +	bool changed = false;
-> +	u32 adv;
-> +	int ret;
-> +
-> +	/* In fact, if we disable autoneg, we can't link up correctly:
-> +	 *  2.5G/1G: Need AN to exchange master/slave information.
-> +	 *  100M: Without AN, link starts at half duplex(According to IEEE 802.3-2018),
-> +	 *        which this phy doesn't support.
-> +	 *   10M: Deprecated in this ethernet phy.
-> +	 */
-> +	if (phydev->autoneg == AUTONEG_DISABLE)
-> +		return -EOPNOTSUPP;
+From: Chris Lew <quic_clew@quicinc.com>
 
-We have another driver (stmmac) where a platform driver is wanting to
-put a hack in the ksettings_set() ethtool path to error out on
-disabling AN for 1G speeds. This sounds like something that is
-applicable to more than one hardware (and I've been wondering whether
-it is universally true that 1G copper links and faster all require
-AN to function.)
+Ignore the ENODEV failures returned by kernel_sendmsg(). These errors
+indicate that either the local port has been closed or the remote has
+gone down. Neither of these scenarios are fatal and will eventually be
+handled through packets that are later queued on the control port.
 
-Thus, I'm wondering whether this is something that the core code should
-be doing.
+Signed-off-by: Chris Lew <quic_clew@quicinc.com>
+Signed-off-by: Sarannya Sasikumar <quic_sarannya@quicinc.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
 
-> +	/* This phy can't handle collision, and neither can (XFI)MAC it's connected to.
-> +	 * Although it can do HDX handshake, it doesn't support CSMA/CD that HDX requires.
-> +	 */
+Changes from previous revision:
+Changed return type of service_announce_del from int to void.
 
-What the MAC can and can't do really has little bearing on what link
-modes the PHY driver should be providing. It is the responsibility of
-the MAC driver to appropriately change what is supported when attaching
-to the PHY. If using phylink, this is done by phylink via the MAC driver
-telling phylink what it is capable of via mac_capabilities.
+ net/qrtr/ns.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-> +static int mt798x_2p5ge_phy_get_rate_matching(struct phy_device *phydev,
-> +					      phy_interface_t iface)
-> +{
-> +	if (iface == PHY_INTERFACE_MODE_XGMII)
-> +		return RATE_MATCH_PAUSE;
-
-You mention above XFI...
-
-XFI is 10GBASE-R protocol to XFP module electrical standards.
-SFI is 10GBASE-R protocol to SFP+ module electrical standards.
-
-phy_interface_t is interested in the protocol. So, given that you
-mention XFI, why doesn't this test for PHY_INTERFACE_MODE_10GBASER?
-
-> +static int mt798x_2p5ge_phy_probe(struct phy_device *phydev)
-> +{
-> +	struct mtk_i2p5ge_phy_priv *priv;
-> +
-> +	priv = devm_kzalloc(&phydev->mdio.dev,
-> +			    sizeof(struct mtk_i2p5ge_phy_priv), GFP_KERNEL);
-> +	if (!priv)
-> +		return -ENOMEM;
-> +
-> +	switch (phydev->drv->phy_id) {
-> +	case MTK_2P5GPHY_ID_MT7988:
-> +		/* The original hardware only sets MDIO_DEVS_PMAPMD */
-> +		phydev->c45_ids.mmds_present |= (MDIO_DEVS_PCS | MDIO_DEVS_AN |
-> +						 MDIO_DEVS_VEND1 | MDIO_DEVS_VEND2);
-
-No need for parens on the RHS. The RHS is an expression in its own
-right, and there's no point in putting parens around the expression
-to turn it into another expression!
-
+diff --git a/net/qrtr/ns.c b/net/qrtr/ns.c
+index 654a3cc0d347..e821101e7a4b 100644
+--- a/net/qrtr/ns.c
++++ b/net/qrtr/ns.c
+@@ -132,7 +132,7 @@ static int service_announce_new(struct sockaddr_qrtr *dest,
+ 	return kernel_sendmsg(qrtr_ns.sock, &msg, &iv, 1, sizeof(pkt));
+ }
+ 
+-static int service_announce_del(struct sockaddr_qrtr *dest,
++static void service_announce_del(struct sockaddr_qrtr *dest,
+ 				struct qrtr_server *srv)
+ {
+ 	struct qrtr_ctrl_pkt pkt;
+@@ -157,10 +157,10 @@ static int service_announce_del(struct sockaddr_qrtr *dest,
+ 	msg.msg_namelen = sizeof(*dest);
+ 
+ 	ret = kernel_sendmsg(qrtr_ns.sock, &msg, &iv, 1, sizeof(pkt));
+-	if (ret < 0)
++	if (ret < 0 && ret != -ENODEV)
+ 		pr_err("failed to announce del service\n");
+ 
+-	return ret;
++	return;
+ }
+ 
+ static void lookup_notify(struct sockaddr_qrtr *to, struct qrtr_server *srv,
+@@ -188,7 +188,7 @@ static void lookup_notify(struct sockaddr_qrtr *to, struct qrtr_server *srv,
+ 	msg.msg_namelen = sizeof(*to);
+ 
+ 	ret = kernel_sendmsg(qrtr_ns.sock, &msg, &iv, 1, sizeof(pkt));
+-	if (ret < 0)
++	if (ret < 0 && ret != -ENODEV)
+ 		pr_err("failed to send lookup notification\n");
+ }
+ 
+@@ -207,6 +207,9 @@ static int announce_servers(struct sockaddr_qrtr *sq)
+ 	xa_for_each(&node->servers, index, srv) {
+ 		ret = service_announce_new(sq, srv);
+ 		if (ret < 0) {
++			if (ret == -ENODEV)
++				continue;
++
+ 			pr_err("failed to announce new service\n");
+ 			return ret;
+ 		}
+@@ -369,7 +372,7 @@ static int ctrl_cmd_bye(struct sockaddr_qrtr *from)
+ 		msg.msg_namelen = sizeof(sq);
+ 
+ 		ret = kernel_sendmsg(qrtr_ns.sock, &msg, &iv, 1, sizeof(pkt));
+-		if (ret < 0) {
++		if (ret < 0 && ret != -ENODEV) {
+ 			pr_err("failed to send bye cmd\n");
+ 			return ret;
+ 		}
+@@ -443,7 +446,7 @@ static int ctrl_cmd_del_client(struct sockaddr_qrtr *from,
+ 		msg.msg_namelen = sizeof(sq);
+ 
+ 		ret = kernel_sendmsg(qrtr_ns.sock, &msg, &iv, 1, sizeof(pkt));
+-		if (ret < 0) {
++		if (ret < 0 && ret != -ENODEV) {
+ 			pr_err("failed to send del client cmd\n");
+ 			return ret;
+ 		}
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.25.1
+
 
