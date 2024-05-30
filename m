@@ -1,231 +1,154 @@
-Return-Path: <netdev+bounces-99490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 112378D50A9
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 19:12:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA678D509D
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 19:11:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB3EF28449C
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:12:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98E921F21DD5
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:11:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88DAA45BE7;
-	Thu, 30 May 2024 17:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E6B94436A;
+	Thu, 30 May 2024 17:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H2Zn4dth"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hMV1UhCL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0D34596F
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 17:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FDE94653C;
+	Thu, 30 May 2024 17:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717089090; cv=none; b=exxfjEWQCZf+6XU3xRJUjcSZO0q11W3gaHDr+Wqjk7LMZVDWXM6Y6mTs0EL2c4/GeeQ8Ba3r2J7w4IqoDUAcqDM0hdWmL+Z8w7UbkDQQpYxJ/TMNwE3aXe1POrQFRoanwHqrpwHQypxjv2rvN9HLhLhuJd65w2qRmrbwG3rydU8=
+	t=1717089076; cv=none; b=bR+Zr0e7Zo8gRtq3bkkqWgY19QBbt8eENnOYZIDkqVy75pZCyaeIKz0IkHBqoR+qslLXjTEaCuAGQrAGHTH2Zg+otC0JyGFNIUvjcT4DaHA8V9SaSNK1BQg8+7X72431Q6x2xW3rsfHCPGE5O/sIaQ+GiCuvfpRZhb9O8ghJ/mA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717089090; c=relaxed/simple;
-	bh=R4qLM+BQn3XxsCPVE4RYDTUL+Z8EQlbXY7xbvSAy3qw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WbzdPJRAfDPD7RztjEer9yyEcdTj5pUEUGA2jgHdCJrp48wvDBLY828CWDPVBNnfxRqNAaWXolzaTTh3KQjv/ZJWjpuWNCEPh9T5r2gnCF1otH0R9G7h2IBOHPpiSNJkrkA8NxKAZjGgU4ZI66PESN3sWc2q2LLkiQluB0qIaUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H2Zn4dth; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717089087;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RfxFF6kUcIbc0941Da6QzZxyTGVMinRI8tUQ/IpNou4=;
-	b=H2Zn4dthHPJe4RkkeBKbzmkZLkp+AsrpKFtwGItXE5srfi3hnXUfWdTVEiysu+91N/PH/Q
-	EF/fUBs2BwO6DpS3szhTzEIFSSj23xmssvbz/XG+9Fl85i10D9b16vaIpv5LlvmWZJcJzW
-	PPkipU9ov2Lmjm+BIeS+slZaEjr+5ww=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-518-o_rxwDGpPKaAMPS1QspyZQ-1; Thu, 30 May 2024 13:11:24 -0400
-X-MC-Unique: o_rxwDGpPKaAMPS1QspyZQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0725384B177;
-	Thu, 30 May 2024 17:11:23 +0000 (UTC)
-Received: from dcaratti.users.ipa.redhat.com (unknown [10.45.224.83])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0F3EA2018298;
-	Thu, 30 May 2024 17:11:19 +0000 (UTC)
-From: Davide Caratti <dcaratti@redhat.com>
-To: dcaratti@redhat.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	i.maximets@ovn.org,
-	jhs@mojatatu.com,
-	jiri@resnulli.us,
-	kuba@kernel.org,
-	lucien.xin@gmail.com,
-	marcelo.leitner@gmail.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	xiyou.wangcong@gmail.com,
-	echaudro@redhat.com
-Subject: [PATCH net-next v4 2/2] net/sched: cls_flower: add support for matching tunnel control flags
-Date: Thu, 30 May 2024 19:08:35 +0200
-Message-ID: <bc5449dc17cfebe90849c9daba8a078065f5ddf8.1717088241.git.dcaratti@redhat.com>
-In-Reply-To: <cover.1717088241.git.dcaratti@redhat.com>
-References: <cover.1717088241.git.dcaratti@redhat.com>
+	s=arc-20240116; t=1717089076; c=relaxed/simple;
+	bh=w1P9GtWTZiHFljha6+hHxilF9/Ml0j8wVOwBBGlUVKc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FNu+bgo4MCselEaJDzQO4m8v62Yr2W/5wPMFQDMxqa1GqjFDxw4HS1DpDtoC3O8E/Wx3XXTNDWKgMvhATvP9Ocah6EvfoveH9B/3Xw/7j0dk8uNwiQTQhJff6VH8Z61TwF6GSpQd98p8jneQJF2VCzDC947KGWDmhURmYKkTC0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hMV1UhCL; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1f61f775738so6362865ad.2;
+        Thu, 30 May 2024 10:11:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717089074; x=1717693874; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=b5dMIK+YmRjKcd+w3hKSLG4KLhKC/IhFM8M8zHEuCAE=;
+        b=hMV1UhCLwlKxQjhs6r8tmhQMgu61oo8J5jwJFpDBAlq3ec9zZsrynG+aYyHTEQZbXn
+         KIG42d8cQLeBKwqPBK5pTiCMegaiysg5zgiVC3IW7cqQR8Hc2yLDgCgPzJ9pWlq0eEri
+         jxGS42BTCR3unVO5qyime7FKXurFSTUM6RQtb3KuSCQZN8lf+3sNN4zGxKoqK3KiCnjq
+         u4nfj0K4xpbtBlLG6NLpT/k/VZ1ZAVeJx5VqVRBK/wdQ+YoOllW085K3QQq6BRu8oyT5
+         f37NnnHNAzFDD+71I49hkzMcVP1TrhR0cSbo0A32OEyaX9Avwp0j9SX4mOWZG0k7zk8P
+         MlUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717089074; x=1717693874;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b5dMIK+YmRjKcd+w3hKSLG4KLhKC/IhFM8M8zHEuCAE=;
+        b=AVhcHGnaDEu05WxJHV6xTh2FFTljODLqOaYhFn5zQtFqeD722JXF4zZkkgF01xDpGC
+         XEldUxksEaFSlyRHN4Hij+1NRVlLDyuXAHwLMHomD5TboI7ypUPyrp1bErZwQjyw8YA6
+         6lu0S9sRw8tXo4lAGcGuKnX9kCgDHKuOlWSq2PkI5DrGcQHX+nWpf6VuKDueAJUvZACC
+         zUUEFIxONrfxt48Aq+aBKZrmcGmKPBVA0G7yfLLPLaMh69/VL8jf4+CHfsZFPkwEeO0R
+         WiKnoD4ji0dt/LOy+NckHoE89m515q0L80Hw85V8hdzr729CbGGL/k3JXnky7lVmGx84
+         3gtw==
+X-Forwarded-Encrypted: i=1; AJvYcCXgoYfDCGX7YthnArIzmCDwcPDl2MGVok6fM30fxa7co+GXFEzxvbueWtqFxBBWAW8x56498JAqCCjJ9SZ8KhvjsriMuL06Pd6HCENyUOg6bKF63aG9EtSazG5FdBC9o5MHmvno
+X-Gm-Message-State: AOJu0YzIuv536NXXANqPIHFQo1sR8wRa27TRdlzFk4oyjhFn+w21IGR5
+	dBhGSwdBoIhGfNIa4eEjubiOr07IWE5HGl7wKy/xr/6uc+BTed3a
+X-Google-Smtp-Source: AGHT+IEBj73siAJfZoLiX9gqpPn+nv1DxMqUBBrc8uKp//jC475DsqApjM9Y16BLcPTu9eoocFrNUA==
+X-Received: by 2002:a17:902:c7d2:b0:1f3:a14:5203 with SMTP id d9443c01a7336-1f61962bd45mr20087525ad.38.1717089074324;
+        Thu, 30 May 2024 10:11:14 -0700 (PDT)
+Received: from localhost ([216.228.127.129])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6323dd824sm203895ad.128.2024.05.30.10.11.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 May 2024 10:11:13 -0700 (PDT)
+Date: Thu, 30 May 2024 10:11:11 -0700
+From: Yury Norov <yury.norov@gmail.com>
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexander Potapenko <glider@google.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v6 13/21] bitmap: make bitmap_{get,set}_value8()
+ use bitmap_{read,write}()
+Message-ID: <ZlizL6d1_ePq-eKs@yury-ThinkPad>
+References: <20240327152358.2368467-1-aleksander.lobakin@intel.com>
+ <20240327152358.2368467-14-aleksander.lobakin@intel.com>
+ <5a18f5ac-4e9a-4baf-b720-98eac7b6792f@arm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+In-Reply-To: <5a18f5ac-4e9a-4baf-b720-98eac7b6792f@arm.com>
 
-extend cls_flower to match TUNNEL_FLAGS_PRESENT bits in tunnel metadata.
+On Wed, May 29, 2024 at 04:12:25PM +0100, Robin Murphy wrote:
+> Hi Alexander,
+> 
+> On 27/03/2024 3:23 pm, Alexander Lobakin wrote:
+> > Now that we have generic bitmap_read() and bitmap_write(), which are
+> > inline and try to take care of non-bound-crossing and aligned cases
+> > to keep them optimized, collapse bitmap_{get,set}_value8() into
+> > simple wrappers around the former ones.
+> > bloat-o-meter shows no difference in vmlinux and -2 bytes for
+> > gpio-pca953x.ko, which says the optimization didn't suffer due to
+> > that change. The converted helpers have the value width embedded
+> > and always compile-time constant and that helps a lot.
+> 
+> This change appears to have introduced a build failure for me on arm64
+> (with GCC 9.4.0 from Ubuntu 20.04.02) - reverting b44759705f7d makes
+> these errors go away again:
+> 
+> In file included from drivers/gpio/gpio-pca953x.c:12:
+> drivers/gpio/gpio-pca953x.c: In function ‘pca953x_probe’:
+> ./include/linux/bitmap.h:799:17: error: array subscript [1, 1024] is outside array bounds of ‘long unsigned int[1]’ [-Werror=array-bounds]
+>   799 |  map[index + 1] &= BITMAP_FIRST_WORD_MASK(start + nbits);
+>       |                 ^~
+> In file included from ./include/linux/atomic.h:5,
+>                  from drivers/gpio/gpio-pca953x.c:11:
+> drivers/gpio/gpio-pca953x.c:1015:17: note: while referencing ‘val’
+>  1015 |  DECLARE_BITMAP(val, MAX_LINE);
+>       |                 ^~~
+> ./include/linux/types.h:11:16: note: in definition of macro ‘DECLARE_BITMAP’
+>    11 |  unsigned long name[BITS_TO_LONGS(bits)]
+>       |                ^~~~
+> In file included from drivers/gpio/gpio-pca953x.c:12:
+> ./include/linux/bitmap.h:800:17: error: array subscript [1, 1024] is outside array bounds of ‘long unsigned int[1]’ [-Werror=array-bounds]
+>   800 |  map[index + 1] |= (value >> space);
+>       |  ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+> In file included from ./include/linux/atomic.h:5,
+>                  from drivers/gpio/gpio-pca953x.c:11:
+> drivers/gpio/gpio-pca953x.c:1015:17: note: while referencing ‘val’
+>  1015 |  DECLARE_BITMAP(val, MAX_LINE);
+>       |                 ^~~
+> ./include/linux/types.h:11:16: note: in definition of macro ‘DECLARE_BITMAP’
+>    11 |  unsigned long name[BITS_TO_LONGS(bits)]
+>       |                ^~~~
+> 
+> I've not dug further since I don't have any interest in the pca953x
+> driver - it just happened to be enabled in my config, so for now I've
+> turned it off. However I couldn't obviously see any other reports of
+> this, so here it is.
 
-Suggested-by: Ilya Maximets <i.maximets@ovn.org>
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: Davide Caratti <dcaratti@redhat.com>
----
- include/uapi/linux/pkt_cls.h |  3 ++
- net/sched/cls_flower.c       | 56 +++++++++++++++++++++++++++++++++++-
- 2 files changed, 58 insertions(+), 1 deletion(-)
+It's a compiler false-positive. The straightforward fix is to disable the warning
+For gcc9+, and it's in Andrew Morton's tree alrady. but there's some discussion 
+ongoing on how it should be mitigated properlu:
 
-diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
-index 229fc925ec3a..b6d38f5fd7c0 100644
---- a/include/uapi/linux/pkt_cls.h
-+++ b/include/uapi/linux/pkt_cls.h
-@@ -554,6 +554,9 @@ enum {
- 	TCA_FLOWER_KEY_SPI,		/* be32 */
- 	TCA_FLOWER_KEY_SPI_MASK,	/* be32 */
- 
-+	TCA_FLOWER_KEY_ENC_FLAGS,	/* u32 */
-+	TCA_FLOWER_KEY_ENC_FLAGS_MASK,	/* u32 */
-+
- 	__TCA_FLOWER_MAX,
- };
- 
-diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-index fd9a6f20b60b..eef570c577ac 100644
---- a/net/sched/cls_flower.c
-+++ b/net/sched/cls_flower.c
-@@ -41,6 +41,12 @@
- #define TCA_FLOWER_KEY_CT_FLAGS_MASK \
- 		(TCA_FLOWER_KEY_CT_FLAGS_MAX - 1)
- 
-+#define TUNNEL_FLAGS_PRESENT (\
-+	_BITUL(IP_TUNNEL_CSUM_BIT) |		\
-+	_BITUL(IP_TUNNEL_DONT_FRAGMENT_BIT) |	\
-+	_BITUL(IP_TUNNEL_OAM_BIT) |		\
-+	_BITUL(IP_TUNNEL_CRIT_OPT_BIT))
-+
- struct fl_flow_key {
- 	struct flow_dissector_key_meta meta;
- 	struct flow_dissector_key_control control;
-@@ -75,6 +81,7 @@ struct fl_flow_key {
- 	struct flow_dissector_key_l2tpv3 l2tpv3;
- 	struct flow_dissector_key_ipsec ipsec;
- 	struct flow_dissector_key_cfm cfm;
-+	struct flow_dissector_key_enc_flags enc_flags;
- } __aligned(BITS_PER_LONG / 8); /* Ensure that we can do comparisons as longs. */
- 
- struct fl_flow_mask_range {
-@@ -732,6 +739,10 @@ static const struct nla_policy fl_policy[TCA_FLOWER_MAX + 1] = {
- 	[TCA_FLOWER_KEY_SPI_MASK]	= { .type = NLA_U32 },
- 	[TCA_FLOWER_L2_MISS]		= NLA_POLICY_MAX(NLA_U8, 1),
- 	[TCA_FLOWER_KEY_CFM]		= { .type = NLA_NESTED },
-+	[TCA_FLOWER_KEY_ENC_FLAGS]	= NLA_POLICY_MASK(NLA_U32,
-+							  TUNNEL_FLAGS_PRESENT),
-+	[TCA_FLOWER_KEY_ENC_FLAGS_MASK]	= NLA_POLICY_MASK(NLA_U32,
-+							  TUNNEL_FLAGS_PRESENT),
- };
- 
- static const struct nla_policy
-@@ -1825,6 +1836,21 @@ static int fl_set_key_cfm(struct nlattr **tb,
- 	return 0;
- }
- 
-+static int fl_set_key_enc_flags(struct nlattr **tb, u32 *flags_key,
-+				u32 *flags_mask, struct netlink_ext_ack *extack)
-+{
-+	/* mask is mandatory for flags */
-+	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, TCA_FLOWER_KEY_ENC_FLAGS_MASK)) {
-+		NL_SET_ERR_MSG(extack, "missing enc_flags mask");
-+		return -EINVAL;
-+	}
-+
-+	*flags_key = nla_get_u32(tb[TCA_FLOWER_KEY_ENC_FLAGS]);
-+	*flags_mask = nla_get_u32(tb[TCA_FLOWER_KEY_ENC_FLAGS_MASK]);
-+
-+	return 0;
-+}
-+
- static int fl_set_key(struct net *net, struct nlattr **tb,
- 		      struct fl_flow_key *key, struct fl_flow_key *mask,
- 		      struct netlink_ext_ack *extack)
-@@ -2059,9 +2085,16 @@ static int fl_set_key(struct net *net, struct nlattr **tb,
- 	if (ret)
- 		return ret;
- 
--	if (tb[TCA_FLOWER_KEY_FLAGS])
-+	if (tb[TCA_FLOWER_KEY_FLAGS]) {
- 		ret = fl_set_key_flags(tb, &key->control.flags,
- 				       &mask->control.flags, extack);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	if (tb[TCA_FLOWER_KEY_ENC_FLAGS])
-+		ret = fl_set_key_enc_flags(tb, &key->enc_flags.flags,
-+					   &mask->enc_flags.flags, extack);
- 
- 	return ret;
- }
-@@ -2175,6 +2208,8 @@ static void fl_init_dissector(struct flow_dissector *dissector,
- 			     FLOW_DISSECTOR_KEY_IPSEC, ipsec);
- 	FL_KEY_SET_IF_MASKED(mask, keys, cnt,
- 			     FLOW_DISSECTOR_KEY_CFM, cfm);
-+	FL_KEY_SET_IF_MASKED(mask, keys, cnt,
-+			     FLOW_DISSECTOR_KEY_ENC_FLAGS, enc_flags);
- 
- 	skb_flow_dissector_init(dissector, keys, cnt);
- }
-@@ -3291,6 +3326,22 @@ static int fl_dump_key_cfm(struct sk_buff *skb,
- 	return err;
- }
- 
-+static int fl_dump_key_enc_flags(struct sk_buff *skb,
-+				 struct flow_dissector_key_enc_flags *key,
-+				 struct flow_dissector_key_enc_flags *mask)
-+{
-+	if (!memchr_inv(mask, 0, sizeof(*mask)))
-+		return 0;
-+
-+	if (nla_put_u32(skb, TCA_FLOWER_KEY_ENC_FLAGS, key->flags))
-+		return -EMSGSIZE;
-+
-+	if (nla_put_u32(skb, TCA_FLOWER_KEY_ENC_FLAGS_MASK, mask->flags))
-+		return -EMSGSIZE;
-+
-+	return 0;
-+}
-+
- static int fl_dump_key_options(struct sk_buff *skb, int enc_opt_type,
- 			       struct flow_dissector_key_enc_opts *enc_opts)
- {
-@@ -3592,6 +3643,9 @@ static int fl_dump_key(struct sk_buff *skb, struct net *net,
- 	if (fl_dump_key_cfm(skb, &key->cfm, &mask->cfm))
- 		goto nla_put_failure;
- 
-+	if (fl_dump_key_enc_flags(skb, &key->enc_flags, &mask->enc_flags))
-+		goto nla_put_failure;
-+
- 	return 0;
- 
- nla_put_failure:
--- 
-2.44.0
+https://lore.kernel.org/all/0ab2702f-8245-4f02-beb7-dcc7d79d5416@app.fastmail.com/T/
 
+Thanks,
+YUry
 
