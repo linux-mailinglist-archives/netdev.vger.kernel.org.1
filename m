@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-99246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CB128D433B
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B05EC8D433C
 	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 04:00:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50B631F2314D
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 02:00:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC3D21C231E0
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 02:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFCAF17BA4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0BDA17BA8;
 	Thu, 30 May 2024 02:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l/LzTUNd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ph7h1rCP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A1FC2E9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A5314286;
 	Thu, 30 May 2024 02:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717034432; cv=none; b=E1DQ3UODLPQfY8faPkNRqghbDpSP9tRW2Cg10THDIGxHPxt0+O+uOXeNzsKJeW0s4makFgdaLwSZmR0iZdTPYRL2M77Zs3FKdeypwzmA7ohJI+Ng1SF4Dwijtne/rxpfFFOvocVSOZZgi5JFFGHep7swJvWuT6dcb4tq1kYRz8Q=
+	t=1717034432; cv=none; b=u1e+VKwpj7A25VOE2rIJzSp5aKCdqaGk2OBp0jeWLCMRt8jHPy7Z47MZMK8c9n9i7Uy1pnBU2uXE9Uyi5YDRSVUO6BpPGqvbeGyJh2Y7CP32Kj+roW63ci6nooVgMVqIlviTwKVmWUrTypQcKYFCR50p1i7a7UeppYh4MtVSMXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717034432; c=relaxed/simple;
-	bh=JxtROD1xNSjCJsqXFY/a55Z5Z4Z7MK5y6MUH2nMzrgs=;
+	bh=giUOLxIduZvTBVTj8dQhszO7U46VjwbPQTAZbzSBxX8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RejezNETDAc0rLHyKNWMZuOmegbq4tKrEJ0DPyXaSPqoSMO/4z/1nrm5bYd7yNH+dqJZhWKk2gSsUTgK05jiL0H905zgd5Ij7SZaFxCZ8hthCmLhbWZY2qcEZtgQktV2qj6UC6ftjdAidoy+H+JZXS5pod0ICblKgxfWJLbOzlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l/LzTUNd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4563BC2BD10;
+	 In-Reply-To:To:Cc; b=l1qO7pSLI/RJpQj0wd/wo8ZwEhkVUxoYs4UxSNOAI1f7qRac1lRinwJTPaegGk3+Ii0IWWFRVTshXnn3VdflKexLoakgrIxZA4rtLMWAIX+PaWbQkwr0/hcIBODomkIYPlWjCYjoOcqvOKXpvhPv9+wKxe88CVGbbqhYPQWSJF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ph7h1rCP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 58363C32782;
 	Thu, 30 May 2024 02:00:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1717034432;
-	bh=JxtROD1xNSjCJsqXFY/a55Z5Z4Z7MK5y6MUH2nMzrgs=;
+	bh=giUOLxIduZvTBVTj8dQhszO7U46VjwbPQTAZbzSBxX8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=l/LzTUNdBX95zl+aEwEy2Ripz5P0gqSephirqr96LDv6jQ88RBi6vhwzgjgt6LZY/
-	 TlAHvAmdwHyuU3SgcKG/LpX3OgLy73YYUedi7gGe30Tu7XK2NF2SmkMUQNePuUq+8k
-	 XSjCygnFZ0BG7lx5BSe7Z0G6RtnBfmN1dSm+Pv8RTgaYriow0fBB1jZKW1EoR+D8Zi
-	 zuXEFzRBBsQDe818kiyLTmO2lR/NybXomleRXoRl0JHwYHHEhgM68/dYJrlHSgo84E
-	 blHEQ/bCxiz24mxe65L8MqzpNZOihTAF24djFjf6KCM784zmmxd+7zT4uVIleSbLqr
-	 sC2t4vGDRa11Q==
+	b=ph7h1rCPZiI6AWd1luIlQY43/fXJIM2064EvMijjM2RbaUqF6sM4vDJlS8Bf0Ucgo
+	 Cfc2BGIYFpzQTcMvZDYo1/Kl416wW8TsmSRGikm0Goe5tW8cXd445Q2SCT9jIdOE4Z
+	 7qjjJbiTf8D0MJTVBICU6WfJeW2KPACbejv9WusV8gTBL9FGmeRcv8xhHwF7Zg0qJo
+	 CqpwvTdw1a9zXQd+T6s4GAyuG2HheJlSemG7vfPYS8thnC+5rA8izbRJyLtUsQa9xA
+	 bR56e1LOyDAl2xNr5nRaHO3RNCS2wtn79lBlpv/rqfu7/GC2pNoXFjs58eGrxKCUpd
+	 8q2zVv7DZJudA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2EADBD84BCD;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 46821D84BD0;
 	Thu, 30 May 2024 02:00:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: dsa: microchip: fix RGMII error in KSZ DSA driver
+Subject: Re: [PATCH net] ipv4: correctly iterate over the target netns in
+ inet_dump_ifaddr()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171703443218.3291.4892024519339960900.git-patchwork-notify@kernel.org>
+ <171703443228.3291.4714432873121553067.git-patchwork-notify@kernel.org>
 Date: Thu, 30 May 2024 02:00:32 +0000
-References: <1716932066-3342-1-git-send-email-Tristram.Ha@microchip.com>
-In-Reply-To: <1716932066-3342-1-git-send-email-Tristram.Ha@microchip.com>
-To:  <Tristram.Ha@microchip.com>
-Cc: woojung.huh@microchip.com, andrew@lunn.ch, vivien.didelot@gmail.com,
- f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, tristram.ha@microchip.com
+References: <20240528203030.10839-1-aleksandr.mikhalitsyn@canonical.com>
+In-Reply-To: <20240528203030.10839-1-aleksandr.mikhalitsyn@canonical.com>
+To: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Cc: edumazet@google.com, kuba@kernel.org, dsahern@kernel.org,
+ pabeni@redhat.com, stgraber@stgraber.org, brauner@kernel.org,
+ davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 28 May 2024 14:34:26 -0700 you wrote:
-> From: Tristram Ha <tristram.ha@microchip.com>
+On Tue, 28 May 2024 22:30:30 +0200 you wrote:
+> A recent change to inet_dump_ifaddr had the function incorrectly iterate
+> over net rather than tgt_net, resulting in the data coming for the
+> incorrect network namespace.
 > 
-> The driver should return RMII interface when XMII is running in RMII mode.
-> 
-> Fixes: 0ab7f6bf1675 ("net: dsa: microchip: ksz9477: use common xmii function")
-> Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
-> Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
-> Acked-by: Jerry Ray <jerry.ray@microchip.com>
+> Fixes: cdb2f80f1c10 ("inet: use xa_array iterator to implement inet_dump_ifaddr()")
+> Reported-by: Stéphane Graber <stgraber@stgraber.org>
+> Closes: https://github.com/lxc/incus/issues/892
+> Bisected-by: Stéphane Graber <stgraber@stgraber.org>
+> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+> Tested-by: Stéphane Graber <stgraber@stgraber.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: dsa: microchip: fix RGMII error in KSZ DSA driver
-    https://git.kernel.org/netdev/net/c/278d65ccdadb
+  - [net] ipv4: correctly iterate over the target netns in inet_dump_ifaddr()
+    https://git.kernel.org/netdev/net/c/b8c8abefc07b
 
 You are awesome, thank you!
 -- 
