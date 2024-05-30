@@ -1,182 +1,139 @@
-Return-Path: <netdev+bounces-99496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8733E8D50FD
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 19:27:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C445A8D5115
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 19:36:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12F441F24625
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:27:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B552282D2F
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9833BB2E;
-	Thu, 30 May 2024 17:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9226344C76;
+	Thu, 30 May 2024 17:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="qo8XaPPp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tt4Z7obe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DB1187560
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 17:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF9A17F5;
+	Thu, 30 May 2024 17:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717090046; cv=none; b=JaVi64Zuw+DEnpQIpaLKKt5qEaF79ARPQ8fsEykqODjEPw5s7hp0T8Jr8fJUKONuSpcQP2bQXiV/lZ1rdWQtS5c38mzcmcOfh+PUQG/ECxjYxIO7rq8PP5AKMbwu94RPwOveiRXMNV1yQvgBAVGEnCCR+wc2GEzLsr27YyekbGY=
+	t=1717090558; cv=none; b=llDA+gozbKlQ7W3QseWjJY6WPmlZn63cVkacTf7QVEo10aSYuVQEjoqTNSltr8PpZhXvRsj8AIJkppi6oKFF0UjFFzg6bgBWkLmKhH8ZzzMq5WB6hWKDIrtZB0eYz8Xcvx/bjzTa3kPHLG0Tuom9NSLbUst/bNA2mU4AFa22Lyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717090046; c=relaxed/simple;
-	bh=AzPPrQvWftZavVm8o7x8tDX+QGoOOGJh4cLKvdDATCg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u3pNfOrvWKzr83pRVgb4M19Fdm2+r/pdVg/0xB/HCCpOFVoSbmvESgsKZR/Ytg/TmCtH2a5aspPEOIAcmiWVnISBVYgU1/AjT+VpVSO5Z+gEaI9A0cGzoEFRoz4eV6T8SUg6IIk0MOVpcKZTIyLUG3ObNc+hB30IMBSYVMXc7nY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=qo8XaPPp; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-57a2406f951so955906a12.1
-        for <netdev@vger.kernel.org>; Thu, 30 May 2024 10:27:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1717090043; x=1717694843; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Bjn6kV+I1+puKhuNk+vFEkh0Zq4tZL1VGL97CFzqy7o=;
-        b=qo8XaPPpdPN4hI6pgMYZ9iEUHHnysbzhFaLkCWeKmzDDvpjUB2Iy7/gSxGYHXDuqD4
-         OKye8tOhbWJQNvQaObI0MLxGt3wmPDEZu3hqoXGdJyv3hO9r/F5XQc9kW5Prw8EWcOlG
-         mNcFdo4NwaQsdXRDHnR6hlOsShryok/XRjbqwm0De1m+zb29y0VwAafO/5xlrY5YC/ki
-         UOQ36puHPFpWnfjjAxNmKc2A2thjHU8LdxJBy5yR6/HwHlNdq+jDiJQxX7KCMSiaOF3s
-         M2EJttIUI8u7r+0e8X2KcXG5a72nBupPRdnBiBFMHCBJUvEACAKvlITc7tJ6vkYHLuc+
-         MTQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717090043; x=1717694843;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bjn6kV+I1+puKhuNk+vFEkh0Zq4tZL1VGL97CFzqy7o=;
-        b=FlvAH3YTP8CZCOBQgr6GuhpefCOgNz71lQpnf3LDeLnPoCFkz8J5KwDKKeDDAhGjDo
-         ef3vxPFgHuP7P7mwj5Z/3ZnkeqeSL5JLLpbk8sCrYr/1G0o+OPyRqlCQChZXSy0zUmyO
-         VO6jWvFK4Nf6Cil3PcHfjDwewLrgHqpJ1n4oJVloJwqqQRZ5cF3BS5AhvlrcU7Y5rT88
-         Jg3wGtA5gkhEPX35rBFJJ5ht1mKhG12mmNVyAJP8weS5Ru7enHy8Jy5O/4Gv+sX0szQL
-         dIrLIWp8XVdq1deF1ivUkByJ7B/69NJTwFmHoFHM2x/Ut2t1oZ/S08oV6cz8uYo/NSzc
-         VAAA==
-X-Forwarded-Encrypted: i=1; AJvYcCVFFE4gQ/JnqvHdfgaU3g6iM2BTElz/eeRxDDpxz8cQwWIQEQ7onFXvxO6HKpczQwsHzQbfvS5fBQP+UDdqLrQsj6GLemAo
-X-Gm-Message-State: AOJu0YxzRg01ZUlMPHTWldd+qUbzNEHDxVMungG98th3jeOspu4vkB5x
-	6K/l3V1LgEvib//V4Ih8WbiFQSKeHT4FTP38QVXxCLrrjy5TYQwptHJ07844BnyYE+cEnc7obQ5
-	4IjEtVQ==
-X-Google-Smtp-Source: AGHT+IFRAtJRLfiYDc7FcZZcJbfFnMzj0OUctLnGljxS15fNIrA18znVuoboXkovavrwQU+wlAtKKA==
-X-Received: by 2002:a50:8d57:0:b0:57a:27b9:25f5 with SMTP id 4fb4d7f45d1cf-57a27b9285dmr1260770a12.35.1717090042576;
-        Thu, 30 May 2024 10:27:22 -0700 (PDT)
-Received: from [192.168.0.105] (bras-109-160-25-143.comnet.bg. [109.160.25.143])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57a31c6d30esm35285a12.73.2024.05.30.10.27.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 May 2024 10:27:22 -0700 (PDT)
-Message-ID: <a9a50b48-d85f-4465-a7b0-dec8b3f49281@blackwall.org>
-Date: Thu, 30 May 2024 20:27:20 +0300
+	s=arc-20240116; t=1717090558; c=relaxed/simple;
+	bh=ySA3qGoOv77Kj+2JOSfztlTPJtvNGX/ZUjZpww6gAWQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=faZOUovDoKQLK1+HFW0Twj0c8PdsJsQqBA868SGFnk64Z8ubHYXn7xpzAAciHrwv1mIzYfMD7I9+z9kDLvyAZSIdrqvHAJCCA04fWdOq7zEtIX1BdVAMHmaT79E41zwzuJVMb3/v9iAnLaB9P0qJqtoe73SL95T2INkMEfdqxac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tt4Z7obe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2638BC2BBFC;
+	Thu, 30 May 2024 17:35:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717090558;
+	bh=ySA3qGoOv77Kj+2JOSfztlTPJtvNGX/ZUjZpww6gAWQ=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=Tt4Z7obenZPIzytNHWx8Uf5ToRX1Ul/8ItRUAQLmMfBxQzIU6CrU67LSnfS3AzMRR
+	 8uufZL/8YJc1w2zkMxrOEGaDHd+QWSbeX68ikLMkEyteok3231VRcUROhnoU/UQSCm
+	 CtQ6kE0sNJm41M4hJNskKrhqAIkrbKfKoQzDC2d8BDTSRv/NKTKCJw6646PdotwOnq
+	 dwno/IXtn7a4pAQwt672DGFqjF9Z5rXLz7LjEpDr8/z8ojo0gvktypWSgQqsn17a13
+	 JKOAYowe/vceNGtNN/6ZWzkeY4feuQncFsNVp+ueZOR0/8nabyFjp0kkvhp6SIMbhP
+	 iCXVDd/FIkHIA==
+Message-ID: <7e443c56-129e-4421-8dd8-adb57e9e6193@kernel.org>
+Date: Thu, 30 May 2024 19:35:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/4] Allow configuration of multipath hash seed
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- Ido Schimmel <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>
-References: <20240529111844.13330-1-petrm@nvidia.com>
- <878d1248-a710-4b02-b9c7-70937328c939@blackwall.org>
- <878qzr9qk6.fsf@nvidia.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <878qzr9qk6.fsf@nvidia.com>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [TEST] Flake report
+Content-Language: en-GB
+From: Matthieu Baerts <matttbe@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, MPTCP Upstream <mptcp@lists.linux.dev>
+References: <20240509160958.2987ef50@kernel.org>
+ <11ff9d2b-6c3e-4ee5-81c0-d36de2308dbd@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <11ff9d2b-6c3e-4ee5-81c0-d36de2308dbd@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 5/30/24 18:25, Petr Machata wrote:
-> 
-> Nikolay Aleksandrov <razor@blackwall.org> writes:
-> 
->> I think that using memory management for such simple task is an
->> overkill. Would it be simpler to define 2 x 4 byte seed variables
->> in netns_ipv4 (e.g. user_seed, mp_seed). One is set only by the
->> user through the sysctl, which would also set mp_seed. Then you
->> can use mp_seed in the fast-path to construct that siphash key.
->> If the user_seed is set to 0 then you reset to some static init
->> hash value that is generated on init_net's creation. The idea
-> 
-> Currently the flow dissector siphash key is initialized lazily so that
-> the pool of random bytes is full when the initialization is done:
-> 
->     https://lore.kernel.org/all/20131023180527.GC2403@order.stressinduktion.org
->     https://lore.kernel.org/all/20131023111219.GA31531@order.stressinduktion.org
-> 
-> I'm not sure how important that is -- the mailing does not really
-> discuss much in the way of rationale, and admits it's not critical. But
-> initializing the seed during net init would undo that. At the same time,
-> initializing it lazily would be a bit of a mess, as we would have to
-> possibly retroactively update mp_hash as well, which would be racy vs.
-> user_hash update unless locked. So dunno.
+Hi Jakub,
 
-If you want to keep the late init, untested:
-init_mp_seed_once() -> DO_ONCE(func (net_get_random_once(&init_mp_seed),
-memcpy(&init_net.mp_seed, &init_mp_seed))
+(+ MPTCP ML, - authors of other unstable selftests)
 
+On 10/05/2024 16:28, Matthieu Baerts wrote:
+> On 10/05/2024 01:09, Jakub Kicinski wrote:
 > 
-> If you are OK with giving up on the siphash key "quality", I'm fine with
-> this.
+> (...)
 > 
-
-IMO that's fine, early init of the seed wouldn't be a problem. net's
-hash_mix is already initialized early.
-
-> Alternatively I can keep the dispatch in like it currently is. I.e.:
-> 
-> 	if (user_seed) {
-> 		sip_hash = construct(user_seed)
-> 		return flow_hash_from_keys_seed(sip_hash)
-> 	} else {
-> 		return flow_hash_from_keys()
-> 	}
-> 
-> I wanted to have the flow dispatcher hash init early as well, as it made
-> the code branch-free like you note below, but then Ido dug out that
-
-+1
-
-> there are $reasons for how it's currently done.
-> >> is to avoid leaking that initial seed, to have the same seed
->> for all netns (known behaviour), be able to recognize when a
->> seed was set and if the user sets a seed then overwrite it for
->> that ns, but to be able to reset it as well.
->> Since 32 bits are enough I don't see why we should be using
->> the flow hash seed, note that init_net's initialization already
-> 
-> No deep reason in using the dissector hash as far as I'm concerned.
-> I just didn't want to change things arbitrarily, so kept the current
-> behavior except where I needed it to change.
-> 
->> uses get_random_bytes() for hashes. This seems like a simpler
->> scheme that doesn't require memory management for a 32 bit seed.
->> Also it has the benefit that it will remove the test when generating
->> a hash because in the initial/non-user-set case we just have the
->> initial seed in mp_seed which is used to generate the siphash key,
->> i.e. we always use that internal seed for the hash, regardless if
->> it was set by the user or it's the initial seed.
+>> mptcp
+>> -----
+>> To: Matthieu Baerts <matttbe@kernel.org>
 >>
->> That's just one suggestion, if you decide to use more memory you
->> can keep the whole key in netns_ipv4 instead, the point is I don't
->> think we need memory management for this value.
+>> simult-flows-sh is still quite flaky :(
 > 
-> I kept the RCU stuff in because it makes it easy to precompute the
-> siphash key while allowing readers to access it lock-free. I could
-> inline it and guard with a seqlock instead, but that's a bit messier
-> code-wise. Or indeed construct in-situ, it's an atomic access plus like
-> four instructions or something like that.
+> Yes, we need to find a solution for that. It is not as unstable on our
+> side [1]. We will look at that next week. If we cannot find a solution
+> quickly, we will skip the flaky subtests to stop the noise while
+> continuing to investigate.
+Now that the flaky MPTCP subtests results have been ignored, the results
+look better:
 
-You can READ/WRITE_ONCE() the full 8 bytes every time so it's lock-free
-and consistent view of both values for observers. For fast-path it'll
-only be accessing one of the two values, so it's fine either way. You
-can use barriers to ensure latest value is seen by interested readers,
-but for most eventual consistency would be enough.
+  https://netdev.bots.linux.dev/flakes.html?br-cnt=88&tn-needle=mptcp
+
+Do you think we could also stop ignoring them on NIPA side?
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
