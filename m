@@ -1,163 +1,101 @@
-Return-Path: <netdev+bounces-99300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3E968D45C4
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 09:08:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D81E98D45F7
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 09:22:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C2F7284636
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 07:08:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3734DB2104E
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 07:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E573F4D8AB;
-	Thu, 30 May 2024 07:08:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC8497316F;
+	Thu, 30 May 2024 07:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="eK9yYGJB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lmq72Mm8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E334D8A5
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 07:08:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400851CD20
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 07:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717052922; cv=none; b=eSR2VRjSEq7CxCl0LMSs/5VT1d3oS/RhYlAksBBzOvu6bk6ISHTvUKpNQ/bK2OolHdcS2oAcO4Nd9Mlnudrt0UxFjTGmLtMbwaop/xbrOixNeIsk1/dDEPMlD8GQdtrnGMANQKyPWzdxB62T21Z9dV/qbewvWrIngAWJnkqLE/c=
+	t=1717053766; cv=none; b=KHzQuFoyw6yqJ2znOgkA/M0wekrpZeGksGcdNljqh+yDvUSp/FjeTnkyqwK6WFX+fiH6qgt2UejYoV7PgFQDMkOKXJJvvjKEuYJjn4wZvfz0zTsAdDVqy4DjVUkwHzVs1WCMw1pNUA8vr4EKHiraCH2z+FtlMNQ6GB1+9/maW9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717052922; c=relaxed/simple;
-	bh=BniW6rWiN74lvUrkYpNGa9ngKB30V1X82LLmR41ooy0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Tf22Uny+zumVjID7z0QcoDXxA37dGd2G3CF5H45huXR+ENMFAWadMRcLrseKs5TgwZjggNcHVB3az3LcwGI1Rhk/j5fTqXF09zrWxz7lTYCvKu7XAvbdmhWpQbShfkzKbfLR71owh7iEUEHXw/RI63wQXTZn/gRGqhDydq5BxBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=eK9yYGJB; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com [209.85.208.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 49CA13F42A
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 07:08:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1717052916;
-	bh=TRdoJVYUghUxsPDAMk3jETTan44HR4AbMtVfdYZkEqw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=eK9yYGJBRX5sjqPb6+A+mXmX0Py81nIwfq8ioDVC3ha+VtaWOqsAG6qSWlHzIc53u
-	 cXSoKFrQI6IGmXBFA6Dlf8YWCtMacvnImEYQFlEzsiE679yb0qcm7HGvIlHY22h1e1
-	 qqXSO7KHn8otoZBrCOcfEcC8PCFCD+R3xS9MYnAWdg82Q2+Cz2stNjkxkGQrEZzlaI
-	 jaRCfP5wCqAV6jJhJO5Rl/LnIhynwHRM7fxEEac480tcY8ejfCcqdVEtX2MWYRnYiR
-	 gGOXF2gNN8kX+qMcPGi6fGQmwFvnCKfMcrs5m8J05c+EXbN5p7KvAApnhK1wdEnTQl
-	 R2wyPb869ZNbg==
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2ea839a481bso3906531fa.0
-        for <netdev@vger.kernel.org>; Thu, 30 May 2024 00:08:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717052915; x=1717657715;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TRdoJVYUghUxsPDAMk3jETTan44HR4AbMtVfdYZkEqw=;
-        b=uEOxa1RNedlR3H0N3V755e5fazgT5toHvpMk5jwqDWIVP1J1bs25ShA6MjzaQapVzq
-         9ovgrMhUlZCYdREtH2l8OXAJyOhPzC1b5Y2oDgXQ11KuHWwMjEQ4oJWNMAeWfD1Bl5XH
-         D7LqErBV4l/aDLZEEwzDTrPiICqceoZLmx4a/wWn3Y6Mez3FmXrgQtHq4VpRsTq2UdSO
-         q3cgsOehuacKWxmSkQByGmGRePHRWYV9TGUCQM3IxbauTQ57/6Gu41ScUnkHNRIvT/BV
-         CqdoQn05N+P3so0SeM4DDbYOSd+qeq7ciTUNBXHER99Ag0+4oxt+2uWLmfOCInvPWBA9
-         eV4g==
-X-Forwarded-Encrypted: i=1; AJvYcCXGb147nci1Q+ygWHE7AGh42NYASDWo3dWapeT4lWaBfxxXSUgDHPsew0+gdwia6+0E4BJ8txnWrI3LaQCBEFfO2Qyyw6g5
-X-Gm-Message-State: AOJu0YyFjj3WlNt3Q/bGTo0y4micTW5mvLPx4l8b/c2df53J/pdRuIco
-	XvXIpJtnHo8ouJnFiiesy3CJzZ8ePEhjvUQTZLs/7HLMc21LqNkLb0aJjEKztys9dsqyJyEudFe
-	UcM5MGaTEKgmh6uwSm8EcfXqxVFffWzijtXGVc/opl6ERTJ3BPIJAbW0r/+BbDQRXhNT8PuXsFL
-	PlrfGxOqLr93baxcXtgCsq2bL3c513SRIqzWw61IhwZHys
-X-Received: by 2002:a2e:a4c8:0:b0:2ea:8191:ec47 with SMTP id 38308e7fff4ca-2ea84827c6dmr6745581fa.28.1717052915706;
-        Thu, 30 May 2024 00:08:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGGNzMz5WM60Dn387vCm1QkAb1S8YVIGqyKkJPuQe24YTk1ju3RtdlPlXZO/RYVScKuyUOSO1Z9O623Eurys8w=
-X-Received: by 2002:a2e:a4c8:0:b0:2ea:8191:ec47 with SMTP id
- 38308e7fff4ca-2ea84827c6dmr6745421fa.28.1717052915311; Thu, 30 May 2024
- 00:08:35 -0700 (PDT)
+	s=arc-20240116; t=1717053766; c=relaxed/simple;
+	bh=ZHMvWcAgW2V4u+BvmrVa8WAs8F/hf3YNFThVq/o6xJU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C8mlEKgmqSnSmJx53MKJjgNH9hyYNeRhA95i5kTGUvI7U7HkfJP4hLugEcVVwIoI0bY5XYGNRpJdviUV0WIG3RniUy9j4cAstyGQsq/ZD+Kcyf14xABzMP8LIJuG8V9hcZO6bNlFqYJmDKTwjKBF9Si/NGHuPSbMXT7VTDJSkHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=lmq72Mm8; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=A/73ebAlsC/3BTmrvK4IFg/WQ37OWh2ZE3F/n1tmBwI=; b=lmq72Mm8NiAK+mUV3kHBmewYb+
+	t25+eQf+oSrqyb7Z3OBhhGAqtv6KbE2ewaOas5OOY1rjZboxbAF8xYQs39/6TuZxWLnunzZ1ZebOA
+	D7nJmfOOzitdS3khvqd6g1F/B1mF5lJJc3eTJUewX1jEBFKSzT7kQnwekSM47JnAM14h8wEjVekBn
+	8qluXnsZNP/YdHfmUf6Z/YglvGfmOoRSSJq551/OXI3gTeEevm93jp1aJY+E9vITl9tQhPkiIoJT+
+	Udth2B6lgAu7mgq7ImjnVBeEBkm4ioLzdHgm60+BgHvrOoEAE7EqJortH6ypt9m8rEElRbRS5uZEL
+	oIuesvGA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34450)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sCa7E-00073A-23;
+	Thu, 30 May 2024 08:22:24 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sCa7C-0004yH-O6; Thu, 30 May 2024 08:22:22 +0100
+Date: Thu, 30 May 2024 08:22:22 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: Yanteng Si <siyanteng@loongson.cn>, andrew@lunn.ch,
+	hkallweit1@gmail.com, peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	fancer.lancer@gmail.com, Jose.Abreu@synopsys.com,
+	guyinggang@loongson.cn, netdev@vger.kernel.org,
+	chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
+Subject: Re: [PATCH net-next v13 12/15] net: stmmac: Fixed failure to set
+ network speed to 1000.
+Message-ID: <ZlgpLm3L6EdFO60f@shell.armlinux.org.uk>
+References: <cover.1716973237.git.siyanteng@loongson.cn>
+ <e7ae2409f68a2f953ba7c823e248de7d67dfd4e9.1716973237.git.siyanteng@loongson.cn>
+ <CAAhV-H6ZJwWQOhAPmoaH4KYr66LCurKq94f87FQ05yEX6XYoNg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240528100315.24290-1-en-wei.wu@canonical.com>
- <88c6a5ee-1872-4c15-bef2-dcf3bc0b39fb@molgen.mpg.de> <CAMqyJG0uUgjN90BqjXSfgq7HD3ACdLwOM8P2B+wjiP1Zn1gjAQ@mail.gmail.com>
- <971a2c3b-1cd9-48c5-aa50-e3c441277f0a@molgen.mpg.de>
-In-Reply-To: <971a2c3b-1cd9-48c5-aa50-e3c441277f0a@molgen.mpg.de>
-From: En-Wei WU <en-wei.wu@canonical.com>
-Date: Thu, 30 May 2024 15:08:23 +0800
-Message-ID: <CAMqyJG13Q+20p5gPpLZ1JYBS6yt5HZox0=gaT87vDyxN1rxRyA@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] [PATCH] ice: irdma hardware init failed after suspend/resume
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: jesse.brandeburg@intel.com, intel-wired-lan@lists.osuosl.org, 
-	rickywu0421@gmail.com, linux-kernel@vger.kernel.org, edumazet@google.com, 
-	anthony.l.nguyen@intel.com, netdev@vger.kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, davem@davemloft.net, wojciech.drewek@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAAhV-H6ZJwWQOhAPmoaH4KYr66LCurKq94f87FQ05yEX6XYoNg@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Thank you for your reply.
+On Thu, May 30, 2024 at 10:25:01AM +0800, Huacai Chen wrote:
+> Hi, Yanteng,
+> 
+> The title should be "Fix ....." rather than "Fixed .....", and it is
 
-> Sorry for being unclear. I meant, does resuming the system take longer
-> now? (initcall_debug might give a clue.)
-I've tested the S3 suspend/resume with the initcall_debug kernel
-command option, and it shows no clear difference between having or not
-having the ice_init_rdma in ice_resume:
-Without ice_init_rdma:
-```
-[  104.241129] ice 0000:86:00.0: PM: pci_pm_resume+0x0/0x110 returned
-0 after 9415 usecs
-[  104.241206] ice 0000:86:00.1: PM: pci_pm_resume+0x0/0x110 returned
-0 after 9443 usecs
-```
-With ice_init_rdma:
-```
-[  122.749022] ice 0000:86:00.1: PM: pci_pm_resume+0x0/0x110 returned
-0 after 9485 usecs
-[  122.749068] ice 0000:86:00.0: PM: pci_pm_resume+0x0/0x110 returned
-0 after 9532 usecs
-```
+I would avoid the ambiguous "Fix" which for stable folk imply that this
+is a bug fix - but it isn't. It's adding support for requiring 1G
+speeds to always be negotiated.
 
-> And ice_init_rdma should be moved to ice_rebuild (replace ice_plug_aux_de=
-v)
-We can defer the ice_init_rdma to the later service task by adopting this.
+I would like this patch to be held off until more thought can be put
+into how to handle this without having a hack in the driver (stmmac
+has too many hacks and we're going to have to start saying no to
+these.)
 
-> You should call ice_deinit_rdma in ice_prepare_for_reset (replace ice_unp=
-lug_aux_dev),
-It seems like we must call ice_deinit_rdma in ice_suspend. If we call
-it in the later service task, it will:
-1. break some existing code setup by ice_resume
-2. Since the PCI-X vector table is flushed at the end of ice_suspend,
-we have no way to release PCI-X vectors for rdma if we had allocated
-it dynamically
-The second point is important since we didn't release the PCI-X
-vectors for rdma (if we allocated it dynamically) in the original
-ice_suspend, and it's somewhat like a leak in the original code.
+However, I'm completely overloaded right now to have any bandwidth
+to think about this.
 
-Best regards,
-Ricky.
-
-On Thu, 30 May 2024 at 04:19, Paul Menzel <pmenzel@molgen.mpg.de> wrote:
->
-> Dear En-Wei,
->
->
-> Thank you for responding so quickly.
->
-> Am 29.05.24 um 05:17 schrieb En-Wei WU:
->
-> [=E2=80=A6]
->
-> >> What effect does this have on resume time?
-> >
-> > When we call ice_init_rdma() at resume time, it will allocate entries
-> > at pf->irq_tracker.entries and update pf->msix_entries for later use
-> > (request_irq) by irdma.
->
-> Sorry for being unclear. I meant, does resuming the system take longer
-> now? (initcall_debug might give a clue.)
->
->
-> Kind regards,
->
-> Paul
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
