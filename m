@@ -1,138 +1,160 @@
-Return-Path: <netdev+bounces-99562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8A378D54B0
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 23:40:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E0CE8D54BD
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 23:47:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D3D11F25438
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 21:40:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F4035B2218D
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 21:47:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE80181D03;
-	Thu, 30 May 2024 21:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBAF218306F;
+	Thu, 30 May 2024 21:46:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TwH5JCYw"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="FcquoAme"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74BB2180A92;
-	Thu, 30 May 2024 21:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC242E85A
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 21:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717105250; cv=none; b=ZfDspEE5zBsqPoYGEY1g/EFjyi51ZFesTJXxNICjt8c4XbkhiE5/c5ycfq1vUzMbSdOrRbNKfqGcKrVh9pUepgRgwMWBhkFse0BYKzMXq5hprZdXsjKcu6q+9FbPqZepP8BfbMeKgATEigYTOUKGkX7+OPSdyWBFoI/YR6f1MAA=
+	t=1717105619; cv=none; b=RmSB8xOIq6VO9QEuEAlTbyTkpV1bxeeYnWuhQwky+dtI5MAZqzyiWfV2zNB6X1blRMtrvOBKsvbrSGaHpqhbocYG145qzGSf6Ki4eQ0OT/FP0Xhb+enMSjHfGW3mUbOiSLpKUwEG62MnKMMSkONY0o5b624EbM8R8LBRboS3k3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717105250; c=relaxed/simple;
-	bh=1w2qN10WOqvuZQeu6VvgnNDi3oQj5EaJz95IcVWuFvo=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=SOqrdml24jhVJ4IKUyryjPXtSCJ/2iRjizQvyk7ICAnmvwZXi8M/VthQvjC2pJgalQ1DNo1uSaBtz24V86BlKDjg28eZ7WkYWkuHjzekuUtgztpcNLekMBUmp41IcwLHceatfSStClsY3pM9zkgoyNo+vp7yq8GZSOvwUSHhR+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=TwH5JCYw; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44ULRZDY032634;
-	Thu, 30 May 2024 21:40:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=content-transfer-encoding : date : from : message-id : mime-version :
- subject : to; s=pp1; bh=1rytHSjc5j7es5kFgrgVdsI3VdYT1M/6yMPekap969A=;
- b=TwH5JCYwf77iQTVGhYmoILo+DSPUrBzdPlxxDK7SvYt9sSEzhnEo+gTJ+/JdRuHXxdZc
- fO6xg/5tOk/i+kekBiZqdwv7lqKgbGNMq/Q1FezYXUQ1nga/oVd8/SvZPXEYJTxFk4G5
- MEUfr9fUYRAGC9xkQAQZK7CnY3DpPjb3fcp3psZp15jKQLsKfX+O53w73/dBDKtyksa+
- 7E7BPiotnunHblWvQwSl1SrZ/ckIAxnHfHTzS2YJe6zx4Znv5wH9S/X7yAG2n0VM+ND0
- 7BicAXqXY5doxKh5IGW2SZqaslcbADP+jjEKKL9tTlb1NaCYz2WNOKFxxsLz+mK05qBi xw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yf1cn0136-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 30 May 2024 21:40:42 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44ULef9E022058;
-	Thu, 30 May 2024 21:40:41 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yf1cn0133-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 30 May 2024 21:40:41 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44UIptMF002437;
-	Thu, 30 May 2024 21:40:40 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ydpb0v9mc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 30 May 2024 21:40:40 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44ULebeF27984224
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 30 May 2024 21:40:40 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C060D5805A;
-	Thu, 30 May 2024 21:40:37 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6EA7558052;
-	Thu, 30 May 2024 21:40:37 +0000 (GMT)
-Received: from ltcwspoon18.bm.com (unknown [9.40.194.38])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 30 May 2024 21:40:37 +0000 (GMT)
-From: David Christensen <drc@linux.ibm.com>
-To: Shannon Nelson <shannon.nelson@amd.com>,
-        Brett Creeley <brett.creeley@amd.com>,
-        drivers@pensando.io (supporter:PENSANDO ETHERNET DRIVERS),
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, David Christensen <drc@linux.ibm.com>,
-        netdev@vger.kernel.org (open list:PENSANDO ETHERNET DRIVERS),
-        linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] ionic: advertise 52-bit addressing limitation for MSI-X
-Date: Thu, 30 May 2024 17:40:20 -0400
-Message-ID: <20240530214026.774256-1-drc@linux.ibm.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1717105619; c=relaxed/simple;
+	bh=PCtXbe0h4/GG8mxMBQ8PPq48bwhyZuUXEWugmZ3umHM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=YelYy0DLGMUvyJdUuhv7MTBuMmDIPR+auC/3nOTUUbB3flAeDa2pzfbcgoPjOWvWOAHLwVUUogLnzp7ZzwvE+8OgNRFDsKWwZw4xOUGc55hEz4CtY2rnQBm0escSQTfFsX8ijvGVS91O4TJp/sPJTv2FdrVzp3HopCIffJEk5ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=FcquoAme; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6ad86f3cc34so7666516d6.1
+        for <netdev@vger.kernel.org>; Thu, 30 May 2024 14:46:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1717105616; x=1717710416; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=U+hGbEM+fsi1EeTk/F7iSCEszhWuMBnEsqNB1vusLac=;
+        b=FcquoAmetY6eldxavbnVAF07BtjHgnzejL4f69WW+2gTxQEhHoDVFOINCpfMhvZRmi
+         wC3LPS8yuv8BIYvcEBs3LgbcKRFGKgFoPWEAqrNAY+ORRX15J/0cRPrErK/dXOyN7qKn
+         8QO6T3JHBxsxzDPLVEfq+bU8CJ5Q0+1XVurJiSQViNTgAoX19S5m5xmyejgpbvQP1j0k
+         NEPKk7BW2O5XzTFXkgVg8KJjIW5dpnft0Mg1ih5osk0QbMKQyEJ4ueJX+VVxmy0wqzFJ
+         JrgCF8J0CeZDEoWydJDvc/frNram9keTG5MWrkK66jYv8XX1dRYfpBFJTT11n3aAiboq
+         AYmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717105616; x=1717710416;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U+hGbEM+fsi1EeTk/F7iSCEszhWuMBnEsqNB1vusLac=;
+        b=sXplIdP+huMwRup6qyR613yBfErru7FZNV6wf1qu74HL/7R7fa+Se5V8oOg84qn4ck
+         W2Gux+edQBYR3nfJkLEEm4NQMuo3Onh3hX/EEOJGACawCNp5GrPYi9/Ol412D5lGmW8U
+         8ZgNBJ8Zr844wUap1ludXLHXL+1il//V1gW0jqvuGJ9+9vqdUriO/5ZqbI94yYH+WPAa
+         9e6iJva6vDs5w6doMMQTPZACL9o7NHf5r4xGQjYXJLbemLad1Dz72/l24q7iEW8tqfRp
+         yH/Zoy80+zZmjRuf1iJDaDidq2nNc7ALNNfqTDDIrMCcxq2/aYAL+nBrtox4Pzg0Kzl4
+         ql5w==
+X-Gm-Message-State: AOJu0YwuHAmf2jxYLtYU6Tl+4In4AYcZgRebpVW893OBVJUXw21GxSMQ
+	KcD8SfK4IhgL3LMUNP0QlgKnl+t6kDovIYOYsC8Tl2G4bHDZtHWUuVU/lBs/yk/kjrY6FjDaFpu
+	UfbE=
+X-Google-Smtp-Source: AGHT+IGA+5z8EvlVM17m7A1gpNDDe3MH79lfJJS0F7/GHSOlJrV/5W7j0m+nQ9GfYwwVDjefFUWvsw==
+X-Received: by 2002:a05:6214:440b:b0:6ad:9e54:e70f with SMTP id 6a1803df08f44-6aecd6f08aamr1779126d6.50.1717105616070;
+        Thu, 30 May 2024 14:46:56 -0700 (PDT)
+Received: from debian.debian ([2a09:bac5:7a49:f9b::18e:1c])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ae4a7466a7sm1908696d6.44.2024.05.30.14.46.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 May 2024 14:46:55 -0700 (PDT)
+Date: Thu, 30 May 2024 14:46:53 -0700
+From: Yan Zhai <yan@cloudflare.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Abhishek Chauhan <quic_abchauha@quicinc.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Florian Westphal <fw@strlen.de>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	David Howells <dhowells@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	linux-kernel@vger.kernel.org, kernel-team@cloudflare.com,
+	Jesper Dangaard Brouer <hawk@kernel.org>
+Subject: [RFC net-next 0/6] net: pass receive socket to drop tracepoint
+Message-ID: <cover.1717105215.git.yan@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: J2-TfskN_QWrdP5zpeRJQ-LdwR5YL2ka
-X-Proofpoint-ORIG-GUID: tM5MTeu0JewSnauJjzVyQbhgNvnIKFVp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-30_17,2024-05-30_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
- priorityscore=1501 impostorscore=0 mlxlogscore=743 suspectscore=0
- bulkscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0 adultscore=0
- phishscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2405300162
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Current ionic devices only support 52 internal physical address
-lines. This is sufficient for x86_64 systems which have similar
-limitations but does not apply to all other architectures,
-notably IBM POWER (ppc64). To ensure that MSI/MSI-X vectors are
-not set outside the physical address limits of the NIC, set the
-recently added no_64bit_msi value of the pci_dev structure
-during device probe.
+Greeting!
 
-Signed-off-by: David Christensen <drc@linux.ibm.com>
----
- drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c | 4 ++++
- 1 file changed, 4 insertions(+)
+We set up our production packet drop monitoring around the kfree_skb
+tracepoint. While this tracepoint is extremely valuable for diagnosing
+critical problems, we find some limitation with drops on the local
+receive path: this tracepoint can only inspect the dropped skb itself,
+but such skb might not carry enough information to:
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-index 6ba8d4aca0a0..1e7f507f461f 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-@@ -326,6 +326,10 @@ static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_out;
- 	}
- 
-+	/* Ensure MSI/MSI-X interrupts lie within addressable physical memory */
-+	if (IONIC_ADDR_LEN < 64)
-+		pdev->no_64bit_msi = 1;
-+
- 	err = ionic_setup_one(ionic);
- 	if (err)
- 		goto err_out;
+1. determine in which netns/container this skb gets dropped
+2. determine by which socket/service this skb oughts to be received
+
+The 1st issue is because skb->dev is the only member field with valid
+netns reference. But skb->dev can get cleared or reused. For example,
+tcp_v4_rcv will clear skb->dev and in later processing it might be reused
+for OFO tree.
+
+The 2nd issue is because there is no reference on an skb that reliably
+points to a receiving socket. skb->sk usually points to the local
+sending socket, and it only points to a receive socket briefly after
+early demux stage, yet the socket can get stolen later. For certain drop
+reason like TCP OFO_MERGE, Zerowindow, UDP at PROTO_MEM error, etc, it
+is hard to infer which receiving socket is impacted. This cannot be
+overcome by simply looking at the packet header, because of
+complications like sk lookup programs. In the past, single purpose
+tracepoints like trace_udp_fail_queue_rcv_skb, trace_sock_rcvqueue_full,
+etc are added as needed to provide more visibility. This could be
+handled in a more generic way.
+
+In this change set we propose a new 'kfree_skb_for_sk' call as a drop-in
+replacement for kfree_skb_reason at various local input path. It accepts
+an extra receiving socket argument, and places the socket in skb->cb for
+tracepoint consumption. With an rx socket, it can easily deal with both
+issues above. Using cb field is more of a concern that a tracepoint
+signature might be a part of stable ABI, but please advise if otherwise.
+
+Yan Zhai (6):
+  net: add kfree_skb_for_sk function
+  ping: pass rx socket on rcv drops
+  net: raw: pass rx socket on rcv drops
+  tcp: pass rx socket on rcv drops
+  udp: pass rx socket on rcv drops
+  af_packet: pass rx socket on rcv drops
+
+ include/linux/skbuff.h | 48 ++++++++++++++++++++++++++++++++++++++++--
+ net/core/dev.c         | 21 +++++++-----------
+ net/core/skbuff.c      | 29 +++++++++++++------------
+ net/ipv4/ping.c        |  2 +-
+ net/ipv4/raw.c         |  4 ++--
+ net/ipv4/syncookies.c  |  2 +-
+ net/ipv4/tcp_input.c   |  2 +-
+ net/ipv4/tcp_ipv4.c    |  4 ++--
+ net/ipv4/udp.c         |  6 +++---
+ net/ipv6/raw.c         |  8 +++----
+ net/ipv6/syncookies.c  |  2 +-
+ net/ipv6/tcp_ipv6.c    |  4 ++--
+ net/ipv6/udp.c         |  6 +++---
+ net/packet/af_packet.c |  6 +++---
+ 14 files changed, 93 insertions(+), 51 deletions(-)
+
 -- 
-2.43.0
+2.30.2
+
 
 
