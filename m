@@ -1,257 +1,209 @@
-Return-Path: <netdev+bounces-99350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EB778D499F
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 12:26:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AEC48D49A4
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 12:29:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9A27283C55
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 10:25:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EE611C22255
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 10:29:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6768514D71B;
-	Thu, 30 May 2024 10:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b="EVWhdLlD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58AD91761BD;
+	Thu, 30 May 2024 10:29:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.savoirfairelinux.com (mail.savoirfairelinux.com [208.88.110.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6C9176AAE
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 10:25:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.88.110.44
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D63433B3;
+	Thu, 30 May 2024 10:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717064719; cv=none; b=MC3/xKxWGS49nk7U6gjYkUotBtdLoP54tuDlMpICEyzpkZAMptbfT99KrNGgZjtr2EB6AouW19HDuMK+kdQgdG9+gKreJ601yaC2WAdUCm9xTpkeHsXa1krxOc+2VDJhPDo48kRutjixZQYe+f1cNr2cV9CkyVKE8adKPZVVxY4=
+	t=1717064956; cv=none; b=MQu01ExpYWd3tX/vV/fTMd5AFkMbgcB/ptggR0SSDU/V9kPVQ9Vk3SOome32ieRmpjII2eX9AiH2DM0vjKWcSLbYxSlwbq3I/wQm1eFG7675wK8UUyPQGtzWimqgwI3msvlgt0hou5hRQ02ANpak5r/upAwIvxi/IdSrhzqb14g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717064719; c=relaxed/simple;
-	bh=T+XWsFi7Zp00QuXleTyFDfLRSGyq5aoe0Ao7ucW+MvM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nKHbosl7xcJHNLTPT9SVIQopuyEECjVh5bA9UtbjQceQn+3dLFkssWO6+kX5a/swL8xI8hcoH7SaEFd0afWy8YHxoNmxLIGaPJsqX4q3PN39j5ZnPnl9nosScaZtBoY+QUTiXrOURdGm/XiJu3DGvOCHRoGZQw0ORORe3CkAwSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com; spf=pass smtp.mailfrom=savoirfairelinux.com; dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b=EVWhdLlD; arc=none smtp.client-ip=208.88.110.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=savoirfairelinux.com
-Received: from localhost (localhost [127.0.0.1])
-	by mail.savoirfairelinux.com (Postfix) with ESMTP id 3206F9C32FC;
-	Thu, 30 May 2024 06:25:14 -0400 (EDT)
-Received: from mail.savoirfairelinux.com ([127.0.0.1])
- by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10032)
- with ESMTP id 0IWIx_esQcaR; Thu, 30 May 2024 06:25:12 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
-	by mail.savoirfairelinux.com (Postfix) with ESMTP id D61139C5847;
-	Thu, 30 May 2024 06:25:12 -0400 (EDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.savoirfairelinux.com D61139C5847
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=savoirfairelinux.com; s=DFC430D2-D198-11EC-948E-34200CB392D2;
-	t=1717064712; bh=tfhRbGUxBvcpFrVufTpKrccUBh0CLoH/U4j9Wubt0+k=;
-	h=From:To:Date:Message-Id:MIME-Version;
-	b=EVWhdLlD7OLpqBh6cWZLQoq9ejub6lktdhSYQzwvC0hxfFgEDrN8o6cprtXDseHSJ
-	 dFHgY8o4meYlapeeB4YxCRICYtejr91kJ6mWLGaS2Wfs/rJw1cfWkTi17qhV66uw0k
-	 PWXgcwkh6jaXglSdbMSqlCciVbj9wMooPV3NxJFL9GJy3+HRj/fLFzBr/l3Xh54tXl
-	 22eoC24A8sliJ3vWH8Z7dZVMyIMm0lkfWLTRIG561G7pfqbfI8RkcELyFKvUae4Meo
-	 aKdNQid7PX2tiIVntogNBRZ1V32WeE38rwTizMYX3lBH4OUiAVpv1ukWDoA0NULEqz
-	 aqZ3XnCA0CHxA==
-X-Virus-Scanned: amavis at mail.savoirfairelinux.com
-Received: from mail.savoirfairelinux.com ([127.0.0.1])
- by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10026)
- with ESMTP id ACq2z9obPSgR; Thu, 30 May 2024 06:25:12 -0400 (EDT)
-Received: from sfl-deribaucourt.rennes.sfl (lmontsouris-657-1-69-118.w80-15.abo.wanadoo.fr [80.15.101.118])
-	by mail.savoirfairelinux.com (Postfix) with ESMTPSA id EAC4E9C32FC;
-	Thu, 30 May 2024 06:25:11 -0400 (EDT)
-From: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
-To: netdev@vger.kernel.org
-Cc: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	woojung.huh@microchip.com,
-	embedded-discuss@lists.savoirfairelinux.net,
-	Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
-Subject: [PATCH v3 5/5] net: dsa: microchip: monitor potential faults in half-duplex mode
-Date: Thu, 30 May 2024 10:24:36 +0000
-Message-Id: <20240530102436.226189-6-enguerrand.de-ribaucourt@savoirfairelinux.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240530102436.226189-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
-References: <20240530102436.226189-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+	s=arc-20240116; t=1717064956; c=relaxed/simple;
+	bh=dqXFzIy34r9alYikOtvaZBp/VtCNyiGN2Z42QiwgkOc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=uqBnlPrAIJ3haxOQ5inFo8ZOa1VWkBdOruo5lga6/Ao19zyCiBW9DeSnFu7JH48uMcfkpos9DS6zWSgnHemCUrIoclauyz9enNNuGsXLAmywlu3tGLUnyUi6vI51thGSImFLLqdI0D9dIJUwesrIY/zTeuhl9SoqTFCtZlkjYAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-IronPort-AV: E=Sophos;i="6.08,201,1712588400"; 
+   d="asc'?scan'208";a="210129620"
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie6.idc.renesas.com with ESMTP; 30 May 2024 19:29:05 +0900
+Received: from [10.226.92.220] (unknown [10.226.92.220])
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id E44FB4010DF9;
+	Thu, 30 May 2024 19:29:01 +0900 (JST)
+Message-ID: <b6d03e9a-8889-4fbd-a388-c168d1547e24@bp.renesas.com>
+Date: Thu, 30 May 2024 11:29:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH v4 7/7] net: ravb: Allocate RX buffers via page
+ pool
+Content-Language: en-GB
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Biju Das <biju.das.jz@bp.renesas.com>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240528150339.6791-1-paul.barker.ct@bp.renesas.com>
+ <20240528150339.6791-8-paul.barker.ct@bp.renesas.com>
+ <eefce0af-2771-a56c-753d-85fe991fdf31@omp.ru>
+ <e7cf9dd8-9c67-476b-a892-b8dbe9312c4c@bp.renesas.com>
+Organization: Renesas Electronics Corporation
+In-Reply-To: <e7cf9dd8-9c67-476b-a892-b8dbe9312c4c@bp.renesas.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------tMLKLiVDOLIictAzyrx8ObJN"
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------tMLKLiVDOLIictAzyrx8ObJN
+Content-Type: multipart/mixed; boundary="------------DRJUhX0cQajqiJhTTYTqEnsN";
+ protected-headers="v1"
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Biju Das <biju.das.jz@bp.renesas.com>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Message-ID: <b6d03e9a-8889-4fbd-a388-c168d1547e24@bp.renesas.com>
+Subject: Re: [net-next PATCH v4 7/7] net: ravb: Allocate RX buffers via page
+ pool
+References: <20240528150339.6791-1-paul.barker.ct@bp.renesas.com>
+ <20240528150339.6791-8-paul.barker.ct@bp.renesas.com>
+ <eefce0af-2771-a56c-753d-85fe991fdf31@omp.ru>
+ <e7cf9dd8-9c67-476b-a892-b8dbe9312c4c@bp.renesas.com>
+In-Reply-To: <e7cf9dd8-9c67-476b-a892-b8dbe9312c4c@bp.renesas.com>
+
+--------------DRJUhX0cQajqiJhTTYTqEnsN
+Content-Type: multipart/mixed; boundary="------------JTNDfQ0jYDB0WNTP7QO0aKQ4"
+
+--------------JTNDfQ0jYDB0WNTP7QO0aKQ4
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-The errata DS80000754 recommends monitoring potential faults in
-half-duplex mode for the KSZ9477 familly.
+On 30/05/2024 10:21, Paul Barker wrote:
+> On 29/05/2024 21:52, Sergey Shtylyov wrote:
+>> On 5/28/24 6:03 PM, Paul Barker wrote:
+>>> @@ -865,7 +894,16 @@ static int ravb_rx_gbeth(struct net_device *ndev=
+, int budget, int q)
+>>>  				stats->rx_bytes +=3D skb->len;
+>>>  				napi_gro_receive(&priv->napi[q], skb);
+>>>  				rx_packets++;
+>>> +
+>>> +				/* Clear rx_1st_skb so that it will only be
+>>> +				 * non-NULL when valid.
+>>> +				 */
+>>> +				if (die_dt =3D=3D DT_FEND)
+>>> +					priv->rx_1st_skb =3D NULL;
+>>
+>>    Hm, can't we do this under *case* DT_FEND above?
+>=20
+> It makes more logical sense to me to do this as the last step, but I
+> guess it's a little more optimal to do it earlier. I'll move it.
 
-half-duplex is not very common so I just added a critical message
-when the fault conditions are detected. The switch can be expected
-to be unable to communicate anymore in these states and a software
-reset of the switch would be required which I did not implement.
+Actually, this doesn't even need to be conditional. If die_dt is
+DT_FSINGLE, priv->rx_1st_skb will already be NULL so this will be a
+no-op. So I'll just simplify this.
 
-Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirf=
-airelinux.com>
----
- drivers/net/dsa/microchip/ksz9477.c     | 34 +++++++++++++++++++++++++
- drivers/net/dsa/microchip/ksz9477.h     |  2 ++
- drivers/net/dsa/microchip/ksz9477_reg.h |  8 ++++--
- drivers/net/dsa/microchip/ksz_common.c  |  7 +++++
- drivers/net/dsa/microchip/ksz_common.h  |  1 +
- 5 files changed, 50 insertions(+), 2 deletions(-)
+Thanks,
 
-diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microc=
-hip/ksz9477.c
-index 343b9d7538e9..ea1c12304f7f 100644
---- a/drivers/net/dsa/microchip/ksz9477.c
-+++ b/drivers/net/dsa/microchip/ksz9477.c
-@@ -429,6 +429,40 @@ void ksz9477_freeze_mib(struct ksz_device *dev, int =
-port, bool freeze)
- 	mutex_unlock(&p->mib.cnt_mutex);
- }
-=20
-+void ksz9477_errata_monitor(struct ksz_device *dev, int port,
-+			    u64 tx_late_col)
-+{
-+	u8 status;
-+	u16 pqm;
-+	u32 pmavbc;
-+
-+	ksz_pread8(dev, port, REG_PORT_STATUS_0, &status);
-+	if (!((status & PORT_INTF_SPEED_MASK) =3D=3D PORT_INTF_SPEED_MASK) &&
-+	    !(status & PORT_INTF_FULL_DUPLEX)) {
-+		dev_warn_once(dev->dev,
-+			      "Half-duplex detected on port %d, transmission halt may occur\n=
-",
-+			      port);
-+		/* Errata DS80000754 recommends monitoring potential faults in
-+		 * half-duplex mode. The switch might not be able to communicate anymo=
-re
-+		 * in these states.
-+		 */
-+		if (tx_late_col !=3D 0) {
-+			/* Transmission halt with late collisions */
-+			dev_crit_ratelimited(dev->dev,
-+					     "TX late collisions detected, transmission may be halted on po=
-rt %d\n",
-+					     port);
-+		}
-+		ksz_pread16(dev, port, REG_PORT_QM_TX_CNT_0__4, &pqm);
-+		ksz_read32(dev, REG_PMAVBC, &pmavbc);
-+		if (((pmavbc & PMAVBC_MASK) >> PMAVBC_SHIFT <=3D 0x580) ||
-+		    ((pqm & PORT_QM_TX_CNT_M) >=3D 0x200)) {
-+			/* Transmission halt with Half-Duplex and VLAN */
-+			dev_crit_ratelimited(dev->dev,
-+					     "resources out of limits, transmission may be halted\n");
-+		}
-+	}
-+}
-+
- void ksz9477_port_init_cnt(struct ksz_device *dev, int port)
- {
- 	struct ksz_port_mib *mib =3D &dev->ports[port].mib;
-diff --git a/drivers/net/dsa/microchip/ksz9477.h b/drivers/net/dsa/microc=
-hip/ksz9477.h
-index ce1e656b800b..3312ef28e99c 100644
---- a/drivers/net/dsa/microchip/ksz9477.h
-+++ b/drivers/net/dsa/microchip/ksz9477.h
-@@ -36,6 +36,8 @@ int ksz9477_port_mirror_add(struct ksz_device *dev, int=
- port,
- 			    bool ingress, struct netlink_ext_ack *extack);
- void ksz9477_port_mirror_del(struct ksz_device *dev, int port,
- 			     struct dsa_mall_mirror_tc_entry *mirror);
-+void ksz9477_errata_monitor(struct ksz_device *dev, int port,
-+			    u64 tx_late_col);
- void ksz9477_get_caps(struct ksz_device *dev, int port,
- 		      struct phylink_config *config);
- int ksz9477_fdb_dump(struct ksz_device *dev, int port,
-diff --git a/drivers/net/dsa/microchip/ksz9477_reg.h b/drivers/net/dsa/mi=
-crochip/ksz9477_reg.h
-index f3a205ee483f..3238b9748d0f 100644
---- a/drivers/net/dsa/microchip/ksz9477_reg.h
-+++ b/drivers/net/dsa/microchip/ksz9477_reg.h
-@@ -842,8 +842,7 @@
-=20
- #define REG_PORT_STATUS_0		0x0030
-=20
--#define PORT_INTF_SPEED_M		0x3
--#define PORT_INTF_SPEED_S		3
-+#define PORT_INTF_SPEED_MASK		0x0018
- #define PORT_INTF_FULL_DUPLEX		BIT(2)
- #define PORT_TX_FLOW_CTRL		BIT(1)
- #define PORT_RX_FLOW_CTRL		BIT(0)
-@@ -1167,6 +1166,11 @@
- #define PORT_RMII_CLK_SEL		BIT(7)
- #define PORT_MII_SEL_EDGE		BIT(5)
-=20
-+#define REG_PMAVBC				0x03AC
-+
-+#define PMAVBC_MASK				0x7ff0000
-+#define PMAVBC_SHIFT			16
-+
- /* 4 - MAC */
- #define REG_PORT_MAC_CTRL_0		0x0400
-=20
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/mic=
-rochip/ksz_common.c
-index 1e0085cd9a9a..26e2fcd74ba8 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -1382,6 +1382,7 @@ const struct ksz_chip_data ksz_switch_chips[] =3D {
- 		.tc_cbs_supported =3D true,
- 		.ops =3D &ksz9477_dev_ops,
- 		.phylink_mac_ops =3D &ksz9477_phylink_mac_ops,
-+		.phy_errata_9477 =3D true,
- 		.mib_names =3D ksz9477_mib_names,
- 		.mib_cnt =3D ARRAY_SIZE(ksz9477_mib_names),
- 		.reg_mib_cnt =3D MIB_COUNTER_NUM,
-@@ -1416,6 +1417,7 @@ const struct ksz_chip_data ksz_switch_chips[] =3D {
- 		.num_ipms =3D 8,
- 		.ops =3D &ksz9477_dev_ops,
- 		.phylink_mac_ops =3D &ksz9477_phylink_mac_ops,
-+		.phy_errata_9477 =3D true,
- 		.mib_names =3D ksz9477_mib_names,
- 		.mib_cnt =3D ARRAY_SIZE(ksz9477_mib_names),
- 		.reg_mib_cnt =3D MIB_COUNTER_NUM,
-@@ -1450,6 +1452,7 @@ const struct ksz_chip_data ksz_switch_chips[] =3D {
- 		.num_ipms =3D 8,
- 		.ops =3D &ksz9477_dev_ops,
- 		.phylink_mac_ops =3D &ksz9477_phylink_mac_ops,
-+		.phy_errata_9477 =3D true,
- 		.mib_names =3D ksz9477_mib_names,
- 		.mib_cnt =3D ARRAY_SIZE(ksz9477_mib_names),
- 		.reg_mib_cnt =3D MIB_COUNTER_NUM,
-@@ -1540,6 +1543,7 @@ const struct ksz_chip_data ksz_switch_chips[] =3D {
- 		.tc_cbs_supported =3D true,
- 		.ops =3D &ksz9477_dev_ops,
- 		.phylink_mac_ops =3D &ksz9477_phylink_mac_ops,
-+		.phy_errata_9477 =3D true,
- 		.mib_names =3D ksz9477_mib_names,
- 		.mib_cnt =3D ARRAY_SIZE(ksz9477_mib_names),
- 		.reg_mib_cnt =3D MIB_COUNTER_NUM,
-@@ -1861,6 +1865,9 @@ void ksz_r_mib_stats64(struct ksz_device *dev, int =
-port)
- 	pstats->rx_pause_frames =3D raw->rx_pause;
-=20
- 	spin_unlock(&mib->stats64_lock);
-+
-+	if (dev->info->phy_errata_9477)
-+		ksz9477_errata_monitor(dev, port, raw->tx_late_col);
- }
-=20
- void ksz88xx_r_mib_stats64(struct ksz_device *dev, int port)
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/mic=
-rochip/ksz_common.h
-index c784fd23a993..ee7db46e469d 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -66,6 +66,7 @@ struct ksz_chip_data {
- 	bool tc_cbs_supported;
- 	const struct ksz_dev_ops *ops;
- 	const struct phylink_mac_ops *phylink_mac_ops;
-+	bool phy_errata_9477;
- 	bool ksz87xx_eee_link_erratum;
- 	const struct ksz_mib_names *mib_names;
- 	int mib_cnt;
 --=20
-2.34.1
+Paul Barker
+--------------JTNDfQ0jYDB0WNTP7QO0aKQ4
+Content-Type: application/pgp-keys; name="OpenPGP_0x27F4B3459F002257.asc"
+Content-Disposition: attachment; filename="OpenPGP_0x27F4B3459F002257.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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3D
+=3DsIIN
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------JTNDfQ0jYDB0WNTP7QO0aKQ4--
+
+--------------DRJUhX0cQajqiJhTTYTqEnsN--
+
+--------------tMLKLiVDOLIictAzyrx8ObJN
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQSiu8gv1Xr0fIw/aoLbaV4Vf/JGvQUCZlhU7AUDAAAAAAAKCRDbaV4Vf/JGvdxd
+AP42vywr81zonb/12KZ8LCRoem+tbUVaUTzQrfUWOP35hwD/S9XQoDc13SPUgUVW88rmA+rx86a+
+6NsXKWGAtJNSwwo=
+=/DKM
+-----END PGP SIGNATURE-----
+
+--------------tMLKLiVDOLIictAzyrx8ObJN--
 
