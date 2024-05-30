@@ -1,130 +1,117 @@
-Return-Path: <netdev+bounces-99429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D7528D4D8F
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 16:10:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A6A98D4DA1
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 16:13:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B10EF1F21696
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 14:09:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28FB61F22569
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 14:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3DA6176233;
-	Thu, 30 May 2024 14:09:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B577E176233;
+	Thu, 30 May 2024 14:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hLYeVC8E"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YyqbK50U"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B189F186E3E;
-	Thu, 30 May 2024 14:09:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C41E186E26
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 14:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717078174; cv=none; b=tAby/oLyfOAk2SKpxN65OlHT2RmxNaC2VHZTxGYnNctKcNUvMzcXG+hBUVQk5ocZq0FaPBrNZcHyNoXuLq/aDszptWRj+Pxw4TrIkyB/Wb12driyWOgqAr/B8uvyJvahVFj5sbCkjZ/ATBLz8m90nuSasankb+rTex1llwDrmn0=
+	t=1717078392; cv=none; b=NZHM4b6xgAicEWwF9HldqnlPdv2PvOyYRIat/s8fMUNdl1jCTdcb/HC1ZqD40r7PXMMtS8/PUjm/dw1Uqtlw1b3h5RzW2PF7+v9t+dhhRUUsSeocB/5fJg+s1m6v1pM2FpNNiNDTs33V73/1rLOPv5iW226o7s47uWEzWxOPGew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717078174; c=relaxed/simple;
-	bh=0mLim+N0NZXzzifrzM1f9tix9Oup0SLdlMxf8uGQDO4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yn730kYlC+kur+UF3YcWzgYDu5zxllI8tW2UOWIPjDi1/kRq6jIU3d+kNxbH/vUl7XA0L/+ZyMUmO3i7IrIf2VStub7+ZnyzId3IUz6bZV4X68+6ddSOYVsnI+5XsYoe/F1YsH0xQv92TpmJQZ5df4RRIuqIsZNRRyZ+zE1/Qc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hLYeVC8E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B288EC2BBFC;
-	Thu, 30 May 2024 14:09:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717078174;
-	bh=0mLim+N0NZXzzifrzM1f9tix9Oup0SLdlMxf8uGQDO4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hLYeVC8E5yfVaZZ8IGkMwO7x8cROf0taZhFZkFQlevZy9/aUEvV5+xH5zEzEkIxvv
-	 hSvE/+oo4ENBk/utTU1i4+v8HXZLbgf8YiywK5wPFSA11QM4G+29220m+zVskjZZmM
-	 kKlwzW+tgEvfmNhTRvh9/jU0LLdCVOra+vpWjjtzc7MqTKwUBPv3XgAu0QGiyueSs/
-	 QdpRFss/NfUO2dIHSokoyn9+e2F9w+Hh+yUSx5inayAdjr3Y52rmZ3Be8HdgA5T+hF
-	 pT/0riZYahiPhDhw4D9gZb6WoqBI60rbJr+a3LQrBnIRd32FLQPdzDhVmAifujPE+y
-	 i3GK9l8F4w5UA==
-Message-ID: <1fdae4f8-066e-488a-bf6c-e3f1f4f36984@kernel.org>
-Date: Thu, 30 May 2024 16:09:19 +0200
+	s=arc-20240116; t=1717078392; c=relaxed/simple;
+	bh=r5a0FVlFB8dVilFIOOoYFbQUjONqa/y/kOAP8TysiEk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WQTX7rRAp8WTGSy7w/tSglFtXonguqt6SzXaANSP9bS9T/Sfs257sfDIbT32pWtDdHyui+HQbDkMriMqfjbEwSOFSehZXkRTjIUrxqZO6CHfr7jvEiLq5nbU3eEKBo+/9cpwr4S0oRp22Yj4m0WSQcACVc2pT9XcHxrHmnvSZCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YyqbK50U; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717078390;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r5a0FVlFB8dVilFIOOoYFbQUjONqa/y/kOAP8TysiEk=;
+	b=YyqbK50Uf5Xt6oKYmai/VJDgMy4CjKGm6QTrILpyUCKBQ41gC+c2itjY1kFzgFETvRFJxV
+	mvJpIUHCUd3P+vdHKuW3iD9s0AuHPaMBc0L6L7gkA+jcNl135NdzHi03zSFxwRepTY5Vrm
+	rmFK8NCKRpSKoQxi0vveXCfKVo/Wy38=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-522-obrYYhtqPWON3sCjan7oEA-1; Thu, 30 May 2024 10:13:06 -0400
+X-MC-Unique: obrYYhtqPWON3sCjan7oEA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D47C0800CA5;
+	Thu, 30 May 2024 14:13:05 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.192.98])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 78FAA40C6CB2;
+	Thu, 30 May 2024 14:13:02 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: yongqin.liu@linaro.org
+Cc: amit.pundir@linaro.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	inventor500@vivaldi.net,
+	jstultz@google.com,
+	jtornosm@redhat.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	stable@vger.kernel.org,
+	sumit.semwal@linaro.org
+Subject: Re: [PATCH] net: usb: ax88179_178a: fix link status when link is set to down/up
+Date: Thu, 30 May 2024 16:13:00 +0200
+Message-ID: <20240530141301.434601-1-jtornosm@redhat.com>
+In-Reply-To: <CAMSo37U3Pree8XbHNBOzNXhFAiPss+8FQms1bLy06xeMeWfTcg@mail.gmail.com>
+References: <CAMSo37U3Pree8XbHNBOzNXhFAiPss+8FQms1bLy06xeMeWfTcg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next v2 3/3] doc: new 'mptcp' page in 'networking'
-Content-Language: en-GB
-To: Randy Dunlap <rdunlap@infradead.org>, mptcp@lists.linux.dev,
- Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>, Gregory Detal <gregory.detal@gmail.com>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240528-upstream-net-20240520-mptcp-doc-v2-0-47f2d5bc2ef3@kernel.org>
- <20240528-upstream-net-20240520-mptcp-doc-v2-3-47f2d5bc2ef3@kernel.org>
- <9076abad-01f6-4ff4-a176-c2f4a85eb3fc@infradead.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <9076abad-01f6-4ff4-a176-c2f4a85eb3fc@infradead.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-Hi Randy,
+Hello Yongqin,
 
-On 29/05/2024 18:59, Randy Dunlap wrote:
-> Fix a few run-on sentences:
+> is there any message that I could check to make sure if the
+> initialization is finished?
+> or like with adding some printk lines for some kernel functions to hack
+>
+>> Anyway, I will try to reproduce here and analyze it.
+>
+> Thanks very much! And please feel free to let me know if there is
+> anything I could help with on the Android build.
 
-Thank you for the review!
+I have finally managed to reproduce an error similar to the one mentioned
+during the boot stage. I created a systemd service with a similar
+configuration script to do the same and it works (I can reconfigure the
+mac address at boot time, the ip address is configured and the interface
+works), because the driver is completely initialized. In order to reproduce,
+I have introduced a big delay in the probe operation to get closer in time
+to the configuration script and the problem is there.
+Maybe, the script set_ethaddr.sh could be synchronized with the driver, but
+I think, if possible, it is better to check in a better way in the driver;
+I will try it. When I have something I can comment you, if you can test it,
+to be sure about the solution.
 
-I just applied these modifications in the v3:
+By the way, I have tried with my other fix to avoid the spurious link
+messages, but it didn't help.
 
-https://lore.kernel.org/r/20240530-upstream-net-20240520-mptcp-doc-v3-0-e94cdd9f2673@kernel.org
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+Best regards
+José Ignacio
 
 
