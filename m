@@ -1,105 +1,110 @@
-Return-Path: <netdev+bounces-99450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A88E38D4F20
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:32:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3940E8D4F2B
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:35:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDEEBB2189A
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 15:32:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6ABAF1C20A78
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 15:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5834E182D07;
-	Thu, 30 May 2024 15:32:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF63182D0F;
+	Thu, 30 May 2024 15:35:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zf/MlNxV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HxQJxm4R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 331D217624E
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 15:32:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED03182D0B
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 15:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717083120; cv=none; b=WFEsU0Gef6r4Y0qbw4gPkJqiADZpCB+Sg5thxMjRXrawmVvHdrFepjlrhB2ZfmRhDkoiaOX+p+afyXRcIaYc+XQMsgIf/qWDNz0jPK1PLiPcWOjNeTubjgrKDzleZ4y214LYaQPHGAX5de+4DTSomJXoAfHuyHVh64yuu+Y+w8I=
+	t=1717083308; cv=none; b=Sg1Lg+AwX2VKipIpPNRS5nJgGmCMi8FpibiTb7DSF0S8Z60DUmSR0812526jv4gdw7tvVCCAp3g9475d/1EXkJSfqyTG4Hi/qP3TxwQotJ+kCT7+mDrIzKRRtsdtcBeAnAl5GlhPS1Po3jaMKQtctcmxufal9redX1ARtiXPxuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717083120; c=relaxed/simple;
-	bh=ySKPgds6JhciB8Xb2QG83wZnoGR9dhxQMdGZKY3KwDo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GC6gR8UY22LoEX65uVUjoqd0UcCt/slqw+RBsOiPn7t2y0zNLueUkybPEVXnl2uuQupUf+c1b8aiNgvR4/FeyRkxoDABbfhn97u08padTbdNooxFt5FpmbJ5XBM1u48pdOegiGHykwKukDaeC9oWDV8W3mZl5TpAmYJEp9Gsgow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zf/MlNxV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D39FC2BBFC;
-	Thu, 30 May 2024 15:31:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717083119;
-	bh=ySKPgds6JhciB8Xb2QG83wZnoGR9dhxQMdGZKY3KwDo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Zf/MlNxVZb9ZTH7DClT3aEmqccFsuzJYOU8iwn8wJLbr61i2cTSj79btP9bESh/FY
-	 YTKC35JKo1WNsvP35KTn/hDE454P0wwjt8Yp66mlnFkV6YqK4/rXxaFXgJNVzi8lYD
-	 l3q0zOwpj6iXCq1oXhLun0BJ8oj+XHzgIGgd6AcMo2KFf0sw2wYMFgfnllPLMOCxfD
-	 tN/bG6+6lca9BxZQS8hC/+7WzfhDgYf9N5nxVqqHNNjL8t2g036jSQxNbmHx8o3m73
-	 IKximAL8srNuLgrjb139f6QxvKG/tfput9ZgXRWU6Lo4G/+BRqSnyBnqP9b2a3CYPV
-	 aajXrfBm3qKUg==
-Date: Thu, 30 May 2024 08:31:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, netdev@vger.kernel.org, Saeed Mahameed
- <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
- <leonro@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
-Subject: Re: [PATCH net-next 11/15] net/mlx5e: SHAMPO, Add no-split ethtool
- counters for header/data split
-Message-ID: <20240530083158.02ecfa5c@kernel.org>
-In-Reply-To: <ZlfzR_UV9CcCjR99@x130.lan>
-References: <20240528142807.903965-1-tariqt@nvidia.com>
-	<20240528142807.903965-12-tariqt@nvidia.com>
-	<20240529182208.401b1ecf@kernel.org>
-	<ZlfzR_UV9CcCjR99@x130.lan>
+	s=arc-20240116; t=1717083308; c=relaxed/simple;
+	bh=NaQ5xKPuR7VYpNp+74ArNs/xSE6rSRfrC4s6/wDWvOk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=CNmypwxgvVuHYYzoqG5MVrwkJrLyrAl49bXGPQQPF3JQxwdelaKSV+SN8C7CRDFjkOKZeW3/YPUQGVfjgWQSFEcqIxsw0UaH+GN1r0WZ5ln1cAUrI/429oXaW2oVgE0wAtunumB4WZIO96BRq22UiBLE6qTwQ/j8tcqyI6UkY3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yyd.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HxQJxm4R; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yyd.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-df4d62ff39fso1827663276.2
+        for <netdev@vger.kernel.org>; Thu, 30 May 2024 08:35:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717083306; x=1717688106; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=evO4Qb0QZF4LjU0jNgSSqw+W1ET4O9O/ESFe9syIN1A=;
+        b=HxQJxm4R9vt4uDIsQlg9qckH0g03gctPaySikSlmc5YUF83qisKfySd9TObLkpDzZ1
+         FR7M8kzkelTep9Pizo9nICxXCZhEGEuihzMTHfpYfReZKwJgvX8RxHKpj6VzjIgvIZHL
+         UIJdXmmRRtKbEynQuZJvkTzzWjIiaqlTq8UcAWzSAiFfZtdwbmhNCBkolanXKDDwaPRE
+         UDRyFk2qGTNl4W6Oo3UkCGkWIazvWpKZcYmXQ8ykv8sN23nGPQLwNQ5IRjamN/jJ4Cba
+         NLmjhsbfo8m1ZSwpaSJb+Pka2MxhPNVJOosc+J1fgK7ffupcbnPX7P4iEVpSkHk4rIn0
+         aFoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717083306; x=1717688106;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=evO4Qb0QZF4LjU0jNgSSqw+W1ET4O9O/ESFe9syIN1A=;
+        b=tG0uEoP/+W+dI22yAWr+LOY/rRruqwwW58sG6VJPIEFdPR2NuT7iz46nd5YnNl4KSf
+         QqRfLsQXOACgkjd2K2KEAyOZrbsW/5M6+HO/qEZdR40C1vPbZwVelA5HBeBVzgiD3JTq
+         QQWgZsPZy4LSQtrQjgGjVozrUpj1v4CgMPlkHjktFmNW9wRHG3NVlpSN0fJvJEED2flz
+         kGjtwZ5gFHhyCHaWPakwvH5JJdpSDc2wH17bqdC0MtXIU5apIOCseLWosS7J8YMRvBp3
+         wfcEGsw/pk9KjhOOuzHCD1SkP8+eVCCFS/WwQ7XDKzfTo5DoBrlDF9zFlBkWMEZqfjBo
+         h+7Q==
+X-Gm-Message-State: AOJu0YxyT9H5Qpi2eUXE2H0Jq/ZZ34GeH7ZO1PaNZsx2WwP9+Ro/Blea
+	HlJM8iDKA13euwI+bELp0aQMsKUVLpAnKlSfcWby/ObLoMlSIE9lp5vvbzdFL5y6Bg==
+X-Google-Smtp-Source: AGHT+IHHPkC3bE4qDXjRfQAiVFdgGPCTn5vgcox11LkRi+9Vc70yV+wVXnk2tH2VIVcK6UkxA/VQrmI=
+X-Received: from yyd.c.googlers.com ([fda3:e722:ac3:cc00:dc:567e:c0a8:13c9])
+ (user=yyd job=sendgmr) by 2002:a25:cec7:0:b0:df4:da46:75d6 with SMTP id
+ 3f1490d57ef6-dfa5a5d8d3bmr599026276.6.1717083306469; Thu, 30 May 2024
+ 08:35:06 -0700 (PDT)
+Date: Thu, 30 May 2024 15:34:34 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
+Message-ID: <20240530153436.2202800-1-yyd@google.com>
+Subject: [PATCH net-next v2 0/2] tcp: add sysctl_tcp_rto_min_us
+From: Kevin Yang <yyd@google.com>
+To: David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, ncardwell@google.com, ycheng@google.com, 
+	kerneljasonxing@gmail.com, pabeni@redhat.com, tonylu@linux.alibaba.com, 
+	Kevin Yang <yyd@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 29 May 2024 20:32:23 -0700 Saeed Mahameed wrote:
-> On 29 May 18:22, Jakub Kicinski wrote:
-> >On Tue, 28 May 2024 17:28:03 +0300 Tariq Toukan wrote:  
-> >> +   * - `rx[i]_hds_nosplit_packets`
-> >> +     - Number of packets that were not split in modes that do header/data split
-> >> +       [#accel]_.
-> >> +     - Informative
-> >> +
-> >> +   * - `rx[i]_hds_nosplit_bytes`
-> >> +     - Number of bytes that were not split in modes that do header/data split
-> >> +       [#accel]_.
-> >> +     - Informative  
-> >
-> >This is too vague. The ethtool HDS feature is for TCP only.
-> >What does this count? Non-TCP packets basically?
-> 
-> But this is not the ethtool HDS, this is the mlx5 HW GRO hds.
+Adding a sysctl knob to allow user to specify a default
+rto_min at socket init time.
 
-Okay, but you need to put more detail into the description.
-"not split in modes which do split" is going to immediately 
-make the reader ask themselves "but why?".
+After this patch series, the rto_min will has multiple sources:
+route option has the highest precedence, followed by the
+TCP_BPF_RTO_MIN socket option, followed by this new
+tcp_rto_min_us sysctl.
 
-> On the sane note, are we planning to have different control knobs/stats for
-> tcp/udp/ip HDS? ConnectX supports both TCP and UDP on the same queue, 
-> the driver has no control on which protocol gets HDS and which doesn't.
+v2:
+    fit line width to 80 column.
 
-No plans at this stage. The ethtool HDS is specifically there
-to tell user space whether it should bother trying to use TCP mmap.
+v1: https://lore.kernel.org/netdev/20240528171320.1332292-1-yyd@google.com/
 
-> >Given this is a HW-GRO series, are HDS packets == HW-GRO eligible
-> >packets?
-> 
-> No, UDP will also get header data split or other TCP packets that don't
-> belong to any aggregation context in the HW.
+Kevin Yang (2):
+  tcp: derive delack_max with tcp_rto_min helper
+  tcp: add sysctl_tcp_rto_min_us
 
-I see.
+ Documentation/networking/ip-sysctl.rst | 13 +++++++++++++
+ include/net/netns/ipv4.h               |  1 +
+ net/ipv4/sysctl_net_ipv4.c             |  8 ++++++++
+ net/ipv4/tcp.c                         |  4 +++-
+ net/ipv4/tcp_ipv4.c                    |  1 +
+ net/ipv4/tcp_output.c                  | 11 ++---------
+ 6 files changed, 28 insertions(+), 10 deletions(-)
+
+-- 
+2.45.1.288.g0e0cd299f1-goog
+
 
