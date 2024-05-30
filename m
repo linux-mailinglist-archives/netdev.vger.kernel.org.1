@@ -1,156 +1,239 @@
-Return-Path: <netdev+bounces-99225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B552D8D4273
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 02:45:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 908908D4278
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 02:47:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6F1A1C2216E
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 00:45:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B36AB1C2263A
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 00:47:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AC168F47;
-	Thu, 30 May 2024 00:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9EE8F47;
+	Thu, 30 May 2024 00:47:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="I1VaVCsd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AWbyJFfo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC78C134BD
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 00:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F376D8814
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 00:47:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717029951; cv=none; b=YIzWFLWaA0gY3qvZx2rR67apLkZN8v7KQUnhVY3iXCb9lU7ikomXgsg/XCGe3Sueci5e6xIXXUX67g0qzp4X4E5lwuvIBnQAECtQV8F/HJTUht88TwMh+HA7loG3XazNKsqR8ztl+6nfS1QjYF5MXMivD3ncbMXimVB2QPHvldE=
+	t=1717030026; cv=none; b=QQ633R8043axhGat+vSxJbc5YLjNJzgNx5cRmn9wf+8cEp7zBCRMCHkdG/fvVtUDuuQ7Vdp2zXxwk3cshAFrK64WFiSn4URpHtyKnWcXLWZL1m+n6uWQcbcJWz7SC2BG66b2qprLGLkqb2L+ODjdyskfRcS7m5gLXp+UP+WJ9Vk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717029951; c=relaxed/simple;
-	bh=wBz2qZopS6FfLTe4ZSNt9bUuEFegNutb19fG4EI+yAQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CjcWhOUkes0r5l8uIgsuRKHykcY1Z7KpLlKdkw+UWgwvzQ2QEtjNzxzmOrYimBeU5ghmt8pcaeFOHqkiXcC4Fr8KcaxQF7f5XI460TGzX2TEpKqUrCwr/kSnbkYlenSGGvhaUN4exIhXGF1mNp2sY6DLg4SuhN5EyoQSOrQRev4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=I1VaVCsd; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-66629f45359so312419a12.3
-        for <netdev@vger.kernel.org>; Wed, 29 May 2024 17:45:49 -0700 (PDT)
+	s=arc-20240116; t=1717030026; c=relaxed/simple;
+	bh=T7+L8zSx24UPrxEiXAjqn+OrIhKKuzWRn04I7ERbZIU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=RpBvitswRCNbrrhPbKEZRSGXlz8Dy1eLtx5yxHs87mSh4g4IKFIZR6df3c3WCIkPJ3HVbztcvZLv/bM0t5sAGbahuIgBrA27eYScCa8rlYVvc52tIZZGTz6IJWfj7Qn8C068QPOPCWa3V2D7LAO1G/Vmz68+30XJ/4RaO/f9wHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AWbyJFfo; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-43f87ba7d3eso1467881cf.0
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 17:47:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1717029949; x=1717634749; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=UzT4rsaryvD4HsIjsYHJczNs+fMyCNVp7/lsR9UttHw=;
-        b=I1VaVCsdIl1m5FsHcC0pBBxjAMfa/ng+p4U17H1mLGQ8MfCwLEuTEHNWoSIZtBWMRc
-         cVJEHhaHfR06d6kal2VJvwF12gG5KQFGpjEKYTsjPg/y0OwlhEUt6YOzhxgEMkeFkWK9
-         e0NMv/noYBftZ2dxACbNPzgD55I8vytIG4jYw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717029949; x=1717634749;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1717030024; x=1717634824; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UzT4rsaryvD4HsIjsYHJczNs+fMyCNVp7/lsR9UttHw=;
-        b=Sy/hMmVVek5lQMQEh9rmnLGLJ0HBDoKiTSgGAsOMBQ6wz0tGaG+i9etnCopKaFKSeQ
-         SCDiIfBeDX1meirhUZOWSEbM9Xf0f8n3cpl+tUVpoGBQHwLgJ9rAMgXgB/dfd9xx0ZMk
-         MOVOniAstL+yc5gcmmMpYy844EV1KIi7MZUSypk3VIXR1iI3vPMv9w9zoxAa7a3F/TK5
-         fphtmG55mi2xYOSchBJuQYSfhM3lV+ePxdRc5M3xdRVGRewP+2K7pPdi/07t9FOiGe1L
-         8mAiO+qoNBMb0Qe0Lf7SV2rc9YdhpaMuClRp3VMadoxCJujeX1WOlx98rJGMxL7TWYfQ
-         tjdg==
-X-Forwarded-Encrypted: i=1; AJvYcCVB/w5o0EZ2C+Va6FUuPd6CEQor9hU8nm0w+vFiBc+TJ0VYNdmVrMpHc/vAawIZnHGf3yU8gd7axMEx1A98o/i751vMXijF
-X-Gm-Message-State: AOJu0YwqxM6s/Q1Axyq71Sx7A9Q15uj9yC8+9/Y5CyxBlon2Ct1CzuwE
-	HhVKvuBDmF19eQKb4KacQayPFK2966mcTRm0GtuENTxejwVmfaJKBZL4l0NH0A==
-X-Google-Smtp-Source: AGHT+IGw/uQweGpiOxtSfYPC7LJBdJ2zJ1rqH+pim/ho7+uhpHOfv5xU/GTUkOAC13zAozamcR+7Gw==
-X-Received: by 2002:a17:90a:de93:b0:2c1:a9da:8344 with SMTP id 98e67ed59e1d1-2c1ab9e32c6mr750050a91.9.1717029948937;
-        Wed, 29 May 2024 17:45:48 -0700 (PDT)
-Received: from [10.66.192.68] ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c1abe3d4d7sm288005a91.44.2024.05.29.17.45.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 May 2024 17:45:48 -0700 (PDT)
-Message-ID: <bcbe13ec-839c-4061-895c-8188bcd03841@broadcom.com>
-Date: Wed, 29 May 2024 17:45:43 -0700
+        bh=xG2J5UvvwrbJ4Z1FlJXLqS51iEXcDyo71lcqaTpzDqA=;
+        b=AWbyJFfoowKW6YeukatK5Yf9XFmw80ZOMrImcPRDCsa2DRQEACMJv/+daYDi5gUL50
+         zZVDj07ocWkPnicrEWGS93CuRoqK1HKb+5su2Ek27OCvZeAkCEx5DmjblaDvMUbyolht
+         XIKf/m9s0e5y23i9TinD/HwRYouu4V5u3prVb+xJ30cHokR7V4OoTesk3ruQsI8jdk7R
+         neSCB/k6zmV/xVq3dBt1GvdGE16cVumS2URSUoBpjVkB1gzLxoEAzEpEQMbiiPJR9LlE
+         nKKnACFg8S210LvnC2W2Rn2QrZQbpzIbjHD/EpRcse3JBFQ0E1vvMENwTc9fWl9Y7ED2
+         i8rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717030024; x=1717634824;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xG2J5UvvwrbJ4Z1FlJXLqS51iEXcDyo71lcqaTpzDqA=;
+        b=ZzSMxNDGzCfOMn/3AMsR5FOnowWEDjSx0ZNtULLuKKNE/J2cPHG18GHEifItumPCqD
+         I5AE6KruO+oSdaA6Pr6uHVNYkFJvO8IzL5eyXPNhbjC2Mmin+JitI+aESIKMuqCHMrna
+         XzVwID/hJzChpkVfQ9S4K6/sk5EJP5oStjo4CYLrFlP2/V9l9mzrz1BgtTyObH2Pkfiq
+         n8NDnDW3/FMxC2ShZur9NbJslXdMIlXJyw2Mljv7HfsK1Rb5E6W30XKQDfVcYHZggAzG
+         Qu3LYGd2kcFtnd9Zd/X+2ZCl2erIFn1YgkWaq+uefPjUETYNuIQP1K0c7/ZSV9muqR9M
+         00bw==
+X-Gm-Message-State: AOJu0Yy6lzsYK/11jntLxdiwN34onqECWTLlR8oUrSCDprvjcPkTUmio
+	SkwI9Qxq9P3BSOzb9Cm1z9kuU3KRIXa03KJQn6z0OZ2AR6eTBcDE
+X-Google-Smtp-Source: AGHT+IEcUzLimxS+TW1Z7xVjW2+AsDFudFsuncv45+BXAp4Ee4q1XRT5LAVNWQZzfAnLHiNrHHl+VA==
+X-Received: by 2002:ac8:5d54:0:b0:43e:3b8e:671f with SMTP id d75a77b69052e-43fe93130c2mr8855001cf.47.1717030023624;
+        Wed, 29 May 2024 17:47:03 -0700 (PDT)
+Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43fb16b97aasm60002811cf.4.2024.05.29.17.47.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 May 2024 17:47:03 -0700 (PDT)
+Date: Wed, 29 May 2024 20:47:02 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ pabeni@redhat.com, 
+ borisp@nvidia.com, 
+ gal@nvidia.com, 
+ cratiu@nvidia.com, 
+ rrameshbabu@nvidia.com, 
+ steffen.klassert@secunet.com, 
+ tariqt@nvidia.com
+Message-ID: <6657cc86ddf97_37107c29438@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240529103505.601872ea@kernel.org>
+References: <20240510030435.120935-1-kuba@kernel.org>
+ <20240510030435.120935-2-kuba@kernel.org>
+ <66416bc7b2d10_1d6c6729475@willemb.c.googlers.com.notmuch>
+ <20240529103505.601872ea@kernel.org>
+Subject: Re: [RFC net-next 01/15] psp: add documentation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 6/8] x86/vmware: Correct macro names
-To: Markus Elfring <Markus.Elfring@web.de>,
- linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
- virtualization@lists.linux.dev, dri-devel@lists.freedesktop.org,
- linux-input@vger.kernel.org, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, x86@kernel.org,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
- Thomas Gleixner <tglx@linutronix.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, Ajay Kaher <akaher@vmware.com>,
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, Daniel Vetter
- <daniel@ffwll.ch>, David Airlie <airlied@gmail.com>,
- "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Simon Horman <horms@kernel.org>,
- Thomas Zimmermann <tzimmermann@suse.de>, Tim Merrifield
- <timothym@vmware.com>, Zack Rusin <zackr@vmware.com>
-References: <20240523191446.54695-7-alexey.makhalov@broadcom.com>
- <448230a6-1afd-416f-a430-3fc83d81908f@web.de>
-Content-Language: en-US
-From: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Autocrypt: addr=alexey.makhalov@broadcom.com; keydata=
- xsFNBGVo9lkBEACeouRIm6Q3QTvjcnPczfBqgLffURstVJz5nqjnrNR4T+8dwNrZB8PTgOWA
- QdGV4bIyqtNG7UHQuZ7sVKr2tx0gYJyQ5uZgncEHB5YIuhQ/CyAHrVmO+5/0/xWCLI0g44rF
- ZJqsYw2JQ2+vayTWbR65rkOiKL8GOVFNZanDg80BRh6qCmCEMXd/tymxvgnvWpHtxMgukexk
- 4vV9nV4XhxRVYdpLk8mBxsh+AEbHE+nbWgIuJDrmrZDGI2Dha7JFoB0Mi6hbbYd9BdkcHKQ7
- 6c+S1xOrZL3jX7OIFhb4NNnEOhh8/+BDlyby478p6YsimNa7TgAUbrygGyfVG8usrZy8SvO+
- vUbVQwqjcJaCK1xazK12dfuZm2kSMJUrJqa9ng6OMjkE2/WrtnK8ruFNSCdytzbuheT0nYUJ
- Uwy84cU4p2K/N2C4vYjcn+IT+l1BFr5FViKYruoRLVH6zK/WOoZjA+Fc6tdM5nC1pgSB9c7h
- XLQqDSzYPzk3nqeHWG1qJ0Hu7pscIrjxyNTIZ5le0TlpblJdoRcL5maDNw22yle8m4D18ERF
- VrqNoqwW8fObMCHbd6C3m75lzerq1HhrSvLyU4UfprEyAcjOI1C0319SXfYlXDjKXRQyaDZP
- wxln8uShSitSSnx0AsSAjcUa8Cc7km81+G2WSK3S2wVIAN11awARAQABzS5BbGV4ZXkgTWFr
- aGFsb3YgPGFsZXhleS5tYWtoYWxvdkBicm9hZGNvbS5jb20+wsGNBBMBCAA3FiEEjLzRtST/
- a5u42vOKbM7yHr5SJ3cFAmVo9lwFCQ0oaIACGwMECwkIBwUVCAkKCwUWAgMBAAAKCRBszvIe
- vlInd0jTD/9bZtjehewLRrW3dRDAbLG/+J5g1K4X5qQPfAo42NrhZQlOTibL7ixwq7NSXynZ
- V4Iu9jHAW++KXjxJzkg7zjBf9OOvvgCpqZGKYgWNvHHnX4eIVh8Ikp5JtvGPMBcRv7lJA5co
- kb+RHo9iRrB1dvRIOsP1SlGS85SiNA0yvmgqwbigLDmDRSWtvvt9XPwU1iqF+1OopT3UE10i
- /z+qE2ogcw2ADveBovq2W4JeQEBvlETwDKOdh8Q3UBHOqrZUrL7YjpUxgmb89FcjdDzUU95I
- fCB5YxF0hUctxFH5Uujh2F4qk0m2rp7+aOGtxWCJUqkHXjgpOoxyn0FPZiZlDkst84NO5OSI
- 5ZFPwaFqxUrFF+cFCY2O/UE2gpoK9Lt3gYNK6o2WIAtufuiYVdK6lANMkBgZ+t2fDLIN147a
- 172zu8XnyJMTo+tVfUjxwqynoR/NSWpVPs0Ck3K0LGjQE0tJ6HZrH0vudXk3YaiqW+D4CtGh
- I17Pk0h6x8LCdjmWmuDXoc99ezOEFSyWuTHjAYxx3cmgSUyIhdHtimuf0CVLTcFoBErb/5pJ
- zjb11Cj0HP87FMH57bnD3qyfkBMOB6tztfdt3vkCBaWkxaiTGXNhwr4IiLUoi90yIdXDMcTj
- /gvnjXgN+31iYgPWgTOdUEQud0DwDwuDwkzx/0x4sF1Dfc7BTQRlaPZcARAAuGkoYKWcrCh8
- 5RffedM6uBZ4p5Z4+RVj05uq7hlAwhHUpLP/XGbgNzhJP375Lonmnuyg2x7oHxfiwOohuuiA
- MnhSeEXn2qWZJuHosrYxs9y2zyiE/GTUAcqKiYBFa/96zOaZjHpNuQ5qSHYL64WhqvtmCQYg
- fL+jes2Z4IXl2R7MrN9OE+G3A3pOAo8TZKUEmlUV85fSmgopIX+hCiSQmRNRtp2jK6hd2+38
- YAXc+eRxYgXKaWX5zeBgNrfM7Oxeh/0iWRZPWstTvVH2xMlzywOB3e/fqg+Q3NlPGDrTyHoc
- L86ZELSLcMTFn+RXw8lX8oVjTcQA0M8sQHB5g0JEWtMsFjnQZkJGCfeh0Odbn/F8nZ6LQQtu
- +fjc/4n9vRun+PZjdhd3W9ZM9D87W9XJg9txIaYnoUXBLLpHK/OirFfr5cJTUf4svtE3EVXb
- x6P9vr7zqUbE0f76h1eDPmyMwFAuibIXhNoEoKQtEjLX9aKgKYny3hczRiuQpA+6U4oTNn4S
- /CEqphLPT53aMH0w4x0CebMPozf24ZE9YphdX8ECclLBlDL1/zx2xKrJNw8v6wdXMSfsybBW
- 98b5b1eVBk1uc1UMlpDl7AIHyCMTjL9Ha85eoya/Hk9l93aVHgK04hOBY2ED1/ZRpj0M5P5m
- tNX1JqZunpyvKooT1PrJr4UAEQEAAcLBfAQYAQgAJhYhBIy80bUk/2ubuNrzimzO8h6+Uid3
- BQJlaPZeBQkNKGiAAhsMAAoJEGzO8h6+Uid3SDoQAI3XXqsehWKvyAVeGXPxmkk+Suos/nJC
- xZWjp4U2xbbegBnNWladZoNdlVW/WV+FSFsN5IWztxQTWBMI12A0dx+Ooi9PSIANnlN+gQsA
- 9WeQ5iDNveEHZyK1GmuqZ3M3YZ1r3T2KyzTnPPZQ1B8gMQ442bOBWe077MqtLaC0J1jHyWHU
- j6BbUCAyR2/OCV/n1bH4wYIm2lgrOd2WuzoAGvju+j2g7hMRxw/xeHeu8S0czHuEZ0dC6fR1
- ZKUOw03+mM/xRzL1be6RVS9AF7R5oDd11RrTOb7k14z0inFqSRrRwzOPKcuMxrApcquar336
- 3FQuLcJLjBo/SAOh2JatOkkwkw5PZseqdwcAk5+wcCbdYy8J8ttR04iV1FzrdQp8HbVxGNo7
- AlDn1qtoHzvJHSQG51tbXWfLIi1ek3tpwJWj08+Zo+M47X6B65g7wdrwCiiFfclhXhI1eJNy
- fqqZgi3rxgu4sc5lmR846emZ/Tx85/nizqWCv7xUBxQwmhRPZRW+37vS2OLpyrTtBj3/tEM9
- m9GMmTZqaJFeK7WCpprJV4jNHpWZuNAsQrdK1MrceIxb0/6wYe0xK79lScxms+zs9pGTrO4U
- 5RoS4gXK65ECcBH8/mumV6oBmLrNxKUrzTczdo9PnkmRyZcAa6AndbjmQDznwxvTZu2LjMPC EuY0
-In-Reply-To: <448230a6-1afd-416f-a430-3fc83d81908f@web.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-
-
-On 5/25/24 8:53 AM, Markus Elfring wrote:
->> VCPU_RESERVED and LEGACY_X2APIC are not VMware hypercall commands.
->> These are bits in return value of VMWARE_CMD_GETVCPU_INFO command.
->> Change VMWARE_CMD_ prefix to GETVCPU_INFO_ one. …
+Jakub Kicinski wrote:
+> On Sun, 12 May 2024 21:24:23 -0400 Willem de Bruijn wrote:
+> > Jakub Kicinski wrote:
+> > > +PSP Security Protocol (PSP) was defined at Google and published in:
+> > > +
+> > > +https://raw.githubusercontent.com/google/psp/main/doc/PSP_Arch_Spec.pdf
+> > > +
+> > > +This section briefly covers protocol aspects crucial for understanding
+> > > +the kernel API. Refer to the protocol specification for further details.
+> > > +
+> > > +Note that the kernel implementation and documentation uses the term
+> > > +"secret state" in place of "master key", it is both less confusing
+> > > +to an average developer and is less likely to run afoul any naming
+> > > +guidelines.  
+> > 
+> > There is some value in using the same terminology in the code as in
+> > the spec.
+> > 
+> > And the session keys are derived from a key. That is more precise than
+> > state. Specifically, counter-mode KDF from an AES key.
+> > 
+> > Perhaps device key, instead of master key? 
 > 
-> Can such information be relevant for the addition of the tag “Fixes”?
-> 
+> Weak preference towards secret state, but device key works, too.
 
-Makes sense! Thanks, --Alexey
+Totally your choice. I just wanted to make sure this was considered.
+ 
+> > > +Derived Rx keys
+> > > +---------------
+> > > +
+> > > +PSP borrows some terms and mechanisms from IPsec. PSP was designed
+> > > +with HW offloads in mind. The key feature of PSP is that Rx keys for every
+> > > +connection do not have to be stored by the receiver but can be derived
+> > > +from secret state and information present in packet headers.  
+> > 
+> > A second less obvious, but neat, feature is that it supports an
+> > encryption offset, such that (say) the L4 ports are integrity
+> > protected, but not encrypted, to allow for in-network telemetry.
+> 
+> I know, but the opening paragraph has:
+> 
+>    This section briefly covers protocol aspects crucial for
+>    understanding the kernel API. Refer to the protocol specification for further details.
+> 
+> :) .. and I didn't implement the offset, yet. (It's trivial to add and
+> ETOOMANYPATCHES.)
+
+Ack, sounds good.
+
+> 
+> > > +This makes it possible to implement receivers which require a constant
+> > > +amount of memory regardless of the number of connections (``O(1)`` scaling).
+> > > +
+> > > +Tx keys have to be stored like with any other protocol,  
+> > 
+> > Keys can optionally be passed in descriptor.
+> 
+> Added: Preferably, the Tx keys should be provided with the packet (e.g.
+> as part of the descriptors).
+> 
+> > > +The expectation is that higher layer protocols will take care of
+> > > +protocol and key negotiation. For example one may use TLS key exchange,
+> > > +announce the PSP capability, and switch to PSP if both endpoints
+> > > +are PSP-capable.  
+> > 
+> > > +Securing a connection
+> > > +---------------------
+> > > +
+> > > +PSP encryption is currently only supported for TCP connections.
+> > > +Rx and Tx keys are allocated separately. First the ``rx-assoc``
+> > > +Netlink command needs to be issued, specifying a target TCP socket.
+> > > +Kernel will allocate a new PSP Rx key from the NIC and associate it
+> > > +with given socket. At this stage socket will accept both PSP-secured
+> > > +and plain text TCP packets.
+> > > +
+> > > +Tx keys are installed using the ``tx-assoc`` Netlink command.
+> > > +Once the Tx keys are installed all data read from the socket will
+> > > +be PSP-secured. In other words act of installing Tx keys has the secondary
+> > > +effect on the Rx direction, requring all received packets to be encrypted.  
+> > 
+> > Consider clarifying the entire state diagram from when one pair
+> > initiates upgrade.
+> 
+> Not sure about state diagram, there are only 3 states. Or do you mean
+> extend TCP state diagrams? I think a table may be better:
+> 
+> Event         | Normal TCP      | Rx PSP key present | Tx PSP key present |
+> ---------------------------------------------------------------------------
+> Rx plain text | accept          | accept             | drop               |
+> 
+> Rx PSP (good) | drop            | accept             | accept             |
+> 
+> Rx PSP (bad)  | drop            | drop               | drop               |
+> 
+> Tx            | plain text      | plain text         | encrypted *        |
+> 
+> * data enqueued before Tx key in installed will not be encrypted
+>   (either initial send nor retranmissions)
+> 
+> 
+> What should I add?
+
+I've mostly been concerned about the below edge cases.
+
+If both peers are in TCP_ESTABLISHED for the during of the upgrade,
+and data is aligned on message boundary, things are straightforward.
+
+The retransmit logic is clear, as this is controlled by skb->decrypted
+on the individual skbs on the retransmit queue.
+
+That also solves another edge case: skb geometry changes on retransmit
+(due to different MSS or segs, using tcp_fragment, tso_fragment,
+tcp_retrans_try_collapse, ..) maintain skb->decrypted. It's not
+possible that skb is accidentally created that combines plaintext and
+ciphertext content.
+
+Although.. does this require adding that skb->decrypted check to
+tcp_skb_can_collapse?
+ 
+> > And some edge cases:
+> > 
+> > - retransmits
+> > - TCP fin handshake, if only one peer succeeds
+> 
+> So FIN when one end is "locked down" and the other isn't?
+
+If one peer can enter the state where it drops all plaintext, while
+the other decides to close the connection before completing the
+upgrade, and thus sends a plaintext FIN.
+
+If (big if) that can happen, then the connection cannot be cleanly
+closed.
+ 
+> > - TCP control socket response to encrypted pkt
+> 
+> Control sock ignores PSP.
+
+Another example where a peer stays open and stays retrying if it has
+upgraded and drops all plaintext.
+
+
 
