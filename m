@@ -1,209 +1,185 @@
-Return-Path: <netdev+bounces-99351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AEC48D49A4
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 12:29:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A73298D49A7
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 12:30:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EE611C22255
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 10:29:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63854283D96
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 10:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58AD91761BD;
-	Thu, 30 May 2024 10:29:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C4A176AC7;
+	Thu, 30 May 2024 10:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G/LCCiuA"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D63433B3;
-	Thu, 30 May 2024 10:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A33118398B
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 10:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717064956; cv=none; b=MQu01ExpYWd3tX/vV/fTMd5AFkMbgcB/ptggR0SSDU/V9kPVQ9Vk3SOome32ieRmpjII2eX9AiH2DM0vjKWcSLbYxSlwbq3I/wQm1eFG7675wK8UUyPQGtzWimqgwI3msvlgt0hou5hRQ02ANpak5r/upAwIvxi/IdSrhzqb14g=
+	t=1717065009; cv=none; b=cRA+pWo6fHeoe64IoJRrYELbYf/GRFO1OyDB4wmHGhUaO1ZLP1WDhOMh1BkPpwKXm39NvoWy28Zwi2qXcS3qGM/9ryPIiAyi/TSesO0RtYqNfZPyBc+7ePawFsUxbSVC8MbULZhMOHJdGyhaIW7gNObNsSPP4SlUPnZMPBdjayI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717064956; c=relaxed/simple;
-	bh=dqXFzIy34r9alYikOtvaZBp/VtCNyiGN2Z42QiwgkOc=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=uqBnlPrAIJ3haxOQ5inFo8ZOa1VWkBdOruo5lga6/Ao19zyCiBW9DeSnFu7JH48uMcfkpos9DS6zWSgnHemCUrIoclauyz9enNNuGsXLAmywlu3tGLUnyUi6vI51thGSImFLLqdI0D9dIJUwesrIY/zTeuhl9SoqTFCtZlkjYAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-X-IronPort-AV: E=Sophos;i="6.08,201,1712588400"; 
-   d="asc'?scan'208";a="210129620"
-Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
-  by relmlie6.idc.renesas.com with ESMTP; 30 May 2024 19:29:05 +0900
-Received: from [10.226.92.220] (unknown [10.226.92.220])
-	by relmlir5.idc.renesas.com (Postfix) with ESMTP id E44FB4010DF9;
-	Thu, 30 May 2024 19:29:01 +0900 (JST)
-Message-ID: <b6d03e9a-8889-4fbd-a388-c168d1547e24@bp.renesas.com>
-Date: Thu, 30 May 2024 11:29:00 +0100
+	s=arc-20240116; t=1717065009; c=relaxed/simple;
+	bh=mVHva8M32IxDEuPKEKgHcF5zqbOYLYjPtVGp80CqZ68=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=amnSK3M77UGjQTYJkTs1scwYbT0LeJMaxbBxIOHT8ojVbM1escxnIauODZOcfwHxw0njFaLlsRvzJF3et/g6gkckHbBadAPuHRk48BKYVRZPsD9gsbP8rjyJwLS75LwrshETFggPLAp7VEu5gevpT5A5nesjbmlewPsh8+g8164=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G/LCCiuA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717065006;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fXuu0VhYv/Sqtsmj/xee9XrMd/ZRARenPycPxIhwC84=;
+	b=G/LCCiuA2T41HAuHVieZymegU6tGYjFLTKArSRVruAaw/uEqDDR51nYCyLfRZ6CXTCxkTD
+	ajf3NCUgDHgUTtZMq1iCV8vthFB4+5X7R4q6WDLiTTpE6nfdenpJrfbKPMkYJQi/HMXIXs
+	QJDGMndDmxKbvnjHygwAvUV/vi6qyAA=
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-401-SX9xmhW_O5axfZdeC4oiVg-1; Thu, 30 May 2024 06:30:04 -0400
+X-MC-Unique: SX9xmhW_O5axfZdeC4oiVg-1
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-6658175f9d4so760884a12.0
+        for <netdev@vger.kernel.org>; Thu, 30 May 2024 03:30:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717065004; x=1717669804;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fXuu0VhYv/Sqtsmj/xee9XrMd/ZRARenPycPxIhwC84=;
+        b=aK7i5n4TKYt43sBNgIetNAIvFZva6c25iUEz6SrIx+CTUccbxNxUxp4tlFTHhw/NHC
+         f8VQfRYdG/8s0+jSSzem3LZt3Qpjw64SuGh9YZ8sOhKSpSGA4ARz3KtDwyljJzMfS0vu
+         TAE1fvVcc4+QAhSc6uulz78KAoo0q6Y+/BsapaHxYsvfaVXlcvlg64rNnDrY/AxdBlmm
+         R7XCoBiVRpD95E9a1YPN92VN8ENOI27DgkbIiq6IOeKtmml34pxAc0HrzuUDYloj1o1r
+         4opJHwJZchk1xfhQpx21h0Kp67OLCjAFuJ539oU5d2vBk1qxgDsuvJBKrWvL2AEz/yQC
+         PrQw==
+X-Forwarded-Encrypted: i=1; AJvYcCU4hz9BnM2OP21fSl3LQMAHOclR0mZCyeV3FU+yrTkIbHvQA0P3I5wWWtIWorrk8EZqh7XzNZaoZZAVpqSEPBfdvCbHulq/
+X-Gm-Message-State: AOJu0Yy/vF/2pqHwLiWYDOv48qjXp+kv9cDQvGpNocyW39o3aPVCyqzu
+	L9XwB6XOIrTYez5QnzW4XSSgF4VJMwoO42P4NhGfa1Nth/wiSSgaCMuSE6CEbEe+q3mfCXaw3La
+	/14Nc9P0hn8OV3/tWJD4kEA879sYGpf82RavhWfESu+9+fnVB8aiLlkO7bHUiAgJGg7ZurwbAx9
+	k2hVsnt+vD0R1VatCiKpBdXBQuqJ1e
+X-Received: by 2002:a17:90a:ce90:b0:2c0:3400:df40 with SMTP id 98e67ed59e1d1-2c1aabe9d88mr2621235a91.0.1717065003795;
+        Thu, 30 May 2024 03:30:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGA7U478P9i05qqxnNKG+nvSy+yQhk/wrEg2bbs8tGfMLiA4XTvaTHtx1q3ccmrbRhBHVyV89R4f4eHnf4hT+E=
+X-Received: by 2002:a17:90a:ce90:b0:2c0:3400:df40 with SMTP id
+ 98e67ed59e1d1-2c1aabe9d88mr2621210a91.0.1717065003379; Thu, 30 May 2024
+ 03:30:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH v4 7/7] net: ravb: Allocate RX buffers via page
- pool
-Content-Language: en-GB
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Biju Das <biju.das.jz@bp.renesas.com>,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240528150339.6791-1-paul.barker.ct@bp.renesas.com>
- <20240528150339.6791-8-paul.barker.ct@bp.renesas.com>
- <eefce0af-2771-a56c-753d-85fe991fdf31@omp.ru>
- <e7cf9dd8-9c67-476b-a892-b8dbe9312c4c@bp.renesas.com>
-Organization: Renesas Electronics Corporation
-In-Reply-To: <e7cf9dd8-9c67-476b-a892-b8dbe9312c4c@bp.renesas.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------tMLKLiVDOLIictAzyrx8ObJN"
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------tMLKLiVDOLIictAzyrx8ObJN
-Content-Type: multipart/mixed; boundary="------------DRJUhX0cQajqiJhTTYTqEnsN";
- protected-headers="v1"
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Biju Das <biju.das.jz@bp.renesas.com>,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Message-ID: <b6d03e9a-8889-4fbd-a388-c168d1547e24@bp.renesas.com>
-Subject: Re: [net-next PATCH v4 7/7] net: ravb: Allocate RX buffers via page
- pool
-References: <20240528150339.6791-1-paul.barker.ct@bp.renesas.com>
- <20240528150339.6791-8-paul.barker.ct@bp.renesas.com>
- <eefce0af-2771-a56c-753d-85fe991fdf31@omp.ru>
- <e7cf9dd8-9c67-476b-a892-b8dbe9312c4c@bp.renesas.com>
-In-Reply-To: <e7cf9dd8-9c67-476b-a892-b8dbe9312c4c@bp.renesas.com>
-
---------------DRJUhX0cQajqiJhTTYTqEnsN
-Content-Type: multipart/mixed; boundary="------------JTNDfQ0jYDB0WNTP7QO0aKQ4"
-
---------------JTNDfQ0jYDB0WNTP7QO0aKQ4
-Content-Type: text/plain; charset=UTF-8
+References: <20240530032055.8036-1-jasowang@redhat.com> <20240530020531-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240530020531-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 30 May 2024 18:29:51 +0800
+Message-ID: <CACGkMEun-77fXbQ93H_GEC4=0_7CLq7iPtXSKe9Qriw-Qh1Tbw@mail.gmail.com>
+Subject: Re: [PATCH net-next V2] virtio-net: synchronize operstate with admin
+ state on up/down
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: xuanzhuo@linux.alibaba.com, eperezma@redhat.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>, 
+	Gia-Khanh Nguyen <gia-khanh.nguyen@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 30/05/2024 10:21, Paul Barker wrote:
-> On 29/05/2024 21:52, Sergey Shtylyov wrote:
->> On 5/28/24 6:03 PM, Paul Barker wrote:
->>> @@ -865,7 +894,16 @@ static int ravb_rx_gbeth(struct net_device *ndev=
-, int budget, int q)
->>>  				stats->rx_bytes +=3D skb->len;
->>>  				napi_gro_receive(&priv->napi[q], skb);
->>>  				rx_packets++;
->>> +
->>> +				/* Clear rx_1st_skb so that it will only be
->>> +				 * non-NULL when valid.
->>> +				 */
->>> +				if (die_dt =3D=3D DT_FEND)
->>> +					priv->rx_1st_skb =3D NULL;
->>
->>    Hm, can't we do this under *case* DT_FEND above?
->=20
-> It makes more logical sense to me to do this as the last step, but I
-> guess it's a little more optimal to do it earlier. I'll move it.
+On Thu, May 30, 2024 at 2:10=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Thu, May 30, 2024 at 11:20:55AM +0800, Jason Wang wrote:
+> > This patch synchronize operstate with admin state per RFC2863.
+> >
+> > This is done by trying to toggle the carrier upon open/close and
+> > synchronize with the config change work. This allows propagate status
+> > correctly to stacked devices like:
+> >
+> > ip link add link enp0s3 macvlan0 type macvlan
+> > ip link set link enp0s3 down
+> > ip link show
+> >
+> > Before this patch:
+> >
+> > 3: enp0s3: <BROADCAST,MULTICAST> mtu 1500 qdisc pfifo_fast state DOWN m=
+ode DEFAULT group default qlen 1000
+> >     link/ether 00:00:05:00:00:09 brd ff:ff:ff:ff:ff:ff
+> > ......
+> > 5: macvlan0@enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 q=
+disc noqueue state UP mode DEFAULT group default qlen 1000
+> >     link/ether b2:a9:c5:04:da:53 brd ff:ff:ff:ff:ff:ff
+> >
+> > After this patch:
+> >
+> > 3: enp0s3: <BROADCAST,MULTICAST> mtu 1500 qdisc pfifo_fast state DOWN m=
+ode DEFAULT group default qlen 1000
+> >     link/ether 00:00:05:00:00:09 brd ff:ff:ff:ff:ff:ff
+> > ...
+> > 5: macvlan0@enp0s3: <NO-CARRIER,BROADCAST,MULTICAST,UP,M-DOWN> mtu 1500=
+ qdisc noqueue state LOWERLAYERDOWN mode DEFAULT group default qlen 1000
+> >     link/ether b2:a9:c5:04:da:53 brd ff:ff:ff:ff:ff:ff
+> >
+> > Cc: Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>
+> > Cc: Gia-Khanh Nguyen <gia-khanh.nguyen@oracle.com>
+> > Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > ---
+> > Changes since V1:
+> > - rebase
+> > - add ack/review tags
+>
+>
+>
+>
+>
+> > ---
+> >  drivers/net/virtio_net.c | 94 +++++++++++++++++++++++++++-------------
+> >  1 file changed, 63 insertions(+), 31 deletions(-)
+> >
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index 4a802c0ea2cb..69e4ae353c51 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -433,6 +433,12 @@ struct virtnet_info {
+> >       /* The lock to synchronize the access to refill_enabled */
+> >       spinlock_t refill_lock;
+> >
+> > +     /* Is config change enabled? */
+> > +     bool config_change_enabled;
+> > +
+> > +     /* The lock to synchronize the access to config_change_enabled */
+> > +     spinlock_t config_change_lock;
+> > +
+> >       /* Work struct for config space updates */
+> >       struct work_struct config_work;
+> >
+>
+>
+> But we already have dev->config_lock and dev->config_enabled.
+>
+> And it actually works better - instead of discarding config
+> change events it defers them until enabled.
+>
 
-Actually, this doesn't even need to be conditional. If die_dt is
-DT_FSINGLE, priv->rx_1st_skb will already be NULL so this will be a
-no-op. So I'll just simplify this.
+Yes but then both virtio-net driver and virtio core can ask to enable
+and disable and then we need some kind of synchronization which is
+non-trivial.
 
-Thanks,
+And device enabling on the core is different from bringing the device
+up in the networking subsystem. Here we just delay to deal with the
+config change interrupt on ndo_open(). (E.g try to ack announce is
+meaningless when the device is down).
 
---=20
-Paul Barker
---------------JTNDfQ0jYDB0WNTP7QO0aKQ4
-Content-Type: application/pgp-keys; name="OpenPGP_0x27F4B3459F002257.asc"
-Content-Disposition: attachment; filename="OpenPGP_0x27F4B3459F002257.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
+Thanks
 
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-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3D
-=3DsIIN
------END PGP PUBLIC KEY BLOCK-----
-
---------------JTNDfQ0jYDB0WNTP7QO0aKQ4--
-
---------------DRJUhX0cQajqiJhTTYTqEnsN--
-
---------------tMLKLiVDOLIictAzyrx8ObJN
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQSiu8gv1Xr0fIw/aoLbaV4Vf/JGvQUCZlhU7AUDAAAAAAAKCRDbaV4Vf/JGvdxd
-AP42vywr81zonb/12KZ8LCRoem+tbUVaUTzQrfUWOP35hwD/S9XQoDc13SPUgUVW88rmA+rx86a+
-6NsXKWGAtJNSwwo=
-=/DKM
------END PGP SIGNATURE-----
-
---------------tMLKLiVDOLIictAzyrx8ObJN--
 
