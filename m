@@ -1,134 +1,153 @@
-Return-Path: <netdev+bounces-99255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC5C08D43B1
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 04:25:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70E168D43B2
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 04:26:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B97A1C211FB
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 02:25:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2679D2831BA
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 02:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67B571C68F;
-	Thu, 30 May 2024 02:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6629D1CA96;
+	Thu, 30 May 2024 02:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eFOIpTuL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C4x9UyXL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4239E17BA4
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 02:25:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AE61C68F
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 02:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717035915; cv=none; b=fD9SUGLuYrQxg+TrSUg1RBpkDxqm7tlPaY1/+S+dSMLKEjkxgzZxAsCK+YKnxWcLxkHHbHSK9DfLet63VJ5a5SpmIRL+UXrEI2Xya5nqhYlcoMwauz42g71eGcq3YF9JO7QxTVCfJ3MS99Sr21pf1A4zx90+GQ5Oqf+PfHLMfZ0=
+	t=1717036005; cv=none; b=gk3RcVlYn4UPbCM3zFb6sH6fSgIPH+GnsobC5b4cERejPGV66obZIJzYPTwn815+efSz7kgMECKqZQLs547u01BkjdvmokAdAHLKiBMFrKifg0fue7zOFZzlMoCCuepubzanWQh88gFqFSFP6S8XJmhRZHHB0IjCT2DvpJZHb8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717035915; c=relaxed/simple;
-	bh=UcxU3E0qQ+2AG+rQmng32OwJU8UN9xoTEsh8++nAILg=;
+	s=arc-20240116; t=1717036005; c=relaxed/simple;
+	bh=ttvT3Ah8wGJXvc1wF+zv6cWjUvrcFWayTzZSGPdzpVY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZGgRKTIPvwDDJ9PrzfqpKb96whk1laW/HmS69SB0qxjKZIK/tvnhKlbheEeJOnu8+T/KdZ4rzTsCFvnf0zQGuLGH4DXv5U4ZRjCobeSlfAobfgCR4MbwQ8ejn2Fk9FWn2zzNijXVG9U2C4nqaDIHW+OjBWioHvd0pGAOHt64IfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eFOIpTuL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFB34C116B1
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 02:25:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717035914;
-	bh=UcxU3E0qQ+2AG+rQmng32OwJU8UN9xoTEsh8++nAILg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=eFOIpTuLEnJloRsRSP0s4IYk6P5TxUwtMGURLr+IMtqEH2BQSYCp8V/5IxAILCg+S
-	 dYuwsBS1wEXckexTHZsKvytba5yiTm+huqV9RYiiUSnJguMgl8tGfiS5P8bgCO4ofj
-	 LlCMMcYp3eufu1MGNnwplopVmOL0dFmGuhKj1uMwpAX0vcHUuBsptD84CTYinpX5wb
-	 o23G5OiDF6r1NXQ8aIs7CYzuTiRG3zJYYB9+z+utB/dvewTO+6xSL6pGZ/U8s3tEva
-	 j5KrSo/KHWeBesJmoOj16gZR6wXUB+dziGIYB3of1NO7IS5DJ3oeML7XkevXqbFGA/
-	 wDJP5HYXyfb6A==
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a626919d19dso105323266b.0
-        for <netdev@vger.kernel.org>; Wed, 29 May 2024 19:25:14 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUoHK2bUc3iDcR4w/rwaraeKYqOVi698kqvk0YTRp5rvKayd3yaErMJga3iWHm2whyeXAiI+kdnT7Sz127clLqXer2ekZA3
-X-Gm-Message-State: AOJu0YzcpxjPdxMwYxHX6ld/zLi9Mz/LAEdoWKBEX7fBaHXDNcAlKvY2
-	ALUaSee9KlMgB+Uv0QzRe+9hEU+sYSUqlQPlSnvOsQnxwQULEt6NEY9zXdQXW9bIFuFa8vsozgX
-	vGrpI/wE2DZr9SUV+ktajkJKGqro=
-X-Google-Smtp-Source: AGHT+IFaExT5wshCLDKuDJFe7Sx+KVmOlC7lmJ1yzBoulhBEVmtHrY1Kg64OdEqfJWGmnE/c+sQYQ1wGWRvka+u6L/k=
-X-Received: by 2002:a17:906:abd6:b0:a59:bbea:14e8 with SMTP id
- a640c23a62f3a-a65f0a5539bmr42119566b.17.1717035913341; Wed, 29 May 2024
- 19:25:13 -0700 (PDT)
+	 To:Cc:Content-Type; b=dPIomS1ff1z6gSIzt5d9WDwMw44Culo//ZZUishsZfenStjiMKKOOzwJAW7HewQ5BeurfHrmL6PS4o21PJa2CqqJcKuX3b+sQXX3Tk5sRXgFGuFB3yxAFgG988QEZk6yKdZn2q1a+Ek5XHO5CY71UnHhknyy6foq7eHAOT825NU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C4x9UyXL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717036002;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YnXsZTwwCzxzslifQa2+0cYHA7NTq6cDJZpAlg9suAg=;
+	b=C4x9UyXLWCeMWJNFgi58E+6kIlI1Ce9HrRuxJwMW6cobmWR6SXNBFdsOPmdMwKiL3JTxxz
+	YFpxJRwDytr4asl4p1kqfOYd8z2z5bys2+ltpisBwJl7Yc/btVI48A72CI1VQIzzzrd4fJ
+	wR8jDpFoQRNeywdgJhayqXxQKbzGPDQ=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-539-CZYcUyabNiWYiOFIM6GMQQ-1; Wed, 29 May 2024 22:26:40 -0400
+X-MC-Unique: CZYcUyabNiWYiOFIM6GMQQ-1
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2bf5bb2a414so345071a91.1
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 19:26:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717035999; x=1717640799;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YnXsZTwwCzxzslifQa2+0cYHA7NTq6cDJZpAlg9suAg=;
+        b=ov6JO7ZHTCscgl2MSQoZ1dtXLeUUZGkBIWYhzo0v8sb3bf1tF2ixISAtz8U4fBt4hJ
+         a58ZsUVYIYqvHshUhmdrkbdOW4X4czIxgq+lGTgWLR7yGdx5bizH4CViu+7GV9u/arcJ
+         2Y0lg14nUfIu5Fgy3NOuL8oEiqnRHFK2UhcAuCqgtHeTaALsPbejoZT5lukOI2OrwdLL
+         qwJxNW2CwdjFCdgEjPmpME074jFuNgYmAwKEEL+2tN3VxZRtwO2e7GWVpCR1U5ek5kCX
+         UmYVg05o6j5+d7SicJxmIYuGjuJaMaBnMK5nWrjLuYXBrW8KjrPL5Q8FQkmhGJKtK1VG
+         7TKg==
+X-Forwarded-Encrypted: i=1; AJvYcCV2ajKaAqk1GrBVqWhqzgRcIyMaZeijM+q9xszris+a9QAG74nmVAjfHtGobmq/E43Q5Dq4laXV+9LQSfdVj4gI8xMQ2zQb
+X-Gm-Message-State: AOJu0YwQoriM4RF9+57RqR+HE4V5bPVLo/io+5Xx8awHyXkw0/6eOQmX
+	vWwADceCPysetFP4wH7GyHo/3BiuH2s8D4Fr4kiO7SQf/vApxRqu7eLeACpBkHsdJd++veJJfBS
+	l1YFt6U5gVH2kOmoNFKN2abzdQHbXimowF7uUgJewmS/PHVb9SBZDvqdthhAf9IaBEYIGd7lhzf
+	gf/R6qXk6w8jy+q9YeznyX35yyTYvN
+X-Received: by 2002:a17:90a:f195:b0:2bd:d42a:f84e with SMTP id 98e67ed59e1d1-2c1abc06547mr875954a91.7.1717035999547;
+        Wed, 29 May 2024 19:26:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH8dBx7RLFwBbNLz/cVRtFvFW6wntNsZHbddxuYrQboeaA2JoWMYRdJDPzA+vve9b7jk9Fg1IkiIYjLozfohWs=
+X-Received: by 2002:a17:90a:f195:b0:2bd:d42a:f84e with SMTP id
+ 98e67ed59e1d1-2c1abc06547mr875939a91.7.1717035999145; Wed, 29 May 2024
+ 19:26:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1716973237.git.siyanteng@loongson.cn> <e7ae2409f68a2f953ba7c823e248de7d67dfd4e9.1716973237.git.siyanteng@loongson.cn>
-In-Reply-To: <e7ae2409f68a2f953ba7c823e248de7d67dfd4e9.1716973237.git.siyanteng@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Thu, 30 May 2024 10:25:01 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H6ZJwWQOhAPmoaH4KYr66LCurKq94f87FQ05yEX6XYoNg@mail.gmail.com>
-Message-ID: <CAAhV-H6ZJwWQOhAPmoaH4KYr66LCurKq94f87FQ05yEX6XYoNg@mail.gmail.com>
-Subject: Re: [PATCH net-next v13 12/15] net: stmmac: Fixed failure to set
- network speed to 1000.
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, fancer.lancer@gmail.com, 
-	Jose.Abreu@synopsys.com, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
+References: <1717026141-25716-1-git-send-email-si-wei.liu@oracle.com>
+In-Reply-To: <1717026141-25716-1-git-send-email-si-wei.liu@oracle.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 30 May 2024 10:26:27 +0800
+Message-ID: <CACGkMEugdcKjxMA_3+-gfh4wKOP5vTvYOb2V+MP7VxDiZ6EhiA@mail.gmail.com>
+Subject: Re: [PATCH] net: tap: validate metadata and length for XDP buff
+ before building up skb
+To: Si-Wei Liu <si-wei.liu@oracle.com>
+Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, mst@redhat.com, 
+	boris.ostrovsky@oracle.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi, Yanteng,
-
-The title should be "Fix ....." rather than "Fixed .....", and it is
-better to move this patch earlier since it is a preparation for later
-Loongson-related patches.
-
-Huacai
-
-On Wed, May 29, 2024 at 6:20=E2=80=AFPM Yanteng Si <siyanteng@loongson.cn> =
+On Thu, May 30, 2024 at 8:54=E2=80=AFAM Si-Wei Liu <si-wei.liu@oracle.com> =
 wrote:
 >
-> Loongson GNET devices with dev revision 0x00 do not
-> support manually setting the speed to 1000, When the
-> bug is triggered, let's return -EOPNOTSUPP, which
-> will be flag in later gnet support patches.
+> The cited commit missed to check against the validity of the length
+> and various pointers on the XDP buff metadata in the tap_get_user_xdp()
+> path, which could cause a corrupted skb to be sent downstack. For
+> instance, tap_get_user() prohibits short frame which has the length
+> less than Ethernet header size from being transmitted, while the
+> skb_set_network_header() in tap_get_user_xdp() would set skb's
+> network_header regardless of the actual XDP buff data size. This
+> could either cause out-of-bound access beyond the actual length, or
+> confuse the underlayer with incorrect or inconsistent header length
+> in the skb metadata.
 >
-> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> Propose to drop any frame shorter than the Ethernet header size just
+> like how tap_get_user() does. While at it, validate the pointers in
+> XDP buff to avoid potential size overrun.
+>
+> Fixes: 0efac27791ee ("tap: accept an array of XDP buffs through sendmsg()=
+")
+> Cc: jasowang@redhat.com
+> Signed-off-by: Si-Wei Liu <si-wei.liu@oracle.com>
 > ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 6 ++++++
->  include/linux/stmmac.h                               | 1 +
->  2 files changed, 7 insertions(+)
+>  drivers/net/tap.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 >
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drive=
-rs/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-> index 542e2633a6f5..eb4b3eaf9e17 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-> @@ -422,6 +422,12 @@ stmmac_ethtool_set_link_ksettings(struct net_device =
-*dev,
->                 return 0;
->         }
+> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+> index bfdd3875fe86..69596479536f 100644
+> --- a/drivers/net/tap.c
+> +++ b/drivers/net/tap.c
+> @@ -1177,6 +1177,13 @@ static int tap_get_user_xdp(struct tap_queue *q, s=
+truct xdp_buff *xdp)
+>         struct sk_buff *skb;
+>         int err, depth;
 >
-> +       if (priv->plat->flags & STMMAC_FLAG_DISABLE_FORCE_1000) {
-> +               if (cmd->base.speed =3D=3D SPEED_1000 &&
-> +                   cmd->base.autoneg !=3D AUTONEG_ENABLE)
-> +                       return -EOPNOTSUPP;
+> +       if (unlikely(xdp->data < xdp->data_hard_start ||
+> +                    xdp->data_end < xdp->data ||
+> +                    xdp->data_end - xdp->data < ETH_HLEN)) {
+> +               err =3D -EINVAL;
+> +               goto err;
 > +       }
+
+For ETH_HLEN check, is it better to do it in vhost-net? It seems
+tuntap suffers from this as well.
+
+And for the check for other xdp fields, it deserves a BUG_ON() or at
+least WARN_ON() as they are set by vhost-net.
+
+Thanks
+
 > +
->         return phylink_ethtool_ksettings_set(priv->phylink, cmd);
->  }
+>         if (q->flags & IFF_VNET_HDR)
+>                 vnet_hdr_len =3D READ_ONCE(q->vnet_hdr_sz);
 >
-> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-> index 1536455f9052..3e4f7e8d73fb 100644
-> --- a/include/linux/stmmac.h
-> +++ b/include/linux/stmmac.h
-> @@ -208,6 +208,7 @@ struct dwmac4_addrs {
->  #define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI         BIT(10)
->  #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING      BIT(11)
->  #define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY   BIT(12)
-> +#define STMMAC_FLAG_DISABLE_FORCE_1000         BIT(13)
->
->  struct plat_stmmacenet_data {
->         int bus_id;
 > --
-> 2.31.4
+> 2.39.3
 >
+
 
