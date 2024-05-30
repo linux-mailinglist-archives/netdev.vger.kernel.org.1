@@ -1,243 +1,255 @@
-Return-Path: <netdev+bounces-99550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 810CB8D5405
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 22:48:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E33338D5407
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 22:51:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 352D3284C58
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 20:48:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 102131C20CBF
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 20:51:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C44984D2A;
-	Thu, 30 May 2024 20:48:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE1BE17F4E0;
+	Thu, 30 May 2024 20:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QXEw0bN7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A44D18756A
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 20:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700E317E442;
+	Thu, 30 May 2024 20:51:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717102091; cv=none; b=h3SyP1lHEfvEJLomhHVuIcNo5VM9iljFORA9494HEnvzsA7pGKcoFeDomGM3nyAa164tsKNz+8ypXgbN3N+ef2NFaOeG85JuTQG99e0aNn8i4D5/7krYexuP4FanMjKD/O22j0fpgTZxN8FJGXEq24OmOiznRNv+9ldqSvYdj14=
+	t=1717102302; cv=none; b=FTXvrUuQg93Dksd0taOyGDEvwjcdGuUJ76izrkFNfXoqFgGodhQoH/bjAYVWRHWp+e5GUZuCbZBuNTWexH5vYg8+faLx4gkOLq2+Q9eB5SKko0Vz/koVubu6HFF4oiJwZK6BMphaMF5nfxqX8kyfLIk4695i3/gW4FwcR5A8Tzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717102091; c=relaxed/simple;
-	bh=zLihNuizMFuHGGW38wruXu5d27shrXQ7GNLJzE1X3cg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=a28gHcQka8kwQSx285pi+GQc03ZRT0KEShaEtR4+qL7CENH73JudvE56N9t90pSHcDew8vSeZmQUhL1DzkgeQdmWyucADXI1g/l1S8GYF72SGFIVAGA13+jdiUxVb6CiQw/MKhG9SqD+DAM6qSXN2Wp7vv5Izp80SGfZbwj5vqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44UJjKHS013327;
-	Thu, 30 May 2024 13:48:01 -0700
-DKIM-Signature: =?UTF-8?Q?v=3D1;_a=3Drsa-sha256;_c=3Drelaxed/relaxed;_d=3Dmeta.com;_h=3Dc?=
- =?UTF-8?Q?c:content-transfer-encoding:content-type:date:from:message-id:m?=
- =?UTF-8?Q?ime-version:subject:to;_s=3Ds2048-2021-q4;_bh=3Dr1nExtLSApXqemP?=
- =?UTF-8?Q?mZoendJMXmczUZJiBFv1G9YHLNfE=3D;_b=3DO2Kze15OzOuVPrPiQlBZDnuuCV?=
- =?UTF-8?Q?Xt0y0pQO0Z2Ga78IIiU72wbX7uRpHARgZJh0fN84rG_n8ayl8n4GG5mRNFer3UI?=
- =?UTF-8?Q?mahJAOwEuGroYwlf5CbZJ+E/z0a/5ZC4diAOBj6sPMExlyl6_M2uDOysUwUG+HS?=
- =?UTF-8?Q?JVDgrUKIIdyLYyRz+058Z/u83Mo4aeEwVSVjclXTVYwOUCWwAVg5S/_ZnR+Itmv?=
- =?UTF-8?Q?p2mfAjltovVbd+jZ8UlQfasirnDBDtquJ95SOhgte5/9K8p8+ZaDjas5qufQ_Z/?=
- =?UTF-8?Q?IiHdxRVU7xFc9QxwRso/5f/n5OVmBOyqF/qOoDdslLQUxgypvUDLdHksfhtIM17?=
- =?UTF-8?Q?kGa_Hg=3D=3D_?=
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3yemeqw00p-4
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Thu, 30 May 2024 13:48:01 -0700
-Received: from devvm4158.cln0.facebook.com (2620:10d:c0a8:1c::11) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server id
- 15.2.1544.11; Thu, 30 May 2024 20:47:58 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Michael Chan <michael.chan@broadcom.com>,
-        Vadim Fedorenko
-	<vadim.fedorenko@linux.dev>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Jakub
- Kicinski" <kuba@kernel.org>
-CC: Richard Cochran <richardcochran@gmail.com>, <netdev@vger.kernel.org>,
-        Vadim Fedorenko <vadfed@meta.com>
-Subject: [PATCH net-next v2] bnxt_en: add timestamping statistics support
-Date: Thu, 30 May 2024 13:47:51 -0700
-Message-ID: <20240530204751.99636-1-vadfed@meta.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1717102302; c=relaxed/simple;
+	bh=RAYBy0qHJIwdJxwWflZaAKdWrjsSMABWj1ElC/ICSCM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X2yim/ZhYlizPPqyhqxdUmxrlbJiulV2083RriWouEO59UJ6t66ujBsFoSOejhM09g0t6UTI+GhfdG3HX57tDu0EY5s90xwIUcJHhn/IgotlbaEuj1MGYHHUrNY81u2nK9HRCFH7OcCShxniq8tiH/mJ94K8sFZd1pObCqBCX3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QXEw0bN7; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717102299; x=1748638299;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=RAYBy0qHJIwdJxwWflZaAKdWrjsSMABWj1ElC/ICSCM=;
+  b=QXEw0bN7N26U/Cg245eKuzTMDwFxidyQGF/I/FEKso9JAVasQjZtYyl4
+   IbFsuKFALsZJn+rbnWryV4199NP6GnOQaQoQw+cm5cNVromyt86aEKvn6
+   eH1mLSrzCkTHH6hfRjw4D446g3lMP+nqOTC3nSrVKdj1N0fjG+YEuY87X
+   yqY2LNWq0wniVPoi2jJgw+id4w+v4cz1EIksu+ru3jz+Wrk1OBzd2bbb2
+   CQ1tGT8vxqeIKqiAnsKNHxfGFcpLp0HYPDPW6wzft3+05/wSbU7D0NwHl
+   iSKQ4zwk7iQ3CYizovBgvk2X2CK6ZWEePEKelogJ2Mk2i75ndPdbAAnUf
+   Q==;
+X-CSE-ConnectionGUID: RaBdZ+S0Th2cfIbwWPdsqw==
+X-CSE-MsgGUID: Yo927A+LSXm4RBIYAQAs3Q==
+X-IronPort-AV: E=McAfee;i="6600,9927,11088"; a="31114957"
+X-IronPort-AV: E=Sophos;i="6.08,202,1712646000"; 
+   d="scan'208";a="31114957"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2024 13:51:39 -0700
+X-CSE-ConnectionGUID: nQeAQxXuQx2BCT4H/y9BJg==
+X-CSE-MsgGUID: M5ftgt0KTsqUxFvQd8Cvlw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,202,1712646000"; 
+   d="scan'208";a="35869134"
+Received: from unknown (HELO 0610945e7d16) ([10.239.97.151])
+  by fmviesa007.fm.intel.com with ESMTP; 30 May 2024 13:51:35 -0700
+Received: from kbuild by 0610945e7d16 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sCmkH-000Fxh-00;
+	Thu, 30 May 2024 20:51:33 +0000
+Date: Fri, 31 May 2024 04:51:27 +0800
+From: kernel test robot <lkp@intel.com>
+To: Subbaraya Sundeep <sbhatta@marvell.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Subbaraya Sundeep <sbhatta@marvell.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [net-next PATCH] octeontx2: Improve mailbox tracepoints for
+ debugging
+Message-ID: <202405310425.kxMtnCmV-lkp@intel.com>
+References: <1717070038-18381-1-git-send-email-sbhatta@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: G6GrhbOQTUKgXM-aepy7pl_EwxarNulJ
-X-Proofpoint-ORIG-GUID: G6GrhbOQTUKgXM-aepy7pl_EwxarNulJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-30_17,2024-05-30_01,2024-05-17_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1717070038-18381-1-git-send-email-sbhatta@marvell.com>
 
-The ethtool_ts_stats structure was introduced earlier this year. Now
-it's time to support this group of counters in more drivers.
-This patch adds support to bnxt driver.
+Hi Subbaraya,
 
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
-v1 -> v2:
- - embed stats structure into ptp_cfg structure
- - keep ethtool stats untouched if ptp is not enabled
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c      | 18 +++++++++++++-----
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c  | 14 ++++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c  |  8 ++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h  |  8 ++++++++
- 4 files changed, 43 insertions(+), 5 deletions(-)
+kernel test robot noticed the following build errors:
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index c437ca1c0fd3..6d9faa78e391 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -512,8 +512,11 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)) {
- 		struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
- 
--		if (ptp && ptp->tx_tstamp_en && !skb_is_gso(skb) &&
--		    atomic_dec_if_positive(&ptp->tx_avail) >= 0) {
-+		if (ptp && ptp->tx_tstamp_en && !skb_is_gso(skb)) {
-+			if (!atomic_dec_if_positive(&ptp->tx_avail)) {
-+				atomic64_inc(&ptp->stats.ts_err);
-+				goto tx_no_ts;
-+			}
- 			if (!bnxt_ptp_parse(skb, &ptp->tx_seqid,
- 					    &ptp->tx_hdr_off)) {
- 				if (vlan_tag_flags)
-@@ -526,6 +529,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 		}
- 	}
- 
-+tx_no_ts:
- 	if (unlikely(skb->no_fcs))
- 		lflags |= cpu_to_le32(TX_BD_FLAGS_NO_CRC);
- 
-@@ -732,8 +736,10 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	return NETDEV_TX_OK;
- 
- tx_dma_error:
--	if (BNXT_TX_PTP_IS_SET(lflags))
-+	if (BNXT_TX_PTP_IS_SET(lflags)) {
-+		atomic64_inc(&bp->ptp_cfg->stats.ts_err);
- 		atomic_inc(&bp->ptp_cfg->tx_avail);
-+	}
- 
- 	last_frag = i;
- 
-@@ -812,10 +818,12 @@ static void __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
- 		if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_IN_PROGRESS)) {
- 			if (BNXT_CHIP_P5(bp)) {
- 				/* PTP worker takes ownership of the skb */
--				if (!bnxt_get_tx_ts_p5(bp, skb))
-+				if (!bnxt_get_tx_ts_p5(bp, skb)) {
- 					skb = NULL;
--				else
-+				} else {
-+					atomic64_inc(&bp->ptp_cfg->stats.ts_err);
- 					atomic_inc(&bp->ptp_cfg->tx_avail);
-+				}
- 			}
- 		}
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 8763f8a01457..bf157f6cc042 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -5233,6 +5233,19 @@ static void bnxt_get_rmon_stats(struct net_device *dev,
- 	*ranges = bnxt_rmon_ranges;
- }
- 
-+static void bnxt_get_ptp_stats(struct net_device *dev,
-+			       struct ethtool_ts_stats *ts_stats)
-+{
-+	struct bnxt *bp = netdev_priv(dev);
-+	struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
-+
-+	if (ptp) {
-+		ts_stats->pkts = ptp->stats.ts_pkts;
-+		ts_stats->lost = ptp->stats.ts_lost;
-+		ts_stats->err = atomic64_read(&ptp->stats.ts_err);
-+	}
-+}
-+
- static void bnxt_get_link_ext_stats(struct net_device *dev,
- 				    struct ethtool_link_ext_stats *stats)
- {
-@@ -5316,4 +5329,5 @@ const struct ethtool_ops bnxt_ethtool_ops = {
- 	.get_eth_mac_stats	= bnxt_get_eth_mac_stats,
- 	.get_eth_ctrl_stats	= bnxt_get_eth_ctrl_stats,
- 	.get_rmon_stats		= bnxt_get_rmon_stats,
-+	.get_ts_stats		= bnxt_get_ptp_stats,
- };
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-index e661ab154d6b..a14d46b9bfdf 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-@@ -696,11 +696,13 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
- 		spin_unlock_bh(&ptp->ptp_lock);
- 		timestamp.hwtstamp = ns_to_ktime(ns);
- 		skb_tstamp_tx(ptp->tx_skb, &timestamp);
-+		ptp->stats.ts_pkts++;
- 	} else {
- 		if (!time_after_eq(jiffies, ptp->abs_txts_tmo)) {
- 			ptp->txts_pending = true;
- 			return;
- 		}
-+		ptp->stats.ts_lost++;
- 		netdev_warn_once(bp->dev,
- 				 "TS query for TX timer failed rc = %x\n", rc);
- 	}
-@@ -979,6 +981,11 @@ int bnxt_ptp_init(struct bnxt *bp, bool phc_cfg)
- 		rc = err;
- 		goto out;
- 	}
-+
-+	ptp->stats.ts_pkts = 0;
-+	ptp->stats.ts_lost = 0;
-+	atomic64_set(&ptp->stats.ts_err, 0);
-+
- 	if (BNXT_CHIP_P5(bp)) {
- 		spin_lock_bh(&ptp->ptp_lock);
- 		bnxt_refclk_read(bp, NULL, &ptp->current_time);
-@@ -1013,5 +1020,6 @@ void bnxt_ptp_clear(struct bnxt *bp)
- 		dev_kfree_skb_any(ptp->tx_skb);
- 		ptp->tx_skb = NULL;
- 	}
-+
- 	bnxt_unmap_ptp_regs(bp);
- }
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-index 2c3415c8fc03..8c30b428a428 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h
-@@ -79,6 +79,12 @@ struct bnxt_pps {
- 	struct pps_pin pins[BNXT_MAX_TSIO_PINS];
- };
- 
-+struct bnxt_ptp_stats {
-+	u64		ts_pkts;
-+	u64		ts_lost;
-+	atomic64_t	ts_err;
-+};
-+
- struct bnxt_ptp_cfg {
- 	struct ptp_clock_info	ptp_info;
- 	struct ptp_clock	*ptp_clock;
-@@ -125,6 +131,8 @@ struct bnxt_ptp_cfg {
- 	u32			refclk_mapped_regs[2];
- 	u32			txts_tmo;
- 	unsigned long		abs_txts_tmo;
-+
-+	struct bnxt_ptp_stats	stats;
- };
- 
- #if BITS_PER_LONG == 32
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Subbaraya-Sundeep/octeontx2-Improve-mailbox-tracepoints-for-debugging/20240530-195537
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/1717070038-18381-1-git-send-email-sbhatta%40marvell.com
+patch subject: [net-next PATCH] octeontx2: Improve mailbox tracepoints for debugging
+config: um-allyesconfig (https://download.01.org/0day-ci/archive/20240531/202405310425.kxMtnCmV-lkp@intel.com/config)
+compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240531/202405310425.kxMtnCmV-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405310425.kxMtnCmV-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from include/trace/trace_events.h:419,
+                    from include/trace/define_trace.h:102,
+                    from drivers/net/ethernet/marvell/octeontx2/af/rvu_trace.h:144,
+                    from drivers/net/ethernet/marvell/octeontx2/af/rvu_trace.c:9:
+>> drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:119:1: error: macro "__assign_str" passed 2 arguments, but takes just 1
+     119 | );
+         | ^~            
+   In file included from include/trace/trace_events.h:375:
+   include/trace/stages/stage6_event_callback.h:34: note: macro "__assign_str" defined here
+      34 | #define __assign_str(dst)                                               \
+         | 
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h: In function 'trace_event_raw_event_otx2_msg_wait_rsp':
+>> drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:115:28: error: '__assign_str' undeclared (first use in this function)
+     115 |             TP_fast_assign(__assign_str(dev, pci_name(pdev))
+         |                            ^~~~~~~~~~~~
+   include/trace/trace_events.h:402:11: note: in definition of macro 'DECLARE_EVENT_CLASS'
+     402 |         { assign; }                                                     \
+         |           ^~~~~~
+   include/trace/trace_events.h:44:30: note: in expansion of macro 'PARAMS'
+      44 |                              PARAMS(assign),                   \
+         |                              ^~~~~~
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:110:1: note: in expansion of macro 'TRACE_EVENT'
+     110 | TRACE_EVENT(otx2_msg_wait_rsp,
+         | ^~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:115:13: note: in expansion of macro 'TP_fast_assign'
+     115 |             TP_fast_assign(__assign_str(dev, pci_name(pdev))
+         |             ^~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:115:28: note: each undeclared identifier is reported only once for each function it appears in
+     115 |             TP_fast_assign(__assign_str(dev, pci_name(pdev))
+         |                            ^~~~~~~~~~~~
+   include/trace/trace_events.h:402:11: note: in definition of macro 'DECLARE_EVENT_CLASS'
+     402 |         { assign; }                                                     \
+         |           ^~~~~~
+   include/trace/trace_events.h:44:30: note: in expansion of macro 'PARAMS'
+      44 |                              PARAMS(assign),                   \
+         |                              ^~~~~~
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:110:1: note: in expansion of macro 'TRACE_EVENT'
+     110 | TRACE_EVENT(otx2_msg_wait_rsp,
+         | ^~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:115:13: note: in expansion of macro 'TP_fast_assign'
+     115 |             TP_fast_assign(__assign_str(dev, pci_name(pdev))
+         |             ^~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h: At top level:
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:134:1: error: macro "__assign_str" passed 2 arguments, but takes just 1
+     134 | );
+         | ^~            
+   include/trace/stages/stage6_event_callback.h:34: note: macro "__assign_str" defined here
+      34 | #define __assign_str(dst)                                               \
+         | 
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:134:1: error: macro "__assign_str" passed 2 arguments, but takes just 1
+     134 | );
+         | ^~            
+   include/trace/stages/stage6_event_callback.h:34: note: macro "__assign_str" defined here
+      34 | #define __assign_str(dst)                                               \
+         | 
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h: In function 'trace_event_raw_event_otx2_msg_status':
+>> drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:128:28: error: unknown type name '__assign_str'
+     128 |             TP_fast_assign(__assign_str(dev, pci_name(pdev))
+         |                            ^~~~~~~~~~~~
+   include/trace/trace_events.h:402:11: note: in definition of macro 'DECLARE_EVENT_CLASS'
+     402 |         { assign; }                                                     \
+         |           ^~~~~~
+   include/trace/trace_events.h:44:30: note: in expansion of macro 'PARAMS'
+      44 |                              PARAMS(assign),                   \
+         |                              ^~~~~~
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:121:1: note: in expansion of macro 'TRACE_EVENT'
+     121 | TRACE_EVENT(otx2_msg_status,
+         | ^~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:128:13: note: in expansion of macro 'TP_fast_assign'
+     128 |             TP_fast_assign(__assign_str(dev, pci_name(pdev))
+         |             ^~~~~~~~~~~~~~
+>> include/trace/stages/stage6_event_callback.h:9:17: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'entry'
+       9 | #define __entry entry
+         |                 ^~~~~
+   include/trace/trace_events.h:402:11: note: in definition of macro 'DECLARE_EVENT_CLASS'
+     402 |         { assign; }                                                     \
+         |           ^~~~~~
+   include/trace/trace_events.h:44:30: note: in expansion of macro 'PARAMS'
+      44 |                              PARAMS(assign),                   \
+         |                              ^~~~~~
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:121:1: note: in expansion of macro 'TRACE_EVENT'
+     121 | TRACE_EVENT(otx2_msg_status,
+         | ^~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:128:13: note: in expansion of macro 'TP_fast_assign'
+     128 |             TP_fast_assign(__assign_str(dev, pci_name(pdev))
+         |             ^~~~~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:130:28: note: in expansion of macro '__entry'
+     130 |                            __entry->num_msgs = num_msgs;
+         |                            ^~~~~~~
+   In file included from include/trace/trace_events.h:469:
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h: At top level:
+>> drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:119:1: error: macro "__assign_str" passed 2 arguments, but takes just 1
+     119 | );
+         | ^~            
+   include/trace/stages/stage6_event_callback.h:34: note: macro "__assign_str" defined here
+      34 | #define __assign_str(dst)                                               \
+         | 
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:134:1: error: macro "__assign_str" passed 2 arguments, but takes just 1
+     134 | );
+         | ^~            
+   include/trace/stages/stage6_event_callback.h:34: note: macro "__assign_str" defined here
+      34 | #define __assign_str(dst)                                               \
+         | 
+   drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h:134:1: error: macro "__assign_str" passed 2 arguments, but takes just 1
+     134 | );
+         | ^~            
+   include/trace/stages/stage6_event_callback.h:34: note: macro "__assign_str" defined here
+      34 | #define __assign_str(dst)                                               \
+         | 
+
+
+vim +/__assign_str +119 drivers/net/ethernet/marvell/octeontx2/af/./rvu_trace.h
+
+   109	
+   110	TRACE_EVENT(otx2_msg_wait_rsp,
+   111		    TP_PROTO(const struct pci_dev *pdev),
+   112		    TP_ARGS(pdev),
+   113		    TP_STRUCT__entry(__string(dev, pci_name(pdev))
+   114		    ),
+ > 115		    TP_fast_assign(__assign_str(dev, pci_name(pdev))
+   116		    ),
+   117		    TP_printk("[%s] timed out while waiting for response\n",
+   118			      __get_str(dev))
+ > 119	);
+   120	
+   121	TRACE_EVENT(otx2_msg_status,
+   122		    TP_PROTO(const struct pci_dev *pdev, const char *msg, u16 num_msgs),
+   123		    TP_ARGS(pdev, msg, num_msgs),
+   124		    TP_STRUCT__entry(__string(dev, pci_name(pdev))
+   125				     __string(str, msg)
+   126				     __field(u16, num_msgs)
+   127		    ),
+ > 128		    TP_fast_assign(__assign_str(dev, pci_name(pdev))
+   129				   __assign_str(str, msg)
+   130				   __entry->num_msgs = num_msgs;
+   131		    ),
+   132		    TP_printk("[%s] %s num_msgs:%d\n", __get_str(dev),
+   133			      __get_str(str), __entry->num_msgs)
+ > 134	);
+   135	
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
