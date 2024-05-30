@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-99221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8A9F8D4263
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 02:30:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38C5D8D4262
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 02:30:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7202FB22D34
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 00:30:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACC9C28683D
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 00:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A148E8BEF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D3F8465;
 	Thu, 30 May 2024 00:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FKgvoaAC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZfOdzaRV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A746FDC;
-	Thu, 30 May 2024 00:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A396AB8
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 00:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717029033; cv=none; b=IcxWWh5HQCPwjvXbktKpIVG4lD9eTkBvSCWHTUGVGi1OBLC4bQGDs/2WPRKv1RscqrDwjejmYXnd+ktxC50vkH2CnorJO6Q2T8ZKWxNNnaNQWtIqL/mA/fA/a6NFhP9+tKpvpgNbvmUvHYIFyLsXMNRORTYcw7jRAvdELObXazE=
+	t=1717029033; cv=none; b=CyNwuE30kHc6mLQRlFdwUJOz26f3t7I7W1clVe+UpcIPcbIRjveqpuv4DNRHEFu1ak0sJ2h68u+/bXxFgN5Oi8/QJcM9fuLa9sAwptfwUrGLoy/MuM7ViSjgXn/3iy9LdaRp6O0n/wP0VGyjcjPMquIoKYKBbnZFxv8fiSPt4lE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717029033; c=relaxed/simple;
-	bh=iOlsCdtGN5mJ24UNtjfirO5jVyeFeACF7esLrZv0bTE=;
+	bh=jbY6kPTOWiY3QNQmc2zKELSLwprEdsHMoP85XJ01ngI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LdzDaX6rYGz0fvrNiktSv8ThtDgylUOUvMEusf+mUW5N5zqNf0fyoNzZHWNGcgd9D258mlw4LlK1/4bSFnlD7LizlLkrHgBNaswG4TOPh12Pmwz7JmqaZ7qG3rdppsppwuLd4IqH5l83WLASHeOarWAsZrqoOJvLJZIDKnkve7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FKgvoaAC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 16ED0C32782;
+	 In-Reply-To:To:Cc; b=JnV6e5XjdNWDPqupOf/Pst0E/sCu3r+tp7eqSQC15IDHtr3X9xlAegjetS7ykIn8FY7nU9u3wcLf3IipT5b7S66BSQk+G+1/cQc6LuecGlf5eimfVnqtV6KnU9XoHPtms87UjspIdMQVnDI/fAL28r2Heulg4wCxNOgXFwOZPMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZfOdzaRV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 20747C32781;
 	Thu, 30 May 2024 00:30:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1717029033;
-	bh=iOlsCdtGN5mJ24UNtjfirO5jVyeFeACF7esLrZv0bTE=;
+	bh=jbY6kPTOWiY3QNQmc2zKELSLwprEdsHMoP85XJ01ngI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FKgvoaACJmytLzjCiItceXnpzg+acBVYyfPiieT6pKPFVO8oz6rjXC4xqvRQ/ATVC
-	 cwGAycfnWwdcf3xrlTfPwl8K66TuSh/M+7M2Qa0YILC2en8Hj9DWSuUXI/pm/A+3Fl
-	 FR+UCCJqVEqhKtgZOQd9hOWDeCFv3nkfvkVwED/dr+0Zrl1JC4VPup6h3jU8rZ0l8T
-	 gyyybDlZzCxhup3dARHgQEx6GX/sADx8eN9mbyy05g0hF2STQNsNkGllSTpWnYXzRA
-	 MyLBa0DYffUEe0v6smC9GIH5dKdy529JvoA7CIYhf17ycl7ldcS9vC//JPtal+YI49
-	 BT8Ga9s9cDgww==
+	b=ZfOdzaRV+0tnunc8B2FV3B9u1e0MSNZZqEZ0/3H1HeMwyuqmH6SGGuvas/chqbG7g
+	 sWU0iKH7HUaSj9yENKAIwQKsSprrDF6qp9mE6sw7SfVZDD3heGQnmGMHKr7/q1BN0X
+	 MWQ4/UPnjp2UV50sqzlZOWfnAQfYZ9f4lvn5tLLoD7mzJWC00cFVs+mWSnyOD9VtaH
+	 LetaYthv/WYo7qWiDiQR+KrGR86dVHLafZvrN7xCWdJZz/BJDDvU8aZeCTqfPcJdVZ
+	 S6O6J7XBjCmXpL6QzM9W5JdxE6+BceijzFv21MsP6ETw2ucax3SZAdTFhCGVa5xw0/
+	 EmhQPYVQfY3PA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 00A17CF21E0;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0B5D3D84BCF;
 	Thu, 30 May 2024 00:30:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,44 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] netconsole: Do not shutdown dynamic configuration if
- cmdline is invalid
+Subject: Re: [PATCH v2 net-next 0/4] tcp: fix tcp_poll() races
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171702903299.18765.2718725823072532974.git-patchwork-notify@kernel.org>
-Date: Thu, 30 May 2024 00:30:32 +0000
-References: <20240528084225.3215853-1-leitao@debian.org>
-In-Reply-To: <20240528084225.3215853-1-leitao@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, thepacketgeek@gmail.com, aijay@meta.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <171702903304.18765.3851256551010590517.git-patchwork-notify@kernel.org>
+Date: Thu, 30 May 2024 00:30:33 +0000
+References: <20240528125253.1966136-1-edumazet@google.com>
+In-Reply-To: <20240528125253.1966136-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ ncardwell@google.com, David.Laight@aculab.com, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 28 May 2024 01:42:24 -0700 you wrote:
-> If a user provides an invalid netconsole configuration during boot time
-> (e.g., specifying an invalid ethX interface), netconsole will be
-> entirely disabled. Consequently, the user won't be able to create new
-> entries in /sys/kernel/config/netconsole/ as that directory does not
-> exist.
+On Tue, 28 May 2024 12:52:49 +0000 you wrote:
+> Flakes in packetdrill tests stressing epoll_wait()
+> were root caused to bad ordering in tcp_write_err()
 > 
-> Apart from misconfiguration, another issue arises when ethX is loaded as
-> a module and the netconsole= line in the command line points to ethX,
-> resulting in an obvious failure. This renders netconsole unusable, as
-> /sys/kernel/config/netconsole/ will never appear. This is more annoying
-> since users reconfigure (or just toggle) the configuratin later (see
-> commit 5fbd6cdbe304b ("netconsole: Attach cmdline target to dynamic
-> target"))
+> Precisely, we have to call sk_error_report() after
+> tcp_done().
+> 
+> When fixing this issue, we discovered tcp_abort(),
+> tcp_v4_err() and tcp_v6_err() had similar issues.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] netconsole: Do not shutdown dynamic configuration if cmdline is invalid
-    https://git.kernel.org/netdev/net-next/c/c3390677f625
+  - [v2,net-next,1/4] tcp: add tcp_done_with_error() helper
+    https://git.kernel.org/netdev/net-next/c/5e514f1cba09
+  - [v2,net-next,2/4] tcp: fix race in tcp_write_err()
+    https://git.kernel.org/netdev/net-next/c/853c3bd7b791
+  - [v2,net-next,3/4] tcp: fix races in tcp_abort()
+    https://git.kernel.org/netdev/net-next/c/5ce4645c23cf
+  - [v2,net-next,4/4] tcp: fix races in tcp_v[46]_err()
+    https://git.kernel.org/netdev/net-next/c/fde6f897f2a1
 
 You are awesome, thank you!
 -- 
