@@ -1,379 +1,463 @@
-Return-Path: <netdev+bounces-99366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A81C68D49F4
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 12:58:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B245D8D49FD
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 13:02:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C2201F22752
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 10:58:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 483F21C21DD2
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 11:02:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 443964D8CC;
-	Thu, 30 May 2024 10:58:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAE5C16F0DE;
+	Thu, 30 May 2024 11:02:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="GtXwExWP"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ztf0UMet"
 X-Original-To: netdev@vger.kernel.org
-Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7893A1078B;
-	Thu, 30 May 2024 10:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531D6161302
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 11:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717066703; cv=none; b=ulUNF2Fh3Z6urJVNNOPj8AYL87dBZxUh2Li5x1FCJS2qJRm3ghKZ7SIKgPB7RFFcDGM/daXIM3Pw34xsjED10J9Fvw4njD2ZpBcnfts7qGkpa79cdFpOLFKqh+0evZtasaRV51yl4NUxhbQzTMv/hXSZcEiomURAGnhLni6lIjI=
+	t=1717066966; cv=none; b=fxm5hXUhJGQxYHbAezZAua46eg8iSDEODHIhECa20sqInez9HDqG0g94frQ+FnKFpO+rxdHNMvLRqaAaJHb96oDXphiYzmercEne9fBHl726D1kTwETHDlJs4tHLEvmfqpjB1fEOWQTL/QiYER5M+Pfm4DZAAd+KY45J1JiUAvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717066703; c=relaxed/simple;
-	bh=pHVPmozNrQvbi8eSXFjDbvhSTnvkweWPVS7IgYcnNwY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BtI/M4a8NPoJZ6ueSx79sErXIAXvMMloFwSknO/9G6K9TbSOllOl8rg2CAVRaSTFN3WRV7wnaLUpTYEDaxQ1x70Q3H0dCOxdlMYtvdilcDYNHJVnnitXkYjQPQhosme2wVTVxlQ2cE09WhoLOiA54l2skckduzF/DiD1UUAvZwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=GtXwExWP; arc=none smtp.client-ip=188.40.30.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
-	s=default2211; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=1Triv7GGqoGRDhDHopUcipOEWSvLcQZXTm097LYRKcw=; b=GtXwExWPWxr5e02b7sGUEE2jOY
-	8MGtB1+Uy6+9UFHNtko3OhFdjTaSaaWBnsRLP6g0Hq5nNSJO0nAs8RwA1Nwv8FfVk0oF0aioQxDyq
-	XjtlTYut5E57ekx7lWObN5CX1kpdwQLx/0cuMnmsLLMVdL+oKpoEoxFUGRXRfp/+iZjOXJQaOa1FX
-	7f5q2nM/xD+HfCghadlwumYjAz4LnjVuncUliBlAwF+x7GNFQoopivzjgqbblhhOPC+EHtf1FWJAs
-	jNykYhUDzM5QF8p/ZNpaXK26VlPU3mAZ5z6WHT8cHqRiVv5n2aUtqguiME2PpkV1Tl5jHQggFnJEb
-	IC5pg+fg==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <martin@geanix.com>)
-	id 1sCdU7-000OJe-Fk; Thu, 30 May 2024 12:58:15 +0200
-Received: from [185.17.218.86] (helo=zen..)
-	by sslproxy02.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <martin@geanix.com>)
-	id 1sCdU7-000KPr-10;
-	Thu, 30 May 2024 12:58:14 +0200
-From: =?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>
-To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Markus Schneider-Pargmann <msp@baylibre.com>,
-	=?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3] can: m_can: don't enable transceiver when probing
-Date: Thu, 30 May 2024 12:57:58 +0200
-Message-ID: <20240530105801.3930087-1-martin@geanix.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1717066966; c=relaxed/simple;
+	bh=ze99tk+tgTu5+kvB3B+xjJ6rgWHqjZwCG275dnpJOtQ=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=RHhB4JIPdZWP++NQDfrrgGBEwSLFkl3+a2Z/FobLVmQAVbA2z233hIYGIwumZ4XZfJHgOlIAgryviNYGOO0sptjQYJisvW6iu+5UW9Ead1iwSZLDDb/r270hR540iJ//w8jqdxuv+Zuy/KxI2kcJd/C+puhxNyD6hbQ9XMqzdpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ztf0UMet; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2e716e302bdso7289271fa.1
+        for <netdev@vger.kernel.org>; Thu, 30 May 2024 04:02:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1717066962; x=1717671762; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:references:cc:to:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wdJdpjrFVd2jyJBfi7/1Ypm+QKe5VhIURoGePuM+Fi8=;
+        b=ztf0UMetXZ0g9IScgcxjnFeBmBr7/L8eOw/WkTMRWXeNQuPU/Q0neC0wsqiJtu5v+t
+         9CBR+LUm21lQLZ177DjzcJt+sXK/v3YPJHRNaNcb/60JxmE0uI9YKOXXikHyH3h4I5iW
+         x7J9vPAzS7AWCM9N931lYbaG9Ish5q7+j93JkBRYK7LnuEdbq1EXAst6j/f9kqbbR8Rj
+         ZaJ7nb7/ShLRmPxe0VP4YnU5TDty5Dg+2fOsUhJQ7i4O+Sb/oDyfNFU23YMJ2JHCZ7Jd
+         AIZ+FxfIqSs7GoIRux/4fEGna698XqDY/5+9T9dXypITYokhGSNGzGez5eLc+kweHvcg
+         FrLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717066962; x=1717671762;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:references:cc:to:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wdJdpjrFVd2jyJBfi7/1Ypm+QKe5VhIURoGePuM+Fi8=;
+        b=q1Km/MK8uzGG398aWEA4vwJLEL+CRWyX+ju0SWeBEe5gb2KVoxk3FpposPZqVxA3Ry
+         Ruavtr8ZSXDdTIeSivrvgAMGusaeV7zM6Hh2RaxT6M1qX2hqT5ahFP3hEwwuoV5oDxHe
+         1VopQUJz1q6pqSX0PmdLsz3wV1NCpgBh8OcgxCLtmCHU4YKja1l4fjoUQ56AyDKEuZWW
+         BkxhtNG0ILEQ29vFy8KnwxOuMENp+49EX4Xm6nqnBL+TruTPrLtbf+36CewRCSYcqzDx
+         dnM3XB50Zh2QfHMTdTWI3G6ZrOu5iFnUQLO3rEkmpbPxPL9GNYZpMxnvThX8U31mtkPI
+         zQzg==
+X-Forwarded-Encrypted: i=1; AJvYcCUEhdka4lK/4qLZMItVAIA8QczV+E7nAuOofhB+FtncFGZaJa045TiBjAWtWOAtNmcKfmxWyKaoV9AOcUc87j+nsZiFKteG
+X-Gm-Message-State: AOJu0Yw5jeWkwLX1awm6iJUhrJcaRzm5eCzz/RtsFj7cejTrD324Q3yg
+	v2gAjVEEEEiWpH/0k4wxo3Dx0l1vupcAS3j4/6KzJoS58qEAFT90NzptabyJ/m8=
+X-Google-Smtp-Source: AGHT+IFvRk0G/cssi1T5jykWS+sj3N7w+SJtv/NxzFC1qgP86vHMQCqJ5uR4sfMEFkv8MZ00HcJ33w==
+X-Received: by 2002:a2e:9d89:0:b0:2e5:1dae:1789 with SMTP id 38308e7fff4ca-2ea847f5e1dmr9802301fa.22.1717066962166;
+        Thu, 30 May 2024 04:02:42 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:982:cbb0:6c5:6f34:623a:2f88? ([2a01:e0a:982:cbb0:6c5:6f34:623a:2f88])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35579d7d88esm17272899f8f.19.2024.05.30.04.02.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 May 2024 04:02:41 -0700 (PDT)
+Message-ID: <177a7a7e-9e99-4e2a-9f85-e2994a049892@linaro.org>
+Date: Thu, 30 May 2024 13:02:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: martin@geanix.com
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27291/Thu May 30 10:29:52 2024)
+User-Agent: Mozilla Thunderbird
+From: Neil Armstrong <neil.armstrong@linaro.org>
+Reply-To: neil.armstrong@linaro.org
+Subject: Re: [PATCH v8 00/17] power: sequencing: implement the subsystem and
+ add first users
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+ Rocky Liao <quic_rjliao@quicinc.com>, Kalle Valo <kvalo@kernel.org>,
+ Jeff Johnson <jjohnson@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>, Bjorn Helgaas
+ <bhelgaas@google.com>, Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+ Elliot Berman <quic_eberman@quicinc.com>,
+ Caleb Connolly <caleb.connolly@linaro.org>,
+ Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, Alex Elder <elder@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, Jeff Johnson <quic_jjohnson@quicinc.com>,
+ ath12k@lists.infradead.org, linux-pm@vger.kernel.org,
+ linux-pci@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, kernel@quicinc.com,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ Amit Pundir <amit.pundir@linaro.org>
+References: <20240528-pwrseq-v8-0-d354d52b763c@linaro.org>
+Content-Language: en-US, fr
+Autocrypt: addr=neil.armstrong@linaro.org; keydata=
+ xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
+ GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
+ BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
+ qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
+ 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
+ AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
+ OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
+ Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
+ YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
+ GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
+ UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
+ GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
+ yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
+ QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
+ SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
+ 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
+ Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
+ oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
+ M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
+ 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
+ KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
+ 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
+ QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
+Organization: Linaro
+In-Reply-To: <20240528-pwrseq-v8-0-d354d52b763c@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The m_can driver sets and clears the CCCR.INIT bit during probe (both
-when testing the NON-ISO bit, and when configuring the chip). After
-clearing the CCCR.INIT bit, the transceiver enters normal mode, where it
-affects the CAN bus (i.e. it ACKs frames). This can cause troubles when
-the m_can node is only used for monitoring the bus, as one cannot setup
-listen-only mode before the device is probed.
+On 28/05/2024 21:03, Bartosz Golaszewski wrote:
+> Note: I am resending this series in its entirety once more for
+> discussions and reviews. If there won't be any major objections, I'll
+> then start sending individual bits and pieces to appropriate trees.
+> 
+> Merging strategy: The DT binding and DTS changes are a no-brainer, they
+> can go through the wireless, regulator and arm-msm trees separately. The
+> bluetooth and PCI changes have a build-time dependency on the power
+> sequencing code. The bluetooth changes also have a run-time dependency on
+> the PCI pwrctl part. In order to get it into next I plan to pick up the
+> power sequencing code into my own tree and maintain it. I can then
+> provide an immutable tag for the BT and PCI trees to pull. I wouldn't
+> stress about the BT runtime dependency as it will be fixed once all
+> changes are in next.
+> 
+> The actual cover letter follows:
+> 
+> --
+> 
+> Problem statement #1: Dynamic bus chicken-and-egg problem.
+> 
+> Certain on-board PCI devices need to be powered up before they are can be
+> detected but their PCI drivers won't get bound until the device is
+> powered-up so enabling the relevant resources in the PCI device driver
+> itself is impossible.
+> 
+> Problem statement #2: Sharing inter-dependent resources between devices.
+> 
+> Certain devices that use separate drivers (often on different busses)
+> share resources (regulators, clocks, etc.). Typically these resources
+> are reference-counted but in some cases there are additional interactions
+> between them to consider, for example specific power-up sequence timings.
+> 
+> ===
+> 
+> The reason for tackling both of these problems in a single series is the
+> fact the the platform I'm working on - Qualcomm RB5 - deals with both and
+> both need to be addressed in order to enable WLAN and Bluetooth support
+> upstream.
+> 
+> The on-board WLAN/BT package - QCA6391 - has a Power Management Unit that
+> takes inputs from the host and exposes LDO outputs consumed by the BT and
+> WLAN modules which can be powered-up and down independently. However
+> a delay of 100ms must be respected between enabling the BT- and
+> WLAN-enable GPIOs.
+> 
+> A similar design with a discreet PMU is also employed in other models of
+> the WCN family of chips although we can often do without the delays. With
+> this series we add support for the WCN7850 as well.
+> 
+> ===
+> 
+> We introduce a new subsystem here - the power sequencing framework. The
+> qcom-wcn driver that we add is its first user. It implements the power-up
+> sequences for QCA6390 and WCN7850 chips. However - we only use it to
+> power-up the bluetooth module in the former. We use it to driver the WLAN
+> modules in both. The reason for this is that for WCN7850 we have
+> comprehensive bindings already upstream together with existing DT users.
+> Porting them to using the pwrseq subsystem can be done separately and in
+> an incremental manner once the subsystem itself is upstream. We will also
+> have to ensure backward DT compatibility. To avoid overcomplicating this
+> series, let's leave it out for now.
+> 
+> ===
+> 
+> This series is logically split into several sections. I'll go
+> patch-by-patch and explain each step.
+> 
+> Patches 1/16-5/16:
+> 
+> These contain all relevant DT bindings changes. We add new documents for
+> the QCA6390 & WCN7850 PMUs and ATH12K devices as well as extend the bindings
+> for the Qualcomm Bluetooth and ATH11K modules with regulators used by them
+> in QCA6390.
+> 
+> Patches 6/16-8/16:
+> 
+> These contain changes to device-tree sources for the three platforms we
+> work with in this series. We model the PMUs of the WLAN/BT chips as
+> top-level platform devices on the device tree. In order to limit the scope
+> of this series and not introduce an excessive amount of confusion with
+> deprecating DT bindings, we leave the Bluetooth nodes on sm8650 and sm8550
+> as is (meaning: they continue to consumer the GPIOs and power inputs from
+> the host). As the WCN7850 module doesn't require any specific timings, we can
+> incrementally change that later.
+> 
+> In both cases we add WLAN nodes that consume the power outputs of the PMU.
+> For QCA6390 we also make the Bluetooth node of the RB5 consume the outputs
+> of the PMU - we can do it as the bindings for this chip did not define any
+> supply handles prior to this series meaning we are able to get this correct
+> right away.
+> 
+> Patches 9/16-12/16:
+> 
+> These contain the bulk of the PCI changes for this series. We introduce
+> a simple framework for powering up PCI devices before detecting them on
+> the bus.
+> 
+> The general approach is as follows: PCI devices that need special
+> treatment before they can be powered up, scanned and bound to their PCI
+> drivers must be described on the device-tree as child nodes of the PCI
+> port node. These devices will be instantiated on the platform bus. They
+> will in fact be generic platform devices with the compatible of the form
+> used for PCI devices already upstream ("pci<vendor ID>,<device ID">). We
+> add a new directory under drivers/pci/pwrctl/ that contains PCI pwrctl
+> drivers. These drivers are platform drivers that will now be matched
+> against the devices instantiated from port children just like any other
+> platform pairs.
+> 
+> Both the power control platform device *AND* the associated PCI device
+> reuse the same OF node and have access to the same properties. The goal
+> of the platform driver is to request and bring up any required resources
+> and let the pwrctl framework know that it's now OK to rescan the bus and
+> detect the devices. When the device is bound, we are notified about it
+> by the PCI bus notifier event and can establish a device link between the
+> power control device and the PCI device so that any future extension for
+> power-management will already be able to work with the correct hierachy.
+> 
+> The reusing of the OF node is the reason for the small changes to the PCI
+> OF core: as the bootloader can possibly leave the relevant regulators on
+> before booting linux, the PCI device can be detected before its platform
+> abstraction is probed. In this case, we find that device first and mark
+> its OF node as reused. The pwrctl framework handles the opposite case
+> (when the PCI device is detected only after the platform driver
+> successfully enabled it).
+> 
+> Patch 13/16 - 14/16:
+> 
+> These add a relatively simple power sequencing subsystem and the first
+> driver using it: the pwrseq module for the PMUs on the WCN family of chips.
+> 
+> I'm proposing to add a subsystem that allows different devices to use a shared
+> power sequence split into consumer-specific as well as common "units".
+> 
+> A power sequence provider driver registers a set of units with pwrseq
+> core. Each unit can be enabled and disabled and contains an optional list
+> of other units which must be enabled before it itself can be. A unit
+> represents a discreet chunk of the power sequence.
+> 
+> It also registers a list of targets: a target is an abstraction wrapping
+> a unit which allows consumers to tell pwrseq which unit they want to
+> reach. Real-life example is the driver we're adding here: there's a set
+> of common regulators, two PCIe-specific ones and two enable GPIOs: one
+> for Bluetooth and one for WLAN.
+> 
+> The Bluetooth driver requests a descriptor to the power sequencer and
+> names the target it wants to reach:
+> 
+>      pwrseq = devm_pwrseq_get(dev, "bluetooth");
+> 
+> The pwrseq core then knows that when the driver calls:
+> 
+>      pwrseq_power_on(pwrseq);
+> 
+> It must enable the "bluetooth-enable" unit but it depends on the
+> "regulators-common" unit so this one is enabled first. The provider
+> driver is also in charge of assuring an appropriate delay between
+> enabling the BT and WLAN enable GPIOs. The WLAN-specific resources are
+> handled by the "wlan-enable" unit and so are not enabled until the WLAN
+> driver requests the "wlan" target to be powered on.
+> 
+> Another thing worth discussing is the way we associate the consumer with
+> the relevant power sequencer. DT maintainers have expressed a discontent
+> with the existing mmc pwrseq bindings and have NAKed an earlier
+> initiative to introduce global pwrseq bindings to the kernel[1].
+> 
+> In this approach, we model the existing regulators and GPIOs in DT but
+> the pwrseq subsystem requires each provider to provide a .match()
+> callback. Whenever a consumer requests a power sequencer handle, we
+> iterate over the list of pwrseq drivers and call .match() for each. It's
+> up to the driver to verify in a platform-specific way whether it deals
+> with its consumer and let the core pwrseq code know.
+> 
+> The advantage of this over reusing the regulator or reset subsystem is
+> that it's more generalized and can handle resources of all kinds as well
+> as deal with any kind of power-on sequences: for instance, Qualcomm has
+> a PCI switch they want a driver for but this switch requires enabling
+> some resources first (PCI pwrctl) and then configuring the device over
+> I2C (which can be handled by the pwrseq provider).
+> 
+> Patch 15:
+> 
+> This patch makes the Qualcomm Bluetooth driver get and use the power
+> sequencer for QCA6390.
+> 
+> Patch 16:
+> 
+> While tiny, this patch is possibly the highlight of the entire series.
+> It uses the two abstraction layers we introduced before to create an
+> elegant power sequencing PCI power control driver and supports the ath11k
+> module on QCA6390 and ath12k on WCN7850.
+> 
+> With this series we can now enable BT and WLAN on several new Qualcomm
+> boards upstream.
+> 
+> Tested on RB5, sm8650-qrd, sm8650-hdk and sm8550-qrd.
+> 
+> Changelog:
+> 
+> Since v7:
+> - added DTS changes for sm8650-hdk
+> - added circular dependency detection for pwrseq units
+> - fixed a KASAN reported use-after-free error in remove path
+> - improve Kconfig descriptions
+> - fix typos in bindings and Kconfig
+> - fixed issues reported by smatch
+> - fix the unbind path in PCI pwrctl
+> - lots of minor improvements to the pwrseq core
+> 
+> Since v6:
+> - kernel doc fixes
+> - drop myself from the DT bindings maintainers list for ath12k
+> - wait until the PCI bridge device is fully added before creating the
+>    PCI pwrctl platform devices for its sub-nodes, otherwise we may see
+>    sysfs and procfs attribute failures (due to duplication, we're
+>    basically trying to probe the same device twice at the same time)
+> - I kept the regulators for QCA6390's ath11k as required as they only
+>    apply to this specific Qualcomm package
+> 
+> Since v5:
+> - unify the approach to modelling the WCN WLAN/BT chips by always exposing
+>    the PMU node on the device tree and making the WLAN and BT nodes become
+>    consumers of its power outputs; this includes a major rework of the DT
+>    sources, bindings and driver code; there's no more a separate PCI
+>    pwrctl driver for WCN7850, instead its power-up sequence was moved
+>    into the pwrseq driver common for all WCN chips
+> - don't set load_uA from new regulator consumers
+> - fix reported kerneldoc issues
+> - drop voltage ranges for PMU outputs from DT
+> - many minor tweaks and reworks
+> 
+> v1: Original RFC:
+> 
+> https://lore.kernel.org/lkml/20240104130123.37115-1-brgl@bgdev.pl/T/
+> 
+> v2: First real patch series (should have been PATCH v2) adding what I
+>      referred to back then as PCI power sequencing:
+> 
+> https://lore.kernel.org/linux-arm-kernel/2024021413-grumbling-unlivable-c145@gregkh/T/
+> 
+> v3: RFC for the DT representation of the PMU supplying the WLAN and BT
+>      modules inside the QCA6391 package (was largely separate from the
+>      series but probably should have been called PATCH or RFC v3):
+> 
+> https://lore.kernel.org/all/CAMRc=Mc+GNoi57eTQg71DXkQKjdaoAmCpB=h2ndEpGnmdhVV-Q@mail.gmail.com/T/
+> 
+> v4: Second attempt at the full series with changed scope (introduction of
+>      the pwrseq subsystem, should have been RFC v4)
+> 
+> https://lore.kernel.org/lkml/20240201155532.49707-1-brgl@bgdev.pl/T/
+> 
+> v5: Two different ways of handling QCA6390 and WCN7850:
+> 
+> https://lore.kernel.org/lkml/20240216203215.40870-1-brgl@bgdev.pl/
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+> Bartosz Golaszewski (16):
+>        regulator: dt-bindings: describe the PMU module of the QCA6390 package
+>        regulator: dt-bindings: describe the PMU module of the WCN7850 package
+>        dt-bindings: net: bluetooth: qualcomm: describe regulators for QCA6390
+>        dt-bindings: net: wireless: qcom,ath11k: describe the ath11k on QCA6390
+>        dt-bindings: net: wireless: describe the ath12k PCI module
+>        arm64: dts: qcom: sm8550-qrd: add the Wifi node
+>        arm64: dts: qcom: sm8650-qrd: add the Wifi node
+>        arm64: dts: qcom: qrb5165-rb5: add the Wifi node
+>        power: sequencing: implement the pwrseq core
+>        power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets
+>        PCI: hold the rescan mutex when scanning for the first time
+>        PCI/pwrctl: reuse the OF node for power controlled devices
+>        PCI/pwrctl: create platform devices for child OF nodes of the port node
+>        PCI/pwrctl: add PCI power control core code
+>        PCI/pwrctl: add a PCI power control driver for power sequenced devices
+>        Bluetooth: qca: use the power sequencer for QCA6390
+> 
+> Neil Armstrong (1):
+>        arm64: dts: qcom: sm8650-hdk: add the Wifi node
+> 
+>   .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |   17 +
+>   .../bindings/net/wireless/qcom,ath11k-pci.yaml     |   46 +
+>   .../bindings/net/wireless/qcom,ath12k.yaml         |   99 ++
+>   .../bindings/regulator/qcom,qca6390-pmu.yaml       |  185 ++++
+>   MAINTAINERS                                        |    8 +
+>   arch/arm64/boot/dts/qcom/qrb5165-rb5.dts           |  103 +-
+>   arch/arm64/boot/dts/qcom/sm8250.dtsi               |    2 +-
+>   arch/arm64/boot/dts/qcom/sm8550-qrd.dts            |   97 ++
+>   arch/arm64/boot/dts/qcom/sm8550.dtsi               |    2 +-
+>   arch/arm64/boot/dts/qcom/sm8650-hdk.dts            |   89 ++
+>   arch/arm64/boot/dts/qcom/sm8650-qrd.dts            |   89 ++
+>   arch/arm64/boot/dts/qcom/sm8650.dtsi               |    2 +-
+>   drivers/bluetooth/hci_qca.c                        |   74 +-
+>   drivers/pci/Kconfig                                |    1 +
+>   drivers/pci/Makefile                               |    1 +
+>   drivers/pci/bus.c                                  |    9 +
+>   drivers/pci/of.c                                   |   14 +-
+>   drivers/pci/probe.c                                |    2 +
+>   drivers/pci/pwrctl/Kconfig                         |   17 +
+>   drivers/pci/pwrctl/Makefile                        |    6 +
+>   drivers/pci/pwrctl/core.c                          |  137 +++
+>   drivers/pci/pwrctl/pci-pwrctl-pwrseq.c             |   89 ++
+>   drivers/pci/remove.c                               |    3 +-
+>   drivers/power/Kconfig                              |    1 +
+>   drivers/power/Makefile                             |    1 +
+>   drivers/power/sequencing/Kconfig                   |   28 +
+>   drivers/power/sequencing/Makefile                  |    6 +
+>   drivers/power/sequencing/core.c                    | 1105 ++++++++++++++++++++
+>   drivers/power/sequencing/pwrseq-qcom-wcn.c         |  336 ++++++
+>   include/linux/pci-pwrctl.h                         |   51 +
+>   include/linux/pwrseq/consumer.h                    |   56 +
+>   include/linux/pwrseq/provider.h                    |   75 ++
+>   32 files changed, 2717 insertions(+), 34 deletions(-)
+> ---
+> base-commit: 6dc544b66971c7f9909ff038b62149105272d26a
+> change-id: 20240527-pwrseq-76fc025248a2
+> 
+> Best regards,
 
-Rework the probe flow, so that the CCCR.INIT bit is only cleared when
-upping the device. First, the tcan4x5x driver is changed to stay in
-standby mode during/after probe. This in turn requires changes when
-setting bits in the CCCR register, as its CSR and CSA bits are always
-high in standby mode.
+Tested-by: Neil Armstrong <neil.armstrong@linaro.org> # on SM8550-QRD
+Tested-by: Neil Armstrong <neil.armstrong@linaro.org> # on SM8650-QRD
+Tested-by: Neil Armstrong <neil.armstrong@linaro.org> # on SM8650-HDK
 
-Signed-off-by: Martin Hundebøll <martin@geanix.com>
----
- drivers/net/can/m_can/m_can.c         | 169 ++++++++++++++++----------
- drivers/net/can/m_can/tcan4x5x-core.c |  13 +-
- 2 files changed, 116 insertions(+), 66 deletions(-)
-
-diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index 14b231c4d7ec..0f74ab249b35 100644
---- a/drivers/net/can/m_can/m_can.c
-+++ b/drivers/net/can/m_can/m_can.c
-@@ -379,38 +379,72 @@ m_can_txe_fifo_read(struct m_can_classdev *cdev, u32 fgi, u32 offset, u32 *val)
- 	return cdev->ops->read_fifo(cdev, addr_offset, val, 1);
- }
- 
--static void m_can_config_endisable(struct m_can_classdev *cdev, bool enable)
-+static int m_can_cccr_update_bits(struct m_can_classdev *cdev, u32 mask, u32 val)
- {
--	u32 cccr = m_can_read(cdev, M_CAN_CCCR);
--	u32 timeout = 10;
--	u32 val = 0;
--
--	/* Clear the Clock stop request if it was set */
--	if (cccr & CCCR_CSR)
--		cccr &= ~CCCR_CSR;
--
--	if (enable) {
--		/* enable m_can configuration */
--		m_can_write(cdev, M_CAN_CCCR, cccr | CCCR_INIT);
--		udelay(5);
--		/* CCCR.CCE can only be set/reset while CCCR.INIT = '1' */
--		m_can_write(cdev, M_CAN_CCCR, cccr | CCCR_INIT | CCCR_CCE);
--	} else {
--		m_can_write(cdev, M_CAN_CCCR, cccr & ~(CCCR_INIT | CCCR_CCE));
-+	u32 val_before = m_can_read(cdev, M_CAN_CCCR);
-+	u32 val_after = (val_before & ~mask) | val;
-+	size_t tries = 10;
-+
-+	if (!(mask & CCCR_INIT) && !(val_before & CCCR_INIT)) {
-+		dev_err(cdev->dev,
-+			"refusing to configure device when in normal mode\n");
-+		return -EBUSY;
- 	}
- 
--	/* there's a delay for module initialization */
--	if (enable)
--		val = CCCR_INIT | CCCR_CCE;
--
--	while ((m_can_read(cdev, M_CAN_CCCR) & (CCCR_INIT | CCCR_CCE)) != val) {
--		if (timeout == 0) {
--			netdev_warn(cdev->net, "Failed to init module\n");
--			return;
--		}
--		timeout--;
--		udelay(1);
-+	/* The chip should be in standby mode when changing the CCCR register,
-+	 * and some chips set the CSR and CSA bits when in standby. Furthermore,
-+	 * the CSR and CSA bits should be written as zeros, even when they read
-+	 * ones.
-+	 */
-+	val_after &= ~(CCCR_CSR | CCCR_CSA);
-+
-+	while (tries--) {
-+		u32 val_read;
-+
-+		/* Write the desired value in each try, as setting some bits in
-+		 * the CCCR register require other bits to be set first. E.g.
-+		 * setting the NISO bit requires setting the CCE bit first.
-+		 */
-+		m_can_write(cdev, M_CAN_CCCR, val_after);
-+
-+		val_read = m_can_read(cdev, M_CAN_CCCR) & ~(CCCR_CSR | CCCR_CSA);
-+
-+		if (val_read == val_after)
-+			return 0;
-+
-+		usleep_range(1, 5);
- 	}
-+
-+	return -ETIMEDOUT;
-+}
-+
-+static int m_can_config_enable(struct m_can_classdev *cdev)
-+{
-+	int err;
-+
-+	/* CCCR_INIT must be set in order to set CCCR_CCE, but access to
-+	 * configuration registers should only be enabled when in standby mode,
-+	 * where CCCR_INIT is always set.
-+	 */
-+	err = m_can_cccr_update_bits(cdev, CCCR_CCE, CCCR_CCE);
-+	if (err)
-+		netdev_err(cdev->net, "failed to enable configuration mode\n");
-+
-+	return err;
-+}
-+
-+static int m_can_config_disable(struct m_can_classdev *cdev)
-+{
-+	int err;
-+
-+	/* Only clear CCCR_CCE, since CCCR_INIT cannot be cleared while in
-+	 * standby mode
-+	 */
-+	err = m_can_cccr_update_bits(cdev, CCCR_CCE, 0);
-+	if (err)
-+		netdev_err(cdev->net, "failed to disable configuration registers\n");
-+
-+	return err;
- }
- 
- static void m_can_interrupt_enable(struct m_can_classdev *cdev, u32 interrupts)
-@@ -1403,7 +1437,9 @@ static int m_can_chip_config(struct net_device *dev)
- 	interrupts &= ~(IR_ARA | IR_ELO | IR_DRX | IR_TEFF | IR_TFE | IR_TCF |
- 			IR_HPM | IR_RF1F | IR_RF1W | IR_RF1N | IR_RF0F);
- 
--	m_can_config_endisable(cdev, true);
-+	err = m_can_config_enable(cdev);
-+	if (err)
-+		return err;
- 
- 	/* RX Buffer/FIFO Element Size 64 bytes data field */
- 	m_can_write(cdev, M_CAN_RXESC,
-@@ -1521,7 +1557,9 @@ static int m_can_chip_config(struct net_device *dev)
- 		    FIELD_PREP(TSCC_TCP_MASK, 0xf) |
- 		    FIELD_PREP(TSCC_TSS_MASK, TSCC_TSS_INTERNAL));
- 
--	m_can_config_endisable(cdev, false);
-+	err = m_can_config_disable(cdev);
-+	if (err)
-+		return err;
- 
- 	if (cdev->ops->init)
- 		cdev->ops->init(cdev);
-@@ -1550,7 +1588,11 @@ static int m_can_start(struct net_device *dev)
- 		cdev->tx_fifo_putidx = FIELD_GET(TXFQS_TFQPI_MASK,
- 						 m_can_read(cdev, M_CAN_TXFQS));
- 
--	return 0;
-+	ret = m_can_cccr_update_bits(cdev, CCCR_INIT, 0);
-+	if (ret)
-+		netdev_err(dev, "failed to enter normal mode\n");
-+
-+	return ret;
- }
- 
- static int m_can_set_mode(struct net_device *dev, enum can_mode mode)
-@@ -1599,43 +1641,37 @@ static int m_can_check_core_release(struct m_can_classdev *cdev)
- }
- 
- /* Selectable Non ISO support only in version 3.2.x
-- * This function checks if the bit is writable.
-+ * Return 1 if the bit is writable, 0 if it is not, or negative on error.
-  */
--static bool m_can_niso_supported(struct m_can_classdev *cdev)
-+static int m_can_niso_supported(struct m_can_classdev *cdev)
- {
--	u32 cccr_reg, cccr_poll = 0;
--	int niso_timeout = -ETIMEDOUT;
--	int i;
-+	int ret, niso;
- 
--	m_can_config_endisable(cdev, true);
--	cccr_reg = m_can_read(cdev, M_CAN_CCCR);
--	cccr_reg |= CCCR_NISO;
--	m_can_write(cdev, M_CAN_CCCR, cccr_reg);
-+	ret = m_can_config_enable(cdev);
-+	if (ret)
-+		return ret;
- 
--	for (i = 0; i <= 10; i++) {
--		cccr_poll = m_can_read(cdev, M_CAN_CCCR);
--		if (cccr_poll == cccr_reg) {
--			niso_timeout = 0;
--			break;
--		}
-+	/* First try to set the NISO bit. */
-+	niso = m_can_cccr_update_bits(cdev, CCCR_NISO, CCCR_NISO);
- 
--		usleep_range(1, 5);
-+	/* Then clear the it again. */
-+	ret = m_can_cccr_update_bits(cdev, CCCR_NISO, 0);
-+	if (ret) {
-+		dev_err(cdev->dev, "failed to revert the NON-ISO bit in CCCR\n");
-+		return ret;
- 	}
- 
--	/* Clear NISO */
--	cccr_reg &= ~(CCCR_NISO);
--	m_can_write(cdev, M_CAN_CCCR, cccr_reg);
-+	ret = m_can_config_disable(cdev);
-+	if (ret)
-+		return ret;
- 
--	m_can_config_endisable(cdev, false);
--
--	/* return false if time out (-ETIMEDOUT), else return true */
--	return !niso_timeout;
-+	return niso == 0;
- }
- 
- static int m_can_dev_setup(struct m_can_classdev *cdev)
- {
- 	struct net_device *dev = cdev->net;
--	int m_can_version, err;
-+	int m_can_version, err, niso;
- 
- 	m_can_version = m_can_check_core_release(cdev);
- 	/* return if unsupported version */
-@@ -1684,9 +1720,11 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
- 		cdev->can.bittiming_const = &m_can_bittiming_const_31X;
- 		cdev->can.data_bittiming_const = &m_can_data_bittiming_const_31X;
- 
--		cdev->can.ctrlmode_supported |=
--			(m_can_niso_supported(cdev) ?
--			 CAN_CTRLMODE_FD_NON_ISO : 0);
-+		niso = m_can_niso_supported(cdev);
-+		if (niso < 0)
-+			return err;
-+		if (niso)
-+			cdev->can.ctrlmode_supported |= CAN_CTRLMODE_FD_NON_ISO;
- 		break;
- 	default:
- 		dev_err(cdev->dev, "Unsupported version number: %2d",
-@@ -1694,21 +1732,26 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
- 		return -EINVAL;
- 	}
- 
--	if (cdev->ops->init)
--		cdev->ops->init(cdev);
--
--	return 0;
-+	/* Forcing standby mode should be redunant, as the chip should be in
-+	 * standby after a reset. Write the INIT bit anyways, should the chip
-+	 * be configured by previous stage.
-+	 */
-+	return m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
- }
- 
- static void m_can_stop(struct net_device *dev)
- {
- 	struct m_can_classdev *cdev = netdev_priv(dev);
-+	int ret;
- 
- 	/* disable all interrupts */
- 	m_can_disable_all_interrupts(cdev);
- 
- 	/* Set init mode to disengage from the network */
--	m_can_config_endisable(cdev, true);
-+	ret = m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
-+	if (ret)
-+		netdev_err(dev, "failed to enter standby mode: %pe\n",
-+			   ERR_PTR(ret));
- 
- 	/* set the state as STOPPED */
- 	cdev->can.state = CAN_STATE_STOPPED;
-diff --git a/drivers/net/can/m_can/tcan4x5x-core.c b/drivers/net/can/m_can/tcan4x5x-core.c
-index a42600dac70d..d723206ac7c9 100644
---- a/drivers/net/can/m_can/tcan4x5x-core.c
-+++ b/drivers/net/can/m_can/tcan4x5x-core.c
-@@ -453,10 +453,17 @@ static int tcan4x5x_can_probe(struct spi_device *spi)
- 		goto out_power;
- 	}
- 
--	ret = tcan4x5x_init(mcan_class);
-+	tcan4x5x_check_wake(priv);
-+
-+	ret = tcan4x5x_write_tcan_reg(mcan_class, TCAN4X5X_INT_EN, 0);
- 	if (ret) {
--		dev_err(&spi->dev, "tcan initialization failed %pe\n",
--			ERR_PTR(ret));
-+		dev_err(&spi->dev, "Disabling interrupts failed %pe\n", ERR_PTR(ret));
-+		goto out_power;
-+	}
-+
-+	ret = tcan4x5x_clear_interrupts(mcan_class);
-+	if (ret) {
-+		dev_err(&spi->dev, "Clearing interrupts failed %pe\n", ERR_PTR(ret));
- 		goto out_power;
- 	}
- 
--- 
-2.44.0
-
+Thanks,
+Neil
 
