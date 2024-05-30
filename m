@@ -1,52 +1,77 @@
-Return-Path: <netdev+bounces-99348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 887228D4977
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 12:19:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CEDC8D499D
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 12:25:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B99D11C21CA6
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 10:19:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3F781F2456E
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 10:25:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA57169AEC;
-	Thu, 30 May 2024 10:19:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 093FD17C7A4;
+	Thu, 30 May 2024 10:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aWhB0q8F"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98D8183998
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 10:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD97176AAE;
+	Thu, 30 May 2024 10:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717064368; cv=none; b=PLxdRoP2xJUc2s+zUPBpbPZ+NzgI3StrcaExU7qXV/NCywGbhwXlw7OdNm4tISrDXnVoGgjCz9wA3BH8CMGN3o0reEFCL6rhPpEomZ5nRnZxqCVWih+HZZ49AHxfp73CJEkGrwzg83BRSS5oN+Gc2CxHtk0bUo8im6xoxqm8F1M=
+	t=1717064655; cv=none; b=Btm+RTJwfkQrmanek3mQ5Ym+SLb9+Eeb4PSV9Zo6XAT3AI95EyVRRE8wJWTxnT0gxXSg3YXprspGXYR6mOabiEGStoFXxgxTEglZS/rcDEJjRMCe2ZAQb38EQLVctj3VL5txIySkId5z+hSBCB7UeqFZFWB0bjzz3VVIX5cSIU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717064368; c=relaxed/simple;
-	bh=6S9MRbrEqxJXTa7St2/QPR36zqpXQIavMNVMgePLivU=;
+	s=arc-20240116; t=1717064655; c=relaxed/simple;
+	bh=HeUGkiaEEtwv7kBlE3o/lEprM8J67nEM4mfW/LV/zzw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fSE+l51YKTtdzSw4GpAln0vzdUZK0zKBq8IEnDalx6BQBkN3WuVRxI9BRLLQlyVhXzmojRS3wq0Z23jeSs+b6TnfqbElzJAKUC7dPWBwtXzNHa4/kLkVSklSRxN28hqQWIAoTMtLMwgTwDQ0E8I57PhP5ENqy/DbnONELxAxctw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sCcsQ-000000006cy-0LqN;
-	Thu, 30 May 2024 10:19:18 +0000
-Date: Thu, 30 May 2024 11:19:11 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: netdev@vger.kernel.org, nbd@nbd.name, john@phrozen.org,
-	sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, lorenzo.bianconi@redhat.com,
-	sujuan.chen@mediatek.com, Elad Yifee <eladwf@gmail.com>
-Subject: Re: [PATCH net-next] net: ethernet: mtk_wed: add support for devices
- with more than 4GB of dram
-Message-ID: <ZlhSn8Z6E2Dc1khG@makrotopia.org>
-References: <1c7efdf5d384ea7af3c0209723e40b2ee0f956bf.1700239272.git.lorenzo@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AM0cNrFK6NkodCW5C3PEOT3rgcJiBCnXGxpombFFkVJzad9DVj4d83S3/+62csUzQ7+x3KESMiTGWkLA6nI+CzZAUnn65K4j1q+3ppSM8nddzVb1hfo5lTpcONRkOgaHfnGh0lZ94xvS2TjSz1o23qsYP68fHQhzh20oa3YIQXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=aWhB0q8F; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=J8pf6YD6PYPOxhuxnDNwdGpGAeMHzezf+cUCwL+fh0o=; b=aWhB0q8FGQSlqKpGjJIcrnT3F7
+	Zx/XgjYvWTYLMXoHUeY8mv0PKp85aDgd8vJDRO0Fk1T9t9mc409SY5JpH350Izgo+CFy8ePIF4yDU
+	Vl0Dpi4nCJNm3K1qIk78HHqkPICKrFp9IHwh65eynTxZk1R6AoSxnaqUXmvEVehq4klMP7DZU6MWx
+	N9iwij8balZT7Ly1MLxQq+TnRIYoXkQaQ9GjC9FyXA9pq9wVsXMotY8zUmMAfvR/1dj/zQ3udRX3q
+	C5b2WwFnaS2DyuTgXgamN/N8sjbUnING7J9ih0sVJkqNhV5wsGy5UHGMG7gHU5852NdzAu7IQZXu2
+	UmqcMNbg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40714)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sCcwo-0007FG-2a;
+	Thu, 30 May 2024 11:23:50 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sCcwn-00054M-LC; Thu, 30 May 2024 11:23:49 +0100
+Date: Thu, 30 May 2024 11:23:49 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Sky Huang <SkyLake.Huang@mediatek.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Steven Liu <Steven.Liu@mediatek.com>
+Subject: Re: [PATCH net-next v5 4/5] net: phy: mediatek: Extend 1G TX/RX link
+ pulse time
+Message-ID: <ZlhTtSHRVrjWO0KD@shell.armlinux.org.uk>
+References: <20240530034844.11176-1-SkyLake.Huang@mediatek.com>
+ <20240530034844.11176-5-SkyLake.Huang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,52 +80,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1c7efdf5d384ea7af3c0209723e40b2ee0f956bf.1700239272.git.lorenzo@kernel.org>
+In-Reply-To: <20240530034844.11176-5-SkyLake.Huang@mediatek.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi!
+Hi,
 
-On Fri, Nov 17, 2023 at 05:42:59PM +0100, Lorenzo Bianconi wrote:
-> Introduce WED offloading support for boards with more than 4GB of
-> memory.
-> 
-> [...]
+A few suggestions:
 
-> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> index 3cf6589cfdac..a6e91573f8da 100644
-> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> @@ -1159,15 +1159,18 @@ static int mtk_init_fq_dma(struct mtk_eth *eth)
->  	phy_ring_tail = eth->phy_scratch_ring + soc->txrx.txd_size * (cnt - 1);
->  
->  	for (i = 0; i < cnt; i++) {
-> +		dma_addr_t addr = dma_addr + i * MTK_QDMA_PAGE_SIZE;
->  		struct mtk_tx_dma_v2 *txd;
->  
->  		txd = eth->scratch_ring + i * soc->txrx.txd_size;
-> -		txd->txd1 = dma_addr + i * MTK_QDMA_PAGE_SIZE;
-> +		txd->txd1 = addr;
->  		if (i < cnt - 1)
->  			txd->txd2 = eth->phy_scratch_ring +
->  				    (i + 1) * soc->txrx.txd_size;
->  
->  		txd->txd3 = TX_DMA_PLEN0(MTK_QDMA_PAGE_SIZE);
-> +		if (MTK_HAS_CAPS(soc->caps, MTK_36BIT_DMA))
-> +			txd->txd3 |= TX_DMA_PREP_ADDR64(addr);
->  		txd->txd4 = 0;
->  		if (mtk_is_netsys_v2_or_greater(eth)) {
->  			txd->txd5 = 0;
+On Thu, May 30, 2024 at 11:48:43AM +0800, Sky Huang wrote:
+> +static int extend_an_new_lp_cnt_limit(struct phy_device *phydev)
+> +{
+> +	int mmd_read_ret;
+> +	u32 reg_val;
+> +	int timeout;
+> +
+> +	timeout = read_poll_timeout(mmd_read_ret = phy_read_mmd, reg_val,
+> +				    (mmd_read_ret < 0) || reg_val & MTK_PHY_FINAL_SPEED_1000,
+> +				    10000, 1000000, false, phydev,
+> +				    MDIO_MMD_VEND1, MTK_PHY_LINK_STATUS_MISC);
 
-The above part of the patch should also be applied to 'net' tree as fix
-for commit 2d75891ebc09 ("net: ethernet: mtk_eth_soc: support 36-bit DMA
-addressing on MT7988").
+	timeout = phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
+					    MTK_PHY_LINK_STATUS_MISC,
+					    reg_val,
+					    reg_val & MTK_PHY_FINAL_SPEED_1000,
+					    10000, 1000000, false);
 
-It should have probably been a separate commit in first place, but it is
-how it is now and I'm glad that it fixes the remaining issues on devices
-devices with 4 GiB of RAM or more (and hence exceeding the 32-bit
-addressing range given that DRAM starts at 0x40000000; the commit
-message here states that only boards with more than 4 GiB are affected,
-but in reality it's boards with more then 3 GiB because of the DRAM
-start offset).
+> +	if (mmd_read_ret < 0)
+> +		return mmd_read_ret;
 
-Reported-by: Elad Yifee <eladwf@gmail.com>
+So, what if the poll times out (timeout == -ETIMEDOUT) ? If you want to
+ignore that, then:
+
+	if (timeout < 0 && timeout != -ETIMEDOUT)
+		return timeout;
+
+> +int mtk_gphy_cl22_read_status(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	ret = genphy_read_status(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (phydev->autoneg == AUTONEG_ENABLE && !phydev->autoneg_complete) {
+> +		ret = phy_read(phydev, MII_CTRL1000);
+> +		if ((ret & ADVERTISE_1000FULL) || (ret & ADVERTISE_1000HALF)) {
+
+This is equivalent to:
+
+		if (ret & (ADVERTISE_1000FULL | ADVERTISE_1000HALF)) {
+
+which is easier to read.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
