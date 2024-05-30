@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-99472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C91978D4FE8
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 18:34:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9A6E8D4FE9
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 18:34:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6339B23779
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 16:34:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A028E282D9A
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 16:34:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99C02374C2;
-	Thu, 30 May 2024 16:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B172124211;
+	Thu, 30 May 2024 16:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="bFNkcuFj"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="NfzwVhEc"
 X-Original-To: netdev@vger.kernel.org
 Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2075.outbound.protection.outlook.com [40.107.20.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD7D3A8D8
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 16:34:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7DC3CF4F
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 16:34:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.75
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717086845; cv=fail; b=XqdBLvwbXGAtHJuFkFs4X2hhif1++MoKlhT0vP9oULVUNg6FPtUiVJa2voCKS8KEbeQNwbXMhMjQUWl8XNFfT9b+ABe/dbwd3X081Qu1IC91VWHQ+NpjzR4cAxtnp0RBXIzfXrGGIral0HiQbJyIvz6QugxoqeoDRRW3rdiFED4=
+	t=1717086847; cv=fail; b=omHX3gImlXMTDLY26Zfq05nWw7aSIuhwnS2y+8rkc8sgrIOAfT8vDh95qpiox1nn4n7jkD/F8QNPq4hoZCI+ResexogGIUQ0k1bIMb1zAMtDUDa87/wGBxe9pfEnhT6GgxY0M9QDmZGCxKnGAyHmfz6leVe5BRGTsdDp8abchMQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717086845; c=relaxed/simple;
-	bh=qfW+ye0G3DBgN9LNDQfQCGI2a9v1Xj8X254HCQ7sglQ=;
+	s=arc-20240116; t=1717086847; c=relaxed/simple;
+	bh=zAOi82lwElbWjk4sX9r+p1R4tyCTGDDq9+/D3EuVCPg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=cZ0xEenqtLsai/VzQaPeZj+VJ7y9gRM8GGPfHjuxtkrcowd3fj5W4NKYkaL1zz+VF5R1TPfqaYrqPsMaXtcxqyBRTZiaunY3w4rmHPRrvyF1C1JRPOpwwpMsvY3zgRZHMES06+svKpTtgsKFjr+xN+it5m9lHMgotWUwdykN/Rw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=bFNkcuFj; arc=fail smtp.client-ip=40.107.20.75
+	 Content-Type:MIME-Version; b=P1QRlLenyolI+gIgN5yBOPqB3h3mdCuSgr6/J1nUGAtbarA2ssiPM3Ki5GiowsacL9sF1oK3j75IVcYwFigZq12HOf2Vvdn/is/+uIjsdsqk6TWg8lV910SSHthK9jhcNcrh7+WtQZ832ET55McBtzsgce1za70/bqUYwWWteDc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=NfzwVhEc; arc=fail smtp.client-ip=40.107.20.75
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H51iMOJPqu2h4FPE/EDG7NQNveT5R11SKllDFiIwceGzxyqqWjORShnWicxqkQWHMIuxsXeiGqyFVWZBctCqRM6evz1e795qT8RUD8kJRfwnUJhQbrZCxdJpNmBmsiqqw8swA0BX+EpyijHBXESmUD6uHwxn0JAK2/4sTgs8ftHzLriEG5WTCupim4pGtfRX0+TKxX1NJ8Os/ZIPL3lFpfoR++CNdJz++9vTeXI8vKfKEiz2Pve14pkz/hCJJQWCy5K47ohsrzeJGeuLWj1zeKY/3cAt95v1AiAZUK7YgRknJEHGtNWHkAxPjQqdsPU+idxj8/gjGi4tRRLZfZy4Mw==
+ b=RQuCU28V4XpIjOkeCPaZvBepTUvxGA63aQ/fVS7NPaRYjQQWmoRUPvSepQY+Y0x4HAJqgGPjkceb4ouogkxQNVOnugJrmsczDc8o5uoP3C389I5ZrLp0HnPHpFE6B8mFzUlCHrqqcKKdb/+MQ9xrFE1Bx+A+OU9AqKnHI5hzsdp36e++2t11TP2lFL6yDqmbzueDmlZKyS4m2Hnbu3KoRaHmiKV383BfA65VFHael7Qzbkv72OJ8goBGahnXp+TVk0k8dNYtH9xTWQoC8jiS7iOE4flp6J1/LGwENMFtjtqYzAVk/4BWmKwFyI2ULUg1CykR5r8hxRHoxHuHoCVDGw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kC69P7+DJXL0P8flyTJ3LbXGPnwGwgBf0GHiUTClNI8=;
- b=byIohTeYogyoorABHrH8lxfPOxV0/eW/d6zwQZxY/iMLKI071QZaeIwTFs10xSJw9fj66LF0xRpct5TFpxWMEQ6K9l62Laa++Dddzz5kDDkIFu4DAlVM1LcLJEYZ7Pe1WVIYawreVZnWHGnK4A8LLW96Qbjk6ah2bbDRDnuJxIqGzUxifr3fuWXc3ES/0bH6TSUADOdsFvKI4oP/P5GsrFA9AQz92kvG5wU9RFf9/NMHWK9W952l74szd8bdnrAgSlrTLAT6IIWTzVaVTqzMmwkXNDIVstw4WmIccLu8tLMQoV/r/kRamHO8bitc3NDiw9bHEf5pqPTN5JtSAa9OvA==
+ bh=8S1pJzufn0aVv9s5+81QCgIoFK39A9YFq1fhAFT7dls=;
+ b=CgruX28mh8rDrVTpJtXqmxCKE5A9+puRbHfJwE76M//Oyi2xZSheMFa4e/+NQ9y1V2lBAnrdfzfFFzJm9w3nR3vFLeJwTrmi6GQbJQTkotRVhDOFrTArRr05TDn8pVc+mWTIVyIewJfBcFS4J/vlLExBSInXHvYdmNsJbC8HHCHUWE9hjaNPwokMp3Ef2wlPrY3NGlWmTr79MBaHFOhB3zB0K+SBQcQ45T9YnE+E/k3obyde2medtVvW49OxSHC4lKGxwGycdgfTjCdNpOnuH9jvTR0B2x9sMyqChPmW8xkfa7OipQK9hefm1gIXs4MbFWKrcPoBqAgbHZJ6ZIim2w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kC69P7+DJXL0P8flyTJ3LbXGPnwGwgBf0GHiUTClNI8=;
- b=bFNkcuFjsLmCZbHKbHBfCr/pyVX2ioywM1H861oN5nHfXoSWZd6x037WsZeSyyIYzT+eP/S3SZwLX5fkiOGe9qitL57ftnubFgivE0AS+3CmFF/Fr/O0kT0EOzYPyUXb4CCYHSbgmRQw6vWo/lYM7Z6dpuHzEFhLkJe5kepipsM=
+ bh=8S1pJzufn0aVv9s5+81QCgIoFK39A9YFq1fhAFT7dls=;
+ b=NfzwVhEc+wB0MXCYj8fYhQLuGsvP6i6FODvlSGZNvcC9mq9EfbWQVYZ6NPgWF+Km6Pj43dIDFR9WamHdBdujkgomaMsGftLpFzG8C6BsQAjC5UDsVy2+om+NONuo4vD7bDYcQiWa1L5k0SRLgRNotfq99amjAUWMwujgSTp2RBc=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from DB7PR04MB4555.eurprd04.prod.outlook.com (2603:10a6:5:33::26) by
  DU0PR04MB9585.eurprd04.prod.outlook.com (2603:10a6:10:316::5) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7633.21; Thu, 30 May 2024 16:33:56 +0000
+ 15.20.7633.21; Thu, 30 May 2024 16:33:57 +0000
 Received: from DB7PR04MB4555.eurprd04.prod.outlook.com
  ([fe80::86ff:def:c14a:a72a]) by DB7PR04MB4555.eurprd04.prod.outlook.com
  ([fe80::86ff:def:c14a:a72a%7]) with mapi id 15.20.7611.030; Thu, 30 May 2024
- 16:33:56 +0000
+ 16:33:57 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -68,9 +68,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Florian Fainelli <f.fainelli@gmail.com>,
 	Colin Foster <colin.foster@in-advantage.com>,
 	Russell King <linux@armlinux.org.uk>
-Subject: [PATCH net-next 6/8] net: dsa: ocelot: use ds->num_tx_queues = OCELOT_NUM_TC for all models
-Date: Thu, 30 May 2024 19:33:31 +0300
-Message-Id: <20240530163333.2458884-7-vladimir.oltean@nxp.com>
+Subject: [PATCH net-next 7/8] net: dsa: ocelot: common probing code
+Date: Thu, 30 May 2024 19:33:32 +0300
+Message-Id: <20240530163333.2458884-8-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240530163333.2458884-1-vladimir.oltean@nxp.com>
 References: <20240530163333.2458884-1-vladimir.oltean@nxp.com>
@@ -87,186 +87,358 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DB7PR04MB4555:EE_|DU0PR04MB9585:EE_
-X-MS-Office365-Filtering-Correlation-Id: 81efcce2-0edd-457a-6c07-08dc80c64ce3
+X-MS-Office365-Filtering-Correlation-Id: 15475933-4b7a-4d53-7b9b-08dc80c64d9e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230031|376005|52116005|1800799015|7416005|366007|38350700005;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?8+nklsUrDctqGpeir4MzqSMLfOtLiuG7CUqZvv6a5J+DhO+1y31PLO6Wdez6?=
- =?us-ascii?Q?WCZlcueiaLhLyuq5Ad/qF4XFlqaF+6b7R6V27FZulOeTD+JNPUF1erSfMURD?=
- =?us-ascii?Q?2DlMAZ6lFuHBRXOn01w0b80LwQmSMRXjTyM8WgX3DxI+3GqSoHztB2ardH3B?=
- =?us-ascii?Q?M3CoFNlTBSJvbC/yci3tmn4tqowim8TVGyrzfyzs/z9IFVHtRpK+sraxopW1?=
- =?us-ascii?Q?zUFClURXP+t1oolLanHhLzAzj7D3/jOeR5FllaB9XuHxQvYxPBX2Hd2U0SGi?=
- =?us-ascii?Q?gL3gtBc3lOLUBT3QzQaNVQYZ5YB+e4jXJbQF1C7r0QJ3d8zcXRtqhUACWaG8?=
- =?us-ascii?Q?CznXkCe56h/mgXPouhdaJOx/k/Okus8cIUZYpw3FtE9t0MKV4pzbSu18qCO7?=
- =?us-ascii?Q?s0w/0faYd8jEkWmnaxK2nfIupzEuFJmRJSKsAoguvPKq6wms8Xiklp4hGyVX?=
- =?us-ascii?Q?drwXinKgsqAN/Im5XridDwuffbG/2pramCM1ulevW/YFX4TGXYm3hl1i+b8y?=
- =?us-ascii?Q?DJM9Tdq47qO9ddnDhw4nWI0tmaWZDX5sPWSbCt0n+u3X362dIf7JoT+qAuBG?=
- =?us-ascii?Q?k3XSlXBB6Mw64d2fAiPC9zeRvSV61uoarnhTBp7Hi+quCM4htatv7dvwMe/Z?=
- =?us-ascii?Q?R5fnVmOjVLIoc7MZeL0Io0Qq/N3VJxJVLe0f0WB05KteUoGc64rFjpY4z65o?=
- =?us-ascii?Q?FkAM6MTnoK0KvoY0A/9BzY7MgUD+OgDdMAWNKNG/CO9sNMuOrEgEm4c7ZwHl?=
- =?us-ascii?Q?8hlhVTDs9Yl6JR5JycsJwmyVvuPcjU3Gyei83qfTkaNnn5x0ap6qs0eILQck?=
- =?us-ascii?Q?MgOx79B615lFI6/084k5lZCe8EujxVyBTNdbZ7lW2DaYDtjHzLdVdqUYqkfo?=
- =?us-ascii?Q?tpzDHdUPbpzw0DMDQR+9UFwjeJYalJur5LtlmGRo4v3dAUzyTPeuj+MDcETT?=
- =?us-ascii?Q?soIWAy0ZJBgxCBWx69/YGfPxrCKorHzj/3EfO6c3U8jH/jAYsn35Y5rGYh99?=
- =?us-ascii?Q?L+JRVR9o1aNiT5jhofQhvN0hgZn/ex9dKcg3JRtTk5/iC0yAOmCPtn+fg7ev?=
- =?us-ascii?Q?I4BGOdBclDBxNpfw0F137bUP92lSE/NNkoigMI8cC0yOu6OhNJguvknqGGux?=
- =?us-ascii?Q?g/ThatAnbEMsmvB8iC+41+zJrQSRFDt2N5oDPGzbXJxxCsaKcq45KwayFWAg?=
- =?us-ascii?Q?vKMwZXRU0pXZGgFMObde0ER95rq8xuXx9tLctfJym9NIj3teTZJ2PAB4hPUL?=
- =?us-ascii?Q?tFV0oBysLVcma73hsHbVKTtqrcEXDxAoMy6/4RLQHg=3D=3D?=
+	=?us-ascii?Q?Ae24eEh1zFZqT4e2HBiW4csWZ8t3hWVkpEx/bniBHVGRQPkD/mxPIeDqgXsm?=
+ =?us-ascii?Q?jY9MF9VFRmvEOhf94PZ/E0zThTeWtgluChUIBDS951L/tC+FfAvmoVjzAWFV?=
+ =?us-ascii?Q?TRNgj1IlKu7LkgE/1S88PWTBJLRXjLNprAH1hoohmda6vvPKi15FWclV+FRZ?=
+ =?us-ascii?Q?vBNoQjcLGydcygeMDwt5NEJUWLOLxGNy+Xc25Q3sBCInL9su248GQHVLULYw?=
+ =?us-ascii?Q?4XaYZ7w7rsfhtphyntFpPt2YAOxYF7qgSOnecvcMflIY53JDWwW6W+z/qdaZ?=
+ =?us-ascii?Q?Y6YOApkzDCeUBBeWneDNzdiVeO4mC5E3fuB1DcVk0iskzuVxIQ7RO2Nz3tvb?=
+ =?us-ascii?Q?C3Qw3EK84gidpJVJOi20rpcCWS65+tB7kDHXgBl7aRymdnnefBbdtIcLkduY?=
+ =?us-ascii?Q?zIl6JhTs1hPRqfgQFSOJ9YvgX1QjJ3IMKm9/vznNQ9GQzcCfphgaOn67UP9m?=
+ =?us-ascii?Q?2zW/E1xN07NY7OZlXI9Sip4kSsdaIj9Rbyapvw/KXdIUrTqwh5/h96ZK/PF8?=
+ =?us-ascii?Q?Gcqzs7A7WH+Xu9+zdrX8vMgWmGCVyWHM3hE+fOU5JeSBy0nTu2YSeYeD/nAZ?=
+ =?us-ascii?Q?YroLuzvFaz6voHKx3cUav4E2zlZOT6aJPa0PZZuFdnpk6GimFFLisnJ4On8A?=
+ =?us-ascii?Q?HRzs0rvDHiNIQEhbwkWA//1EUbAhOT3IV9aWQ8pDhbuOgc8qiXZkX7l1VthE?=
+ =?us-ascii?Q?6T8QsErmRk6f2nnUMEho72qb88seH0EAfGZ4GKlWN7ZTbMTWfWWF8oImq9CD?=
+ =?us-ascii?Q?cm6EQTwUMcerM7EzhvWsdrBTXpUCkEFAADwjh9QBKRRdDUh7Km4Azwf/7m8u?=
+ =?us-ascii?Q?azWCJvCSTL21rWZ2mLI6dJMhEDyEr3mAjjMRgd7wzD810mgV27fSLUcF0COk?=
+ =?us-ascii?Q?cKbmJfPHyKEJM9lF36S9w5qEvRPcfden/nYkSeqYrRy/EHWJxfWvZ6S79xK7?=
+ =?us-ascii?Q?QGAlZ0Da5TF1TuitgzkgPaTmIYwK3jMvQMcCkeNMFRCtni9juf9/qNYvXo1d?=
+ =?us-ascii?Q?mcR61HqH83oA6sGGvze26bGcBfjlHiMQxQcXPWPA/NtYbbURSGxtS8WmmxS0?=
+ =?us-ascii?Q?V2G7NwonpJW7D1tS/8/VtfgwsHB3UyvyyA97pdWbMP+BQG2OxFuDEbbM/FlB?=
+ =?us-ascii?Q?xviapbmpDsktJgRjwXSzjHCMaEl4MLR0dpSGmUlyNaBCJHG7BdpIMvub9UHd?=
+ =?us-ascii?Q?L3lwM05cYPLVNk35VrKt6xTa+5UggLRmTqHe0hJ4CG0EE/mzzj7m1j0zAZm8?=
+ =?us-ascii?Q?0YJGyA+IFLS76iKgjh8LrqRSTkQXykTJbiBtBcWqRA=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR04MB4555.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(52116005)(1800799015)(7416005)(366007)(38350700005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?LbIyDc7zlLhsTY5AxEPVx83B3d5kZiS85EJcy/i2ms4vc7lIQHSlEASKO1F+?=
- =?us-ascii?Q?aHd/da72AKaoGpd9Csab8h7MBjYnTZNV8MIE5TwBAKGm/1Le6AgIZzWmnBpY?=
- =?us-ascii?Q?Ffu1sUuCBP/fBtUzUn1kdaxHRRAyV6/i1zQHgzWqgQWR87/agjFj/e6Sz/BV?=
- =?us-ascii?Q?EE/Vj/KmUtvnoiKyuvNI/A7sQFBIKxGPh99dTQH9M7vnTIP4QmueXlqsM1G8?=
- =?us-ascii?Q?pQE97/EqXDh7W1JCM5EdH3CY5ONS5kKT7kZdaMDTVq1+jJff3nivqmNptVUT?=
- =?us-ascii?Q?06h+7xVZNlm/zZT0Gwk7bxLmw4KHW/mUWMsIWqrWcj9j9NPljbqftrvLZpfH?=
- =?us-ascii?Q?OPGDUyj6eHuX1zQq/kqsPARrsmkE6outjhAMuf2sN5xs+PzPVHba8kn65RBB?=
- =?us-ascii?Q?hqweGKP6y7x1p2zyF9boOnuu3AnDW/TKVw1nVwLMM26MiLl9ueXmr4rkooIh?=
- =?us-ascii?Q?n1Dd04RMy7YO1FY4Z21WEjdZ3idKS/077UJuDa7LOxvb9U3o/2F8Qy7QUCVn?=
- =?us-ascii?Q?6963PemP148Z+8mfJaRbj+5hJbuLJrbSrj+iirPsSBtHuZtm8bntesPg7Ez+?=
- =?us-ascii?Q?wYwf0MW4ZWBIXUBH0f/yeOCmQHJBTKKON8QX16xU8jri46OyaKcOifN+vLXH?=
- =?us-ascii?Q?PVahZ8KWbXCcVRUjyVnUDOQ8e9MU4LgnvWTtVTwBIymFawGs3DmwK6YVISHp?=
- =?us-ascii?Q?T/Pp4QxuITufmfSICikEv5zi9vEtmVZXMYlBlPSjDB9NaTfs+btNOyckRUIo?=
- =?us-ascii?Q?HyjPcXTtO0ymSB3j9v5y98dhH/rpjvFUrSZmGZhM/f8ilL18vL+mOvSaoQqk?=
- =?us-ascii?Q?F6tUpBWkX/EPz5shpGTEaV9hHLhS6ZLzKi9MbzRa5R9269CmyF50jSy4pPut?=
- =?us-ascii?Q?A54niBZrb4zeHAOl4OnQZ3/SSHC4FqqNiadTyVMa6r31T43my6+/jp7obz6R?=
- =?us-ascii?Q?15ZBZnc9jIVGAaOvjngwdg3ugx5cExaJQHdNSCaa4TIQfBk93Ltxp0Ef88Xo?=
- =?us-ascii?Q?zUenR7belF7BzYLGcBbOvtrfnjHap7Yj8iriKrL57YfUJ9SA/VqjToforQ6e?=
- =?us-ascii?Q?ERMW1hUeGR9Nc35UbupoulOOCJhTrzs5c93k6SQ+HU6lKhSC4fXeGaeYTKjQ?=
- =?us-ascii?Q?yroigame2Yrpt7YBPyyPKJnQ0CKVgYWogQijgVnUd1Hhn4K0oncfMBElhano?=
- =?us-ascii?Q?V8P6CJAPY+eoJ/hhWJRSuNzFMJcljGFIHcjuSMjZ2fox/Cy+sTyXiaOY88RJ?=
- =?us-ascii?Q?qsoukIK3+EFU08n3Djtd0NpgT8slVCiCA1gtgXlyRfFgelAzN8F+IS90KAcs?=
- =?us-ascii?Q?Q5JCJER4iXfFZ+rUv+a/yFp4nB5OqkVwC2r/xgL/mkzahqrUKfH/l+b45Mi1?=
- =?us-ascii?Q?Bf06+yjYdCWCSssAPfsMfJ63ZQc0UEzRkPfugXL4C0mZ1LS1+kxtZYfPZiEi?=
- =?us-ascii?Q?YhbkYeYLX8COXAPfs/GtobXYw//QThUmQxIMBKCR/O7DZN6bn47v9m9kcnIV?=
- =?us-ascii?Q?0xyyYk1iUap1f2cyc1EjiDlc4RBpUuA9olUgfSP8D6QwVzkzR7wCyb/dRTMN?=
- =?us-ascii?Q?6to4b2j89VF4Rm/DP+53XTGtHJD3mmaROt/oMdseA0DGadib8GoYTBhgcjNT?=
- =?us-ascii?Q?KQ=3D=3D?=
+	=?us-ascii?Q?Divg6tVeoEpYhnK422/+L4s9MJN96v2EoY7TlMWBwQGDkm/SCE+eKAmdKLex?=
+ =?us-ascii?Q?ZW1w9ZCaAd+fIMw2IJaj4cm8OLXumkPje7EfdPwhFi5sUy0wePoEqeCB4OWA?=
+ =?us-ascii?Q?JGLBKMNsGylNHhQ6DEEbTBigHCYytdTDUM+ZBRG9TTtdA3J4K4UHMHFJwjcU?=
+ =?us-ascii?Q?aqUVYKZdhfOXG3zP9nzjdO/zAiOF3j+KNXaAvZ3K1L1Q1WpS90pIkVy8SAnP?=
+ =?us-ascii?Q?FRPuDASZy8JZla87ezrLiMVoOiZtwI1GO++zYuOtsJifCj7/+8r2xSVq+zK7?=
+ =?us-ascii?Q?MQJ6j45IfKkl+hQ0FS3jRCh7B9Hr+JqRBEiIZ0OPIgJCfNzdiKVxrldqXF5m?=
+ =?us-ascii?Q?yn9syHbSXUApe3T8ueHATgAynitx5gXgQiRrqerXuE6YLGPY9IArthpyMylm?=
+ =?us-ascii?Q?BuzVubiB62Az1sF5bn3kEbUWbCef2qYfRYNkqCvrFqB9Ft/Uyu32JumhKTnd?=
+ =?us-ascii?Q?IdHzcbqXItbliR0331rYPaYOyd/MzpsqliLSWsFoUUWx09BPZFKk7uvgVHgX?=
+ =?us-ascii?Q?x+R7Qy7NyLuKdhYxDf3Iw3rRd4szzy9PwuQQKruUJAtiFE2AWgApt5++qbij?=
+ =?us-ascii?Q?hHClUQ33KbWXYCaAWSPnXO6vLUcr14grsHk0Jg2xwAdWXGhwGmUSYkZYVFyK?=
+ =?us-ascii?Q?vxvwNsQrQ0PDazAX9BpUzqg88fgMluzEmpUPmXULigTMVjVIZQzw0uV/fVi6?=
+ =?us-ascii?Q?v/YHFaaghjuy1wCDjSkXRs3HyzL3z+k3iG7L4QfjmxUV0XWYUCPiv4y7ADXU?=
+ =?us-ascii?Q?XUE6fLaEcSgmI8UjXEoURInkwhN+tEHFiS8ydloLxhfhzsYndE1tuKVk5jip?=
+ =?us-ascii?Q?RHWPg5ktTmeFaNV9Su6Hsq7XKletq8mtKr0WQP1dtsOAh8QTrgYlaZIM/xEw?=
+ =?us-ascii?Q?Z/cu0KdC0k++oYBt1AfopQDvHggXP5HwTvUUuI0p8SRXa8WuLWP7cIejOmTZ?=
+ =?us-ascii?Q?RRNkg72Xw0CldeDbdW/vIgB2+olAxLa7pNk9Ppo+fOq9LDjE2gFmhrg4fmI1?=
+ =?us-ascii?Q?QS4hBATif303r9B7LPaBTYTwRgxt8/xjhKvsvasRYZ6v3sc3hDnzA0w62rG9?=
+ =?us-ascii?Q?6j5V2GN4KmjIGLHBoDlukUDAlWxgRbzrqSUwwPg+2qjk0DhfvPuR67Uju3kh?=
+ =?us-ascii?Q?9mzqShMiynRZoXZLG0XxK6+kvoL0tXg7Ylxm1U8WeqAa3G8hIoKBg5wwwNlF?=
+ =?us-ascii?Q?YMK3kVL1zbhGuSJS3LGZnh0g9JTHVO2LujMCGyZMzU7TrHCOCWD8HKLPv+KA?=
+ =?us-ascii?Q?9rVwQQQSRkhca8U2UsTBh31nCiLyQUqOorbvZv8nfKzUpjALcFRGzp7hAqPV?=
+ =?us-ascii?Q?f4IWObWrVdVq/SaPKEEerwjTl6ZhFzbOfuYsHOZ+7DvkIOlbQ0R3DrHVTHvz?=
+ =?us-ascii?Q?jujcIOS9sJDHkG7VBtyNDQUucXgXBcswG+Xi3wrgXz+XUCINSgFPCsthnmcY?=
+ =?us-ascii?Q?/7v4b3YeITi84Y/1YHsevLkWnbsSkZ4il9sD7YJ9OiACnTynZulQ6ICM3hlN?=
+ =?us-ascii?Q?bqdjyF1a5KjSL882lMkE0r2RJkYwnNg3v3apJn80rYl+yjMrK6LYQaUUqww5?=
+ =?us-ascii?Q?4sRiqCerqlcirufWPfAHE0XI6XKpraffxUMyrrAzqzN1byZbAIHdCc+SO65R?=
+ =?us-ascii?Q?ag=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 81efcce2-0edd-457a-6c07-08dc80c64ce3
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15475933-4b7a-4d53-7b9b-08dc80c64d9e
 X-MS-Exchange-CrossTenant-AuthSource: DB7PR04MB4555.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2024 16:33:56.2898
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2024 16:33:57.5171
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zJ2eZPncM3HGApiWF9aSSW4Fe9rRw75BvciHhzQdQBF9Uv0M13odnXtTPaNbrx4vCJ2WrwoTaTUeap5+LUFoww==
+X-MS-Exchange-CrossTenant-UserPrincipalName: Jb0k9hKle9B/QEZWAFLbGo21winBHDRsB5DeCqG+of89S+nepoHyc6geOStX+4N9AYAoPPupEYMQrFkMfXZqvw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR04MB9585
 
-Russell King points out that seville_vsc9953 populates
-felix->info->num_tx_queues = 8, but this doesn't make it all the way
-into ds->num_tx_queues (which is how the user interface netdev queues
-get allocated) [1].
+Russell King suggested that felix_vsc9959, seville_vsc9953 and
+ocelot_ext have a large portion of duplicated init code, which could be
+made common [1].
 
-[1]: https://lore.kernel.org/all/20240415160150.yejcazpjqvn7vhxu@skbuf/
+[1]: https://lore.kernel.org/all/Zh1GvcOTXqb7CpQt@shell.armlinux.org.uk/
 
-When num_tx_queues=0 for seville, this is implicitly converted to 1 by
-dsa_user_create(), and this is good enough for basic operation for a
-switch port. The tc qdisc offload layer works with netdev TX queues,
-so for QoS offload we need to pretend we have multiple TX queues. The
-VSC9953, like ocelot_ext, doesn't export QoS offload, so it doesn't
-really matter. But we can definitely set num_tx_queues=8 for all
-switches.
+Here, we take the following common steps:
+- "felix" and "ds" structure allocation
+- "felix", "ocelot" and "ds" basic structure initialization
+- dsa_register_switch() call
 
-The felix->info->num_tx_queues construct itself seems unnecessary.
-It was introduced by commit de143c0e274b ("net: dsa: felix: Configure
-Time-Aware Scheduler via taprio offload") at a time when vsc9959
-(LS1028A) was the only switch supported by the driver.
+and we make a common function out of them.
 
-8 traffic classes, and 1 queue per traffic class, is a common
-architectural feature of all switches in the family. So they could
-all just set OCELOT_NUM_TC and be fine.
+For every driver except felix_vsc9959, this is also the entire probing
+procedure. For felix_vsc9959, we also need to do some PCI-specific
+stuff, which can easily be reordered to be done before, and unwound on
+failure.
 
+We also have to convert the bus-specific platform_set_drvdata() and
+pci_set_drvdata() calls into dev_set_drvdata(). But this should have no
+impact on the behavior.
+
+Suggested-by: "Russell King (Oracle)" <linux@armlinux.org.uk>
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
- drivers/net/dsa/ocelot/felix.h           | 1 -
- drivers/net/dsa/ocelot/felix_vsc9959.c   | 4 ++--
- drivers/net/dsa/ocelot/ocelot_ext.c      | 3 +--
- drivers/net/dsa/ocelot/seville_vsc9953.c | 3 ++-
- 4 files changed, 5 insertions(+), 6 deletions(-)
+ drivers/net/dsa/ocelot/felix.c           | 47 ++++++++++++++++++++++++
+ drivers/net/dsa/ocelot/felix.h           |  5 +++
+ drivers/net/dsa/ocelot/felix_vsc9959.c   | 44 +++-------------------
+ drivers/net/dsa/ocelot/ocelot_ext.c      | 40 +-------------------
+ drivers/net/dsa/ocelot/seville_vsc9953.c | 38 ++-----------------
+ 5 files changed, 63 insertions(+), 111 deletions(-)
 
+diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
+index 09c0800b18ab..accf737f7b69 100644
+--- a/drivers/net/dsa/ocelot/felix.c
++++ b/drivers/net/dsa/ocelot/felix.c
+@@ -2195,6 +2195,53 @@ const struct dsa_switch_ops felix_switch_ops = {
+ };
+ EXPORT_SYMBOL_GPL(felix_switch_ops);
+ 
++int felix_register_switch(struct device *dev, resource_size_t switch_base,
++			  int num_flooding_pgids, bool ptp,
++			  bool mm_supported,
++			  enum dsa_tag_protocol init_tag_proto,
++			  const struct felix_info *info)
++{
++	struct dsa_switch *ds;
++	struct ocelot *ocelot;
++	struct felix *felix;
++	int err;
++
++	felix = devm_kzalloc(dev, sizeof(*felix), GFP_KERNEL);
++	if (!felix)
++		return -ENOMEM;
++
++	ds = devm_kzalloc(dev, sizeof(*ds), GFP_KERNEL);
++	if (!ds)
++		return -ENOMEM;
++
++	dev_set_drvdata(dev, felix);
++
++	ocelot = &felix->ocelot;
++	ocelot->dev = dev;
++	ocelot->num_flooding_pgids = num_flooding_pgids;
++	ocelot->ptp = ptp;
++	ocelot->mm_supported = mm_supported;
++
++	felix->info = info;
++	felix->switch_base = switch_base;
++	felix->ds = ds;
++	felix->tag_proto = init_tag_proto;
++
++	ds->dev = dev;
++	ds->num_ports = info->num_ports;
++	ds->num_tx_queues = OCELOT_NUM_TC;
++	ds->ops = &felix_switch_ops;
++	ds->phylink_mac_ops = &felix_phylink_mac_ops;
++	ds->priv = ocelot;
++
++	err = dsa_register_switch(ds);
++	if (err)
++		dev_err_probe(dev, err, "Failed to register DSA switch\n");
++
++	return err;
++}
++EXPORT_SYMBOL_GPL(felix_register_switch);
++
+ struct net_device *felix_port_to_netdev(struct ocelot *ocelot, int port)
+ {
+ 	struct felix *felix = ocelot_to_felix(ocelot);
 diff --git a/drivers/net/dsa/ocelot/felix.h b/drivers/net/dsa/ocelot/felix.h
-index e67a25f6f816..e0bfea10ff52 100644
+index e0bfea10ff52..85b4f8616003 100644
 --- a/drivers/net/dsa/ocelot/felix.h
 +++ b/drivers/net/dsa/ocelot/felix.h
-@@ -32,7 +32,6 @@ struct felix_info {
- 	const u32			*port_modes;
- 	int				num_mact_rows;
- 	int				num_ports;
--	int				num_tx_queues;
- 	struct vcap_props		*vcap;
- 	u16				vcap_pol_base;
- 	u16				vcap_pol_max;
+@@ -100,6 +100,11 @@ struct felix {
+ 	unsigned long			host_flood_mc_mask;
+ };
+ 
++int felix_register_switch(struct device *dev, resource_size_t switch_base,
++			  int num_flooding_pgids, bool ptp,
++			  bool mm_supported,
++			  enum dsa_tag_protocol init_tag_proto,
++			  const struct felix_info *info);
+ struct net_device *felix_port_to_netdev(struct ocelot *ocelot, int port);
+ int felix_netdev_to_port(struct net_device *dev);
+ 
 diff --git a/drivers/net/dsa/ocelot/felix_vsc9959.c b/drivers/net/dsa/ocelot/felix_vsc9959.c
-index 20563abd617f..ec8b124e8f61 100644
+index ec8b124e8f61..ba37a566da39 100644
 --- a/drivers/net/dsa/ocelot/felix_vsc9959.c
 +++ b/drivers/net/dsa/ocelot/felix_vsc9959.c
-@@ -2658,7 +2658,6 @@ static const struct felix_info felix_info_vsc9959 = {
- 	.vcap_pol_max2		= 0,
- 	.num_mact_rows		= 2048,
- 	.num_ports		= VSC9959_NUM_PORTS,
--	.num_tx_queues		= OCELOT_NUM_TC,
- 	.quirks			= FELIX_MAC_QUIRKS,
- 	.quirk_no_xtr_irq	= true,
- 	.ptp_caps		= &vsc9959_ptp_caps,
-@@ -2711,7 +2710,8 @@ static int felix_pci_probe(struct pci_dev *pdev,
+@@ -2673,9 +2673,7 @@ static int felix_pci_probe(struct pci_dev *pdev,
+ 			   const struct pci_device_id *id)
+ {
+ 	struct device *dev = &pdev->dev;
+-	struct dsa_switch *ds;
+-	struct ocelot *ocelot;
+-	struct felix *felix;
++	resource_size_t switch_base;
+ 	int err;
  
- 	ds->dev = dev;
- 	ds->num_ports = felix->info->num_ports;
--	ds->num_tx_queues = felix->info->num_tx_queues;
-+	ds->num_tx_queues = OCELOT_NUM_TC;
-+
- 	ds->ops = &felix_switch_ops;
- 	ds->phylink_mac_ops = &felix_phylink_mac_ops;
- 	ds->priv = ocelot;
+ 	err = pci_enable_device(pdev);
+@@ -2684,45 +2682,15 @@ static int felix_pci_probe(struct pci_dev *pdev,
+ 		return err;
+ 	}
+ 
+-	felix = devm_kzalloc(dev, sizeof(struct felix), GFP_KERNEL);
+-	if (!felix) {
+-		err = -ENOMEM;
+-		goto out_disable;
+-	}
+-
+-	pci_set_drvdata(pdev, felix);
+-	ocelot = &felix->ocelot;
+-	ocelot->dev = dev;
+-	ocelot->num_flooding_pgids = OCELOT_NUM_TC;
+-	felix->info = &felix_info_vsc9959;
+-	felix->switch_base = pci_resource_start(pdev, VSC9959_SWITCH_PCI_BAR);
+-
+ 	pci_set_master(pdev);
+ 
+-	ocelot->ptp = 1;
+-	ocelot->mm_supported = true;
++	switch_base = pci_resource_start(pdev, VSC9959_SWITCH_PCI_BAR);
+ 
+-	ds = devm_kzalloc(dev, sizeof(struct dsa_switch), GFP_KERNEL);
+-	if (!ds) {
+-		err = -ENOMEM;
++	err = felix_register_switch(dev, switch_base, OCELOT_NUM_TC,
++				    true, true, DSA_TAG_PROTO_OCELOT,
++				    &felix_info_vsc9959);
++	if (err)
+ 		goto out_disable;
+-	}
+-
+-	ds->dev = dev;
+-	ds->num_ports = felix->info->num_ports;
+-	ds->num_tx_queues = OCELOT_NUM_TC;
+-
+-	ds->ops = &felix_switch_ops;
+-	ds->phylink_mac_ops = &felix_phylink_mac_ops;
+-	ds->priv = ocelot;
+-	felix->ds = ds;
+-	felix->tag_proto = DSA_TAG_PROTO_OCELOT;
+-
+-	err = dsa_register_switch(ds);
+-	if (err) {
+-		dev_err_probe(dev, err, "Failed to register DSA switch\n");
+-		goto out_disable;
+-	}
+ 
+ 	return 0;
+ 
 diff --git a/drivers/net/dsa/ocelot/ocelot_ext.c b/drivers/net/dsa/ocelot/ocelot_ext.c
-index c893f3ee238b..9cd24f77dc49 100644
+index 9cd24f77dc49..5632a7248cd4 100644
 --- a/drivers/net/dsa/ocelot/ocelot_ext.c
 +++ b/drivers/net/dsa/ocelot/ocelot_ext.c
-@@ -57,7 +57,6 @@ static const struct felix_info vsc7512_info = {
- 	.vcap				= vsc7514_vcap_props,
- 	.num_mact_rows			= 1024,
- 	.num_ports			= VSC7514_NUM_PORTS,
--	.num_tx_queues			= OCELOT_NUM_TC,
- 	.port_modes			= vsc7512_port_modes,
- 	.phylink_mac_config		= ocelot_phylink_mac_config,
- 	.configure_serdes		= ocelot_port_configure_serdes,
-@@ -90,7 +89,7 @@ static int ocelot_ext_probe(struct platform_device *pdev)
+@@ -64,44 +64,8 @@ static const struct felix_info vsc7512_info = {
  
- 	ds->dev = dev;
- 	ds->num_ports = felix->info->num_ports;
--	ds->num_tx_queues = felix->info->num_tx_queues;
-+	ds->num_tx_queues = OCELOT_NUM_TC;
+ static int ocelot_ext_probe(struct platform_device *pdev)
+ {
+-	struct device *dev = &pdev->dev;
+-	struct dsa_switch *ds;
+-	struct ocelot *ocelot;
+-	struct felix *felix;
+-	int err;
+-
+-	felix = devm_kzalloc(dev, sizeof(*felix), GFP_KERNEL);
+-	if (!felix)
+-		return -ENOMEM;
+-
+-	dev_set_drvdata(dev, felix);
+-
+-	ocelot = &felix->ocelot;
+-	ocelot->dev = dev;
+-
+-	ocelot->num_flooding_pgids = 1;
+-
+-	felix->info = &vsc7512_info;
+-
+-	ds = devm_kzalloc(dev, sizeof(*ds), GFP_KERNEL);
+-	if (!ds)
+-		return -ENOMEM;
+-
+-	ds->dev = dev;
+-	ds->num_ports = felix->info->num_ports;
+-	ds->num_tx_queues = OCELOT_NUM_TC;
+-
+-	ds->ops = &felix_switch_ops;
+-	ds->phylink_mac_ops = &felix_phylink_mac_ops;
+-	ds->priv = ocelot;
+-	felix->ds = ds;
+-	felix->tag_proto = DSA_TAG_PROTO_OCELOT;
+-
+-	err = dsa_register_switch(ds);
+-	if (err)
+-		dev_err_probe(dev, err, "Failed to register DSA switch\n");
+-
+-	return err;
++	return felix_register_switch(&pdev->dev, 0, 1, false, false,
++				     DSA_TAG_PROTO_OCELOT, &vsc7512_info);
+ }
  
- 	ds->ops = &felix_switch_ops;
- 	ds->phylink_mac_ops = &felix_phylink_mac_ops;
+ static void ocelot_ext_remove(struct platform_device *pdev)
 diff --git a/drivers/net/dsa/ocelot/seville_vsc9953.c b/drivers/net/dsa/ocelot/seville_vsc9953.c
-index e63247d3dfdb..83bd0e1ee692 100644
+index 83bd0e1ee692..70782649c395 100644
 --- a/drivers/net/dsa/ocelot/seville_vsc9953.c
 +++ b/drivers/net/dsa/ocelot/seville_vsc9953.c
-@@ -963,7 +963,6 @@ static const struct felix_info seville_info_vsc9953 = {
- 	.quirks			= FELIX_MAC_QUIRKS,
- 	.num_mact_rows		= 2048,
- 	.num_ports		= VSC9953_NUM_PORTS,
--	.num_tx_queues		= OCELOT_NUM_TC,
- 	.mdio_bus_alloc		= vsc9953_mdio_bus_alloc,
- 	.mdio_bus_free		= vsc9953_mdio_bus_free,
- 	.port_modes		= vsc9953_port_modes,
-@@ -1002,6 +1001,8 @@ static int seville_probe(struct platform_device *pdev)
+@@ -971,49 +971,17 @@ static const struct felix_info seville_info_vsc9953 = {
+ static int seville_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+-	struct dsa_switch *ds;
+-	struct ocelot *ocelot;
+ 	struct resource *res;
+-	struct felix *felix;
+-	int err;
+-
+-	felix = devm_kzalloc(dev, sizeof(struct felix), GFP_KERNEL);
+-	if (!felix)
+-		return -ENOMEM;
+-
+-	platform_set_drvdata(pdev, felix);
+-
+-	ocelot = &felix->ocelot;
+-	ocelot->dev = dev;
+-	ocelot->num_flooding_pgids = 1;
+-	felix->info = &seville_info_vsc9953;
  
- 	ds->dev = dev;
- 	ds->num_ports = felix->info->num_ports;
-+	ds->num_tx_queues = OCELOT_NUM_TC;
-+
- 	ds->ops = &felix_switch_ops;
- 	ds->phylink_mac_ops = &felix_phylink_mac_ops;
- 	ds->priv = ocelot;
+ 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 	if (!res) {
+ 		dev_err(dev, "Invalid resource\n");
+ 		return -EINVAL;
+ 	}
+-	felix->switch_base = res->start;
+-
+-	ds = devm_kzalloc(dev, sizeof(struct dsa_switch), GFP_KERNEL);
+-	if (!ds)
+-		return -ENOMEM;
+-
+-	ds->dev = dev;
+-	ds->num_ports = felix->info->num_ports;
+-	ds->num_tx_queues = OCELOT_NUM_TC;
+-
+-	ds->ops = &felix_switch_ops;
+-	ds->phylink_mac_ops = &felix_phylink_mac_ops;
+-	ds->priv = ocelot;
+-	felix->ds = ds;
+-	felix->tag_proto = DSA_TAG_PROTO_SEVILLE;
+-
+-	err = dsa_register_switch(ds);
+-	if (err)
+-		dev_err(dev, "Failed to register DSA switch: %d\n", err);
+ 
+-	return err;
++	return felix_register_switch(dev, res->start, 1, false, false,
++				     DSA_TAG_PROTO_SEVILLE,
++				     &seville_info_vsc9953);
+ }
+ 
+ static void seville_remove(struct platform_device *pdev)
 -- 
 2.34.1
 
