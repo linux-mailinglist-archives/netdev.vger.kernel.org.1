@@ -1,124 +1,97 @@
-Return-Path: <netdev+bounces-99272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C275B8D442A
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 05:28:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF9ED8D4431
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 05:32:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76F53286869
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 03:28:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3FD0BB24809
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 03:32:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEDE354FB1;
-	Thu, 30 May 2024 03:28:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FAAA139579;
+	Thu, 30 May 2024 03:32:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iqqrp33P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y+McAG2P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CAFD5647B
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 03:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE52139566
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 03:32:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717039700; cv=none; b=soyl2fs2J804NA99Gr0cZNQrb+oaG6v6agcFC1YYlBsn8WEj4R0j1xIlAkDyL/cqJzMAjmDnAq+iG643Xj1kHXgYHisBKz15H0TffrOYqbDA6P+Mj/RST69c/EkOAqXBl9KtA4FSeRTEArLEEsu00gIWgT7k1+bczFWDppABid8=
+	t=1717039945; cv=none; b=BiLT8yHVD7vm7Zya0PLkrX/789OwoBCsCPh52d7l/2pLPzNfRByCxiTq5PW0BB2d3ko7wBGPStJZXTdoodIEBo5qLAz7hxDXNzrH5KaQ81H/7lNDwwrW5XfPnQVH/zRE4Q7WffhZLBquSYOCqlFKSLQQ3aHs2wSQyfTL+fx55Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717039700; c=relaxed/simple;
-	bh=cvXcMx9l++AOxS1bUlBF9OE0JuWh1P9WQPBfXgd6rgQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ttzRiXiBFPCRgCMBrWSU8nn4twl40azAWUflgAWNG8oij8EWAKYZnMTVsTFW9S3HIf9un74geJ3cafHHi9R0iFj5BX0g6FnijZDY6hk4EooQv7+2I//0KZbSKfFORJIWT6PTerJR/MD/YzyKdpHvXEUxV7lhTldYDcKBn47auUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Iqqrp33P; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-70231566377so254454b3a.0
-        for <netdev@vger.kernel.org>; Wed, 29 May 2024 20:28:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717039698; x=1717644498; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AcIS2DB3SRfxRMB+nZJAOQPaZWEf+4JritcBFBDshKs=;
-        b=Iqqrp33PhJzStzGt532KNiTZkOTdKHCXyltNQZMsjo8uCSwplyNYJOuMVm/ZR5FEVb
-         0rs3+g6+c3aA3wnX6Ea1FB9DBnB+sAMJABH1Z/RG9ZwaWE3xwrBNuMypSZPM4MpK9Hu3
-         CXtG7ymUGR26cRxMNMYijicmjh6/oW1iBSttDvo9cx5ABIRhZlPeD1IOSI52rToBfOup
-         162o3aJ57oDAapZL57PrJ0yczH0aLdGv8+rgNmQPfUGyrI2GAWzjArPMI8x/bdDj4ljR
-         2PadiPrXB7CS7ULlquwQoOjbkPnDpNt/oq5x/+5U8Qq0xkvtKVCC56xUtL3KP1JOxcJ3
-         ebGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717039698; x=1717644498;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AcIS2DB3SRfxRMB+nZJAOQPaZWEf+4JritcBFBDshKs=;
-        b=urHk5VmaVT4qUuqyl1ItWK8FTeuI8bpQfiBjhOebzlnNYTv6NLuiqLIjz3qwGXWfcQ
-         PMRGWBV5HRFWFVcHeYB0xcsysHDQAEa+yvyZNB9RXgfYSkUihIPHZ+10LpaURTStdacQ
-         PQU54R8AL9Nw/qiF2MjYsTsI6jlUwBSy8R4ZiXYwPjv6ICcEvRQWFgxcqcs6kAStlqaJ
-         J5gzKMNhj3pjdDhSHONlYbGP9UcIx8M0l1hoHSHMQsIu8FdAaMnYWAoJ8ksrvJ8SgAN0
-         lEA8ULiVM0JCs+Iq/4frWo6tFKZwyECjUnk0KTgX8LphtkKm5cJZOB0IGiJ297LWHa81
-         iWJQ==
-X-Gm-Message-State: AOJu0Yy/X/EZ2CjSNiFX07Mn7U6IQcGVqFBMrYnHNGMBg2lsbtKhe1jH
-	LG4dUqtKG+brCWHqwXX7K1S68o7ewXo+HkXawfn7UA/NhlmWQ4YB
-X-Google-Smtp-Source: AGHT+IFxnUj+yf7nDjSft2jWxq5ov9nDjf9e5sIHeYYvEetjc1vD2FqC+BmCmDlOgmzet0gFcvCNBw==
-X-Received: by 2002:a05:6a20:9192:b0:1af:b0be:4661 with SMTP id adf61e73a8af0-1b26454b0b3mr1042054637.19.1717039697818;
-        Wed, 29 May 2024 20:28:17 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c1a77a1eb2sm595027a91.51.2024.05.29.20.28.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 May 2024 20:28:17 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>,
-	John Sperbeck <jsperbeck@google.com>
-Subject: [PATCH net] net: rps: fix error when CONFIG_RFS_ACCEL is off
-Date: Thu, 30 May 2024 11:27:17 +0800
-Message-Id: <20240530032717.57787-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1717039945; c=relaxed/simple;
+	bh=QdjBA/cGJKxHSqdrkpKs+wmuBb/1Tv41LF2zB1jMHc4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J3p6tZ0yyj3d7hlwoGeQKYmDyvIxSThsBXsn4Z7op6yMpooCiNCOXma1h9wejXy2vSdy4QjkPnmkyHiV13EjNAZ+RGA7yqyuI+DRBMUdgkK456Xygf47aHXES5JZMp6zoiogK2KSS8BiTlzPELwqJcnNdA3a02Xyl2voQPgZ1Bc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y+McAG2P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89A1AC116B1;
+	Thu, 30 May 2024 03:32:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717039944;
+	bh=QdjBA/cGJKxHSqdrkpKs+wmuBb/1Tv41LF2zB1jMHc4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Y+McAG2PTD0WQnWE89Zy4JvwRY/OYNjFQbYBIG3VyetJDXEAX/dQsD/b6kBKKVron
+	 Ws7jYLLLKUr8qpKdRornTPS0Ypp3nZNHLVZyZUX+beDnet5fCYJjL4rLlVTzH0+os3
+	 aIQZc6+oqT9KW1cWDOzuDUMT6gskaNSoVPG7tPslAiIqAdLm8xqqNdbow59kpC+Uye
+	 s0Nec4PDBePe5JyN6LSuN5S7Mw6vHkE+E1v970Vaa3ph4pztCHb0zmHb3xwD1F5nat
+	 iWxBvqzRVqfJZudxW9If5yXRC6/g1xiKhF7NcRBMrAHTCUCSdBxyXu/pDakapxoKlS
+	 vRwGxkPVqVmWQ==
+Date: Wed, 29 May 2024 20:32:23 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tariq Toukan <tariqt@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net-next 11/15] net/mlx5e: SHAMPO, Add no-split ethtool
+ counters for header/data split
+Message-ID: <ZlfzR_UV9CcCjR99@x130.lan>
+References: <20240528142807.903965-1-tariqt@nvidia.com>
+ <20240528142807.903965-12-tariqt@nvidia.com>
+ <20240529182208.401b1ecf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20240529182208.401b1ecf@kernel.org>
 
-From: Jason Xing <kernelxing@tencent.com>
+On 29 May 18:22, Jakub Kicinski wrote:
+>On Tue, 28 May 2024 17:28:03 +0300 Tariq Toukan wrote:
+>> +   * - `rx[i]_hds_nosplit_packets`
+>> +     - Number of packets that were not split in modes that do header/data split
+>> +       [#accel]_.
+>> +     - Informative
+>> +
+>> +   * - `rx[i]_hds_nosplit_bytes`
+>> +     - Number of bytes that were not split in modes that do header/data split
+>> +       [#accel]_.
+>> +     - Informative
+>
+>This is too vague. The ethtool HDS feature is for TCP only.
+>What does this count? Non-TCP packets basically?
+>
 
-John Sperbeck reported that if we turn off CONFIG_RFS_ACCEL, the 'head'
-is not defined, which will trigger compile error. So I move the 'head'
-out of the CONFIG_RFS_ACCEL scope.
+But this is not the ethtool HDS, this is the mlx5 HW GRO hds.
+On the sane note, are we planning to have different control knobs/stats for
+tcp/udp/ip HDS? ConnectX supports both TCP and UDP on the same queue, 
+the driver has no control on which protocol gets HDS and which doesn't.
 
-Fixes: 84b6823cd96b ("net: rps: protect last_qtail with rps_input_queue_tail_save() helper")
-Reported-by: John Sperbeck <jsperbeck@google.com>
-Closes: https://lore.kernel.org/all/20240529203421.2432481-1-jsperbeck@google.com/
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- net/core/dev.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+>Given this is a HW-GRO series, are HDS packets == HW-GRO eligible
+>packets?
+>
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 85fe8138f3e4..e62698c7a0e6 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4516,12 +4516,13 @@ set_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 	    struct rps_dev_flow *rflow, u16 next_cpu)
- {
- 	if (next_cpu < nr_cpu_ids) {
-+		u32 head;
- #ifdef CONFIG_RFS_ACCEL
- 		struct netdev_rx_queue *rxqueue;
- 		struct rps_dev_flow_table *flow_table;
- 		struct rps_dev_flow *old_rflow;
--		u32 flow_id, head;
- 		u16 rxq_index;
-+		u32 flow_id;
- 		int rc;
- 
- 		/* Should we steer this flow to a different hardware queue? */
--- 
-2.37.3
+No, UDP will also get header data split or other TCP packets that don't
+belong to any aggregation context in the HW.
 
 
