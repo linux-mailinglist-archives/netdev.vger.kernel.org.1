@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-99586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C5088D564F
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:36:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA7CD8D5650
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:36:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4258828446E
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 23:36:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78B30284CA3
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 23:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF6417C7B0;
-	Thu, 30 May 2024 23:36:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D9B618398A;
+	Thu, 30 May 2024 23:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WeMWqy/1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hJapuffz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EAD555896;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBCD218397C;
 	Thu, 30 May 2024 23:36:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717112185; cv=none; b=GMZcU6ZZKXzDE40BWw4RsuiV8bc7M6uG/afJO4ECEhzNhDeWSA7W4ple8FlGI8WsZ17dsoFtBDMiMT8wH/I/Y6FhVPRSyawWi7s6VZDJgcRT4kV4bycKVr3YmBWkrHVYu/xcqvwrO8bIKXwpshxcbe7XVBWYT/JjnP7w3szQrj4=
+	t=1717112186; cv=none; b=YClGm+uPIsGiVVf1/JLGfn046LoS/DwPpu5tdjLAiUeB1oZajuZ6romB15VaYYbuZmAqEmBVXb2kB0Pw0gBH5ecpdLVzx+rYnRB/ZbLUsr8nacZEPjDSb6rglkOBaQfRjkqQhg5rUZvdU8UyGak1L+3rrpOMz/aRf7K1qJlLonY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717112185; c=relaxed/simple;
-	bh=7vmH6yCpl8nIABl2n0tr/dfno3/kdI3WWJlSpv9XZTo=;
+	s=arc-20240116; t=1717112186; c=relaxed/simple;
+	bh=Tc3mfR659n1UEdqi4bi378GMou0NHGPpevDsK5F2eK8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XRlf5JgKrqChg8Qb31/aTi4M4c2rMJ9fHp1yiXoSFZU+SbtG+7wFKkTScc2eEXU8m4tDKd8+eFJAv+szOrfrkNALbWmB1kScFnKWyqjjv+M69Oyn82pMij1Spa9bCkuKzcUXrGY6QpbSR8irYJd05fWBCCCAF2JLiy5kV+unTxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WeMWqy/1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E74EC4AF09;
-	Thu, 30 May 2024 23:36:24 +0000 (UTC)
+	 MIME-Version; b=L4dP8afUrKM1m90mQH575wJ01AZpcRCyA8VU7cNf9dnAOe1usGwTV5zU1a+QLUTp1FHGeiQ6aZ0JZpcoYGjJDszGgwLzaOe3Je6SvZ+f8sz2BF0sejbU2glKZ4ZGZCC+jUB1wx7mrMJTCfOrwNFWYQ2PXByqsmx4EiUY0NXl+7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hJapuffz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28748C4AF0C;
+	Thu, 30 May 2024 23:36:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1717112185;
-	bh=7vmH6yCpl8nIABl2n0tr/dfno3/kdI3WWJlSpv9XZTo=;
+	bh=Tc3mfR659n1UEdqi4bi378GMou0NHGPpevDsK5F2eK8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WeMWqy/1Yl0oVNzzDbjsoqUbobQiYv7VvAojosHA3h4RZJfaoJRxvtNVEf2AEjU4e
-	 o1j9rOYl4hGE/0B2nAJQKNs+x6RpODXoB1h7zt4wxeC2Z4GbEiV7RkjxyhYJVCrXK7
-	 Fv4aiaEQLc/C61Gs5x72Fq3y+RlLdfgmlquVYC2c2A/Rw7YPpKWEQw0ri7Uq8LpXRS
-	 po1WyjyNBnSs1M8dMPd+IVfS5tkIP30hQ3xN/0LSfMOWhio0yLLST6fj0bLrbMumrF
-	 06+gv8BIDn6dGzBboi993qUMOLyM9BY/moerCU5fmQZ6D7sB1lbBd8PCUs9WkGYb76
-	 5XzjLGb7I62xg==
+	b=hJapuffzj+Ah08nz7JesYCuLgG7/6ADXBDTv3ViohtuON8qxHJbSTLm5+M8K5tkWA
+	 cop6ZnUrO5EqoQSq4cw0YdUx9bBmKYIH/MJFoMt8aKDvARHu9J5ZSKJSeYh5/Yg4kO
+	 5nC8QF3Kpd8iQhz5BztnXw+KXFBKG9AnNJqJk7Ojf/AAE4k+0MynVOnPEUnoXhXgJk
+	 rCMAZV+qoqWX0qrBLjybF+nNRi8YK2TjlgTpTNV9ahv0iU1qgrgEXJLYvZ8MTg0ueb
+	 07SgCM8sPTS2EKmJRMYV7mmrqsl+1rRGbJIhKT4gBPL3HYNuhjBKdFVDp4lPOFQ3Fr
+	 y1CbDKreim89Q==
 From: Jakub Kicinski <kuba@kernel.org>
 To: edumazet@google.com,
 	pabeni@redhat.com
@@ -52,9 +52,9 @@ Cc: davem@davemloft.net,
 	borisp@nvidia.com,
 	willemdebruijn.kernel@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 1/3] tcp: wrap mptcp and decrypted checks into tcp_skb_can_collapse_rx()
-Date: Thu, 30 May 2024 16:36:14 -0700
-Message-ID: <20240530233616.85897-2-kuba@kernel.org>
+Subject: [PATCH net-next 2/3] tcp: add a helper for setting EOR on tail skb
+Date: Thu, 30 May 2024 16:36:15 -0700
+Message-ID: <20240530233616.85897-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20240530233616.85897-1-kuba@kernel.org>
 References: <20240530233616.85897-1-kuba@kernel.org>
@@ -66,94 +66,88 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-tcp_skb_can_collapse() checks for conditions which don't make
-sense on input. Because of this we ended up sprinkling a few
-pairs of mptcp_skb_can_collapse() and skb_cmp_decrypted() calls
-on the input path. Group them in a new helper. This should make
-it less likely that someone will check mptcp and not decrypted
-or vice versa when adding new code.
+TLS (and hopefully soon PSP will) use EOR to prevent skbs
+with different decrypted state from getting merged, without
+adding new tests to the skb handling. In both cases once
+the connection switches to an "encrypted" state, all subsequent
+skbs will be encrypted, so a single "EOR fence" is sufficient
+to prevent mixing.
 
-This implicitly adds a decrypted check early in tcp_collapse().
-AFAIU this will very slightly increase our ability to collapse
-packets under memory pressure, not a real bug.
+Add a helper for setting the EOR bit, to make this arrangement
+more explicit.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/net/tcp.h    |  7 +++++++
- net/ipv4/tcp_input.c | 11 +++--------
- net/ipv4/tcp_ipv4.c  |  3 +--
- 3 files changed, 11 insertions(+), 10 deletions(-)
+ include/net/tcp.h    |  9 +++++++++
+ net/tls/tls_device.c | 11 ++---------
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
 diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 32815a40dea1..32741856da01 100644
+index 32741856da01..08c3b99501cf 100644
 --- a/include/net/tcp.h
 +++ b/include/net/tcp.h
-@@ -1071,6 +1071,13 @@ static inline bool tcp_skb_can_collapse(const struct sk_buff *to,
+@@ -1066,6 +1066,7 @@ static inline bool tcp_skb_can_collapse_to(const struct sk_buff *skb)
+ static inline bool tcp_skb_can_collapse(const struct sk_buff *to,
+ 					const struct sk_buff *from)
+ {
++	/* skb_cmp_decrypted() not needed, use tcp_write_collapse_fence() */
+ 	return likely(tcp_skb_can_collapse_to(to) &&
+ 		      mptcp_skb_can_collapse(to, from) &&
  		      skb_pure_zcopy_same(to, from));
+@@ -2102,6 +2103,14 @@ static inline void tcp_rtx_queue_unlink_and_free(struct sk_buff *skb, struct soc
+ 	tcp_wmem_free_skb(sk, skb);
  }
  
-+static inline bool tcp_skb_can_collapse_rx(const struct sk_buff *to,
-+					   const struct sk_buff *from)
++static inline void tcp_write_collapse_fence(struct sock *sk)
 +{
-+	return likely(mptcp_skb_can_collapse(to, from) &&
-+		      !skb_cmp_decrypted(to, from));
++	struct sk_buff *skb = tcp_write_queue_tail(sk);
++
++	if (skb)
++		TCP_SKB_CB(skb)->eor = 1;
 +}
 +
- /* Events passed to congestion control interface */
- enum tcp_ca_event {
- 	CA_EVENT_TX_START,	/* first transmit when no packets in flight */
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 5aadf64e554d..212b6fd0caf7 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -4813,10 +4813,7 @@ static bool tcp_try_coalesce(struct sock *sk,
- 	if (TCP_SKB_CB(from)->seq != TCP_SKB_CB(to)->end_seq)
- 		return false;
+ static inline void tcp_push_pending_frames(struct sock *sk)
+ {
+ 	if (tcp_send_head(sk)) {
+diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
+index ab6e694f7bc2..dc063c2c7950 100644
+--- a/net/tls/tls_device.c
++++ b/net/tls/tls_device.c
+@@ -231,14 +231,10 @@ static void tls_device_resync_tx(struct sock *sk, struct tls_context *tls_ctx,
+ 				 u32 seq)
+ {
+ 	struct net_device *netdev;
+-	struct sk_buff *skb;
+ 	int err = 0;
+ 	u8 *rcd_sn;
  
--	if (!mptcp_skb_can_collapse(to, from))
--		return false;
+-	skb = tcp_write_queue_tail(sk);
+-	if (skb)
+-		TCP_SKB_CB(skb)->eor = 1;
 -
--	if (skb_cmp_decrypted(from, to))
-+	if (!tcp_skb_can_collapse_rx(to, from))
- 		return false;
++	tcp_write_collapse_fence(sk);
+ 	rcd_sn = tls_ctx->tx.rec_seq;
  
- 	if (!skb_try_coalesce(to, from, fragstolen, &delta))
-@@ -5372,7 +5369,7 @@ tcp_collapse(struct sock *sk, struct sk_buff_head *list, struct rb_root *root,
- 			break;
- 		}
+ 	trace_tls_device_tx_resync_send(sk, seq, rcd_sn);
+@@ -1067,7 +1063,6 @@ int tls_set_device_offload(struct sock *sk)
+ 	struct tls_prot_info *prot;
+ 	struct net_device *netdev;
+ 	struct tls_context *ctx;
+-	struct sk_buff *skb;
+ 	char *iv, *rec_seq;
+ 	int rc;
  
--		if (n && n != tail && mptcp_skb_can_collapse(skb, n) &&
-+		if (n && n != tail && tcp_skb_can_collapse_rx(skb, n) &&
- 		    TCP_SKB_CB(skb)->end_seq != TCP_SKB_CB(n)->seq) {
- 			end_of_skbs = false;
- 			break;
-@@ -5423,11 +5420,9 @@ tcp_collapse(struct sock *sk, struct sk_buff_head *list, struct rb_root *root,
- 				skb = tcp_collapse_one(sk, skb, list, root);
- 				if (!skb ||
- 				    skb == tail ||
--				    !mptcp_skb_can_collapse(nskb, skb) ||
-+				    !tcp_skb_can_collapse_rx(nskb, skb) ||
- 				    (TCP_SKB_CB(skb)->tcp_flags & (TCPHDR_SYN | TCPHDR_FIN)))
- 					goto end;
--				if (skb_cmp_decrypted(skb, nskb))
--					goto end;
- 			}
- 		}
- 	}
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 041c7eda9abe..228de0c95a9d 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -2049,8 +2049,7 @@ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
- 	      TCP_SKB_CB(skb)->tcp_flags) & TCPHDR_ACK) ||
- 	    ((TCP_SKB_CB(tail)->tcp_flags ^
- 	      TCP_SKB_CB(skb)->tcp_flags) & (TCPHDR_ECE | TCPHDR_CWR)) ||
--	    !mptcp_skb_can_collapse(tail, skb) ||
--	    skb_cmp_decrypted(tail, skb) ||
-+	    !tcp_skb_can_collapse_rx(tail, skb) ||
- 	    thtail->doff != th->doff ||
- 	    memcmp(thtail + 1, th + 1, hdrlen - sizeof(*th)))
- 		goto no_coalesce;
+@@ -1138,9 +1133,7 @@ int tls_set_device_offload(struct sock *sk)
+ 	 * SKBs where only part of the payload needs to be encrypted.
+ 	 * So mark the last skb in the write queue as end of record.
+ 	 */
+-	skb = tcp_write_queue_tail(sk);
+-	if (skb)
+-		TCP_SKB_CB(skb)->eor = 1;
++	tcp_write_collapse_fence(sk);
+ 
+ 	/* Avoid offloading if the device is down
+ 	 * We don't want to offload new flows after
 -- 
 2.45.1
 
