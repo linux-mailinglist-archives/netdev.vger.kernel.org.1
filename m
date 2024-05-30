@@ -1,151 +1,134 @@
-Return-Path: <netdev+bounces-99440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C61428D4E19
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 16:35:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8B628D4E15
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 16:35:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 471FBB23C6F
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 14:35:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73DD8282788
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 14:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F5F17D89A;
-	Thu, 30 May 2024 14:35:34 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD16E169AC6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E08017C202;
 	Thu, 30 May 2024 14:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P5/GsT9P"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE26B1E4AD;
+	Thu, 30 May 2024 14:35:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717079734; cv=none; b=dtxh86bbeJ6nbPdPhY1Eozts4LvcpPrfKnwu3hxMmdBUg+F3KDXORGpF41ISWAUbk6Z1yuzHySXGThYWCAuZwR/Tly8FntXzuHCw0L9+703xO8886IgWRGXMOkImOtiY2P2swBMGKptCN7eDqKeR6boR4dQwTJYhMA9lXvYumQM=
+	t=1717079729; cv=none; b=iPNlkV9ZBQRTQ+b5xs+P1DLuZ6B2eJChdD3z9ITxovaB7ER9IJVjE2/8FkUuyW91yvdtC2LppghVTWjOLAHQNYsyByzHt65d+Dk9VngD/SWdart6IIRy7r5C9JG4VTKqQ1dzsPuXkciH5CisEXLpXBLugtgxBJnO7kY92EjdTuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717079734; c=relaxed/simple;
-	bh=nw72xWnPpdyLXDd6BSSXfeSuAij6WeLgNpBcNRwcIao=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=cxpv7taI9362vLoLEi0dMUtq7xGKcEZFlMtb0Oc8HcoTKhQrlYmtfThQyOzhkXuEMpCL0PJLMwAjY8dHNQV6utu+z6pqffJdKYQyMKZ0UzeQfw5wgUgNofZ2cZdrs6BgUc9du/pVuZBr3kyPrYyrG4Lf3DBe28m8fezBU7kTOZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4VqpZq18vWzmWxF;
-	Thu, 30 May 2024 22:30:59 +0800 (CST)
-Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
-	by mail.maildlp.com (Postfix) with ESMTPS id 813F018007F;
-	Thu, 30 May 2024 22:35:23 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 30 May 2024 22:35:19 +0800
-Message-ID: <f4b5e2b9-e960-fd08-fdf4-328bb475e2ef@huawei-partners.com>
-Date: Thu, 30 May 2024 17:35:14 +0300
+	s=arc-20240116; t=1717079729; c=relaxed/simple;
+	bh=9sWgSQa6TgS8KLWUQBeccq3Rfa7bq3zza/P8Pb2pEJA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XY0lScDfAxYzsrc87MaRDW+s33UOT7UFq/Qula4HJhrJVTmm+dYQctAFFlznSQW0lUvAz7IEKaphkg5Qyayug7UUTpJtLCmd6iMg4wZ7RIkIFq1fKd9ARK1LTVPH/iDrQ/BTQM6+tJ/4zuWSzciVsalebIRKEhok8qTgvaciXzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P5/GsT9P; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4202ca70318so9909595e9.1;
+        Thu, 30 May 2024 07:35:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717079726; x=1717684526; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WYTiFuR4DPSHFGqvlJB8DMX9Y1O9jK1V/mJHl1kS0Pc=;
+        b=P5/GsT9Pdf9csYeNfyfjcfXydEfEbHCfZAXVaKckA2trO5VAxWd6z28HtgQpB4O/nf
+         sFeiMVL6UdUEzQHrzfT6VRXDUCgOtzxi06m5wuk8Hz4Qiwfek5yn8UVANZcftR4bWlCI
+         SbuHeG3V4bYyEeRf1KbmDYc9/c6t5YkdhK31y7sdl6emGoXz4I7+jdTfkwSQbuqgvSaX
+         grFhGAEkqEjrTlkddb9H6ukZKtzDusZDvRdH/btRGKKR8Ax4zGwM6rsDAzCR7owzVbWX
+         lBUrB+zZQmISJygosh84qv6V7SEYP1yx1XnfY4MrIOHk6jmAypef0Ha5f1Q8dns3AGsS
+         EpHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717079726; x=1717684526;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WYTiFuR4DPSHFGqvlJB8DMX9Y1O9jK1V/mJHl1kS0Pc=;
+        b=CWNL6QyZXg7K721r1kP0yPg+/bq7O0L5fsThBXV9dLaYP+Jc4KyU3yqIe7A6FC5LQb
+         zdwpBnGi4e3Jg2pASDC4fQybbPuqVd5mbdB68orAB58rAXhrKzg2qonXYqk3jA68EJYL
+         I5/qfW9E8HL5wTB1TxLOTWR7eHgWQa7MtkWIkrhXqF35n+UDVDqPXGZDf7FkaTnL10tV
+         zmA1zb6zl/PAkPWMklr6HIW6vtNVqyNb9wJ6XprdPv+WyqA5e/GQ3u8oFLD14gMciHGU
+         BS8VU+3i3OKQfE5SekI6dcy0FRYP7iiURpBZKu4VNJ7L8JUWUOHpqGASiw2S59MlWRhe
+         ToZg==
+X-Forwarded-Encrypted: i=1; AJvYcCV/tlTfaRJBOX8+BSLP5yFc9jfhqHkHnSp2S+dTZrb0GjBCuH4inBgzbmj26KznAbZ5TpFWDr8LDmQWEc9MsVXPTeYPPLbRB7167PGxBFjJnuMH+fljNSkGgAaTkt7yuRQK3BBg
+X-Gm-Message-State: AOJu0Ywdp7F1ZZSS+fTPO/uX8PsEa9XLI/Iji2Y69i9J2IOB8fRQiNSP
+	cRpu+42QJlXMV8A98grl44fxleR/EEExi+naJwdVNNtdqTr6j8+F
+X-Google-Smtp-Source: AGHT+IGaY+/PZA5mIGZDeKr/VUQRACFvFwkdzFPSepCWD2Pnl6K5q1TGTKBDO+05lApmOK2QjvmQQw==
+X-Received: by 2002:a05:600c:4fc2:b0:41b:fea6:6526 with SMTP id 5b1f17b1804b1-4212792f6aemr22848325e9.33.1717079725585;
+        Thu, 30 May 2024 07:35:25 -0700 (PDT)
+Received: from skbuf ([188.25.55.166])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42127062f0dsm26826995e9.17.2024.05.30.07.35.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 May 2024 07:35:24 -0700 (PDT)
+Date: Thu, 30 May 2024 17:35:22 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Xiaolei Wang <xiaolei.wang@windriver.com>, Andrew Lunn <andrew@lunn.ch>,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net v2 PATCH] net: stmmac: Update CBS parameters when speed
+ changes after linking up
+Message-ID: <20240530143522.32c5lhkg42yiggob@skbuf>
+References: <20240530061453.561708-1-xiaolei.wang@windriver.com>
+ <f8b0843f-7900-4ad0-9e70-c16175e893d9@lunn.ch>
+ <20240530132822.xv23at32wj73hzfj@skbuf>
+ <ZliBzo7eETml/+bl@shell.armlinux.org.uk>
+ <20240530135335.yanffjb3ketmoo7u@skbuf>
+ <ZliJ2O+bj18jQ0B8@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 04/12] selftests/landlock: Add
- protocol.socket_access_rights to socket tests
-Content-Language: ru
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
-CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
-	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-References: <20240524093015.2402952-1-ivanov.mikhail1@huawei-partners.com>
- <20240524093015.2402952-5-ivanov.mikhail1@huawei-partners.com>
- <ZlTyj_0g-E4oM22G@google.com>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <ZlTyj_0g-E4oM22G@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
- dggpemm500020.china.huawei.com (7.185.36.49)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZliJ2O+bj18jQ0B8@shell.armlinux.org.uk>
 
+On Thu, May 30, 2024 at 03:14:48PM +0100, Russell King (Oracle) wrote:
+> > I don't see why the CBS parameters would need to be de-programmed from
+> > hardware on a link down event. Is that some stmmac specific thing?
+> 
+> If the driver is having to do computation on the parameters based on
+> the link speed, then when the link speed changes, the parameters
+> no longer match what the kernel _thinks_ those parameters were
+> programmed with.
+> 
+> What I'm trying to get over to you is that what you propose causes
+> an inconsistency between how the hardware is _programmed_ to behave
+> for CBS and what the kernel reports the CBS settings are if the
+> link speed changes.
+> 
+> It's all very well saying that userspace should basically reconstruct
+> the tc settings when the link changes, but not everyone is aware of
+> that. I'm saying it's a problem if one isn't aware of this issue with
+> this hardware, and one looks at tc qdisc show output, and assumes
+> that reflects what is actually being used when it isn't.
+> 
+> It's quality of implmentation - as far as I'm concerned, the kernel
+> should *not* mislead the user like this.
 
+I was saying that the tc-cbs parameters input into the kernel should
+already have the link speed baked into them:
+portTransmitRate = idleSlope - sendSlope. In theory one could feed any
+data into the kernel, but this is based on the IEEE 802.1Q formulas.
 
-5/27/2024 11:52 PM, Günther Noack wrote:
-> Hello!
-> 
-> I see that this test is adapted from the network_access_rights test in
-> net_test.c, and some of the subsequent are similarly copied from there.  It
-> makes it hard to criticize the code, because being a little bit consistent is
-> probably a good thing.  Have you found any opportunities to extract
-> commonalities into common.h?
+I had missed the fact that there is a calculation dependent on
+priv->speed within tc_setup_cbs(), and I'm sorry for that. I thought
+that the values were passed unaltered down to stmmac_config_cbs(). So
+"make no change to the driver" is no longer my recommendation.
 
-I think that all common tests should be extracted to common.h or maybe
-some new header. *_test.c could maintain a fixture for these tests for
-some rule-specific logic. Such refactoring should be in separate patch
-though.
-
-> 	
-> On Fri, May 24, 2024 at 05:30:07PM +0800, Mikhail Ivanov wrote:
->> Add test that checks possibility of adding rule with every possible
->> access right.
->>
->> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->> ---
->>
->> Changes since v1:
->> * Formats code with clang-format.
->> * Refactors commit message.
->> ---
->>   .../testing/selftests/landlock/socket_test.c  | 28 +++++++++++++++++++
->>   1 file changed, 28 insertions(+)
->>
->> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testing/selftests/landlock/socket_test.c
->> index 4c51f89ed578..eb5d62263460 100644
->> --- a/tools/testing/selftests/landlock/socket_test.c
->> +++ b/tools/testing/selftests/landlock/socket_test.c
->> @@ -178,4 +178,32 @@ TEST_F(protocol, create)
->>   	ASSERT_EQ(EAFNOSUPPORT, test_socket(&self->unspec_srv0));
->>   }
->>   
->> +TEST_F(protocol, socket_access_rights)
->> +{
->> +	const struct landlock_ruleset_attr ruleset_attr = {
->> +		.handled_access_socket = ACCESS_ALL,
->> +	};
->> +	struct landlock_socket_attr protocol = {
->> +		.family = self->srv0.protocol.family,
->> +		.type = self->srv0.protocol.type,
->> +	};
->> +	int ruleset_fd;
->> +	__u64 access;
->> +
->> +	ruleset_fd =
->> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
->> +	ASSERT_LE(0, ruleset_fd);
->> +
->> +	for (access = 1; access <= ACCESS_LAST; access <<= 1) {
->> +		protocol.allowed_access = access;
->> +		EXPECT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
->> +					       &protocol, 0))
->> +		{
->> +			TH_LOG("Failed to add rule with access 0x%llx: %s",
->> +			       access, strerror(errno));
->> +		}
->> +	}
->> +	EXPECT_EQ(0, close(ruleset_fd));
-> 
-> Reviewed-by: Günther Noack <gnoack@google.com>
-> 
-> P.S. We are inconsistent with our use of EXPECT/ASSERT for test teardown.  The
-> fs_test.c uses ASSERT_EQ in these places whereas net_test.c and your new tests
-> use EXPECT_EQ.
-> 
-> It admittedly does not make much of a difference for close(), so should be OK.
-> Some other selftests are even ignoring the result for close().  If we want to
-> make it consistent in the Landlock tests again, we can also do it in an
-> independent sweep.
-> 
-> I filed a small cleanup task as a reminder:
-> https://github.com/landlock-lsm/linux/issues/31
-> 
-> —Günther
+In that case, my recommendation is to do as sja1105_setup_tc_cbs() does:
+replace priv->speed with the portTransmitRate recovered from the tc-cbs
+parameters, and fully expect that when the link speed changes, user
+space comes along and changes those parameters.
 
