@@ -1,235 +1,91 @@
-Return-Path: <netdev+bounces-99446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 585C18D4EB4
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:09:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 138F48D4EE4
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:17:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1FA31F2356E
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 15:09:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A35441F25D0F
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 15:16:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA40F17D8A0;
-	Thu, 30 May 2024 15:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC3E8187549;
+	Thu, 30 May 2024 15:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JqM9B8lg"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B00145A01;
-	Thu, 30 May 2024 15:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F32187540;
+	Thu, 30 May 2024 15:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717081755; cv=none; b=X1NM0irFa2CIy6f6KlS/FJw28x9+dWKRuwps36XT/Zjh0ds87PYyPUDoq8TzNngqK/gZ4UpMGULT0inZ610BjraQGL4Ae7CjMDci6K63wsSLRTQQyXI/LG3SWYKtXl4TEvg36VPV89RKnf5jUwpFaDYS17owvQCGHf7mvr/ojvA=
+	t=1717082215; cv=none; b=aKfPl5jdNpEXl9tojErftjSBNQn6VQz2cjSaanLaYIkAGERLn42hIuBS9xjdGyS3G+UxMKkZ+09LhEfkMD6viaC8AGmp5a/yfP+QRpWVCbJ6pKIOVeBHzVDYu+1imUDYSEziwHU318gsrWPPfyzk7Wtms+9yzxZyEitoKiJy/bQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717081755; c=relaxed/simple;
-	bh=I3znZk7Px2aLbm4BQbBDIODP0k06GM7AnNSbWvHr/Wo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=uG+6i8Un9xHn3/TDEcqr51bbiQTy5eegkSkWI1/OgVECKTy2e3rKvudA1Jfa+sd/tYFYk2jWMo4AzW+5/u7OaBqlazpM5675/q1c2NHppjZ53puB6/Dq0cQT4xGvHXDqeO3vB70wIDiOy9mLI7m5v7VV37UuG2xkS9buEKEf2qs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4VqqLK61MNz1S7Mv;
-	Thu, 30 May 2024 23:05:13 +0800 (CST)
-Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
-	by mail.maildlp.com (Postfix) with ESMTPS id A0C2A180069;
-	Thu, 30 May 2024 23:09:02 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 30 May 2024 23:08:58 +0800
-Message-ID: <f79783ff-5ab7-163e-d2d3-4af9872a38c6@huawei-partners.com>
-Date: Thu, 30 May 2024 18:08:53 +0300
+	s=arc-20240116; t=1717082215; c=relaxed/simple;
+	bh=fa0yMmxC2QPbMThwYz+/xLlUrjogilIctWdLDj2RcM0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JQQIP/SX9hj7Ayuwfctm0ZEBhpE3wWv05lPlbN70eLOpa7IX/aX6U3M4sr9vZV8AGqqw0QWPZkUGDUSiVWBWmxCRJkUe8oSGuTBiyMm84Rbvqmbw9A/vKlayo7fOs0e0E6UyuXDO9edgpYkovDscOnjkuEG7LBY/FxdYlPBtqiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JqM9B8lg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE0DFC32781;
+	Thu, 30 May 2024 15:16:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717082215;
+	bh=fa0yMmxC2QPbMThwYz+/xLlUrjogilIctWdLDj2RcM0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JqM9B8lgLMEU14G4JMKkVxyi0rQSZ0GgNxBmdZ31ubamsPc3dAsXAPpNIsH/KHkIg
+	 mKhYPU5eqT0XEfOdVIfwx3e1xJ/9bslazZjlL6GJRYiLyzFI5/FHsgY5alz4vsg+Yl
+	 uxYZhauXnZkjj18On86xNKMvuypSdlN9XZ341erSw5lylEkj7AtuXzWoOTsLAA+uAH
+	 7cpnm2s5ZS9XFX+TsFyPGXV0a2VoFX87MeUHrFZVnrfpcZvwi7/vMGjOioJSAemWNm
+	 n8Cx1Mty3Qw/sNkVaN07nYH353czFcdFcGpoJvTruWwqicqmEXb6+4VLuvZiMVxAbv
+	 lNJWpwXOdPpJw==
+Date: Thu, 30 May 2024 08:16:53 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: <davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, Alexander Duyck
+ <alexander.duyck@gmail.com>, Andrew Morton <akpm@linux-foundation.org>,
+ <linux-mm@kvack.org>
+Subject: Re: [PATCH net-next v5 01/13] mm: page_frag: add a test module for
+ page_frag
+Message-ID: <20240530081653.769e4377@kernel.org>
+In-Reply-To: <1cba403b-a2c7-5706-78b7-91ccc6caa53b@huawei.com>
+References: <20240528125604.63048-1-linyunsheng@huawei.com>
+	<20240528125604.63048-2-linyunsheng@huawei.com>
+	<20240529172938.3a83784d@kernel.org>
+	<1cba403b-a2c7-5706-78b7-91ccc6caa53b@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 08/12] selftests/landlock: Add
- tcp_layers.ruleset_overlap to socket tests
-Content-Language: ru
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
-CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
-	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-References: <20240524093015.2402952-1-ivanov.mikhail1@huawei-partners.com>
- <20240524093015.2402952-9-ivanov.mikhail1@huawei-partners.com>
- <ZlT2edk0lBcMPcjp@google.com>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <ZlT2edk0lBcMPcjp@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
- dggpemm500020.china.huawei.com (7.185.36.49)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-
-
-5/28/2024 12:09 AM, Günther Noack wrote:
-> On Fri, May 24, 2024 at 05:30:11PM +0800, Mikhail Ivanov wrote:
->> * Add tcp_layers fixture for tests that check multiple layer
->>    configuration scenarios.
->>
->> * Add test that validates multiple layer behavior with overlapped
->>    restrictions.
->>
->> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->> ---
->>
->> Changes since v1:
->> * Replaces test_socket_create() with test_socket().
->> * Formats code with clang-format.
->> * Refactors commit message.
->> * Minor fixes.
->> ---
->>   .../testing/selftests/landlock/socket_test.c  | 109 ++++++++++++++++++
->>   1 file changed, 109 insertions(+)
->>
->> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testing/selftests/landlock/socket_test.c
->> index 751596c381fe..52edc1a8ac21 100644
->> --- a/tools/testing/selftests/landlock/socket_test.c
->> +++ b/tools/testing/selftests/landlock/socket_test.c
->> @@ -299,4 +299,113 @@ TEST_F(protocol, inval)
->>   				       &protocol, 0));
->>   }
->>   
->> +FIXTURE(tcp_layers)
->> +{
->> +	struct service_fixture srv0;
->> +};
->> +
->> +FIXTURE_VARIANT(tcp_layers)
->> +{
->> +	const size_t num_layers;
->> +};
->> +
->> +FIXTURE_SETUP(tcp_layers)
->> +{
->> +	const struct protocol_variant prot = {
->> +		.family = AF_INET,
->> +		.type = SOCK_STREAM,
->> +	};
->> +
->> +	disable_caps(_metadata);
->> +	self->srv0.protocol = prot;
->> +	setup_namespace(_metadata);
->> +};
->> +
->> +FIXTURE_TEARDOWN(tcp_layers)
->> +{
->> +}
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(tcp_layers, no_sandbox_with_ipv4) {
->> +	/* clang-format on */
->> +	.num_layers = 0,
->> +};
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(tcp_layers, one_sandbox_with_ipv4) {
->> +	/* clang-format on */
->> +	.num_layers = 1,
->> +};
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(tcp_layers, two_sandboxes_with_ipv4) {
->> +	/* clang-format on */
->> +	.num_layers = 2,
->> +};
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(tcp_layers, three_sandboxes_with_ipv4) {
->> +	/* clang-format on */
->> +	.num_layers = 3,
->> +};
->> +
->> +TEST_F(tcp_layers, ruleset_overlap)
->> +{
->> +	const struct landlock_ruleset_attr ruleset_attr = {
->> +		.handled_access_socket = LANDLOCK_ACCESS_SOCKET_CREATE,
->> +	};
->> +	const struct landlock_socket_attr tcp_create = {
->> +		.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
->> +		.family = self->srv0.protocol.family,
->> +		.type = self->srv0.protocol.type,
->> +	};
->> +
->> +	if (variant->num_layers >= 1) {
->> +		int ruleset_fd;
->> +
->> +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
->> +						     sizeof(ruleset_attr), 0);
->> +		ASSERT_LE(0, ruleset_fd);
->> +
->> +		/* Allows create. */
->> +		ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
->> +					       &tcp_create, 0));
->> +		enforce_ruleset(_metadata, ruleset_fd);
->> +		EXPECT_EQ(0, close(ruleset_fd));
->> +	}
->> +
->> +	if (variant->num_layers >= 2) {
->> +		int ruleset_fd;
->> +
->> +		/* Creates another ruleset layer with denied create. */
->> +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
->> +						     sizeof(ruleset_attr), 0);
->> +		ASSERT_LE(0, ruleset_fd);
->> +
->> +		enforce_ruleset(_metadata, ruleset_fd);
->> +		EXPECT_EQ(0, close(ruleset_fd));
->> +	}
->> +
->> +	if (variant->num_layers >= 3) {
->> +		int ruleset_fd;
->> +
->> +		/* Creates another ruleset layer. */
->> +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
->> +						     sizeof(ruleset_attr), 0);
->> +		ASSERT_LE(0, ruleset_fd);
->> +
->> +		/* Try to allow create second time. */
->> +		ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
->> +					       &tcp_create, 0));
->> +		enforce_ruleset(_metadata, ruleset_fd);
->> +		EXPECT_EQ(0, close(ruleset_fd));
->> +	}
->> +
->> +	if (variant->num_layers < 2) {
->> +		ASSERT_EQ(0, test_socket(&self->srv0));
->> +	} else {
->> +		ASSERT_EQ(EACCES, test_socket(&self->srv0));
->> +	}
->> +}
+On Thu, 30 May 2024 17:17:17 +0800 Yunsheng Lin wrote:
+> > Is this test actually meaningfully testing page_frag or rather
+> > the objpool construct and the scheduler? :S  
 > 
-> Wouldn't this be simpler if you did multiple checks in one test, in a sequence?
+> For the objpool part, I guess it is ok to say that it is a
+> meaningfully testing for both page_frag and objpool if there is
+> changing to either of them.
+
+Why guess when you can measure it. 
+Slow one down and see if it impacts the benchmark.
+
+> For the scheduler part, this test provides the below module param
+> to avoid the the noise from scheduler.
 > 
->    * Expect that socket() works
->    * Enforce ruleset 1 with a rule
->    * Expect that socket() works
->    * Enforce ruleset 2 without a rule
->    * Expect that socket() fails
->    * Enforce ruleset 3
->    * Expect that socket() still fails
+> +static int test_push_cpu;
+> +module_param(test_push_cpu, int, 0600);
+> +MODULE_PARM_DESC(test_push_cpu, "test cpu for pushing fragment");
+> +
+> +static int test_pop_cpu;
+> +module_param(test_pop_cpu, int, 0600);
+> +MODULE_PARM_DESC(test_pop_cpu, "test cpu for popping fragment");
 > 
-> Then it would test the same and you would not need the fixture.
-> If you extracted these if bodies above into helper functions,
-> I think it would also read reasonably well.
-
-I adapted this test from net_test.c and wanted it to remain similar to
-the original. But I agree that such simplification is rational, probably
-it's worth a little inconsistency.
-
-Perhaps this test should be made common, like the tests that were
-discussed earlier [1].
-
-[1] 
-https://lore.kernel.org/all/f4b5e2b9-e960-fd08-fdf4-328bb475e2ef@huawei-partners.com/
-
-> 
-> —Günther
+> Or is there any better idea for testing page_frag?
 
