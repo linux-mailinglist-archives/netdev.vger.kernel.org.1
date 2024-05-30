@@ -1,47 +1,41 @@
-Return-Path: <netdev+bounces-99331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BF408D4843
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 11:20:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B36138D4847
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 11:21:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01B841F217D0
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 09:20:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E08F281C49
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 09:21:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C6C6F2FF;
-	Thu, 30 May 2024 09:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="maGjA+QM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 247FB6F301;
+	Thu, 30 May 2024 09:21:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5654D2B9A6;
-	Thu, 30 May 2024 09:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0870183971;
+	Thu, 30 May 2024 09:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717060830; cv=none; b=uVX6x97EMytOqNcQoBp3EFl6GonOvQNJ6QyJWt04Dsx01dmSALZ0Le4Am70CFiUAQxLGUQvQ8EG+4zOP50I9cczB73ffSvbzxAxM/KmppzqV0j8eGd9H+5pDogwuLdNxI2Zi1hGeWCbpNxINNCdFnnzFbRjlpQHSz/1MosfKyEw=
+	t=1717060889; cv=none; b=PM+yIkoUalI8UQzs8tlo2NdpmxSuod6pnCtmIzXASEnxq2TJnnkA/ZIyPd2Q+pTR4u+F9oT8U4bMkB+8bUccLcI5b3RGrXekqsEqdcFNOeovROfMniZJ9RgeO3hR49WSuDfSyVJgGNXgIY56G6EvH1fQ9el6YfJEtHaGV6/3juc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717060830; c=relaxed/simple;
-	bh=AS8FoxNq/3y4juMwXgw0wFGMhWR72c8hGDpfc19TXSk=;
-	h=Content-Type:Message-ID:Date:MIME-Version:To:Cc:From:Subject; b=PeHcxiOyV6rfQwjmrwAuC4ikUNPUwHfM4Kz6JDHUCwOIMbtViXzlrkmjYcYmCMGgdkhsq2FOiv1f1LIxP3eKfQUlQF76oCDnRr5mlciqRzFEcDm0Fcw3gOKuwz90c+gwbjxWgmB889aqyUpFRzEiK6DtqrMVgXHvgUBzA+q3TpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=maGjA+QM; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1717060824; h=Content-Type:Message-ID:Date:MIME-Version:To:From:Subject;
-	bh=f4MSym5b4AKHh3k0J9Ynf9t0qQOu2NHa4FMrcrBRobg=;
-	b=maGjA+QMKJ+ap1vYccZXqr2qyVSERqw9gwVsthcW1FfCeMQBVMoYZpPMN7XpWWaMBvBHfjRiIjmxfvRUf34dAwBW2UWiAYcBcLa7GhRB/O56ijoUd47GRG38EUGidSSXIG+PeF2E29Pi4gCs4FZVjQ/FyXvtsz0mZM8FLSen5zg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067113;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0W7Wbif1_1717060813;
-Received: from 30.221.130.47(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W7Wbif1_1717060813)
-          by smtp.aliyun-inc.com;
-          Thu, 30 May 2024 17:20:23 +0800
-Content-Type: multipart/mixed; boundary="------------lg3kpQHr1m0Tha1wwCOSWEXb"
-Message-ID: <5eaf3858-e7fd-4db8-83e8-3d7a3e0e9ae2@linux.alibaba.com>
-Date: Thu, 30 May 2024 17:20:12 +0800
+	s=arc-20240116; t=1717060889; c=relaxed/simple;
+	bh=WyJ8/AA8xtDaG+uv7jk8HpbPR3mDB7JxK6qcLYPk1QU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dKBGx3txC0aWBT9QD6jVuHMP/fMJqCDzVVyNz5z2Yf1SVsTvVsGsu1goRTc4+pyws8p7zXoEqSHdT3mi+mGB8f8yJx9alev5qe9kRfnDpGygfd06S3WKygvR8LBNckUEtYfC6EnVjeukWETnChOfsGWpw+Ct7PwSxIVpLQpH03E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-IronPort-AV: E=Sophos;i="6.08,199,1712588400"; 
+   d="asc'?scan'208";a="206163612"
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie5.idc.renesas.com with ESMTP; 30 May 2024 18:21:23 +0900
+Received: from [10.226.92.79] (unknown [10.226.92.79])
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id 1697C400F2CC;
+	Thu, 30 May 2024 18:21:18 +0900 (JST)
+Message-ID: <e7cf9dd8-9c67-476b-a892-b8dbe9312c4c@bp.renesas.com>
+Date: Thu, 30 May 2024 10:21:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,324 +43,395 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: Gerd Bayer <gbayer@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
- Jan Karcher <jaka@linux.ibm.com>
-Cc: "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-From: Wen Gu <guwen@linux.alibaba.com>
-Subject: Re: [PATCH net v3 2/2] net/smc: Use correct buffer sizes when
- switching between TCP and SMC
+Subject: Re: [net-next PATCH v4 7/7] net: ravb: Allocate RX buffers via page
+ pool
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Biju Das <biju.das.jz@bp.renesas.com>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240528150339.6791-1-paul.barker.ct@bp.renesas.com>
+ <20240528150339.6791-8-paul.barker.ct@bp.renesas.com>
+ <eefce0af-2771-a56c-753d-85fe991fdf31@omp.ru>
+Content-Language: en-GB
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+Organization: Renesas Electronics Corporation
+In-Reply-To: <eefce0af-2771-a56c-753d-85fe991fdf31@omp.ru>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------NduQAJmKJW5S98p94IasMcFk"
 
-This is a multi-part message in MIME format.
---------------lg3kpQHr1m0Tha1wwCOSWEXb
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------NduQAJmKJW5S98p94IasMcFk
+Content-Type: multipart/mixed; boundary="------------tT627k6zk8L9vxPOpFEzDnM7";
+ protected-headers="v1"
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Biju Das <biju.das.jz@bp.renesas.com>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Message-ID: <e7cf9dd8-9c67-476b-a892-b8dbe9312c4c@bp.renesas.com>
+Subject: Re: [net-next PATCH v4 7/7] net: ravb: Allocate RX buffers via page
+ pool
+References: <20240528150339.6791-1-paul.barker.ct@bp.renesas.com>
+ <20240528150339.6791-8-paul.barker.ct@bp.renesas.com>
+ <eefce0af-2771-a56c-753d-85fe991fdf31@omp.ru>
+In-Reply-To: <eefce0af-2771-a56c-753d-85fe991fdf31@omp.ru>
 
-> Tuning of the effective buffer size through setsockopts was working for
-> SMC traffic only but not for TCP fall-back connections even before
-> commit 0227f058aa29 ("net/smc: Unbind r/w buffer size from clcsock and
-> make them tunable"). That change made it apparent that TCP fall-back
-> connections would use net.smc.[rw]mem as buffer size instead of
-> net.ipv4_tcp_[rw]mem.
-> 
-> Amend the code that copies attributes between the (TCP) clcsock and the
-> SMC socket and adjust buffer sizes appropriately:
-> - Copy over sk_userlocks so that both sockets agree on whether tuning
->   via setsockopt is active.
-> - When falling back to TCP use sk_sndbuf or sk_rcvbuf as specified with
->   setsockopt. Otherwise, use the sysctl value for TCP/IPv4.
-> - Likewise, use either values from setsockopt or from sysctl for SMC
->   (duplicated) on successful SMC connect.
-> 
-> In smc_tcp_listen_work() drop the explicit copy of buffer sizes as that
-> is taken care of by the attribute copy.
+--------------tT627k6zk8L9vxPOpFEzDnM7
+Content-Type: multipart/mixed; boundary="------------gYXoYI3vxxKEXotyQaJdbFVX"
 
-[...]
-> +/* if set, use value set by setsockopt() - else use IPv4 or SMC sysctl value */
-> +static void smc_adjust_sock_bufsizes(struct sock *nsk, struct sock *osk,
-> +				     unsigned long mask)
-> +{
-> +	struct net *nnet = sock_net(nsk);
-> +
-> +	nsk->sk_userlocks = osk->sk_userlocks;
-> +	if (osk->sk_userlocks & SOCK_SNDBUF_LOCK) {
-> +		nsk->sk_sndbuf = osk->sk_sndbuf;
-> +	} else {
-> +		if (mask == SK_FLAGS_SMC_TO_CLC)
-> +			WRITE_ONCE(nsk->sk_sndbuf,
-> +				   READ_ONCE(nnet->ipv4.sysctl_tcp_wmem[1]));
+--------------gYXoYI3vxxKEXotyQaJdbFVX
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Gerd,
+On 29/05/2024 21:52, Sergey Shtylyov wrote:
+> On 5/28/24 6:03 PM, Paul Barker wrote:
+>=20
+>> This patch makes multiple changes that can't be separated:
+>>
+>>   1) Allocate plain RX buffers via a page pool instead of allocating
+>>      SKBs, then use build_skb() when a packet is received.
+>>   2) For GbEth IP, reduce the RX buffer size to 2kB.
+>>   3) For GbEth IP, merge packets which span more than one RX descripto=
+r
+>>      as SKB fragments instead of copying data.
+>>
+>> Implementing (1) without (2) would require the use of an order-1 page
+>> pool (instead of an order-0 page pool split into page fragments) for
+>> GbEth.
+>>
+>> Implementing (2) without (3) would leave us no space to re-assemble
+>> packets which span more than one RX descriptor.
+>>
+>> Implementing (3) without (1) would not be possible as the network stac=
+k
+>> expects to use put_page() or page_pool_put_page() to free SKB fragment=
+s
+>> after an SKB is consumed.
+>>
+>> RX checksum offload support is adjusted to handle both linear and
+>> nonlinear (fragmented) packets.
+>>
+>> This patch gives the following improvements during testing with iperf3=
+=2E
+>>
+>>   * RZ/G2L:
+>>     * TCP RX: same bandwidth at -43% CPU load (70% -> 40%)
+>>     * UDP RX: same bandwidth at -17% CPU load (88% -> 74%)
+>>
+>>   * RZ/G2UL:
+>>     * TCP RX: +30% bandwidth (726Mbps -> 941Mbps)
+>>     * UDP RX: +417% bandwidth (108Mbps -> 558Mbps)
+>>
+>>   * RZ/G3S:
+>>     * TCP RX: +64% bandwidth (562Mbps -> 920Mbps)
+>>     * UDP RX: +420% bandwidth (90Mbps -> 468Mbps)
+>>
+>>   * RZ/Five:
+>>     * TCP RX: +217% bandwidth (145Mbps -> 459Mbps)
+>>     * UDP RX: +470% bandwidth (20Mbps -> 114Mbps)
+>>
+>> There is no significant impact on bandwidth or CPU load in testing on
+>> RZ/G2H or R-Car M3N.
+>>
+>> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+>> ---
+>> Changes v3->v4:
+>>   * Used a separate page pool for each RX queue.
+>>   * Passed struct ravb_rx_desc to ravb_alloc_rx_buffer() so that we ca=
+n
+>>     simplify the calling function.
+>>   * Explained the calculation of rx_desc->ds_cc.
+>>   * Added handling of nonlinear SKBs in ravb_rx_csum_gbeth().
+>>
+>>  drivers/net/ethernet/renesas/ravb.h      |  10 +-
+>>  drivers/net/ethernet/renesas/ravb_main.c | 230 ++++++++++++++--------=
+-
+>>  2 files changed, 146 insertions(+), 94 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/etherne=
+t/renesas/ravb.h
+>> index 6a7aa7dd17e6..f2091a17fcf7 100644
+>> --- a/drivers/net/ethernet/renesas/ravb.h
+>> +++ b/drivers/net/ethernet/renesas/ravb.h
+> [...]> @@ -1094,7 +1099,8 @@ struct ravb_private {
+>>  	struct ravb_tx_desc *tx_ring[NUM_TX_QUEUE];
+>>  	void *tx_align[NUM_TX_QUEUE];
+>>  	struct sk_buff *rx_1st_skb;
+>> -	struct sk_buff **rx_skb[NUM_RX_QUEUE];
+>> +	struct page_pool *rx_pool[NUM_RX_QUEUE];
+>=20
+>    Don't we need #include <net/page_pool/types.h>
 
-I noticed that during TCP connection establishment, tcp_sndbuf_expand()
-will tune sk->sk_sndbuf, that causes clcsock's sk_sndbuf to no longer
-be sysctl_tcp_wmem[1]. But here we set it back to sysctl_tcp_wmem[1].
+Yes. I got away with it as ravb_main.c includes
+<net/page_pool/helpers.h> before including "ravb.h", but the header
+shouldn't assume that.
 
-So I did some tests to see if the values of sk_sndbuf and sk_rcvbuf are
-as expected in SMC and fallback cases (see the attached server.c and
-client.c for the reproducer and here are the sysctl values in my environment)
+>=20
+> [...]
+>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/et=
+hernet/renesas/ravb_main.c
+>> index dd92f074881a..bb7f7d44be6e 100644
+>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> [...]
+>> @@ -317,35 +289,56 @@ static void ravb_ring_free(struct net_device *nd=
+ev, int q)
+>>  	priv->tx_skb[q] =3D NULL;
+>>  }
+>> =20
+>> +static int
+>> +ravb_alloc_rx_buffer(struct net_device *ndev, int q, u32 entry, gfp_t=
+ gfp_mask,
+>> +		     struct ravb_rx_desc *rx_desc)
+>> +{
+>> +	struct ravb_private *priv =3D netdev_priv(ndev);
+>> +	const struct ravb_hw_info *info =3D priv->info;
+>> +	struct ravb_rx_buffer *rx_buff =3D &priv->rx_buffers[q][entry];
+>> +	dma_addr_t dma_addr;
+>> +	unsigned int size;
+>> +
+>> +	size =3D info->rx_buffer_size;
+>> +	rx_buff->page =3D page_pool_alloc(priv->rx_pool[q], &rx_buff->offset=
+, &size,
+>> +					gfp_mask);
+>> +	if (unlikely(!rx_buff->page)) {
+>> +		/* We just set the data size to 0 for a failed mapping
+>> +		 * which should prevent DMA from happening...
+>> +		 */
+>> +		rx_desc->ds_cc =3D cpu_to_le16(0);
+>> +		return -ENOMEM;
+>> +	}
+>> +
+>> +	dma_addr =3D page_pool_get_dma_addr(rx_buff->page) + rx_buff->offset=
+;
+>> +	dma_sync_single_for_device(ndev->dev.parent, dma_addr,
+>> +				   info->rx_buffer_size, DMA_FROM_DEVICE);
+>=20
+>    Do we really need this call?
 
-net.ipv4.tcp_wmem = 4096        4096    16777216
-net.ipv4.tcp_rmem = 4096        4096    16777216
-net.smc.wmem = 65536
-net.smc.rmem = 65536
+Looking at .config I see CONFIG_DMA_NEED_SYNC=3Dy so yes I think this is
+needed.
 
+>=20
+>> +	rx_desc->dptr =3D cpu_to_le32(dma_addr);
+>> +
+>> +	/* The end of the RX buffer is used to store skb shared data, so we =
+need
+>> +	 * to ensure that the hardware leaves enough space for this.
+>> +	 */
+>> +	rx_desc->ds_cc =3D cpu_to_le16(info->rx_buffer_size
+>> +				     - SKB_DATA_ALIGN(sizeof(struct skb_shared_info))
+>=20
+>    Please leave the - operator on the previous line...
 
-1. No additional sk_{snd|rcv}buf settings
+Ack.
 
-1.1 TCP
+>=20
+>> +				     - ETH_FCS_LEN + sizeof(__sum16));
+>=20
+>    Here as well...
 
-     ./server
-     ./client -i <serv_ip>
+Ack.
 
-     results:
-     - server: sndbuf_size 87040, rcvbuf_size 4096
-     - client: sndbuf_size 87040, rcvbuf_size 4096
+>=20
+>> +	return 0;
+>> +}
+>> +
+>>  static u32
+>>  ravb_rx_ring_refill(struct net_device *ndev, int q, u32 count, gfp_t =
+gfp_mask)
+>>  {
+>>  	struct ravb_private *priv =3D netdev_priv(ndev);
+>> -	const struct ravb_hw_info *info =3D priv->info;
+>>  	struct ravb_rx_desc *rx_desc;
+>> -	dma_addr_t dma_addr;
+>>  	u32 i, entry;
+>> =20
+>>  	for (i =3D 0; i < count; i++) {
+>>  		entry =3D (priv->dirty_rx[q] + i) % priv->num_rx_ring[q];
+>>  		rx_desc =3D ravb_rx_get_desc(priv, q, entry);
+>> -		rx_desc->ds_cc =3D cpu_to_le16(info->rx_max_desc_use);
+>> =20
+>> -		if (!priv->rx_skb[q][entry]) {
+>> -			priv->rx_skb[q][entry] =3D ravb_alloc_skb(ndev, info, gfp_mask);
+>> -			if (!priv->rx_skb[q][entry])
+>> +		if (!priv->rx_buffers[q][entry].page) {
+>> +			if (unlikely(ravb_alloc_rx_buffer(ndev, q, entry,
+>=20
+>    Well, IIRC Greg KH is against using unlikely() unless you have actua=
+lly
+> instrumented the code and this gives an improvement... have you? :-)
 
-1.2 SMC
+My understanding was that we should use unlikely() for error checking in
+hot code paths where we want the "good" path to be optimised. I can drop
+this if I'm wrong though.
 
-     smc_run ./server
-     smc_run ./client -i <serv_ip>
+>=20
+> [...]
+>> @@ -727,12 +739,22 @@ static void ravb_rx_csum_gbeth(struct sk_buff *s=
+kb)
+>>  	if (unlikely(skb->len < sizeof(__sum16) * 2))
+>>  		return;
+>> =20
+>> -	hw_csum =3D skb_tail_pointer(skb) - sizeof(__sum16);
+>> +	if (skb_is_nonlinear(skb)) {
+>> +		last_frag =3D &shinfo->frags[shinfo->nr_frags - 1];
+>> +		hw_csum =3D skb_frag_address(last_frag) + skb_frag_size(last_frag) =
+- sizeof(__sum16);
+>> +	} else {
+>> +		hw_csum =3D skb_tail_pointer(skb) - sizeof(__sum16);
+>> +	}
+>=20
+>    We can do the subtraction only once here...
 
-     results:
-     - server: sndbuf_size 131072, rcvbuf_size 131072
-     - client: sndbuf_size 131072, rcvbuf_size 131072
+Ack. I'll pull that out of the if.
 
-1.3 SMC, but server fallback
+>=20
+> [...]
+>> @@ -816,14 +824,26 @@ static int ravb_rx_gbeth(struct net_device *ndev=
+, int budget, int q)
+>>  			if (desc_status & MSC_CEEF)
+>>  				stats->rx_missed_errors++;
+>>  		} else {
+>> +			struct ravb_rx_buffer *rx_buff =3D &priv->rx_buffers[q][entry];
+>> +			void *rx_addr =3D page_address(rx_buff->page) + rx_buff->offset;
+>=20
+>    Need an empty line here...
 
-     smc_run ./server
-     ./client -i <serv_ip>
+Ack.
 
-     results:
-     - server: sndbuf_size 87040, rcvbuf_size 4096
-     - client: sndbuf_size 87040, rcvbuf_size 4096
+>=20
+>>  			die_dt =3D desc->die_dt & 0xF0;
+>> -			skb =3D ravb_get_skb_gbeth(ndev, entry, desc);
+>> +			dma_sync_single_for_cpu(ndev->dev.parent, le32_to_cpu(desc->dptr),=
 
-1.4 SMC, but client fallback
+>> +						desc_len, DMA_FROM_DEVICE);
+>> +
+>>  			switch (die_dt) {
+>>  			case DT_FSINGLE:
+>>  			case DT_FSTART:
+>>  				/* Start of packet:
+>> -				 * Set initial data length.
+>> +				 * Prepare an SKB and add initial data.
+>=20
+>    I'd prefer calling it skb in the comments...
 
-     ./server
-     smc_run ./client -i <serv_ip>
+Ack.
 
-     results:
-     - server: sndbuf_size 87040, rcvbuf_size 4096
-     - client: sndbuf_size 4096, rcvbuf_size 4096    <--- I think clcsock's sk_sndbuf should
-                                                          be the same as 1.1 after fallback?
+>=20
+> [...]
+>> @@ -865,7 +894,16 @@ static int ravb_rx_gbeth(struct net_device *ndev,=
+ int budget, int q)
+>>  				stats->rx_bytes +=3D skb->len;
+>>  				napi_gro_receive(&priv->napi[q], skb);
+>>  				rx_packets++;
+>> +
+>> +				/* Clear rx_1st_skb so that it will only be
+>> +				 * non-NULL when valid.
+>> +				 */
+>> +				if (die_dt =3D=3D DT_FEND)
+>> +					priv->rx_1st_skb =3D NULL;
+>=20
+>    Hm, can't we do this under *case* DT_FEND above?
 
+It makes more logical sense to me to do this as the last step, but I
+guess it's a little more optimal to do it earlier. I'll move it.
 
-2. Set server listen sock's and client sock's sk_{snd|rcv}buf
-    as 16KB by setsockopt() before connection establishment.
+Thanks,
 
-2.1 TCP
+--=20
+Paul Barker
+--------------gYXoYI3vxxKEXotyQaJdbFVX
+Content-Type: application/pgp-keys; name="OpenPGP_0x27F4B3459F002257.asc"
+Content-Disposition: attachment; filename="OpenPGP_0x27F4B3459F002257.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-     ./server -s 16384
-     ./client -i <serv_ip> -s 16384
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
-     results:
-     - server: sndbuf_size 32768, rcvbuf_size 32768
-     - client: sndbuf_size 32768, rcvbuf_size 32768
+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3D
+=3DsIIN
+-----END PGP PUBLIC KEY BLOCK-----
 
-2.2 SMC
+--------------gYXoYI3vxxKEXotyQaJdbFVX--
 
-     smc_run ./server -s 16384
-     smc_run ./client -i <serv_ip> -s 16384
+--------------tT627k6zk8L9vxPOpFEzDnM7--
 
-     results:
-     - server: sndbuf_size 32768, rcvbuf_size 32768
-     - client: sndbuf_size 32768, rcvbuf_size 32768
+--------------NduQAJmKJW5S98p94IasMcFk
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-2.3 SMC, but server fallback
+-----BEGIN PGP SIGNATURE-----
 
-     smc_run ./server -s 16384
-     ./client -i <serv_ip> -s 16384
+wnsEABYIACMWIQSiu8gv1Xr0fIw/aoLbaV4Vf/JGvQUCZlhFDQUDAAAAAAAKCRDbaV4Vf/JGvcXD
+AQCrgEBeh3Q47M88KJr3A+824TVXmdwbR8DZTYZJWvTYgAEAnyZP9yXhntoUECQxVpmydhJiR0fi
+eeluhSL2cfp0MQ4=
+=BtU8
+-----END PGP SIGNATURE-----
 
-     results:
-     - server: sndbuf_size 32768, rcvbuf_size 32768
-     - client: sndbuf_size 32768, rcvbuf_size 32768
-
-2.4 SMC, but client fallback
-
-     ./server -s 16384
-     smc_run ./client -i <serv_ip> -s 16384
-
-     results:
-     - server: sndbuf_size 32768, rcvbuf_size 32768
-     - client: sndbuf_size 32768, rcvbuf_size 32768
-
-
-In the above 8 sets of tests, 1.4 does not seem to meet expectations.
-It is because we reset clcsock's sk_sndbuf to sysctl_tcp_wmem[1] in
-smc_copy_sock_settings_to_clc(). I think it should be like 1.1 TCP values
-after fallback. What do you think?
-
-If so, we may need to avoid setting sysctl value to clcsock's sk_sndbuf
-in smc_adjust_sock_bufsizes(). Furthermore, maybe all the setting-sysctl-value
-can be omitted, since smc sock's and clcsock's sk_{snd|rcv}buf have been
-set to sysctl value during their sock initialization (smc_sock_alloc() and
-tcp_init_sock()).
-
-
-And another question is why 1.3 is as expected? The direct cause is that
-server does not call smc_copy_sock_settings_to_clc() when fallback, like the
-client smc_connect_fallback() does. But I didn't figure out what is the
-reason for the different behavior? Do you have any information? Thanks a lot!
-
-
-Best regards,
-Wen Gu
-
-> +		else
-> +			WRITE_ONCE(nsk->sk_sndbuf,
-> +				   2 * READ_ONCE(nnet->smc.sysctl_wmem));
-> +	}
-> +	if (osk->sk_userlocks & SOCK_RCVBUF_LOCK) {
-> +		nsk->sk_rcvbuf = osk->sk_rcvbuf;
-> +	} else {
-> +		if (mask == SK_FLAGS_SMC_TO_CLC)
-> +			WRITE_ONCE(nsk->sk_rcvbuf,
-> +				   READ_ONCE(nnet->ipv4.sysctl_tcp_rmem[1]));
-> +		else
-> +			WRITE_ONCE(nsk->sk_rcvbuf,
-> +				   2 * READ_ONCE(nnet->smc.sysctl_rmem));
-> +	}
-> +}
-> +
-
-[...]
-
---------------lg3kpQHr1m0Tha1wwCOSWEXb
-Content-Type: text/plain; charset=UTF-8; name="client.c"
-Content-Disposition: attachment; filename="client.c"
-Content-Transfer-Encoding: base64
-
-I2luY2x1ZGUgPHN0ZGlvLmg+CiNpbmNsdWRlIDxzdHJpbmcuaD4KI2luY2x1ZGUgPHN0ZGxp
-Yi5oPgojaW5jbHVkZSA8dW5pc3RkLmg+CiNpbmNsdWRlIDxhcnBhL2luZXQuaD4KI2luY2x1
-ZGUgPHN5cy9zb2NrZXQuaD4KI2luY2x1ZGUgPG5ldGluZXQvaW4uaD4KI2luY2x1ZGUgPHN0
-ZGJvb2wuaD4KI2luY2x1ZGUgPGVycm5vLmg+CiNpbmNsdWRlIDxuZXRpbmV0L3RjcC5oPgoK
-I2lmbmRlZiBBRl9TTUMKI2RlZmluZSBBRl9TTUMgICAgICAgICAgNDMKI2VuZGlmCiNkZWZp
-bmUgTkVUX1BST1RPQ0FMICAgIEFGX0lORVQKI2RlZmluZSBTRVJWX0lQICAgICAgICAgIjEx
-LjIxMy41LjMzIgojZGVmaW5lIFNFUlZfUE9SVCAgICAgICAxMDAxMgoKY2hhciAqaXA7Cgpp
-bnQgbmV0X2NsbnQoaW50IGJ1Zl9zaXplLCBpbnQgcG9ydCkKewogICAgICAgIGludCBzbmRi
-dWZfc2l6ZSwgcmN2YnVmX3NpemU7CiAgICAgICAgc3RydWN0IHNvY2thZGRyX2luIHNfYWRk
-cjsKICAgICAgICBjaGFyIG1zZ1sxMjhdID0geyAwIH07CiAgICAgICAgaW50IG9wdGxlbiA9
-IDQ7CiAgICAgICAgaW50IHNvY2s7CiAgICAgICAgaW50IHJjOwoKICAgICAgICBpZiAoIXBv
-cnQpCiAgICAgICAgICAgICAgICBwb3J0ID0gU0VSVl9QT1JUOwoKICAgICAgICBzb2NrID0g
-c29ja2V0KE5FVF9QUk9UT0NBTCwgU09DS19TVFJFQU0sIDApOwoKICAgICAgICBpZiAoYnVm
-X3NpemUpIHsKICAgICAgICAgICAgICAgIHNuZGJ1Zl9zaXplID0gcmN2YnVmX3NpemUgPSBi
-dWZfc2l6ZTsKICAgICAgICAgICAgICAgIC8qIHNldCBzbmRidWYgYW5kIHJjdmJ1ZiAqLwog
-ICAgICAgICAgICAgICAgaWYgKHNldHNvY2tvcHQoc29jaywgU09MX1NPQ0tFVCwgU09fU05E
-QlVGLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZzbmRidWZfc2l6ZSwgc2l6
-ZW9mKGludCkpKSB7CiAgICAgICAgICAgICAgICAgICAgICAgIHByaW50Zigic2V0IHNuZGJ1
-ZiBmYWlsZWRcbiIpOwogICAgICAgICAgICAgICAgICAgICAgICByZXR1cm4gMDsKICAgICAg
-ICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGlmIChzZXRzb2Nrb3B0KHNvY2ssIFNPTF9T
-T0NLRVQsIFNPX1JDVkJVRiwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmcmN2
-YnVmX3NpemUsIHNpemVvZihpbnQpKSkgewogICAgICAgICAgICAgICAgICAgICAgICBwcmlu
-dGYoInNldCByY3ZidWYgZmFpbGVkXG4iKTsKICAgICAgICAgICAgICAgICAgICAgICAgcmV0
-dXJuIDA7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICBtZW1zZXQoJnNf
-YWRkciwgMCwgc2l6ZW9mKHNfYWRkcikpOwogICAgICAgIHNfYWRkci5zaW5fZmFtaWx5ID0g
-TkVUX1BST1RPQ0FMOwogICAgICAgIGlmIChpcCkKICAgICAgICAgICAgICAgIHNfYWRkci5z
-aW5fYWRkci5zX2FkZHIgPSBpbmV0X2FkZHIoaXApOwogICAgICAgIGVsc2UKICAgICAgICAg
-ICAgICAgIHNfYWRkci5zaW5fYWRkci5zX2FkZHIgPSBpbmV0X2FkZHIoU0VSVl9JUCk7CiAg
-ICAgICAgc19hZGRyLnNpbl9wb3J0ID0gaHRvbnMocG9ydCk7CiAgICAgICAgaWYgKGNvbm5l
-Y3Qoc29jaywgKHN0cnVjdCBzb2NrYWRkciopJnNfYWRkciwgc2l6ZW9mKHNfYWRkcikpKXsK
-ICAgICAgICAgICAgICAgIHByaW50ZigiY29ubmVjdCBmYWlsXG4iKTsKICAgICAgICAgICAg
-ICAgIHJldHVybiAwOwogICAgICAgIH0KCiAgICAgICAgc25kYnVmX3NpemUgPSAwOyByY3Zi
-dWZfc2l6ZSA9IDA7CiAgICAgICAgZ2V0c29ja29wdChzb2NrLCBTT0xfU09DS0VULCBTT19T
-TkRCVUYsICZzbmRidWZfc2l6ZSwgJm9wdGxlbik7CiAgICAgICAgZ2V0c29ja29wdChzb2Nr
-LCBTT0xfU09DS0VULCBTT19SQ1ZCVUYsICZyY3ZidWZfc2l6ZSwgJm9wdGxlbik7CiAgICAg
-ICAgcHJpbnRmKCJjbGllbnQ6IHNuZGJ1Zl9zaXplICVkLCByY3ZidWZfc2l6ZSAlZFxuIiwg
-c25kYnVmX3NpemUsIHJjdmJ1Zl9zaXplKTsKCiAgICAgICAgcmVjdihzb2NrLCBtc2csIHNp
-emVvZihtc2cpLCAwKTsKICAgICAgICBwcmludGYoImdldCBtc2c6ICVzXG4iLCBtc2cpOwog
-ICAgICAgIHNlbmQoc29jaywgIlJlc3BvbnNlIiwgc2l6ZW9mKCJSZXNwb25zZSIpLCBNU0df
-Tk9TSUdOQUwpOwoKICAgICAgICBjbG9zZShzb2NrKTsKfQoKaW50IG1haW4oaW50IGFyZ2Ms
-IGNoYXIgKiphcmd2KXsKICAgICAgICBib29sIHdyb25nX3BhcmFtID0gZmFsc2U7CiAgICAg
-ICAgaW50IGJ1Zl9zaXplID0gMCwgcG9ydCA9IDA7CiAgICAgICAgaW50IGM7CiAgICAgICAg
-d2hpbGUoIXdyb25nX3BhcmFtICYmCiAgICAgICAgICAgICAgKC0xICE9IChjID0gZ2V0b3B0
-KGFyZ2MsIGFyZ3YsICJwOnM6aToiKSkpKSB7CiAgICAgICAgICAgICAgICBzd2l0Y2ggKGMp
-IHsKICAgICAgICAgICAgICAgICAgICAgICAgY2FzZSAncyc6CiAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgYnVmX3NpemUgPSBhdG9pKG9wdGFyZyk7CiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgYnJlYWs7CiAgICAgICAgICAgICAgICAgICAgICAgIGNhc2Ug
-J2knOgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGlwID0gc3RyZHVwKG9wdGFy
-Zyk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7CiAgICAgICAgICAg
-ICAgICAgICAgICAgIGNhc2UgJ3AnOgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IHBvcnQgPSBhdG9pKG9wdGFyZyk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-YnJlYWs7CiAgICAgICAgICAgICAgICAgICAgICAgIGNhc2UgJz8nOgogICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIHByaW50ZigidXNhZ2U6IC4vY2xpZW50IC1zIDxidWZzaXpl
-PiAtaSA8aXA+IC1wIDxwb3J0PlxuIik7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgd3JvbmdfcGFyYW0gPSB0cnVlOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IGJyZWFrOwogICAgICAgICAgICAgICAgfQogICAgICAgIH0KICAgICAgICBpZiAoIXdyb25n
-X3BhcmFtKQogICAgICAgICAgICAgICAgbmV0X2NsbnQoYnVmX3NpemUsIHBvcnQpOwogICAg
-ICAgIHJldHVybiAwOwp9Cg==
---------------lg3kpQHr1m0Tha1wwCOSWEXb
-Content-Type: text/plain; charset=UTF-8; name="server.c"
-Content-Disposition: attachment; filename="server.c"
-Content-Transfer-Encoding: base64
-
-I2luY2x1ZGUgPHN0ZGlvLmg+CiNpbmNsdWRlIDxzdHJpbmcuaD4KI2luY2x1ZGUgPHN0ZGxp
-Yi5oPgojaW5jbHVkZSA8dW5pc3RkLmg+CiNpbmNsdWRlIDxhcnBhL2luZXQuaD4KI2luY2x1
-ZGUgPHN5cy9zb2NrZXQuaD4KI2luY2x1ZGUgPG5ldGluZXQvaW4uaD4KI2luY2x1ZGUgPGVy
-cm5vLmg+CiNpbmNsdWRlIDxzdGRib29sLmg+CiNpbmNsdWRlIDxuZXRpbmV0L3RjcC5oPgoK
-I2lmbmRlZiBBRl9TTUMKI2RlZmluZSBBRl9TTUMgICAgICAgICAgNDMKI2VuZGlmCiNkZWZp
-bmUgTkVUX1BST1RPQ0FMICAgIEFGX0lORVQKI2RlZmluZSBTRVJWX0lQICAgICAgICAgIjAu
-MC4wLjAiCiNkZWZpbmUgU0VSVl9QT1JUICAgICAgIDEwMDEyCgppbnQgbmV0X3NlcnYoaW50
-IGJ1Zl9zaXplLCBpbnQgcG9ydCkKewogICAgICAgIGludCBzbmRidWZfc2l6ZSwgcmN2YnVm
-X3NpemU7CiAgICAgICAgc3RydWN0IHNvY2thZGRyX2luIHNfYWRkcjsKICAgICAgICBzdHJ1
-Y3Qgc29ja2FkZHJfaW4gY19hZGRyOwogICAgICAgIGNoYXIgbXNnWzEyOF0gPSAiUmVxdWVz
-dCI7CiAgICAgICAgaW50IGxfc29jaywgc19zb2NrOwogICAgICAgIGludCBvcHRsZW4gPSA0
-OwoKICAgICAgICBpZiAoIXBvcnQpCiAgICAgICAgICAgICAgICBwb3J0ID0gU0VSVl9QT1JU
-OwoKICAgICAgICBsX3NvY2sgPSBzb2NrZXQoTkVUX1BST1RPQ0FMLCBTT0NLX1NUUkVBTSwg
-MCk7CgogICAgICAgIGlmIChidWZfc2l6ZSkgewogICAgICAgICAgICAgICAgc25kYnVmX3Np
-emUgPSByY3ZidWZfc2l6ZSA9IGJ1Zl9zaXplOwogICAgICAgICAgICAgICAgLyogc2V0IHNu
-ZGJ1ZiBhbmQgcmN2YnVmICovCiAgICAgICAgICAgICAgICBpZiAoc2V0c29ja29wdChsX3Nv
-Y2ssIFNPTF9TT0NLRVQsIFNPX1NOREJVRiwKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAmc25kYnVmX3NpemUsIHNpemVvZihpbnQpKSkgewogICAgICAgICAgICAgICAgICAg
-ICAgICBwcmludGYoInNldCBzbmRidWYgZmFpbGVkXG4iKTsKICAgICAgICAgICAgICAgICAg
-ICAgICAgcmV0dXJuIDA7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBpZiAo
-c2V0c29ja29wdChsX3NvY2ssIFNPTF9TT0NLRVQsIFNPX1JDVkJVRiwKICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAmcmN2YnVmX3NpemUsIHNpemVvZihpbnQpKSkgewogICAg
-ICAgICAgICAgICAgICAgICAgICBwcmludGYoInNldCByY3ZidWYgZmFpbGVkXG4iLCByY3Zi
-dWZfc2l6ZSk7CiAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiAwOwogICAgICAgICAg
-ICAgICAgfQogICAgICAgIH0KCiAgICAgICAgbWVtc2V0KCZzX2FkZHIsIDAsIHNpemVvZihz
-dHJ1Y3Qgc29ja2FkZHJfaW4pKTsKICAgICAgICBzX2FkZHIuc2luX2ZhbWlseSA9IE5FVF9Q
-Uk9UT0NBTDsKICAgICAgICBzX2FkZHIuc2luX2FkZHIuc19hZGRyID0gaW5ldF9hZGRyKFNF
-UlZfSVApOwogICAgICAgIHNfYWRkci5zaW5fcG9ydCA9IGh0b25zKHBvcnQpOwogICAgICAg
-IGlmIChiaW5kKGxfc29jaywgKHN0cnVjdCBzb2NrYWRkciopJnNfYWRkciwgc2l6ZW9mKHNf
-YWRkcikpKSB7CiAgICAgICAgICAgICAgICBwcmludGYoImJpbmQgbGlzdGVuIHNvY2tldCBl
-cnJvciAlZFxuIiwgZXJybm8pOwogICAgICAgICAgICAgICAgcmV0dXJuIDA7CiAgICAgICAg
-fQogICAgICAgIGlmIChsaXN0ZW4obF9zb2NrLCAyMCkpIHsKICAgICAgICAgICAgICAgIHBy
-aW50ZigibGlzdGVuIGVycm9yXG4iKTsKICAgICAgICAgICAgICAgIHJldHVybiAwOwogICAg
-ICAgIH0KCiAgICAgICAgc29ja2xlbl90IGNfYWRkcl9sZW4gPSBzaXplb2YoY19hZGRyKTsK
-ICAgICAgICBzX3NvY2sgPSBhY2NlcHQobF9zb2NrLCAoc3RydWN0IHNvY2thZGRyKikmY19h
-ZGRyLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgJmNfYWRkcl9sZW4pOwogICAgICAg
-IGlmIChzX3NvY2sgPCAwKSB7CiAgICAgICAgICAgICAgICBwcmludGYoImFjY2VwdCBmYWls
-XG4iKTsKICAgICAgICAgICAgICAgIHJldHVybiAwOwogICAgICAgIH0gZWxzZSB7CiAgICAg
-ICAgICAgICAgICBjaGFyIGlwWzE2XSA9IHsgMCB9OwogICAgICAgICAgICAgICAgaW5ldF9u
-dG9wKE5FVF9QUk9UT0NBTCwgJihjX2FkZHIuc2luX2FkZHIpLCBpcCwgSU5FVF9BRERSU1RS
-TEVOKTsKICAgICAgICAgICAgICAgIHByaW50ZigiYWNjZXB0IGNvbm5lY3Rpb246IGlwICVz
-IHBvcnQgJWRcbiIsCiAgICAgICAgICAgICAgICAgICAgICAgIGlwLCBjX2FkZHIuc2luX3Bv
-cnQpOwogICAgICAgIH0KICAgICAgICBnZXRzb2Nrb3B0KHNfc29jaywgU09MX1NPQ0tFVCwg
-U09fU05EQlVGLCAmc25kYnVmX3NpemUsICZvcHRsZW4pOwogICAgICAgIGdldHNvY2tvcHQo
-c19zb2NrLCBTT0xfU09DS0VULCBTT19SQ1ZCVUYsICZyY3ZidWZfc2l6ZSwgJm9wdGxlbik7
-CiAgICAgICAgcHJpbnRmKCJzZXJ2ZXI6IHNuZGJ1Zl9zaXplICVkLCByY3ZidWZfc2l6ZSAl
-ZFxuIiwgc25kYnVmX3NpemUsIHJjdmJ1Zl9zaXplKTsKCiAgICAgICAgc2VuZChzX3NvY2ss
-ICJSZXF1ZXN0Iiwgc2l6ZW9mKCJSZXF1ZXN0IiksIE1TR19OT1NJR05BTCk7CiAgICAgICAg
-cmVjdihzX3NvY2ssIG1zZywgc2l6ZW9mKG1zZyksIDApOwogICAgICAgIHByaW50ZigiZ2V0
-IG1zZzogJXNcbiIsIG1zZyk7CgogICAgICAgIGNsb3NlKHNfc29jayk7CiAgICAgICAgY2xv
-c2UobF9zb2NrKTsKICAgICAgICByZXR1cm4gMDsKfQoKaW50IG1haW4oaW50IGFyZ2MsIGNo
-YXIgKiphcmd2KQp7CiAgICAgICAgYm9vbCB3cm9uZ19wYXJhbSA9IGZhbHNlOwogICAgICAg
-IGludCBidWZfc2l6ZSA9IDAsIHBvcnQgPSAwOwogICAgICAgIGludCBjOwogICAgICAgIHdo
-aWxlKCF3cm9uZ19wYXJhbSAmJgogICAgICAgICAgICAgICgtMSAhPSAoYyA9IGdldG9wdChh
-cmdjLCBhcmd2LCAicDpzOiIpKSkpIHsKICAgICAgICAgICAgICAgIHN3aXRjaCAoYykgewog
-ICAgICAgICAgICAgICAgICAgICAgICBjYXNlICdzJzoKICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBidWZfc2l6ZSA9IGF0b2kob3B0YXJnKTsKICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBicmVhazsKICAgICAgICAgICAgICAgICAgICAgICAgY2FzZSAncCc6
-CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcG9ydCA9IGF0b2kob3B0YXJnKTsK
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBicmVhazsKICAgICAgICAgICAgICAg
-ICAgICAgICAgY2FzZSAnPyc6CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcHJp
-bnRmKCJ1c2FnZTogLi9zZXJ2ZXIgLXMgPGJ1ZnNpemU+IC1wIDxwb3J0PlxuIik7CiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgd3JvbmdfcGFyYW0gPSB0cnVlOwogICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIGJyZWFrOwogICAgICAgICAgICAgICAgfQogICAg
-ICAgIH0KICAgICAgICBpZiAoIXdyb25nX3BhcmFtKQogICAgICAgICAgICAgICAgbmV0X3Nl
-cnYoYnVmX3NpemUsIHBvcnQpOwogICAgICAgIHJldHVybiAwOwp9Cgo=
-
---------------lg3kpQHr1m0Tha1wwCOSWEXb--
+--------------NduQAJmKJW5S98p94IasMcFk--
 
