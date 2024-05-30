@@ -1,143 +1,145 @@
-Return-Path: <netdev+bounces-99499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80E1B8D511E
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 19:38:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3F838D5120
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 19:40:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC0CF28343D
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:38:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E25F01C225F3
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:40:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9EF46521;
-	Thu, 30 May 2024 17:38:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64ED746556;
+	Thu, 30 May 2024 17:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2pyHE8k9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G5/iu49C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B0518757F
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 17:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6FE18757F
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 17:40:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717090734; cv=none; b=hU6P7fghCLYdR4jYEzKcCfXmx9ce5cJYFK9ao6bplj5+mwlHo5zgTOmgCSn/KDN/0ZJrRPzSTah4isCDyRZt2nJWXwf2mh96wRPp8W080tfOTO6F2Lv+Zh65aO9V/U4GFHXU7szXRd5nt2z+g1taWx7QMJS19ri/s+jrDUfziA0=
+	t=1717090805; cv=none; b=AykaqQitfO1xWx2SwDXuXguyUyR4CjpYdhx82yW3bnb0pSTriljxTBXuapugqbWBWoS5Z3/E/34o/6cCPr3sN3eqQjxAEeB8Z4df83qbLopiSpd7Glx2lpGVTXBEcaWEFxpM2cBszuE07PPi7BGHxDeDLN+wDrIL0mUk2hidnnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717090734; c=relaxed/simple;
-	bh=mi9zV5y50BYmzSatp20dGoOtZTzkd3IYofryuQjtfkk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fU6r9M+PtVJ3mflBrE00fcAdQ3yMEOInxGSdMgeftHcoGynduyKiSU+O2MXz8BhV3M2c+GH7FFr6Ydpho/JmPiafqlG1rJMwfwQDTRqA/JzqBMlJipICz7OMYk74vT+ia2nCprSH+tuyI2bE9Zy0McfpKIFWsKDHHNpFLEMOzcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2pyHE8k9; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5750a8737e5so1613a12.0
-        for <netdev@vger.kernel.org>; Thu, 30 May 2024 10:38:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717090731; x=1717695531; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J1Qb7akEq5yCmelTDmjxq7mBISC0Z5mjD3Lgkgcz6kw=;
-        b=2pyHE8k9b+slg0RTrs04Dr+maRnN80IV57RQgQlFWTFWIZwDd6o8qR/Fu9QMOL9DKN
-         Dt4VRUH7OVbFvlsRek5pigY3oW9TI/qibimwyGnLcjCJKeVDFHl6MmBJfD1Ov4cwqFpK
-         Kr14VmEIpZSGx4vITBNRI+4qNPBkIWTS5SZa1R09zMajLjb2LQeUMaj/d3WCbWuEpLWz
-         dj/0m6G2RgUz4QSYzEdBlNhFUEuHt4dkrJpbBMxilVeEV7ugdbkd8qXAcgO/UOKBDWWD
-         XEJMBy8gdoUifOJUb8RNyW2Ijx+MN8sbDmppMtF7rxvyanF2OsrAl/Dq5CZY0l93lemy
-         g3gQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717090731; x=1717695531;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J1Qb7akEq5yCmelTDmjxq7mBISC0Z5mjD3Lgkgcz6kw=;
-        b=T0oiN2mLom6FvYFN3GwzuUJ6Mkh+VAbLK97DOOtlwnZP4I5R+2wg7swmgeOJkcCT0Y
-         o5efOdrx0IX0sjrr5w5ghLwpDcy6gXAPvW5vfVkNPSOmHqbu9aMNPfOJElp6wfBKxnoj
-         DHiUhZWW4e++iuLh555qXVfBPiTReEATzZ2/EUjz3et269AC8h32KA8+0IrCOlXlnINq
-         UBPJczeHpkggDIDVQNZ20hYG4mwEZaBSaTe0RL+QgrJaU+YDg2KDdTreLHPx/olByxpn
-         lVOlxaUmHJ18ByA7Qef4cDVlp92izHlO3QT3xWsA5MJ7mZPRdm0nCiCPhi27nSVJaEj2
-         iyCw==
-X-Gm-Message-State: AOJu0YwVT9aw/RGGM8+38SkbiWz7bGlXQoXS6wmi2igN5UvFUT+3cTMl
-	2lwB+NOFAzO017ggXUSiF+ognrHm0LsqaQpQz6NpHDpYu1W7B47lrm+SyIYHHimnKMQVtRMXg0S
-	X4pPmRpzCjTu0/mpPzn0pHInp8T4V5M9eDZqp
-X-Google-Smtp-Source: AGHT+IFfBLLIwisiQNM9r3xLxxbuwPZQAO+IdpMQxPWTlVp2BJtmXBRmHrZyszeSziU893PnpKJrDxd5ptqkaabDiSg=
-X-Received: by 2002:a50:ee87:0:b0:57a:2398:5ea2 with SMTP id
- 4fb4d7f45d1cf-57a239860f9mr138520a12.3.1717090730693; Thu, 30 May 2024
- 10:38:50 -0700 (PDT)
+	s=arc-20240116; t=1717090805; c=relaxed/simple;
+	bh=lzf+r43xu7w2qX3kzjP+qMyZAJzLiLGXupv9+XWi/y0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=jT1ntkFhUoZ5b1CuGOC42AiFHnfXhYKuxBDOhk1UWaZgXqo8krI2pIRCP/uZ541ETOrqdQgveX+IoKQSmEcOWFI8yxPj2Vv+6IHYapnvVpsXXY780tppIn7TOs9R9oJLFfQb+WDNDSK2BzLoL11qh82NPpWMAWiYSYLgeS/l3zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G5/iu49C; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717090803; x=1748626803;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=lzf+r43xu7w2qX3kzjP+qMyZAJzLiLGXupv9+XWi/y0=;
+  b=G5/iu49CKOXU2ZAw6/hVDyVOz44MkxujS6cRWjY0w8lnGe+e9LxtOPAV
+   +bBsYVcwW8TqJWre8BSOakRepTV5oMadV/h9pu6TY0j9ighMChKjFyAKo
+   IehuG0GfjgZHfOoePbzOL7nYE0OPh7J+n8wwMWNYBDFthHjkj9MadWd7F
+   HuVAZtbgvsdyZsr3DdCo9I3aDGinbJSSBBE3oPQIAOzfnhr+YQBI1126j
+   lVoF1egl2yxk3xQBRLkXmBc1RgXn8MpMtOTxC3pILzC1Af0l1gainoqbg
+   uiUopifTaVnQMtsEZlB1HaP3j+Gycgglk8DD4q26T7Zs1fJwg7zosZWAJ
+   w==;
+X-CSE-ConnectionGUID: MvNDrc85Ty+SW8sXb7y2+Q==
+X-CSE-MsgGUID: jn6G/W0RSFmrahS9BGIlpw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11088"; a="31119252"
+X-IronPort-AV: E=Sophos;i="6.08,202,1712646000"; 
+   d="scan'208";a="31119252"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2024 10:40:02 -0700
+X-CSE-ConnectionGUID: /vcvvof9QFyCxghSHKx4zw==
+X-CSE-MsgGUID: sTLMPy0+TBScLV+6UOwUGA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,202,1712646000"; 
+   d="scan'208";a="66766667"
+Received: from jekeller-desk.amr.corp.intel.com ([10.166.241.1])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2024 10:40:02 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net 0/6] Intel Wired LAN Driver Updates 2024-05-29 (ice,
+ igc)
+Date: Thu, 30 May 2024 10:39:27 -0700
+Message-Id: <20240530-net-2024-05-30-intel-net-fixes-v1-0-8b11c8c9bff8@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1717087015.git.pabeni@redhat.com>
-In-Reply-To: <cover.1717087015.git.pabeni@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 30 May 2024 19:38:39 +0200
-Message-ID: <CANn89iJusnd3fEr5U47iOPmH8joRohOcD==Q4vVLrM+c808i0g@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/3] dst_cache: cope with device removal
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAM+5WGYC/x3MSwqAMAwE0KtI1gbqJ1S8irjQNmpAqrQignh3o
+ 8s3M8wNiaNwgja7IfIpSbagKPIM3DKEmVG8GkpT1oYqg4EP/ICGUCnh4PUPJ7k44ejI+YbIW2t
+ BT/bIf6EfHegM+ud5AVCXhjd1AAAA
+To: Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>, 
+ netdev <netdev@vger.kernel.org>
+Cc: Jacob Keller <jacob.e.keller@intel.com>, 
+ Paul Greenwalt <paul.greenwalt@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>, 
+ Larysa Zaremba <larysa.zaremba@intel.com>, Simon Horman <horms@kernel.org>, 
+ Chandan Kumar Rout <chandanx.rout@intel.com>, 
+ Igor Bagnucki <igor.bagnucki@intel.com>, 
+ Sasha Neftin <sasha.neftin@intel.com>, 
+ Dima Ruinskiy <dima.ruinskiy@intel.com>, 
+ Naama Meir <naamax.meir@linux.intel.com>
+X-Mailer: b4 0.13.0
 
-On Thu, May 30, 2024 at 7:21=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> Eric reported a net device refcount leak and diagnosed the root cause
-> as the dst_cache not coping well with the underlying device removal.
->
-> To address such issue, this series introduces the infrastructure to let
-> the existing uncached list handle the relevant cleanup.
->
-> Patch 1 and 2 are preparation changes to make the uncached list infra
-> more flexible for the new use-case, and patch 3 addresses the issue.
->
-> ---
-> Targeting net-next as the addressed problem is quite ancient and I fear
-> some unexpected side effects for patch 2.
+This series includes fixes for the ice driver as well as a fix for the igc
+driver.
 
-Thanks Paolo, I am going to test this ASAP.
+Jacob fixes two issues in the ice driver with reading the NVM for providing
+firmware data via devlink info. First, fix an off-by-one error when reading
+the Preserved Fields Area, resolving an infinite loop triggered on some
+NVMs which lack certain data in the NVM. Second, fix the reading of the NVM
+Shadow RAM on newer E830 and E825-C devices which have a variable sized CSS
+header rather than assuming this header is always the same fixed size as in
+the E810 devices.
 
-BTW I found suspect dst_cache uses from lwtunnel in the output path.
-AFAIK lwtunnel_output() does not block BH.
-Either we change lwtunnel_output() or replace some of the ->output
-methods to use local_bh_disable() ?
+Larysa fixes three issues with the ice driver XDP logic that could occur if
+the number of queues is changed after enabling an XDP program. First, the
+af_xdp_zc_qps bitmap is removed and replaced by simpler logic to track
+whether queues are in zero-copy mode. Second, the reset and .ndo_bpf flows
+are distinguished to avoid potential races with a PF reset occuring
+simultaneously to .ndo_bpf callback from userspace. Third, the logic for
+mapping XDP queues to vectors is fixed so that XDP state is restored for
+XDP queues after a reconfiguration.
 
-If BH is already held, I do not think
-preempt_disable()/preempt_enable(); pairs are necessary.
+Sasha fixes reporting of Energy Efficient Ethernet support via ethtool in
+the igc driver.
 
-diff --git a/net/ipv6/ioam6_iptunnel.c b/net/ipv6/ioam6_iptunnel.c
-index 7563f8c6aa87cf9f7841ee78dcea2a16f60ac344..bf7120ecea1ebe834e70073710b=
-e0c1692d7ad1d
-100644
---- a/net/ipv6/ioam6_iptunnel.c
-+++ b/net/ipv6/ioam6_iptunnel.c
-@@ -351,9 +351,9 @@ static int ioam6_output(struct net *net, struct
-sock *sk, struct sk_buff *skb)
-                goto drop;
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+Jacob Keller (2):
+      ice: fix iteration of TLVs in Preserved Fields Area
+      ice: fix reads from NVM Shadow RAM on E830 and E825-C devices
 
-        if (!ipv6_addr_equal(&orig_daddr, &ipv6_hdr(skb)->daddr)) {
--               preempt_disable();
-+               local_bh_disable();
-                dst =3D dst_cache_get(&ilwt->cache);
--               preempt_enable();
-+               local_bh_enable();
+Larysa Zaremba (3):
+      ice: remove af_xdp_zc_qps bitmap
+      ice: add flag to distinguish reset from .ndo_bpf in XDP rings config
+      ice: map XDP queues to vectors in ice_vsi_map_rings_to_vectors()
 
-                if (unlikely(!dst)) {
-                        struct ipv6hdr *hdr =3D ipv6_hdr(skb);
-@@ -373,9 +373,9 @@ static int ioam6_output(struct net *net, struct
-sock *sk, struct sk_buff *skb)
-                                goto drop;
-                        }
+Sasha Neftin (1):
+      igc: Fix Energy Efficient Ethernet support declaration
 
--                       preempt_disable();
-+                       local_bh_disable();
-                        dst_cache_set_ip6(&ilwt->cache, dst, &fl6.saddr);
--                       preempt_enable();
-+                       local_bh_enable();
-                }
+ drivers/net/ethernet/intel/ice/ice.h         |  44 +++++---
+ drivers/net/ethernet/intel/ice/ice_base.c    |   3 +
+ drivers/net/ethernet/intel/ice/ice_lib.c     |  29 ++----
+ drivers/net/ethernet/intel/ice/ice_main.c    | 144 +++++++++++++++------------
+ drivers/net/ethernet/intel/ice/ice_nvm.c     | 116 +++++++++++++++++++--
+ drivers/net/ethernet/intel/ice/ice_type.h    |  14 ++-
+ drivers/net/ethernet/intel/ice/ice_xsk.c     |  13 ++-
+ drivers/net/ethernet/intel/igc/igc_ethtool.c |   9 +-
+ drivers/net/ethernet/intel/igc/igc_main.c    |   4 +
+ 9 files changed, 258 insertions(+), 118 deletions(-)
+---
+base-commit: 13c7c941e72908b8cce5a84b45a7b5e485ca12ed
+change-id: 20240530-net-2024-05-30-intel-net-fixes-bc5cd855d777
 
-                skb_dst_drop(skb);
+Best regards,
+-- 
+Jacob Keller <jacob.e.keller@intel.com>
+
 
