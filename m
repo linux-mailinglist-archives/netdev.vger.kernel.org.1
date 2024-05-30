@@ -1,230 +1,129 @@
-Return-Path: <netdev+bounces-99342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD4CF8D4904
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 11:57:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1A9F8D4949
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 12:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C0A11C21434
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 09:57:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFA681C21835
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 10:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DC915ADBE;
-	Thu, 30 May 2024 09:57:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54DF1761AB;
+	Thu, 30 May 2024 10:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="I4eKtr1M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RTNgVc1C"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECCC155335
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 09:57:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E8418399A;
+	Thu, 30 May 2024 10:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717063066; cv=none; b=tginossar/qWHowxWmuFbM2b634cCRBxMAFFVJCTvZV7j6SVTMEop7EvJc+S0+c6pG/LyeL1GoRoK+dx2Fl2L57Lu6Ef/62f16JGs5i8VTbGJlDCRz0IToRBpxDi8BlEDbm/ScXpmWJ/029MHu1gLXrynWC0zDbOAzHzORYmXOM=
+	t=1717063829; cv=none; b=KTDxrMasa1tE++36YoHU3tOnfEH0WA9eHKR1WAbAnn28PBKh3NOaKFp4H+ECQ5snCCO6vVCCuR7nOpYqiUfoxFA0aTvx3KbE8pHM6YdggmdDtfUF3zr49RID7PDMkIbYll4X0u/Rsp8jXpqgSDXD928Yk/ClGVctW645QNfmKRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717063066; c=relaxed/simple;
-	bh=5eB/L7hkmtLXKZDKTo5GXqhn2Ueo+rHcGZT8s+I0fEo=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=qOV9o+rGOYkgMMenv6nnwDgbcDlmJwm4sIOThM3gXNA13pgM3DQKHpsB5acNCUq4WLi4MogHXVpd1PDhO//pX7RhlmTbbcDjnpfcDkm0ZECwlVZTmmIHwLQldzKgfLh/60NNCEtLzruwgpBqOQNSGDVbAGT+IAQWG3sXZ4C30bM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=I4eKtr1M; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1717063061; h=Message-ID:Subject:Date:From:To;
-	bh=HuM/wA4hvKxfW5Mf4GN3euKVd03+xrTW5J497YHW3wU=;
-	b=I4eKtr1Mws72brU1KxANGdcelFV7MKkyCF6nKpmoJ1Q+t3TTaRhADCv4zDmbzGr6qTIi/uOCloljFM3mabKaqPmxcyxXEWCoZRo31+sfxJa/qzSitVDHly2pYYWz22PDdrvgxTfs2libUwgXHk294D2XPGdv0fY12y062YtV5k0=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R291e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067109;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W7WbvrE_1717063060;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W7WbvrE_1717063060)
-          by smtp.aliyun-inc.com;
-          Thu, 30 May 2024 17:57:40 +0800
-Message-ID: <1717063051.9626064-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net v3 2/2] virtio_net: fix a spurious deadlock issue
-Date: Thu, 30 May 2024 17:57:31 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: Jason Wang <jasowang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Daniel Jurgens <danielj@nvidia.com>,
- netdev@vger.kernel.org,
- virtualization@lists.linux.dev
-References: <20240528134116.117426-1-hengqi@linux.alibaba.com>
- <20240528134116.117426-3-hengqi@linux.alibaba.com>
-In-Reply-To: <20240528134116.117426-3-hengqi@linux.alibaba.com>
+	s=arc-20240116; t=1717063829; c=relaxed/simple;
+	bh=0YkPHJJ6K449wpbhi1+CxFc/+STh7XNQcY/cT/hnD+U=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=oEY9W5j8uxT8BkQzFo4mWZ5LZ5m4ewzeGgprsdMQGHILTjqmqRdq0Vl3l23IMFg8jUymzRIy/+Lv+3jknQHcBXEm/ySUia0jCAq3cwuBOLyMOulXQBSotVREnDIPdGk66jhQN1GASccsQqGlTmlu07FcjuCRVjM+BZwdaPTOKPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RTNgVc1C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 02167C3277B;
+	Thu, 30 May 2024 10:10:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717063829;
+	bh=0YkPHJJ6K449wpbhi1+CxFc/+STh7XNQcY/cT/hnD+U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=RTNgVc1CKxZ1Ww5Pmwez5c6dZ4ctr5vJemqyqD97lTlN6sqi7dh6WhlEpiOgwd330
+	 mD48TuQjp/mt3HSrbltNYY6wAIsY2Mys8QrXbLeAv+ny0aP9fqbpGPeTCCuBOmZMbc
+	 BdnJHcEDSElVSb0X+qcVdPKkGvcKTfm/yrUSnn6u/Ct69w3yJnrmPxJp8cF2N8QbMc
+	 gB8RL2VP/a7GkHHezjEwd59Ve8YAjHfJcH4mhlIihS2D0RVCePyVctoEL2lNrdzJJt
+	 gRQxUpbgwjrJmeA7wN/GeaqIrtecOhvd7Z+dskz+5900MNIfIniaquXIMf5/P7+jjT
+	 5kqZfjMgjKhMg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E52B3CF21F2;
+	Thu, 30 May 2024 10:10:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] ipvlan: Dont Use skb->sk in
+ ipvlan_process_v{4,6}_outbound
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171706382893.341.2212459840285450534.git-patchwork-notify@kernel.org>
+Date: Thu, 30 May 2024 10:10:28 +0000
+References: <20240529095633.613103-1-yuehaibing@huawei.com>
+In-Reply-To: <20240529095633.613103-1-yuehaibing@huawei.com>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, maheshb@google.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Tue, 28 May 2024 21:41:16 +0800, Heng Qi <hengqi@linux.alibaba.com> wrote:
-> When the following snippet is run, lockdep will report a deadlock[1].
->
->   /* Acquire all queues dim_locks */
->   for (i = 0; i < vi->max_queue_pairs; i++)
->           mutex_lock(&vi->rq[i].dim_lock);
->
-> There's no deadlock here because the vq locks are always taken
-> in the same order, but lockdep can not figure it out. So refactoring
-> the code to alleviate the problem.
->
-> [1]
-> ========================================================
-> WARNING: possible recursive locking detected
-> 6.9.0-rc7+ #319 Not tainted
-> --------------------------------------------
-> ethtool/962 is trying to acquire lock:
->
-> but task is already holding lock:
->
-> other info that might help us debug this:
-> Possible unsafe locking scenario:
->
->       CPU0
->       ----
->  lock(&vi->rq[i].dim_lock);
->  lock(&vi->rq[i].dim_lock);
->
-> *** DEADLOCK ***
->
->  May be due to missing lock nesting notation
->
-> 3 locks held by ethtool/962:
->  #0: ffffffff82dbaab0 (cb_lock){++++}-{3:3}, at: genl_rcv+0x19/0x40
->  #1: ffffffff82dad0a8 (rtnl_mutex){+.+.}-{3:3}, at:
-> 				ethnl_default_set_doit+0xbe/0x1e0
->
-> stack backtrace:
-> CPU: 6 PID: 962 Comm: ethtool Not tainted 6.9.0-rc7+ #319
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-> 	   rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Wed, 29 May 2024 17:56:33 +0800 you wrote:
+> Raw packet from PF_PACKET socket ontop of an IPv6-backed ipvlan device will
+> hit WARN_ON_ONCE() in sk_mc_loop() through sch_direct_xmit() path.
+> 
+> WARNING: CPU: 2 PID: 0 at net/core/sock.c:775 sk_mc_loop+0x2d/0x70
+> Modules linked in: sch_netem ipvlan rfkill cirrus drm_shmem_helper sg drm_kms_helper
+> CPU: 2 PID: 0 Comm: swapper/2 Kdump: loaded Not tainted 6.9.0+ #279
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+> RIP: 0010:sk_mc_loop+0x2d/0x70
+> Code: fa 0f 1f 44 00 00 65 0f b7 15 f7 96 a3 4f 31 c0 66 85 d2 75 26 48 85 ff 74 1c
+> RSP: 0018:ffffa9584015cd78 EFLAGS: 00010212
+> RAX: 0000000000000011 RBX: ffff91e585793e00 RCX: 0000000002c6a001
+> RDX: 0000000000000000 RSI: 0000000000000040 RDI: ffff91e589c0f000
+> RBP: ffff91e5855bd100 R08: 0000000000000000 R09: 3d00545216f43d00
+> R10: ffff91e584fdcc50 R11: 00000060dd8616f4 R12: ffff91e58132d000
+> R13: ffff91e584fdcc68 R14: ffff91e5869ce800 R15: ffff91e589c0f000
+> FS:  0000000000000000(0000) GS:ffff91e898100000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f788f7c44c0 CR3: 0000000008e1a000 CR4: 00000000000006f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 > Call Trace:
->  <TASK>
->  dump_stack_lvl+0x79/0xb0
->  check_deadlock+0x130/0x220
->  __lock_acquire+0x861/0x990
->  lock_acquire.part.0+0x72/0x1d0
->  ? lock_acquire+0xf8/0x130
->  __mutex_lock+0x71/0xd50
->  virtnet_set_coalesce+0x151/0x190
->  __ethnl_set_coalesce.isra.0+0x3f8/0x4d0
->  ethnl_set_coalesce+0x34/0x90
->  ethnl_default_set_doit+0xdd/0x1e0
->  genl_family_rcv_msg_doit+0xdc/0x130
->  genl_family_rcv_msg+0x154/0x230
->  ? __pfx_ethnl_default_set_doit+0x10/0x10
->  genl_rcv_msg+0x4b/0xa0
->  ? __pfx_genl_rcv_msg+0x10/0x10
->  netlink_rcv_skb+0x5a/0x110
->  genl_rcv+0x28/0x40
->  netlink_unicast+0x1af/0x280
->  netlink_sendmsg+0x20e/0x460
->  __sys_sendto+0x1fe/0x210
->  ? find_held_lock+0x2b/0x80
->  ? do_user_addr_fault+0x3a2/0x8a0
->  ? __lock_release+0x5e/0x160
->  ? do_user_addr_fault+0x3a2/0x8a0
->  ? lock_release+0x72/0x140
->  ? do_user_addr_fault+0x3a7/0x8a0
->  __x64_sys_sendto+0x29/0x30
->  do_syscall_64+0x78/0x180
->  entry_SYSCALL_64_after_hwframe+0x76/0x7e
->
-> Fixes: 4d4ac2ececd3 ("virtio_net: Add a lock for per queue RX coalesce")
-> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> <IRQ>
+>  ? __warn (kernel/panic.c:693)
+>  ? sk_mc_loop (net/core/sock.c:760)
+>  ? report_bug (lib/bug.c:201 lib/bug.c:219)
+>  ? handle_bug (arch/x86/kernel/traps.c:239)
+>  ? exc_invalid_op (arch/x86/kernel/traps.c:260 (discriminator 1))
+>  ? asm_exc_invalid_op (./arch/x86/include/asm/idtentry.h:621)
+>  ? sk_mc_loop (net/core/sock.c:760)
+>  ip6_finish_output2 (net/ipv6/ip6_output.c:83 (discriminator 1))
+>  ? nf_hook_slow (net/netfilter/core.c:626)
+>  ip6_finish_output (net/ipv6/ip6_output.c:222)
+>  ? __pfx_ip6_finish_output (net/ipv6/ip6_output.c:215)
+>  ipvlan_xmit_mode_l3 (drivers/net/ipvlan/ipvlan_core.c:602) ipvlan
+>  ipvlan_start_xmit (drivers/net/ipvlan/ipvlan_main.c:226) ipvlan
+>  dev_hard_start_xmit (net/core/dev.c:3594)
+>  sch_direct_xmit (net/sched/sch_generic.c:343)
+>  __qdisc_run (net/sched/sch_generic.c:416)
+>  net_tx_action (net/core/dev.c:5286)
+>  handle_softirqs (kernel/softirq.c:555)
+>  __irq_exit_rcu (kernel/softirq.c:589)
+>  sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1043)
+> 
+> [...]
 
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Here is the summary with links:
+  - [net,v2] ipvlan: Dont Use skb->sk in ipvlan_process_v{4,6}_outbound
+    https://git.kernel.org/netdev/net/c/b3dc6e8003b5
 
-> ---
->  drivers/net/virtio_net.c | 36 ++++++++++++++++--------------------
->  1 file changed, 16 insertions(+), 20 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 4f828a9e5889..ecb5203d0372 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -4257,7 +4257,6 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
->  	struct virtio_net_ctrl_coal_rx *coal_rx __free(kfree) = NULL;
->  	bool rx_ctrl_dim_on = !!ec->use_adaptive_rx_coalesce;
->  	struct scatterlist sgs_rx;
-> -	int ret = 0;
->  	int i;
->
->  	if (rx_ctrl_dim_on && !virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-> @@ -4267,27 +4266,27 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
->  			       ec->rx_max_coalesced_frames != vi->intr_coal_rx.max_packets))
->  		return -EINVAL;
->
-> -	/* Acquire all queues dim_locks */
-> -	for (i = 0; i < vi->max_queue_pairs; i++)
-> -		mutex_lock(&vi->rq[i].dim_lock);
-> -
->  	if (rx_ctrl_dim_on && !vi->rx_dim_enabled) {
->  		vi->rx_dim_enabled = true;
-> -		for (i = 0; i < vi->max_queue_pairs; i++)
-> +		for (i = 0; i < vi->max_queue_pairs; i++) {
-> +			mutex_lock(&vi->rq[i].dim_lock);
->  			vi->rq[i].dim_enabled = true;
-> -		goto unlock;
-> +			mutex_unlock(&vi->rq[i].dim_lock);
-> +		}
-> +		return 0;
->  	}
->
->  	coal_rx = kzalloc(sizeof(*coal_rx), GFP_KERNEL);
-> -	if (!coal_rx) {
-> -		ret = -ENOMEM;
-> -		goto unlock;
-> -	}
-> +	if (!coal_rx)
-> +		return -ENOMEM;
->
->  	if (!rx_ctrl_dim_on && vi->rx_dim_enabled) {
->  		vi->rx_dim_enabled = false;
-> -		for (i = 0; i < vi->max_queue_pairs; i++)
-> +		for (i = 0; i < vi->max_queue_pairs; i++) {
-> +			mutex_lock(&vi->rq[i].dim_lock);
->  			vi->rq[i].dim_enabled = false;
-> +			mutex_unlock(&vi->rq[i].dim_lock);
-> +		}
->  	}
->
->  	/* Since the per-queue coalescing params can be set,
-> @@ -4300,22 +4299,19 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
->
->  	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_NOTF_COAL,
->  				  VIRTIO_NET_CTRL_NOTF_COAL_RX_SET,
-> -				  &sgs_rx)) {
-> -		ret = -EINVAL;
-> -		goto unlock;
-> -	}
-> +				  &sgs_rx))
-> +		return -EINVAL;
->
->  	vi->intr_coal_rx.max_usecs = ec->rx_coalesce_usecs;
->  	vi->intr_coal_rx.max_packets = ec->rx_max_coalesced_frames;
->  	for (i = 0; i < vi->max_queue_pairs; i++) {
-> +		mutex_lock(&vi->rq[i].dim_lock);
->  		vi->rq[i].intr_coal.max_usecs = ec->rx_coalesce_usecs;
->  		vi->rq[i].intr_coal.max_packets = ec->rx_max_coalesced_frames;
-> -	}
-> -unlock:
-> -	for (i = vi->max_queue_pairs - 1; i >= 0; i--)
->  		mutex_unlock(&vi->rq[i].dim_lock);
-> +	}
->
-> -	return ret;
-> +	return 0;
->  }
->
->  static int virtnet_send_notf_coal_cmds(struct virtnet_info *vi,
-> --
-> 2.32.0.3.g01195cf9f
->
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
