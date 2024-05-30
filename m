@@ -1,144 +1,101 @@
-Return-Path: <netdev+bounces-99239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AB618D42FC
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 03:34:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 065A08D4303
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 03:40:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F370B234A7
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 01:34:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82883B23213
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 01:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDD2017545;
-	Thu, 30 May 2024 01:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B81168B8;
+	Thu, 30 May 2024 01:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NQOiKjlv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OVS0zkBC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78350134DE;
-	Thu, 30 May 2024 01:34:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B887D299;
+	Thu, 30 May 2024 01:40:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717032868; cv=none; b=UkuAPiez9dHWDBDDxZbtjE6X7Yqffu5CZ98K7TYFXpazeginO0bKEAlybxbziiP/pVUtGhkvCDr/R8gQur4NIEzxb/0Pn9FlkydG5StYwGaSWpbUDKIVrCCKiqdyyr/P44ecerdX+9nHDMnK8NJJTgNPWsDCzzY/DLZW60jDuGA=
+	t=1717033214; cv=none; b=H6oGW4SblIOPztHnsDcE8jwTrbzE2U4eMOqaTkRRZpFW1uGNnDT/QAfJDoHsDw6VeGAlvPMExwRuJSGY86qZbK8fBINuZKVg5jjRLGE5AQXU4pHtpa36jlXTAa0DjChhSUVVQi7LN22ZaLSmIs6pt1XPXJOp77orgAMzZ/HFpXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717032868; c=relaxed/simple;
-	bh=scYKQLLie7Snp8rTwRhCqK4FGsPnWKidk0pUWlozPpQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GDyUOXi/rU1MPNtlYJc/asyBA1HRY70gwS9J5hQgNn3Sze5gFH79y2niXSFF7+XwFs+az/i3w3Z2dws31l+YWSTXlIwaDBKV9LMcxU46Si9QCSs8ouvcYQCBQeLNvqqH6RNAjFu2slfEOhw4ajIl5Cxs4s15yFKdp/bKJuoci6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NQOiKjlv; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2bd816ecaf5so264134a91.2;
-        Wed, 29 May 2024 18:34:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717032867; x=1717637667; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lz9rT6iMtPGxWAxp0Dgc6em4/oZcPEZrP5wJjE1TLsU=;
-        b=NQOiKjlvRwiaEENKEyJ14+L5becJ9aiD/N/udVI17BDHAho+NkSdaJEbXsat/ndYUX
-         BbvVs6gwsibB7YkCnyqJiVLetLzY009dB3TA9WRjQMU3scH+fW0Vrv8XapJzUuQWLE+L
-         rDg93zuGs0+Uwx8RkFd9zXJpYgwyCTXVHybVACOf6D/RO2G99t4sVhIEAHG7BbMVhO7B
-         FfUOWPPPlyi31qipkxia5nG67d9GR0v/WHnYvE/ylLmXPTLiF6wJoLHVpPF9ZqEnJSjD
-         izVbvPossakq6Ne3b7fnaCH/qLhDMM4EZpnU68YaCXwQB6bUEqztr3VWZIkzASMcRSmV
-         r4Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717032867; x=1717637667;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Lz9rT6iMtPGxWAxp0Dgc6em4/oZcPEZrP5wJjE1TLsU=;
-        b=KUbNqM/tuM7VuHk9TKQ22pDbdFcZ8jcTMafdVy7w9OOZKWE2t+gIrOlLlm+6loSjFz
-         DSFOlStSOrB46MGoCCUGlg9iuhIlzn/OaXgz/QnK2+lik+DtZkBGExyDFhMThB6BEWrD
-         RunbjgHSNpwX00eLcJOQV4Bfxqaler35mpGrYn24CE/QdzxCo1bbi+Jm0w96+9IlwApY
-         s20U/uQhNGFQHRLUnIRD5nl4wb/7uZ6Dcu/LSTyDwnWDLFlvKEexZNMBGEoLHCv4IUQD
-         vQ42ep6MX77P8rP/jSvRlKStF3cIcsjc1PYqDia0WppRmKA1dpWoJJtnKam8mJo00AaS
-         JTQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWpHIxUTJWVeXfElsuGMF2kx2M0bramvELlYr8ebzzyXSzTTSFdKHmKGo0Kf5HOZeYdKcj+tx2+qmUJjDa3oVLIM8eSx6Us2TXC6D1TpJJCjLedtzeU6PJt+JQ/Rmuk5juKHyJaFiDvIpam954HJGpB4HXWRZHC4NeshSla3dg5rOVRk9dC
-X-Gm-Message-State: AOJu0YzMiz/ex8WLa2rTbVsI5M+z2V2VWpVMqPT2UXhteulQ6d77jOIC
-	jMgrHENLfXWmcT7l9sP6pKGUiYCNCDGbuk/SPS7eKWMVLpr7K+hr
-X-Google-Smtp-Source: AGHT+IHYFUxRloxCcpin5n6RPZ78K2DMBhJxsrtugp2WausT+RjrzexhzIiEsjaQDoxMoGrE81FJTQ==
-X-Received: by 2002:a17:90a:cb8b:b0:2c1:97c2:5cbb with SMTP id 98e67ed59e1d1-2c1abbfa718mr837475a91.21.1717032866670;
-        Wed, 29 May 2024 18:34:26 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c1a7780affsm534189a91.23.2024.05.29.18.34.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 May 2024 18:34:26 -0700 (PDT)
-Date: Thu, 30 May 2024 09:34:16 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Ravi Gunasekaran <r-gunasekaran@ti.com>,
-	Simon Horman <horms@kernel.org>,
-	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
-	Murali Karicheri <m-karicheri2@ti.com>,
-	Arvid Brodin <Arvid.Brodin@xdin.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	"Ricardo B. Marliere" <ricardo@marliere.net>,
-	Casper Andersson <casper.casan@gmail.com>,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Geliang Tang <tanggeliang@kylinos.cn>,
-	Shuah Khan <shuah@kernel.org>
-Subject: Re: [PATCH] selftests: hsr: Extend the hsr_redbox.sh test to use
- fixed MAC addresses
-Message-ID: <ZlfXmDN-W1dZRYQL@Laptop-X1>
-References: <20240529142232.2625747-1-lukma@denx.de>
- <20240529142232.2625747-2-lukma@denx.de>
+	s=arc-20240116; t=1717033214; c=relaxed/simple;
+	bh=/a3OkwfELwxb5Ut+MgxOZAlCZBTT6NvlJfjqQmhTdWM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aAchHOBNSx3v6MO8NraB3u7FmS/SSCRPPeO/ngAlDM0Y3r3m6U9CducDJ0E0O5choeTHTZdKvYBwLB5HF03zwArWuSuTi057+Batp92Kp15YWNHtqZMdKx9UG/sQREmPOuMR3d6k8VmvdaYhfUMCaniMceldOgqVBaHGOqHAgv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OVS0zkBC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9478EC113CC;
+	Thu, 30 May 2024 01:40:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717033214;
+	bh=/a3OkwfELwxb5Ut+MgxOZAlCZBTT6NvlJfjqQmhTdWM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OVS0zkBChjBRfxjrk8h/Y2AmlnvdB+d8eGeHKJMORQ8Bjl8Xa/rn/45y/Q52ptF7V
+	 Td7y4bX6N1H8YykoITZLPrmj+d6vPHa1DrqcrRrDsX/l47Z9LwW13399gZftI465pU
+	 V56yNHpriGlaYYgoEjDD/saXWZiuazVXuJB4zTC+G5n+ZWTBR2HqL8P5Totxofpzn5
+	 26JOioMSPfyw8J89E6RZIwphvXgp3tOltPD8krCXb2xpKzYmdtwWt00nOzbFD6HJ/e
+	 EySqqyIOuNHU6aXi/NIcVxeWzErvWXkXovJVoAcJlwLPvZM1CHLjiRXI7bGhVWHen/
+	 GPyjGMqrwsTVg==
+Date: Wed, 29 May 2024 18:40:12 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Mina
+ Almasry <almasrymina@google.com>,
+ nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH iwl-next 11/12] idpf: convert header split mode to
+ libeth + napi_build_skb()
+Message-ID: <20240529184012.5e999a93@kernel.org>
+In-Reply-To: <20240528134846.148890-12-aleksander.lobakin@intel.com>
+References: <20240528134846.148890-1-aleksander.lobakin@intel.com>
+	<20240528134846.148890-12-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240529142232.2625747-2-lukma@denx.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 29, 2024 at 04:22:32PM +0200, Lukasz Majewski wrote:
-> Fixed MAC addresses help with debugging as last four bytes identify the
-> network namespace.
+On Tue, 28 May 2024 15:48:45 +0200 Alexander Lobakin wrote:
+> Currently, idpf uses the following model for the header buffers:
 > 
-> Moreover, it allows to mimic the real life setup with for example bridge
-> having the same MAC address on each port.
+> * buffers are allocated via dma_alloc_coherent();
+> * when receiving, napi_alloc_skb() is called and then the header is
+>   copied to the newly allocated linear part.
 > 
-> Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> ---
->  tools/testing/selftests/net/hsr/hsr_redbox.sh | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/net/hsr/hsr_redbox.sh b/tools/testing/selftests/net/hsr/hsr_redbox.sh
-> index 1f36785347c0..998103502d5d 100755
-> --- a/tools/testing/selftests/net/hsr/hsr_redbox.sh
-> +++ b/tools/testing/selftests/net/hsr/hsr_redbox.sh
-> @@ -96,6 +96,21 @@ setup_hsr_interfaces()
->  	ip -n "${ns4}" link set ns4eth1 up
->  	ip -n "${ns5}" link set ns5eth1 up
->  
-> +	ip -net "$ns1" link set address 00:11:22:00:01:01 dev ns1eth1
-> +	ip -net "$ns1" link set address 00:11:22:00:01:02 dev ns1eth2
-> +
-> +	ip -net "$ns2" link set address 00:11:22:00:02:01 dev ns2eth1
-> +	ip -net "$ns2" link set address 00:11:22:00:02:02 dev ns2eth2
-> +	ip -net "$ns2" link set address 00:11:22:00:02:03 dev ns2eth3
-> +
-> +	ip -net "$ns3" link set address 00:11:22:00:03:11 dev ns3eth1
-> +	ip -net "$ns3" link set address 00:11:22:00:03:11 dev ns3eth2
-> +	ip -net "$ns3" link set address 00:11:22:00:03:11 dev ns3eth3
-> +	ip -net "$ns3" link set address 00:11:22:00:03:11 dev ns3br1
+> This is far from optimal as DMA coherent zone is slow on many systems
+> and memcpy() neutralizes the idea and benefits of the header split. Not
+> speaking of that XDP can't be run on DMA coherent buffers, but at the
+> same time the idea of allocating an skb to run XDP program is ill.
+> Instead, use libeth to create page_pools for the header buffers, allocate
+> them dynamically and then build an skb via napi_build_skb() around them
+> with no memory copy. With one exception...
+> When you enable header split, you except you'll always have a separate
 
-The ns3's mac addresses are same, is it a copy-paste error?
+                                    accept
 
-BTW, please add the target tree for the patch, e.g.
+> header buffer, so that you could reserve headroom and tailroom only
+> there and then use full buffers for the data. For example, this is how
+> TCP zerocopy works -- you have to have the payload aligned to PAGE_SIZE.
+> The current hardware running idpf does *not* guarantee that you'll
+> always have headers placed separately. For example, on my setup, even
+> ICMP packets are written as one piece to the data buffers. You can't
+> build a valid skb around a data buffer in this case.
+> To not complicate things and not lose TCP zerocopy etc., when such thing
+> happens, use the empty header buffer and pull either full frame (if it's
+> short) or the Ethernet header there and build an skb around it. GRO
+> layer will pull more from the data buffer later. This W/A will hopefully
+> be removed one day.
 
-[PATCH net-next]
-
-Thanks
-Hangbin
+Hopefully soon, cause it will prevent you from mapping data buffers to
+user space or using DMABUF memory :(
 
