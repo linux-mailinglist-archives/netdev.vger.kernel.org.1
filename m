@@ -1,87 +1,124 @@
-Return-Path: <netdev+bounces-99271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA11C8D4414
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 05:26:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C275B8D442A
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 05:28:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAC7D1C210C5
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 03:26:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76F53286869
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 03:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FBB851C5A;
-	Thu, 30 May 2024 03:26:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEDE354FB1;
+	Thu, 30 May 2024 03:28:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GHm+LZUL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iqqrp33P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B8FA256A
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 03:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CAFD5647B
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 03:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717039591; cv=none; b=ixpYdl2xrsbl3CieqtSo6yssng9PX/Q3qmeHV7Xnxq29vTjgdblBy1mL+JBfdOwkiNJeXgeFwQfTuo1N/Sqe02SIMoWSkXGIUvrtMefB0WuH0cCYYpptzyK8tH31261AWS+VorjqhhYl8XGeerLjXu+q0iDJcft4adkkDS0PYWA=
+	t=1717039700; cv=none; b=soyl2fs2J804NA99Gr0cZNQrb+oaG6v6agcFC1YYlBsn8WEj4R0j1xIlAkDyL/cqJzMAjmDnAq+iG643Xj1kHXgYHisBKz15H0TffrOYqbDA6P+Mj/RST69c/EkOAqXBl9KtA4FSeRTEArLEEsu00gIWgT7k1+bczFWDppABid8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717039591; c=relaxed/simple;
-	bh=gsNJ5T/uD9Xj/aHogYPzXYqxlgJ6tSm8kd9BWdAqBKM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oYwDTAf2QZw3b4Z0tKE8HoWHLuvUUTprpxvzMnym2eB96zPxf/kdryOCj8ZBm1jw3m667eaxePOpnp+XrDrVKEO+mjFMyG0aCIo+qOjU6GNjJn2T5OZsQli9QKA3XvfPeW3Rf/okFCxFzjTmPvHZmj8ByosYWoYles+fHe0vi5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GHm+LZUL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDBE0C116B1;
-	Thu, 30 May 2024 03:26:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717039590;
-	bh=gsNJ5T/uD9Xj/aHogYPzXYqxlgJ6tSm8kd9BWdAqBKM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GHm+LZULUY0+3qSz1mtpS+78iV/XeuzOVMdXG+Fbkn9S/CbvTjLLXTd3ytQNKDGHI
-	 I4uwY7vo9nvENgOpWOWyCvPj/+tpCmOJHiBbSlL9wdltakW8WQ6A1JjX1J8q6qiKCX
-	 /2sqPDWKzOEWsAThyp9Ko39pERsZO7lDjIttFlhV0TeVS+PNHj6OMB+TjmXiI9tKVf
-	 LmCDbKHxovBF6cAydM1bdrhQJB/yva9ixECmYTgcU0kxvSlw2AcgPcgvW5J2Rs356s
-	 HlDAhErEo4eMoQcZCxyNXuucm2EAVp3CABvZM/WMNZQj/OC1y8X1blSI7g7U93SShS
-	 J1LHeVB2mfwow==
-Date: Wed, 29 May 2024 20:26:29 -0700
-From: Saeed Mahameed <saeed@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Tariq Toukan <tariqt@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
-	Yoray Zack <yorayz@nvidia.com>
-Subject: Re: [PATCH net-next 13/15] net/mlx5e: SHAMPO, Use KSMs instead of
- KLMs
-Message-ID: <Zlfx5Rq-eru82XXj@x130.lan>
-References: <20240528142807.903965-1-tariqt@nvidia.com>
- <20240528142807.903965-14-tariqt@nvidia.com>
- <20240529182316.1383db91@kernel.org>
+	s=arc-20240116; t=1717039700; c=relaxed/simple;
+	bh=cvXcMx9l++AOxS1bUlBF9OE0JuWh1P9WQPBfXgd6rgQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ttzRiXiBFPCRgCMBrWSU8nn4twl40azAWUflgAWNG8oij8EWAKYZnMTVsTFW9S3HIf9un74geJ3cafHHi9R0iFj5BX0g6FnijZDY6hk4EooQv7+2I//0KZbSKfFORJIWT6PTerJR/MD/YzyKdpHvXEUxV7lhTldYDcKBn47auUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Iqqrp33P; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-70231566377so254454b3a.0
+        for <netdev@vger.kernel.org>; Wed, 29 May 2024 20:28:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717039698; x=1717644498; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AcIS2DB3SRfxRMB+nZJAOQPaZWEf+4JritcBFBDshKs=;
+        b=Iqqrp33PhJzStzGt532KNiTZkOTdKHCXyltNQZMsjo8uCSwplyNYJOuMVm/ZR5FEVb
+         0rs3+g6+c3aA3wnX6Ea1FB9DBnB+sAMJABH1Z/RG9ZwaWE3xwrBNuMypSZPM4MpK9Hu3
+         CXtG7ymUGR26cRxMNMYijicmjh6/oW1iBSttDvo9cx5ABIRhZlPeD1IOSI52rToBfOup
+         162o3aJ57oDAapZL57PrJ0yczH0aLdGv8+rgNmQPfUGyrI2GAWzjArPMI8x/bdDj4ljR
+         2PadiPrXB7CS7ULlquwQoOjbkPnDpNt/oq5x/+5U8Qq0xkvtKVCC56xUtL3KP1JOxcJ3
+         ebGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717039698; x=1717644498;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AcIS2DB3SRfxRMB+nZJAOQPaZWEf+4JritcBFBDshKs=;
+        b=urHk5VmaVT4qUuqyl1ItWK8FTeuI8bpQfiBjhOebzlnNYTv6NLuiqLIjz3qwGXWfcQ
+         PMRGWBV5HRFWFVcHeYB0xcsysHDQAEa+yvyZNB9RXgfYSkUihIPHZ+10LpaURTStdacQ
+         PQU54R8AL9Nw/qiF2MjYsTsI6jlUwBSy8R4ZiXYwPjv6ICcEvRQWFgxcqcs6kAStlqaJ
+         J5gzKMNhj3pjdDhSHONlYbGP9UcIx8M0l1hoHSHMQsIu8FdAaMnYWAoJ8ksrvJ8SgAN0
+         lEA8ULiVM0JCs+Iq/4frWo6tFKZwyECjUnk0KTgX8LphtkKm5cJZOB0IGiJ297LWHa81
+         iWJQ==
+X-Gm-Message-State: AOJu0Yy/X/EZ2CjSNiFX07Mn7U6IQcGVqFBMrYnHNGMBg2lsbtKhe1jH
+	LG4dUqtKG+brCWHqwXX7K1S68o7ewXo+HkXawfn7UA/NhlmWQ4YB
+X-Google-Smtp-Source: AGHT+IFxnUj+yf7nDjSft2jWxq5ov9nDjf9e5sIHeYYvEetjc1vD2FqC+BmCmDlOgmzet0gFcvCNBw==
+X-Received: by 2002:a05:6a20:9192:b0:1af:b0be:4661 with SMTP id adf61e73a8af0-1b26454b0b3mr1042054637.19.1717039697818;
+        Wed, 29 May 2024 20:28:17 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c1a77a1eb2sm595027a91.51.2024.05.29.20.28.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 May 2024 20:28:17 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>,
+	John Sperbeck <jsperbeck@google.com>
+Subject: [PATCH net] net: rps: fix error when CONFIG_RFS_ACCEL is off
+Date: Thu, 30 May 2024 11:27:17 +0800
+Message-Id: <20240530032717.57787-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240529182316.1383db91@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On 29 May 18:23, Jakub Kicinski wrote:
->On Tue, 28 May 2024 17:28:05 +0300 Tariq Toukan wrote:
->> KSM Mkey is KLM Mkey with a fixed buffer size. Due to this fact,
->> it is a faster mechanism than KLM.
->>
->> SHAMPO feature used KLMs Mkeys for memory mappings of its headers buffer.
->> As it used KLMs with the same buffer size for each entry,
->> we can use KSMs instead.
->>
->> This commit changes the Mkeys that map the SHAMPO headers buffer
->> from KLMs to KSMs.
->
->Any references for understanding what KSM and KLM stand for?
->
+From: Jason Xing <kernelxing@tencent.com>
 
-Not available publicly. Simply those are two different HW mechanisms to
-translate HW virtual to physical addresses. KSM assumes fixed buffer
-length, hence performs faster.
+John Sperbeck reported that if we turn off CONFIG_RFS_ACCEL, the 'head'
+is not defined, which will trigger compile error. So I move the 'head'
+out of the CONFIG_RFS_ACCEL scope.
+
+Fixes: 84b6823cd96b ("net: rps: protect last_qtail with rps_input_queue_tail_save() helper")
+Reported-by: John Sperbeck <jsperbeck@google.com>
+Closes: https://lore.kernel.org/all/20240529203421.2432481-1-jsperbeck@google.com/
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+ net/core/dev.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 85fe8138f3e4..e62698c7a0e6 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4516,12 +4516,13 @@ set_rps_cpu(struct net_device *dev, struct sk_buff *skb,
+ 	    struct rps_dev_flow *rflow, u16 next_cpu)
+ {
+ 	if (next_cpu < nr_cpu_ids) {
++		u32 head;
+ #ifdef CONFIG_RFS_ACCEL
+ 		struct netdev_rx_queue *rxqueue;
+ 		struct rps_dev_flow_table *flow_table;
+ 		struct rps_dev_flow *old_rflow;
+-		u32 flow_id, head;
+ 		u16 rxq_index;
++		u32 flow_id;
+ 		int rc;
+ 
+ 		/* Should we steer this flow to a different hardware queue? */
+-- 
+2.37.3
+
 
