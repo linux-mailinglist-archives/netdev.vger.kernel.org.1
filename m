@@ -1,68 +1,76 @@
-Return-Path: <netdev+bounces-99455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B24F88D4F4A
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:43:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E9DC8D4F5D
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:46:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E41921C2250A
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 15:43:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE550B28A09
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 15:46:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 739EC183082;
-	Thu, 30 May 2024 15:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A0131CA9E;
+	Thu, 30 May 2024 15:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a4j9SunI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g/Ikush+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42939143C40;
-	Thu, 30 May 2024 15:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9CE187560;
+	Thu, 30 May 2024 15:45:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717083777; cv=none; b=Uvg3QdjAtUzR5ApjL2FPwd+5zViGVF3Kwoe10np0BSWr0t8Cvpm6qUY5N9DpD5dd4JUJur1z+tU2ijGqmA9aF7Hv08Vha3hgg4SdYNJ4zTgDew40i4QwvhSgNRAvpjNV7EpkTHhdbzLzzSOSAdRWGTrI66uYA2VCesjqRl0fdCQ=
+	t=1717083956; cv=none; b=jwiIl//HZKcT/kr/taQzG+khjlRk5G50igmBGs8GUZgGyvc/Isn3DSBVvfPF6hacpQ30167XUzFm1Zcfu/B8cvwqMyHAl5Z6aZDnxkv7usr6XOi7FUS95AjJYBosKbjTEZdYYy0eCTKNOqrcl4yM6OoginuKvykDUIlm/7tBB40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717083777; c=relaxed/simple;
-	bh=FvgUqKbCwTMGuyq+WCkzYfAToo/noscKFADcKO1XZTs=;
+	s=arc-20240116; t=1717083956; c=relaxed/simple;
+	bh=xsSwkUyeq1nQUoOErCP//MKePEhkvAUWLNfLc8T0PRw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dmliX+GT9V8UFG2IMgCU7lL/qAizhVzYWnyEUSo1Mi2BqOy/S9iKcYxenCGt1dm8zatgkqmMfp71tKCPn5z5ULvfCXkyDhb1+ib/Fgr0S/mjgf73QmAvGSWzlQ/sGX/u8qt3WG1e/8cheSl8fkz0iIxJd/wjIxoWW3+hs8Y3BXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a4j9SunI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 109D3C2BBFC;
-	Thu, 30 May 2024 15:42:56 +0000 (UTC)
+	 MIME-Version:Content-Type; b=HPx4vRN39F2LG4pfLZtXlDndzaBT6TJCIceiuGETyvSlKJhEv8Iioqr+ySD8QKsnB9D3wT8AYg/egsxBVJD7o6Dng9x+mSyNTOOGdZ+1LHqIEg+AvR1ssHlkUTk+C2cwKcmwUlwaP5miFZQj3ou8j9Pru4LED74HcdBWuuiFbRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g/Ikush+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CF86C2BBFC;
+	Thu, 30 May 2024 15:45:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717083777;
-	bh=FvgUqKbCwTMGuyq+WCkzYfAToo/noscKFADcKO1XZTs=;
+	s=k20201202; t=1717083955;
+	bh=xsSwkUyeq1nQUoOErCP//MKePEhkvAUWLNfLc8T0PRw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=a4j9SunIZXxZvoQpSFFfeXqP1YaEE5f73KgkqD5K7sqCLCuyexuxW9moMGKcx7Vmj
-	 Fe6u7g9P6dkwq88ERfm1GfLHzALr/5xxIXEirxm1DExbpAhxAHV8n/mGDBHlqHsk9L
-	 MgNySsGXv94WBacmz4Ip5GJ3ECHKjofNvNgB1QNup0jH8JxiVNF709LcXeOOJmh01q
-	 ZVl+UX+g/6UPQpeeszJxj5WIHg5B4fdNfZ80hMuflkBE/9HC8TyFhDrAq3ic/eyU7B
-	 1v7Oy6nGeIjnYZSgMIaZt3esnkd/PN9gI7SMvmEP+7CfwrY3+6lTxzG/Pm3lwtrzFF
-	 HhC9rVXE7Mj+A==
-Date: Thu, 30 May 2024 08:42:55 -0700
+	b=g/Ikush+zKUa+GCP1lDlqOhGaISQyGEezWdeyn+6j6UKyGFNaaIaYmbbmgZC88olM
+	 bJG4nSfy2bqJx0grAwCh5Za1T3WD32v9xk6kqUpoapslpcBeTpmS18b9YLp0nZr9/A
+	 f/uaKuq5jn2kNfRwdMx031VfiPZNl3onKb6Lo+cHtUu0XaBElTYV3oV1p0h9Z3uBu/
+	 6GBHJHaobWD6HIjTVD0ZnyfA6t0DMgezZJBeYJc7z/9RIy9QbTIStbC0eXH+YH/VDx
+	 bWGOix8Gcz19Pcs6ffRplr7yqvow1VCaMQ3rPhtPHtzAJIsIC5jBoc48bYDFrb7+CZ
+	 p+gaToO+g2Ylg==
+Date: Thu, 30 May 2024 08:45:53 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>,
- linux-hardening@vger.kernel.org, netdev@vger.kernel.org,
- linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, Colin Ian King <colin.i.king@gmail.com>, Ahmed
- Zaki <ahmed.zaki@intel.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>, Konstantin
- Taranov <kotaranov@microsoft.com>, Kees Cook <keescook@chromium.org>, Paolo
- Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "David S.
- Miller" <davem@davemloft.net>, Dexuan Cui <decui@microsoft.com>, Wei Liu
- <wei.liu@kernel.org>, Haiyang Zhang <haiyangz@microsoft.com>, "K. Y.
- Srinivasan" <kys@microsoft.com>, Jason Gunthorpe <jgg@ziepe.ca>, Ajay
- Sharma <sharmaajay@microsoft.com>, Long Li <longli@microsoft.com>, Shradha
- Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH net-next v2] net: mana: Allow variable size indirection
- table
-Message-ID: <20240530084255.0b550d35@kernel.org>
-In-Reply-To: <20240530143702.GB3884@unreal>
-References: <1716960955-3195-1-git-send-email-shradhagupta@linux.microsoft.com>
-	<20240530143702.GB3884@unreal>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Sai Krishna Gajula <saikrishnag@marvell.com>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ "UNGLinuxDriver@microchip.com" <UNGLinuxDriver@microchip.com>, Simon Horman
+ <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linux-doc@vger.kernel.org"
+ <linux-doc@vger.kernel.org>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: Re:  [PATCH net-next v13 12/14] net: ptp: Move ptp_clock_index() to
+ builtin symbol
+Message-ID: <20240530084553.5e437938@kernel.org>
+In-Reply-To: <20240530145350.6341746f@kmaincent-XPS-13-7390>
+References: <20240529-feature_ptp_netnext-v13-0-6eda4d40fa4f@bootlin.com>
+	<20240529-feature_ptp_netnext-v13-12-6eda4d40fa4f@bootlin.com>
+	<BY3PR18MB47074528CBB38F55A3F58A19A0F32@BY3PR18MB4707.namprd18.prod.outlook.com>
+	<20240530145350.6341746f@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,13 +80,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 30 May 2024 17:37:02 +0300 Leon Romanovsky wrote:
-> Once you are ok with this patch, let me create shared branch for it.
-> It is -rc1 and Konstantin already submitted some changes to qp.c
-> https://lore.kernel.org/all/1716366242-558-1-git-send-email-kotaranov@linux.microsoft.com/
+On Thu, 30 May 2024 14:53:50 +0200 Kory Maincent wrote:
+> > Please check the "build_clang - FAILED", "build_32bit - FAILED" build errors.  
 > 
-> This specific patch applies on top of Konstantin's changes cleanly.
+> Could you be more explicit? Which config are you using?
+> What is the build error?
+> 
+> I don't really see how this patch can bring a 32bit or clang build error. 
 
-Yeah, once it's not buggy shared branch SG! Just to be sure, on top
-of -rc1, right?
+Must be the same build problem I reported.
 
