@@ -1,160 +1,123 @@
-Return-Path: <netdev+bounces-99326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCF008D4829
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 11:13:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D13C8D479A
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 10:57:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71C971F21A0C
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 09:13:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A1B51F225A8
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 08:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52C81183979;
-	Thu, 30 May 2024 09:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B3C315B573;
+	Thu, 30 May 2024 08:56:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="wZ5ROcnU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IWmdv6zj"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7C9183973
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 09:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9860413B290
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 08:56:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717060385; cv=none; b=bMhvLeht+eBRE/leT0u+ZVHuumwsv/mT/IKyPIzGnYW5GQCnH5fl+HHO6lueSHiyJk+be1Cgytj1dmXr06gV4oyJNk1WC0j93uVDRwC3OhjLyKhWZhoimouBV1LSFaNXsUkRcZovva2+OBza5BNys2wXi4bh98tGhBJtzrhmpSU=
+	t=1717059391; cv=none; b=NuNnFeJ8pFPuQw25SX7iv02IfyioTvzaqXHBw7pP9Rq/eKgdpNGS9XOcUcZeEAewMJYOM6z+lxygqU+Bkg1dwF6xrCh/bV10cSCE3SayRPiEoov3+xS42cn6pnT/fNmyFt6n17kCjd7lHqcvRbm/EgXWX7ZoSw0MGV1tZB8TCcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717060385; c=relaxed/simple;
-	bh=xe5FIuhMy93kJX1XnWgqwVB3T4SMSXoOA+p7FeEX7x4=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=DziawNjKTOk+kgfM4g39Tj23mUXXCUKxBnBen873JWej4U/3C/VWzJ3K93l9S9rwS7O4LxruxiNGdqJU6h2wnUQ5NuhWaO0M37QdWRYW1+H1rudtMgOWbvT+47hWG4YNo91GdlQDshrT0kUHzA97BJsrL6y43o0vcSNtxYI0qwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=wZ5ROcnU; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1717060380; h=Message-ID:Subject:Date:From:To;
-	bh=89kKgGLmjLMer9ydMYGhYwVeiGXJLhKdY8ZU1/xZSIQ=;
-	b=wZ5ROcnUoceDu1eEZPSNX10m7/abe6SuozfzNRWg64cW6GEV+92HDreRqHVqvO+FrdaOjMOTZRcSjz95KTgADIsiNDRfRR91wtp5UjthCE+rBxt40ADLw6ieAxgs7WSRWOWn3657BcHSkdqHEYX4GpMkwQaZNNi70lvoo1qO5Xw=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R651e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067112;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W7WSSnR_1717060379;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W7WSSnR_1717060379)
-          by smtp.aliyun-inc.com;
-          Thu, 30 May 2024 17:13:00 +0800
-Message-ID: <1717058986.0899282-2-hengqi@linux.alibaba.com>
-Subject: Re: [PATCH net v3 2/2] virtio_net: fix a spurious deadlock issue
-Date: Thu, 30 May 2024 16:49:46 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Jiri Pirko <jiri@resnulli.us>,
- Daniel Jurgens <danielj@nvidia.com>,
- netdev@vger.kernel.org,
- virtualization@lists.linux.dev
-References: <20240528134116.117426-1-hengqi@linux.alibaba.com>
- <20240528134116.117426-3-hengqi@linux.alibaba.com>
- <e6411cb5ec7e5ecc211faded7af4843647c6143a.camel@redhat.com>
-In-Reply-To: <e6411cb5ec7e5ecc211faded7af4843647c6143a.camel@redhat.com>
+	s=arc-20240116; t=1717059391; c=relaxed/simple;
+	bh=7MIEsx3viVzGK+9Ye/pP9NjKqSOEzFj4nY7OfSS17JA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OwqHu7LKuET+2V3NgMHKaY2SIFKysx0uy6wx/5kGYkusH8u5H9VRHFKY+x/QZdzoMo1uVqsIABNCKZTUOu9gszKWKdyMhA3z7/o+5EsrrRidJ8C1tTXXQ1V8NdlSrKOBzCvcLB7NfQJTHoOJCc3MWxid0abih6XLuBxgZi0X9Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IWmdv6zj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717059388;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=wp9dT8wMnCyOCgEUiVZrNKqa8UOFLDrwjHbCmADMGTw=;
+	b=IWmdv6zjobW7HkOHdm3Zbzw9njaewRIuKGdIBZNCDEIfc2tZj7hMrBziKADMArm76fJPJY
+	Sq4zm3oCulW4unY6EJymdlbXkxfnnmKWcffZL/S4C/SatdHwWUqhKYe7mwpuJ6s9fNkX/Q
+	8KbisH/8mmqJrdb4oWP1i9lsMcHyDFM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-537-pw0Pzv4uNQaS0VDEbcnOWA-1; Thu, 30 May 2024 04:56:26 -0400
+X-MC-Unique: pw0Pzv4uNQaS0VDEbcnOWA-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3550810816bso35862f8f.3
+        for <netdev@vger.kernel.org>; Thu, 30 May 2024 01:56:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717059385; x=1717664185;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wp9dT8wMnCyOCgEUiVZrNKqa8UOFLDrwjHbCmADMGTw=;
+        b=XJhXIr5DaNqklh0yxgGZJOO3cBP3PaWTGsLE62vabQQY17Wiz9kFiLowGu3pI96v0a
+         XeY+ZxPU9UcNQzX18FJbEt8wO2Gw+Gw2k0bqrkK+IPbBu02yk1BKiiM/52MqwM5PTk7h
+         087sFH0rAoXGQhL96xFumFlKKPGAsSFCgYPHZ/ASmGAwBEuFYZHbevLtHxn6GW4VE4hg
+         f8pJT11Sgb2mZaKIuDSbmR5PjUnd16N+PSX6es6jSFbaBVAMED19awHz/eu/LeX8pk5h
+         N/ixXkVPTpsb3DAwn6jBm0KRkvShULLLNocF+UZ+1Zien0fsKI/zu0R6cPiOLPqKXSMl
+         MssA==
+X-Forwarded-Encrypted: i=1; AJvYcCUn8HjGQfUyOI42MsvEmWrfg6buszihjzRTLBq11rhK2b5ylBdfsLeRZy94SqLTmW6hrnNGlfawV7MvdHfY5rX4Ry5t5zbw
+X-Gm-Message-State: AOJu0YyHxnncbvEIo+3H9iqpy1rmESIVb6/wXgU6XZAkNepOUYBoz/oz
+	67DjBq6EIXyhqNrRJvz+vsUpDF+3cetECL9eKzn3lfk+N+IltvEnMGX2CiLu/kbiaQ+F2pWOYsZ
+	3YMTEFLO4YjR6RM0vvBVfQUhVKCy5oh6ek/URGJ3DC2o5VN9PLJGTJw==
+X-Received: by 2002:a5d:6106:0:b0:358:a09:2677 with SMTP id ffacd0b85a97d-35dc007f0e5mr1417475f8f.2.1717059385132;
+        Thu, 30 May 2024 01:56:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE5g49sVWo14q3yzafoJelbNBLZrTw+aBDr7TNTSOXdYo4t02cOtNuBjL2RWSj0/66rZREUIg==
+X-Received: by 2002:a5d:6106:0:b0:358:a09:2677 with SMTP id ffacd0b85a97d-35dc007f0e5mr1417462f8f.2.1717059384745;
+        Thu, 30 May 2024 01:56:24 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3341:b094:ab10:29ae:cdc:4db4:a22a])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35dc9885324sm1013378f8f.38.2024.05.30.01.56.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 May 2024 01:56:24 -0700 (PDT)
+Message-ID: <6092d48946628c7e41fff25b161fdb71ce55d3d2.camel@redhat.com>
+Subject: Re: [PATCH net] net: dsa: microchip: fix wrong register write when
+ masking interrupt
+From: Paolo Abeni <pabeni@redhat.com>
+To: Tristram.Ha@microchip.com, Arun Ramadoss <arun.ramadoss@microchip.com>, 
+ Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+ Vivien Didelot <vivien.didelot@gmail.com>, Florian Fainelli
+ <f.fainelli@gmail.com>,  Vladimir Oltean <olteanv@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,
+ UNGLinuxDriver@microchip.com, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Date: Thu, 30 May 2024 10:56:22 +0200
+In-Reply-To: <1716932113-3418-1-git-send-email-Tristram.Ha@microchip.com>
+References: <1716932113-3418-1-git-send-email-Tristram.Ha@microchip.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
 
-On Thu, 30 May 2024 10:34:07 +0200, Paolo Abeni <pabeni@redhat.com> wrote:
-> On Tue, 2024-05-28 at 21:41 +0800, Heng Qi wrote:
-> > When the following snippet is run, lockdep will report a deadlock[1].
-> > 
-> >   /* Acquire all queues dim_locks */
-> >   for (i = 0; i < vi->max_queue_pairs; i++)
-> >           mutex_lock(&vi->rq[i].dim_lock);
-> > 
-> > There's no deadlock here because the vq locks are always taken
-> > in the same order, but lockdep can not figure it out. So refactoring
-> > the code to alleviate the problem.
-> > 
-> > [1]
-> > ========================================================
-> > WARNING: possible recursive locking detected
-> > 6.9.0-rc7+ #319 Not tainted
-> > --------------------------------------------
-> > ethtool/962 is trying to acquire lock:
-> > 
-> > but task is already holding lock:
-> > 
-> > other info that might help us debug this:
-> > Possible unsafe locking scenario:
-> > 
-> >       CPU0
-> >       ----
-> >  lock(&vi->rq[i].dim_lock);
-> >  lock(&vi->rq[i].dim_lock);
-> > 
-> > *** DEADLOCK ***
-> > 
-> >  May be due to missing lock nesting notation
-> > 
-> > 3 locks held by ethtool/962:
-> >  #0: ffffffff82dbaab0 (cb_lock){++++}-{3:3}, at: genl_rcv+0x19/0x40
-> >  #1: ffffffff82dad0a8 (rtnl_mutex){+.+.}-{3:3}, at:
-> > 				ethnl_default_set_doit+0xbe/0x1e0
-> > 
-> > stack backtrace:
-> > CPU: 6 PID: 962 Comm: ethtool Not tainted 6.9.0-rc7+ #319
-> > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-> > 	   rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-> > Call Trace:
-> >  <TASK>
-> >  dump_stack_lvl+0x79/0xb0
-> >  check_deadlock+0x130/0x220
-> >  __lock_acquire+0x861/0x990
-> >  lock_acquire.part.0+0x72/0x1d0
-> >  ? lock_acquire+0xf8/0x130
-> >  __mutex_lock+0x71/0xd50
-> >  virtnet_set_coalesce+0x151/0x190
-> >  __ethnl_set_coalesce.isra.0+0x3f8/0x4d0
-> >  ethnl_set_coalesce+0x34/0x90
-> >  ethnl_default_set_doit+0xdd/0x1e0
-> >  genl_family_rcv_msg_doit+0xdc/0x130
-> >  genl_family_rcv_msg+0x154/0x230
-> >  ? __pfx_ethnl_default_set_doit+0x10/0x10
-> >  genl_rcv_msg+0x4b/0xa0
-> >  ? __pfx_genl_rcv_msg+0x10/0x10
-> >  netlink_rcv_skb+0x5a/0x110
-> >  genl_rcv+0x28/0x40
-> >  netlink_unicast+0x1af/0x280
-> >  netlink_sendmsg+0x20e/0x460
-> >  __sys_sendto+0x1fe/0x210
-> >  ? find_held_lock+0x2b/0x80
-> >  ? do_user_addr_fault+0x3a2/0x8a0
-> >  ? __lock_release+0x5e/0x160
-> >  ? do_user_addr_fault+0x3a2/0x8a0
-> >  ? lock_release+0x72/0x140
-> >  ? do_user_addr_fault+0x3a7/0x8a0
-> >  __x64_sys_sendto+0x29/0x30
-> >  do_syscall_64+0x78/0x180
-> >  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> > 
-> > Fixes: 4d4ac2ececd3 ("virtio_net: Add a lock for per queue RX coalesce")
-> > Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-> 
-> This would have deserved a changelog after the commit message.
+On Tue, 2024-05-28 at 14:35 -0700, Tristram.Ha@microchip.com wrote:
+> From: Tristram Ha <tristram.ha@microchip.com>
+>=20
+> The initial code used 32-bit register.  After that it was changed to 0x1F
+> so it is no longer appropriate to use 32-bit write.
 
-I declared the changelog in the cover-letter, but I can initiate a new
-RESEND version with a changelog in this patch if you want :)
+IMHO the above sentence is too much unclear. It sort of implies that
+the currently used register is 8 bit wide because such register address
+can be represented with 8 bit - which in turn sounds weird or
+irrelevant.
 
-> 
-> The patch LGTM (for obvious reasons ;), but it deserves an explicit ack
-> from Jason and/or Michael
+I guess some documentation describes register 0x1F, please rephrase the
+changelog accordingly.
 
-Thanks.
+Thanks,
 
-> 
-> Cheers,
-> 
-> Paolo
-> 
+Paolo
+
 
