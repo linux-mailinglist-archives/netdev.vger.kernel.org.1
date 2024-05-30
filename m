@@ -1,139 +1,143 @@
-Return-Path: <netdev+bounces-99498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C445A8D5115
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 19:36:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80E1B8D511E
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 19:38:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B552282D2F
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:36:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC0CF28343D
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:38:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9226344C76;
-	Thu, 30 May 2024 17:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9EF46521;
+	Thu, 30 May 2024 17:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tt4Z7obe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2pyHE8k9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF9A17F5;
-	Thu, 30 May 2024 17:35:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B0518757F
+	for <netdev@vger.kernel.org>; Thu, 30 May 2024 17:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717090558; cv=none; b=llDA+gozbKlQ7W3QseWjJY6WPmlZn63cVkacTf7QVEo10aSYuVQEjoqTNSltr8PpZhXvRsj8AIJkppi6oKFF0UjFFzg6bgBWkLmKhH8ZzzMq5WB6hWKDIrtZB0eYz8Xcvx/bjzTa3kPHLG0Tuom9NSLbUst/bNA2mU4AFa22Lyc=
+	t=1717090734; cv=none; b=hU6P7fghCLYdR4jYEzKcCfXmx9ce5cJYFK9ao6bplj5+mwlHo5zgTOmgCSn/KDN/0ZJrRPzSTah4isCDyRZt2nJWXwf2mh96wRPp8W080tfOTO6F2Lv+Zh65aO9V/U4GFHXU7szXRd5nt2z+g1taWx7QMJS19ri/s+jrDUfziA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717090558; c=relaxed/simple;
-	bh=ySA3qGoOv77Kj+2JOSfztlTPJtvNGX/ZUjZpww6gAWQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=faZOUovDoKQLK1+HFW0Twj0c8PdsJsQqBA868SGFnk64Z8ubHYXn7xpzAAciHrwv1mIzYfMD7I9+z9kDLvyAZSIdrqvHAJCCA04fWdOq7zEtIX1BdVAMHmaT79E41zwzuJVMb3/v9iAnLaB9P0qJqtoe73SL95T2INkMEfdqxac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tt4Z7obe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2638BC2BBFC;
-	Thu, 30 May 2024 17:35:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717090558;
-	bh=ySA3qGoOv77Kj+2JOSfztlTPJtvNGX/ZUjZpww6gAWQ=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=Tt4Z7obenZPIzytNHWx8Uf5ToRX1Ul/8ItRUAQLmMfBxQzIU6CrU67LSnfS3AzMRR
-	 8uufZL/8YJc1w2zkMxrOEGaDHd+QWSbeX68ikLMkEyteok3231VRcUROhnoU/UQSCm
-	 CtQ6kE0sNJm41M4hJNskKrhqAIkrbKfKoQzDC2d8BDTSRv/NKTKCJw6646PdotwOnq
-	 dwno/IXtn7a4pAQwt672DGFqjF9Z5rXLz7LjEpDr8/z8ojo0gvktypWSgQqsn17a13
-	 JKOAYowe/vceNGtNN/6ZWzkeY4feuQncFsNVp+ueZOR0/8nabyFjp0kkvhp6SIMbhP
-	 iCXVDd/FIkHIA==
-Message-ID: <7e443c56-129e-4421-8dd8-adb57e9e6193@kernel.org>
-Date: Thu, 30 May 2024 19:35:56 +0200
+	s=arc-20240116; t=1717090734; c=relaxed/simple;
+	bh=mi9zV5y50BYmzSatp20dGoOtZTzkd3IYofryuQjtfkk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fU6r9M+PtVJ3mflBrE00fcAdQ3yMEOInxGSdMgeftHcoGynduyKiSU+O2MXz8BhV3M2c+GH7FFr6Ydpho/JmPiafqlG1rJMwfwQDTRqA/JzqBMlJipICz7OMYk74vT+ia2nCprSH+tuyI2bE9Zy0McfpKIFWsKDHHNpFLEMOzcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2pyHE8k9; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5750a8737e5so1613a12.0
+        for <netdev@vger.kernel.org>; Thu, 30 May 2024 10:38:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717090731; x=1717695531; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J1Qb7akEq5yCmelTDmjxq7mBISC0Z5mjD3Lgkgcz6kw=;
+        b=2pyHE8k9b+slg0RTrs04Dr+maRnN80IV57RQgQlFWTFWIZwDd6o8qR/Fu9QMOL9DKN
+         Dt4VRUH7OVbFvlsRek5pigY3oW9TI/qibimwyGnLcjCJKeVDFHl6MmBJfD1Ov4cwqFpK
+         Kr14VmEIpZSGx4vITBNRI+4qNPBkIWTS5SZa1R09zMajLjb2LQeUMaj/d3WCbWuEpLWz
+         dj/0m6G2RgUz4QSYzEdBlNhFUEuHt4dkrJpbBMxilVeEV7ugdbkd8qXAcgO/UOKBDWWD
+         XEJMBy8gdoUifOJUb8RNyW2Ijx+MN8sbDmppMtF7rxvyanF2OsrAl/Dq5CZY0l93lemy
+         g3gQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717090731; x=1717695531;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J1Qb7akEq5yCmelTDmjxq7mBISC0Z5mjD3Lgkgcz6kw=;
+        b=T0oiN2mLom6FvYFN3GwzuUJ6Mkh+VAbLK97DOOtlwnZP4I5R+2wg7swmgeOJkcCT0Y
+         o5efOdrx0IX0sjrr5w5ghLwpDcy6gXAPvW5vfVkNPSOmHqbu9aMNPfOJElp6wfBKxnoj
+         DHiUhZWW4e++iuLh555qXVfBPiTReEATzZ2/EUjz3et269AC8h32KA8+0IrCOlXlnINq
+         UBPJczeHpkggDIDVQNZ20hYG4mwEZaBSaTe0RL+QgrJaU+YDg2KDdTreLHPx/olByxpn
+         lVOlxaUmHJ18ByA7Qef4cDVlp92izHlO3QT3xWsA5MJ7mZPRdm0nCiCPhi27nSVJaEj2
+         iyCw==
+X-Gm-Message-State: AOJu0YwVT9aw/RGGM8+38SkbiWz7bGlXQoXS6wmi2igN5UvFUT+3cTMl
+	2lwB+NOFAzO017ggXUSiF+ognrHm0LsqaQpQz6NpHDpYu1W7B47lrm+SyIYHHimnKMQVtRMXg0S
+	X4pPmRpzCjTu0/mpPzn0pHInp8T4V5M9eDZqp
+X-Google-Smtp-Source: AGHT+IFfBLLIwisiQNM9r3xLxxbuwPZQAO+IdpMQxPWTlVp2BJtmXBRmHrZyszeSziU893PnpKJrDxd5ptqkaabDiSg=
+X-Received: by 2002:a50:ee87:0:b0:57a:2398:5ea2 with SMTP id
+ 4fb4d7f45d1cf-57a239860f9mr138520a12.3.1717090730693; Thu, 30 May 2024
+ 10:38:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [TEST] Flake report
-Content-Language: en-GB
-From: Matthieu Baerts <matttbe@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, MPTCP Upstream <mptcp@lists.linux.dev>
-References: <20240509160958.2987ef50@kernel.org>
- <11ff9d2b-6c3e-4ee5-81c0-d36de2308dbd@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <11ff9d2b-6c3e-4ee5-81c0-d36de2308dbd@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <cover.1717087015.git.pabeni@redhat.com>
+In-Reply-To: <cover.1717087015.git.pabeni@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 30 May 2024 19:38:39 +0200
+Message-ID: <CANn89iJusnd3fEr5U47iOPmH8joRohOcD==Q4vVLrM+c808i0g@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/3] dst_cache: cope with device removal
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jakub,
+On Thu, May 30, 2024 at 7:21=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> Eric reported a net device refcount leak and diagnosed the root cause
+> as the dst_cache not coping well with the underlying device removal.
+>
+> To address such issue, this series introduces the infrastructure to let
+> the existing uncached list handle the relevant cleanup.
+>
+> Patch 1 and 2 are preparation changes to make the uncached list infra
+> more flexible for the new use-case, and patch 3 addresses the issue.
+>
+> ---
+> Targeting net-next as the addressed problem is quite ancient and I fear
+> some unexpected side effects for patch 2.
 
-(+ MPTCP ML, - authors of other unstable selftests)
+Thanks Paolo, I am going to test this ASAP.
 
-On 10/05/2024 16:28, Matthieu Baerts wrote:
-> On 10/05/2024 01:09, Jakub Kicinski wrote:
-> 
-> (...)
-> 
->> mptcp
->> -----
->> To: Matthieu Baerts <matttbe@kernel.org>
->>
->> simult-flows-sh is still quite flaky :(
-> 
-> Yes, we need to find a solution for that. It is not as unstable on our
-> side [1]. We will look at that next week. If we cannot find a solution
-> quickly, we will skip the flaky subtests to stop the noise while
-> continuing to investigate.
-Now that the flaky MPTCP subtests results have been ignored, the results
-look better:
+BTW I found suspect dst_cache uses from lwtunnel in the output path.
+AFAIK lwtunnel_output() does not block BH.
+Either we change lwtunnel_output() or replace some of the ->output
+methods to use local_bh_disable() ?
 
-  https://netdev.bots.linux.dev/flakes.html?br-cnt=88&tn-needle=mptcp
+If BH is already held, I do not think
+preempt_disable()/preempt_enable(); pairs are necessary.
 
-Do you think we could also stop ignoring them on NIPA side?
+diff --git a/net/ipv6/ioam6_iptunnel.c b/net/ipv6/ioam6_iptunnel.c
+index 7563f8c6aa87cf9f7841ee78dcea2a16f60ac344..bf7120ecea1ebe834e70073710b=
+e0c1692d7ad1d
+100644
+--- a/net/ipv6/ioam6_iptunnel.c
++++ b/net/ipv6/ioam6_iptunnel.c
+@@ -351,9 +351,9 @@ static int ioam6_output(struct net *net, struct
+sock *sk, struct sk_buff *skb)
+                goto drop;
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+        if (!ipv6_addr_equal(&orig_daddr, &ipv6_hdr(skb)->daddr)) {
+-               preempt_disable();
++               local_bh_disable();
+                dst =3D dst_cache_get(&ilwt->cache);
+-               preempt_enable();
++               local_bh_enable();
 
+                if (unlikely(!dst)) {
+                        struct ipv6hdr *hdr =3D ipv6_hdr(skb);
+@@ -373,9 +373,9 @@ static int ioam6_output(struct net *net, struct
+sock *sk, struct sk_buff *skb)
+                                goto drop;
+                        }
+
+-                       preempt_disable();
++                       local_bh_disable();
+                        dst_cache_set_ip6(&ilwt->cache, dst, &fl6.saddr);
+-                       preempt_enable();
++                       local_bh_enable();
+                }
+
+                skb_dst_drop(skb);
 
