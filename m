@@ -1,335 +1,287 @@
-Return-Path: <netdev+bounces-99520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E5778D51DD
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 20:36:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB9748D51E1
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 20:38:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42F1E28472F
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 18:36:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13533B21910
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 18:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 981684D9E3;
-	Thu, 30 May 2024 18:36:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 742D54CE05;
+	Thu, 30 May 2024 18:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZxwiUM1s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C882C4C3C3
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 18:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717094194; cv=none; b=ftmwr8YfUK163CWHMeM531i6NoHuxg3GP+snCaX8hyYrxgOxoBJPvq21iNXZtYt78CKyopA5GvNL5JciWuzsKTBa/h3regFeMJvr/xYbnjw+SNvzPWLDI03IoZhjgIoC1w6zyBXvMuVKtSXimrqFwEU/wWJc4DfC28IxxB+neEY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717094194; c=relaxed/simple;
-	bh=i3Pc/CviSAhHjormskhMKUif8ESk5MiMeWzZjwjN/mA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=hrl/O7snOr79O4DF8hNFLBCDX8IoQRGXGEpi5SVpnhcOfiX9835+k6/5SjG27Ms1ux8ZcFRh+f3fbqJxYDiFFN2YfcOJVNfgwvgdvQXdnkGEbztaxXd+8j3tFf45zPJoRI28qnaQkvBd1iaQhtngjfQ3S36LrM9XCv4DNv0mjBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-7e212ee8008so155216439f.0
-        for <netdev@vger.kernel.org>; Thu, 30 May 2024 11:36:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717094192; x=1717698992;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RFSm7dVTf6uWq0rBom+Q5nS1FnZS70bDYMkL075o/WU=;
-        b=oGHlT9fHMXqR+ENW6rVVV+EzcGSrDtwZwxqQFpq1BBKxyvrCS0JlHBAnGG6d92hEWz
-         oNuxsQ0O2BN5IQOeqGPRQ37JOmw3o5RzZF875IDinBarJ1NzD8r2LuxaeIWq+qhlNCMG
-         sVYQPwwrg2+HQGM0dGS4AgP2Zcj1O38VXRmz3pxLzCLnt0zIxD6HYotNJFu873NR6zHz
-         4tJpN5WGXkZRFCmITHTvPZL2IKldNPrKdi1wvYMi3o+FDuNk0U/buCmXtfAdu+DDH5ol
-         f4PwfnySiu/KG5BdEoIeZ9TmNYsiXKGaQYJ8K6I6Ip7XJydetYmyLvrW8z0ZCrZqK/ka
-         7Vdw==
-X-Forwarded-Encrypted: i=1; AJvYcCWHKD54OSMKWa3i9G0Exav7YT4OHTy6uKgamjza/kqzhptEUtwgJCS5P8z/iRNs1gAciNsw6OPM1XgctRq7yYmHPKGdK75N
-X-Gm-Message-State: AOJu0Ywq/mouzs42BbGdM7Ifw8wntCkjTItfoNOHXu85weVksTlG+QNF
-	St8mI3N7P14HgR4DTnh+7Uaw23jL6hWUU+Ln0SY/f0NJv8sBVBF1zAJqW9icmU1QKhs57oWnJIk
-	qTBkLFiYCPmQg9f17Rot489p50SM4BmOhP9TBAI47/ytgwEuVTReSYXw=
-X-Google-Smtp-Source: AGHT+IHeL0AzcXNDKZXGqRxetDsb+6LW9UgeXRP+dayZVaQ3Mi9K6ohw0eUzNBpesSpEj/j16PUFrg1afksj13T5TZZsPno+BL1R
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD7F187577;
+	Thu, 30 May 2024 18:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717094308; cv=fail; b=VI784GZnTLaY1ZI6WR8FHGpxEfhpUVLIJK+8+kkcrNFEzypZRA1oZ2vUGjIYX58KH7bnSdBwwSJ3cEbY65S44qbqrXMSU9TrnN70uRi2IIC/EPrNCy0wiGSs4YVuIPNAI2c0jNg3+VQ1BjJbIqi7lNlWrFkJEyUQMnSXxSyHSNQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717094308; c=relaxed/simple;
+	bh=Y4olmUBENkf6FZ4yPcfkSgZZKFf01qE0/+Tcudj/4no=;
+	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=XzyW4acPMzbvkE2o2CnLFh9yzCInMxb9g7Tvcq+u6mA7jp+hhsErg8o+yLKDND++uv6GYAa4p7edJIxNWw+hcDl5Z15zxZtr994N0sY+Jz7/14vrEyPk47gM7/hdSWhyUWWCPbgDSuSOObhS/dnHgv7s6S7i/CTicuT2dltNuPk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZxwiUM1s; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717094306; x=1748630306;
+  h=message-id:date:subject:to:references:from:in-reply-to:
+   content-transfer-encoding:mime-version;
+  bh=Y4olmUBENkf6FZ4yPcfkSgZZKFf01qE0/+Tcudj/4no=;
+  b=ZxwiUM1sedY4UXCX+S6/O/y3hUJlnjxXTIFhNMA1JMLuw/fGXnU+u8QR
+   kf6WL1D0iPROysjzZq+cbQglpDqlbA+mRrDvSy4828c0o7A8C0DnEUd8f
+   Aip/f58CF7OF4CgGR3V9Nfxk5JZvnJtsiI+FZInAVlztxzV9v60T37t+b
+   1XD/39ycb7xXyUXaKWK59akW5ozlUl+8/I8/yxvRiv1Ov/2LBu/GFlGvP
+   dD0LuU+nJeKNBMntlEaNA8QKQbFKEihlxNe5804cWQ3JwWXI9YUa29UCV
+   rBbGNAMuZZQ69FtWpbXoVcBZ1td10SGWNTNgzeDu05Z4ojlKviR0GJQ7h
+   Q==;
+X-CSE-ConnectionGUID: +S3wDv0fQP2Oq7oBae3zUg==
+X-CSE-MsgGUID: C84HLulkSLulFjLvBy2byQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11088"; a="24167617"
+X-IronPort-AV: E=Sophos;i="6.08,202,1712646000"; 
+   d="scan'208";a="24167617"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2024 11:38:25 -0700
+X-CSE-ConnectionGUID: vFPf6lQzRBW4kjQU4x6UCA==
+X-CSE-MsgGUID: OtT3fxlYRP6X4NsuXyTZag==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,202,1712646000"; 
+   d="scan'208";a="66775345"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 May 2024 11:38:26 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 30 May 2024 11:38:25 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 30 May 2024 11:38:24 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 30 May 2024 11:38:24 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 30 May 2024 11:38:24 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=im/0GDxb9k22hitTWaILEYxsJuWS9JiUdhJnHK6DHZ7MB/cfjOb9XXpTxxnqFFamgiatuTrNDmTOy85wOTQroB7apr3JQxjTuisVBSC3ONw4m5/U0ufw5XgPNA+MTAKt47zQPgMQIJNBu/F+bufuk3O9OfVOw+q/FOI1cC9oWtSYKa9snoQBjZ4Hh/r2TaNmrZQf2squB29Cc7RzxIsroCxRdbqdQtnAbPTLn3YObsrx+juWfQIGXqVGUKf3mbAeiZKqpafU9i3CLyX4rQucAoFF61I0cz4o74BEE+QSabuunTAx975Fo14gifqLXcuhycgyaEyzVX/AtyWh+v3LeA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UQ2g63CwHwCotKc/Ht72irZpF9c4TM2kGkcml0NjbW4=;
+ b=kmw6qSK5J6BGvrU2WVnbaICzqaKm55bPnbTMHy/F8LzftzMBXweFTrBLS494nV8kGsVKCREuhueNXya+bZf5+qRrej0TkVoJdhWNAxwii85z/g1Dszbs5OHAZiAJf1Ce+q1EkV0CRI8fp0ltkzPyw4iOYtxcJbT61TT1s04Ux5aB6M2ntBOzVIPwYVkutgfgzfwh8jyjUvu3rTqLXDSUCuxxTuuBXtwzCgFmiCeIITU0Pu8yyl9bVFz2dLxi3T1/pCuPa16qhJ2O9ByCtdRFqJ8pqeRgnwVL+MzOWZmkZz+3x45dKwwcpAFgD2JJwpoEqHw26UKhu7VSYXepgDpMNQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by PH7PR11MB8455.namprd11.prod.outlook.com (2603:10b6:510:30d::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.22; Thu, 30 May
+ 2024 18:38:22 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%5]) with mapi id 15.20.7633.018; Thu, 30 May 2024
+ 18:38:22 +0000
+Message-ID: <6f4874d9-4233-48cd-8ee3-0576068fbc4c@intel.com>
+Date: Thu, 30 May 2024 11:38:21 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH v3] octeontx2-pf: Add ucast filter count
+ configurability via devlink.
+To: Sai Krishna <saikrishnag@marvell.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<sgoutham@marvell.com>, <gakula@marvell.com>, <hkelam@marvell.com>,
+	<sbhatta@marvell.com>
+References: <20240530101515.201635-1-saikrishnag@marvell.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20240530101515.201635-1-saikrishnag@marvell.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0239.namprd03.prod.outlook.com
+ (2603:10b6:303:b9::34) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:1307:b0:488:75e3:f3c5 with SMTP id
- 8926c6da1cb9f-4b1da6452d7mr153260173.0.1717094192016; Thu, 30 May 2024
- 11:36:32 -0700 (PDT)
-Date: Thu, 30 May 2024 11:36:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005c8adb0619b025aa@google.com>
-Subject: [syzbot] [mm?] possible deadlock in try_to_wake_up (5)
-From: syzbot <syzbot+4970d08867f5a5b0bb78@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    95348e463eab selftests/bpf: Add netkit test for pkt_type
-git tree:       bpf
-console output: https://syzkaller.appspot.com/x/log.txt?x=11646be0980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=17ffd15f654c98ba
-dashboard link: https://syzkaller.appspot.com/bug?extid=4970d08867f5a5b0bb78
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/45aceeb3f8f5/disk-95348e46.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ff3ff3033939/vmlinux-95348e46.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/fdfb9e139fb3/bzImage-95348e46.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4970d08867f5a5b0bb78@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.9.0-syzkaller-08570-g95348e463eab #0 Not tainted
-------------------------------------------------------
-syz-executor.0/8491 is trying to acquire lock:
-ffff8880176f0a18 (&p->pi_lock){-.-.}-{2:2}, at: class_raw_spinlock_irqsave_constructor include/linux/spinlock.h:553 [inline]
-ffff8880176f0a18 (&p->pi_lock){-.-.}-{2:2}, at: try_to_wake_up+0xb0/0x1470 kernel/sched/core.c:4262
-
-but task is already holding lock:
-ffff8880b9538828 (lock#10){+.+.}-{2:2}, at: local_lock_acquire include/linux/local_lock_internal.h:29 [inline]
-ffff8880b9538828 (lock#10){+.+.}-{2:2}, at: __mmap_lock_do_trace_acquire_returned+0x8f/0x630 mm/mmap_lock.c:237
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (lock#10){+.+.}-{2:2}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       local_lock_acquire include/linux/local_lock_internal.h:29 [inline]
-       __mmap_lock_do_trace_acquire_returned+0xa8/0x630 mm/mmap_lock.c:237
-       __mmap_lock_trace_acquire_returned include/linux/mmap_lock.h:36 [inline]
-       mmap_read_trylock include/linux/mmap_lock.h:166 [inline]
-       stack_map_get_build_id_offset+0x9b2/0x9d0 kernel/bpf/stackmap.c:141
-       __bpf_get_stack+0x4ad/0x5a0 kernel/bpf/stackmap.c:449
-       ____bpf_get_stack_raw_tp kernel/trace/bpf_trace.c:1994 [inline]
-       bpf_get_stack_raw_tp+0x1a3/0x240 kernel/trace/bpf_trace.c:1984
-       0xffffffffa0001b6a
-       bpf_dispatcher_nop_func include/linux/bpf.h:1243 [inline]
-       __bpf_prog_run include/linux/filter.h:682 [inline]
-       bpf_prog_run include/linux/filter.h:698 [inline]
-       __bpf_trace_run kernel/trace/bpf_trace.c:2403 [inline]
-       bpf_trace_run2+0x47d/0x540 kernel/trace/bpf_trace.c:2444
-       trace_tlb_flush+0x118/0x140 include/trace/events/tlb.h:38
-       switch_mm_irqs_off+0x7cb/0xae0
-       context_switch kernel/sched/core.c:5392 [inline]
-       __schedule+0x1066/0x4a50 kernel/sched/core.c:6745
-       preempt_schedule_common+0x84/0xd0 kernel/sched/core.c:6924
-       preempt_schedule+0xe1/0xf0 kernel/sched/core.c:6948
-       preempt_schedule_thunk+0x1a/0x30 arch/x86/entry/thunk.S:12
-       __raw_spin_unlock include/linux/spinlock_api_smp.h:143 [inline]
-       _raw_spin_unlock+0x3e/0x50 kernel/locking/spinlock.c:186
-       spin_unlock include/linux/spinlock.h:391 [inline]
-       __text_poke+0xa6b/0xd30 arch/x86/kernel/alternative.c:1944
-       text_poke arch/x86/kernel/alternative.c:1968 [inline]
-       text_poke_bp_batch+0x265/0xb30 arch/x86/kernel/alternative.c:2276
-       text_poke_flush arch/x86/kernel/alternative.c:2470 [inline]
-       text_poke_finish+0x30/0x50 arch/x86/kernel/alternative.c:2477
-       arch_jump_label_transform_apply+0x1c/0x30 arch/x86/kernel/jump_label.c:146
-       static_key_enable_cpuslocked+0x136/0x260 kernel/jump_label.c:205
-       static_key_enable+0x1a/0x20 kernel/jump_label.c:218
-       tracepoint_add_func+0x953/0x9e0 kernel/tracepoint.c:361
-       tracepoint_probe_register_prio kernel/tracepoint.c:511 [inline]
-       tracepoint_probe_register+0x105/0x160 kernel/tracepoint.c:531
-       perf_trace_event_reg kernel/trace/trace_event_perf.c:129 [inline]
-       perf_trace_event_init+0x478/0x910 kernel/trace/trace_event_perf.c:202
-       perf_trace_init+0x243/0x2e0 kernel/trace/trace_event_perf.c:226
-       perf_tp_event_init+0x8d/0x110 kernel/events/core.c:10210
-       perf_try_init_event+0x139/0x3f0 kernel/events/core.c:11685
-       perf_init_event kernel/events/core.c:11755 [inline]
-       perf_event_alloc+0x1018/0x20b0 kernel/events/core.c:12033
-       __do_sys_perf_event_open kernel/events/core.c:12540 [inline]
-       __se_sys_perf_event_open+0xb43/0x38d0 kernel/events/core.c:12431
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (&rq->__lock){-.-.}-{2:2}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       _raw_spin_lock_nested+0x31/0x40 kernel/locking/spinlock.c:378
-       raw_spin_rq_lock_nested+0x2a/0x140 kernel/sched/core.c:559
-       raw_spin_rq_lock kernel/sched/sched.h:1406 [inline]
-       rq_lock kernel/sched/sched.h:1702 [inline]
-       task_fork_fair+0x61/0x1e0 kernel/sched/fair.c:12709
-       sched_cgroup_fork+0x37c/0x410 kernel/sched/core.c:4844
-       copy_process+0x2217/0x3dc0 kernel/fork.c:2499
-       kernel_clone+0x226/0x8f0 kernel/fork.c:2797
-       user_mode_thread+0x132/0x1a0 kernel/fork.c:2875
-       rest_init+0x23/0x300 init/main.c:707
-       start_kernel+0x47a/0x500 init/main.c:1084
-       x86_64_start_reservations+0x2a/0x30 arch/x86/kernel/head64.c:507
-       x86_64_start_kernel+0x99/0xa0 arch/x86/kernel/head64.c:488
-       common_startup_64+0x13e/0x147
-
--> #0 (&p->pi_lock){-.-.}-{2:2}:
-       check_prev_add kernel/locking/lockdep.c:3134 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-       validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
-       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
-       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-       _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
-       class_raw_spinlock_irqsave_constructor include/linux/spinlock.h:553 [inline]
-       try_to_wake_up+0xb0/0x1470 kernel/sched/core.c:4262
-       rcu_read_unlock_special+0x3db/0x550 kernel/rcu/tree_plugin.h:655
-       __rcu_read_unlock+0xa1/0x110 kernel/rcu/tree_plugin.h:426
-       __mmap_lock_do_trace_acquire_returned+0x1f9/0x630 mm/mmap_lock.c:237
-       __mmap_lock_trace_acquire_returned include/linux/mmap_lock.h:36 [inline]
-       mmap_read_trylock include/linux/mmap_lock.h:166 [inline]
-       get_mmap_lock_carefully mm/memory.c:5628 [inline]
-       lock_mm_and_find_vma+0x213/0x2f0 mm/memory.c:5688
-       do_user_addr_fault arch/x86/mm/fault.c:1355 [inline]
-       handle_page_fault arch/x86/mm/fault.c:1475 [inline]
-       exc_page_fault+0x1a9/0x8a0 arch/x86/mm/fault.c:1533
-       asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:623
-       fault_in_readable+0x165/0x2b0
-       fault_in_iov_iter_readable+0x229/0x280 lib/iov_iter.c:94
-       generic_perform_write+0x220/0x640 mm/filemap.c:3964
-       ext4_buffered_write_iter+0xc6/0x350 fs/ext4/file.c:299
-       ext4_file_write_iter+0x1de/0x1a10
-       call_write_iter include/linux/fs.h:2120 [inline]
-       new_sync_write fs/read_write.c:497 [inline]
-       vfs_write+0xa2d/0xc50 fs/read_write.c:590
-       ksys_write+0x1a0/0x2c0 fs/read_write.c:643
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  &p->pi_lock --> &rq->__lock --> lock#10
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(lock#10);
-                               lock(&rq->__lock);
-                               lock(lock#10);
-  lock(&p->pi_lock);
-
- *** DEADLOCK ***
-
-5 locks held by syz-executor.0/8491:
- #0: ffff888057b239c8 (&f->f_pos_lock){+.+.}-{3:3}, at: __fdget_pos+0x259/0x320 fs/file.c:1191
- #1: ffff88802f3aa420 (sb_writers#4){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2871 [inline]
- #1: ffff88802f3aa420 (sb_writers#4){.+.+}-{0:0}, at: vfs_write+0x227/0xc50 fs/read_write.c:586
- #2: ffff88805e14ac00 (&sb->s_type->i_mutex_key#8){++++}-{3:3}, at: inode_lock include/linux/fs.h:791 [inline]
- #2: ffff88805e14ac00 (&sb->s_type->i_mutex_key#8){++++}-{3:3}, at: ext4_buffered_write_iter+0x97/0x350 fs/ext4/file.c:294
- #3: ffff88807b0b81a0 (&mm->mmap_lock){++++}-{3:3}, at: mmap_read_trylock include/linux/mmap_lock.h:165 [inline]
- #3: ffff88807b0b81a0 (&mm->mmap_lock){++++}-{3:3}, at: get_mmap_lock_carefully mm/memory.c:5628 [inline]
- #3: ffff88807b0b81a0 (&mm->mmap_lock){++++}-{3:3}, at: lock_mm_and_find_vma+0x32/0x2f0 mm/memory.c:5688
- #4: ffff8880b9538828 (lock#10){+.+.}-{2:2}, at: local_lock_acquire include/linux/local_lock_internal.h:29 [inline]
- #4: ffff8880b9538828 (lock#10){+.+.}-{2:2}, at: __mmap_lock_do_trace_acquire_returned+0x8f/0x630 mm/mmap_lock.c:237
-
-stack backtrace:
-CPU: 1 PID: 8491 Comm: syz-executor.0 Not tainted 6.9.0-syzkaller-08570-g95348e463eab #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
- check_prev_add kernel/locking/lockdep.c:3134 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5754
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
- class_raw_spinlock_irqsave_constructor include/linux/spinlock.h:553 [inline]
- try_to_wake_up+0xb0/0x1470 kernel/sched/core.c:4262
- rcu_read_unlock_special+0x3db/0x550 kernel/rcu/tree_plugin.h:655
- __rcu_read_unlock+0xa1/0x110 kernel/rcu/tree_plugin.h:426
- __mmap_lock_do_trace_acquire_returned+0x1f9/0x630 mm/mmap_lock.c:237
- __mmap_lock_trace_acquire_returned include/linux/mmap_lock.h:36 [inline]
- mmap_read_trylock include/linux/mmap_lock.h:166 [inline]
- get_mmap_lock_carefully mm/memory.c:5628 [inline]
- lock_mm_and_find_vma+0x213/0x2f0 mm/memory.c:5688
- do_user_addr_fault arch/x86/mm/fault.c:1355 [inline]
- handle_page_fault arch/x86/mm/fault.c:1475 [inline]
- exc_page_fault+0x1a9/0x8a0 arch/x86/mm/fault.c:1533
- asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:623
-RIP: 0010:fault_in_readable+0x165/0x2b0 mm/gup.c:2009
-Code: b5 ff 4c 8d b3 ff 0f 00 00 48 89 d8 4d 01 e6 49 81 e6 00 f0 ff ff 49 39 c6 72 6b e8 85 80 b5 ff 4c 39 f3 74 6e 4c 89 64 24 10 <44> 8a 23 43 0f b6 04 2f 84 c0 75 18 44 88 64 24 40 48 81 c3 00 10
-RSP: 0018:ffffc90002e4f860 EFLAGS: 00050287
-RAX: ffffffff81e0b14b RBX: 000000002008e000 RCX: 0000000000040000
-RDX: ffffc90009789000 RSI: 00000000000311f0 RDI: 00000000000311f1
-RBP: ffffc90002e4f918 R08: ffffffff81e0b0e8 R09: ffffffff84ad9419
-R10: 0000000000000002 R11: ffff888022843c00 R12: 0000000000001000
-R13: dffffc0000000000 R14: 000000002008f000 R15: 1ffff920005c9f14
- fault_in_iov_iter_readable+0x229/0x280 lib/iov_iter.c:94
- generic_perform_write+0x220/0x640 mm/filemap.c:3964
- ext4_buffered_write_iter+0xc6/0x350 fs/ext4/file.c:299
- ext4_file_write_iter+0x1de/0x1a10
- call_write_iter include/linux/fs.h:2120 [inline]
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xa2d/0xc50 fs/read_write.c:590
- ksys_write+0x1a0/0x2c0 fs/read_write.c:643
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fd1f167cee9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fd1f23c40c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007fd1f17abf80 RCX: 00007fd1f167cee9
-RDX: 00000000fffffd26 RSI: 0000000020000000 RDI: 0000000000000004
-RBP: 00007fd1f16c949e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007fd1f17abf80 R15: 00007ffdbacf9b68
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	b5 ff                	mov    $0xff,%ch
-   2:	4c 8d b3 ff 0f 00 00 	lea    0xfff(%rbx),%r14
-   9:	48 89 d8             	mov    %rbx,%rax
-   c:	4d 01 e6             	add    %r12,%r14
-   f:	49 81 e6 00 f0 ff ff 	and    $0xfffffffffffff000,%r14
-  16:	49 39 c6             	cmp    %rax,%r14
-  19:	72 6b                	jb     0x86
-  1b:	e8 85 80 b5 ff       	call   0xffb580a5
-  20:	4c 39 f3             	cmp    %r14,%rbx
-  23:	74 6e                	je     0x93
-  25:	4c 89 64 24 10       	mov    %r12,0x10(%rsp)
-* 2a:	44 8a 23             	mov    (%rbx),%r12b <-- trapping instruction
-  2d:	43 0f b6 04 2f       	movzbl (%r15,%r13,1),%eax
-  32:	84 c0                	test   %al,%al
-  34:	75 18                	jne    0x4e
-  36:	44 88 64 24 40       	mov    %r12b,0x40(%rsp)
-  3b:	48                   	rex.W
-  3c:	81                   	.byte 0x81
-  3d:	c3                   	ret
-  3e:	00 10                	add    %dl,(%rax)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH7PR11MB8455:EE_
+X-MS-Office365-Filtering-Correlation-Id: fbe6cc67-55c3-45ce-de5e-08dc80d7af38
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|7416005|376005|366007|921011;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?cXlOU2ZmeDYvbElnMEZiTHYxR2VkMTU1cUgraFZtMjhmVWg4Ly9KYjZiMjNV?=
+ =?utf-8?B?SnlScTlqT0Vidm9LUVBXVWpZelk5eVh5elJmOXdqQzVtcG12NmxwQkV6UkV5?=
+ =?utf-8?B?MnB0d3pra3U0Qm5uR1pDSmErVjlYWk9OdzRCb0NsK2x3QnRHSmV4eTd1S2ZF?=
+ =?utf-8?B?R01JeEMzVkdwTjZQVE40d3JmcStqYllIM1V5UFJIQWdoRCtOcGp0R3cvQit6?=
+ =?utf-8?B?N2E0NXJRcGNmdnlYUlpudXNjZkEvK3c0TW1XbUJBYkpjZTg5azU5OE90NDlJ?=
+ =?utf-8?B?OXNXR3pFR3BGWkNFaTcyN0llb3NmRTBZKzlUc3ZjUTJmWEtOOTNRa3lCVjJm?=
+ =?utf-8?B?d2FVdXFxYUNucWQ4TkVaeFhhMGR4RHowbk5IU0N3MEpTdTJZWFBrakJ0bVh0?=
+ =?utf-8?B?ZUN1UHFUOWhYNWhOWGIyTEVsOHY0dFROM0ZaQ2pxNE05MFBsaEl1N2N4b2Z4?=
+ =?utf-8?B?YnR4bWE2ZlQrSERvc2R5Zy8zZEZFMk9BM09WdjRpa3NaenoyTmUzeTNnNWto?=
+ =?utf-8?B?ZjBZb3QzU1QwcFNmelBsTmN6Y3BvSnllb2Nwcmp5Q083enVjSDhka2krR2hi?=
+ =?utf-8?B?b0thNGYvUFg3bFRrU1dpZ21kRktua2NRR1ZlN3FRY1dNdGhpUzhsaFJPNGtD?=
+ =?utf-8?B?cXM2NnhCWmhiWjlpMVYrbnBVdG83UnFyNVVQRHVYRWtlSUs3dk1GakFOLzVu?=
+ =?utf-8?B?eHMyWmVjbTJPampxNDVwMHEyTmZoSW1NSWFneXZSK2p0Y2VLeVh6VXR0b3I0?=
+ =?utf-8?B?ckFaYlpQeU55OTJHOU9UMEFzNGVhMHNubStrRnAwekVCRmxGOEx6aGN2TEtF?=
+ =?utf-8?B?M0NRSjdJd09MbGZqN01MRlQrSTVzSkoyWU1XYWZaSFZmMG5GZGRNSUYyNmRh?=
+ =?utf-8?B?R20vdzhyYUhlWk0yZ0xqTzAvK1laTjFnTklMT3V3S0xRbXBIb0R5LzZBR2VR?=
+ =?utf-8?B?aFJmVGYrYSt1M29yeWZ5OHh6QmE0QWRHUjhNU1BEQ1RIVGZYbE1CRWJaZ2hG?=
+ =?utf-8?B?TGhoMWhVSkZOQlFla0FnWlVzckYwRFZlUWdGRU9uUTZjSjIwRnRuRTZaNU51?=
+ =?utf-8?B?amkwUU5VTkVjVVl1bTRlS3kwY0NXMDNVVjdJcERDTkNVNmw5K3BkSGJKZEdr?=
+ =?utf-8?B?VFlPNW00S0ZjRzBQQVc3ZFd6Z2ZRelloYjhDWUdwc1kreUdpUWpKYmlXbW5s?=
+ =?utf-8?B?YlExK294ZFpEamNLUnc5NEw5eE5pWG83VHNGQVhoSHVlT3lpWEVNNS9vYUFv?=
+ =?utf-8?B?cHJPZzcyMStrZmZjdHoyNmNWc05YOER6ZnFDc2hwTXhFZEI4VU5HY1kxMlZi?=
+ =?utf-8?B?alk1RDNkYk5SL2xDNXR4VHo0SitheXNpZVpGd2Y0bWJ2L0lIRk5aSjBLQ2J5?=
+ =?utf-8?B?bUlNSEVpRHJzV3BrL2xqQ0tld0FQZUh3VXlzbENaUDVqdmtucWxSckc1K1pQ?=
+ =?utf-8?B?R3V1cy9KOHV4OExaVlZ5MmR6a0NjNkpjVTc4MzFrWFpvRW0xVTVVSTNuaHkr?=
+ =?utf-8?B?TkFXK3hUbjRseHFUVE5rRjNPbk9kUmVObHRIeEVxNm1RTzh4dm1uNmRrZGpi?=
+ =?utf-8?B?L3dwSjRIeHdZdXBSTnlidEZ2YlE1YzlwRGFDbFpna1hhaGZSdlBoa2ExTUJZ?=
+ =?utf-8?B?OWo4Mm9ZYXJpeHVwUkVFM2dkWVNudFZWRXpIZlIzSnI4dlYrN0QvUjR3encx?=
+ =?utf-8?B?QWF6ZHdFNC9vbHZPYTVSam9BR3AzRW04Y2t6Tmw3VS9yU2dPUkI2VzhzaXBG?=
+ =?utf-8?Q?sbnlVgZfDsmaGiEK3pDwvq5Yh2Fjru5t375KlPl?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(376005)(366007)(921011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Ymo3YWJCbEdsSVRQWlNYQVpCc1l4TGsrYnU0YWUxdDdvNktaT3B0Q1hMd2Za?=
+ =?utf-8?B?T2ZrOTRWdG0rbXFmNXQvYkFvOEhkU2ROMlJycitZaCtoYXpzRzEySkZmRVUv?=
+ =?utf-8?B?K3Jya1hxWDVDL3NrSW5VVUpRVUVLbG4yWnY4dWNzMEg5R05WUkJGTkZDWCs3?=
+ =?utf-8?B?TXR6dG1xbEgrSXZveGpUWExGRUdaUG9YVjRzRjRUQU1KK1VvOWpSV0RLQlcy?=
+ =?utf-8?B?eUJyK0lYNVFPcnhhTHd2UGZKdzJVSWYzRUNjb2lMSXRuNWFCWEx0WlVpSWF4?=
+ =?utf-8?B?bVNuS3VRK3BKT3JzbGxoMjVlUk9GajcxUjFBZ1dKM1lsN3NremdKQlJ2M2Ri?=
+ =?utf-8?B?RHFUWVRNMmpYMVRHSFlXbmg5YXYzUk52VlBpZFh6ajhlcEkvYlR0T1ZpdTEz?=
+ =?utf-8?B?eXRoelhEZkJ2L3JmeE9wRXd4L3h2cFB3cjVLSisxTldxVlltZ2t4UjdTWTZK?=
+ =?utf-8?B?Q2kzUm12MzF0MTd2aHFvZ2VjcGFkdjkwMXZQaW1CcEZyVzBNOGg2QmZhNC9O?=
+ =?utf-8?B?SFVuRFJMNVhORDhBenVjM3h2aWVXWDl4bjNGdXRQaXQvamlMMmlYeFFrZmt1?=
+ =?utf-8?B?ZGhqVlRPcU4yMkMyY1NTZzVIWlYzWUJwVkNSWmp6QzM3SVlra2FCNHFKRFBo?=
+ =?utf-8?B?OGVTYnRnM0djbEZSTUFDZGtFaEMvRlI3aDRvVzBnSm9yWWxucktXN1FnU0JM?=
+ =?utf-8?B?K0xTT0xCcUZOVjB1VkZKZ0gvdS9TN1hacnlVc1duampXSnVlaTZ4VXp1blh5?=
+ =?utf-8?B?TGlYZHAvRUJmRFh4UlFGTTUyV1hJL2NxejdUUWw3c1ZoRllBam5jMDJXWG10?=
+ =?utf-8?B?MG1MSnp3ZVRQQkVCY1JtSVdjV0ZOU05tRW43YlNLZXk5TndiTURGdTJETlY3?=
+ =?utf-8?B?T2FDdXczQ1NaM2c2c2Q4ZHFhMU1haTNCeGR4dDBUY1dUVDZ4VDN0a2U0N1hU?=
+ =?utf-8?B?NE5NMWRORW81NktoampUWnhaL252aDMrWE81Tm55S2NDangxcWhocWZ3dXFk?=
+ =?utf-8?B?dE4zenBhNHBHM2EzaFg1OXVtTU9IZVN1RjlyNldtSUpJQ0M4NjZrN1Bzbm1W?=
+ =?utf-8?B?MmQ3cTJVQy8zNmlVbWN1OG1VWlQ4K2NzUWw1bFRQTjJHdWYrTndwNWJiTEpB?=
+ =?utf-8?B?RS8xYWxZdlYzN3ZpWW1LRnh3RWI0alg0Q2h0SWFKZTExV21FN0hMNHBZZ0Jh?=
+ =?utf-8?B?c2oyY1RuTWdESmpOa3ZFTWhqbjEzSUl6bkpFc1pQRXdZYTQ1VG1RU1lKRnNn?=
+ =?utf-8?B?Yk1mZW1NSUVMZ1NSSWxWc0hSVHY3ZFRMY1c2MlJ5RXJncDNxTS84dGVJa0hm?=
+ =?utf-8?B?TUhueU1aUVRCVk1aN2VQZlRjM3lhRnpEcDlEZ0FQMUpJaDViZ3QyVHNOUnVD?=
+ =?utf-8?B?d040UXhONUZlZnVmRUFHbGovVzRlV3VReWYreHJwR3JFUzNTSDdBZWJBZEVw?=
+ =?utf-8?B?QnJTVzh5bDNGWXBIb1R4RWN5bStzN2p3Vzd3MFNlNWl2czFQZWttQ2pOUE0r?=
+ =?utf-8?B?SDluaUozREpiY0d3WERZZ0hTM2pHZGM2VmZPbGdDYUU1RXhZT3dpN3cvV2xD?=
+ =?utf-8?B?M2t3RURXUGoyOGVHMVlHRmljTklBUzV3Mzl2SlY5S1cybDNiMzFmS3lScnBJ?=
+ =?utf-8?B?dWpIdEQ4SUs5dXF0TU5XdjhIb3l2VTJnb2tnVUp3cVFES0tCN3VSVjQ3MUxC?=
+ =?utf-8?B?cFVQTzhDR3ozNnA2aWsybDhxaTUzanVTalMxK2NVSVNnUGVKdU9IQ1VIT0FQ?=
+ =?utf-8?B?a2grL3RXaDU1M3F5UmdFNUJOWXdxMzZtRDFPbTk3cDRqK01BZ0d6TEtlMXlh?=
+ =?utf-8?B?OWJtN3l4OEhqZER4aXRycmZ3L3FwVEpuaVdDOER2MEVIaDlLYkdWVWJjZ0cr?=
+ =?utf-8?B?TkdWREhnUkhTVWZiQ205QTlzWStmUTRWUHhKa0dQUlBzRlZwam0zVlJBblFR?=
+ =?utf-8?B?VVN2eGZLSy94WkR2RzhXd1loZ1dsaDRxTTFNNXd2SEVxYWNFUUJVR25JNGtK?=
+ =?utf-8?B?ZWVDSzQxeWl3ZWpZa21FMGF6VFI2N216VkRoY3VIOGxGYUdPcEhCZHBjdndV?=
+ =?utf-8?B?RCtrVEpqRGlRYUl5ZkRnT1B3RE9pTTRIQlVERHh5TGFHSHRIT25GU0lla2Ez?=
+ =?utf-8?B?aHJqVmxYMndNMHJpUkpHR2ZWdE83UjRGTytlRFV6aTg1akNSeHZ3eDF5YXAw?=
+ =?utf-8?B?S2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: fbe6cc67-55c3-45ce-de5e-08dc80d7af38
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2024 18:38:22.6611
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AvN/tq8K++quRLCCBBsxVfrG6n6t716ouH50CJN5XJxPkNVYWJZ/a0byCrJBA2ZA+9Jbl9b1mtVwPyMSOYWsAVKqVDmFlXkMVzggllb9Jho=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8455
+X-OriginatorOrg: intel.com
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On 5/30/2024 3:15 AM, Sai Krishna wrote:
+> Added a devlink param to set/modify unicast filter count. Currently
+> it's hardcoded with a macro.
+> 
+> commands:
+> 
+> To get the current unicast filter count
+>  # devlink dev param show pci/0002:02:00.0 name unicast_filter_count
+> 
+> To change/set the unicast filter count
+>  # devlink dev param  set  pci/0002:02:00.0  name unicast_filter_count
+>  value 5 cmode runtime
+> 
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+A bit of explanation about why this needs to be configurable would be
+useful. What is the impact of lowering or raising this value? Presumably
+you need to change the MCAM table size? Lowering this on one port might
+enable raising it on another?
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+It seems reasonable to me, but it is helpful to provide such motivations
+in the commit message.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+> Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
+> ---
+> v3:
+>     - Addressed review comments given by Jakub Kicinski
+>         1. Documented unicast_filter_count devlink param
+>         2. Minor change to match upstream code base
+> v2:
+>     - Addressed review comments given by Simon Horman
+> 	1. Updated the commit message with example commads
+>         2. Modified/optimized conditions
+> 
+>  .../networking/devlink/octeontx2.rst          | 16 +++++
+>  .../marvell/octeontx2/nic/otx2_common.h       |  7 +-
+>  .../marvell/octeontx2/nic/otx2_devlink.c      | 64 +++++++++++++++++++
+>  .../marvell/octeontx2/nic/otx2_flows.c        | 20 +++---
+>  .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  2 +-
+>  5 files changed, 95 insertions(+), 14 deletions(-)
+> 
+> diff --git a/Documentation/networking/devlink/octeontx2.rst b/Documentation/networking/devlink/octeontx2.rst
+> index 610de99b728a..5910289b4d4e 100644
+> --- a/Documentation/networking/devlink/octeontx2.rst
+> +++ b/Documentation/networking/devlink/octeontx2.rst
+> @@ -40,3 +40,19 @@ The ``octeontx2 AF`` driver implements the following driver-specific parameters.
+>       - runtime
+>       - Use to set the quantum which hardware uses for scheduling among transmit queues.
+>         Hardware uses weighted DWRR algorithm to schedule among all transmit queues.
+> +
+> +The ``octeontx2 PF`` driver implements the following driver-specific parameters.
+> +
+> +.. list-table:: Driver-specific parameters implemented
+> +   :widths: 5 5 5 85
+> +
+> +   * - Name
+> +     - Type
+> +     - Mode
+> +     - Description
+> +   * - ``unicast_filter_count``
+> +     - u8
+> +     - runtime
+> +     - Used to Set/modify unicast filter count, which helps in better utilization of
+> +       resources against possible wastage(un-used) with current scheme of hardcoded
+> +       unicast count.
 
-If you want to undo deduplication, reply with:
-#syz undup
+The text here could be worded a little better. Once the patch is applied
+then hard coding is no longer the "current scheme".
+
+I might have worded this like:
+
+"Set the maximum number of unicast filters that can be programmed for
+the device. This can be used to achieve better device resource
+utilization, avoiding over consumption of unused MCAM table entries."
+
+Or something similar.
 
