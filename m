@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-99502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5E608D5122
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 19:40:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B3108D5123
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 19:40:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01FD32859AD
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:40:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3CD21F23070
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 17:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49AB8481B8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699FF481BD;
 	Thu, 30 May 2024 17:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G/amJ4+7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K6D7VRRQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70BA34655F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C930446BA0
 	for <netdev@vger.kernel.org>; Thu, 30 May 2024 17:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717090807; cv=none; b=Zs1LlwZpWPQj7HxE2EsmRsI9FtFOPp0J94/tovgjL/Yl2K55kWlCet7B3h80GnAb9qB9OAf/DfWnUWDXYOSg/kE7PCOgGGt/Gaw+cmhOkl0S+v+P4MBK9Vg8FtiY4iXCjE5xErvu9ulFgRb9Ash618GrHoq4fQ3MUDX5Gf79jUY=
+	t=1717090807; cv=none; b=sHB9uxLuGasrbEO5rd8/3Qf1zVVbr0tYJ2vEr7MZNRFzjhj6a4vBoezqDSaUeeWRkk7vpSMA3OTmYB88LuT2E3/3QMeTFja36pXefZrdLVyITC7P4yaZlzNeIItp6B3SdaQxg6sXfjFqC0IIhd+B9xLw3xxEU6cpB5PNzZJp5EM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717090807; c=relaxed/simple;
-	bh=nsK1xYI+tztfapzrB2bS37X2EEtBBxDd6AIioUmjrGM=;
+	bh=YunoSBmfF4xBYtM2W8VHvFhwJS4LXoiaUkq6/oNkDBY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=g8w8ieENsuEKl1/JX7h6lc+hxy/bVPg0mmxb2N+QDWujLgwY6G6noQZlrK1Audcxj/W2eGvsoMKqce9Q7QBm4h361Y0ck9fUAoDnOLb4wcdpUiIVBMQTjSML4hzyBpbajiqzKOfIiakpBBAU1RRftr/X6JY/6e8v2xqpF9TQU4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G/amJ4+7; arc=none smtp.client-ip=192.198.163.8
+	 In-Reply-To:To:Cc; b=GPBfAhgJ9w9sMekSvdYQ/5BPQy9vuveYnJAgM1CEjszFPfyaPanp9ajD+i1jbAOVKOT90ILWzMI8ZoDNynw1N4VBXwyMPe77jsMetfzSP1JVoFoD01yeBBYyXZD8fnKbgyZlZQdoRPe9vWaR74YFckout5yUOR7dMrWHFLn5Yfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K6D7VRRQ; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717090805; x=1748626805;
+  t=1717090806; x=1748626806;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=nsK1xYI+tztfapzrB2bS37X2EEtBBxDd6AIioUmjrGM=;
-  b=G/amJ4+7Am+NEUvMPoD5rzjDjTRehodBRUTfgepAXKlajQGwPK7Jmj31
-   QIHanDAU5Jdv8EMo2qwlLvJiAQCv6FONist9GxB3S1f1I3Wp5BL3LRowC
-   0T/gP0rqS8FlswX3BT9ogpyPnfwQ24i+9V7JyjPMA2Hi5Fkw51BTOnqzL
-   B4NuOD74MWNEiSTCqVVAUoUpZ/Zh8NjF4Vh61dlBdpfgR6SLt9MkFbyh2
-   ngDGoJFPkUUY2EwaPtF2nTV7GUdl8sF5fxfQX0ATWs4ysQBnV/jP42piw
-   iYKYhOndJu8BGb6yujSI5bxymC/3kX/risNcASjVwJyOdBki/9mlmuVjS
+  bh=YunoSBmfF4xBYtM2W8VHvFhwJS4LXoiaUkq6/oNkDBY=;
+  b=K6D7VRRQNYE+/5QiU5zmIaPgaNPrXspxp2NkMJP8Apw4+Bj6jDKBmdF6
+   7aWQoj2RxupooBHSyOP4qfML0TkBoaa9Tm2RBUVLttaZHvMeNA4QrfCJ4
+   c6plsCAeNkqyiKB3xQPKmNlIghMYmb9unEJxCLLhR0CPteOEqo1joCapk
+   p+uY9y8LGBc+aEC5nvcosonZen+yk/QQOM7sUpPtgJVEa6cCmES0boVcd
+   motmKYBanq3NIYw6DDpyd8GcivLuyWZanjpKUEj1pinb4rN1A4vqwHTpm
+   DpyBXNVDTvFrQq8S6nAxFJ3aaSiepFTB9gHSfE4lCDGbmL8jsEraggxME
    w==;
-X-CSE-ConnectionGUID: WbD+IoSRT62gZtqQKd1uKA==
-X-CSE-MsgGUID: fE7Du/JdSp2+NfrQSs+pDA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11088"; a="31119258"
+X-CSE-ConnectionGUID: iHfL7H7/TNOOLLW5n/vBdg==
+X-CSE-MsgGUID: S1QHyzB7TtiHP4HxCyB7xw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11088"; a="31119260"
 X-IronPort-AV: E=Sophos;i="6.08,202,1712646000"; 
-   d="scan'208";a="31119258"
+   d="scan'208";a="31119260"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
   by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2024 10:40:02 -0700
-X-CSE-ConnectionGUID: CE8nTLkCS62zaVmMtZK6Pg==
-X-CSE-MsgGUID: 8Z5kP8PUQfWwRbkr2x8AAg==
+X-CSE-ConnectionGUID: B9QQ3gQST7KNvTl97fX31Q==
+X-CSE-MsgGUID: Dvf23ER4Rq2zgdm6ZBiNNw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,202,1712646000"; 
-   d="scan'208";a="66766673"
+   d="scan'208";a="66766677"
 Received: from jekeller-desk.amr.corp.intel.com ([10.166.241.1])
   by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2024 10:40:02 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Thu, 30 May 2024 10:39:29 -0700
-Subject: [PATCH net 2/6] ice: fix reads from NVM Shadow RAM on E830 and
- E825-C devices
+Date: Thu, 30 May 2024 10:39:30 -0700
+Subject: [PATCH net 3/6] ice: remove af_xdp_zc_qps bitmap
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,213 +69,175 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240530-net-2024-05-30-intel-net-fixes-v1-2-8b11c8c9bff8@intel.com>
+Message-Id: <20240530-net-2024-05-30-intel-net-fixes-v1-3-8b11c8c9bff8@intel.com>
 References: <20240530-net-2024-05-30-intel-net-fixes-v1-0-8b11c8c9bff8@intel.com>
 In-Reply-To: <20240530-net-2024-05-30-intel-net-fixes-v1-0-8b11c8c9bff8@intel.com>
 To: Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>, 
  netdev <netdev@vger.kernel.org>
 Cc: Jacob Keller <jacob.e.keller@intel.com>, 
- Paul Greenwalt <paul.greenwalt@intel.com>, 
+ Larysa Zaremba <larysa.zaremba@intel.com>, 
  Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+ Simon Horman <horms@kernel.org>, 
+ Chandan Kumar Rout <chandanx.rout@intel.com>
 X-Mailer: b4 0.13.0
 
-The ice driver reads data from the Shadow RAM portion of the NVM during
-initialization, including data used to identify the NVM image and device,
-such as the ETRACK ID used to populate devlink dev info fw.bundle.
+From: Larysa Zaremba <larysa.zaremba@intel.com>
 
-Currently it is using a fixed offset defined by ICE_CSS_HEADER_LENGTH to
-compute the appropriate offset. This worked fine for E810 and E822 devices
-which both have CSS header length of 330 words.
+Referenced commit has introduced a bitmap to distinguish between ZC and
+copy-mode AF_XDP queues, because xsk_get_pool_from_qid() does not do this
+for us.
 
-Other devices, including both E825-C and E830 devices have different sizes
-for their CSS header. The use of a hard coded value results in the driver
-reading from the wrong block in the NVM when attempting to access the
-Shadow RAM copy. This results in the driver reporting the fw.bundle as 0x0
-in both the devlink dev info and ethtool -i output.
+The bitmap would be especially useful when restoring previous state after
+rebuild, if only it was not reallocated in the process. This leads to e.g.
+xdpsock dying after changing number of queues.
 
-The first E830 support was introduced by commit ba20ecb1d1bb ("ice: Hook up
-4 E830 devices by adding their IDs") and the first E825-C support was
-introducted by commit f64e18944233 ("ice: introduce new E825C devices
-family")
+Instead of preserving the bitmap during the rebuild, remove it completely
+and distinguish between ZC and copy-mode queues based on the presence of
+a device associated with the pool.
 
-The NVM actually contains the CSS header length embedded in it. Remove the
-hard coded value and replace it with logic to read the length from the NVM
-directly. This is more resilient against all existing and future hardware,
-vs looking up the expected values from a table. It ensures the driver will
-read from the appropriate place when determining the ETRACK ID value used
-for populating the fw.bundle_id and for reporting in ethtool -i.
-
-The CSS header length for both the active and inactive flash bank is stored
-in the ice_bank_info structure to avoid unnecessary duplicate work when
-accessing multiple words of the Shadow RAM. Both banks are read in the
-unlikely event that the header length is different for the NVM in the
-inactive bank, rather than being different only by the overall device
-family.
-
-Fixes: ba20ecb1d1bb ("ice: Hook up 4 E830 devices by adding their IDs")
-Co-developed-by: Paul Greenwalt <paul.greenwalt@intel.com>
-Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+Fixes: e102db780e1c ("ice: track AF_XDP ZC enabled queues in bitmap")
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_nvm.c  | 88 ++++++++++++++++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_type.h | 14 +++--
- 2 files changed, 93 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/intel/ice/ice.h     | 32 +++++++++++++++++++++-----------
+ drivers/net/ethernet/intel/ice/ice_lib.c |  8 --------
+ drivers/net/ethernet/intel/ice/ice_xsk.c | 13 ++++++-------
+ 3 files changed, 27 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_nvm.c b/drivers/net/ethernet/intel/ice/ice_nvm.c
-index ea7cbdf8492d..59e8879ac059 100644
---- a/drivers/net/ethernet/intel/ice/ice_nvm.c
-+++ b/drivers/net/ethernet/intel/ice/ice_nvm.c
-@@ -374,11 +374,25 @@ ice_read_nvm_module(struct ice_hw *hw, enum ice_bank_select bank, u32 offset, u1
-  *
-  * Read the specified word from the copy of the Shadow RAM found in the
-  * specified NVM module.
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index 6ad8002b22e1..d4d840729bda 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -409,7 +409,6 @@ struct ice_vsi {
+ 	struct ice_tc_cfg tc_cfg;
+ 	struct bpf_prog *xdp_prog;
+ 	struct ice_tx_ring **xdp_rings;	 /* XDP ring array */
+-	unsigned long *af_xdp_zc_qps;	 /* tracks AF_XDP ZC enabled qps */
+ 	u16 num_xdp_txq;		 /* Used XDP queues */
+ 	u8 xdp_mapping_mode;		 /* ICE_MAP_MODE_[CONTIG|SCATTER] */
+ 
+@@ -746,6 +745,25 @@ static inline void ice_set_ring_xdp(struct ice_tx_ring *ring)
+ 	ring->flags |= ICE_TX_FLAGS_RING_XDP;
+ }
+ 
++/**
++ * ice_get_xp_from_qid - get ZC XSK buffer pool bound to a queue ID
++ * @vsi: pointer to VSI
++ * @qid: index of a queue to look at XSK buff pool presence
 + *
-+ * Note that the Shadow RAM copy is always located after the CSS header, and
-+ * is aligned to 64-byte (32-word) offsets.
-  */
- static int
- ice_read_nvm_sr_copy(struct ice_hw *hw, enum ice_bank_select bank, u32 offset, u16 *data)
- {
--	return ice_read_nvm_module(hw, bank, ICE_NVM_SR_COPY_WORD_OFFSET + offset, data);
-+	u32 sr_copy;
++ * Returns a pointer to xsk_buff_pool structure if there is a buffer pool
++ * attached and configured as zero-copy, NULL otherwise.
++ */
++static inline struct xsk_buff_pool *ice_get_xp_from_qid(struct ice_vsi *vsi,
++							u16 qid)
++{
++	struct xsk_buff_pool *pool = xsk_get_pool_from_qid(vsi->netdev, qid);
 +
-+	switch (bank) {
-+	case ICE_ACTIVE_FLASH_BANK:
-+		sr_copy = roundup(hw->flash.banks.active_css_hdr_len, 32);
-+		break;
-+	case ICE_INACTIVE_FLASH_BANK:
-+		sr_copy = roundup(hw->flash.banks.inactive_css_hdr_len, 32);
-+		break;
-+	}
++	if (!ice_is_xdp_ena_vsi(vsi))
++		return NULL;
 +
-+	return ice_read_nvm_module(hw, bank, sr_copy + offset, data);
++	return (pool && pool->dev) ? pool : NULL;
++}
++
+ /**
+  * ice_xsk_pool - get XSK buffer pool bound to a ring
+  * @ring: Rx ring to use
+@@ -758,10 +776,7 @@ static inline struct xsk_buff_pool *ice_xsk_pool(struct ice_rx_ring *ring)
+ 	struct ice_vsi *vsi = ring->vsi;
+ 	u16 qid = ring->q_index;
+ 
+-	if (!ice_is_xdp_ena_vsi(vsi) || !test_bit(qid, vsi->af_xdp_zc_qps))
+-		return NULL;
+-
+-	return xsk_get_pool_from_qid(vsi->netdev, qid);
++	return ice_get_xp_from_qid(vsi, qid);
  }
  
  /**
-@@ -1023,6 +1037,72 @@ static int ice_determine_active_flash_banks(struct ice_hw *hw)
+@@ -786,12 +801,7 @@ static inline void ice_tx_xsk_pool(struct ice_vsi *vsi, u16 qid)
+ 	if (!ring)
+ 		return;
+ 
+-	if (!ice_is_xdp_ena_vsi(vsi) || !test_bit(qid, vsi->af_xdp_zc_qps)) {
+-		ring->xsk_pool = NULL;
+-		return;
+-	}
+-
+-	ring->xsk_pool = xsk_get_pool_from_qid(vsi->netdev, qid);
++	ring->xsk_pool = ice_get_xp_from_qid(vsi, qid);
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 5371e91f6bbb..c0a7ff6c7e87 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -114,14 +114,8 @@ static int ice_vsi_alloc_arrays(struct ice_vsi *vsi)
+ 	if (!vsi->q_vectors)
+ 		goto err_vectors;
+ 
+-	vsi->af_xdp_zc_qps = bitmap_zalloc(max_t(int, vsi->alloc_txq, vsi->alloc_rxq), GFP_KERNEL);
+-	if (!vsi->af_xdp_zc_qps)
+-		goto err_zc_qps;
+-
+ 	return 0;
+ 
+-err_zc_qps:
+-	devm_kfree(dev, vsi->q_vectors);
+ err_vectors:
+ 	devm_kfree(dev, vsi->rxq_map);
+ err_rxq_map:
+@@ -309,8 +303,6 @@ static void ice_vsi_free_arrays(struct ice_vsi *vsi)
+ 
+ 	dev = ice_pf_to_dev(pf);
+ 
+-	bitmap_free(vsi->af_xdp_zc_qps);
+-	vsi->af_xdp_zc_qps = NULL;
+ 	/* free the ring and vector containers */
+ 	devm_kfree(dev, vsi->q_vectors);
+ 	vsi->q_vectors = NULL;
+diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
+index 7541f223bf4f..a65955eb23c0 100644
+--- a/drivers/net/ethernet/intel/ice/ice_xsk.c
++++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
+@@ -269,7 +269,6 @@ static int ice_xsk_pool_disable(struct ice_vsi *vsi, u16 qid)
+ 	if (!pool)
+ 		return -EINVAL;
+ 
+-	clear_bit(qid, vsi->af_xdp_zc_qps);
+ 	xsk_pool_dma_unmap(pool, ICE_RX_DMA_ATTR);
+ 
+ 	return 0;
+@@ -300,8 +299,6 @@ ice_xsk_pool_enable(struct ice_vsi *vsi, struct xsk_buff_pool *pool, u16 qid)
+ 	if (err)
+ 		return err;
+ 
+-	set_bit(qid, vsi->af_xdp_zc_qps);
+-
  	return 0;
  }
  
-+/**
-+ * ice_get_nvm_css_hdr_len - Read the CSS header length from the NVM CSS header
-+ * @hw: pointer to the HW struct
-+ * @bank: whether to read from the active or inactive flash bank
-+ * @hdr_len: storage for header length in words
-+ *
-+ * Read the CSS header length from the NVM CSS header and add the Authentication
-+ * header size, and then convert to words.
-+ *
-+ * Return: zero on success, or a negative error code on failure.
-+ */
-+static int
-+ice_get_nvm_css_hdr_len(struct ice_hw *hw, enum ice_bank_select bank,
-+			u32 *hdr_len)
-+{
-+	u16 hdr_len_l, hdr_len_h;
-+	u32 hdr_len_dword;
-+	int status;
+@@ -349,11 +346,13 @@ ice_realloc_rx_xdp_bufs(struct ice_rx_ring *rx_ring, bool pool_present)
+ int ice_realloc_zc_buf(struct ice_vsi *vsi, bool zc)
+ {
+ 	struct ice_rx_ring *rx_ring;
+-	unsigned long q;
++	uint i;
 +
-+	status = ice_read_nvm_module(hw, bank, ICE_NVM_CSS_HDR_LEN_L,
-+				     &hdr_len_l);
-+	if (status)
-+		return status;
-+
-+	status = ice_read_nvm_module(hw, bank, ICE_NVM_CSS_HDR_LEN_H,
-+				     &hdr_len_h);
-+	if (status)
-+		return status;
-+
-+	/* CSS header length is in DWORD, so convert to words and add
-+	 * authentication header size
-+	 */
-+	hdr_len_dword = hdr_len_h << 16 | hdr_len_l;
-+	*hdr_len = (hdr_len_dword * 2) + ICE_NVM_AUTH_HEADER_LEN;
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_determine_css_hdr_len - Discover CSS header length for the device
-+ * @hw: pointer to the HW struct
-+ *
-+ * Determine the size of the CSS header at the start of the NVM module. This
-+ * is useful for locating the Shadow RAM copy in the NVM, as the Shadow RAM is
-+ * always located just after the CSS header.
-+ *
-+ * Return: zero on success, or a negative error code on failure.
-+ */
-+static int ice_determine_css_hdr_len(struct ice_hw *hw)
-+{
-+	struct ice_bank_info *banks = &hw->flash.banks;
-+	int status;
-+
-+	status = ice_get_nvm_css_hdr_len(hw, ICE_ACTIVE_FLASH_BANK,
-+					 &banks->active_css_hdr_len);
-+	if (status)
-+		return status;
-+
-+	status = ice_get_nvm_css_hdr_len(hw, ICE_INACTIVE_FLASH_BANK,
-+					 &banks->inactive_css_hdr_len);
-+	if (status)
-+		return status;
-+
-+	return 0;
-+}
-+
- /**
-  * ice_init_nvm - initializes NVM setting
-  * @hw: pointer to the HW struct
-@@ -1069,6 +1149,12 @@ int ice_init_nvm(struct ice_hw *hw)
- 		return status;
++	ice_for_each_rxq(vsi, i) {
++		rx_ring = vsi->rx_rings[i];
++		if (!rx_ring->xsk_pool)
++			continue;
+ 
+-	for_each_set_bit(q, vsi->af_xdp_zc_qps,
+-			 max_t(int, vsi->alloc_txq, vsi->alloc_rxq)) {
+-		rx_ring = vsi->rx_rings[q];
+ 		if (ice_realloc_rx_xdp_bufs(rx_ring, zc))
+ 			return -ENOMEM;
  	}
- 
-+	status = ice_determine_css_hdr_len(hw);
-+	if (status) {
-+		ice_debug(hw, ICE_DBG_NVM, "Failed to determine Shadow RAM copy offsets.\n");
-+		return status;
-+	}
-+
- 	status = ice_get_nvm_ver_info(hw, ICE_ACTIVE_FLASH_BANK, &flash->nvm);
- 	if (status) {
- 		ice_debug(hw, ICE_DBG_INIT, "Failed to read NVM info.\n");
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index f0796a93f428..eef397e5baa0 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -482,6 +482,8 @@ struct ice_bank_info {
- 	u32 orom_size;				/* Size of OROM bank */
- 	u32 netlist_ptr;			/* Pointer to 1st Netlist bank */
- 	u32 netlist_size;			/* Size of Netlist bank */
-+	u32 active_css_hdr_len;			/* Active CSS header length */
-+	u32 inactive_css_hdr_len;		/* Inactive CSS header length */
- 	enum ice_flash_bank nvm_bank;		/* Active NVM bank */
- 	enum ice_flash_bank orom_bank;		/* Active OROM bank */
- 	enum ice_flash_bank netlist_bank;	/* Active Netlist bank */
-@@ -1087,17 +1089,13 @@ struct ice_aq_get_set_rss_lut_params {
- #define ICE_SR_SECTOR_SIZE_IN_WORDS	0x800
- 
- /* CSS Header words */
-+#define ICE_NVM_CSS_HDR_LEN_L			0x02
-+#define ICE_NVM_CSS_HDR_LEN_H			0x03
- #define ICE_NVM_CSS_SREV_L			0x14
- #define ICE_NVM_CSS_SREV_H			0x15
- 
--/* Length of CSS header section in words */
--#define ICE_CSS_HEADER_LENGTH			330
--
--/* Offset of Shadow RAM copy in the NVM bank area. */
--#define ICE_NVM_SR_COPY_WORD_OFFSET		roundup(ICE_CSS_HEADER_LENGTH, 32)
--
--/* Size in bytes of Option ROM trailer */
--#define ICE_NVM_OROM_TRAILER_LENGTH		(2 * ICE_CSS_HEADER_LENGTH)
-+/* Length of Authentication header section in words */
-+#define ICE_NVM_AUTH_HEADER_LEN			0x08
- 
- /* The Link Topology Netlist section is stored as a series of words. It is
-  * stored in the NVM as a TLV, with the first two words containing the type
 
 -- 
 2.44.0.53.g0f9d4d28b7e6
