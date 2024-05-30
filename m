@@ -1,734 +1,245 @@
-Return-Path: <netdev+bounces-99546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 362BF8D5393
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 22:20:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 420F18D53E1
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 22:30:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C423B21A00
-	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 20:20:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8BE91F2743D
+	for <lists+netdev@lfdr.de>; Thu, 30 May 2024 20:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5A9199EA9;
-	Thu, 30 May 2024 20:16:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42BB54D8D0;
+	Thu, 30 May 2024 20:30:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AZ6D7wLE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="na7T7t6v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5323818628C
-	for <netdev@vger.kernel.org>; Thu, 30 May 2024 20:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717100215; cv=none; b=Wk3mGo9CWwur1z2uTRrKceIwf1155+I8J4YLP0Mz/QIgPnzFlLzBg8q6+VbNZmkcL+NF30E64Z0T0gdaRYloeWQ35NjJvX9joRNiyMExDE/EqpsueVsqNgNuoSNtos/CdIZVxFnmSpctsQMr60l9cV8r0XJSwHYVzkw0WY+NwPY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717100215; c=relaxed/simple;
-	bh=LInu/jBkSG++r6iSgjLWgEgWYQibfLm7kW/Alr0T9Gk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Pa7CUYx4/wEXXqeVBD7Ak86FG2FHrONWskOTnQo/0dFuVJ3Mdv4N2WgSO/BwVsudKrjnK+cFg/BvzQAi4lGsEcWnbBYLGLHjgSrMPhJpQvjSaGFDYqo1HI9Hv2rTGo54x2JczRjeeBmEA+ailBoLIUHenhHs1BqfIB8kaUtFcXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AZ6D7wLE; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-62a0841402aso4247347b3.2
-        for <netdev@vger.kernel.org>; Thu, 30 May 2024 13:16:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717100205; x=1717705005; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jJiVWgtSrxfLAO3xDXDkkFapUzaLpqZpeRoBI8y0Ibg=;
-        b=AZ6D7wLEC51wloRjrKS3IROfxnHH9aLbJGAfyqUolXrFnNtKPHy3Z4lDoW7SA0O2ls
-         HJPQ4tqYbSvpzaeaPCzSQ5gN68YLgVqh59K33VrvFEjcrgOGrsUYgBMLuifKd1wfyUr9
-         ipPiF2DuFC8Fom9xk+68LzPnekzUI3JZclvcdSWl73bDCyOGS/V4e6SC0XNTTklzfrD9
-         tMx4AMEQpBhw5JzV4JBMAiMAXhE8dzcbI0OkpnS1HvJBOLDTV1icClIeaVk9OP+ZK1i6
-         4DdHGCRSdGHCX+8fHQuToxPpBxV1rn5uAGB7PBH2gPd18UlYaKXNFf2sEu6tvxuWid6R
-         HFrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717100205; x=1717705005;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jJiVWgtSrxfLAO3xDXDkkFapUzaLpqZpeRoBI8y0Ibg=;
-        b=MdCrSvkS0QGOhoc6TOPkzeX1pOKyd+iplIQwD314ZcKp2OA4KCRpGT60Z/w2U5HRs0
-         VkjrhxSSjGlTWenVEO868fw0vDO9ab0B3YCs2tPdNpP58CQUwi1b5JuGRbxfM+8MWdA3
-         hcEAIBXbjNdANmgbjfED7bKkUb3iUX7nC03u2zxmsbv8ceN4SJDI3rMb8I+e38cdLTN3
-         oaLV469r3mTF3SLJ/Hk6WqdUrZ4BWCxLVxor8aoaGw483ZvaACwl1mD+khjqgNxRdStu
-         sQjYswm3mafiKv4YMJ4kxdRW6nnGfEsqMXneFhcGzmBrk1Ms5KuzHM5vp6Ljh8O/6pGQ
-         rfWw==
-X-Gm-Message-State: AOJu0YwJZ2ts7Tc7sOODuEkqbCOZbDBhN+wL+ZjU3mfG0jTKBHvLEn/S
-	cA/k6KCZ3p4oIrS/9Ss8PJRApehkEvmcYiVY6s/1wHoBDjrFl/WDs9ilobjPVZu0YaaS+UWG82k
-	mftC+cJCKLjG8/uJsQb93v6vWAzASTfIbUI/pGroCzcjuni/SZNNJk7cW7gT+g2WVOMCLeutQye
-	Td8EsGxEOAxgGAdzzd8E0r1GGFErgSP/NTO40VNwT8bO7nnne0cawMFW35nCc=
-X-Google-Smtp-Source: AGHT+IHtpkSASVHTK3UMgGJZ4rIULXVX5QhUVMJ33d8nXEf9fNvkyHoVq8f2hNzAQAiJxxVmn2h5dAghgN7PsTQBlA==
-X-Received: from almasrymina.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:4bc5])
- (user=almasrymina job=sendgmr) by 2002:a05:6902:70c:b0:df4:9b3d:669f with
- SMTP id 3f1490d57ef6-dfa5a5a6ae0mr253283276.1.1717100204455; Thu, 30 May 2024
- 13:16:44 -0700 (PDT)
-Date: Thu, 30 May 2024 20:16:13 +0000
-In-Reply-To: <20240530201616.1316526-1-almasrymina@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3FA3207;
+	Thu, 30 May 2024 20:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717101043; cv=fail; b=TTE0soLJHXtI2ImJOJjp2V0NBFOjgc1gGNBZ1QWZ7SMujHtXLUrm82qdkIXsrCP2HE6p2rNFYnnnmA9/jKWsHNSFadKMupozDfMnIAuEEv2qGoQD8gBhJu9GQphrkNaDUAtXt6w+481YXnClr9fNRbBx2LDJeF9O8IEPKJfZKsw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717101043; c=relaxed/simple;
+	bh=E4vgHFWVgN5Ci74FEt5hn7519abcxCVoDpuO9aCDCV8=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=S2IsZ6iPER2BggA8Tv/PYuNh98iUTWSTnSAvuPy9f6Nchss4QrY2MMYuNP9L4fGYAgPBPoYH3SCxGTAT/pV2o0xxxAsImI7423BngBZqWd94+65SNDpvCO8ULRYdEl7OHXE1e3M2A6bRYJj8f989hWXnT6jr16R/T5RUEfqukNk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=na7T7t6v; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717101041; x=1748637041;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=E4vgHFWVgN5Ci74FEt5hn7519abcxCVoDpuO9aCDCV8=;
+  b=na7T7t6vxWfCosRwrr4lPRLhOvofJBlugiMUxJhRlEZ9lLx4RlARkagi
+   FNX+MDumm8cZSlF0DsffZuNiUiXS0wsQS/86Sv1HYTCgqxrck/LzOjw4Y
+   6I787U+jIoGqAQrucOP0r0azFazTD7zrfa86399pyUqWPEk2v2KezorUp
+   30rmZnAaUpuWl9Lmr8Tg3V/WFESqEBxcxtz+8t5xXXLh+g1vCBkUnYkvV
+   dnnPW6xoJFJSVVxLNRarf/G6iArBOHoEgi+FbzmfsprYFCxUOxQH3gNEP
+   Aub41EC4wljeVljfsM6GFibDcZ3pcEa3CWdJou2owZ744qT3VNuEcIydE
+   g==;
+X-CSE-ConnectionGUID: A3TgDfq7TJmSCnSbtyKx/w==
+X-CSE-MsgGUID: h7mbyVhSTYqHrCyyQG9aXg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11088"; a="13745765"
+X-IronPort-AV: E=Sophos;i="6.08,202,1712646000"; 
+   d="scan'208";a="13745765"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2024 13:30:40 -0700
+X-CSE-ConnectionGUID: uT+j650TSq+euQSwJBT2SA==
+X-CSE-MsgGUID: mUL0DYx+SAiFg5++xE57vw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,202,1712646000"; 
+   d="scan'208";a="36437018"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 May 2024 13:30:38 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 30 May 2024 13:30:37 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 30 May 2024 13:30:37 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 30 May 2024 13:30:37 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=f3EexfEt+ApqfZaD0ODBDHdrqyaz0fotkjAJNib+krpSUjtjt5MAWp9CS2h22Rp7qOoOUnS4D3APykwiMr7VP8XrvwrjB9or6FHcy2FVxXbpdyyHELY02Ga41ea5py01vhHgdVoONbUoLSX+0I5NL0FR3XdcpjHL3l1cwoYkYMJsx+MMkVGss71w4Og3EUA90jMpSCg2kBFrJt3MPNDOYQZNE1c6SJd8qyNtQvHlJ8GEtAGQKQr7Zxn3Pq/NTs9/Qh0W3erJSe92RR6X8ZFHZisL0iZ9ZuLbNdy+XELezoL7F6ZmZWSUNLggw6wxEW7uTk4ztEnGsDODudwNtYl4iA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dhlwlJraD2DXQNDc5EsUdEHwMPbQkf3wpE8TGSZG3LU=;
+ b=eLR+3nkRVfyGuyYNWD7j6F3eVHuZgK+b0rOw71pMBxDQl66LXj9swa+FgzpOxzveLQKPmrLxkqrLXbxa03lSHbNEWxplqYymka6gVgYHKNCt5CvzsRyvOVMIawixyXMF5kTeRJqk5fxhZ6DrNYI79bSUC3bTOTS52iAX1TnjxuNQ+tkMekz3iR0I8Fid+lMoNCo0zfYzOI1rFDdTAxLR5LQPzwNAat20orOTnGeFJW4o09nga3eyn3do2CAVxU9QByFik5ZzS4V8MuNHqqJUcw4YyP2aBPHPH/KX84GfM6GINUm20zFaVOpK/S/2cJdlw//0YF9zsyt9pfVo2Zo0Pw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by DS0PR11MB7766.namprd11.prod.outlook.com (2603:10b6:8:138::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.19; Thu, 30 May
+ 2024 20:30:29 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%5]) with mapi id 15.20.7633.018; Thu, 30 May 2024
+ 20:30:29 +0000
+Message-ID: <b4bcd52c-ba0b-46b2-b302-fb412542328b@intel.com>
+Date: Thu, 30 May 2024 13:30:26 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ethernet: octeontx2: avoid linking objects into multiple
+ modules
+To: Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>, "Sunil
+ Goutham" <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>, hariprasad
+	<hkelam@marvell.com>
+CC: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Suman Ghosh
+	<sumang@marvell.com>, Simon Horman <horms@kernel.org>, Anthony L Nguyen
+	<anthony.l.nguyen@intel.com>, Jiri Pirko <jiri@resnulli.us>, "Mateusz
+ Polchlopek" <mateusz.polchlopek@intel.com>, Netdev <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20240528152527.2148092-1-arnd@kernel.org>
+ <2f1603fa-d03c-412c-895c-bc4afa06834b@intel.com>
+ <866cb878-47fa-4bb9-ba93-6a0c0e70a4f7@app.fastmail.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <866cb878-47fa-4bb9-ba93-6a0c0e70a4f7@app.fastmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0149.namprd03.prod.outlook.com
+ (2603:10b6:303:8c::34) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240530201616.1316526-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
-Message-ID: <20240530201616.1316526-15-almasrymina@google.com>
-Subject: [PATCH net-next v10 14/14] selftests: add ncdevmem, netcat for devmem TCP
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org
-Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, 
-	"=?UTF-8?q?Christian=20K=C3=B6nig?=" <christian.koenig@amd.com>, Pavel Begunkov <asml.silence@gmail.com>, 
-	David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DS0PR11MB7766:EE_
+X-MS-Office365-Filtering-Correlation-Id: b4883ff1-63bb-4fd6-f970-08dc80e75880
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|1800799015|366007|7416005;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?SWozcHVTdGlZanRIa0ZsZVRXbldpeWVQTEJXcUdTNmdqaWJ5bkFHd0U0SXFC?=
+ =?utf-8?B?YVNJNTFHY1pvQm5MM3lkdUwrNXUyQ05GRWUxUVRScnFhZGZkYjk1SC9Zem9z?=
+ =?utf-8?B?M1p5YXhkYlg0RGxHNHV6cHh0WGN4YTg4aWR3TTJRMVlRZVlLdTRSVXZwRkNx?=
+ =?utf-8?B?YnhDY2VNRWhVNjQyN0hxSHM2cG45ZEF2L3hhMW52YWJaWmNOaDdXV3VxQ014?=
+ =?utf-8?B?SER1NXpxSEJVNnk0dUxQQ3VsOVdLd0VVV0FNa0EvODAzdEQvQ3VtbWtidmd3?=
+ =?utf-8?B?ZVRQUjg4amszbXNCZ292dmlrKzdEQlpJR0NwWG9nZDdIUitoSHZLWldqcW5K?=
+ =?utf-8?B?WHl4aDYrNzhidHI2KzZWT25mZlBrZWczRjV6Zy9keEZ2c0tzazd2K3ViYzlp?=
+ =?utf-8?B?eDFaOGNqZi8rcUNaUVo4OWNpajhmQ2lRWlhmYzNsZzJYWG9ET1ZMYnpCY3hM?=
+ =?utf-8?B?SGRJanltM3JXNndYcEFZcEdZdmo1MnJIZUd3ODlkOGlvOEROYUZ3TDYwSXpr?=
+ =?utf-8?B?ZVZDdjQydTg1clMxdFdMa1cvSUt3alMzZ1NGaVdrRHVDaU9OeWs2ZWYwU1R0?=
+ =?utf-8?B?a25HaExtalkzeHBpcktiRWNENmx4T2NvWm95K2ZOMzhFeURPR20wcDJjNFVG?=
+ =?utf-8?B?dmJ4RHBTbG9Ocjkva2V1MDdFZmhCNUJ0SkRkWTEzUndXem9CT3V4L2JrdGJE?=
+ =?utf-8?B?N0RpSlNKOGVHdVY0c0lwUlFKR2E5Vm16bGs4cVEwVkZ4OThnRElQR1h6NStS?=
+ =?utf-8?B?ckxtUXRQakl2QWRBdGpNUVprdzJjem4yZjRYSnI4VUZZL1U3S3B2d3lTbThP?=
+ =?utf-8?B?UDBhd0JTaCtGdW1tMnVldTZKOFRKdk5VL2JERUJlNm5IWGNJS0Y0N01RcmUy?=
+ =?utf-8?B?ZUg4d3YxcnJDbS9KR2hoRXBtckRpSDR0ZEFZVVdqT3dIUE03ZXJZWGRlZFBp?=
+ =?utf-8?B?blVPbGRIOVl4cktlck5kZkNROHhJU1hMUkN3U2I4NmRoNncyZ2YreGNlRTR0?=
+ =?utf-8?B?ckRBUWtrSnhwWWRoNGRpczN6K3NsV0VJLyswTFpkdVRQbXdmdm9aRzhkeUZP?=
+ =?utf-8?B?RmVwNDR0b3BoWTZXbkpyeXhvUWxlOU9aVy9jcU9aWFgwWlBJVTF0UEFVU0Rm?=
+ =?utf-8?B?eDUrS3NuKzVZckZTUG5mbDRSTzNleEx3bmtOWWhGT3JuT3lDSXRJRVRuMW4r?=
+ =?utf-8?B?S1EwcmIyRVM3T0VTMHJOVnpGVHhuTEtZOEdGQ1lnRFBUVkNJWnAxTm9Lai9n?=
+ =?utf-8?B?bUc0djF1S2dnZkg4aUdsZVVENnYvSGpzMDhjbm5nb3hPZVE3WGRrc2hXM1Mv?=
+ =?utf-8?B?OHQ1M1pSTGtRRE5FdDJhVE9TVVlUL2FNSlZwZWRtcC9Ndlc0eWlhbG5JSzRH?=
+ =?utf-8?B?aHR5Sk9UWXJWc0NsQzYwd1d5elFTRVN1cEpMUnJ5YUc2YzZtZ0RKK0dVZ1d5?=
+ =?utf-8?B?cHBqam1jRUwwM3ppek5kY2QrZzZTUzdVbUd6TGJNTUR4RFRBeS9PM0hHalJr?=
+ =?utf-8?B?NEZBUGlwSndtQ1YwZzF3eEE3anlrOWR2K2UvamZpWTljcHRINzZFdHRnb0xw?=
+ =?utf-8?B?c1NWa0VqallXU1BhVmw2R3FwRCtwbnZJdEFCMmxWMHlQNWpnQWE3NDNUb2JT?=
+ =?utf-8?B?cE52N0ZYQkdpS0c5UmxIODFONFNuL0ZqM01hejV6aDRJWkU3LzJTeGNGU0J6?=
+ =?utf-8?B?N2IzUW5WUFVGQkorR1Nnck00WkdyK1NHeTZFNFl3NWlzZGxhSHdWTUlBPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007)(7416005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QlYrRWRYRUQrNHQvbnBGazdFb05hd1ptNjR0Q1RpRHl2OFpwa005TUZ4Zlp3?=
+ =?utf-8?B?emYrZFFqUWFSVVM0d1J5TXVzUUE1YWMrK25hR3BQNTQ0R2F0QXFOTnNEaTU3?=
+ =?utf-8?B?ZlVIT3lsRlNuQ3dZeVJPQnlib3NiUW05cGpieGh1ZEN4RFBUVmUzWjQ3NVNN?=
+ =?utf-8?B?QTlmY3VvUFlyT0FPcHhZeS9uZkdKWkxrZkJVUVAxRDZKN0pITXp6cGlYNU1i?=
+ =?utf-8?B?bGVrdlZGNkhJSXpCWE9mT2N6bEJ5SWRMWmdURE1QdDBlREprdDRkelhQRExn?=
+ =?utf-8?B?OVdVSlpMME5qd09ucVVRcEQwOXgyT3kzTXl2Q3EzWUJDS2o4cnNhemFhWFQ4?=
+ =?utf-8?B?ZCtVNFg5YkxvQm4rWm1vTmZPS3JmMnUyb0VyQjFlUUdJTVV0ZkVnZW5GNHp1?=
+ =?utf-8?B?aExSUWEvZi9LS0Q3WnpmU0FVL0x5QktGR1pmY05tZVppY2UvZnh0M2JOMGhq?=
+ =?utf-8?B?eXBkYUVVVktiU2xlcjN6VFdkMldKU2pxZ3FwNTMyUXozTkpmN1JSYmM5MXpG?=
+ =?utf-8?B?R250anpYcWN5blVKTjZXbHIzTUtUWHltTzRqc0UrK1hsM21iQ2h6VW5hZ2RY?=
+ =?utf-8?B?UE45cmhuRlBFVnVMVjBCdHRjdWo5ejdvQ01Cbk14T1gva3M0QmhlZFVHc0s1?=
+ =?utf-8?B?aTBIR3QrREpXZktMZGVOS1l3U05ObW9uU0xKb2hSdHl5b3duaVJHU0J2Q2tJ?=
+ =?utf-8?B?NVBsbkdUY3VLd05XdW5HWmpncEFibG1GOGRzd2pyV0JCSjJqblJuVFJGcDFX?=
+ =?utf-8?B?UDcvWWgwRDl1VGRYbjVYQm0yRFRadkZxdXEvWVk4WmwxZkJmRDhpNDJKQ1FV?=
+ =?utf-8?B?ZGZ1YS8wdWNQcmhiTGNpNjJoSHJZeXhBSm10WVBGRk9Da3E3ZzVlN2QyOE40?=
+ =?utf-8?B?SWJlVjZGQURXaXVQcmk2RWxVVjN6Q3JKR09RNTRiSmFDQ21kM2Z6Y2didE5l?=
+ =?utf-8?B?MlZYOGVkRGtXZnRRM3A4ZXVwdjcwbW1VZEgrczNacTBZK3kzQmczMGNMZlRa?=
+ =?utf-8?B?SVdzeHMwZWRzWnVsMWVPcXlmaHVvWDZMdWRxVkR4NmtYeUZTYkxIVHNBdDJ6?=
+ =?utf-8?B?bWVKOGpRNU1hZG1EbENvamVMUDNTNFI5MVAyRUdIcTdBeTl0MFUzUkkreVB0?=
+ =?utf-8?B?di84cFZYcXJtejAxNU5idTNHSzBGN3VBZmhvU09UblZRRlBuWCtaUThGTDdF?=
+ =?utf-8?B?ZVhQQ05Xa1lReUpWRXJnSzc0cFRhSE9TVUdLRHE5RXVWRG05ZUVzNWFpQUpi?=
+ =?utf-8?B?ZGJ6WFJGMEE3UHV6OUQxMzEvMzBpeWgvMjFpWXlQSkdVdHJqa0ZBeEVDVi9D?=
+ =?utf-8?B?SG9uL05JaXF0L1l4UGd1Szl2eCtaMW9MOHhPY1FEMTJQeXVYRjVTcWNuWVdQ?=
+ =?utf-8?B?clIvZXBvRUY2ckJYeSsvTk5mU01lUFBnT2xsbzBBSzI1cXdNVldMWVRlNTRT?=
+ =?utf-8?B?UEhKdEdQNEtiQ2ZCUmhSa2FkcG1SaE5Day9xVHVRTWdocmlMTDBaVVVkUEFE?=
+ =?utf-8?B?bkI1M3RkOHBKazdHRU1VektUQWFLdHJMeTRDajlMczhvL3BPeS9ieXMydlNL?=
+ =?utf-8?B?M1pwWDBmR3hnVmo1ZW1FSE5uamk4amE1K1hwZVprbDBoMldBYmlrRElqT29H?=
+ =?utf-8?B?a3pxT1pIVUdSQXNLVVZqeDBRNStWYUhEdzZ6RzBnVWNDMTdUODFSbmxCVnIx?=
+ =?utf-8?B?QU9xS0h5TjkxQkpBQlgrT3JUNE93TXZ6Q0Y0bzN4cHFKbnVaVmNUWE5BSDhr?=
+ =?utf-8?B?Tjk1Q0JFTEg5SWR3Ty95RkJRazF0UmM3V3FMeW9mcWRFUHg0UEo3aThTcmV2?=
+ =?utf-8?B?ZzhCSXVmSmd1dHJFWFBuVWdRK2pBY0dUQ1M4TzdMWUVVL3BZaXpxSHVZTm1L?=
+ =?utf-8?B?Yi9pM2dlWVZBWVdKcHozVEQrOGt5MlNOK2ZJYlJTRUdST2hmbnlXSG9hMXlK?=
+ =?utf-8?B?ZjFzSS9rM01mN1FSWlQ5TTV1a0x1ZHNORElpU25YcXlRbXFDV0M1cXBwT1Bx?=
+ =?utf-8?B?SWZEQVVneWJlQjYrVTQ2VGJHblpjaUhSRTk1OXpKUW5sdDlieEQ2cWJSWkl4?=
+ =?utf-8?B?VVBPRFZYWHQreE14Q3E1dGFlcXUzVXNabUhjUGxsR21ha0ZLK1hJV09WRVc3?=
+ =?utf-8?B?OVBwVGxzbFdxSFI4Y0tad2xJbUZwZkUvNVlhUGJXby9NeTEwNVdlRGJNMGp2?=
+ =?utf-8?B?Znc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4883ff1-63bb-4fd6-f970-08dc80e75880
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2024 20:30:29.1422
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uPJFTsV52oFJPq67BS9/AYkndEdLx7o1XDSsyi1lGDLmhp+vO6pFypIefM0LmXycdT6cxbTERFrrf6NeKoY6wnAw7n6S6uWXruOjaccZTAY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7766
+X-OriginatorOrg: intel.com
 
-ncdevmem is a devmem TCP netcat. It works similarly to netcat, but it
-sends and receives data using the devmem TCP APIs. It uses udmabuf as
-the dmabuf provider. It is compatible with a regular netcat running on
-a peer, or a ncdevmem running on a peer.
 
-In addition to normal netcat support, ncdevmem has a validation mode,
-where it sends a specific pattern and validates this pattern on the
-receiver side to ensure data integrity.
 
-Suggested-by: Stanislav Fomichev <sdf@google.com>
-Signed-off-by: Mina Almasry <almasrymina@google.com>
+On 5/30/2024 11:52 AM, Arnd Bergmann wrote:
+> On Thu, May 30, 2024, at 19:54, Jacob Keller wrote:
+>> On 5/28/2024 8:25 AM, Arnd Bergmann wrote:
+>>> From: Arnd Bergmann <arnd@arndb.de>
+>>>
+>>> Each object file contains information about which module it gets linked
+>>> into, so linking the same file into multiple modules now causes a warning:
+>>>
+>>> scripts/Makefile.build:254: drivers/net/ethernet/marvell/octeontx2/nic/Makefile: otx2_devlink.o is added to multiple modules: rvu_nicpf rvu_nicvf
+>>>
+>>
+>> When I tried to build, I don't see any warnings produced on the current
+>> net-next with W=1. Is this something new and not yet in net-next tree?
+>> If not, how do I enable this warning in my local build?
+> 
+> The warning has been around with W=1 for over a year now, it still
+> shows up here:
+> 
+> make ARCH=arm64 allmodconfig drivers/net/ethernet/marvell/octeontx2/ -skj20
+> scripts/Makefile.build:236: drivers/net/ethernet/marvell/octeontx2/nic/Makefile: otx2_devlink.o is added to multiple modules: rvu_nicpf rvu_nicvf
+> scripts/Makefile.build:236: drivers/net/ethernet/marvell/octeontx2/nic/Makefile: otx2_dcbnl.o is added to multiple modules: rvu_nicpf rvu_nicvf
+> 
+> 
+>     Arnd
 
----
-v9: https://lore.kernel.org/netdev/20240403002053.2376017-15-almasrymina@google.com/
-- Remove unused nic_pci_addr entry (Cong).
+Hmm. Ah yep, I must have missed W=1. I thought I had it enabled. Doing a
+clean rebuild with it, I do see the warnings.
 
-v6:
-- Updated to bind 8 queues.
-- Added RSS configuration.
-- Added some more tests for the netlink API.
-
-Changes in v1:
-- Many more general cleanups (Willem).
-- Removed driver reset (Jakub).
-- Removed hardcoded if index (Paolo).
-
-RFC v2:
-- General cleanups (Willem).
-
----
- tools/testing/selftests/net/.gitignore |   1 +
- tools/testing/selftests/net/Makefile   |   5 +
- tools/testing/selftests/net/ncdevmem.c | 542 +++++++++++++++++++++++++
- 3 files changed, 548 insertions(+)
- create mode 100644 tools/testing/selftests/net/ncdevmem.c
-
-diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
-index 49a56eb5d0368..9cd3c99c6e5d4 100644
---- a/tools/testing/selftests/net/.gitignore
-+++ b/tools/testing/selftests/net/.gitignore
-@@ -17,6 +17,7 @@ ipv6_flowlabel
- ipv6_flowlabel_mgr
- log.txt
- msg_zerocopy
-+ncdevmem
- nettest
- psock_fanout
- psock_snd
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index bd01e4a0be2c2..df3fdd727ffb3 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -5,6 +5,10 @@ CFLAGS =  -Wall -Wl,--no-as-needed -O2 -g
- CFLAGS += -I../../../../usr/include/ $(KHDR_INCLUDES)
- # Additional include paths needed by kselftest.h
- CFLAGS += -I../
-+CFLAGS += -I../../../net/ynl/generated/
-+CFLAGS += -I../../../net/ynl/lib/
-+
-+LDLIBS += ../../../net/ynl/lib/ynl.a ../../../net/ynl/generated/protos.a
- 
- TEST_PROGS := run_netsocktests run_afpackettests test_bpf.sh netdevice.sh \
- 	      rtnetlink.sh xfrm_policy.sh test_blackhole_dev.sh
-@@ -91,6 +95,7 @@ TEST_PROGS += fdb_flush.sh
- TEST_PROGS += fq_band_pktlimit.sh
- TEST_PROGS += vlan_hw_filter.sh
- TEST_PROGS += bpf_offload.py
-+TEST_GEN_FILES += ncdevmem
- 
- TEST_FILES := settings
- TEST_FILES += in_netns.sh lib.sh net_helper.sh setup_loopback.sh setup_veth.sh
-diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selftests/net/ncdevmem.c
-new file mode 100644
-index 0000000000000..e00255e54f77b
---- /dev/null
-+++ b/tools/testing/selftests/net/ncdevmem.c
-@@ -0,0 +1,542 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#define _GNU_SOURCE
-+#define __EXPORTED_HEADERS__
-+
-+#include <linux/uio.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <stdbool.h>
-+#include <string.h>
-+#include <errno.h>
-+#define __iovec_defined
-+#include <fcntl.h>
-+#include <malloc.h>
-+#include <error.h>
-+
-+#include <arpa/inet.h>
-+#include <sys/socket.h>
-+#include <sys/mman.h>
-+#include <sys/ioctl.h>
-+#include <sys/syscall.h>
-+
-+#include <linux/memfd.h>
-+#include <linux/if.h>
-+#include <linux/dma-buf.h>
-+#include <linux/udmabuf.h>
-+#include <libmnl/libmnl.h>
-+#include <linux/types.h>
-+#include <linux/netlink.h>
-+#include <linux/genetlink.h>
-+#include <linux/netdev.h>
-+#include <time.h>
-+
-+#include "netdev-user.h"
-+#include <ynl.h>
-+
-+#define PAGE_SHIFT 12
-+#define TEST_PREFIX "ncdevmem"
-+#define NUM_PAGES 16000
-+
-+#ifndef MSG_SOCK_DEVMEM
-+#define MSG_SOCK_DEVMEM 0x2000000
-+#endif
-+
-+/*
-+ * tcpdevmem netcat. Works similarly to netcat but does device memory TCP
-+ * instead of regular TCP. Uses udmabuf to mock a dmabuf provider.
-+ *
-+ * Usage:
-+ *
-+ *	On server:
-+ *	ncdevmem -s <server IP> -c <client IP> -f eth1 -d 3 -n 0000:06:00.0 -l \
-+ *		-p 5201 -v 7
-+ *
-+ *	On client:
-+ *	yes $(echo -e \\x01\\x02\\x03\\x04\\x05\\x06) | \
-+ *		tr \\n \\0 | \
-+ *		head -c 5G | \
-+ *		nc <server IP> 5201 -p 5201
-+ *
-+ * Note this is compatible with regular netcat. i.e. the sender or receiver can
-+ * be replaced with regular netcat to test the RX or TX path in isolation.
-+ */
-+
-+static char *server_ip = "192.168.1.4";
-+static char *client_ip = "192.168.1.2";
-+static char *port = "5201";
-+static size_t do_validation;
-+static int start_queue = 8;
-+static int num_queues = 8;
-+static char *ifname = "eth1";
-+static unsigned int ifindex = 3;
-+static unsigned int iterations;
-+static unsigned int dmabuf_id;
-+
-+void print_bytes(void *ptr, size_t size)
-+{
-+	unsigned char *p = ptr;
-+	int i;
-+
-+	for (i = 0; i < size; i++)
-+		printf("%02hhX ", p[i]);
-+	printf("\n");
-+}
-+
-+void print_nonzero_bytes(void *ptr, size_t size)
-+{
-+	unsigned char *p = ptr;
-+	unsigned int i;
-+
-+	for (i = 0; i < size; i++)
-+		putchar(p[i]);
-+	printf("\n");
-+}
-+
-+void validate_buffer(void *line, size_t size)
-+{
-+	static unsigned char seed = 1;
-+	unsigned char *ptr = line;
-+	int errors = 0;
-+	size_t i;
-+
-+	for (i = 0; i < size; i++) {
-+		if (ptr[i] != seed) {
-+			fprintf(stderr,
-+				"Failed validation: expected=%u, actual=%u, index=%lu\n",
-+				seed, ptr[i], i);
-+			errors++;
-+			if (errors > 20)
-+				error(1, 0, "validation failed.");
-+		}
-+		seed++;
-+		if (seed == do_validation)
-+			seed = 0;
-+	}
-+
-+	fprintf(stdout, "Validated buffer\n");
-+}
-+
-+static void reset_flow_steering(void)
-+{
-+	char command[256];
-+
-+	memset(command, 0, sizeof(command));
-+	snprintf(command, sizeof(command), "sudo ethtool -K %s ntuple off",
-+		 "eth1");
-+	system(command);
-+
-+	memset(command, 0, sizeof(command));
-+	snprintf(command, sizeof(command), "sudo ethtool -K %s ntuple on",
-+		 "eth1");
-+	system(command);
-+}
-+
-+static void configure_rss(void)
-+{
-+	char command[256];
-+
-+	memset(command, 0, sizeof(command));
-+	snprintf(command, sizeof(command), "sudo ethtool -X %s equal %d",
-+		 ifname, start_queue);
-+	system(command);
-+}
-+
-+static void configure_flow_steering(void)
-+{
-+	char command[256];
-+
-+	memset(command, 0, sizeof(command));
-+	snprintf(command, sizeof(command),
-+		 "sudo ethtool -N %s flow-type tcp4 src-ip %s dst-ip %s src-port %s dst-port %s queue %d",
-+		 ifname, client_ip, server_ip, port, port, start_queue);
-+	system(command);
-+}
-+
-+static int bind_rx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
-+			 struct netdev_queue_dmabuf *queues,
-+			 unsigned int n_queue_index, struct ynl_sock **ys)
-+{
-+	struct netdev_bind_rx_req *req = NULL;
-+	struct netdev_bind_rx_rsp *rsp = NULL;
-+	struct ynl_error yerr;
-+
-+	*ys = ynl_sock_create(&ynl_netdev_family, &yerr);
-+	if (!*ys) {
-+		fprintf(stderr, "YNL: %s\n", yerr.msg);
-+		return -1;
-+	}
-+
-+	req = netdev_bind_rx_req_alloc();
-+	netdev_bind_rx_req_set_ifindex(req, ifindex);
-+	netdev_bind_rx_req_set_dmabuf_fd(req, dmabuf_fd);
-+	__netdev_bind_rx_req_set_queues(req, queues, n_queue_index);
-+
-+	rsp = netdev_bind_rx(*ys, req);
-+	if (!rsp) {
-+		perror("netdev_bind_rx");
-+		goto err_close;
-+	}
-+
-+	if (!rsp->_present.dmabuf_id) {
-+		perror("dmabuf_id not present");
-+		goto err_close;
-+	}
-+
-+	printf("got dmabuf id=%d\n", rsp->dmabuf_id);
-+	dmabuf_id = rsp->dmabuf_id;
-+
-+	netdev_bind_rx_req_free(req);
-+	netdev_bind_rx_rsp_free(rsp);
-+
-+	return 0;
-+
-+err_close:
-+	fprintf(stderr, "YNL failed: %s\n", (*ys)->err.msg);
-+	netdev_bind_rx_req_free(req);
-+	ynl_sock_destroy(*ys);
-+	return -1;
-+}
-+
-+static void create_udmabuf(int *devfd, int *memfd, int *buf, size_t dmabuf_size)
-+{
-+	struct udmabuf_create create;
-+	int ret;
-+
-+	*devfd = open("/dev/udmabuf", O_RDWR);
-+	if (*devfd < 0) {
-+		error(70, 0,
-+		      "%s: [skip,no-udmabuf: Unable to access DMA buffer device file]\n",
-+		      TEST_PREFIX);
-+	}
-+
-+	*memfd = memfd_create("udmabuf-test", MFD_ALLOW_SEALING);
-+	if (*memfd < 0)
-+		error(70, 0, "%s: [skip,no-memfd]\n", TEST_PREFIX);
-+
-+	/* Required for udmabuf */
-+	ret = fcntl(*memfd, F_ADD_SEALS, F_SEAL_SHRINK);
-+	if (ret < 0)
-+		error(73, 0, "%s: [skip,fcntl-add-seals]\n", TEST_PREFIX);
-+
-+	ret = ftruncate(*memfd, dmabuf_size);
-+	if (ret == -1)
-+		error(74, 0, "%s: [FAIL,memfd-truncate]\n", TEST_PREFIX);
-+
-+	memset(&create, 0, sizeof(create));
-+
-+	create.memfd = *memfd;
-+	create.offset = 0;
-+	create.size = dmabuf_size;
-+	*buf = ioctl(*devfd, UDMABUF_CREATE, &create);
-+	if (*buf < 0)
-+		error(75, 0, "%s: [FAIL, create udmabuf]\n", TEST_PREFIX);
-+}
-+
-+int do_server(void)
-+{
-+	char ctrl_data[sizeof(int) * 20000];
-+	struct netdev_queue_dmabuf *queues;
-+	size_t non_page_aligned_frags = 0;
-+	struct sockaddr_in client_addr;
-+	struct sockaddr_in server_sin;
-+	size_t page_aligned_frags = 0;
-+	int devfd, memfd, buf, ret;
-+	size_t total_received = 0;
-+	socklen_t client_addr_len;
-+	bool is_devmem = false;
-+	char *buf_mem = NULL;
-+	struct ynl_sock *ys;
-+	size_t dmabuf_size;
-+	char iobuf[819200];
-+	char buffer[256];
-+	int socket_fd;
-+	int client_fd;
-+	size_t i = 0;
-+	int opt = 1;
-+
-+	dmabuf_size = getpagesize() * NUM_PAGES;
-+
-+	create_udmabuf(&devfd, &memfd, &buf, dmabuf_size);
-+
-+	reset_flow_steering();
-+
-+	/* Configure RSS to divert all traffic from our devmem queues */
-+	configure_rss();
-+
-+	/* Flow steer our devmem flows to start_queue */
-+	configure_flow_steering();
-+
-+	sleep(1);
-+
-+	queues = malloc(sizeof(*queues) * num_queues);
-+
-+	for (i = 0; i < num_queues; i++) {
-+		queues[i]._present.type = 1;
-+		queues[i]._present.idx = 1;
-+		queues[i].type = NETDEV_QUEUE_TYPE_RX;
-+		queues[i].idx = start_queue + i;
-+	}
-+
-+	if (bind_rx_queue(ifindex, buf, queues, num_queues, &ys))
-+		error(1, 0, "Failed to bind\n");
-+
-+	buf_mem = mmap(NULL, dmabuf_size, PROT_READ | PROT_WRITE, MAP_SHARED,
-+		       buf, 0);
-+	if (buf_mem == MAP_FAILED)
-+		error(1, 0, "mmap()");
-+
-+	server_sin.sin_family = AF_INET;
-+	server_sin.sin_port = htons(atoi(port));
-+
-+	ret = inet_pton(server_sin.sin_family, server_ip, &server_sin.sin_addr);
-+	if (socket < 0)
-+		error(79, 0, "%s: [FAIL, create socket]\n", TEST_PREFIX);
-+
-+	socket_fd = socket(server_sin.sin_family, SOCK_STREAM, 0);
-+	if (socket < 0)
-+		error(errno, errno, "%s: [FAIL, create socket]\n", TEST_PREFIX);
-+
-+	ret = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEPORT, &opt,
-+			 sizeof(opt));
-+	if (ret)
-+		error(errno, errno, "%s: [FAIL, set sock opt]\n", TEST_PREFIX);
-+
-+	ret = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt,
-+			 sizeof(opt));
-+	if (ret)
-+		error(errno, errno, "%s: [FAIL, set sock opt]\n", TEST_PREFIX);
-+
-+	printf("binding to address %s:%d\n", server_ip,
-+	       ntohs(server_sin.sin_port));
-+
-+	ret = bind(socket_fd, &server_sin, sizeof(server_sin));
-+	if (ret)
-+		error(errno, errno, "%s: [FAIL, bind]\n", TEST_PREFIX);
-+
-+	ret = listen(socket_fd, 1);
-+	if (ret)
-+		error(errno, errno, "%s: [FAIL, listen]\n", TEST_PREFIX);
-+
-+	client_addr_len = sizeof(client_addr);
-+
-+	inet_ntop(server_sin.sin_family, &server_sin.sin_addr, buffer,
-+		  sizeof(buffer));
-+	printf("Waiting or connection on %s:%d\n", buffer,
-+	       ntohs(server_sin.sin_port));
-+	client_fd = accept(socket_fd, &client_addr, &client_addr_len);
-+
-+	inet_ntop(client_addr.sin_family, &client_addr.sin_addr, buffer,
-+		  sizeof(buffer));
-+	printf("Got connection from %s:%d\n", buffer,
-+	       ntohs(client_addr.sin_port));
-+
-+	while (1) {
-+		struct iovec iov = { .iov_base = iobuf,
-+				     .iov_len = sizeof(iobuf) };
-+		struct dmabuf_cmsg *dmabuf_cmsg = NULL;
-+		struct dma_buf_sync sync = { 0 };
-+		struct cmsghdr *cm = NULL;
-+		struct msghdr msg = { 0 };
-+		struct dmabuf_token token;
-+		ssize_t ret;
-+
-+		is_devmem = false;
-+		printf("\n\n");
-+
-+		msg.msg_iov = &iov;
-+		msg.msg_iovlen = 1;
-+		msg.msg_control = ctrl_data;
-+		msg.msg_controllen = sizeof(ctrl_data);
-+		ret = recvmsg(client_fd, &msg, MSG_SOCK_DEVMEM);
-+		printf("recvmsg ret=%ld\n", ret);
-+		if (ret < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))
-+			continue;
-+		if (ret < 0) {
-+			perror("recvmsg");
-+			continue;
-+		}
-+		if (ret == 0) {
-+			printf("client exited\n");
-+			goto cleanup;
-+		}
-+
-+		i++;
-+		for (cm = CMSG_FIRSTHDR(&msg); cm; cm = CMSG_NXTHDR(&msg, cm)) {
-+			if (cm->cmsg_level != SOL_SOCKET ||
-+			    (cm->cmsg_type != SCM_DEVMEM_DMABUF &&
-+			     cm->cmsg_type != SCM_DEVMEM_LINEAR)) {
-+				fprintf(stdout, "skipping non-devmem cmsg\n");
-+				continue;
-+			}
-+
-+			dmabuf_cmsg = (struct dmabuf_cmsg *)CMSG_DATA(cm);
-+			is_devmem = true;
-+
-+			if (cm->cmsg_type == SCM_DEVMEM_LINEAR) {
-+				/* TODO: process data copied from skb's linear
-+				 * buffer.
-+				 */
-+				fprintf(stdout,
-+					"SCM_DEVMEM_LINEAR. dmabuf_cmsg->frag_size=%u\n",
-+					dmabuf_cmsg->frag_size);
-+
-+				continue;
-+			}
-+
-+			token.token_start = dmabuf_cmsg->frag_token;
-+			token.token_count = 1;
-+
-+			total_received += dmabuf_cmsg->frag_size;
-+			printf("received frag_page=%llu, in_page_offset=%llu, frag_offset=%llu, frag_size=%u, token=%u, total_received=%lu, dmabuf_id=%u\n",
-+			       dmabuf_cmsg->frag_offset >> PAGE_SHIFT,
-+			       dmabuf_cmsg->frag_offset % getpagesize(),
-+			       dmabuf_cmsg->frag_offset, dmabuf_cmsg->frag_size,
-+			       dmabuf_cmsg->frag_token, total_received,
-+			       dmabuf_cmsg->dmabuf_id);
-+
-+			if (dmabuf_cmsg->dmabuf_id != dmabuf_id)
-+				error(1, 0,
-+				      "received on wrong dmabuf_id: flow steering error\n");
-+
-+			if (dmabuf_cmsg->frag_size % getpagesize())
-+				non_page_aligned_frags++;
-+			else
-+				page_aligned_frags++;
-+
-+			sync.flags = DMA_BUF_SYNC_READ | DMA_BUF_SYNC_START;
-+			ioctl(buf, DMA_BUF_IOCTL_SYNC, &sync);
-+
-+			if (do_validation)
-+				validate_buffer(
-+					((unsigned char *)buf_mem) +
-+						dmabuf_cmsg->frag_offset,
-+					dmabuf_cmsg->frag_size);
-+			else
-+				print_nonzero_bytes(
-+					((unsigned char *)buf_mem) +
-+						dmabuf_cmsg->frag_offset,
-+					dmabuf_cmsg->frag_size);
-+
-+			sync.flags = DMA_BUF_SYNC_READ | DMA_BUF_SYNC_END;
-+			ioctl(buf, DMA_BUF_IOCTL_SYNC, &sync);
-+
-+			ret = setsockopt(client_fd, SOL_SOCKET,
-+					 SO_DEVMEM_DONTNEED, &token,
-+					 sizeof(token));
-+			if (ret != 1)
-+				error(1, 0,
-+				      "SO_DEVMEM_DONTNEED not enough tokens");
-+		}
-+		if (!is_devmem)
-+			error(1, 0, "flow steering error\n");
-+
-+		printf("total_received=%lu\n", total_received);
-+	}
-+
-+	fprintf(stdout, "%s: ok\n", TEST_PREFIX);
-+
-+	fprintf(stdout, "page_aligned_frags=%lu, non_page_aligned_frags=%lu\n",
-+		page_aligned_frags, non_page_aligned_frags);
-+
-+	fprintf(stdout, "page_aligned_frags=%lu, non_page_aligned_frags=%lu\n",
-+		page_aligned_frags, non_page_aligned_frags);
-+
-+cleanup:
-+
-+	munmap(buf_mem, dmabuf_size);
-+	close(client_fd);
-+	close(socket_fd);
-+	close(buf);
-+	close(memfd);
-+	close(devfd);
-+	ynl_sock_destroy(ys);
-+
-+	return 0;
-+}
-+
-+void run_devmem_tests(void)
-+{
-+	struct netdev_queue_dmabuf *queues;
-+	int devfd, memfd, buf;
-+	struct ynl_sock *ys;
-+	size_t dmabuf_size;
-+	size_t i = 0;
-+
-+	dmabuf_size = getpagesize() * NUM_PAGES;
-+
-+	create_udmabuf(&devfd, &memfd, &buf, dmabuf_size);
-+
-+	/* Configure RSS to divert all traffic from our devmem queues */
-+	configure_rss();
-+
-+	sleep(1);
-+
-+	queues = malloc(sizeof(*queues) * num_queues);
-+
-+	for (i = 0; i < num_queues; i++) {
-+		queues[i]._present.type = 1;
-+		queues[i]._present.idx = 1;
-+		queues[i].type = NETDEV_QUEUE_TYPE_RX;
-+		queues[i].idx = start_queue + i;
-+	}
-+
-+	if (bind_rx_queue(ifindex, buf, queues, num_queues, &ys))
-+		error(1, 0, "Failed to bind\n");
-+
-+	/* Closing the netlink socket does an implicit unbind */
-+	ynl_sock_destroy(ys);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	int is_server = 0, opt;
-+
-+	while ((opt = getopt(argc, argv, "ls:c:p:v:q:f:n:i:d:")) != -1) {
-+		switch (opt) {
-+		case 'l':
-+			is_server = 1;
-+			break;
-+		case 's':
-+			server_ip = optarg;
-+			break;
-+		case 'c':
-+			client_ip = optarg;
-+			break;
-+		case 'p':
-+			port = optarg;
-+			break;
-+		case 'v':
-+			do_validation = atoll(optarg);
-+			break;
-+		case 'q':
-+			num_queues = atoi(optarg);
-+			break;
-+		case 't':
-+			start_queue = atoi(optarg);
-+			break;
-+		case 'f':
-+			ifname = optarg;
-+			break;
-+		case 'd':
-+			ifindex = atoi(optarg);
-+			break;
-+		case 'i':
-+			iterations = atoll(optarg);
-+			break;
-+		case '?':
-+			printf("unknown option: %c\n", optopt);
-+			break;
-+		}
-+	}
-+
-+	for (; optind < argc; optind++)
-+		printf("extra arguments: %s\n", argv[optind]);
-+
-+	run_devmem_tests();
-+
-+	if (is_server)
-+		return do_server();
-+
-+	return 0;
-+}
--- 
-2.45.1.288.g0e0cd299f1-goog
-
+Thanks,
+Jake
 
