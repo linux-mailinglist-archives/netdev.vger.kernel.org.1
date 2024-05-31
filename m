@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-99624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4710A8D5840
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 03:40:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 803A18D583C
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 03:40:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01EB5289214
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:40:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B93B2892A2
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:40:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADDA81171C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6047BDF5B;
 	Fri, 31 May 2024 01:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RwHOnC3j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="psVe0hdm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82047EAE7;
-	Fri, 31 May 2024 01:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF4717550
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 01:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717119633; cv=none; b=k5L1GRaO6uzWzSPlHkSUA5R+HjC6ggknzXgzpKJKymV8qSGcOFZLPuLnHOXF8bCvzli9C2Ngwvbz222Nzf3xt4C6G1OVSFFt026LUL9IYPPAaHq6c9/IBpF23jehCNn8w2goSiVjxqTP76YrIy1kw9e53JaFXcRosfi+4HwRq/8=
+	t=1717119633; cv=none; b=YkVWhpmzxL2v8TMVAC9NZrXMgPnygIRFkMMj4bDz8A7J2gOZcJRjwv0vHyksncHMYRfUuGI6YiRXkQvkipDcYdgAha0+u1vKq0DYO6qxG0oIRPT2ucTPrNDn5wlDL2Pkrr/YzWioiYDPhcNelI40DwF1pThn1NPm/2SNotlSHtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717119633; c=relaxed/simple;
-	bh=0QcoVA6kHXD2J3K8hFxrVZXAMa5lJRX2YC7JyYwXKB8=;
+	bh=VKOc60I90X/dugTkbNmULut2FA8Ge149pb8+tDxQzoI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mY9vbFOKXBk4qkOZRWx0Ok73mUF5PEaCnJ1AzH7rlFv5FNhHTKUtws1ikTAx3CYi0+IIiywF0oJtgjSkBn1YHoTQaz5153ZBlirA5qLy6xSBRHhdPRvvo/pjq/qmzYgQJwwwdN84c5IFEB23MguCcSdOKLprrs19CjzjQBRkZXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RwHOnC3j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1A338C4AF08;
+	 In-Reply-To:To:Cc; b=U+9eKKjj6u2Q2oYUt4jZBJyEemGwPRvKYxmoRr+feuIERPcffyZDwm4bH+wMwy2kG2BexyQ20yhYbtlHpjk3UWbTWaTJ5hrCA/vIrEtn+ry8zzHwBoeSWIuoAUz3kHSSdd4rjqDFfltdYV/DwMKx2wDqYpgnYa72oKTPVOJsA6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=psVe0hdm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0F0C6C32789;
 	Fri, 31 May 2024 01:40:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1717119633;
-	bh=0QcoVA6kHXD2J3K8hFxrVZXAMa5lJRX2YC7JyYwXKB8=;
+	bh=VKOc60I90X/dugTkbNmULut2FA8Ge149pb8+tDxQzoI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RwHOnC3jCNFDY2o1kGmkqDFFHKEx8K1DgJYFqW7iRywvaOtMQn66lKn2Lw///RetX
-	 yk4JuXK12EUNLxAgEzwvRDRbYOpUv+K5czj4SzmJc76m5ja5M/lEyRpxAaZc2TFraN
-	 Q4jOAC9BHWrWS0U7cUJfGJlzhsCqGHuKhqI6FMfrZnz5C5WFn2FWjUkku03mtPAgiG
-	 6N6q0PxRGlK99RpULvdMohKWbjNH2pVaBbEKIkNuBKxTJgPq5H7gxhkiYnS2OgKahE
-	 ++/FVWbvEv92GBHoPeyzLxgC1hF7cpdQxtSki31DXbEdq9meRe1vH0YVaBqLMFOJ6/
-	 3IvrNtY5Bqlzg==
+	b=psVe0hdmUrhZ9Yuy5iKDwfoR05NxUsL8ljOAjExIwZ2MvF7kNVeN/wv+nsqVVYbr3
+	 otEL9u05Yz82rZ/4mbpkQCxrCDuvE02Ny426usEKtRDhhcPyyTn4V4XwIpf6Fnh6f0
+	 rF7z1mGByhiHwkXzDBsa34tdZB0pYeItxBktMbTQlXNNHo6PiSBfP6AZQkvo4TWdCH
+	 grjakpW5CVv48njlCsyXxkkbMCUCN5zqfLIsG5hUS08EX5iP/ZMSyoF2OSlKRFqJOY
+	 Cpier8/c2VmnjGkJVWQm4ygSXX7svGvl80Mc44e1q7WrVxTt4TyiwG0kQZUCpmQFFQ
+	 nkLLjhKesrgmg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0CD4AD84BD0;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0279FCF21F3;
 	Fri, 31 May 2024 01:40:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,42 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] dt-bindings: net: ti: icssg_prueth: Add documentation for
- PA_STATS support
+Subject: Re: [PATCHv2 net-next] ipv6: sr: restruct ifdefines
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171711963304.18580.11844749195457939777.git-patchwork-notify@kernel.org>
+ <171711963300.18580.9918782792276151812.git-patchwork-notify@kernel.org>
 Date: Fri, 31 May 2024 01:40:33 +0000
-References: <20240529115225.630535-1-danishanwar@ti.com>
-In-Reply-To: <20240529115225.630535-1-danishanwar@ti.com>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: conor+dt@kernel.org, krzk+dt@kernel.org, robh@kernel.org,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, srk@ti.com,
- vigneshr@ti.com, r-gunasekaran@ti.com, rogerq@kernel.org
+References: <20240529040908.3472952-1-liuhangbin@gmail.com>
+In-Reply-To: <20240529040908.3472952-1-liuhangbin@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ kovalev@altlinux.org, sd@queasysnail.net, gnault@redhat.com,
+ horms@kernel.org, david.lebrun@uclouvain.be
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 29 May 2024 17:22:25 +0530 you wrote:
-> Add documentation for ti,pa-stats property which is syscon regmap for
-> PA_STATS registers. This will be used to dump statistics maintained by
-> ICSSG firmware.
+On Wed, 29 May 2024 12:09:08 +0800 you wrote:
+> There are too many ifdef in IPv6 segment routing code that may cause logic
+> problems. like commit 160e9d275218 ("ipv6: sr: fix invalid unregister error
+> path"). To avoid this, the init functions are redefined for both cases. The
+> code could be more clear after all fidefs are removed.
 > 
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-> ---
-> Changes from v1 to v2:
-> *) Updated description of ti,pa-stats to explain the purpose of PA_STATS
->    module in context of ICSSG.
+> Suggested-by: Simon Horman <horms@kernel.org>
+> Suggested-by: David Ahern <dsahern@kernel.org>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] dt-bindings: net: ti: icssg_prueth: Add documentation for PA_STATS support
-    https://git.kernel.org/netdev/net-next/c/2f19a795e1f9
+  - [PATCHv2,net-next] ipv6: sr: restruct ifdefines
+    https://git.kernel.org/netdev/net-next/c/a79d8fe2ff8e
 
 You are awesome, thank you!
 -- 
