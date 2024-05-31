@@ -1,212 +1,111 @@
-Return-Path: <netdev+bounces-99792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE6548D6820
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 19:26:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 033568D682F
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 19:33:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35053B278DB
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 17:26:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9717A1F23115
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 17:33:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA277176AC0;
-	Fri, 31 May 2024 17:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68A2178CEA;
+	Fri, 31 May 2024 17:33:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fqCIp0zW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C7355E4C;
-	Fri, 31 May 2024 17:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC49B17B404
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 17:33:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717176358; cv=none; b=ta8FjahfJ/VsiEH16ivs/PJ8gwfEBfAlfUiumfbNOr7E0+JZr6JH0K8WZGxqQGCb0NiJZfqjNqSEzu7oXlqLSMyBQSeg3uRHuSasoso/+MUnFCGtQKGxmR9w7vLOB2hrEroAKQKZvZduhlwl9n+ut4NpKft+rE/7wtORa78Etb8=
+	t=1717176794; cv=none; b=ehnxfD4trK7cCRJY7WE80NKgFjcWbaF32edFadyPVU3oy9LDQcx2V76oV7jWsjSwvgEqhDwvTnTZvSm58PD9DWKdm9jJNwlpHmqPsX4E4cRjlO7VXoHbs8JUXTAEVtJMbqnnuvoOijlEafTAOCVk+mwUzcf6nGbZMRiK2PAf38U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717176358; c=relaxed/simple;
-	bh=ZWgpS0W3Gu1vL+QPpeRCpIdJcGFrwbbUpa/7iI5oy58=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=UrMObpx+EolmuH+c44FvirMTm2b+/RTcFaXnwOnk8NXQRXCCXbaUXQ9UwLcrqqJKQFAt8I/6WWNeulWp/+15A45FVu8611kyPQ/m/cv2/9HOoS9gyxf81xcDULaO2iib6vM/4SJxEsDlDIe7ehIzq49uqdKMtJc8B5bubQQM1Gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.78.69) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 31 May
- 2024 20:25:33 +0300
-Subject: Re: [net-next PATCH v4 7/7] net: ravb: Allocate RX buffers via page
- pool
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-CC: Biju Das <biju.das.jz@bp.renesas.com>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
-	<yoshihiro.shimoda.uh@renesas.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240528150339.6791-1-paul.barker.ct@bp.renesas.com>
- <20240528150339.6791-8-paul.barker.ct@bp.renesas.com>
- <eefce0af-2771-a56c-753d-85fe991fdf31@omp.ru>
- <e7cf9dd8-9c67-476b-a892-b8dbe9312c4c@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <a59baa2d-0f00-18b9-bdea-0206b7a93f52@omp.ru>
-Date: Fri, 31 May 2024 20:25:33 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1717176794; c=relaxed/simple;
+	bh=Iz2IxoSLx0mYAaS6/wqJ6kAq9yl19RcojIN+J4H87qQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y+tUZu8sHsnk/Nma7/IiJtp7Gmm7npXgvXdLBfDF5KRuhWDUDJjeozYeckkStMRiTaseWZFwVl/a8tLRlx958hidCiBb78c/teH+IATDYxN9OD6o23F8mf1k2SJb1W0HI1wBCLt45p/wdYGqibBjVlstrR7gaQxpW+F11zYmSqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fqCIp0zW; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717176792; x=1748712792;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Iz2IxoSLx0mYAaS6/wqJ6kAq9yl19RcojIN+J4H87qQ=;
+  b=fqCIp0zW0MRY8CWMWdSSrP5a/hfynqcb0YRFeeEQxlYuRkDwQPGRcOfh
+   ClKS0Cd+UeZ81rs8YCyqRD/sL+IIs83E16v+6twcx9Dg/T6l4x/nXVCyi
+   HJ45jAGSDAGHqJDXFo3Fh4norITXREpvWsA9OuQzrEsq27tsdot71nV6j
+   g8Qei0shhNIIglyetSWqSB6AWvu4bcv2Z3BbGiK7JpQEYvAB2EXu99UB4
+   8+N0DEe8HMtfFxf+snGlN5SJxxYnJn/bZtlA4VnWplrNMHAxrQlQZZzAU
+   CFxhtnCOZP2ypGNX6mzCQbsAKgyOvvCC2tI6JMnxAPZqOuK3bHeikSOmn
+   A==;
+X-CSE-ConnectionGUID: Dtp6wEryRaG5/qVQJ9giRA==
+X-CSE-MsgGUID: DM8drnNOTZeh/LZ1o//grQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11089"; a="17530207"
+X-IronPort-AV: E=Sophos;i="6.08,205,1712646000"; 
+   d="scan'208";a="17530207"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2024 10:33:11 -0700
+X-CSE-ConnectionGUID: pDrSoQvMQwWM8ryj8Cs1Zw==
+X-CSE-MsgGUID: d1uYIgx1QQatUG41TXGXkA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,205,1712646000"; 
+   d="scan'208";a="36810105"
+Received: from unknown (HELO 0610945e7d16) ([10.239.97.151])
+  by orviesa008.jf.intel.com with ESMTP; 31 May 2024 10:33:06 -0700
+Received: from kbuild by 0610945e7d16 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sD67j-000Ha1-0v;
+	Fri, 31 May 2024 17:33:03 +0000
+Date: Sat, 1 Jun 2024 01:32:13 +0800
+From: kernel test robot <lkp@intel.com>
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH net-next 3/3] dst_cache: let rt_uncached cope with
+ dst_cache cleanup
+Message-ID: <202406010139.PSZGIJkQ-lkp@intel.com>
+References: <cd710487a34149654a5ff73a8c0df9b1d3fc73a9.1717087015.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <e7cf9dd8-9c67-476b-a892-b8dbe9312c4c@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 05/31/2024 17:10:09
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 185664 [May 31 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 20 0.3.20
- 743589a8af6ec90b529f2124c2bbfc3ce1d2f20f
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.69 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.78.69
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 05/31/2024 17:14:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 5/31/2024 12:02:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cd710487a34149654a5ff73a8c0df9b1d3fc73a9.1717087015.git.pabeni@redhat.com>
 
-On 5/30/24 12:21 PM, Paul Barker wrote:
-[...]
+Hi Paolo,
 
->>> This patch makes multiple changes that can't be separated:
->>>
->>>   1) Allocate plain RX buffers via a page pool instead of allocating
->>>      SKBs, then use build_skb() when a packet is received.
->>>   2) For GbEth IP, reduce the RX buffer size to 2kB.
->>>   3) For GbEth IP, merge packets which span more than one RX descriptor
->>>      as SKB fragments instead of copying data.
->>>
->>> Implementing (1) without (2) would require the use of an order-1 page
->>> pool (instead of an order-0 page pool split into page fragments) for
->>> GbEth.
->>>
->>> Implementing (2) without (3) would leave us no space to re-assemble
->>> packets which span more than one RX descriptor.
->>>
->>> Implementing (3) without (1) would not be possible as the network stack
->>> expects to use put_page() or page_pool_put_page() to free SKB fragments
->>> after an SKB is consumed.
->>>
->>> RX checksum offload support is adjusted to handle both linear and
->>> nonlinear (fragmented) packets.
->>>
->>> This patch gives the following improvements during testing with iperf3.
->>>
->>>   * RZ/G2L:
->>>     * TCP RX: same bandwidth at -43% CPU load (70% -> 40%)
->>>     * UDP RX: same bandwidth at -17% CPU load (88% -> 74%)
->>>
->>>   * RZ/G2UL:
->>>     * TCP RX: +30% bandwidth (726Mbps -> 941Mbps)
->>>     * UDP RX: +417% bandwidth (108Mbps -> 558Mbps)
->>>
->>>   * RZ/G3S:
->>>     * TCP RX: +64% bandwidth (562Mbps -> 920Mbps)
->>>     * UDP RX: +420% bandwidth (90Mbps -> 468Mbps)
->>>
->>>   * RZ/Five:
->>>     * TCP RX: +217% bandwidth (145Mbps -> 459Mbps)
->>>     * UDP RX: +470% bandwidth (20Mbps -> 114Mbps)
->>>
->>> There is no significant impact on bandwidth or CPU load in testing on
->>> RZ/G2H or R-Car M3N.
->>>
->>> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
-[...]
+kernel test robot noticed the following build errors:
 
->>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->>> index dd92f074881a..bb7f7d44be6e 100644
->>> --- a/drivers/net/ethernet/renesas/ravb_main.c
->>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-[...]
->>> +	return 0;
->>> +}
->>> +
->>>  static u32
->>>  ravb_rx_ring_refill(struct net_device *ndev, int q, u32 count, gfp_t gfp_mask)
->>>  {
->>>  	struct ravb_private *priv = netdev_priv(ndev);
->>> -	const struct ravb_hw_info *info = priv->info;
->>>  	struct ravb_rx_desc *rx_desc;
->>> -	dma_addr_t dma_addr;
->>>  	u32 i, entry;
->>>  
->>>  	for (i = 0; i < count; i++) {
->>>  		entry = (priv->dirty_rx[q] + i) % priv->num_rx_ring[q];
->>>  		rx_desc = ravb_rx_get_desc(priv, q, entry);
->>> -		rx_desc->ds_cc = cpu_to_le16(info->rx_max_desc_use);
->>>  
->>> -		if (!priv->rx_skb[q][entry]) {
->>> -			priv->rx_skb[q][entry] = ravb_alloc_skb(ndev, info, gfp_mask);
->>> -			if (!priv->rx_skb[q][entry])
->>> +		if (!priv->rx_buffers[q][entry].page) {
->>> +			if (unlikely(ravb_alloc_rx_buffer(ndev, q, entry,
->>
->>    Well, IIRC Greg KH is against using unlikely() unless you have actually
->> instrumented the code and this gives an improvement... have you? :-)
-> 
-> My understanding was that we should use unlikely() for error checking in
-> hot code paths where we want the "good" path to be optimised. I can drop
-> this if I'm wrong though.
+[auto build test ERROR on net-next/main]
 
-   OK, keep it... :-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Paolo-Abeni/ipv6-use-a-new-flag-to-indicate-elevated-refcount/20240531-012716
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/cd710487a34149654a5ff73a8c0df9b1d3fc73a9.1717087015.git.pabeni%40redhat.com
+patch subject: [PATCH net-next 3/3] dst_cache: let rt_uncached cope with dst_cache cleanup
+config: m68k-defconfig (https://download.01.org/0day-ci/archive/20240601/202406010139.PSZGIJkQ-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240601/202406010139.PSZGIJkQ-lkp@intel.com/reproduce)
 
-[...]
->>> @@ -865,7 +894,16 @@ static int ravb_rx_gbeth(struct net_device *ndev, int budget, int q)
->>>  				stats->rx_bytes += skb->len;
->>>  				napi_gro_receive(&priv->napi[q], skb);
->>>  				rx_packets++;
->>> +
->>> +				/* Clear rx_1st_skb so that it will only be
->>> +				 * non-NULL when valid.
->>> +				 */
->>> +				if (die_dt == DT_FEND)
->>> +					priv->rx_1st_skb = NULL;
->>
->>    Hm, can't we do this under *case* DT_FEND above?
-> 
-> It makes more logical sense to me to do this as the last step, but I
-> guess it's a little more optimal to do it earlier. I'll move it.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406010139.PSZGIJkQ-lkp@intel.com/
 
-   Looking at it once more, we can't... unless I'm missing s/th. :-)
+All errors (new ones prefixed by >>):
 
-> Thanks,
+   m68k-linux-ld: net/core/dst_cache.o: in function `dst_cache_set_ip6':
+>> dst_cache.c:(.text+0x21e): undefined reference to `rt6_uncached_list_add'
 
-MBR, Sergey
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
