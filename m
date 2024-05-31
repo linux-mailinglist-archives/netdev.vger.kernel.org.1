@@ -1,113 +1,107 @@
-Return-Path: <netdev+bounces-99656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 747A88D5AB8
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 08:48:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 75A8B8D5ABD
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 08:49:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B7181F235B1
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 06:48:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29A851F24D13
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 06:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0DC80C1D;
-	Fri, 31 May 2024 06:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB3628DA0;
+	Fri, 31 May 2024 06:49:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="m9Zktthj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89AFE28DA0
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 06:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69F97BB0C
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 06:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717138113; cv=none; b=gyvE67zThMIFR+hjg5qcVE7X17iXRZ6Qbnr5RcKg1g8Lg4+7HY572XvXjXlS8BQu5B9ZWY0pcmtNZm4ArnUGXsXadCx+Bmy9fKK/ERgdG5tg/5QYF/QCOfy0rkaYuo5RTVRKoXz+X3w6I1lwXaJ53uI4kaoDOPTuFf/CW7OnXHM=
+	t=1717138141; cv=none; b=fI6EPUFwo1RW41DMdqMSz3YwMB7XQbgbv7s5E1nIVYRb061D+9EtE75Rxtyj7fo31xkBLcWS+DUBXf3CNEzYpWJJ2Jn3rOd6DA0F0cTg2ba4pQSAwPdDYlP2laRM06VVQ6KqohEmexsWMnIgrgvJPWra3FcNa7nNuALyp58CM7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717138113; c=relaxed/simple;
-	bh=qivUw7f0iVhUehwdSWwvcJpdzxYS2h3SyJlIKeuqBww=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=nk0WqobQLrB3aKntc0IoNb333jFzoELXUg5NA5ZbACGvt60Ky4+5wNSwJ/rEfF4S+zfRsK1WgrWpjmajTggEr2wNn6Fz68lcdc4AdDNdwc3bPnFeCVUx8UwlKDbGnFG+T7JqONuJw/0FGRF7AWEI2wPyr4jVVeeYjeGcgxZlf0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7eac3b73a53so197038639f.0
-        for <netdev@vger.kernel.org>; Thu, 30 May 2024 23:48:32 -0700 (PDT)
+	s=arc-20240116; t=1717138141; c=relaxed/simple;
+	bh=vJ5QSe/GmKqSf962lGoIY80yoXTVRVCTvCocvZuiMK4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LZvsnd0W7PqJ30ooYVPlXbs9d+88N3bG7ns1avkjcebIXyB0zsiwrjEknqvRgv+KvAkuBoFExhthOUL/I+xa2vvFgqlD4/quN8Wl3YWH59rY9PurWIDCX7pHdRZBQAPMCY5pY5IRIXIPldu0yyRd2rU2OFkJeweNHZsi4HjgA04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=m9Zktthj; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a6265d47c61so53468766b.0
+        for <netdev@vger.kernel.org>; Thu, 30 May 2024 23:48:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gooddata.com; s=google; t=1717138138; x=1717742938; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=yMq6SD6aBiKxC2vs9a0Gg7Nmr+dWK0Vp9kiP1h5wxBE=;
+        b=m9ZktthjgvK/b733CRsLGUTDCKRnAHdCMWwW9+sHMSroY9caKaTvNzvTgv3WjR4FA3
+         51xCEJvxeJc5zjgb9NzK0jH6La+sifEpmReLyBm37rYDaUdw50k5bT55D9s/Pke+FpnP
+         JDWPyulk+9U6DyQ+OCGbFaqbPR2zAWITrBNgw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717138112; x=1717742912;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CPZc/5ish8L/JwOZvC7ChlN8WdWLFQ894K+NxOgkXEc=;
-        b=DxU61iLMs53gOloSrLupAVjJRIt0jZsCLFY62w1uXdcO0KRsZRvqu5mZQSlJ026F1d
-         6EYMskdVOgPPXFxHnFDxjHREX82bWrzvLe3WJMe731LAfUVqOtXDIVSAcJ5XeNwWjaMl
-         ES9zsW12dFNDFXLmAyXCXyoPDWK2qhYgKNOeZ7lXYM9qO5McUOlQXhrsAQ7L9pp3YUee
-         f1dXBD2jjT801flXh9dMXu6m2mLu5R0LklIkIKYBXLje3LWGJ9nGUXMRKoQSK9G1HqOv
-         ZuSmZwck/uT4K4D9Z00bUCUI52HFF1uPsr+C9AX7bKvOpiUV9GKf8L75wEl7dAMpi+IK
-         JeLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWufaPbiRdEtRG93iW7/fpovuH6O4Rqxx0cQJJYoveBa2ZSCAiBO/BK2QTr5yURUfmILniP50zrGmD1gWpiYuholOcQ6YBH
-X-Gm-Message-State: AOJu0YywAwz63pitDSaingzFN9q7ETWWwf9zihloAd1Jh2lHaTsEnFev
-	+ZlxRrXscxqezpelNDsgnXN4dSf5qH6VJDsMukEySHRuH92xL2c5Yga8+8yjwPDv5m2etbwJ4AQ
-	7+0tLgtzP2c9x4MiPT764LtNYoz6ohLpnQA5Yg/NNgmZL2rf8wbPzBYs=
-X-Google-Smtp-Source: AGHT+IEc3P5LtBhsqyNjS5ws4um1Pv4U75o5yh/t8TKdP+IHi8wJygRfnfgtlKQFplWF8SecCX5sGnC2Nrl36l7oIgQ88z22P+sY
+        d=1e100.net; s=20230601; t=1717138138; x=1717742938;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yMq6SD6aBiKxC2vs9a0Gg7Nmr+dWK0Vp9kiP1h5wxBE=;
+        b=ZRk/WDQSoeeKyRpmpLmnRmFJaaRBLETA+Yyr732tuyp88L+bllkyHOsK73sDu+8PuY
+         xGyS+Uby1zlsTJVAVC7D7pxVfN0RfDwU6dSMR0p3vWUTVTXT2FcZpqvXvkgvVR/lkKFJ
+         6joxWkqmQuIyFZQQvlvC7XacNKcGUIJfHsYpWg00fvLQi8Jd+70J6S5ggv+cNNb6XtmN
+         t2dIkc+s9PvUSEGb8HcFLG99sv3x9pKIczGgojAr16z4SYaLJCLqamM5zGBh7JWeGMXZ
+         Vesy2i0meiTpCBf/TfvQoaghcHRsrHswfKz8TP2Ko2b97FU+MRUK/2/E0j6KCtSO7Mh6
+         w4hQ==
+X-Gm-Message-State: AOJu0Yy+S1l03rahNGUQR8dNb2Yr/l31FCHaAX+y18PRUGYZpSjhTXFh
+	qx0sAnOgr56VpErZdlkoIdJJdnSK2bycX7VSfF4Be5SMdu6ZO6GlHhguUld0nrhtsTtllSVADB3
+	VESwKvubo2axcV3HMym7xcZgiF2YU7tHHfVE6
+X-Google-Smtp-Source: AGHT+IH1AwmOeAG9xWo4dTYat4Hp+ETXDAKG3qHEZNQLfS36GvxnAYodkBvYqzkuloPcWs7+Yu56VZZHgeKKJTwFW5E=
+X-Received: by 2002:a17:906:6b02:b0:a63:4703:14b1 with SMTP id
+ a640c23a62f3a-a682022ca1amr61124966b.22.1717138137804; Thu, 30 May 2024
+ 23:48:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:292b:b0:488:d489:3963 with SMTP id
- 8926c6da1cb9f-4b541f5aae1mr6890173.1.1717138111779; Thu, 30 May 2024 23:48:31
- -0700 (PDT)
-Date: Thu, 30 May 2024 23:48:31 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000002ee1580619ba5fb4@google.com>
-Subject: [syzbot] Monthly net report (May 2024)
-From: syzbot <syzbot+listce1365cc6514a1f8f55f@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+References: <CAK8fFZ7MKoFSEzMBDAOjoUt+vTZRRQgLDNXEOfdCCXSoXXKE0g@mail.gmail.com>
+ <20240530173324.378acb1f@kernel.org>
+In-Reply-To: <20240530173324.378acb1f@kernel.org>
+From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Date: Fri, 31 May 2024 08:48:31 +0200
+Message-ID: <CAK8fFZ6nEFcfr8VpBJTo_cRwk6UX0Kr97xuq6NhxyvfYFZ1Awg@mail.gmail.com>
+Subject: Re: [regresion] Dell's OMSA Systems Management Data Engine stuck
+ after update from 6.8.y to 6.9.y (with bisecting)
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Igor Raits <igor@gooddata.com>, 
+	Daniel Secik <daniel.secik@gooddata.com>, Zdenek Pesek <zdenek.pesek@gooddata.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Hello net maintainers/developers,
+>
+> On Thu, 30 May 2024 09:52:38 +0200 Jaroslav Pulchart wrote:
+> > However, reverting just the "use xarray iterator to implement
+> > rtnl_dump_ifinfo" change did not resolve the issue. Do you have any
+> > suggestions on what to try next and how to fix it?
+>
+> The daemon must have rolled its own netlink parsing.
+>
+> Could you try this?
+>
+> diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+> index 96accde527da..5fd06473ddd9 100644
+> --- a/net/ipv4/devinet.c
+> +++ b/net/ipv4/devinet.c
+> @@ -1912,6 +1912,8 @@ static int inet_dump_ifaddr(struct sk_buff *skb, struct netlink_callback *cb)
+>                         goto done;
+>         }
+>  done:
+> +       if (err == -EMSGSIZE && likely(skb->len))
+> +               err = skb->len;
+>         if (fillargs.netnsid >= 0)
+>                 put_net(tgt_net);
+>         rcu_read_unlock();
 
-This is a 31-day syzbot report for the net subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/net
-
-During the period, 18 new issues were detected and 7 were fixed.
-In total, 94 issues are still open and 1447 have been fixed so far.
-
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  27358   Yes   possible deadlock in team_del_slave (3)
-                   https://syzkaller.appspot.com/bug?extid=705c61d60b091ef42c04
-<2>  4787    Yes   KMSAN: uninit-value in eth_type_trans (2)
-                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
-<3>  3655    Yes   unregister_netdevice: waiting for DEV to become free (8)
-                   https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
-<4>  2060    Yes   WARNING in skb_ensure_writable
-                   https://syzkaller.appspot.com/bug?extid=0c4150bff9fff3bf023c
-<5>  1243    Yes   INFO: task hung in rfkill_global_led_trigger_worker (2)
-                   https://syzkaller.appspot.com/bug?extid=2e39bc6569d281acbcfb
-<6>  1214    Yes   INFO: task hung in rtnetlink_rcv_msg
-                   https://syzkaller.appspot.com/bug?extid=8218a8a0ff60c19b8eae
-<7>  1067    Yes   INFO: task hung in switchdev_deferred_process_work (2)
-                   https://syzkaller.appspot.com/bug?extid=8ecc009e206a956ab317
-<8>  990     Yes   possible deadlock in __dev_queue_xmit (3)
-                   https://syzkaller.appspot.com/bug?extid=3b165dac15094065651e
-<9>  807     Yes   possible deadlock in sock_map_delete_elem
-                   https://syzkaller.appspot.com/bug?extid=4ac2fe2b496abca8fa4b
-<10> 791     No    INFO: task hung in addrconf_dad_work (4)
-                   https://syzkaller.appspot.com/bug?extid=46af9e85f01be0118283
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+I tried it and it did not help, the issue is still there.
 
