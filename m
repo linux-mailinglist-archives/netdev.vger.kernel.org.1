@@ -1,78 +1,62 @@
-Return-Path: <netdev+bounces-99685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 694F78D5D40
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 10:55:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC6C48D5D43
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 10:55:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2580828B07E
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 08:55:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8DDD28AA56
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 08:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0184E156677;
-	Fri, 31 May 2024 08:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A700155C9B;
+	Fri, 31 May 2024 08:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="IrQzKMml"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="E6Q56tQl"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa12.hc1455-7.c3s2.iphmx.com (esa12.hc1455-7.c3s2.iphmx.com [139.138.37.100])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D7515665B
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 08:54:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.37.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23406155A53;
+	Fri, 31 May 2024 08:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717145673; cv=none; b=WO/up0IKB++xZhKqTLLsJkp1flO0IKPmNMWL+MDerc9bXVbGotmwYo0hTKabU8qwXhfS69HnjxRNbEt7gJ9EzReXpfAxY2Ne5462WtHAeGDUfp7FVxl008rHiVKKpfGJdjsHwXuOohN7l1LJOyTO4B8mq+5DCoslR0DbYf4cNHM=
+	t=1717145682; cv=none; b=jXpHZXaN/U1O3vSaFI1/67CDQKE7H5hOsWKw790vI884KeH92tjoVqeLC8bvWaZTpmFU8BlKnR4FbxB4l56VaKSrlolTyBWZNIQ2e3zwXw3PT56XP4HgGi9EJ9ssZfbgmA9I468jQV11J/LpwxC6o6F3ezAyAMUMJ836mIjUXQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717145673; c=relaxed/simple;
-	bh=ocCtK7TxO3KuKC0j7zTbWsXMjjRO80aBpoP7m9MXrQ0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZqgFpmB7Yo1EwMr2JnWWWaBgXISpQI9bSgQ5d/+yvpUvcUInlVwJ84OHrZ0FHYjyuqL0RHj6DF33TQqycFVutKWhnqV2B8g5yNA7rn0CnsQyRR4AlsOId050zR7F6itsBVSHOz/QZ78+hSFI0Th4GyBv05B4D0woO/+oU9YhgTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=IrQzKMml; arc=none smtp.client-ip=139.138.37.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1717145672; x=1748681672;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ocCtK7TxO3KuKC0j7zTbWsXMjjRO80aBpoP7m9MXrQ0=;
-  b=IrQzKMmlNCYP9px0aKMKkiE4JwE/7YdSPJXOEHbeKQY1bCY++gi/qb2z
-   15cmHJJNDg2R14Ji64Praq/txnqlOhircCSlCeDxT6kxLf8+GD92PpaZO
-   kRz1s6//9oI8AWZp7JYITUj9xZyiwppK1AGRk9wiz8VQBzWQkgjZ34VnV
-   UH/s82CfytVkO9Kzf6o77p12aXG2naz2RcCnqG6do+1cdu8NjPrrh7T8J
-   44oYtgpHyDVpJ66AmWJ6cOTTGv/7aBmPG6/WQ7F5ZMEmHgYqFzOPMXC9X
-   NJ+Uc0xQ3AmJWJBQjhu8HMRG06FB+GCMOoEQtZNEkCj+Dntjjps2DCjHB
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11088"; a="140067277"
-X-IronPort-AV: E=Sophos;i="6.08,203,1712588400"; 
-   d="scan'208";a="140067277"
-Received: from unknown (HELO yto-r4.gw.nic.fujitsu.com) ([218.44.52.220])
-  by esa12.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2024 17:54:29 +0900
-Received: from yto-m2.gw.nic.fujitsu.com (yto-nat-yto-m2.gw.nic.fujitsu.com [192.168.83.65])
-	by yto-r4.gw.nic.fujitsu.com (Postfix) with ESMTP id 13BD4D4F5F
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 17:54:27 +0900 (JST)
-Received: from kws-ab3.gw.nic.fujitsu.com (kws-ab3.gw.nic.fujitsu.com [192.51.206.21])
-	by yto-m2.gw.nic.fujitsu.com (Postfix) with ESMTP id 54091D5601
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 17:54:26 +0900 (JST)
-Received: from edo.cn.fujitsu.com (edo.cn.fujitsu.com [10.167.33.5])
-	by kws-ab3.gw.nic.fujitsu.com (Postfix) with ESMTP id DA8432030C8A7
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 17:54:25 +0900 (JST)
-Received: from G08FNSTD200033.g08.fujitsu.local (unknown [10.167.225.189])
-	by edo.cn.fujitsu.com (Postfix) with ESMTP id 3ACF81A000A;
-	Fri, 31 May 2024 16:54:25 +0800 (CST)
-From: Chen Hanxiao <chenhx.fnst@fujitsu.com>
-To: Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: bridge@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next] net: bridge: fix an inconsistent indentation
-Date: Fri, 31 May 2024 16:54:02 +0800
-Message-Id: <20240531085402.1838-1-chenhx.fnst@fujitsu.com>
-X-Mailer: git-send-email 2.37.1.windows.1
+	s=arc-20240116; t=1717145682; c=relaxed/simple;
+	bh=JFEYnpKVhC3OKPMmlFbiYqQ6JmpSsmBSmRlLuUInyTk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XgbkS4HAlyQ0OnmJmHoHmYamjzNqY8zDvGmjCMax69iXQgIjEUJkps17Mi/XubLUGtJWmE1aDaDRWyS4jfyh6bUcGBseQmf1SSHBHPU864cdKdtvQSgKJ8v0PTANvMRPAopzoRxAHJSXx7rL87rYPRoU26xkYtOzBu6jAXl3VZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=E6Q56tQl; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1717145670; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=u45yl/ongPk3D/+8eUViTWu0t7iGmxovN58bXNXSZhI=;
+	b=E6Q56tQlOz9ZCIS3rCuk651obBOfEO9XZciEF0mskSpsVfJUJmcdtKnarL748g57sjlYfVvfjzqKrsndHPT3177ZyxjhR61/Xkeb07324ZVsZLewgVYxpLs6jX7PyhM4DczHEP5Bnln2OHMYFW1R7CjPg5xQ0HEgmTwEQS6JQGg=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045075189;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W7ZRJhf_1717145657;
+Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W7ZRJhf_1717145657)
+          by smtp.aliyun-inc.com;
+          Fri, 31 May 2024 16:54:30 +0800
+From: Wen Gu <guwen@linux.alibaba.com>
+To: gbayer@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net/smc: avoid overwriting when adjusting sock bufsizes
+Date: Fri, 31 May 2024 16:54:17 +0800
+Message-Id: <20240531085417.43104-1-guwen@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,49 +64,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-TM-AS-Product-Ver: IMSS-9.1.0.1417-9.0.0.1002-28420.006
-X-TM-AS-User-Approved-Sender: Yes
-X-TMASE-Version: IMSS-9.1.0.1417-9.0.1002-28420.006
-X-TMASE-Result: 10-3.235300-10.000000
-X-TMASE-MatchedRID: MIzou+McLCqSlJbFK+uaF2/6CCblACLhTfK5j0EZbyufHrjLA9DhZiTC
-	VwyY5KnUIvrftAIhWmLy9zcRSkKatTOfD6L6toKjtPtBQlRa0ix9LQinZ4QefOYQ3zcXToXr+gt
-	Hj7OwNO2OhzOa6g8KrYT+gRlsVJu0A1JMyXUvJPVRIvRZ3/3s6z2Nnjucv3QSc5ARF/jGx9CNd4
-	2xNa0qYY3AqGMtRT4gzOoGrutJjQAmXg5tYQqr4RXBt/mUREyAj/ZFF9Wfm7hNy7ppG0IjcFQqk
-	0j7vLVUewMSBDreIdk=
-X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
 
-Smatch complains:
-net/bridge/br_netlink_tunnel.c:
-   318 br_process_vlan_tunnel_info() warn: inconsistent indenting
+When copying smc settings to clcsock, avoid setting clcsock's sk_sndbuf
+to sysctl_tcp_wmem[1], since this may overwrite the value set by
+tcp_sndbuf_expand() in TCP connection establishment.
 
-Fix it with a proper indenting
+And the other setting sk_{snd|rcv}buf to sysctl value in
+smc_adjust_sock_bufsizes() can also be omitted since the initialization
+of smc sock and clcsock has set sk_{snd|rcv}buf to smc.sysctl_{w|r}mem
+or ipv4_sysctl_tcp_{w|r}mem[1].
 
-Signed-off-by: Chen Hanxiao <chenhx.fnst@fujitsu.com>
+Fixes: 30c3c4a4497c ("net/smc: Use correct buffer sizes when switching between TCP and SMC")
+Link: https://lore.kernel.org/r/5eaf3858-e7fd-4db8-83e8-3d7a3e0e9ae2@linux.alibaba.com
+Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
 ---
-v2:
-    add net-next tag
-    modify subject
+FYI,
+The detailed motivation and testing can be found in the link above.
+---
+ net/smc/af_smc.c | 22 ++--------------------
+ 1 file changed, 2 insertions(+), 20 deletions(-)
 
- net/bridge/br_netlink_tunnel.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/bridge/br_netlink_tunnel.c b/net/bridge/br_netlink_tunnel.c
-index 17abf092f7ca..71a12da30004 100644
---- a/net/bridge/br_netlink_tunnel.c
-+++ b/net/bridge/br_netlink_tunnel.c
-@@ -315,8 +315,8 @@ int br_process_vlan_tunnel_info(const struct net_bridge *br,
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index 9389f0cfa374..a35281153067 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -459,29 +459,11 @@ static int smc_bind(struct socket *sock, struct sockaddr *uaddr,
+ static void smc_adjust_sock_bufsizes(struct sock *nsk, struct sock *osk,
+ 				     unsigned long mask)
+ {
+-	struct net *nnet = sock_net(nsk);
+-
+ 	nsk->sk_userlocks = osk->sk_userlocks;
+-	if (osk->sk_userlocks & SOCK_SNDBUF_LOCK) {
++	if (osk->sk_userlocks & SOCK_SNDBUF_LOCK)
+ 		nsk->sk_sndbuf = osk->sk_sndbuf;
+-	} else {
+-		if (mask == SK_FLAGS_SMC_TO_CLC)
+-			WRITE_ONCE(nsk->sk_sndbuf,
+-				   READ_ONCE(nnet->ipv4.sysctl_tcp_wmem[1]));
+-		else
+-			WRITE_ONCE(nsk->sk_sndbuf,
+-				   2 * READ_ONCE(nnet->smc.sysctl_wmem));
+-	}
+-	if (osk->sk_userlocks & SOCK_RCVBUF_LOCK) {
++	if (osk->sk_userlocks & SOCK_RCVBUF_LOCK)
+ 		nsk->sk_rcvbuf = osk->sk_rcvbuf;
+-	} else {
+-		if (mask == SK_FLAGS_SMC_TO_CLC)
+-			WRITE_ONCE(nsk->sk_rcvbuf,
+-				   READ_ONCE(nnet->ipv4.sysctl_tcp_rmem[1]));
+-		else
+-			WRITE_ONCE(nsk->sk_rcvbuf,
+-				   2 * READ_ONCE(nnet->smc.sysctl_rmem));
+-	}
+ }
  
- 			if (curr_change)
- 				*changed = curr_change;
--			 __vlan_tunnel_handle_range(p, &v_start, &v_end, v,
--						    curr_change);
-+			__vlan_tunnel_handle_range(p, &v_start, &v_end, v,
-+						   curr_change);
- 		}
- 		if (v_start && v_end)
- 			br_vlan_notify(br, p, v_start->vid, v_end->vid,
+ static void smc_copy_sock_settings(struct sock *nsk, struct sock *osk,
 -- 
-2.39.1
+2.32.0.3.g01195cf9f
 
 
