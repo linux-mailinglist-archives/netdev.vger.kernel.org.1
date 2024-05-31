@@ -1,323 +1,195 @@
-Return-Path: <netdev+bounces-99818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CECF98D6975
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 21:11:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 073EA8D6985
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 21:15:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 236C3B22164
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 19:11:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B04E1F29CBC
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 19:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE17416EC13;
-	Fri, 31 May 2024 19:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8EBF17D35A;
+	Fri, 31 May 2024 19:14:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S+ie3pTd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OrCqjAbN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A5F80C0C;
-	Fri, 31 May 2024 19:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACADC178369;
+	Fri, 31 May 2024 19:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717182681; cv=none; b=YbtJqggsjbZ9t4EnzxtCod+nGHKZQNBYZgrA2NevxnxclDEExsJS6lhJgH086UAHmDBPUGQK87wS/ICw0dvYxIt6FwG3AjFrlQc0xnru4jni1LUkQ0EMqa5+1zAbeV9JOuUrdlYuTWLvV+SJRM+tdml/89+IKvbkEgPXIXvS+Jw=
+	t=1717182899; cv=none; b=HSV5fAExQEfI5aq98TJhd8jfc8C+ABD8I7TYScCsDa4p7C2kkskIVUPJaY73BYD68vkLcWXrOLgIZWf0YVkNZoJp4rvsrjNJL6BFlysFwQz8mmwha98s6yVAdpWuHsz7cwutI+p0yh+WmYz2NtJnk5j2ZhbG/ZF9VnPNISlrjsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717182681; c=relaxed/simple;
-	bh=xcumjKroYJajRLjPl3G3FFFgsaqYtkG6IGqxPPwx9Js=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C2EJLv4GViUleDF+81LA/PP/CMDHKtGdLmiyV9paUxhA3l6NlHAiFa5PIB164bF/MST/ch+Yq4v86iG+bARVCLzTAQCFIQU43NFWrdIXKd8Xloh3GHcTlyVo93415D6+am6hMa2jm9Xq0BZtf26P3Y2kxMFPXYBBn+YZ7WQBUF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S+ie3pTd; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52b80e5688aso2975423e87.0;
-        Fri, 31 May 2024 12:11:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717182678; x=1717787478; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6kslRM3yfjg/MhSNhtbfqX1X8EhzfkXqhDL01AiRjsM=;
-        b=S+ie3pTdqqqS+uPstu5+KPWU6Vr5mpGwYXFLnf1pYNShEnZsGmP/WZDbLfBL7omr7N
-         0DlN4LhtW3ocHneeAEyvw9KiuI0eU0LYk3eNwgf68VtYI99j9ZkE8TYo+dpU7Ebdd6+f
-         W8pKsQvpNOd6k+cAv/+OlKL/VZBJojO3ENTz2gR04ZiPUWS5GDiv3oWipLmn9y1RoCrY
-         DERDpAbJKg1TnEfaYZZbh18sY+aGDT5iCVoq4wt/+ZpiuUUl4omPBAX1+8dAvvL2sqGw
-         q4TXTRUtcv7ri+DkfwmLNgo4ryar5rZKYwMm9sHToVuitQLYV0lviqsjE8wv74/peweE
-         Onjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717182678; x=1717787478;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6kslRM3yfjg/MhSNhtbfqX1X8EhzfkXqhDL01AiRjsM=;
-        b=WP0gtRiYKMPqMHT0zJ0nQNLpi06hQE+UvY9a71cWdEOpOQMTVc2yWkq4kF5vydbclx
-         UJOQsk70KYWbnCbouM7VF8Yic4QeSf76ij+gLPjmFZPVVpUS0AeXA/cX1EpM9yR9TDck
-         zb6EHhA7dPWPlU2R/p+31yqHEmtMZlH2nwplbsjR+mkTCDs/9T4Up0yjNbT5AeJszFym
-         xPxyekxCMwTuzKCwYNhWINPKNFHIlp6C9krf82RUaoatYgT3PbQYKkRf/gv+59ocBAbg
-         tki+bXtFs3xyfiTgrcMeqL2q/+XNV2mTV8r8zLjeBV5dqL7pd0n4s3jgROT1uIr/D9GN
-         e1MQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVM2THC08Tx4MQK2rM4udb5sowT8oKHpIXlq0ruSMMUNrYCaGzVi5/Tork5YG9Mjs7FNwF6PxYdrSX714LHwhpn7d1r1bhAbO4F5ziXBHQvQ+Qw+TdO2WWfbOd4z1uCawsdYFYOzqlAcwCn9lEvWylVR4TtQIAsFPp0
-X-Gm-Message-State: AOJu0YxgDO8txaR+BOVeQQJkhvD5Uj8xt4eOK0qmPECW6tJ1vadzqrhs
-	SgiRGsVTbOnrkPR4w1T/B0x7CXefUJF5Mtnj6Hsb3lobROfjy+bH
-X-Google-Smtp-Source: AGHT+IFuZ0H3DDikFSOJ4Di9tHfxiL5Q3qyxR/uNcbMu4/vbma7/yldKy8iUFEdGyAeqEMaBKsc4pw==
-X-Received: by 2002:a19:ad49:0:b0:51d:9291:6945 with SMTP id 2adb3069b0e04-52b895a3e24mr2463749e87.44.1717182677389;
-        Fri, 31 May 2024 12:11:17 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52b84d8f131sm412753e87.306.2024.05.31.12.11.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 May 2024 12:11:16 -0700 (PDT)
-Date: Fri, 31 May 2024 22:11:13 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Byungho An <bh74.an@samsung.com>, Giuseppe CAVALLARO <peppe.cavallaro@st.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 2/3] net: stmmac: Activate Inband/PCS flag
- based on the selected iface
-Message-ID: <bfa4porldqxhbhbvlwidslzik4mkil22trkxv5ilpk6vobcv6s@2omp37ju4dil>
-References: <ZkDuJAx7atDXjf5m@shell.armlinux.org.uk>
- <20240524210304.9164-1-fancer.lancer@gmail.com>
- <20240524210304.9164-2-fancer.lancer@gmail.com>
- <ZlNoLHoHjt3BsFde@shell.armlinux.org.uk>
- <ZlN4tkY8fNM8/D8p@shell.armlinux.org.uk>
- <ukszpirecb3pwnz5bbmy7wl44ujh6t2ewrnodmrye5kjmonsz2@pgf5b2oy5n3p>
- <ZlXmjKtKozXThPFv@shell.armlinux.org.uk>
- <ZlYEmBSw3bNtf7tJ@shell.armlinux.org.uk>
+	s=arc-20240116; t=1717182899; c=relaxed/simple;
+	bh=tBx0KaEXOIynYzOOaB1bqfZ9QktW0dbm7km7OlYN+Rs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aXtH2VZpuQalEpnuQrqo9ksqV3KlxsUFjXgd84nkQm7Jhbvh2WkSBWiUoiRKg0+XcKsIbN1hXhBgsLF9lAl2bqb/c+93q00nqCIDNy9oWV1DrRyQ8lVUGsmJmsTgJi8Z021Uv2Ix6XKBDbM/go7Fc8ixIkx+YBWAqB7n8znaIYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OrCqjAbN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B23DC4AF09;
+	Fri, 31 May 2024 19:14:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717182899;
+	bh=tBx0KaEXOIynYzOOaB1bqfZ9QktW0dbm7km7OlYN+Rs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=OrCqjAbNKm0AWv71bIwhSQBBUUXBwgB56ZUzHevoL1a8V28yF5NTlx5e6IyOh7JRY
+	 6rv2Ek5BX7HXnYmFeOrJjAxTxTijFXeh+JcHunaBXhehvX1x3+fhkPs2lN3n4JpR2A
+	 I+J/B5MBYoX0PxxiHEsZ1WFi6BH2ynVV1JRrEEkeVQhPfrR/zF/+0LWF1p7d5FqgaX
+	 zbQY2wbPRsw+uYnVhK2M1J5zt9lAO17YuZJMBfIvfWN+E1oZt8bcGk6y9pv2PSmu5W
+	 fsvrX3xjMAJqmoIq4r8mUw2r4QiHb7Uk7Oy7TRhR44n/F2rl5Px4jSLKCfPgMxSvsp
+	 D3uzLvjLRdOMw==
+From: Kees Cook <kees@kernel.org>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Kees Cook <kees@kernel.org>,
+	"GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
+	Christoph Lameter <cl@linux.com>,
+	Pekka Enberg <penberg@kernel.org>,
+	David Rientjes <rientjes@google.com>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+	jvoisin <julien.voisin@dustri.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Hyeonggon Yoo <42.hyeyoo@gmail.com>,
+	Xiu Jianfeng <xiujianfeng@huawei.com>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Jann Horn <jannh@google.com>,
+	Matteo Rizzo <matteorizzo@google.com>,
+	Thomas Graf <tgraf@suug.ch>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-hardening@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v4 0/6] slab: Introduce dedicated bucket allocator
+Date: Fri, 31 May 2024 12:14:52 -0700
+Message-Id: <20240531191304.it.853-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZlYEmBSw3bNtf7tJ@shell.armlinux.org.uk>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5639; i=kees@kernel.org; h=from:subject:message-id; bh=tBx0KaEXOIynYzOOaB1bqfZ9QktW0dbm7km7OlYN+Rs=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBmWiGxbiOlG/iNE86Nprep9z5p0TnTMedaC8B0s cmSg2FPrxqJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZlohsQAKCRCJcvTf3G3A JsZMEACa4xV/oNU/T5sSEh9oE3qw9UvbiJIzdKvwqn1kbdL6wnYCkPggvCGd40ONLDpGvLOv0Cy EO6BEDZldyF3eKBahgBQuDfFYylseB1or4He/ZzrwkV7Qz6Ckm8NVZheUl3W9lwhapXBiYw155E TmzDU+ak3q+6WQiOzQ91Mrh8xmmYLeI43rKVHuVsr1l75Xv4NUHj37If6DjMjj+AjMOwTZLhT+z rABdFOBLww6qOt8Z+Qma5/owfoG6VADg6xBb5TulXNPUrp+L0KF5wXtonSJbwrTZwTRQdJh0AtC jCB+7v+aY5kZVu5nGiFaHfZQIqgliudOAn//iorKWY5TbdtDia4z+vNESAat8nMcvY2G9GlOcQz r0f2mqShBJQ+scm/HLNV2cvT43yGXznkSEjXyN/TGyArApYQ+JgOZrwLGq0qMMsN0jw2Bh45pbY xMA1P30Dz6u2jzSqW5DYRk/DS6C/e8GPirnIlaU7dgJ4DC4MG/CU6TBUVBS1puFKCFYlKE34lxn ldCim2hnPfq0yr7PMaDU8YMH81e7I73kB+VVc/5hLnJEBwDCLnAQcxyEtPvGEKmWAJgyOz5wz6o COZw+BlIcufsq4RZwrx30Wf87clFc/pfLaKcuUaxzSV+Mv8Z5UTRvbF9PPUdTSjDzNFU85Twk+7 q9Oq1YbxQT7ND
+ Qw==
+X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 
-On Tue, May 28, 2024 at 05:21:44PM +0100, Russell King (Oracle) wrote:
-> On Tue, May 28, 2024 at 03:13:32PM +0100, Russell King (Oracle) wrote:
-> > > Alternative solution could be to use the has_gmac/has_gmac4 flags
-> > > instead. That will emphasize that the embedded PCS is expected to be
-> > > specific for the DW GMAC and DW QoS Eth IP-cores:
-> > > 
-> > >        if (phy_interface_mode_is_rgmii(interface))
-> > >                priv->hw->pcs = STMMAC_PCS_RGMII;
-> > >        else if ((priv->plat.has_gmac || priv->plat.has_gmac4) &&
-> > > 		interface == PHY_INTERFACE_MODE_SGMII)
-> > >                priv->hw->pcs = STMMAC_PCS_SGMII;
-> > 
-> > which implies that gmac (dwgmac1000_core.c) and gmac4 (dwgmac4_core.c)
-> > will always have its internal PCS if we're using SGMII mode. Does this
-> > mean it is true that these cores will never be used with an external
-> > PCS?
-> 
+Hi,
 
-> Sorry to go off on a related tangent, but I've just been looking at
-> hw->ps which is related to this.
+ v4:
+  - Rebase to v6.10-rc1
+  - Add CONFIG_SLAB_BUCKETS to turn off the feature
+ v3: https://lore.kernel.org/lkml/20240424213019.make.366-kees@kernel.org/
+ v2: https://lore.kernel.org/lkml/20240305100933.it.923-kees@kernel.org/
+ v1: https://lore.kernel.org/lkml/20240304184252.work.496-kees@kernel.org/
 
-I was meditating around the hw->ps part for several days on the last
-week and just gave up in finding of how that semantics could be
-incorporated in the phylink pcs logic...
+For the cover letter, I'm repeating commit log for patch 4 here, which has
+additional clarifications and rationale since v2:
 
-> 
-> As I understand, hw->ps comes from the "snps,ps-speed" property in DT,
-> which is used for SGMII and MAC2MAC connections. Presumably for the
-> SGMII case, this is used where the port is made to look like the PHY
-> end of the SGMII link.
+    Dedicated caches are available for fixed size allocations via
+    kmem_cache_alloc(), but for dynamically sized allocations there is only
+    the global kmalloc API's set of buckets available. This means it isn't
+    possible to separate specific sets of dynamically sized allocations into
+    a separate collection of caches.
+    
+    This leads to a use-after-free exploitation weakness in the Linux
+    kernel since many heap memory spraying/grooming attacks depend on using
+    userspace-controllable dynamically sized allocations to collide with
+    fixed size allocations that end up in same cache.
+    
+    While CONFIG_RANDOM_KMALLOC_CACHES provides a probabilistic defense
+    against these kinds of "type confusion" attacks, including for fixed
+    same-size heap objects, we can create a complementary deterministic
+    defense for dynamically sized allocations that are directly user
+    controlled. Addressing these cases is limited in scope, so isolation these
+    kinds of interfaces will not become an unbounded game of whack-a-mole. For
+    example, pass through memdup_user(), making isolation there very
+    effective.
+    
+    In order to isolate user-controllable sized allocations from system
+    allocations, introduce kmem_buckets_create(), which behaves like
+    kmem_cache_create(). Introduce kmem_buckets_alloc(), which behaves like
+    kmem_cache_alloc(). Introduce kmem_buckets_alloc_track_caller() for
+    where caller tracking is needed. Introduce kmem_buckets_valloc() for
+    cases where vmalloc callback is needed.
+    
+    Allows for confining allocations to a dedicated set of sized caches
+    (which have the same layout as the kmalloc caches).
+    
+    This can also be used in the future to extend codetag allocation
+    annotations to implement per-caller allocation cache isolation[1] even
+    for dynamic allocations.
+    
+    Memory allocation pinning[2] is still needed to plug the Use-After-Free
+    cross-allocator weakness, but that is an existing and separate issue
+    which is complementary to this improvement. Development continues for
+    that feature via the SLAB_VIRTUAL[3] series (which could also provide
+    guard pages -- another complementary improvement).
+    
+    Link: https://lore.kernel.org/lkml/202402211449.401382D2AF@keescook [1]
+    Link: https://googleprojectzero.blogspot.com/2021/10/how-simple-linux-kernel-memory.html [2]
+    Link: https://lore.kernel.org/lkml/20230915105933.495735-1-matteorizzo@google.com/ [3]
 
-Right. The speed comes from the "snps,ps-speed" property and is
-utilized to set the particular port speed in the MAC2MAC case. But
-neither DW QoS Eth nor DW GMAC HW-manual explicitly describe that
-case. The only SGMII MAC2MAC mention there is GMAC_AN_CTRL_SGMRAL flag
-description:
+After the core implementation are 2 patches that cover the most heavily
+abused "repeat offenders" used in exploits. Repeating those details here:
 
-"SGMII RAL Control
+    The msg subsystem is a common target for exploiting[1][2][3][4][5][6]
+    use-after-free type confusion flaws in the kernel for both read and
+    write primitives. Avoid having a user-controlled size cache share the
+    global kmalloc allocator by using a separate set of kmalloc buckets.
+    
+    Link: https://blog.hacktivesecurity.com/index.php/2022/06/13/linux-kernel-exploit-development-1day-case-study/ [1]
+    Link: https://hardenedvault.net/blog/2022-11-13-msg_msg-recon-mitigation-ved/ [2]
+    Link: https://www.willsroot.io/2021/08/corctf-2021-fire-of-salvation-writeup.html [3]
+    Link: https://a13xp0p0v.github.io/2021/02/09/CVE-2021-26708.html [4]
+    Link: https://google.github.io/security-research/pocs/linux/cve-2021-22555/writeup.html [5]
+    Link: https://zplin.me/papers/ELOISE.pdf [6]
+    Link: https://syst3mfailure.io/wall-of-perdition/ [7]
 
-When set, this bit forces the SGMII RAL block to operate in the speed
-configured in the Speed and Port Select bits of the MAC Configuration
-register. This is useful when the SGMII interface is used in a direct
-MAC to MAC connection (without a PHY) and any MAC must reconfigure the
-speed.  When reset, the SGMII RAL block operates according to the link
-speed status received on SGMII (from the PHY).
+    Both memdup_user() and vmemdup_user() handle allocations that are
+    regularly used for exploiting use-after-free type confusion flaws in
+    the kernel (e.g. prctl() PR_SET_VMA_ANON_NAME[1] and setxattr[2][3][4]
+    respectively).
+    
+    Since both are designed for contents coming from userspace, it allows
+    for userspace-controlled allocation sizes. Use a dedicated set of kmalloc
+    buckets so these allocations do not share caches with the global kmalloc
+    buckets.
+    
+    Link: https://starlabs.sg/blog/2023/07-prctl-anon_vma_name-an-amusing-heap-spray/ [1]
+    Link: https://duasynt.com/blog/linux-kernel-heap-spray [2]
+    Link: https://etenal.me/archives/1336 [3]
+    Link: https://github.com/a13xp0p0v/kernel-hack-drill/blob/master/drill_exploit_uaf.c [4]
 
-This bit is reserved (and RO) if the SGMII PHY interface is not
-selected during core configuration."
+Thanks!
 
-> 
-> I'm guessing MAC2MAC refers to RGMII, or does that also refer to
-> SGMII-as-PHY?
+-Kees
 
-I guess that it can be utilized in both cases: RGMII-to-RGMII and
-SGMII-to-SGMII MAC2MAC setups. The only difference is that the
-GMAC_AN_CTRL_SGMRAL flag setting would be useless for RGMII. But
-originally the mac_device_info::ps field was introduced for the SGMII
-MAC2MAC config here:
-02e57b9d7c8c ("drivers: net: stmmac: add port selection programming")
-and the "snps,ps-speed" property can be spotted alongside with 
-phy-mode = "sgmii" only, here:
-arch/arm64/boot/dts/qcom/sa8775p-ride.dts
 
-Although AFAICS the dwmac1000_core_init()/dwmac4_core_init() methods
-lack of the GMAC_CONTROL_TC/GMAC_PHYIF_CTRLSTATUS_TC flags set in the
-(hw->ps)-related if-clause. Without that the specified speed setting
-won't be in-bend delivered to the other side of the MAC2MAC link and
-the internal PCS functionality won't work. Synopsys DW GMAC/Qos Eth
-databooks explicitly say that these flags need to be set for the MAC
-to be sending its Port speed, Duplex mode and Link Up/Down flag
-setting over the RGMII/SGMII in-band signal:
+Kees Cook (6):
+  mm/slab: Introduce kmem_buckets typedef
+  mm/slab: Plumb kmem_buckets into __do_kmalloc_node()
+  mm/slab: Introduce kvmalloc_buckets_node() that can take kmem_buckets
+    argument
+  mm/slab: Introduce kmem_buckets_create() and family
+  ipc, msg: Use dedicated slab buckets for alloc_msg()
+  mm/util: Use dedicated slab buckets for memdup_user()
 
-SGMII: "The tx_config_reg[15:0] bits sent by the MAC during
-Auto-negotiation depend on whether the Transmit Configuration register
-bit is enabled for the SGMII interface."
+ include/linux/slab.h | 70 ++++++++++++++++++++++++++++-------
+ ipc/msgutil.c        | 13 ++++++-
+ lib/rhashtable.c     |  2 +-
+ mm/Kconfig           | 15 ++++++++
+ mm/slab.h            |  6 ++-
+ mm/slab_common.c     | 87 ++++++++++++++++++++++++++++++++++++++++++--
+ mm/slub.c            | 34 ++++++++++++-----
+ mm/util.c            | 29 +++++++++++----
+ 8 files changed, 217 insertions(+), 39 deletions(-)
 
-RGMII: "When the RGMII interface is configured to transmit the
-configuration during the IFG, then rgmii_txd[3:0] reflects the Duplex
-Mode, Port Select, Speed (encoded as 00 for 10 Mbps, 01 for 100 Mbps
-and 10 for 1000 Mbps), and Link Up/Down bits of the MAC Configuration
-Register,"
+-- 
+2.34.1
 
-TC flag description:
-"Transmit Configuration in RGMII, SGMII, or SMII
-
-When set, this bit enables the transmission of duplex mode, link
-speed, and link up or down information to the PHY in the RGMII, SMII,
-or SGMII port. When this bit is reset, no such information is driven
-to the PHY. This bit is reserved (and RO) if the RGMII, SMII, or SGMII
-PHY port is not selected during core configuration."
-
-> 
-> I think it would've been nice to have picked SGMII-as-PHY up in the
-> driver earlier - we don't tend to use the "normal" PHY interface
-> mode names, instead we have the REVxxx modes, so I think this
-> _should_ have introduced PHY_INTERFACE_MODE_REVSGMII.
-
-Not sure whether it would be a correct thing to do. RevMII is a real
-interface. DW GMAC/QoS Eth can be synthesized with RevMII PHY
-interface support. Mac2Mac SGMII/RGMII is a feature of the standard
-SGMII/RGMII interfaces.
-
-On the other hand we already have the set of the artificial modes like
-"rgmii-id/rgmii-txid/rgmii-rxid" indicating the MAC-side delays but
-describing the same interfaces. So I don't have a strong opinion
-against have the modes like "rev-rgmii"/"rev-sgmii".
-
-> 
-> In any case, moving on... in stmmac_hw_setup(), we have:
-> 
->         /* PS and related bits will be programmed according to the speed */
->         if (priv->hw->pcs) {
->                 int speed = priv->plat->mac_port_sel_speed;
-> 
->                 if ((speed == SPEED_10) || (speed == SPEED_100) ||
->                     (speed == SPEED_1000)) {
->                         priv->hw->ps = speed;
->                 } else {
->                         dev_warn(priv->device, "invalid port speed\n");
->                         priv->hw->ps = 0;
->                 }
->         }
-> 
-
-> Which means that if we're using the integrated PCS, then we basically
-> require the "snps,ps-speed" property otherwise we'll issue a warning
-> at this point... this seems to imply that reverse mode is the only
-> mode supported, which I'm fairly sure is false. So, maybe this
-> shouldn't be issuing the warning if mac_port_sel_speed was zero?
-
-Seeing the link state could be delivered over the in-band path, I
-guess the "snps,ps-speed" property is supposed to be optional so the
-mac_port_sel_speed being zero is a possible case. Thus the warning is
-indeed misleading and it is totally ok to have mac_port_sel_speed
-being set to zero. If it is, then the link state shall be determined
-either over in-band or from the PHY.
-
-> 
-> Moving on... hw->ps can only be 10M, 100M or 1G speeds and nothing else
-> - which is fine since RGMII and Cisco SGMII only support these speeds.
-> 
-> dwmac1000 tests for this against these speeds, so it is also fine.
-> 
-> dwmac4 is basically the same as dwmac1000, so is also fine.
-> 
-> The core code as it stands today passes this into the pcs_ctrl_ane
-> method's rsgmi_ral argument, which sets GMAC_AN_CTRL_SGMRAL. Presumably
-> this selects "reverse" mode for both SGMII and RGMII?
-
-No, GMAC_AN_CTRL_SGMRAL flag works for SGMII only, which enables the
-fixed link speed (see my second comment in this email message) by
-forcing the SGMII RAL (Rate Adaptation Layer) working with the
-pre-defined speed. AFAIU RGMII interface doesn't need that flag since
-it always works with the pre-defined speed and has no Rate Adaptation
-engine.
-
-> 
-> Persuing this a bit futher, qcom-ethqos always calls this with rsgmi_ral
-> clear. Presumably, qcom-ethqos never specifies "snps,ps-speed" in DT,
-> and thus always gets the warning above?
-
-Interesting situation. Actually no. The only DW QoS Eth device for
-which "snps,ps-speed = 1000" is specified is "qcom,sa8775p-ethqosi"
-(see arch/arm64/boot/dts/qcom/sa8775p-ride.dts), due to that no
-warning is printed. But on the other hand the low-level driver
-(drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c) also sets
-the STMMAC_FLAG_HAS_INTEGRATED_PCS flag exactly for that device, which
-effectively disables the entire internal PCS functionality (except the
-speed setup performed in dwmac4_core_init()).
-
-Holy mother of ...
-
-> 
-> Finally, we get to the core issue, which is dwxgmac2_core.c.
-> dwxgmac2 tests this member against 10G, 2.5G and "any other non-zero
-> value". Out of all of these, the only possible path through that code
-> would be the one which results in:
-> 
-> 	tx |= hw->link.speed1000;
-> 
-> Neither of the other two (2.5G and 10G) are possible because those
-> aren't legal values for hw->ps. Moreover, it doesn't appear to have
-> any kind of PCS, so I'm wondering whether any of this code gets used.
-
-I guess the (hw->ps)-related code snippet has been just dummy-copied from
-another dwmac*_core.c file to DW XGMAC. So IMO it can be freely
-dropped. After all the bindings define the snps,ps-speed as:
-
-      "Port selection speed that can be passed to the core when PCS
-      is supported. For example, this is used in case of SGMII and
-      MAC2MAC connection."
-
-I doubt DW XGMAC could be used in the MAC2MAC setup, and it doesn't
-have any internal PCS (may have externally connected DW XPCS though).
-
-> 
-> 
-> So, I suspect some of this is "not quite right" either, and I wonder
-> about the implications of changing how hw->pcs is set - whether we
-> first need to fix the code above dealing with priv->hw->ps ?
-> 
-> I'm also wondering what impact this has on my PCS conversion.
-
-My brain got blown up thinking about this one week ago. So I gave up
-in looking for a portable way of fixing the MAC2MAC part and sent my
-three patches as is to you. I thought after some time I could come up
-with some ideas about that. Alas the time-break didn't help.)
-
-I can't say for sure what could be a better way to align the things
-around the internal PCS and MAC2MAC case. But IMO seeing the code is
-vastly messy and unlikely has been widely used I'd suggest to preserve
-the semantics as required by the Qualcomm QoS Eth
-(dwmac-qcom-ethqos.c), and free redefining the rest of the
-things as you wish.
-
--Serge(y)
-
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
