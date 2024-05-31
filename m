@@ -1,142 +1,113 @@
-Return-Path: <netdev+bounces-99665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A74158D5C13
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 09:52:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EECD18D5C34
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 10:05:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 374CBB21215
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 07:52:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A959C289483
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 08:05:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD137407A;
-	Fri, 31 May 2024 07:52:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA843762D2;
+	Fri, 31 May 2024 08:05:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dbyMf5md"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ycG9ge/t"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B371A2E657;
-	Fri, 31 May 2024 07:52:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476CE1865C
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 08:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717141952; cv=none; b=Oud3bNNmhS3WUBrVdjhJgX/s7V7lGTFSbg0tz28KupJwmp4xdmHPkHQxtdjm4NpYtIk+PC4B5+FRKLGdOgVBre7oWyOFAET3w9d8CJZ3++j2K0+M2uZtfVQSOJHrImoVN539climek5K91KywwwQkB8/UWUoCiYO9RKwR0S0AJE=
+	t=1717142730; cv=none; b=etNoO14UwXUmRvEfKv+D6wQPPfERq0vHNRppGNVJk42Pcj9Uwo5drdtuO+u7bcVmSNCGlYUUpbxaav6YXIhoSBL1ZpD3ydFv0Y4T2VpUr5v6fimwJrS7fiup+9+PPjREHGYuecwYlYJPAknZ6VqvSecDytFpFMMknXWPAJQKWxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717141952; c=relaxed/simple;
-	bh=bf3+WBp/nd8t8wKvPAuOc0MLtKkIBBYI562yJ9S/rbc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ss0Qlei9BZbI9b0+a//2qDHrQfB6E/waef6c7ysZc0cFr7HKH7JMk1CKm7JfmqdkCZGoOd4yeNGH7jkr1PSwJJFy0zRtzpf85TVrvo4GEnYJaM1yQ6QRJ0MMsQzfx3Vx9EGkVzv/iHk8YQNmWlY00i8F2g1Hqq7xSryHpHpJc9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dbyMf5md; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF497C116B1;
-	Fri, 31 May 2024 07:52:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717141951;
-	bh=bf3+WBp/nd8t8wKvPAuOc0MLtKkIBBYI562yJ9S/rbc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dbyMf5md1/Nz+BDRLIvEysZ2Th0/lxDuUZ8HjgOVtRNodaZnIAAI2Vu73o12Sxhn3
-	 reuyNjFOo56zFj+zaRHxSG+2naif3lqtvA7mgzmZ4zRc7IvYDCra4z0dK6TAOdjpR+
-	 gm7MbnlTUghs6g7xIS/msnuhsFSsO2AMMjlXsfv9vCkRkjSQo1NK4FOaebqMpQEdG1
-	 grEZ3gCeI5yaKV6HshRgdp8p7micVA7QQ/QjLDAoxdo0jv4o8L2fjXwAeiDE5HFuSL
-	 XVnbAEPfU24gi2cVxLcGK9fBe5KVWLLdxNm5Feghca6S6iMAJ92OZ2nQKbH+843akD
-	 eX5NYVo0QrDeg==
-Message-ID: <91138be1-cd25-4efb-8709-2e4cf24be800@kernel.org>
-Date: Fri, 31 May 2024 09:52:27 +0200
+	s=arc-20240116; t=1717142730; c=relaxed/simple;
+	bh=LdOe7vKJkwmCN7blsp3hxb+hR1lKuyKqJ0YB4ZRrgs8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n0rvxCOoLgHGpj1cFTjDsQThaFrpMtIVd5NMusWdevXVQ8LX2sbuNQSqZH8NjcgTykVB8fXFOQ1w+y2eBABTNWVMSCy6hI1U9DrwIJ0LjprwtkONzXuz0EBDahjjc4f+QUC1XRDqrn/dLT6tn9KXDx597NzD6TnXgwySPK7+Dko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ycG9ge/t; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-57a22af919cso7078a12.1
+        for <netdev@vger.kernel.org>; Fri, 31 May 2024 01:05:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717142727; x=1717747527; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LdOe7vKJkwmCN7blsp3hxb+hR1lKuyKqJ0YB4ZRrgs8=;
+        b=ycG9ge/tkAOWVux0SRFUMx6LGBbkjitGuwL0nWPL7v7+crEjjfd9hsaQSWFwuSP7A2
+         7F/yTl3PYnERczlu5iy6UISUTIUvFX+bR+p1WF35m96ElgtfJtDGZkOQz+onAscPCMel
+         cJV2STTTcbB5MG03ofRMyZWCGEyPqSIAI/Y9TUu4jaYkcHqhyal7Sq/5w02irF6C0ABh
+         Sqhx3G3jvldw38aoN3zZhfl5FUpvVHHiG7+2YHX35h1EbLHZ/suvZj6aG1Z6yOdcqWTr
+         h+7SHEnYp0yWG3V2gbKTAjiHSRJJRckaScijblYhYlbDIh7uCnnfd4YSYY6MGJJ+hs9C
+         CHBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717142727; x=1717747527;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LdOe7vKJkwmCN7blsp3hxb+hR1lKuyKqJ0YB4ZRrgs8=;
+        b=DOeiuMBR9v9h2tuDcCvXr/QGfc1KtHg1Lg63a1CXavEVpZpnCUjF675KmfUAPX7nNf
+         Co3yyhTBWK0JOZPXNOU+sGCt4WrlAAuXyHxfY9g0seDoUVeR7ak3oWwA7UGNxjWq+7wK
+         gUSfrpTZ91KEqWAUxCnyMF3sS1rZtVcnT5Ga9Iu5WxHBROeQwEnnml7xggHJdZpCU2sR
+         9NKWa0Ad4Ax28hmCUnUZ0ENyFbnGxLt3Yo2HQisZ3flxHEqaE1LTIDS4iCWj+4GXasnw
+         G3nA5n0pPt6D16vEhf9dno+yxMSPDTVN+DES7aaGnLtaqNMvfldAYb6YMAOfby7Da2qf
+         s4ig==
+X-Forwarded-Encrypted: i=1; AJvYcCX8hC9WE4Vy+UcQqK0JGqgNdczDfmB6gwcXmb/K9AVzPmgaBnz3v1Nu5fM1NycsC6+HvRZBTYgFVHxrwdQJFSmKCke4O7o3
+X-Gm-Message-State: AOJu0YyU7FkrdTbz0kSw3XI/yVu4uvuotaN/p629BZa3ZzfVJVsaGMOS
+	t5j4zloMpVDUEQC2TsNghOWN+ch5e5M/7n1JcXQeCwttDRKHnnXvTYRPwm02S8KY9CGz6xyudYz
+	77PMNAdo2ySZqBFeAXZWUTM7s+5ZkQ7SvENfs
+X-Google-Smtp-Source: AGHT+IFQFBnqbUV7tAf95uZTmt3CZ4nUyEqX3z2RmFBUqTlcS9EnjAIBpQPRN9agdan1iDop76JyIXfT/gCUordUqgk=
+X-Received: by 2002:a05:6402:38c:b0:57a:1937:e28b with SMTP id
+ 4fb4d7f45d1cf-57a37861c27mr65077a12.1.1717142727187; Fri, 31 May 2024
+ 01:05:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [TEST] Flake report
-Content-Language: en-GB
+References: <20240530232607.82686-1-kuba@kernel.org> <20240530162919.178c8cda@kernel.org>
+In-Reply-To: <20240530162919.178c8cda@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 31 May 2024 10:05:13 +0200
+Message-ID: <CANn89iLy_tn-5Z9oyEDtaGCuHpW278PeQbFj5yVfqhgD0ZVSTA@mail.gmail.com>
+Subject: Re: [PATCH net] net: tls: fix marking packets as decrypted
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, MPTCP Upstream <mptcp@lists.linux.dev>
-References: <20240509160958.2987ef50@kernel.org>
- <11ff9d2b-6c3e-4ee5-81c0-d36de2308dbd@kernel.org>
- <7e443c56-129e-4421-8dd8-adb57e9e6193@kernel.org>
- <20240530104123.72ab528b@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20240530104123.72ab528b@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	sd@queasysnail.net, dhowells@redhat.com, borisp@nvidia.com, 
+	john.fastabend@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jakub,
+On Fri, May 31, 2024 at 1:29=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 30 May 2024 16:26:07 -0700 Jakub Kicinski wrote:
+> > For TLS offload we mark packets with skb->decrypted to make sure
+> > they don't escape the host without getting encrypted first.
+> > The crypto state lives in the socket, so it may get detached
+> > by a call to skb_orphan(). As a safety check - the egress path
+> > drops all packets with skb->decrypted and no "crypto-safe" socket.
+> >
+> > The skb marking was added to sendpage only (and not sendmsg),
+> > because tls_device injected data into the TCP stack using sendpage.
+> > This special case was missed when sendpage got folded into sendmsg.
+> >
+> > Fixes: c5c37af6ecad ("tcp: Convert do_tcp_sendpages() to use MSG_SPLICE=
+_PAGES")
+> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>
+> Forgot to mention - compile tested only, ENODEV :(
 
-On 30/05/2024 19:41, Jakub Kicinski wrote:
-> On Thu, 30 May 2024 19:35:56 +0200 Matthieu Baerts wrote:
->>> Yes, we need to find a solution for that. It is not as unstable on our
->>> side [1]. We will look at that next week. If we cannot find a solution
->>> quickly, we will skip the flaky subtests to stop the noise while
->>> continuing to investigate.  
->> Now that the flaky MPTCP subtests results have been ignored, the results
->> look better:
->>
->>   https://netdev.bots.linux.dev/flakes.html?br-cnt=88&tn-needle=mptcp
->>
->> Do you think we could also stop ignoring them on NIPA side?
-> 
-> Thanks for take care of it, done!
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-Thank you for the modification!
-
-That could have been predicted: just after having removed them from the
-list, these tests appeared to be unstable again! But I guess it is
-because there is a conflict between -net and net-next [1], and the
-"fixes" that are currently only in -net are no longer included in what
-is being validated.
-
-Sorry for the troubles! :)
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+In net-next, we could probably move skb_cmp_decrypted(), skb_is_decrypted()=
+,
+skb_copy_decrypted() to a new include file, and define
+skb_set_decrypted() helper there.
 
