@@ -1,241 +1,323 @@
-Return-Path: <netdev+bounces-99817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FCC38D6960
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 21:05:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CECF98D6975
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 21:11:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 530CDB21B83
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 19:05:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 236C3B22164
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 19:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3406B7F7D1;
-	Fri, 31 May 2024 19:05:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE17416EC13;
+	Fri, 31 May 2024 19:11:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="LhVIrZAi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S+ie3pTd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B947F482
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 19:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A5F80C0C;
+	Fri, 31 May 2024 19:11:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717182331; cv=none; b=R4JwaG4CtrfN2P16RkfdoPb0Cwqr6Jt9UjCFyNXIUUmzhcISLHmkevXPpAe4I3yagDcOgYbBTu6FZqirvUVtRSw43/cqYZg1D8epn1rk5pupTeilEjUW8K96oylGJBul5IIaceILR6QbQWBMgGsBAU7/JRgGAWTyUcG6XkPfE3Q=
+	t=1717182681; cv=none; b=YbtJqggsjbZ9t4EnzxtCod+nGHKZQNBYZgrA2NevxnxclDEExsJS6lhJgH086UAHmDBPUGQK87wS/ICw0dvYxIt6FwG3AjFrlQc0xnru4jni1LUkQ0EMqa5+1zAbeV9JOuUrdlYuTWLvV+SJRM+tdml/89+IKvbkEgPXIXvS+Jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717182331; c=relaxed/simple;
-	bh=JLgUk4/H0I49wI7AFpjfE5SBqXIrl4DmbD4W1JvveUQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sXETYv5Dw5/USlMFAlMWe2tJ3r7YJR6j7RapXnRsOc0yAcbJtXMHit/MchQdvE5zwyHa/KlLhDZDfmDw4pIAvLtSCurrse+Yag1c7Mgmn4kxu9AuroYPnmED2K2p6Kf+MLys8h1/Kdxr4e9vg98D5H6P/Crx/3QPbPCFl3lG/No=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=LhVIrZAi; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-57a32b0211aso1517170a12.2
-        for <netdev@vger.kernel.org>; Fri, 31 May 2024 12:05:29 -0700 (PDT)
+	s=arc-20240116; t=1717182681; c=relaxed/simple;
+	bh=xcumjKroYJajRLjPl3G3FFFgsaqYtkG6IGqxPPwx9Js=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C2EJLv4GViUleDF+81LA/PP/CMDHKtGdLmiyV9paUxhA3l6NlHAiFa5PIB164bF/MST/ch+Yq4v86iG+bARVCLzTAQCFIQU43NFWrdIXKd8Xloh3GHcTlyVo93415D6+am6hMa2jm9Xq0BZtf26P3Y2kxMFPXYBBn+YZ7WQBUF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S+ie3pTd; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52b80e5688aso2975423e87.0;
+        Fri, 31 May 2024 12:11:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1717182328; x=1717787128; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XI3ySpP1YuGuRU+0r2fjh+wjdLvP3upJGIzwxGrKcXs=;
-        b=LhVIrZAiHb7iMJSGRxvYzuyS37uhblIV4+4flec2xUd0h9+pTRbsY6S4E1cRvrORPH
-         jH3wgPoZVNRSrLa1erSkHI44EtEqEYqBhCSvrBg7kSAbQvB0M9Ry2Qv8xYmDoDTOPIDr
-         /fjGQjac5/PT8FxjEb5NO+Vri925HWedruGDHcBobRcrJWZ7Bb/dTSCqxXbUNGs3lZV2
-         UxUefJ9UHX83icT+tfjtNoWYvSypj8EL+IDbyQUzHVLWkP1yAze33zV57m0xWNF8UOMX
-         +R/cBr5aqrGHNrv4+j8ix/BGlbzngEVcPvVGhSdWHYRv026D2OKiszL+7KUnjizxx8J9
-         CNkA==
+        d=gmail.com; s=20230601; t=1717182678; x=1717787478; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6kslRM3yfjg/MhSNhtbfqX1X8EhzfkXqhDL01AiRjsM=;
+        b=S+ie3pTdqqqS+uPstu5+KPWU6Vr5mpGwYXFLnf1pYNShEnZsGmP/WZDbLfBL7omr7N
+         0DlN4LhtW3ocHneeAEyvw9KiuI0eU0LYk3eNwgf68VtYI99j9ZkE8TYo+dpU7Ebdd6+f
+         W8pKsQvpNOd6k+cAv/+OlKL/VZBJojO3ENTz2gR04ZiPUWS5GDiv3oWipLmn9y1RoCrY
+         DERDpAbJKg1TnEfaYZZbh18sY+aGDT5iCVoq4wt/+ZpiuUUl4omPBAX1+8dAvvL2sqGw
+         q4TXTRUtcv7ri+DkfwmLNgo4ryar5rZKYwMm9sHToVuitQLYV0lviqsjE8wv74/peweE
+         Onjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717182328; x=1717787128;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XI3ySpP1YuGuRU+0r2fjh+wjdLvP3upJGIzwxGrKcXs=;
-        b=Do5CI1Uc2npCyXugKXp3EyZXbUhRguOZCYJ3J0E0Hg+GRwTrOFW8W+R6uDCfLr/0gZ
-         fKgJdh6yznFNh8bWhNzD0o10HY1Kj5or8lOy3F2l18qdzu6uC6wDlwnr2FPifQvQG056
-         aTJGvqJbIiVyfeMh+yAZbPnqPchSDsFHc6o37MUVHRtopxo/uR+VLB375gza0JocjpGy
-         Z8u6GhVwr/uWEv6ViQfVuv5SqGellLjFI07QPxC6w8I6oZdKLDHVnZUpSCfUBHzxbM85
-         6hzsdfuNZtDXrD0bOPx8T3IuHjgFIKZZ76BjdRf5cak6EkZbIzYXbk4oMWnVBSIsrgGJ
-         sF8w==
-X-Gm-Message-State: AOJu0YznpwUuUTl/pNpNK1zHKAI80m0x9YFc3Te1u3PmpibB9HinevSG
-	sWr1YsiULRu1+h/ZwEdSoUMzWABiXU2xCV3jubZX/zvgM0GFdR37l09r8G5tEqaetRyutkrm826
-	47DlNW4no6QNY7FNQp5jRCzf+8QCZx8s5z/fvIQ==
-X-Google-Smtp-Source: AGHT+IGHM+cFCKr3cD4qLfBdzN50PJ4EDyUgAhS4Wnkb4lkIVrzCC1xfhFir50c+Rban7OD/Mp5ebucWbvjCKDVrJhg=
-X-Received: by 2002:a50:9f22:0:b0:57a:2bfd:82b3 with SMTP id
- 4fb4d7f45d1cf-57a36430e90mr1727721a12.23.1717182327616; Fri, 31 May 2024
- 12:05:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1717182678; x=1717787478;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6kslRM3yfjg/MhSNhtbfqX1X8EhzfkXqhDL01AiRjsM=;
+        b=WP0gtRiYKMPqMHT0zJ0nQNLpi06hQE+UvY9a71cWdEOpOQMTVc2yWkq4kF5vydbclx
+         UJOQsk70KYWbnCbouM7VF8Yic4QeSf76ij+gLPjmFZPVVpUS0AeXA/cX1EpM9yR9TDck
+         zb6EHhA7dPWPlU2R/p+31yqHEmtMZlH2nwplbsjR+mkTCDs/9T4Up0yjNbT5AeJszFym
+         xPxyekxCMwTuzKCwYNhWINPKNFHIlp6C9krf82RUaoatYgT3PbQYKkRf/gv+59ocBAbg
+         tki+bXtFs3xyfiTgrcMeqL2q/+XNV2mTV8r8zLjeBV5dqL7pd0n4s3jgROT1uIr/D9GN
+         e1MQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVM2THC08Tx4MQK2rM4udb5sowT8oKHpIXlq0ruSMMUNrYCaGzVi5/Tork5YG9Mjs7FNwF6PxYdrSX714LHwhpn7d1r1bhAbO4F5ziXBHQvQ+Qw+TdO2WWfbOd4z1uCawsdYFYOzqlAcwCn9lEvWylVR4TtQIAsFPp0
+X-Gm-Message-State: AOJu0YxgDO8txaR+BOVeQQJkhvD5Uj8xt4eOK0qmPECW6tJ1vadzqrhs
+	SgiRGsVTbOnrkPR4w1T/B0x7CXefUJF5Mtnj6Hsb3lobROfjy+bH
+X-Google-Smtp-Source: AGHT+IFuZ0H3DDikFSOJ4Di9tHfxiL5Q3qyxR/uNcbMu4/vbma7/yldKy8iUFEdGyAeqEMaBKsc4pw==
+X-Received: by 2002:a19:ad49:0:b0:51d:9291:6945 with SMTP id 2adb3069b0e04-52b895a3e24mr2463749e87.44.1717182677389;
+        Fri, 31 May 2024 12:11:17 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52b84d8f131sm412753e87.306.2024.05.31.12.11.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 May 2024 12:11:16 -0700 (PDT)
+Date: Fri, 31 May 2024 22:11:13 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Byungho An <bh74.an@samsung.com>, Giuseppe CAVALLARO <peppe.cavallaro@st.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 2/3] net: stmmac: Activate Inband/PCS flag
+ based on the selected iface
+Message-ID: <bfa4porldqxhbhbvlwidslzik4mkil22trkxv5ilpk6vobcv6s@2omp37ju4dil>
+References: <ZkDuJAx7atDXjf5m@shell.armlinux.org.uk>
+ <20240524210304.9164-1-fancer.lancer@gmail.com>
+ <20240524210304.9164-2-fancer.lancer@gmail.com>
+ <ZlNoLHoHjt3BsFde@shell.armlinux.org.uk>
+ <ZlN4tkY8fNM8/D8p@shell.armlinux.org.uk>
+ <ukszpirecb3pwnz5bbmy7wl44ujh6t2ewrnodmrye5kjmonsz2@pgf5b2oy5n3p>
+ <ZlXmjKtKozXThPFv@shell.armlinux.org.uk>
+ <ZlYEmBSw3bNtf7tJ@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1717105215.git.yan@cloudflare.com> <9be3733eee16bb81a7e8e2e57ebcc008f95cae08.1717105215.git.yan@cloudflare.com>
- <CANn89iLo6A__U5HqeA65NuBnrg36jpt9EOUC7T0fLdNEpa6eRQ@mail.gmail.com>
- <CAO3-PboQ68+xFe4Z10L-s-k3NCgciGXNWM00-3wgqbPmGaBB9A@mail.gmail.com> <CANn89iJ_rd_vUH1LPbby5vV=s=jWdpzvDKnm6H1YK=wRPWBiyw@mail.gmail.com>
-In-Reply-To: <CANn89iJ_rd_vUH1LPbby5vV=s=jWdpzvDKnm6H1YK=wRPWBiyw@mail.gmail.com>
-From: Yan Zhai <yan@cloudflare.com>
-Date: Fri, 31 May 2024 14:05:16 -0500
-Message-ID: <CAO3-PbqaiqWvc1vgHzj2-DEQUPCxTByp4r+zTBWyo-XP4u1G4A@mail.gmail.com>
-Subject: Re: [RFC net-next 1/6] net: add kfree_skb_for_sk function
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, Abhishek Chauhan <quic_abchauha@quicinc.com>, 
-	Mina Almasry <almasrymina@google.com>, Florian Westphal <fw@strlen.de>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, David Howells <dhowells@redhat.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Lorenzo Bianconi <lorenzo@kernel.org>, 
-	Pavel Begunkov <asml.silence@gmail.com>, linux-kernel@vger.kernel.org, 
-	kernel-team@cloudflare.com, Jesper Dangaard Brouer <hawk@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZlYEmBSw3bNtf7tJ@shell.armlinux.org.uk>
 
-On Fri, May 31, 2024 at 12:32=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Fri, May 31, 2024 at 6:58=E2=80=AFPM Yan Zhai <yan@cloudflare.com> wro=
-te:
-> >
-> > Hi Eric,
-> >
-> >  Thanks for the feedback.
-> >
-> > On Fri, May 31, 2024 at 1:51=E2=80=AFAM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > On Thu, May 30, 2024 at 11:46=E2=80=AFPM Yan Zhai <yan@cloudflare.com=
-> wrote:
-> > > >
-> > > > Implement a new kfree_skb_for_sk to replace kfree_skb_reason on a f=
-ew
-> > > > local receive path. The function accepts an extra receiving socket
-> > > > argument, which will be set in skb->cb for kfree_skb/consume_skb
-> > > > tracepoint consumption. With this extra bit of information, it will=
- be
-> > > > easier to attribute dropped packets to netns/containers and
-> > > > sockets/services for performance and error monitoring purposes.
-> > >
-> > > This is a lot of code churn...
-> > >
-> > > I have to ask : Why not simply adding an sk parameter to an existing
-> > > trace point ?
-> > >
-> > Modifying a signature of the current tracepoint seems like a breaking
-> > change, that's why I was saving the context inside skb->cb, hoping to
-> > not impact any existing programs watching this tracepoint. But
-> > thinking it twice, it might not cause a problem if the signature
-> > becomes:
-> >
-> >  trace_kfree_skb(const struct sk_buff *skb, void *location, enum
-> > skb_drop_reason reason, const struct sock *sk)
-> >
-> > As return values are usually not a thing for tracepoints, it is
-> > probably still compatible. The cons is that the last "sk" still breaks
-> > the integrity of naming. How about making a "kfree_skb_context"
-> > internal struct and putting it as the last argument to "hide" the
-> > naming confusion?
-> >
-> > > If this not possible, I would rather add new tracepoints, adding new =
-classes,
-> > > because it will ease your debugging :
-> > >
-> > > When looking for TCP drops, simply use a tcp_event_sk_skb_reason inst=
-ance,
-> > > and voila, no distractions caused by RAW/ICMP/ICMPv6/af_packet drops.
-> > >
-> > > DECLARE_EVENT_CLASS(tcp_event_sk_skb_reason,
-> > >
-> > >      TP_PROTO(const struct sock *sk, const struct sk_buff *skb, enum
-> > > skb_drop_reason reason),
-> > > ...
-> > > );
-> >
-> > The alternative of adding another tracepoint could indeed work, we had
-> > a few cases like that in the past, e.g.
-> >
-> > https://lore.kernel.org/lkml/20230711043453.64095-1-ivan@cloudflare.com=
-/
-> > https://lore.kernel.org/netdev/20230707043923.35578-1-ivan@cloudflare.c=
-om/
-> >
-> > But it does feel like a whack-a-mole thing. The problems are solvable
-> > if we extend the kfree_skb tracepoint, so I would prefer to not add a
-> > new tracepoint.
->
-> Solvable with many future merge conflicts for stable teams.
->
-I don't quite follow it. I think this specific commit using skb->cb is
-unnecessary so I am going to re-work it. As you initially mentioned,
-maybe I should just extend kfree_skb tracepoint. I saw a similar
-change dd1b527831a3("net: add location to trace_consume_skb()"), is it
-something I might follow, or do you specifically mean changes like
-this can annoy stable teams?
+On Tue, May 28, 2024 at 05:21:44PM +0100, Russell King (Oracle) wrote:
+> On Tue, May 28, 2024 at 03:13:32PM +0100, Russell King (Oracle) wrote:
+> > > Alternative solution could be to use the has_gmac/has_gmac4 flags
+> > > instead. That will emphasize that the embedded PCS is expected to be
+> > > specific for the DW GMAC and DW QoS Eth IP-cores:
+> > > 
+> > >        if (phy_interface_mode_is_rgmii(interface))
+> > >                priv->hw->pcs = STMMAC_PCS_RGMII;
+> > >        else if ((priv->plat.has_gmac || priv->plat.has_gmac4) &&
+> > > 		interface == PHY_INTERFACE_MODE_SGMII)
+> > >                priv->hw->pcs = STMMAC_PCS_SGMII;
+> > 
+> > which implies that gmac (dwgmac1000_core.c) and gmac4 (dwgmac4_core.c)
+> > will always have its internal PCS if we're using SGMII mode. Does this
+> > mean it is true that these cores will never be used with an external
+> > PCS?
+> 
 
->
-> >
-> > >
-> > > Also, the name ( kfree_skb_for_sk) and order of parameters is confusi=
-ng.
-> > >
-> > > I always prefer this kind of ordering/names :
-> > >
-> > > void sk_skb_reason_drop( [struct net *net ] // not relevant here, but
-> > > to expand the rationale
-> > >               struct sock *sk, struct sk_buff *skb, enum skb_drop_rea=
-son reason)
-> > >
-> > > Looking at the name, we immediately see the parameter order.
-> > >
-> > > The consume one (no @reason there) would be called
-> > >
-> > > void sk_skb_consume(struct sock *sk, struct sk_buff *skb);
-> >
-> > I was intending to keep the "kfree_skb" prefix initially since it
-> > would appear less surprising to kernel developers who used kfree_skb
-> > and kfree_skb_reason. But your points do make good sense. How about
-> > "kfree_sk_skb_reason" and "consume_sk_skb" here?
-> >
->
-> IMO kfree_skb() and consume_skb() were a wrong choice. We have to live
-> with them.
->
-> It should have been skb_free(), skb_consume(), skb_alloc(),
-> to be consistent.
->
-> Following (partial) list was much better:
->
-> skb_add_rx_frag_netmem, skb_coalesce_rx_frag, skb_pp_cow_data,
-> skb_cow_data_for_xdp,
-> skb_dump, skb_tx_error, skb_morph, skb_zerocopy_iter_stream, skb_copy_ubu=
-fs,
-> skb_clone, skb_headers_offset_update, skb_copy_header, skb_copy,
-> skb_realloc_headroom, skb_expand_head, skb_copy_expand, skb_put,
-> skb_push, skb_pull, skb_pull_data, skb_trim, skb_copy_bits,
-> skb_splice_bits, skb_send_sock_locked, skb_store_bits,
-> skb_checksum, skb_copy_and_csum_bits, skb_zerocopy_headlen,
-> skb_zerocopy, skb_copy_and_csum_dev, skb_dequeue,
-> skb_dequeue_tail, skb_queue_purge_reason, skb_errqueue_purge,
-> skb_queue_head, skb_queue_tail, skb_unlink, skb_append,
-> skb_split, skb_prepare_seq_read, skb_seq_read, skb_abort_seq_read,
-> skb_find_text, skb_append_pagefrags, skb_pull_rcsum, skb_segment_list,
-> skb_segment, skb_to_sgvec, skb_to_sgvec_nomark, skb_cow_data, skb_clone_s=
-k,
-> skb_complete_tx_timestamp, skb_tstamp_tx, skb_complete_wifi_ack,
-> skb_partial_csum_set, skb_checksum_setup, skb_checksum_trimmed,
-> skb_try_coalesce, skb_scrub_packet, skb_vlan_untag, skb_ensure_writable,
-> skb_ensure_writable_head_tail, skb_vlan_pop, skb_vlan_push, skb_eth_pop,
-> skb_eth_push, skb_mpls_push, skb_mpls_pop, skb_mpls_update_lse,
-> skb_mpls_dec_ttl, skb_condense, skb_ext_add, skb_splice_from_iter
->
-> (just to make my point very very clear)
->
-> Instead we have a myriad of functions with illogical parameter
-> ordering vs their names.
->
-> I see no reason to add more confusion for new helpers.
+> Sorry to go off on a related tangent, but I've just been looking at
+> hw->ps which is related to this.
 
-ACK. Thanks for clarifying.
+I was meditating around the hw->ps part for several days on the last
+week and just gave up in finding of how that semantics could be
+incorporated in the phylink pcs logic...
 
-Yan
+> 
+> As I understand, hw->ps comes from the "snps,ps-speed" property in DT,
+> which is used for SGMII and MAC2MAC connections. Presumably for the
+> SGMII case, this is used where the port is made to look like the PHY
+> end of the SGMII link.
+
+Right. The speed comes from the "snps,ps-speed" property and is
+utilized to set the particular port speed in the MAC2MAC case. But
+neither DW QoS Eth nor DW GMAC HW-manual explicitly describe that
+case. The only SGMII MAC2MAC mention there is GMAC_AN_CTRL_SGMRAL flag
+description:
+
+"SGMII RAL Control
+
+When set, this bit forces the SGMII RAL block to operate in the speed
+configured in the Speed and Port Select bits of the MAC Configuration
+register. This is useful when the SGMII interface is used in a direct
+MAC to MAC connection (without a PHY) and any MAC must reconfigure the
+speed.  When reset, the SGMII RAL block operates according to the link
+speed status received on SGMII (from the PHY).
+
+This bit is reserved (and RO) if the SGMII PHY interface is not
+selected during core configuration."
+
+> 
+> I'm guessing MAC2MAC refers to RGMII, or does that also refer to
+> SGMII-as-PHY?
+
+I guess that it can be utilized in both cases: RGMII-to-RGMII and
+SGMII-to-SGMII MAC2MAC setups. The only difference is that the
+GMAC_AN_CTRL_SGMRAL flag setting would be useless for RGMII. But
+originally the mac_device_info::ps field was introduced for the SGMII
+MAC2MAC config here:
+02e57b9d7c8c ("drivers: net: stmmac: add port selection programming")
+and the "snps,ps-speed" property can be spotted alongside with 
+phy-mode = "sgmii" only, here:
+arch/arm64/boot/dts/qcom/sa8775p-ride.dts
+
+Although AFAICS the dwmac1000_core_init()/dwmac4_core_init() methods
+lack of the GMAC_CONTROL_TC/GMAC_PHYIF_CTRLSTATUS_TC flags set in the
+(hw->ps)-related if-clause. Without that the specified speed setting
+won't be in-bend delivered to the other side of the MAC2MAC link and
+the internal PCS functionality won't work. Synopsys DW GMAC/Qos Eth
+databooks explicitly say that these flags need to be set for the MAC
+to be sending its Port speed, Duplex mode and Link Up/Down flag
+setting over the RGMII/SGMII in-band signal:
+
+SGMII: "The tx_config_reg[15:0] bits sent by the MAC during
+Auto-negotiation depend on whether the Transmit Configuration register
+bit is enabled for the SGMII interface."
+
+RGMII: "When the RGMII interface is configured to transmit the
+configuration during the IFG, then rgmii_txd[3:0] reflects the Duplex
+Mode, Port Select, Speed (encoded as 00 for 10 Mbps, 01 for 100 Mbps
+and 10 for 1000 Mbps), and Link Up/Down bits of the MAC Configuration
+Register,"
+
+TC flag description:
+"Transmit Configuration in RGMII, SGMII, or SMII
+
+When set, this bit enables the transmission of duplex mode, link
+speed, and link up or down information to the PHY in the RGMII, SMII,
+or SGMII port. When this bit is reset, no such information is driven
+to the PHY. This bit is reserved (and RO) if the RGMII, SMII, or SGMII
+PHY port is not selected during core configuration."
+
+> 
+> I think it would've been nice to have picked SGMII-as-PHY up in the
+> driver earlier - we don't tend to use the "normal" PHY interface
+> mode names, instead we have the REVxxx modes, so I think this
+> _should_ have introduced PHY_INTERFACE_MODE_REVSGMII.
+
+Not sure whether it would be a correct thing to do. RevMII is a real
+interface. DW GMAC/QoS Eth can be synthesized with RevMII PHY
+interface support. Mac2Mac SGMII/RGMII is a feature of the standard
+SGMII/RGMII interfaces.
+
+On the other hand we already have the set of the artificial modes like
+"rgmii-id/rgmii-txid/rgmii-rxid" indicating the MAC-side delays but
+describing the same interfaces. So I don't have a strong opinion
+against have the modes like "rev-rgmii"/"rev-sgmii".
+
+> 
+> In any case, moving on... in stmmac_hw_setup(), we have:
+> 
+>         /* PS and related bits will be programmed according to the speed */
+>         if (priv->hw->pcs) {
+>                 int speed = priv->plat->mac_port_sel_speed;
+> 
+>                 if ((speed == SPEED_10) || (speed == SPEED_100) ||
+>                     (speed == SPEED_1000)) {
+>                         priv->hw->ps = speed;
+>                 } else {
+>                         dev_warn(priv->device, "invalid port speed\n");
+>                         priv->hw->ps = 0;
+>                 }
+>         }
+> 
+
+> Which means that if we're using the integrated PCS, then we basically
+> require the "snps,ps-speed" property otherwise we'll issue a warning
+> at this point... this seems to imply that reverse mode is the only
+> mode supported, which I'm fairly sure is false. So, maybe this
+> shouldn't be issuing the warning if mac_port_sel_speed was zero?
+
+Seeing the link state could be delivered over the in-band path, I
+guess the "snps,ps-speed" property is supposed to be optional so the
+mac_port_sel_speed being zero is a possible case. Thus the warning is
+indeed misleading and it is totally ok to have mac_port_sel_speed
+being set to zero. If it is, then the link state shall be determined
+either over in-band or from the PHY.
+
+> 
+> Moving on... hw->ps can only be 10M, 100M or 1G speeds and nothing else
+> - which is fine since RGMII and Cisco SGMII only support these speeds.
+> 
+> dwmac1000 tests for this against these speeds, so it is also fine.
+> 
+> dwmac4 is basically the same as dwmac1000, so is also fine.
+> 
+> The core code as it stands today passes this into the pcs_ctrl_ane
+> method's rsgmi_ral argument, which sets GMAC_AN_CTRL_SGMRAL. Presumably
+> this selects "reverse" mode for both SGMII and RGMII?
+
+No, GMAC_AN_CTRL_SGMRAL flag works for SGMII only, which enables the
+fixed link speed (see my second comment in this email message) by
+forcing the SGMII RAL (Rate Adaptation Layer) working with the
+pre-defined speed. AFAIU RGMII interface doesn't need that flag since
+it always works with the pre-defined speed and has no Rate Adaptation
+engine.
+
+> 
+> Persuing this a bit futher, qcom-ethqos always calls this with rsgmi_ral
+> clear. Presumably, qcom-ethqos never specifies "snps,ps-speed" in DT,
+> and thus always gets the warning above?
+
+Interesting situation. Actually no. The only DW QoS Eth device for
+which "snps,ps-speed = 1000" is specified is "qcom,sa8775p-ethqosi"
+(see arch/arm64/boot/dts/qcom/sa8775p-ride.dts), due to that no
+warning is printed. But on the other hand the low-level driver
+(drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c) also sets
+the STMMAC_FLAG_HAS_INTEGRATED_PCS flag exactly for that device, which
+effectively disables the entire internal PCS functionality (except the
+speed setup performed in dwmac4_core_init()).
+
+Holy mother of ...
+
+> 
+> Finally, we get to the core issue, which is dwxgmac2_core.c.
+> dwxgmac2 tests this member against 10G, 2.5G and "any other non-zero
+> value". Out of all of these, the only possible path through that code
+> would be the one which results in:
+> 
+> 	tx |= hw->link.speed1000;
+> 
+> Neither of the other two (2.5G and 10G) are possible because those
+> aren't legal values for hw->ps. Moreover, it doesn't appear to have
+> any kind of PCS, so I'm wondering whether any of this code gets used.
+
+I guess the (hw->ps)-related code snippet has been just dummy-copied from
+another dwmac*_core.c file to DW XGMAC. So IMO it can be freely
+dropped. After all the bindings define the snps,ps-speed as:
+
+      "Port selection speed that can be passed to the core when PCS
+      is supported. For example, this is used in case of SGMII and
+      MAC2MAC connection."
+
+I doubt DW XGMAC could be used in the MAC2MAC setup, and it doesn't
+have any internal PCS (may have externally connected DW XPCS though).
+
+> 
+> 
+> So, I suspect some of this is "not quite right" either, and I wonder
+> about the implications of changing how hw->pcs is set - whether we
+> first need to fix the code above dealing with priv->hw->ps ?
+> 
+> I'm also wondering what impact this has on my PCS conversion.
+
+My brain got blown up thinking about this one week ago. So I gave up
+in looking for a portable way of fixing the MAC2MAC part and sent my
+three patches as is to you. I thought after some time I could come up
+with some ideas about that. Alas the time-break didn't help.)
+
+I can't say for sure what could be a better way to align the things
+around the internal PCS and MAC2MAC case. But IMO seeing the code is
+vastly messy and unlikely has been widely used I'd suggest to preserve
+the semantics as required by the Qualcomm QoS Eth
+(dwmac-qcom-ethqos.c), and free redefining the rest of the
+things as you wish.
+
+-Serge(y)
+
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
