@@ -1,166 +1,161 @@
-Return-Path: <netdev+bounces-99707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D57928D5FCA
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 12:37:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 742548D5FD0
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 12:38:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03B751C21A0F
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 10:37:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C4A71F25285
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 10:38:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A791155C82;
-	Fri, 31 May 2024 10:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0F8F156967;
+	Fri, 31 May 2024 10:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="F0heMktW";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="YN+uNLES"
 X-Original-To: netdev@vger.kernel.org
-Received: from externalmx.cuda-inc.com (externalmx01.cuda-inc.com [198.35.20.47])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2453DBB7
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 10:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.35.20.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46900155C8E;
+	Fri, 31 May 2024 10:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717151849; cv=none; b=SejHzQT2PSD+Q0NMkM9Ru7l7NnI5Abg/zzOT9QU88kcgiAe0ddH3eOzdnFTuZXmeDSunidFQRyDaTZAuv1F2/xkBWLhnOtjAFKEcJsqBYV7RAS3jUzHlOQ/BiMFGr9VKvkBGiAt0E4TGRD+2KSOLHJ2jCGb1TyyrC3fnkJUyHTo=
+	t=1717151892; cv=none; b=TKYVd6bDWSG2ZyRwwS/8Uj0nYUjNwQSXO2xjOQDZeJDcuN2CZ/fxrl5qNKxesf5S5t2EExkPOlhWxJ6DAzCOwQHkUA7kJFtCGXFhNhQNUjQV6Io+SIYp+5IUdSVCjA+JTaUQItGY2sHLzrXhAuWjL/idntnuyt9mi9XwAZo7O58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717151849; c=relaxed/simple;
-	bh=mt1umim5qW9CYCCXa3trl99j6H8pKhvS5Ms57VFwfeY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qSRpFVbfdK6Nd46YJTJJn2bmN+4fmRrT0/4XI8QOp1gVvIfvMI9WwPeSJkYPKzN20zmRnpi3G9ECgWNXQTL5Cex1haUGKnzR/WRg9aAsa4bypwSN537viZOifKY6Y75c+WAnchxb3P7EDT0DJEUwlAPQzE+4I82Iz8pEEKQVH1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=barracuda.com; spf=pass smtp.mailfrom=barracuda.com; arc=none smtp.client-ip=198.35.20.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=barracuda.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=barracuda.com
-X-ASG-Debug-ID: 1717151838-1fbdb972675400970001-BZBGGp
-Received: from Rick.eu.ad.cuda-inc.com ([10.42.96.1]) by externalmx.cuda-inc.com with ESMTP id FskQn4GpINukxv1P; Fri, 31 May 2024 03:37:19 -0700 (PDT)
-X-Barracuda-Envelope-From: mstocker@barracuda.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.42.96.1
-From: Matthias Stocker <mstocker@barracuda.com>
-To: kuba@kernel.org,
-	doshir@vmware.com,
-	pv-drivers@vmware.com,
-	netdev@vger.kernel.org
-Cc: Matthias Stocker <mstocker@barracuda.com>
-Subject: [PATCH v2] vmxnet3: disable rx data ring on dma allocation failure
-Date: Fri, 31 May 2024 12:37:11 +0200
-X-ASG-Orig-Subj: [PATCH v2] vmxnet3: disable rx data ring on dma allocation failure
-Message-ID: <20240531103711.101961-1-mstocker@barracuda.com>
-X-Mailer: git-send-email 2.45.1
+	s=arc-20240116; t=1717151892; c=relaxed/simple;
+	bh=pHEsO2qn1rcaa/CVVCC1rJCGrocpF3xq2ymrPBC1hyM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tVa84WxKhoNcvFLGRU7mPDvTn3SYjw7Slnhf/Dyb+0WDQn2nuyX/CyEOOcdFGupdMLE4fV5FfWWjkhxhMRZAQGXCFB31ElW2VCIPcM9z/of7iyW2vZHOO5h7TNkhyZTs+7mbWNfMcVeSI9oStdRlHmsJcVw3tIdVSM2TnMdcvjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=F0heMktW; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=YN+uNLES; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Fri, 31 May 2024 12:38:07 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1717151889;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s4acigBe027wOQx0luMaaon6tV311jRRizAmbiQqL3w=;
+	b=F0heMktWAuN3lpcjkR+BkoYknS08e++75PnvWStPB9mL2ifxNdHcKz5weNkFgwFB1j84Qw
+	QMYeUMqjHfYnQDfLmxfG2IMol2YmnIYoV9aDk3SIvCyO9iJc/PrYDZExR53KWU5eBit800
+	A/8ur4BgPCXyYAcK0arCAFyxTYkLdMSj9Go2Y8rByOr4PvmyKltCd8K6hxKDc8uxbiMzhS
+	O/0ecInyrCKM0d9uYSRkS3A/JOTNZ6Up+04k9Kl5vtbZutIm4rIE2mvgdJFOll5X/Ok3EF
+	Wu1wiB8LMEdDeFz3DMTP32t5qruIRsjPHFSDeoImxEjZtLmkFDty3EdUcpWWnA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1717151889;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s4acigBe027wOQx0luMaaon6tV311jRRizAmbiQqL3w=;
+	b=YN+uNLESzX+WmX/Q2l0gLeQmgehpBRHwNK7BGf1Ci7es9A7xJHTFdbLQVw8obMJK45/1gV
+	40Y6OrLNtX5SqzCQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Yonghong Song <yonghong.song@linux.dev>, bpf@vger.kernel.org
+Subject: Re: [PATCH v3 net-next 14/15] net: Reference bpf_redirect_info via
+ task_struct on PREEMPT_RT.
+Message-ID: <20240531103807.QjzIOAOh@linutronix.de>
+References: <20240529162927.403425-1-bigeasy@linutronix.de>
+ <20240529162927.403425-15-bigeasy@linutronix.de>
+ <87y17sfey6.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Barracuda-Connect: UNKNOWN[10.42.96.1]
-X-Barracuda-Start-Time: 1717151838
-X-Barracuda-URL: https://10.42.53.111:443/cgi-mod/mark.cgi
-X-Barracuda-Scan-Msg-Size: 5235
-X-Barracuda-Spam-Score: 0.00
-X-Barracuda-Spam-Status: No, SCORE=0.00 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.125591
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87y17sfey6.fsf@toke.dk>
 
-When vmxnet3_rq_create() fails to allocate memory for rq->data_ring.base,
-the subsequent call to vmxnet3_rq_destroy_all_rxdataring does not reset
-rq->data_ring.desc_size for the data ring that failed, which presumably
-causes the hypervisor to reference it on packet reception.
+On 2024-05-30 00:09:21 [+0200], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> [...]
+> > @@ -240,12 +240,14 @@ static int cpu_map_bpf_prog_run(struct bpf_cpu_ma=
+p_entry *rcpu, void **frames,
+> >  				int xdp_n, struct xdp_cpumap_stats *stats,
+> >  				struct list_head *list)
+> >  {
+> > +	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
+> >  	int nframes;
+>=20
+> I think we need to zero-initialise all the context objects we allocate
+> on the stack.
+>=20
+> The reason being that an XDP program can return XDP_REDIRECT without
+> calling any of the redirect helpers first; which will lead to
+> xdp_do_redirect() being called without any of the fields in struct
+> bpf_redirect_info having being set. This can lead to a crash if the
+> values happen to be the wrong value; and if we're not initialising the
+> stack space used by this struct, we have no guarantees about what value
+> they will end up with.
 
-To fix this bug, rq->data_ring.desc_size needs to be set to 0 to tell
-the hypervisor to disable this feature.
+Okay, I can do that.
 
-[   95.436876] kernel BUG at net/core/skbuff.c:207!
-[   95.439074] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
-[   95.440411] CPU: 7 PID: 0 Comm: swapper/7 Not tainted 6.9.3-dirty #1
-[   95.441558] Hardware name: VMware, Inc. VMware Virtual
-Platform/440BX Desktop Reference Platform, BIOS 6.00 12/12/2018
-[   95.443481] RIP: 0010:skb_panic+0x4d/0x4f
-[   95.444404] Code: 4f 70 50 8b 87 c0 00 00 00 50 8b 87 bc 00 00 00 50
-ff b7 d0 00 00 00 4c 8b 8f c8 00 00 00 48 c7 c7 68 e8 be 9f e8 63 58 f9
-ff <0f> 0b 48 8b 14 24 48 c7 c1 d0 73 65 9f e8 a1 ff ff ff 48 8b 14 24
-[   95.447684] RSP: 0018:ffffa13340274dd0 EFLAGS: 00010246
-[   95.448762] RAX: 0000000000000089 RBX: ffff8fbbc72b02d0 RCX: 000000000000083f
-[   95.450148] RDX: 0000000000000000 RSI: 00000000000000f6 RDI: 000000000000083f
-[   95.451520] RBP: 000000000000002d R08: 0000000000000000 R09: ffffa13340274c60
-[   95.452886] R10: ffffffffa04ed468 R11: 0000000000000002 R12: 0000000000000000
-[   95.454293] R13: ffff8fbbdab3c2d0 R14: ffff8fbbdbd829e0 R15: ffff8fbbdbd809e0
-[   95.455682] FS:  0000000000000000(0000) GS:ffff8fbeefd80000(0000) knlGS:0000000000000000
-[   95.457178] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   95.458340] CR2: 00007fd0d1f650c8 CR3: 0000000115f28000 CR4: 00000000000406f0
-[   95.459791] Call Trace:
-[   95.460515]  <IRQ>
-[   95.461180]  ? __die_body.cold+0x19/0x27
-[   95.462150]  ? die+0x2e/0x50
-[   95.462976]  ? do_trap+0xca/0x110
-[   95.463973]  ? do_error_trap+0x6a/0x90
-[   95.464966]  ? skb_panic+0x4d/0x4f
-[   95.465901]  ? exc_invalid_op+0x50/0x70
-[   95.466849]  ? skb_panic+0x4d/0x4f
-[   95.467718]  ? asm_exc_invalid_op+0x1a/0x20
-[   95.468758]  ? skb_panic+0x4d/0x4f
-[   95.469655]  skb_put.cold+0x10/0x10
-[   95.470573]  vmxnet3_rq_rx_complete+0x862/0x11e0 [vmxnet3]
-[   95.471853]  vmxnet3_poll_rx_only+0x36/0xb0 [vmxnet3]
-[   95.473185]  __napi_poll+0x2b/0x160
-[   95.474145]  net_rx_action+0x2c6/0x3b0
-[   95.475115]  handle_softirqs+0xe7/0x2a0
-[   95.476122]  __irq_exit_rcu+0x97/0xb0
-[   95.477109]  common_interrupt+0x85/0xa0
-[   95.478102]  </IRQ>
-[   95.478846]  <TASK>
-[   95.479603]  asm_common_interrupt+0x26/0x40
-[   95.480657] RIP: 0010:pv_native_safe_halt+0xf/0x20
-[   95.481801] Code: 22 d7 e9 54 87 01 00 0f 1f 40 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa eb 07 0f 00 2d 93 ba 3b 00 fb f4 <e9> 2c 87 01 00 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90
-[   95.485563] RSP: 0018:ffffa133400ffe58 EFLAGS: 00000246
-[   95.486882] RAX: 0000000000004000 RBX: ffff8fbbc1d14064 RCX: 0000000000000000
-[   95.488477] RDX: ffff8fbeefd80000 RSI: ffff8fbbc1d14000 RDI: 0000000000000001
-[   95.490067] RBP: ffff8fbbc1d14064 R08: ffffffffa0652260 R09: 00000000000010d3
-[   95.491683] R10: 0000000000000018 R11: ffff8fbeefdb4764 R12: ffffffffa0652260
-[   95.493389] R13: ffffffffa06522e0 R14: 0000000000000001 R15: 0000000000000000
-[   95.495035]  acpi_safe_halt+0x14/0x20
-[   95.496127]  acpi_idle_do_entry+0x2f/0x50
-[   95.497221]  acpi_idle_enter+0x7f/0xd0
-[   95.498272]  cpuidle_enter_state+0x81/0x420
-[   95.499375]  cpuidle_enter+0x2d/0x40
-[   95.500400]  do_idle+0x1e5/0x240
-[   95.501385]  cpu_startup_entry+0x29/0x30
-[   95.502422]  start_secondary+0x11c/0x140
-[   95.503454]  common_startup_64+0x13e/0x141
-[   95.504466]  </TASK>
-[   95.505197] Modules linked in: nft_fib_inet nft_fib_ipv4
-nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6
-nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6
-nf_defrag_ipv4 rfkill ip_set nf_tables vsock_loopback
-vmw_vsock_virtio_transport_common qrtr vmw_vsock_vmci_transport vsock
-sunrpc binfmt_misc pktcdvd vmw_balloon pcspkr vmw_vmci i2c_piix4 joydev
-loop dm_multipath nfnetlink zram crct10dif_pclmul crc32_pclmul vmwgfx
-crc32c_intel polyval_clmulni polyval_generic ghash_clmulni_intel
-sha512_ssse3 sha256_ssse3 vmxnet3 sha1_ssse3 drm_ttm_helper vmw_pvscsi
-ttm ata_generic pata_acpi serio_raw scsi_dh_rdac scsi_dh_emc
-scsi_dh_alua ip6_tables ip_tables fuse
-[   95.516536] ---[ end trace 0000000000000000 ]---
+> >  void bpf_clear_redirect_map(struct bpf_map *map)
+> >  {
+> > -	struct bpf_redirect_info *ri;
+> > -	int cpu;
+> > -
+> > -	for_each_possible_cpu(cpu) {
+> > -		ri =3D per_cpu_ptr(&bpf_redirect_info, cpu);
+> > -		/* Avoid polluting remote cacheline due to writes if
+> > -		 * not needed. Once we pass this test, we need the
+> > -		 * cmpxchg() to make sure it hasn't been changed in
+> > -		 * the meantime by remote CPU.
+> > -		 */
+> > -		if (unlikely(READ_ONCE(ri->map) =3D=3D map))
+> > -			cmpxchg(&ri->map, map, NULL);
+> > -	}
+> > +	/* ri->map is assigned in __bpf_xdp_redirect_map() from within a eBPF
+> > +	 * program/ during NAPI callback. It is used during
+> > +	 * xdp_do_generic_redirect_map()/ __xdp_do_redirect_frame() from the
+> > +	 * redirect callback afterwards. ri->map is cleared after usage.
+> > +	 * The path has no explicit RCU read section but the local_bh_disable=
+()
+> > +	 * is also a RCU read section which makes the complete softirq callba=
+ck
+> > +	 * RCU protected. This in turn makes ri->map RCU protected and it is
+> > +	 * sufficient to wait a grace period to ensure that no "ri->map =3D=
+=3D map"
+> > +	 * exists. dev_map_free() removes the map from the list and then
+> > +	 * invokes synchronize_rcu() after calling this function.
+> > +	 */
+> >  }
+>=20
+> With the zeroing of the stack variable mentioned above, I agree that
+> this is not needed anymore, but I think we should just get rid of the
+> function entirely and put a comment in devmap.c instead of the call to
+> the (now empty) function.
 
-Fixes: 6f4833383e85 ("net: vmxnet3: Fix NULL pointer dereference in vmxnet3_rq_rx_complete()")
-Signed-off-by: Matthias Stocker <mstocker@barracuda.com>
----
- drivers/net/vmxnet3/vmxnet3_drv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I wasn't entirely sure if my reasoning is valid. In that case=E2=80=A6
 
-diff --git a/drivers/net/vmxnet3/vmxnet3_drv.c b/drivers/net/vmxnet3/vmxnet3_drv.c
-index 0578864792b6..beebe09eb88f 100644
---- a/drivers/net/vmxnet3/vmxnet3_drv.c
-+++ b/drivers/net/vmxnet3/vmxnet3_drv.c
-@@ -2034,8 +2034,8 @@ vmxnet3_rq_destroy_all_rxdataring(struct vmxnet3_adapter *adapter)
- 					  rq->data_ring.base,
- 					  rq->data_ring.basePA);
- 			rq->data_ring.base = NULL;
--			rq->data_ring.desc_size = 0;
- 		}
-+		rq->data_ring.desc_size = 0;
- 	}
- }
- 
--- 
-2.45.1
+> -Toke
 
+Sebastian
 
