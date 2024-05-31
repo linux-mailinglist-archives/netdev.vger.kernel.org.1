@@ -1,72 +1,73 @@
-Return-Path: <netdev+bounces-99617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0240C8D582D
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 03:38:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 607CC8D582F
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 03:38:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76F2DB22F8C
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:38:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DDEF1C212D5
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:38:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A973BDF6C;
-	Fri, 31 May 2024 01:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF732848D;
+	Fri, 31 May 2024 01:35:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="lSo6f6vn"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="jlT9UCFF"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2AE5C89;
-	Fri, 31 May 2024 01:35:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E803217997;
+	Fri, 31 May 2024 01:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717119312; cv=none; b=rbt4aYcpR4n3VHdFKk/hFL0WZ5u/aN+xdTym48wqyYF6OH+UtK4ci8G5VjUN24tw62lFpYw7wjDnYIuDi50gpRLQ2sWGZ/tnSJz5ZL7pk32DUN6uvT9IVRcf9ymzB8xXaVJ3HNAfElDqyplZ0cZKgHGA3w4wnL8QbyCnNxnkTSA=
+	t=1717119333; cv=none; b=Yf6KDTKXniulUJXiJ9iDAi52jCo32orpG0Hl0ovwsvxPa1Crk/DDUPoGaFeZS2UZ4oWtcZoHUBJ/fEad//wV0V371ycJU0j6D822nx0fEbHyVL6jv8FfROu/Q9Jz8RI/Nu9UFiDXcDO1Mz/+qAf3g1TmqwvfjTTUKCy1tfHJx3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717119312; c=relaxed/simple;
-	bh=TKphNDbRBuukut1Ep2302cA61A0z6FOESwmZlyo0rOw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AA/WhMzg7vSpEwIL1gI6EDEMGLV9vMFicQ5Y5eGdwVHRJgg3bddDHV+aMmEDyfwVtVHH59T6mX9iQsKcXBqYrfApBkiHfV1uXt1gRGqA92OmAFqhcjhI+jHkFb8UtFLHyZ+Rev3VS8N0Hs1QC9pHlc3/PLeOiB6OZ4/TpYk4B+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=lSo6f6vn; arc=none smtp.client-ip=68.232.153.233
+	s=arc-20240116; t=1717119333; c=relaxed/simple;
+	bh=zLFIT7XW4up0CVQnRvr8v7E+UFd7Ne27jN3zvsFPxlU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FMy5qcZ0JUqa3wNaiL+eJr0uYTEQWCHX97eDX/6Fnkg3UwkpD4J54FpZH3J5ly3EkItUscUVDARgLVJ2rX3oLKO7hy2pMTbl2nbl33ETVQNFOnJCNresisHqoYxoUoxu53EFusLQXIoq9apwkmNv+OhazuZDBmhB+8kpoQCqwxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=jlT9UCFF; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1717119311; x=1748655311;
+  t=1717119332; x=1748655332;
   h=from:to:cc:subject:date:message-id:mime-version;
-  bh=TKphNDbRBuukut1Ep2302cA61A0z6FOESwmZlyo0rOw=;
-  b=lSo6f6vnqE6pRgZ1ccpAN/06ZVeTjMsdkgRlKEIoohoLt6Jzr0tqK1WY
-   VxxGJ9KxyacPsj6rcSH7rON8tX+W1aPp2ikCOvDEXcDbpFZOrjZ9qnmZ4
-   d3ZD1RU+Yc7WnkV2LcFWL+M/C7rcJX1x5U6HV/1LxcEoFUS67MWM5bkOk
-   glsxmA48RWUsWnlUwpH3X1FABolprzvMoRnmQoTua07bEH+sizb6aD2C8
-   CTLZ9hwWIMQGyKXmInv78VKPruwNEvG7gD1Wh/fgfYV74WeICs6WFIV4b
-   e3FTG/mz6hgIh7OVRJeux+Rt2oBRJ1q1ql1wJ6FmPl3uAdkwPORdPODdd
-   g==;
-X-CSE-ConnectionGUID: /B7No0VXTMuuzRK/V9lgdw==
-X-CSE-MsgGUID: 01GfK7jXSBOKQb7FeaLGVA==
+  bh=zLFIT7XW4up0CVQnRvr8v7E+UFd7Ne27jN3zvsFPxlU=;
+  b=jlT9UCFFzQzEOJP4gTciLZzXL4TkL9zO2OCpuHPKH25gIhnFdgXc1fni
+   tEjxQvCKarR8b/f06cVNa5thPz4iTv692sZMX+aCqi/uP4ITUsDwlFI6m
+   2PjZxQf8DczU35jJI3yHesMb6gz+Cagf/FcLvRn7jtySnQQQSPhivHNi2
+   2tx7IZ60IllEBdoPRW64Ff5K9f8zgwSJZYD0C8NdFaQUDD653I/NgPkNw
+   yspGW1hXVrj//Oz03Wl6if6zyBme0rhNC+UapKNDuWsbM/55B5eBdNHrE
+   FUSLm5KtMC5p/sS2ZjqgQ3FkEr0mnPPod3ZxomvklSEPFD7KXq4vuV7Nm
+   Q==;
+X-CSE-ConnectionGUID: uaX4rQuDRYaqKusCUzsbmg==
+X-CSE-MsgGUID: VbXv9pbSRWe4ULR1kz/fsQ==
 X-IronPort-AV: E=Sophos;i="6.08,202,1712646000"; 
-   d="scan'208";a="26781072"
+   d="scan'208";a="27407181"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 May 2024 18:35:09 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 May 2024 18:35:29 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 30 May 2024 18:34:39 -0700
+ 15.1.2507.35; Thu, 30 May 2024 18:35:09 -0700
 Received: from hat-linux.microchip.com (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Thu, 30 May 2024 18:34:38 -0700
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Thu, 30 May 2024 18:35:08 -0700
 From: <Tristram.Ha@microchip.com>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>
+To: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+	Vivien Didelot <vivien.didelot@gmail.com>, Florian Fainelli
+	<f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>
 CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Tristram Ha
 	<tristram.ha@microchip.com>
-Subject: [PATCH v1 net] net: phy: Micrel KSZ8061: fix errata solution not taking effect problem
-Date: Thu, 30 May 2024 18:38:01 -0700
-Message-ID: <1717119481-3353-1-git-send-email-Tristram.Ha@microchip.com>
+Subject: [PATCH v1 net] net: dsa: microchip: fix RGMII error in KSZ DSA driver
+Date: Thu, 30 May 2024 18:38:31 -0700
+Message-ID: <1717119511-3401-1-git-send-email-Tristram.Ha@microchip.com>
 X-Mailer: git-send-email 1.9.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -78,90 +79,33 @@ Content-Type: text/plain
 
 From: Tristram Ha <tristram.ha@microchip.com>
 
-KSZ8061 needs to write to a MMD register at driver initialization to fix
-an errata.  This worked in 5.0 kernel but not in newer kernels.  The
-issue is the main phylib code no longer resets PHY at the very beginning.
-Calling phy resuming code later will reset the chip if it is already
-powered down at the beginning.  This wipes out the MMD register write.
-Solution is to implement a phy resume function for KSZ8061 to take care
-of this problem.
+The driver should return RMII interface when XMII is running in RMII mode.
 
-Fixes: 232ba3a51cc2 ("net: phy: Micrel KSZ8061: link failure after cable connect")
+Fixes: 0ab7f6bf1675 ("net: dsa: microchip: ksz9477: use common xmii function")
 Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
+Acked-by: Jerry Ray <jerry.ray@microchip.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
 v1
- - Correct the kernel version to 5.0
+- Add review from Andrew Lunn
 
- drivers/net/phy/micrel.c | 42 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 41 insertions(+), 1 deletion(-)
+ drivers/net/dsa/microchip/ksz_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 2b8f8b7f1517..618e532ee5d7 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -866,6 +866,17 @@ static int ksz8061_config_init(struct phy_device *phydev)
- {
- 	int ret;
- 
-+	/* Chip can be powered down by the bootstrap code. */
-+	ret = phy_read(phydev, MII_BMCR);
-+	if (ret < 0)
-+		return ret;
-+	if (ret & BMCR_PDOWN) {
-+		ret = phy_write(phydev, MII_BMCR, ret & ~BMCR_PDOWN);
-+		if (ret < 0)
-+			return ret;
-+		usleep_range(1000, 2000);
-+	}
-+
- 	ret = phy_write_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_DEVID1, 0xB61A);
- 	if (ret)
- 		return ret;
-@@ -2085,6 +2096,35 @@ static int kszphy_resume(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int ksz8061_resume(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* This function can be called twice when the Ethernet device is on. */
-+	ret = phy_read(phydev, MII_BMCR);
-+	if (ret < 0)
-+		return ret;
-+	if (!(ret & BMCR_PDOWN))
-+		return 0;
-+
-+	genphy_resume(phydev);
-+	usleep_range(1000, 2000);
-+
-+	/* Re-program the value after chip is reset. */
-+	ret = phy_write_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_DEVID1, 0xB61A);
-+	if (ret)
-+		return ret;
-+
-+	/* Enable PHY Interrupts */
-+	if (phy_interrupt_is_valid(phydev)) {
-+		phydev->interrupts = PHY_INTERRUPT_ENABLED;
-+		if (phydev->drv->config_intr)
-+			phydev->drv->config_intr(phydev);
-+	}
-+
-+	return 0;
-+}
-+
- static int kszphy_probe(struct phy_device *phydev)
- {
- 	const struct kszphy_type *type = phydev->drv->driver_data;
-@@ -5339,7 +5379,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.config_intr	= kszphy_config_intr,
- 	.handle_interrupt = kszphy_handle_interrupt,
- 	.suspend	= kszphy_suspend,
--	.resume		= kszphy_resume,
-+	.resume		= ksz8061_resume,
- }, {
- 	.phy_id		= PHY_ID_KSZ9021,
- 	.phy_id_mask	= 0x000ffffe,
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 1e0085cd9a9a..2818e24e2a51 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -3142,7 +3142,7 @@ phy_interface_t ksz_get_xmii(struct ksz_device *dev, int port, bool gbit)
+ 		else
+ 			interface = PHY_INTERFACE_MODE_MII;
+ 	} else if (val == bitval[P_RMII_SEL]) {
+-		interface = PHY_INTERFACE_MODE_RGMII;
++		interface = PHY_INTERFACE_MODE_RMII;
+ 	} else {
+ 		interface = PHY_INTERFACE_MODE_RGMII;
+ 		if (data8 & P_RGMII_ID_EG_ENABLE)
 -- 
 2.34.1
 
