@@ -1,112 +1,82 @@
-Return-Path: <netdev+bounces-99629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FFC78D587A
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 04:02:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD8DF8D5882
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 04:08:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F2061F2704F
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 02:02:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 264A6B22710
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 02:08:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 224C6745D5;
-	Fri, 31 May 2024 02:02:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E636BFCA;
+	Fri, 31 May 2024 02:08:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ZZjTlWT+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CCaU9/GI"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B1A5FBBA;
-	Fri, 31 May 2024 02:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7561D4C7C
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 02:08:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717120936; cv=none; b=FuajlNiTkR2rjPtQM4z5zq+xA7baldcbHVBTXe0z+t7an2IoaP4j0V4+/87uEcE37jGGdQ0l4RMglYUjVTJnKsffjCvhEjqF/YJ5fp+aAqska4Zn5g8kfbhIXaaxab6JSA4USNbV2/ykX8GAL7fJ4qANT5XP1mZ7Ip9/zVO+z5o=
+	t=1717121289; cv=none; b=HC9684Az9ILAeQTzpW489st94sXU67PPTcWa4qI50+N2DqIetMDYLqJ0A3WQTvIZcR0t6yTO9KTqMj7xb9WBRAXc44INCNK4yUd7Rl+FFUvFYAygZc8270776zK+r6AYZDrbnSsw6UoDFT8h++GgrKdwZpryP+vEtgVglf+T5+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717120936; c=relaxed/simple;
-	bh=5Qd0+YkPbyEFtmhmhsPZSrhbDlVPAjQSs8XXnIwKSvM=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=PXkCkCb3Kx53/wiL1DAgJgLPdR/wAJ/V37zjq5C3oEve6CZAaklVgvYUTnuzkvzShKThDvZRgNC4fX+s5UZ1Bou4fG3vW9Q6Tc2oATk4DGgM5Qh+ukK7h83oMbvdi9GVKt8T/y97xzFVhkRQKuZo7edIVWK7wag3ni+X1D+D9HA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ZZjTlWT+; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1717120929; h=Message-ID:Subject:Date:From:To;
-	bh=5Qd0+YkPbyEFtmhmhsPZSrhbDlVPAjQSs8XXnIwKSvM=;
-	b=ZZjTlWT+Nz8CDcPZ20xthn5GHGJlJ7S+q74BGPEjPQmPInWuWSM8G/R19AVSCaMQAD1AEaJ3/IMMMqQx3+x8vE32iL1NH/ibpTCHpxUmY9Kz3pLiyVPNQbsYjb2s3OlbCaJUdYrCsCQ1sDNrycB2/dVqBum+du5dw4pRKO+VMss=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R541e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067110;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W7YFVXu_1717120928;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W7YFVXu_1717120928)
-          by smtp.aliyun-inc.com;
-          Fri, 31 May 2024 10:02:08 +0800
-Message-ID: <1717120653.9337146-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v2 00/12] virtnet_net: prepare for af-xdp
-Date: Fri, 31 May 2024 09:57:33 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>
-References: <20240530112406.94452-1-xuanzhuo@linux.alibaba.com>
- <20240530075003-mutt-send-email-mst@kernel.org>
- <1717070084.6955814-1-xuanzhuo@linux.alibaba.com>
- <1717119614.404968-1-xuanzhuo@linux.alibaba.com>
- <20240530185517.33ba5daa@kernel.org>
-In-Reply-To: <20240530185517.33ba5daa@kernel.org>
+	s=arc-20240116; t=1717121289; c=relaxed/simple;
+	bh=5MC0SOOF/9jNNucsP57aN323scpYQHPWMS1SOinKQqs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cNIud8wBkZ8muoTcUDw8bU/vT1i+2FdFq3RGW/uOjwlwV+5Y+eWlhLiAtUNrS6bRuteHHzFK5kDkaXXu4C4PHCc4RBrixNUq6jlLj6wCKbRTq36BKn+GF743wP2vFexAfzwDPG13UOj2bMO3i3vF0+mvowYG4YjhdeuXDiMhml4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CCaU9/GI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B17B9C2BBFC;
+	Fri, 31 May 2024 02:08:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717121289;
+	bh=5MC0SOOF/9jNNucsP57aN323scpYQHPWMS1SOinKQqs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CCaU9/GIRndHSn7Hcqv73HTz9Pb2qXuHSXD62RdT9EiqhKCLlKj8EVYIffG19n/UD
+	 HmiTZkSwFRH8dd9Ms+pROdo2r+8YuuEH8Y31wWsxQx5SFAaCl7fzh55PP5hCQsub7g
+	 gsgIEVxezf7JMaZREAHv4ACfpZW16c286Rq4+WHyv3oDtVCrv5GqmkHWGdcvjNAFuY
+	 T3JcMLukAGO4EfuJgvscQIdqngopD/TPzSRKPbYcVPdVWdNykM4/Eog9wOhObwCIJ9
+	 NDIYC6WIr7yFx1zjmo0gSU2lhBr6oIsWy63qeK35Ztsk/icga37EzpLWn6a+DcrJkh
+	 iCA4hX87rM4MA==
+Date: Thu, 30 May 2024 19:08:07 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: David Miller <davem@davemloft.net>, netdev <netdev@vger.kernel.org>,
+ Larysa Zaremba <larysa.zaremba@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Simon Horman <horms@kernel.org>, Chandan
+ Kumar Rout <chandanx.rout@intel.com>
+Subject: Re: [PATCH net 3/6] ice: remove af_xdp_zc_qps bitmap
+Message-ID: <20240530190807.56956a36@kernel.org>
+In-Reply-To: <20240530-net-2024-05-30-intel-net-fixes-v1-3-8b11c8c9bff8@intel.com>
+References: <20240530-net-2024-05-30-intel-net-fixes-v1-0-8b11c8c9bff8@intel.com>
+	<20240530-net-2024-05-30-intel-net-fixes-v1-3-8b11c8c9bff8@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 30 May 2024 18:55:17 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
-> On Fri, 31 May 2024 09:40:14 +0800 Xuan Zhuo wrote:
-> > On Thu, 30 May 2024 19:54:44 +0800, Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
-> > > On Thu, 30 May 2024 07:53:17 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > It's great that you are working on this but
-> > > > I'd like to see the actual use of this first.
-> > >
-> > >
-> > > For me, that is easy. But how should we do, if we use one patch set,
-> > > then the commit number maybe 26, that exceeds 15 (limit of the net next).
-> >
-> > Hi, Jakub
-> >
-> > There will be a huge patch set (about 25) to support AF-XDP for virtio-net.
-> > Can I just post this huge patch set if the maintainers of virtio-net agree?
->
-> First of all, I see you posted v2 within 4 hours of v1, without really
-> waiting for Michael to reply.
+On Thu, 30 May 2024 10:39:30 -0700 Jacob Keller wrote:
+> +/**
+> + * ice_get_xp_from_qid - get ZC XSK buffer pool bound to a queue ID
+> + * @vsi: pointer to VSI
+> + * @qid: index of a queue to look at XSK buff pool presence
+> + *
+> + * Returns a pointer to xsk_buff_pool structure if there is a buffer pool
+> + * attached and configured as zero-copy, NULL otherwise.
+> + */
 
-Because I was checking the code, I found some commits need to be prepared also.
+drivers/net/ethernet/intel/ice/ice.h:758: warning: No description found for=
+ return value of 'ice_get_xp_from_qid'
 
-> So I guess that 15 patch rule is not the
-> only one you intend to break?
-
-Actually, that is the only one rule.
-
->
-> On v1 Michael asked you to not do the rename, and start with AF_XDP
-> support. Why don't you do that instead of asking me if you can break
-> more rules?
-
-Because if I don't rename the files, there will still be about 21 commits. For
-me, I don't think this is the key. If I release everything in one patch set,
-then I think Michael can understand why I want to rename the files.
-
-Thanks.
-
-
-> --
-> pw-bot: cr
+(BTW sorry I didn't manage to get to your series for net-next today =F0=9F=
+=98=A3=EF=B8=8F)
+--=20
+pw-bot: cr
 
