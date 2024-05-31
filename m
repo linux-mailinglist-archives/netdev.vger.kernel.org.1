@@ -1,59 +1,58 @@
-Return-Path: <netdev+bounces-99765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E7508D64DA
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 16:51:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06E6E8D64DC
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 16:51:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B015D1C24CF7
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 14:51:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA3C31F27DA9
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 14:51:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 054EE56773;
-	Fri, 31 May 2024 14:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C19D959147;
+	Fri, 31 May 2024 14:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="gJhSWPMl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nbzoTH+M"
 X-Original-To: netdev@vger.kernel.org
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE932558B9
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 14:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D14D558B9
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 14:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717167019; cv=none; b=HsnbLgCZ+WZFK8qFk+uCTKx52/MDDnzcuYuk4sPKVFHRFJfFAqK1TEuWckqGjZKy52fS92m/ksxSuCI3hjEPsQsTUoIquxp3ZsP2EjmHb/+ou9Acq5EQ9CoIXH72lOXkVo+2fFbN0ipL36T8pXT+Ptv05xYMjdUwfzFWOJ6nVpk=
+	t=1717167028; cv=none; b=ZE55vvZoNLG0j1/HYWt4deTu6k3o/kGg2Rle0W7imrqnvm+DGGD/Y2Q0VWCzFQsDk+OgQ9xdAtMMSJi4332cI+7q1YMp5QfexHs+v4RNrPgdTBawNrACX/vK4q7A1Vw/wYEXpPFLDIg+vcmj2kiayG5gS5LbrcVzi+1iXNkSjQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717167019; c=relaxed/simple;
-	bh=zIxJj+eFNW131CghuD8tAVb+DXZz1K/r7747QzysLZ0=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=oW+mgk/JzCEWbj/MSguO9ruf7/+HBg6wJrtWynZ1lXeI+mnMtM1ci/x2Pav3T86WguvYz9aVaDzchYW8K8n7ctV3swzkr3wqwfWXQKXQ3AlDxx2SNZVSJT6AVH/px0MVqzPuR3aaKrIOQo5XYbayd2izxfeUjQFd705/nq7hzgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=gJhSWPMl; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
-Received: from macsyma.thunk.org (unn-149-40-50-56.datapacket.com [149.40.50.56] (may be forged))
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 44VEnwYM020082
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 31 May 2024 10:50:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1717167002; bh=TVitHfGXx2wIQGCXtRSfpVuiPAJXkRLy5+/11kjTZi8=;
-	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
-	b=gJhSWPMlva12midGaeg/PHU2neWOcKsKiFso7tYpYY6tMVpafdbk0znXMFEK9H1hU
-	 qdyBPtkEngiB7yqQ+IbNrHlkWYOWgTjcvQgJNO7MTOTZisvZdZSoDHJWY3lqeJaYZE
-	 U38u43F9VE4lFxJknYqgbIoTNE+P1A2Q4LVc12BHeDv1KKY88JN9DqWz4hzA6iWmx8
-	 y2TY1uFckzpWjIiew4C1qPlARFYwrj6ebMmhkk+fiFQEX7rpKDXel6j5rvPRdi9eDf
-	 HMJqjXMcGDUiuhpBoML4bUHQ6xIbM2FnKtOoPuHSbUzya2eBGa7gg01LX6ZZmBbqR2
-	 QX791qc6scs2g==
-Received: by macsyma.thunk.org (Postfix, from userid 15806)
-	id 257EA340A68; Fri, 31 May 2024 16:49:57 +0200 (CEST)
-Date: Fri, 31 May 2024 16:49:57 +0200
-From: "Theodore Ts'o" <tytso@mit.edu>
-To: Linux Kernel Developers List <linux-kernel@vger.kernel.org>,
-        Linux Filesystem Development List <linux-fsdevel@vger.kernel.org>,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org,
-        linux-mm@kvack.org, ksummit@lists.linux.dev
-Subject: Maintainers Summit 2024 Call for Topics
-Message-ID: <20240531144957.GA301668@mit.edu>
+	s=arc-20240116; t=1717167028; c=relaxed/simple;
+	bh=V3c+3Y5HJA8ik51zRIjpUeJRb0Yr+J6Q6zHt1I6UsDE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tXL+J+MhXp5B/d0RMX0y21nTWacfQhUTgrUljp9bA6bwRLhTZrDt9Ti2GwcUh/TsH4npSQTCZ72+XHYkef9td1TwJuw+OAy33SMzGd9Yp5BpJ8+wKQmxYC6pHABuw1525OGd2xer1jvVHaBSW9ilAK5rqayuiFtI/uTgHbLqbek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nbzoTH+M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6CFEC32781;
+	Fri, 31 May 2024 14:50:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717167028;
+	bh=V3c+3Y5HJA8ik51zRIjpUeJRb0Yr+J6Q6zHt1I6UsDE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nbzoTH+MJV127ZPsLgWBPWRwSMJcFWhnRsN2MO7rM7Bb1EmITxFdRMYuNY/AdnGoB
+	 qHhKhS+X+w3tb8OcLfibCGTphISCpYdgEtLFtSFg28NvUHND7Xff3bhALvymR/BMnT
+	 nkANUGUrlwPrQAX5XYLE3qO4I6hw1WJHJ7nfbjaFqj3RsbTxAidGLsErApgWzNSSNq
+	 r6wKHRaTjaUmOs2NFKUX4v/hZ8ChZgKH/9Gyo2/t91V+R1w2rPNqx+mQa+NsI/Vya/
+	 O24VyJbpgkhp3rwSObWLV+f5Z5nUfa8sYUBjUPsF9ori6TGmVynyU6uOFhcgP7bZwJ
+	 DKruvewWldLsA==
+Date: Fri, 31 May 2024 15:50:24 +0100
+From: Simon Horman <horms@kernel.org>
+To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	jacob.e.keller@intel.com, Stefan Wegrzyn <stefan.wegrzyn@intel.com>,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Jan Sokolowski <jan.sokolowski@intel.com>
+Subject: Re: [PATCH iwl-next v7 2/7] ixgbe: Add support for E610 device
+ capabilities detection
+Message-ID: <20240531145024.GI123401@kernel.org>
+References: <20240527151023.3634-1-piotr.kwapulinski@intel.com>
+ <20240527151023.3634-3-piotr.kwapulinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,72 +61,124 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20240527151023.3634-3-piotr.kwapulinski@intel.com>
 
-This year, the Maintainers Summit will be held in Vienna, Austria on
-Tuesday, September 17th, 2024, just before the Linux Plumber's Conference
-(September 18--20th).
+On Mon, May 27, 2024 at 05:10:18PM +0200, Piotr Kwapulinski wrote:
+> Add low level support for E610 device capabilities detection. The
+> capabilities are discovered via the Admin Command Interface. Discover the
+> following capabilities:
+> - function caps: vmdq, dcb, rss, rx/tx qs, msix, nvm, orom, reset
+> - device caps: vsi, fdir, 1588
+> - phy caps
+> 
+> Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
+> Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
+> Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> Reviewed-by: Jan Sokolowski <jan.sokolowski@intel.com>
+> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 517 ++++++++++++++++++
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |  11 +
+>  2 files changed, 528 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
 
-As in previous years, the Maintainers Summit is invite-only, where the
-primary focus will be process issues around Linux Kernel Development.
-It will be limited to 30 invitees and a handful of sponsored
-attendees.
+...
 
-Linus has generated a list of people for the program committee to
-consider.  People who suggest topics that should be discussed at the
-Maintainers Summit will also be added to the list for consideration.
-To make topic suggestions for the Maintainers Summit, please send
-e-mail to the ksummit@lists.linux.dev with a subject prefix of
-[MAINTAINERS SUMMIT].
+> +/**
+> + * ixgbe_discover_dev_caps - Read and extract device capabilities
+> + * @hw: pointer to the hardware structure
+> + * @dev_caps: pointer to device capabilities structure
+> + *
+> + * Read the device capabilities and extract them into the dev_caps structure
+> + * for later use.
+> + *
+> + * Return: the exit code of the operation.
+> + */
+> +int ixgbe_discover_dev_caps(struct ixgbe_hw *hw,
+> +			    struct ixgbe_hw_dev_caps *dev_caps)
+> +{
+> +	u8 *cbuf __free(kfree);
+> +	u32 cap_count;
+> +	int err;
+> +
+> +	cbuf = kzalloc(IXGBE_ACI_MAX_BUFFER_SIZE, GFP_KERNEL);
+> +	if (!cbuf)
+> +		return -ENOMEM;
+> +	/* Although the driver doesn't know the number of capabilities the
+> +	 * device will return, we can simply send a 4KB buffer, the maximum
+> +	 * possible size that firmware can return.
+> +	 */
+> +	cap_count = IXGBE_ACI_MAX_BUFFER_SIZE /
+> +		    sizeof(struct ixgbe_aci_cmd_list_caps_elem);
+> +
+> +	err = ixgbe_aci_list_caps(hw, cbuf, IXGBE_ACI_MAX_BUFFER_SIZE,
+> +				  &cap_count,
+> +				  ixgbe_aci_opc_list_dev_caps);
+> +	if (!err)
+> +		ixgbe_parse_dev_caps(hw, dev_caps, cbuf, cap_count);
+> +
+> +	return err;
 
-To get the most out of our topic discussions, folks proposing a topic
-should also suggest relevant people and desired outcomes.
+Hi Piotr, all,
 
-For an examples of past Maintainers Summit topics, please see these
-LWN articles:
+A minor nit from my side.
 
- * 2023 https://lwn.net/Articles/951847/
- * 2022 https://lwn.net/Articles/908320/
- * 2021 https://lwn.net/Articles/870415/
+It would be more idiomatic to write this such that the main flow of
+execution is the non-error path, while errors are handled by conditions. In
+this case, something like this (completely untested!):
 
-The Kernel Summit is organized as a track which is run in parallel
-with the other tracks at the Linux Plumbers Conference (LPC), and is
-open to all registered attendees of LPC.  The goal of the Kernel
-Summit track will be to provide a forum to discuss specific technical
-issues that would be easier to resolve in person than over e-mail.
-The program committee will also consider "information sharing" topics
-if they are clearly of interest to the wider development community
-(i.e., advanced training in topics that would be useful to kernel
-developers).
+	err = ixgbe_aci_list_caps(hw, cbuf, IXGBE_ACI_MAX_BUFFER_SIZE,
+				  &cap_count,
+				  ixgbe_aci_opc_list_dev_caps);
+	if (err)
+		return err;
 
-To suggest a topic for the Kernel Summit, please do two things. by
-June 16th, 2024.  First, please tag your e-mail with [TECH TOPIC].  As
-before, please use a separate e-mail for each topic, and send the
-topic suggestions to the ksummit discussion list.
+	ixgbe_parse_dev_caps(hw, dev_caps, cbuf, cap_count);
 
-Secondly, please create a topic at the Linux Plumbers Conference
-proposal submission site and target it to the Kernel Summit track:
+	return 0;
 
-	https://lpc.events/event/18/abstracts/
+Likewise in ixgbe_discover_func_caps()
 
-Please do both steps.  I'll try to notice if someone forgets one or
-the other, but your chances of making sure your proposal gets the
-necessary attention and consideration are maximized by submitting both
-to the mailing list and the web site.
+> +}
+> +
+> +/**
+> + * ixgbe_discover_func_caps - Read and extract function capabilities
+> + * @hw: pointer to the hardware structure
+> + * @func_caps: pointer to function capabilities structure
+> + *
+> + * Read the function capabilities and extract them into the func_caps structure
+> + * for later use.
+> + *
+> + * Return: the exit code of the operation.
+> + */
+> +int ixgbe_discover_func_caps(struct ixgbe_hw *hw,
+> +			     struct ixgbe_hw_func_caps *func_caps)
+> +{
+> +	u8 *cbuf __free(kfree);
+> +	u32 cap_count;
+> +	int err;
+> +
+> +	cbuf = kzalloc(IXGBE_ACI_MAX_BUFFER_SIZE, GFP_KERNEL);
+> +	if (!cbuf)
+> +		return -ENOMEM;
+> +
+> +	/* Although the driver doesn't know the number of capabilities the
+> +	 * device will return, we can simply send a 4KB buffer, the maximum
+> +	 * possible size that firmware can return.
+> +	 */
+> +	cap_count = IXGBE_ACI_MAX_BUFFER_SIZE /
+> +		    sizeof(struct ixgbe_aci_cmd_list_caps_elem);
+> +
+> +	err = ixgbe_aci_list_caps(hw, cbuf, IXGBE_ACI_MAX_BUFFER_SIZE,
+> +				  &cap_count,
+> +				  ixgbe_aci_opc_list_func_caps);
+> +	if (!err)
+> +		ixgbe_parse_func_caps(hw, func_caps, cbuf, cap_count);
+> +
+> +	return err;
+> +}
 
-
-If you were not subscribed on to the kernel mailing list from
-last year (or if you had removed yourself after the kernel summit),
-you can subscribe by sending an e-mail to the address:
-
-   ksummit+subscribe@lists.linux.dev
-
-The program committee this year is composed of the following people:
-
-Christian Brauner
-Jon Corbet
-Greg KH
-Sasha Levin
-Ted Ts'o
-Rafael J. Wysocki
-
+...
 
