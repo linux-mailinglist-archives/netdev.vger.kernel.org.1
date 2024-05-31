@@ -1,124 +1,80 @@
-Return-Path: <netdev+bounces-99753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 247F88D6350
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 15:45:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 663038D635F
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 15:46:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E59E1C21C42
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 13:45:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BCF81C26ECE
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 13:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D36158DD7;
-	Fri, 31 May 2024 13:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935E8158DDC;
+	Fri, 31 May 2024 13:46:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WdD3x3ba"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5eoKD5e/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C117440B;
-	Fri, 31 May 2024 13:45:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DBDD15CD63
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 13:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717163146; cv=none; b=CR1BZnrsGyo+uoX/1FhDiZUp6nArLTmBp3qRV1peqjHD7TDBcUjqFGe4gpmEGKCET7afIUge8sQKi6GuhmL+mC/CoMpQhOqmZyU87e8zx1u8d/G44x0nI2LBXWFzPfRnKp4cbFttxTMJhRXv+bBgEE4Wlp3QxQErB0Yv7NTLpl8=
+	t=1717163184; cv=none; b=SeqeRR2FO/RKH8FpSv3ryE/84yZSuIFfI/54YUDe+1uYA2EON5LBHPiYCtufm3xa6+QsMxjKNThucUSfgLqU/BFCnzGMmcKe3Y8LTnaSQDUm3+5ucqIGN8FOKAnFeKtwnfGKA8rUHubmzM40zUtIeNSYcwcIGLK6KrZFeBpEjNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717163146; c=relaxed/simple;
-	bh=9bHZx7MoCQbM3wc0+T6G78EbGSWMbO1srcZcLpQFe1w=;
+	s=arc-20240116; t=1717163184; c=relaxed/simple;
+	bh=+r2cgwhGMM6K1DF1TXC084RnUm3+yBwQLByZuZon6OQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cpQhyqsM7rDTKONdtngiMbVFJxhjwVPOXvcF/qWTygpyBZ238v3grYh7m+HduQiFCtg1Qk9b3ySWQFKlqngpyhiXmjB51/12tVzUpb15OhvvGOQOGHvEGEktX1apwg6JAoojOPWU2RdDraIOuD6koZY2LKorl1K1FKIR5pv83y4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WdD3x3ba; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A572BC116B1;
-	Fri, 31 May 2024 13:45:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717163145;
-	bh=9bHZx7MoCQbM3wc0+T6G78EbGSWMbO1srcZcLpQFe1w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WdD3x3baOEE+lLJPD4j0hSwr8gdBDEPG2WDozfakC6eUwn73jRAQv66g4pSumaXxE
-	 oWV1EMVpxXj011/a3sEVJL+5xVahBkX5OWLXMQfi4JBOBAqhjVWif43KBF5rQo84Ke
-	 uhCtOL/HUYFN3ePGNKE9X4RKq9xPsfnFi6cGcU9m+u50koP1DtWTRls39xB9/UII0I
-	 fdSTfPrd5DzgUFJktrEFJYXK3Y9SVW5d9fYRPkpx3cqoPTnj6ge+G4hDTokRCoL6pY
-	 0VMFpdkJwbqnlv3qh8BqTWi5j5w+l6SDBYuUg2TaczKCRjlnFnQfVECKEzfKD8GFzm
-	 itjSp5c4ci0+w==
-Date: Fri, 31 May 2024 14:45:36 +0100
-From: Lee Jones <lee@kernel.org>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Gregory Clement <gregory.clement@bootlin.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, UNGLinuxDriver@microchip.com,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=j1JfmX3AQPUGUdgx/oWKGCuK77/7IJX9hxu8jM3aP+kw87wVDchWIbD1CvL+OiKcRLU811Hac41s2NvQvzRKOKT+wcebld/Qi10unUn0V4gMV10Bwj/ezBLkTulfpb5XuiPlPFmnhsb9phlcy3jZQslPAlA7aO1y10itZTYouR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5eoKD5e/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Rdkksymfi46lkvUCYihYvILBL9M98BG91F3EtFDa3V0=; b=5eoKD5e//cg5+4cppQMQtrfgzg
+	DeHsFtBKjytNrVxv3XUqWOn8JnvUcDOsp46EcjH2YGV9B5zJYpQxf5i8fAt5r7L8U7IKEF0S5cS7g
+	5uD8yUL0G07Ql0mKU4xlv0UyAt7gQRpSt1PTdF5qwsyf/JVv3wLPjv4jeqAOdjU+vIEQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sD2aC-00GTBU-Jh; Fri, 31 May 2024 15:46:12 +0200
+Date: Fri, 31 May 2024 15:46:12 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-mtd@lists.infradead.org,
-	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH] dt-bindings: mfd: syscon: Add more simple compatibles
-Message-ID: <20240531134536.GK1005600@google.com>
-References: <20240510123018.3902184-1-robh@kernel.org>
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: remove obsolete phylink dsa_switch
+ operations
+Message-ID: <e7845173-b601-47ce-870e-6896d3d5916a@lunn.ch>
+References: <E1sCxVx-00EwVY-E2@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240510123018.3902184-1-robh@kernel.org>
+In-Reply-To: <E1sCxVx-00EwVY-E2@rmk-PC.armlinux.org.uk>
 
-On Fri, 10 May 2024, Rob Herring (Arm) wrote:
-
-> Add another batch of various "simple" syscon compatibles which were
-> undocumented or still documented with old text bindings. Remove the old
-> text binding docs for the ones which were documented.
+On Fri, May 31, 2024 at 09:21:29AM +0100, Russell King (Oracle) wrote:
+> No driver now uses the DSA switch phylink members, so we can now remove
+> the shim functions and method pointers. Arrange to print an error
+> message and fail registration if a DSA driver does not provide the
+> phylink MAC operations structure.
 > 
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> ---
-> This batch is mostly from arm32 platforms.
-> ---
->  .../bindings/arm/amlogic/analog-top.txt       | 20 -------------
->  .../bindings/arm/amlogic/assist.txt           | 17 -----------
->  .../bindings/arm/amlogic/bootrom.txt          | 17 -----------
->  .../devicetree/bindings/arm/amlogic/pmu.txt   | 18 ------------
->  .../devicetree/bindings/arm/atmel-sysregs.txt | 29 -------------------
->  .../devicetree/bindings/arm/axis.txt          | 16 ----------
->  .../arm/cpu-enable-method/al,alpine-smp       | 10 -------
->  .../arm/freescale/fsl,vf610-mscm-cpucfg.txt   | 14 ---------
->  .../bindings/arm/marvell/marvell,dove.txt     | 15 ----------
->  .../devicetree/bindings/arm/spear-misc.txt    |  9 ------
->  .../bindings/clock/ti-keystone-pllctrl.txt    | 20 -------------
->  .../devicetree/bindings/mfd/syscon.yaml       | 29 +++++++++++++++++++
->  .../devicetree/bindings/mips/mscc.txt         | 17 -----------
->  .../devicetree/bindings/mtd/atmel-nand.txt    |  9 ------
->  .../bindings/net/hisilicon-hip04-net.txt      | 10 -------
->  15 files changed, 29 insertions(+), 221 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/arm/amlogic/analog-top.txt
->  delete mode 100644 Documentation/devicetree/bindings/arm/amlogic/assist.txt
->  delete mode 100644 Documentation/devicetree/bindings/arm/amlogic/bootrom.txt
->  delete mode 100644 Documentation/devicetree/bindings/arm/amlogic/pmu.txt
->  delete mode 100644 Documentation/devicetree/bindings/arm/freescale/fsl,vf610-mscm-cpucfg.txt
->  delete mode 100644 Documentation/devicetree/bindings/arm/spear-misc.txt
->  delete mode 100644 Documentation/devicetree/bindings/clock/ti-keystone-pllctrl.txt
+> Signed-off-by: Russell King (oracle) <rmk+kernel@armlinux.org.uk>
 
-No longer applies.  Please rebase and I'll promptly hoover this up.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
--- 
-Lee Jones [李琼斯]
+    Andrew
 
