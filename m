@@ -1,258 +1,228 @@
-Return-Path: <netdev+bounces-99828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D23D58D69B2
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 21:22:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A98378D69B7
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 21:30:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46C211F217A7
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 19:22:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 248F41F28806
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 19:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E3C20DCB;
-	Fri, 31 May 2024 19:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DB7180BFF;
+	Fri, 31 May 2024 19:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="zqaWfS95";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="J51wZAOy"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="U9SexC7R"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FAFE1C6AE
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 19:22:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.153.233
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717183365; cv=fail; b=CDy4c4SwZpRoAAPRNHULGoEjuP8DCZTCxLWKlyWxR52K/hG19Y5HLU5RuHTUaWsU8E9EtvvInuTdVPxFnyVxhLdmzRCPyHAuRE109jsUl36kbhXv0PqWzI0zBq1uZuBLtfd0+0qTrTPcrStXb1NxSlgzwz2cGvAVaY/RTXzhw5Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717183365; c=relaxed/simple;
-	bh=qEuzVMcariOurt5023AOLWIoEJLwF4hf0lAy4nXo7B0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=NKQo46xO087k5QOVUp52DTh4p2rd4ME5ihc1WHOt83WTjiHxg6VAK43R8HsmyOKCe8+SpLGIoNBwLKUFG1LP0HI8/FmH6kGZuPH+8NBdtUX6k9L8rYyxZYT6UF/qKCLcPP/1P11KI4o646HMihiKWfzhwWVYiRfzFRr3oWse+q8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=zqaWfS95; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=J51wZAOy; arc=fail smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1717183363; x=1748719363;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=qEuzVMcariOurt5023AOLWIoEJLwF4hf0lAy4nXo7B0=;
-  b=zqaWfS955ZxPWgciHDkuvU3I8f66cXdvo7vA+bmpUNfbXqOpDYQqsel4
-   ImfgZcdCw3lhB1mF5UcI5frVjtaidEV/MTmOWHyi3zLlb52pMa/PIQKJd
-   /w3b5oG0/oEY5b3ADWYMEU/CjlX7Veg6M3tsH37skm/v/S42XKKNJjuaR
-   DgVJfEuMpkEhL6apS8v+dAkIdii0NQCjBI4KofuWNhOrSBHzdCtQy8rX4
-   3xsMyuBkVdQIrOTRmMVNvCk452xlpLUqWtfqpZwpbwnhnLIxUVq6sppLx
-   mdOTnfSEyRv4I1cw1Pb814Cfy6m98nT8vaEzHa9f+lNyfKlKW/1ePSbQ+
-   w==;
-X-CSE-ConnectionGUID: ckiF1CeZSMWBlbZXoguXtA==
-X-CSE-MsgGUID: 2e5x6jEXQLG5K2d8u53iaQ==
-X-IronPort-AV: E=Sophos;i="6.08,205,1712646000"; 
-   d="scan'208";a="29181176"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 31 May 2024 12:22:42 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 31 May 2024 12:22:27 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 31 May 2024 12:22:27 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LJjPQNvuxZwHcfcDSS70b8ZgyG6+HU4xz8vlIaqgDzHo0gGxh9e7EvDmEMXmS4PJumWjcqE3EVgQ96JebQN8F3ETvYM3suW90pMgkKe3jf5DKKwUtA2EJH0BCuySqBush1CDGBRq/ef4iD5IszYwNKSp3TiwVIdlG3EQXMckx6QEN0uGRAo+mOHr1LypGJfttcmExkfz0tQdTh2N7SDlhoBkYYkS2OGTePBoKg1M2sV9W33TNzZk6pgE8odLQa/MbBT0+xHi/p434F1UHMZwVww/7d0594JJevTops/5r9RoSadKAPA+9YdryPDrQUEqiL4lnbb3zKWpWA+YlqjZww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lh/mCkpA30aYJLjbVWjln5VpKJfJSxoNiRrZEPOHehk=;
- b=VwHx4AMQPMRa/9DLXyOMvp72vp8pdk11v2NLBLAgAWC5lmSoTzvSuMEaNr29miI548lD4skjc2MKHqGl1rR+DIP1EyuLj7X9av0YFqaa6yUNjFh1ZdMeesr11xPCAs+yxEajIIiFWEsp8XJz09ZFjwCSg/7lglbktkBLY+Daa1meZKGISksJFKReMHvCMe3TnYC2xaVV0rrJ174HTfygVu4SnwGuk/rIg+nMTgHWrV+3p6ERzvplCNE7F+lTPq9R/ChoNMVzmCWfm6fPIilGf2/ksOfL0EZOwO3jDGK0JhWbcvL40kjCBQhIWN+0NcMdcCdKdNAJ2w2nSCx3gxgjvA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lh/mCkpA30aYJLjbVWjln5VpKJfJSxoNiRrZEPOHehk=;
- b=J51wZAOyra59cJRrUyASZtKhrxBLEcwd4So2kCCccS3egx1lEotp5BMkypksAWI5tbPUH/JBbTJtqkAo13MIsQWBmVO2IurQClqqSYGwaACSddJDDxDj6m6ibEqB/wBtnGH45OzgBaKWMrumhXIX8JUUlfU3FJFNtWzxsv4gwoyUgmnGW56XY3RvpD9d/NnYWbRVaZyrAlfGdK8EkijGNYMk+PZEkQfp+XkwjCj6iGyTxQDM0VKomXHGPpekM7Stv53eJf71dk4ZYrcV++in18v8ZabDkR9In/NudewXaxlOjjo9g8X27uN8n9+kBcDm6vrw4doruqF/QNnCldowQg==
-Received: from BYAPR11MB3558.namprd11.prod.outlook.com (2603:10b6:a03:b3::11)
- by MW4PR11MB6713.namprd11.prod.outlook.com (2603:10b6:303:1e8::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.22; Fri, 31 May
- 2024 19:22:24 +0000
-Received: from BYAPR11MB3558.namprd11.prod.outlook.com
- ([fe80::c03a:b12:f801:d3f6]) by BYAPR11MB3558.namprd11.prod.outlook.com
- ([fe80::c03a:b12:f801:d3f6%6]) with mapi id 15.20.7611.025; Fri, 31 May 2024
- 19:22:24 +0000
-From: <Tristram.Ha@microchip.com>
-To: <enguerrand.de-ribaucourt@savoirfairelinux.com>
-CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<Woojung.Huh@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<netdev@vger.kernel.org>
-Subject: RE: [PATCH net v4 2/5] net: phy: micrel: disable suspend/resume
- callbacks following errata
-Thread-Topic: [PATCH net v4 2/5] net: phy: micrel: disable suspend/resume
- callbacks following errata
-Thread-Index: AQHas2ZgRTJcrl+8QUWBqUy02CDO37GxuF6g
-Date: Fri, 31 May 2024 19:22:24 +0000
-Message-ID: <BYAPR11MB355807D7460030E897709AA1ECFC2@BYAPR11MB3558.namprd11.prod.outlook.com>
-References: <20240530102436.226189-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
- <20240531142430.678198-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
- <20240531142430.678198-3-enguerrand.de-ribaucourt@savoirfairelinux.com>
-In-Reply-To: <20240531142430.678198-3-enguerrand.de-ribaucourt@savoirfairelinux.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BYAPR11MB3558:EE_|MW4PR11MB6713:EE_
-x-ms-office365-filtering-correlation-id: b208eb6a-73a8-41e9-5ab4-08dc81a70057
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|366007|1800799015|376005|38070700009;
-x-microsoft-antispam-message-info: =?us-ascii?Q?15ufSje8lED+IY6kz77dEsbu5BI+u9ZIqjFMEWyVdkILNhTAQxm3BKAWqYyY?=
- =?us-ascii?Q?RiTchd4KOEEwlSu7MS2A/DiWujeD2J90/A7tx7W0LNevHTSgq3ljlxfGMp5e?=
- =?us-ascii?Q?qDkStbUqjmNxzkvpnMjvHnNdNY+mEnGaiQ/MUhyxYPNlC7rDqE2lUj+9+2Jp?=
- =?us-ascii?Q?ucum3mL2OflBtJqYE9jfVN003ZYHnn5yKbywYWctq+m966FOCXlMFQ7RWVTW?=
- =?us-ascii?Q?Dfdq0LY4x/uosECKQmWV/ZzHAJgKephZaPgxxmUnczdKXgEwDkTmeVW8spUN?=
- =?us-ascii?Q?uRZILpu2IUHy/Jyn5Qq+XW5FascUvcQxiqAsH3JzZeTCcUp+//E31AVsSvkl?=
- =?us-ascii?Q?fazhJ2TkkTpBwAxM51MNAxwCdY6Momww/xPqe9YcpBQNSYJJ227kgZkm4T3T?=
- =?us-ascii?Q?TMQaQk2ikWDAhJY5UwZyBoTecYYHrJJIYPl9sLlk6EsACEnUKIC40t0RLlZ5?=
- =?us-ascii?Q?/sdGffuob/lg4uZW0vqCXETRa3HEXjpIMcFFhJpeAODg5dCkFOQuu/MxQIX5?=
- =?us-ascii?Q?ChKzU5bxnYNR/nkGurHKFSN2j5KI7hcqOt48lzVVKn/dAYLG2QBcmBf8zzE/?=
- =?us-ascii?Q?OQVhJJxyl/JDxQgU1DJ6pVancJEroyaIvw72Z+ORSjcy40zNIUhtIsO3h3Nh?=
- =?us-ascii?Q?30ZlvCwc4Grf/LPncM7KfkqZJLN2wmZmeD1J5PeYeHH5qbuaLBv2Nd8mR9QL?=
- =?us-ascii?Q?OFq+vpXYC+dXb1Z4mPFaMqQlo1efGfMA7HK0Jw28eWooU6VZbXMbKEIwD5Op?=
- =?us-ascii?Q?kd5/6X7iwYNaAliFurJbMfSg6nFAbm730r5dtLfjY9eh3tZCY/8VRPuhYAQi?=
- =?us-ascii?Q?iVTfJzPhcHqODfWOhPt88fdtg8j3MI0TrjzL/PAOFKtLA0Cb9rvLuZd0dDQy?=
- =?us-ascii?Q?4BevFnj1x1gwgS3dxkSkBp8S+VrW/Uv8UJPnI5SJHhOjmbmh9j++mTbPOc+B?=
- =?us-ascii?Q?Ko3E/RP0qs5bwHaX5+NDiItzPlzswipQI+p9oowOFnfg0iUhLeV4bXJKUM1R?=
- =?us-ascii?Q?3kODvluRElnLO5uhCylJ7tS4DeM8iI3dR5mRvYK+8Qc5H82wOMJ3Ycq2GYWR?=
- =?us-ascii?Q?J4giO7op/x5a3VxPW2kef3EZ1A5E1MCfvMkbuYVzEwfMWgr4tYjeRw9Bx20U?=
- =?us-ascii?Q?2XjksC7Gu+WBwkuYgQ/ieMusP6cUPSkaBzOLyy7MylJzBE4E9bk/I7lk3bP6?=
- =?us-ascii?Q?zNUSC0GdPLBT1pL63b5N278TK8TWB2PQDTNXKQPv9Fmk59DDHIVAWYgCT7xA?=
- =?us-ascii?Q?MIAQctROQirXAgLLGFSa6/cIXjfbsa3vMeeQ2vCOxQ=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3558.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?eQyd+AoKRwyiWCw+7k+3XYm5bnnANJ5eiRiGLrAOk7XBndzMMMGRf3tmS8b2?=
- =?us-ascii?Q?BavBJWlFArtAmoouFVWErX/SJG7jiznp+y8HKcQqUCatLJ1WqNK7jEzKQXgg?=
- =?us-ascii?Q?W4PU0CfEQzoakKpOwyq8QcdqegM3qyrgxsTpg1V20+mn90Meu42qd0b1zLwP?=
- =?us-ascii?Q?5xeE/SkXqymSSzTT8m51LhlEvxjmn5OtaHBbOdLKpZBClSfJRDjJYYEN5+p3?=
- =?us-ascii?Q?hY1QF+1ng8pkTeIcARwuxlmBA1pG6FrJ9G9uuxXsxeUc17h9NSr+tCDYFFKJ?=
- =?us-ascii?Q?3DxGQ29lCSjl6g7XXOIcBAuQ+At6UWTq3wucGScsAw1KCeKX1cPxek3R4vRk?=
- =?us-ascii?Q?22uj+DsONt+FtQmDlWP5g3iN7WKEkLuKwybsjkKemh92OQNlOCpnpccajrKN?=
- =?us-ascii?Q?R2d9CqivcJQbHFiEWxwoLTAFStexv12ADQSmTSjrfKa/mAt7FUSoIdJPw61X?=
- =?us-ascii?Q?G5bEUmTGRGVmYlZ4uPByHn45BcpANWadTGWZo7grJWIZU3fz8fg8ymVKXmW8?=
- =?us-ascii?Q?B2x6IeCxC+VU934i2c7QcOtmDJj+xWQ55VDGIrEomiLjVVIiyS6cQ6n74KY8?=
- =?us-ascii?Q?Nn1eDC5j7AGD9hthOfb9xdHMYnPVpYpsI5/Y5n3g8wUbk7gT5Y5qYymimJ1p?=
- =?us-ascii?Q?pDGCnA05t6MISRKwswIclp6tiTQLGPhvoal+u3bLSXWmUkHKnYuSSqhYUCDj?=
- =?us-ascii?Q?+wnipsR79vplyZPoYFhuFP3EmExLGEOoNhqS7kpBuUydvSHZOSUUX3krnQ/U?=
- =?us-ascii?Q?vJjyxn45JgXVHbZV4G7fywO5H8e8t4BIoug38verOYNkGj/vgo78dFNBfLqY?=
- =?us-ascii?Q?THekfAUZVe79yN53jLFIWhh21h14FPXw9Nl5J0lVrOAU8sAUXFZcrxBmELhp?=
- =?us-ascii?Q?O752p5HxSSR4EOeyfPCicOom8jl1qKZmvTF/WAQ/YTdRk++c8kpVdOAC58h3?=
- =?us-ascii?Q?+bG/Zlf5w17cVlM7MwYaaoDqp6DhSdHBtQ9iosAqnx6q2MyknBUnzDmbzyUa?=
- =?us-ascii?Q?RyRFocDb+XC1z6hRl+6MpWbfHztfRJFncAAnNfZGttYYl9+0EwwWqaSeCBRa?=
- =?us-ascii?Q?s6k8octNYJ9075sob9AyFRKuR7RF2qtrd18al/PinXCfOSyQQ4uPpAMtIUrb?=
- =?us-ascii?Q?GQtq2SjQCZBlNSWNQSX+428gD35SoSOGiQQHEXrCiWCmWcu+UQqjY2zb/tpO?=
- =?us-ascii?Q?Frfv+KUFP4oe12ofvclAMSmzgqrcojTaYiyXIImNDYxXcOQ/Z/V3bCJL6Ssk?=
- =?us-ascii?Q?df/JpJ1cyb+bv/wWQPM8ic5TFUrqDLQ/rbyoP7ucx9RVibtxPiv9PAsNkDXv?=
- =?us-ascii?Q?M9evCHkYtACnQL6ASOJxZSzuT415AqfaHDDPAAHE90EroUqjjqNoA0PEQ4Ic?=
- =?us-ascii?Q?PmxzwHzWYPHkB63KABKYrrsS3QQoEGZCbGofAimOOgGfSRBIoPOF2wQhWNWD?=
- =?us-ascii?Q?+n/6/B8unbrVbHWNJsFrpf1EfYl6avwDBdXIwW3LvEzXlJLm/J2LVdcuCaav?=
- =?us-ascii?Q?7PHNSavy+ptbQGBYNByCoVYFm+OKS0tx4IvqvvemlHnk1Dw8Pm9YRGVQUkY2?=
- =?us-ascii?Q?e6ljHfrgCMwESavE6p/n2jI6oH8A28Az1HI1XbkL?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301198060E;
+	Fri, 31 May 2024 19:30:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717183854; cv=none; b=XlDIMHj/VAtHhVnktq/VDfEbdA8Q8ELrfSgnCeCy3M3Y6CnWNhTfM+I8hZ8uTbam/AAxwfVHGa11MJktMG3aZf8V6wFXo2+MA1L8sQYmwt+781mxCcpUSd9u4ESzDry+o8k5RTTOECewNtpOvybrkg01WGZa4cSbz41q3foJWHw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717183854; c=relaxed/simple;
+	bh=z8uzJKSifRIK3GWiIUeZtQqc65MtApfDUecHoBdeV9Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QsbDs10O6w2gIrFUwo0W0/y8L0r8A1SYpbZD3wFAS3TN0hnokqmD/9A/b61CWqKzYwkMRO/aQsKl0YObcRi+nS62kW4xASOe3mmhumflCsEj96pB5HSUtFZXNBfGD9YdUbJuXn0lmS74zqpHogokfe768oHBCGxaKAW2iL6y0M4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=U9SexC7R; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=S9mHIQQm5cGqY4bLkFBXjSdhRykuzFxJcjgIe1svJ7o=; b=U9SexC7RC1hTsF5vRAxJnxnJHH
+	dLZ1LflYfoWO2OuCxU3MR/vYqdR8AnSAoiapTc7PddjybP1/HklAAtGiMy4fdM7EwuHzjeF8xIgMW
+	7rFAlHEZ0h/biUPgz1WP1lHgtPa//j1awSS89+F/LIn27ufOa1cEqIAysshEBKohpguuOPgn6Nerh
+	zU91Zd6pp1Ch4PoReIusHdSM7J5EAGI7a1ca7+WFpQ3J12c5ZRiGWDwPo2Q7//op8FfDNrPWko7k0
+	d9ScfhUslZAvjwP2Rqn97OeFHIaHLh0mFydPe1qKXiZr13uo47vVAYO4tQIdskwVeY+/SKObQs4v1
+	YK+IDRcA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43346)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sD7xN-0000RY-17;
+	Fri, 31 May 2024 20:30:29 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sD7xL-0006Hk-IZ; Fri, 31 May 2024 20:30:27 +0100
+Date: Fri, 31 May 2024 20:30:27 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Byungho An <bh74.an@samsung.com>,
+	Giuseppe CAVALLARO <peppe.cavallaro@st.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 2/3] net: stmmac: Activate Inband/PCS flag
+ based on the selected iface
+Message-ID: <ZlolU6+lUaXQSQID@shell.armlinux.org.uk>
+References: <ZkDuJAx7atDXjf5m@shell.armlinux.org.uk>
+ <20240524210304.9164-1-fancer.lancer@gmail.com>
+ <20240524210304.9164-2-fancer.lancer@gmail.com>
+ <ZlNoLHoHjt3BsFde@shell.armlinux.org.uk>
+ <ZlN4tkY8fNM8/D8p@shell.armlinux.org.uk>
+ <ukszpirecb3pwnz5bbmy7wl44ujh6t2ewrnodmrye5kjmonsz2@pgf5b2oy5n3p>
+ <ZlXmjKtKozXThPFv@shell.armlinux.org.uk>
+ <x4snwm24lqebfcu3xqipwnxcexxbxhfijw7ldsukk23tn5k3rc@g3tfmynhvm26>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3558.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b208eb6a-73a8-41e9-5ab4-08dc81a70057
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 May 2024 19:22:24.4481
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Vx8/tAgrJANYOmoaGXHhoUKsv4uo/Ndv3X8sVnubVmXwSAJuh0RptJryqqUdk9OzImcVkWn1aKvkZ+gdvRWgWkwoPRkKVRYWRk1c6SoyFkc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6713
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <x4snwm24lqebfcu3xqipwnxcexxbxhfijw7ldsukk23tn5k3rc@g3tfmynhvm26>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+
+Hi Serge,
+
+Thanks for the reply. I've attempted to deal with most of these in my
+v2 posting, but maybe not in the best way yet.
+
+On Fri, May 31, 2024 at 08:13:49PM +0300, Serge Semin wrote:
+> > Does this
+> > mean it is true that these cores will never be used with an external
+> > PCS?
+> 
+> Sorry, I was wrong to suggest the (priv->plat.has_gmac ||
+> priv->plat.has_gmac4)-based statement. Indeed there is a case of having DW
+> QoS Eth and DW XPCS synthesized together with the SGMII/1000Base-X
+> downstream interface. Not sure why it was needed to implement that way
+> seeing DW QoS Eth IP-core supports optional SGMII PHY interface out of
+> box, but AFAICS Intel mGBE is that case. Anyway the correct way to
+> detect the internal PCS support is to check the PCSSEL flag set in the
+> HWFEATURE register (preserved in the stmmac_priv::dma_cap::pcs field).
+
+We can only wonder why!
+
+> > Please can you confirm that if an external PCS (e.g. xpcs, lynx PCS)
+> > is being used, the internal PCS will not have been synthesized, and
+> > thus priv->dma_cap.pcs will be false?
+> 
+> Alas I can't confirm that. priv->dma_cap.pcs only indicates the
+> internal PCS availability. External PCS is an independent entity from
+> the DW *MAC IP-core point of view. So the DW GMAC/QoS Eth/XGMAC
+> controllers aren't aware of its existence. It's the low-level platform
+> driver/code responsibility to somehow detect it being available
+> ("pcs-handle" property, plat->mdio_bus_data->has_xpcs flag, etc).
+> 
+> Regarding the internal PCS, as long as the DW GMAC or DW QoS Eth is
+> synthesized with the SGMII/TBI/RTBI PHY interface support
+> priv->dma_cap.pcs will get to be true. Note the device can be
+> synthesized with several PHY interfaces supported. As long as
+> SGMII/TBI/RTBI PHY interface is any of them, the flag will be set
+> irrespective from the PHY interface activated at runtime. 
+
+I've been debating about this, and given your response, I'm wondering
+whether we should change stmmac_mac_select_pcs() to instead do:
+
+static struct phylink_pcs *stmmac_mac_select_pcs(struct phylink_config *config,
+						 phy_interface_t interface)
+{
+	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
+	struct phylink_pcs *pcs;
+
+	if (priv->plat->select_pcs) {
+		pcs = priv->plat->select_pcs(priv, interface);
+		if (!IS_ERR(pcs))
+			return pcs;
+	}
+
+	return stmmac_mac_phylink_select_pcs(priv, interface);
+}
+
+and push the problem of whether to provide a PCS that overrides
+the MAC internal PCS into platform code. That would mean Intel mGBE
+would be able to override with XPCS. rzn1 and socfpga can then do
+their own thing as well.
+
+I'm trying hard not to go down another rabbit hole... I've just
+spotted that socfpga sets mac_interface to PHY_INTERFACE_MODE_SGMII.
+That's another reason for pushing this down into platform drivers -
+if platform drivers are doing weird stuff, then we can contain their
+weirdness in the platform drivers moving it out of the core code.
+
+> You can extend the priv->dma_cap.pcs flag semantics. So it could
+> be indicating three types of the PCS'es:
+> RGMII, SGMII, XPCS (or TBI/RTBI in future).
+
+If TBI/RTBI gets supported, then this would have to be extended, but I
+get the impression that this isn't popular.
+
+> I guess the DW XPCS implementation might be more preferable. From one
+> side DW XPCS SGMII can support up to 2.5Gbps speed, while the DW
+> GMAC/QoS Eth SGMII can work with up to 1Gbps speed only. On the other
+> hand the DW XPCS might be available over the MDIO-bus, which is slower
+> to access than the internal PCS CSRs available in the DW GMAC/QoS Eth
+> CSRs space. So the more performant link speed seems more useful
+> feature over the faster device setup process.
+
+I think which should be used would depend on how the hardware is wired
+up. This brings us back to platform specifics again, which points
+towards moving the decision making into platform code as per the above.
+
+> One thing I am not sure about is that there is a real case of having
+> the DW GMAC/QoS Eth synthesized with the native SGMII/TBI/RTBI PHY
+> interface support and being attached to the DW XPCS controller, which
+> would have the SGMII downstream PHY interface. DW XPCS has only the
+> XGMII or GMII/MII upstream interfaces over which the MAC can be
+> attached.
+
+That gives us another possibility, but needs platforms to be doing
+the right thing. If mac_interface were set to XGMII or GMII/MII, then
+that would exclude the internal MAC PCS.
+
+> So DW GMAC/QoS Eth and DW XPCS can be connected via the
+> GMII/MII interface only. Regarding Intel mGBE, it likely is having a
+> setup like this:
+> 
+> +------------+          +---------+
+> |            | GMII/MII |         |   SGMII
+> | DW QoS Eth +----------+ DW XPCS +------------
+> |            |          |         | 1000Base-X
+> +------------+          +---------+
 
 
+So as an alternative, 
 
-> -----Original Message-----
-> From: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux=
-.com>
-> Sent: Friday, May 31, 2024 7:24 AM
-> To: netdev@vger.kernel.org
-> Cc: andrew@lunn.ch; hkallweit1@gmail.com; linux@armlinux.org.uk; Woojung =
-Huh -
-> C21699 <Woojung.Huh@microchip.com>; UNGLinuxDriver
-> <UNGLinuxDriver@microchip.com>; Enguerrand de Ribaucourt <enguerrand.de-
-> ribaucourt@savoirfairelinux.com>
-> Subject: [PATCH net v4 2/5] net: phy: micrel: disable suspend/resume call=
-backs
-> following errata
->=20
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e content
-> is safe
->=20
-> Microchip's erratas state that powering down a PHY may cause errors
-> on the adjacent PHYs due to the power supply noise. The suggested
-> workaround is to avoid toggling the powerdown bit dynamically while
-> traffic may be present.
->=20
-> Fixes: fc3973a1fa09 ("phy: micrel: add Microchip KSZ 9477 Switch PHY supp=
-ort")
-> Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-
-> ribaucourt@savoirfairelinux.com>
-> ---
-> v4:
->  - rebase on net/main
->  - add Fixes tag
-> v3: https://lore.kernel.org/all/20240530102436.226189-3-enguerrand.de-
-> ribaucourt@savoirfairelinux.com/
-> ---
->  drivers/net/phy/micrel.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-> index 8a6dfaceeab3..2608d6cc7257 100644
-> --- a/drivers/net/phy/micrel.c
-> +++ b/drivers/net/phy/micrel.c
-> @@ -5492,8 +5492,9 @@ static struct phy_driver ksphy_driver[] =3D {
->         .config_init    =3D ksz9477_config_init,
->         .config_intr    =3D kszphy_config_intr,
->         .handle_interrupt =3D kszphy_handle_interrupt,
-> -       .suspend        =3D genphy_suspend,
-> -       .resume         =3D genphy_resume,
-> +       /* No suspend/resume callbacks because of errata DS80000758:
-> +        * Toggling PHY Powerdown can cause errors or link failures in ad=
-jacent PHYs
-> +        */
->         .get_features   =3D ksz9477_get_features,
->  }, {
->         .phy_id         =3D PHY_ID_KSZ9897,
+     mac_interface            phy_interface
 
-KSZ9893 uses the same PHY driver as KSZ9477.  KSZ9893 belongs to KSZ9893
-family while KSZ9477 belongs to KSZ9897 family.  They share most
-registers but KSZ9893 does not require PHY setup for link compatibility
-and does not have this PHY power up link lost issue, so it is not
-appropriate to completely disable PHY power down.
+     XGMII/GMII/MII           SGMII/1000Base-X
+MAC ---------------- DW XPCS ------------------
 
-PHY power down is executed when the network device is turned off.  The
-PHY is powered up when the network device is turned on.  This sometimes
-can cause other ports in KSZ9897 switch to lose link temporarily.  The
-link will come back.
+     INTERNAL                SGMII/TBI/RTBI
+MAC ---------- Internal PCS ----------------
 
-In my opinion this problem does not impact much as the network devices
-are not likely to be turned off/on many times and likely to be turned
-off once during system initialization.
+     INTERNAL                  RGMII
+MAC ---------- Internal "PCS" --------------
 
+One of the problems here, though, is socfpga. It uses mac_interface
+with RGMII*, MII, GMII, SGMII and RMII. I think it's confusing
+mac_interface for phy_interface, but I haven't read through enough
+of it to be certain.
 
+So that again leads me back to my proposal above for
+stmmac_mac_select_pcs() as the least likely to break proposition -
+at least given how things are at the moment.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
