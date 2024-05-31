@@ -1,508 +1,224 @@
-Return-Path: <netdev+bounces-99873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D3928D6CE1
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 01:35:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E2DC8D6CFF
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 01:49:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5BC328711E
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 23:35:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E7821C22F8B
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 23:49:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB6A612FB26;
-	Fri, 31 May 2024 23:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA19579DC7;
+	Fri, 31 May 2024 23:49:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kM4aBSbe"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="y9+gHK5r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2077.outbound.protection.outlook.com [40.107.95.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA0C839E2;
-	Fri, 31 May 2024 23:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717198526; cv=none; b=nysY+djdQqN86EEwujI6SVz6y/I9d6bMBxanjT6QfZT2bzrIgD37Dlve0Nl/zYtdKp9AvmdoNgP4q33gyCABaEiq7Lpbz467wkn47P391xLgPo9d6Z9q+DfqiJfSYSuOkUDZgKHT990gVlE21xhfKJDnsaK8rlgc+KjGsqXVJ5c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717198526; c=relaxed/simple;
-	bh=yjMKDi2mlJXGwm4mF/dX3TyydqwW0M56oZq8IfzIOkk=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J9j8/RV3JN3yzUI9jBwwdPlWMPevHdaDvoVrndbFds15Qvj8p8/EIOZw7+/U0aboGYLxjSFFHauuJp04nUQ11Y0gi3+M6Qe85BiR67NlyGVdH5vIDiJa4BZnzY0tCB9z3ew8mjvlaDainlY6m3GXXZNpBEjIv1/d6svPSELMSQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kM4aBSbe; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-354cd8da8b9so2341689f8f.0;
-        Fri, 31 May 2024 16:35:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717198522; x=1717803322; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tU8+I8hHiW5cb39j4MGgMH/Z3VAo01Hmdc4GAMWx2VM=;
-        b=kM4aBSbe5v+gsuYpPYvGQGlvVii/fFyLVS2gWRp0tAzmLQN34TLCwnvZFsUZuR3Gzk
-         NtnvY5tm7V0DQN1tX4y5bs4Zokk+ASwfLUX3BmvhnQy/cz4p23isM6sdDxCvR3Rw+Kys
-         Djz1Zf4lZMeZLu8Pdn48KpD5tn5X7QmNGwHseqMlmcMxXHUuYmPLHysMH7KocB9/97+n
-         r0DaZsSW8AydKezxoZY2N50/kxLDsx2TjDPVpp8RLGKyCh4UOLN8OFS1lolhupKkgU5/
-         WnUzFxkZC4S+1AQO3y/EG4cpT5ctGFJIx1UbQHBwsL+GYSA5KOP+DBJ2GKRPB9XY6ofJ
-         BCAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717198522; x=1717803322;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tU8+I8hHiW5cb39j4MGgMH/Z3VAo01Hmdc4GAMWx2VM=;
-        b=Y/ja0dVRSupliKsctzncYYy5IlpIu3cPUrSdHrwnBY5UCUU0MuVlGGJKi01DEi2PGD
-         3eCGgI498izyQjeolgC4BSKKpQdziqsA6wkPPSyA+x31ZIN6L11ECRu0kS6ZWj+0MBWs
-         cANqjMpt7/MqU7NQKopxBJDbTfqS1GYgfnwH6PP2m7i+4kyeztsFUn+B5PdS21QiZR08
-         /wff+r0083gq1ab307MjmwXiksTkDsNxsuu0yy9VvhJR9HiLXSrMQn6BmbvI+r79xzlH
-         1w9iwZXQMB84tQuBLRniKFGoye/BEXGrGQHElmEfWvYQwi6+giw7ysm9we+riJPK1+7N
-         2yZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU9Al6G8ngz2DJekkVFF8IP1IJaYUJ6prtRa/rQ5Kp6+ZyzDprJ5kSXwMAU2e8lbt8zPKzv+c3hCy5AintagBzII64vOGBdwA2t5p9JeG/2QnEEZNMi/lYP3Wg5LgmV9YFg3Ud/
-X-Gm-Message-State: AOJu0Yyx8XgPYHNOqTcpeJFr+wHxlrXPsNvuY1aNZumPAIGWaiqsN1qG
-	l3OYciNyKXha+HYhRn17dNB+EaAHamk1ojGc3/nQ+hmUOMmekqWT
-X-Google-Smtp-Source: AGHT+IEgEfl8FBkPjCN1xeBqvp8ttXzSctiyV3QnoUHI0x9gpW7rZM1YUMFQ3LL1XX9kg/JXuaJGvQ==
-X-Received: by 2002:a5d:484e:0:b0:355:38e:c391 with SMTP id ffacd0b85a97d-35e0f30ae25mr2516351f8f.51.1717198522209;
-        Fri, 31 May 2024 16:35:22 -0700 (PDT)
-Received: from localhost.localdomain (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-35dd04c9d78sm2779599f8f.27.2024.05.31.16.35.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 May 2024 16:35:21 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Robert Marko <robimarko@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	=?UTF-8?q?Pawe=C5=82=20Owoc?= <frut3k7@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [net-next PATCH v3 2/2] net: phy: aquantia: add support for PHY LEDs
-Date: Sat,  1 Jun 2024 01:35:03 +0200
-Message-ID: <20240531233505.24903-2-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240531233505.24903-1-ansuelsmth@gmail.com>
-References: <20240531233505.24903-1-ansuelsmth@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20DB1E4AD
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 23:49:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717199352; cv=fail; b=m4FaHw3ZGBDSgJwFcqjK/iUeu62eXaCSYGi50Pomm0d065IeoZu45Xp6sSti/71AiMJBa8yFBBtYY2Hh0zInT71d7DHrJPb/BGAYuloBkORkPMnAKeixbx4N1fIf3KQfzHKYuMfaiwvrf45mmRgAtt7CnmhpHk+LQIP2mcUB2Zs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717199352; c=relaxed/simple;
+	bh=Wk0MR3hzD3uCYUCIoJwoRIljeXn3FEL1WaR2d88dScg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=TEgk+8yEfjMPewpCxIEumE2i0DavSYpdMhzGzsAVwTyp68AJsqjUnXz0TE3FDflP+qWI7bGhuJmPDVn1Jxbac9pPGHDPnJ8kFOnkuX+AUUt/oIiL17CuqVBtBKas3suPmoqUEIGwTotWpzVorMKyPsd0bW8n6JMeXvsWVMpLJug=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=y9+gHK5r; arc=fail smtp.client-ip=40.107.95.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Xos+XxYcCz2D0QbwuI9Gde/STIpARUJhOsNFtiPHePMLtQ2Lp+6RcD54+01G499acRG3UmSrO8hy+55McR+NuDfHpOwX8kQL5/SSOxaiOSyKpBvBJPZrIhN67q5zIQA7SUHKS/4lAHtsN8KwqovZqD3TBM8D2dFX+mNiirL0JGBUqWdDDJXPI1JMYqGrFM3hbCQ7Uf5pWl+qtBtiYZVTzptRFBBOEZYwFK5hNAwwAlPep6sPyHC43vuMmvHe4nZtvAJzuvfbKzIleN4NkC/BRq6dbLJfzEsRXeMYxT/gjtihTM1Di6MA52F+g6aM9JfgGYv7D9PbP5pdUFsUYxF7VA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9oYtn3+cqQ7zunVR9kcRJvhwxvqfjTZ95mqcqljnpZQ=;
+ b=cBO43fF/znoJTUN4hAzhqQI525g7Tl/pIL2YBHC/N8b1UuGdGZlKo34uHZNi9M7vQTXM4mvKFckyLHJ4SckU0F0awEl+YfcoDiK4jdJfKCj8ycyAwa+Rdx4ek10jaJ33VkhIEfiIjduz7GsgivdywPR2aR6zHjwZ7e/0fWUUzVXyEJmaAy6ylufV41jNeXF/d9Es2w3DlTf6bNVl9Zv38oOkfDphC1TAU65dfPP5ITTCnsGz1zF4MI5tTNzCyNFINz11m1GCGeJo2JGmYXCylJ4fX/fJIKmTonE59iQT1NcoNjRgYk+WU0gHi/OsgeF+ZI7JntbYcHObdJJ2ciH1cg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9oYtn3+cqQ7zunVR9kcRJvhwxvqfjTZ95mqcqljnpZQ=;
+ b=y9+gHK5rk+0Co+WMk/hnhhRD4bcOfGpTxTqwEebIGbBZaJgXxaMQbx8Q3fMborHyC5AphVvkFICQI71UpGaKCasyo5O4paioMDMMk9A59jRpKLvdUK1F93Fybmc2Oof22yBGOtVGd8Vf3kuR5YFjXsvwZEsEpwGFEHg4uLF3IxA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ CH3PR12MB9396.namprd12.prod.outlook.com (2603:10b6:610:1d0::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7633.21; Fri, 31 May 2024 23:49:04 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::c8a9:4b0d:e1c7:aecb]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::c8a9:4b0d:e1c7:aecb%4]) with mapi id 15.20.7633.018; Fri, 31 May 2024
+ 23:49:04 +0000
+Message-ID: <8c933691-a31b-42ba-b1ed-9bbd20491963@amd.com>
+Date: Fri, 31 May 2024 16:49:01 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 iwl-net 3/8] ice: replace synchronize_rcu with
+ synchronize_net
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, anthony.l.nguyen@intel.com,
+ magnus.karlsson@intel.com, michal.kubiak@intel.com, larysa.zaremba@intel.com
+References: <20240529112337.3639084-1-maciej.fijalkowski@intel.com>
+ <20240529112337.3639084-4-maciej.fijalkowski@intel.com>
+Content-Language: en-US
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <20240529112337.3639084-4-maciej.fijalkowski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY3PR10CA0015.namprd10.prod.outlook.com
+ (2603:10b6:a03:255::20) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|CH3PR12MB9396:EE_
+X-MS-Office365-Filtering-Correlation-Id: c7998f33-743b-4fbe-9c3e-08dc81cc40b8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|376005|366007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ZWNlUi9QejlRakRlajd3QzZxaU1ER0R3RjhKY3pKMEpBZlVxVmJJTVRKSFVw?=
+ =?utf-8?B?N3RjWktrSDk4b1R0Zyt5dkd1WjVONzBJQnlTR0tDZUpQTFp1SitYcUgya09N?=
+ =?utf-8?B?WUVtaEJzU015Rnd1VndyU2xMTVY4cG93ZUVDMUVBRThYOUJwUTlrVkhXRnhT?=
+ =?utf-8?B?RGdBakY1Ny81YlBBYVFPQmFwUndWUmZyaUxkcWFoNTlhZ2huZXBmM2VsQ3h0?=
+ =?utf-8?B?R0ZZRFRGTjcwVXVMclFOU3RiaEYzZXhBaG9KYUNBTDEzVm81NXRFNE5GL2gz?=
+ =?utf-8?B?aTJ0aEFiSEN4UnZXU1VMaW5lZ2FqWW1ybkxWaERtZE5yUVloUm9LRHhyWkxH?=
+ =?utf-8?B?VkFIckg2aFBmbmdpUmZsamU4eGZCMzFNNzI0TStiTk5YTVlRcHM4by9UbDN5?=
+ =?utf-8?B?WFRMZTUxeTI4Z1ptK3ZvamxDVkRvVVczZm8xR0FIMDFNQ1JGUW5MSVUvcG1V?=
+ =?utf-8?B?NkJNeHFXOWh5ZzlaUTFrNCtteG1ORG1SK3RRVGdpZlpMRHlkeVBueXZXQmxH?=
+ =?utf-8?B?dEd4enVKUUoxZlIzaUEyQ0JCNWh1NXR3bFZNRWdnZXFOSUw2TmJ1QUlrWUtk?=
+ =?utf-8?B?eTJFSTBEcGxpb2VFWklDdXZWMUZxQk1sSDN4eEZEYXVaMTBQWERUU29YSVR3?=
+ =?utf-8?B?d3dPOEUxNTlHYXduY0RrRVFwM1UyYzdzZndkTXh3ODFzczk3NWd2NzBKM1hv?=
+ =?utf-8?B?Rml3NE9MMmNYVzBnR05tejhDUlROSDkvd1gzQ0NjQXIwd2ZMdGFkQnA1dVM5?=
+ =?utf-8?B?TGROeS9FQVNYUUV3cGhjKzBCOG5kNC9YTlZOOUlGOTNCSzdTdDAvYllrTnlQ?=
+ =?utf-8?B?bVQxWVZES1hLY2p6RFU2WURqTmpNUGI2VXNoOTlDbnZTK29LT2ZDV1NiWEpz?=
+ =?utf-8?B?MHNTbld3SzNScTNNbXlrTWFqS25TTDJ5djJ5ZDErL1IxdDF0Qnp5bDJEN0J3?=
+ =?utf-8?B?aEh3WjVJcWJVRGszL1hzaUZQNGJibWowQXE3emRoOHRjSVhEUGZHWGxIZWI3?=
+ =?utf-8?B?aUlyYUVkV1g3MTB5cXBYUjlLU1VLSWxvZFgzUXlvTnZ1Y2E5d0hPMG5jaDZx?=
+ =?utf-8?B?Z3YrSlc5OGxoOWtFcVpzNTkzcmdBZkpZcDFBeFpyUGd2RUVEekZBVFo2TzJw?=
+ =?utf-8?B?Qjk4MUhiVmlOZndWVkxoVjFBR0J3dS83dWhvU1J5OEZXejg0WHJRMDkzMkJi?=
+ =?utf-8?B?LzVnWDJTWXpLM24rQjZReVRNU3h4WnFzOVhuekZiSElxK0NYc0RpYWU5UWtj?=
+ =?utf-8?B?ZGtMbG4vdk5PQmsvVlJOS0krRW5zWDZ2NkRMeHZxQWFlUHhQdmprbXU2ZmdX?=
+ =?utf-8?B?NWJ2Y1k1b21MRFhIQm1yTSs1L3o2M0tUb1FqbXZrS0JUbTU4cU50TE9OVnda?=
+ =?utf-8?B?UXcrQWdFUFdPQmllaUhRYjUvdnBaYTB5Q1I5M0svTnhoczR2ZzBSZGp3eHI1?=
+ =?utf-8?B?QmRnbjF3NzJaOGFualRkNHF2d0t4WU1WZXcvbXd2MVc2RkNseUJnTzMycEd3?=
+ =?utf-8?B?RUVnc2wxZEhRc0tobGJrMGxGbFNUYllpT3U3ZmJ0Sy9KL0tqQ2ZnZk0xaFha?=
+ =?utf-8?B?NmQvdXhSSGRjVkxRYjlmRUVzbi83SkQ0d3N4cUp0cVl2bTNobnBYWEF4a2cy?=
+ =?utf-8?B?SDd1anFVeEhwc2txWnE3ckt0REQvcVdwVGVaeStySnNzODh3Lzk4cGYxWGdG?=
+ =?utf-8?B?Y0dyYW5mNzdnNDFwcEFlSjM4MUdLU1pSS1ZTTHNwZkZPLzMvbUpZbGxBPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UldnLzRkSEtrdUFaQmVhYThOY2F0ZEJDeU0xcEd0azVJVm5tQmdwU2dVUmdU?=
+ =?utf-8?B?cFFPaHpyY2paTzJ0LzRQRlhFczNhQUMyQ0JDSTFERkhEeGNaVmE0M05Hd1JY?=
+ =?utf-8?B?S1lCZ1pBT1lqVisxWFlEUEs2OTNmQi9yWitYQWVnVW5sSEpqM3A3WUtEbWM4?=
+ =?utf-8?B?ZUhEY25EbFJXRFJIeVZkT0ZiU0pDQjJVbzhUNHZxRXI4b295bGZsL3JIYkFv?=
+ =?utf-8?B?MjE1WEY2WkRUMm9YWXBYMHJCQnFmL015QzRpdWQ4OGdEdUpYdm1GZFdTMFl1?=
+ =?utf-8?B?a05qb1NXTThJeXZ5UU5ObVZJTmJYM0duQ09NRlRpUXhQdkt2TFpqSGNpME5N?=
+ =?utf-8?B?UUFFbUZhamsvdVF1cjFVank4cjcyZ3R6a3NEdzhyb3QzVjcyV2RQaGlaRURX?=
+ =?utf-8?B?dDZJSSs4UzhpTlZ3NVI4SjdrZkx1WUpzSzNGZ2ExYkwxalJTcE9ienZKRlNS?=
+ =?utf-8?B?TUpZQmgxSVZhUGt4Njc5aEVuSXZhNUxkUG0yTTNZTDlvSC8xMzNtbHdIL0pa?=
+ =?utf-8?B?cVFBZGhUajlhMVlYdGIwK2o0QnVYbTNVbmsxRUNqZUFpbGlaUlVHT2tlbUpn?=
+ =?utf-8?B?bi9wYW1meklEaGhqRFU4ekhVQ1VrS1IvL3htMFdHbjBjK0VhcTQrZ2phd0JG?=
+ =?utf-8?B?MVBKVGxka1pzbms4SGlXUXU0VDZpMkpyWk5xbGNzS3IzSWdySFI5TS80b2tx?=
+ =?utf-8?B?dGhFVzUrNFNDdDlNUE56NzdsZ2lsS3ZaOVpXd0MwNUFVa2g1SXM0eXZ1LzhI?=
+ =?utf-8?B?NTdZODU5SGZLMUFqMU5WSW1icEpoYVh2Rnk2QzFKdnVIQzFBbDlTVWZFS0lZ?=
+ =?utf-8?B?UlZjK1FkQmpycUxUTVNyVVFGcS9oOGV2aXdwVGZzblZWMWNtNWtRMkU0d0NE?=
+ =?utf-8?B?S2JOb21WOGRFM1g2cHRIWS9vVkhyT1l3dlg3ZnY1WElvcFZtTFlzM1dEaVgr?=
+ =?utf-8?B?M2xMeFhEaEtoMDFRcmFucjMrUWFGVUp2ai9hWmRuTGdrUzBNRXNxTURwVGtM?=
+ =?utf-8?B?SmNCeE9XdGs4ODdHYW5jNFFOME9GcktkZm5jVDllUU0yNGVGOGlmY05XN2E1?=
+ =?utf-8?B?RzZvRjZWU3NiUDFQMVpnREdnbVFrOVJDUlBaUnA5NzV1TlJ4R1luSThQdzd3?=
+ =?utf-8?B?MlRjQXVTa25qc282STcvUkhKcVRJNi9ueTJSOEJKaFluOE5IL3ZyWjkvMWRN?=
+ =?utf-8?B?ZzdBVnIzSHVBcnRXR0c1ZmtYaGV1Vmh6bzhOQUtlNFRwVlh1OVlqb0VmUGZt?=
+ =?utf-8?B?L3pwOGtSV3pjVk5VTDRReUJCT0JOajF5NDkwVzFqaytXd1Qyb3RKemJ3UWVu?=
+ =?utf-8?B?eTFKSC9yWkRVUHFsNlpVWU9lT3ExN0xyQ0JtaUN4amFNU3hqb0ttUHQyemNx?=
+ =?utf-8?B?OEVoL0hsYjdVN3F1cS9DM0hhRnRNK1Mxb3J3d3RVbWVFZUc3QytLRWN0RWxM?=
+ =?utf-8?B?bFg3MXJKbVVPVjI2VGlUM3VwbkIxNHAxVGhrcVJqZ0hTeXNNNkN5RjNqaWxv?=
+ =?utf-8?B?V3pLOVBhYzZWUm9jbWZNZk0vbUpJNDROSWJaK2pUUFpLWHlrMUZyWStOL2ov?=
+ =?utf-8?B?WDRzRDJrMytmQnAwWHhwak1ocFV1b0dSWW53eXl5WGhWQ21ySExYdGo3RnZM?=
+ =?utf-8?B?eVdnZnFYMVcyTENLMWk2cnc2S2I3K3RYd1NlTDB3QUN4cFpORWZpNCtoNDNP?=
+ =?utf-8?B?T0ZLTDNpTTE2MG53VkJVWGpLSlM2YTkrMFlLR0xTSkUyOVpCLzRab242NGdl?=
+ =?utf-8?B?ZlU1VktVZHRidEcxRnVxTE0zOW5IQjRPcTNxY21uc0FVUjVvUC81Nnk4TjRl?=
+ =?utf-8?B?L3dNTERuaXI3OUxlbXQyM0NoSUJOQzNTSFVnZlNaL0M4Q05TNlY4ZTVualFl?=
+ =?utf-8?B?YlNNM2NqY0RUUDB6b3hnSkd6UUdXZ0VrNmFWa3VBV3hxVHVkTGVUL3RuTGN6?=
+ =?utf-8?B?blRlYlFXNzZlVmttcjlrY1krN2wyTi9TVlZBcGNhRzNneUpLQnliTHNJR2kx?=
+ =?utf-8?B?RGpMTmMwWUdWb0YvWnNYNnllMTBJRFR5UUNnSHo0MGx5Ujc2OGp6OVpRVWU4?=
+ =?utf-8?B?MHhKcVV6YVR5dG0rdXQzcGJMOEdFak5tZnAyVm9oOFdnSThHZHRicGorRnc3?=
+ =?utf-8?Q?L4FLor883dK5NDBoTL6VRehRD?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c7998f33-743b-4fbe-9c3e-08dc81cc40b8
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2024 23:49:04.0484
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: A882ajVfNIn0oyXy2UGbXibVaZMQpNoktPQYU4Mkdwtd7odUChSq2snaT/upuaIN+R77vUmMAnNPTu+uEyHt1Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9396
 
-From: Daniel Golle <daniel@makrotopia.org>
+On 5/29/2024 4:23 AM, Maciej Fijalkowski wrote:
+> 
+> Given that ice_qp_dis() is called under rtnl_lock, synchronize_net() can
+> be called instead of synchronize_rcu() so that XDP rings can finish its
+> job in a faster way. Also let us do this as earlier in XSK queue disable
+> flow.
+> 
+> Additionally, turn off regular Tx queue before disabling irqs and NAPI.
+> 
+> Fixes: 2d4238f55697 ("ice: Add support for AF_XDP")
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> ---
+>   drivers/net/ethernet/intel/ice/ice_xsk.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
+> index 4f606a1055b0..e93cb0ca4106 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_xsk.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
+> @@ -53,7 +53,6 @@ static void ice_qp_clean_rings(struct ice_vsi *vsi, u16 q_idx)
+>   {
+>          ice_clean_tx_ring(vsi->tx_rings[q_idx]);
+>          if (ice_is_xdp_ena_vsi(vsi)) {
+> -               synchronize_rcu();
+>                  ice_clean_tx_ring(vsi->xdp_rings[q_idx]);
+>          }
 
-Aquantia Ethernet PHYs got 3 LED output pins which are typically used
-to indicate link status and activity.
-Add a minimal LED controller driver supporting the most common uses
-with the 'netdev' trigger as well as software-driven forced control of
-the LEDs.
+With only one statement left in the block you'll probably want to remove 
+the {}'s
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-[ rework indentation, fix checkpatch error and improve some functions ]
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
-Changes v3:
-- Add Reviewed-by tag
-- Use AQR_MAX_LEDS for every ops
-Changes v2:
-- Out of RFC
+sln
 
- drivers/net/phy/aquantia/Makefile        |   2 +-
- drivers/net/phy/aquantia/aquantia.h      |  40 ++++++
- drivers/net/phy/aquantia/aquantia_leds.c | 150 +++++++++++++++++++++++
- drivers/net/phy/aquantia/aquantia_main.c |  63 +++++++++-
- 4 files changed, 252 insertions(+), 3 deletions(-)
- create mode 100644 drivers/net/phy/aquantia/aquantia_leds.c
 
-diff --git a/drivers/net/phy/aquantia/Makefile b/drivers/net/phy/aquantia/Makefile
-index aa77fb63c8ec..c6c4d494ee2a 100644
---- a/drivers/net/phy/aquantia/Makefile
-+++ b/drivers/net/phy/aquantia/Makefile
-@@ -1,5 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0
--aquantia-objs			+= aquantia_main.o aquantia_firmware.o
-+aquantia-objs			+= aquantia_main.o aquantia_firmware.o aquantia_leds.o
- ifdef CONFIG_HWMON
- aquantia-objs			+= aquantia_hwmon.o
- endif
-diff --git a/drivers/net/phy/aquantia/aquantia.h b/drivers/net/phy/aquantia/aquantia.h
-index c79b33d95628..c0e1fd9d7152 100644
---- a/drivers/net/phy/aquantia/aquantia.h
-+++ b/drivers/net/phy/aquantia/aquantia.h
-@@ -63,6 +63,28 @@
- #define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_OVD	BIT(6)
- #define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL	BIT(0)
- 
-+#define VEND1_GLOBAL_LED_PROV			0xc430
-+#define AQR_LED_PROV(x)				(VEND1_GLOBAL_LED_PROV + (x))
-+#define VEND1_GLOBAL_LED_PROV_LINK2500		BIT(14)
-+#define VEND1_GLOBAL_LED_PROV_LINK5000		BIT(15)
-+#define VEND1_GLOBAL_LED_PROV_FORCE_ON		BIT(8)
-+#define VEND1_GLOBAL_LED_PROV_LINK10000		BIT(7)
-+#define VEND1_GLOBAL_LED_PROV_LINK1000		BIT(6)
-+#define VEND1_GLOBAL_LED_PROV_LINK100		BIT(5)
-+#define VEND1_GLOBAL_LED_PROV_RX_ACT		BIT(3)
-+#define VEND1_GLOBAL_LED_PROV_TX_ACT		BIT(2)
-+#define VEND1_GLOBAL_LED_PROV_ACT_STRETCH	GENMASK(0, 1)
-+
-+#define VEND1_GLOBAL_LED_PROV_LINK_MASK		(VEND1_GLOBAL_LED_PROV_LINK100 | \
-+						 VEND1_GLOBAL_LED_PROV_LINK1000 | \
-+						 VEND1_GLOBAL_LED_PROV_LINK10000 | \
-+						 VEND1_GLOBAL_LED_PROV_LINK5000 | \
-+						 VEND1_GLOBAL_LED_PROV_LINK2500)
-+
-+#define VEND1_GLOBAL_LED_DRIVE			0xc438
-+#define VEND1_GLOBAL_LED_DRIVE_VDD		BIT(1)
-+#define AQR_LED_DRIVE(x)			(VEND1_GLOBAL_LED_DRIVE + (x))
-+
- #define VEND1_THERMAL_PROV_HIGH_TEMP_FAIL	0xc421
- #define VEND1_THERMAL_PROV_LOW_TEMP_FAIL	0xc422
- #define VEND1_THERMAL_PROV_HIGH_TEMP_WARN	0xc423
-@@ -125,6 +147,8 @@
- #define VEND1_GLOBAL_INT_VEND_MASK_GLOBAL2	BIT(1)
- #define VEND1_GLOBAL_INT_VEND_MASK_GLOBAL3	BIT(0)
- 
-+#define AQR_MAX_LEDS				3
-+
- struct aqr107_hw_stat {
- 	const char *name;
- 	int reg;
-@@ -149,6 +173,7 @@ static const struct aqr107_hw_stat aqr107_hw_stats[] = {
- 
- struct aqr107_priv {
- 	u64 sgmii_stats[AQR107_SGMII_STAT_SZ];
-+	unsigned long leds_active_low;
- };
- 
- #if IS_REACHABLE(CONFIG_HWMON)
-@@ -158,3 +183,18 @@ static inline int aqr_hwmon_probe(struct phy_device *phydev) { return 0; }
- #endif
- 
- int aqr_firmware_load(struct phy_device *phydev);
-+
-+int aqr_phy_led_blink_set(struct phy_device *phydev, u8 index,
-+			  unsigned long *delay_on,
-+			  unsigned long *delay_off);
-+int aqr_phy_led_brightness_set(struct phy_device *phydev,
-+			       u8 index, enum led_brightness value);
-+int aqr_phy_led_hw_is_supported(struct phy_device *phydev, u8 index,
-+				unsigned long rules);
-+int aqr_phy_led_hw_control_get(struct phy_device *phydev, u8 index,
-+			       unsigned long *rules);
-+int aqr_phy_led_hw_control_set(struct phy_device *phydev, u8 index,
-+			       unsigned long rules);
-+int aqr_phy_led_active_low_set(struct phy_device *phydev, int index, bool enable);
-+int aqr_phy_led_polarity_set(struct phy_device *phydev, int index,
-+			     unsigned long modes);
-diff --git a/drivers/net/phy/aquantia/aquantia_leds.c b/drivers/net/phy/aquantia/aquantia_leds.c
-new file mode 100644
-index 000000000000..0516ac02c3f8
---- /dev/null
-+++ b/drivers/net/phy/aquantia/aquantia_leds.c
-@@ -0,0 +1,150 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* LED driver for Aquantia PHY
-+ *
-+ * Author: Daniel Golle <daniel@makrotopia.org>
-+ */
-+
-+#include <linux/phy.h>
-+
-+#include "aquantia.h"
-+
-+int aqr_phy_led_brightness_set(struct phy_device *phydev,
-+			       u8 index, enum led_brightness value)
-+{
-+	if (index >= AQR_MAX_LEDS)
-+		return -EINVAL;
-+
-+	return phy_modify_mmd(phydev, MDIO_MMD_VEND1, AQR_LED_PROV(index),
-+			      VEND1_GLOBAL_LED_PROV_LINK_MASK |
-+			      VEND1_GLOBAL_LED_PROV_FORCE_ON |
-+			      VEND1_GLOBAL_LED_PROV_RX_ACT |
-+			      VEND1_GLOBAL_LED_PROV_TX_ACT,
-+			      value ? VEND1_GLOBAL_LED_PROV_FORCE_ON : 0);
-+}
-+
-+static const unsigned long supported_triggers = (BIT(TRIGGER_NETDEV_LINK) |
-+						 BIT(TRIGGER_NETDEV_LINK_100) |
-+						 BIT(TRIGGER_NETDEV_LINK_1000) |
-+						 BIT(TRIGGER_NETDEV_LINK_2500) |
-+						 BIT(TRIGGER_NETDEV_LINK_5000) |
-+						 BIT(TRIGGER_NETDEV_LINK_10000)  |
-+						 BIT(TRIGGER_NETDEV_RX) |
-+						 BIT(TRIGGER_NETDEV_TX));
-+
-+int aqr_phy_led_hw_is_supported(struct phy_device *phydev, u8 index,
-+				unsigned long rules)
-+{
-+	if (index >= AQR_MAX_LEDS)
-+		return -EINVAL;
-+
-+	/* All combinations of the supported triggers are allowed */
-+	if (rules & ~supported_triggers)
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
-+int aqr_phy_led_hw_control_get(struct phy_device *phydev, u8 index,
-+			       unsigned long *rules)
-+{
-+	int val;
-+
-+	if (index >= AQR_MAX_LEDS)
-+		return -EINVAL;
-+
-+	val = phy_read_mmd(phydev, MDIO_MMD_VEND1, AQR_LED_PROV(index));
-+	if (val < 0)
-+		return val;
-+
-+	*rules = 0;
-+	if (val & VEND1_GLOBAL_LED_PROV_LINK100)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_100);
-+
-+	if (val & VEND1_GLOBAL_LED_PROV_LINK1000)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_1000);
-+
-+	if (val & VEND1_GLOBAL_LED_PROV_LINK2500)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_2500);
-+
-+	if (val & VEND1_GLOBAL_LED_PROV_LINK5000)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_5000);
-+
-+	if (val & VEND1_GLOBAL_LED_PROV_LINK10000)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_10000);
-+
-+	if (val & VEND1_GLOBAL_LED_PROV_RX_ACT)
-+		*rules |= BIT(TRIGGER_NETDEV_RX);
-+
-+	if (val & VEND1_GLOBAL_LED_PROV_TX_ACT)
-+		*rules |= BIT(TRIGGER_NETDEV_TX);
-+
-+	return 0;
-+}
-+
-+int aqr_phy_led_hw_control_set(struct phy_device *phydev, u8 index,
-+			       unsigned long rules)
-+{
-+	u16 val = 0;
-+
-+	if (index >= AQR_MAX_LEDS)
-+		return -EINVAL;
-+
-+	if (rules & (BIT(TRIGGER_NETDEV_LINK_100) | BIT(TRIGGER_NETDEV_LINK)))
-+		val |= VEND1_GLOBAL_LED_PROV_LINK100;
-+
-+	if (rules & (BIT(TRIGGER_NETDEV_LINK_1000) | BIT(TRIGGER_NETDEV_LINK)))
-+		val |= VEND1_GLOBAL_LED_PROV_LINK1000;
-+
-+	if (rules & (BIT(TRIGGER_NETDEV_LINK_2500) | BIT(TRIGGER_NETDEV_LINK)))
-+		val |= VEND1_GLOBAL_LED_PROV_LINK2500;
-+
-+	if (rules & (BIT(TRIGGER_NETDEV_LINK_5000) | BIT(TRIGGER_NETDEV_LINK)))
-+		val |= VEND1_GLOBAL_LED_PROV_LINK5000;
-+
-+	if (rules & (BIT(TRIGGER_NETDEV_LINK_10000) | BIT(TRIGGER_NETDEV_LINK)))
-+		val |= VEND1_GLOBAL_LED_PROV_LINK10000;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_RX))
-+		val |= VEND1_GLOBAL_LED_PROV_RX_ACT;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_TX))
-+		val |= VEND1_GLOBAL_LED_PROV_TX_ACT;
-+
-+	return phy_modify_mmd(phydev, MDIO_MMD_VEND1, AQR_LED_PROV(index),
-+			      VEND1_GLOBAL_LED_PROV_LINK_MASK |
-+			      VEND1_GLOBAL_LED_PROV_FORCE_ON |
-+			      VEND1_GLOBAL_LED_PROV_RX_ACT |
-+			      VEND1_GLOBAL_LED_PROV_TX_ACT, val);
-+}
-+
-+int aqr_phy_led_active_low_set(struct phy_device *phydev, int index, bool enable)
-+{
-+	return phy_modify_mmd(phydev, MDIO_MMD_VEND1, AQR_LED_DRIVE(index),
-+			      VEND1_GLOBAL_LED_DRIVE_VDD, enable);
-+}
-+
-+int aqr_phy_led_polarity_set(struct phy_device *phydev, int index, unsigned long modes)
-+{
-+	struct aqr107_priv *priv = phydev->priv;
-+	bool active_low = false;
-+	u32 mode;
-+
-+	if (index >= AQR_MAX_LEDS)
-+		return -EINVAL;
-+
-+	for_each_set_bit(mode, &modes, __PHY_LED_MODES_NUM) {
-+		switch (mode) {
-+		case PHY_LED_ACTIVE_LOW:
-+			active_low = true;
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
-+	}
-+
-+	/* Save LED driver vdd state to restore on SW reset */
-+	if (active_low)
-+		priv->leds_active_low |= BIT(index);
-+
-+	return aqr_phy_led_active_low_set(phydev, index, active_low);
-+}
-diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
-index 252123d12efb..6c14355744b7 100644
---- a/drivers/net/phy/aquantia/aquantia_main.c
-+++ b/drivers/net/phy/aquantia/aquantia_main.c
-@@ -475,7 +475,9 @@ static void aqr107_chip_info(struct phy_device *phydev)
- 
- static int aqr107_config_init(struct phy_device *phydev)
- {
--	int ret;
-+	struct aqr107_priv *priv = phydev->priv;
-+	u32 led_active_low;
-+	int ret, index = 0;
- 
- 	/* Check that the PHY interface type is compatible */
- 	if (phydev->interface != PHY_INTERFACE_MODE_SGMII &&
-@@ -496,7 +498,19 @@ static int aqr107_config_init(struct phy_device *phydev)
- 	if (!ret)
- 		aqr107_chip_info(phydev);
- 
--	return aqr107_set_downshift(phydev, MDIO_AN_VEND_PROV_DOWNSHIFT_DFLT);
-+	ret = aqr107_set_downshift(phydev, MDIO_AN_VEND_PROV_DOWNSHIFT_DFLT);
-+	if (ret)
-+		return ret;
-+
-+	/* Restore LED polarity state after reset */
-+	for_each_set_bit(led_active_low, &priv->leds_active_low, AQR_MAX_LEDS) {
-+		ret = aqr_phy_led_active_low_set(phydev, index, led_active_low);
-+		if (ret)
-+			return ret;
-+		index++;
-+	}
-+
-+	return 0;
- }
- 
- static int aqcs109_config_init(struct phy_device *phydev)
-@@ -786,6 +800,11 @@ static struct phy_driver aqr_driver[] = {
- 	.get_strings	= aqr107_get_strings,
- 	.get_stats	= aqr107_get_stats,
- 	.link_change_notify = aqr107_link_change_notify,
-+	.led_brightness_set = aqr_phy_led_brightness_set,
-+	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
-+	.led_hw_control_set = aqr_phy_led_hw_control_set,
-+	.led_hw_control_get = aqr_phy_led_hw_control_get,
-+	.led_polarity_set = aqr_phy_led_polarity_set,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQCS109),
-@@ -805,6 +824,11 @@ static struct phy_driver aqr_driver[] = {
- 	.get_strings	= aqr107_get_strings,
- 	.get_stats	= aqr107_get_stats,
- 	.link_change_notify = aqr107_link_change_notify,
-+	.led_brightness_set = aqr_phy_led_brightness_set,
-+	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
-+	.led_hw_control_set = aqr_phy_led_hw_control_set,
-+	.led_hw_control_get = aqr_phy_led_hw_control_get,
-+	.led_polarity_set = aqr_phy_led_polarity_set,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR111),
-@@ -824,6 +848,11 @@ static struct phy_driver aqr_driver[] = {
- 	.get_strings	= aqr107_get_strings,
- 	.get_stats	= aqr107_get_stats,
- 	.link_change_notify = aqr107_link_change_notify,
-+	.led_brightness_set = aqr_phy_led_brightness_set,
-+	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
-+	.led_hw_control_set = aqr_phy_led_hw_control_set,
-+	.led_hw_control_get = aqr_phy_led_hw_control_get,
-+	.led_polarity_set = aqr_phy_led_polarity_set,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR111B0),
-@@ -843,6 +872,11 @@ static struct phy_driver aqr_driver[] = {
- 	.get_strings	= aqr107_get_strings,
- 	.get_stats	= aqr107_get_stats,
- 	.link_change_notify = aqr107_link_change_notify,
-+	.led_brightness_set = aqr_phy_led_brightness_set,
-+	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
-+	.led_hw_control_set = aqr_phy_led_hw_control_set,
-+	.led_hw_control_get = aqr_phy_led_hw_control_get,
-+	.led_polarity_set = aqr_phy_led_polarity_set,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR405),
-@@ -869,6 +903,11 @@ static struct phy_driver aqr_driver[] = {
- 	.get_strings	= aqr107_get_strings,
- 	.get_stats	= aqr107_get_stats,
- 	.link_change_notify = aqr107_link_change_notify,
-+	.led_brightness_set = aqr_phy_led_brightness_set,
-+	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
-+	.led_hw_control_set = aqr_phy_led_hw_control_set,
-+	.led_hw_control_get = aqr_phy_led_hw_control_get,
-+	.led_polarity_set = aqr_phy_led_polarity_set,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR412),
-@@ -906,6 +945,11 @@ static struct phy_driver aqr_driver[] = {
- 	.get_strings    = aqr107_get_strings,
- 	.get_stats      = aqr107_get_stats,
- 	.link_change_notify = aqr107_link_change_notify,
-+	.led_brightness_set = aqr_phy_led_brightness_set,
-+	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
-+	.led_hw_control_set = aqr_phy_led_hw_control_set,
-+	.led_hw_control_get = aqr_phy_led_hw_control_get,
-+	.led_polarity_set = aqr_phy_led_polarity_set,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR113C),
-@@ -925,6 +969,11 @@ static struct phy_driver aqr_driver[] = {
- 	.get_strings    = aqr107_get_strings,
- 	.get_stats      = aqr107_get_stats,
- 	.link_change_notify = aqr107_link_change_notify,
-+	.led_brightness_set = aqr_phy_led_brightness_set,
-+	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
-+	.led_hw_control_set = aqr_phy_led_hw_control_set,
-+	.led_hw_control_get = aqr_phy_led_hw_control_get,
-+	.led_polarity_set = aqr_phy_led_polarity_set,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR114C),
-@@ -944,6 +993,11 @@ static struct phy_driver aqr_driver[] = {
- 	.get_strings    = aqr107_get_strings,
- 	.get_stats      = aqr107_get_stats,
- 	.link_change_notify = aqr107_link_change_notify,
-+	.led_brightness_set = aqr_phy_led_brightness_set,
-+	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
-+	.led_hw_control_set = aqr_phy_led_hw_control_set,
-+	.led_hw_control_get = aqr_phy_led_hw_control_get,
-+	.led_polarity_set = aqr_phy_led_polarity_set,
- },
- {
- 	PHY_ID_MATCH_MODEL(PHY_ID_AQR813),
-@@ -963,6 +1017,11 @@ static struct phy_driver aqr_driver[] = {
- 	.get_strings	= aqr107_get_strings,
- 	.get_stats	= aqr107_get_stats,
- 	.link_change_notify = aqr107_link_change_notify,
-+	.led_brightness_set = aqr_phy_led_brightness_set,
-+	.led_hw_is_supported = aqr_phy_led_hw_is_supported,
-+	.led_hw_control_set = aqr_phy_led_hw_control_set,
-+	.led_hw_control_get = aqr_phy_led_hw_control_get,
-+	.led_polarity_set = aqr_phy_led_polarity_set,
- },
- };
- 
--- 
-2.43.0
-
+>          ice_clean_rx_ring(vsi->rx_rings[q_idx]);
+> @@ -180,11 +179,12 @@ static int ice_qp_dis(struct ice_vsi *vsi, u16 q_idx)
+>                  usleep_range(1000, 2000);
+>          }
+> 
+> +       synchronize_net();
+> +       netif_tx_stop_queue(netdev_get_tx_queue(vsi->netdev, q_idx));
+> +
+>          ice_qvec_dis_irq(vsi, rx_ring, q_vector);
+>          ice_qvec_toggle_napi(vsi, q_vector, false);
+> 
+> -       netif_tx_stop_queue(netdev_get_tx_queue(vsi->netdev, q_idx));
+> -
+>          ice_fill_txq_meta(vsi, tx_ring, &txq_meta);
+>          err = ice_vsi_stop_tx_ring(vsi, ICE_NO_RESET, 0, tx_ring, &txq_meta);
+>          if (err)
+> --
+> 2.34.1
+> 
+> 
 
