@@ -1,108 +1,168 @@
-Return-Path: <netdev+bounces-99616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 469AC8D57C5
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 03:30:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0240C8D582D
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 03:38:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D898F1F24C1D
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:30:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76F2DB22F8C
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:38:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A20C156;
-	Fri, 31 May 2024 01:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A973BDF6C;
+	Fri, 31 May 2024 01:35:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t/CyCm+d"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="lSo6f6vn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C79B5C89
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 01:30:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2AE5C89;
+	Fri, 31 May 2024 01:35:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717119033; cv=none; b=cJSCEybJ2dRsiWXyZFPbnBe72YGY6eYnk667YmCHFDmxW9swOHRu9hS7HfmrSbMRtoKJuY/StxMDvXWBqFg1w5GeGgu1bPuHvS0eN3lcNG39Nx5HzPd9ud5GO8qpEdXPCOFlbKA2dbgx/XADcuffFdWC61kTY/k+QLlJnOTt4lo=
+	t=1717119312; cv=none; b=rbt4aYcpR4n3VHdFKk/hFL0WZ5u/aN+xdTym48wqyYF6OH+UtK4ci8G5VjUN24tw62lFpYw7wjDnYIuDi50gpRLQ2sWGZ/tnSJz5ZL7pk32DUN6uvT9IVRcf9ymzB8xXaVJ3HNAfElDqyplZ0cZKgHGA3w4wnL8QbyCnNxnkTSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717119033; c=relaxed/simple;
-	bh=gplwgHz1Me2WRmbeY9JqmQgoik6i3sjcmYTeSXrTurw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gH/D1vWQOv9phRmQWf8Mtw68nEghwXYaHcXDZBLcgH1zCyacTu/1LOv//++2LlpZIu9XFT5QcfLs2W4IYPVoHOSHn9/+vOTy6BYSR9GYO2XayeRpLpENeKzN+LL/NiirPgbcrB87um7sKH8yGM9lajraumS6/flTVoQ6T0wkPiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t/CyCm+d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 03A50C32786;
-	Fri, 31 May 2024 01:30:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717119033;
-	bh=gplwgHz1Me2WRmbeY9JqmQgoik6i3sjcmYTeSXrTurw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=t/CyCm+dy5mMqbYCSn/QexoTaEqyZfZTsQ9iyWJdEfh6VKfO49WL2W69kPNRyy1yE
-	 CjbgM8l5yq9KaLDwOXZNBBo3xuPoBSiAF+EilI2geJj0GpIy2iOUylWOTB0AmE0m4D
-	 SgXqDrP4al7Ec2+d1+SsmvrrBlYF6WPQlm5LW2w2ruMz+jeStpIa9hP2APXJXRuZqJ
-	 7F4a7aDrYXrDhR9zAjkGUG36lloOYF7huSOHRt17rSRwTlgtwiBZwEVakwK5Wtfm0Y
-	 tjFeT7BKjzNPFGqrm4aXvW0Tkf/gWlfCBmqovBL9QZWriaF91v6/NHtVkrzj7YM4dJ
-	 FUMWeWShUgBbg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DF754CF21F3;
-	Fri, 31 May 2024 01:30:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1717119312; c=relaxed/simple;
+	bh=TKphNDbRBuukut1Ep2302cA61A0z6FOESwmZlyo0rOw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AA/WhMzg7vSpEwIL1gI6EDEMGLV9vMFicQ5Y5eGdwVHRJgg3bddDHV+aMmEDyfwVtVHH59T6mX9iQsKcXBqYrfApBkiHfV1uXt1gRGqA92OmAFqhcjhI+jHkFb8UtFLHyZ+Rev3VS8N0Hs1QC9pHlc3/PLeOiB6OZ4/TpYk4B+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=lSo6f6vn; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1717119311; x=1748655311;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=TKphNDbRBuukut1Ep2302cA61A0z6FOESwmZlyo0rOw=;
+  b=lSo6f6vnqE6pRgZ1ccpAN/06ZVeTjMsdkgRlKEIoohoLt6Jzr0tqK1WY
+   VxxGJ9KxyacPsj6rcSH7rON8tX+W1aPp2ikCOvDEXcDbpFZOrjZ9qnmZ4
+   d3ZD1RU+Yc7WnkV2LcFWL+M/C7rcJX1x5U6HV/1LxcEoFUS67MWM5bkOk
+   glsxmA48RWUsWnlUwpH3X1FABolprzvMoRnmQoTua07bEH+sizb6aD2C8
+   CTLZ9hwWIMQGyKXmInv78VKPruwNEvG7gD1Wh/fgfYV74WeICs6WFIV4b
+   e3FTG/mz6hgIh7OVRJeux+Rt2oBRJ1q1ql1wJ6FmPl3uAdkwPORdPODdd
+   g==;
+X-CSE-ConnectionGUID: /B7No0VXTMuuzRK/V9lgdw==
+X-CSE-MsgGUID: 01GfK7jXSBOKQb7FeaLGVA==
+X-IronPort-AV: E=Sophos;i="6.08,202,1712646000"; 
+   d="scan'208";a="26781072"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 May 2024 18:35:09 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 30 May 2024 18:34:39 -0700
+Received: from hat-linux.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Thu, 30 May 2024 18:34:38 -0700
+From: <Tristram.Ha@microchip.com>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Tristram Ha
+	<tristram.ha@microchip.com>
+Subject: [PATCH v1 net] net: phy: Micrel KSZ8061: fix errata solution not taking effect problem
+Date: Thu, 30 May 2024 18:38:01 -0700
+Message-ID: <1717119481-3353-1-git-send-email-Tristram.Ha@microchip.com>
+X-Mailer: git-send-email 1.9.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/7] ionic: updates for v6.11
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171711903291.12927.4247643339908614644.git-patchwork-notify@kernel.org>
-Date: Fri, 31 May 2024 01:30:32 +0000
-References: <20240529000259.25775-1-shannon.nelson@amd.com>
-In-Reply-To: <20240529000259.25775-1-shannon.nelson@amd.com>
-To: Nelson@codeaurora.org, Shannon <shannon.nelson@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- brett.creeley@amd.com, drivers@pensando.io
+Content-Type: text/plain
 
-Hello:
+From: Tristram Ha <tristram.ha@microchip.com>
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+KSZ8061 needs to write to a MMD register at driver initialization to fix
+an errata.  This worked in 5.0 kernel but not in newer kernels.  The
+issue is the main phylib code no longer resets PHY at the very beginning.
+Calling phy resuming code later will reset the chip if it is already
+powered down at the beginning.  This wipes out the MMD register write.
+Solution is to implement a phy resume function for KSZ8061 to take care
+of this problem.
 
-On Tue, 28 May 2024 17:02:52 -0700 you wrote:
-> These are a few minor fixes for the ionic driver to clean
-> up a some little things that have been waiting for attention.
-> These were originally sent for net, but now respun for net-next.
-> 
-> v1: https://lore.kernel.org/netdev/20240521013715.12098-1-shannon.nelson@amd.com/
-> 
-> Brett Creeley (3):
->   ionic: Pass ionic_txq_desc to ionic_tx_tso_post
->   ionic: Mark error paths in the data path as unlikely
->   ionic: Use netdev_name() function instead of netdev->name
-> 
-> [...]
+Fixes: 232ba3a51cc2 ("net: phy: Micrel KSZ8061: link failure after cable connect")
+Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+---
+v1
+ - Correct the kernel version to 5.0
 
-Here is the summary with links:
-  - [net-next,v2,1/7] ionic: fix potential irq name truncation
-    https://git.kernel.org/netdev/net-next/c/3eb76e71b16e
-  - [net-next,v2,2/7] ionic: Reset LIF device while restarting LIF
-    https://git.kernel.org/netdev/net-next/c/8097a2f3d21a
-  - [net-next,v2,3/7] ionic: Pass ionic_txq_desc to ionic_tx_tso_post
-    https://git.kernel.org/netdev/net-next/c/4dde9588c54d
-  - [net-next,v2,4/7] ionic: Mark error paths in the data path as unlikely
-    https://git.kernel.org/netdev/net-next/c/d9c04209990b
-  - [net-next,v2,5/7] ionic: Use netdev_name() function instead of netdev->name
-    https://git.kernel.org/netdev/net-next/c/fc53d4652448
-  - [net-next,v2,6/7] ionic: only sync frag_len in first buffer of xdp
-    https://git.kernel.org/netdev/net-next/c/488da00479d5
-  - [net-next,v2,7/7] ionic: fix up ionic_if.h kernel-doc issues
-    https://git.kernel.org/netdev/net-next/c/a54e2a36b68c
+ drivers/net/phy/micrel.c | 42 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 41 insertions(+), 1 deletion(-)
 
-You are awesome, thank you!
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index 2b8f8b7f1517..618e532ee5d7 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -866,6 +866,17 @@ static int ksz8061_config_init(struct phy_device *phydev)
+ {
+ 	int ret;
+ 
++	/* Chip can be powered down by the bootstrap code. */
++	ret = phy_read(phydev, MII_BMCR);
++	if (ret < 0)
++		return ret;
++	if (ret & BMCR_PDOWN) {
++		ret = phy_write(phydev, MII_BMCR, ret & ~BMCR_PDOWN);
++		if (ret < 0)
++			return ret;
++		usleep_range(1000, 2000);
++	}
++
+ 	ret = phy_write_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_DEVID1, 0xB61A);
+ 	if (ret)
+ 		return ret;
+@@ -2085,6 +2096,35 @@ static int kszphy_resume(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++static int ksz8061_resume(struct phy_device *phydev)
++{
++	int ret;
++
++	/* This function can be called twice when the Ethernet device is on. */
++	ret = phy_read(phydev, MII_BMCR);
++	if (ret < 0)
++		return ret;
++	if (!(ret & BMCR_PDOWN))
++		return 0;
++
++	genphy_resume(phydev);
++	usleep_range(1000, 2000);
++
++	/* Re-program the value after chip is reset. */
++	ret = phy_write_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_DEVID1, 0xB61A);
++	if (ret)
++		return ret;
++
++	/* Enable PHY Interrupts */
++	if (phy_interrupt_is_valid(phydev)) {
++		phydev->interrupts = PHY_INTERRUPT_ENABLED;
++		if (phydev->drv->config_intr)
++			phydev->drv->config_intr(phydev);
++	}
++
++	return 0;
++}
++
+ static int kszphy_probe(struct phy_device *phydev)
+ {
+ 	const struct kszphy_type *type = phydev->drv->driver_data;
+@@ -5339,7 +5379,7 @@ static struct phy_driver ksphy_driver[] = {
+ 	.config_intr	= kszphy_config_intr,
+ 	.handle_interrupt = kszphy_handle_interrupt,
+ 	.suspend	= kszphy_suspend,
+-	.resume		= kszphy_resume,
++	.resume		= ksz8061_resume,
+ }, {
+ 	.phy_id		= PHY_ID_KSZ9021,
+ 	.phy_id_mask	= 0x000ffffe,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
