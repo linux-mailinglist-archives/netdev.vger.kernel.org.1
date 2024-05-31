@@ -1,171 +1,111 @@
-Return-Path: <netdev+bounces-99824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35EB68D6990
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 21:16:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E432E8D699D
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 21:18:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8E46B26079
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 19:16:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01E981C25816
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 19:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C34E17FAAB;
-	Fri, 31 May 2024 19:15:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80EEC156F5D;
+	Fri, 31 May 2024 19:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rfluF7TZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ffxUwYbu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D29D17DE1D;
-	Fri, 31 May 2024 19:14:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5D717B51D
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 19:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717182900; cv=none; b=WaKzJlZWHVqp8DvmBAZedB/KNJF8Axe0Q4N06u/0FgyGgn+gKIA7FrZ/GW71+a8VR6X3DkkXGBjhkeM3mJK9M5GOESRd6L334GfVIqhEFbWnw3R0IWYpwGOINK3GOvONpY8gxD6o0e+1FHoQDMsNICGIWaJ8AN1G85Rdw2DHhM4=
+	t=1717183019; cv=none; b=Sla9+vwzefppdIwrvNYqpw4T6Uf+CFiNpOGxPLHl8WhndpGvfppCkmF1hItbcmFDrr4+8bhUt5vQ0atdm7ueN2tPgJWSn1zWG2MqG3n9alFSOEH+ZX0rqDA4hq23AcESqW31DbgE6okZ2UPNMrJ0+AlaGmz+2mNs3mEuqmSioSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717182900; c=relaxed/simple;
-	bh=Mz67Iw49GR9dHuxCXZEK5DP7jtaPkYbVmfaXomUh4Hg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=X2VBwwyT6chmqpgkNmbCJ2a8Nb0MdB/yIxzPymQ7boXn4mbsdASgy42hUbnBfXD9NQO37v9QjgYUaIIBg0H8MvjtStc/jgHUCFCuRUqaBFjIY+oysDGcz2aRjXsU9VDU45VcpdnTrihrKY0fAjuEU1QlGxfrVjVGdDHzNoKXS5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rfluF7TZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C83B3C4AF14;
-	Fri, 31 May 2024 19:14:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717182899;
-	bh=Mz67Iw49GR9dHuxCXZEK5DP7jtaPkYbVmfaXomUh4Hg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rfluF7TZUaUoGLyXwpABguT3qbLtGxJfRuvK1/sobxp2PtxVb1OvM+4f6W0OqHeBZ
-	 HVCzHLuNgSXNbiDvOWo9b7sp150CFJMu2u5Um36A0qhgQrBPy7TMnrLGv3uzbjkyag
-	 ETb5sbk1uj1K2LerZ6n2j87yVt5dO/HIggUL9fZR7Aul0NbBjm/n43QC1+Hv51nB1k
-	 mp09o+nVaHmN5D0x1KPcjGlapgB2ZG4WFgEWl5AlJB9c52+E8mPLywMYlQsclIHxnr
-	 9KCd1BNYNPs9QuW+MPJzXFiKHsSxEdrofPeS5TkNIhK1n3PkfEQEpc0GwQ/T7EUEsr
-	 q8HVHOW9Ln5Yw==
-From: Kees Cook <kees@kernel.org>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Kees Cook <kees@kernel.org>,
-	"GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
-	Xiu Jianfeng <xiujianfeng@huawei.com>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Jann Horn <jannh@google.com>,
-	Matteo Rizzo <matteorizzo@google.com>,
-	jvoisin <julien.voisin@dustri.org>,
-	linux-mm@kvack.org,
-	Christoph Lameter <cl@linux.com>,
-	Pekka Enberg <penberg@kernel.org>,
-	David Rientjes <rientjes@google.com>,
-	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Hyeonggon Yoo <42.hyeyoo@gmail.com>,
-	Thomas Graf <tgraf@suug.ch>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v4 6/6] mm/util: Use dedicated slab buckets for memdup_user()
-Date: Fri, 31 May 2024 12:14:58 -0700
-Message-Id: <20240531191458.987345-6-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240531191304.it.853-kees@kernel.org>
-References: <20240531191304.it.853-kees@kernel.org>
+	s=arc-20240116; t=1717183019; c=relaxed/simple;
+	bh=2TN1+yUFYmFNZ90rtkyuDL+QOaavawjDVTSZRbDBu1E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=j6YPbkwhwDmhALnv3UvkBGUVlb51Z/LuIOSOokCbctoxMY8fhZPhkkpPlMzVWGUZTIiPPUzbvJtQ+W3JvWLXC2R9eqeiepfLIJWWcmwIcW1+NSEZAjlF2W90k1DBQ3fIc6e8F6HS9X+rBfhi4eUKfQYF3mQNVMVV5H9Hd9ymO1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ffxUwYbu; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57a16f4b8bfso4029a12.0
+        for <netdev@vger.kernel.org>; Fri, 31 May 2024 12:16:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717183016; x=1717787816; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2TN1+yUFYmFNZ90rtkyuDL+QOaavawjDVTSZRbDBu1E=;
+        b=ffxUwYbu6MGJqbjNm6vdyr10PWvkhCwgX+RlIWGJghrzc0SO9gZ98XjXEKKt+lWK+2
+         UOWGP9l3ddXbRvF1UYsiSqaS1DNWgQV4N7Z1O9IbHrQCALHHr0fhaYZxe0Jr2w54zNwe
+         RWjQZACpPnivOdtvqZf6JU9xPNLunqsPrG2tt5lzaxRWuDk1im6dWfuPoMEkKr9Def3/
+         mJU+CxBj80nQyqhlxgGjKt1ofqH6EpSo7ncFs6Ia5genyCfr1drWcopNnI3Cp1z0hy4b
+         1WrSx1t/DyYX2j9wzm9EaIodLHSBOK9Mhw6EgbY5ZWtn++IZJRidzXua4o0UChxKuvdM
+         u+Lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717183016; x=1717787816;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2TN1+yUFYmFNZ90rtkyuDL+QOaavawjDVTSZRbDBu1E=;
+        b=aVd9UJTuJLVelc2Ju57XN9lcp4aKDyRI8KMmnKXGGyykeLI7s4pwnbjPYw1UgJKTYO
+         25EdqfA/dt8KfEDYIFPoT9gfwLGKgbtqaRv5HiDwVhM7WmE2w7R6cRyATaH9H3coCGro
+         ZtDalXR51M7xQ5cd+kAH88BHa6k/HzK635dL3ZAvS+srZsk0m3xGD3HOMUIzPfWZTyZ6
+         9UPwnAER4s6xeCGa/g2rsIZGBqk101tdOjHrVG55u0J5Z5mHXPJgO/RTVrsN7VZ35hBU
+         f8pmv7kq+WTNeCD2y1vGOfMONzSUVKF8P5CVZa2/lYJkk9AAVxvdzBPOnjuz4bG3+jLU
+         M2cw==
+X-Gm-Message-State: AOJu0Yxc4eEwZb39FDKB0isluASfy5uG2ZT9kOO1DLu0dDonCBk3DhfM
+	RbOG2RF50B1qWPYSEW+KEiVZMqcku3VFGR4p0puFQnWcSi+rvEAFlHWtqz6Z1gHUoXwiu4fhYyW
+	M8N1PY901jV19INP53Tcjdi+r1rnIVysc4oob
+X-Google-Smtp-Source: AGHT+IHh/ooU8c2Toxh7cOMgiwd8L54fyK0d/tqwFQvwxmfHQhfUtt+SzgIAVhpsHannXCfVs6nAPGDb+xXyz9YZn4c=
+X-Received: by 2002:a05:6402:31f3:b0:576:b1a9:2960 with SMTP id
+ 4fb4d7f45d1cf-57a46790f45mr19873a12.5.1717183015872; Fri, 31 May 2024
+ 12:16:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3128; i=kees@kernel.org; h=from:subject; bh=Mz67Iw49GR9dHuxCXZEK5DP7jtaPkYbVmfaXomUh4Hg=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBmWiGxTogF+aXNFJapX/Rt8xhEoMFuFnyE/DJdq wqt+/Xyp5mJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZlohsQAKCRCJcvTf3G3A JjfaD/9HhI1ZsSAtkAsPWK/ezBjLTmg9GWtl4cRE5dSCRoRpeonv9zJFzQSi/z6q8G0WsUdqG3O q3/OwvDkzuj5PVGBcnx18cxE+4jWy8wzjmDguTWCRaey3mtxit/8c4XHxisL60NntcKaMbwh1TN oi5hUUUDQgI71vHIiuoXRO7zD2LY7dCXiUhbTkKyehfUbQRNzSdc/2Pk73vDhtorWRkwDBJmAt0 uJkgJBPYxsUVHdzXRNgA49jdAloxUMLEOmlZE05GQz2kMjakueNT/8zW4hXJ7jhtvqRqOReYkWa CEnpQa2OzgwYHWFfEWJWI7MsyPy4M4h8Wy4r9jHIAPv1ZI/zkUTPZU9UmIpqDWi86FrEhYHDeqP 4CzdIm2QHlf9rFaFB3G8u+OmTO+U4UQPGxK10sZ/JNM5bmYPRvtF136Lz2cZZp6pDXpW5RIA31c pW3P212pGt3TZNiDXGRd6TG/m06XADFHeuA1H2z1/DCG0Pn0C2r1aG4jC/EWrlOH+81naGmWRHk YVXH7L3KauzmbodVlUZRHUYFlOFEtHjHjfnJWGZw1CIhpNZexJHeN8T4/Fl3NWTgqC6GdfKMkWI xvelqd86qCJCCvYtZVCbFr4MHOoTH1oyU+I8dvyKYQlqyqeJi07lpI6JnOevOTL03LyuLUsgq9e +5WiQK2W0zfBIpA==
-X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+References: <cover.1717105215.git.yan@cloudflare.com> <9be3733eee16bb81a7e8e2e57ebcc008f95cae08.1717105215.git.yan@cloudflare.com>
+ <CANn89iLo6A__U5HqeA65NuBnrg36jpt9EOUC7T0fLdNEpa6eRQ@mail.gmail.com>
+ <CAO3-PboQ68+xFe4Z10L-s-k3NCgciGXNWM00-3wgqbPmGaBB9A@mail.gmail.com>
+ <CANn89iJ_rd_vUH1LPbby5vV=s=jWdpzvDKnm6H1YK=wRPWBiyw@mail.gmail.com> <CAO3-PbqaiqWvc1vgHzj2-DEQUPCxTByp4r+zTBWyo-XP4u1G4A@mail.gmail.com>
+In-Reply-To: <CAO3-PbqaiqWvc1vgHzj2-DEQUPCxTByp4r+zTBWyo-XP4u1G4A@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 31 May 2024 21:16:41 +0200
+Message-ID: <CANn89iLrKwA7zQW4zMMDtAQy16vJGhX+wzfpFeQgTdyzVWhc8g@mail.gmail.com>
+Subject: Re: [RFC net-next 1/6] net: add kfree_skb_for_sk function
+To: Yan Zhai <yan@cloudflare.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	David Ahern <dsahern@kernel.org>, Abhishek Chauhan <quic_abchauha@quicinc.com>, 
+	Mina Almasry <almasrymina@google.com>, Florian Westphal <fw@strlen.de>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, David Howells <dhowells@redhat.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Lorenzo Bianconi <lorenzo@kernel.org>, 
+	Pavel Begunkov <asml.silence@gmail.com>, linux-kernel@vger.kernel.org, 
+	kernel-team@cloudflare.com, Jesper Dangaard Brouer <hawk@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Both memdup_user() and vmemdup_user() handle allocations that are
-regularly used for exploiting use-after-free type confusion flaws in
-the kernel (e.g. prctl() PR_SET_VMA_ANON_NAME[1] and setxattr[2][3][4]
-respectively).
+On Fri, May 31, 2024 at 9:05=E2=80=AFPM Yan Zhai <yan@cloudflare.com> wrote=
+:
+>
 
-Since both are designed for contents coming from userspace, it allows
-for userspace-controlled allocation sizes. Use a dedicated set of kmalloc
-buckets so these allocations do not share caches with the global kmalloc
-buckets.
+> I don't quite follow it. I think this specific commit using skb->cb is
+> unnecessary so I am going to re-work it. As you initially mentioned,
+> maybe I should just extend kfree_skb tracepoint. I saw a similar
+> change dd1b527831a3("net: add location to trace_consume_skb()"), is it
+> something I might follow, or do you specifically mean changes like
+> this can annoy stable teams?
+>
 
-After a fresh boot under Ubuntu 23.10, we can see the caches are already
-in active use:
+I do not think trace points arguments are put in stone.
 
- # grep ^memdup /proc/slabinfo
- memdup_user-8k         4      4   8192    4    8 : ...
- memdup_user-4k         8      8   4096    8    8 : ...
- memdup_user-2k        16     16   2048   16    8 : ...
- memdup_user-1k         0      0   1024   16    4 : ...
- memdup_user-512        0      0    512   16    2 : ...
- memdup_user-256        0      0    256   16    1 : ...
- memdup_user-128        0      0    128   32    1 : ...
- memdup_user-64       256    256     64   64    1 : ...
- memdup_user-32       512    512     32  128    1 : ...
- memdup_user-16      1024   1024     16  256    1 : ...
- memdup_user-8       2048   2048      8  512    1 : ...
- memdup_user-192        0      0    192   21    1 : ...
- memdup_user-96       168    168     96   42    1 : ...
-
-Link: https://starlabs.sg/blog/2023/07-prctl-anon_vma_name-an-amusing-heap-spray/ [1]
-Link: https://duasynt.com/blog/linux-kernel-heap-spray [2]
-Link: https://etenal.me/archives/1336 [3]
-Link: https://github.com/a13xp0p0v/kernel-hack-drill/blob/master/drill_exploit_uaf.c [4]
-Signed-off-by: Kees Cook <kees@kernel.org>
----
-Cc: "GONG, Ruiqi" <gongruiqi@huaweicloud.com>
-Cc: Xiu Jianfeng <xiujianfeng@huawei.com>
-Cc: Suren Baghdasaryan <surenb@google.com>
-Cc: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: Jann Horn <jannh@google.com>
-Cc: Matteo Rizzo <matteorizzo@google.com>
-Cc: jvoisin <julien.voisin@dustri.org>
-Cc: linux-mm@kvack.org
----
- mm/util.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/mm/util.c b/mm/util.c
-index 53f7fc5912bd..f30460c82641 100644
---- a/mm/util.c
-+++ b/mm/util.c
-@@ -198,6 +198,16 @@ char *kmemdup_nul(const char *s, size_t len, gfp_t gfp)
- }
- EXPORT_SYMBOL(kmemdup_nul);
- 
-+static kmem_buckets *user_buckets __ro_after_init;
-+
-+static int __init init_user_buckets(void)
-+{
-+	user_buckets = kmem_buckets_create("memdup_user", 0, 0, 0, INT_MAX, NULL);
-+
-+	return 0;
-+}
-+subsys_initcall(init_user_buckets);
-+
- /**
-  * memdup_user - duplicate memory region from user space
-  *
-@@ -211,7 +221,7 @@ void *memdup_user(const void __user *src, size_t len)
- {
- 	void *p;
- 
--	p = kmalloc_track_caller(len, GFP_USER | __GFP_NOWARN);
-+	p = kmem_buckets_alloc_track_caller(user_buckets, len, GFP_USER | __GFP_NOWARN);
- 	if (!p)
- 		return ERR_PTR(-ENOMEM);
- 
-@@ -237,7 +247,7 @@ void *vmemdup_user(const void __user *src, size_t len)
- {
- 	void *p;
- 
--	p = kvmalloc(len, GFP_USER);
-+	p = kmem_buckets_valloc(user_buckets, len, GFP_USER);
- 	if (!p)
- 		return ERR_PTR(-ENOMEM);
- 
--- 
-2.34.1
-
+If they were, I would nack the addition of new tracepoints, to prevent
+ossification.
 
