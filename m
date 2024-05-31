@@ -1,82 +1,117 @@
-Return-Path: <netdev+bounces-99630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD8DF8D5882
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 04:08:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AAA2D8D5895
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 04:21:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 264A6B22710
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 02:08:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C267B22DFF
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 02:20:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E636BFCA;
-	Fri, 31 May 2024 02:08:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE5474E3D;
+	Fri, 31 May 2024 02:20:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CCaU9/GI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AYC6kPFD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7561D4C7C
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 02:08:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0852A4C6D;
+	Fri, 31 May 2024 02:20:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717121289; cv=none; b=HC9684Az9ILAeQTzpW489st94sXU67PPTcWa4qI50+N2DqIetMDYLqJ0A3WQTvIZcR0t6yTO9KTqMj7xb9WBRAXc44INCNK4yUd7Rl+FFUvFYAygZc8270776zK+r6AYZDrbnSsw6UoDFT8h++GgrKdwZpryP+vEtgVglf+T5+M=
+	t=1717122053; cv=none; b=qJN6LtxxE6xEde2u3fWcV4o+nC+y1UwXWReNiYSrJWfbh5C/if6yhVSk6f5qq1jmyeOe/gGLBlIF8ZOTXAndpgojI0tbcd0gxghHGow6srpyJT5M7Ndr9ncvSaaS1/6xwVuVYJR1bi9x33pClGOJd2EwYJ0INAxdIAxqbkN6Hzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717121289; c=relaxed/simple;
-	bh=5MC0SOOF/9jNNucsP57aN323scpYQHPWMS1SOinKQqs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cNIud8wBkZ8muoTcUDw8bU/vT1i+2FdFq3RGW/uOjwlwV+5Y+eWlhLiAtUNrS6bRuteHHzFK5kDkaXXu4C4PHCc4RBrixNUq6jlLj6wCKbRTq36BKn+GF743wP2vFexAfzwDPG13UOj2bMO3i3vF0+mvowYG4YjhdeuXDiMhml4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CCaU9/GI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B17B9C2BBFC;
-	Fri, 31 May 2024 02:08:08 +0000 (UTC)
+	s=arc-20240116; t=1717122053; c=relaxed/simple;
+	bh=b5G/xzCKKv13+PNvSDpcSoc6cOLXomTBBZTbM3WNl+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BMzdU36xnguHz19KBSNUPL6f/7K0BugDCo/a57c27SOqc2ykg2dpQGfXjUKPMXC7OSUtBodwS5xf2CyMC6a7ZY5V0vRu+cSDCO6LLOvfPVQgioHW+/I9p75Fudj3gzUO8PlWqAcqCQwTQ38EkylQZLCLWY7LKbMweq1YrR/IMTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AYC6kPFD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 028B2C2BBFC;
+	Fri, 31 May 2024 02:20:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717121289;
-	bh=5MC0SOOF/9jNNucsP57aN323scpYQHPWMS1SOinKQqs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CCaU9/GIRndHSn7Hcqv73HTz9Pb2qXuHSXD62RdT9EiqhKCLlKj8EVYIffG19n/UD
-	 HmiTZkSwFRH8dd9Ms+pROdo2r+8YuuEH8Y31wWsxQx5SFAaCl7fzh55PP5hCQsub7g
-	 gsgIEVxezf7JMaZREAHv4ACfpZW16c286Rq4+WHyv3oDtVCrv5GqmkHWGdcvjNAFuY
-	 T3JcMLukAGO4EfuJgvscQIdqngopD/TPzSRKPbYcVPdVWdNykM4/Eog9wOhObwCIJ9
-	 NDIYC6WIr7yFx1zjmo0gSU2lhBr6oIsWy63qeK35Ztsk/icga37EzpLWn6a+DcrJkh
-	 iCA4hX87rM4MA==
-Date: Thu, 30 May 2024 19:08:07 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: David Miller <davem@davemloft.net>, netdev <netdev@vger.kernel.org>,
- Larysa Zaremba <larysa.zaremba@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Simon Horman <horms@kernel.org>, Chandan
- Kumar Rout <chandanx.rout@intel.com>
-Subject: Re: [PATCH net 3/6] ice: remove af_xdp_zc_qps bitmap
-Message-ID: <20240530190807.56956a36@kernel.org>
-In-Reply-To: <20240530-net-2024-05-30-intel-net-fixes-v1-3-8b11c8c9bff8@intel.com>
-References: <20240530-net-2024-05-30-intel-net-fixes-v1-0-8b11c8c9bff8@intel.com>
-	<20240530-net-2024-05-30-intel-net-fixes-v1-3-8b11c8c9bff8@intel.com>
+	s=k20201202; t=1717122052;
+	bh=b5G/xzCKKv13+PNvSDpcSoc6cOLXomTBBZTbM3WNl+Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AYC6kPFDmbrWlFSPd9ew7nngeX7vNnr7ubo6m9b2OyqpSVvNr9Q8uOXF8czbmW329
+	 hAMZAcC4V57o7n/GKhiLNhD6YeGftel6CgNbC9WQctIo0hrmBGfQuHjIWWzmsAmlvb
+	 JnaxB7ChCJyWD8KJo6Wn7BnKMdiBznYh4hKn6gjWpyU7R9JYYwYQA3a6N4VRSZT268
+	 wDAWVRGuUaqLVlfNCd9QEI/q0r/+8/3Xf23cYFxgVBkAxZUCUe/yue9txfFzQ/fr4K
+	 hVFb4of589BAsJUL6hVkvmusxUoILUcdQYNjKrsziUWjldRgk0RMdSIjwVc3hG1bhe
+	 U+MvwDYRDWjYg==
+Date: Thu, 30 May 2024 19:20:50 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Lizhi Xu <lizhi.xu@windriver.com>
+Cc: coreteam@netfilter.org, davem@davemloft.net, fw@strlen.de,
+	jaegeuk@kernel.org, kadlec@netfilter.org, kuba@kernel.org,
+	linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	pablo@netfilter.org,
+	syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com, tytso@mit.edu
+Subject: Re: [PATCH] ext4: add casefolded file check
+Message-ID: <20240531022050.GB1502@sol.localdomain>
+References: <20240531010513.GA9629@sol.localdomain>
+ <20240531014747.1386219-1-lizhi.xu@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240531014747.1386219-1-lizhi.xu@windriver.com>
 
-On Thu, 30 May 2024 10:39:30 -0700 Jacob Keller wrote:
-> +/**
-> + * ice_get_xp_from_qid - get ZC XSK buffer pool bound to a queue ID
-> + * @vsi: pointer to VSI
-> + * @qid: index of a queue to look at XSK buff pool presence
-> + *
-> + * Returns a pointer to xsk_buff_pool structure if there is a buffer pool
-> + * attached and configured as zero-copy, NULL otherwise.
-> + */
+On Fri, May 31, 2024 at 09:47:47AM +0800, 'Lizhi Xu' via syzkaller-bugs wrote:
+> On Thu, 30 May 2024 18:05:13 -0700, Eric Biggers wrote:
+> > > The file name that needs to calculate the siphash must have both flags casefolded
+> > > and dir at the same time, so before calculating it, confirm that the flag meets
+> > > the conditions.
+> > >
+> > > Reported-by: syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com
+> > > Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+> > > ---
+> > >  fs/ext4/hash.c | 4 ++++
+> > >  1 file changed, 4 insertions(+)
+> > >
+> > > diff --git a/fs/ext4/hash.c b/fs/ext4/hash.c
+> > > index deabe29da7fb..c8840cfc01dd 100644
+> > > --- a/fs/ext4/hash.c
+> > > +++ b/fs/ext4/hash.c
+> > > @@ -265,6 +265,10 @@ static int __ext4fs_dirhash(const struct inode *dir, const char *name, int len,
+> > >  		__u64	combined_hash;
+> > >
+> > >  		if (fscrypt_has_encryption_key(dir)) {
+> > > +			if (!IS_CASEFOLDED(dir)) {
+> > > +				ext4_warning_inode(dir, "Siphash requires Casefolded file");
+> > > +				return -2;
+> > > +			}
+> > >  			combined_hash = fscrypt_fname_siphash(dir, &qname);
+> > >  		} else {
+> > >  			ext4_warning_inode(dir, "Siphash requires key");
+> > 
+> > First, this needs to be sent to the ext4 mailing list (and not to irrelevant
+> > mailing lists such as netdev).  Please use ./scripts/get_maintainer.pl, as is
+> > recommended by Documentation/process/submitting-patches.rst.
+> > 
+> > Second, ext4 already checks for the directory being casefolded before allowing
+> > siphash.  This is done by dx_probe().  Evidently syzbot found some way around
+> > that, so what needs to be done is figure out why that happened and what is the
+> > best fix to prevent it.  This is not necessarily the patch you've proposed, as
+> > the real issue might actually be a missing check at some earlier time like when
+> > reading the inode from disk or when mounting the filesystem.
+> I have confirmed that there is no casefolded feature when creating the directory.
+> I agree with your statement that it should be checked for casefold features when
+> mounting or reading from disk.
+> 
 
-drivers/net/ethernet/intel/ice/ice.h:758: warning: No description found for=
- return value of 'ice_get_xp_from_qid'
+I haven't looked at the syzbot reproducer, but I'm guessing that the
+DX_HASH_SIPHASH is coming from s_def_hash_version in the filesystem superblock.
+It's not valid to have DX_HASH_SIPHASH there, and it probably would make more
+sense to validate that at mount time.
 
-(BTW sorry I didn't manage to get to your series for net-next today =F0=9F=
-=98=A3=EF=B8=8F)
---=20
-pw-bot: cr
+- Eric
 
