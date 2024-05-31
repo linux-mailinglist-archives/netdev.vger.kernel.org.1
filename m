@@ -1,116 +1,108 @@
-Return-Path: <netdev+bounces-99632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D4998D58AA
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 04:38:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ACA58D58E2
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 05:08:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 459A228651F
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 02:38:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB53FB2339A
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 03:08:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB5E78269;
-	Fri, 31 May 2024 02:38:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="UxBobHUs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB4678C6D;
+	Fri, 31 May 2024 03:08:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53311F16B;
-	Fri, 31 May 2024 02:38:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A5F36134;
+	Fri, 31 May 2024 03:08:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717123117; cv=none; b=WtVksWWePbUuo7FED+ePlaQtLXUIdEuzt0UkFDuFPdhUgOJqi/rFQYDwVc77hOMMZn/3etxPaQfy6Auj8nUK1GTp28w9KaM8PttXRm6yr2YxJuZ95PrlF3B+Fho4srtZJChKMaMk3qw+ZNzusuOt/YHyw6E8EzBqXDN/XUgIYYc=
+	t=1717124888; cv=none; b=TswiXIjgVi/3FdCXLIIYFsFEpQ9jAQdp8UeXTMNmoezkOOkDDx9xruVkSTKLuvcByABGY70CEs/CrrEqkoKMMxz/O3XJXXB4LrGcqTjaJCoLsAlCtnw7/MSMiRiqGGtrQAXk4Nd9bTl7faQWe9VS4eG2JIRKspCBT5L5vJvsMxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717123117; c=relaxed/simple;
-	bh=rxh9sVn7HASgC784iwT/sLpCZlAS7XWdGXXksQAs2nI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=iOoAV6t3rlPc9eeMGAdVeLH3vrjCc9ZA6quKs8PmRzAD2qVD8jQihqvN3PUvWcGNADxQ73if1NnDBtPulpFyy5MOYcZsKpWd6jWo2/wFQ+T5zEGsE9+GKUA2HBYpxvHxpK9qHoyJuZaBLRbcOLwxGHrl0h7fbZU3K3xdlhoQk00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=UxBobHUs; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1717123107;
-	bh=eMFPK0u+EsMV50uPGvRYMXzeCximC+x+ai1u0XQ0Y9I=;
-	h=Date:From:To:Cc:Subject:From;
-	b=UxBobHUslnwQhnRqFvXypMWyXjzSaB6W4+nKmzshxM7VzuFm5POpQ7DcY51+HkKml
-	 XXgphJ7juZdVuciGJXTjZaytjkNc3DKHjGzxB8tr2cFwYBmB4qBEzQmFksg/znk+Nu
-	 D9DKehl0YlBvYzzwtu9XHIeVtUgl/eqs/V1B7lH0FC5u21nvkyZtoDuBldeuCJtFY2
-	 ZrsAkpXywRbIARuEIpOCyD2ZiLGWWFe4tGotAWHM+EcIGj4FvdhE7GI1vyun9VAS1X
-	 BKVFgTsiXuG6uFsOWkEr1hXLzUmvX5l9cuob0Vp1ZSiTRqmLdzy68fGd7ZqSXbbhgl
-	 hgoJXTGUof4AQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Vr6kB70Y6z4wyQ;
-	Fri, 31 May 2024 12:38:26 +1000 (AEST)
-Date: Fri, 31 May 2024 12:38:22 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, MD Danish Anwar <danishanwar@ti.com>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <20240531123822.3bb7eadf@canb.auug.org.au>
+	s=arc-20240116; t=1717124888; c=relaxed/simple;
+	bh=YRSUgk6swjRvnBPRLMjfQT2uYJPFNmeIsKM0ICz4PlU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XFoIluQIPdQERnOzP7FNpK3wvdlwpESuenUL9au7FAvhsXUpcZcH0LbEMFniXohKDLBRnw1ztadket32adhvr92BDXPKTalNqHMvuHCB6D/lChj/jV4EAa46I9Yr4Hhu6snmTOQENn/YPEmctZYan9q28sP4WX65MzmQYnd2NZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44V2wIL9001103;
+	Thu, 30 May 2024 20:07:50 -0700
+Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3yf5pd80wx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Thu, 30 May 2024 20:07:50 -0700 (PDT)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 30 May 2024 20:07:45 -0700
+Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.39 via Frontend Transport; Thu, 30 May 2024 20:07:41 -0700
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <ebiggers@kernel.org>
+CC: <coreteam@netfilter.org>, <davem@davemloft.net>, <fw@strlen.de>,
+        <jaegeuk@kernel.org>, <kadlec@netfilter.org>, <kuba@kernel.org>,
+        <linux-fscrypt@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <lizhi.xu@windriver.com>, <netdev@vger.kernel.org>,
+        <netfilter-devel@vger.kernel.org>, <pablo@netfilter.org>,
+        <syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com>,
+        <syzkaller-bugs@googlegroups.com>, <tytso@mit.edu>
+Subject: [PATCH V2] ext4: add casefolded feature check before setup encrypted info
+Date: Fri, 31 May 2024 11:07:40 +0800
+Message-ID: <20240531030740.1024475-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240531010513.GA9629@sol.localdomain>
+References: <20240531010513.GA9629@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/T_qxduSg5ONj0V1Rt.aIDlL";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: yI9wjQvpvni-JHf5Al8qA9yHzSaM7lnS
+X-Proofpoint-ORIG-GUID: yI9wjQvpvni-JHf5Al8qA9yHzSaM7lnS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-30_21,2024-05-30_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ suspectscore=0 phishscore=0 clxscore=1015 lowpriorityscore=0 mlxscore=0
+ malwarescore=0 adultscore=0 priorityscore=1501 impostorscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.21.0-2405170001 definitions=main-2405310023
 
---Sig_/T_qxduSg5ONj0V1Rt.aIDlL
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Due to the current file system not supporting the casefolded feature, only 
+i_crypt_info was initialized when creating encrypted information, without actually
+setting the sighash. Therefore, when creating an inode, if the system does not 
+support the casefolded feature, encrypted information will not be created.
 
-Hi all,
+Reported-by: syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com
+Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+---
+ fs/ext4/ialloc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Today's linux-next merge of the net-next tree got a conflict in:
+diff --git a/fs/ext4/ialloc.c b/fs/ext4/ialloc.c
+index e9bbb1da2d0a..47b75589fdf4 100644
+--- a/fs/ext4/ialloc.c
++++ b/fs/ext4/ialloc.c
+@@ -983,7 +983,8 @@ struct inode *__ext4_new_inode(struct mnt_idmap *idmap,
+ 		ei->i_projid = make_kprojid(&init_user_ns, EXT4_DEF_PROJID);
+ 
+ 	if (!(i_flags & EXT4_EA_INODE_FL)) {
+-		err = fscrypt_prepare_new_inode(dir, inode, &encrypt);
++		if (ext4_has_feature_casefold(inode->i_sb))
++			err = fscrypt_prepare_new_inode(dir, inode, &encrypt);
+ 		if (err)
+ 			goto out;
+ 	}
+-- 
+2.43.0
 
-  drivers/net/ethernet/ti/icssg/icssg_classifier.c
-
-between commit:
-
-  56a5cf538c3f ("net: ti: icssg-prueth: Fix start counter for ft1 filter")
-
-from the net tree and commit:
-
-  abd5576b9c57 ("net: ti: icssg-prueth: Add support for ICSSG switch firmwa=
-re")
-
-from the net-next tree.
-
-I fixed it up (I used the former (they both did effectively the same thing
-in this spot) and can carry the fix as necessary. This is now fixed as
-far as linux-next is concerned, but any non trivial conflicts should be
-mentioned to your upstream maintainer when your tree is submitted for
-merging.  You may also want to consider cooperating with the maintainer
-of the conflicting tree to minimise any particularly complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/T_qxduSg5ONj0V1Rt.aIDlL
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmZZOB4ACgkQAVBC80lX
-0Gy1lgf/eM2kx7/2qvfoIi/+xQqFA5KD1pNrYChv0LPgol2Bi+tsINergmWJHAJ5
-JuthhHDNXnJFnVCXIlKX3tXd0suOmHHFV3RyzECxv5Alv3BGy6H+9sLbPMtQ2i/K
-sbFJZFClGUG43IwFf5nbo4ce7PJ6lfbZo3PCbYqoOilKyowvVSgu9ZzGMIgDxV5Z
-G2cRfVZj9JFXrXjCoTUsXKtgtQHaTBmrrs6x3qdzg4TuYtyxAyaNe0U/29xsl/aT
-ppxWkeAp2fcaqha9IbxkRhQdrDpbqcmqrBRnrTHg4oldVE30SvMIFLnUrqq8Z1q9
-+4a7OKXC4Y4PUyCUK/juU2ZyuvskMg==
-=7LFf
------END PGP SIGNATURE-----
-
---Sig_/T_qxduSg5ONj0V1Rt.aIDlL--
 
