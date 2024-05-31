@@ -1,112 +1,208 @@
-Return-Path: <netdev+bounces-99725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 767DB8D60BD
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 13:33:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44A0C8D6107
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 13:55:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D5771F23C53
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 11:33:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD9231F23F7D
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 11:55:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81569157470;
-	Fri, 31 May 2024 11:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58C41581F0;
+	Fri, 31 May 2024 11:55:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JPduiQ7G"
+	dkim=permerror (0-bit key) header.d=sapience.com header.i=@sapience.com header.b="eNSQVIMw";
+	dkim=pass (2048-bit key) header.d=sapience.com header.i=@sapience.com header.b="oQXCzoNL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from s1.sapience.com (s1.sapience.com [72.84.236.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D878173C;
-	Fri, 31 May 2024 11:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717155194; cv=none; b=pfOYhYT5xV3ow+eGJSN0MNiMewdmhSHSYoJAdlpLyyflnbalFpkBOws9BOIiJfgNGqRE/T1IcNTD92LUVHdPKorU7FCGxrT/QB5UyX5cz1NR6mMt/pyry45XxZCK6etLpx38uH68dFr91U0ArGQcfTOWE+LI70bwWlOuqknriZE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717155194; c=relaxed/simple;
-	bh=PDYcD/VuW+SV7ExAXgARgpwsN09SPWDnbp+i4nzDJQk=;
-	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
-	 Message-Id:Subject; b=q6sZJo2TlZvsmHbBS/56UtlaGiNSR9L+uerjTBvkS0FG2vJzBrh30aR/MBOWjB1FtoD0EllOHM8JVccOSmhuGZ5cLSauIAr7BjxittvLWsEN8m/+d2zqtzPzMbpEJZ+KzIOGFMXyNCCHyvionYDwgY60ZkP6v8xkRiQzTNhEVQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JPduiQ7G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93D70C116B1;
-	Fri, 31 May 2024 11:33:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717155193;
-	bh=PDYcD/VuW+SV7ExAXgARgpwsN09SPWDnbp+i4nzDJQk=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=JPduiQ7Gs3cA09tsRhbFzZJTWLRZtrjCKsLyR8Vc8iEeokYeV4ZdOqRaQ4pCeX8VH
-	 crFPAUv5wtCFXOYhkrvH5+O3JT6rRwVOxERkoZqYsxFr7qjVd/AGNVizB20Ah7IpKC
-	 8I+yKkI6U1hTFip6Wb6S06HJO9sOBUiOJdHpLy9EnMtGfCHYssb2pIaoES7qFYWMso
-	 r4rR7DcEteT2pNVBRZD2JkcwEDzIRbkSjo+VKpGdUNWwyLGTnWOuJuDNkAXhyBNeNT
-	 67siHQbO4DZtqT9IrE3aGztiE/mjrbZMgEktxXz13ka/DRjGeylwiN4lyWYIkhHaId
-	 2dzA7NblT/Qwg==
-Date: Fri, 31 May 2024 06:33:12 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B39157A6C;
+	Fri, 31 May 2024 11:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=72.84.236.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717156528; cv=fail; b=UlNqtztWtQCokVGm17pG4fBbDPCyC/h6/o6lCQvIse7HgCo8DGQ9m+e6LTLqrhIrzwDWjstn+3MsYqPuAGazVpEzHRAwnvKtPhPo4M0icVl7TM9G28Ej8aWTng5lCJNWrp5stYAE4wLTiiAJZi1zmGudBvbI19rfko95GaldgCQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717156528; c=relaxed/simple;
+	bh=Bd3KZ+yFQSeCtmXYqYm3VH6yU8fRiWgc3mbKerK/UhU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mWRU5mLtfTdpmDaebTwZhg6gu1XiK7Xi4xtrctPrmnr4H0E9teCS/BvRnt21iy1ordXvhTketm0NgrnCRsl5uThaPu64D4+Wg8EY2+Rd1LOsf12aQaOLMlSZtUh6LyXZH5QT5Iw4/heEKUl9ZH+CiqTpWLUGndcJYW46aOcUujQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sapience.com; spf=pass smtp.mailfrom=sapience.com; dkim=permerror (0-bit key) header.d=sapience.com header.i=@sapience.com header.b=eNSQVIMw; dkim=pass (2048-bit key) header.d=sapience.com header.i=@sapience.com header.b=oQXCzoNL; arc=fail smtp.client-ip=72.84.236.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sapience.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sapience.com
+Authentication-Results: dkim-srvy7; dkim=pass (Good ed25519-sha256 
+   signature) header.d=sapience.com header.i=@sapience.com 
+   header.a=ed25519-sha256; dkim=pass (Good 2048 bit rsa-sha256 signature) 
+   header.d=sapience.com header.i=@sapience.com header.a=rsa-sha256
+Received: from srv8.sapience.com (srv8.sapience.com [x.x.x.x])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by s1.sapience.com (Postfix) with ESMTPS id 07690480A2E;
+	Fri, 31 May 2024 07:55:25 -0400 (EDT)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=sapience.com;
+ i=@sapience.com; q=dns/txt; s=dk-ed25519-220413; t=1717156525;
+ h=message-id : subject : from : to : cc : date : in-reply-to :
+ references : content-type : mime-version : from;
+ bh=Bd3KZ+yFQSeCtmXYqYm3VH6yU8fRiWgc3mbKerK/UhU=;
+ b=eNSQVIMwKba7IepHL2th/FwZ/XAvK4Mu2K78TT8lDkCvIFwzw8G4ziIpHBJoQ06JZynSD
+ mYGz6Beg5VWZlUtCQ==
+ARC-Seal: i=1; a=rsa-sha256; d=sapience.com; s=arc6-rsa-220412; t=1717156525;
+	cv=none; b=DQRufJH8RG0EtfdpGLg3OscZNCvXlRob9CHXc58/zcFeIqlGOpDzAUHSrhKzgsQmsVDK87Hux0UqZ07EdKjihtZiDGoaRTlQFlO8gg3bwRG0vVZcxS7oDd9Y489xspb4VXwMNxOH55KyZ4Y1qRx0m+ErY5w3aJWoROmZYagD8KI4Rj6BHqDM3yVw1hGKowvE32CCkOZlGR2gDR5nDU8cefH8T3wVfkRVNI8Pv+UAwc6l78HYJv1gdUDAVU59CLC3ME4B32hf0ReI3+VvoS7pHxHtiisnfCrpnzBIGo9h6VjHPmSuJRCtDSEuZ3cvYnPb67+hXMWYeg4lRhYehbV2mg==
+ARC-Message-Signature: i=1; a=rsa-sha256; d=sapience.com; s=arc6-rsa-220412;
+	t=1717156525; c=relaxed/simple;
+	bh=Bd3KZ+yFQSeCtmXYqYm3VH6yU8fRiWgc3mbKerK/UhU=;
+	h=DKIM-Signature:DKIM-Signature:Message-ID:Subject:From:To:Cc:Date:
+	 In-Reply-To:References:Autocrypt:Content-Type:User-Agent:
+	 MIME-Version; b=Ur5FWX81IzOOX/7AMkWfZBbo2GA0zlTYHf2yG8vwwXWGmZSuqO0gYTCs8Bh6Nozz/2fmc7HsUnBvo2KzCo46io7xQ0HGWYSyXPoM55QEj4SnEa9UFMM8FOZDiEQfkHPJfIiT771Zc9ocfG9UvANIGpnWLd9ieLIcfMh2VeUy5nyzn2sE5MgWUr4GD3X38XNMjeygv++lCW/0FfmB7Ad+eY2BK1ZndT8o8L5yzsShmWtLhi3yGzQRm3Di7bOC/MYxCjbWZtHFdEORWoCuns4yBHj3sY7Ulf/kr21ULSgp41Ocpm+9OZY+EYEheTVkiIMIqlPS6dJZxMe+HxG91RAA5Q==
+ARC-Authentication-Results: i=1; arc-srv8.sapience.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sapience.com;
+ i=@sapience.com; q=dns/txt; s=dk-rsa-220413; t=1717156525;
+ h=message-id : subject : from : to : cc : date : in-reply-to :
+ references : content-type : mime-version : from;
+ bh=Bd3KZ+yFQSeCtmXYqYm3VH6yU8fRiWgc3mbKerK/UhU=;
+ b=oQXCzoNLpXEAKjmy4+GQ2r0RA7pkqKeTmXo0aLajKdOo1GGUQWVHGDlU5yRsTcSEhOM4L
+ t21GgvxgsZ1MqO+V0D56TlmdvrjkHu+mOXDNJMcWhm/oAySHzBXRHUpqRnajW91DCBJrHn6
+ j6cNAeuLQdwwNr7RUsTVpuWMUYavCpKBCxehQNjBS4aKwN79bN2etnnE1GXYKkBlGJyeI3Q
+ lOzQcck1qtJChwy0pSOCz/2HWSVq7zBPNs6FX3By/s9NKLp2K7FgBjaLZnSTRJrzLQQvCM9
+ o/Zyr1KLCDallirjgJzDCLLML1LsKGAiOQXnaOHv/Iwy3dqylbn3w+1/CWvw==
+Received: from lap7.sapience.com (lap7w.sapience.com [x.x.x.x])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by srv8.sapience.com (Postfix) with ESMTPS id B69D4280016;
+	Fri, 31 May 2024 07:55:25 -0400 (EDT)
+Message-ID: <69d0c5f0b237990fd2c7cd88768aa2a70a5ee83a.camel@sapience.com>
+Subject: Re: Hung tasks due to a AB-BA deadlock between the leds_list_lock
+ rwsem and the rtnl mutex
+From: Genes Lists <lists@sapience.com>
+To: Hans de Goede <hdegoede@redhat.com>, Linux regressions mailing list
+	 <regressions@lists.linux.dev>, Pavel Machek <pavel@ucw.cz>, Lee Jones
+	 <lee@kernel.org>, Linux LEDs <linux-leds@vger.kernel.org>, Heiner Kallweit
+	 <hkallweit1@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch, 
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com,  johanneswueller@gmail.com, "Russell King (Oracle)"
+ <linux@armlinux.org.uk>
+Date: Fri, 31 May 2024 07:55:25 -0400
+In-Reply-To: <618601d8-f82a-402f-bf7f-831671d3d83f@redhat.com>
+References: <9d189ec329cfe68ed68699f314e191a10d4b5eda.camel@sapience.com>
+	 <15a0bbd24cd01bd0b60b7047958a2e3ab556ea6f.camel@sapience.com>
+	 <ZliHhebSGQYZ/0S0@shell.armlinux.org.uk>
+	 <42d498fc-c95b-4441-b81a-aee4237d1c0d@leemhuis.info>
+	 <618601d8-f82a-402f-bf7f-831671d3d83f@redhat.com>
+Autocrypt: addr=lists@sapience.com; prefer-encrypt=mutual;
+ keydata=mDMEXSY9GRYJKwYBBAHaRw8BAQdAwzFfmp+m0ldl2vgmbtPC/XN7/k5vscpADq3BmRy5R
+ 7y0LU1haWwgTGlzdHMgKEwwIDIwMTkwNzEwKSA8bGlzdHNAc2FwaWVuY2UuY29tPoiWBBMWCAA+Ah
+ sBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEE5YMoUxcbEgQOvOMKc+dlCv6PxQAFAmPJfooFCRl
+ vRHEACgkQc+dlCv6PxQAc/wEA/Dbmg91DOGXll0OW1GKaZQGQDl7fHibMOKRGC6X/emoA+wQR5FIz
+ BnV/PrXbao8LS/h0tSkeXgPsYxrzvfZInIAC
+Content-Type: multipart/signed; micalg="pgp-sha384";
+	protocol="application/pgp-signature"; boundary="=-Y2OqDd5dYDgI7spdeu7K"
+User-Agent: Evolution 3.52.2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: angelogioacchino.delregno@collabora.com, pabeni@redhat.com, 
- devicetree@vger.kernel.org, upstream@airoha.com, conor@kernel.org, 
- krzysztof.kozlowski+dt@linaro.org, davem@davemloft.net, will@kernel.org, 
- nbd@nbd.name, lorenzo.bianconi83@gmail.com, catalin.marinas@arm.com, 
- netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org, 
- benjamin.larsson@genexis.eu, conor+dt@kernel.org, 
- linux-arm-kernel@lists.infradead.org, robh+dt@kernel.org
-In-Reply-To: <97946e955b05d21fe96ef8f98f794831cbd7c3b5.1717150593.git.lorenzo@kernel.org>
-References: <cover.1717150593.git.lorenzo@kernel.org>
- <97946e955b05d21fe96ef8f98f794831cbd7c3b5.1717150593.git.lorenzo@kernel.org>
-Message-Id: <171715519233.1178488.4895515254191995557.robh@kernel.org>
-Subject: Re: [PATCH net-next 1/3] dt-bindings: net: airoha: Add EN7581
- ethernet controller
 
 
-On Fri, 31 May 2024 12:22:18 +0200, Lorenzo Bianconi wrote:
-> Introduce device-tree binding documentation for Airoha EN7581 ethernet
-> mac controller.
-> 
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  .../bindings/net/airoha,en7581.yaml           | 106 ++++++++++++++++++
->  1 file changed, 106 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/airoha,en7581.yaml
-> 
+--=-Y2OqDd5dYDgI7spdeu7K
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-My bot found errors running 'make dt_binding_check' on your patch:
+On Fri, 2024-05-31 at 11:50 +0200, Hans de Goede wrote:
+> Hi,
+>=20
+> ...
 
-yamllint warnings/errors:
+> I actually have been looking at a ledtrig-netdev lockdep warning
+> yesterday
+> which I believe is the same thing. I'll include the lockdep trace
+> below.
+>=20
+> According to lockdep there indeed is a ABBA (ish) cyclic deadlock
+> with
+> the rtnl mutex vs led-triggers related locks. I believe that this
+> problem
+> may be a pre-existing problem but this now actually gets hit in
+> kernels >=3D
+> 6.9 because of commit 66601a29bb23 ("leds: class: If no default
+> trigger is
+> given, make hw_control trigger the default trigger"). Before that
+> commit
+> the "netdev" trigger would not be bound / set as phy LEDs trigger by
+> default.
+>=20
+> +Cc Heiner Kallweit who authored that commit.
+>=20
+> The netdev trigger typically is not needed because the PHY LEDs are
+> typically
+> under hw-control and the netdev trigger even tries to leave things
+> that way
+> so setting it as the active trigger for the LED class device is
+> basically
+> a no-op. I guess the goal of that commit is correctly have the
+> triggers
+> file content reflect that the LED is controlled by a netdev and to
+> allow
+> changing the hw-control mode without the user first needing to set
+> netdev
+> as trigger before being able to change the mode.
+>=20
+> But there is a price to this, besides the locking problem this also
+> causes the ledtrig-netdev module to load on pretty much everyones
+> systems (when build as a module) even though 99.999% of our users
+> likely does not need this at all...
+>=20
+> Given this price and the troubles this is causing I think it might be
+> best
+> to revert 66601a29bb23. There might still be a locking issue when
+> setting
+> the trigger to netdev manually (I'll check and follow up) but this
+> should
+> fix the regression users are hitting since typically users do not set
+> the trigger manually.
+>=20
+> Gene, as the original reporter of this can you do "modinfo
+> ledtrig_netdev"
+> and if this shows that ledtrig_netdev is a module for you try
+> blacklisting
+> ledtrig_netdev ?=C2=A0 And if it is not a module can you try building a
+> 6.9
+> kernel with commit 66601a29bb23 reverted and see if that helps ?
 
-dtschema/dtc warnings/errors:
-Documentation/devicetree/bindings/net/airoha,en7581.example.dts:27:18: fatal error: dt-bindings/reset/airoha,en7581-reset.h: No such file or directory
-   27 |         #include <dt-bindings/reset/airoha,en7581-reset.h>
-      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-make[2]: *** [scripts/Makefile.lib:427: Documentation/devicetree/bindings/net/airoha,en7581.example.dtb] Error 1
-make[2]: *** Waiting for unfinished jobs....
-make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1430: dt_binding_check] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
+Thank you - I've blacklisted ledtrig_netdev and will report back if
+anything interesting happens.
 
-doc reference errors (make refcheckdocs):
+best
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/97946e955b05d21fe96ef8f98f794831cbd7c3b5.1717150593.git.lorenzo@kernel.org
+gene
 
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
+>=20
+>=20
+> Regards,
+>=20
+> Hans
 
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
+--=20
+Gene
 
-pip3 install dtschema --upgrade
 
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+--=-Y2OqDd5dYDgI7spdeu7K
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
 
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYJAB0WIQRByXNdQO2KDRJ2iXo5BdB0L6Ze2wUCZlm6rQAKCRA5BdB0L6Ze
+2ztQAP9qMQRR3zWotstYwUJgtGTnC8aBJ+98ER37vLWOQ8tUfwD/YXQxaCPd9Swg
+ncFhq3xPmLoOpSikgJb3evYfVsGEzQU=
+=tg5T
+-----END PGP SIGNATURE-----
+
+--=-Y2OqDd5dYDgI7spdeu7K--
 
