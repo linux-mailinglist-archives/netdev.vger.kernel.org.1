@@ -1,125 +1,104 @@
-Return-Path: <netdev+bounces-99668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF3658D5C64
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 10:12:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 045A58D5C68
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 10:12:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C649DB2112D
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 08:12:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4C38288EB3
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 08:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21AF1770FE;
-	Fri, 31 May 2024 08:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD04A7711E;
+	Fri, 31 May 2024 08:12:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="DtgbQQtX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CRedeXsI"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa8.hc1455-7.c3s2.iphmx.com (esa8.hc1455-7.c3s2.iphmx.com [139.138.61.253])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAC874057
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 08:11:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.61.253
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4627015E89
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 08:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717143121; cv=none; b=rcIPefYq2tcL8LOxjrb76s6oUtnF/8WtmMFnbMyMn/m06RrY73kwCQEeh/AZ+ywqxY3UPgrYjcTsHQbhMqC76gqeKOr4+xz8OwCcUzN12bggIYtBmZDKhabikLFGvbx1KB4e55q21+NgJ6/FdJuliqFsmnKVCAzuRa51mrpnXzQ=
+	t=1717143158; cv=none; b=nTtr+AkxCmxvnqtNyZ3XAt8jzm2zzGan2U2jUm0usd/waI921Lw9VPikXFUaqpVMMgqMIQ34EZlLFeAvXk6nryHuH91aXUTQEj/EJl14iNSOcHWv8m5L96o+aLJE+jajZGh9Xovp1NzfhI5CfLI7t7SLsDfdiIRNwl3pXCxfIbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717143121; c=relaxed/simple;
-	bh=YAzk/Z21OffZ/0jQxK+37Gcwl/sCwNgTdKOAQBLXBXw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=B4hQY0AwJCIUbRQ6fG9mnDENFKJMBrKuOQLvzR63w+QQO2WiSPnfYsKlIkYEMxYaUTL1587HpiBPrYgyMYmvXFcO3YVCmEgqi98DgTpN4+tp+JG76EU2vZmjwMC/UyqdgnEBPUeU3XDekhlf3orS8xw4V/GBv+YHXIot/pA4QXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=DtgbQQtX; arc=none smtp.client-ip=139.138.61.253
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1717143118; x=1748679118;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=YAzk/Z21OffZ/0jQxK+37Gcwl/sCwNgTdKOAQBLXBXw=;
-  b=DtgbQQtXMlBk2mWpfuhWcDSTXuRjgAvrT4r7r+OSEnv4NDGXQNBIW5qd
-   F1fcQXm+NZE4KcOF3tFOZTa7jo6EUyAlj8J82R1fnlHDHPEYWadRkNU8b
-   JjBk8u0gatFKxqKPUXtF+LUg2YtNh9ZqZd6Mf/gq5S+hgYAQqbpMsXiXx
-   b1oAI/UiAoYgHPfHk2HjhY+PIIv7OiCHmtr79bHeGpG0qF08GRnDpS8zz
-   p0AqGhXZLfPzhchMwgJ+AkqjqLHV2bbG14qBSHrfvbO2WvOPyyGbhDtcG
-   hTM67xABNCJOh2aUIJCFWEk4ueBupiE2HJul9Wtf1c9oqpT5tXXYH6Hqn
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11088"; a="148973649"
-X-IronPort-AV: E=Sophos;i="6.08,203,1712588400"; 
-   d="scan'208";a="148973649"
-Received: from unknown (HELO oym-r4.gw.nic.fujitsu.com) ([210.162.30.92])
-  by esa8.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2024 17:11:49 +0900
-Received: from oym-m1.gw.nic.fujitsu.com (oym-nat-oym-m1.gw.nic.fujitsu.com [192.168.87.58])
-	by oym-r4.gw.nic.fujitsu.com (Postfix) with ESMTP id 16DB6D805A
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 17:11:48 +0900 (JST)
-Received: from kws-ab4.gw.nic.fujitsu.com (kws-ab4.gw.nic.fujitsu.com [192.51.206.22])
-	by oym-m1.gw.nic.fujitsu.com (Postfix) with ESMTP id 4B4B915818
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 17:11:47 +0900 (JST)
-Received: from edo.cn.fujitsu.com (edo.cn.fujitsu.com [10.167.33.5])
-	by kws-ab4.gw.nic.fujitsu.com (Postfix) with ESMTP id 931892F4C2B
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 17:11:46 +0900 (JST)
-Received: from G08FNSTD200033.g08.fujitsu.local (unknown [10.167.225.189])
-	by edo.cn.fujitsu.com (Postfix) with ESMTP id 6BD901A000A;
-	Fri, 31 May 2024 16:11:45 +0800 (CST)
-From: Chen Hanxiao <chenhx.fnst@fujitsu.com>
-To: Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: bridge@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH] net: bridge: Clean up one inconsistent indenting warn reported by smatch
-Date: Fri, 31 May 2024 16:11:36 +0800
-Message-Id: <20240531081136.582-1-chenhx.fnst@fujitsu.com>
-X-Mailer: git-send-email 2.37.1.windows.1
+	s=arc-20240116; t=1717143158; c=relaxed/simple;
+	bh=+zcuFiMnBzt6Je3SocB3n14Z+8rap9B5dQT91Kolxik=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PzmYyGI+g9eQhjn4J25crGnpfqUXn/YZ007Ug0V22/nQxhTkapDWbVp39urDwzgR4AKuSMXppynsvSAGgsummuE0Xs3Be2vdgJvMMqM5uZ0Lsa6WRrqiSsCUxCjK5ERexqaMj3tl9qsdJROF/fgR3dF7eNpYBIGyNOCSMpQ42Cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CRedeXsI; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-57a22af919cso7144a12.1
+        for <netdev@vger.kernel.org>; Fri, 31 May 2024 01:12:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717143155; x=1717747955; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+zcuFiMnBzt6Je3SocB3n14Z+8rap9B5dQT91Kolxik=;
+        b=CRedeXsI6+NwJtVel/UQgHObUcrZfJ17p9SALGX6CLxpKBdZp7LF7BjZvh7NyxI7Zu
+         tWbUdPjWOe8i1ZMOasJp7HnwCvTRLgxCPGSoCkbixT9/HrKBYV2NT24a0X8p6pkLfA3Z
+         ZeBFhE6ho2CdBurh6l8WaHL3zHQQJwwHNSz9c3AxXOZr1zdcOt2eNZPBsAnDaxlcC8p7
+         eDVh9ev+zHL/5LHPnoICm4eeWXclf8vfQn11kK+vSFf+M/SafF7ayci9HpEdtq62iTkv
+         XH7kIerh0zmgo5iGxsEUlQV7H8DAT1KhqJMBCCCRXIa1j+b36iwExEO6VqqlmqZurrmv
+         0xOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717143155; x=1717747955;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+zcuFiMnBzt6Je3SocB3n14Z+8rap9B5dQT91Kolxik=;
+        b=H5Dy/hlWIdtvZW5ZTP64cCiXIjQ7AvcqTTR1Wcsqn8S5xrjkBGkwTrBLESmwG1FqfM
+         I3XYiVamqfsZRD3FFbnFNBb0avSDKHLWyFjYdEy9/7ZODP6i38Nzkzaqi1LrRsWgv9Qq
+         J7Dous7XmPMHmIZdJQtY34teXIexo/7owGKp+g2MjFhr3sMoWw3SQ/VbHx7mDExitZVQ
+         2MVdu2Z7mjcX/IOaTLda5577uGmpj/0IPJSKoADAiHHZrULgZFjE+vndpkZSwv6O1t1N
+         WCN76ClfO8aiNrod+QC/A44SzTU20TzbuVPrLO5YkJjQcB6JzFYLG3m3ZOmhOMBDrQ82
+         15eA==
+X-Gm-Message-State: AOJu0Yy1XzAjhq+RQLwV3SqOddaYkmkB/d09yqmRQxVFuN8UOW02m0bn
+	Dir4aqaGdpy/m25kWdTl59Jo05+pOP+kh6cVfjk5A83WE7IwZ0HmeFD+BQ0HpTbZbMJn24nvChd
+	c/MS6PtbpQ/hT3mrRbLMsYixhA2IDIusioQBnR4ApH20UBFpg+g==
+X-Google-Smtp-Source: AGHT+IEMtyGeXl/fX7gxxAL/632eX3+s+KyYKjTtKvCIZwvhhUfWl/OjeNy13luErF1LkScAcaTd4e4OSvlnM4p8mrY=
+X-Received: by 2002:a05:6402:2029:b0:57a:2398:5ea2 with SMTP id
+ 4fb4d7f45d1cf-57a378648c9mr75743a12.3.1717143154749; Fri, 31 May 2024
+ 01:12:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-TM-AS-Product-Ver: IMSS-9.1.0.1417-9.0.0.1002-28420.006
-X-TM-AS-User-Approved-Sender: Yes
-X-TMASE-Version: IMSS-9.1.0.1417-9.0.1002-28420.006
-X-TMASE-Result: 10-3.538300-10.000000
-X-TMASE-MatchedRID: E96g+3imn7mSlJbFK+uaF2/6CCblACLhTfK5j0EZbyvAuQ0xDMaXkH4q
-	tYI9sRE/L2EYbInFI5stE4KgUQ2xoJcFdomgH0lnFEUknJ/kEl5jFT88f69nG/oLR4+zsDTtjoc
-	zmuoPCq2uFo2Cd8JyNxeqljGHCpsHTexG/klFQrnrVcsQVCm36v+3yk9jUTPbq8Inj9pPWMWgny
-	0VDDErFuOQXG+3ze/ebpNNOGz5jTIVwbf5lERMgI/2RRfVn5u4Tcu6aRtCI3BUKpNI+7y1VHsDE
-	gQ63iHZ
-X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
+References: <20240530232722.45255-1-technoboy85@gmail.com> <20240530232722.45255-2-technoboy85@gmail.com>
+In-Reply-To: <20240530232722.45255-2-technoboy85@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 31 May 2024 10:12:23 +0200
+Message-ID: <CANn89i+GZ31Epxs6sfgg_skW4QOQHKFA4GHgM_4i95FcxX31gQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/2] net: make net.core.{r,w}mem_{default,max} namespaced
+To: technoboy85@gmail.com
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Matteo Croce <teknoraver@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-smatch complains:
-net/bridge/br_netlink_tunnel.c:
-   318 br_process_vlan_tunnel_info() warn: inconsistent indenting
+On Fri, May 31, 2024 at 1:27=E2=80=AFAM <technoboy85@gmail.com> wrote:
+>
+> From: Matteo Croce <teknoraver@meta.com>
+>
+> The following sysctl are global and can't be read from a netns:
+>
+> net.core.rmem_default
+> net.core.rmem_max
+> net.core.wmem_default
+> net.core.wmem_max
+>
+> Make the following sysctl parameters available readonly from within a
+> network namespace, allowing a container to read them.
+>
+> Signed-off-by: Matteo Croce <teknoraver@meta.com>
 
-Fix it with proper indenting.
-
-Signed-off-by: Chen Hanxiao <chenhx.fnst@fujitsu.com>
----
- net/bridge/br_netlink_tunnel.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/net/bridge/br_netlink_tunnel.c b/net/bridge/br_netlink_tunnel.c
-index 17abf092f7ca..25ac3a5386ef 100644
---- a/net/bridge/br_netlink_tunnel.c
-+++ b/net/bridge/br_netlink_tunnel.c
-@@ -315,8 +315,9 @@ int br_process_vlan_tunnel_info(const struct net_bridge *br,
- 
- 			if (curr_change)
- 				*changed = curr_change;
--			 __vlan_tunnel_handle_range(p, &v_start, &v_end, v,
--						    curr_change);
-+
-+			__vlan_tunnel_handle_range(p, &v_start, &v_end, v,
-+						   curr_change);
- 		}
- 		if (v_start && v_end)
- 			br_vlan_notify(br, p, v_start->vid, v_end->vid,
--- 
-2.39.1
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
