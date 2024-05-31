@@ -1,50 +1,63 @@
-Return-Path: <netdev+bounces-99622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 803A18D583C
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 03:40:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86D0E8D5861
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 03:48:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B93B2892A2
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:40:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27D1AB255B6
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6047BDF5B;
-	Fri, 31 May 2024 01:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="psVe0hdm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3825D26A;
+	Fri, 31 May 2024 01:48:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF4717550
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 01:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C18134AB;
+	Fri, 31 May 2024 01:48:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717119633; cv=none; b=YkVWhpmzxL2v8TMVAC9NZrXMgPnygIRFkMMj4bDz8A7J2gOZcJRjwv0vHyksncHMYRfUuGI6YiRXkQvkipDcYdgAha0+u1vKq0DYO6qxG0oIRPT2ucTPrNDn5wlDL2Pkrr/YzWioiYDPhcNelI40DwF1pThn1NPm/2SNotlSHtk=
+	t=1717120092; cv=none; b=NBZ81qT9wc5HVrHeGgnf+Nz7+6Xu4bJT+1j2NHUyy4gMmL3+XoBuCsrbQ/bLKfjGgvRZbeR0bd4M/X7jTSX6mj65odlrz2uNiFg4pqSy/OfcYjbH98qIM72Sap3mM6Sjhvx77DIgy6BtT29pRbS1nua7BeDXqlF7fvCegWaT/x8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717119633; c=relaxed/simple;
-	bh=VKOc60I90X/dugTkbNmULut2FA8Ge149pb8+tDxQzoI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=U+9eKKjj6u2Q2oYUt4jZBJyEemGwPRvKYxmoRr+feuIERPcffyZDwm4bH+wMwy2kG2BexyQ20yhYbtlHpjk3UWbTWaTJ5hrCA/vIrEtn+ry8zzHwBoeSWIuoAUz3kHSSdd4rjqDFfltdYV/DwMKx2wDqYpgnYa72oKTPVOJsA6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=psVe0hdm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0F0C6C32789;
-	Fri, 31 May 2024 01:40:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717119633;
-	bh=VKOc60I90X/dugTkbNmULut2FA8Ge149pb8+tDxQzoI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=psVe0hdmUrhZ9Yuy5iKDwfoR05NxUsL8ljOAjExIwZ2MvF7kNVeN/wv+nsqVVYbr3
-	 otEL9u05Yz82rZ/4mbpkQCxrCDuvE02Ny426usEKtRDhhcPyyTn4V4XwIpf6Fnh6f0
-	 rF7z1mGByhiHwkXzDBsa34tdZB0pYeItxBktMbTQlXNNHo6PiSBfP6AZQkvo4TWdCH
-	 grjakpW5CVv48njlCsyXxkkbMCUCN5zqfLIsG5hUS08EX5iP/ZMSyoF2OSlKRFqJOY
-	 Cpier8/c2VmnjGkJVWQm4ygSXX7svGvl80Mc44e1q7WrVxTt4TyiwG0kQZUCpmQFFQ
-	 nkLLjhKesrgmg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0279FCF21F3;
-	Fri, 31 May 2024 01:40:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1717120092; c=relaxed/simple;
+	bh=XXFs9+w+leXFOGcTVJZF03joneWjmglFEMPKRibsnIM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KhKhWsabNk3eGhwU8uJE//AuRoDgDEX+JzMkMMttOcVkrHQKpee2EbNYA8BPMK77wabddG/YLp1ylvAIh/MbUCtRbNIO3ERrvM8GnXhKGQv/LTInYwbi3MP2935V5DS1YDvQjntYVwBAjwcgi+C2Fx/7uaiaJNHb91MhZrkMSnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44V1l1oB006715;
+	Thu, 30 May 2024 18:47:52 -0700
+Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3yf56c0023-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Thu, 30 May 2024 18:47:52 -0700 (PDT)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 30 May 2024 18:47:51 -0700
+Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.39 via Frontend Transport; Thu, 30 May 2024 18:47:48 -0700
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <ebiggers@kernel.org>
+CC: <coreteam@netfilter.org>, <davem@davemloft.net>, <fw@strlen.de>,
+        <jaegeuk@kernel.org>, <kadlec@netfilter.org>, <kuba@kernel.org>,
+        <linux-fscrypt@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <lizhi.xu@windriver.com>, <netdev@vger.kernel.org>,
+        <netfilter-devel@vger.kernel.org>, <pablo@netfilter.org>,
+        <syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com>,
+        <syzkaller-bugs@googlegroups.com>, <tytso@mit.edu>
+Subject: Re: [PATCH] ext4: add casefolded file check
+Date: Fri, 31 May 2024 09:47:47 +0800
+Message-ID: <20240531014747.1386219-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240531010513.GA9629@sol.localdomain>
+References: <20240531010513.GA9629@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,44 +65,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCHv2 net-next] ipv6: sr: restruct ifdefines
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171711963300.18580.9918782792276151812.git-patchwork-notify@kernel.org>
-Date: Fri, 31 May 2024 01:40:33 +0000
-References: <20240529040908.3472952-1-liuhangbin@gmail.com>
-In-Reply-To: <20240529040908.3472952-1-liuhangbin@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- kovalev@altlinux.org, sd@queasysnail.net, gnault@redhat.com,
- horms@kernel.org, david.lebrun@uclouvain.be
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: IR-rrk4oZSkM4-YLtYKV04o7RY55hJG5
+X-Proofpoint-GUID: IR-rrk4oZSkM4-YLtYKV04o7RY55hJG5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-30_21,2024-05-30_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ mlxscore=0 impostorscore=0 clxscore=1015 bulkscore=0 phishscore=0
+ mlxlogscore=957 lowpriorityscore=0 spamscore=0 priorityscore=1501
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.21.0-2405170001 definitions=main-2405310013
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 29 May 2024 12:09:08 +0800 you wrote:
-> There are too many ifdef in IPv6 segment routing code that may cause logic
-> problems. like commit 160e9d275218 ("ipv6: sr: fix invalid unregister error
-> path"). To avoid this, the init functions are redefined for both cases. The
-> code could be more clear after all fidefs are removed.
+On Thu, 30 May 2024 18:05:13 -0700, Eric Biggers wrote:
+> > The file name that needs to calculate the siphash must have both flags casefolded
+> > and dir at the same time, so before calculating it, confirm that the flag meets
+> > the conditions.
+> >
+> > Reported-by: syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com
+> > Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+> > ---
+> >  fs/ext4/hash.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >
+> > diff --git a/fs/ext4/hash.c b/fs/ext4/hash.c
+> > index deabe29da7fb..c8840cfc01dd 100644
+> > --- a/fs/ext4/hash.c
+> > +++ b/fs/ext4/hash.c
+> > @@ -265,6 +265,10 @@ static int __ext4fs_dirhash(const struct inode *dir, const char *name, int len,
+> >  		__u64	combined_hash;
+> >
+> >  		if (fscrypt_has_encryption_key(dir)) {
+> > +			if (!IS_CASEFOLDED(dir)) {
+> > +				ext4_warning_inode(dir, "Siphash requires Casefolded file");
+> > +				return -2;
+> > +			}
+> >  			combined_hash = fscrypt_fname_siphash(dir, &qname);
+> >  		} else {
+> >  			ext4_warning_inode(dir, "Siphash requires key");
 > 
-> Suggested-by: Simon Horman <horms@kernel.org>
-> Suggested-by: David Ahern <dsahern@kernel.org>
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> First, this needs to be sent to the ext4 mailing list (and not to irrelevant
+> mailing lists such as netdev).  Please use ./scripts/get_maintainer.pl, as is
+> recommended by Documentation/process/submitting-patches.rst.
 > 
-> [...]
+> Second, ext4 already checks for the directory being casefolded before allowing
+> siphash.  This is done by dx_probe().  Evidently syzbot found some way around
+> that, so what needs to be done is figure out why that happened and what is the
+> best fix to prevent it.  This is not necessarily the patch you've proposed, as
+> the real issue might actually be a missing check at some earlier time like when
+> reading the inode from disk or when mounting the filesystem.
+I have confirmed that there is no casefolded feature when creating the directory.
+I agree with your statement that it should be checked for casefold features when
+mounting or reading from disk.
 
-Here is the summary with links:
-  - [PATCHv2,net-next] ipv6: sr: restruct ifdefines
-    https://git.kernel.org/netdev/net-next/c/a79d8fe2ff8e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Lizhi
 
