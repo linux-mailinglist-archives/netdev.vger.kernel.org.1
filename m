@@ -1,56 +1,61 @@
-Return-Path: <netdev+bounces-99599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AACA8D56F4
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 02:33:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DD968D570C
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 02:39:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9C5B2872D7
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 00:33:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE7CA1C217A0
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 00:39:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB027360;
-	Fri, 31 May 2024 00:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 880484405;
+	Fri, 31 May 2024 00:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="apNRvaXX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="giV28BoS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F974A32
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 00:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B954C6D;
+	Fri, 31 May 2024 00:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717115605; cv=none; b=m9TfH1mc7N3IjtiBRxg6oNxk/1Sxiy+FWLCjMufUMtxjnkKuOZqcVpnbZUh5CoF9zI/N40UBvHcIAVj+gN5iMJw+hzpU6cwIo7mG4CU5tZQ0LOjoelnZyxsJ3jUehS7XdtkznO5kISrQ4zMXB9KEYmz1HN12zHNin8H1At+lltY=
+	t=1717115944; cv=none; b=oAUga5X/QgpdsTliYPURK7KZ2Pn5ZqIu2CqEmMdYQPJFqpvw4oqzrQeIVL9DQ3rDhfyHYIG3f7yTrORM5sMM9GaA8VTmWobcm30FrPz9R/SXYA/RdQXZap/i5e629K3oj9X2ZpEb+LSoIPSjYbLnvopyY1TmNYZ2Yd3ySfWUpr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717115605; c=relaxed/simple;
-	bh=D95IV3NhWEB2yX+ShrdmQ9V0xhZkwGaB1P/AdxInIlc=;
+	s=arc-20240116; t=1717115944; c=relaxed/simple;
+	bh=jz3uNt0ungI64vdcOBPvDDK2/oZ7fHMTLKoFD/qP59c=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QcSupCql3OfByLuPxmo/1gyA8+HPSaQ7x7fT6YBvbRWj96yhJQUdXnri5ShwofghHUM9LsrJaUbFNoZi9zkzn3ZUymSoEqfkSyfSqZ9rGwexsDAbQJE20CJsbrq/Qxi34m2pXW+tA9zsNpfmQaBszsiUm1o+1f8DA/2NAR+g3s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=apNRvaXX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1352CC2BBFC;
-	Fri, 31 May 2024 00:33:25 +0000 (UTC)
+	 MIME-Version:Content-Type; b=MrfF0yAhDQCixG5mFxOUcvVsLIFypjLTJyGCYXenANpK02COBTN88Efl4i6Ongm/ehPhgEEOnns/ykxpBUwEe5eYKOVNgUOCTStGw/6/VpXybnWQTisY/kVRvHmqh8Ni9JdbbcSSdAqmcCD76yCWHVjR10QwPFMWat7vKSiHbRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=giV28BoS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AAF6C2BBFC;
+	Fri, 31 May 2024 00:39:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717115605;
-	bh=D95IV3NhWEB2yX+ShrdmQ9V0xhZkwGaB1P/AdxInIlc=;
+	s=k20201202; t=1717115943;
+	bh=jz3uNt0ungI64vdcOBPvDDK2/oZ7fHMTLKoFD/qP59c=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=apNRvaXXO+KLap2TLr8OwaG2gho0yzsed6dWuEiI3vmvAHl3zVkqtKnRwxKYgThPk
-	 7K9fRf2jb/ZVL6hzBANEaahfEomEUkC00cF6ck9gzgm1wKjrP6ORBURVT5xRn9W/XB
-	 1AcdaPWyPYVyFMXSvG68TllM7mTMSKo9ewbzT/QPwPLPmafDXh8AUSW/zJLgtOwEyc
-	 wTc/j6qBSeQEOsco3zMY4z4F8rwR5+VBf/yp/AzaPOIg5zc+9LC8qOWjOgyVZfW/Xv
-	 gu3jvToebMUCB8OJBXfgbIV9GepqmMVRhzggyLEOH6OLl1YSg1wCTBNXR2lHmJzIpN
-	 p9RlUzs0YOGzg==
-Date: Thu, 30 May 2024 17:33:24 -0700
+	b=giV28BoSnq+WkGdlsUZ2v7q3wbUwkzvm1r13itdZk5Hxcf+NUAhhCy4ALwgqAKLW2
+	 UXE5axb8WsEyx3qjCsIBzuyQkk6EcskV94ijqaVejCn+8barpbcYOztB0KZoZCRX3f
+	 QniJYLQ3nCWj1hDHv4KDQRrdThNnOIfz1vcl48mS8e6r3aP9grmplZL518i8Ea1Vhh
+	 cYe2Gu1c3eaCOLPyw4NnvVkaRBPm+o+vKMDYBxp87KssjYBtLnyeMlHnn2cyXZy3Bg
+	 tzjQqmDJxaY+zuTer2OL5jFBXa7UXM7rrkWPO8ekhfx9PfRf9ywB7Q3PncwZlbvY6/
+	 ab7scJI8aGDlw==
+Date: Thu, 30 May 2024 17:39:02 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Cc: netdev@vger.kernel.org, Igor Raits <igor@gooddata.com>, Daniel Secik
- <daniel.secik@gooddata.com>, Zdenek Pesek <zdenek.pesek@gooddata.com>
-Subject: Re: [regresion] Dell's OMSA Systems Management Data Engine stuck
- after update from 6.8.y to 6.9.y (with bisecting)
-Message-ID: <20240530173324.378acb1f@kernel.org>
-In-Reply-To: <CAK8fFZ7MKoFSEzMBDAOjoUt+vTZRRQgLDNXEOfdCCXSoXXKE0g@mail.gmail.com>
-References: <CAK8fFZ7MKoFSEzMBDAOjoUt+vTZRRQgLDNXEOfdCCXSoXXKE0g@mail.gmail.com>
+To: Joe Damato <jdamato@fastly.com>, Saeed Mahameed <saeedm@nvidia.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ nalramli@fastly.com, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Leon Romanovsky <leon@kernel.org>, "open
+ list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [RFC net-next v3 0/2] mlx5: Add netdev-genl queue stats
+Message-ID: <20240530173902.7f00a610@kernel.org>
+In-Reply-To: <ZlkWnXirc-NhQERA@LQ3V64L9R2>
+References: <20240529031628.324117-1-jdamato@fastly.com>
+	<20240530171128.35bd0ee2@kernel.org>
+	<ZlkWnXirc-NhQERA@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,26 +65,29 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 30 May 2024 09:52:38 +0200 Jaroslav Pulchart wrote:
-> However, reverting just the "use xarray iterator to implement
-> rtnl_dump_ifinfo" change did not resolve the issue. Do you have any
-> suggestions on what to try next and how to fix it?
+On Thu, 30 May 2024 17:15:25 -0700 Joe Damato wrote:
+> > Why to base, and not report them as queue stats?
+> > 
+> > Judging by mlx5e_update_tx_netdev_queues() calls sprinkled in
+> > ../mlx5/core/en/htb.c it seems that the driver will update the
+> > real_num_tx_queues accordingly. And from mlx5e_qid_from_qos()
+> > it seems like the inverse calculation is:
+> > 
+> > i - (chs->params.num_channels + is_ptp)*mlx5e_get_dcb_num_tc(&chs->params)
+> > 
+> > But really, isn't it enough to use priv->txq2sq[i] for the active
+> > queues, and not active ones you've already covered?  
+> 
+> This is what I proposed in the thread for the v2, but Tariq
+> suggested a different approach he liked more, please see this
+> message for more details:
+> 
+>   https://lore.kernel.org/netdev/68225941-f3c3-4335-8f3d-edee43f59033@gmail.com/
+> 
+> I attempted to implement option 1 as he described in his message.
 
-The daemon must have rolled its own netlink parsing.
+I see, although it sounds like option 2 would also work.
 
-Could you try this?
-
-diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index 96accde527da..5fd06473ddd9 100644
---- a/net/ipv4/devinet.c
-+++ b/net/ipv4/devinet.c
-@@ -1912,6 +1912,8 @@ static int inet_dump_ifaddr(struct sk_buff *skb, struct netlink_callback *cb)
- 			goto done;
- 	}
- done:
-+	if (err == -EMSGSIZE && likely(skb->len))
-+		err = skb->len;
- 	if (fillargs.netnsid >= 0)
- 		put_net(tgt_net);
- 	rcu_read_unlock();
+Saeed can you shine any light here? I'm worried Tariq is already AFK
+for the weekend and we'll make no progress until Monday...
 
