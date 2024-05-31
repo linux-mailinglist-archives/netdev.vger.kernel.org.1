@@ -1,117 +1,142 @@
-Return-Path: <netdev+bounces-99664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A609F8D5BCE
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 09:48:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A74158D5C13
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 09:52:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C8D7B24111
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 07:48:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 374CBB21215
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 07:52:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 716B4762D0;
-	Fri, 31 May 2024 07:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD137407A;
+	Fri, 31 May 2024 07:52:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rVSKoCRT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dbyMf5md"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975867441F
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 07:48:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B371A2E657;
+	Fri, 31 May 2024 07:52:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717141697; cv=none; b=l1VAG5YfAiM9iaP0qyC7dOuqrGF0y/j6J/6kj8vDJ0LwTuppBx3aQaw4hlb8XVhxt0tvl+pRWynAUoD4VkMNmawzb8Oe8X/yP/Z/t3LvgIMvD0KuqxkcpYV+Dm+ZPszBSf1AIbwOjbxGYsWzjKbCoxL4/TsBQ8EoX7vDhb1ZTB4=
+	t=1717141952; cv=none; b=Oud3bNNmhS3WUBrVdjhJgX/s7V7lGTFSbg0tz28KupJwmp4xdmHPkHQxtdjm4NpYtIk+PC4B5+FRKLGdOgVBre7oWyOFAET3w9d8CJZ3++j2K0+M2uZtfVQSOJHrImoVN539climek5K91KywwwQkB8/UWUoCiYO9RKwR0S0AJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717141697; c=relaxed/simple;
-	bh=9e8sNM+ssP8xW+4abcU4AuzrNXd1o7HhNG9uZB5MJcY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QQgPLpj0kEw0PWTpm20YDTt0Li6MKMs/vrbxdabFi3eLwGHVPAagGj3KvvCOTVec4mW9w8+qwRuD+PL1Ou1DE/uI3uPJzGrsvfN/v8UuokrL5hjTd8u/zZhDaHUAh2TThn0F+hBAr9MY0mxSzLCbHuLBs07nrw4IhDKAKnzNY6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=rVSKoCRT; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=WMRgCjIjbnYaXtuP/I/6StaZplNnsNrJiV1yPXkSpc8=; b=rVSKoCRT29DjaaZzMujbgHq9LD
-	90ThmysLqYk8kBgTirxDcImYvqch2BS/sG4o1TWfMrUcrcesAzM/UtPwjjXm2IH86mkCWhIlfKXop
-	KCkqXrMVTVl8sRxZrolPFJLvB1GprWLjic15Vd+cVgEY7RHNrCAUDR83p5c1gMoLO9w0Nk1X+/EaJ
-	xF5IOeDqesRPhBohC9DqdTYJ1FsFnoJ+S6isTm0Zma9EfwqAYePu4VpAgNxvsHTzWwcpxVNGkXbN0
-	OqMULfPDPiui34vCmGjijgCWLQm3v4x0Tt0O9FQH6NAQRLtImMOofCia055GAE7FizFNt/tKmbwQZ
-	DdTB/kNA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45718)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sCwzY-0008Ea-2R;
-	Fri, 31 May 2024 08:48:00 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sCwzX-0005uo-7t; Fri, 31 May 2024 08:47:59 +0100
-Date: Fri, 31 May 2024 08:47:59 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Colin Foster <colin.foster@in-advantage.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH net-next 0/8] Probing cleanup for the Felix DSA driver
-Message-ID: <ZlmAry5lo/Mrrlhl@shell.armlinux.org.uk>
-References: <20240530163333.2458884-1-vladimir.oltean@nxp.com>
- <Zlk/GmpxUq/iOqs4@colin-ia-desktop>
+	s=arc-20240116; t=1717141952; c=relaxed/simple;
+	bh=bf3+WBp/nd8t8wKvPAuOc0MLtKkIBBYI562yJ9S/rbc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ss0Qlei9BZbI9b0+a//2qDHrQfB6E/waef6c7ysZc0cFr7HKH7JMk1CKm7JfmqdkCZGoOd4yeNGH7jkr1PSwJJFy0zRtzpf85TVrvo4GEnYJaM1yQ6QRJ0MMsQzfx3Vx9EGkVzv/iHk8YQNmWlY00i8F2g1Hqq7xSryHpHpJc9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dbyMf5md; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF497C116B1;
+	Fri, 31 May 2024 07:52:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717141951;
+	bh=bf3+WBp/nd8t8wKvPAuOc0MLtKkIBBYI562yJ9S/rbc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=dbyMf5md1/Nz+BDRLIvEysZ2Th0/lxDuUZ8HjgOVtRNodaZnIAAI2Vu73o12Sxhn3
+	 reuyNjFOo56zFj+zaRHxSG+2naif3lqtvA7mgzmZ4zRc7IvYDCra4z0dK6TAOdjpR+
+	 gm7MbnlTUghs6g7xIS/msnuhsFSsO2AMMjlXsfv9vCkRkjSQo1NK4FOaebqMpQEdG1
+	 grEZ3gCeI5yaKV6HshRgdp8p7micVA7QQ/QjLDAoxdo0jv4o8L2fjXwAeiDE5HFuSL
+	 XVnbAEPfU24gi2cVxLcGK9fBe5KVWLLdxNm5Feghca6S6iMAJ92OZ2nQKbH+843akD
+	 eX5NYVo0QrDeg==
+Message-ID: <91138be1-cd25-4efb-8709-2e4cf24be800@kernel.org>
+Date: Fri, 31 May 2024 09:52:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zlk/GmpxUq/iOqs4@colin-ia-desktop>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [TEST] Flake report
+Content-Language: en-GB
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, MPTCP Upstream <mptcp@lists.linux.dev>
+References: <20240509160958.2987ef50@kernel.org>
+ <11ff9d2b-6c3e-4ee5-81c0-d36de2308dbd@kernel.org>
+ <7e443c56-129e-4421-8dd8-adb57e9e6193@kernel.org>
+ <20240530104123.72ab528b@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240530104123.72ab528b@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 30, 2024 at 10:08:10PM -0500, Colin Foster wrote:
-> Hi Vladimir,
+Hi Jakub,
+
+On 30/05/2024 19:41, Jakub Kicinski wrote:
+> On Thu, 30 May 2024 19:35:56 +0200 Matthieu Baerts wrote:
+>>> Yes, we need to find a solution for that. It is not as unstable on our
+>>> side [1]. We will look at that next week. If we cannot find a solution
+>>> quickly, we will skip the flaky subtests to stop the noise while
+>>> continuing to investigate.  
+>> Now that the flaky MPTCP subtests results have been ignored, the results
+>> look better:
+>>
+>>   https://netdev.bots.linux.dev/flakes.html?br-cnt=88&tn-needle=mptcp
+>>
+>> Do you think we could also stop ignoring them on NIPA side?
 > 
-> On Thu, May 30, 2024 at 07:33:25PM +0300, Vladimir Oltean wrote:
-> > This is a follow-up to Russell King's request for code consolidation
-> > among felix_vsc9959, seville_vsc9953 and ocelot_ext, stated here:
-> > https://lore.kernel.org/all/Zh1GvcOTXqb7CpQt@shell.armlinux.org.uk/
-> > 
-> > Details are in individual patches. Testing was done on NXP LS1028A
-> > (felix_vsc9959).
-> > 
-> > Vladimir Oltean (8):
-> >   net: dsa: ocelot: use devres in ocelot_ext_probe()
-> >   net: dsa: ocelot: use devres in seville_probe()
-> >   net: dsa: ocelot: delete open coded status = "disabled" parsing
-> >   net: dsa: ocelot: consistently use devres in felix_pci_probe()
-> >   net: dsa: ocelot: move devm_request_threaded_irq() to felix_setup()
-> >   net: dsa: ocelot: use ds->num_tx_queues = OCELOT_NUM_TC for all models
-> >   net: dsa: ocelot: common probing code
-> >   net: dsa: ocelot: unexport felix_phylink_mac_ops and felix_switch_ops
-> > 
-> >  drivers/net/dsa/ocelot/felix.c           |  62 ++++++++++++-
-> >  drivers/net/dsa/ocelot/felix.h           |  10 +-
-> >  drivers/net/dsa/ocelot/felix_vsc9959.c   | 113 +++++++----------------
-> >  drivers/net/dsa/ocelot/ocelot_ext.c      |  55 +----------
-> 
-> Just FYI I tried testing this but hit an unrelated regression in 6.10,
-> and a `git b4` on 6.9.3 has conflicts. So I'm still alive, but probably
-> won't get to testing this tonight. Looks good though.
+> Thanks for take care of it, done!
 
-You will need... the net-next tree because it's dependent on a patch I
-submitted earlier this week.
+Thank you for the modification!
 
+That could have been predicted: just after having removed them from the
+list, these tests appeared to be unstable again! But I guess it is
+because there is a conflict between -net and net-next [1], and the
+"fixes" that are currently only in -net are no longer included in what
+is being validated.
+
+Sorry for the troubles! :)
+
+Cheers,
+Matt
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Sponsored by the NGI0 Core fund.
+
 
