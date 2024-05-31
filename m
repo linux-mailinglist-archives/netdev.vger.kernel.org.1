@@ -1,96 +1,83 @@
-Return-Path: <netdev+bounces-99611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E49FC8D579B
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 03:10:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFBC08D57BC
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 03:26:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 852FCB23D24
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:10:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79E4C1F26A78
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:26:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFA7A5C89;
-	Fri, 31 May 2024 01:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5A579F2;
+	Fri, 31 May 2024 01:26:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aXW97PsS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XcthxgjL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A6917545;
-	Fri, 31 May 2024 01:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25926AC0;
+	Fri, 31 May 2024 01:26:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717117831; cv=none; b=oTs/W/bf2XHbbj/QM71duDl4DWnxkNN4dc8IzFFpOBwtDVxIzoGtRbsma5DPm+H5zbpI05a17dwZ7UVh6QMb/AMYpEcWndgQzqQjJZQ6uySnT/IyzYxNCkdW53xT3PbKTYYOLkv1/H8gtmZn33s+iPI7YDG84TLN/W480dQ+Rns=
+	t=1717118793; cv=none; b=tvI8jVg35qesxuZf2PP23o370soX8lsOh2QSCDDtEv9J/o4hf2o/GNUOyKL3i1IcUETSBB8cyUB4eKlmAudCK0RJps6ymuhjhIJdj2kfLHUcwBVeD8R6fIs2JRaOBMtCVlfPkFkpqOIQaMPkj3wv1m5ESB3Y78oi5AglsSKflFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717117831; c=relaxed/simple;
-	bh=w0X7ZvxTXuag+5wWSwMpoObcm6tYak9x7e48Xv4bRkQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iHeQFip85pPVjLM8/8rTaOpw8vGaRbeDJkNfZ9/LBz0vgrzDlug5AlaVNtHJSGMXbRFb30rrpehYUb7jqjoV/ei8ziP8bDy5UMF0NM+HGd/dEmqrWdORjRAYEmcCPwT7bYrCopCroY9N5OUEP+cUKC26kklN4qZtmZ7vJ6zFtqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aXW97PsS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A3A49C32789;
-	Fri, 31 May 2024 01:10:30 +0000 (UTC)
+	s=arc-20240116; t=1717118793; c=relaxed/simple;
+	bh=N9x3KJfZAFE+0hlOyg8a3tFKFVoKWKQbYsf4Mx27kGY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Dq5U/ev2H98Pbht0Qj/WrEtlOe5Hnsw5mblV1zECug+uBHojNtU6UgBsSpEe7o9YtVVOX0I7SQWHHWG8NrZp/2c2vOLzqouJmg1Hvn0+PF7CstQksf4y8/sqCUC1S2hYws8ANybtCkusFsS9wI7BvZtTw7i2MPx1DSXd5ypXeFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XcthxgjL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFCA7C2BBFC;
+	Fri, 31 May 2024 01:26:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717117830;
-	bh=w0X7ZvxTXuag+5wWSwMpoObcm6tYak9x7e48Xv4bRkQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aXW97PsS3G+z/wAHMX6wIt4TOvN877AcBk1MUTIORVj5mXtHyhbktu1ps/yvIWA1U
-	 a6mZiQd5loLjfkMr589whFtKEVwop0szj0T13ThkvJzFkiVZjPC7MRvF6SX3of9VNJ
-	 tHhy+hwSy9cR/RoylA0z+Ejr/FzVD42yOMrJu8MzUbV7FSQX6p05qB4AcmhIgR8TiM
-	 E1m0dfAqfMH5zQK1x39J4osv5R8Nzqli8TQtcis8Kd8jJw2PQLxA2PN0HA8qJeTsQB
-	 3rXQSsk4D5+G6KMe2ey7a3yzkpZvlxBmSEmhnWiyqux0XDMNHmmZA55/2a5EHenYGY
-	 0WqIQrcQNCN/Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 913EDC3276C;
-	Fri, 31 May 2024 01:10:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1717118792;
+	bh=N9x3KJfZAFE+0hlOyg8a3tFKFVoKWKQbYsf4Mx27kGY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XcthxgjLWbApPwZx3iH/h/KsMGbl1GGmAo31uRRm0gZKT10BlU496elvwjsYuKiby
+	 uK1axb0ZiTEGL9QA+xxORzFOyMy2gCdgRq1S1noPyFd5QZWODP3a6DGPHxnx4x81b7
+	 Vtx6G6VRBZNEDquAyTMWBrsDDBUBr3obVnAIUTdowVloj5uxLKKLIVGsXRdOeSRWv6
+	 gI19Q3BmsiQstL1KwzWmhmIzch++1bD3dSA+PwrvucY2JRZmBw3XyJXmFc6aVJHYnL
+	 eJYK28h0RiRqMdaMnLpdW1JjqyOmU9tFlf7bXiR0TR06nFZE2w/4Dm8Nofod/pHP17
+	 +kOur6nifFVkg==
+Date: Thu, 30 May 2024 18:26:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ nalramli@fastly.com, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Leon Romanovsky <leon@kernel.org>, "open
+ list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [RFC net-next v3 0/2] mlx5: Add netdev-genl queue stats
+Message-ID: <20240530182630.55139604@kernel.org>
+In-Reply-To: <Zlki09qJi4h4l5xS@LQ3V64L9R2>
+References: <20240529031628.324117-1-jdamato@fastly.com>
+	<20240530171128.35bd0ee2@kernel.org>
+	<ZlkWnXirc-NhQERA@LQ3V64L9R2>
+	<Zlki09qJi4h4l5xS@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] ethernet: octeontx2: avoid linking objects into multiple
- modules
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171711783059.1907.3068035818325840874.git-patchwork-notify@kernel.org>
-Date: Fri, 31 May 2024 01:10:30 +0000
-References: <20240528152527.2148092-1-arnd@kernel.org>
-In-Reply-To: <20240528152527.2148092-1-arnd@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
- hkelam@marvell.com, arnd@arndb.de, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
- sumang@marvell.com, horms@kernel.org, anthony.l.nguyen@intel.com,
- jiri@resnulli.us, mateusz.polchlopek@intel.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 30 May 2024 18:07:31 -0700 Joe Damato wrote:
+> Unless I am missing something, I think mlx5e_fold_sw_stats64 would
+> need code similar to mlx5e_stats_grp_sw_update_stats_qos and then
+> rtnl would account for htb stats.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Hm, I think you're right. I'm just surprised this could have gone
+unnoticed for so long.
 
-On Tue, 28 May 2024 17:25:05 +0200 you wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Each object file contains information about which module it gets linked
-> into, so linking the same file into multiple modules now causes a warning:
-> 
-> scripts/Makefile.build:254: drivers/net/ethernet/marvell/octeontx2/nic/Makefile: otx2_devlink.o is added to multiple modules: rvu_nicpf rvu_nicvf
-> 
-> [...]
+> That said: since it seems the htb numbers are not included right
+> now, I was proposing adding that in later both to rtnl and
+> netdev-genl together, hoping that would keep the proposed
+> simpler/easier to get accepted.
 
-Here is the summary with links:
-  - ethernet: octeontx2: avoid linking objects into multiple modules
-    https://git.kernel.org/netdev/net-next/c/727c94c9539a
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+SGTM.
 
