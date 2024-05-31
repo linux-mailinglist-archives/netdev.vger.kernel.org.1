@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-99621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B36378D583B
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 03:40:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 628DB8D583D
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 03:40:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E47BD1C22190
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:40:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E6572891FE
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA9FC8E9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 912FBEEBA;
 	Fri, 31 May 2024 01:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oWEsa6Dk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tiQFP/7A"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A7817545
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E431EAC0
 	for <netdev@vger.kernel.org>; Fri, 31 May 2024 01:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717119633; cv=none; b=ZId5FE/BzzP+POYB3T8ITUkrniTazM+vyFawk9+tuh6D3cDbRxW6aMTmEBea+sIZRGwAoVI/b9bh0ZXjI9OPFZdoVPC920tjhX5rKY6FZQb4eeJvun/GTrM97SieUyRp9NyXrKUIg5yuZW6g1fKH/eGY1CaGc8kxgsLo6m4YpgI=
+	t=1717119633; cv=none; b=o8ddDnpdW7DfGyzcUuuBXzzd/7WiF74xPe8uVTc/AInUHuCLtrbr8rBTTIEbMjI0ihk1VeXMpjAWP6ZhM+byvP2Ivjd7YTZmSKx8GUzcoxABu7j1eGxLsiptQD+P6yQQD70JBSU9ugRpSemHOEuO0rZorKZBQAU37ZhncC/w1Z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717119633; c=relaxed/simple;
-	bh=CYHulmigE52cT3mZ/+i7wAv/vNOBtBcebTbzxOSEvx0=;
+	bh=4MX+4QyA9aY/3tLLMNgCFcl/V8UrJJEv3wyQpCxZSU0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=IGuCvdog6EnkF1byd0OsB3LAzJhCeR86aL2x7X0jeEpI2EENytKr1XQsQ3WqPio/ZPPRX4tSQNXa8x1nPnCu998tGzpDCh/8efNtFSWMAINUG5eKu6loVHguVgWTpHCOqVV2s8g6QrdD4bcB7wXsbBCYyxroal2PGuzIVOsunT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oWEsa6Dk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 01A1EC32786;
-	Fri, 31 May 2024 01:40:32 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=OCsKkBTdZeOm9EUMHeCS+6CRdf5IRamwpBzW6HRw9l9rRTXovblpRcZY0WYgBE5pPT5kqRJW2jIYRqnrvfF1UWRz8cOgorWg3fg+uEOd/2xr2L/RZY8jlQBlPBDnjXunyJg4V/k1sDDvrjKzAOUimcHOqi2GMAZh0DpqK+rfwaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tiQFP/7A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 06EF9C4AF07;
+	Fri, 31 May 2024 01:40:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1717119633;
-	bh=CYHulmigE52cT3mZ/+i7wAv/vNOBtBcebTbzxOSEvx0=;
+	bh=4MX+4QyA9aY/3tLLMNgCFcl/V8UrJJEv3wyQpCxZSU0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oWEsa6Dk3JFB44WcgDCF7/M2VC8mYsqmNAUu5cYBGaVJcYpU3VWGUQ2of0DQI7s8A
-	 vs2MKNhsQnGyYfTLVr8ilji8juZCKfv/xEktuBp2qCTDXfOmDS3CA2hpePMoEnlB0D
-	 6CXKWKYYnBVjGiMaLztlCvWbkZGLeAPOsaO5WrrL44FHLQZXmEriBxqOaWPM/GmgXw
-	 CuwIFQYOG4honZXVcZ9h2gGdznWDMmNJvfbXKuq2YYUj8R30DNZ9W4b1/L5kkVC/bO
-	 T1qhpmHxgDVaQhz9wdkMVGEvhd68sbi3HeP+1mz+JhkNuUrfIf85GacH45d/uastHb
-	 L2gCOE8TptwcA==
+	b=tiQFP/7AtYOHf/cmqm3vzihtMQcTIPTfwMDEgiwMVwrzWqJWlNKA2EVwvxpRDRQ/d
+	 D8lYvBABhsjsiVLB1N8lw8rGKLDFbU1Wn8qEXic2Xd0y9eSVrRHcKpWwRzBmpRKQ4j
+	 dHKr7gEuAL3pBtky6ftDw4CUhxE4N5EdU3btjRLq8J8pvCj8Pb1lqXQZ+eCQyjrUsX
+	 a2XH+33UKSwuTyAHHMnOcp1VSDZ3HdZB54yLT+hglhtuXo4fuLpOw/IM68J9sLMoQe
+	 YwO+OP1brYj3BO9b62UPOlZSRwNC2GxSdz2BrtrGnATPBKm2b9WJO1TBheDqBPbT3/
+	 98d0ORFyrdQlQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E186BC3276C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EB8B2D84BCD;
 	Fri, 31 May 2024 01:40:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,51 +52,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/6] net: stmmac: cleanups
+Subject: Re: [PATCH net-next 0/6] net: phylink: rearrange ovr_an_inband support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171711963292.18580.1918608353290496503.git-patchwork-notify@kernel.org>
+ <171711963296.18580.14971727622513760852.git-patchwork-notify@kernel.org>
 Date: Fri, 31 May 2024 01:40:32 +0000
-References: <Zlbp7xdUZAXblOZJ@shell.armlinux.org.uk>
-In-Reply-To: <Zlbp7xdUZAXblOZJ@shell.armlinux.org.uk>
+References: <ZlctinnTT8Xhemsm@shell.armlinux.org.uk>
+In-Reply-To: <ZlctinnTT8Xhemsm@shell.armlinux.org.uk>
 To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: fancer.lancer@gmail.com, ahalaney@redhat.com,
- alexandre.torgue@foss.st.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, joabreu@synopsys.com, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
- netdev@vger.kernel.org, pabeni@redhat.com, vkoul@kernel.org
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ joabreu@synopsys.com, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, madalin.bucur@nxp.com,
+ mcoquelin.stm32@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com,
+ sean.anderson@seco.com, ahalaney@redhat.com, fancer.lancer@gmail.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 29 May 2024 09:40:15 +0100 you wrote:
+On Wed, 29 May 2024 14:28:42 +0100 you wrote:
 > Hi,
 > 
-> This series removes various redundant items in the stmmac driver:
+> This series addresses the use of the ovr_an_inband flag, which is used
+> by two drivers to indicate to phylink that they wish to use inband mode
+> without firmware specifying inband mode.
 > 
-> - the unused TBI and RTBI PCS flags
-> - the NULL pointer initialisations for PCS methods in dwxgmac2
-> - the stmmac_pcs_rane() method which is never called, and it's
->   associated implementations
-> - the redundant netif_carrier_off()s
+> The issue with ovr_an_inband is that it overrides not only PHY mode,
+> but also fixed-link mode. Both of the drivers that set this flag
+> contain code to detect when fixed-link mode will be used, and then
+> either avoid setting it or explicitly clear the flag. This is
+> wasteful when phylink already knows this.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/6] net: stmmac: Drop TBI/RTBI PCS flags
-    https://git.kernel.org/netdev/net-next/c/482b3c3ba757
-  - [net-next,v2,2/6] net: stmmac: dwxgmac2: remove useless NULL pointer initialisations
-    https://git.kernel.org/netdev/net-next/c/4af90c0f4844
-  - [net-next,v2,3/6] net: stmmac: remove pcs_rane() method
-    https://git.kernel.org/netdev/net-next/c/3277407e5e82
-  - [net-next,v2,4/6] net: stmmac: remove unnecessary netif_carrier_off()
-    https://git.kernel.org/netdev/net-next/c/aee04f4bb44d
-  - [net-next,v2,5/6] net: stmmac: include linux/io.h rather than asm/io.h
-    https://git.kernel.org/netdev/net-next/c/cd56ff75ccfc
-  - [net-next,v2,6/6] net: stmmac: ethqos: clean up setting serdes speed
-    https://git.kernel.org/netdev/net-next/c/7efc70657704
+  - [net-next,1/6] net: phylink: rearrange phylink_parse_mode()
+    https://git.kernel.org/netdev/net-next/c/75518b0dc9d6
+  - [net-next,2/6] net: phylink: move test for ovr_an_inband
+    https://git.kernel.org/netdev/net-next/c/fea49f065c1c
+  - [net-next,3/6] net: phylink: rename ovr_an_inband to default_an_inband
+    https://git.kernel.org/netdev/net-next/c/02d00dc73d8d
+  - [net-next,4/6] net: fman_memac: remove the now unnecessary checking for fixed-link
+    https://git.kernel.org/netdev/net-next/c/5e332954e760
+  - [net-next,5/6] net: stmmac: rename xpcs_an_inband to default_an_inband
+    https://git.kernel.org/netdev/net-next/c/83f55b01dd90
+  - [net-next,6/6] net: stmmac: dwmac-intel: remove checking for fixed link
+    https://git.kernel.org/netdev/net-next/c/ab77c7aa9388
 
 You are awesome, thank you!
 -- 
