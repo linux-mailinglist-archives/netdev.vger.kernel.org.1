@@ -1,167 +1,171 @@
-Return-Path: <netdev+bounces-99795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E603C8D6874
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 19:49:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 424C58D68BD
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 20:12:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D9111F2885B
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 17:49:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7555289922
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 18:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF71446D1;
-	Fri, 31 May 2024 17:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFA2617C20E;
+	Fri, 31 May 2024 18:12:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=phytec.de header.i=@phytec.de header.b="ZA4T4lzH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WkNB/UYd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mickerik.phytec.de (mickerik.phytec.de [91.26.50.163])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FB91DFCB
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 17:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.26.50.163
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C69176258
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 18:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717177739; cv=none; b=FRy9Id96LPR6N2lTzdiFWkea6zyEA9+dpFHkunUHIl0z2umJHXf46dqjO5sqIhq6YoNK9UsTJm7Q2odwIVywhvxt4ouaUnXpaOoWP2guJ1xV/6UspFXDoQSsPPLuhv6bPDIrg9vMmm5vKWZ1J50bB10HzSWvUzoHBAbxNTD2+PU=
+	t=1717179123; cv=none; b=l7XgBb7GzGPKLpEWkIffWdSBhdfGTWiwXvOjElpiSKqEIVYRiH/viI4gqVZ0aK+rBhHk9nAe8LAhvFMa1iIsslcNUpHXA6qTn/Qxbt/1+z53ouxyBERNpB75txGCTZovpeSDxOh/RGDoU5MRzjVBsubVvYcVBHkxNfUkX0yZ9vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717177739; c=relaxed/simple;
-	bh=MXqn0xeA2HqxHTRc1nTtDIQVZRm+olzLnPAvyUPI2QM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=MYCAVrxz1PTJHiTe9d1u05iTCBnwjrejeahGWEPjMiQkp9fVbdz2s0Qwv4KkRfzxGhL0RgQs5k5L9P58RZE74dkSTLIQjB8HXoz/VEP3Q9yl6nrKnm+meCYCppj8sBQ+AR0AK0e1dlmyUVjFlG/1LCGGV1Xd4CTwFrtndXPySCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phytec.de; spf=pass smtp.mailfrom=phytec.de; dkim=pass (1024-bit key) header.d=phytec.de header.i=@phytec.de header.b=ZA4T4lzH; arc=none smtp.client-ip=91.26.50.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phytec.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phytec.de
-DKIM-Signature: v=1; a=rsa-sha256; d=phytec.de; s=a4; c=relaxed/simple;
-	q=dns/txt; i=@phytec.de; t=1717177731; x=1719769731;
-	h=From:Sender:Reply-To:Subject:Date:Message-ID:To:CC:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=MXqn0xeA2HqxHTRc1nTtDIQVZRm+olzLnPAvyUPI2QM=;
-	b=ZA4T4lzH7QGt3f0O18jjmVSizCsSkHJeh8ODoezaUrRyxH2WDOjhbe1gS5Om20h4
-	VO6JPByrwj38Iaj9PfKt8XaUaxaTQTceU1XgW7KvKsN/xotJb3Ti6Y0w+zHlbVBn
-	rEk32qSBgVfjc/Ft04H34G8+lsmdsZHDkbXxKK6Rb/s=;
-X-AuditID: ac14000a-03251700000021bc-eb-665a0d834430
-Received: from berlix.phytec.de (Unknown_Domain [172.25.0.12])
-	(using TLS with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(Client did not present a certificate)
-	by mickerik.phytec.de (PHYTEC Mail Gateway) with SMTP id 55.77.08636.38D0A566; Fri, 31 May 2024 19:48:51 +0200 (CEST)
-Received: from [10.0.0.42] (172.25.0.11) by Berlix.phytec.de (172.25.0.12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.6; Fri, 31 May
- 2024 19:48:43 +0200
-Message-ID: <828e0af0-bad4-4012-b519-2d292f0035a5@phytec.de>
-Date: Fri, 31 May 2024 19:48:38 +0200
+	s=arc-20240116; t=1717179123; c=relaxed/simple;
+	bh=2W5a4FkyIWrmZpTDIuM0HNCBwfLq0NtYDbJGbW/qSwg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rq78b/AfhGKnSZn+l99QXECEcfxDTx1KoP62WSwzcH8e/GGQs9EN/qirGevSbXhR/yULHvyKorxIqevMGw/AsaCPSHs0/YbqIwNTHG60nDryU61/iW5w6T4/l8cN+fWfLM2kuU87lYceYlP3j0ssiaDxrgfQN9DKGreL3ccmnRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WkNB/UYd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81B49C116B1;
+	Fri, 31 May 2024 18:12:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717179123;
+	bh=2W5a4FkyIWrmZpTDIuM0HNCBwfLq0NtYDbJGbW/qSwg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WkNB/UYde4Vf4gq7BXTPhxovzYDYIarLppMOLcp9q/QSxifA7WHFr0sIiqliUgEa/
+	 X6OVdRZsBeCD4r7VLcUao9G8cCd9GO9ifbn1uzWws4yeeduNabTJuC471LZh/3tPri
+	 pilBEin7I3FpXt6EuwrBmB8hezFfuWgCN9cIj6P8u5LbksJG+mqnRg8fz2Ojmm2eLR
+	 OqPZ9OHMCqtE9e4BF41mPjLsxf/wIbrEHf2iq9UFvfKlCOdaFoAMrnjY6icuQNBSGW
+	 y/QDgLXvFl0fAoDd0G5gUbnL4rKJiwHjyJYwwICtZgRSsUOQ8nuCM5NksjAVwt9n29
+	 yX3Dzuahiuytw==
+Date: Fri, 31 May 2024 19:11:59 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	jacob.e.keller@intel.com, anthony.l.nguyen@intel.com,
+	Junfeng Guo <junfeng.guo@intel.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>
+Subject: Re: [PATCH iwl-next v2 11/13] ice: enable FDIR filters from raw
+ binary patterns for VFs
+Message-ID: <20240531181159.GD491852@kernel.org>
+References: <20240527185810.3077299-1-ahmed.zaki@intel.com>
+ <20240527185810.3077299-12-ahmed.zaki@intel.com>
+ <20240531131802.GG123401@kernel.org>
+ <f2cf6650-a164-4d3c-a3d9-cc57c66069a5@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] dt-bindings: net: dp8386x: Add MIT license along with
- GPL-2.0
-To: Udit Kumar <u-kumar1@ti.com>, <vigneshr@ti.com>, <nm@ti.com>,
-	<tglx@linutronix.de>, <tpiepho@impinj.com>
-CC: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <robh@kernel.org>,
-	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, Kip Broadhurst <kbroadhurst@ti.com>
-References: <20240531165725.1815176-1-u-kumar1@ti.com>
-Content-Language: en-US
-From: Wadim Egorov <w.egorov@phytec.de>
-In-Reply-To: <20240531165725.1815176-1-u-kumar1@ti.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: Berlix.phytec.de (172.25.0.12) To Berlix.phytec.de
- (172.25.0.12)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrGIsWRmVeSWpSXmKPExsWyRpKBR7eZNyrNoG2PtMX5u4eYLdbsPcdk
-	Med8C4vF/CPnWC2eHnvEbrH+q6TFy1n32CwubOtjtdj0+BqrxeVdc9gsji0Qs3jz4yyTxbfT
-	bxgt/u/ZwW6xedNUZoslcx+yW0zbO4PZ4v/ZD+wOQh5bVt5k8liwqdTjzYTbTB6bVnWyebw7
-	d47dY/OSeo+dOz4zebzfd5XN4/iN7UwenzfJBXBFcdmkpOZklqUW6dslcGWsmXGUpeCeaMWj
-	R/oNjLcEuxg5OSQETCT2r7jB0sXIxSEksIRJYvHPyUwQzi1GiaWbL7KBVPEK2EgcbVsFZrMI
-	qEqsWbidFSIuKHFy5hMWEFtUQF7i/q0Z7CC2sEC4xIpru4HiHBwiAnkSB6ZVgcxkFrjOJNHw
-	aCNYvZCAmcTWg3eZQWxmAXGJW0/mM4HYbALqEnc2fAObzylgLjHn8Xc2iBoLicVvDrJD2PIS
-	29/OYYaYIy/x4tJyFohv5CWmnXvNDGGHSmz9sp1pAqPwLCSnzkKybhaSsbOQjF3AyLKKUSg3
-	Mzk7tSgzW68go7IkNVkvJXUTIyiuRRi4djD2zfE4xMjEwXiIUYKDWUmE91d6RJoQb0piZVVq
-	UX58UWlOavEhRmkOFiVx3tUdwalCAumJJanZqakFqUUwWSYOTqkGRgkHU6bV9779uCu2/0cZ
-	R7mjZ3yl37Vzh/dbfw36+XWGeeav2fOvP+RirlnTzNkWGCu/+LvM3OajT7Qsj382CHn9TNLX
-	2mWiL2N28WaD+d4q11csF+20U9mls+hNr8cxYc65mWtWPds2RSuau7HBWERl56b9PWEWChuq
-	+jnWfPa6b7zOK3nXUiWW4oxEQy3mouJEAIKNn37ZAgAA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f2cf6650-a164-4d3c-a3d9-cc57c66069a5@intel.com>
 
+On Fri, May 31, 2024 at 09:47:47AM -0600, Ahmed Zaki wrote:
+> 
+> 
+> On 2024-05-31 7:18 a.m., Simon Horman wrote:
+> > On Mon, May 27, 2024 at 12:58:08PM -0600, Ahmed Zaki wrote:
+> > > From: Junfeng Guo <junfeng.guo@intel.com>
+> > > 
+> > > Enable VFs to create FDIR filters from raw binary patterns.
+> > > The corresponding processes for raw flow are added in the
+> > > Parse / Create / Destroy stages.
+> > > 
+> > > Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> > > Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
+> > > Co-developed-by: Ahmed Zaki <ahmed.zaki@intel.com>
+> > > Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
+> > 
+> > ...
+> > 
+> > > diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
+> > 
+> > ...
+> > 
+> > > +/**
+> > > + * ice_flow_set_parser_prof - Set flow profile based on the parsed profile info
+> > > + * @hw: pointer to the HW struct
+> > > + * @dest_vsi: dest VSI
+> > > + * @fdir_vsi: fdir programming VSI
+> > > + * @prof: stores parsed profile info from raw flow
+> > > + * @blk: classification blk
+> > > + */
+> > > +int
+> > > +ice_flow_set_parser_prof(struct ice_hw *hw, u16 dest_vsi, u16 fdir_vsi,
+> > > +			 struct ice_parser_profile *prof, enum ice_block blk)
+> > > +{
+> > > +	u64 id = find_first_bit(prof->ptypes, ICE_FLOW_PTYPE_MAX);
+> > > +	struct ice_flow_prof_params *params __free(kfree);
+> > > +	u8 fv_words = hw->blk[blk].es.fvw;
+> > > +	int status;
+> > > +	int i, idx;
+> > > +
+> > > +	params = kzalloc(sizeof(*params), GFP_KERNEL);
+> > > +	if (!params)
+> > > +		return -ENOMEM;
+> > 
+> > 
+> > params seems to be leaked when this function returns below,
+> > in both error and non-error cases.
+> 
+> Shouldn't the __free guard take care of this?
 
+Yes, sorry for missing that.
 
-Am 31.05.24 um 18:57 schrieb Udit Kumar:
-> Modify license to include dual licensing as GPL-2.0-only OR MIT
-> license for TI specific phy header files. This allows for Linux
-> kernel files to be used in other Operating System ecosystems
-> such as Zephyr or FreeBSD.
-> 
-> While at this, update the GPL-2.0 to be GPL-2.0-only to be in sync
-> with latest SPDX conventions (GPL-2.0 is deprecated).
-> 
-> While at this, update the TI copyright year to sync with current year
-> to indicate license change.
-> 
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Trent Piepho <tpiepho@impinj.com>
-> Cc: Wadim Egorov <w.egorov@phytec.de>
-> Cc: Kip Broadhurst <kbroadhurst@ti.com>
-> Signed-off-by: Udit Kumar <u-kumar1@ti.com>
+...
 
-Acked-by: Wadim Egorov <w.egorov@phytec.de>
+> > > diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> > > index 5635e9da2212..9138f7783da0 100644
+> > > --- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> > > +++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> > > @@ -1,8 +1,8 @@
+> > >   // SPDX-License-Identifier: GPL-2.0
+> > >   /* Copyright (C) 2022, Intel Corporation. */
+> > > -#include "ice_vf_lib_private.h"
+> > >   #include "ice.h"
+> > > +#include "ice_vf_lib_private.h"
+> > >   #include "ice_lib.h"
+> > >   #include "ice_fltr.h"
+> > >   #include "ice_virtchnl_allowlist.h"
+> > 
+> > To me tweaking the order of includes seems to indicate
+> > that something isn't quite right. Is there some sort of
+> > dependency loop being juggled here?
+> 
+> This was needed because of the changes in ice_flow.h, struct ice_vsi is now
+> used. I will check if there is a better fix.
 
-> ---
-> Changelog:
-> Changes in v2:
-> - Updated Copyright information as per review comments of v1
-> - Added all authors[0] in CC list of patch
-> - Extended patch to LAKML list
-> v1 link: https://lore.kernel.org/all/20240517104226.3395480-1-u-kumar1@ti.com/
+Thanks.
+
+...
+
+> > > +static int
+> > > +ice_vc_fdir_parse_raw(struct ice_vf *vf,
+> > > +		      struct virtchnl_proto_hdrs *proto,
+> > > +		      struct virtchnl_fdir_fltr_conf *conf)
+> > > +{
+> > > +	u8 *pkt_buf, *msk_buf __free(kfree);
+> > > +	struct ice_parser_result rslt;
+> > > +	struct ice_pf *pf = vf->pf;
+> > > +	struct ice_parser *psr;
+> > > +	int status = -ENOMEM;
+> > > +	struct ice_hw *hw;
+> > > +	u16 udp_port = 0;
+> > > +
+> > > +	pkt_buf = kzalloc(proto->raw.pkt_len, GFP_KERNEL);
+> > > +	msk_buf = kzalloc(proto->raw.pkt_len, GFP_KERNEL);
+> > 
+> > msk_buf appears to be leaked both in when this function
+> > returns for both error and non-error cases.
 > 
-> [0] Patch cc list is based upon (I am representing @ti.com for this patch)
-> git log --no-merges --pretty="%ae" $files|grep -v "@ti.com"
-> 
-> Requesting Acked-by, from the CC list of patch at the earliest
-> 
-> 
->   include/dt-bindings/net/ti-dp83867.h | 4 ++--
->   include/dt-bindings/net/ti-dp83869.h | 4 ++--
->   2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/dt-bindings/net/ti-dp83867.h b/include/dt-bindings/net/ti-dp83867.h
-> index 6fc4b445d3a1..b8a4f3ff4a3b 100644
-> --- a/include/dt-bindings/net/ti-dp83867.h
-> +++ b/include/dt-bindings/net/ti-dp83867.h
-> @@ -1,10 +1,10 @@
-> -/* SPDX-License-Identifier: GPL-2.0-only */
-> +/* SPDX-License-Identifier: GPL-2.0-only OR MIT */
->   /*
->    * Device Tree constants for the Texas Instruments DP83867 PHY
->    *
->    * Author: Dan Murphy <dmurphy@ti.com>
->    *
-> - * Copyright:   (C) 2015 Texas Instruments, Inc.
-> + * Copyright (C) 2015-2024 Texas Instruments Incorporated - https://www.ti.com/
->    */
->   
->   #ifndef _DT_BINDINGS_TI_DP83867_H
-> diff --git a/include/dt-bindings/net/ti-dp83869.h b/include/dt-bindings/net/ti-dp83869.h
-> index 218b1a64e975..917114aad7d0 100644
-> --- a/include/dt-bindings/net/ti-dp83869.h
-> +++ b/include/dt-bindings/net/ti-dp83869.h
-> @@ -1,10 +1,10 @@
-> -/* SPDX-License-Identifier: GPL-2.0-only */
-> +/* SPDX-License-Identifier: GPL-2.0-only OR MIT */
->   /*
->    * Device Tree constants for the Texas Instruments DP83869 PHY
->    *
->    * Author: Dan Murphy <dmurphy@ti.com>
->    *
-> - * Copyright:   (C) 2019 Texas Instruments, Inc.
-> + * Copyright (C) 2015-2024 Texas Instruments Incorporated - https://www.ti.com/
->    */
->   
->   #ifndef _DT_BINDINGS_TI_DP83869_H
+> Same, guarded by __free. I am new to these guards myself, pls let me know if
+> I am missing something.
+
+No, sorry. Somehow I missed the __free.
+I think we are good here.
 
