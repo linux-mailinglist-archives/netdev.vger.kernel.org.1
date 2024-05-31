@@ -1,266 +1,151 @@
-Return-Path: <netdev+bounces-99763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9B2B8D6476
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 16:25:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2FF18D64C0
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 16:46:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3443EB28841
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 14:25:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27525B271C2
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 14:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01153F8C7;
-	Fri, 31 May 2024 14:24:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735035337C;
+	Fri, 31 May 2024 14:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b="dyrJ/imL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NIxqLIOy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.savoirfairelinux.com (mail.savoirfairelinux.com [208.88.110.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7672837D
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 14:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.88.110.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC46B2233E
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 14:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717165488; cv=none; b=V8AobI+gO3AyQAEvLr0VXqr3gxaGfemNxv/06PJjWnwxILmjHOarrn2YcH9EB4hUthR3PjXE2Hh3Gjt/Wzt/6AP2H9+DEbkg6HVKcjgPt++GULtTuV1SvOLW2eYS0oM3jo4Bvdn6lIs+gtHukUnw8K6LTE1ddqlVs1AiSGC9F3Y=
+	t=1717166809; cv=none; b=kFVoUpPlnKSA5sC4F1ce6YvOuw1xKOQrntyh8xuQ/ZYKYTstEcTVfr+MHNcF7lo/uizuxgz4z3GiiFiMgmGtWWy4qOtuO2V8R+zQTvlHMfvAp62UxaQSd7u5YaOM8nrqeOmlaqGxbCQmeeZ2Xkq/O1aQbJDgprHFLOULwV3iVNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717165488; c=relaxed/simple;
-	bh=Lfs/KUSHLBDNE5S/XFidUV2cUUXtUJg5a9ooZeLuaJc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HCwJLPBqVNvGX/okoIvil2sFfql17P0HQDtQUMP2dAsNLkupSoT4Hqo5cRIBNJ7pZO4djKVusqgftZbAg8frpMmgLJFgECfGpFHy/JITfCEHN4wlH4QIB9bWhpDvN9iXYqIlEa+1QHMx2ocrydSBub0W3GmEqQEr3jccFfOIV0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com; spf=pass smtp.mailfrom=savoirfairelinux.com; dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b=dyrJ/imL; arc=none smtp.client-ip=208.88.110.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=savoirfairelinux.com
-Received: from localhost (localhost [127.0.0.1])
-	by mail.savoirfairelinux.com (Postfix) with ESMTP id 992FB9C405E;
-	Fri, 31 May 2024 10:24:46 -0400 (EDT)
-Received: from mail.savoirfairelinux.com ([127.0.0.1])
- by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10032)
- with ESMTP id CPfsGg65tdHE; Fri, 31 May 2024 10:24:45 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
-	by mail.savoirfairelinux.com (Postfix) with ESMTP id 331089C32FC;
-	Fri, 31 May 2024 10:24:45 -0400 (EDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.savoirfairelinux.com 331089C32FC
+	s=arc-20240116; t=1717166809; c=relaxed/simple;
+	bh=7cuhSZIVrf02s7Dqtu4woIFIW46cbVuZlO2z9yNeyNw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=i06HOghz2HFcFKGnQDPKTM3MEHkthdwROV2fzixBSLMfb3DhszPS/cwBQYuFYc8pleapDs9MvZ+VGUOK9CD+yzmmwoBnLJ9KTbOlpX4DnqtJSv9tKkEpjw6fwPrJjh2uYOH4pBOuUNVbGY/tVKtoinnpoPD7frX0mu0hWUEphsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NIxqLIOy; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-43fb058873bso5720651cf.1
+        for <netdev@vger.kernel.org>; Fri, 31 May 2024 07:46:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=savoirfairelinux.com; s=DFC430D2-D198-11EC-948E-34200CB392D2;
-	t=1717165485; bh=Zh3SrCOoE5gcB4w9AEOZxFggzCrs9zEQkfGnuOBZIhc=;
-	h=From:To:Date:Message-Id:MIME-Version;
-	b=dyrJ/imLP3e+PAdfMz1duDqn/LdQPb6Sj309KXZXmTqEvfWYyaaGpZ0bm3edjRGNQ
-	 XaEc/0aNjzq/laP7nFuTgv5++mndgsuxOvpxxghyDYb107plmlgYZKZUqMXdPfcWO4
-	 O6SFg5/D7Xf2EzLTjm83oi4mvinnIqUq7BsJf40sF7H+VnT0ECjWdGVfNpZMHmO+3x
-	 fiD1VS/xSdXDNPgYzibpu7sUWGaDNp4tiGQX1+CXhkrDGC58GRlb3h4BVd6GFKoka/
-	 evfigOZRt7LxwguBQvrSreIJqRdbDhcuxX4OmDGsxj44BzcqUM2ZtIvMkJLlKGtJpr
-	 c/dVoc4k/sJPw==
-X-Virus-Scanned: amavis at mail.savoirfairelinux.com
-Received: from mail.savoirfairelinux.com ([127.0.0.1])
- by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10026)
- with ESMTP id IU6Wxgl6dWEt; Fri, 31 May 2024 10:24:45 -0400 (EDT)
-Received: from sfl-deribaucourt.rennes.sfl (lmontsouris-657-1-69-118.w80-15.abo.wanadoo.fr [80.15.101.118])
-	by mail.savoirfairelinux.com (Postfix) with ESMTPSA id 4772B9C405E;
-	Fri, 31 May 2024 10:24:44 -0400 (EDT)
-From: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
-To: netdev@vger.kernel.org
-Cc: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	woojung.huh@microchip.com,
-	UNGLinuxDriver@microchip.com,
-	Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
-Subject: [PATCH net v4 5/5] net: dsa: microchip: monitor potential faults in half-duplex mode
-Date: Fri, 31 May 2024 14:24:30 +0000
-Message-Id: <20240531142430.678198-6-enguerrand.de-ribaucourt@savoirfairelinux.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240531142430.678198-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
-References: <20240530102436.226189-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
- <20240531142430.678198-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+        d=gmail.com; s=20230601; t=1717166807; x=1717771607; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+pncjrM/rcfmj22XxUpDcMXbqLWqiXgeyTc6o80S9nw=;
+        b=NIxqLIOybrO6jEuMwNa19YVMpiifQV0IZjrgN12meb6qKsffRZQPmm0dZU9Xk9IndM
+         pz2kHbvz1CEY18wc1A0e5jfyhrjYQhkXIIcIvN3x73iNbWH2JEgXxwnpxbWqT7SMCudQ
+         O4SwvWM+dNFJw3mY6FYaJPFzWRP0+4SDsHXxxxoGPW1uL+83ycVUbsHiRbz7z7jumj+I
+         pc2q+OJetK6mAOM2phEtLbqjMWw0FLlJ1fqQ7FVRwnSrRr95VORMspY19/W1k0TNgteZ
+         g3Sjb9nokJ2Plr3dEKNq1shjaWP0xhjlsKWlB7jNIyRb8IR6FvOD3h8bsmx45IGX9iIX
+         ewAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717166807; x=1717771607;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+pncjrM/rcfmj22XxUpDcMXbqLWqiXgeyTc6o80S9nw=;
+        b=ufjs26yPW3GahonOWAhzKXwQCVuky23PLWYQO+4NeTm1eZEWJhe6CubQFWN72o8QBv
+         k/mpanHdQ/qQhnyCBNHRUuXO4I+vCLivb+vtNP2WBP2kOZzQD7BrHSNiHzLdZkbepM4k
+         29Ty0CCGXQtMZfZDygZonuM6RQwqu2N5jjNrmWw/51jjM3Z9MV//SKZMcFArlagyF8K0
+         G/JiAyKI/BYSYD5m+GbdsXt7RPRK4VeYAz0JfNZE6nbA/lT2vwGW/Og2OsjvPy6Se+oD
+         O2Io4+C/iq8q3PzNIIQ8J2D2WOPY3gXlKlo3z5llnvkkXSK1MJ1Veu77LPmBayT5sDGX
+         FutQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWKd7CTwvzx0kO1MX5URSNfddv3FDkdiHU9kB8rlXHzLHfcVIRKOwZ6NiNJ0V54P6mc9DnpHtnL18edj/446R9CCZ2xoRWH
+X-Gm-Message-State: AOJu0YzY/1GOKe+pBMFHut5aCkR8lI306/AwlzJcDIH8lLI2hpnyk3tG
+	OsqQ/GkPwxD7Pi1Rpv0N5yMVUxTU2nx+I1PiQ0uKPe4iVFJqdSjR
+X-Google-Smtp-Source: AGHT+IEX7L5Mgxn6feqnRT+guMTMGPipb4tnNQ34PwSG81TpaM2Vx4QZi7dX1C3DDv+klgITpKxGCQ==
+X-Received: by 2002:a05:6214:3204:b0:6ae:abc:82fe with SMTP id 6a1803df08f44-6aecd59a276mr23897826d6.27.1717166806635;
+        Fri, 31 May 2024 07:46:46 -0700 (PDT)
+Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ae4b417a3esm6907086d6.116.2024.05.31.07.46.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 May 2024 07:46:46 -0700 (PDT)
+Date: Fri, 31 May 2024 10:46:45 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Paul Wouters <paul@nohats.ca>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com, 
+ borisp@nvidia.com, 
+ gal@nvidia.com, 
+ cratiu@nvidia.com, 
+ rrameshbabu@nvidia.com, 
+ tariqt@nvidia.com
+Message-ID: <6659e2d5cd07e_3fde492947a@willemb.c.googlers.com.notmuch>
+In-Reply-To: <ZllpgEvQ4QnfP3m7@gauss3.secunet.de>
+References: <1da873f4-7d9b-1bb3-0c44-0c04923bf3ab@nohats.ca>
+ <ZlWm/rt2OGfOCiZR@gauss3.secunet.de>
+ <6655e0eecb33a_29176f29427@willemb.c.googlers.com.notmuch>
+ <ZllpgEvQ4QnfP3m7@gauss3.secunet.de>
+Subject: Re: [RFC net-next 00/15] add basic PSP encryption for TCP connections
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-The errata DS80000754 recommends monitoring potential faults in
-half-duplex mode for the KSZ9477 familly.
+Steffen Klassert wrote:
+> On Tue, May 28, 2024 at 09:49:34AM -0400, Willem de Bruijn wrote:
+> > Steffen Klassert wrote:
+> > > On Wed, May 22, 2024 at 08:56:02AM -0400, Paul Wouters wrote:
+> > > > Jakub Kicinski wrote:
+> > > > 
+> > > > > Add support for PSP encryption of TCP connections.
+> > > > > 
+> > > > > PSP is a protocol out of Google:
+> > > > > https://github.com/google/psp/blob/main/doc/PSP_Arch_Spec.pdf
+> > > > > which shares some similarities with IPsec. I added some more info
+> > > > > in the first patch so I'll keep it short here.
+> > > > 
+> > > > Speaking as an IETF contributor, I am little surprised here. I know
+> > > > the google people reached out at IETF and were told their stuff is
+> > > > so similar to IPsec, maybe they should talk to the IPsecME Working
+> > > > Group. There, I believe Steffen Klassert started working on supporting
+> > > > the PSP features requested using updates to the ESP/WESP IPsec protocol,
+> > > > such as support for encryption offset to reveal protocol/ports for
+> > > > routing encrypted traffic.
+> > > 
+> > > This was somewhat semipublic information, so I did not talk about
+> > > it on the lists yet. Today we published the draft, it can be found here:
+> > > 
+> > > https://datatracker.ietf.org/doc/draft-klassert-ipsecme-wespv2/
+> > > 
+> > > Please note that the packet format specification is portable to other
+> > > protocol use cases, such as PSP. It uses IKEv2 as a negotiation
+> > > protocol and does not define any key derivation etc. as PSP does.
+> > > But it can be also used with other protocols for key negotiation
+> > > and key derivation.
+> > 
+> > Very nice. Thanks for posting, Steffen.
+> > 
+> > One point about why PSP is that the exact protocol and packet format
+> > is already in use and supported by hardware.
+> > 
+> > It makes sense to work to get to an IETF standard protocol that
+> > captures the same benefits. But that is independent from enabling what
+> > is already implemented.
+> 
+> Sure, PSP is already implemented in hardware and needs to be supported.
+> I don't want to judge if it was a good idea to start this without
+> talking to the IETF, but maybe now Google can join the effort at the
+> IETF do standardize a modern encryption protocol that meets all the
+> requirements we have these days. This will be likely on the agenda of
+> the next IETF IPsecME working group meeting, so would be nice to
+> see somebody from the Google 'PSP team' there.
 
-half-duplex is not very common so I just added a critical message
-when the fault conditions are detected. The switch can be expected
-to be unable to communicate anymore in these states and a software
-reset of the switch would be required which I did not implement.
-
-Fixes: b987e98e50ab ("dsa: add DSA switch driver for Microchip KSZ9477")
-Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirf=
-airelinux.com>
----
-v4:
- - rebase on net/main
- - add Fixes tag
- - reverse x-mas tree
-v3: https://lore.kernel.org/all/20240530102436.226189-6-enguerrand.de-rib=
-aucourt@savoirfairelinux.com/
----
- drivers/net/dsa/microchip/ksz9477.c     | 34 +++++++++++++++++++++++++
- drivers/net/dsa/microchip/ksz9477.h     |  2 ++
- drivers/net/dsa/microchip/ksz9477_reg.h |  8 ++++--
- drivers/net/dsa/microchip/ksz_common.c  |  7 +++++
- drivers/net/dsa/microchip/ksz_common.h  |  1 +
- 5 files changed, 50 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microc=
-hip/ksz9477.c
-index 343b9d7538e9..9c69c78c0b92 100644
---- a/drivers/net/dsa/microchip/ksz9477.c
-+++ b/drivers/net/dsa/microchip/ksz9477.c
-@@ -429,6 +429,40 @@ void ksz9477_freeze_mib(struct ksz_device *dev, int =
-port, bool freeze)
- 	mutex_unlock(&p->mib.cnt_mutex);
- }
-=20
-+void ksz9477_errata_monitor(struct ksz_device *dev, int port,
-+			    u64 tx_late_col)
-+{
-+	u32 pmavbc;
-+	u8 status;
-+	u16 pqm;
-+
-+	ksz_pread8(dev, port, REG_PORT_STATUS_0, &status);
-+	if (!((status & PORT_INTF_SPEED_MASK) =3D=3D PORT_INTF_SPEED_MASK) &&
-+	    !(status & PORT_INTF_FULL_DUPLEX)) {
-+		dev_warn_once(dev->dev,
-+			      "Half-duplex detected on port %d, transmission halt may occur\n=
-",
-+			      port);
-+		/* Errata DS80000754 recommends monitoring potential faults in
-+		 * half-duplex mode. The switch might not be able to communicate anymo=
-re
-+		 * in these states.
-+		 */
-+		if (tx_late_col !=3D 0) {
-+			/* Transmission halt with late collisions */
-+			dev_crit_ratelimited(dev->dev,
-+					     "TX late collisions detected, transmission may be halted on po=
-rt %d\n",
-+					     port);
-+		}
-+		ksz_pread16(dev, port, REG_PORT_QM_TX_CNT_0__4, &pqm);
-+		ksz_read32(dev, REG_PMAVBC, &pmavbc);
-+		if (((pmavbc & PMAVBC_MASK) >> PMAVBC_SHIFT <=3D 0x580) ||
-+		    ((pqm & PORT_QM_TX_CNT_M) >=3D 0x200)) {
-+			/* Transmission halt with Half-Duplex and VLAN */
-+			dev_crit_ratelimited(dev->dev,
-+					     "resources out of limits, transmission may be halted\n");
-+		}
-+	}
-+}
-+
- void ksz9477_port_init_cnt(struct ksz_device *dev, int port)
- {
- 	struct ksz_port_mib *mib =3D &dev->ports[port].mib;
-diff --git a/drivers/net/dsa/microchip/ksz9477.h b/drivers/net/dsa/microc=
-hip/ksz9477.h
-index ce1e656b800b..3312ef28e99c 100644
---- a/drivers/net/dsa/microchip/ksz9477.h
-+++ b/drivers/net/dsa/microchip/ksz9477.h
-@@ -36,6 +36,8 @@ int ksz9477_port_mirror_add(struct ksz_device *dev, int=
- port,
- 			    bool ingress, struct netlink_ext_ack *extack);
- void ksz9477_port_mirror_del(struct ksz_device *dev, int port,
- 			     struct dsa_mall_mirror_tc_entry *mirror);
-+void ksz9477_errata_monitor(struct ksz_device *dev, int port,
-+			    u64 tx_late_col);
- void ksz9477_get_caps(struct ksz_device *dev, int port,
- 		      struct phylink_config *config);
- int ksz9477_fdb_dump(struct ksz_device *dev, int port,
-diff --git a/drivers/net/dsa/microchip/ksz9477_reg.h b/drivers/net/dsa/mi=
-crochip/ksz9477_reg.h
-index f3a205ee483f..3238b9748d0f 100644
---- a/drivers/net/dsa/microchip/ksz9477_reg.h
-+++ b/drivers/net/dsa/microchip/ksz9477_reg.h
-@@ -842,8 +842,7 @@
-=20
- #define REG_PORT_STATUS_0		0x0030
-=20
--#define PORT_INTF_SPEED_M		0x3
--#define PORT_INTF_SPEED_S		3
-+#define PORT_INTF_SPEED_MASK		0x0018
- #define PORT_INTF_FULL_DUPLEX		BIT(2)
- #define PORT_TX_FLOW_CTRL		BIT(1)
- #define PORT_RX_FLOW_CTRL		BIT(0)
-@@ -1167,6 +1166,11 @@
- #define PORT_RMII_CLK_SEL		BIT(7)
- #define PORT_MII_SEL_EDGE		BIT(5)
-=20
-+#define REG_PMAVBC				0x03AC
-+
-+#define PMAVBC_MASK				0x7ff0000
-+#define PMAVBC_SHIFT			16
-+
- /* 4 - MAC */
- #define REG_PORT_MAC_CTRL_0		0x0400
-=20
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/mic=
-rochip/ksz_common.c
-index 2818e24e2a51..edc7467f101d 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -1382,6 +1382,7 @@ const struct ksz_chip_data ksz_switch_chips[] =3D {
- 		.tc_cbs_supported =3D true,
- 		.ops =3D &ksz9477_dev_ops,
- 		.phylink_mac_ops =3D &ksz9477_phylink_mac_ops,
-+		.phy_errata_9477 =3D true,
- 		.mib_names =3D ksz9477_mib_names,
- 		.mib_cnt =3D ARRAY_SIZE(ksz9477_mib_names),
- 		.reg_mib_cnt =3D MIB_COUNTER_NUM,
-@@ -1416,6 +1417,7 @@ const struct ksz_chip_data ksz_switch_chips[] =3D {
- 		.num_ipms =3D 8,
- 		.ops =3D &ksz9477_dev_ops,
- 		.phylink_mac_ops =3D &ksz9477_phylink_mac_ops,
-+		.phy_errata_9477 =3D true,
- 		.mib_names =3D ksz9477_mib_names,
- 		.mib_cnt =3D ARRAY_SIZE(ksz9477_mib_names),
- 		.reg_mib_cnt =3D MIB_COUNTER_NUM,
-@@ -1450,6 +1452,7 @@ const struct ksz_chip_data ksz_switch_chips[] =3D {
- 		.num_ipms =3D 8,
- 		.ops =3D &ksz9477_dev_ops,
- 		.phylink_mac_ops =3D &ksz9477_phylink_mac_ops,
-+		.phy_errata_9477 =3D true,
- 		.mib_names =3D ksz9477_mib_names,
- 		.mib_cnt =3D ARRAY_SIZE(ksz9477_mib_names),
- 		.reg_mib_cnt =3D MIB_COUNTER_NUM,
-@@ -1540,6 +1543,7 @@ const struct ksz_chip_data ksz_switch_chips[] =3D {
- 		.tc_cbs_supported =3D true,
- 		.ops =3D &ksz9477_dev_ops,
- 		.phylink_mac_ops =3D &ksz9477_phylink_mac_ops,
-+		.phy_errata_9477 =3D true,
- 		.mib_names =3D ksz9477_mib_names,
- 		.mib_cnt =3D ARRAY_SIZE(ksz9477_mib_names),
- 		.reg_mib_cnt =3D MIB_COUNTER_NUM,
-@@ -1861,6 +1865,9 @@ void ksz_r_mib_stats64(struct ksz_device *dev, int =
-port)
- 	pstats->rx_pause_frames =3D raw->rx_pause;
-=20
- 	spin_unlock(&mib->stats64_lock);
-+
-+	if (dev->info->phy_errata_9477)
-+		ksz9477_errata_monitor(dev, port, raw->tx_late_col);
- }
-=20
- void ksz88xx_r_mib_stats64(struct ksz_device *dev, int port)
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/mic=
-rochip/ksz_common.h
-index c784fd23a993..ee7db46e469d 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -66,6 +66,7 @@ struct ksz_chip_data {
- 	bool tc_cbs_supported;
- 	const struct ksz_dev_ops *ops;
- 	const struct phylink_mac_ops *phylink_mac_ops;
-+	bool phy_errata_9477;
- 	bool ksz87xx_eee_link_erratum;
- 	const struct ksz_mib_names *mib_names;
- 	int mib_cnt;
---=20
-2.34.1
-
+Sounds good. We'll try to have someone join the next WG meeting
+during IETF 120.
 
