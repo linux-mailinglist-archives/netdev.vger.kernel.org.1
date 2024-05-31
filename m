@@ -1,61 +1,55 @@
-Return-Path: <netdev+bounces-99809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D23468D68EA
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 20:19:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17D348D68F4
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 20:25:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C20228A8FD
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 18:19:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEE6F1F244B6
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 18:25:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D08417E460;
-	Fri, 31 May 2024 18:18:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 706FC17D352;
+	Fri, 31 May 2024 18:25:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QfidlvOl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kh3Ckn1a"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1945717E45E
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 18:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CEBC17D343
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 18:25:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717179529; cv=none; b=pIpLGeqtx76p21atXe+C4HGCwdRNXjul1x7u/HSAZdcihYjmCn6OIpBCkd0dmn+S6G7X7i+bgOquPc4CDnFWgkr8SraTbaiNxPK8LCyW5iBREMV5I79DDiP+cmK6K8v/aPjDMljUVzO+1H8DLScX7TYCQEKP2FKWQKfANR4TBOY=
+	t=1717179953; cv=none; b=RQxwYc9e6JrP0UqijWVK3Vc7C2PqzfnAIspELrOB7u5bBbOtiXyoZi3/SJlXg0ofUnb3bKPfcBke6v/Z3Unqp0mzhjZk5TRZBZTkPUopwD6BXtLBfM1tM9gp9OzUz6pDFRplKKdFGhpGsYw92Hc51YbMQ4N7yBdcsb1Cjt5oB9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717179529; c=relaxed/simple;
-	bh=yTCk9ONn+AOISS6mJp230I9j1L/ri//w8UIENOBzFPQ=;
+	s=arc-20240116; t=1717179953; c=relaxed/simple;
+	bh=gw2JcXterCcKSVJS6tZdEZSTY3FbDxSWvpTUL/n5XmM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ov/Or0GeAIwKMSPLwgA4QBF8oRai//0YCDMDFisBnH37Yw9WfgbBjMscuqXUD4uFhbWbsg1axJOcjFx+mBAKCA3mzRW1zQ5StqPkKIelipLSllEheoViJYpzrXkGxR9oSaX5oW9fwCE7r85mw9l/Mhl/b0pAKOjubc9CT3ibUmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QfidlvOl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA081C116B1;
-	Fri, 31 May 2024 18:18:45 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=pILfP8yY6KfldDMJGR4x5hkx+WLz1vbU0hMYBgmFuE8WGLODByD7RowsbBX8JBTfG5+SnWOXtEIryw73JLTLtJMClEx0uxhiOwv86aJBqPZciwleJK6bmg8CzuCYmzptZMDSi1JahhQQM3pYcMK0T2mHpVqeobghh6BGUyOKjU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kh3Ckn1a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93422C116B1;
+	Fri, 31 May 2024 18:25:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717179528;
-	bh=yTCk9ONn+AOISS6mJp230I9j1L/ri//w8UIENOBzFPQ=;
+	s=k20201202; t=1717179952;
+	bh=gw2JcXterCcKSVJS6tZdEZSTY3FbDxSWvpTUL/n5XmM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QfidlvOlpLSKaHgutW+r451uKcLN6lLcvKxKUgLDI+e6GzUMd/qAyhAMhYR1WH+Ui
-	 Y1JbX/Wo6EurlcaVbQsR/0xzjQYc7RKuhsvtAU8IMvjlFxsfSXa541VsLuL6bRsKun
-	 n1tOeaAhYLMWtxt0iR2rDmLxI4YHsmgPJcK7skkk0obt25PfIdWcuh1Sjb7J+mx1H9
-	 QuSW08O/aPeQOdFq6FH3sM7HPkzg3KyI/JBVz0dLNUaIFESAd5jdGQLNnAWf+LAnlD
-	 l9EgT08L/ct085jsdG2OElixxFQV7LRl4RjMWc4IgPHRycfMIH+KsUdoy+FPni9TgY
-	 PqaOdGM9+40ug==
-Date: Fri, 31 May 2024 19:18:43 +0100
+	b=Kh3Ckn1aB1aX9w7X2x4+IFjKMsWvVkJIjAOPwPvQLsrAINfNJ2RDiiZOQa2GVPBa+
+	 atwIJlJKziUalAvb9X/q6yjwxcbqr1pPuhczZzo2SeFpuNoxgIjxIMQqxssTX7ssce
+	 3kp+c3OsM7EybjQ1dJb4W7N3h5IexVxJnKkxeuvPGIli82XZaEEsx5Na74KSHc/Jcc
+	 kRxvn5UUFYnr1egRwaPMdQ7I8+SuinQcPJtEKGYGfwmVnC5WNRVsrL4i1XS1fhS8TJ
+	 qivt5hlQj+n66U/OSS5vGgxp8BKQndbB127ngchWi55UMywBWvKHstEddx7HPOIaoM
+	 9eLVUUSyuyA2w==
+Date: Fri, 31 May 2024 19:25:49 +0100
 From: Simon Horman <horms@kernel.org>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com, jiri@nvidia.com,
-	mateusz.polchlopek@intel.com, shayd@nvidia.com,
-	kalesh-anakkur.purayil@broadcom.com
-Subject: Re: [iwl-next v3 15/15] ice: allow to activate and deactivate
- subfunction
-Message-ID: <20240531181843.GQ491852@kernel.org>
-References: <20240528043813.1342483-1-michal.swiatkowski@linux.intel.com>
- <20240528043813.1342483-16-michal.swiatkowski@linux.intel.com>
+To: Michal Kubiak <michal.kubiak@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, maciej.fijalkowski@intel.com,
+	netdev@vger.kernel.org, Wojciech Drewek <wojciech.drewek@intel.com>
+Subject: Re: [PATCH iwl-net] i40e: Fix XDP program unloading while removing
+ the driver
+Message-ID: <20240531182549.GR491852@kernel.org>
+References: <20240516164108.1482192-1-michal.kubiak@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,16 +58,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240528043813.1342483-16-michal.swiatkowski@linux.intel.com>
+In-Reply-To: <20240516164108.1482192-1-michal.kubiak@intel.com>
 
-On Tue, May 28, 2024 at 06:38:13AM +0200, Michal Swiatkowski wrote:
-> From: Piotr Raczynski <piotr.raczynski@intel.com>
+On Thu, May 16, 2024 at 06:41:08PM +0200, Michal Kubiak wrote:
+> The commit 6533e558c650 ("i40e: Fix reset path while removing
+> the driver") introduced a new PF state "__I40E_IN_REMOVE" to block
+> modifying the XDP program while the driver is being removed.
+> Unfortunately, such a change is useful only if the ".ndo_bpf()"
+> callback was called out of the rmmod context because unloading the
+> existing XDP program is also a part of driver removing procedure.
+> In other words, from the rmmod context the driver is expected to
+> unload the XDP program without reporting any errors. Otherwise,
+> the kernel warning with callstack is printed out to dmesg.
 > 
-> Use previously implemented SF aux driver. It is probe during SF
-> activation and remove after deactivation.
+> Example failing scenario:
+>  1. Load the i40e driver.
+>  2. Load the XDP program.
+>  3. Unload the i40e driver (using "rmmod" command).
 > 
-> Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Fix this by improving checks in ".ndo_bpf()" to determine if that
+> callback was called from the removing context and if the kernel
+> wants to unload the XDP program. Allow for unloading the XDP program
+> in such a case.
+> 
+> Fixes: 6533e558c650 ("i40e: Fix reset path while removing the driver")
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
