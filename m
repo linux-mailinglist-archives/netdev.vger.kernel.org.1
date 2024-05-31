@@ -1,223 +1,167 @@
-Return-Path: <netdev+bounces-99793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 321748D682D
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 19:33:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E603C8D6874
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 19:49:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCD3E2812A4
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 17:33:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D9111F2885B
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 17:49:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9976F15DBB2;
-	Fri, 31 May 2024 17:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EF71446D1;
+	Fri, 31 May 2024 17:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KRFkAU7s"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=phytec.de header.i=@phytec.de header.b="ZA4T4lzH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mickerik.phytec.de (mickerik.phytec.de [91.26.50.163])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7AA02E3F2
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 17:32:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FB91DFCB
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 17:48:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.26.50.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717176779; cv=none; b=IB3odjOS9PEQx9c+cEAxwRm9z1840tk/chpIqLTlcTOoEDab/m6a2eC0VfSjsIOG7r/be47t7aYcw0KzCsbko5EOdsUrxZbjpH/qfinyfEwV0YCbQpJvC6N/JSskigUucSe25TKvHAt1JPAwGTb2eGm/uQVOgRF25bbP/HpkxFI=
+	t=1717177739; cv=none; b=FRy9Id96LPR6N2lTzdiFWkea6zyEA9+dpFHkunUHIl0z2umJHXf46dqjO5sqIhq6YoNK9UsTJm7Q2odwIVywhvxt4ouaUnXpaOoWP2guJ1xV/6UspFXDoQSsPPLuhv6bPDIrg9vMmm5vKWZ1J50bB10HzSWvUzoHBAbxNTD2+PU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717176779; c=relaxed/simple;
-	bh=Yjwu0m+erAt8XFKFMLD6Bnxw1BqoPUA8ibnGos7ynxI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gGqHTnzDQaVlAHzOLUSN4hbCFXi8QyVndiHK8RMe9NpFUsSnhdrM0tJ2VZ31q66YXW9cAHLDUjiYua/IXKbQx7+i0LRUdcAPbiHQN9fJxQyZ/oX7f28SmF6BsY5bWq1rq2sekuqw0h+ODjMxZ7LmdrTKTp7yNiFPryO7sl1vUjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KRFkAU7s; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5750a8737e5so1206a12.0
-        for <netdev@vger.kernel.org>; Fri, 31 May 2024 10:32:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717176776; x=1717781576; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OMppGFFrT5MnAdCHtOHnnUXgbQ/hA3PsMnZtuj4qBMk=;
-        b=KRFkAU7st43Cdiq4nVUn5JGa6MxYne7t9z/z4hoIkUhr4ERXBz6LctBHaW90cbNCYX
-         m/qnrRnvDUof3V1psMG9Qfd0qGtlF2i/fqZHlsmQ9dazFEplzTrhAIPCXfMDMbz9eIHs
-         7TjQhHynZOqwxYcRt7OJU8fi2wA9XKLJUDC7YuiahiK27dYnEHW3OKZTMTFMb8VEiwCR
-         HhQk7M0MTcvDGP7aQWNgKUcDqT55p5mstWMIyzO6h+oGzKjXvHQvhWerIEqI0Mow5TDg
-         i027iyUVFrMg9oprSDjToQyTORLdxlYzG17kGJ3h9K54t1WSslEB8al8jl3Sp1xKexpl
-         BqGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717176776; x=1717781576;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OMppGFFrT5MnAdCHtOHnnUXgbQ/hA3PsMnZtuj4qBMk=;
-        b=TsilhCArgEv9HesnLp3WDNmZ6+nXs8XHQpRx1ik+a6+x+ovoYQ/xKDvKO1sivG1IbF
-         p5ai9X+aAHCfz/3H6bK5OK9w9T8lAT6OVs05K2dIhsnp6DqKXvphi7rLBPIlFLgHPR+V
-         XPO9PHrFaJqw2YPapTH5vL8B4ZvFjeqbhbLWwp6gHx23LpajiRWK2JcNVAqjGp0hHopa
-         Ltm496WuWnZ4nTXvkvmEOecsdxSh/a5PrpF1Bqu0FHf1lvcCcpeT+O/0YmJYT83AnngQ
-         tKj+wgQ3jPc28dLssc3CIdD3trso89hqPcLXPDiNkdES9WDAC0vPQ34eeaei5bDctE6O
-         6DgA==
-X-Gm-Message-State: AOJu0Ywm0hTEc6VfbxcxE6mfB/FoylqnanpzOOfGJS6c6BwJ9f+I1Vqy
-	XlQdtT+CYfWgTNuC8JxRMFvKl6rK1YBePBvDmSjnjSvZUhFEkQJcq/v5LG2DNOA9+uKli+k0hsO
-	lB/1BnjGIpA7BYOuTriFZg5CJM8GUvHuZ5YNN
-X-Google-Smtp-Source: AGHT+IHjgVhIXQvVdwtHzJuyaNq2GU/GVBnM8Bv/P4NUq/vSKvPAUzqUKZazgAiWkdEk2muNzf0p2aUiASM34KOmnMk=
-X-Received: by 2002:a05:6402:682:b0:57a:3103:9372 with SMTP id
- 4fb4d7f45d1cf-57a37923832mr160622a12.7.1717176773754; Fri, 31 May 2024
- 10:32:53 -0700 (PDT)
+	s=arc-20240116; t=1717177739; c=relaxed/simple;
+	bh=MXqn0xeA2HqxHTRc1nTtDIQVZRm+olzLnPAvyUPI2QM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=MYCAVrxz1PTJHiTe9d1u05iTCBnwjrejeahGWEPjMiQkp9fVbdz2s0Qwv4KkRfzxGhL0RgQs5k5L9P58RZE74dkSTLIQjB8HXoz/VEP3Q9yl6nrKnm+meCYCppj8sBQ+AR0AK0e1dlmyUVjFlG/1LCGGV1Xd4CTwFrtndXPySCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phytec.de; spf=pass smtp.mailfrom=phytec.de; dkim=pass (1024-bit key) header.d=phytec.de header.i=@phytec.de header.b=ZA4T4lzH; arc=none smtp.client-ip=91.26.50.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phytec.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phytec.de
+DKIM-Signature: v=1; a=rsa-sha256; d=phytec.de; s=a4; c=relaxed/simple;
+	q=dns/txt; i=@phytec.de; t=1717177731; x=1719769731;
+	h=From:Sender:Reply-To:Subject:Date:Message-ID:To:CC:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=MXqn0xeA2HqxHTRc1nTtDIQVZRm+olzLnPAvyUPI2QM=;
+	b=ZA4T4lzH7QGt3f0O18jjmVSizCsSkHJeh8ODoezaUrRyxH2WDOjhbe1gS5Om20h4
+	VO6JPByrwj38Iaj9PfKt8XaUaxaTQTceU1XgW7KvKsN/xotJb3Ti6Y0w+zHlbVBn
+	rEk32qSBgVfjc/Ft04H34G8+lsmdsZHDkbXxKK6Rb/s=;
+X-AuditID: ac14000a-03251700000021bc-eb-665a0d834430
+Received: from berlix.phytec.de (Unknown_Domain [172.25.0.12])
+	(using TLS with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(Client did not present a certificate)
+	by mickerik.phytec.de (PHYTEC Mail Gateway) with SMTP id 55.77.08636.38D0A566; Fri, 31 May 2024 19:48:51 +0200 (CEST)
+Received: from [10.0.0.42] (172.25.0.11) by Berlix.phytec.de (172.25.0.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.6; Fri, 31 May
+ 2024 19:48:43 +0200
+Message-ID: <828e0af0-bad4-4012-b519-2d292f0035a5@phytec.de>
+Date: Fri, 31 May 2024 19:48:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1717105215.git.yan@cloudflare.com> <9be3733eee16bb81a7e8e2e57ebcc008f95cae08.1717105215.git.yan@cloudflare.com>
- <CANn89iLo6A__U5HqeA65NuBnrg36jpt9EOUC7T0fLdNEpa6eRQ@mail.gmail.com> <CAO3-PboQ68+xFe4Z10L-s-k3NCgciGXNWM00-3wgqbPmGaBB9A@mail.gmail.com>
-In-Reply-To: <CAO3-PboQ68+xFe4Z10L-s-k3NCgciGXNWM00-3wgqbPmGaBB9A@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 31 May 2024 19:32:40 +0200
-Message-ID: <CANn89iJ_rd_vUH1LPbby5vV=s=jWdpzvDKnm6H1YK=wRPWBiyw@mail.gmail.com>
-Subject: Re: [RFC net-next 1/6] net: add kfree_skb_for_sk function
-To: Yan Zhai <yan@cloudflare.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, Abhishek Chauhan <quic_abchauha@quicinc.com>, 
-	Mina Almasry <almasrymina@google.com>, Florian Westphal <fw@strlen.de>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, David Howells <dhowells@redhat.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Lorenzo Bianconi <lorenzo@kernel.org>, 
-	Pavel Begunkov <asml.silence@gmail.com>, linux-kernel@vger.kernel.org, 
-	kernel-team@cloudflare.com, Jesper Dangaard Brouer <hawk@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, May 31, 2024 at 6:58=E2=80=AFPM Yan Zhai <yan@cloudflare.com> wrote=
-:
->
-> Hi Eric,
->
->  Thanks for the feedback.
->
-> On Fri, May 31, 2024 at 1:51=E2=80=AFAM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > On Thu, May 30, 2024 at 11:46=E2=80=AFPM Yan Zhai <yan@cloudflare.com> =
-wrote:
-> > >
-> > > Implement a new kfree_skb_for_sk to replace kfree_skb_reason on a few
-> > > local receive path. The function accepts an extra receiving socket
-> > > argument, which will be set in skb->cb for kfree_skb/consume_skb
-> > > tracepoint consumption. With this extra bit of information, it will b=
-e
-> > > easier to attribute dropped packets to netns/containers and
-> > > sockets/services for performance and error monitoring purposes.
-> >
-> > This is a lot of code churn...
-> >
-> > I have to ask : Why not simply adding an sk parameter to an existing
-> > trace point ?
-> >
-> Modifying a signature of the current tracepoint seems like a breaking
-> change, that's why I was saving the context inside skb->cb, hoping to
-> not impact any existing programs watching this tracepoint. But
-> thinking it twice, it might not cause a problem if the signature
-> becomes:
->
->  trace_kfree_skb(const struct sk_buff *skb, void *location, enum
-> skb_drop_reason reason, const struct sock *sk)
->
-> As return values are usually not a thing for tracepoints, it is
-> probably still compatible. The cons is that the last "sk" still breaks
-> the integrity of naming. How about making a "kfree_skb_context"
-> internal struct and putting it as the last argument to "hide" the
-> naming confusion?
->
-> > If this not possible, I would rather add new tracepoints, adding new cl=
-asses,
-> > because it will ease your debugging :
-> >
-> > When looking for TCP drops, simply use a tcp_event_sk_skb_reason instan=
-ce,
-> > and voila, no distractions caused by RAW/ICMP/ICMPv6/af_packet drops.
-> >
-> > DECLARE_EVENT_CLASS(tcp_event_sk_skb_reason,
-> >
-> >      TP_PROTO(const struct sock *sk, const struct sk_buff *skb, enum
-> > skb_drop_reason reason),
-> > ...
-> > );
->
-> The alternative of adding another tracepoint could indeed work, we had
-> a few cases like that in the past, e.g.
->
-> https://lore.kernel.org/lkml/20230711043453.64095-1-ivan@cloudflare.com/
-> https://lore.kernel.org/netdev/20230707043923.35578-1-ivan@cloudflare.com=
-/
->
-> But it does feel like a whack-a-mole thing. The problems are solvable
-> if we extend the kfree_skb tracepoint, so I would prefer to not add a
-> new tracepoint.
-
-Solvable with many future merge conflicts for stable teams.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] dt-bindings: net: dp8386x: Add MIT license along with
+ GPL-2.0
+To: Udit Kumar <u-kumar1@ti.com>, <vigneshr@ti.com>, <nm@ti.com>,
+	<tglx@linutronix.de>, <tpiepho@impinj.com>
+CC: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <robh@kernel.org>,
+	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, Kip Broadhurst <kbroadhurst@ti.com>
+References: <20240531165725.1815176-1-u-kumar1@ti.com>
+Content-Language: en-US
+From: Wadim Egorov <w.egorov@phytec.de>
+In-Reply-To: <20240531165725.1815176-1-u-kumar1@ti.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: Berlix.phytec.de (172.25.0.12) To Berlix.phytec.de
+ (172.25.0.12)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrGIsWRmVeSWpSXmKPExsWyRpKBR7eZNyrNoG2PtMX5u4eYLdbsPcdk
+	Med8C4vF/CPnWC2eHnvEbrH+q6TFy1n32CwubOtjtdj0+BqrxeVdc9gsji0Qs3jz4yyTxbfT
+	bxgt/u/ZwW6xedNUZoslcx+yW0zbO4PZ4v/ZD+wOQh5bVt5k8liwqdTjzYTbTB6bVnWyebw7
+	d47dY/OSeo+dOz4zebzfd5XN4/iN7UwenzfJBXBFcdmkpOZklqUW6dslcGWsmXGUpeCeaMWj
+	R/oNjLcEuxg5OSQETCT2r7jB0sXIxSEksIRJYvHPyUwQzi1GiaWbL7KBVPEK2EgcbVsFZrMI
+	qEqsWbidFSIuKHFy5hMWEFtUQF7i/q0Z7CC2sEC4xIpru4HiHBwiAnkSB6ZVgcxkFrjOJNHw
+	aCNYvZCAmcTWg3eZQWxmAXGJW0/mM4HYbALqEnc2fAObzylgLjHn8Xc2iBoLicVvDrJD2PIS
+	29/OYYaYIy/x4tJyFohv5CWmnXvNDGGHSmz9sp1pAqPwLCSnzkKybhaSsbOQjF3AyLKKUSg3
+	Mzk7tSgzW68go7IkNVkvJXUTIyiuRRi4djD2zfE4xMjEwXiIUYKDWUmE91d6RJoQb0piZVVq
+	UX58UWlOavEhRmkOFiVx3tUdwalCAumJJanZqakFqUUwWSYOTqkGRgkHU6bV9779uCu2/0cZ
+	R7mjZ3yl37Vzh/dbfw36+XWGeeav2fOvP+RirlnTzNkWGCu/+LvM3OajT7Qsj382CHn9TNLX
+	2mWiL2N28WaD+d4q11csF+20U9mls+hNr8cxYc65mWtWPds2RSuau7HBWERl56b9PWEWChuq
+	+jnWfPa6b7zOK3nXUiWW4oxEQy3mouJEAIKNn37ZAgAA
 
 
->
-> >
-> > Also, the name ( kfree_skb_for_sk) and order of parameters is confusing=
-.
-> >
-> > I always prefer this kind of ordering/names :
-> >
-> > void sk_skb_reason_drop( [struct net *net ] // not relevant here, but
-> > to expand the rationale
-> >               struct sock *sk, struct sk_buff *skb, enum skb_drop_reaso=
-n reason)
-> >
-> > Looking at the name, we immediately see the parameter order.
-> >
-> > The consume one (no @reason there) would be called
-> >
-> > void sk_skb_consume(struct sock *sk, struct sk_buff *skb);
->
-> I was intending to keep the "kfree_skb" prefix initially since it
-> would appear less surprising to kernel developers who used kfree_skb
-> and kfree_skb_reason. But your points do make good sense. How about
-> "kfree_sk_skb_reason" and "consume_sk_skb" here?
->
 
-IMO kfree_skb() and consume_skb() were a wrong choice. We have to live
-with them.
+Am 31.05.24 um 18:57 schrieb Udit Kumar:
+> Modify license to include dual licensing as GPL-2.0-only OR MIT
+> license for TI specific phy header files. This allows for Linux
+> kernel files to be used in other Operating System ecosystems
+> such as Zephyr or FreeBSD.
+> 
+> While at this, update the GPL-2.0 to be GPL-2.0-only to be in sync
+> with latest SPDX conventions (GPL-2.0 is deprecated).
+> 
+> While at this, update the TI copyright year to sync with current year
+> to indicate license change.
+> 
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Trent Piepho <tpiepho@impinj.com>
+> Cc: Wadim Egorov <w.egorov@phytec.de>
+> Cc: Kip Broadhurst <kbroadhurst@ti.com>
+> Signed-off-by: Udit Kumar <u-kumar1@ti.com>
 
-It should have been skb_free(), skb_consume(), skb_alloc(),
-to be consistent.
+Acked-by: Wadim Egorov <w.egorov@phytec.de>
 
-Following (partial) list was much better:
-
-skb_add_rx_frag_netmem, skb_coalesce_rx_frag, skb_pp_cow_data,
-skb_cow_data_for_xdp,
-skb_dump, skb_tx_error, skb_morph, skb_zerocopy_iter_stream, skb_copy_ubufs=
-,
-skb_clone, skb_headers_offset_update, skb_copy_header, skb_copy,
-skb_realloc_headroom, skb_expand_head, skb_copy_expand, skb_put,
-skb_push, skb_pull, skb_pull_data, skb_trim, skb_copy_bits,
-skb_splice_bits, skb_send_sock_locked, skb_store_bits,
-skb_checksum, skb_copy_and_csum_bits, skb_zerocopy_headlen,
-skb_zerocopy, skb_copy_and_csum_dev, skb_dequeue,
-skb_dequeue_tail, skb_queue_purge_reason, skb_errqueue_purge,
-skb_queue_head, skb_queue_tail, skb_unlink, skb_append,
-skb_split, skb_prepare_seq_read, skb_seq_read, skb_abort_seq_read,
-skb_find_text, skb_append_pagefrags, skb_pull_rcsum, skb_segment_list,
-skb_segment, skb_to_sgvec, skb_to_sgvec_nomark, skb_cow_data, skb_clone_sk,
-skb_complete_tx_timestamp, skb_tstamp_tx, skb_complete_wifi_ack,
-skb_partial_csum_set, skb_checksum_setup, skb_checksum_trimmed,
-skb_try_coalesce, skb_scrub_packet, skb_vlan_untag, skb_ensure_writable,
-skb_ensure_writable_head_tail, skb_vlan_pop, skb_vlan_push, skb_eth_pop,
-skb_eth_push, skb_mpls_push, skb_mpls_pop, skb_mpls_update_lse,
-skb_mpls_dec_ttl, skb_condense, skb_ext_add, skb_splice_from_iter
-
-(just to make my point very very clear)
-
-Instead we have a myriad of functions with illogical parameter
-ordering vs their names.
-
-I see no reason to add more confusion for new helpers.
+> ---
+> Changelog:
+> Changes in v2:
+> - Updated Copyright information as per review comments of v1
+> - Added all authors[0] in CC list of patch
+> - Extended patch to LAKML list
+> v1 link: https://lore.kernel.org/all/20240517104226.3395480-1-u-kumar1@ti.com/
+> 
+> [0] Patch cc list is based upon (I am representing @ti.com for this patch)
+> git log --no-merges --pretty="%ae" $files|grep -v "@ti.com"
+> 
+> Requesting Acked-by, from the CC list of patch at the earliest
+> 
+> 
+>   include/dt-bindings/net/ti-dp83867.h | 4 ++--
+>   include/dt-bindings/net/ti-dp83869.h | 4 ++--
+>   2 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/dt-bindings/net/ti-dp83867.h b/include/dt-bindings/net/ti-dp83867.h
+> index 6fc4b445d3a1..b8a4f3ff4a3b 100644
+> --- a/include/dt-bindings/net/ti-dp83867.h
+> +++ b/include/dt-bindings/net/ti-dp83867.h
+> @@ -1,10 +1,10 @@
+> -/* SPDX-License-Identifier: GPL-2.0-only */
+> +/* SPDX-License-Identifier: GPL-2.0-only OR MIT */
+>   /*
+>    * Device Tree constants for the Texas Instruments DP83867 PHY
+>    *
+>    * Author: Dan Murphy <dmurphy@ti.com>
+>    *
+> - * Copyright:   (C) 2015 Texas Instruments, Inc.
+> + * Copyright (C) 2015-2024 Texas Instruments Incorporated - https://www.ti.com/
+>    */
+>   
+>   #ifndef _DT_BINDINGS_TI_DP83867_H
+> diff --git a/include/dt-bindings/net/ti-dp83869.h b/include/dt-bindings/net/ti-dp83869.h
+> index 218b1a64e975..917114aad7d0 100644
+> --- a/include/dt-bindings/net/ti-dp83869.h
+> +++ b/include/dt-bindings/net/ti-dp83869.h
+> @@ -1,10 +1,10 @@
+> -/* SPDX-License-Identifier: GPL-2.0-only */
+> +/* SPDX-License-Identifier: GPL-2.0-only OR MIT */
+>   /*
+>    * Device Tree constants for the Texas Instruments DP83869 PHY
+>    *
+>    * Author: Dan Murphy <dmurphy@ti.com>
+>    *
+> - * Copyright:   (C) 2019 Texas Instruments, Inc.
+> + * Copyright (C) 2015-2024 Texas Instruments Incorporated - https://www.ti.com/
+>    */
+>   
+>   #ifndef _DT_BINDINGS_TI_DP83869_H
 
