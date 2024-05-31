@@ -1,167 +1,96 @@
-Return-Path: <netdev+bounces-99679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 718E38D5CF2
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 10:40:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C1538D5CF5
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 10:40:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28D122886FD
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 08:40:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37E4C288D16
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 08:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37E7150985;
-	Fri, 31 May 2024 08:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78850150986;
+	Fri, 31 May 2024 08:40:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="QIC+VDbT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="okDAFYOC"
 X-Original-To: netdev@vger.kernel.org
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1BE187567;
-	Fri, 31 May 2024 08:39:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D754F150989
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 08:40:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717144797; cv=none; b=Rth7HvCmWPjzsen2LzghF6NyVq4t7aYWCBbRCRkUqEySNXBcI5t+wUVHTN2C7W2FPgDKReGqXDrDV3iWyC1TfCWyT+J15N8wtMN075hcEwJJfOtIoAim8ACniFDlinGptlIIngxKCjGEqPmO8YUiFN9N43Z9YOT8S3h8/gPPRv0=
+	t=1717144816; cv=none; b=szAp8gJPNqkUPJp4q8k6sXOsi40S1VQmuJOzCpJtbhcVbV3sDeokAtfmBH3AFfgMmUVTIsgVvnhYELXTQIpWWZAqEW3oTi0hSn5LuRWN3svGoSPHJf8adZpckB6Um2tw+U0S+gG1M0AzLGKgYTpsyBjy6ZA0qvlYCVnof/1Fu3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717144797; c=relaxed/simple;
-	bh=HZYCsKjMSc/EqPpUCUY+p9VaVxhaFBNBTLb4Frz7Asg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HI/8j+ocU7TbzwxplMrvnshw5Dxc3lNeEpedaEE4Tv533UG14yfWXw/HMpk2rQWZuMA774ZexElLYU00bJo/beDoekSSamxNjlOOzkMApSf3TSOnhNmcUAfnqFPMbNWbx5zuvbDZrhrFZJ5whqEg3vr8c7Wjgkqt9MPCWKDK7+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=QIC+VDbT; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:Reply-To:MIME-Version:Date:
-	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	In-Reply-To:References; bh=hfDzAvU8xDKFTc19pK9dW0rwA+QcQVLK4v1h8Qtw0Fs=;
-	t=1717144795; x=1717576795; b=QIC+VDbT23zvgu93nYy1Aw9r2kfqwfOAxweuCVs4Om3Fhyu
-	668zxbnpElfmXiZyxeEtQYvUgr3mdMzVNffOSOJkQHg/nDGELXr3Bz7dFz+0bTap9PX/4F9k27CRh
-	2wi2CR4IvUZnV7p2co+MEdPbOxztW+AjeIksy2ldpr8KM11sTsoE3iz+jyMiFoDI3f0zrb6DHZFaJ
-	H8T7AyPKlvKCcoGWxMz4MTaBaT9EXlN0ocSs6IKyDkiTtarL+/4I4Y9kPOJkTkcOH59QZtXBG1GGE
-	VCqHxvwgPTsuCBX0YX+gBdfxj42xt6MaloWrxhS5W1OBpxiR3rtxt6btXzneokeg==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1sCxnj-0005SD-1R; Fri, 31 May 2024 10:39:51 +0200
-Message-ID: <42d498fc-c95b-4441-b81a-aee4237d1c0d@leemhuis.info>
-Date: Fri, 31 May 2024 10:39:40 +0200
+	s=arc-20240116; t=1717144816; c=relaxed/simple;
+	bh=qoYmiDVQHGoJhDIUf17rxSBZimgTo2HvSHSaaEmvtKc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YvVrfXzTwMb6VcVT/ltk+DVnRRJHTAh8gqy6a9rna+dZlJKmjO6URFnBM/jR1BhaHrlt4NMHBQM3vf6oEuavlEqSA2WqeV6FBlerfVNqevBRSHS/yZc8sPAeoIUf6dPpcYS9k3Cd04VowqJnd00ihSh9q+DooINuRYQFoHN6YXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=okDAFYOC; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5750a8737e5so10792a12.0
+        for <netdev@vger.kernel.org>; Fri, 31 May 2024 01:40:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717144813; x=1717749613; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qoYmiDVQHGoJhDIUf17rxSBZimgTo2HvSHSaaEmvtKc=;
+        b=okDAFYOC3I6e58eVgQ3TPmEHdBXoAtn8jqbwv5z1nS0aWz62xVJ7ax05yMvgpxoE0x
+         zTpl6Esrh6luj3iPiUe4yudQ1CYkb4VtHY55mMaoQOUnC9g9CPGIw2ULiBr3dQ4qfVY/
+         jyNt4t1XAwQ/AY2MR5eBftnKQen6ykaBlDBMJdgjrzh8EalcM3S8LkEvAyf1b0SvPxMT
+         c5PWSaZll5WI9xMcUQxl7QKCb00NuRyrDdvkCxXV9t6qG1UUCjtRlRQs3UFp8z/Yjoth
+         K0tNBEPeg/TYZ3a/EY4O8hFw5Pj7nhC21nA2g+ZFOz5tbQ+XKy0JLJox3CPuLnp2Fdd5
+         tqpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717144813; x=1717749613;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qoYmiDVQHGoJhDIUf17rxSBZimgTo2HvSHSaaEmvtKc=;
+        b=pWQIHIDqx1JFE8bfnfI9mOrF5D+pLGNK+Gt99zgI1KOJbSBFnXJWFanmaw6o2IbOmw
+         8MbjeiFeLwPQL0ZdnMS6KTyH9YrYnIg+ehOWaHqg4W5XZrbgsjJZoQueDhzfbN7phWJW
+         yPx05lOlTeI1aJK0TicC0Wdxf8rJqwn0mLe0frNB0UdOODj3+0pCZRsXnz2N39hT8etD
+         Jop5iOmzeoOKa8iBHm5meBZJyJDap0QK4YJcmpv+0jJIfnrUOXEnJtfyaa5wUzqoCAgt
+         A/q6YDNTUkxpMABiNb7Fnw6gtwhxf/SzDGZSydBKzYK+urvQsV9QW0eG+bo+l9dvjm59
+         T+Eg==
+X-Forwarded-Encrypted: i=1; AJvYcCXhe8aWUq4irZcPw0ZNWerAsDr8Aft/i1PG9fofUnxD3QDonAC2XnVJsxRsYfCOLXxBTH5ypKwIbq6oxEMfsAQTlUOm0n4I
+X-Gm-Message-State: AOJu0Yze0t/6G0KRqg95RLEL7lunL+rCvmwiw4393hk38lnrB7gRGn83
+	ubzoyc7c9Xq2w5KJ5c6SMLROiS01g7/ZdQAbl9OttNU2TDuc7A6k7J1S8UTIN3klXII1mwX4hgE
+	0wun+IQd2/J4o94EnOrwMa2SnCQyxfVubsOi6
+X-Google-Smtp-Source: AGHT+IFGbauQlcPU+hEeKoyanfKhy4gjinVXt02F9RE1UHv+tzn11F9/2S2LUgD+Oau+MCnadvuLIZbn0Fa/zUtcMp4=
+X-Received: by 2002:aa7:d04a:0:b0:57a:1a30:f5da with SMTP id
+ 4fb4d7f45d1cf-57a339d8ae6mr123533a12.2.1717144812810; Fri, 31 May 2024
+ 01:40:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: Hung tasks due to a AB-BA deadlock between the leds_list_lock rwsem
- and the rtnl mutex (was: 6.9.3 Hung tasks)
-To: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
- Linux LEDs <linux-leds@vger.kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, johanneswueller@gmail.com,
- "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Genes Lists <lists@sapience.com>,
- Linux kernel regressions list <regressions@lists.linux.dev>
-References: <9d189ec329cfe68ed68699f314e191a10d4b5eda.camel@sapience.com>
- <15a0bbd24cd01bd0b60b7047958a2e3ab556ea6f.camel@sapience.com>
- <ZliHhebSGQYZ/0S0@shell.armlinux.org.uk>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Content-Language: en-US, de-DE
-In-Reply-To: <ZliHhebSGQYZ/0S0@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1717144795;124009fb;
-X-HE-SMSGID: 1sCxnj-0005SD-1R
+References: <20240530233616.85897-1-kuba@kernel.org> <20240530233616.85897-4-kuba@kernel.org>
+In-Reply-To: <20240530233616.85897-4-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 31 May 2024 10:40:01 +0200
+Message-ID: <CANn89iLMJrnyvtT+CG635Pbv8BjLYsOEGkf1ut0nY93sUBunOg@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/3] net: skb: add compatibility warnings to skb_shift()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: pabeni@redhat.com, davem@davemloft.net, netdev@vger.kernel.org, 
+	mptcp@lists.linux.dev, matttbe@kernel.org, martineau@kernel.org, 
+	borisp@nvidia.com, willemdebruijn.kernel@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-[adding the LED folks and the regressions list to the list of recipients]
+On Fri, May 31, 2024 at 1:36=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> According to current semantics we should never try to shift data
+> between skbs which differ on decrypted or pp_recycle status.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
-for once, to make this easily accessible to everyone.
-
-Lee, Pavel, could you look into below regression report please? Thread
-starts here:
-https://lore.kernel.org/all/9d189ec329cfe68ed68699f314e191a10d4b5eda.camel@sapience.com/
-
-Another report with somewhat similar symptom can be found here:
-https://lore.kernel.org/lkml/e441605c-eaf2-4c2d-872b-d8e541f4cf60@gmail.com/
-
-See also Russell's analysis of that report below (many many thx for
-that, much appreciated Russel!).
-
-To my untrained eyes all of this sounds a lot like we still have a 6.9
-regression related to the LED code somewhere. Reminder, we had earlier
-trouble, but that was avoided through other measures:
-
-* 3d913719df14c2 ("wifi: iwlwifi: Use request_module_nowait") /
-https://lore.kernel.org/lkml/30f757e3-73c5-5473-c1f8-328bab98fd7d@candelatech.com/
-
-* c04d1b9ecce565 ("igc: Fix LED-related deadlock on driver unbind") /
-https://lore.kernel.org/all/ZhRD3cOtz5i-61PB@mail-itl/
-
-* 19fa4f2a85d777 ("r8169: fix LED-related deadlock on module removal")
-
-That iwlwifi commit even calls it self "work around". The developer that
-submitted it bisected the problem to a LED merge, but sadly that was the
-end of it. :-/
-
-Ciao, Thorsten
-
-On 30.05.24 16:04, Russell King (Oracle) wrote:
-> On Thu, May 30, 2024 at 09:36:45AM -0400, Genes Lists wrote:
->> On Thu, 2024-05-30 at 08:53 -0400, Genes Lists wrote:
->> This report for 6.9.1 could well be the same issue:
->> https://lore.kernel.org/lkml/e441605c-eaf2-4c2d-872b-d8e541f4cf60@gmail.com/
-> 
-> The reg_check_chans_work() thing in pid 285 is likely stuck on the
-> rtnl lock. The same is true of pid 287.
-> 
-> That will be because of the thread (pid 663) that's stuck in
-> __dev_open()...led_trigger_register(), where the rtnl lock will have
-> been taken in that path. It looks to me like led_trigger_register()
-> is stuck waiting for read access with the leds_list_lock rwsem.
-> 
-> There are only two places that take that rwsem in write mode, which
-> are led_classdev_register_ext() and led_classdev_unregister(). None
-> of these paths are blocking in v6.9.
-> 
-> Pid 641 doesn't look significant (its probably waiting for either
-> pid 285 or 287 to complete its work.)
-> 
-> Pid 666 looks like it is blocked waiting for exclusive write-access
-> on the leds_list_lock - but it isn't holding that lock. This means
-> there must already be some other reader or writer holding this lock.
-> 
-> Pid 722 doesn't look sigificant (same as pid 641).
-> 
-> Pid 760 is also waiting for the rtnl lock.
-> 
-> Pid 854, 855 also doesn't look sigificant (as pid 641).
-> 
-> And then we get to pid 858. This is in set_device_name(), which
-> was called from led_trigger_set() and led_trigger_register().
-> We know from pid 663 that led_trigger_register() can take a read
-> on leds_list_lock, and indeed it does and then calls
-> led_match_default_trigger(), which then goes on to call
-> led_trigger_set(). Bingo, this is why pid 666 is blocked, which
-> then blocks pid 663. pid 663 takes the rtnl lock, which blocks
-> everything else _and_ also blocks pid 858 in set_device_name().
-> 
-> Lockdep would've found this... this is a classic AB-BA deadlock
-> between the leds_list_lock rwsem and the rtnl mutex.
-> 
-> I haven't checked to see how that deadlock got introduced, that's
-> for someone else to do.
-
-P.S.:
-
-#regzbot report: /
-#regzbot introduced: f5c31bcf604d
-#regzbot duplicate:
-https://lore.kernel.org/lkml/e441605c-eaf2-4c2d-872b-d8e541f4cf60@gmail.com/
-#regzbot summary: leds: Hung tasks due to a AB-BA deadlock between the
-leds_list_lock rwsem and the rtnl mutex
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
