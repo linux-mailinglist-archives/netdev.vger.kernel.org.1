@@ -1,62 +1,61 @@
-Return-Path: <netdev+bounces-99815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B22BE8D6944
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 20:55:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36B9E8D695A
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 21:02:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D0B4288500
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 18:55:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C70F2B23002
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 19:02:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 711D77EEF5;
-	Fri, 31 May 2024 18:55:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91BE219FD;
+	Fri, 31 May 2024 19:02:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pdFtuEiW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="clO6WlOV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385E57E563;
-	Fri, 31 May 2024 18:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EFE47C6C9;
+	Fri, 31 May 2024 19:02:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717181722; cv=none; b=MLbKcALVr+E961c9UexKbAVYW/Bo5LoFjaZTXsrZ7DF6diJCs2UAlqdWYBiYoFpRUsR68MCWhfh+iaSSs86Lfa0OQAggGk1e/NOBICoo6gR+T6EPiwvgg/m2aVrBpl0TfsQUNf3Tqi+uvtEBsuAxVQMNQ1LqNr3Dlz5EpO3fTxo=
+	t=1717182159; cv=none; b=f7f10Rz6J2mVZ050hGuNTabOSJX7GuaqP5rGi898A5mjbVgc2IA3cEnoMOhAQ/jC3PaH0bdhaTaCwPtuqnbx5yYpgHn5Dxm5pkPfnce/beseyw0+KVWoOjsxHKYnPEX9bBe58/JBp3AQxtWvGRURdAShoHySLhA4q+1fuR+XEEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717181722; c=relaxed/simple;
-	bh=WuHvG2oalIqTM1m9wO4kdurTHHM8QmXjw2z7bpGaImo=;
+	s=arc-20240116; t=1717182159; c=relaxed/simple;
+	bh=pCOmk1nKWaAgFuK1NF4rUoo/cWiU7vuNtYV5z/Eozdo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ojhUmt/DmMfJgn0pgIWhKXHAVONnAcMt3yT8Np7nlpeMxDPBx29PdUO6UEMcbrOeQ0fE/XChLiBZbCZ4VxURGTWZb75bJjWfByW5kLcCJ6nT+vX6P/aLpUyqUiXO6rF9w0mEZNppOwXe7UP8gGtdX6xUFE5nIhYv3bustnUyGIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pdFtuEiW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35C0CC116B1;
-	Fri, 31 May 2024 18:55:21 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=LwS1wwS9C43xPK+S4NBH333YYuGk7xxhi1+kGbs14/Z4Ktsxfe2VU3y7JqzgMJiQJc9jEoPXycYoxALjvBMpwO1CiFxvrT2TxxWD0tcl/Ws0FsItokqDATIdxHSKuS4YD1g8s63/8qG9mqn1n9fOmkEU+IK16+VYmqS0/VKA034=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=clO6WlOV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57582C116B1;
+	Fri, 31 May 2024 19:02:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717181721;
-	bh=WuHvG2oalIqTM1m9wO4kdurTHHM8QmXjw2z7bpGaImo=;
+	s=k20201202; t=1717182159;
+	bh=pCOmk1nKWaAgFuK1NF4rUoo/cWiU7vuNtYV5z/Eozdo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pdFtuEiWRBKlfEt/Jm+TBEnM6gGoF36pGUFRi4tb9EVzO6olRyIFpl0O69mkQTL3f
-	 0+hZ8ujtQuNzH60tS+YF63MfwgBlzTzHKhSnx8BW3d9zP8ZSbe/itTaaFRN17sPTJa
-	 nmvPQhPnVJ5DPQw/+VU2Cy4a2nisulJAuX2/odWcPUCmAhQuXvz4sm+eGhJS11l4Dm
-	 AYonGo0podM6AOrSbned+4JgEE8qDwUByNsSr2sumJT+9yB8tXTFmjd/9VLcy9+cbC
-	 B++2BZCQm8he9i6zMtEcC+rzqdnwpiaFxdmyNikGzBoC2HRVszGzD7l/T93snXwgon
-	 dNQu5mmzQ1izQ==
-Date: Fri, 31 May 2024 11:55:19 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Lizhi Xu <lizhi.xu@windriver.com>
-Cc: lkp@intel.com, coreteam@netfilter.org, davem@davemloft.net,
-	fw@strlen.de, jaegeuk@kernel.org, kadlec@netfilter.org,
-	kuba@kernel.org, linux-fscrypt@vger.kernel.org,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	oe-kbuild-all@lists.linux.dev, pablo@netfilter.org,
-	syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com, tytso@mit.edu
-Subject: Re: [PATCH V4] ext4: check hash version and filesystem casefolded
- consistent
-Message-ID: <20240531185519.GB1153@sol.localdomain>
-References: <202405311607.yQR7dozp-lkp@intel.com>
- <20240531090611.2972737-1-lizhi.xu@windriver.com>
+	b=clO6WlOVUctdpP66XQRtk2+Sgb6XmJ2r2DY+DUD3cdtpCzCmxRwCP9kRTO7psEfyy
+	 oN6OWIpUetQkcxNSLbJKNkk5w1w6tauzOJcBYjCf+VupXtdmA5pnwbu27UbqQ2Jmcs
+	 KX0+s3+uDISsK9etAQnBWwvkUOh3vs/+WwVyu84w0j18kvDze4TfJjm22r92vKRJsA
+	 6bXhYDs+16wceyJfw+HxY9/jcysSUtulZN/wFLUkH4G+g2LFz+jhOv5PXIwFIZezQe
+	 6InCkwC55yVRMfO8FArNcSas1G9bVFBp94NxqjUX9/yswBaVlGDz0Dr6aO8dDkHhza
+	 46J/3TxfmXSmQ==
+Date: Fri, 31 May 2024 20:02:34 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tristram.Ha@microchip.com
+Cc: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+	Vivien Didelot <vivien.didelot@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: dsa: microchip: fix initial port flush problem
+Message-ID: <20240531190234.GT491852@kernel.org>
+References: <1716932145-3486-1-git-send-email-Tristram.Ha@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,34 +64,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240531090611.2972737-1-lizhi.xu@windriver.com>
+In-Reply-To: <1716932145-3486-1-git-send-email-Tristram.Ha@microchip.com>
 
-On Fri, May 31, 2024 at 05:06:11PM +0800, 'Lizhi Xu' via syzkaller-bugs wrote:
-> When mounting the ext4 filesystem, if the hash version and casefolded are not
-> consistent, exit the mounting.
+On Tue, May 28, 2024 at 02:35:45PM -0700, Tristram.Ha@microchip.com wrote:
+> From: Tristram Ha <tristram.ha@microchip.com>
 > 
-> Reported-by: syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com
-> Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+> The very first flush in any port will flush all learned addresses in all
+> ports.  This can be observed by unplugging a cable from one port while
+> additional ports are connected and dumping the fdb entries.
+> 
+> This problem is caused by the initially wrong value programmed to the
+> register.  After the first flush the value is reset back to the normal so
+> the next port flush will not cause such problem again.
+
+Hi Tristram,
+
+I think it would be worth spelling out why it is correct to:
+1. Not set SW_FLUSH_STP_TABLE or SW_FLUSH_MSTP_TABLE; and
+2. Preserve the value of the other bits of REG_SW_LUE_CTRL_1
+
+> 
+> Fixes: b987e98e50ab ("dsa: add DSA switch driver for Microchip KSZ9477")
+> Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
 > ---
->  fs/ext4/super.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  drivers/net/dsa/microchip/ksz9477.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 > 
-> diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-> index c682fb927b64..0ad326504c50 100644
-> --- a/fs/ext4/super.c
-> +++ b/fs/ext4/super.c
-> @@ -5262,6 +5262,11 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
->  		goto failed_mount;
+> diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
+> index f8ad7833f5d9..7cc92b90ffea 100644
+> --- a/drivers/net/dsa/microchip/ksz9477.c
+> +++ b/drivers/net/dsa/microchip/ksz9477.c
+> @@ -356,8 +356,7 @@ int ksz9477_reset_switch(struct ksz_device *dev)
 >  
->  	ext4_hash_info_init(sb);
-> +	if (es->s_def_hash_version == DX_HASH_SIPHASH && 
-> +	    !ext4_has_feature_casefold(sb)) {
-> +		err = -EINVAL;
-> +		goto failed_mount;
-> +	}
-
-For the third time: you need to use the correct mailing lists.
-Please follow Documentation/process/submitting-patches.rst.
-
-- Eric
+>  	/* default configuration */
+>  	ksz_read8(dev, REG_SW_LUE_CTRL_1, &data8);
+> -	data8 = SW_AGING_ENABLE | SW_LINK_AUTO_AGING |
+> -	      SW_SRC_ADDR_FILTER | SW_FLUSH_STP_TABLE | SW_FLUSH_MSTP_TABLE;
+> +	data8 |= SW_AGING_ENABLE | SW_LINK_AUTO_AGING | SW_SRC_ADDR_FILTER;
+>  	ksz_write8(dev, REG_SW_LUE_CTRL_1, data8);
+>  
+>  	/* disable interrupts */
+> -- 
+> 2.34.1
+> 
+> 
 
