@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-99614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD6F98D57C2
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 03:29:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41CCC8D57C4
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 03:30:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B0EAB21EFE
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:29:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC7611F24B9B
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 01:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D880F79CD;
-	Fri, 31 May 2024 01:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9124B848D;
+	Fri, 31 May 2024 01:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IPo44rHM"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtu5ljy1ljeznc42.icoremail.net (zg8tmtu5ljy1ljeznc42.icoremail.net [159.65.134.6])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69CF0D26A;
-	Fri, 31 May 2024 01:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.65.134.6
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7675234
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 01:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717118990; cv=none; b=tBwtAMY5HXxnfi0H7VHw8+s58qbwUL3FXiDr64rAMzKg79S3FStlY8ygDV/c6J/HBksvXXs6pwkqpSu5GjazNoPmbLHtGtCTk6exos+++HHPBU/2E5aM8S34u3C0t0p+bu6QSw5X07a8GdI+1nw1k3tmKS+Lb2iLD06enNytQFg=
+	t=1717119033; cv=none; b=oqNd/3A6JcLJ3IFFcC4kKZcVi8wuvGK+tiqJ2+iiXg6VAFUQhGMkFPdDynOI21RHbtsoi8/SqbSrYIir9u274j7CTMuAefrZE609+yItaQcz/r4vS8ORFRE8nrgZbSQ5N28WgahyZ6DVXpR47MXP3+mO7/NqB0rv1liuhEdtDm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717118990; c=relaxed/simple;
-	bh=cN24PCts8cd/+uVtUS2fsYyNPhWnS9RM9MgIE/6VNN0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=C//G1e6XXuM55pFGIQdwPGHTrOknEe83NFtNOIWOdihocxt2CVzdaoCb+r+olUugjvsNLvQlk4reTi2bgzphosRUNnfqGnzJmHaJK/ETRKPSqO2AotHdablPJgOquodcm/cxJtLDwPTq0gEM5Mlkmp7X7CLgaX/P7cYX100GMcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=159.65.134.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from gui.. (unknown [125.120.154.162])
-	by mail-app4 (Coremail) with SMTP id cS_KCgCnNrTWJ1lmOB00AQ--.34291S4;
-	Fri, 31 May 2024 09:28:55 +0800 (CST)
-From: Lin Ma <linma@zju.edu.cn>
-To: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Lin Ma <linma@zju.edu.cn>
-Subject: [PATCH net-next v1] netfilter: cttimeout: remove 'l3num' attr check
-Date: Fri, 31 May 2024 09:28:47 +0800
-Message-Id: <20240531012847.2390529-1-linma@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1717119033; c=relaxed/simple;
+	bh=S6HMeJxlmeXPMLhgNx8QBpnY6OZZaO7mFYFvhZWNdCI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MPU2nOMhys7exr9rNQehw2TxTVMaEpThvX3B5j07yt4q5N4IStGUxnwiiaLuXpW+ORU/pqGzcT5R11DVjmSpg+WC6HSREQrY4Kl7FEwUNIUX96VxUMq55fYxrtBaJUbYPt5mrBlZdtL+/gCM4MJMi3yYh4MlsfCeu+g84+1baVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IPo44rHM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0C071C4AF08;
+	Fri, 31 May 2024 01:30:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717119033;
+	bh=S6HMeJxlmeXPMLhgNx8QBpnY6OZZaO7mFYFvhZWNdCI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=IPo44rHMRw69Iy4jHpRrwQnPe2Yg++cO/ismJLag3Kk+5Y3ESvOK4QNpe4WgfhrxM
+	 hk6o/rTcpnCM3Pir6ztbNuJv+q/Yic6DleTh6Jvre4BS034vOg2cMduky21h0pdeaG
+	 of+rwax/pQ88LdjpKzbq5tCn8fewRwJxu2mXwvmLWfuACTFUT3ylIilGR7e23y2qfD
+	 3YqI+EEcJCUi77PHSGJXvw9yqsaGwtk8J7qpC96Oc6xZgOx831IW/fgi5FzbiSCz2u
+	 5OieopM9zIPgXX7F5u6TkooBMvK2dluKYC88jtLRBRlyKl6ezQBsel5vhsJE8RakcW
+	 4Rxks8sxwNkQg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E8BDAC3276C;
+	Fri, 31 May 2024 01:30:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,55 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cS_KCgCnNrTWJ1lmOB00AQ--.34291S4
-X-Coremail-Antispam: 1UD129KBjvdXoW7Gr18Cr4xKr4DAF13Ar4fKrg_yoWkGrg_Zr
-	Wkta9rZF15Jw4qgw4UKa1fXr9rK34xWF1fuFyfX3y7J3s8twsYgrWv9as0yF17Cw1DKFyU
-	Ar4vqryru343KjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb3xFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr1j
-	6rxdM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
-	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
-	C2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
+Subject: Re: [PATCH net-next] net: fjes: correct TRACE_INCLUDE_PATH
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171711903295.12927.8801867288122729954.git-patchwork-notify@kernel.org>
+Date: Fri, 31 May 2024 01:30:32 +0000
+References: <20240529023322.3467755-1-kuba@kernel.org>
+In-Reply-To: <20240529023322.3467755-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com
 
-After commit dd2934a95701 ("netfilter: conntrack: remove l3->l4 mapping
-information"), the attribute of type `CTA_TIMEOUT_L3PROTO` is not used
-any more in function cttimeout_default_set.
+Hello:
 
-However, the previous commit ea9cf2a55a7b ("netfilter: cttimeout: remove
-set but not used variable 'l3num'") forgot to remove the attribute
-present check when removing the related variable.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-This commit removes that check to ensure consistency.
+On Tue, 28 May 2024 19:33:22 -0700 you wrote:
+> A comment in define_trace.h clearly states:
+> 
+>  TRACE_INCLUDE_PATH if the path is something other than core kernel
+>                                                            vvvvvvvvvvvvvv
+>  include/trace then this macro can define the path to use. Note, the path
+>  is relative to define_trace.h, not the file including it. Full path names
+>  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  for out of tree modules must be used.
+> 
+> [...]
 
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
----
- net/netfilter/nfnetlink_cttimeout.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Here is the summary with links:
+  - [net-next] net: fjes: correct TRACE_INCLUDE_PATH
+    https://git.kernel.org/netdev/net-next/c/57e3c5af2bef
 
-diff --git a/net/netfilter/nfnetlink_cttimeout.c b/net/netfilter/nfnetlink_cttimeout.c
-index f466af4f8531..eab4f476b47f 100644
---- a/net/netfilter/nfnetlink_cttimeout.c
-+++ b/net/netfilter/nfnetlink_cttimeout.c
-@@ -366,8 +366,7 @@ static int cttimeout_default_set(struct sk_buff *skb,
- 	__u8 l4num;
- 	int ret;
- 
--	if (!cda[CTA_TIMEOUT_L3PROTO] ||
--	    !cda[CTA_TIMEOUT_L4PROTO] ||
-+	if (!cda[CTA_TIMEOUT_L4PROTO] ||
- 	    !cda[CTA_TIMEOUT_DATA])
- 		return -EINVAL;
- 
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
