@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-99802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 895D08D68CE
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 20:16:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCB4F8D68D1
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 20:17:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C821B209DB
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 18:16:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DE561F23342
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 18:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19B77CF25;
-	Fri, 31 May 2024 18:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1692F158204;
+	Fri, 31 May 2024 18:17:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aHGj21nE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HY9z2Yii"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D86B2E3F2
-	for <netdev@vger.kernel.org>; Fri, 31 May 2024 18:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67B72E3F2
+	for <netdev@vger.kernel.org>; Fri, 31 May 2024 18:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717179402; cv=none; b=RBoduFqEHA6pCfASr5LoBRsmIrSx4/U8fByb1sClhQsWGz6HoOEtxt1BkBNISY0TyAAVDI7kmEm5OsofLJxz7vduOmCTcKNQlyQCVq2k5xcci+D9Dy1MCIrqtbivhRae4Ci+gC8sj99gdXr+AO8YyjgPHRCL3kDk79gf9jMJcxs=
+	t=1717179420; cv=none; b=SmK7Z3gC0hbfPbRrAkVtuDxdIYaENpkn5TLCvd/zbHiUQBrjTk/3rrZ3+GAMiEVonsPiUvCZETDet2+raGL7QhqB7Bd3x7pG/RPNn7NZToYWk0Y1HkwiW1JwSZn6Wr5Lg59ayskUZ7xArPzickzWqKT18KFqxgOafzukac9n2cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717179402; c=relaxed/simple;
-	bh=c2AhUU9SBSyXJlvKJgqsryat+Qx3wrELjVaj15yK1E0=;
+	s=arc-20240116; t=1717179420; c=relaxed/simple;
+	bh=KOgNjrMn9knsj/gt9uAmGZH0ZGkZNuqnBZRpvXpDHS8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bYrjKF+m04uDuiGVb1YAX2E8yjMpH9R2zyk0ifGI8ijS19DtzrBIvq/e5/VeQ6+HHjNH7/yWK7nOyGY+IlUGoKyfDqLNARgtriw1vqnOvo+M5MffBZYkBGb01zdZ35/Gp0BVZtJWY7yZ1S61767or9sW8NWclt6g6mDnkDmEfXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aHGj21nE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DFD6C116B1;
-	Fri, 31 May 2024 18:16:39 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=RWOE2of/hsDYIrSLeIhhWaiw0QX9pma7POmBQUTPsV11v4iwVpbaLaDMQLhsTsvLYC5He7OzO+VWNB/5lciPPacdGL+v2o7BbPetZ2XKObWSWaWnaqpCWRYVP4aLxSyxF6rUL8LOg0fMuob8rxH0nem+xiQkjeCtKLtrbivwT3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HY9z2Yii; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A62EC116B1;
+	Fri, 31 May 2024 18:16:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717179402;
-	bh=c2AhUU9SBSyXJlvKJgqsryat+Qx3wrELjVaj15yK1E0=;
+	s=k20201202; t=1717179419;
+	bh=KOgNjrMn9knsj/gt9uAmGZH0ZGkZNuqnBZRpvXpDHS8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aHGj21nE+zlXJptMysLaRE+UNnSkYVMg+J4JtiWMbY5Mthp/Ugd6PdEEA5DYzfh0E
-	 OEmgg0uLlP7wAyup2wNyiiwxFLUeVlGwQ3bqVnXn2Q/wMlCH8LDG2HGIIFeSHCOEo/
-	 AAcPJE6C81dWzyxjplre9T+TAYmUESuugfT/hlojXC2IQOWBNtHp7Iv+H2UCkT48aV
-	 CcQjfZ1ZkMM+Os/Z6MzGAP/dDKUe8+1sFSEm5N3tYBvoN6opSrnjbx0HQQJPt42a8X
-	 3gKRHTEnmYdCCUaFTfJKxjVl/iTm/a4YUNqyqL8hegtIeHQfAHeLMfOtljOAO9FKyE
-	 WjyEGLUtmUNOg==
-Date: Fri, 31 May 2024 19:16:37 +0100
+	b=HY9z2YiiZb7/DB5vqPY/rjeGaqIEGJhqtwVHlg7JASckBeFdSd+KupN2geekBaTQ7
+	 lothdNh/KVGLX7/xoBWaK4aQ8xisKSGdjuHUi+kHQZWziDCC3T7AdhAYQniAJMncas
+	 cZN1KaMCiWMVXnY+RqUpUQfj0UCNYmMvAy9wgeY6Z9jWwL1GfHovInqarWhw4BTeK6
+	 38VMlFVQTxetRUYXlHoDH3ybmhjFgO/hQAE2YVtb2DpRd8wxvKZ1Szow5SYNbWzdsH
+	 LuydcFkcnAX+rq7ReiVkM/CaOXhq3qCZeYqSX0jBrgwHR61mzz9FWhq5FdaGXN01GH
+	 BCQL97uvR5fhg==
+Date: Fri, 31 May 2024 19:16:54 +0100
 From: Simon Horman <horms@kernel.org>
 To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
@@ -51,10 +51,10 @@ Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	pio.raczynski@gmail.com, jiri@nvidia.com,
 	mateusz.polchlopek@intel.com, shayd@nvidia.com,
 	kalesh-anakkur.purayil@broadcom.com
-Subject: Re: [iwl-next v3 07/15] ice: implement netdev for subfunction
-Message-ID: <20240531181637.GJ491852@kernel.org>
+Subject: Re: [iwl-next v3 08/15] ice: make representor code generic
+Message-ID: <20240531181654.GK491852@kernel.org>
 References: <20240528043813.1342483-1-michal.swiatkowski@linux.intel.com>
- <20240528043813.1342483-8-michal.swiatkowski@linux.intel.com>
+ <20240528043813.1342483-9-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,18 +63,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240528043813.1342483-8-michal.swiatkowski@linux.intel.com>
+In-Reply-To: <20240528043813.1342483-9-michal.swiatkowski@linux.intel.com>
 
-On Tue, May 28, 2024 at 06:38:05AM +0200, Michal Swiatkowski wrote:
-> From: Piotr Raczynski <piotr.raczynski@intel.com>
+On Tue, May 28, 2024 at 06:38:06AM +0200, Michal Swiatkowski wrote:
+> Keep the same flow of port representor creation, but instead of general
+> attach function create helpers for specific representor type.
 > 
-> Configure netdevice for subfunction usecase. Mostly it is reusing ops
-> from the PF netdevice.
+> Store function pointer for add and remove representor.
 > 
-> SF netdev is linked to devlink port registered after SF activation.
+> Type of port representor can be also known based on VSI type, but it
+> is more clean to have it directly saved in port representor structure.
 > 
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-> Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
+> Add devlink lock for whole port representor creation and destruction.
+> 
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
