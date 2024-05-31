@@ -1,606 +1,250 @@
-Return-Path: <netdev+bounces-99688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D6088D5D61
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 10:59:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 344A98D5D6D
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 11:03:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 503301C22410
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 08:59:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 578991C229BE
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 09:03:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A7A113D539;
-	Fri, 31 May 2024 08:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15AB41369B9;
+	Fri, 31 May 2024 09:03:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MZXieieX"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oyuFEjCX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26538182B9;
-	Fri, 31 May 2024 08:59:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B37A7770FD;
+	Fri, 31 May 2024 09:03:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717145982; cv=none; b=QXC9K+AZycfDKUcoICAn/j0zbOGmpU8BPs8/Cbmok4W8yDywaGP5LXs8JstF6LT3q3k1k0SBsyAAFJ+OuN33+P2Mpqi4XPCwUIOYPmSUKTe4Wra4afQrNX3k+pACKrJM+OcVJhXbV2EotxGAyLba74Y67YFwtjPFwLK4xlTjKJ0=
+	t=1717146215; cv=none; b=JFUiNqikYv4+9i8nkANMFDuZElYz2B6OszOFCWqWTynKlHCReGqxVPcb+0bxPIX/nKeNWsR5OyFwJDAYp613QwzskAH19Ld/Xqn+vxMUar/0lEd57zl53II4y8Q9avP/DW1HuebBXbxTi+X9KXY1PB22TUcXkk+C7MIN7oQ9kVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717145982; c=relaxed/simple;
-	bh=qL4aK7Nv4BLtVwweFvln4rfwcgeW/ZE5139hyLjaifc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y772XCUzr7Pv876ANZjP8cbNTzjQdGqv2RrIUrSSw4rRA2+waZkULUiPjFzmSxjF9gTeWy34I47Q+A3uLElt4ABvYx7PULe9Q2ptdWQ0Y0Uo9zAjL2S++b50XhgVgYPtC6a9PWOGKTkQ6Uz0l7wn3+itG5LXp1BJjojnYXKgX34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MZXieieX; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717145980; x=1748681980;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=qL4aK7Nv4BLtVwweFvln4rfwcgeW/ZE5139hyLjaifc=;
-  b=MZXieieX8OjNO4y9s/8enO5FD+DFL7nGztSS2fqnQrCE/jm9INedTV8K
-   zx/lS6pkSIQYDVQnbJT9bKEH8WZNhscXIBhJMRLlv0rKyOgyzUKR39hNv
-   lp7NlBqFhz78LSx3PhJlu/2bFFhq+IwVOPsNPL9XhPyilRysUNBsjvDIy
-   sdwv4fSlA70B/Gz07PrgkOmvlUQyg2pe0WsO3fXBduqnzEITpAWan61rC
-   DX/DcyZ3veS5U5uVSRY9N5XuA+6gJXrw3EcrLXcWlQlaZ4pxdmVaxjClW
-   j968PZAR8qLHWqZ32ESrK//o1Twc39TjW4HzP9TVgAU5U0f5oVJ0MUhqT
-   w==;
-X-CSE-ConnectionGUID: PmMduE2ySXusCyhOorfJ5w==
-X-CSE-MsgGUID: 1fd1dWubTrWO7iFQDYDVig==
-X-IronPort-AV: E=McAfee;i="6600,9927,11088"; a="13804224"
-X-IronPort-AV: E=Sophos;i="6.08,203,1712646000"; 
-   d="scan'208";a="13804224"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2024 01:59:40 -0700
-X-CSE-ConnectionGUID: rd4Zxb6zSaWfSpbUxkc8Yw==
-X-CSE-MsgGUID: G3/cV4m8TRKqdlpaGmBSkg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,203,1712646000"; 
-   d="scan'208";a="73584850"
-Received: from unknown (HELO 0610945e7d16) ([10.239.97.151])
-  by orviesa001.jf.intel.com with ESMTP; 31 May 2024 01:59:35 -0700
-Received: from kbuild by 0610945e7d16 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sCy6m-000Gp4-2b;
-	Fri, 31 May 2024 08:59:32 +0000
-Date: Fri, 31 May 2024 16:58:25 +0800
-From: kernel test robot <lkp@intel.com>
-To: Lizhi Xu <lizhi.xu@windriver.com>, ebiggers@kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	coreteam@netfilter.org, davem@davemloft.net, fw@strlen.de,
-	jaegeuk@kernel.org, kadlec@netfilter.org, kuba@kernel.org,
-	linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org,
-	lizhi.xu@windriver.com, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, pablo@netfilter.org,
-	syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com, tytso@mit.edu
-Subject: Re: [PATCH V2] ext4: add casefolded feature check before setup
- encrypted info
-Message-ID: <202405311607.yQR7dozp-lkp@intel.com>
-References: <20240531030740.1024475-1-lizhi.xu@windriver.com>
+	s=arc-20240116; t=1717146215; c=relaxed/simple;
+	bh=S0ZKYYnPoHPKYkKOnAkf25zs6aVUOp2ahpjN8lCEaOg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=M5j9dP8IPDCSt+vtN+SPxqw/XUL9Q/xmDitdiL6PzLQwLSbLlBP/tP+4IOdioNKBc8mb7mm8Y1MHum7h3kd0bNu1c0IKRsb4RGRXR/xmCGUPkeOXpjqNHaF4QL85w0yrKbej5fbth7wjcQt1zz/udK0AzJApEKQSi88/Dp5OMv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=oyuFEjCX; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44V8Pllt005650;
+	Fri, 31 May 2024 09:03:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
+ content-transfer-encoding : content-type : date : from : in-reply-to :
+ message-id : mime-version : references : subject : to; s=pp1;
+ bh=XydXLZ2izbHKZATJ4GMzAav3AkDiEapDJQW2XKsdEDE=;
+ b=oyuFEjCXTagFnA/OGazviomD5ka/oUQd+lq+gup2Ax6qeeB0YeLKqblXki480GxEAV0V
+ FwXgzlYvsW4xO7h8y3gikx7QfpphY8s5ObeQCvitewLGseG/A5oppgRZbDBKNrBvY9qh
+ kkgS3BQei/yFPZyRfGt8XLWAXBJpvjtp2RdnN9q/a9os54ynoK8hNLQncuGukf9svPvu
+ ux8IQz8oFgR5OK5QTOafkp5LpCERUBT97bcRbJMFuuitr+ds45kZfvGBY8q2uBQEW+6H
+ E1ZMEubB9WRSu3yDhGchqUZ+0WE6+LXyr/y/dA3lgQmsrwFG/Dm+dEHaQk3wZdFOLg8c SQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yfaatr6jx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 May 2024 09:03:27 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44V93Q9s031992;
+	Fri, 31 May 2024 09:03:26 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yfaatr6jt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 May 2024 09:03:26 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44V8jkoM029003;
+	Fri, 31 May 2024 09:03:25 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ydpayy168-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 May 2024 09:03:25 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44V93MDu29164142
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 31 May 2024 09:03:24 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3AC4158065;
+	Fri, 31 May 2024 09:03:22 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BBD815804B;
+	Fri, 31 May 2024 09:03:19 +0000 (GMT)
+Received: from [9.171.25.186] (unknown [9.171.25.186])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 31 May 2024 09:03:19 +0000 (GMT)
+Message-ID: <0f590cb7-9b67-4dce-93a4-5da89812a075@linux.ibm.com>
+Date: Fri, 31 May 2024 11:03:18 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/2] Change the upper boundary of SMC-R's snd_buf
+ and rcv_buf to 512MB
+To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, jaka@linux.ibm.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com
+Cc: kgraul@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        guwen@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240528135138.99266-1-guangguan.wang@linux.alibaba.com>
+ <328ea674-0904-4c81-a6e2-7be3420ad578@linux.ibm.com>
+ <e2d0dae7-827e-41f8-bcd5-7d10fd7df594@linux.alibaba.com>
+Content-Language: en-US
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <e2d0dae7-827e-41f8-bcd5-7d10fd7df594@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: wgKl3mqkdsnyIbOV6nixZhSNyYNUSMOi
+X-Proofpoint-ORIG-GUID: GWWSKTeXVKpKorl7dO_hdR4akTS0zHmz
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240531030740.1024475-1-lizhi.xu@windriver.com>
-
-Hi Lizhi,
-
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on tytso-ext4/dev]
-[also build test WARNING on netfilter-nf/main linus/master v6.10-rc1 next-20240529]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Lizhi-Xu/ext4-add-casefolded-feature-check-before-setup-encrypted-info/20240531-111129
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/tytso/ext4.git dev
-patch link:    https://lore.kernel.org/r/20240531030740.1024475-1-lizhi.xu%40windriver.com
-patch subject: [PATCH V2] ext4: add casefolded feature check before setup encrypted info
-config: riscv-defconfig (https://download.01.org/0day-ci/archive/20240531/202405311607.yQR7dozp-lkp@intel.com/config)
-compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project bafda89a0944d947fc4b3b5663185e07a397ac30)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240531/202405311607.yQR7dozp-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405311607.yQR7dozp-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from fs/ext4/ialloc.c:21:
-   In file included from include/linux/buffer_head.h:12:
-   In file included from include/linux/blk_types.h:10:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:8:
-   In file included from include/linux/cacheflush.h:5:
-   In file included from arch/riscv/include/asm/cacheflush.h:9:
-   In file included from include/linux/mm.h:2208:
-   include/linux/vmstat.h:522:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     522 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
->> fs/ext4/ialloc.c:986:7: warning: variable 'err' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
-     986 |                 if (ext4_has_feature_casefold(inode->i_sb))
-         |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   fs/ext4/ialloc.c:988:7: note: uninitialized use occurs here
-     988 |                 if (err)
-         |                     ^~~
-   fs/ext4/ialloc.c:986:3: note: remove the 'if' if its condition is always true
-     986 |                 if (ext4_has_feature_casefold(inode->i_sb))
-         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     987 |                         err = fscrypt_prepare_new_inode(dir, inode, &encrypt);
-   fs/ext4/ialloc.c:939:15: note: initialize the variable 'err' to silence this warning
-     939 |         int ret2, err;
-         |                      ^
-         |                       = 0
-   2 warnings generated.
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-31_05,2024-05-30_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=999
+ mlxscore=0 impostorscore=0 suspectscore=0 malwarescore=0 clxscore=1015
+ lowpriorityscore=0 adultscore=0 priorityscore=1501 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2405310066
 
 
-vim +986 fs/ext4/ialloc.c
 
-   912	
-   913	/*
-   914	 * There are two policies for allocating an inode.  If the new inode is
-   915	 * a directory, then a forward search is made for a block group with both
-   916	 * free space and a low directory-to-inode ratio; if that fails, then of
-   917	 * the groups with above-average free space, that group with the fewest
-   918	 * directories already is chosen.
-   919	 *
-   920	 * For other inodes, search forward from the parent directory's block
-   921	 * group to find a free inode.
-   922	 */
-   923	struct inode *__ext4_new_inode(struct mnt_idmap *idmap,
-   924				       handle_t *handle, struct inode *dir,
-   925				       umode_t mode, const struct qstr *qstr,
-   926				       __u32 goal, uid_t *owner, __u32 i_flags,
-   927				       int handle_type, unsigned int line_no,
-   928				       int nblocks)
-   929	{
-   930		struct super_block *sb;
-   931		struct buffer_head *inode_bitmap_bh = NULL;
-   932		struct buffer_head *group_desc_bh;
-   933		ext4_group_t ngroups, group = 0;
-   934		unsigned long ino = 0;
-   935		struct inode *inode;
-   936		struct ext4_group_desc *gdp = NULL;
-   937		struct ext4_inode_info *ei;
-   938		struct ext4_sb_info *sbi;
-   939		int ret2, err;
-   940		struct inode *ret;
-   941		ext4_group_t i;
-   942		ext4_group_t flex_group;
-   943		struct ext4_group_info *grp = NULL;
-   944		bool encrypt = false;
-   945	
-   946		/* Cannot create files in a deleted directory */
-   947		if (!dir || !dir->i_nlink)
-   948			return ERR_PTR(-EPERM);
-   949	
-   950		sb = dir->i_sb;
-   951		sbi = EXT4_SB(sb);
-   952	
-   953		if (unlikely(ext4_forced_shutdown(sb)))
-   954			return ERR_PTR(-EIO);
-   955	
-   956		ngroups = ext4_get_groups_count(sb);
-   957		trace_ext4_request_inode(dir, mode);
-   958		inode = new_inode(sb);
-   959		if (!inode)
-   960			return ERR_PTR(-ENOMEM);
-   961		ei = EXT4_I(inode);
-   962	
-   963		/*
-   964		 * Initialize owners and quota early so that we don't have to account
-   965		 * for quota initialization worst case in standard inode creating
-   966		 * transaction
-   967		 */
-   968		if (owner) {
-   969			inode->i_mode = mode;
-   970			i_uid_write(inode, owner[0]);
-   971			i_gid_write(inode, owner[1]);
-   972		} else if (test_opt(sb, GRPID)) {
-   973			inode->i_mode = mode;
-   974			inode_fsuid_set(inode, idmap);
-   975			inode->i_gid = dir->i_gid;
-   976		} else
-   977			inode_init_owner(idmap, inode, dir, mode);
-   978	
-   979		if (ext4_has_feature_project(sb) &&
-   980		    ext4_test_inode_flag(dir, EXT4_INODE_PROJINHERIT))
-   981			ei->i_projid = EXT4_I(dir)->i_projid;
-   982		else
-   983			ei->i_projid = make_kprojid(&init_user_ns, EXT4_DEF_PROJID);
-   984	
-   985		if (!(i_flags & EXT4_EA_INODE_FL)) {
- > 986			if (ext4_has_feature_casefold(inode->i_sb))
-   987				err = fscrypt_prepare_new_inode(dir, inode, &encrypt);
-   988			if (err)
-   989				goto out;
-   990		}
-   991	
-   992		err = dquot_initialize(inode);
-   993		if (err)
-   994			goto out;
-   995	
-   996		if (!handle && sbi->s_journal && !(i_flags & EXT4_EA_INODE_FL)) {
-   997			ret2 = ext4_xattr_credits_for_new_inode(dir, mode, encrypt);
-   998			if (ret2 < 0) {
-   999				err = ret2;
-  1000				goto out;
-  1001			}
-  1002			nblocks += ret2;
-  1003		}
-  1004	
-  1005		if (!goal)
-  1006			goal = sbi->s_inode_goal;
-  1007	
-  1008		if (goal && goal <= le32_to_cpu(sbi->s_es->s_inodes_count)) {
-  1009			group = (goal - 1) / EXT4_INODES_PER_GROUP(sb);
-  1010			ino = (goal - 1) % EXT4_INODES_PER_GROUP(sb);
-  1011			ret2 = 0;
-  1012			goto got_group;
-  1013		}
-  1014	
-  1015		if (S_ISDIR(mode))
-  1016			ret2 = find_group_orlov(sb, dir, &group, mode, qstr);
-  1017		else
-  1018			ret2 = find_group_other(sb, dir, &group, mode);
-  1019	
-  1020	got_group:
-  1021		EXT4_I(dir)->i_last_alloc_group = group;
-  1022		err = -ENOSPC;
-  1023		if (ret2 == -1)
-  1024			goto out;
-  1025	
-  1026		/*
-  1027		 * Normally we will only go through one pass of this loop,
-  1028		 * unless we get unlucky and it turns out the group we selected
-  1029		 * had its last inode grabbed by someone else.
-  1030		 */
-  1031		for (i = 0; i < ngroups; i++, ino = 0) {
-  1032			err = -EIO;
-  1033	
-  1034			gdp = ext4_get_group_desc(sb, group, &group_desc_bh);
-  1035			if (!gdp)
-  1036				goto out;
-  1037	
-  1038			/*
-  1039			 * Check free inodes count before loading bitmap.
-  1040			 */
-  1041			if (ext4_free_inodes_count(sb, gdp) == 0)
-  1042				goto next_group;
-  1043	
-  1044			if (!(sbi->s_mount_state & EXT4_FC_REPLAY)) {
-  1045				grp = ext4_get_group_info(sb, group);
-  1046				/*
-  1047				 * Skip groups with already-known suspicious inode
-  1048				 * tables
-  1049				 */
-  1050				if (!grp || EXT4_MB_GRP_IBITMAP_CORRUPT(grp))
-  1051					goto next_group;
-  1052			}
-  1053	
-  1054			brelse(inode_bitmap_bh);
-  1055			inode_bitmap_bh = ext4_read_inode_bitmap(sb, group);
-  1056			/* Skip groups with suspicious inode tables */
-  1057			if (((!(sbi->s_mount_state & EXT4_FC_REPLAY))
-  1058			     && EXT4_MB_GRP_IBITMAP_CORRUPT(grp)) ||
-  1059			    IS_ERR(inode_bitmap_bh)) {
-  1060				inode_bitmap_bh = NULL;
-  1061				goto next_group;
-  1062			}
-  1063	
-  1064	repeat_in_this_group:
-  1065			ret2 = find_inode_bit(sb, group, inode_bitmap_bh, &ino);
-  1066			if (!ret2)
-  1067				goto next_group;
-  1068	
-  1069			if (group == 0 && (ino + 1) < EXT4_FIRST_INO(sb)) {
-  1070				ext4_error(sb, "reserved inode found cleared - "
-  1071					   "inode=%lu", ino + 1);
-  1072				ext4_mark_group_bitmap_corrupted(sb, group,
-  1073						EXT4_GROUP_INFO_IBITMAP_CORRUPT);
-  1074				goto next_group;
-  1075			}
-  1076	
-  1077			if ((!(sbi->s_mount_state & EXT4_FC_REPLAY)) && !handle) {
-  1078				BUG_ON(nblocks <= 0);
-  1079				handle = __ext4_journal_start_sb(NULL, dir->i_sb,
-  1080					 line_no, handle_type, nblocks, 0,
-  1081					 ext4_trans_default_revoke_credits(sb));
-  1082				if (IS_ERR(handle)) {
-  1083					err = PTR_ERR(handle);
-  1084					ext4_std_error(sb, err);
-  1085					goto out;
-  1086				}
-  1087			}
-  1088			BUFFER_TRACE(inode_bitmap_bh, "get_write_access");
-  1089			err = ext4_journal_get_write_access(handle, sb, inode_bitmap_bh,
-  1090							    EXT4_JTR_NONE);
-  1091			if (err) {
-  1092				ext4_std_error(sb, err);
-  1093				goto out;
-  1094			}
-  1095			ext4_lock_group(sb, group);
-  1096			ret2 = ext4_test_and_set_bit(ino, inode_bitmap_bh->b_data);
-  1097			if (ret2) {
-  1098				/* Someone already took the bit. Repeat the search
-  1099				 * with lock held.
-  1100				 */
-  1101				ret2 = find_inode_bit(sb, group, inode_bitmap_bh, &ino);
-  1102				if (ret2) {
-  1103					ext4_set_bit(ino, inode_bitmap_bh->b_data);
-  1104					ret2 = 0;
-  1105				} else {
-  1106					ret2 = 1; /* we didn't grab the inode */
-  1107				}
-  1108			}
-  1109			ext4_unlock_group(sb, group);
-  1110			ino++;		/* the inode bitmap is zero-based */
-  1111			if (!ret2)
-  1112				goto got; /* we grabbed the inode! */
-  1113	
-  1114			if (ino < EXT4_INODES_PER_GROUP(sb))
-  1115				goto repeat_in_this_group;
-  1116	next_group:
-  1117			if (++group == ngroups)
-  1118				group = 0;
-  1119		}
-  1120		err = -ENOSPC;
-  1121		goto out;
-  1122	
-  1123	got:
-  1124		BUFFER_TRACE(inode_bitmap_bh, "call ext4_handle_dirty_metadata");
-  1125		err = ext4_handle_dirty_metadata(handle, NULL, inode_bitmap_bh);
-  1126		if (err) {
-  1127			ext4_std_error(sb, err);
-  1128			goto out;
-  1129		}
-  1130	
-  1131		BUFFER_TRACE(group_desc_bh, "get_write_access");
-  1132		err = ext4_journal_get_write_access(handle, sb, group_desc_bh,
-  1133						    EXT4_JTR_NONE);
-  1134		if (err) {
-  1135			ext4_std_error(sb, err);
-  1136			goto out;
-  1137		}
-  1138	
-  1139		/* We may have to initialize the block bitmap if it isn't already */
-  1140		if (ext4_has_group_desc_csum(sb) &&
-  1141		    gdp->bg_flags & cpu_to_le16(EXT4_BG_BLOCK_UNINIT)) {
-  1142			struct buffer_head *block_bitmap_bh;
-  1143	
-  1144			block_bitmap_bh = ext4_read_block_bitmap(sb, group);
-  1145			if (IS_ERR(block_bitmap_bh)) {
-  1146				err = PTR_ERR(block_bitmap_bh);
-  1147				goto out;
-  1148			}
-  1149			BUFFER_TRACE(block_bitmap_bh, "get block bitmap access");
-  1150			err = ext4_journal_get_write_access(handle, sb, block_bitmap_bh,
-  1151							    EXT4_JTR_NONE);
-  1152			if (err) {
-  1153				brelse(block_bitmap_bh);
-  1154				ext4_std_error(sb, err);
-  1155				goto out;
-  1156			}
-  1157	
-  1158			BUFFER_TRACE(block_bitmap_bh, "dirty block bitmap");
-  1159			err = ext4_handle_dirty_metadata(handle, NULL, block_bitmap_bh);
-  1160	
-  1161			/* recheck and clear flag under lock if we still need to */
-  1162			ext4_lock_group(sb, group);
-  1163			if (ext4_has_group_desc_csum(sb) &&
-  1164			    (gdp->bg_flags & cpu_to_le16(EXT4_BG_BLOCK_UNINIT))) {
-  1165				gdp->bg_flags &= cpu_to_le16(~EXT4_BG_BLOCK_UNINIT);
-  1166				ext4_free_group_clusters_set(sb, gdp,
-  1167					ext4_free_clusters_after_init(sb, group, gdp));
-  1168				ext4_block_bitmap_csum_set(sb, gdp, block_bitmap_bh);
-  1169				ext4_group_desc_csum_set(sb, group, gdp);
-  1170			}
-  1171			ext4_unlock_group(sb, group);
-  1172			brelse(block_bitmap_bh);
-  1173	
-  1174			if (err) {
-  1175				ext4_std_error(sb, err);
-  1176				goto out;
-  1177			}
-  1178		}
-  1179	
-  1180		/* Update the relevant bg descriptor fields */
-  1181		if (ext4_has_group_desc_csum(sb)) {
-  1182			int free;
-  1183			struct ext4_group_info *grp = NULL;
-  1184	
-  1185			if (!(sbi->s_mount_state & EXT4_FC_REPLAY)) {
-  1186				grp = ext4_get_group_info(sb, group);
-  1187				if (!grp) {
-  1188					err = -EFSCORRUPTED;
-  1189					goto out;
-  1190				}
-  1191				down_read(&grp->alloc_sem); /*
-  1192							     * protect vs itable
-  1193							     * lazyinit
-  1194							     */
-  1195			}
-  1196			ext4_lock_group(sb, group); /* while we modify the bg desc */
-  1197			free = EXT4_INODES_PER_GROUP(sb) -
-  1198				ext4_itable_unused_count(sb, gdp);
-  1199			if (gdp->bg_flags & cpu_to_le16(EXT4_BG_INODE_UNINIT)) {
-  1200				gdp->bg_flags &= cpu_to_le16(~EXT4_BG_INODE_UNINIT);
-  1201				free = 0;
-  1202			}
-  1203			/*
-  1204			 * Check the relative inode number against the last used
-  1205			 * relative inode number in this group. if it is greater
-  1206			 * we need to update the bg_itable_unused count
-  1207			 */
-  1208			if (ino > free)
-  1209				ext4_itable_unused_set(sb, gdp,
-  1210						(EXT4_INODES_PER_GROUP(sb) - ino));
-  1211			if (!(sbi->s_mount_state & EXT4_FC_REPLAY))
-  1212				up_read(&grp->alloc_sem);
-  1213		} else {
-  1214			ext4_lock_group(sb, group);
-  1215		}
-  1216	
-  1217		ext4_free_inodes_set(sb, gdp, ext4_free_inodes_count(sb, gdp) - 1);
-  1218		if (S_ISDIR(mode)) {
-  1219			ext4_used_dirs_set(sb, gdp, ext4_used_dirs_count(sb, gdp) + 1);
-  1220			if (sbi->s_log_groups_per_flex) {
-  1221				ext4_group_t f = ext4_flex_group(sbi, group);
-  1222	
-  1223				atomic_inc(&sbi_array_rcu_deref(sbi, s_flex_groups,
-  1224								f)->used_dirs);
-  1225			}
-  1226		}
-  1227		if (ext4_has_group_desc_csum(sb)) {
-  1228			ext4_inode_bitmap_csum_set(sb, gdp, inode_bitmap_bh,
-  1229						   EXT4_INODES_PER_GROUP(sb) / 8);
-  1230			ext4_group_desc_csum_set(sb, group, gdp);
-  1231		}
-  1232		ext4_unlock_group(sb, group);
-  1233	
-  1234		BUFFER_TRACE(group_desc_bh, "call ext4_handle_dirty_metadata");
-  1235		err = ext4_handle_dirty_metadata(handle, NULL, group_desc_bh);
-  1236		if (err) {
-  1237			ext4_std_error(sb, err);
-  1238			goto out;
-  1239		}
-  1240	
-  1241		percpu_counter_dec(&sbi->s_freeinodes_counter);
-  1242		if (S_ISDIR(mode))
-  1243			percpu_counter_inc(&sbi->s_dirs_counter);
-  1244	
-  1245		if (sbi->s_log_groups_per_flex) {
-  1246			flex_group = ext4_flex_group(sbi, group);
-  1247			atomic_dec(&sbi_array_rcu_deref(sbi, s_flex_groups,
-  1248							flex_group)->free_inodes);
-  1249		}
-  1250	
-  1251		inode->i_ino = ino + group * EXT4_INODES_PER_GROUP(sb);
-  1252		/* This is the optimal IO size (for stat), not the fs block size */
-  1253		inode->i_blocks = 0;
-  1254		simple_inode_init_ts(inode);
-  1255		ei->i_crtime = inode_get_mtime(inode);
-  1256	
-  1257		memset(ei->i_data, 0, sizeof(ei->i_data));
-  1258		ei->i_dir_start_lookup = 0;
-  1259		ei->i_disksize = 0;
-  1260	
-  1261		/* Don't inherit extent flag from directory, amongst others. */
-  1262		ei->i_flags =
-  1263			ext4_mask_flags(mode, EXT4_I(dir)->i_flags & EXT4_FL_INHERITED);
-  1264		ei->i_flags |= i_flags;
-  1265		ei->i_file_acl = 0;
-  1266		ei->i_dtime = 0;
-  1267		ei->i_block_group = group;
-  1268		ei->i_last_alloc_group = ~0;
-  1269	
-  1270		ext4_set_inode_flags(inode, true);
-  1271		if (IS_DIRSYNC(inode))
-  1272			ext4_handle_sync(handle);
-  1273		if (insert_inode_locked(inode) < 0) {
-  1274			/*
-  1275			 * Likely a bitmap corruption causing inode to be allocated
-  1276			 * twice.
-  1277			 */
-  1278			err = -EIO;
-  1279			ext4_error(sb, "failed to insert inode %lu: doubly allocated?",
-  1280				   inode->i_ino);
-  1281			ext4_mark_group_bitmap_corrupted(sb, group,
-  1282						EXT4_GROUP_INFO_IBITMAP_CORRUPT);
-  1283			goto out;
-  1284		}
-  1285		inode->i_generation = get_random_u32();
-  1286	
-  1287		/* Precompute checksum seed for inode metadata */
-  1288		if (ext4_has_metadata_csum(sb)) {
-  1289			__u32 csum;
-  1290			__le32 inum = cpu_to_le32(inode->i_ino);
-  1291			__le32 gen = cpu_to_le32(inode->i_generation);
-  1292			csum = ext4_chksum(sbi, sbi->s_csum_seed, (__u8 *)&inum,
-  1293					   sizeof(inum));
-  1294			ei->i_csum_seed = ext4_chksum(sbi, csum, (__u8 *)&gen,
-  1295						      sizeof(gen));
-  1296		}
-  1297	
-  1298		ext4_clear_state_flags(ei); /* Only relevant on 32-bit archs */
-  1299		ext4_set_inode_state(inode, EXT4_STATE_NEW);
-  1300	
-  1301		ei->i_extra_isize = sbi->s_want_extra_isize;
-  1302		ei->i_inline_off = 0;
-  1303		if (ext4_has_feature_inline_data(sb) &&
-  1304		    (!(ei->i_flags & EXT4_DAX_FL) || S_ISDIR(mode)))
-  1305			ext4_set_inode_state(inode, EXT4_STATE_MAY_INLINE_DATA);
-  1306		ret = inode;
-  1307		err = dquot_alloc_inode(inode);
-  1308		if (err)
-  1309			goto fail_drop;
-  1310	
-  1311		/*
-  1312		 * Since the encryption xattr will always be unique, create it first so
-  1313		 * that it's less likely to end up in an external xattr block and
-  1314		 * prevent its deduplication.
-  1315		 */
-  1316		if (encrypt) {
-  1317			err = fscrypt_set_context(inode, handle);
-  1318			if (err)
-  1319				goto fail_free_drop;
-  1320		}
-  1321	
-  1322		if (!(ei->i_flags & EXT4_EA_INODE_FL)) {
-  1323			err = ext4_init_acl(handle, inode, dir);
-  1324			if (err)
-  1325				goto fail_free_drop;
-  1326	
-  1327			err = ext4_init_security(handle, inode, dir, qstr);
-  1328			if (err)
-  1329				goto fail_free_drop;
-  1330		}
-  1331	
-  1332		if (ext4_has_feature_extents(sb)) {
-  1333			/* set extent flag only for directory, file and normal symlink*/
-  1334			if (S_ISDIR(mode) || S_ISREG(mode) || S_ISLNK(mode)) {
-  1335				ext4_set_inode_flag(inode, EXT4_INODE_EXTENTS);
-  1336				ext4_ext_tree_init(handle, inode);
-  1337			}
-  1338		}
-  1339	
-  1340		if (ext4_handle_valid(handle)) {
-  1341			ei->i_sync_tid = handle->h_transaction->t_tid;
-  1342			ei->i_datasync_tid = handle->h_transaction->t_tid;
-  1343		}
-  1344	
-  1345		err = ext4_mark_inode_dirty(handle, inode);
-  1346		if (err) {
-  1347			ext4_std_error(sb, err);
-  1348			goto fail_free_drop;
-  1349		}
-  1350	
-  1351		ext4_debug("allocating inode %lu\n", inode->i_ino);
-  1352		trace_ext4_allocate_inode(inode, dir, mode);
-  1353		brelse(inode_bitmap_bh);
-  1354		return ret;
-  1355	
-  1356	fail_free_drop:
-  1357		dquot_free_inode(inode);
-  1358	fail_drop:
-  1359		clear_nlink(inode);
-  1360		unlock_new_inode(inode);
-  1361	out:
-  1362		dquot_drop(inode);
-  1363		inode->i_flags |= S_NOQUOTA;
-  1364		iput(inode);
-  1365		brelse(inode_bitmap_bh);
-  1366		return ERR_PTR(err);
-  1367	}
-  1368	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+On 31.05.24 10:15, Guangguan Wang wrote:
+> 
+> 
+> On 2024/5/30 00:28, Wenjia Zhang wrote:
+>>
+>>
+>> On 28.05.24 15:51, Guangguan Wang wrote:
+>>> SMCR_RMBE_SIZES is the upper boundary of SMC-R's snd_buf and rcv_buf.
+>>> The maximum bytes of snd_buf and rcv_buf can be calculated by 2^SMCR_
+>>> RMBE_SIZES * 16KB. SMCR_RMBE_SIZES = 5 means the upper boundary is 512KB.
+>>> TCP's snd_buf and rcv_buf max size is configured by net.ipv4.tcp_w/rmem[2]
+>>> whose defalut value is 4MB or 6MB, is much larger than SMC-R's upper
+>>> boundary.
+>>>
+>>> In some scenarios, such as Recommendation System, the communication
+>>> pattern is mainly large size send/recv, where the size of snd_buf and
+>>> rcv_buf greatly affects performance. Due to the upper boundary
+>>> disadvantage, SMC-R performs poor than TCP in those scenarios. So it
+>>> is time to enlarge the upper boundary size of SMC-R's snd_buf and rcv_buf,
+>>> so that the SMC-R's snd_buf and rcv_buf can be configured to larger size
+>>> for performance gain in such scenarios.
+>>>
+>>> The SMC-R rcv_buf's size will be transferred to peer by the field
+>>> rmbe_size in clc accept and confirm message. The length of the field
+>>> rmbe_size is four bits, which means the maximum value of SMCR_RMBE_SIZES
+>>> is 15. In case of frequently adjusting the value of SMCR_RMBE_SIZES
+>>> in different scenarios, set the value of SMCR_RMBE_SIZES to the maximum
+>>> value 15, which means the upper boundary of SMC-R's snd_buf and rcv_buf
+>>> is 512MB. As the real memory usage is determined by the value of
+>>> net.smc.w/rmem, not by the upper boundary, set the value of SMCR_RMBE_SIZES
+>>> to the maximum value has no side affects.
+>>>
+>> Hi Guangguan,
+>>
+>> That is correct that the maximum buffer(snd_buf and rcv_buf) size of SMCR is much smaller than TCP's. If I remember correctly, that was because the 512KB was enough for the traffic and did not waist memory space after some experiment. Sure, that was years ago, and it could be very different nowadays. But I'm still curious if you have any concrete scenario with performance benchmark which shows the distinguish disadvantage of the current maximum buffer size.
+>>
+> 
+> Hi Wenjia,
+> 
+> The performance benchmark can be "Wide & Deep Recommender Model Training in TensorFlow" (https://github.com/NVIDIA/DeepLearningExamples/tree/master/TensorFlow/Recommendation/WideAndDeep).
+> The related paper here: https://arxiv.org/pdf/1606.07792.
+> 
+> The performance unit is steps/s, where a higher value indicates better performance.
+> 
+> 1) using 512KB snd_buf/recv_buf for SMC-R, default(4MB snd_buf/6MB recv_buf) for TCP:
+>   SMC-R performance vs TCP performance = 24.21 steps/s vs 24.85 steps/s
+> 
+> ps smcr stat:
+> RX Stats
+>    Data transmitted (Bytes)    37600503985 (37.60G)
+>    Total requests                   677841
+>    Buffer full                       40074 (5.91%)
+>              8KB    16KB    32KB    64KB   128KB   256KB   512KB  >512KB
+>    Bufs        0       0       0       0       0       0       4       0
+>    Reqs   178.2K  12.69K  8.125K  45.71K  23.51K  20.75K  60.16K       0
+> TX Stats
+>    Data transmitted (Bytes)   118471581684 (118.5G)
+>    Total requests                   874395
+>    Buffer full                      343080 (39.24%)
+>    Buffer full (remote)             468523 (53.58%)
+>    Buffer too small                 607914 (69.52%)
+>    Buffer too small (remote)        607914 (69.52%)
+>              8KB    16KB    32KB    64KB   128KB   256KB   512KB  >512KB
+>    Bufs        0       0       0       0       0       0       4       0
+>    Reqs   119.7K  3.169K  2.662K  5.583K  8.523K  21.55K  34.58K  318.0K
+> 
+> worker smcr stat:
+> RX Stats
+>    Data transmitted (Bytes)   118471581723 (118.5G)
+>    Total requests                   835959
+>    Buffer full                       99227 (11.87%)
+>              8KB    16KB    32KB    64KB   128KB   256KB   512KB  >512KB
+>    Bufs        0       0       0       0       0       0       4       0
+>    Reqs   125.4K  13.14K  17.49K  16.78K  34.27K  34.12K  223.8K       0
+> TX Stats
+>    Data transmitted (Bytes)    37600504139 (37.60G)
+>    Total requests                   606822
+>    Buffer full                       86597 (14.27%)
+>    Buffer full (remote)             156098 (25.72%)
+>    Buffer too small                 154218 (25.41%)
+>    Buffer too small (remote)        154218 (25.41%)
+>              8KB    16KB    32KB    64KB   128KB   256KB   512KB  >512KB
+>    Bufs        0       0       0       0       0       0       4       0
+>    Reqs   323.6K  13.26K  6.979K  50.84K  19.43K  14.46K  8.231K  81.80K
+> 
+> 2) using 4MB snd_buf and 6MB recv_buf for SMC-R, default(4MB snd_buf/6MB recv_buf) for TCP:
+>   SMC-R performance vs TCP performance = 29.35 steps/s vs 24.85 steps/s
+> 
+> ps smcr stat:
+> RX Stats
+>    Data transmitted (Bytes)   110853495554 (110.9G)
+>    Total requests                  1165230
+>    Buffer full                           0 (0.00%)
+>              8KB    16KB    32KB    64KB   128KB   256KB   512KB  >512KB
+>    Bufs        0       0       0       0       0       0       0       4
+>    Reqs   340.2K  29.65K  19.58K  76.32K  55.37K  39.15K  7.042K  43.88K
+> TX Stats
+>    Data transmitted (Bytes)   349072090590 (349.1G)
+>    Total requests                   922705
+>    Buffer full                      154765 (16.77%)
+>    Buffer full (remote)             309940 (33.59%)
+>    Buffer too small                  46896 (5.08%)
+>    Buffer too small (remote)         14304 (1.55%)
+>              8KB    16KB    32KB    64KB   128KB   256KB   512KB  >512KB
+>    Bufs        0       0       0       0       0       0       0       4
+>    Reqs   420.8K  11.15K  3.609K  12.28K  13.05K  26.08K  22.13K  240.3K
+> 
+> worker smcr stat:
+> RX Stats
+>    Data transmitted (Bytes)   349072090590 (349.1G)
+>    Total requests                   585165
+>    Buffer full                           0 (0.00%)
+>              8KB    16KB    32KB    64KB   128KB   256KB   512KB  >512KB
+>    Bufs        0       0       0       0       0       0       0       4
+>    Reqs   155.4K  13.42K  4.070K  4.462K  3.628K  9.720K  12.01K  165.0K
+> TX Stats
+>    Data transmitted (Bytes)   110854684711 (110.9G)
+>    Total requests                  1052628
+>    Buffer full                       34760 (3.30%)
+>    Buffer full (remote)              77630 (7.37%)
+>    Buffer too small                  22330 (2.12%)
+>    Buffer too small (remote)          7040 (0.67%)
+>              8KB    16KB    32KB    64KB   128KB   256KB   512KB  >512KB
+>    Bufs        0       0       0       0       0       0       0       4
+>    Reqs   666.3K  38.43K  20.65K  135.1K  54.19K  36.69K  3.948K  56.42K
+> 
+> 
+>  From the above smcr stat, we can see quantities send/recv with large size more than 512KB, and quantities send blocked due to
+> buffer full or buffer too small. And when configured with larger send/recv buffer, we get less send block and better performance.
+> 
+That is exactly what I asked for, thank you for the details! Please give 
+me some days to try by ourselves. If the performance is also significant 
+as yours and no other side effect, why not?!
 
