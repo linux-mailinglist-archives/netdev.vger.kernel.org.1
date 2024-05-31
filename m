@@ -1,178 +1,120 @@
-Return-Path: <netdev+bounces-99675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A25E8D5CC8
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 10:35:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75A958D5C50
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 10:08:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E0101C2100D
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 08:35:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DD661F2783B
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 08:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62E4314F9F5;
-	Fri, 31 May 2024 08:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Cw4xuoEw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C01BA770E5;
+	Fri, 31 May 2024 08:07:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 167E214F9EE;
-	Fri, 31 May 2024 08:35:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3355077F10;
+	Fri, 31 May 2024 08:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717144530; cv=none; b=bu6JTXXA+s86mQ2uQinmlWG628n3CLnD+3PMIkGwPnkqw6Su06TQ9GPOt4JvJCQF9J2GJVtoMAB3PwitoJfxUGLO1oYxNixOad8c0czl0yhDXYJeGSHcQmPsYBa4PaL7nEhdGQb6SE+DptI66cZHkTfit7EOVR1tB7rYETqR4C4=
+	t=1717142874; cv=none; b=UW4EXn/RzCYNhlP2Ne5qTFg7GNmKVatzCsc7BtMm1qE3vUbg9NN78MNXdyE+3n3ryH//tK5/1ctPLlYRHxCmswfrLClLmcsgDiylhDs1DRlqaziWzvboeKC7vyz0mjTL/pjG6nzeu0CLculI9FjHw06LRBxv8ebq8ti0EMEp5HI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717144530; c=relaxed/simple;
-	bh=HQvoDqK60c0HziAFW58bTtlxbgZFzYALbQqMlQCXe34=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=HXPKtneyF00VtjICWs74pBWdVh5PH0eBEMpcAwYqlI3AXNVIJYB1zw39QmcYxHbEPjKy8JuFEbFRRr87kpHBbtkUY63a5OlzRV+Aia2j7cT7m1+QE0g9KT9L4yXd4T/5TxwGkIaieKS35WVu5bc57XxFsBXPigtWh4D1bkWz0Co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Cw4xuoEw; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44V87KPv031165;
-	Fri, 31 May 2024 08:35:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
- content-transfer-encoding : content-type : date : from : in-reply-to :
- message-id : mime-version : references : subject : to; s=pp1;
- bh=1y6y1eXrv6sruReBVh9hGh2wEZ2WHcWE1MoRbCvgWQo=;
- b=Cw4xuoEwtmNtZUYbm/VKLDZwx6lhKZdcMNWv+DGntOlaMuFXLd3iLjW/PBHFDMLEmZpe
- gDKuDl/9ahfu074EN5Y6DxmC5EWcZA1AB6+VVIE34tdu7TVKZ/fq82/ospRpFC8O/Hgq
- /DgrcZC4SXzUiykRnK1AcQ1ENJkSq48CYjOchWbgetAgr12E2GQ6dBmTd0wIAJaUaS96
- FMK2K4QymrgUb2hZijjEfxn6rJIjVpiT5/8Q7lMd/RXISUiPE/ojSLLaMasSHtPoC/ef
- bYdVSRok5TazeZFSbP9wwR8j1+8CsIaPeZ81G4iT08nrPFUA2e4kj5LLAdezIAatl3+C iQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yfarr02bp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 31 May 2024 08:35:24 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44V8ZNRv012833;
-	Fri, 31 May 2024 08:35:23 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yfarr02ba-6
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 31 May 2024 08:35:23 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44V56l9Q006890;
-	Fri, 31 May 2024 08:06:50 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ydpebprgk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 31 May 2024 08:06:50 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44V86lE412845622
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 31 May 2024 08:06:49 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E6C635806D;
-	Fri, 31 May 2024 08:06:46 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6C6755805B;
-	Fri, 31 May 2024 08:06:44 +0000 (GMT)
-Received: from [9.171.25.186] (unknown [9.171.25.186])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 31 May 2024 08:06:44 +0000 (GMT)
-Message-ID: <882713c2-02bd-4396-83be-c527b9d24eef@linux.ibm.com>
-Date: Fri, 31 May 2024 10:06:43 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 0/3] Introduce IPPROTO_SMC
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-        jaka@linux.ibm.com, wintera@linux.ibm.com, guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-        tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
-References: <1717061440-59937-1-git-send-email-alibuda@linux.alibaba.com>
- <bd80b8f9-9c86-4a9b-a7ba-07471dcd5a7c@linux.alibaba.com>
-Content-Language: en-US
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <bd80b8f9-9c86-4a9b-a7ba-07471dcd5a7c@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: _BZ4CaLMBLezEpodBiGmWMvgj76_bl20
-X-Proofpoint-GUID: 0bX0-E3mnhLzEtiWJDaFgvmShrW_jIq9
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1717142874; c=relaxed/simple;
+	bh=vsNgwHvZRQwmQctv8l3O/7QfMvyCgHzZeFs9HeynMFw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jt3oAybZAH5k0j6a8phv5qjQlF6bFAFR8m8TV+WVovneb1iQnuSt5sYAe+YSuLkSw3Qc8sNTBHgCnMTHMomTkdMxPa0K5zUYlZPtaIHOT3u5OJ8i7YDqhmDlZsprdRFn8Ukh9A6q7fyqRd5wM+JH4Q9eQNzuuw6EDt3py9fFTcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: dc4ececc1f2411ef9305a59a3cc225df-20240531
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:71caded7-58ec-4b1f-8584-4f013905d8e5,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-5
+X-CID-INFO: VERSION:1.1.38,REQID:71caded7-58ec-4b1f-8584-4f013905d8e5,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:82c5f88,CLOUDID:d5a16ab178cbfb61a30cf038e50e53f0,BulkI
+	D:2405311607473M99V4K1,BulkQuantity:0,Recheck:0,SF:66|24|17|19|44|102,TC:n
+	il,Content:0,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,CO
+	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: dc4ececc1f2411ef9305a59a3cc225df-20240531
+Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw.kylinos.cn
+	(envelope-from <jiangyunshui@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 558551494; Fri, 31 May 2024 16:07:44 +0800
+Received: from mail.kylinos.cn (localhost [127.0.0.1])
+	by mail.kylinos.cn (NSMail) with SMTP id 78DF3E000EB9;
+	Fri, 31 May 2024 16:07:44 +0800 (CST)
+X-ns-mid: postfix-66598550-342445703
+Received: from kylin-pc.. (unknown [172.25.130.133])
+	by mail.kylinos.cn (NSMail) with ESMTPA id 4CDE2E000EB9;
+	Fri, 31 May 2024 16:07:42 +0800 (CST)
+From: Yunshui Jiang <jiangyunshui@kylinos.cn>
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-wpan@vger.kernel.org
+Cc: alex.aring@gmail.com,
+	stefan@datenfreihafen.org,
+	miquel.raynal@bootlin.com,
+	davem@davemloft.net,
+	Yunshui Jiang <jiangyunshui@kylinos.cn>
+Subject: [PATCH] net: mac802154: Fix racy device stats updates by DEV_STATS_INC() and DEV_STATS_ADD()
+Date: Fri, 31 May 2024 16:07:39 +0800
+Message-Id: <20240531080739.2608969-1-jiangyunshui@kylinos.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-31_04,2024-05-30_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- malwarescore=0 priorityscore=1501 mlxlogscore=999 lowpriorityscore=0
- bulkscore=0 phishscore=0 adultscore=0 impostorscore=0 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2405310064
+Content-Transfer-Encoding: quoted-printable
 
+mac802154 devices update their dev->stats fields locklessly. Therefore
+these counters should be updated atomically. Adopt SMP safe DEV_STATS_INC=
+()
+and DEV_STATS_ADD() to achieve this.
 
+Signed-off-by: Yunshui Jiang <jiangyunshui@kylinos.cn>
+---
+ net/mac802154/tx.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-On 30.05.24 12:14, D. Wythe wrote:
-> 
-> 
-> On 5/30/24 5:30 PM, D. Wythe wrote:
->> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>
->> This patch allows to create smc socket via AF_INET,
->> similar to the following code,
->>
->> /* create v4 smc sock */
->> v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
->>
->> /* create v6 smc sock */
->> v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
-> 
-> Welcome everyone to try out the eBPF based version of smc_run during 
-> testing, I have added a separate command called smc_run.bpf,
-> it was equivalent to normal smc_run but with IPPROTO_SMC via eBPF.
-> 
-> You can obtain the code and more info from: 
-> https://github.com/D-Wythe/smc-tools
-> 
-> Usage:
-> 
-> smc_run.bpf
-> An eBPF implemented smc_run based on IPPROTO_SMC:
-> 
-> 1. Support to transparent replacement based on command (Just like smc_run).
-> 2. Supprot to transparent replacement based on pid configuration. And 
-> supports the inheritance of this capability between parent and child 
-> processes.
-> 3. Support to transparent replacement based on per netns configuration.
-> 
-> smc_run.bpf COMMAND
-> 
-> 1. Equivalent to smc_run but with IPPROTO_SMC via eBPF
-> 
-> smc_run.bpf -p pid
-> 
->   1. Add the process with target pid to the map. Afterward, all socket() 
-> calls of the process and its descendant processes will be replaced from 
-> IPPROTO_TCP to IPPROTO_SMC.
->   2. Mapping will be automatically deleted when process exits.
->   3. Specifically, COMMAND mode is actually works like following:
-> 
->      smc_run.bpf -p $$
->      COMMAND
->      exit
-> 
-> smc_run.bpf -n 1
-> 
->   1. Make all socket() calls of the current netns to be replaced from 
-> IPPROTO_TCP to IPPROTO_SMC.
->   2. Turn off it by smc_run.bpf -n 0
-> 
-> 
-Hi D. Wythe,
+diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+index 2a6f1ed763c9..6fbed5bb5c3e 100644
+--- a/net/mac802154/tx.c
++++ b/net/mac802154/tx.c
+@@ -34,8 +34,8 @@ void ieee802154_xmit_sync_worker(struct work_struct *wo=
+rk)
+ 	if (res)
+ 		goto err_tx;
+=20
+-	dev->stats.tx_packets++;
+-	dev->stats.tx_bytes +=3D skb->len;
++	DEV_STATS_INC(dev, tx_packets);
++	DEV_STATS_ADD(dev, tx_bytes, skb->len);
+=20
+ 	ieee802154_xmit_complete(&local->hw, skb, false);
+=20
+@@ -90,8 +90,8 @@ ieee802154_tx(struct ieee802154_local *local, struct sk=
+_buff *skb)
+ 		if (ret)
+ 			goto err_wake_netif_queue;
+=20
+-		dev->stats.tx_packets++;
+-		dev->stats.tx_bytes +=3D len;
++		DEV_STATS_INC(dev, tx_packets);
++		DEV_STATS_ADD(dev, tx_bytes, len);
+ 	} else {
+ 		local->tx_skb =3D skb;
+ 		queue_work(local->workqueue, &local->sync_tx_work);
+--=20
+2.34.1
 
-Thank you for the info and description! The code generally looks good to 
-me, just still some details I need to check again. And I'd like to give 
-smc_run.bpf a try, and maybe let you know if it works for me next week.
-
-Thanks,
-Wenjia
 
