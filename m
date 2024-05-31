@@ -1,117 +1,116 @@
-Return-Path: <netdev+bounces-99631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAA2D8D5895
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 04:21:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D4998D58AA
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 04:38:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C267B22DFF
-	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 02:20:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 459A228651F
+	for <lists+netdev@lfdr.de>; Fri, 31 May 2024 02:38:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE5474E3D;
-	Fri, 31 May 2024 02:20:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB5E78269;
+	Fri, 31 May 2024 02:38:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AYC6kPFD"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="UxBobHUs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0852A4C6D;
-	Fri, 31 May 2024 02:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53311F16B;
+	Fri, 31 May 2024 02:38:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717122053; cv=none; b=qJN6LtxxE6xEde2u3fWcV4o+nC+y1UwXWReNiYSrJWfbh5C/if6yhVSk6f5qq1jmyeOe/gGLBlIF8ZOTXAndpgojI0tbcd0gxghHGow6srpyJT5M7Ndr9ncvSaaS1/6xwVuVYJR1bi9x33pClGOJd2EwYJ0INAxdIAxqbkN6Hzc=
+	t=1717123117; cv=none; b=WtVksWWePbUuo7FED+ePlaQtLXUIdEuzt0UkFDuFPdhUgOJqi/rFQYDwVc77hOMMZn/3etxPaQfy6Auj8nUK1GTp28w9KaM8PttXRm6yr2YxJuZ95PrlF3B+Fho4srtZJChKMaMk3qw+ZNzusuOt/YHyw6E8EzBqXDN/XUgIYYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717122053; c=relaxed/simple;
-	bh=b5G/xzCKKv13+PNvSDpcSoc6cOLXomTBBZTbM3WNl+Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BMzdU36xnguHz19KBSNUPL6f/7K0BugDCo/a57c27SOqc2ykg2dpQGfXjUKPMXC7OSUtBodwS5xf2CyMC6a7ZY5V0vRu+cSDCO6LLOvfPVQgioHW+/I9p75Fudj3gzUO8PlWqAcqCQwTQ38EkylQZLCLWY7LKbMweq1YrR/IMTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AYC6kPFD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 028B2C2BBFC;
-	Fri, 31 May 2024 02:20:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717122052;
-	bh=b5G/xzCKKv13+PNvSDpcSoc6cOLXomTBBZTbM3WNl+Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AYC6kPFDmbrWlFSPd9ew7nngeX7vNnr7ubo6m9b2OyqpSVvNr9Q8uOXF8czbmW329
-	 hAMZAcC4V57o7n/GKhiLNhD6YeGftel6CgNbC9WQctIo0hrmBGfQuHjIWWzmsAmlvb
-	 JnaxB7ChCJyWD8KJo6Wn7BnKMdiBznYh4hKn6gjWpyU7R9JYYwYQA3a6N4VRSZT268
-	 wDAWVRGuUaqLVlfNCd9QEI/q0r/+8/3Xf23cYFxgVBkAxZUCUe/yue9txfFzQ/fr4K
-	 hVFb4of589BAsJUL6hVkvmusxUoILUcdQYNjKrsziUWjldRgk0RMdSIjwVc3hG1bhe
-	 U+MvwDYRDWjYg==
-Date: Thu, 30 May 2024 19:20:50 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Lizhi Xu <lizhi.xu@windriver.com>
-Cc: coreteam@netfilter.org, davem@davemloft.net, fw@strlen.de,
-	jaegeuk@kernel.org, kadlec@netfilter.org, kuba@kernel.org,
-	linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	pablo@netfilter.org,
-	syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com, tytso@mit.edu
-Subject: Re: [PATCH] ext4: add casefolded file check
-Message-ID: <20240531022050.GB1502@sol.localdomain>
-References: <20240531010513.GA9629@sol.localdomain>
- <20240531014747.1386219-1-lizhi.xu@windriver.com>
+	s=arc-20240116; t=1717123117; c=relaxed/simple;
+	bh=rxh9sVn7HASgC784iwT/sLpCZlAS7XWdGXXksQAs2nI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=iOoAV6t3rlPc9eeMGAdVeLH3vrjCc9ZA6quKs8PmRzAD2qVD8jQihqvN3PUvWcGNADxQ73if1NnDBtPulpFyy5MOYcZsKpWd6jWo2/wFQ+T5zEGsE9+GKUA2HBYpxvHxpK9qHoyJuZaBLRbcOLwxGHrl0h7fbZU3K3xdlhoQk00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=UxBobHUs; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1717123107;
+	bh=eMFPK0u+EsMV50uPGvRYMXzeCximC+x+ai1u0XQ0Y9I=;
+	h=Date:From:To:Cc:Subject:From;
+	b=UxBobHUslnwQhnRqFvXypMWyXjzSaB6W4+nKmzshxM7VzuFm5POpQ7DcY51+HkKml
+	 XXgphJ7juZdVuciGJXTjZaytjkNc3DKHjGzxB8tr2cFwYBmB4qBEzQmFksg/znk+Nu
+	 D9DKehl0YlBvYzzwtu9XHIeVtUgl/eqs/V1B7lH0FC5u21nvkyZtoDuBldeuCJtFY2
+	 ZrsAkpXywRbIARuEIpOCyD2ZiLGWWFe4tGotAWHM+EcIGj4FvdhE7GI1vyun9VAS1X
+	 BKVFgTsiXuG6uFsOWkEr1hXLzUmvX5l9cuob0Vp1ZSiTRqmLdzy68fGd7ZqSXbbhgl
+	 hgoJXTGUof4AQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Vr6kB70Y6z4wyQ;
+	Fri, 31 May 2024 12:38:26 +1000 (AEST)
+Date: Fri, 31 May 2024 12:38:22 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, MD Danish Anwar <danishanwar@ti.com>
+Subject: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <20240531123822.3bb7eadf@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240531014747.1386219-1-lizhi.xu@windriver.com>
+Content-Type: multipart/signed; boundary="Sig_/T_qxduSg5ONj0V1Rt.aIDlL";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Fri, May 31, 2024 at 09:47:47AM +0800, 'Lizhi Xu' via syzkaller-bugs wrote:
-> On Thu, 30 May 2024 18:05:13 -0700, Eric Biggers wrote:
-> > > The file name that needs to calculate the siphash must have both flags casefolded
-> > > and dir at the same time, so before calculating it, confirm that the flag meets
-> > > the conditions.
-> > >
-> > > Reported-by: syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com
-> > > Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
-> > > ---
-> > >  fs/ext4/hash.c | 4 ++++
-> > >  1 file changed, 4 insertions(+)
-> > >
-> > > diff --git a/fs/ext4/hash.c b/fs/ext4/hash.c
-> > > index deabe29da7fb..c8840cfc01dd 100644
-> > > --- a/fs/ext4/hash.c
-> > > +++ b/fs/ext4/hash.c
-> > > @@ -265,6 +265,10 @@ static int __ext4fs_dirhash(const struct inode *dir, const char *name, int len,
-> > >  		__u64	combined_hash;
-> > >
-> > >  		if (fscrypt_has_encryption_key(dir)) {
-> > > +			if (!IS_CASEFOLDED(dir)) {
-> > > +				ext4_warning_inode(dir, "Siphash requires Casefolded file");
-> > > +				return -2;
-> > > +			}
-> > >  			combined_hash = fscrypt_fname_siphash(dir, &qname);
-> > >  		} else {
-> > >  			ext4_warning_inode(dir, "Siphash requires key");
-> > 
-> > First, this needs to be sent to the ext4 mailing list (and not to irrelevant
-> > mailing lists such as netdev).  Please use ./scripts/get_maintainer.pl, as is
-> > recommended by Documentation/process/submitting-patches.rst.
-> > 
-> > Second, ext4 already checks for the directory being casefolded before allowing
-> > siphash.  This is done by dx_probe().  Evidently syzbot found some way around
-> > that, so what needs to be done is figure out why that happened and what is the
-> > best fix to prevent it.  This is not necessarily the patch you've proposed, as
-> > the real issue might actually be a missing check at some earlier time like when
-> > reading the inode from disk or when mounting the filesystem.
-> I have confirmed that there is no casefolded feature when creating the directory.
-> I agree with your statement that it should be checked for casefold features when
-> mounting or reading from disk.
-> 
+--Sig_/T_qxduSg5ONj0V1Rt.aIDlL
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I haven't looked at the syzbot reproducer, but I'm guessing that the
-DX_HASH_SIPHASH is coming from s_def_hash_version in the filesystem superblock.
-It's not valid to have DX_HASH_SIPHASH there, and it probably would make more
-sense to validate that at mount time.
+Hi all,
 
-- Eric
+Today's linux-next merge of the net-next tree got a conflict in:
+
+  drivers/net/ethernet/ti/icssg/icssg_classifier.c
+
+between commit:
+
+  56a5cf538c3f ("net: ti: icssg-prueth: Fix start counter for ft1 filter")
+
+from the net tree and commit:
+
+  abd5576b9c57 ("net: ti: icssg-prueth: Add support for ICSSG switch firmwa=
+re")
+
+from the net-next tree.
+
+I fixed it up (I used the former (they both did effectively the same thing
+in this spot) and can carry the fix as necessary. This is now fixed as
+far as linux-next is concerned, but any non trivial conflicts should be
+mentioned to your upstream maintainer when your tree is submitted for
+merging.  You may also want to consider cooperating with the maintainer
+of the conflicting tree to minimise any particularly complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/T_qxduSg5ONj0V1Rt.aIDlL
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmZZOB4ACgkQAVBC80lX
+0Gy1lgf/eM2kx7/2qvfoIi/+xQqFA5KD1pNrYChv0LPgol2Bi+tsINergmWJHAJ5
+JuthhHDNXnJFnVCXIlKX3tXd0suOmHHFV3RyzECxv5Alv3BGy6H+9sLbPMtQ2i/K
+sbFJZFClGUG43IwFf5nbo4ce7PJ6lfbZo3PCbYqoOilKyowvVSgu9ZzGMIgDxV5Z
+G2cRfVZj9JFXrXjCoTUsXKtgtQHaTBmrrs6x3qdzg4TuYtyxAyaNe0U/29xsl/aT
+ppxWkeAp2fcaqha9IbxkRhQdrDpbqcmqrBRnrTHg4oldVE30SvMIFLnUrqq8Z1q9
++4a7OKXC4Y4PUyCUK/juU2ZyuvskMg==
+=7LFf
+-----END PGP SIGNATURE-----
+
+--Sig_/T_qxduSg5ONj0V1Rt.aIDlL--
 
