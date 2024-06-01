@@ -1,92 +1,84 @@
-Return-Path: <netdev+bounces-99947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E47FE8D729F
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 01:00:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 833088D72A6
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 01:05:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53B391F22047
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 23:00:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 005841C20AC2
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 23:05:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFA9B2E419;
-	Sat,  1 Jun 2024 23:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03424446AE;
+	Sat,  1 Jun 2024 23:05:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gw2N/naR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H41Tfx7i"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6CB62032D;
-	Sat,  1 Jun 2024 23:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04484437C;
+	Sat,  1 Jun 2024 23:05:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717282830; cv=none; b=naQ0YkP+nf3V8viaTdkrwH+ifzxCegMT+341mtxp7T4KYhMhmaWFie/94etz071dlPNxwj0hXAP4gI3bRIuslHfWPT9I6aK3ujJD5V2QHXQeZHZMvw8o6/esFQ1H/1DEfOCu+54COd/yBv5xjHn/G4+SkX/mI29WEmzLU9mAx04=
+	t=1717283135; cv=none; b=DKADI7k9A5RaOFdjxcw2J+xQAFebUFcpWOG5jJYjtEp6RgIA8V9hKX2RggUrgiBB4nQFtN6qVcRLrF4T5TWlULwh1mviYh+Pb7TLn1qf8Cjn3P3W6ntpz6P92iSkeREzFdqN6MW0qyYhcTUoLljaX+1ZYqNZZEvaKOaMmLLj9W4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717282830; c=relaxed/simple;
-	bh=dn7tHb0D8BYATJK0Urlct3wSl3oO4d5o7t54Y1CN7Zo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=i+o5aA5YmUgN64TTXotN2fpVH0z4e5eAsPyg0zOd1+AZTUGr+LSPbgAT6d3UsgLitGUQ2ks9gPvwdWa5kU8ioit+2u1YibJ5iShJGQUD9nfLGI3EFyPacH2zN2ZORCyGwnrigw1XvNQCRwn7QRKtKxpGJ7JkaM/STtlpMTzZQEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gw2N/naR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 644B3C4AF07;
-	Sat,  1 Jun 2024 23:00:30 +0000 (UTC)
+	s=arc-20240116; t=1717283135; c=relaxed/simple;
+	bh=vXRysHJ7OeR347JX0djOMnBBqz7wH9yNpRItiF160IQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AuvkbTmx7MRQnx0crqSExmWchqqjo32c0kMW74YdWABn3uyaSDB3Vn2O5KbvvxkVNXiXwNN4cpnVCaFolVDM9g+nI75ym/s1A3+1KU5ETVkmdTq/bOSDKMbmVY9af3VVYriXkS4iHCiRXxLETtxroCb66u8oGooS//5Ym9EVVL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H41Tfx7i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1870CC32786;
+	Sat,  1 Jun 2024 23:05:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717282830;
-	bh=dn7tHb0D8BYATJK0Urlct3wSl3oO4d5o7t54Y1CN7Zo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Gw2N/naR7li3G+krL4DRvJ9PrwMmau1of+iFa3EMVRsBQS5Nt68Z7RLoZd3wdbpjl
-	 eCpc0M0fFNwqj63ACCJe0ruGwt0LkAXse/un2EVZbHqsXhymE7OhCxD450tai6qgCO
-	 XWuRGMj3ZrmCi56Gh54NIYB7/QNxBabIf1gIStaXeUGAi8Pqrz1M9+LrI8lN/vfgpn
-	 caKZL17LPWq/vrcwk+m+oQptzgkjS2ve7jg7bA605wctgW/Oy3bxzRKAOvHUqMBb2C
-	 PP+ZlBetYve0N2YYhaHNxM4GiIu3Z1jkQ6kNcuOpVPMeIHW5CIgaVh/3HNBnqt7SgJ
-	 32VLMY4/j9Qiw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 55FBADEA717;
-	Sat,  1 Jun 2024 23:00:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1717283135;
+	bh=vXRysHJ7OeR347JX0djOMnBBqz7wH9yNpRItiF160IQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=H41Tfx7iKRNU2t0Qkcr2oG7OsGBkl10nagtBXQ24nOD5kbr1K6oLb05gQP1Z+R+uq
+	 OEUPbKH1w8STff1izqVMVuoxJjqgWpCzsRjEkW4EHPVAobl83ld8mGONP0GZRHDw0h
+	 s0966ARJDNjBBwE42z2quFtY+OI3MljcbbxpG6Dn8kRQOxPcT71sgcygfRX73LYT0o
+	 wmRI9xyp7SKfJ+snBowXEDsM3IzYszUEOKleil5ZUTmV0OqZQXjWbJ1heugscFx8cJ
+	 pHfixadXDo4kcRhmh1lJBo6M1FBuuz2V2z/Lh1/bjPWde/9oudK7veiJybFom32PMS
+	 5Eb+y8U/eTCeQ==
+Date: Sat, 1 Jun 2024 16:05:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ronak Doshi <ronak.doshi@broadcom.com>
+Cc: <netdev@vger.kernel.org>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 net-next 0/4] vmxnet3: upgrade to version 9
+Message-ID: <20240601160534.5478fa47@kernel.org>
+In-Reply-To: <20240531193050.4132-1-ronak.doshi@broadcom.com>
+References: <20240531193050.4132-1-ronak.doshi@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5] ax25: Fix refcount imbalance on inbound connections
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171728283034.4092.12616353767873504629.git-patchwork-notify@kernel.org>
-Date: Sat, 01 Jun 2024 23:00:30 +0000
-References: <20240529210242.3346844-2-lars@oddbit.com>
-In-Reply-To: <20240529210242.3346844-2-lars@oddbit.com>
-To: Lars Kellogg-Stedman <lars@oddbit.com>
-Cc: netdev@vger.kernel.org, linux-hams@vger.kernel.org, duoming@zju.edu.cn,
- crossd@gmail.com, christopher.maness@gmail.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 29 May 2024 17:02:43 -0400 you wrote:
-> From: Lars Kellogg-Stedman <lars@oddbit.com>
+On Fri, 31 May 2024 12:30:45 -0700 Ronak Doshi wrote:
+> vmxnet3 emulation has recently added timestamping feature which allows the
+> hypervisor (ESXi) to calculate latency from guest virtual NIC driver to all
+> the way up to the physical NIC. This patch series extends vmxnet3 driver
+> to leverage these new feature.
 > 
-> When releasing a socket in ax25_release(), we call netdev_put() to
-> decrease the refcount on the associated ax.25 device. However, the
-> execution path for accepting an incoming connection never calls
-> netdev_hold(). This imbalance leads to refcount errors, and ultimately
-> to kernel crashes.
-> 
-> [...]
+> Compatibility is maintained using existing vmxnet3 versioning mechanism as
+> follows:
+> - new features added to vmxnet3 emulation are associated with new vmxnet3
+>    version viz. vmxnet3 version 9.
+> - emulation advertises all the versions it supports to the driver.
+> - during initialization, vmxnet3 driver picks the highest version number
+> supported by both the emulation and the driver and configures emulation
+> to run at that version.
 
-Here is the summary with links:
-  - [v5] ax25: Fix refcount imbalance on inbound connections
-    https://git.kernel.org/netdev/net/c/3c34fb0bd4a4
+Please review:
+https://lore.kernel.org/all/20240531103711.101961-1-mstocker@barracuda.com/
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+It may be worth reading:
+https://docs.kernel.org/next/maintainer/feature-and-driver-maintainers.html
 
