@@ -1,67 +1,58 @@
-Return-Path: <netdev+bounces-99915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AB798D6FD0
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 14:51:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9581B8D6FE0
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 15:06:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11666B21E92
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 12:51:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEA041F21EBD
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 13:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A11BE14F9E8;
-	Sat,  1 Jun 2024 12:51:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49AE314F13D;
+	Sat,  1 Jun 2024 13:06:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ugZ44SuL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C745STl5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786D61E481;
-	Sat,  1 Jun 2024 12:51:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F65E14E2E4;
+	Sat,  1 Jun 2024 13:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717246271; cv=none; b=jAhK0i1kC6O3VA6fMcXkTjn/0VeCgHTldJQQVfct/4X5IyWpmuq/qKrbUDAvdKgpOQd3ET2Q0xC3r94YiL5mKVsI1giJ3WOBfJYQt06yK2dmmTNIxsWc/+52As7s/Ds0GeiQoBQ496N4spaHAz8nxFc7KgkZ47WkdzQ4F7uUYUk=
+	t=1717247194; cv=none; b=iskFkcM7zSJMeKFCU5Q9yvMhd26qlIeZGE8R/RFFGDD+3eDFk9so9RmtsqMqDCEav4RpnphKbmdSNOuBTpeBNahALBQXKvC779U5++DqM8J8wb8MfjgAFgXOYIaHL+5Gyx5fE8h6mIEfyQSpnivbuU/oB9AU0KAXaCITahCDH2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717246271; c=relaxed/simple;
-	bh=IzVE8C5YnZqN4O/Tp+wPp3Yj9q5vgoAeBWNn9VqOA40=;
+	s=arc-20240116; t=1717247194; c=relaxed/simple;
+	bh=pUHMnLaHbw8fQVrrxom6RhMVZBz2hDqPwbP8h+otBQs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KkdnHF8usyiGpZ0HedsakKc3stJpzFCSBF9k8t3HIb+lHDsO3091JkpRl+mm/Z3nSmewyWNbookkWM33sukXRUJ+Y0JyPeip7zupgH3bRn1VN+z7Zmh0IiTT8MDPycWiG9/6G7rgX7sYV0tmXfTvZZA/6yOXSaSJBQ7f6UqJ4ZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ugZ44SuL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58518C116B1;
-	Sat,  1 Jun 2024 12:51:07 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=d382zeuIbUPXFdC1wBjzEl7dZa/VRtvN5I7s8pdTtfCwOGok3EoffuwD5TTm67KMkBQgGU//gA27le1sJA2sJ0uoo8v3Lv8RLijaU7nXTzeliryCJO4bPFkOHi0fNB35i4oER/gWyO9HbhmxsnrUzSAy0EHOqgHgujiuaAckl7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C745STl5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93421C116B1;
+	Sat,  1 Jun 2024 13:06:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717246271;
-	bh=IzVE8C5YnZqN4O/Tp+wPp3Yj9q5vgoAeBWNn9VqOA40=;
+	s=k20201202; t=1717247193;
+	bh=pUHMnLaHbw8fQVrrxom6RhMVZBz2hDqPwbP8h+otBQs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ugZ44SuLkf2nnIYZlKqk7L03OHlHheoG4Me5zcNB7IszGH03C2Mx7je8pWFwWl9xj
-	 V2ZZowVtql7AsGfCxzRDb+NgzH3t2d/qKQ2f2sdjeYSpF4GDVLHCsKBAVl+sNlcR6s
-	 dnlheMQuFIXUIpaMMiv+qZLZ73qEtYjTXy3MYot3lnIUkr4XHWOH2uoGigf8ooMLjd
-	 SMShVhenf3y/P7QVCfB67ncRbUGP3Th0a+jqhQzs+rBqw7aASG9Qg1wWnRmQtTeY/q
-	 RX0sFMVXhPS7CsGPaO7ASsDQ6bXc3neZuCOLLMsD6sSLJ6SyQ/2kTznDa8/LItddZ2
-	 jkj8r+Ww1HPDw==
-Date: Sat, 1 Jun 2024 13:51:05 +0100
+	b=C745STl5epF6aTYeO8Z9UCteuLF1VypR0q76OamDulIddu6EGywENXKWxFO5qZnpT
+	 eTxA0XIwAzafejYUfk6H1h3Jp82Fzs70gMQ5dioQQfCc9vGwQ8y4lKJKphX+Gzt4go
+	 aLChAKfyBMF0x0p/SuJg94gp7o23i43qfgCTUfj921SwUPtO6Ve/KnWyfzHxq1yiuY
+	 KDcoaXHMd+5ST36ksBFPO7l+EfJ37gioTffV9r91MOBdFYRiDFDhnS3DuljU3HqMhL
+	 XZzDnzcZ3jkvV+3JF7zsC65K62/uDTrUSTBI4r09K4QPapIjbw2StSnbrE44YzKdVl
+	 eTnCesujt/SXQ==
+Date: Sat, 1 Jun 2024 14:06:28 +0100
 From: Simon Horman <horms@kernel.org>
-To: Sky Huang <SkyLake.Huang@mediatek.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH net-next v5 5/5] net: phy: add driver for built-in 2.5G
- ethernet PHY on MT7988
-Message-ID: <20240601125105.GJ491852@kernel.org>
-References: <20240530034844.11176-1-SkyLake.Huang@mediatek.com>
- <20240530034844.11176-6-SkyLake.Huang@mediatek.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+	wintera@linux.ibm.com, guwen@linux.alibaba.com, kuba@kernel.org,
+	davem@davemloft.net, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+	tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
+Subject: Re: [PATCH net-next v4 3/3] net/smc: Introduce IPPROTO_SMC
+Message-ID: <20240601130628.GK491852@kernel.org>
+References: <1716955147-88923-1-git-send-email-alibuda@linux.alibaba.com>
+ <1716955147-88923-4-git-send-email-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,189 +61,76 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240530034844.11176-6-SkyLake.Huang@mediatek.com>
+In-Reply-To: <1716955147-88923-4-git-send-email-alibuda@linux.alibaba.com>
 
-On Thu, May 30, 2024 at 11:48:44AM +0800, Sky Huang wrote:
-> From: "SkyLake.Huang" <skylake.huang@mediatek.com>
+On Wed, May 29, 2024 at 11:59:07AM +0800, D. Wythe wrote:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
 > 
-> v1:
-> Add support for internal 2.5Gphy on MT7988. This driver will load
-> necessary firmware, add appropriate time delay and figure out LED.
-> Also, certain control registers will be set to fix link-up issues.
+> This patch allows to create smc socket via AF_INET,
+> similar to the following code,
 > 
-> v2:
-> 1. Move md32_en_cfg_base & pmb_addr detection in probe function.
-> 2. Do not read PMB & MD32_EN_CFG base addresses from dts. We won't
-> change that from board to board. Leave them in driver code. Also,
-> release those addresses after firmware is triggered.
-> 3. Remove half duplex code which leads to ambiguity. Those are for
-> testing & developing previously.
-> 4. Use correct BMCR definitions.
-> 5. Correct config_aneg / get_features / read_status functions.
-> 6. Change mt7988_2p5ge prefix to mt798x_2p5ge in case that our next
-> platform uses this 2.5Gphy driver.
+> /* create v4 smc sock */
+> v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
 > 
-> v3:
-> 1. Add range check for firmware.
-> 2. Fix c45_ids.mmds_present in probe function.
-> 3. Still use genphy_update_link() in read_status because
-> genphy_c45_read_link() can't correct detect link on this phy.
+> /* create v6 smc sock */
+> v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
 > 
-> v4:
-> 1. Move firmware loading function to mt798x_2p5ge_phy_load_fw()
-> 2. Add AN disable warning in mt798x_2p5ge_phy_config_aneg()
-> 3. Clarify the HDX comments in mt798x_2p5ge_phy_get_features()
+> There are several reasons why we believe it is appropriate here:
 > 
-> v5:
-> 1. Move md32_en_cfg_base & pmb_addr to local variables to achieve
-> symmetric code.
-> 2. Print out firmware date code & version.
-> 3. Don't return error if LED pinctrl switching fails. Also, add
-> comments to this unusual operations.
-> 4. Return -EOPNOTSUPP for AN off case in config_aneg().
+> 1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
+> address. There is no AF_SMC address at all.
 > 
-
-Hi Sky,
-
-This is a somewhat unusual way to arrange a patch description.
-
-Usually the description describes the change, particularly why
-the change is being made.
-
-While the per-version changes are listed below the scissors ("---").
-
-> Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
+> 2. Create smc socket in the AF_INET(6) path, which allows us to reuse
+> the infrastructure of AF_INET(6) path, such as common ebpf hooks.
+> Otherwise, smc have to implement it again in AF_SMC path.
+> 
+> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
 
 ...
 
-> diff --git a/drivers/net/phy/mediatek/mtk-2p5ge.c b/drivers/net/phy/mediatek/mtk-2p5ge.c
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
 
 ...
 
-> +static int mt798x_2p5ge_phy_load_fw(struct phy_device *phydev)
-> +{
-> +	struct mtk_i2p5ge_phy_priv *priv = phydev->priv;
-> +	void __iomem *md32_en_cfg_base, *pmb_addr;
-> +	struct device *dev = &phydev->mdio.dev;
-> +	const struct firmware *fw;
-> +	int ret, i;
-> +	u16 reg;
-> +
-> +	if (priv->fw_loaded)
-> +		return 0;
-> +
-> +	pmb_addr = ioremap(MT7988_2P5GE_PMB_BASE, MT7988_2P5GE_PMB_LEN);
-> +	if (!pmb_addr)
-> +		return -ENOMEM;
-> +	md32_en_cfg_base = ioremap(MT7988_2P5GE_MD32_EN_CFG_BASE, MT7988_2P5GE_MD32_EN_CFG_LEN);
+> @@ -3594,9 +3595,31 @@ static int __init smc_init(void)
+>  		goto out_lo;
+>  	}
+>  
+> +	rc = proto_register(&smc_inet_prot, 1);
+> +	if (rc) {
+> +		pr_err("%s: proto_register smc_inet_prot fails with %d\n", __func__, rc);
 
-nit: Networking still prefers code to be 80 columns wide or less.
-     It looks like that can be trivially achieved here and
-     several other places in this patch.
+Hi,
 
-     OTOH, I don't think there is no need to break lines to meet this
-     requirement where it is particularly awkward to do so.
+FWIIW, my feeling is that if a log message includes __func__ then it should
+be a debug level message, and even then I'm dubious about the value of
+__func__: we do have many tools including dynamic tracing or pinpointing
+problems.
 
-     Flagged by checkpatch.pl --max-line-length=80
+So I would suggest rephrasing this message and dropping __func__.
+Or maybe removing it entirely.
+Or if not, lowering the priority of this message to debug.
 
-> +	if (!md32_en_cfg_base) {
-> +		ret = -ENOMEM;
-> +		goto free_pmb;
+If for some reason __func__ remains, please do consider wrapping
+the line to 80c columns or less, which can be trivially done here
+(please don't split the format string in any case).
+
+Flagged by checkpatch.pl --max-line-length=80
+
+> +		goto out_ulp;
 > +	}
-> +
-> +	ret = request_firmware(&fw, MT7988_2P5GE_PMB, dev);
-> +	if (ret) {
-> +		dev_err(dev, "failed to load firmware: %s, ret: %d\n",
-> +			MT7988_2P5GE_PMB, ret);
-> +		goto free;
+> +	inet_register_protosw(&smc_inet_protosw);
+> +#if IS_ENABLED(CONFIG_IPV6)
+> +	rc = proto_register(&smc_inet6_prot, 1);
+> +	if (rc) {
+> +		pr_err("%s: proto_register smc_inet6_prot fails with %d\n", __func__, rc);
+
+Here too.
+
+> +		goto out_inet_prot;
 > +	}
-> +
-> +	if (fw->size != MT7988_2P5GE_PMB_SIZE) {
-> +		dev_err(dev, "Firmware size 0x%zx != 0x%x\n",
-> +			fw->size, MT7988_2P5GE_PMB_SIZE);
-> +		ret = -EINVAL;
-> +		goto free;
-> +	}
-> +
-> +	reg = readw(md32_en_cfg_base);
-> +	if (reg & MD32_EN) {
-> +		phy_set_bits(phydev, MII_BMCR, BMCR_RESET);
-> +		usleep_range(10000, 11000);
-> +	}
-> +	phy_set_bits(phydev, MII_BMCR, BMCR_PDOWN);
-> +
-> +	/* Write magic number to safely stall MCU */
-> +	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x800e, 0x1100);
-> +	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x800f, 0x00df);
-> +
-> +	for (i = 0; i < MT7988_2P5GE_PMB_SIZE - 1; i += 4)
-> +		writel(*((uint32_t *)(fw->data + i)), pmb_addr + i);
-> +	release_firmware(fw);
-> +	dev_info(dev, "Firmware date code: %x/%x/%x, version: %x.%x\n",
-> +		 be16_to_cpu(*((uint16_t *)(fw->data + MT7988_2P5GE_PMB_SIZE - 8))),
-
-If the data at fw->data + MT7988_2P5GE_PMB_SIZE - 8 is a 16-bit
-Big Endian value, then I think the cast should be to __be16 rather
-than uint16_t (and in any case u16 would be preferred to uint16_t
-as this is Kernel code).
-
-Flagged by Sparse.
-
-> +		 *(fw->data + MT7988_2P5GE_PMB_SIZE - 6),
-> +		 *(fw->data + MT7988_2P5GE_PMB_SIZE - 5),
-> +		 *(fw->data + MT7988_2P5GE_PMB_SIZE - 2),
-> +		 *(fw->data + MT7988_2P5GE_PMB_SIZE - 1));
-> +
-> +	writew(reg & ~MD32_EN, md32_en_cfg_base);
-> +	writew(reg | MD32_EN, md32_en_cfg_base);
-> +	phy_set_bits(phydev, MII_BMCR, BMCR_RESET);
-> +	/* We need a delay here to stabilize initialization of MCU */
-> +	usleep_range(7000, 8000);
-> +	dev_info(dev, "Firmware loading/trigger ok.\n");
-> +
-> +	priv->fw_loaded = true;
-> +
-> +free:
-> +	iounmap(md32_en_cfg_base);
-> +free_pmb:
-> +	iounmap(pmb_addr);
-> +
-> +	return ret ? ret : 0;
-> +}
-
-...
-
-> +static int mt798x_2p5ge_phy_led_blink_set(struct phy_device *phydev, u8 index,
-> +					  unsigned long *delay_on,
-> +					  unsigned long *delay_off)
-> +{
-> +	bool blinking = false;
-> +	int err = 0;
-> +	struct mtk_i2p5ge_phy_priv *priv = phydev->priv;
-
-nit: Please consider arranging local variables in reverse xmas tree order - 
-     longest line to shortest.
-
-     Edward Cree's tool can be helpful:
-     https://github.com/ecree-solarflare/xmastree
-
-> +
-> +	if (index > 1)
-> +		return -EINVAL;
-> +
-> +	if (delay_on && delay_off && (*delay_on > 0) && (*delay_off > 0)) {
-> +		blinking = true;
-> +		*delay_on = 50;
-> +		*delay_off = 50;
-> +	}
-> +
-> +	err = mtk_phy_hw_led_blink_set(phydev, index, &priv->led_state, blinking);
-> +	if (err)
-> +		return err;
-> +
-> +	return mtk_phy_hw_led_on_set(phydev, index, &priv->led_state,
-> +				     MTK_2P5GPHY_LED_ON_MASK, false);
-> +}
+> +	inet6_register_protosw(&smc_inet6_protosw);
+> +#endif
 
 ...
 
