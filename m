@@ -1,217 +1,180 @@
-Return-Path: <netdev+bounces-99931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A1928D71C6
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 22:06:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1035C8D71F6
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 23:25:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8B1F2824BC
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 20:06:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 867A32820B5
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 21:25:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A17BC154C17;
-	Sat,  1 Jun 2024 20:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C91A33CA;
+	Sat,  1 Jun 2024 21:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HAn9nG5G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tIVUeGvn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E22A9154BFC
-	for <netdev@vger.kernel.org>; Sat,  1 Jun 2024 20:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771A818026
+	for <netdev@vger.kernel.org>; Sat,  1 Jun 2024 21:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717272363; cv=none; b=cYg8VzBnU6XZF23GtausCYQyNcd9roK2kQ/A/X7kDbbwGiB1oExBMQhqnFVhh8p17WJC078e3Gt7iAgzX2i4Kki5qtBNMvjRb4iVou/YyWhQjkZWn7yCCCBvOhIPSE+1OEHIE4ngRHCWSDSEH6UZMn4fmH1XpZedVSUIBpK/aYM=
+	t=1717277123; cv=none; b=gNN8n7bRODDOEk6V5F1L76relpWLi+dMHqKZxMYyjSR0onkW4s9rGTpqwV08+bjHzgQ3BK0rK/GEejgWDAeMMEp4Ob1OBChyJufxkYjuZsVOySlQBQtWSVriP6XBFJ8snr/8VTo+CZAGtrz8PlKMhc4Y+F9EHNKUHMWwt0lpibo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717272363; c=relaxed/simple;
-	bh=bb1Eh6sYxp0wiXwMLIgdauY1kNYKOWwZ0sTYj+x+3i4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=DFLvHNB8k85W+1TETeF6bcwQ8s92FF+gh4zCFftx3XIYnKL/OjjKErvabw7/CGwUMKVInkZOngx6dSh99Ygf1A3hbPrkE2aITX4TxMjorRNU/PdFnoZTfEs20Plvkpo6sEbzN3QmQd5//eHIoDvIJomSUIaogaD3kXOELSHbQT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HAn9nG5G; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717272360;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dzxohq/lDop4X+G5bOl0wtRNygcADEx/hc58/q+dn7c=;
-	b=HAn9nG5GpH0Sr3CNB6equ/aC/Z/5wvlUdhPQTGDq8wMDPXlxd7hw+3UFs4qV+Tkz1DlVg4
-	N0jW5RP4sUl4dvyM1m3HcbtoelJ0ViJ5j/Z18uJ7KJGHP4lOS8GGXSy451MG4FhdTrb1oI
-	gJrY59dkmoSvUoxLPmSyU/pOEyNkfmo=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-161-Dt6kWiWWOQ-MhVK12T7LBA-1; Sat, 01 Jun 2024 16:05:57 -0400
-X-MC-Unique: Dt6kWiWWOQ-MhVK12T7LBA-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a68c70ab413so35074466b.1
-        for <netdev@vger.kernel.org>; Sat, 01 Jun 2024 13:05:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717272356; x=1717877156;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dzxohq/lDop4X+G5bOl0wtRNygcADEx/hc58/q+dn7c=;
-        b=WxYcjWeN7JgoWzLLX1650CmiYnqRim4rXuFAX84/5ouCSEpGYM4SpG9bMP2eTzadwR
-         3gPWLVA8VWVNggbPzs+75jt9tQYBbv8pvizWyatAooRVZ9d9D8dsfKS3dog86F03caqW
-         f2iSF8/ueCv6Tvn+3fWfw7SK1mL/Bh6b1q4F5sqZxESGoNy5gRLmBgzYC3V23b6T8O1/
-         yrD8/gLtuV3qI7aIMxQQkTiwHAzgCXcjFeO1/NbqMa+cPwfNEMPrcWndIq/8iMFWDC4Y
-         s/50Db8kyXlWk/QUScfKxEc+OM756nhAKcGf2rIms6zVpM6HnOcp1JTHSfcYrNbVfWUs
-         FKBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWuU+a4qguPkNGFLKMf6yZNtAXwckVtRg0X7X5ex6fFAYqDqgoHidqxUTAOR9IOff2j6MgsA12rQi5SPPaaEOYjCYagMnjx
-X-Gm-Message-State: AOJu0YzSV8Un13H9ZDnypwvGBV4pS3iBMdlp/hANRzodJL2ZVRhpURXI
-	zxUegtbYgtY3Cwd5+xZ2D+xRCCq5b6fzJp/JX/5A2VV+RbhvkJElShL3+CcbMDRPs8XgOYFG3ac
-	6NgrKxoKqkVkbuRQ6+1/phiy2EYjShIDjbXxBJEUZvjZkscBVJilvBw==
-X-Received: by 2002:a17:906:5a8c:b0:a68:e834:e9bb with SMTP id a640c23a62f3a-a68e834ff24mr25612266b.35.1717272355884;
-        Sat, 01 Jun 2024 13:05:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHKBjI4khq4cOxujM+nFtg2T6bx0NqxvdpUtcJC72aKWj08HWBrV5C0F9kUUcWZtUreaiC0mQ==
-X-Received: by 2002:a17:906:5a8c:b0:a68:e834:e9bb with SMTP id a640c23a62f3a-a68e834ff24mr25609766b.35.1717272355320;
-        Sat, 01 Jun 2024 13:05:55 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:c32:7800:5bfa:a036:83f0:f9ec? (2001-1c00-0c32-7800-5bfa-a036-83f0-f9ec.cable.dynamic.v6.ziggo.nl. [2001:1c00:c32:7800:5bfa:a036:83f0:f9ec])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6848423bc9sm210815066b.147.2024.06.01.13.05.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 01 Jun 2024 13:05:54 -0700 (PDT)
-Message-ID: <d7c555cc-d07c-4f22-9636-9ebb44165e1d@redhat.com>
-Date: Sat, 1 Jun 2024 22:05:53 +0200
+	s=arc-20240116; t=1717277123; c=relaxed/simple;
+	bh=WJU1cD/YQhuFtgctqnXN6aaAwOyPi86CFLrtzD0fFZs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bWTEuAl2f5rDXgTdn2I6yZ1KiflErhiX5JLS5rgoxviHZeu9CraB6yGCkgX7RED51dKbsFg7BT51Q4pkg3CbeiJS8cqeC64gCWXPoJpl94BiI3shaA8G5WVfLKACTah5uzxoQc4jO31RZKqOq5Sq3P1Fq2HQZnYoY/7HZJUQDFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tIVUeGvn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2AB0C116B1;
+	Sat,  1 Jun 2024 21:25:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717277123;
+	bh=WJU1cD/YQhuFtgctqnXN6aaAwOyPi86CFLrtzD0fFZs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tIVUeGvnW5UaICp2EF91/NI17z7DqQC+PIShIAkdVs9E4a6NrwPbBEHs/lw0/5RK2
+	 7v9kK2BF+HHR/xuAqwZqQNa3AC1z9tW7ZwVnF+UNtye9gnoO7R1TreHCa59+MHbU4m
+	 mhN2ePrTA9wB4WdDm+NL7OzwWmQb8+dLOoEBuJeO7IS1Pqhq0TmPeo11VjJxGj70oq
+	 uasLZaZnmQVBTsJduz0TpUv6EqaLb9hn0DSVOnYK3bjz4SJmef/d/EZCw9MihGEP55
+	 UD40kcKrAvSP0Cc0dILJ1ekGHrA4c2okblu7rpaFn+OkTB/gWJqgKk4MN0v/F/pbxE
+	 L5AFnf3cnhx2w==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>,
+	dsahern@kernel.org
+Subject: [PATCH net] inet: bring NLM_DONE out to a separate recv() in inet_dump_ifaddr()
+Date: Sat,  1 Jun 2024 14:25:17 -0700
+Message-ID: <20240601212517.644844-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Hung tasks due to a AB-BA deadlock between the leds_list_lock
- rwsem and the rtnl mutex
-From: Hans de Goede <hdegoede@redhat.com>
-To: Linux regressions mailing list <regressions@lists.linux.dev>,
- Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
- Linux LEDs <linux-leds@vger.kernel.org>,
- Heiner Kallweit <hkallweit1@gmail.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, johanneswueller@gmail.com,
- "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Genes Lists <lists@sapience.com>
-References: <9d189ec329cfe68ed68699f314e191a10d4b5eda.camel@sapience.com>
- <15a0bbd24cd01bd0b60b7047958a2e3ab556ea6f.camel@sapience.com>
- <ZliHhebSGQYZ/0S0@shell.armlinux.org.uk>
- <42d498fc-c95b-4441-b81a-aee4237d1c0d@leemhuis.info>
- <618601d8-f82a-402f-bf7f-831671d3d83f@redhat.com>
- <d8f8b1b2-1ffd-435a-8bed-b1a05d16a270@redhat.com>
-Content-Language: en-US, nl
-In-Reply-To: <d8f8b1b2-1ffd-435a-8bed-b1a05d16a270@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi All,
+Jaroslav reports Dell's OMSA Systems Management Data Engine
+expects NLM_DONE in a separate recvmsg(), so revert to the
+old behavior.
 
-On 5/31/24 12:22 PM, Hans de Goede wrote:
-> Hi,
-> 
-> On 5/31/24 11:50 AM, Hans de Goede wrote:
->> Hi,
->>
->> On 5/31/24 10:39 AM, Linux regression tracking (Thorsten Leemhuis) wrote:
->>> [adding the LED folks and the regressions list to the list of recipients]
->>>
->>> Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
->>> for once, to make this easily accessible to everyone.
->>>
->>> Lee, Pavel, could you look into below regression report please? Thread
->>> starts here:
->>> https://lore.kernel.org/all/9d189ec329cfe68ed68699f314e191a10d4b5eda.camel@sapience.com/
->>>
->>> Another report with somewhat similar symptom can be found here:
->>> https://lore.kernel.org/lkml/e441605c-eaf2-4c2d-872b-d8e541f4cf60@gmail.com/
->>>
->>> See also Russell's analysis of that report below (many many thx for
->>> that, much appreciated Russel!).
->>>
->>> To my untrained eyes all of this sounds a lot like we still have a 6.9
->>> regression related to the LED code somewhere. Reminder, we had earlier
->>> trouble, but that was avoided through other measures:
->>>
->>> * 3d913719df14c2 ("wifi: iwlwifi: Use request_module_nowait") /
->>> https://lore.kernel.org/lkml/30f757e3-73c5-5473-c1f8-328bab98fd7d@candelatech.com/
->>>
->>> * c04d1b9ecce565 ("igc: Fix LED-related deadlock on driver unbind") /
->>> https://lore.kernel.org/all/ZhRD3cOtz5i-61PB@mail-itl/
->>>
->>> * 19fa4f2a85d777 ("r8169: fix LED-related deadlock on module removal")
->>>
->>> That iwlwifi commit even calls it self "work around". The developer that
->>> submitted it bisected the problem to a LED merge, but sadly that was the
->>> end of it. :-/
->>
->> I actually have been looking at a ledtrig-netdev lockdep warning yesterday
->> which I believe is the same thing. I'll include the lockdep trace below.
->>
->> According to lockdep there indeed is a ABBA (ish) cyclic deadlock with
->> the rtnl mutex vs led-triggers related locks. I believe that this problem
->> may be a pre-existing problem but this now actually gets hit in kernels >=
->> 6.9 because of commit 66601a29bb23 ("leds: class: If no default trigger is
->> given, make hw_control trigger the default trigger"). Before that commit
->> the "netdev" trigger would not be bound / set as phy LEDs trigger by default.
->>
->> +Cc Heiner Kallweit who authored that commit.
->>
->> The netdev trigger typically is not needed because the PHY LEDs are typically
->> under hw-control and the netdev trigger even tries to leave things that way
->> so setting it as the active trigger for the LED class device is basically
->> a no-op. I guess the goal of that commit is correctly have the triggers
->> file content reflect that the LED is controlled by a netdev and to allow
->> changing the hw-control mode without the user first needing to set netdev
->> as trigger before being able to change the mode.
->>
->> But there is a price to this, besides the locking problem this also
->> causes the ledtrig-netdev module to load on pretty much everyones
->> systems (when build as a module) even though 99.999% of our users
->> likely does not need this at all...
->>
->> Given this price and the troubles this is causing I think it might be best
->> to revert 66601a29bb23. There might still be a locking issue when setting
->> the trigger to netdev manually (I'll check and follow up) but this should
->> fix the regression users are hitting since typically users do not set
->> the trigger manually.
-> 
-> Ok, I can confirm that the lockdep warning is gone for me with 66601a29bb23
-> reverted. Unfortunately it does still happen after a "modprobe ledtrig_netdev"
-> (to add it to the list of available triggers) and then setting the trigger
-> for /sys/class/leds/enp42s0-0::lan to netdev manually.
-> 
-> Still reverting 66601a29bb23 should avoid the problem getting triggered
-> and this would seem like a safe fix especially for the 6.9 series and
-> then the necessary time can be taken to fix the actual underlying locking
-> issue which 66601a29bb23 exposes.
+This is the same kind of fix as we added in
+commit 460b0d33cf10 ("inet: bring NLM_DONE out to a separate recv() again")
+so wrap the logic into a helper, to make it easier to keep track
+of which dump handles we know to require legacy handling
+(and possibly one day let sockets opt into not doing this).
 
-I recently wrote a new input-events LED trigger:
-https://lore.kernel.org/linux-leds/20240531135910.168965-2-hdegoede@redhat.com/
+Tested:
 
-and I just found out this has a very similar deadlock problem. It seems
-there it a generic problem with LEDs or LED triggers getting registered
-by subsystems while holding a global lock from that subsystem vs
-the activate / deactivate method of the trigger calling functions of that
-same subsystem which require that same global lock.
+  ./cli.py --dbg-small-recv 4096 --spec netlink/specs/rt_addr.yaml \
+           --dump getaddr --json '{"ifa-family": 2}'
 
-I came up with a fix but that just fixed the activate() path leaving
-a similar deadlock in place in the deactivate path:
+  ./cli.py --dbg-small-recv 4096 --spec netlink/specs/rt_route.yaml \
+           --dump getroute --json '{"rtm-family": 2}'
 
-https://lore.kernel.org/linux-leds/20240601195528.48308-1-hdegoede@redhat.com/
-https://lore.kernel.org/linux-leds/20240601195528.48308-3-hdegoede@redhat.com/
+Fixes: cdb2f80f1c10 ("inet: use xa_array iterator to implement inet_dump_ifaddr()")
+Reported-by: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Link: https://lore.kernel.org/all/CAK8fFZ7MKoFSEzMBDAOjoUt+vTZRRQgLDNXEOfdCCXSoXXKE0g@mail.gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: dsahern@kernel.org
+---
+ include/net/netlink.h   | 42 +++++++++++++++++++++++++++++++++++++++++
+ net/ipv4/devinet.c      |  3 +++
+ net/ipv4/fib_frontend.c |  5 +----
+ 3 files changed, 46 insertions(+), 4 deletions(-)
 
-So this seems to be a non trivial problem to solve. For the new input-events
-trigger I plan to solve this by switching to a single input_handler which will
-be registered at module_init() time instead of having a handler per LED and
-registering that handler at activate() time.
-
-But I have no idea how to solve this for the netdev trigger I just wanted
-to share my experience with the input-events trigger in case it is useful.
-
-Regards,
-
-Hans
-
+diff --git a/include/net/netlink.h b/include/net/netlink.h
+index e78ce008e07c..8369aca32443 100644
+--- a/include/net/netlink.h
++++ b/include/net/netlink.h
+@@ -1198,6 +1198,48 @@ nl_dump_check_consistent(struct netlink_callback *cb,
+ 	cb->prev_seq = cb->seq;
+ }
+ 
++/**
++ * nl_dump_legacy_retval - get legacy return code for netlink dumps
++ * @err: error encountered during dump, negative errno or zero
++ * @skb: skb with the dump results
++ *
++ * Netlink dump callbacks get called multiple times per dump, because
++ * all the objects may not fit into a single skb. Whether another iteration
++ * is necessary gets decided based on the return value of the callback
++ * (with 0 meaning "end reached").
++ *
++ * The semantics used to be more complicated, with positive return values
++ * meaning "continue" and negative meaning "end with an error". A lot of
++ * handlers simplified this to return skb->len ? : -errno. Meaning that zero
++ * would only be returned when skb was empty, requiring another recvmsg()
++ * syscall just to get the NLM_DONE message.
++ *
++ * The current semantics allow handlers to also return -EMSGSIZE to continue.
++ *
++ * Unfortunately, some user space has started to depend on the NLM_DONE
++ * message being returned individually, in a separate recvmsg(). Select
++ * netlink dumps must preserve those semantics.
++ *
++ * This helper wraps the "legacy logic" and serves as an annotation for
++ * dumps which are known to require legacy handling.
++ *
++ * When used in combination with for_each_netdev_dump() - make sure to
++ * invalidate the ifindex when iteration is done. for_each_netdev_dump()
++ * does not move the iterator index "after" the last valid entry.
++ *
++ * NOTE: Do not use this helper for dumps without known legacy users!
++ *       Most families are accessed only using well-written libraries
++ *       so starting to coalesce NLM_DONE is perfectly fine, and more efficient.
++ *
++ * Return: return code to use for a dump handler
++ */
++static inline int nl_dump_legacy_retval(int err, const struct sk_buff *skb)
++{
++	if (err < 0 && err != -EMSGSIZE)
++		return err;
++	return skb->len;
++}
++
+ /**************************************************************************
+  * Netlink Attributes
+  **************************************************************************/
+diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+index 96accde527da..6d0e5cbd95b4 100644
+--- a/net/ipv4/devinet.c
++++ b/net/ipv4/devinet.c
+@@ -1911,7 +1911,10 @@ static int inet_dump_ifaddr(struct sk_buff *skb, struct netlink_callback *cb)
+ 		if (err < 0)
+ 			goto done;
+ 	}
++	ctx->ifindex = ULONG_MAX;
+ done:
++	err = nl_dump_legacy_retval(err, skb);
++
+ 	if (fillargs.netnsid >= 0)
+ 		put_net(tgt_net);
+ 	rcu_read_unlock();
+diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
+index c484b1c0fc00..100d77eafe35 100644
+--- a/net/ipv4/fib_frontend.c
++++ b/net/ipv4/fib_frontend.c
+@@ -1051,10 +1051,7 @@ static int inet_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
+ 		}
+ 	}
+ 
+-	/* Don't let NLM_DONE coalesce into a message, even if it could.
+-	 * Some user space expects NLM_DONE in a separate recv().
+-	 */
+-	err = skb->len;
++	err = nl_dump_legacy_retval(err, skb);
+ out:
+ 
+ 	cb->args[1] = e;
+-- 
+2.45.1
 
 
