@@ -1,130 +1,103 @@
-Return-Path: <netdev+bounces-99911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 616168D6FA6
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 14:05:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 919E78D6FA8
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 14:06:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F11BD1F22375
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 12:05:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C29071C20D54
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 12:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B9514F9DD;
-	Sat,  1 Jun 2024 12:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218B214F9D7;
+	Sat,  1 Jun 2024 12:06:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qUCEfpMz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ILjt9Rou"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF80D14F11D;
-	Sat,  1 Jun 2024 12:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0DF014F9D4
+	for <netdev@vger.kernel.org>; Sat,  1 Jun 2024 12:06:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717243551; cv=none; b=tePdjFkQ1+stiCDJEWIsHnmnDGkyvJxKcx5TO+kyp1RIQhQRCe0OlwOiYX/4EWBhm8AWnOG+/hqX77akC7Af+bZm4RPo12VfdYoZlXbjcM1W3n0g/5N4QrkLu/AdUu01597DWtT6k+u+G4EEnZ7BTDORZa6YzCQePYQqaIaS0GY=
+	t=1717243606; cv=none; b=Swg1x2RGjelnlfbQ415YpFFRYqSN6BMPdh15VFdR7b0JiTCyYZna/RrmSUis+Od6pcNH93k4BtHqKEzaaH0RyrDbGfJjDTDt4HYum7FNNLhYN0BI3+5k7706Un0t1SD+HYC8zjKwUP5ghs0W1A8wbWo2bC7i16WnplmPlenH4po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717243551; c=relaxed/simple;
-	bh=gpmoHDNdcBUdXCxDIsEosMQ7ZR2VEkQU+Y3h+1Gc2Wo=;
+	s=arc-20240116; t=1717243606; c=relaxed/simple;
+	bh=p5Sw3GRe1Lge4SnF2pmAC4IQ0ato2xmCd88hFsuZff8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VdwE/do03ylMVkOz8h9wCQsYn+aZH9Sl9UlYMcn8osY2GLGn/769tyeyLerRkGxyqPv36jU7tRmxkF6LqwjdeBuT2xRKf/ZvsdsRkvPaOrZhYoKZCkTVMB6L0XCgEJqUx71r659H1Dr+tUXH0moqRwYptWTVqmT7FUMZHkjt034=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qUCEfpMz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CD5AC116B1;
-	Sat,  1 Jun 2024 12:05:47 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=HWUwie9q5zeWI7xmmorOZU14wb6l7z9B7IivxAZggRKHoPIFenoTwSx2aeKLAjR3zfAUnpmtogpBy/Dh9YK412NcPoUDCHkz70HpytKMq58IkWFUWosndzecZQ4MdT+YO2kLMe+fx4qd3BUazBqEpumxzZzlrcvUp1ZHIynqCQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ILjt9Rou; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4ED9C116B1;
+	Sat,  1 Jun 2024 12:06:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717243550;
-	bh=gpmoHDNdcBUdXCxDIsEosMQ7ZR2VEkQU+Y3h+1Gc2Wo=;
+	s=k20201202; t=1717243605;
+	bh=p5Sw3GRe1Lge4SnF2pmAC4IQ0ato2xmCd88hFsuZff8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qUCEfpMzmRd6IJpzlNuwa8H3GBtfPJUFkylGL2QCA67KbPBUlFjqiomnHe0WlioMp
-	 Axljd74C/sSzzRsXlSAQr9PHkoc0Hue/yseoOf3ZT0JoOO1JWoUl4W4Dh166tQDFyj
-	 pEdC7be4YM7Vo1mv+vup7A9vIQOcKL7hLVd9goAarKk7gIHC9AgUnbGs7nj5pe+jUd
-	 rEWEjjFLpQG2uOMDb72aaC28MgK3IMJQDkWlITxzcNXIJLiqKyTUERQ4HEVT4FB6Xb
-	 S2smLA/TplgTyz1Phw1VIkjXRVCXoFBHMkKL/vtjqa3iN3FF3NQcpO/YcQfDJ/Jr6E
-	 txaL0yaQsNM2Q==
-Date: Sat, 1 Jun 2024 13:05:45 +0100
+	b=ILjt9RouX1ucqRipERDIi+L/u5HdPvHVds7Ws10gho3vykMKgAg3HbaYTVcKm/PaW
+	 7c3PQePyZi24BoY0mqWrphT1ZP7wBlS24+9NU9kXI0+13wrKKOPo/rZnhWifG9Cu6I
+	 SMomQxlUTdXhDkrEl0SnCXiiOVyfW69RQCf03Ne8hSMvuk2BmAAKTICn2t77a4IjSz
+	 UTaYleqf0RwHNvZViknzYuUejkBw0jbYpcs8Nwcow8xzHRfsbmi5mVrMbnwFu8tM7N
+	 z4TzPON4rzXbgA8NUE7TvUiVDrl5gD5LG7jp5PqKrLXBJxciJeTn+FeRe+IfQJXCU/
+	 tXKxznl4dh8AQ==
+Date: Sat, 1 Jun 2024 13:06:41 +0100
 From: Simon Horman <horms@kernel.org>
-To: Tristram.Ha@microchip.com
-Cc: Woojung.Huh@microchip.com, andrew@lunn.ch, vivien.didelot@gmail.com,
-	f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: dsa: microchip: fix initial port flush problem
-Message-ID: <20240601120545.GG491852@kernel.org>
-References: <1716932145-3486-1-git-send-email-Tristram.Ha@microchip.com>
- <20240531190234.GT491852@kernel.org>
- <BYAPR11MB35583B3BA16BFB2F78615DBBECFC2@BYAPR11MB3558.namprd11.prod.outlook.com>
+To: "Keller, Jacob E" <jacob.e.keller@intel.com>
+Cc: "Zaki, Ahmed" <ahmed.zaki@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Guo, Junfeng" <junfeng.guo@intel.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>
+Subject: Re: [PATCH iwl-next v2 11/13] ice: enable FDIR filters from raw
+ binary patterns for VFs
+Message-ID: <20240601120641.GH491852@kernel.org>
+References: <20240527185810.3077299-1-ahmed.zaki@intel.com>
+ <20240527185810.3077299-12-ahmed.zaki@intel.com>
+ <20240531131802.GG123401@kernel.org>
+ <f2cf6650-a164-4d3c-a3d9-cc57c66069a5@intel.com>
+ <CO1PR11MB50893931EC0BE4F79FA46761D6FD2@CO1PR11MB5089.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <BYAPR11MB35583B3BA16BFB2F78615DBBECFC2@BYAPR11MB3558.namprd11.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CO1PR11MB50893931EC0BE4F79FA46761D6FD2@CO1PR11MB5089.namprd11.prod.outlook.com>
 
-On Fri, May 31, 2024 at 07:19:54PM +0000, Tristram.Ha@microchip.com wrote:
-> > Subject: Re: [PATCH net] net: dsa: microchip: fix initial port flush problem
-> > 
-> > EXTERNAL EMAIL: Do not click links or open attachments unless you know the content
-> > is safe
-> > 
-> > On Tue, May 28, 2024 at 02:35:45PM -0700, Tristram.Ha@microchip.com wrote:
-> > > From: Tristram Ha <tristram.ha@microchip.com>
-> > >
-> > > The very first flush in any port will flush all learned addresses in all
-> > > ports.  This can be observed by unplugging a cable from one port while
-> > > additional ports are connected and dumping the fdb entries.
-> > >
-> > > This problem is caused by the initially wrong value programmed to the
-> > > register.  After the first flush the value is reset back to the normal so
-> > > the next port flush will not cause such problem again.
-> > 
-> > Hi Tristram,
-> > 
-> > I think it would be worth spelling out why it is correct to:
-> > 1. Not set SW_FLUSH_STP_TABLE or SW_FLUSH_MSTP_TABLE; and
-> > 2. Preserve the value of the other bits of REG_SW_LUE_CTRL_1
+On Sat, Jun 01, 2024 at 12:24:14AM +0000, Keller, Jacob E wrote:
 > 
-> Setting SW_FLUSH_STP_TABLE and SW_FLUSH_MSTP_TABLE bits are wrong as they
-> are action bits.  The bit should be set only when doing an action like
-> flushing.
-
-Understood, thanks. And I guess that only bits that are being configured
-should be changed, thus the values other bits are preserved with this
-change.
-
-FWIIW, I do think it would be worth adding something about this to the
-patch description.
-
 > 
+> > -----Original Message-----
+> > From: Zaki, Ahmed <ahmed.zaki@intel.com>
+> > Sent: Friday, May 31, 2024 8:48 AM
+> > To: Simon Horman <horms@kernel.org>
+> > Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Keller, Jacob E
+> > <jacob.e.keller@intel.com>; Nguyen, Anthony L <anthony.l.nguyen@intel.com>;
+> > Guo, Junfeng <junfeng.guo@intel.com>; Marcin Szycik
+> > <marcin.szycik@linux.intel.com>
+> > Subject: Re: [PATCH iwl-next v2 11/13] ice: enable FDIR filters from raw binary
+> > patterns for VFs
+> > 
+> > 
+> > 
+> > On 2024-05-31 7:18 a.m., Simon Horman wrote:
+> > > On Mon, May 27, 2024 at 12:58:08PM -0600, Ahmed Zaki wrote:
+> > >> From: Junfeng Guo <junfeng.guo@intel.com>
 > > >
-> > > Fixes: b987e98e50ab ("dsa: add DSA switch driver for Microchip KSZ9477")
-> > > Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
-> > > ---
-> > >  drivers/net/dsa/microchip/ksz9477.c | 3 +--
-> > >  1 file changed, 1 insertion(+), 2 deletions(-)
-> > >
-> > > diff --git a/drivers/net/dsa/microchip/ksz9477.c
-> > b/drivers/net/dsa/microchip/ksz9477.c
-> > > index f8ad7833f5d9..7cc92b90ffea 100644
-> > > --- a/drivers/net/dsa/microchip/ksz9477.c
-> > > +++ b/drivers/net/dsa/microchip/ksz9477.c
-> > > @@ -356,8 +356,7 @@ int ksz9477_reset_switch(struct ksz_device *dev)
-> > >
-> > >       /* default configuration */
-> > >       ksz_read8(dev, REG_SW_LUE_CTRL_1, &data8);
-> > > -     data8 = SW_AGING_ENABLE | SW_LINK_AUTO_AGING |
-> > > -           SW_SRC_ADDR_FILTER | SW_FLUSH_STP_TABLE | SW_FLUSH_MSTP_TABLE;
-> > > +     data8 |= SW_AGING_ENABLE | SW_LINK_AUTO_AGING |
-> > SW_SRC_ADDR_FILTER;
-> > >       ksz_write8(dev, REG_SW_LUE_CTRL_1, data8);
-> > >
-> > >       /* disable interrupts */
-> > > --
-> > > 2.34.1
-> > >
-> > >
+> > > To me tweaking the order of includes seems to indicate
+> > > that something isn't quite right. Is there some sort of
+> > > dependency loop being juggled here?
+> > 
+> > This was needed because of the changes in ice_flow.h, struct ice_vsi is
+> > now used. I will check if there is a better fix.
+> > 
 > 
+> I think there is probably a dependency loop. Ice has had a lot of issues w.r.t. header includes ☹
+
+Understood, let's leave that for another day :)
 
