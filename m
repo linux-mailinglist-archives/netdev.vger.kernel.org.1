@@ -1,118 +1,136 @@
-Return-Path: <netdev+bounces-99918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1E2C8D6FF3
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 15:11:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 432618D7026
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 15:17:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6089E1F21C3E
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 13:11:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75B8AB22B12
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 13:17:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4441509B0;
-	Sat,  1 Jun 2024 13:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC4A315099F;
+	Sat,  1 Jun 2024 13:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l1WV53eh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qzwFtJx9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF0E150999;
-	Sat,  1 Jun 2024 13:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33DE8405D;
+	Sat,  1 Jun 2024 13:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717247459; cv=none; b=EerjX9rMtuBDQHP/DoXtnPt8Et24ILUR6WgEQjEObT8Ypvu1wwJ0YUjekNt/mkvg7v0WokuycEZiVHtOZpYPtLtQUp7VcUjA7Pw19s+Sp2XbeCzIpbDH+G41V5stxr/pl+JQ186dmZk+t87jfw0vTEuAmT8gysiD5FH5+SjDebQ=
+	t=1717247786; cv=none; b=rlsxyo0/+JdxIeR33FLY7Jl1QSVmFQwF07iHhpJ5juDIblwwMp5R5iXkSNpA9sJwuO7w6tN09ZVnllvv81HaB3gPpRMfhb0lk5ReyFQbEi+BD2KAbhtyctg8RQ110sA8Krfd0F9HewhHm06zLdk1/PyQp6pJboPQuYUi2ahN3zM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717247459; c=relaxed/simple;
-	bh=yvirPWICtc2QO7WKfB/iVO5Zi8WPqbGY2CUGPPTKTgc=;
+	s=arc-20240116; t=1717247786; c=relaxed/simple;
+	bh=BDYiHLgOxFM07kj3mFIpBgiAJCFSiSzDEkmgs0Bz6e4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PfGB5fxTb6HTQdbXthGHqUflOKWN9MKvTscMhKHHlsSPXZMP+GS83BySO20qRNjAP20ToGCKLAa1dNAhTrq+gxjcxLf3Icwh4ifVA05zqlvHTp3r/war1TYTdHZ4SdK3egMMqXYYrnM8IQUbBOfHZSXqE2uMIocuwuTczI5TccM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l1WV53eh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E95C1C116B1;
-	Sat,  1 Jun 2024 13:10:55 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=c/R9N2G2PGziMhsVckAst64v7ydA6Kf5airJk6VT0MwyO8zcWouFEDB4jJz5fGOZ/BGuQJGoSI4VB2TWBWiWhX9tqGJKz+YLYYRHBVOh+n8/7L4y6WfZBENpiGtG2sjWGWuzV8sPvVhtqv235Xej/eeiJgPiYEoVfjhMEy0X0Vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qzwFtJx9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58868C116B1;
+	Sat,  1 Jun 2024 13:16:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717247458;
-	bh=yvirPWICtc2QO7WKfB/iVO5Zi8WPqbGY2CUGPPTKTgc=;
+	s=k20201202; t=1717247786;
+	bh=BDYiHLgOxFM07kj3mFIpBgiAJCFSiSzDEkmgs0Bz6e4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=l1WV53eh1n81m2udc9OuBCt0KFuPBHRwk5fkRV4wNsbu+WrEfgbfmAEZhkmVRA2Zv
-	 CgSP5lySgLwPxnPnXG0xDQs86mifJ1pRdAaF8XpUE7tEDwjuWLg7cfH7CbpadeW6Bc
-	 WJOqi5Ezrc2B8ytpAfhXe0gUOJfvPF7jmuoKZ89rZCzuiRrwaB2Y6Nr5uqhhdBc/Nw
-	 D6XmAfbECyD9Dr+JdoughBdHVodQPnsOx92x6nBuoX6vVVP0SVBUYHv7dlCUb/zgIP
-	 PA0QFzUU9O3DSh2vgB0mYUixEyLVPQifeZRjRGIPNUOE2yII1dhAX/mHIIup0iHNJI
-	 VlnYR6hSjMwVQ==
-Date: Sat, 1 Jun 2024 14:10:53 +0100
+	b=qzwFtJx9UWUqPoJ4Ua9VVxFOHJjLpCQMH/v4XL3bqjyjBWK9AbgkffroAK4MHg/sx
+	 abTdKTKrMUgOkMcoVS0wgfQC8oCEzH6KzezX+liK4gT/0bwpdaYPx+ATXXbWjjU71D
+	 1wuknLzCU5a2G2kMcveLvPflbEj8xnWzryHQuVuFc9VQ27kqCjY79w+0yZU+dXkjx/
+	 3HsEfhq++XE0B7g3u1xbqIVdmctaLQhGTIg1vhvqS8wvc0ARn2jVAcxSHGlo1pW2K+
+	 Q9hsaLEH6XxBxKk03E19t217FEU7vFYefoZGTVefHpVrXdsnbVw81wiYEPD8FJHvcK
+	 w6ZjxKOc0ejJg==
+Date: Sat, 1 Jun 2024 14:16:20 +0100
 From: Simon Horman <horms@kernel.org>
-To: Martin =?utf-8?Q?Hundeb=C3=B8ll?= <martin@geanix.com>
-Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Markus Schneider-Pargmann <msp@baylibre.com>,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] can: m_can: don't enable transceiver when probing
-Message-ID: <20240601131053.GL491852@kernel.org>
-References: <20240530105801.3930087-1-martin@geanix.com>
+To: Ricky Wu <en-wei.wu@canonical.com>
+Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	rickywu0421@gmail.com, wojciech.drewek@intel.com,
+	michal.swiatkowski@linux.intel.com, pmenzel@molgen.mpg.de,
+	Cyrus Lien <cyrus.lien@canonical.com>
+Subject: Re: [PATCH net,v2] ice: avoid IRQ collision to fix init failure on
+ ACPI S3 resume
+Message-ID: <20240601131620.GM491852@kernel.org>
+References: <20240530142131.26741-1-en-wei.wu@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240530105801.3930087-1-martin@geanix.com>
+In-Reply-To: <20240530142131.26741-1-en-wei.wu@canonical.com>
 
-On Thu, May 30, 2024 at 12:57:58PM +0200, Martin Hundebøll wrote:
-> The m_can driver sets and clears the CCCR.INIT bit during probe (both
-> when testing the NON-ISO bit, and when configuring the chip). After
-> clearing the CCCR.INIT bit, the transceiver enters normal mode, where it
-> affects the CAN bus (i.e. it ACKs frames). This can cause troubles when
-> the m_can node is only used for monitoring the bus, as one cannot setup
-> listen-only mode before the device is probed.
+On Thu, May 30, 2024 at 10:21:31PM +0800, Ricky Wu wrote:
+> A bug in https://bugzilla.kernel.org/show_bug.cgi?id=218906 describes
+> that irdma would break and report hardware initialization failed after
+> suspend/resume with Intel E810 NIC (tested on 6.9.0-rc5).
 > 
-> Rework the probe flow, so that the CCCR.INIT bit is only cleared when
-> upping the device. First, the tcan4x5x driver is changed to stay in
-> standby mode during/after probe. This in turn requires changes when
-> setting bits in the CCCR register, as its CSR and CSA bits are always
-> high in standby mode.
+> The problem is caused due to the collision between the irq numbers
+> requested in irdma and the irq numbers requested in other drivers
+> after suspend/resume.
 > 
-> Signed-off-by: Martin Hundebøll <martin@geanix.com>
+> The irq numbers used by irdma are derived from ice's ice_pf->msix_entries
+> which stores mappings between MSI-X index and Linux interrupt number.
+> It's supposed to be cleaned up when suspend and rebuilt in resume but
+> it's not, causing irdma using the old irq numbers stored in the old
+> ice_pf->msix_entries to request_irq() when resume. And eventually
+> collide with other drivers.
+> 
+> This patch fixes this problem. On suspend, we call ice_deinit_rdma() to
+> clean up the ice_pf->msix_entries (and free the MSI-X vectors used by
+> irdma if we've dynamically allocated them). On resume, we call
+> ice_init_rdma() to rebuild the ice_pf->msix_entries (and allocate the
+> MSI-X vectors if we would like to dynamically allocate them).
+> 
+> Fixes: f9f5301e7e2d ("ice: Register auxiliary device to provide RDMA")
+> Tested-by: Cyrus Lien <cyrus.lien@canonical.com>
+> Signed-off-by: Ricky Wu <en-wei.wu@canonical.com>
 > ---
->  drivers/net/can/m_can/m_can.c         | 169 ++++++++++++++++----------
->  drivers/net/can/m_can/tcan4x5x-core.c |  13 +-
->  2 files changed, 116 insertions(+), 66 deletions(-)
+> Changes in v2:
+> - Change title
+> - Add Fixes and Tested-by tags
+> - Fix typo
+> ---
+>  drivers/net/ethernet/intel/ice/ice_main.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-
-...
-
-> @@ -1694,21 +1732,26 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
->  		return -EINVAL;
->  	}
+> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+> index f60c022f7960..ec3cbadaa162 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> @@ -5544,7 +5544,7 @@ static int ice_suspend(struct device *dev)
+>  	 */
+>  	disabled = ice_service_task_stop(pf);
 >  
-> -	if (cdev->ops->init)
-> -		cdev->ops->init(cdev);
-> -
-> -	return 0;
-> +	/* Forcing standby mode should be redunant, as the chip should be in
+> -	ice_unplug_aux_dev(pf);
+> +	ice_deinit_rdma(pf);
+>  
+>  	/* Already suspended?, then there is nothing to do */
+>  	if (test_and_set_bit(ICE_SUSPENDED, pf->state)) {
+> @@ -5624,6 +5624,10 @@ static int ice_resume(struct device *dev)
+>  	if (ret)
+>  		dev_err(dev, "Cannot restore interrupt scheme: %d\n", ret);
+>  
+> +	ret = ice_init_rdma(pf);
+> +	if (ret)
+> +		dev_err(dev, "Reinitialize RDMA during resume failed: %d\n", ret);
+> +
 
-Hi Martin,
+nit: The line above could trivially be wrapped to fit within 80 columns,
+     as is preferred for Networking code.
 
-A minor nit from my side as it looks like there will be another revision
-anyway.
+     Flagged by checkpatch.pl --max-line-length=80
 
-redunant -> redundant
-
-> +	 * standby after a reset. Write the INIT bit anyways, should the chip
-> +	 * be configured by previous stage.
-> +	 */
-> +	return m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
->  }
-
-...
+>  	clear_bit(ICE_DOWN, pf->state);
+>  	/* Now perform PF reset and rebuild */
+>  	reset_type = ICE_RESET_PFR;
+> -- 
+> 2.43.0
+> 
+> 
 
