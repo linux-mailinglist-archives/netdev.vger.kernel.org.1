@@ -1,57 +1,61 @@
-Return-Path: <netdev+bounces-99906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1BCF8D6F5E
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 12:37:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39B7E8D6F7F
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 13:36:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 798D71F21C82
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 10:37:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA9F31F22326
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 11:36:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A785914D711;
-	Sat,  1 Jun 2024 10:37:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5F3823BC;
+	Sat,  1 Jun 2024 11:36:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pfNAJ7+V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gzj36iIF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834F227473
-	for <netdev@vger.kernel.org>; Sat,  1 Jun 2024 10:37:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF47335A7;
+	Sat,  1 Jun 2024 11:36:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717238225; cv=none; b=IIR387VMWYAc4/rGq7EaAlfM62FdXCIYQu77iOgOQ3G96R57nTyb36TbfXAiGTgrs6n7OINeiVoxBPwlDcRclWrwoAiROZnwz0jnnd8McJDqCP81ugOi4G6SJcYwgEkX8pa+L2XG5uXznRun9RSvh4fvgqIH5gBCGv1DeULpajA=
+	t=1717241762; cv=none; b=Nf7yjwUP6YQaanub/hnnLIeo+R9f99LQfOSTkeO6UEfaf/gMixOoVpE31i+ZE9X1J12H9baox9kb0ipGWjkFarCuqp6jkUlReMFVC/Hx6oQsZscXRIrVN7S5GBo1BAdoXWkjgM0SgWdvtzEi39xIBhACqmhKy/UQKnOV+DdcDIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717238225; c=relaxed/simple;
-	bh=nMmQUZvfNwbrHJKiwXc49r6mbQM5EdcKTwYZj3x3q/g=;
+	s=arc-20240116; t=1717241762; c=relaxed/simple;
+	bh=kpQf4gwEeOOzDfhWhhcG3oI1znrd4vE/jJPK+EcV08I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i4WbGkM1PmZ0NgWkBehyPm13FEY6wwCTkU4Rf8DitYqmWgmN7euyFAwqsKXjXFTwlSURJ3xUqN8QHDNsNXzrclDpunMB1WT5G2SB9r1AdTI9klO+MdinU5ualwr/8wr/8qqN4emSJjJfN2sGGnQcUvQCT4isGlgAByxslWPpn58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pfNAJ7+V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7C23C116B1;
-	Sat,  1 Jun 2024 10:37:03 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=uXtM+Hn4RHtV+qSYixDK48x/Vw5QBdSSguF5dxi4fc2qgmEnbYeCe/PlrN5mgt1wdk30LRDfo7/qTz/c3/2S/RJkKpGEAVUCHuLUtEcPOcyOThjjGyr5aZ0MC13GAZqH3epj86GUZQwsMBd3wjCXO+BZMNaQhHKgzG+1dnWYB0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gzj36iIF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66135C116B1;
+	Sat,  1 Jun 2024 11:35:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717238225;
-	bh=nMmQUZvfNwbrHJKiwXc49r6mbQM5EdcKTwYZj3x3q/g=;
+	s=k20201202; t=1717241762;
+	bh=kpQf4gwEeOOzDfhWhhcG3oI1znrd4vE/jJPK+EcV08I=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pfNAJ7+VPPFYIWrJd7NwR2rUvfPf1Ue/1iw0wSC1+vGX6ysXgMZo+WTc6+Tel4Fi7
-	 q64fLAMvuZ4l14/az8eLSMt2tlmAM+APiHNgbl56POAlUT8mMHtGvx7poK21ONMaPy
-	 afOPHrKIvqwi+ieZ13m3l97M+WDAtKOnZcknztcIAmL/Oyz62/do0UtoQCDaUC9Rtu
-	 Y7opx6DFo1qz5uXJ0JJRpMfNLQorFB3q5E5uKNb+0N5ynw2iETPgBJnMV02S4s5FCA
-	 tC4ac7ZEBaWge7IrhXuR8Y5rSVvZzKZRNrUU3jtARj47+DpVdlM9b/lmeQDuDlnB2N
-	 qTd12LVNwiq0g==
-Date: Sat, 1 Jun 2024 11:37:01 +0100
+	b=gzj36iIF2LvyS7Kv7+EL84VyeI6zM2JaoVBShSc4JqtM8sFYhlxcx0KUbWYikYebQ
+	 kQHucV5qqOknsjNo2DRtp8y44jNhLyDoXX5Tqh0ZDOATy6DLSWeOFEscMrIutOCkhq
+	 VkxP0kAuj9FJ+Lj+BErd1LWQD5TVNapB4zls0XCC16an1emBni6tZdToA+bcdJl1kQ
+	 R09XGLRF3mXBTTZ/N/Zkh99tY0JV+LtFiSKmRu2OnM83b0aExNwB5i5XdLWHGPgUBt
+	 zfFGV+2qNdmLYuqpG0fM4GamTMjYi6sN/iAe6xPID701LvsT5DwQLOCSwHVoUZEyeC
+	 yb12Et9/B2rdA==
+Date: Sat, 1 Jun 2024 12:35:57 +0100
 From: Simon Horman <horms@kernel.org>
-To: zijianzhang@bytedance.com
-Cc: netdev@vger.kernel.org, edumazet@google.com,
-	willemdebruijn.kernel@gmail.com, cong.wang@bytedance.com,
-	xiaochun.lu@bytedance.com
-Subject: Re: [PATCH net-next v4 2/3] sock: add MSG_ZEROCOPY notification
- mechanism based on msg_control
-Message-ID: <20240601103701.GD491852@kernel.org>
-References: <20240528212103.350767-1-zijianzhang@bytedance.com>
- <20240528212103.350767-3-zijianzhang@bytedance.com>
+To: Joe Damato <jdamato@fastly.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	nalramli@fastly.com, Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>
+Subject: Re: [RFC net-next v3 1/2] net/mlx5e: Add helpers to calculate txq
+ and ch idx
+Message-ID: <20240601113557.GE491852@kernel.org>
+References: <20240529031628.324117-1-jdamato@fastly.com>
+ <20240529031628.324117-2-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,121 +64,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240528212103.350767-3-zijianzhang@bytedance.com>
+In-Reply-To: <20240529031628.324117-2-jdamato@fastly.com>
 
-On Tue, May 28, 2024 at 09:21:02PM +0000, zijianzhang@bytedance.com wrote:
-> From: Zijian Zhang <zijianzhang@bytedance.com>
+On Wed, May 29, 2024 at 03:16:26AM +0000, Joe Damato wrote:
+> Add two helpers to:
 > 
-> The MSG_ZEROCOPY flag enables copy avoidance for socket send calls.
-> However, zerocopy is not a free lunch. Apart from the management of user
-> pages, the combination of poll + recvmsg to receive notifications incurs
-> unignorable overhead in the applications. The overhead of such sometimes
-> might be more than the CPU savings from zerocopy. We try to solve this
-> problem with a new notification mechanism based on msgcontrol.
-> This new mechanism aims to reduce the overhead associated with receiving
-> notifications by embedding them directly into user arguments passed with
-> each sendmsg control message. By doing so, we can significantly reduce
-> the complexity and overhead for managing notifications. In an ideal
-> pattern, the user will keep calling sendmsg with SCM_ZC_NOTIFICATION
-> msg_control, and the notification will be delivered as soon as possible.
+> 1. Compute the txq_ix given a channel and a tc offset (tc_to_txq_ix).
+> 2. Compute the channel index and tc offset given a txq_ix
+>    (txq_ix_to_chtc_ix).
 > 
-> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
-> Signed-off-by: Xiaochun Lu <xiaochun.lu@bytedance.com>
+> The first helper, tc_to_txq_ix, is used in place of the mathematical
+> expressionin mlx5e_open_sqs when txq_ix values are computed.
+> 
+> The second helper, txq_ix_to_chtc_ix, will be used in a following patch.
+
+Hi Joe,
+
+I think it would be best to add txq_ix_to_chtc_ix as part of patch that
+uses it, because the current arrangement will cause allmodconfigs with
+clang-18 and W=1 to fail due to txq_ix_to_chtc_ix being unused.
 
 ...
-
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index 521e6373d4f7..21239469d75c 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -2847,6 +2847,74 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
->  	case SCM_RIGHTS:
->  	case SCM_CREDENTIALS:
->  		break;
-> +	case SCM_ZC_NOTIFICATION: {
-> +		int ret, i = 0;
-> +		int cmsg_data_len, zc_info_elem_num;
-> +		void __user	*usr_addr;
-> +		struct zc_info_elem zc_info_kern[SOCK_ZC_INFO_MAX];
-> +		unsigned long flags;
-> +		struct sk_buff_head *q, local_q;
-> +		struct sk_buff *skb, *tmp;
-> +		struct sock_exterr_skb *serr;
-
-Hi Zijian Zhang, Xiaochun Lu, all,
-
-When compiling on ARM (32bit) with multi_v7_defconfig using clang-18
-I see the following warning:
-
-.../sock.c:2808:5: warning: stack frame size (1664) exceeds limit (1024) in '__sock_cmsg_send' [-Wframe-larger-than]
- 2808 | int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
-
-I expect this is mostly explained by the addition of zc_info_kern above.
-
-> +
-> +		if (!sock_flag(sk, SOCK_ZEROCOPY) || sk->sk_family == PF_RDS)
-> +			return -EINVAL;
-> +
-> +		cmsg_data_len = cmsg->cmsg_len - sizeof(struct cmsghdr);
-> +		if (cmsg_data_len % sizeof(struct zc_info_elem))
-> +			return -EINVAL;
-> +
-> +		zc_info_elem_num = cmsg_data_len / sizeof(struct zc_info_elem);
-> +		if (!zc_info_elem_num || zc_info_elem_num > SOCK_ZC_INFO_MAX)
-> +			return -EINVAL;
-> +
-> +		if (in_compat_syscall())
-> +			usr_addr = compat_ptr(*(compat_uptr_t *)CMSG_DATA(cmsg));
-> +		else
-> +			usr_addr = (void __user *)*(void **)CMSG_DATA(cmsg);
-> +		if (!access_ok(usr_addr, cmsg_data_len))
-> +			return -EFAULT;
-> +
-> +		q = &sk->sk_error_queue;
-> +		skb_queue_head_init(&local_q);
-> +		spin_lock_irqsave(&q->lock, flags);
-> +		skb = skb_peek(q);
-> +		while (skb && i < zc_info_elem_num) {
-> +			struct sk_buff *skb_next = skb_peek_next(skb, q);
-> +
-> +			serr = SKB_EXT_ERR(skb);
-> +			if (serr->ee.ee_errno == 0 &&
-> +			    serr->ee.ee_origin == SO_EE_ORIGIN_ZEROCOPY) {
-> +				zc_info_kern[i].hi = serr->ee.ee_data;
-> +				zc_info_kern[i].lo = serr->ee.ee_info;
-> +				zc_info_kern[i].zerocopy = !(serr->ee.ee_code
-> +								& SO_EE_CODE_ZEROCOPY_COPIED);
-> +				__skb_unlink(skb, q);
-> +				__skb_queue_tail(&local_q, skb);
-> +				i++;
-> +			}
-> +			skb = skb_next;
-> +		}
-> +		spin_unlock_irqrestore(&q->lock, flags);
-> +
-> +		ret = copy_to_user(usr_addr,
-> +				   zc_info_kern,
-> +					i * sizeof(struct zc_info_elem));
-> +
-> +		if (unlikely(ret)) {
-> +			spin_lock_irqsave(&q->lock, flags);
-> +			skb_queue_reverse_walk_safe(&local_q, skb, tmp) {
-> +				__skb_unlink(skb, &local_q);
-> +				__skb_queue_head(q, skb);
-> +			}
-> +			spin_unlock_irqrestore(&q->lock, flags);
-> +			return -EFAULT;
-> +		}
-> +
-> +		while ((skb = __skb_dequeue(&local_q)))
-> +			consume_skb(skb);
-> +		break;
-> +	}
->  	default:
->  		return -EINVAL;
->  	}
-> -- 
-> 2.20.1
-> 
-> 
 
