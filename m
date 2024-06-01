@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-99884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8860F8D6D58
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 03:44:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B8958D6D5A
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 03:44:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B83DE1C21788
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 01:44:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB1B01F23196
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 01:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE1A61755C;
-	Sat,  1 Jun 2024 01:42:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC8F1946F;
+	Sat,  1 Jun 2024 01:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="P6BCgOqj"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="YD4BtylA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1C514287
-	for <netdev@vger.kernel.org>; Sat,  1 Jun 2024 01:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C786D14287
+	for <netdev@vger.kernel.org>; Sat,  1 Jun 2024 01:42:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717206175; cv=none; b=J0kLrdZxVbgugQbvuiCduLjS/97Qrio+wYRRNBUF7o7Ucw7pwtgxYY0e8hQsAdfpWNIfXuWBg4+Iit5wAgLBbF5TEGLv7AzF/AoW3ingvbqYP3JUzW2wWgDDtZR6mxwy/yOJXS3o64tn3/nlw6AWR2wk3lo1mwGR+Fx0SfTqHcw=
+	t=1717206179; cv=none; b=QD+kjCM5GFTKJc3WJGq0thogqfz43QH5MVJ7LIMPopURiU0/MZumV/l94UnUf4Tq1fy+Db1S/GAAI4SjVwCVay39tB0+eZ8kAL4bhf2ZzJ5k9Krlh1szbNMQ7bIMENx3JpFfb7YADlXhlyyWVpl6CPsWZayukMm5muqBfsi5Cwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717206175; c=relaxed/simple;
-	bh=jkzjDY7vnEB8DqdbcGuw7ABHpoGpOOOicO2KkYgqYYM=;
+	s=arc-20240116; t=1717206179; c=relaxed/simple;
+	bh=kSyvuVmoawm0A1229Z9cjCnSswrtkKHtT2WgaP8HoEM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XeXD749pArD8PZ/4BxHkjtXb7jOOCIrypIWbfsIak00NIvKhX3sBwsfnSOoe6RSiIAq6nuhcqvlCrVnUfi0d8OH16O6/LIEGrTdHZgMW8OkEhf+nLV1eGP/wGT1HEeSPbiZsDQo6U8ys9R7EUFWzFTMJs4ivzFKK4vipCk0tx2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=P6BCgOqj; arc=none smtp.client-ip=209.85.128.177
+	 Content-Type:Content-Disposition:In-Reply-To; b=oLjCtPdTnXma5CebD6GQe+r+2DNnC9BqoytSqmN3ZrrO7egIZCnz2kQrCxK7p++/oHY7TC+IeUBy3RDYjRjx/rhZyF3vhFzOQ8YrF95vRRzNKccEHxYKbTTAjoEuTW/Vpvy4v2s6u2yKBYmlJGhpbIt7gDb2iDuiLgnI00Ljo4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=YD4BtylA; arc=none smtp.client-ip=209.85.128.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-62a08092c4dso25275967b3.0
-        for <netdev@vger.kernel.org>; Fri, 31 May 2024 18:42:54 -0700 (PDT)
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-62a08b250a2so26622937b3.3
+        for <netdev@vger.kernel.org>; Fri, 31 May 2024 18:42:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1717206172; x=1717810972; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1717206176; x=1717810976; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZokBvFXzTLhgVv1PaHNF9XfQX0m9YCf5c4LTRhvqEjE=;
-        b=P6BCgOqjCwEYkeAdeHdpygNBK/qpkaaRTAoG3Srt734tzOsdCer3T7xSEb8QjSZy+2
-         DCoioOQojDkxUysL/G2PvHNUmDcM9YU0jKUERh8K1jpIt9kQeOALk4V4WaR4rY09speE
-         G8eYlu48+epL/jS9HWmK4Mwy3V/c8H1IUyxUa4QZPFozfnxFTRt+JOAoG+omCPo7jKvf
-         SXG8vFVQNcv+v827gegNe/z6fkWaphPaYenKBwVSr2bdW9LD4MAnTwdcTLbZz/MJ6Q02
-         RaQWwT3nLZUhqYff2Rgqi9BlDjPOep9vpDxbzDUuReLbDtM9aOyYCDlY5ngsA+6yQyre
-         D+kQ==
+        bh=GJDm6iwovalgWz0sxMpvGD5PNxGmSKas+lavj2Qq0ow=;
+        b=YD4BtylARo6CiEtgUKYej8A3xKc7kvOxKEg7U2CcUZeVW/+6hz6E6WEAJkuzo9hnQl
+         Bn25RhH4kyt0BUK9NirWMskx1dcIZvxAmB+iiime/jhO4R2ibp1nWjNsb9xu2R3niQRo
+         v4OnhKU3uzkd9vasOojq8uwWvXB5PHwx2LQiIcMdrkf30TunowZoeJe2c746vO08gagK
+         /38xK/4ya0qqXp4DSd7vYVSGKgGHzDoZ8E+Dzv8HRQKpbY4fXjRsWj/qRxgD5TSZfMZ8
+         yxUbC0oOV3nifgyUtsVJZHJ+9RW9LksglHg63o83I0M1r4vymnprh/+E091i3PIkVLOP
+         wPNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717206172; x=1717810972;
+        d=1e100.net; s=20230601; t=1717206176; x=1717810976;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZokBvFXzTLhgVv1PaHNF9XfQX0m9YCf5c4LTRhvqEjE=;
-        b=Ba75hhym/YgRiZ26/unnew+x0qSOb5fU5tNyTWbb5eqDrRyKFp/atN4VaZLQmLy5sJ
-         36L5GV3/5V6yjbmPhuhQIox2DzqYyMGZ4nMbHIExWyg93lO7iwdqVS/Zm5u3L87sVQsJ
-         V8J+S+l4dZ+/+0HIHgZ7gRavqB4j9Dj7tz4OH7e4vEFJYapyHAENuExp5RZCMGPWxmQF
-         3EQf1QCBmWGSwKnm21dnmcRIYWhnyFlSSkpb2rT4RZXm4guKZYbmvmG2WWPIsDLltHw6
-         gEpfvsjhwbh1RzhPXRqX8xyt1pSvjbroSZrpkDZuGcDgWqQLcmpehCll7zin+QmrXCec
-         upBw==
-X-Gm-Message-State: AOJu0YwQU1XN239CDD+iQO2WpK+RE4V1GJBBEyTL/2EkVbrJjqL7AHcS
-	+81PE42gPmKf0GBoCgFHXKH9A7tWPuVtGFZeaU5sM4HpFdN/qPEhK/JG3WADfQN0GE4Rqm44qcG
-	TKsE=
-X-Google-Smtp-Source: AGHT+IHxVHyrr3VrYHe1OY427vM5xOxlLkkCH+3te1HypqOSqMSXO5Gncg6Y43GhkUSd/fqXGDmlUw==
-X-Received: by 2002:a81:e302:0:b0:61a:cd65:3010 with SMTP id 00721157ae682-62c7971cf21mr35315987b3.30.1717206172275;
-        Fri, 31 May 2024 18:42:52 -0700 (PDT)
+        bh=GJDm6iwovalgWz0sxMpvGD5PNxGmSKas+lavj2Qq0ow=;
+        b=gedX/9moBGIJkaO2dAx/siuiTfZCxhdxm6Xw0xwr3ApG5PCmc3AtJYq6y4Wl3/edDz
+         rhwkG1zCab2R60y9vByoPfk2ETW0qYwQ7Io6U8uNYhKDFqd2ODDD/QUwEvd4g6tQ9++U
+         sXucSqaFQTIgpjDY9YsJ539vvJgTK+TuBlv/N8wM4LAXq3bf/qJnjreLeiDVIeDOTD7+
+         beD+AqaS8xHX03PgtOGCJBcidqGTvJfU/V0WVLJ0pRFhTPBnojOkALaXak/XIxf7OJPh
+         +d+fekulwT7OeH2CNcXJr8PVHPy7QtATq9Q7pSrO0WoTFv8fXTyT+gVyWVxChPn5sAby
+         UqRw==
+X-Gm-Message-State: AOJu0YyXb+acPyqMGA9kvR8HVXQhNdSWthXDOKvFjm7WtqBwa4/3sSLp
+	Txjka7aczu3FH2LDyfc/vUJIX4UplXWc+xxa+PSJVps1nQ2uKJkR1pd/6NaaeI9isQQfnFQF3cQ
+	W4aI=
+X-Google-Smtp-Source: AGHT+IH/j2vzJwaTlUPRMs2EMQDMQa6P7RZLullnU/Y5B7uu39vSuoijNLKOBF04J9MmRcLjvexeoQ==
+X-Received: by 2002:a81:ce03:0:b0:618:8e76:af45 with SMTP id 00721157ae682-62c797ef694mr32229037b3.52.1717206174989;
+        Fri, 31 May 2024 18:42:54 -0700 (PDT)
 Received: from debian.debian ([2a09:bac5:7a49:f9b::18e:1c])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-62c765b8c28sm5377187b3.28.2024.05.31.18.42.50
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-62c765e6efesm5424497b3.42.2024.05.31.18.42.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 May 2024 18:42:51 -0700 (PDT)
-Date: Fri, 31 May 2024 18:42:49 -0700
+        Fri, 31 May 2024 18:42:54 -0700 (PDT)
+Date: Fri, 31 May 2024 18:42:52 -0700
 From: Yan Zhai <yan@cloudflare.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -84,8 +84,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Pavel Begunkov <asml.silence@gmail.com>,
 	linux-kernel@vger.kernel.org, kernel-team@cloudflare.com,
 	Jesper Dangaard Brouer <hawk@kernel.org>
-Subject: [RFC v2 net-next 3/7] ping: use sk_skb_reason_drop to free rx packets
-Message-ID: <71a5ce50c3a2657bc9b28d5030e33bef112e74cc.1717206060.git.yan@cloudflare.com>
+Subject: [RFC v2 net-next 4/7] net: raw: use sk_skb_reason_drop to free rx
+ packets
+Message-ID: <0ecd499cd2e43560f22997b3aed0b72eb585dd7a.1717206060.git.yan@cloudflare.com>
 References: <cover.1717206060.git.yan@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -102,21 +103,70 @@ socket to the tracepoint.
 
 Signed-off-by: Yan Zhai <yan@cloudflare.com>
 ---
- net/ipv4/ping.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/ipv4/raw.c | 4 ++--
+ net/ipv6/raw.c | 8 ++++----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
-index 823306487a82..619ddc087957 100644
---- a/net/ipv4/ping.c
-+++ b/net/ipv4/ping.c
-@@ -946,7 +946,7 @@ static enum skb_drop_reason __ping_queue_rcv_skb(struct sock *sk,
- 	pr_debug("ping_queue_rcv_skb(sk=%p,sk->num=%d,skb=%p)\n",
- 		 inet_sk(sk), inet_sk(sk)->inet_num, skb);
+diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
+index 1a0953650356..474dfd263c8b 100644
+--- a/net/ipv4/raw.c
++++ b/net/ipv4/raw.c
+@@ -301,7 +301,7 @@ static int raw_rcv_skb(struct sock *sk, struct sk_buff *skb)
+ 
+ 	ipv4_pktinfo_prepare(sk, skb, true);
  	if (sock_queue_rcv_skb_reason(sk, skb, &reason) < 0) {
 -		kfree_skb_reason(skb, reason);
 +		sk_skb_reason_drop(sk, skb, reason);
- 		pr_debug("ping_queue_rcv_skb -> failed\n");
- 		return reason;
+ 		return NET_RX_DROP;
+ 	}
+ 
+@@ -312,7 +312,7 @@ int raw_rcv(struct sock *sk, struct sk_buff *skb)
+ {
+ 	if (!xfrm4_policy_check(sk, XFRM_POLICY_IN, skb)) {
+ 		atomic_inc(&sk->sk_drops);
+-		kfree_skb_reason(skb, SKB_DROP_REASON_XFRM_POLICY);
++		sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_XFRM_POLICY);
+ 		return NET_RX_DROP;
+ 	}
+ 	nf_reset_ct(skb);
+diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
+index f838366e8256..608fa9d05b55 100644
+--- a/net/ipv6/raw.c
++++ b/net/ipv6/raw.c
+@@ -362,14 +362,14 @@ static inline int rawv6_rcv_skb(struct sock *sk, struct sk_buff *skb)
+ 	if ((raw6_sk(sk)->checksum || rcu_access_pointer(sk->sk_filter)) &&
+ 	    skb_checksum_complete(skb)) {
+ 		atomic_inc(&sk->sk_drops);
+-		kfree_skb_reason(skb, SKB_DROP_REASON_SKB_CSUM);
++		sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_SKB_CSUM);
+ 		return NET_RX_DROP;
+ 	}
+ 
+ 	/* Charge it to the socket. */
+ 	skb_dst_drop(skb);
+ 	if (sock_queue_rcv_skb_reason(sk, skb, &reason) < 0) {
+-		kfree_skb_reason(skb, reason);
++		sk_skb_reason_drop(sk, skb, reason);
+ 		return NET_RX_DROP;
+ 	}
+ 
+@@ -390,7 +390,7 @@ int rawv6_rcv(struct sock *sk, struct sk_buff *skb)
+ 
+ 	if (!xfrm6_policy_check(sk, XFRM_POLICY_IN, skb)) {
+ 		atomic_inc(&sk->sk_drops);
+-		kfree_skb_reason(skb, SKB_DROP_REASON_XFRM_POLICY);
++		sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_XFRM_POLICY);
+ 		return NET_RX_DROP;
+ 	}
+ 	nf_reset_ct(skb);
+@@ -415,7 +415,7 @@ int rawv6_rcv(struct sock *sk, struct sk_buff *skb)
+ 	if (inet_test_bit(HDRINCL, sk)) {
+ 		if (skb_checksum_complete(skb)) {
+ 			atomic_inc(&sk->sk_drops);
+-			kfree_skb_reason(skb, SKB_DROP_REASON_SKB_CSUM);
++			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_SKB_CSUM);
+ 			return NET_RX_DROP;
+ 		}
  	}
 -- 
 2.30.2
