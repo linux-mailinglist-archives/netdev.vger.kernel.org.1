@@ -1,98 +1,73 @@
-Return-Path: <netdev+bounces-99954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 293FE8D72B1
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 01:20:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF80B8D72B7
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 01:25:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4AB31F216CF
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 23:20:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77EE52818CA
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 23:25:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A5644366;
-	Sat,  1 Jun 2024 23:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37FD844366;
+	Sat,  1 Jun 2024 23:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pti8llGT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YtLygYHL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30D841C680;
-	Sat,  1 Jun 2024 23:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073232594;
+	Sat,  1 Jun 2024 23:25:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717284030; cv=none; b=gSsDgoqKtsiUsG/Sg3fKywlhwLQhIPqUv88AIGHYVh/cWmresHz84DrcvDh2jOT1rcMB4XwRh5wd37h3xgU2sCLsjjSXMDI21bwgnlSw0ElBRIPPtJMFw9rY/w2HYffLiXu6pG6wHiJfSgrRcm9X/bMU2jPywviqtc+Xr1DZio0=
+	t=1717284333; cv=none; b=AYVAjuaBU5bHQf1GxZ1lEXygdMR/EAsnmoOvzNpc7mu++qxifQzxnstkYC+ZxP45Y9VHnKQ09iF6DkgmBhPGcDrEOI6TUZl41meZpfChWAmC+sdcur6MwseTJOhTuHiz39qCD5shAVygaBS9Esw3ZDxq7wy4+Y97X/xH9fWeUnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717284030; c=relaxed/simple;
-	bh=TnMNRk/w6PSirdgEmK2klgbQv1j+5PdUI5UdJVn345Q=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QcOYU9nfyJCL7WpxLMhWCcldjPQbeufyI4me4DUfyjGQQZ29YHJD5dNKJRvCIbGFspW6ZhFXwjyfij0EXWki7ycFJv5OB+2IWGOPLwPNn1zX1KrjcfmlEWldpIbWdX2MVHi+dYPRDpVK1OJP4BWihNvphvMPO7J+sn39KMNRrmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pti8llGT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B73ABC4AF07;
-	Sat,  1 Jun 2024 23:20:29 +0000 (UTC)
+	s=arc-20240116; t=1717284333; c=relaxed/simple;
+	bh=bWqX4drNC9o6AwoxILiTunyHa9cMrhcFzjYMPovyb30=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aQLmSNts/DEvzPUyJG142viuB1o3VCxHfjGTZapLO8UTVPYcN7yj+XoemnZxfuSTv6+z6R1IqKu80wNhQU2hjo8Pru/VwKv22qUvhv6Byohhsf8qPJdBfeh8NkkhYE5hJL4xE004dw1vVRc3Wrxk4nJ+A6Niclx5Y3FIvTamSgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YtLygYHL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BCCBC116B1;
+	Sat,  1 Jun 2024 23:25:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717284029;
-	bh=TnMNRk/w6PSirdgEmK2klgbQv1j+5PdUI5UdJVn345Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pti8llGT78EU3LOCGKz7Eb8J3EE86loJoSKMl0aiYWbqVZ4ds+FBuH53M2OZKuJ3f
-	 XG+RGThkQm2fupVZXDGWnSp0M/TymCA2T8++SBka6HZZKK08A98vG0V/DjTs8q8/9z
-	 mqB7kRzIGR3Elwz1ZC/GiPmzXAq7YOq+9ATYVP3Yepv3zuvdl0ZPRGPHgT2RQuxf9F
-	 qL8KTg9nUV+IvMDxbPXAVDjNSYlnmCq+BorkX1Wnt9sslyf+qRmoqhR+/OHf/rOiVL
-	 Cqkw+bIKJFuRPL/oV0kMCRiVlT4AJGBXskaWclEgvBpmVJHqEa4rnyyh/npbyhLiAD
-	 zoHQNPb9v6xag==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A97E9DEA717;
-	Sat,  1 Jun 2024 23:20:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1717284332;
+	bh=bWqX4drNC9o6AwoxILiTunyHa9cMrhcFzjYMPovyb30=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YtLygYHLjSp4sAY5FVV96DhW65UNu1NC1loeVslwO+9p6843fVHug4VqzD5kqVWb+
+	 JnPi18Cp4Fa12GkvLAtr9mcC4wbSpG7NdgYEcl2rZ1yMyxVXt7kF16GDaEBLtT/D8g
+	 luys9rEw+yptp9ytSb3VYJdcsOZxkUkfmXxngNHQceiTnuUd7rVV3Kq830+ONrOSFg
+	 UNQPSPFHdKSffslX1PWPclFlHmkyR4fC8Ta+S8nnPmuGaTXJH4Djz9ygClP+3KfpzK
+	 aPBYKiQ6incSBIbDIv5dfmqNFwGLRHNpmQZkdx+u+6MgfW//KY0itxqKaEffaw/RGP
+	 1BbgwWzaeFvwA==
+Date: Sat, 1 Jun 2024 16:25:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Rengarajan S <rengarajan.s@microchip.com>
+Cc: <woojung.huh@microchip.com>, <UNGLinuxDriver@microchip.com>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-usb@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 0/2] lan78xx: Enable 125 MHz CLK and Auto
+ Speed configuration for LAN7801 if NO EEPROM is detected
+Message-ID: <20240601162531.57670edf@kernel.org>
+In-Reply-To: <20240529140256.1849764-1-rengarajan.s@microchip.com>
+References: <20240529140256.1849764-1-rengarajan.s@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/2] net: visibility of memory limits in netns
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171728402968.13922.4485290889430995702.git-patchwork-notify@kernel.org>
-Date: Sat, 01 Jun 2024 23:20:29 +0000
-References: <20240530232722.45255-1-technoboy85@gmail.com>
-In-Reply-To: <20240530232722.45255-1-technoboy85@gmail.com>
-To: Matteo Croce <technoboy85@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, shakeel.butt@linux.dev,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- teknoraver@meta.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 29 May 2024 19:32:54 +0530 Rengarajan S wrote:
+> This patch series adds the support for 125 MHz clock, Auto speed and
+> auto duplex configuration for LAN7801 in the absence of EEPROM.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+I had to look up why this is not a fix.
 
-On Fri, 31 May 2024 01:27:20 +0200 you wrote:
-> From: Matteo Croce <teknoraver@meta.com>
-> 
-> Some programs need to know the size of the network buffers to operate
-> correctly, export the following sysctls read-only in network namespaces:
-> 
-> - net.core.rmem_default
-> - net.core.rmem_max
-> - net.core.wmem_default
-> - net.core.wmem_max
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2,1/2] net: make net.core.{r,w}mem_{default,max} namespaced
-    https://git.kernel.org/netdev/net-next/c/19249c0724f2
-  - [net-next,v2,2/2] selftests: net: tests net.core.{r,w}mem_{default,max} sysctls in a netns
-    https://git.kernel.org/netdev/net-next/c/5b5233fb81bf
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+When someone asks you a question, please edit the commit message /
+cover letter so that the answer is obvious for the next revision...
 
