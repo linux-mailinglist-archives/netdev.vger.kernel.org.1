@@ -1,98 +1,75 @@
-Return-Path: <netdev+bounces-99941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE6AE8D7281
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 00:30:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A49A8D7287
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 00:34:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84FE21F2191D
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 22:30:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E690E281EAA
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 22:34:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31AE22B9C7;
-	Sat,  1 Jun 2024 22:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66707224CC;
+	Sat,  1 Jun 2024 22:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sBQvyX74"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qk6XOP7Q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC062224CC;
-	Sat,  1 Jun 2024 22:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357E217CD;
+	Sat,  1 Jun 2024 22:34:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717281030; cv=none; b=HO0mpSR8ZUbBgByXEHtgRC74/mId0mK9rK6WSEiKD1sAKKN0UivLOVbRhlwQJJG9YTiS0z4N6aQyr3u8gI4D3ZAhWz0R6CifdQgveaP/LW3injYNpjHINXBbmca0f/wZaVU1KD6kRM3ZqMpnnbC3RyyKfyZWtAG/ClpEe+NMUzQ=
+	t=1717281273; cv=none; b=hIlQ2mJPaojQxHWcLVL7wA2ccExG/qC81NUMJkfm2lgNRhWuzCx9lHMaEE7XuV9jEE5mvdBhdlAQJtbODuQMY1/7iGGxS5kdkyh4buH41wuVObdfQlMtLFXpTYFbhQF82dx5jpXt8TG4fas8kV5YR6hjLDYBnOatUOlgYbC0eCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717281030; c=relaxed/simple;
-	bh=BxJehKDbY16NeSK4HqgSAPE5UO3fb+8pHTqhsHA8MO4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SSo9yth74rjKgttDorvZVEcosFaAofHpu7JuuL7Cv0WALpQHo4F0DM0y+1NvroWIKpWLfKT+GaM4CEEmkZazm6ope6EVTp+ZfYDI/NFZ1BhZxhTFKNzDAPClbDiS+/W1F7TpHp58G9O9sL4VoqbMEOcqavlQLe05Uv2GIyeG7rI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sBQvyX74; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 79774C32786;
-	Sat,  1 Jun 2024 22:30:29 +0000 (UTC)
+	s=arc-20240116; t=1717281273; c=relaxed/simple;
+	bh=/7RICJIhdkyAioWDSfVcToOPLi7N+lZhkwn9ZdLZwdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UDMyJsc1vAOfPr1IcWLd0KOl0P/6h3OaQjcdeTMpc7vDSMRjrUoMJbmMxTBp8Qtq3HzogQ3V44F1xsbq5U/BIZHEtXaVGiv9Du+kwMMQFRAMJxQXy2XB7A4CuvoJs7ZHhtebSr8l8dZp5P534Tm9iMWubrD7iqMh6HZss5ieRHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qk6XOP7Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC77DC116B1;
+	Sat,  1 Jun 2024 22:34:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717281029;
-	bh=BxJehKDbY16NeSK4HqgSAPE5UO3fb+8pHTqhsHA8MO4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sBQvyX74T8gvi7TCiLQcHq2XUMK2sntMrYZGjYjC53aCtkCDHKMD2ybf2a1R11FsE
-	 RLepBlSsPmnfIczy4pJ3jHDWyxT120e6Cc1qvIicFUJuKvHXDQwXgSz2f/eJjMVs3z
-	 qh3+sJhiPQbk/thvrw6qNLtG9zk8cdfKP42/8tTAluHp9NlQk/dEyigt6RblcIBxzQ
-	 or7za3aQp8hBt+JySpFKLBirHdx8bH8cMosnGL55//KRL2RQqjqvAlTAklG7FmZAj6
-	 nrKJo3cq1uDuqtTLFdSNE643AnQwtzamzjcK9Z/GIkLfnmdoiZtY0RQMbokBKVD+cv
-	 38pGY883t/IRQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 69FD6DEA711;
-	Sat,  1 Jun 2024 22:30:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1717281272;
+	bh=/7RICJIhdkyAioWDSfVcToOPLi7N+lZhkwn9ZdLZwdk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qk6XOP7QLxQvaJzodYjBXICKyCzfEgMKoWWU5SAiIbhOXBRMoPxzxtGW36qKFUYTY
+	 /lgnajbB7HY9YMb/JuGjrMvoPQ5asrGNOcOtsPfFxEbxOahDO2ApTq3E5kzMs9u9+R
+	 S3tmpAldw7pcUxWvJh0KGWS5YSMUyyCdSUoXi406ZHFVCnl6Ruua3qdN/iaUqLAsCC
+	 Vd7vTTN1qfvuCS5KgZestXPC03BlHzd+Futp2/PA4hpbMRuL1os5Yglx/0q8dD5mic
+	 /B94tN1RbmdJ/e9shnyaY/YQevuckGqbZEVsFdUSFvCVLIxaGJMMebvp0unYLGI6YK
+	 zdfpZ3X8A/9Ow==
+Date: Sat, 1 Jun 2024 15:34:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ofir Gal <ofir.gal@volumez.com>
+Cc: davem@davemloft.net, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
+ ceph-devel@vger.kernel.org, dhowells@redhat.com, edumazet@google.com,
+ pabeni@redhat.com, kbusch@kernel.org, axboe@kernel.dk, hch@lst.de,
+ sagi@grimberg.me, philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+ christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
+Subject: Re: [PATCH v2 0/4] bugfix: Introduce sendpages_ok() to check
+ sendpage_ok() on contiguous pages
+Message-ID: <20240601153430.19416989@kernel.org>
+In-Reply-To: <20240530142417.146696-1-ofir.gal@volumez.com>
+References: <20240530142417.146696-1-ofir.gal@volumez.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/3] doc: mptcp: new general doc and fixes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171728102943.22013.15601696646895135776.git-patchwork-notify@kernel.org>
-Date: Sat, 01 Jun 2024 22:30:29 +0000
-References: <20240530-upstream-net-20240520-mptcp-doc-v3-0-e94cdd9f2673@kernel.org>
-In-Reply-To: <20240530-upstream-net-20240520-mptcp-doc-v3-0-e94cdd9f2673@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- corbet@lwn.net, gregory.detal@gmail.com, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- rdunlap@infradead.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 30 May 2024 17:24:10 +0300 Ofir Gal wrote:
+> skbuff: before sendpage_ok - i: 0. page: 0x654eccd7 (pfn: 120755)
+> skbuff: before sendpage_ok - i: 1. page: 0x1666a4da (pfn: 120756)
+> skbuff: before sendpage_ok - i: 2. page: 0x54f9f140 (pfn: 120757)
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 30 May 2024 16:07:29 +0200 you wrote:
-> A general documentation about MPTCP was missing since its introduction
-> in v5.6. The last patch adds a new 'mptcp' page in the 'networking'
-> documentation.
-> 
-> The first patch is a fix for a missing sysctl entry introduced in v6.10
-> rc0, and the second one reorder the sysctl entries.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v3,1/3] doc: mptcp: add missing 'available_schedulers' entry
-    https://git.kernel.org/netdev/net-next/c/ccf45c92d746
-  - [net-next,v3,2/3] doc: mptcp: alphabetical order
-    https://git.kernel.org/netdev/net-next/c/a32c6966b23d
-  - [net-next,v3,3/3] doc: new 'mptcp' page in 'networking'
-    https://git.kernel.org/netdev/net-next/c/c049275f24de
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+noob question, how do you get 3 contiguous pages, the third of which 
+is slab? is_slab doesn't mean what I think it does, or we got extremely
+lucky with kmalloc?
 
