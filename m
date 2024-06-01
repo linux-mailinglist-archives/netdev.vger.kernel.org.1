@@ -1,145 +1,119 @@
-Return-Path: <netdev+bounces-99879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75FA08D6D39
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 03:15:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ACDA8D6D47
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 03:36:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B24D288296
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 01:15:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3AFA1F22463
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 01:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C2C46BF;
-	Sat,  1 Jun 2024 01:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19DE4C8D;
+	Sat,  1 Jun 2024 01:35:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="du9P3Xko"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hu+KnvrU"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDD32582;
-	Sat,  1 Jun 2024 01:15:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E659EA55;
+	Sat,  1 Jun 2024 01:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717204531; cv=none; b=N9Ki9rAvRbq7cMjJL3HNS3m/n9ciQa/W3iJjZAdDZ3tVGv41NkUHPvbaoAOEwPF4Q/oOA3U5v/U//m2rNVEO4T+RdnAicCg/vuDogO7HnEHeGQIOYqW4VMv0SP16wdvkuxbGQrgkOcRjYX0FKzHNLvmCTPVR15Re8OPzbnpFxN4=
+	t=1717205752; cv=none; b=p1mEPLnqYo1ZxHE7Pci7FQs5QcktZHpcO+XFDMilPta136p702NBW+0j5q1mAqlAYOhTlblt9Nq1ec+oQFRTz3gu9huQtWVLsjUBk3kcl2qiLUztCuWXDUHZKbKSFYCjrVeaNS812AuPo4bdO7rHtYtFJonrjc4UgNpgZDe7Q9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717204531; c=relaxed/simple;
-	bh=8njHc4+OQxH6Zvo0xJgYYXhAprYJryPWqzqHTO7+d1Y=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=QyhsVyaUi9noIYtSXYkxjQJlDLpRzcyAXuPTrxv/X0HBh7wAzA/pl7LFhviGBzorC/ZP5Jm/6QIFPurmI76e/CN4GfGFbZzkIVSQ5YyQILBoI41+fUembR6jNAH2lvKol6epEDpAjOmXPM3Zfb8bbMmLLI9nCE9YaqlNA5nOAlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=du9P3Xko; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1717204520; h=Message-ID:Subject:Date:From:To;
-	bh=7c9v1vjRkw+eOQnY17pAKIlCydJpq+ODaejt+ncs1Os=;
-	b=du9P3XkokTkzMZZ1ONDAopbWg66PL4JLiNeZ6EPAGwVoow1TCNIxOw6Yk/VFreSzIF4ekSrIHhSo/jVPeT+eGRTZXkiFwEWzeMR2BnQ+Zitva76sXqjTc7OsZ2wCFucCEfceDDam6+t9GJnw9sl25xJaGVtAHUOyCSsRmfuwVbA=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067110;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W7bCb3w_1717204518;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W7bCb3w_1717204518)
-          by smtp.aliyun-inc.com;
-          Sat, 01 Jun 2024 09:15:19 +0800
-Message-ID: <1717203689.8004525-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v2 00/12] virtnet_net: prepare for af-xdp
-Date: Sat, 1 Jun 2024 09:01:29 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240530112406.94452-1-xuanzhuo@linux.alibaba.com>
- <20240530075003-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240530075003-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1717205752; c=relaxed/simple;
+	bh=JIE5jOBsrlzZ0lEBPCZS1yYi5SPKvHwIFS3deAbj+uA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=Y4AEzAGOa4mWhaQACdW6TkFa3XczwOIvqvu886PMnMvMZHONVpVFnPTwjAgV0zxWqpGcTHucj3HnkRuutASLWzEH7nhITQFRnfjtCWuqF+qPG0IVcgVwzH2P3GU7Jkm6+tulxh8pFNbSQL6c9JuySRCwP3fmMlOdhInqY0nCpYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hu+KnvrU; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44VGXrxl003132;
+	Sat, 1 Jun 2024 01:35:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=2RJguZbdCcE6FZLVBkMIrT
+	6V48VaPYg6v2ZfQzLv98o=; b=hu+KnvrUlNh2flrt/fnDI8dKU3VRd3I7y4jrJ9
+	WJ/a9PhIh8NG623qZCEiyWMw6vppyzZMgQP4TzZd9cFsCV9dbEJm8lUVcwHKyNHM
+	nWashyK2tvd0Yialz+H0NxbyJCNpulcq6ac5w6+z0mQY/d6fU5Rqy9QfOsNwbDvN
+	1iOUBY+JCgNz0V09Blpno1EP6X5zBJrq4Iz8Fia1mJ8ObgTSMvcgVaSXGgncjycC
+	xvCqKvTgSKoqGzzNq87Cear8CTxlxj6lwt9FfMN79H4fn8C9H8dCKQy3pWRuQhnN
+	TYnkcoT5O+6ghHCHDH3S6MtJ8717WdS5lZsUMROoWJCIzp9g==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yfa9bjj59-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 01 Jun 2024 01:35:45 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 4511ZiN4018678
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 1 Jun 2024 01:35:44 GMT
+Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 31 May
+ 2024 18:35:43 -0700
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Date: Fri, 31 May 2024 18:35:43 -0700
+Subject: [PATCH] lib/test_rhashtable: add missing MODULE_DESCRIPTION()
+ macro
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <20240531-md-lib-test_rhashtable-v1-1-cd6d4138f1b6@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIAO56WmYC/x3M0QrCMAxA0V8ZeTbQznWIvyIi6RZtoKuSVBmM/
+ bvVx/Nw7wbGKmxw7jZQ/ojJszT4QwdTovJglLkZetcPLhw9LjNmiVjZ6k0TWaoUM6MfgjuNcWQ
+ fGFr8Ur7L+h9frs2RjDEqlSn9dlnKe8WFrLLCvn8BRb4hhocAAAA=
+To: Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>,
+        Jeff Johnson <quic_jjohnson@quicinc.com>
+X-Mailer: b4 0.13.0
+X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: E6A4vEU4dtSJMEaBdutNQky12Qni-kE5
+X-Proofpoint-GUID: E6A4vEU4dtSJMEaBdutNQky12Qni-kE5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-31_14,2024-05-30_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 priorityscore=1501 bulkscore=0 adultscore=0 mlxscore=0
+ phishscore=0 clxscore=1011 spamscore=0 malwarescore=0 suspectscore=0
+ mlxlogscore=895 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406010010
 
-On Thu, 30 May 2024 07:53:17 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Thu, May 30, 2024 at 07:23:54PM +0800, Xuan Zhuo wrote:
-> > This patch set prepares for supporting af-xdp zerocopy.
-> > There is no feature change in this patch set.
-> > I just want to reduce the patch num of the final patch set,
-> > so I split the patch set.
-> >
-> > Thanks.
-> >
-> > v2:
-> >     1. Add five commits. That provides some helper for sq to support premapped
-> >        mode. And the last one refactors distinguishing xmit types.
-> >
-> > v1:
-> >     1. resend for the new net-next merge window
-> >
->
->
-> It's great that you are working on this but
-> I'd like to see the actual use of this first.
+make allmodconfig && make W=1 C=1 reports:
+WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_rhashtable.o
 
-I want to finish this work quickly. I don't have a particular preference for
-whether to use a separate directory; as an engineer, I think it makes sense. I
-don't want to keep dwelling on this issue. I also hope that as a maintainer, you
-can help me complete this work as soon as possible. You should know that I have
-been working on this for about three years now.
+Add the missing invocation of the MODULE_DESCRIPTION() macro.
 
-I can completely follow your suggestion regarding splitting the directory.
-However, there will still be many patches, so I hope that these patches in this
-patch set can be merged first.
+Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+---
+ lib/test_rhashtable.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-   virtio_net: separate virtnet_rx_resize()
-   virtio_net: separate virtnet_tx_resize()
-   virtio_net: separate receive_mergeable
-   virtio_net: separate receive_buf
-   virtio_net: refactor the xmit type
+diff --git a/lib/test_rhashtable.c b/lib/test_rhashtable.c
+index 42b585208249..c63db03ebb9d 100644
+--- a/lib/test_rhashtable.c
++++ b/lib/test_rhashtable.c
+@@ -811,4 +811,5 @@ static void __exit test_rht_exit(void)
+ module_init(test_rht_init);
+ module_exit(test_rht_exit);
+ 
++MODULE_DESCRIPTION("Resizable, Scalable, Concurrent Hash Table test module");
+ MODULE_LICENSE("GPL v2");
 
-I will try to compress the subsequent patch sets, hoping to reduce them to about 15.
+---
+base-commit: b050496579632f86ee1ef7e7501906db579f3457
+change-id: 20240531-md-lib-test_rhashtable-145086b6e15e
 
-Thanks.
-
-
->
-> >
-> > Xuan Zhuo (12):
-> >   virtio_net: independent directory
-> >   virtio_net: move core structures to virtio_net.h
-> >   virtio_net: add prefix virtnet to all struct inside virtio_net.h
-> >   virtio_net: separate virtnet_rx_resize()
-> >   virtio_net: separate virtnet_tx_resize()
-> >   virtio_net: separate receive_mergeable
-> >   virtio_net: separate receive_buf
-> >   virtio_ring: introduce vring_need_unmap_buffer
-> >   virtio_ring: introduce dma map api for page
-> >   virtio_ring: introduce virtqueue_dma_map_sg_attrs
-> >   virtio_ring: virtqueue_set_dma_premapped() support to disable
-> >   virtio_net: refactor the xmit type
-> >
-> >  MAINTAINERS                                   |   2 +-
-> >  drivers/net/Kconfig                           |   9 +-
-> >  drivers/net/Makefile                          |   2 +-
-> >  drivers/net/virtio/Kconfig                    |  12 +
-> >  drivers/net/virtio/Makefile                   |   8 +
-> >  drivers/net/virtio/virtnet.h                  | 248 ++++++++
-> >  .../{virtio_net.c => virtio/virtnet_main.c}   | 596 +++++++-----------
-> >  drivers/virtio/virtio_ring.c                  | 118 +++-
-> >  include/linux/virtio.h                        |  12 +-
-> >  9 files changed, 606 insertions(+), 401 deletions(-)
-> >  create mode 100644 drivers/net/virtio/Kconfig
-> >  create mode 100644 drivers/net/virtio/Makefile
-> >  create mode 100644 drivers/net/virtio/virtnet.h
-> >  rename drivers/net/{virtio_net.c => virtio/virtnet_main.c} (93%)
-> >
-> > --
-> > 2.32.0.3.g01195cf9f
->
 
