@@ -1,108 +1,119 @@
-Return-Path: <netdev+bounces-99950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 542CB8D72AB
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 01:10:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA4B98D72AC
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 01:10:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F516281395
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 23:10:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2B842813C2
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 23:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C19222F1E;
-	Sat,  1 Jun 2024 23:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE3539FEB;
+	Sat,  1 Jun 2024 23:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="aeoaWuxt"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jaXCDTOb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9D338FB0
-	for <netdev@vger.kernel.org>; Sat,  1 Jun 2024 23:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EABB822F1E
+	for <netdev@vger.kernel.org>; Sat,  1 Jun 2024 23:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717283418; cv=none; b=Kq35ibgctpQ8+9BE0y7MKQuVyQBIzyRukluoSjWv2HNZUcVt65aOiiIhRL1nlNS62+6wCiss62/He9142y3qeWNmZj/Fe46oEVSAfdRnnsvFRsTmqkN11cL4T+54cKEpI/tXgBfTwLTcfab8gQN8bCytCnyblFoxqs+uo+4SFlU=
+	t=1717283433; cv=none; b=GCl9pNbqP3MHiLzWZXlAiQKVXkiBZWwmbUhG9EEkrSnt7wD7lt8Um5Sxk/xf6S03GJDRSf4ltQKNc6jrp76p4/c4KcSo6xBaKRRx/2d4zk0C9ZtUXOkp/87Z2hOpDY8sKwyQOGAn6fjQ7esTNh6qABwM9ADFBEu+FQ2a+CffQxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717283418; c=relaxed/simple;
-	bh=QSzoC+J3evxRdNx7jjZB+Optb7puke7ZZvRp3epTuRY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CwKPIjgcgmeTkrX1jQDcqo/dTCDgosHXS4O1lyqhuAaHLyix/rFVSFFFJKl/HtmJXOTl8bqLE0gf+/Jv6E2GzKcywYQiXjZaCvyAALYlK4OtFbN1iMfJKhwz49Y8er3Vj4UAtA33mxzFWCPV30bRUx6k30o2SNRhmJQ264ApJng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=aeoaWuxt; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1f6342c5fa8so14910875ad.1
-        for <netdev@vger.kernel.org>; Sat, 01 Jun 2024 16:10:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1717283415; x=1717888215; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HbSov62WxJ+FXZ1blI97jG+IhmcO8chYp/ObclCZSe8=;
-        b=aeoaWuxtnjoJzoFYllHs9ayWhWe0y+2B8/iWDow/ugz2CuYMDNcQpXT+USM849Avr2
-         HMNhiDVt29oPx+rEMZB4Zd86ap3QTAsfDHclWoOlkPhTAmQ+pZDkGXG3LTCbYWjKfvJs
-         1WQ/eYrCPgo3HDNtT5U177DxSCHmGSFkD63ysXSHYgY44+83CVul7esGKxX+dj1gSFf3
-         zFh14rPhKKZee3joOdotGhMz6pYvJynIxsmg3lvbwTE1CRkSyS5GP4zQ1ILftqNbhGfB
-         wyW2zAPuf5eJtALlP3cBOPXPQ1VWEmvqWNIlRkfWYjldH4CQ/ti6xp4ezO6/hLUwvtXz
-         IeAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717283415; x=1717888215;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HbSov62WxJ+FXZ1blI97jG+IhmcO8chYp/ObclCZSe8=;
-        b=ucB+FPvkqRXbpEPeZ4k/suFnuYbVB13H0Y16LsPU4zHFMlm+L4w8L+cJTxgZc8zcBq
-         BmTnyjwfrE3DLvg0wK2HERTABwmcUrzqRaPpu6qcHG8+H6d9IhOPkzytKryAmPwHHnXN
-         nw0BsncrGxPXwVB2ic29K4+tVNf+wFVXqabmdhMGA4eizS1YWyJSE6mMexohL+lA6L/N
-         xCD942U1W/71AqLj34lNcRBcKQ7gOY8OSGue24uBcl5nfcTxmw8r39L7z7RpFvtr5fuu
-         LjZpb/JYaBQfnP9sj2UJODQK19kz3x2lzAOZR59c1FBbwfmbhjzcDQ2JGYrrkOdEfk+5
-         I2VA==
-X-Forwarded-Encrypted: i=1; AJvYcCW60cMSJpLKpLdvFnLCt1b8aNNAL9loYmvJ+r208Ouxsy5D9tCWdCWK3MtbralrGjJOkEdqwSrLAUnI3aeM61vP72TFuNLz
-X-Gm-Message-State: AOJu0YyZi5BuTR6h2iru13YonMeAjZqV99w9+CPp3JK4r2QU6/n5JAJK
-	wyzahbGuglyVOQ1+gDr6kJUHYQvNxcBRgFQGLseP1qeLLeysNb84iXrOcdGV+Ng=
-X-Google-Smtp-Source: AGHT+IGw0N5rqwCb8FqnWNnIKbOOUCe/SmbxbHRGe+lbs8z5VLZbJCSFzhZhqNTBqIxCC1wJcSQWBg==
-X-Received: by 2002:a17:902:ec87:b0:1f4:9e9f:57df with SMTP id d9443c01a7336-1f6370b1249mr71046035ad.58.1717283415487;
-        Sat, 01 Jun 2024 16:10:15 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f63241ad60sm37889105ad.290.2024.06.01.16.10.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Jun 2024 16:10:15 -0700 (PDT)
-Date: Sat, 1 Jun 2024 16:10:13 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>,
- dsahern@kernel.org
-Subject: Re: [PATCH net] inet: bring NLM_DONE out to a separate recv() in
- inet_dump_ifaddr()
-Message-ID: <20240601161013.10d5e52c@hermes.local>
-In-Reply-To: <20240601212517.644844-1-kuba@kernel.org>
-References: <20240601212517.644844-1-kuba@kernel.org>
+	s=arc-20240116; t=1717283433; c=relaxed/simple;
+	bh=xc5D6iinK+ZdTIWBCQ93YABmH3bdBh266+L6Y+YFahM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=EN/1mObHZIaSJvUn6Lvsi+O3PhinIDeXv58+KglItUd5o8R34pqmuKpLXo02y6UjVNQ1k2Q/lQwyiDJBSLxENMj9d1YWWqVZOFP0oFY5lMKw28jMq2+iGE8Qvwe/1kZNNAs7vvCbpjSYMUjx7vmSM/ey5HfOLVFoLf1bXc1dm5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jaXCDTOb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 78560C32786;
+	Sat,  1 Jun 2024 23:10:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717283432;
+	bh=xc5D6iinK+ZdTIWBCQ93YABmH3bdBh266+L6Y+YFahM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jaXCDTOb7bsWL6z9vUXgjBwPt9K7QB+/JJ/tBzmXxhEPG7fhuEE6shHgPJ+OE3sRt
+	 rDbpEsuRVTjoCtSPbVLwfVxRLzM3ou6RJPEjAp/tXthBZLgYmLqSJnfJwS8LXePk4l
+	 5N9U947bQ8082fY6eKQz+QFhAq24ml6SIATR6NycKlWhUUDECU2PkdQ5oneFRCP7Fa
+	 MMqn75lWkB61CdH/MXUk0c1zQajixMAtzGs81h3Bkfzcrpvd0wI64BaQAxGDecEOiS
+	 QFpX1nshdQodSPVjh6sXaMuWJ1uBs9xCeToa3ZESqDySw+5pJOMEiAqgP9NVukqxWl
+	 nDiIOgshhpznw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 65EEADEA711;
+	Sat,  1 Jun 2024 23:10:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH next 00/11] ice: Introduce ETH56G PHY model for E825C
+ products
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171728343241.8366.1128871642096497353.git-patchwork-notify@kernel.org>
+Date: Sat, 01 Jun 2024 23:10:32 +0000
+References: <20240528-next-2024-05-28-ptp-refactors-v1-0-c082739bb6f6@intel.com>
+In-Reply-To: <20240528-next-2024-05-28-ptp-refactors-v1-0-c082739bb6f6@intel.com>
+To: Keller@codeaurora.org, Jacob E <jacob.e.keller@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
+ jiri@resnulli.us, karol.kolacinski@intel.com, przemyslaw.kitszel@intel.com,
+ arkadiusz.kubalewski@intel.com, himasekharx.reddy.pucha@intel.com,
+ sergey.temerkhanov@intel.com, michal.michalik@intel.com,
+ grzegorz.nitka@intel.com, prathisna.padmasanan@intel.com,
+ pawel.kaminski@intel.com, mateusz.polchlopek@intel.com
 
-On Sat,  1 Jun 2024 14:25:17 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+Hello:
 
-> + * When used in combination with for_each_netdev_dump() - make sure to
-> + * invalidate the ifindex when iteration is done. for_each_netdev_dump()
-> + * does not move the iterator index "after" the last valid entry.
-> + *
-> + * NOTE: Do not use this helper for dumps without known legacy users!
-> + *       Most families are accessed only using well-written libraries
-> + *       so starting to coalesce NLM_DONE is perfectly fine, and more efficient.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Sorry, I disagree.
+On Tue, 28 May 2024 16:03:50 -0700 you wrote:
+> E825C products have a different PHY model than E822, E823 and E810 products.
+> This PHY is ETH56G and its support is necessary to have functional PTP stack
+> for E825C products.
+> 
+> This series refactors the ice driver to add support for the new PHY model.
+> 
+> Karol introduces the ice_ptp_hw structure. This is used to replace some
+> hard-coded values relating to the PHY quad and port numbers, as well as to
+> hold the phy_model type.
+> 
+> [...]
 
-You can't just fix the problem areas. The split was an ABI change, and there could
-be a problem in any dump. This the ABI version of the old argument 
-  If a tree falls in a forest and no one is around to hear it, does it make a sound?
+Here is the summary with links:
+  - [next,01/11] ice: Introduce ice_ptp_hw struct
+    https://git.kernel.org/netdev/net-next/c/d551d075b043
+  - [next,02/11] ice: Introduce helper to get tmr_cmd_reg values
+    (no matching commit)
+  - [next,03/11] ice: Implement Tx interrupt enablement functions
+    (no matching commit)
+  - [next,04/11] ice: Add PHY OFFSET_READY register clearing
+    https://git.kernel.org/netdev/net-next/c/c199b31a043c
+  - [next,05/11] ice: Move CGU block
+    (no matching commit)
+  - [next,06/11] ice: Introduce ice_get_base_incval() helper
+    https://git.kernel.org/netdev/net-next/c/1f374d57c393
+  - [next,07/11] ice: Introduce ETH56G PHY model for E825C products
+    https://git.kernel.org/netdev/net-next/c/7cab44f1c35f
+  - [next,08/11] ice: Change CGU regs struct to anonymous
+    https://git.kernel.org/netdev/net-next/c/b390ecc2e375
+  - [next,09/11] ice: Add support for E825-C TS PLL handling
+    https://git.kernel.org/netdev/net-next/c/713dcad2a8c7
+  - [next,10/11] ice: Add NAC Topology device capability parser
+    https://git.kernel.org/netdev/net-next/c/5f847eede638
+  - [next,11/11] ice: Adjust PTP init for 2x50G E825C devices
+    https://git.kernel.org/netdev/net-next/c/4409ea1726cb
 
-All dumps must behave the same. You are stuck with the legacy behavior.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
