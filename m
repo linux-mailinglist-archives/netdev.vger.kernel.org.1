@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-99891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C490E8D6DFC
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 07:06:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F32348D6DFD
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 07:06:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78C9328379B
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 05:06:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 301191C2180C
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 05:06:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C1B0D2FA;
-	Sat,  1 Jun 2024 05:06:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0C6BA94B;
+	Sat,  1 Jun 2024 05:06:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kXN08pqL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OSxvJ/im"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52703A94B
-	for <netdev@vger.kernel.org>; Sat,  1 Jun 2024 05:06:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60AB3D304
+	for <netdev@vger.kernel.org>; Sat,  1 Jun 2024 05:06:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717218368; cv=none; b=FplOJmVLEzZVdHgpdhNhsZoWXdFobwb8pnzdqtRJRI+XImc/sol07ipG3XE2yarlXEKlVxDcCBzjkm9fvg4wG7RIFDjB4srG7HVGqvFWvyqi/0hue0NNpIXJxSGcrXRiSkYatuAfkHatz/4Hn2G6I/GI0Ei6FWsosbHSgn0yXKU=
+	t=1717218369; cv=none; b=iUvUud6LdQ4pzVPS9B+KA8cE9gjmGQ12asr9YMmW7TpEmY6i8vzj7AEtoFtp6peToGiahU57558i6cbnnFgRsNe/qUqIhYOMyCNi7r7ffVunF/YM7Lsv5gobIES7Sov0LSlmOZl1mbxlympOMHdCJEbvU5AkWHAfImWvj/sTfx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717218368; c=relaxed/simple;
-	bh=5gAAu0+ANjZ2f3aNfH2MIaQStoz7OJBOTF/8vijLQjk=;
+	s=arc-20240116; t=1717218369; c=relaxed/simple;
+	bh=VTMW35vEjpM/QHpe8flrpNOsuPZ/GSDAzkaNqO8kDJg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TPwBHyj0QsrmEPqWx6g2rX2ETkTAmvX5vUyYJb0bCkLemLGeZCMqjc3gAufqbcNDmanAldi59W0z0qlEUUFew29wtg4eE288NWERj+f6wmFxllfP2XkjjC/6TObiSuPf5U6Tnk8uJLq0jOC38k5ONSLKy6mQpUCu7fceXAcGtk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kXN08pqL; arc=none smtp.client-ip=198.175.65.19
+	 MIME-Version; b=X0jOZsCyc38qfKdKGfAN/45KyZXDgiXGsuAt0TgOSEbAs9vhsvR3N1PWW7ld7j70vfUXBYMAyixl5ZRE8vC382PM921AnEntQCbSOzjsROmOowX9PCMDF3xDTc2rL+gUHLAtTKvmVsxJOGi+VeLWm8dvngWtKv7kj+Now3P0Vz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OSxvJ/im; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717218367; x=1748754367;
+  t=1717218369; x=1748754369;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=5gAAu0+ANjZ2f3aNfH2MIaQStoz7OJBOTF/8vijLQjk=;
-  b=kXN08pqL0iuZ7uQGnz6Rr03ZhFfycuLyOWZ7zlLmjfh76uYtK1mQN/2D
-   oGnjH7Tvcx1TyxNhdACUCAOStQsUTMQbECSxEAvUgmmcl+efZJV399aia
-   pLZvgWdVXiwicChnkSLt76XyTMTNlob3gVmsqhZGUGjBbQUqvknkUmhDY
-   u/V2EZYw3iP3YRXNTzBaDBoo37AjBn6kiV/+4QbM1G2q6NTqNjAWUBT+k
-   H+AZo5xBx2kdCyozZ0vYIpuMIbIjvkZjh2E+uOw4mbF8AZc1V0JPK5VR6
-   8xxnwOCT/8WjYxig+hOXrqzDUfDUBqQ6OSqM4kjFwhWE8r5OO2Gm0XUsf
-   g==;
-X-CSE-ConnectionGUID: jkL7FUyfRoeMhbj0wRfA2Q==
-X-CSE-MsgGUID: cOaN8WxnTvmGnCwn5sTaKg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11089"; a="13617877"
+  bh=VTMW35vEjpM/QHpe8flrpNOsuPZ/GSDAzkaNqO8kDJg=;
+  b=OSxvJ/imIwPIdLoY2dq3VmJBHfTuNBOjtyrCfdVPDyX5dPSkkBCsEyAQ
+   2QJhAK0RDq9ijjtfocnu61vswSLyoQ6wcWao2YuuE/ayWeVs9WGAmwVAb
+   RLHMJwSAO9VwjlFzPVAzFszzzZuXcWjGsl9ws1/+gz4OmFwqxYyn4Upjs
+   gYok+Z+KWa4/5tkNzev3Xe2UClK05WKOZsOEPlRsiT/aTpJHOYtBtzZQB
+   jliUW5u2/AKqEfT1lH+RT3qK8UYa/5xNSUh4sRqbXkPm7y+gPP6bS6pnZ
+   850oLqQndjOyOhcS1oSHXml491KF6k9W5y1adDwD2FCuwp5tCgu5vr96F
+   A==;
+X-CSE-ConnectionGUID: zoqL1LGkSO2Ngf4BsI55jQ==
+X-CSE-MsgGUID: NVObdTKZQYyzE7XNRlS9tw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11089"; a="13617883"
 X-IronPort-AV: E=Sophos;i="6.08,206,1712646000"; 
-   d="scan'208";a="13617877"
+   d="scan'208";a="13617883"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
   by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2024 22:06:06 -0700
-X-CSE-ConnectionGUID: UaZoHNPfQl+7hO4Bkyu/HA==
-X-CSE-MsgGUID: lCa6v8GkRrS6YR6RZ4ehKg==
+X-CSE-ConnectionGUID: TsnPq5hSQE6SquLzxWy+YQ==
+X-CSE-MsgGUID: F6s4g2OvSFecWpLHIkmYWw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,206,1712646000"; 
-   d="scan'208";a="41286990"
+   d="scan'208";a="41286992"
 Received: from black.fi.intel.com ([10.237.72.28])
   by orviesa005.jf.intel.com with ESMTP; 31 May 2024 22:06:03 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1001)
-	id CC3CBA1; Sat, 01 Jun 2024 08:06:01 +0300 (EEST)
+	id D54A718E; Sat, 01 Jun 2024 08:06:01 +0300 (EEST)
 From: Mika Westerberg <mika.westerberg@linux.intel.com>
 To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
 	Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -73,9 +73,9 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Naama Meir <naamax.meir@linux.intel.com>,
 	netdev@vger.kernel.org,
 	Mika Westerberg <mika.westerberg@linux.intel.com>
-Subject: [PATCH 1/2] Revert "igc: fix a log entry using uninitialized netdev"
-Date: Sat,  1 Jun 2024 08:06:00 +0300
-Message-ID: <20240601050601.1782063-2-mika.westerberg@linux.intel.com>
+Subject: [PATCH 2/2] igc: Use PCI device pointer in logging in igc_ptp_init()
+Date: Sat,  1 Jun 2024 08:06:01 +0300
+Message-ID: <20240601050601.1782063-3-mika.westerberg@linux.intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240601050601.1782063-1-mika.westerberg@linux.intel.com>
 References: <20240601050601.1782063-1-mika.westerberg@linux.intel.com>
@@ -87,65 +87,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This reverts commit 86167183a17e03ec77198897975e9fdfbd53cb0b.
+As described in the commit 86167183a17e ("igc: fix a log entry using
+uninitialized netdev"), the netdev has not yet been registered so we get
+weird log entry like:
 
-The commit in question moved call to igc_ptp_init() to happen after
-igc_reset() which calls igc_ptp_reset() with the spinlock not yet
-initialized so we get following splat:
+[    5.133667] igc 0000:01:00.0 (unnamed net_device) (uninitialized): PHC added
 
- BUG: spinlock bad magic on CPU#4, udevd/249
-  lock: 0xffff98f317e6d4b0, .magic: 00000000, .owner: <none>/-1, .owner_cpu: 0
- CPU: 4 PID: 249 Comm: udevd Not tainted 6.10.0-rc1+ #1312
- Call Trace:
-  <TASK>
-  dump_stack_lvl+0x6c/0x90
-  dump_stack+0x10/0x20
-  spin_bug+0x8c/0xc0
-  do_raw_spin_lock+0x6c/0xc0
-  _raw_spin_lock_irqsave+0x30/0x40
-  igc_ptp_clear_tx_tstamp+0x2e/0xc0 [igc]
-  igc_ptp_set_timestamp_mode+0x191/0x280 [igc]
-  igc_ptp_reset+0x33/0x230 [igc]
-  igc_reset+0xba/0x100 [igc]
-  igc_probe+0x7d1/0xa10 [igc]
+Fix this by using the PCI device pointer instead, that's valid and
+available at this point.
 
-It is likely that there are other things igc_ptp_init() does that are
-required by igc_ptp_reset(), so for this reason revert the commit in
-question.
-
-Fixes: 86167183a17e ("igc: fix a log entry using uninitialized netdev")
-Cc: Corinna Vinschen <vinschen@redhat.com>
-Cc: Hariprasad Kelam <hkelam@marvell.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: Naama Meir <naamax.meir@linux.intel.com>
 Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
 ---
- drivers/net/ethernet/intel/igc/igc_main.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/intel/igc/igc_ptp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 12f004f46082..ace2fbfd87d6 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -7028,6 +7028,8 @@ static int igc_probe(struct pci_dev *pdev,
- 	device_set_wakeup_enable(&adapter->pdev->dev,
- 				 adapter->flags & IGC_FLAG_WOL_SUPPORTED);
- 
-+	igc_ptp_init(adapter);
-+
- 	igc_tsn_clear_schedule(adapter);
- 
- 	/* reset the hardware with the new settings */
-@@ -7049,9 +7051,6 @@ static int igc_probe(struct pci_dev *pdev,
- 	/* Check if Media Autosense is enabled */
- 	adapter->ei = *ei;
- 
--	/* do hw tstamp init after resetting */
--	igc_ptp_init(adapter);
--
- 	/* print pcie link status and MAC address */
- 	pcie_print_link_status(pdev);
- 	netdev_info(netdev, "MAC: %pM\n", netdev->dev_addr);
+diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c b/drivers/net/ethernet/intel/igc/igc_ptp.c
+index 1bb026232efc..c4a5ddbe6f34 100644
+--- a/drivers/net/ethernet/intel/igc/igc_ptp.c
++++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
+@@ -1169,9 +1169,9 @@ void igc_ptp_init(struct igc_adapter *adapter)
+ 						&adapter->pdev->dev);
+ 	if (IS_ERR(adapter->ptp_clock)) {
+ 		adapter->ptp_clock = NULL;
+-		netdev_err(netdev, "ptp_clock_register failed\n");
++		dev_err(&adapter->pdev->dev, "ptp_clock_register failed\n");
+ 	} else if (adapter->ptp_clock) {
+-		netdev_info(netdev, "PHC added\n");
++		dev_info(&adapter->pdev->dev, "PHC added\n");
+ 		adapter->ptp_flags |= IGC_PTP_ENABLED;
+ 	}
+ }
 -- 
 2.43.0
 
