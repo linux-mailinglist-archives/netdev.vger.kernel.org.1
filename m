@@ -1,136 +1,171 @@
-Return-Path: <netdev+bounces-99916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9581B8D6FE0
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 15:06:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AC2B8D6FEA
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 15:09:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEA041F21EBD
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 13:06:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4903283BF0
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 13:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49AE314F13D;
-	Sat,  1 Jun 2024 13:06:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852B51514C3;
+	Sat,  1 Jun 2024 13:09:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C745STl5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XK+toAIN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F65E14E2E4;
-	Sat,  1 Jun 2024 13:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA99412FB34;
+	Sat,  1 Jun 2024 13:09:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717247194; cv=none; b=iskFkcM7zSJMeKFCU5Q9yvMhd26qlIeZGE8R/RFFGDD+3eDFk9so9RmtsqMqDCEav4RpnphKbmdSNOuBTpeBNahALBQXKvC779U5++DqM8J8wb8MfjgAFgXOYIaHL+5Gyx5fE8h6mIEfyQSpnivbuU/oB9AU0KAXaCITahCDH2s=
+	t=1717247351; cv=none; b=R3Q51BL6JEI6Omgp8nwceETtxU83cO/5UMRjnXP5ad0GqG93Zwluz/NgOZKPGJ6Vn1+O8Hhdu/ei8n2nNvJIa5OlGiN6YTFFd+6mWFJWcASHiHTy/56xA9O4o8xaG2z4pYMQrk6bcN2PpIL6Rm+TvgkvqHHBShHpeWAcv+jRGKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717247194; c=relaxed/simple;
-	bh=pUHMnLaHbw8fQVrrxom6RhMVZBz2hDqPwbP8h+otBQs=;
+	s=arc-20240116; t=1717247351; c=relaxed/simple;
+	bh=JeCV8WyWwZWgsRBoBsXvODv76tCrqrpoTPjcXqyhaow=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d382zeuIbUPXFdC1wBjzEl7dZa/VRtvN5I7s8pdTtfCwOGok3EoffuwD5TTm67KMkBQgGU//gA27le1sJA2sJ0uoo8v3Lv8RLijaU7nXTzeliryCJO4bPFkOHi0fNB35i4oER/gWyO9HbhmxsnrUzSAy0EHOqgHgujiuaAckl7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C745STl5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93421C116B1;
-	Sat,  1 Jun 2024 13:06:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717247193;
-	bh=pUHMnLaHbw8fQVrrxom6RhMVZBz2hDqPwbP8h+otBQs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C745STl5epF6aTYeO8Z9UCteuLF1VypR0q76OamDulIddu6EGywENXKWxFO5qZnpT
-	 eTxA0XIwAzafejYUfk6H1h3Jp82Fzs70gMQ5dioQQfCc9vGwQ8y4lKJKphX+Gzt4go
-	 aLChAKfyBMF0x0p/SuJg94gp7o23i43qfgCTUfj921SwUPtO6Ve/KnWyfzHxq1yiuY
-	 KDcoaXHMd+5ST36ksBFPO7l+EfJ37gioTffV9r91MOBdFYRiDFDhnS3DuljU3HqMhL
-	 XZzDnzcZ3jkvV+3JF7zsC65K62/uDTrUSTBI4r09K4QPapIjbw2StSnbrE44YzKdVl
-	 eTnCesujt/SXQ==
-Date: Sat, 1 Jun 2024 14:06:28 +0100
-From: Simon Horman <horms@kernel.org>
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
-	wintera@linux.ibm.com, guwen@linux.alibaba.com, kuba@kernel.org,
-	davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
-Subject: Re: [PATCH net-next v4 3/3] net/smc: Introduce IPPROTO_SMC
-Message-ID: <20240601130628.GK491852@kernel.org>
-References: <1716955147-88923-1-git-send-email-alibuda@linux.alibaba.com>
- <1716955147-88923-4-git-send-email-alibuda@linux.alibaba.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=M4JE/cPlbdfXEZc7eWNN3ckQSVLOig2VDk4AFk8gaz9q/hj8vLloWO3bTMxvoPR9xx+Q9wW3ffdjgSClrcG6MTScG6PXztxsrJU5ARNj3yqCRq4Dtxl4iaYFAuTJTLtA44gkvYDbYWsmfeyDVljzvmDVDH4qeLdOzDd0OVwNbVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XK+toAIN; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1f480624d10so23883935ad.1;
+        Sat, 01 Jun 2024 06:09:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717247349; x=1717852149; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JeCV8WyWwZWgsRBoBsXvODv76tCrqrpoTPjcXqyhaow=;
+        b=XK+toAINfJVGtTmUD3Soy0vZsJyLB8cubuJe/oohosJE2IaO7hXTeDKjcG9hNos62f
+         GJyptL3LNYxldQS3PWjxKnVoONl/DcgWoivTLhiCf8MJwquaGfIx1+g28tsf5TnrcAXt
+         fcNA1NdeyxXUHba0NrCYx5W3sUMwNejEysDA/iTRVdVLisVjYmp30WtRwT4k8NipW/ME
+         0drREBCxR0emIhka6DiTUPv5kg6pe/qxH+AqefRsu7GY79OKUwy40EaqFaVsapp5AiaI
+         V70SSn/KVtxFC8XCcqvioQacmZMftg3asl7k1QEBNqT4rv/DN3rNTxPvYLvAD+tM5+/z
+         SXlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717247349; x=1717852149;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JeCV8WyWwZWgsRBoBsXvODv76tCrqrpoTPjcXqyhaow=;
+        b=mupf7dbpkqcr2BPc2+heTZBijVidN6ng2Quj0GtUTQZrHwszyit75IbOlH+VFWgmki
+         mnqqMvSL5gqqLrl5rOxjNZyPprSryhxaAiCRAiTDSVU3nuGP6gmrmZNr0LOpaoyaQ9nk
+         y/Fg+Xoo2R6rVom+Oe5V4zt3lODm23VoPJWDObB1INKnWj+dVJIK85Y7N5mpeIZjs7ph
+         ra3jmOcFMeErpagEdOUycLhsgITfVKS9jyCee/GyuEzT89xVQLl7B0Xi/ZhTr+FgB/8u
+         ESXlyLnlhKptDbvHfyukGCFdEs+QHAJqUBgMRpvc0P9BqoNdSg4rHH4xFAXUGqZJtt4s
+         G3XA==
+X-Forwarded-Encrypted: i=1; AJvYcCXsDpo+RVKG33/tJ8B2nSqKJjAo1fE5UyixihAQfJyfstahQQdZ98IgGaSXh/WOPmQfBsG+wUsAE60iAffF1iuw+YNNab4chkoaQwj6KVjshlUVCboxjDqvA/sZAbSNCo42nBsgotRNb1KIqq/Nkwh4e/G32hi6ZSExVMFNJ73SmwzOXyid+ed47S2T0SPJvN8ocQpopjAk7ujPGD44PHD4jF6G9z0Y0GPtZNkglZ8nnBaVtX6UTlDMeo6pgMqBcc26xgeqv9OuVdNxuNNSK3dkvV331S5HTQHByrX4NKwXiRExtdw2O6y6U8nCTXzWVQBnCdhN9xsr8/s66bg+QgpKeEioCh8caFlyCG7XTj2quynZe/1LQ1l5TrwvR9VBK4EJViRtZ68adA1HbkoR9VfCPo8+cr+CQ5WT4I3ycUzaa/RKtakCVdFDV4CSnzWC4RRRsmZSHwLgMKqRB0PwnYK+uYQNFCHPcsK4mcyt6BFgG/GDhNmJngp/kSehLtlKSk2GGmK/Fg==
+X-Gm-Message-State: AOJu0YxlpxYMMmDiIQZDSJutOxeVxlxT7Tzqckmx691LsIRcQIFd0xGf
+	au+Un04HmZjznlSwpaTdoUJ0bMe/vuOnUpOvOF6lpLCoNjtzTEgl
+X-Google-Smtp-Source: AGHT+IFMrqly2po5FAbpY8Ll75+7jqZGxykv2GKZgaeba5l+UFazICmi5KDmbbiaIzRe6tWODUDHbA==
+X-Received: by 2002:a17:902:c412:b0:1f6:310b:a3cd with SMTP id d9443c01a7336-1f637018d0dmr55346295ad.20.1717247349084;
+        Sat, 01 Jun 2024 06:09:09 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f632338afbsm33014155ad.47.2024.06.01.06.09.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 01 Jun 2024 06:09:08 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id B7AAC186E1EBA; Sat, 01 Jun 2024 20:09:03 +0700 (WIB)
+Date: Sat, 1 Jun 2024 20:09:03 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Matt Turner <mattst88@gmail.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Shailend Chand <shailend@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Mao Zhu <zhumao001@208suo.com>, Ran Sun <sunran001@208suo.com>,
+	Xiang wangx <wangxiang@cdjrlc.com>,
+	Shaomin Deng <dengshaomin@cdjrlc.com>,
+	Charles Han <hanchunchao@inspur.com>,
+	Attreyee M <tintinm2017@gmail.com>, LihaSika <lihasika@gmail.com>
+Subject: Re: [PATCH net-next v10 13/14] net: add devmem TCP documentation
+Message-ID: <Zlsdb05xe4EnIXmq@archie.me>
+References: <20240530201616.1316526-1-almasrymina@google.com>
+ <20240530201616.1316526-14-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="aC8Ai/5tbLCsiak5"
 Content-Disposition: inline
-In-Reply-To: <1716955147-88923-4-git-send-email-alibuda@linux.alibaba.com>
+In-Reply-To: <20240530201616.1316526-14-almasrymina@google.com>
 
-On Wed, May 29, 2024 at 11:59:07AM +0800, D. Wythe wrote:
-> From: "D. Wythe" <alibuda@linux.alibaba.com>
-> 
-> This patch allows to create smc socket via AF_INET,
-> similar to the following code,
-> 
-> /* create v4 smc sock */
-> v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
-> 
-> /* create v6 smc sock */
-> v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
-> 
-> There are several reasons why we believe it is appropriate here:
-> 
-> 1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
-> address. There is no AF_SMC address at all.
-> 
-> 2. Create smc socket in the AF_INET(6) path, which allows us to reuse
-> the infrastructure of AF_INET(6) path, such as common ebpf hooks.
-> Otherwise, smc have to implement it again in AF_SMC path.
-> 
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
 
-...
+--aC8Ai/5tbLCsiak5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+On Thu, May 30, 2024 at 08:16:12PM +0000, Mina Almasry wrote:
+> Add documentation outlining the usage and details of devmem TCP.
+>=20
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+>=20
 
-...
+The doc LGTM, thanks!
 
-> @@ -3594,9 +3595,31 @@ static int __init smc_init(void)
->  		goto out_lo;
->  	}
->  
-> +	rc = proto_register(&smc_inet_prot, 1);
-> +	if (rc) {
-> +		pr_err("%s: proto_register smc_inet_prot fails with %d\n", __func__, rc);
+Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
 
-Hi,
+--=20
+An old man doll... just what I always wanted! - Clara
 
-FWIIW, my feeling is that if a log message includes __func__ then it should
-be a debug level message, and even then I'm dubious about the value of
-__func__: we do have many tools including dynamic tracing or pinpointing
-problems.
+--aC8Ai/5tbLCsiak5
+Content-Type: application/pgp-signature; name="signature.asc"
 
-So I would suggest rephrasing this message and dropping __func__.
-Or maybe removing it entirely.
-Or if not, lowering the priority of this message to debug.
+-----BEGIN PGP SIGNATURE-----
 
-If for some reason __func__ remains, please do consider wrapping
-the line to 80c columns or less, which can be trivially done here
-(please don't split the format string in any case).
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZlsdaQAKCRD2uYlJVVFO
+o0YSAP9oUIejut2Xeqpj9kDBtkMcGA4Nf4zKVIgKdapDIWoSMAEA/6GrjlpUnXa2
+aFvYS6BFsRnMWpsP7c/bQ/LplabX6wM=
+=YUa0
+-----END PGP SIGNATURE-----
 
-Flagged by checkpatch.pl --max-line-length=80
-
-> +		goto out_ulp;
-> +	}
-> +	inet_register_protosw(&smc_inet_protosw);
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +	rc = proto_register(&smc_inet6_prot, 1);
-> +	if (rc) {
-> +		pr_err("%s: proto_register smc_inet6_prot fails with %d\n", __func__, rc);
-
-Here too.
-
-> +		goto out_inet_prot;
-> +	}
-> +	inet6_register_protosw(&smc_inet6_protosw);
-> +#endif
-
-...
+--aC8Ai/5tbLCsiak5--
 
