@@ -1,119 +1,164 @@
-Return-Path: <netdev+bounces-99880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ACDA8D6D47
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 03:36:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 891428D6D4D
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 03:42:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3AFA1F22463
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 01:35:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E8E528189E
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 01:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19DE4C8D;
-	Sat,  1 Jun 2024 01:35:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C97E79D2;
+	Sat,  1 Jun 2024 01:42:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hu+KnvrU"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="YZGOMqCU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E659EA55;
-	Sat,  1 Jun 2024 01:35:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DFBEC5
+	for <netdev@vger.kernel.org>; Sat,  1 Jun 2024 01:42:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717205752; cv=none; b=p1mEPLnqYo1ZxHE7Pci7FQs5QcktZHpcO+XFDMilPta136p702NBW+0j5q1mAqlAYOhTlblt9Nq1ec+oQFRTz3gu9huQtWVLsjUBk3kcl2qiLUztCuWXDUHZKbKSFYCjrVeaNS812AuPo4bdO7rHtYtFJonrjc4UgNpgZDe7Q9k=
+	t=1717206168; cv=none; b=LQbwX0JEvlHfRl3KEdLOU+yMvE/HjBK7yEgKbbWS1ymqUC2lbuQY6R9mFkikmK9R/9AFTL6tTruZaaoT7uS25oKgMEHC1eZqq+tFVDOJ6z+hOGj62mDDqr+s+NnSlAREd1dt+OjZFMC1WOfyasGaFjqcf69t7rp/9RFTbOKs2eA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717205752; c=relaxed/simple;
-	bh=JIE5jOBsrlzZ0lEBPCZS1yYi5SPKvHwIFS3deAbj+uA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=Y4AEzAGOa4mWhaQACdW6TkFa3XczwOIvqvu886PMnMvMZHONVpVFnPTwjAgV0zxWqpGcTHucj3HnkRuutASLWzEH7nhITQFRnfjtCWuqF+qPG0IVcgVwzH2P3GU7Jkm6+tulxh8pFNbSQL6c9JuySRCwP3fmMlOdhInqY0nCpYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hu+KnvrU; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44VGXrxl003132;
-	Sat, 1 Jun 2024 01:35:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=2RJguZbdCcE6FZLVBkMIrT
-	6V48VaPYg6v2ZfQzLv98o=; b=hu+KnvrUlNh2flrt/fnDI8dKU3VRd3I7y4jrJ9
-	WJ/a9PhIh8NG623qZCEiyWMw6vppyzZMgQP4TzZd9cFsCV9dbEJm8lUVcwHKyNHM
-	nWashyK2tvd0Yialz+H0NxbyJCNpulcq6ac5w6+z0mQY/d6fU5Rqy9QfOsNwbDvN
-	1iOUBY+JCgNz0V09Blpno1EP6X5zBJrq4Iz8Fia1mJ8ObgTSMvcgVaSXGgncjycC
-	xvCqKvTgSKoqGzzNq87Cear8CTxlxj6lwt9FfMN79H4fn8C9H8dCKQy3pWRuQhnN
-	TYnkcoT5O+6ghHCHDH3S6MtJ8717WdS5lZsUMROoWJCIzp9g==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yfa9bjj59-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 01 Jun 2024 01:35:45 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 4511ZiN4018678
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 1 Jun 2024 01:35:44 GMT
-Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 31 May
- 2024 18:35:43 -0700
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-Date: Fri, 31 May 2024 18:35:43 -0700
-Subject: [PATCH] lib/test_rhashtable: add missing MODULE_DESCRIPTION()
- macro
+	s=arc-20240116; t=1717206168; c=relaxed/simple;
+	bh=RtPBGDrjxHAF9pAAHS4/V3G72zZ9pxbAwV6Wa1ILOXI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=rPPw/+w07baHyegGsnC7oJl7eBLCUvpOf+12DSUgjxgEb6r7PAFTmo1dTxVWoDUMo6gHiA3p5AUDWkoZdjglV/X4PbQrpgSyAglHYhIBLdgs36Rq1/46Dp7z0ja4tyGNdj0jfeGHV4c+nx5Wa05KsM5NZ9ovPm2U89H9nEnq63I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=YZGOMqCU; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-62a2424ed00so29214547b3.1
+        for <netdev@vger.kernel.org>; Fri, 31 May 2024 18:42:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1717206164; x=1717810964; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8cHPMeLcn44EVetD1HkMPMRNrtYI3nYnKi2QgdwWdQY=;
+        b=YZGOMqCUpj0mhzwc5yc54DDa8OKa+pUngzFTy8bHBvKFF2M6l3tk6FAaVJWDLvPm0v
+         9+gXSOOgYItVvXVeC7dVBU3kg9bsPxQQu0W0bXu1mhFGbafJZwx1UkmnwTN7gCu0+gfd
+         fXc2XPy8FWZacnFjUZ4kYVI8cf9I4silQh5FjA3+qrN6kdGl1lUriH9Tkndta1cbq4th
+         +buvxxQu4setuWfzA6lCmkbJhmv8G7eKqciiTzARQU3jEzW7om3aYhmJNMK/6/VvVKs5
+         q5/U28/YR0GWrb2P88v2YL0J0dive/M6QUH7X5W5WroMXvpGqqQdMNLVCHMPRBrIcmcK
+         uP1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717206164; x=1717810964;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8cHPMeLcn44EVetD1HkMPMRNrtYI3nYnKi2QgdwWdQY=;
+        b=C3JyRum2jB1oGaTW3OQq4aIG2bSXxmmYPlhUYyqH39bkxnw7BuEMZ9pEaAXw8nLQhT
+         EwFXnUKEVbT5V5gyzJacJHJhbDzxrmxUJAB+4YrEPNYFBTqRRzxrMdHH/eOY7oqwGPnr
+         LSsnM7FKPsjeoLaNAKYuyOUAK2ti/48SKlIsfPRl1GKPme33NmQtA5l+sK1sVY/+9Qk7
+         6NSOpegopZK8cyH/oR2/lq4jzGkQX51QMLFHO6HY1KXc0pAHGstYoIdcjQZb7+XLjzUb
+         8A+yUZFTj6oKlQuPKRCQHAdwKh5PCfWSw1Yvj2fiMYHH8bUqwGifIfb+d1kP24paxHsI
+         oUTQ==
+X-Gm-Message-State: AOJu0Yz4L+6AqZVr0Ctprm4T7D2V+MUK78cbVHt5w7KxIMFSS/YswH03
+	AF1kchsuiHuW+EDPNjV5EkNGJgxlcFly6zn2ftc6karuyKzwQ8q/iY4I/L5EO9BmJsDSlz3gJLI
+	9Xb8=
+X-Google-Smtp-Source: AGHT+IG7sanvx5FAHKJW1bxvvxPFu/J+Chdp5KgLHMLXg3dhzqi/Xmmf5bGO2qo5XX/yN4elKZ1zBQ==
+X-Received: by 2002:a81:400a:0:b0:627:dca5:407b with SMTP id 00721157ae682-62c79708770mr35288347b3.13.1717206163692;
+        Fri, 31 May 2024 18:42:43 -0700 (PDT)
+Received: from debian.debian ([2a09:bac5:7a49:f9b::18e:1c])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-62c766c9ca5sm5321317b3.143.2024.05.31.18.42.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 May 2024 18:42:43 -0700 (PDT)
+Date: Fri, 31 May 2024 18:42:40 -0700
+From: Yan Zhai <yan@cloudflare.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Abhishek Chauhan <quic_abchauha@quicinc.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Florian Westphal <fw@strlen.de>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	David Howells <dhowells@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	linux-kernel@vger.kernel.org, kernel-team@cloudflare.com,
+	Jesper Dangaard Brouer <hawk@kernel.org>
+Subject: [RFC v2 net-next 0/7] net: pass receive socket to drop tracepoint
+Message-ID: <cover.1717206060.git.yan@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20240531-md-lib-test_rhashtable-v1-1-cd6d4138f1b6@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIAO56WmYC/x3M0QrCMAxA0V8ZeTbQznWIvyIi6RZtoKuSVBmM/
- bvVx/Nw7wbGKmxw7jZQ/ojJszT4QwdTovJglLkZetcPLhw9LjNmiVjZ6k0TWaoUM6MfgjuNcWQ
- fGFr8Ur7L+h9frs2RjDEqlSn9dlnKe8WFrLLCvn8BRb4hhocAAAA=
-To: Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>,
-        Jeff Johnson <quic_jjohnson@quicinc.com>
-X-Mailer: b4 0.13.0
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: E6A4vEU4dtSJMEaBdutNQky12Qni-kE5
-X-Proofpoint-GUID: E6A4vEU4dtSJMEaBdutNQky12Qni-kE5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-31_14,2024-05-30_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 priorityscore=1501 bulkscore=0 adultscore=0 mlxscore=0
- phishscore=0 clxscore=1011 spamscore=0 malwarescore=0 suspectscore=0
- mlxlogscore=895 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406010010
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-make allmodconfig && make W=1 C=1 reports:
-WARNING: modpost: missing MODULE_DESCRIPTION() in lib/test_rhashtable.o
+We set up our production packet drop monitoring around the kfree_skb
+tracepoint. While this tracepoint is extremely valuable for diagnosing
+critical problems, it also has some limitation with drops on the local
+receive path: this tracepoint can only inspect the dropped skb itself,
+but such skb might not carry enough information to:
 
-Add the missing invocation of the MODULE_DESCRIPTION() macro.
+1. determine in which netns/container this skb gets dropped
+2. determine by which socket/service this skb oughts to be received
 
-Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
----
- lib/test_rhashtable.c | 1 +
- 1 file changed, 1 insertion(+)
+The 1st issue is because skb->dev is the only member field with valid
+netns reference. But skb->dev can get cleared or reused. For example,
+tcp_v4_rcv will clear skb->dev and in later processing it might be reused
+for OFO tree.
 
-diff --git a/lib/test_rhashtable.c b/lib/test_rhashtable.c
-index 42b585208249..c63db03ebb9d 100644
---- a/lib/test_rhashtable.c
-+++ b/lib/test_rhashtable.c
-@@ -811,4 +811,5 @@ static void __exit test_rht_exit(void)
- module_init(test_rht_init);
- module_exit(test_rht_exit);
- 
-+MODULE_DESCRIPTION("Resizable, Scalable, Concurrent Hash Table test module");
- MODULE_LICENSE("GPL v2");
+The 2nd issue is because there is no reference on an skb that reliably
+points to a receiving socket. skb->sk usually points to the local
+sending socket, and it only points to a receive socket briefly after
+early demux stage, yet the socket can get stolen later. For certain drop
+reason like TCP OFO_MERGE, Zerowindow, UDP at PROTO_MEM error, etc, it
+is hard to infer which receiving socket is impacted. This cannot be
+overcome by simply looking at the packet header, because of
+complications like sk lookup programs. In the past, single purpose
+tracepoints like trace_udp_fail_queue_rcv_skb, trace_sock_rcvqueue_full,
+etc are added as needed to provide more visibility. This could be
+handled in a more generic way.
 
----
-base-commit: b050496579632f86ee1ef7e7501906db579f3457
-change-id: 20240531-md-lib-test_rhashtable-145086b6e15e
+In this change set we propose a new 'sk_skb_reason_drop' call as a drop-in
+replacement for kfree_skb_reason at various local input path. It accepts
+an extra receiving socket argument. Both issues above can be resolved
+via this new argument.
+
+V1->V2: instead of using skb->cb, directly add the needed argument to
+trace_kfree_skb tracepoint. Also renamed functions as Eric Dumazet
+suggested.
+
+V1: https://lore.kernel.org/netdev/cover.1717105215.git.yan@cloudflare.com/
+
+Yan Zhai (7):
+  net: add rx_sk to trace_kfree_skb
+  net: introduce sk_skb_reason_drop function
+  ping: use sk_skb_reason_drop to free rx packets
+  net: raw: use sk_skb_reason_drop to free rx packets
+  tcp: use sk_skb_reason_drop to free rx packets
+  udp: use sk_skb_reason_drop to free rx packets
+  af_packet: use sk_skb_reason_drop to free rx packets
+
+ include/linux/skbuff.h     | 10 ++++++++--
+ include/trace/events/skb.h | 11 +++++++----
+ net/core/dev.c             |  2 +-
+ net/core/skbuff.c          | 22 ++++++++++++----------
+ net/ipv4/ping.c            |  2 +-
+ net/ipv4/raw.c             |  4 ++--
+ net/ipv4/syncookies.c      |  2 +-
+ net/ipv4/tcp_input.c       |  2 +-
+ net/ipv4/tcp_ipv4.c        |  6 +++---
+ net/ipv4/udp.c             | 10 +++++-----
+ net/ipv6/raw.c             |  8 ++++----
+ net/ipv6/syncookies.c      |  2 +-
+ net/ipv6/tcp_ipv6.c        |  6 +++---
+ net/ipv6/udp.c             | 10 +++++-----
+ net/packet/af_packet.c     |  6 +++---
+ 15 files changed, 57 insertions(+), 46 deletions(-)
+
+-- 
+2.30.2
+
 
 
