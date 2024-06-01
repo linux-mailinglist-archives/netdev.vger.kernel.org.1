@@ -1,57 +1,59 @@
-Return-Path: <netdev+bounces-99922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E30B28D7037
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 15:30:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D76DB8D703A
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 15:33:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97DC82822F8
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 13:30:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1459E1C20B88
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 13:33:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77A8D1514D0;
-	Sat,  1 Jun 2024 13:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 543C11514DC;
+	Sat,  1 Jun 2024 13:33:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mF8zfR4c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rn6moEja"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E7A1FA1
-	for <netdev@vger.kernel.org>; Sat,  1 Jun 2024 13:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308B3824AF
+	for <netdev@vger.kernel.org>; Sat,  1 Jun 2024 13:33:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717248630; cv=none; b=cX80UqCT8LXEIY2qRc5btueqa5aSTiUB10S+1fruLFAS4vX9yyKclzaMvX6E3qIqOJ3VwDGM+e0PX119rbg7hSk3eu+UYTNXxcR/b9f1AD7dJsr5MvUypKzOyjitjWF0ZV07gI4HZT5y9vq3JAoLNYj+SFQ4701rNrFHHncNvew=
+	t=1717248808; cv=none; b=lFEBpm1Do04MZF+hGmw1ymoAg3e+qmv1a/Ppcq6r8s7Ts950lCIHg+rv9vYh6rrA4EtR9QMR3q/IqH3P3vxgHhy1/Mq8pW/WVcEVot/J4vf5xU01hyH4KIeXxLp3TKN64QQL9W/NzA7v/e1V2auwfwP0NgkqkE8iDl650W3VqN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717248630; c=relaxed/simple;
-	bh=NE2zh6nIZZVp7tENSf/sGl4moHwYoR+yioOzLzMXE6s=;
+	s=arc-20240116; t=1717248808; c=relaxed/simple;
+	bh=O4Qcp6gTrWx719Wf7YYA47W+bVFj66fUbAcnH/Ic6rQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=piFGrV48YkugrZY7IQpbERX5A9zt4YHZk3RqDBkwMappE3qU2NrnZw4TF0AgdBlZLSvKoy7v72sZYYAB10BR0x5PeJw23GHEr9bEfQYusv6yLdf0xHcURTpmaSAgw6lBAbdseNrSFNOv2uJOWxx5B1q/SaKkB8Bci8OnV/uZNJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mF8zfR4c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34A40C116B1;
-	Sat,  1 Jun 2024 13:30:28 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=kApyIXIsd7jL8Wy1DOdDzWKGyGeY3ol5NYiGzipYh2gxQJNcwX3nw35l3MNDoGI6E/h3UPYMi6RfN7T3R1sHZmGoiJOdqvO5No8T1BB0heFfPtp299q4JMIh+tXWClP0QSuNFx9EM3YohSYDzF2+JvaOts0sctrP5lkk2PVEZ1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rn6moEja; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6468C116B1;
+	Sat,  1 Jun 2024 13:33:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717248629;
-	bh=NE2zh6nIZZVp7tENSf/sGl4moHwYoR+yioOzLzMXE6s=;
+	s=k20201202; t=1717248807;
+	bh=O4Qcp6gTrWx719Wf7YYA47W+bVFj66fUbAcnH/Ic6rQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mF8zfR4cTtf3GV7P05RWECmn/iEbw7XE6vJ+HpIm6SkPO1kbba5ILpfCVyHn7koMQ
-	 4Id6S0VJGkkih02v4pKr3V+ZdxHNnf3PABaPsY7NsUnKg0rdotyS2EyZKS/pTRJmBb
-	 Bb9qcp9nKJzlJGVQfrAtvR9L81TVmo1t3tu8p8IcckIwy0UrA99kdVDxKtnds+fG50
-	 OE+0iFv8hv0pKb7ufoqgflH3WGMXqGqc/6wiYtuIkvWb4JrvvhZVdHB8jXmRnn74zR
-	 X3fEcpj+6xwRO9PTiPXf/Np7t8l7sFiuPLUWishTp9stWvKGQRiGkv6YBCwpaiPVYb
-	 mH+NTNN/Yjkog==
-Date: Sat, 1 Jun 2024 14:30:25 +0100
+	b=rn6moEjab8RdnBKadGF2kqsBJ0EvFtK5ckeWbSj2JqulVniEgcaOp8ACO18gtEBqH
+	 yREGEfhz35JBfoP8ATwZ4xtBy2V06Swn5ni1umJ5Y4cNJX+XLKnslw4OwIvQUeegKU
+	 B2Anl7+Rx1Y2toWcDbDYwh07djFguBPAczwljbrhM0ga0jAdEPx+I0BoZ6QNqKHHn/
+	 rk8L1H6G/f11SgiZOFUNQVeIoJf4hoSCaPls6CfNuJAwu7ojMznAkGbVpgSJ0NrcZC
+	 nou0pr8c5kU7Cl52BYAgvvhdl4SS8EY59ZWFShL8/JXezV+LXyCta3eNKXhWzWKZ3j
+	 90JAVc8y7PRNg==
+Date: Sat, 1 Jun 2024 14:33:22 +0100
 From: Simon Horman <horms@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v1 net-next] af_unix: Don't check last_len in
- unix_stream_data_wait().
-Message-ID: <20240601133025.GO491852@kernel.org>
-References: <20240530164256.40223-1-kuniyu@amazon.com>
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: davem@davemloft.net, edumazet@google.com, i.maximets@ovn.org,
+	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org,
+	lucien.xin@gmail.com, marcelo.leitner@gmail.com,
+	netdev@vger.kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com,
+	echaudro@redhat.com
+Subject: Re: [PATCH net-next v4 1/2] flow_dissector: add support for tunnel
+ control flags
+Message-ID: <20240601133322.GP491852@kernel.org>
+References: <cover.1717088241.git.dcaratti@redhat.com>
+ <f89d9bffac091e52a30c819211358eb8d066f156.1717088241.git.dcaratti@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,40 +62,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240530164256.40223-1-kuniyu@amazon.com>
+In-Reply-To: <f89d9bffac091e52a30c819211358eb8d066f156.1717088241.git.dcaratti@redhat.com>
 
-On Thu, May 30, 2024 at 09:42:56AM -0700, Kuniyuki Iwashima wrote:
-> When commit 869e7c62486e ("net: af_unix: implement stream sendpage
-> support") added sendpage() support, data could be appended to the last
-> skb in the receiver's queue.
+On Thu, May 30, 2024 at 07:08:34PM +0200, Davide Caratti wrote:
+> Dissect [no]csum, [no]dontfrag, [no]oam, [no]crit flags from skb metadata.
+> This is a prerequisite for matching these control flags using TC flower.
 > 
-> That's why we needed to check if the length of the last skb was changed
-> while waiting for new data in unix_stream_data_wait().
-> 
-> However, commit a0dbf5f818f9 ("af_unix: Support MSG_SPLICE_PAGES") and
-> commit 57d44a354a43 ("unix: Convert unix_stream_sendpage() to use
-> MSG_SPLICE_PAGES") refactored sendmsg(), and now data is always added
-> to a new skb.
-> 
-> Now we no longer need to check the length of the last skb, so let's
-> remove the dead logic in unix_stream_data_wait().
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Suggested-by: Ilya Maximets <i.maximets@ovn.org>
+> Signed-off-by: Davide Caratti <dcaratti@redhat.com>
 
-...
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> @@ -2744,8 +2738,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
->  
->  			mutex_unlock(&u->iolock);
->  
-> -			timeo = unix_stream_data_wait(sk, timeo, last,
-> -						      last_len, freezable);
-> +			timeo = unix_stream_data_wait(sk, timeo, last, freezable);
-
-Hi Iwashima-san,
-
-A minor nit from my side. In the case that you have to reason perhaps
-keep the line above to <= 80 columns wide.
-
-...
 
