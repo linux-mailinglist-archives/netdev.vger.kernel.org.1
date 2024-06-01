@@ -1,101 +1,155 @@
-Return-Path: <netdev+bounces-99913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 682328D6FAE
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 14:15:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FCA18D6FB4
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 14:15:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 984501C2116B
-	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 12:15:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E4171C21513
+	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 12:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8C7150992;
-	Sat,  1 Jun 2024 12:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5F714F9ED;
+	Sat,  1 Jun 2024 12:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LHpjK5Ze"
+	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="m5aCDMt9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED8515098B;
-	Sat,  1 Jun 2024 12:15:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AE11C6AF;
+	Sat,  1 Jun 2024 12:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717244102; cv=none; b=efOnF/ZKAiRQCjj9Q5a9sUMQeGe8/INV9tpbMXjLsMvQawLFAa2eEPwsY9b2aMd2gDFFzryH0A8WCBPsokb21Pv/1VVvJ0RLOijRiR2QmLpi+wuLLrWs+wqJi/r8EnVzTebEn3D/N7StOZuXqcQkQdhrEpxW9c9wETw38ZChpRk=
+	t=1717244137; cv=none; b=ijN1Tb5DN5WC1b6LT7G+SKbD72auP9ymhYfWC4yGwEF/toR2ZVNHB1URCdq/5lKWIU/2B8kxDlq3ttODM4J0MqRJU+Fl1RTn2GBz3l2L4WnzVzV4Orzo8GLDYh045MxbUhel3Po0IzmN6b2COqw4OwhoAelbTYFOOIw/vrc00wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717244102; c=relaxed/simple;
-	bh=vcVNQET1Ou8ZFeBFz69a2SOS5V8abshMfVybYk+Krfs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fhwYHXCVYpqebi3CC26aNEd+7GDJ7BmB7Uj+X1rIFnF2ie8wPkGZ1DEKKx5SAnA7mvT1KY6SFN16kolIqHZrcHWOgNPcIjHz1L1+ItjLN4ECzNqsfti/tGPsUhMVoC+uQDBVSlzIgkjrFZNZYst37dasIDIoZ6pJpnvyWPQU7rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LHpjK5Ze; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDCAEC116B1;
-	Sat,  1 Jun 2024 12:14:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717244101;
-	bh=vcVNQET1Ou8ZFeBFz69a2SOS5V8abshMfVybYk+Krfs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LHpjK5ZeebdryEm2BRaWzYaWhptl/kaIjxtrOm0NmEkj3IKek3Lo5ub0a+n2DBYyZ
-	 CKqPP7twOY0J0B3gF2c9ldR4hGrWds+e5PviuHbhIC+KILJNE2CF0jHm3nICiEMJAT
-	 tbR4g5HnZXHI66V8F0exQUCvn+25O2clDzX52biUzUQ8/ylK6eFPhT7+i324Nay38E
-	 ME0+FNd3iqdL3sKnhn99MdJkiCuAIAcjxxGsvr/37Rh61Y6i8HuGsHTq1/Mz0+YwtX
-	 aKD8kQTvjSKkkuVfaSi18LcvlxHWJo4Xlt5DD8LV3ZFJORRrsiJmm9yBsfFI8B3tyV
-	 myC2siGiWKrlQ==
-Date: Sat, 1 Jun 2024 13:14:57 +0100
-From: Simon Horman <horms@kernel.org>
-To: 0x7f454c46@gmail.com
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net] net/tcp: Don't consider TCP_CLOSE in
- TCP_AO_ESTABLISHED
-Message-ID: <20240601121457.GI491852@kernel.org>
-References: <20240529-tcp_ao-sk_state-v1-1-d69b5d323c52@gmail.com>
+	s=arc-20240116; t=1717244137; c=relaxed/simple;
+	bh=lvEcECdSPEZ9gHThU+ok/dFIWZz6KwxLY9jrZJous+A=;
+	h=MIME-Version:Message-ID:From:To:Cc:Subject:Content-Type:Date:
+	 In-Reply-To:References; b=qinnWlpNhkYTPqduaE6VlTYSYTr3GAt6PYUi7l+GixbF7FfYLNiy3pMngtIVnSu/5QAVuihxog12uh0C5i0AbnWuyodO/jmc7Ht8KlzjcMNKLTUSHVA674mya/oiZqPCB/V645/TFiQRBaG8qHzG8Ov1fiTz4o56v+NI0agaDTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=m5aCDMt9; arc=none smtp.client-ip=212.227.17.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=public-files.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=public-files.de;
+	s=s31663417; t=1717244099; x=1717848899; i=frank-w@public-files.de;
+	bh=lvEcECdSPEZ9gHThU+ok/dFIWZz6KwxLY9jrZJous+A=;
+	h=X-UI-Sender-Class:MIME-Version:Message-ID:From:To:Cc:Subject:
+	 Content-Type:Date:In-Reply-To:References:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=m5aCDMt9HIKbzsoH185M2Yfo7fwJNHtvlNHVa/bMzbqeyUwAcCDoHKWMO6dsDI53
+	 MJbr0KmSgP3NQLBPJk18KbHxWuxalptJOh6Su/R6adC7cbXf5IhdBhmmPyONNqaxH
+	 ztqZgY7HfIsjPIlaLguwHbK5V9XyX675I19rtAOFx9aECAsjm1dFdzHLBRjj52Vtb
+	 0iHGfvdBdhOtHgMtAZqlIfawXd1Ez01bZMj4GAgNoZzSWhllstz7dzSIyldJ2JWrc
+	 T30oa9v9lynbC+TAPfqxkoPDtTpWCCyFMrNRfKxaiIhqQAj32xggKks1z11AI9YJD
+	 K0mxsWQEAWSjr2+0gQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [217.61.147.29] ([217.61.147.29]) by web-mail.gmx.net
+ (3c-app-gmx-bap08.server.lan [172.19.172.78]) (via HTTP); Sat, 1 Jun 2024
+ 14:14:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240529-tcp_ao-sk_state-v1-1-d69b5d323c52@gmail.com>
+Message-ID: <trinity-afd8a6d5-1acc-4020-b8cb-e0db80c241cf-1717244099767@3c-app-gmx-bap08>
+From: Frank Wunderlich <frank-w@public-files.de>
+To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Frank Wunderlich <linux@fw-web.de>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
+ <conor+dt@kernel.org>, Michael Turquette <mturquette@baylibre.com>, Stephen
+ Boyd <sboyd@kernel.org>, Pavel Machek <pavel@ucw.cz>, Lee Jones
+ <lee@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>, Eric
+ Woudstra <ericwouds@gmail.com>, Tianling Shen <cnsztl@immortalwrt.org>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-leds@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, Conor Dooley
+ <conor.dooley@microchip.com>
+Subject: Aw: Re: [PATCH v3 1/2] dt-bindings: arm64: mediatek: add BananaPi
+ R3 Mini
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 1 Jun 2024 14:14:59 +0200
+Importance: normal
+Sensitivity: Normal
+In-Reply-To: <a7a20d35-f566-4c3c-aef1-cb7a0f349cf6@collabora.com>
+References: <20240510095707.6895-1-linux@fw-web.de>
+ <20240510095707.6895-2-linux@fw-web.de>
+ <a7a20d35-f566-4c3c-aef1-cb7a0f349cf6@collabora.com>
+X-UI-Message-Type: mail
+X-Priority: 3
+X-Provags-ID: V03:K1:csPF87R4ollgagNDdL+HT/01eQEv27Y1G6e/ybL/hqAjMvhTTSL19a/hYOa0N91ckFy1u
+ m/eYtsKP20+o0LNLtViebe5BzFkkpLthFMc+cWYLiaBRUO1wRywenLslwMPzj1BwkeqJn3nB5VBp
+ lAtk6lfKrjvW2V/6XLYH2iHIkdf15CgqJBnHcp2ZHZZ2k3S8N31M0GFv6rHVcEjV/jEJ/0f0zHJ/
+ ylN01GfwjzQMSbeVeXs5M5yoGXANlVLm4tlzXIbhg0HhNTT/qvTNliIkyUBnodU+MrfLKyGHHZ1f
+ tQ=
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:9m4bUWM75tM=;ugYFxEsX+a5lkO2Zcqo7G7+zfjz
+ KgZNAsN3DTuYK3PROs1445uXbDRwkbcD66MED97R3+O7hjCWpSwSoPsmzCTTDv0zBMbQGXh2J
+ Rh3PIAzlinoT4BgrR+nFDOOAaMTiN7oaPXSJXEWcWKFQDc24BT3nmEYf8oVtr2X4exqH7rTNX
+ /kHtKuu7s/WsjsgwgIM2zi87Q5PZPFiEEI0iGdUcKf7g7z2MZiY7UvKywVB9BZrIEJKtIuqe0
+ HP3udYRs2G2f5j61t4hLnjGgstPa6W8AArZtYzQor43jJAr3TcCU4JLw0jpa5vqpRQMWrReXn
+ XJUk8DWSA6dWWcZ65b9rFPFW7k787d/7E6BIBdxAp8uKEH2Owb3L3Wd/N4g0Un2A0YDVQFzih
+ l0BqF85t6MQsTdyPsh+vApyipjIjyyzkd333sRukslARpXzpMtOkSlWbGIYmgopu5HYZcJYu9
+ Dmqkphtrrd29iysn9D/nbBybeVFGxO8Lc2vYWFOgH4shL9PDOw8+N1IpyllqnV1NN3XFqUYqp
+ YTeYPHrDeJPr20/JJJmADXkdn3nnppFBwyf9mB3TuHOpU0/QDjHp0g9a2SJ9ZYl2e7xhtvwLn
+ EaBKXkNJRLJgcZ4oMGhyRzYs3qbSAe3Tls/AHhD4GQ+DZIVN9lIYsgAf+tuao1ojvoW3IDUQT
+ t10Sk5GHXuxiqRbXRBpxVgQaf8UXonCoskxpzxyb9wcLt+SwzryX27Qw4ajCX0E=
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 29, 2024 at 06:29:32PM +0100, Dmitry Safonov via B4 Relay wrote:
-> From: Dmitry Safonov <0x7f454c46@gmail.com>
-> 
-> TCP_CLOSE may or may not have current/rnext keys and should not be
-> considered "established". The fast-path for TCP_CLOSE is
-> SKB_DROP_REASON_TCP_CLOSE. This is what tcp_rcv_state_process() does
-> anyways. Add an early drop path to not spend any time verifying
-> segment signatures for sockets in TCP_CLOSE state.
-> 
-> Cc: stable@vger.kernel.org # v6.7
-> Fixes: 0a3a809089eb ("net/tcp: Verify inbound TCP-AO signed segments")
-> Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
+Hi
 
-...
+just a gentle ping...is there anything missing?
 
-> diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-> index 781b67a52571..37c42b63ff99 100644
-> --- a/net/ipv4/tcp_ao.c
-> +++ b/net/ipv4/tcp_ao.c
-> @@ -933,6 +933,7 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
->  	struct tcp_ao_key *key;
->  	__be32 sisn, disn;
->  	u8 *traffic_key;
-> +	int state;
->  	u32 sne = 0;
+i see state in netdev-patchwork [1] is "changes requested", but comments d=
+o not say anything about this...
 
-Hi Dimitry,
+in mtk-patchwork [2] it is new and i do not see patches in mtk-next [3] ye=
+t
 
-It's probably not a good reason to respon this patch, but if you do make a
-v2 for some other reason, please consider reverse xmas tree order -
-longest line to shortest for local variable declarations - here.
+regards Frank
 
-I'll leave actual review of this patch to others.
+[1] https://patchwork.kernel.org/project/netdevbpf/list/?series=3D852204&s=
+tate=3D%2A&archive=3Dboth
+[2] https://patchwork.kernel.org/project/linux-mediatek/patch/202405100957=
+07.6895-2-linux@fw-web.de/
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/mediatek/linux.git
 
-...
+> Gesendet: Montag, 13. Mai 2024 um 15:06 Uhr
+> Von: "AngeloGioacchino Del Regno" <angelogioacchino.delregno@collabora.c=
+om>
+> An: "Frank Wunderlich" <linux@fw-web.de>, "Rob Herring" <robh@kernel.org=
+>, "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>, "Conor Doole=
+y" <conor+dt@kernel.org>, "Michael Turquette" <mturquette@baylibre.com>, "=
+Stephen Boyd" <sboyd@kernel.org>, "Pavel Machek" <pavel@ucw.cz>, "Lee Jone=
+s" <lee@kernel.org>, "David S. Miller" <davem@davemloft.net>, "Eric Dumaze=
+t" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni=
+" <pabeni@redhat.com>, "Matthias Brugger" <matthias.bgg@gmail.com>
+> Cc: "Frank Wunderlich" <frank-w@public-files.de>, "Eric Woudstra" <ericw=
+ouds@gmail.com>, "Tianling Shen" <cnsztl@immortalwrt.org>, devicetree@vger=
+.kernel.org, linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org, linu=
+x-leds@vger.kernel.org, netdev@vger.kernel.org, linux-arm-kernel@lists.inf=
+radead.org, linux-mediatek@lists.infradead.org, "Conor Dooley" <conor.dool=
+ey@microchip.com>
+> Betreff: Re: [PATCH v3 1/2] dt-bindings: arm64: mediatek: add BananaPi R=
+3 Mini
+>
+> Il 10/05/24 11:57, Frank Wunderlich ha scritto:
+> > From: Frank Wunderlich <frank-w@public-files.de>
+> >
+> > Add MT7988A based BananaPi R3 Mini.
+> >
+> > Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+> > Acked-by: Conor Dooley <conor.dooley@microchip.com>
+>
+> Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@colla=
+bora.com>
+>
+>
+>
 
