@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-99959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60F478D72C6
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF0218D72C7
 	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 01:40:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2DC41F217E8
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8BC41C20AD8
 	for <lists+netdev@lfdr.de>; Sat,  1 Jun 2024 23:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA98347A7C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D022A481B4;
 	Sat,  1 Jun 2024 23:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mD1n0cik"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lqr40Vsu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E1A4437C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D942D03B;
 	Sat,  1 Jun 2024 23:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717285232; cv=none; b=svyrjrdSiLuVlEPiRF6hWHidUy3OLSxD2epVO8iWCWVtD4yNeTW/IGwjGulOS3NbqvCxWNjwt7YFRFWnXQW2LY+xKCyEcDX0enyDo1X/0Pv4JhLqR/xdl63+1fYnC4pmy22jnAEmuJeqo2LK4XT2c7GoD5OnnwKbowJwjQqn5p8=
+	t=1717285232; cv=none; b=du3l1mcoMgcTpLfW5yCs9Jg+XHJNnaGMDnqMTioS19UqqbcssGMBWRsKk98Im7MJeG//SeRrPPmw9oLKgr1QK0gfJYkEG45H/6CVRsEClwTOmKb1pSm4Oc/Xa+cABVP8zEmEzVTDze+DLoCXHCm7bGOxvg8Wh20RUj27Wk0o4us=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717285232; c=relaxed/simple;
-	bh=DmOW4BTjUz0mvgpEjHmJGdOect42gJWE//k3ifLPmJ0=;
+	bh=SzK6SnnCtN4uWivormsbmB5kh1qb8znJq7rVIGk3xcA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GzgWqTtcM6Oifq0KQ4aFszgjVQvXuArRZvhIv289WDRG7+oAEs/kdU+oppO2BuehjJvqq2/IGuV4S/RUyNJySkpQzWdPkiqRjtZWZ1GXvGiLkTdaEMSTDbrgJcPvQSTTVw9vgLvAjN7H9r2KV4pBiAdLQ+9rvm3ti4rgQSBDPr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mD1n0cik; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3A0F1C4AF07;
+	 In-Reply-To:To:Cc; b=mnTkfH5hv6q9Vs8z3SprXtc9cX438uf7jvElc3RA1HfXbwWwX2S1UgUwxgLX46k9YbtWOCkykTDs0k6zsB/43EquIgsVzFmEOFeNDugItfgnFcBcBosjMgAhuK4g8d3CZkqNogZXNvpaqsDkuEhfwwCVaFDduVK3qQ8K3AG9Lco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lqr40Vsu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 47453C32786;
 	Sat,  1 Jun 2024 23:40:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1717285232;
-	bh=DmOW4BTjUz0mvgpEjHmJGdOect42gJWE//k3ifLPmJ0=;
+	bh=SzK6SnnCtN4uWivormsbmB5kh1qb8znJq7rVIGk3xcA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mD1n0cikmvLD8yrotShgJ4qO4CVOc7JBp2BvDQ4DbbYzqBG127HstSHbDe+LEiiML
-	 DGMJ6UuJEYro7pbX2v2375KdPz3Z89mgJQxGusGBAdHLHYJn1MfEvHrClRSxU3A2kU
-	 egIujNZJiTQl+IxWs2MtZPebI9LQo8eE+eEB4a+jY7NydymRuiYurgGh7vrwsCekpv
-	 HImdcnbtesHyySSVtQQq9478Mzp09kkAvuSh8g58a3WLHtQomBZ9y+pL1BqqibczfZ
-	 bmVOTfDIW4HgvXRARWQpE5wKdhhkBfw0uh+iG3z4wl0Qc93poM/yHjpUVvCCUiIUqL
-	 E3F+XZTpLmnVQ==
+	b=lqr40Vsu3FmNJWSHy0ytDZeOQdjHpl2KEAbZl5E9Y/ifkF3BFUcVJlLw2e2aPW4r0
+	 c1vJM7I5AzRPywFh9Hw5Y46YWcudX4roBcxBtF25vkv+3lvp9L1ITmWml3RN7OY0tL
+	 OLVCpKhmPqk4e5k8Az0/jwXhUQV6fpitefVlR5Nh87uOtrctuE0l+ij3L00nt9zAqO
+	 80ZfYeDg8H3ztwkD07ay/9j0W0H9EgCUL3djABQpCwMyfZL6wwgwLj6OqRYEP1OZAk
+	 u96F0VzxTsuFte8nDmVKLRVE3KL/D8I2C8GrWo6+1bdnTSnzxYSczK3UpwQIWDIu0f
+	 3N6TwZUwlk9QQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 28C5AC4936D;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 37586DEA715;
 	Sat,  1 Jun 2024 23:40:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,41 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net] net/ncsi: Fix the multi thread manner of NCSI driver
+Subject: Re: [PATCH net] net/tcp: Don't consider TCP_CLOSE in
+ TCP_AO_ESTABLISHED
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171728523216.22535.12892429413724862460.git-patchwork-notify@kernel.org>
+ <171728523222.22535.13972880486024891915.git-patchwork-notify@kernel.org>
 Date: Sat, 01 Jun 2024 23:40:32 +0000
-References: <20240529065856.825241-1-delphine_cc_chiu@wiwynn.com>
-In-Reply-To: <20240529065856.825241-1-delphine_cc_chiu@wiwynn.com>
-To: Delphine_CC_Chiu/WYHQ/Wiwynn <Delphine_CC_Chiu@wiwynn.com>
-Cc: patrick@stwcx.xyz, sam@mendozajonas.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, joel@jms.id.au,
- gwshan@linux.vnet.ibm.com, delphine_cc_chiu@wiwynn.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240529-tcp_ao-sk_state-v1-1-d69b5d323c52@gmail.com>
+In-Reply-To: <20240529-tcp_ao-sk_state-v1-1-d69b5d323c52@gmail.com>
+To: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, 0x7f454c46@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 29 May 2024 14:58:55 +0800 you wrote:
-> Currently NCSI driver will send several NCSI commands back to back without
-> waiting the response of previous NCSI command or timeout in some state
-> when NIC have multi channel. This operation against the single thread
-> manner defined by NCSI SPEC(section 6.3.2.3 in DSP0222_1.1.1)
+On Wed, 29 May 2024 18:29:32 +0100 you wrote:
+> From: Dmitry Safonov <0x7f454c46@gmail.com>
 > 
-> According to NCSI SPEC(section 6.2.13.1 in DSP0222_1.1.1), we should probe
-> one channel at a time by sending NCSI commands (Clear initial state, Get
-> version ID, Get capabilities...), than repeat this steps until the max
-> number of channels which we got from NCSI command (Get capabilities) has
-> been probed.
+> TCP_CLOSE may or may not have current/rnext keys and should not be
+> considered "established". The fast-path for TCP_CLOSE is
+> SKB_DROP_REASON_TCP_CLOSE. This is what tcp_rcv_state_process() does
+> anyways. Add an early drop path to not spend any time verifying
+> segment signatures for sockets in TCP_CLOSE state.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,net] net/ncsi: Fix the multi thread manner of NCSI driver
-    https://git.kernel.org/netdev/net/c/e85e271dec02
+  - [net] net/tcp: Don't consider TCP_CLOSE in TCP_AO_ESTABLISHED
+    https://git.kernel.org/netdev/net/c/33700a0c9b56
 
 You are awesome, thank you!
 -- 
