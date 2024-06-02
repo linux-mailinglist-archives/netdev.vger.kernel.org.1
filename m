@@ -1,108 +1,218 @@
-Return-Path: <netdev+bounces-99972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4307F8D742B
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 09:48:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 78EE98D743B
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 10:03:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 694921C20A98
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 07:48:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A5D61C20A5F
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 08:03:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A3F118AEA;
-	Sun,  2 Jun 2024 07:48:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571AD1CD16;
+	Sun,  2 Jun 2024 08:03:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CD4208A1;
-	Sun,  2 Jun 2024 07:48:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A86AD59;
+	Sun,  2 Jun 2024 08:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717314499; cv=none; b=AnK3njdj2p0Jnr2oze3t0gL1tPYISbKCxGc8ToBW+nGPHgx1mINYUoyhfd9JRZQz2UX8Pn6+XxzWOtU6NxykyMMz1WQ4B9S0qjVF1gkew4opLfxBI23EzEpiioHSQGUewads5SXUyB6vazzUcavnjgS5yP9oCBXOaAoB41f1Flw=
+	t=1717315397; cv=none; b=YkWnFFU7lbRv4sFws2P/azxqh+uFO8RehjISr6JUcIvPgqYH2FHSDxJMucDiNu2hOhqX8SrUZkgDxRqNWQFsz+AxK0v9DGk41tvwv9Iy4S53dbP6Q1Fb4Ksec9OqMPPPHu/fY4sMNPkHLoFpkBStoeUpMGUYIv21i90S0XJXwXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717314499; c=relaxed/simple;
-	bh=0osbBSBLTMt8nX/8+KW0zNocP78w7qcjHw2JL9olbfQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Df/JkQ6P1CVerlRVHFoTAUJ8TWJC8uqxFZwsT8rCk4ZPZeK5Ne9ruk29tG2peoRkHeCRrYy6ntBIyXrCVVegMAx19Yxv/of/4JolDW8uqdde1QHqqjESOyEZcbYKbrc0JnRtMDkaSRsWNKP0jKT9ptaz2Nj7ibTYoXt2234HOms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+	s=arc-20240116; t=1717315397; c=relaxed/simple;
+	bh=yKPK/NtDfn6mI3z0T1fVgXyIK3NlZ3bRAmi1lDAYxMc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lZoMxen4m8C/bSrJbbmcvP6xdLK6WyQ1DoxwGwrly9UguxyjzxffapzjOJUaZWschR431pGsPSSg1YJTPQ4l1UiGd47Ov5lao2b2/PeTtOyw2FU8tE+khsnwRruJZbWX2P55LSgMbcHGsx75A+mP6fM0K1HLkhY99p74voTrknc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-35e544aa9a9so19307f8f.2;
-        Sun, 02 Jun 2024 00:48:17 -0700 (PDT)
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-702555eb23bso781763b3a.1;
+        Sun, 02 Jun 2024 01:03:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717314496; x=1717919296;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Mi/VKBiZjMcaZsYVmfXcA5vUMibCH5GQOs6BRjI06o=;
-        b=tj+taI39WaKJoLi+4NzuLFlFrkkj1WGSluBv+5Xo+5bPSShP+w2kRDMmmJ2gS5bof+
-         0WhJgLZt05mCkYw54d+n7nGfC77SBvPUBqYUE4zPf2exeKMm9mTPBUfZabKP2m3DFE7j
-         mwScTMMN6nyFwvT1oHsaRH7biCilyz07gB/yzwKaof47RaY0SwRbtpbOYcux09BXD/gu
-         FpCUl6SOoJJJGxwhogeSj5RDDm+pY4aTqrG5Lx4cu9TDgSsGLF4iNPyUF04pjAg6uRUz
-         PD/HWNPfx3pLPwqhuUiVeJinFUg2R2WM7XopN7BCRfSfqXjZ5sNlCLAOGHSslDvposXe
-         9ITg==
-X-Forwarded-Encrypted: i=1; AJvYcCW70C9ThNH0FoFyl9U1VJ5oSSXz9IJpPgutcMJp/7ryP1EEm2m/gDMtf2AE59jvoXpampH3xqvKunLHb8GsXpPdKe+IUWv3Q28doWy830q8+2yDW7jauvBBS5WzPNlLMODhEGamt1g73MUjZYll2x1B6ILrg8K29nCbX6KFExIr
-X-Gm-Message-State: AOJu0YxSpKzWLEtUFujMIyZCDuZJvpXC3P12SfakCG2dhv/LqiLcnHeW
-	kIPgdky/4345W+6CE6K6Yl1iyJhmpMu1Z1CEEr3taMGBlSFqaveO
-X-Google-Smtp-Source: AGHT+IFsCjXnSMmjNSZUGoj/v4xQvOLvmmlAnC28L1qi45HucRzp7Mm8nzhveD4Y6FLy0KHDf5ir5A==
-X-Received: by 2002:adf:f547:0:b0:358:d0c:b9a0 with SMTP id ffacd0b85a97d-35e0f23ebc2mr4051664f8f.1.1717314495772;
-        Sun, 02 Jun 2024 00:48:15 -0700 (PDT)
-Received: from [10.100.102.74] (85.65.205.146.dynamic.barak-online.net. [85.65.205.146])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35dd062edcdsm5532084f8f.70.2024.06.02.00.48.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 02 Jun 2024 00:48:15 -0700 (PDT)
-Message-ID: <9f62247b-ae36-49d9-9ccc-6ea5a238e147@grimberg.me>
-Date: Sun, 2 Jun 2024 10:48:12 +0300
+        d=1e100.net; s=20230601; t=1717315395; x=1717920195;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zKGTqymitwuSSvE//rhOmRtXD7moCcqza47DyUX/qKE=;
+        b=DGEsSqtvL3kXWRBG1TZaMkRM/1Wh9WJK2mMr/R0743rvhn6S8qXYdGD/Cfnz5vhQNV
+         oZj5jm/uqgit64RD7pz5UsKL3GDy0z+tBEwPEG8n7yxxU1ij/iL4eVhNCvMIKYGULV9s
+         VjKNG6jwO6AYJsCcq2PCECdiSXRleMEnbUnRuC2zqoGiJMtrhhSkJm3pTZEWZ1KsW2uJ
+         KiBi0CpRqkaF/Wwc7hO8ncqMHCqH0D6Lre892Lv1uIrQ61IabjXFYVckq4FbSRBp+SY9
+         VH+REhkqDEIuQMErvhUWS8ZMP0/N+tO86sNPpvwWrlgpLFUTNwbge8f0cbM7qquMnXaj
+         wY5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWBwFGuPX9mFB+5C+Vubnl3OKhOLGpXdqhMDWA9UQoVB9m/FmnxyX7kTePENGhPKFjcllP5MVPMQM3Q7uo+a8l1cKmD9V8adRywv8hKgcwtolZuozdTtzXkftsLqC47fRdDB4UeMsqhFe78utJXuc5NGL2UhJcev0dSgv72EC9V4KmgnP4=
+X-Gm-Message-State: AOJu0YwtBcrIIVHrUPFsTaIR4Gxg/45KUdsyuwmzFSHychdfoi6XmlKl
+	yqeL6XPkPpEgCIFYt5MUQpOpmfS8Z1MEgpdMQm6KT0MnWVJSwoITk5om7rGVMrVzclj5mCAIN0K
+	frtmBopx48/9DXYrxEvLJc29bDd/0i0i7
+X-Google-Smtp-Source: AGHT+IG9Z+v5sGePu/ouFexS/nYiKkKVnIjYOHr62JDsq7X5tw/5cjo8g/k8r/yrJTmJAz8F1XwzxLO/JVJWbbs3GTM=
+X-Received: by 2002:a05:6a20:914d:b0:1a9:a32d:17cc with SMTP id
+ adf61e73a8af0-1b26f141cf0mr6508132637.18.1717315394490; Sun, 02 Jun 2024
+ 01:03:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/4] bugfix: Introduce sendpages_ok() to check
- sendpage_ok() on contiguous pages
-To: Jakub Kicinski <kuba@kernel.org>, Ofir Gal <ofir.gal@volumez.com>
-Cc: davem@davemloft.net, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
- ceph-devel@vger.kernel.org, dhowells@redhat.com, edumazet@google.com,
- pabeni@redhat.com, kbusch@kernel.org, axboe@kernel.dk, hch@lst.de,
- philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
- christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
-References: <20240530142417.146696-1-ofir.gal@volumez.com>
- <20240601153430.19416989@kernel.org>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20240601153430.19416989@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <cover.1716973640.git.geert+renesas@glider.be> <2cf38c10b83c8e5c04d68b17a930b6d9dbf66f40.1716973640.git.geert+renesas@glider.be>
+In-Reply-To: <2cf38c10b83c8e5c04d68b17a930b6d9dbf66f40.1716973640.git.geert+renesas@glider.be>
+From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
+Date: Sun, 2 Jun 2024 17:03:02 +0900
+Message-ID: <CAMZ6RqKZdo1Mk=tY-vqCm0YYr_Qk8m53+LHXqeM+1LL=S=+RqQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] can: rcar_canfd: Simplify clock handling
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Wolfram Sang <wsa+renesas@sang-engineering.com>, 
+	linux-can@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
+On Wed. 29 May 2024 at 18:12, Geert Uytterhoeven
+<geert+renesas@glider.be> wrote:
+> The main CAN clock is either the internal CANFD clock, or the external
+> CAN clock.  Hence replace the two-valued enum by a simple boolean flag.
+> Consolidate all CANFD clock handling inside a single branch.
 
+For what it is worth, your patch also saves up to 8 bytes in struct
+rcar_canfd_global (depends on the architecture).
 
-On 02/06/2024 1:34, Jakub Kicinski wrote:
-> On Thu, 30 May 2024 17:24:10 +0300 Ofir Gal wrote:
->> skbuff: before sendpage_ok - i: 0. page: 0x654eccd7 (pfn: 120755)
->> skbuff: before sendpage_ok - i: 1. page: 0x1666a4da (pfn: 120756)
->> skbuff: before sendpage_ok - i: 2. page: 0x54f9f140 (pfn: 120757)
-> noob question, how do you get 3 contiguous pages, the third of which
-> is slab? is_slab doesn't mean what I think it does, or we got extremely
-> lucky with kmalloc?
+Before:
+
+  $ pahole drivers/net/can/rcar/rcar_canfd.o -C rcar_canfd_global
+  struct rcar_canfd_global {
+      struct rcar_canfd_channel * ch[8];               /*     0    64 */
+      /* --- cacheline 1 boundary (64 bytes) --- */
+      void *                     base;                 /*    64     8 */
+      struct platform_device *   pdev;                 /*    72     8 */
+      struct clk *               clkp;                 /*    80     8 */
+      struct clk *               can_clk;              /*    88     8 */
+      enum rcar_canfd_fcanclk    fcan;                 /*    96     4 */
+
+      /* XXX 4 bytes hole, try to pack */
+
+      long unsigned int          channels_mask;        /*   104     8 */
+      bool                       fdmode;               /*   112     1 */
+
+      /* XXX 7 bytes hole, try to pack */
+
+      struct reset_control *     rstc1;                /*   120     8 */
+      /* --- cacheline 2 boundary (128 bytes) --- */
+      struct reset_control *     rstc2;                /*   128     8 */
+      const struct rcar_canfd_hw_info  * info;         /*   136     8 */
+
+      /* size: 144, cachelines: 3, members: 11 */
+      /* sum members: 133, holes: 2, sum holes: 11 */
+      /* last cacheline: 16 bytes */
+  };
+
+After:
+
+  $ pahole drivers/net/can/rcar/rcar_canfd.o -C rcar_canfd_global
+  struct rcar_canfd_global {
+      struct rcar_canfd_channel * ch[8];               /*     0    64 */
+      /* --- cacheline 1 boundary (64 bytes) --- */
+      void *                     base;                 /*    64     8 */
+      struct platform_device *   pdev;                 /*    72     8 */
+      struct clk *               clkp;                 /*    80     8 */
+      struct clk *               can_clk;              /*    88     8 */
+      long unsigned int          channels_mask;        /*    96     8 */
+      bool                       extclk;               /*   104     1 */
+      bool                       fdmode;               /*   105     1 */
+
+      /* XXX 6 bytes hole, try to pack */
+
+      struct reset_control *     rstc1;                /*   112     8 */
+      struct reset_control *     rstc2;                /*   120     8 */
+      /* --- cacheline 2 boundary (128 bytes) --- */
+      const struct rcar_canfd_hw_info  * info;         /*   128     8 */
+
+      /* size: 136, cachelines: 3, members: 11 */
+      /* sum members: 130, holes: 1, sum holes: 6 */
+      /* last cacheline: 8 bytes */
+  };
+
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+>  drivers/net/can/rcar/rcar_canfd.c | 24 +++++++-----------------
+>  1 file changed, 7 insertions(+), 17 deletions(-)
 >
+> diff --git a/drivers/net/can/rcar/rcar_canfd.c b/drivers/net/can/rcar/rcar_canfd.c
+> index b828427187353d6f..474840b58e8f13f1 100644
+> --- a/drivers/net/can/rcar/rcar_canfd.c
+> +++ b/drivers/net/can/rcar/rcar_canfd.c
+> @@ -508,12 +508,6 @@
+>   */
+>  #define RCANFD_CFFIFO_IDX              0
+>
+> -/* fCAN clock select register settings */
+> -enum rcar_canfd_fcanclk {
+> -       RCANFD_CANFDCLK = 0,            /* CANFD clock */
+> -       RCANFD_EXTCLK,                  /* Externally input clock */
+> -};
+> -
+>  struct rcar_canfd_global;
+>
+>  struct rcar_canfd_hw_info {
+> @@ -545,8 +539,8 @@ struct rcar_canfd_global {
+>         struct platform_device *pdev;   /* Respective platform device */
+>         struct clk *clkp;               /* Peripheral clock */
+>         struct clk *can_clk;            /* fCAN clock */
+> -       enum rcar_canfd_fcanclk fcan;   /* CANFD or Ext clock */
+>         unsigned long channels_mask;    /* Enabled channels mask */
+> +       bool extclk;                    /* CANFD or Ext clock */
+>         bool fdmode;                    /* CAN FD or Classical CAN only mode */
 
-The contig range according to the trace is 256K, the third page was just the
-first time that it saw this !ok page.
+Notwithstanding comment: you may consider to replace those two booleans by a:
 
-I asked the same thing. nvme-tcp gets a bio and sets up its own iov_iter
-on the bio bvec for sending it over the wire. The test that reproduces this
-creates an raid1 md device which probably has at least some effect into how
-we got this buffer.
+          unsigned int flags;
 
-With the recent multipage bvecs work from Ming, nvme-tcp bvec entries will
-often point to contiguous ranges that are > PAGE_SIZE. I didn't look 
-into the
-implementation of skb_splice_from_iter, but I think its not very 
-efficient to
-extract a contiguous range in PAGE_SIZE granular vector...
+This way, no more fields would be needed in the future if more quirks are added.
+
+>         struct reset_control *rstc1;
+>         struct reset_control *rstc2;
+> @@ -777,7 +771,7 @@ static void rcar_canfd_configure_controller(struct rcar_canfd_global *gpriv)
+>                 cfg |= RCANFD_GCFG_CMPOC;
+>
+>         /* Set External Clock if selected */
+> -       if (gpriv->fcan != RCANFD_CANFDCLK)
+> +       if (gpriv->extclk)
+>                 cfg |= RCANFD_GCFG_DCS;
+>
+>         rcar_canfd_set_bit(gpriv->base, RCANFD_GCFG, cfg);
+> @@ -1941,16 +1935,12 @@ static int rcar_canfd_probe(struct platform_device *pdev)
+>                         return dev_err_probe(dev, PTR_ERR(gpriv->can_clk),
+>                                              "cannot get canfd clock\n");
+>
+> -               gpriv->fcan = RCANFD_CANFDCLK;
+> -
+> +               /* CANFD clock may be further divided within the IP */
+> +               fcan_freq = clk_get_rate(gpriv->can_clk) / info->postdiv;
+>         } else {
+> -               gpriv->fcan = RCANFD_EXTCLK;
+> +               fcan_freq = clk_get_rate(gpriv->can_clk);
+> +               gpriv->extclk = true;
+>         }
+> -       fcan_freq = clk_get_rate(gpriv->can_clk);
+> -
+> -       if (gpriv->fcan == RCANFD_CANFDCLK)
+> -               /* CANFD clock is further divided by (1/2) within the IP */
+> -               fcan_freq /= info->postdiv;
+>
+>         addr = devm_platform_ioremap_resource(pdev, 0);
+>         if (IS_ERR(addr)) {
+> @@ -2060,7 +2050,7 @@ static int rcar_canfd_probe(struct platform_device *pdev)
+>
+>         platform_set_drvdata(pdev, gpriv);
+>         dev_info(dev, "global operational state (clk %d, fdmode %d)\n",
+> -                gpriv->fcan, gpriv->fdmode);
+> +                gpriv->extclk, gpriv->fdmode);
+>         return 0;
+>
+>  fail_channel:
+> --
+> 2.34.1
+>
+>
 
