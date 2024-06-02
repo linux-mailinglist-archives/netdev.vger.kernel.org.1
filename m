@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-99998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A101A8D7672
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 16:52:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5EE78D7623
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 16:19:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBA911C21824
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 14:52:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02F1A1C20C8C
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 14:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76FC24207F;
-	Sun,  2 Jun 2024 14:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D9F4085D;
+	Sun,  2 Jun 2024 14:19:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="lW9I/gRQ"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="FM1O1hTM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-14.smtpout.orange.fr [80.12.242.14])
+Received: from msa.smtpout.orange.fr (msa-208.smtpout.orange.fr [193.252.23.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF66B64B;
-	Sun,  2 Jun 2024 14:52:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC53444366;
+	Sun,  2 Jun 2024 14:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.23.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717339972; cv=none; b=E71rZ9KklA/0eK0ZgFgW6kG72U+jmTvrpTlvRq06mQGAOzlYBLs7DR+QQ353vTLiwSzs8tCbBZdyot5we3Yf+d+FcAYm52BGrccMik+O2P904pstfukehLR3rCq5nLeLtHZUDjbomGQA6rxSsosM7QcoIKzV4fYv3/Le/0RpK/4=
+	t=1717337955; cv=none; b=lCla5qBpR+4OX5STzl/C7p7FvhQXnPKugyjF1LWa6p2RxFfvzS3HvHC/HWSFnoB7caD/HRbYN8mguewOva98R7PbGn9J2xLOl9rwQTw54f5TmTD+ZAD0uTUAcHrQcZBkC1rKcKHkuDbnJtnrpnaN56X5x6VLVhxJIL/hi9HSBMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717339972; c=relaxed/simple;
-	bh=lTgUwlG7nLBFiETrR69C8cfUl4O8VNEeo7B8BbTo+ZY=;
+	s=arc-20240116; t=1717337955; c=relaxed/simple;
+	bh=/ie5zhTuzVnG6guZfln69UgguCT3/wECkJkH3j8zbpM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jcACGcYmf7MmeslE7SgfMd6mUTPosGF8Cv3Xk+G7crLvwr4F+s6bYRhm/BY4MNtkbnTxopW7Z2DEh3GzFkM+pWJpQSqShjn6fYUZ8iHguDNw/1MZSHSLs3WXE5B2ML9sfkFHSXQgUNcmLv5XasIsQT3e/Q8WOSp6pUd3uVdRvx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=lW9I/gRQ; arc=none smtp.client-ip=80.12.242.14
+	 MIME-Version; b=Ba34cMqCRhJY+KUHm6tYy93yFwLqsM9xe+wCznovdmE8/cmnI+JYMfbglL0QflDZAOOVpODAxuascq/EPxTG/pvGL0CKIfdxmoOvM+LejQVjhTnmbHRgzCvic4bqhAtNXa26xft2qtr+DUV5Q6J3cfRN1hgcvHw2RW9UPnomPIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=FM1O1hTM; arc=none smtp.client-ip=193.252.23.208
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
 Received: from fedora.home ([86.243.17.157])
 	by smtp.orange.fr with ESMTPA
-	id Dm2ns8x2vLmxrDm2ysLKRD; Sun, 02 Jun 2024 16:18:57 +0200
+	id Dm2ns8x2vLmxrDm34sLKU9; Sun, 02 Jun 2024 16:19:02 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1717337937;
-	bh=tSEqEQfth4qJVeha9JEnu00+3Nn6CnfjFpf6x4pdbiI=;
+	s=t20230301; t=1717337942;
+	bh=8DCrRJgxsQW+5+97dKa8ee3w1WqnGfGM17kPgJs0kHQ=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=lW9I/gRQVxMFu1jpMG+o+Dwoe9VaffsG8sUWLrrUW63upI2dFwGHJ/tYt6FUiB+m9
-	 8s0imuKf+JWbw6+l5tt6nsfvVmS6Ohv7qlbie/rBpq40bf1bBuKdKHRjHfnA+x4Unc
-	 R6J5WL1Aornl7H+0A5g1D+ixQf+a81Ja/Otzo1vu/3bT9C2AyEXDVIbrZ4OXXGXg+P
-	 g0tH9wLO1utXdRoHy46J241KX/IbAp8rylHWQtllfAmWittTbT6XPsjLCZVjtd/4Yd
-	 /1O94jiq28JdrVYo+6337fYE7hVb88/2j3AaarUFOmiY88zQ+SaFNwxrRicyjUqdAp
-	 pIgjpJzDdxL9Q==
+	b=FM1O1hTM4WFxAG79oe1B7VmaCBJfo7x0hhU2ROmG5cyAqvPfzGfh46VLnVHeII7tj
+	 cIY7TAldPUG3qnbl3Wrv32zSOljsiR0BiJEYsAmXFwxYEkxg58neQsVKkSmOOnAL+x
+	 BNLzJmLKi0e21ihiR7TAzIpG24KV13eUnJAn0DVGTM9O+HYl90/vp3WfpZkOJBNpiK
+	 YS0qUpnZoUT7JvIzhvQ01INDqU038cGhcqRUFPMvxcreeUwixpkvntsGxTc5JcBaIv
+	 2VrPmEIDp1eh1NmcvbloUjVf1QRC6hp6WkYMuRCOYMXLS2+/UeiKa7crSP46kYbPnp
+	 cK/knB7LyZQxw==
 X-ME-Helo: fedora.home
 X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sun, 02 Jun 2024 16:18:57 +0200
+X-ME-Date: Sun, 02 Jun 2024 16:19:02 +0200
 X-ME-IP: 86.243.17.157
 From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 To: idosch@nvidia.com,
@@ -60,9 +60,9 @@ Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	kernel-janitors@vger.kernel.org,
 	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH 1/2 net-next] devlink: Constify the 'table_ops' parameter of devl_dpipe_table_register()
-Date: Sun,  2 Jun 2024 16:18:52 +0200
-Message-ID: <3d1deee6bb5a31ee1a41645223fa8b4df1eef7ba.1717337525.git.christophe.jaillet@wanadoo.fr>
+Subject: [PATCH 2/2 net-next] mlxsw: spectrum_router: Constify struct devlink_dpipe_table_ops
+Date: Sun,  2 Jun 2024 16:18:53 +0200
+Message-ID: <6d79c82023fd7e3c4b2da6ac92ecf478366e8dca.1717337525.git.christophe.jaillet@wanadoo.fr>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <cover.1717337525.git.christophe.jaillet@wanadoo.fr>
 References: <cover.1717337525.git.christophe.jaillet@wanadoo.fr>
@@ -74,56 +74,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-"struct devlink_dpipe_table_ops" only contains some function pointers.
+'struct devlink_dpipe_table_ops' are not modified in this driver.
 
-Update "struct devlink_dpipe_table" and the 'table_ops' parameter of
-devl_dpipe_table_register() so that structures in drivers can be
-constified.
-
-Constifying these structures will move some data to a read-only section, so
+Constifying these structures moves some data to a read-only section, so
 increase overall security.
+
+On a x86_64, with allmodconfig:
+Before:
+======
+   text	   data	    bss	    dec	    hex	filename
+  15557	    712	      0	  16269	   3f8d	drivers/net/ethernet/mellanox/mlxsw/spectrum_dpipe.o
+
+After:
+=====
+   text	   data	    bss	    dec	    hex	filename
+  15789	    488	      0	  16277	   3f95	drivers/net/ethernet/mellanox/mlxsw/spectrum_dpipe.o
 
 Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 ---
- include/net/devlink.h | 4 ++--
- net/devlink/dpipe.c   | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_dpipe.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/devlink.h b/include/net/devlink.h
-index 35eb0f884386..db5eff6cb60f 100644
---- a/include/net/devlink.h
-+++ b/include/net/devlink.h
-@@ -352,7 +352,7 @@ struct devlink_dpipe_table {
- 	bool resource_valid;
- 	u64 resource_id;
- 	u64 resource_units;
--	struct devlink_dpipe_table_ops *table_ops;
-+	const struct devlink_dpipe_table_ops *table_ops;
- 	struct rcu_head rcu;
- };
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_dpipe.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_dpipe.c
+index ca80af06465f..fa6eddd27ecf 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_dpipe.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_dpipe.c
+@@ -283,7 +283,7 @@ static u64 mlxsw_sp_dpipe_table_erif_size_get(void *priv)
+ 	return MLXSW_CORE_RES_GET(mlxsw_sp->core, MAX_RIFS);
+ }
  
-@@ -1751,7 +1751,7 @@ void devl_sb_unregister(struct devlink *devlink, unsigned int sb_index);
- void devlink_sb_unregister(struct devlink *devlink, unsigned int sb_index);
- int devl_dpipe_table_register(struct devlink *devlink,
- 			      const char *table_name,
--			      struct devlink_dpipe_table_ops *table_ops,
-+			      const struct devlink_dpipe_table_ops *table_ops,
- 			      void *priv, bool counter_control_extern);
- void devl_dpipe_table_unregister(struct devlink *devlink,
- 				 const char *table_name);
-diff --git a/net/devlink/dpipe.c b/net/devlink/dpipe.c
-index a72a9292efc5..55009b377447 100644
---- a/net/devlink/dpipe.c
-+++ b/net/devlink/dpipe.c
-@@ -839,7 +839,7 @@ EXPORT_SYMBOL_GPL(devlink_dpipe_table_counter_enabled);
-  */
- int devl_dpipe_table_register(struct devlink *devlink,
- 			      const char *table_name,
--			      struct devlink_dpipe_table_ops *table_ops,
-+			      const struct devlink_dpipe_table_ops *table_ops,
- 			      void *priv, bool counter_control_extern)
- {
- 	struct devlink_dpipe_table *table;
+-static struct devlink_dpipe_table_ops mlxsw_sp_erif_ops = {
++static const struct devlink_dpipe_table_ops mlxsw_sp_erif_ops = {
+ 	.matches_dump = mlxsw_sp_dpipe_table_erif_matches_dump,
+ 	.actions_dump = mlxsw_sp_dpipe_table_erif_actions_dump,
+ 	.entries_dump = mlxsw_sp_dpipe_table_erif_entries_dump,
+@@ -734,7 +734,7 @@ static u64 mlxsw_sp_dpipe_table_host4_size_get(void *priv)
+ 	return mlxsw_sp_dpipe_table_host_size_get(mlxsw_sp, AF_INET);
+ }
+ 
+-static struct devlink_dpipe_table_ops mlxsw_sp_host4_ops = {
++static const struct devlink_dpipe_table_ops mlxsw_sp_host4_ops = {
+ 	.matches_dump = mlxsw_sp_dpipe_table_host4_matches_dump,
+ 	.actions_dump = mlxsw_sp_dpipe_table_host_actions_dump,
+ 	.entries_dump = mlxsw_sp_dpipe_table_host4_entries_dump,
+@@ -811,7 +811,7 @@ static u64 mlxsw_sp_dpipe_table_host6_size_get(void *priv)
+ 	return mlxsw_sp_dpipe_table_host_size_get(mlxsw_sp, AF_INET6);
+ }
+ 
+-static struct devlink_dpipe_table_ops mlxsw_sp_host6_ops = {
++static const struct devlink_dpipe_table_ops mlxsw_sp_host6_ops = {
+ 	.matches_dump = mlxsw_sp_dpipe_table_host6_matches_dump,
+ 	.actions_dump = mlxsw_sp_dpipe_table_host_actions_dump,
+ 	.entries_dump = mlxsw_sp_dpipe_table_host6_entries_dump,
+@@ -1230,7 +1230,7 @@ mlxsw_sp_dpipe_table_adj_size_get(void *priv)
+ 	return size;
+ }
+ 
+-static struct devlink_dpipe_table_ops mlxsw_sp_dpipe_table_adj_ops = {
++static const struct devlink_dpipe_table_ops mlxsw_sp_dpipe_table_adj_ops = {
+ 	.matches_dump = mlxsw_sp_dpipe_table_adj_matches_dump,
+ 	.actions_dump = mlxsw_sp_dpipe_table_adj_actions_dump,
+ 	.entries_dump = mlxsw_sp_dpipe_table_adj_entries_dump,
 -- 
 2.45.1
 
