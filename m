@@ -1,279 +1,204 @@
-Return-Path: <netdev+bounces-100028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77C2F8D783B
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 23:16:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C44A18D786D
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 23:55:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C2A91C209B1
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 21:16:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56B952814CD
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 21:55:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7C1C6F06A;
-	Sun,  2 Jun 2024 21:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0189D482ED;
+	Sun,  2 Jun 2024 21:55:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YNLfVEaK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uhf9LWSr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8051DDEE;
-	Sun,  2 Jun 2024 21:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFBA210E6
+	for <netdev@vger.kernel.org>; Sun,  2 Jun 2024 21:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717362957; cv=none; b=JarYUjLe4q85avvT8x8QUEGwSEGNqpqz629ffFYyUUdk5UcHMMf0tZH+jAL/GAAaIL2gZW8CG1KeGXpZVYpxipxLp0NdLKzVr4x1bC9Gg6d7qyY/5a7ofqI6aGn8dxQ9yvKYwE7IsXN3CwluTYwUhsCW7jB/0H8rmmOr3VILXNM=
+	t=1717365354; cv=none; b=TO7BbFrBwX0EEekwyZmeRcVthMOwAWgDfXQ5P68i4cSC6F4gZp//PfK0jD1UKynxC3wBDumfXzml9WelADBueM+Rxk57IPCDKZ4mo+oMO68Godt8sJ3zEbuAy6EDlW3XUFkF2LStx728um2S+I8VURRcNs2JNoJWk/7TkoozlHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717362957; c=relaxed/simple;
-	bh=M++0u+W4mK9MwYmOrRySBBS5cDRDB0dQj/1G68qhDeg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H22x4GmbuKMR+8x81R2sLpMJhAj1puaUPnf2lnBGkJj9REZr1glKyHXUc3aSBNRYLjz7WK3gANgWZtKLj+55s+cLLCYnebzGiBEg6ylRHTBs4XHvkkGeAtKckVtzXACVZS0DUTxItxQk+UNvsWsdFNHRa6e8UCJlwc4BNDYJzUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YNLfVEaK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A27B9C2BBFC;
-	Sun,  2 Jun 2024 21:15:56 +0000 (UTC)
+	s=arc-20240116; t=1717365354; c=relaxed/simple;
+	bh=kzb6HGYfa/xyMnxpTCJD7vhgo4XxOdARoMkXYpJ240E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=svXJWUt7sXOuMyhBiy1FIbcoVsuHOHO/EhN2vOlaxrx0SSpmpDF7YcDVYrKPNOynxnGGN8KN/hh1XvDNibEzVHcthvAlI0idda5kBMYa1MLgm8txyfxlJ/4jtVtS3k45DRE1b3IIdFhU6qYu+PoellTqWzyu5lo6apoUaJeanUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uhf9LWSr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08009C32789;
+	Sun,  2 Jun 2024 21:55:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717362957;
-	bh=M++0u+W4mK9MwYmOrRySBBS5cDRDB0dQj/1G68qhDeg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YNLfVEaKnI0TueS9xy+9VunvGyupBFb2V3bBfXXaV496NCJri1NXODSAiVx2tPQYZ
-	 32wLJzDznfWZ0IQzquJtWZIrNcnhADuR85cIs5XrogX74zjMLsq8+wpnyZ2heYxrdf
-	 DZ+IddJSYRa2tYH/fkvpgETA8zAUYnrq0+Z/Q45l1Zj54tnDeEWU4iRCkBfyuTyLge
-	 UupdbbKqemzgvJVYXQESqdophOoBrC3S79VzmRKixJEC3R8XLBsZPE6+uwAnXmimKq
-	 EKJbwllt1PTXgr6cIax/SIIkhNNqmpfC7N2aTehd+iQIbTMp6ra3UA9c07z+AKjwHO
-	 L+xrcDJzK6Jig==
-Date: Sun, 2 Jun 2024 23:15:53 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, nbd@nbd.name, lorenzo.bianconi83@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, conor@kernel.org,
-	linux-arm-kernel@lists.infradead.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, catalin.marinas@arm.com,
-	will@kernel.org, upstream@airoha.com,
-	angelogioacchino.delregno@collabora.com,
-	benjamin.larsson@genexis.eu
-Subject: Re: [PATCH net-next 3/3] net: airoha: Introduce ethernet support for
- EN7581 SoC
-Message-ID: <ZlzhCVO7WCGyYMi9@lore-desk>
-References: <cover.1717150593.git.lorenzo@kernel.org>
- <4d63e7706ef7ae12aade49e41bb6d0bb6b429706.1717150593.git.lorenzo@kernel.org>
- <c3207c89-2d4e-4e92-8822-f6a1f7d64e06@lunn.ch>
+	s=k20201202; t=1717365354;
+	bh=kzb6HGYfa/xyMnxpTCJD7vhgo4XxOdARoMkXYpJ240E=;
+	h=From:To:Cc:Subject:Date:From;
+	b=uhf9LWSreKdq0DZXAiWkbsOEtUDXuGY0yB6LDzUV/AFAf+LtFyXgXzti6n532aR9t
+	 VED8SGaN1vD1/5XgIOOKXSuYY7oR0wsRF53QmSpuew8u8PpL/8iaIceYbQO3Yr1K/J
+	 ruzwrwX+kaDcnwu+KmfcZNIlPQJ1F2o+C1oX5F8hqs/w3hW1IItaBpufKM5rNc2WBx
+	 sLk/YCotsvN9Fr+EKFoUA+K/rA/hMA594A5SGpKAn5IuuCfHwObLHbfT44/KUnmbU/
+	 NePPg6ERNu99LYTOIsefB/cQOvm142PerARU05Y+RQ/Ds/kFxPuuSOmi3J+f6giJ+U
+	 emBK7GTqJgKeA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>,
+	dsahern@kernel.org
+Subject: [PATCH net v2] inet: bring NLM_DONE out to a separate recv() in inet_dump_ifaddr()
+Date: Sun,  2 Jun 2024 14:55:52 -0700
+Message-ID: <20240602215552.807150-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="CZ+A1N2g01IXv6oZ"
-Content-Disposition: inline
-In-Reply-To: <c3207c89-2d4e-4e92-8822-f6a1f7d64e06@lunn.ch>
+Content-Transfer-Encoding: 8bit
 
+Jaroslav reports Dell's OMSA Systems Management Data Engine
+expects NLM_DONE in a separate recvmsg(), so revert to the
+old behavior.
 
---CZ+A1N2g01IXv6oZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This is the same kind of fix as we added in
+commit 460b0d33cf10 ("inet: bring NLM_DONE out to a separate recv() again")
+so wrap the logic into a helper, to make it easier to keep track
+of which dump handles we know to require legacy handling
+(and possibly one day let sockets opt into not doing this).
 
-> > +static int airoha_set_gdma_port(struct airoha_eth *eth, int port, bool=
- enable)
-> > +{
-> > +	u32 vip_port, cfg_addr, val =3D enable ? FE_DP_PPE : FE_DP_DROP;
-> > +
-> > +	switch (port) {
-> > +	case 0:
-> > +		vip_port =3D BIT(22);
-> > +		cfg_addr =3D REG_GDM3_FWD_CFG;
-> > +		break;
-> > +	case 1:
-> > +		vip_port =3D BIT(23);
-> > +		cfg_addr =3D REG_GDM3_FWD_CFG;
-> > +		break;
-> > +	case 2:
-> > +		vip_port =3D BIT(25);
-> > +		cfg_addr =3D REG_GDM4_FWD_CFG;
-> > +		break;
-> > +	case 4:
-> > +		vip_port =3D BIT(24);
-> > +		cfg_addr =3D REG_GDM4_FWD_CFG;
-> > +		break;
->=20
-> Please add some #defines for the BIT(), so there is descriptive
-> names. Please do the same other places you have BIT macros, it makes
-> the code easier to understand.
+Tested:
 
-ack, I will do in v2
+  ./cli.py --dbg-small-recv 4096 --spec netlink/specs/rt_addr.yaml \
+           --dump getaddr --json '{"ifa-family": 2}'
 
->=20
-> > +static int airoha_set_gdma_ports(struct airoha_eth *eth, bool enable)
-> > +{
-> > +	const int port_list[] =3D { 0, 1, 2, 4 };
-> > +	int i;
->=20
-> Maybe add a comment about port 3?
->=20
-> > +static void airoha_fe_vip_setup(struct airoha_eth *eth)
-> > +{
-> > +	airoha_fe_wr(eth, REG_FE_VIP_PATN(3), 0x8863); /* ETH->PPP (0x8863) */
->=20
-> Rather than a comment, use ETH_P_PPP_DISC
+  ./cli.py --dbg-small-recv 4096 --spec netlink/specs/rt_route.yaml \
+           --dump getroute --json '{"rtm-family": 2}'
 
-ack, I will do in v2
+  ./cli.py --dbg-small-recv 4096 --spec netlink/specs/rt_link.yaml \
+           --dump getlink
 
->=20
-> > +	airoha_fe_wr(eth, REG_FE_VIP_EN(3), PATN_FCPU_EN_MASK | PATN_EN_MASK);
-> > +
-> > +	airoha_fe_wr(eth, REG_FE_VIP_PATN(4), 0xc021); /* PPP->LCP (0xc021) */
->=20
-> PPP_LCP
+Fixes: 3e41af90767d ("rtnetlink: use xarray iterator to implement rtnl_dump_ifinfo()")
+Fixes: cdb2f80f1c10 ("inet: use xa_array iterator to implement inet_dump_ifaddr()")
+Reported-by: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Link: https://lore.kernel.org/all/CAK8fFZ7MKoFSEzMBDAOjoUt+vTZRRQgLDNXEOfdCCXSoXXKE0g@mail.gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+v2:
+ - adjust the comment in the kdoc
+ - add getlink
 
-ack, I will do in v2
->=20
-> > +	airoha_fe_wr(eth, REG_FE_VIP_EN(4),
-> > +		     PATN_FCPU_EN_MASK | FIELD_PREP(PATN_TYPE_MASK, 1) |
-> > +		     PATN_EN_MASK);
-> > +
-> > +	airoha_fe_wr(eth, REG_FE_VIP_PATN(6), 0x8021); /* PPP->IPCP (0x8021) =
-*/
->=20
-> PPP_IPCP
->=20
-> etc...
+CC: dsahern@kernel.org
+---
+ include/net/netlink.h   | 40 ++++++++++++++++++++++++++++++++++++++++
+ net/core/rtnetlink.c    |  5 ++++-
+ net/ipv4/devinet.c      |  3 +++
+ net/ipv4/fib_frontend.c |  5 +----
+ 4 files changed, 48 insertions(+), 5 deletions(-)
 
-ack, I will do in v2
+diff --git a/include/net/netlink.h b/include/net/netlink.h
+index e78ce008e07c..e41069edaea1 100644
+--- a/include/net/netlink.h
++++ b/include/net/netlink.h
+@@ -1198,6 +1198,46 @@ nl_dump_check_consistent(struct netlink_callback *cb,
+ 	cb->prev_seq = cb->seq;
+ }
+ 
++/**
++ * nl_dump_legacy_retval - get legacy return code for netlink dumps
++ * @err: error encountered during dump, negative errno or zero
++ * @skb: skb with the dump results
++ *
++ * Netlink dump callbacks get called multiple times per dump, because
++ * all the objects may not fit into a single skb. Whether another iteration
++ * is necessary gets decided based on the return value of the callback
++ * (with 0 meaning "end reached").
++ *
++ * The semantics used to be more complicated, with positive return values
++ * meaning "continue" and negative meaning "end with an error". A lot of
++ * handlers simplified this to return skb->len ? : -errno. Meaning that zero
++ * would only be returned when skb was empty, requiring another recvmsg()
++ * syscall just to get the NLM_DONE message.
++ *
++ * The current semantics allow handlers to also return -EMSGSIZE to continue.
++ *
++ * Unfortunately, some user space has started to depend on the NLM_DONE
++ * message being returned individually, in a separate recvmsg(). Select
++ * netlink dumps must preserve those semantics.
++ *
++ * This helper wraps the "legacy logic" and serves as an annotation for
++ * dumps which are known to require legacy handling.
++ *
++ * When used in combination with for_each_netdev_dump() - make sure to
++ * invalidate the ifindex when iteration is done. for_each_netdev_dump()
++ * does not move the iterator index "after" the last valid entry.
++ *
++ * NOTE: Do not use this helper in new code or dumps without legacy users!
++ *
++ * Return: return code to use for a dump handler
++ */
++static inline int nl_dump_legacy_retval(int err, const struct sk_buff *skb)
++{
++	if (err < 0 && err != -EMSGSIZE)
++		return err;
++	return skb->len;
++}
++
+ /**************************************************************************
+  * Netlink Attributes
+  **************************************************************************/
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index b86b0a87367d..522bbd70c205 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -2284,8 +2284,11 @@ static int rtnl_dump_ifinfo(struct sk_buff *skb, struct netlink_callback *cb)
+ 				       ext_filter_mask, 0, NULL, 0,
+ 				       netnsid, GFP_KERNEL);
+ 		if (err < 0)
+-			break;
++			goto done;
+ 	}
++	ctx->ifindex = INT_MAX;
++done:
++	err = nl_dump_legacy_retval(err, skb);
+ 	cb->seq = tgt_net->dev_base_seq;
+ 	nl_dump_check_consistent(cb, nlmsg_hdr(skb));
+ 	if (netnsid >= 0)
+diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+index 96accde527da..4666e1ee2c14 100644
+--- a/net/ipv4/devinet.c
++++ b/net/ipv4/devinet.c
+@@ -1911,7 +1911,10 @@ static int inet_dump_ifaddr(struct sk_buff *skb, struct netlink_callback *cb)
+ 		if (err < 0)
+ 			goto done;
+ 	}
++	ctx->ifindex = INT_MAX;
+ done:
++	err = nl_dump_legacy_retval(err, skb);
++
+ 	if (fillargs.netnsid >= 0)
+ 		put_net(tgt_net);
+ 	rcu_read_unlock();
+diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
+index c484b1c0fc00..100d77eafe35 100644
+--- a/net/ipv4/fib_frontend.c
++++ b/net/ipv4/fib_frontend.c
+@@ -1051,10 +1051,7 @@ static int inet_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
+ 		}
+ 	}
+ 
+-	/* Don't let NLM_DONE coalesce into a message, even if it could.
+-	 * Some user space expects NLM_DONE in a separate recv().
+-	 */
+-	err = skb->len;
++	err = nl_dump_legacy_retval(err, skb);
+ out:
+ 
+ 	cb->args[1] = e;
+-- 
+2.45.1
 
->=20
-> > +static int airoha_qdma_fill_rx_queue(struct airoha_queue *q)
-> > +{
-> > +	struct airoha_eth *eth =3D q->eth;
-> > +	struct device *dev =3D eth->net_dev->dev.parent;
-> > +	int qid =3D q - &eth->q_rx[0], nframes =3D 0;
->=20
-> Reverse Christmass tree. Which means you will need to move some of the
-> assignments into the body of the function.
-
-ack, I will fix it in v2
->=20
-> > +static int airoha_dev_open(struct net_device *dev)
-> > +{
-> > +	struct airoha_eth *eth =3D netdev_priv(dev);
-> > +	int err;
-> > +
-> > +	if (netdev_uses_dsa(dev))
-> > +		airoha_fe_set(eth, REG_GDM1_INGRESS_CFG, GDM1_STAG_EN_MASK);
-> > +	else
-> > +		airoha_fe_clear(eth, REG_GDM1_INGRESS_CFG, GDM1_STAG_EN_MASK);
->=20
-> Does this imply the hardware can be used in a situation where it is
-> not connected to a switch? Does it have an MII and MDIO bus? Could a
-> PHY be connected? If it can be used as a conventional NIC, we need to
-> ensure there is a path to use usage without an ABI breakage.
-
-I tested the driver removing the dsa switch from the board dts and
-resetting the switch at bootstrap in order to erase uboot running
-configuration.  Doing so the driver works fine.
-Moreover, I will add in the future connections to different phys through
-GDM{2,3,4} ports (so far we support just GDM1 that is connected the mt7530
-switch).
-
->=20
-> > +static int airoha_register_debugfs(struct airoha_eth *eth)
-> > +{
-> > +	eth->debugfs_dir =3D debugfs_create_dir(KBUILD_MODNAME, NULL);
-> > +	if (IS_ERR(eth->debugfs_dir))
-> > +		return PTR_ERR(eth->debugfs_dir);
->=20
-> No error checking should be performed with debugfs calls. Just keep
-> going and it will work out O.K.
-
-ack, I will fix it in v2
-
->=20
-> > +	err =3D of_get_ethdev_address(np, dev);
-> > +	if (err) {
-> > +		if (err =3D=3D -EPROBE_DEFER)
-> > +			return err;
-> > +
-> > +		eth_hw_addr_random(dev);
-> > +		dev_err(&pdev->dev, "generated random MAC address %pM\n",
-> > +			dev->dev_addr);
->=20
-> dev_info() would be better here, since it is not considered an error.
-
-ack, I will fix it in v2
-
->=20
-> > +	err =3D airoha_hw_init(eth);
-> > +	if (err)
-> > +		return err;
-> > +
-> > +	airoha_qdma_start_napi(eth);
-> > +	err =3D register_netdev(dev);
-> > +	if (err)
-> > +		return err;
-> > +
-> > +	err =3D airoha_register_debugfs(eth);
-> > +	if (err)
-> > +		return err;
-> > +
-> > +	platform_set_drvdata(pdev, eth);
->=20
-> Is this required? As soon as you call register_netdev(), the device is
-> live and in use. It can be sending the first packets before the
-> function returns. So if anything needs this connection between the
-> platform data and the eth, it will not be in place, and bad things
-> will happen.
-
-it is used just in the remove callback but I can move it before
-register_netdev() and I will set it to NULL in case of error.
-
->=20
-> > +static inline void airoha_qdma_start_napi(struct airoha_eth *eth)
-> > +{
-> > +	int i;
-> > +
-> > +	for (i =3D 0; i < ARRAY_SIZE(eth->q_tx_irq); i++)
-> > +		napi_enable(&eth->q_tx_irq[i].napi);
-> > +
-> > +	airoha_qdma_for_each_q_rx(eth, i)
-> > +		napi_enable(&eth->q_rx[i].napi);
-> > +}
-> > +
-> > +static inline void airoha_qdma_stop_napi(struct airoha_eth *eth)
-> > +{
-> > +	int i;
-> > +
-> > +	for (i =3D 0; i < ARRAY_SIZE(eth->q_tx_irq); i++)
-> > +		napi_disable(&eth->q_tx_irq[i].napi);
-> > +
-> > +	airoha_qdma_for_each_q_rx(eth, i)
-> > +		napi_disable(&eth->q_rx[i].napi);
-> > +}
->=20
-> These seem off to be in a header file?
-
-ack, I will move them in .c.
-
-Regards,
-Lorenzo
-
->=20
->     Andrew
->=20
-> ---
-> pw-bot: cr
-
---CZ+A1N2g01IXv6oZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZlzhCQAKCRA6cBh0uS2t
-rJzgAP47/O83h3iZRAN8AD3fUFvOiXbzDbxdVq8TOzN/nZawpwEA2gLE1PXnxaej
-ySKZz7YXr26pru9cq6r6ZjwHESA61gU=
-=5+65
------END PGP SIGNATURE-----
-
---CZ+A1N2g01IXv6oZ--
 
