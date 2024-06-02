@@ -1,122 +1,127 @@
-Return-Path: <netdev+bounces-100021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 608078D776C
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 20:10:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0026C8D7776
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 20:27:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 031011F211EF
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 18:10:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7427F1F21337
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 18:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 850B95FB8A;
-	Sun,  2 Jun 2024 18:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7E164A98;
+	Sun,  2 Jun 2024 18:27:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DMXRB2nP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LstfUTUH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F031E4A2;
-	Sun,  2 Jun 2024 18:10:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65ADE39FDD;
+	Sun,  2 Jun 2024 18:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717351811; cv=none; b=iqnkVFqnmtykCKkl7t0QqZLuZTzCOava4KuISTJVB4UPU37H7pYNayi5/4ypK6es+UfHHRnOcAJbI+oqDi+ayUNUL9Lqs7fbTcyt28o7Q5qSiE3QxqtM11lQRJtoZ67Q9+Gigr+vDTfzNdK0e25LyJehtxGrPoWSVauGCn2XxiY=
+	t=1717352840; cv=none; b=soOFBSjEJM2FacyASRzfwh0OnfwL1IpkUrlpWoNOQ+YqQ/JqVZQHiEBSXdo3FLHDAdxFMNST+b5ElI0/GcgJ9F6FUnoswrPI6VdJtd7PFdA5mzzbKzezuELEfXP68kd4yctDMt07LgdOJHf/3EX0n5YCnegyV8aQqJohnK8DQS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717351811; c=relaxed/simple;
-	bh=+2MHK2yMT+QKsyqaCKdYfGSKtVMLtPAzggfxfAy/6mc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=blJZ4MiG5HluMLtwbsY/23TJHntGutHPj3StfoHVE5nlcgCJF+Vu54dIVBg598G2HqN621MDJHc8O8K31i0ElzI8Zjibmk1bUTpfy1oS5mi1t9J0C4oDZLhUhLUSgwR4LPJ8lQYoBvB6Dcdl9cSQ+essUpJqY7KQY9O3CvvbLMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DMXRB2nP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54FD1C2BBFC;
-	Sun,  2 Jun 2024 18:10:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717351810;
-	bh=+2MHK2yMT+QKsyqaCKdYfGSKtVMLtPAzggfxfAy/6mc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DMXRB2nPmoDXEmw78Xp2j8KvSgFsayRwfNGzYQHtr3rVYV8XL9yyY0i5oLVuEjs/4
-	 cY8X7VLaWfJ+MTMikL0+t/l8EpqULi2xC8cGf0mumpKOEypU0uc3QdnEJCN9QHMsGZ
-	 TtXEoanspd5DhWx2ud7/3wQKJ08BMz3t96GuH6b8JrdcYg0wyMYH4CuW/17o7D3W5/
-	 d30Yg32xUJ9bFMS8eOcOI3igakZ+1E9kpGDDGqvcPfjwAF3FIBJuZYLf6kx83ELvtw
-	 5kWgBRsx1uE5jaNuPv5fegJ0Jf8sktv/gGbc2VRuqTCoQuVq9p91VSE8prGhTCfDCR
-	 QLcBaqXvjKztQ==
-Date: Sun, 2 Jun 2024 20:10:06 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, nbd@nbd.name, lorenzo.bianconi83@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, conor@kernel.org,
-	linux-arm-kernel@lists.infradead.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	devicetree@vger.kernel.org, catalin.marinas@arm.com,
-	will@kernel.org, upstream@airoha.com,
-	angelogioacchino.delregno@collabora.com,
-	benjamin.larsson@genexis.eu
-Subject: Re: [PATCH net-next 3/3] net: airoha: Introduce ethernet support for
- EN7581 SoC
-Message-ID: <Zly1fi5kr9YNo2yN@lore-desk>
-References: <cover.1717150593.git.lorenzo@kernel.org>
- <4d63e7706ef7ae12aade49e41bb6d0bb6b429706.1717150593.git.lorenzo@kernel.org>
- <9efb0c64-d3b2-478b-953e-94ef8be3ddec@lunn.ch>
+	s=arc-20240116; t=1717352840; c=relaxed/simple;
+	bh=OlfH/fy/yrVPChwsu+/wusMIhTqj5QvM8psAgNsK0eY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=K/ly8iZXkfKy/hALBAN4QAjMH476no/UulPuTagB2EvI6oFI+ji3Yf8KYoviE+8QTu5O70+F6LITVbIVQ7NJTC35lQbDd8suKcXEHDfV7pjPVyNwLhCeX+cA4GykBVNdnyA+3E6Xb54rsRzPMnvny/0GyNk2GQki1pNfhCEbL00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LstfUTUH; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-70255d5ddb8so845305b3a.0;
+        Sun, 02 Jun 2024 11:27:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717352838; x=1717957638; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cz4RbsfTPwYac1XpECU+5e1PfNtGMLY5PUzwpA6s3+Q=;
+        b=LstfUTUHLlrvQH3EH24FjRuA4+LvOFVVyVZTcLWe4Tz/iGQi8fEwaP83xPVpMu1IJk
+         9A++o0FI2+Bf8KDkZOeZPEIKre6gso69Doi+lbgt01HyID4SltkQyWslZtfQ4sDnz00f
+         dVIpf5DB502S01wgR9Y5vWw7YwsfGNgX4jR8sErdRU4jwl35LWGPM5nU8oC3eP+ZMTt6
+         caUwOgkC9GylfyiZeYn7bkiSTSwwiQecHhmlpLvsrNbWlHWL+rw9F/RjZJ47XQourOMG
+         dyeGlZQK0ZI3WPPlPnb4AQJL6Sb9ijA/xLq0ex1+cgNJnN9R42Yp2FlQBupo32E1yZX5
+         Tb5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717352838; x=1717957638;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cz4RbsfTPwYac1XpECU+5e1PfNtGMLY5PUzwpA6s3+Q=;
+        b=Eq6QOkwvnaO2hlxgSzIHLe5FpVDKbMusB+TCw7KQo1OPSMLATdvpKH/u9MYqfNWbCI
+         HtzbHL5KAA/QxQ1tdQn0hjZtZZ8MZfsorZ8omJcWqdBBPDCM+dcv/2c31yPNwA8lC2/Z
+         me2uI3H74ycDAz5WVFYNHYf4od0cXhWXjmHi8eututTyOmGnYe/x39Bh+DzVHxyfL5kz
+         XJzYUYvVXPErNnb4xSGfMyK2BLlSWdFlZAgZGzK9w+FDPA9jnpFONlMiH7JVGxMliLWA
+         5BOBa3szxyQAipTPEjA+tW2Rb9gJlwy9STa9xLS3SrJRDHVLtfakrG61AkUXnYZ1FNJS
+         IHUQ==
+X-Gm-Message-State: AOJu0Yx4godYR5tnlno+dgaVN0W0MftSTAP+HtIaj74d0pKFUEc0T5US
+	oZrHC0xRIPwQv0Nf/zLIE6mzbJTX2ONtJflYaaQkCnLW7Q4p+pB8VFTfxQ==
+X-Google-Smtp-Source: AGHT+IHfcjaBCK58T8HD+hNvaaffVC3TQmTmd0kTZWY2jqIb2/tRw4wrWTEr9/w8bkUflBqJfw7XKA==
+X-Received: by 2002:a05:6a00:9283:b0:702:5f69:54e0 with SMTP id d2e1a72fcca58-7025f695787mr3866593b3a.14.1717352838115;
+        Sun, 02 Jun 2024 11:27:18 -0700 (PDT)
+Received: from pop-os.hsd1.ca.comcast.net ([2601:647:6881:9060:ca2c:f1d4:4d:74a3])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-702423cf27fsm4387564b3a.12.2024.06.02.11.27.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Jun 2024 11:27:17 -0700 (PDT)
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	Cong Wang <cong.wang@bytedance.com>,
+	syzbot+1989ee16d94720836244@syzkaller.appspotmail.com,
+	Andrii Nakryiko <andrii@kernel.org>
+Subject: [Patch bpf] bpf: fix a potential use-after-free in bpf_link_free()
+Date: Sun,  2 Jun 2024 11:27:03 -0700
+Message-Id: <20240602182703.207276-1-xiyou.wangcong@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="rMKqNu+NNvg9Cdc8"
-Content-Disposition: inline
-In-Reply-To: <9efb0c64-d3b2-478b-953e-94ef8be3ddec@lunn.ch>
+Content-Transfer-Encoding: 8bit
 
+From: Cong Wang <cong.wang@bytedance.com>
 
---rMKqNu+NNvg9Cdc8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+After commit 1a80dbcb2dba, bpf_link can be freed by
+link->ops->dealloc_deferred, but the code still tests and uses
+link->ops->dealloc afterward, which leads to a use-after-free as
+reported by syzbot. Actually, one of them should be sufficient, so
+just call one of them instead of both. Also add a WARN_ON() in case
+of any problematic implementation.
 
-> > +static void airoha_remove(struct platform_device *pdev)
-> > +{
-> > +	struct airoha_eth *eth =3D platform_get_drvdata(pdev);
-> > +	int i;
-> > +
-> > +	debugfs_remove(eth->debugfs_dir);
-> > +
-> > +	airoha_qdma_for_each_q_rx(eth, i) {
-> > +		struct airoha_queue *q =3D &eth->q_rx[i];
-> > +
-> > +		netif_napi_del(&q->napi);
-> > +		airoha_qdma_clenaup_rx_queue(q);
-> > +		page_pool_destroy(q->page_pool);
-> > +	}
-> > +
-> > +	for (i =3D 0; i < ARRAY_SIZE(eth->q_tx_irq); i++)
-> > +		netif_napi_del(&eth->q_tx_irq[i].napi);
-> > +	for (i =3D 0; i < ARRAY_SIZE(eth->q_tx); i++)
-> > +		airoha_qdma_clenaup_tx_queue(&eth->q_tx[i]);
-> > +}
->=20
-> You don't appear to unregister the netdev. remove() should basically
-> be the reverse of probe().
->=20
->     Andrew
+Reported-by: syzbot+1989ee16d94720836244@syzkaller.appspotmail.com
+Fixes: 1a80dbcb2dba ("bpf: support deferring bpf_link dealloc to after RCU grace period")
+Cc: Andrii Nakryiko <andrii@kernel.org>
+Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+---
+ kernel/bpf/syscall.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-ack, I will fix it in v2.
+diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
+index 2222c3ff88e7..d8f244069495 100644
+--- a/kernel/bpf/syscall.c
++++ b/kernel/bpf/syscall.c
+@@ -2998,6 +2998,7 @@ static int bpf_obj_get(const union bpf_attr *attr)
+ void bpf_link_init(struct bpf_link *link, enum bpf_link_type type,
+ 		   const struct bpf_link_ops *ops, struct bpf_prog *prog)
+ {
++	WARN_ON(ops->dealloc && ops->dealloc_deferred);
+ 	atomic64_set(&link->refcnt, 1);
+ 	link->type = type;
+ 	link->id = 0;
+@@ -3074,8 +3075,7 @@ static void bpf_link_free(struct bpf_link *link)
+ 			call_rcu_tasks_trace(&link->rcu, bpf_link_defer_dealloc_mult_rcu_gp);
+ 		else
+ 			call_rcu(&link->rcu, bpf_link_defer_dealloc_rcu_gp);
+-	}
+-	if (link->ops->dealloc)
++	} else if (link->ops->dealloc)
+ 		link->ops->dealloc(link);
+ }
+ 
+-- 
+2.34.1
 
-Regards,
-Lorenzo
-
---rMKqNu+NNvg9Cdc8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZly1fgAKCRA6cBh0uS2t
-rGnRAQDL+Z25OzOQ0PBS7Q4U+fs6OlcTqibJhISHTyD7t+RhwgD9F7EUM814UEW/
-+o/GVe1SP1g9LG4cu0E1pVX9uw2XRgI=
-=aNJq
------END PGP SIGNATURE-----
-
---rMKqNu+NNvg9Cdc8--
 
