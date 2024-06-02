@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-100011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B11978D7735
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 18:45:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BCA88D7744
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 19:05:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B9C61F212A8
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 16:45:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D45B1C20AD6
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 17:05:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2205E11712;
-	Sun,  2 Jun 2024 16:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E47C555880;
+	Sun,  2 Jun 2024 17:05:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eMV20MTy"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jSbStml4"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDCA1DFF8;
-	Sun,  2 Jun 2024 16:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0604E482FA;
+	Sun,  2 Jun 2024 17:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717346729; cv=none; b=BiQ1yLUquaEkHoCSAc76icNvS+/YUs2lz8waxHEL0yjV4y9fb56uuyAbVgKabGBV4/0iF8YQL3RdGAdgQbnMqnPPUl4s1ztl/L7pVQaNiIPh34ueefZd8oMSWGbTBd2oR8nb+bsL3DeVRsEe9ko4bsi8a2nLEBBLsDba12+VM+o=
+	t=1717347915; cv=none; b=jybMKjtP02RTDglWCXRzQCciPZUP/Vnf8WQAj8P8wg1/h4pEBRf3+nyZIl3bVd9RROZzN8LbHpt/87wEIqWo+x5XmNnopB6qTVqvVxsW5eoE9kT5XoTZpyHoAbsDUohMtNpltPD2Dy8r0CnKKNAj9KSEXhQAZ8IqAHi92LuJJQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717346729; c=relaxed/simple;
-	bh=c5LYpW+xTgQarazi/IQ7/kG9iiaYTqQFdkkLNpW95pw=;
+	s=arc-20240116; t=1717347915; c=relaxed/simple;
+	bh=ft1WFhqfEDuAOEfdUsxrdnOhE+mAw0j0NCjbdvAdVYk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fQwTWrX4Wfnn1qclyZ2AEZHmB90a+ejt1oiiBRCB/aVtt6NA7yQN70D5TYlbk6fDgB6H72cnFf/o9XjSuCoTKjpt8H5BlDKWvdJepZ16bHxQVGr6kRu4J0qVCoJtVKF0ZNI6fHDFqoCHy75QK3oM6LFN5YGBnd1G02bRNK6mjxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eMV20MTy; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gp0IwnnWBNp+6X99uXmYG+YwJ06+o2J0QZxNnJPvpFp/mRyLAHDxwklPPRkNrPk+pE06XJKWC1mXZ1Hu01N1JN408bvy2v4gBtlz0mZpbmwhUbDLpvfmo9t9XGnoMHRhEj5aEDgypsIKcruZIpq/YC73NnD5jzrQx/F9fxaRSGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jSbStml4; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,26 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=E+ueS2eEFa2OpuuO5ZI4AFvsqau7YjoMECLisKyw7Wk=; b=eMV20MTyZ4k3m5ti7s7PxT6V6f
-	E4fWb4/PivFFAQ9A3x9BIRT/NiW9SWEh5zXBmzNLFqXnHZ1saDuqSnJ6E6gOpof8Gxg0GnJRZ8eVz
-	LQw8iHtNIxVqU8W1lOWDpw3k4UM0zh3HNrlVI6cyXXnUkFIamHzBW40HIYhvei8Hkcy4=;
+	bh=XrnfCFVA692poKyGKvkjY/UIQpDOqNdBiQZ2G92IKbY=; b=jSbStml4jJu/FcVZfeQeWHVefN
+	gRtv9iDMkk7KfKHemRdkbNmPyX+MYfKguFiZmjTs4xniW7pSFjA+Z80xQYCu5PYanMgPt8nSd6Zpg
+	OljtJMUxIPtAN+54FkuF2J4TIMqhB1cy0FVkNHpDJUoqbiEH0bPy0brjIErTO20jUEFU=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sDoKa-00Ge9U-Gf; Sun, 02 Jun 2024 18:45:16 +0200
-Date: Sun, 2 Jun 2024 18:45:16 +0200
+	id 1sDodj-00GeBb-J4; Sun, 02 Jun 2024 19:05:03 +0200
+Date: Sun, 2 Jun 2024 19:05:03 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Yojana Mallik <y-mallik@ti.com>
-Cc: schnelle@linux.ibm.com, wsa+renesas@sang-engineering.com,
-	diogo.ivo@siemens.com, rdunlap@infradead.org, horms@kernel.org,
-	vigneshr@ti.com, rogerq@ti.com, danishanwar@ti.com,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, srk@ti.com, rogerq@kernel.org
-Subject: Re: [PATCH net-next v2 2/3] net: ethernet: ti: Register the RPMsg
- driver as network device
-Message-ID: <4416ada7-399b-4ea0-88b0-32ca432d777b@lunn.ch>
-References: <20240531064006.1223417-1-y-mallik@ti.com>
- <20240531064006.1223417-3-y-mallik@ti.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: netdev@vger.kernel.org, nbd@nbd.name, lorenzo.bianconi83@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, conor@kernel.org,
+	linux-arm-kernel@lists.infradead.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, catalin.marinas@arm.com,
+	will@kernel.org, upstream@airoha.com,
+	angelogioacchino.delregno@collabora.com,
+	benjamin.larsson@genexis.eu
+Subject: Re: [PATCH net-next 2/3] arm64: dts: airoha: Add EN7581 ethernet node
+Message-ID: <e79b7180-74ef-4306-9f73-47ee54c91660@lunn.ch>
+References: <cover.1717150593.git.lorenzo@kernel.org>
+ <0f4194ef6243ae0767887f25a4e661092c10fbbd.1717150593.git.lorenzo@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,83 +66,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240531064006.1223417-3-y-mallik@ti.com>
+In-Reply-To: <0f4194ef6243ae0767887f25a4e661092c10fbbd.1717150593.git.lorenzo@kernel.org>
 
-> +enum icve_rpmsg_type {
-> +	/* Request types */
-> +	ICVE_REQ_SHM_INFO = 0,
-> +	ICVE_REQ_SET_MAC_ADDR,
+On Fri, May 31, 2024 at 12:22:19PM +0200, Lorenzo Bianconi wrote:
+> Introduce the Airoha EN7581 ethernet node in Airoha EN7581 dtsi
+> 
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  arch/arm64/boot/dts/airoha/en7581-evb.dts |  4 +++
+>  arch/arm64/boot/dts/airoha/en7581.dtsi    | 31 +++++++++++++++++++++++
+>  2 files changed, 35 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/airoha/en7581-evb.dts b/arch/arm64/boot/dts/airoha/en7581-evb.dts
+> index cf58e43dd5b2..82da86ae00b0 100644
+> --- a/arch/arm64/boot/dts/airoha/en7581-evb.dts
+> +++ b/arch/arm64/boot/dts/airoha/en7581-evb.dts
+> @@ -24,3 +24,7 @@ memory@80000000 {
+>  		reg = <0x0 0x80000000 0x2 0x00000000>;
+>  	};
+>  };
 > +
-> +	/* Response types */
-> +	ICVE_RESP_SHM_INFO,
-> +	ICVE_RESP_SET_MAC_ADDR,
-> +
-> +	/* Notification types */
-> +	ICVE_NOTIFY_PORT_UP,
-> +	ICVE_NOTIFY_PORT_DOWN,
-> +	ICVE_NOTIFY_PORT_READY,
-> +	ICVE_NOTIFY_REMOTE_READY,
+> +&eth0 {
+> +	status = "okay";
 > +};
 
-+struct message_header {
-+       u32 src_id;
-+       u32 msg_type; /* Do not use enum type, as enum size is compiler dependent */
-+} __packed;
-
-
-Given how you have defined icve_rpmsg_type, what is the point of
-message_header.msg_type?
-
-It seems like this would make more sense:
-
-enum icve_rpmsg_request_type {
-	ICVE_REQ_SHM_INFO = 0,
-	ICVE_REQ_SET_MAC_ADDR,
-}
-
-enum icve_rpmsg_response_type {
-	ICVE_RESP_SHM_INFO,
-	ICVE_RESP_SET_MAC_ADDR,
-}
-enum icve_rpmsg_notify_type {
-	ICVE_NOTIFY_PORT_UP,
-	ICVE_NOTIFY_PORT_DOWN,
-	ICVE_NOTIFY_PORT_READY,
-	ICVE_NOTIFY_REMOTE_READY,
-};
-
-Also, why SET_MAC_ADDR? It would be good to document where the MAC
-address are coming from. And what address this is setting.
-
-In fact, please put all the protocol documentation into a .rst
-file. That will help us discuss the protocol independent of the
-implementation. The protocol is an ABI, so needs to be reviewed well.
-
-> +struct icve_shm_info {
-> +	/* Total shared memory size */
-> +	u32 total_shm_size;
-> +	/* Total number of buffers */
-> +	u32 num_pkt_bufs;
-> +	/* Per buff slot size i.e MTU Size + 4 bytes for magic number + 4 bytes
-> +	 * for Pkt len
-> +	 */
-
-What is your definition of MTU?
-
-enp2s0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN mode DEFAULT group default qlen 1000
-
-Typically, MTU does not include the Ethernet header or checksum. Is
-that what you mean here?
-
-> +	u32 buff_slot_size;
-> +	/* Base Address for Tx or Rx shared memory */
-> +	u32 base_addr;
-> +} __packed;
-
-What do you mean by address here? Virtual address, physical address,
-DMA address? And whos address is this, you have two CPUs here, with no
-guaranteed the shared memory is mapped to the same address in both
-address spaces.
+Is that enough to make it useful? Don't you need a phy-handle, or
+phy-mode?
 
 	Andrew
 
