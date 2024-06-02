@@ -1,191 +1,179 @@
-Return-Path: <netdev+bounces-99978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D282F8D74B1
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 12:00:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2FA98D74E3
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 13:16:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3762EB2113D
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 10:00:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9877D281FDC
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 11:16:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 683B9374E9;
-	Sun,  2 Jun 2024 10:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5393A381BE;
+	Sun,  2 Jun 2024 11:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q0/RIoAJ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SPg7HO2U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2054.outbound.protection.outlook.com [40.107.243.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5EA134C4
-	for <netdev@vger.kernel.org>; Sun,  2 Jun 2024 10:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717322424; cv=none; b=sFuo5rzjnhNC/3y3yvqHnwlmeS2sqKsJWfnn+E6GK2me2nAcLyq6tnVj3NKhYPgGz6CG0DINab6migz7wBMR/09VrYuUAWNMZUMlC+9256Z9KmwtVMQboM/vT+7/BKnNQXfOBI6mhvVb27q3TH+HgcwDev7S/dveWIw3btRiKCY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717322424; c=relaxed/simple;
-	bh=HEhSG4+mRS1nZ+PjmPl4mXmikQADX7MPWQeQabc7pCE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pT66asJ1/w5IeK1JFO0GOQ/DfKek+XopF0soAizCIMt2gGy8STZrIpuREaULC1QyfYKu1wPcfFdjUkBeaJIWesu8xYrgF/BCUqtI+pNRa8T6kV2PPMa9yZBshE+52yUz7jx2PHD+veFZLNbYe6WKNmP1v1UPYcZrA5F8cjZHi4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q0/RIoAJ; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42135a497c3so36945e9.0
-        for <netdev@vger.kernel.org>; Sun, 02 Jun 2024 03:00:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717322421; x=1717927221; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SgNo7tmpieGVze/+PEnwgBOltq1cSDq/eNb7C8oH77s=;
-        b=q0/RIoAJbU4i22SWkxNLcB8NEpqwuCT2Jg+Gilu5Fvf4v8A4WnDePK9NhBNRG28RiN
-         TOyh71vo41/6iLCScIVEhs3whA+bEgvcXPXRVFzp9NTCMGyjQWtHjaX54w7oCbAlmV9V
-         t23+FjAZIrrGrhTvvC/jKRbiyGcxlOo7qJafaxhLYiI6QUHdqY6YsCTXfAveBJF8sJlg
-         0IjQJ7drDtZR2xJQfV5NYiWKQooTNmXSR2VVFFIKXUaxIp2T2XW0QVkN/LFNBDToCoIB
-         UE9+KtdPfCKnax+BaUC/OBM3HwfiVKtmOPvXinXZHYto6Ws+Vzt2TIZdJDKNOqyk3eY2
-         ooOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717322421; x=1717927221;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SgNo7tmpieGVze/+PEnwgBOltq1cSDq/eNb7C8oH77s=;
-        b=WphLTg4tu0B68VZm5mYnkhEkpegnOXWYL/FuDECTOKs7GaBIbfdoXbzhZrGYDl9otZ
-         fWJ+2PgDQhQdWUxZg5LEEauDw0g5DVu7emPXixDs0qUipYE0XaSUDiKCKOIiSHHWp8Iz
-         63VSRWCSUfgJdZCV5kyMfTNxs038OXvIsQrhqtPCHzCR/z5ehW2JGa0Ey2OfRSfxy5/G
-         RVnslQ11jOLL/r4Vl2kzwPCSrJMYcdiRVkRKvkg0iI1Hf9VGPZKHBkns/RAx7Iu40PhK
-         4S93a5qm7RKc7ly+JbM3x1OLPTrtOYaJMB3xDmIdnrSvcBM8vSq+9VOKR9GutNaVsRss
-         DC6w==
-X-Forwarded-Encrypted: i=1; AJvYcCWGiipEyPt+6r24LVq4yMrg/LSnk1uEp31i/HcejovpMJ6xNpZKQZWWzFNyJElLOQEFxF483AOWzXe9f48y//EvkOPVcGZl
-X-Gm-Message-State: AOJu0YwJKFwuBaBEZlC8ZfLj3yAt7CA0JZgaU+Rf1DFpQsYLq0POHs4z
-	IsxNKrvqqUwyw1mMcm5FiBVCoYXazX//vCg2nikAcNtzwziDVxboARxZAUfMUNnkjiO5crjwbFb
-	WPssTfZ6wsMlfQtNsehtokmN4Jp73h9xe9cYax1D28uEmKIw9RsRz
-X-Google-Smtp-Source: AGHT+IF72/Kq6OP/T5OJeK7Ym9xgUmUaMFRXEU5tyKgpo9eDEfWv/70RLtngc+MQh5GtQ0esCNU8NURNHIm4uRq7I8Q=
-X-Received: by 2002:a05:600c:4586:b0:41f:a15d:220a with SMTP id
- 5b1f17b1804b1-42134f3119fmr2065655e9.4.1717322420419; Sun, 02 Jun 2024
- 03:00:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A122C2C694;
+	Sun,  2 Jun 2024 11:16:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717326986; cv=fail; b=ocnbw7JwRCLf7q0rw0q9GtBJRFpopGPQZLFKOSuOxO81Qp+9ZprfPAQt4wurpjlOuXWzHBalkexepv2nuQZBm6sduJbzGOZp24KKNjc4xFSOXaXp2roEvQDFRYfvYj9AFmt5MRsXXt5imYUu3s8s8QQ+6kt5zeImfCyNDcPfNuU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717326986; c=relaxed/simple;
+	bh=/qKs9VN04V3lMgRDcR7SY9Us821/Yd+Wf4T3hz045kk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=iRTBH6CaUu6KJgCMx8umUfLzp+EARsadCGeDDuEBnctksDM6cUExd0M2lC+hbSX7yKLxUd/rTFOmCvC3x/imIuvCuoMU2aXcUtPSdj2nH2ZdbyStw1d7KRTzroKISJPuQWsYLM/nns1H4vsN5RXJfNLsCr5nAM81Xle9+SlFZSQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SPg7HO2U; arc=fail smtp.client-ip=40.107.243.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j84OZ1GBG0CX8v4VF6ML5rJ/cNobVCQPC37NsGVQ21NNRMsVl7esWRQrbdaZoO5G5p0syPcj+wQePIJNy5u1h08FlFBOh5x+ufbN+nP28+f+c15Y+0m0gAU5eSn0BIFbEi/3A0t6h9n7X5VxD3Cyb4xH6ng9g4w6Hx88ZnvIUb5fJKBDWWslc1nm1GxAVz+LIwW0e+VZsqteXiaXlOnBcBRmzGXvote5cMmKVrmcxm4yK7V8kHaLngM2ZdiVCXgv7X6wVJXgEtlYKYuctmBPj/A4UKUG/ZGG9nsx+gNDXWO+9eMxNd5Xr26swCKlyfGnQy3X+L7jQNWnfp9DyzKzdQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4L4jHrKPSMZo38rJ1tB5hkG2kBAnCrhxe72bG1ZduE4=;
+ b=YZxQXBf2zSTpBE181kUB4JnGALpAqDKKG31bsWFRutawOGmlUXw9gqB8TlwT9cAoZjkWsKhrZq5M6oWaS1ZV0vjmfYY/W420CR4o/k9JfuHW7/lPFbrmUtbR1mVm/3vpmPogLjvtf2M+IDOTM6cPQDcerDQYJsDRI9Nqy8+pArOVSQzO58RbiGz+GVv2j514b1TLMc+N8E1FKeYmG7NLdr5J6yU2Adh8TF0quYaquGBnwYj60y3Y83H1kZhTH0CJ8nvwbS31ri5e0i9r2Artan4Aa7z/L6/K/VNJ/l92DZiXp+rZ14yhNdh+jUZsoE7UwIcY4+8FuARTNIWxCIwLVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4L4jHrKPSMZo38rJ1tB5hkG2kBAnCrhxe72bG1ZduE4=;
+ b=SPg7HO2UWzsJnQi0F3k6ZWQUKimp31KfnyPvgzEs23apP1lfukCdaDEWhBOQl3P3fux1qoTD+mSP2rTwcmXuCBYB95jupYVVQGd7aQ9RCkcGdcerwHcze7Y57Nsy90XWOcGzmJIRRSrqoWNXCNkA6qllEnZgpow+EC3tZ40PGI3Q1hF4n03wm3/JH4er6fnqhnlwH51VUvvh1bI55SW+FFrlsVT2owxOkxt5+j5mSy7OGGiDtCnw8gwe/XemcMch10YS/AmMU8/9VOKcOcTkyKBdN8AqvpqCq6DgBzYjvbtsmQjfKV4MQ9BCH2le5XaC2F1f6l2P9ZW/cUs33gOegA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
+ by DM4PR12MB6664.namprd12.prod.outlook.com (2603:10b6:8:bb::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.29; Sun, 2 Jun
+ 2024 11:16:21 +0000
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::9ec8:2099:689a:b41f]) by CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::9ec8:2099:689a:b41f%3]) with mapi id 15.20.7633.021; Sun, 2 Jun 2024
+ 11:16:20 +0000
+Date: Sun, 2 Jun 2024 14:15:49 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Petr Machata <petrm@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next 2/4] net: ipv4: Add a sysctl to set multipath
+ hash seed
+Message-ID: <ZlxUZcDdLanjcGAb@shredder>
+References: <20240529111844.13330-1-petrm@nvidia.com>
+ <20240529111844.13330-3-petrm@nvidia.com>
+ <20240530180034.307318fd@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240530180034.307318fd@kernel.org>
+X-ClientProxiedBy: TL0P290CA0007.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::11) To CY5PR12MB6179.namprd12.prod.outlook.com
+ (2603:10b6:930:24::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240601212517.644844-1-kuba@kernel.org> <20240601161013.10d5e52c@hermes.local>
- <20240601164814.3c34c807@kernel.org> <ad393197-fd1a-4cd8-a371-f6529419193b@kernel.org>
-In-Reply-To: <ad393197-fd1a-4cd8-a371-f6529419193b@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 2 Jun 2024 12:00:09 +0200
-Message-ID: <CANn89i+i-CooK7GHKr=UYDw4Nf7EYQ5GFGB3PFZiaB7a_j3_xA@mail.gmail.com>
-Subject: Re: [PATCH net] inet: bring NLM_DONE out to a separate recv() in inet_dump_ifaddr()
-To: David Ahern <dsahern@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, davem@davemloft.net, 
-	netdev@vger.kernel.org, pabeni@redhat.com, 
-	Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|DM4PR12MB6664:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1aab9766-04f2-4e8f-bf42-08dc82f56e04
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|376005|366007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?R8pkIMqz7LtylMju8b85AoBtBHZZEl7/Oap0ECwqcOH8/JA4l9g6XZkDQ8kz?=
+ =?us-ascii?Q?s1Ih9i4M4WxPk/FvKn3/CS5Q6xww2AvvgTbvaX57cLkmkpO7EaF0RUiICtNO?=
+ =?us-ascii?Q?FL/KPS61h7lxIXCRiurth/dUKPQ2eXCdMZ/UUgUFrdELJg7dqAQxsZW8fFuF?=
+ =?us-ascii?Q?ErGgJVxSILcYYGnaIOtAahaAmji6EQ4xXxQODSc91T9KsrTUgkOOCAZkDc8V?=
+ =?us-ascii?Q?2eLaQs2DAUvDixvKdWCNO0+yJaetKbQiFKwV3bJLbz/L98DPEOt35p2fXoJH?=
+ =?us-ascii?Q?w43D4lWt3pA+gP0lUo2NltGI5eKdrAyP7aDr4guXnLYiBW/r0g5HQBPWZ7bm?=
+ =?us-ascii?Q?ALynGeljCOttGtP3oEJPgba9OXEdJtjeLvYPCCESB+kxTl5qKw1hXNd3Ojei?=
+ =?us-ascii?Q?Rwkf1wBmmcdG6cEhoO/2D1e3a2smH/7bRof/NFrj9NbedTJYHqabxTu5XT5+?=
+ =?us-ascii?Q?947Ses6wSBKCYH99X1iSHMthq2aPg4rJmV7NVF9224q3J5mOG1grjsoCU92x?=
+ =?us-ascii?Q?bu4/jh6qJq72Ff45JzgHsjem83zzGsgznqlBZIiGH3wr61I1jgExCkNPClik?=
+ =?us-ascii?Q?F+78NJ9lk4tVPZFedTJRhLAXdZuSs3pZ1YT8GxO8le3kLHkrgS6MJZTMHt8J?=
+ =?us-ascii?Q?xCQrPjP5d16yVkLwnd/0ZODWqCuKHMN+7x1rtYS+mvbHLibu65T4smaoI8ec?=
+ =?us-ascii?Q?DB+ObQUOOxSSqp2PRwbmcVSjkAWSazHk7ZA+EIKqgRiCxZRr8CeXIVvmLo4k?=
+ =?us-ascii?Q?DkXmc5ofIpIe0AznWyLbwlrpXIDAKd9s6STBATC+ssrE4dG4BKHqKY3BgcDq?=
+ =?us-ascii?Q?uE2guq1wfSLiLphfTxR22CMQz/Ha7Sock+ZchKAsQOs/9KIUBUfaQ5yoOAL6?=
+ =?us-ascii?Q?80cettm4GD6KAxNrGMhG9TAgPej3uurAVf6n1BpmTfAoe20OIN63aCV8Axd/?=
+ =?us-ascii?Q?6XX4SWILrFz7pE6Td0+BlyDgLceZywAK7fYMS5kZOQ1PyLR1SnP5TFfJKBJp?=
+ =?us-ascii?Q?qKkI+akjttdQn/wfvFUILeKxoMvpXWMyHc1LDngd11lwQktkwJEFk/RG6+gI?=
+ =?us-ascii?Q?f/1F7jRwoMyOtN4dCeVeTyBh5MRAym4+UPV8TDGbjlQXAqz9drtF6IEOpvXl?=
+ =?us-ascii?Q?bf6I+VA0XjwyYcwYcVROaPJdR0WRokKPcf089wkEMqAm3IRA0fAsipBdtY3p?=
+ =?us-ascii?Q?uCpPsI7/Xwq2ahoEUT1Xhj0C/orOY1nsGSRQDAh1VDqaGMnwauoZnk9fP8yq?=
+ =?us-ascii?Q?P+ZjtBM8D/uhB/a93riGN0OrSyKWBWCQasujBWC2CA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?bXakhHc9jmgKe7JxCQp3/j8xoXJJlzYWq8Rzt9912tAfxx9j6mA2iqEFjs6V?=
+ =?us-ascii?Q?H8mNAr3WRJCXpZ6Y53hhJ40+m6SlXdu/PYjqS4bG13Yck0BZ+UDaY32S4Q5L?=
+ =?us-ascii?Q?An9qqDKVv8FtkWA4C993UhdEo5YAEktmZXPBwm/fBevstr7LONR7uEAOM7xT?=
+ =?us-ascii?Q?HSvvkwxhizGesJ37vOxMZmulN8tuaR3Za2fT7m7oQFrA2k+y4ma4UdpfOZmc?=
+ =?us-ascii?Q?SUTgsopqnYjh15hX/5du91ifw96sU+88r87YODZWGPqjQ2he/eInZJ0pkrEK?=
+ =?us-ascii?Q?gAfBPvsnSTQJ+Ul6+o4XxqR9YsQL9gOEnS6PR5o4qok/Nsyi5MhNyxxxHQdc?=
+ =?us-ascii?Q?vZVeYLx485A1cyI4lo8kGTFpo486LT27kqMkoWITbng6o5S14G0UWb4syUBr?=
+ =?us-ascii?Q?dG3GWLdZhIYCcnhREoRUSC0swqzzgEEw83qX+QjgfgAxaR1VF81owsBqgBLn?=
+ =?us-ascii?Q?1xGi7IhjIuIiqs4t6L/Jp4sFbPnULilUivHI9P1NbzKfjVhgXO0VGlA46/Pq?=
+ =?us-ascii?Q?qgcV8cD5WktOR4SHJ56/8XS1FtHdKbzrT/yyz2mjGj7bJ6C4y7+AbeNwrw/B?=
+ =?us-ascii?Q?xzu1ImduS0Q/O+bgr0RCoVUTK+Ee1KA0V5VfKYzcbeQoMyV9a5yvqlhfINER?=
+ =?us-ascii?Q?6LvmYdspcu12/6051IjY6hym4UNq/g/2W2ENqKlr+4RQcBpqGwhY26QbiE6T?=
+ =?us-ascii?Q?U3+nx5R93rryI5Xk2TLMoxoLihIFB0Dhmx+5Oo0UJxIVCu5Kwbayz7I9r3lv?=
+ =?us-ascii?Q?Ie6mC4nKob/P3wbcZUqt/GhRqlFEPe6BKyiAoY7xY7KQS+nAbVFWZJAYA6yb?=
+ =?us-ascii?Q?QfrbtA5zOKHLvaFghF26hjrUevowwygt6NfHMAshwxdk4QT887LDISntFK6L?=
+ =?us-ascii?Q?eqI6cjb17D2mYp/UT5EdhL457mFcIRDIyCqIxeWFDHi+B9UK4ZMeI5eEkPGm?=
+ =?us-ascii?Q?7SH4f2/6ngpz+kYDoTzatEV9ZcC3hJcPwysOZVS2RSI7rUN5KNwJYEla4GLe?=
+ =?us-ascii?Q?CWjdU5v3nlmUJ+9fOK6aePOfh5DaBCFZnNiSvwu4gP4ofH1cWpMZ+BNRr3VT?=
+ =?us-ascii?Q?pm4akIaVefIMkaXrP83kbrc+sGueyMoeUY+1Q7TbucKiMdeJDdJmfkPKUL5C?=
+ =?us-ascii?Q?k8wy0FpY+6VKlB/JJL8OXcGHssDW8SeeM01ROL0YYM+sN8lK77gCa5e6tsfU?=
+ =?us-ascii?Q?3q0ybK+9J7hc7930Vc+UVy2hsJY6gK26VRINTvu+bLn630lAzmXW53fwNYvK?=
+ =?us-ascii?Q?nXINQJJhGHx6iE4HzByJklqFovgwkNLXfmgNshH0ZMMiiQH5FlDNus7Dr7Vz?=
+ =?us-ascii?Q?RtNsTvG2zCbdyUAX27+2cqi0F8dymJMiADZ9KWy/P5zTzZdDArQ5+gKsc5X+?=
+ =?us-ascii?Q?dQAX+aXdl4CV9qQgBuJN649AnxapaswVRXKxSN+FiGQc/2z7DB7yj4gOaiHp?=
+ =?us-ascii?Q?l/6CYmv4R7APgdjg+oa+a5a/4F6p8oL362AHfw+9ATV5yiHjKk8KwIJE3g7L?=
+ =?us-ascii?Q?GScRnQeIkvRB4hrkjVpFiddrWLOt3jEOXiUDgcr+dOyhIE7Zk5Ph9vqUWBbF?=
+ =?us-ascii?Q?euf0iRU7Q/vsbCeZIrkUtZ62++VZlDqgY2bPO+lE?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1aab9766-04f2-4e8f-bf42-08dc82f56e04
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2024 11:16:20.5418
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: E1o2EXWB23r2mhsowGYjih3vG7R2qXOe2U/z5v4EJwztL+1kV7EJN8SWFFhqaorzsfycn/26cMK9v89FDpX3Pg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6664
 
-On Sun, Jun 2, 2024 at 4:23=E2=80=AFAM David Ahern <dsahern@kernel.org> wro=
-te:
->
-> On 6/1/24 5:48 PM, Jakub Kicinski wrote:
-> > On Sat, 1 Jun 2024 16:10:13 -0700 Stephen Hemminger wrote:
-> >> Sorry, I disagree.
-> >>
-> >> You can't just fix the problem areas. The split was an ABI change, and=
- there could
-> >> be a problem in any dump. This the ABI version of the old argument
-> >>   If a tree falls in a forest and no one is around to hear it, does it=
- make a sound?
-> >>
-> >> All dumps must behave the same. You are stuck with the legacy behavior=
-.
->
-> I don't agree with such a hard line stance. Mistakes made 20 years ago
-> cannot hold Linux back from moving forward. We have to continue
-> searching for ways to allow better or more performant behavior.
->
-> >
-> > The dump partitioning is up to the family. Multiple families
-> > coalesce NLM_DONE from day 1. "All dumps must behave the same"
-> > is saying we should convert all families to be poorly behaved.
-> >
-> > Admittedly changing the most heavily used parts of rtnetlink is very
-> > risky. And there's couple more corner cases which I'm afraid someone
-> > will hit. I'm adding this helper to clearly annotate "legacy"
-> > callbacks, so we don't regress again. At the same time nobody should
-> > use this in new code or "just to be safe" (read: because they don't
-> > understand netlink).
->
-> What about a socket option that says "I am a modern app and can handle
-> the new way" - similar to the strict mode option that was added? Then
-> the decision of requiring a separate message for NLM_DONE can be based
-> on the app. Could even throw a `pr_warn_once("modernize app %s/%d\n")`
-> to help old apps understand they need to move forward.
+On Thu, May 30, 2024 at 06:00:34PM -0700, Jakub Kicinski wrote:
+> On Wed, 29 May 2024 13:18:42 +0200 Petr Machata wrote:
+> > +fib_multipath_hash_seed - UNSIGNED INTEGER
+> > +	The seed value used when calculating hash for multipath routes. Applies
+> 
+> nits..
+> 
+> For RSS we call it key rather than seed, is calling it seed well
+> established for ECMP?
 
-Main motivation for me was to avoid re-grabbing RTNL again just to get NLM_=
-DONE.
+I have only seen documentation where it is called "seed". Examples:
 
-The avoidance of the two system calls was really secondary.
+Cumulus:
+https://docs.nvidia.com/networking-ethernet-software/cumulus-linux-59/Layer-3/Routing/Equal-Cost-Multipath-Load-Sharing/#unique-hash-seed
 
-I think we could make a generic change in netlink_dump() to force NLM_DONE
-in an empty message _and_ avoiding a useless call to the dump method, which
-might still use RTNL or other contended mutex.
+Arista:
+https://arista.my.site.com/AristaCommunity/s/article/hashing-for-l2-port-channels-and-l3-ecmp
 
-In a prior feedback I suggested a sysctl that Jakub disliked,
-but really we do not care yet, as long as we avoid RTNL as much as we can.
-
-Jakub, what about the following generic change, instead of ad-hoc changes ?
-
-I tested it, I can send it with the minimal change (the alloc skb
-optim will reach net-next)
-
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index fa9c090cf629e6e92c097285b262ed90324c7656..0a58e5d13b8e68dd3fbb2b3fb36=
-2c3399fa29909
-100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -2289,15 +2289,20 @@ static int netlink_dump(struct sock *sk, bool
-lock_taken)
-         * ever provided a big enough buffer.
-         */
-        cb =3D &nlk->cb;
--       alloc_min_size =3D max_t(int, cb->min_dump_alloc, NLMSG_GOODSIZE);
--
--       max_recvmsg_len =3D READ_ONCE(nlk->max_recvmsg_len);
--       if (alloc_min_size < max_recvmsg_len) {
--               alloc_size =3D max_recvmsg_len;
--               skb =3D alloc_skb(alloc_size,
-+       if (nlk->dump_done_errno) {
-+               alloc_min_size =3D max_t(int, cb->min_dump_alloc, NLMSG_GOO=
-DSIZE);
-+               max_recvmsg_len =3D READ_ONCE(nlk->max_recvmsg_len);
-+               if (alloc_min_size < max_recvmsg_len) {
-+                       alloc_size =3D max_recvmsg_len;
-+                       skb =3D alloc_skb(alloc_size,
-                                (GFP_KERNEL & ~__GFP_DIRECT_RECLAIM) |
-                                __GFP_NOWARN | __GFP_NORETRY);
-+               }
-+       } else {
-+               /* Allocate the space needed for NLMSG_DONE alone. */
-+               alloc_min_size =3D nlmsg_total_size(sizeof(nlk->dump_done_e=
-rrno));
-        }
-+
-        if (!skb) {
-                alloc_size =3D alloc_min_size;
-                skb =3D alloc_skb(alloc_size, GFP_KERNEL);
-@@ -2350,8 +2355,7 @@ static int netlink_dump(struct sock *sk, bool lock_ta=
-ken)
-                cb->extack =3D NULL;
-        }
-
--       if (nlk->dump_done_errno > 0 ||
--           skb_tailroom(skb) <
-nlmsg_total_size(sizeof(nlk->dump_done_errno))) {
-+       if (skb->len) {
-                mutex_unlock(&nlk->nl_cb_mutex);
-
-                if (sk_filter(sk, skb))
+Research from Fastly around load balancing (Section 6.3):
+https://www.usenix.org/system/files/conference/nsdi18/nsdi18-araujo.pdf
 
