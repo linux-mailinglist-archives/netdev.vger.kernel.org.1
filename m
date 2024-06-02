@@ -1,139 +1,94 @@
-Return-Path: <netdev+bounces-99983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0CDF8D761D
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 16:15:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 16B3D8D7620
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 16:19:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C8F82827B3
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 14:15:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC43E282584
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 14:19:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCFAC40861;
-	Sun,  2 Jun 2024 14:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9A240855;
+	Sun,  2 Jun 2024 14:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aQNuF2ni"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="cBgnWd7W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from msa.smtpout.orange.fr (msa-208.smtpout.orange.fr [193.252.23.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8C32628D;
-	Sun,  2 Jun 2024 14:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1EF23BBCB;
+	Sun,  2 Jun 2024 14:19:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.23.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717337731; cv=none; b=ILdq/t7Luoa4vRCzldzdXZog86vtEeREyZ9nC7GM0Hf7gxhB4MAXoldp2bbyKkP5rF3JAJcI3kcEzW/onMsHH25v+2qD4whDNFyqge/v62bQFduPJErhF3T+99S7Ak/nFbc6NybHDPMV6yBxE8ctAU9pgJAt9SRh2oWyn2Ku/iM=
+	t=1717337947; cv=none; b=aFZthFnwWyNiyF2Re+Sfn5pY6R2T04w5wQuLROnwV/QYECaUpcEOx/FPgeImsw0fpET17Uq8+cY/lBV2ccL3cYlktGnrQ939HVTSfFAgiDQ1qLsRjvq/Oe4XQ1/JnseTm0xDIg1Dn2Jo1A5T1o9T75j+0xmiykjgLfnJZMKQPA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717337731; c=relaxed/simple;
-	bh=yRl0Zy6wzI7m8PsJn21x3czS9XtE5+g9dbkMjfOVvSQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tlCHbRkFSt4WZfZIoWqorkN1V0eSeaTfOZK1y/g4d6Cx1Jq9zxgAJqWtHhKjD9cxQYO8T0+QrWPmZV9ylLjgEgZ4Vy3QAHpUWB1jbMcbG6Q/WAt54uZ3nDTpd5MD7DsKpjHgpUpeIQ5AdLfkVqYtIB3in8LLEbzUwVjDsyPkKnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aQNuF2ni; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2e95a75a90eso37786681fa.2;
-        Sun, 02 Jun 2024 07:15:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717337728; x=1717942528; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KpXeC176RaICWlSlxpJ+NDHy2MPx5eaGXOEoT5L913w=;
-        b=aQNuF2niJA3QVpSN2o5KWli9J/p0jlLW+Qm0PkZRCQgo7ojgrmYFoFn9Ziq+YavUBb
-         k7znzSNeHn6rKlOGIyMQfwleISloEn4DuUd0cGAHMx8fBl9hrcClZObeMPIGaw/9s2S5
-         K0NDyFZUpJtg7iZ40y3S0qVguQeu5LDcPFdBxkqFcbhhwpMkFwdAY5epXBfcUgD6fW1d
-         gvmBQMpGDqNL4co+YzF8vyphrP+SFdigt3w0IS0uOJoSSr99HXo12VuowY9E5LbL3Tk0
-         M/1TBCgGbpq0jwXup0X0aMnhmSCRRByikEs9SlLxnRCQLVglpjZRm+hVt85DVUSNIZZW
-         qNXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717337728; x=1717942528;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KpXeC176RaICWlSlxpJ+NDHy2MPx5eaGXOEoT5L913w=;
-        b=Xlzx6DarQFBZbQu/lso4JXnnuk9GPOOnCVh0VsicAx5nBo6wrue4b53nOWdSIE9QQn
-         6hJhBFMP9LcA0N6l7zyVw88NL7Tjqg43bGhomM9IzwNo36jNdUHKi8R1AXRDiZVga3Mg
-         oeO0ejNksHl6n+cBMwGyW7DoJFrpcz0YWNiy2ZGrb9+5lk04UfflYYXMaIIQRk/SFPQ8
-         pTTrVHaK2rzghgcgvq8BgInfE67N+eqqbcSfjxyFwmQTYNVept/5qEQ5nAhkM/8tUgIB
-         PCQ6OUNJzPdyHY/xEKR1PqKK5DC8ykVBcBGfLowzwBXxdltqFaczsWLwMycfJploL44M
-         WIBg==
-X-Forwarded-Encrypted: i=1; AJvYcCWOVka6FnvMho/I8+6lqZeohSDYT8taGY6aSNGVIBeSWMTqZsP2fmCXlOYLGbMjiN4cQtGrguxGyTeadE6DvZgksHIj0eyhq2pyugp82g+Tz7dnzCEg7sXohIhFKfi15ZtjFi6U
-X-Gm-Message-State: AOJu0YzSRA2UwDYWUwj0s0GkSBfS2I00UFPa0RDKzXZMN6X3wk6uovg2
-	6xL7lKPp3tLbA3cIU0ElA7teoDzD0QgIWc2bTd5HTTyHOkwOdcuK
-X-Google-Smtp-Source: AGHT+IHhCeDc8Zsm3l7ZPMhThg8eoRnqf8HB2t/6rIPuOLXgMXpgQd1zMhnyuc4dATN2jc6yS4R9jA==
-X-Received: by 2002:a2e:99c2:0:b0:2ea:8abe:2319 with SMTP id 38308e7fff4ca-2ea94f69880mr43253701fa.0.1717337727848;
-        Sun, 02 Jun 2024 07:15:27 -0700 (PDT)
-Received: from skbuf ([188.25.55.166])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57a5dc1e2d6sm760305a12.59.2024.06.02.07.15.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Jun 2024 07:15:27 -0700 (PDT)
-Date: Sun, 2 Jun 2024 17:15:24 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Tristram.Ha@microchip.com
-Cc: Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vivien Didelot <vivien.didelot@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 net] net: dsa: microchip: fix wrong register write
- when masking interrupt
-Message-ID: <20240602141524.iap3b6w2dxilwzjg@skbuf>
-References: <1717119553-3441-1-git-send-email-Tristram.Ha@microchip.com>
+	s=arc-20240116; t=1717337947; c=relaxed/simple;
+	bh=616g9PhgfscNJD37Ox3mo0av4VN7wRoUTxTISJCeSz4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WrL7RJNipFtG1nmCH0iZRylbKmMhn4HuIU3B95BipClUJ0aVTy+X5Lk6Ir+fNO8JxdhJBGeiLXMJDcVJ/Sp4mwUSWFTqFy8IWB2Ji8s8dkWUeKBS83t8uxJH7qpVcPAbk/FviHZ67J/9A0ET5bUDYxAiuee6PVn124ywmLa5P+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=cBgnWd7W; arc=none smtp.client-ip=193.252.23.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from fedora.home ([86.243.17.157])
+	by smtp.orange.fr with ESMTPA
+	id Dm2ns8x2vLmxrDm2osLKQn; Sun, 02 Jun 2024 16:18:48 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1717337928;
+	bh=o8RBOg2YVX5TQy4cE+lxZslyfDzc2SAKgZRk6xBA98A=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=cBgnWd7WnT6MnIPUJWlcVKcKzEravI82GDI9l1h2wBd8piCoOUEXvahpzMVhX0YYi
+	 +c0dXsLxViMBiPEAZtQS6DUJinvg+F6UHeMIuW5L4wxb2+B8oRrIQOuQNIywRvBFN5
+	 zb98sWqE6r+UCOikf2FAzKYXlhF3u28DKeRhGuWaFKz099oseE1fFYcBp/wkmIU5Hd
+	 bLfY0tirZEd8fjG9z+slYw/X5tIX5WMhg2L/BzFRXPBCXCZbtenmDVlnCA2GvqBV6y
+	 emC2yDWfTCip6MwsbpHXCgj3CPUNArawGtx11VxT796+4dcuVNOYYxAnDfpOp504iC
+	 lMcr7btn/7Vng==
+X-ME-Helo: fedora.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sun, 02 Jun 2024 16:18:48 +0200
+X-ME-IP: 86.243.17.157
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: idosch@nvidia.com,
+	petrm@nvidia.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jiri@resnulli.us
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: [PATCH 0/2 net-next] devlink: Constify struct devlink_dpipe_table_ops
+Date: Sun,  2 Jun 2024 16:18:51 +0200
+Message-ID: <cover.1717337525.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1717119553-3441-1-git-send-email-Tristram.Ha@microchip.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, May 30, 2024 at 06:39:13PM -0700, Tristram.Ha@microchip.com wrote:
-> From: Tristram Ha <tristram.ha@microchip.com>
-> 
-> Initially the macro REG_SW_PORT_INT_MASK__4 is defined as 0x001C in
-> ksz9477_reg.h and REG_PORT_INT_MASK is defined as 0x#01F.  Because the
-> global and port interrupt handling is about the same the new
-> REG_SW_PORT_INT_MASK__1 is defined as 0x1F in ksz_common.h.  This works
-> as only the least significant bits have effect.  As a result the 32-bit
-> write needs to be changed to 8-bit.
-> 
-> Fixes: e1add7dd6183 ("net: dsa: microchip: use common irq routines for girq and pirq")
-> Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
-> ---
-> v1
->  - clarify the reason to change the code
+Patch 1 updates devl_dpipe_table_register() and struct
+devlink_dpipe_table to accept "const struct devlink_dpipe_table_ops".
 
-After v1 comes v2.
+Then patch 2 updates the only user of this function.
 
-> 
->  drivers/net/dsa/microchip/ksz_common.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-> index 1e0085cd9a9a..3ad0879b00cd 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.c
-> +++ b/drivers/net/dsa/microchip/ksz_common.c
-> @@ -2185,7 +2185,7 @@ static void ksz_irq_bus_sync_unlock(struct irq_data *d)
->  	struct ksz_device *dev = kirq->dev;
->  	int ret;
->  
-> -	ret = ksz_write32(dev, kirq->reg_mask, kirq->masked);
-> +	ret = ksz_write8(dev, kirq->reg_mask, kirq->masked);
->  	if (ret)
->  		dev_err(dev->dev, "failed to change IRQ mask\n");
->  
-> -- 
-> 2.34.1
-> 
+This is compile tested only.
 
-What is the user-visible functional impact of the 32-bit access? Justify
-why this is a bug worth sending to stable kernels please.
+Christophe JAILLET (2):
+  devlink: Constify the 'table_ops' parameter of
+    devl_dpipe_table_register()
+  mlxsw: spectrum_router: Constify struct devlink_dpipe_table_ops
 
-FWIW, struct ksz_irq operates on 16-bit registers.
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_dpipe.c | 8 ++++----
+ include/net/devlink.h                                | 4 ++--
+ net/devlink/dpipe.c                                  | 2 +-
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
+-- 
+2.45.1
+
 
