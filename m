@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-100010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 364158D7722
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 18:21:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B11978D7735
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 18:45:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E17791F21430
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 16:21:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B9C61F212A8
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 16:45:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0675E43ABC;
-	Sun,  2 Jun 2024 16:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2205E11712;
+	Sun,  2 Jun 2024 16:45:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="s5btemq9"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eMV20MTy"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0CC3FB1C;
-	Sun,  2 Jun 2024 16:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDCA1DFF8;
+	Sun,  2 Jun 2024 16:45:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717345279; cv=none; b=AqvtnyNJy3TEL3kES6H0DNjJygwVgJm1OY4rGVBMWTWdxNOToYZ8afsVmZwZ3W+falCtWL2G2Kpo1grft+uEvwuE9HAIFDEAm3VItMUocyDPU9oel8evZvR5xP14/lLLW9IdoHbTJQQAKzToPft3mkKPFJj22h8dAuT8zl+XrR8=
+	t=1717346729; cv=none; b=BiQ1yLUquaEkHoCSAc76icNvS+/YUs2lz8waxHEL0yjV4y9fb56uuyAbVgKabGBV4/0iF8YQL3RdGAdgQbnMqnPPUl4s1ztl/L7pVQaNiIPh34ueefZd8oMSWGbTBd2oR8nb+bsL3DeVRsEe9ko4bsi8a2nLEBBLsDba12+VM+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717345279; c=relaxed/simple;
-	bh=rgmgH6ZXXN6LnOGXXD8uWUrImhsUMJz2+a2zP1CzdCE=;
+	s=arc-20240116; t=1717346729; c=relaxed/simple;
+	bh=c5LYpW+xTgQarazi/IQ7/kG9iiaYTqQFdkkLNpW95pw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EQtAEBLQ0OYCOkv5kIJ4LndDyMg0WZKiCxv9v4zKMh6wSEvOWLM2c4CUprntRbWsF62Qng9L4I/89X/+MVrm1oofVaoeyqLW6OSj6Vo7QY8dTtU8p4f8CobfL1vAS+dnE7lxXNwDaYrZwUA6b0QLMxziEFMjNBJa/NFjZaVB4uI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=s5btemq9; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=fQwTWrX4Wfnn1qclyZ2AEZHmB90a+ejt1oiiBRCB/aVtt6NA7yQN70D5TYlbk6fDgB6H72cnFf/o9XjSuCoTKjpt8H5BlDKWvdJepZ16bHxQVGr6kRu4J0qVCoJtVKF0ZNI6fHDFqoCHy75QK3oM6LFN5YGBnd1G02bRNK6mjxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eMV20MTy; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=i/1kvhUhUqUDyhq2DiabkGz9MoU8dADRCCFSjMXz4/g=; b=s5btemq9YwafbTJodrRPM1Unpf
-	PRFpUjQnn6Z1cd580gsJEWvkZT+C1lidH5k08GKNwi4KON/A+QgkENgFwsUS2ns71aJIxYYXhhfVQ
-	5D3cpbmXMbzzc7h+eHmdSFyEMDN91unuINBylIrve+fKTwUN9QJx46F3Mc5hUbIeb294=;
+	bh=E+ueS2eEFa2OpuuO5ZI4AFvsqau7YjoMECLisKyw7Wk=; b=eMV20MTyZ4k3m5ti7s7PxT6V6f
+	E4fWb4/PivFFAQ9A3x9BIRT/NiW9SWEh5zXBmzNLFqXnHZ1saDuqSnJ6E6gOpof8Gxg0GnJRZ8eVz
+	LQw8iHtNIxVqU8W1lOWDpw3k4UM0zh3HNrlVI6cyXXnUkFIamHzBW40HIYhvei8Hkcy4=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sDnxC-00Ge5Z-2H; Sun, 02 Jun 2024 18:21:06 +0200
-Date: Sun, 2 Jun 2024 18:21:06 +0200
+	id 1sDoKa-00Ge9U-Gf; Sun, 02 Jun 2024 18:45:16 +0200
+Date: Sun, 2 Jun 2024 18:45:16 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Yojana Mallik <y-mallik@ti.com>
 Cc: schnelle@linux.ibm.com, wsa+renesas@sang-engineering.com,
@@ -51,11 +51,11 @@ Cc: schnelle@linux.ibm.com, wsa+renesas@sang-engineering.com,
 	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
 	davem@davemloft.net, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, srk@ti.com, rogerq@kernel.org
-Subject: Re: [PATCH net-next v2 1/3] net: ethernet: ti: RPMsg based shared
- memory ethernet driver
-Message-ID: <389e1f57-1666-4298-a970-74f730740e4c@lunn.ch>
+Subject: Re: [PATCH net-next v2 2/3] net: ethernet: ti: Register the RPMsg
+ driver as network device
+Message-ID: <4416ada7-399b-4ea0-88b0-32ca432d777b@lunn.ch>
 References: <20240531064006.1223417-1-y-mallik@ti.com>
- <20240531064006.1223417-2-y-mallik@ti.com>
+ <20240531064006.1223417-3-y-mallik@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,102 +64,83 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240531064006.1223417-2-y-mallik@ti.com>
+In-Reply-To: <20240531064006.1223417-3-y-mallik@ti.com>
 
-> +struct request_message {
-> +	u32 type; /* Request Type */
-> +	u32 id;	  /* Request ID */
-> +} __packed;
+> +enum icve_rpmsg_type {
+> +	/* Request types */
+> +	ICVE_REQ_SHM_INFO = 0,
+> +	ICVE_REQ_SET_MAC_ADDR,
 > +
-> +struct response_message {
-> +	u32 type;	/* Response Type */
-> +	u32 id;		/* Response ID */
-> +} __packed;
+> +	/* Response types */
+> +	ICVE_RESP_SHM_INFO,
+> +	ICVE_RESP_SET_MAC_ADDR,
 > +
-> +struct notify_message {
-> +	u32 type;	/* Notify Type */
-> +	u32 id;		/* Notify ID */
+> +	/* Notification types */
+> +	ICVE_NOTIFY_PORT_UP,
+> +	ICVE_NOTIFY_PORT_DOWN,
+> +	ICVE_NOTIFY_PORT_READY,
+> +	ICVE_NOTIFY_REMOTE_READY,
+> +};
+
++struct message_header {
++       u32 src_id;
++       u32 msg_type; /* Do not use enum type, as enum size is compiler dependent */
++} __packed;
+
+
+Given how you have defined icve_rpmsg_type, what is the point of
+message_header.msg_type?
+
+It seems like this would make more sense:
+
+enum icve_rpmsg_request_type {
+	ICVE_REQ_SHM_INFO = 0,
+	ICVE_REQ_SET_MAC_ADDR,
+}
+
+enum icve_rpmsg_response_type {
+	ICVE_RESP_SHM_INFO,
+	ICVE_RESP_SET_MAC_ADDR,
+}
+enum icve_rpmsg_notify_type {
+	ICVE_NOTIFY_PORT_UP,
+	ICVE_NOTIFY_PORT_DOWN,
+	ICVE_NOTIFY_PORT_READY,
+	ICVE_NOTIFY_REMOTE_READY,
+};
+
+Also, why SET_MAC_ADDR? It would be good to document where the MAC
+address are coming from. And what address this is setting.
+
+In fact, please put all the protocol documentation into a .rst
+file. That will help us discuss the protocol independent of the
+implementation. The protocol is an ABI, so needs to be reviewed well.
+
+> +struct icve_shm_info {
+> +	/* Total shared memory size */
+> +	u32 total_shm_size;
+> +	/* Total number of buffers */
+> +	u32 num_pkt_bufs;
+> +	/* Per buff slot size i.e MTU Size + 4 bytes for magic number + 4 bytes
+> +	 * for Pkt len
+> +	 */
+
+What is your definition of MTU?
+
+enp2s0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN mode DEFAULT group default qlen 1000
+
+Typically, MTU does not include the Ethernet header or checksum. Is
+that what you mean here?
+
+> +	u32 buff_slot_size;
+> +	/* Base Address for Tx or Rx shared memory */
+> +	u32 base_addr;
 > +} __packed;
 
-These are basically identical.
-
-The packed should not be needed, since these structures are naturally
-aligned. The compiler will do the right thing without the
-__packet. And there is a general dislike for __packed. It is better to
-layout your structures correctly so they are not needed.
-
-> +struct message_header {
-> +	u32 src_id;
-> +	u32 msg_type; /* Do not use enum type, as enum size is compiler dependent */
-> +} __packed;
-> +
-> +struct message {
-> +	struct message_header msg_hdr;
-> +	union {
-> +		struct request_message req_msg;
-> +		struct response_message resp_msg;
-> +		struct notify_message notify_msg;
-> +	};
-
-Since they are identical, why bother with a union?  It could be argued
-it allows future extensions, but i don't see any sort of protocol
-version here so you can tell if extra fields have been added.
-
-> +static int icve_rpmsg_cb(struct rpmsg_device *rpdev, void *data, int len,
-> +			 void *priv, u32 src)
-> +{
-> +	struct icve_common *common = dev_get_drvdata(&rpdev->dev);
-> +	struct message *msg = (struct message *)data;
-> +	u32 msg_type = msg->msg_hdr.msg_type;
-> +	u32 rpmsg_type;
-> +
-> +	switch (msg_type) {
-> +	case ICVE_REQUEST_MSG:
-> +		rpmsg_type = msg->req_msg.type;
-> +		dev_dbg(common->dev, "Msg type = %d; RPMsg type = %d\n",
-> +			msg_type, rpmsg_type);
-> +		break;
-> +	case ICVE_RESPONSE_MSG:
-> +		rpmsg_type = msg->resp_msg.type;
-> +		dev_dbg(common->dev, "Msg type = %d; RPMsg type = %d\n",
-> +			msg_type, rpmsg_type);
-> +		break;
-> +	case ICVE_NOTIFY_MSG:
-> +		rpmsg_type = msg->notify_msg.type;
-> +		dev_dbg(common->dev, "Msg type = %d; RPMsg type = %d\n",
-> +			msg_type, rpmsg_type);
-
-This can be flattened to:
-
-> +	case ICVE_REQUEST_MSG:
-> +	case ICVE_RESPONSE_MSG:
-> +	case ICVE_NOTIFY_MSG:
-> +		rpmsg_type = msg->notify_msg.type;
-> +		dev_dbg(common->dev, "Msg type = %d; RPMsg type = %d\n",
-> +			msg_type, rpmsg_type);
-
-which makes me wounder about the value of this. Yes, later patches are
-going to flesh this out, but what value is there in printing the
-numerical value of msg_type, when you could easily have the text
-"Request", "Response", and "Notify". And why not include src_id and id
-in this debug output? If you are going to add debug output, please
-make it complete, otherwise it is often not useful.
-
-> +		break;
-> +	default:
-> +		dev_err(common->dev, "Invalid msg type\n");
-> +		break;
-
-That is a potential way for the other end to DoS you. It also makes
-changes to the protocol difficult, since you cannot add new messages
-without DoS a machine using the old protocol. It would be better to
-just increment a counter and keep going.
-
-> +static void icve_rpmsg_remove(struct rpmsg_device *rpdev)
-> +{
-> +	dev_info(&rpdev->dev, "icve rpmsg client driver is removed\n");
-
-Please don't spam the logs. dev_dbg(), or nothing at all.
+What do you mean by address here? Virtual address, physical address,
+DMA address? And whos address is this, you have two CPUs here, with no
+guaranteed the shared memory is mapped to the same address in both
+address spaces.
 
 	Andrew
 
