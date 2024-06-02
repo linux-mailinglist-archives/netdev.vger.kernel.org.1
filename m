@@ -1,243 +1,108 @@
-Return-Path: <netdev+bounces-99971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FE438D7426
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 09:35:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4307F8D742B
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 09:48:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54802281C31
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 07:35:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 694921C20A98
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 07:48:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CF831C6BD;
-	Sun,  2 Jun 2024 07:35:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="oTDjHXAY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A3F118AEA;
+	Sun,  2 Jun 2024 07:48:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5870C18E1E;
-	Sun,  2 Jun 2024 07:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CD4208A1;
+	Sun,  2 Jun 2024 07:48:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717313733; cv=none; b=sGehwyrQmXXXE/nlqD+zvrgq5uOqxxbEG7vT+BQP+QS2hmo+sjQlTXwvzCvZIxJpBGAxxYHToG+zLaX2B1JRcoQBDKSlFuMYF420gVEKdM5L1Lh+VbViGgY1bDjeWDn/4av4ayWXl9GfQzgyEcWZz3hgt3NNVn41g5DllBxnFOw=
+	t=1717314499; cv=none; b=AnK3njdj2p0Jnr2oze3t0gL1tPYISbKCxGc8ToBW+nGPHgx1mINYUoyhfd9JRZQz2UX8Pn6+XxzWOtU6NxykyMMz1WQ4B9S0qjVF1gkew4opLfxBI23EzEpiioHSQGUewads5SXUyB6vazzUcavnjgS5yP9oCBXOaAoB41f1Flw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717313733; c=relaxed/simple;
-	bh=WrL/dzPK6dyk4/rUnyH625rKKaobfOcsBjRdT0BEGjM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Izo2vx8I+2dyTbQr3rc5pLR5PAdFEcPdFAaWwyoQtB3V7Um1WyJq24vplKLuCHRPmzFQf4VbEdy9bx0bR3o+rAs50xNfwpzR/8/18PqIInaFryormjIoMhr6tH1EniszzNtQoGl+bMd/XA0RF0b/iigxfcv+LRVvNdjRv8eoWhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=oTDjHXAY; arc=none smtp.client-ip=198.47.23.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4527ZDZi047118;
-	Sun, 2 Jun 2024 02:35:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1717313713;
-	bh=NPwiSUWPZffMQdrpny0/ObFSmYXer4XLAJ1sktspOOI=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=oTDjHXAYn6d+/GjzRxJYhe+98WNfA3qOkIZneWTAQdtvqZbV/IItW0tIvAVMIZunW
-	 Et/5GdiLc/4HKk5h6s3mp+brHalefTdVQYcs+d3iilsGCWGeJjgGuoABcFjKvnvwpb
-	 pcjxzW/oT0t8wQxMxxDDhs1FwFB+8yCfxawWdo6c=
-Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4527ZDaW001002
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Sun, 2 Jun 2024 02:35:13 -0500
-Received: from DFLE105.ent.ti.com (10.64.6.26) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 2
- Jun 2024 02:35:13 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Sun, 2 Jun 2024 02:35:12 -0500
-Received: from localhost (uda0492258.dhcp.ti.com [172.24.227.9])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4527ZCpK035720;
-	Sun, 2 Jun 2024 02:35:12 -0500
-Date: Sun, 2 Jun 2024 13:05:11 +0530
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-To: Yojana Mallik <y-mallik@ti.com>
-CC: <schnelle@linux.ibm.com>, <wsa+renesas@sang-engineering.com>,
-        <diogo.ivo@siemens.com>, <rdunlap@infradead.org>, <horms@kernel.org>,
-        <vigneshr@ti.com>, <rogerq@ti.com>, <danishanwar@ti.com>,
-        <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
-        <davem@davemloft.net>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <rogerq@kernel.org>,
-        <s-vadapalli@ti.com>
-Subject: Re: [PATCH net-next v2 2/3] net: ethernet: ti: Register the RPMsg
- driver as network device
-Message-ID: <70166bc4-2c55-4a46-b442-4a3c49d6d64d@ti.com>
-References: <20240531064006.1223417-1-y-mallik@ti.com>
- <20240531064006.1223417-3-y-mallik@ti.com>
+	s=arc-20240116; t=1717314499; c=relaxed/simple;
+	bh=0osbBSBLTMt8nX/8+KW0zNocP78w7qcjHw2JL9olbfQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Df/JkQ6P1CVerlRVHFoTAUJ8TWJC8uqxFZwsT8rCk4ZPZeK5Ne9ruk29tG2peoRkHeCRrYy6ntBIyXrCVVegMAx19Yxv/of/4JolDW8uqdde1QHqqjESOyEZcbYKbrc0JnRtMDkaSRsWNKP0jKT9ptaz2Nj7ibTYoXt2234HOms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-35e544aa9a9so19307f8f.2;
+        Sun, 02 Jun 2024 00:48:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717314496; x=1717919296;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Mi/VKBiZjMcaZsYVmfXcA5vUMibCH5GQOs6BRjI06o=;
+        b=tj+taI39WaKJoLi+4NzuLFlFrkkj1WGSluBv+5Xo+5bPSShP+w2kRDMmmJ2gS5bof+
+         0WhJgLZt05mCkYw54d+n7nGfC77SBvPUBqYUE4zPf2exeKMm9mTPBUfZabKP2m3DFE7j
+         mwScTMMN6nyFwvT1oHsaRH7biCilyz07gB/yzwKaof47RaY0SwRbtpbOYcux09BXD/gu
+         FpCUl6SOoJJJGxwhogeSj5RDDm+pY4aTqrG5Lx4cu9TDgSsGLF4iNPyUF04pjAg6uRUz
+         PD/HWNPfx3pLPwqhuUiVeJinFUg2R2WM7XopN7BCRfSfqXjZ5sNlCLAOGHSslDvposXe
+         9ITg==
+X-Forwarded-Encrypted: i=1; AJvYcCW70C9ThNH0FoFyl9U1VJ5oSSXz9IJpPgutcMJp/7ryP1EEm2m/gDMtf2AE59jvoXpampH3xqvKunLHb8GsXpPdKe+IUWv3Q28doWy830q8+2yDW7jauvBBS5WzPNlLMODhEGamt1g73MUjZYll2x1B6ILrg8K29nCbX6KFExIr
+X-Gm-Message-State: AOJu0YxSpKzWLEtUFujMIyZCDuZJvpXC3P12SfakCG2dhv/LqiLcnHeW
+	kIPgdky/4345W+6CE6K6Yl1iyJhmpMu1Z1CEEr3taMGBlSFqaveO
+X-Google-Smtp-Source: AGHT+IFsCjXnSMmjNSZUGoj/v4xQvOLvmmlAnC28L1qi45HucRzp7Mm8nzhveD4Y6FLy0KHDf5ir5A==
+X-Received: by 2002:adf:f547:0:b0:358:d0c:b9a0 with SMTP id ffacd0b85a97d-35e0f23ebc2mr4051664f8f.1.1717314495772;
+        Sun, 02 Jun 2024 00:48:15 -0700 (PDT)
+Received: from [10.100.102.74] (85.65.205.146.dynamic.barak-online.net. [85.65.205.146])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35dd062edcdsm5532084f8f.70.2024.06.02.00.48.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 02 Jun 2024 00:48:15 -0700 (PDT)
+Message-ID: <9f62247b-ae36-49d9-9ccc-6ea5a238e147@grimberg.me>
+Date: Sun, 2 Jun 2024 10:48:12 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240531064006.1223417-3-y-mallik@ti.com>
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/4] bugfix: Introduce sendpages_ok() to check
+ sendpage_ok() on contiguous pages
+To: Jakub Kicinski <kuba@kernel.org>, Ofir Gal <ofir.gal@volumez.com>
+Cc: davem@davemloft.net, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
+ ceph-devel@vger.kernel.org, dhowells@redhat.com, edumazet@google.com,
+ pabeni@redhat.com, kbusch@kernel.org, axboe@kernel.dk, hch@lst.de,
+ philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+ christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
+References: <20240530142417.146696-1-ofir.gal@volumez.com>
+ <20240601153430.19416989@kernel.org>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20240601153430.19416989@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, May 31, 2024 at 12:10:05PM +0530, Yojana Mallik wrote:
-> Register the RPMsg driver as network device and add support for
-> basic ethernet functionality by using the shared memory for data
-> plane.
-> 
-> The shared memory layout is as below, with the region between
-> PKT_1_LEN to PKT_N modelled as circular buffer.
-> 
-> -------------------------
-> |          HEAD         |
-> -------------------------
-> |          TAIL         |
-> -------------------------
-> |       PKT_1_LEN       |
-> |         PKT_1         |
-> -------------------------
-> |       PKT_2_LEN       |
-> |         PKT_2         |
-> -------------------------
-> |           .           |
-> |           .           |
-> -------------------------
-> |       PKT_N_LEN       |
-> |         PKT_N         |
-> -------------------------
-> 
-> The offset between the HEAD and TAIL is polled to process the Rx packets.
-> 
-> Signed-off-by: Yojana Mallik <y-mallik@ti.com>
-> ---
->  drivers/net/ethernet/ti/icve_rpmsg_common.h   |  86 ++++
->  drivers/net/ethernet/ti/inter_core_virt_eth.c | 453 +++++++++++++++++-
->  drivers/net/ethernet/ti/inter_core_virt_eth.h |  35 +-
->  3 files changed, 570 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ti/icve_rpmsg_common.h b/drivers/net/ethernet/ti/icve_rpmsg_common.h
-> index 7cd157479d4d..2e3833de14bd 100644
-> --- a/drivers/net/ethernet/ti/icve_rpmsg_common.h
-> +++ b/drivers/net/ethernet/ti/icve_rpmsg_common.h
-> @@ -15,14 +15,58 @@ enum icve_msg_type {
->  	ICVE_NOTIFY_MSG,
->  };
 
-[...]
 
->  
->  #endif /* __ICVE_RPMSG_COMMON_H__ */
-> diff --git a/drivers/net/ethernet/ti/inter_core_virt_eth.c b/drivers/net/ethernet/ti/inter_core_virt_eth.c
-> index bea822d2373a..d96547d317fe 100644
-> --- a/drivers/net/ethernet/ti/inter_core_virt_eth.c
-> +++ b/drivers/net/ethernet/ti/inter_core_virt_eth.c
-> @@ -6,11 +6,145 @@
->  
->  #include "inter_core_virt_eth.h"
+On 02/06/2024 1:34, Jakub Kicinski wrote:
+> On Thu, 30 May 2024 17:24:10 +0300 Ofir Gal wrote:
+>> skbuff: before sendpage_ok - i: 0. page: 0x654eccd7 (pfn: 120755)
+>> skbuff: before sendpage_ok - i: 1. page: 0x1666a4da (pfn: 120756)
+>> skbuff: before sendpage_ok - i: 2. page: 0x54f9f140 (pfn: 120757)
+> noob question, how do you get 3 contiguous pages, the third of which
+> is slab? is_slab doesn't mean what I think it does, or we got extremely
+> lucky with kmalloc?
+>
 
-[...]
+The contig range according to the trace is 256K, the third page was just the
+first time that it saw this !ok page.
 
->  
-> +static int create_request(struct icve_common *common,
-> +			  enum icve_rpmsg_type rpmsg_type)
-> +{
-> +	struct message *msg = &common->send_msg;
-> +	int ret = 0;
-> +
-> +	msg->msg_hdr.src_id = common->port->port_id;
-> +	msg->req_msg.type = rpmsg_type;
-> +
-> +	switch (rpmsg_type) {
-> +	case ICVE_REQ_SHM_INFO:
-> +		msg->msg_hdr.msg_type = ICVE_REQUEST_MSG;
-> +		break;
-> +	case ICVE_REQ_SET_MAC_ADDR:
-> +		msg->msg_hdr.msg_type = ICVE_REQUEST_MSG;
-> +		ether_addr_copy(msg->req_msg.mac_addr.addr,
-> +				common->port->ndev->dev_addr);
-> +		break;
-> +	case ICVE_NOTIFY_PORT_UP:
-> +	case ICVE_NOTIFY_PORT_DOWN:
-> +		msg->msg_hdr.msg_type = ICVE_NOTIFY_MSG;
-> +		break;
-> +	default:
-> +		ret = -EINVAL;
-> +		dev_err(common->dev, "Invalid RPMSG request\n");
-> +	};
-> +	return ret;
-> +}
-> +
-> +static int icve_create_send_request(struct icve_common *common,
-> +				    enum icve_rpmsg_type rpmsg_type,
-> +				    bool wait)
-> +{
-> +	unsigned long flags;
-> +	int ret;
-> +
-> +	if (wait)
-> +		reinit_completion(&common->sync_msg);
-> +
-> +	spin_lock_irqsave(&common->send_msg_lock, flags);
-> +	create_request(common, rpmsg_type);
+I asked the same thing. nvme-tcp gets a bio and sets up its own iov_iter
+on the bio bvec for sending it over the wire. The test that reproduces this
+creates an raid1 md device which probably has at least some effect into how
+we got this buffer.
 
-Why isn't the return value of create_request() being checked?
-If it is guaranteed to always return 0 based on the design, convert it
-to a void function.
-
-> +	rpmsg_send(common->rpdev->ept, (void *)(&common->send_msg),
-> +		   sizeof(common->send_msg));
-> +	spin_unlock_irqrestore(&common->send_msg_lock, flags);
-> +
-> +	if (wait) {
-> +		ret = wait_for_completion_timeout(&common->sync_msg,
-> +						  ICVE_REQ_TIMEOUT);
-> +
-> +		if (!ret) {
-> +			dev_err(common->dev, "Failed to receive response within %ld jiffies\n",
-> +				ICVE_REQ_TIMEOUT);
-> +			ret = -ETIMEDOUT;
-> +			return ret;
-> +		}
-> +	}
-> +	return ret;
-> +}
-> +
-> +static void icve_state_machine(struct work_struct *work)
-> +{
-> +	struct delayed_work *dwork = to_delayed_work(work);
-> +	struct icve_common *common;
-> +	struct icve_port *port;
-> +
-> +	common = container_of(dwork, struct icve_common, state_work);
-> +	port = common->port;
-> +
-> +	mutex_lock(&common->state_lock);
-> +
-> +	switch (common->state) {
-> +	case ICVE_STATE_PROBE:
-> +		break;
-> +	case ICVE_STATE_OPEN:
-> +		icve_create_send_request(common, ICVE_REQ_SHM_INFO, false);
-
-The return value of icve_create_send_request() is not being checked. Is
-it guaranteed to succeed? Where is the error handling path if
-icve_create_send_request() fails?
-
-> +		break;
-> +	case ICVE_STATE_CLOSE:
-> +		break;
-> +	case ICVE_STATE_READY:
-> +		icve_create_send_request(common, ICVE_REQ_SET_MAC_ADDR, false);
-
-Same here and at all other places where icve_create_send_request() is
-being invoked. The icve_create_send_request() seems to be newly added in
-this version of the series and wasn't there in the RFC patch. This should
-be mentioned in the Changelog.
-
-[...]
-
-Regards,
-Siddharth.
+With the recent multipage bvecs work from Ming, nvme-tcp bvec entries will
+often point to contiguous ranges that are > PAGE_SIZE. I didn't look 
+into the
+implementation of skb_splice_from_iter, but I think its not very 
+efficient to
+extract a contiguous range in PAGE_SIZE granular vector...
 
