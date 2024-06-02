@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-99999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2BCC8D7688
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 17:19:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 699AB8D76D7
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 17:45:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD2CE1C20919
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 15:19:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03FC01F21120
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 15:45:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852B3433C9;
-	Sun,  2 Jun 2024 15:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 506623BBF4;
+	Sun,  2 Jun 2024 15:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="19z0dVig"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qrwTJ06U"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E907EB66F;
-	Sun,  2 Jun 2024 15:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8BC17736;
+	Sun,  2 Jun 2024 15:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717341594; cv=none; b=CpSxFV1ZSsKakALt7jb3UtgwiqiQakMs9gnhHxzUPTmiJL6IaU8jVSgZqyhS+s1vYJVVcgVa47wbXXOkNexws+6HlKclNPwJ3iCfNvZJo8QQtlq8RrxP04kZ/0MQkWe6AaIEVV7wuUJYRYI7ndzXrIfGVJc7XQ/1pWszHzo8hvw=
+	t=1717343148; cv=none; b=R6RcEGKDNUFEATpZlV+iApXBn0CoMBVImNlG+Ri+mv1DjjoRgapXfp+bGGw1jSCnnwU/cZJ9lf/ZvR1Gcuk43WbDfVXaIqoT8ZJv1bwtQri3oivy96OSGO6wTugPyzlo+MIhE8YTCHZdUwzrHOOWjKKIp2vl/7WnCstCsgq4Dsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717341594; c=relaxed/simple;
-	bh=SQPi2dhR+hrDRiZHBXwEL9RYbOgNyAjNeqon/0CFbvs=;
+	s=arc-20240116; t=1717343148; c=relaxed/simple;
+	bh=LZHz46gZY0Uo9hNwDp7vSBscpdT7ixIYgNYA5g2hde4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GukhEVpenvoBDt7OH4RHNqmqk7qgdio2wMC/ALqz0tUC4CW/MT2QV8bHjwB4cD9ECHz6sMdwT6YRnw1DNcebeb3SDmYLlz2yYUPnSOGLlw2H0UXKsQ4hD3Ow8zNaaKMiObD3E9EYPiGw3E37EJO8mUXIC19LoYd5BD2OogK8FUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=19z0dVig; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=S4isz4kvxdWt5GELrVOeu92QPJCugFAbiXWZu+vTQmf09NmYaU9GrB1qWiF5NLqK70jZDrZig5raYja3yQ8N6Fkx1TFC8Tb7I/qc+1tRLNZ6OF1x0KHKMzICJBD23f0ewlpR+PnI/VKQeNEssM82OcDJdwAB55hWlrKmrghMZ7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qrwTJ06U; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,35 +36,25 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=nqavnFoJZa1xwelaw40YOoUGVHNLrYxcxg9LB1wcUDc=; b=19z0dVig33YnGNy2632d3m3fcl
-	jiLjbxL6hgfaKJoRbsPfAGcOqsdDmkKKMSvtYX59YruXV2+8istZwECGDh8KmSYPy0FY+7PSm1p4H
-	VZaQ2YoSz0U+k7m3Ot9OWrwNmWOTvwvyTDkYJbQ34iMyhx4Ra2CiJiT3QLBcXIsA1UyA=;
+	bh=P0IunT5E4kP03Ju05n5fpl6v0D6JN754xrn2B0poXdM=; b=qrwTJ06UWxG9noO5YDvcSBOtGW
+	KHzgAILPHxG9rf1O2+ugBoT+4dlqXjVUo8zS+QF1uln9n8X7tUsb8tMV7CtXLfNcF0RvN5pSYIJgw
+	S3pMiySWVjkKPwHxnv6MP9gScyzIlYm1tgmmNwEWeyy/vM00ImWWwA7BhCUbQ1GxAXg0=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sDmzg-00Gcco-M6; Sun, 02 Jun 2024 17:19:36 +0200
-Date: Sun, 2 Jun 2024 17:19:36 +0200
+	id 1sDnOj-00GdQu-AP; Sun, 02 Jun 2024 17:45:29 +0200
+Date: Sun, 2 Jun 2024 17:45:29 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Sunil Kovvuri Goutham <sgoutham@marvell.com>
-Cc: Diogo Ivo <diogo.ivo@siemens.com>, MD Danish Anwar <danishanwar@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-	Tero Kristo <kristo@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Jan Kiszka <jan.kiszka@siemens.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
-Subject: Re: [EXTERNAL] [PATCH 2/3] net: ti: icss-iep: Enable compare events
-Message-ID: <c4fb16a9-7b5f-4ba2-98ea-ac554fbe313f@lunn.ch>
-References: <20240529-iep-v1-0-7273c07592d3@siemens.com>
- <20240529-iep-v1-2-7273c07592d3@siemens.com>
- <BY3PR18MB47377FBF88724DD5A4814BCEC6FC2@BY3PR18MB4737.namprd18.prod.outlook.com>
+To: Yojana Mallik <y-mallik@ti.com>
+Cc: schnelle@linux.ibm.com, wsa+renesas@sang-engineering.com,
+	diogo.ivo@siemens.com, rdunlap@infradead.org, horms@kernel.org,
+	vigneshr@ti.com, rogerq@ti.com, danishanwar@ti.com,
+	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+	davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, srk@ti.com, rogerq@kernel.org
+Subject: Re: [PATCH net-next v2 0/3] Introducing Intercore Virtual Ethernet
+ (ICVE) driver
+Message-ID: <8f5d2448-bfd7-48a5-be12-fb16cdc4de79@lunn.ch>
+References: <20240531064006.1223417-1-y-mallik@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,27 +63,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BY3PR18MB47377FBF88724DD5A4814BCEC6FC2@BY3PR18MB4737.namprd18.prod.outlook.com>
+In-Reply-To: <20240531064006.1223417-1-y-mallik@ti.com>
 
-> >+	iep->cap_cmp_irq = platform_get_irq_byname_optional(pdev,
-> >"iep_cap_cmp");
-> >+	if (iep->cap_cmp_irq < 0) {
-> >+		if (iep->cap_cmp_irq == -EPROBE_DEFER)
-> >+			return iep->cap_cmp_irq;
+On Fri, May 31, 2024 at 12:10:03PM +0530, Yojana Mallik wrote:
+> virtio-net provides a solution for virtual ethernet interface in a
+> virtualized environment.
 > 
-> This info is coming from DT, is PROBE_DIFFER error return value possible ?
+> There might be a use-case for traffic tunneling between heterogeneous
+> processors in a non virtualized environment such as TI's AM64x that has
+> Cortex A53 and Cortex R5 where Linux runs on A53 and a flavour of RTOS
+> on R5(FreeRTOS) and the ethernet controller is managed by R5 and needs
+> to pass some low priority data to A53.
+> 
+> One solution for such an use case where the ethernet controller does
+> not support DMA for Tx/Rx channel, could be a RPMsg based shared memory
+> ethernet driver.
 
-static int __platform_get_irq_byname(struct platform_device *dev,
-				     const char *name)
-{
-	struct resource *r;
-	int ret;
+virtio-net is very generic and vendor agnostic.
 
-	ret = fwnode_irq_get_byname(dev_fwnode(&dev->dev), name);
-	if (ret > 0 || ret == -EPROBE_DEFER)
-		return ret;
-
-This suggests it can happen.
+Looking at icve, what is TI specific? Why not define a generic
+solution which could be used for any heterogeneous system? We are
+seeming more and more such systems, and there is no point everybody
+re-inventing the wheel. So what i would like to see is something
+similar to driver/tty/rpmsg_tty.c, a driver/net/ethernet/rpmsg_eth.c,
+with good documentation of the protocol used, so that others can
+implement it. And since you say you have FreeRTOS on the other end,
+you could also contribute that side to FreeRTOS as well. A complete
+open source solution everybody can use.
 
 	Andrew
 
