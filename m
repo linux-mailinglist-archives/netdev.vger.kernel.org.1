@@ -1,96 +1,83 @@
-Return-Path: <netdev+bounces-100024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2E9C8D7792
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 21:24:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 918C78D779A
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 21:32:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 003B91C20DB3
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 19:24:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE2A0B21385
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 19:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4066EB68;
-	Sun,  2 Jun 2024 19:24:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 430026EB7C;
+	Sun,  2 Jun 2024 19:32:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="AX5Z4WNR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GbI4sD15"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6998E2209B
-	for <netdev@vger.kernel.org>; Sun,  2 Jun 2024 19:24:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8629A262B6;
+	Sun,  2 Jun 2024 19:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717356242; cv=none; b=JwDZ9OboQqFjlynmlu0q/G3h6/nkXamGTzfhikAtamoTsKbudOpoZZzJ5i/Fk603GL6T3ZikIavnnK7bx/ptBo93XvBUKtd5VjYYZ4m9qIf2SWlh1hA3w8W/5V2hSsv5aMHg9V9htGxwRc9GReYQqaDBCw7DpY2BYmVepC36Qa4=
+	t=1717356759; cv=none; b=scEQLS/1nN+oEh+rBrzUM+JvEx0zijkfeZTDCLSu2WySxVvSn7wBntHB+d2fLfSYMtWyXPlY5fDEKKFzO+5rQsNXn4LUOW1X095DZ9ZGiugereSCvQDU+5j7mu3hKnqNM6qG7+Yoh1JcGU9yYNRtO3QaAX/o3Cd/GP3uUlomEgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717356242; c=relaxed/simple;
-	bh=qFKsyOePVq/VZ3JIFbqe8V02kL7/ITBZkREWuaoRyFw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dcp5zVIxbEZej7VlZ8s77VSy3evjzMys6X75yMl9V0t71xVmY+RF+DUbh3SwPv/WdsCcqUew1rkvq1q4A3oEzjYW7+DrZXF3LQHmKkGqB7r+NhBwjKmpxNiKzof/Jmi8z53GfQoKsGeK5RC9A4eZ1SiYC9GvHT39KK7BCjyjtKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=AX5Z4WNR; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6f4603237e0so2390520b3a.0
-        for <netdev@vger.kernel.org>; Sun, 02 Jun 2024 12:24:01 -0700 (PDT)
+	s=arc-20240116; t=1717356759; c=relaxed/simple;
+	bh=jIno1JF/zaBu1ybGTRfJ2FsZUbHpL9bl8tN6FO+8hLI=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GoYPvCfvEmGutKJGCEcv5ImIX7CdNNsCVS1u21crjmEtpHp+E7uPRSDqzenPKJPWQWtwJNcYv0fYPzC/yXc9zen3oGo8SqIEG7DLd8/Akk4epw6nTNA+6V/f21BH4Lxx29J+k0w3hB9GZR+ttOX/qCSosXoxm+ZMOLbXpe8CW3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GbI4sD15; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-421338c4c3bso15185125e9.1;
+        Sun, 02 Jun 2024 12:32:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1717356241; x=1717961041; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6Y3tCKTuoMYJ9KLxmz/0pp/IbE4WV30YqEEAEWzotb0=;
-        b=AX5Z4WNREqCMtfSZ+OlZ2HJZ7BaehtBof2ksCvqO8Xqr/BF5SFfZJaSyY1Is+O9+z/
-         b+VFAUiB+FCV8egPkl7M3Ek6A+9K360cdwpK5OKufI+j27+084GgqUzPya4+yTgioGjc
-         cFDz9KBJ2dbSpV+NnVYQt59bFuvIQxpYJee8A=
+        d=gmail.com; s=20230601; t=1717356756; x=1717961556; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lKCOsV2XYSwYAbin9usnjEvg6RDHEVLVcrQaFWDC7m0=;
+        b=GbI4sD15ZU0Je0FaUTfxG4q9X1Sn/UXD/6ViACsnvAGzxj4DAPeS2Uj4+6FUrstT1V
+         YMg3TIrN2jMvPe8B5KSwkfKgI59Tj3Dw7/h16+zdMczzwgReU0D6BTlV6KS4nm+wBmlV
+         Os6nwUuBzxwcRX77V/Bo7IGdOUlLcQHZuG0KDyjkB2YoBWa5UzVZRK+ZnU+3jz4nKeMv
+         6Qu+QPcM0G3ms/6Q6Qay7hWduOARJMZ70JyOQtjfl0FIkYBCuQe1v3sZO/kK8b+9Vl9z
+         e5JtzAiXT2HdsztaRlxkqnHpUE3/rdHbVI9Wy8agA1PihZQWmKM0/jV/cDDze09+pZXO
+         9hUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717356241; x=1717961041;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Y3tCKTuoMYJ9KLxmz/0pp/IbE4WV30YqEEAEWzotb0=;
-        b=Akti1dK26aSUVFxAnYxeSDrGFRYtYBqSJCQWGSX7Hn0AuYa8FU4w881VX2Di1DwMdy
-         eG+YfLOUK3UqgxUfKu/KSMFhcucKJvtWefQbwzd97l0z85SivkTyi9L+aTCkU0CmoMnM
-         BGUO4jZToUx1oGuypV1A8NfJ0z/QvmGk2ShPi4yidOmDEyjgbnFebCwkXgzUA6tAqedx
-         WujkkD8oaGcK0Rzfeuvc7c74gzfU0HNNH+mjG+CYWtYv9wRUiDjt7b67lQgvI22W+p7g
-         gw/NIBZkApF3OvPqNmNf6x4ncBxVrIVERpk9GlHDOF/FFH/VQ3B0nmaL5zbWzUldrfY5
-         8Blw==
-X-Forwarded-Encrypted: i=1; AJvYcCVFmag6NY+ddCqnvi61rovlCXpx66nR9QyTzSLoWkV0zisiVCOPQHgSy285eWANG1V3y+4LqqcfgXnvAEs0ZOPVNCxzr84W
-X-Gm-Message-State: AOJu0Ywm90sTe9TuqQwYYI7IxffPUZIlzBY/KNMXwN22DhpybYLzcbix
-	cYSmYbrBz2Z1zxKyHdQsMieG+k3LME2wwP3OmSo7zNRfEmBu/wl/fwDQi/15FbwUrxL3QwaUl9l
-	e
-X-Google-Smtp-Source: AGHT+IFevz76P75NXcHiN0JDZMUF8qUTk0bC63DtirDuVzzRVRN0ulqFXsAABGtrz12hZTsYn+74Cw==
-X-Received: by 2002:a05:6a00:1ca1:b0:702:6658:252b with SMTP id d2e1a72fcca58-702665826f5mr2800463b3a.13.1717356240660;
-        Sun, 02 Jun 2024 12:24:00 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7024e30820fsm3468032b3a.196.2024.06.02.12.23.59
+        d=1e100.net; s=20230601; t=1717356756; x=1717961556;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lKCOsV2XYSwYAbin9usnjEvg6RDHEVLVcrQaFWDC7m0=;
+        b=r8gMDG/9IrfuojA9t30pUYo1SHOPFGfchhKuju7/n2fPRlOqJ4IT0hezEpf/pVNBZw
+         ud+rWOM3OtMaYl3ziGNvW9yMXrAC70fHDz/kYKHU5j4l0ImUpER7am2NdwKuFpKzqrj2
+         DlmWmmJer40FboCPEd73ik3bMcHRncE8MA9aFd/EHp0StLE5eylOfiU78Z96I2Ugv1Bg
+         zct7SFhJ8XAF6Su9/Oemimn2IT98NqtXgJ+1poymZS9Eg2aLQfoj0ARGhdEhvGbhaqKV
+         3SMfYc1YUClkZgRIc+U/wyQwLthyMUTb+mxU3TQo/6x0MXEU860Y7p4vVYogG1mTkc0A
+         bvww==
+X-Forwarded-Encrypted: i=1; AJvYcCXIMSfSPJHel9qqpwfcJhRpnIw0u9p+ESN4GUZDvRoFcS74x0oX9gwgroYaTo8H6mtwiCuzRAKQRHuumFUcuJ6EqA9z
+X-Gm-Message-State: AOJu0Yw3QXxgkM+8tvI3c1QpFpi93kABPCzxj+q9agGmWmaY2x9cCV3n
+	69q0R5D4/u18OUYgljtDGFQBlddfyAYopkOfVvAhcq48yIq61ZVK
+X-Google-Smtp-Source: AGHT+IE0wIV1lHMQma4StsOqMl/QcsD2jWifORtX8XnqJREO7HxFU7LfOfxBZ7lixUh2Jjyb/RaZBA==
+X-Received: by 2002:a05:600c:6ca:b0:41a:b961:9495 with SMTP id 5b1f17b1804b1-4212e09cc32mr57986895e9.25.1717356755591;
+        Sun, 02 Jun 2024 12:32:35 -0700 (PDT)
+Received: from krava ([83.240.60.202])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4213411b25dsm68313655e9.40.2024.06.02.12.32.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Jun 2024 12:24:00 -0700 (PDT)
-Date: Sun, 2 Jun 2024 12:23:57 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Simon Horman <horms@kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	nalramli@fastly.com, Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>
-Subject: Re: [RFC net-next v3 1/2] net/mlx5e: Add helpers to calculate txq
- and ch idx
-Message-ID: <ZlzGzcwn5JRG9kx2@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, nalramli@fastly.com,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>
-References: <20240529031628.324117-1-jdamato@fastly.com>
- <20240529031628.324117-2-jdamato@fastly.com>
- <20240601113557.GE491852@kernel.org>
- <20240601113913.GA696607@kernel.org>
+        Sun, 02 Jun 2024 12:32:35 -0700 (PDT)
+From: Jiri Olsa <olsajiri@gmail.com>
+X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
+Date: Sun, 2 Jun 2024 21:32:33 +0200
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+	Cong Wang <cong.wang@bytedance.com>,
+	syzbot+1989ee16d94720836244@syzkaller.appspotmail.com,
+	Andrii Nakryiko <andrii@kernel.org>
+Subject: Re: [Patch bpf] bpf: fix a potential use-after-free in
+ bpf_link_free()
+Message-ID: <ZlzI0bhlMP1sAHEI@krava>
+References: <20240602182703.207276-1-xiyou.wangcong@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,37 +86,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240601113913.GA696607@kernel.org>
+In-Reply-To: <20240602182703.207276-1-xiyou.wangcong@gmail.com>
 
-On Sat, Jun 01, 2024 at 12:39:13PM +0100, Simon Horman wrote:
-> On Sat, Jun 01, 2024 at 12:35:57PM +0100, Simon Horman wrote:
-> > On Wed, May 29, 2024 at 03:16:26AM +0000, Joe Damato wrote:
-> > > Add two helpers to:
-> > > 
-> > > 1. Compute the txq_ix given a channel and a tc offset (tc_to_txq_ix).
-> > > 2. Compute the channel index and tc offset given a txq_ix
-> > >    (txq_ix_to_chtc_ix).
-> > > 
-> > > The first helper, tc_to_txq_ix, is used in place of the mathematical
-> > > expressionin mlx5e_open_sqs when txq_ix values are computed.
-> > > 
-> > > The second helper, txq_ix_to_chtc_ix, will be used in a following patch.
-> > 
-> > Hi Joe,
-> > 
-> > I think it would be best to add txq_ix_to_chtc_ix as part of patch that
-> > uses it, because the current arrangement will cause allmodconfigs with
-> > clang-18 and W=1 to fail due to txq_ix_to_chtc_ix being unused.
-> > 
-> > ...
+On Sun, Jun 02, 2024 at 11:27:03AM -0700, Cong Wang wrote:
+> From: Cong Wang <cong.wang@bytedance.com>
 > 
-> Sorry, one more thing.
+> After commit 1a80dbcb2dba, bpf_link can be freed by
+> link->ops->dealloc_deferred, but the code still tests and uses
+> link->ops->dealloc afterward, which leads to a use-after-free as
+> reported by syzbot. Actually, one of them should be sufficient, so
+> just call one of them instead of both. Also add a WARN_ON() in case
+> of any problematic implementation.
 > 
-> Please don't use inline in .c files unless there is a demonstrable
-> reason - f.e. performance - to do so. Rather, let the compiler figure
-> out when to inline functions.
+> Reported-by: syzbot+1989ee16d94720836244@syzkaller.appspotmail.com
+> Fixes: 1a80dbcb2dba ("bpf: support deferring bpf_link dealloc to after RCU grace period")
+> Cc: Andrii Nakryiko <andrii@kernel.org>
+> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+> ---
+>  kernel/bpf/syscall.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
+> index 2222c3ff88e7..d8f244069495 100644
+> --- a/kernel/bpf/syscall.c
+> +++ b/kernel/bpf/syscall.c
+> @@ -2998,6 +2998,7 @@ static int bpf_obj_get(const union bpf_attr *attr)
+>  void bpf_link_init(struct bpf_link *link, enum bpf_link_type type,
+>  		   const struct bpf_link_ops *ops, struct bpf_prog *prog)
+>  {
+> +	WARN_ON(ops->dealloc && ops->dealloc_deferred);
+>  	atomic64_set(&link->refcnt, 1);
+>  	link->type = type;
+>  	link->id = 0;
+> @@ -3074,8 +3075,7 @@ static void bpf_link_free(struct bpf_link *link)
+>  			call_rcu_tasks_trace(&link->rcu, bpf_link_defer_dealloc_mult_rcu_gp);
+>  		else
+>  			call_rcu(&link->rcu, bpf_link_defer_dealloc_rcu_gp);
+> -	}
+> -	if (link->ops->dealloc)
+> +	} else if (link->ops->dealloc)
+>  		link->ops->dealloc(link);
 
-Sure, I'll make sure in the next revision to include the second
-helper in the second patch instead and avoid using "inline" in both
-cases.
+nice catch
+
+Acked-by: Jiri Olsa <jolsa@kernel.org>
+
+jirka
 
