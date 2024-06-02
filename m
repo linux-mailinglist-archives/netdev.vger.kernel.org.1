@@ -1,172 +1,99 @@
-Return-Path: <netdev+bounces-99997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-99999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51B8E8D7661
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 16:40:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2BCC8D7688
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 17:19:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74A5E1C21A4A
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 14:40:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD2CE1C20919
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 15:19:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD4077E563;
-	Sun,  2 Jun 2024 14:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852B3433C9;
+	Sun,  2 Jun 2024 15:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MzgnCH8f"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="19z0dVig"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A6F78C79;
-	Sun,  2 Jun 2024 14:37:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E907EB66F;
+	Sun,  2 Jun 2024 15:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717339026; cv=none; b=t5J+Cyz8K30jod1emSapFK/B7yCGpRXbyO6ZZZHtXwp3UdaIEnFbNQJXAEA4hCLNuTuopgIrq3+JgP+qZW26LtZpvbg0dr/eCg4lqhqFq3u7fEKJq3Cm1JhkD92n+nDrgJfFa7HUSRtCIdawG7B3BY2i9gFIpklUedJBmG0ZZLs=
+	t=1717341594; cv=none; b=CpSxFV1ZSsKakALt7jb3UtgwiqiQakMs9gnhHxzUPTmiJL6IaU8jVSgZqyhS+s1vYJVVcgVa47wbXXOkNexws+6HlKclNPwJ3iCfNvZJo8QQtlq8RrxP04kZ/0MQkWe6AaIEVV7wuUJYRYI7ndzXrIfGVJc7XQ/1pWszHzo8hvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717339026; c=relaxed/simple;
-	bh=IgeH3NtZfgVCNuT/fZC/EjAkaOCyYtD8Ar2FpuVB4Ak=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p8Ze5B3yKEDbBq1favrvLnHc5k0HtqAkGas2NzOh6/xk8UgpfXc85F616QtjSFLMgUd2xvgCyyWzE+tCumoWdA+s84drYbFEvZpd5pztDcpBcy8a/Gy2FPMxhJuIi+rKmLjRNehqtwUgWX5+wZ+uV5KkhRvfTfCqeDvo10V0q8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MzgnCH8f; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52b919d1fc0so780276e87.0;
-        Sun, 02 Jun 2024 07:37:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717339023; x=1717943823; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dU7sOuoCnE7DZBaFJYawXWXaLrHsBgPyxKdpukglgGI=;
-        b=MzgnCH8fIEvlVeENCVv2NJnCW/o3q3mBfChHp334+anYG371Dpsx96kLCcsJoOM60L
-         kIPuH3NhiUvb8iN8XQfKwGF9l3fu/z+4T2UYFw816coboERULLCXjOnv65UyfpNKesek
-         zxbtHCA3riPW6eBY/smUDPnkTOHrIOwiOmix5qfvZpI8wJ17aQVc8/0y2L6GydPFvp3b
-         K5z7wsFqf7nXITQJDImA9quBf3k4N7dvWKZ3sFOjK6PVC2JFXUnbtTsG9dQaFnsRj14I
-         mjTeYreJKryUkZLFKJ/74i75HHPqKSMhYDbOKT2P5TgUx0VIH/a84KTeP1ybQ7VbXpGr
-         k8ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717339023; x=1717943823;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dU7sOuoCnE7DZBaFJYawXWXaLrHsBgPyxKdpukglgGI=;
-        b=CnxUAcCT9QSMeGbQJ++uONbxdKWOahW3rkuj2Yzhyj4LfCcy4r6v+lRvq5M9syrJo7
-         ANlWeibIm7T3e6sI9FFjjQWcsU7qkMPUU2bcKMxH+x3pU1SonMUlHHse7JohlyxajraJ
-         QrcqdcT6Cj7NryNLiy+JjHiuv8cCRtO8BBua+DGl1VlT2C13EJuStraQYp/Ip8m0SpGP
-         L0HkQSdFIK5TDJY7P8DMTxLr0QwQNj6jjHAz6RMcSDqVOSYgOBWcj1kR2WFD1T6s/rDx
-         FLlOG3XABcoxtE0mZWSXjDCADAvxtQGd3VPp19KUoInhsuyLo5JY0pkb2Xvl2wQn+tsv
-         QiIA==
-X-Forwarded-Encrypted: i=1; AJvYcCWCphfqYwfl7ncxupRJKbc/bg4rkauhCqq+QxPVOk3EAhAjkpb7Utge5EoWv8KfCAmqBviroExvxZ4AKR7pPZIi/xy892AcbB22FuHwXvsgtPsroNHQPxfpMznSJ/4Tv1mVCWdV819QQKy7kOn/IfOeFRvkxFX7eKkcbiKqPeclJg==
-X-Gm-Message-State: AOJu0YyQ00SJlVcLURRWCw6bnAm3UYh0FW1g3WDOt33bknGBtl+by/J9
-	cS9xi1aeIs6YPRd0XqMiSYHafpDufIx04BE99NF9GQxSbMpewrNO
-X-Google-Smtp-Source: AGHT+IGG30UwFOotd/0Zdrr/C30omiONtB0LV+xIFdYgqxXQLjQdJQlWg/j2uttrnvCHheKu72hvDg==
-X-Received: by 2002:a19:5f53:0:b0:52b:8912:2843 with SMTP id 2adb3069b0e04-52b89122a59mr1943524e87.32.1717339022871;
-        Sun, 02 Jun 2024 07:37:02 -0700 (PDT)
-Received: from localhost ([178.178.142.64])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52b84d34b18sm966116e87.12.2024.06.02.07.37.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Jun 2024 07:37:02 -0700 (PDT)
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
+	s=arc-20240116; t=1717341594; c=relaxed/simple;
+	bh=SQPi2dhR+hrDRiZHBXwEL9RYbOgNyAjNeqon/0CFbvs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GukhEVpenvoBDt7OH4RHNqmqk7qgdio2wMC/ALqz0tUC4CW/MT2QV8bHjwB4cD9ECHz6sMdwT6YRnw1DNcebeb3SDmYLlz2yYUPnSOGLlw2H0UXKsQ4hD3Ow8zNaaKMiObD3E9EYPiGw3E37EJO8mUXIC19LoYd5BD2OogK8FUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=19z0dVig; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=nqavnFoJZa1xwelaw40YOoUGVHNLrYxcxg9LB1wcUDc=; b=19z0dVig33YnGNy2632d3m3fcl
+	jiLjbxL6hgfaKJoRbsPfAGcOqsdDmkKKMSvtYX59YruXV2+8istZwECGDh8KmSYPy0FY+7PSm1p4H
+	VZaQ2YoSz0U+k7m3Ot9OWrwNmWOTvwvyTDkYJbQ34iMyhx4Ra2CiJiT3QLBcXIsA1UyA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sDmzg-00Gcco-M6; Sun, 02 Jun 2024 17:19:36 +0200
+Date: Sun, 2 Jun 2024 17:19:36 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+Cc: Diogo Ivo <diogo.ivo@siemens.com>, MD Danish Anwar <danishanwar@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: Serge Semin <fancer.lancer@gmail.com>,
-	Sagar Cheluvegowda <quic_scheluve@quicinc.com>,
-	Abhishek Chauhan <quic_abchauha@quicinc.com>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Tomer Maimon <tmaimon77@gmail.com>,
-	openbmc@lists.ozlabs.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next v2 10/10] net: stmmac: Add DW XPCS specified via "pcs-handle" support
-Date: Sun,  2 Jun 2024 17:36:24 +0300
-Message-ID: <20240602143636.5839-11-fancer.lancer@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240602143636.5839-1-fancer.lancer@gmail.com>
-References: <20240602143636.5839-1-fancer.lancer@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jan Kiszka <jan.kiszka@siemens.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
+Subject: Re: [EXTERNAL] [PATCH 2/3] net: ti: icss-iep: Enable compare events
+Message-ID: <c4fb16a9-7b5f-4ba2-98ea-ac554fbe313f@lunn.ch>
+References: <20240529-iep-v1-0-7273c07592d3@siemens.com>
+ <20240529-iep-v1-2-7273c07592d3@siemens.com>
+ <BY3PR18MB47377FBF88724DD5A4814BCEC6FC2@BY3PR18MB4737.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BY3PR18MB47377FBF88724DD5A4814BCEC6FC2@BY3PR18MB4737.namprd18.prod.outlook.com>
 
-Recently the DW XPCS DT-bindings have been introduced and the DW XPCS
-driver has been altered to support the DW XPCS registered as a platform
-device. In order to have the DW XPCS DT-device accessed from the STMMAC
-driver let's alter the STMMAC PCS-setup procedure to support the
-"pcs-handle" property containing the phandle reference to the DW XPCS
-device DT-node. The respective fwnode will be then passed to the
-xpcs_create_fwnode() function which in its turn will create the DW XPCS
-descriptor utilized in the main driver for the PCS-related setups.
+> >+	iep->cap_cmp_irq = platform_get_irq_byname_optional(pdev,
+> >"iep_cap_cmp");
+> >+	if (iep->cap_cmp_irq < 0) {
+> >+		if (iep->cap_cmp_irq == -EPROBE_DEFER)
+> >+			return iep->cap_cmp_irq;
+> 
+> This info is coming from DT, is PROBE_DIFFER error return value possible ?
 
-Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+static int __platform_get_irq_byname(struct platform_device *dev,
+				     const char *name)
+{
+	struct resource *r;
+	int ret;
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-index 807789d7309a..dc040051aa53 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-@@ -497,15 +497,22 @@ int stmmac_mdio_reset(struct mii_bus *bus)
- 
- int stmmac_pcs_setup(struct net_device *ndev)
- {
-+	struct fwnode_handle *devnode, *pcsnode;
- 	struct dw_xpcs *xpcs = NULL;
- 	struct stmmac_priv *priv;
- 	int addr, mode, ret;
- 
- 	priv = netdev_priv(ndev);
- 	mode = priv->plat->phy_interface;
-+	devnode = priv->plat->port_node;
- 
- 	if (priv->plat->pcs_init) {
- 		ret = priv->plat->pcs_init(priv);
-+	} else if (fwnode_property_present(devnode, "pcs-handle")) {
-+		pcsnode = fwnode_find_reference(devnode, "pcs-handle", 0);
-+		xpcs = xpcs_create_fwnode(pcsnode, mode);
-+		fwnode_handle_put(pcsnode);
-+		ret = PTR_ERR_OR_ZERO(xpcs);
- 	} else if (priv->plat->mdio_bus_data &&
- 		   priv->plat->mdio_bus_data->has_xpcs) {
- 		addr = priv->plat->mdio_bus_data->xpcs_addr;
-@@ -515,10 +522,8 @@ int stmmac_pcs_setup(struct net_device *ndev)
- 		return 0;
- 	}
- 
--	if (ret) {
--		dev_warn(priv->device, "No xPCS found\n");
--		return ret;
--	}
-+	if (ret)
-+		return dev_err_probe(priv->device, ret, "No xPCS found\n");
- 
- 	priv->hw->xpcs = xpcs;
- 
--- 
-2.43.0
+	ret = fwnode_irq_get_byname(dev_fwnode(&dev->dev), name);
+	if (ret > 0 || ret == -EPROBE_DEFER)
+		return ret;
 
+This suggests it can happen.
+
+	Andrew
 
