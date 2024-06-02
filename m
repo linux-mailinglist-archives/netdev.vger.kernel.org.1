@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-100020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13A2C8D7766
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 20:00:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 608078D776C
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 20:10:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C84E1C20CA7
-	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 18:00:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 031011F211EF
+	for <lists+netdev@lfdr.de>; Sun,  2 Jun 2024 18:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CE4B57C8A;
-	Sun,  2 Jun 2024 18:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 850B95FB8A;
+	Sun,  2 Jun 2024 18:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iA/TVdPu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DMXRB2nP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75582D058;
-	Sun,  2 Jun 2024 18:00:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F031E4A2;
+	Sun,  2 Jun 2024 18:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717351247; cv=none; b=K6QG3JUE9oS2M/KUgdqsVl8nvbqDq8QG8tHfMpkVMQFes7BExcUKafNAzrzTUTFkv1gNGPczeOjvV/ME7NoU5TOMID6TdeGiyOftsluQIuxf7GtpxGezwVPOm6lPvsjrUaxwF4O0Q47FHCa3KVG0RLhrIL/N7Xl5F/xQmIdBZ7Q=
+	t=1717351811; cv=none; b=iqnkVFqnmtykCKkl7t0QqZLuZTzCOava4KuISTJVB4UPU37H7pYNayi5/4ypK6es+UfHHRnOcAJbI+oqDi+ayUNUL9Lqs7fbTcyt28o7Q5qSiE3QxqtM11lQRJtoZ67Q9+Gigr+vDTfzNdK0e25LyJehtxGrPoWSVauGCn2XxiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717351247; c=relaxed/simple;
-	bh=5UOnIiRDPsNdGugtQZJiB/T2OYSpcEW+eXrkeXtY3RQ=;
+	s=arc-20240116; t=1717351811; c=relaxed/simple;
+	bh=+2MHK2yMT+QKsyqaCKdYfGSKtVMLtPAzggfxfAy/6mc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TXeNAQOXmWNxIvzoDPNqmc5qwhbM3okEcO5+91/suuq4PAiDDYkRddHt9kkGtGSe88glh3EE+HZUgsGv8BcNMuVvCuGVO8Mv/sWJQiAQuOPiCpIwAcyq+aLeyVaHIIDNhoie3AmQr+mtLwChpqrSs8Cy14bhDvJCbij4pGWHCb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iA/TVdPu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE931C2BBFC;
-	Sun,  2 Jun 2024 18:00:46 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=blJZ4MiG5HluMLtwbsY/23TJHntGutHPj3StfoHVE5nlcgCJF+Vu54dIVBg598G2HqN621MDJHc8O8K31i0ElzI8Zjibmk1bUTpfy1oS5mi1t9J0C4oDZLhUhLUSgwR4LPJ8lQYoBvB6Dcdl9cSQ+essUpJqY7KQY9O3CvvbLMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DMXRB2nP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54FD1C2BBFC;
+	Sun,  2 Jun 2024 18:10:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717351247;
-	bh=5UOnIiRDPsNdGugtQZJiB/T2OYSpcEW+eXrkeXtY3RQ=;
+	s=k20201202; t=1717351810;
+	bh=+2MHK2yMT+QKsyqaCKdYfGSKtVMLtPAzggfxfAy/6mc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iA/TVdPuXZPybwHwCmA6GHM4NU8a5NDlRurw2P1I4HZV5tnhKKtnByNW7xZ2Qm3q5
-	 LSqEqr6w3sX7E8WTPlMk254Hv7+kZXMDE4JncCbNl2PNPGiUVlqyXfFRtcli8UiVOd
-	 +HW0zcnLlRnsSULWFXQ5QR5rHZKBBRLGqAKexNXCYcCxmyZwhwRda0tpDmALIMgejS
-	 AOCrgMMFCIg8jft7Pgz5Dq3MNerkMj0JBvfaP9NwaIkZi/sema9CNwvxU8TC2R7Clg
-	 lb4plkR4ilcqHUz7N7oX+PnZimXVwp/TrnXBSCDxCqQ5n8QBihPdt+kIJPpMZkE1dK
-	 Ym0rTdmB4yetQ==
-Date: Sun, 2 Jun 2024 20:00:43 +0200
+	b=DMXRB2nPmoDXEmw78Xp2j8KvSgFsayRwfNGzYQHtr3rVYV8XL9yyY0i5oLVuEjs/4
+	 cY8X7VLaWfJ+MTMikL0+t/l8EpqULi2xC8cGf0mumpKOEypU0uc3QdnEJCN9QHMsGZ
+	 TtXEoanspd5DhWx2ud7/3wQKJ08BMz3t96GuH6b8JrdcYg0wyMYH4CuW/17o7D3W5/
+	 d30Yg32xUJ9bFMS8eOcOI3igakZ+1E9kpGDDGqvcPfjwAF3FIBJuZYLf6kx83ELvtw
+	 5kWgBRsx1uE5jaNuPv5fegJ0Jf8sktv/gGbc2VRuqTCoQuVq9p91VSE8prGhTCfDCR
+	 QLcBaqXvjKztQ==
+Date: Sun, 2 Jun 2024 20:10:06 +0200
 From: Lorenzo Bianconi <lorenzo@kernel.org>
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: netdev@vger.kernel.org, nbd@nbd.name, lorenzo.bianconi83@gmail.com,
@@ -53,13 +53,12 @@ Cc: netdev@vger.kernel.org, nbd@nbd.name, lorenzo.bianconi83@gmail.com,
 	will@kernel.org, upstream@airoha.com,
 	angelogioacchino.delregno@collabora.com,
 	benjamin.larsson@genexis.eu
-Subject: Re: [PATCH net-next 2/3] arm64: dts: airoha: Add EN7581 ethernet node
-Message-ID: <ZlyzS8eDlPHnfFPe@lore-desk>
+Subject: Re: [PATCH net-next 3/3] net: airoha: Introduce ethernet support for
+ EN7581 SoC
+Message-ID: <Zly1fi5kr9YNo2yN@lore-desk>
 References: <cover.1717150593.git.lorenzo@kernel.org>
- <0f4194ef6243ae0767887f25a4e661092c10fbbd.1717150593.git.lorenzo@kernel.org>
- <e79b7180-74ef-4306-9f73-47ee54c91660@lunn.ch>
- <ZlyuCeh9vOaZJsGy@lore-desk>
- <1ffe4a56-c3fc-4553-aa32-c7a0d9780b5c@lunn.ch>
+ <4d63e7706ef7ae12aade49e41bb6d0bb6b429706.1717150593.git.lorenzo@kernel.org>
+ <9efb0c64-d3b2-478b-953e-94ef8be3ddec@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,68 +66,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="mLMcE8/hNitlLsVi"
+	protocol="application/pgp-signature"; boundary="rMKqNu+NNvg9Cdc8"
 Content-Disposition: inline
-In-Reply-To: <1ffe4a56-c3fc-4553-aa32-c7a0d9780b5c@lunn.ch>
+In-Reply-To: <9efb0c64-d3b2-478b-953e-94ef8be3ddec@lunn.ch>
 
 
---mLMcE8/hNitlLsVi
+--rMKqNu+NNvg9Cdc8
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-> On Sun, Jun 02, 2024 at 07:38:17PM +0200, Lorenzo Bianconi wrote:
-> > > On Fri, May 31, 2024 at 12:22:19PM +0200, Lorenzo Bianconi wrote:
-> > > > Introduce the Airoha EN7581 ethernet node in Airoha EN7581 dtsi
-> > > >=20
-> > > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > > > ---
-> > > >  arch/arm64/boot/dts/airoha/en7581-evb.dts |  4 +++
-> > > >  arch/arm64/boot/dts/airoha/en7581.dtsi    | 31 +++++++++++++++++++=
-++++
-> > > >  2 files changed, 35 insertions(+)
-> > > >=20
-> > > > diff --git a/arch/arm64/boot/dts/airoha/en7581-evb.dts b/arch/arm64=
-/boot/dts/airoha/en7581-evb.dts
-> > > > index cf58e43dd5b2..82da86ae00b0 100644
-> > > > --- a/arch/arm64/boot/dts/airoha/en7581-evb.dts
-> > > > +++ b/arch/arm64/boot/dts/airoha/en7581-evb.dts
-> > > > @@ -24,3 +24,7 @@ memory@80000000 {
-> > > >  		reg =3D <0x0 0x80000000 0x2 0x00000000>;
-> > > >  	};
-> > > >  };
-> > > > +
-> > > > +&eth0 {
-> > > > +	status =3D "okay";
-> > > > +};
-> > >=20
-> > > Is that enough to make it useful? Don't you need a phy-handle, or
-> > > phy-mode?
-> >=20
-> > This changes is actually in a subsequent patch (not posted yet) where I=
- will
-> > add support for the mt7530 dsa switch. Do you prefer to add it here?
+> > +static void airoha_remove(struct platform_device *pdev)
+> > +{
+> > +	struct airoha_eth *eth =3D platform_get_drvdata(pdev);
+> > +	int i;
+> > +
+> > +	debugfs_remove(eth->debugfs_dir);
+> > +
+> > +	airoha_qdma_for_each_q_rx(eth, i) {
+> > +		struct airoha_queue *q =3D &eth->q_rx[i];
+> > +
+> > +		netif_napi_del(&q->napi);
+> > +		airoha_qdma_clenaup_rx_queue(q);
+> > +		page_pool_destroy(q->page_pool);
+> > +	}
+> > +
+> > +	for (i =3D 0; i < ARRAY_SIZE(eth->q_tx_irq); i++)
+> > +		netif_napi_del(&eth->q_tx_irq[i].napi);
+> > +	for (i =3D 0; i < ARRAY_SIZE(eth->q_tx); i++)
+> > +		airoha_qdma_clenaup_tx_queue(&eth->q_tx[i]);
+> > +}
 >=20
-> I would prefer you move this later when you add the switch.
+> You don't appear to unregister the netdev. remove() should basically
+> be the reverse of probe().
+>=20
+>     Andrew
 
-ack, I will do in v2.
+ack, I will fix it in v2.
 
 Regards,
 Lorenzo
 
->=20
-> 	Andrew
-
---mLMcE8/hNitlLsVi
+--rMKqNu+NNvg9Cdc8
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZlyzSwAKCRA6cBh0uS2t
-rAySAQDvYJ/z4iFpraJsdCmypuOvJe21bKuejWVQA2FhNoeVPgEAqowO2Ld13fNX
-nrrqtZTJf79b1etA0M9fpyy4O4QHDw8=
-=Rlsw
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZly1fgAKCRA6cBh0uS2t
+rGnRAQDL+Z25OzOQ0PBS7Q4U+fs6OlcTqibJhISHTyD7t+RhwgD9F7EUM814UEW/
++o/GVe1SP1g9LG4cu0E1pVX9uw2XRgI=
+=aNJq
 -----END PGP SIGNATURE-----
 
---mLMcE8/hNitlLsVi--
+--rMKqNu+NNvg9Cdc8--
 
