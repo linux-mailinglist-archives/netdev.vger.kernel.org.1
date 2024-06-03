@@ -1,215 +1,142 @@
-Return-Path: <netdev+bounces-100189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88ED18D8196
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 13:51:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB1838D81A6
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 13:53:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 152041F23805
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 11:51:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 652461F222A1
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 11:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF8D8614C;
-	Mon,  3 Jun 2024 11:51:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E662886634;
+	Mon,  3 Jun 2024 11:53:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XYz1T7Jc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m3T5r7yk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45DC985C46;
-	Mon,  3 Jun 2024 11:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F5486278
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 11:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717415490; cv=none; b=u17PGI/F2ziM3TqyEUEolGL4Krs9+moNrjllvYNXL0pCXlC0hjTihR13HDiJ0Ydy1UP5E8Ifym02CWv+CL70rOfwZBH1xhw7PpLPoWe8//QeoAbJeE4Mm2qWOFVXjszElBQMqvkFgWneDpF6DUmzLOufh8nCrVlNfr8/Yv7rwS4=
+	t=1717415612; cv=none; b=oigimuzoGRxYk+I7I8HIoQ1AlaTGYWSOCR405HakyR3pOaZXLV44eXiN5GDGub3vBtCntjd7Tc0nOJU216p4BvtJPBfgQNA4iNaoVR5u2+xRM2LmDaolnrfQdv02hDOkSlmdhpKVzlfNvFxjAn3WUnQMzXv3JMDmpU2AqzLbt+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717415490; c=relaxed/simple;
-	bh=dnFAluB4y6Ozxk3Y50bYaxjCBEZXX1yDcIMuCXTldcc=;
-	h=Content-Type:MIME-Version:From:Subject:To:Cc:Message-Id:Date; b=WrJcuVJys9fle1dHPq44tp1BSS0WT0S9jPqlLHxQ74EcPtFqFXoUvAEyDDG7zIsWQ/zrCWijV/x2r6qu/7CU7pDTH+gVbanApcTyEKKRJjIOHavFhj+tQblA7iGK7/VZuHmKYok94ou1lm2QofpU28Y9nKTeVtlOJ+qMS7Fbx4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XYz1T7Jc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9494CC2BD10;
-	Mon,  3 Jun 2024 11:51:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717415490;
-	bh=dnFAluB4y6Ozxk3Y50bYaxjCBEZXX1yDcIMuCXTldcc=;
-	h=From:Subject:To:Cc:Date:From;
-	b=XYz1T7Jcav2+SeoopomV8r3mtxlPMkOwBYu+UF4VS/vGFXGGaXGLdQF1+qZHGPdLf
-	 pSQce6bYobzGBsYvzvu5mD0zUWofKjLL68cnNy39E/P+kyRm8D4u4I3vqSRYzkzeiG
-	 9jcv8gClye/hATbLRw9FYvfgRv0jLYmJL90dTCnm3yJulu9zfS0BzOwS3QFuTbxs80
-	 j23c8JGjrzm4BGmA1huWOeGEZ3kPWEr3FssJYUr0DBkybht2VUoj8DVOS3N9klr9LY
-	 nGL4/QvyY/WyM0JJwxIE64oWPJ85gcT1rKcJuI7iBlZDeZG58XV15gfYJ7FfYlTR/L
-	 w0tlVXAY6n7pA==
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1717415612; c=relaxed/simple;
+	bh=iI1xbwEGAsahYCSHGv/Nl5RH5Fyx0iyN9EQiEXNptpM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MiosxBZbKwFAZOfOSGNqTEpdHropgLyEES/dHm+/uNtJOpmDMI4CKUUmip5UlYAWtgnpEpneoRFTXacUkF3LnaqXZ8gxxP6lK4yP+nTnvERMkZv9PlOM1YUa1ZSBUED7DjNttiHIaa8GtSprl+VlUeU+3Vq3W095C7S4OBE8ZSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m3T5r7yk; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-57a22af919cso13658a12.1
+        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 04:53:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717415609; x=1718020409; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J5kKrdNrL/QGV/tFJ2qzIqsuhTWt4pdsE95KGDdCviw=;
+        b=m3T5r7ykLS11hrWZDWHGBShvl03fUFaqp5brgjt5xFAUT70AIi3QFf/cRIl0v46gW5
+         PP/aPplzn0mC6qJ4/UlsQxMdm4mALhZdWYhV64fB2XQ8H0sKM4KGSupojneBLpvXrVab
+         +aWpBICrkjqmvgN/Pi7RZMDm4lfqgLYnmgtIsZu0lBwiFc4D+01aCYPt4VRwHjJ3G+lQ
+         x10nfZNQobNNtsQo/OvW/PvXalUXc76WbTWobmAHX9aTGftd5I7BzZhqGCVosTRrfzH6
+         5LsVxXFZLZ2GdbVWcKdva8Y+ohBpbNbsbGOR0RlJdHmvuONxILkh/akbSh5qrC+mInWt
+         WIuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717415609; x=1718020409;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J5kKrdNrL/QGV/tFJ2qzIqsuhTWt4pdsE95KGDdCviw=;
+        b=RdhSpnEF8Ivs2evypeQ1ACEzhqVLJD/WMaCaSl7kLPfkaZmEtZQVzu9AxElotncP0/
+         +onK+d5+JvPGqDieN0CD5F0xu/HdezhGTt8PQEflxDPI732nOCGdYukVEVd7IT2nseDF
+         lqF1AOTG4q0LusaGEhzfo6kXP7YXh3YzLrsFRmkzQxU4DLaYWgzsSQMIEV2sZydNhkcx
+         WYbHD9iwCieAw6ZsTPQherxfWbr+tpdNyvqLIuJtw7WzA7uw1pdjXbln0Z/nAS+OUoSR
+         Wjzm7S7kwJ205KDI0Ir5iMttxYl7A7cfnPJQy1f2uSVUtlQPonkWSKqj6mH3Ndso9nfu
+         nEtw==
+X-Gm-Message-State: AOJu0Yz7fyOm7g2bJyYIiAUeLgN5ShR/Z8wHoQLDOvo3bPShr8AEZzNl
+	qNptROcsrml+lhrgkkHpzFS4NuYaGFb52g7GS8rAdGxdfFMIfWbdEiPjbgJ1laP+msLYJBXJCxu
+	/1qu7IZkmRy3cM1RUbA9xTVkIBCi/idoHNbjc
+X-Google-Smtp-Source: AGHT+IFlFo+GLxhjNhm16ajuw3nSkjt2K15wYl+OEUZugbeomhfBEzfwrFRZNXxcaO8Dc17ff+Fp9aqhdlJh4BVpDKk=
+X-Received: by 2002:a05:6402:2113:b0:57a:1a30:f5da with SMTP id
+ 4fb4d7f45d1cf-57a46125455mr362458a12.2.1717415609137; Mon, 03 Jun 2024
+ 04:53:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-From: Kalle Valo <kvalo@kernel.org>
-Subject: pull-request: wireless-2024-06-03
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Message-Id: <20240603115129.9494CC2BD10@smtp.kernel.org>
-Date: Mon,  3 Jun 2024 11:51:29 +0000 (UTC)
+References: <20240603093625.4055-1-fw@strlen.de> <20240603093625.4055-2-fw@strlen.de>
+ <CANn89i+Zp=_F0tHTgQKuk1+5MV8MU+N=JV35vSTwKLFmi_5dNg@mail.gmail.com> <20240603112152.GB8496@breakpoint.cc>
+In-Reply-To: <20240603112152.GB8496@breakpoint.cc>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 3 Jun 2024 13:53:16 +0200
+Message-ID: <CANn89iJ=cBBJ-iHLNE1h3KZyUxfDFMw1sHnDWAGCvrXLzv+FZA@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 1/3] net: tcp/dcpp: prepare for tw_timer un-pinning
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, mleitner@redhat.com, 
+	juri.lelli@redhat.com, vschneid@redhat.com, tglozar@redhat.com, 
+	dsahern@kernel.org, bigeasy@linutronix.de, tglx@linutronix.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Mon, Jun 3, 2024 at 1:21=E2=80=AFPM Florian Westphal <fw@strlen.de> wrot=
+e:
+>
+> Eric Dumazet <edumazet@google.com> wrote:
+> > On Mon, Jun 3, 2024 at 11:37=E2=80=AFAM Florian Westphal <fw@strlen.de>=
+ wrote:
+> > > +       spin_lock(lock);
+> > > +       if (timer_shutdown(&tw->tw_timer)) {
+> > > +               /* releases @lock */
+> > > +               __inet_twsk_kill(tw, lock);
+> > > +       } else {
+> >
+> > If we do not have a sync variant here, I think that inet_twsk_purge()
+> > could return while ongoing timers are alive.
+>
+> Yes.
+>
+> We can't use sync variant, it would deadlock on ehash spinlock.
+>
+> > tcp_sk_exit_batch() would then possibly hit :
+> >
+> > WARN_ON_ONCE(!refcount_dec_and_test(&net->ipv4.tcp_death_row.tw_refcoun=
+t));
+> >
+> > The alive timer are releasing tw->tw_dr->tw_refcount at the end of
+> > inet_twsk_kill()
+>
+> Theoretically the tw socket can be unlinked from the tw hash already
+> (inet_twsk_purge won't encounter it), but timer is still running.
+>
+> Only solution I see is to schedule() in tcp_sk_exit_batch() until
+> tw_refcount has dropped to the expected value, i.e. something like
+>
+> static void tcp_wait_for_tw_timers(struct net *n)
+> {
+>         while (refcount_read(&n->ipv4.tcp_death_row.tw_refcount) > 1))
+>                 schedule();
+> }
+>
+> Any better idea?
 
-here's a pull request to net tree, more info below. Please let me know if there
-are any problems.
 
-Kalle
+Maybe usleep_range(500, 1000)
 
-The following changes since commit 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0:
+>
+> I started to sketch a patch that keeps PINNED as-is but schedules almost
+> all of the actual work to a work item.
+>
+> Idea was that it would lower RT latencies to acceptable level but it got
+> so ugly that I did not follow this path.
+>
+> I could resurrect this if you think its worth a try.
 
-  Linux 6.10-rc1 (2024-05-26 15:20:12 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2024-06-03
-
-for you to fetch changes up to 819bda58e77bb67974f94dc1aa11b0556b6f6889:
-
-  wifi: rtlwifi: Ignore IEEE80211_CONF_CHANGE_RETRY_LIMITS (2024-06-01 13:15:26 +0300)
-
-----------------------------------------------------------------
-wireless fixes for v6.10-rc3
-
-The first fixes for v6.10. And we have a big one, I suspect the
-biggest wireless pull request we ever had. There are fixes all over,
-both in stack and drivers. Likely the most important here are mt76 not
-working on mt7615 devices, ath11k not being able to connect to 6 GHz
-networks and rtlwifi suffering from packet loss. But of course there's
-much more.
-
-----------------------------------------------------------------
-Aditya Kumar Singh (1):
-      wifi: mac80211: pass proper link id for channel switch started notification
-
-Alexis Lothoré (3):
-      Revert "wifi: wilc1000: convert list management to RCU"
-      Revert "wifi: wilc1000: set atomic flag on kmemdup in srcu critical section"
-      wifi: wilc1000: document SRCU usage instead of SRCU
-
-Ayala Beker (1):
-      wifi: iwlwifi: mvm: properly set 6 GHz channel direct probe option
-
-Baochen Qiang (1):
-      wifi: ath11k: move power type check to ASSOC stage when connecting to 6 GHz AP
-
-Benjamin Berg (1):
-      wifi: iwlwifi: mvm: remove stale STA link data during restart
-
-Bitterblue Smith (1):
-      wifi: rtlwifi: Ignore IEEE80211_CONF_CHANGE_RETRY_LIMITS
-
-Breno Leitao (1):
-      wifi: ath11k: Fix error path in ath11k_pcic_ext_irq_config
-
-Carl Huang (1):
-      wifi: ath11k: fix WCN6750 firmware crash caused by 17 num_vdevs
-
-Dmitry Antipov (1):
-      wifi: mac80211: fix UBSAN noise in ieee80211_prep_hw_scan()
-
-Dmitry Baryshkov (1):
-      wifi: ath10k: fix QCOM_RPROC_COMMON dependency
-
-Emmanuel Grumbach (2):
-      wifi: iwlwifi: mvm: fix a crash on 7265
-      wifi: iwlwifi: mvm: don't read past the mfuart notifcation
-
-Ilan Peer (1):
-      wifi: iwlwifi: mvm: Fix scan abort handling with HW rfkill
-
-Johannes Berg (8):
-      wifi: cfg80211: validate HE operation element parsing
-      wifi: cfg80211: fully move wiphy work to unbound workqueue
-      wifi: mac80211: apply mcast rate only if interface is up
-      wifi: mac80211: handle tasklet frames before stopping
-      wifi: cfg80211: fix 6 GHz scan request building
-      wifi: iwlwifi: mvm: revert gen2 TX A-MPDU size to 64
-      wifi: iwlwifi: mvm: handle BA session teardown in RF-kill
-      wifi: mt76: mt7615: add missing chanctx ops
-
-Kalle Valo (1):
-      Merge tag 'ath-current-20240531' of git://git.kernel.org/pub/scm/linux/kernel/git/kvalo/ath
-
-Lin Ma (1):
-      wifi: cfg80211: pmsr: use correct nla_get_uX functions
-
-Lingbo Kong (2):
-      wifi: mac80211: fix Spatial Reuse element size check
-      wifi: mac80211: correctly parse Spatial Reuse Parameter Set element
-
-Miri Korenblit (2):
-      wifi: iwlwifi: mvm: don't initialize csa_work twice
-      wifi: iwlwifi: mvm: check n_ssids before accessing the ssids
-
-Mordechay Goodstein (1):
-      wifi: iwlwifi: mvm: set properly mac header
-
-Nicolas Escande (2):
-      wifi: mac80211: mesh: Fix leak of mesh_preq_queue objects
-      wifi: mac80211: mesh: init nonpeer_pm to active by default in mesh sdata
-
-Remi Pommarel (2):
-      wifi: mac80211: Fix deadlock in ieee80211_sta_ps_deliver_wakeup()
-      wifi: cfg80211: Lock wiphy in cfg80211_get_station
-
-Shahar S Matityahu (1):
-      wifi: iwlwifi: dbg_ini: move iwl_dbg_tlv_free outside of debugfs ifdef
-
-Shaul Triebitz (1):
-      wifi: iwlwifi: mvm: always set the TWT IE offset
-
-Yedidya Benshimol (2):
-      wifi: iwlwifi: mvm: d3: fix WoWLAN command version lookup
-      wifi: iwlwifi: mvm: Handle BIGTK cipher in kek_kck cmd
-
- drivers/net/wireless/ath/ath10k/Kconfig            |  1 +
- drivers/net/wireless/ath/ath11k/core.c             |  2 +-
- drivers/net/wireless/ath/ath11k/mac.c              | 38 ++++++++++------
- drivers/net/wireless/ath/ath11k/pcic.c             | 25 +++++++----
- drivers/net/wireless/intel/iwlwifi/iwl-drv.c       |  2 +-
- drivers/net/wireless/intel/iwlwifi/mvm/d3.c        | 16 +++++--
- drivers/net/wireless/intel/iwlwifi/mvm/debugfs.c   |  9 ++++
- drivers/net/wireless/intel/iwlwifi/mvm/fw.c        | 14 +-----
- drivers/net/wireless/intel/iwlwifi/mvm/mac-ctxt.c  |  2 +-
- drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c  | 39 ++++++++++++++++-
- .../net/wireless/intel/iwlwifi/mvm/mld-mac80211.c  |  2 -
- drivers/net/wireless/intel/iwlwifi/mvm/mld-sta.c   | 13 +++---
- drivers/net/wireless/intel/iwlwifi/mvm/mvm.h       |  1 +
- drivers/net/wireless/intel/iwlwifi/mvm/rs.h        |  9 +---
- drivers/net/wireless/intel/iwlwifi/mvm/rxmq.c      |  5 ++-
- drivers/net/wireless/intel/iwlwifi/mvm/scan.c      | 12 ++++--
- drivers/net/wireless/intel/iwlwifi/mvm/sta.c       | 12 ++++--
- drivers/net/wireless/intel/iwlwifi/mvm/sta.h       |  5 +++
- drivers/net/wireless/mediatek/mt76/mt7615/main.c   |  4 ++
- drivers/net/wireless/microchip/wilc1000/cfg80211.c | 41 ++++++++++--------
- drivers/net/wireless/microchip/wilc1000/hif.c      | 17 +++++---
- drivers/net/wireless/microchip/wilc1000/netdev.c   | 43 +++++++++++--------
- drivers/net/wireless/microchip/wilc1000/netdev.h   | 12 +++++-
- drivers/net/wireless/microchip/wilc1000/wlan.c     |  5 ++-
- drivers/net/wireless/realtek/rtlwifi/core.c        | 15 -------
- net/mac80211/cfg.c                                 |  9 ++--
- net/mac80211/he.c                                  | 10 ++++-
- net/mac80211/ieee80211_i.h                         |  2 +
- net/mac80211/main.c                                | 10 ++++-
- net/mac80211/mesh.c                                |  1 +
- net/mac80211/mesh_pathtbl.c                        | 13 ++++++
- net/mac80211/parse.c                               |  2 +-
- net/mac80211/scan.c                                | 14 ++++--
- net/mac80211/sta_info.c                            |  4 +-
- net/mac80211/util.c                                |  2 +
- net/wireless/core.c                                |  2 +-
- net/wireless/pmsr.c                                |  8 ++--
- net/wireless/rdev-ops.h                            |  6 ++-
- net/wireless/scan.c                                | 50 ++++++++++++++--------
- net/wireless/sysfs.c                               |  4 +-
- net/wireless/util.c                                |  7 ++-
- 41 files changed, 322 insertions(+), 166 deletions(-)
-
+I would rather avoid a work queue.
 
