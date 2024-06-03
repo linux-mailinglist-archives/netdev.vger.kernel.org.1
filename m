@@ -1,102 +1,129 @@
-Return-Path: <netdev+bounces-100304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6646E8D8756
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 18:32:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 463F38D878B
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 19:01:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2162F2895F1
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 16:32:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D69E61F2227C
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 17:01:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02FD512FF76;
-	Mon,  3 Jun 2024 16:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Klhwk9nl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41C4130E44;
+	Mon,  3 Jun 2024 17:01:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2CE6A031
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 16:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3A72562E;
+	Mon,  3 Jun 2024 17:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717432361; cv=none; b=bgRztW9ufLj8ojbP+Vx4K0AgV2QfVrWqA71lRdzwHxd/6DTJ3nKEhWvLX7zLfx9ijF5+dpAq5QwieCTcVIXd+nieIpgIKO8TkFdn7e3rB2SqONCTeVfvlDfr1EXM9sFv9xANy1adN/xt7nBrh1M1lrpDEt0Nr/ZEWV6Gqz3IHjM=
+	t=1717434072; cv=none; b=M41V+dtogt4HbYLG1dQzm+ed4i/Y/YmxGWzla1zdwTgq3OHwGRiQ5EA/zowjwdmdUbxLnoJIWwYFuz8ibiwn3aM2rtOY9GzPJ4NGIZaBHZ3oH5/wIjLSVPoSHzINDj2D1Q049ftr+sj474gIVTTu+8/S0hSUUM1mjkdOGGrFEzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717432361; c=relaxed/simple;
-	bh=IqLqspOHTl8hgSiM2prJnhvO55WUO3JHIBjl0LsKXT0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d0/rr9TMngSkg84GrVGOeVeIbsLgnkiknuJPQBuM/zi/8WbaR5ShuWGbfbo2Pp161Klpm8ZPTux1OybICV6OULFSY4YafzqM619MdAWDGxXhX7C5iBUPXtrY19uqs9oARV5WtM9Mp34bU3rkhWLKl58CPi30HycN4k2eP3FCFWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Klhwk9nl; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1717432361; x=1748968361;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=0aTdtecEtokYI6tbmTy/VuHpW6bFvedj8rHlf72UyZY=;
-  b=Klhwk9nlUnrOayFGyeu2XVbs2x2g+a/9HY0zN9gJuJq+nK16DT/AdSR3
-   yu6s6sr4Hyl/ij9+4jgM7UWtelNRTCcmqt5IX+AdDWi5CFyVnmu8nsJOD
-   MkXI1h3XYd7KrVHuiQecpgdB8CvLhWuRKEVfAj2hcKuMIFEcsQb9/QEQE
-   8=;
-X-IronPort-AV: E=Sophos;i="6.08,212,1712620800"; 
-   d="scan'208";a="730126360"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2024 16:32:35 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:21409]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.35.105:2525] with esmtp (Farcaster)
- id b8b1c8bf-8ed4-4709-a366-835eda28084c; Mon, 3 Jun 2024 16:32:17 +0000 (UTC)
-X-Farcaster-Flow-ID: b8b1c8bf-8ed4-4709-a366-835eda28084c
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 3 Jun 2024 16:32:17 +0000
-Received: from 88665a182662.ant.amazon.com (10.88.143.104) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 3 Jun 2024 16:32:14 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <xiyou.wangcong@gmail.com>
-CC: <cong.wang@bytedance.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v1 net 01/15] af_unix: Set sk->sk_state under unix_state_lock() for truly disconencted peer.
-Date: Mon, 3 Jun 2024 09:32:05 -0700
-Message-ID: <20240603163205.84412-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <Zl3utZZF/Sa7OnAj@pop-os.localdomain>
-References: <Zl3utZZF/Sa7OnAj@pop-os.localdomain>
+	s=arc-20240116; t=1717434072; c=relaxed/simple;
+	bh=g0urmVYosNcFn5Vrer0s4W3kW7EhZLaLDQ8k8VjSfgw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ILGgXO3r7O752sZP2dYwOyG/S7DIdAfRSHcFsBPKcaXjSKs9qSAVPESCMTMx98I/RPLCuxVgMfF7Lcmyu7RnYQxKTzE4ImRThTpRI29K5iQO1My3Ld6jFnZ3+CsK9C6D37IthM1NU9A1Tk8z83bwZnf1F4cPjL7vF7LnqrnH7SY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sEB3I-000000002Nq-1Sjk;
+	Mon, 03 Jun 2024 17:00:56 +0000
+Date: Mon, 3 Jun 2024 18:00:49 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Sky Huang <SkyLake.Huang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Qingfang Deng <dqfext@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Steven Liu <Steven.Liu@mediatek.com>
+Subject: Re: [PATCH net-next v6 5/5] net: phy: add driver for built-in 2.5G
+ ethernet PHY on MT7988
+Message-ID: <Zl32waW34yTiuF9u@makrotopia.org>
+References: <20240603121834.27433-1-SkyLake.Huang@mediatek.com>
+ <20240603121834.27433-6-SkyLake.Huang@mediatek.com>
+ <Zl3ELbG8c8y0/4DN@shell.armlinux.org.uk>
+ <Zl3Fwoiv1bJlGaQZ@makrotopia.org>
+ <Zl3IGN5ZHCQfQfmt@shell.armlinux.org.uk>
+ <Zl3Yo3dwQlXEfP3i@makrotopia.org>
+ <Zl3lkIDqnt4JD//u@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWC001.ant.amazon.com (10.13.139.233) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zl3lkIDqnt4JD//u@shell.armlinux.org.uk>
 
-From: Cong Wang <xiyou.wangcong@gmail.com>
-Date: Mon, 3 Jun 2024 09:26:29 -0700
-> On Mon, Jun 03, 2024 at 07:32:17AM -0700, Kuniyuki Iwashima wrote:
-> > -		if (other != old_peer)
-> > +		if (other != old_peer) {
-> >  			unix_dgram_disconnected(sk, old_peer);
-> > +
-> > +			unix_state_lock(old_peer);
-> > +			if (!unix_peer(old_peer))
-> > +				WRITE_ONCE(old_peer->sk_state, TCP_CLOSE);
-> > +			unix_state_lock(old_peer);
+On Mon, Jun 03, 2024 at 04:47:28PM +0100, Russell King (Oracle) wrote:
+> On Mon, Jun 03, 2024 at 03:52:19PM +0100, Daniel Golle wrote:
+> > On Mon, Jun 03, 2024 at 02:41:44PM +0100, Russell King (Oracle) wrote:
+> > > On Mon, Jun 03, 2024 at 02:31:46PM +0100, Daniel Golle wrote:
+> > > > On Mon, Jun 03, 2024 at 02:25:01PM +0100, Russell King (Oracle) wrote:
+> > > > > On Mon, Jun 03, 2024 at 08:18:34PM +0800, Sky Huang wrote:
+> > > > > > Add support for internal 2.5Gphy on MT7988. This driver will load
+> > > > > > necessary firmware, add appropriate time delay and figure out LED.
+> > > > > > Also, certain control registers will be set to fix link-up issues.
+> > > > > 
+> > > > > Based on our previous discussion, it may be worth checking in the
+> > > > > .config_init() method whether phydev->interface is one of the
+> > > > > PHY interface modes that this PHY supports. As I understand from one
+> > > > > of your previous emails, the possibilities are XGMII, USXGMII or
+> > > > > INTERNAL. Thus:
+> > > > > 
+> > > > > > +static int mt798x_2p5ge_phy_config_init(struct phy_device *phydev)
+> > > > > > +{
+> > > > > > +	struct pinctrl *pinctrl;
+> > > > > > +	int ret;
+> > > > > 
+> > > > > 	/* Check that the PHY interface type is compatible */
+> > > > > 	if (phydev->interface != PHY_INTERFACE_MODE_INTERNAL &&
+> > > > > 	    phydev->interface != PHY_INTERFACE_MODE_XGMII &&
+> > > > > 	    phydev->interface != PHY_INTERFACE_MODE_USXGMII)
+> > > > > 		return -ENODEV;
+> > > > 
+> > > > The PHY is built-into the SoC, and as such the connection type should
+> > > > always be "internal". The PHY does not exist as dedicated IC, only
+> > > > as built-in part of the MT7988 SoC.
+> > > 
+> > > That's not how it was described to me by Sky.
+> > > 
+> > > If what you say is correct, then the implementation of
+> > > mt798x_2p5ge_phy_get_rate_matching() which checks for interface modes
+> > > other than INTERNAL is not correct. Also it means that config_init()
+> > > should not permit anything but INTERNAL.
+> > 
+> > The way the PHY is connected to the MAC *inside the chip* is XGMII
+> > according the MediaTek. So call it "internal" or "xgmii", however, up to
+> > my knowledge it's a fact that there is **only one way** this PHY is
+> > connected and used, and that is being an internal part of the MT7988 SoC.
+> > 
+> > Imho, as there are no actual XGMII signals exposed anywhere I'd use
+> > "internal" to describe the link between MAC and PHY (which are both
+> > inside the same chip package).
 > 
-> lock() old_peer twice? Has it been tested? ;-)B
+> I don't care what gets decided about what's acceptable for the PHY to
+> accept, just that it checks for the acceptable modes in .config_init()
+> and the .get_rate_matching() method is not checking for interface
+> modes that are not permitted.
 
-Ugh, apparently no :S  (compile-test only)
-
-Should've run the same command in the changelog.
-Will fix in v2.
-
-Thanks!
+What I meant to express is that there is no need for such a check, also
+not in config_init. There is only one way and one MAC-side interface mode
+to operate that PHY, so the value will anyway not be considered anywhere
+in the driver.
 
