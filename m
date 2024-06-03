@@ -1,395 +1,218 @@
-Return-Path: <netdev+bounces-100213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F2F18D82A8
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 14:46:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C43578D82A5
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 14:46:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DB0B284002
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 12:46:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05542B215D7
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 12:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3A0212C54A;
-	Mon,  3 Jun 2024 12:46:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD12E84FD6;
+	Mon,  3 Jun 2024 12:46:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="FGNXr6Oj"
+	dkim=pass (2048-bit key) header.d=storingio.onmicrosoft.com header.i=@storingio.onmicrosoft.com header.b="Ewf77Bqf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2093.outbound.protection.outlook.com [40.107.13.93])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2497512C544
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 12:46:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717418791; cv=none; b=NKyPg4uJnVNOA+14LgzRJpTcDJ08NFn2MvQfzAgja5m+Ihb/hyyswd987+EpatDjI1GAg+2aESxJgvrF94xbl86IoxS426g0VVSRDsNCDb022KLiKxG3CtVegN/JKa8R2T7rlTeeOFk+BZzne5/jY+aMNONG8XR0YkJ5P5KHBPc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717418791; c=relaxed/simple;
-	bh=6HFy5+wOkRYUrxgCUTpTSArhF9jE6b4cxHm9qamGrWk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fmuUHno/fJBWQYybC+MvkKUl/xcr9KgQLf3dTGH8TJUITCAwVGnbK8o6dR2pAq0WWxF3boJjCcenD/kyFKygnJAMHALPbwbg43CVtCSLufe9scYmgqfVfB4CrUkD7LiAxDvoeEt6Ei/+BwVkv9gq4Gb86zQrbfwnVK43iJZaq4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=FGNXr6Oj; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a68a9a4e9a6so218842066b.3
-        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 05:46:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 285C61E491;
+	Mon,  3 Jun 2024 12:46:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.13.93
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717418787; cv=fail; b=Q0SN981Xb9WfQUYiZ/dmc79XbP2rF6fRdKliA4/NJxmxT7wGUQJsyR4TOMR9C5usRQdNS8AtVpsEYN1OT64m5wuS0J8WrdBPYlKStCbIEnoQPMTE0m5kJUWd6N6SzWGkO0hG/kR5FULgPUqHjXYMWR9LX/Q/XoHME9q7v65p0K0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717418787; c=relaxed/simple;
+	bh=94fPuzV8P66EaP34/8y8Gk3j98BjVlJv4sSoqazvKGg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=HZef0BdLcjgRH4F5TdlC/4gNfMi+WjReSt6yBhPyHloSLyX4340obBSuHJUlB3QrKj2oGGhv3ORozGpe1Uv1wz7EH9IoGqtNkf8uipmzcziBjsyo0DVfhKrD/eyFc6Cq8SxNSxAzEH4f5oakjoMgGtOIRBD8mCaV0mjKZ4Sthrk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=volumez.com; spf=pass smtp.mailfrom=volumez.com; dkim=pass (2048-bit key) header.d=storingio.onmicrosoft.com header.i=@storingio.onmicrosoft.com header.b=Ewf77Bqf; arc=fail smtp.client-ip=40.107.13.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=volumez.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=volumez.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=E/9egwzOaQLP+GLNENVesCEoxNihg6ifjHy+qNYnpxfjjqCUBvtBtYfG1z26nE1re11ylhIvjZBSz/ZnwNszqzyYlC1alYBgFr89q5LyIS/U9DVCMU+bm9xh+QQpncl3UoTlPG0hwwqfWS7t7kFv4hldRpAfrcFzOGMN+TDiDCGC7r87KnBUiYxneyBir7UtLjqOjHoN8K+EsFoSBuWM0H4FaHnXM0IVXyWrBWfu32Xf6ictd8erYMQleYiJnJ+oYfOLqSjDKOVc6ApU0/Wnv5sDCmH8VP8iHCfgLAgn0xYFGZbrakRFV1COKH6ekTwA4PNAn9D6QY44KItinVUjtA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=94fPuzV8P66EaP34/8y8Gk3j98BjVlJv4sSoqazvKGg=;
+ b=QEm0sc/NOubCJZqB9muycS6CXSaFw+hmrHQK6k0Rhsca+g2UbtxW0un3W6sGe87INpofFsS166FRyOoN0OWqtkpSS+YMTUedq1QlH+Eqgoigcy5hcK5hgEmZ4Xrj22+bcGVYjRUwvXYRMkLz/YdtN7Lizdco2OT1cle3/M+pDIGcT014CVs5JW9Q/QV0syZ3J54Pa5knSk8C+XT1ZmBJh+bvX5SZMFr1f9c+3+UO1rq8NF8COVCGeXqxs7HoccVg+KgRo71r3y+qmbyMXL8ODC0uqv3zFxEFEqkcBPBdzEzIc8izYhlgdsAEj3cX0VEMUR5aDXd1fPW7nAl7pjTpzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=volumez.com; dmarc=pass action=none header.from=volumez.com;
+ dkim=pass header.d=volumez.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1717418787; x=1718023587; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2L2U1sXFtbMxWKaSJ9TjfQd4zHQ7IAtinuynbdeF0AE=;
-        b=FGNXr6Ojs/dZo679rSH0mSfev4N6QH6SW4x/oyIck46V9eHjqql/GSN17PKtrT2C0T
-         YwkwTUFq8bdIKF9JxapYa650VWICSyJvM/yK2GUjh6KhWxCZr0vq5c7C7cIv7JYsUpCa
-         DlZ010UMv1cncLDVB06CgTy720unMnBdWs7wmtlaPEglWGt4XgKIkc+Yhohejj3F4q4f
-         9fXF0CdS/hs37NzDmwfUaHjDf+lS9uU2PwdD1ilhdfzlUfvpj3ZMTjFDcuOAzJGgN7BF
-         8MHW4m8p/SJWT7x8kKd7WTiHXkDVpODUNJXy6LDGx13Sdy38Ssk9IxbB4S2AweB+XuwM
-         4m8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717418787; x=1718023587;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2L2U1sXFtbMxWKaSJ9TjfQd4zHQ7IAtinuynbdeF0AE=;
-        b=HnQa/Hwdrc39MVRpEfKVvFwqRMusX1aSuLoM9fZn0E0HRPrEi2z96CHR6K+K0RodjI
-         7PXCZORe37qev4vz7SXu2d8EXLa9MiXUTJ0aFtOHruIjJWPnwkk85UGpZJ9Vz5EGOq73
-         OiZgjRVNuuwm9atNXfxx77YarMOSJZA9ootSbAFl9WFDBvdxlVTAmLgoYek6lAlcgSP2
-         yaEzukbvsctg8tEbAyJ07m+LSmZHrw/3ibYOhmKD4higp4wVZZ2vuKeKL04w9e0rVBx+
-         OlVCX5B6LOBxlvnVVdXn6m/jrdodZwJcsHTjxTIkckrhL5sLFgF4JsE8Z58tkelHBKGm
-         E9zw==
-X-Gm-Message-State: AOJu0YwNqFp5t/B9MZXXthLhW0jGIhfd5sMww+EEVztB6D8YXYz9DpCO
-	04NZ3vZVPtRluxQNeXmDX1jB6bp1avxikN0Ys9ipQp27zVcCFhqTUJyPvBSCcSShFhQJhN2JH/z
-	EvWYpfQ==
-X-Google-Smtp-Source: AGHT+IHc3pyJ0DcnaIwnILTHU2DngxOomSEYQUj7wqhQIhyn5POSet+K7KrfKQU+hrX5OeepvSiG9g==
-X-Received: by 2002:a5d:4107:0:b0:35b:a0b2:464a with SMTP id ffacd0b85a97d-35e0f30a885mr5958847f8f.45.1717418766670;
-        Mon, 03 Jun 2024 05:46:06 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35dd064bba6sm8650347f8f.104.2024.06.03.05.46.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jun 2024 05:46:06 -0700 (PDT)
-Date: Mon, 3 Jun 2024 14:46:02 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	kuba@kernel.org, jacob.e.keller@intel.com
-Subject: Re: [PATCH iwl-next v3] ice: Add support for devlink
- local_forwarding param.
-Message-ID: <Zl27CvHVJmT-LG6C@nanopsycho.orion>
-References: <20240603123146.735804-1-wojciech.drewek@intel.com>
+ d=storingio.onmicrosoft.com; s=selector1-storingio-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=94fPuzV8P66EaP34/8y8Gk3j98BjVlJv4sSoqazvKGg=;
+ b=Ewf77Bqfy+WiXiESYyJAQSw028dsBisdtPoz6ANvfhVfTkchC+0fAKy0IK1g3TTGCzdR/wz6zD3SU6A2ROK73II62D3d6HrYRuQTQvxjIT635JmXUfZyfLFFdcceVcRVAODYF3SmlpoGWPgoKAgiCP45OIfO+AK2QXVJSYQRr+/nTArZAIWCUMskAa3OKyTssqLMTGjC8SXulW7Pbp9/6kKDqZKF+Zsr0R8OfYR7xayTfZrtrqlIjTTsg5Fb5r5kcsarOC0zhiYXuzhQLZLN1rsAj76hZJbJVXsDk8/Ft75jnV/NnKX7EceZrEQMxcqbMjF/ozfRxOVvPzIVIx/b0Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=volumez.com;
+Received: from AM0PR04MB5107.eurprd04.prod.outlook.com (2603:10a6:208:cb::11)
+ by AS8PR04MB9189.eurprd04.prod.outlook.com (2603:10a6:20b:44c::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.25; Mon, 3 Jun
+ 2024 12:46:22 +0000
+Received: from AM0PR04MB5107.eurprd04.prod.outlook.com
+ ([fe80::de53:c058:7ef:21fb]) by AM0PR04MB5107.eurprd04.prod.outlook.com
+ ([fe80::de53:c058:7ef:21fb%4]) with mapi id 15.20.7633.021; Mon, 3 Jun 2024
+ 12:46:21 +0000
+Message-ID: <359112e8-602b-4ac7-8326-c672276f0004@volumez.com>
+Date: Mon, 3 Jun 2024 15:46:16 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/4] bugfix: Introduce sendpages_ok() to check
+ sendpage_ok() on contiguous pages
+To: Hannes Reinecke <hare@suse.de>, Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
+ ceph-devel@vger.kernel.org, dhowells@redhat.com, edumazet@google.com,
+ pabeni@redhat.com, kbusch@kernel.org, axboe@kernel.dk, hch@lst.de,
+ sagi@grimberg.me, philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+ christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
+References: <20240530142417.146696-1-ofir.gal@volumez.com>
+ <20240601153430.19416989@kernel.org>
+ <05d5fd1a-9295-4753-a201-c9a968ee7982@suse.de>
+Content-Language: en-US
+From: Ofir Gal <ofir.gal@volumez.com>
+In-Reply-To: <05d5fd1a-9295-4753-a201-c9a968ee7982@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: TL0P290CA0003.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::18) To AM0PR04MB5107.eurprd04.prod.outlook.com
+ (2603:10a6:208:cb::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240603123146.735804-1-wojciech.drewek@intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB5107:EE_|AS8PR04MB9189:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5c03a35b-707d-4fef-ba9f-08dc83cb2b60
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|7416005|1800799015|376005|366007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?TlE0elBIMEJJVzJGSGpZZ0pHZVplTGl6Z0h4dlVhRDRFb0V4ZEZkd2Z0anZL?=
+ =?utf-8?B?TXViM1UvaEswSW94MWFvL0JQWjUxaDduU0NRSlMzNGdSYzRsUHpBZHFNV3hz?=
+ =?utf-8?B?a3kzNVA1OXBpVFF1TElWWXBidnhocGhEcXN1ZGJMYjFXVTZ6UHFST091RW9H?=
+ =?utf-8?B?Wi9YWDAyZ2hTRS9KeWJYOVBxbWgzQ2R0Y2VGYlJXYXMyNlIrcXE4OXd4NW15?=
+ =?utf-8?B?RTlISFJ6c04yMjZ6R1hzd1ZuemRTNUJ2NEtOMUFCdWErdWRGWkh5SVJxUjVo?=
+ =?utf-8?B?RkZsbStkbUhDbHAvZ2N2eDE1M2N5WFdqWndGc2ptNnRrTFMyVDMrcHhxelJP?=
+ =?utf-8?B?dG42dExJSHBRS0dUSjUyQVF5dDlTNDAyN2xuVnZQdUtGOUJaMEhXNUtzem1p?=
+ =?utf-8?B?ZFdzYXN4MTJPTTlRWDV1OGd3dThpOUY3N2MzWGNxR2ErQllKS0VnQlhpMlJZ?=
+ =?utf-8?B?MnVVZXlyVHlhQk5BaVMzTFJHRFh5aXpoRjQweDJycmpXREJ3U1FkTTQrbngz?=
+ =?utf-8?B?MUYweGp1ajNVK2xGVkNQZkYrVjdzSWlPYlJLaWdESnVRQVgxcUZCNktYdHg4?=
+ =?utf-8?B?NGdSMkN0NUVyRnlrRlo4YWVuaUxxeXNqak92Z3lXMnJ6eXRGL012YmtnZW03?=
+ =?utf-8?B?eDBlM3dIbThDdGJmSmx1TnlHdVZKb0Y1TytVQlp0WFRPajE5VjN2U3hNZjF6?=
+ =?utf-8?B?bmhKSEYrRXFyU3FUT1Y4d3dBdkpZK0ZxZm0wbHJ6RzIvOGFmOXNZNENTNWJB?=
+ =?utf-8?B?QTBCMU1SRERZd21Ra3V6YXlSaW15TzVRV1BlbEJodXJFdzQyVDJXNENuZEpU?=
+ =?utf-8?B?d1YweUQ2bHExRlZhd0VMdmVSampXKzJnTUlvNFhqT09GRG5TUlVOeVQvQWY0?=
+ =?utf-8?B?NW1TYzQveXlDNW9pZ2Y4R0VBOWVRZzVhTVlETnZpMzZQaGVPTkt6NzQvRHpy?=
+ =?utf-8?B?YTg0QXNEZENVeFNSYmhhSWs3YnZpb2NpYURycnlqNmlqanNCUTI1c0FhZDJZ?=
+ =?utf-8?B?ZTBRdzNMdyt0NlJ3b1VYd0dPbDN3NTJ4cUtUaDl1OHd2VGRYRzYxMVdqODJw?=
+ =?utf-8?B?UjZxaUVCTS9QT0pRc3Q4Y0ViQVBYTVEvb1NLcVZCRmpjbER1ZitIVUllSm5K?=
+ =?utf-8?B?UHNOR0NJNHRnempUNWdUQzFCY0xqOW5paktXQ3RRR1NiSFRsejFMeHRhc1dx?=
+ =?utf-8?B?MDNqNFRZQWRTYWl3RC9HUzJleDV2cElZVHZwU2taMkdGRU9vM2hZVXhxcktz?=
+ =?utf-8?B?aElXU0JRQkxBTFlPTDZsYjJpdW82V1lRcXdtK21tM1ErRm5Eck9LcHNnWWRW?=
+ =?utf-8?B?RkJ4Ukh3L1lkZGJqY2xuSlBqKy9nbk4zNmdwYkVsOXhlRFVFSkJIbGwxY2ZI?=
+ =?utf-8?B?T1JnRzhvRWk0cWJyV1ZWdjYycGs1ZUFDVU9NUDdaTHBtVmpWbUhnejZuSllT?=
+ =?utf-8?B?eUwxWHhab3phYURhMlhySEg3K1J6bFo2R0I2T05UTHVBanRqbG1GWmdpdENE?=
+ =?utf-8?B?OEJ3WVpqYkVMcEhIaTNQWFJkUHc2ZVhXN0I0Tll2aGVPV2pTQ0h3TktRSFMx?=
+ =?utf-8?B?dy8yNDAwSG1oTnBBdUN0TjE3ckdDNjQ4TXVYTTZvNFFZRnlRU0FITldraHM3?=
+ =?utf-8?B?R2dlRlNVUGdwTXpxektqUDRBSnNJOWFDWkVuN0lDUm1vOFRRd3BmSnJKd3pm?=
+ =?utf-8?B?dzlxbXVEVDRVbnJPK2t3ZlU3Yk1zbXREYzc0NzR6d3VEcm0yemNFWUNBPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5107.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ZFJmUVRJNFBpZHFWSDlBMVl3YXVja1JneTcyTXVXcTFuZ2NGWSs1RmxaUlgr?=
+ =?utf-8?B?V1dZZVBMQkJqc1k3RlRQRWpmSXVjaTRsL2NrOUVCd2NOL0p6bnZWUkVEcGRm?=
+ =?utf-8?B?UTFROWh1UWZpYjB3V2xLeUZRVXd4RkQ1eCtpQWc0d3g1eWJjSDRqeExNTFhG?=
+ =?utf-8?B?QW9KSWF6eENaYlM4OTJZZDh1WmFvbisrV3dPdGRlYzBJYkplaDRNVEMwLy9F?=
+ =?utf-8?B?U3ZYK1hyaFZFcDdOSkpsZVQ2cG9vekJLcVF1ZjhZWHNUSDFrT2tOK2MzbXZW?=
+ =?utf-8?B?TVFyWEMxdXM5N3F1VzRQa2JJdnY3SnlnanMzUHhOL2UrcWZmdUQzbGsyeW41?=
+ =?utf-8?B?U2NJZU5PYktGaDZBbm8xajZqWWRwRUhnS1pYVWw2LzhOeSszc2VEdS9DK1E2?=
+ =?utf-8?B?YmZLdFZSQkkveUtWUWpYZFZHZ0FYMUtpaEtzV0hsUTJVczZDeXNaQm5Gc1da?=
+ =?utf-8?B?S2VmaU5TSXcxZit2THlYRzhHUFNMTEY1Y2RBdWYwN1dTa0VFTkE3emd6SEZs?=
+ =?utf-8?B?a2EzQlJIdzBZenNhdEowanM4U3huczBOdG1GRnY3ZHkwZkpETWdNM2daM3ll?=
+ =?utf-8?B?Y2NCM1hEaUtHRUk5TzlrSmYyWmVhSlRMMlFydFp0elZqRXVlc21rN0RaZ2Rm?=
+ =?utf-8?B?czBUUmcxTHFGT1lKTzg5ZkFPcXpyejIvc1RncDFTcUkwWDVYNkk5TUlYZ1U4?=
+ =?utf-8?B?L1RZUmJkcHYvd3Q2MCtXYlUrVytyTDhhaTJ1SGFyZ1JVWXd3RnFvR201c3Ru?=
+ =?utf-8?B?bjVOUUh6Q3BEWTYrbno0WTltWTFncEp6NDhrRHZrSzdnSExzS2NpQUVXZTJ3?=
+ =?utf-8?B?ZDMweHdKbFNBM0dDZ3FmN01pUExiMlZMSitqb3lRUXNIUHhLVjRBMENWSXpK?=
+ =?utf-8?B?c3EzRE5EVVRONjBJZGhCcEVLUVpUY3dUSXNoWW1jeFZWci9ySVliV2FqanB5?=
+ =?utf-8?B?eS8wSFVuVis2d0plNUZ6a2YvSlJsTHhmNE5hKzJXR0Vjd3JtUFJpb1pNR1pB?=
+ =?utf-8?B?Y08zSjhMZ01zUWdRaUZtMC9JSDI1eWQxZThqeTlpd1J2YStEcTIybHl0dlBI?=
+ =?utf-8?B?YUhQajZyT1pNR2FmL1lyYXYwUG9pS2p4Z2dQc2dTUTRmZHdyQUI1d1BGZk91?=
+ =?utf-8?B?RW5EUDdRaWRyYVlhbzV0YzAxMTJpNWFIbmpEdTNrM2dicTBWaE5Ib0VGRDdO?=
+ =?utf-8?B?a3ZTWmxwZEVxV0ZHVCs4VG9FbE1mc3FWUHhnOGxGOENHaUtxTnRsVTA4OGpR?=
+ =?utf-8?B?TEY2N1UvcDdTTVFDSnR2MGwzeFFZU3JVcHFkWUh3N0g1UE5mMEpVSHJtNkMv?=
+ =?utf-8?B?aC9GOUQ2UFd0cGJzc0F6cGJ3VXpyaXU5dUlzSmlQK3FNWG1ZVHRrOVRQd1Ft?=
+ =?utf-8?B?NGxLZzJZRmhTeGxQaDVhVjFPcVljVm5GbUpENkV6VmVOb0ZQV2x6Y051R1ZE?=
+ =?utf-8?B?REg4Rlc5dXR0MEl5Ykg1clRGOFdIU0p1WmNLWFcvUFQzSXp2VThyYmlBNFdr?=
+ =?utf-8?B?dGY1NlNPb25laStLQWNDMnkxM1NmM3JiWVJBQ0RKWFBkRWNjdW5NcjZiY3hK?=
+ =?utf-8?B?MW9IK0YwYWJYSGt2MWx1VlNQVXE3NkxQMGtpV1Fpd2JiQ3hvWExxL1JCeUN3?=
+ =?utf-8?B?TTRxcE9hLytxVjYzRVl2Vk4xcTA1RU1Ya3RFU1NHOFBJMlEyZDlnZ1lhd3hs?=
+ =?utf-8?B?ZWZEaWExM1M3RXg0UzlUcEsvZU5zYVZONmNUS3NOQ0h1bXVOOXdwMUFjZzdR?=
+ =?utf-8?B?RkpwZTdhTzR2blQ1YnZieFJpeHhERFViN1VQRGY3V2d3MUpoSDg4MVhacGpy?=
+ =?utf-8?B?c2JpTk91RmdvbTZEaGJCWVo2d2tLQzhwakxvM3ZTVjBCMng4V013b25EcFJq?=
+ =?utf-8?B?UUpGWjhvRkUzUURwdnhzdFZpeGZhSWIvOEJhZEdYM0Zod1FlTHhKNlNJN0ZV?=
+ =?utf-8?B?WTI3eWVhcnhjbFgyNmc1bG5FNlJKSHFhTWxsNGVlV0hYUlN0bFBtVXlRRHdj?=
+ =?utf-8?B?UkcvTW1ncGVmMUdINzFhUjVtSEJOS05KbFhqTWdyTkc5VWZDQVRpTkxRRWlS?=
+ =?utf-8?B?bEZZMW92YkhIZUNjYk9SMjR3WjJna3dJbHFSdmtidUJxdmd1WTBqNitWQ3k3?=
+ =?utf-8?Q?+zg/+QpEabSRuVPcsPKTC6ZPF?=
+X-OriginatorOrg: volumez.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5c03a35b-707d-4fef-ba9f-08dc83cb2b60
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB5107.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2024 12:46:21.6636
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b1841924-914b-4377-bb23-9f1fac784a1d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lxeqHRUuxwFX5Svh3PA94c6NljpbIEvopsDpUc65JHlaZ73jO+ae/LEYFAzKRvdQnhffHg/EQT6DF35QtRJPgg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB9189
 
-Mon, Jun 03, 2024 at 02:31:46PM CEST, wojciech.drewek@intel.com wrote:
->From: Pawel Kaminski <pawel.kaminski@intel.com>
->
->Add support for driver-specific devlink local_forwarding param.
->Supported values are "enabled", "disabled" and "prioritized".
->Default configuration is set to "enabled".
->
->Add documentation in networking/devlink/ice.rst.
->
->In previous generations of Intel NICs the transmit scheduler was only
->limited by PCIe bandwidth when scheduling/assigning hairpin-badwidth
->between VFs. Changes to E810 HW design introduced scheduler limitation,
->so that available hairpin-bandwidth is bound to external port speed.
->In order to address this limitation and enable NFV services such as
->"service chaining" a knob to adjust the scheduler config was created.
->Driver can send a configuration message to the FW over admin queue and
->internal FW logic will reconfigure HW to prioritize and add more BW to
->VF to VF traffic. As end result for example 10G port will no longer limit
->hairpin-badwith to 10G and much higher speeds can be achieved.
->
->Devlink local_forwarding param set to "prioritized" enables higher
->hairpin-badwitdh on related PFs. Configuration is applicable only to
->8x10G and 4x25G cards.
->
->Changing local_forwarding configuration will trigger CORER reset in
->order to take effect.
->
->Example command to change current value:
->devlink dev param set pci/0000:b2:00.3 name local_forwarding \
->        value prioritized \
->        cmode runtime
->
->Co-developed-by: Michal Wilczynski <michal.wilczynski@intel.com>
->Signed-off-by: Michal Wilczynski <michal.wilczynski@intel.com>
->Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->Signed-off-by: Pawel Kaminski <pawel.kaminski@intel.com>
->Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
->---
->v2: Extend documentation
->v3: rename loopback to local_forwarding
->---
-> Documentation/networking/devlink/ice.rst      |  23 ++++
-> .../net/ethernet/intel/ice/devlink/devlink.c  | 126 ++++++++++++++++++
-> .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  11 +-
-> drivers/net/ethernet/intel/ice/ice_common.c   |   4 +
-> drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
-> 5 files changed, 164 insertions(+), 1 deletion(-)
->
->diff --git a/Documentation/networking/devlink/ice.rst b/Documentation/networking/devlink/ice.rst
->index 830c04354222..0eb64bd4710f 100644
->--- a/Documentation/networking/devlink/ice.rst
->+++ b/Documentation/networking/devlink/ice.rst
->@@ -11,6 +11,7 @@ Parameters
-> ==========
-> 
-> .. list-table:: Generic parameters implemented
->+   :widths: 5 5 90
-> 
->    * - Name
->      - Mode
->@@ -68,6 +69,28 @@ Parameters
-> 
->        To verify that value has been set:
->        $ devlink dev param show pci/0000:16:00.0 name tx_scheduling_layers
->+.. list-table:: Driver specific parameters implemented
->+    :widths: 5 5 90
->+
->+    * - Name
->+      - Mode
->+      - Description
->+    * - ``local_forwarding``
->+      - runtime
->+      - Controls loopback behavior by tuning scheduler bandwidth.
->+        Supported values are:
->+
->+        ``enabled`` - VF to VF traffic is allowed on port
->+
->+        ``disabled`` - VF to VF traffic is not allowed on this port
->+
->+        ``prioritized`` - VF to VF traffic is prioritized on this port
-
-Does this apply on SFs too?
 
 
->+
->+        Default value of ``local_forwarding`` parameter is ``enabled``.
->+        ``prioritized`` provides ability to adjust VF to VF traffic rate to increase
->+        one port capacity at cost of the another. User needs to disable
->+        local forwarding on one of the ports in order have increased capacity
->+        on the ``prioritized`` port.
-> 
-> Info versions
-> =============
->diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
->index f774781ab514..810a901d7afd 100644
->--- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
->+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
->@@ -1381,9 +1381,129 @@ ice_devlink_enable_iw_validate(struct devlink *devlink, u32 id,
-> 	return 0;
+On 03/06/2024 12:07, Hannes Reinecke wrote:
+> On 6/2/24 00:34, Jakub Kicinski wrote:
+>> On Thu, 30 May 2024 17:24:10 +0300 Ofir Gal wrote:
+>>> skbuff: before sendpage_ok - i: 0. page: 0x654eccd7 (pfn: 120755)
+>>> skbuff: before sendpage_ok - i: 1. page: 0x1666a4da (pfn: 120756)
+>>> skbuff: before sendpage_ok - i: 2. page: 0x54f9f140 (pfn: 120757)
+>>
+>> noob question, how do you get 3 contiguous pages, the third of which
+>> is slab? is_slab doesn't mean what I think it does, or we got extremely
+>> lucky with kmalloc?
+>>
+> I guess it's not slab which triggered; the actual code is:
+>
+> static inline bool sendpage_ok(struct page *page)
+> {
+>         return !PageSlab(page) && page_count(page) >= 1;
 > }
-> 
->+#define DEVLINK_LOCAL_FWD_DISABLED_STR "disabled"
->+#define DEVLINK_LOCAL_FWD_ENABLED_STR "enabled"
->+#define DEVLINK_LOCAL_FWD_PRIORITIZED_STR "prioritized"
->+
->+/**
->+ * ice_devlink_local_fwd_mode_to_str - Get string for local_fwd mode.
->+ * @mode: local forwarding for mode used in port_info struct.
->+ *
->+ * Return: Mode respective string or "Invalid".
->+ */
->+static const char *
->+ice_devlink_local_fwd_mode_to_str(enum ice_local_fwd_mode mode)
->+{
->+	switch (mode) {
->+	case ICE_LOCAL_FWD_MODE_ENABLED:
->+		return DEVLINK_LOCAL_FWD_ENABLED_STR;
->+	case ICE_LOCAL_FWD_MODE_PRIORITIZED:
->+		return DEVLINK_LOCAL_FWD_PRIORITIZED_STR;
->+	case ICE_LOCAL_FWD_MODE_DISABLED:
->+		return DEVLINK_LOCAL_FWD_DISABLED_STR;
->+	}
->+
->+	return "Invalid";
->+}
->+
->+/**
->+ * ice_devlink_local_fwd_str_to_mode - Get local_fwd mode from string name.
->+ * @mode_str: local forwarding mode string.
->+ *
->+ * Return: Mode value or negative number if invalid.
->+ */
->+static int ice_devlink_local_fwd_str_to_mode(const char *mode_str)
->+{
->+	if (!strcmp(mode_str, DEVLINK_LOCAL_FWD_ENABLED_STR))
->+		return ICE_LOCAL_FWD_MODE_ENABLED;
->+	else if (!strcmp(mode_str, DEVLINK_LOCAL_FWD_PRIORITIZED_STR))
->+		return ICE_LOCAL_FWD_MODE_PRIORITIZED;
->+	else if (!strcmp(mode_str, DEVLINK_LOCAL_FWD_DISABLED_STR))
->+		return ICE_LOCAL_FWD_MODE_DISABLED;
->+
->+	return -EINVAL;
->+}
->+
->+/**
->+ * ice_devlink_local_fwd_get - Get local_fwd parameter.
->+ * @devlink: Pointer to the devlink instance.
->+ * @id: The parameter ID to set.
->+ * @ctx: Context to store the parameter value.
->+ *
->+ * Return: Zero.
->+ */
->+static int ice_devlink_local_fwd_get(struct devlink *devlink, u32 id,
->+				     struct devlink_param_gset_ctx *ctx)
->+{
->+	struct ice_pf *pf = devlink_priv(devlink);
->+	struct ice_port_info *pi;
->+	const char *mode_str;
->+
->+	pi = pf->hw.port_info;
->+	mode_str = ice_devlink_local_fwd_mode_to_str(pi->local_fwd_mode);
->+	snprintf(ctx->val.vstr, sizeof(ctx->val.vstr), "%s", mode_str);
->+
->+	return 0;
->+}
->+
->+/**
->+ * ice_devlink_local_fwd_set - Set local_fwd parameter.
->+ * @devlink: Pointer to the devlink instance.
->+ * @id: The parameter ID to set.
->+ * @ctx: Context to get the parameter value.
->+ * @extack: Netlink extended ACK structure.
->+ *
->+ * Return: Zero.
->+ */
->+static int ice_devlink_local_fwd_set(struct devlink *devlink, u32 id,
->+				     struct devlink_param_gset_ctx *ctx,
->+				     struct netlink_ext_ack *extack)
->+{
->+	int new_local_fwd_mode = ice_devlink_local_fwd_str_to_mode(ctx->val.vstr);
->+	struct ice_pf *pf = devlink_priv(devlink);
->+	struct device *dev = ice_pf_to_dev(pf);
->+	struct ice_port_info *pi;
->+
->+	pi = pf->hw.port_info;
->+	if (pi->local_fwd_mode != new_local_fwd_mode) {
->+		pi->local_fwd_mode = new_local_fwd_mode;
->+		dev_info(dev, "Setting local_fwd to %s\n", ctx->val.vstr);
->+		ice_schedule_reset(pf, ICE_RESET_CORER);
->+	}
->+
->+	return 0;
->+}
->+
->+/**
->+ * ice_devlink_local_fwd_validate - Validate passed local_fwd parameter value.
->+ * @devlink: Unused pointer to devlink instance.
->+ * @id: The parameter ID to validate.
->+ * @val: Value to validate.
->+ * @extack: Netlink extended ACK structure.
->+ *
->+ * Supported values are:
->+ * "enabled" - local_fwd is enabled, "disabled" - local_fwd is disabled
->+ * "prioritized" - local_fwd traffic is prioritized in scheduling.
->+ *
->+ * Return: Zero when passed parameter value is supported. Negative value on
->+ * error.
->+ */
->+static int ice_devlink_local_fwd_validate(struct devlink *devlink, u32 id,
->+					  union devlink_param_value val,
->+					  struct netlink_ext_ack *extack)
->+{
->+	if (ice_devlink_local_fwd_str_to_mode(val.vstr) < 0) {
->+		NL_SET_ERR_MSG_MOD(extack, "Error: Requested value is not supported.");
->+		return -EINVAL;
->+	}
->+
->+	return 0;
->+}
->+
-> enum ice_param_id {
-> 	ICE_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
-> 	ICE_DEVLINK_PARAM_ID_TX_SCHED_LAYERS,
->+	ICE_DEVLINK_PARAM_ID_LOCAL_FWD,
-> };
-> 
-> static const struct devlink_param ice_dvl_rdma_params[] = {
->@@ -1405,6 +1525,12 @@ static const struct devlink_param ice_dvl_sched_params[] = {
-> 			     ice_devlink_tx_sched_layers_get,
-> 			     ice_devlink_tx_sched_layers_set,
-> 			     ice_devlink_tx_sched_layers_validate),
->+	DEVLINK_PARAM_DRIVER(ICE_DEVLINK_PARAM_ID_LOCAL_FWD,
->+			     "local_forwarding", DEVLINK_PARAM_TYPE_STRING,
->+			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
->+			     ice_devlink_local_fwd_get,
->+			     ice_devlink_local_fwd_set,
->+			     ice_devlink_local_fwd_validate),
-> };
-> 
-> static void ice_devlink_free(void *devlink_ptr)
->diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
->index 621a2ca7093e..9683842f8880 100644
->--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
->+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
->@@ -232,6 +232,13 @@ struct ice_aqc_get_sw_cfg_resp_elem {
-> #define ICE_AQC_GET_SW_CONF_RESP_IS_VF		BIT(15)
-> };
-> 
->+/* Loopback port parameter mode values. */
->+enum ice_local_fwd_mode {
->+	ICE_LOCAL_FWD_MODE_ENABLED = 0,
->+	ICE_LOCAL_FWD_MODE_DISABLED = 1,
->+	ICE_LOCAL_FWD_MODE_PRIORITIZED = 2,
->+};
->+
-> /* Set Port parameters, (direct, 0x0203) */
-> struct ice_aqc_set_port_params {
-> 	__le16 cmd_flags;
->@@ -240,7 +247,9 @@ struct ice_aqc_set_port_params {
-> 	__le16 swid;
-> #define ICE_AQC_PORT_SWID_VALID			BIT(15)
-> #define ICE_AQC_PORT_SWID_M			0xFF
->-	u8 reserved[10];
->+	u8 local_fwd_mode;
->+#define ICE_AQC_SET_P_PARAMS_LOCAL_FWD_MODE_VALID BIT(2)
->+	u8 reserved[9];
-> };
-> 
-> /* These resource type defines are used for all switch resource
->diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
->index 9ae61cd8923e..60ad7774812c 100644
->--- a/drivers/net/ethernet/intel/ice/ice_common.c
->+++ b/drivers/net/ethernet/intel/ice/ice_common.c
->@@ -1086,6 +1086,7 @@ int ice_init_hw(struct ice_hw *hw)
-> 		goto err_unroll_cqinit;
-> 	}
-> 
->+	hw->port_info->local_fwd_mode = ICE_LOCAL_FWD_MODE_ENABLED;
-> 	/* set the back pointer to HW */
-> 	hw->port_info->hw = hw;
-> 
->@@ -3070,6 +3071,9 @@ ice_aq_set_port_params(struct ice_port_info *pi, bool double_vlan,
-> 		cmd_flags |= ICE_AQC_SET_P_PARAMS_DOUBLE_VLAN_ENA;
-> 	cmd->cmd_flags = cpu_to_le16(cmd_flags);
-> 
->+	cmd->local_fwd_mode = pi->local_fwd_mode |
->+				ICE_AQC_SET_P_PARAMS_LOCAL_FWD_MODE_VALID;
->+
-> 	return ice_aq_send_cmd(hw, &desc, NULL, 0, cd);
-> }
-> 
->diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
->index aac59c85a911..f3e4d8030f43 100644
->--- a/drivers/net/ethernet/intel/ice/ice_type.h
->+++ b/drivers/net/ethernet/intel/ice/ice_type.h
->@@ -730,6 +730,7 @@ struct ice_port_info {
-> 	u16 sw_id;			/* Initial switch ID belongs to port */
-> 	u16 pf_vf_num;
-> 	u8 port_state;
->+	u8 local_fwd_mode;
-> #define ICE_SCHED_PORT_STATE_INIT	0x0
-> #define ICE_SCHED_PORT_STATE_READY	0x1
-> 	u8 lport;
->-- 
->2.40.1
 >
->
+> My bet is on 'page_count()' triggering.
+It failed because the page has slab, page count is 1. Sorry for not
+clarifying this.
+
+"skbuff: !sendpage_ok - page: 0x54f9f140 (pfn: 120757). is_slab: 1, page_count: 1"
+                                                                 ^
+The print I used:
+pr_info(
+    "!sendpage_ok - page: 0x%p (pfn: %lx). is_slab: %u, page_count: %u\n",
+    (void *)page,
+    page_to_pfn(page),
+    page_address(page),
+    !!PageSlab(page),
+    page_count(page)
+);
+
+
+Regarding the origin of the IO, I haven't investigated it yet. I suspect
+the first 2 pages are the superblocks of the raid (mdp_superblock_1 and
+bitmap_super_s) and the rest of the IO is the bitmap.
+
 
