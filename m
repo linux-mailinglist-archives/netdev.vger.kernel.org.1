@@ -1,192 +1,403 @@
-Return-Path: <netdev+bounces-100175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0EA48D807A
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 13:01:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8775B8D807D
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 13:04:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D6691F2126A
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 11:01:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA64B1C21446
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 11:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C6C67E0FC;
-	Mon,  3 Jun 2024 11:01:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFFEF83CCB;
+	Mon,  3 Jun 2024 11:03:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="g9CLrUgB"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="cy1pEwp0"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2060.outbound.protection.outlook.com [40.107.22.60])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADDB878C80
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 11:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717412506; cv=fail; b=s025Tvvl/t+G87uOzIEUUCUaJqrbPaJWSlX964TlPOQbMSxom3Z1ObnQG3qKIHF5G+b/nG35HsL3ykGOhiKxdKa8HM48aQZZHFlIcf8dpF/dzwL3GImjMU5kU6Lzq4NXwxtExONP+i9y9KktURHmFUXttWfOhYpCrPQ7BxjO5CE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717412506; c=relaxed/simple;
-	bh=/72bBi/vRwVg0lZFi0Cz/6tOZqojeRPO781JwkmAHio=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=oQyTRj03NhHGsoKE2fm+S+2efGBqFawu2fT/DiQ56yDelwj44d8NHeQas/yldaNflVozVINYJ63h1A7t4wx+LdmA51XZEvhhvqpEjF04dbYse3ndSA07Wzanlh22T/llFT+ubaLbPdlu+i2s2sLfyP8y7NWvvLutNYWpXQiDNMU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=g9CLrUgB; arc=fail smtp.client-ip=40.107.22.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QZGaji1zKitxPqIqwLruMUW1fr0eSiSuYoVVgH7xfuz1yrhsxvS/j5IjlXWxA6yHQt1BUurd662Ef+LctANykxb/2KH3u8oxIMqOMdRbczMvPgX03EeERxtBiNzH5hWxA+CNFDLq0iZcY0YOVlm+25t863afjdkv/B8MmeR+ETRCSkYZ2XL+hyMYelJg6dMerQudV+cFAILNCWYx3NB4R1hkMX2uvpQ/WITcl7moYEiGVeEuhH4KFeN6C3Oi+BcdelopxVo4/uL3bqiVVMQehCTtu8utK05zh16rMWJOo/lWLO80lmBcJhy5zOoyLirGIMagXTdN+a0uhN9HBgPdJA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=asrjViZ3tdJ3Ge6+c56GM1Tt80pubco/OXZsU+Ic9Sw=;
- b=kjID3QiogcEHo5C9b5LDX7/FBPJo/8t3jWSX8zUn1Ulkr5H1+JZpyZCnC+suQtBrkR8Z1BmyciVWSQe0/M7LoEhkgfnj2UxdDBWuisNv8DOCCJsWncNKjkRPRxYsWEQvIzfugbSEF0ayALP/oFYXIcojBK0/IBsQc7bG3BSnSFWtk8EVgbNe3req8I+c8nPYmGlv4CEHU0ggOGoM2F/2rX2s0T1sdz0nBnpS021Efdk0zqnaKT0IDFuzuMgmYnLr+4ouZuRbd5y/zMFgvcvnWLFZLKeEJjT70vT+ajuEeFisoZzsb6BJmDveNy178M7yphdWOxgFqcWgRhWvMY8LPA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=asrjViZ3tdJ3Ge6+c56GM1Tt80pubco/OXZsU+Ic9Sw=;
- b=g9CLrUgBivkdbN0AiR9keJxDQQ1gTXb+h5jHNYzz2nXXX6IffhQfv9+m9cGupf8qg/DnQa/hTNjOeIjiP2Abt5zcpiDBdUUiBrsHRcmWzrj5Rho1OkPkmOghqshTMvPwzTZp9/l2vGV9Xw1z9EqNlKYfuh3X8BmqNDNT9piutss=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from DB7PR04MB4555.eurprd04.prod.outlook.com (2603:10a6:5:33::26) by
- AS1PR04MB9335.eurprd04.prod.outlook.com (2603:10a6:20b:4dd::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.23; Mon, 3 Jun
- 2024 11:01:41 +0000
-Received: from DB7PR04MB4555.eurprd04.prod.outlook.com
- ([fe80::86ff:def:c14a:a72a]) by DB7PR04MB4555.eurprd04.prod.outlook.com
- ([fe80::86ff:def:c14a:a72a%7]) with mapi id 15.20.7611.030; Mon, 3 Jun 2024
- 11:01:40 +0000
-Date: Mon, 3 Jun 2024 14:01:37 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Colin Foster <colin.foster@in-advantage.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Russell King <linux@armlinux.org.uk>
-Subject: Re: [PATCH net-next 1/8] net: dsa: ocelot: use devres in
- ocelot_ext_probe()
-Message-ID: <20240603110137.4b2a777e4ivzxc5l@skbuf>
-References: <20240530163333.2458884-1-vladimir.oltean@nxp.com>
- <20240530163333.2458884-2-vladimir.oltean@nxp.com>
- <Zl0joZpD8YXMXf9h@colin-ia-desktop>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zl0joZpD8YXMXf9h@colin-ia-desktop>
-X-ClientProxiedBy: VI1PR0102CA0057.eurprd01.prod.exchangelabs.com
- (2603:10a6:803::34) To DB7PR04MB4555.eurprd04.prod.outlook.com
- (2603:10a6:5:33::26)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85FEC7E0FC;
+	Mon,  3 Jun 2024 11:03:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717412636; cv=none; b=RCTr/3Tdjt+ZQAxqXmG+3OW0ib7bzSM1SnVrXShUZc7uKWESSVvjm7PgYVdXNLVK+MpKqT6yal62pTYv7pgwzHTr8odTE0AK8tZBbP4qH+uLei5XHnco1gbj/wWerlXxcF8esGcUGNIIX4KFfjPur/IrLY6xCacBNP/2g8aPf6w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717412636; c=relaxed/simple;
+	bh=NpkjSkHGZeUe9c7hsdeK5vwkf+TbCfa8VW5GwxruLCU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=d/cpFzOKLKGJCtXHIL+TZDsX8MH3wHFft1cmBUTimjUlZM5JAO7Hx7+NR520Pgi2GRSs4WioUDRAVu4ysSeiQE2xyPc+DH19omSjTMW+ACX+DuVgGnrfliWGFTEc9WyDXNHEMEUXLlhLIdeQmgPelY0tLeWQfvIumZJS9nXWiwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=cy1pEwp0; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id EC62787D1D;
+	Mon,  3 Jun 2024 13:03:49 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1717412632;
+	bh=xJ45bh48GVqYlmdtTWZwWBUq4raxArSg1WSjXgO6nic=;
+	h=From:To:Cc:Subject:Date:From;
+	b=cy1pEwp0zWhrg6jNFYLvQMFMt6XJ+TgWxC5sTYgKXN9jaA2wStRofFcvRSXGvRRcy
+	 Iuw+l4kcxgyL0t6Bqci4ZUE/5wEriFX5+lh930+mE4/MZYr2FnLZggOrtCjcZxlU5K
+	 AxEFG/qLJF16Y+RIX/25xRJvgguRl0G/36WJyJxwspkkwv5RyhbVthtCfyohRHaGzx
+	 vN/7IkAcA6YzOVdiyCHNrB8PHEJ6PLP1hnRA3vNmuOs1Z9kPW578BFMsGKD3p32Z3U
+	 BvgNAQlR2zGn+SwOcPFe9ir+d0yAnz2uGqBWIFgepK+p74fGJhIjjM03dge5G7TDkl
+	 acWhNnRY+BsOw==
+From: Lukasz Majewski <lukma@denx.de>
+To: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Tristram.Ha@microchip.com,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Ravi Gunasekaran <r-gunasekaran@ti.com>,
+	Simon Horman <horms@kernel.org>,
+	Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
+	Murali Karicheri <m-karicheri2@ti.com>,
+	Arvid Brodin <Arvid.Brodin@xdin.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	"Ricardo B. Marliere" <ricardo@marliere.net>,
+	Casper Andersson <casper.casan@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Geliang Tang <tanggeliang@kylinos.cn>,
+	Shuah Khan <shuah@kernel.org>,
+	Shigeru Yoshida <syoshida@redhat.com>,
+	Lukasz Majewski <lukma@denx.de>
+Subject: [PATCH v1 net-next] net: hsr: Send supervisory frames to HSR network with ProxyNodeTable data
+Date: Mon,  3 Jun 2024 13:03:29 +0200
+Message-Id: <20240603110329.3157458-1-lukma@denx.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB7PR04MB4555:EE_|AS1PR04MB9335:EE_
-X-MS-Office365-Filtering-Correlation-Id: d18f1431-f916-4a5d-77c4-08dc83bc8c02
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|376005|7416005|366007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?AZHNO+1Mfu5Td+NPQf08ayZNVTzw/7emF86XCx2rwYybjNsvx/yLa/H34S+Q?=
- =?us-ascii?Q?4WGu6L9AMYVMSoyTs0/uucCjO4osO/xmCeJ505pfU2r+A7RfSDRkRUwZH86a?=
- =?us-ascii?Q?qzKmXrYCYNfwYedR8Ft9sZUB3TZf82y8T/ZZXrf8LPX1sLEF2iOtLWTivBVy?=
- =?us-ascii?Q?46LugTVmcFBJrunucAzDKlNOodHE3v4cbAbpu3oZ6r4EuZcu+lwsJIt6ymIC?=
- =?us-ascii?Q?CKQr9bcs4fw+XE6XU7qivaiT86QoRm63cR51sZnf+G6VJLVV05ik9xKwD62C?=
- =?us-ascii?Q?fo8PXeC5KRTi5CCGrlQLxHKaGk39doiENSDNudvYMZ5ZM2Yf5RzjlypGe03e?=
- =?us-ascii?Q?A112KQs0fLeKUSit8gTOkmh4KT0m60YRUaKLwAQ7VDHoB5pnYwwZeI6uJ7sn?=
- =?us-ascii?Q?Llj0H89oXADB5TRnwHuQYMX5UKi3EwyaCZYV5ITxsMab7hVv9kKb5nk/HCPK?=
- =?us-ascii?Q?ljwtdXhsE1ON4Ds3QHzTdM0QQmhpr8nGSGPpD525wrjPxTXso2SJ+x1kRdj0?=
- =?us-ascii?Q?aTOFDZ8vlHECvndyd1z7fd2AqUSDp96kuZFPWaXr05sCXA4+4XUW4N+w4UML?=
- =?us-ascii?Q?fMguLPcEimDXtefJdzwuiEljk/LfWuv6PdG/urN9QTUvLo8ys0SzhP5+QDdf?=
- =?us-ascii?Q?arOd7TAzfCVEGHW+FFRKeTtOA0MRb6A1ZrVVUfaevAEpL5e0MxWz6VBwmE1S?=
- =?us-ascii?Q?4w14GUXpV+q91X7hKiOH6AQP9yDWXcCG8R1I3BL+TVIO/fk2rRlk0hemSdy2?=
- =?us-ascii?Q?yt6M2OBFQ1iqxxE1UC670l+YGuY8uQSD+PqLsO+QL2eIu/OPk/PnEDGpBAbm?=
- =?us-ascii?Q?waSEMH1uC+Fus55ab+CoCeEfSJEBzRoagIzCuyRXq5JPNt9EUP05JQ0wi/7e?=
- =?us-ascii?Q?BHo0ZGg+vsnvJ3Rn0VFLawiF0NLNSvXjzuPP4l7sKA+4GHKzXw1l43IuGAbM?=
- =?us-ascii?Q?XvJuTkkHvFZIFX+9hu0zBXOStTzS8RiK5MGBK9sHQZZVZUsYlkXoby8LqfS+?=
- =?us-ascii?Q?EVFnhPhuMNp5Z3o4fQdP69sShvZ+DKWHRuBby2yjAWpQ3YcKh4f+94QIJcrl?=
- =?us-ascii?Q?YOBG3M/+xRN4QELbTFxlFxVf3I4padVOFog+v3QkThYoEVNhtskQZarLOlRa?=
- =?us-ascii?Q?tTC1qmjnhMNrtFvpKGkj+rfCkOfEss24uCJO2GS+S1V76ANHjt+Q86fWvd8m?=
- =?us-ascii?Q?jt5QDxB5E4VWzpOMkNlQbspwgIkitbQNPop5cApsBNjP4mJxZQE0XISStbTC?=
- =?us-ascii?Q?QZoFU6tCQi78hBNWwxis2PlL3j3A9sdjSX2TPPoQxw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR04MB4555.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(7416005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ZaU3ggEwaD3zcEQwqKCMU3sng6R4XdwoUCkJ+jgo6T6IL3iAh9jjE4o/gkZU?=
- =?us-ascii?Q?9oO7sjRjnt/LWlxrr9Wd5WqFtnqvvoTvlX7RKLMpnx8cMYLyDi5WqeDm2rGC?=
- =?us-ascii?Q?fE4SGE/q0J3SXGMuVIPcpP3RpEeguRagQ5Y9SlvFVTls6qM5kfZ565XgN8jK?=
- =?us-ascii?Q?E8cKUSU5o8opRh6OwkBT12zrJI8L9sONtoaqOzQUBwsqo0BzveYGxh0tbogl?=
- =?us-ascii?Q?geboAhFrdH+NneQNPha+d5flh9KpHa7ATej7DeVou6RJKU8Az16MsQDJEiQW?=
- =?us-ascii?Q?njkRID/v8WZlzuc2wzS/rJht6Ib2DDm4FldOQr5zMupHy1K/B5HT7ANCRfjh?=
- =?us-ascii?Q?hXng7k5AuDWl2HbzdSy5GzGWqcKRLhfFsEuAke/PCLaTRtzBFddP47Jbwcr0?=
- =?us-ascii?Q?CBreWM67Bff5RfJNvYXMxQ4eTbwqwKcOTdu/K3n6HWwxmHe0zg7+iE80OheZ?=
- =?us-ascii?Q?yzKCqckhudmVI1vZxLxYcyuTGShwoMYjeVDKD15oWTi4MK7L65VwAOa/o1W1?=
- =?us-ascii?Q?ocFd7CnCSEdH1O3wUjvr9hK92JZbYXUH7hPy2gvNKIGHN3BjwdFfCM/3uV0K?=
- =?us-ascii?Q?Or3OWroiltptqPpIPXs9tVxHq/jPAjmmuzWzQ4Zz1CqFWlFykcIGDouvKHdj?=
- =?us-ascii?Q?CzNoX7CrZaNZ/x41VAX99pRYNW02udHXf1sj6GDuNSYbQQ1NvGo1vNp/Ewdi?=
- =?us-ascii?Q?h271zN+x1hBczCCehhnf3wlk4OCnwrT+RPRrCdJ8SfnxAajRRmq0wb4uizao?=
- =?us-ascii?Q?pzRw6QboIvuvrs/BB99W2rLob0WLGOAuHhsiK6HdwqJ0qIl66E/RcJmSFN0u?=
- =?us-ascii?Q?l+dwAMZmXsAdfKBcXsXQQbialwe/L0xRXCUYPVkY+DsJl6BHrTRd5nkMuHi0?=
- =?us-ascii?Q?HVkSuwJIPKXx5EkL5yfIS02ljRKxdkudtsSN8kynB0GnQjlk7B6jhvOqBqUp?=
- =?us-ascii?Q?RGTH6fuYJUaFDK17dxGM8DyqdPwz0TjVExl9e82yC8SBF6ZNvZ3ercCmXLXc?=
- =?us-ascii?Q?1x8W0/n0MILweYHFi8Z/NZULCEv9EldjzjOhWDr7c5S1zbV4d8v5a80Fqj5N?=
- =?us-ascii?Q?j6JRShR6u7Ng20LAesmjUBKwA8AmeA8sDvXvbDkmXbggzCQ8EOe5GVtulyMV?=
- =?us-ascii?Q?umwgIfrYjsZL5zTUUDDoZ7suFMIPpKKBgI2tSgYLaIo/vCxdcdMLFKc7Mnwa?=
- =?us-ascii?Q?ly+vR2wDHRl1DXbGMkyQVqpxLHsbAGKn/ydJ1ZtyTSsy9WuY7hpnoexpqEQO?=
- =?us-ascii?Q?rxP7YD6IKqZ4aOei5cnw8366xrnAhI13udXpqJ5Z2C1ivuADEcFINohk0qJe?=
- =?us-ascii?Q?JzMoT0l0ZnQiNKWhTPCc8nTdgTvYiCHKD+eJUKwMAJ0kVZathCiaTduHf78B?=
- =?us-ascii?Q?jhzsgQrAdr3orVKJXNFNsgd7T1FTYu9kKtDwnTWOnp1YTbb2hww1bqWeFGQC?=
- =?us-ascii?Q?BDrhxYEEgB41H3z36Kks+W/MUg4PxnH2KIimWLddLVuaPUJEdBzYKCojJjST?=
- =?us-ascii?Q?uE+gUe7pViRrvgn5I67/W3BDRWmN1dbY3zCnwlQBKXv8JIzAEZY9KxdBPlVC?=
- =?us-ascii?Q?bcnrz4iagCTtyWbs+3m5AV5Yn/zcPmNwODLtUr/0zzqnvlUtscG+epcKtFeB?=
- =?us-ascii?Q?Uw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d18f1431-f916-4a5d-77c4-08dc83bc8c02
-X-MS-Exchange-CrossTenant-AuthSource: DB7PR04MB4555.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2024 11:01:40.7501
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OHQP+fTCitNnjsCsdYu7+rcOLHuwz/7ePp0fq5rNRrspQX3jWUwgdDciAjnVh1sFlx9WOShPbQM+QDclj8c5fw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR04MB9335
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Sun, Jun 02, 2024 at 09:00:01PM -0500, Colin Foster wrote:
-> On Thu, May 30, 2024 at 07:33:26PM +0300, Vladimir Oltean wrote:
-> > Russell King suggested that felix_vsc9959, seville_vsc9953 and
-> > ocelot_ext have a large portion of duplicated init and teardown code,
-> > which could be made common [1]. The teardown code could even be
-> > simplified away if we made use of devres, something which is used here
-> > and there in the felix driver, just not very consistently.
-> > 
-> > [1] https://lore.kernel.org/all/Zh1GvcOTXqb7CpQt@shell.armlinux.org.uk/
-> > 
-> > Prepare the ground in the ocelot_ext driver, by allocating the data
-> > structures using devres and deleting the kfree() calls. This also
-> > deletes the "Failed to allocate ..." message, since memory allocation
-> > errors are extremely loud anyway, and it's hard to miss them.
-> > 
-> > Suggested-by: "Russell King (Oracle)" <linux@armlinux.org.uk>
-> > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> > ---
-> >  drivers/net/dsa/ocelot/ocelot_ext.c | 24 +++++-------------------
-> > 1 file changed, 5 insertions(+), 19 deletions(-)
-> > 
-> > diff --git a/drivers/net/dsa/ocelot/ocelot_ext.c b/drivers/net/dsa/ocelot/ocelot_ext.c
-> > index a8927dc7aca4..c893f3ee238b 100644
-> > --- a/drivers/net/dsa/ocelot/ocelot_ext.c
-> > +++ b/drivers/net/dsa/ocelot/ocelot_ext.c
-> 
-> I found my issue and was able to test the series.
-> 
-> Tested-by: Colin Foster <colin.foster@in-advantage.com>
+This patch provides support for sending supervision HSR frames with
+MAC addresses stored in ProxyNodeTable when RedBox (i.e. HSR-SAN) is
+enabled.
 
-Thanks for testing, Colin.
+Supervision frames with RedBox MAC address (appended as second TLV)
+are only send for ProxyNodeTable nodes.
+
+This patch series shall be tested with hsr_redbox.sh script.
+
+Signed-off-by: Lukasz Majewski <lukma@denx.de>
+---
+ net/hsr/hsr_device.c   | 63 ++++++++++++++++++++++++++++++++++--------
+ net/hsr/hsr_forward.c  | 40 +++++++++++++++++++++++++--
+ net/hsr/hsr_framereg.c | 15 ++++++++++
+ net/hsr/hsr_framereg.h |  2 ++
+ net/hsr/hsr_main.h     |  4 ++-
+ net/hsr/hsr_netlink.c  |  1 +
+ 6 files changed, 111 insertions(+), 14 deletions(-)
+
+diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+index e6904288d40d..f85331d75454 100644
+--- a/net/hsr/hsr_device.c
++++ b/net/hsr/hsr_device.c
+@@ -73,9 +73,15 @@ static void hsr_check_announce(struct net_device *hsr_dev)
+ 			mod_timer(&hsr->announce_timer, jiffies +
+ 				  msecs_to_jiffies(HSR_ANNOUNCE_INTERVAL));
+ 		}
++
++		if (hsr->redbox && !timer_pending(&hsr->announce_proxy_timer))
++			mod_timer(&hsr->announce_proxy_timer, jiffies +
++				  msecs_to_jiffies(HSR_ANNOUNCE_INTERVAL) / 2);
+ 	} else {
+ 		/* Deactivate the announce timer  */
+ 		timer_delete(&hsr->announce_timer);
++		if (hsr->redbox)
++			timer_delete(&hsr->announce_proxy_timer);
+ 	}
+ }
+ 
+@@ -279,10 +285,11 @@ static struct sk_buff *hsr_init_skb(struct hsr_port *master)
+ 	return NULL;
+ }
+ 
+-static void send_hsr_supervision_frame(struct hsr_port *master,
+-				       unsigned long *interval)
++static void send_hsr_supervision_frame(struct hsr_port *port,
++				       unsigned long *interval,
++				       const unsigned char addr[ETH_ALEN])
+ {
+-	struct hsr_priv *hsr = master->hsr;
++	struct hsr_priv *hsr = port->hsr;
+ 	__u8 type = HSR_TLV_LIFE_CHECK;
+ 	struct hsr_sup_payload *hsr_sp;
+ 	struct hsr_sup_tlv *hsr_stlv;
+@@ -296,9 +303,9 @@ static void send_hsr_supervision_frame(struct hsr_port *master,
+ 		hsr->announce_count++;
+ 	}
+ 
+-	skb = hsr_init_skb(master);
++	skb = hsr_init_skb(port);
+ 	if (!skb) {
+-		netdev_warn_once(master->dev, "HSR: Could not send supervision frame\n");
++		netdev_warn_once(port->dev, "HSR: Could not send supervision frame\n");
+ 		return;
+ 	}
+ 
+@@ -321,11 +328,12 @@ static void send_hsr_supervision_frame(struct hsr_port *master,
+ 	hsr_stag->tlv.HSR_TLV_length = hsr->prot_version ?
+ 				sizeof(struct hsr_sup_payload) : 12;
+ 
+-	/* Payload: MacAddressA */
++	/* Payload: MacAddressA / SAN MAC from ProxyNodeTable */
+ 	hsr_sp = skb_put(skb, sizeof(struct hsr_sup_payload));
+-	ether_addr_copy(hsr_sp->macaddress_A, master->dev->dev_addr);
++	ether_addr_copy(hsr_sp->macaddress_A, addr);
+ 
+-	if (hsr->redbox) {
++	if (hsr->redbox &&
++	    hsr_is_node_in_db(&hsr->proxy_node_db, addr)) {
+ 		hsr_stlv = skb_put(skb, sizeof(struct hsr_sup_tlv));
+ 		hsr_stlv->HSR_TLV_type = PRP_TLV_REDBOX_MAC;
+ 		hsr_stlv->HSR_TLV_length = sizeof(struct hsr_sup_payload);
+@@ -340,13 +348,14 @@ static void send_hsr_supervision_frame(struct hsr_port *master,
+ 		return;
+ 	}
+ 
+-	hsr_forward_skb(skb, master);
++	hsr_forward_skb(skb, port);
+ 	spin_unlock_bh(&hsr->seqnr_lock);
+ 	return;
+ }
+ 
+ static void send_prp_supervision_frame(struct hsr_port *master,
+-				       unsigned long *interval)
++				       unsigned long *interval,
++				       const unsigned char addr[ETH_ALEN])
+ {
+ 	struct hsr_priv *hsr = master->hsr;
+ 	struct hsr_sup_payload *hsr_sp;
+@@ -396,7 +405,7 @@ static void hsr_announce(struct timer_list *t)
+ 
+ 	rcu_read_lock();
+ 	master = hsr_port_get_hsr(hsr, HSR_PT_MASTER);
+-	hsr->proto_ops->send_sv_frame(master, &interval);
++	hsr->proto_ops->send_sv_frame(master, &interval, master->dev->dev_addr);
+ 
+ 	if (is_admin_up(master->dev))
+ 		mod_timer(&hsr->announce_timer, jiffies + interval);
+@@ -404,6 +413,37 @@ static void hsr_announce(struct timer_list *t)
+ 	rcu_read_unlock();
+ }
+ 
++/* Announce (supervision frame) timer function for RedBox
++ */
++static void hsr_proxy_announce(struct timer_list *t)
++{
++	struct hsr_port *interlink;
++	unsigned long interval = 0;
++	struct hsr_node *node;
++	struct hsr_priv *hsr = from_timer(hsr, t, announce_proxy_timer);
++
++	rcu_read_lock();
++	/* RedBOX sends supervisory frames to HSR network with MAC addresses
++	 * of SAN nodes stored in ProxyNodeTable.
++	 */
++	interlink = hsr_port_get_hsr(hsr, HSR_PT_INTERLINK);
++	list_for_each_entry_rcu(node, &hsr->proxy_node_db, mac_list) {
++		if (hsr_addr_is_redbox(hsr, node->macaddress_A))
++			continue;
++		hsr->proto_ops->send_sv_frame(interlink, &interval,
++					      node->macaddress_A);
++	}
++
++	if (is_admin_up(interlink->dev)) {
++		if (interval == 0)
++			interval = msecs_to_jiffies(HSR_ANNOUNCE_INTERVAL);
++
++		mod_timer(&hsr->announce_proxy_timer, jiffies + interval);
++	}
++
++	rcu_read_unlock();
++}
++
+ void hsr_del_ports(struct hsr_priv *hsr)
+ {
+ 	struct hsr_port *port;
+@@ -590,6 +630,7 @@ int hsr_dev_finalize(struct net_device *hsr_dev, struct net_device *slave[2],
+ 	timer_setup(&hsr->announce_timer, hsr_announce, 0);
+ 	timer_setup(&hsr->prune_timer, hsr_prune_nodes, 0);
+ 	timer_setup(&hsr->prune_proxy_timer, hsr_prune_proxy_nodes, 0);
++	timer_setup(&hsr->announce_proxy_timer, hsr_proxy_announce, 0);
+ 
+ 	ether_addr_copy(hsr->sup_multicast_addr, def_multicast_addr);
+ 	hsr->sup_multicast_addr[ETH_ALEN - 1] = multicast_spec;
+diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
+index 05a61b8286ec..2aa2621d8517 100644
+--- a/net/hsr/hsr_forward.c
++++ b/net/hsr/hsr_forward.c
+@@ -117,6 +117,38 @@ static bool is_supervision_frame(struct hsr_priv *hsr, struct sk_buff *skb)
+ 	return true;
+ }
+ 
++static bool is_proxy_supervision_frame(struct hsr_priv *hsr,
++				       struct sk_buff *skb)
++{
++	struct hsr_sup_payload *payload;
++	struct ethhdr *eth_hdr;
++	u16 total_length = 0;
++
++	eth_hdr = (struct ethhdr *)skb_mac_header(skb);
++
++	/* Get the HSR protocol revision. */
++	if (eth_hdr->h_proto == htons(ETH_P_HSR))
++		total_length = sizeof(struct hsrv1_ethhdr_sp);
++	else
++		total_length = sizeof(struct hsrv0_ethhdr_sp);
++
++	if (!pskb_may_pull(skb, total_length))
++		return false;
++
++	skb_pull(skb, total_length);
++	payload = (struct hsr_sup_payload *)skb->data;
++	skb_push(skb, total_length);
++
++	/* For RedBox (HSR-SAN) check if we have received the supervision
++	 * frame with MAC addresses from own ProxyNodeTable.
++	 */
++	if (hsr_is_node_in_db(&hsr->proxy_node_db,
++			      payload->macaddress_A))
++		return true;
++
++	return false;
++}
++
+ static struct sk_buff *create_stripped_skb_hsr(struct sk_buff *skb_in,
+ 					       struct hsr_frame_info *frame)
+ {
+@@ -499,7 +531,8 @@ static void hsr_forward_do(struct hsr_frame_info *frame)
+ 					   frame->sequence_nr))
+ 			continue;
+ 
+-		if (frame->is_supervision && port->type == HSR_PT_MASTER) {
++		if (frame->is_supervision && port->type == HSR_PT_MASTER &&
++		    !frame->is_proxy_supervision) {
+ 			hsr_handle_sup_frame(frame);
+ 			continue;
+ 		}
+@@ -637,6 +670,9 @@ static int fill_frame_info(struct hsr_frame_info *frame,
+ 
+ 	memset(frame, 0, sizeof(*frame));
+ 	frame->is_supervision = is_supervision_frame(port->hsr, skb);
++	if (frame->is_supervision && hsr->redbox)
++		frame->is_proxy_supervision =
++			is_proxy_supervision_frame(port->hsr, skb);
+ 
+ 	n_db = &hsr->node_db;
+ 	if (port->type == HSR_PT_INTERLINK)
+@@ -688,7 +724,7 @@ void hsr_forward_skb(struct sk_buff *skb, struct hsr_port *port)
+ 	/* Gets called for ingress frames as well as egress from master port.
+ 	 * So check and increment stats for master port only here.
+ 	 */
+-	if (port->type == HSR_PT_MASTER) {
++	if (port->type == HSR_PT_MASTER || port->type == HSR_PT_INTERLINK) {
+ 		port->dev->stats.tx_packets++;
+ 		port->dev->stats.tx_bytes += skb->len;
+ 	}
+diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
+index 614df9649794..8d2a5e8adf83 100644
+--- a/net/hsr/hsr_framereg.c
++++ b/net/hsr/hsr_framereg.c
+@@ -36,6 +36,17 @@ static bool seq_nr_after(u16 a, u16 b)
+ #define seq_nr_before(a, b)		seq_nr_after((b), (a))
+ #define seq_nr_before_or_eq(a, b)	(!seq_nr_after((a), (b)))
+ 
++bool hsr_addr_is_redbox(struct hsr_priv *hsr, unsigned char *addr)
++{
++	if (!hsr->redbox || !is_valid_ether_addr(hsr->macaddress_redbox))
++		return false;
++
++	if (ether_addr_equal(addr, hsr->macaddress_redbox))
++		return true;
++
++	return false;
++}
++
+ bool hsr_addr_is_self(struct hsr_priv *hsr, unsigned char *addr)
+ {
+ 	struct hsr_self_node *sn;
+@@ -591,6 +602,10 @@ void hsr_prune_proxy_nodes(struct timer_list *t)
+ 
+ 	spin_lock_bh(&hsr->list_lock);
+ 	list_for_each_entry_safe(node, tmp, &hsr->proxy_node_db, mac_list) {
++		/* Don't prune RedBox node. */
++		if (hsr_addr_is_redbox(hsr, node->macaddress_A))
++			continue;
++
+ 		timestamp = node->time_in[HSR_PT_INTERLINK];
+ 
+ 		/* Prune old entries */
+diff --git a/net/hsr/hsr_framereg.h b/net/hsr/hsr_framereg.h
+index 7619e31c1d2d..993fa950d814 100644
+--- a/net/hsr/hsr_framereg.h
++++ b/net/hsr/hsr_framereg.h
+@@ -22,6 +22,7 @@ struct hsr_frame_info {
+ 	struct hsr_node *node_src;
+ 	u16 sequence_nr;
+ 	bool is_supervision;
++	bool is_proxy_supervision;
+ 	bool is_vlan;
+ 	bool is_local_dest;
+ 	bool is_local_exclusive;
+@@ -35,6 +36,7 @@ struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
+ 			      enum hsr_port_type rx_port);
+ void hsr_handle_sup_frame(struct hsr_frame_info *frame);
+ bool hsr_addr_is_self(struct hsr_priv *hsr, unsigned char *addr);
++bool hsr_addr_is_redbox(struct hsr_priv *hsr, unsigned char *addr);
+ 
+ void hsr_addr_subst_source(struct hsr_node *node, struct sk_buff *skb);
+ void hsr_addr_subst_dest(struct hsr_node *node_src, struct sk_buff *skb,
+diff --git a/net/hsr/hsr_main.h b/net/hsr/hsr_main.h
+index 23850b16d1ea..ab1f8d35d9dc 100644
+--- a/net/hsr/hsr_main.h
++++ b/net/hsr/hsr_main.h
+@@ -170,7 +170,8 @@ struct hsr_node;
+ 
+ struct hsr_proto_ops {
+ 	/* format and send supervision frame */
+-	void (*send_sv_frame)(struct hsr_port *port, unsigned long *interval);
++	void (*send_sv_frame)(struct hsr_port *port, unsigned long *interval,
++			      const unsigned char addr[ETH_ALEN]);
+ 	void (*handle_san_frame)(bool san, enum hsr_port_type port,
+ 				 struct hsr_node *node);
+ 	bool (*drop_frame)(struct hsr_frame_info *frame, struct hsr_port *port);
+@@ -197,6 +198,7 @@ struct hsr_priv {
+ 	struct list_head	proxy_node_db;	/* RedBox HSR proxy nodes */
+ 	struct hsr_self_node	__rcu *self_node;	/* MACs of slaves */
+ 	struct timer_list	announce_timer;	/* Supervision frame dispatch */
++	struct timer_list	announce_proxy_timer;
+ 	struct timer_list	prune_timer;
+ 	struct timer_list	prune_proxy_timer;
+ 	int announce_count;
+diff --git a/net/hsr/hsr_netlink.c b/net/hsr/hsr_netlink.c
+index 898f18c6da53..f6ff0b61e08a 100644
+--- a/net/hsr/hsr_netlink.c
++++ b/net/hsr/hsr_netlink.c
+@@ -131,6 +131,7 @@ static void hsr_dellink(struct net_device *dev, struct list_head *head)
+ 	del_timer_sync(&hsr->prune_timer);
+ 	del_timer_sync(&hsr->prune_proxy_timer);
+ 	del_timer_sync(&hsr->announce_timer);
++	timer_delete_sync(&hsr->announce_proxy_timer);
+ 
+ 	hsr_debugfs_term(hsr);
+ 	hsr_del_ports(hsr);
+-- 
+2.20.1
+
 
