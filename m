@@ -1,156 +1,131 @@
-Return-Path: <netdev+bounces-100094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6C428D7D4F
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 10:26:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A9228D7D97
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 10:41:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 040741C21D8B
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 08:26:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC7A91C222CC
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 08:41:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 431C85821A;
-	Mon,  3 Jun 2024 08:26:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DC046EB4A;
+	Mon,  3 Jun 2024 08:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fC2hui4T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S5eK3gvV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8862859B4A
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 08:26:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9823383BE;
+	Mon,  3 Jun 2024 08:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717403172; cv=none; b=sSFpOJtDtckIJVtja+0kwoP58ZU9rckqJUrVTHVgsD96gigMzM/DpjJXyVliMZ3T1wYXJcT1Vz0NHkc6JanZYtGcQJEIRtp7I3GOkuSfGpH7rvaVfIitP2MVe7wN7+FxOTQNvlLBaeJJPWB4P8OoqffOjx6yUzfMqdOucuc7Fl4=
+	t=1717404088; cv=none; b=X0TA16Mb3pbaePZcLULsFrglXndAX31Hc4HK3rNG/W9Wdcu7i5GQrYvAAXLyV/UxWCBjM2IgsjTfSHOv7TCX+TQZRuyh31jVmWOk9rvGLQBGV8gOM4UM4/3WPUv4QBa5WG/36ucXl+S+52okOk85qdm+aHrRSLVh6tRn0cWz5vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717403172; c=relaxed/simple;
-	bh=bSiPANs1zqvcKZQI2zpHQ/6pcDeUisEkCeFQwKMGNtY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=axJyOawNd0syHE18SS/P4ypE4x1ImFYOJ0EkL9OeQ4xbTAzoabOSDwxoOu6B6gkMvIiyVo7iRpvrPlKKe7tyyzcTX4g+iIaYIRPTt8sNq+P8kp4c2NXmFTqtoIrXmGWvovwjaBnpPD8Xp7rlesdIBa+417UlmkwBQuh5B3o5FAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fC2hui4T; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5750a8737e5so15064a12.0
-        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 01:26:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717403169; x=1718007969; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e8dFqRUzN06I6td+1eA8YESyOb42WkNK5puVp1UusMM=;
-        b=fC2hui4T3F52MLqPAbUVUUU0xfxICcCYkISNVk14KUO/WWV6RRs3QJI8aWAAuJ+TCb
-         PRbfKMhCG7Rd3bHxrk6mY4o27b//w+mYyGhsTo8Q5MeTo0MsvY7QYb7vl7sgz24L+/sA
-         VZiRfQPRVlxWp1sLOdGeiwitOUaR0TVVG5cCN1bUWkvRzOekWqLY/T+OV3AkQKMhr5q4
-         h7e9e6MiUf7+dKFcqlsQhLOukCofDzzj/GoQKcLzLTPFaC6fu9Lxf5punwIzMf1zVFyo
-         NcsDRFHsJD65Ty29jjenS6qqpiqO58mUlMGKdLIvWEKbVAqOmOGp+9KEKAot/D4+hki2
-         NSDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717403169; x=1718007969;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=e8dFqRUzN06I6td+1eA8YESyOb42WkNK5puVp1UusMM=;
-        b=a10skdKHoHVih8HcskhpCGNHspeziajUMD81WCUEtOZyGorsmvE6UX7odLjZRGNAqY
-         /ShDb/rlnj3571zg0htJNgHH3EbsQAxbqgOXRm1m45b8wMSG2eFU1EvbUr4Oif9hJuP6
-         N3iLPNuE2BQeIYseNFM3xmOed6HFgGtnv3r3TlfcGCeZPgaR/Y5vcX1Iikcwxmbg0kqY
-         wSls8VDHM2Rfrf+1O0cHQtyrQl5LmedkdLdzzsPDxo6P4CrFkFgO9pF11AI6KpdKJ/zx
-         AwopV/DD6CH0Ngt8gIHEK/DjcKLfQ7Yq4AjOJaGXy58LYJ1kpzylOGO11ukjLGMKakS+
-         lLMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW77d/ixNe7IdNU8JNV29JZhZCEgZwhF/1KD4cgKbRwC7uvLhazaSaR9HikqNKbksN0KM+/QoAqrhSOS4ZUC2amGfoP2wNZ
-X-Gm-Message-State: AOJu0Yxhpky6x0X9//+SZ2S9G2DByB9jevszfyS4Ri+GVNq3FlH0SHjV
-	OpOwxJ6Rh6DBL5sFihYXx+8PxwHiiDp9RE+e37x8JMEnh5Usog1qeq3Ie0wLb73MtZ9vXKGhu+v
-	BqqitZEECIChRucfFmBM6+RbRqIE+Oc9N4Azu
-X-Google-Smtp-Source: AGHT+IGZuDthXbWoFSnEQ7MaNweVS5sD7QeK3KCUOLuZLtw+fgjft1YjRnq0rFgcK1OXGLQN/XyrGOdazbJuRadceCA=
-X-Received: by 2002:a50:ee85:0:b0:57a:22c8:2d3c with SMTP id
- 4fb4d7f45d1cf-57a45f1cde0mr245850a12.0.1717403168431; Mon, 03 Jun 2024
- 01:26:08 -0700 (PDT)
+	s=arc-20240116; t=1717404088; c=relaxed/simple;
+	bh=fKoLx7kOYeVfEWenmuVw+KXEUzR3ArFKL0In9YO3j6Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nNC++AG2gPm8Xh1uXmJ9h1yYSTpb3jNi98c6aVMFZqRfc2hL+ZCO2g28rxEMfWbccffli+yzH7Mm4utaHzPLSu2GNSPlutJA4RFakuvZy/GDWtIfUbk4f4q8RRjuZ8RXumrQs1N4Dw1IfRMJnZh3xf4990Tw61MnA/9jlr+GBu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S5eK3gvV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A961C2BD10;
+	Mon,  3 Jun 2024 08:41:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717404087;
+	bh=fKoLx7kOYeVfEWenmuVw+KXEUzR3ArFKL0In9YO3j6Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=S5eK3gvVgBdd3RmU/4lx4tWmr33Pn0YJBBdp3sp6wDd90SlKHniAGHiuGx9v3A+ZV
+	 x7qP3KRBcOrG1FQLT68MMCjufbbCoJz6q0UxQ7MjVexqjCwcg0nqKuw3+fcMaNe4NE
+	 Etv3Oo/ONlm/huQEH9PW3pVAomVMG5ww1RFneGBG+rw9ZIY4h4Xx7y+MW60niNjfTD
+	 xp7h8KDwe+RVkRc94XRBUOYt3ufp6buIPgk3qPaTgMwuFXEPTEfNMg2XnsN8cwlyAO
+	 A0xKNgYWAuxVaBlrBc5afKzeMR+5vCJ0jnLH2lJtv4ChMKyjwRULBg6E06orXjmJil
+	 0XLHupbgFxm2Q==
+Date: Mon, 3 Jun 2024 11:41:22 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: linux-hardening@vger.kernel.org, netdev@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, Colin Ian King <colin.i.king@gmail.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Kees Cook <keescook@chromium.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Long Li <longli@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH net-next v3] net: mana: Allow variable size indirection
+ table
+Message-ID: <20240603084122.GK3884@unreal>
+References: <1717169861-15825-1-git-send-email-shradhagupta@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240529111844.13330-1-petrm@nvidia.com> <20240529111844.13330-3-petrm@nvidia.com>
- <CANn89iL8P68pHvCKy242Z6ggWsceK4_TWMr7OakS3guRok=_gw@mail.gmail.com> <875xuqiivg.fsf@toke.dk>
-In-Reply-To: <875xuqiivg.fsf@toke.dk>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 3 Jun 2024 10:25:54 +0200
-Message-ID: <CANn89iJ5UzQGBMNvZJqknuTCn13Ov4pXp7Rr+pq0G+BkJ53g7Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/4] net: ipv4: Add a sysctl to set multipath
- hash seed
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Ido Schimmel <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	linux-doc@vger.kernel.org, Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1717169861-15825-1-git-send-email-shradhagupta@linux.microsoft.com>
 
-On Mon, Jun 3, 2024 at 9:30=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <to=
-ke@redhat.com> wrote:
->
-> Eric Dumazet <edumazet@google.com> writes:
->
-> > On Wed, May 29, 2024 at 1:21=E2=80=AFPM Petr Machata <petrm@nvidia.com>=
- wrote:
-> >>
-> >> When calculating hashes for the purpose of multipath forwarding, both =
-IPv4
-> >> and IPv6 code currently fall back on flow_hash_from_keys(). That uses =
-a
-> >> randomly-generated seed. That's a fine choice by default, but unfortun=
-ately
-> >> some deployments may need a tighter control over the seed used.
-> >>
-> >> In this patch, make the seed configurable by adding a new sysctl key,
-> >> net.ipv4.fib_multipath_hash_seed to control the seed. This seed is use=
-d
-> >> specifically for multipath forwarding and not for the other concerns t=
-hat
-> >> flow_hash_from_keys() is used for, such as queue selection. Expose the=
- knob
-> >> as sysctl because other such settings, such as headers to hash, are al=
-so
-> >> handled that way. Like those, the multipath hash seed is a per-netns
-> >> variable.
-> >>
-> >> Despite being placed in the net.ipv4 namespace, the multipath seed sys=
-ctl
-> >> is used for both IPv4 and IPv6, similarly to e.g. a number of TCP
-> >> variables.
-> >>
-> > ...
-> >
-> >> +       rtnl_lock();
-> >> +       old =3D rcu_replace_pointer_rtnl(net->ipv4.sysctl_fib_multipat=
-h_hash_seed,
-> >> +                                      mphs);
-> >> +       rtnl_unlock();
-> >> +
-> >
-> > In case you keep RCU for the next version, please do not use rtnl_lock(=
-) here.
-> >
-> > A simple xchg() will work just fine.
-> >
-> > old =3D xchg((__force struct struct sysctl_fib_multipath_hash_seed
-> > **)&net->ipv4.sysctl_fib_multipath_hash_seed,
-> >                  mphs);
->
-> We added a macro to do this kind of thing without triggering any of the
-> RCU type linter warnings, in:
->
-> 76c8eaafe4f0 ("rcu: Create an unrcu_pointer() to remove __rcu from a poin=
-ter")
->
-> So as an alternative to open-coding the cast, something like this could
-> work - I guess it's mostly a matter of taste:
->
-> old =3D unrcu_pointer(xchg(&net->ipv4.sysctl_fib_multipath_hash_seed, RCU=
-_INITIALIZER(mphs)));
+On Fri, May 31, 2024 at 08:37:41AM -0700, Shradha Gupta wrote:
+> Allow variable size indirection table allocation in MANA instead
+> of using a constant value MANA_INDIRECT_TABLE_SIZE.
+> The size is now derived from the MANA_QUERY_VPORT_CONFIG and the
+> indirection table is allocated dynamically.
+> 
+> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> Reviewed-by: Dexuan Cui <decui@microsoft.com>
+> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> ---
+>  Changes in v3:
+>  * Fixed the memory leak(save_table) in mana_set_rxfh()
+> 
+>  Changes in v2:
+>  * Rebased to latest net-next tree
+>  * Rearranged cleanup code in mana_probe_port to avoid extra operations
+> ---
+>  drivers/infiniband/hw/mana/qp.c               | 10 +--
+>  drivers/net/ethernet/microsoft/mana/mana_en.c | 68 ++++++++++++++++---
+>  .../ethernet/microsoft/mana/mana_ethtool.c    | 27 +++++---
+>  include/net/mana/gdma.h                       |  4 +-
+>  include/net/mana/mana.h                       |  9 +--
+>  5 files changed, 89 insertions(+), 29 deletions(-)
 
-Good to know, thanks.
+<...>
 
-Not sure why __kernel qualifier has been put there.
+> +free_indir:
+> +	apc->indir_table_sz = 0;
+> +	kfree(apc->indir_table);
+> +	apc->indir_table = NULL;
+> +	kfree(apc->rxobj_table);
+> +	apc->rxobj_table = NULL;
+>  reset_apc:
+>  	kfree(apc->rxqs);
+>  	apc->rxqs = NULL;
+> @@ -2897,6 +2936,7 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+>  {
+
+<...>
+
+> @@ -2931,6 +2972,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+>  		}
+>  
+>  		unregister_netdevice(ndev);
+> +		apc->indir_table_sz = 0;
+> +		kfree(apc->indir_table);
+> +		apc->indir_table = NULL;
+> +		kfree(apc->rxobj_table);
+> +		apc->rxobj_table = NULL;
+
+Why do you need to NULLify here? Will apc is going to be accessible
+after call to mana_remove? or port probe failure?
+
+Thanks
 
