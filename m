@@ -1,44 +1,45 @@
-Return-Path: <netdev+bounces-100040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3607E8D7A44
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 05:00:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E0418D7A4C
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 05:01:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E07C81F214C6
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 03:00:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17407B20BC0
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 03:01:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C755B652;
-	Mon,  3 Jun 2024 03:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C8EBB651;
+	Mon,  3 Jun 2024 03:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="slv8mh6v"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="YkrokYDI"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A92763BF;
-	Mon,  3 Jun 2024 03:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCED022094;
+	Mon,  3 Jun 2024 03:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717383632; cv=none; b=sbn59H+6ObI9Yczn/xUGAgsSHbymrUGoBfVmXx1asOHAaYD8vSOIk1Xu77hCocqDY842MjGP7uGgGva91qquW55Gyg9Bi0yimHqGpv417Sn5QcPHWpVI9HZnIbFNcqO5gfbscci0HrW7KBvdBgwFHqp/SThIDREeK4KuCcqGNVE=
+	t=1717383638; cv=none; b=j9wE8ZPPjmGUkJsBnaY+sRBTMbYBD8DBDJeIcfTatX1BvEYr8cc5duonTTsuxrsbyb7SdyWeMldBugWg0dnV/ic02Xo11hn+O/lbnpULKtH++Oa0Uz4vdJSbwv7U/YACxORiiGESLw/5reXbRQz9z+eEmkE34xXjCCl9wJQ1QXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717383632; c=relaxed/simple;
-	bh=WOnj/IcDSlueB+vGPyyHInzYUvdCXbpgHFU/T6yMTZ4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=b4WydivLk3Whf6lEPSqKmCfhDjQEZE06yzt7i6adWIwd97aK8hOaUhfc0L+k4+Yyf01jM6pE6MFtzykoiDKSmrDvz6pRYnmwEy+/k7rp1eErjRcqAU/tFb4wlD6NXpCLqgk1oPUJUW8edof0yVgtBoL4FMzAvMe9lBi1TOWbiHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=slv8mh6v; arc=none smtp.client-ip=115.124.30.110
+	s=arc-20240116; t=1717383638; c=relaxed/simple;
+	bh=BawHqwpXofuidHEmqHFcxPwnvzTtkFYocQ8WEg8HeOI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ov+fP/luGH5EazWMvbRQNYqbjanKpCDhjyqtlVLxNADKWX2hko8ngjSWCVwEHhNlRTto/Bj1QRdzknXTbZk1vmBG8pN2PzuvtfDauHAqebJF2SQn5HBJfdTPq3CUUD4MlvbEWgo/ZTRZgOOSQRXw3wE55f/0ZQuOwN2gJSy6IN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=YkrokYDI; arc=none smtp.client-ip=115.124.30.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1717383626; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=MbSoVs/ilZxke123ltmytiq9A1aRCmuP5A2IBJuRxqQ=;
-	b=slv8mh6v/bMnvShQGR4LVxAJOdvXUfsgDh+iFvehyneuyi3mNZ9flMom9i3MkJvv3tm97MJPrdeTojqo/73akA6J/5Cr9VGcISoHAYkTCqSaWgWWrmTiq/+WUUPHB2+W0FyJ2dYiGb9dusZ2NQEe9e9uKxWVCo1yc+1YmBblJQo=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R861e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W7gQbTd_1717383625;
-Received: from localhost.localdomain(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0W7gQbTd_1717383625)
+	t=1717383627; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=xDBiGtmUEsT7+M0SWdnNsuru+On4RVk8moCAN4HJcGA=;
+	b=YkrokYDIgFKvn9pzqStmqlQVnQ/V46d3fmC49gqfFiBcBgcNMleTXuabqDg66x4JTmmlIaxnRmG60+yKMVeQMkrJ7KUuQAYe8V+xYBL1GWBMcAEK6UKZJY8s4lC65+3mr+FfH7mYFwUJZiPJTDTax8HKPXdfeA0e2iIkbMn5eUU=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032014031;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W7gQbUD_1717383626;
+Received: from localhost.localdomain(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0W7gQbUD_1717383626)
           by smtp.aliyun-inc.com;
-          Mon, 03 Jun 2024 11:00:26 +0800
+          Mon, 03 Jun 2024 11:00:27 +0800
 From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
 To: wenjia@linux.ibm.com,
 	jaka@linux.ibm.com,
@@ -53,10 +54,12 @@ Cc: kgraul@linux.ibm.com,
 	linux-s390@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 0/2] net/smc: Change the upper boundary of SMC-R's snd_buf and rcv_buf to 512MB
-Date: Mon,  3 Jun 2024 11:00:17 +0800
-Message-Id: <20240603030019.91346-1-guangguan.wang@linux.alibaba.com>
+Subject: [PATCH net-next v2 1/2] net/smc: set rmb's SG_MAX_SINGLE_ALLOC limitation only when CONFIG_ARCH_NO_SG_CHAIN is defined
+Date: Mon,  3 Jun 2024 11:00:18 +0800
+Message-Id: <20240603030019.91346-2-guangguan.wang@linux.alibaba.com>
 X-Mailer: git-send-email 2.24.3 (Apple Git-128)
+In-Reply-To: <20240603030019.91346-1-guangguan.wang@linux.alibaba.com>
+References: <20240603030019.91346-1-guangguan.wang@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,39 +68,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-SMCR_RMBE_SIZES is the upper boundary of SMC-R's snd_buf and rcv_buf.
-The maximum bytes of snd_buf and rcv_buf can be calculated by 2^SMCR_
-RMBE_SIZES * 16KB. SMCR_RMBE_SIZES = 5 means the upper boundary is 512KB.
-TCP's snd_buf and rcv_buf max size is configured by net.ipv4.tcp_w/rmem[2]
-whose default value is 4MB or 6MB, is much larger than SMC-R's upper
-boundary.
+SG_MAX_SINGLE_ALLOC is used to limit maximum number of entries that
+will be allocated in one piece of scatterlist. When the entries of
+scatterlist exceeds SG_MAX_SINGLE_ALLOC, sg chain will be used. From
+commit 7c703e54cc71 ("arch: switch the default on ARCH_HAS_SG_CHAIN"),
+we can know that the macro CONFIG_ARCH_NO_SG_CHAIN is used to identify
+whether sg chain is supported. So, SMC-R's rmb buffer should be limited
+by SG_MAX_SINGLE_ALLOC only when the macro CONFIG_ARCH_NO_SG_CHAIN is
+defined.
 
-In some scenarios, such as Recommendation System, the communication
-pattern is mainly large size send/recv, where the size of snd_buf and
-rcv_buf greatly affects performance. Due to the upper boundary
-disadvantage, SMC-R performs poor than TCP in those scenarios. So it
-is time to enlarge the upper boundary size of SMC-R's snd_buf and rcv_buf,
-so that the SMC-R's snd_buf and rcv_buf can be configured to larger size
-for performance gain in such scenarios.
+Fixes: a3fe3d01bd0d ("net/smc: introduce sg-logic for RMBs")
+Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+Co-developed-by: Wen Gu <guwen@linux.alibaba.com>
+Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+---
+ net/smc/smc_core.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-The SMC-R rcv_buf's size will be transferred to peer by the field
-rmbe_size in clc accept and confirm message. The length of the field
-rmbe_size is four bits, which means the maximum value of SMCR_RMBE_SIZES
-is 15. In case of frequently adjusting the value of SMCR_RMBE_SIZES
-in different scenarios, set the value of SMCR_RMBE_SIZES to the maximum
-value 15, which means the upper boundary of SMC-R's snd_buf and rcv_buf
-is 512MB. As the real memory usage is determined by the value of
-net.smc.w/rmem, not by the upper boundary, set the value of SMCR_RMBE_SIZES
-to the maximum value has no side affects.
-
-Guangguan Wang (2):
-  net/smc: set rmb's SG_MAX_SINGLE_ALLOC limitation only when
-    CONFIG_ARCH_NO_SG_CHAIN is defined
-  net/smc: change SMCR_RMBE_SIZES from 5 to 15
-
- net/smc/smc_core.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
+diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
+index fafdb97adfad..acca3b1a068f 100644
+--- a/net/smc/smc_core.c
++++ b/net/smc/smc_core.c
+@@ -2015,7 +2015,6 @@ int smc_conn_create(struct smc_sock *smc, struct smc_init_info *ini)
+  */
+ static u8 smc_compress_bufsize(int size, bool is_smcd, bool is_rmb)
+ {
+-	const unsigned int max_scat = SG_MAX_SINGLE_ALLOC * PAGE_SIZE;
+ 	u8 compressed;
+ 
+ 	if (size <= SMC_BUF_MIN_SIZE)
+@@ -2025,9 +2024,11 @@ static u8 smc_compress_bufsize(int size, bool is_smcd, bool is_rmb)
+ 	compressed = min_t(u8, ilog2(size) + 1,
+ 			   is_smcd ? SMCD_DMBE_SIZES : SMCR_RMBE_SIZES);
+ 
++#ifdef CONFIG_ARCH_NO_SG_CHAIN
+ 	if (!is_smcd && is_rmb)
+ 		/* RMBs are backed by & limited to max size of scatterlists */
+-		compressed = min_t(u8, compressed, ilog2(max_scat >> 14));
++		compressed = min_t(u8, compressed, ilog2((SG_MAX_SINGLE_ALLOC * PAGE_SIZE) >> 14));
++#endif
+ 
+ 	return compressed;
+ }
 -- 
 2.24.3 (Apple Git-128)
 
