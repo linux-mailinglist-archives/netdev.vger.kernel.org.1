@@ -1,218 +1,204 @@
-Return-Path: <netdev+bounces-100293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16EF98D868C
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 17:54:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C50BD8D86CB
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 17:59:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83FE11F25B88
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 15:53:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 018471C21656
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 15:59:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E27136653;
-	Mon,  3 Jun 2024 15:53:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hnQdhHdK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873DA133291;
+	Mon,  3 Jun 2024 15:59:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2068.outbound.protection.outlook.com [40.107.220.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D25132124;
-	Mon,  3 Jun 2024 15:53:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717430017; cv=fail; b=HyGZ1nwX+e/WlPmYU0sIHo04fJPYTRnabg05NfKNAV6yCbh6Q3PR+ILXsRyZQZHliyyZO2T5AWrHPj7/hoxB4qSSAOa8LtBoGY+sa49IeiMmuxN1Y4cdWlT9mYoHWegPx5dv6TO9tLfhlDQE/BjH2pUVBpJwrDpvmRsxKEDXIBA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717430017; c=relaxed/simple;
-	bh=8OD2Hfx/2G14AFgglBk1QAzWsKVoply2tS4MrhiZpkU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jvnRkTdVchFg0J3YU4Xtjd/cltMmSp9PYcadtAeS3aL69lCwQUZNW4EBK/RBQDEZvKIQCI+rnuGltHj1i6y25Nv1BtIImRGHm3DORo0xn1NGTEerjfRx6/XJD2vjJYeZkkz6IHQnORL5js0FCZ33tIe35bc2h330GNJBDZXvQKM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hnQdhHdK; arc=fail smtp.client-ip=40.107.220.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IVqPlOxP5f13fl+dwbu6Ro32C98W0v+cSlCr+pW88CJ4b2WK3nvgd2JU2A7NRtFWEG7zzjCbEXnWbjm01Doi6p84qMkd7TaLA584sc4xtxn55CrSJCxmemHZl/+05t1TgVEQhW3WBywmdGgrydxHVyVtmNN1q6hECYMnrJ026PuXjLUy8ODF/yU5c/uibu18xv4W93UWZgCrTyBzL7DmPBGFV9U881QdYjBwPWbFTJCmwiPxsNpi7vXC8ayhCOe55VZp8NmDqzbZWKn2bsZPhLce6yzpiY364Z4LzkuRGqfBQFTNIVgp+Nwk7V8mPBVrsAvioyGkHRKq43Bkqs0RCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eCI4chK7kbXXkpq7Y0mXZ5pHELGxM+ZuWnWxVCW7XP8=;
- b=OqzQ/xnveD/cEx1OFtAfUuX9PkEJiJCqdDsVrFLY4w2S++058lC0MdNd+hq2Q3HiALqZWg1oqHEIdWXCe0DPr7yosGJP2UvjtvByY/ufQa0ZwhuqcA6P5gPzvmXyy6T7KW4hHPI4/BiIKAD+GxYqGCFKAnw/ZnlCeRke1xRm+wzHhhU67qyL1uc4EgfCzO9gpCuQXH8wxVz0Z+YrFUek04LPHVd80jBN0AAHWeCAxb7abX1bK/9xT53DGmmrRHXpS6L65wNdPRNyK5uYicIfoqyU8a24DY1vaE/5OL95rNKL+xbVPHmnHjks06LihxSCEbrgEvsvleZzD6TUeBi6yQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eCI4chK7kbXXkpq7Y0mXZ5pHELGxM+ZuWnWxVCW7XP8=;
- b=hnQdhHdK2/aZBRnfJ3fEpNpyIhuQMOmvYOCj1ulPTazgu7XkkdJ9mN9ij7ycqsJHI98OJgKPSiLb0fAF5m4fqpPj2xgc12Ete4kGkChaAHWaEb+SUUN2PxmyOlJ7QRvB7+2RdBg60Opz+CD2hY/KMs97wnif2QiQ0Wui4qrjErM5U0rBKaud0IZsPbyt/UbCdvshfdJ5oez1k/zxPCl1SNaSQhpKzLZnzAXil51e7lN1SvK14Bo/ztCx15cLBjL1re34+PvwXJDy6mc46bBmloh1LEUZ4T8OBV6/FK8qrT+pGebqQrvwjC+IGQpPNGDGw0ev7SdX3rX+enLNORy3Ig==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by MN0PR12MB6197.namprd12.prod.outlook.com (2603:10b6:208:3c6::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.21; Mon, 3 Jun
- 2024 15:53:28 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e%4]) with mapi id 15.20.7633.021; Mon, 3 Jun 2024
- 15:53:28 +0000
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Jonathan Corbet <corbet@lwn.net>,
-	Itay Avraham <itayavr@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Leon Romanovsky <leon@kernel.org>,
-	linux-doc@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>
-Cc: Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	David Ahern <dsahern@kernel.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Jiri Pirko <jiri@nvidia.com>,
-	Leonid Bloch <lbloch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	linux-cxl@vger.kernel.org,
-	patches@lists.linux.dev
-Subject: [PATCH 8/8] mlx5: Create an auxiliary device for fwctl_mlx5
-Date: Mon,  3 Jun 2024 12:53:24 -0300
-Message-ID: <8-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
-In-Reply-To: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
-References:
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: YT4PR01CA0132.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:d5::22) To DM6PR12MB3849.namprd12.prod.outlook.com
- (2603:10b6:5:1c7::26)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3489132126
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 15:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717430363; cv=none; b=aQzdbnqWtVi8CcrOjSC0ET4AM3eN/dmuG6OvjErpU0UQdWXDG79Ps1oKCYyzeHlSyf/LBcyY+hH2OMaA4lo+II3x9kSjgWQhha96SzqMfNN6euNk7FMKg/Uzmo07Xw/JcDAqpKMjO+KZ2kzicHb1mbXDohwecC00ervKb9QL0cA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717430363; c=relaxed/simple;
+	bh=ZS8XNDDIwqbPQNlOt0M8zUcP5ClXieEXFN6pdZB3NGE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=HrRcw+GlZMgnEmhw11t/xs9Jb3kJdUVQGnqZDlTud5TC6PP4dGilBK+tVslU6mwp23YLsTCDTUJMNBqLAVYBJFoFLFShD0opU4mMwl+zEroDU1ehgzcVM0DAs/aLjEguVY5CXEaG7w/DVwwTPlr6SFkTFfTr7rPB4iZBTz+YseQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-7e8e2ea7b4bso605117139f.0
+        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 08:59:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717430361; x=1718035161;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rOknuMVBkACSavYBD9q8M++Rf/C5mn6knDTAqar4USA=;
+        b=Hy8zk1ZG5scBQbHqH/mbmHw8DC+gSjHXjV3IKdLpRWidhV8Oy25TIEtRKECCPxbXlj
+         iLor20UYP1JUhZqU3DemBjSNJ5XbcOpBOWB1pHNqUKcPi8HZVVr06to8rUcQJeTD1abt
+         mlvoO7nnSzdryzktnEpYZ5jM0Adm+LKy2ljTQKF6hPQozZo7uIW8t2dewq2zdseEsJXA
+         fPjmwucztMVlZ1bq+CrLMWzyq7O/lh+X3OYRJfzdxiINwFxiZ5UUKjKXdihk90ApfpYx
+         B6YF1Y9nr3B42AlLPERAg/UIs0FmqnqCdn+P6ICBq05Nk9762v7IgM9BUZ8BqMUMm6mr
+         SDKg==
+X-Forwarded-Encrypted: i=1; AJvYcCVjDHAlFdMUJj+qwA/9X//ceWpvFNfOLty8XPav3OHXGxFHKbSicx9VGw6tvanKZvXmAmcKZdEj5bOqBdmAU80YJu+k9fBX
+X-Gm-Message-State: AOJu0YwH8l5YeiS+6Nw1BXnKZLnDO8JNmi57qAiuJVmnXUI+nsq8H6sz
+	LCdKwTrk8sUp1XpHCS5MMWzPVxzXbwUUHl7Zob5MRvsFZ5w0ADITl1z4mh1ilK4fr3YzGqfg8bZ
+	Ddy7LojENAcMWY+D6UKrPFmvPi9wQ6HztXB9x5gyvoEE+bZB5yH4W7T4=
+X-Google-Smtp-Source: AGHT+IGrseyfw7x6vaspKxO0tzZ7g3R4HV8zpSbRtzpepiBtuepTOnVDnPO6UtAowck+qrCh1gb8dkwnx2txh8QCaWrp+RXw6d60
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|MN0PR12MB6197:EE_
-X-MS-Office365-Filtering-Correlation-Id: caa30098-1afe-4d44-39db-08dc83e54edf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|1800799015|7416005|366007|376005|921011;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?VMgqRTUyGMR98NSXW40ZtN3QbjJLZo7IcJ2Go4ySeMQ6iXiuFbCYKV2OpXhI?=
- =?us-ascii?Q?svoimvyjgD05uyCqE1o66Cyg4H7aP+QImh7vEYjpVrZsJxsD+DBsaZq1aMfw?=
- =?us-ascii?Q?3AYkTzAAflAbtjjQ6qoDshocbs+RKNnbyIAk69OV15Rk1aY13EwOXU4dNYfX?=
- =?us-ascii?Q?2Wfh8DO8E2lme+v2RrGrOSkre7CsD6X+laFCiZPp4ZQREJm9O3lZUg9nzMBy?=
- =?us-ascii?Q?7OYIR2o14rc9dZfuXLkRQg4UT888izSCNxx3rEdyApXVCOk+RQijTYCakw5l?=
- =?us-ascii?Q?zKdkWfGPY8u5/v8bs70ioxM8BzyHjb+NlrFn1Tc6V/LIq/WL2C2/XVlUJUdu?=
- =?us-ascii?Q?JPaKMRUL9ALCQAfzYeU+mxhNIkUGP1GQjGdgm3OeRgkyHq0WfhCYwRMnQ4yp?=
- =?us-ascii?Q?F/fPwFZ7ptmj2AA0URLm/a/nAvptcdszxY1jGbXeLbedF8XCceh6+WEB/TBx?=
- =?us-ascii?Q?V79e5slPuU473W7r1mI6EJL/UCukrMQtI1rbqrYRtCLf4962mT6Xa5aoBHWD?=
- =?us-ascii?Q?6r7TWj5DqGMM0/dkSqp9/azL1Pu/OYmMch9UxZ3NMu22/yjRcBizhpBJU5JY?=
- =?us-ascii?Q?D7Tt7P1n9SAP5viEVhFytDit34XNsw+RwPXUitm/tfQnDv7o9bjFQbNncbu4?=
- =?us-ascii?Q?bH6Wua5O2WwUyMDDmHGmCWpaBP8AeWoVUZzQmwh5eBZnBLR3VsgyOK1k9Vfq?=
- =?us-ascii?Q?KlO0yA9d6cHAyT4K9zTofjhSGZjOE2w3eS70b9AKdPc0HOQgSH2FGEL6YcSD?=
- =?us-ascii?Q?yVg9PnG2XxjlH5R1FBjyqQxTl8HN+SBAuT/5PwIRDWAv9YcVLur2zJ5Xhnkb?=
- =?us-ascii?Q?VVjbVdQSZKKSfKQdzQZT2iaV2EaX8THhVwzh23Mmr5yxQNLX4S2R+OLjRFrq?=
- =?us-ascii?Q?nlXPRmFgi22MrXpqGEDmEHL/2Po+WZFHzpk+KX+UOZ0KIVKpb0dfpK7xd7s4?=
- =?us-ascii?Q?jFTv6G0QfVHWA8YtXSoGKyvs2K1H3P0jv2PMsVeKOhxRrE9qAIjpZl1Odn1v?=
- =?us-ascii?Q?X+nkm0itJp5UrYVym853KuUutEX1ZMaWLT6Zhgqp9M6SYvFTAVHjeK0qVZs8?=
- =?us-ascii?Q?I2eAdXlRdo01+Tia8g6BdKJUCayI1opG1nRTHmKhgJw+03wtuTodk68Wes7+?=
- =?us-ascii?Q?BzdgXEYHLWW4Oo0E8dJQrxdB4o4aV/aAXmsDilJ4nDOHY7WP92kbzXWRIqQB?=
- =?us-ascii?Q?uRI/Ht2tEpkizdF4Wl1vdkq7GZJ83g1NkPcgJ2s6kCbdSHoO8+477yb+sqkh?=
- =?us-ascii?Q?CKL3S2K57Tr6j93DgphhtV9viMn/dCf/i5vVE35r2eaHF3+5h3Ind2jtlVKt?=
- =?us-ascii?Q?FoBcbY7rQ5XuChwmY0jZuU/u?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(366007)(376005)(921011);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?WCCcGwGYT7RZJ9C2vHsHOYK/fJ132pdSsREKbLfI2uIxDJyxOyQN/i1pPqsJ?=
- =?us-ascii?Q?YrDnCfSRTk1+4ItXPKMn/0GKAWOJTkRJDcXuBdZxMQHzUIFHJIxkUs4cN1AD?=
- =?us-ascii?Q?cojf3uF0u/lwzGUETxsgul+LUZ0GaLvQVEMg/X5aYNhfvE+yqnsUNQ4tHv1y?=
- =?us-ascii?Q?ZoWvMRCg7/CrqH6N7mDMRofpc9fpOK34UZLq/81aHvShNrEoAj27sFu/TnZZ?=
- =?us-ascii?Q?whkg51GOlrqH6R5821aXVin8Cmolbrf+f9xYjpe3j6HVezr4R28uTIH43pNn?=
- =?us-ascii?Q?Z4g3TaWC1VS0TXPZbFfJoZhYwTglZ97oEeZzbl2bO7JuHALbA+KEfQbTm21T?=
- =?us-ascii?Q?4EKWqraz7RktVCjy4py9oiFHehaZRf0jmj4OQ9kL/0GWIdQEJW8MI8hcWuQK?=
- =?us-ascii?Q?c4djxCWTPvHsTbWXaP2N/VvUEhsOwtvtDCGqTRkx3IljOFfec0eq4JbFBuff?=
- =?us-ascii?Q?zxIxS5163anQgKFuQ7J2SHnbrpXuVS2svH0YyL+CHq7wY3HAxUE0/1TRr2l1?=
- =?us-ascii?Q?HbJx/Df3Py/OYocJNJZPYYVVSAVbyTt2kU6t0a/5Uf2VhXGtfvnjHCrC3WHP?=
- =?us-ascii?Q?v1wWyDRwTonIJFhoqzFFtIf08uaS7e6NMhyLm5cYvjJwKXBnBhzJCqEWfdZv?=
- =?us-ascii?Q?1/jAlXIHHsIXwWRvWqelPu0Rd+C7y+17VPp1gXKf4WPlexrf8KaHPjNV/X+I?=
- =?us-ascii?Q?ydQbEw6VpfimErM0JByxbwWBgyCat7YLzc2C3O9sYC9/Pw5ENvNyDdRpm1lv?=
- =?us-ascii?Q?3x02zr7peF3AeaZNS89U0ncWeRFDoj46Q38ywencxCL2xAGabS96iovm+eL2?=
- =?us-ascii?Q?9K87gC9Mohq+QMfg3XAqClebK0GNnkSi4cPaQmm01qhQVFgde1CNdZiTOLqH?=
- =?us-ascii?Q?675soQaq0pDKXkL2A399vJDjtvJpdlmgUx5LJZd6vL+RgzVPZHPCVSLeYDSX?=
- =?us-ascii?Q?IVPGMz5A0CqihKgoMmTQICCQEE2+Nodte0lbrngUFBN+HZhGy7muGK7Z0nDq?=
- =?us-ascii?Q?sJtVUbjZqgzGphgoyLldVXF0uK14cjPDHURifKwbdJiRQNpkybqgEe43h96T?=
- =?us-ascii?Q?qMiZPOr57ckzG3BxDSKd0qx99kkA72/Nhw09A5A4eqSW/sb9SKN9879pHiVs?=
- =?us-ascii?Q?+kDT/YVWEwlb/ObcmiAIsczj6Ca+Wv4Ae2pMWlUIHCsng55bNjxzJLMV7SsJ?=
- =?us-ascii?Q?QqzwaZ/xOYJ3fTrbNbN6yzs/HIPvTIfx1MrLtCS5XrDdvzQEN/fHkcw42ZXh?=
- =?us-ascii?Q?/3G1XwqCzMb3yBmnwV5Mx84pikGSR5hmG6OaCcZR/4jubSO3i5PPqz64aK5f?=
- =?us-ascii?Q?pZOwxXuXS2yuvwlwJAAFgpM7s7uGSaLU+CAOCQJiAtQPADbHttsEzDFi6We6?=
- =?us-ascii?Q?zBN2QnCLiVy/PlZez5Oit8MtPmzcPDu1er3lBjy9QKhs5n1xK822nKjkINFx?=
- =?us-ascii?Q?rBU05eWDv5LM6Jw367SGcbSB7KG6OwYuSldhSUrsTBcMkeKc11Eu8x/TNpwi?=
- =?us-ascii?Q?LvhICW4EWqeA363ZSPKo/mudGP5mbR7LpXHwlBaVPo8g4CTWEFEZMyYLiW6f?=
- =?us-ascii?Q?+F53lK+zCsfuRZAzMTYI+CL8W9iT97WW97Wer2nF?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: caa30098-1afe-4d44-39db-08dc83e54edf
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2024 15:53:27.4995
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2k9YKqF/oop0NEkdguYs28VumxJonegN0Z5CiEUzlUlQE79VoUzXXaZjCa5vjgZ0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6197
+X-Received: by 2002:a05:6602:6d0b:b0:7de:d6a0:d9c4 with SMTP id
+ ca18e2360f4ac-7eafff3deecmr69850139f.2.1717430360954; Mon, 03 Jun 2024
+ 08:59:20 -0700 (PDT)
+Date: Mon, 03 Jun 2024 08:59:20 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009767ec0619fe6a1d@google.com>
+Subject: [syzbot] [net?] UBSAN: array-index-out-of-bounds in
+ llc_conn_state_process (2)
+From: syzbot <syzbot+628f93722c08dc5aabe0@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+Hello,
 
-If the device supports User Context then it can support fwctl. Create an
-auxiliary device to allow fwctl to bind to it.
+syzbot found the following issue on:
 
-Create a sysfs like:
+HEAD commit:    6d7ddd805123 Merge tag 'soc-fixes-6.9-3' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12596604980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7144b4fe7fbf5900
+dashboard link: https://syzkaller.appspot.com/bug?extid=628f93722c08dc5aabe0
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-$ ls /sys/devices/pci0000:00/0000:00:0a.0/mlx5_core.fwctl.0/driver -l
-lrwxrwxrwx 1 root root 0 Apr 25 19:46 /sys/devices/pci0000:00/0000:00:0a.0/mlx5_core.fwctl.0/driver -> ../../../../bus/auxiliary/drivers/mlx5_fwctl.mlx5_fwctl
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/4d60cb47fbb1/disk-6d7ddd80.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f3ff90de7db5/vmlinux-6d7ddd80.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d452970444cd/bzImage-6d7ddd80.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+628f93722c08dc5aabe0@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+UBSAN: array-index-out-of-bounds in net/llc/llc_conn.c:694:24
+index -1 is out of range for type 'int [12][5]'
+CPU: 0 PID: 15346 Comm: syz-executor.4 Not tainted 6.9.0-rc7-syzkaller-00023-g6d7ddd805123 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:114
+ ubsan_epilogue lib/ubsan.c:231 [inline]
+ __ubsan_handle_out_of_bounds+0x110/0x150 lib/ubsan.c:429
+ llc_find_offset net/llc/llc_conn.c:694 [inline]
+ llc_qualify_conn_ev net/llc/llc_conn.c:401 [inline]
+ llc_conn_service net/llc/llc_conn.c:366 [inline]
+ llc_conn_state_process+0x1381/0x14e0 net/llc/llc_conn.c:72
+ llc_process_tmr_ev net/llc/llc_c_ac.c:1445 [inline]
+ llc_conn_tmr_common_cb+0x450/0x8e0 net/llc/llc_c_ac.c:1331
+ call_timer_fn+0x1a0/0x610 kernel/time/timer.c:1793
+ expire_timers kernel/time/timer.c:1844 [inline]
+ __run_timers+0x74b/0xaf0 kernel/time/timer.c:2418
+ __run_timer_base kernel/time/timer.c:2429 [inline]
+ __run_timer_base kernel/time/timer.c:2422 [inline]
+ run_timer_base+0x111/0x190 kernel/time/timer.c:2438
+ run_timer_softirq+0x1a/0x40 kernel/time/timer.c:2448
+ handle_softirqs+0x216/0x8f0 kernel/softirq.c:554
+ __do_softirq kernel/softirq.c:588 [inline]
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu kernel/softirq.c:637 [inline]
+ irq_exit_rcu+0xbb/0x120 kernel/softirq.c:649
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+ sysvec_apic_timer_interrupt+0x95/0xb0 arch/x86/kernel/apic/apic.c:1043
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:lock_acquire+0x1f2/0x560 kernel/locking/lockdep.c:5722
+Code: c1 05 0a 93 96 7e 83 f8 01 0f 85 ea 02 00 00 9c 58 f6 c4 02 0f 85 d5 02 00 00 48 85 ed 74 01 fb 48 b8 00 00 00 00 00 fc ff df <48> 01 c3 48 c7 03 00 00 00 00 48 c7 43 08 00 00 00 00 48 8b 84 24
+RSP: 0018:ffffc900033df5e0 EFLAGS: 00000206
+RAX: dffffc0000000000 RBX: 1ffff9200067bebe RCX: ffffffff816b01de
+RDX: 0000000000000001 RSI: ffffffff8b0cb100 RDI: ffffffff8b6f57a0
+RBP: 0000000000000200 R08: 0000000000000000 R09: fffffbfff27bba45
+R10: ffffffff93ddd22f R11: 0000000000000000 R12: 0000000000000001
+R13: 0000000000000000 R14: ffff888073a52d80 R15: 0000000000000000
+ __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+ __mutex_lock+0x175/0x9c0 kernel/locking/mutex.c:752
+ __unix_dgram_recvmsg+0x267/0x1000 net/unix/af_unix.c:2426
+ unix_dgram_recvmsg+0xd0/0x110 net/unix/af_unix.c:2531
+ sock_recvmsg_nosec net/socket.c:1046 [inline]
+ ____sys_recvmsg+0x5fe/0x6b0 net/socket.c:2801
+ ___sys_recvmsg+0x115/0x1a0 net/socket.c:2845
+ do_recvmmsg+0x2ba/0x750 net/socket.c:2939
+ __sys_recvmmsg net/socket.c:3018 [inline]
+ __do_sys_recvmmsg net/socket.c:3041 [inline]
+ __se_sys_recvmmsg net/socket.c:3034 [inline]
+ __x64_sys_recvmmsg+0x239/0x290 net/socket.c:3034
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcf/0x260 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f6eefa7dd69
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f6ef08350c8 EFLAGS: 00000246 ORIG_RAX: 000000000000012b
+RAX: ffffffffffffffda RBX: 00007f6eefbac050 RCX: 00007f6eefa7dd69
+RDX: 0000000000010106 RSI: 00000000200000c0 RDI: 0000000000000005
+RBP: 00007f6eefaca49e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000002 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000006e R14: 00007f6eefbac050 R15: 00007ffeec7fdc18
+ </TASK>
+---[ end trace ]---
+----------------
+Code disassembly (best guess):
+   0:	c1 05 0a 93 96 7e 83 	roll   $0x83,0x7e96930a(%rip)        # 0x7e969311
+   7:	f8                   	clc
+   8:	01 0f                	add    %ecx,(%rdi)
+   a:	85 ea                	test   %ebp,%edx
+   c:	02 00                	add    (%rax),%al
+   e:	00 9c 58 f6 c4 02 0f 	add    %bl,0xf02c4f6(%rax,%rbx,2)
+  15:	85 d5                	test   %edx,%ebp
+  17:	02 00                	add    (%rax),%al
+  19:	00 48 85             	add    %cl,-0x7b(%rax)
+  1c:	ed                   	in     (%dx),%eax
+  1d:	74 01                	je     0x20
+  1f:	fb                   	sti
+  20:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  27:	fc ff df
+* 2a:	48 01 c3             	add    %rax,%rbx <-- trapping instruction
+  2d:	48 c7 03 00 00 00 00 	movq   $0x0,(%rbx)
+  34:	48 c7 43 08 00 00 00 	movq   $0x0,0x8(%rbx)
+  3b:	00
+  3c:	48                   	rex.W
+  3d:	8b                   	.byte 0x8b
+  3e:	84                   	.byte 0x84
+  3f:	24                   	.byte 0x24
+
+
 ---
- drivers/net/ethernet/mellanox/mlx5/core/dev.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/dev.c b/drivers/net/ethernet/mellanox/mlx5/core/dev.c
-index 47e7c2639774fd..6781ddb090c475 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/dev.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/dev.c
-@@ -228,8 +228,14 @@ enum {
- 	MLX5_INTERFACE_PROTOCOL_VNET,
- 
- 	MLX5_INTERFACE_PROTOCOL_DPLL,
-+	MLX5_INTERFACE_PROTOCOL_FWCTL,
- };
- 
-+static bool is_fwctl_supported(struct mlx5_core_dev *dev)
-+{
-+	return MLX5_CAP_GEN(dev, uctx_cap);
-+}
-+
- static const struct mlx5_adev_device {
- 	const char *suffix;
- 	bool (*is_supported)(struct mlx5_core_dev *dev);
-@@ -252,6 +258,8 @@ static const struct mlx5_adev_device {
- 					   .is_supported = &is_mp_supported },
- 	[MLX5_INTERFACE_PROTOCOL_DPLL] = { .suffix = "dpll",
- 					   .is_supported = &is_dpll_supported },
-+	[MLX5_INTERFACE_PROTOCOL_FWCTL] = { .suffix = "fwctl",
-+					    .is_supported = &is_fwctl_supported },
- };
- 
- int mlx5_adev_idx_alloc(void)
--- 
-2.45.2
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
