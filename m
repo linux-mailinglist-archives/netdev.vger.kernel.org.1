@@ -1,199 +1,125 @@
-Return-Path: <netdev+bounces-100280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 573E18D864C
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 17:44:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A7BE8D8650
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 17:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B49A41F221EE
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 15:44:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 458232814D8
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 15:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B23ED132123;
-	Mon,  3 Jun 2024 15:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98BAF1E525;
+	Mon,  3 Jun 2024 15:45:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g2pGxbPQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hh+K4zvg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67491311B4
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 15:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08168FBF0
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 15:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717429459; cv=none; b=D1U3rqY/qmtGROhS3Aqzo3FR5zDevNfUzg7vuZJCzKFDlvjGXXlM1DvdEmDBKu60fM3/JArzDzY6a7ek2ZrWbtyWGxN0YX5GniZc8hfa/V1XLXmq4JBIvz49pvM2KUL2au+eVfJuTrSseOK6DsnndWehq2v7sBHNv6EQqjJDPXw=
+	t=1717429509; cv=none; b=LP75IeFGw1elyRcqDqFn/SIC9P4FwxQzFURadpQUHv8FqGgUWZWNVMxfXzqTgPvTGGaQbzNcPE+nLG9+sMX3fNBCJ6Kb0wK4qKYg2bgzn60pH3U5IWFTKjApWZR1YFUeosXnF+Ip6o0nUwaANoj36+v9fByiKCym9ZJ+R23xtcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717429459; c=relaxed/simple;
-	bh=ViCOgp0Yz/a1mBDif8ovCtOgE1SFPQZh2StHW9aA04A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JORE9r5EX7QduvuWzH1GV7S/1j8qKCAjdg1cvogu3G0g8ig/UJmUu9N2Fxplr9SCwUPpYC/TDMeft/uzAd86M9TAp0a/5tkgB1kRppd7H4+SoL07upD2OGJ9P17LbZgTh1S9e1G9oFieewUI3N5v+FtzmTp/o25dc9GDMfXN4Vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g2pGxbPQ; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a68b5f18fc5so251512166b.1
-        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 08:44:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717429455; x=1718034255; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rqJ9wkj5wZpDYGPbIA+rqZwe8IgS9OX1IL+4hKpxPn4=;
-        b=g2pGxbPQ9ZGPb9G9nYOHHhrxTVOtUJfV9458zm88if8hA13aqyLDEJipAGSqvX8TB+
-         FTasRCdH7JHpoINO3WVCONpJheLxEsaNr8Ef1yGDiBNaN2RxJ2Nzl7ihOG9ZAEaFdOK8
-         GfllnyypXe50GRE0mPPo+THrRNvBwWfaWOb29haboSGS4whavBCCiCEYHNIDHW2u3Bj9
-         mcWO3d1uQJfuFBZAa89/mW4CLtQsdh8Cx0waCMTKIdowIlPddY3GDPmhoWU9o7SJrLe7
-         i+0l2jfSFXe46fNY2b0ovBZWKMpvDDMucWgOaO7ZZamsjmtZbL3/zRbXMaKnUCQTMx1t
-         8lGQ==
+	s=arc-20240116; t=1717429509; c=relaxed/simple;
+	bh=ioQ5KF/zbLWQqVR58nqvHdJ5IzIHS0gPNw3Q1ZTT5L8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=FWnTUqRcfezEedsi1ftD1M7Eu4j9HdQ7n42DDmL05YnE0Zb1cO2qObo/JuIZWd0JCQF7m0TnZbhcFjWPdOc5orObwBuD5zRdrT/OS04oKu/rB9HDtAIFvN9vyyR8ik8l+1+CtzJLPktgiaxJ4AkOsEFumReceh0D4h0VUfNU5yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hh+K4zvg; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717429507;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=W7q9OWi35t1/elcXtW2zo9yCoz0EpM2qoyV0Vc5TVeU=;
+	b=hh+K4zvgkJ2fxC8Kd2dOMUk/k0ZzI3+ERHN+65Py1ymKc+5pL9AYdNtrg8+5cC5HzQYr42
+	BAwBYV/pe3FFZQ+ugL7EYSO7UNDlAOb3Z0lSVvbYig1j8LiHs90T4TG7zi39nTn7MYfiCe
+	/TG3OoloeFetHyhq6jfbNORb9L0pkb0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-116-UZrgumqjODSXtVIyPTxCPw-1; Mon, 03 Jun 2024 11:45:05 -0400
+X-MC-Unique: UZrgumqjODSXtVIyPTxCPw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42133136397so3510325e9.1
+        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 08:45:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717429455; x=1718034255;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rqJ9wkj5wZpDYGPbIA+rqZwe8IgS9OX1IL+4hKpxPn4=;
-        b=RtaKw/FI0xrfEkO6Ah/lmnlqjH930m4Y3MhVrqmfEqZPvNxRYdu5dTLFGtUzD7uj14
-         BQaMr8qKhMfTZya4S2cuxV3obRS//8nMyZejMLpbPcI/6HQ01AmJCgOEUHlvSOXXI6Qz
-         5cygYiDO/VEqD0R/nz53B+C8E1MK0AOLUj5K4Fxy3yQz1zKxCrrp/92o39EzvBgKxjTL
-         9oc87WL/CrhffCIaomJ28OCdp7OAueT5EewHG/tgSIO//eXWZwTsJCwf6CLF8hOlybH7
-         MZhSXPhMbtbIT/+Gv4fXI2Wbdn12gxQ/GTR/vJ89+vPqmroTW59vj2MkFCXbVHyYbL3Q
-         c9bA==
-X-Forwarded-Encrypted: i=1; AJvYcCWw9YnWS5s9vLmtSpA7aqCVZmRBbV5b1IGEkfz8MmDkhk8Y2B5kf0Z3N9nuvcFlEPdB0CorJP29aDVcO4EpaMferZiJJFQQ
-X-Gm-Message-State: AOJu0Yzoiop+C1pyl55FnVCOUnh1N0UlTxdnq3lXFn9uf6dVQsyGjoD+
-	osSQ3itepwGoKK45f3NIHUpHM8oLRcgvhLNfjsEVTfQMWGLKZe20obnKzjfl3segCUZ8Uf34Nqn
-	G206/RC+C1sj/BQyvNy2sFAJJow81qf3LZ4wQ
-X-Google-Smtp-Source: AGHT+IEgXEMq7A34vV1MITk1aHrXEuVw+nVV7KMqkaSqRj4HNWxMWt5F6AEA8YGPMHEYOyWRevT8/8awpnNeVecVNuY=
-X-Received: by 2002:a17:907:3f28:b0:a68:5ac4:3aaf with SMTP id
- a640c23a62f3a-a685ac43be7mr699125166b.41.1717429454535; Mon, 03 Jun 2024
- 08:44:14 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1717429504; x=1718034304;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W7q9OWi35t1/elcXtW2zo9yCoz0EpM2qoyV0Vc5TVeU=;
+        b=P2MXMCisTnfl4QYlT5aokDjYkXS1MkRwDgryUOCoMiwMcdUA0SC5xPFOyDWzFGsMWr
+         H+FoOz/4qG6tRbgd3sCGs3JitJqe+N1kHxByNZV3LK7KvkppFQRbgd9l7FGch3N/BT3Q
+         5wds3pr0e9kScWlQPJfCI4TNZC3FKkwhxWpUXX+624UtNUa85pxuD+MOVzGQOdNhs8Bd
+         zDWOf1MvwIVVm2CaoptMrW3bBcaJhFhgklhKRPFFv5SFwiKK95gp1IxIXyjs2Cg/ar9j
+         aNLmyqNyGUQbR0zcjeKli6ax1yieCF4lmkQxDg6yq3cX5wp0MYYUjGYWlBNnD0S9Foxz
+         Zn0A==
+X-Gm-Message-State: AOJu0Yyr/Ys4F1Gc9ciFDEgigGAwOz/dGNLjqFJREHWCH/+GLznWSiDK
+	/1mU3loSL7zpdev8g4oYKOTYQbkPkD2BDPuAi8vaBZd2UohPVeXwpLYAu8StF0KSKOlnCSk5+5z
+	hdiFhn4fHWX9jTLW6g8wd8utDEnTgA7ei7uRd4n4BoJ4Btn8DOBWqAQ==
+X-Received: by 2002:a05:600c:1c1e:b0:421:2c02:9779 with SMTP id 5b1f17b1804b1-4212e0c55c3mr76207665e9.4.1717429504255;
+        Mon, 03 Jun 2024 08:45:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG1pKGgnR84i8AqW8l4eNbVZNpKIgQK12LE32CevW6gmQshM9W+la+6cjCOrl28P7NJh+WRkw==
+X-Received: by 2002:a05:600c:1c1e:b0:421:2c02:9779 with SMTP id 5b1f17b1804b1-4212e0c55c3mr76207405e9.4.1717429503878;
+        Mon, 03 Jun 2024 08:45:03 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3344:1b74:3a10::f71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35dd0649fb5sm8921316f8f.94.2024.06.03.08.45.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Jun 2024 08:45:03 -0700 (PDT)
+Message-ID: <869b10820071077afa766ca4467e2d2cc7615413.camel@redhat.com>
+Subject: Re: [PATCH net 0/5] dst_cache: fix possible races
+From: Paolo Abeni <pabeni@redhat.com>
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com
+Date: Mon, 03 Jun 2024 17:45:01 +0200
+In-Reply-To: <20240531132636.2637995-1-edumazet@google.com>
+References: <20240531132636.2637995-1-edumazet@google.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240530201616.1316526-1-almasrymina@google.com>
- <20240530201616.1316526-3-almasrymina@google.com> <ZlqzER_ufrhlB28v@infradead.org>
- <CAHS8izMU_nMEr04J9kXiX6rJqK4nQKA+W-enKLhNxvK7=H2pgA@mail.gmail.com> <5aee4bba-ca65-443c-bd78-e5599b814a13@gmail.com>
-In-Reply-To: <5aee4bba-ca65-443c-bd78-e5599b814a13@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 3 Jun 2024 08:43:58 -0700
-Message-ID: <CAHS8izNmT_NzgCu1pY1RKgJh+kP2rCL_90Gqau2Pkd3-48Q1_w@mail.gmail.com>
-Subject: Re: [PATCH net-next v10 02/14] net: page_pool: create hooks for
- custom page providers
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 3, 2024 at 7:52=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.c=
-om> wrote:
->
-> On 6/3/24 15:17, Mina Almasry wrote:
-> > On Fri, May 31, 2024 at 10:35=E2=80=AFPM Christoph Hellwig <hch@infrade=
-ad.org> wrote:
-> >>
-> >> On Thu, May 30, 2024 at 08:16:01PM +0000, Mina Almasry wrote:
-> >>> I'm unsure if the discussion has been resolved yet. Sending the serie=
-s
-> >>> anyway to get reviews/feedback on the (unrelated) rest of the series.
-> >>
-> >> As far as I'm concerned it is not.  I've not seen any convincing
-> >> argument for more than page/folio allocator including larger order /
-> >> huge page and dmabuf.
-> >>
-> >
-> > Thanks Christoph, this particular patch series adds dmabuf, so I
-> > assume no objection there. I assume the objection is that you want the
-> > generic, extensible hooks removed.
-> >
-> > To be honest, I don't think the hooks are an integral part of the
-> > design, and at this point I think we've argued for them enough. I
-> > think we can easily achieve the same thing with just raw if statements
-> > in a couple of places. We can always add the hooks if and only if we
-> > actually justify many memory providers.
-> >
-> > Any objections to me removing the hooks and directing to memory
-> > allocations via simple if statements? Something like (very rough
-> > draft, doesn't compile):
->
-> The question for Christoph is what exactly is the objection here? Why we
-> would not be using well defined ops when we know there will be more
-> users? Repeating what I said in the last thread, for io_uring it's used
-> to implement the flow of buffers from userspace to the kernel, the ABI,
-> which is orthogonal to the issue of what memory type it is and how it
-> came there. And even if you mandate unnecessary dmabuf condoms for user
-> memory in one form or another IMHO for no clear reason, the callbacks
-> (or yet another if-else) would still be needed.
->
-> Sure, Mina can drop and hard code devmem path to easy the pain for
-> him and delay the discussion, but then shortly after I will be
-> re-sending same shit.
+On Fri, 2024-05-31 at 13:26 +0000, Eric Dumazet wrote:
+> This series is inspired by various undisclosed syzbot
+> reports hinting at corruptions in dst_cache structures.
+>=20
+> It seems at least four users of dst_cache are racy against
+> BH reentrancy.
+>=20
+> Last patch is adding a DEBUG_NET check to catch future misuses.
+> =20
+> Eric Dumazet (5):
+>   ipv6: ioam: block BH from ioam6_output()
+>   net: ipv6: rpl_iptunnel: block BH in rpl_output() and rpl_input()
+>   ipv6: sr: block BH in seg6_output_core() and seg6_input_core()
+>   ila: block BH in ila_output()
+>   net: dst_cache: add two DEBUG_NET warnings
+>=20
+>  net/core/dst_cache.c      |  2 ++
+>  net/ipv6/ila/ila_lwt.c    |  7 ++++++-
+>  net/ipv6/ioam6_iptunnel.c |  8 ++++----
+>  net/ipv6/rpl_iptunnel.c   | 14 ++++++--------
+>  net/ipv6/seg6_iptunnel.c  | 14 ++++++--------
+>  5 files changed, 24 insertions(+), 21 deletions(-)
+>=20
+LGTM, thanks!
 
-You don't need to re-send the same ops again, right? You can add io
-uring support without ops. Something like:
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 92be1aaf18ccc..2cc986455bce6 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -557,8 +557,8 @@ netmem_ref page_pool_alloc_netmem(struct page_pool
-*pool, gfp_t gfp)
-                return netmem;
-
-        /* Slow-path: cache empty, do real allocation */
--       if (static_branch_unlikely(&page_pool_mem_providers) && pool->mp_op=
-s)
--               netmem =3D pool->mp_ops->alloc_pages(pool, gfp);
-+       if (unlikely(page_pool_is_dmabuf(pool)))
-+               netmem =3D mp_dmabuf_devmem_alloc_pages():
-+       else if (unlikely(page_pool_is_iouring(pool)))
-+               netmem =3D mp_io_uring_alloc_pages():
-       else
-                netmem =3D __page_pool_alloc_pages_slow(pool, gfp);
-        return netmem;
-
-So IMO, the ops themselves, which Christoph is repeatedly nacking, are
-not that important.
-
-I humbly think the energy should be spent convincing maintainers of
-the use case of io uring memory, not the ops. The ops are a cosmetic
-change to the code, and can be added later. Christoph is nacking the
-ops because it gives people too much rope [1].
-
-But if you disagree and think the ops themselves are important for a
-reason I missed, I'm happy waiting until agreement is reached here.
-Sorry, just voicing my 2 cents.
-
-[1] https://lore.kernel.org/netdev/ZjjHUh1eINPg1wkn@infradead.org/
-
---=20
-Thanks,
-Mina
 
