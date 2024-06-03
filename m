@@ -1,161 +1,139 @@
-Return-Path: <netdev+bounces-100240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4835E8D84BC
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 16:17:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F9538D84D6
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 16:22:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3456286084
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 14:17:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4A902898EC
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 14:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986C412E1EE;
-	Mon,  3 Jun 2024 14:17:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B50112EBE1;
+	Mon,  3 Jun 2024 14:22:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aB7uHwwR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dzgeAJ8t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6990112F386
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 14:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4164B12EBD3
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 14:22:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717424245; cv=none; b=MlenCmJMZXpMjNOAb+hSfhP2AVa4Xoxbpw1LEtKRCLhJqPUmYCEnJ3RhyN40GPh6MRxH5Jw18bvxjlhaAg40ezDAvidp3YbjNTepuLFlB+QhVunvHke5P830DjoIPdDcQCLQ7Y/JXheuwGw7D9mJifsbcqa2m2VBKRYYA3yc4EI=
+	t=1717424557; cv=none; b=mTgW5PcDrZ2dcYV9JJupaoSj9vkFGcIaymF2HeR3GyWrH+dcYy2yIEW+3qa4MPoDQqSWAQu1XbRrhhcMoVNs55JsfaTuDjFZnBN5bedm4ak9dlErommpxUVfkRmaheDWeP+I3qIvRFAtQ664XUPkrHmJHAQ+bwlg5mDob8Ibbok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717424245; c=relaxed/simple;
-	bh=HKIk/fziZZuLGu58aSs/+3iSct4B2ZtBElSDQxdl5rg=;
+	s=arc-20240116; t=1717424557; c=relaxed/simple;
+	bh=We6rDzcmNkZka8Yg/UlI2NOrRc8wZeBmovLsr1vpxms=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Sn59ClksE7Y/E/n9SK/UK1dHj9P9dBPkxjL1FCIy60JT7FQsQw/yT4CjTaBu14CQsyU09ASki+JC4xThukPCmjb13oAT5tj8cEW4FERyimp2PmymxGRc5MEaj1dwrnvyL2jwTsPa8QZ2Id5aNHc4R/kaxBmgriBpFri2j4N7SjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aB7uHwwR; arc=none smtp.client-ip=209.85.218.44
+	 To:Cc:Content-Type; b=ewFGjaTuQyp2jfYMLyEqkAym8UNFRWMQazhTXwxWc8bAx3y5Y46BgJafDMxU4bDG6W0Djb6eg6y/nfCLRLioqMJVWjUj4n71jBpQcilTc16rFFqDzI3wFQCX06E8ss01YH0J/iAqbcDEs/0Gkwk8lZ06I1uWUfqBXuD+o5YrtNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dzgeAJ8t; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a68b41ef3f6so199921866b.1
-        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 07:17:23 -0700 (PDT)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-42133fbe137so114605e9.0
+        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 07:22:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717424242; x=1718029042; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1717424554; x=1718029354; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hX960fiFK86sEZShyroAmINX+eMw+I3MOlcUpYKxHw8=;
-        b=aB7uHwwRC7K0jUH0NEm5WyzGaXSGKbzBBXAQ/6KPLq5hvpt5gIsvpFgfO+Ff0rEtAi
-         jFQAdvKA+d/RJ2UFZ8PV41xtUcqWdMTeSLaliBueAXelYp9ptkog+SW+FezzEmmo9o9d
-         BwrDZZ+ccw3hWVXFmvqFB2pRbtAZzZP0f/yDYFTuMXWx0g9CeAg6iSPPB5H1TcvUZGho
-         uWsd8K4622fPZ85APw7Ml60GB0r4/d7flyjjdgDutm+xZWqjhAu0MvYpF0qu9XjpyYC4
-         3JsnzPJ1DDmPHBUsMLmTQbjkIB/LXXKRTnAd//N+7CaOMjZU6LKDJea6nZRDzlyQFFWR
-         7HNw==
+        bh=B8oQaL9FAbTlCxOBkxoi1tsS9fGHeajwNfgQS79Eab4=;
+        b=dzgeAJ8tRQ+ykTrLKMx9/nAwCI4DR984reWh4BnR/jcQNWJv5GGqZ9eXmFsJlaUd3Y
+         6mRCk3QpTRHpU6a4XC1meVpYRyYhDeNOK7GrP+avkVxplvIfMUOJhGQSa8annvb5rMow
+         +d+6EJsTR2ecomqEUl0p8h9lCluDVo9fKTmN3tMXd9rp6efUICO1tnB9ibnjXGCq/J11
+         IoGUPYFsMidASbZnjRRcAsDL73t+q+dGED0B4uPc6JqAmDt86CGlC6Zu9DNYtvIDKtcL
+         VPH6KPlO5s9dO3g7in7+da0EGOKz6meLFWPWuWrLHFqY5EXo/bYjjGuaZmzoLNYSBzHy
+         bzWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717424242; x=1718029042;
+        d=1e100.net; s=20230601; t=1717424554; x=1718029354;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hX960fiFK86sEZShyroAmINX+eMw+I3MOlcUpYKxHw8=;
-        b=GrRBkhnOxFHfM9xGrhy1MxsbZuSe0YPt6uMeiDt/zGvSXGOTar8IqvNcPnZhZFzWI7
-         +Bmk5edguo6CxYk2NVtdHQNO2jPjgIriIHhIHwp7hxAt/OD4XoGsaJCF+EMREey7e0Yg
-         RvKdb4o/lQ+/a8BrmnKhxRexVoAI/eAk+M1+P7wWShpQeEcMnpIt8coBJKDsRjpmtqdM
-         +ucz0bSxD/CHPiEDMGeEzUYOIJ5Xy8k4DLxFe/Laja3ndkX5LoLDi0oQLrsI6lq/tHnY
-         E5qN/IXFwUNqR7L4mPRmP4XGbsmC1+B61WAIOeQpyrjrF/6f+1qS0CdayzGMX4aqLA8M
-         n/ug==
-X-Gm-Message-State: AOJu0YyQ2kWXddDdvWbXPRXra80UePJoQYjkrK6/r46SFCYMMCCR7djL
-	PiaDtut+HUd00q5DhHelOd/9AyfHut+0Os1qOn5xqUH69ia19RdGtzylpONf49U28sYk27PJFj6
-	tMNg0HpKTK3y09Qjn5HCH/Aai66VS/9W1zc5i
-X-Google-Smtp-Source: AGHT+IF2dM971g+G40jgbxNlCnWLD2vDmcmV06zLLO0GJhjluR0VCD0WMHMSdMpVvOnlSN5qx4LmzaU7Z6g2TUlHcjM=
-X-Received: by 2002:a17:907:914e:b0:a68:9621:a93c with SMTP id
- a640c23a62f3a-a689621ab6fmr371329366b.8.1717424241215; Mon, 03 Jun 2024
- 07:17:21 -0700 (PDT)
+        bh=B8oQaL9FAbTlCxOBkxoi1tsS9fGHeajwNfgQS79Eab4=;
+        b=E/BAYoVQpFWmGb0rGYgFXsVMLViT4PS+KW/hKsEt6JLtfn5q43jZkohI9Yt2Qae1UW
+         vAA9dEtQr9OcyDD/cbaZF8CGgK+3ocilAgiLLZaWoRVrF88K5vaFrhEc4G6CFMXbM7I4
+         5QMoF4NtZLB0SCFK6E883WJ6SKhjnxDRFp1DUddApuL7hFrM4CS5jofhGuCv/Vy2VASb
+         hu5RcMMCkSwPhBDz+9J2+h1McjU0omsn0HiAULNGIEOc8J9hMa8vZZ7L+951kzPU1vLT
+         d6FBnJ82V7EH7N7rOgu5imRqyrOZkXkFwX7KYIUqwaEfMdDiuPEcihUtcyytplSCtrWo
+         tSwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXx8uPbbNQkfD2jDvEWwEkBN5VVyT6C69LF3e/kjNIO9tQOl8zYEikwzbyPK6SuEzM8upZ+cKOLY6TUlRPEnLke7wOcy4r/
+X-Gm-Message-State: AOJu0YzuekhRyTT2bK5s6oin/uZ0SrbyfnAX1xO+dI0h+1f+fpyUlg+k
+	u5a6FpjncxgQ69NgKJH2/3OJwMbGcIDY7N91mISKH9wnkkUtf4EU+jtszq7w1eWGkVt0F8KAe9o
+	6EgGJh0a8UFuMsD9EIepKUiI8qW4UDWNPjFoQ
+X-Google-Smtp-Source: AGHT+IGfBZSQC3nuMyFIA62nQgOn5i3KE9nV0HmxA6glYXaTTKcthM+CvYrX0yBPIaZTUjSBF0eToYcanDe9tlaGby8=
+X-Received: by 2002:a05:600c:1d27:b0:421:328e:99db with SMTP id
+ 5b1f17b1804b1-421358b2ea5mr3535925e9.1.1717424554207; Mon, 03 Jun 2024
+ 07:22:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240530201616.1316526-1-almasrymina@google.com>
- <20240530201616.1316526-3-almasrymina@google.com> <ZlqzER_ufrhlB28v@infradead.org>
-In-Reply-To: <ZlqzER_ufrhlB28v@infradead.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 3 Jun 2024 07:17:05 -0700
-Message-ID: <CAHS8izMU_nMEr04J9kXiX6rJqK4nQKA+W-enKLhNxvK7=H2pgA@mail.gmail.com>
-Subject: Re: [PATCH net-next v10 02/14] net: page_pool: create hooks for
- custom page providers
-To: Christoph Hellwig <hch@infradead.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
+References: <20240601212517.644844-1-kuba@kernel.org> <20240601161013.10d5e52c@hermes.local>
+ <20240601164814.3c34c807@kernel.org> <ad393197-fd1a-4cd8-a371-f6529419193b@kernel.org>
+ <CANn89i+i-CooK7GHKr=UYDw4Nf7EYQ5GFGB3PFZiaB7a_j3_xA@mail.gmail.com>
+ <20240602152102.1a50feed@kernel.org> <20240603065425.6b74c2dd@kernel.org>
+In-Reply-To: <20240603065425.6b74c2dd@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 3 Jun 2024 16:22:19 +0200
+Message-ID: <CANn89iKF3z_c7_2bqAVcqKZfrsFaTtdQcUNvMQo4mZCFk0Nx8g@mail.gmail.com>
+Subject: Re: [PATCH net] inet: bring NLM_DONE out to a separate recv() in inet_dump_ifaddr()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, davem@davemloft.net, 
+	netdev@vger.kernel.org, pabeni@redhat.com, 
+	Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 31, 2024 at 10:35=E2=80=AFPM Christoph Hellwig <hch@infradead.o=
-rg> wrote:
+On Mon, Jun 3, 2024 at 3:54=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
 >
-> On Thu, May 30, 2024 at 08:16:01PM +0000, Mina Almasry wrote:
-> > I'm unsure if the discussion has been resolved yet. Sending the series
-> > anyway to get reviews/feedback on the (unrelated) rest of the series.
+> On Sun, 2 Jun 2024 15:21:02 -0700 Jakub Kicinski wrote:
+> > Netlink is full of legacy behavior, the only way to make it usable
+> > in modern environments is to let new families not repeat the mistakes.
+> > That's why I'd really rather not add a workaround at the af_netlink
+> > level. Why would ethtool (which correctly coalesced NLM_DONE from day 1=
+)
+> > suddenly start needed another recv(). A lot of the time the entire dump
+> > fits in one skb.
+> >
+> > If you prefer to sacrifice all of rtnetlink (some of which, to be clear=
+,
+> > has also been correctly coded from day 1) - we can add a trampoline for
+> > rtnetlink dump handlers?
 >
-> As far as I'm concerned it is not.  I've not seen any convincing
-> argument for more than page/folio allocator including larger order /
-> huge page and dmabuf.
+> Hi Eric, how do you feel about this approach? It would also let us
+> extract the "RTNL unlocked dump" handling from af_netlink.c, which
+> would be nice.
+
+Sure, I have not thought of af_netlink
+
+>
+> BTW it will probably need to be paired with fixing the
+> for_each_netdev_dump() foot gun, maybe (untested):
 >
 
-Thanks Christoph, this particular patch series adds dmabuf, so I
-assume no objection there. I assume the objection is that you want the
-generic, extensible hooks removed.
-
-To be honest, I don't think the hooks are an integral part of the
-design, and at this point I think we've argued for them enough. I
-think we can easily achieve the same thing with just raw if statements
-in a couple of places. We can always add the hooks if and only if we
-actually justify many memory providers.
-
-Any objections to me removing the hooks and directing to memory
-allocations via simple if statements? Something like (very rough
-draft, doesn't compile):
-
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 92be1aaf18ccc..2cc986455bce6 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -557,8 +557,8 @@ netmem_ref page_pool_alloc_netmem(struct page_pool
-*pool, gfp_t gfp)
-                return netmem;
-
-        /* Slow-path: cache empty, do real allocation */
--       if (static_branch_unlikely(&page_pool_mem_providers) && pool->mp_op=
-s)
--               netmem =3D pool->mp_ops->alloc_pages(pool, gfp);
-+       if (unlikely(page_pool_is_dmabuf(pool)))
-+               netmem =3D mp_dmabuf_devmem_alloc_pages():
-        else
-                netmem =3D __page_pool_alloc_pages_slow(pool, gfp);
-        return netmem;
+I confess I am a bit lost : this part relates to your original submission,
+when you set "ctx->ifindex =3D ULONG_MAX;"  in inet_dump_ifaddr() ?
 
 
---=20
-Thanks,
-Mina
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -3025,7 +3025,8 @@ int call_netdevice_notifiers_info(unsigned long val=
+,
+>  #define net_device_entry(lh)   list_entry(lh, struct net_device, dev_lis=
+t)
+>
+>  #define for_each_netdev_dump(net, d, ifindex)                          \
+> -       xa_for_each_start(&(net)->dev_by_index, (ifindex), (d), (ifindex)=
+)
+> +       for (; (d =3D xa_find(&(net)->dev_by_index, &ifindex,            =
+ \
+> +                           ULONG_MAX, XA_PRESENT)); ifindex++)
+>
+>  static inline struct net_device *next_net_device(struct net_device *dev)
+>  {
+>
 
