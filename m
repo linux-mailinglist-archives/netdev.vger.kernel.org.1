@@ -1,105 +1,105 @@
-Return-Path: <netdev+bounces-100086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE9A48D7CCD
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:52:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFB6B8D7CD2
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:52:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C0DB1C21135
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 07:52:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EC10B20EEF
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 07:52:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12C64DA06;
-	Mon,  3 Jun 2024 07:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="5LVGfTIv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11655025E;
+	Mon,  3 Jun 2024 07:52:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABAE3BB24;
-	Mon,  3 Jun 2024 07:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 530634D5AB
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 07:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717401115; cv=none; b=B8O7EiiuJU7+x+Doe2/m155QgiDQp8+Ol3Yl9/1kmkWPAXsL+TZgZSJKR4EKa/CVePnjR/AKyMnrJSJajlCyCxwvNNbFhdoQWD12txIxos8adiTIrD5Y4bgXs0J5UzZqqWarAM4OwXwfws6zFrYG4tnOYAAyLQbm3fc5j5zyLaU=
+	t=1717401150; cv=none; b=X0iuO6wQZrOdmTuqzK1MHgSHP7tUZZrkpg44HFi0un3OJOA0Y9Ez5p964j+N3RjSDsS/455IueGY+/qeP28TAGumEWNiUzZfH/+hcRgMXc+uNUn/ivHfBgOfrvE1YxmaYpqzozabaIAtD1Yk9IlPHjAq/i5qOy7VzwtQTKl/vzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717401115; c=relaxed/simple;
-	bh=UNGmFlIjG+IUgjY9/2P+gSGtwZOytRdfZTK8275Gdt0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=blRnEqD91BOe66/Yf49snpNvb4fGhI17hssMMZPEXfE/35dAzcaWdXTzmYBaeX95Z+ikea8EEohCB4pWla2x5jYs/6aAz/XD3SxvzMJyLLL/G7hBFbN4msuj8ygbO7wvXUfk284RRaaFMWhOUgizFwB0VnObH+qMV4nPsAP5uLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=5LVGfTIv; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1717401112;
-	bh=UNGmFlIjG+IUgjY9/2P+gSGtwZOytRdfZTK8275Gdt0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=5LVGfTIv30xTmxae/jtC/qEtIh1xKmHlQBqe+vE/2u5F+lO+oiMSnk9o7iZwexD9n
-	 x7I5TgBu5DEdJsje+vsAW4KERyBP+ko81aLax8XC/1VXYf7wdNRcBu1mDm9GZDStV7
-	 IM3+VuHGhNC1i/bX7Ldz7FfDG65LBOQ/Y13cy9Du6Uu3vDdRwVLIejTL0LWhBFJtxa
-	 TSzDZ0zwkTm6R3X+mN1MqVxXiGB/U7J5iuBnuZ5gN5S3CvZM+8rmD1C80GP9ffuEkK
-	 +Uwk6c0PSCtuDmlNaVc6FNgwkfR2N5dPAaSX8Qk65vgSjBvxluJh5yp8lR0rPk62eZ
-	 HpDkTqC0yXMTQ==
-Received: from IcarusMOD.eternityproject.eu (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 0FE7537813CA;
-	Mon,  3 Jun 2024 07:51:51 +0000 (UTC)
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-To: Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Michael Turquette <mturquette@baylibre.com>, 
- Stephen Boyd <sboyd@kernel.org>, Pavel Machek <pavel@ucw.cz>, 
- Lee Jones <lee@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
- Frank Wunderlich <linux@fw-web.de>
-Cc: Frank Wunderlich <frank-w@public-files.de>, 
- Eric Woudstra <ericwouds@gmail.com>, Tianling Shen <cnsztl@immortalwrt.org>, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-clk@vger.kernel.org, linux-leds@vger.kernel.org, 
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org
-In-Reply-To: <20240510095707.6895-1-linux@fw-web.de>
-References: <20240510095707.6895-1-linux@fw-web.de>
-Subject: Re: [PATCH v3 0/2] Add Bananapi R3 Mini
-Message-Id: <171740111097.46559.14241820863717418080.b4-ty@collabora.com>
-Date: Mon, 03 Jun 2024 09:51:50 +0200
+	s=arc-20240116; t=1717401150; c=relaxed/simple;
+	bh=KcJRQhY3nMROuW8nO7tJ4lFJ4VWQJyXIpKfmyB62Rrg=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=DnoGLqFXNJVBVO/XdzyqLlmJS7khpjr3dQNWaB+qAcIUqztGRR2lw213PiKptfvmli+kXTvenJ2r5Ykg06baI86XboX5csbOcb0fbQ9QFOqrHMwJooCc++uNYmblFPCDCeQCqLbCUPaZUELoaYMWzwMAUBhJ363inaGO4kcwPcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3737b3ae019so45841595ab.2
+        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 00:52:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717401148; x=1718005948;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=V/aGlV4k0Lr3kE7dmWlGvv+6D6/deQLCQVo//mqUHVU=;
+        b=TOV3LbO0gyEOyelbfHU0DNJma8Q7RAwlkDBrWfzDtArLay/XZeYBe1eZvfJv+3lFsw
+         s9xKOCBKSkMsOanIWavP3oWx6/1wcMcmSNm1WrQiWUX89R7giFDmw34DchsHnbBAulz2
+         40GGbGfKfTTnsn9h8nZ6T/RKwHE/miyAGkVAL4TuxMGcOaggtTDLroxQVLVN1mwfY+0C
+         V7t5wTuJnfov85dzXZvWqgc0L1mhmN6GksE08k1CMILgUh74idWxbT3edDcs/7k22l9Y
+         CkGdv1HInr3NI7ZvSaCVZIBGrJM+YPPdiW8GviOhiWxEmPCs2c0RRlVXJvcoga7b59mp
+         LDpg==
+X-Forwarded-Encrypted: i=1; AJvYcCXa8um1myrEyRwvC2ciDhkkolaVQbEXeKqcEfTKgMERQy6xyHH6qFML5JYjSOjVYmycpj7VgcVwRzuXpvyiHrHeO4JCNlxi
+X-Gm-Message-State: AOJu0Yyp5ntD8AxoojSv26mZ/exA2aj7rHaSCKFAaaVFYL0r2zZ0V9bg
+	wiLrn56kg9MHTWU3xYnXImCogZ1brbVFSTiENGXe3a6ojOmy1fRFz3cJjy5U+0nQyD6Md81rTMU
+	t5QXkdavadnj82cRQ0e8aZxP5j0mjNxHCNdZV8V8ycmlDVT7IiobdwJ4=
+X-Google-Smtp-Source: AGHT+IHZTLwnXciYRBxGbMsaDQQLLx01yMiPJRv7LvWByuU29JWGTpzhUWdV2Zq7IB7EG2pRfo6lNpmjpj69CytAvXf6AfPe3WQ2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13.0
+X-Received: by 2002:a05:6e02:b25:b0:36c:5014:3bf0 with SMTP id
+ e9e14a558f8ab-3748b9e18dfmr6369595ab.3.1717401148573; Mon, 03 Jun 2024
+ 00:52:28 -0700 (PDT)
+Date: Mon, 03 Jun 2024 00:52:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000065d96e0619f79dff@google.com>
+Subject: [syzbot] Monthly wireguard report (Jun 2024)
+From: syzbot <syzbot+list782da1462944fe92dbc9@syzkaller.appspotmail.com>
+To: Jason@zx2c4.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 10 May 2024 11:57:05 +0200, Frank Wunderlich wrote:
-> From: Frank Wunderlich <frank-w@public-files.de>
-> 
-> Add mt7986 based BananaPi R3 Mini SBC.
-> 
-> changes in v3:
-> - fixed unicde parenthesis in commit description of dts patch
-> - dropped "dts:" from title of binding patch
-> - added AB to binding and RB to dts patch
-> 
-> [...]
+Hello wireguard maintainers/developers,
 
-Applied to v6.10-next/dts64, thanks!
+This is a 31-day syzbot report for the wireguard subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wireguard
 
-[1/2] dt-bindings: arm64: mediatek: add BananaPi R3 Mini
-      commit: ca33f36216abe52eef8e660c638d8200e72251e9
-[2/2] arm64: dts: mediatek: Add mt7986 based Bananapi R3 Mini
-      commit: 07d7e57ea9d9491075820d447f140de9b6c3bd40
+During the period, 4 new issues were detected and 0 were fixed.
+In total, 9 issues are still open and 16 have been fixed so far.
 
-Cheers,
-Angelo
+Some of the still happening issues:
 
+Ref Crashes Repro Title
+<1> 972     No    KCSAN: data-race in wg_packet_send_staged_packets / wg_packet_send_staged_packets (3)
+                  https://syzkaller.appspot.com/bug?extid=6ba34f16b98fe40daef1
+<2> 63      No    INFO: task hung in wg_destruct
+                  https://syzkaller.appspot.com/bug?extid=a6bdd2d02402f18fdd5e
+<3> 48      No    INFO: task hung in wg_netns_pre_exit (4)
+                  https://syzkaller.appspot.com/bug?extid=1d5c9cd5bcdce13e618e
+<4> 4       No    WARNING in kthread_unpark (2)
+                  https://syzkaller.appspot.com/bug?extid=943d34fa3cf2191e3068
+<5> 1       No    WARNING: locking bug in wg_packet_encrypt_worker
+                  https://syzkaller.appspot.com/bug?extid=f19160c19b77d76b5bc2
+<6> 1       No    general protection fault in wg_packet_receive
+                  https://syzkaller.appspot.com/bug?extid=470d70be7e9ee9f22a01
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
