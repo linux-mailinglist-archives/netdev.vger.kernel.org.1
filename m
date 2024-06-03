@@ -1,61 +1,58 @@
-Return-Path: <netdev+bounces-100403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9418B8FA6A8
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 01:54:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3330C8FA6AD
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 01:56:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C98721C223DB
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 23:54:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB4651F23E60
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 23:56:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67EB7137C48;
-	Mon,  3 Jun 2024 23:54:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67ADD13D284;
+	Mon,  3 Jun 2024 23:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cJuAI/FS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WlRi+oWm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7EC81736;
-	Mon,  3 Jun 2024 23:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A91513D27C;
+	Mon,  3 Jun 2024 23:55:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717458845; cv=none; b=GwA3NFFQszlZkoAKYgO4bEosbugTKzu2ld3utSR88wUSNFRJHB5JXjGgRKfz20C9GqExkmnfl8WqBVP8m+MEUIuuUd2stRywcFY5v5zDJ62OFhRgcq1nTSJlDDbiB+ks5sAQlgeE9T7stuTMrqMiPyNx8AqPw+YhIPrkbR9fojU=
+	t=1717458945; cv=none; b=ZK+we3iWSOlswZQeBWEzHyg3SWi0B7d3gXkUygEAkoUdMeZ3AecqXWLON+z9iLHqmPgpWMPIJq6Yv/H9kxpXII8O/uPcRgEJPm7ByWNccg7s3CGEWQEsk5DpmPUWeKQvaZ0WL0a568C4ay7IhObprFZjcm+OOiyhoQDeRyKRzrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717458845; c=relaxed/simple;
-	bh=3iqePMcRCpRmCaztme16eVBY3ZAraIQTl1ul9uEadqk=;
+	s=arc-20240116; t=1717458945; c=relaxed/simple;
+	bh=49k/N76rSkVbMyCGLrPhdc2JjNR5PlQ62XZdNfocVbs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X6tKyxu43q2+mKujbj6SCdVK+VUlCi/CUYRx+wn6/K1dkhRH2T289xHBpSJFmWg9QV+s96L+oRWpG7l9esFgzI/3K5zhJGBH6I26wNqNGIwiYsvTu7gQsCGpzspl1qteQMiT6TeP04u65cIqCKugJIA3AD76HGrO13hHrBon6uQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cJuAI/FS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 175A2C2BD10;
-	Mon,  3 Jun 2024 23:54:04 +0000 (UTC)
+	 MIME-Version:Content-Type; b=L9mr/AZVYiIh9uDc1tc+LvRFKTuouiEIASQGq/N+7HLEor/CJ0HGv21AgD+L11b2F+KVSCPdUVUxiGfgCfVVvi6MHX47kl++v1yNhnROM6BLhRi3CqnvHqa90lx3DNTGo8wnSGi3dWld5OCj6WpkjIobGiaOF/NssH3PFNujN7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WlRi+oWm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81023C4AF08;
+	Mon,  3 Jun 2024 23:55:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717458844;
-	bh=3iqePMcRCpRmCaztme16eVBY3ZAraIQTl1ul9uEadqk=;
+	s=k20201202; t=1717458944;
+	bh=49k/N76rSkVbMyCGLrPhdc2JjNR5PlQ62XZdNfocVbs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cJuAI/FSiBhygz2JM9O4fcI4fU/klINi8S9mHKliPtRTIBucQZu+ihg5dBt9Bing1
-	 2a5a1G5wQxnUeX5n6T7ia/z0xwQMZEIVEZ0WEz1h3y4D7ZZ0V0g1ymaMDXUoaRmz25
-	 6JCiQqLNb+vaKbZQ6Tlzem5JwCo+2uqr20sH64OQhzzbePsE+3QsXpwj9w2JXdKV7u
-	 C+y9u+5PZFC/qUJLHqgwuDsH77+qUU2H7OdvdgQVGFv7/V+44AxRof6i10I///blQT
-	 qHjK3nMx6t9a6w28TbOh9txjMGXuSBvc5j2Hkg5LXYNBB/Iwro1SHKE5UZ839E0ENA
-	 Scb0Uivq0S74w==
-Date: Mon, 3 Jun 2024 16:54:03 -0700
+	b=WlRi+oWmLYzBZTR6yAynA1gYroOpWQjYROAm3XdTW6F7sdZE+3zLn0NXGq+dP3tqg
+	 jhADpCe+kTJgFJVxKpk8qQqlVLcxqYFhrNYn0PjaefenZtiggA9AFqW3Lp3Q3UYM/y
+	 dQ8ao6cnwSympOJ2LS5FctYKLXPGlUNLcFeunQgB3ysZ2w5j4PhjPny3jHo/0x4NLW
+	 ZphXB3cIEfn/6vYUc9BM1c6NR093v4Xuq0dvs2oqhku2u9RMhpojrqO9tSqAu8KXzy
+	 KxmjHx1nhpFglnFenNc3jSQCp2MtBOUWG6dFd902ktdrnhCLg6v/m2tFjiu6yUXDgp
+	 WSPxjnBLZVPew==
+Date: Mon, 3 Jun 2024 16:55:43 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Yojana Mallik <y-mallik@ti.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, schnelle@linux.ibm.com,
- wsa+renesas@sang-engineering.com, diogo.ivo@siemens.com,
- rdunlap@infradead.org, horms@kernel.org, vigneshr@ti.com, rogerq@ti.com,
- danishanwar@ti.com, pabeni@redhat.com, edumazet@google.com,
- davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- srk@ti.com, rogerq@kernel.org
-Subject: Re: [PATCH net-next v2 0/3] Introducing Intercore Virtual Ethernet
- (ICVE) driver
-Message-ID: <20240603165403.1133217c@kernel.org>
-In-Reply-To: <8f5d2448-bfd7-48a5-be12-fb16cdc4de79@lunn.ch>
-References: <20240531064006.1223417-1-y-mallik@ti.com>
-	<8f5d2448-bfd7-48a5-be12-fb16cdc4de79@lunn.ch>
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: Yunshui Jiang <jiangyunshui@kylinos.cn>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-wpan@vger.kernel.org, alex.aring@gmail.com,
+ miquel.raynal@bootlin.com, davem@davemloft.net
+Subject: Re: [PATCH] net: mac802154: Fix racy device stats updates by
+ DEV_STATS_INC() and DEV_STATS_ADD()
+Message-ID: <20240603165543.46c7d3b4@kernel.org>
+In-Reply-To: <41e4b0e3-ecc0-43ca-a6cd-4a6beb0ceb8f@datenfreihafen.org>
+References: <20240531080739.2608969-1-jiangyunshui@kylinos.cn>
+	<41e4b0e3-ecc0-43ca-a6cd-4a6beb0ceb8f@datenfreihafen.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,33 +62,55 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 2 Jun 2024 17:45:29 +0200 Andrew Lunn wrote:
-> On Fri, May 31, 2024 at 12:10:03PM +0530, Yojana Mallik wrote:
-> > virtio-net provides a solution for virtual ethernet interface in a
-> > virtualized environment.
-> > 
-> > There might be a use-case for traffic tunneling between heterogeneous
-> > processors in a non virtualized environment such as TI's AM64x that has
-> > Cortex A53 and Cortex R5 where Linux runs on A53 and a flavour of RTOS
-> > on R5(FreeRTOS) and the ethernet controller is managed by R5 and needs
-> > to pass some low priority data to A53.
-> > 
-> > One solution for such an use case where the ethernet controller does
-> > not support DMA for Tx/Rx channel, could be a RPMsg based shared memory
-> > ethernet driver.  
+On Mon, 3 Jun 2024 11:33:28 +0200 Stefan Schmidt wrote:
+> Hello.
 > 
-> virtio-net is very generic and vendor agnostic.
+> On 31.05.24 10:07, Yunshui Jiang wrote:
+> > mac802154 devices update their dev->stats fields locklessly. Therefore
+> > these counters should be updated atomically. Adopt SMP safe DEV_STATS_INC()
+> > and DEV_STATS_ADD() to achieve this.
+> > 
+> > Signed-off-by: Yunshui Jiang <jiangyunshui@kylinos.cn>
+> > ---
+> >   net/mac802154/tx.c | 8 ++++----
+> >   1 file changed, 4 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+> > index 2a6f1ed763c9..6fbed5bb5c3e 100644
+> > --- a/net/mac802154/tx.c
+> > +++ b/net/mac802154/tx.c
+> > @@ -34,8 +34,8 @@ void ieee802154_xmit_sync_worker(struct work_struct *work)
+> >   	if (res)
+> >   		goto err_tx;
+> >   
+> > -	dev->stats.tx_packets++;
+> > -	dev->stats.tx_bytes += skb->len;
+> > +	DEV_STATS_INC(dev, tx_packets);
+> > +	DEV_STATS_ADD(dev, tx_bytes, skb->len);
+> >   
+> >   	ieee802154_xmit_complete(&local->hw, skb, false);
+> >   
+> > @@ -90,8 +90,8 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+> >   		if (ret)
+> >   			goto err_wake_netif_queue;
+> >   
+> > -		dev->stats.tx_packets++;
+> > -		dev->stats.tx_bytes += len;
+> > +		DEV_STATS_INC(dev, tx_packets);
+> > +		DEV_STATS_ADD(dev, tx_bytes, len);
+> >   	} else {
+> >   		local->tx_skb = skb;
+> >   		queue_work(local->workqueue, &local->sync_tx_work);  
 > 
-> Looking at icve, what is TI specific? Why not define a generic
-> solution which could be used for any heterogeneous system? We are
-> seeming more and more such systems, and there is no point everybody
-> re-inventing the wheel. So what i would like to see is something
-> similar to driver/tty/rpmsg_tty.c, a driver/net/ethernet/rpmsg_eth.c,
-> with good documentation of the protocol used, so that others can
-> implement it. And since you say you have FreeRTOS on the other end,
-> you could also contribute that side to FreeRTOS as well. A complete
-> open source solution everybody can use.
+> This patch has been applied to the wpan tree and will be
+> part of the next pull request to net. Thanks!
 
-100% agreed! FWIW there's also a PCIe NTB driver which provides very
-similar functionality.
+Hi! I haven't looked in detail, but FWIW
+
+$ git grep LLTX net/mac802154/
+$
+
+and similar patch from this author has been rejected:
+
+https://lore.kernel.org/all/CANn89iLPYoOjMxNjBVHY7GwPFBGuxwRoM9gZZ-fWUUYFYjM1Uw@mail.gmail.com/
 
