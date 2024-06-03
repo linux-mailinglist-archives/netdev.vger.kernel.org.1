@@ -1,239 +1,114 @@
-Return-Path: <netdev+bounces-100274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EC328D860F
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 17:31:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38ACE8D8608
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 17:27:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C48B71F234B3
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 15:31:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67CEA1C21DD0
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 15:27:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A631311A8;
-	Mon,  3 Jun 2024 15:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4CEB130ACF;
+	Mon,  3 Jun 2024 15:27:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="FCviUm6O"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3wgaOVD1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-42ab.mail.infomaniak.ch (smtp-42ab.mail.infomaniak.ch [84.16.66.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7293C126F1F
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 15:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0041F130A79
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 15:27:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717428647; cv=none; b=O95EsYHXQtpteEIutEMdR6sZqm1rs+9QueShFkuzrnAvy77txILAPFwcxYN8if1BxryT9B+QbTpf0HQLL0Hf7vclitOm+kPT6A1KMdsQYmV4bVkJ0mLB2cuatXjOK640nfUJ1zqdGex19yYJe3iWZnJamv3A5f22/Kx12N4w/GQ=
+	t=1717428424; cv=none; b=sOPnQgHBMTEhpObwZ8Z3T22OsD7WicBLIUKo/rHZeczgeIXl03aHl3vvWtuYQOUD8S+0mY7Zv25pVpBFi0E7BGzuY5Vwvlyao/Zm6KiIuDVX8Ffzqh4FsqI1QCHABGmu6lnbIp9HN+aEtO0wZe12K7UMEY7MYrpgJUukS6t47lA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717428647; c=relaxed/simple;
-	bh=/mjcv62h20/YuCxxk+v08bUG5s4jmTFwSRETq+kYZyY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qOUwMPKf+6Dx43usssSZsGETop4G35+Kc2Dsdo/xjVblgMpWRcplafBgcNDpe2pILu6AoTCNUd5RhV919TuwDvM8HEAGI7/bOmtgmNznyb20xW0m+ytvWg6nljh+91swxCyQValuamPdjcOliEmqHB/txBKZTCAs0SNeHy22+mU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=FCviUm6O; arc=none smtp.client-ip=84.16.66.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VtHXC0M63zslV;
-	Mon,  3 Jun 2024 17:22:19 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1717428138;
-	bh=f72YWsPTvzhPYR8mlANeq/hcliyb10E3qJT1dzHyWlE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FCviUm6OSZIQsFmYeFMuIVZSwN3n7uizhrCyJkHYNEMuBhApx6FQ67CDILxyskfop
-	 aVAyh5a/QaxyW5HZqgTV0n+wufcPEfHn7T9x3Uhpb8+S66FQgwXnapRugQg/6mMUQc
-	 oPo+VOLyV3QwXGr/GGUFWisYCXLdGXACc30gwVBA=
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4VtHX95W5szJ1K;
-	Mon,  3 Jun 2024 17:22:17 +0200 (CEST)
-Date: Mon, 3 Jun 2024 17:22:12 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Tahera Fahimi <fahimitahera@gmail.com>
-Cc: aul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E.Hallyn" <serge@hallyn.com>, linux-security-module@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, outreachy@lists.linux.dev, netdev@vger.kernel.org, 
-	=?utf-8?B?QmrDtnJu?= Roy Baron <bjorn3_gh@protonmail.com>, Jann Horn <jannh@google.com>, 
-	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>
-Subject: Re: [PATCH v2] landlock: Add abstract unix socket connect
- restrictions
-Message-ID: <20240603.Quaes2eich5f@digikod.net>
-References: <ZgX5TRTrSDPrJFfF@tahera-OptiPlex-5000>
- <20240401.ieC2uqua5sha@digikod.net>
- <ZhcRnhVKFUgCleDi@tahera-OptiPlex-5000>
- <20240411.ahgeefeiNg4i@digikod.net>
- <ZlkIAIpWG/l64Pl9@tahera-OptiPlex-5000>
- <20240531.Ahg5aap6caeG@digikod.net>
- <ZlotXL4sfY5Ez3I5@tahera-OptiPlex-5000>
+	s=arc-20240116; t=1717428424; c=relaxed/simple;
+	bh=GCysREynIq/k51pK3FKpKnbZv+Fx3mwb/h1RL1zfJf0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G913ZwaM3yew4C8ehpUmXiWMu+4dZy4LOzHiyLFr5uUHB1zw0WjSj1rZCR8KBCHGalFzzrKK82iRtqvfFEpOU9alCvA+kDgo22Firz58CQNCQl9JVqsIBxqpdT1sAg95m50bta0sS67Apv33u8Oodlw9r8Gols/NjvmM9MfXElg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3wgaOVD1; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5750a8737e5so20866a12.0
+        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 08:27:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717428421; x=1718033221; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gVxi/LkSwefxfDS7AW/R5wh+l7a4RTyOnxlV/0NRh9I=;
+        b=3wgaOVD14H+4llJEvl+cMrVbW1LJr64Sfb96dgZl2BGPtXY69ZxW1vP74tSH4jhAOZ
+         F8vWWKsaEa95CsPAUERqO9ZeHEIOQVEN0TJBOBHPfYMRep6zku8BSlXbzIUSMHNdH8hw
+         31mjb/s5SAyhdTEtW+LGeAbME0irpDqBAQge1x5WYj4V0ao7i8wMp8sShqQ6pxGkteMd
+         7j/K0AymjGjxpgfvPh9l6gb2V92lpw3TxmMl1696ETXWyKaFIGWhyKgeNY/PorZOGYA6
+         KoDF1frlJVABZ4qwbwOqJAJ07jU8hfnqjXJKCKduKCZAD6MJ/wfL/jW9QcZLMsWs/JhE
+         Y34w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717428421; x=1718033221;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gVxi/LkSwefxfDS7AW/R5wh+l7a4RTyOnxlV/0NRh9I=;
+        b=c5MPoDXFoxwcuJAQjzYlKRhFHfSZKJXhnTurJr2EWB7N4oC+dzYSXuyC9VxlFw4DoZ
+         AXmrHzzOkcmm+Ek31uCehDbaC42gTGyaMf0JN8VK/j0dAWHn9EX8VrkYyPaFikulLx8O
+         pRh2GxDjM/gOri79tZsSqtUIcLyre4zL4h3w10j2HN5Mry7Hbrn7IpStKW/MXIXq+EQx
+         Y0sq9nqfSjmuSeAabhTRtq8fuOvi39k//wcbNF6O966TS5g7Cqi0kerPOtUDEhAt4RUk
+         oyIi5iPsjVbELYExVftKddFqLLXNctE3bh+9YqpQSgyAqOT1zK5OTNFFsQcyHfohHryj
+         eBMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWLChs1KZRMZU7+KXcsCAKv5qpBkT5Tz+wagoLzOuMlF9JczT4WtqydsS2d3+5qlRMGz+ZlXDowH6YkbprhThcZozI/4kJU
+X-Gm-Message-State: AOJu0YyhEg/R+uuy/tJYA8Nk5ejTsIlgQXX0SlfBdVwf4x3K6rPd+Fed
+	07noefadiKHa/UCohbMKO1jLTnydeSgoKN5WUlo8EMTiSuILPSPf/xSpdNtnQWpyS3yKPylcxKS
+	vlVlL/ZwvDUOkqY5ynmf1eGymgrtMOUxLLxlldJaO6mkppjf/Hw==
+X-Google-Smtp-Source: AGHT+IEJie29gRrZXmpmVBvoKCO+i4C2KqVEvQbrFdH2NVmjrW0Z6GhwwdwpKM+0oESJ3vTVZLe5hyr90DPQuDg3TO8=
+X-Received: by 2002:aa7:d48b:0:b0:57a:57e3:ea0f with SMTP id
+ 4fb4d7f45d1cf-57a57e3eb9amr185511a12.5.1717428420392; Mon, 03 Jun 2024
+ 08:27:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZlotXL4sfY5Ez3I5@tahera-OptiPlex-5000>
-X-Infomaniak-Routing: alpha
+References: <20240601212517.644844-1-kuba@kernel.org> <20240601161013.10d5e52c@hermes.local>
+ <20240601164814.3c34c807@kernel.org> <ad393197-fd1a-4cd8-a371-f6529419193b@kernel.org>
+ <CANn89i+i-CooK7GHKr=UYDw4Nf7EYQ5GFGB3PFZiaB7a_j3_xA@mail.gmail.com>
+ <20240602152102.1a50feed@kernel.org> <20240603065425.6b74c2dd@kernel.org>
+ <CANn89iKF3z_c7_2bqAVcqKZfrsFaTtdQcUNvMQo4mZCFk0Nx8g@mail.gmail.com> <20240603075941.297d1e56@kernel.org>
+In-Reply-To: <20240603075941.297d1e56@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 3 Jun 2024 17:26:46 +0200
+Message-ID: <CANn89iKax5w4Cx+q-fZa5GEjXwgZzn0Z_=VUWMO_F4Po3hFyxg@mail.gmail.com>
+Subject: Re: [PATCH net] inet: bring NLM_DONE out to a separate recv() in inet_dump_ifaddr()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, davem@davemloft.net, 
+	netdev@vger.kernel.org, pabeni@redhat.com, 
+	Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-OK, thanks to your examples I found some issues with this "send/recv"
-design.  A sandboxed process should not be able to block actions on
-its own socket from a higher privileged domain (or a process without
-domain).  One issue is that if a domain D2 denies access (to its
-abstract unix sockets) to its parent D1, processes without domains (e.g.
-parent of D1) should not be restricted in any way.  Furthermore, it
-should not be possible for a process to enforce such restriction if it
-is not already sandboxed in a domain.  Implementing such mechanism would
-require to add exceptions, which makes this design inconsistent.
+On Mon, Jun 3, 2024 at 4:59=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Mon, 3 Jun 2024 16:22:19 +0200 Eric Dumazet wrote:
+> > > Hi Eric, how do you feel about this approach? It would also let us
+> > > extract the "RTNL unlocked dump" handling from af_netlink.c, which
+> > > would be nice.
+> >
+> > Sure, I have not thought of af_netlink
+> >
+> > > BTW it will probably need to be paired with fixing the
+> > > for_each_netdev_dump() foot gun, maybe (untested):
+> >
+> > I confess I am a bit lost : this part relates to your original submissi=
+on,
+> > when you set "ctx->ifindex =3D ULONG_MAX;"  in inet_dump_ifaddr() ?
+>
+> Yes, xa_for_each_start() leaves ifindex at the last valid entry, so
+> without this snippet it's not safe to call dump again after we reached
+> the end.
 
-Let's get back to the initial "scope" design, which is simpler and
-consistent with the ptrace restrictions.  Sorry for the back and forth.
-This discussions will be useful for the rationale though. ;)
-I kept the relevant parts:
-
-On Fri, May 31, 2024 at 02:04:44PM -0600, Tahera Fahimi wrote:
-> On Fri, May 31, 2024 at 11:39:12AM +0200, Mickaël Salaün wrote:
-> > On Thu, May 30, 2024 at 05:13:04PM -0600, Tahera Fahimi wrote:
-> > > On Tue, Apr 30, 2024 at 05:24:45PM +0200, Mickaël Salaün wrote:
-> > > > On Wed, Apr 10, 2024 at 04:24:30PM -0600, Tahera Fahimi wrote:
-> > > > > On Tue, Apr 02, 2024 at 11:53:09AM +0200, Mickaël Salaün wrote:
-
-[...]
-
-> > > > > > Because of compatibility reasons, and because Landlock should be
-> > > > > > flexible, we need to extend the user space interface.  As explained in
-> > > > > > the GitHub issue, we need to add a new "scoped" field to the
-> > > > > > landlock_ruleset_attr struct. This field will optionally contain a
-> > > > > > LANDLOCK_RULESET_SCOPED_ABSTRACT_UNIX_SOCKET flag to specify that this
-> > > > > > ruleset will deny any connection from within the sandbox to its parents
-> > > > > > (i.e. any parent sandbox or not-sandboxed processes).
-> > > > 
-> > > > > Thanks for the feedback. Here is what I understood, please correct me if
-> > > > > I am wrong. First, I should add another field to the
-> > > > > landlock_ruleset_attr (a field like handled_access_net, but for the unix
-> > > > > sockets) with a flag LANDLOCK_ACCESS_UNIX_CONNECT (it is a flag like
-> > > > > LANDLOCK_ACCESS_NET_CONNECT_TCP but fot the unix sockets connect).
-
-Yes, but the field's name should be "scoped", and it will only accept a
-LANDLOCK_RULESET_SCOPED_ABSTRACT_UNIX_SOCKET flag.
-
-This is a bit different than handled_access_net because there is no rule
-that would accept LANDLOCK_RULESET_SCOPED_ABSTRACT_UNIX_SOCKET (i.e. it
-is a restriction-only).
-
-Without LANDLOCK_RULESET_SCOPED_ABSTRACT_UNIX_SOCKET, the current
-behavior should not be changed.  This should be covered with appropriate
-tests.
-
-Taking the following examples for domains with
-LANDLOCK_RULESET_SCOPED_ABSTRACT_UNIX_SOCKET, we get the same
-restrictions as with ptrace:
-
-[...]
-
-> /*
->  *        No domain
->  *
->  *   P1-.               P1 -> P2 : allow
->  *       \              P2 -> P1 : allow
->  *        'P2
->  */
-
-This is still correct.
-
-> /*
->  *        Child domain:
->  *
->  *   P1--.              P1 -> P2 : deny
->  *        \             P2 -> P1 : deny
->  *        .'-----.
->  *        |  P2  |
->  *        '------'
->  */
-
-With the "scoped" approach:
-P1 -> P2: allow
-P2 -> P1: deny
-
-> /*
->  *        Parent domain
->  * .------.
->  * |  P1  --.           P1 -> P2 : allow
->  * '------'  \          P2 -> P1 : allow
->  *            '
->  *            P2
->  */
-
-With the "scoped" approach:
-P1 -> P2: deny
-P2 -> P1: allow
-
-Indeed, only the domain hierarchy matters, not the process hierarchy.
-This works the same way with ptrace restrictions.
-
-> /*
->  *        Parent + child domain(inherited)
->  * .------.
->  * |  P1  ---.          P1 -> P2 : deny
->  * '------'   \         P2 -> P1 : deny
->  *         .---'--.
->  *         |  P2  |
->  *         '------'
->  */
-
-This is still correct.
-
-> /*
->  *         Same domain (sibling)
->  * .-------------.
->  * | P1----.     |      P1 -> P2 : allow
->  * |        \    |      P2 -> P1 : allow
->  * |         '   |
->  * |         P2  |
->  * '-------------'
->  */
-
-This is still correct.
-
-> /*
->  *         Inherited + child domain
->  * .-----------------.
->  * |  P1----.        |  P1 -> P2 : deny
->  * |         \       |  P2 -> P1 : deny
->  * |        .-'----. |
->  * |        |  P2  | |
->  * |        '------' |
->  * '-----------------'
->  */
-
-With the "scoped" approach:
-P1 -> P2: allow
-P2 -> P1: deny
-
-> /*
->  *         Inherited + parent domain
->  * .-----------------.
->  * |.------.         |  P1 -> P2 : allow
->  * ||  P1  ----.     |  P2 -> P1 : allow
->  * |'------'    \    |
->  * |             '   |
->  * |             P2  |
->  * '-----------------'
->  */
-
-With the "scoped" approach:
-P1 -> P2: deny
-P2 -> P1: allow
-
-> /*
->  *         Inherited + parent and child domain
->  * .-----------------.
->  * | .------.        |  P1 -> P2 : deny
->  * | |  P1  .        |  P2 -> P1 : deny
->  * | '------'\       |
->  * |          \      |
->  * |        .--'---. |
->  * |        |  P2  | |
->  * |        '------' |
->  * '-----------------'
->  */
-
-This is still correct.
+A generic change would be to make sure we remember we hit the end,
+I guess this can be done later.
 
