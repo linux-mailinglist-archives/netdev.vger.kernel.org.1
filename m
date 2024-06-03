@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-100246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B40A78D850C
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 16:31:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE3448D850D
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 16:31:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B15C1F2187D
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 14:31:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 597A6B22702
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 14:31:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3198A134410;
-	Mon,  3 Jun 2024 14:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B43FB136643;
+	Mon,  3 Jun 2024 14:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="EFtn/JfO"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="U5JsTJpK"
 X-Original-To: netdev@vger.kernel.org
 Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DCB61311A7
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 14:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9A9134406;
+	Mon,  3 Jun 2024 14:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717425017; cv=none; b=RbPCmYPaDJw28j9mQHUii8V8kddm7ehE0RdLzobgkINtVGn36ctBPCt1WITwWrbvfZE8KhgYdYPgiMChs44KBlWT+JU537b79oeqc8iP2Q8VwZWvF8cnnqSUnlOwihwZbOKodzYM5eIaDe98jNcAn+EiIVDEwDBeqGnGHK+xAU8=
+	t=1717425018; cv=none; b=IjQuYv9L9JPWHYQWATivkT6bDwE/s28rYiTOGUvLcx0thXLqmvt9Sc8p2keWCjEjhuilhrkAbarkb0HoVp0smMhDSokw+g+L9Jf/FE6/erqNdVrw4erWbjC0BUtTbymjjX3iv9Lqx8uu7hsE6kogw+DRgQlSMf0+C4TLHmLk5Dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717425017; c=relaxed/simple;
-	bh=RIFC2dLClnA5GSHx4hCgUcQeo7MGnIwwf6LZNjvHqVs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LadmCcwJqabyraXSHMFDQ1VeA5j+pPrSXO5lBrJuSpimZdOCvnela7idwcC7xJW54pzxVV+4yzC34JoMsWhpi4YptW7YcaQlZ36ctQjyZb9Z9S3oAw9WifKy0Z0ovvcLaUcsmHec6MFPogNAfvw3zvkTI32cksQKoWNvKlPN0aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=EFtn/JfO; arc=none smtp.client-ip=85.214.62.61
+	s=arc-20240116; t=1717425018; c=relaxed/simple;
+	bh=ca3PFMqvf2PEgoAA0VG4VlDQamgfG44SJn7TGmIqUT8=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Qg96lQVlrSesoc1C4NHmM2wjeSJTPJ6no4ynXaHygDMwJ9EPTtAW/j3X0bxxlgb6zYnO5ZzAKx6aWFI7k7i3EKYquF6EQVirgzK0QIz89nS/rvbop4KFelVR5vXMFaH4i1XXu6IJg6Mlv2ov9j/PjDKzYpXDFpSZqD+9ndogOEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=U5JsTJpK; arc=none smtp.client-ip=85.214.62.61
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
 Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
 	(No client certificate requested)
 	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id CF707882AF;
-	Mon,  3 Jun 2024 16:30:12 +0200 (CEST)
+	by phobos.denx.de (Postfix) with ESMTPSA id E7E2D88308;
+	Mon,  3 Jun 2024 16:30:13 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1717425013;
-	bh=lqnIEjB6gWuRJxieyOxq6KGZD2sIbDGcg8/jyWxGVSc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EFtn/JfOq8gVGoTUIGT88zgMKJdOYAup8klZKLrB82doMp1py1obVTTJXe2BpUIeR
-	 AYFek3j5tCkT+4z3pQvHFLUYGWyhxA2DQan2T0pJ6qZXTsViQTAhbbsPdSqxYurwji
-	 iSfQw3kDOl3zvzebhv94FFhZH5eyWlLFDEJgK6Wf8rd5h8YTRfajSDge1NrP+4NhQS
-	 5vB94HQM2L/nrbp3bR19CKsKLqtlyH6KRqfVLi2jY346dyMALK3YKHtuPN0/k5SZI0
-	 JYQwymvNc1ey+iOlJGZRnYCZe7X8lfcnWzm0wlQPizRWF+tPykwetTGTwi9TG8YSXq
-	 8rVtZxnRK1UAQ==
-Message-ID: <d1aac0b0-c985-40c2-8a6f-29a4617edaf8@denx.de>
-Date: Mon, 3 Jun 2024 16:26:19 +0200
+	s=phobos-20191101; t=1717425015;
+	bh=D1FOb8+LRm3aTJoqLkva7vJcqtsDNNOiof4KFRfCgww=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
+	b=U5JsTJpKB9XrS+tOJLOdQnsrjPnXzbEKxTliEtCsqgl9KiPEoZiH/ruyYK8A4xR6w
+	 6BTejiu4wQw10P32WDrayv4apql6SINcNU1zBEL1UleFpWvNjsXYUWPagQhgFk1d7C
+	 AOnA5FvELgXNYWpNKVmVbPMvFUvBhKE3FNFkFO46G1s3+Keqj69pNyCis9vnebE+Po
+	 QgJ8ePGlpDpOea5a0C3f+LEQF70txG3PZy1lQ4PqAlIjg1X4ztyN/N1vGSXaUIVHNp
+	 o1J7lMtU3Se4D24YoY8YTLAaEg06HeQdXRgkQrCEMt6L1j1I9L/B6n/KE25YxFMyM0
+	 t+0qPGhF12zDQ==
+Message-ID: <f1c30ac7-cec1-422f-9114-7b30321d3563@denx.de>
+Date: Mon, 3 Jun 2024 16:27:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,114 +56,113 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,RFC,PATCH 1/5] net: stmmac: dwmac-stm32: Separate out
- external clock rate validation
-To: Sai Krishna Gajula <saikrishnag@marvell.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Christophe Roullier <christophe.roullier@foss.st.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, Paolo Abeni
- <pabeni@redhat.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-stm32@st-md-mailman.stormreply.com"
- <linux-stm32@st-md-mailman.stormreply.com>
-References: <20240427215113.57548-1-marex@denx.de>
- <BY3PR18MB4707314AE781472140361D62A01B2@BY3PR18MB4707.namprd18.prod.outlook.com>
-Content-Language: en-US
 From: Marek Vasut <marex@denx.de>
-In-Reply-To: <BY3PR18MB4707314AE781472140361D62A01B2@BY3PR18MB4707.namprd18.prod.outlook.com>
+Subject: Re: [PATCH v3 02/11] net: stmmac: dwmac-stm32: Separate out external
+ clock rate validation
+To: Christophe Roullier <christophe.roullier@foss.st.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Richard Cochran <richardcochran@gmail.com>, Jose Abreu
+ <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>, Sai Krishna Gajula <saikrishnag@marvell.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240603092757.71902-1-christophe.roullier@foss.st.com>
+ <20240603092757.71902-3-christophe.roullier@foss.st.com>
+Content-Language: en-US
+In-Reply-To: <20240603092757.71902-3-christophe.roullier@foss.st.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
 X-Virus-Status: Clean
 
-On 4/29/24 9:19 AM, Sai Krishna Gajula wrote:
+On 6/3/24 11:27 AM, Christophe Roullier wrote:
+> From: Marek Vasut <marex@denx.de>
 > 
->> -----Original Message-----
->> From: Marek Vasut <marex@denx.de>
->> Sent: Sunday, April 28, 2024 3:21 AM
->> To: netdev@vger.kernel.org
->> Cc: Marek Vasut <marex@denx.de>; David S. Miller <davem@davemloft.net>;
->> Alexandre Torgue <alexandre.torgue@foss.st.com>; Christophe Roullier
->> <christophe.roullier@foss.st.com>; Eric Dumazet <edumazet@google.com>;
->> Jakub Kicinski <kuba@kernel.org>; Jose Abreu <joabreu@synopsys.com>;
->> Maxime Coquelin <mcoquelin.stm32@gmail.com>; Paolo Abeni
->> <pabeni@redhat.com>; linux-arm-kernel@lists.infradead.org; linux-
->> stm32@st-md-mailman.stormreply.com
->> Subject: [net-next,RFC,PATCH 1/5] net: stmmac: dwmac-stm32:
->> Separate out external clock rate validation
->>
->> Pull the external clock frequency validation into a separate function, to avoid
->> conflating it with external clock DT property decoding and clock mux register
->> configuration. This should make the code easier to read and understand.
->>
->> This does change the code behavior slightly. The clock mux PMCR register
->> setting now depends solely on the DT properties which configure the clock
->> mux between external clock and internal RCC generated clock. The mux
->> PMCR register settings no longer depend on the supplied clock frequency, that
->> supplied clock frequency is now only validated, and if the clock frequency is
->> invalid for a mode, it is rejected.
->>
->> Previously, the code would switch the PMCR register clock mux to internal RCC
->> generated clock if external clock couldn't provide suitable frequency, without
->> checking whether the RCC generated clock frequency is correct. Such behavior
->> is risky at best, user should have configured their clock correctly in the first
->> place, so this behavior is removed here.
->>
->> Signed-off-by: Marek Vasut <marex@denx.de>
->> ---
->> Cc: "David S. Miller" <davem@davemloft.net>
->> Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
->> Cc: Christophe Roullier <christophe.roullier@foss.st.com>
->> Cc: Eric Dumazet <edumazet@google.com>
->> Cc: Jakub Kicinski <kuba@kernel.org>
->> Cc: Jose Abreu <joabreu@synopsys.com>
->> Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
->> Cc: Paolo Abeni <pabeni@redhat.com>
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: linux-stm32@st-md-mailman.stormreply.com
->> Cc: netdev@vger.kernel.org
->> ---
->>   .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 54 +++++++++++++++----
->>   1 file changed, 44 insertions(+), 10 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
->> b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
->> index c92dfc4ecf570..43340a5573c64 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
->> @@ -157,25 +157,57 @@ static int stm32_dwmac_init(struct
->> plat_stmmacenet_data *plat_dat, bool resume)
->>   	return stm32_dwmac_clk_enable(dwmac, resume);  }
->>
->> +static int stm32mp1_validate_ethck_rate(struct plat_stmmacenet_data
->> +*plat_dat) {
->> +	struct stm32_dwmac *dwmac = plat_dat->bsp_priv;
->> +	const u32 clk_rate = clk_get_rate(dwmac->clk_eth_ck);
+> Pull the external clock frequency validation into a separate function,
+> to avoid conflating it with external clock DT property decoding and
+> clock mux register configuration. This should make the code easier to
+> read and understand.
 > 
-> Please check reverse x-mass tree is followed for these variables, if possible.
+> This does change the code behavior slightly. The clock mux PMCR register
+> setting now depends solely on the DT properties which configure the clock
+> mux between external clock and internal RCC generated clock. The mux PMCR
+> register settings no longer depend on the supplied clock frequency, that
+> supplied clock frequency is now only validated, and if the clock frequency
+> is invalid for a mode, it is rejected.
 > 
->> +
->> +	switch (plat_dat->mac_interface) {
->> +	case PHY_INTERFACE_MODE_MII:
->> +		if (clk_rate == ETH_CK_F_25M)
->> +			return 0;
->> +		break;
->> +	case PHY_INTERFACE_MODE_GMII:
->> +		if (clk_rate == ETH_CK_F_25M)
->> +			return 0;
->> +		break;
+> Previously, the code would switch the PMCR register clock mux to internal
+> RCC generated clock if external clock couldn't provide suitable frequency,
+> without checking whether the RCC generated clock frequency is correct. Such
+> behavior is risky at best, user should have configured their clock correctly
+> in the first place, so this behavior is removed here.
 > 
-> Please check, whether we can combine the two cases..
+> Signed-off-by: Marek Vasut <marex@denx.de>
+> ---
+>   .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 54 +++++++++++++++----
+>   1 file changed, 44 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+> index c92dfc4ecf570..43340a5573c64 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+> @@ -157,25 +157,57 @@ static int stm32_dwmac_init(struct plat_stmmacenet_data *plat_dat, bool resume)
+>   	return stm32_dwmac_clk_enable(dwmac, resume);
+>   }
+>   
+> +static int stm32mp1_validate_ethck_rate(struct plat_stmmacenet_data *plat_dat)
+> +{
+> +	struct stm32_dwmac *dwmac = plat_dat->bsp_priv;
+> +	const u32 clk_rate = clk_get_rate(dwmac->clk_eth_ck);
 
-I hope those would be addressed in v4 of:
+ From Sai in
+Re: [net-next,RFC,PATCH 1/5] net: stmmac: dwmac-stm32: Separate out 
+external clock rate validation
 
-[PATCH v3 02/11] net: stmmac: dwmac-stm32: Separate out external clock 
-rate validation
+Please check reverse x-mass tree is followed for these variables, if 
+possible.
 
-Thanks !
+> +	switch (plat_dat->mac_interface) {
+> +	case PHY_INTERFACE_MODE_MII:
+> +		if (clk_rate == ETH_CK_F_25M)
+> +			return 0;
+> +		break;
+> +	case PHY_INTERFACE_MODE_GMII:
+> +		if (clk_rate == ETH_CK_F_25M)
+> +			return 0;
+> +		break;
+
+ From Sai in
+Re: [net-next,RFC,PATCH 1/5] net: stmmac: dwmac-stm32: Separate out 
+external clock rate validation
+
+Please check, whether we can combine the two cases..
+
+> +	case PHY_INTERFACE_MODE_RMII:
+> +		if (clk_rate == ETH_CK_F_25M || clk_rate == ETH_CK_F_50M)
+> +			return 0;
+> +		break;
+> +	case PHY_INTERFACE_MODE_RGMII:
+> +	case PHY_INTERFACE_MODE_RGMII_ID:
+> +	case PHY_INTERFACE_MODE_RGMII_RXID:
+> +	case PHY_INTERFACE_MODE_RGMII_TXID:
+> +		if (clk_rate == ETH_CK_F_25M || clk_rate == ETH_CK_F_125M)
+> +			return 0;
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +
+> +	dev_err(dwmac->dev, "Mode %s does not match eth-ck frequency %d Hz",
+> +		phy_modes(plat_dat->mac_interface), clk_rate);
+> +	return -EINVAL;
+> +}
+
+[...]
 
