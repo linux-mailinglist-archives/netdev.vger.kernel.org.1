@@ -1,151 +1,178 @@
-Return-Path: <netdev+bounces-100374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (unknown [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 276798F9A48
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 23:41:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62ED58F9F7E
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 23:42:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D25D628C177
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 21:34:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3E771C24545
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 21:36:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0C7313C3EB;
-	Mon,  3 Jun 2024 21:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B50D513C677;
+	Mon,  3 Jun 2024 21:36:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ByVoQelQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fs+3QsX2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E3213C3C0
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 21:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F370313BAFA;
+	Mon,  3 Jun 2024 21:36:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717450463; cv=none; b=tYioWHFLbUFW+5pZsnU216qfk3h3R4oSM+PT8yihYZEUey10X1xX+1SzKmdlfmiBMTwy9jDeIZVRrQHdFJ9IWpjZBnY8srT1XMMFG6tNYEWriLKbXgVC1LiQSJNcKP40rxlsDE/JpsOD7U1SNsB0nhbn0V5fQJ/XgT1KNFpc8M8=
+	t=1717450583; cv=none; b=kYXX3Pjcat4AOopT38Hxza6v2QiEF8/TN2Vto/4Vi+r0L/s3wK47KpON37gwERDZ6jvjIWaiOmf8J+IjFIswKqXDvKZJjZBPXqJB1D1rDao8jD/sOw/vsJWARmoe3U/XF+RqefnI5idVmUBm0ZUNErl7yrVsLJbaDw+gAwfsT8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717450463; c=relaxed/simple;
-	bh=Qe2H7f0zyDUtjohuco3vh6Kpz+eDB8Y0SyKI1fX2xI8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gs1wPuNzZ7lIJgc5moWtwl2/tMOAb554nlsBCfnvIbt98MJua7V3ye4hQqBSCNloHGkCULcmOCP0dIju/8gfOBqbAGFKceSnof8K2lkIuqDG+C2M0c1FDe4928ED5qunmQM+24dX50B+S9Ps2v+njgikCwmxjCe5LX76JQ4sEZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ByVoQelQ; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a63036f2daaso542883466b.1
-        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 14:34:21 -0700 (PDT)
+	s=arc-20240116; t=1717450583; c=relaxed/simple;
+	bh=yP79aolh8GQFN+IHos8AknZ14rK4+i6ta2F7QFhKUwU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=oizL6pjQ7F4zP07GhTf//XxVUmV1HDOG6cYCY+jNR1g/oNXBVrrXePYKUPawaaQ0gwVVKL2PsAcKmTAbJc2wHqTPPkVtLJVEkEXdkPujDoLbNdvv9h6cfTLk1Jz5h+jSwpAaInmy/qRuKmF8YNCgLu4qkF3YzO2ThpzOSfaKRjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fs+3QsX2; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-35e1fcd0c0fso453531f8f.0;
+        Mon, 03 Jun 2024 14:36:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717450460; x=1718055260; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HIeGDDwQw+KvfKWciKSemhA5egFwCai9faXGKzrCfDE=;
-        b=ByVoQelQFPcOqdLpQMvGGwCnaggE+tfCkfmTrQFBSF71l/SxP4G4kW3o6ETavNrZV3
-         BQUZPhfW0WN8A8RzadKTiLBbE4Avot9t1e1J5usPdejrnmsFIfirGQpKwe/oFBjBP4K7
-         NBQKwGMypJRpSKS0jO1X6rn5c4pgM/WLUGyqGzANsGkeMdubkKVfeAGrr/jJf+n6c8my
-         2mnMilNk/VKKE0ayA6UMzlvVjDf5d4YhE5XrdXHqMsskOHSGLpzFTua6MsmXpJr1S9vn
-         qZx06tvEpe3oiCjqPyx8mkSTtVxvPSz6+31LfU1J4rH0zMeJS6POXwBNIf3w2p/Ow+HR
-         g9FQ==
+        d=gmail.com; s=20230601; t=1717450580; x=1718055380; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=f1v+KA04jP8QqbiGIVQWtQ3w6aQ7F0PDEMAzrcid//c=;
+        b=Fs+3QsX2Va8RV26k9MFN3rN7hHu+M6ao8T82+RjXgAQKoU00n1A3fX0h3cMYMPa4dV
+         EctG2zDJMGBsW11yFrkQ1smjRMEGAhMQH4E8jQ9QYGo6j/emVbguWW+R10XWOhGJiVMt
+         kVk/aMTb0Lbgp7gvhPR/gNdNOGsllJiOPYy/40ZsBVkChFXacKGY6/etcmQniXJJWnWc
+         j6aKNJ/GoqKkga2CvMd7DTpmObE8o0oLT9dCCoN+xCKh+/sczAB30D2yMXU1TQotPEOY
+         5ZHa7GmhlSyNTgmN4SFeYDUpvCZp2JvPmUUkU5XrqInV9X3Z442BitxBiCnmeDXsFhCc
+         mzPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717450460; x=1718055260;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HIeGDDwQw+KvfKWciKSemhA5egFwCai9faXGKzrCfDE=;
-        b=J8hf6m9e4g8toaBMXQJIq7dVRyW3bFDJa4hZu+EfCcYo6Ln4In7ItBspXDPE/9SlEn
-         6F3uxoyI4XxQajwHkdCgoKvzeF8Gu/X2GbDdZdK6eq7G9h18Oz6+B12JvX1vBRu/WFks
-         Js/bwOjt2RBVIIPx4iZ0zJGPUTcjSdl4kpyxSF/KOYFrzrlqK9D8gTQk8N8paOBbr9ue
-         FRWBoBVPciP2qkgx5u6L7M2PtQXTdLx+NjptSWUBvqckCG2brnK/dQDwp2KC1kfbQdQB
-         ufdh1srO9GTy1vS3uVLyYZXs8Iu2b10LGx/CgxwEjk8HFT6g/GU4L9N3UZlcByLeFB2g
-         4+6A==
-X-Forwarded-Encrypted: i=1; AJvYcCWOlrgeOxDyWS/Phuje5Sdk+4Al2aJrOsTurOSoC7cyuYXV/L33VlLEugzsNrM+htd/6lU+RNsq2Fms4u3nBpqbQfq2m21W
-X-Gm-Message-State: AOJu0Yy6mEz2+2biqHlQHD+g6jEWt9MwQpNsSI7ibPnkOA/JfM1Oj7Hm
-	pd8Vuh9q0C7OFrpEuVBB5HrW6705Roa4RqPgzMJBuaONLxbe7trOrfgi1i2VLxuyxmEnWnkSvww
-	0W03oIUpSBp23W0kziPQyeSvdCCXfwW3T3gkc
-X-Google-Smtp-Source: AGHT+IFqsII+ofZD5Nq97kLmqOrSBbabIF4iI8xllAQVfN//5g+V7A5++Okxo2jfX83YM1t5Moi1aV4JTBfZn5Lj3hg=
-X-Received: by 2002:a17:907:3f1f:b0:a69:5ac:2417 with SMTP id
- a640c23a62f3a-a6905ac2600mr288494566b.51.1717450460122; Mon, 03 Jun 2024
- 14:34:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1717450580; x=1718055380;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=f1v+KA04jP8QqbiGIVQWtQ3w6aQ7F0PDEMAzrcid//c=;
+        b=rKDH/+D716hctIi/P7ZEjs2MiLuvrXbwE+jhp3gFSx09SHTWB+hdb/fSeAp4yDYtKR
+         i/XSTGbOtsAZJgkhL9699BNltwLDC0jKE/WLjNPM/NkBjIWhmeRLfYGXZcKbxMu4MR2b
+         U2JiafLibh7T5y0ENnzSL5jHw8WvhQFdG1DG7CZf8PbwpL8hUpw6tJlHAiTs5pPRw22c
+         AlH+OUbizD9fsGAiI0WifDwLR4OtqNuenV+gKGuVy0wDEyQwBErSDpaZZaJXLr6TVMey
+         mYxDuOazwIkyLRDprN5PUMvyUEC2Y0R3hAGK9YlGZXVJHEi8E12wSFrdUp5Vh2Zp/Oc4
+         hh0A==
+X-Forwarded-Encrypted: i=1; AJvYcCVF9QKvkcvWy/9Fum3oj4lsUbPwU5oiSoRYba1HQ0YygIle3yZPWQPICS7qFYiiMGuM9Ne6/PS9jVXFJtBfhjIG9rdxxkS8B5RkUqDuOpMimYTWl6oCWjjwQUOHtykqk5LWO2l1bU7EyoKVm/kGzcXRf3kvIqaJUaXT+Wn4p84Liw==
+X-Gm-Message-State: AOJu0Yz8UvM7AcAuy2u+Tg5FKZiF0VMXFoEDHolve3Tu3mjq5SuXv+Uf
+	QfrnM8X+uwc3m4uNYx+DW/F2+wHhDbT2Y8mHoAP2uobIKbUCX2We
+X-Google-Smtp-Source: AGHT+IF0Clu7RK4ucCAEU/naKfWxRCfok8IEwF6MNnG+Ktajd2eXm/hayWmXHEvuyzqClFcCcgWCdQ==
+X-Received: by 2002:a05:6000:90:b0:354:df59:c9a4 with SMTP id ffacd0b85a97d-35e0f259bacmr7192816f8f.9.1717450579951;
+        Mon, 03 Jun 2024 14:36:19 -0700 (PDT)
+Received: from [172.27.34.192] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35dd04c0f1fsm9882380f8f.15.2024.06.03.14.36.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Jun 2024 14:36:19 -0700 (PDT)
+Message-ID: <eedb6e7e-bd99-400d-81d9-6f72e6009acb@gmail.com>
+Date: Tue, 4 Jun 2024 00:36:16 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240530153436.2202800-1-yyd@google.com> <20240530153436.2202800-2-yyd@google.com>
- <160254f0fe9e4c829dfbe9420b704750@AcuMS.aculab.com>
-In-Reply-To: <160254f0fe9e4c829dfbe9420b704750@AcuMS.aculab.com>
-From: Kevin Yang <yyd@google.com>
-Date: Mon, 3 Jun 2024 17:34:07 -0400
-Message-ID: <CAPREpbb90pDeDOJF+jX=ULOG+b=abfXeemaFBt6woGJzCpp=Uw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/2] tcp: derive delack_max with tcp_rto_min helper
-To: David Laight <David.Laight@aculab.com>
-Cc: David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"ncardwell@google.com" <ncardwell@google.com>, "ycheng@google.com" <ycheng@google.com>, 
-	"kerneljasonxing@gmail.com" <kerneljasonxing@gmail.com>, "pabeni@redhat.com" <pabeni@redhat.com>, 
-	"tonylu@linux.alibaba.com" <tonylu@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next v3 2/2] net/mlx5e: Add per queue netdev-genl stats
+To: Joe Damato <jdamato@fastly.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, nalramli@fastly.com,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ "open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <20240529031628.324117-1-jdamato@fastly.com>
+ <20240529031628.324117-3-jdamato@fastly.com>
+ <5b3a0f6a-5a03-45d7-ab10-1f1ba25504d3@gmail.com>
+ <ZlzGjXxVD-JClqIy@LQ3V64L9R2>
+ <eda43490-8d77-4d7d-9b24-1aafd073d760@gmail.com>
+ <Zl4X82y3ecR2Mnye@LQ3V64L9R2>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <Zl4X82y3ecR2Mnye@LQ3V64L9R2>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-thanks for the nice suggestions, sent v3
-https://lore.kernel.org/netdev/20240603213054.3883725-1-yyd@google.com/
 
-On Sat, Jun 1, 2024 at 10:56=E2=80=AFAM David Laight <David.Laight@aculab.c=
-om> wrote:
->
-> From: Kevin Yang
-> > Sent: 30 May 2024 16:35
-> > To: David Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.c=
-om>; Jakub Kicinski
-> >
-> > Rto_min now has multiple souces, ordered by preprecedence high to
-> > low: ip route option rto_min, icsk->icsk_rto_min.
-> >
-> > When derive delack_max from rto_min, we should not only use ip
-> > route option, but should use tcp_rto_min helper to get the correct
-> > rto_min.
-> ...
-> > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> > index f97e098f18a5..b44f639a9fa6 100644
-> > --- a/net/ipv4/tcp_output.c
-> > +++ b/net/ipv4/tcp_output.c
-> > @@ -4163,16 +4163,9 @@ EXPORT_SYMBOL(tcp_connect);
-> >
-> >  u32 tcp_delack_max(const struct sock *sk)
-> >  {
-> > -     const struct dst_entry *dst =3D __sk_dst_get(sk);
-> > -     u32 delack_max =3D inet_csk(sk)->icsk_delack_max;
-> > -
-> > -     if (dst && dst_metric_locked(dst, RTAX_RTO_MIN)) {
-> > -             u32 rto_min =3D dst_metric_rtt(dst, RTAX_RTO_MIN);
-> > -             u32 delack_from_rto_min =3D max_t(int, 1, rto_min - 1);
-> > +     u32 delack_from_rto_min =3D max_t(int, 1, tcp_rto_min(sk) - 1);
->
-> That max_t() is more horrid than most.
-> Perhaps:
->                 =3D max(tcp_rto_min(sk), 2) - 1;
->
-> >
-> > -             delack_max =3D min_t(u32, delack_max, delack_from_rto_min=
-);
-> > -     }
-> > -     return delack_max;
-> > +     return min_t(u32, inet_csk(sk)->icsk_delack_max, delack_from_rto_=
-min);
->
-> Can that just be a min() ??
->
->         David
->
-> >  }
-> >
-> >  /* Send out a delayed ack, the caller does the policy checking
-> > --
-> > 2.45.1.288.g0e0cd299f1-goog
-> >
->
-> -
-> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1=
- 1PT, UK
-> Registration No: 1397386 (Wales)
+
+On 03/06/2024 22:22, Joe Damato wrote:
+> On Mon, Jun 03, 2024 at 02:11:14PM +0300, Tariq Toukan wrote:
+>>
+
+...
+
+>>
+>> I still don't really like this design, so I gave some more thought on
+>> this...
+>>
+>> I think we should come up with a new mapping array under priv, that maps i
+>> (from real_num_tx_queues) to the matching sq_stats struct.
+>> This array would be maintained in the channels open/close functions,
+>> similarly to priv->txq2sq.
+>>
+>> Then, we would not calculate the mapping per call, but just get the proper
+>> pointer from the array. This eases the handling of htb and ptp queues, which
+>> were missed in your txq_ix_to_chtc_ix().
+> 
+> Maybe I am just getting way off track here, but I noticed this in
+> drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c in
+> set_pflag_tx_port_ts:
+> 
+>    if (!err)
+>      priv->tx_ptp_opened = true;
+> 
+> but what if enable is false, meaning the user is disabling ptp via
+> ethtool?
+> 
+
+This bool field under priv acts as a flag, means: ptp was ever opened.
+It's the same idea as max_opened_tc, but with boolean instead of numeric.
+
+> In that case, shouldn't this be:
+> 
+>    if (!err)
+>      priv->tx_ptp_opened = enabled;
+> 
+> Because it seems like the user could pass 0 to disable ptp, and with
+> the current code then trigger mlx5e_close_channels which would call
+> mlx5e_ptp_close, but priv->tx_ptp_opened might still be true even
+> though ptp has been closed. Just a guess as I really don't know much
+> about this code at all, but it seems that the MLX5E_PFLAG_TX_PORT_TS
+> will be set in set_pflag_tx_port_ts based on enable, which then
+> affects how mlx5e_open_channels behaves.
+> 
+> Likewise in mlx5e_ptp_close_queues, maybe
+> rx_ptp_opened and tx_ptp_opened should be set to false there?
+> 
+> It seems like the user could get the driver into an inconsistent
+> state by enabling then disabling ptp, but maybe I'm just reading
+> this all wrong.
+> 
+> Is that a bug? If so, I can submit:
+> 
+> 1. ethtool tx_ptp_opened = false
+> 2. rx_ptp_opened = tx_ptp_opened = false in mlx5e_ptp_close_queues
+> 
+> to net as a Fixes ?
+> 
+> I am asking about this from the perspective of stats, because in the
+> qos stuff, the txq2sq_stats mapping is created or removed (set to
+> NULL) in mlx5e_activate_qos_sq and mlx5e_deactivate_qos_sq /
+> mlx5e_qos_deactivate_queues, respectively.
+> 
+> This means that priv->txq2sq_stats could be a valid sq_stats or
+> invalid for deactivated TCs and qos. It seems like ptp should work
+> the same way, but I have no idea.
+> 
+> If ptp did work the same way, then in base the code would check if
+> ptp was disabled and obtain the stats from it, if there are any from
+> it being previously enabled.
+> 
+> That seems like more consistent behavior, but sorry if
+> I'm totally off on all of this.
+> 
 
