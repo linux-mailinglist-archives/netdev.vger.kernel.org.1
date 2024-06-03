@@ -1,163 +1,167 @@
-Return-Path: <netdev+bounces-100318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1698E8D889D
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 20:30:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFEFB8D88A0
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 20:31:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ADFF288EBE
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 18:30:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43B84B20A69
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 18:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B305137914;
-	Mon,  3 Jun 2024 18:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5572D1384B6;
+	Mon,  3 Jun 2024 18:31:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="QfcmgenT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="itx3Kk1A"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1379C1CD38;
-	Mon,  3 Jun 2024 18:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 849FA137C2E
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 18:31:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717439444; cv=none; b=tpaVTn4MYVdPobvXxaEZlbX4y2M2ewXvFnsYwj2eiTq3fGSOzZe01hnYBA3KR0PmtxYHv/lp+ENDcZfRgkPqSkkEmztl+M2CWlP7GIbxwvCkpX0QikEpeDPkJVwGygqnxAWe+hPp5KNMhklUG3YJ+FVOCKM+2PCpT2UCfekOElw=
+	t=1717439492; cv=none; b=fCp0Ae0OS6oaSsPLPp8fLiUVdpWJ822EuPmBix7npHQUh7ixeaAJjyWh/kq7kUcO9Vxr6cZBp09uTG5O7aE8q5GBF0xq9fT5e9pUDd/dElMVtAU/f0wZVEKQ70TSxo36RZ3mdSKh5+vK1lQR6ea6RZT2Jm9Gl5yHQvVQg4LYnCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717439444; c=relaxed/simple;
-	bh=9v8yk8hhCWhRa9NmC3FvjjlL9Rh/7lRdVrGZtOgPerQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=slDKWaTEfYImRpzksTKtoJVMMvoEgLbROnmvgn/oMxmUTri1qte1Yr54oRZwFe15lbMVL8RX4Ivx+/uxHc7rdg3M0HKD+743OhcR3NtJYOGRpHwQJRcDMUBg3ZLoIVMkufIewHzYW3LQN0fQScfaCZGir8JTrjPt5T6enW05I1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=QfcmgenT; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=oCvWTMBZzFyQI14e28Nz1Gd7RpB4B15zOofvtVYziac=; b=QfcmgenTxMFEewMSOKyAloZXNF
-	K2qEiU+N51KbMp0eCj/A8qCg+g59IRTKIYInxtDu03ueIA5QIYfPZdoUWoHFSgmEJLFHdk69jfSkV
-	GZuu3G981AM4lxNY/pAc5MIgiGavYg1boBE1eQRjHVChzLcPrJOZuc7JtF4OdKu4DPWijvHbhpjYX
-	Zf92F7Z64mgG/k37NAFo6VG/kKzNpKbVPt0mQSpoIauHsKf/llM8CmUzT0OQomqIJm/ivVDXLgD9u
-	M1gSWH9Dslp/5E/2NCzjOAu0BzwztH8e07Bi3b5r6co4a+kslXyzH5dLSS/Lnv2s/mipYCrnwZuwb
-	BmyO1vrA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56784)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sECRq-00034t-0s;
-	Mon, 03 Jun 2024 19:30:22 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sECRo-0000eL-Ly; Mon, 03 Jun 2024 19:30:20 +0100
-Date: Mon, 3 Jun 2024 19:30:20 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Sky Huang <SkyLake.Huang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	s=arc-20240116; t=1717439492; c=relaxed/simple;
+	bh=qsya4nkJf9ItcPXlY7BN+r2obn6IM42sPgazzJIezz0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GoGMfC1OZ0/FDZln86jUHZgDZlV4jLXf4O8kpdYuLMaoGWPt0eq3ciRCB1VLXjlg5YNmr1a89C0c6JbRCdb7F2rE28BwqbyYZZJ4Hbg3UyuIcRxu7USBeCsqJSQRBceCgMkdIOR26srUlnYrBGZ/lxQ+kxIscra2kUUvVqnVzKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=itx3Kk1A; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717439489;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Yl8vr4y8a6U6pmG4DWdxKYXNybm3u7Z5la/ggzjv+O4=;
+	b=itx3Kk1AQfBHRfQ5GNq4HCBoWLMjXHSfEXN60POt1HXQxUVRWOYfpINbRl4/dNpclXYn6S
+	+WDRkPd/gJXZhqlG3mx3r9U1lHWaSCBu/JY2SFrxeL7aEM+vHwu8qtwVmamjsu7W36M6ZT
+	ONOfj9wi9vE3CrULAQNdrYmGtvgyi0E=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-602-ggZ-nkC7PtaeEckWHU-_Fg-1; Mon, 03 Jun 2024 14:31:25 -0400
+X-MC-Unique: ggZ-nkC7PtaeEckWHU-_Fg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 19C038058D7;
+	Mon,  3 Jun 2024 18:31:25 +0000 (UTC)
+Received: from antares.redhat.com (unknown [10.39.193.112])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 93EC2105017A;
+	Mon,  3 Jun 2024 18:31:22 +0000 (UTC)
+From: Adrian Moreno <amorenoz@redhat.com>
+To: netdev@vger.kernel.org
+Cc: aconole@redhat.com,
+	Adrian Moreno <amorenoz@redhat.com>,
+	Pravin B Shelar <pshelar@ovn.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH net-next v6 5/5] net: phy: add driver for built-in 2.5G
- ethernet PHY on MT7988
-Message-ID: <Zl4LvKlhty/9o38y@shell.armlinux.org.uk>
-References: <20240603121834.27433-1-SkyLake.Huang@mediatek.com>
- <20240603121834.27433-6-SkyLake.Huang@mediatek.com>
- <Zl3ELbG8c8y0/4DN@shell.armlinux.org.uk>
- <Zl3Fwoiv1bJlGaQZ@makrotopia.org>
- <Zl3IGN5ZHCQfQfmt@shell.armlinux.org.uk>
- <Zl3Yo3dwQlXEfP3i@makrotopia.org>
- <Zl3lkIDqnt4JD//u@shell.armlinux.org.uk>
- <Zl32waW34yTiuF9u@makrotopia.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	dev@openvswitch.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 1/2] selftests: openvswitch: fix action formatting
+Date: Mon,  3 Jun 2024 20:31:19 +0200
+Message-ID: <20240603183121.2305013-1-amorenoz@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zl32waW34yTiuF9u@makrotopia.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On Mon, Jun 03, 2024 at 06:00:49PM +0100, Daniel Golle wrote:
-> On Mon, Jun 03, 2024 at 04:47:28PM +0100, Russell King (Oracle) wrote:
-> > On Mon, Jun 03, 2024 at 03:52:19PM +0100, Daniel Golle wrote:
-> > > On Mon, Jun 03, 2024 at 02:41:44PM +0100, Russell King (Oracle) wrote:
-> > > > On Mon, Jun 03, 2024 at 02:31:46PM +0100, Daniel Golle wrote:
-> > > > > On Mon, Jun 03, 2024 at 02:25:01PM +0100, Russell King (Oracle) wrote:
-> > > > > > On Mon, Jun 03, 2024 at 08:18:34PM +0800, Sky Huang wrote:
-> > > > > > > Add support for internal 2.5Gphy on MT7988. This driver will load
-> > > > > > > necessary firmware, add appropriate time delay and figure out LED.
-> > > > > > > Also, certain control registers will be set to fix link-up issues.
-> > > > > > 
-> > > > > > Based on our previous discussion, it may be worth checking in the
-> > > > > > .config_init() method whether phydev->interface is one of the
-> > > > > > PHY interface modes that this PHY supports. As I understand from one
-> > > > > > of your previous emails, the possibilities are XGMII, USXGMII or
-> > > > > > INTERNAL. Thus:
-> > > > > > 
-> > > > > > > +static int mt798x_2p5ge_phy_config_init(struct phy_device *phydev)
-> > > > > > > +{
-> > > > > > > +	struct pinctrl *pinctrl;
-> > > > > > > +	int ret;
-> > > > > > 
-> > > > > > 	/* Check that the PHY interface type is compatible */
-> > > > > > 	if (phydev->interface != PHY_INTERFACE_MODE_INTERNAL &&
-> > > > > > 	    phydev->interface != PHY_INTERFACE_MODE_XGMII &&
-> > > > > > 	    phydev->interface != PHY_INTERFACE_MODE_USXGMII)
-> > > > > > 		return -ENODEV;
-> > > > > 
-> > > > > The PHY is built-into the SoC, and as such the connection type should
-> > > > > always be "internal". The PHY does not exist as dedicated IC, only
-> > > > > as built-in part of the MT7988 SoC.
-> > > > 
-> > > > That's not how it was described to me by Sky.
-> > > > 
-> > > > If what you say is correct, then the implementation of
-> > > > mt798x_2p5ge_phy_get_rate_matching() which checks for interface modes
-> > > > other than INTERNAL is not correct. Also it means that config_init()
-> > > > should not permit anything but INTERNAL.
-> > > 
-> > > The way the PHY is connected to the MAC *inside the chip* is XGMII
-> > > according the MediaTek. So call it "internal" or "xgmii", however, up to
-> > > my knowledge it's a fact that there is **only one way** this PHY is
-> > > connected and used, and that is being an internal part of the MT7988 SoC.
-> > > 
-> > > Imho, as there are no actual XGMII signals exposed anywhere I'd use
-> > > "internal" to describe the link between MAC and PHY (which are both
-> > > inside the same chip package).
-> > 
-> > I don't care what gets decided about what's acceptable for the PHY to
-> > accept, just that it checks for the acceptable modes in .config_init()
-> > and the .get_rate_matching() method is not checking for interface
-> > modes that are not permitted.
-> 
-> What I meant to express is that there is no need for such a check, also
-> not in config_init. There is only one way and one MAC-side interface mode
-> to operate that PHY, so the value will anyway not be considered anywhere
-> in the driver.
+In the action formatting function ("dpstr"), the iteration is made over
+the nla_map, so if there are more than one attribute from the same type
+we only print the first one.
 
-No, it matters. With drivers using phylink, the PHY interface mode is
-used in certain circumstances to constrain what the net device can do.
-So, it makes sense for new PHY drivers to ensure that the PHY interface
-mode is one that they can support, rather than just accepting whatever
-is passed to them (which then can lead to maintainability issues for
-subsystems.)
+Fix this by iterating over the actual attributes.
 
-So, excuse me for disagreeing with you, but I do want to see such a
-check in new PHY drivers.
+Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+---
+ .../selftests/net/openvswitch/ovs-dpctl.py    | 48 +++++++++++--------
+ 1 file changed, 27 insertions(+), 21 deletions(-)
 
+diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+index 1dd057afd3fb..b76907ac0092 100644
+--- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
++++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+@@ -437,40 +437,46 @@ class ovsactions(nla):
+     def dpstr(self, more=False):
+         print_str = ""
+ 
+-        for field in self.nla_map:
+-            if field[1] == "none" or self.get_attr(field[0]) is None:
++        for attr_name, value in self["attrs"]:
++            attr_desc = next(filter(lambda x: x[0] == attr_name, self.nla_map),
++                             None)
++            if not attr_desc:
++                raise ValueError("Unknown attribute: %s" % attr)
++
++            attr_type = attr_desc[1]
++
++            if attr_type == "none":
+                 continue
+             if print_str != "":
+                 print_str += ","
+ 
+-            if field[1] == "uint32":
+-                if field[0] == "OVS_ACTION_ATTR_OUTPUT":
+-                    print_str += "%d" % int(self.get_attr(field[0]))
+-                elif field[0] == "OVS_ACTION_ATTR_RECIRC":
+-                    print_str += "recirc(0x%x)" % int(self.get_attr(field[0]))
+-                elif field[0] == "OVS_ACTION_ATTR_TRUNC":
+-                    print_str += "trunc(%d)" % int(self.get_attr(field[0]))
+-                elif field[0] == "OVS_ACTION_ATTR_DROP":
+-                    print_str += "drop(%d)" % int(self.get_attr(field[0]))
+-            elif field[1] == "flag":
+-                if field[0] == "OVS_ACTION_ATTR_CT_CLEAR":
++            if attr_type == "uint32":
++                if attr_name == "OVS_ACTION_ATTR_OUTPUT":
++                    print_str += "%d" % int(value)
++                elif attr_name == "OVS_ACTION_ATTR_RECIRC":
++                    print_str += "recirc(0x%x)" % int(value)
++                elif attr_name == "OVS_ACTION_ATTR_TRUNC":
++                    print_str += "trunc(%d)" % int(value)
++                elif attr_name == "OVS_ACTION_ATTR_DROP":
++                    print_str += "drop(%d)" % int(value)
++            elif attr_type == "flag":
++                if attr_name == "OVS_ACTION_ATTR_CT_CLEAR":
+                     print_str += "ct_clear"
+-                elif field[0] == "OVS_ACTION_ATTR_POP_VLAN":
++                elif attr_name == "OVS_ACTION_ATTR_POP_VLAN":
+                     print_str += "pop_vlan"
+-                elif field[0] == "OVS_ACTION_ATTR_POP_ETH":
++                elif attr_name == "OVS_ACTION_ATTR_POP_ETH":
+                     print_str += "pop_eth"
+-                elif field[0] == "OVS_ACTION_ATTR_POP_NSH":
++                elif attr_name == "OVS_ACTION_ATTR_POP_NSH":
+                     print_str += "pop_nsh"
+-                elif field[0] == "OVS_ACTION_ATTR_POP_MPLS":
++                elif attr_name == "OVS_ACTION_ATTR_POP_MPLS":
+                     print_str += "pop_mpls"
+             else:
+-                datum = self.get_attr(field[0])
+-                if field[0] == "OVS_ACTION_ATTR_CLONE":
++                if attr_name == "OVS_ACTION_ATTR_CLONE":
+                     print_str += "clone("
+-                    print_str += datum.dpstr(more)
++                    print_str += value.dpstr(more)
+                     print_str += ")"
+                 else:
+-                    print_str += datum.dpstr(more)
++                    print_str += value.dpstr(more)
+ 
+         return print_str
+ 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.45.1
+
 
