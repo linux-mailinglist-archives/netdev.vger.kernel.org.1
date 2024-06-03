@@ -1,95 +1,150 @@
-Return-Path: <netdev+bounces-100230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AFCD8D8402
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 15:32:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EDE48D8401
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 15:32:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CFE51C21BA3
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 13:32:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA27A1F23B58
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 13:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B354312D769;
-	Mon,  3 Jun 2024 13:32:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1B812DD8E;
+	Mon,  3 Jun 2024 13:32:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9F1212D1FA;
-	Mon,  3 Jun 2024 13:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA3F12D75C
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 13:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717421529; cv=none; b=c4/jIXYVhpoS+Eu5stzG53TJMtGNuxqFFucpLrzZWU01CZcd8SPs7c5B22vpUlP2F0Ih27rB0tdda6R600JZNS0fAYqO6oHh5VgAx3jgcYMp8WelPhrkC1h7puKa/WgVYB26GMDTRH0r7y/M6EzxGaa0aXMX+1tY9RM6QlWO5Wo=
+	t=1717421525; cv=none; b=P05VrQtHH+aISx3kXfcQkx/2YC2Dmz8FLROg6/EMP/C7yRuyxz22XdjcN3hrLSxISscffmYfN6bCoGmlclYIe8XL467iu+iqie7cR+p0AN+OF10RlXm3w4N5Bcx3v2pswYeBc5dHx4Oxr3xQnvVvRu/dA/8S9OQzNwZm6/qJG9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717421529; c=relaxed/simple;
-	bh=i7qyliEW3tXAHVQUR36q8o9p80BoaaM8/W3VFHNn2Wc=;
+	s=arc-20240116; t=1717421525; c=relaxed/simple;
+	bh=xqsubzw6RF/3q23ZeAk99Ptlavs+dHfB9cH46W8yYq4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gTg3c5bmGFsZcKZ5Jcs9if7Os55gMR8f7Mue9UOLLSSZwYnLbyCHXTeNQxDeT4nSTH5vj0L2I3PDhs9dNBoEAF7VikadId9qm2CHr0X3ZgbQpmdFXXLlMHGGgAuGGbIiZfJfBCDbvCSvdV+wVUHQeiRDzwjL2JJXghe5gWoHRRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sE7mv-000000001SM-47uV;
-	Mon, 03 Jun 2024 13:31:50 +0000
-Date: Mon, 3 Jun 2024 14:31:46 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Sky Huang <SkyLake.Huang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=TBt3S8Y+0HCHlp+f9OWIWxTr4zeQ+fCzyikahdJ2ZMDNdjOqdXVtXIFeY8WHmpG5f7cNprky+urgSbs6So3pBCQsu8+nSnMdz1abDGi7J4AX9d2sSaKRWp3/hJnDz1wIJUo5Lg2iSdLVEPSn3KrcKQR9lanXpkj9ejSGgYoT4EQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sE7n4-0002jD-Jw; Mon, 03 Jun 2024 15:31:58 +0200
+Date: Mon, 3 Jun 2024 15:31:58 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH net-next v6 5/5] net: phy: add driver for built-in 2.5G
- ethernet PHY on MT7988
-Message-ID: <Zl3Fwoiv1bJlGaQZ@makrotopia.org>
-References: <20240603121834.27433-1-SkyLake.Huang@mediatek.com>
- <20240603121834.27433-6-SkyLake.Huang@mediatek.com>
- <Zl3ELbG8c8y0/4DN@shell.armlinux.org.uk>
+	Jakub Kicinski <kuba@kernel.org>, mleitner@redhat.com,
+	juri.lelli@redhat.com, vschneid@redhat.com, tglozar@redhat.com,
+	dsahern@kernel.org, bigeasy@linutronix.de, tglx@linutronix.de
+Subject: Re: [PATCH net-next v6 1/3] net: tcp/dcpp: prepare for tw_timer
+ un-pinning
+Message-ID: <20240603133158.GC8496@breakpoint.cc>
+References: <20240603093625.4055-1-fw@strlen.de>
+ <20240603093625.4055-2-fw@strlen.de>
+ <CANn89i+Zp=_F0tHTgQKuk1+5MV8MU+N=JV35vSTwKLFmi_5dNg@mail.gmail.com>
+ <20240603112152.GB8496@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Zl3ELbG8c8y0/4DN@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240603112152.GB8496@breakpoint.cc>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Mon, Jun 03, 2024 at 02:25:01PM +0100, Russell King (Oracle) wrote:
-> On Mon, Jun 03, 2024 at 08:18:34PM +0800, Sky Huang wrote:
-> > Add support for internal 2.5Gphy on MT7988. This driver will load
-> > necessary firmware, add appropriate time delay and figure out LED.
-> > Also, certain control registers will be set to fix link-up issues.
+Florian Westphal <fw@strlen.de> wrote:
+> Eric Dumazet <edumazet@google.com> wrote:
+> > On Mon, Jun 3, 2024 at 11:37 AM Florian Westphal <fw@strlen.de> wrote:
+> > > +       spin_lock(lock);
+> > > +       if (timer_shutdown(&tw->tw_timer)) {
+> > > +               /* releases @lock */
+> > > +               __inet_twsk_kill(tw, lock);
+> > > +       } else {
+> > 
+> > If we do not have a sync variant here, I think that inet_twsk_purge()
+> > could return while ongoing timers are alive.
 > 
-> Based on our previous discussion, it may be worth checking in the
-> .config_init() method whether phydev->interface is one of the
-> PHY interface modes that this PHY supports. As I understand from one
-> of your previous emails, the possibilities are XGMII, USXGMII or
-> INTERNAL. Thus:
+> Yes.
 > 
-> > +static int mt798x_2p5ge_phy_config_init(struct phy_device *phydev)
-> > +{
-> > +	struct pinctrl *pinctrl;
-> > +	int ret;
+> We can't use sync variant, it would deadlock on ehash spinlock.
 > 
-> 	/* Check that the PHY interface type is compatible */
-> 	if (phydev->interface != PHY_INTERFACE_MODE_INTERNAL &&
-> 	    phydev->interface != PHY_INTERFACE_MODE_XGMII &&
-> 	    phydev->interface != PHY_INTERFACE_MODE_USXGMII)
-> 		return -ENODEV;
+> > tcp_sk_exit_batch() would then possibly hit :
+> > 
+> > WARN_ON_ONCE(!refcount_dec_and_test(&net->ipv4.tcp_death_row.tw_refcount));
+> > 
+> > The alive timer are releasing tw->tw_dr->tw_refcount at the end of
+> > inet_twsk_kill()
+> 
+> Theoretically the tw socket can be unlinked from the tw hash already
+> (inet_twsk_purge won't encounter it), but timer is still running.
+> 
+> Only solution I see is to schedule() in tcp_sk_exit_batch() until
+> tw_refcount has dropped to the expected value, i.e. something like
+> 
+> static void tcp_wait_for_tw_timers(struct net *n)
+> {
+> 	while (refcount_read(&n->ipv4.tcp_death_row.tw_refcount) > 1))
+> 		schedule();
+> }
+> 
+> Any better idea?
 
-The PHY is built-into the SoC, and as such the connection type should
-always be "internal". The PHY does not exist as dedicated IC, only
-as built-in part of the MT7988 SoC.
+Actually, I think we can solve this in a much simpler way.
+
+Instead of replacing:
+
+void inet_twsk_deschedule_put(struct inet_timewait_sock *tw)
+{
+ if (del_timer_sync(&tw->tw_timer))
+    inet_twsk_kill(tw);
+ inet_twsk_put(tw);
+}
+
+With:
+ spinlock_t *lock = inet_ehash_lockp(hashinfo, tw->tw_hash);
+ spin_lock(lock);
+ if (timer_shutdown(&tw->tw_timer)) {
+
+(Which gets us into the tcp_sk_exit_batch trouble Eric points out),
+we can simply add "empty" ehash lock unlock pair before calling
+del_timer_sync():
+
+void inet_twsk_deschedule_put(struct inet_timewait_sock *tw)
+{
++	spinlock_t *lock = inet_ehash_lockp(hashinfo, tw->tw_hash);
++	spin_lock(lock)
++	spin_unlock(lock)
+
+        if (del_timer_sync(&tw->tw_timer))
+                inet_twsk_kill(tw);
+        inet_twsk_put(tw);
+}
+
+Rationale:
+inet_twsk_deschedule_put() cannot be called before hashdance_schedule
+calls refcount_set(&tw->tw_refcnt, 3).
+
+Before this any refcount_inc_not_zero fails so we never get into
+deschedule_put.
+
+Hashdance_schedule holds the ehash lock when it sets the tw refcount.
+The lock is released only after the timer is up and running.
+
+When inet_twsk_deschedule_put() is called, and hashdance_schedule
+is not yet done, the spinlock/unlock pair will guarantee that
+the timer is up after the spin_unlock.
+
+I think this is much better than the schedule loop waiting for tw_dr
+refcount to drop, it mainly needs a comment to explain what this is
+doing.
+
+Thoughts?
 
