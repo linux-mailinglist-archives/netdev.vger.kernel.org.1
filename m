@@ -1,139 +1,169 @@
-Return-Path: <netdev+bounces-100241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F9538D84D6
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 16:22:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B40A78D850C
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 16:31:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4A902898EC
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 14:22:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B15C1F2187D
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 14:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B50112EBE1;
-	Mon,  3 Jun 2024 14:22:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3198A134410;
+	Mon,  3 Jun 2024 14:30:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dzgeAJ8t"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="EFtn/JfO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4164B12EBD3
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 14:22:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DCB61311A7
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 14:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717424557; cv=none; b=mTgW5PcDrZ2dcYV9JJupaoSj9vkFGcIaymF2HeR3GyWrH+dcYy2yIEW+3qa4MPoDQqSWAQu1XbRrhhcMoVNs55JsfaTuDjFZnBN5bedm4ak9dlErommpxUVfkRmaheDWeP+I3qIvRFAtQ664XUPkrHmJHAQ+bwlg5mDob8Ibbok=
+	t=1717425017; cv=none; b=RbPCmYPaDJw28j9mQHUii8V8kddm7ehE0RdLzobgkINtVGn36ctBPCt1WITwWrbvfZE8KhgYdYPgiMChs44KBlWT+JU537b79oeqc8iP2Q8VwZWvF8cnnqSUnlOwihwZbOKodzYM5eIaDe98jNcAn+EiIVDEwDBeqGnGHK+xAU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717424557; c=relaxed/simple;
-	bh=We6rDzcmNkZka8Yg/UlI2NOrRc8wZeBmovLsr1vpxms=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ewFGjaTuQyp2jfYMLyEqkAym8UNFRWMQazhTXwxWc8bAx3y5Y46BgJafDMxU4bDG6W0Djb6eg6y/nfCLRLioqMJVWjUj4n71jBpQcilTc16rFFqDzI3wFQCX06E8ss01YH0J/iAqbcDEs/0Gkwk8lZ06I1uWUfqBXuD+o5YrtNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dzgeAJ8t; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-42133fbe137so114605e9.0
-        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 07:22:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717424554; x=1718029354; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B8oQaL9FAbTlCxOBkxoi1tsS9fGHeajwNfgQS79Eab4=;
-        b=dzgeAJ8tRQ+ykTrLKMx9/nAwCI4DR984reWh4BnR/jcQNWJv5GGqZ9eXmFsJlaUd3Y
-         6mRCk3QpTRHpU6a4XC1meVpYRyYhDeNOK7GrP+avkVxplvIfMUOJhGQSa8annvb5rMow
-         +d+6EJsTR2ecomqEUl0p8h9lCluDVo9fKTmN3tMXd9rp6efUICO1tnB9ibnjXGCq/J11
-         IoGUPYFsMidASbZnjRRcAsDL73t+q+dGED0B4uPc6JqAmDt86CGlC6Zu9DNYtvIDKtcL
-         VPH6KPlO5s9dO3g7in7+da0EGOKz6meLFWPWuWrLHFqY5EXo/bYjjGuaZmzoLNYSBzHy
-         bzWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717424554; x=1718029354;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B8oQaL9FAbTlCxOBkxoi1tsS9fGHeajwNfgQS79Eab4=;
-        b=E/BAYoVQpFWmGb0rGYgFXsVMLViT4PS+KW/hKsEt6JLtfn5q43jZkohI9Yt2Qae1UW
-         vAA9dEtQr9OcyDD/cbaZF8CGgK+3ocilAgiLLZaWoRVrF88K5vaFrhEc4G6CFMXbM7I4
-         5QMoF4NtZLB0SCFK6E883WJ6SKhjnxDRFp1DUddApuL7hFrM4CS5jofhGuCv/Vy2VASb
-         hu5RcMMCkSwPhBDz+9J2+h1McjU0omsn0HiAULNGIEOc8J9hMa8vZZ7L+951kzPU1vLT
-         d6FBnJ82V7EH7N7rOgu5imRqyrOZkXkFwX7KYIUqwaEfMdDiuPEcihUtcyytplSCtrWo
-         tSwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXx8uPbbNQkfD2jDvEWwEkBN5VVyT6C69LF3e/kjNIO9tQOl8zYEikwzbyPK6SuEzM8upZ+cKOLY6TUlRPEnLke7wOcy4r/
-X-Gm-Message-State: AOJu0YzuekhRyTT2bK5s6oin/uZ0SrbyfnAX1xO+dI0h+1f+fpyUlg+k
-	u5a6FpjncxgQ69NgKJH2/3OJwMbGcIDY7N91mISKH9wnkkUtf4EU+jtszq7w1eWGkVt0F8KAe9o
-	6EgGJh0a8UFuMsD9EIepKUiI8qW4UDWNPjFoQ
-X-Google-Smtp-Source: AGHT+IGfBZSQC3nuMyFIA62nQgOn5i3KE9nV0HmxA6glYXaTTKcthM+CvYrX0yBPIaZTUjSBF0eToYcanDe9tlaGby8=
-X-Received: by 2002:a05:600c:1d27:b0:421:328e:99db with SMTP id
- 5b1f17b1804b1-421358b2ea5mr3535925e9.1.1717424554207; Mon, 03 Jun 2024
- 07:22:34 -0700 (PDT)
+	s=arc-20240116; t=1717425017; c=relaxed/simple;
+	bh=RIFC2dLClnA5GSHx4hCgUcQeo7MGnIwwf6LZNjvHqVs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LadmCcwJqabyraXSHMFDQ1VeA5j+pPrSXO5lBrJuSpimZdOCvnela7idwcC7xJW54pzxVV+4yzC34JoMsWhpi4YptW7YcaQlZ36ctQjyZb9Z9S3oAw9WifKy0Z0ovvcLaUcsmHec6MFPogNAfvw3zvkTI32cksQKoWNvKlPN0aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=EFtn/JfO; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id CF707882AF;
+	Mon,  3 Jun 2024 16:30:12 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1717425013;
+	bh=lqnIEjB6gWuRJxieyOxq6KGZD2sIbDGcg8/jyWxGVSc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=EFtn/JfOq8gVGoTUIGT88zgMKJdOYAup8klZKLrB82doMp1py1obVTTJXe2BpUIeR
+	 AYFek3j5tCkT+4z3pQvHFLUYGWyhxA2DQan2T0pJ6qZXTsViQTAhbbsPdSqxYurwji
+	 iSfQw3kDOl3zvzebhv94FFhZH5eyWlLFDEJgK6Wf8rd5h8YTRfajSDge1NrP+4NhQS
+	 5vB94HQM2L/nrbp3bR19CKsKLqtlyH6KRqfVLi2jY346dyMALK3YKHtuPN0/k5SZI0
+	 JYQwymvNc1ey+iOlJGZRnYCZe7X8lfcnWzm0wlQPizRWF+tPykwetTGTwi9TG8YSXq
+	 8rVtZxnRK1UAQ==
+Message-ID: <d1aac0b0-c985-40c2-8a6f-29a4617edaf8@denx.de>
+Date: Mon, 3 Jun 2024 16:26:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240601212517.644844-1-kuba@kernel.org> <20240601161013.10d5e52c@hermes.local>
- <20240601164814.3c34c807@kernel.org> <ad393197-fd1a-4cd8-a371-f6529419193b@kernel.org>
- <CANn89i+i-CooK7GHKr=UYDw4Nf7EYQ5GFGB3PFZiaB7a_j3_xA@mail.gmail.com>
- <20240602152102.1a50feed@kernel.org> <20240603065425.6b74c2dd@kernel.org>
-In-Reply-To: <20240603065425.6b74c2dd@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 3 Jun 2024 16:22:19 +0200
-Message-ID: <CANn89iKF3z_c7_2bqAVcqKZfrsFaTtdQcUNvMQo4mZCFk0Nx8g@mail.gmail.com>
-Subject: Re: [PATCH net] inet: bring NLM_DONE out to a separate recv() in inet_dump_ifaddr()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, davem@davemloft.net, 
-	netdev@vger.kernel.org, pabeni@redhat.com, 
-	Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next,RFC,PATCH 1/5] net: stmmac: dwmac-stm32: Separate out
+ external clock rate validation
+To: Sai Krishna Gajula <saikrishnag@marvell.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Christophe Roullier <christophe.roullier@foss.st.com>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, Paolo Abeni
+ <pabeni@redhat.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-stm32@st-md-mailman.stormreply.com"
+ <linux-stm32@st-md-mailman.stormreply.com>
+References: <20240427215113.57548-1-marex@denx.de>
+ <BY3PR18MB4707314AE781472140361D62A01B2@BY3PR18MB4707.namprd18.prod.outlook.com>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <BY3PR18MB4707314AE781472140361D62A01B2@BY3PR18MB4707.namprd18.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Mon, Jun 3, 2024 at 3:54=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Sun, 2 Jun 2024 15:21:02 -0700 Jakub Kicinski wrote:
-> > Netlink is full of legacy behavior, the only way to make it usable
-> > in modern environments is to let new families not repeat the mistakes.
-> > That's why I'd really rather not add a workaround at the af_netlink
-> > level. Why would ethtool (which correctly coalesced NLM_DONE from day 1=
-)
-> > suddenly start needed another recv(). A lot of the time the entire dump
-> > fits in one skb.
-> >
-> > If you prefer to sacrifice all of rtnetlink (some of which, to be clear=
-,
-> > has also been correctly coded from day 1) - we can add a trampoline for
-> > rtnetlink dump handlers?
->
-> Hi Eric, how do you feel about this approach? It would also let us
-> extract the "RTNL unlocked dump" handling from af_netlink.c, which
-> would be nice.
+On 4/29/24 9:19 AM, Sai Krishna Gajula wrote:
+> 
+>> -----Original Message-----
+>> From: Marek Vasut <marex@denx.de>
+>> Sent: Sunday, April 28, 2024 3:21 AM
+>> To: netdev@vger.kernel.org
+>> Cc: Marek Vasut <marex@denx.de>; David S. Miller <davem@davemloft.net>;
+>> Alexandre Torgue <alexandre.torgue@foss.st.com>; Christophe Roullier
+>> <christophe.roullier@foss.st.com>; Eric Dumazet <edumazet@google.com>;
+>> Jakub Kicinski <kuba@kernel.org>; Jose Abreu <joabreu@synopsys.com>;
+>> Maxime Coquelin <mcoquelin.stm32@gmail.com>; Paolo Abeni
+>> <pabeni@redhat.com>; linux-arm-kernel@lists.infradead.org; linux-
+>> stm32@st-md-mailman.stormreply.com
+>> Subject: [net-next,RFC,PATCH 1/5] net: stmmac: dwmac-stm32:
+>> Separate out external clock rate validation
+>>
+>> Pull the external clock frequency validation into a separate function, to avoid
+>> conflating it with external clock DT property decoding and clock mux register
+>> configuration. This should make the code easier to read and understand.
+>>
+>> This does change the code behavior slightly. The clock mux PMCR register
+>> setting now depends solely on the DT properties which configure the clock
+>> mux between external clock and internal RCC generated clock. The mux
+>> PMCR register settings no longer depend on the supplied clock frequency, that
+>> supplied clock frequency is now only validated, and if the clock frequency is
+>> invalid for a mode, it is rejected.
+>>
+>> Previously, the code would switch the PMCR register clock mux to internal RCC
+>> generated clock if external clock couldn't provide suitable frequency, without
+>> checking whether the RCC generated clock frequency is correct. Such behavior
+>> is risky at best, user should have configured their clock correctly in the first
+>> place, so this behavior is removed here.
+>>
+>> Signed-off-by: Marek Vasut <marex@denx.de>
+>> ---
+>> Cc: "David S. Miller" <davem@davemloft.net>
+>> Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
+>> Cc: Christophe Roullier <christophe.roullier@foss.st.com>
+>> Cc: Eric Dumazet <edumazet@google.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: Jose Abreu <joabreu@synopsys.com>
+>> Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
+>> Cc: Paolo Abeni <pabeni@redhat.com>
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> Cc: linux-stm32@st-md-mailman.stormreply.com
+>> Cc: netdev@vger.kernel.org
+>> ---
+>>   .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 54 +++++++++++++++----
+>>   1 file changed, 44 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+>> b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+>> index c92dfc4ecf570..43340a5573c64 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+>> @@ -157,25 +157,57 @@ static int stm32_dwmac_init(struct
+>> plat_stmmacenet_data *plat_dat, bool resume)
+>>   	return stm32_dwmac_clk_enable(dwmac, resume);  }
+>>
+>> +static int stm32mp1_validate_ethck_rate(struct plat_stmmacenet_data
+>> +*plat_dat) {
+>> +	struct stm32_dwmac *dwmac = plat_dat->bsp_priv;
+>> +	const u32 clk_rate = clk_get_rate(dwmac->clk_eth_ck);
+> 
+> Please check reverse x-mass tree is followed for these variables, if possible.
+> 
+>> +
+>> +	switch (plat_dat->mac_interface) {
+>> +	case PHY_INTERFACE_MODE_MII:
+>> +		if (clk_rate == ETH_CK_F_25M)
+>> +			return 0;
+>> +		break;
+>> +	case PHY_INTERFACE_MODE_GMII:
+>> +		if (clk_rate == ETH_CK_F_25M)
+>> +			return 0;
+>> +		break;
+> 
+> Please check, whether we can combine the two cases..
 
-Sure, I have not thought of af_netlink
+I hope those would be addressed in v4 of:
 
->
-> BTW it will probably need to be paired with fixing the
-> for_each_netdev_dump() foot gun, maybe (untested):
->
+[PATCH v3 02/11] net: stmmac: dwmac-stm32: Separate out external clock 
+rate validation
 
-I confess I am a bit lost : this part relates to your original submission,
-when you set "ctx->ifindex =3D ULONG_MAX;"  in inet_dump_ifaddr() ?
-
-
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -3025,7 +3025,8 @@ int call_netdevice_notifiers_info(unsigned long val=
-,
->  #define net_device_entry(lh)   list_entry(lh, struct net_device, dev_lis=
-t)
->
->  #define for_each_netdev_dump(net, d, ifindex)                          \
-> -       xa_for_each_start(&(net)->dev_by_index, (ifindex), (d), (ifindex)=
-)
-> +       for (; (d =3D xa_find(&(net)->dev_by_index, &ifindex,            =
- \
-> +                           ULONG_MAX, XA_PRESENT)); ifindex++)
->
->  static inline struct net_device *next_net_device(struct net_device *dev)
->  {
->
+Thanks !
 
