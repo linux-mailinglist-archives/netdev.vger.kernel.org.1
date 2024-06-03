@@ -1,537 +1,560 @@
-Return-Path: <netdev+bounces-100223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A38F58D836F
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 15:05:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B7268D83A2
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 15:13:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5908E28680F
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 13:05:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22692283AFF
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 13:13:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D67912CD89;
-	Mon,  3 Jun 2024 13:05:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E399F12D74B;
+	Mon,  3 Jun 2024 13:13:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mahYKxdu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XqwCPCKX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11FD91E4A2
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 13:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717419919; cv=fail; b=n6Hb000YQWgMDl4Mf8gj9rUCPE80GlIICIJ6+UNztKjKUpV4xB3ZHuHrQ7NAXdy0APUBXSoY549PhCuArsJPmHep2oIjXriob/1AMvGHBfXBxMW0b3roCOMnavGbcMyLmzNxsFq72AcvKHqCXEm7yl6Sx7nDwOoUIgwVqXbOyTA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717419919; c=relaxed/simple;
-	bh=oNpeiOMRLibx9JCUJ7l7A91jJ4dK1Q+kkh33oIQXLjY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=csmKPCWojtu+/LRfHepVfdREkR6SFncMGVs2dhnhLT83lGzRTCej/Pv0t6NZhhifOVyTTbTELK3wLZk8qNB0ATkFb7d6L635v0Zh/CSBanMFarAAwPaHMj0R8jd96EQjADgdBEo+BOBPCXRj3h7hSiV7W5wXTjvYWYx4/85Z5OI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mahYKxdu; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717419917; x=1748955917;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=oNpeiOMRLibx9JCUJ7l7A91jJ4dK1Q+kkh33oIQXLjY=;
-  b=mahYKxduML8z3cNdcbQoacnAulQn1WjCBrsUNGbgwL7nsEsz7KCqBfhU
-   6se22y8g060/5TCM5KKt8UtYuAVVrwAO2PSSi92E2/QBZAjojCBf2lnCT
-   2MSoObbfRIlRJRDqKhMDa/A8f/+Z4/TIyBUkBPKq8sPWJL9Wvu0CRBTGG
-   2uIWcRMDkF/FT8Dy4TpYGKL5/pE5uOAMG0EXlYGm558C6RQMuWMNcfgnx
-   ufJuIQVaplPBnZUKcXtnyMo8CJhMw3OS4GYXeIyUy/9hPKq+7/GzHN+RC
-   BA9s5l82xylFqMpYduesRpOuGLP/5ERqwEdSYJ09PfSmdrbZfAmtGlZol
-   g==;
-X-CSE-ConnectionGUID: Fw8MpRsvR2K57kR4TOUT3g==
-X-CSE-MsgGUID: 9MPiBa9/SLChPLXaiwcZFQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11092"; a="13720402"
-X-IronPort-AV: E=Sophos;i="6.08,211,1712646000"; 
-   d="scan'208";a="13720402"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2024 06:05:17 -0700
-X-CSE-ConnectionGUID: LT7xEgbSRxqEibtV8G1+JQ==
-X-CSE-MsgGUID: CaSRnPXXRu6fcP+FskSH2w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,211,1712646000"; 
-   d="scan'208";a="41803792"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Jun 2024 06:05:16 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 3 Jun 2024 06:05:15 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 3 Jun 2024 06:05:15 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.40) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 3 Jun 2024 06:05:15 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A7mT+vbOpvZx9asZKVLzDW90L+TUaiHHSs+TESd90XuH5vLbi7C5+iFz6stnG+GqLDH1ILrjs2al3oW1ZJ9YXLR70pZG/Op1uRgLNBIY0MR+hsvsVpKlmLNpbDQbJYGyxwbB50hKqOia1yn6863M7nrjMbeCfFQt3ArqD3LVICS01jpz8mNXM84S+ikmTO6ueDZsipPeezYlaZIBCTVDrL03w+QDpn1QGx1kWhdbZUKNqTyjzgDli1Ylht+YDAbbAMxwTVsfGUR/OMOavHw8FP+pG7sEPRLUyH4ai4kRJUeNZpg9KX9MnwuY7c9PEm7oLovPNlaEqZ5lO/rDfwfQgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hCsGQCzj/gLAxIZE1M/1W22YBIYIURglyc/HHh1BT/s=;
- b=aJh4nnl7LvvH5WFw0N/747BK+cO8HWlCag74fdUvVQPjkpYtTksAh6c0R3fdlFsFKQlsfjDDStLCRHu26tcXnUIaisQ/DvE/Ku8JBSWpXMBXQjYsdQPXqrt9Djp1x5fm1W5g+d4DlKyhm0nVoV8HpF5IofZBMU5nlgy2XnDRB+GeCJ2Ls8cTZI7HG33KD7mgzOt8Ym6/HnQy1QyETfTZWZPX3IS2+a9omTZwfr/Sr3oo4YNOsZaSgpW237ojIDEAhx6bdRDDRjnGzH/08jiczfhT70K6Dqqdj5dr0h5iu9GNRYQnt25gLrYnPodKjsOvvChrn9UeWql6IvihF6KXQw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM6PR11MB4610.namprd11.prod.outlook.com (2603:10b6:5:2ab::19)
- by CH0PR11MB5265.namprd11.prod.outlook.com (2603:10b6:610:e0::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.27; Mon, 3 Jun
- 2024 13:05:13 +0000
-Received: from DM6PR11MB4610.namprd11.prod.outlook.com
- ([fe80::c24a:5ab8:133d:cb04]) by DM6PR11MB4610.namprd11.prod.outlook.com
- ([fe80::c24a:5ab8:133d:cb04%4]) with mapi id 15.20.7633.021; Mon, 3 Jun 2024
- 13:05:13 +0000
-From: "Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>
-To: Simon Horman <horms@kernel.org>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Keller, Jacob E"
-	<jacob.e.keller@intel.com>, "Wegrzyn, Stefan" <stefan.wegrzyn@intel.com>,
-	"Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>, "Glaza, Jan"
-	<jan.glaza@intel.com>
-Subject: RE: [PATCH iwl-next v7 3/7] ixgbe: Add link management support for
- E610 device
-Thread-Topic: [PATCH iwl-next v7 3/7] ixgbe: Add link management support for
- E610 device
-Thread-Index: AQHasEWiFJDgUgCkp0eTQNoaS5ErbrGxdC6AgASW2SA=
-Date: Mon, 3 Jun 2024 13:05:13 +0000
-Message-ID: <DM6PR11MB46103DEF82B2CFAA97FB9145F3FF2@DM6PR11MB4610.namprd11.prod.outlook.com>
-References: <20240527151023.3634-1-piotr.kwapulinski@intel.com>
- <20240527151023.3634-4-piotr.kwapulinski@intel.com>
- <20240531145357.GJ123401@kernel.org>
-In-Reply-To: <20240531145357.GJ123401@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR11MB4610:EE_|CH0PR11MB5265:EE_
-x-ms-office365-filtering-correlation-id: 47d22a9d-6900-4b1f-ad53-08dc83cdce4a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|366007|1800799015|376005|38070700009;
-x-microsoft-antispam-message-info: =?us-ascii?Q?kXRms7MFFqtSUeJ6vskYSrRJhLIRJjmVTQoLDEARLUZNejEoNd6mdU8Ijie5?=
- =?us-ascii?Q?3JQ7AH01GKmq+WBS5u7BxxFrLz+LdUm9g7u8LhFzxRy4lMjRxi21vSL2CJS4?=
- =?us-ascii?Q?nH5j5lGQnjOL0XNhgMRFmK28QoYo0sDZvEXyobyaeDnkmGXIimUzZRLC0a2r?=
- =?us-ascii?Q?Zl4T2vzzaek6mq2OwnqQErKa0FQKm0lgz4t/QsiaNpo18qwhsEP/fCNJ2sg3?=
- =?us-ascii?Q?W46gs/UXphYsm1KunQPQBjtJ2uI0GzeXKD7CHEHlhzYLtGoiR6zoJNpOY89I?=
- =?us-ascii?Q?a/gDJiLwG2gNqeyy109KMlRUJ2vfpW9kSL6hSjWR7hyN/1sD8ti0Sefhsu1o?=
- =?us-ascii?Q?QSaIvYaNMkPbCdSgAo3IzdYe+JZl66TWIFZnFipVqLhhn0o1c4PE6Zfgzeh2?=
- =?us-ascii?Q?eqdTPMZ1rapfx49SPu5AKdXdSIaeHdgMFUhrYt+YFGxu9hf9xns9XGDvt7Dm?=
- =?us-ascii?Q?UXn0A0WD3Wr4uVtGxKAePnviWTQsjRhekbv2Lw2wmTMjPfVbTH+Ab2ZT95Sh?=
- =?us-ascii?Q?YyfK1niC27+iCVHon4Sd8V08djInaqrfuu10a6H41FbniQH0uB5ZddSeBYGp?=
- =?us-ascii?Q?lf836qX3nLqQgJtNfc7v0kEgoV3Aid9LJTVGiG5mkP7iu164b1Ns6lhgxw5M?=
- =?us-ascii?Q?IQy2Cxaipz+4J1QiqHKqj2w+j55ClQTwwnh7HxLH7bIihVCUR/V97NaiFZDK?=
- =?us-ascii?Q?QH0MDiFD4a6X1uWxpFeWMRsDhbZIr2ggzDculaHJOfNu7nn4vRYgUpuWsCH5?=
- =?us-ascii?Q?Xk/6ir4q1A9wN4+TF9VhtT+UnB7z/zd2nZaYma+003i1vD2F1og+7vRY0xDC?=
- =?us-ascii?Q?WuHQ/WJSrw++AdWscntyFSCsB9q3Ne8nnQTHSXrMfqG5Zavo7J3kl67+AZqI?=
- =?us-ascii?Q?wIHdqpqB+3Na5W9ltC7XcuR2+3Q/ewC4VpTis+ESgjLM/QNMdwgTSt+v0F/A?=
- =?us-ascii?Q?8e04NYi4MU79RpjiwkCtDtfDRsFx9tvVbTdke6m1OfqEHWxcCpTUBVrCxAUd?=
- =?us-ascii?Q?M/H39R2zbcc82a9cq6a2aZTMfEUzqynwAcCcn97yNHmKrACUGcbysqft3Vi0?=
- =?us-ascii?Q?xA0McDz0ViMg7YfuZSS2IsVSylnrQllVZ3d0MKzOxagPX61zElMERDWLYOYA?=
- =?us-ascii?Q?AqyAVwsIUpHRqAjgMeHh50huieHk4bYAJHqyf+wTuyQki03KBqCa+PZ5pyeU?=
- =?us-ascii?Q?7xkFC0SN5IIABAJMxGR9Lq/uLdhvK6oXpytwPD1lIk3bXjUE9hnPgRk/CMHh?=
- =?us-ascii?Q?3H2NIbaB6995P+NtTs4rrW9/XjJt3WLXB9VaXzB3SnlVg2p2XucQ0RFRJASN?=
- =?us-ascii?Q?OLaPHaPSLWGaTkd8FQUkCXiYJB2w4/PJ1i7CRidsWhyGuw=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4610.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?93+dpGUU12FV3RJ56JBzOjr+sgMPi4Gk8FtbDISEsGPoekl1euMoa8KTEvmc?=
- =?us-ascii?Q?WGrzpfSrGfmovL3MkpZALIjltgHUc2RmcAqr8Ymmg+ORr7VbTohw4pHNWBmT?=
- =?us-ascii?Q?sKOF1fg/zCJ0BvJ9gzt2vSd9JBRdBgdI0ZKzMr7jyyl3RP1VleAYF+aFQDsI?=
- =?us-ascii?Q?b1dBF3CP3iXbbPkSyHJDCJP/bWDYT+KMItLBYmlOWG8PZOD4z9OYjpsSzxxa?=
- =?us-ascii?Q?cYSxGzYy3wN2swJN92EkyKw7jnczIErgjIvIONPuiG3Au8hwgj0BRt/QbKEc?=
- =?us-ascii?Q?jhLWsXk/83/GahWd0127BriXQ6lByiw8Zn7KNNJvWdYNl9YGlmJPZ75KAyyo?=
- =?us-ascii?Q?49VfoyE1TzmZ1dJVD5MLpvsiDVoUyBzamHlGgWaIgfqxJZk8+f45bqrl6aEF?=
- =?us-ascii?Q?JgA9UFKK7oRBQL+WjRVwtTDt6M683KrU+pDgIIwM3rQohenfg4aQoPjb2vKx?=
- =?us-ascii?Q?RIf6f5J2Fa2vz77w7fr2i4YhPQLd6E1Eea/vR4odKz8EI58o6EwBkrz5jiq2?=
- =?us-ascii?Q?JWT/YtlPl+OcLnOmGU7njX2/jotWTaX6nf5i+QmQyLQA74LuvW6DuxzgxsyB?=
- =?us-ascii?Q?dbQIU2DbuthME1N+xf7Mbkq5aoDrk9cu7BkIfhh+j3b4fNkTpTNRXfK4Wj2Z?=
- =?us-ascii?Q?07kayDVujaPZBEEh1bDiSuuWL+dqjuxoRpJ3+rMWN6IXuCxTkhRS3Mm4Fju7?=
- =?us-ascii?Q?9kTLhq1WPhi3Ck9Q5PoP9/LZP14WUiYvM07QdqZs2w5HGaTniHN7oBT6gqxs?=
- =?us-ascii?Q?zpuoFfi6oIU6HTLCV2nbxrNk+HfVTJ19TGDd5UvhzNG9y5Iy2EouKitK2NFJ?=
- =?us-ascii?Q?95DWSerAddJEyvpKIOqZilAcQ2zoW793LUeVqxnfjeHRoa8UvPpohZyfUKj5?=
- =?us-ascii?Q?/aaY1UuUKP2Ri1GVpk8rl1hK2C7HJRTi+w3RS3Da0+LBMqvVIaCPL/5ZGMQ8?=
- =?us-ascii?Q?mfZLfwtUIg1mt3ifc3Bng9EbPZ7/8X2qE3CbRAYU31ILfuKvRJtRNsCBu0Xd?=
- =?us-ascii?Q?Bqh5qQ4rxv7p+tmiCrlgjJcKFTNBMfA7SXVUjAxbbUxOwOSnwHPsCFqM9soJ?=
- =?us-ascii?Q?FTE2NhGJ0FfVNM08qsLq0yFZj2nT97113GYwWGxkUnzfINia3EzFeGol++8S?=
- =?us-ascii?Q?BI2oC2wpbI9eT7L47bvTFB0DhYGVfyF4FYgNvSkrNWLiV5AQbCkeCcHJGqYk?=
- =?us-ascii?Q?PUp1VFRMpnWNcKQhmDE153t3GmaSTkq9VpDKyWow+Od5Ywa5BKSZAvxsGG2M?=
- =?us-ascii?Q?R35F8JYEICOUyTeaBfI+sNBCeLGGxwDUtxBRyhg0cjQwJUz8qY7u7nOosfiX?=
- =?us-ascii?Q?AccnuBhHL0eDnQjQiuAmmyZpREX7g2f0U3iub/u3CRhi7GRTIiRGWsDphnEh?=
- =?us-ascii?Q?kls5/4KKDpIE0dK8elSIm/T5Vaka1KCTEc6x/aA3bQsjqWXvMskE3D70micF?=
- =?us-ascii?Q?HIivriQIi0Hmzzxccph77p6LO+zK5oor+OIgxVwcD8sQE3pwfI8koh6G/KQd?=
- =?us-ascii?Q?3KK8JWx6Ov+IaywQe5yLFmT3COXIoJ08+uqq2IgQxkmns82PT5NSbK3mvm7z?=
- =?us-ascii?Q?3SorHTuialijsCT1pmjm680TyHG9EH9aLU32s4da?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1D012C550;
+	Mon,  3 Jun 2024 13:13:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717420401; cv=none; b=GCbW8/SzSwsb+GWcDdtujw8q8bB/PLTL7IGPVEWJHekcjY3KhCDs9nJsggizVyoa8SYHqksJ6TCORrPKhMlDoeOZkQX54uofM/ia/9E8bkf8O4OamTx65vlfB52CAf8ZlxnX9AJ0RrC6XaGZyz5+YhYHxYVhTjfuL0B99qVH/2w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717420401; c=relaxed/simple;
+	bh=o1YRPJ6qJEZ1CMAFtxumb6TtfEE5pv+lHDiHuw1PFEk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZUcAhtOqSa3FJOrLN3wRBrJzN0e1bcxx9mfhDt8AvcYhGZb4Hz4wadMt3wlp0S0Dcqt8KDcIjUcCyGsWW5vKDfubHXu0KabX7YjuhPdmZjR9tP8NisEKBo3jOuYc7nircCnAe31vF7O2VWzoAlqq72q9oPzL2rQgrZDZS/gViYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XqwCPCKX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A14E1C2BD10;
+	Mon,  3 Jun 2024 13:13:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717420400;
+	bh=o1YRPJ6qJEZ1CMAFtxumb6TtfEE5pv+lHDiHuw1PFEk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=XqwCPCKX92S0V0n2hk8gqca7Q80siGY7IyYeqsDcDKplKoaLuETUnF5Eb4+hIp8Se
+	 EMjE4Wv98oEVq25AEPIcNhc5Rv4Vp5amzbDKBsi8kieRM2j5opYqvBiRJiJuJ7Gebi
+	 6BrU0o5zCEeM5G73fgw1BHNTLM5dwUoFBXQZILY7sxz6kaSSGiWmWzy2d/rD/xoHEZ
+	 4GQBZp+JvQzEHI+EYhEcTEInAclvA+3A4Qpr9vLKDAqw26NX9kXyo/khVV8ubT6NHr
+	 Uvj+fRvVcl+CtQkpQYsdFC8u1KhyQNUFuBuc4JkOnW5zoUyxBPZygzXtmts3QyjDdk
+	 64SG8oh+K3S8g==
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Gregory Clement <gregory.clement@bootlin.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	UNGLinuxDriver@microchip.com,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Conor Dooley <conor.dooley@microchip.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-clk@vger.kernel.org,
+	linux-mips@vger.kernel.org,
+	linux-mtd@lists.infradead.org,
+	netdev@vger.kernel.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH v2] dt-bindings: mfd: syscon: Add more simple compatibles
+Date: Mon,  3 Jun 2024 08:12:27 -0500
+Message-ID: <20240603131230.136196-2-robh@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4610.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 47d22a9d-6900-4b1f-ad53-08dc83cdce4a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jun 2024 13:05:13.1969
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: B73nhBTXMOcydxssMqW/WYrsTqzmabmTOsaRPH2fKRoQ7a0CEzu7HZ5U+ao+clld3My8a/3sD6aw/fy3i/AExFZkywcOrb6B8WY7Kpa35To=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5265
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
->-----Original Message-----
->From: Simon Horman <horms@kernel.org>=20
->Sent: Friday, May 31, 2024 4:54 PM
->To: Kwapulinski, Piotr <piotr.kwapulinski@intel.com>
->Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Keller, Jaco=
-b E <jacob.e.keller@intel.com>; Wegrzyn, Stefan <stefan.wegrzyn@intel.com>;=
- Jagielski, Jedrzej <jedrzej.jagielski@intel.com>; Glaza, Jan <jan.glaza@in=
-tel.com>
->Subject: Re: [PATCH iwl-next v7 3/7] ixgbe: Add link management support fo=
-r E610 device
->
->On Mon, May 27, 2024 at 05:10:19PM +0200, Piotr Kwapulinski wrote:
->> Add low level link management support for E610 device. Link management=20
->> operations are handled via the Admin Command Interface. Add the=20
->> following link management operations:
->> - get link capabilities
->> - set up link
->> - get media type
->> - get link status, link status events
->> - link power management
->>=20
->> Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
->> Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
->> Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
->> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
->> Reviewed-by: Jan Glaza <jan.glaza@intel.com>
->> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
->
->Hi Pitor, all,
->
->Some more minor feedback from my side.
->
->...
->
->> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c=20
->> b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
->
->...
->
->> +/**
->> + * ixgbe_is_media_cage_present - check if media cage is present
->> + * @hw: pointer to the HW struct
->> + *
->> + * Identify presence of media cage using the ACI command (0x06E0).
->> + *
->> + * Return: true if media cage is present, else false. If no cage,=20
->> +then
->> + * media type is backplane or BASE-T.
->> + */
->> +static bool ixgbe_is_media_cage_present(struct ixgbe_hw *hw) {
->> +	struct ixgbe_aci_cmd_get_link_topo *cmd;
->> +	struct ixgbe_aci_desc desc;
->> +
->> +	cmd =3D &desc.params.get_link_topo;
->> +
->> +	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_get_link_topo);
->> +
->> +	cmd->addr.topo_params.node_type_ctx =3D
->> +		FIELD_PREP(IXGBE_ACI_LINK_TOPO_NODE_CTX_M,
->> +			   IXGBE_ACI_LINK_TOPO_NODE_CTX_PORT);
->> +
->> +	/* Set node type. */
->> +	cmd->addr.topo_params.node_type_ctx |=3D
->> +		(IXGBE_ACI_LINK_TOPO_NODE_TYPE_M &
->> +		 IXGBE_ACI_LINK_TOPO_NODE_TYPE_CAGE);
->
->nit: Can this also use FIELD_PREP?
-Hello Simon
-Will try to apply
+Add another batch of various "simple" syscon compatibles which were
+undocumented or still documented with old text bindings. Remove the old
+text binding docs for the ones which were documented.
 
->
->> +
->> +	/* Node type cage can be used to determine if cage is present. If AQC
->> +	 * returns error (ENOENT), then no cage present. If no cage present th=
-en
->> +	 * connection type is backplane or BASE-T.
->> +	 */
->> +	return ixgbe_aci_get_netlist_node(hw, cmd, NULL, NULL); }
->
->...
->
->> +/**
->> + * ixgbe_get_link_status - get status of the HW network link
->> + * @hw: pointer to the HW struct
->> + * @link_up: pointer to bool (true/false =3D linkup/linkdown)
->> + *
->> + * Variable link_up is true if link is up, false if link is down.
->> + * The variable link_up is invalid if status is non zero. As a
->> + * result of this call, link status reporting becomes enabled
->> + *
->> + * Return: the exit code of the operation.
->> + */
->> +int ixgbe_get_link_status(struct ixgbe_hw *hw, bool *link_up) {
->> +	int err =3D 0;
->> +
->> +	if (!hw || !link_up)
->> +		return -EINVAL;
->> +
->> +	if (hw->link.get_link_info) {
->> +		err =3D ixgbe_update_link_info(hw);
->> +		if (err)
->> +			return err;
->> +	}
->> +
->> +	*link_up =3D hw->link.link_info.link_info & IXGBE_ACI_LINK_UP;
->> +
->> +	return err;
->
->nit: If the function used "return 0" here,
->     then there would be no need to initialise err to 0
->     and the scope of err could be reduced to the if clause where
->     ixgbe_update_link_info() is called.
-Will do
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Acked-by: Stephen Boyd <sboyd@kernel.org>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com> # mtd
+Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+---
+v2:
+- Rebase on mfd next branch
 
->
->> +}
->
->...
->
->> +/**
->> + * ixgbe_fc_autoneg_e610 - Configure flow control
->> + * @hw: pointer to hardware structure
->> + *
->> + * Configure Flow Control.
->> + */
->> +void ixgbe_fc_autoneg_e610(struct ixgbe_hw *hw) {
->> +	int err;
->> +
->> +	/* Get current link err.
->> +	 * Current FC mode will be stored in the hw context.
->> +	 */
->> +	err =3D ixgbe_aci_get_link_info(hw, false, NULL);
->> +	if (err)
->> +		goto out;
->> +
->> +	/* Check if the link is up */
->> +	if (!(hw->link.link_info.link_info & IXGBE_ACI_LINK_UP)) {
->> +		err =3D -EIO;
->> +		goto out;
->> +	}
->> +
->> +	/* Check if auto-negotiation has completed */
->> +	if (!(hw->link.link_info.an_info & IXGBE_ACI_AN_COMPLETED)) {
->> +		err =3D -EIO;
->> +		goto out;
->> +	}
->> +
->> +out:
->> +	if (!err) {
->> +		hw->fc.fc_was_autonegged =3D true;
->> +	} else {
->> +		hw->fc.fc_was_autonegged =3D false;
->> +		hw->fc.current_mode =3D hw->fc.requested_mode;
->> +	}
->> +}
->
->As out is only jumped to from error paths, and err is not returned, perhap=
-s this is a bit nicer (completely untested!):
-Will do
+ .../bindings/arm/amlogic/analog-top.txt       | 20 -------------
+ .../bindings/arm/amlogic/assist.txt           | 17 -----------
+ .../bindings/arm/amlogic/bootrom.txt          | 17 -----------
+ .../devicetree/bindings/arm/amlogic/pmu.txt   | 18 ------------
+ .../devicetree/bindings/arm/atmel-sysregs.txt | 29 -------------------
+ .../devicetree/bindings/arm/axis.txt          | 16 ----------
+ .../arm/cpu-enable-method/al,alpine-smp       | 10 -------
+ .../arm/freescale/fsl,vf610-mscm-cpucfg.txt   | 14 ---------
+ .../bindings/arm/marvell/marvell,dove.txt     | 15 ----------
+ .../devicetree/bindings/arm/spear-misc.txt    |  9 ------
+ .../bindings/clock/ti-keystone-pllctrl.txt    | 20 -------------
+ .../devicetree/bindings/mfd/syscon.yaml       | 29 +++++++++++++++++++
+ .../devicetree/bindings/mips/mscc.txt         | 17 -----------
+ .../devicetree/bindings/mtd/atmel-nand.txt    |  9 ------
+ .../bindings/net/hisilicon-hip04-net.txt      | 10 -------
+ 15 files changed, 29 insertions(+), 221 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/arm/amlogic/analog-top.txt
+ delete mode 100644 Documentation/devicetree/bindings/arm/amlogic/assist.txt
+ delete mode 100644 Documentation/devicetree/bindings/arm/amlogic/bootrom.txt
+ delete mode 100644 Documentation/devicetree/bindings/arm/amlogic/pmu.txt
+ delete mode 100644 Documentation/devicetree/bindings/arm/freescale/fsl,vf610-mscm-cpucfg.txt
+ delete mode 100644 Documentation/devicetree/bindings/arm/spear-misc.txt
+ delete mode 100644 Documentation/devicetree/bindings/clock/ti-keystone-pllctrl.txt
 
->
->void ixgbe_fc_autoneg_e610(struct ixgbe_hw *hw) {
->	int err;
->
->	/* Get current link err.
->	 * Current FC mode will be stored in the hw context.
->	 */
->	err =3D ixgbe_aci_get_link_info(hw, false, NULL);
->	if (err)
->		goto no_autoneg;
->
->	/* Check if the link is up */
->	if (!(hw->link.link_info.link_info & IXGBE_ACI_LINK_UP))
->		goto no_autoneg;
->
->	/* Check if auto-negotiation has completed */
->	if (!(hw->link.link_info.an_info & IXGBE_ACI_AN_COMPLETED))
->		goto no_autoneg;
->
->	hw->fc.fc_was_autonegged =3D true;
->	return;
->
->no_autoneg:
->	hw->fc.fc_was_autonegged =3D false;
->	hw->fc.current_mode =3D hw->fc.requested_mode; }
->
->> +
->> +/**
->> + * ixgbe_disable_rx_e610 - Disable RX unit
->> + * @hw: pointer to hardware structure
->> + *
->> + * Disable RX DMA unit on E610 with use of ACI command (0x000C).
->> + *
->> + * Return: the exit code of the operation.
->> + */
->> +void ixgbe_disable_rx_e610(struct ixgbe_hw *hw) {
->> +	u32 rxctrl =3D IXGBE_READ_REG(hw, IXGBE_RXCTRL);
->> +
->> +	if (rxctrl & IXGBE_RXCTRL_RXEN) {
->
->FWIIW, this could be less indented using something like:
->
->	if (!(rxctrl & IXGBE_RXCTRL_RXEN))
->		return;
-Will do
+diff --git a/Documentation/devicetree/bindings/arm/amlogic/analog-top.txt b/Documentation/devicetree/bindings/arm/amlogic/analog-top.txt
+deleted file mode 100644
+index 101dc21014ec..000000000000
+--- a/Documentation/devicetree/bindings/arm/amlogic/analog-top.txt
++++ /dev/null
+@@ -1,20 +0,0 @@
+-Amlogic Meson8 and Meson8b "analog top" registers:
+---------------------------------------------------
+-
+-The analog top registers contain information about the so-called
+-"metal revision" (which encodes the "minor version") of the SoC.
+-
+-Required properties:
+-- reg: the register range of the analog top registers
+-- compatible: depending on the SoC this should be one of:
+-		- "amlogic,meson8-analog-top"
+-		- "amlogic,meson8b-analog-top"
+-		along with "syscon"
+-
+-
+-Example:
+-
+-	analog_top: analog-top@81a8 {
+-		compatible = "amlogic,meson8-analog-top", "syscon";
+-		reg = <0x81a8 0x14>;
+-	};
+diff --git a/Documentation/devicetree/bindings/arm/amlogic/assist.txt b/Documentation/devicetree/bindings/arm/amlogic/assist.txt
+deleted file mode 100644
+index 7656812b67b9..000000000000
+--- a/Documentation/devicetree/bindings/arm/amlogic/assist.txt
++++ /dev/null
+@@ -1,17 +0,0 @@
+-Amlogic Meson6/Meson8/Meson8b assist registers:
+------------------------------------------------
+-
+-The assist registers contain basic information about the SoC,
+-for example the encoded SoC part number.
+-
+-Required properties:
+-- reg: the register range of the assist registers
+-- compatible: should be "amlogic,meson-mx-assist" along with "syscon"
+-
+-
+-Example:
+-
+-	assist: assist@7c00 {
+-		compatible = "amlogic,meson-mx-assist", "syscon";
+-		reg = <0x7c00 0x200>;
+-	};
+diff --git a/Documentation/devicetree/bindings/arm/amlogic/bootrom.txt b/Documentation/devicetree/bindings/arm/amlogic/bootrom.txt
+deleted file mode 100644
+index 407e27f230ab..000000000000
+--- a/Documentation/devicetree/bindings/arm/amlogic/bootrom.txt
++++ /dev/null
+@@ -1,17 +0,0 @@
+-Amlogic Meson6/Meson8/Meson8b bootrom:
+---------------------------------------
+-
+-The bootrom register area can be used to access SoC specific
+-information, such as the "misc version".
+-
+-Required properties:
+-- reg: the register range of the bootrom registers
+-- compatible: should be "amlogic,meson-mx-bootrom" along with "syscon"
+-
+-
+-Example:
+-
+-	bootrom: bootrom@d9040000 {
+-		compatible = "amlogic,meson-mx-bootrom", "syscon";
+-		reg = <0xd9040000 0x10000>;
+-	};
+diff --git a/Documentation/devicetree/bindings/arm/amlogic/pmu.txt b/Documentation/devicetree/bindings/arm/amlogic/pmu.txt
+deleted file mode 100644
+index 72f8d08198b6..000000000000
+--- a/Documentation/devicetree/bindings/arm/amlogic/pmu.txt
++++ /dev/null
+@@ -1,18 +0,0 @@
+-Amlogic Meson8 and Meson8b power-management-unit:
+--------------------------------------------------
+-
+-The pmu is used to turn off and on different power domains of the SoCs
+-This includes the power to the CPU cores.
+-
+-Required node properties:
+-- compatible value : depending on the SoC this should be one of:
+-			"amlogic,meson8-pmu"
+-			"amlogic,meson8b-pmu"
+-- reg : physical base address and the size of the registers window
+-
+-Example:
+-
+-	pmu@c81000e4 {
+-		compatible = "amlogic,meson8b-pmu", "syscon";
+-		reg = <0xc81000e0 0x18>;
+-	};
+diff --git a/Documentation/devicetree/bindings/arm/atmel-sysregs.txt b/Documentation/devicetree/bindings/arm/atmel-sysregs.txt
+index 67a66bf74895..7374beb5a613 100644
+--- a/Documentation/devicetree/bindings/arm/atmel-sysregs.txt
++++ b/Documentation/devicetree/bindings/arm/atmel-sysregs.txt
+@@ -41,35 +41,6 @@ Examples:
+ 		reg = <0xffffe800 0x200>;
+ 	};
+ 
+-RAMC PHY Controller required properties:
+-- compatible: Should be "microchip,sama7g5-ddr3phy", "syscon"
+-- reg: Should contain registers location and length
+-
+-Example:
+-
+-	ddr3phy: ddr3phy@e3804000 {
+-		compatible = "microchip,sama7g5-ddr3phy", "syscon";
+-		reg = <0xe3804000 0x1000>;
+-};
+-
+-Special Function Registers (SFR)
+-
+-Special Function Registers (SFR) manage specific aspects of the integrated
+-memory, bridge implementations, processor and other functionality not controlled
+-elsewhere.
+-
+-required properties:
+-- compatible: Should be "atmel,<chip>-sfr", "syscon" or
+-	"atmel,<chip>-sfrbu", "syscon"
+-  <chip> can be "sama5d3", "sama5d4" or "sama5d2".
+-  It also can be "microchip,sam9x60-sfr", "syscon".
+-- reg: Should contain registers location and length
+-
+-	sfr@f0038000 {
+-		compatible = "atmel,sama5d3-sfr", "syscon";
+-		reg = <0xf0038000 0x60>;
+-	};
+-
+ Security Module (SECUMOD)
+ 
+ The Security Module macrocell provides all necessary secure functions to avoid
+diff --git a/Documentation/devicetree/bindings/arm/axis.txt b/Documentation/devicetree/bindings/arm/axis.txt
+index ae345e1c8d2b..ebd33a88776f 100644
+--- a/Documentation/devicetree/bindings/arm/axis.txt
++++ b/Documentation/devicetree/bindings/arm/axis.txt
+@@ -7,22 +7,6 @@ ARTPEC-6 ARM SoC
+ Required root node properties:
+ - compatible = "axis,artpec6";
+ 
+-ARTPEC-6 System Controller
+---------------------------
+-
+-The ARTPEC-6 has a system controller with mixed functions controlling DMA, PCIe
+-and resets.
+-
+-Required properties:
+-- compatible: "axis,artpec6-syscon", "syscon"
+-- reg: Address and length of the register bank.
+-
+-Example:
+-	syscon {
+-		compatible = "axis,artpec6-syscon", "syscon";
+-		reg = <0xf8000000 0x48>;
+-	};
+-
+ ARTPEC-6 Development board:
+ ---------------------------
+ Required root node properties:
+diff --git a/Documentation/devicetree/bindings/arm/cpu-enable-method/al,alpine-smp b/Documentation/devicetree/bindings/arm/cpu-enable-method/al,alpine-smp
+index 35e5afb6d9ad..cc7b1402a31f 100644
+--- a/Documentation/devicetree/bindings/arm/cpu-enable-method/al,alpine-smp
++++ b/Documentation/devicetree/bindings/arm/cpu-enable-method/al,alpine-smp
+@@ -27,16 +27,6 @@ Properties:
+ - reg : Offset and length of the register set for the device
+ 
+ 
+-* Alpine System-Fabric Service Registers
+-
+-The System-Fabric Service Registers allow various operation on CPU and
+-system fabric, like powering CPUs off.
+-
+-Properties:
+-- compatible : Should contain "al,alpine-sysfabric-service" and "syscon".
+-- reg : Offset and length of the register set for the device
+-
+-
+ Example:
+ 
+ cpus {
+diff --git a/Documentation/devicetree/bindings/arm/freescale/fsl,vf610-mscm-cpucfg.txt b/Documentation/devicetree/bindings/arm/freescale/fsl,vf610-mscm-cpucfg.txt
+deleted file mode 100644
+index 44aa3c451ccf..000000000000
+--- a/Documentation/devicetree/bindings/arm/freescale/fsl,vf610-mscm-cpucfg.txt
++++ /dev/null
+@@ -1,14 +0,0 @@
+-Freescale Vybrid Miscellaneous System Control - CPU Configuration
+-
+-The MSCM IP contains multiple sub modules, this binding describes the first
+-block of registers which contains CPU configuration information.
+-
+-Required properties:
+-- compatible:	"fsl,vf610-mscm-cpucfg", "syscon"
+-- reg:		the register range of the MSCM CPU configuration registers
+-
+-Example:
+-	mscm_cpucfg: cpucfg@40001000 {
+-		compatible = "fsl,vf610-mscm-cpucfg", "syscon";
+-		reg = <0x40001000 0x800>;
+-	}
+diff --git a/Documentation/devicetree/bindings/arm/marvell/marvell,dove.txt b/Documentation/devicetree/bindings/arm/marvell/marvell,dove.txt
+index aaaf64c56e44..e10e8525eabd 100644
+--- a/Documentation/devicetree/bindings/arm/marvell/marvell,dove.txt
++++ b/Documentation/devicetree/bindings/arm/marvell/marvell,dove.txt
+@@ -5,18 +5,3 @@ Boards with a Marvell Dove SoC shall have the following properties:
+ 
+ Required root node property:
+ - compatible: must contain "marvell,dove";
+-
+-* Global Configuration registers
+-
+-Global Configuration registers of Dove SoC are shared by a syscon node.
+-
+-Required properties:
+-- compatible: must contain "marvell,dove-global-config" and "syscon".
+-- reg: base address and size of the Global Configuration registers.
+-
+-Example:
+-
+-gconf: global-config@e802c {
+-	compatible = "marvell,dove-global-config", "syscon";
+-	reg = <0xe802c 0x14>;
+-};
+diff --git a/Documentation/devicetree/bindings/arm/spear-misc.txt b/Documentation/devicetree/bindings/arm/spear-misc.txt
+deleted file mode 100644
+index e404e2556b4a..000000000000
+--- a/Documentation/devicetree/bindings/arm/spear-misc.txt
++++ /dev/null
+@@ -1,9 +0,0 @@
+-SPEAr Misc configuration
+-===========================
+-SPEAr SOCs have some miscellaneous registers which are used to configure
+-few properties of different peripheral controllers.
+-
+-misc node required properties:
+-
+-- compatible Should be	"st,spear1340-misc", "syscon".
+-- reg: Address range of misc space up to 8K
+diff --git a/Documentation/devicetree/bindings/clock/ti-keystone-pllctrl.txt b/Documentation/devicetree/bindings/clock/ti-keystone-pllctrl.txt
+deleted file mode 100644
+index c35cb6c4af4d..000000000000
+--- a/Documentation/devicetree/bindings/clock/ti-keystone-pllctrl.txt
++++ /dev/null
+@@ -1,20 +0,0 @@
+-* Device tree bindings for Texas Instruments keystone pll controller
+-
+-The main pll controller used to drive theC66x CorePacs, the switch fabric,
+-and a majority of the peripheral clocks (all but the ARM CorePacs, DDR3 and
+-the NETCP modules) requires a PLL Controller to manage the various clock
+-divisions, gating, and synchronization.
+-
+-Required properties:
+-
+-- compatible:		"ti,keystone-pllctrl", "syscon"
+-
+-- reg:			contains offset/length value for pll controller
+-			registers space.
+-
+-Example:
+-
+-pllctrl: pll-controller@02310000 {
+-	compatible = "ti,keystone-pllctrl", "syscon";
+-	reg = <0x02310000 0x200>;
+-};
+diff --git a/Documentation/devicetree/bindings/mfd/syscon.yaml b/Documentation/devicetree/bindings/mfd/syscon.yaml
+index 6a5834b11a35..79830dd51ac3 100644
+--- a/Documentation/devicetree/bindings/mfd/syscon.yaml
++++ b/Documentation/devicetree/bindings/mfd/syscon.yaml
+@@ -34,36 +34,59 @@ properties:
+     anyOf:
+       - items:
+           - enum:
++              - al,alpine-sysfabric-service
+               - allwinner,sun8i-a83t-system-controller
+               - allwinner,sun8i-h3-system-controller
+               - allwinner,sun8i-v3s-system-controller
+               - allwinner,sun50i-a64-system-controller
++              - altr,l3regs
+               - altr,sdr-ctl
+               - amd,pensando-elba-syscon
++              - amlogic,meson-mx-assist
++              - amlogic,meson-mx-bootrom
++              - amlogic,meson8-analog-top
++              - amlogic,meson8b-analog-top
++              - amlogic,meson8-pmu
++              - amlogic,meson8b-pmu
+               - apm,xgene-csw
+               - apm,xgene-efuse
+               - apm,xgene-mcb
+               - apm,xgene-rb
+               - apm,xgene-scu
++              - atmel,sama5d2-sfrbu
++              - atmel,sama5d3-nfc-io
++              - atmel,sama5d3-sfrbu
++              - atmel,sama5d4-sfrbu
++              - axis,artpec6-syscon
+               - brcm,cru-clkset
+               - brcm,sr-cdru
+               - brcm,sr-mhb
++              - cirrus,ep7209-syscon1
++              - cirrus,ep7209-syscon2
++              - cirrus,ep7209-syscon3
++              - cnxt,cx92755-uc
+               - freecom,fsg-cs2-system-controller
+               - fsl,imx93-aonmix-ns-syscfg
+               - fsl,imx93-wakeupmix-syscfg
+               - fsl,ls1088a-reset
++              - fsl,vf610-anatop
++              - fsl,vf610-mscm-cpucfg
+               - hisilicon,dsa-subctrl
+               - hisilicon,hi6220-sramctrl
++              - hisilicon,hip04-ppe
+               - hisilicon,pcie-sas-subctrl
+               - hisilicon,peri-subctrl
+               - hpe,gxp-sysreg
+               - intel,lgm-syscon
+               - loongson,ls1b-syscon
+               - loongson,ls1c-syscon
++              - lsi,axxia-syscon
+               - marvell,armada-3700-cpu-misc
+               - marvell,armada-3700-nb-pm
+               - marvell,armada-3700-avs
+               - marvell,armada-3700-usb2-host-misc
++              - marvell,dove-global-config
++              - mediatek,mt2701-pctl-a-syscfg
+               - mediatek,mt2712-pctl-a-syscfg
+               - mediatek,mt6397-pctl-pmic-syscfg
+               - mediatek,mt8135-pctl-a-syscfg
+@@ -71,7 +94,10 @@ properties:
+               - mediatek,mt8173-pctl-a-syscfg
+               - mediatek,mt8365-syscfg
+               - microchip,lan966x-cpu-syscon
++              - microchip,sam9x60-sfr
++              - microchip,sama7g5-ddr3phy
+               - microchip,sparx5-cpu-syscon
++              - mscc,ocelot-cpu-syscon
+               - mstar,msc313-pmsleep
+               - nuvoton,ma35d1-sys
+               - nuvoton,wpcm450-shm
+@@ -86,6 +112,8 @@ properties:
+               - rockchip,rk3568-qos
+               - rockchip,rk3588-qos
+               - rockchip,rv1126-qos
++              - st,spear1340-misc
++              - stericsson,nomadik-pmu
+               - starfive,jh7100-sysmain
+               - ti,am62-usb-phy-ctrl
+               - ti,am625-dss-oldi-io-ctrl
+@@ -93,6 +121,7 @@ properties:
+               - ti,am654-dss-oldi-io-ctrl
+               - ti,am654-serdes-ctrl
+               - ti,j784s4-pcie-ctrl
++              - ti,keystone-pllctrl
+ 
+           - const: syscon
+ 
+diff --git a/Documentation/devicetree/bindings/mips/mscc.txt b/Documentation/devicetree/bindings/mips/mscc.txt
+index cc916eaeed0a..e74165696b76 100644
+--- a/Documentation/devicetree/bindings/mips/mscc.txt
++++ b/Documentation/devicetree/bindings/mips/mscc.txt
+@@ -25,23 +25,6 @@ Example:
+ 		reg = <0x71070000 0x1c>;
+ 	};
+ 
+-
+-o CPU system control:
+-
+-The SoC has a few registers (ICPU_CFG:CPU_SYSTEM_CTRL) handling configuration of
+-the CPU: 8 general purpose registers, reset control, CPU en/disabling, CPU
+-endianness, CPU bus control, CPU status.
+-
+-Required properties:
+-- compatible: Should be "mscc,ocelot-cpu-syscon", "syscon"
+-- reg : Should contain registers location and length
+-
+-Example:
+-	syscon@70000000 {
+-		compatible = "mscc,ocelot-cpu-syscon", "syscon";
+-		reg = <0x70000000 0x2c>;
+-	};
+-
+ o HSIO regs:
+ 
+ The SoC has a few registers (HSIO) handling miscellaneous functionalities:
+diff --git a/Documentation/devicetree/bindings/mtd/atmel-nand.txt b/Documentation/devicetree/bindings/mtd/atmel-nand.txt
+index 4598930851d9..e36c35b17873 100644
+--- a/Documentation/devicetree/bindings/mtd/atmel-nand.txt
++++ b/Documentation/devicetree/bindings/mtd/atmel-nand.txt
+@@ -60,15 +60,6 @@ Required properties:
+ - reg: should contain 2 register ranges. The first one is pointing to the PMECC
+        block, and the second one to the PMECC_ERRLOC block.
+ 
+-* SAMA5 NFC I/O bindings:
+-
+-SAMA5 SoCs embed an advanced NAND controller logic to automate READ/WRITE page
+-operations. This interface to this logic is placed in a separate I/O range and
+-should thus have its own DT node.
+-
+-- compatible: should be "atmel,sama5d3-nfc-io", "syscon".
+-- reg: should contain the I/O range used to interact with the NFC logic.
+-
+ Example:
+ 
+ 	nfc_io: nfc-io@70000000 {
+diff --git a/Documentation/devicetree/bindings/net/hisilicon-hip04-net.txt b/Documentation/devicetree/bindings/net/hisilicon-hip04-net.txt
+index 464c0dafc617..c09eec6422ac 100644
+--- a/Documentation/devicetree/bindings/net/hisilicon-hip04-net.txt
++++ b/Documentation/devicetree/bindings/net/hisilicon-hip04-net.txt
+@@ -19,16 +19,6 @@ Optional properties:
+ [1] Documentation/devicetree/bindings/net/ethernet.txt
+ 
+ 
+-* Ethernet ppe node:
+-Control rx & tx fifos of all ethernet controllers.
+-Have 2048 recv channels shared by all ethernet controllers, only if no overlap.
+-Each controller's recv channel start from channel * number (RX_DESC_NUM).
+-
+-Required properties:
+-- compatible: "hisilicon,hip04-ppe", "syscon".
+-- reg: address and length of the register set for the device.
+-
+-
+ * MDIO bus node:
+ 
+ Required properties:
+-- 
+2.43.0
 
->
->	...
->
->> +		u32 pfdtxgswc;
->> +		int err;
->> +
->> +		pfdtxgswc =3D IXGBE_READ_REG(hw, IXGBE_PFDTXGSWC);
->> +		if (pfdtxgswc & IXGBE_PFDTXGSWC_VT_LBEN) {
->> +			pfdtxgswc &=3D ~IXGBE_PFDTXGSWC_VT_LBEN;
->> +			IXGBE_WRITE_REG(hw, IXGBE_PFDTXGSWC, pfdtxgswc);
->> +			hw->mac.set_lben =3D true;
->> +		} else {
->> +			hw->mac.set_lben =3D false;
->> +		}
->> +
->> +		err =3D ixgbe_aci_disable_rxen(hw);
->> +
->> +		/* If we fail - disable RX using register write */
->> +		if (err) {
->> +			rxctrl =3D IXGBE_READ_REG(hw, IXGBE_RXCTRL);
->> +			if (rxctrl & IXGBE_RXCTRL_RXEN) {
->> +				rxctrl &=3D ~IXGBE_RXCTRL_RXEN;
->> +				IXGBE_WRITE_REG(hw, IXGBE_RXCTRL, rxctrl);
->> +			}
->> +		}
->> +	}
->> +}
->
->...
->
->> +/**
->> + * ixgbe_setup_phy_link_e610 - Sets up firmware-controlled PHYs
->> + * @hw: pointer to hardware structure
->> + *
->> + * Set the parameters for the firmware-controlled PHYs.
->> + *
->> + * Return: the exit code of the operation.
->> + */
->> +int ixgbe_setup_phy_link_e610(struct ixgbe_hw *hw) {
->> +	struct ixgbe_aci_cmd_get_phy_caps_data pcaps;
->> +	struct ixgbe_aci_cmd_set_phy_cfg_data pcfg;
->> +	int err;
->> +
->> +	err =3D ixgbe_aci_get_link_info(hw, false, NULL);
->> +	if (err)
->> +		goto err;
->> +
->> +	/* Set PHY Configuration only if media is available */
->> +	if (!(hw->link.link_info.link_info & IXGBE_ACI_MEDIA_AVAILABLE)) {
->> +		err =3D ixgbe_aci_set_link_restart_an(hw, false);
->> +		if (err)
->> +			goto err;
->> +
->> +		return 0;
->> +	}
->> +
->> +	err =3D ixgbe_aci_get_phy_caps(hw, false, IXGBE_ACI_REPORT_DFLT_CFG,
->> +				     &pcaps);
->> +	if (err)
->> +		goto err;
->
->nit: The goto label only returns err.
->     So IMHO it' slightly nicer to just do that here.
->     And return 0 right at the end of the function.
-Will do
-Thank you for feedback
-
->
->> +
->> +	ixgbe_copy_phy_caps_to_cfg(&pcaps, &pcfg);
->> +
->> +	pcfg.caps |=3D IXGBE_ACI_PHY_ENA_LINK;
->> +	pcfg.caps |=3D IXGBE_ACI_PHY_ENA_AUTO_LINK_UPDT;
->> +
->> +	/* Set default PHY types for a given speed */
->> +	pcfg.phy_type_low =3D 0;
->> +	pcfg.phy_type_high =3D 0;
->> +
->> +	if (hw->phy.autoneg_advertised & IXGBE_LINK_SPEED_10_FULL) {
->> +		pcfg.phy_type_high |=3D IXGBE_PHY_TYPE_HIGH_10BASE_T;
->> +		pcfg.phy_type_high |=3D IXGBE_PHY_TYPE_HIGH_10M_SGMII;
->> +	}
->> +	if (hw->phy.autoneg_advertised & IXGBE_LINK_SPEED_100_FULL) {
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_100BASE_TX;
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_100M_SGMII;
->> +		pcfg.phy_type_high |=3D IXGBE_PHY_TYPE_HIGH_100M_USXGMII;
->> +	}
->> +	if (hw->phy.autoneg_advertised & IXGBE_LINK_SPEED_1GB_FULL) {
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_1000BASE_T;
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_1000BASE_SX;
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_1000BASE_LX;
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_1000BASE_KX;
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_1G_SGMII;
->> +		pcfg.phy_type_high |=3D IXGBE_PHY_TYPE_HIGH_1G_USXGMII;
->> +	}
->> +	if (hw->phy.autoneg_advertised & IXGBE_LINK_SPEED_2_5GB_FULL) {
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_2500BASE_T;
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_2500BASE_X;
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_2500BASE_KX;
->> +		pcfg.phy_type_high |=3D IXGBE_PHY_TYPE_HIGH_2500M_SGMII;
->> +		pcfg.phy_type_high |=3D IXGBE_PHY_TYPE_HIGH_2500M_USXGMII;
->> +	}
->> +	if (hw->phy.autoneg_advertised & IXGBE_LINK_SPEED_5GB_FULL) {
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_5GBASE_T;
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_5GBASE_KR;
->> +		pcfg.phy_type_high |=3D IXGBE_PHY_TYPE_HIGH_5G_USXGMII;
->> +	}
->> +	if (hw->phy.autoneg_advertised & IXGBE_LINK_SPEED_10GB_FULL) {
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_10GBASE_T;
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_10G_SFI_DA;
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_10GBASE_SR;
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_10GBASE_LR;
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_10GBASE_KR_CR1;
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_10G_SFI_AOC_ACC;
->> +		pcfg.phy_type_low  |=3D IXGBE_PHY_TYPE_LOW_10G_SFI_C2C;
->> +		pcfg.phy_type_high |=3D IXGBE_PHY_TYPE_HIGH_10G_USXGMII;
->> +	}
->> +
->> +	/* Mask the set values to avoid requesting unsupported link types */
->> +	pcfg.phy_type_low &=3D pcaps.phy_type_low;
->> +	pcfg.phy_type_high &=3D pcaps.phy_type_high;
->> +
->> +	err =3D ixgbe_aci_set_phy_cfg(hw, &pcfg);
->> +	if (err)
->> +		goto err;
->> +
->> +	/* Request link restart - without putting it down */
->> +	err =3D ixgbe_aci_set_link_restart_an(hw, true);
->> +	if (err)
->> +		goto err;
->> +
->> +err:
->> +	return err;
->> +}
->
->...
->
 
