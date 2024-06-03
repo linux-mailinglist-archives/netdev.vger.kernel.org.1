@@ -1,105 +1,130 @@
-Return-Path: <netdev+bounces-100302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C7E98D8742
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 18:26:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72FE58D8748
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 18:27:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 396A31C21498
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 16:26:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 211B11F21BDC
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 16:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A57D13664A;
-	Mon,  3 Jun 2024 16:26:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079D013665A;
+	Mon,  3 Jun 2024 16:27:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZwAeZjFH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XTDQCUZ7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F287B13213B
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 16:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0ADB132134;
+	Mon,  3 Jun 2024 16:27:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717431993; cv=none; b=Hq4ddYJCN9LqXSMoV/zbVdyqelmDtha19g97l5rhN8SFiVNKx/0WJY3mtN6LijtFlYYKPcoER/hqlXxCAYSjqw7AOEGutfWB3gYsodO0yRyJ994z8JW2e2ij8cXEcD9cBGngPh0U8BVS2CruxPdPMZTAYUGZQUE2Pm+VH0q9uDY=
+	t=1717432072; cv=none; b=fHfa9D5SnfamtRjxlaQtTaVIvqi6zDjsq3qx6yseItXeAizt2r3H7+qHNnVHBnfu6XWOBm7DGzJobLhL40UgsDrtdheglEBcDFnO3EB5N45yRzo7qLR90BHmEN8cKJENGJqLsuAUWldGupQiE3tmmSxSdyugn3tEnzQwSuyW9pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717431993; c=relaxed/simple;
-	bh=22EqqaxbM4HGxv3TszZ9BCmY5sdK22o5tsfD7q6nh6Q=;
+	s=arc-20240116; t=1717432072; c=relaxed/simple;
+	bh=oRnkuVfmEo68h8xsojH0l6YCZM7vKTDbSA9MjVX8lcI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S1czWZb/PWUHRom858Uti96OjbpHJK3gexWnVdYB0n50GLsWpKJllVquQP0Quznjb2NJk3aE+n0FD4IKjilDztT5cp7k4NCLvvhCDZv0prJ94U1T6qr8grWyB++HzKquJEjwlkUqboTreqcikqlZPYZ6xZs9iOjf3KvGKeC8RnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZwAeZjFH; arc=none smtp.client-ip=209.85.161.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5b2e942171cso2687934eaf.3
-        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 09:26:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717431991; x=1718036791; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=U8CkUtHwGXe1uhSPhtIrr2bvyUYFM8p08hrXi+18hG0=;
-        b=ZwAeZjFHglV1Rt8yk8qXiRH/b8FOP5S+O2yFfT6cQj/Ru2iv4jnyQy+P7ejzYfvTws
-         MK1qXNgyvDmN9iMhH8+3Mv2tJpQe8k2bww0BxJ1B7RIJs6hKw2b6Zt+TIyuKdEn2txX9
-         4ZpaxAYvD+4LeZVCx2KcqFPE8ylRyAHPkayFb2ro2YOjpyAU5sV+4NUGR0Ckyt6nGmCW
-         tcaPvyi2oxxCw+tJUEl9sRz/4lKqCSu6a8qvVqdYHUJIDjf3IYz/26eJjdta0nGAvWKJ
-         FKWnZthwTCzFxwWMbsVv5HDE5kJwJm6k3aQpVk9qCLSQuJ5O7ngrpns8LErXNFH6LyFj
-         JUdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717431991; x=1718036791;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U8CkUtHwGXe1uhSPhtIrr2bvyUYFM8p08hrXi+18hG0=;
-        b=lXV7S4RRrvdwaUGghp8DmwtPGyaohdVUD1v8GQxedHHVlcdRQzDBjU99qWS7CQ3mPh
-         y5J7EZMsmXtm9l/0VNzFDpoM6o6PbjQ/kwPPXuHXrA91R06dAk5HHbKBPMN61bYNRBt2
-         VrcsfENO9JMGolNjWq6J2TtBnziACjbRyh7MEI8Zv24SwbOhGOjSodQwFSYPs2EZ5QBJ
-         gmRnPgDCYmCP5b9V6ZPvyksY5iMYT0CWuEWozoqjihybHRntVFFtbXPBnlMhciYdC1+n
-         ybFuWJqSqFSt9VXdgPuLI3ORXsUAqYH+HTkW7shL0qRl9TyBvmn45Xl/bW22/ywsnske
-         OfXg==
-X-Forwarded-Encrypted: i=1; AJvYcCWWPdc8/5C6LZ2cs6AukUw4F3258BAVsFSlzpj3VGmGNIPYG9lCe0Aj25jIHFxQMtxD2AkTCOV59kTbU3V3UEwfTL+by72/
-X-Gm-Message-State: AOJu0Yxz+H8zA2fjMqBLXk2ndxrshuAPYdz6Qn1m7OeGhn/XC5XURxnH
-	iKE3FQRW6LhgWFzsRiUBuvErXroZ/3n5I0qNgLEb7olLtDDk+Lsm
-X-Google-Smtp-Source: AGHT+IESNm+OYdOl6QNLKm7lpy+gEGeUX90k7+szR3pZx2a+uPJzRwhZYxu79sh+fYBuPzvmEwl3pg==
-X-Received: by 2002:a05:6358:8a7:b0:19c:2cb5:4e8c with SMTP id e5c5f4694b2df-19c2cb54f4fmr72278655d.27.1717431990860;
-        Mon, 03 Jun 2024 09:26:30 -0700 (PDT)
-Received: from localhost ([2601:647:6881:9060:2d6e:32ad:faf4:991a])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6c353f0b2c8sm5608893a12.2.2024.06.03.09.26.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jun 2024 09:26:30 -0700 (PDT)
-Date: Mon, 3 Jun 2024 09:26:29 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
-	Cong Wang <cong.wang@bytedance.com>
-Subject: Re: [PATCH v1 net 01/15] af_unix: Set sk->sk_state under
- unix_state_lock() for truly disconencted peer.
-Message-ID: <Zl3utZZF/Sa7OnAj@pop-os.localdomain>
-References: <20240603143231.62085-1-kuniyu@amazon.com>
- <20240603143231.62085-2-kuniyu@amazon.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UkAUgo4ChS62jfRRc0Il/QszXYDEKcSLFn4j/vz1tCRA5DOU/FudeZKXOq+c6bUG92/suswTOTiPz6IvYKNYCWrK8Y3e4zAHaJEVQuof/G5VSNYFt80q4b4uKHLYYM4YeUsFlQZBbBfuAVi8TdKPsyE5fo/XvJsYZB0vmbwYWls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XTDQCUZ7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94A0DC2BD10;
+	Mon,  3 Jun 2024 16:27:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717432072;
+	bh=oRnkuVfmEo68h8xsojH0l6YCZM7vKTDbSA9MjVX8lcI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XTDQCUZ72bRlkxaGtCsAqytSxIUqNNsLDD45miaFV68weGEv3pg0ZBst7gtAFNIHg
+	 zItZc18cuDfFBVyrhoFztU2cZCGIWsYIvFgCm3YdtCqJJawZ7JI/Rcfw6x4j2IZuNm
+	 wwJJnVm1re9PVNhckzmO4qN+yp2hxSTVPI17Q40/w4gqcKB0pn1NhpOIhIbwfXZjFQ
+	 gn+dAf2KAveEpqKNb2RKKaxGVKty3ReE8eF2T8HVjYENoq4KpNogOFm0XQ+8Lrd6xP
+	 UG/I+9/1iOTdEh21gPaiAwQKeyuOEKiy2a32p5eL1hmUC05Z/BUe9Seec1FGNDQq4x
+	 0f06xk90PpiYg==
+Date: Mon, 3 Jun 2024 17:27:43 +0100
+From: Mark Brown <broonie@kernel.org>
+To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jakub Kicinski <kuba@kernel.org>, Kees Cook <keescook@chromium.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Sasha Levin <sashal@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Shengyu Li <shengyu.li.evgeny@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	Brendan Higgins <brendanhiggins@google.com>,
+	David Gow <davidgow@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
+	Jon Hunter <jonathanh@nvidia.com>, Ron Economos <re@w6rz.net>,
+	Ronald Warsow <rwarsow@gmx.de>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Will Drewry <wad@chromium.org>,
+	kernel test robot <oliver.sang@intel.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v7 04/10] selftests/harness: Fix interleaved scheduling
+ leading to race conditions
+Message-ID: <187423fb-ec78-4318-9da0-5b27df62b71f@sirena.org.uk>
+References: <20240511171445.904356-1-mic@digikod.net>
+ <20240511171445.904356-5-mic@digikod.net>
+ <9341d4db-5e21-418c-bf9e-9ae2da7877e1@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="fOjdVNyedpGvq4UL"
 Content-Disposition: inline
-In-Reply-To: <20240603143231.62085-2-kuniyu@amazon.com>
+In-Reply-To: <9341d4db-5e21-418c-bf9e-9ae2da7877e1@sirena.org.uk>
+X-Cookie: Don't let your status become too quo!
 
-On Mon, Jun 03, 2024 at 07:32:17AM -0700, Kuniyuki Iwashima wrote:
-> -		if (other != old_peer)
-> +		if (other != old_peer) {
->  			unix_dgram_disconnected(sk, old_peer);
-> +
-> +			unix_state_lock(old_peer);
-> +			if (!unix_peer(old_peer))
-> +				WRITE_ONCE(old_peer->sk_state, TCP_CLOSE);
-> +			unix_state_lock(old_peer);
 
-lock() old_peer twice? Has it been tested? ;-)
+--fOjdVNyedpGvq4UL
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Regards.
+On Mon, May 27, 2024 at 08:07:40PM +0100, Mark Brown wrote:
+> On Sat, May 11, 2024 at 07:14:39PM +0200, Micka=EBl Sala=FCn wrote:
+
+> > Fix a race condition when running several FIXTURE_TEARDOWN() managing
+> > the same resource.  This fixes a race condition in the Landlock file
+> > system tests when creating or unmounting the same directory.
+>=20
+> > Using clone3() with CLONE_VFORK guarantees that the child and grandchild
+> > test processes are sequentially scheduled.  This is implemented with a
+> > new clone3_vfork() helper replacing the fork() call.
+>=20
+> This is now in mainline and appears to be causing several tests (at
+> least the ptrace vmaccess global_attach test on arm64, possibly also
+> some of the epoll tests) that previously were timed out by the harness
+> to to hang instead.  A bisect seems to point at this patch in
+> particular, there was a bunch of discussion of the fallout of these
+> patches but I'm afraid I lost track of it, is there something in flight
+> for this?  -next is affected as well from the looks of it.
+
+FWIW I'm still seeing this on -rc2...
+
+--fOjdVNyedpGvq4UL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZd7v4ACgkQJNaLcl1U
+h9AM+wf/ZmkJuaskXgcwXDXT1jI3wnrjvwPBo1nyTsX3wcmiDZXCGtR9qwuVn+XC
+0N4ICDlxmX4lBZ8v6GJhe1blCagYT9WHp5g6aVe5D/kAf7m0IJG+I8JgPWjjg0J+
+QIZ6vf4WjCml2ZpHWv/gB8ZAJeZyiRvpKlldLnZfrzJaGQFx4hhIj2G44jUa4T1y
+3yHEgwaZfeeAYa2jZ1sZYD74zrPceqOUF38syHzbT9OgKDbPxXtI4KKDjXwe/aTp
+6IOZMgeT5ivv0/47+PtodbX2QXl/5fSpQ/LOUW55xzIarOAhPx2EsfcBQW6RTaAv
+R7Vzezy0MyONRIEvmdT1iCjwnlZvDw==
+=tzUV
+-----END PGP SIGNATURE-----
+
+--fOjdVNyedpGvq4UL--
 
