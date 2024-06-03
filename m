@@ -1,118 +1,207 @@
-Return-Path: <netdev+bounces-100075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CDBC8D7C46
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:15:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 99AD38D7C50
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:19:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8C7F1F229BC
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 07:15:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37D4E1F22B3C
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 07:19:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C2F37147;
-	Mon,  3 Jun 2024 07:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6883F9D9;
+	Mon,  3 Jun 2024 07:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iiF4IBx1"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fnNJiHwB";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+BqH44Bo";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fnNJiHwB";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+BqH44Bo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC31821360;
-	Mon,  3 Jun 2024 07:15:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB093DB91;
+	Mon,  3 Jun 2024 07:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717398916; cv=none; b=L1PPmPhmMmlVvxOBBvml4W5A5CsTGkvZUVs5iT8YqQppj5aB3r9hJ97LEugVCsqh9u+tR+gPy+TR8hPMdzx3/7ya8MihcmbAO4026eokHTdAhqB0wPC1DsaLgKIIVifzdTCpNnuaUKV6+N80Sc/DfAWpPI2yFO41ZOKT/7oaPAU=
+	t=1717399144; cv=none; b=i9/1TDXmonCPE52e/JgxS7goKwipvTSmL9za8HexAkxWlmaE+5lyZBcJaD8JYnnIFWX/fSYw17pMLt2ouxw4quR5tepmKBOy3EBHn+/01qUHAg5rRJy+5L9ZsPvq5+0rwCOvQvJ5PZxMvdoReAGjnl2EZvCl1dSDLrxIq0nJ1bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717398916; c=relaxed/simple;
-	bh=SRkAH4O5vOm0fmKCzjnZRzeUfl/+uwl1jXqqZccV5YI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iCE5mKU4TLcD21ZvmlbIqFltX91Xtu9eLHhsYn5Q+TL342+/NuZdJoTSZkMACC7/1QKHa8xQctT08sc8FNvtAbDp74N9iTgvI9R2Js+VuMW1GPDcTTRojmrahpp0WO8XBLLEunN4DySC3mxJgyy88mHI9UnD35xWdj2OPaQpRk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iiF4IBx1; arc=none smtp.client-ip=209.85.214.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-1f60a17e3e7so3207595ad.1;
-        Mon, 03 Jun 2024 00:15:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717398914; x=1718003714; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6sWJ+ghBtSe8Nj1TZ8ojyawHfDULvuVFkGiOmN9JBQA=;
-        b=iiF4IBx1YmAwhf7jp3j9chkKni3KRDUjFJV4ENHDncu9/FLFjOdTNkscCGzONk516p
-         R5rjRLbgkUpY0GPvUmhgAIy9zpQyxRr0eqU0r01ljVnY4Fa2tIsWLij6qP+almEjStUU
-         m8oaoPoc+NtybDpMKTZ2BORevN39j7tOn1uXUwDDydevG50IX0HZP5r9OXOAgBeLC8m1
-         nl9TYLR69LAG0WAtUgh+XrquZr8GdkMIKU7i/oda0AnGT3qz4yiFCpsT4sJUBshaJqHQ
-         eSzGbXEs+Nc0x/TZR2Pt39hajw75AFlbPXhAO/SG7LHbq2SGUs3UaiJi+okf/JJQvpc7
-         6i+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717398914; x=1718003714;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6sWJ+ghBtSe8Nj1TZ8ojyawHfDULvuVFkGiOmN9JBQA=;
-        b=fQcQqiXrLCwwVoOWB0goJT8x2w4Llj4nIqgnuGrJ06WOWAZpm/x8kSO+b4tfY3DXR/
-         B6DS5RO281GkImcY6L7/bgKZMYXBVB49MFqvG1TII8nRvXY5fNXeBifpLOzrepDuSIVH
-         Pvv+d+CzScTPo34HExHoCWUCPEHrRoQVXvqylyifvVeVjesWISL8tyNjMqnbAOEfaaIX
-         Bd9gI5KMDqQ/hool7nnk0iIOHmIq+Q1nOPM4ofBeh6ws08lRjlal8V0Ibwpze/oxjdhP
-         G/uCJLGkBFnXanzne7gBAhd52pYXyZu/pgXeJbe1yScxeDUlV5Fu7OSOgpbR+2h4oZ3c
-         KkrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUIRWi6Q6/ZjivKxVHp/GCXOAS4r3YBIcEZg6qlnGYURaW4SgBxneFT6JBpLq/FBtiJSqnUhgSsBhcVcl7hyUVrpAy2jIGXHoKz5MGg
-X-Gm-Message-State: AOJu0YwzKhS9LqSAIT8pU0sBffkh9FajdFKTe/XB/2Y69arr0GCeuzQA
-	UVNOUaGklRn/c39PZg8NN6FI65sjaGhxFrkdb75UOr+zoT+wgsSD
-X-Google-Smtp-Source: AGHT+IFm4jVAaNRV503akITNTz08JFMRgh+rtxe1U62GtxRAVS5Fp2leg7A20Z5lwI5YzTS1axJJqQ==
-X-Received: by 2002:a17:902:e74c:b0:1f6:828e:86ab with SMTP id d9443c01a7336-1f6828e8839mr8714735ad.6.1717398913996;
-        Mon, 03 Jun 2024 00:15:13 -0700 (PDT)
-Received: from hbh25y.. ([31.223.184.113])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f63237ae1dsm58613335ad.119.2024.06.03.00.15.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jun 2024 00:15:13 -0700 (PDT)
-From: Hangyu Hua <hbh25y@gmail.com>
-To: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	vladbu@mellanox.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Hangyu Hua <hbh25y@gmail.com>
-Subject: [PATCH] net: sched: sch_multiq: fix possible OOB write in multiq_tune()
-Date: Mon,  3 Jun 2024 15:13:03 +0800
-Message-Id: <20240603071303.17986-1-hbh25y@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1717399144; c=relaxed/simple;
+	bh=pdJXbmmu4MBcZTg+r1XvCKHL1kTTZ1tDns8hoAXtzK0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DskpCrYmckqklnSSUASmC0QiBZ8o64TEx7d/HyG1R9An1iBuNiQ8iW4Anxnb0RXdmq1+1JLtguv/9J8neVk+bSL8N6fyubSwgeGQQG7BCTb+xzx80Abv8tIMTno8BqVM5uP04xmHyx+VEPQOu/DyPRgivQnt+TGo2fClPHt3vBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fnNJiHwB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+BqH44Bo; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fnNJiHwB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+BqH44Bo; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 45EFA22217;
+	Mon,  3 Jun 2024 07:19:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1717399141; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rp339kq5sMQTQWuAgyY0m8zVUYDlI1+PpQaPOqzv8ng=;
+	b=fnNJiHwBn3EBwbLR6b0INrZic0HiwD5nE/AzhTHwVemqKAr6wSxyvTmxhEzzhnhLhSytkm
+	DhGpmdrtBdLLPPhMdRVouJrABaOrTPbFBlIt1RS3PwsZA4xOemteHineY8crjZp+56uiB0
+	jO/ARokZxeBMqA7k0jXW38SVaK3ZjHg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1717399141;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rp339kq5sMQTQWuAgyY0m8zVUYDlI1+PpQaPOqzv8ng=;
+	b=+BqH44Boug2vgP3fIw56KDp0Y7IfzweIa9mb3N/D/cFRGerQ8GiNxtTH2np83XLVaQLlvj
+	6QmJY1UpMnYEMKAQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1717399141; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rp339kq5sMQTQWuAgyY0m8zVUYDlI1+PpQaPOqzv8ng=;
+	b=fnNJiHwBn3EBwbLR6b0INrZic0HiwD5nE/AzhTHwVemqKAr6wSxyvTmxhEzzhnhLhSytkm
+	DhGpmdrtBdLLPPhMdRVouJrABaOrTPbFBlIt1RS3PwsZA4xOemteHineY8crjZp+56uiB0
+	jO/ARokZxeBMqA7k0jXW38SVaK3ZjHg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1717399141;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rp339kq5sMQTQWuAgyY0m8zVUYDlI1+PpQaPOqzv8ng=;
+	b=+BqH44Boug2vgP3fIw56KDp0Y7IfzweIa9mb3N/D/cFRGerQ8GiNxtTH2np83XLVaQLlvj
+	6QmJY1UpMnYEMKAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9A91F13A93;
+	Mon,  3 Jun 2024 07:19:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id pZqII2RuXWakVgAAD6G6ig
+	(envelope-from <hare@suse.de>); Mon, 03 Jun 2024 07:19:00 +0000
+Message-ID: <8fc3fc34-2861-429e-9716-b25b90049693@suse.de>
+Date: Mon, 3 Jun 2024 09:18:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/4] net: introduce helper sendpages_ok()
+Content-Language: en-US
+To: Ofir Gal <ofir.gal@volumez.com>, davem@davemloft.net,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, ceph-devel@vger.kernel.org
+Cc: dhowells@redhat.com, edumazet@google.com, pabeni@redhat.com,
+ kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
+ philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+ christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
+References: <20240530132629.4180932-1-ofir.gal@volumez.com>
+ <20240530132629.4180932-2-ofir.gal@volumez.com>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20240530132629.4180932-2-ofir.gal@volumez.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.29 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,google.com,kernel.org,kernel.dk,lst.de,grimberg.me,linbit.com,gmail.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -4.29
+X-Spam-Flag: NO
 
-q->bands will be assigned to qopt->bands to execute subsequent code logic
-after kmalloc. So the old q->bands should not be used in kmalloc.
-Otherwise, an out-of-bounds write will occur.
+On 5/30/24 15:26, Ofir Gal wrote:
+> Network drivers are using sendpage_ok() to check the first page of an
+> iterator in order to disable MSG_SPLICE_PAGES. The iterator can
+> represent list of contiguous pages.
+> 
+> When MSG_SPLICE_PAGES is enabled skb_splice_from_iter() is being used,
+> it requires all pages in the iterator to be sendable. Therefore it needs
+> to check that each page is sendable.
+> 
+> The patch introduces a helper sendpages_ok(), it returns true if all the
+> contiguous pages are sendable.
+> 
+> Drivers who want to send contiguous pages with MSG_SPLICE_PAGES may use
+> this helper to check whether the page list is OK. If the helper does not
+> return true, the driver should remove MSG_SPLICE_PAGES flag.
+> 
+> Signed-off-by: Ofir Gal <ofir.gal@volumez.com>
+> ---
+>   include/linux/net.h | 20 ++++++++++++++++++++
+>   1 file changed, 20 insertions(+)
+> 
+> diff --git a/include/linux/net.h b/include/linux/net.h
+> index 688320b79fcc..b33bdc3e2031 100644
+> --- a/include/linux/net.h
+> +++ b/include/linux/net.h
+> @@ -322,6 +322,26 @@ static inline bool sendpage_ok(struct page *page)
+>   	return !PageSlab(page) && page_count(page) >= 1;
+>   }
+>   
+> +/*
+> + * Check sendpage_ok on contiguous pages.
+> + */
+> +static inline bool sendpages_ok(struct page *page, size_t len, size_t offset)
+> +{
+> +	unsigned int pagecount;
+> +	size_t page_offset;
+> +	int k;
+> +
+> +	page = page + offset / PAGE_SIZE;
+> +	page_offset = offset % PAGE_SIZE;
+> +	pagecount = DIV_ROUND_UP(len + page_offset, PAGE_SIZE);
+> +
+Don't we miss the first page for offset > PAGE_SIZE?
+I'd rather check for all pages from 'page' up to (offset + len), just
+to be on the safe side.
 
-Fixes: c2999f7fb05b ("net: sched: multiq: don't call qdisc_put() while holding tree lock")
-Signed-off-by: Hangyu Hua <hbh25y@gmail.com>
----
- net/sched/sch_multiq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> +	for (k = 0; k < pagecount; k++)
+> +		if (!sendpage_ok(page + k))
+> +			return false;
+> +
+> +	return true;
+> +}
+> +
+>   int kernel_sendmsg(struct socket *sock, struct msghdr *msg, struct kvec *vec,
+>   		   size_t num, size_t len);
+>   int kernel_sendmsg_locked(struct sock *sk, struct msghdr *msg,
 
-diff --git a/net/sched/sch_multiq.c b/net/sched/sch_multiq.c
-index 79e93a19d5fa..06e03f5cd7ce 100644
---- a/net/sched/sch_multiq.c
-+++ b/net/sched/sch_multiq.c
-@@ -185,7 +185,7 @@ static int multiq_tune(struct Qdisc *sch, struct nlattr *opt,
- 
- 	qopt->bands = qdisc_dev(sch)->real_num_tx_queues;
- 
--	removed = kmalloc(sizeof(*removed) * (q->max_bands - q->bands),
-+	removed = kmalloc(sizeof(*removed) * (q->max_bands - qopt->bands),
- 			  GFP_KERNEL);
- 	if (!removed)
- 		return -ENOMEM;
+Cheers,
+
+Hannes
 -- 
-2.34.1
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
 
