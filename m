@@ -1,111 +1,245 @@
-Return-Path: <netdev+bounces-100166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8E3D8D8005
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 12:32:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB8228D800B
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 12:33:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 260461C235F7
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 10:32:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A7091C237CC
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 10:33:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4A28175B;
-	Mon,  3 Jun 2024 10:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D9F82D7C;
+	Mon,  3 Jun 2024 10:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="XiBHJ921"
+	dkim=pass (2048-bit key) header.d=storingio.onmicrosoft.com header.i=@storingio.onmicrosoft.com header.b="ZG/Ta+JY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zeus03.de (www.zeus03.de [194.117.254.33])
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2124.outbound.protection.outlook.com [40.107.105.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16129374D1
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 10:32:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717410742; cv=none; b=GrbFzWfYiOv67cAdfM+K4N0hfHn5Wc4eMKztAjv9nd6K0/WDGpAWn0kjuFbGfLjmsDV+sjyHsdCuG1JwLI4NEzDoLhV8Uda9k7YFvkNHRATr6HCLZQcYK+Z2lA0AZd2dBAf8s0LzypCjBX/5tX5+/qFdsr+4MTtDbv6wTJCzvsA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717410742; c=relaxed/simple;
-	bh=6gacXq5vJZFo4/JcqCc7ZeWC71yxhq7d5UAbsSFdcC8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nDn9c7VWURSQHzcRjLancHHOuQXcXO2ST1rOUINgvSxap+4Tcvai2bc07SpfGmvHQkJNWq1CuzXer694Imd8Sq7G1RLIm9SD7qxVdRdW3VotTiUqi96NMfU8UlVTocxWF+RsJHiS+jk/LvXokEY3xe7to7g02VSfnFCKqhgAtRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=XiBHJ921; arc=none smtp.client-ip=194.117.254.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sang-engineering.com; h=date:from:to:cc:subject:message-id
-	:references:mime-version:content-type:in-reply-to; s=k1; bh=eLfG
-	Lt7Q7gxinXk9NTwg5OBgUI0WVKgLDksuWhB/zrU=; b=XiBHJ921SyhGcAit6aoF
-	aOJUOF+zmtUPIA1eAx/87IROUBrg5WKdoKs2fiucNTbzjwrgANeyfz+L7n2f1Bo+
-	UNv/XYjbIWB2OKBAgCP5NNEUz8RdeVugll/N9h1MqgqkpzitlCaG0yzR0+5wDMFl
-	VVAEEbxy6eUjAAX+zDeG22Pp47H4Y3vFAyIcrXmQBfp/zy37MRH3S5PkULwCevKt
-	8G+kEvIPRnXRsAcaVMX0EmMFbFXNTbKFrwryogsy5bUNov72O7GFZMJe3jA1bRj9
-	nNOoc2Z70r7Dj2GgY7AZ/Tsez9H04SISfXstjZ0JZnk0S3G7aDki/72ZTB33Iv4l
-	Rw==
-Received: (qmail 1921309 invoked from network); 3 Jun 2024 12:32:16 +0200
-Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 3 Jun 2024 12:32:16 +0200
-X-UD-Smtp-Session: l3s3148p1@SS3Z2PkZyoAgAwDPXzLGAH1eNELjOc3g
-Date: Mon, 3 Jun 2024 12:32:15 +0200
-From: Wolfram Sang <wsa+renesas@sang-engineering.com>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, linux-can@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 1/3] can: rcar_canfd: Simplify clock handling
-Message-ID: <d5orw4madur5e5rx2kcnkop5e333rhd43ngy7spphnm4sqylya@mvwitvshclax>
-Mail-Followup-To: Wolfram Sang <wsa+renesas@sang-engineering.com>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Marc Kleine-Budde <mkl@pengutronix.de>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, linux-can@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	netdev@vger.kernel.org
-References: <cover.1716973640.git.geert+renesas@glider.be>
- <2cf38c10b83c8e5c04d68b17a930b6d9dbf66f40.1716973640.git.geert+renesas@glider.be>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57C1107A8;
+	Mon,  3 Jun 2024 10:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717410783; cv=fail; b=QY57LY3Z4wNNBWAfzHg2uS7j/FdIlz8UKuTqZU1SMSMWzWnnwLoT1eCR7+2Bd+mI5lythoL4ypLrUoLfd/H4ttDQk5xNt+9RLPB8TZGGVZIhNwIwwNItpjBAGhO0nI1mg5wbffte7zNmeaOzZzexcZHLBJBRfcyeiNBAlyT/bTA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717410783; c=relaxed/simple;
+	bh=XFdksna1Kd5K+wXvr50fpAeA/8p5banMyLKhv8Bc8dU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=tjOxAOpNP9mDwvc70bIxxNFm/9AevCNY5EHLtLV5VciuUC52Vq/azo222vmrNEqzxhVQcuopwuYjXvDKkvm0V+ocUzNPK3AEcNmJO3BtEohyVhjVd0N2aMXmqDHNcUMTPuBbBhDNTEPs25z5DI5+d24+gMMswRH+OyCIqjACL9o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=volumez.com; spf=pass smtp.mailfrom=volumez.com; dkim=pass (2048-bit key) header.d=storingio.onmicrosoft.com header.i=@storingio.onmicrosoft.com header.b=ZG/Ta+JY; arc=fail smtp.client-ip=40.107.105.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=volumez.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=volumez.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j2YY2cKmcV8l7OKwHYlP2cP9bymYKH0AOQqlJJl4pGMYv5YdFNGJzW+0K0Uo4rNMOcmtLSqpAnZv8f0zt68pXOyeEFHdgrgE31a4hxj9IiP1l7AP/CWwK1Ky1kP1aWXQio5zWxLzKNoJi4tX5quyZ9KrybZSrZt9Bk0JoYueSO6rXM2AZRiNRToB6Tno6BHZHOmmGZg+Nbkyw2zMHKNU9890PrnD6UcAipmEG99MJ722Enuc/Hja7en54vbDREh0nf0vA/AF8ve5S1sJ37Is9+wiD14/80P8IRflCITOHKnc6OznC9rA7YmziLBwETxuzS+jbn78tOS2LGHHBRLFNg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XFdksna1Kd5K+wXvr50fpAeA/8p5banMyLKhv8Bc8dU=;
+ b=YEKN6smNaEKaGuExuLtSV/iMnovn423axtzqTel6wrhtgT9GNX9OghvlW3L0DBPE677XDleiLLE3Wa34vY3++UD0SPpf68Fxf2BYxgBbxN955WFLgVLKEovduE9zKCJYh8UPsE/pHT57w882Woop4uermEN9aQ4vhpERROkN6qxfvlyh2i4cy8ym3QJyAUOZtkjVazA8MD8+80hEBJvu8Bs4WRRvl4EsAwdjqvY53G4Kij1rHW0s8FrjWSbkvAOcE0vLgbTcJg/Bu1LWwxjzKsA0qNmzayxja8egRgQpRY6JlVlqMDERcCoXwEzAlQ0J39yLAzEsOVDlfNrkKSeQLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=volumez.com; dmarc=pass action=none header.from=volumez.com;
+ dkim=pass header.d=volumez.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=storingio.onmicrosoft.com; s=selector1-storingio-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XFdksna1Kd5K+wXvr50fpAeA/8p5banMyLKhv8Bc8dU=;
+ b=ZG/Ta+JYhLXgGqNHVHCLHSwSpGFi9ONPgt2/QMBJc7+0Fxa20QT+gbS6ASClGewH4HWJ1rM5FN9YB5CPLUgDNj/rYfMjGuuaGYethgDRC6hBnTq3iWd3uYsdD4SGBBOMYnorbJ7fo+XHOS8Hr1Y93WjjQju7k6Utd8xjQ1uOduu+zYFkP61EqJusy0sn9awW54EB3Nr5vG+/DVy4yvSArY3XpV5PFRpwKDSJdIe1KvsD+KHIoJgoM1YT8DXn2i7dNf0PZw1iw2eJ5W7vmv7mbhz3HQd5hMSNC6nl1LqzM5MUe3hKIcN1B49ifJIUKsbU4WqgflHDhqBlLMY9+rhmDA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=volumez.com;
+Received: from AM0PR04MB5107.eurprd04.prod.outlook.com (2603:10a6:208:cb::11)
+ by DU4PR04MB11029.eurprd04.prod.outlook.com (2603:10a6:10:590::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.24; Mon, 3 Jun
+ 2024 10:32:59 +0000
+Received: from AM0PR04MB5107.eurprd04.prod.outlook.com
+ ([fe80::de53:c058:7ef:21fb]) by AM0PR04MB5107.eurprd04.prod.outlook.com
+ ([fe80::de53:c058:7ef:21fb%4]) with mapi id 15.20.7633.021; Mon, 3 Jun 2024
+ 10:32:58 +0000
+Message-ID: <bca1947a-4826-472d-a62c-5ca5ad724939@volumez.com>
+Date: Mon, 3 Jun 2024 13:32:54 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/4] bugfix: Introduce sendpages_ok() to check
+ sendpage_ok() on contiguous pages
+To: Sagi Grimberg <sagi@grimberg.me>, davem@davemloft.net,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, ceph-devel@vger.kernel.org
+Cc: dhowells@redhat.com, edumazet@google.com, pabeni@redhat.com,
+ kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, philipp.reisner@linbit.com,
+ lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
+ idryomov@gmail.com, xiubli@redhat.com
+References: <20240530132629.4180932-1-ofir.gal@volumez.com>
+ <d6b2c19b-c2a6-400c-bbf1-bf0469138777@grimberg.me>
+Content-Language: en-US
+From: Ofir Gal <ofir.gal@volumez.com>
+In-Reply-To: <d6b2c19b-c2a6-400c-bbf1-bf0469138777@grimberg.me>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: TL0P290CA0008.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:5::19) To AM0PR04MB5107.eurprd04.prod.outlook.com
+ (2603:10a6:208:cb::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="enazmods4fveag25"
-Content-Disposition: inline
-In-Reply-To: <2cf38c10b83c8e5c04d68b17a930b6d9dbf66f40.1716973640.git.geert+renesas@glider.be>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB5107:EE_|DU4PR04MB11029:EE_
+X-MS-Office365-Filtering-Correlation-Id: dac32f5c-7002-4d7a-f21f-08dc83b8898c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|1800799015|376005|7416005;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?amN5eloyN2JsanI0VDh6Wkp5ejFva1NTTnZGS2VKR0VnRVZPOXdpZmdScmFM?=
+ =?utf-8?B?bzR1VnhWcGY5QUg2RmFkRnNkdWt5M2F3R1duRzNKZGFaRmk2Z0JrNVNveEE3?=
+ =?utf-8?B?Vk9OeUc4SVk2R0xFQ2hPSkxNL3hnZTdwZThTYWttMy80YVcxZENqb0Qzb2xF?=
+ =?utf-8?B?b2ZqOStZUzVVU2hEWklhSmdyUElKZzA1QkhpYy9JTXdpc3hxOWVEQjNlam1W?=
+ =?utf-8?B?UFRLWHh0dXNtcXBRcmxyNXgvVUF5c0k4Y2tQSkFPMlFJZ3NXQm5RNnpwdHh2?=
+ =?utf-8?B?Q2g4dzRraU5ZQ21JMTN0UnVoZDl5Zy9PMUVFTHJpUjhLWW8zbGpmaDJMNWN0?=
+ =?utf-8?B?WXo3NU9rNEgvU2R6ZEZhdmgvM0RBR1hIc1dydmw3YjErbVFWV25aVno5ZERD?=
+ =?utf-8?B?V2hPUVRVZW1ncHRId1JWV2Q2UW9SWU9ncXVlcjBnNGJEY0c1M1RtcjBGY24w?=
+ =?utf-8?B?Z3RRdWE5bWh2NHltakEyWFdGSXltVytITlpWNCswNDFVWUMycUV3S05qVmtZ?=
+ =?utf-8?B?R0ttdG5BTzM5Mk4wV2V3RUVmc1ZqMTFDcXhHT3pCbkFSamM1L250QTMwQW00?=
+ =?utf-8?B?cHRsOUo5YlpnTi9CRTl5a2pCbldLZkVpcy9VYVVlYUFSMExNL2VrYWkxaHJr?=
+ =?utf-8?B?VGRUeDlFV2orTTk4b1kzYzIxZEl3TW13Vll1NDFJajRXOERSUURmMXpnZjVW?=
+ =?utf-8?B?M1B0VGFQWlZrVGZ0aGYvcE9KZitYTHp3RCtXbWpLcGpRVGllRTM4UUZEMFNC?=
+ =?utf-8?B?S3hWbkNmaG9BZ2tFeW5oaU5zcUpiTmV4M3JrblNMUkxHZEVtUmlFbTFNMHBZ?=
+ =?utf-8?B?N1FBdE5tZVNoTEppSmdjaUdnU0ZBcTlZOTBFZlUzSHg3N0M0QUovNFFzS2dR?=
+ =?utf-8?B?UHF2dFgxcENwZHNieldXUkhETHdGdmpFSXJ6NmxLTG9EMDZYNHhFSS9Lbzl6?=
+ =?utf-8?B?bzQzMSsrVE0yajY5b1ZMaCttVHc2bnJqWlFERGhEbTB6ZkRmbU15MHYwdDg5?=
+ =?utf-8?B?ZDRWbGUzNm5wQU82anYrcU41eXJvMVVsa3dIeitZVUk2U0k4bVBRYTN5QUUy?=
+ =?utf-8?B?Q0lzdWFBUUVGdjhkb282aTYvekhGcmtENVpGbHpqaVpkSXFLa1dUS1g5V0x6?=
+ =?utf-8?B?Z204MHdOZjlpaWMwazNFaUgyeFo4Uk15Y2JtWXViK3V0cFo5MG1LbndFUXd6?=
+ =?utf-8?B?dXB5eHF0aFBBaXlrdlMwWGMvaVBEdTU2TXZjS09OZmdyUHdhU2hHZWlwRzg0?=
+ =?utf-8?B?WlgrcHJhOHRnei9CanQ0TVd3YUpqb1pRa3JOMWF3UWFlZzJDZ1J3OW5rSVpE?=
+ =?utf-8?B?T2lTc2ZlN3ZHVkp0WTRKU0NGNzJwTjRoMUNvSDYzRkdCNHcwcmx4VUpsTmZ5?=
+ =?utf-8?B?S0tUTVR4cDk5RE9WRHo2WmsyVlJZVHpjanpJVnlUbk9ralN6YmNPeFdUOCtV?=
+ =?utf-8?B?MVZQcGVkR2dlSzFTYk5tN21aaWQvaDB6dmdGRzZYdXJXSEY3ZHFyK2ZWNzZ5?=
+ =?utf-8?B?MUl2em13QVhmMHJTdnAzU1JIQmt6aCthc3paT1B4bG9uVEowZDZIbVg3cG9r?=
+ =?utf-8?B?NEZnNHlWckp3bjhiblZ0ZVZVaTlobWhFWjkwUFU3THIzdWV6TS96bnp2TElk?=
+ =?utf-8?B?aUZzZ1JCcEQ3ZG9rL2hEd0JUUUR3cXl4OGd4N0FucVlFMUt1TkhaaEhRTnYy?=
+ =?utf-8?B?ZFJxUWtwR3o4Mk5Rd29mZ3NYMzhNc0hsTW00V1ZJdUR2U2pCaEFxK09nPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB5107.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(7416005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?M1dJZ2tBcE55Y2EwcnNXSjNjSEhBeGprREZMUENmaDYvTWxLZEFYRnBWYjZz?=
+ =?utf-8?B?cjZxM0F0Z2dROE1OVURIN2RVK0s2ZFRobTNyRnA1cFppWDU2bXJPNE53WFgv?=
+ =?utf-8?B?M2VCOVowZkwvQUZhTi83YXBzMWdLYmJuakdKZndaczI3L2pYeHFFOWlEaTRV?=
+ =?utf-8?B?TlVFMVhvL01jZlNnL3RQaHVRYnZlbFg2YjhtYlYyWGV4bi9ZZ3lPdHRHM3Az?=
+ =?utf-8?B?QWs3WnVrajNDeXEzdUtqRXU3Yms5bTd1azJmVk81QW5nSTAzRDNDeWhwMWRM?=
+ =?utf-8?B?bUlVcWVsUWlpSWI0dTcrWkNUR0hYSXpSajJ3MFJqc3gxeXBhdHp6R2R3bjdC?=
+ =?utf-8?B?OVNiUDVKYk5XbEVQZHZsaGlyTTgzZjlzMlNrWHhIb1NaWEVMUFZRT1pPTkxo?=
+ =?utf-8?B?RG9IUzE4aURnR1RyeXNHdVVCNzg1MXhIMWh6anhHdW82WHMrMXFma0hjNDhQ?=
+ =?utf-8?B?TDYwNXIrbWVZL0JWM3phWHlGTkl5czVzWUlQajlzVHg3OWJBc01BZzNxNUpD?=
+ =?utf-8?B?RERPWmxTNzRVc0VqNFd1TDUxVEt3YWJCU3pvOUxkbUxCWFRWb1B4WHZaeVRH?=
+ =?utf-8?B?MmxOS2U0aGFSVFRpVDQyaWxPb1p4ODdoK0EwNWxQUHRHMmlyM05SdzB0b3Vo?=
+ =?utf-8?B?dHVCVEdPMVptOTBpSGtYcWhaUXR1aFI0S2NlOExmVVQxVFRBUVY0V0dXSGNQ?=
+ =?utf-8?B?ZG9GaHRhYWhpeExVck40UXZmL1Q1cTZUbUowUW16TnRacDYreCs4anNTRXF4?=
+ =?utf-8?B?R0RBQVc0bUNqZTV6bkRQSFNlOUE0bkJTaXEwb21xSlZpRWVmWlF4NWRpL3k0?=
+ =?utf-8?B?VDR5QWZ2KzhnbnlBYU1XUHpLYWc2NFEwOFIxWVhmZE8zOTR6SFV4UEJMWHFL?=
+ =?utf-8?B?aHhmdTFncUN4OXVWbzNqMkE2QTNQQ01NSEJGQlVPMjN5R3JBaHMxZXdlSVA4?=
+ =?utf-8?B?R3YvRVNoOHJSdk8rakR0QWdrTXd0TWRoSjQ1djRvV0gzY2JMbTZFRVRub01u?=
+ =?utf-8?B?NlVKaW9veGEraDZaenJ5TFRzUmpvNS8rUWhLNitEMXhwSjRZNTRGSmZzZEtq?=
+ =?utf-8?B?akxjTTBEa1paZXcwL2VBaDE2d0ZiN2NBQ3lBZ3VOMzFBM1huMGRQVGlyclJK?=
+ =?utf-8?B?VHJwbDdpNWhpOTdMSXJraFU4SXJnSWdjZGp1OVo5MDdnYnlkRGllRFNtK3Nl?=
+ =?utf-8?B?UVBmVU9GcS9nbENEMnJMUkd5OTJYMUcwQkVWd284aHNSYmNmVGo3WDJBdktj?=
+ =?utf-8?B?R1JKcnoxNXBvektsalJtYm9qWE9JaTh4cUpFM0taem15dk9uRHNCSjg1YkRK?=
+ =?utf-8?B?N3ZFem5pSkZzTHdYbmhiY3ZFcXg4dEZENVgyR3FWdFJyTE5rZU9EOCs5c2x6?=
+ =?utf-8?B?RnhHa3R3WHByT2ZUYTA2VW5idVhDSmFLbTMvcDRIa2RpNVZUM1RkREVTZElu?=
+ =?utf-8?B?UVpPaWhhNjV4ZmhQM0dKMzBJVTB0NFFwemNRSnh1WDhoSy9JNENnb1VXaHJK?=
+ =?utf-8?B?Y2FqcER3WWticE85Y2VIaTRxL29XbU1VTHNrZTVkVDc1ZllqY2U4SCtyOGtp?=
+ =?utf-8?B?K0RlK1BveVBtOFJyUEliSW1TVUVEamNsUlVZa3R0T080TGRwZ3FiNXEyVVA3?=
+ =?utf-8?B?TVAwQjcxMXJhY2MraEdFL1NObTlyREI1WVA4VlVnWXdLR1hKaEVuK01PZGF0?=
+ =?utf-8?B?T25Ub2g0L3ltcU9XOTFvdVNYdTYwMHNxY3BaeDV5b2FOdExwZ1FiNjRNVXY2?=
+ =?utf-8?B?RVd1Nmk3b2pTclY4eVdMbERvajFRWTQvMytNTEx5Nks5OEMxcGJIODhsRFNo?=
+ =?utf-8?B?bTJDb21pVUNMV1BDTWlIcENNVG1pUlFVU2F1UjVNQnM5VTZsK3VQVi92dkx2?=
+ =?utf-8?B?QnlULzJhQnFVd3RQQTUvUWkwa1lCQ3dqVTdwRkdiWDg2SDZnUWkwRzZRaDV2?=
+ =?utf-8?B?TXd1NXdXY0k0R0FvNVdsVDIxalhhNzlmYUJIZWl3b1k5V2NndXVHY1VyWm9O?=
+ =?utf-8?B?Tjk5bUZlNzFOTmJxMnFFbnV6OGF1ZGg0SkpPNkdDTUNidnRjdnJsbVlOWGNK?=
+ =?utf-8?B?TG9UNXBwS1o4SEdCYndib2EwZU55ekJqSFlkeitrY2xWeXVZMDhoRTRDcTUv?=
+ =?utf-8?Q?9Qo6Kb1+stuDKZxGQX95I0I9O?=
+X-OriginatorOrg: volumez.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dac32f5c-7002-4d7a-f21f-08dc83b8898c
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB5107.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2024 10:32:58.7866
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b1841924-914b-4377-bb23-9f1fac784a1d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zoYqfuv7pPX2JrRW+1eokv4dxkwZ1hBMS2yct+zzmfhasAzYM4Y/XtTENQsmKbBWAHDaADjyGy28pXDqE47Zlw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB11029
 
 
---enazmods4fveag25
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 29, 2024 at 11:12:13AM +0200, Geert Uytterhoeven wrote:
-> The main CAN clock is either the internal CANFD clock, or the external
-> CAN clock.  Hence replace the two-valued enum by a simple boolean flag.
-> Consolidate all CANFD clock handling inside a single branch.
->=20
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+On 30/05/2024 20:58, Sagi Grimberg wrote:
+> Hey Ofir,
+>
+> On 30/05/2024 16:26, Ofir Gal wrote:
+>> skb_splice_from_iter() warns on !sendpage_ok() which results in nvme-tcp
+>> data transfer failure. This warning leads to hanging IO.
+>>
+>> nvme-tcp using sendpage_ok() to check the first page of an iterator in
+>> order to disable MSG_SPLICE_PAGES. The iterator can represent a list of
+>> contiguous pages.
+>>
+>> When MSG_SPLICE_PAGES is enabled skb_splice_from_iter() is being used,
+>> it requires all pages in the iterator to be sendable.
+>> skb_splice_from_iter() checks each page with sendpage_ok().
+>>
+>> nvme_tcp_try_send_data() might allow MSG_SPLICE_PAGES when the first
+>> page is sendable, but the next one are not. skb_splice_from_iter() will
+>> attempt to send all the pages in the iterator. When reaching an
+>> unsendable page the IO will hang.
+>
+> Interesting. Do you know where this buffer came from? I find it strange
+> that a we get a bvec with a contiguous segment which consists of non slab
+> originated pages together with slab originated pages... it is surprising to see
+> a mix of the two.
 
-Nice simplification!
+I find it strange as well, I haven't investigate the origin of the IO
+yet. I suspect the first 2 pages are the superblocks of the raid
+(mdp_superblock_1 and bitmap_super_s) and the rest of the IO is the
+bitmap.
 
-Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+I have stumbled with the same issue when running xfs_format (couldn't
+reproduce it from scratch). I suspect there are others cases that mix
+the slab pages and non-slab pages.
 
+> I'm wandering if this is something that happened before david's splice_pages
+> changes. Maybe before that with multipage bvecs? Anyways it is strange, never
+> seen that.
+I haven't bisect the commit that caused the behavior but I have tested
+ubuntu with 6.2.0 kernel, the bug didn't occur. (6.2.0 doesn't contain
+david's splice_pages changes).
 
---enazmods4fveag25
-Content-Type: application/pgp-signature; name="signature.asc"
+I'm not familiar with "multipage bvecs" patch, which patch do you refer
+to?
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmZdm6wACgkQFA3kzBSg
-KbZ4OxAAgd4GBocBLfl/h6rGu6FYbawWMIoahmg+8Gp/IoXCOs8MyvgKkp180ZS1
-F3zlBj1x98U4cK6UzsVOPgyDJTHh32G7c2d0g6xVBf185XMuwWU6Kh/agqj7aAH/
-u2M4eJHhKS2PfOCHNteNtN65Q+pFfDEKNc1ogb3SwKQMyD2QtyUWVfBzjNxHp8oW
-qNH724EjoIvFkf4XrZjzk2MuiOxf1bui081C4rVv2oEKk5ZKsyZ11j+AVZuyct/e
-GG91tkoB5KWlogZu2ED8Pb0MngPz5XsyC6v0rTWljRWBbWcpE+GVHAIDNSdlPDw4
-RBNY1HE7XIl/Q23Y4KuHQb7s6+cQ7edxOhxuRM+w42G/rvJatnmmdDo8MdJD/gvt
-c3z4kiG99+I3Udu2IVVVB1tYyr69Z72SBvrRSdkdUM4z494X2lV5cZ578KnHRtbo
-LGQb70ZgJ2GgcRHZVwUQIVQpyBcfjpTz5a9c1ynf9/FXORSJAJjEB8WXn/Y4fexB
-ED0EEXSDoZFELRxLgqwRVUcCppxyXNE6sghE0g0j9D/TD4KdTCztgLqddk4+rdqL
-mueNp9kZc7c21lrwXtymft9tNfRMZIRhQLQbFilxpE2NnzrECXK/GrzmDQqziFgX
-SsPIs31hZgvKHOSRhPulPnPjNsKcI7dQC38aThitLYIGyhSfbW0=
-=0tSn
------END PGP SIGNATURE-----
-
---enazmods4fveag25--
+> David,  strange that nvme-tcp is setting a single contiguous element bvec but it
+> is broken up into PAGE_SIZE increments in skb_splice_from_iter...
+>
+>>
+>> The patch introduces a helper sendpages_ok(), it returns true if all the
+>> continuous pages are sendable.
+>>
+>> Drivers who want to send contiguous pages with MSG_SPLICE_PAGES may use
+>> this helper to check whether the page list is OK. If the helper does not
+>> return true, the driver should remove MSG_SPLICE_PAGES flag.
+>>
+>>
+>> The bug is reproducible, in order to reproduce we need nvme-over-tcp
+>> controllers with optimal IO size bigger than PAGE_SIZE. Creating a raid
+>> with bitmap over those devices reproduces the bug.
+>>
+>> In order to simulate large optimal IO size you can use dm-stripe with a
+>> single device.
+>> Script to reproduce the issue on top of brd devices using dm-stripe is
+>> attached below.
+>
+> This is a great candidate for blktests. would be very beneficial to have it added there.
+Good idea, will do!
 
