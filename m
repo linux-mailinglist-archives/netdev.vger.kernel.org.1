@@ -1,91 +1,84 @@
-Return-Path: <netdev+bounces-100126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 845448D7EED
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 11:38:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 439768D7EDE
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 11:36:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27FDD1F241A6
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:38:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1BCEB2261D
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:36:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E2312CDA5;
-	Mon,  3 Jun 2024 09:31:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7498084D26;
+	Mon,  3 Jun 2024 09:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="1WOse9Dz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="afg+mk2v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCE812C54A;
-	Mon,  3 Jun 2024 09:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A511129A7A;
+	Mon,  3 Jun 2024 09:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717407076; cv=none; b=eFFZUgqXw0n9G64yCPZEBPUrqmSFRvdYnnZ/EkQGQUQf9DeYFMVUm0MpzuuEurZHbPPg3/tXOHA4lsOEIpTc7+ZZfQYKAuFKkv3TFJahvIAdhTp7jOlDn03093VqvdXFzWf3tL9AcX++EcHV4M3c0OyDDZiGl+CcEoYTFZ8DMR4=
+	t=1717407046; cv=none; b=D2Bh+AIQVz8RxYqMLevBkx0ujO1m0TMAzdTo9QPa0bVtnoSo5MX4FJzZZ71QK2YHMXAJ7IdbMLDAO6aoEVq+O5IsPu1KBL+LanuKDUEQUtZYp9PwGjmERLTlKlNUJVAPcBRatNQO7DvLjcIRZR6EM543y3BGpJWr5sjKOunlLGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717407076; c=relaxed/simple;
-	bh=ASPyOvafeU8VnD2cU1j9pdX2DUV8CS9oyXQ6p597/n4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=npHJKZyBgHY2C7MnjdhkqhQtII/ARKhPkYB0b/5DQBcnmrkaGkEyq7pNoFri+kE3DT2bxMrVCETeuZmAOcHHmAo5Op8bGW0h02tkJGhdz+u1Oh1oUF/3M47/04GgoVvFBmzKBHsETZN+oGJP1PgFRFx7r91XQ1/LquAM2qMcI94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=1WOse9Dz; arc=none smtp.client-ip=91.207.212.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4539Bmdg019015;
-	Mon, 3 Jun 2024 11:30:52 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	lPzEVJUMCFm6veKb1Y3KHWri4JNgUORxCYZTZgJtc6A=; b=1WOse9DzLaP1JAMS
-	tqBuxIXpldlrNPWUvpBGL00H8nejHMZJjFTs3c/T3I5RG354hqcbQ+aQ6em38BmI
-	GDZ+hRGNdbCr/rN4Dby2/5jyWp5ngu5VVKWK2UJ4emd+aQpK8X9Peve9Ie0kHxPT
-	6iuUhEdifH1WI+X5U4MyEgsJLYqhg7Td9fg13oVmY0VguSKizkBahOq5Le7LcmKn
-	vovD/daNOsSSc2ARFgK7gsd3MjOliUYDcGLN0P0tRPXn+EqZjJTzA0y2rn4MhApu
-	8+rNtecO7lZMdjHphmq3yi4QRhCJiBtfdPZL9wFdldMalQ8lG+UdPolfc3+SwuRK
-	0m603Q==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yfw9164kn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Jun 2024 11:30:52 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 17BC840046;
-	Mon,  3 Jun 2024 11:30:49 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 6131C21514D;
-	Mon,  3 Jun 2024 11:30:44 +0200 (CEST)
-Received: from localhost (10.48.86.164) by SHFDAG1NODE2.st.com (10.75.129.70)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 3 Jun
- 2024 11:30:44 +0200
-From: Christophe Roullier <christophe.roullier@foss.st.com>
-To: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
-        Mark
- Brown <broonie@kernel.org>,
-        Christophe Roullier
-	<christophe.roullier@foss.st.com>,
-        Marek Vasut <marex@denx.de>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3 11/11] ARM: multi_v7_defconfig: Add MCP23S08 pinctrl support
-Date: Mon, 3 Jun 2024 11:27:57 +0200
-Message-ID: <20240603092757.71902-12-christophe.roullier@foss.st.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240603092757.71902-1-christophe.roullier@foss.st.com>
-References: <20240603092757.71902-1-christophe.roullier@foss.st.com>
+	s=arc-20240116; t=1717407046; c=relaxed/simple;
+	bh=PlGq7u0Y2WD+2rPxC0bqOy2yBbVouV51QHxitKWWfYs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k1ZRdZi63CBnWNOd6mKd1R6tqdkgtfUZLdZXHLrlYBbSRiwd2miihi8muIrFoWq2Ra80s6a5CbuyBXHWtuuUbss4yDOI4xth2RR4V/fdpqU1N5GEVIrgxGbmbZ6ttw2knmP57nfaxOheQjOCVgls2/gYQVMS5DaMQut32hK6jXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=afg+mk2v; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2c1b9152848so2697769a91.1;
+        Mon, 03 Jun 2024 02:30:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717407044; x=1718011844; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pTfg4W7hBCVeAcgxRuU+2sIqAsGnPVdsC6neRJn0WXo=;
+        b=afg+mk2vaTpxEL6dIekCkJgKNAg+9hF/wdoLXv0fajDC6lttD5E4CsqoesSMzTWARR
+         yNGBmZEyDjt7lib2/zxXcdMMu0i8OPmKBP8EKbZyzcUsuSct6ugYrbYvcyi6oefxCvKQ
+         ETfGc/k+vQS6ENx9qMJw/etJpkqEceJhr4f1yIrBwKRtpPrzTpGikRo4L3vdhkC0/+bK
+         N6y5xVw76djuaHdatrC+fNKcys6B9Ly9iUcsgH//RvsHXSuQLvDl5lycPPlH6E4nnNda
+         4L9nrkZ2w0XlLP2qbSfMnodCFSDE+/d41n5B5kA9CO5l4jahc5PWz3twRkPzW4GlkZg3
+         60JQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717407044; x=1718011844;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pTfg4W7hBCVeAcgxRuU+2sIqAsGnPVdsC6neRJn0WXo=;
+        b=AKqPZUPNXt/W7HLPnJEwLcvmBAqXEULrTaOZ142vbaS1vCizlo2Ns2JJDt6S8cKY/m
+         Pi6m+hL52G+RCZp6ULtJ+4+rw1Hb9kK0QMETr+JIiXT2ivQGVzx95rPx3ahSn16GtwA1
+         lWn326Kuz4n/Q20z5XGmWByMBUBK3Nc2W18OETOOphvQGD0c7oKLZYPYBzlVr+j/kPnJ
+         nTbIiRHBVZTDsJWN/jJYqStyJYCoG1QHG7EQ9AoyUW/dtme1qFRf30KpW/nuUwiomQKa
+         Xw8Yf+3Adi9R79UmpvtULVX3Qwr/lmnmRA31KGdNr4OAIgaE+FMiHZrzYqe8Q9E7CaJn
+         ou+w==
+X-Forwarded-Encrypted: i=1; AJvYcCVYGtXM2pAEPbtn/CFIwD0beOyg26iSjQbhlb4mc2/Q5Dbt6pYwCEMSn9Lm2s57CgQjPqKckeM1RrSionJpB7LyPGcvg5+QJXXBrq/u57i6
+X-Gm-Message-State: AOJu0YwLLENmSwwN2YsxxdnULRuiySp2jdQG910QA5niGUi2sZ0VsWAg
+	ml1Com/44Wi1IDYdhbNYwUyuEVQet25VFakGa/CUQp7oQ7LRNDRoAGXL6eIcFdp3Og==
+X-Google-Smtp-Source: AGHT+IHNshtVpxw2GSYIJLcmEx5FBtoZtIwmnPKolXjlWNGSHOkknjnUXczc8WB4BN7SMJLaAvFH9w==
+X-Received: by 2002:a17:90a:d987:b0:2c1:a58a:1146 with SMTP id 98e67ed59e1d1-2c1dc560848mr6665451a91.4.1717407043812;
+        Mon, 03 Jun 2024 02:30:43 -0700 (PDT)
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c1a777d2f9sm8000429a91.27.2024.06.03.02.30.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Jun 2024 02:30:43 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Lukasz Majewski <lukma@denx.de>,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] selftests: hsr: add missing config for CONFIG_BRIDGE
+Date: Mon,  3 Jun 2024 17:30:19 +0800
+Message-ID: <20240603093019.2125266-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,36 +86,26 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-06-03_06,2024-05-30_01,2024-05-17_01
 
-Need to enable MCP23S08 I/O expanders to manage Ethernet phy
-reset in STM32MP135F-DK board
-STMMAC driver defer is not silent, need to put this config in
-built-in to avoid huge of Ethernet messages
+hsr_redbox.sh test need to create bridge for testing. Add the missing
+config CONFIG_BRIDGE in config file.
 
-Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
+Fixes: eafbf0574e05 ("test: hsr: Extend the hsr_redbox.sh to have more SAN devices connected")
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- arch/arm/configs/multi_v7_defconfig | 1 +
+ tools/testing/selftests/net/hsr/config | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm/configs/multi_v7_defconfig b/arch/arm/configs/multi_v7_defconfig
-index 86bf057ac3663..9758f3d41ad70 100644
---- a/arch/arm/configs/multi_v7_defconfig
-+++ b/arch/arm/configs/multi_v7_defconfig
-@@ -469,6 +469,7 @@ CONFIG_SPI_XILINX=y
- CONFIG_SPI_SPIDEV=y
- CONFIG_SPMI=y
- CONFIG_PINCTRL_AS3722=y
-+CONFIG_PINCTRL_MCP23S08=y
- CONFIG_PINCTRL_MICROCHIP_SGPIO=y
- CONFIG_PINCTRL_OCELOT=y
- CONFIG_PINCTRL_PALMAS=y
+diff --git a/tools/testing/selftests/net/hsr/config b/tools/testing/selftests/net/hsr/config
+index 22061204fb69..241542441c51 100644
+--- a/tools/testing/selftests/net/hsr/config
++++ b/tools/testing/selftests/net/hsr/config
+@@ -2,3 +2,4 @@ CONFIG_IPV6=y
+ CONFIG_NET_SCH_NETEM=m
+ CONFIG_HSR=y
+ CONFIG_VETH=y
++CONFIG_BRIDGE=y
 -- 
-2.25.1
+2.43.0
 
 
