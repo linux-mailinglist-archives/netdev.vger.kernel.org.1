@@ -1,250 +1,158 @@
-Return-Path: <netdev+bounces-100397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A43E8FA5D9
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 00:41:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD4A78FA5FB
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 00:45:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14BA51F24FE0
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 22:41:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FF7D1F24B69
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 22:45:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B16D8141987;
-	Mon,  3 Jun 2024 22:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D64AB13D26C;
+	Mon,  3 Jun 2024 22:45:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UEx6ptZt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LgLq+8y8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33FC1411C8
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 22:38:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A6D13D25F;
+	Mon,  3 Jun 2024 22:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717454309; cv=none; b=D2oN0hogoWV4YVX6pEzIYdVEmAbgC8TDkr38yTcDtB1L2JVK3pdTj//iD+LBxKAnI0chPzfVoB7w2ebbd37yjSpTI7xFmaFmYQ5oxH0acBos8JcvGGyrkF2gQRE+4ZP95XiyIwRUb5BUJnzLEf7PedtmccgiBl3S6MT9JWY40ag=
+	t=1717454700; cv=none; b=p3rF0cyEh0aUUywLYrnCNr8pSrMXnCtBoMZdEhHcVeuh37vISFZ9MVPuFkEee+c7s52l9y2c8928tkDhGHqjuZR+jXrF1C4kkfrQk8esB/3dKrrQs0gwfX/FjzxguMwpFpSFejqgiUMOoG9ROd6+NZ6mj6Yvl04MP8E2fisCbd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717454309; c=relaxed/simple;
-	bh=2kjzUB8na2cN4OBQvNPcjvOEQpeAh1YQfpxhoGDNjck=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=QuKIBlCP9VAKyDhg3WkjTus8klx0apbA4DtbQaHE9skGyRokzAtOPdqJCvouBwsn3CIMsRa0efcwc4S0HwK9XPzPlrWCU0hAX6L8lBpQnOY4PxBBnFT8sDRlOOj5AJbkn7Lo+1+hzsQs/rBAFJr8JcMG7p/AgqDsljzMzn4ZF+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UEx6ptZt; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717454308; x=1748990308;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=2kjzUB8na2cN4OBQvNPcjvOEQpeAh1YQfpxhoGDNjck=;
-  b=UEx6ptZtZFtP/ahoqo9pkxj9HT1GRyh14NcfFl9VJUn4Q0g6b5C77A51
-   LrKq/iwZ4L5CVSJvoRmiN5YYGZzYk+l9FOg/eLaF+hCIo1i01HhHADyZ4
-   H5+MwQOj4+8xp+eLV9guE4nxaTEzPpwnt+p1+ZNKSJEf5WwXTkjsmJtc1
-   O9g/mEyTULDQXzQmXhDUN3yvHIx2NHskv+rr6dEX9UaToF5zc+7eT+MzJ
-   HbdxRvShGL0G9TN1xRmmr3Ad/NNC9CZqTe6ere+LIw1wsr68erZoPfynP
-   a4VRWWWSQXIsTE+JJN2lK7Sx/s1AWNVbAqaYGsfDa2obi1CnLtQDE7FjG
-   A==;
-X-CSE-ConnectionGUID: Q5QfyT0QTwCvuXHeOZ0suQ==
-X-CSE-MsgGUID: F15ntv/RQHGxruY86iJHbg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11092"; a="13780134"
-X-IronPort-AV: E=Sophos;i="6.08,212,1712646000"; 
-   d="scan'208";a="13780134"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2024 15:38:23 -0700
-X-CSE-ConnectionGUID: lqLXdgxlQCyd49Q8qWZl6g==
-X-CSE-MsgGUID: ww1Y1VBORQmkmDhNE2N4CA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,212,1712646000"; 
-   d="scan'208";a="41471208"
-Received: from jekeller-desk.amr.corp.intel.com ([10.166.241.1])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2024 15:38:22 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Mon, 03 Jun 2024 15:38:21 -0700
-Subject: [PATCH 9/9] igc: add support for ethtool.set_phys_id
+	s=arc-20240116; t=1717454700; c=relaxed/simple;
+	bh=SS7haSNVEINimgm5/W3mtfCykszqT69zvNdWxSykOjQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CLss/wV/rLJgZU1rrFS6/mRQ9lf9yQv4MANyl8d3+mR5GBmNSY2NVT4ulQAtzpZHUvpLO8m6ymaAWjh/fmYBXZ3R8aLLU1bj9vbwd/qOBMkMympOWuIjFB0PkhzXMA8+b+Xe6ypvv9VrK1b+/XIz6JkcyP5QKyySAoVaNR/Xsl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LgLq+8y8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A9B4C2BD10;
+	Mon,  3 Jun 2024 22:45:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717454700;
+	bh=SS7haSNVEINimgm5/W3mtfCykszqT69zvNdWxSykOjQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LgLq+8y8Z9DNbcbleJK889AVVnanG0dEtt5fKMT90XrX8yhVQXh+DJYOmUBI7RoRr
+	 92hDsbxfH0jlFkbi+R9Sqkv2vkYfpeQWyhYTNoZnLI89Skr/P+hbBMh1M0Z0Zig+Oq
+	 gVcGlkOzJB4aP/MlGkVI9O0VFhlfk/cWGKCGNUqeYLcPQloFR9ps99dXIeZChYlhpO
+	 Al6nt2qihiHJVIwBqarO7DDgq1Zhsrl5ep4Mn0fXRPp/rivGBk43FftWgOBsrQmBUF
+	 9bTKITNMbFRd5u+qk9Rw3US4QpdF+jLNIwZPzDCD6xEzESRlNqQpgQrpQKxGeffyUT
+	 aWai68IuOUsyQ==
+Date: Mon, 3 Jun 2024 15:44:59 -0700
+From: Kees Cook <kees@kernel.org>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>,
+	David Rientjes <rientjes@google.com>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+	jvoisin <julien.voisin@dustri.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Hyeonggon Yoo <42.hyeyoo@gmail.com>, linux-mm@kvack.org,
+	linux-hardening@vger.kernel.org,
+	"GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
+	Xiu Jianfeng <xiujianfeng@huawei.com>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Jann Horn <jannh@google.com>, Matteo Rizzo <matteorizzo@google.com>,
+	Thomas Graf <tgraf@suug.ch>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 2/6] mm/slab: Plumb kmem_buckets into
+ __do_kmalloc_node()
+Message-ID: <202406031539.3A465006@keescook>
+References: <20240531191304.it.853-kees@kernel.org>
+ <20240531191458.987345-2-kees@kernel.org>
+ <8c0c4af3-4782-4dbc-b413-e2f3b79c0246@suse.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240603-next-2024-06-03-intel-next-batch-v1-9-e0523b28f325@intel.com>
-References: <20240603-next-2024-06-03-intel-next-batch-v1-0-e0523b28f325@intel.com>
-In-Reply-To: <20240603-next-2024-06-03-intel-next-batch-v1-0-e0523b28f325@intel.com>
-To: David Miller <davem@davemloft.net>, netdev <netdev@vger.kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>
-Cc: Jacob Keller <jacob.e.keller@intel.com>, 
- Vitaly Lifshits <vitaly.lifshits@intel.com>, 
- Menachem Fogel <menachem.fogel@intel.com>, 
- Naama Meir <naamax.meir@linux.intel.com>
-X-Mailer: b4 0.13.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8c0c4af3-4782-4dbc-b413-e2f3b79c0246@suse.cz>
 
-From: Vitaly Lifshits <vitaly.lifshits@intel.com>
+On Mon, Jun 03, 2024 at 07:06:15PM +0200, Vlastimil Babka wrote:
+> On 5/31/24 9:14 PM, Kees Cook wrote:
+> > Introduce CONFIG_SLAB_BUCKETS which provides the infrastructure to
+> > support separated kmalloc buckets (in the follow kmem_buckets_create()
+> > patches and future codetag-based separation). Since this will provide
+> > a mitigation for a very common case of exploits, enable it by default.
+> 
+> Are you sure? I thought there was a policy that nobody is special enough
+> to have stuff enabled by default. Is it worth risking Linus shouting? :)
 
-Add support for ethtool.set_phys_id callback to initiate LED blinking
-and stopping them by the ethtool interface.
-This is done by storing the initial LEDCTL register value and restoring
-it when LED blinking is terminated.
+I think it's important to have this enabled given how common the
+exploitation methodology is and how cheap this solution is. Regardless,
+if you want it "default n", I can change it.
 
-In addition, moved IGC_LEDCTL related defines from igc_leds.c to
-igc_defines.h where they can be included by all of the igc module
-files.
+> I found this too verbose and tried a different approach, in the end rewrote
+> everything to verify the idea works. So I'll just link to the result in git:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/vbabka/linux.git/log/?h=slab-buckets-v4-rewrite
+> 
+> It's also rebased on slab.git:slab/for-6.11/cleanups with some alloc_hooks()
+> cleanups that would cause conflicts otherwkse.
+> 
+> But the crux of that approach is:
+> 
+> /*
+>  * These macros allow declaring a kmem_buckets * parameter alongside size, which
+>  * can be compiled out with CONFIG_SLAB_BUCKETS=n so that a large number of call
+>  * sites don't have to pass NULL.
+>  */
+> #ifdef CONFIG_SLAB_BUCKETS
+> #define DECL_BUCKET_PARAMS(_size, _b)   size_t (_size), kmem_buckets *(_b)
+> #define PASS_BUCKET_PARAMS(_size, _b)   (_size), (_b)
+> #define PASS_BUCKET_PARAM(_b)           (_b)
+> #else
+> #define DECL_BUCKET_PARAMS(_size, _b)   size_t (_size)
+> #define PASS_BUCKET_PARAMS(_size, _b)   (_size)
+> #define PASS_BUCKET_PARAM(_b)           NULL
+> #endif
+> 
+> Then we have declaration e.g.
+> 
+> void *__kmalloc_node_noprof(DECL_BUCKET_PARAMS(size, b), gfp_t flags, int node)
+>                                 __assume_kmalloc_alignment __alloc_size(1);
+> 
+> and the function is called like (from code not using buckets)
+> return __kmalloc_node_noprof(PASS_BUCKET_PARAMS(size, NULL), flags, node);
+> 
+> or (from code using buckets)
+> #define kmem_buckets_alloc(_b, _size, _flags)   \
+>         alloc_hooks(__kmalloc_node_noprof(PASS_BUCKET_PARAMS(_size, _b), _flags, NUMA_NO_NODE))
+> 
+> And implementation looks like:
+> 
+> void *__kmalloc_node_noprof(DECL_BUCKET_PARAMS(size, b), gfp_t flags, int node)
+> {
+>         return __do_kmalloc_node(size, PASS_BUCKET_PARAM(b), flags, node, _RET_IP_);
+> }
+> 
+> The size param is always the first, so the __alloc_size(1) doesn't need tweaking.
+> size is also used in the macros even if it's never mangled, because it's easy
+> to pass one param instead of two, but not zero params instead of one, if we want
+> the ending comma not be part of the macro (which would look awkward).
+> 
+> Does it look ok to you? Of course names of the macros could be tweaked. Anyway feel
+> free to use the branch for the followup. Hopefully this way is also compatible with
+> the planned codetag based followup.
 
-Co-developed-by: Menachem Fogel <menachem.fogel@intel.com>
-Signed-off-by: Menachem Fogel <menachem.fogel@intel.com>
-Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/igc/igc_defines.h | 22 +++++++++++++++++++
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 32 ++++++++++++++++++++++++++++
- drivers/net/ethernet/intel/igc/igc_hw.h      |  2 ++
- drivers/net/ethernet/intel/igc/igc_leds.c    | 21 +-----------------
- drivers/net/ethernet/intel/igc/igc_main.c    |  2 ++
- 5 files changed, 59 insertions(+), 20 deletions(-)
+This looks really nice, thank you! This is well aligned with the codetag
+followup, which also needs to have "size" be very easy to find (to the
+macros can check for compile-time-constant or not).
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
-index 5f92b3c7c3d4..664d49f10427 100644
---- a/drivers/net/ethernet/intel/igc/igc_defines.h
-+++ b/drivers/net/ethernet/intel/igc/igc_defines.h
-@@ -686,4 +686,26 @@
- #define IGC_LTRMAXV_LSNP_REQ		0x00008000 /* LTR Snoop Requirement */
- #define IGC_LTRMAXV_SCALE_SHIFT		10
- 
-+/* LED ctrl defines */
-+#define IGC_NUM_LEDS			3
-+
-+#define IGC_LEDCTL_GLOBAL_BLINK_MODE	BIT(5)
-+#define IGC_LEDCTL_LED0_MODE_SHIFT	0
-+#define IGC_LEDCTL_LED0_MODE_MASK	GENMASK(3, 0)
-+#define IGC_LEDCTL_LED0_BLINK		BIT(7)
-+#define IGC_LEDCTL_LED1_MODE_SHIFT	8
-+#define IGC_LEDCTL_LED1_MODE_MASK	GENMASK(11, 8)
-+#define IGC_LEDCTL_LED1_BLINK		BIT(15)
-+#define IGC_LEDCTL_LED2_MODE_SHIFT	16
-+#define IGC_LEDCTL_LED2_MODE_MASK	GENMASK(19, 16)
-+#define IGC_LEDCTL_LED2_BLINK		BIT(23)
-+
-+#define IGC_LEDCTL_MODE_ON		0x00
-+#define IGC_LEDCTL_MODE_OFF		0x01
-+#define IGC_LEDCTL_MODE_LINK_10		0x05
-+#define IGC_LEDCTL_MODE_LINK_100	0x06
-+#define IGC_LEDCTL_MODE_LINK_1000	0x07
-+#define IGC_LEDCTL_MODE_LINK_2500	0x08
-+#define IGC_LEDCTL_MODE_ACTIVITY	0x0b
-+
- #endif /* _IGC_DEFINES_H_ */
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index f2c4f1966bb0..82ece5f95f1e 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1975,6 +1975,37 @@ static void igc_ethtool_diag_test(struct net_device *netdev,
- 	msleep_interruptible(4 * 1000);
- }
- 
-+static int igc_ethtool_set_phys_id(struct net_device *netdev,
-+				   enum ethtool_phys_id_state state)
-+{
-+	struct igc_adapter *adapter = netdev_priv(netdev);
-+	struct igc_hw *hw = &adapter->hw;
-+	u32 ledctl;
-+
-+	switch (state) {
-+	case ETHTOOL_ID_ACTIVE:
-+		ledctl = rd32(IGC_LEDCTL);
-+
-+		/* initiate LED1 blinking */
-+		ledctl &= ~(IGC_LEDCTL_GLOBAL_BLINK_MODE |
-+			   IGC_LEDCTL_LED1_MODE_MASK |
-+			   IGC_LEDCTL_LED2_MODE_MASK);
-+		ledctl |= IGC_LEDCTL_LED1_BLINK;
-+		wr32(IGC_LEDCTL, ledctl);
-+		break;
-+
-+	case ETHTOOL_ID_INACTIVE:
-+		/* restore LEDCTL default value */
-+		wr32(IGC_LEDCTL, hw->mac.ledctl_default);
-+		break;
-+
-+	default:
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
- static const struct ethtool_ops igc_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS,
- 	.get_drvinfo		= igc_ethtool_get_drvinfo,
-@@ -2013,6 +2044,7 @@ static const struct ethtool_ops igc_ethtool_ops = {
- 	.get_link_ksettings	= igc_ethtool_get_link_ksettings,
- 	.set_link_ksettings	= igc_ethtool_set_link_ksettings,
- 	.self_test		= igc_ethtool_diag_test,
-+	.set_phys_id		= igc_ethtool_set_phys_id,
- };
- 
- void igc_ethtool_set_ops(struct net_device *netdev)
-diff --git a/drivers/net/ethernet/intel/igc/igc_hw.h b/drivers/net/ethernet/intel/igc/igc_hw.h
-index e1c572e0d4ef..45b68695bdb7 100644
---- a/drivers/net/ethernet/intel/igc/igc_hw.h
-+++ b/drivers/net/ethernet/intel/igc/igc_hw.h
-@@ -95,6 +95,8 @@ struct igc_mac_info {
- 	bool autoneg;
- 	bool autoneg_failed;
- 	bool get_link_status;
-+
-+	u32 ledctl_default;
- };
- 
- struct igc_nvm_operations {
-diff --git a/drivers/net/ethernet/intel/igc/igc_leds.c b/drivers/net/ethernet/intel/igc/igc_leds.c
-index 3929b25b6ae6..e5eeef240802 100644
---- a/drivers/net/ethernet/intel/igc/igc_leds.c
-+++ b/drivers/net/ethernet/intel/igc/igc_leds.c
-@@ -8,26 +8,7 @@
- #include <uapi/linux/uleds.h>
- 
- #include "igc.h"
--
--#define IGC_NUM_LEDS			3
--
--#define IGC_LEDCTL_LED0_MODE_SHIFT	0
--#define IGC_LEDCTL_LED0_MODE_MASK	GENMASK(3, 0)
--#define IGC_LEDCTL_LED0_BLINK		BIT(7)
--#define IGC_LEDCTL_LED1_MODE_SHIFT	8
--#define IGC_LEDCTL_LED1_MODE_MASK	GENMASK(11, 8)
--#define IGC_LEDCTL_LED1_BLINK		BIT(15)
--#define IGC_LEDCTL_LED2_MODE_SHIFT	16
--#define IGC_LEDCTL_LED2_MODE_MASK	GENMASK(19, 16)
--#define IGC_LEDCTL_LED2_BLINK		BIT(23)
--
--#define IGC_LEDCTL_MODE_ON		0x00
--#define IGC_LEDCTL_MODE_OFF		0x01
--#define IGC_LEDCTL_MODE_LINK_10		0x05
--#define IGC_LEDCTL_MODE_LINK_100	0x06
--#define IGC_LEDCTL_MODE_LINK_1000	0x07
--#define IGC_LEDCTL_MODE_LINK_2500	0x08
--#define IGC_LEDCTL_MODE_ACTIVITY	0x0b
-+#include "igc_defines.h"
- 
- #define IGC_SUPPORTED_MODES						 \
- 	(BIT(TRIGGER_NETDEV_LINK_2500) | BIT(TRIGGER_NETDEV_LINK_1000) | \
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 12f004f46082..d0db302aa3eb 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -7070,6 +7070,8 @@ static int igc_probe(struct pci_dev *pdev,
- 			goto err_register;
- 	}
- 
-+	hw->mac.ledctl_default = rd32(IGC_LEDCTL);
-+
- 	return 0;
- 
- err_register:
+I will go work from your branch...
+
+Thanks!
+
+-Kees
 
 -- 
-2.44.0.53.g0f9d4d28b7e6
-
+Kees Cook
 
