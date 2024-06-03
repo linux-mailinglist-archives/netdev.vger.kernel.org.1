@@ -1,117 +1,184 @@
-Return-Path: <netdev+bounces-100112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 690798D7E6B
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 11:22:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ADD58D7E6E
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 11:24:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20EAF2831C3
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:22:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17696282FFC
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB6A7E110;
-	Mon,  3 Jun 2024 09:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3487E578;
+	Mon,  3 Jun 2024 09:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jzQdBJbd"
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="GEi6pGeA"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85D886BFA7
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 09:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067B153392;
+	Mon,  3 Jun 2024 09:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717406548; cv=none; b=N3snyR5dVLNEXBnKtOXO/lcKc+dFTUbPynRCPyH29TXDhNfa7jOeNLWLbx54BO8dWgLPxgCJ514NAp/6L2yLab+slJpKr4EAGUZiEr8NSSrjvrNyPzbJQcETA3lhUv4njQF6QOm8VYuO7tXWKl4jGjVrNV/J2LzD8ODdA/pKZRw=
+	t=1717406677; cv=none; b=e0bblhG1Km+ouwtnkUhAV+hpxjtQ4aIBd1BCvE1C3xkP3jK13o1aShAZA1WK8t/HwwZLvkmriOywkLbats7DV/NF8T2jZ5e8CiBrUTxLy3WQzRrUKbhOqAx7LF93V0dld0dnkHbadIYvdqwu2Ui7fFTWI7Lut0Wf2UkB4USsHEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717406548; c=relaxed/simple;
-	bh=CA7QhH8JCNHYO57Ao/KgDtAWzPycb4G4WIUu2c23j7Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ih6fx6+8O6cURi/oV0pL68ViAyKOl+ayj6pnMFleAQa+TQ07eTXjDf9J0DDYwCbwsK4QC2wbGAcPDaRbY1QWkhue8aqe2lSz7gC+xt+3WzR0QvHUCwHwYfICXZrzQV6Jj9iyaXtYicd43sK5fIhuYCDzhV7pnsbfTQNceWMVhsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jzQdBJbd; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	s=arc-20240116; t=1717406677; c=relaxed/simple;
+	bh=sZV9sGIYSh32X5aVunx+X2ZqSTjZPK2NT/Sq952/+IM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p0raopD2Lhmg24eKXHKjW0fn8+gm3ktbMoT9ErwfQkpcJqIq7t52WmA4zZ6MC3Ure/oOcVt18lNJTF11lDf3X7ETXuv2NotEMfzi5yDtQgUwlrd2OxSRymqe9gjaealHqvkC/mH37nCRhsDv7rH3ncvKcqbbzrnSDoGzbLVkPrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=GEi6pGeA; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Rpg+gKZj8eQLCVGWgrEmxuzQNnpAd05t5v6kkUyzuQY=; b=jzQdBJbdJKKb/mGa9x5+qhH9zD
-	7nhKQnxLlCiP1RHonk+JDPqPeQJQ24VntKfSFVY4TwMLBeROIjB6pBJQRc8srZ+YTiRQpLGQRhykH
-	qKJ+V34AEWbkGIDOd5YP2WSPU5+uc7QRULScsXlk0ypFkqMyJW27zTW+AxKrFcxPWMBGOltej4AGc
-	+Mwa3Kg8jqHWxj2g6jgf5rXvmYK6vS0A2RXYICOhwEfTSb+577OFd03R347PMVsA43v1tbyLkhfg2
-	Pl9/otP7bzLCIuqLh12JRkda7qRGAF2+rGpaSczorSwYDvJYXTtTqkeQ+RlWPlS8ZPqj5aiobZik9
-	2d9Va3qQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59558)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sE3tR-0002VG-1j;
-	Mon, 03 Jun 2024 10:22:17 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sE3tR-0000Jb-EZ; Mon, 03 Jun 2024 10:22:17 +0100
-Date: Mon, 3 Jun 2024 10:22:17 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, horms@kernel.org,
-	kuba@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
-	hfdevel@gmx.net, naveenm@marvell.com, jdamato@fastly.com
-Subject: Re: [PATCH net-next v8 6/6] net: tn40xx: add phylink support
-Message-ID: <Zl2LSfGqvPUvUoRT@shell.armlinux.org.uk>
-References: <20240603064955.58327-1-fujita.tomonori@gmail.com>
- <20240603064955.58327-7-fujita.tomonori@gmail.com>
+	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
+	References; bh=4BPrmksCSYYF0YoAvQOx1MdXjMUjY3TOtCFspO/clO8=; t=1717406675;
+	x=1717838675; b=GEi6pGeA0SqqzsGnSeST0BR+0GEbolCOMP5GEQFl2JQUd5NmU9WWNsx+tsS5Y
+	woa6oQUtzS89cfn0gaplwUVd6sKIwT/479LlWPhk4cgPvh6W4IJ4TUj39lhgZThHFCemHo6YHrfJF
+	K5WwWvr12ERnK+1G13eVUgShzsRKdfWYRMuwk7xr2Tuxndnxu4p1o5H4YNC1IK1QuxLwMdST2JFuG
+	0Fy4V8TlvIawALgfBD/PrjdEla4UJT3fBwRqAaQnBDI9kwuma34aKxPmms47XMkv02VZo2HHR1C62
+	0ihOGdchLqLW8f9yva8buh48l9hWHzQbGSAN1tJZFL44c3sjSA==;
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1sE3vU-00070K-Ue; Mon, 03 Jun 2024 11:24:25 +0200
+Message-ID: <7d22ac7e-c505-430b-82cc-6b14b04f3c90@leemhuis.info>
+Date: Mon, 3 Jun 2024 11:24:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240603064955.58327-7-fujita.tomonori@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: "ERROR: modpost: "icssg_queue_pop" [...] undefined" on arm64
+To: MD Danish Anwar <danishanwar@ti.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>, Jan Kiszka
+ <jan.kiszka@siemens.com>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Wolfram Sang <wsa+renesas@sang-engineering.com>,
+ Niklas Schnelle <schnelle@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+ Diogo Ivo <diogo.ivo@siemens.com>, Roger Quadros <rogerq@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>
+Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, srk@ti.com,
+ Vignesh Raghavendra <vigneshr@ti.com>
+References: <20240528113734.379422-1-danishanwar@ti.com>
+ <20240528113734.379422-2-danishanwar@ti.com>
+ <de980a49-b802-417a-a57e-2c47f67b08e4@leemhuis.info>
+ <b4256b15-997d-4e10-a6a9-a1b41011c867@ti.com>
+From: Thorsten Leemhuis <linux@leemhuis.info>
+Content-Language: en-US, de-DE
+Autocrypt: addr=linux@leemhuis.info; keydata=
+ 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 n7RI
+In-Reply-To: <b4256b15-997d-4e10-a6a9-a1b41011c867@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;linux@leemhuis.info;1717406675;4e76c9a1;
+X-HE-SMSGID: 1sE3vU-00070K-Ue
 
-On Mon, Jun 03, 2024 at 03:49:55PM +0900, FUJITA Tomonori wrote:
-> @@ -1374,6 +1375,10 @@ static void tn40_stop(struct tn40_priv *priv)
->  static int tn40_close(struct net_device *ndev)
->  {
->  	struct tn40_priv *priv = netdev_priv(ndev);
-> +
-> +	phylink_stop(priv->phylink);
-> +	phylink_disconnect_phy(priv->phylink);
+On 03.06.24 10:14, MD Danish Anwar wrote:
+> On 03/06/24 12:39 pm, Thorsten Leemhuis wrote:
+>> On 28.05.24 13:37, MD Danish Anwar wrote:
+>>> Introduce helper functions to configure firmware FDB tables, VLAN tables
+>>> and Port VLAN ID settings to aid adding Switch mode support.
+>>>
+>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>>
+>> Hi! Since Friday I get a compile error in my -next builds for Fedora:
+>>
+>> ERROR: modpost: "icssg_queue_push"
+>> [drivers/net/ethernet/ti/icssg-prueth-sr1.ko] undefined!
+>> ERROR: modpost: "icssg_queue_pop"
+>> [drivers/net/ethernet/ti/icssg-prueth-sr1.ko] undefined!
+> 
+> Before posting the patches I had tested them with defconfig and I didn't
+> see any ERRORs.
+> 
+> I think in the config that you are using most probably
+> CONFIG_TI_ICSSG_PRUETH_SR1 is enabled. The patch adds APIs in
+> icssg_config.c which uses APIs added in icssg_qeueus.c.
+> 
+> Now CONFIG_TI_ICSSG_PRUETH_SR1 also uses icssg_config.c but
+> icssg_queues.c is not built for SR1 as a result this error is coming.
+> 
+> Fix for this will be to build icssg_queues as well for SR1 driver.
+> 
+> I will test the fix and post it to net-next soon.
 
-There is no need to pair both of these together - you can disconnect
-from the PHY later if it's more convenient.
+thx!
 
-> +
->  	napi_disable(&priv->napi);
->  	netif_napi_del(&priv->napi);
->  	tn40_stop(priv);
-> @@ -1392,6 +1397,14 @@ static int tn40_open(struct net_device *dev)
->  		return ret;
->  	}
->  	napi_enable(&priv->napi);
-> +	ret = phylink_connect_phy(priv->phylink, priv->phydev);
-> +	if (ret) {
-> +		napi_disable(&priv->napi);
-> +		tn40_stop(priv);
-> +		netdev_err(dev, "failed to connect to phy %d\n", ret);
-> +		return ret;
-> +	}
+>> Looks like this problem was found and reported mid May by the kernel
+>> test robot already, which identified a earlier version of the patch I'm
+>> replying to to be the cause:
+>> https://lore.kernel.org/all/202405182038.ncf1mL7Z-lkp@intel.com/
+>>
+>> That and the fact that the patch showed up in -next on Friday makes me
+>> assume that my problem is caused by this change as well as well. A build
+>> log can be found here:
+>> https://download.copr.fedorainfracloud.org/results/@kernel-vanilla/next/fedora-39-aarch64/07523690-next-next-all/builder-live.log.gz
+>>
+>> I don't have the .config at hand, but can provide it when needed.
+> 
+> Yes that would be helpful. If possible just check in the .config what
+> symbols are enabled related to ICSS. (`cat .config | grep ICSS`)
 
-Again, no need to pair phylink_connect_phy() close to phylink_start()
-if there's somewhere more convenient to place it. Operation with the
-PHY doesn't begin until phylink_start() is called.
+I can't easily access the .config used the build system used for the
+build, but unless I did something stupid it should be identical to this one:
+https://www.leemhuis.info/files/misc/kernel-6.10.0-aarch64.config
 
-My review comment last time was purely about where phylink_start()
-and phylink_stop() were being called. It's the placement of these
-two functions that are key.
+FWIW, that .config is generated by some scripts Fedora uses when
+building their kernels.
 
-Thanks.
+$ grep ICSS kernel-6.10.0-aarch64.config
+CONFIG_TI_ICSSG_PRUETH=m
+CONFIG_TI_ICSSG_PRUETH_SR1=m
+CONFIG_TI_ICSS_IEP=m
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+HTH, Ciao, Thorsten
 
