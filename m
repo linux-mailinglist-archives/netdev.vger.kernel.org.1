@@ -1,189 +1,170 @@
-Return-Path: <netdev+bounces-100347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13F628D8B08
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 22:46:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 943348D8B44
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 23:06:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBFB31F25690
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 20:46:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4D32B246E5
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 21:06:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649171386D0;
-	Mon,  3 Jun 2024 20:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F9C13B588;
+	Mon,  3 Jun 2024 21:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OGDHUnGD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2073.outbound.protection.outlook.com [40.107.94.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C32B651;
-	Mon,  3 Jun 2024 20:46:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717447574; cv=none; b=Bp8k6QPsb1D1sUWELzrEcxSWOcu9mQ1JxQa2zQgcjfAP/u9tlbMQfiXR81KQmryhojTnmliWq0yNxWKnoGfES61noUS7z/dyLzh0I2/XjIfvxNQU8AaN7uqpeirDmtavW44I1CS45T/OLtxz8S9EKB0gz0QZ25iArJSTN/yw8Sk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717447574; c=relaxed/simple;
-	bh=R2QkOlhuMFFxiF5tENr/6ZI22OVqBhT81sSAayPR0k8=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=e1ZLvQtS2gtADCItfXNu5m1/nZO7m4EQk/zRMQz1T2BhL4S17T6cLindZpLTYcZbpTvNckISBKLM3Lh95g58V7SSxdkW4UgF9jd7ZLLKEMExEiQP6pV6paqVIcyz0tlSiuT4XVwB1qowZMDbRUCq/c37v1IQEKHDuQveaPDCOPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.75.167) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 3 Jun
- 2024 23:45:52 +0300
-Subject: Re: [net-next PATCH v4 7/7] net: ravb: Allocate RX buffers via page
- pool
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, Simon Horman
-	<horms@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, =?UTF-8?Q?Niklas_S=c3=b6derlund?=
-	<niklas.soderlund+renesas@ragnatech.se>, Biju Das
-	<biju.das.jz@bp.renesas.com>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
-	<yoshihiro.shimoda.uh@renesas.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240528150339.6791-1-paul.barker.ct@bp.renesas.com>
- <20240528150339.6791-8-paul.barker.ct@bp.renesas.com>
- <20240601101300.GA491852@kernel.org>
- <6165a9a3-15ec-4a40-901a-17c2be64daf1@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <d0c47784-ec5f-eabf-8fe9-9405093accf8@omp.ru>
-Date: Mon, 3 Jun 2024 23:45:51 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245A7134409
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 21:05:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717448760; cv=fail; b=A74uiZRWiEh9A3wJ91u91KyMQWZLp+EEyqwJDC+G7bdNn12/vYAwz5GAmctM2rUyqE3GBPZUAreryTeOXyx4CUbiqgIX4Hp0LQSscMbBc7CLB65WGY7YUp/SzeV2ibmzQY69sidAWQTjZUk8L7/NXKVrJI9gEakRcgkAS6644a8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717448760; c=relaxed/simple;
+	bh=idzSrI9HtyrjM5GtWUeS+MO5zxvhR5kp2jkR9x9LGK0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=giR/73Fr21Px9RI46qvlBkd0+RnCBpyXmajJNgh6CtMLv0WMODHksg4JlgSr6sdA1ZWVjo7u2o8xOCNm7uqcgv+eko5jwwBAWeQxP5UAlpRdqAnUz0jqQ+v7uaX/sqxVfnjXH92YDIu8qNZbtCfZdOmPIrRGb9uHRUobO5QXN40=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OGDHUnGD; arc=fail smtp.client-ip=40.107.94.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DeQ19q56EHPahImiF4M8dk3w2JHwLUC2+gvRgYO3PnRIk8nGjtzf89Gnc7JgPxbCx/l9SheSjyce110/XvS4wM5b73OWkhIIbTHSlsgBYrgkmo5gCQuzs1faiS3uhEnfEg2DqmhhH5Aoxr5gZw/UjcetkwXdGLo3j6tY3dL5DWYcg8FMAI3w9RNHebk4HUUa3keSfSzSy5fAAXooJkYsZ4GzkGv6XZIYiNu/5NoyMzlz71K5ODtIqIytdimmkSS/i00rxl34Brw8Ptacaig54paUkMWCDa2JbWxAaBRuB0JHD2p6ZLldTioCRtTuXaIdKnRDJw/j3kWJWu0Z4r7UVA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PZ2rspHFamPH55/l7e5R+juxuavxsE9dyJsF99KbL84=;
+ b=hK0HPckQ2YY6f0up/OmMn1EHaExCHW8Nk2LDiqz+HuQbEoIs4j7DcfG6QJtGJGkli9p3gAHZIJ98MrMWYIZ1LyOGNSFiLA6taBvzkB2F8s35x6wc455MrAxyqDJM8EF4ay33Jqcwg2OOW2hYKltJJtmgN6+wBpAPlKsyGvgPGWmgcTQaiTx+UTZu1MLM+sQj+we2YRHSnNxzNzzGgaTBvcI99hK+uOHcDu/1WvbvjXP2y2Np4g1gfV7RLiI5wqlm7qGIgHHF2sLvgPhDelTpr8lUV1QucDj/WvY5cwDu0c64NUBCD38ji6VpsmAxBpj7wsU9vMMq+prjrTJtHX/loA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PZ2rspHFamPH55/l7e5R+juxuavxsE9dyJsF99KbL84=;
+ b=OGDHUnGDpy6RJzVHlDNZLRUrsDurnXKZks5xBIExXf+G3QxkN3ToVsFpjWo+xlYFykHhcYnonToUoQEiq19RRZ9aRuBn8Pfc99ONtUkCHrn8ExqxsiSYYw1tViTsAia/Ea2wJeve3wFKmyY0UifwGypN490vlqGwDwIzdjc/1+glEV5osQPkmsoWTnkEhunHBFcHdPSJPxo3UBeqiN9fTuyDb2BWE+XdwMfVgJCAAWxlIUncCPoIs9/y8wBz7Z0VyPjS5DywxBze1NXulLSXiOVeH/3IFiN4DQ2MlNP/eo8s8+J8DJjL8/p6iL4oQZinN00hBkCP9rpS5f4+qC83jw==
+Received: from DS7PR03CA0346.namprd03.prod.outlook.com (2603:10b6:8:55::9) by
+ DS0PR12MB8296.namprd12.prod.outlook.com (2603:10b6:8:f7::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7633.27; Mon, 3 Jun 2024 21:05:56 +0000
+Received: from DS3PEPF0000C37B.namprd04.prod.outlook.com
+ (2603:10b6:8:55:cafe::af) by DS7PR03CA0346.outlook.office365.com
+ (2603:10b6:8:55::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.30 via Frontend
+ Transport; Mon, 3 Jun 2024 21:05:57 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ DS3PEPF0000C37B.mail.protection.outlook.com (10.167.23.5) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7633.15 via Frontend Transport; Mon, 3 Jun 2024 21:05:56 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 3 Jun 2024
+ 14:05:48 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 3 Jun 2024 14:05:48 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 3 Jun 2024 14:05:46 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Tariq Toukan
+	<tariqt@nvidia.com>
+Subject: [PATCH net 0/2] mlx5 core fixes 20240603
+Date: Tue, 4 Jun 2024 00:04:41 +0300
+Message-ID: <20240603210443.980518-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <6165a9a3-15ec-4a40-901a-17c2be64daf1@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 06/03/2024 20:26:14
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 185692 [Jun 03 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 20 0.3.20
- 743589a8af6ec90b529f2124c2bbfc3ce1d2f20f
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.167 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.167 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	lore.kernel.org:7.1.1;www.kernel.org:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.75.167
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 06/03/2024 20:31:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 6/3/2024 5:58:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37B:EE_|DS0PR12MB8296:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5458ae53-6352-421c-0d3c-08dc8410f644
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|376005|36860700004|82310400017|1800799015;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?scybYp4028AqoBuDivlBTUfpexQGybTQhUBelk3oR7tbDqEus3JiV0tzAuWN?=
+ =?us-ascii?Q?8g0iILm65HwIFyS4GK7OVg/rYzl64naTEuCCcbuTsxMRc8AgeAJi10TcxHEy?=
+ =?us-ascii?Q?e0Gwcm4vZgPyVXftLTXPCwFBWcZ142XDUNWz+2xcvxI8zBQTjK83oDi1QbE6?=
+ =?us-ascii?Q?/yTIvvlvhDQZ7SmhW1tO8uumRuH7gEp/5V6hZhse8FmQDscnlQ3zn9aU8I6r?=
+ =?us-ascii?Q?D0ofNJh4pEfBsNdVau7+Jq+8i4dXQ82p3r6APlLqKzkgKoLMIpY3Ja+68sPW?=
+ =?us-ascii?Q?Vxs5uhui32Lo8TzvNZxjPF3AnuvS02Y8c5T2J/PUh3YCz6DuLRmhg2GfRitX?=
+ =?us-ascii?Q?0b5XoyItV5xU8j6Q9OziJFFWfBerUQJ+Ra9/sN5a4epUfYgMzWtg1nCQVb25?=
+ =?us-ascii?Q?4ekPLUp8VOjiJFPgOPSjZWKIz19egXtsu75nyHVw8Jl2haxGhGedFayMBzBb?=
+ =?us-ascii?Q?fyupW5UxRep5JZVYMEvVzoyGqbSvU9rW9zhC6a3nUjxrU0OVijl1MqbUDALi?=
+ =?us-ascii?Q?bdmdmIVySrKzyYEjkTd1nv3mpXxNnhmh5OpVKM0rVnIa1PyEwuMT3dBMcHqW?=
+ =?us-ascii?Q?p2T9O+l+9EVWl2FI7ht+khpM6nDkqR6LXGP+k0CG19EeifMq7ETkF2TICtUL?=
+ =?us-ascii?Q?DNgfXftBTaKJgVzvxJ2LAIEnkas0iTf5GppSik5Tc6PN29RVEB0DGP29jxuf?=
+ =?us-ascii?Q?WfKrGDiMsH4hbGs/2fAiP0k58we2JWBISCWiPEMakx8d4Cf72e6trGFeIY/O?=
+ =?us-ascii?Q?UICY3nVB6nkSejlHNBypXhAuVAKQzw6sOkxOvaE3U0dfM/odA17g2gtkGDNv?=
+ =?us-ascii?Q?ADPj1qJ0VZUhaDZlzFCQF0zXKXbDSNRlxlALnVi3eX9DBG7WDdUnPYcnsO+0?=
+ =?us-ascii?Q?dThc7lw2dEUIhcAkpC8WrvWoMkegI6ZzvcuiCbCGjkc6cXhRtcDEQ/uWXgN/?=
+ =?us-ascii?Q?nXGZPUssH0vdZlCPpEhY8+OeEfmj7SqjxeTte1GmLvh3EChQ45xiCBbwwl5i?=
+ =?us-ascii?Q?u3erPNLQPBxI3nu5oUsqaFm4xO+zDPSG5HLlwmtGfvJxevfOnfa7rn5mz9TV?=
+ =?us-ascii?Q?HwqCgXU59XCLzLTE04khYGCLWZW04y6NwZKVhFTyD4JNagt7At9qDfxXZGcn?=
+ =?us-ascii?Q?I1ELGirgtZxSbhQzB99bV/zjvNVYdtaBMIzZftl6VH+odnHbPd16oF9TifyI?=
+ =?us-ascii?Q?cUwvYhfHEN3Brf1wxjvEXMxs1oC6ZGEQqD4KKLdok1nTtty2Z6VvlK4smPbY?=
+ =?us-ascii?Q?40puqpeSFiUfI27I3Z8JNhHI5Wtj5oV6aULsifoqsQYXpZ3We81oD2w0cmSX?=
+ =?us-ascii?Q?9eHTl50RCKainXV+0eC7fWvzoInbLNpXTGieVvwNPgDcrqnSx0Zv95pVcSjt?=
+ =?us-ascii?Q?uUaAEmM=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(36860700004)(82310400017)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2024 21:05:56.4359
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5458ae53-6352-421c-0d3c-08dc8410f644
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF0000C37B.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8296
 
-On 6/3/24 11:02 AM, Paul Barker wrote:
-[...]
->>> This patch makes multiple changes that can't be separated:
->>>
->>>   1) Allocate plain RX buffers via a page pool instead of allocating
->>>      SKBs, then use build_skb() when a packet is received.
->>>   2) For GbEth IP, reduce the RX buffer size to 2kB.
->>>   3) For GbEth IP, merge packets which span more than one RX descriptor
->>>      as SKB fragments instead of copying data.
->>>
->>> Implementing (1) without (2) would require the use of an order-1 page
->>> pool (instead of an order-0 page pool split into page fragments) for
->>> GbEth.
->>>
->>> Implementing (2) without (3) would leave us no space to re-assemble
->>> packets which span more than one RX descriptor.
->>>
->>> Implementing (3) without (1) would not be possible as the network stack
->>> expects to use put_page() or page_pool_put_page() to free SKB fragments
->>> after an SKB is consumed.
->>>
->>> RX checksum offload support is adjusted to handle both linear and
->>> nonlinear (fragmented) packets.
->>>
->>> This patch gives the following improvements during testing with iperf3.
->>>
->>>   * RZ/G2L:
->>>     * TCP RX: same bandwidth at -43% CPU load (70% -> 40%)
->>>     * UDP RX: same bandwidth at -17% CPU load (88% -> 74%)
->>>
->>>   * RZ/G2UL:
->>>     * TCP RX: +30% bandwidth (726Mbps -> 941Mbps)
->>>     * UDP RX: +417% bandwidth (108Mbps -> 558Mbps)
->>>
->>>   * RZ/G3S:
->>>     * TCP RX: +64% bandwidth (562Mbps -> 920Mbps)
->>>     * UDP RX: +420% bandwidth (90Mbps -> 468Mbps)
->>>
->>>   * RZ/Five:
->>>     * TCP RX: +217% bandwidth (145Mbps -> 459Mbps)
->>>     * UDP RX: +470% bandwidth (20Mbps -> 114Mbps)
->>>
->>> There is no significant impact on bandwidth or CPU load in testing on
->>> RZ/G2H or R-Car M3N.
->>>
->>> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+Hi,
 
-[...]
+This small patchset provides two bug fixes from the team to the mlx5 core driver.
 
->>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-[...]
->>> @@ -298,13 +269,14 @@ static void ravb_ring_free(struct net_device *ndev, int q)
->>>  		priv->tx_ring[q] = NULL;
->>>  	}
->>>  
->>> -	/* Free RX skb ringbuffer */
->>> -	if (priv->rx_skb[q]) {
->>> -		for (i = 0; i < priv->num_rx_ring[q]; i++)
->>> -			dev_kfree_skb(priv->rx_skb[q][i]);
->>> +	/* Free RX buffers */
->>> +	for (i = 0; i < priv->num_rx_ring[q]; i++) {
->>> +		if (priv->rx_buffers[q][i].page)
->>> +			page_pool_put_page(priv->rx_pool[q], priv->rx_buffers[q][i].page, 0, true);
->>
->> nit: Networking still prefers code to be 80 columns wide or less.
->>      It looks like that can be trivially achieved here.
->>
->>      Flagged by checkpatch.pl --max-line-length=80
-> 
-> Sergey has asked me to wrap to 100 cols [1]. I can only find a reference
-> to 80 in the docs though [2], so I guess you may be right.
-> 
-> [1]: https://lore.kernel.org/all/611a49b8-ecdb-6b91-9d3e-262bf3851f5b@omp.ru/
-> [2]: https://www.kernel.org/doc/html/latest/process/coding-style.html
+Series generated against:
+commit 33700a0c9b56 ("net/tcp: Don't consider TCP_CLOSE in TCP_AO_ESTABLISHED")
 
-   Note that I (mostly) meant the comments...
+Regards,
+Tariq
 
-[...]
+Moshe Shemesh (1):
+  net/mlx5: Stop waiting for PCI if pci channel is offline
 
-MBR, Sergey
+Shay Drory (1):
+  net/mlx5: Always stop health timer during driver removal
+
+ drivers/net/ethernet/mellanox/mlx5/core/fw.c          | 4 ++++
+ drivers/net/ethernet/mellanox/mlx5/core/health.c      | 8 ++++++++
+ drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c | 4 ++++
+ drivers/net/ethernet/mellanox/mlx5/core/main.c        | 3 +++
+ 4 files changed, 19 insertions(+)
+
+-- 
+2.31.1
+
 
