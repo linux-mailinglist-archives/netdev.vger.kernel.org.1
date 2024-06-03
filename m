@@ -1,144 +1,433 @@
-Return-Path: <netdev+bounces-100369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30DE48DDEFF
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 23:28:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63C6A8E7576
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 23:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCDF1285D0D
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 21:28:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01A38285B03
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 21:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3742C13C80C;
-	Mon,  3 Jun 2024 21:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EB913C3EB;
+	Mon,  3 Jun 2024 21:33:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Uvkz1e85"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SofPNvTM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A6613C3FD;
-	Mon,  3 Jun 2024 21:28:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9664713BC38;
+	Mon,  3 Jun 2024 21:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717450083; cv=none; b=qMS49FXYBvA2JcW9hNIx67HdowUwEI5Mwa0FvGQHat2WxOQ9iTvN1NiWkbTv1QPNi1HclNSfu03VG00zc6QXB0KfqoqlzA40bJOTD8m9fxq6ZX1XFzxbGvJdz+uW1DcbeQiG8vCgtKy5ALTv4lcXxJhlhg5DuyjxClKjHigHNwM=
+	t=1717450385; cv=none; b=mdfA+ngktBoBguoHuZy+op9x+oO5pgE/ujkjCyAYKsvJzNBXzr7sC7zREHfCCbQ1S9SA9pY5GZYUHGq1mENIZM/NDGcBYcVCG0NlyPBVi6cAnz7EjxadPl5uT5f+nzF5pFwfCkdqiaF92uwu3n1Wf0avi7y2lDhS98+vQLq1HW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717450083; c=relaxed/simple;
-	bh=sJn8dFZQLw2fmK2rJKb/aIWYwv735vUTvmHjnnVa8SM=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DXZSLwRszdVmwqQo8kH5DHcwjiYmmgDQBeXw7xE3VbBGSOcmaq05JMSZewDOFjohcg+wWM2vy1HxOCgF4RG8iAZ6RcfO6DdMkH6tB6dVMwRNWm5yKacz2DFSIlVsh94SyvHzOK6PuB1H2qlMIHogV/a5A9fnH75s6HqTmklg3HY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Uvkz1e85; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 453LKVbf004773;
-	Mon, 3 Jun 2024 21:27:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=content-transfer-encoding : date : from : in-reply-to : message-id :
- mime-version : references : subject : to; s=pp1;
- bh=8S6scMshr6tSq+DiziFQE+WxeVKxyQiLKP2e8PnBO60=;
- b=Uvkz1e85Hs9TxxEOjuFwWMq7fOYXVN+iNZEh9IDa6SZjDA3bB8I2R+oteKPmD8XWAsA4
- 6O0bX7f796Qd43uudriRLWhbDN49IqHE1Ns+WiOZ9Gpj+QJqYwrq5CDgcd5exs/GRKK+
- /QhuX1/aFsOjN1zUJl8XADeunG3sRru/dAVQEtNz46Wzs4pao2YrVGmo9P+PSnFLjDW5
- 74EEy45fIZneuz9jXPxzS4/V/88w+awVmZCO0POMkSRIFzImRRVinR9FzUW0GuHFLag4
- GD0gVnG5JHZfkUPQSYKAk4sLSeXE6g2TBwCwYaX6YHdIRY3Ml8dUYnDZR1G+pWT+9EWy +Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yhnf981et-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Jun 2024 21:27:54 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 453LRsMl016080;
-	Mon, 3 Jun 2024 21:27:54 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yhnf981eq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Jun 2024 21:27:54 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 453Ji6xs026628;
-	Mon, 3 Jun 2024 21:27:52 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ygffmt4y4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Jun 2024 21:27:52 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 453LRoUe14025424
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 3 Jun 2024 21:27:52 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8421A58060;
-	Mon,  3 Jun 2024 21:27:50 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E5AB45805E;
-	Mon,  3 Jun 2024 21:27:49 +0000 (GMT)
-Received: from ltcwspoon18.bm.com (unknown [9.40.194.38])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  3 Jun 2024 21:27:49 +0000 (GMT)
-From: David Christensen <drc@linux.ibm.com>
-To: Shannon Nelson <shannon.nelson@amd.com>,
-        Brett Creeley <brett.creeley@amd.com>,
-        drivers@pensando.io (supporter:PENSANDO ETHERNET DRIVERS),
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, David Christensen <drc@linux.ibm.com>,
-        netdev@vger.kernel.org (open list:PENSANDO ETHERNET DRIVERS),
-        linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v2] ionic: advertise 52-bit addressing limitation for MSI-X
-Date: Mon,  3 Jun 2024 17:27:41 -0400
-Message-ID: <20240603212747.1079134-1-drc@linux.ibm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240530214026.774256-1-drc@linux.ibm.com>
-References: <20240530214026.774256-1-drc@linux.ibm.com>
+	s=arc-20240116; t=1717450385; c=relaxed/simple;
+	bh=IRX9bS15i35u5Lzh5gYWwhiJj9f51+b0V4KCOmiUHrY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BnOVQAic1BrN9vE0eojIKXC4YqWbG4aFr4b3pkUGdNOyutXXlHY4IvJEAUyZszb/CSCoRJFB56zsUmlasyvhjIQf8VQF+jtldwRlZ9XnYt6G/GdEn3y0sWGR0fCQcA7MgBteW4pij0u/tQiISM6C/WldUtpVG+mWakhIT1cl8S4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SofPNvTM; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717450383; x=1748986383;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=IRX9bS15i35u5Lzh5gYWwhiJj9f51+b0V4KCOmiUHrY=;
+  b=SofPNvTMGgYpNYrZ90MdKu17ekO1wgW72+1+5K/JU01L1ncou75nKjd1
+   vCu8NcpuQnRjJMivpJjKzM+8r7JOY31buKKBYKvXoZpgTOsxWIcPVMG4R
+   eTxrwZsb3IbMHKpzFpCCIcyhfMO9ZnB7J0SICMKUQXcSqJICLj/Qj2nG5
+   VRq7VIgySsxK4FFOqBQKFEvwdyn0zCzSKbcU0iyX+LNqNMWIUVHZSZwON
+   0hNKlqGZuYHf/55UXhXicyXKA7PEcdfU3oS7zsgY9L9R2F5Vio5L23MLm
+   zpTK2pyLNZcVWGEjM6LYveV3nLafNMljYpYBmgYDEOuy5S6k7JNA023yd
+   A==;
+X-CSE-ConnectionGUID: NjsM09liTFK01bT5lF2peQ==
+X-CSE-MsgGUID: if43yT/TQAe53WzjctD1Bg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11092"; a="13841423"
+X-IronPort-AV: E=Sophos;i="6.08,212,1712646000"; 
+   d="scan'208";a="13841423"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2024 14:33:03 -0700
+X-CSE-ConnectionGUID: K6u+dh6NRp+yTamOVXLcKQ==
+X-CSE-MsgGUID: H9QcPA1LTMyRI2OOPHRz3g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,212,1712646000"; 
+   d="scan'208";a="37030752"
+Received: from unknown (HELO 0610945e7d16) ([10.239.97.151])
+  by fmviesa006.fm.intel.com with ESMTP; 03 Jun 2024 14:32:58 -0700
+Received: from kbuild by 0610945e7d16 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sEFIW-000MDX-0T;
+	Mon, 03 Jun 2024 21:32:56 +0000
+Date: Tue, 4 Jun 2024 05:27:54 +0800
+From: kernel test robot <lkp@intel.com>
+To: Yojana Mallik <y-mallik@ti.com>, schnelle@linux.ibm.com,
+	wsa+renesas@sang-engineering.com, diogo.ivo@siemens.com,
+	rdunlap@infradead.org, horms@kernel.org, vigneshr@ti.com,
+	rogerq@ti.com, danishanwar@ti.com, pabeni@redhat.com,
+	kuba@kernel.org, edumazet@google.com, davem@davemloft.net
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, srk@ti.com, rogerq@kernel.org
+Subject: Re: [PATCH net-next v2 3/3] net: ethernet: ti: icve: Add support for
+ multicast filtering
+Message-ID: <202406040524.rKAgLczS-lkp@intel.com>
+References: <20240531064006.1223417-4-y-mallik@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Cmtwd-_6opUdRXMsHcHFevFRVV6SKc1b
-X-Proofpoint-ORIG-GUID: dMg9qzWn0gWnPL_IrE_FJbqkg08Gr8_h
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-06-03_17,2024-05-30_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- bulkscore=0 lowpriorityscore=0 mlxlogscore=889 spamscore=0 suspectscore=0
- impostorscore=0 phishscore=0 clxscore=1015 priorityscore=1501 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
- definitions=main-2406030173
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240531064006.1223417-4-y-mallik@ti.com>
 
-Current ionic devices only support 52 internal physical address
-lines. This is sufficient for x86_64 systems which have similar
-limitations but does not apply to all other architectures,
-notably IBM POWER (ppc64). To ensure that MSI/MSI-X vectors are
-not set outside the physical address limits of the NIC, set the
-no_64bit_msi value of the pci_dev structure during device probe.
+Hi Yojana,
 
-Signed-off-by: David Christensen <drc@linux.ibm.com>
----
-v2: Limit change to ppc64 systems as suggested
----
- drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c | 5 +++++
- 1 file changed, 5 insertions(+)
+kernel test robot noticed the following build warnings:
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-index 6ba8d4aca0a0..a7146d50f814 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-@@ -326,6 +326,11 @@ static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_out;
- 	}
- 
-+#ifdef CONFIG_PPC64
-+	/* Ensure MSI/MSI-X interrupts lie within addressable physical memory */
-+	pdev->no_64bit_msi = 1;
-+#endif
-+
- 	err = ionic_setup_one(ionic);
- 	if (err)
- 		goto err_out;
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Yojana-Mallik/net-ethernet-ti-RPMsg-based-shared-memory-ethernet-driver/20240531-144258
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240531064006.1223417-4-y-mallik%40ti.com
+patch subject: [PATCH net-next v2 3/3] net: ethernet: ti: icve: Add support for multicast filtering
+config: powerpc64-randconfig-r112-20240604 (https://download.01.org/0day-ci/archive/20240604/202406040524.rKAgLczS-lkp@intel.com/config)
+compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project d7d2d4f53fc79b4b58e8d8d08151b577c3699d4a)
+reproduce: (https://download.01.org/0day-ci/archive/20240604/202406040524.rKAgLczS-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406040524.rKAgLczS-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/net/ethernet/ti/inter_core_virt_eth.c:291:32: sparse: sparse: cast removes address space '__iomem' of expression
+>> drivers/net/ethernet/ti/inter_core_virt_eth.c:291:32: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected void const volatile [noderef] __iomem *s @@     got void * @@
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:291:32: sparse:     expected void const volatile [noderef] __iomem *s
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:291:32: sparse:     got void *
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:306:32: sparse: sparse: cast removes address space '__iomem' of expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:306:32: sparse: sparse: incorrect type in argument 2 (different address spaces) @@     expected void const volatile [noderef] __iomem *s @@     got void * @@
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:306:32: sparse:     expected void const volatile [noderef] __iomem *s
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:306:32: sparse:     got void *
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:392:22: sparse: sparse: cast removes address space '__iomem' of expression
+>> drivers/net/ethernet/ti/inter_core_virt_eth.c:393:49: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected void volatile [noderef] __iomem *d @@     got void * @@
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:393:49: sparse:     expected void volatile [noderef] __iomem *d
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:393:49: sparse:     got void *
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:397:22: sparse: sparse: cast removes address space '__iomem' of expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:397:22: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected void volatile [noderef] __iomem *d @@     got void * @@
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:397:22: sparse:     expected void volatile [noderef] __iomem *d
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:397:22: sparse:     got void *
+>> drivers/net/ethernet/ti/inter_core_virt_eth.c:496:30: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct icve_shm_buf [noderef] __iomem *buf @@     got void * @@
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:496:30: sparse:     expected struct icve_shm_buf [noderef] __iomem *buf
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:496:30: sparse:     got void *
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:510:30: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct icve_shm_buf [noderef] __iomem *buf @@     got void * @@
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:510:30: sparse:     expected struct icve_shm_buf [noderef] __iomem *buf
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:510:30: sparse:     got void *
+   drivers/net/ethernet/ti/inter_core_virt_eth.c: note: in included file (through include/linux/mmzone.h, include/linux/gfp.h, include/linux/xarray.h, ...):
+   include/linux/page-flags.h:240:46: sparse: sparse: self-comparison always evaluates to false
+   include/linux/page-flags.h:240:46: sparse: sparse: self-comparison always evaluates to false
+>> drivers/net/ethernet/ti/inter_core_virt_eth.c:153:31: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:154:31: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:193:40: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:212:40: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:280:31: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:281:31: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:291:55: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:291:55: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:306:55: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:306:55: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:325:32: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:326:41: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:379:31: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:380:31: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:392:44: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:394:45: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:392:44: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:394:45: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:397:45: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:399:46: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:397:45: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:399:46: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:401:24: sparse: sparse: dereference of noderef expression
+   drivers/net/ethernet/ti/inter_core_virt_eth.c:402:33: sparse: sparse: dereference of noderef expression
+
+vim +/__iomem +291 drivers/net/ethernet/ti/inter_core_virt_eth.c
+
+5655a9b008b088 Yojana Mallik    2024-05-31  145  
+5655a9b008b088 Yojana Mallik    2024-05-31  146  static void icve_rx_timer(struct timer_list *timer)
+5655a9b008b088 Yojana Mallik    2024-05-31  147  {
+5655a9b008b088 Yojana Mallik    2024-05-31  148  	struct icve_port *port = from_timer(port, timer, rx_timer);
+5655a9b008b088 Yojana Mallik    2024-05-31  149  	struct napi_struct *napi;
+5655a9b008b088 Yojana Mallik    2024-05-31  150  	int num_pkts = 0;
+5655a9b008b088 Yojana Mallik    2024-05-31  151  	u32 head, tail;
+5655a9b008b088 Yojana Mallik    2024-05-31  152  
+5655a9b008b088 Yojana Mallik    2024-05-31 @153  	head = port->rx_buffer->head->index;
+5655a9b008b088 Yojana Mallik    2024-05-31  154  	tail = port->rx_buffer->tail->index;
+5655a9b008b088 Yojana Mallik    2024-05-31  155  
+5655a9b008b088 Yojana Mallik    2024-05-31  156  	num_pkts = tail - head;
+5655a9b008b088 Yojana Mallik    2024-05-31  157  	num_pkts = num_pkts >= 0 ? num_pkts :
+5655a9b008b088 Yojana Mallik    2024-05-31  158  				   (num_pkts + port->icve_rx_max_buffers);
+5655a9b008b088 Yojana Mallik    2024-05-31  159  
+5655a9b008b088 Yojana Mallik    2024-05-31  160  	napi = &port->rx_napi;
+5655a9b008b088 Yojana Mallik    2024-05-31  161  	if (num_pkts && likely(napi_schedule_prep(napi)))
+5655a9b008b088 Yojana Mallik    2024-05-31  162  		__napi_schedule(napi);
+5655a9b008b088 Yojana Mallik    2024-05-31  163  	else
+5655a9b008b088 Yojana Mallik    2024-05-31  164  		mod_timer(&port->rx_timer, RX_POLL_JIFFIES);
+5655a9b008b088 Yojana Mallik    2024-05-31  165  }
+5655a9b008b088 Yojana Mallik    2024-05-31  166  
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  167  static int icve_rpmsg_cb(struct rpmsg_device *rpdev, void *data, int len,
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  168  			 void *priv, u32 src)
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  169  {
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  170  	struct icve_common *common = dev_get_drvdata(&rpdev->dev);
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  171  	struct message *msg = (struct message *)data;
+5655a9b008b088 Yojana Mallik    2024-05-31  172  	struct icve_port *port = common->port;
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  173  	u32 msg_type = msg->msg_hdr.msg_type;
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  174  	u32 rpmsg_type;
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  175  
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  176  	switch (msg_type) {
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  177  	case ICVE_REQUEST_MSG:
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  178  		rpmsg_type = msg->req_msg.type;
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  179  		dev_dbg(common->dev, "Msg type = %d; RPMsg type = %d\n",
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  180  			msg_type, rpmsg_type);
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  181  		break;
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  182  	case ICVE_RESPONSE_MSG:
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  183  		rpmsg_type = msg->resp_msg.type;
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  184  		dev_dbg(common->dev, "Msg type = %d; RPMsg type = %d\n",
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  185  			msg_type, rpmsg_type);
+5655a9b008b088 Yojana Mallik    2024-05-31  186  		switch (rpmsg_type) {
+5655a9b008b088 Yojana Mallik    2024-05-31  187  		case ICVE_RESP_SHM_INFO:
+5655a9b008b088 Yojana Mallik    2024-05-31  188  			/* Retrieve Tx and Rx shared memory info from msg */
+5655a9b008b088 Yojana Mallik    2024-05-31  189  			port->tx_buffer->head =
+5655a9b008b088 Yojana Mallik    2024-05-31  190  				ioremap(msg->resp_msg.shm_info.shm_info_tx.base_addr,
+5655a9b008b088 Yojana Mallik    2024-05-31  191  					sizeof(*port->tx_buffer->head));
+5655a9b008b088 Yojana Mallik    2024-05-31  192  
+5655a9b008b088 Yojana Mallik    2024-05-31  193  			port->tx_buffer->buf->base_addr =
+5655a9b008b088 Yojana Mallik    2024-05-31  194  				ioremap((msg->resp_msg.shm_info.shm_info_tx.base_addr +
+5655a9b008b088 Yojana Mallik    2024-05-31  195  					sizeof(*port->tx_buffer->head)),
+5655a9b008b088 Yojana Mallik    2024-05-31  196  					(msg->resp_msg.shm_info.shm_info_tx.num_pkt_bufs *
+5655a9b008b088 Yojana Mallik    2024-05-31  197  					 msg->resp_msg.shm_info.shm_info_tx.buff_slot_size));
+5655a9b008b088 Yojana Mallik    2024-05-31  198  
+5655a9b008b088 Yojana Mallik    2024-05-31  199  			port->tx_buffer->tail =
+5655a9b008b088 Yojana Mallik    2024-05-31  200  				ioremap(msg->resp_msg.shm_info.shm_info_tx.base_addr +
+5655a9b008b088 Yojana Mallik    2024-05-31  201  					sizeof(*port->tx_buffer->head) +
+5655a9b008b088 Yojana Mallik    2024-05-31  202  					(msg->resp_msg.shm_info.shm_info_tx.num_pkt_bufs *
+5655a9b008b088 Yojana Mallik    2024-05-31  203  					msg->resp_msg.shm_info.shm_info_tx.buff_slot_size),
+5655a9b008b088 Yojana Mallik    2024-05-31  204  					sizeof(*port->tx_buffer->tail));
+5655a9b008b088 Yojana Mallik    2024-05-31  205  
+5655a9b008b088 Yojana Mallik    2024-05-31  206  			port->icve_tx_max_buffers = msg->resp_msg.shm_info.shm_info_tx.num_pkt_bufs;
+5655a9b008b088 Yojana Mallik    2024-05-31  207  
+5655a9b008b088 Yojana Mallik    2024-05-31  208  			port->rx_buffer->head =
+5655a9b008b088 Yojana Mallik    2024-05-31  209  				ioremap(msg->resp_msg.shm_info.shm_info_rx.base_addr,
+5655a9b008b088 Yojana Mallik    2024-05-31  210  					sizeof(*port->rx_buffer->head));
+5655a9b008b088 Yojana Mallik    2024-05-31  211  
+5655a9b008b088 Yojana Mallik    2024-05-31  212  			port->rx_buffer->buf->base_addr =
+5655a9b008b088 Yojana Mallik    2024-05-31  213  				ioremap(msg->resp_msg.shm_info.shm_info_rx.base_addr +
+5655a9b008b088 Yojana Mallik    2024-05-31  214  					sizeof(*port->rx_buffer->head),
+5655a9b008b088 Yojana Mallik    2024-05-31  215  					(msg->resp_msg.shm_info.shm_info_rx.num_pkt_bufs *
+5655a9b008b088 Yojana Mallik    2024-05-31  216  					 msg->resp_msg.shm_info.shm_info_rx.buff_slot_size));
+5655a9b008b088 Yojana Mallik    2024-05-31  217  
+5655a9b008b088 Yojana Mallik    2024-05-31  218  			port->rx_buffer->tail =
+5655a9b008b088 Yojana Mallik    2024-05-31  219  				ioremap(msg->resp_msg.shm_info.shm_info_rx.base_addr +
+5655a9b008b088 Yojana Mallik    2024-05-31  220  					sizeof(*port->rx_buffer->head) +
+5655a9b008b088 Yojana Mallik    2024-05-31  221  					(msg->resp_msg.shm_info.shm_info_rx.num_pkt_bufs *
+5655a9b008b088 Yojana Mallik    2024-05-31  222  					msg->resp_msg.shm_info.shm_info_rx.buff_slot_size),
+5655a9b008b088 Yojana Mallik    2024-05-31  223  					sizeof(*port->rx_buffer->tail));
+5655a9b008b088 Yojana Mallik    2024-05-31  224  
+5655a9b008b088 Yojana Mallik    2024-05-31  225  			port->icve_rx_max_buffers =
+5655a9b008b088 Yojana Mallik    2024-05-31  226  				msg->resp_msg.shm_info.shm_info_rx.num_pkt_bufs;
+5655a9b008b088 Yojana Mallik    2024-05-31  227  
+5655a9b008b088 Yojana Mallik    2024-05-31  228  			mutex_lock(&common->state_lock);
+5655a9b008b088 Yojana Mallik    2024-05-31  229  			common->state = ICVE_STATE_READY;
+5655a9b008b088 Yojana Mallik    2024-05-31  230  			mutex_unlock(&common->state_lock);
+5655a9b008b088 Yojana Mallik    2024-05-31  231  
+5655a9b008b088 Yojana Mallik    2024-05-31  232  			mod_delayed_work(system_wq,
+5655a9b008b088 Yojana Mallik    2024-05-31  233  					 &common->state_work,
+5655a9b008b088 Yojana Mallik    2024-05-31  234  					 STATE_MACHINE_TIME);
+5655a9b008b088 Yojana Mallik    2024-05-31  235  
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  236  			break;
+5655a9b008b088 Yojana Mallik    2024-05-31  237  		case ICVE_RESP_SET_MAC_ADDR:
+5655a9b008b088 Yojana Mallik    2024-05-31  238  			break;
+9ebbebae44242d Yojana Mallik    2024-05-31  239  		case ICVE_RESP_ADD_MC_ADDR:
+9ebbebae44242d Yojana Mallik    2024-05-31  240  		case ICVE_RESP_DEL_MC_ADDR:
+9ebbebae44242d Yojana Mallik    2024-05-31  241  			complete(&common->sync_msg);
+9ebbebae44242d Yojana Mallik    2024-05-31  242  			break;
+5655a9b008b088 Yojana Mallik    2024-05-31  243  		}
+5655a9b008b088 Yojana Mallik    2024-05-31  244  
+5655a9b008b088 Yojana Mallik    2024-05-31  245  		break;
+5655a9b008b088 Yojana Mallik    2024-05-31  246  
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  247  	case ICVE_NOTIFY_MSG:
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  248  		rpmsg_type = msg->notify_msg.type;
+5655a9b008b088 Yojana Mallik    2024-05-31  249  		switch (rpmsg_type) {
+5655a9b008b088 Yojana Mallik    2024-05-31  250  		case ICVE_NOTIFY_REMOTE_READY:
+5655a9b008b088 Yojana Mallik    2024-05-31  251  			mutex_lock(&common->state_lock);
+5655a9b008b088 Yojana Mallik    2024-05-31  252  			common->state = ICVE_STATE_RUNNING;
+5655a9b008b088 Yojana Mallik    2024-05-31  253  			mutex_unlock(&common->state_lock);
+5655a9b008b088 Yojana Mallik    2024-05-31  254  
+5655a9b008b088 Yojana Mallik    2024-05-31  255  			mod_delayed_work(system_wq,
+5655a9b008b088 Yojana Mallik    2024-05-31  256  					 &common->state_work,
+5655a9b008b088 Yojana Mallik    2024-05-31  257  					 STATE_MACHINE_TIME);
+5655a9b008b088 Yojana Mallik    2024-05-31  258  			break;
+5655a9b008b088 Yojana Mallik    2024-05-31  259  		case ICVE_NOTIFY_PORT_UP:
+5655a9b008b088 Yojana Mallik    2024-05-31  260  		case ICVE_NOTIFY_PORT_DOWN:
+5655a9b008b088 Yojana Mallik    2024-05-31  261  			break;
+5655a9b008b088 Yojana Mallik    2024-05-31  262  		}
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  263  		break;
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  264  	default:
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  265  		dev_err(common->dev, "Invalid msg type\n");
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  266  		break;
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  267  	}
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  268  	return 0;
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  269  }
+c7f4ad97418d24 Ravi Gunasekaran 2024-05-31  270  
+5655a9b008b088 Yojana Mallik    2024-05-31  271  static int icve_rx_packets(struct napi_struct *napi, int budget)
+5655a9b008b088 Yojana Mallik    2024-05-31  272  {
+5655a9b008b088 Yojana Mallik    2024-05-31  273  	struct icve_port *port = container_of(napi, struct icve_port, rx_napi);
+5655a9b008b088 Yojana Mallik    2024-05-31  274  	u32 count, process_pkts;
+5655a9b008b088 Yojana Mallik    2024-05-31  275  	struct sk_buff *skb;
+5655a9b008b088 Yojana Mallik    2024-05-31  276  	u32 head, tail;
+5655a9b008b088 Yojana Mallik    2024-05-31  277  	int num_pkts;
+5655a9b008b088 Yojana Mallik    2024-05-31  278  	u32 pkt_len;
+5655a9b008b088 Yojana Mallik    2024-05-31  279  
+5655a9b008b088 Yojana Mallik    2024-05-31  280  	head = port->rx_buffer->head->index;
+5655a9b008b088 Yojana Mallik    2024-05-31  281  	tail = port->rx_buffer->tail->index;
+5655a9b008b088 Yojana Mallik    2024-05-31  282  
+5655a9b008b088 Yojana Mallik    2024-05-31  283  	num_pkts = head - tail;
+5655a9b008b088 Yojana Mallik    2024-05-31  284  
+5655a9b008b088 Yojana Mallik    2024-05-31  285  	num_pkts = num_pkts >= 0 ? num_pkts :
+5655a9b008b088 Yojana Mallik    2024-05-31  286  				   (num_pkts + port->icve_rx_max_buffers);
+5655a9b008b088 Yojana Mallik    2024-05-31  287  	process_pkts = min(num_pkts, budget);
+5655a9b008b088 Yojana Mallik    2024-05-31  288  	count = 0;
+5655a9b008b088 Yojana Mallik    2024-05-31  289  	while (count < process_pkts) {
+5655a9b008b088 Yojana Mallik    2024-05-31  290  		memcpy_fromio((void *)&pkt_len,
+5655a9b008b088 Yojana Mallik    2024-05-31 @291  			      (void *)(port->rx_buffer->buf->base_addr +
+5655a9b008b088 Yojana Mallik    2024-05-31  292  			      MAGIC_NUM_SIZE_TYPE +
+5655a9b008b088 Yojana Mallik    2024-05-31  293  			      (((tail + count) % port->icve_rx_max_buffers) *
+5655a9b008b088 Yojana Mallik    2024-05-31  294  			      ICVE_BUFFER_SIZE)),
+5655a9b008b088 Yojana Mallik    2024-05-31  295  			      PKT_LEN_SIZE_TYPE);
+5655a9b008b088 Yojana Mallik    2024-05-31  296  		/* Start building the skb */
+5655a9b008b088 Yojana Mallik    2024-05-31  297  		skb = napi_alloc_skb(napi, pkt_len);
+5655a9b008b088 Yojana Mallik    2024-05-31  298  		if (!skb) {
+5655a9b008b088 Yojana Mallik    2024-05-31  299  			port->ndev->stats.rx_dropped++;
+5655a9b008b088 Yojana Mallik    2024-05-31  300  			goto rx_dropped;
+5655a9b008b088 Yojana Mallik    2024-05-31  301  		}
+5655a9b008b088 Yojana Mallik    2024-05-31  302  
+5655a9b008b088 Yojana Mallik    2024-05-31  303  		skb->dev = port->ndev;
+5655a9b008b088 Yojana Mallik    2024-05-31  304  		skb_put(skb, pkt_len);
+5655a9b008b088 Yojana Mallik    2024-05-31  305  		memcpy_fromio((void *)skb->data,
+5655a9b008b088 Yojana Mallik    2024-05-31  306  			      (void *)(port->rx_buffer->buf->base_addr +
+5655a9b008b088 Yojana Mallik    2024-05-31  307  			      PKT_LEN_SIZE_TYPE + MAGIC_NUM_SIZE_TYPE +
+5655a9b008b088 Yojana Mallik    2024-05-31  308  			      (((tail + count) % port->icve_rx_max_buffers) *
+5655a9b008b088 Yojana Mallik    2024-05-31  309  			      ICVE_BUFFER_SIZE)),
+5655a9b008b088 Yojana Mallik    2024-05-31  310  			      pkt_len);
+5655a9b008b088 Yojana Mallik    2024-05-31  311  
+5655a9b008b088 Yojana Mallik    2024-05-31  312  		skb->protocol = eth_type_trans(skb, port->ndev);
+5655a9b008b088 Yojana Mallik    2024-05-31  313  
+5655a9b008b088 Yojana Mallik    2024-05-31  314  		/* Push skb into network stack */
+5655a9b008b088 Yojana Mallik    2024-05-31  315  		napi_gro_receive(napi, skb);
+5655a9b008b088 Yojana Mallik    2024-05-31  316  
+5655a9b008b088 Yojana Mallik    2024-05-31  317  		count++;
+5655a9b008b088 Yojana Mallik    2024-05-31  318  		port->ndev->stats.rx_packets++;
+5655a9b008b088 Yojana Mallik    2024-05-31  319  		port->ndev->stats.rx_bytes += skb->len;
+5655a9b008b088 Yojana Mallik    2024-05-31  320  	}
+5655a9b008b088 Yojana Mallik    2024-05-31  321  
+5655a9b008b088 Yojana Mallik    2024-05-31  322  rx_dropped:
+5655a9b008b088 Yojana Mallik    2024-05-31  323  
+5655a9b008b088 Yojana Mallik    2024-05-31  324  	if (num_pkts) {
+5655a9b008b088 Yojana Mallik    2024-05-31  325  		port->rx_buffer->tail->index =
+5655a9b008b088 Yojana Mallik    2024-05-31  326  			(port->rx_buffer->tail->index + count) %
+5655a9b008b088 Yojana Mallik    2024-05-31  327  			port->icve_rx_max_buffers;
+5655a9b008b088 Yojana Mallik    2024-05-31  328  
+5655a9b008b088 Yojana Mallik    2024-05-31  329  		if (num_pkts < budget && napi_complete_done(napi, count))
+5655a9b008b088 Yojana Mallik    2024-05-31  330  			mod_timer(&port->rx_timer, RX_POLL_TIMEOUT);
+5655a9b008b088 Yojana Mallik    2024-05-31  331  	}
+5655a9b008b088 Yojana Mallik    2024-05-31  332  
+5655a9b008b088 Yojana Mallik    2024-05-31  333  	return count;
+5655a9b008b088 Yojana Mallik    2024-05-31  334  }
+5655a9b008b088 Yojana Mallik    2024-05-31  335  
+5655a9b008b088 Yojana Mallik    2024-05-31  336  static int icve_ndo_open(struct net_device *ndev)
+5655a9b008b088 Yojana Mallik    2024-05-31  337  {
+5655a9b008b088 Yojana Mallik    2024-05-31  338  	struct icve_common *common = icve_ndev_to_common(ndev);
+5655a9b008b088 Yojana Mallik    2024-05-31  339  
+5655a9b008b088 Yojana Mallik    2024-05-31  340  	mutex_lock(&common->state_lock);
+5655a9b008b088 Yojana Mallik    2024-05-31  341  	common->state = ICVE_STATE_OPEN;
+5655a9b008b088 Yojana Mallik    2024-05-31  342  	mutex_unlock(&common->state_lock);
+5655a9b008b088 Yojana Mallik    2024-05-31  343  	mod_delayed_work(system_wq, &common->state_work, msecs_to_jiffies(100));
+5655a9b008b088 Yojana Mallik    2024-05-31  344  
+5655a9b008b088 Yojana Mallik    2024-05-31  345  	return 0;
+5655a9b008b088 Yojana Mallik    2024-05-31  346  }
+5655a9b008b088 Yojana Mallik    2024-05-31  347  
+5655a9b008b088 Yojana Mallik    2024-05-31  348  static int icve_ndo_stop(struct net_device *ndev)
+5655a9b008b088 Yojana Mallik    2024-05-31  349  {
+5655a9b008b088 Yojana Mallik    2024-05-31  350  	struct icve_common *common = icve_ndev_to_common(ndev);
+5655a9b008b088 Yojana Mallik    2024-05-31  351  	struct icve_port *port = icve_ndev_to_port(ndev);
+5655a9b008b088 Yojana Mallik    2024-05-31  352  
+5655a9b008b088 Yojana Mallik    2024-05-31  353  	mutex_lock(&common->state_lock);
+5655a9b008b088 Yojana Mallik    2024-05-31  354  	common->state = ICVE_STATE_CLOSE;
+5655a9b008b088 Yojana Mallik    2024-05-31  355  	mutex_unlock(&common->state_lock);
+5655a9b008b088 Yojana Mallik    2024-05-31  356  
+5655a9b008b088 Yojana Mallik    2024-05-31  357  	netif_carrier_off(port->ndev);
+5655a9b008b088 Yojana Mallik    2024-05-31  358  
+5655a9b008b088 Yojana Mallik    2024-05-31  359  	__dev_mc_unsync(ndev, icve_del_mc_addr);
+5655a9b008b088 Yojana Mallik    2024-05-31  360  	__hw_addr_init(&common->mc_list);
+5655a9b008b088 Yojana Mallik    2024-05-31  361  
+5655a9b008b088 Yojana Mallik    2024-05-31  362  	cancel_delayed_work_sync(&common->state_work);
+5655a9b008b088 Yojana Mallik    2024-05-31  363  	del_timer_sync(&port->rx_timer);
+5655a9b008b088 Yojana Mallik    2024-05-31  364  	napi_disable(&port->rx_napi);
+5655a9b008b088 Yojana Mallik    2024-05-31  365  
+5655a9b008b088 Yojana Mallik    2024-05-31  366  	cancel_work_sync(&common->rx_mode_work);
+5655a9b008b088 Yojana Mallik    2024-05-31  367  
+5655a9b008b088 Yojana Mallik    2024-05-31  368  	return 0;
+5655a9b008b088 Yojana Mallik    2024-05-31  369  }
+5655a9b008b088 Yojana Mallik    2024-05-31  370  
+5655a9b008b088 Yojana Mallik    2024-05-31  371  static netdev_tx_t icve_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+5655a9b008b088 Yojana Mallik    2024-05-31  372  {
+5655a9b008b088 Yojana Mallik    2024-05-31  373  	struct icve_port *port = icve_ndev_to_port(ndev);
+5655a9b008b088 Yojana Mallik    2024-05-31  374  	u32 head, tail;
+5655a9b008b088 Yojana Mallik    2024-05-31  375  	int num_pkts;
+5655a9b008b088 Yojana Mallik    2024-05-31  376  	u32 len;
+5655a9b008b088 Yojana Mallik    2024-05-31  377  
+5655a9b008b088 Yojana Mallik    2024-05-31  378  	len = skb_headlen(skb);
+5655a9b008b088 Yojana Mallik    2024-05-31  379  	head = port->tx_buffer->head->index;
+5655a9b008b088 Yojana Mallik    2024-05-31  380  	tail = port->tx_buffer->tail->index;
+5655a9b008b088 Yojana Mallik    2024-05-31  381  
+5655a9b008b088 Yojana Mallik    2024-05-31  382  	/* If the buffer queue is full, then drop packet */
+5655a9b008b088 Yojana Mallik    2024-05-31  383  	num_pkts = head - tail;
+5655a9b008b088 Yojana Mallik    2024-05-31  384  	num_pkts = num_pkts >= 0 ? num_pkts :
+5655a9b008b088 Yojana Mallik    2024-05-31  385  				   (num_pkts + port->icve_tx_max_buffers);
+5655a9b008b088 Yojana Mallik    2024-05-31  386  
+5655a9b008b088 Yojana Mallik    2024-05-31  387  	if ((num_pkts + 1) == port->icve_tx_max_buffers) {
+5655a9b008b088 Yojana Mallik    2024-05-31  388  		netdev_warn(ndev, "Tx buffer full %d\n", num_pkts);
+5655a9b008b088 Yojana Mallik    2024-05-31  389  		goto ring_full;
+5655a9b008b088 Yojana Mallik    2024-05-31  390  	}
+5655a9b008b088 Yojana Mallik    2024-05-31  391  	/* Copy length */
+5655a9b008b088 Yojana Mallik    2024-05-31  392  	memcpy_toio((void *)port->tx_buffer->buf->base_addr +
+5655a9b008b088 Yojana Mallik    2024-05-31 @393  			    MAGIC_NUM_SIZE_TYPE +
+5655a9b008b088 Yojana Mallik    2024-05-31  394  			    (port->tx_buffer->head->index * ICVE_BUFFER_SIZE),
+5655a9b008b088 Yojana Mallik    2024-05-31  395  		    (void *)&len, PKT_LEN_SIZE_TYPE);
+5655a9b008b088 Yojana Mallik    2024-05-31  396  	/* Copy data to shared mem */
+5655a9b008b088 Yojana Mallik    2024-05-31  397  	memcpy_toio((void *)(port->tx_buffer->buf->base_addr +
+5655a9b008b088 Yojana Mallik    2024-05-31  398  			     MAGIC_NUM_SIZE_TYPE + PKT_LEN_SIZE_TYPE +
+5655a9b008b088 Yojana Mallik    2024-05-31  399  			     (port->tx_buffer->head->index * ICVE_BUFFER_SIZE)),
+5655a9b008b088 Yojana Mallik    2024-05-31  400  		    (void *)skb->data, len);
+5655a9b008b088 Yojana Mallik    2024-05-31  401  	port->tx_buffer->head->index =
+5655a9b008b088 Yojana Mallik    2024-05-31  402  		(port->tx_buffer->head->index + 1) % port->icve_tx_max_buffers;
+5655a9b008b088 Yojana Mallik    2024-05-31  403  
+5655a9b008b088 Yojana Mallik    2024-05-31  404  	ndev->stats.tx_packets++;
+5655a9b008b088 Yojana Mallik    2024-05-31  405  	ndev->stats.tx_bytes += skb->len;
+5655a9b008b088 Yojana Mallik    2024-05-31  406  
+5655a9b008b088 Yojana Mallik    2024-05-31  407  	dev_consume_skb_any(skb);
+5655a9b008b088 Yojana Mallik    2024-05-31  408  	return NETDEV_TX_OK;
+5655a9b008b088 Yojana Mallik    2024-05-31  409  
+5655a9b008b088 Yojana Mallik    2024-05-31  410  ring_full:
+5655a9b008b088 Yojana Mallik    2024-05-31  411  	return NETDEV_TX_BUSY;
+5655a9b008b088 Yojana Mallik    2024-05-31  412  }
+5655a9b008b088 Yojana Mallik    2024-05-31  413  
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
