@@ -1,119 +1,151 @@
-Return-Path: <netdev+bounces-100041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 048528D7A48
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 05:00:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFF528D7A51
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 05:01:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7992CB20BBA
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 03:00:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40AACB20BDA
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 03:01:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0767AEAC2;
-	Mon,  3 Jun 2024 03:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90881FBF0;
+	Mon,  3 Jun 2024 03:01:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="d6kT8xAZ"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="bHUEil9q"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982B68F72;
-	Mon,  3 Jun 2024 03:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E95711182;
+	Mon,  3 Jun 2024 03:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717383632; cv=none; b=hzSXt9UhyCpzldcF5UOZeImYequO+niw2criMeoG3lufUWwZjdw9pwTQV71WibcmCywA2mKSXLsNLcv8C8XTE7grlYFJE287+6HddD3cxsvnkAwPWdeCxhUDuedsJn4D9kle112iLATtmK8kQ9I6Ln4qskyqewF1SdMinJP6f38=
+	t=1717383670; cv=none; b=gw/YF8awfywa7SxPWNIp1JyDB0aqJD6ofpayX34t5LUUk/wtlej3jgTUiLeDs2G/g0ouPqZ//7vHGBHYjGRk1LzWZQHbIazxCCCIVHYuCz1qQzI6z/eYMIowOuAmP4QdM4xlJ/KC8Vzho9AYiD82wweKBf2E/r3mGjq98op9jlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717383632; c=relaxed/simple;
-	bh=lugJqSJ1/XUwiPdotA8v7i7A6PAzS0bTvnu+1nr0uCk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=TBKhjQbCPA6kKHagELsYfe1/tk4UOgyO7c64tajZr4NPmdL3F7V6o/YzfkNu997UU2EAHj9XSpg1Ld50nCJ2Hg68/VdrwxrELxL27t88uiJ6XRRHR8XiY7W4H8IOhrw6n6iy4SxW3/ELWjlKB74vAWWRaU1ljJuIeohiy12ACMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=d6kT8xAZ; arc=none smtp.client-ip=115.124.30.99
+	s=arc-20240116; t=1717383670; c=relaxed/simple;
+	bh=kN4aH6dfyUML0tRGO5f6y6MUiI/aLR5XPgVdDkrgHKQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KCz/qpAUGohsnSaYRGM6LTZL60KvNmwgek7YSVzgnURar/NsXb5JS6Db9ptmHjxvhiGJS37o3GLI/lvJWly4Z7D3aHpEkLa5fRQcAVFGBS5XFhcF+cOHWb/dTvyigRfNss1qUz9/+jkDEWdyD6hIK5uDw2ztnxUt2DamYXQ72Yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=bHUEil9q; arc=none smtp.client-ip=115.124.30.132
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1717383628; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=c8Qrefu5m5AiWDhNk1XblbhGEG6YihUTmhwULb3d7Ck=;
-	b=d6kT8xAZmdam3huNTuqTvHIkBxpS+8xxIZgSt8fL1br02/0QFmiZd5rX0b00CXkX9BHsy/C/uLd/Muz/bVsSx5ZZjJbTi9IN2ZZxgJkYIDyz0vKU3vOIismp53PPbKDE8HhnlIYiohJ96WKuG0RqIssYDv8f+bttpqzOq2Evxk4=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R761e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033022160150;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W7gQbUV_1717383627;
-Received: from localhost.localdomain(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0W7gQbUV_1717383627)
+	t=1717383665; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=qnkimNEeRKea+jhfzLFamRg4Ct6Hoc9CkbavUbVGjV8=;
+	b=bHUEil9qREqSxCnfRMNMeYNu2JCR9qIK6cyrCs8N7g36dCLt7aoppVbWNDT3P9oSAOY/Mk3l9BegQsAZcYIu5G6DozdEB8qOFv9+GM1xluvXUP7DPpLJlgKsUv1Vht8j0f8hH2J9/043bgII8m8rLK5izDeGPwwn3VT+gOkuZBk=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032014031;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W7gEUSa_1717383664;
+Received: from 30.221.145.154(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W7gEUSa_1717383664)
           by smtp.aliyun-inc.com;
-          Mon, 03 Jun 2024 11:00:27 +0800
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-To: wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: kgraul@linux.ibm.com,
-	alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 2/2] net/smc: change SMCR_RMBE_SIZES from 5 to 15
-Date: Mon,  3 Jun 2024 11:00:19 +0800
-Message-Id: <20240603030019.91346-3-guangguan.wang@linux.alibaba.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
-In-Reply-To: <20240603030019.91346-1-guangguan.wang@linux.alibaba.com>
-References: <20240603030019.91346-1-guangguan.wang@linux.alibaba.com>
+          Mon, 03 Jun 2024 11:01:04 +0800
+Message-ID: <ee95457f-94d9-474c-9929-eda061cbf854@linux.alibaba.com>
+Date: Mon, 3 Jun 2024 11:01:03 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 0/3] Introduce IPPROTO_SMC
+To: Wenjia Zhang <wenjia@linux.ibm.com>, kgraul@linux.ibm.com,
+ jaka@linux.ibm.com, wintera@linux.ibm.com, guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+ tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
+References: <1717061440-59937-1-git-send-email-alibuda@linux.alibaba.com>
+ <bd80b8f9-9c86-4a9b-a7ba-07471dcd5a7c@linux.alibaba.com>
+ <882713c2-02bd-4396-83be-c527b9d24eef@linux.ibm.com>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <882713c2-02bd-4396-83be-c527b9d24eef@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-SMCR_RMBE_SIZES is the upper boundary of SMC-R's snd_buf and rcv_buf.
-The maximum bytes of snd_buf and rcv_buf can be calculated by 2^SMCR_
-RMBE_SIZES * 16KB. SMCR_RMBE_SIZES = 5 means the upper boundary is 512KB.
-TCP's snd_buf and rcv_buf max size is configured by net.ipv4.tcp_w/rmem[2]
-whose default value is 4MB or 6MB, is much larger than SMC-R's upper
-boundary.
 
-In some scenarios, such as Recommendation System, the communication
-pattern is mainly large size send/recv, where the size of snd_buf and
-rcv_buf greatly affects performance. Due to the upper boundary
-disadvantage, SMC-R performs poor than TCP in those scenarios. So it
-is time to enlarge the upper boundary size of SMC-R's snd_buf and rcv_buf,
-so that the SMC-R's snd_buf and rcv_buf can be configured to larger size
-for performance gain in such scenarios.
 
-The SMC-R rcv_buf's size will be transferred to peer by the field
-rmbe_size in clc accept and confirm message. The length of the field
-rmbe_size is four bits, which means the maximum value of SMCR_RMBE_SIZES
-is 15. In case of frequently adjusting the value of SMCR_RMBE_SIZES
-in different scenarios, set the value of SMCR_RMBE_SIZES to the maximum
-value 15, which means the upper boundary of SMC-R's snd_buf and rcv_buf
-is 512MB. As the real memory usage is determined by the value of
-net.smc.w/rmem, not by the upper boundary, set the value of SMCR_RMBE_SIZES
-to the maximum value has no side affects.
+On 5/31/24 4:06 PM, Wenjia Zhang wrote:
+>
+>
+> On 30.05.24 12:14, D. Wythe wrote:
+>>
+>>
+>> On 5/30/24 5:30 PM, D. Wythe wrote:
+>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>>>
+>>> This patch allows to create smc socket via AF_INET,
+>>> similar to the following code,
+>>>
+>>> /* create v4 smc sock */
+>>> v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
+>>>
+>>> /* create v6 smc sock */
+>>> v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
+>>
+>> Welcome everyone to try out the eBPF based version of smc_run during 
+>> testing, I have added a separate command called smc_run.bpf,
+>> it was equivalent to normal smc_run but with IPPROTO_SMC via eBPF.
+>>
+>> You can obtain the code and more info from: 
+>> https://github.com/D-Wythe/smc-tools
+>>
+>> Usage:
+>>
+>> smc_run.bpf
+>> An eBPF implemented smc_run based on IPPROTO_SMC:
+>>
+>> 1. Support to transparent replacement based on command (Just like 
+>> smc_run).
+>> 2. Supprot to transparent replacement based on pid configuration. And 
+>> supports the inheritance of this capability between parent and child 
+>> processes.
+>> 3. Support to transparent replacement based on per netns configuration.
+>>
+>> smc_run.bpf COMMAND
+>>
+>> 1. Equivalent to smc_run but with IPPROTO_SMC via eBPF
+>>
+>> smc_run.bpf -p pid
+>>
+>>   1. Add the process with target pid to the map. Afterward, all 
+>> socket() calls of the process and its descendant processes will be 
+>> replaced from IPPROTO_TCP to IPPROTO_SMC.
+>>   2. Mapping will be automatically deleted when process exits.
+>>   3. Specifically, COMMAND mode is actually works like following:
+>>
+>>      smc_run.bpf -p $$
+>>      COMMAND
+>>      exit
+>>
+>> smc_run.bpf -n 1
+>>
+>>   1. Make all socket() calls of the current netns to be replaced from 
+>> IPPROTO_TCP to IPPROTO_SMC.
+>>   2. Turn off it by smc_run.bpf -n 0
+>>
+>>
+> Hi D. Wythe,
+>
+> Thank you for the info and description! The code generally looks good 
+> to me, just still some details I need to check again. And I'd like to 
+> give smc_run.bpf a try, and maybe let you know if it works for me next 
+> week.
+>
+> Thanks,
+> Wenjia
 
-Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-Co-developed-by: Wen Gu <guwen@linux.alibaba.com>
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
----
- net/smc/smc_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Wenjia,
 
-diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-index acca3b1a068f..3b95828d9976 100644
---- a/net/smc/smc_core.c
-+++ b/net/smc/smc_core.c
-@@ -2006,7 +2006,7 @@ int smc_conn_create(struct smc_sock *smc, struct smc_init_info *ini)
- }
- 
- #define SMCD_DMBE_SIZES		6 /* 0 -> 16KB, 1 -> 32KB, .. 6 -> 1MB */
--#define SMCR_RMBE_SIZES		5 /* 0 -> 16KB, 1 -> 32KB, .. 5 -> 512KB */
-+#define SMCR_RMBE_SIZES		15 /* 0 -> 16KB, 1 -> 32KB, .. 15 -> 512MB */
- 
- /* convert the RMB size into the compressed notation (minimum 16K, see
-  * SMCD/R_DMBE_SIZES.
--- 
-2.24.3 (Apple Git-128)
+That's okay to us. And if there are any issues regarding the use of 
+smc_run.bpf, please let me know.
+
+Best wishes,
+D. Wythe
+
+
+
+
 
 
