@@ -1,456 +1,297 @@
-Return-Path: <netdev+bounces-100340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C62B48D8A36
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 21:33:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DA748D8A23
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 21:27:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E2B81F21FDE
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 19:33:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43E3428B6F3
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 19:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4493E3838F;
-	Mon,  3 Jun 2024 19:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C2441386B9;
+	Mon,  3 Jun 2024 19:27:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="PWjc0lNt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ILJN3d+Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout4.routing.net (mxout4.routing.net [134.0.28.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3A1364A1;
-	Mon,  3 Jun 2024 19:32:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE840137923;
+	Mon,  3 Jun 2024 19:27:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717443176; cv=none; b=sjb0SQo2ynXCgcIGkYHHogIkCOPDz0+rouDebK0HW2V1GBvb8w0R702Xi46Kno1bJrMzRVovwoQES/pI3cbRNmBklFes6Jz9woG2RSxkC0i9DM3tNMKS+iqgQfSJv/UyJvNKPx7jbsUxDTD7GqxtsdKNjNQkXh+/bq0/jaUkjHA=
+	t=1717442850; cv=none; b=GJr6XVOjc1xme8CHjYg5WeJdwAiWphoSv2CDo77b3+HY7TX6yooSCYiMgGO4RkNXF9rGvzL8foAGG+SDJQtgZTY/sqP9z5+IxGN7zvjs0V9tHYbBHNLyH0AMG6hPymLHQNxza2bMaFki/mZdVFU5BfGVWfqRG4Qmv3q1rwdbnC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717443176; c=relaxed/simple;
-	bh=hUSKr90HDtRhq9U26fSMgowN3ifOtMIGTo7c9KC1suI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=D6Y14oFB7KIsRU7ImMmhr1HsqbmDYUJvbFIG9yzovVvIPWAXt+maUXDhCQ8lUlI6+OZRJY1BzLvXRSBTrKl+LIGklM8ZOciX8B8v4m05Xky/9nV4doV83TKwWMqyJLk1JxYz+TtBRiPhPSXFVhfn9IA4hzRDKF6GwCyN4zB2BXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=PWjc0lNt; arc=none smtp.client-ip=134.0.28.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbox1.masterlogin.de (unknown [192.168.10.88])
-	by mxout4.routing.net (Postfix) with ESMTP id 9754410089E;
-	Mon,  3 Jun 2024 19:25:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1717442725;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=3ho/sytEmPR7aIAlSZxzlsWBIjDhubSXnBGb+VrHbnk=;
-	b=PWjc0lNtdY+VySgZcrgtOBGQlMRAb/PG5cDtAqZcvqj5hs6Ob4rnb7V8TVtQG+VYn8T7Vq
-	DHWhAZXR0n8bziSAteJuMZZTiYTRYeKtONj/Nb+8fup3F/bxa7ScC9EGvu6L+3EYKkUDs9
-	1tF8CikMa4K0HzCWN86M0zT+hTNGl9E=
-Received: from frank-G5.. (fttx-pool-80.245.76.156.bambit.de [80.245.76.156])
-	by mxbox1.masterlogin.de (Postfix) with ESMTPSA id 490004010B;
-	Mon,  3 Jun 2024 19:25:24 +0000 (UTC)
-From: Frank Wunderlich <linux@fw-web.de>
-To: Felix Fietkau <nbd@nbd.name>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
-	John Crispin <john@phrozen.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	bc-bocun.chen@mediatek.com,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: [net v3] net: ethernet: mtk_eth_soc: handle dma buffer size soc specific
-Date: Mon,  3 Jun 2024 21:25:05 +0200
-Message-Id: <20240603192505.217881-1-linux@fw-web.de>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1717442850; c=relaxed/simple;
+	bh=47uw8RWIbjUiHWJurauYJwd7gqPt4ef9pG1jD75prPk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=b0wUs8mB2LQMotVa4FhrDNBE16aCE0dlmUTrH99XlG63JTDIRzyySZUEX4BBwR/s8snlEPCvm5S+zJCdFNB7d2d/ZKgWmXHmuTltIZMVGE/Okx8AzqR7KAZRXf5jvS1aPfz4+EgqSvIb+8SaQI6fuU+OIA3NLNlS70wB5lVaUZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ILJN3d+Z; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6ae60725ea1so1916216d6.2;
+        Mon, 03 Jun 2024 12:27:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717442848; x=1718047648; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SmTEdHXQ85Dl/tdaJHccb8Q46/nHFSNmwMi+k0konyI=;
+        b=ILJN3d+ZI9zJ906p3auUkn9+GlLu9BeA2WQHJcTM+8z5gfE3O4vRlx8G2eepbPy1bi
+         /4MOWLMY4K2qBSel8OW+Wc1IUn5d4pP7mhr3y6jNe3ucCVbtxfBUN0YfgWCzyTfItRbU
+         zolP5cLYoWPu7v9PPhhvprXuyWmmTdn0CLp64C996eAL4QiS+WFnaO/r0gk0BZvPb6ag
+         Y2XeCZKVwM88oBQ6KYHwbWyen0qzmec8gpHKfcIBhefKKoxXhN8yIKsQqzNhRuPN3jvf
+         dnd5wFnopaiUlpIV5KBXvXB8oc+1q8I3gcBuchCBKS1AQA8uR8He9e2XskDZx+nihMGZ
+         ubjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717442848; x=1718047648;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=SmTEdHXQ85Dl/tdaJHccb8Q46/nHFSNmwMi+k0konyI=;
+        b=wgkHEYkTiqT6qUV1cftQo+J0YhWLbup0fkIFnw51OEMqKR/gohkuu3bY15/K6KmA8E
+         rFAl2f+Imuvm+8NW1WK/KaQcwCb4JyaiQXwUolru5qFYQf7KhO6BRSajMc//exOxcU4O
+         rNyIxs2TMXG/wnjsQ8BO6UTSToOAky+gMNYRSx2g1rHRPCEb+xLk+lPYf7Y1UGykiOuY
+         51gUzWOL+jEQHMJJH+VjStCYd17mOWOQlluU9zNYWoJaZtwUCkefvjDeGEMPi9D+ClFf
+         fG/4X0zuK/dyyyjVU7X6SbZisz7Oum9rucWMcalbLvwpQnbKRRrEYuwt/v8ij7norQAn
+         mT/w==
+X-Forwarded-Encrypted: i=1; AJvYcCUOOKqmzZZgNEyu5WJOesMt0ofu23WXrQMx8q7hBO4EBtRJKVlS/UX2yoQFy6uKYfViX1FbgVJypHJsdtTucSsHqaHBhee6YHz4gn7VI8SeZ1IvPyJPgxBGFuvVi1CkotsaoAF/HlzLmWr8jZI2mP+PqmyCco3Cs+ru5k6d
+X-Gm-Message-State: AOJu0YwyODvSUrkNWFvlUQehk5KmYrIPHXuhlx1WqkG94MUY+HrApUxu
+	cnoQzDJOpCAxhjaMfeX6bIqmLLLCEX+5d4/W4wEKKB0wHE7KoHKG
+X-Google-Smtp-Source: AGHT+IFt+zJ0mg3LTg11DS1JRh5fHggaZdCXXkW+lqhMsGm8HRoczVZZaGeJVxysxnzY+7lwlQy51A==
+X-Received: by 2002:a05:6214:440b:b0:6af:518b:170e with SMTP id 6a1803df08f44-6af518b17a2mr59682676d6.33.1717442847600;
+        Mon, 03 Jun 2024 12:27:27 -0700 (PDT)
+Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ae4b4179f4sm33246106d6.113.2024.06.03.12.27.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Jun 2024 12:27:26 -0700 (PDT)
+Date: Mon, 03 Jun 2024 15:27:26 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Chengen Du <chengen.du@canonical.com>, 
+ willemdebruijn.kernel@gmail.com
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ kaber@trash.net, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Chengen Du <chengen.du@canonical.com>, 
+ stable@vger.kernel.org
+Message-ID: <665e191e62436_239903294b7@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240603034747.162184-1-chengen.du@canonical.com>
+References: <20240603034747.162184-1-chengen.du@canonical.com>
+Subject: Re: [PATCH v4] af_packet: Handle outgoing VLAN packets without
+ hardware offloading
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Mail-ID: 5f76a187-31fa-4752-91ff-2a93f0492706
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-From: Frank Wunderlich <frank-w@public-files.de>
+Chengen Du wrote:
+> The issue initially stems from libpcap. The ethertype will be overwritten
+> as the VLAN TPID if the network interface lacks hardware VLAN offloading.
+> In the outbound packet path, if hardware VLAN offloading is unavailable,
+> the VLAN tag is inserted into the payload but then cleared from the sk_buff
+> struct. Consequently, this can lead to a false negative when checking for
+> the presence of a VLAN tag, causing the packet sniffing outcome to lack
+> VLAN tag information (i.e., TCI-TPID). As a result, the packet capturing
+> tool may be unable to parse packets as expected.
+> 
+> The TCI-TPID is missing because the prb_fill_vlan_info() function does not
+> modify the tp_vlan_tci/tp_vlan_tpid values, as the information is in the
+> payload and not in the sk_buff struct. The skb_vlan_tag_present() function
+> only checks vlan_all in the sk_buff struct. In cooked mode, the L2 header
+> is stripped, preventing the packet capturing tool from determining the
+> correct TCI-TPID value. Additionally, the protocol in SLL is incorrect,
+> which means the packet capturing tool cannot parse the L3 header correctly.
+> 
+> Link: https://github.com/the-tcpdump-group/libpcap/issues/1105
+> Link: https://lore.kernel.org/netdev/20240520070348.26725-1-chengen.du@canonical.com/T/#u
+> Fixes: 393e52e33c6c ("packet: deliver VLAN TCI to userspace")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Chengen Du <chengen.du@canonical.com>
+> ---
+>  net/packet/af_packet.c | 85 ++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 74 insertions(+), 11 deletions(-)
+> 
+> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> index ea3ebc160e25..21d34a12c11c 100644
+> --- a/net/packet/af_packet.c
+> +++ b/net/packet/af_packet.c
+> @@ -538,6 +538,62 @@ static void *packet_current_frame(struct packet_sock *po,
+>  	return packet_lookup_frame(po, rb, rb->head, status);
+>  }
+>  
+> +static int vlan_get_info(struct sk_buff *skb, u16 *tci, u16 *tpid)
+> +{
+> +	if (skb_vlan_tag_present(skb)) {
+> +		*tci = skb_vlan_tag_get(skb);
+> +		*tpid = ntohs(skb->vlan_proto);
+> +	} else if (unlikely(eth_type_vlan(skb->protocol))) {
+> +		unsigned int vlan_depth = skb->mac_len;
+> +		struct vlan_hdr vhdr, *vh;
+> +		u8 *skb_head = skb->data;
+> +		int skb_len = skb->len;
+> +
+> +		if (vlan_depth) {
+> +			if (WARN_ON(vlan_depth < VLAN_HLEN))
+> +				return 0;
+> +			vlan_depth -= VLAN_HLEN;
+> +		} else {
+> +			vlan_depth = ETH_HLEN;
+> +		}
+> +
+> +		skb_push(skb, skb->data - skb_mac_header(skb));
+> +		vh = skb_header_pointer(skb, vlan_depth, sizeof(vhdr), &vhdr);
+> +		if (skb_head != skb->data) {
+> +			skb->data = skb_head;
+> +			skb->len = skb_len;
+> +		}
+> +		if (unlikely(!vh))
+> +			return 0;
 
-The mainline MTK ethernet driver suffers long time from rarly but
-annoying tx queue timeouts. We think that this is caused by fixed
-dma sizes hardcoded for all SoCs.
+This duplicates much of __vlan_get_protocol.
 
-We suspect this problem arises from a low level of free TX DMADs,
-the TX Ring alomost full.
+With a wrapper to allow calling that while skb->data points at the
+network header (as this is only SOCK_DGRAM) rather than the mac
+header that it expects.
 
-The transmit timeout is caused by the Tx queue not waking up. The
-Tx queue stops when the free counter is less than ring->thres, and
-it will wake up once the free counter is greater than ring->thres.
-If the CPU is too late to wake up the Tx queues, it may cause a
-transmit timeout.
-Therefore, we increased the TX and RX DMADs to improve this error
-situation.
+> +
+> +		*tci = ntohs(vh->h_vlan_TCI);
+> +		*tpid = ntohs(skb->protocol);
+> +	} else {
+> +		return 0;
+> +	}
+> +
+> +	return 1;
+> +}
+> +
+> +static __be16 sll_get_protocol(struct sk_buff *skb)
+> +{
+> +	__be16 proto = skb->protocol;
+> +
+> +	if (unlikely(eth_type_vlan(proto))) {
+> +		u8 *skb_head = skb->data;
+> +		int skb_len = skb->len;
+> +
+> +		skb_push(skb, skb->data - skb_mac_header(skb));
+> +		proto = __vlan_get_protocol(skb, proto, NULL);
+> +		if (skb_head != skb->data) {
+> +			skb->data = skb_head;
+> +			skb->len = skb_len;
+> +		}
 
-Use the dma-size implementation from SDK in a per SoC manner. In
-difference to SDK we have no RSS feature yet, so all RX/TX sizes
-should be raised from 512 to 2048 byte except fqdma on mt7988 to
-avoid the tx timeout issue.
+Then this does the same, but does call the function.
 
-Fixes: 656e705243fd ("net-next: mediatek: add support for MT7623 ethernet")
-Suggested-by: Daniel Golle <daniel@makrotopia.org>
-Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
----
-based on SDK:
+Is the difference that in the above you're trying to get the data only
+out of the outer most vlan tag?
 
-https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/fac194d6253d339e15c651c052b532a449a04d6e
+If so, can just call skb_header_pointer(skb, 0, sizeof(vhdr), &vhdr),
+as skb->data is pointing to this tag.
 
-v3:
-- rephrase commit message with some information from mtk
-- change the TX/RX DMA Size from 512 to 2048 for all platforms.
-  When rss gets upstream TX Size should be increases to 4096 and
-  the RX Size decreased to 1024 for MT798[1/6/8].
-- drop fq_dma_size from rt5350/mt7628 as this does not have QDMA
-v2:
-- fix unused variable 'addr' in 32bit build
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 104 +++++++++++++-------
- drivers/net/ethernet/mediatek/mtk_eth_soc.h |   9 +-
- 2 files changed, 77 insertions(+), 36 deletions(-)
+As for sll_get_protocol, ideally we could just pass vlan_depth as an
+extra parameter to __vlan_get_protocol. But that is too much churn. So
+then you're approach of moving skb->data is indeed needed. Maybe call it
+vlan_get_protocol_dgram or so. As that better describes the action.
+> +	}
+> +
+> +	return proto;
+> +}
+> +
+>  static void prb_del_retire_blk_timer(struct tpacket_kbdq_core *pkc)
+>  {
+>  	del_timer_sync(&pkc->retire_blk_timer);
+> @@ -1007,9 +1063,11 @@ static void prb_clear_rxhash(struct tpacket_kbdq_core *pkc,
+>  static void prb_fill_vlan_info(struct tpacket_kbdq_core *pkc,
+>  			struct tpacket3_hdr *ppd)
+>  {
+> -	if (skb_vlan_tag_present(pkc->skb)) {
+> -		ppd->hv1.tp_vlan_tci = skb_vlan_tag_get(pkc->skb);
+> -		ppd->hv1.tp_vlan_tpid = ntohs(pkc->skb->vlan_proto);
+> +	u16 tci, tpid;
+> +
+> +	if (vlan_get_info(pkc->skb, &tci, &tpid)) {
+> +		ppd->hv1.tp_vlan_tci = tci;
+> +		ppd->hv1.tp_vlan_tpid = tpid;
+>  		ppd->tp_status = TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index cae46290a7ae..c84ce54a84a0 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -1131,9 +1131,9 @@ static int mtk_init_fq_dma(struct mtk_eth *eth)
- {
- 	const struct mtk_soc_data *soc = eth->soc;
- 	dma_addr_t phy_ring_tail;
--	int cnt = MTK_QDMA_RING_SIZE;
-+	int cnt = soc->tx.fq_dma_size;
- 	dma_addr_t dma_addr;
--	int i;
-+	int i, j, len;
- 
- 	if (MTK_HAS_CAPS(eth->soc->caps, MTK_SRAM))
- 		eth->scratch_ring = eth->sram_base;
-@@ -1142,40 +1142,46 @@ static int mtk_init_fq_dma(struct mtk_eth *eth)
- 						       cnt * soc->tx.desc_size,
- 						       &eth->phy_scratch_ring,
- 						       GFP_KERNEL);
-+
- 	if (unlikely(!eth->scratch_ring))
- 		return -ENOMEM;
- 
--	eth->scratch_head = kcalloc(cnt, MTK_QDMA_PAGE_SIZE, GFP_KERNEL);
--	if (unlikely(!eth->scratch_head))
--		return -ENOMEM;
-+	phy_ring_tail = eth->phy_scratch_ring + soc->tx.desc_size * (cnt - 1);
- 
--	dma_addr = dma_map_single(eth->dma_dev,
--				  eth->scratch_head, cnt * MTK_QDMA_PAGE_SIZE,
--				  DMA_FROM_DEVICE);
--	if (unlikely(dma_mapping_error(eth->dma_dev, dma_addr)))
--		return -ENOMEM;
-+	for (j = 0; j < DIV_ROUND_UP(soc->tx.fq_dma_size, MTK_FQ_DMA_LENGTH); j++) {
-+		len = min_t(int, cnt - j * MTK_FQ_DMA_LENGTH, MTK_FQ_DMA_LENGTH);
-+		eth->scratch_head[j] = kcalloc(len, MTK_QDMA_PAGE_SIZE, GFP_KERNEL);
- 
--	phy_ring_tail = eth->phy_scratch_ring + soc->tx.desc_size * (cnt - 1);
-+		if (unlikely(!eth->scratch_head[j]))
-+			return -ENOMEM;
- 
--	for (i = 0; i < cnt; i++) {
--		dma_addr_t addr = dma_addr + i * MTK_QDMA_PAGE_SIZE;
--		struct mtk_tx_dma_v2 *txd;
-+		dma_addr = dma_map_single(eth->dma_dev,
-+					  eth->scratch_head[j], len * MTK_QDMA_PAGE_SIZE,
-+					  DMA_FROM_DEVICE);
- 
--		txd = eth->scratch_ring + i * soc->tx.desc_size;
--		txd->txd1 = addr;
--		if (i < cnt - 1)
--			txd->txd2 = eth->phy_scratch_ring +
--				    (i + 1) * soc->tx.desc_size;
-+		if (unlikely(dma_mapping_error(eth->dma_dev, dma_addr)))
-+			return -ENOMEM;
- 
--		txd->txd3 = TX_DMA_PLEN0(MTK_QDMA_PAGE_SIZE);
--		if (MTK_HAS_CAPS(soc->caps, MTK_36BIT_DMA))
--			txd->txd3 |= TX_DMA_PREP_ADDR64(addr);
--		txd->txd4 = 0;
--		if (mtk_is_netsys_v2_or_greater(eth)) {
--			txd->txd5 = 0;
--			txd->txd6 = 0;
--			txd->txd7 = 0;
--			txd->txd8 = 0;
-+		for (i = 0; i < cnt; i++) {
-+			struct mtk_tx_dma_v2 *txd;
-+
-+			txd = eth->scratch_ring + (j * MTK_FQ_DMA_LENGTH + i) * soc->tx.desc_size;
-+			txd->txd1 = dma_addr + i * MTK_QDMA_PAGE_SIZE;
-+			if (j * MTK_FQ_DMA_LENGTH + i < cnt)
-+				txd->txd2 = eth->phy_scratch_ring +
-+					    (j * MTK_FQ_DMA_LENGTH + i + 1) * soc->tx.desc_size;
-+
-+			txd->txd3 = TX_DMA_PLEN0(MTK_QDMA_PAGE_SIZE);
-+			if (MTK_HAS_CAPS(soc->caps, MTK_36BIT_DMA))
-+				txd->txd3 |= TX_DMA_PREP_ADDR64(dma_addr + i * MTK_QDMA_PAGE_SIZE);
-+
-+			txd->txd4 = 0;
-+			if (mtk_is_netsys_v2_or_greater(eth)) {
-+				txd->txd5 = 0;
-+				txd->txd6 = 0;
-+				txd->txd7 = 0;
-+				txd->txd8 = 0;
-+			}
- 		}
- 	}
- 
-@@ -2457,7 +2463,7 @@ static int mtk_tx_alloc(struct mtk_eth *eth)
- 	if (MTK_HAS_CAPS(soc->caps, MTK_QDMA))
- 		ring_size = MTK_QDMA_RING_SIZE;
- 	else
--		ring_size = MTK_DMA_SIZE;
-+		ring_size = soc->tx.dma_size;
- 
- 	ring->buf = kcalloc(ring_size, sizeof(*ring->buf),
- 			       GFP_KERNEL);
-@@ -2465,8 +2471,8 @@ static int mtk_tx_alloc(struct mtk_eth *eth)
- 		goto no_tx_mem;
- 
- 	if (MTK_HAS_CAPS(soc->caps, MTK_SRAM)) {
--		ring->dma = eth->sram_base + ring_size * sz;
--		ring->phys = eth->phy_scratch_ring + ring_size * (dma_addr_t)sz;
-+		ring->dma = eth->sram_base + soc->tx.fq_dma_size * sz;
-+		ring->phys = eth->phy_scratch_ring + soc->tx.fq_dma_size * (dma_addr_t)sz;
- 	} else {
- 		ring->dma = dma_alloc_coherent(eth->dma_dev, ring_size * sz,
- 					       &ring->phys, GFP_KERNEL);
-@@ -2588,6 +2594,7 @@ static void mtk_tx_clean(struct mtk_eth *eth)
- static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
- {
- 	const struct mtk_reg_map *reg_map = eth->soc->reg_map;
-+	const struct mtk_soc_data *soc = eth->soc;
- 	struct mtk_rx_ring *ring;
- 	int rx_data_len, rx_dma_size, tx_ring_size;
- 	int i;
-@@ -2595,7 +2602,7 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
- 	if (MTK_HAS_CAPS(eth->soc->caps, MTK_QDMA))
- 		tx_ring_size = MTK_QDMA_RING_SIZE;
- 	else
--		tx_ring_size = MTK_DMA_SIZE;
-+		tx_ring_size = soc->tx.dma_size;
- 
- 	if (rx_flag == MTK_RX_FLAGS_QDMA) {
- 		if (ring_no)
-@@ -2610,7 +2617,7 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
- 		rx_dma_size = MTK_HW_LRO_DMA_SIZE;
- 	} else {
- 		rx_data_len = ETH_DATA_LEN;
--		rx_dma_size = MTK_DMA_SIZE;
-+		rx_dma_size = soc->rx.dma_size;
- 	}
- 
- 	ring->frag_size = mtk_max_frag_size(rx_data_len);
-@@ -3139,7 +3146,10 @@ static void mtk_dma_free(struct mtk_eth *eth)
- 			mtk_rx_clean(eth, &eth->rx_ring[i], false);
- 	}
- 
--	kfree(eth->scratch_head);
-+	for (i = 0; i < DIV_ROUND_UP(soc->tx.fq_dma_size, MTK_FQ_DMA_LENGTH); i++) {
-+		kfree(eth->scratch_head[i]);
-+		eth->scratch_head[i] = NULL;
-+	}
- }
- 
- static bool mtk_hw_reset_check(struct mtk_eth *eth)
-@@ -5052,11 +5062,14 @@ static const struct mtk_soc_data mt2701_data = {
- 		.desc_size = sizeof(struct mtk_tx_dma),
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN,
- 		.dma_len_offset = 16,
-+		.dma_size = MTK_DMA_SIZE(2K),
-+		.fq_dma_size = MTK_DMA_SIZE(2K),
- 	},
- 	.rx = {
- 		.desc_size = sizeof(struct mtk_rx_dma),
- 		.irq_done_mask = MTK_RX_DONE_INT,
- 		.dma_l4_valid = RX_DMA_L4_VALID,
-+		.dma_size = MTK_DMA_SIZE(2K),
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN,
- 		.dma_len_offset = 16,
- 	},
-@@ -5076,11 +5089,14 @@ static const struct mtk_soc_data mt7621_data = {
- 		.desc_size = sizeof(struct mtk_tx_dma),
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN,
- 		.dma_len_offset = 16,
-+		.dma_size = MTK_DMA_SIZE(2K),
-+		.fq_dma_size = MTK_DMA_SIZE(2K),
- 	},
- 	.rx = {
- 		.desc_size = sizeof(struct mtk_rx_dma),
- 		.irq_done_mask = MTK_RX_DONE_INT,
- 		.dma_l4_valid = RX_DMA_L4_VALID,
-+		.dma_size = MTK_DMA_SIZE(2K),
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN,
- 		.dma_len_offset = 16,
- 	},
-@@ -5102,11 +5118,14 @@ static const struct mtk_soc_data mt7622_data = {
- 		.desc_size = sizeof(struct mtk_tx_dma),
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN,
- 		.dma_len_offset = 16,
-+		.dma_size = MTK_DMA_SIZE(2K),
-+		.fq_dma_size = MTK_DMA_SIZE(2K),
- 	},
- 	.rx = {
- 		.desc_size = sizeof(struct mtk_rx_dma),
- 		.irq_done_mask = MTK_RX_DONE_INT,
- 		.dma_l4_valid = RX_DMA_L4_VALID,
-+		.dma_size = MTK_DMA_SIZE(2K),
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN,
- 		.dma_len_offset = 16,
- 	},
-@@ -5127,11 +5146,14 @@ static const struct mtk_soc_data mt7623_data = {
- 		.desc_size = sizeof(struct mtk_tx_dma),
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN,
- 		.dma_len_offset = 16,
-+		.dma_size = MTK_DMA_SIZE(2K),
-+		.fq_dma_size = MTK_DMA_SIZE(2K),
- 	},
- 	.rx = {
- 		.desc_size = sizeof(struct mtk_rx_dma),
- 		.irq_done_mask = MTK_RX_DONE_INT,
- 		.dma_l4_valid = RX_DMA_L4_VALID,
-+		.dma_size = MTK_DMA_SIZE(2K),
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN,
- 		.dma_len_offset = 16,
- 	},
-@@ -5150,11 +5172,14 @@ static const struct mtk_soc_data mt7629_data = {
- 		.desc_size = sizeof(struct mtk_tx_dma),
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN,
- 		.dma_len_offset = 16,
-+		.dma_size = MTK_DMA_SIZE(2K),
-+		.fq_dma_size = MTK_DMA_SIZE(2K),
- 	},
- 	.rx = {
- 		.desc_size = sizeof(struct mtk_rx_dma),
- 		.irq_done_mask = MTK_RX_DONE_INT,
- 		.dma_l4_valid = RX_DMA_L4_VALID,
-+		.dma_size = MTK_DMA_SIZE(2K),
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN,
- 		.dma_len_offset = 16,
- 	},
-@@ -5176,6 +5201,8 @@ static const struct mtk_soc_data mt7981_data = {
- 		.desc_size = sizeof(struct mtk_tx_dma_v2),
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN_V2,
- 		.dma_len_offset = 8,
-+		.dma_size = MTK_DMA_SIZE(2K),
-+		.fq_dma_size = MTK_DMA_SIZE(2K),
- 	},
- 	.rx = {
- 		.desc_size = sizeof(struct mtk_rx_dma),
-@@ -5183,6 +5210,7 @@ static const struct mtk_soc_data mt7981_data = {
- 		.dma_l4_valid = RX_DMA_L4_VALID_V2,
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN,
- 		.dma_len_offset = 16,
-+		.dma_size = MTK_DMA_SIZE(2K),
- 	},
- };
- 
-@@ -5202,6 +5230,8 @@ static const struct mtk_soc_data mt7986_data = {
- 		.desc_size = sizeof(struct mtk_tx_dma_v2),
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN_V2,
- 		.dma_len_offset = 8,
-+		.dma_size = MTK_DMA_SIZE(2K),
-+		.fq_dma_size = MTK_DMA_SIZE(2K),
- 	},
- 	.rx = {
- 		.desc_size = sizeof(struct mtk_rx_dma),
-@@ -5209,6 +5239,7 @@ static const struct mtk_soc_data mt7986_data = {
- 		.dma_l4_valid = RX_DMA_L4_VALID_V2,
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN,
- 		.dma_len_offset = 16,
-+		.dma_size = MTK_DMA_SIZE(2K),
- 	},
- };
- 
-@@ -5228,6 +5259,8 @@ static const struct mtk_soc_data mt7988_data = {
- 		.desc_size = sizeof(struct mtk_tx_dma_v2),
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN_V2,
- 		.dma_len_offset = 8,
-+		.dma_size = MTK_DMA_SIZE(2K),
-+		.fq_dma_size = MTK_DMA_SIZE(4K),
- 	},
- 	.rx = {
- 		.desc_size = sizeof(struct mtk_rx_dma_v2),
-@@ -5235,6 +5268,7 @@ static const struct mtk_soc_data mt7988_data = {
- 		.dma_l4_valid = RX_DMA_L4_VALID_V2,
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN_V2,
- 		.dma_len_offset = 8,
-+		.dma_size = MTK_DMA_SIZE(2K),
- 	},
- };
- 
-@@ -5249,6 +5283,7 @@ static const struct mtk_soc_data rt5350_data = {
- 		.desc_size = sizeof(struct mtk_tx_dma),
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN,
- 		.dma_len_offset = 16,
-+		.dma_size = MTK_DMA_SIZE(2K),
- 	},
- 	.rx = {
- 		.desc_size = sizeof(struct mtk_rx_dma),
-@@ -5256,6 +5291,7 @@ static const struct mtk_soc_data rt5350_data = {
- 		.dma_l4_valid = RX_DMA_L4_VALID_PDMA,
- 		.dma_max_len = MTK_TX_DMA_BUF_LEN,
- 		.dma_len_offset = 16,
-+		.dma_size = MTK_DMA_SIZE(2K),
- 	},
- };
- 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-index 4eab30b44070..f5174f6cb1bb 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-@@ -32,7 +32,9 @@
- #define MTK_TX_DMA_BUF_LEN	0x3fff
- #define MTK_TX_DMA_BUF_LEN_V2	0xffff
- #define MTK_QDMA_RING_SIZE	2048
--#define MTK_DMA_SIZE		512
-+#define MTK_DMA_SIZE(x)		(SZ_##x)
-+#define MTK_FQ_DMA_HEAD		32
-+#define MTK_FQ_DMA_LENGTH	2048
- #define MTK_RX_ETH_HLEN		(ETH_HLEN + ETH_FCS_LEN)
- #define MTK_RX_HLEN		(NET_SKB_PAD + MTK_RX_ETH_HLEN + NET_IP_ALIGN)
- #define MTK_DMA_DUMMY_DESC	0xffffffff
-@@ -1176,6 +1178,8 @@ struct mtk_soc_data {
- 		u32	desc_size;
- 		u32	dma_max_len;
- 		u32	dma_len_offset;
-+		u32	dma_size;
-+		u32	fq_dma_size;
- 	} tx;
- 	struct {
- 		u32	desc_size;
-@@ -1183,6 +1187,7 @@ struct mtk_soc_data {
- 		u32	dma_l4_valid;
- 		u32	dma_max_len;
- 		u32	dma_len_offset;
-+		u32	dma_size;
- 	} rx;
- };
- 
-@@ -1264,7 +1269,7 @@ struct mtk_eth {
- 	struct napi_struct		rx_napi;
- 	void				*scratch_ring;
- 	dma_addr_t			phy_scratch_ring;
--	void				*scratch_head;
-+	void				*scratch_head[MTK_FQ_DMA_HEAD];
- 	struct clk			*clks[MTK_CLK_MAX];
- 
- 	struct mii_bus			*mii_bus;
--- 
-2.34.1
+Why change this from v3? I found the two separate cases more clear.
+
+>  	} else {
+>  		ppd->hv1.tp_vlan_tci = 0;
+> @@ -2418,15 +2476,17 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+>  		hdrlen = sizeof(*h.h1);
+>  		break;
+>  	case TPACKET_V2:
+> +		u16 tci, tpid;
+> +
+>  		h.h2->tp_len = skb->len;
+>  		h.h2->tp_snaplen = snaplen;
+>  		h.h2->tp_mac = macoff;
+>  		h.h2->tp_net = netoff;
+>  		h.h2->tp_sec = ts.tv_sec;
+>  		h.h2->tp_nsec = ts.tv_nsec;
+> -		if (skb_vlan_tag_present(skb)) {
+> -			h.h2->tp_vlan_tci = skb_vlan_tag_get(skb);
+> -			h.h2->tp_vlan_tpid = ntohs(skb->vlan_proto);
+> +		if (vlan_get_info(skb, &tci, &tpid)) {
+> +			h.h2->tp_vlan_tci = tci;
+> +			h.h2->tp_vlan_tpid = tpid;
+>  			status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
+>  		} else {
+>  			h.h2->tp_vlan_tci = 0;
+> @@ -2457,7 +2517,8 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+>  	sll->sll_halen = dev_parse_header(skb, sll->sll_addr);
+>  	sll->sll_family = AF_PACKET;
+>  	sll->sll_hatype = dev->type;
+> -	sll->sll_protocol = skb->protocol;
+> +	sll->sll_protocol = (sk->sk_type == SOCK_DGRAM) ?
+> +		sll_get_protocol(skb) : skb->protocol;
+>  	sll->sll_pkttype = skb->pkt_type;
+>  	if (unlikely(packet_sock_flag(po, PACKET_SOCK_ORIGDEV)))
+>  		sll->sll_ifindex = orig_dev->ifindex;
+> @@ -3482,7 +3543,8 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>  		/* Original length was stored in sockaddr_ll fields */
+>  		origlen = PACKET_SKB_CB(skb)->sa.origlen;
+>  		sll->sll_family = AF_PACKET;
+> -		sll->sll_protocol = skb->protocol;
+> +		sll->sll_protocol = (sock->type == SOCK_DGRAM) ?
+> +			sll_get_protocol(skb) : skb->protocol;
+>  	}
+>  
+>  	sock_recv_cmsgs(msg, sk, skb);
+> @@ -3521,6 +3583,7 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>  
+>  	if (packet_sock_flag(pkt_sk(sk), PACKET_SOCK_AUXDATA)) {
+>  		struct tpacket_auxdata aux;
+> +		u16 tci, tpid;
+>  
+>  		aux.tp_status = TP_STATUS_USER;
+>  		if (skb->ip_summed == CHECKSUM_PARTIAL)
+> @@ -3535,9 +3598,9 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>  		aux.tp_snaplen = skb->len;
+>  		aux.tp_mac = 0;
+>  		aux.tp_net = skb_network_offset(skb);
+> -		if (skb_vlan_tag_present(skb)) {
+> -			aux.tp_vlan_tci = skb_vlan_tag_get(skb);
+> -			aux.tp_vlan_tpid = ntohs(skb->vlan_proto);
+> +		if (vlan_get_info(skb, &tci, &tpid)) {
+> +			aux.tp_vlan_tci = tci;
+> +			aux.tp_vlan_tpid = tpid;
+>  			aux.tp_status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
+>  		} else {
+>  			aux.tp_vlan_tci = 0;
+> -- 
+> 2.43.0
+> 
+
 
 
