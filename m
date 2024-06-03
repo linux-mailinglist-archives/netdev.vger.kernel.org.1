@@ -1,101 +1,210 @@
-Return-Path: <netdev+bounces-100378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AE798FA45B
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 23:50:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35ECB8FA550
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 00:00:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08BCE28D500
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 21:50:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0103B26183
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 22:00:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4614713C8F2;
-	Mon,  3 Jun 2024 21:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 887A713C9D4;
+	Mon,  3 Jun 2024 22:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="qYHIkmV7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JWil5/qF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97EE13C8E8
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 21:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09EE42ABE;
+	Mon,  3 Jun 2024 22:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717451422; cv=none; b=jgB52dIovpPbJvx7SjR+Vllq41fc0HYURTfDvehMTdf/kZM6zjLSBzl7DT0aNjRdAcVkEUfeeVqMsjVwsO7KZIpKkDF1E35ak9ixoYwbYEc5zKEaAr0vUXajyn/fqrknX0cESDNNjNcti45eLsdFnWAVSPZ7GPmWvLJRmbKlnLY=
+	t=1717452036; cv=none; b=Qmiy+bHclC020GV5PTKL0M7TjSTJz60lSY7LvoVgW3fN0//zhnp8yMqdOJWTXRBxToecG2CYX5vsfAepkfFd6LWcwUlKry86vdUaViPLdNa6jYu/gApGEuxHFk0HHF2lTKxbzePXIxMJhQDsyzDJYwuQBCnvQb+i/a/sw8Ny+pU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717451422; c=relaxed/simple;
-	bh=jQETexEejuJ/VAhqGR17NqtTNOI2iX3uh3MiiJifQJw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mNPKRQ8y1vgh3SFjRAbJzDUx857ssXuxb1DQjfTyWugoncEjBpgw5/Wuf2J1p7rRCEg1Lkrgch9DJtTz8B9kOEea6hpUOgqV0ri+wdEivjO0VEtKiRLCCgYYiY1TscECwBKSX+BdN2gClgHGgPVfGGK+v3FU4AvKx0iuzNjYMk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=qYHIkmV7; arc=none smtp.client-ip=209.85.160.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-245435c02e1so2650270fac.0
-        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 14:50:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1717451420; x=1718056220; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZziI2v+i5IGjIKB8mlMLCYTpY3QI/oZfBdzVvUiG3pw=;
-        b=qYHIkmV7eR++1Jk87ogdHtjoEcI5ih1MRWLIA3J5MvcNcogA1uejXla+1L9xhQnePr
-         FEOVvJIyyqXHADsMR8Ry+0w6+vaws0JTHn2IVjk9hz8K3AAw4vWrM4OXu2bp00mp0sO4
-         uTIFOU10bmKcXBYNyAKa7ZM3lX3VldG3zpsG0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717451420; x=1718056220;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZziI2v+i5IGjIKB8mlMLCYTpY3QI/oZfBdzVvUiG3pw=;
-        b=BJVdJs3DFs8bA63jkmY3H+KpU9ULLDLD0QFfkvj/2jauvezxoV2dEU5Xbzb34F0tmF
-         6X5RfUfm0bOu/vMKce32D5BhReDl9MFBu8gMMVgJKWdMuXUaI0yCMql6xHcR80xSWQEG
-         xMNu7rRQN5o4DmgagBQ3qY0QGGO0J03MHgqORIwqKtx1jeWAgHOguURpLZDRVNhlHjq0
-         M1y/WM1N5EabLw/UjnlLvjPSiuVIOOt4ZYp66P4YtGSjCzBpBk3qFP5nAYcVlrVSxE1J
-         2V7ptV1uuWza6DSyBJVvlnlRFRrkta1tTGH1CEmXE9OTtlbybZPJjh4b8/6v4N6r5Wop
-         LiMw==
-X-Forwarded-Encrypted: i=1; AJvYcCVw+hkN4wBv8qJDI9Qx74TCkf+GfsevKZkzhZu/oEcOuSgZAQ8bvfk/x2xpI4ahReU0W/ZOF0E91gxO8Dzt6EzGj1dsvifv
-X-Gm-Message-State: AOJu0YxgVz96f68NTUZXAfYu8b8olwfcYJeFsmI5rywbF7Et4vtcznvV
-	ubAn045sKUDnA5jmawm0tBZU77+Z4JCkNLL24LdyDCPPiDOUsJYUMSdf8DHA6gY=
-X-Google-Smtp-Source: AGHT+IExaHxmG4w13jF3tz6Wk1yFelIINj206SDMlX2noHX3ytwoyWzS/nopw4WIncY0zt7vHmmxvA==
-X-Received: by 2002:a05:6871:88b:b0:24c:ae57:b4ab with SMTP id 586e51a60fabf-2508b80dc81mr12624917fac.11.1717451419771;
-        Mon, 03 Jun 2024 14:50:19 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70242b09133sm6158526b3a.178.2024.06.03.14.50.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jun 2024 14:50:19 -0700 (PDT)
-Date: Mon, 3 Jun 2024 14:50:16 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	nalramli@fastly.com, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
+	s=arc-20240116; t=1717452036; c=relaxed/simple;
+	bh=ZMS/4Gp6hXyd9fPwx/y5x+q7VhsaGgJvMHFGFXB2aCI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=a2bSp2lBcMD5U+Pc9BUsgl1djkPrpriT7AcT+RfCTl6uKrunUFTkiy3iYymKORe2OBXfIeheKRElca4GmfAx3hXgs9HduZ0GkTYfTfCSuaf5lljQfQmGNnGtnjv3S9EqL8KTCox1f5yj99UmN06yFhCU5Wd+I3a0fergGuQWmyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JWil5/qF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54BDEC2BD10;
+	Mon,  3 Jun 2024 22:00:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717452035;
+	bh=ZMS/4Gp6hXyd9fPwx/y5x+q7VhsaGgJvMHFGFXB2aCI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=JWil5/qFuymosoPDATfZqx6FJDnMlkeS59q6fSB+oGtZnzLWlZsOYK17IUuX1oHS1
+	 +ZGbOlO5XGTxStebKzleLLdP/ku6ByksYgWD6+z1Mv7KGjnwR3GMzWiuZo1J++YQBe
+	 YnonzpNdWoLK+5fnowMqG8M5MeJ10EV/gsKGvDpIY4wVIBC1HO+F/kfe8gBd+/QboZ
+	 BrnDQ+EAlvw7Yi4J9eZ6M1GbDt3y6+iqhqMKYxUzNtAOVfJ3SN/iHY1B0HdRGk77/Z
+	 OryQ3BNvB0McYwdX86nz7FOZKP/BNHRMgHpGVTqXr+aaBtJCcPNM0ORUNnE3rDopfE
+	 4lfytT5yAufhQ==
+Date: Mon, 3 Jun 2024 17:00:32 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Corey Minyard <minyard@acm.org>,
+	Allen Pais <apais@linux.microsoft.com>,
+	Sebastian Reichel <sebastian.reichel@collabora.com>,
+	Perry Yuan <perry.yuan@amd.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Nuno Sa <nuno.sa@analog.com>, Guenter Roeck <linux@roeck-us.net>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>, Lee Jones <lee@kernel.org>,
+	Samuel Holland <samuel@sholland.org>,
+	Elad Nachman <enachman@marvell.com>,
+	Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Gregory Greenman <gregory.greenman@intel.com>,
+	Benjamin Berg <benjamin.berg@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Robert Richter <rrichter@amd.com>, Vinod Koul <vkoul@kernel.org>,
+	Chunfeng Yun <chunfeng.yun@mediatek.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
+	Nikita Kravets <teackot@gmail.com>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	Stanley Chang <stanley_chang@realtek.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Abdel Alkuor <abdelalkuor@geotab.com>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Eric Biggers <ebiggers@google.com>,
+	Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>,
+	"Steven Rostedt (Google)" <rostedt@goodmis.org>,
+	Daniel Bristot de Oliveira <bristot@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Hugh Dickins <hughd@google.com>, Abel Wu <wuyun.abel@bytedance.com>,
+	John Johansen <john.johansen@canonical.com>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	Stefan Berger <stefanb@linux.ibm.com>,
+	Roberto Sassu <roberto.sassu@huawei.com>,
+	Eric Snowberg <eric.snowberg@oracle.com>,
+	Takashi Iwai <tiwai@suse.de>,
+	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+	Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+	Mark Brown <broonie@kernel.org>,
+	Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
+	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-acpi@vger.kernel.org, linux-ide@vger.kernel.org,
+	openipmi-developer@lists.sourceforge.net, linux-clk@vger.kernel.org,
+	linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org, linux-tegra@vger.kernel.org,
+	linux-pm@vger.kernel.org, qat-linux@intel.com,
+	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+	intel-xe@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+	linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org,
+	linux-leds@vger.kernel.org, linux-sunxi@lists.linux.dev,
+	linux-omap@vger.kernel.org, linux-mmc@vger.kernel.org,
+	linux-mtd@lists.infradead.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org,
+	linux-gpio@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+	linux-staging@lists.linux.dev, linux-usb@vger.kernel.org,
+	linux-fbdev@vger.kernel.org, linux-bcachefs@vger.kernel.org,
+	linux-hardening@vger.kernel.org, cgroups@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-mm@kvack.org,
+	apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
+	linux-integrity@vger.kernel.org, alsa-devel@alsa-project.org,
+	linux-sound@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	David Howells <dhowells@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <lenb@kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Daniel Scally <djrscally@gmail.com>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Peter De Schrijver <pdeschrijver@nvidia.com>,
+	Prashant Gaikwad <pgaikwad@nvidia.com>,
+	Thierry Reding <thierry.reding@gmail.com>,
+	Jonathan Hunter <jonathanh@nvidia.com>,
+	Huang Rui <ray.huang@amd.com>,
+	"Gautham R. Shenoy" <gautham.shenoy@amd.com>,
+	Mario Limonciello <mario.limonciello@amd.com>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	Karol Herbst <kherbst@redhat.com>, Lyude Paul <lyude@redhat.com>,
+	Danilo Krummrich <dakr@redhat.com>,
+	Jean Delvare <jdelvare@suse.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Pavel Machek <pavel@ucw.cz>, Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Hu Ziji <huziji@marvell.com>, Ulf Hansson <ulf.hansson@linaro.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Potnuri Bharat Teja <bharat@chelsio.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [RFC net-next v3 2/2] net/mlx5e: Add per queue netdev-genl stats
-Message-ID: <Zl46mKIn_cLaqcad@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Tariq Toukan <ttoukan.linux@gmail.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	nalramli@fastly.com, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>
-References: <20240529031628.324117-1-jdamato@fastly.com>
- <20240529031628.324117-3-jdamato@fastly.com>
- <5b3a0f6a-5a03-45d7-ab10-1f1ba25504d3@gmail.com>
- <ZlzGjXxVD-JClqIy@LQ3V64L9R2>
- <eda43490-8d77-4d7d-9b24-1aafd073d760@gmail.com>
- <Zl4X82y3ecR2Mnye@LQ3V64L9R2>
- <eedb6e7e-bd99-400d-81d9-6f72e6009acb@gmail.com>
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Mahesh J Salgaonkar <mahesh@linux.ibm.com>,
+	Oliver O'Halloran <oohall@gmail.com>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	JC Kuo <jckuo@nvidia.com>, Andrew Lunn <andrew@lunn.ch>,
+	Gregory Clement <gregory.clement@bootlin.com>,
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
+	Sebastian Reichel <sre@kernel.org>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
+	Thinh Nguyen <Thinh.Nguyen@synopsys.com>,
+	Helge Deller <deller@gmx.de>, Brian Foster <bfoster@redhat.com>,
+	Zhihao Cheng <chengzhihao1@huawei.com>, Tejun Heo <tj@kernel.org>,
+	Zefan Li <lizefan.x@bytedance.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+	Daniel Bristot de Oliveira <bristot@redhat.com>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Jason Baron <jbaron@akamai.com>, Jim Cromie <jim.cromie@gmail.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+	Clemens Ladisch <clemens@ladisch.de>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH v1 1/1] treewide: Align match_string() with
+ sysfs_match_string()
+Message-ID: <20240603220032.GA701908@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,48 +213,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <eedb6e7e-bd99-400d-81d9-6f72e6009acb@gmail.com>
+In-Reply-To: <20240603211538.289765-1-andriy.shevchenko@linux.intel.com>
 
-On Tue, Jun 04, 2024 at 12:36:16AM +0300, Tariq Toukan wrote:
-> 
-> 
-> On 03/06/2024 22:22, Joe Damato wrote:
-> > On Mon, Jun 03, 2024 at 02:11:14PM +0300, Tariq Toukan wrote:
-> > > 
-> 
-> ...
-> 
-> > > 
-> > > I still don't really like this design, so I gave some more thought on
-> > > this...
-> > > 
-> > > I think we should come up with a new mapping array under priv, that maps i
-> > > (from real_num_tx_queues) to the matching sq_stats struct.
-> > > This array would be maintained in the channels open/close functions,
-> > > similarly to priv->txq2sq.
-> > > 
-> > > Then, we would not calculate the mapping per call, but just get the proper
-> > > pointer from the array. This eases the handling of htb and ptp queues, which
-> > > were missed in your txq_ix_to_chtc_ix().
-> > 
-> > Maybe I am just getting way off track here, but I noticed this in
-> > drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c in
-> > set_pflag_tx_port_ts:
-> > 
-> >    if (!err)
-> >      priv->tx_ptp_opened = true;
-> > 
-> > but what if enable is false, meaning the user is disabling ptp via
-> > ethtool?
-> > 
-> 
-> This bool field under priv acts as a flag, means: ptp was ever opened.
-> It's the same idea as max_opened_tc, but with boolean instead of numeric.
+On Sun, Jun 02, 2024 at 06:57:12PM +0300, Andy Shevchenko wrote:
+> Make two APIs look similar. Hence convert match_string() to be
+> a 2-argument macro. In order to avoid unneeded churn, convert
+> all users as well. There is no functional change intended.
 
-OK, but then to avoid double counting ptp, I suppose we don't
-output ptp stats in base and only when the correct txq_ix is passed
-in to the tx stats function which refers to the PTP queue?
+Looks nice, thanks for doing this.
 
-It's either that or we dont include ptp's sqstats in the
-txq2sq_stats mapping you've proposed, if I understand correctly.
+> diff --git a/drivers/pci/pcie/aer.c b/drivers/pci/pcie/aer.c
+> index ac6293c24976..2d317c7e1cea 100644
+> --- a/drivers/pci/pcie/aer.c
+> +++ b/drivers/pci/pcie/aer.c
+> @@ -210,7 +210,7 @@ void pcie_ecrc_get_policy(char *str)
+>  {
+>  	int i;
+>  
+> -	i = match_string(ecrc_policy_str, ARRAY_SIZE(ecrc_policy_str), str);
+> +	i = match_string(ecrc_policy_str, str);
+>  	if (i < 0)
+>  		return;
+>  
+
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>	# drivers/pci/
+
+> +++ b/mm/vmpressure.c
+> @@ -388,7 +388,7 @@ int vmpressure_register_event(struct mem_cgroup *memcg,
+>  
+>  	/* Find required level */
+>  	token = strsep(&spec, ",");
+> -	ret = match_string(vmpressure_str_levels, VMPRESSURE_NUM_LEVELS, token);
+> +	ret = match_string(vmpressure_str_levels, token);
+
+VMPRESSURE_NUM_LEVELS looks like it's no longer used?
+
+>  	if (ret < 0)
+>  		goto out;
+>  	level = ret;
+> @@ -396,7 +396,7 @@ int vmpressure_register_event(struct mem_cgroup *memcg,
+>  	/* Find optional mode */
+>  	token = strsep(&spec, ",");
+>  	if (token) {
+> -		ret = match_string(vmpressure_str_modes, VMPRESSURE_NUM_MODES, token);
+> +		ret = match_string(vmpressure_str_modes, token);
+
+Ditto.
+
+>  		if (ret < 0)
+>  			goto out;
+>  		mode = ret;
 
