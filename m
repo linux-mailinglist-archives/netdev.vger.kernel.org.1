@@ -1,216 +1,144 @@
-Return-Path: <netdev+bounces-100088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10B148D7CDC
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:53:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A2E48D7CDD
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:53:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7932B1F2167D
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 07:53:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC0111F209A5
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 07:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CFB14F213;
-	Mon,  3 Jun 2024 07:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33A3C4EB30;
+	Mon,  3 Jun 2024 07:53:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hCyDg4K+"
+	dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b="r3XkzYpL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.savoirfairelinux.com (mail.savoirfairelinux.com [208.88.110.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B974EB45;
-	Mon,  3 Jun 2024 07:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A13E4F8A0
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 07:53:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.88.110.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717401216; cv=none; b=EY7usFri3pkZkGnaeVFsg1S2tKnOgHk3/ed9Ee8cqlj64CHAUQ8fiSynAmtUUFRnPAdlzuYi/0q/XeUCN+4uuwxWt6vF6qIiBPNd4ZLdRw7bK/99u4aVkehUTxIY91fR51vnfQTog2tqEbg48aNsjRXuQaZ9ztPB2g9iEYu7fn4=
+	t=1717401235; cv=none; b=uM24V2Le5uVxS2oFX3/oQbsYwd2pnvsMMZ2b9xkIWgkn8fZtP3rGYf9gr7TmRGWac2285+byGm8k0bicQ/jTiC9Oq9atBS//VmeR0KlpyQcavs2hUkNUowfrAIa+vXWqgIrrDlpNb6Zvmn4zoOQ4KISQ/PX3bLm5Fy6wFRVV+m0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717401216; c=relaxed/simple;
-	bh=OUw0iTREKZQj9XWGrzozbBwR9IvvahgQX/H3qNpX+30=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q04bvMSff5Pn1EddhDR49Vj7Mzw67c+iBJoWsmrjs2iXYFTO05/gbsRVihEC4cEcG4LSPWQIeG+1Tco5kYT5Bqa4I5lMvPuplxxhIEVINOP4istR8q461j4XRozEDz9E50bxHKOWBx+gxvWh1lJt8I6yT9rULVLqBZofMQ7gpzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hCyDg4K+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FCBDC2BD10;
-	Mon,  3 Jun 2024 07:53:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717401214;
-	bh=OUw0iTREKZQj9XWGrzozbBwR9IvvahgQX/H3qNpX+30=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hCyDg4K+s+YOv1rXqx6PJ/1ogPkktiLka+s+ESRulIXfPVJvJCg+oIOAtIU76653s
-	 SO9izDFlA9/et8Q6ARwZEJU6qqyDTbCGK0Uok6g4VaDAn1WDgkyu5hSkIRfLnyQ6jx
-	 tJK9O4wmzdR/FscB5aEXnftXdtY4HDTnTsegIbG6CJKHRh2/Niksdu7E+Bz1RHJwU+
-	 xC+PhOzUY2WNXEkTsZMBrQO6COGAWiO0WJY78RZdWTJ9CQO79Fjc71dvAtzXhfCZbo
-	 JgX3z08KIGy93itwvXknbYuIQxunr4aRCfvUPE5CJx4BaiTBeL8U2KxOulcHmFFje9
-	 lthsgFK2b/W1w==
-Date: Mon, 3 Jun 2024 09:53:31 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Sunil Kovvuri Goutham <sgoutham@marvell.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"nbd@nbd.name" <nbd@nbd.name>,
-	"lorenzo.bianconi83@gmail.com" <lorenzo.bianconi83@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"conor@kernel.org" <conor@kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"upstream@airoha.com" <upstream@airoha.com>,
-	"angelogioacchino.delregno@collabora.com" <angelogioacchino.delregno@collabora.com>,
-	"benjamin.larsson@genexis.eu" <benjamin.larsson@genexis.eu>
-Subject: Re: [EXTERNAL] [PATCH net-next 3/3] net: airoha: Introduce ethernet
- support for EN7581 SoC
-Message-ID: <Zl12e1LjSqf-M7cb@lore-desk>
-References: <cover.1717150593.git.lorenzo@kernel.org>
- <4d63e7706ef7ae12aade49e41bb6d0bb6b429706.1717150593.git.lorenzo@kernel.org>
- <BY3PR18MB4737F74D6674C04CAFDCD9C9C6FF2@BY3PR18MB4737.namprd18.prod.outlook.com>
+	s=arc-20240116; t=1717401235; c=relaxed/simple;
+	bh=tMA0PLVEVwuXNqcMFfJ3pL550AbyLmJTaj1FeqlHJ60=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e8hQCb8y4s3CPEYP+iBPMOGsucE0Cb4Z5C7Yqb+LAHIpem9OWr7D2H/iUoPFxyhvREzo3ughzG4yPJ4CW4fwjGmco0VsRh5TVLC7BevRgrvQe6jEUJX9mU6i0K5sw93TZGFlRzgseiMDfNDQnS7YAnEltvrbJv2F6QkNqp4lnlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com; spf=pass smtp.mailfrom=savoirfairelinux.com; dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b=r3XkzYpL; arc=none smtp.client-ip=208.88.110.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=savoirfairelinux.com
+Received: from localhost (localhost [127.0.0.1])
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id B1FA19C5763;
+	Mon,  3 Jun 2024 03:53:43 -0400 (EDT)
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+ by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id 6sZYtQQ032Tu; Mon,  3 Jun 2024 03:53:42 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id BF1AA9C590D;
+	Mon,  3 Jun 2024 03:53:42 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.savoirfairelinux.com BF1AA9C590D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=savoirfairelinux.com; s=DFC430D2-D198-11EC-948E-34200CB392D2;
+	t=1717401222; bh=QGSouRqOjqHsO//WD6mtds2J+tveNEzXkUmSdNQpnNA=;
+	h=Message-ID:Date:MIME-Version:To:From;
+	b=r3XkzYpLp1ddA8A7h1MMZMWP8RWtFjTCensjqmdYXvq3hF6LK2uG6g89UTlFt5iqd
+	 /fI3/w39xbjijV5oUTMEi5Aub9JR8EN7jBhFGPC6sBQFNqhYwVQqTuIJTIajzk3xo3
+	 PwHnz/0Mjg/Z+OEuNed/dqc3cFJGgjTnl7sqqAfUiUpivbxYe4JFhB3A9SA9P/G0Fx
+	 l1bHCS8qUjVeHsSalWoVZ3MrL3ufBZRIxKe9oRBu/UEipNF8k3yyUvNPZ3qNShzMkm
+	 T/WyNYZyxSjA8uYh/eqta3fHBuIjeKpy1OKgf8zI7F2cQQ0voolksKTP9jFdDgGSq5
+	 DuGqewnLQTFIQ==
+X-Virus-Scanned: amavis at mail.savoirfairelinux.com
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+ by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id 0wl_ASQMgV_H; Mon,  3 Jun 2024 03:53:42 -0400 (EDT)
+Received: from [192.168.216.123] (lmontsouris-657-1-69-118.w80-15.abo.wanadoo.fr [80.15.101.118])
+	by mail.savoirfairelinux.com (Postfix) with ESMTPSA id CC57A9C5763;
+	Mon,  3 Jun 2024 03:53:41 -0400 (EDT)
+Message-ID: <3f9457f0-b71a-4f45-a045-65e02cd00af0@savoirfairelinux.com>
+Date: Mon, 3 Jun 2024 09:53:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="My9euhtWkGFeYwU6"
-Content-Disposition: inline
-In-Reply-To: <BY3PR18MB4737F74D6674C04CAFDCD9C9C6FF2@BY3PR18MB4737.namprd18.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4 1/5] net: phy: micrel: add Microchip KSZ 9897
+ Switch PHY support
+To: Tristram.Ha@microchip.com
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ Woojung.Huh@microchip.com, UNGLinuxDriver@microchip.com,
+ netdev@vger.kernel.org
+References: <20240530102436.226189-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+ <20240531142430.678198-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+ <20240531142430.678198-2-enguerrand.de-ribaucourt@savoirfairelinux.com>
+ <BYAPR11MB35582B2BF1C72C8237E96C43ECFC2@BYAPR11MB3558.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+In-Reply-To: <BYAPR11MB35582B2BF1C72C8237E96C43ECFC2@BYAPR11MB3558.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
---My9euhtWkGFeYwU6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
->=20
->=20
-> >-----Original Message-----
-> >From: Lorenzo Bianconi <lorenzo@kernel.org>
-> >Sent: Friday, May 31, 2024 3:52 PM
-> >To: netdev@vger.kernel.org
-> >Cc: nbd@nbd.name; lorenzo.bianconi83@gmail.com; davem@davemloft.net;
-> >edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
-> >conor@kernel.org; linux-arm-kernel@lists.infradead.org; robh+dt@kernel.o=
-rg;
-> >krzysztof.kozlowski+dt@linaro.org; conor+dt@kernel.org;
-> >devicetree@vger.kernel.org; catalin.marinas@arm.com; will@kernel.org;
-> >upstream@airoha.com; angelogioacchino.delregno@collabora.com;
-> >benjamin.larsson@genexis.eu
-> >Subject: [EXTERNAL] [PATCH net-next 3/3] net: airoha: Introduce ethernet
-> >support for EN7581 SoC
-> >
-> >Prioritize security for external emails: Confirm sender and content safe=
-ty before
-> >clicking links or opening attachments
-> >
-> >----------------------------------------------------------------------
-> >Add airoha_eth driver in order to introduce ethernet support for
-> >Airoha EN7581 SoC available on EN7581 development board (en7581-evb).
-> >en7581-evb networking architecture is composed by airoha_eth as mac
-> >controller (cpu port) and a mt7530 dsa based switch.
-> >EN7581 mac controller is mainly composed by Frame Engine (FE) and
-> >QoS-DMA (QDMA) modules. FE is used for traffic offloading (just basic
-> >functionalities are supported now) while QDMA is used for DMA operation
-> >and QOS functionalities between mac layer and the dsa switch (hw QoS is
-> >not available yet and it will be added in the future).
-> >Currently only hw lan features are available, hw wan will be added with
-> >subsequent patches.
-> >
-> >Tested-by: Benjamin Larsson <benjamin.larsson@genexis.eu>
-> >Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> >---
-> ......
-> >+
-> >+static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
-> >+{
-> >+	struct airoha_eth *eth =3D q->eth;
-> >+	struct device *dev =3D eth->net_dev->dev.parent;
-> >+	int done =3D 0, qid =3D q - &eth->q_rx[0];
-> >+
-> >+	spin_lock_bh(&q->lock);
->=20
-> There is one napi per queue, why lock ?
+On 31/05/2024 21:39, Tristram.Ha@microchip.com wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+>> Sent: Friday, May 31, 2024 7:24 AM
+>> diff --git a/include/linux/micrel_phy.h b/include/linux/micrel_phy.h
+>> index 591bf5b5e8dc..81cc16dc2ddf 100644
+>> --- a/include/linux/micrel_phy.h
+>> +++ b/include/linux/micrel_phy.h
+>> @@ -39,6 +39,10 @@
+>>   #define PHY_ID_KSZ87XX         0x00221550
+>>
+>>   #define        PHY_ID_KSZ9477          0x00221631
+>> +/* Pseudo ID to specify in compatible field of device tree.
+>> + * Otherwise the device reports the same ID as KSZ8081 on CPU ports.
+>> + */
+>> +#define        PHY_ID_KSZ9897          0x002217ff
+>>
+> 
+> I am curious about this KSZ9897 device.  Can you point out its product
+> page on Microchip website?
+> 
+> KSZ9897 is typically referred to the KSZ9897 switch family, which
+> contains KSZ9897, KSZ9896, KSZ9567, KSZ8567, KSZ9477 and some others.
+> 
+> I am not aware that KSZ9897 has MDIO access.  The switch is only accessed
+> through I2C and SPI and proprietary IBA.
+> 
+> It seems the only function is just to report link so a fixed PHY should
+> be adequate in this situation.
+> 
+> MDIO only mode is present in KSZ8863/KSZ8873 switches.  I do not know
+> useful to use such mode in KSZ9897.
+> 
 
-we can get rid of it for rx queues (I will do in v2) but not for xmit ones
-since airoha_qdma_tx_napi_poll() can run in parallel with airoha_dev_xmit()
+I'm using the KSZ9897R from this page:
+  - https://www.microchip.com/en-us/product/ksz9897
 
->=20
-> ...........................
-> >+
-> >+	q =3D &eth->q_tx[qid];
-> >+	spin_lock_bh(&q->lock);
->=20
-> Same here, is this lock needed ?
-> If yes, can you please elaborate why.
+My CPU (i.MX6ULL) is connected to the CPU port 6 in RMII, listed in "Two 
+Configurable External MAC Ports" with RGMII. This is for network 
+connectivity with the switch, while I'm using SPI for DSA control. 
+FIGURE 2-1 illustrates that architecture. However, this MDIO interface 
+is indeed missing some documentation. For instance, it's phy_id is never 
+listed (Section 5.2.2.3 only for ports 1-5).
 
-ndo_start_xmit callback can run in parallel with airoha_qdma_tx_napi_poll()
+I use a fixed-link property in the device tree, but the link would never 
+come up if I use the KSZ8081 PHY driver which was selected without these 
+patches because it emits the same phy_id as port 6. The genphy and 
+KSZ9477 PHY dirvers were no better. I found out that the KSZ8873MLL 
+driver was compatible though, which seems to make sense given your 
+explanation.
 
->=20
-> >+
-> >+	if (q->queued + nr_frags > q->ndesc) {
-> >+		/* not enough space in the queue */
-> >+		spin_unlock_bh(&q->lock);
-> >+		return NETDEV_TX_BUSY;
-> >+	}
-> >+
->=20
-> I do not see netif_set_tso_max_segs() being set, so HW doesn't have any l=
-imit wrt
-> number of TSO segs and number of fragments in skb, is it ??
-
-I do not think there is any specific limitation for it
-
->=20
-> ...........
-> >+static int airoha_probe(struct platform_device *pdev)
-> >+{
-> >+	struct device_node *np =3D pdev->dev.of_node;
-> >+	struct net_device *dev;
-> >+	struct airoha_eth *eth;
-> >+	int err;
-> >+
-> >+	dev =3D devm_alloc_etherdev_mqs(&pdev->dev, sizeof(*eth),
-> >+				      AIROHA_NUM_TX_RING,
-> >AIROHA_NUM_RX_RING);
->=20
-> Always 32 queues, even if kernel is booted with less number cores ?
-
-ethtool is not supported yet, I will add it with followup patches
-
->=20
->=20
-> Overall this is a big patch deserving to be split, probably separate patc=
-hes for init and datapath logic.
-
-I guess specific parts (initialization, tx or rx code) are not big enough t=
-o deserve a dedicated patches.
-
-> Also I do not see basic functionality like BQL not being supported, is th=
-at intentional ?
-
-ack, I will add it in v2.
-
-Regards,
-Lorenzo
-
->=20
-> Thanks,
-> Sunil.
->=20
-
---My9euhtWkGFeYwU6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZl12ewAKCRA6cBh0uS2t
-rDRAAP46ZBEFk+YyM7J9tirrICqDRyz7T2FO1kdVLyt4hVV4mAEAq0e8JL55GKq2
-Jtv3riDZQdk6AuvSpeUQMxthGrcSeQM=
-=vlvP
------END PGP SIGNATURE-----
-
---My9euhtWkGFeYwU6--
+-- 
+Savoir-faire Linux
+Enguerrand de Ribaucourt
 
