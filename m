@@ -1,97 +1,132 @@
-Return-Path: <netdev+bounces-100051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C3A8D7B0B
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 07:45:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BDAB8D7B14
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 07:51:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAAFF1F2104D
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 05:45:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A85C1F21674
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 05:51:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0069B1D54D;
-	Mon,  3 Jun 2024 05:45:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018C520DD3;
+	Mon,  3 Jun 2024 05:51:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="p0YOH0Lu"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="JFMU//xg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4489320332
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 05:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149491D54D;
+	Mon,  3 Jun 2024 05:51:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717393529; cv=none; b=NL3i92AF74CBxxHybuqZSfuTL6tCJzzKDzCFLv5e41ol9FTCnMxTZeZsNDJcs2zIrseCY18NdN4m5wkbvCJlhUxL6war9o53E6/ydoYQOlTK3g5iBYwvSOcvyMjnVRlE9AHp+FCCVGqnwDUmEfOtKOOJyi5L8vSVNaRIDwKWKbw=
+	t=1717393864; cv=none; b=H8hyeiC9t9AMlnX+MPD+N32/MYJ1jtwe4/jKCRNbs66HkJvVbDNtx94q7zGJINIFjKyOZrdGMfMozqwhLkk0O6Z2Sa9hqQ2SfvBMO4Az8yQyvPRB/xaJ93JpZ4KE64Thl2bbjJF452oNwKTaYiel+g5/WG5n6RTtfq0ImQRM60k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717393529; c=relaxed/simple;
-	bh=KPKnGVWpVEgc8Gqrz6vUCSmBzBxFm4nIZ4pPK59St6g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LB4pUkyY4+NNR7nBivIXd14kLDRP38kDSjUAgDiwGymeGJA0zc6WTymPO3a9VnqQr6BbNgrgkphYl1mFjgEr2ZtH2vePiIB01oEs9bTpmarpGZ0wHTP81BK/Kf3RUOZPFLAIDqOSno7ZgE5X9trdIZQPa+DiNB32UFR6yBiUPP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=p0YOH0Lu; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-52b992fd796so732485e87.0
-        for <netdev@vger.kernel.org>; Sun, 02 Jun 2024 22:45:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gooddata.com; s=google; t=1717393526; x=1717998326; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=KPKnGVWpVEgc8Gqrz6vUCSmBzBxFm4nIZ4pPK59St6g=;
-        b=p0YOH0LuE2OuJi073TF7Gj9esDmLkARjW7aOwK2HOOj4WbAansk1wkIxE2XwCOgfXN
-         cqyg7SNAjR4oZ8pHHD1Bqk4BdmRkPqT39pOSAIFaTwGEuvGTtVbnA8N2g30P6Jn/5QBQ
-         FIYT/diKIpTbJqI1d3rEH1vBBrXnOA7oGG+Es=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717393526; x=1717998326;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KPKnGVWpVEgc8Gqrz6vUCSmBzBxFm4nIZ4pPK59St6g=;
-        b=JgGBFxEe7n9fLSfRbnwQt3LjFsBX92L/BUv3xKOubhPDrN2vTUm53bSynKbzA5QlHp
-         ak0t4tvVH7byZBsEZI3GVauT8P3zAco/H4pvXoqgQOAGQy2J64CIbYAv8wpBFDTeBYwf
-         W/stCI0nNcrtjKwzBSlmE8TvG8gXqJI2dJuLg8o8Tp0l7e/IhNymdQGkzXEoewylpf04
-         ZKZUcYqdjsIgqmafYwr9LdYFtNVUMchAtV/fkS5KDYPGME1KdE4g5PutkV/kC95epK2X
-         joUbfADNY1GgBRU7dpL/zQp8ipkrIKg0RQLzXvOmrb8rdI1IsQfmLPCnCEMxX/XVW0Fy
-         MUjA==
-X-Gm-Message-State: AOJu0YzaDIkZnwwLZPD6z2J3ON12/s5INjKovLKNcznRPWp5bVUucvsU
-	s+SDPYItBXUVQP1KC7DD+gbN86fcztIGo4bEFD2W+X/FOWRm7g9JgpSSaG75+SklzFSL+9be34I
-	tgKC8Q3njssqfHMYRZYaGor+WXwunjDIbqMbX
-X-Google-Smtp-Source: AGHT+IFLL8MSI6WbUVQvroJz9ejvgZ+bu2gKUkZlbIX2qORoPKcEcJAZrK0WBmalEY0GvU9nhfg4Hl/xK3cckpZbz0M=
-X-Received: by 2002:a05:6512:2029:b0:52b:8455:a9df with SMTP id
- 2adb3069b0e04-52b896b8210mr4500387e87.34.1717393526215; Sun, 02 Jun 2024
- 22:45:26 -0700 (PDT)
+	s=arc-20240116; t=1717393864; c=relaxed/simple;
+	bh=uMGsc/61hNRADrGZxVf65rV7HllHnrDixdPpmqNacpo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=lPKyvEaIBFJ/A+mFANCktERqW9CdUYlhQ1I5Klv0mojM5j9aR9zUfxSPt81B4hkvOR5pZCXGzAVHm2ebN96vzWCjoni3V8iBT5K34JxxXPmw0n5EttGTfznGR7+hLMmEHMz97m7vlBjAJY1+SPi/AOAchX9mF+kP+YDLVbzseb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=JFMU//xg; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4535od7V062866;
+	Mon, 3 Jun 2024 00:50:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1717393839;
+	bh=4tezTvsBvS4XRAl+qfRmXNgQcdSrlJtF1XHxBZw/4Z4=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=JFMU//xgHgVbiE70uXVZuWTLXrRckm1+rqfAdYa3wATSizRfIYChEBs95Peym077f
+	 uGTvoHkeZ+3iBtWOR93Z/aeUCWpPOHDHJSoIUvPv5QxkSACWIwgAChZ4ApHHfmDEI4
+	 OCzecYIxdwiKh7d4Uo2yqw8djrYiNZSPU3sP4Icw=
+Received: from DLEE112.ent.ti.com (dlee112.ent.ti.com [157.170.170.23])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4535odk3008598
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 3 Jun 2024 00:50:39 -0500
+Received: from DLEE103.ent.ti.com (157.170.170.33) by DLEE112.ent.ti.com
+ (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 3
+ Jun 2024 00:50:39 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE103.ent.ti.com
+ (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 3 Jun 2024 00:50:39 -0500
+Received: from [172.24.227.57] (linux-team-01.dhcp.ti.com [172.24.227.57])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4535oYBB004880;
+	Mon, 3 Jun 2024 00:50:35 -0500
+Message-ID: <dbb10d47-bc9c-4180-a063-bd51ba0d214c@ti.com>
+Date: Mon, 3 Jun 2024 11:20:33 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAK8fFZ7MKoFSEzMBDAOjoUt+vTZRRQgLDNXEOfdCCXSoXXKE0g@mail.gmail.com>
- <20240530173324.378acb1f@kernel.org> <CAK8fFZ6nEFcfr8VpBJTo_cRwk6UX0Kr97xuq6NhxyvfYFZ1Awg@mail.gmail.com>
- <20240531142607.5123c3f0@kernel.org> <CAK8fFZ5ED9-m12KDbEeipjN0ZkZZo5Bdb3=+8KWJ=35zUHNCpA@mail.gmail.com>
- <20240601142527.475cdc0f@kernel.org> <CAK8fFZ76h79N76D+OJe6nbvnLA7Bsx_bdpvjP2j=_a5aEzgw-g@mail.gmail.com>
- <20240602145654.296f62e4@kernel.org>
-In-Reply-To: <20240602145654.296f62e4@kernel.org>
-From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Date: Mon, 3 Jun 2024 07:44:59 +0200
-Message-ID: <CAK8fFZ5S24+YqsTW0ZWCOU++ADzffovpty4pd0ZAVEba1RBotA@mail.gmail.com>
-Subject: Re: [regresion] Dell's OMSA Systems Management Data Engine stuck
- after update from 6.8.y to 6.9.y (with bisecting)
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Igor Raits <igor@gooddata.com>, 
-	Daniel Secik <daniel.secik@gooddata.com>, Zdenek Pesek <zdenek.pesek@gooddata.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/3] net: ethernet: ti: RPMsg based shared
+ memory ethernet driver
+To: Randy Dunlap <rdunlap@infradead.org>, <schnelle@linux.ibm.com>,
+        <wsa+renesas@sang-engineering.com>, <diogo.ivo@siemens.com>,
+        <horms@kernel.org>, <vigneshr@ti.com>, <rogerq@ti.com>,
+        <danishanwar@ti.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
+        <edumazet@google.com>, <davem@davemloft.net>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <srk@ti.com>,
+        <rogerq@kernel.org>
+References: <20240531064006.1223417-1-y-mallik@ti.com>
+ <20240531064006.1223417-2-y-mallik@ti.com>
+ <98b1a3a4-5db8-4b69-9e3e-99f2dadf1b43@infradead.org>
+Content-Language: en-US
+From: Yojana Mallik <y-mallik@ti.com>
+In-Reply-To: <98b1a3a4-5db8-4b69-9e3e-99f2dadf1b43@infradead.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
+
+
+On 5/31/24 21:00, Randy Dunlap wrote:
+> 
+> 
+> On 5/30/24 11:40 PM, Yojana Mallik wrote:
+>> diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
+>> index 1729eb0e0b41..4f00cb8fe9f1 100644
+>> --- a/drivers/net/ethernet/ti/Kconfig
+>> +++ b/drivers/net/ethernet/ti/Kconfig
+>> @@ -145,6 +145,15 @@ config TI_AM65_CPSW_QOS
+>>   	  The EST scheduler runs on CPTS and the TAS/EST schedule is
+>>   	  updated in the Fetch RAM memory of the CPSW.
+>>   
+>> +config TI_K3_INTERCORE_VIRT_ETH
+>> +	tristate "TI K3 Intercore Virtual Ethernet driver"
+>> +	help
+>> +	  This driver provides intercore virtual ethernet driver
+>> +	  capability.Intercore Virtual Ethernet driver is modelled as
+> 
+> 	  capability. Intercore
+
+I will fix this.
+
+> 
+>> +	  a RPMsg based shared memory ethernet driver for network traffic
+> 
+> 	  a RPMsg-based
+> 
+
+I will fix this.
+
+>> +	  tunnelling between heterogeneous processors Cortex A and Cortex R
+>> +	  used in TI's K3 SoCs.
+> 
+> 
+> OK, the darned British spellings can stay. ;)
+> (the double-l words)
 >
-> On Sun, 2 Jun 2024 07:35:16 +0200 Jaroslav Pulchart wrote:
-> > > Ugh, same thing, I didn't test properly.
-> > > I tested now and sent a full patch.
-> >
-> > I built the kernel with the new patch but still do not works but we
-> > might hit another issue (strace is different): See attached strace.log
->
-> Thanks, added that one and sent v2.
 
+I will fix this. Thankyou for pointing out the errors.
 
-Great! With v2 it WORKS! Thank you
+Regards,
+Yojana Mallik
+
 
