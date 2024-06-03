@@ -1,118 +1,94 @@
-Return-Path: <netdev+bounces-100138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DAEB8D7F36
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 11:46:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B0C68D7F12
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 11:43:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B712284B14
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:46:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9404285BC7
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E321292E4;
-	Mon,  3 Jun 2024 09:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="EJ61GY7M"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ECFA84D0D;
+	Mon,  3 Jun 2024 09:37:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE8B84FD8;
-	Mon,  3 Jun 2024 09:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D71484A4C
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 09:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717407632; cv=none; b=M3iW45BqTi6pwt2iRVxz1ZLBs4CarQZp72eJa+s5r84/I0p4fe40fDCnel3eYR3i0fyuNvGLHa3P1e9MAXIn7bb46XySjtXustfCKT9XxduPkHJr606XyFHijYr+rSjCuYk+Y4NPGQVOrIUwvGDAhV9h+YwA523SSRIWg7fBmiQ=
+	t=1717407446; cv=none; b=BOIqYSe6IriXFGRwLOdTt5MiPxTQkq+JPnE+8xyDXsd1fAFZlPC5lLEiEXHvpUEXAb9VVulu5ubkyXCSE9KOpWIBDqr0zuvt86Nc3snpQbIwL1iAoT9ejsYRyu6xc5YBrZqp/JpBtEkK72hWfhHgbkhVfD156HCl33pQuT9M/wY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717407632; c=relaxed/simple;
-	bh=oVDr4kqufAv/dxzz5Lxq0u/Ascj3+Nvd6O3eZYaIXi4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DKzkhEnMlebmBVJQ9G5Oj5rCk+kNf8VvUW9bQJxCfHa/HG6vr5tm/3Gmdx9BuqmBGaTixV6+bU9K51mikxXI+wnx8B7FxtFe3fodVilJdm8Qj92ddL1Uz2BzJ3+WL/sIFcPkQTxBfrsPWia8ALxBX/Gr96R/YgZ9c/nHq/4/vEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=EJ61GY7M; arc=none smtp.client-ip=78.47.171.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
-Received: from [192.168.2.51] (unknown [45.118.184.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id D8BCDC063F;
-	Mon,  3 Jun 2024 11:33:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1717407209;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3nWKy6AKKd5kBCqS4Y/8g3wOqFQkOvvYM77V/sj1yk4=;
-	b=EJ61GY7Mjdnz4zlqQCfRKO0kKsMMgfxuNIV77s8WH2+buDVSdhFI9jBEksT4vaHhzgSTU8
-	M+CCD72vV+LLeHk90K2xcf9/Uo8oLScKiaU5d9QPJBDMPymDXjhbQcEYUpVgKM2ejD8wnK
-	+cS2KGFGquZtu1UrFPmviX332DzaRqpyRU5d77CgkL+H5T/h498dQ34qQrmVBm2YP9Ce1s
-	5LGnkbhY3ElztedPf86I09ypKV1JoGl3C6U93c3YGz7GxHV9dn6fsj4hns8retU3z3gc07
-	FYpZOvZohcH1Y3+vGTu5X6oS586w68ltei+5vdJLK3oGQvAhEJLFGlFighqv1g==
-Message-ID: <41e4b0e3-ecc0-43ca-a6cd-4a6beb0ceb8f@datenfreihafen.org>
-Date: Mon, 3 Jun 2024 11:33:28 +0200
+	s=arc-20240116; t=1717407446; c=relaxed/simple;
+	bh=jLXL6yoOAXB9948xB5BgPgh9JjDORCujSpegEBlbC6Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YBXT+QCeVhbD3gNqfDPqnMOh9ZBHtI+i8+A7KkymM3JKBUWSSGCCjUyq5DysAnpLgiBFzAM5KrCTgkSCd8edtLrJJfwucBqp0ITf2KKaUffuCvm7dHnB2JCpZmRtxmVGLa/Oo+/r+B7AEPhYoiYRh/wWxW1MW1J6uz/+gm3oFqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1sE480-00012Z-6l; Mon, 03 Jun 2024 11:37:20 +0200
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	mleitner@redhat.com,
+	juri.lelli@redhat.com,
+	vschneid@redhat.com,
+	tglozar@redhat.com,
+	dsahern@kernel.org,
+	bigeasy@linutronix.de,
+	tglx@linutronix.de
+Subject: [PATCH net-next v6 0/3] net: tcp: un-pin tw timer
+Date: Mon,  3 Jun 2024 11:36:09 +0200
+Message-ID: <20240603093625.4055-1-fw@strlen.de>
+X-Mailer: git-send-email 2.44.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: mac802154: Fix racy device stats updates by
- DEV_STATS_INC() and DEV_STATS_ADD()
-To: Yunshui Jiang <jiangyunshui@kylinos.cn>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-wpan@vger.kernel.org
-Cc: alex.aring@gmail.com, miquel.raynal@bootlin.com, davem@davemloft.net
-References: <20240531080739.2608969-1-jiangyunshui@kylinos.cn>
-Content-Language: en-US
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20240531080739.2608969-1-jiangyunshui@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hello.
+This is v6 of the series where the tw_timer is un-pinned to get rid of
+interferences in isolated CPUs setups.
 
-On 31.05.24 10:07, Yunshui Jiang wrote:
-> mac802154 devices update their dev->stats fields locklessly. Therefore
-> these counters should be updated atomically. Adopt SMP safe DEV_STATS_INC()
-> and DEV_STATS_ADD() to achieve this.
-> 
-> Signed-off-by: Yunshui Jiang <jiangyunshui@kylinos.cn>
-> ---
->   net/mac802154/tx.c | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-> index 2a6f1ed763c9..6fbed5bb5c3e 100644
-> --- a/net/mac802154/tx.c
-> +++ b/net/mac802154/tx.c
-> @@ -34,8 +34,8 @@ void ieee802154_xmit_sync_worker(struct work_struct *work)
->   	if (res)
->   		goto err_tx;
->   
-> -	dev->stats.tx_packets++;
-> -	dev->stats.tx_bytes += skb->len;
-> +	DEV_STATS_INC(dev, tx_packets);
-> +	DEV_STATS_ADD(dev, tx_bytes, skb->len);
->   
->   	ieee802154_xmit_complete(&local->hw, skb, false);
->   
-> @@ -90,8 +90,8 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
->   		if (ret)
->   			goto err_wake_netif_queue;
->   
-> -		dev->stats.tx_packets++;
-> -		dev->stats.tx_bytes += len;
-> +		DEV_STATS_INC(dev, tx_packets);
-> +		DEV_STATS_ADD(dev, tx_bytes, len);
->   	} else {
->   		local->tx_skb = skb;
->   		queue_work(local->workqueue, &local->sync_tx_work);
+First patch makes necessary preparations, existing code relies on
+TIMER_PINNED to avoid races.
 
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
+Second patch un-pins the TW timer. Could be folded into the first one,
+but it might help wrt. bisection.
 
-regards
-Stefan Schmidt
+Third patch is a minor cleanup to move a helper from .h to the only
+remaining compilation unit.
+
+Tested with iperf3 and stress-ng socket mode.
+
+Changes since previous iteration:
+ - do not use work queues, keep timers as-is
+ - use timer_shutdown (can't wait for timer with spinlock held)
+ - keep existing tw sk refcount (3)
+
+Florian Westphal (2):
+  net: tcp: un-pin the tw_timer
+  tcp: move inet_twsk_schedule helper out of header
+
+Valentin Schneider (1):
+  net: tcp/dcpp: prepare for tw_timer un-pinning
+
+ include/net/inet_timewait_sock.h | 11 ++---
+ net/dccp/minisocks.c             |  3 +-
+ net/ipv4/inet_timewait_sock.c    | 81 +++++++++++++++++++++++++++-----
+ net/ipv4/tcp_minisocks.c         |  3 +-
+ 4 files changed, 74 insertions(+), 24 deletions(-)
+
+-- 
+2.44.2
+
 
