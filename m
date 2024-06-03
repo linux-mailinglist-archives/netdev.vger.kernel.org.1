@@ -1,130 +1,102 @@
-Return-Path: <netdev+bounces-100303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72FE58D8748
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 18:27:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6646E8D8756
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 18:32:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 211B11F21BDC
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 16:27:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2162F2895F1
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 16:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079D013665A;
-	Mon,  3 Jun 2024 16:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02FD512FF76;
+	Mon,  3 Jun 2024 16:32:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XTDQCUZ7"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Klhwk9nl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0ADB132134;
-	Mon,  3 Jun 2024 16:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2CE6A031
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 16:32:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717432072; cv=none; b=fHfa9D5SnfamtRjxlaQtTaVIvqi6zDjsq3qx6yseItXeAizt2r3H7+qHNnVHBnfu6XWOBm7DGzJobLhL40UgsDrtdheglEBcDFnO3EB5N45yRzo7qLR90BHmEN8cKJENGJqLsuAUWldGupQiE3tmmSxSdyugn3tEnzQwSuyW9pc=
+	t=1717432361; cv=none; b=bgRztW9ufLj8ojbP+Vx4K0AgV2QfVrWqA71lRdzwHxd/6DTJ3nKEhWvLX7zLfx9ijF5+dpAq5QwieCTcVIXd+nieIpgIKO8TkFdn7e3rB2SqONCTeVfvlDfr1EXM9sFv9xANy1adN/xt7nBrh1M1lrpDEt0Nr/ZEWV6Gqz3IHjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717432072; c=relaxed/simple;
-	bh=oRnkuVfmEo68h8xsojH0l6YCZM7vKTDbSA9MjVX8lcI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UkAUgo4ChS62jfRRc0Il/QszXYDEKcSLFn4j/vz1tCRA5DOU/FudeZKXOq+c6bUG92/suswTOTiPz6IvYKNYCWrK8Y3e4zAHaJEVQuof/G5VSNYFt80q4b4uKHLYYM4YeUsFlQZBbBfuAVi8TdKPsyE5fo/XvJsYZB0vmbwYWls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XTDQCUZ7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94A0DC2BD10;
-	Mon,  3 Jun 2024 16:27:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717432072;
-	bh=oRnkuVfmEo68h8xsojH0l6YCZM7vKTDbSA9MjVX8lcI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XTDQCUZ72bRlkxaGtCsAqytSxIUqNNsLDD45miaFV68weGEv3pg0ZBst7gtAFNIHg
-	 zItZc18cuDfFBVyrhoFztU2cZCGIWsYIvFgCm3YdtCqJJawZ7JI/Rcfw6x4j2IZuNm
-	 wwJJnVm1re9PVNhckzmO4qN+yp2hxSTVPI17Q40/w4gqcKB0pn1NhpOIhIbwfXZjFQ
-	 gn+dAf2KAveEpqKNb2RKKaxGVKty3ReE8eF2T8HVjYENoq4KpNogOFm0XQ+8Lrd6xP
-	 UG/I+9/1iOTdEh21gPaiAwQKeyuOEKiy2a32p5eL1hmUC05Z/BUe9Seec1FGNDQq4x
-	 0f06xk90PpiYg==
-Date: Mon, 3 Jun 2024 17:27:43 +0100
-From: Mark Brown <broonie@kernel.org>
-To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jakub Kicinski <kuba@kernel.org>, Kees Cook <keescook@chromium.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Sasha Levin <sashal@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Shengyu Li <shengyu.li.evgeny@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Bagas Sanjaya <bagasdotme@gmail.com>,
-	Brendan Higgins <brendanhiggins@google.com>,
-	David Gow <davidgow@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
-	Jon Hunter <jonathanh@nvidia.com>, Ron Economos <re@w6rz.net>,
-	Ronald Warsow <rwarsow@gmx.de>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Will Drewry <wad@chromium.org>,
-	kernel test robot <oliver.sang@intel.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v7 04/10] selftests/harness: Fix interleaved scheduling
- leading to race conditions
-Message-ID: <187423fb-ec78-4318-9da0-5b27df62b71f@sirena.org.uk>
-References: <20240511171445.904356-1-mic@digikod.net>
- <20240511171445.904356-5-mic@digikod.net>
- <9341d4db-5e21-418c-bf9e-9ae2da7877e1@sirena.org.uk>
+	s=arc-20240116; t=1717432361; c=relaxed/simple;
+	bh=IqLqspOHTl8hgSiM2prJnhvO55WUO3JHIBjl0LsKXT0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d0/rr9TMngSkg84GrVGOeVeIbsLgnkiknuJPQBuM/zi/8WbaR5ShuWGbfbo2Pp161Klpm8ZPTux1OybICV6OULFSY4YafzqM619MdAWDGxXhX7C5iBUPXtrY19uqs9oARV5WtM9Mp34bU3rkhWLKl58CPi30HycN4k2eP3FCFWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Klhwk9nl; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1717432361; x=1748968361;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=0aTdtecEtokYI6tbmTy/VuHpW6bFvedj8rHlf72UyZY=;
+  b=Klhwk9nlUnrOayFGyeu2XVbs2x2g+a/9HY0zN9gJuJq+nK16DT/AdSR3
+   yu6s6sr4Hyl/ij9+4jgM7UWtelNRTCcmqt5IX+AdDWi5CFyVnmu8nsJOD
+   MkXI1h3XYd7KrVHuiQecpgdB8CvLhWuRKEVfAj2hcKuMIFEcsQb9/QEQE
+   8=;
+X-IronPort-AV: E=Sophos;i="6.08,212,1712620800"; 
+   d="scan'208";a="730126360"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2024 16:32:35 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:21409]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.35.105:2525] with esmtp (Farcaster)
+ id b8b1c8bf-8ed4-4709-a366-835eda28084c; Mon, 3 Jun 2024 16:32:17 +0000 (UTC)
+X-Farcaster-Flow-ID: b8b1c8bf-8ed4-4709-a366-835eda28084c
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Mon, 3 Jun 2024 16:32:17 +0000
+Received: from 88665a182662.ant.amazon.com (10.88.143.104) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 3 Jun 2024 16:32:14 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <xiyou.wangcong@gmail.com>
+CC: <cong.wang@bytedance.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v1 net 01/15] af_unix: Set sk->sk_state under unix_state_lock() for truly disconencted peer.
+Date: Mon, 3 Jun 2024 09:32:05 -0700
+Message-ID: <20240603163205.84412-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <Zl3utZZF/Sa7OnAj@pop-os.localdomain>
+References: <Zl3utZZF/Sa7OnAj@pop-os.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fOjdVNyedpGvq4UL"
-Content-Disposition: inline
-In-Reply-To: <9341d4db-5e21-418c-bf9e-9ae2da7877e1@sirena.org.uk>
-X-Cookie: Don't let your status become too quo!
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWC001.ant.amazon.com (10.13.139.233) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
+From: Cong Wang <xiyou.wangcong@gmail.com>
+Date: Mon, 3 Jun 2024 09:26:29 -0700
+> On Mon, Jun 03, 2024 at 07:32:17AM -0700, Kuniyuki Iwashima wrote:
+> > -		if (other != old_peer)
+> > +		if (other != old_peer) {
+> >  			unix_dgram_disconnected(sk, old_peer);
+> > +
+> > +			unix_state_lock(old_peer);
+> > +			if (!unix_peer(old_peer))
+> > +				WRITE_ONCE(old_peer->sk_state, TCP_CLOSE);
+> > +			unix_state_lock(old_peer);
+> 
+> lock() old_peer twice? Has it been tested? ;-)B
 
---fOjdVNyedpGvq4UL
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ugh, apparently no :S  (compile-test only)
 
-On Mon, May 27, 2024 at 08:07:40PM +0100, Mark Brown wrote:
-> On Sat, May 11, 2024 at 07:14:39PM +0200, Micka=EBl Sala=FCn wrote:
+Should've run the same command in the changelog.
+Will fix in v2.
 
-> > Fix a race condition when running several FIXTURE_TEARDOWN() managing
-> > the same resource.  This fixes a race condition in the Landlock file
-> > system tests when creating or unmounting the same directory.
->=20
-> > Using clone3() with CLONE_VFORK guarantees that the child and grandchild
-> > test processes are sequentially scheduled.  This is implemented with a
-> > new clone3_vfork() helper replacing the fork() call.
->=20
-> This is now in mainline and appears to be causing several tests (at
-> least the ptrace vmaccess global_attach test on arm64, possibly also
-> some of the epoll tests) that previously were timed out by the harness
-> to to hang instead.  A bisect seems to point at this patch in
-> particular, there was a bunch of discussion of the fallout of these
-> patches but I'm afraid I lost track of it, is there something in flight
-> for this?  -next is affected as well from the looks of it.
-
-FWIW I'm still seeing this on -rc2...
-
---fOjdVNyedpGvq4UL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZd7v4ACgkQJNaLcl1U
-h9AM+wf/ZmkJuaskXgcwXDXT1jI3wnrjvwPBo1nyTsX3wcmiDZXCGtR9qwuVn+XC
-0N4ICDlxmX4lBZ8v6GJhe1blCagYT9WHp5g6aVe5D/kAf7m0IJG+I8JgPWjjg0J+
-QIZ6vf4WjCml2ZpHWv/gB8ZAJeZyiRvpKlldLnZfrzJaGQFx4hhIj2G44jUa4T1y
-3yHEgwaZfeeAYa2jZ1sZYD74zrPceqOUF38syHzbT9OgKDbPxXtI4KKDjXwe/aTp
-6IOZMgeT5ivv0/47+PtodbX2QXl/5fSpQ/LOUW55xzIarOAhPx2EsfcBQW6RTaAv
-R7Vzezy0MyONRIEvmdT1iCjwnlZvDw==
-=tzUV
------END PGP SIGNATURE-----
-
---fOjdVNyedpGvq4UL--
+Thanks!
 
