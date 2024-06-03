@@ -1,78 +1,83 @@
-Return-Path: <netdev+bounces-100312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9608A8D87FD
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 19:32:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0EF98D8837
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 19:53:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B95991C220DC
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 17:32:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56E741F21D67
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 17:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D96913776A;
-	Mon,  3 Jun 2024 17:32:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3228137924;
+	Mon,  3 Jun 2024 17:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="JSGomEIi"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b="beEn81V5"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2058.outbound.protection.outlook.com [40.107.93.58])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2093.outbound.protection.outlook.com [40.107.237.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5FA1369A0
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 17:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7464420317;
+	Mon,  3 Jun 2024 17:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.93
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717435939; cv=fail; b=PmU5Upj3x88Lrg2WW+NXuB3ycFio9CfooMqWjm9z+FYKzIPJKQLnvZHXoRTFCWhGOd0yPSRHJyiH6T/RBWd/1Nu24PPVeFOazRyb4u182XrCsFkFGYTiousQVdnw3eE+PiEjmNVosawcpN62ZrN8GpIrfjArT2iNx3CnsD91tQI=
+	t=1717437217; cv=fail; b=XkV0nyN6qNqOOYoqYHNOUlJd1J0Ny2mMA2eyfWXm8mUY74lGUPvs52kXlBXEjhgNd42Wo0K38Bwq9MepKrsRFAbjvFUDkLpoZZ4L8bjyPZYoMdyV4d6+AI7xAiDRPvoRNDc0wAy3Y/f0qIFfPvlie+wLJOlbcnWxT6LlATxQqb0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717435939; c=relaxed/simple;
-	bh=2q8upj8FnabYdnbpSpGeb1SqHKKzlL6W1+Z5u4BRbck=;
+	s=arc-20240116; t=1717437217; c=relaxed/simple;
+	bh=4gMDzO1CK9LDm9El8tLLRrDDT3IICi9P+MnQWJQYUS8=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=uja7zBiBRocRWwnYmkYW+4U9nw1rDP+Y2usoDZ/JIs/KtRRCZxN6QYk3ldq2DxRhvJCgAMI+KCp5BFWB39wpR3S5lvUF25fKJR1TvTohLQ4bib3DbeeHvjdh3ZOb4Tvs2Kftgf039zIBiERVePZbpyp9GvOcUVBGvPkUn904SLM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=JSGomEIi; arc=fail smtp.client-ip=40.107.93.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	 Content-Type:MIME-Version; b=plS3vg/sq6dVn+PLVbh3oA/FbfJ6rI0zevjgvXk+2C15pXLAmRh7IXWwVLWMQl2lDHHbd+b+PI9aFA+IvwmzIdX/UQWpYG27v85C/2hw/quOWzS8vOi/4KorHGnfYrzqUy2zLZBzVx0T3ft/RkAoemJY1JOxE4Q1h5eA7dPWyL4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=fail (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b=beEn81V5 reason="key not found in DNS"; arc=fail smtp.client-ip=40.107.237.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kv/vivRBabr/dsPGiyG1dkTuUyiGLXwpWVGoYXICRXMGGO8sgaDv6jRxQkJpZxuu9NI6vyTMjeJwbn8Pbaq6gLnqb/No919Kdve16xr64rtr/WEOj2jqC4udqpZ8MG6uqVob6u6279p6LwJXYFgE/rP96FgzQzXbcun5h4b4RMAxG7AFar/cllq+8XWOcFD0uqmzyGpMdS+ZuWtp0TT2MjW6mZdI2k9pOMxChd/DJnQskH0FEq6LdynQGqEKsIdKc4jzinUaVMce4k3o/SWpg8XdaVNsX6STcr+0pZexqD9G9QHLb85OCd8ahvK0xshPmmHkKAoZ591v02Cv0PjbEQ==
+ b=evUudp6SZEHJrwF1PCqhYdoHlDBXgBzHZvGtvBu/OtoRJl37Vfl3FTVVCKapMsp5g2b+1oaSfKTypUKqn+GuPHsJ9q+aD+IgV8aYfQytH9xsg4EJiftIK5YkjYKAJKChYvOAdq6EPvdj9EIo22z+5gYOtWEXp7PcY5nUoQhUbMn6N2cEauxJoKWv+7UZL1kBfbi436kIiq3+P6r+87lXOqcEwr3y72QtYqykzO3yE1UoSyAn31yaRQJezmpAlZOlIDHqLzgKnJN7AfuIKcpZ2qwl4rcKgRQ1bbtVoPy/Zkg8QgKhPX1yaHGmrqhCosec7y0BjmaodwhyNzFIxdjQGQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Pqmx5c5s1fmTdvX7rNSy36Ya9+U8pWonIXoeX7jEH+A=;
- b=FS8ayamAt4f+CYekQwgsnGWkL1LrwtoprXZsO3VjN3tUvTI8mOpK30aRHMrZaeDRCgdJ10U2pl82fXDblDBttujaAYMujAaMhG8/cYXcpo9SQeFy6KDtKkH/kPajxQzqD42816h8qRr3Nxu4aVLX6VaGimKQIQxDbJ4pAij0mrngIDW0tPhWGsfUUO7HS09yw8C7PXAPtBGWDBFxJBKqJXXN2n7XBO1UB//0k0WAWuxzm7mScth7rSRhZENJU3zWMd8oL8klgdtlotjEXCLMyx1puMHNQ+YdZaPAQjA32nfS0SnIoVwkOVJcq8dZ1Iw55BsVuovFMz3L1wG8su3ccA==
+ bh=LmNGMD0Z2EqUHUkXNsv9+8hzOjbPO4plKDaDFkqxctI=;
+ b=kVu4n5w1jS2JBmY03LtPwZpDkzRTRVRqCNTDYoVYsnEj8qpaMjxUM8XZMEZuVcN/xlS9FcYmBZ7YuQPXPqjwwbO5uY9ZnRILTc1krIpJxGnVcbZSHi4V7TMk4mVsmG/IZbnvFf+BRZa/El7Un3GA1QgnIJ+82KarMUc3iuwfzmoO/gQrws9YFK0F7fZX7k+3kAfNNyBV6il48zoQ1rtgeOfkXfqrWuhqGXN0uQfWIQmXQ4b8mNMMPei2+VW09ftlErcSejsyd47ErogXIiNbuyDMqtNliYhr6Xf7hh/IYlDVXGAOMbuYzYp3XbOucMw3t5uB61RDwc4VmugYj9qkYQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=amperemail.onmicrosoft.com; dkim=pass
+ header.d=amperemail.onmicrosoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Pqmx5c5s1fmTdvX7rNSy36Ya9+U8pWonIXoeX7jEH+A=;
- b=JSGomEIiK/RZFc+pom8ktGaozqC14xKtX29ZDhL7wiJaHFavfWbyJZj++0jf0hmU4oyA8ArtwM5uLUFdQxoAGsWPrwnVKCsSJLfRibGLeZaui8qmCsNQzm/uT1s8+yTmWyHwb6Y0N9ugylorLgu4gUDY3NTvvrbIC7yfh5PivuU=
+ bh=LmNGMD0Z2EqUHUkXNsv9+8hzOjbPO4plKDaDFkqxctI=;
+ b=beEn81V51LTswUELUUdZ2juXK7hCumMEWp+uGxlUcGGQy+FeQs/j8256Muq2jsng4PthR4jsEkdzMFZtSaDcsLgOgt7kHQeWr77TNLs4u1xYXkNC2hmwH0u2FtFU0zmGvGVS5IfsBAZRqprbrOpUh+cedy5rboyoF/98cRD1OeE=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- IA0PR12MB8206.namprd12.prod.outlook.com (2603:10b6:208:403::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.27; Mon, 3 Jun
- 2024 17:32:13 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb%4]) with mapi id 15.20.7633.018; Mon, 3 Jun 2024
- 17:32:13 +0000
-Message-ID: <91b676fb-b067-4fe7-9cbe-7352625f1cfa@amd.com>
-Date: Mon, 3 Jun 2024 10:32:11 -0700
+ header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
+Received: from SA0PR01MB6171.prod.exchangelabs.com (2603:10b6:806:e5::16) by
+ BL3PR01MB7180.prod.exchangelabs.com (2603:10b6:208:347::24) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7633.21; Mon, 3 Jun 2024 17:53:32 +0000
+Received: from SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d]) by SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d%6]) with mapi id 15.20.7633.021; Mon, 3 Jun 2024
+ 17:53:32 +0000
+Message-ID: <1a38b394-30ae-42c6-b363-9f3a00166259@amperemail.onmicrosoft.com>
+Date: Mon, 3 Jun 2024 13:53:29 -0400
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ionic: fix kernel panic in XDP_TX action
-To: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, brett.creeley@amd.com,
- drivers@pensando.io, netdev@vger.kernel.org
-Cc: jacob.e.keller@intel.com
-References: <20240603045755.501895-1-ap420073@gmail.com>
+Subject: Re: [PATCH v2 3/3] mctp pcc: Implement MCTP over PCC Transport
+To: Jeremy Kerr <jk@codeconstruct.com.au>, admiyo@os.amperecomputing.com,
+ Matt Johnston <matt@codeconstruct.com.au>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240513173546.679061-1-admiyo@os.amperecomputing.com>
+ <20240528191823.17775-1-admiyo@os.amperecomputing.com>
+ <20240528191823.17775-4-admiyo@os.amperecomputing.com>
+ <6a01ffb4ef800f381d3e494bf1862f6e4468eb7d.camel@codeconstruct.com.au>
 Content-Language: en-US
-From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <20240603045755.501895-1-ap420073@gmail.com>
+From: Adam Young <admiyo@amperemail.onmicrosoft.com>
+In-Reply-To: <6a01ffb4ef800f381d3e494bf1862f6e4468eb7d.camel@codeconstruct.com.au>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR07CA0001.namprd07.prod.outlook.com
- (2603:10b6:a02:bc::14) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BLAPR03CA0144.namprd03.prod.outlook.com
+ (2603:10b6:208:32e::29) To SA0PR01MB6171.prod.exchangelabs.com
+ (2603:10b6:806:e5::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,166 +85,606 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|IA0PR12MB8206:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5185fa6e-3d80-42d2-9150-08dc83f31b27
+X-MS-TrafficTypeDiagnostic: SA0PR01MB6171:EE_|BL3PR01MB7180:EE_
+X-MS-Office365-Filtering-Correlation-Id: 96f1d3cf-670a-409d-8edb-08dc83f6152d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|376005|366007;
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|1800799015|376005;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?QlZSRTZKNENVT0NTTXB1U0ZkQm1oZEpyRWcrSERKZ2xWQWpZaWRzMEV0M2xa?=
- =?utf-8?B?YVRqVU16NmdLOFhJUDhrOEdxRi90NDFRM1NocDVtQlZFbTRldGM5Q0VUL1Rm?=
- =?utf-8?B?TkZ1THBCMFR3b2JQTGw4NCtON2IwOEhaUGZFaVlmUG5YNm5UOEFTTTVtYzJL?=
- =?utf-8?B?TVF1M0tETSswWDBXM0FmUVF6ZGlldXpOc2h5RzNadXRqVzhxVWZ6UGxuMWRX?=
- =?utf-8?B?Vkg0amI3THFZaCtDeEt1VHV1UTJZUFg1RkJGV3BiYWxJS1preERYbjZ5Ulcv?=
- =?utf-8?B?UEJMUTlnbnhyeU1OYjFvTXBDL2lzbzFQaEJYVmx1TEZUK3o3ZFF5eGtXd1Ux?=
- =?utf-8?B?b2Z6MVgzVGJoaHR4YTd0eUgvY3Q5OTU4SmNrTUdXaU5raVllcVNucEp2eEk5?=
- =?utf-8?B?VHMvMHdQUGpmdnd1VnNGREpZTGNYTGhFMVB3eFE3ZDlFc2JHVUs2SnhTT3Jk?=
- =?utf-8?B?OXhHYjd3dGhmcTJIdlNrNmxialRmblZQQjR2cEdMU0Q5UkxXYTZ1QkVRa1BH?=
- =?utf-8?B?YlQ3OVR3YWZlMzMwazhYdmQ5NVJxVlVLWU13TFlUcTdIV3FwTkJ2UElCQ0tF?=
- =?utf-8?B?RE1FUm41alEzTHRsdjRRMmt5RC80eW1BVWRydVFtTmF2NGE3SHRHZm9XZ2JB?=
- =?utf-8?B?N1VmVUpreDVsOTl3TXNvSkpmNVAzMXR5QzVEb0JzUTJCcHQ4RDE3VmJlc1E0?=
- =?utf-8?B?dHVqc0Y3MVBxRGR5YmluRHhKcnlST2hDNHBwL25IdStydk00SkdKYzRENUFu?=
- =?utf-8?B?VU9vZWpUV2dYUk0yYTBhd1dHNWNjRE9KWm5XWUcwQ2NWSVd2a1JrRzJnT0Iy?=
- =?utf-8?B?MlZrUUUrTlFJclVhVVVjOHhKejdhOUwyVlNNVWVqU0xtUTM4c3dNYlVxWmNK?=
- =?utf-8?B?WnQ0YlhwcjFQazluMGsrYUloZE1DQ3JJWmFvVTZmZTl4dGx1T24vZ0E2cjZq?=
- =?utf-8?B?U2dhZld6NVkyMDM3ZGtRRld0ckFLRUVpbUhMMGVmWmtGV0hTRGthbEZQNm1w?=
- =?utf-8?B?NzdqQisxeDJYcEN5MjcrS1NQVDM5bDdZdVdtY2h5dnJsRzFaNFBQcGFKMjQv?=
- =?utf-8?B?Y2wxUXFLVjEwbGpSblNvS3lwQUZoQ29oYXJZUkNnTXhkT01BNmQwRWlWS29Z?=
- =?utf-8?B?S044NTh1VTA2dG1PVGd0anBSdWNjdXAwOXhIVW11MXJHWXVMUWxLN2p1V2Zm?=
- =?utf-8?B?b2VjY2k0d2lQMTN5VmhtbHNabk5MdGdtdXg5d0FTYlJPczRDY3p5MlQ4b2cw?=
- =?utf-8?B?Rk8reElqNFJMcVZUN2pZU0lVMFNwMXFLc3k0T09HVjJ0MVU0NXpDcUZqWUdC?=
- =?utf-8?B?YlNXSG1JaWJraW9wbGpPNDhQbzRuVjVoNGdPMHl1dExJSzM2VTVqNkFDb2Ur?=
- =?utf-8?B?TExnUm5Mbk81SEJmU2FicDlCWDczV002SlZKNnpmUlcrNEtXbHl3VERabE5t?=
- =?utf-8?B?V2VydmhRTGhFaUFVWnJWUDQ0YW55bVk3MDd6YStiZDhPZS9mODdXREd1THJn?=
- =?utf-8?B?VGw3MStXSzJGL2tOQWN5MStTSENLVTAxL0JHcGtNOXF0OVlDNUhPY2ptaWVD?=
- =?utf-8?B?Z0RVZHA0MUtKdC9pSjRoMEliNjNWeFNuanNWSXJEbCtucHVoenluR1poMWcx?=
- =?utf-8?B?MFFoM0dCR1RSTWp4YXp3V09Pb1M3UndiWDh0Sm9OU1VEbEg3T3JDb3J2VUZp?=
- =?utf-8?B?djhnS1RuSGExbmpkQmhwRG1GM3A1UzlublZicHJLNjd5dzMrakRQUkVBPT0=?=
+	=?utf-8?B?QkdkMzRnQis2NjhNMzZXbi85TmErbDdXMExoT0ZYQkM4a2FoRUpiSDZOYUs0?=
+ =?utf-8?B?M1RDTHA5bnVaRVZXY3pCejZqQmE4cURsandGa0FUVzlSUGpwVHhJNFl5WlVm?=
+ =?utf-8?B?U2QxRm5ob2kwU0Evd04waWhRZE5paVJLZkNVUms3VkFSc0lnRFUwVUFYSnNj?=
+ =?utf-8?B?L01XZlZIamRCUi9DTzR2QmQ0MEJzclRjT0tGS25pcW5MaThER2JzcXlOR2dh?=
+ =?utf-8?B?U0lGaVpRaGlxT2FBY2MzMlUwOVdVQzlXMU1obHVCMjFNdkNqSXBDTU9yNEdU?=
+ =?utf-8?B?UGFnMGVIK0lFNFdRK1pqRjZ3NTN0ZG4yV2M0UXFGUUMzSWJtNVJRcDJRTHlL?=
+ =?utf-8?B?YVRnSWhEQUFGWEhVMGEvOVJyZ0V3c2g1NjNmelRzOVRDYlZPdy9oWWZyTnVF?=
+ =?utf-8?B?VmdVcCtHZlNBcjFRZytwTEhqbFBWSGxtRlpYLzZQRVVpZGdCMHZhalVrRjV5?=
+ =?utf-8?B?bzQwU2tPNkVJelEzODV3Tnl6Sk1HWTc3SCtxdTYyaGZweEl1anp5bjBIT2xN?=
+ =?utf-8?B?OW50c0RQOTd4d3NxVGNIUzNFbDJyTmZLVElaTEpDN1hQVU5NTkhTRzdWNFhU?=
+ =?utf-8?B?UHhoOUZYM1laREFLSnQxWlVZQm80eEI0NU5teXExRUlQd0xrK0JYdlZ1NDBF?=
+ =?utf-8?B?a215dW14SGlmQVhmL3ZpaUM3cEl0RDR1S1VpdTdXdXc3QVZkRFh4SGpEMmRa?=
+ =?utf-8?B?TGhudE9rTXEzZE9GcWl2STN2c256MlQzMGNJMmlwWEJkUmJvaFMrcFVBZmNn?=
+ =?utf-8?B?RDZmMlhYdVlsSDdsRG9hbUdrOGpDWGJ6aEZiUnAxYlFZOStBaXhpVEJZeXM1?=
+ =?utf-8?B?eFhXZ0xERHphb2ZsczYrdXFLcC9Oem5Qb3R1bWlFd1hYUUNwUlNNcHF0eXhR?=
+ =?utf-8?B?TDFKV0pvaGNqWEpEbnYyT3dMQTIrbVhJcU5aSk1jdjVrUnNJNFlUVTJ2UUJr?=
+ =?utf-8?B?dkxvdnQwM2JBQ3pyZXdEanNBanZWUEtzUXEzVDg0MU5nODBlQ3M3YUh4ZzEx?=
+ =?utf-8?B?RTlSQ3lzR3h6cFVFNlJLWmxlZFk2QVpleHNuQ0ZRdUoxTmpOVWt1ME9lb002?=
+ =?utf-8?B?R0QyUHFBOVBSd1hOTjUyckdWd3VyaXNLb2NvYU5OZE1CemloZFJuR25IaGdM?=
+ =?utf-8?B?OW9hMTlNN0VlRlpBTGZXTHJVVnJzNENMNWY4QmVIZFJldUpLM0NzSUhYN3VQ?=
+ =?utf-8?B?S1NPcFM2Q3hlOE1aam5zRHBnRSt3cEQ4YlVTd2szZzQyM2xIem8vUmpuNEZz?=
+ =?utf-8?B?UytLU2lGZHo3ZUkvVGQyOWMvNUtzQzNNWlo1WXdhSU1Gc3RCWndzd2JZRkhk?=
+ =?utf-8?B?RXI1NmYyaHUvZk9PUDdoYUpWNDYzMkNzRnhzb042SmtyY1VDTmNpbkRiSElY?=
+ =?utf-8?B?SThtOVFLWWtrTTZuaEE2K2hjS0x1V1dKOVhuWUJobW4yWUNsRDZqRkdSZ1dn?=
+ =?utf-8?B?SkNLbGZ6S2REUHNFNklFaGJaNkU4L1g1dXFYNE00aW5oeVRYMkJKN2grV1o5?=
+ =?utf-8?B?OVQ0NHBQUWQzWkU5dFRnZExKd1FKVk1GVGJmNVVMM0lkQndhTm5SV0NWN25L?=
+ =?utf-8?B?VERJZzVmeGlwUHFLd3JHSFBETkd1dUVJaDFzY0JSQXl0Q2NaL0FyMXVVdEFs?=
+ =?utf-8?B?VFFhckR6SUcxYmFmTU5ZbEhCTEVraUJNMzM4MlljUUtSUUNKVGlZajZUYnhJ?=
+ =?utf-8?B?N0xZeFVFc0Q1R3FhWFMrM0pJS3ByRTBoMzdSc2c0bE5TTjIrcDBQNCtnPT0=?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR01MB6171.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Q0llZGxWbUV3cktENEFrUUR4M0ZiMjB3bmRUdTJjTUdNakxpOXBsSy8ycCtV?=
- =?utf-8?B?VkNHaFJnZG9iM1dnR0NBcVFKWlFmMXl2WVZIZ1ZLc3lYaTVmK05MSnpZSnVh?=
- =?utf-8?B?dEtJbWp0M0Y3NVRSQXcxUk50TFRkeFZnYXhXUHI1blF5eDA2WHNvNkJJaGVE?=
- =?utf-8?B?ZjhTL3lOTUU4K2VsZ3g4cXU0UXBjRzBMWHNHQ3VneEp6U0hUeDVNOGp0ZDJP?=
- =?utf-8?B?OGtPc0t6UUwyRkxyNCthbTBaSHJRNFY0RzZmQXZJbGJuWnFLelFQV0E5WVVn?=
- =?utf-8?B?RGtOTGczZ3VjRUJQSmh3YkhUcm4yZ0pGUnlFdldDN2hhaUp5QjBpaW5tR1FT?=
- =?utf-8?B?ODJVT0VJMXZ2M2JkZDBhMVRpWG02ZVdmZ0lkNEdjb1k5M2JlaTdCMVpQSlJ2?=
- =?utf-8?B?bm9KR0pLQjhYKzF3b1VXZFlDQjJWYm1FZXhSZ2N2a2JCc3E1UUVBbGxMS2ky?=
- =?utf-8?B?SnduS3FtUEZ1VzRXUng4WnBxZlBJdWNhdy9Pa2RWclFBWlVUOUZWTStCOTk5?=
- =?utf-8?B?ZmdoU2ZXUnNYaWpEMzJLaWlzOWluUTlhY256a3VFcTVFRXpoR1RGN2RKZDFY?=
- =?utf-8?B?b2xCNy9oOGJBSUZKa2pOQlhHaGpwazhFWEdNcjEvWjFOajY1Y2FEaUd6Zlpq?=
- =?utf-8?B?VDVrU0FLV3gxTEduQko4ZE02VEZtdktGVU8yRjRYb0lWbVAzaUw5NkNDZERZ?=
- =?utf-8?B?VlI3YVdMaGRyVGtGM3RHU093M005ZmNheVNxQlhwcEhJUncyVjNIUzNJa21q?=
- =?utf-8?B?aVdldlZYMEFBUERpL1JwektaWThkSFUzMzF1WUk1aGU5b2Q0cithdDRGTlQ3?=
- =?utf-8?B?bU1mWHUyVXVlVWhFZFdTa2F4Ympad1huTFZYK2hiNTZ2ejVqeG5qSXNtamUw?=
- =?utf-8?B?ZVVzckhmWk9LazlwN3RtRmZoZFBrNGxGVkRuUWRMMDBOWkJaK25QNHFsTmUw?=
- =?utf-8?B?eGxkZ1hDUGcyeU1qUjA5b3R4b2Z4N0VJMk1Gbit2ZHNNN0M0aDB2ZjdyOWhU?=
- =?utf-8?B?M0F1Vkp5bnpBK3RabjBxZm5iMmpwMWNkY3pqdmhXRmhiL2ZPOE1YVEFVYldi?=
- =?utf-8?B?bW9GeTZjOW1GSHo0NmVMVXArZzRoaXJKc2o2RUFnR04xRWZEdmFWYXVjbjg2?=
- =?utf-8?B?azhVYkdSOEJLSDFPVld3ZVNRMDA3MFV2VFpCTnVpK2F3cCtvelh1VU12TjRt?=
- =?utf-8?B?eDRVR0pYazRZS0ZzcjNhSEcwWG10VFE4amFYVFVkeWkzbThqencvVEYxZ0wx?=
- =?utf-8?B?ZjZGeDZUMnRsc2E3eFdlOEFNK2gwdzFVMkpWK1Vvam5HQVl3TEFOUG16Q3ZL?=
- =?utf-8?B?QVhEWGFzT0FVREJSQktnZlZaNkp3S1RwcDJoSzRJa1BZN1Q3WUwyN3lWZS8y?=
- =?utf-8?B?VWM5NGV4QkRGWlFpTmpWaEZuVW03dzI4MVVXWXYwR3NPL0FkcEFWdGVRS3h3?=
- =?utf-8?B?RjY3RmRZdTM1K01zWUFZZi9td0M0OHh0QXh1NGJVZzVPcFZlUTZKM2VybDRY?=
- =?utf-8?B?Wm9YcDJmNmdrazVFS2tQQ1UwWUhjQmZ3enNMdUNCZFJjYlpHVjZLMWIySVdw?=
- =?utf-8?B?ZFhKMW5Jdng2M2xub015UDF0dXk1dTA1Q3ZjanFBZjZ5UVd5QUxOcnNSVjdU?=
- =?utf-8?B?dFFDUkIzNUNLTmtxQ0lGaDdoQlNPNUJJY24zdEtoSTdpU0o5QkRKSFhZOFVU?=
- =?utf-8?B?RWlkaUdRQjViMUxYc2Fmd3AvdEc5ZUxZb0N2SnUyZ3Y4T1NDakVXZGlhWkh1?=
- =?utf-8?B?amZubUV0YlF2Mm0zZzlnVE5aVCs3dTJkd0oxVXVnSFkxMjFXRFlMRWRicXpQ?=
- =?utf-8?B?NFd6YlF1U0gvRklUUjdHTWlTQTV5OUI0V3VHVnppeVFUV3UxakxydWNHeWQr?=
- =?utf-8?B?NjJEUGpVM1ZwZkhMQUhaVExGL2cyYTVEM1QvVytIc3BxQ2xvT1hWNkEwTVJS?=
- =?utf-8?B?dU9ITTU3ci94by9ITUZKd0hZTHU1WGtVa2VEQjZtWCtCYm9LWTMyUi9aS3Fo?=
- =?utf-8?B?N1VjdGhtRm9xUU9yU0pqbUVDZ1Q4U3VLaG9WU0E2VjY1ZkxrRzJsKzVYdWVK?=
- =?utf-8?B?S0hRRVd0bDl3OTZ1R1NkdFlheWNrY3NEalhMalh5QTlrOG9LQzdGbVJleFNy?=
- =?utf-8?Q?bx+65ppb7atw7zyhRdZ38Sv7E?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5185fa6e-3d80-42d2-9150-08dc83f31b27
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+	=?utf-8?B?a0VCRGFDV2dKeHM3TU4rZ211K2c0KzZEVWJvWHNFU3FlamlxNDBLWVhjbkJk?=
+ =?utf-8?B?VlZTVzhhbVgyZWIxcyt0dk10V2ZZdVFrcnllZkpBT0VHRFUvVk5yQm9pZjRq?=
+ =?utf-8?B?N3pvY2JvN3ZoUTk3Unc1dnB2TVpiNjlsWVpxRmpPcFNhTzcrZS9BUlhvcGIv?=
+ =?utf-8?B?TlBINDZ1K29Xd0xyT2pVcHFnc0I0RitZeXhVL1ladHlBM01oMGRNNVpHQ1or?=
+ =?utf-8?B?TG1HNEQxMTJaeDM5eXNGZEswc2xQa2Y5cFFiMGQzWkthRENrdHdJL1hjM0ZB?=
+ =?utf-8?B?SUxlSXVyOEcrbitYaWFrTTJXY0h4U3FjNHlsVzNObEJ2a29KUzA3eWp5eGdq?=
+ =?utf-8?B?UE5kdEdHY1YzMXVxeis2TTdWRElld1JTU1NUTlJLY01BbitGaFMyM2pweDda?=
+ =?utf-8?B?NnQrTW1VaDFOSmhQcDZrcFFlM0dPV21JbU9URVZHN3poTnhGc0ZmMUR6RGcw?=
+ =?utf-8?B?d1VqQnkrNWpWVDRySzJacnBSRkRRWEIyTE95M3lYQ1ZUclFkWnZ3aVRhRVpU?=
+ =?utf-8?B?ZDg5Y0h6Wm5EZ2t2Ly9pRjNPL0JraWFRWmxDNFFMOHFoTkZBSjB3TkJVUU51?=
+ =?utf-8?B?YXhibHlvOXJ1OFppeitrRUJONXVGaTJhQnJsMTZtZXV6TUhlS1krMGM4WFhn?=
+ =?utf-8?B?VFNVVlFrdzBQZ2lNcC84alFtcmtNUmxxcWYxYjJUREgyRHdRTlpXTGUvTVBQ?=
+ =?utf-8?B?eTN4OHlYaXNKZ1dOM25ySC9sOC82SFoxZDlITWgxdWpSZmxVdkFNdWhJRFBq?=
+ =?utf-8?B?T2kvRWRYT3pXYWZTcWJITVl0Rlo4OVI1YUdCSDl0VUwwYVhaVHloSzdtNmZG?=
+ =?utf-8?B?MGhhaUZKZWIyNzFaaDJlbmhLMnJGQWcwaWJ3bUtJWkVBZWxDN1l6VWhIbzl4?=
+ =?utf-8?B?a1U4c0cyY2lHNEF2UDdRRll0WXQ2ZFNqekptZzhWYkppL3c1QkxhYW44ZzJw?=
+ =?utf-8?B?OFR1UTZsU3lveEx1MG1rMHpES1pZdStyT0lIU2JVUzNoSDlSQ3lIbFdRZXZD?=
+ =?utf-8?B?UE5wd1VRT1MvekJEYjBFQmM3RC9jcDEwNUhkaUhhb0pNUG4wVjdmazBUMGJi?=
+ =?utf-8?B?b3FubTVuanZFYWlmR3UwL0dPUjVBUzNUYVp1aW9Lek9rU1phL1hlSDRYcU1y?=
+ =?utf-8?B?d0FITHA2RzM1NThEK0hiNzBXSVNPN3g5UXN2SkwxbFpIbGVFRFExK2JaU0ds?=
+ =?utf-8?B?NnNjOTZFenhKMG0rZDZYOHNmRW1ZL1phd1RsS2djWEFzVEpWZlZqM2Q0Z2RB?=
+ =?utf-8?B?OEtqM3ZQRm5XV0xFcUwyamxpU1VZU2lGbjFGKzlCd3I5K3FQNDQ0dHpMTGN4?=
+ =?utf-8?B?byt6RmxGQTdlSWNnZnZ6NmtnanByRFpXYmE0UW1jcXI5empzTXR2TUU2cXBM?=
+ =?utf-8?B?emE4R050QkJld2l1VmxkbktVQzlLNUs2QjFVRCtXTVczZDJEY0ZhNXRCdWpR?=
+ =?utf-8?B?UE5KZklpVTJkQVhKSnYzc0w0NFE4aGR2MFZrbWdCVllwMlhSM3Q1S01SbktK?=
+ =?utf-8?B?cW1KTHZWdU5zWnh2a1UyaXZLRkEzUWhyN291NDFNNGdmWDcxVFFTSkVOWkhT?=
+ =?utf-8?B?bW05N2g5cnJBdGRidW1hNmhjQjQ2ZUpBK3E4TnJIQ1V2aHZhSm9PNGVsOTBk?=
+ =?utf-8?B?N2FDK0Nrb1dsN1drd2IwK0VxK2R3UjNtYUFOOFNnSnpUL3RnM1dPSk1NemJH?=
+ =?utf-8?B?RjMzNE1LU0ZXN05rb2FZeGI4MVBiOElDZndmY0FFSGV4Wmw0M0k2QlFUOTR4?=
+ =?utf-8?B?VVFTdUZmL1ZocTZpYk9Xb0VtVDU5ZVFFMzR0eE9wVHQ3b1d4RWYvdlQ4S1Bk?=
+ =?utf-8?B?WXMxRVlIQWQzMEs3b2I3dnlrbnYrOHU1NnFrYkFsT2dHS3kvQ0lNc1hocklr?=
+ =?utf-8?B?WXhuL1JsUFVHNTkxNEtNTTQ3NHJPOGlKZnRZTkowU0x2RTk3ZXgyeXFha2wr?=
+ =?utf-8?B?UDBZS2ppeVpZY0M2RWJiMHo4cnl3QWNvNGtweTN3eFA1NjhBamtTTlh2WlJN?=
+ =?utf-8?B?bHV0VENVOG1sV3ZpSUFkN1VRbmwxWXdrV1ZUdU1Fa3dCNVRQbElLcWJCbjBP?=
+ =?utf-8?B?U09UK0ZkSUtwZGw2SHl2OTl2ZGlRRU1CeTAvN1p3TFlWc3pMR08za1g4OSti?=
+ =?utf-8?B?ODNYeW5na2FpZG1VeUpzS1k4SmhUL0o0Sk1PeUs4L09INS9mbEw3R1NpTFVK?=
+ =?utf-8?B?ME9oOVgvMzJxUzRyTXh0SUxDdDFwUCtrUzJPWlVETnFaaFp4Rnl0aDFqK2ht?=
+ =?utf-8?Q?7S16FNhwK3hf+KMpWXpQwolisH/zaU3O1qjA95EAso=3D?=
+X-OriginatorOrg: amperemail.onmicrosoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 96f1d3cf-670a-409d-8edb-08dc83f6152d
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR01MB6171.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2024 17:32:13.7236
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2024 17:53:32.1555
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ad8tn7BO3XkzHiZwfHw+HL8FKwE3YriU2SvTbtn0GTk8C1Ha+EvcRzOxhUuyeSuWyUGJjo4eJFRFB5aSI5Zx/Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8206
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1jIZTnE2uOc2tck3j7fmBuq2cyOPrWeh5Qn4GoXL5Q/qTdsMBR0G+EX06HdjbJCS19UnLj2rEx5Xx/qhKAwBLVXK87lmm+VnKJ5a55iEpJxqXAj7WVPxWx2yUEMTUqiP
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR01MB7180
 
-On 6/2/2024 9:57 PM, Taehee Yoo wrote:
-> 
-> In the XDP_TX path, ionic driver sends a packet to the TX path with rx
-> page and corresponding dma address.
-> After tx is done, ionic_tx_clean() frees that page.
-> But RX ring buffer isn't reset to NULL.
-> So, it uses a freed page, which causes kernel panic.
-> 
-> BUG: unable to handle page fault for address: ffff8881576c110c
-> PGD 773801067 P4D 773801067 PUD 87f086067 PMD 87efca067 PTE 800ffffea893e060
-> Oops: Oops: 0000 [#1] PREEMPT SMP DEBUG_PAGEALLOC KASAN NOPTI
-> CPU: 1 PID: 25 Comm: ksoftirqd/1 Not tainted 6.9.0+ #11
-> Hardware name: ASUS System Product Name/PRIME Z690-P D4, BIOS 0603 11/01/2021
-> RIP: 0010:bpf_prog_f0b8caeac1068a55_balancer_ingress+0x3b/0x44f
-> Code: 00 53 41 55 41 56 41 57 b8 01 00 00 00 48 8b 5f 08 4c 8b 77 00 4c 89 f7 48 83 c7 0e 48 39 d8
-> RSP: 0018:ffff888104e6fa28 EFLAGS: 00010283
-> RAX: 0000000000000002 RBX: ffff8881576c1140 RCX: 0000000000000002
-> RDX: ffffffffc0051f64 RSI: ffffc90002d33048 RDI: ffff8881576c110e
-> RBP: ffff888104e6fa88 R08: 0000000000000000 R09: ffffed1027a04a23
-> R10: 0000000000000000 R11: 0000000000000000 R12: ffff8881b03a21a8
-> R13: ffff8881589f800f R14: ffff8881576c1100 R15: 00000001576c1100
-> FS: 0000000000000000(0000) GS:ffff88881ae00000(0000) knlGS:0000000000000000
-> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: ffff8881576c110c CR3: 0000000767a90000 CR4: 00000000007506f0
-> PKRU: 55555554
-> Call Trace:
-> <TASK>
-> ? __die+0x20/0x70
-> ? page_fault_oops+0x254/0x790
-> ? __pfx_page_fault_oops+0x10/0x10
-> ? __pfx_is_prefetch.constprop.0+0x10/0x10
-> ? search_bpf_extables+0x165/0x260
-> ? fixup_exception+0x4a/0x970
-> ? exc_page_fault+0xcb/0xe0
-> ? asm_exc_page_fault+0x22/0x30
-> ? 0xffffffffc0051f64
-> ? bpf_prog_f0b8caeac1068a55_balancer_ingress+0x3b/0x44f
-> ? do_raw_spin_unlock+0x54/0x220
-> ionic_rx_service+0x11ab/0x3010 [ionic 9180c3001ab627d82bbc5f3ebe8a0decaf6bb864]
-> ? ionic_tx_clean+0x29b/0xc60 [ionic 9180c3001ab627d82bbc5f3ebe8a0decaf6bb864]
-> ? __pfx_ionic_tx_clean+0x10/0x10 [ionic 9180c3001ab627d82bbc5f3ebe8a0decaf6bb864]
-> ? __pfx_ionic_rx_service+0x10/0x10 [ionic 9180c3001ab627d82bbc5f3ebe8a0decaf6bb864]
-> ? ionic_tx_cq_service+0x25d/0xa00 [ionic 9180c3001ab627d82bbc5f3ebe8a0decaf6bb864]
-> ? __pfx_ionic_rx_service+0x10/0x10 [ionic 9180c3001ab627d82bbc5f3ebe8a0decaf6bb864]
-> ionic_cq_service+0x69/0x150 [ionic 9180c3001ab627d82bbc5f3ebe8a0decaf6bb864]
-> ionic_txrx_napi+0x11a/0x540 [ionic 9180c3001ab627d82bbc5f3ebe8a0decaf6bb864]
-> __napi_poll.constprop.0+0xa0/0x440
-> net_rx_action+0x7e7/0xc30
-> ? __pfx_net_rx_action+0x10/0x10
-> 
-> Fixes: 8eeed8373e1c ("ionic: Add XDP_TX support")
-> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+Pretty sure I have all these corrections in the next one.  Some inline 
+comments.
 
-Thanks,
-Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
 
-> ---
->   drivers/net/ethernet/pensando/ionic/ionic_txrx.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-> index 5dba6d2d633c..2427610f4306 100644
-> --- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-> +++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-> @@ -586,6 +586,7 @@ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
->                          netdev_dbg(netdev, "tx ionic_xdp_post_frame err %d\n", err);
->                          goto out_xdp_abort;
->                  }
-> +               buf_info->page = NULL;
->                  stats->xdp_tx++;
-> 
->                  /* the Tx completion will free the buffers */
-> --
-> 2.34.1
-> 
+
+On 5/28/24 23:02, Jeremy Kerr wrote:
+> Hi Adam,
+>
+> Thanks for the v2! Progress looks good, this seems simpler now too. Some
+> comments inline.
+>
+>> From: Adam Young <admiyo@amperecomputing.com>
+>>
+>> Implementation of DMTF DSP:0292
+>> Management Control Transport Protocol(MCTP)  over
+>> Platform Communication Channel(PCC)
+>>
+>> MCTP devices are specified by entries in DSDT/SDST and
+>> reference channels specified in the PCCT.
+>>
+>> Communication with other devices use the PCC based
+>> doorbell mechanism.
+> Signed-off-by?
+>
+> And can you include a brief summary of changes since the prior version
+> you have sent? (see
+> https://lore.kernel.org/netdev/20240220081053.1439104-1-jk@codeconstruct.com.au/
+> for an example, the marker lines means that the changes don't get
+> included in the commit log; Jakub may also have other preferences around
+> this...)
+
+They are all in the header patch.
+
+>
+>> diff --git a/drivers/net/mctp/Kconfig b/drivers/net/mctp/Kconfig
+>> index ce9d2d2ccf3b..ff4effd8e99c 100644
+>> --- a/drivers/net/mctp/Kconfig
+>> +++ b/drivers/net/mctp/Kconfig
+>> @@ -42,6 +42,19 @@ config MCTP_TRANSPORT_I3C
+>>            A MCTP protocol network device is created for each I3C bus
+>>            having a "mctp-controller" devicetree property.
+>>   
+>> +config MCTP_TRANSPORT_PCC
+>> +       tristate "MCTP  PCC transport"
+> Super minor: you have two spaces between "MCTP" and "PCC"
+>
+>> +       select ACPI
+>> +       help
+>> +         Provides a driver to access MCTP devices over PCC transport,
+>> +         A MCTP protocol network device is created via ACPI for each
+>> +         entry in the DST/SDST that matches the identifier. The Platform
+>> +         commuinucation channels are selected from the corresponding
+>> +         entries in the PCCT.
+>> +
+>> +         Say y here if you need to connect to MCTP endpoints over PCC. To
+>> +         compile as a module, use m; the module will be called mctp-pcc.
+>> +
+>>   endmenu
+>>   
+>>   endif
+>> diff --git a/drivers/net/mctp/Makefile b/drivers/net/mctp/Makefile
+>> index e1cb99ced54a..492a9e47638f 100644
+>> --- a/drivers/net/mctp/Makefile
+>> +++ b/drivers/net/mctp/Makefile
+>> @@ -1,3 +1,4 @@
+>> +obj-$(CONFIG_MCTP_TRANSPORT_PCC) += mctp-pcc.o
+>>   obj-$(CONFIG_MCTP_SERIAL) += mctp-serial.o
+>>   obj-$(CONFIG_MCTP_TRANSPORT_I2C) += mctp-i2c.o
+>>   obj-$(CONFIG_MCTP_TRANSPORT_I3C) += mctp-i3c.o
+>> diff --git a/drivers/net/mctp/mctp-pcc.c b/drivers/net/mctp/mctp-pcc.c
+>> new file mode 100644
+>> index 000000000000..d97f40789fd8
+>> --- /dev/null
+>> +++ b/drivers/net/mctp/mctp-pcc.c
+>> @@ -0,0 +1,361 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * mctp-pcc.c - Driver for MCTP over PCC.
+>> + * Copyright (c) 2024, Ampere Computing LLC
+>> + */
+>> +
+>> +#include <linux/acpi.h>
+>> +#include <linux/if_arp.h>
+>> +#include <linux/init.h>
+>> +#include <linux/kernel.h>
+>> +#include <linux/module.h>
+>> +#include <linux/netdevice.h>
+>> +#include <linux/platform_device.h>
+>> +#include <linux/string.h>
+>> +
+>> +#include <acpi/acpi_bus.h>
+>> +#include <acpi/acpi_drivers.h>
+>> +#include <acpi/acrestyp.h>
+>> +#include <acpi/actbl.h>
+>> +#include <net/mctp.h>
+>> +#include <net/mctpdevice.h>
+>> +#include <acpi/pcc.h>
+>> +#include <net/pkt_sched.h>
+>> +
+>> +#define SPDM_VERSION_OFFSET 1
+>> +#define SPDM_REQ_RESP_OFFSET 2
+>> +#define MCTP_PAYLOAD_LENGTH 256
+>> +#define MCTP_CMD_LENGTH 4
+>> +#define MCTP_PCC_VERSION     0x1 /* DSP0253 defines a single version: 1 */
+>> +#define MCTP_SIGNATURE "MCTP"
+>> +#define SIGNATURE_LENGTH 4
+>> +#define MCTP_HEADER_LENGTH 12
+>> +#define MCTP_MIN_MTU 68
+>> +#define PCC_MAGIC 0x50434300
+>> +#define PCC_DWORD_TYPE 0x0c
+>> +
+>> +struct mctp_pcc_hdr {
+>> +       u32 signature;
+>> +       u32 flags;
+>> +       u32 length;
+>> +       char mctp_signature[4];
+>> +};
+> The usage of this struct isn't really consistent; you'll at least want
+> endian annotations on these members. More on that below though.
+
+
+
+
+>
+>> +
+>> +struct mctp_pcc_hw_addr {
+>> +       u32 inbox_index;
+>> +       u32 outbox_index;
+>> +};
+>> +
+>> +/* The netdev structure. One of these per PCC adapter. */
+>> +struct mctp_pcc_ndev {
+>> +       struct list_head next;
+>> +       /* spinlock to serialize access to pcc buffer and registers*/
+>> +       spinlock_t lock;
+>> +       struct mctp_dev mdev;
+>> +       struct acpi_device *acpi_device;
+>> +       struct pcc_mbox_chan *in_chan;
+>> +       struct pcc_mbox_chan *out_chan;
+>> +       struct mbox_client outbox_client;
+>> +       struct mbox_client inbox_client;
+>> +       void __iomem *pcc_comm_inbox_addr;
+>> +       void __iomem *pcc_comm_outbox_addr;
+>> +       struct mctp_pcc_hw_addr hw_addr;
+>> +       void (*cleanup_channel)(struct pcc_mbox_chan *in_chan);
+> Why this as a callback? There's only one possible function it can be.
+
+Vestige of code designed to work with multiple mailbox implementations. 
+Will remove.
+
+
+>
+>> +};
+>> +
+>> +static struct list_head mctp_pcc_ndevs;
+> I'm not clear on what this list is doing; it seems to be for freeing
+> devices on module unload (or device remove).
+>
+> However, the module will be refcounted while there are devices bound, so
+> module unload shouldn't be possible in that state. So the only time
+> you'll be iterating this list to free everything will be when it's
+> empty.
+>
+> You could replace this with the mctp_pcc_driver_remove() just removing the
+> device passed in the argument, rather than doing any list iteration.
+>
+> ... unless I've missed something?
+
+There is no requirement that all the devices  be unloaded in order for 
+the module to get unloaded.
+
+It someone wants to disable the MCTP devices, they can unload the 
+module, and it gets cleaned up.
+
+With ACPI, the devices never go away, they are defined in a table read 
+at start up and stay there.  So without this change there is no way to 
+unload the module.  Maybe it is just a convenience for development, but 
+I think most modules behave this way.
+
+
+>
+>
+>> +
+>> +static void mctp_pcc_client_rx_callback(struct mbox_client *c, void *buffer)
+>> +{
+>> +       struct mctp_pcc_ndev *mctp_pcc_dev;
+>> +       struct mctp_skb_cb *cb;
+>> +       struct sk_buff *skb;
+>> +       u32 length_offset;
+>> +       u32 flags_offset;
+>> +       void *skb_buf;
+>> +       u32 data_len;
+>> +       u32 flags;
+>> +
+>> +       mctp_pcc_dev = container_of(c, struct mctp_pcc_ndev, inbox_client);
+>> +       length_offset = offsetof(struct mctp_pcc_hdr, length);
+>> +       data_len = readl(mctp_pcc_dev->pcc_comm_inbox_addr + length_offset) +
+>> +                  MCTP_HEADER_LENGTH;
+> Doing this using offsetof with separate readl()s is a bit clunky. Can
+> you memcpy_fromio the whole header, and use the appropriate endian
+> accessors?
+I was overthinking this.  You are right.
+>
+> (this would match the behaviour in the tx path)
+>
+> Also, maybe check that data_len is sensible before allocating.
+Good idea
+>
+>> +
+>> +       skb = netdev_alloc_skb(mctp_pcc_dev->mdev.dev, data_len);
+>> +       if (!skb) {
+>> +               mctp_pcc_dev->mdev.dev->stats.rx_dropped++;
+>> +               return;
+>> +       }
+>> +       mctp_pcc_dev->mdev.dev->stats.rx_packets++;
+>> +       mctp_pcc_dev->mdev.dev->stats.rx_bytes += data_len;
+>> +       skb->protocol = htons(ETH_P_MCTP);
+>> +       skb_buf = skb_put(skb, data_len);
+>> +       memcpy_fromio(skb_buf, mctp_pcc_dev->pcc_comm_inbox_addr, data_len);
+>> +       skb_reset_mac_header(skb);
+>> +       skb_pull(skb, sizeof(struct mctp_pcc_hdr));
+> Any benefit in including the pcc_hdr in the skb?
+>
+> (not necessarily an issue, just asking...)
+It shows up in  tracing of the packet.  Useful for debugging.
+>
+>> +       skb_reset_network_header(skb);
+>> +       cb = __mctp_cb(skb);
+>> +       cb->halen = 0;
+>> +       skb->dev =  mctp_pcc_dev->mdev.dev;
+>> +       netif_rx(skb);
+>> +
+>> +       flags_offset = offsetof(struct mctp_pcc_hdr, flags);
+>> +       flags = readl(mctp_pcc_dev->pcc_comm_inbox_addr + flags_offset);
+>> +       mctp_pcc_dev->in_chan->ack_rx = (flags & 1) > 0;
+> Might be best to define what the flags bits mean, rather than
+> magic-numbering this.
+I'll make a constant for the mask.
+>
+> Does anything need to tell the mailbox driver to do that ack after
+> setting ack_rx?
+
+Yes.  It is in the previous patch, in the pcc_mailbox code.  I 
+originally had it as a follow on, but reordered to make it a pre-req.  
+That allows me to inline this logic, making the driver easier to review 
+(I hope).
+
+>
+>> +static netdev_tx_t mctp_pcc_tx(struct sk_buff *skb, struct net_device *ndev)
+>> +{
+>> +       struct mctp_pcc_hdr pcc_header;
+>> +       struct mctp_pcc_ndev *mpnd;
+>> +       void __iomem *buffer;
+>> +       unsigned long flags;
+>> +       int rc;
+>> +
+>> +       netif_stop_queue(ndev);
+> Do you need to stop and restart the queue? Your handling is atomic.
+I guess not.  This was just from following the examples of others. Will 
+remove.
+>
+>> +       ndev->stats.tx_bytes += skb->len;
+>> +       ndev->stats.tx_packets++;
+>> +       mpnd = (struct mctp_pcc_ndev *)netdev_priv(ndev);
+> no need for this cast, netdev_priv() returns void *
+>
+>> +
+>> +       spin_lock_irqsave(&mpnd->lock, flags);
+>> +       buffer = mpnd->pcc_comm_outbox_addr;
+>> +       pcc_header.signature = PCC_MAGIC;
+>> +       pcc_header.flags = 0x1;
+> Magic numbers for flags here too
+>
+>> +       memcpy(pcc_header.mctp_signature, MCTP_SIGNATURE, SIGNATURE_LENGTH);
+>> +       pcc_header.length = skb->len + SIGNATURE_LENGTH;
+>> +       memcpy_toio(buffer, &pcc_header, sizeof(struct mctp_pcc_hdr));
+>> +       memcpy_toio(buffer + sizeof(struct mctp_pcc_hdr), skb->data, skb->len);
+>> +       rc = mpnd->out_chan->mchan->mbox->ops->send_data(mpnd->out_chan->mchan,
+>> +                                                        NULL);
+>> +       spin_unlock_irqrestore(&mpnd->lock, flags);
+>> +
+>> +       dev_consume_skb_any(skb);
+>> +       netif_start_queue(ndev);
+>> +       if (!rc)
+>> +               return NETDEV_TX_OK;
+>> +       return NETDEV_TX_BUSY;
+> I think you want to return NETDEV_TX_OK unconditionally here, or at
+> least you need to change the queue handling; see the comment for the
+> ndo_start_xmit callback.
+Will Do. Thanks for pointing out that comment, would never have seen it.
+>
+>> +}
+>> +
+>> +static const struct net_device_ops mctp_pcc_netdev_ops = {
+>> +       .ndo_start_xmit = mctp_pcc_tx,
+>> +       .ndo_uninit = NULL
+> No need for this assignment.
+>
+>> +};
+>> +
+>> +static void  mctp_pcc_setup(struct net_device *ndev)
+>> +{
+>> +       ndev->type = ARPHRD_MCTP;
+>> +       ndev->hard_header_len = 0;
+>> +       ndev->addr_len = 0;
+>> +       ndev->tx_queue_len = DEFAULT_TX_QUEUE_LEN;
+>> +       ndev->flags = IFF_NOARP;
+>> +       ndev->netdev_ops = &mctp_pcc_netdev_ops;
+>> +       ndev->needs_free_netdev = true;
+>> +}
+>> +
+>> +static int create_mctp_pcc_netdev(struct acpi_device *acpi_dev,
+>> +                                 struct device *dev, int inbox_index,
+>> +                                 int outbox_index)
+>> +{
+>> +       struct mctp_pcc_ndev *mctp_pcc_dev;
+>> +       struct net_device *ndev;
+>> +       int mctp_pcc_mtu;
+>> +       char name[32];
+>> +       int rc;
+>> +
+>> +       snprintf(name, sizeof(name), "mctpipcc%d", inbox_index);
+>> +       ndev = alloc_netdev(sizeof(struct mctp_pcc_ndev), name, NET_NAME_ENUM,
+>> +                           mctp_pcc_setup);
+>> +       if (!ndev)
+>> +               return -ENOMEM;
+>> +       mctp_pcc_dev = (struct mctp_pcc_ndev *)netdev_priv(ndev);
+>> +       INIT_LIST_HEAD(&mctp_pcc_dev->next);
+>> +       spin_lock_init(&mctp_pcc_dev->lock);
+>> +
+>> +       mctp_pcc_dev->hw_addr.inbox_index = inbox_index;
+>> +       mctp_pcc_dev->hw_addr.outbox_index = outbox_index;
+>> +       mctp_pcc_dev->inbox_client.rx_callback = mctp_pcc_client_rx_callback;
+>> +       mctp_pcc_dev->cleanup_channel = pcc_mbox_free_channel;
+>> +       mctp_pcc_dev->out_chan =
+>> +               pcc_mbox_request_channel(&mctp_pcc_dev->outbox_client,
+>> +                                        outbox_index);
+>> +       if (IS_ERR(mctp_pcc_dev->out_chan)) {
+>> +               rc = PTR_ERR(mctp_pcc_dev->out_chan);
+>> +               goto free_netdev;
+>> +       }
+>> +       mctp_pcc_dev->in_chan =
+>> +               pcc_mbox_request_channel(&mctp_pcc_dev->inbox_client,
+>> +                                        inbox_index);
+>> +       if (IS_ERR(mctp_pcc_dev->in_chan)) {
+>> +               rc = PTR_ERR(mctp_pcc_dev->in_chan);
+>> +               goto cleanup_out_channel;
+>> +       }
+>> +       mctp_pcc_dev->pcc_comm_inbox_addr =
+>> +               devm_ioremap(dev, mctp_pcc_dev->in_chan->shmem_base_addr,
+>> +                            mctp_pcc_dev->in_chan->shmem_size);
+>> +       if (!mctp_pcc_dev->pcc_comm_inbox_addr) {
+>> +               rc = -EINVAL;
+>> +               goto cleanup_in_channel;
+>> +       }
+>> +       mctp_pcc_dev->pcc_comm_outbox_addr =
+>> +               devm_ioremap(dev, mctp_pcc_dev->out_chan->shmem_base_addr,
+>> +                            mctp_pcc_dev->out_chan->shmem_size);
+>> +       if (!mctp_pcc_dev->pcc_comm_outbox_addr) {
+>> +               rc = -EINVAL;
+>> +               goto cleanup_in_channel;
+>> +       }
+>> +       mctp_pcc_dev->acpi_device = acpi_dev;
+> You probably want the link back too:
+>
+>            acpi_dev->driver_data = mctp_pcc_dev;
+>
+>
+>> +       mctp_pcc_dev->inbox_client.dev = dev;
+>> +       mctp_pcc_dev->outbox_client.dev = dev;
+>> +       mctp_pcc_dev->mdev.dev = ndev;
+>> +
+>> +/* There is no clean way to pass the MTU to the callback function
+>> + * used for registration, so set the values ahead of time.
+>> + */
+> Super minor, but keep this aligned with the code indent.
+>
+>> +       mctp_pcc_mtu = mctp_pcc_dev->out_chan->shmem_size -
+>> +               sizeof(struct mctp_pcc_hdr);
+>> +       ndev->mtu = mctp_pcc_mtu;
+>> +       ndev->max_mtu = mctp_pcc_mtu;
+>> +       ndev->min_mtu = MCTP_MIN_MTU;
+> Same as last review: I'd recommend setting the MTU to the minimum, and
+> leaving it up to userspace to do a `mctp link mctppcc0 mtu <whatever>`.
+> This means you don't break things if/when you ever encounter remote
+> endpoints that don't support the max mtu.
+>
+> If the driver could reliably detect the remote max MTU, then what you
+> have is fine (and the driver would then set the appropriate MTU
+> here).
+>
+> However, if that probing *cannot* be done at the driver level, or needs
+> any userspace interaction to do so (say, a higher level protocol), then
+> you've set a MTU that could be unusable in this initial state. In that
+> case, setting it low to start with means that the link is usable by
+> default.
+>
+> Userspace can then hard-code a higher MTU if you like, and that can be
+> adjusted later as appropriate.
+>
+> (this is a lesson learnt from the i2c transport...)
+
+Ah...makes sense.  I was not sure if our impl,enetation could handle 
+that yet, but it appears to,
+
+If it can't, it is a bug we have to fix.
+
+
+>
+>> +/* pass in adev=NULL to remove all devices
+>> + */
+>> +static void mctp_pcc_driver_remove(struct acpi_device *adev)
+>> +{
+>> +       struct mctp_pcc_ndev *mctp_pcc_dev = NULL;
+>> +       struct list_head *ptr;
+>> +       struct list_head *tmp;
+>> +
+>> +       list_for_each_safe(ptr, tmp, &mctp_pcc_ndevs) {
+>> +               struct net_device *ndev;
+>> +
+>> +               mctp_pcc_dev = list_entry(ptr, struct mctp_pcc_ndev, next);
+>> +               if (adev && mctp_pcc_dev->acpi_device == adev)
+>> +                       continue;
+>> +
+>> +               mctp_pcc_dev->cleanup_channel(mctp_pcc_dev->out_chan);
+>> +               mctp_pcc_dev->cleanup_channel(mctp_pcc_dev->in_chan);
+>> +               ndev = mctp_pcc_dev->mdev.dev;
+>> +               if (ndev)
+>> +                       mctp_unregister_netdev(ndev);
+>> +               list_del(ptr);
+>> +               if (adev)
+>> +                       break;
+>> +       }
+>> +};
+> Assuming we don't need the free-everything case, how about something
+> like:
+>
+>      static void mctp_pcc_driver_remove(struct acpi_device *adev)
+>      {
+>            struct mctp_pcc_ndev *mctp_pcc_dev = acpi_driver_data(adev);
+>
+>            mctp_pcc_dev->cleanup_channel(mctp_pcc_dev->out_chan);
+>            mctp_pcc_dev->cleanup_channel(mctp_pcc_dev->in_chan);
+>            mctp_unregister_netdev(mctp_pcc_dev->mdev.dev);
+>       }
+>
+> If you do need the list iteration: you're currently doing the cleanup on
+> every adev *except* the one you want:
+>
+>> +               if (adev && mctp_pcc_dev->acpi_device == adev)
+>> +                       continue;
+> I think you meant '!=' instead of '=='?
+Yes.  Yes I did.  This is code that has to be there for completeness, 
+but I don't really have a way to test, except for the "delete all" case.
+>
+>> +
+>> +static const struct acpi_device_id mctp_pcc_device_ids[] = {
+>> +       { "DMT0001", 0},
+>> +       { "", 0},
+>> +};
+>> +
+>> +static struct acpi_driver mctp_pcc_driver = {
+>> +       .name = "mctp_pcc",
+>> +       .class = "Unknown",
+>> +       .ids = mctp_pcc_device_ids,
+>> +       .ops = {
+>> +               .add = mctp_pcc_driver_add,
+>> +               .remove = mctp_pcc_driver_remove,
+>> +               .notify = NULL,
+> Minor: don't need the zero assignment here.
+>
+>> +       },
+>> +       .owner = THIS_MODULE,
+>> +
+>> +};
+>> +
+> [...]
+>
+>> +static int __init mctp_pcc_mod_init(void)
+>> +{
+>> +       int rc;
+>> +
+>> +       pr_debug("Initializing MCTP over PCC transport driver\n");
+>> +       INIT_LIST_HEAD(&mctp_pcc_ndevs);
+>> +       rc = acpi_bus_register_driver(&mctp_pcc_driver);
+>> +       if (rc < 0)
+>> +               ACPI_DEBUG_PRINT((ACPI_DB_ERROR, "Error registering driver\n"));
+>> +       return rc;
+>> +}
+>> +
+>> +static __exit void mctp_pcc_mod_exit(void)
+>> +{
+>> +       pr_debug("Removing MCTP over PCC transport driver\n");
+>> +       mctp_pcc_driver_remove(NULL);
+>> +       acpi_bus_unregister_driver(&mctp_pcc_driver);
+>> +}
+>> +
+>> +module_init(mctp_pcc_mod_init);
+>> +module_exit(mctp_pcc_mod_exit);
+> If you end up removing the mctp_pcc_ndevs list, these can all be
+> replaced with module_acpi_driver(mctp_pcc_driver);
+
+Yeah, I can't get away with that.  The ACPI devices may still be there 
+when some one calls rmmod, and so we need to clean up the ndevs.  It is 
+the only case  where the module will be removed, as the ACPI devices 
+never go away.
+
+
+>
+> Cheers,
+>
+>
+> Jeremy
 
