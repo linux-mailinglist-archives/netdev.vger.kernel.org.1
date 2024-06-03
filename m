@@ -1,66 +1,61 @@
-Return-Path: <netdev+bounces-100195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E6C38D81E5
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 14:08:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 50CF18D81EC
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 14:09:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFD681C237AD
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 12:08:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81C131C2205B
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 12:09:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02B7127B5C;
-	Mon,  3 Jun 2024 12:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80C1F127B62;
+	Mon,  3 Jun 2024 12:09:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eK8gc9go"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ASzj+nrV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74BB6127B57;
-	Mon,  3 Jun 2024 12:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 589CC1272BA;
+	Mon,  3 Jun 2024 12:09:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717416482; cv=none; b=F54+rcxBuzwX1NliwRTmaHKPZbYxnsZ4DWpWv/4/NaL8exohp+yg34fPVpwa3ztNSiSlpc093DALAwLuQDYioq+RwHamAqimce8VQXeI/qL3qtPI1tuS2JsxbpA+CmVoszMYnaAqwDIr0PfPbpUQOqj3BwJTEeJV/OzNeDHKmQ4=
+	t=1717416562; cv=none; b=FbQrwpA/x2XjCtUwPaRHxdzuSuI7Dj893jQJlE/1Ik/uTq2hORoEJzWXtWISghMBJdLyw1JlOGzXxTG2EFK9FMU2jZuXnS4iX+l7R/OdddlxKo1DKSWAxVasygoTvKus5HJiDTsuPlaFJkDfo6wJTIGUSvATANnyi5sYxFVzq5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717416482; c=relaxed/simple;
-	bh=t/kiuL7yysUaDv9h6Ko6pozdzy1YUywrInZQqgLCv44=;
+	s=arc-20240116; t=1717416562; c=relaxed/simple;
+	bh=plkS0ousBNjrv17Xqd/8eT7VQ5Pas7WSNDnHEpPXCgY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iwfCWFKjHRarUOt6C+900sReiM4WRwhyCbd88Pc7yJt+5HV7GGEpTnt/OeWt2nOMfEYt39PVtZZMbPGsv0bzNXKeZax3xGPxy90pxT380d7RV0ChNHhBOMum9R1IZVrzgMlzUwk2efxb/tiHLQHXAXajMs6gzrigbd3dEZX596c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eK8gc9go; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5A04C32789;
-	Mon,  3 Jun 2024 12:07:59 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Oj2WSpbgo8eVgqpxMDi5D/1/69NvNm2P0A+0z4ckLlqAFGcfNZgzq8VN3L+geaHxO4shBbKy75VrLSX3b/cxQycZ13aLrYJY9Id4hGYXa3RwCp7IQEvOE/ZcnigHUwUvb5Wh5b08SlzMCNOSxHJMhXzr4UzlVTXLwZ/p5snqFIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ASzj+nrV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BABFC32789;
+	Mon,  3 Jun 2024 12:09:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717416482;
-	bh=t/kiuL7yysUaDv9h6Ko6pozdzy1YUywrInZQqgLCv44=;
+	s=k20201202; t=1717416562;
+	bh=plkS0ousBNjrv17Xqd/8eT7VQ5Pas7WSNDnHEpPXCgY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eK8gc9gom/rDp6a2ivWGEmPiZvktpCzm9yLbvH/8D3YAGF/LO5lCUbTvHL0Mn8vYH
-	 vwC1mJnH5RaW9eaGocojBeBWvnDCCxcuMLJ0vBCVnY3ZdPUR9j9gq4du2znJsey57/
-	 78IpPvjHjnlfABGh8mBVN/HcSbaVOcjP0b5ZqtezJze0cJIlMRZSbjxRh2GsdK70yy
-	 sug3kyCGOBIMks0HnU8/u5A+QQoo33ESTsL/x7Vbunq4aJMOZMTQqS4Ww6ENO7YLQ+
-	 kRNvR3sNNYwKDUpCSF91VjnGDC1+OliSl+R6dXzfxLjb0XaVnaZA4j/Kvz8d4rRjf4
-	 zV1ukoFOwLe0Q==
-Date: Mon, 3 Jun 2024 13:07:57 +0100
+	b=ASzj+nrV2ws4WRmt65ddCIRPr1RMX0Z2L7GOuCJQmcEoWa7qtoyh0HMEH6Rp/lQro
+	 hTYN6qWw9xywOHH8LqePTQc0J2Bt/Q2UPPsPQWs104eJ5rVl3jwTSRMaONFYlR/dBR
+	 QeP90xAwzAyfDATYeHbcOp7Tt0XkhvMEwWYtOK6OAIBjB94Day4DqpyUZYFFImMrau
+	 hwZsG23yb7nPm1r6gSODDXDCCfloi8tRXN6Onu1RgEOH636uYY/hVuDvP/KgaSng+K
+	 Tkoik53zlQoUDOoJh0oG1gWxNxsYSgKmVve329KJx6CyY20Qmg46KVxerk0fSSg2wp
+	 M823FWaz1KxKQ==
+Date: Mon, 3 Jun 2024 13:09:17 +0100
 From: Simon Horman <horms@kernel.org>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v4 7/7] net: ravb: Allocate RX buffers via page
- pool
-Message-ID: <20240603120757.GX491852@kernel.org>
-References: <20240528150339.6791-1-paul.barker.ct@bp.renesas.com>
- <20240528150339.6791-8-paul.barker.ct@bp.renesas.com>
- <20240601101300.GA491852@kernel.org>
- <6165a9a3-15ec-4a40-901a-17c2be64daf1@bp.renesas.com>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	netfilter-devel@vger.kernel.org, donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v1] netfilter: nfnetlink: convert kfree_skb to
+ consume_skb
+Message-ID: <20240603120917.GY491852@kernel.org>
+References: <20240528103754.98985-1-donald.hunter@gmail.com>
+ <20240531161410.GC491852@kernel.org>
+ <m2ed9ecrj4.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,50 +64,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6165a9a3-15ec-4a40-901a-17c2be64daf1@bp.renesas.com>
+In-Reply-To: <m2ed9ecrj4.fsf@gmail.com>
 
-On Mon, Jun 03, 2024 at 09:02:51AM +0100, Paul Barker wrote:
-> On 01/06/2024 11:13, Simon Horman wrote:
-> > On Tue, May 28, 2024 at 04:03:39PM +0100, Paul Barker wrote:
-
-...
-
-> >> @@ -298,13 +269,14 @@ static void ravb_ring_free(struct net_device *ndev, int q)
-> >>  		priv->tx_ring[q] = NULL;
-> >>  	}
-> >>  
-> >> -	/* Free RX skb ringbuffer */
-> >> -	if (priv->rx_skb[q]) {
-> >> -		for (i = 0; i < priv->num_rx_ring[q]; i++)
-> >> -			dev_kfree_skb(priv->rx_skb[q][i]);
-> >> +	/* Free RX buffers */
-> >> +	for (i = 0; i < priv->num_rx_ring[q]; i++) {
-> >> +		if (priv->rx_buffers[q][i].page)
-> >> +			page_pool_put_page(priv->rx_pool[q], priv->rx_buffers[q][i].page, 0, true);
-> > 
-> > nit: Networking still prefers code to be 80 columns wide or less.
-> >      It looks like that can be trivially achieved here.
-> > 
-> >      Flagged by checkpatch.pl --max-line-length=80
+On Mon, Jun 03, 2024 at 10:19:27AM +0100, Donald Hunter wrote:
+> Simon Horman <horms@kernel.org> writes:
 > 
-> Sergey has asked me to wrap to 100 cols [1]. I can only find a reference
-> to 80 in the docs though [2], so I guess you may be right.
+> > On Tue, May 28, 2024 at 11:37:54AM +0100, Donald Hunter wrote:
+> >> Use consume_skb in the batch code path to avoid generating spurious
+> >> NOT_SPECIFIED skb drop reasons.
+> >> 
+> >> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+> >
+> > Hi Donald,
+> >
+> > I do wonder if this is the correct approach. I'm happy to stand corrected,
+> > but my understanding is that consume_skb() is for situations where the skb
+> > is no longer needed for reasons other than errors. But some of these
+> > call-sites do appear to be error paths of sorts.
+> >
+> > ...
 > 
-> [1]: https://lore.kernel.org/all/611a49b8-ecdb-6b91-9d3e-262bf3851f5b@omp.ru/
-> [2]: https://www.kernel.org/doc/html/latest/process/coding-style.html
+> Hi Simon,
+> 
+> They all look to be application layer errors which are either
+> communicated back to the client or cause a replay. My understanding is
+> that consume_skb() should be used here since kfree_skb() now implies a
+> (transport?) drop.
 
-Hi Paul,
+Hi Donald,
 
-If Sergey prefers 100 then I won't argue :)
-
-FWIIW, think what has happened here relates to the Kernel, at some point,
-going from 80 to 100 columns as the preferred maximum width, while Networking
-stuck with 80.
-
-...
-
-
-
-
-
+Thanks, that makes sense to me.
 
