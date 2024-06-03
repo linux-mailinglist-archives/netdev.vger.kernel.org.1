@@ -1,117 +1,144 @@
-Return-Path: <netdev+bounces-100368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E954A8DB713
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 23:27:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30DE48DDEFF
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 23:28:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25C691C23EC6
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 21:27:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCDF1285D0D
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 21:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CBFC13BC0C;
-	Mon,  3 Jun 2024 21:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3742C13C80C;
+	Mon,  3 Jun 2024 21:28:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Uvkz1e85"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727A513BAE5;
-	Mon,  3 Jun 2024 21:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A6613C3FD;
+	Mon,  3 Jun 2024 21:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717450033; cv=none; b=NYj7j2ReoT88lDCctX0hVEeLZgLH5VUrI1cJ/SmlIUKDQc0nXs2skRGoF7hp87vLu0PhknwsuX0WVo+HkYTzVlQwaHReG/K13NByg2gaoicfyroHnf0xHlt3LS9KHpYDLuVJLQqIcLNpro7wo9G0nHzjOxsuAVWzyZ3JGjdGXns=
+	t=1717450083; cv=none; b=qMS49FXYBvA2JcW9hNIx67HdowUwEI5Mwa0FvGQHat2WxOQ9iTvN1NiWkbTv1QPNi1HclNSfu03VG00zc6QXB0KfqoqlzA40bJOTD8m9fxq6ZX1XFzxbGvJdz+uW1DcbeQiG8vCgtKy5ALTv4lcXxJhlhg5DuyjxClKjHigHNwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717450033; c=relaxed/simple;
-	bh=cweTklJChgGQJ4iaB8EL2Zwbqlpyn3DUc51xHBMHR10=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CYRDAnqEHjhZzdTOVODamO+zcXvgc5IRrOPmpOFwJ5d4TOweGRtSB6zqU4FXBB8nvRZnn6DvK72OvXVrkkN0lixM3Wnt0f4+F55tQU7KEPjADxwf9K82OnISgpzEVa3+NtxN67u3fPWPtcHPPYVon/6C0at7jtgWVM370INKi1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-35dbf63c774so161264f8f.2;
-        Mon, 03 Jun 2024 14:27:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717450030; x=1718054830;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uY599MDCIjCv3UIyzbwe3bA9VXqb6OB7ySlkBu+KXLw=;
-        b=kIhkd+Qxb2SAVzXaMbJkzBlqKEWhwCMmnvoqoOC031bH/Q624ZLlxgl8+Kk1k1U3nH
-         neGykquLU6h2Lqr0elQPuZlBszQSD5nh1NRWTRaw6OEIeFnK5/WfEjMg5wK4yRMczUeH
-         40XfZW9m3ME2VyFmxXoZVeNUIpM9ssQBi1wgG5wlzKgz8b5E4KDUTIOEUSo/iRPFEqst
-         PHHWm5CFi4REfonBQXEP00ad1ycG0bb8XjGbNiI1hN4uQyIUZF0WHBgvq+u9p6mX2qnK
-         +umPwL9QNcRru/Gp7KKfmn9XEWNDTVnaJ5ijBHEprE/4vahZm3rWB779Rlv92mRE342Q
-         9Tuw==
-X-Forwarded-Encrypted: i=1; AJvYcCXWVM/EDnAqp9YkhNzqoXjBE7CkLVke+hJE/crcgtZsrtNV1UALsV4Db3nSeVSBoq1d/yM3leX2lnoE8nLaESogfSmNIaMeXf3xLDJYnr309+LdBgc/yRnIHRMtJaVpaiEl98/vqqo1f/RgFWhH8ptZwWnOLLQ2z57W/ucHR/Sm
-X-Gm-Message-State: AOJu0YwcfF7pEv3F2slftBILNgaiZEyZsGpYaP3MTGNBNF1e1UTRHRFz
-	EKaap0feZFw33BRGf4IlT5cMc6PsRrvCVLbMSRg3iuFa0dyPqJVk
-X-Google-Smtp-Source: AGHT+IH46P8IN4JrAN5hCuulfHxINGqT3MUA6PYnKCaDFijovEp8eZHOBGyMyXYbErBqqHO2JIAUtg==
-X-Received: by 2002:a05:600c:1c1e:b0:421:2c02:9779 with SMTP id 5b1f17b1804b1-4212e0c55c3mr82014925e9.4.1717450029553;
-        Mon, 03 Jun 2024 14:27:09 -0700 (PDT)
-Received: from [10.100.102.74] (85.65.205.146.dynamic.barak-online.net. [85.65.205.146])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42134f12e72sm100165345e9.34.2024.06.03.14.27.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Jun 2024 14:27:09 -0700 (PDT)
-Message-ID: <86e60615-9286-4c9c-bffc-72304bd3cc1f@grimberg.me>
-Date: Tue, 4 Jun 2024 00:27:06 +0300
+	s=arc-20240116; t=1717450083; c=relaxed/simple;
+	bh=sJn8dFZQLw2fmK2rJKb/aIWYwv735vUTvmHjnnVa8SM=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DXZSLwRszdVmwqQo8kH5DHcwjiYmmgDQBeXw7xE3VbBGSOcmaq05JMSZewDOFjohcg+wWM2vy1HxOCgF4RG8iAZ6RcfO6DdMkH6tB6dVMwRNWm5yKacz2DFSIlVsh94SyvHzOK6PuB1H2qlMIHogV/a5A9fnH75s6HqTmklg3HY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Uvkz1e85; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 453LKVbf004773;
+	Mon, 3 Jun 2024 21:27:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=content-transfer-encoding : date : from : in-reply-to : message-id :
+ mime-version : references : subject : to; s=pp1;
+ bh=8S6scMshr6tSq+DiziFQE+WxeVKxyQiLKP2e8PnBO60=;
+ b=Uvkz1e85Hs9TxxEOjuFwWMq7fOYXVN+iNZEh9IDa6SZjDA3bB8I2R+oteKPmD8XWAsA4
+ 6O0bX7f796Qd43uudriRLWhbDN49IqHE1Ns+WiOZ9Gpj+QJqYwrq5CDgcd5exs/GRKK+
+ /QhuX1/aFsOjN1zUJl8XADeunG3sRru/dAVQEtNz46Wzs4pao2YrVGmo9P+PSnFLjDW5
+ 74EEy45fIZneuz9jXPxzS4/V/88w+awVmZCO0POMkSRIFzImRRVinR9FzUW0GuHFLag4
+ GD0gVnG5JHZfkUPQSYKAk4sLSeXE6g2TBwCwYaX6YHdIRY3Ml8dUYnDZR1G+pWT+9EWy +Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yhnf981et-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Jun 2024 21:27:54 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 453LRsMl016080;
+	Mon, 3 Jun 2024 21:27:54 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yhnf981eq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Jun 2024 21:27:54 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 453Ji6xs026628;
+	Mon, 3 Jun 2024 21:27:52 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ygffmt4y4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Jun 2024 21:27:52 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 453LRoUe14025424
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 3 Jun 2024 21:27:52 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8421A58060;
+	Mon,  3 Jun 2024 21:27:50 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E5AB45805E;
+	Mon,  3 Jun 2024 21:27:49 +0000 (GMT)
+Received: from ltcwspoon18.bm.com (unknown [9.40.194.38])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  3 Jun 2024 21:27:49 +0000 (GMT)
+From: David Christensen <drc@linux.ibm.com>
+To: Shannon Nelson <shannon.nelson@amd.com>,
+        Brett Creeley <brett.creeley@amd.com>,
+        drivers@pensando.io (supporter:PENSANDO ETHERNET DRIVERS),
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, David Christensen <drc@linux.ibm.com>,
+        netdev@vger.kernel.org (open list:PENSANDO ETHERNET DRIVERS),
+        linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next v2] ionic: advertise 52-bit addressing limitation for MSI-X
+Date: Mon,  3 Jun 2024 17:27:41 -0400
+Message-ID: <20240603212747.1079134-1-drc@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240530214026.774256-1-drc@linux.ibm.com>
+References: <20240530214026.774256-1-drc@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] net: introduce helper sendpages_ok()
-To: Ofir Gal <ofir.gal@volumez.com>, davem@davemloft.net,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, ceph-devel@vger.kernel.org
-Cc: dhowells@redhat.com, edumazet@google.com, pabeni@redhat.com,
- kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, philipp.reisner@linbit.com,
- lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
- idryomov@gmail.com, xiubli@redhat.com
-References: <20240530142417.146696-1-ofir.gal@volumez.com>
- <20240530142417.146696-2-ofir.gal@volumez.com>
- <8d0c198f-9c15-4a8f-957a-2e4aecddd2e5@grimberg.me>
- <23821101-adf0-4e38-a894-fb05a19cb9c3@volumez.com>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <23821101-adf0-4e38-a894-fb05a19cb9c3@volumez.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Cmtwd-_6opUdRXMsHcHFevFRVV6SKc1b
+X-Proofpoint-ORIG-GUID: dMg9qzWn0gWnPL_IrE_FJbqkg08Gr8_h
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-06-03_17,2024-05-30_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ bulkscore=0 lowpriorityscore=0 mlxlogscore=889 spamscore=0 suspectscore=0
+ impostorscore=0 phishscore=0 clxscore=1015 priorityscore=1501 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
+ definitions=main-2406030173
 
->> I still don't understand how a page in the middle of a contiguous range ends
->> up coming from the slab while others don't.
-> I haven't investigate the origin of the IO
-> yet. I suspect the first 2 pages are the superblocks of the raid
-> (mdp_superblock_1 and bitmap_super_s) and the rest of the IO is the bitmap.
+Current ionic devices only support 52 internal physical address
+lines. This is sufficient for x86_64 systems which have similar
+limitations but does not apply to all other architectures,
+notably IBM POWER (ppc64). To ensure that MSI/MSI-X vectors are
+not set outside the physical address limits of the NIC, set the
+no_64bit_msi value of the pci_dev structure during device probe.
 
-Well, if these indeed are different origins and just *happen* to be a 
-mixture
-of slab originated pages and non-slab pages combined together in a 
-single bio of a bvec entry,
-I'd suspect that it would be more beneficial to split the bvec 
-(essentially not allow bio_add_page
-to append the page to tail bvec depending on a queue limit (similar to 
-how we handle sg gaps).
+Signed-off-by: David Christensen <drc@linux.ibm.com>
+---
+v2: Limit change to ppc64 systems as suggested
+---
+ drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
->
->> Ofir, can you please check which condition in sendpage_ok actually fails?
-> It failed because the page has slab, page count is 1. Sorry for not
-> clarifying this.
->
-> "skbuff: !sendpage_ok - page: 0x54f9f140 (pfn: 120757). is_slab: 1, page_count: 1"
->                                                                   ^
-> The print I used:
-> pr_info(
->      "!sendpage_ok - page: 0x%p (pfn: %lx). is_slab: %u, page_count: %u\n",
->      (void *)page,
->      page_to_pfn(page),
->      page_address(page),
->      !!PageSlab(page),
->      page_count(page)
-> );
->
->
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
+index 6ba8d4aca0a0..a7146d50f814 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
+@@ -326,6 +326,11 @@ static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto err_out;
+ 	}
+ 
++#ifdef CONFIG_PPC64
++	/* Ensure MSI/MSI-X interrupts lie within addressable physical memory */
++	pdev->no_64bit_msi = 1;
++#endif
++
+ 	err = ionic_setup_one(ionic);
+ 	if (err)
+ 		goto err_out;
+-- 
+2.43.0
 
 
