@@ -1,155 +1,167 @@
-Return-Path: <netdev+bounces-100091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C0878D7D12
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 10:13:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6727D8D7D1B
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 10:15:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE6DF280D65
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 08:13:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9820B1C20FBB
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 08:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDEF65477A;
-	Mon,  3 Jun 2024 08:13:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D308741C76;
+	Mon,  3 Jun 2024 08:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="k8EuRzzC"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="T3TJ2Ds5"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2DF7487BF;
-	Mon,  3 Jun 2024 08:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC6B3209;
+	Mon,  3 Jun 2024 08:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717402431; cv=none; b=Es2dZBjQLmkabrEnIPRuuaZYKoDaykULPLgNqHN4LcfPFRMRsUHF+NXGJmqWT5UCgaqn0BZW5lqwyGFKWp6D5SmOgQ7wm9Eu4OSgPYhSudf8SNzwOS9OUqaW8VKnM4gvJBLodQq9MLtJ2GDhKwRoK5nOtrTlhhsI6+SbIB1XmCs=
+	t=1717402543; cv=none; b=QaIkv9s/XQ8gxWjFU3qAmiX7ikugrzwMQNSrfidGNgkg0wrGpWgP+Yqq0fBwlBXIJwKYHN231PTowfTRUCn5mSpd/zwt1bPwTm4kgH10HRIMLgM0L3yAuEekLw9r0+xC/aAOMMB1BAubqKMoz8HiJRynPh5P4QY04BEKBDsS6Y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717402431; c=relaxed/simple;
-	bh=dw35w2HlX6uEnLlGNP7oEeKFfwVxxiVEbHS8HsSh6Pc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RLmtzltzhsC9yqBv6wiGonsf4liBWvELcdn/v2eh9IKa7GR3RdKSoWDSrtMIy8E0kSjDxNKZTgrKfw6v4v052i6Oz0SW9Wci/he1KRN0c1tqAiOdqh6Rba768TqQOMQl3FJBOsu38mZLOyqqYnLHTuRre6WKa/TBxJas6Qon1Ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=k8EuRzzC; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=59CM1T4kNHLXN8iP2xZIPMYXtUjSOpZ37vbcWdKyQJY=; b=k8EuRzzCfKfASeTkUM2IU1ILOO
-	wJkGORLCBY5HaUOijcxWfp3qDWtOYt2ghO1T3T8m6SHBTf4uYr5NlTmkwQG1F/QCnZH4l8aiw4jPP
-	9Av/CfwaGZWtgawb95ZQt/1ExzH8/nCNWS4Z9AGRzpMQe4gvf7z/i6hqgp/PfZbtGcXStlSnU9EIE
-	VfikzYJdeyrQzEuuVz6X0HL/rfP1aFGjcyvpHOow3m/Xdk+MqpeL03AAUYWNKiIsUPexZ6RY5deUb
-	ybosb0beHgkpRMEIIGgU4EsSIt/Cmxp5Qk1tiImUk5AUp0ZnwzhaYKWAy96LRL/bVAkX8hTH0aqyT
-	ye9H7dLA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50452)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sE2hz-0002PF-31;
-	Mon, 03 Jun 2024 09:06:24 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sE2hy-0000Fn-FF; Mon, 03 Jun 2024 09:06:22 +0100
-Date: Mon, 3 Jun 2024 09:06:22 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: SkyLake Huang =?utf-8?B?KOm7g+WVn+a+pCk=?= <SkyLake.Huang@mediatek.com>
-Cc: "andrew@lunn.ch" <andrew@lunn.ch>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"dqfext@gmail.com" <dqfext@gmail.com>,
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-	Steven Liu =?utf-8?B?KOWKieS6uuixqik=?= <steven.liu@mediatek.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"angelogioacchino.delregno@collabora.com" <angelogioacchino.delregno@collabora.com>,
-	"daniel@makrotopia.org" <daniel@makrotopia.org>
-Subject: Re: [PATCH net-next v5 4/5] net: phy: mediatek: Extend 1G TX/RX link
- pulse time
-Message-ID: <Zl15fh7y2oZmFfd7@shell.armlinux.org.uk>
-References: <20240530034844.11176-1-SkyLake.Huang@mediatek.com>
- <20240530034844.11176-5-SkyLake.Huang@mediatek.com>
- <ZlhTtSHRVrjWO0KD@shell.armlinux.org.uk>
- <a6280b885cf1cffa845310e7e565e1dd7421dc66.camel@mediatek.com>
- <Zlik7TfUsOanlBMV@shell.armlinux.org.uk>
- <e25de8898d594d14ade148004fdddb1f2c5b47f7.camel@mediatek.com>
+	s=arc-20240116; t=1717402543; c=relaxed/simple;
+	bh=1eCTuiou3HfcQnMc21I72HS3WKJE0285PhpncV0zcBQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=sO1mB/2uhw5RlAxP2T8lxSCrx0t4Y5HGleSEn9TyJ2Bwhbrd5TtC8t+u4uD7Su+ecl33ebMz2FBCrBl2jkx72QSBUWOL8w1Q8cq5IW+0hIoiH4Yyha5ca3u8MHc1n+HBcBnaQwMJ8ukNqbFm+OLxu0eP9E/7me92lREv9K9kxSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=T3TJ2Ds5; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4538F2Re078821;
+	Mon, 3 Jun 2024 03:15:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1717402502;
+	bh=cuyAjV2HDIfTM5xAajcR3acONEE4m9KGW7HlevF+gfQ=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=T3TJ2Ds5C1J7kH43IYAD2y4MCdcLDB9BduJ3s/Be5V3x8dQyqnsZtyqyW6Lp33NMG
+	 D83t9Q/jGL6LQerJh6kqCRm7SuY60fL0eBSMF3jA+x8s56RM0zaLsMnUBqiliewAZd
+	 WXf7C+Py3PSU7ddZo/M5GDJoDV/uaRtUSi3hd19M=
+Received: from DLEE109.ent.ti.com (dlee109.ent.ti.com [157.170.170.41])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4538F1MG009107
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 3 Jun 2024 03:15:02 -0500
+Received: from DLEE105.ent.ti.com (157.170.170.35) by DLEE109.ent.ti.com
+ (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 3
+ Jun 2024 03:15:01 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE105.ent.ti.com
+ (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 3 Jun 2024 03:15:01 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4538EsDi071578;
+	Mon, 3 Jun 2024 03:14:55 -0500
+Message-ID: <b4256b15-997d-4e10-a6a9-a1b41011c867@ti.com>
+Date: Mon, 3 Jun 2024 13:44:54 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e25de8898d594d14ade148004fdddb1f2c5b47f7.camel@mediatek.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: "ERROR: modpost: "icssg_queue_pop" [...] undefined" on arm64
+Content-Language: en-US
+To: Thorsten Leemhuis <linux@leemhuis.info>,
+        Dan Carpenter
+	<dan.carpenter@linaro.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>, Simon Horman
+	<horms@kernel.org>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Vladimir Oltean
+	<vladimir.oltean@nxp.com>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>, Diogo Ivo <diogo.ivo@siemens.com>,
+        Roger Quadros <rogerq@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>
+CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>
+References: <20240528113734.379422-1-danishanwar@ti.com>
+ <20240528113734.379422-2-danishanwar@ti.com>
+ <de980a49-b802-417a-a57e-2c47f67b08e4@leemhuis.info>
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <de980a49-b802-417a-a57e-2c47f67b08e4@leemhuis.info>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Mon, Jun 03, 2024 at 03:15:36AM +0000, SkyLake Huang (黃啟澤) wrote:
-> On Thu, 2024-05-30 at 17:10 +0100, Russell King (Oracle) wrote:
-> >  	 
-> > External email : Please do not click links or open attachments until
-> > you have verified the sender or the content.
-> >  On Thu, May 30, 2024 at 04:01:08PM +0000, SkyLake Huang (黃啟澤) wrote:
-> > > I'm not going to handle timeout case here. If we can't detect
-> > > MTK_PHY_FINAL_SPEED_1000 in 1 second, let it go and we'll detect it
-> > > next round.
-> > 
-> > With this waiting up to one second for MTK_PHY_FINAL_SPEED_1000 to be
-> > set...
-> > 
-> > > > > +int mtk_gphy_cl22_read_status(struct phy_device *phydev)
-> > > > > +{
-> > > > > +int ret;
-> > > > > +
-> > > > > +ret = genphy_read_status(phydev);
-> > > > > +if (ret)
-> > > > > +return ret;
-> > > > > +
-> > > > > +if (phydev->autoneg == AUTONEG_ENABLE && !phydev-
-> > > > >autoneg_complete) {
-> > 
-> > Are you sure you want this condition like this? When the link is
-> > down,
-> > and 1G speeds are being advertised, it means that you'll call
-> > extend_an_new_lp_cnt_limit(). If MTK_PHY_FINAL_SPEED_1000 doesn't get
-> > set, that'll take one second each and every time we poll the PHY for
-> > its status - which will be done while holding phydev->lock.
-> > 
-> > This doesn't sound very good.
-> > 
-> > -- 
-> > RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> > FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Hi Thorsten,
+
+On 03/06/24 12:39 pm, Thorsten Leemhuis wrote:
+> On 28.05.24 13:37, MD Danish Anwar wrote:
+>> Introduce helper functions to configure firmware FDB tables, VLAN tables
+>> and Port VLAN ID settings to aid adding Switch mode support.
+>>
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 > 
-> I add another condition to make sure we enter
-> extend_an_new_lp_cnt_limit() only in first few seconds when we plug in
-> cable.
+> Hi! Since Friday I get a compile error in my -next builds for Fedora:
 > 
-> It will look like this:
-> ===============================================================
-> #define MTK_PHY_AUX_CTRL_AND_STATUS		0x14
-> #define   MTK_PHY_LP_DETECTED_MASK		GENMASK(7, 6)
+> ERROR: modpost: "icssg_queue_push"
+> [drivers/net/ethernet/ti/icssg-prueth-sr1.ko] undefined!
+> ERROR: modpost: "icssg_queue_pop"
+> [drivers/net/ethernet/ti/icssg-prueth-sr1.ko] undefined!
 > 
-> if (phydev->autoneg == AUTONEG_ENABLE && !phydev->autoneg_complete) {
-> 	phy_select_page(phydev, MTK_PHY_PAGE_EXTENDED_1);
-> 	ret = __phy_read(phydev, MTK_PHY_AUX_CTRL_AND_STATUS);
-> 	phy_restore_page(phydev, MTK_PHY_PAGE_STANDARD, 0);
 
-We provide a helper for this:
+Before posting the patches I had tested them with defconfig and I didn't
+see any ERRORs.
 
-	ret = phy_read_paged(phydev, MTK_PHY_PAGE_EXTENDED_1,
-			     MTK_PHY_AUX_CTRL_AND_STATUS);
+I think in the config that you are using most probably
+CONFIG_TI_ICSSG_PRUETH_SR1 is enabled. The patch adds APIs in
+icssg_config.c which uses APIs added in icssg_qeueus.c.
 
-but please check "ret" for errors.
+Now CONFIG_TI_ICSSG_PRUETH_SR1 also uses icssg_config.c but
+icssg_queues.c is not built for SR1 as a result this error is coming.
+
+Fix for this will be to build icssg_queues as well for SR1 driver.
+
+I will test the fix and post it to net-next soon.
+
+> Looks like this problem was found and reported mid May by the kernel
+> test robot already, which identified a earlier version of the patch I'm
+> replying to to be the cause:
+> https://lore.kernel.org/all/202405182038.ncf1mL7Z-lkp@intel.com/
+> 
+> That and the fact that the patch showed up in -next on Friday makes me
+> assume that my problem is caused by this change as well as well. A build
+> log can be found here:
+> https://download.copr.fedorainfracloud.org/results/@kernel-vanilla/next/fedora-39-aarch64/07523690-next-next-all/builder-live.log.gz
+> 
+> I don't have the .config at hand, but can provide it when needed.
+> 
+
+Yes that would be helpful. If possible just check in the .config what
+symbols are enabled related to ICSS. (`cat .config | grep ICSS`)
+
+> Ciao, Thorsten
+> 
+>> ---
+>>  drivers/net/ethernet/ti/icssg/icssg_config.c | 170 +++++++++++++++++++
+>>  drivers/net/ethernet/ti/icssg/icssg_config.h |  19 +++
+>>  drivers/net/ethernet/ti/icssg/icssg_prueth.h |  12 ++
+>>  3 files changed, 201 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
+>> index 15f2235bf90f..2213374d4d45 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
+>> @@ -477,3 +477,173 @@ void icssg_config_set_speed(struct prueth_emac *emac)
+>>  
+
+[...]
+
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks and Regards,
+Danish
 
