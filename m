@@ -1,96 +1,199 @@
-Return-Path: <netdev+bounces-100279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 935C88D8641
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 17:41:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 573E18D864C
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 17:44:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FEB8281C89
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 15:41:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B49A41F221EE
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 15:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B4F132111;
-	Mon,  3 Jun 2024 15:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B23ED132123;
+	Mon,  3 Jun 2024 15:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g2pGxbPQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7591C13210B
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 15:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67491311B4
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 15:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717429284; cv=none; b=o8wU5IS39nlrQCY4DosE9sX9fYOTMHtc9al8qOHCYbeiBZUh3gWmcylhcSng8KqTnirXC3z6rSBYea51cyE6uYh51cA/ML1kLOOIQngvcb1MB5yeZ3+fC0TWmD93H8SqC4nmRLoVgaf7k7/IfmZ36/c8/5HMCRCLtfDJmi0GXhA=
+	t=1717429459; cv=none; b=D1U3rqY/qmtGROhS3Aqzo3FR5zDevNfUzg7vuZJCzKFDlvjGXXlM1DvdEmDBKu60fM3/JArzDzY6a7ek2ZrWbtyWGxN0YX5GniZc8hfa/V1XLXmq4JBIvz49pvM2KUL2au+eVfJuTrSseOK6DsnndWehq2v7sBHNv6EQqjJDPXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717429284; c=relaxed/simple;
-	bh=3VudYg20/y/EaXfg1mqXl0DAjnCh9ZSW1omJW3es4Sc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XG4y4G4wLPqe3BGuYbDQg9oqslRZXRwepeOjlRjQG5CGlf44eRfhPa6aDKROV+y4T2T5/nzVc24jNEJ7cmvm6xhzfCOCzTq2JZRCSqiJMflgqIrhmpcUzz7yswkAE8WXNJRg4kBfb23zsEQkkdOge6lzfr6U+oZH49A6Cr0lyKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-147-GAt3ON1kPJqDSfIJeMpDEA-1; Mon, 03 Jun 2024 16:40:03 +0100
-X-MC-Unique: GAt3ON1kPJqDSfIJeMpDEA-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 3 Jun
- 2024 16:39:22 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Mon, 3 Jun 2024 16:39:22 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: linux-sctp <linux-sctp@vger.kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: SCTP doesn't seem to let you 'cancel' a blocking accept()
-Thread-Topic: SCTP doesn't seem to let you 'cancel' a blocking accept()
-Thread-Index: Adq1ybjOUyi6xNR1Tiu+WEi2iGmOKw==
-Date: Mon, 3 Jun 2024 15:39:22 +0000
-Message-ID: <4faeb583e1d44d82b4e16374b0ad583c@AcuMS.aculab.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1717429459; c=relaxed/simple;
+	bh=ViCOgp0Yz/a1mBDif8ovCtOgE1SFPQZh2StHW9aA04A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JORE9r5EX7QduvuWzH1GV7S/1j8qKCAjdg1cvogu3G0g8ig/UJmUu9N2Fxplr9SCwUPpYC/TDMeft/uzAd86M9TAp0a/5tkgB1kRppd7H4+SoL07upD2OGJ9P17LbZgTh1S9e1G9oFieewUI3N5v+FtzmTp/o25dc9GDMfXN4Vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g2pGxbPQ; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a68b5f18fc5so251512166b.1
+        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 08:44:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717429455; x=1718034255; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rqJ9wkj5wZpDYGPbIA+rqZwe8IgS9OX1IL+4hKpxPn4=;
+        b=g2pGxbPQ9ZGPb9G9nYOHHhrxTVOtUJfV9458zm88if8hA13aqyLDEJipAGSqvX8TB+
+         FTasRCdH7JHpoINO3WVCONpJheLxEsaNr8Ef1yGDiBNaN2RxJ2Nzl7ihOG9ZAEaFdOK8
+         GfllnyypXe50GRE0mPPo+THrRNvBwWfaWOb29haboSGS4whavBCCiCEYHNIDHW2u3Bj9
+         mcWO3d1uQJfuFBZAa89/mW4CLtQsdh8Cx0waCMTKIdowIlPddY3GDPmhoWU9o7SJrLe7
+         i+0l2jfSFXe46fNY2b0ovBZWKMpvDDMucWgOaO7ZZamsjmtZbL3/zRbXMaKnUCQTMx1t
+         8lGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717429455; x=1718034255;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rqJ9wkj5wZpDYGPbIA+rqZwe8IgS9OX1IL+4hKpxPn4=;
+        b=RtaKw/FI0xrfEkO6Ah/lmnlqjH930m4Y3MhVrqmfEqZPvNxRYdu5dTLFGtUzD7uj14
+         BQaMr8qKhMfTZya4S2cuxV3obRS//8nMyZejMLpbPcI/6HQ01AmJCgOEUHlvSOXXI6Qz
+         5cygYiDO/VEqD0R/nz53B+C8E1MK0AOLUj5K4Fxy3yQz1zKxCrrp/92o39EzvBgKxjTL
+         9oc87WL/CrhffCIaomJ28OCdp7OAueT5EewHG/tgSIO//eXWZwTsJCwf6CLF8hOlybH7
+         MZhSXPhMbtbIT/+Gv4fXI2Wbdn12gxQ/GTR/vJ89+vPqmroTW59vj2MkFCXbVHyYbL3Q
+         c9bA==
+X-Forwarded-Encrypted: i=1; AJvYcCWw9YnWS5s9vLmtSpA7aqCVZmRBbV5b1IGEkfz8MmDkhk8Y2B5kf0Z3N9nuvcFlEPdB0CorJP29aDVcO4EpaMferZiJJFQQ
+X-Gm-Message-State: AOJu0Yzoiop+C1pyl55FnVCOUnh1N0UlTxdnq3lXFn9uf6dVQsyGjoD+
+	osSQ3itepwGoKK45f3NIHUpHM8oLRcgvhLNfjsEVTfQMWGLKZe20obnKzjfl3segCUZ8Uf34Nqn
+	G206/RC+C1sj/BQyvNy2sFAJJow81qf3LZ4wQ
+X-Google-Smtp-Source: AGHT+IEgXEMq7A34vV1MITk1aHrXEuVw+nVV7KMqkaSqRj4HNWxMWt5F6AEA8YGPMHEYOyWRevT8/8awpnNeVecVNuY=
+X-Received: by 2002:a17:907:3f28:b0:a68:5ac4:3aaf with SMTP id
+ a640c23a62f3a-a685ac43be7mr699125166b.41.1717429454535; Mon, 03 Jun 2024
+ 08:44:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
+References: <20240530201616.1316526-1-almasrymina@google.com>
+ <20240530201616.1316526-3-almasrymina@google.com> <ZlqzER_ufrhlB28v@infradead.org>
+ <CAHS8izMU_nMEr04J9kXiX6rJqK4nQKA+W-enKLhNxvK7=H2pgA@mail.gmail.com> <5aee4bba-ca65-443c-bd78-e5599b814a13@gmail.com>
+In-Reply-To: <5aee4bba-ca65-443c-bd78-e5599b814a13@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 3 Jun 2024 08:43:58 -0700
+Message-ID: <CAHS8izNmT_NzgCu1pY1RKgJh+kP2rCL_90Gqau2Pkd3-48Q1_w@mail.gmail.com>
+Subject: Re: [PATCH net-next v10 02/14] net: page_pool: create hooks for
+ custom page providers
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
+	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-In a multithreaded program it is reasonable to have a thread blocked in acc=
-ept().
-With TCP a subsequent shutdown(listen_fd, SHUT_RDWR) causes the accept to f=
-ail.
-But nothing happens for SCTP.
+On Mon, Jun 3, 2024 at 7:52=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.c=
+om> wrote:
+>
+> On 6/3/24 15:17, Mina Almasry wrote:
+> > On Fri, May 31, 2024 at 10:35=E2=80=AFPM Christoph Hellwig <hch@infrade=
+ad.org> wrote:
+> >>
+> >> On Thu, May 30, 2024 at 08:16:01PM +0000, Mina Almasry wrote:
+> >>> I'm unsure if the discussion has been resolved yet. Sending the serie=
+s
+> >>> anyway to get reviews/feedback on the (unrelated) rest of the series.
+> >>
+> >> As far as I'm concerned it is not.  I've not seen any convincing
+> >> argument for more than page/folio allocator including larger order /
+> >> huge page and dmabuf.
+> >>
+> >
+> > Thanks Christoph, this particular patch series adds dmabuf, so I
+> > assume no objection there. I assume the objection is that you want the
+> > generic, extensible hooks removed.
+> >
+> > To be honest, I don't think the hooks are an integral part of the
+> > design, and at this point I think we've argued for them enough. I
+> > think we can easily achieve the same thing with just raw if statements
+> > in a couple of places. We can always add the hooks if and only if we
+> > actually justify many memory providers.
+> >
+> > Any objections to me removing the hooks and directing to memory
+> > allocations via simple if statements? Something like (very rough
+> > draft, doesn't compile):
+>
+> The question for Christoph is what exactly is the objection here? Why we
+> would not be using well defined ops when we know there will be more
+> users? Repeating what I said in the last thread, for io_uring it's used
+> to implement the flow of buffers from userspace to the kernel, the ABI,
+> which is orthogonal to the issue of what memory type it is and how it
+> came there. And even if you mandate unnecessary dmabuf condoms for user
+> memory in one form or another IMHO for no clear reason, the callbacks
+> (or yet another if-else) would still be needed.
+>
+> Sure, Mina can drop and hard code devmem path to easy the pain for
+> him and delay the discussion, but then shortly after I will be
+> re-sending same shit.
 
-I think the 'magic' happens when tcp_disconnect() calls inet_csk_listen_sto=
-p(sk)
-but sctp_disconnect() is an empty function and nothing happens.
+You don't need to re-send the same ops again, right? You can add io
+uring support without ops. Something like:
 
-I can't see any calls to inet_csk_listen_stop() in the sctp code - so I sus=
-pect
-it isn't possible at all.
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 92be1aaf18ccc..2cc986455bce6 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -557,8 +557,8 @@ netmem_ref page_pool_alloc_netmem(struct page_pool
+*pool, gfp_t gfp)
+                return netmem;
 
-This all relates to a very old (pre git) comment in inet_shutdown() that
-shutdown needs to act on listening and connecting sockets until the VFS
-layer is 'fixed' (presumably to let close() through - not going to happen.)
+        /* Slow-path: cache empty, do real allocation */
+-       if (static_branch_unlikely(&page_pool_mem_providers) && pool->mp_op=
+s)
+-               netmem =3D pool->mp_ops->alloc_pages(pool, gfp);
++       if (unlikely(page_pool_is_dmabuf(pool)))
++               netmem =3D mp_dmabuf_devmem_alloc_pages():
++       else if (unlikely(page_pool_is_iouring(pool)))
++               netmem =3D mp_io_uring_alloc_pages():
+       else
+                netmem =3D __page_pool_alloc_pages_slow(pool, gfp);
+        return netmem;
 
-I also suspect that a blocking connect() can't be cancelled either?
+So IMO, the ops themselves, which Christoph is repeatedly nacking, are
+not that important.
 
-Clearly the application can avoid the issue by using poll() and an
-extra eventfd() for the wakeup - but it is all a faff for code that
-otherwise straight forward.
+I humbly think the energy should be spent convincing maintainers of
+the use case of io uring memory, not the ops. The ops are a cosmetic
+change to the code, and can be added later. Christoph is nacking the
+ops because it gives people too much rope [1].
 
-=09=09David
+But if you disagree and think the ops themselves are important for a
+reason I missed, I'm happy waiting until agreement is reached here.
+Sorry, just voicing my 2 cents.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
+[1] https://lore.kernel.org/netdev/ZjjHUh1eINPg1wkn@infradead.org/
 
+--=20
+Thanks,
+Mina
 
