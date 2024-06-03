@@ -1,47 +1,48 @@
-Return-Path: <netdev+bounces-100037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D9A48D7A0F
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 04:21:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECABD8D7A1D
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 04:42:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20D821F2155F
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 02:21:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C8CC1F20F2B
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 02:42:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF425244;
-	Mon,  3 Jun 2024 02:21:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC7335250;
+	Mon,  3 Jun 2024 02:42:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="n/twqi65"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LIEIUJ/a"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2FFB64F;
-	Mon,  3 Jun 2024 02:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8644C46AF
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 02:42:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717381299; cv=none; b=p8CM1W4pFnakCe6YwS1nAqEkoTeI7wc452KuWsXCH7GQa3Vk8WjW382DfdCLaagr1erhwchx7sQGtvBSR3VbFKbpwZugESbg5I2s7kEob6yVDfHw8KI7ffmjgT0+UX5zxSQm4ZmI1jo5zuThYM9cmvFb3Y5kncUfOlzOaC6f9lw=
+	t=1717382536; cv=none; b=uTPe+rUrNOnp23RSl/fm0SymB+bW521JkFLqhu742G7WfENjgEcD/SmpC0/Wmd/CSuE7MMBuzuwfHlM6+8/76uvoA6xbobMaUtY2B4mUxVeSeZIGxE9peXq3JybptB44RfH9J4iLIu/x9KdYa1/QT/bsxXmCj1b7yKQNybLYIow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717381299; c=relaxed/simple;
-	bh=GxsG4dkWnrl6biBJJU/FZyFxq7wrlNkODen4UfiLAU4=;
+	s=arc-20240116; t=1717382536; c=relaxed/simple;
+	bh=szRr1ZrFVhoqIW05er6VvT95RtIFU5F1q5/KULroP9I=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SOh5GkiVLwSmJ3usGW2tlcIFFvySEHnKSzcVnljfrcYfZJYgG5AmFV8YDFPByL/D60VaQwq04SCbQc5vStu/aPrICNyzcfTMvlgXM1gAaVKzGxPYOHvtg90+CSkXIWq9m4wnPS1Ecu7FSmqtV0hiCd/YREv5JqcYx8hAflwnqls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=n/twqi65; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1717381287; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=QEa9UFXOBmvQ9lQIuD1SY9wFvJzOEIAY/T7O4TOM0TM=;
-	b=n/twqi65vFTXgmJXYeAsqycDkiYkNvhEzAD7uorwaW+z/+x7Cnw4wniEQvuwtuPaygVd5BOx+SmcZImHI97jxbjEBEruuXlZrTvuJZnrqJeuVQ46JUFxdweOSoqK7pgJB6osKanRXXxlYFQDLf7JB7ZZnXAahNmr16kEnCM49rs=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067113;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W7gQOiA_1717381285;
-Received: from 30.221.101.211(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0W7gQOiA_1717381285)
-          by smtp.aliyun-inc.com;
-          Mon, 03 Jun 2024 10:21:26 +0800
-Message-ID: <9bc9e02c-6114-4790-8afc-7166f6e0e63f@linux.alibaba.com>
-Date: Mon, 3 Jun 2024 10:21:23 +0800
+	 In-Reply-To:Content-Type; b=hr4L+w3AepmCJwrL6/cs6wZJmtfELfqe/zeenUYEADZSlGto493hH1/C0PRyth6a2oqIijz40ivzAZ2RFfbhx4Fx4gHkmpxS0y0kQDASkgmR3Vgm1zQEQ1UG6T4GB4YWk1Bu5KC5QJeG1um0jB2ryx2itYIz3rXRv1su7n5zbCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LIEIUJ/a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B89A6C2BBFC;
+	Mon,  3 Jun 2024 02:42:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717382536;
+	bh=szRr1ZrFVhoqIW05er6VvT95RtIFU5F1q5/KULroP9I=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=LIEIUJ/awsgFN0V+0fP06hMdOwlgWTho6NquGN3biTN2lSdEew1guaOYCmBIjquOA
+	 FLu7dfBSvQMAi3IYrEq+Etje7BHJJkxomDyfNb1ro2BRC77z3vq2KvMjBpe2anTdea
+	 nU5fdobKW0/X1Jh2keSnGgxWCWFwmP0V0BIiMum3E+FDf+3xS1NAO5//9KqNTVFLQx
+	 r2i4RQMMItXNyZwvVBAO3UBH/luoVENQdLKv6dPeTsuEF1W0ymANxfgtkhg0nN2YEg
+	 lj8SsvaLxehWO2vJK/ABGFBZYiB907n1jNZ4SZAKk8Y5r0HzAfKb6qOhv2vKbdtPcM
+	 aTKL7mni+mQjQ==
+Message-ID: <dafecb99-d4e4-4c0c-a339-a5a5bebcc41c@kernel.org>
+Date: Sun, 2 Jun 2024 20:42:14 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,60 +50,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] net/smc: set rmb's SG_MAX_SINGLE_ALLOC
- limitation only when CONFIG_ARCH_NO_SG_CHAIN is defined
-To: Simon Horman <horms@kernel.org>
-Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- kgraul@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- guwen@linux.alibaba.com, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240528135138.99266-1-guangguan.wang@linux.alibaba.com>
- <20240528135138.99266-2-guangguan.wang@linux.alibaba.com>
- <20240601083517.GX491852@kernel.org>
+Subject: Re: [PATCH net] inet: bring NLM_DONE out to a separate recv() in
+ inet_dump_ifaddr()
 Content-Language: en-US
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-In-Reply-To: <20240601083517.GX491852@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, davem@davemloft.net,
+ netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+References: <20240601212517.644844-1-kuba@kernel.org>
+ <20240601161013.10d5e52c@hermes.local> <20240601164814.3c34c807@kernel.org>
+ <ad393197-fd1a-4cd8-a371-f6529419193b@kernel.org>
+ <20240602145916.0629c8e2@kernel.org>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240602145916.0629c8e2@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-
-
-On 2024/6/1 16:35, Simon Horman wrote:
-> On Tue, May 28, 2024 at 09:51:37PM +0800, Guangguan Wang wrote:
->> SG_MAX_SINGLE_ALLOC is used to limit maximum number of entries that
->> will be allocated in one piece of scatterlist. When the entries of
->> scatterlist exceeds SG_MAX_SINGLE_ALLOC, sg chain will be used. From
->> commit 7c703e54cc71 ("arch: switch the default on ARCH_HAS_SG_CHAIN"),
->> we can know that the macro CONFIG_ARCH_NO_SG_CHAIN is used to identify
->> whether sg chain is supported. So, SMC-R's rmb buffer should be limitted
-> 
-> Hi Guangguan Wang,
-> 
-> As it looks like there will be a v2:
-> 
-> In this patch: limitted -> limited
-> In patch 2/2:  defalut -> default
-> 
-> checkpatch.pl --codespell is your friend.
-> 
->> by SG_MAX_SINGLE_ALLOC only when the macro CONFIG_ARCH_NO_SG_CHAIN is
->> defined.
+On 6/2/24 3:59 PM, Jakub Kicinski wrote:
+> On Sat, 1 Jun 2024 20:23:17 -0600 David Ahern wrote:
+>>> The dump partitioning is up to the family. Multiple families
+>>> coalesce NLM_DONE from day 1. "All dumps must behave the same"
+>>> is saying we should convert all families to be poorly behaved.
+>>>
+>>> Admittedly changing the most heavily used parts of rtnetlink is very
+>>> risky. And there's couple more corner cases which I'm afraid someone
+>>> will hit. I'm adding this helper to clearly annotate "legacy"
+>>> callbacks, so we don't regress again. At the same time nobody should
+>>> use this in new code or "just to be safe" (read: because they don't
+>>> understand netlink).  
 >>
->> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
->> Co-developed-by: Wen Gu <guwen@linux.alibaba.com>
->> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
->> Fixes: a3fe3d01bd0d ("net/smc: introduce sg-logic for RMBs")
+>> What about a socket option that says "I am a modern app and can handle
+>> the new way" - similar to the strict mode option that was added? Then
+>> the decision of requiring a separate message for NLM_DONE can be based
+>> on the app.
 > 
-> I think it is usual to put the fixes tag above the Signed-of tags,
-> although I don't see anything about that in [1].
+> That seems like a good solution, with the helper marking the "legacy"
+> handlers - I hope it should be trivial to add such option and change
+> the helper's behavior based on the socket state.
 > 
-> [1] https://www.kernel.org/doc/html/latest/process/submitting-patches.html#using-reported-by-tested-by-reviewed-by-suggested-by-and-fixes
+>> Could even throw a `pr_warn_once("modernize app %s/%d\n")`
+>> to help old apps understand they need to move forward.
 > 
-> ...
+> Hm, do you think people would actually modernize all the legacy apps?
 
-I will fix it in the next version.
+I have worked for a few companies that do monitor dmesg and when given
+the right push will update apps. Best an OS can do.
 
-Thanks,
-Guangguan Wang
+> 
+> Coincidentally, looking at Jaroslav's traces it appears that the app
+> sets ifindex for the link dump, so it must not be opting into strict
+> checking, either.
+
+:-(
+
+I should have added a warning back when the option was introduced - that
+and a warning when options to a dump are ignored.
 
