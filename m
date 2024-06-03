@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-100330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED5EE8D891E
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 20:58:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73B588D891F
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 20:58:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8B262844D7
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 18:58:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4B2BB234BB
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 18:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F414313A253;
-	Mon,  3 Jun 2024 18:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FAA413A3E0;
+	Mon,  3 Jun 2024 18:57:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F7y7Z5F1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JaSBbFl0"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FF1139D0E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F9F139D03
 	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 18:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717441057; cv=none; b=Tb3CtwBb0TG07eRSIItNoVWVZ+szy7a4d3+TIIH35LtHCuEq+IuI8JAPYNp5ljsuB9kUtEg6hpcmaqF8nR6aY8CfhbyQUijOPdUStJ90ar3s6bN2D41KMw3jBreqh2uu5JIp2S1n+JYVqDjzCAGvSoFo4gyK0uAZaQHYA3azwc0=
+	t=1717441058; cv=none; b=X0jJ1RaPhSpxNgUrWx7AKw9iaPnw881fCsMQPbOpVUSthqK/hUFGZxjY/L8+UucI/60J/0nhW5PATo3ckmGtD6YoPi1UUiN1chzU6VQYuLaMqQGT9U9W3LF9GsabqG0GQzTEfFSzP4PEl8JBBETjERNDNDu3OICtKKE9VsmlfuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717441057; c=relaxed/simple;
-	bh=AOIfXTx4GyYj5Pmc8/o/l6pRT6iHumQj2ONfkG8r2Rc=;
+	s=arc-20240116; t=1717441058; c=relaxed/simple;
+	bh=csIRAevQXaXV3/QuFII3hWH9VinOv3RpXCGK35oePmE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LY/6JfSwnhr/4/eIS81ZSpQg11Cm/zrLLMSKWRfozxIutWeEUAeqk2MYtA4Swnt8Xlj6SM0MhY3OGpTnoL2qv6weWtf4gl0bPPIHnsLCaTDdYaQEL7A0Fsj0VkZYclPebRi1HgNPACq6gPsFLVb67hEfRUlq6+T+W5Cj0buq/gw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F7y7Z5F1; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=S3DS2RXuokUnkRkR4HVLeua0FmbWIU6LjEEhTo25VnKujWHduMbBrNEhTe7vOeUK7Jce0Dbm4BNr456r2GhaBOgyLL6qMv79z0CrCJF2xFvF1Ml4Jmn4qQZAZKf+gQlENOG6wTmQb/vAKZVZDXRjFaO3T2N1dZw9JD5vuajCTy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JaSBbFl0; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
@@ -37,25 +37,25 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CTM8vbk+rNcu3ConnsNMKQW7YR+1u374e63lDdvg+dM=;
-	b=F7y7Z5F1r5GnclO2tJvzIMlKsn4Ypvioltb1yppFcWTnqP3VulJmymdJ74DRgKa2bAN/xS
-	1BfBQCHnfEpKPk/gqn/m/9qnk0N0tN+McvO1W5Ole0QrD2G8NOpkjKi5wsRSYGFRaHVSCM
-	aOco7wQLWGDVI+yIUeMOInvZvF0ikZo=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=4xSmS4Boy+eXPLwyzOO4qkDTJ3SBH44Hzdq5XOl44QY=;
+	b=JaSBbFl04d9rGHDthnIfwmYEw+ckAdzERap4nQAGKUDJay7cL35UE7luxpxCsFFFgZbJue
+	Q21i9OGgy1gWQReM6S2qtjxvJgMySkWxHUO9HP4n6Qk+BWNXuoeWvIjOuSlmakLw0RpTCq
+	/ZHVPuap+rvGUSyDV3/pHGYwZGGzrzQ=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-326-pESIncLTNA2FSzU1or3mMA-1; Mon,
- 03 Jun 2024 14:57:30 -0400
-X-MC-Unique: pESIncLTNA2FSzU1or3mMA-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-692-u0DgwDLgMFKSTDBzqjI8YA-1; Mon,
+ 03 Jun 2024 14:57:32 -0400
+X-MC-Unique: u0DgwDLgMFKSTDBzqjI8YA-1
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 411391913F5B;
-	Mon,  3 Jun 2024 18:57:24 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6BE9D18D22A0;
+	Mon,  3 Jun 2024 18:57:30 +0000 (UTC)
 Received: from antares.redhat.com (unknown [10.39.193.112])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2B24F1955F6E;
-	Mon,  3 Jun 2024 18:57:18 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2E7671955F6E;
+	Mon,  3 Jun 2024 18:57:25 +0000 (UTC)
 From: Adrian Moreno <amorenoz@redhat.com>
 To: netdev@vger.kernel.org
 Cc: aconole@redhat.com,
@@ -64,18 +64,16 @@ Cc: aconole@redhat.com,
 	i.maximets@ovn.org,
 	dev@openvswitch.org,
 	Adrian Moreno <amorenoz@redhat.com>,
-	Yotam Gigi <yotam.gi@gmail.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
+	Pravin B Shelar <pshelar@ovn.org>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 4/9] net: psample: allow using rate as probability
-Date: Mon,  3 Jun 2024 20:56:38 +0200
-Message-ID: <20240603185647.2310748-5-amorenoz@redhat.com>
+Subject: [PATCH net-next v2 5/9] net: openvswitch: add emit_sample action
+Date: Mon,  3 Jun 2024 20:56:39 +0200
+Message-ID: <20240603185647.2310748-6-amorenoz@redhat.com>
 In-Reply-To: <20240603185647.2310748-1-amorenoz@redhat.com>
 References: <20240603185647.2310748-1-amorenoz@redhat.com>
 Precedence: bulk
@@ -87,90 +85,248 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Although not explicitly documented in the psample module itself, the
-definition of PSAMPLE_ATTR_SAMPLE_RATE seems inherited from act_sample.
+Add support for a new action: emit_sample.
 
-Quoting tc-sample(8):
-"RATE of 100 will lead to an average of one sampled packet out of every
-100 observed."
+This action accepts a u32 group id and a variable-length cookie and uses
+the psample multicast group to make the packet available for
+observability.
 
-With this semantics, the rates that we can express with an unsigned
-32-bits number are very unevenly distributed and concentrated towards
-"sampling few packets".
-For example, we can express a probability of 2.32E-8% but we
-cannot express anything between 100% and 50%.
-
-For sampling applications that are capable of sampling a decent
-amount of packets, this sampling rate semantics is not very useful.
-
-Add a new flag to the uAPI that indicates that the sampling rate is
-expressed in scaled probability, this is:
-- 0 is 0% probability, no packets get sampled.
-- U32_MAX is 100% probability, all packets get sampled.
+The maximum length of the user-defined cookie is set to 16, same as
+tc_cookie, to discourage using cookies that will not be offloadable.
 
 Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
 ---
- include/net/psample.h                 | 3 ++-
- include/uapi/linux/psample.h          | 4 ++++
- include/uapi/linux/tc_act/tc_sample.h | 1 +
- net/psample/psample.c                 | 3 +++
- 4 files changed, 10 insertions(+), 1 deletion(-)
+ Documentation/netlink/specs/ovs_flow.yaml | 17 ++++++++
+ include/uapi/linux/openvswitch.h          | 25 ++++++++++++
+ net/openvswitch/actions.c                 | 50 +++++++++++++++++++++++
+ net/openvswitch/flow_netlink.c            | 33 ++++++++++++++-
+ 4 files changed, 124 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/psample.h b/include/net/psample.h
-index 2ac71260a546..c52e9ebd88dd 100644
---- a/include/net/psample.h
-+++ b/include/net/psample.h
-@@ -24,7 +24,8 @@ struct psample_metadata {
- 	u8 out_tc_valid:1,
- 	   out_tc_occ_valid:1,
- 	   latency_valid:1,
--	   unused:5;
-+	   rate_as_probability:1,
-+	   unused:4;
- 	const u8 *user_cookie;
- 	u32 user_cookie_len;
- };
-diff --git a/include/uapi/linux/psample.h b/include/uapi/linux/psample.h
-index e80637e1d97b..8b069e75beab 100644
---- a/include/uapi/linux/psample.h
-+++ b/include/uapi/linux/psample.h
-@@ -20,6 +20,10 @@ enum {
- 	PSAMPLE_ATTR_TIMESTAMP,		/* u64, nanoseconds */
- 	PSAMPLE_ATTR_PROTO,		/* u16 */
- 	PSAMPLE_ATTR_USER_COOKIE,	/* binary, user provided data */
-+	PSAMPLE_ATTR_SAMPLE_PROBABILITY,/* no argument, interpret rate in
-+					 * PSAMPLE_ATTR_SAMPLE_RATE as a
-+					 * probability scaled 0 - U32_MAX.
-+					 */
+diff --git a/Documentation/netlink/specs/ovs_flow.yaml b/Documentation/netlink/specs/ovs_flow.yaml
+index 4fdfc6b5cae9..a7ab5593a24f 100644
+--- a/Documentation/netlink/specs/ovs_flow.yaml
++++ b/Documentation/netlink/specs/ovs_flow.yaml
+@@ -727,6 +727,12 @@ attribute-sets:
+         name: dec-ttl
+         type: nest
+         nested-attributes: dec-ttl-attrs
++      -
++        name: emit-sample
++        type: nest
++        nested-attributes: emit-sample-attrs
++        doc: |
++          Sends a packet sample to psample for external observation.
+   -
+     name: tunnel-key-attrs
+     enum-name: ovs-tunnel-key-attr
+@@ -938,6 +944,17 @@ attribute-sets:
+       -
+         name: gbp
+         type: u32
++  -
++    name: emit-sample-attrs
++    enum-name: ovs-emit-sample-attr
++    name-prefix: ovs-emit-sample-attr-
++    attributes:
++      -
++        name: group
++        type: u32
++      -
++        name: cookie
++        type: binary
  
- 	__PSAMPLE_ATTR_MAX
+ operations:
+   name-prefix: ovs-flow-cmd-
+diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
+index efc82c318fa2..a0e9dde0584a 100644
+--- a/include/uapi/linux/openvswitch.h
++++ b/include/uapi/linux/openvswitch.h
+@@ -914,6 +914,30 @@ struct check_pkt_len_arg {
  };
-diff --git a/include/uapi/linux/tc_act/tc_sample.h b/include/uapi/linux/tc_act/tc_sample.h
-index fee1bcc20793..7ee0735e7b38 100644
---- a/include/uapi/linux/tc_act/tc_sample.h
-+++ b/include/uapi/linux/tc_act/tc_sample.h
-@@ -18,6 +18,7 @@ enum {
- 	TCA_SAMPLE_TRUNC_SIZE,
- 	TCA_SAMPLE_PSAMPLE_GROUP,
- 	TCA_SAMPLE_PAD,
-+	TCA_SAMPLE_PROBABILITY,
- 	__TCA_SAMPLE_MAX
- };
- #define TCA_SAMPLE_MAX (__TCA_SAMPLE_MAX - 1)
-diff --git a/net/psample/psample.c b/net/psample/psample.c
-index 1c76f3e48dcd..f48b5b9cd409 100644
---- a/net/psample/psample.c
-+++ b/net/psample/psample.c
-@@ -497,6 +497,9 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
- 		    md->user_cookie))
- 		goto error;
+ #endif
  
-+	if (md->rate_as_probability)
-+		nla_put_flag(skb, PSAMPLE_ATTR_SAMPLE_PROBABILITY);
++#define OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE 16
++/**
++ * enum ovs_emit_sample_attr - Attributes for %OVS_ACTION_ATTR_EMIT_SAMPLE
++ * action.
++ *
++ * @OVS_EMIT_SAMPLE_ATTR_GROUP: 32-bit number to identify the source of the
++ * sample.
++ * @OVS_EMIT_SAMPLE_ATTR_COOKIE: A variable-length binary cookie that contains
++ * user-defined metadata. The maximum length is 16 bytes.
++ *
++ * Sends the packet to the psample multicast group with the specified group and
++ * cookie. It is possible to combine this action with the
++ * %OVS_ACTION_ATTR_TRUNC action to limit the size of the packet being emitted.
++ */
++enum ovs_emit_sample_attr {
++	OVS_EMIT_SAMPLE_ATTR_UNPSEC,
++	OVS_EMIT_SAMPLE_ATTR_GROUP,	/* u32 number. */
++	OVS_EMIT_SAMPLE_ATTR_COOKIE,	/* Optional, user specified cookie. */
++	__OVS_EMIT_SAMPLE_ATTR_MAX
++};
 +
- 	genlmsg_end(nl_skb, data);
- 	genlmsg_multicast_netns(&psample_nl_family, group->net, nl_skb, 0,
- 				PSAMPLE_NL_MCGRP_SAMPLE, GFP_ATOMIC);
++#define OVS_EMIT_SAMPLE_ATTR_MAX (__OVS_EMIT_SAMPLE_ATTR_MAX - 1)
++
++
+ /**
+  * enum ovs_action_attr - Action types.
+  *
+@@ -1004,6 +1028,7 @@ enum ovs_action_attr {
+ 	OVS_ACTION_ATTR_ADD_MPLS,     /* struct ovs_action_add_mpls. */
+ 	OVS_ACTION_ATTR_DEC_TTL,      /* Nested OVS_DEC_TTL_ATTR_*. */
+ 	OVS_ACTION_ATTR_DROP,         /* u32 error code. */
++	OVS_ACTION_ATTR_EMIT_SAMPLE,  /* Nested OVS_EMIT_SAMPLE_ATTR_*. */
+ 
+ 	__OVS_ACTION_ATTR_MAX,	      /* Nothing past this will be accepted
+ 				       * from userspace. */
+diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+index 964225580824..3b4dba0ded59 100644
+--- a/net/openvswitch/actions.c
++++ b/net/openvswitch/actions.c
+@@ -24,6 +24,11 @@
+ #include <net/checksum.h>
+ #include <net/dsfield.h>
+ #include <net/mpls.h>
++
++#if IS_ENABLED(CONFIG_PSAMPLE)
++#include <net/psample.h>
++#endif
++
+ #include <net/sctp/checksum.h>
+ 
+ #include "datapath.h"
+@@ -1299,6 +1304,46 @@ static int execute_dec_ttl(struct sk_buff *skb, struct sw_flow_key *key)
+ 	return 0;
+ }
+ 
++static int execute_emit_sample(struct datapath *dp, struct sk_buff *skb,
++			       const struct sw_flow_key *key,
++			       const struct nlattr *attr)
++{
++#if IS_ENABLED(CONFIG_PSAMPLE)
++	struct psample_group psample_group = {};
++	struct psample_metadata md = {};
++	struct vport *input_vport;
++	const struct nlattr *a;
++	int rem;
++
++	for (a = nla_data(attr), rem = nla_len(attr); rem > 0;
++	     a = nla_next(a, &rem)) {
++		switch (nla_type(a)) {
++		case OVS_EMIT_SAMPLE_ATTR_GROUP:
++			psample_group.group_num = nla_get_u32(a);
++			break;
++
++		case OVS_EMIT_SAMPLE_ATTR_COOKIE:
++			md.user_cookie = nla_data(a);
++			md.user_cookie_len = nla_len(a);
++			break;
++		}
++	}
++
++	psample_group.net = ovs_dp_get_net(dp);
++
++	input_vport = ovs_vport_rcu(dp, key->phy.in_port);
++	if (!input_vport)
++		input_vport = ovs_vport_rcu(dp, OVSP_LOCAL);
++
++	md.in_ifindex = input_vport->dev->ifindex;
++	md.trunc_size = skb->len - OVS_CB(skb)->cutlen;
++
++	psample_sample_packet(&psample_group, skb, 0, &md);
++#endif
++
++	return 0;
++}
++
+ /* Execute a list of actions against 'skb'. */
+ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
+ 			      struct sw_flow_key *key,
+@@ -1502,6 +1547,11 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
+ 			ovs_kfree_skb_reason(skb, reason);
+ 			return 0;
+ 		}
++
++		case OVS_ACTION_ATTR_EMIT_SAMPLE:
++			err = execute_emit_sample(dp, skb, key, a);
++			OVS_CB(skb)->cutlen = 0;
++			break;
+ 		}
+ 
+ 		if (unlikely(err)) {
+diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
+index f224d9bcea5e..eb59ff9c8154 100644
+--- a/net/openvswitch/flow_netlink.c
++++ b/net/openvswitch/flow_netlink.c
+@@ -64,6 +64,7 @@ static bool actions_may_change_flow(const struct nlattr *actions)
+ 		case OVS_ACTION_ATTR_TRUNC:
+ 		case OVS_ACTION_ATTR_USERSPACE:
+ 		case OVS_ACTION_ATTR_DROP:
++		case OVS_ACTION_ATTR_EMIT_SAMPLE:
+ 			break;
+ 
+ 		case OVS_ACTION_ATTR_CT:
+@@ -2409,7 +2410,7 @@ static void ovs_nla_free_nested_actions(const struct nlattr *actions, int len)
+ 	/* Whenever new actions are added, the need to update this
+ 	 * function should be considered.
+ 	 */
+-	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 24);
++	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 25);
+ 
+ 	if (!actions)
+ 		return;
+@@ -3157,6 +3158,29 @@ static int validate_and_copy_check_pkt_len(struct net *net,
+ 	return 0;
+ }
+ 
++static int validate_emit_sample(const struct nlattr *attr)
++{
++	static const struct nla_policy policy[OVS_EMIT_SAMPLE_ATTR_MAX + 1] = {
++		[OVS_EMIT_SAMPLE_ATTR_GROUP] = { .type = NLA_U32 },
++		[OVS_EMIT_SAMPLE_ATTR_COOKIE] = {
++			.type = NLA_BINARY,
++			.len = OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE
++		},
++	};
++	struct nlattr *a[OVS_EMIT_SAMPLE_ATTR_MAX  + 1];
++	int err;
++
++	if (!IS_ENABLED(CONFIG_PSAMPLE))
++		return -EOPNOTSUPP;
++
++	err = nla_parse_nested(a, OVS_EMIT_SAMPLE_ATTR_MAX, attr, policy,
++			       NULL);
++	if (err)
++		return err;
++
++	return a[OVS_EMIT_SAMPLE_ATTR_GROUP] ? 0 : -EINVAL;
++}
++
+ static int copy_action(const struct nlattr *from,
+ 		       struct sw_flow_actions **sfa, bool log)
+ {
+@@ -3212,6 +3236,7 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
+ 			[OVS_ACTION_ATTR_ADD_MPLS] = sizeof(struct ovs_action_add_mpls),
+ 			[OVS_ACTION_ATTR_DEC_TTL] = (u32)-1,
+ 			[OVS_ACTION_ATTR_DROP] = sizeof(u32),
++			[OVS_ACTION_ATTR_EMIT_SAMPLE] = (u32)-1,
+ 		};
+ 		const struct ovs_action_push_vlan *vlan;
+ 		int type = nla_type(a);
+@@ -3490,6 +3515,12 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
+ 				return -EINVAL;
+ 			break;
+ 
++		case OVS_ACTION_ATTR_EMIT_SAMPLE:
++			err = validate_emit_sample(a);
++			if (err)
++				return err;
++			break;
++
+ 		default:
+ 			OVS_NLERR(log, "Unknown Action type %d", type);
+ 			return -EINVAL;
 -- 
 2.45.1
 
