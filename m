@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-100118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67FDA8D7EB5
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 11:32:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8123C8D7EDA
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 11:36:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15F3A1F2755A
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:32:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C37AAB23E0B
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9772485293;
-	Mon,  3 Jun 2024 09:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E535D84D06;
+	Mon,  3 Jun 2024 09:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="LdawYK84"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="UitswJ3h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39D984D3A;
-	Mon,  3 Jun 2024 09:30:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3122581735;
+	Mon,  3 Jun 2024 09:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717407007; cv=none; b=nualIHlQCv5emd2dGsIU8J0AOdYQU2CZSqkyS3CpZPZ9oUdbEKMRNpoHMluzNafATDX5JhzKNLpifhdXYPXOrD3SjT/UffWFI7X3rgEAUYiTKF94jtPEv6d3ySMhhzvr3b7WYbmtYqsG9JdENOYUqwJekaA/sqjFQXNBDhjil8s=
+	t=1717407034; cv=none; b=L81BHZk7HHxP7v2Ko+873ph7xdJ09P4/5AA7vMMZnLemBX0DfjqvOiRf26D88V89hHFc98TbXo1oZC/BeCEZa+WNHndmP4Nj6s03zx4J25j7CaZNk3arnOn+Iua31vm16Fw5qnFjGax7DvNR3CaFnhCsa0hVV/TcuqberHSTknY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717407007; c=relaxed/simple;
-	bh=7DtE2k2URWPLOQxFQ6I32AXng4aK2uTQua12hUWR4aE=;
+	s=arc-20240116; t=1717407034; c=relaxed/simple;
+	bh=5XgmPkWBE7ZrQHTH6fXh6qp6yVoRV8csp4Z9wMZqsbc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LyuiGI3y+Xo2ZfRBUoIJ8LOCsVLrtRskox1j/s3pa/6AIvcGfoL/+Yndzh/mk/wPQboIirU95w58tOKYRR2yRTMaaglDQi4ZuA7cVxLMn76rKMytdDFshztHpW3LjkzgmO6qbAgjLCDevGCbkcDZJ0xPk9acUje+in22odLfhhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=LdawYK84; arc=none smtp.client-ip=185.132.182.106
+	 MIME-Version:Content-Type; b=ctYZO+2GT6kvvtn0b81k1qwvNQqUmaL27kmH74S4b64M1Tpib+qbS7H0m3b4sgk/ismXwLAcHDx8y4Y2pYOTGRM58muNCNXN1jDw7lqgcJv98/WNjNog2H1ha7QAhg0HJmmOfwXCguh6nTTOXeh9IzhAZ0XhaS8gCVGZcqANunc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=UitswJ3h; arc=none smtp.client-ip=91.207.212.93
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4537qTC2019652;
-	Mon, 3 Jun 2024 11:29:35 +0200
+Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4537tPEg025945;
+	Mon, 3 Jun 2024 11:30:06 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	+WD+VBlXoFQll6mJcA7zh1UIJj1M9uQ2/WUqbV1b2r0=; b=LdawYK84eemb8ohd
-	EnIJjSiXjELBTeHyI73xB/irO+O4cOXQIQoKGO6FwhmY0e7ZMPoes/wOY6iVsdSX
-	3amTGiC1t6h0crmiAD5fCAfJyd8CQbbxohOXfzF8tPv39fS4JTd10xNWAIPScSL3
-	Ng3pwxgDf4+MBrEvtiitrcMfREUKWkdgnSxU6pvcJNQRwVzlB3tdMbv7tH0Ov3K+
-	bJSm/mayI2ay/fPTn+2HsPtZwyto/vQYZkaI+t6GUudV7yOFgXnPRr1cXvZ6p0Aa
-	vcxTuvQFiB5h1UuHpYb/o22yctNkQT2FLGnPqMnPVu64pSAWGpBBHntI4V9K+ifM
-	0JxKjA==
+	NfcQLCZBbrEU38iTeiVqyZtqsVutxZOJ7Fj/6YgsHgk=; b=UitswJ3hDhHG+s/k
+	MfQy/milC+koVo6++r1bz/KKEaCMX1lWQe909ZeTFrbGeAoilZeIV5lYr+RJvY++
+	5xP/ye/B557nPWsultsq2zcqPr0Pm/f+L+p6oZN0MSuVVmbUyVFKYiv15lzsNpwj
+	KO9zEs4HzaU4FjgtaHWO21fAmppS34TJrJwWfcbRkvV+PHh31QvaZH5Cn2PpGACr
+	15sSVsCRvWvHddXiTE3hA1FCxZaTiAQKmxhS4i5m7Mr/tzX9VFH1lM1m2VK7fZ3N
+	qZ8laiDXrfw9UohJmvSI9L23dHVfaxrx60/ntFkhPHvgkEhZl9qw+Zn7NkTvqKnj
+	23oatg==
 Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ygd70mehd-1
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ygekhm9k8-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Jun 2024 11:29:34 +0200 (MEST)
+	Mon, 03 Jun 2024 11:30:05 +0200 (MEST)
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id A025540048;
-	Mon,  3 Jun 2024 11:29:29 +0200 (CEST)
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id C4EF240046;
+	Mon,  3 Jun 2024 11:30:01 +0200 (CEST)
 Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 8DB452132DF;
-	Mon,  3 Jun 2024 11:28:18 +0200 (CEST)
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 0AB1C21660A;
+	Mon,  3 Jun 2024 11:29:30 +0200 (CEST)
 Received: from localhost (10.48.86.164) by SHFDAG1NODE2.st.com (10.75.129.70)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 3 Jun
- 2024 11:28:18 +0200
+ 2024 11:29:29 +0200
 From: Christophe Roullier <christophe.roullier@foss.st.com>
 To: "David S . Miller" <davem@davemloft.net>,
         Eric Dumazet
@@ -80,9 +80,9 @@ To: "David S . Miller" <davem@davemloft.net>,
 CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-stm32@st-md-mailman.stormreply.com>,
         <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3 04/11] net: stmmac: dwmac-stm32: Extract PMCR configuration
-Date: Mon, 3 Jun 2024 11:27:50 +0200
-Message-ID: <20240603092757.71902-5-christophe.roullier@foss.st.com>
+Subject: [PATCH v3 05/11] net: stmmac: dwmac-stm32: Clean up the debug prints
+Date: Mon, 3 Jun 2024 11:27:51 +0200
+Message-ID: <20240603092757.71902-6-christophe.roullier@foss.st.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240603092757.71902-1-christophe.roullier@foss.st.com>
 References: <20240603092757.71902-1-christophe.roullier@foss.st.com>
@@ -102,72 +102,84 @@ X-Proofpoint-Virus-Version: vendor=baseguard
 
 From: Marek Vasut <marex@denx.de>
 
-Pull the PMCR clock mux configuration into a separate function. This is
-the final change of three, which moves external clock rate validation,
-external clock selector decoding, and clock mux configuration into
-separate functions. This should make the code easier to undrestand.
-No functional change intended.
+Use dev_err()/dev_dbg() and phy_modes() to print PHY mode instead of
+pr_debug() and hand-written PHY mode decoding. This way, each debug
+print has associated device with it and duplicated mode decoding is
+removed.
 
 Signed-off-by: Marek Vasut <marex@denx.de>
 ---
- .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 27 ++++++++++++-------
- 1 file changed, 17 insertions(+), 10 deletions(-)
+ .../net/ethernet/stmicro/stmmac/dwmac-stm32.c  | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-index e552cc25fb808..3fedb447970a6 100644
+index 3fedb447970a6..91e1a540616d1 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-@@ -222,15 +222,11 @@ static int stm32mp1_validate_ethck_rate(struct plat_stmmacenet_data *plat_dat)
- 	return -EINVAL;
- }
- 
--static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
-+static int stm32mp1_configure_pmcr(struct plat_stmmacenet_data *plat_dat)
- {
- 	struct stm32_dwmac *dwmac = plat_dat->bsp_priv;
- 	u32 reg = dwmac->mode_reg;
--	int val, ret;
--
--	ret = stm32mp1_select_ethck_external(plat_dat);
--	if (ret)
--		return ret;
-+	int val;
- 
+@@ -231,19 +231,16 @@ static int stm32mp1_configure_pmcr(struct plat_stmmacenet_data *plat_dat)
  	switch (plat_dat->mac_interface) {
  	case PHY_INTERFACE_MODE_MII:
-@@ -265,10 +261,6 @@ static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
+ 		val = SYSCFG_PMCR_ETH_SEL_MII;
+-		pr_debug("SYSCFG init : PHY_INTERFACE_MODE_MII\n");
+ 		break;
+ 	case PHY_INTERFACE_MODE_GMII:
+ 		val = SYSCFG_PMCR_ETH_SEL_GMII;
+ 		if (dwmac->enable_eth_ck)
+ 			val |= SYSCFG_PMCR_ETH_CLK_SEL;
+-		pr_debug("SYSCFG init : PHY_INTERFACE_MODE_GMII\n");
+ 		break;
+ 	case PHY_INTERFACE_MODE_RMII:
+ 		val = SYSCFG_PMCR_ETH_SEL_RMII;
+ 		if (dwmac->enable_eth_ck)
+ 			val |= SYSCFG_PMCR_ETH_REF_CLK_SEL;
+-		pr_debug("SYSCFG init : PHY_INTERFACE_MODE_RMII\n");
+ 		break;
+ 	case PHY_INTERFACE_MODE_RGMII:
+ 	case PHY_INTERFACE_MODE_RGMII_ID:
+@@ -252,15 +249,16 @@ static int stm32mp1_configure_pmcr(struct plat_stmmacenet_data *plat_dat)
+ 		val = SYSCFG_PMCR_ETH_SEL_RGMII;
+ 		if (dwmac->enable_eth_ck)
+ 			val |= SYSCFG_PMCR_ETH_CLK_SEL;
+-		pr_debug("SYSCFG init : PHY_INTERFACE_MODE_RGMII\n");
+ 		break;
+ 	default:
+-		pr_debug("SYSCFG init :  Do not manage %d interface\n",
+-			 plat_dat->mac_interface);
++		dev_err(dwmac->dev, "Mode %s not supported",
++			phy_modes(plat_dat->mac_interface));
+ 		/* Do not manage others interfaces */
  		return -EINVAL;
  	}
  
--	ret = stm32mp1_validate_ethck_rate(plat_dat);
--	if (ret)
--		return ret;
--
++	dev_dbg(dwmac->dev, "Mode %s", phy_modes(plat_dat->mac_interface));
++
  	/* Need to update PMCCLRR (clear register) */
  	regmap_write(dwmac->regmap, reg + SYSCFG_PMCCLRR_OFFSET,
  		     dwmac->ops->syscfg_eth_mask);
-@@ -278,6 +270,21 @@ static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
- 				 dwmac->ops->syscfg_eth_mask, val);
- }
+@@ -294,19 +292,19 @@ static int stm32mcu_set_mode(struct plat_stmmacenet_data *plat_dat)
+ 	switch (plat_dat->mac_interface) {
+ 	case PHY_INTERFACE_MODE_MII:
+ 		val = SYSCFG_MCU_ETH_SEL_MII;
+-		pr_debug("SYSCFG init : PHY_INTERFACE_MODE_MII\n");
+ 		break;
+ 	case PHY_INTERFACE_MODE_RMII:
+ 		val = SYSCFG_MCU_ETH_SEL_RMII;
+-		pr_debug("SYSCFG init : PHY_INTERFACE_MODE_RMII\n");
+ 		break;
+ 	default:
+-		pr_debug("SYSCFG init :  Do not manage %d interface\n",
+-			 plat_dat->mac_interface);
++		dev_err(dwmac->dev, "Mode %s not supported",
++			phy_modes(plat_dat->mac_interface));
+ 		/* Do not manage others interfaces */
+ 		return -EINVAL;
+ 	}
  
-+static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
-+{
-+	int ret;
++	dev_dbg(dwmac->dev, "Mode %s", phy_modes(plat_dat->mac_interface));
 +
-+	ret = stm32mp1_select_ethck_external(plat_dat);
-+	if (ret)
-+		return ret;
-+
-+	ret = stm32mp1_validate_ethck_rate(plat_dat);
-+	if (ret)
-+		return ret;
-+
-+	return stm32mp1_configure_pmcr(plat_dat);
-+}
-+
- static int stm32mcu_set_mode(struct plat_stmmacenet_data *plat_dat)
- {
- 	struct stm32_dwmac *dwmac = plat_dat->bsp_priv;
+ 	return regmap_update_bits(dwmac->regmap, reg,
+ 				 dwmac->ops->syscfg_eth_mask, val << 23);
+ }
 -- 
 2.25.1
 
