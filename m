@@ -1,129 +1,119 @@
-Return-Path: <netdev+bounces-100305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 463F38D878B
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 19:01:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7DCD8D8790
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 19:02:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D69E61F2227C
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 17:01:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12D5A28A0AB
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 17:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41C4130E44;
-	Mon,  3 Jun 2024 17:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A643130E44;
+	Mon,  3 Jun 2024 17:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kni+LbIs"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3A72562E;
-	Mon,  3 Jun 2024 17:01:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FEAE12FB0B
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 17:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717434072; cv=none; b=M41V+dtogt4HbYLG1dQzm+ed4i/Y/YmxGWzla1zdwTgq3OHwGRiQ5EA/zowjwdmdUbxLnoJIWwYFuz8ibiwn3aM2rtOY9GzPJ4NGIZaBHZ3oH5/wIjLSVPoSHzINDj2D1Q049ftr+sj474gIVTTu+8/S0hSUUM1mjkdOGGrFEzw=
+	t=1717434153; cv=none; b=IF8RyMPFuLhN65cN3nd01u6Z0vvYNUyhzKt0k4vO9vnnQrgZWWs4xlQ5VwVGBQLJ5slhyOc+WUfN9hJ8piXhnyXFLdmK3BAZ9Qwr8j/9Un+H7SsfRLTY5qjkp236frVOLO0GaMRcqZYG5GqPER/nLaYH3MjaKQxwVBiNp2auAaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717434072; c=relaxed/simple;
-	bh=g0urmVYosNcFn5Vrer0s4W3kW7EhZLaLDQ8k8VjSfgw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ILGgXO3r7O752sZP2dYwOyG/S7DIdAfRSHcFsBPKcaXjSKs9qSAVPESCMTMx98I/RPLCuxVgMfF7Lcmyu7RnYQxKTzE4ImRThTpRI29K5iQO1My3Ld6jFnZ3+CsK9C6D37IthM1NU9A1Tk8z83bwZnf1F4cPjL7vF7LnqrnH7SY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sEB3I-000000002Nq-1Sjk;
-	Mon, 03 Jun 2024 17:00:56 +0000
-Date: Mon, 3 Jun 2024 18:00:49 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Sky Huang <SkyLake.Huang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH net-next v6 5/5] net: phy: add driver for built-in 2.5G
- ethernet PHY on MT7988
-Message-ID: <Zl32waW34yTiuF9u@makrotopia.org>
-References: <20240603121834.27433-1-SkyLake.Huang@mediatek.com>
- <20240603121834.27433-6-SkyLake.Huang@mediatek.com>
- <Zl3ELbG8c8y0/4DN@shell.armlinux.org.uk>
- <Zl3Fwoiv1bJlGaQZ@makrotopia.org>
- <Zl3IGN5ZHCQfQfmt@shell.armlinux.org.uk>
- <Zl3Yo3dwQlXEfP3i@makrotopia.org>
- <Zl3lkIDqnt4JD//u@shell.armlinux.org.uk>
+	s=arc-20240116; t=1717434153; c=relaxed/simple;
+	bh=VjMt0glpQePD8evdEjP05HrOAXJ7FMPoS+Bm3n4Nkhw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=N3zPw1vOz5klS2pub1fOtIB/ZPXbZgZ2LJ/54DK4ROOHGQn9MIPhhzV32+4K8OaHvOZILg9NagQxNSyvg4628QYilcVfp+QbixsAMY4EFxw1Yvr9zjvpo+Fpf95Qr6SdWZZ8Nz12JuRe/qam1MP+iMEFNEZYffdAbdCueh50zag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kni+LbIs; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-6cdf9a16229so115578a12.3
+        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 10:02:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717434151; x=1718038951; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hM97C1DwkDE3R6cN0KJoKmJQI59XMjBaknQKnZz5NeE=;
+        b=Kni+LbIsJRhvOZLzwZvcTkFTDcVLIWL3x/k8l11HJMhzHzyz47G4Bwsq8tZuEXnBlU
+         O+LE+uti+aFlv7r5srl2dzBQWzvFH4JN7gnezbalgrmqglpU+XEo6BbXucGfbl2P1XQT
+         VgtxAM60E3ZgWNixIX59+JvN+KZxQz96kleFDl+kdykd5a8SrVU5AlcDk5NhEVpmcuKR
+         f6j1e//S9J5AKtll622TPY6hXdL/GsU66+LzBvPKDb6EYGekgOrUkBr4PZa/7KRGxHAf
+         +Arw+nK/ChLyqavmMRQxw3fdR53WCMlPC80yP654XUmzSya9Tc6UpLLR8DgaIHGZeOWA
+         MsMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717434151; x=1718038951;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hM97C1DwkDE3R6cN0KJoKmJQI59XMjBaknQKnZz5NeE=;
+        b=mkKUASgpc1vU4/il0ZPMUxXzKQb7rsYlmK1O7Lf/X2UDDVCY3hsW4xc/VrL0O+yJUB
+         cDI0hfM4Qnj5ABRVDOz8B/ByGFY9vbvbcwclFkrRmgGqptM8FzQNL4/4uoSmBSItnlaL
+         rLUYc5dE/2LUDqNdgicuHx0c0a8ItQHqelJJ217ECwzP0k9j4ZnpG7/bDAF2il5mN3At
+         rcRTvTfrQCCh4vOpZ30YqUU/npGFOVZCHx4YxVsh+J1rytit1qKF+8/wsRnyyIFZBkJM
+         iIaeMuIZt5Vvf8H5n4NcxytZtxu6Tzrgmn23f7/Lil3Mn5kPixNesyRkwpahqOErtFXh
+         iKRQ==
+X-Gm-Message-State: AOJu0Yzu9sFlD0yWsRR1nFlaP2FrL4zScwgBS4592kE5+suYnUkidHp1
+	obC/aTZdZ/3v+gkqJ5S7VRIHqiYE/fDGWg9Y7VLeGBNFUTfhJglF
+X-Google-Smtp-Source: AGHT+IGuDw2evC4F6PvTbIamoMcNVw149vK0hJNtZu5/sqgt0ZQEGrCWXYyJox9BE24L7f9VJsNREA==
+X-Received: by 2002:a17:90b:1241:b0:2c2:1d86:f785 with SMTP id 98e67ed59e1d1-2c21d86f8e4mr3703907a91.47.1717434151173;
+        Mon, 03 Jun 2024 10:02:31 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([111.201.28.17])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c1c27e577fsm6460431a91.32.2024.06.03.10.02.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Jun 2024 10:02:30 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	matttbe@kernel.org,
+	martineau@kernel.org,
+	geliang@kernel.org
+Cc: netdev@vger.kernel.org,
+	mptcp@lists.linux.dev,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net v5 0/2] tcp/mptcp: count CLOSE-WAIT for CurrEstab
+Date: Tue,  4 Jun 2024 01:02:15 +0800
+Message-Id: <20240603170217.6243-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zl3lkIDqnt4JD//u@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 03, 2024 at 04:47:28PM +0100, Russell King (Oracle) wrote:
-> On Mon, Jun 03, 2024 at 03:52:19PM +0100, Daniel Golle wrote:
-> > On Mon, Jun 03, 2024 at 02:41:44PM +0100, Russell King (Oracle) wrote:
-> > > On Mon, Jun 03, 2024 at 02:31:46PM +0100, Daniel Golle wrote:
-> > > > On Mon, Jun 03, 2024 at 02:25:01PM +0100, Russell King (Oracle) wrote:
-> > > > > On Mon, Jun 03, 2024 at 08:18:34PM +0800, Sky Huang wrote:
-> > > > > > Add support for internal 2.5Gphy on MT7988. This driver will load
-> > > > > > necessary firmware, add appropriate time delay and figure out LED.
-> > > > > > Also, certain control registers will be set to fix link-up issues.
-> > > > > 
-> > > > > Based on our previous discussion, it may be worth checking in the
-> > > > > .config_init() method whether phydev->interface is one of the
-> > > > > PHY interface modes that this PHY supports. As I understand from one
-> > > > > of your previous emails, the possibilities are XGMII, USXGMII or
-> > > > > INTERNAL. Thus:
-> > > > > 
-> > > > > > +static int mt798x_2p5ge_phy_config_init(struct phy_device *phydev)
-> > > > > > +{
-> > > > > > +	struct pinctrl *pinctrl;
-> > > > > > +	int ret;
-> > > > > 
-> > > > > 	/* Check that the PHY interface type is compatible */
-> > > > > 	if (phydev->interface != PHY_INTERFACE_MODE_INTERNAL &&
-> > > > > 	    phydev->interface != PHY_INTERFACE_MODE_XGMII &&
-> > > > > 	    phydev->interface != PHY_INTERFACE_MODE_USXGMII)
-> > > > > 		return -ENODEV;
-> > > > 
-> > > > The PHY is built-into the SoC, and as such the connection type should
-> > > > always be "internal". The PHY does not exist as dedicated IC, only
-> > > > as built-in part of the MT7988 SoC.
-> > > 
-> > > That's not how it was described to me by Sky.
-> > > 
-> > > If what you say is correct, then the implementation of
-> > > mt798x_2p5ge_phy_get_rate_matching() which checks for interface modes
-> > > other than INTERNAL is not correct. Also it means that config_init()
-> > > should not permit anything but INTERNAL.
-> > 
-> > The way the PHY is connected to the MAC *inside the chip* is XGMII
-> > according the MediaTek. So call it "internal" or "xgmii", however, up to
-> > my knowledge it's a fact that there is **only one way** this PHY is
-> > connected and used, and that is being an internal part of the MT7988 SoC.
-> > 
-> > Imho, as there are no actual XGMII signals exposed anywhere I'd use
-> > "internal" to describe the link between MAC and PHY (which are both
-> > inside the same chip package).
-> 
-> I don't care what gets decided about what's acceptable for the PHY to
-> accept, just that it checks for the acceptable modes in .config_init()
-> and the .get_rate_matching() method is not checking for interface
-> modes that are not permitted.
+From: Jason Xing <kernelxing@tencent.com>
 
-What I meant to express is that there is no need for such a check, also
-not in config_init. There is only one way and one MAC-side interface mode
-to operate that PHY, so the value will anyway not be considered anywhere
-in the driver.
+Taking CLOSE-WAIT sockets into CurrEstab counters is in accordance with RFC
+1213, as suggested by Eric and Neal.
+
+v5
+Link: https://lore.kernel.org/all/20240531091753.75930-1-kerneljasonxing@gmail.com/
+1. add more detailed comment (Matthieu)
+
+v4
+Link: https://lore.kernel.org/all/20240530131308.59737-1-kerneljasonxing@gmail.com/
+1. correct the Fixes: tag in patch [2/2]. (Eric)
+
+Previous discussion
+Link: https://lore.kernel.org/all/20240529033104.33882-1-kerneljasonxing@gmail.com/
+
+Jason Xing (2):
+  tcp: count CLOSE-WAIT sockets for TCP_MIB_CURRESTAB
+  mptcp: count CLOSE-WAIT sockets for MPTCP_MIB_CURRESTAB
+
+ net/ipv4/tcp.c       | 6 +++++-
+ net/mptcp/protocol.c | 9 +++++++--
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+-- 
+2.37.3
+
 
