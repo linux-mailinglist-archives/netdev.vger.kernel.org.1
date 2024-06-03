@@ -1,52 +1,60 @@
-Return-Path: <netdev+bounces-100072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85A418D7C31
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:09:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C04958D7C30
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:09:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D74DFB2271B
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 07:09:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4ADBEB22288
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 07:09:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 061333E49E;
-	Mon,  3 Jun 2024 07:09:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="q5lme7dv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD643B781;
+	Mon,  3 Jun 2024 07:09:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409523B297;
-	Mon,  3 Jun 2024 07:09:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EEF43B297
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 07:09:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717398576; cv=none; b=sjsyTx+/oj1sVw7Q3sWFsmNLNDURV8P/xvU36tAQUCF+9QH3K4SVl4vcSWrbxSEtz8W592N98f7oDjm4hsSTShuqpFvxgNxVgEpi1u3B1quLQnMMBA87WZLsQl7UpgpYJy0FuRvk7x4YIxJqlPX+gUR2OR26HvXM/eN49+xFcSs=
+	t=1717398572; cv=none; b=KHicCO5j93tqGAnisSf9vPrEkvA9kCxuDD0uiIsf8tWMjmev/1BYrGhFFcAaazlalpJ8gdOyPY/DF8MjcIgXT4WC/c4pcqD4Z2FEuno3Hn/AoIRKsXtr7ZNInxxUDbyqH1r3Qpm8xDT5JDoBqJs8GgDS4BXNBJS0ZraFxs9Iy40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717398576; c=relaxed/simple;
-	bh=7ugu+6bkjE+KB/YtSRKnXmti/vB38R8XnolG71eebZ0=;
+	s=arc-20240116; t=1717398572; c=relaxed/simple;
+	bh=vZQGMrlEvkmRdd1HpKGljrbktFKGmnk60QbPOo0kGfw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ftaI59TCYvITaksDGwLwIlHBFTeMMlrhg3roZ+eho+rjMZCTcsCKhKBUCRTHlFcB/w1xTHU0aXBLV338zgNgWQTvUov9+1CTxY8gCMajzRrqvor55bmm1VY7d2oMhxw593TbfKj3qlIuwY/a4vLcRAt6AyxH8Li2HYxBzYM05N4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=q5lme7dv; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
-	References; bh=/JZ5P7Z02l8WZ3cRpitT5VAHx/w1IRQf9UE3sfmYEn4=; t=1717398574;
-	x=1717830574; b=q5lme7dvdooP4c51KJJ6qNZSg0KEhgzKMc3K3QKWZzvqiyitXjNvEkO8udV4Q
-	orVQ3Fb8UaWY682UCAjPl2zdjrGC8dMuQDpRauKU7zmi2u+qR/sEn5BKleSzkmsmt/BAp3KdYxYvr
-	vYRibSB3IhAkm170GNme1JdWf5+WGEmDjkBZNNtG1f0Ly/LabLSSJ6YVMP+DAuo61FDhIU9+Z+HZB
-	6W9m/QhDY6/23/ZQ+khg12tOCDAf2KyjQEpGE8d/WW4sXdMW/pN47xsNrT3mh7eSQKEWQKfilkB5v
-	HAWJtRlY1oOcGVRR7UWqX9wJ370Y+uOY4ktDNrXdNEyq8Aylkw==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1sE1oh-0004xw-Vo; Mon, 03 Jun 2024 09:09:16 +0200
-Message-ID: <de980a49-b802-417a-a57e-2c47f67b08e4@leemhuis.info>
-Date: Mon, 3 Jun 2024 09:09:12 +0200
+	 In-Reply-To:Content-Type; b=NLSagmLd+V5TUviEp8AnoS1EKCKZpXOe/qaiAD90+NZZSDK3+RzCmJRQwsgg9D1wHyowxipYSVc9i931SXvm6Jwevg8hdMPhRGUQPUk3jZRZCkgTFDZ49IwCi3LbwD7U3YXlRTgrFTONk/PS5fyaXQgEmr/JqVDyEk3h8jeTQQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2eaadde4dafso1221381fa.3
+        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 00:09:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717398568; x=1718003368;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=k5xzErDAmbdmISQVPCaa1tqc9grd1xDfpbrLoCt0N4A=;
+        b=mwllO7uASe7tiJl+YGabRCLEdQN1Kaj6c4f6hn1z0YNIcvCHzB5MbZShXyk7X99jG1
+         ltBX+E5fNi4HH0vzFVaBwLXq6J4cse4noa3VaY2qZiL+gBZ7YTm/Wi0G5ykjkMbT2d3T
+         Bzaj+NTESUg6kRgaZCoDMAu1dOFJCaj3R/JA7oNm4U+2DuSnZZyEHzVrGhj7JqFzwgbM
+         ud6keRWFnKRF1jxatvxU7VV/pYk6EU0TW4VPKXNdx9rCLwiEWAQYTT0fXR/9xk00spHL
+         WM0nPrqa1r/6pIGLFLel3A2f3/j8oK6BQMpDvgxb+kCaBVHNt8o/xsDzrKoPK5Zj225D
+         2GeA==
+X-Forwarded-Encrypted: i=1; AJvYcCXBLyWO6IeThPCyjpmuuKiHL2wGg5OWkk2uqiIXeWQMb37rX2XXTqQgU2dGEZvFFM+Gtpgt9Ks4hBu5dsiEAqpKyXj7JO9E
+X-Gm-Message-State: AOJu0YwhaLsz6uibWVy4psWnbqGxVmENTnBFx7gBwxrcTsTtlvStGHhl
+	Xkz0IqzwE4MLnSj8mqkGFFMNgIhCADbFj6qti1tmDi+Dj9HT903z5se2dNGp
+X-Google-Smtp-Source: AGHT+IE5r0soLdabb6igj9MUhMvzBhhVUB3h1THX9KOP4A2vIvTn24IsAKgih+iOUrLVnDfjUfYBRw==
+X-Received: by 2002:a2e:9899:0:b0:2e8:60ab:c6e7 with SMTP id 38308e7fff4ca-2ea950e6688mr52910291fa.2.1717398568094;
+        Mon, 03 Jun 2024 00:09:28 -0700 (PDT)
+Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4213cd1c075sm27099335e9.0.2024.06.03.00.09.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Jun 2024 00:09:27 -0700 (PDT)
+Message-ID: <06d9c3c9-8d27-46bf-a0cf-0c3ea1a0d3ec@grimberg.me>
+Date: Mon, 3 Jun 2024 10:09:26 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,357 +62,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: "ERROR: modpost: "icssg_queue_pop" [...] undefined" on arm64 (was:
- [PATCH net-next v6 1/3] net: ti: icssg-prueth: Add helper functions to
- configure FDB)
-To: MD Danish Anwar <danishanwar@ti.com>,
- Dan Carpenter <dan.carpenter@linaro.org>, Jan Kiszka
- <jan.kiszka@siemens.com>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- Wolfram Sang <wsa+renesas@sang-engineering.com>,
- Niklas Schnelle <schnelle@linux.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
- Diogo Ivo <diogo.ivo@siemens.com>, Roger Quadros <rogerq@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>
-Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, srk@ti.com,
- Vignesh Raghavendra <vigneshr@ti.com>
-References: <20240528113734.379422-1-danishanwar@ti.com>
- <20240528113734.379422-2-danishanwar@ti.com>
-From: Thorsten Leemhuis <linux@leemhuis.info>
-Content-Language: en-US, de-DE
-Autocrypt: addr=linux@leemhuis.info; keydata=
- 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 n7RI
-In-Reply-To: <20240528113734.379422-2-danishanwar@ti.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v25 00/20] nvme-tcp receive offloads
+To: Christoph Hellwig <hch@lst.de>, Jakub Kicinski <kuba@kernel.org>
+Cc: Aurelien Aptel <aaptel@nvidia.com>, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, kbusch@kernel.org, axboe@fb.com,
+ chaitanyak@nvidia.com, davem@davemloft.net
+References: <20240529160053.111531-1-aaptel@nvidia.com>
+ <20240530183906.4534c029@kernel.org> <20240531061142.GB17723@lst.de>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20240531061142.GB17723@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;linux@leemhuis.info;1717398574;fe658f45;
-X-HE-SMSGID: 1sE1oh-0004xw-Vo
 
-On 28.05.24 13:37, MD Danish Anwar wrote:
-> Introduce helper functions to configure firmware FDB tables, VLAN tables
-> and Port VLAN ID settings to aid adding Switch mode support.
-> 
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 
-Hi! Since Friday I get a compile error in my -next builds for Fedora:
 
-ERROR: modpost: "icssg_queue_push"
-[drivers/net/ethernet/ti/icssg-prueth-sr1.ko] undefined!
-ERROR: modpost: "icssg_queue_pop"
-[drivers/net/ethernet/ti/icssg-prueth-sr1.ko] undefined!
+On 31/05/2024 9:11, Christoph Hellwig wrote:
+> FYI, I still absolutely detest this code.  I know people want to
+> avoid the page copy for NVMe over TCP (or any TCP based storage
+> protocols for that matter), but having these weird vendors specific
+> hooks all the way up into the application protocol are just horrible.
 
-Looks like this problem was found and reported mid May by the kernel
-test robot already, which identified a earlier version of the patch I'm
-replying to to be the cause:
-https://lore.kernel.org/all/202405182038.ncf1mL7Z-lkp@intel.com/
+I hoped for a transparent ddp offload as well, but I don't see how this
+is possible.
 
-That and the fact that the patch showed up in -next on Friday makes me
-assume that my problem is caused by this change as well as well. A build
-log can be found here:
-https://download.copr.fedorainfracloud.org/results/@kernel-vanilla/next/fedora-39-aarch64/07523690-next-next-all/builder-live.log.gz
+>
+> IETF has standardized a generic data placement protocol, which is
+> part of iWarp.  Even if folks don't like RDMA it exists to solve
+> exactly these kinds of problems of data placement.
 
-I don't have the .config at hand, but can provide it when needed.
+iWARP changes the wire protocol. Is your comment to just go make people
+use iWARP instead of TCP? or extending NVMe/TCP to natively support DDP?
 
-Ciao, Thorsten
+I think that the former is limiting, and the latter is unclear.
 
-> ---
->  drivers/net/ethernet/ti/icssg/icssg_config.c | 170 +++++++++++++++++++
->  drivers/net/ethernet/ti/icssg/icssg_config.h |  19 +++
->  drivers/net/ethernet/ti/icssg/icssg_prueth.h |  12 ++
->  3 files changed, 201 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-> index 15f2235bf90f..2213374d4d45 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-> @@ -477,3 +477,173 @@ void icssg_config_set_speed(struct prueth_emac *emac)
->  
->  	writeb(fw_speed, emac->dram.va + PORT_LINK_SPEED_OFFSET);
->  }
-> +
-> +int icssg_send_fdb_msg(struct prueth_emac *emac, struct mgmt_cmd *cmd,
-> +		       struct mgmt_cmd_rsp *rsp)
-> +{
-> +	struct prueth *prueth = emac->prueth;
-> +	int slice = prueth_emac_slice(emac);
-> +	int addr, ret;
-> +
-> +	addr = icssg_queue_pop(prueth, slice == 0 ?
-> +			       ICSSG_CMD_POP_SLICE0 : ICSSG_CMD_POP_SLICE1);
-> +	if (addr < 0)
-> +		return addr;
-> +
-> +	/* First 4 bytes have FW owned buffer linking info which should
-> +	 * not be touched
-> +	 */
-> +	memcpy_toio(prueth->shram.va + addr + 4, cmd, sizeof(*cmd));
-> +	icssg_queue_push(prueth, slice == 0 ?
-> +			 ICSSG_CMD_PUSH_SLICE0 : ICSSG_CMD_PUSH_SLICE1, addr);
-> +	ret = read_poll_timeout(icssg_queue_pop, addr, addr >= 0,
-> +				2000, 20000000, false, prueth, slice == 0 ?
-> +				ICSSG_RSP_POP_SLICE0 : ICSSG_RSP_POP_SLICE1);
-> +	if (ret) {
-> +		netdev_err(emac->ndev, "Timedout sending HWQ message\n");
-> +		return ret;
-> +	}
-> +
-> +	memcpy_fromio(rsp, prueth->shram.va + addr, sizeof(*rsp));
-> +	/* Return buffer back for to pool */
-> +	icssg_queue_push(prueth, slice == 0 ?
-> +			 ICSSG_RSP_PUSH_SLICE0 : ICSSG_RSP_PUSH_SLICE1, addr);
-> +
-> +	return 0;
-> +}
-> +
-> +static void icssg_fdb_setup(struct prueth_emac *emac, struct mgmt_cmd *fdb_cmd,
-> +			    const unsigned char *addr, u8 fid, int cmd)
-> +{
-> +	int slice = prueth_emac_slice(emac);
-> +	u8 mac_fid[ETH_ALEN + 2];
-> +	u16 fdb_slot;
-> +
-> +	ether_addr_copy(mac_fid, addr);
-> +
-> +	/* 1-1 VID-FID mapping is already setup */
-> +	mac_fid[ETH_ALEN] = fid;
-> +	mac_fid[ETH_ALEN + 1] = 0;
-> +
-> +	fdb_slot = bitrev32(crc32_le(0, mac_fid, 8)) & PRUETH_SWITCH_FDB_MASK;
-> +
-> +	fdb_cmd->header = ICSSG_FW_MGMT_CMD_HEADER;
-> +	fdb_cmd->type   = ICSSG_FW_MGMT_FDB_CMD_TYPE;
-> +	fdb_cmd->seqnum = ++(emac->prueth->icssg_hwcmdseq);
-> +	fdb_cmd->param  = cmd;
-> +	fdb_cmd->param |= (slice << 4);
-> +
-> +	memcpy(&fdb_cmd->cmd_args[0], addr, 4);
-> +	memcpy(&fdb_cmd->cmd_args[1], &addr[4], 2);
-> +	fdb_cmd->cmd_args[2] = fdb_slot;
-> +
-> +	netdev_dbg(emac->ndev, "MAC %pM slot %X FID %X\n", addr, fdb_slot, fid);
-> +}
-> +
-> +int icssg_fdb_add_del(struct prueth_emac *emac, const unsigned char *addr,
-> +		      u8 vid, u8 fid_c2, bool add)
-> +{
-> +	struct mgmt_cmd_rsp fdb_cmd_rsp = { 0 };
-> +	struct mgmt_cmd fdb_cmd = { 0 };
-> +	u8 fid = vid;
-> +	int ret;
-> +
-> +	icssg_fdb_setup(emac, &fdb_cmd, addr, fid, add ? ICSS_CMD_ADD_FDB : ICSS_CMD_DEL_FDB);
-> +
-> +	fid_c2 |= ICSSG_FDB_ENTRY_VALID;
-> +	fdb_cmd.cmd_args[1] |= ((fid << 16) | (fid_c2 << 24));
-> +
-> +	ret = icssg_send_fdb_msg(emac, &fdb_cmd, &fdb_cmd_rsp);
-> +	if (ret)
-> +		return ret;
-> +
-> +	WARN_ON(fdb_cmd.seqnum != fdb_cmd_rsp.seqnum);
-> +	if (fdb_cmd_rsp.status == 1)
-> +		return 0;
-> +
-> +	return -EINVAL;
-> +}
-> +
-> +int icssg_fdb_lookup(struct prueth_emac *emac, const unsigned char *addr,
-> +		     u8 vid)
-> +{
-> +	struct mgmt_cmd_rsp fdb_cmd_rsp = { 0 };
-> +	struct mgmt_cmd fdb_cmd = { 0 };
-> +	struct prueth_fdb_slot *slot;
-> +	u8 fid = vid;
-> +	int ret, i;
-> +
-> +	icssg_fdb_setup(emac, &fdb_cmd, addr, fid, ICSS_CMD_GET_FDB_SLOT);
-> +
-> +	fdb_cmd.cmd_args[1] |= fid << 16;
-> +
-> +	ret = icssg_send_fdb_msg(emac, &fdb_cmd, &fdb_cmd_rsp);
-> +	if (ret)
-> +		return ret;
-> +
-> +	WARN_ON(fdb_cmd.seqnum != fdb_cmd_rsp.seqnum);
-> +
-> +	slot = (struct prueth_fdb_slot __force *)(emac->dram.va + FDB_CMD_BUFFER);
-> +	for (i = 0; i < 4; i++) {
-> +		if (ether_addr_equal(addr, slot->mac) && vid == slot->fid)
-> +			return (slot->fid_c2 & ~ICSSG_FDB_ENTRY_VALID);
-> +		slot++;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +void icssg_vtbl_modify(struct prueth_emac *emac, u8 vid, u8 port_mask,
-> +		       u8 untag_mask, bool add)
-> +{
-> +	struct prueth *prueth = emac->prueth;
-> +	struct prueth_vlan_tbl *tbl;
-> +	u8 fid_c1;
-> +
-> +	tbl = prueth->vlan_tbl;
-> +	fid_c1 = tbl[vid].fid_c1;
-> +
-> +	/* FID_C1: bit0..2 port membership mask,
-> +	 * bit3..5 tagging mask for each port
-> +	 * bit6 Stream VID (not handled currently)
-> +	 * bit7 MC flood (not handled currently)
-> +	 */
-> +	if (add) {
-> +		fid_c1 |= (port_mask | port_mask << 3);
-> +		fid_c1 &= ~(untag_mask << 3);
-> +	} else {
-> +		fid_c1 &= ~(port_mask | port_mask << 3);
-> +	}
-> +
-> +	tbl[vid].fid_c1 = fid_c1;
-> +}
-> +
-> +u16 icssg_get_pvid(struct prueth_emac *emac)
-> +{
-> +	struct prueth *prueth = emac->prueth;
-> +	u32 pvid;
-> +
-> +	if (emac->port_id == PRUETH_PORT_MII0)
-> +		pvid = readl(prueth->shram.va + EMAC_ICSSG_SWITCH_PORT1_DEFAULT_VLAN_OFFSET);
-> +	else
-> +		pvid = readl(prueth->shram.va + EMAC_ICSSG_SWITCH_PORT2_DEFAULT_VLAN_OFFSET);
-> +
-> +	pvid = pvid >> 24;
-> +
-> +	return pvid;
-> +}
-> +
-> +void icssg_set_pvid(struct prueth *prueth, u8 vid, u8 port)
-> +{
-> +	u32 pvid;
-> +
-> +	/* only 256 VLANs are supported */
-> +	pvid = (u32 __force)cpu_to_be32((ETH_P_8021Q << 16) | (vid & 0xff));
-> +
-> +	if (port == PRUETH_PORT_MII0)
-> +		writel(pvid, prueth->shram.va + EMAC_ICSSG_SWITCH_PORT1_DEFAULT_VLAN_OFFSET);
-> +	else if (port == PRUETH_PORT_MII1)
-> +		writel(pvid, prueth->shram.va + EMAC_ICSSG_SWITCH_PORT2_DEFAULT_VLAN_OFFSET);
-> +	else
-> +		writel(pvid, prueth->shram.va + EMAC_ICSSG_SWITCH_PORT0_DEFAULT_VLAN_OFFSET);
-> +}
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.h b/drivers/net/ethernet/ti/icssg/icssg_config.h
-> index cf2ea4bd22a2..4a9721aa6057 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_config.h
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.h
-> @@ -35,6 +35,8 @@ struct icssg_flow_cfg {
->  	(2 * (PRUETH_EMAC_BUF_POOL_SIZE * PRUETH_NUM_BUF_POOLS + \
->  	 PRUETH_EMAC_RX_CTX_BUF_SIZE * 2))
->  
-> +#define PRUETH_SWITCH_FDB_MASK ((SIZE_OF_FDB / NUMBER_OF_FDB_BUCKET_ENTRIES) - 1)
-> +
->  struct icssg_rxq_ctx {
->  	__le32 start[3];
->  	__le32 end;
-> @@ -202,6 +204,23 @@ struct icssg_setclock_desc {
->  #define ICSSG_TS_PUSH_SLICE0	40
->  #define ICSSG_TS_PUSH_SLICE1	41
->  
-> +struct mgmt_cmd {
-> +	u8 param;
-> +	u8 seqnum;
-> +	u8 type;
-> +	u8 header;
-> +	u32 cmd_args[3];
-> +};
-> +
-> +struct mgmt_cmd_rsp {
-> +	u32 reserved;
-> +	u8 status;
-> +	u8 seqnum;
-> +	u8 type;
-> +	u8 header;
-> +	u32 cmd_args[3];
-> +};
-> +
->  /* FDB FID_C2 flag definitions */
->  /* Indicates host port membership.*/
->  #define ICSSG_FDB_ENTRY_P0_MEMBERSHIP         BIT(0)
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> index a78c5eb75fb8..82bdad9702c3 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> @@ -232,6 +232,7 @@ struct icssg_firmwares {
->   * @emacs_initialized: num of EMACs/ext ports that are up/running
->   * @iep0: pointer to IEP0 device
->   * @iep1: pointer to IEP1 device
-> + * @vlan_tbl: VLAN-FID table pointer
->   */
->  struct prueth {
->  	struct device *dev;
-> @@ -256,6 +257,7 @@ struct prueth {
->  	int emacs_initialized;
->  	struct icss_iep *iep0;
->  	struct icss_iep *iep1;
-> +	struct prueth_vlan_tbl *vlan_tbl;
->  };
->  
->  struct emac_tx_ts_response {
-> @@ -313,6 +315,16 @@ int icssg_queue_pop(struct prueth *prueth, u8 queue);
->  void icssg_queue_push(struct prueth *prueth, int queue, u16 addr);
->  u32 icssg_queue_level(struct prueth *prueth, int queue);
->  
-> +int icssg_send_fdb_msg(struct prueth_emac *emac, struct mgmt_cmd *cmd,
-> +		       struct mgmt_cmd_rsp *rsp);
-> +int icssg_fdb_add_del(struct prueth_emac *emac,  const unsigned char *addr,
-> +		      u8 vid, u8 fid_c2, bool add);
-> +int icssg_fdb_lookup(struct prueth_emac *emac, const unsigned char *addr,
-> +		     u8 vid);
-> +void icssg_vtbl_modify(struct prueth_emac *emac, u8 vid, u8 port_mask,
-> +		       u8 untag_mask, bool add);
-> +u16 icssg_get_pvid(struct prueth_emac *emac);
-> +void icssg_set_pvid(struct prueth *prueth, u8 vid, u8 port);
->  #define prueth_napi_to_tx_chn(pnapi) \
->  	container_of(pnapi, struct prueth_tx_chn, napi_tx)
->  
+ From what I understand, the offload engine uses the NVMe command-id as
+the rkey (or stag) for ddp purposes.
+
+>    And if we can't
+> arse folks into standard data placement methods we at least need it
+> vendor independent and without hooks into the actual protocol
+> driver.
+>
+
+That would be great, but what does a "vendor independent without hooks" 
+look like from
+your perspective? I'd love having this translate to standard (and some 
+new) socket operations,
+but I could not find a way that this can be done given the current 
+architecture.
+
+Early on, I thought that enabling the queue offload could be modeled as 
+a setsockopt() and
+and nvme_tcp_setup_ddp() would be modeled as a new 
+recvmsg(MSG_DDP_BUFFER, iovec, tag) but where I got stuck was the whole 
+async teardown mechanism that the nic has. But if this is solvable, I 
+think such an interface is much better.
+FWIW, I think that the benefit of this is worth having. I think that the 
+folks from NVIDIA
+are committed to supporting and evolving it.
 
