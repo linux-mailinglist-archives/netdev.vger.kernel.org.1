@@ -1,619 +1,251 @@
-Return-Path: <netdev+bounces-100341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E44B98D8A64
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 21:40:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E84848D8A6F
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 21:47:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1362D1C21E74
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 19:40:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2D8C1C21479
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 19:47:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 537EE12C466;
-	Mon,  3 Jun 2024 19:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB61137933;
+	Mon,  3 Jun 2024 19:47:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PVxL9lQg"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB44259C;
-	Mon,  3 Jun 2024 19:40:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717443623; cv=none; b=ibvEAY7ERcNXh1DWlh5XkFc/f0sNxb9INvy4fYj5Bn92N2CVALjTXV1SaBwuO3zAsiq/E5Ogf5EN9y2FCK7ky/D6w+BxWsYl5DdYSXWnLfHp5qEf2LeEIQN5nej3zlnort42mFwdQduW9pAjRGukzPzd0bay2Rp/U+uQhooqvQE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717443623; c=relaxed/simple;
-	bh=J/HfkgNXDBgjj+xuCDJxeUExicd7R2Xef0qzapK9Wig=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=opzGtYjpth7XrRTjyO5DQRNwYrnBwu3WCYfrjvHmRcSuJh/D91rYwwNKGv647KsWB04PltpVZttPDJKCj3U5swXqGeoDZ7+yghpZmbZov1JMtxnX02BC0Ixe1j3+oXXSnGS845mNrrT8b4zfa2rvKWoxzJ/5Raz3TmHKElGuDL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.97.1)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sEDXL-0000000031F-3gJ1;
-	Mon, 03 Jun 2024 19:40:08 +0000
-Date: Mon, 3 Jun 2024 20:40:03 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Sky Huang <SkyLake.Huang@mediatek.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH net-next v6 5/5] net: phy: add driver for built-in 2.5G
- ethernet PHY on MT7988
-Message-ID: <Zl4cE2yc5MuJSZJ6@makrotopia.org>
-References: <20240603121834.27433-1-SkyLake.Huang@mediatek.com>
- <20240603121834.27433-6-SkyLake.Huang@mediatek.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E2340877
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 19:47:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717444070; cv=fail; b=LORTGQyK7iggfRiCizcLAYQ5nQDK9mPD/7GHAgiBDAp2tRpKFFX2QAGLYHRMJIR5rkDUOpOJ6w46zNgFS+p61O5eBq5nZmxHh39G8IVsUerMrpBbhjxc00rr2agBBRbnXaDBkTq64X1yahbkUECDwigrKYKo+pTgOrAFkCVL9HE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717444070; c=relaxed/simple;
+	bh=bu+cHn63lubUttv0zkSAy9o/IAJPfxI7CmnNkO0GXwI=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=DH5TR2RrLBdO6O6WDz0CrGkxCY1JLb1Gx/NWIOZKkJXL0ye/HtevOtElg+5SF0EbR6+80yXRpx/J/7kyfNyosBDi6i2V7y1J8WpgIICes8okyhWOHLGialHzSdVtyXUWZR3g8Im6kqIIA0JaElkGv+huwZeCjfaT5LaHS2c1Ypc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PVxL9lQg; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717444069; x=1748980069;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=bu+cHn63lubUttv0zkSAy9o/IAJPfxI7CmnNkO0GXwI=;
+  b=PVxL9lQgEobtsR5wqSDzRUC7UT5dwERMBW+3HjSjWdH6mLIHzCsiwDZa
+   mowBqN27e0cjv5sgk5398FtL7D0kSQe0hq+weRVF5gGI/ycBod1AlESEm
+   8YkWCScX/7cWxkm/rnA0FmiXxJ/acVd+dkZwTI0x1myowWr3UeR92ILwp
+   8m4OMlBK+O2XQIOizsDD1fCOCgabnU4EGoGVU/xgq5ySNu9GKqEw6zl3D
+   FaqAviRnju+BgvF8vY9fUoVOXkBtchE4iLfVlwWV660sOK5BZ4hXzZ7bL
+   M5fcxWuho6SS/nUqnpa6PQUCAZj/i9glku7SV4T+MappBQB6IlSYTh+oq
+   A==;
+X-CSE-ConnectionGUID: P6gupQtsRq6JjnZPK5tW+A==
+X-CSE-MsgGUID: lIZ7srOJRwaeug3Dp/CnSA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11092"; a="31488378"
+X-IronPort-AV: E=Sophos;i="6.08,212,1712646000"; 
+   d="scan'208";a="31488378"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2024 12:47:48 -0700
+X-CSE-ConnectionGUID: u/EfcY4qTc6hFsoxN3mG0Q==
+X-CSE-MsgGUID: YoPJyXURQGaLlmW7XOPIlw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,212,1712646000"; 
+   d="scan'208";a="37436673"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Jun 2024 12:47:49 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 3 Jun 2024 12:47:47 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 3 Jun 2024 12:47:47 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 3 Jun 2024 12:47:47 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KW23Oim9WKdmUbrdwkfww2v2AcLd8R9VaUATNnv6P0BaQuyrpQJYh8Slr/5YlqHnJarwRfD0Pb1/Neo8Fl/T3ObFwE3VsrUKHgxEvYGFtueHM/vUQ22996hamJ/bJXby5LY+L0iXm2uz0ZxfGB6ZUPk6mUEKhk2Is0ji7JEu8wBv7rWcIFdA1MbpdcxAeOPWhxg7L7fso7u9hsdFobG0eW2tah9hxQ+mAfOrzfGdeVflnigLBRv/8nhMAz4gV3cEtj8057f9HBfgSibDJsyR7Zb20E8yqmlvuhWV6F12KRA0xq9fm7G50PpZVHkJUCI/L69Idz8M0XEzPLEfWJE1WA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=f4dlHc8Ii6pve9lMypWrcvABjSn3aGCvnQDI4L19RUE=;
+ b=KxRI3qeIX8ud1aa2Rgr5ayutkjVXI0yoc+w+9FeEyFFFz67MwkC5IAGIctRi5ZfVZSLpDcO0z4zCmTNPIiLlKnZyCX34fwFQpcH+4f8BpR4E4B0AYBnHXtIxVvNJAuSs3bbRibyHjcpApWxCyUJ99v1f5O84oGNq7uVxej8aJdh5dKb6bWRky78MqfczSGPyyjRQQbGgj6WfMJ8jk44ZhxJ6wbs84PpYIhZmEisL2nYH3HXy7ZhUgvSTkNZ17KY7liP8c+aCUAetHGwCcsZHGIUvguXnoVD+x3JBn5E7zMl7WCnoZi1JwkaK5LjW4ZZIp6aa4CwLfkV1ap3dr1oMAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB5095.namprd11.prod.outlook.com (2603:10b6:510:3b::14)
+ by SA0PR11MB4687.namprd11.prod.outlook.com (2603:10b6:806:96::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.24; Mon, 3 Jun
+ 2024 19:47:45 +0000
+Received: from PH0PR11MB5095.namprd11.prod.outlook.com
+ ([fe80::215b:e85e:1973:8189]) by PH0PR11MB5095.namprd11.prod.outlook.com
+ ([fe80::215b:e85e:1973:8189%6]) with mapi id 15.20.7633.021; Mon, 3 Jun 2024
+ 19:47:45 +0000
+Message-ID: <10ffa7ab-0121-48b7-9605-c45364d5d9d4@intel.com>
+Date: Mon, 3 Jun 2024 12:47:42 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH next 07/11] ice: Introduce ETH56G PHY model for E825C
+ products
+To: Simon Horman <horms@kernel.org>
+CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	netdev <netdev@vger.kernel.org>, Jiri Pirko <jiri@resnulli.us>, "Sergey
+ Temerkhanov" <sergey.temerkhanov@intel.com>, Michal Michalik
+	<michal.michalik@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Karol Kolacinski
+	<karol.kolacinski@intel.com>, Pucha Himasekhar Reddy
+	<himasekharx.reddy.pucha@intel.com>
+References: <20240528-next-2024-05-28-ptp-refactors-v1-0-c082739bb6f6@intel.com>
+ <20240528-next-2024-05-28-ptp-refactors-v1-7-c082739bb6f6@intel.com>
+ <20240601103519.GC491852@kernel.org>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20240601103519.GC491852@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0136.namprd03.prod.outlook.com
+ (2603:10b6:303:8c::21) To PH0PR11MB5095.namprd11.prod.outlook.com
+ (2603:10b6:510:3b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240603121834.27433-6-SkyLake.Huang@mediatek.com>
-
-On Mon, Jun 03, 2024 at 08:18:34PM +0800, Sky Huang wrote:
-> From: "SkyLake.Huang" <skylake.huang@mediatek.com>
-> 
-> Add support for internal 2.5Gphy on MT7988. This driver will load
-> necessary firmware, add appropriate time delay and figure out LED.
-> Also, certain control registers will be set to fix link-up issues.
-> 
-> Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
-> ---
-> Changes in v2:
-> 1. Move md32_en_cfg_base & pmb_addr detection in probe function.
-> 2. Do not read PMB & MD32_EN_CFG base addresses from dts. We won't
-> change that from board to board. Leave them in driver code. Also,
-> release those addresses after firmware is triggered.
-> 3. Remove half duplex code which leads to ambiguity. Those are for
-> testing & developing previously.
-> 4. Use correct BMCR definitions.
-> 5. Correct config_aneg / get_features / read_status functions.
-> 6. Change mt7988_2p5ge prefix to mt798x_2p5ge in case that our next
-> platform uses this 2.5Gphy driver.
-> 
-> Changes in v3:
-> 1. Add range check for firmware.
-> 2. Fix c45_ids.mmds_present in probe function.
-> 3. Still use genphy_update_link() in read_status because
-> genphy_c45_read_link() can't correct detect link on this phy.
-> 
-> Changes in v4:
-> 1. Move firmware loading function to mt798x_2p5ge_phy_load_fw()
-> 2. Add AN disable warning in mt798x_2p5ge_phy_config_aneg()
-> 3. Clarify the HDX comments in mt798x_2p5ge_phy_get_features()
-> 
-> Changes in v5:
-> 1. Move md32_en_cfg_base & pmb_addr to local variables to achieve
-> symmetric code.
-> 2. Print out firmware date code & version.
-> 3. Don't return error if LED pinctrl switching fails. Also, add
-> comments to this unusual operations.
-> 4. Return -EOPNOTSUPP for AN off case in config_aneg().
-> 
-> Changes in v6:
-> 1. Force casting (fw->data + MT7988_2P5GE_PMB_SIZE - 8) with __be16.
-> 2. Remove parens on RHS of "phydev->c45_ids.mmds_present |=".
-> 3. Add PHY_INTERFACE_MODE_INTERNAL check in
-> mt798x_2p5ge_phy_get_rate_matching()
-> 4. Arrange local variables in reverse Xmas tree order.
-> ---
->  MAINTAINERS                          |   1 +
->  drivers/net/phy/mediatek/Kconfig     |  11 +
->  drivers/net/phy/mediatek/Makefile    |   1 +
->  drivers/net/phy/mediatek/mtk-2p5ge.c | 435 +++++++++++++++++++++++++++
->  4 files changed, 448 insertions(+)
->  create mode 100644 drivers/net/phy/mediatek/mtk-2p5ge.c
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index e58e05c..fe380f2 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -13793,6 +13793,7 @@ M:	Qingfang Deng <dqfext@gmail.com>
->  M:	SkyLake Huang <SkyLake.Huang@mediatek.com>
->  L:	netdev@vger.kernel.org
->  S:	Maintained
-> +F:	drivers/net/phy/mediatek/mtk-2p5ge.c
->  F:	drivers/net/phy/mediatek/mtk-ge-soc.c
->  F:	drivers/net/phy/mediatek/mtk-phy-lib.c
->  F:	drivers/net/phy/mediatek/mtk-ge.c
-> diff --git a/drivers/net/phy/mediatek/Kconfig b/drivers/net/phy/mediatek/Kconfig
-> index 448bc20..1490352 100644
-> --- a/drivers/net/phy/mediatek/Kconfig
-> +++ b/drivers/net/phy/mediatek/Kconfig
-> @@ -25,3 +25,14 @@ config MEDIATEK_GE_SOC_PHY
->  	  the MT7981 and MT7988 SoCs. These PHYs need calibration data
->  	  present in the SoCs efuse and will dynamically calibrate VCM
->  	  (common-mode voltage) during startup.
-> +
-> +config MEDIATEK_2P5GE_PHY
-> +	tristate "MediaTek 2.5Gb Ethernet PHYs"
-> +	depends on (ARM64 && ARCH_MEDIATEK) || COMPILE_TEST
-> +	select MTK_NET_PHYLIB
-> +	help
-> +	  Supports MediaTek SoC built-in 2.5Gb Ethernet PHYs.
-> +
-> +	  This will load necessary firmware and add appropriate time delay.
-> +	  Accelerate this procedure through internal pbus instead of MDIO
-> +	  bus. Certain link-up issues will also be fixed here.
-> diff --git a/drivers/net/phy/mediatek/Makefile b/drivers/net/phy/mediatek/Makefile
-> index 814879d..c6db8ab 100644
-> --- a/drivers/net/phy/mediatek/Makefile
-> +++ b/drivers/net/phy/mediatek/Makefile
-> @@ -2,3 +2,4 @@
->  obj-$(CONFIG_MTK_NET_PHYLIB)		+= mtk-phy-lib.o
->  obj-$(CONFIG_MEDIATEK_GE_PHY)		+= mtk-ge.o
->  obj-$(CONFIG_MEDIATEK_GE_SOC_PHY)	+= mtk-ge-soc.o
-> +obj-$(CONFIG_MEDIATEK_2P5GE_PHY)	+= mtk-2p5ge.o
-> diff --git a/drivers/net/phy/mediatek/mtk-2p5ge.c b/drivers/net/phy/mediatek/mtk-2p5ge.c
-> new file mode 100644
-> index 0000000..0c92608
-> --- /dev/null
-> +++ b/drivers/net/phy/mediatek/mtk-2p5ge.c
-> @@ -0,0 +1,435 @@
-> +// SPDX-License-Identifier: GPL-2.0+
-> +#include <linux/bitfield.h>
-> +#include <linux/firmware.h>
-> +#include <linux/module.h>
-> +#include <linux/nvmem-consumer.h>
-> +#include <linux/of_address.h>
-> +#include <linux/of_platform.h>
-> +#include <linux/pinctrl/consumer.h>
-> +#include <linux/phy.h>
-> +#include <linux/pm_domain.h>
-> +#include <linux/pm_runtime.h>
-> +
-> +#include "mtk.h"
-> +
-> +#define MTK_2P5GPHY_ID_MT7988	(0x00339c11)
-> +
-> +#define MT7988_2P5GE_PMB "mediatek/mt7988/i2p5ge-phy-pmb.bin"
-> +#define MT7988_2P5GE_PMB_SIZE	(0x20000)
-> +#define MT7988_2P5GE_PMB_BASE	(0x0f100000)
-> +#define MT7988_2P5GE_PMB_LEN	(0x20000)
-> +#define MT7988_2P5GE_MD32_EN_CFG_BASE	(0x0f0f0018)
-> +#define MT7988_2P5GE_MD32_EN_CFG_LEN	(0x20)
-> +#define   MD32_EN			BIT(0)
-> +
-> +#define BASE100T_STATUS_EXTEND		(0x10)
-> +#define BASE1000T_STATUS_EXTEND		(0x11)
-> +#define EXTEND_CTRL_AND_STATUS		(0x16)
-> +
-> +#define PHY_AUX_CTRL_STATUS		(0x1d)
-> +#define   PHY_AUX_DPX_MASK		GENMASK(5, 5)
-> +#define   PHY_AUX_SPEED_MASK		GENMASK(4, 2)
-> +
-> +#define MTK_PHY_LPI_PCS_DSP_CTRL		(0x121)
-> +#define   MTK_PHY_LPI_SIG_EN_LO_THRESH100_MASK	GENMASK(12, 8)
-> +
-> +/* Registers on Token Ring debug nodes */
-> +/* ch_addr = 0x0, node_addr = 0xf, data_addr = 0x3c */
-> +#define AUTO_NP_10XEN				BIT(6)
-> +
-> +struct mtk_i2p5ge_phy_priv {
-> +	bool fw_loaded;
-> +	unsigned long led_state;
-> +};
-> +
-> +enum {
-> +	PHY_AUX_SPD_10 = 0,
-> +	PHY_AUX_SPD_100,
-> +	PHY_AUX_SPD_1000,
-> +	PHY_AUX_SPD_2500,
-> +};
-> +
-> +static int mt798x_2p5ge_phy_load_fw(struct phy_device *phydev)
-> +{
-> +	struct mtk_i2p5ge_phy_priv *priv = phydev->priv;
-> +	void __iomem *md32_en_cfg_base, *pmb_addr;
-> +	struct device *dev = &phydev->mdio.dev;
-> +	const struct firmware *fw;
-> +	int ret, i;
-> +	u16 reg;
-> +
-> +	if (priv->fw_loaded)
-> +		return 0;
-> +
-> +	pmb_addr = ioremap(MT7988_2P5GE_PMB_BASE, MT7988_2P5GE_PMB_LEN);
-> +	if (!pmb_addr)
-> +		return -ENOMEM;
-> +	md32_en_cfg_base = ioremap(MT7988_2P5GE_MD32_EN_CFG_BASE,
-> +				   MT7988_2P5GE_MD32_EN_CFG_LEN);
-> +	if (!md32_en_cfg_base) {
-> +		ret = -ENOMEM;
-> +		goto free_pmb;
-> +	}
-> +
-> +	ret = request_firmware(&fw, MT7988_2P5GE_PMB, dev);
-> +	if (ret) {
-> +		dev_err(dev, "failed to load firmware: %s, ret: %d\n",
-> +			MT7988_2P5GE_PMB, ret);
-> +		goto free;
-> +	}
-> +
-> +	if (fw->size != MT7988_2P5GE_PMB_SIZE) {
-> +		dev_err(dev, "Firmware size 0x%zx != 0x%x\n",
-> +			fw->size, MT7988_2P5GE_PMB_SIZE);
-> +		ret = -EINVAL;
-> +		goto free;
-> +	}
-> +
-> +	reg = readw(md32_en_cfg_base);
-> +	if (reg & MD32_EN) {
-> +		phy_set_bits(phydev, MII_BMCR, BMCR_RESET);
-> +		usleep_range(10000, 11000);
-> +	}
-> +	phy_set_bits(phydev, MII_BMCR, BMCR_PDOWN);
-> +
-> +	/* Write magic number to safely stall MCU */
-> +	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x800e, 0x1100);
-> +	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x800f, 0x00df);
-> +
-> +	for (i = 0; i < MT7988_2P5GE_PMB_SIZE - 1; i += 4)
-> +		writel(*((uint32_t *)(fw->data + i)), pmb_addr + i);
-> +	release_firmware(fw);
-> +	dev_info(dev, "Firmware date code: %x/%x/%x, version: %x.%x\n",
-> +		 be16_to_cpu(*((__be16 *)(fw->data +
-> +					  MT7988_2P5GE_PMB_SIZE - 8))),
-> +		 *(fw->data + MT7988_2P5GE_PMB_SIZE - 6),
-> +		 *(fw->data + MT7988_2P5GE_PMB_SIZE - 5),
-> +		 *(fw->data + MT7988_2P5GE_PMB_SIZE - 2),
-> +		 *(fw->data + MT7988_2P5GE_PMB_SIZE - 1));
-> +
-> +	writew(reg & ~MD32_EN, md32_en_cfg_base);
-> +	writew(reg | MD32_EN, md32_en_cfg_base);
-> +	phy_set_bits(phydev, MII_BMCR, BMCR_RESET);
-> +	/* We need a delay here to stabilize initialization of MCU */
-> +	usleep_range(7000, 8000);
-> +	dev_info(dev, "Firmware loading/trigger ok.\n");
-> +
-> +	priv->fw_loaded = true;
-> +
-> +free:
-> +	iounmap(md32_en_cfg_base);
-> +free_pmb:
-> +	iounmap(pmb_addr);
-> +
-> +	return ret ? ret : 0;
-> +}
-> +
-> +static int mt798x_2p5ge_phy_config_init(struct phy_device *phydev)
-> +{
-> +	struct pinctrl *pinctrl;
-> +	int ret;
-> +
-> +	ret = mt798x_2p5ge_phy_load_fw(phydev);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	/* Setup LED */
-> +	phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MTK_PHY_LED0_ON_CTRL,
-> +			 MTK_PHY_LED_ON_POLARITY | MTK_PHY_LED_ON_LINK10 |
-> +			 MTK_PHY_LED_ON_LINK100 | MTK_PHY_LED_ON_LINK1000 |
-> +			 MTK_PHY_LED_ON_LINK2500);
-> +	phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MTK_PHY_LED1_ON_CTRL,
-> +			 MTK_PHY_LED_ON_FDX | MTK_PHY_LED_ON_HDX);
-> +
-> +	/* Switch pinctrl after setting polarity to avoid bogus blinking */
-> +	pinctrl = devm_pinctrl_get_select(&phydev->mdio.dev, "i2p5gbe-led");
-> +	if (IS_ERR(pinctrl))
-> +		dev_err(&phydev->mdio.dev, "Fail to set LED pins!\n");
-> +
-> +	phy_modify_mmd(phydev, MDIO_MMD_VEND1, MTK_PHY_LPI_PCS_DSP_CTRL,
-> +		       MTK_PHY_LPI_SIG_EN_LO_THRESH100_MASK, 0);
-> +
-> +	/* Enable 16-bit next page exchange bit if 1000-BT isn't advertising */
-> +	tr_modify(phydev, 0x0, 0xf, 0x3c, AUTO_NP_10XEN,
-> +		  FIELD_PREP(AUTO_NP_10XEN, 0x1));
-> +
-> +	/* Enable HW auto downshift */
-> +	phy_modify_paged(phydev, MTK_PHY_PAGE_EXTENDED_1,
-> +			 MTK_PHY_AUX_CTRL_AND_STATUS,
-> +			 0, MTK_PHY_ENABLE_DOWNSHIFT);
-> +
-> +	return 0;
-> +}
-> +
-> +static int mt798x_2p5ge_phy_config_aneg(struct phy_device *phydev)
-> +{
-> +	bool changed = false;
-> +	u32 adv;
-> +	int ret;
-> +
-> +	/* In fact, if we disable autoneg, we can't link up correctly:
-> +	 *  2.5G/1G: Need AN to exchange master/slave information.
-> +	 *  100M: Without AN, link starts at half duplex (According to
-> +	 *        IEEE 802.3-2018), which this phy doesn't support.
-> +	 *   10M: Deprecated in this ethernet phy.
-> +	 */
-> +	if (phydev->autoneg == AUTONEG_DISABLE)
-> +		return -EOPNOTSUPP;
-> +
-> +	ret = genphy_c45_an_config_aneg(phydev);
-> +	if (ret < 0)
-> +		return ret;
-> +	if (ret > 0)
-> +		changed = true;
-> +
-> +	/* Clause 45 doesn't define 1000BaseT support. Use Clause 22 instead in
-> +	 * our design.
-> +	 */
-> +	adv = linkmode_adv_to_mii_ctrl1000_t(phydev->advertising);
-> +	ret = phy_modify_changed(phydev, MII_CTRL1000, ADVERTISE_1000FULL, adv);
-> +	if (ret < 0)
-> +		return ret;
-> +	if (ret > 0)
-> +		changed = true;
-> +
-> +	return genphy_c45_check_and_restart_aneg(phydev, changed);
-> +}
-> +
-> +static int mt798x_2p5ge_phy_get_features(struct phy_device *phydev)
-> +{
-> +	int ret;
-> +
-> +	ret = genphy_c45_pma_read_abilities(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* This phy can't handle collision, and neither can (XFI)MAC it's
-> +	 * connected to. Although it can do HDX handshake, it doesn't support
-> +	 * CSMA/CD that HDX requires.
-> +	 */
-> +	linkmode_clear_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT,
-> +			   phydev->supported);
-> +
-> +	return 0;
-> +}
-> +
-> +static int mt798x_2p5ge_phy_read_status(struct phy_device *phydev)
-> +{
-> +	int ret;
-> +
-> +	/* When MDIO_STAT1_LSTATUS is raised genphy_c45_read_link(), this phy
-> +	 * actually hasn't finished AN. So use CL22's link update function
-> +	 * instead.
-> +	 */
-> +	ret = genphy_update_link(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	phydev->speed = SPEED_UNKNOWN;
-> +	phydev->duplex = DUPLEX_UNKNOWN;
-> +	phydev->pause = 0;
-> +	phydev->asym_pause = 0;
-> +
-> +	/* We'll read link speed through vendor specific registers down below.
-> +	 * So remove phy_resolve_aneg_linkmode (AN on) & genphy_c45_read_pma
-> +	 * (AN off).
-> +	 */
-> +	if (phydev->autoneg == AUTONEG_ENABLE && phydev->autoneg_complete) {
-> +		ret = genphy_c45_read_lpa(phydev);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		/* Clause 45 doesn't define 1000BaseT support. Read the link
-> +		 * partner's 1G advertisement via Clause 22.
-> +		 */
-> +		ret = phy_read(phydev, MII_STAT1000);
-> +		if (ret < 0)
-> +			return ret;
-> +		mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, ret);
-> +	} else if (phydev->autoneg == AUTONEG_DISABLE) {
-> +		linkmode_zero(phydev->lp_advertising);
-> +	}
-> +
-> +	if (phydev->link) {
-> +		ret = phy_read(phydev, PHY_AUX_CTRL_STATUS);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		switch (FIELD_GET(PHY_AUX_SPEED_MASK, ret)) {
-> +		case PHY_AUX_SPD_10:
-> +			phydev->speed = SPEED_10;
-> +			break;
-> +		case PHY_AUX_SPD_100:
-> +			phydev->speed = SPEED_100;
-> +			break;
-> +		case PHY_AUX_SPD_1000:
-> +			phydev->speed = SPEED_1000;
-> +			break;
-> +		case PHY_AUX_SPD_2500:
-> +			phydev->speed = SPEED_2500;
-> +			break;
-> +		}
-> +
-> +		phydev->duplex = DUPLEX_FULL;
-> +		/* FIXME:
-> +		 * The current firmware always enables rate adaptation mode.
-> +		 */
-> +		phydev->rate_matching = RATE_MATCH_PAUSE;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int mt798x_2p5ge_phy_get_rate_matching(struct phy_device *phydev,
-> +					      phy_interface_t iface)
-> +{
-> +	if (iface == PHY_INTERFACE_MODE_XGMII ||
-> +	    iface == PHY_INTERFACE_MODE_INTERNAL)
-> +		return RATE_MATCH_PAUSE;
-> +	return RATE_MATCH_NONE;
-
-As the phy is always connected in the same way internally inside the MT7988
-this check and destinction doesn't make sense to me.
-
-Imho you should always return RATE_MATCH_PAUSE, unless the same PHY also
-exists in other SoCs and/or is connected in different interface modes.
-
-In any way, please explain this part to us, especially in which situation
-exactly you want to return RATE_MATCH_NONE and for which reason.
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB5095:EE_|SA0PR11MB4687:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5e11d836-4c03-4023-3d60-08dc84060a33
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|366007|1800799015;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?MmFVUTE1QWVPQWg0eHFscWhtTHVpQmkwVTNPdFd3dXlZMDJ6N2NaZ2R3dVlH?=
+ =?utf-8?B?VG41aHd0SXBmQkM1K2U5QW9vTlcxNmdhdG80ZFhtYnFuQkVMY1ZjZG1zb2pq?=
+ =?utf-8?B?RXhVNnFwY0lCZGNkUWI0VmR2VHA4eHNrZmRySE4xOGlaZytjUjR5eWJmTCtL?=
+ =?utf-8?B?MmJYaHBPM1E5R3dtL1hhbEhxUjZleVR5aWt1N1JmenU0KzNoUFJXY2tzd2Z6?=
+ =?utf-8?B?ZDRiY09PTTE3djNjUVVRYklJbXZBMGpJdktvd3JaZ2dENGpRTXlJRXVwSDBu?=
+ =?utf-8?B?OFVWdXlhODBGOGZ1dDE3QkFHSFRiMkR1OGtudjA4K1BqaUhSaS9UYVRjb2tL?=
+ =?utf-8?B?OVhMM09EQnRBbm1wbEhDeGpUOTNBNDBnR1RPSDNYMWxja1c1WkVCamV0KzBQ?=
+ =?utf-8?B?SFpxSmF2dVE1V2FQYys5a2ZqdEZYWWs2ZDdaNHJrUUdCWkdYcEFLbGV6dFRC?=
+ =?utf-8?B?Rk56WFRZc0laR0s1dnExdHRJdDZxV29jMHc4RzRIUVpZOFVPZzh4ckc3THZN?=
+ =?utf-8?B?NUpwZ1h0QjBQYmFXYUJnQTJRREtKKzErTDJkaE95b3RyTkpjL2NzNG82MjhR?=
+ =?utf-8?B?ZUFEcFMvRUU2bzNQbzlIdXNXNDVUenY1UHRpR0U2Z0NyVkxVVWtxekMyeTcw?=
+ =?utf-8?B?V1daZXpDRHVROFBndlNyVU53cnhiWnpUeE5QS0JkQXJxdEQwV1VIUEZCckFt?=
+ =?utf-8?B?eDdBSzNVWTVnRmI4d1FTbjVwUW12VGhRTE9IcTFMVEFvM2k1amRLa1BFdFlI?=
+ =?utf-8?B?QVRIcUFwNnptMi9MdGtlcVZoaEN0Zkk5azFod2tDNVJZa08xWTZObXdBbmNq?=
+ =?utf-8?B?M1BHVjcvb3hLWkpUVjhxUnpoYVRYbEw3L0hSYmdBVHIrdE5zM3NYWjdiRVdy?=
+ =?utf-8?B?Q3g4RWxRSUFPZmVPM0dtaEY4RzZSck4vUzY5WkJLSkxsRDJBUmtrcWxzNnVZ?=
+ =?utf-8?B?d2tiM0puVytLMHhaME1IK2VMT2hQcjhIdzBIMTFndHY2ckl0M2N1Yk5nQ0pw?=
+ =?utf-8?B?Qm9qVWlZRFF6ZWF5ek5DcSsxWlJuRTh4em53a2NqZW8velpFdjdEWEpoU3Vo?=
+ =?utf-8?B?MUJPL05wSzV2VzdvcWFmUjJ3ejRmNS9KWHU0NlF6eFhHcWdQZEliUU9USGNq?=
+ =?utf-8?B?SzkzMWV0UHl0c2lpUk96OUNjc1NvbUlWY3h1bWFtcTlZcVRLNk5EWnpXblZS?=
+ =?utf-8?B?YWFsNlNiTktITXZmNGgrVVZERVcvbXp4VThrZEtNUFZVTGdGSG5mWlVXTnNY?=
+ =?utf-8?B?aERJUVN1S0ZFWkNGaS96cmhYZE03L1dScWdtalJuNC9lbW53elZWdUxGMzBZ?=
+ =?utf-8?B?U2dIUGpid0I3OFVGbWNhOGRmYlN4T1NvaVlTVkw0dERjM0gwSWpQdTdReGl2?=
+ =?utf-8?B?K2ovbkJHWmtETW15ZjJQTExlWGhnWlVQSXZwME1xRzhCR2NKd1Bab1dCZXJw?=
+ =?utf-8?B?UFJ0MzE3RlVrL2NrTmZzNWRTVjFSd0tGczJOOURXODlhb0JkMEVRUUpxVEJ1?=
+ =?utf-8?B?Qk1vekM4TS96K1BhK0JhdTBDSjE2Nno4REgxcWZMTEhGaUd1bXE4cktJZFJL?=
+ =?utf-8?B?bmFwYUVkTTRJUDdMekk3Zkp0dUFKRUpPUEk3a3NSR253RWszTTRMZ1M2V3BX?=
+ =?utf-8?B?VXI2Z2pHWjN2aDlhZG5nU1NqeVAzdC9WdkRjOUVDRUV3Yk1mK1ovd2FLNExs?=
+ =?utf-8?B?SFVLUUJEQjFGQkY0ZTRHMHQraE9SYlQyNkpLeXU5eFNCSDEvWE0vQ2xRPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5095.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?S2p6ZmRFNzYxZWVFUjFZZHBjMlZ4ZTM0R3Q4SkJlMnkzSkRDMVBaUHQrVisw?=
+ =?utf-8?B?YUtvLzA3ZGs5ejFTbVUwMXVzaVFMZzJTUmx0UkdraTlIY211V1loZGZjUkNl?=
+ =?utf-8?B?ZkRtTnlKbWROa2FLMHljVkR3YTU4Vk8vR21ITkUyT2NvcFNaZllSV1hUUEhG?=
+ =?utf-8?B?UUhKb25pcHVjSWFQaWp3OFFtMVM2SmFLUkhQVUdJUHc3ZVdvSEtSb3c2QUM1?=
+ =?utf-8?B?V2xMWWE4Nmd6TUhZcUY3WDVwTnB3TGJHL01pM0FQVVlabTdINUV6L3orSklx?=
+ =?utf-8?B?QnoybEtqb0d1MnYzbXBPbm9MR1J6cCtnRTRXNEVDTHdCeVM5azZUcSsxV3BE?=
+ =?utf-8?B?RFRkT2pQZFdWQWFNWDFjemt1Y3dFaHVuSlR4NUpOYjlodDJLWXdGMVMxNVJW?=
+ =?utf-8?B?KzV1SFhrOWptL2xJb1VnbXc4QUV3Nmxnd1lFdUdMd01jQXo5N2RBaGZZQWNS?=
+ =?utf-8?B?RDdYRHBlQjJMbzczdytSa3hWcEVPN0dWVXM4VUhpa1JubnZaWENnQmFjZHpq?=
+ =?utf-8?B?bWpTdnFWM0syYWdUUjl3T3V0U2xFR1hLUTZRdThnMnRTWGM1Y2R5SUxNOXRr?=
+ =?utf-8?B?Q0VTSGZXaW53bEFZeVZEZDZ1TlRoRFkrNTZ3S3JwSDkrTEFCbDhpTDdaVHRM?=
+ =?utf-8?B?dXBzajBVZEhMUFRpa3lYaW1qYmU3bDhPRGxwb0lDRksyZFRKODdqZHFKc2dL?=
+ =?utf-8?B?SXlYdWhlYzhsbjZPK2M1bmdtOFQ5V2xhb0NHa0NyWENQaCthV3JqMmY3UGda?=
+ =?utf-8?B?RDhOZ2ZrMkRIY3VvUFZwU2FwQ3I1QlhrM29uMWpLTTFxU3VCanhwdjI0RzZ4?=
+ =?utf-8?B?WlV6bis4MzJKRE4xU3FDUytrbm1VUUVtTnRBMGxHWnFPSG81TytXcnBlQU8x?=
+ =?utf-8?B?YngzQVAwazM1endWNTY3M216RDl4eVNOQ0tOSTZyemxNbHBuekFTWW5MUzFV?=
+ =?utf-8?B?ZDMwdUpxbGw0QVkvMklqM0w5NFZHcWRmQWtEc2NaNThnYlMyeFhqN2lLLzNB?=
+ =?utf-8?B?ckZvcDlXT1MxRmVDK2VzSUxlTFN4a0dUZ2k5Z2NZOXhMeG9kQnhvMDFWOUVT?=
+ =?utf-8?B?ZElLQ3pCdUZ3MUxYeW9HNXMwd2JvTE5lUlF4SXgxRnNub2d5KzVuY1NHZlZz?=
+ =?utf-8?B?Y2NMUzIveTBhVjlYczBHb1NrbnMrYkNyN1U0NUNkcGNjSldyV2E3d0c1QUZr?=
+ =?utf-8?B?V1Exb0VYNzNqMk5WSjNTK2orL21IZ25BdWZ0YzVVNTZyNld3MGc2Znd3OGxB?=
+ =?utf-8?B?ZU9GdlFWU3RXTGx0d1VGWHpFOHlNRkUxb1FKajNBK0poeXRmRklUbHRnVzhq?=
+ =?utf-8?B?bGxRanpOOVNzSVY5MTJ4NWh0T2V5V3plQ2I5enZrMkQydVhFR0tBNTNIbXB3?=
+ =?utf-8?B?eDBuMGo4TE84U29KQmVQOHhWOGpSRFpFT3EwbVM3eEZrdFoyNE85OVBtUStG?=
+ =?utf-8?B?alpNRVFYVUs0UmxjVHpMMTJhaXV2ZHNEODJCSFplM0RsMW5zdXE0MHROOEtZ?=
+ =?utf-8?B?K1pnUC9HSkVBNkJucHNlTUFSU0swL3MvQzYrNy9kTm5aTkVjemlHMFZEYmEr?=
+ =?utf-8?B?SjIxMHdSTHpSRmUzbVJSaDZ0clVnc1c5YkdGbkxPWEJCUW1aRXQrdDJUd0lE?=
+ =?utf-8?B?Snhhc0xGRTZpcnFJdVkwTlhQSzQxckpXMUxuQ01aZ0YwVEZESmx0UmdwT1hP?=
+ =?utf-8?B?S2NrSS9Dc0tXeHU2dU4rZ3YrdlZmMnFjc1BNS2JpblB3K0ZSUGw4djdWby94?=
+ =?utf-8?B?YS81NmxSRjIwMW1KMHN6YVhjVVUzVVdSdjhWbXdBNzNEdWZoQTRtRStDZ3Jw?=
+ =?utf-8?B?YnJQKzdYb2x5bmVkUnlMeVVRRW42WnBGSlV4Z0V3UVRld2U0cElrZk43Z1FW?=
+ =?utf-8?B?Wi8veGs4SE5Bb3RtcUY2Y3F2YjVjZ2tPQnVwZms0SkRsR1dMOEhhNDVPbU5z?=
+ =?utf-8?B?S3d3SHFJdXpQVE9kVUZydDZTaVRDOGd2SXhnM0M2VDhLY3ZtTVNybUUvcE9R?=
+ =?utf-8?B?RE9HdTl1TkRmVW1kWGgrTjNqdDU1NnlGU0ZqcHIvalc4NSt5YUNZbS9tb3JN?=
+ =?utf-8?B?aHIyTXhJdVJQK1NBVkowcFJERXhjNDd0dFI0NEpFcU1QVDFmdlhBQ0c1Z2Ex?=
+ =?utf-8?B?T0dmL2tET0NEVGZuRHRBRTZsVFkyMXZoTFU5RHovR3o4ZmswT0tCbStiNC9l?=
+ =?utf-8?B?eHc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5e11d836-4c03-4023-3d60-08dc84060a33
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5095.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2024 19:47:45.7397
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vmEKVL796nLsBEtysa0qNERWd3Apuphsq55/A1N8IlVi26A2BScqg3bTMUpu6lc28neegYZyCpxseHy8JWpkYQS97jbW2B9B2vyED+VKv8Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4687
+X-OriginatorOrg: intel.com
 
 
 
-> +}
-> +
-> +static const unsigned long supported_triggers =
-> +	(BIT(TRIGGER_NETDEV_FULL_DUPLEX) |
-> +	 BIT(TRIGGER_NETDEV_LINK)        |
-> +	 BIT(TRIGGER_NETDEV_LINK_10)     |
-> +	 BIT(TRIGGER_NETDEV_LINK_100)    |
-> +	 BIT(TRIGGER_NETDEV_LINK_1000)   |
-> +	 BIT(TRIGGER_NETDEV_LINK_2500)   |
-> +	 BIT(TRIGGER_NETDEV_RX)          |
-> +	 BIT(TRIGGER_NETDEV_TX));
-> +
-> +static int mt798x_2p5ge_phy_led_blink_set(struct phy_device *phydev, u8 index,
-> +					  unsigned long *delay_on,
-> +					  unsigned long *delay_off)
-> +{
-> +	struct mtk_i2p5ge_phy_priv *priv = phydev->priv;
-> +	bool blinking = false;
-> +	int err = 0;
-> +
-> +	if (index > 1)
-> +		return -EINVAL;
-> +
-> +	if (delay_on && delay_off && (*delay_on > 0) && (*delay_off > 0)) {
-> +		blinking = true;
-> +		*delay_on = 50;
-> +		*delay_off = 50;
-> +	}
-> +
-> +	err = mtk_phy_hw_led_blink_set(phydev, index, &priv->led_state,
-> +				       blinking);
-> +	if (err)
-> +		return err;
-> +
-> +	return mtk_phy_hw_led_on_set(phydev, index, &priv->led_state,
-> +				     MTK_2P5GPHY_LED_ON_MASK, false);
-> +}
-> +
-> +static int mt798x_2p5ge_phy_led_brightness_set(struct phy_device *phydev,
-> +					       u8 index,
-> +					       enum led_brightness value)
-> +{
-> +	struct mtk_i2p5ge_phy_priv *priv = phydev->priv;
-> +	int err;
-> +
-> +	err = mtk_phy_hw_led_blink_set(phydev, index, &priv->led_state, false);
-> +	if (err)
-> +		return err;
-> +
-> +	return mtk_phy_hw_led_on_set(phydev, index, &priv->led_state,
-> +				     MTK_2P5GPHY_LED_ON_MASK,
-> +				     (value != LED_OFF));
-> +}
-> +
-> +static int mt798x_2p5ge_phy_led_hw_is_supported(struct phy_device *phydev,
-> +						u8 index, unsigned long rules)
-> +{
-> +	return mtk_phy_led_hw_is_supported(phydev, index, rules,
-> +					   supported_triggers);
-> +}
-> +
-> +static int mt798x_2p5ge_phy_led_hw_control_get(struct phy_device *phydev,
-> +					       u8 index, unsigned long *rules)
-> +{
-> +	struct mtk_i2p5ge_phy_priv *priv = phydev->priv;
-> +
-> +	return mtk_phy_led_hw_ctrl_get(phydev, index, rules, &priv->led_state,
-> +				       MTK_2P5GPHY_LED_ON_SET,
-> +				       MTK_2P5GPHY_LED_RX_BLINK_SET,
-> +				       MTK_2P5GPHY_LED_TX_BLINK_SET);
-> +};
-> +
-> +static int mt798x_2p5ge_phy_led_hw_control_set(struct phy_device *phydev,
-> +					       u8 index, unsigned long rules)
-> +{
-> +	struct mtk_i2p5ge_phy_priv *priv = phydev->priv;
-> +
-> +	return mtk_phy_led_hw_ctrl_set(phydev, index, rules, &priv->led_state,
-> +				       MTK_2P5GPHY_LED_ON_SET,
-> +				       MTK_2P5GPHY_LED_RX_BLINK_SET,
-> +				       MTK_2P5GPHY_LED_TX_BLINK_SET);
-> +};
-> +
-> +static int mt798x_2p5ge_phy_probe(struct phy_device *phydev)
-> +{
-> +	struct mtk_i2p5ge_phy_priv *priv;
-> +
-> +	priv = devm_kzalloc(&phydev->mdio.dev,
-> +			    sizeof(struct mtk_i2p5ge_phy_priv), GFP_KERNEL);
-> +	if (!priv)
-> +		return -ENOMEM;
-> +
-> +	switch (phydev->drv->phy_id) {
-> +	case MTK_2P5GPHY_ID_MT7988:
-> +		/* The original hardware only sets MDIO_DEVS_PMAPMD */
-> +		phydev->c45_ids.mmds_present |= MDIO_DEVS_PCS |
-> +						MDIO_DEVS_AN |
-> +						MDIO_DEVS_VEND1 |
-> +						MDIO_DEVS_VEND2;
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	priv->fw_loaded = false;
-> +	phydev->priv = priv;
-> +
-> +	mtk_phy_leds_state_init(phydev);
-> +
-> +	return 0;
-> +}
-> +
-> +static struct phy_driver mtk_gephy_driver[] = {
-> +	{
-> +		PHY_ID_MATCH_MODEL(MTK_2P5GPHY_ID_MT7988),
-> +		.name		= "MediaTek MT7988 2.5GbE PHY",
-> +		.probe		= mt798x_2p5ge_phy_probe,
-> +		.config_init	= mt798x_2p5ge_phy_config_init,
-> +		.config_aneg    = mt798x_2p5ge_phy_config_aneg,
-> +		.get_features	= mt798x_2p5ge_phy_get_features,
-> +		.read_status	= mt798x_2p5ge_phy_read_status,
-> +		.get_rate_matching	= mt798x_2p5ge_phy_get_rate_matching,
-> +		.suspend	= genphy_suspend,
-> +		.resume		= genphy_resume,
-> +		.read_page	= mtk_phy_read_page,
-> +		.write_page	= mtk_phy_write_page,
-> +		.led_blink_set	= mt798x_2p5ge_phy_led_blink_set,
-> +		.led_brightness_set = mt798x_2p5ge_phy_led_brightness_set,
-> +		.led_hw_is_supported = mt798x_2p5ge_phy_led_hw_is_supported,
-> +		.led_hw_control_get = mt798x_2p5ge_phy_led_hw_control_get,
-> +		.led_hw_control_set = mt798x_2p5ge_phy_led_hw_control_set,
-> +	},
-> +};
-> +
-> +module_phy_driver(mtk_gephy_driver);
-> +
-> +static struct mdio_device_id __maybe_unused mtk_2p5ge_phy_tbl[] = {
-> +	{ PHY_ID_MATCH_VENDOR(0x00339c00) },
-> +	{ }
-> +};
-> +
-> +MODULE_DESCRIPTION("MediaTek 2.5Gb Ethernet PHY driver");
-> +MODULE_AUTHOR("SkyLake Huang <SkyLake.Huang@mediatek.com>");
-> +MODULE_LICENSE("GPL");
-> +
-> +MODULE_DEVICE_TABLE(mdio, mtk_2p5ge_phy_tbl);
-> -- 
-> 2.34.1
+On 6/1/2024 3:35 AM, Simon Horman wrote:
+> On Tue, May 28, 2024 at 04:03:57PM -0700, Jacob Keller wrote:
+>> From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+>>
+>> E825C products feature a new PHY model - ETH56G.
+>>
+>> Introduces all necessary PHY definitions, functions etc. for ETH56G PHY,
+>> analogous to E82X and E810 ones with addition of a few HW-specific
+>> functionalities for ETH56G like one-step timestamping.
+>>
+>> It ensures correct PTP initialization and operation for E825C products.
+>>
+>> Co-developed-by: Jacob Keller <jacob.e.keller@intel.com>
+>> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+>> Co-developed-by: Michal Michalik <michal.michalik@intel.com>
+>> Signed-off-by: Michal Michalik <michal.michalik@intel.com>
+>> Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>> Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
+>> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+>> Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+>> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 > 
+> Hi Jacob,
 > 
+> This isn't a proper review, but I noticed that your signed-off
+> appears twice above.
+> 
+
+Yes it does. I developed some of the original code which Sergey used
+here (hence my Co-developed-by and Signed-off-by). But I am also
+covering for Tony and submitting the patch so I added my sign-off-by to
+the end of the sequence since I'm the one who submitted the full series
+to netdev.
+
+I'm not entirely sure how to handle this, since its a bit awkward. I
+guess there are a couple of other ways we could have done this, from
+dropping my co-developed-by tag, to moving it to the end..
 
