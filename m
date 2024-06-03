@@ -1,87 +1,97 @@
-Return-Path: <netdev+bounces-100111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0484C8D7E66
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 11:22:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAB0A8D7F3C
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 11:48:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3686E1C21070
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:22:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D2041F23318
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940E67A140;
-	Mon,  3 Jun 2024 09:22:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0EFC85C66;
+	Mon,  3 Jun 2024 09:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U/NWRskS"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="a9/0xdnk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2040.outbound.protection.outlook.com [40.107.237.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B0453392;
-	Mon,  3 Jun 2024 09:22:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717406526; cv=none; b=rwH9r+gxznQxyn2W3lnRqCiYJTFKu9AGXOfkhyXNBnEDERz5IUCX+43v32eTYZQim4BEX63wi0jXhKMEnEFpEL+mTHa8NziYei3xFUqQS8RPAbSHBmPmT5ITTo7tarw9++eTA7Q7nPAlIdRO11B5WNZNo8GzLiOq0831aq53/oA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717406526; c=relaxed/simple;
-	bh=kkqv7f+rHzuJEI/kMTRxMigNaE2KbZILSTGg00a2wQs=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=gzqO+AC/vYMIOWRHi3y0DUDua4Tx4UUZtWepbsbUIZ8SnusW5q5sb1xRjifnqOCPEsHtyQHYv2KzQzyc6MF3JyZqbSFjIg7WxcjbXBVHefqMtQq/Me1+PFok9lTk7VPF7vYsdbmRPb2J/aKsHI+2jeWSm0z1nEi1QF7V9vRT2dI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U/NWRskS; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-421140314d5so36450925e9.0;
-        Mon, 03 Jun 2024 02:22:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717406523; x=1718011323; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QhkDydpEnWVJa23NYnN09j8h5HHO16p8o6lqrJSS9S4=;
-        b=U/NWRskSNb39w4DEcGf2BDBRJs50I0YSlvbBKmVA5lXeG/60J5aeO1V5sauFeoHspn
-         uLrGYrvnUp5U1XirJTJnVJdkd91R/KSl9hX2JFYzuZwwGvJ28lJeCaDKLC98+a6QKbj9
-         8He1i7IzTjrsrTRZF0CNbFLnsJP/H9mdRbswG0sEDH4Y0Eej/INf8jBQI8E9ZgsupL9B
-         GhBj0ZeQ+DASd0phFrWFtUCQqe4mxFOGNeYH9JHge9e3TeArJtrdWuehU1c8LODukBvu
-         eTH7uFwHUnHxtXhA4Y7dy62V+mFFhIx6lmSSTKIzwT11aM4ZB8Jja1to1ziNDQEQy9/X
-         5EHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717406523; x=1718011323;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QhkDydpEnWVJa23NYnN09j8h5HHO16p8o6lqrJSS9S4=;
-        b=lKrFjNUF+ipNmAtBjk0keuiFZggtKnDyx1Ov4k/MNSgP3xnTodrrDhB57jlQnhRWiV
-         iHO6YbCG7RxQQUmN03FlPJS9eUblMn/FMZFl8p5xzwPYFUgkf1+SUm2+KdI86eATkThv
-         4x+F74yKQjP930oejdCXwFs2vmkdRsMQcL6ZJAnEt779asQpMOU14geVlK3OXnYAFHB5
-         wKQF1+hWtq+DaobBb9eNhzJNwxhkET/qu7vb7ywT2QAfcuTrZRnX8U5OclxC0cvvjAqT
-         fs2Tcl70uGB/9uDBKIzvujkAZyYNuyULcfKkcLc5cgFC2Vf+kCeT1Z5mdf+ny41117NV
-         mWKA==
-X-Forwarded-Encrypted: i=1; AJvYcCW2jRFDiM4azfBFXEOCGAvZnObjhqW+gGGQ90uKCBwecw7S2r3kXvHrmY1tu3/xD28yJXtzg2qsA8FZ8jR5z9v0aRpPyVux+2w0ptPwSC6F
-X-Gm-Message-State: AOJu0YzNE8BZ273fXtRpoc9Cj2WwCGoMORLRvnY9msI4l1fGs0YjRTkd
-	vv/RAfkPZVhima/r/jVQhk3Vi8iwpX4YDlhNBnb/PP1K5V/I2xlF
-X-Google-Smtp-Source: AGHT+IGYii8s236v2HRjuN11+ZclzNcKnARrLpPWiM+5LfNTUZcr+ku5iSmvDXFi/pfZX2i8uoEUEQ==
-X-Received: by 2002:a05:600c:a4b:b0:421:1165:f240 with SMTP id 5b1f17b1804b1-4212e0bfd91mr72960375e9.36.1717406522919;
-        Mon, 03 Jun 2024 02:22:02 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:601f:3dcb:b672:8b65])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4212c0fb782sm109146475e9.24.2024.06.03.02.22.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jun 2024 02:22:02 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,  "David S.
- Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Paolo
- Abeni <pabeni@redhat.com>,  Pablo Neira Ayuso <pablo@netfilter.org>,
-  Jozsef Kadlecsik <kadlec@netfilter.org>,
-  netfilter-devel@vger.kernel.org,  donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1] netfilter: nfnetlink: convert kfree_skb to
- consume_skb
-In-Reply-To: <20240531161410.GC491852@kernel.org> (Simon Horman's message of
-	"Fri, 31 May 2024 17:14:10 +0100")
-Date: Mon, 03 Jun 2024 10:19:27 +0100
-Message-ID: <m2ed9ecrj4.fsf@gmail.com>
-References: <20240528103754.98985-1-donald.hunter@gmail.com>
-	<20240531161410.GC491852@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393868595A
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 09:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717407734; cv=fail; b=lPbbqwLCRyHrIrNBfe7NJQw2QbkJqIGpwfJb6KuusjeqWq2uXRWcG2JRAc4oJY6eSbyGC9gUxOjlu0WNfS4iG4Q2epcZ5gbsotbszLZUx6xRi0jXlRlQyO88vfMliHn7KPDzB7xgnY5zXOlU6itfSKnaBcGcDwht4M5tlQ9IXac=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717407734; c=relaxed/simple;
+	bh=I0vEK83CLygenKAQ34D0SE4wD2EdLCTfOOQ93GdJ/IY=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=BV1R2kUC3PktD/v1WKx1nQs7qLaE8W8ljX3343QHNT1ZhvzrRsAhXf3t90milqTaGnEcMJYSbyL9nQTk3UPtvD1PTbXluCLwDMqJ0lUOKe88CUZNOwG13p0H5U3Pob7bon+Y5rxVGfpv3oq4JVOJeUPBwGAmzF13hehTgkN9U7s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=a9/0xdnk; arc=fail smtp.client-ip=40.107.237.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UDHno6wvXefzKhd68c2w7ZUBrKdRSwgWC1FWR1LK8F/ecM2/mB2NoaS06/IPLQkXs9ZR5qFDBYLu87tgRyRa2ws4wYLi6ZrHxqU3/B8xP69mD2w9X9HEyQ13/uLFdeezOZhYJZ35LVLdjzY9wOKE/CiwFKbyerve+QbxYfComdLk9ZZlwQ6X5CJF+ZV4C7ycNbAwpudEtA/TKUpRIPKgHPnAF5Xo+cjtNW/sgkXKdEOpgjrw+ZPVn9qP7o3weZs84PQRNnvfTn7mufkKEfNYi/Q4SuPAWx8Ya/PIlPmRwCkdcoz984NNLFUgpti5fdy8t7wPoTUyXGtdluzikNHSUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9KrCbwi0Rw+NV2wcCOKhIM37+SLvug6UkHOwZLcFgX0=;
+ b=RO7zGU4fdJ7uH1PgH7IbhL9dv/o7MMJ8DZf79ATSCiDYS/pZak8s/r0zScsv1l0WV/Dx8SV2g4Mn1reXMktzmyDEse3317FcIOq+OUN1JP+qp4BYqPx/GvLL04tPC5mWhI0JGuKoawhQIph6xyljeF6Vn1mxZfo/RqAUYjN6r5VReTgQfYG0yNngcjeHky9qEShG/0hpO4TBpLwwdceYcahGzJy7xA1/vc7m+H/tUEYpkkqJzJt61t9qzrcfTI90dhrvjXljXGizNYyNZWfk9nKtr7083NX5pvkREvFLAsDTSn9cxii4AfBRUX0gXlbUVy9DvchrMaiVa5q+3mpsZA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9KrCbwi0Rw+NV2wcCOKhIM37+SLvug6UkHOwZLcFgX0=;
+ b=a9/0xdnkOGfFFU1azJnjM9QErE/deuuFjme8ttKUut6AMY1Ly4MCncRvm/+4xeO7vLHsybSCJQVP4dAeOJIQgRzO5GqNLdEswrltV5qK5XzGx3Py00UetkJUTguHkOk/M7r7Ct+oFAX3hSKkcBfW8z4EtEI5+lk6KlQBeRhqTt9wSKs+srTodnx+2AN0JN/Xnjn7KS3QSd6uQl+5HJm3ww3u7CYeUKVeC2P9GzBj618Q553cvj66zSc6sekyviV01sUtArJ/qS2WTCkxfBgewPNd5kA5W6Fih/Rm9HWGdiD2bolS5Z+4Zr3+UE9E4jb1AQRTMmAoFBgTWOBZg9ywFQ==
+Received: from CH2PR08CA0010.namprd08.prod.outlook.com (2603:10b6:610:5a::20)
+ by SA3PR12MB7805.namprd12.prod.outlook.com (2603:10b6:806:319::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.17; Mon, 3 Jun
+ 2024 09:42:09 +0000
+Received: from CH1PEPF0000A34B.namprd04.prod.outlook.com
+ (2603:10b6:610:5a:cafe::9a) by CH2PR08CA0010.outlook.office365.com
+ (2603:10b6:610:5a::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.29 via Frontend
+ Transport; Mon, 3 Jun 2024 09:42:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH1PEPF0000A34B.mail.protection.outlook.com (10.167.244.10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7633.15 via Frontend Transport; Mon, 3 Jun 2024 09:42:09 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 3 Jun 2024
+ 02:41:57 -0700
+Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 3 Jun 2024
+ 02:41:52 -0700
+References: <20240529111844.13330-1-petrm@nvidia.com>
+ <878d1248-a710-4b02-b9c7-70937328c939@blackwall.org>
+ <878qzr9qk6.fsf@nvidia.com>
+ <a9a50b48-d85f-4465-a7b0-dec8b3f49281@blackwall.org>
+ <4b67d969-b069-4e1a-9f09-f0308a25b03b@blackwall.org>
+ <b4818488-a315-43bf-86bc-85cd6b854f0a@blackwall.org>
+User-agent: mu4e 1.8.11; emacs 29.3
+From: Petr Machata <petrm@nvidia.com>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+CC: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>, Ido Schimmel
+	<idosch@nvidia.com>, David Ahern <dsahern@kernel.org>
+Subject: Re: [PATCH net-next 0/4] Allow configuration of multipath hash seed
+Date: Mon, 3 Jun 2024 11:21:47 +0200
+In-Reply-To: <b4818488-a315-43bf-86bc-85cd6b854f0a@blackwall.org>
+Message-ID: <871q5e9xd0.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,28 +99,87 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000A34B:EE_|SA3PR12MB7805:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3ce74816-cc74-452d-1aa9-08dc83b1705a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|376005|82310400017|1800799015|36860700004;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?NjuUHHtxpGuj0oS3PkZBHPT7Ru9trIjWQ5hObkYkRZS5KCa6TehNfmfku8A0?=
+ =?us-ascii?Q?MCJkNmCKTk7ogzQ0M+51iskTKI+C1k8PRHqRKgPVkKax/K5d5L2UzLoGWDFf?=
+ =?us-ascii?Q?iQXVgWTYHuWNNqQj50BKcHcCHTZ1Vk4Ll4JiO3eHwX84hIr+jUEB0D7b/A8L?=
+ =?us-ascii?Q?9nqFTzW24qdQGwGIp8Wi+YenIwanr/+aNhceSoZTYxBOFIp7l2at+wdpXLuc?=
+ =?us-ascii?Q?vVu+VqQMwczlHYfsYjay9KUzqHqolU3wY2t0aJ+ZrYT0iLd0japXF6ITJNcw?=
+ =?us-ascii?Q?F/9NnLJrp7rqyMKj5IoKbTPUm2o7qt3dzr4Vi4Y6WKNUmBnGLYqWf0fiojgL?=
+ =?us-ascii?Q?U+caZ1xPgKIfwWbyndnkYO498aHd6Wv5PjMNqrS6jRQ+sm9FqxkcFy4TjimD?=
+ =?us-ascii?Q?FmrNAFAq2U6850yY5m1jGu4UN/dEtzpVKiohYNZa77z5XaHNWHTl+x9d65y4?=
+ =?us-ascii?Q?Ke6VTK8BKvMW9zUZl6oRDLHKSdeyfdQAf5y0wam4tvStKdWZZ1eysr5n2YU3?=
+ =?us-ascii?Q?b6Os+P7RqNDvWrbMShApkZqAox9MV3Siv0nIQ2qJpLhZrpeAlhzvtSlCeUZf?=
+ =?us-ascii?Q?BMti5MSj/DlWwJILMUFOn2aEQ9udmuHfvSufYefmnCrxNuHob0o8kGmNUz67?=
+ =?us-ascii?Q?mERE6PSm407edpwerpAnkmGRla3wBRD4X71qDMxUPc4lAvihH1tNMKXUhn70?=
+ =?us-ascii?Q?2bHQUmvT67ClU61zz/AfpHxquilN6qvUFRWqCZnBOQLasegC2BiF7yhbNlNy?=
+ =?us-ascii?Q?tnvVNUr0esAZzA8rjqnFsYFEDB65vDAK84+vHmFlnQcsq7uz/HUr6xtlU0F4?=
+ =?us-ascii?Q?UjOMK3bhp4hHYIj9Xxc+o4Efg15AmYCK8pdBfoq6uSDY8MZyuKv8qgQNymVp?=
+ =?us-ascii?Q?PLjQ4BeQrPE8Bsa7D4GgpZTviQF6Zb28xdOOz9Hj7uVyQus5yZfJctzAalh2?=
+ =?us-ascii?Q?4COW1TjfCkSRGkR1alDJCtgO6cKFZs1nMtZXJe/n6QRyub861iTQhKjYyZBb?=
+ =?us-ascii?Q?ENNf4US37JYIHs0usOG4XNLnwSW8mP45g4d02SfHFgyaRHtIs3sSc3vEXivb?=
+ =?us-ascii?Q?N1oDKU9OCuRECXjjHE9qQvTZO98JSLlZo6MiAy7qqwz2uZUCrNYHxtFJudGs?=
+ =?us-ascii?Q?vouUPLZHaM7+oG92dWmIMU6UTtenvayg8re26UN7WwwG94sDPvlWhnDj3V04?=
+ =?us-ascii?Q?tHD+FxIcGD4znEVAIlSlmKuINQmUurfx2JkoIjJx/nzy/Pf9BHUX0wLLKkpT?=
+ =?us-ascii?Q?09bCzK2ExakuC7umCVK4lz29WqWLmBoOz+OyFm8w6ejLNCsYQo8t2Ej6Kr+a?=
+ =?us-ascii?Q?oEPJt1VyChuYTpfeMu3pNXAmaJ2IayIppr7HDbMU0ZLJAt9mDtmNK6pksnEJ?=
+ =?us-ascii?Q?CcGiLCM=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(82310400017)(1800799015)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jun 2024 09:42:09.5608
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3ce74816-cc74-452d-1aa9-08dc83b1705a
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000A34B.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7805
 
-Simon Horman <horms@kernel.org> writes:
 
-> On Tue, May 28, 2024 at 11:37:54AM +0100, Donald Hunter wrote:
->> Use consume_skb in the batch code path to avoid generating spurious
->> NOT_SPECIFIED skb drop reasons.
+Nikolay Aleksandrov <razor@blackwall.org> writes:
+
+> On 5/30/24 21:07, Nikolay Aleksandrov wrote:
+>> On 5/30/24 20:27, Nikolay Aleksandrov wrote:
+>>> On 5/30/24 18:25, Petr Machata wrote:
+>>>>
+>>>> I kept the RCU stuff in because it makes it easy to precompute the
+>>>> siphash key while allowing readers to access it lock-free. I could
+>>>> inline it and guard with a seqlock instead, but that's a bit messier
+>>>> code-wise. Or indeed construct in-situ, it's an atomic access plus like
+>>>> four instructions or something like that.
+>>>
+>>> You can READ/WRITE_ONCE() the full 8 bytes every time so it's lock-free
+>>> and consistent view of both values for observers. For fast-path it'll
+>>> only be accessing one of the two values, so it's fine either way. You
+>>> can use barriers to ensure latest value is seen by interested readers,
+>>> but for most eventual consistency would be enough.
 >> 
->> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+>> Actually aren't we interested only in user_seed in the external reader
+>> case? We don't care what's in mp_seed, so this is much simpler.
 >
-> Hi Donald,
->
-> I do wonder if this is the correct approach. I'm happy to stand corrected,
-> but my understanding is that consume_skb() is for situations where the skb
-> is no longer needed for reasons other than errors. But some of these
-> call-sites do appear to be error paths of sorts.
->
-> ...
+> Oh, I misunderstood you, didn't I? :) Were you talking about
+> constructing the siphash key in the fast-path above? If yes,
+> then sure it's a few instructions but nothing conditional.
 
-Hi Simon,
+That's what I meant. I tried to be concise and went overboard.
 
-They all look to be application layer errors which are either
-communicated back to the client or cause a replay. My understanding is
-that consume_skb() should be used here since kfree_skb() now implies a
-(transport?) drop.
+> I don't think we need anything atomic in that case.
+
+Hmm, right, no competing increments of any sort, so WRITE_ONCE in the
+control path and READ_ONCE in fastpath should be enough.
+
+Thanks for the feedback, I'll send v2 this week.
 
