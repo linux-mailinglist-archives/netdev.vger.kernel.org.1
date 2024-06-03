@@ -1,135 +1,131 @@
-Return-Path: <netdev+bounces-100103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E0C88D7DF9
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 10:59:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E09588D7E0A
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 11:04:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04D22B22EC3
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 08:59:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D8312832EB
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:04:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB492763E6;
-	Mon,  3 Jun 2024 08:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D5F87F7FB;
+	Mon,  3 Jun 2024 09:04:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="M5BF7/K2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="B/GXgkrR"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF723BBF3;
-	Mon,  3 Jun 2024 08:59:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABB277E792;
+	Mon,  3 Jun 2024 09:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717405178; cv=none; b=Ao3o9Np9YP7ieg6x3aYAtiJ2u+vZdnEafderQ3EqVBVxsHQwuRhxGqji8mVey0F4XZfFl756OAyjhVqrNqLuodzlhPPG+BSCwg8MYPyQDxftHhaWL2Ca+yGOGLjxxX+EToAaXGjwxSvLBcpgmmKBRGMJ/FY22GEIWYHn1C58Sgs=
+	t=1717405478; cv=none; b=nm78hbIYHCf0A+qCrp9zAYi9Fr1P95WxN53kbc02WXwdAmyzMTkhCKAm12NygQ4JUDEZiItZMXYitZku4WLAuqZKHzqNNhY7DTjlrUPiYuNkjJhaQQXozy8tpqGMmEAIqpi1rHXE+YPU2TXZT4o+rz+Ko6oTZBNsF5PrdCxkXCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717405178; c=relaxed/simple;
-	bh=YjhSDpAWleEs9BPBmEs280DWm8Awk83Zv7R9WMe2Id8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OAiTViMdhGUNVZDYzLjRATFHRg7OU67WQ6P/+C532JNkO3hEjOqF42hFGQPevbmx2rcvhtjjtkO+XUiZjDcnGkn0WS/J7VRoKHFqfir8etmf/Rd93DuH3rF4wGAXehIVAWRV8xJqH+wZR4ugYWdPeLWjYWMOnFoUuWOyCr7zYeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=M5BF7/K2; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+	s=arc-20240116; t=1717405478; c=relaxed/simple;
+	bh=k7Hy66vX/C6sOWjPSgDZazgLPHPy3ibQ3Zr6PMgovpE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KePc425jyShjkqFKFb0YmNssI6hliVjmoJcsz4E9IsnIBvK/5d6pajST28Yzl0qkdhx2CZAtNPRznGulAzzGTQUrV8sccLJTc3HOUJ6UjICu4/o5rjZvF4Uvgd5LEIC3xcSrYxlzjABCeSii/fh0PBWd0x/mm4EnR2eR7rACVPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=B/GXgkrR; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=lZ/LyNdtSnF0AiaJ6+PvIy76nSDZwJ0+Z/JHxOAO9DQ=; b=M5BF7/K2A184RnFJzHueA9mDru
-	rX8SVtiHZ1xVwZofAb2afV0qoqzuJieMKY3CkILYyWRrEWH4G9QDiEkzQxXZBOrkaKJzUPIQCECG5
-	EuOOLLiLiJG/gl6zsEVhBrw7ZmrY2fKqwHrF3zLvxiY9rPkRYl8oGcCkbVqMFw6pO2jXhdvWE+nkB
-	Q8ANhfYeLYTDblfUmhy++TosElRq89n1mT19UtTcFiXtPuxvigAWNkdbighP3VFCbTwzu854Sptwo
-	eW2gj0k+jmy5xD8ZyvMaruhRxV6GfNIx3EJbPYsLKKa3cRKfLcYjHzKO2HYUbYFNcDtmrVoF/kwDK
-	0fCNCYdg==;
-Received: from 29.248.197.178.dynamic.dsl-lte-bonding.zhbmb00p-msn.res.cust.swisscom.ch ([178.197.248.29] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sE3XN-000LW6-En; Mon, 03 Jun 2024 10:59:29 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	David Bauer <mail@david-bauer.net>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Martin KaFai Lau <martin.lau@kernel.org>
-Subject: [PATCH v2 net] vxlan: Fix regression when dropping packets due to invalid src addresses
-Date: Mon,  3 Jun 2024 10:59:26 +0200
-Message-Id: <20240603085926.7918-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=PL2tpWgubRP0I1wFdl1ZHWzMi0qsZ0DU3zEaEHooRQY=; b=B/GXgkrRVf4Kx2g9TuilFMzYS2
+	U9NTJ5sySISyPgH9X1HT28urmVye+m8mf3bX59ZQDteLTM3jnFc1Kzc+tmlAFyVnmxXtbYs0av3NO
+	OmLqHpnPC3byTnIq33a+gZJnip3nRKGZul8W89TBkvBRFJ3JHiAwenoET9L5h8IZwUzENpMQUAMOp
+	uZWQu6OKtFlZCvBAv4hF9G3Y3hTj/hTIKsrrPn661EXWRJZ/hIJmtTR9est5xH+53rgZ7RoQL2Dnr
+	KDSvpFP9+i3sAVYcUhzW8UeuDOaW9ZGHARWbtggPnAP4+E0DPiweET4f+R95aIdfxnRFa9XdvgzvH
+	ZnB0owOQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45002)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sE3bi-0002Tb-2G;
+	Mon, 03 Jun 2024 10:03:58 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sE3be-0000IR-OA; Mon, 03 Jun 2024 10:03:54 +0100
+Date: Mon, 3 Jun 2024 10:03:54 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Sagar Cheluvegowda <quic_scheluve@quicinc.com>,
+	Abhishek Chauhan <quic_abchauha@quicinc.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Tomer Maimon <tmaimon77@gmail.com>, openbmc@lists.ozlabs.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v2 10/10] net: stmmac: Add DW XPCS specified via
+ "pcs-handle" support
+Message-ID: <Zl2G+gK8qpBjGpb3@shell.armlinux.org.uk>
+References: <20240602143636.5839-1-fancer.lancer@gmail.com>
+ <20240602143636.5839-11-fancer.lancer@gmail.com>
+ <2lpomvxhmh7bxqhkuexukztwzjfblulobepmnc4g4us7leldgp@o3a3zgnpua2a>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27294/Sun Jun  2 10:29:37 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2lpomvxhmh7bxqhkuexukztwzjfblulobepmnc4g4us7leldgp@o3a3zgnpua2a>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Commit f58f45c1e5b9 ("vxlan: drop packets from invalid src-address")
-has recently been added to vxlan mainly in the context of source
-address snooping/learning so that when it is enabled, an entry in the
-FDB is not being created for an invalid address for the corresponding
-tunnel endpoint.
+On Mon, Jun 03, 2024 at 11:54:22AM +0300, Serge Semin wrote:
+> >  	if (priv->plat->pcs_init) {
+> >  		ret = priv->plat->pcs_init(priv);
+> 
+> > +	} else if (fwnode_property_present(devnode, "pcs-handle")) {
+> > +		pcsnode = fwnode_find_reference(devnode, "pcs-handle", 0);
+> > +		xpcs = xpcs_create_fwnode(pcsnode, mode);
+> > +		fwnode_handle_put(pcsnode);
+> > +		ret = PTR_ERR_OR_ZERO(xpcs);
+> 
+> Just figured, we might wish to be a bit more portable in the
+> "pcs-handle" property semantics implementation seeing there can be at
+> least three different PCS attached:
+> DW XPCS
+> Lynx PCS
+> Renesas RZ/N1 MII
+> 
+> Any suggestion of how to distinguish the passed handle? Perhaps
+> named-property, phandle argument, by the compatible string or the
+> node-name?
 
-Before commit f58f45c1e5b9 vxlan was similarly behaving as geneve in
-that it passed through whichever macs were set in the L2 header. It
-turns out that this change in behavior breaks setups, for example,
-Cilium with netkit in L3 mode for Pods as well as tunnel mode has been
-passing before the change in f58f45c1e5b9 for both vxlan and geneve.
-After mentioned change it is only passing for geneve as in case of
-vxlan packets are dropped due to vxlan_set_mac() returning false as
-source and destination macs are zero which for E/W traffic via tunnel
-is totally fine.
+I can't think of a reasonable solution to this at the moment. One
+solution could be pushing this down into the platform code to deal
+with as an interim solution, via the new .pcs_init() method.
 
-Fix it by only opting into the is_valid_ether_addr() check in
-vxlan_set_mac() when in fact source address snooping/learning is
-actually enabled in vxlan. This is done by moving the check into
-vxlan_snoop(). With this change, the Cilium connectivity test suite
-passes again for both tunnel flavors.
+We could also do that with the current XPCS code, since we know that
+only Intel mGBE uses xpcs. This would probably allow us to get rid
+of the has_xpcs flag.
 
-Fixes: f58f45c1e5b9 ("vxlan: drop packets from invalid src-address")
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Cc: David Bauer <mail@david-bauer.net>
-Cc: Ido Schimmel <idosch@nvidia.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Martin KaFai Lau <martin.lau@kernel.org>
----
- v1 -> v2:
-  - Moved is_valid_ether_addr into vxlan_snoop, thanks Ido!
-
- drivers/net/vxlan/vxlan_core.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index f78dd0438843..567cb3faab70 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -1446,6 +1446,10 @@ static bool vxlan_snoop(struct net_device *dev,
- 	struct vxlan_fdb *f;
- 	u32 ifindex = 0;
- 
-+	/* Ignore packets from invalid src-address */
-+	if (!is_valid_ether_addr(src_mac))
-+		return true;
-+
- #if IS_ENABLED(CONFIG_IPV6)
- 	if (src_ip->sa.sa_family == AF_INET6 &&
- 	    (ipv6_addr_type(&src_ip->sin6.sin6_addr) & IPV6_ADDR_LINKLOCAL))
-@@ -1616,10 +1620,6 @@ static bool vxlan_set_mac(struct vxlan_dev *vxlan,
- 	if (ether_addr_equal(eth_hdr(skb)->h_source, vxlan->dev->dev_addr))
- 		return false;
- 
--	/* Ignore packets from invalid src-address */
--	if (!is_valid_ether_addr(eth_hdr(skb)->h_source))
--		return false;
--
- 	/* Get address from the outer IP header */
- 	if (vxlan_get_sk_family(vs) == AF_INET) {
- 		saddr.sin.sin_addr.s_addr = ip_hdr(skb)->saddr;
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
