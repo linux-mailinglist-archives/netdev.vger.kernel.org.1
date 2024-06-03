@@ -1,80 +1,84 @@
-Return-Path: <netdev+bounces-100276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF7F58D8619
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 17:33:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6B178D861F
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 17:34:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BDC3281F1C
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 15:33:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12FF21C21409
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 15:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76A32130A53;
-	Mon,  3 Jun 2024 15:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62E1412D205;
+	Mon,  3 Jun 2024 15:33:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="e8OycE3u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ImVQK+zW"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5113113212F
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 15:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6891292FF
+	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 15:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717428776; cv=none; b=TJdJKbZ9cRnc6JF49wqXXNd6rZRt0d4XS5hDvo8D0J8syLRUnGl+K2L/IpOydyZwnVsKYT8L2sIviBbC9EPgqWvtSlszIMY3aTpIACXCL3rUkdC1gK7jdZK7Ep3gq3rQ6v/sVmgJGIj4yjg37VK5o8PKDh2u9KsM4vuisMyTA4A=
+	t=1717428837; cv=none; b=MqwxEDPPgIEUtq0cMADyyTMG6dLJeIOtEHSzHHmbFCRdm9V06ifnrU5Y1Q8A77wc0qxrrMcI2UtvkTAvywRBHrnmi69TKU8/iH6/t9FlvAuYsaZN00ZZyll5QeQwgo2tA7YMJCN/5vj2ocQHhNgQjja2Ikyg9nBFmDTBopVl0Uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717428776; c=relaxed/simple;
-	bh=OAwTePRedi3gdRIXf7Cp5PRiOAp31n90wFv4SHEoLBs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=Jy6Rw9fMAaw6KFrFXTDJB0zQy1/6N9eejV+xyFDKuS2y6C+wX/GkPcDadRHprNtxptZ/Q/02pzyLSQOsxJEFF1Ddm9FcMkMTZAOWl7265IWwwCaEt2MS4bMX8/0SUDC3XpUfZEfP8svVAm97bh8OT9i7VUIoaddaBthOXCHeidY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=e8OycE3u; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=6QRNhJ/5iKbZMDRUG/
-	tdhRNGdotsBC+WL3FP2F6jJbs=; b=e8OycE3umnvFclXrjWsCZ1AksxSMlH+nH/
-	NADdP7FiTergfOOruS/ZDtT1+d3eNy4xJANbm1EGcPXjEWqMuMwwUH/ZKXYvmz6A
-	GJpT/zy8rexfElIgB9ZoBDJ5A24EHnug0mxQ2UZk+otsd1NFqUAcoCycAmik6z40
-	I+wyDcvL4=
-Received: from yang-Virtual-Machine.mshome.net (unknown [223.148.145.250])
-	by gzga-smtp-mta-g3-4 (Coremail) with SMTP id _____wDnVz7_4V1mm8_yCQ--.29546S2;
-	Mon, 03 Jun 2024 23:32:17 +0800 (CST)
-From: yangfeng <yangfeng59949@163.com>
-To: andrew@lunn.ch
-Cc: hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	netdev@vger.kernel.org,
-	yangfeng59949@163.com,
-	yangfeng@kylinos.cn
-Subject: Re: Re: [PATCH] net: phy: rtl8211f add ethtool set wol function
-Date: Mon,  3 Jun 2024 23:32:15 +0800
-Message-Id: <20240603153215.6628-1-yangfeng59949@163.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <098c355c-a7b7-4570-988f-56e7d54989f3@lunn.ch>
-References: <098c355c-a7b7-4570-988f-56e7d54989f3@lunn.ch>
-X-CM-TRANSID:_____wDnVz7_4V1mm8_yCQ--.29546S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWruw4fCry8Zry7KFWDGrykKrg_yoW3GrcEkF
-	1DJrs29w42vrs3Ga95GFyfuw4293y7tws5Xr9xX34ay3Wava92kFZ7Gw1fury3uw1IkF9r
-	Cws8G3y09wn8ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7VUUXTmUUUUUU==
-X-CM-SenderInfo: p1dqww5hqjkmqzuzqiywtou0bp/1tbiVgrxeGV4IoOLEgADsz
+	s=arc-20240116; t=1717428837; c=relaxed/simple;
+	bh=RWgQzSiKwz+soRrVxETfYHRexxx/WGvMka/7e/m21FA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B0CKuMWWgKeKKIJczM+yfeKwACwtU8jFnzbzE/qqRuAhJHfk6RlEn1YYsYgzvcONy+L5uxe/R10KeEwBFATBC1AWksCC8hXnVn4bHmyNOCLRu8kxx3UtyzWoalFD+gAfgIoEwCM4QLl3aDDP4k0yX75IP8I+BzF8XXQ+Tk95yVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ImVQK+zW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CBA9C2BD10;
+	Mon,  3 Jun 2024 15:33:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717428836;
+	bh=RWgQzSiKwz+soRrVxETfYHRexxx/WGvMka/7e/m21FA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ImVQK+zW0ctIl9A/pUTNffkfSV5RQyJKvgt5F6QjKpSDj4dMR2snaR64YNKOK+XLR
+	 l5Q4OaWWMTHqBmMluB0TbI6/P1p/hHomWXwc3PMG3dYtndrHsX5SHgMTKZH8cVQJkn
+	 53dzdnYIaxfMCwpSqow5JhrI/KJe5SRir0eOsPeTKB+aGVahsC8aIQ44ZSv/IQ1t9C
+	 QX5DqJ+xz27gozNLggfBZ4kvHUas6JhUvxJ1W9lpp7Dhj12/8QyXceCNXo8aUe2w2a
+	 klg7qtW1ryQO5ZzJbqcU4QlmSDtOdmrrhCu3Ixx3VcxQG1zdffR0LBlhNdSQBYPWff
+	 TUYToXQIigKIg==
+Message-ID: <7fb14a5e-0283-4551-a284-98f6d9ce02fb@kernel.org>
+Date: Mon, 3 Jun 2024 09:33:55 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] inet: bring NLM_DONE out to a separate recv() in
+ inet_dump_ifaddr()
+Content-Language: en-US
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+ Stephen Hemminger <stephen@networkplumber.org>, davem@davemloft.net,
+ netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+References: <20240601212517.644844-1-kuba@kernel.org>
+ <20240601161013.10d5e52c@hermes.local> <20240601164814.3c34c807@kernel.org>
+ <ad393197-fd1a-4cd8-a371-f6529419193b@kernel.org>
+ <CAM0EoM=jJwXjz3qJoT21oBsHJRCbwem10GMo1QStPL7MtUwTjg@mail.gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <CAM0EoM=jJwXjz3qJoT21oBsHJRCbwem10GMo1QStPL7MtUwTjg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The RTL8211F series can monitor the network for a link change event, 
-a Wake-Up Frame, or a Magic  Packet, and notify the system via the INTB/PMEB (Power Management Event; ‘B’ means low active) pin  
-when such a packet or event occurs. The system can then be restored to a normal state to process incoming  jobs. 
-The INTB/PMEB pin needs to be connected with a 4.7k ohm resistor and pulled up to 3.3V. 
-When  the Wake-Up Frame or a Magic Packet is sent to the PHY, the INTB/PMEB pin will be set low to notify  the system to wake up. 
+On 6/3/24 8:05 AM, Jamal Hadi Salim wrote:
+> 
+> Sorry, being a little lazy so asking instead:
+> NLMSG_DONE is traditionally the "EOT" (end of transaction) signal, if
+> you get rid of it  - how does the user know there are more msgs coming
+> or the dump transaction is over? In addition to the user->kernel "I am
+> modern", perhaps set the nlmsg_flag in the reverse path to either say
+> "there's more coming" which you dont set on the last message or "we
+> are doing this the new way". Backward compat is very important - there
+> are dinosaur apps out there that will break otherwise.
+> 
 
-
-For example,
- 1.Set MAC Address Page 0x0d8c, Reg16~Reg18 
- 2.Set Max packet length Page 0xd8a, Reg17 = 0x9fff
- 3.WOL event select and enable Page 0x0d8a Reg16 =  0x1000 //enable Magic Packet Event
-
-Kind regards，
-Yang Feng
-
+NLM_DONE is not getting removed. The recent changes allow the end
+message signal without a separate system call.
 
