@@ -1,160 +1,142 @@
-Return-Path: <netdev+bounces-100081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 786E78D7C78
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:30:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD6A88D7C9E
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 09:40:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D742C1F22C25
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 07:30:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 480C31F2119B
+	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 07:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84048374FF;
-	Mon,  3 Jun 2024 07:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 586F6481A7;
+	Mon,  3 Jun 2024 07:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fqX2pWYU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UXfBP6n5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF53447A4C
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 07:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5B347A4C;
+	Mon,  3 Jun 2024 07:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717399808; cv=none; b=UeZTtKgMZcu9qhZXQx4KJyRSnUiviH/5jqGEdycoM+66VrDJeVRUmKT4lz7jreKR1gcgmrreOEEBG9rWOn+vhxSedmIN0R1KdHGeakH2LP5+cToaA1Rp0WEbydPS/PzeVhXFIDy7lDdIzn1pwf5ukrdQWMvTEmfcfw6xABZN6hc=
+	t=1717400427; cv=none; b=aKOBQLUZNbExBGutYADJuDK8GAUJEu5e87lUkHSWw1iFo9Wg3OjR4nDHJExNO05nJBcQ5+HyyabH137B4U0YXy9CL2Q0fhvgFXU+tWl5GLqUyEczQ1F3o0iehXyP8VwNkfXufK/lgdY7edI2lJeci3bAJQTjU1XJdVsA3z4wuIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717399808; c=relaxed/simple;
-	bh=TBaGszon3mFIeXU68gQM5CDSneTfzPvNaj6TyqTP1Q8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=kH5SsVwx4J0uWPrz95iQSBjMRzQABfvAt5bqzelul5KL46rRW9zhlcGnyDwfk3U/0ZBwg/JWWUJ2rLvBFOfI0TFSXlolCORwDfD3WjRwZcpXQ1ODotXwEqhfr5qTR1+ri72Q4y+Nko1B8pbQD4PQ/O8K40HX0JAkRKnv+Te7NNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fqX2pWYU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717399805;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ouM0sg5bJmUOXnAkDCV0pxODjPk5RxFX/OfwRyv9Vzs=;
-	b=fqX2pWYUiIEgFJC7iiDY5wCFXw3/HVv/kHNwIx2yv41Ca4OAUKTS8mBNlxca8eu4j2aQSN
-	YqsboQ05NGxghHO+cU+RzsVY+XTecJdAiP90P/q8cEeC8w30XxVIYNEt+EMDl7PRlyXXvR
-	PIF0wznjL2dutLqy3sturyWNDIKb8qs=
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-376-WpVhBr0lNVq_s_hd1kV90w-1; Mon, 03 Jun 2024 03:30:02 -0400
-X-MC-Unique: WpVhBr0lNVq_s_hd1kV90w-1
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-702543bf7bbso2117540b3a.2
-        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 00:30:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717399801; x=1718004601;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ouM0sg5bJmUOXnAkDCV0pxODjPk5RxFX/OfwRyv9Vzs=;
-        b=Dt2AJsJzC3rvmP+za+4gw8HXzrQ6jL3lJrn5WWOJvfDsfwSntjnKeWBC8SKnYQUaO0
-         4senO3kjDiz63HSbDXRPQi7ULHNQGUUQPP6gZ6ZdqrWrvFFAiGRtI8/UBID0ZSMloD1X
-         EKQGB+M2Xe/Ub3gdwh9djPJBUCMG5a6lVPIWzo7RM2AmaJQsdCw0/3T0jTsxMPdZTmrr
-         A1AJEMJZwsRf6NA+MyEQxVwlNvdIb1yGFcP2hUEXbl3m2Ps4ZFyiirxslGWyEPes2SVu
-         PIW3HOtkM6AVzra1OpkGhu6b94KTLJpsFu049ofL4MpAE4vTjK/b1sB31szoMRtZ6ezC
-         MqJw==
-X-Forwarded-Encrypted: i=1; AJvYcCUzDlYboJzTEXTZUN5RGz7CA2/XK9E0ebLD8eOGBwcgt3IewBCm+Y+qQPWdA8ruGuUYYPYr1FGdKHQ/AG1HNU+7H5uJEzWd
-X-Gm-Message-State: AOJu0YxlLa5U26B3Azs1JmTYV+dDdBLgiDp6Nq6wCq7sofs70qzlEM8v
-	2lrJ4W2XhQBgcHXKSs2t5VJlO1BY+2BdCMEUb9ebE6OPr/WgjkV6nV5faXWhdvffnTL/RhqNKhB
-	fwqOPl5SF7gxldt5vtKWUclAUtGt197jP46V0iuKvNa/zksgc7Nvq6g==
-X-Received: by 2002:a05:6a00:98a:b0:702:3a47:2b1b with SMTP id d2e1a72fcca58-7024780ceefmr12740156b3a.20.1717399801185;
-        Mon, 03 Jun 2024 00:30:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFpkWa3SzJr0Rdd/mO37tXK8peMm9jhly2t+o9IOFzY7JHX4dNSgYjdYw2iplWMW+34Bbottw==
-X-Received: by 2002:a05:6a00:98a:b0:702:3a47:2b1b with SMTP id d2e1a72fcca58-7024780ceefmr12740132b3a.20.1717399800748;
-        Mon, 03 Jun 2024 00:30:00 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-702423cf27fsm5085996b3a.12.2024.06.03.00.29.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jun 2024 00:30:00 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 3728113850D8; Mon, 03 Jun 2024 09:29:55 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Eric Dumazet <edumazet@google.com>, Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>, David Ahern
- <dsahern@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next 2/4] net: ipv4: Add a sysctl to set multipath
- hash seed
-In-Reply-To: <CANn89iL8P68pHvCKy242Z6ggWsceK4_TWMr7OakS3guRok=_gw@mail.gmail.com>
-References: <20240529111844.13330-1-petrm@nvidia.com>
- <20240529111844.13330-3-petrm@nvidia.com>
- <CANn89iL8P68pHvCKy242Z6ggWsceK4_TWMr7OakS3guRok=_gw@mail.gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 03 Jun 2024 09:29:55 +0200
-Message-ID: <875xuqiivg.fsf@toke.dk>
+	s=arc-20240116; t=1717400427; c=relaxed/simple;
+	bh=9rBCxnNOqL19PhtN8Ev8Pt2LG9neDHVmcXIvCefgzec=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dIQCJGspaGmERF6neT83kJFfPTuCsnPQy0EkeP+KRF0wYkCJ8ukopmOO2CTNr/yTOPENbfG3/raLH6dOeNWUOYimRbT+JM6Xj+5LalwvxWFepnUdgu7kRqa142vBlVrkTZOd8I5fUrcrbcSfqJR5ni/EF9tV5mLnPHbJPZWH9l4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UXfBP6n5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C910BC2BD10;
+	Mon,  3 Jun 2024 07:40:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717400426;
+	bh=9rBCxnNOqL19PhtN8Ev8Pt2LG9neDHVmcXIvCefgzec=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UXfBP6n5YKpnpIqXq39RpLHYgCW8Niq2bWdBki6s5CTiKVZD1bPk6+fey8Yt4aMHQ
+	 lZDmH78vbZcqpbais3P2jbWcihAnjRHR4eaqY29qdxyOP15U9NDtRRz98zhjKRQiaU
+	 SNDgP44uoxEtngXnnT88fTiJECnUTJewvTc8Y/sYlSUhu0FCXUlDHXCTCWuO34DfFQ
+	 p8nZctkihrFLHTOtXdYd7w7FGAyRoaq7DnkNL32j53mTpFemI45EsUtRgMPWa+5RCM
+	 HGeeTJSaKewpr+NfxU+Q7Zxo9t/hN0keqQVn9+Ue6N4pE4lwufaiX5mrf5c/eNGlQo
+	 xeVDNkLrn6fNQ==
+Date: Mon, 3 Jun 2024 08:40:21 +0100
+From: Simon Horman <horms@kernel.org>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Tristram.Ha@microchip.com, Woojung.Huh@microchip.com, andrew@lunn.ch,
+	vivien.didelot@gmail.com, f.fainelli@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: dsa: microchip: fix initial port flush problem
+Message-ID: <20240603074021.GV491852@kernel.org>
+References: <1716932145-3486-1-git-send-email-Tristram.Ha@microchip.com>
+ <20240531190234.GT491852@kernel.org>
+ <BYAPR11MB35583B3BA16BFB2F78615DBBECFC2@BYAPR11MB3558.namprd11.prod.outlook.com>
+ <20240601120545.GG491852@kernel.org>
+ <20240602140118.nnlvydm4dp6wr4c3@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240602140118.nnlvydm4dp6wr4c3@skbuf>
 
-Eric Dumazet <edumazet@google.com> writes:
+On Sun, Jun 02, 2024 at 05:01:18PM +0300, Vladimir Oltean wrote:
+> On Sat, Jun 01, 2024 at 01:05:45PM +0100, Simon Horman wrote:
+> > On Fri, May 31, 2024 at 07:19:54PM +0000, Tristram.Ha@microchip.com wrote:
+> > > > Subject: Re: [PATCH net] net: dsa: microchip: fix initial port flush problem
+> > > > 
+> > > > EXTERNAL EMAIL: Do not click links or open attachments unless you know the content
+> > > > is safe
+> > > > 
+> > > > On Tue, May 28, 2024 at 02:35:45PM -0700, Tristram.Ha@microchip.com wrote:
+> > > > > From: Tristram Ha <tristram.ha@microchip.com>
+> > > > >
+> > > > > The very first flush in any port will flush all learned addresses in all
+> > > > > ports.  This can be observed by unplugging a cable from one port while
+> > > > > additional ports are connected and dumping the fdb entries.
+> > > > >
+> > > > > This problem is caused by the initially wrong value programmed to the
+> > > > > register.  After the first flush the value is reset back to the normal so
+> > > > > the next port flush will not cause such problem again.
+> > > > 
+> > > > Hi Tristram,
+> > > > 
+> > > > I think it would be worth spelling out why it is correct to:
+> > > > 1. Not set SW_FLUSH_STP_TABLE or SW_FLUSH_MSTP_TABLE; and
+> > > > 2. Preserve the value of the other bits of REG_SW_LUE_CTRL_1
+> > > 
+> > > Setting SW_FLUSH_STP_TABLE and SW_FLUSH_MSTP_TABLE bits are wrong as they
+> > > are action bits.  The bit should be set only when doing an action like
+> > > flushing.
+> > 
+> > Understood, thanks. And I guess that only bits that are being configured
+> > should be changed, thus the values other bits are preserved with this
+> > change.
+> > 
+> > FWIIW, I do think it would be worth adding something about this to the
+> > patch description.
+> 
+> I agree the description is confusing and I had to look it up in the
+> datasheet to understand.
+> 
+> I would suggest something along the lines of:
+> 
+> Setting the SW_FLUSH_STP_TABLE | SW_FLUSH_MSTP_TABLE bits of
+> REG_SW_LUE_CTRL_1 does not do anything right away. They are
+> just one-shot modifiers of the upcoming flush action executed by
+> ksz9477_flush_dyn_mac_table().
+> 
+> It is wrong to set these bits at ksz9477_reset_switch() time, because
+> it makes ksz9477_flush_dyn_mac_table() have an unexpected and incorrect
+> behavior during its first run. When DSA calls ksz_port_fast_age() on a
+> single port for the first time, due to this modifier being set, the
+> entire FDB will be flushed of dynamically learned entries, across all
+> ports.
+> 
+> Additionally, there is another mistake in the original code, which is
+> that the value read from the REG_SW_LUE_CTRL_1 is immediately discarded,
+> rather than preserved. The relevant bit which is set by default in this
+> register (but we are mistakenly clearing) is:
+> 
+> Bit 3: Multicast Source Address Filtering
+> 1 = Forward packets with a multicast source address
+> 0 = Drop packets with a multicast source address
 
-> On Wed, May 29, 2024 at 1:21=E2=80=AFPM Petr Machata <petrm@nvidia.com> w=
-rote:
->>
->> When calculating hashes for the purpose of multipath forwarding, both IP=
-v4
->> and IPv6 code currently fall back on flow_hash_from_keys(). That uses a
->> randomly-generated seed. That's a fine choice by default, but unfortunat=
-ely
->> some deployments may need a tighter control over the seed used.
->>
->> In this patch, make the seed configurable by adding a new sysctl key,
->> net.ipv4.fib_multipath_hash_seed to control the seed. This seed is used
->> specifically for multipath forwarding and not for the other concerns that
->> flow_hash_from_keys() is used for, such as queue selection. Expose the k=
-nob
->> as sysctl because other such settings, such as headers to hash, are also
->> handled that way. Like those, the multipath hash seed is a per-netns
->> variable.
->>
->> Despite being placed in the net.ipv4 namespace, the multipath seed sysctl
->> is used for both IPv4 and IPv6, similarly to e.g. a number of TCP
->> variables.
->>
-> ...
->
->> +       rtnl_lock();
->> +       old =3D rcu_replace_pointer_rtnl(net->ipv4.sysctl_fib_multipath_=
-hash_seed,
->> +                                      mphs);
->> +       rtnl_unlock();
->> +
->
-> In case you keep RCU for the next version, please do not use rtnl_lock() =
-here.
->
-> A simple xchg() will work just fine.
->
-> old =3D xchg((__force struct struct sysctl_fib_multipath_hash_seed
-> **)&net->ipv4.sysctl_fib_multipath_hash_seed,
->                  mphs);
+Thanks, that makes things a lot clearer to me.
 
-We added a macro to do this kind of thing without triggering any of the
-RCU type linter warnings, in:
+> Tristram, now a question to you: why would we want to forward packets
+> with a multicast source address? It looks like clearing that field is
+> one of those things which were accidentally correct.
+> 
+> The cleanest way to not make a functional change where none is intended
+> is to simply delete the read.
 
-76c8eaafe4f0 ("rcu: Create an unrcu_pointer() to remove __rcu from a pointe=
-r")
-
-So as an alternative to open-coding the cast, something like this could
-work - I guess it's mostly a matter of taste:
-
-old =3D unrcu_pointer(xchg(&net->ipv4.sysctl_fib_multipath_hash_seed, RCU_I=
-NITIALIZER(mphs)));
-
--Toke
-
+FWIIW, I thought about that too. But I was concerned that perhaps the read
+has a side effect, because I don't know the hw well enough to say otherwise.
 
