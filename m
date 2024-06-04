@@ -1,221 +1,182 @@
-Return-Path: <netdev+bounces-100411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92DCB8FA70E
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 02:33:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 578908FA71F
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 02:46:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5112E282C57
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 00:33:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6F751F23CDE
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 00:46:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A9347FD;
-	Tue,  4 Jun 2024 00:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A7BE522F;
+	Tue,  4 Jun 2024 00:46:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="XjS6uJbI"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="h64O2c+v"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2080.outbound.protection.outlook.com [40.107.243.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66BD6FBF
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 00:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.80
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717461207; cv=fail; b=UMmg1Ul5bPHVhuwQzXYN1goeplQIlQmVqSeJdNxutl2ORlH3psqalIfBh6L69I4GWTehzrNkxsrak34cFCs6tp08/eCtwE0UMOp5rCiHpSGGGiWSvq2LeSB0vfpR3FPhCDefk00q+2Y9L/XDwNu76wSP0kNAoNHGB4g4XRGztFw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717461207; c=relaxed/simple;
-	bh=VkZ+4N0vwt2ez8jxESnJW3bdQqKD1cmlhfC0afALqx4=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=mYDDMAVR7vk/rymOoa2rphnoRDULaHnoa69cWDgLK7zpHfqcNXOzvycCw+/gRulGj6aHEODJvqPh/imgH2ski2VRHsjhpo/Zx/an7WKzBXn6DiSI/BSev/jougUmDHCLt0gjoaQB+APC/piUmu1sEL8w1FaUgRaItsPQAsUwblw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=XjS6uJbI; arc=fail smtp.client-ip=40.107.243.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Vmm/ltb58nZYRy6XXEaynNCI41QBWCcOdalGgPRQdHgvgLf2ZJkhGn6BBvomXRTtXJPuVcHqwbbIsixtZaj04DQsgd+r+riayD1Joj3wmZiPpOUsnje5azgzbyJgO6wxHvjiLVrqUbQKAJ26I5lJs3Jr0DAkNqkpqbPqrJU0S+9OiWvU2fYx1BkQhqTAGH8ghtLjAy0UkuTQwU/XjBilvtEk96XBn+lhcUrwyHt37JvjiWLyOvC9K1jjTEbQsj7AAkW19jiu0Vyb/PvLBdVSqumiyx35k1sjzUm47dUvwCbTxZy3GZlqJYl1OrDiVsH8+Iyqqo/11ldbgA1jplcexg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/QyhkOpa8fADf8mZXLkypXozK4TO6Ez1IRjGRvyvFAY=;
- b=URXrdvFfqu6ke/2welU6jFsH2Q2HZAIVsyNmwXu/fUrvnz97wJuzRcT6G22SgT6i4vFTxaYQ+IBrlypsDIpBUrtLdXtSswY9ZWK6gLu9CXIFVDfwdKCGq1LeH43hw51Bb7G0AREZ0y0SkLlPFGEeDPNE5ghVvpV3Gvevg7FoAV87efxccMPYRDkaVKlqLGfN1y5S3GqzSOLEQt0/zx1R/3OZVya4DxWdRxGDrs/iCJh7obKfqqluTGp7jOq9bRci7LIfHbzoesfJv7PLNWZS7Zz1Vf2i5gODslsFU+LfnIg7P8UgyKQPDNW2ztxrv9bUmK22jZQhzHtl6kuPV8UbGw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/QyhkOpa8fADf8mZXLkypXozK4TO6Ez1IRjGRvyvFAY=;
- b=XjS6uJbIdydgLac1eB9EtALui0chD9R75zxra/lsUkrqKFdmvl62rGdWeJhapgDtJtldNIw/X9YkUGsHhLHO+uDOqkSeEu5fXclM/mvMFmEIwoDG2sDTy495ty2pjv17ByJIo6yGUYRqzIV2i+J8VQhA1dTY2vnZrp914M9hmOw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- CYYPR12MB8855.namprd12.prod.outlook.com (2603:10b6:930:bb::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7611.26; Tue, 4 Jun 2024 00:33:23 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb%4]) with mapi id 15.20.7633.018; Tue, 4 Jun 2024
- 00:33:23 +0000
-Message-ID: <05dae177-ff31-4ad8-98f2-c93e14ea37ce@amd.com>
-Date: Mon, 3 Jun 2024 17:33:21 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net] idpf: extend tx watchdog timeout
-To: Joshua Hay <joshua.a.hay@intel.com>, intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org, Sridhar Samudrala <sridhar.samudrala@intel.com>
-References: <20240603184714.3697911-1-joshua.a.hay@intel.com>
-Content-Language: en-US
-From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <20240603184714.3697911-1-joshua.a.hay@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR02CA0060.namprd02.prod.outlook.com
- (2603:10b6:a03:54::37) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DD663E
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 00:46:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717462001; cv=none; b=J3q2/Hl4Jn9Wa+Oxe7c0aFGn7/HiHDCsqSNE2VNciZJP2Jlj3ear0aZoT2q4r6Ap4clqkSZoPE7MLFzorQeC09t3Mj6SgUUAPJgoq47yLPlpVTExCSTvs4XkKMnAxg0+LPb4CVuJQD/jQ52MKndlL/XoIbn7G149mgeaMzc5eso=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717462001; c=relaxed/simple;
+	bh=CcYTAVWyB3ymSj/OaY1OftSd6VsNT505IUtr0hifhfE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QoW9lcjH8gGGXAFUUwgvU5my9iBwgEi30FGNwsQJ1/8/JwnpoKpTOp+bFhYlfP82VIlM4z0No7JnY3/5qF1s9yIKw3uC129XODTrcBkarx8dJayShF7uR0LH0dLSQnhhohkki9+itfyB81RRlPATwcXwvcshSluuJALzSKxf/0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=h64O2c+v; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7025f4f4572so1384524b3a.1
+        for <netdev@vger.kernel.org>; Mon, 03 Jun 2024 17:46:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1717461999; x=1718066799; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=j6qJ3cMHA2ZvV0BHrtuqD+iovtfIMHyhYFzDZ7OtxxQ=;
+        b=h64O2c+vb0/hkqU+j9xiH+oAo/4BANflqg4hW7j+kVwpE7XHPT2g9KvMqWp1OONrBo
+         G91IdPe6AVx0cowx4wB70eyAgmss4XprBoq3GZVQffhyGOCsSZBjUm5QG2d2pMUmvNWu
+         nAyQZL8hNYYovwlqCHv+qhxC86OZdHK0Tq3h0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717461999; x=1718066799;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j6qJ3cMHA2ZvV0BHrtuqD+iovtfIMHyhYFzDZ7OtxxQ=;
+        b=UR2y7RD0MdO2Eumy8/mxt88bIlFJv6hfXukQH/wvI+gWhafz2MWXlQo9SeAg2ZqFBL
+         iO+ljmu3El6WrteBR2e0m84H6xcOxgSFTgzLPMqcT0fK2HjmxAdaY31+qyDhF8VK0AlH
+         RgwnqKop+ZBZKvjZS9v2Q2O9wYCjG6pGOdiRtYOvpm2tN5M6N8XQQux/S+1QwSXOtifI
+         +mzc2YEaOSdLERVCNVBmYeSNJnks2PPYk7Q+ZfpuSwQWP91xIzyOBgpITgGCUDaxouCs
+         7j0Zi4afRY46JMB45VSCv3CP0fmVOPw6luOBe3tW9gZZnccEiz+vPZ5w5UFSHqrFWm2b
+         r3DQ==
+X-Gm-Message-State: AOJu0YzQL4umuCN4m45zO3yLNTXfJ8yWm0tkpOiW69h94b11cHdoh6EN
+	px3T1GHcT5PUItOL87fe10y+vj0F3X5yRo0jJyHGC9p4F/53wKdESI1iTqzWikO7f3o+QcCkpVp
+	AbmKWlVx7Nvrb7HW+ya6uMVUQX/BRGuno7rdO3c31gSe+RGcZlol216XWJyjQJSZ5gIaoaEPfwy
+	Q3Rx9i6KuNk/O5lV0cF2i/gMGkoYyBi9XAY5M=
+X-Google-Smtp-Source: AGHT+IHiXBgr5xgcd9sLnnfdN+CIcxTRhmG+sm41M8+12g0FN0OWcYs//B0JiJ/pC845y6AvHYrpUw==
+X-Received: by 2002:a05:6a20:8418:b0:1a7:590e:279e with SMTP id adf61e73a8af0-1b2a2b84011mr1872915637.5.1717461998677;
+        Mon, 03 Jun 2024 17:46:38 -0700 (PDT)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70242c26067sm6049316b3a.218.2024.06.03.17.46.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Jun 2024 17:46:38 -0700 (PDT)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: nalramli@fastly.com,
+	Joe Damato <jdamato@fastly.com>,
+	Carolina Jubran <cjubran@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	linux-rdma@vger.kernel.org (open list:MELLANOX MLX5 core VPI driver),
+	Naveen Mamindlapalli <naveenm@marvell.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: [RFC net-next v4 0/2] mlx5: Add netdev-genl queue stats
+Date: Tue,  4 Jun 2024 00:46:24 +0000
+Message-Id: <20240604004629.299699-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|CYYPR12MB8855:EE_
-X-MS-Office365-Filtering-Correlation-Id: b5f6f037-f8b1-424d-40e9-08dc842df0e1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|376005|366007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dUJpV3p0d3JabmlnbFNxTFYzOW11U0tIRzcrcFVyUDhVUlZ6cTRmQ290RTly?=
- =?utf-8?B?QlFxVnErd29sNm5rckNPNGpkdTdRaGtDa08rMEVJMzcxMlZ2aXAvT0F6NENS?=
- =?utf-8?B?RGtlMm9JMC9id0JNczJ6Q2g2a1I0ZnpZU1I4ZFhuaTM4TThCNnZqK0VEcWJK?=
- =?utf-8?B?LzkxNFExUEE1NlltbDVVQmVXYlV5bXdKSy9IdFVCMFdJSHd4TWdmdEFZZGRY?=
- =?utf-8?B?OEhrejlvNjdRVmovM1AxS3NLU1U0OUVqdmFtdEFBeGlxRHJPa21CVHBPZjlx?=
- =?utf-8?B?SkwwWmhNSHM3TUtpdFA3V1htZjJVN0hFQkl0NGJ2RUVMODRLbU1zUTJZTXdq?=
- =?utf-8?B?MVpvQ1oyZkV5cStMQXFsRHRKY3JRR1I0WXE1Tm1uMFlpU0d6NkhDTFd0YU1p?=
- =?utf-8?B?RGx0N0R4RFVucGQwV2pCTWN5N1MrU1J0cmNESi9yRk1qTFJWeG1HdENFbHps?=
- =?utf-8?B?dkpiV1VlR3lEQ2c3S1VHRmpKM2ZpZ2pudVcxa0VtUkp0TjVJSWZUSUtmMCs2?=
- =?utf-8?B?SnozaWlNWHZvNWlrVUJtb0FOazNxMnp5cDhjSE0wSzQ2L1lEZ0wxUzVNVW5G?=
- =?utf-8?B?WEw5cllMM25sRGV5bFd6R0tTK3hDYWdSVW54R2ZpNCtHdXY0cnVraVdDMEY2?=
- =?utf-8?B?Y2FWWmxNbEQvNHMxbHZKSklXQ25jQ1lXd21IczVDaEs0YmVuclY1N01sbFFm?=
- =?utf-8?B?V3lBMExGNFdZaDV4cUppdGNsQkV2bldBODIwczNWOFZaM1hLSWJyd2xaZTJh?=
- =?utf-8?B?UXd5ZjUxd1lNSnNhR3lnSzdBRHc3ZzNGR3NHQ3kxKzRsQzdTdFBCb1BZWHc3?=
- =?utf-8?B?cG4rdE5WdDVkdXd5NWJPWitoeWRtM0J0cVozODhRZVlWWHRabnI4WkZrQnJ3?=
- =?utf-8?B?QmxIZFpoNjBFcW1SdjlFZjZaa09odk1QeWdEdzZGWTVlS0NUVEJxRWx1Vlhp?=
- =?utf-8?B?bCtEUWZETzh0ZzZpOFVQekpKVkZKNUVkK3ZxdFV1WFlqN3F0MENPbEJiTnlH?=
- =?utf-8?B?d1dPbW9sZ05KQlJPdVlTZ1JlbFBkOHJ2cktoSU9Id05NQXJCcWczNmJtVW42?=
- =?utf-8?B?eWxwQVFzdjVaS3F5K1NnRi9wUk83a3p0cnZ0M0FuQjVGbGdoa2pCY2pUbGRr?=
- =?utf-8?B?R1d6N3ZDdDkwTjVJc1ZvU215VzFZR1RKWEl4eUxYSlVNdEUrMEhHL3R4TSt1?=
- =?utf-8?B?SEtnbmkwNGtJNVFMVSs5RWtPalVMTEtYcUxxZXpBTDVIaHcrWE1JQktkODJs?=
- =?utf-8?B?b2RGWEJXcmtVTDNnd05yR3k3KzNOMUs5TnlvSXRkRzE3Q2pZRklDUFAza0dj?=
- =?utf-8?B?VmJUSHFOMEI3M1RDWkVINEFuV2lFQ0lWU3R2eDdjd0RQcFpudmVUTmdjRWpN?=
- =?utf-8?B?VEEzUUpYK2hCZlVpeTJIdUJVZUYvckZLV1pTb0E4WkxBV0tMMW1aMlhEclFR?=
- =?utf-8?B?QXpBWmpGdGFnT0ZQZDZ5M0R0cWtXMTc5UHp6aWZ1cmlrenkvQVBwdC9HS3Rm?=
- =?utf-8?B?eHdsN0xpSktyQzlPNHV1MktJMUZrRGNhOUxXTnAyWVB4KzdQY01sQ3dZRVFY?=
- =?utf-8?B?YnArUWdCQ09iZnJwVSswa3FUb0JuNktmZ3Fza2l2NWxvblpzdUZLWVY5T0dI?=
- =?utf-8?B?cjJTcEFVYW10V3pjdEc1WW1nTjgwZlcrQy9tWXEwcTBWWXcxeVE5WmJkTDlE?=
- =?utf-8?B?c2owTVdnK2lCd01iWW9zMkZsTUpWR21ZcTJqYzg4NzZMekQ3bFhDbUl3PT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bVFUUThWSWVRcEhuZk9jc281MnY4TmxnSWQ0Zmo1NGJOVWl0anlBZERlbkU2?=
- =?utf-8?B?RDM4Sm93NUZrZDlUbzZVbXFQMjBQT3Jkd0RQN0xUL2ovcFp4dHNtYXRPYTI3?=
- =?utf-8?B?bFBwK2x2Qmdpcm5tYjUweU8yT21yeFVhcnBsd0prV2QxaVdFSmlLNURtVUlM?=
- =?utf-8?B?QTlieG5uTlZpNG5EaFJRRWZLdDYyZFY0eGtwbVRGOVFKdHlGV2FNS3llOVpj?=
- =?utf-8?B?WUtnVjhxdGc5TnlZUG93NzJKeDJOeWZ5QVFMQU85QjBKeGt3U2Z6QXBjdGp1?=
- =?utf-8?B?aTJNSmtscHBlMTM3ak5NQUVKcmZFNjIwYUVKNzk5cFRjQWRMOURZeS9GQUdL?=
- =?utf-8?B?RnVyTG5lWDlDajd1bk5aU0x5aUV2YXpxelp2OVNCRDhzUEdnbUI3a1ZqNk9Q?=
- =?utf-8?B?UkIzYU5wczBKL3BuZDdpY3hyc2dPYXVFUkhyczVTNlhDa2F2NUJybjhzVUl3?=
- =?utf-8?B?RVNmQVhGTEVPZGNUK2prTU5nTnVXN0hYWHJnOG1NaEkzeTBlSDFwSnpWSkNq?=
- =?utf-8?B?K1o1UFZNeFBCd0pyaWJmMUZWbHl3NFEwa0ZtRlVySXVNY0dDWGdSeXFhdUsy?=
- =?utf-8?B?RlNFNzV6UlNKN2UycTJHeXp2Nm5uajBhT1diMnFmWGRubUY1R3ZaZHhoOUtk?=
- =?utf-8?B?bk1QNmNrdGtPZjl4SDI5d1lCL3BXYXo2TVVsOFF4aFR5RFQzYlo2eC9MTVpP?=
- =?utf-8?B?Szcra0JCS2F3cmd1dFZjZmI0WnpUdGtrU05DTVVpQk85UGpFcHZHK3ZQQnRU?=
- =?utf-8?B?R1BleEpJT1psQnArYnFXTm1HaGpNTnRCNjZPZVRDZ3ZKdUN5ZEZtd3ZTOG1w?=
- =?utf-8?B?WVVwcGw2WFhMMnJqR1daVk5SU2ZPZGhlaURZT0RhV3g5WmJ5MS9wSlFKRUMy?=
- =?utf-8?B?Qm1hWGdKZFMybW1FSk5oZzFWNmtFVEtLRmdtRXR5cEk3LzhXdzZweGp1c2xm?=
- =?utf-8?B?WnBLUGZtaVdzb05WL2hwdzBQVzB3ZlloRzJJTWhGYzlMYUVzTm9iVTRXOUky?=
- =?utf-8?B?NTE2Ti80aE9GRHVqV2wzM2JaeHp2Y1ZwM2M5RE1YTGtvQktVY3Z0WkRLTkxo?=
- =?utf-8?B?M213ZlJ1L0dqODBhOEJwUzNzUDFRNHN5QkdkUW9IYkZOZytic3pDUEtyYnhX?=
- =?utf-8?B?MmlZajRHVnVRYzEzTlp4TmlUQ0dHVjZDMTVuSThKdkZsaWtFa3FpRmJDdlIz?=
- =?utf-8?B?Wk9Ea3pNdUowbmIzMTFHNEN2b0s2V2dRVzVjUlJkS3JKKzgzM2lTMDVvK3Nz?=
- =?utf-8?B?Y1N4S1lVOW81RVEzQVdqMkFwci9HbnZhcGg4UEwrREdIUEJ6dVBHMmwzaktO?=
- =?utf-8?B?STdlSDVsTStpR2UybWowL212c0VZUzNWL0RpckhhTXBWVFdycHZVWDkzOUdj?=
- =?utf-8?B?K3FaT05JcEdjSmcxZWQrUDgrNDVOVlIyWW42VFhqUmtyNS8wanRWd0djT0Nj?=
- =?utf-8?B?aWRNMzlpUmdZMm5sb0cwSkNSY2w5T09iT1F0TlE4SU90MjhoVmM3QTdwWGU4?=
- =?utf-8?B?WUdybVpmelQvdm5MNG80NlcrWVlWWjBiN1Y4NDlCTFp0aWdWbDJyTURHT1JY?=
- =?utf-8?B?MGZOVVNQMjNqcUFjWHFlZHd5SnJyZVp5Z3RDamd5K3dvaXZvVURIT2dYSGpa?=
- =?utf-8?B?b2lHZTcrajVoRVJYL2hPOGwzY0UvbnJyM3JlemE2bFYxa0dzRVVjbXlTbXJt?=
- =?utf-8?B?TFNvaVcreHk4QzVPMWloaFE1M0JVNXdjcStSdmNqZHF5dVkxNVFrc3QraWNT?=
- =?utf-8?B?dnYyQnVXdGt0OEZzVmxBalp5UC8zd2h6d3ZyTWd0UFFOVEFZM0UwelpIbUZy?=
- =?utf-8?B?ajBMZXNMQjViNUtaak4wckVrKzBnQkNhMlFXeml5bWRQUkg4QytIOVhGSnJC?=
- =?utf-8?B?R0FjYmE1WlV4QjdIc21GNW9hU3B4RTB4SGZkSjQ2WnpiTURhK1lJbHU1UXRS?=
- =?utf-8?B?cFBpNEhqOGhadks4cXVoTHZiQ2NtSVQrU1MwWExRU2N2dXVHZlR2QkkyYWxJ?=
- =?utf-8?B?aFZ6cE04SzBiU0V6MDB5YzZnM0JINEZHdGorVjhISk1rQlZselBJYVBqVkhE?=
- =?utf-8?B?SmVJandSdWVnYVRnditKYVJJMlBXSDk5b29vQzZmTm1sa2pEdHBjRnFQTlVL?=
- =?utf-8?Q?2ftXX5SlfcxA+TowUnylgzDBd?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b5f6f037-f8b1-424d-40e9-08dc842df0e1
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2024 00:33:23.0685
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RS/gDGL3rcHiiVaE80f9RQ5C/PF3YONnijh1AAcXwYYiPUKz1LscS3niP45wKtnWwxESqs9Ey8VR1GV3fTYUBw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8855
+Content-Transfer-Encoding: 8bit
 
-On 6/3/2024 11:47 AM, Joshua Hay wrote:
-> 
-> There are several reasons for a TX completion to take longer than usual
-> to be written back by HW. For example, the completion for a packet that
-> misses a rule will have increased latency. The side effect of these
-> variable latencies for any given packet is out of order completions. The
-> stack sends packet X and Y. If packet X takes longer because of the rule
-> miss in the example above, but packet Y hits, it can go on the wire
-> immediately. Which also means it can be completed first.  The driver
-> will then receive a completion for packet Y before packet X.  The driver
-> will stash the buffers for packet X in a hash table to allow the tx send
-> queue descriptors for both packet X and Y to be reused. The driver will
-> receive the completion for packet X sometime later and have to search
-> the hash table for the associated packet.
-> 
-> The driver cleans packets directly on the ring first, i.e. not out of
-> order completions since they are to some extent considered "slow(er)
-> path". However, certain workloads can increase the frequency of out of
-> order completions thus introducing even more latency into the cleaning
-> path. Bump up the timeout value to account for these workloads.
-> 
-> Fixes: 0fe45467a104 ("idpf: add create vport and netdev configuration")
-> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-> ---
->   drivers/net/ethernet/intel/idpf/idpf_lib.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-> index f1ee5584e8fa..3d4ae2ed9b96 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-> @@ -770,8 +770,8 @@ static int idpf_cfg_netdev(struct idpf_vport *vport)
->          else
->                  netdev->netdev_ops = &idpf_netdev_ops_singleq;
-> 
-> -       /* setup watchdog timeout value to be 5 second */
-> -       netdev->watchdog_timeo = 5 * HZ;
-> +       /* setup watchdog timeout value to be 30 seconds */
-> +       netdev->watchdog_timeo = 30 * HZ;
+Greetings:
 
-Huh... that's a pretty big number.  If it really needs to be that big I 
-wonder if there's something else that needs attention.
+Welcome to rfc v4.
 
-sln
+Significant rewrite from v3 and hopefully getting closer to correctly
+exporting per queue stats from mlx5. Please see changelog below for
+detailed changes, especially regarding PTP stats.
 
+Note that my NIC does not seem to support PTP and I couldn't get the
+mlnx-tools mlnx_qos script to work, so I was only able to test the
+following cases:
 
-> 
->          netdev->dev_port = idx;
-> 
-> --
-> 2.39.2
-> 
-> 
+- device up at booot
+- adjusting queue counts
+- device down (e.g. ip link set dev eth4 down)
+
+Please see the commit message of patch 2/2 for more details on output
+and test cases.
+
+v3 thread: https://lore.kernel.org/lkml/20240601113913.GA696607@kernel.org/T/
+
+Thanks,
+Joe
+
+rfcv3 -> rfcv4:
+ - Patch 1/2 now creates a mapping (priv->txq2sq_stats) which maps txq
+   indices to sq_stats structures so stats can be accessed directly.
+   This mapping is kept up to date along side txq2sq.
+
+ - Patch 2/2:
+   - All mutex_lock/unlock on state_lock has been dropped.
+   - mlx5e_get_queue_stats_rx now uses ASSERT_RTNL() and has a special
+     case for PTP. If PTP was ever opened, is currently opened, and the
+     channel index matches, stats for PTP RX are output.
+   - mlx5e_get_queue_stats_tx rewritten to use priv->txq2sq_stats. No
+     corner cases are needed here because any txq idx (passed in as i)
+     will have an up to date mapping in priv->txq2sq_stats.
+   - mlx5e_get_base_stats:
+     - in the RX case:
+       - iterates from [params.num_channels, stats_nch) collecting
+         stats.
+       - if ptp was ever opened but is currently closed, add the PTP
+         stats.
+     - in the TX case:
+       - handle 2 cases:
+         - the channel is available, so sum only the unavailable TCs
+           [mlx5e_get_dcb_num_tc, max_opened_tc).
+         - the channel is unavailable, so sum all TCs [0, max_opened_tc).
+       - if ptp was ever opened but is currently closed, add the PTP
+         sq stats.
+
+v2 -> rfcv3:
+ - Added patch 1/2 which creates some helpers for computing the txq_ix
+   and ch_ix/tc_ix.
+
+ - Patch 2/2 modified in several ways:
+   - Fixed variable declarations in mlx5e_get_queue_stats_rx to be at
+     the start of the function.
+   - mlx5e_get_queue_stats_tx rewritten to access sq stats directly by
+     using the helpers added in the previous patch.
+   - mlx5e_get_base_stats modified in several ways:
+     - Took the state_lock when accessing priv->channels.
+     - For the base RX stats, code was simplified to call
+       mlx5e_get_queue_stats_rx instead of repeating the same code.
+     - For the base TX stats, I attempted to implement what I think
+       Tariq suggested in the previous thread:
+         - for available channels, only unavailable TC stats are summed
+	 - for unavailable channels, all stats for TCs up to
+	   max_opened_tc are summed.
+
+v1 - > v2:
+  - Essentially a full rewrite after comments from Jakub, Tariq, and
+    Zhu.
+
+Joe Damato (2):
+  net/mlx5e: Add txq to sq stats mapping
+  net/mlx5e: Add per queue netdev-genl stats
+
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |   2 +
+ .../net/ethernet/mellanox/mlx5/core/en/qos.c  |  13 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c | 149 +++++++++++++++++-
+ 3 files changed, 161 insertions(+), 3 deletions(-)
+
+-- 
+2.25.1
+
 
