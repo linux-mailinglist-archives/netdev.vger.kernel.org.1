@@ -1,71 +1,75 @@
-Return-Path: <netdev+bounces-100688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 026618FB992
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:53:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4571D8FB993
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:53:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 335DA1C23231
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:53:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA2AD1F24F8C
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:53:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98FA8148828;
-	Tue,  4 Jun 2024 16:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D648214883F;
+	Tue,  4 Jun 2024 16:53:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZO21RHd6"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LCetpOgL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E0DC171BA
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 16:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BBA146D71
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 16:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717519979; cv=none; b=i0OKoNn/zB2Y8jYPip5XEUp3rWbZTYaozcezp4CJouTywG8g1GhmKtJNMUGG/jQSYc4pYm/n0O3HDBjtOo0b5Td1OXlf05BSewsNyn+evYkUKDiPOfq8PsC1XDrbiD0DbvOWq9Dqo5uM53UIMy8XQLqUTByKkunCp7wLhJiYuVA=
+	t=1717520001; cv=none; b=E93Fy7ooAwFHCfdmqc/f6xp06MM4VWnGyUkM3iRHM4sdW6Bs6ABTnR8VyleeODoH6PAm2ORuKEhbWR782lO6Ewr3EOygfmn0iePwjT2hNKdIedMM8Ncvkb5bt/PNm1NfR4UqCa+XdfhM+V22hJbdCMC3U2y7VXkd/hQ7EvJsFg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717519979; c=relaxed/simple;
-	bh=ExCp8oZSZXS/Znqhu02RK46x7llOo+T8lYiD3vYyHlA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LqDmJ1GryDadRqIllT2Yh6TkbBtVJvAeStjB0jm3Z7UZoKwEsBzbV4RhZbbYyVnhfLtLfltIW/8b8XqgOr4MoT0jxyKOWfFRViUrdOfJbeGWDAjjvZn0AT8uU7f9NeiT2ABbJ/GA8xq6bOPJAKkJC8xknJJkU/mF7Isa2iG78as=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZO21RHd6; arc=none smtp.client-ip=99.78.197.217
+	s=arc-20240116; t=1717520001; c=relaxed/simple;
+	bh=wRuOKWfU6wp0gkX0ECizns+0HwZcYhiXvplX1v8oET8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nlTZGzUqdx4GL9L+vapmgL08JWlTtHtHr1UQx3t88WZPlIVv0a8PXBWnKksEL2MDbcMS764D6IsrFWXXk7LwAoAxjRfStdmRLx9Y+02bnfl6SB/a9DObXz4Pgzqe8iBNe+npnhBW1XqtSc0w+Nw3yTmTBNqKBvBTfd6W9S/HM28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=LCetpOgL; arc=none smtp.client-ip=99.78.197.220
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1717519978; x=1749055978;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=LAADkQ/YMzO10GCI0rpAbQlAJmD59zaTYNKlXk5SZ/s=;
-  b=ZO21RHd6Bb/fqwXggAFDk85BWd9x2XDikmZcuw7Ewj1jZKMaxOWszeGn
-   6metSiWCo9s4CeTv+hQDxlq0bt4IlueuvWl7SxGjfFPU92uiHOPSveNYn
-   Y/dSxsgfPl280QqoieQ1CidGbfozYWRqwR+HSvsQ2GXMa80X+Hj4qGO53
-   Q=;
+  t=1717520000; x=1749056000;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=x6NQk/Vl4BGkVzzcqiCVdwrVM6R4SEd3igy91h8wJSI=;
+  b=LCetpOgLZI87A2sQTqxTI+QD7coxh/VuAQoiIFxP7BX0k4udHyncAzXy
+   kc/3BCkWdcihrlEjd3TaGXGPDKBcCXZsxw9v9KX/m6USOiVvVcoPj407z
+   TaPfkXhayaQf/hB/TUpZPdtqQStT/VVHC6gyyo97EHyNPmzbcb9AqV3i2
+   o=;
 X-IronPort-AV: E=Sophos;i="6.08,214,1712620800"; 
-   d="scan'208";a="299733767"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 16:52:54 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:36330]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.57.174:2525] with esmtp (Farcaster)
- id 303c369f-f794-44b6-82c9-c89f32d6dc70; Tue, 4 Jun 2024 16:52:53 +0000 (UTC)
-X-Farcaster-Flow-ID: 303c369f-f794-44b6-82c9-c89f32d6dc70
+   d="scan'208";a="94166907"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 16:53:18 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:47481]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.42.213:2525] with esmtp (Farcaster)
+ id 6b6c476f-e72f-4328-a171-3a8a4f31db6c; Tue, 4 Jun 2024 16:53:18 +0000 (UTC)
+X-Farcaster-Flow-ID: 6b6c476f-e72f-4328-a171-3a8a4f31db6c
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Tue, 4 Jun 2024 16:52:53 +0000
+ 15.2.1258.28; Tue, 4 Jun 2024 16:53:17 +0000
 Received: from 88665a182662.ant.amazon.com (10.187.170.50) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Tue, 4 Jun 2024 16:52:51 +0000
+ 15.2.1258.34; Tue, 4 Jun 2024 16:53:15 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net 00/15] af_unix: Fix lockless access of sk->sk_state and others fields.
-Date: Tue, 4 Jun 2024 09:52:26 -0700
-Message-ID: <20240604165241.44758-1-kuniyu@amazon.com>
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, Cong Wang
+	<cong.wang@bytedance.com>
+Subject: [PATCH v2 net 01/15] af_unix: Set sk->sk_state under unix_state_lock() for truly disconencted peer.
+Date: Tue, 4 Jun 2024 09:52:27 -0700
+Message-ID: <20240604165241.44758-2-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240604165241.44758-1-kuniyu@amazon.com>
+References: <20240604165241.44758-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,60 +78,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA001.ant.amazon.com (10.13.139.112) To
+X-ClientProxiedBy: EX19D031UWC002.ant.amazon.com (10.13.139.212) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-The patch 1 fixes a bug where SOCK_DGRAM's sk->sk_state is changed
-to TCP_CLOSE even if the socket is connect()ed to another socket.
+When a SOCK_DGRAM socket connect()s to another socket, the both sockets'
+sk->sk_state are changed to TCP_ESTABLISHED so that we can register them
+to BPF SOCKMAP.
 
-The rest of this series annotates lockless accesses to the following
-fields.
+When the socket disconnects from the peer by connect(AF_UNSPEC), the state
+is set back to TCP_CLOSE.
 
-  * sk->sk_state
-  * sk->sk_sndbuf
-  * net->unx.sysctl_max_dgram_qlen
-  * sk->sk_receive_queue.qlen
-  * sk->sk_shutdown
+Then, the peer's state is also set to TCP_CLOSE, but the update is done
+locklessly and unconditionally.
 
-Note that with this series there is skb_queue_empty() left in
-unix_dgram_disconnected() that needs to be changed to lockless
-version, and unix_peer(other) access there should be protected
-by unix_state_lock().
+Let's say socket A connect()ed to B, B connect()ed to C, and A disconnects
+from B.
 
-This will require some refactoring, so another series will follow.
+After the first two connect()s, all three sockets' sk->sk_state are
+TCP_ESTABLISHED:
 
+  $ ss -xa
+  Netid State  Recv-Q Send-Q  Local Address:Port  Peer Address:PortProcess
+  u_dgr ESTAB  0      0       @A 641              * 642
+  u_dgr ESTAB  0      0       @B 642              * 643
+  u_dgr ESTAB  0      0       @C 643              * 0
 
-Changes:
-  v2:
-    * Patch 1: Fix wrong double lock
+And after the disconnect, B's state is TCP_CLOSE even though it's still
+connected to C and C's state is TCP_ESTABLISHED.
 
-  v1: https://lore.kernel.org/netdev/20240603143231.62085-1-kuniyu@amazon.com/
+  $ ss -xa
+  Netid State  Recv-Q Send-Q  Local Address:Port  Peer Address:PortProcess
+  u_dgr UNCONN 0      0       @A 641              * 0
+  u_dgr UNCONN 0      0       @B 642              * 643
+  u_dgr ESTAB  0      0       @C 643              * 0
 
+In this case, we cannot register B to SOCKMAP.
 
-Kuniyuki Iwashima (15):
-  af_unix: Set sk->sk_state under unix_state_lock() for truly
-    disconencted peer.
-  af_unix: Annodate data-races around sk->sk_state for writers.
-  af_unix: Annotate data-race of sk->sk_state in unix_inq_len().
-  af_unix: Annotate data-races around sk->sk_state in unix_write_space()
-    and poll().
-  af_unix: Annotate data-race of sk->sk_state in unix_stream_connect().
-  af_unix: Annotate data-race of sk->sk_state in unix_accept().
-  af_unix: Annotate data-races around sk->sk_state in sendmsg() and
-    recvmsg().
-  af_unix: Annotate data-race of sk->sk_state in unix_stream_read_skb().
-  af_unix: Annotate data-races around sk->sk_state in UNIX_DIAG.
-  af_unix: Annotate data-races around sk->sk_sndbuf.
-  af_unix: Annotate data-race of net->unx.sysctl_max_dgram_qlen.
-  af_unix: Use unix_recvq_full_lockless() in unix_stream_connect().
-  af_unix: Use skb_queue_empty_lockless() in unix_release_sock().
-  af_unix: Use skb_queue_len_lockless() in sk_diag_show_rqlen().
-  af_unix: Annotate data-race of sk->sk_shutdown in sk_diag_fill().
+So, when a socket disconnects from the peer, we should not set TCP_CLOSE to
+the peer if the peer is connected to yet another socket, and this must be
+done under unix_state_lock().
 
- net/unix/af_unix.c | 90 +++++++++++++++++++++++-----------------------
- net/unix/diag.c    | 12 +++----
- 2 files changed, 50 insertions(+), 52 deletions(-)
+Note that we use WRITE_ONCE() for sk->sk_state as there are many lockless
+readers.  These data-races will be fixed in the following patches.
 
+Fixes: 83301b5367a9 ("af_unix: Set TCP_ESTABLISHED for datagram sockets too")
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+CC: Cong Wang <cong.wang@bytedance.com>
+---
+ net/unix/af_unix.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 25b49efc0926..b162164b7a42 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -570,7 +570,6 @@ static void unix_dgram_disconnected(struct sock *sk, struct sock *other)
+ 			sk_error_report(other);
+ 		}
+ 	}
+-	other->sk_state = TCP_CLOSE;
+ }
+ 
+ static void unix_sock_destructor(struct sock *sk)
+@@ -1424,8 +1423,15 @@ static int unix_dgram_connect(struct socket *sock, struct sockaddr *addr,
+ 
+ 		unix_state_double_unlock(sk, other);
+ 
+-		if (other != old_peer)
++		if (other != old_peer) {
+ 			unix_dgram_disconnected(sk, old_peer);
++
++			unix_state_lock(old_peer);
++			if (!unix_peer(old_peer))
++				WRITE_ONCE(old_peer->sk_state, TCP_CLOSE);
++			unix_state_unlock(old_peer);
++		}
++
+ 		sock_put(old_peer);
+ 	} else {
+ 		unix_peer(sk) = other;
 -- 
 2.30.2
 
