@@ -1,75 +1,77 @@
-Return-Path: <netdev+bounces-100580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C43968FB3B2
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:25:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E028D8FB3B5
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:25:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77C8C2888A7
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 13:25:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E94D1C230CB
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 13:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285051474C4;
-	Tue,  4 Jun 2024 13:25:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 138771482E2;
+	Tue,  4 Jun 2024 13:25:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fdrzMDE+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XO+beToQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5048A146D7C
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 13:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7891474A7
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 13:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717507501; cv=none; b=Z9UH8HqFg7qJPufCaM7Z3n5A7lNEkGaM4rlbl6YnI1+dUIEX3+GBue6wGxJHtJeHn6sMrFvsoLL3F8xlJBvfiTOHx7UDKvfI5SS3NHMPL3ddIBJGHM012RtVXWS7IaBNQ8q0+P1feB8UuaPZYzLu5Z5i9+gT2F5oCiv43m9KNRU=
+	t=1717507501; cv=none; b=quEQHsBOt+6q+oJDhlyXOBjMrw+uL1/ZqSV0htZZVz+NarEKsyFe6Q59WK5IycBgD2cQ1mcftSNjxET/UzbI43Cq2QRBkhpIXLVUCzE8GR7egzPWeuQv/wc9FDLmXTzS4mGvVOR2DzunH0TJaL4gOqy3HXfXe7XRfiZ/2uiQgB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717507501; c=relaxed/simple;
-	bh=JZB4QkRdNZoCQTBwVqiAD8p8/oUZ3Ajog3nl68G0FE8=;
+	bh=2rnRHsT8WgEM65d2QBslYeKDa3HGkzBmudrOVZLu4II=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Vwj/cU2eWilp1fkiVMKAKQELSsU8MEVfQmLezaqReIBg54QV8zNFyoToY9yH291z30wNBRa26C17d09wiaym2+N1ZXXDP/xpMQASmGksn/ishmvV9q4P0Dn2yciKSpEOIySrBvHqxWNsq92KMq/4E2HOVy3yOC5aDVMiIOfKLkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fdrzMDE+; arc=none smtp.client-ip=192.198.163.15
+	 MIME-Version; b=p7yF/CnikfgZ6wEzEUqEP3gAIB5expPhHdUrD5wh4/I6/ClzVFmmdTVLmA5oLRr1Xdj7e4GdrB1siPnBPL/PnJvXFkBm924/vJPfsMdFOynxmr2s8enRLrGunqK261O2QlXYHoOXDNK1USMzrmH2fnMxBlkAUt4dQW/V2dJQUHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XO+beToQ; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717507499; x=1749043499;
+  t=1717507500; x=1749043500;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=JZB4QkRdNZoCQTBwVqiAD8p8/oUZ3Ajog3nl68G0FE8=;
-  b=fdrzMDE+CbOFuA4w9cNry0Ksr+7JjXAy5sRtAKyMyH3DquuRcWCMpwbO
-   MVXU9hNDMXAfAVJuNLNhjGZXJNrelfTEDCedmKqVQs72ReZbaQq57msMh
-   9QbEb1kl84UwiUBNc4RB4hjCVpM9P0dzF6PQjt4kjBwCP/AE0Kqsg9S5m
-   fZMXWmW9xwy7YRqyXAOnXaoTUVm+refEfd30bT+uFXkrkQ0mgW42XbJNd
-   IzqiQXKrPt2VphPVPoZ4ez77q0N11pUTYjwgYmqoJaFLDSDjKixxu6k8A
-   8fdD8VlqJ3/KZOnWlDejfs9Cw9Q2RXyX5gWaIk+BvIKe55GFzGsvE/rQr
+  bh=2rnRHsT8WgEM65d2QBslYeKDa3HGkzBmudrOVZLu4II=;
+  b=XO+beToQHIcXP7P+wBj2rXqwJs/hRnR9bUzH3VXYRZnMX/zHk+VdiZ2/
+   WhC3ewtJ24O7YNXfFEDFH9FmFGkLeEaH2loJrxkR7VjFoKwxOcMgKtrb8
+   Hzj3D2B3Yd+BWtU54rk3XW1440oElX3ouj2TZFeacgfw1UEz+fwH+8vGq
+   jGmAmil2Nmh12DcvtlImMM9viqFM09VuXpMZpxxu7lA6P8DvyaqZhvd2l
+   BspyUX5sx8XNAs5+b4u/kiXFwgWOHaHSMb7fPRIdLoC6mdupBsvJV2M3o
+   CYvUcXGRNfOLVUl6Y4vodNZuSph20rEe4tX6BLyGPVw2n4PKEXTrIWDWT
    g==;
-X-CSE-ConnectionGUID: blHi73RJTEu2gHr0mXYsMw==
-X-CSE-MsgGUID: k0jBCE6HTpqkIxAY/U9xTg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11093"; a="14245385"
+X-CSE-ConnectionGUID: AAIhXJ9qT7yJD/veB5XnDg==
+X-CSE-MsgGUID: jT2aaTT+QgOHgDKchlL1zQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11093"; a="14245389"
 X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
-   d="scan'208";a="14245385"
+   d="scan'208";a="14245389"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 06:24:59 -0700
-X-CSE-ConnectionGUID: mgkqYfx/TiGPtDXaX5A3ug==
-X-CSE-MsgGUID: R4BAnwdKTSCBRQzqmqOa2A==
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 06:25:00 -0700
+X-CSE-ConnectionGUID: 7Nc7Pby5Rv+rSpATqqP1pw==
+X-CSE-MsgGUID: FsA4LaNyRum+Fg1J8NMSTA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
-   d="scan'208";a="37109758"
+   d="scan'208";a="37109763"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa007.fm.intel.com with ESMTP; 04 Jun 2024 06:24:56 -0700
+  by fmviesa007.fm.intel.com with ESMTP; 04 Jun 2024 06:24:57 -0700
 Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 5C438125BC;
-	Tue,  4 Jun 2024 14:24:48 +0100 (IST)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 5B4E7125BD;
+	Tue,  4 Jun 2024 14:24:49 +0100 (IST)
 From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Sai Krishna <saikrishnag@marvell.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
 	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-next v7 05/12] iavf: negotiate PTP capabilities
-Date: Tue,  4 Jun 2024 09:13:53 -0400
-Message-Id: <20240604131400.13655-6-mateusz.polchlopek@intel.com>
+Subject: [Intel-wired-lan] [PATCH iwl-next v7 06/12] iavf: add initial framework for registering PTP clock
+Date: Tue,  4 Jun 2024 09:13:54 -0400
+Message-Id: <20240604131400.13655-7-mateusz.polchlopek@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20240604131400.13655-1-mateusz.polchlopek@intel.com>
 References: <20240604131400.13655-1-mateusz.polchlopek@intel.com>
@@ -83,321 +85,231 @@ Content-Transfer-Encoding: 8bit
 
 From: Jacob Keller <jacob.e.keller@intel.com>
 
-Add a new extended capabilities negotiation to exchange information from
-the PF about what PTP capabilities are supported by this VF. This
-requires sending a VIRTCHNL_OP_1588_PTP_GET_CAPS message, and waiting
-for the response from the PF. Handle this early on during the VF
-initialization.
+Add the iavf_ptp.c file and fill it in with a skeleton framework to
+allow registering the PTP clock device.
+Add implementation of helper functions to check if a PTP capability
+is supported and handle change in PTP capabilities.
+Enabling virtual clock would be possible, though it would probably
+perform poorly due to the lack of direct time access.
 
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Reviewed-by: Sai Krishna <saikrishnag@marvell.com>
+Co-developed-by: Ahmed Zaki <ahmed.zaki@intel.com>
+Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
 Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 ---
- drivers/net/ethernet/intel/iavf/iavf.h        | 17 +++-
- drivers/net/ethernet/intel/iavf/iavf_main.c   | 69 ++++++++++++++++
- drivers/net/ethernet/intel/iavf/iavf_ptp.h    | 12 +++
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 79 +++++++++++++++++++
- 4 files changed, 175 insertions(+), 2 deletions(-)
- create mode 100644 drivers/net/ethernet/intel/iavf/iavf_ptp.h
+ drivers/net/ethernet/intel/iavf/Makefile      |   3 +-
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |   5 +
+ drivers/net/ethernet/intel/iavf/iavf_ptp.c    | 125 ++++++++++++++++++
+ drivers/net/ethernet/intel/iavf/iavf_ptp.h    |  10 ++
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |   2 +
+ 5 files changed, 144 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/intel/iavf/iavf_ptp.c
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
-index bc0201f6453d..8e86b0edb046 100644
---- a/drivers/net/ethernet/intel/iavf/iavf.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf.h
-@@ -40,6 +40,7 @@
- #include "iavf_txrx.h"
- #include "iavf_fdir.h"
- #include "iavf_adv_rss.h"
-+#include "iavf_ptp.h"
- #include <linux/bitmap.h>
+diff --git a/drivers/net/ethernet/intel/iavf/Makefile b/drivers/net/ethernet/intel/iavf/Makefile
+index 356ac9faa5bf..364eafe31483 100644
+--- a/drivers/net/ethernet/intel/iavf/Makefile
++++ b/drivers/net/ethernet/intel/iavf/Makefile
+@@ -12,4 +12,5 @@ subdir-ccflags-y += -I$(src)
+ obj-$(CONFIG_IAVF) += iavf.o
  
- #define DEFAULT_DEBUG_LEVEL_SHIFT 3
-@@ -338,13 +339,16 @@ struct iavf_adapter {
- #define IAVF_FLAG_AQ_ENABLE_STAG_VLAN_INSERTION		BIT_ULL(37)
- #define IAVF_FLAG_AQ_DISABLE_STAG_VLAN_INSERTION	BIT_ULL(38)
- #define IAVF_FLAG_AQ_GET_SUPPORTED_RXDIDS		BIT_ULL(39)
-+#define IAVF_FLAG_AQ_GET_PTP_CAPS			BIT_ULL(40)
-+#define IAVF_FLAG_AQ_SEND_PTP_CMD			BIT_ULL(41)
- 
- 	/* AQ messages that must be sent after IAVF_FLAG_AQ_GET_CONFIG, in
- 	 * order to negotiated extended capabilities.
- 	 */
- #define IAVF_FLAG_AQ_EXTENDED_CAPS			\
- 	(IAVF_FLAG_AQ_GET_OFFLOAD_VLAN_V2_CAPS |	\
--	 IAVF_FLAG_AQ_GET_SUPPORTED_RXDIDS)
-+	 IAVF_FLAG_AQ_GET_SUPPORTED_RXDIDS |		\
-+	 IAVF_FLAG_AQ_GET_PTP_CAPS)
- 
- 	/* flags for processing extended capability messages during
- 	 * __IAVF_INIT_EXTENDED_CAPS. Each capability exchange requires
-@@ -358,12 +362,16 @@ struct iavf_adapter {
- #define IAVF_EXTENDED_CAP_RECV_VLAN_V2			BIT_ULL(1)
- #define IAVF_EXTENDED_CAP_SEND_RXDID			BIT_ULL(2)
- #define IAVF_EXTENDED_CAP_RECV_RXDID			BIT_ULL(3)
-+#define IAVF_EXTENDED_CAP_SEND_PTP			BIT_ULL(4)
-+#define IAVF_EXTENDED_CAP_RECV_PTP			BIT_ULL(5)
- 
- #define IAVF_EXTENDED_CAPS				\
- 	(IAVF_EXTENDED_CAP_SEND_VLAN_V2 |		\
- 	 IAVF_EXTENDED_CAP_RECV_VLAN_V2 |		\
- 	 IAVF_EXTENDED_CAP_SEND_RXDID |			\
--	 IAVF_EXTENDED_CAP_RECV_RXDID)
-+	 IAVF_EXTENDED_CAP_RECV_RXDID |			\
-+	 IAVF_EXTENDED_CAP_SEND_PTP |			\
-+	 IAVF_EXTENDED_CAP_RECV_PTP)
- 
- 	/* Lock to prevent possible clobbering of
- 	 * current_netdev_promisc_flags
-@@ -423,6 +431,8 @@ struct iavf_adapter {
- 			     VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF)
- #define RXDID_ALLOWED(_a) ((_a)->vf_res->vf_cap_flags & \
- 			   VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC)
-+#define PTP_ALLOWED(_a) ((_a)->vf_res->vf_cap_flags & \
-+			 VIRTCHNL_VF_CAP_PTP)
- 	struct virtchnl_vf_resource *vf_res; /* incl. all VSIs */
- 	struct virtchnl_vsi_resource *vsi_res; /* our LAN VSI */
- 	struct virtchnl_version_info pf_version;
-@@ -430,6 +440,7 @@ struct iavf_adapter {
- 		       ((_a)->pf_version.minor == 1))
- 	struct virtchnl_vlan_caps vlan_v2_caps;
- 	struct virtchnl_supported_rxdids supported_rxdids;
-+	struct iavf_ptp ptp;
- 	u16 msg_enable;
- 	struct iavf_eth_stats current_stats;
- 	struct iavf_vsi vsi;
-@@ -569,6 +580,8 @@ int iavf_get_vf_vlan_v2_caps(struct iavf_adapter *adapter);
- int iavf_send_vf_offload_vlan_v2_msg(struct iavf_adapter *adapter);
- int iavf_send_vf_supported_rxdids_msg(struct iavf_adapter *adapter);
- int iavf_get_vf_supported_rxdids(struct iavf_adapter *adapter);
-+int iavf_send_vf_ptp_caps_msg(struct iavf_adapter *adapter);
-+int iavf_get_vf_ptp_caps(struct iavf_adapter *adapter);
- void iavf_set_queue_vlan_tag_loc(struct iavf_adapter *adapter);
- u16 iavf_get_num_vlans_added(struct iavf_adapter *adapter);
- void iavf_irq_enable(struct iavf_adapter *adapter, bool flush);
+ iavf-y := iavf_main.o iavf_ethtool.o iavf_virtchnl.o iavf_fdir.o \
+-	  iavf_adv_rss.o iavf_txrx.o iavf_common.o iavf_adminq.o
++	  iavf_adv_rss.o iavf_txrx.o iavf_common.o iavf_adminq.o \
++	  iavf_ptp.o
 diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 11f3280793e6..7612c2f15845 100644
+index 7612c2f15845..cf11a1fd19bd 100644
 --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
 +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -2084,6 +2084,8 @@ static int iavf_process_aq_command(struct iavf_adapter *adapter)
- 		return iavf_send_vf_offload_vlan_v2_msg(adapter);
- 	if (adapter->aq_required & IAVF_FLAG_AQ_GET_SUPPORTED_RXDIDS)
- 		return iavf_send_vf_supported_rxdids_msg(adapter);
-+	if (adapter->aq_required & IAVF_FLAG_AQ_GET_PTP_CAPS)
-+		return iavf_send_vf_ptp_caps_msg(adapter);
- 	if (adapter->aq_required & IAVF_FLAG_AQ_DISABLE_QUEUES) {
- 		iavf_disable_queues(adapter);
- 		return 0;
-@@ -2658,6 +2660,64 @@ static void iavf_init_recv_supported_rxdids(struct iavf_adapter *adapter)
- 	iavf_change_state(adapter, __IAVF_INIT_FAILED);
- }
+@@ -2848,6 +2848,9 @@ static void iavf_init_config_adapter(struct iavf_adapter *adapter)
+ 		/* request initial VLAN offload settings */
+ 		iavf_set_vlan_offload_features(adapter, 0, netdev->features);
  
-+/**
-+ * iavf_init_send_ptp_caps - part of querying for extended PTP capabilities
-+ * @adapter: board private structure
-+ *
-+ * Function processes send of the request for 1588 PTP capabilities to the PF.
-+ * Must clear IAVF_EXTENDED_CAP_SEND_PTP if the message is not sent, e.g.
-+ * due to the PF not negotiating VIRTCHNL_VF_PTP_CAP
-+ */
-+static void iavf_init_send_ptp_caps(struct iavf_adapter *adapter)
-+{
-+	int ret;
++	/* Setup initial PTP configuration */
++	iavf_ptp_init(adapter);
 +
-+	WARN_ON(!(adapter->extended_caps & IAVF_EXTENDED_CAP_SEND_PTP));
-+
-+	ret = iavf_send_vf_ptp_caps_msg(adapter);
-+	if (ret == -EOPNOTSUPP) {
-+		/* PF does not support VIRTCHNL_VF_PTP_CAP. In this case, we
-+		 * did not send the capability exchange message and do not
-+		 * expect a response.
-+		 */
-+		adapter->extended_caps &= ~IAVF_EXTENDED_CAP_RECV_PTP;
-+	}
-+
-+	/* We sent the message, so move on to the next step */
-+	adapter->extended_caps &= ~IAVF_EXTENDED_CAP_SEND_PTP;
-+}
-+
-+/**
-+ * iavf_init_recv_ptp_caps - part of querying for supported PTP capabilities
-+ * @adapter: board private structure
-+ *
-+ * Function processes receipt of the PTP capabilities supported on this VF.
-+ **/
-+static void iavf_init_recv_ptp_caps(struct iavf_adapter *adapter)
-+{
-+	int ret;
-+
-+	WARN_ON(!(adapter->extended_caps & IAVF_EXTENDED_CAP_RECV_PTP));
-+
-+	memset(&adapter->ptp.hw_caps, 0, sizeof(adapter->ptp.hw_caps));
-+
-+	ret = iavf_get_vf_ptp_caps(adapter);
-+	if (ret)
-+		goto err;
-+
-+	/* We've processed the PF response to the VIRTCHNL_OP_1588_PTP_GET_CAPS
-+	 * message we sent previously.
-+	 */
-+	adapter->extended_caps &= ~IAVF_EXTENDED_CAP_RECV_PTP;
-+	return;
-+err:
-+	/* We didn't receive a reply. Make sure we try sending again when
-+	 * __IAVF_INIT_FAILED attempts to recover.
-+	 */
-+	adapter->extended_caps |= IAVF_EXTENDED_CAP_SEND_PTP;
-+	iavf_change_state(adapter, __IAVF_INIT_FAILED);
-+}
-+
- /**
-  * iavf_init_process_extended_caps - Part of driver startup
-  * @adapter: board private structure
-@@ -2691,6 +2751,15 @@ static void iavf_init_process_extended_caps(struct iavf_adapter *adapter)
- 		return;
+ 	iavf_schedule_finish_config(adapter);
+ 	return;
+ 
+@@ -5475,6 +5478,8 @@ static void iavf_remove(struct pci_dev *pdev)
+ 		msleep(50);
  	}
  
-+	/* Process capability exchange for PTP features */
-+	if (adapter->extended_caps & IAVF_EXTENDED_CAP_SEND_PTP) {
-+		iavf_init_send_ptp_caps(adapter);
-+		return;
-+	} else if (adapter->extended_caps & IAVF_EXTENDED_CAP_RECV_PTP) {
-+		iavf_init_recv_ptp_caps(adapter);
-+		return;
-+	}
++	iavf_ptp_release(adapter);
 +
- 	/* When we reach here, no further extended capabilities exchanges are
- 	 * necessary, so we finally transition into __IAVF_INIT_CONFIG_ADAPTER
- 	 */
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.h b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
+ 	iavf_misc_irq_disable(adapter);
+ 	/* Shut down all the garbage mashers on the detention level */
+ 	cancel_work_sync(&adapter->reset_task);
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.c b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
 new file mode 100644
-index 000000000000..aee4e2da0b9a
+index 000000000000..84ce98ac9c31
 --- /dev/null
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
++++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
+@@ -0,0 +1,125 @@
++// SPDX-License-Identifier: GPL-2.0
 +/* Copyright(c) 2024 Intel Corporation. */
 +
-+#ifndef _IAVF_PTP_H_
-+#define _IAVF_PTP_H_
++#include "iavf.h"
 +
-+/* fields used for PTP support */
-+struct iavf_ptp {
-+	struct virtchnl_ptp_caps hw_caps;
-+};
-+
-+#endif /* _IAVF_PTP_H_ */
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-index 797e6ecbc30b..096b15375b3d 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-@@ -148,6 +148,7 @@ int iavf_send_vf_config_msg(struct iavf_adapter *adapter)
- 	       VIRTCHNL_VF_OFFLOAD_CRC |
- 	       VIRTCHNL_VF_OFFLOAD_ENCAP_CSUM |
- 	       VIRTCHNL_VF_OFFLOAD_REQ_QUEUES |
-+	       VIRTCHNL_VF_CAP_PTP |
- 	       VIRTCHNL_VF_OFFLOAD_ADQ |
- 	       VIRTCHNL_VF_OFFLOAD_USO |
- 	       VIRTCHNL_VF_OFFLOAD_FDIR_PF |
-@@ -190,6 +191,41 @@ int iavf_send_vf_supported_rxdids_msg(struct iavf_adapter *adapter)
- 				NULL, 0);
- }
- 
 +/**
-+ * iavf_send_vf_ptp_caps_msg - Send request for PTP capabilities
++ * iavf_ptp_cap_supported - Check if a PTP capability is supported
++ * @adapter: private adapter structure
++ * @cap: the capability bitmask to check
++ *
++ * Return: true if every capability set in cap is also set in the enabled
++ *         capabilities reported by the PF, false otherwise.
++ */
++bool iavf_ptp_cap_supported(struct iavf_adapter *adapter, u32 cap)
++{
++	if (!PTP_ALLOWED(adapter))
++		return false;
++
++	/* Only return true if every bit in cap is set in hw_caps.caps */
++	return (adapter->ptp.hw_caps.caps & cap) == cap;
++}
++
++/**
++ * iavf_ptp_register_clock - Register a new PTP for userspace
 + * @adapter: private adapter structure
 + *
-+ * Send the VIRTCHNL_OP_1588_PTP_GET_CAPS command to the PF to request the PTP
-+ * capabilities available to this device. This includes the following
-+ * potential access:
++ * Allocate and register a new PTP clock device if necessary.
 + *
-+ * * READ_PHC - access to read the PTP hardware clock time
-+ * * RX_TSTAMP - access to request Rx timestamps on all received packets
-+ *
-+ * The PF will reply with the same opcode a filled out copy of the
-+ * virtchnl_ptp_caps structure which defines the specifics of which features
-+ * are accessible to this device.
-+ *
-+ * Return: 0 if success, error code otherwise
++ * Return: 0 if success, error otherwise
 + */
-+int iavf_send_vf_ptp_caps_msg(struct iavf_adapter *adapter)
++static int iavf_ptp_register_clock(struct iavf_adapter *adapter)
 +{
-+	struct virtchnl_ptp_caps hw_caps = {};
++	struct ptp_clock_info *ptp_info = &adapter->ptp.info;
++	struct device *dev = &adapter->pdev->dev;
 +
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_GET_PTP_CAPS;
++	memset(ptp_info, 0, sizeof(*ptp_info));
 +
-+	if (!PTP_ALLOWED(adapter))
-+		return -EOPNOTSUPP;
++	snprintf(ptp_info->name, sizeof(ptp_info->name) - 1, "%s-%s-clk",
++		 dev_driver_string(dev),
++		 dev_name(dev));
++	ptp_info->owner = THIS_MODULE;
 +
-+	hw_caps.caps = (VIRTCHNL_1588_PTP_CAP_READ_PHC |
-+			VIRTCHNL_1588_PTP_CAP_RX_TSTAMP);
++	adapter->ptp.clock = ptp_clock_register(ptp_info, dev);
++	if (IS_ERR(adapter->ptp.clock))
++		return PTR_ERR(adapter->ptp.clock);
 +
-+	adapter->current_op = VIRTCHNL_OP_1588_PTP_GET_CAPS;
-+
-+	return iavf_send_pf_msg(adapter, VIRTCHNL_OP_1588_PTP_GET_CAPS,
-+				(u8 *)&hw_caps, sizeof(hw_caps));
++	dev_info(&adapter->pdev->dev, "PTP clock %s registered\n",
++		 adapter->ptp.info.name);
++	return 0;
 +}
 +
- /**
-  * iavf_validate_num_queues
-  * @adapter: adapter structure
-@@ -315,6 +351,45 @@ int iavf_get_vf_supported_rxdids(struct iavf_adapter *adapter)
- 	return err;
- }
++/**
++ * iavf_ptp_init - Initialize PTP support if capability was negotiated
++ * @adapter: private adapter structure
++ *
++ * Initialize PTP functionality, based on the capabilities that the PF has
++ * enabled for this VF.
++ */
++void iavf_ptp_init(struct iavf_adapter *adapter)
++{
++	struct device *dev = &adapter->pdev->dev;
++	int err;
++
++	if (WARN_ON(adapter->ptp.initialized)) {
++		dev_err(dev, "PTP functionality was already initialized!\n");
++		return;
++	}
++
++	if (!iavf_ptp_cap_supported(adapter, VIRTCHNL_1588_PTP_CAP_READ_PHC)) {
++		dev_dbg(dev, "Device does not have PTP clock support\n");
++		return;
++	}
++
++	err = iavf_ptp_register_clock(adapter);
++	if (err) {
++		dev_warn(dev, "Failed to register PTP clock device (%d)\n",
++			 err);
++		return;
++	}
++
++	adapter->ptp.initialized = true;
++}
++
++/**
++ * iavf_ptp_release - Disable PTP support
++ * @adapter: private adapter structure
++ *
++ * Release all PTP resources that were previously initialized.
++ */
++void iavf_ptp_release(struct iavf_adapter *adapter)
++{
++	adapter->ptp.initialized = false;
++
++	if (!IS_ERR_OR_NULL(adapter->ptp.clock)) {
++		dev_info(&adapter->pdev->dev, "removing PTP clock %s\n",
++			 adapter->ptp.info.name);
++		ptp_clock_unregister(adapter->ptp.clock);
++		adapter->ptp.clock = NULL;
++	}
++}
++
++/**
++ * iavf_ptp_process_caps - Handle change in PTP capabilities
++ * @adapter: private adapter structure
++ *
++ * Handle any state changes necessary due to change in PTP capabilities, such
++ * as after a device reset or change in configuration from the PF.
++ */
++void iavf_ptp_process_caps(struct iavf_adapter *adapter)
++{
++	struct device *dev = &adapter->pdev->dev;
++
++	dev_dbg(dev, "PTP capabilities changed at runtime\n");
++
++	/* Check if the device gained or lost necessary access to support the
++	 * PTP hardware clock. If so, driver must respond appropriately by
++	 * creating or destroying the PTP clock device.
++	 */
++	if (adapter->ptp.initialized &&
++	    !iavf_ptp_cap_supported(adapter, VIRTCHNL_1588_PTP_CAP_READ_PHC))
++		iavf_ptp_release(adapter);
++	else if (!adapter->ptp.initialized &&
++		 iavf_ptp_cap_supported(adapter, VIRTCHNL_1588_PTP_CAP_READ_PHC))
++		iavf_ptp_init(adapter);
++}
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.h b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
+index aee4e2da0b9a..4939c219bd18 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_ptp.h
++++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
+@@ -4,9 +4,19 @@
+ #ifndef _IAVF_PTP_H_
+ #define _IAVF_PTP_H_
  
-+int iavf_get_vf_ptp_caps(struct iavf_adapter *adapter)
-+{
-+	struct iavf_hw *hw = &adapter->hw;
-+	struct iavf_arq_event_info event;
-+	enum virtchnl_ops op;
-+	enum iavf_status err;
-+	u16 len;
++#include <linux/ptp_clock_kernel.h>
 +
-+	len =  sizeof(struct virtchnl_ptp_caps);
-+	event.buf_len = len;
-+	event.msg_buf = kzalloc(event.buf_len, GFP_KERNEL);
-+	if (!event.msg_buf) {
-+		err = -ENOMEM;
-+		goto out;
-+	}
+ /* fields used for PTP support */
+ struct iavf_ptp {
+ 	struct virtchnl_ptp_caps hw_caps;
++	bool initialized;
++	struct ptp_clock_info info;
++	struct ptp_clock *clock;
+ };
+ 
++void iavf_ptp_init(struct iavf_adapter *adapter);
++void iavf_ptp_release(struct iavf_adapter *adapter);
++void iavf_ptp_process_caps(struct iavf_adapter *adapter);
++bool iavf_ptp_cap_supported(struct iavf_adapter *adapter, u32 cap);
 +
-+	while (1) {
-+		/* When the AQ is empty, iavf_clean_arq_element will return
-+		 * nonzero and this loop will terminate.
-+		 */
-+		err = iavf_clean_arq_element(hw, &event, NULL);
-+		if (err != IAVF_SUCCESS)
-+			goto out_alloc;
-+		op = (enum virtchnl_ops)le32_to_cpu(event.desc.cookie_high);
-+		if (op == VIRTCHNL_OP_1588_PTP_GET_CAPS)
-+			break;
-+	}
-+
-+	err = (enum iavf_status)le32_to_cpu(event.desc.cookie_low);
-+	if (err)
-+		goto out_alloc;
-+
-+	memcpy(&adapter->ptp.hw_caps, event.msg_buf, min(event.msg_len, len));
-+out_alloc:
-+	kfree(event.msg_buf);
-+out:
-+	return err;
-+}
-+
- /**
-  * iavf_configure_queues
-  * @adapter: adapter structure
-@@ -2431,6 +2506,10 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 		memcpy(&adapter->supported_rxdids, msg,
- 		       min_t(u16, msglen, sizeof(adapter->supported_rxdids)));
+ #endif /* _IAVF_PTP_H_ */
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+index 096b15375b3d..ebb764e20ddf 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+@@ -2509,6 +2509,8 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
+ 	case VIRTCHNL_OP_1588_PTP_GET_CAPS:
+ 		memcpy(&adapter->ptp.hw_caps, msg,
+ 		       min_t(u16, msglen, sizeof(adapter->ptp.hw_caps)));
++		/* process any state change needed due to new capabilities */
++		iavf_ptp_process_caps(adapter);
  		break;
-+	case VIRTCHNL_OP_1588_PTP_GET_CAPS:
-+		memcpy(&adapter->ptp.hw_caps, msg,
-+		       min_t(u16, msglen, sizeof(adapter->ptp.hw_caps)));
-+		break;
  	case VIRTCHNL_OP_ENABLE_QUEUES:
  		/* enable transmits */
- 		iavf_irq_enable(adapter, true);
 -- 
 2.38.1
 
