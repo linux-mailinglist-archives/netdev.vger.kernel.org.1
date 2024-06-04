@@ -1,131 +1,136 @@
-Return-Path: <netdev+bounces-100787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C3B08FC01D
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 01:45:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 705E38FC036
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 01:53:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 591A8281DB1
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 23:45:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A16581C21871
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 23:53:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C6614D71E;
-	Tue,  4 Jun 2024 23:44:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E6F14D70E;
+	Tue,  4 Jun 2024 23:53:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4DYnlGoH"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eXmgrUVk"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DC714D6E1;
-	Tue,  4 Jun 2024 23:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE84314D449
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 23:53:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717544694; cv=none; b=jhKIw31WhFvYnKXyu0H5IsHZo7f77H+UuN1+R4PLDribxd3dsikuF2rcxsSBc7yGxeJK4X0F/qFCjvTvZF2ZlHC+1OUynEycIJCgMT76JP4yfWYALzl+cp+leMnnhzvl0dtEDxWpL3L8w3YMpEf2Ngf1YvXasrOjv4JVaEvWVC4=
+	t=1717545199; cv=none; b=XwgTykLd/BYz+dfkxrey/DlJLDli3YoGQgb7Aob/nkLPj5bvxG9u5gjTq2rFFM9mleZo3BcbrpeqOraohRGFry8/pzoaLXkh/bnqLgzQgGC07497reqmOyrpnjZUa5b0H1CQgKKYrIC3DqA49+v0gCH36KC/piUn9gYq/a9Zbjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717544694; c=relaxed/simple;
-	bh=5vLaTMhC/f80cHfutQVA8NT+YBHXfBWGgHaK2vOxNpQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fpDFON7lauewfG4hkWenVziJ1Kgl/ErIQFvYq4Oo7OjpNCysu5PTlAQGzS+/HlBl2OaFfl499s6FmqDfDvPDem2n+JKy59+AlAxmiDYY4LzFX/SMaOj2TQT/RTWHR8lG+TYxcKkdHsBl4c/3V9EiX9UtfM8V+YV1sJfQdnZQvEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4DYnlGoH; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=PhT9KFFOExWQF20U3AwXuDAmtkcJMJ2i2CdJFaJH1tU=; b=4DYnlGoH09CVVe9B8D6eWoe6IX
-	DObz3+SkqGCNdjLs+aUSWP4imauIabFyOz0tYAXBGAaspL4LEEykxzsBt1MplXhQMcu03p7QOuQAx
-	8TnzwFCM/jMxcD752sO5+qJexRWAe9BvXi/lZ0eAt2OWIDNwwpRUDYNeI+HKaBzM6AbI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sEdpV-00GqyR-E0; Wed, 05 Jun 2024 01:44:37 +0200
-Date: Wed, 5 Jun 2024 01:44:37 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Paolo Abeni <pabeni@redhat.com>,
-	Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-	Matt Turner <mattst88@gmail.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Ahern <dsahern@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Shailend Chand <shailend@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Subject: Re: [PATCH net-next v10 05/14] netdev: netdevice devmem allocator
-Message-ID: <3be107ce-3d9f-4528-b9f7-1c9e38da0688@lunn.ch>
-References: <20240530201616.1316526-1-almasrymina@google.com>
- <20240530201616.1316526-6-almasrymina@google.com>
- <bea8b8bf1630309bb004f614e4a3c7f684a6acb6.camel@redhat.com>
- <20240604121551.07192993@gandalf.local.home>
- <20240604163158.GB21513@ziepe.ca>
- <20240604124243.66203a46@gandalf.local.home>
+	s=arc-20240116; t=1717545199; c=relaxed/simple;
+	bh=Zpoq44WjqJcKjXQIxwNH1FdsFxaKOKAngaXTWh/BTD0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kKougnEd/Xh8WxIvdLsLndN9jxDaUo5xRXhZQzMmPf46sqleWAK0B0+6o2jSkUzOcXlF4PK5N5ITdZKAX6k3W+ItVAMXNfUH2nM69OF8mXuvbOaIjX/luScdf5VVmQAqWoqV3HNHqBN+bF2DGqq/iT29RpjyrOrO97o4rb1Kp4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eXmgrUVk; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: gregkh@linuxfoundation.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1717545195;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nsvW5WrtUFha+bvJijPjsgy9DS6DwvlLBlXNWCE80vw=;
+	b=eXmgrUVkEBUpU3p9t9WrhsjablrCRXDWmg2chcN6zkkIluwx/6ziwu64ZYgDmHzYgCTV0V
+	L1eH4KkCnbdYWnF76QoBNIM5MTQUfcf/hl/5/HoVSvUx5sM0K8C8Tjwuel23THKE+LrgqI
+	HMlXTMc5wOuw+d1bHCbrCp69H6bvTVk=
+X-Envelope-To: kuba@kernel.org
+X-Envelope-To: jirislaby@kernel.org
+X-Envelope-To: jonathan.lemon@gmail.com
+X-Envelope-To: linux-serial@vger.kernel.org
+X-Envelope-To: netdev@vger.kernel.org
+Message-ID: <d59e00e1-d390-4140-b34f-58eaf13baee7@linux.dev>
+Date: Wed, 5 Jun 2024 00:53:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240604124243.66203a46@gandalf.local.home>
+Subject: Re: [PATCH v2 net] ptp: ocp: adjust serial port symlink creation
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Jiri Slaby <jirislaby@kernel.org>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>, linux-serial@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240510110405.15115-1-vadim.fedorenko@linux.dev>
+ <2024051046-decimeter-devotee-076a@gregkh>
+ <cf74065c-7b68-48d8-b1af-b18ab413f732@linux.dev>
+ <2024060428-childcare-clunky-067c@gregkh>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <2024060428-childcare-clunky-067c@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-> Interesting, as I sped up the ftrace ring buffer by a substantial amount by
-> adding strategic __always_inline, noinline, likely() and unlikely()
-> throughout the code. It had to do with what was considered the fast path
-> and slow path, and not actually the size of the function. gcc got it
-> horribly wrong.
+On 04/06/2024 12:50, Greg Kroah-Hartman wrote:
+> On Wed, May 22, 2024 at 01:39:21PM +0100, Vadim Fedorenko wrote:
+>> On 10/05/2024 12:13, Greg Kroah-Hartman wrote:
+>>> On Fri, May 10, 2024 at 11:04:05AM +0000, Vadim Fedorenko wrote:
+>>>> The commit b286f4e87e32 ("serial: core: Move tty and serdev to be children
+>>>> of serial core port device") changed the hierarchy of serial port devices
+>>>> and device_find_child_by_name cannot find ttyS* devices because they are
+>>>> no longer directly attached. Add some logic to restore symlinks creation
+>>>> to the driver for OCP TimeCard.
+>>>>
+>>>> Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be children of serial core port device")
+>>>> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>>>> ---
+>>>> v2:
+>>>>    add serial/8250 maintainers
+>>>> ---
+>>>>    drivers/ptp/ptp_ocp.c | 30 +++++++++++++++++++++---------
+>>>>    1 file changed, 21 insertions(+), 9 deletions(-)
+>>>
+>>> Hi,
+>>>
+>>> This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
+>>> a patch that has triggered this response.  He used to manually respond
+>>> to these common problems, but in order to save his sanity (he kept
+>>> writing the same thing over and over, yet to different people), I was
+>>> created.  Hopefully you will not take offence and will fix the problem
+>>> in your patch and resubmit it so that it can be accepted into the Linux
+>>> kernel tree.
+>>>
+>>> You are receiving this message because of the following common error(s)
+>>> as indicated below:
+>>>
+>>> - You have marked a patch with a "Fixes:" tag for a commit that is in an
+>>>     older released kernel, yet you do not have a cc: stable line in the
+>>>     signed-off-by area at all, which means that the patch will not be
+>>>     applied to any older kernel releases.  To properly fix this, please
+>>>     follow the documented rules in the
+>>>     Documentation/process/stable-kernel-rules.rst file for how to resolve
+>>>     this.
+>>>
+>>> If you wish to discuss this problem further, or you have questions about
+>>> how to resolve this issue, please feel free to respond to this email and
+>>> Greg will reply once he has dug out from the pending patches received
+>>> from other developers.
+>>
+>> Hi Greg!
+>>
+>> Just gentle ping, I'm still looking for better solution for serial
+>> device lookup in TimeCard driver.
+> 
+> See my comment on the other patch in this thread.
+> 
+> In short, you shouldn't need to do any of this.
 
-And what did the compiler people say when you reported gcc was getting
-it wrong?
+Got it, thanks. I'll try to find another way.
 
-Our assumption is, the compiler is better than a human at deciding
-this. Or at least, a human who does not spend a long time profiling
-and tuning. If this assumption is not true, we probably should be
-trying to figure out why, and improving the compiler when
-possible. That will benefit everybody.
 
-       Andrew
+> thanks,
+> 
+> greg k-h
 
 
