@@ -1,204 +1,136 @@
-Return-Path: <netdev+bounces-100675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72E328FB8A8
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:17:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9292E8FB8AF
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:18:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94E421C24CB5
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:17:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 293261F251FF
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:18:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CFAE13D526;
-	Tue,  4 Jun 2024 16:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91E2C1482FC;
+	Tue,  4 Jun 2024 16:18:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eC1xsCLQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MfEtLhqw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A05148305;
-	Tue,  4 Jun 2024 16:16:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EDC8146A87
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 16:18:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717517799; cv=none; b=unW5wUBbOj0Da0vyiM/mVbLoMV8Otp3S9X1dFoOKXPWqk08ZvSoQ6WOVys5iiBc8iH1WUSXThtT+NA6mSvn/MHa7PCvXX20mXYajAgs34u/EU+mrgIIU1rSp93+rCOSoabb3ZJ0B2spEaoWjKHvMOxEQJYv+Tij4Unxozbxzmm4=
+	t=1717517905; cv=none; b=Pczcfy1/NbqEyvXW7x22vHviZAbpP5Mtj3AV9Ro3KQR8yATUVrtCueBYABLL+OLPoVq02glU7LIft312oNk5PJ7E8h2L/5ixLxZ7ANHJ2ikkFUvb2nt9hew40vtiJKv8NCvuxvQ8Wr3IpBzepcKj87ux3U6zb2czw5pn++DQqZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717517799; c=relaxed/simple;
-	bh=1e9RG+2Ze+kSjju4jnURgtLVyboPBj/hCLl0BkLzV0Q=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=d+kv+ZxUdQ9Gv1PTL72an4DLedgrNgXLr7q+UTpH4VJr7QrSr4/0Ox58G+OHtP+RgekJgn5cVXwZuTb2X6aKivly8n0XgELGwmiSIm8rNCG92YCrP5lVdYxtZ2JJABgnfjSQUP4ehvQ+xl0Sr2mEgNooyWLKSvtT+CkgT/Ida3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eC1xsCLQ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 454Fq8A4023070;
-	Tue, 4 Jun 2024 16:16:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
- content-transfer-encoding : content-type : date : from : in-reply-to :
- message-id : mime-version : references : subject : to; s=pp1;
- bh=ZtCksyZ8jmBRtowIXUVm+kXmHPyAtzAyf+9pX8s/W/I=;
- b=eC1xsCLQFLTbJDYWlntSfEYu9x7FLtoitYrbbuSuCvsAm+418OyjUQ9Yop/qdHld5cMc
- HCE0k6BL0J1sPLyTBKUDvsLv2dkNF/tu9ruOrtmL/hfYpoRJuim2tNuNUW7rsqBZJkFl
- 03HqZ94O9FR8mFO68zP191GbzYIvuFj8kBpxrxMrhgS5rerhMPGn+Xm9D7CeeZEaAzMH
- PftX5NXRaB6Jimm5NA7qmzxpVS/nKLeOTcKPbDHA6jq2xN+PWsMiYlYnVVzfXiN1FGCF
- STOL+DwRiY9+C+Dq2jICQaRWvcRCi0Zkquw1vO4nvW3lAkIqfC/V+2IVUH9auWVuDIun Aw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yj5xm82dx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Jun 2024 16:16:34 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 454GCs5c026187;
-	Tue, 4 Jun 2024 16:16:33 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yj5xm82dr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Jun 2024 16:16:33 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 454DvW5w022794;
-	Tue, 4 Jun 2024 16:16:32 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ygg6m6q0n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Jun 2024 16:16:32 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 454GGQ8X49086932
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 4 Jun 2024 16:16:28 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7CC6920049;
-	Tue,  4 Jun 2024 16:16:26 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3619420040;
-	Tue,  4 Jun 2024 16:16:26 +0000 (GMT)
-Received: from [9.152.224.39] (unknown [9.152.224.39])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  4 Jun 2024 16:16:26 +0000 (GMT)
-Message-ID: <cc606c7b6fb53d00d80122b987c94bd7cb385af0.camel@linux.ibm.com>
-Subject: Re: [PATCH net] net/smc: avoid overwriting when adjusting sock
- bufsizes
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, jaka@linux.ibm.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date: Tue, 04 Jun 2024 18:16:21 +0200
-In-Reply-To: <20240531085417.43104-1-guwen@linux.alibaba.com>
-References: <20240531085417.43104-1-guwen@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.52.1 (3.52.1-1.fc40app1) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 30IDO0IliIBx3wuhW8Ez_EelcRsmh699
-X-Proofpoint-GUID: qdyy8YkF-p-cxQRE0l5eaAmfYc0BlW3z
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1717517905; c=relaxed/simple;
+	bh=nPqXATH3gJO0xG3OcvVlRB8VrvjY/FhA0oPoFQeHE5g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kaWaAXQt1cevr7lX5LSmv+q5+5t3D/jJoPsqaDMmcaKFk6a02QmYjdF2VmeErsGuDRTlUCkLiVVXg4vuZccYTmAalWBv5u3yeejt1Q4d6FoGFGedEKK4r3AQCACK1PiGFrITxxNgd7mo2o1hHTNsdvn8JPLkOjwAUejSf9AII/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MfEtLhqw; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-70257104b4dso2610725b3a.1
+        for <netdev@vger.kernel.org>; Tue, 04 Jun 2024 09:18:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717517903; x=1718122703; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qdfqg+XI8I+MI3h2wU8ZL/dAxG9QlNacDO9P7kZI7gM=;
+        b=MfEtLhqw5YqEBo5Z/gPPho2xFh4bZEyajq85qVR+voM+VZTYNdpr4vGmaOb5tkzYvb
+         hjZHUkTlq+vx7jtXBqDnDNWXAuUX6J+2JXXVe86fssXzMO7DQy5sCV8ejaMYd/MIsNKL
+         QIdn+At/RtcKaHGBo0rPKgfZIX7hsSzcZXxZdX+P9jVaMZZl31k+iwbogPhwvD0BBFjw
+         DWL027nMZD3ELu7L9gnh4V31Nlk+GzzXyR7phhkdzPypf+tcwA7jCScPIAzjzRkmPn0a
+         s637czL131zlJCy+FcHMX7UzLZDMlvKUhqvgBD7QktPKMbD2ljgZC397sGbza0bFJzUr
+         Uirg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717517903; x=1718122703;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qdfqg+XI8I+MI3h2wU8ZL/dAxG9QlNacDO9P7kZI7gM=;
+        b=UWHRYmL3Xg7BspGf0x+F8P3hpKVkW3VXns1R01I18qDCywK747unUw2Lo4FMcjyJ+V
+         Tjrb2QpiNoNGUPa3x90ykkkivxCdyJGyfuOKvJou1fmD6i0x+/KVcG9CQtlKr0pNlY3B
+         3VAgrJ90B9fwwvjkwR1mzyTV8ucbVQ1VTcGSmrn+Ws5hRSS9RjlWnmqbvJ3vhYXW/Fpm
+         Iidf2A6rhRFu2kVvFEC5Igp/JEq3r7OgWyozv6MwEk71UrETByjgMe34OJqJucWbopnW
+         kSN+zYsbRDmkz1kCssKf2YXkF7ENZtB+cV2i1fTBhP+LoHGwx5PgPYTSUmfeaMOSEqOb
+         ccgw==
+X-Forwarded-Encrypted: i=1; AJvYcCWaExEMrwaU7l6FyU45nHNB3U1WOhQ/qytcV3qXWu+1xXtyvHDNza6TGsbmh54lDsuG9nseNX3Q5Io6Baj3YmVK94wN9gR4
+X-Gm-Message-State: AOJu0YzY4j/zwdPIDXmuXXKf09sNz9vjzHre4Bs8uI48cdGag7haH1gA
+	IeK/KM0C2arENXqCKUO4mGcjs5tnrKXHYfKUXLNWNdG6QiQE3KGgenukwZrwNPFqExHiyM687hQ
+	roVc2RFxrbDOs/FQR005cIWiTr6w+R0gb/Krk
+X-Google-Smtp-Source: AGHT+IHH8BcDT51//iJobaXt0VIzNrVR1B4YFM/qgQyKNVEvfCFBn+scD7t29ulO1UCUwWCXKi767BV3CuTLWi/kpUY=
+X-Received: by 2002:a05:6a20:3d94:b0:1ad:90dc:4a65 with SMTP id
+ adf61e73a8af0-1b2b6fba62amr92507637.27.1717517903068; Tue, 04 Jun 2024
+ 09:18:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-04_09,2024-06-04_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 impostorscore=0 mlxlogscore=999 spamscore=0
- malwarescore=0 phishscore=0 mlxscore=0 adultscore=0 suspectscore=0
- lowpriorityscore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2405010000 definitions=main-2406040130
+References: <20230810123057.43407-1-xuanzhuo@linux.alibaba.com>
+ <20230810123057.43407-5-xuanzhuo@linux.alibaba.com> <0b726a75574ad98200b815f173e59a5378e9df04.camel@linux.ibm.com>
+In-Reply-To: <0b726a75574ad98200b815f173e59a5378e9df04.camel@linux.ibm.com>
+From: Alexander Potapenko <glider@google.com>
+Date: Tue, 4 Jun 2024 18:17:44 +0200
+Message-ID: <CAG_fn=Wv4Tw8guW=mFYyV9T18C_qPZOxr3fwKcRkDVXm1e+iXg@mail.gmail.com>
+Subject: Re: [PATCH vhost v13 04/12] virtio_ring: support add premapped buf
+To: Ilya Leoshkevich <iii@linux.ibm.com>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, virtualization@lists.linux-foundation.org, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Christoph Hellwig <hch@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Wen Gu,
+On Tue, Jun 4, 2024 at 6:07=E2=80=AFPM Ilya Leoshkevich <iii@linux.ibm.com>=
+ wrote:
+>
+> On Thu, 2023-08-10 at 20:30 +0800, Xuan Zhuo wrote:
+> > If the vq is the premapped mode, use the sg_dma_address() directly.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  drivers/virtio/virtio_ring.c | 19 +++++++++++++++++--
+> >  1 file changed, 17 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/virtio/virtio_ring.c
+> > b/drivers/virtio/virtio_ring.c
+> > index 8e81b01e0735..f9f772e85a38 100644
+> > --- a/drivers/virtio/virtio_ring.c
+> > +++ b/drivers/virtio/virtio_ring.c
+> > @@ -361,6 +361,11 @@ static struct device *vring_dma_dev(const struct
+> > vring_virtqueue *vq)
+> >  static int vring_map_one_sg(const struct vring_virtqueue *vq, struct
+> > scatterlist *sg,
+> >                           enum dma_data_direction direction,
+> > dma_addr_t *addr)
+> >  {
+> > +     if (vq->premapped) {
+> > +             *addr =3D sg_dma_address(sg);
+> > +             return 0;
+> > +     }
+> > +
+>
+> I wonder if something needs to be done for KMSAN here, like it's done
+> by the next block in this function? I'm looking into what seems to be a
+> KMSAN false positive on s390x:
+>
+> BUG: KMSAN: uninit-value in receive_buf+0x45ca/0x6990
+>  receive_buf+0x45ca/0x6990
+>  virtnet_poll+0x17e0/0x3130
+>  net_rx_action+0x832/0x26e0
+>  handle_softirqs+0x330/0x10f0
+>  [...]
 
-sorry for the late reply, I'm just catching up after a bit of a
-vacation.
+I think there's a similar problem on x86 as well:
+https://syzkaller.appspot.com/bug?extid=3Dc5336dcd1b741349d27a
 
-On Fri, 2024-05-31 at 16:54 +0800, Wen Gu wrote:
-> When copying smc settings to clcsock, avoid setting clcsock's
-> sk_sndbuf to sysctl_tcp_wmem[1], since this may overwrite the value
-> set by tcp_sndbuf_expand() in TCP connection establishment.
->=20
-> And the other setting sk_{snd|rcv}buf to sysctl value in
-> smc_adjust_sock_bufsizes() can also be omitted since the
-> initialization of smc sock and clcsock has set sk_{snd|rcv}buf to
-> smc.sysctl_{w|r}mem or ipv4_sysctl_tcp_{w|r}mem[1].
->=20
-> Fixes: 30c3c4a4497c ("net/smc: Use correct buffer sizes when
-> switching between TCP and SMC")
-> Link:
-> https://lore.kernel.org/r/5eaf3858-e7fd-4db8-83e8-3d7a3e0e9ae2@linux.alib=
-aba.com
-> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-> ---
-> FYI,
-> The detailed motivation and testing can be found in the link above.
-> ---
-> =C2=A0net/smc/af_smc.c | 22 ++--------------------
-> =C2=A01 file changed, 2 insertions(+), 20 deletions(-)
->=20
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index 9389f0cfa374..a35281153067 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -459,29 +459,11 @@ static int smc_bind(struct socket *sock, struct
-> sockaddr *uaddr,
-> =C2=A0static void smc_adjust_sock_bufsizes(struct sock *nsk, struct sock
-> *osk,
-> =C2=A0				=C2=A0=C2=A0=C2=A0=C2=A0 unsigned long mask)
-> =C2=A0{
-> -	struct net *nnet =3D sock_net(nsk);
-> -
-> =C2=A0	nsk->sk_userlocks =3D osk->sk_userlocks;
-> -	if (osk->sk_userlocks & SOCK_SNDBUF_LOCK) {
-> +	if (osk->sk_userlocks & SOCK_SNDBUF_LOCK)
-> =C2=A0		nsk->sk_sndbuf =3D osk->sk_sndbuf;
-> -	} else {
-> -		if (mask =3D=3D SK_FLAGS_SMC_TO_CLC)
-> -			WRITE_ONCE(nsk->sk_sndbuf,
-> -				=C2=A0=C2=A0 READ_ONCE(nnet-
-> >ipv4.sysctl_tcp_wmem[1]));
-> -		else
-> -			WRITE_ONCE(nsk->sk_sndbuf,
-> -				=C2=A0=C2=A0 2 * READ_ONCE(nnet-
-> >smc.sysctl_wmem));
-> -	}
-> -	if (osk->sk_userlocks & SOCK_RCVBUF_LOCK) {
-> +	if (osk->sk_userlocks & SOCK_RCVBUF_LOCK)
-> =C2=A0		nsk->sk_rcvbuf =3D osk->sk_rcvbuf;
-> -	} else {
-> -		if (mask =3D=3D SK_FLAGS_SMC_TO_CLC)
-> -			WRITE_ONCE(nsk->sk_rcvbuf,
-> -				=C2=A0=C2=A0 READ_ONCE(nnet-
-> >ipv4.sysctl_tcp_rmem[1]));
-> -		else
-> -			WRITE_ONCE(nsk->sk_rcvbuf,
-> -				=C2=A0=C2=A0 2 * READ_ONCE(nnet-
-> >smc.sysctl_rmem));
-> -	}
-> =C2=A0}
-> =C2=A0
-> =C2=A0static void smc_copy_sock_settings(struct sock *nsk, struct sock
-> *osk,
-
-As Wenjia already said, we've discussed this a bit.
-As I remember, I've added the sections to copy over the sysctl values=20
-as a "safety measure" when moving between smc/clc sockets - but had the
-wrong assumption in mind that e.g. in a fall-back a new TCP handshake
-would be done. Apparently, we didn't test the buffer size behavior in
-these scenarios enough to notice the "weird" behavior.
-
-So we reviewed your initial report of the oddity per your message in
-the link above, too.
-
-We fully agree that if no connection at the SMC level could be
-established, you should expect the socket buffersizes be used that had
-been established for the TCP connection - regardless if the fallback is
-due to the server or the client.
-
-So feel free to add my
-Reviewed-by: Gerd Bayer <gbayer@linux.ibm.com>, too.
-
-Thanks,
-Gerd
+I was going to look closer this week.
 
