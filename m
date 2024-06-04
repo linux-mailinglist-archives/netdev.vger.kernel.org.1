@@ -1,144 +1,204 @@
-Return-Path: <netdev+bounces-100674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 955BB8FB8A6
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:16:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72E328FB8A8
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:17:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E707282CE7
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:16:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94E421C24CB5
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:17:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C904147C98;
-	Tue,  4 Jun 2024 16:16:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CFAE13D526;
+	Tue,  4 Jun 2024 16:16:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hRse4xFr"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eC1xsCLQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9399913D635;
-	Tue,  4 Jun 2024 16:16:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A05148305;
+	Tue,  4 Jun 2024 16:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717517781; cv=none; b=kn5Pdw+XilYtcnAZ8dWzujIEIhI+4WQ4WKj7kGu+w/zx6bzyEUyqH3ciieQkE4D3NPMEIV28l6uiNb7fBgTrk4e19agsRjCJvIowu8nCfp6aWAIk7itZVK5zDIs+GhOQGM4gS2TzV+Pa0wrf/d9JZWPIDMJEh6rjXkaTzgGoWp4=
+	t=1717517799; cv=none; b=unW5wUBbOj0Da0vyiM/mVbLoMV8Otp3S9X1dFoOKXPWqk08ZvSoQ6WOVys5iiBc8iH1WUSXThtT+NA6mSvn/MHa7PCvXX20mXYajAgs34u/EU+mrgIIU1rSp93+rCOSoabb3ZJ0B2spEaoWjKHvMOxEQJYv+Tij4Unxozbxzmm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717517781; c=relaxed/simple;
-	bh=XYwRliGG6vqwmqRscOEguPLD97v+obXl0lmknTVhOmU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nCoxELoJZscVBwgiQt79YRiwcQvzVsCl0PGIlXRgWj13k17SrFjKwIfs75TGKHE1tx9t5gJqaUSq8k5JCGdgNSHBgA1Mx5lsI136GzuifH1UheuBE4Z7O3PIPkkXHHVssA/+xCTUsYz4HPNaEWgD5BivSqUvoR5291rFTEYczmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hRse4xFr; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717517780; x=1749053780;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=XYwRliGG6vqwmqRscOEguPLD97v+obXl0lmknTVhOmU=;
-  b=hRse4xFrx9hvlmVeY5JYqBRgh4uN+o1N7FjbAVqUhrFNtfp9BNxVdTdl
-   RQcDhRTW0XdzmvP4JnJVBaKEJCJETDrE/C3McC5b/aP+I0oB3J5y5XuhN
-   UY7cHsCr5UJckSAphbS6VIiljCDCZL9R4k4HAgm+j7Wgmhbs9Ypox6Vd1
-   KcA8LvtTs3VVP5schKjkKzfPDC39YlRUGPpsp4mvfpxQSqFj/5o111qEF
-   sFhqxW0mvJEzzSqVdrYoa6XQJh1JhFW4jDqW2eKZzMkYnKakh7vUXQYya
-   P7c/aWyM7PkxVqfXz0+nEHJNd+d5aP3JEH4o3wov/GzhLXF0+Qc5aGjtb
-   g==;
-X-CSE-ConnectionGUID: 6CNgZH53Qs2WUhPoyTLBGg==
-X-CSE-MsgGUID: b1/wSVvBQGuWWjuoQ5h7rQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11093"; a="13919490"
-X-IronPort-AV: E=Sophos;i="6.08,214,1712646000"; 
-   d="scan'208";a="13919490"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 09:16:03 -0700
-X-CSE-ConnectionGUID: 7fkVkoAPR1a+blKuqpTKQA==
-X-CSE-MsgGUID: YOlWfs+USnOPzP+FZEWsSA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,214,1712646000"; 
-   d="scan'208";a="42400135"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa004.jf.intel.com with ESMTP; 04 Jun 2024 09:15:59 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 1948A2DC; Tue, 04 Jun 2024 19:15:57 +0300 (EEST)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH net v1 1/1] net dsa: qca8k: fix usages of device_get_named_child_node()
-Date: Tue,  4 Jun 2024 19:15:51 +0300
-Message-ID: <20240604161551.2409910-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.43.0.rc1.1336.g36b5255a03ac
+	s=arc-20240116; t=1717517799; c=relaxed/simple;
+	bh=1e9RG+2Ze+kSjju4jnURgtLVyboPBj/hCLl0BkLzV0Q=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=d+kv+ZxUdQ9Gv1PTL72an4DLedgrNgXLr7q+UTpH4VJr7QrSr4/0Ox58G+OHtP+RgekJgn5cVXwZuTb2X6aKivly8n0XgELGwmiSIm8rNCG92YCrP5lVdYxtZ2JJABgnfjSQUP4ehvQ+xl0Sr2mEgNooyWLKSvtT+CkgT/Ida3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eC1xsCLQ; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 454Fq8A4023070;
+	Tue, 4 Jun 2024 16:16:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
+ content-transfer-encoding : content-type : date : from : in-reply-to :
+ message-id : mime-version : references : subject : to; s=pp1;
+ bh=ZtCksyZ8jmBRtowIXUVm+kXmHPyAtzAyf+9pX8s/W/I=;
+ b=eC1xsCLQFLTbJDYWlntSfEYu9x7FLtoitYrbbuSuCvsAm+418OyjUQ9Yop/qdHld5cMc
+ HCE0k6BL0J1sPLyTBKUDvsLv2dkNF/tu9ruOrtmL/hfYpoRJuim2tNuNUW7rsqBZJkFl
+ 03HqZ94O9FR8mFO68zP191GbzYIvuFj8kBpxrxMrhgS5rerhMPGn+Xm9D7CeeZEaAzMH
+ PftX5NXRaB6Jimm5NA7qmzxpVS/nKLeOTcKPbDHA6jq2xN+PWsMiYlYnVVzfXiN1FGCF
+ STOL+DwRiY9+C+Dq2jICQaRWvcRCi0Zkquw1vO4nvW3lAkIqfC/V+2IVUH9auWVuDIun Aw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yj5xm82dx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Jun 2024 16:16:34 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 454GCs5c026187;
+	Tue, 4 Jun 2024 16:16:33 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yj5xm82dr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Jun 2024 16:16:33 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 454DvW5w022794;
+	Tue, 4 Jun 2024 16:16:32 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ygg6m6q0n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Jun 2024 16:16:32 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 454GGQ8X49086932
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 4 Jun 2024 16:16:28 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7CC6920049;
+	Tue,  4 Jun 2024 16:16:26 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3619420040;
+	Tue,  4 Jun 2024 16:16:26 +0000 (GMT)
+Received: from [9.152.224.39] (unknown [9.152.224.39])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  4 Jun 2024 16:16:26 +0000 (GMT)
+Message-ID: <cc606c7b6fb53d00d80122b987c94bd7cb385af0.camel@linux.ibm.com>
+Subject: Re: [PATCH net] net/smc: avoid overwriting when adjusting sock
+ bufsizes
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date: Tue, 04 Jun 2024 18:16:21 +0200
+In-Reply-To: <20240531085417.43104-1-guwen@linux.alibaba.com>
+References: <20240531085417.43104-1-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.52.1 (3.52.1-1.fc40app1) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 30IDO0IliIBx3wuhW8Ez_EelcRsmh699
+X-Proofpoint-GUID: qdyy8YkF-p-cxQRE0l5eaAmfYc0BlW3z
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-04_09,2024-06-04_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 impostorscore=0 mlxlogscore=999 spamscore=0
+ malwarescore=0 phishscore=0 mlxscore=0 adultscore=0 suspectscore=0
+ lowpriorityscore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2405010000 definitions=main-2406040130
 
-The documentation for device_get_named_child_node() mentions this
-important point:
+Hi Wen Gu,
 
-"
-The caller is responsible for calling fwnode_handle_put() on the
-returned fwnode pointer.
-"
+sorry for the late reply, I'm just catching up after a bit of a
+vacation.
 
-Add fwnode_handle_put() to avoid leaked references.
+On Fri, 2024-05-31 at 16:54 +0800, Wen Gu wrote:
+> When copying smc settings to clcsock, avoid setting clcsock's
+> sk_sndbuf to sysctl_tcp_wmem[1], since this may overwrite the value
+> set by tcp_sndbuf_expand() in TCP connection establishment.
+>=20
+> And the other setting sk_{snd|rcv}buf to sysctl value in
+> smc_adjust_sock_bufsizes() can also be omitted since the
+> initialization of smc sock and clcsock has set sk_{snd|rcv}buf to
+> smc.sysctl_{w|r}mem or ipv4_sysctl_tcp_{w|r}mem[1].
+>=20
+> Fixes: 30c3c4a4497c ("net/smc: Use correct buffer sizes when
+> switching between TCP and SMC")
+> Link:
+> https://lore.kernel.org/r/5eaf3858-e7fd-4db8-83e8-3d7a3e0e9ae2@linux.alib=
+aba.com
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> ---
+> FYI,
+> The detailed motivation and testing can be found in the link above.
+> ---
+> =C2=A0net/smc/af_smc.c | 22 ++--------------------
+> =C2=A01 file changed, 2 insertions(+), 20 deletions(-)
+>=20
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index 9389f0cfa374..a35281153067 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -459,29 +459,11 @@ static int smc_bind(struct socket *sock, struct
+> sockaddr *uaddr,
+> =C2=A0static void smc_adjust_sock_bufsizes(struct sock *nsk, struct sock
+> *osk,
+> =C2=A0				=C2=A0=C2=A0=C2=A0=C2=A0 unsigned long mask)
+> =C2=A0{
+> -	struct net *nnet =3D sock_net(nsk);
+> -
+> =C2=A0	nsk->sk_userlocks =3D osk->sk_userlocks;
+> -	if (osk->sk_userlocks & SOCK_SNDBUF_LOCK) {
+> +	if (osk->sk_userlocks & SOCK_SNDBUF_LOCK)
+> =C2=A0		nsk->sk_sndbuf =3D osk->sk_sndbuf;
+> -	} else {
+> -		if (mask =3D=3D SK_FLAGS_SMC_TO_CLC)
+> -			WRITE_ONCE(nsk->sk_sndbuf,
+> -				=C2=A0=C2=A0 READ_ONCE(nnet-
+> >ipv4.sysctl_tcp_wmem[1]));
+> -		else
+> -			WRITE_ONCE(nsk->sk_sndbuf,
+> -				=C2=A0=C2=A0 2 * READ_ONCE(nnet-
+> >smc.sysctl_wmem));
+> -	}
+> -	if (osk->sk_userlocks & SOCK_RCVBUF_LOCK) {
+> +	if (osk->sk_userlocks & SOCK_RCVBUF_LOCK)
+> =C2=A0		nsk->sk_rcvbuf =3D osk->sk_rcvbuf;
+> -	} else {
+> -		if (mask =3D=3D SK_FLAGS_SMC_TO_CLC)
+> -			WRITE_ONCE(nsk->sk_rcvbuf,
+> -				=C2=A0=C2=A0 READ_ONCE(nnet-
+> >ipv4.sysctl_tcp_rmem[1]));
+> -		else
+> -			WRITE_ONCE(nsk->sk_rcvbuf,
+> -				=C2=A0=C2=A0 2 * READ_ONCE(nnet-
+> >smc.sysctl_rmem));
+> -	}
+> =C2=A0}
+> =C2=A0
+> =C2=A0static void smc_copy_sock_settings(struct sock *nsk, struct sock
+> *osk,
 
-Fixes: 1e264f9d2918 ("net: dsa: qca8k: add LEDs basic support")
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/net/dsa/qca/qca8k-leds.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+As Wenjia already said, we've discussed this a bit.
+As I remember, I've added the sections to copy over the sysctl values=20
+as a "safety measure" when moving between smc/clc sockets - but had the
+wrong assumption in mind that e.g. in a fall-back a new TCP handshake
+would be done. Apparently, we didn't test the buffer size behavior in
+these scenarios enough to notice the "weird" behavior.
 
-diff --git a/drivers/net/dsa/qca/qca8k-leds.c b/drivers/net/dsa/qca/qca8k-leds.c
-index 811ebeeff4ed..ef529615237c 100644
---- a/drivers/net/dsa/qca/qca8k-leds.c
-+++ b/drivers/net/dsa/qca/qca8k-leds.c
-@@ -431,8 +431,10 @@ qca8k_parse_port_leds(struct qca8k_priv *priv, struct fwnode_handle *port, int p
- 		init_data.devicename = kasprintf(GFP_KERNEL, "%s:0%d",
- 						 priv->internal_mdio_bus->id,
- 						 port_num);
--		if (!init_data.devicename)
-+		if (!init_data.devicename) {
-+			fwnode_handle_put(leds);
- 			return -ENOMEM;
-+		}
- 
- 		ret = devm_led_classdev_register_ext(priv->dev, &port_led->cdev, &init_data);
- 		if (ret)
-@@ -441,6 +443,7 @@ qca8k_parse_port_leds(struct qca8k_priv *priv, struct fwnode_handle *port, int p
- 		kfree(init_data.devicename);
- 	}
- 
-+	fwnode_handle_put(leds);
- 	return 0;
- }
- 
-@@ -471,9 +474,13 @@ qca8k_setup_led_ctrl(struct qca8k_priv *priv)
- 		 * the correct port for LED setup.
- 		 */
- 		ret = qca8k_parse_port_leds(priv, port, qca8k_port_to_phy(port_num));
--		if (ret)
-+		if (ret) {
-+			fwnode_handle_put(port);
-+			fwnode_handle_put(ports);
- 			return ret;
-+		}
- 	}
- 
-+	fwnode_handle_put(ports);
- 	return 0;
- }
--- 
-2.43.0.rc1.1336.g36b5255a03ac
+So we reviewed your initial report of the oddity per your message in
+the link above, too.
 
+We fully agree that if no connection at the SMC level could be
+established, you should expect the socket buffersizes be used that had
+been established for the TCP connection - regardless if the fallback is
+due to the server or the client.
+
+So feel free to add my
+Reviewed-by: Gerd Bayer <gbayer@linux.ibm.com>, too.
+
+Thanks,
+Gerd
 
