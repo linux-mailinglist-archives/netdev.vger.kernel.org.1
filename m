@@ -1,148 +1,104 @@
-Return-Path: <netdev+bounces-100682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4376D8FB972
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:47:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE3488FB943
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:43:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2BE22B29CE4
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:43:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B6531C24100
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:43:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3140F148FFB;
-	Tue,  4 Jun 2024 16:43:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E65F51487F6;
+	Tue,  4 Jun 2024 16:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vTYCXb6v"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1BF1148847;
-	Tue,  4 Jun 2024 16:43:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6D81E501;
+	Tue,  4 Jun 2024 16:42:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717519384; cv=none; b=OlCJephw07T+5wvKsyAOGxJ1edQZ/0O0T6Y4aSahpKs3XXLgB03Fo+dCHRuNOCx2SbBWc2QED+gY7rnW3Nb8Qr0ECi8rFyhe6Ct6drLDYTpekI5vclA07hkBXtZPPeKs3SYvXYjMBTR0/n5ofKPveqKYvqlldfXp50K6aOzmi1I=
+	t=1717519380; cv=none; b=sjGmePJskeFtjCuDWCAbD6AgQhmUAkZ70+J47HT3fisDMrhFU/ks9iBFk4FpqeWA8IDbcgQJRi2q4avbWd4ghvqDuX07wEe7+69hHK20NcPIA9KJJEyQ8nOh+Fpew4txDi9LgtbEy36ahkd5zc+puxCy6ED98xw7GaYyDQ4xgBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717519384; c=relaxed/simple;
-	bh=oPp4w96Wn+D5XlEch5Zme9OLK7LhiUVGAGTFRFKOodA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CWbYMHgM1cifiFHLmlbP09OUtTS+Ry8+r19Gr0bqFWtyd+wPaV/Cj+EygfiwmeegBBZjSvzaTldp5y96y09bPFf2cXFMEAHQQqZy3rolER7p7J/LM4AbixTbhjCSsP8BJ4KQaNo1UqHfzC91m503+RhV/tS+fKrrcNewc+/KBnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0BBAC2BBFC;
-	Tue,  4 Jun 2024 16:42:46 +0000 (UTC)
-Date: Tue, 4 Jun 2024 12:42:43 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Paolo Abeni <pabeni@redhat.com>, Mina Almasry <almasrymina@google.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky
- <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, Thomas
- Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
- <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>,
- Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Masami
- Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, Arnd Bergmann <arnd@arndb.de>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
- <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan
- <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, Christian
- =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>, Pavel Begunkov
- <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Yunsheng Lin
- <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
- Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
- Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
- <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, Kaiyuan
- Zhang <kaiyuanz@google.com>
-Subject: Re: [PATCH net-next v10 05/14] netdev: netdevice devmem allocator
-Message-ID: <20240604124243.66203a46@gandalf.local.home>
-In-Reply-To: <20240604163158.GB21513@ziepe.ca>
-References: <20240530201616.1316526-1-almasrymina@google.com>
-	<20240530201616.1316526-6-almasrymina@google.com>
-	<bea8b8bf1630309bb004f614e4a3c7f684a6acb6.camel@redhat.com>
-	<20240604121551.07192993@gandalf.local.home>
-	<20240604163158.GB21513@ziepe.ca>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1717519380; c=relaxed/simple;
+	bh=AVtQe8CFoYugapmEsmqWT20D9mcrIl8sDllXLwuOlaY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FCErtDXhVk0ckl+Oa6PleuS03Ps0TzFLq4T33V19w42Yf9tKdB7GXJaxNPyKThMA1Me+ExX2GCXjdmGdEi22ZWSqXx51Haz4ruJYGfhgjx10QPOoIliT9HaBEDpY25EwfR6b2r4P2j9vR0kZW0e4ks8uYsZJdWg2fsvJmC3wfXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vTYCXb6v; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=DdfadAZSfkGpxNXKZvLe0K4hYYEeYeHrSPQP31Ta2nY=; b=vTYCXb6vG/GLCadC7Z7YyQK/Pd
+	ewdtAB6KOIPsO5rbPp62EYsYRXLFyaKBe62tQl78IIzrkyUdCbivxhLxp8vFtD/QYtwOOFGOgq7Yr
+	fyWMLA8xoHd4i4uL/KCEfl5jha8zt0PmA0XcilzRk6F+NDkjrj1nstCrfXyqAWuo09NGBtyvDbxnL
+	TP+/7ZiTdLimNXr8vCUG9EdQPAMpumgAWXbQc6aWRMxU7kZYdX/YDZaFS8BTykODSvf+aw7j9wG5r
+	S7sLN5xTs7tIxy+6cCwaxvrVhqnhuyZNn8rxBhveW4lqKn+a/EGUy9enb7+ZiTbP7zTWWVUOTphfR
+	JCmq3WDg==;
+Received: from [50.53.4.147] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sEXFM-00000003Ats-0uHJ;
+	Tue, 04 Jun 2024 16:42:52 +0000
+Message-ID: <68ae1ebb-90d7-4b4b-84a2-578b7217d5c5@infradead.org>
+Date: Tue, 4 Jun 2024 09:42:50 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/8] fwctl: Add basic structure for a class subsystem with
+ a cdev
+To: Jason Gunthorpe <jgg@nvidia.com>, Jonathan Corbet <corbet@lwn.net>,
+ Itay Avraham <itayavr@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+ Leon Romanovsky <leon@kernel.org>, linux-doc@vger.kernel.org,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Tariq Toukan <tariqt@nvidia.com>
+Cc: Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Aron Silverton <aron.silverton@oracle.com>,
+ Dan Williams <dan.j.williams@intel.com>, David Ahern <dsahern@kernel.org>,
+ Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
+ Leonid Bloch <lbloch@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+ linux-cxl@vger.kernel.org, patches@lists.linux.dev
+References: <1-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <1-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Tue, 4 Jun 2024 13:31:58 -0300
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
 
-> On Tue, Jun 04, 2024 at 12:15:51PM -0400, Steven Rostedt wrote:
-> > On Tue, 04 Jun 2024 12:13:15 +0200
-> > Paolo Abeni <pabeni@redhat.com> wrote:
-> >   
-> > > On Thu, 2024-05-30 at 20:16 +0000, Mina Almasry wrote:  
-> > > > diff --git a/net/core/devmem.c b/net/core/devmem.c
-> > > > index d82f92d7cf9ce..d5fac8edf621d 100644
-> > > > --- a/net/core/devmem.c
-> > > > +++ b/net/core/devmem.c
-> > > > @@ -32,6 +32,14 @@ static void net_devmem_dmabuf_free_chunk_owner(struct gen_pool *genpool,
-> > > >  	kfree(owner);
-> > > >  }
-> > > >  
-> > > > +static inline dma_addr_t net_devmem_get_dma_addr(const struct net_iov *niov)    
-> > > 
-> > > Minor nit: please no 'inline' keyword in c files.  
-> > 
-> > I'm curious. Is this a networking rule? I use 'inline' in my C code all the
-> > time.  
-> 
-> It mostly comes from Documentation/process/coding-style.rst:
-> 
-> 15) The inline disease
-> ----------------------
-> 
-> There appears to be a common misperception that gcc has a magic "make me
-> faster" speedup option called ``inline``. While the use of inlines can be
-> appropriate (for example as a means of replacing macros, see Chapter 12), it
-> very often is not. Abundant use of the inline keyword leads to a much bigger
-> kernel, which in turn slows the system as a whole down, due to a bigger
-> icache footprint for the CPU and simply because there is less memory
-> available for the pagecache. Just think about it; a pagecache miss causes a
-> disk seek, which easily takes 5 milliseconds. There are a LOT of cpu cycles
-> that can go into these 5 milliseconds.
-> 
-> A reasonable rule of thumb is to not put inline at functions that have more
-> than 3 lines of code in them. An exception to this rule are the cases where
-> a parameter is known to be a compiletime constant, and as a result of this
-> constantness you *know* the compiler will be able to optimize most of your
-> function away at compile time. For a good example of this later case, see
-> the kmalloc() inline function.
-> 
-> Often people argue that adding inline to functions that are static and used
-> only once is always a win since there is no space tradeoff. While this is
-> technically correct, gcc is capable of inlining these automatically without
-> help, and the maintenance issue of removing the inline when a second user
-> appears outweighs the potential value of the hint that tells gcc to do
-> something it would have done anyway.
-> 
 
-Interesting, as I sped up the ftrace ring buffer by a substantial amount by
-adding strategic __always_inline, noinline, likely() and unlikely()
-throughout the code. It had to do with what was considered the fast path
-and slow path, and not actually the size of the function. gcc got it
-horribly wrong.
+On 6/3/24 8:53 AM, Jason Gunthorpe wrote:
+> diff --git a/drivers/fwctl/Kconfig b/drivers/fwctl/Kconfig
+> new file mode 100644
+> index 00000000000000..6ceee3347ae642
+> --- /dev/null
+> +++ b/drivers/fwctl/Kconfig
+> @@ -0,0 +1,9 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +menuconfig FWCTL
+> +        tristate "fwctl device firmware access framework"
 
--- Steve
+Use tab above instead of spaces for indentation, please.
+
+> +	help
+> +	  fwctl provides a userspace API for restricted access to communicate
+> +	  with on-device firmware. The communication channel is intended to
+> +	  support a wide range of lockdown compatible device behaviors including
+> +	  manipulating device FLASH, debugging, and other activities that don't
+> +	  fit neatly into an existing subsystem.
+
+-- 
+#Randy
+https://people.kernel.org/tglx/notes-about-netiquette
+https://subspace.kernel.org/etiquette.html
 
