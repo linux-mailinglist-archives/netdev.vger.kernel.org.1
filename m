@@ -1,76 +1,122 @@
-Return-Path: <netdev+bounces-100429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A6488FA936
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 06:30:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE4E48FA97E
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 07:08:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D73001F214A6
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 04:30:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F20AF1C22A39
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 05:08:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6997A1386B9;
-	Tue,  4 Jun 2024 04:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E0513D516;
+	Tue,  4 Jun 2024 05:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="HV+GjgbM";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="JT+m5en8"
 X-Original-To: netdev@vger.kernel.org
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from wfhigh3-smtp.messagingengine.com (wfhigh3-smtp.messagingengine.com [64.147.123.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C55E8F77;
-	Tue,  4 Jun 2024 04:30:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F99177A1E;
+	Tue,  4 Jun 2024 05:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717475448; cv=none; b=uHlqlaLWOsKb0H9+nW2aP2YrnVJJa4p/DOCakttUBzBb74oVxUDAkw5S8Lwy6jk8/SFEjbLABXPwTMhUgUi9MSZL65wozRuufVi9LAbsibu7m/WlKMi6q0kO82aiZFr4gz9t0rUC+gyn0cvGHTeSdi9dsajmxzfDdIwEl44WjNw=
+	t=1717477726; cv=none; b=aJXYy5H4Cg5leuvheou/J4fWzuGRk4DWauBLSmFZ3BSn4jtWLXtjMFeQx3cvGZ78mxMhG2TNC0cIAAmP/XgUYp0a8sVg8cTvyrwA3K/V+SXzwKCcB14113DzmNFHYfCB89N6pXZqJwHE2OjkTGUauzG7fF7nK9pR2hBZz2JiDJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717475448; c=relaxed/simple;
-	bh=FrRpTyIC0TSN7vgeKaP9koVH9eDEgABWGhVAwupcyZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XI1vq7Y1el0blYK7ZynkUCDqE7w4ZshYHEFqsF3yCvTe1ypvaoTC11YPLeXmf6nD2X0sQghRroAAmDOWhmLjetJAlKpvcJy+GLFpdhyRgjKNaeyj7YyuTmf85dUhtW9D9fA897QroxXNNXB25bepbRjbZYxP/JZ7Ay5niYk1+qE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 71B6A68D15; Tue,  4 Jun 2024 06:30:41 +0200 (CEST)
-Date: Tue, 4 Jun 2024 06:30:41 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Ofir Gal <ofir.gal@volumez.com>,
-	davem@davemloft.net, linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
-	ceph-devel@vger.kernel.org, dhowells@redhat.com,
-	edumazet@google.com, pabeni@redhat.com, kbusch@kernel.org,
-	axboe@kernel.dk, sagi@grimberg.me, philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com, christoph.boehmwalder@linbit.com,
-	idryomov@gmail.com, xiubli@redhat.com
-Subject: Re: [PATCH v2 0/4] bugfix: Introduce sendpages_ok() to check
- sendpage_ok() on contiguous pages
-Message-ID: <20240604043041.GA28886@lst.de>
-References: <20240530142417.146696-1-ofir.gal@volumez.com> <20240531073214.GA19108@lst.de> <20240601153610.30a92740@kernel.org>
+	s=arc-20240116; t=1717477726; c=relaxed/simple;
+	bh=Yhs+Trzfw2UYkasFfbTkjOuR07fTN02HNrxpExajLgg=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=bvZ0RTZseKrJHFC8czay+n+vcQ20tN8amARtmjYC6PzcKsULwnUpX3Fs/O7zUb7EkTDIYzo1ybi46AzNQtWVVAIjnYFulrkHxuj/S6dF1JEq2pt8+RqLwnWLZpa19Uo6WWNkRmTraHhvHU73PV2pn2gmFrhvNampPngVXrpOebs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=HV+GjgbM; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=JT+m5en8; arc=none smtp.client-ip=64.147.123.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfhigh.west.internal (Postfix) with ESMTP id C8B2B1800160;
+	Tue,  4 Jun 2024 01:08:42 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Tue, 04 Jun 2024 01:08:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1717477722; x=1717564122; bh=O24HxZ2FR/
+	QfFJfNzwiXTjH2DTdDQikschmKkwMV0UU=; b=HV+GjgbM23DiWwvZ9MEVu4CveG
+	h/9TTrM92zxDoQQLb94Ymv3XC+3UtM7UZfmlRqOtdHfGzikRirOvO1KQjzfw5qEH
+	moha8Pv6GvcGP5DeHDkoVLQX8i0t1PqfDfCKjmKrvgsAMxrpTj1n9EPqWjJQUpU7
+	5tVLpDHKf1OVy8uL5sWsjNf0Dyjm0U5U76Un/hm4AS3WJEIn9b8GDTCeDw9P5iuE
+	UD7LglTcveQe4BYiqHP7J5s6csHIylUI9LdXpZdPCnxODpib/gJMQEdQumEl6X77
+	bYEIMXgXLMu5sa3vxNKpw6jawMZGSgF/4VtJmDGv1fmeGKhrzVesHqYdU3cw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1717477722; x=1717564122; bh=O24HxZ2FR/QfFJfNzwiXTjH2DTdD
+	QikschmKkwMV0UU=; b=JT+m5en8tm9vxgxfG7NXG3Ovb2cPHKlHz6tUerAkJTDq
+	ux8k3U0T9UfOw22vLB6/xG1rhuFDP5SaBQJeMZNMRwjUCwPXXA0hWPfpdqJdI34R
+	Mp8XbY9I07AzQAbxpcVhRtVWIY5h6Ck3J9O+loxcCn1ODlRdSqe5rv0tyOXSW4rV
+	UNFyua1I9s4tvKfcLFOsjjeP1vryWhEbiWY0fp/A2UQGFBhag8fozcvlFJqcSyPo
+	CZPwQZN+m3Kyp6Q8ZYhFjUHpjCxdifXM4f6yjuZIeLhiTbh+12CykiVKowriucMc
+	9x8hHpezXYQRLBnnmORAA94AAwO4tQB53uWX77EOSQ==
+X-ME-Sender: <xms:WaFeZhbOl4ZvAr8Sl7DqYbIGbpxPIbeUSWBudnEF_9f3FcAWzcej1Q>
+    <xme:WaFeZoafCArsDMAa-Dr_By9vgT9ptafcYDD9ZQxuj-kxX3hmHz0rHyXcvzCGX4hMo
+    biG8DQgjbcEbUvRwZg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrvdelfedgledtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
+    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:WaFeZj-o5j_ehrGCA7qjcfcvDc_eWbaduw1X-s0mUo6Tv5_Yo3mj0Q>
+    <xmx:WaFeZvqoVXFd-OQermMGYqMXHKMLrUtx8yaNvDhoQmczUuD9TRbTWQ>
+    <xmx:WaFeZspSBQa6GFMbLGFRy2sjz7nDX8xRTGO7OgNNYFYE9F6Z5huEzg>
+    <xmx:WaFeZlRYxFeBSRy2LJ8FSYkPhmvRniGjrbn1rDMG0xf_5KXpmjdPJg>
+    <xmx:WqFeZtfkjKn4RyRt9rhOVtDq-HgyYw--heVlBBho0diRzbWZIz_YgTt8>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 7D78DB6008D; Tue,  4 Jun 2024 01:08:41 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-491-g033e30d24-fm-20240520.001-g033e30d2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240601153610.30a92740@kernel.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Message-Id: <1bf553b0-bc37-4922-b480-41d965ce5224@app.fastmail.com>
+In-Reply-To: <20240603171957.11cb069f@kernel.org>
+References: <20240531152223.25591c8e@canb.auug.org.au>
+ <20240604100207.226f3ac3@canb.auug.org.au>
+ <20240603171957.11cb069f@kernel.org>
+Date: Tue, 04 Jun 2024 07:08:21 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Jakub Kicinski" <kuba@kernel.org>
+Cc: "Stephen Rothwell" <sfr@canb.auug.org.au>,
+ "David S . Miller" <davem@davemloft.net>, "Paolo Abeni" <pabeni@redhat.com>,
+ Netdev <netdev@vger.kernel.org>,
+ "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
+ linux-next <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build failure after merge of the net-next tree
+Content-Type: text/plain
 
-On Sat, Jun 01, 2024 at 03:36:10PM -0700, Jakub Kicinski wrote:
-> On Fri, 31 May 2024 09:32:14 +0200 Christoph Hellwig wrote:
-> > I still find it hightly annoying that we can't have a helper that
-> > simply does the right thing for callers, but I guess this is the
-> > best thing we can get without a change of mind from the networking
-> > maintainers..
-> 
-> Change mind about what? Did I miss a discussion?
+On Tue, Jun 4, 2024, at 02:19, Jakub Kicinski wrote:
+> On Tue, 4 Jun 2024 10:02:07 +1000 Stephen Rothwell wrote:
+>> > 
+>> >   727c94c9539a ("ethernet: octeontx2: avoid linking objects into multiple modules")
+>> > 
+>> > I have reverted that commit for today.  
+>> 
+>> Any fix for this yet?
+>
+> Arnd, do you have cycles to take a look? I don't unfortunately, if you
+> don't either perhaps revert for now?
 
-Having a net helper to just send some memory in the most efficient
-way and leave it up to the networking code to decide if it wants
-to use sendpage or sendmsg internally as needed instead of burdening
-the caller.
+Let's revert it for now. I tried reproducing it when I got the
+first report but failed, and have not had a chance to look again
+so far.
 
-This happened before sendpage_ok was added, so probably in 2020
-and most involved Dave and not you.
+     Arnd
 
