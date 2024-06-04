@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-100633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8B1F8FB66E
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 17:00:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1091E8FB670
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 17:01:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 261971C208E9
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:00:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C1E41F219CF
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A2B713CA9A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFEF813D51F;
 	Tue,  4 Jun 2024 15:00:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from chinatelecom.cn (smtpnm6-07.21cn.com [182.42.151.156])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A79D12D765
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E681EEC8
 	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 15:00:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=182.42.151.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717513255; cv=none; b=LDq5lTbeRUGq+x0+LrP2dp+rAnCAHq3SnHRZzkkqdgpZ6sdbm+82kbLWYcdxuqTaiC0AgiD8L7Hia8GY3yQpB6EW6HKiIQnXMosFSUmvusNkaHWo/V6vhxphpL3Gdw0RqB5gLNFM7WSYqNK2ENFhXv2+Afuaoi9aHCtKyq7r8PU=
+	t=1717513255; cv=none; b=Y6Zm9HVR52mL5xeqlrdGZ7alx/OZElZQty/jTF9MFJw+X+iDPFwrbyGisczAIvfMgZ6m7sUhb9Sb2V09OFXPkBf8jH3zz/SxcxBGS8Fnmf3CbUo+vbVDSpmytHja4eVuNknpLEgVJHocIePRFTZk36oTNkahkjYXnUmBh4GP9CY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717513255; c=relaxed/simple;
-	bh=mDOxQ0Q+7Kz/UFgo3/xPlIvUC1mQgM8mKRSONdkaE6o=;
+	bh=krLtQW/RcjHyBtXVaGsde+IuEb3MtB/2By5TI9swnSE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TM4swVbHrxkN5KnZvtt0lZXCo4vMq7KPa5Ix+5pf4g9ar79KzA3NHk3eUXpYDG9VIANNmixBhKKVKVSfhsLJGVMegyJvkephABFHvHUq5azJ88GrRZu1FaYTm3f+HJ9ooVVlZSqhYAKLz7igMuaTNWhl+4Y8WgqxBtnqSWsXVoU=
+	 MIME-Version; b=IQqkSNKagMbNv9E7sN5qgBIka2J4gH7G0IsP5wOxUEJz9nRu2A8+Q7E3UblVsVrYtavE2+4zA+5/5UMeMMz9tnBFC/RCord+3ZVsDkubi/igb+fvXUgrzTrsI5C0EtbXvK1hr30YsRzD/e6MCBdtRAocSCDbXIPwSS6zsXNthEA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn; spf=pass smtp.mailfrom=chinatelecom.cn; arc=none smtp.client-ip=182.42.151.156
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chinatelecom.cn
@@ -31,13 +31,13 @@ HMM_SOURCE_IP:192.168.137.232:63982.1038894331
 HMM_ATTACHE_NUM:0000
 HMM_SOURCE_TYPE:SMTP
 Received: from clientip-36.111.140.9 (unknown [192.168.137.232])
-	by chinatelecom.cn (HERMES) with SMTP id C28749BCEE;
-	Tue,  4 Jun 2024 22:50:16 +0800 (CST)
+	by chinatelecom.cn (HERMES) with SMTP id 255C39B257;
+	Tue,  4 Jun 2024 22:50:20 +0800 (CST)
 X-189-SAVE-TO-SEND: +wujianguo@chinatelecom.cn
 Received: from  ([36.111.140.9])
-	by gateway-mua-dep-b5744948-nkwsn with ESMTP id 2dcf9165decc40a4b29a93776314ba74 for netdev@vger.kernel.org;
-	Tue, 04 Jun 2024 22:50:19 CST
-X-Transaction-ID: 2dcf9165decc40a4b29a93776314ba74
+	by gateway-mua-dep-b5744948-nkwsn with ESMTP id c772be5dfe954aba991e3df430053a68 for netdev@vger.kernel.org;
+	Tue, 04 Jun 2024 22:50:23 CST
+X-Transaction-ID: c772be5dfe954aba991e3df430053a68
 X-Real-From: wujianguo@chinatelecom.cn
 X-Receive-IP: 36.111.140.9
 X-MEDUSA-Status: 0
@@ -51,11 +51,10 @@ Cc: kuba@kernel.org,
 	dsahern@kernel.org,
 	pabeni@redhat.com,
 	wujianguo106@163.com,
-	wujianguo <wujianguo@chinatelecom.cn>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net v2 1/3] seg6: fix parameter passing when calling NF_HOOK() in End.DX4 and End.DX6 behaviors
-Date: Tue,  4 Jun 2024 22:49:47 +0800
-Message-ID: <20240604144949.22729-2-wujianguo@chinatelecom.cn>
+	wujianguo <wujianguo@chinatelecom.cn>
+Subject: [PATCH net v2 2/3] selftests: add selftest for the SRv6 End.DX4 behavior with netfilter
+Date: Tue,  4 Jun 2024 22:49:48 +0800
+Message-ID: <20240604144949.22729-3-wujianguo@chinatelecom.cn>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240604144949.22729-1-wujianguo@chinatelecom.cn>
 References: <20240604144949.22729-1-wujianguo@chinatelecom.cn>
@@ -69,89 +68,370 @@ Content-Transfer-Encoding: 8bit
 
 From: Jianguo Wu <wujianguo@chinatelecom.cn>
 
-input_action_end_dx4() and input_action_end_dx6() are called NF_HOOK() for
-PREROUTING hook, in PREROUTING hook, we should passing a valid indev,
-and a NULL outdev to NF_HOOK(), otherwise may trigger a NULL pointer
-dereference, as below:
+this selftest is designed for evaluating the SRv6 End.DX4 behavior
+used with netfilter(rpfilter), in this example, for implementing
+IPv4 L3 VPN use cases.
 
-    [74830.647293] BUG: kernel NULL pointer dereference, address: 0000000000000090
-    [74830.655633] #PF: supervisor read access in kernel mode
-    [74830.657888] #PF: error_code(0x0000) - not-present page
-    [74830.659500] PGD 0 P4D 0
-    [74830.660450] Oops: 0000 [#1] PREEMPT SMP PTI
-    ...
-    [74830.664953] Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
-    [74830.666569] RIP: 0010:rpfilter_mt+0x44/0x15e [ipt_rpfilter]
-    ...
-    [74830.689725] Call Trace:
-    [74830.690402]  <IRQ>
-    [74830.690953]  ? show_trace_log_lvl+0x1c4/0x2df
-    [74830.692020]  ? show_trace_log_lvl+0x1c4/0x2df
-    [74830.693095]  ? ipt_do_table+0x286/0x710 [ip_tables]
-    [74830.694275]  ? __die_body.cold+0x8/0xd
-    [74830.695205]  ? page_fault_oops+0xac/0x140
-    [74830.696244]  ? exc_page_fault+0x62/0x150
-    [74830.697225]  ? asm_exc_page_fault+0x22/0x30
-    [74830.698344]  ? rpfilter_mt+0x44/0x15e [ipt_rpfilter]
-    [74830.699540]  ipt_do_table+0x286/0x710 [ip_tables]
-    [74830.700758]  ? ip6_route_input+0x19d/0x240
-    [74830.701752]  nf_hook_slow+0x3f/0xb0
-    [74830.702678]  input_action_end_dx4+0x19b/0x1e0
-    [74830.703735]  ? input_action_end_t+0xe0/0xe0
-    [74830.704734]  seg6_local_input_core+0x2d/0x60
-    [74830.705782]  lwtunnel_input+0x5b/0xb0
-    [74830.706690]  __netif_receive_skb_one_core+0x63/0xa0
-    [74830.707825]  process_backlog+0x99/0x140
-    [74830.709538]  __napi_poll+0x2c/0x160
-    [74830.710673]  net_rx_action+0x296/0x350
-    [74830.711860]  __do_softirq+0xcb/0x2ac
-    [74830.713049]  do_softirq+0x63/0x90
-
-input_action_end_dx4() passing a NULL indev to NF_HOOK(), and finally
-trigger a NULL dereference in rpfilter_mt()->rpfilter_is_loopback():
-
-    static bool
-    rpfilter_is_loopback(const struct sk_buff *skb,
-          	       const struct net_device *in)
-    {
-            // in is NULL
-            return skb->pkt_type == PACKET_LOOPBACK ||
-          	 in->flags & IFF_LOOPBACK;
-    }
-
-Fixes: 7a3f5b0de364 ("netfilter: add netfilter hooks to SRv6 data plane")
 Signed-off-by: Jianguo Wu <wujianguo@chinatelecom.cn>
-Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- net/ipv6/seg6_local.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ tools/testing/selftests/net/Makefile               |   1 +
+ .../selftests/net/srv6_end_dx4_netfilter_test.sh   | 335 +++++++++++++++++++++
+ 2 files changed, 336 insertions(+)
+ create mode 100644 tools/testing/selftests/net/srv6_end_dx4_netfilter_test.sh
 
-diff --git a/net/ipv6/seg6_local.c b/net/ipv6/seg6_local.c
-index 24e2b4b..c434940 100644
---- a/net/ipv6/seg6_local.c
-+++ b/net/ipv6/seg6_local.c
-@@ -941,8 +941,8 @@ static int input_action_end_dx6(struct sk_buff *skb,
- 
- 	if (static_branch_unlikely(&nf_hooks_lwtunnel_enabled))
- 		return NF_HOOK(NFPROTO_IPV6, NF_INET_PRE_ROUTING,
--			       dev_net(skb->dev), NULL, skb, NULL,
--			       skb_dst(skb)->dev, input_action_end_dx6_finish);
-+			       dev_net(skb->dev), NULL, skb, skb->dev,
-+			       NULL, input_action_end_dx6_finish);
- 
- 	return input_action_end_dx6_finish(dev_net(skb->dev), NULL, skb);
- drop:
-@@ -991,8 +991,8 @@ static int input_action_end_dx4(struct sk_buff *skb,
- 
- 	if (static_branch_unlikely(&nf_hooks_lwtunnel_enabled))
- 		return NF_HOOK(NFPROTO_IPV4, NF_INET_PRE_ROUTING,
--			       dev_net(skb->dev), NULL, skb, NULL,
--			       skb_dst(skb)->dev, input_action_end_dx4_finish);
-+			       dev_net(skb->dev), NULL, skb, skb->dev,
-+			       NULL, input_action_end_dx4_finish);
- 
- 	return input_action_end_dx4_finish(dev_net(skb->dev), NULL, skb);
- drop:
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index bd01e4a0..7a5f7dd 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -43,6 +43,7 @@ TEST_PROGS += srv6_hl2encap_red_l2vpn_test.sh
+ TEST_PROGS += srv6_end_next_csid_l3vpn_test.sh
+ TEST_PROGS += srv6_end_x_next_csid_l3vpn_test.sh
+ TEST_PROGS += srv6_end_flavors_test.sh
++TEST_PROGS += srv6_end_dx4_netfilter_test.sh
+ TEST_PROGS += vrf_strict_mode_test.sh
+ TEST_PROGS += arp_ndisc_evict_nocarrier.sh
+ TEST_PROGS += ndisc_unsolicited_na_test.sh
+diff --git a/tools/testing/selftests/net/srv6_end_dx4_netfilter_test.sh b/tools/testing/selftests/net/srv6_end_dx4_netfilter_test.sh
+new file mode 100644
+index 0000000..2ba749b
+--- /dev/null
++++ b/tools/testing/selftests/net/srv6_end_dx4_netfilter_test.sh
+@@ -0,0 +1,335 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++#
++# author: Jianguo Wu <wujianguo@chinatelecom.cn>
++#
++# Mostly copied from tools/testing/selftests/net/srv6_end_dt6_l3vpn_test.sh.
++#
++# This script is designed for testing the support of netfilter hooks for
++# SRv6 End.DX4 behavior.
++#
++# Hereafter a network diagram is shown, where one tenants (named 100) offer
++# IPv4 L3 VPN services allowing hosts to communicate with each other across
++# an IPv6 network.
++#
++# Routers rt-1 and rt-2 implement IPv4 L3 VPN services leveraging the SRv6
++# architecture. The key components for such VPNs are: a) SRv6 Encap behavior,
++# b) SRv6 End.DX4 behavior.
++#
++# To explain how an IPv4 L3 VPN based on SRv6 works, let us briefly consider an
++# example where, within the same domain of tenant 100, the host hs-1 pings
++# the host hs-2.
++#
++# First of all, L2 reachability of the host hs-2 is taken into account by
++# the router rt-1 which acts as an arp proxy.
++#
++# When the host hs-1 sends an IPv4 packet destined to hs-2, the router rt-1
++# receives the packet on the internal veth-t100 interface, rt-1 contains the
++# SRv6 Encap route for encapsulating the IPv4 packet in a IPv6 plus the Segment
++# Routing Header (SRH) packet. This packet is sent through the (IPv6) core
++# network up to the router rt-2 that receives it on veth0 interface.
++#
++# The rt-2 router uses the 'localsid' routing table to process incoming
++# IPv6+SRH packets which belong to the VPN of the tenant 100. For each of these
++# packets, the SRv6 End.DX4 behavior removes the outer IPv6+SRH headers and
++# routs the packet to the specified nexthop. Afterwards, the packet is sent to
++# the host hs-2 through the veth-t100 interface.
++#
++# The ping response follows the same processing but this time the role of rt-1
++# and rt-2 are swapped.
++#
++# And when net.netfilter.nf_hooks_lwtunnel is set to 1 in rt-1 or rt-2, and a
++# rpfilter iptables rule is added, SRv6 packets will go through netfilter PREROUTING
++# hooks.
++#
++#
++# +-------------------+                                   +-------------------+
++# |                   |                                   |                   |
++# |    hs-1 netns     |                                   |     hs-2 netns    |
++# |                   |                                   |                   |
++# |  +-------------+  |                                   |  +-------------+  |
++# |  |    veth0    |  |                                   |  |    veth0    |  |
++# |  | 10.0.0.1/24 |  |                                   |  | 10.0.0.2/24 |  |
++# |  +-------------+  |                                   |  +-------------+  |
++# |        .          |                                   |         .         |
++# +-------------------+                                   +-------------------+
++#          .                                                        .
++#          .                                                        .
++#          .                                                        .
++# +-----------------------------------+   +-----------------------------------+
++# |        .                          |   |                         .         |
++# | +---------------+                 |   |                 +---------------- |
++# | |   veth-t100   |                 |   |                 |   veth-t100   | |
++# | | 10.0.0.11/24  |    +----------+ |   | +----------+    | 10.0.0.22/24  | |
++# | +-------+-------+   |   route   | |   | |   route  |    +-------+-------- |
++# |                     |   table   | |   | |   table  |                      |
++# |                      +----------+ |   | +----------+                      |
++# |                  +--------------+ |   | +--------------+                  |
++# |                 |      veth0    | |   | |   veth0       |                 |
++# |                 | 2001:11::1/64 |.|...|.| 2001:11::2/64 |                 |
++# |                  +--------------+ |   | +--------------+                  |
++# |                                   |   |                                   |
++# |                        rt-1 netns |   | rt-2 netns                        |
++# |                                   |   |                                   |
++# +-----------------------------------+   +-----------------------------------+
++#
++# ~~~~~~~~~~~~~~~~~~~~~~~~~
++# | Network configuration |
++# ~~~~~~~~~~~~~~~~~~~~~~~~~
++#
++# rt-1: localsid table
++# +----------------------------------------------------------------+
++# |SID              |Action                                        |
++# +----------------------------------------------------------------+
++# |fc00:21:100::6004|apply SRv6 End.DX4 nh4 10.0.0.1 dev veth-t100 |
++# +----------------------------------------------------------------+
++#
++# rt-1: route table
++# +---------------------------------------------------+
++# |host       |Action                                 |
++# +---------------------------------------------------+
++# |10.0.0.2   |apply seg6 encap segs fc00:12:100::6004|
++# +---------------------------------------------------+
++# |10.0.0.0/24|forward to dev veth_t100               |
++# +---------------------------------------------------+
++#
++#
++# rt-2: localsid table
++# +---------------------------------------------------------------+
++# |SID              |Action                                       |
++# +---------------------------------------------------------------+
++# |fc00:12:100::6004|apply SRv6 End.DX4 nh4 10.0.0.2 dev veth-t100|
++# +---------------------------------------------------------------+
++#
++# rt-2: route table
++# +---------------------------------------------------+
++# |host       |Action                                 |
++# +---------------------------------------------------+
++# |10.0.0.1   |apply seg6 encap segs fc00:21:100::6004|
++# +---------------------------------------------------+
++# |10.0.0.0/24|forward to dev veth_t100               |
++# +---------------------------------------------------+
++#
++
++# Kselftest framework requirement - SKIP code is 4.
++ksft_skip=4
++
++readonly IPv6_RT_NETWORK=2001:11
++readonly IPv4_HS_NETWORK=10.0.0
++readonly SID_LOCATOR=fc00
++
++PING_TIMEOUT_SEC=4
++
++ret=0
++
++PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
++
++log_test()
++{
++	local rc=$1
++	local expected=$2
++	local msg="$3"
++
++	if [ ${rc} -eq ${expected} ]; then
++		nsuccess=$((nsuccess+1))
++		printf "\n    TEST: %-60s  [ OK ]\n" "${msg}"
++	else
++		ret=1
++		nfail=$((nfail+1))
++		printf "\n    TEST: %-60s  [FAIL]\n" "${msg}"
++		if [ "${PAUSE_ON_FAIL}" = "yes" ]; then
++			echo
++			echo "hit enter to continue, 'q' to quit"
++			read a
++			[ "$a" = "q" ] && exit 1
++		fi
++	fi
++}
++
++print_log_test_results()
++{
++	if [ "$TESTS" != "none" ]; then
++		printf "\nTests passed: %3d\n" ${nsuccess}
++		printf "Tests failed: %3d\n"   ${nfail}
++	fi
++}
++
++log_section()
++{
++	echo
++	echo "################################################################################"
++	echo "TEST SECTION: $*"
++	echo "################################################################################"
++}
++
++cleanup()
++{
++	ip link del veth-rt-1 2>/dev/null || true
++	ip link del veth-rt-2 2>/dev/null || true
++
++	# destroy routers rt-* and hosts hs-*
++	for ns in $(ip netns show | grep -E 'rt-*|hs-*'); do
++		ip netns del ${ns} || true
++	done
++}
++
++# Setup the basic networking for the routers
++setup_rt_networking()
++{
++	local rt=$1
++	local nsname=rt-${rt}
++
++	ip netns add ${nsname}
++
++	ip netns exec ${nsname} sysctl -wq net.ipv6.conf.all.accept_dad=0
++	ip netns exec ${nsname} sysctl -wq net.ipv6.conf.default.accept_dad=0
++
++	ip link set veth-rt-${rt} netns ${nsname}
++	ip -netns ${nsname} link set veth-rt-${rt} name veth0
++
++	ip -netns ${nsname} addr add ${IPv6_RT_NETWORK}::${rt}/64 dev veth0 nodad
++	ip -netns ${nsname} link set veth0 up
++	ip -netns ${nsname} link set lo up
++
++	ip netns exec ${nsname} sysctl -wq net.ipv4.ip_forward=1
++	ip netns exec ${nsname} sysctl -wq net.ipv6.conf.all.forwarding=1
++}
++
++setup_rt_netfilter()
++{
++	local rt=$1
++	local nsname=rt-${rt}
++
++	ip netns exec ${nsname} sysctl -wq net.netfilter.nf_hooks_lwtunnel=1
++	ip netns exec ${nsname} iptables -t raw -A PREROUTING -m rpfilter --invert -j DROP
++}
++
++setup_hs()
++{
++	local hs=$1
++	local rt=$2
++	local tid=$3
++	local hsname=hs-${hs}
++	local rtname=rt-${rt}
++	local rtveth=veth-t${tid}
++
++	# set the networking for the host
++	ip netns add ${hsname}
++
++	ip -netns ${hsname} link add veth0 type veth peer name ${rtveth}
++	ip -netns ${hsname} link set ${rtveth} netns ${rtname}
++	ip -netns ${hsname} addr add ${IPv4_HS_NETWORK}.${hs}/24 dev veth0
++	ip -netns ${hsname} link set veth0 up
++	ip -netns ${hsname} link set lo up
++
++	ip -netns ${rtname} addr add ${IPv4_HS_NETWORK}.${rt}${hs}/24 dev ${rtveth}
++	ip -netns ${rtname} link set ${rtveth} up
++
++	ip netns exec ${rtname} sysctl -wq net.ipv4.conf.${rtveth}.proxy_arp=1
++}
++
++setup_vpn_config()
++{
++	local hssrc=$1
++	local rtsrc=$2
++	local hsdst=$3
++	local rtdst=$4
++	local tid=$5
++
++	local hssrc_name=hs-t${tid}-${hssrc}
++	local hsdst_name=hs-t${tid}-${hsdst}
++	local rtsrc_name=rt-${rtsrc}
++	local rtdst_name=rt-${rtdst}
++	local vpn_sid=${SID_LOCATOR}:${hssrc}${hsdst}:${tid}::6004
++
++	# set the encap route for encapsulating packets which arrive from the
++	# host hssrc and destined to the access router rtsrc.
++	ip -netns ${rtsrc_name} -4 route add ${IPv4_HS_NETWORK}.${hsdst}/32 \
++		encap seg6 mode encap segs ${vpn_sid} dev veth0
++	ip -netns ${rtsrc_name} -6 route add ${vpn_sid}/128 \
++		via 2001:11::${rtdst} dev veth0
++
++	# set the decap route for decapsulating packets which arrive from
++	# the rtdst router and destined to the hsdst host.
++	ip -netns ${rtdst_name} -6 route add ${vpn_sid}/128 \
++		encap seg6local action End.DX4 nh4 ${IPv4_HS_NETWORK}.${hsdst} dev veth-t${tid}
++}
++
++setup()
++{
++	ip link add veth-rt-1 type veth peer name veth-rt-2
++	# setup the networking for router rt-1 and router rt-2
++	setup_rt_networking 1
++	setup_rt_networking 2
++
++	# setup two hosts for the tenant 100.
++	#  - host hs-1 is directly connected to the router rt-1;
++	#  - host hs-2 is directly connected to the router rt-2.
++	setup_hs 1 1 100
++	setup_hs 2 2 100
++
++	# setup the IPv4 L3 VPN which connects the host hs-1 and host hs-2.
++	setup_vpn_config 1 1 2 2 100  #args: src_host src_router dst_host dst_router tenant
++	setup_vpn_config 2 2 1 1 100
++}
++
++check_hs_connectivity()
++{
++	local hssrc=$1
++	local hsdst=$2
++	local tid=$3
++
++	ip netns exec hs-${hssrc} ping -c 1 -W ${PING_TIMEOUT_SEC} \
++		${IPv4_HS_NETWORK}.${hsdst} >/dev/null 2>&1
++}
++
++check_and_log_hs_connectivity()
++{
++	local hssrc=$1
++	local hsdst=$2
++	local tid=$3
++
++	check_hs_connectivity ${hssrc} ${hsdst} ${tid}
++	log_test $? 0 "Hosts connectivity: hs-${hssrc} -> hs-${hsdst} (tenant ${tid})"
++}
++
++host_tests()
++{
++	log_section "SRv6 VPN connectivity test among hosts in the same tenant"
++
++	check_and_log_hs_connectivity 1 2 100
++	check_and_log_hs_connectivity 2 1 100
++}
++
++router_netfilter_tests()
++{
++	log_section "SRv6 VPN connectivity test with netfilter enabled in routers"
++	setup_rt_netfilter 1
++	setup_rt_netfilter 2
++
++	check_and_log_hs_connectivity 1 2 100
++	check_and_log_hs_connectivity 2 1 100
++}
++
++if [ "$(id -u)" -ne 0 ];then
++	echo "SKIP: Need root privileges"
++	exit $ksft_skip
++fi
++
++if [ ! -x "$(command -v ip)" ]; then
++	echo "SKIP: Could not run test without ip tool"
++	exit $ksft_skip
++fi
++
++cleanup &>/dev/null
++
++setup
++
++host_tests
++router_netfilter_tests
++
++print_log_test_results
++
++cleanup &>/dev/null
++
++exit ${ret}
 -- 
 1.8.3.1
 
