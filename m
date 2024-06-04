@@ -1,95 +1,125 @@
-Return-Path: <netdev+bounces-100544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90D158FB0F2
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 13:20:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5418F8FB120
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 13:29:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42AF81F230F3
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 11:20:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5D6228325B
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 11:29:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC2F7144D3A;
-	Tue,  4 Jun 2024 11:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5575E145339;
+	Tue,  4 Jun 2024 11:29:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C/Ct0UOp"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PWcMlLRC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F831420D7
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 11:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4FD31442E3
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 11:29:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717500028; cv=none; b=j0+OB3xJUHqASJrWo6CWZVxmSXmBUMFyWZfdV66xvYu7USb25A9plwqll4LcLo5Rdsrv9NlLtTe7r42XGyDqPIWyynTGrBNEpMi1Nj6FodM4UJ1qz/tHV27mtADjv0mN5XejWmU8VdQB7S0bauUk5y8GpTZKoXVvamjjaiiLg2g=
+	t=1717500591; cv=none; b=gJQz53cR6angnqOfDcGcasW06CHbzhfDNkRT75+pfeGHtlIjiLaeyCiFoIrD0q1RD5ZYFGToXPp9ImxzXSHnCuIAQYU2pg1fv32vhUtn0RLLpDfkFQLObglgRvvWmolf3F02+dLMPbs2Vp0NV3oAxX+fY+9eumolXAeUd5GiChw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717500028; c=relaxed/simple;
-	bh=cIkgOPBPBXV0L09HZ0nfqkUPKEBCVUQiwvDhIWbcvAU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jtaQT1Yy+/INXia0d3/+Ig9DbdV6O69xe4/MEqUJX9oODpMyhnC6ypOUZhhivksMWZsTPXf5D1yaY4Aqa/hMc4mxgiDnBCVfWpE104b1isjM3W+EPD1tn2kJxbQQjxfx18VMXcq7obVu9zoLvXZ6P7gy5dYCOWz4QK5Xpc23i+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C/Ct0UOp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 66BCBC4AF07;
-	Tue,  4 Jun 2024 11:20:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717500028;
-	bh=cIkgOPBPBXV0L09HZ0nfqkUPKEBCVUQiwvDhIWbcvAU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=C/Ct0UOpmmBNSwC025zk4qTwX8RugFZIynzlxdP5TgMD5MMV1qhH8nMMUy+ijRf5a
-	 ZOjyUrvFa7DcbC0ECB0pvl1S94A079kEFRJ1qr59Wbtgq2vq5Zl8FJUquUUHZYKPhF
-	 5UJE/JpUvDDDVXGD6bfDq97ghw+IdAqU5NTKfFIDmkNXy25IbLUVWlwibV/R4fb45p
-	 wfwpILPeXavYnewT7dgZSjr3oI9iQ2InRgL32fAGJ4eac5RUq2+HvOWVLSjVaA6Vkt
-	 ztpIiieKK9ZKeQq18+IKhZW4PONeI1fOGKlZDqZD/0PyeT7+aS/PsVy1968jvS2bNr
-	 3jLdoSl5Mf1lA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 556D8DEFB90;
-	Tue,  4 Jun 2024 11:20:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1717500591; c=relaxed/simple;
+	bh=dWWSNUqYDN5ry/z+GcmaaaXs7Riv5UKJE0DQmHdqdws=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=P6AJfNym7HKbA3OlTg0EelruBCgzoiKbdIn6PEPCp5tKaN5TzutrlCzIzSaJcUL2xqOlPaVCGKlOBpzgY9pSHMY553KApFWPp5MdLHm7k6evojzsCtk6D+chIWjGjW5pV0WIbElqwNk2GLy+NtcC5ROYNiBEYIEzEUFUDgJsPjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PWcMlLRC; arc=none smtp.client-ip=95.215.58.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: linux@armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1717500586;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uAxVotTNa0Ga3e/m4xN4nXb1+mWjuU+gf6eQphyby0I=;
+	b=PWcMlLRCBWwEtb1zFIyOreTVGGZx/8yGqFqegFHe3jnkpGSbM4OcpEFp9L7PWL1oDzSlXq
+	E1D/Hp7UEG0ZmQ78SG5+ViySuTfw5KUflDkGiAU1XmFlAGVuQ/Reh66hVBt7WMVItYllus
+	cL2iLNzMKmQlVGW8F56LneAabK4nke8=
+X-Envelope-To: chenhuacai@kernel.org
+X-Envelope-To: fancer.lancer@gmail.com
+X-Envelope-To: siyanteng@loongson.cn
+X-Envelope-To: andrew@lunn.ch
+X-Envelope-To: hkallweit1@gmail.com
+X-Envelope-To: peppe.cavallaro@st.com
+X-Envelope-To: alexandre.torgue@foss.st.com
+X-Envelope-To: joabreu@synopsys.com
+X-Envelope-To: jose.abreu@synopsys.com
+X-Envelope-To: guyinggang@loongson.cn
+X-Envelope-To: netdev@vger.kernel.org
+X-Envelope-To: chris.chenfeiyang@gmail.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: tls: fix marking packets as decrypted
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171750002834.2984.5798468091342409300.git-patchwork-notify@kernel.org>
-Date: Tue, 04 Jun 2024 11:20:28 +0000
-References: <20240530232607.82686-1-kuba@kernel.org>
-In-Reply-To: <20240530232607.82686-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, sd@queasysnail.net, dhowells@redhat.com,
- borisp@nvidia.com, john.fastabend@gmail.com
+Date: Tue, 04 Jun 2024 11:29:43 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: si.yanteng@linux.dev
+Message-ID: <6ba14d835ff12f479eeced585b9336c1e6219d54@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH net-next v13 12/15] net: stmmac: Fixed failure to set
+ network speed to 1000.
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>, "Huacai Chen"
+ <chenhuacai@kernel.org>, fancer.lancer@gmail.com
+Cc: "Yanteng Si" <siyanteng@loongson.cn>, andrew@lunn.ch,
+ hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ Jose.Abreu@synopsys.com, guyinggang@loongson.cn, netdev@vger.kernel.org,
+ chris.chenfeiyang@gmail.com
+In-Reply-To: <ZlgpLm3L6EdFO60f@shell.armlinux.org.uk>
+References: <cover.1716973237.git.siyanteng@loongson.cn>
+ <e7ae2409f68a2f953ba7c823e248de7d67dfd4e9.1716973237.git.siyanteng@loongson.cn>
+ <CAAhV-H6ZJwWQOhAPmoaH4KYr66LCurKq94f87FQ05yEX6XYoNg@mail.gmail.com>
+ <ZlgpLm3L6EdFO60f@shell.armlinux.org.uk>
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
+2024=E5=B9=B45=E6=9C=8830=E6=97=A5 15:22, "Russell King (Oracle)" <linux@=
+armlinux.org.uk> =E5=86=99=E5=88=B0:
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Hi, Russell, Serge,
 
-On Thu, 30 May 2024 16:26:07 -0700 you wrote:
-> For TLS offload we mark packets with skb->decrypted to make sure
-> they don't escape the host without getting encrypted first.
-> The crypto state lives in the socket, so it may get detached
-> by a call to skb_orphan(). As a safety check - the egress path
-> drops all packets with skb->decrypted and no "crypto-safe" socket.
-> 
-> The skb marking was added to sendpage only (and not sendmsg),
-> because tls_device injected data into the TCP stack using sendpage.
-> This special case was missed when sendpage got folded into sendmsg.
-> 
-> [...]
+>=20
+>=20On Thu, May 30, 2024 at 10:25:01AM +0800, Huacai Chen wrote:
+>=20
+>=20>=20
+>=20> Hi, Yanteng,
+> >=20
+>=20>=20=20
+>=20>=20
+>=20>  The title should be "Fix ....." rather than "Fixed .....", and it =
+is
+> >=20
+>=20
+> I would avoid the ambiguous "Fix" which for stable folk imply that this
+>=20
+>=20is a bug fix - but it isn't. It's adding support for requiring 1G
+>=20
+>=20speeds to always be negotiated.
+Oh, I get it now. Thanks!
 
-Here is the summary with links:
-  - [net] net: tls: fix marking packets as decrypted
-    https://git.kernel.org/netdev/net/c/a535d5943237
+>=20
+>=20I would like this patch to be held off until more thought can be put
+>=20
+>=20into how to handle this without having a hack in the driver (stmmac
+>=20
+>=20has too many hacks and we're going to have to start saying no to
+>=20
+>=20these.)
+Yeah, you have a point there, but I would also like to hear Serge's opini=
+on.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
+Thanks,
+Yanteng
 
