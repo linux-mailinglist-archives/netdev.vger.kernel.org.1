@@ -1,97 +1,119 @@
-Return-Path: <netdev+bounces-100782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32E418FBF72
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 01:00:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 145668FBF84
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 01:03:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B295D1F23118
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 23:00:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5D84B26C72
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 23:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA59B1411EB;
-	Tue,  4 Jun 2024 23:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B30814BFA8;
+	Tue,  4 Jun 2024 23:03:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vAvpfzdT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fawe8hIk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937FA137C37
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 23:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94FE21411EB;
+	Tue,  4 Jun 2024 23:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717542029; cv=none; b=bUbUpcufxLXcMFSdd8pu2hEskp+ED8mSOJWFe19mzU4Rs8mNhsjL1spoUcGOjvHD+TGPqdLcHvFa3pPGD3TT7Er7bnamAoq0w0Qpvv+tajq0bWWarI2xBUeBkQGIyPZfO2WpuOF10m7ubQ3RsUZ07LqtXKGFfNGzwRPymhZxNGA=
+	t=1717542207; cv=none; b=i5byORIWWWrMRz+KxX7XJVZF2oAkP0KwPy1iv+5dwOGSrcOYVqmQPkQaYIqCGZDM+tKtPM8DgIfP5RDiZjcYJ6UDGJ1Iw4pIOU7aijInw4BI0kVLEV2sBOPYJGQzBfA4ZEv6kQQKxaqo7UVpqGkJNFzjt8+XhIEJOhKRK6RevpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717542029; c=relaxed/simple;
-	bh=Kz2QJnKzTNpnZG8strgA81NjQ4YFYQ0leWMuCwNAJy0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Xw5Lp6nxpRO9wvw1hkdLIh5R81Z0IPg6jvE/rtv1TD+a+jdmE2K9TNQU4Ig9iCUQ4L2FBqPcz6fhWmcxA2xZVDJg+cLmEdllsSUTh4doLiKiL0FvHilrwkPm6d4a2JDWd82escssvDkJB2VgV5Rk18xuiiXI5h8rz6SMeRVeUlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vAvpfzdT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 295E8C3277B;
-	Tue,  4 Jun 2024 23:00:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717542029;
-	bh=Kz2QJnKzTNpnZG8strgA81NjQ4YFYQ0leWMuCwNAJy0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=vAvpfzdTWG/xDLKBfg0/23cWs4NMfhR6K1n7Ml03dbXWmZSaKNI78ZpOrEizwJ71C
-	 o4zX+nrnP2MEzHL99pBRfMW7aC911FhDw76NOshxWcV7mgk4O7StTESb8vc9Y1nadq
-	 OI6KxLsHB3M942WlrGzH2in+DIJA+mkAeyFl77SNJQjuYWuh20QlfxfOAr9KtNn3Rc
-	 KU5Ef4/vlpcV4+bGjuI4KiquXmCE4xkKjj9vffXFAKnCU22oB4SaRfePwMIWZZ8adE
-	 er+xC7IONm60WQRqwveBqGSQ/6B+q8xTdL1vH5n4hM+NfHsW0H+swzgXGabzi8oHMh
-	 ww98Pc0zQZ4ng==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 16FC0DEFB90;
-	Tue,  4 Jun 2024 23:00:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1717542207; c=relaxed/simple;
+	bh=5wkVe6B4f2jQUdzLRlr/m4oXjiHPg+lAbnzfBuLuHzQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=VkT0iHH5A0ut6nhhq9yNDkOhZtd5N1u+N19afKfKEeNBWd4DsuECRZ3mmppxmrrmYuIse2Px+tDazLy1X9h2OnYu+a0BnuiLBJ017arsu7yuwqhW2ljFXjtbE49rZKge6BE2tVeHC4K7YJRXdGIyUKnPCPYRoE6mBZWw3P2A7wE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fawe8hIk; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-795186ae415so71801585a.2;
+        Tue, 04 Jun 2024 16:03:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717542204; x=1718147004; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KC9O4YKxf14DXjmcYeFKj4Ou4wMzUtvv21s1nhGSQwg=;
+        b=Fawe8hIkfDG3x10MgX/NBe3IsjsOdZDH9RUGnaYgkEZhBWs5ubXaJJETsGO1DMno5b
+         N6EfX4J84AcDMFIlvbwZNcECXJQclwdmthnseCDgDe+ed4roTCsKhxKiEtf0/GFpAWdW
+         pDCmcO4D4QfSsZhxPEWc8bWbQwSbBkEnbPJJoPTkDka23LhHUMr1hxbgGIvyB8mIxOm5
+         UYi6QNrOkrOTK3bdLnHT2okTCACSTapHsuFaudkRb1RkAe6fbKxlLvkN1nb63eMUcYlG
+         tpKn8ZAnj5Qj9fVHiYg4fcyKmQqv3YTovbnM1Ux216HyFjjnnugkGJH8nQiTI22HhC0b
+         p8EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717542204; x=1718147004;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=KC9O4YKxf14DXjmcYeFKj4Ou4wMzUtvv21s1nhGSQwg=;
+        b=w+/UC94Jb2RjTL9IUlSxjn4hxj1uFEo4khfirKQ554RULEaCicUehP4X/dhBgOKgRh
+         4CGDDRaJkLVEC22DLp58V1bOR7McR50GU4cwBu5hELQNiJV/trM53ivCmUjYLCFwgNg+
+         aqbbfJOQo44CJsqyjVkN1b6a3sVA5wzy+2xBB38wQ0VFSniipYkjo3DptOqaHdH4xCqC
+         mQ5OarYrLKSAvbGuUQ7N7FvkaP6YO8VqQ7n2vUzihORGyfVxcBg+279TyL3uGbsVC6M3
+         ktGsXNoNyF+rct31RYQmpktVgk8m49+eOj8GmKAWxeipZfvY5velZm1wfPmAQDDqrisl
+         QDbg==
+X-Forwarded-Encrypted: i=1; AJvYcCXmbLpVT9aHRQMcWZU6aboQhQcKyBqTfSyII/W2FJ0FCKoDT0ifOu0wdz9t+ffbSmcT2cM85WewNJsZ0usYuFaP2bnWAnqGMlGlKQ7hePUduR2RsYWXIihe/XJg
+X-Gm-Message-State: AOJu0YxPczNSRtbDNPyZOryRJAoqTrWYmX+1OtvMIJIxPb5kwfp2pdNo
+	wPxjOJCYqJffe+A6OTu4JP1sXoMiQXXClI6S9E/S9y9cEmHMwcP7
+X-Google-Smtp-Source: AGHT+IEqHACDMttGWwYUmx4jXqyHaql+/7merGsB1owjlaJHNPveRIW0rUybeUG6JzMYbEubYWdeFw==
+X-Received: by 2002:a05:620a:4ce:b0:795:22be:ce with SMTP id af79cd13be357-79523d3869dmr86024385a.21.1717542204376;
+        Tue, 04 Jun 2024 16:03:24 -0700 (PDT)
+Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-794f2f11fa5sm399451385a.38.2024.06.04.16.03.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jun 2024 16:03:23 -0700 (PDT)
+Date: Tue, 04 Jun 2024 19:03:23 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Magnus Karlsson <magnus.karlsson@gmail.com>, 
+ magnus.karlsson@intel.com, 
+ bjorn@kernel.org, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ netdev@vger.kernel.org, 
+ maciej.fijalkowski@intel.com, 
+ bpf@vger.kernel.org
+Cc: Magnus Karlsson <magnus.karlsson@gmail.com>, 
+ YuvalE@radware.com
+Message-ID: <665f9d3ba5a1a_2c0e4d29423@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240604122927.29080-1-magnus.karlsson@gmail.com>
+References: <20240604122927.29080-1-magnus.karlsson@gmail.com>
+Subject: Re: [PATCH bpf 0/2] Revert "xsk: support redirect to any socket bound
+ to the same umem"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute-next v1 0/2] Add support for xfrm state direction
- attribute
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171754202909.16415.296238771283765271.git-patchwork-notify@kernel.org>
-Date: Tue, 04 Jun 2024 23:00:29 +0000
-References: <20240523151707.972161-1-chopps@labn.net>
-In-Reply-To: <20240523151707.972161-1-chopps@labn.net>
-To: Christian Hopps <chopps@labn.net>
-Cc: netdev@vger.kernel.org, dsahern@gmail.com, devel@linux-ipsec.org,
- chopps@chopps.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
-
-On Thu, 23 May 2024 11:17:05 -0400 you wrote:
-> Summary of Changes:
+Magnus Karlsson wrote:
+> Revert "xsk: support redirect to any socket bound to the same umem"
 > 
->   This patchset adds support for setting the new xfrm state direction
->   attribute.
-> 
->   The change also takes into account the existing "offload" direction
->   atttribute. If the user is already setting the direction when
->   enabling offload then that direciton value is used, and the general
->   "dir in|out" need not additionally be specified.
-> 
-> [...]
+> This patch introduced a potential kernel crash when multiple napi
+> instances redirect to the same AF_XDP socket. By removing the
+> queue_index check, it is possible for multiple napi instances to
+> access the Rx ring at the same time, which will result in a corrupted
+> ring state which can lead to a crash when flushing the rings in
+> __xsk_flush(). This can happen when the linked list of sockets to
+> flush gets corrupted by concurrent accesses. A quick and small fix is
+> unfortunately not possible, so let us revert this for now.
 
-Here is the summary with links:
-  - [iproute-next,v1,1/2] xfrm: add SA direction attribute
-    (no matching commit)
-  - [iproute-next,v1,2/2] xfrm: document new SA direction option
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=7cf98ef28b61
+This is a very useful feature, to be able to use AF_XDP sockets with
+a standard RSS nic configuration.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Not all AF_XDP use cases require the absolute highest packet rate.
 
+Can this be addressed with an optional spinlock on the RxQ, only for
+this case?
 
+If there is no simple enough fix in the short term, do you plan to
+reintroduce this in another form later?
 
