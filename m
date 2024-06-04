@@ -1,188 +1,334 @@
-Return-Path: <netdev+bounces-100515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 231C18FAFC3
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 12:24:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B3038FAFE9
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 12:36:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D1421F228D5
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 10:24:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 083EF1F2199E
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 10:36:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63181448ED;
-	Tue,  4 Jun 2024 10:23:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6B9C1448FD;
+	Tue,  4 Jun 2024 10:36:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iSjDdIdt"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GbIFwz+6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB1C38B
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 10:23:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56F31420D2;
+	Tue,  4 Jun 2024 10:36:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717496636; cv=none; b=TF/28bkpl/ywoWBL0G9zUlj76wF/BbN5amMr4U717DxtzUDIaYZnfBX4kpEMdqJIIWbzuoeGQF69COkS0g1z272yWPzWYsuaEwkfeq0CnYlj7j4FYmMvL5oCEY4fmsi4Csf1Sc05LtSJbPPYagGlF42bgTQnoQCdt1ikZegHFAY=
+	t=1717497375; cv=none; b=TT6Qa6NfxZrBQvXfqOS1R+mVNH+pw1WryQyQUtt5UFU1SWZMTZa6Ot8CyV68TeXKzP4rAdq71DejLnY7UQeFQTRArljdoHy9Rz62atrnzFpeuMTdlGVkv0F9PiJoLMSQw+nr0++hYtGLHNiadYwYiL1/zALvEsUil7kgkr7XvEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717496636; c=relaxed/simple;
-	bh=3fA+ijMelVGnpHEMrovsOfjpvNZBvc0ULJRMousTutk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=VteEsaRyztwkKQEtmuJWhE5sDvpQxvirOrYQgnQTIzDcGvFQsH/X59ira48Zy3Hh0kraxx0QXxUxjkDuOkvnqC99HBfcvygU/vKQ1mnfmTccEhobKeSdDQuE/wXMpt4sm4EXEqIzLdUisaBTN8DCrEvp3clAbT2VNcNMEKiPH5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iSjDdIdt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717496634;
+	s=arc-20240116; t=1717497375; c=relaxed/simple;
+	bh=imfikOJ6FortcKm7/VnBUh3+Dm4gHD+L3ZnRei50E4E=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=gnI8UUZwUMGBVO12QyMGtGJVhZCkmDd3Q1BBpN7q6ZB0y+QGp2YkpKL4nEqD1ZbKgq86bYpMNKuDCCWZx8QZYNYocJiH9/f7PjZKShmEHyUc5KuWZnR11xbSAPqdsTonux5VJk/ppl0EBkHoz7KPkOc/d3etb4Ae+mURA21oEIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GbIFwz+6; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1600BE0008;
+	Tue,  4 Jun 2024 10:36:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1717497368;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=O6tikh5JBiLBm1a4LVwhDF58Q+DFMaskKtK9m6Z5K2w=;
-	b=iSjDdIdtNp7XgzAbulBGvkRkbxWyRbZ1JmMVoSwx9XaAL++oQP2r/gtRTda6ey45ndkYbm
-	4njAyg0Yng6pmKJ6uaqYZMszAxDz8AVc6dtXdfyOGRERLMFshQaY4DnaMgn5l9QmSyuOuI
-	b+IXJRwmNRlnYnC8Jikk54Lw3tB2NmU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-325-5LGL4eTxNeWjE-T5HdYQog-1; Tue, 04 Jun 2024 06:23:53 -0400
-X-MC-Unique: 5LGL4eTxNeWjE-T5HdYQog-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-420298ff621so3961515e9.1
-        for <netdev@vger.kernel.org>; Tue, 04 Jun 2024 03:23:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717496632; x=1718101432;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O6tikh5JBiLBm1a4LVwhDF58Q+DFMaskKtK9m6Z5K2w=;
-        b=J06SurisWi8x+lelzc8Rr5g7wHMcNq9GsF0GObo8N0xd/civPbJhj7gLNB9jPfT4Jz
-         80Oe+sj67OPI5N32q7pSkgFtCuyXMXbILp3eTDNojOX8gv0ty2JvJVDc3e5qdaLrDdPB
-         aX+Y3/iJaAxeg/zDsisl48slFtvjBkZZq42mXN3l90oOYklKpwL67VE6ou4WxarSlnom
-         Xl5HtfG8Sl6sgDv9eau4gA5beUiDrmReDgCyehEicHfReEEVMrmVSLTUbsUyj0aNsW6d
-         /0kBUWReFogKJR7XDJchTQyLrahzH3uvQk0D+VVwZeUq/hdI95YdlOx7cux1Vnd5p9Hm
-         Z7Dg==
-X-Forwarded-Encrypted: i=1; AJvYcCWkEvriwNSJdZ60U2lFuuRgz/TFlLL0naxzgD8irLVJv6U+9evRTb3MIxFjgyS3qmcObfP3F7UMHqOYdeCmPfIj8b9T8D7Q
-X-Gm-Message-State: AOJu0Yz3Okqz7jLCxs8ltTvKwDV3VRO6SvqD3izohgSv9ZI2TStMROTq
-	4DKBTItvrDYZ1o+82ktcPn6k8en9EeCapVTSlLd33ZtnCwpMfAZpphNo8ng7sUMgDMYpUxD/Px8
-	yPg++Kfj8SPjmRiL+W9tU9KGt8ira6cq4tOI5o4C6ca9M5LSiO3BKvw==
-X-Received: by 2002:a05:6000:400a:b0:35e:51cf:6908 with SMTP id ffacd0b85a97d-35e51cf6a65mr6304487f8f.0.1717496632010;
-        Tue, 04 Jun 2024 03:23:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHrhzH032AI5YL7gUIyX1AtuXBZC4N92hUDih0vFJ9VAbnPZz6xUFLcLH2nJjeRcYQ09o42TQ==
-X-Received: by 2002:a05:6000:400a:b0:35e:51cf:6908 with SMTP id ffacd0b85a97d-35e51cf6a65mr6304415f8f.0.1717496631543;
-        Tue, 04 Jun 2024 03:23:51 -0700 (PDT)
-Received: from gerbillo.redhat.com ([2a0d:3344:1b74:3a10::f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35dd04c4388sm11260215f8f.14.2024.06.04.03.23.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jun 2024 03:23:51 -0700 (PDT)
-Message-ID: <31b376371d52797894809ad8a2edd4b76a76775f.camel@redhat.com>
-Subject: Re: [PATCH net-next v10 06/14] page_pool: convert to use netmem
-From: Paolo Abeni <pabeni@redhat.com>
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org, 
-	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Donald Hunter
- <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Richard
- Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky
- <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, Thomas
- Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>, 
- Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
- Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
- <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
- Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
- <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>,  Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,  Shuah Khan
- <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, Christian
- =?ISO-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>, Pavel Begunkov
- <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe
- <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand
- <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
- linux-mm@kvack.org, Matthew Wilcox <willy@infradead.org>
-Date: Tue, 04 Jun 2024 12:23:48 +0200
-In-Reply-To: <20240530201616.1316526-7-almasrymina@google.com>
-References: <20240530201616.1316526-1-almasrymina@google.com>
-	 <20240530201616.1316526-7-almasrymina@google.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=30y8NJ0nbXLz7OQ38/S1QpE1/3/s8iRa7rwvgdvIKBA=;
+	b=GbIFwz+6OgC+URabpdYaZD8SzDVuBk4h9oHAo/DP6VJAP/N1nLdRbuLeO+LKRHqoR5A9ot
+	7apAj66Fk95+2MMwyBpPpf4DfykKcVHAOjp0F9ExIGmCI5bc7OxTwz8NQ8j7CezL6PW45I
+	Uzu9QpR2SrPIbbxzOoftMg2TJd19ezgZz/PmgDyM5gMtkaugg/PsKhTVrkCyryC8jS2+eT
+	Ow4CK360oRSQVsdPhjNIX7qy3A0CjusW6bDl9ek4x1+w3SE3ID86X6VqWC20EaigkDC2hx
+	BtTk4D+6G7yxaGPPfxYbxxesICbWw29uMJxgIF6eJT7mxr6QQ2vRwwbJvawukw==
+From: Kory Maincent <kory.maincent@bootlin.com>
+Subject: [PATCH net-next v14 00/14] net: Make timestamping selectable
+Date: Tue, 04 Jun 2024 12:36:00 +0200
+Message-Id: <20240604-feature_ptp_netnext-v14-0-bfb4632429db@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIABDuXmYC/3XQwU7DMAwG4FdBOVMUu06TcOI9EJrS1maRoJ3aU
+ g1Ne3e8CrShtcfYzuf8OZmRh8yjeX44mYHnPOa+0wPQ44Np9ql75yK3WjBosQQLUAin6Wvg3WE
+ 67DqeOj5ORSnog/OBA9VGbx4Glnxc2FejQ8VlyrxpZ5/HqR++l31ztfR/5bgqz1VhCw9JpEFfW
+ 3Yvdd9PH7l7avrPRZz9VQGgdcWrQh7Z++iAyd4r4U8hi1CtK0EVB1YIhYikvlfijYIbSry8xbk
+ KwFEUhHsF7JUhu/ExYNWxkpCTa0JMccWBGwdxwwF1BDQQCCZow4qDN05pNxxUBxsnSHWVItCKU
+ 14dh1u5SnUqbhO1pPFI/jvn8/kHarPQlLUCAAA=
+To: Florian Fainelli <florian.fainelli@broadcom.com>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Radu Pirea <radu-nicolae.pirea@oss.nxp.com>, 
+ Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
+ Simon Horman <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
+ Kory Maincent <kory.maincent@bootlin.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Alexandra Winter <wintera@linux.ibm.com>
+X-Mailer: b4 0.13.0
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, 2024-05-30 at 20:16 +0000, Mina Almasry wrote:
-> diff --git a/include/trace/events/page_pool.h b/include/trace/events/page=
-_pool.h
-> index 6834356b2d2ae..c5b6383ff2760 100644
-> --- a/include/trace/events/page_pool.h
-> +++ b/include/trace/events/page_pool.h
-> @@ -42,51 +42,52 @@ TRACE_EVENT(page_pool_release,
->  TRACE_EVENT(page_pool_state_release,
-> =20
->  	TP_PROTO(const struct page_pool *pool,
-> -		 const struct page *page, u32 release),
-> +		 netmem_ref netmem, u32 release),
+Up until now, there was no way to let the user select the hardware
+PTP provider at which time stamping occurs. The stack assumed that PHY time
+stamping is always preferred, but some MAC/PHY combinations were buggy.
 
-This causes a sparse warning, as the caller is still passing a 'page'
-argument.
+This series updates the default MAC/PHY default timestamping and aims to
+allow the user to select the desired hwtstamp provider administratively.
 
-> =20
-> -	TP_ARGS(pool, page, release),
-> +	TP_ARGS(pool, netmem, release),
-> =20
->  	TP_STRUCT__entry(
->  		__field(const struct page_pool *,	pool)
-> -		__field(const struct page *,		page)
-> +		__field(netmem_ref,			netmem)
->  		__field(u32,				release)
->  		__field(unsigned long,			pfn)
->  	),
-> =20
->  	TP_fast_assign(
->  		__entry->pool		=3D pool;
-> -		__entry->page		=3D page;
-> +		__entry->netmem		=3D netmem;
->  		__entry->release	=3D release;
-> -		__entry->pfn		=3D page_to_pfn(page);
-> +		__entry->pfn		=3D netmem_to_pfn(netmem);
->  	),
-> =20
-> -	TP_printk("page_pool=3D%p page=3D%p pfn=3D0x%lx release=3D%u",
-> -		  __entry->pool, __entry->page, __entry->pfn, __entry->release)
-> +	TP_printk("page_pool=3D%p netmem=3D%lu pfn=3D0x%lx release=3D%u",
-> +		  __entry->pool, (__force unsigned long)__entry->netmem,
-> +		  __entry->pfn, __entry->release)
->  );
-> =20
->  TRACE_EVENT(page_pool_state_hold,
-> =20
->  	TP_PROTO(const struct page_pool *pool,
-> -		 const struct page *page, u32 hold),
-> +		 netmem_ref netmem, u32 hold),
+Changes in v14:
+- Add back an EXPORT_SYMBOL() missing.
+- Link to v13: https://lore.kernel.org/r/20240529-feature_ptp_netnext-v13-0-6eda4d40fa4f@bootlin.com
 
-Same here.
+Changes in v13:
+- Add PTP builtin code to fix build errors when building PTP as a module.
+- Fix error spotted by smatch and sparse.
+- Link to v12: https://lore.kernel.org/r/20240430-feature_ptp_netnext-v12-0-2c5f24b6a914@bootlin.com
 
-Thanks,
+Changes in v12:
+- Add missing return description in the kdoc.
+- Fix few nit.
+- Link to v11: https://lore.kernel.org/r/20240422-feature_ptp_netnext-v11-0-f14441f2a1d8@bootlin.com
 
-Paolo
+Changes in v11:
+- Add netlink examples.
+- Remove a change of my out of tree marvell_ptp patch in the patch series.
+- Remove useless extern.
+- Link to v10: https://lore.kernel.org/r/20240409-feature_ptp_netnext-v10-0-0fa2ea5c89a9@bootlin.com
+
+Changes in v10:
+- Move declarations to net/core/dev.h instead of netdevice.h
+- Add netlink documentation.
+- Add ETHTOOL_A_TSINFO_GHWTSTAMP netlink attributes instead of a bit in
+  ETHTOOL_A_TSINFO_TIMESTAMPING bitset.
+- Send "Move from simple ida to xarray" patch standalone.
+- Add tsinfo ntf command.
+- Add rcu_lock protection mechanism to avoid memory leak.
+- Fixed doc and kdoc issue.
+- Link to v9: https://lore.kernel.org/r/20240226-feature_ptp_netnext-v9-0-455611549f21@bootlin.com
+
+Changes in v9:
+- Remove the RFC prefix.
+- Correct few NIT fixes.
+- Link to v8: https://lore.kernel.org/r/20240216-feature_ptp_netnext-v8-0-510f42f444fb@bootlin.com
+
+Changes in v8:
+- Drop the 6 first patch as they are now merged.
+- Change the full implementation to not be based on the hwtstamp layer
+  (MAC/PHY) but on the hwtstamp provider which mean a ptp clock and a
+  phc qualifier.
+- Made some patch to prepare the new implementation.
+- Expand netlink tsinfo instead of a new ts command for new hwtstamp
+  configuration uAPI and for dumping tsinfo of specific hwtstamp provider.
+- Link to v7: https://lore.kernel.org/r/20231114-feature_ptp_netnext-v7-0-472e77951e40@bootlin.com
+
+Changes in v7:
+- Fix a temporary build error.
+- Link to v6: https://lore.kernel.org/r/20231019-feature_ptp_netnext-v6-0-71affc27b0e5@bootlin.com
+
+Changes in v6:
+- Few fixes from the reviews.
+- Replace the allowlist to default_timestamp flag to know which phy is
+  using old API behavior.
+- Rename the timestamping layer enum values.
+- Move to a simple enum instead of the mix between enum and bitfield.
+- Update ts_info and ts-set in software timestamping case.
+
+Changes in v5:
+- Update to ndo_hwstamp_get/set. This bring several new patches.
+- Add few patches to make the glue.
+- Convert macb to ndo_hwstamp_get/set.
+- Add netlink specs description of new ethtool commands.
+- Removed netdev notifier.
+- Split the patches that expose the timestamping to userspace to separate
+  the core and ethtool development.
+- Add description of software timestamping.
+- Convert PHYs hwtstamp callback to use kernel_hwtstamp_config.
+
+Changes in v4:
+- Move on to ethtool netlink instead of ioctl.
+- Add a netdev notifier to allow packet trapping by the MAC in case of PHY
+  time stamping.
+- Add a PHY whitelist to not break the old PHY default time-stamping
+  preference API.
+
+Changes in v3:
+- Expose the PTP choice to ethtool instead of sysfs.
+  You can test it with the ethtool source on branch feature_ptp of:
+  https://github.com/kmaincent/ethtool
+- Added a devicetree binding to select the preferred timestamp.
+
+Changes in v2:
+- Move selected_timestamping_layer variable of the concerned patch.
+- Use sysfs_streq instead of strmcmp.
+- Use the PHY timestamp only if available.
+
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
+Kory Maincent (14):
+      net_tstamp: Add TIMESTAMPING SOFTWARE and HARDWARE mask
+      net: Move dev_set_hwtstamp_phylib to net/core/dev.h
+      net: Make dev_get_hwtstamp_phylib accessible
+      net: Make net_hwtstamp_validate accessible
+      net: Change the API of PHY default timestamp to MAC
+      net: net_tstamp: Add unspec field to hwtstamp_source enumeration
+      net: Add struct kernel_ethtool_ts_info
+      ptp: Add phc source and helpers to register specific PTP clock or get information
+      net: Add the possibility to support a selected hwtstamp in netdevice
+      net: netdevsim: ptp_mock: Convert to netdev_ptp_clock_register
+      net: macb: Convert to netdev_ptp_clock_register
+      net: ptp: Move ptp_clock_index() to builtin symbol
+      net: ethtool: tsinfo: Add support for hwtstamp provider and get/set hwtstamp config
+      netlink: specs: tsinfo: Enhance netlink attributes and add a set command
+
+ Documentation/netlink/specs/ethtool.yaml           |  43 +-
+ Documentation/networking/ethtool-netlink.rst       |  38 +-
+ Documentation/networking/timestamping.rst          |  35 +-
+ drivers/net/bonding/bond_main.c                    |   4 +-
+ drivers/net/can/dev/dev.c                          |   2 +-
+ drivers/net/can/peak_canfd/peak_canfd.c            |   2 +-
+ drivers/net/can/usb/gs_usb.c                       |   2 +-
+ drivers/net/can/usb/peak_usb/pcan_usb_core.c       |   2 +-
+ drivers/net/can/usb/peak_usb/pcan_usb_core.h       |   2 +-
+ drivers/net/dsa/hirschmann/hellcreek_hwtstamp.c    |   2 +-
+ drivers/net/dsa/hirschmann/hellcreek_hwtstamp.h    |   2 +-
+ drivers/net/dsa/microchip/ksz_ptp.c                |   2 +-
+ drivers/net/dsa/microchip/ksz_ptp.h                |   2 +-
+ drivers/net/dsa/mv88e6xxx/hwtstamp.c               |   2 +-
+ drivers/net/dsa/mv88e6xxx/hwtstamp.h               |   4 +-
+ drivers/net/dsa/ocelot/felix.c                     |   2 +-
+ drivers/net/dsa/sja1105/sja1105_ptp.c              |   2 +-
+ drivers/net/dsa/sja1105/sja1105_ptp.h              |   2 +-
+ drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c       |   2 +-
+ .../net/ethernet/aquantia/atlantic/aq_ethtool.c    |   2 +-
+ .../net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c    |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c  |   2 +-
+ drivers/net/ethernet/broadcom/tg3.c                |   2 +-
+ drivers/net/ethernet/cadence/macb.h                |   2 +-
+ drivers/net/ethernet/cadence/macb_main.c           |   4 +-
+ drivers/net/ethernet/cadence/macb_ptp.c            |   2 +-
+ drivers/net/ethernet/cavium/liquidio/lio_ethtool.c |   2 +-
+ .../net/ethernet/cavium/thunder/nicvf_ethtool.c    |   2 +-
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c |   2 +-
+ drivers/net/ethernet/cisco/enic/enic_ethtool.c     |   2 +-
+ drivers/net/ethernet/engleder/tsnep_ethtool.c      |   2 +-
+ drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c |   2 +-
+ .../net/ethernet/freescale/dpaa2/dpaa2-ethtool.c   |   2 +-
+ .../net/ethernet/freescale/enetc/enetc_ethtool.c   |   2 +-
+ drivers/net/ethernet/freescale/fec_main.c          |   2 +-
+ drivers/net/ethernet/freescale/gianfar_ethtool.c   |   2 +-
+ .../net/ethernet/fungible/funeth/funeth_ethtool.c  |   2 +-
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h        |   2 +-
+ drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c |   2 +-
+ .../net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c |   2 +-
+ .../net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.h |   2 +-
+ drivers/net/ethernet/intel/e1000e/ethtool.c        |   2 +-
+ drivers/net/ethernet/intel/i40e/i40e_ethtool.c     |   2 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c       |   2 +-
+ drivers/net/ethernet/intel/igb/igb_ethtool.c       |   2 +-
+ drivers/net/ethernet/intel/igc/igc_ethtool.c       |   2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c   |   2 +-
+ drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c    |   2 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_ethtool.c  |   2 +-
+ drivers/net/ethernet/mellanox/mlx4/en_ethtool.c    |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en.h       |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/en_ethtool.c   |   4 +-
+ .../ethernet/mellanox/mlx5/core/ipoib/ethtool.c    |   2 +-
+ drivers/net/ethernet/mellanox/mlxsw/spectrum.h     |   2 +-
+ .../net/ethernet/mellanox/mlxsw/spectrum_ethtool.c |   2 +-
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.c |   4 +-
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.h |  10 +-
+ drivers/net/ethernet/microchip/lan743x_ethtool.c   |   2 +-
+ .../ethernet/microchip/lan966x/lan966x_ethtool.c   |   2 +-
+ .../net/ethernet/microchip/sparx5/sparx5_ethtool.c |   2 +-
+ drivers/net/ethernet/mscc/ocelot_net.c             |   2 +-
+ drivers/net/ethernet/mscc/ocelot_ptp.c             |   2 +-
+ .../net/ethernet/pensando/ionic/ionic_ethtool.c    |   2 +-
+ drivers/net/ethernet/qlogic/qede/qede_ethtool.c    |   2 +-
+ drivers/net/ethernet/qlogic/qede/qede_ptp.c        |   2 +-
+ drivers/net/ethernet/qlogic/qede/qede_ptp.h        |   2 +-
+ drivers/net/ethernet/renesas/ravb_main.c           |   2 +-
+ drivers/net/ethernet/renesas/rswitch.c             |   2 +-
+ drivers/net/ethernet/sfc/ethtool.c                 |   2 +-
+ drivers/net/ethernet/sfc/falcon/nic.h              |   2 +-
+ drivers/net/ethernet/sfc/ptp.c                     |   2 +-
+ drivers/net/ethernet/sfc/ptp.h                     |   5 +-
+ drivers/net/ethernet/sfc/siena/ethtool.c           |   2 +-
+ drivers/net/ethernet/sfc/siena/ptp.c               |   2 +-
+ drivers/net/ethernet/sfc/siena/ptp.h               |   4 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_ethtool.c   |   2 +-
+ drivers/net/ethernet/ti/am65-cpsw-ethtool.c        |   2 +-
+ drivers/net/ethernet/ti/cpsw_ethtool.c             |   4 +-
+ drivers/net/ethernet/ti/cpsw_priv.h                |   2 +-
+ drivers/net/ethernet/ti/icssg/icssg_ethtool.c      |   2 +-
+ drivers/net/ethernet/ti/netcp_ethss.c              |   4 +-
+ drivers/net/ethernet/xscale/ixp4xx_eth.c           |   2 +-
+ drivers/net/macvlan.c                              |   2 +-
+ drivers/net/netdevsim/ethtool.c                    |   2 +-
+ drivers/net/netdevsim/netdev.c                     |  19 +-
+ drivers/net/phy/bcm-phy-ptp.c                      |   5 +-
+ drivers/net/phy/dp83640.c                          |   4 +-
+ drivers/net/phy/micrel.c                           |  10 +-
+ drivers/net/phy/mscc/mscc_ptp.c                    |   5 +-
+ drivers/net/phy/nxp-c45-tja11xx.c                  |   5 +-
+ drivers/net/phy/phy_device.c                       |  11 +
+ drivers/ptp/Makefile                               |   5 +
+ drivers/ptp/ptp_clock.c                            |  39 +-
+ drivers/ptp/ptp_clock_consumer.c                   | 172 ++++++
+ drivers/ptp/ptp_ines.c                             |   2 +-
+ drivers/ptp/ptp_mock.c                             |   4 +-
+ drivers/ptp/ptp_private.h                          |   7 +
+ drivers/s390/net/qeth_ethtool.c                    |   2 +-
+ include/linux/can/dev.h                            |   2 +-
+ include/linux/ethtool.h                            |  29 +-
+ include/linux/mii_timestamper.h                    |   2 +-
+ include/linux/net_tstamp.h                         |  16 +
+ include/linux/netdevice.h                          |   8 +-
+ include/linux/phy.h                                |  21 +-
+ include/linux/ptp_clock_kernel.h                   | 178 ++++++
+ include/linux/ptp_mock.h                           |   4 +-
+ include/net/dsa.h                                  |   2 +-
+ include/soc/mscc/ocelot.h                          |   2 +-
+ include/uapi/linux/ethtool_netlink.h               |  14 +
+ include/uapi/linux/net_tstamp.h                    |  11 +
+ net/8021q/vlan_dev.c                               |   2 +-
+ net/core/dev.h                                     |   7 +
+ net/core/dev_ioctl.c                               |  56 +-
+ net/core/timestamping.c                            |  49 +-
+ net/dsa/user.c                                     |   2 +-
+ net/ethtool/common.c                               |  40 +-
+ net/ethtool/common.h                               |   5 +-
+ net/ethtool/ioctl.c                                |  12 +-
+ net/ethtool/netlink.c                              |  16 +-
+ net/ethtool/netlink.h                              |   6 +-
+ net/ethtool/tsinfo.c                               | 641 ++++++++++++++++++++-
+ net/sched/sch_taprio.c                             |   2 +-
+ 122 files changed, 1520 insertions(+), 202 deletions(-)
+---
+base-commit: caaa6a85f0658de87358e08fb9e3768d2daf5e01
+change-id: 20231011-feature_ptp_netnext-3f278578e84b
+
+Best regards,
+-- 
+Köry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
 
