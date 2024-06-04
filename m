@@ -1,70 +1,94 @@
-Return-Path: <netdev+bounces-100486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42C2B8FAE3B
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 11:01:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F318A8FAE43
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 11:05:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EE7D1C210C5
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 09:01:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 695441F2380C
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 09:05:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5612B142E76;
-	Tue,  4 Jun 2024 09:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF86142E8F;
+	Tue,  4 Jun 2024 09:05:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="AsidLimY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iMVZl9li"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE3E4652;
-	Tue,  4 Jun 2024 09:01:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1BEF652;
+	Tue,  4 Jun 2024 09:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717491672; cv=none; b=esVvlLyh4VYb0YAkKQ6yVLusHeROAhOR/qiYSVz5JJ+xjQesNXnEO5Rls/rukUM3fcguhWdpkhFri8+7dBVmeBGZ5zM1GpxQLsHthj2LjEnTz+TAltNc/hzzV408SWtd++BM2X2okxuUKl+pnRoe4xNE131D+SCaWJnZAi2SBAo=
+	t=1717491905; cv=none; b=ne2uZh5oT5uI9ZpkLcOVj/dtjzAULtPRukfYf66h5xakTr/M4+iXgAYYRmIVr1YTgMJo1d4u5RB+dvM3sxmrIriBrnnzHLd6hCT52eVxlz+KfGfS39TSypGKaWiAjKlU0C03p7QDN37Lf2IeXzSGiG/G9DCee7ALPc6Ti8l/OH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717491672; c=relaxed/simple;
-	bh=77c9JqkTvByLnMHXjAWcS4jMhO6cdGjdlVGhwyYHjZQ=;
+	s=arc-20240116; t=1717491905; c=relaxed/simple;
+	bh=38i9QNxELC3fqCOoR3HD5LVNxT8PUyR/NiYbaTjAuQM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TNpNMtgSDWFV/+CxXDfHKj6ZjERHtuMIFICfO3p50rlDZiYiF3Ss80f4frAhUb9kdsj8hc0pSTTdFbh6wbDyM1bgMUuOqH6lZp7gmok3VNoLyd4Lo8EwzWSJly14b9E+2vCXdPdkruqEQTXz2Scq1ePvTKY0Z9+ihXl8aCWFlyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=AsidLimY; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 45F2220B915A; Tue,  4 Jun 2024 02:01:10 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 45F2220B915A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1717491670;
-	bh=UQ3dE+N/0pFO6FIyT3FNM4hfEUPHqbcPEwjKMAJv84M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AsidLimY5TPpyvOLbjRWzCVqbqAUnF7dDloZafb856Z1DJsm5Z1Nq/RYsydZSy0ro
-	 DcOYptWLGpA7fc+3cMVqo+SQkxHI7EaFpLkJUr0xqAkc4WmoHwwoTQvhp+ZklDCxDH
-	 6JqNAXLTvTTWeLz5NgyF15mjLaiaH91MFA/oy7Aw=
-Date: Tue, 4 Jun 2024 02:01:10 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: linux-hardening@vger.kernel.org, netdev@vger.kernel.org,
-	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, Colin Ian King <colin.i.king@gmail.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Kees Cook <keescook@chromium.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Long Li <longli@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH net-next v3] net: mana: Allow variable size indirection
- table
-Message-ID: <20240604090110.GA11436@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1717169861-15825-1-git-send-email-shradhagupta@linux.microsoft.com>
- <20240603084122.GK3884@unreal>
- <20240604053648.GA14220@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <20240604083205.GM3884@unreal>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nUBrFlldbfqWHABxF4fjH7pDiLsnixZPMdzEFsXf+q3SzHCFLpfGC5M338F1KTGbIOht14Rm/w0iE92beukeB+RM2lTBUG0lR2Ak4S5AT2amJ99j8B5O6fUdQ+wE0MLmC2542e7yQVdFH2/cQF0Hyj48FGMAhZsPwjZI06ysySw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iMVZl9li; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2e73359b8fbso73524471fa.2;
+        Tue, 04 Jun 2024 02:05:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717491902; x=1718096702; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ra/05RG+I2wv8KgtJlT+4wpFEIAZV3HX8GrU0T/bo6E=;
+        b=iMVZl9lio35X8hI84+Qvf+M0shU2VEjkkY//ywhZLacMBmqBJpeslXobEF0LF2B1FR
+         f47UCE7Y2PKbNXV5gJwHIr1F2V3ddSfgLDupLddmhjpLNgPotjfyFp5K2F/JjBs843+z
+         +bCo7TasHmY4Nbv3j9OJgREOOXozK+gM/VgjP1XYbP45mADDXJrfMzFzxevSv+HLEOZO
+         3igM9bs4mR/yiXPy/bm/NG0ytebUNYcisaMBQFFKPL5yFiX7tyZMh/5p7hiuNCvmWRQv
+         VT3Cr4wSHNo94LFKJcxWvwC1/LkuHppUSqr5HnMC9KRHbH6Xhmn6idArTAJYW8ABTFV8
+         cPRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717491902; x=1718096702;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ra/05RG+I2wv8KgtJlT+4wpFEIAZV3HX8GrU0T/bo6E=;
+        b=aeEfOTpKMiC63GW6xAZyUv7+shR0UMUb/0PWLCKm0lWfYrf/hLimKLsTWXnEB934jU
+         OJFv6koJXxCINlwwFZ4EMkkLRFi8fzez7A/oPXxltuunGJRhHJlbc4bRPzWKQX+9lTkK
+         1Wp7QvL8KaWJLj0vr1S9iS2EI4NBnqUFPqny1meC8R/goHWbwKULg3V7jwkTAZFKYsC/
+         VMsyhe5NxCrJWHc5riFUn955gXQgetRpa9ehRlYqt8jFuruj7kLlmEAOLBOcN6genUS2
+         pvEnKl6ZyRz0b/Cfd6JKX+LVn0I46Z5d9H4+ejr4/qYayfFQWfDdE3tgadVkYEKVvDH1
+         uPQw==
+X-Forwarded-Encrypted: i=1; AJvYcCVx0JLna5ue4HzCwfH3L/ITLy6u34dcZYksSWdTv3McKLOeL01yBnJG24vxAQenI+5j2Se+vmr2RUAWiNKB017MQU+LLSY3f9dXapjSVQsP3gmu46TYgcyKXRS2x2F5RGeaD3/TYlr9d7782ZUY7xy5gZ4OEE/FwbGLy+I03k3Kww==
+X-Gm-Message-State: AOJu0YzR7Hpr9DqJ6I/+FcVklbmIuBbPrZ8gAri20hdky0OTefsfTXkD
+	JYmultd7S7YKvpPzSI/Aco5CG4IqdjCoFleyh8KLuooI/unhIJtg
+X-Google-Smtp-Source: AGHT+IGxu8ZeKox/ETHOIGY9tQlCyxdSpOaMcwX3b4V+1NwYwnwZiIpRFm6IZBuIp5wxpDQGIUfJ0A==
+X-Received: by 2002:a2e:3c0b:0:b0:2e5:3f56:2a0e with SMTP id 38308e7fff4ca-2ea9516108emr89381841fa.24.1717491901400;
+        Tue, 04 Jun 2024 02:05:01 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ea91bb4e24sm14583141fa.55.2024.06.04.02.04.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jun 2024 02:05:00 -0700 (PDT)
+Date: Tue, 4 Jun 2024 12:04:57 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Jose Abreu <Jose.Abreu@synopsys.com>, Vladimir Oltean <olteanv@gmail.com>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+	Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Sagar Cheluvegowda <quic_scheluve@quicinc.com>, Abhishek Chauhan <quic_abchauha@quicinc.com>, 
+	Andrew Halaney <ahalaney@redhat.com>, Jiawen Wu <jiawenwu@trustnetic.com>, 
+	Mengyuan Lou <mengyuanlou@net-swift.com>, Tomer Maimon <tmaimon77@gmail.com>, openbmc@lists.ozlabs.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v2 10/10] net: stmmac: Add DW XPCS specified via
+ "pcs-handle" support
+Message-ID: <equlcrx6dgdtrmrlnxxhdunpghw46sjcyn5z6m6lszyiddbag4@eo6oeotzsxef>
+References: <20240602143636.5839-1-fancer.lancer@gmail.com>
+ <20240602143636.5839-11-fancer.lancer@gmail.com>
+ <2lpomvxhmh7bxqhkuexukztwzjfblulobepmnc4g4us7leldgp@o3a3zgnpua2a>
+ <Zl2G+gK8qpBjGpb3@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,82 +97,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240604083205.GM3884@unreal>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <Zl2G+gK8qpBjGpb3@shell.armlinux.org.uk>
 
-On Tue, Jun 04, 2024 at 11:32:05AM +0300, Leon Romanovsky wrote:
-> On Mon, Jun 03, 2024 at 10:36:48PM -0700, Shradha Gupta wrote:
-> > On Mon, Jun 03, 2024 at 11:41:22AM +0300, Leon Romanovsky wrote:
-> > > On Fri, May 31, 2024 at 08:37:41AM -0700, Shradha Gupta wrote:
-> > > > Allow variable size indirection table allocation in MANA instead
-> > > > of using a constant value MANA_INDIRECT_TABLE_SIZE.
-> > > > The size is now derived from the MANA_QUERY_VPORT_CONFIG and the
-> > > > indirection table is allocated dynamically.
-> > > > 
-> > > > Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> > > > Reviewed-by: Dexuan Cui <decui@microsoft.com>
-> > > > Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> > > > ---
-> > > >  Changes in v3:
-> > > >  * Fixed the memory leak(save_table) in mana_set_rxfh()
-> > > > 
-> > > >  Changes in v2:
-> > > >  * Rebased to latest net-next tree
-> > > >  * Rearranged cleanup code in mana_probe_port to avoid extra operations
-> > > > ---
-> > > >  drivers/infiniband/hw/mana/qp.c               | 10 +--
-> > > >  drivers/net/ethernet/microsoft/mana/mana_en.c | 68 ++++++++++++++++---
-> > > >  .../ethernet/microsoft/mana/mana_ethtool.c    | 27 +++++---
-> > > >  include/net/mana/gdma.h                       |  4 +-
-> > > >  include/net/mana/mana.h                       |  9 +--
-> > > >  5 files changed, 89 insertions(+), 29 deletions(-)
-> > > 
-> > > <...>
-> > > 
-> > > > +free_indir:
-> > > > +	apc->indir_table_sz = 0;
-> > > > +	kfree(apc->indir_table);
-> > > > +	apc->indir_table = NULL;
-> > > > +	kfree(apc->rxobj_table);
-> > > > +	apc->rxobj_table = NULL;
-> > > >  reset_apc:
-> > > >  	kfree(apc->rxqs);
-> > > >  	apc->rxqs = NULL;
-> > > > @@ -2897,6 +2936,7 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
-> > > >  {
-> > > 
-> > > <...>
-> > > 
-> > > > @@ -2931,6 +2972,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
-> > > >  		}
-> > > >  
-> > > >  		unregister_netdevice(ndev);
-> > > > +		apc->indir_table_sz = 0;
-> > > > +		kfree(apc->indir_table);
-> > > > +		apc->indir_table = NULL;
-> > > > +		kfree(apc->rxobj_table);
-> > > > +		apc->rxobj_table = NULL;
-> > > 
-> > > Why do you need to NULLify here? Will apc is going to be accessible
-> > > after call to mana_remove? or port probe failure?
-> > Right, they won't be accessed. This is just for the sake of completeness
-> > and to prevent double free in case there are code bug in other place.
-> 
-> This coding patter is called defensive programming, which is discouraged
-> in the kernel. You are not preventing double free, but hiding bugs which
-> were possible to be found by various static analysis tools.
-> 
-> Please don't do it.
-> 
-> Thanks
-Understood, it makes sense. Let me fix this in the next version.
-
-Regards,
-Shradha
-> 
+On Mon, Jun 03, 2024 at 10:03:54AM +0100, Russell King (Oracle) wrote:
+> On Mon, Jun 03, 2024 at 11:54:22AM +0300, Serge Semin wrote:
+> > >  	if (priv->plat->pcs_init) {
+> > >  		ret = priv->plat->pcs_init(priv);
 > > 
-> > Regards,
-> > Shradha.
-> > > 
-> > > Thanks
+> > > +	} else if (fwnode_property_present(devnode, "pcs-handle")) {
+> > > +		pcsnode = fwnode_find_reference(devnode, "pcs-handle", 0);
+> > > +		xpcs = xpcs_create_fwnode(pcsnode, mode);
+> > > +		fwnode_handle_put(pcsnode);
+> > > +		ret = PTR_ERR_OR_ZERO(xpcs);
+> > 
+> > Just figured, we might wish to be a bit more portable in the
+> > "pcs-handle" property semantics implementation seeing there can be at
+> > least three different PCS attached:
+> > DW XPCS
+> > Lynx PCS
+> > Renesas RZ/N1 MII
+> > 
+> > Any suggestion of how to distinguish the passed handle? Perhaps
+> > named-property, phandle argument, by the compatible string or the
+> > node-name?
+> 
+
+> I can't think of a reasonable solution to this at the moment. One
+> solution could be pushing this down into the platform code to deal
+> with as an interim solution, via the new .pcs_init() method.
+> 
+> We could also do that with the current XPCS code, since we know that
+> only Intel mGBE uses xpcs. This would probably allow us to get rid
+> of the has_xpcs flag.
+
+Basically you suggest to move the entire stmmac_pcs_setup() to the
+platforms, don't you? The patch 9 of this series indeed could have
+been converted to just moving the entire PCS-detection loop from
+stmmac_pcs_setup() to the Intel-specific pcs_init.
+
+But IMO some default/generic code would be still useful to preserve in
+the stmmac_pcs_setup() method. When it comes to the fwnode-based
+platform we at least could be falling back to the default DW XPCS
+device registration if no plat_stmmacenet_data::pcs_init() callback
+was specified and there was the "pcs-handle" property found,
+especially seeing DW *MAC and DW XPCS are of the same vendor.
+
+Based on that I can convert patch 9 of this series to introducing the
+pcs_init() callback in the Intel mGBE driver, but preserve the
+semantics of the rest of the series changes.
+
+-Serge(y)
+
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
