@@ -1,109 +1,91 @@
-Return-Path: <netdev+bounces-100704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 704498FB9B6
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:59:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F4288FBA54
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 19:27:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A9392862F9
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:59:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 906371C23B39
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 17:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AAEF149C42;
-	Tue,  4 Jun 2024 16:59:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B534149E17;
+	Tue,  4 Jun 2024 17:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="IJv/LLEy"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="MxWm7+sx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3402149C52
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 16:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0063F149C79;
+	Tue,  4 Jun 2024 17:27:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717520340; cv=none; b=YCg7jsxfr37pMAPbH1Qr/sP89bDE17PayWP/hiQ5VNzXhToSu1vYgsj1y5iArCpHVZc+VTG01hL45nVHe+2i1VoCI6TJ9VRrls9iloxDCJhnTmhnbAL6KrlP1W+kwHC8nub9zY5gjsjU+/ND3x48LmW6vnhZ4qkMD4ctNCyBxt4=
+	t=1717522032; cv=none; b=hAFaDMmSDGVqAyA4B1f5n1RXfgY8rsQLbUvdMCfWPz4D28BCIeWyqxThQjqsfDC23oLWeeDqAbJ+Lb20I68eDRR4g6x05kJsU2e11xxwChGk6aPDd3aqcNwtQz5V+4xy+sJ1bG4wuzkta+u/RD3T9Ee48T8M7efUlu21Yh5ktFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717520340; c=relaxed/simple;
-	bh=MBJjFkMhwoQJmnMUmwwiH+pxWgGUoAcEXnqKyoKhd+I=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Cppm6v2Knp2f8uznGGH9X821TMBzvrHePtz7+F1VceueKaHjGKjaEb1NLNwSOPj+gHCXCqRRMsuJ5XJ7dpTu/MXcmkeM/hIXyjZ+AE7rpFySbtEijMAtMgcNHfdpvVXt520SZDK7gPBZSV5HLZazSePqxM8fup89GdROyCB4B6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=IJv/LLEy; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1717520338; x=1749056338;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=z1acvs1ZNXRVsRS7AINdnhXqQUeE7/TeczdK/Vifgw8=;
-  b=IJv/LLEyWltnA89aaWmOEt0DEMmPDnGgFSiJ7R9utRQwGcHapyaYBsoM
-   TDhyid2Z9p1a4RhHgnZLWkcNySYQsy6OgIAbWsYJn9YQckq2MXgLHeEeK
-   lKjghI0d8pNSKBNm7DDOLh9vRU7Xc+BPsvYOTWavqyQ1vFaFsocFptO5Z
-   w=;
-X-IronPort-AV: E=Sophos;i="6.08,214,1712620800"; 
-   d="scan'208";a="94131827"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 16:58:56 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:27227]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.48.63:2525] with esmtp (Farcaster)
- id ee33d9e8-b74f-4438-897c-6b1f883c5203; Tue, 4 Jun 2024 16:58:56 +0000 (UTC)
-X-Farcaster-Flow-ID: ee33d9e8-b74f-4438-897c-6b1f883c5203
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Tue, 4 Jun 2024 16:58:55 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.50) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Tue, 4 Jun 2024 16:58:53 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net 15/15] af_unix: Annotate data-race of sk->sk_shutdown in sk_diag_fill().
-Date: Tue, 4 Jun 2024 09:52:41 -0700
-Message-ID: <20240604165241.44758-16-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240604165241.44758-1-kuniyu@amazon.com>
-References: <20240604165241.44758-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1717522032; c=relaxed/simple;
+	bh=RIzXKfDhl9Ekyd2nhcKmDBuTQNp0l4FlcxM2THRKcW8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pPyR9StoCBpzr84YGVzKqoYEGeCQ1f3hrAshbLo2e1tohrN3qsJ3FHVs1tJxNRApiABkJWIK2r+YXccACTQXCYYhsaxcZtkw+B+punV2vV8RUwLnVsA8UJEFk3QFwWpIOjoNPAr60sCaZVAjZdOZ+XSRL3E3lMcU22ADwlsmt2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=MxWm7+sx; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 58E348850B;
+	Tue,  4 Jun 2024 19:27:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1717522029;
+	bh=RIzXKfDhl9Ekyd2nhcKmDBuTQNp0l4FlcxM2THRKcW8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MxWm7+sxwnNHjOYrokKndvjjtTOEgiXXEqEBJfhOZeEm/RDMoowQfgTCy18mwlQO7
+	 P9yInaFPTrPVlhOIEdM/R5V+J+JoRyD8+VKGrNM4spXpa1+DSRrW7ZttLo9uQLzNWA
+	 O3Fyy0EV30fSclVXanY84g/FhPLJ93TcAuwL1Mfid2plXKLHsyykavTNphD45F9Pvc
+	 rqWThod9miilq2SMNkFgHtPMoNi15+ENPgyK3Mbuu2Obp8pR3jVS1Z7YI+Gts8jZWg
+	 a/72cQZbCQ9XZgn33Qf7RWBqhcFY/R/fAasZG3Yj+Y/ScZWGvuKjmMGVdzfIUVuE+v
+	 UojIe7iTOTPTA==
+Message-ID: <c2242ba3-3692-4c5f-a979-0d0e80f23629@denx.de>
+Date: Tue, 4 Jun 2024 18:52:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWC004.ant.amazon.com (10.13.139.206) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 10/11] ARM: dts: stm32: add ethernet1 for
+ STM32MP135F-DK board
+To: Christophe Roullier <christophe.roullier@foss.st.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Richard Cochran <richardcochran@gmail.com>, Jose Abreu
+ <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240604143502.154463-1-christophe.roullier@foss.st.com>
+ <20240604143502.154463-11-christophe.roullier@foss.st.com>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <20240604143502.154463-11-christophe.roullier@foss.st.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-While dumping sockets via UNIX_DIAG, we do not hold unix_state_lock().
+On 6/4/24 4:35 PM, Christophe Roullier wrote:
+> Ethernet1: RMII with crystal
+> PHY used is SMSC (LAN8742A)
 
-Let's use READ_ONCE() to read sk->sk_shutdown.
-
-Fixes: e4e541a84863 ("sock-diag: Report shutdown for inet and unix sockets (v2)")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/unix/diag.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/unix/diag.c b/net/unix/diag.c
-index 321336f91a0a..937edf4afed4 100644
---- a/net/unix/diag.c
-+++ b/net/unix/diag.c
-@@ -165,7 +165,7 @@ static int sk_diag_fill(struct sock *sk, struct sk_buff *skb, struct unix_diag_r
- 	    sock_diag_put_meminfo(sk, skb, UNIX_DIAG_MEMINFO))
- 		goto out_nlmsg_trim;
- 
--	if (nla_put_u8(skb, UNIX_DIAG_SHUTDOWN, sk->sk_shutdown))
-+	if (nla_put_u8(skb, UNIX_DIAG_SHUTDOWN, READ_ONCE(sk->sk_shutdown)))
- 		goto out_nlmsg_trim;
- 
- 	if ((req->udiag_show & UDIAG_SHOW_UID) &&
--- 
-2.30.2
-
+Doesn't the STM32MP135F-DK come with two ethernet ports ?
+Why not enable both ?
 
