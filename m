@@ -1,83 +1,180 @@
-Return-Path: <netdev+bounces-100705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 948298FB9C9
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 19:04:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADBEB8FB9F3
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 19:07:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57DFD281F8B
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 17:04:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C2471F2711A
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 17:07:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 511C1146A7A;
-	Tue,  4 Jun 2024 17:04:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ByN3WWcp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A67D114A0B6;
+	Tue,  4 Jun 2024 17:06:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4F42AF16
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 17:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EEAC14A0A9;
+	Tue,  4 Jun 2024 17:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717520642; cv=none; b=bvzYMMaRag+u2sg5+SM8tIVd/FxPnDsDytAXVNNhcVCI/FNnS57XnfmdZ7eoE6xLAurTZyg+P5Q5hyJ4spzWljLB+t+o31MKxQIe6o7FT3Iw+fwO0ZZmUP952fkDhnf5WhriwPsJC7MToCQDJ0C3jiIPprygZSJiLlGqIHMbs+k=
+	t=1717520783; cv=none; b=jRJUebQevlIabXkA1tFVNN6UdMMshsvGePvg1w0D/a7CftZ05WE/L8EK27/7K+fxV0Me4VnfoUShEfKe4XWgQk3zOMPqX5AwvmwlDCv9nOzSBN80l+h1iLTdFdl7FNareb8Y0yJhbZHZV5jH6EgfotXNpEcOM77o89aKeR07lpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717520642; c=relaxed/simple;
-	bh=wuLcJEDBcJsZ3NaLcPDL3HcDMXAbQYto+i/8CFtwcog=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YWRpF/ok/8ytuNtxOlnMv95zNKdoiBiQ6z1cXQY2uY7nNVQ+npUuiTovcYhnd+Y3oMAJ/5+G0f2M7to3XDMfJUCCpg28wQcGeXPQVFl6m/yLUErPbXyfjV6XqWAGOiHRNnFCw/LcsIVDVfjtipNtvABjhBWgF/cwBleM2WnLKjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ByN3WWcp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE674C2BBFC;
-	Tue,  4 Jun 2024 17:03:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717520641;
-	bh=wuLcJEDBcJsZ3NaLcPDL3HcDMXAbQYto+i/8CFtwcog=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ByN3WWcpMotwrLU6VexuORAXzspGOfqqLJhRRUgTP/ysDG68E+5lcISRZF+m7uv4q
-	 zHQi8xt1+7WJFwcoZcf4E933p2SgEDwrWvPsJF0oeIbMHBA9lmQLLehuZYEZqUFCX1
-	 c3YMVSOLygUv3QXV9itH6eftmDMWrQ2DRPHRbITB4FlaNOsJynrs03QF7pk/k3u2Ns
-	 T1I948gEPD1BCpfrtI1f6MMXDOZ/W2M+JD4FhOqIrusrjvlKboYKvkg0/WzasB+LmA
-	 4QwVV6BVKgJD0h5BgKaqYADGxKeKQbukdJiodLsTOfBtuj481AV9Rz+YaGFzlM0oBA
-	 PH7RjOYhsbt3g==
-Date: Tue, 4 Jun 2024 18:03:57 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, dsahern@kernel.org, netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next] net: allow rps/rfs related configs to be
- switched
-Message-ID: <20240604170357.GB791188@kernel.org>
-References: <20240531164440.13292-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1717520783; c=relaxed/simple;
+	bh=nMub7fB/QtlS4oR8KJcOZ9lRXmuFltunoQGGtWqHGuY=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fWhlV64WQjjGtyeVAtuhoQ8RFgj+XMYpwcTlGU/ZdvlsVyOu8zSLw76y4292iGQayQpFKrRnOraZfhKPHdoqkvzQoO/fXasyBGPxF3x9TGdB/nfcbj7HdlVEfEfujTfjqqUo1/feQclPhRAZkaG/nM0jLJMCnD/6tD947LNK8lQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Vtxlz03rpz6K9Sn;
+	Wed,  5 Jun 2024 01:04:47 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id C322A140A87;
+	Wed,  5 Jun 2024 01:05:56 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 4 Jun
+ 2024 18:05:56 +0100
+Date: Tue, 4 Jun 2024 18:05:55 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Leon Romanovsky <leon@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Itay
+ Avraham <itayavr@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed
+	<saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Andy Gospodarek
+	<andrew.gospodarek@broadcom.com>, Aron Silverton <aron.silverton@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>, "David Ahern" <dsahern@kernel.org>,
+	Christoph Hellwig <hch@infradead.org>, "Jiri Pirko" <jiri@nvidia.com>, Leonid
+ Bloch <lbloch@nvidia.com>, <linux-cxl@vger.kernel.org>,
+	<patches@lists.linux.dev>
+Subject: Re: [PATCH 1/8] fwctl: Add basic structure for a class subsystem
+ with a cdev
+Message-ID: <20240604180555.000063c2@Huawei.com>
+In-Reply-To: <20240604155009.GJ19897@nvidia.com>
+References: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+	<1-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+	<20240604093219.GN3884@unreal>
+	<20240604155009.GJ19897@nvidia.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240531164440.13292-1-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Sat, Jun 01, 2024 at 12:44:40AM +0800, Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
+On Tue, 4 Jun 2024 12:50:09 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Tue, Jun 04, 2024 at 12:32:19PM +0300, Leon Romanovsky wrote:
+> > > +static struct fwctl_device *
+> > > +_alloc_device(struct device *parent, const struct fwctl_ops *ops, size_t size)
+> > > +{
+> > > +	struct fwctl_device *fwctl __free(kfree) = kzalloc(size, GFP_KERNEL);
+> > > +
+> > > +	if (!fwctl)
+> > > +		return NULL;  
+> > 
+> > <...>
+> >   
+> > > +/* Drivers use the fwctl_alloc_device() wrapper */
+> > > +struct fwctl_device *_fwctl_alloc_device(struct device *parent,
+> > > +					 const struct fwctl_ops *ops,
+> > > +					 size_t size)
+> > > +{
+> > > +	struct fwctl_device *fwctl __free(fwctl) =
+> > > +		_alloc_device(parent, ops, size);  
+> > 
+> > I'm not a big fan of cleanup.h pattern as it hides important to me
+> > information about memory object lifetime and by "solving" one class of
+> > problems it creates another one.  
 > 
-> After John Sperbeck reported a compile error if the CONFIG_RFS_ACCEL
-> is off, I found that I cannot easily enable/disable the config
-> because of lack of the prompt when using 'make menuconfig'. Therefore,
-> I decided to change rps/rfc related configs altogether.
+> I'm trying it here. One of the most common bugs I end up fixing is
+> error unwind and cleanup.h has successfully removed all of it. Let's
+> find out, others thought it was a good idea to add the infrastructure.
 > 
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> One thing that seems clear in my work here is that you should not use
+> cleanup.h if you don't have simple memory lifetime, like the above
+> case where the memory is freed if the function fails.
+> 
+> > You didn't check if fwctl is NULL before using it.  
+> 
+> Oops, yes
+> 
+> > > +	int devnum;
+> > > +
+> > > +	devnum = ida_alloc_max(&fwctl_ida, FWCTL_MAX_DEVICES - 1, GFP_KERNEL);
+> > > +	if (devnum < 0)
+> > > +		return NULL;
+> > > +	fwctl->dev.devt = fwctl_dev + devnum;
+> > > +
+> > > +	cdev_init(&fwctl->cdev, &fwctl_fops);
+> > > +	fwctl->cdev.owner = THIS_MODULE;
+> > > +
+> > > +	if (dev_set_name(&fwctl->dev, "fwctl%d", fwctl->dev.devt - fwctl_dev))  
+> > 
+> > Did you miss ida_free() here?  
+> 
+> No, the put_device() does it in the release function. The __free
+> always calls fwctl_put()/put_device() on failure, and within all
+> functions except _alloc_device() the put_device() is the correct way
+> to free this memory.
 
-Hi Jason,
+The conditional handling of the ida having been allocated or not is a bit ugly
+as I think it's just papering over this corner case.
+Can fwctl_dev and devnum both be zero? In practice no, but is that guaranteed
+for all time? Maybe...
 
-FWIIW, I think it would be appropriate to also add help text for each option.
-And I would drop "Enable", modeling Kdoc on, f.e. CONFIG_CGROUP_NET_CLASSID.
+We got some kick back from Linus a while back in CXL and the outcome was
+a few more helpers rather than too much cleverness in the use of __free.
 
-Likewise for CONFIG_BQL, although that isn't strictly related to this
-patch.
+Trick for this is often to define a small function that allocates both the
+ida and the device. With in that micro function handle the one error path
+or if you only have two things to do, you can use __free() for the allocation.
 
-...
+Something like
+
+static struct fwctl_device *__alloc_device_and_devt(sizet_t size)
+{
+	struct fw_ctl_device *fwctl;
+	int devnum;
+
+	fwctl = ida_alloc_max(&fwct ...);
+	if (!fwctl)
+		return NULL;
+
+	devnum = ida_alloc_max(&fwct ...);
+	if (devnum < 0) {
+		kfree(fwctl);
+		return NULL;
+	}	
+
+	fwctl->dev.devt = fwctl_Ddev + devnum;
+
+	reutrn fwctl;
+}
+
+Then call device_initialize() on the returned structure ->dev as you know
+you ida and the containing structure are both in a state where the put_device()
+call doesn't need conditions on 'how initialized' it is.
+
+Still, maybe the ugly is fine.  
+
+
+> 
+> Thanks,
+> Jason
+> 
+> 
+
 
