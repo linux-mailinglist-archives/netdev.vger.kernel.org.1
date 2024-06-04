@@ -1,56 +1,59 @@
-Return-Path: <netdev+bounces-100645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 030BA8FB7D8
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 17:48:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AB1D8FB7B8
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 17:44:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5F76B2532E
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:44:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8DFA1F21E09
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFD34144D23;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBA25145A03;
 	Tue,  4 Jun 2024 15:44:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="3wlAAubi";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hFvzdsh/"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ykJvDfut";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0m2WDrYZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F160A13C9CF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03635143C7B;
 	Tue,  4 Jun 2024 15:44:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717515890; cv=none; b=STHcgmyxEPtzMQfh4Q+HmPNw5Fg94bcslJdDjfsnA0PG7W78xxVAyB1Be2TSUmspTbQkvWOOzqw6CHhS/sZJgSO7+/3JXxPuwTQlFuydZCk+CIP2rMihjCfsJHxpp42BhK8J9cphGy805cDEkoiDQSBAOV/o0nbgdPBVAMiF3go=
+	t=1717515890; cv=none; b=DLdENCjKHsthxaliE5m/RGo9SWEZBJawNm699DhL6lIfjOjlH889R2LlNVkyEpEIt4q6Zf1uj0gXK4k7zCW93/KisKv6jTVo00jA2v9HzCXWBKf/w1CQP7yl/LBdGj58UaBBcK1zyKx9H3eH/13n03bLZnWK9ia4Emeev3+sZEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717515890; c=relaxed/simple;
-	bh=Y9KIydymO5KP6Ro+ZXK5X5wzLBFwrtXuEvN1t0Y95P0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LmrBgWgMSE/Nko54QoxZPeHrgx+uLcNaafhHViE3a4FRklZvuKpP671BAlm/1y24CHKvS15Q5Z+mLlfEZBHf/arpTrQoXexG7hhreoEAVZqWGNwSfX03mZR9qvqqCcjH2P/Nf8iyfZifCYhjwwmQxjcrL+mYrwA0ae18Wad/bQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=3wlAAubi; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=hFvzdsh/; arc=none smtp.client-ip=193.142.43.55
+	bh=CpjnF7NQ8ik/bsSLPjV6QCgLsAnODb+JFk1ApHKH3xY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Wxr/ttUwRvdgI/6/fEJA8Urdo7oxamfAprKiRIB4sA2hUb0bTLHt4L1RaUX70JQHQeta8GfUhZgl8GIM8G0q/weQq1blBuMdqCde/TW0lc5ZpDtnzALGAoP18aFr219xQDbchcgs7cMUiRyw46jeaxnXtjwoQ6kXwxNTlzumWOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ykJvDfut; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0m2WDrYZ; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1717515886;
+	s=2020; t=1717515887;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=tlyf5sAkQCwC4isYlW+8wOAOHpxy48UiRTAjqTYeVNQ=;
-	b=3wlAAubif36FjzSyHIp8aMQZGUsozxH8NnOq+veQuaIX0653fsA3Dvp86Zd5BlFYivofUQ
-	TPwvxGdJFpdrba2PaXS6ddySnYX6akUMb4yFyjkI1Rj8rosQt5/1CV4yuWWtfgloUKEOn9
-	tQJTnqX3yKenvbfGft/IyizF1EsktSA22gb2R9KXQbjWiKc84o7mh/fB39PkTnLxnn/2nT
-	Zs3ThiLJdzMNH/JBj1UkAk8VbGCZfuaH26mqvOjbwU22nI6ZGCgww9YjuTzi8x0Z4Mw6aB
-	6YkQg/puCrsU/qSYptiByqQWvsRu6fwgYMovtolp6P8/0wVIN/kNcq1QI1HLpA==
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xKeHb6yb6kbztXYTRHNbaIQnvhpfvhLJP9xjIPFBDgI=;
+	b=ykJvDfutE6xlOyMx3fhoUQoXlLDIbgaNgcp+N9vYoVHrNZHQ+Ma7JwXv24YabS9mmrn8M1
+	qP2jCV/92o9iRXYpi6I3sHLcuWyj9iVwslnKuLB7IPG+FLp+eqcppBW5BjUVSkyVYG90UV
+	DNyquZtbMN5nvludJK7qi7/uiqPmkSBlFh6YrIEe6QK5CzQ4MWS6z0iVL13VWxIs/f9+0X
+	K2txxv8N+497MO8IP0lrjdvzrlJKcryrUgEoZOQKUJnE7V4GLIKAPBZjGeLJGHN9nEtVn/
+	+PWJGvAV9wd9NR2PU9iyIHQ/FlrFR8fa3HNVE1zP5/5cI7zAb4NAPoWBNvOUJg==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1717515886;
+	s=2020e; t=1717515887;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=tlyf5sAkQCwC4isYlW+8wOAOHpxy48UiRTAjqTYeVNQ=;
-	b=hFvzdsh/zdTbryFmf+d/VExo7Rou9jMM0M6p0WKe6eqAnns3SH2EkFzQhQGlcZA2BmtI3O
-	3DS1kfK5UWjqeTCA==
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xKeHb6yb6kbztXYTRHNbaIQnvhpfvhLJP9xjIPFBDgI=;
+	b=0m2WDrYZhNGsNSvPcM+spVvYS7MrOY4bDwFDf41hhrnFws022VE1XY+3y4YgWipbxdyCFL
+	l6LGiHXBpdaSZ3CQ==
 To: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -65,172 +68,165 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Peter Zijlstra <peterz@infradead.org>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>
-Subject: [PATCH v4 net-next 00/15] locking: Introduce nested-BH locking.
-Date: Tue,  4 Jun 2024 17:24:07 +0200
-Message-ID: <20240604154425.878636-1-bigeasy@linutronix.de>
+	Will Deacon <will@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: [PATCH v4 net-next 01/14] locking/local_lock: Add local nested BH locking infrastructure.
+Date: Tue,  4 Jun 2024 17:24:08 +0200
+Message-ID: <20240604154425.878636-2-bigeasy@linutronix.de>
+In-Reply-To: <20240604154425.878636-1-bigeasy@linutronix.de>
+References: <20240604154425.878636-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Disabling bottoms halves acts as per-CPU BKL. On PREEMPT_RT code within
-local_bh_disable() section remains preemtible. As a result high prior
-tasks (or threaded interrupts) will be blocked by lower-prio task (or
-threaded interrupts) which are long running which includes softirq
-sections.
+Add local_lock_nested_bh() locking. It is based on local_lock_t and the
+naming follows the preempt_disable_nested() example.
 
-The proposed way out is to introduce explicit per-CPU locks for
-resources which are protected by local_bh_disable() and use those only
-on PREEMPT_RT so there is no additional overhead for !PREEMPT_RT builds.
+For !PREEMPT_RT + !LOCKDEP it is a per-CPU annotation for locking
+assumptions based on local_bh_disable(). The macro is optimized away
+during compilation.
+For !PREEMPT_RT + LOCKDEP the local_lock_nested_bh() is reduced to
+the usual lock-acquire plus lockdep_assert_in_softirq() - ensuring that
+BH is disabled.
 
-The series introduces the infrastructure and converts large parts of
-networking which is largest stake holder here. Once this done the
-per-CPU lock from local_bh_disable() on PREEMPT_RT can be lifted.
+For PREEMPT_RT local_lock_nested_bh() acquires the specified per-CPU
+lock. It does not disable CPU migration because it relies on
+local_bh_disable() disabling CPU migration.
+With LOCKDEP it performans the usual lockdep checks as with !PREEMPT_RT.
+Due to include hell the softirq check has been moved spinlock.c.
 
-Performance testing. Baseline is net-next as of commit 93bda33046e7a
-("Merge branch'net-constify-ctl_table-arguments-of-utility-functions'")
-plus v6.10-rc1. A 10GiG link is used between two hosts. The command
-   xdp-bench redirect-cpu --cpu 3 --remote-action drop eth1 -e
+The intention is to use this locking in places where locking of a per-CPU
+variable relies on BH being disabled. Instead of treating disabled
+bottom halves as a big per-CPU lock, PREEMPT_RT can use this to reduce
+the locking scope to what actually needs protecting.
+A side effect is that it also documents the protection scope of the
+per-CPU variables.
 
-was invoked on the receiving side with a ixgbe. The sending side uses
-pktgen_sample03_burst_single_flow.sh on i40e.
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ include/linux/local_lock.h          | 10 ++++++++++
+ include/linux/local_lock_internal.h | 31 +++++++++++++++++++++++++++++
+ include/linux/lockdep.h             |  3 +++
+ kernel/locking/spinlock.c           |  8 ++++++++
+ 4 files changed, 52 insertions(+)
 
-Baseline:
-| eth1->?                 9,018,604 rx/s                  0 err,drop/s
-|   receive total         9,018,604 pkt/s                 0 drop/s         =
-       0 error/s
-|     cpu:7               9,018,604 pkt/s                 0 drop/s         =
-       0 error/s
-|   enqueue to cpu 3      9,018,602 pkt/s                 0 drop/s         =
-    7.00 bulk-avg
-|     cpu:7->3            9,018,602 pkt/s                 0 drop/s         =
-    7.00 bulk-avg
-|   kthread total         9,018,606 pkt/s                 0 drop/s         =
- 214,698 sched
-|     cpu:3               9,018,606 pkt/s                 0 drop/s         =
- 214,698 sched
-|     xdp_stats                   0 pass/s        9,018,606 drop/s         =
-       0 redir/s
-|       cpu:3                     0 pass/s        9,018,606 drop/s         =
-       0 redir/s
-|   redirect_err                  0 error/s
-|   xdp_exception                 0 hit/s
-
-perf top --sort cpu,symbol --no-children:
-|   18.14%  007  [k] bpf_prog_4f0ffbb35139c187_cpumap_l4_hash
-|   13.29%  007  [k] ixgbe_poll
-|   12.66%  003  [k] cpu_map_kthread_run
-|    7.23%  003  [k] page_frag_free
-|    6.76%  007  [k] xdp_do_redirect
-|    3.76%  007  [k] cpu_map_redirect
-|    3.13%  007  [k] bq_flush_to_queue
-|    2.51%  003  [k] xdp_return_frame
-|    1.93%  007  [k] try_to_wake_up
-|    1.78%  007  [k] _raw_spin_lock
-|    1.74%  007  [k] cpu_map_enqueue
-|    1.56%  003  [k] bpf_prog_57cd311f2e27366b_cpumap_drop
-
-With this series applied:
-| eth1->?                10,329,340 rx/s                  0 err,drop/s
-|   receive total        10,329,340 pkt/s                 0 drop/s         =
-       0 error/s
-|     cpu:6              10,329,340 pkt/s                 0 drop/s         =
-       0 error/s
-|   enqueue to cpu 3     10,329,338 pkt/s                 0 drop/s         =
-    8.00 bulk-avg
-|     cpu:6->3           10,329,338 pkt/s                 0 drop/s         =
-    8.00 bulk-avg
-|   kthread total        10,329,321 pkt/s                 0 drop/s         =
-  96,297 sched
-|     cpu:3              10,329,321 pkt/s                 0 drop/s         =
-  96,297 sched
-|     xdp_stats                   0 pass/s       10,329,321 drop/s         =
-       0 redir/s
-|       cpu:3                     0 pass/s       10,329,321 drop/s         =
-       0 redir/s
-|   redirect_err                  0 error/s
-|   xdp_exception                 0 hit/s
-
-perf top --sort cpu,symbol --no-children:
-|   20.90%  006  [k] bpf_prog_4f0ffbb35139c187_cpumap_l4_hash
-|   12.62%  006  [k] ixgbe_poll
-|    9.82%  003  [k] page_frag_free
-|    8.73%  003  [k] cpu_map_bpf_prog_run_xdp
-|    6.63%  006  [k] xdp_do_redirect
-|    4.94%  003  [k] cpu_map_kthread_run
-|    4.28%  006  [k] cpu_map_redirect
-|    4.03%  006  [k] bq_flush_to_queue
-|    3.01%  003  [k] xdp_return_frame
-|    1.95%  006  [k] _raw_spin_lock
-|    1.94%  003  [k] bpf_prog_57cd311f2e27366b_cpumap_drop
-
-This diff appears to be noise.
-
-v3=E2=80=A6v4 https://lore.kernel.org/all/20240529162927.403425-1-bigeasy@l=
-inutronix.de/:
-- Removed bpf_clear_redirect_map(), moved the comment to the caller.
-  Suggested by Toke.
-
-- The bpf_redirect_info structure is memset() each time it is assigned.
-  Suggested by Toke.
-
-- The bpf_net_ctx_set() in __napi_busy_loop() has been moved from the
-  top of the function to begin/ end of the BH-disabled section. This has
-  been done to remain in sync with other call sites.
-  After adding the memset() I've been looking at the perf-numbers in my
-  test-case and I haven't noticed an impact, the numbers are in the same
-  range with and without the change. Therefore I kept the numbers from
-  previous posting.
-
-- Collected Alexei's Acked-by.
-
-v2=E2=80=A6v3 https://lore.kernel.org/all/20240503182957.1042122-1-bigeasy@=
-linutronix.de/:
-- WARN checks checks for bpf_net_ctx_get() have been dropped and all
-  NULL checks around it. This means bpf_net_ctx_get_ri() assumes the
-  context has been set and will segfault if it is not the case.
-  Suggested by Alexei and Jesper. This should always work or always
-  segfault.
-
-- It has been suggested by Toke to embed struct bpf_net_context into
-  task_struct instead just a pointer to it. This would increase the size
-  of task_struct by 112 bytes instead just eight and Alexei didn't like
-  it due to the size impact with 1m threads. It is a pointer again.
-
-v1=E2=80=A6v2 https://lore.kernel.org/all/20231215171020.687342-1-bigeasy@l=
-inutronix.de/:
-- Jakub complained about touching networking drivers to make the
-  additional locking work. Alexei complained about the additional
-  locking within the XDP/eBFP case.
-  This led to a change in how the per-CPU variables are accessed for the
-  XDP/eBPF case. On PREEMPT_RT the variables are now stored on stack and
-  the task pointer to the structure is saved in the task_struct while
-  keeping every for !RT unchanged. This was proposed as a RFC in
-  	v1: https://lore.kernel.org/all/20240213145923.2552753-1-bigeasy@linutro=
-nix.de/
-
-  and then updated
-
-        v2: https://lore.kernel.org/all/20240229183109.646865-1-bigeasy@lin=
-utronix.de/
-	  - Renamed the container struct from xdp_storage to bpf_net_context.
-            Suggested by Toke H=C3=B8iland-J=C3=B8rgensen.
-	  - Use the container struct also on !PREEMPT_RT builds. Store the
-	    pointer to the on-stack struct in a per-CPU variable. Suggested by
-            Toke H=C3=B8iland-J=C3=B8rgensen.
-
-  This reduces the initial queue from 24 to 15 patches.
-
-- There were complains about the scoped_guard() which shifts the whole
-  block and makes it harder to review because the whole gets removed and
-  added again. The usage has been replaced with local_lock_nested_bh()+
-  its unlock counterpart.
-
-Sebastian
+diff --git a/include/linux/local_lock.h b/include/linux/local_lock.h
+index 82366a37f4474..091dc0b6bdfb9 100644
+--- a/include/linux/local_lock.h
++++ b/include/linux/local_lock.h
+@@ -62,4 +62,14 @@ DEFINE_LOCK_GUARD_1(local_lock_irqsave, local_lock_t __p=
+ercpu,
+ 		    local_unlock_irqrestore(_T->lock, _T->flags),
+ 		    unsigned long flags)
+=20
++#define local_lock_nested_bh(_lock)				\
++	__local_lock_nested_bh(_lock)
++
++#define local_unlock_nested_bh(_lock)				\
++	__local_unlock_nested_bh(_lock)
++
++DEFINE_GUARD(local_lock_nested_bh, local_lock_t __percpu*,
++	     local_lock_nested_bh(_T),
++	     local_unlock_nested_bh(_T))
++
+ #endif
+diff --git a/include/linux/local_lock_internal.h b/include/linux/local_lock=
+_internal.h
+index 975e33b793a77..8dd71fbbb6d2b 100644
+--- a/include/linux/local_lock_internal.h
++++ b/include/linux/local_lock_internal.h
+@@ -62,6 +62,17 @@ do {								\
+ 	local_lock_debug_init(lock);				\
+ } while (0)
+=20
++#define __spinlock_nested_bh_init(lock)				\
++do {								\
++	static struct lock_class_key __key;			\
++								\
++	debug_check_no_locks_freed((void *)lock, sizeof(*lock));\
++	lockdep_init_map_type(&(lock)->dep_map, #lock, &__key,  \
++			      0, LD_WAIT_CONFIG, LD_WAIT_INV,	\
++			      LD_LOCK_NORMAL);			\
++	local_lock_debug_init(lock);				\
++} while (0)
++
+ #define __local_lock(lock)					\
+ 	do {							\
+ 		preempt_disable();				\
+@@ -98,6 +109,15 @@ do {								\
+ 		local_irq_restore(flags);			\
+ 	} while (0)
+=20
++#define __local_lock_nested_bh(lock)				\
++	do {							\
++		lockdep_assert_in_softirq();			\
++		local_lock_acquire(this_cpu_ptr(lock));	\
++	} while (0)
++
++#define __local_unlock_nested_bh(lock)				\
++	local_lock_release(this_cpu_ptr(lock))
++
+ #else /* !CONFIG_PREEMPT_RT */
+=20
+ /*
+@@ -138,4 +158,15 @@ typedef spinlock_t local_lock_t;
+=20
+ #define __local_unlock_irqrestore(lock, flags)	__local_unlock(lock)
+=20
++#define __local_lock_nested_bh(lock)				\
++do {								\
++	lockdep_assert_in_softirq_func();			\
++	spin_lock(this_cpu_ptr(lock));				\
++} while (0)
++
++#define __local_unlock_nested_bh(lock)				\
++do {								\
++	spin_unlock(this_cpu_ptr((lock)));			\
++} while (0)
++
+ #endif /* CONFIG_PREEMPT_RT */
+diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
+index 5e51b0de4c4b5..fcc02812bf31e 100644
+--- a/include/linux/lockdep.h
++++ b/include/linux/lockdep.h
+@@ -605,6 +605,8 @@ do {									\
+ 		     (!in_softirq() || in_irq() || in_nmi()));		\
+ } while (0)
+=20
++extern void lockdep_assert_in_softirq_func(void);
++
+ #else
+ # define might_lock(lock) do { } while (0)
+ # define might_lock_read(lock) do { } while (0)
+@@ -618,6 +620,7 @@ do {									\
+ # define lockdep_assert_preemption_enabled() do { } while (0)
+ # define lockdep_assert_preemption_disabled() do { } while (0)
+ # define lockdep_assert_in_softirq() do { } while (0)
++# define lockdep_assert_in_softirq_func() do { } while (0)
+ #endif
+=20
+ #ifdef CONFIG_PROVE_RAW_LOCK_NESTING
+diff --git a/kernel/locking/spinlock.c b/kernel/locking/spinlock.c
+index 8475a0794f8c5..438c6086d540e 100644
+--- a/kernel/locking/spinlock.c
++++ b/kernel/locking/spinlock.c
+@@ -413,3 +413,11 @@ notrace int in_lock_functions(unsigned long addr)
+ 	&& addr < (unsigned long)__lock_text_end;
+ }
+ EXPORT_SYMBOL(in_lock_functions);
++
++#if defined(CONFIG_PROVE_LOCKING) && defined(CONFIG_PREEMPT_RT)
++void notrace lockdep_assert_in_softirq_func(void)
++{
++	lockdep_assert_in_softirq();
++}
++EXPORT_SYMBOL(lockdep_assert_in_softirq_func);
++#endif
+--=20
+2.45.1
 
 
