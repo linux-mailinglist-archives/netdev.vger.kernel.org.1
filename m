@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-100635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1091E8FB670
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 17:01:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CB328FB639
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:54:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C1E41F219CF
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:01:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 812DF1F21D5F
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 14:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFEF813D51F;
-	Tue,  4 Jun 2024 15:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8C2E1474BC;
+	Tue,  4 Jun 2024 14:50:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from chinatelecom.cn (smtpnm6-07.21cn.com [182.42.151.156])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E681EEC8
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 15:00:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06BF8171BA
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 14:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=182.42.151.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717513255; cv=none; b=Y6Zm9HVR52mL5xeqlrdGZ7alx/OZElZQty/jTF9MFJw+X+iDPFwrbyGisczAIvfMgZ6m7sUhb9Sb2V09OFXPkBf8jH3zz/SxcxBGS8Fnmf3CbUo+vbVDSpmytHja4eVuNknpLEgVJHocIePRFTZk36oTNkahkjYXnUmBh4GP9CY=
+	t=1717512633; cv=none; b=Uiy6pkQEcVVWILdDXBVb+sr/Ic4/YX6EF0QqXWna3UCDXwz/6d0BGk+NZTFepVBH+BNjTuGwww9At/OkHgWcaouiNgm72GHjD96UdOWOaWT4xPrfQQmukeOf7YDSxdfypDnq5CGete9NuDqQ1XnzqIUy90lM7niJ/+qHaHiAAO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717513255; c=relaxed/simple;
-	bh=krLtQW/RcjHyBtXVaGsde+IuEb3MtB/2By5TI9swnSE=;
+	s=arc-20240116; t=1717512633; c=relaxed/simple;
+	bh=E6PcEF9pEdF50eNZ1n+pF23362OZRGrS7AE3NpbpGPM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IQqkSNKagMbNv9E7sN5qgBIka2J4gH7G0IsP5wOxUEJz9nRu2A8+Q7E3UblVsVrYtavE2+4zA+5/5UMeMMz9tnBFC/RCord+3ZVsDkubi/igb+fvXUgrzTrsI5C0EtbXvK1hr30YsRzD/e6MCBdtRAocSCDbXIPwSS6zsXNthEA=
+	 MIME-Version; b=bWGJ53KhJW+1yx2vXDYd6kPnzSzkQM9z9OK3pFNzrejZKe5A6Nd9Xe3chJfLGyfqHD+NRWL9VWtI29GQWPEkxeKZVO8SWaklt3xQUTLKfDJqrc6ziDF86q06/fmS0wVx36a4mjBvkMDCSrt0eN031bSEBQSviCYpUjjzFsd50Eo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn; spf=pass smtp.mailfrom=chinatelecom.cn; arc=none smtp.client-ip=182.42.151.156
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chinatelecom.cn
@@ -31,13 +31,13 @@ HMM_SOURCE_IP:192.168.137.232:63982.1038894331
 HMM_ATTACHE_NUM:0000
 HMM_SOURCE_TYPE:SMTP
 Received: from clientip-36.111.140.9 (unknown [192.168.137.232])
-	by chinatelecom.cn (HERMES) with SMTP id 255C39B257;
-	Tue,  4 Jun 2024 22:50:20 +0800 (CST)
+	by chinatelecom.cn (HERMES) with SMTP id 59C819AEFD;
+	Tue,  4 Jun 2024 22:50:23 +0800 (CST)
 X-189-SAVE-TO-SEND: +wujianguo@chinatelecom.cn
 Received: from  ([36.111.140.9])
-	by gateway-mua-dep-b5744948-nkwsn with ESMTP id c772be5dfe954aba991e3df430053a68 for netdev@vger.kernel.org;
-	Tue, 04 Jun 2024 22:50:23 CST
-X-Transaction-ID: c772be5dfe954aba991e3df430053a68
+	by gateway-mua-dep-b5744948-nkwsn with ESMTP id 1ca0e94b647b4a6ab2fad6a5a723a5c5 for netdev@vger.kernel.org;
+	Tue, 04 Jun 2024 22:50:26 CST
+X-Transaction-ID: 1ca0e94b647b4a6ab2fad6a5a723a5c5
 X-Real-From: wujianguo@chinatelecom.cn
 X-Receive-IP: 36.111.140.9
 X-MEDUSA-Status: 0
@@ -52,9 +52,9 @@ Cc: kuba@kernel.org,
 	pabeni@redhat.com,
 	wujianguo106@163.com,
 	wujianguo <wujianguo@chinatelecom.cn>
-Subject: [PATCH net v2 2/3] selftests: add selftest for the SRv6 End.DX4 behavior with netfilter
-Date: Tue,  4 Jun 2024 22:49:48 +0800
-Message-ID: <20240604144949.22729-3-wujianguo@chinatelecom.cn>
+Subject: [PATCH net v2 3/3] selftests: add selftest for the SRv6 End.DX6 behavior with netfilter
+Date: Tue,  4 Jun 2024 22:49:49 +0800
+Message-ID: <20240604144949.22729-4-wujianguo@chinatelecom.cn>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240604144949.22729-1-wujianguo@chinatelecom.cn>
 References: <20240604144949.22729-1-wujianguo@chinatelecom.cn>
@@ -68,35 +68,35 @@ Content-Transfer-Encoding: 8bit
 
 From: Jianguo Wu <wujianguo@chinatelecom.cn>
 
-this selftest is designed for evaluating the SRv6 End.DX4 behavior
+this selftest is designed for evaluating the SRv6 End.DX6 behavior
 used with netfilter(rpfilter), in this example, for implementing
-IPv4 L3 VPN use cases.
+IPv6 L3 VPN use cases.
 
 Signed-off-by: Jianguo Wu <wujianguo@chinatelecom.cn>
 ---
  tools/testing/selftests/net/Makefile               |   1 +
- .../selftests/net/srv6_end_dx4_netfilter_test.sh   | 335 +++++++++++++++++++++
- 2 files changed, 336 insertions(+)
- create mode 100644 tools/testing/selftests/net/srv6_end_dx4_netfilter_test.sh
+ .../selftests/net/srv6_end_dx6_netfilter_test.sh   | 340 +++++++++++++++++++++
+ 2 files changed, 341 insertions(+)
+ create mode 100644 tools/testing/selftests/net/srv6_end_dx6_netfilter_test.sh
 
 diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index bd01e4a0..7a5f7dd 100644
+index 7a5f7dd..d939356 100644
 --- a/tools/testing/selftests/net/Makefile
 +++ b/tools/testing/selftests/net/Makefile
-@@ -43,6 +43,7 @@ TEST_PROGS += srv6_hl2encap_red_l2vpn_test.sh
- TEST_PROGS += srv6_end_next_csid_l3vpn_test.sh
+@@ -44,6 +44,7 @@ TEST_PROGS += srv6_end_next_csid_l3vpn_test.sh
  TEST_PROGS += srv6_end_x_next_csid_l3vpn_test.sh
  TEST_PROGS += srv6_end_flavors_test.sh
-+TEST_PROGS += srv6_end_dx4_netfilter_test.sh
+ TEST_PROGS += srv6_end_dx4_netfilter_test.sh
++TEST_PROGS += srv6_end_dx6_netfilter_test.sh
  TEST_PROGS += vrf_strict_mode_test.sh
  TEST_PROGS += arp_ndisc_evict_nocarrier.sh
  TEST_PROGS += ndisc_unsolicited_na_test.sh
-diff --git a/tools/testing/selftests/net/srv6_end_dx4_netfilter_test.sh b/tools/testing/selftests/net/srv6_end_dx4_netfilter_test.sh
+diff --git a/tools/testing/selftests/net/srv6_end_dx6_netfilter_test.sh b/tools/testing/selftests/net/srv6_end_dx6_netfilter_test.sh
 new file mode 100644
-index 0000000..2ba749b
+index 0000000..c9d686f
 --- /dev/null
-+++ b/tools/testing/selftests/net/srv6_end_dx4_netfilter_test.sh
-@@ -0,0 +1,335 @@
++++ b/tools/testing/selftests/net/srv6_end_dx6_netfilter_test.sh
+@@ -0,0 +1,340 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-2.0
 +#
@@ -108,23 +108,23 @@ index 0000000..2ba749b
 +# SRv6 End.DX4 behavior.
 +#
 +# Hereafter a network diagram is shown, where one tenants (named 100) offer
-+# IPv4 L3 VPN services allowing hosts to communicate with each other across
++# IPv6 L3 VPN services allowing hosts to communicate with each other across
 +# an IPv6 network.
 +#
-+# Routers rt-1 and rt-2 implement IPv4 L3 VPN services leveraging the SRv6
++# Routers rt-1 and rt-2 implement IPv6 L3 VPN services leveraging the SRv6
 +# architecture. The key components for such VPNs are: a) SRv6 Encap behavior,
 +# b) SRv6 End.DX4 behavior.
 +#
-+# To explain how an IPv4 L3 VPN based on SRv6 works, let us briefly consider an
++# To explain how an IPv6 L3 VPN based on SRv6 works, let us briefly consider an
 +# example where, within the same domain of tenant 100, the host hs-1 pings
 +# the host hs-2.
 +#
 +# First of all, L2 reachability of the host hs-2 is taken into account by
 +# the router rt-1 which acts as an arp proxy.
 +#
-+# When the host hs-1 sends an IPv4 packet destined to hs-2, the router rt-1
++# When the host hs-1 sends an IPv6 packet destined to hs-2, the router rt-1
 +# receives the packet on the internal veth-t100 interface, rt-1 contains the
-+# SRv6 Encap route for encapsulating the IPv4 packet in a IPv6 plus the Segment
++# SRv6 Encap route for encapsulating the IPv6 packet in a IPv6 plus the Segment
 +# Routing Header (SRH) packet. This packet is sent through the (IPv6) core
 +# network up to the router rt-2 that receives it on veth0 interface.
 +#
@@ -148,7 +148,7 @@ index 0000000..2ba749b
 +# |                   |                                   |                   |
 +# |  +-------------+  |                                   |  +-------------+  |
 +# |  |    veth0    |  |                                   |  |    veth0    |  |
-+# |  | 10.0.0.1/24 |  |                                   |  | 10.0.0.2/24 |  |
++# |  | cafe::1/64  |  |                                   |  | cafe::2/64  |  |
 +# |  +-------------+  |                                   |  +-------------+  |
 +# |        .          |                                   |         .         |
 +# +-------------------+                                   +-------------------+
@@ -159,7 +159,7 @@ index 0000000..2ba749b
 +# |        .                          |   |                         .         |
 +# | +---------------+                 |   |                 +---------------- |
 +# | |   veth-t100   |                 |   |                 |   veth-t100   | |
-+# | | 10.0.0.11/24  |    +----------+ |   | +----------+    | 10.0.0.22/24  | |
++# | | cafe::11/64   |    +----------+ |   | +----------+    | cafe::22/64   | |
 +# | +-------+-------+   |   route   | |   | |   route  |    +-------+-------- |
 +# |                     |   table   | |   | |   table  |                      |
 +# |                      +----------+ |   | +----------+                      |
@@ -180,16 +180,16 @@ index 0000000..2ba749b
 +# +----------------------------------------------------------------+
 +# |SID              |Action                                        |
 +# +----------------------------------------------------------------+
-+# |fc00:21:100::6004|apply SRv6 End.DX4 nh4 10.0.0.1 dev veth-t100 |
++# |fc00:21:100::6004|apply SRv6 End.DX6 nh6 cafe::1 dev veth-t100  |
 +# +----------------------------------------------------------------+
 +#
 +# rt-1: route table
 +# +---------------------------------------------------+
 +# |host       |Action                                 |
 +# +---------------------------------------------------+
-+# |10.0.0.2   |apply seg6 encap segs fc00:12:100::6004|
++# |cafe::2    |apply seg6 encap segs fc00:12:100::6004|
 +# +---------------------------------------------------+
-+# |10.0.0.0/24|forward to dev veth_t100               |
++# |cafe::/64  |forward to dev veth_t100               |
 +# +---------------------------------------------------+
 +#
 +#
@@ -197,16 +197,16 @@ index 0000000..2ba749b
 +# +---------------------------------------------------------------+
 +# |SID              |Action                                       |
 +# +---------------------------------------------------------------+
-+# |fc00:12:100::6004|apply SRv6 End.DX4 nh4 10.0.0.2 dev veth-t100|
++# |fc00:12:100::6004|apply SRv6 End.DX6 nh6 cafe::2 dev veth-t100 |
 +# +---------------------------------------------------------------+
 +#
 +# rt-2: route table
 +# +---------------------------------------------------+
 +# |host       |Action                                 |
 +# +---------------------------------------------------+
-+# |10.0.0.1   |apply seg6 encap segs fc00:21:100::6004|
++# |cafe::1    |apply seg6 encap segs fc00:21:100::6004|
 +# +---------------------------------------------------+
-+# |10.0.0.0/24|forward to dev veth_t100               |
++# |cafe::/64  |forward to dev veth_t100               |
 +# +---------------------------------------------------+
 +#
 +
@@ -214,7 +214,7 @@ index 0000000..2ba749b
 +ksft_skip=4
 +
 +readonly IPv6_RT_NETWORK=2001:11
-+readonly IPv4_HS_NETWORK=10.0.0
++readonly IPv6_HS_NETWORK=cafe
 +readonly SID_LOCATOR=fc00
 +
 +PING_TIMEOUT_SEC=4
@@ -290,7 +290,6 @@ index 0000000..2ba749b
 +	ip -netns ${nsname} link set veth0 up
 +	ip -netns ${nsname} link set lo up
 +
-+	ip netns exec ${nsname} sysctl -wq net.ipv4.ip_forward=1
 +	ip netns exec ${nsname} sysctl -wq net.ipv6.conf.all.forwarding=1
 +}
 +
@@ -317,14 +316,17 @@ index 0000000..2ba749b
 +
 +	ip -netns ${hsname} link add veth0 type veth peer name ${rtveth}
 +	ip -netns ${hsname} link set ${rtveth} netns ${rtname}
-+	ip -netns ${hsname} addr add ${IPv4_HS_NETWORK}.${hs}/24 dev veth0
++	ip -netns ${hsname} addr add ${IPv6_HS_NETWORK}::${hs}/64 dev veth0 nodad
 +	ip -netns ${hsname} link set veth0 up
 +	ip -netns ${hsname} link set lo up
 +
-+	ip -netns ${rtname} addr add ${IPv4_HS_NETWORK}.${rt}${hs}/24 dev ${rtveth}
++	ip -netns ${rtname} addr add ${IPv6_HS_NETWORK}::${rt}${hs}/64 dev ${rtveth}
 +	ip -netns ${rtname} link set ${rtveth} up
 +
-+	ip netns exec ${rtname} sysctl -wq net.ipv4.conf.${rtveth}.proxy_arp=1
++	ip netns exec ${rtname} sysctl -wq net.ipv6.conf.all.accept_dad=0
++	ip netns exec ${rtname} sysctl -wq net.ipv6.conf.default.accept_dad=0
++
++	ip netns exec ${rtname} sysctl -wq net.ipv6.conf.${rtveth}.proxy_ndp=1
 +}
 +
 +setup_vpn_config()
@@ -339,11 +341,14 @@ index 0000000..2ba749b
 +	local hsdst_name=hs-t${tid}-${hsdst}
 +	local rtsrc_name=rt-${rtsrc}
 +	local rtdst_name=rt-${rtdst}
++	local rtveth=veth-t${tid}
 +	local vpn_sid=${SID_LOCATOR}:${hssrc}${hsdst}:${tid}::6004
++
++	ip -netns ${rtsrc_name} -6 neigh add proxy ${IPv6_HS_NETWORK}::${hsdst} dev ${rtveth}
 +
 +	# set the encap route for encapsulating packets which arrive from the
 +	# host hssrc and destined to the access router rtsrc.
-+	ip -netns ${rtsrc_name} -4 route add ${IPv4_HS_NETWORK}.${hsdst}/32 \
++	ip -netns ${rtsrc_name} -6 route add ${IPv6_HS_NETWORK}::${hsdst}/128 \
 +		encap seg6 mode encap segs ${vpn_sid} dev veth0
 +	ip -netns ${rtsrc_name} -6 route add ${vpn_sid}/128 \
 +		via 2001:11::${rtdst} dev veth0
@@ -351,7 +356,7 @@ index 0000000..2ba749b
 +	# set the decap route for decapsulating packets which arrive from
 +	# the rtdst router and destined to the hsdst host.
 +	ip -netns ${rtdst_name} -6 route add ${vpn_sid}/128 \
-+		encap seg6local action End.DX4 nh4 ${IPv4_HS_NETWORK}.${hsdst} dev veth-t${tid}
++		encap seg6local action End.DX6 nh6 ${IPv6_HS_NETWORK}::${hsdst} dev veth-t${tid}
 +}
 +
 +setup()
@@ -378,8 +383,8 @@ index 0000000..2ba749b
 +	local hsdst=$2
 +	local tid=$3
 +
-+	ip netns exec hs-${hssrc} ping -c 1 -W ${PING_TIMEOUT_SEC} \
-+		${IPv4_HS_NETWORK}.${hsdst} >/dev/null 2>&1
++	ip netns exec hs-${hssrc} ping -6 -c 1 -W ${PING_TIMEOUT_SEC} \
++		${IPv6_HS_NETWORK}::${hsdst} >/dev/null 2>&1
 +}
 +
 +check_and_log_hs_connectivity()
