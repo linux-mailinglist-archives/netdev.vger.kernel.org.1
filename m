@@ -1,125 +1,98 @@
-Return-Path: <netdev+bounces-100545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5418F8FB120
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 13:29:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BC038FB128
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 13:30:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5D6228325B
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 11:29:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 972621F22A92
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 11:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5575E145339;
-	Tue,  4 Jun 2024 11:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83AA145343;
+	Tue,  4 Jun 2024 11:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PWcMlLRC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nyDqI2nM"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4FD31442E3
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 11:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5661442E3;
+	Tue,  4 Jun 2024 11:30:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717500591; cv=none; b=gJQz53cR6angnqOfDcGcasW06CHbzhfDNkRT75+pfeGHtlIjiLaeyCiFoIrD0q1RD5ZYFGToXPp9ImxzXSHnCuIAQYU2pg1fv32vhUtn0RLLpDfkFQLObglgRvvWmolf3F02+dLMPbs2Vp0NV3oAxX+fY+9eumolXAeUd5GiChw=
+	t=1717500631; cv=none; b=nOxvMPXwsvYDeEmDrMCm93LxW3+8HWXXmstSw3lFAEB4bcAZ4hdKRr3OasyTef2V+14kXbURCUniUjtJpNgFDVhgeYJDrGTxKkF8NeOMT5QW4slb9ZR74oXxTnbtK5y/vgOr4bfLHZCCXDqIqLLB3XEQ7BIZQDrHxydugRRYrOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717500591; c=relaxed/simple;
-	bh=dWWSNUqYDN5ry/z+GcmaaaXs7Riv5UKJE0DQmHdqdws=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=P6AJfNym7HKbA3OlTg0EelruBCgzoiKbdIn6PEPCp5tKaN5TzutrlCzIzSaJcUL2xqOlPaVCGKlOBpzgY9pSHMY553KApFWPp5MdLHm7k6evojzsCtk6D+chIWjGjW5pV0WIbElqwNk2GLy+NtcC5ROYNiBEYIEzEUFUDgJsPjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PWcMlLRC; arc=none smtp.client-ip=95.215.58.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: linux@armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1717500586;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uAxVotTNa0Ga3e/m4xN4nXb1+mWjuU+gf6eQphyby0I=;
-	b=PWcMlLRCBWwEtb1zFIyOreTVGGZx/8yGqFqegFHe3jnkpGSbM4OcpEFp9L7PWL1oDzSlXq
-	E1D/Hp7UEG0ZmQ78SG5+ViySuTfw5KUflDkGiAU1XmFlAGVuQ/Reh66hVBt7WMVItYllus
-	cL2iLNzMKmQlVGW8F56LneAabK4nke8=
-X-Envelope-To: chenhuacai@kernel.org
-X-Envelope-To: fancer.lancer@gmail.com
-X-Envelope-To: siyanteng@loongson.cn
-X-Envelope-To: andrew@lunn.ch
-X-Envelope-To: hkallweit1@gmail.com
-X-Envelope-To: peppe.cavallaro@st.com
-X-Envelope-To: alexandre.torgue@foss.st.com
-X-Envelope-To: joabreu@synopsys.com
-X-Envelope-To: jose.abreu@synopsys.com
-X-Envelope-To: guyinggang@loongson.cn
-X-Envelope-To: netdev@vger.kernel.org
-X-Envelope-To: chris.chenfeiyang@gmail.com
+	s=arc-20240116; t=1717500631; c=relaxed/simple;
+	bh=wnPcpCiwYuJB7xUl04rFUO/ubRVn7YZK2/gMWkW9BcI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Qigoq51RlQ/365gNolXVbPdwAraSFNIfQAvd5Qc80Pt/EqFFD9ddwjVbGlwvTZtFAwT7WhrdeZ22Bw8xwja6usnZGIsxEGKvXtDvdw3W25oRdEs2JC+MWvnRWoG0W2zyWkygqs6yP+6MF9OV2MMvck9uYUvthXp0pEG4lrBJWME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nyDqI2nM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 62657C3277B;
+	Tue,  4 Jun 2024 11:30:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717500630;
+	bh=wnPcpCiwYuJB7xUl04rFUO/ubRVn7YZK2/gMWkW9BcI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=nyDqI2nMvMFveZZfpCTZu1AXUT47TsUedrdNGqoZ3DbCZGk0bDfY0fETJbnwhC1aD
+	 86GK/4BjOaO8zP/Dxu5j+4ifZIpJfpjYF9riogcK5/ydkBw42Dhc1E3G47WZb24KT2
+	 Dr+BSZURU7siH0l0sYqEfist+YEoillL+6kKfmdVZv/4h3VBtkGQbZGgsCeKu3gPsM
+	 Fc1/vfmbjXHQ3ozOSgMcZA05jRhbNNRPeHWnY4U86ZGHPuQaDnsQ/1hRj5VAD0jGHm
+	 lYoH5LYsyWSo+s0aMs7AvTrxxjoTYzppJZyKRWMt8yJKBHBdyx0LeX5O44PoIbl/lj
+	 Ac3oH7JCiPTNA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 510D5C43617;
+	Tue,  4 Jun 2024 11:30:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 04 Jun 2024 11:29:43 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: si.yanteng@linux.dev
-Message-ID: <6ba14d835ff12f479eeced585b9336c1e6219d54@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net-next v13 12/15] net: stmmac: Fixed failure to set
- network speed to 1000.
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>, "Huacai Chen"
- <chenhuacai@kernel.org>, fancer.lancer@gmail.com
-Cc: "Yanteng Si" <siyanteng@loongson.cn>, andrew@lunn.ch,
- hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- Jose.Abreu@synopsys.com, guyinggang@loongson.cn, netdev@vger.kernel.org,
- chris.chenfeiyang@gmail.com
-In-Reply-To: <ZlgpLm3L6EdFO60f@shell.armlinux.org.uk>
-References: <cover.1716973237.git.siyanteng@loongson.cn>
- <e7ae2409f68a2f953ba7c823e248de7d67dfd4e9.1716973237.git.siyanteng@loongson.cn>
- <CAAhV-H6ZJwWQOhAPmoaH4KYr66LCurKq94f87FQ05yEX6XYoNg@mail.gmail.com>
- <ZlgpLm3L6EdFO60f@shell.armlinux.org.uk>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/3] tcp: refactor skb_cmp_decrypted() checks
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171750063032.8045.5135732857456695804.git-patchwork-notify@kernel.org>
+Date: Tue, 04 Jun 2024 11:30:30 +0000
+References: <20240530233616.85897-1-kuba@kernel.org>
+In-Reply-To: <20240530233616.85897-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: edumazet@google.com, pabeni@redhat.com, davem@davemloft.net,
+ netdev@vger.kernel.org, mptcp@lists.linux.dev, matttbe@kernel.org,
+ martineau@kernel.org, borisp@nvidia.com, willemdebruijn.kernel@gmail.com
 
-2024=E5=B9=B45=E6=9C=8830=E6=97=A5 15:22, "Russell King (Oracle)" <linux@=
-armlinux.org.uk> =E5=86=99=E5=88=B0:
+Hello:
 
-Hi, Russell, Serge,
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
->=20
->=20On Thu, May 30, 2024 at 10:25:01AM +0800, Huacai Chen wrote:
->=20
->=20>=20
->=20> Hi, Yanteng,
-> >=20
->=20>=20=20
->=20>=20
->=20>  The title should be "Fix ....." rather than "Fixed .....", and it =
-is
-> >=20
->=20
-> I would avoid the ambiguous "Fix" which for stable folk imply that this
->=20
->=20is a bug fix - but it isn't. It's adding support for requiring 1G
->=20
->=20speeds to always be negotiated.
-Oh, I get it now. Thanks!
+On Thu, 30 May 2024 16:36:13 -0700 you wrote:
+> Refactor the input patch coalescing checks and wrap "EOR forcing"
+> logic into a helper. This will hopefully make the code easier to
+> follow. While at it throw some DEBUG_NET checks into skb_shift().
+> 
+> Jakub Kicinski (3):
+>   tcp: wrap mptcp and decrypted checks into tcp_skb_can_collapse_rx()
+>   tcp: add a helper for setting EOR on tail skb
+>   net: skb: add compatibility warnings to skb_shift()
+> 
+> [...]
 
->=20
->=20I would like this patch to be held off until more thought can be put
->=20
->=20into how to handle this without having a hack in the driver (stmmac
->=20
->=20has too many hacks and we're going to have to start saying no to
->=20
->=20these.)
-Yeah, you have a point there, but I would also like to hear Serge's opini=
-on.
+Here is the summary with links:
+  - [net-next,1/3] tcp: wrap mptcp and decrypted checks into tcp_skb_can_collapse_rx()
+    https://git.kernel.org/netdev/net-next/c/071115301838
+  - [net-next,2/3] tcp: add a helper for setting EOR on tail skb
+    https://git.kernel.org/netdev/net-next/c/1be68a87ab33
+  - [net-next,3/3] net: skb: add compatibility warnings to skb_shift()
+    https://git.kernel.org/netdev/net-next/c/99b8add01f98
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-Thanks,
-Yanteng
 
