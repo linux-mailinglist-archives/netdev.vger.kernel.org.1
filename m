@@ -1,158 +1,162 @@
-Return-Path: <netdev+bounces-100505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2616C8FAEDE
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 11:32:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B8278FAED9
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 11:32:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D33372876A9
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 09:32:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CF261C20C6A
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 09:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A235814386D;
-	Tue,  4 Jun 2024 09:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96DE7823BC;
+	Tue,  4 Jun 2024 09:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="NNFQbzPs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n0jRI4mi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D73143C61;
-	Tue,  4 Jun 2024 09:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0DC23776;
+	Tue,  4 Jun 2024 09:32:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717493551; cv=none; b=nBwoGyoZqx+zYKO6MVLi3uaNNHuXAtevxI2vOYczJ0DwoxVYT5oGTsteY36oCioD3ypemqXH3G0415k7Kpava+BIUtOHLmmg23wSbH+YYHmur9ZJidqVDG6m0op4P4Y7ynZIVptybnR+mJzCReQS3esHoA42zhqIC1/pJpwwXGs=
+	t=1717493544; cv=none; b=mewwhq6mDYaq71xcCB2zhVU4S2us/NSoc8zSP5F5OIhel2xaHxiDieElWFxYRoTDvJD5NBXjy3FuyNps2rgxoaex/Qq/KVkgCfGbMawlyWZIpfqoa/VW5uIpZw6tGV+FOGMcCIDArTc46bEAU1Xip0w1qRvGAT/aGpuL59n1jdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717493551; c=relaxed/simple;
-	bh=GZXn3XmJqoOaFGUB/lXDS5b6YpMHC6+1oGZopS4SywE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qQRnXeO6eCgnlBNiGemzySHpoKL6C4D8OJitRHnzPh5lghVMJ6aJlh15zrMcOcgd+0ffwUQHzFROfOxocDQZWqn9KN/XEhC6V1TKLjgpFSZKWeRAYhYvtx2UsniHnXTUSWSRI5MxjxG4wXGeWsMaSorzQa+tzeljy9od9vV7nCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=NNFQbzPs; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4548spgB031426;
-	Tue, 4 Jun 2024 11:31:59 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	FQi2ng79ZmbW4+Hz+M/vUkFGo0dt44niiSmJA3UNOB8=; b=NNFQbzPsDaCwdtSy
-	KCUCxh7vVExEbs/WTmc6yBoocLwdNPcmaMvPOrXmvjPyz3nfjvVK8yHVSleKOCYm
-	/M1EuRO+4cfQrS3NAk+RhnWopiCC3u+/EJCaKq3ifO1fjPucLkaL5CCsBczqvGUo
-	EL7+ulOBJs4NgJ2Vk51Y6DXsu+7lUS/HGnX29LRDtgu+XWj4JtjYjdhe5EPlAVrL
-	1TPqEiCUivRfx/hU0ztCgTou81vLETZ3TbOOpLzJUUgtPnv0R1Qy2jz7HvubfqNp
-	EM5UUJ0hhbTOKwFSbr+T3OQEzWFCvxAslndZQlZTO0P1jIiATomnYh85TDMQBfVZ
-	az5vEg==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ygd70sge1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Jun 2024 11:31:59 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 0626840045;
-	Tue,  4 Jun 2024 11:31:55 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 46232211F37;
-	Tue,  4 Jun 2024 11:30:43 +0200 (CEST)
-Received: from [10.48.86.164] (10.48.86.164) by SHFDAG1NODE2.st.com
- (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 4 Jun
- 2024 11:30:42 +0200
-Message-ID: <291953b7-ed37-4b09-9009-588ffdd12fe7@foss.st.com>
-Date: Tue, 4 Jun 2024 11:30:41 +0200
+	s=arc-20240116; t=1717493544; c=relaxed/simple;
+	bh=WbnbTofHxkrx5spG4fYxe59Me3aK8kFxL4l5hleeJcU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VcXYrPAr1qRiGyEgM+CEmckiHtVsGQXH/FKzDUGNCrWPUwHbVttAWRE7do6gFWHKNVE+ztMlLCo6BiDrSGPEgHtaCYm2g+85vUerU3dGQgf+afNrKVTb4TNTw5iRfAtPn1aD7eaJvid9qiRYmA64Hn3SyAeeqAfAbITtr9bDoLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n0jRI4mi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29689C2BBFC;
+	Tue,  4 Jun 2024 09:32:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717493543;
+	bh=WbnbTofHxkrx5spG4fYxe59Me3aK8kFxL4l5hleeJcU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n0jRI4mi3EdRcQYgF9pEa/gRYlCHIf6sBhGXBmPndUxYbrsyeeLEW/8Sfm3a20Fzg
+	 MeLOvwKBiPo1OWfEl2uDOMB5FUbJ/Y4uav2hZeuNO8u9Ps+pw/Bh0cpWp+6jFxLPNp
+	 kRar1fbeX+gaqiEP4V4+r6xUT4FCaufoJKKwj9nfQhyOpJSMBExEQsOUha/7P9jj2f
+	 dYEbWrsjT69gMxDctMlj/JTo7xMp1UY0mbPIfZbbsbhzB5tPMvydaGjC5oGWQQvH+J
+	 6MLj4wLAjtZE2lONLJA49KHrh80nJyX0FPEn0tsw61x5NKwtFtN2opIVtgoN0OkRM7
+	 UPkA2bZvvIjEQ==
+Date: Tue, 4 Jun 2024 12:32:19 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
+	Jakub Kicinski <kuba@kernel.org>, linux-doc@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	David Ahern <dsahern@kernel.org>,
+	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
+	Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org,
+	patches@lists.linux.dev
+Subject: Re: [PATCH 1/8] fwctl: Add basic structure for a class subsystem
+ with a cdev
+Message-ID: <20240604093219.GN3884@unreal>
+References: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+ <1-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 10/11] ARM: dts: stm32: add ethernet1 for
- STM32MP135F-DK board
-To: Marek Vasut <marex@denx.de>, "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre
- Torgue <alexandre.torgue@foss.st.com>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        Liam Girdwood
-	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20240603092757.71902-1-christophe.roullier@foss.st.com>
- <20240603092757.71902-11-christophe.roullier@foss.st.com>
- <29b79c7d-7ff6-40fb-97be-7198a0e9d437@denx.de>
-Content-Language: en-US
-From: Christophe ROULLIER <christophe.roullier@foss.st.com>
-In-Reply-To: <29b79c7d-7ff6-40fb-97be-7198a0e9d437@denx.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-06-04_03,2024-05-30_01,2024-05-17_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
 
+On Mon, Jun 03, 2024 at 12:53:17PM -0300, Jason Gunthorpe wrote:
+> Create the class, character device and functions for a fwctl driver to
+> un/register to the subsystem.
+> 
+> A typical fwctl driver has a sysfs presence like:
+> 
+> $ ls -l /dev/fwctl/fwctl0
+> crw------- 1 root root 250, 0 Apr 25 19:16 /dev/fwctl/fwctl0
+> 
+> $ ls /sys/class/fwctl/fwctl0
+> dev  device  power  subsystem  uevent
+> 
+> $ ls /sys/class/fwctl/fwctl0/device/infiniband/
+> ibp0s10f0
+> 
+> $ ls /sys/class/infiniband/ibp0s10f0/device/fwctl/
+> fwctl0/
+> 
+> $ ls /sys/devices/pci0000:00/0000:00:0a.0/fwctl/fwctl0
+> dev  device  power  subsystem  uevent
+> 
+> Which allows userspace to link all the multi-subsystem driver components
+> together and learn the subsystem specific names for the device's
+> components.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  MAINTAINERS            |   8 ++
+>  drivers/Kconfig        |   2 +
+>  drivers/Makefile       |   1 +
+>  drivers/fwctl/Kconfig  |   9 +++
+>  drivers/fwctl/Makefile |   4 +
+>  drivers/fwctl/main.c   | 174 +++++++++++++++++++++++++++++++++++++++++
+>  include/linux/fwctl.h  |  68 ++++++++++++++++
+>  7 files changed, 266 insertions(+)
+>  create mode 100644 drivers/fwctl/Kconfig
+>  create mode 100644 drivers/fwctl/Makefile
+>  create mode 100644 drivers/fwctl/main.c
+>  create mode 100644 include/linux/fwctl.h
 
-On 6/3/24 15:08, Marek Vasut wrote:
-> On 6/3/24 11:27 AM, Christophe Roullier wrote:
->> Ethernet1: RMII with crystal
->> PHY used is SMSC (LAN8742A)
->>
->> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
->> ---
->>   arch/arm/boot/dts/st/stm32mp135f-dk.dts | 24 ++++++++++++++++++++++++
->>   1 file changed, 24 insertions(+)
->>
->> diff --git a/arch/arm/boot/dts/st/stm32mp135f-dk.dts 
->> b/arch/arm/boot/dts/st/stm32mp135f-dk.dts
->> index 567e53ad285fa..cebe9b91eced9 100644
->> --- a/arch/arm/boot/dts/st/stm32mp135f-dk.dts
->> +++ b/arch/arm/boot/dts/st/stm32mp135f-dk.dts
->> @@ -19,6 +19,7 @@ / {
->>       compatible = "st,stm32mp135f-dk", "st,stm32mp135";
->>         aliases {
->> +        ethernet0 = &ethernet1;
->>           serial0 = &uart4;
->>           serial1 = &usart1;
->>           serial2 = &uart8;
->> @@ -141,6 +142,29 @@ &cryp {
->>       status = "okay";
->>   };
->>   +&ethernet1 {
->> +    status = "okay";
->> +    pinctrl-0 = <&eth1_rmii_pins_a>;
->> +    pinctrl-1 = <&eth1_rmii_sleep_pins_a>;
->> +    pinctrl-names = "default", "sleep";
->> +    phy-mode = "rmii";
->> +    max-speed = <100>;
->
-> Is this needed ? RMII cannot go faster than 100 .
->
-ok (I will put in v4)
-> Also, keep the list sorted alphabetically , P goes after M .
-ok (I will put in v4)
->
->> +    phy-handle = <&phy0_eth1>;
->> +
->> +    mdio {
->> +        #address-cells = <1>;
->> +        #size-cells = <0>;
->> +        compatible = "snps,dwmac-mdio";
->> +
->> +        phy0_eth1: ethernet-phy@0 {
->> +            compatible = "ethernet-phy-id0007.c131";
->> +            reset-gpios =  <&mcp23017 9 GPIO_ACTIVE_LOW>;
->
-> Extra space between = and < , please drop.
-ok (I will put in v4)
+<...>
+
+> +static struct fwctl_device *
+> +_alloc_device(struct device *parent, const struct fwctl_ops *ops, size_t size)
+> +{
+> +	struct fwctl_device *fwctl __free(kfree) = kzalloc(size, GFP_KERNEL);
+> +
+> +	if (!fwctl)
+> +		return NULL;
+
+<...>
+
+> +/* Drivers use the fwctl_alloc_device() wrapper */
+> +struct fwctl_device *_fwctl_alloc_device(struct device *parent,
+> +					 const struct fwctl_ops *ops,
+> +					 size_t size)
+> +{
+> +	struct fwctl_device *fwctl __free(fwctl) =
+> +		_alloc_device(parent, ops, size);
+
+I'm not a big fan of cleanup.h pattern as it hides important to me
+information about memory object lifetime and by "solving" one class of
+problems it creates another one.
+
+You didn't check if fwctl is NULL before using it.
+
+> +	int devnum;
+> +
+> +	devnum = ida_alloc_max(&fwctl_ida, FWCTL_MAX_DEVICES - 1, GFP_KERNEL);
+> +	if (devnum < 0)
+> +		return NULL;
+> +	fwctl->dev.devt = fwctl_dev + devnum;
+> +
+> +	cdev_init(&fwctl->cdev, &fwctl_fops);
+> +	fwctl->cdev.owner = THIS_MODULE;
+> +
+> +	if (dev_set_name(&fwctl->dev, "fwctl%d", fwctl->dev.devt - fwctl_dev))
+
+Did you miss ida_free() here?
+
+> +		return NULL;
+> +
+> +	fwctl->ops = ops;
+> +	return_ptr(fwctl);
+> +}
+> +EXPORT_SYMBOL_NS_GPL(_fwctl_alloc_device, FWCTL);
+
+Thanks
 
