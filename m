@@ -1,300 +1,145 @@
-Return-Path: <netdev+bounces-100496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E7548FAEAA
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 11:24:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 751128FAEB8
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 11:27:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D76141F21E22
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 09:24:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E34C283DD5
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 09:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB87143C76;
-	Tue,  4 Jun 2024 09:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D69C143C4D;
+	Tue,  4 Jun 2024 09:27:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b="UtzC2Qhi"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DIC2be7d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.savoirfairelinux.com (mail.savoirfairelinux.com [208.88.110.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F636143C44
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 09:23:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.88.110.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DEAF143893
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 09:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717493035; cv=none; b=ALYMvw5SeCNmisqCKg5FJLka26Ds8SOj+Gp5IPovqpms6vCobcNTB14Z+geCBPgY5QIVZTxYiOIXLIhmtydxG4i0MEpGcxQ6jLc9ipIgTfCV1U1WMkpvq76NAdUU+ivmY+sevlsz8dU5NiOX0TqgNVsdgrxSj6Eui/M/KI1Y7xo=
+	t=1717493233; cv=none; b=b81r2AT+tAeDJm9wfIBqgKBrklkWqwrErmD6BWBnrbzyygv9Psjp4k0zhkMDC6UePNWGBIfjG6Q630Y215kYYXhzJEV9Rax5OeGn4bKmlxirzb4UmHoCLUhpeItAgEWL2H1N41fREHujMBMZcnAy6rkk2BdwKIohEqljvE5J40M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717493035; c=relaxed/simple;
-	bh=mDJ3akIHf66UKGEP0PqMNDIzuICl1hokgBOQBHTvtCg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bBRyAe2J3UINVdDj2rpFA5Pk3qF29u0Qrx4vXnKfnLfJhnv4PdZenvI2iFDG3RwzunmzDtFO/aA5568dARAK2xI9XsZK6MmkXZgWut3stR9r7SntLn9orQftP6TeNgZl5txiZRnrDPxScxFTzuyPW1LhF1mR5fVStUreOKjffP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com; spf=pass smtp.mailfrom=savoirfairelinux.com; dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b=UtzC2Qhi; arc=none smtp.client-ip=208.88.110.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=savoirfairelinux.com
-Received: from localhost (localhost [127.0.0.1])
-	by mail.savoirfairelinux.com (Postfix) with ESMTP id 208E89C53DB;
-	Tue,  4 Jun 2024 05:23:52 -0400 (EDT)
-Received: from mail.savoirfairelinux.com ([127.0.0.1])
- by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10032)
- with ESMTP id NEmbSB87dOkH; Tue,  4 Jun 2024 05:23:50 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
-	by mail.savoirfairelinux.com (Postfix) with ESMTP id 8649F9C58AE;
-	Tue,  4 Jun 2024 05:23:50 -0400 (EDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.savoirfairelinux.com 8649F9C58AE
+	s=arc-20240116; t=1717493233; c=relaxed/simple;
+	bh=D2jU5oSARChmNNCZuwg8yDcYXULvhyEIQRoV+s3GJ2o=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=tjst3CeU6uwO26U08wK5ATTdUoBc9XNVQRaax716LmctryOLBQIjhD0JRVZIDWI4Y+duwGducIizv3QNEmavnLz3aco9YmLzTfzurr65lPuwu3uNHpa4rHWVEX+gmM6j1rl+TNwQbeLvGxmdoMiAnI4PP+fMxXUCVQ+OI0Oj6Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DIC2be7d; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a696cde86a4so32330466b.1
+        for <netdev@vger.kernel.org>; Tue, 04 Jun 2024 02:27:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=savoirfairelinux.com; s=DFC430D2-D198-11EC-948E-34200CB392D2;
-	t=1717493030; bh=m+ydlYVcjx1DLdIZTB/6atIt/29sZhwpx3hYUj7sQzE=;
-	h=From:To:Date:Message-Id:MIME-Version;
-	b=UtzC2QhiTUPoiDF3w5lxpyppXeYLlDl8UxPtrZyYJ+YqM6tmt2jADQ/Udqsn9Ysn7
-	 O/1iNqPT7TnFToAp0C6aCbzff+zGNvxdNlXdvQ4roJOfSExKTmJXfwH4lCkbEWJ2Et
-	 nq2NRs/L5aS1kXdQM3Faq0CC7+y+yOpY5HM2C9MdtO4VTY1SKqXyNzeWpLpZfJVf85
-	 UVVv/TqPNWXDqKKOiJfdV/9S2AgMmMBoxQ6YTrvRxfYBli/v9ZBixQQp9FjQyJaRnL
-	 q7aKe/YKtfoHqluP/BnWbUgFIGkL9EfeTi0BZjK8JQFfPEwiuR1a7o4f6yZs1CF8Wf
-	 gTRAs1YC+Zoxg==
-X-Virus-Scanned: amavis at mail.savoirfairelinux.com
-Received: from mail.savoirfairelinux.com ([127.0.0.1])
- by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10026)
- with ESMTP id 1m53x3DfG6kR; Tue,  4 Jun 2024 05:23:50 -0400 (EDT)
-Received: from sfl-deribaucourt.rennes.sfl (lmontsouris-657-1-69-118.w80-15.abo.wanadoo.fr [80.15.101.118])
-	by mail.savoirfairelinux.com (Postfix) with ESMTPSA id 5339A9C58EA;
-	Tue,  4 Jun 2024 05:23:49 -0400 (EDT)
-From: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
-To: netdev@vger.kernel.org
-Cc: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	woojung.huh@microchip.com,
-	UNGLinuxDriver@microchip.com,
-	horms@kernel.org,
-	Tristram.Ha@microchip.com,
-	Arun.Ramadoss@microchip.com,
-	Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
-Subject: [PATCH net v5 4/4] net: dsa: microchip: monitor potential faults in half-duplex mode
-Date: Tue,  4 Jun 2024 09:23:05 +0000
-Message-Id: <20240604092304.314636-5-enguerrand.de-ribaucourt@savoirfairelinux.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240530102436.226189-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
-References: <20240530102436.226189-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+        d=linaro.org; s=google; t=1717493230; x=1718098030; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HFq7tpSqPveDiLxXj1+bXctSOmCsU5WM6G1TgLnMF4E=;
+        b=DIC2be7d1nXxXipAyVXD/Lkl1yyj01onmLsH0kARqDowXUAkepgjX5voKoY6znjuuj
+         qVo02AZFpNe6cLFNcgl1RmLO5AEHHmG8UeEV5IOoR8EDweXlQX5ZKeBnSB9e8SUgisz3
+         E/du194yP8uGt168wX3MDgWk51vlWoU1GngMIH4URDmetghpdE7JhZ40CNKm3+RSy1Aw
+         POCySDHHuSw+vUWtoOZ/VBBJ62Xf3wEXL5Jn+q7nJIaG8ZE4s1REGpPelF9zqirxjNwB
+         LqkKD98yiaicrBtHffV4Qpjg2dGTee9SkMqqb+TfKYaQ7C7fddGdrJPKNdymw65Z+Qgb
+         tuew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717493230; x=1718098030;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HFq7tpSqPveDiLxXj1+bXctSOmCsU5WM6G1TgLnMF4E=;
+        b=TT9X1aVGTggmeSczsx5RTU8k0T45z/spF1RIS0trEbm9tCjJcKLjJ7aivv9RDykyE+
+         ChnOIoqNH/sHvvLZklSqeZOELz/cmwqPXZghOjnZqs2/NJNJa3YmlPA1e8lloEXagOgs
+         LeK8ssXhWiz9s1X8cJuz8ERVkDBBkgbP5GCexWryTzHTJqsEOgZ5z2v+WKt16B7yDtXv
+         iqnJzskzwm4itqBhxTXNiCin5ZXQHklwDCBjPdZYvT/rJ71MD1cDp+o7Wdhm1wpwUZhS
+         hYxHU6QpZslR7DQZNhFlywBWVFtob5lj7S/8yXnYEYBt13eZ7AcY7IP5wsBkU7nfUF4p
+         oWdg==
+X-Forwarded-Encrypted: i=1; AJvYcCWfEuVY0OQQUvHASsLjO9PJtiXH31mMADHqZVVr1rA1EOXsRi+JSofHNOt9z+J0gZsLhN9/AydPx/mD7iKIGSd+IFKqCbDo
+X-Gm-Message-State: AOJu0YyyBxY3H+IiQVv4Egb10/LJ0Y/ghLV2SFoAhoDRlYgHM3GZ3bU5
+	aAuBxVmsbb6LfIkw+AxAieTsPFLApD1IJ0hOQIs+k7g0aBRYaD36f06MDUfA23Y=
+X-Google-Smtp-Source: AGHT+IH/8jHjvoRXRq9A58t2qMLFUxjDENPNcf1oh67gqs4xFNC0tXcrBM43MYq2iYNsnSI4K4Askg==
+X-Received: by 2002:a17:907:8690:b0:a69:2bce:e424 with SMTP id a640c23a62f3a-a692bcee4b3mr272176866b.1.1717493229789;
+        Tue, 04 Jun 2024 02:27:09 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a68e940ed6asm378573366b.22.2024.06.04.02.27.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jun 2024 02:27:09 -0700 (PDT)
+Date: Tue, 4 Jun 2024 12:27:06 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev, Lizhi Xu <lizhi.xu@windriver.com>,
+	ebiggers@kernel.org
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, adilger.kernel@dilger.ca,
+	coreteam@netfilter.org, davem@davemloft.net, fw@strlen.de,
+	jaegeuk@kernel.org, kadlec@netfilter.org, kuba@kernel.org,
+	linux-ext4@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lizhi.xu@windriver.com,
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	pablo@netfilter.org,
+	syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com, tytso@mit.edu
+Subject: Re: [PATCH V3] ext4: check hash version and filesystem casefolded
+ consistent
+Message-ID: <638bf33d-7ab0-4ff0-aece-ab877cff1694@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240531085647.2918240-1-lizhi.xu@windriver.com>
 
-The errata DS80000754 recommends monitoring potential faults in
-half-duplex mode for the KSZ9477 family.
+Hi Lizhi,
 
-half-duplex is not very common so I just added a critical message
-when the fault conditions are detected. The switch can be expected
-to be unable to communicate anymore in these states and a software
-reset of the switch would be required which I did not implement.
+kernel test robot noticed the following build warnings:
 
-Fixes: b987e98e50ab ("dsa: add DSA switch driver for Microchip KSZ9477")
-Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirf=
-airelinux.com>
----
-v5:
- - use macros for bitmasks
- - check for return values on ksz_pread*
-v4: https://lore.kernel.org/all/20240531142430.678198-6-enguerrand.de-rib=
-aucourt@savoirfairelinux.com/
- - rebase on net/main
- - add Fixes tag
- - reverse x-mas tree
-v3: https://lore.kernel.org/all/20240530102436.226189-6-enguerrand.de-rib=
-aucourt@savoirfairelinux.com/
----
- drivers/net/dsa/microchip/ksz9477.c     | 42 +++++++++++++++++++++++++
- drivers/net/dsa/microchip/ksz9477.h     |  2 ++
- drivers/net/dsa/microchip/ksz9477_reg.h |  9 ++++--
- drivers/net/dsa/microchip/ksz_common.c  | 11 +++++++
- drivers/net/dsa/microchip/ksz_common.h  |  1 +
- 5 files changed, 63 insertions(+), 2 deletions(-)
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microc=
-hip/ksz9477.c
-index c2878dd0ad7e..30c1d8a748d4 100644
---- a/drivers/net/dsa/microchip/ksz9477.c
-+++ b/drivers/net/dsa/microchip/ksz9477.c
-@@ -429,6 +429,48 @@ void ksz9477_freeze_mib(struct ksz_device *dev, int =
-port, bool freeze)
- 	mutex_unlock(&p->mib.cnt_mutex);
- }
-=20
-+int ksz9477_errata_monitor(struct ksz_device *dev, int port,
-+			   u64 tx_late_col)
-+{
-+	u32 pmavbc;
-+	u8 status;
-+	u16 pqm;
-+	int ret;
-+
-+	ret =3D ksz_pread8(dev, port, REG_PORT_STATUS_0, &status);
-+	if (ret)
-+		return ret;
-+	if (!((status & PORT_INTF_SPEED_MASK) =3D=3D PORT_INTF_SPEED_MASK) &&
-+	    !(status & PORT_INTF_FULL_DUPLEX)) {
-+		dev_warn_once(dev->dev,
-+			      "Half-duplex detected on port %d, transmission halt may occur\n=
-",
-+			      port);
-+		/* Errata DS80000754 recommends monitoring potential faults in
-+		 * half-duplex mode. The switch might not be able to communicate anymo=
-re
-+		 * in these states.
-+		 */
-+		if (tx_late_col !=3D 0) {
-+			/* Transmission halt with late collisions */
-+			dev_crit_ratelimited(dev->dev,
-+					     "TX late collisions detected, transmission may be halted on po=
-rt %d\n",
-+					     port);
-+		}
-+		ret =3D ksz_pread16(dev, port, REG_PORT_QM_TX_CNT_0__4, &pqm);
-+		if (ret)
-+			return ret;
-+		ret =3D ksz_read32(dev, REG_PMAVBC, &pmavbc);
-+		if (ret)
-+			return ret;
-+		if ((FIELD_GET(PMAVBC_MASK, pmavbc) <=3D PMAVBC_MIN) ||
-+		    (FIELD_GET(PORT_QM_TX_CNT_M, pqm) >=3D PORT_QM_TX_CNT_MAX)) {
-+			/* Transmission halt with Half-Duplex and VLAN */
-+			dev_crit_ratelimited(dev->dev,
-+					     "resources out of limits, transmission may be halted\n");
-+		}
-+	}
-+	return ret;
-+}
-+
- void ksz9477_port_init_cnt(struct ksz_device *dev, int port)
- {
- 	struct ksz_port_mib *mib =3D &dev->ports[port].mib;
-diff --git a/drivers/net/dsa/microchip/ksz9477.h b/drivers/net/dsa/microc=
-hip/ksz9477.h
-index ce1e656b800b..239a281da10b 100644
---- a/drivers/net/dsa/microchip/ksz9477.h
-+++ b/drivers/net/dsa/microchip/ksz9477.h
-@@ -36,6 +36,8 @@ int ksz9477_port_mirror_add(struct ksz_device *dev, int=
- port,
- 			    bool ingress, struct netlink_ext_ack *extack);
- void ksz9477_port_mirror_del(struct ksz_device *dev, int port,
- 			     struct dsa_mall_mirror_tc_entry *mirror);
-+int ksz9477_errata_monitor(struct ksz_device *dev, int port,
-+			   u64 tx_late_col);
- void ksz9477_get_caps(struct ksz_device *dev, int port,
- 		      struct phylink_config *config);
- int ksz9477_fdb_dump(struct ksz_device *dev, int port,
-diff --git a/drivers/net/dsa/microchip/ksz9477_reg.h b/drivers/net/dsa/mi=
-crochip/ksz9477_reg.h
-index fb124be8edd3..21fd9cbc3cc1 100644
---- a/drivers/net/dsa/microchip/ksz9477_reg.h
-+++ b/drivers/net/dsa/microchip/ksz9477_reg.h
-@@ -843,8 +843,7 @@
-=20
- #define REG_PORT_STATUS_0		0x0030
-=20
--#define PORT_INTF_SPEED_M		0x3
--#define PORT_INTF_SPEED_S		3
-+#define PORT_INTF_SPEED_MASK		GENMASK(4, 3)
- #define PORT_INTF_FULL_DUPLEX		BIT(2)
- #define PORT_TX_FLOW_CTRL		BIT(1)
- #define PORT_RX_FLOW_CTRL		BIT(0)
-@@ -1168,6 +1167,11 @@
- #define PORT_RMII_CLK_SEL		BIT(7)
- #define PORT_MII_SEL_EDGE		BIT(5)
-=20
-+#define REG_PMAVBC			0x03AC
-+
-+#define PMAVBC_MASK			GENMASK(26, 16)
-+#define PMAVBC_MIN			0x580
-+
- /* 4 - MAC */
- #define REG_PORT_MAC_CTRL_0		0x0400
-=20
-@@ -1495,6 +1499,7 @@
-=20
- #define PORT_QM_TX_CNT_USED_S		0
- #define PORT_QM_TX_CNT_M		(BIT(11) - 1)
-+#define PORT_QM_TX_CNT_MAX		0x200
-=20
- #define REG_PORT_QM_TX_CNT_1__4		0x0A14
-=20
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/mic=
-rochip/ksz_common.c
-index 2818e24e2a51..0433109b42e5 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -1382,6 +1382,7 @@ const struct ksz_chip_data ksz_switch_chips[] =3D {
- 		.tc_cbs_supported =3D true,
- 		.ops =3D &ksz9477_dev_ops,
- 		.phylink_mac_ops =3D &ksz9477_phylink_mac_ops,
-+		.phy_errata_9477 =3D true,
- 		.mib_names =3D ksz9477_mib_names,
- 		.mib_cnt =3D ARRAY_SIZE(ksz9477_mib_names),
- 		.reg_mib_cnt =3D MIB_COUNTER_NUM,
-@@ -1416,6 +1417,7 @@ const struct ksz_chip_data ksz_switch_chips[] =3D {
- 		.num_ipms =3D 8,
- 		.ops =3D &ksz9477_dev_ops,
- 		.phylink_mac_ops =3D &ksz9477_phylink_mac_ops,
-+		.phy_errata_9477 =3D true,
- 		.mib_names =3D ksz9477_mib_names,
- 		.mib_cnt =3D ARRAY_SIZE(ksz9477_mib_names),
- 		.reg_mib_cnt =3D MIB_COUNTER_NUM,
-@@ -1450,6 +1452,7 @@ const struct ksz_chip_data ksz_switch_chips[] =3D {
- 		.num_ipms =3D 8,
- 		.ops =3D &ksz9477_dev_ops,
- 		.phylink_mac_ops =3D &ksz9477_phylink_mac_ops,
-+		.phy_errata_9477 =3D true,
- 		.mib_names =3D ksz9477_mib_names,
- 		.mib_cnt =3D ARRAY_SIZE(ksz9477_mib_names),
- 		.reg_mib_cnt =3D MIB_COUNTER_NUM,
-@@ -1540,6 +1543,7 @@ const struct ksz_chip_data ksz_switch_chips[] =3D {
- 		.tc_cbs_supported =3D true,
- 		.ops =3D &ksz9477_dev_ops,
- 		.phylink_mac_ops =3D &ksz9477_phylink_mac_ops,
-+		.phy_errata_9477 =3D true,
- 		.mib_names =3D ksz9477_mib_names,
- 		.mib_cnt =3D ARRAY_SIZE(ksz9477_mib_names),
- 		.reg_mib_cnt =3D MIB_COUNTER_NUM,
-@@ -1820,6 +1824,7 @@ void ksz_r_mib_stats64(struct ksz_device *dev, int =
-port)
- 	struct rtnl_link_stats64 *stats;
- 	struct ksz_stats_raw *raw;
- 	struct ksz_port_mib *mib;
-+	int ret;
-=20
- 	mib =3D &dev->ports[port].mib;
- 	stats =3D &mib->stats64;
-@@ -1861,6 +1866,12 @@ void ksz_r_mib_stats64(struct ksz_device *dev, int=
- port)
- 	pstats->rx_pause_frames =3D raw->rx_pause;
-=20
- 	spin_unlock(&mib->stats64_lock);
-+
-+	if (dev->info->phy_errata_9477) {
-+		ret =3D ksz9477_errata_monitor(dev, port, raw->tx_late_col);
-+		if (ret)
-+			dev_err(dev->dev, "Failed to monitor transmission halt\n");
-+	}
- }
-=20
- void ksz88xx_r_mib_stats64(struct ksz_device *dev, int port)
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/mic=
-rochip/ksz_common.h
-index c784fd23a993..ee7db46e469d 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -66,6 +66,7 @@ struct ksz_chip_data {
- 	bool tc_cbs_supported;
- 	const struct ksz_dev_ops *ops;
- 	const struct phylink_mac_ops *phylink_mac_ops;
-+	bool phy_errata_9477;
- 	bool ksz87xx_eee_link_erratum;
- 	const struct ksz_mib_names *mib_names;
- 	int mib_cnt;
---=20
-2.34.1
+url:    https://github.com/intel-lab-lkp/linux/commits/Lizhi-Xu/ext4-check-hash-version-and-filesystem-casefolded-consistent/20240531-170046
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/tytso/ext4.git dev
+patch link:    https://lore.kernel.org/r/20240531085647.2918240-1-lizhi.xu%40windriver.com
+patch subject: [PATCH V3] ext4: check hash version and filesystem casefolded consistent
+config: i386-randconfig-141-20240601 (https://download.01.org/0day-ci/archive/20240602/202406020752.Ii2MU4KP-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202406020752.Ii2MU4KP-lkp@intel.com/
+
+smatch warnings:
+fs/ext4/super.c:5287 __ext4_fill_super() warn: missing error code 'err'
+
+vim +/err +5287 fs/ext4/super.c
+
+d4fab7b28e2f5d7 Theodore Ts'o           2023-04-27  5280  	err = ext4_block_group_meta_init(sb, silent);
+d4fab7b28e2f5d7 Theodore Ts'o           2023-04-27  5281  	if (err)
+0d1ee42f27d30ee Alexandre Ratchov       2006-10-11  5282  		goto failed_mount;
+0b8e58a140cae2b Andreas Dilger          2009-06-03  5283  
+db9345d9e6f075e Jason Yan               2023-03-23  5284  	ext4_hash_info_init(sb);
+66b3f078839bbdb Lizhi Xu                2024-05-31  5285  	if (es->s_def_hash_version == DX_HASH_SIPHASH && 
+66b3f078839bbdb Lizhi Xu                2024-05-31  5286  	    !ext4_has_feature_casefold(sb))
+66b3f078839bbdb Lizhi Xu                2024-05-31 @5287  		goto failed_mount;
+
+
+Should this be an error path?  err = something?
+
+ac27a0ec112a089 Dave Kleikamp           2006-10-11  5288  
+d4fab7b28e2f5d7 Theodore Ts'o           2023-04-27  5289  	err = ext4_handle_clustersize(sb);
+d4fab7b28e2f5d7 Theodore Ts'o           2023-04-27  5290  	if (err)
+281b59959707dfa Theodore Ts'o           2011-09-09  5291  		goto failed_mount;
+960fd856fdc3b08 Theodore Ts'o           2013-07-05  5292  
+d4fab7b28e2f5d7 Theodore Ts'o           2023-04-27  5293  	err = ext4_check_geometry(sb, es);
+d4fab7b28e2f5d7 Theodore Ts'o           2023-04-27  5294  	if (err)
+bfe0a5f47ada40d Theodore Ts'o           2018-06-17  5295  		goto failed_mount;
+bfe0a5f47ada40d Theodore Ts'o           2018-06-17  5296  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
 
