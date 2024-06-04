@@ -1,112 +1,102 @@
-Return-Path: <netdev+bounces-100736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2CFC8FBC7C
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 21:27:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E5FC78FBC91
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 21:30:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4305B22F1E
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 19:27:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B8AAB22DEF
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 19:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA56914884D;
-	Tue,  4 Jun 2024 19:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9181514B95D;
+	Tue,  4 Jun 2024 19:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kZHYxDO/"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="NHYIEzd4"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD9F801;
-	Tue,  4 Jun 2024 19:26:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95E8149E00;
+	Tue,  4 Jun 2024 19:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717529219; cv=none; b=A7ga2kf+aTp5jrsw6N5ccvCplubkG1lH+Y7C4EpI3CV1lHQ82JgsYgp3pknK4rMPgTuMtuh4qAeW/7yspsykdCMGheLG8Va9yYrfQHETVizF9XZTBj4Lf0QXu5ZWDHaLTOl+xWRTEnkvcCWy7+06eZpScXpy0RiURV73oiIqGPc=
+	t=1717529416; cv=none; b=BTrSY0qM1Fc6FfvoipTd+8UHoqkZymbIBRjKmI5C0dJfTdLNdvqZKB0mjlp0MOZW2Xgn+H+GSnBMqrG/GKzMhuBFnCSO8gKnqKZB5/qO7HiWes3UZ6VjguL4z6OmZireg6FN9oxMCk6UnRwMU1I3nKrEMM4k9tS6G0olX2i7tJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717529219; c=relaxed/simple;
-	bh=RfYADli4pR43LR8z8+OGq/B16AAsfprRCkUGcCgzMbw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qihTp39lqd/gg3s5YsRYiIwf4Nwr5V5N5YvuBoCaU1XhrApdvA00LSSFZr/NdXIt9xRYLJgjxKZf2glGVeDUU9n861gLc+txRNg/7NbBJr9FMK56hGhu+/TxxNyEjDDcM4nNVZp9ERpbMFP1/Emv0m3osVDF+fDxVmtX1/C1hbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kZHYxDO/; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=wsZATjoAW728C9PCBeyQtYSddogYGOk05sPShVwPjac=; b=kZHYxDO/WVRlIL3QNyFnI4rCsk
-	YgvhSkh9mfhdWR2/JAqlpW0Wm1xbMoXf1OfqcG2i8nQPHDS6Nyn9WFlVsg6jcCjFUP8DcarUZlL10
-	c0F9boXbmKWcoT01q59knzKrEBXXaQal4jFdnx6tMjlKBFYYKQEnCtDfAiD8Q8OzkHP8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sEZnp-00Gq9r-2O; Tue, 04 Jun 2024 21:26:37 +0200
-Date: Tue, 4 Jun 2024 21:26:37 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Ng, Boon Khai" <boon.khai.ng@intel.com>
-Cc: Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Ang, Tien Sung" <tien.sung.ang@intel.com>,
-	"G Thomas, Rohan" <rohan.g.thomas@intel.com>,
-	"Looi, Hong Aun" <hong.aun.looi@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	"Tham, Mun Yew" <mun.yew.tham@intel.com>
-Subject: Re: [Enable Designware XGMAC VLAN Stripping Feature v2 1/1] net:
- stmmac: dwxgmac2: Add support for HW-accelerated VLAN Stripping
-Message-ID: <734c0d46-63f2-457d-85bf-d97159110583@lunn.ch>
-References: <20240527093339.30883-1-boon.khai.ng@intel.com>
- <20240527093339.30883-2-boon.khai.ng@intel.com>
- <48176576-e1d2-4c45-967a-91cabb982a21@lunn.ch>
- <DM8PR11MB5751469FAA2B01EB6CEB7B50C1F12@DM8PR11MB5751.namprd11.prod.outlook.com>
- <48673551-cada-4194-865f-bc04c1e19c29@lunn.ch>
- <DM8PR11MB5751194374C75EC5D5889D6AC1F32@DM8PR11MB5751.namprd11.prod.outlook.com>
- <322d8745-7eae-4a68-4606-d9fdb19b4662@linux.intel.com>
- <BL3PR11MB57488DF9B08EACD88D938E2FC1F82@BL3PR11MB5748.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1717529416; c=relaxed/simple;
+	bh=ndt5DjQLSxNaMRiN5lWMogKV1y5Mo8iJXJhz3aNywNU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=m6I0JCSFywjzslM1h2a99G8MT20dN5rV/k+j8S1Gx3hyMAO9CQY5TCbrm7nb1X8ZEplJxcT/AXzTN6FXaYg5Kx76rUqthsrwIYaWUZ98YNEuGTbA/YiTP6gpC8TgFldFIOXTlIOl+9T8Oq/m7bW/TP8S1r0lFBrDBv8NRr63i7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=NHYIEzd4; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=SjfoPtdjADSbT41zcd4TQ1qMWoklnCAhWIpkfEJKm1Q=;
+	t=1717529413; x=1718739013; b=NHYIEzd4h3I05y9SHIkqwUaFy9wL1RY6nRwgO9qhjGoJ+BO
+	t3M8Aut/gyFurhcII4Mt8BeKGpoXn+23NPH5h39ijQ6o9UyCZWDg3gpcOCqGZowklzPIgCboDwVgC
+	SNH4ASHQtOy824JkeZ09TjFb2USBCXUmFB1xCETtykWO3Kv2kMfkWNsOXqfOK2MXNxB7U3+ljjz7L
+	2OxVz2Ig+rPOArLKKVkQap2OFJbA1tDUkfVC+kGWLfLoyDHUMZ15kuS3VbDMJ7Lc8L8x2rGQAbFVn
+	LTzKndGgFR6hzfl/BgjPhUxAd2houkv1MeRQAhAmb4dki1gNW5WKseWGGkb8nr4Q==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1sEZr5-0000000CoV1-2UFL;
+	Tue, 04 Jun 2024 21:30:00 +0200
+Message-ID: <ab59089feac4cfbc1d681fcaa4a828ca13088ce1.camel@sipsolutions.net>
+Subject: Re: [PATCH v2] wifi: mac80211: Avoid address calculations via out
+ of bounds array indexing
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Kenton Groombridge <concord@gentoo.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com,  linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, Kees Cook
+ <keescook@chromium.org>
+Date: Tue, 04 Jun 2024 21:29:57 +0200
+In-Reply-To: <cx2oet5b5lavjywcbf7u4c32krtoglvt3xbe2sxac55e36iibw@lrd5iuhtxz2g>
+References: <20240517145420.8891-1-concord@gentoo.org>
+	 <d1fea590e53cb1b00dc64f4f8a4c8aec84610401.camel@sipsolutions.net>
+	 <cx2oet5b5lavjywcbf7u4c32krtoglvt3xbe2sxac55e36iibw@lrd5iuhtxz2g>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BL3PR11MB57488DF9B08EACD88D938E2FC1F82@BL3PR11MB5748.namprd11.prod.outlook.com>
+X-malware-bazaar: not-scanned
 
-On Tue, Jun 04, 2024 at 06:05:35AM +0000, Ng, Boon Khai wrote:
->  
-> > You should generalize the existing functions into some other file within
-> > stmmac/ folder and call those functions from both dwmac4_core and
-> > dwxgmac2_core.
-> > Do the rework of existing function & callers first and add the new bits in
-> > another patch in the patch series.
-> >
-> 
-> Hi Ilpo, do you mean I should create a new file for example,
-> stammc_vlan.c,  and move the common vlan function inside?
-> so that it can be called either from dwmac4_core, dwxgmac2_core 
-> or stmmac_main.c? or maybe I should just consolidate them into
-> stmmac_main.c?
+On Tue, 2024-06-04 at 14:53 -0400, Kenton Groombridge wrote:
+> On 24/05/29 04:54PM, Johannes Berg wrote:
+> > On Fri, 2024-05-17 at 10:54 -0400, Kenton Groombridge wrote:
+> > > req->n_channels must be set before req->channels[] can be used.
+> > >=20
+> >=20
+> > I don't know why, but this patch breaks a number of hwsim test cases.
+> >=20
+> > https://w1.fi/cgit/hostap/tree/tests/hwsim/
+> >=20
+> > johannes
+>=20
+> Pardon my absence.
+>=20
+> I'm also not sure why these tests are failing. Unless I'm missing
+> something, the runtime behavior of these code paths shouldn't have
+> changed significantly.
+>=20
 
-Do you have access to all the reference documentation for the IP
-driven in dwmac4_core.c, dwxgmac2_core.c and stmmac_main.c? Is it just
-VLAN which is the same, and everything else is different? Or are other
-blocks of the hardware also identical and the code should be shared?
-If VLAN is all that is identical, then stammc_vlan.c would make sense.
+Looking at your patch again, this seems wrong?
 
-If there is more in common, you can start the cleanup of the mess this
-driver is by moving the VLAN code into a shared file, but make the
-naming of that file more generic so more shared code can be added with
-later cleanups.
+> +				local->hw_scan_req->req.channels[*n_chans++] =3D
+>  							req->channels[i];
+>=20
 
-       Andrew
+This will increment n_chans rather than *n_chans, no?
+
+johannes
 
