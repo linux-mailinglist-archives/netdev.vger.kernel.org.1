@@ -1,136 +1,150 @@
-Return-Path: <netdev+bounces-100676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9292E8FB8AF
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:18:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B5AA8FB8B3
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:18:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 293261F251FF
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:18:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1E9E1F21DA3
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:18:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91E2C1482FC;
-	Tue,  4 Jun 2024 16:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 441D2148307;
+	Tue,  4 Jun 2024 16:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MfEtLhqw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bhEVfBTv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EDC8146A87
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 16:18:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12CCE143C7B;
+	Tue,  4 Jun 2024 16:18:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717517905; cv=none; b=Pczcfy1/NbqEyvXW7x22vHviZAbpP5Mtj3AV9Ro3KQR8yATUVrtCueBYABLL+OLPoVq02glU7LIft312oNk5PJ7E8h2L/5ixLxZ7ANHJ2ikkFUvb2nt9hew40vtiJKv8NCvuxvQ8Wr3IpBzepcKj87ux3U6zb2czw5pn++DQqZo=
+	t=1717517921; cv=none; b=qk2ClEpmyWRU/q1PcXH5QHy8o4S+MctX028KK7h1ZOqgBqvKRiOLMXn5ZfRxalHy79nKphAcWl7KrY7AQYGltk8p+Cw+U++EeneCE5Zb0KlaR5bHoW8bG++LeGOysuX3Mle76inxoBgOmpCzFytZK6lrCqussDJJ+LHZ+s3k2zE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717517905; c=relaxed/simple;
-	bh=nPqXATH3gJO0xG3OcvVlRB8VrvjY/FhA0oPoFQeHE5g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kaWaAXQt1cevr7lX5LSmv+q5+5t3D/jJoPsqaDMmcaKFk6a02QmYjdF2VmeErsGuDRTlUCkLiVVXg4vuZccYTmAalWBv5u3yeejt1Q4d6FoGFGedEKK4r3AQCACK1PiGFrITxxNgd7mo2o1hHTNsdvn8JPLkOjwAUejSf9AII/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MfEtLhqw; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-70257104b4dso2610725b3a.1
-        for <netdev@vger.kernel.org>; Tue, 04 Jun 2024 09:18:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717517903; x=1718122703; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qdfqg+XI8I+MI3h2wU8ZL/dAxG9QlNacDO9P7kZI7gM=;
-        b=MfEtLhqw5YqEBo5Z/gPPho2xFh4bZEyajq85qVR+voM+VZTYNdpr4vGmaOb5tkzYvb
-         hjZHUkTlq+vx7jtXBqDnDNWXAuUX6J+2JXXVe86fssXzMO7DQy5sCV8ejaMYd/MIsNKL
-         QIdn+At/RtcKaHGBo0rPKgfZIX7hsSzcZXxZdX+P9jVaMZZl31k+iwbogPhwvD0BBFjw
-         DWL027nMZD3ELu7L9gnh4V31Nlk+GzzXyR7phhkdzPypf+tcwA7jCScPIAzjzRkmPn0a
-         s637czL131zlJCy+FcHMX7UzLZDMlvKUhqvgBD7QktPKMbD2ljgZC397sGbza0bFJzUr
-         Uirg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717517903; x=1718122703;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qdfqg+XI8I+MI3h2wU8ZL/dAxG9QlNacDO9P7kZI7gM=;
-        b=UWHRYmL3Xg7BspGf0x+F8P3hpKVkW3VXns1R01I18qDCywK747unUw2Lo4FMcjyJ+V
-         Tjrb2QpiNoNGUPa3x90ykkkivxCdyJGyfuOKvJou1fmD6i0x+/KVcG9CQtlKr0pNlY3B
-         3VAgrJ90B9fwwvjkwR1mzyTV8ucbVQ1VTcGSmrn+Ws5hRSS9RjlWnmqbvJ3vhYXW/Fpm
-         Iidf2A6rhRFu2kVvFEC5Igp/JEq3r7OgWyozv6MwEk71UrETByjgMe34OJqJucWbopnW
-         kSN+zYsbRDmkz1kCssKf2YXkF7ENZtB+cV2i1fTBhP+LoHGwx5PgPYTSUmfeaMOSEqOb
-         ccgw==
-X-Forwarded-Encrypted: i=1; AJvYcCWaExEMrwaU7l6FyU45nHNB3U1WOhQ/qytcV3qXWu+1xXtyvHDNza6TGsbmh54lDsuG9nseNX3Q5Io6Baj3YmVK94wN9gR4
-X-Gm-Message-State: AOJu0YzY4j/zwdPIDXmuXXKf09sNz9vjzHre4Bs8uI48cdGag7haH1gA
-	IeK/KM0C2arENXqCKUO4mGcjs5tnrKXHYfKUXLNWNdG6QiQE3KGgenukwZrwNPFqExHiyM687hQ
-	roVc2RFxrbDOs/FQR005cIWiTr6w+R0gb/Krk
-X-Google-Smtp-Source: AGHT+IHH8BcDT51//iJobaXt0VIzNrVR1B4YFM/qgQyKNVEvfCFBn+scD7t29ulO1UCUwWCXKi767BV3CuTLWi/kpUY=
-X-Received: by 2002:a05:6a20:3d94:b0:1ad:90dc:4a65 with SMTP id
- adf61e73a8af0-1b2b6fba62amr92507637.27.1717517903068; Tue, 04 Jun 2024
- 09:18:23 -0700 (PDT)
+	s=arc-20240116; t=1717517921; c=relaxed/simple;
+	bh=bE1vdHtIjSqwigCaLdryxWybdC+nY5atBDg6IDsGPHc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jDtSAhgh5yE+QKAXgdd+ZkD5CO4+6DWZnKnsfHjqXweQB2I5ode3QVP+OZq6gnbXRZoTIRup0G9OwNbYSq9W1zFTjshrRnC23sR85YN+RmY3Nz3j92/BfOslj9iFwzZt8L0E/+wOod7LAMesX+gaMKuCyzwBuV802WQBx5sA6BM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bhEVfBTv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 092E4C32786;
+	Tue,  4 Jun 2024 16:18:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717517920;
+	bh=bE1vdHtIjSqwigCaLdryxWybdC+nY5atBDg6IDsGPHc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bhEVfBTvB89ICwH5kSGyU+pleoJh1UIenKoqhcNlXMpaRnyCpfs/VUD1SN68E+hij
+	 QgA3qyEB068crCIK8AtSPuulcKGShjxkaRKryZjzmyMEIZi0TRUCfPM1tdRGU50u1x
+	 AtQlGltWp1zvO4lFsyWqRt5t5kWxuuPFaZfZD4CnCi4j42z8v73LCvsDYLQ4y0v1eE
+	 H1p+poDml21jEVERJAtULu3WKvdxeQymsrHWu/TRAwwckSdutPYyBCDTCImjOecubP
+	 xXty3JGR2EX1zPl0RD+DrpHOyOhjLWTOeD29jO5Ze8ZEEaz2VwCXAQkxh8va+EW7zz
+	 rVxYvdNQu0u1g==
+Date: Tue, 4 Jun 2024 17:18:32 +0100
+From: Mark Brown <broonie@kernel.org>
+To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jakub Kicinski <kuba@kernel.org>, Kees Cook <keescook@chromium.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Sasha Levin <sashal@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Shengyu Li <shengyu.li.evgeny@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	Brendan Higgins <brendanhiggins@google.com>,
+	David Gow <davidgow@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
+	Jon Hunter <jonathanh@nvidia.com>, Ron Economos <re@w6rz.net>,
+	Ronald Warsow <rwarsow@gmx.de>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Will Drewry <wad@chromium.org>,
+	kernel test robot <oliver.sang@intel.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v7 04/10] selftests/harness: Fix interleaved scheduling
+ leading to race conditions
+Message-ID: <53c0e2e5-46c9-4e49-8ec4-64ef58e6331c@sirena.org.uk>
+References: <20240511171445.904356-1-mic@digikod.net>
+ <20240511171445.904356-5-mic@digikod.net>
+ <9341d4db-5e21-418c-bf9e-9ae2da7877e1@sirena.org.uk>
+ <187423fb-ec78-4318-9da0-5b27df62b71f@sirena.org.uk>
+ <9eb1e48e-b273-475a-9740-52deedf11ee2@sirena.org.uk>
+ <20240604.KaT6shae5eip@digikod.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230810123057.43407-1-xuanzhuo@linux.alibaba.com>
- <20230810123057.43407-5-xuanzhuo@linux.alibaba.com> <0b726a75574ad98200b815f173e59a5378e9df04.camel@linux.ibm.com>
-In-Reply-To: <0b726a75574ad98200b815f173e59a5378e9df04.camel@linux.ibm.com>
-From: Alexander Potapenko <glider@google.com>
-Date: Tue, 4 Jun 2024 18:17:44 +0200
-Message-ID: <CAG_fn=Wv4Tw8guW=mFYyV9T18C_qPZOxr3fwKcRkDVXm1e+iXg@mail.gmail.com>
-Subject: Re: [PATCH vhost v13 04/12] virtio_ring: support add premapped buf
-To: Ilya Leoshkevich <iii@linux.ibm.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, virtualization@lists.linux-foundation.org, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Christoph Hellwig <hch@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="d/oZ8G2r6TlAFN6b"
+Content-Disposition: inline
+In-Reply-To: <20240604.KaT6shae5eip@digikod.net>
+X-Cookie: Is it clean in other dimensions?
+
+
+--d/oZ8G2r6TlAFN6b
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 4, 2024 at 6:07=E2=80=AFPM Ilya Leoshkevich <iii@linux.ibm.com>=
- wrote:
->
-> On Thu, 2023-08-10 at 20:30 +0800, Xuan Zhuo wrote:
-> > If the vq is the premapped mode, use the sg_dma_address() directly.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/virtio/virtio_ring.c | 19 +++++++++++++++++--
-> >  1 file changed, 17 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/virtio/virtio_ring.c
-> > b/drivers/virtio/virtio_ring.c
-> > index 8e81b01e0735..f9f772e85a38 100644
-> > --- a/drivers/virtio/virtio_ring.c
-> > +++ b/drivers/virtio/virtio_ring.c
-> > @@ -361,6 +361,11 @@ static struct device *vring_dma_dev(const struct
-> > vring_virtqueue *vq)
-> >  static int vring_map_one_sg(const struct vring_virtqueue *vq, struct
-> > scatterlist *sg,
-> >                           enum dma_data_direction direction,
-> > dma_addr_t *addr)
-> >  {
-> > +     if (vq->premapped) {
-> > +             *addr =3D sg_dma_address(sg);
-> > +             return 0;
-> > +     }
-> > +
->
-> I wonder if something needs to be done for KMSAN here, like it's done
-> by the next block in this function? I'm looking into what seems to be a
-> KMSAN false positive on s390x:
->
-> BUG: KMSAN: uninit-value in receive_buf+0x45ca/0x6990
->  receive_buf+0x45ca/0x6990
->  virtnet_poll+0x17e0/0x3130
->  net_rx_action+0x832/0x26e0
->  handle_softirqs+0x330/0x10f0
->  [...]
+On Tue, Jun 04, 2024 at 06:06:48PM +0200, Micka=EBl Sala=FCn wrote:
 
-I think there's a similar problem on x86 as well:
-https://syzkaller.appspot.com/bug?extid=3Dc5336dcd1b741349d27a
+> Thanks for the heads up.  I warned about not being able to test
+> everything when fixing kselftest last time, but nobody show up.  Is
+> there an easy way to run most kselftests?  We really need a (more
+> accessible) CI...
 
-I was going to look closer this week.
+You can just invoke the top level kselftests Makefile but between things
+being flaky and runtime requirements there's a bunch of noise there.
+KernelCI covers a bunch of it and would be my go to, I've got a good
+chunk of the selftests that actually build and run reliably in my
+personal CI but it has no visible UI.  Part of the issue here might be
+platform specifics, I'm seeing this on arm64. =20
+
+> > > FWIW I'm still seeing this on -rc2...
+
+> > AFAICT this is due to the switch to using clone3() with CLONE_VFORK
+
+> I guess it started with the previous vfork() that was later replaced
+> with CLONE_VFORK.
+
+Bisect did seem to point at this commit FWIW, I've not dug into any API
+differences or anything here.  The immediate thing being replaced was a
+plain fork() though I see it was vfork() at some point before that, and
+I'd not have noticed if the individual testcases weren't hanging so the
+timeout was needed.
+
+> > I'm not clear what the original race being fixed here was but it seems
+> > like we should revert this since the timeout functionality is pretty
+> > important?
+
+> It took me a while to fix all the previous issues and it would be much
+> easier to just fix this issue too.
+
+> I'm working on it.
+
+Great, thanks.
+
+--d/oZ8G2r6TlAFN6b
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZfPlcACgkQJNaLcl1U
+h9DBngf+IjDxDtusJc/iSMVrkM3BxNZGYxiJwiwd29R9Z1J4+xF1epkd3KXzUhGK
+s7k2vCuJcyj3tj0CDKxLbC155dUIryEvIF8o9oJ5xY4z+l/8SSspGxm0Oly8fjZE
+T3vZLiWmWFyZV6pC9FhXryFLgnCCwmHgKXpMQoRDZGSkpq/DhxYTNAH1n94F2P6e
+vjEnCzuZb9YvH8ZEG7X5yiZs0Z6lUiVSFp4Uqf3AEFLZBl33JFREgnuYpuSsBo/p
+vo6UOKR/TkP61x02iuq5QiL0OtuW/pusrq1yDmAlILHzh6z5DYHgf/iNAumjKykx
+ZxQrgJtk5Fhc8P5nERw/c7Q07LjV/A==
+=Ezzq
+-----END PGP SIGNATURE-----
+
+--d/oZ8G2r6TlAFN6b--
 
