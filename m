@@ -1,594 +1,166 @@
-Return-Path: <netdev+bounces-100538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1BF18FB073
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 12:52:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB5B98FB08E
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 12:53:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26E9C1F221F6
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 10:52:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71574284558
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 10:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4431B144D11;
-	Tue,  4 Jun 2024 10:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A26F14532F;
+	Tue,  4 Jun 2024 10:53:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UdxH/f/A"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XoGCQM1u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0FAA144D03
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 10:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717498347; cv=fail; b=Q+anlX9Jb77mhmfIJuCw6zo0XShimSBXQG0qA81J9cOmQKoxwwZcobPR/wjSCjpzmcFyW5gDtCA2zjB4pGx8/C80mf9F34b2kfJ3mYt2FqKeHyzm/ajY7OHtCT/XXpVK5U9nPKGrjNLPJrRZeQMTkrbP5McCN+ysoBCLLGvRSg4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717498347; c=relaxed/simple;
-	bh=wHHBchUdB6X2tDu/ZAJTqy21MOMYureaEuGsmPpXN4Q=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=AweW+0EpeDAIchP/N8hq4mrI5Oymk3sXdSRdYf5tMItUtx05r/7U58KWzPLOXfDkszMpMf0csDaAHp61438Bq+VmYoV+q4/p/754x/wytkN7+4Rgk+5Aqg9B2FgYTFEdJaLmOIeTOrazJe+JlZfITRJ6lS9Q6w7GK9e9PID/zB8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UdxH/f/A; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717498345; x=1749034345;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=wHHBchUdB6X2tDu/ZAJTqy21MOMYureaEuGsmPpXN4Q=;
-  b=UdxH/f/AFFfcgvxrTPK5hZkep/0U/Ob1fnHs1mgA8byFc7CJxJ1vpp3N
-   J5Jqa7BuImQo02gljZ4ZUV4l1dIfkpmoTMthZ6sUE0r5tLGp+CwTbuAwE
-   wI4XpkfW3ldn1rkRzvGK7YUGGr+vWsf0mNNyrHyKRkEufjleL/fcRDwCd
-   D/fRMdNLA22gzAC+mLjLo//6siv9O5P/nGvHkudFXKxLtkKXyi1Q92sS/
-   8AcdX9fJv83IwlE/Yn5SULxd2yF8KE48XmgMODwfRZH+YRRiN0Yc4GNAB
-   rH9ajQFbo8uoeVq0p6aDa6ICFm3IiwyQxcxPifKHlKepwbHo0I9DPP/V2
-   g==;
-X-CSE-ConnectionGUID: c4A0csySTMW80GP9I+bZgA==
-X-CSE-MsgGUID: +RwF/hwiTeaiPuq92+545w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11092"; a="13986202"
-X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
-   d="scan'208";a="13986202"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 03:52:25 -0700
-X-CSE-ConnectionGUID: XrNanSnyTmmDOKG9VkGsNw==
-X-CSE-MsgGUID: hkK1XuTYTeC2be5PGJieOQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
-   d="scan'208";a="74699830"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Jun 2024 03:52:25 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 4 Jun 2024 03:52:23 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 4 Jun 2024 03:52:23 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 4 Jun 2024 03:52:23 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 4 Jun 2024 03:52:23 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nY+VlLHSLbpbsLKh/f3UQnPymWC1i5lMn5G7gdlH9MGhcFDElKTI8LLCKGVip4bIdi+F8OZnVXYnMcuIm647e0RWutmyt/U5V98tiVFWoBAgQKv85zgSyImLyqdN5ehAhGX39fh0X4ApqfndspSMiYjxS2Ce+pJTPBl9IAxLaKcmNIKHd9kul4r4MvSOpamKlTDYpf+uZgRjep0qJMIpJs+WOwLHD1pPZ1XoHJ6uA3UyFgrmltzWO0/auCTiEEBe6cs25USHCxI8Lzr/D9qYzvFzKv3gD7XL1gEQUqEGA87PG9xILNvTDrR/Wv+Ph2Qp1jZtMkRx2YeLf5bRZa4JGQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QXMTKbZ28krkRKmZ9cUYOcp6Zh+ahbL4ZOCKjO/pz5A=;
- b=DjrbEdFffbNZyhpCtBbWNPDuvKODbiSsK67JRUFAn/MHosQaxTWFS/gdogeqfrWEP7tzqhFrKqCDyjdw5zThFms66cxY9qpQTN0BCzTdZSoQKCvIQLgiXcVIfkALZMRiiTtBZmXhFhK6xbhRLG3sRIZ5Fh4KHGz+JlwvPrKtbPHHNOLCvY6REN3by7pr6exViWo/a4XnIzBmnXnPz5ZidvqVotuFxkTpUSHOQ2o5eETLi0+6qUqdrVRG+ut01BMAkuRjvOnX7Sq/JarJr3XCGjM0MAxQPy5ydbU3iRxqeGB9jrOXrZczDhd722AkmNC7GLyywtzzOh6/gBQikSWwiQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- SA1PR11MB7037.namprd11.prod.outlook.com (2603:10b6:806:2ba::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.30; Tue, 4 Jun
- 2024 10:52:21 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%7]) with mapi id 15.20.7633.021; Tue, 4 Jun 2024
- 10:52:21 +0000
-Date: Tue, 4 Jun 2024 12:52:16 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: "Nelson, Shannon" <shannon.nelson@amd.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<anthony.l.nguyen@intel.com>, <magnus.karlsson@intel.com>,
-	<michal.kubiak@intel.com>, <larysa.zaremba@intel.com>
-Subject: Re: [PATCH v2 iwl-net 6/8] ice: improve updating
- ice_{t,r}x_ring::xsk_pool
-Message-ID: <Zl7x4PowgJyXNwPp@boxer>
-References: <20240529112337.3639084-1-maciej.fijalkowski@intel.com>
- <20240529112337.3639084-7-maciej.fijalkowski@intel.com>
- <3f1a5f28-4e5c-463e-9049-ffc23efc4f93@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <3f1a5f28-4e5c-463e-9049-ffc23efc4f93@amd.com>
-X-ClientProxiedBy: VE1PR08CA0018.eurprd08.prod.outlook.com
- (2603:10a6:803:104::31) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33183145343
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 10:53:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717498425; cv=none; b=TE5iC1ls2e2HSsxG2yxCSAZdUe2uwMu21iXJ9sto+boAX8XQ/QgBcsRXMZ/Riki3V70XxKCgMH17ZXd0Dk9dQ7YtDWI0c52A1NR05NvWjGou5NvG5d6FxqEqCn/zAcrP4PuovWWR9R9W7wLJ7WJazgfYbtjpqyBdTqehU4MbIas=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717498425; c=relaxed/simple;
+	bh=sWJfxrg7DaNSgc2gmCC3cAQqrzVJfSocaCuwhh48x1I=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=iMwoDAY0EYWrmEPRXN0Ks6rkEANSm+tCgaBbmuQmTNiXefxwxVjOuRraTb3tGGMcPicgqgbJtR2C3dxQX0tx4bHc6nYGbV7W/iydR7SjO8rP4N1EkMm6u48CpB/i3ewhBQONm4XPpja+g7IyslS0xF0llA2TolcjxxdzsWhPuTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XoGCQM1u; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717498422;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=woIW2rG36WjVplYf1XFEiaOd0JQOnrJYxOcJXRhrDbw=;
+	b=XoGCQM1uUREZhqrTKNRLKWVMpMs8507DrbhTwSPlwV25zBascauDjOxHZHw5rVU/iIXB7F
+	Fgn88wjHOnmQ5QM2pZDDAkU8XQbCPZIxQa+G9PhajFiIZl0Ysihas57XURxOHTpvHnXvXU
+	/9ULqSruHN6JdMZYEwLOSNOk/dEhwg8=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-263-YfCBosIdPV26OFXu8OCVWw-1; Tue, 04 Jun 2024 06:53:40 -0400
+X-MC-Unique: YfCBosIdPV26OFXu8OCVWw-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2eabd5dc851so922171fa.1
+        for <netdev@vger.kernel.org>; Tue, 04 Jun 2024 03:53:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717498419; x=1718103219;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=woIW2rG36WjVplYf1XFEiaOd0JQOnrJYxOcJXRhrDbw=;
+        b=NuzfcTlC+QzV2xd/NjQM9Hm3lOvuWokusLpasdZ9filO9yf5WVw8fr0qV+D7xIFaEV
+         Mhn3gh34HWSBh7BJ7ZU0kFRV5562VGfy/nx7isiQj54VIfOk/nP2G2WPMtb+xPCbdhtn
+         zsxtZ46Bm+FyGsYvMLNSZ3yXFvhicI5o3AdPMKSfVLY1nMc0Fx/Kl4VJPZdXKhifG02+
+         bmyMWxZ8J+umQK1VNDb3wGOSOj/L3Ce8hvajHtR47YmleyxPDu+7Rd1VIpfakL/GCf5f
+         5etMyi6e8dV/nSHn+m5ZA4NTZVn1hL26AB/MQ81cCB+iKpFMiQvj6mYu9pFu+sJz8R5U
+         Vdsw==
+X-Forwarded-Encrypted: i=1; AJvYcCV3GnEyIK/3F78CPvVQH/1yDh3rPjgoJc0td/ndpBeke5bj6Z7zNTqdjsV7cV1NLRDX2dE7ii+etQYHWRKn8cFfTuR1Jzix
+X-Gm-Message-State: AOJu0YwE7ohKjgWvv5Cntyyl+HLVvdT6hIhhX2TdINU5bGoMkjBuSNzr
+	+EFxCYer2WMK9a0bh6WGYeFYW9fPA6da3ZwJfREvDi/cCN12lm0/lAuGurSNQRN3MVyebUccRY5
+	pcv5eFrnbHZjdVqn4bYXyMvfFmhxKJHVxZZzWkwdBW+PfHibX0/L4Hw==
+X-Received: by 2002:a2e:8949:0:b0:2ea:9449:7713 with SMTP id 38308e7fff4ca-2ea94f5a049mr64304081fa.0.1717498419101;
+        Tue, 04 Jun 2024 03:53:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFmvWfpwajfG6uAbSLakYYmoy41vLEHP3DZ25SAdv9f73cp/s3ZE335ECe8kt5W34Xy9/SQtA==
+X-Received: by 2002:a2e:8949:0:b0:2ea:9449:7713 with SMTP id 38308e7fff4ca-2ea94f5a049mr64303521fa.0.1717498418643;
+        Tue, 04 Jun 2024 03:53:38 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3344:1b74:3a10::f71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4212b84f8e7sm148788635e9.20.2024.06.04.03.53.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jun 2024 03:53:38 -0700 (PDT)
+Message-ID: <9c302fffa10085760eac3d0c64fa66063be3f407.camel@redhat.com>
+Subject: Re: [PATCH net-next v10 11/14] tcp: RX path for devmem TCP
+From: Paolo Abeni <pabeni@redhat.com>
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Donald Hunter
+ <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Richard
+ Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky
+ <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, Thomas
+ Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>, 
+ Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
+ <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>,  Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,  Shuah Khan
+ <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, Christian
+ =?ISO-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>, Pavel Begunkov
+ <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe
+ <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand
+ <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Date: Tue, 04 Jun 2024 12:53:35 +0200
+In-Reply-To: <20240530201616.1316526-12-almasrymina@google.com>
+References: <20240530201616.1316526-1-almasrymina@google.com>
+	 <20240530201616.1316526-12-almasrymina@google.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|SA1PR11MB7037:EE_
-X-MS-Office365-Filtering-Correlation-Id: fca13ad1-d01d-485e-f1a4-08dc848468c9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|1800799015|366007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?NNPGJS5EvdWyxw6Xjd16KgF8I6eP6a7nigg7kHjvsS4MuzO1NgiyMdIYgc8w?=
- =?us-ascii?Q?VD8/IAvJmqhAdyeLFulPE42mhYsVyII/pLEj6VaNckypILAgrJxkQuzPeXyW?=
- =?us-ascii?Q?kRUSk/mu6ph1so8EsEMKg2THW8mqm6BCwF8B46e6sHYTcdaEfmFVHt+8ZPH4?=
- =?us-ascii?Q?ZR3vF3ypIXRpMmFSjSIq5MmUAwYsUQjAzhHnh8D/W94f0/p8Z+DuUU0cAPBr?=
- =?us-ascii?Q?gdMwMVBUZidGJGcXo4gYzLrvMiGgcehw6ktqJqMG0ZFCaGJJhs5j0+85svvu?=
- =?us-ascii?Q?MIDLoAelifKy7hRA1bzB6xBU5IKHclvePcvrq4/5ZJvpkiJslIGroCzEA3Jx?=
- =?us-ascii?Q?HST7p1nG8SaFWqJyqTpCsinYD5gk6fMkigQmlCyOg0htk17amqvCL1Ax/2pj?=
- =?us-ascii?Q?rSv6/3J6FubGpyMRU0qpY/Xgsuhs3AtT3wtnUt9pQq1jaop+DMJN2oxbPXH4?=
- =?us-ascii?Q?PEutbjAOwgqlID/nPRkJebyN356A+6n103dsxp8R6UYxDKhB0MPiU6MdMe0h?=
- =?us-ascii?Q?pgkgvHDTuj+fSYSLhF6Qvk4w+v/uXIMP53GTZIwb6kRCbVg9h+J82mQbI047?=
- =?us-ascii?Q?U/ntGZ6o9hCHERclMzt1XpoM/AtRbH/a2M27Peu98qyRMmNhFQV4oimmgYJY?=
- =?us-ascii?Q?ybPuG5zFAr+IgzmvhUoenskfvUSiLwqBVGgylXH6BmSJRbudapGCx5EYiOMc?=
- =?us-ascii?Q?m7FP3YSkUAXCKLC4+qH8gmpfzhJXWm/cel14q8+cgdhChQknYcEAHIvPlHid?=
- =?us-ascii?Q?Gs2gqS1E+0GAEvisV+YrNldyQi1lKmZU0G19i2A88G4wRwJMoFi4hKTLVwdS?=
- =?us-ascii?Q?6diNshM7J3UIEOxdXSvqnafEom9ECY3tlB03TcZQr9FyE9ngn9O6ncsdUvJn?=
- =?us-ascii?Q?AYfXCc3fleGKEakTH8Bz+FiPvxvhf16UO2q0yDHlBH8VP4gDqIFkYMmJVs3b?=
- =?us-ascii?Q?PqXquonRbLWSx0qL+cJD96PaN2OLxVlCbHJfu1Vr5clE0DOoN0U3ZXbPIGp0?=
- =?us-ascii?Q?Mm4+8LbXlpJGiEaN/1z9lxxPTcqXL/Rs7VdMqAF+DEC3tM5Zx2h9OuMHvz8C?=
- =?us-ascii?Q?ulYk6nBd6ocQj1hMNDeIHS1AXps/o7lccjymm4giy/Wq+YryoZGSWu/hN4dc?=
- =?us-ascii?Q?5RthkmqQO3TRtlzSAIBGdUDSM8I4nks4b0IwK23u7PDpiBqFJ7YAh/L2TYH5?=
- =?us-ascii?Q?YbbAQvEAsR4KxBvitQnzQAoehLl1bOBin01qqLxGa4OvTN9zACD8vIw3W0Kk?=
- =?us-ascii?Q?G5Ej/iI80TuobnteBpC6kkwrSZB09hkUNsxnCB6wFQ=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zxlUYBF6HLnOMONqUFStbj2MxfGqofJrOW3okOwE3NOVmY3za2Vdcw8dVBnU?=
- =?us-ascii?Q?kTogMkElTfPOiQuPbE1NM4Fb7WCf8aNvYbTW3pQm7JR6njfnFsouUsbQ9/HK?=
- =?us-ascii?Q?TexIYfPZlGiLN9AgJQDgPQDwDHBGEs8AdUoNa9T+Xo70UnqH8D49yyvQgJ8F?=
- =?us-ascii?Q?OUTLCZOtO6whhLPKz84yYD7EhfSGjy5xxj8TuUpvNUJG0LCstXlBG3PgLvMx?=
- =?us-ascii?Q?XAopDCT6n8pwMqVfCF4Nm/p7h6Uki975gpVB9icAsSMJg+1jfpOQoKTQMeix?=
- =?us-ascii?Q?Y0Wxnlm3Rk0xUXspDv2whjhsVrc/E+ZzWPZJ8Pj413Mjv3X0sA10SEMdWp1J?=
- =?us-ascii?Q?w+PmZxREwC0Hbu5sQyTi0TPlQudfk+KjmFMrKXyG8idVAulmGYwbY15BMnlH?=
- =?us-ascii?Q?BMHqaRHPDAaWtUkSpuCnCnHUIFljuLgr7ziL6JPA0wUMCcEVpoUmU/t40CJe?=
- =?us-ascii?Q?wJZjEJN/srZNW9sB6/DBuS68hX+um0g0qIiSl6C6d0GOmmv7v/NpO++q5v8P?=
- =?us-ascii?Q?5DGVbFs63f1S3mlP+fx38cVR7FcB366PbrV+t0eA7vJPxhEVOPDsnVmGP1oK?=
- =?us-ascii?Q?rcQFeOcFt0LxmL+IhxoqtCyzeHMyp3Be0AXxVIObljjdfbC7FJiOiBtOUTpH?=
- =?us-ascii?Q?vecNC8ot5zGBdS6jw2Sv2D9nbN2YdUT9pz6EILKN33SKv0EbxAPMJCY28otl?=
- =?us-ascii?Q?M+YBZM5HsPdBs+WCYTcY811/+D/A5lEBvsFLb9OtJnmQY7F9u2h2Z8AvvtHu?=
- =?us-ascii?Q?2o3vfQodqgLWwF3gHk3/43kQZkM1HOXrkjsNhcEKIVk8XK5XMTxlyq5sJ9Dy?=
- =?us-ascii?Q?p9EPYspSfdWUPbt0eySHPa9tQXCDNQJ6Wa5UR8nl/RBWPOu5HH1vEz2ZrQLx?=
- =?us-ascii?Q?5pQgdH7N7jC4ZKhBgCK+OQioUDds8rMbYMOeTuab19BabVryvVtKu3zDWe4b?=
- =?us-ascii?Q?QqSnUsywaELN5hUq/dQ82lJGqvZvoS7xTww+ccP51vgUjfpHTC57QLgFsyAZ?=
- =?us-ascii?Q?1WDVA/HTewvzbrMzhRd2EUjdEXLef7GL7sGf5LCLxigG7AUrioRJ8deCuYBj?=
- =?us-ascii?Q?D3/DVnVZX6ldGRvnpimTigqyU7/frWQaLzqwIg1g8QJt9KocVhaJ4th0fN7j?=
- =?us-ascii?Q?pozs/58+eV/dd3Fjcl1CJhYcA4zo0oIXUQy8SMXY0SQrtAuZe2L0h+qJmwwa?=
- =?us-ascii?Q?oPIUxCLfrxggqC7okvXUakEMk6FplPDJqIJH/0LvZ1zmum8ipRNPwxqhjdqN?=
- =?us-ascii?Q?hmGL4pKqWkH8Ems3jdkdytTvIeeIXaLXjIfhAeiT0Y7VhBSYVFwwhwN9UkUE?=
- =?us-ascii?Q?KsOEmGt6IBB5AQUZzrphTGJd5NXH8zS3kqR9K8qzrdA+jqKt8wp4win5lPxo?=
- =?us-ascii?Q?5IDZmJ7cjprkKzwMcKn0qj5BINw0m+fOrMmGoDDb4rR+SpMX4CZ/j9iUyO8w?=
- =?us-ascii?Q?MsVrHd3CBjXGfJkzbPlAWiJmupCkWpdmL4cV9fsynluEamTwBUZAkZnB5+kg?=
- =?us-ascii?Q?k137e7gSe1c7SMuDjXroPpuC61kgYm0Wv68C84EGwJXFMXED/CnLsGaUuEC6?=
- =?us-ascii?Q?Obf1QRoUcgI0KDfToBgfR83ksKtKoCX2KEG13skMPXjEVu+FfoyxgnklidFa?=
- =?us-ascii?Q?dw=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: fca13ad1-d01d-485e-f1a4-08dc848468c9
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2024 10:52:21.0506
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xrnC04/Ug+PoZetWRMWaqR6gtNaTryT5UdDI7/CauQW2CGNcG/G0q+Q8jCjGSudZ1YVOyZo7MRDn8oc9rjwvbiqQJ82i8yBpEQwo/iwQo04=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB7037
-X-OriginatorOrg: intel.com
 
-On Fri, May 31, 2024 at 04:49:05PM -0700, Nelson, Shannon wrote:
-> On 5/29/2024 4:23 AM, Maciej Fijalkowski wrote:
-> > 
-> > xsk_buff_pool pointers that ice ring structs hold are updated via
-> > ndo_bpf that is executed in process context while it can be read by
-> > remote CPU at the same time within NAPI poll. Use synchronize_net()
-> > after pointer update and {READ,WRITE}_ONCE() when working with mentioned
-> > pointer.
-> > 
-> > Fixes: 2d4238f55697 ("ice: Add support for AF_XDP")
-> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> > ---
-> >   drivers/net/ethernet/intel/ice/ice.h      |  6 +-
-> >   drivers/net/ethernet/intel/ice/ice_base.c |  4 +-
-> >   drivers/net/ethernet/intel/ice/ice_main.c |  2 +-
-> >   drivers/net/ethernet/intel/ice/ice_txrx.c |  4 +-
-> >   drivers/net/ethernet/intel/ice/ice_xsk.c  | 78 ++++++++++++++---------
-> >   drivers/net/ethernet/intel/ice/ice_xsk.h  |  4 +-
-> >   6 files changed, 59 insertions(+), 39 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-> > index da8c8afebc93..701a61d791dd 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice.h
-> > +++ b/drivers/net/ethernet/intel/ice/ice.h
-> > @@ -771,12 +771,12 @@ static inline struct xsk_buff_pool *ice_get_xp_from_qid(struct ice_vsi *vsi,
-> >    * Returns a pointer to xsk_buff_pool structure if there is a buffer pool
-> >    * present, NULL otherwise.
-> >    */
-> > -static inline struct xsk_buff_pool *ice_xsk_pool(struct ice_rx_ring *ring)
-> > +static inline void ice_xsk_pool(struct ice_rx_ring *ring)
-> 
-> Since this patch is changing the logic here you mighht want to change the
-> name of the function.  Instead of getting a pointer with no side effects it
-> is now doing something, so a better name might be ice_set_xsk_pool() to
-> reflect the resulting side effect.
+On Thu, 2024-05-30 at 20:16 +0000, Mina Almasry wrote:
+> @@ -2317,6 +2318,213 @@ static int tcp_inq_hint(struct sock *sk)
+>  	return inq;
+>  }
+> =20
+> +/* batch __xa_alloc() calls and reduce xa_lock()/xa_unlock() overhead. *=
+/
+> +struct tcp_xa_pool {
+> +	u8		max; /* max <=3D MAX_SKB_FRAGS */
+> +	u8		idx; /* idx <=3D max */
+> +	__u32		tokens[MAX_SKB_FRAGS];
+> +	netmem_ref	netmems[MAX_SKB_FRAGS];
+> +};
+> +
+> +static void tcp_xa_pool_commit(struct sock *sk, struct tcp_xa_pool *p,
+> +			       bool lock)
+> +{
+> +	int i;
+> +
+> +	if (!p->max)
+> +		return;
+> +	if (lock)
+> +		xa_lock_bh(&sk->sk_user_frags);
 
-Makes sense, plus the function description needs some adjustment. Will fix
-on v3.
+The conditional lock here confuses sparse.
 
-> 
-> sln
-> 
-> >   {
-> >          struct ice_vsi *vsi = ring->vsi;
-> >          u16 qid = ring->q_index;
-> > 
-> > -       return ice_get_xp_from_qid(vsi, qid);
-> > +       WRITE_ONCE(ring->xsk_pool, ice_get_xp_from_qid(vsi, qid));
-> >   }
-> > 
-> >   /**
-> > @@ -801,7 +801,7 @@ static inline void ice_tx_xsk_pool(struct ice_vsi *vsi, u16 qid)
-> >          if (!ring)
-> >                  return;
-> > 
-> > -       ring->xsk_pool = ice_get_xp_from_qid(vsi, qid);
-> > +       WRITE_ONCE(ring->xsk_pool, ice_get_xp_from_qid(vsi, qid));
-> >   }
-> > 
-> >   /**
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-> > index 5d396c1a7731..f3dfce136106 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_base.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_base.c
-> > @@ -536,7 +536,7 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
-> >                                  return err;
-> >                  }
-> > 
-> > -               ring->xsk_pool = ice_xsk_pool(ring);
-> > +               ice_xsk_pool(ring);
-> >                  if (ring->xsk_pool) {
-> >                          xdp_rxq_info_unreg(&ring->xdp_rxq);
-> > 
-> > @@ -597,7 +597,7 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
-> >                          return 0;
-> >                  }
-> > 
-> > -               ok = ice_alloc_rx_bufs_zc(ring, num_bufs);
-> > +               ok = ice_alloc_rx_bufs_zc(ring, ring->xsk_pool, num_bufs);
-> >                  if (!ok) {
-> >                          u16 pf_q = ring->vsi->rxq_map[ring->q_index];
-> > 
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-> > index 1b61ca3a6eb6..15a6805ac2a1 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_main.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-> > @@ -2946,7 +2946,7 @@ static void ice_vsi_rx_napi_schedule(struct ice_vsi *vsi)
-> >          ice_for_each_rxq(vsi, i) {
-> >                  struct ice_rx_ring *rx_ring = vsi->rx_rings[i];
-> > 
-> > -               if (rx_ring->xsk_pool)
-> > +               if (READ_ONCE(rx_ring->xsk_pool))
-> >                          napi_schedule(&rx_ring->q_vector->napi);
-> >          }
-> >   }
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-> > index 8bb743f78fcb..f4b2b1bca234 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-> > @@ -1523,7 +1523,7 @@ int ice_napi_poll(struct napi_struct *napi, int budget)
-> >          ice_for_each_tx_ring(tx_ring, q_vector->tx) {
-> >                  bool wd;
-> > 
-> > -               if (tx_ring->xsk_pool)
-> > +               if (READ_ONCE(tx_ring->xsk_pool))
-> >                          wd = ice_xmit_zc(tx_ring);
-> >                  else if (ice_ring_is_xdp(tx_ring))
-> >                          wd = true;
-> > @@ -1556,7 +1556,7 @@ int ice_napi_poll(struct napi_struct *napi, int budget)
-> >                   * comparison in the irq context instead of many inside the
-> >                   * ice_clean_rx_irq function and makes the codebase cleaner.
-> >                   */
-> > -               cleaned = rx_ring->xsk_pool ?
-> > +               cleaned = READ_ONCE(rx_ring->xsk_pool) ?
-> >                            ice_clean_rx_irq_zc(rx_ring, budget_per_ring) :
-> >                            ice_clean_rx_irq(rx_ring, budget_per_ring);
-> >                  work_done += cleaned;
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
-> > index 8c5006f37310..693f0e3a37ce 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_xsk.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
-> > @@ -250,6 +250,8 @@ static int ice_qp_ena(struct ice_vsi *vsi, u16 q_idx)
-> >          ice_qvec_toggle_napi(vsi, q_vector, true);
-> >          ice_qvec_ena_irq(vsi, q_vector);
-> > 
-> > +       /* make sure NAPI sees updated ice_{t,x}_ring::xsk_pool */
-> > +       synchronize_net();
-> >          netif_tx_start_queue(netdev_get_tx_queue(vsi->netdev, q_idx));
-> >          netif_carrier_on(vsi->netdev);
-> >          clear_bit(ICE_CFG_BUSY, vsi->state);
-> > @@ -461,6 +463,7 @@ static u16 ice_fill_rx_descs(struct xsk_buff_pool *pool, struct xdp_buff **xdp,
-> >   /**
-> >    * __ice_alloc_rx_bufs_zc - allocate a number of Rx buffers
-> >    * @rx_ring: Rx ring
-> > + * @xsk_pool: XSK buffer pool to pick buffers to be filled by HW
-> >    * @count: The number of buffers to allocate
-> >    *
-> >    * Place the @count of descriptors onto Rx ring. Handle the ring wrap
-> > @@ -469,7 +472,8 @@ static u16 ice_fill_rx_descs(struct xsk_buff_pool *pool, struct xdp_buff **xdp,
-> >    *
-> >    * Returns true if all allocations were successful, false if any fail.
-> >    */
-> > -static bool __ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring, u16 count)
-> > +static bool __ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring,
-> > +                                  struct xsk_buff_pool *xsk_pool, u16 count)
-> >   {
-> >          u32 nb_buffs_extra = 0, nb_buffs = 0;
-> >          union ice_32b_rx_flex_desc *rx_desc;
-> > @@ -481,8 +485,7 @@ static bool __ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring, u16 count)
-> >          xdp = ice_xdp_buf(rx_ring, ntu);
-> > 
-> >          if (ntu + count >= rx_ring->count) {
-> > -               nb_buffs_extra = ice_fill_rx_descs(rx_ring->xsk_pool, xdp,
-> > -                                                  rx_desc,
-> > +               nb_buffs_extra = ice_fill_rx_descs(xsk_pool, xdp, rx_desc,
-> >                                                     rx_ring->count - ntu);
-> >                  if (nb_buffs_extra != rx_ring->count - ntu) {
-> >                          ntu += nb_buffs_extra;
-> > @@ -495,7 +498,7 @@ static bool __ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring, u16 count)
-> >                  ice_release_rx_desc(rx_ring, 0);
-> >          }
-> > 
-> > -       nb_buffs = ice_fill_rx_descs(rx_ring->xsk_pool, xdp, rx_desc, count);
-> > +       nb_buffs = ice_fill_rx_descs(xsk_pool, xdp, rx_desc, count);
-> > 
-> >          ntu += nb_buffs;
-> >          if (ntu == rx_ring->count)
-> > @@ -511,6 +514,7 @@ static bool __ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring, u16 count)
-> >   /**
-> >    * ice_alloc_rx_bufs_zc - allocate a number of Rx buffers
-> >    * @rx_ring: Rx ring
-> > + * @xsk_pool: XSK buffer pool to pick buffers to be filled by HW
-> >    * @count: The number of buffers to allocate
-> >    *
-> >    * Wrapper for internal allocation routine; figure out how many tail
-> > @@ -518,7 +522,8 @@ static bool __ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring, u16 count)
-> >    *
-> >    * Returns true if all calls to internal alloc routine succeeded
-> >    */
-> > -bool ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring, u16 count)
-> > +bool ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring,
-> > +                         struct xsk_buff_pool *xsk_pool, u16 count)
-> >   {
-> >          u16 rx_thresh = ICE_RING_QUARTER(rx_ring);
-> >          u16 leftover, i, tail_bumps;
-> > @@ -527,9 +532,9 @@ bool ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring, u16 count)
-> >          leftover = count - (tail_bumps * rx_thresh);
-> > 
-> >          for (i = 0; i < tail_bumps; i++)
-> > -               if (!__ice_alloc_rx_bufs_zc(rx_ring, rx_thresh))
-> > +               if (!__ice_alloc_rx_bufs_zc(rx_ring, xsk_pool, rx_thresh))
-> >                          return false;
-> > -       return __ice_alloc_rx_bufs_zc(rx_ring, leftover);
-> > +       return __ice_alloc_rx_bufs_zc(rx_ring, xsk_pool, leftover);
-> >   }
-> > 
-> >   /**
-> > @@ -650,7 +655,7 @@ static u32 ice_clean_xdp_irq_zc(struct ice_tx_ring *xdp_ring)
-> >          if (xdp_ring->next_to_clean >= cnt)
-> >                  xdp_ring->next_to_clean -= cnt;
-> >          if (xsk_frames)
-> > -               xsk_tx_completed(xdp_ring->xsk_pool, xsk_frames);
-> > +               xsk_tx_completed(READ_ONCE(xdp_ring->xsk_pool), xsk_frames);
-> > 
-> >          return completed_frames;
-> >   }
-> > @@ -702,7 +707,8 @@ static int ice_xmit_xdp_tx_zc(struct xdp_buff *xdp,
-> >                  dma_addr_t dma;
-> > 
-> >                  dma = xsk_buff_xdp_get_dma(xdp);
-> > -               xsk_buff_raw_dma_sync_for_device(xdp_ring->xsk_pool, dma, size);
-> > +               xsk_buff_raw_dma_sync_for_device(READ_ONCE(xdp_ring->xsk_pool),
-> > +                                                dma, size);
-> > 
-> >                  tx_buf->xdp = xdp;
-> >                  tx_buf->type = ICE_TX_BUF_XSK_TX;
-> > @@ -760,7 +766,8 @@ ice_run_xdp_zc(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
-> >                  err = xdp_do_redirect(rx_ring->netdev, xdp, xdp_prog);
-> >                  if (!err)
-> >                          return ICE_XDP_REDIR;
-> > -               if (xsk_uses_need_wakeup(rx_ring->xsk_pool) && err == -ENOBUFS)
-> > +               if (xsk_uses_need_wakeup(READ_ONCE(rx_ring->xsk_pool)) &&
-> > +                   err == -ENOBUFS)
-> >                          result = ICE_XDP_EXIT;
-> >                  else
-> >                          result = ICE_XDP_CONSUMED;
-> > @@ -829,8 +836,8 @@ ice_add_xsk_frag(struct ice_rx_ring *rx_ring, struct xdp_buff *first,
-> >    */
-> >   int ice_clean_rx_irq_zc(struct ice_rx_ring *rx_ring, int budget)
-> >   {
-> > +       struct xsk_buff_pool *xsk_pool = READ_ONCE(rx_ring->xsk_pool);
-> >          unsigned int total_rx_bytes = 0, total_rx_packets = 0;
-> > -       struct xsk_buff_pool *xsk_pool = rx_ring->xsk_pool;
-> >          u32 ntc = rx_ring->next_to_clean;
-> >          u32 ntu = rx_ring->next_to_use;
-> >          struct xdp_buff *first = NULL;
-> > @@ -942,7 +949,8 @@ int ice_clean_rx_irq_zc(struct ice_rx_ring *rx_ring, int budget)
-> >          rx_ring->next_to_clean = ntc;
-> >          entries_to_alloc = ICE_RX_DESC_UNUSED(rx_ring);
-> >          if (entries_to_alloc > ICE_RING_QUARTER(rx_ring))
-> > -               failure |= !ice_alloc_rx_bufs_zc(rx_ring, entries_to_alloc);
-> > +               failure |= !ice_alloc_rx_bufs_zc(rx_ring, xsk_pool,
-> > +                                                entries_to_alloc);
-> > 
-> >          ice_finalize_xdp_rx(xdp_ring, xdp_xmit, 0);
-> >          ice_update_rx_ring_stats(rx_ring, total_rx_packets, total_rx_bytes);
-> > @@ -965,17 +973,19 @@ int ice_clean_rx_irq_zc(struct ice_rx_ring *rx_ring, int budget)
-> >   /**
-> >    * ice_xmit_pkt - produce a single HW Tx descriptor out of AF_XDP descriptor
-> >    * @xdp_ring: XDP ring to produce the HW Tx descriptor on
-> > + * @xsk_pool: XSK buffer pool to pick buffers to be consumed by HW
-> >    * @desc: AF_XDP descriptor to pull the DMA address and length from
-> >    * @total_bytes: bytes accumulator that will be used for stats update
-> >    */
-> > -static void ice_xmit_pkt(struct ice_tx_ring *xdp_ring, struct xdp_desc *desc,
-> > +static void ice_xmit_pkt(struct ice_tx_ring *xdp_ring,
-> > +                        struct xsk_buff_pool *xsk_pool, struct xdp_desc *desc,
-> >                           unsigned int *total_bytes)
-> >   {
-> >          struct ice_tx_desc *tx_desc;
-> >          dma_addr_t dma;
-> > 
-> > -       dma = xsk_buff_raw_get_dma(xdp_ring->xsk_pool, desc->addr);
-> > -       xsk_buff_raw_dma_sync_for_device(xdp_ring->xsk_pool, dma, desc->len);
-> > +       dma = xsk_buff_raw_get_dma(xsk_pool, desc->addr);
-> > +       xsk_buff_raw_dma_sync_for_device(xsk_pool, dma, desc->len);
-> > 
-> >          tx_desc = ICE_TX_DESC(xdp_ring, xdp_ring->next_to_use++);
-> >          tx_desc->buf_addr = cpu_to_le64(dma);
-> > @@ -988,10 +998,13 @@ static void ice_xmit_pkt(struct ice_tx_ring *xdp_ring, struct xdp_desc *desc,
-> >   /**
-> >    * ice_xmit_pkt_batch - produce a batch of HW Tx descriptors out of AF_XDP descriptors
-> >    * @xdp_ring: XDP ring to produce the HW Tx descriptors on
-> > + * @xsk_pool: XSK buffer pool to pick buffers to be consumed by HW
-> >    * @descs: AF_XDP descriptors to pull the DMA addresses and lengths from
-> >    * @total_bytes: bytes accumulator that will be used for stats update
-> >    */
-> > -static void ice_xmit_pkt_batch(struct ice_tx_ring *xdp_ring, struct xdp_desc *descs,
-> > +static void ice_xmit_pkt_batch(struct ice_tx_ring *xdp_ring,
-> > +                              struct xsk_buff_pool *xsk_pool,
-> > +                              struct xdp_desc *descs,
-> >                                 unsigned int *total_bytes)
-> >   {
-> >          u16 ntu = xdp_ring->next_to_use;
-> > @@ -1001,8 +1014,8 @@ static void ice_xmit_pkt_batch(struct ice_tx_ring *xdp_ring, struct xdp_desc *de
-> >          loop_unrolled_for(i = 0; i < PKTS_PER_BATCH; i++) {
-> >                  dma_addr_t dma;
-> > 
-> > -               dma = xsk_buff_raw_get_dma(xdp_ring->xsk_pool, descs[i].addr);
-> > -               xsk_buff_raw_dma_sync_for_device(xdp_ring->xsk_pool, dma, descs[i].len);
-> > +               dma = xsk_buff_raw_get_dma(xsk_pool, descs[i].addr);
-> > +               xsk_buff_raw_dma_sync_for_device(xsk_pool, dma, descs[i].len);
-> > 
-> >                  tx_desc = ICE_TX_DESC(xdp_ring, ntu++);
-> >                  tx_desc->buf_addr = cpu_to_le64(dma);
-> > @@ -1018,21 +1031,24 @@ static void ice_xmit_pkt_batch(struct ice_tx_ring *xdp_ring, struct xdp_desc *de
-> >   /**
-> >    * ice_fill_tx_hw_ring - produce the number of Tx descriptors onto ring
-> >    * @xdp_ring: XDP ring to produce the HW Tx descriptors on
-> > + * @xsk_pool: XSK buffer pool to pick buffers to be consumed by HW
-> >    * @descs: AF_XDP descriptors to pull the DMA addresses and lengths from
-> >    * @nb_pkts: count of packets to be send
-> >    * @total_bytes: bytes accumulator that will be used for stats update
-> >    */
-> > -static void ice_fill_tx_hw_ring(struct ice_tx_ring *xdp_ring, struct xdp_desc *descs,
-> > -                               u32 nb_pkts, unsigned int *total_bytes)
-> > +static void ice_fill_tx_hw_ring(struct ice_tx_ring *xdp_ring,
-> > +                               struct xsk_buff_pool *xsk_pool,
-> > +                               struct xdp_desc *descs, u32 nb_pkts,
-> > +                               unsigned int *total_bytes)
-> >   {
-> >          u32 batched, leftover, i;
-> > 
-> >          batched = ALIGN_DOWN(nb_pkts, PKTS_PER_BATCH);
-> >          leftover = nb_pkts & (PKTS_PER_BATCH - 1);
-> >          for (i = 0; i < batched; i += PKTS_PER_BATCH)
-> > -               ice_xmit_pkt_batch(xdp_ring, &descs[i], total_bytes);
-> > +               ice_xmit_pkt_batch(xdp_ring, xsk_pool, &descs[i], total_bytes);
-> >          for (; i < batched + leftover; i++)
-> > -               ice_xmit_pkt(xdp_ring, &descs[i], total_bytes);
-> > +               ice_xmit_pkt(xdp_ring, xsk_pool, &descs[i], total_bytes);
-> >   }
-> > 
-> >   /**
-> > @@ -1043,7 +1059,8 @@ static void ice_fill_tx_hw_ring(struct ice_tx_ring *xdp_ring, struct xdp_desc *d
-> >    */
-> >   bool ice_xmit_zc(struct ice_tx_ring *xdp_ring)
-> >   {
-> > -       struct xdp_desc *descs = xdp_ring->xsk_pool->tx_descs;
-> > +       struct xsk_buff_pool *xsk_pool = READ_ONCE(xdp_ring->xsk_pool);
-> > +       struct xdp_desc *descs = xsk_pool->tx_descs;
-> >          u32 nb_pkts, nb_processed = 0;
-> >          unsigned int total_bytes = 0;
-> >          int budget;
-> > @@ -1057,25 +1074,26 @@ bool ice_xmit_zc(struct ice_tx_ring *xdp_ring)
-> >          budget = ICE_DESC_UNUSED(xdp_ring);
-> >          budget = min_t(u16, budget, ICE_RING_QUARTER(xdp_ring));
-> > 
-> > -       nb_pkts = xsk_tx_peek_release_desc_batch(xdp_ring->xsk_pool, budget);
-> > +       nb_pkts = xsk_tx_peek_release_desc_batch(xsk_pool, budget);
-> >          if (!nb_pkts)
-> >                  return true;
-> > 
-> >          if (xdp_ring->next_to_use + nb_pkts >= xdp_ring->count) {
-> >                  nb_processed = xdp_ring->count - xdp_ring->next_to_use;
-> > -               ice_fill_tx_hw_ring(xdp_ring, descs, nb_processed, &total_bytes);
-> > +               ice_fill_tx_hw_ring(xdp_ring, xsk_pool, descs, nb_processed,
-> > +                                   &total_bytes);
-> >                  xdp_ring->next_to_use = 0;
-> >          }
-> > 
-> > -       ice_fill_tx_hw_ring(xdp_ring, &descs[nb_processed], nb_pkts - nb_processed,
-> > -                           &total_bytes);
-> > +       ice_fill_tx_hw_ring(xdp_ring, xsk_pool, &descs[nb_processed],
-> > +                           nb_pkts - nb_processed, &total_bytes);
-> > 
-> >          ice_set_rs_bit(xdp_ring);
-> >          ice_xdp_ring_update_tail(xdp_ring);
-> >          ice_update_tx_ring_stats(xdp_ring, nb_pkts, total_bytes);
-> > 
-> > -       if (xsk_uses_need_wakeup(xdp_ring->xsk_pool))
-> > -               xsk_set_tx_need_wakeup(xdp_ring->xsk_pool);
-> > +       if (xsk_uses_need_wakeup(xsk_pool))
-> > +               xsk_set_tx_need_wakeup(xsk_pool);
-> > 
-> >          return nb_pkts < budget;
-> >   }
-> > @@ -1108,7 +1126,7 @@ ice_xsk_wakeup(struct net_device *netdev, u32 queue_id,
-> > 
-> >          ring = vsi->rx_rings[queue_id]->xdp_ring;
-> > 
-> > -       if (!ring->xsk_pool)
-> > +       if (!READ_ONCE(ring->xsk_pool))
-> >                  return -EINVAL;
-> > 
-> >          /* The idea here is that if NAPI is running, mark a miss, so
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.h b/drivers/net/ethernet/intel/ice/ice_xsk.h
-> > index 6fa181f080ef..4cd2d62a0836 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_xsk.h
-> > +++ b/drivers/net/ethernet/intel/ice/ice_xsk.h
-> > @@ -22,7 +22,8 @@ int ice_xsk_pool_setup(struct ice_vsi *vsi, struct xsk_buff_pool *pool,
-> >                         u16 qid);
-> >   int ice_clean_rx_irq_zc(struct ice_rx_ring *rx_ring, int budget);
-> >   int ice_xsk_wakeup(struct net_device *netdev, u32 queue_id, u32 flags);
-> > -bool ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring, u16 count);
-> > +bool ice_alloc_rx_bufs_zc(struct ice_rx_ring *rx_ring,
-> > +                         struct xsk_buff_pool *xsk_pool, u16 count);
-> >   bool ice_xsk_any_rx_ring_ena(struct ice_vsi *vsi);
-> >   void ice_xsk_clean_rx_ring(struct ice_rx_ring *rx_ring);
-> >   void ice_xsk_clean_xdp_ring(struct ice_tx_ring *xdp_ring);
-> > @@ -51,6 +52,7 @@ ice_clean_rx_irq_zc(struct ice_rx_ring __always_unused *rx_ring,
-> > 
-> >   static inline bool
-> >   ice_alloc_rx_bufs_zc(struct ice_rx_ring __always_unused *rx_ring,
-> > +                    struct xsk_buff_pool __always_unused *xsk_pool,
-> >                       u16 __always_unused count)
-> >   {
-> >          return false;
-> > --
-> > 2.34.1
-> > 
-> > 
+I think you can avoid it providing a unlocked version (no need to check
+for '!p->max' the only caller wanting the unlocked version already
+performs such check) and a locked one, calling the other.
+
+Cheers,
+
+Paolo
+
 
