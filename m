@@ -1,110 +1,119 @@
-Return-Path: <netdev+bounces-100476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1FDF8FAD81
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 10:25:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A8628FADEE
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 10:48:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 512AE1F231D9
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 08:25:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AADB81C24268
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 08:48:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147011422C3;
-	Tue,  4 Jun 2024 08:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59FA4142909;
+	Tue,  4 Jun 2024 08:48:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="ZIKIvBZQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2A313C672;
-	Tue,  4 Jun 2024 08:24:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215A5142E71;
+	Tue,  4 Jun 2024 08:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717489495; cv=none; b=qtNTC2IYizmKwSbg1s/2aYfIk2TDnpqmDT+ZegV6ez5aRutL7Cw3sMLFa8cbDZZcQdJK/mTW9x+oRbhWrb2oB5RkbEoQBXuXqSFq8qrthu6yu6Nvy5d2I+7vEe3ukanKcKCxSEM6flOrJQypw6gjMBiLM0+jvdFAeAnYr5GMMhU=
+	t=1717490900; cv=none; b=Xn8kIM3tuSYSnAV8tTwpXFV/MPlG0/ReEZthOATtK9ufhnM+FhW6qy0JeGrDb+dS0mz586efbZbMjhMJkNdjpesmlf7Ky0Xy+hoJMVE0aA0gnZhnq50waKWYIIerSjrY7dp9F2rxHRMxwqb8MC4mX4XgDR2udWPup0kPpHJXEks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717489495; c=relaxed/simple;
-	bh=V8u4ises0PLg+j92Lwu6MTiv2dwQoVXMLN8iHbUF+/c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N9UPO62UtHYlTjQyPCTGm3rS6oUVTWfAiZA+cmKShw0tKxYHfIETy6c36GJlJ0FBf7ZFVzsTSAbfZKwmjhxjejd8z1ROWC+pTsFg4TmYHW2BhyliAHyVvDsBufc+g1T4+rPDmLaj497nE1KLhZAiRzlPMsbmzs4P2RLMO1yfrn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2eab062bbdeso3025971fa.1;
-        Tue, 04 Jun 2024 01:24:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717489491; x=1718094291;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jT03552+joJgoqrGEVdI7Fe6g8UVlQf4Q+uQisoEmo8=;
-        b=iadCYMBHaT8rFusnKkB/PzQPq6Dnb6uuefo8SPfazjiz7dssrYakp4yvOwMvJUQYr6
-         Xl6FaxrUmkJ3tOHsAn4j8hgmSYcAb4dF3R5CFfIOPlxuTcwbCiSv/Rgfx1OBDoedAslG
-         k2sfeLXF+9f5L5tFphABCx9vxVFCvWUQThUj/vB8pQdWp3X9/9VtCRpBOwHAJn+QEYIF
-         ESxY4vVneo5RM3zdvtqAC3vGrd+zzxajJwR4TVT8tzurUNrwhtYT/VSMjUF7icgGz3dW
-         WFJqTYJ3cAD4esXvPn7sG4GCXNtFScdkQMoRedLmV5a8V2cT3tEyQHSvLTm41F5hrW+s
-         gCVw==
-X-Forwarded-Encrypted: i=1; AJvYcCVXq7HuYzvAQFb65HeqDwbIOg1zIkku4bbwYW4QPqSyLPm/dmIoqGHJiZGqjzsMYSz1OWhEv6LKR337tCykX8TKlZjL7j5jU/BjeEY6bl6AYBOika7hrHA9/imYek39WBaEk6q+x2t7mQeRbOOKsPKVtat05kL/6gNz6LEkMUSJ
-X-Gm-Message-State: AOJu0YyzXEz/TkSQKYs5yV5DFXZeDudg7sNZV9pWcHwEmXy/Tz6HUZKp
-	jl3BwtBsqU6d2x6WC363nghFGkjNbQzpNfHYrgi34VG9odDlszRh
-X-Google-Smtp-Source: AGHT+IHuXM2IV1Hvv1yo73FAtyZR/fINFEtA7+m+S0KNoMFYIA+FZgsSVFChErK9dkk4AU6gDb5/pA==
-X-Received: by 2002:a2e:8756:0:b0:2ea:8442:2096 with SMTP id 38308e7fff4ca-2ea95153f82mr61441631fa.2.1717489491014;
-        Tue, 04 Jun 2024 01:24:51 -0700 (PDT)
-Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4214186ccdcsm34884405e9.16.2024.06.04.01.24.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jun 2024 01:24:50 -0700 (PDT)
-Message-ID: <62c2b8cd-ce6a-4e13-a58c-a6b30a0dcf17@grimberg.me>
-Date: Tue, 4 Jun 2024 11:24:48 +0300
+	s=arc-20240116; t=1717490900; c=relaxed/simple;
+	bh=ObDTaMyPlg/EZhuVBdEekc70AuBXcehtfJBGseg+zr0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EyodKtvbZ0gd/cDi2Cn0IT75JWG1dIBBT3x/V3+nIhWTr+joDgtPyXFQyL6kO/pnBh955oL+Jhp8p2PpIqJ2gUW5j1I6rRvfHhBZZcFgmL7lXwk4vBk37Lx1dVzPcgk8jprl1O2aMpuhik4F+BDvuGz1qjkCXr2gqPesL05KrbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=ZIKIvBZQ; arc=none smtp.client-ip=109.73.34.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
+Received: from mx1.t-argos.ru (localhost [127.0.0.1])
+	by mx1.t-argos.ru (Postfix) with ESMTP id 72C62100002;
+	Tue,  4 Jun 2024 11:26:57 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
+	t=1717489617; bh=96aA8g6YCTBuSRhoE/7DN9QszXndOKeFlN3aO62Y29g=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=ZIKIvBZQsEo2y/eV6W7Lqkym6HpSHl5xXWZUNpzzpwB6x+tP8pYLUbRrut03ziRHC
+	 lX/3BhVJu/s+OGY6JiPdvTp1K6eaSmhfLAtErdJbNxxnFEs4a+k8DC3AZFoOuTI4Ms
+	 t5D3Jdl//wpAfUAH5eazqsom8RNICqyoUfoEETXBXm0b+aCnfE6OvaubvadyJIRB7g
+	 bGDdmLJ4cuEez6GzkqLy300nK3TpjlVoTjkdxpkoGXDsR1h3YHRyD5GC7tzmGhUyrO
+	 GkYAet0DpIASTbptIbjRbtvjxGQceEIdgjhVrUU+rkFGFsAk5oP+2bIy7O+gCzc1Ag
+	 ba3QwWGJubuAw==
+Received: from mx1.t-argos.ru.ru (ta-mail-02.ta.t-argos.ru [172.17.13.212])
+	by mx1.t-argos.ru (Postfix) with ESMTP;
+	Tue,  4 Jun 2024 11:25:47 +0300 (MSK)
+Received: from localhost.localdomain (172.17.215.6) by ta-mail-02
+ (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 4 Jun 2024
+ 11:25:17 +0300
+From: Aleksandr Mishin <amishin@t-argos.ru>
+To: M Chetan Kumar <m.chetan.kumar@intel.com>
+CC: Aleksandr Mishin <amishin@t-argos.ru>, Loic Poulain
+	<loic.poulain@linaro.org>, Sergey Ryazanov <ryazanov.s.a@gmail.com>, Johannes
+ Berg <johannes@sipsolutions.net>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Subject: [PATCH net] net: wwan: iosm: Fix tainted pointer delete is case of region creation fail
+Date: Tue, 4 Jun 2024 11:25:00 +0300
+Message-ID: <20240604082500.20769-1-amishin@t-argos.ru>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] net: introduce helper sendpages_ok()
-To: Christoph Hellwig <hch@lst.de>
-Cc: Ofir Gal <ofir.gal@volumez.com>, davem@davemloft.net,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, ceph-devel@vger.kernel.org, dhowells@redhat.com,
- edumazet@google.com, pabeni@redhat.com, kbusch@kernel.org, axboe@kernel.dk,
- philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
- christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
-References: <20240530142417.146696-1-ofir.gal@volumez.com>
- <20240530142417.146696-2-ofir.gal@volumez.com>
- <8d0c198f-9c15-4a8f-957a-2e4aecddd2e5@grimberg.me>
- <23821101-adf0-4e38-a894-fb05a19cb9c3@volumez.com>
- <86e60615-9286-4c9c-bffc-72304bd3cc1f@grimberg.me>
- <20240604042738.GA28853@lst.de>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20240604042738.GA28853@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
+ (172.17.13.212)
+X-KSMG-Rule-ID: 1
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 185698 [Jun 04 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 20 0.3.20 743589a8af6ec90b529f2124c2bbfc3ce1d2f20f, {Tracking_from_domain_doesnt_match_to}, mx1.t-argos.ru.ru:7.1.1;t-argos.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/06/04 07:46:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/06/04 05:43:00 #25435061
+X-KSMG-AntiVirus-Status: Clean, skipped
 
+In case of region creation fail in ipc_devlink_create_region(), previously
+created regions delete process starts from tainted pointer which actually
+holds error code value.
+Fix this bug by decreasing region index before delete.
 
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-On 04/06/2024 7:27, Christoph Hellwig wrote:
-> On Tue, Jun 04, 2024 at 12:27:06AM +0300, Sagi Grimberg wrote:
->>>> I still don't understand how a page in the middle of a contiguous range ends
->>>> up coming from the slab while others don't.
->>> I haven't investigate the origin of the IO
->>> yet. I suspect the first 2 pages are the superblocks of the raid
->>> (mdp_superblock_1 and bitmap_super_s) and the rest of the IO is the bitmap.
->> Well, if these indeed are different origins and just *happen* to be a
->> mixture
->> of slab originated pages and non-slab pages combined together in a single
->> bio of a bvec entry,
->> I'd suspect that it would be more beneficial to split the bvec (essentially
->> not allow bio_add_page
->> to append the page to tail bvec depending on a queue limit (similar to how
->> we handle sg gaps).
-> So you want to add a PageSlab check to bvec_try_merge_page?  That sounds
-> fairly expensive..
->
+Fixes: 4dcd183fbd67 ("net: wwan: iosm: devlink registration")
+Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+---
+ drivers/net/wwan/iosm/iosm_ipc_devlink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The check needs to happen somewhere apparently, and given that it will 
-be gated by a queue flag
-only request queues that actually needed will suffer, but they will 
-suffer anyways...
+diff --git a/drivers/net/wwan/iosm/iosm_ipc_devlink.c b/drivers/net/wwan/iosm/iosm_ipc_devlink.c
+index bef6819986e9..33d6342124bc 100644
+--- a/drivers/net/wwan/iosm/iosm_ipc_devlink.c
++++ b/drivers/net/wwan/iosm/iosm_ipc_devlink.c
+@@ -211,7 +211,7 @@ static int ipc_devlink_create_region(struct iosm_devlink *devlink)
+ 			rc = PTR_ERR(devlink->cd_regions[i]);
+ 			dev_err(devlink->dev, "Devlink region fail,err %d", rc);
+ 			/* Delete previously created regions */
+-			for ( ; i >= 0; i--)
++			for (i--; i >= 0; i--)
+ 				devlink_region_destroy(devlink->cd_regions[i]);
+ 			goto region_create_fail;
+ 		}
+-- 
+2.30.2
+
 
