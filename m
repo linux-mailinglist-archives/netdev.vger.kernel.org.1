@@ -1,128 +1,89 @@
-Return-Path: <netdev+bounces-100624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88BFC8FB5CC
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:42:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39B068FB616
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:50:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 270A11F25952
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 14:42:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E26201F27531
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 14:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C9C1482FE;
-	Tue,  4 Jun 2024 14:39:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF0A1474AD;
+	Tue,  4 Jun 2024 14:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="7lgQXoag"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n4L/sFM8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A881482E7;
-	Tue,  4 Jun 2024 14:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD7415250C;
+	Tue,  4 Jun 2024 14:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717511964; cv=none; b=tJ7IzIHaz/kL6DHVAsoSlPXnDixgIh8eHqhDE9uP+ydAZgVVRPJEmgU/54+yOIAoMq5s7kBMyoWNnlkRuQcMoLPoVPSv0WfPeqUuGj1IcXY/dHK0UrVUDBf7NtrdJcEFqIAOBxIde1LON6T0odAKrXHB0QrqTIYFVTixv3WB4vU=
+	t=1717512146; cv=none; b=bxnJLQ+FpAdnidIFjLIlZ/QXsvCCBCQ2cBc/e8NhsgLOCC1r8EwUY6yDRrz3fJ7lRLqzv88SONpVKjHHJVgyL7o5iLVw4/heXKQ/ZQZ82Vdg13zb7+aa2B5mmiK0CfdhuzkmIkNrNaiCBaotFgAIpDACvecwF8fdKWUiAvSTmLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717511964; c=relaxed/simple;
-	bh=DJPEv7DHqC2jFC/ml2G0XBZOO08J9xy7Lnf+7JZnsJc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DBMDqy88U0aP4xF8MfaQIBJGVQ6WpJvqOqeF7oSyJE+LqYyJYQRAJ+snb/OtAd5os6aUWBb9gVk5kxRZUNSubm7U9TIXtqzpD+i7iYg15tvZwRluA2dOsfts8VfIfm/icMv7GyS2Cft5nwOLntgLk4TUvlO1B2a57tmrLiOngVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=7lgQXoag; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 454CITxL011744;
-	Tue, 4 Jun 2024 16:39:01 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	wKwsSbDUP5U8ltkUT/lf79BigFMhUPhxIubwoABa380=; b=7lgQXoagjOzWwKcA
-	wFmFz8hyurpTC+g9lL+ZekiFu1B0hArKrM7BNzl6Bxj05veh07ogicGbF0Eygt4W
-	A9NPjXWy9Vtu81xg6JwqXtLWt36evy5FyE4O64GRQNdmDtAp7cfPylzrbBh6QWdl
-	k4uocNg0cuWlsD155NRrAUlwcSzJETkfQvr0slXLfaVw8YcJhYk2C7FYP5GpxMOu
-	fnKCQmglPyUkxAX2x0q5xpjsl8DIERnttxolE0C4LlSAwdEFSenhj9ub2WPnBnCT
-	UGyEDjPSmXhnnrCZSFoawgVo1thxAZqRHlYBPeOozLZApwiwpQ57VLhRN0pKuG8P
-	pK/DFQ==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yg7r03j2d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Jun 2024 16:39:01 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id D385D40044;
-	Tue,  4 Jun 2024 16:38:57 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 05775221961;
-	Tue,  4 Jun 2024 16:37:44 +0200 (CEST)
-Received: from localhost (10.48.86.164) by SHFDAG1NODE2.st.com (10.75.129.70)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 4 Jun
- 2024 16:37:43 +0200
-From: Christophe Roullier <christophe.roullier@foss.st.com>
-To: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
-        Mark
- Brown <broonie@kernel.org>,
-        Christophe Roullier
-	<christophe.roullier@foss.st.com>,
-        Marek Vasut <marex@denx.de>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v4 11/11] ARM: multi_v7_defconfig: Add MCP23S08 pinctrl support
-Date: Tue, 4 Jun 2024 16:35:02 +0200
-Message-ID: <20240604143502.154463-12-christophe.roullier@foss.st.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240604143502.154463-1-christophe.roullier@foss.st.com>
-References: <20240604143502.154463-1-christophe.roullier@foss.st.com>
+	s=arc-20240116; t=1717512146; c=relaxed/simple;
+	bh=fmlRiz5M5NjXBFuEtUQcEwmSqlNPoKCDWdQmvJU2bn8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BFef4EKPFv3FJj/mi6+HxkutsUkVsXBVDPB36bkM00VUWnrRtziUIvpK7zJGSI7An7n8IQWn7EaawKzAnGbwbTrMmNfVepplW0RbEw5ZDmpoqlZ90MTfYWEnms+0aT/D05VutT29oOR73/6HzbvSx+syr1DCLtJ+f5sRmNyxciM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n4L/sFM8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9731AC32786;
+	Tue,  4 Jun 2024 14:42:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717512146;
+	bh=fmlRiz5M5NjXBFuEtUQcEwmSqlNPoKCDWdQmvJU2bn8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=n4L/sFM8i0oFnDH7F8EaDAMFQuuQh8PoG7QQq1M8IxZeajDv8ixPlzS8RP5O5WSbo
+	 fx1EtGxLjwFmVcfA7L6XJ9nj159hlyDZMc5x3Rop05fJhMF0pnorbMylNaXque9krv
+	 nRofPSsBjJTBD+bxZ5P7AhVAicmfaTkOKshWmMLUxvyDRcPKU89n/WuKiFwbnGnmhg
+	 7nCXXoiTqNiZjM8rwLtJ/ZsklEk4PWnKZZJZr8AwL96O1R3jn01o0gIHPfx3nzAUpc
+	 gjuPAWdnyLbyguqM/uXLIwcHdQYnVguuAoMNTsqVxMHwDWIVHTh0ulOUvJoNsydamC
+	 Bk9alCkb/mfng==
+Date: Tue, 4 Jun 2024 07:42:24 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Ofir Gal <ofir.gal@volumez.com>, davem@davemloft.net,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, ceph-devel@vger.kernel.org, dhowells@redhat.com,
+ edumazet@google.com, pabeni@redhat.com, kbusch@kernel.org, axboe@kernel.dk,
+ sagi@grimberg.me, philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+ christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
+Subject: Re: [PATCH v2 0/4] bugfix: Introduce sendpages_ok() to check
+ sendpage_ok() on contiguous pages
+Message-ID: <20240604074224.44668dab@kernel.org>
+In-Reply-To: <20240604043041.GA28886@lst.de>
+References: <20240530142417.146696-1-ofir.gal@volumez.com>
+	<20240531073214.GA19108@lst.de>
+	<20240601153610.30a92740@kernel.org>
+	<20240604043041.GA28886@lst.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-04_09,2024-06-04_01,2024-05-17_01
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Need to enable MCP23S08 I/O expanders to manage Ethernet PHY
-reset in STM32MP135F-DK board.
-Put this config in built-in like STMMAC to avoid huge of Ethernet
-messages during boot (deferred)
+On Tue, 4 Jun 2024 06:30:41 +0200 Christoph Hellwig wrote:
+> On Sat, Jun 01, 2024 at 03:36:10PM -0700, Jakub Kicinski wrote:
+> > On Fri, 31 May 2024 09:32:14 +0200 Christoph Hellwig wrote:  
+> > > I still find it hightly annoying that we can't have a helper that
+> > > simply does the right thing for callers, but I guess this is the
+> > > best thing we can get without a change of mind from the networking
+> > > maintainers..  
+> > 
+> > Change mind about what? Did I miss a discussion?  
+> 
+> Having a net helper to just send some memory in the most efficient
+> way and leave it up to the networking code to decide if it wants
+> to use sendpage or sendmsg internally as needed instead of burdening
+> the caller.
 
-Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
----
- arch/arm/configs/multi_v7_defconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/arm/configs/multi_v7_defconfig b/arch/arm/configs/multi_v7_defconfig
-index 86bf057ac3663..9758f3d41ad70 100644
---- a/arch/arm/configs/multi_v7_defconfig
-+++ b/arch/arm/configs/multi_v7_defconfig
-@@ -469,6 +469,7 @@ CONFIG_SPI_XILINX=y
- CONFIG_SPI_SPIDEV=y
- CONFIG_SPMI=y
- CONFIG_PINCTRL_AS3722=y
-+CONFIG_PINCTRL_MCP23S08=y
- CONFIG_PINCTRL_MICROCHIP_SGPIO=y
- CONFIG_PINCTRL_OCELOT=y
- CONFIG_PINCTRL_PALMAS=y
--- 
-2.25.1
-
+I'd guess the thinking was that if we push back the callers would
+switch the relevant allocations to be page-backed. But we can add
+a comment above the helper that says "you'd be better off using
+page frags and calling sendmsg(MSG_SPLICE_PAGES) directly".
 
