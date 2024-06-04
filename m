@@ -1,62 +1,82 @@
-Return-Path: <netdev+bounces-100643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DAA58FB7AB
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 17:42:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 428AF8FB764
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 17:32:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D2E2B28D23
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:32:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED1F11F28EA7
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:32:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F1251C3E;
-	Tue,  4 Jun 2024 15:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE03B1487FF;
+	Tue,  4 Jun 2024 15:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IUpcoIh7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k88j9n7M"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4013E1482FD;
-	Tue,  4 Jun 2024 15:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A69148823;
+	Tue,  4 Jun 2024 15:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717515035; cv=none; b=BSvap6pa9ByFpLkO4cAVqU+Hxc/0ch3P/zfgLIDLcg+j3dl7yhKmm4f7P0ANEMnhHW0quABqGIMqLZYXdsjuzgwx0ss/A+vtL5MI9zr0132FhOt6N/WMzDzyr9qcJ8VYDUia8W6kg89nlOwp6/WSpkwBZwVTi+uPK2LdZ9LUHmQ=
+	t=1717515046; cv=none; b=T5fDK6Hs1ulfa3JsReT2UNtiiKWo1l/4KZPAuhuyfXLutL55D8BUkD8n2D2VS27Ag88ESTfIp0lndiTA/OFt3RCJEHFVdpENlcbv//ybGMdmeORBUpcZWKUs/ZIP85lWZ5dhnZrvgrAAtHb7k6p8956hjjntt6zGgVy5j7CyG9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717515035; c=relaxed/simple;
-	bh=u9K203DT7q3+ekRSWvUlR+Y9s6vwYEo9Le/NC4TtiN0=;
+	s=arc-20240116; t=1717515046; c=relaxed/simple;
+	bh=Q9gF5EgvOA5LLTK9cyxR6L7uKhJE03ZNCS1qXfNrvcs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MnQZGLaNnTFtjmiYe9PMtUIjWBgody3QluxUXDmxstIQS+Uc4ixhnDFN2OO1K1WjmB67hngrxV9X1NHUKcKZ15h2l0LQrJSvYeK1oQaNenek+KDo72hglG5UuuLUVN3XLLFxBjS3yBbVIO6WSrOSPn23kcnZGq4cleqw6gYK0HU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IUpcoIh7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B7CDC4AF08;
-	Tue,  4 Jun 2024 15:30:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717515034;
-	bh=u9K203DT7q3+ekRSWvUlR+Y9s6vwYEo9Le/NC4TtiN0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IUpcoIh7jBNWzNEULN+DknncEDnocOAB3IU8XexYFsZOT4cy9MpmkKlJdCBuhtON3
-	 qE7PkgUmc/Kig6KrFA1ViA0TJpRV+t/ZFgnsl29xGTi0C4H/MIarY61fde15w8dJM1
-	 6L5NeRAfByk+hNF2YM/ThZXNfJlp5rUhoZqSMGZIE2KrZCzkrtYyqWodyaKMFpe1ZQ
-	 kwaw8m7JsH/XTIlHHl6IfgdwGFVpei9UeQNUjUicB5iDpoJmgaM8bjsqUtEl9Kn9ld
-	 imMMKF2zHSo36ZZ0Tysl369TcgrR3FNVAU97dpguqy3GinrW7bY6k/pLEqsIcXOVIb
-	 OLn0PYcCoqcbA==
-Date: Tue, 4 Jun 2024 16:30:28 +0100
-From: Simon Horman <horms@kernel.org>
-To: Wei Huang <wei.huang2@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	bhelgaas@google.com, corbet@lwn.net, davem@davemloft.net,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z7rwmcnAbGDgi7DHecbYLEJ80UtgiwNTWNmUxeHQ/jZFAYdiTcY+tSNZjr6LW5s443k4aiGHq7wj4pCnUE9gZXycDdQJZo0wAs/bIzS6EbVgtRyc5zBhTzp+HQpu7zfQ8xcbyyuRpUi9Q0w/vCXJSQQA5mrsBUJvGBBC9jKCEA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k88j9n7M; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-70249faa853so1142073b3a.3;
+        Tue, 04 Jun 2024 08:30:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717515045; x=1718119845; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4WUAd0a07uosayYjXtVChrzkP1MPzC+1BaRARn2bBEQ=;
+        b=k88j9n7MFuzJcH33h4Oii2P9d7hsEwpYKpng7qGBCQDxrELyhBKRVYzQAD2pPfAbkP
+         1dja4BEgz85f3ZCo9dYNdKUn2/jIYvXu/US8GCb9wZLIgVMFbNrBk6iEYvpPkqHBXcBT
+         UZEjpKN6yTgG0YbKr/ZMG1PPe1wiy83lGnqjSy2v5/r/uyNoGJKz7OvwueYNbtX3yG6d
+         CszHtMJVWYDgZQJr3ybruKVZ3q3EiVY/D5Vy1E77oUZVW3Cf3j9XaxCGfKiAtLQ1yT/0
+         eqXJr7o2WCJOXs18UlxjRox6lV//CKfVp8gS+ApHGA0pffs/GnRHfr7HxX/+7HqEryZq
+         Qjtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717515045; x=1718119845;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4WUAd0a07uosayYjXtVChrzkP1MPzC+1BaRARn2bBEQ=;
+        b=ZNk8VwnFEitVZu2bpQBqVdit1ThNVuAYd/JsusdofcEnz4gREdcNfLjDtJSOCNhlPr
+         YW01sxbbVLJvy91bjUbuKh2NKZmACemnNqDRz2+rLenmkklgIajm/7fD2e3XV8lyuAks
+         ck7bL+tBZbdvCYoR6tVOTrGpIbUZ1hXtLZc2M7IcPrPv7Qg7+dFxdd7IyfRicPSISLlH
+         DZuTTs2yJYire8+yoXubUyWufs1oarCNL+ijn8i3IlkDDgIMRNcCKwdXjco59IXrud6b
+         mTVdecTadaDBT66PFvri7lhzQkGdQR8XGTUaohuPrxTqSE7SDo9R8oiYc5a0shYKZ0kW
+         sM8w==
+X-Forwarded-Encrypted: i=1; AJvYcCWmVuZmZ0JVK9N7H7mo2aCjhh0QPHwCa7HLqL2UGaVyhze3c8Ru+GGH1e0cdhsaG80TdmaP+ZYL2Ob9/iH263UU02IQ7P56C6Ddn9RvDieyv7QGmRjXBx/fuTGuc0HuQkfAyW/P
+X-Gm-Message-State: AOJu0Yw/6D6Ztpi0iujcV70RE4fV2Tr0AcYvS8CFhm83DJhguxn0rUpA
+	PdF50Cqkm/RXHtfDe6KG8VuycP2K8KzlnkB4L0tG2tsG4KW3bqwf
+X-Google-Smtp-Source: AGHT+IHtUBT0YoPw58DQPWj5WKfxhmZloZmO4RwctteaSvYZiFcb0RwT8INBmthrDxbbSs+ryxJOHQ==
+X-Received: by 2002:a05:6a20:100e:b0:1af:fff9:1c5e with SMTP id adf61e73a8af0-1b26f23d529mr10932023637.43.1717515044674;
+        Tue, 04 Jun 2024 08:30:44 -0700 (PDT)
+Received: from localhost ([2601:647:6881:9060:274a:7c25:e246:a4c4])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70242ae89b0sm7190463b3a.101.2024.06.04.08.30.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jun 2024 08:30:44 -0700 (PDT)
+Date: Tue, 4 Jun 2024 08:30:43 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Hangyu Hua <hbh25y@gmail.com>
+Cc: jhs@mojatatu.com, jiri@resnulli.us, davem@davemloft.net,
 	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	vadim.fedorenko@linux.dev, bagasdotme@gmail.com
-Subject: Re: [PATCH V2 6/9] PCI/TPH: Retrieve steering tag from ACPI _DSM
-Message-ID: <20240604153028.GU491852@kernel.org>
-References: <20240531213841.3246055-1-wei.huang2@amd.com>
- <20240531213841.3246055-7-wei.huang2@amd.com>
+	vladbu@mellanox.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: sched: sch_multiq: fix possible OOB write in
+ multiq_tune()
+Message-ID: <Zl8zI9qQDtNcB0F7@pop-os.localdomain>
+References: <20240603071303.17986-1-hbh25y@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,72 +85,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240531213841.3246055-7-wei.huang2@amd.com>
+In-Reply-To: <20240603071303.17986-1-hbh25y@gmail.com>
 
-On Fri, May 31, 2024 at 04:38:38PM -0500, Wei Huang wrote:
-> According to PCI SIG ECN, calling the _DSM firmware method for a given
-> CPU_UID returns the steering tags for different types of memory
-> (volatile, non-volatile). These tags are supposed to be used in ST
-> table entry for optimal results.
+On Mon, Jun 03, 2024 at 03:13:03PM +0800, Hangyu Hua wrote:
+> q->bands will be assigned to qopt->bands to execute subsequent code logic
+> after kmalloc. So the old q->bands should not be used in kmalloc.
+> Otherwise, an out-of-bounds write will occur.
 > 
-> Co-developed-by: Eric Van Tassell <Eric.VanTassell@amd.com>
-> Signed-off-by: Eric Van Tassell <Eric.VanTassell@amd.com>
-> Signed-off-by: Wei Huang <wei.huang2@amd.com>
-> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
-> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com> 
-> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+> Fixes: c2999f7fb05b ("net: sched: multiq: don't call qdisc_put() while holding tree lock")
+> Signed-off-by: Hangyu Hua <hbh25y@gmail.com>
 
-...
+Looks good to me.
 
-> diff --git a/drivers/pci/pcie/tph.c b/drivers/pci/pcie/tph.c
+Acked-by: Cong Wang <cong.wang@bytedance.com>
 
-...
-
-> +static bool invoke_dsm(acpi_handle handle, u32 cpu_uid, u8 ph,
-> +		       u8 target_type, bool cache_ref_valid,
-> +		       u64 cache_ref, union st_info *st_out)
-> +{
-> +	union acpi_object in_obj, in_buf[3], *out_obj;
-> +
-> +	in_buf[0].integer.type = ACPI_TYPE_INTEGER;
-> +	in_buf[0].integer.value = 0; /* 0 => processor cache steering tags */
-> +
-> +	in_buf[1].integer.type = ACPI_TYPE_INTEGER;
-> +	in_buf[1].integer.value = cpu_uid;
-> +
-> +	in_buf[2].integer.type = ACPI_TYPE_INTEGER;
-> +	in_buf[2].integer.value = ph & 3;
-> +	in_buf[2].integer.value |= (target_type & 1) << 2;
-> +	in_buf[2].integer.value |= (cache_ref_valid & 1) << 3;
-> +	in_buf[2].integer.value |= (cache_ref << 32);
-> +
-> +	in_obj.type = ACPI_TYPE_PACKAGE;
-> +	in_obj.package.count = ARRAY_SIZE(in_buf);
-> +	in_obj.package.elements = in_buf;
-> +
-> +	out_obj = acpi_evaluate_dsm(handle, &pci_acpi_dsm_guid, MIN_ST_DSM_REV,
-> +				    ST_DSM_FUNC_INDEX, &in_obj);
-
-Hi Wei Huang, Eric, all,
-
-This seems to break builds on ARM (32bit) with multi_v7_defconfig.
-
-  .../tph.c:221:39: error: use of undeclared identifier 'pci_acpi_dsm_guid'
-  221 |         out_obj = acpi_evaluate_dsm(handle, &pci_acpi_dsm_guid, MIN_ST_DSM_REV,
-      |
-
-I suspect a dependency on ACPI in Kconfig is appropriate.
-
-> +
-> +	if (!out_obj)
-> +		return false;
-> +
-> +	if (out_obj->type != ACPI_TYPE_BUFFER) {
-> +		pr_err("invalid return type %d from TPH _DSM\n",
-> +		       out_obj->type);
-> +		ACPI_FREE(out_obj);
-> +		return false;
-> +	}
-
-...
+Thanks.
 
