@@ -1,130 +1,102 @@
-Return-Path: <netdev+bounces-100517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CCC08FAFEB
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 12:36:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB43A8FAFF6
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 12:39:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1C811F22EBA
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 10:36:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 486A71F23123
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 10:39:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3BC144D25;
-	Tue,  4 Jun 2024 10:36:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62CAB1448C9;
+	Tue,  4 Jun 2024 10:39:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="X7N4nvDB"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oSmGiUO3"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0898B1448C9;
-	Tue,  4 Jun 2024 10:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B807F38B;
+	Tue,  4 Jun 2024 10:39:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717497376; cv=none; b=CCG9C6L2Afgg9xSSLooY0c/Jn0KtuKnv8WDVXQt8GsgVkOX4TkV5EENY89/iZTiNY7kaOOezs8SIZFw/ybSLzPVEwUpEid+xpr2g0ekxBm+MGCBsAnyC8riRLgg655VCgxfV/kSfkBGMzREMV/cAj8YzQPUspVAZnMPIYCiuz/Q=
+	t=1717497549; cv=none; b=ijLf8/u8Gjy6dthZbIJsHBKRttYl8+UrbRZtYzT7M9675btpVDYRTNPuQBK55MgMNmkWGPbCzdRWCduA6ZhPjamY3E39SVaP6f4/cI2BtdeRMLagc37fO/IJ7VmjJoisQ4mYTKw0BJpjssf7gGQ5OU3GU1AEmikhCpxCYAO44Jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717497376; c=relaxed/simple;
-	bh=fAoFXYYkIkdenvWHNgGiSslpve99mgAMustoo4fOjKM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=E5Pr8FgAhVIoI6VJ4Gi9d+8nTCQenImx+ODAkzXHv8xJMEA44V+HBOIvtj3YlxXrr1eACSGeR8atPT5p2j/1OWNPY7i3mn3W+onAWP9B+NfQ/OAXN+yEP3X5J6kl8TEkjenDqFNwuFpwr6UtA4ryQ52TPPQEbOEPk3yBqW9Ny68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=X7N4nvDB; arc=none smtp.client-ip=217.70.183.196
+	s=arc-20240116; t=1717497549; c=relaxed/simple;
+	bh=bL3qxldcAX8+IkHQP2f9EmkyBJIVsOIIqdAw9DSsXA0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qgpYSF8/YgBf1YhfLPnSN6rJPiWlrG3Xx1zMkIy0QzIseGEyiiRfnvbhkt70o5pOx7FclQskaW8HYveegZtGFCMaema6uC3preD7+5hnuwPW/znYbI48O+gYgHu4ICLMioQ4ONnmXPX3v6wP7drpfRNG19Nty/FoI3HIO75cKGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oSmGiUO3; arc=none smtp.client-ip=217.70.183.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C3CC0E0009;
-	Tue,  4 Jun 2024 10:36:08 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E50001BF20E;
+	Tue,  4 Jun 2024 10:39:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1717497372;
+	t=1717497543;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fA411foyqLMzZ1hKOUW4fEs/FNUN6uX3elekeFZ7ooQ=;
-	b=X7N4nvDBmnw4RYWneE5CtUu3qx19bfW2W4250fsTMXFe6jFiWec0T/VnjVewnrLKDLBrtR
-	MjtespVLF57sWVij73AS/HAQxnI3Mf1SEF+c3giOqJ3uFrCz1wqEbbUx6L1OYk4jU3jtC6
-	vLD2Vdn4o4KNeFaRIlJX7RoQo3lvCYEz30GENbZWXAuQRnVKidqkCBJpz26wjnnojWNQFM
-	Fkayj7j2VgbS48X54m27vCV5wqYBI19sIjasEkIqo6L6M2ONxLxQ0GPvUNkU2ETvpY3hvo
-	yIgdsR5JAe/GYK8F1d6GIIGfa9+T650WqNcqiduSZVGFd0TLjijvbFNfAsDCpQ==
+	bh=bL3qxldcAX8+IkHQP2f9EmkyBJIVsOIIqdAw9DSsXA0=;
+	b=oSmGiUO3/xVMBccibnbiS2E5jpMtnRTV4iZxoMRTUZSwxdA/QZBuNYjUEDxc6kYPrpoLx4
+	hZCpdob1UDptoziJCTgvZjw6wfARrxbFEQZ0iR+lJgA58XG5pVi2twM8PQrKKVP8tXlYUJ
+	uzDrLeWjdBVuAAJ2NA7gwDzA8OTNxy8OpZEIKkiDVTZs9A6kTFawofjjZLiXoG5n9Yk2wG
+	3uetPeuZ5qLF6YUiFS+151X/6eV16wGbQzjw4e54F8TKygBhLg9JYsNx7R6i0ec2+bzZsn
+	e5t9ole8oX6CmVD2WrFAvXGVbDSHGE9GEPg89fIuDlDcsywdl9jZEPDp7ku6HA==
+Date: Tue, 4 Jun 2024 12:38:59 +0200
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Tue, 04 Jun 2024 12:36:01 +0200
-Subject: [PATCH net-next v14 01/14] net_tstamp: Add TIMESTAMPING SOFTWARE
- and HARDWARE mask
+To: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu
+ Pirea <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh
+ <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Willem de Bruijn <willemb@google.com>, Alexandra Winter
+ <wintera@linux.ibm.com>
+Subject: Re: [PATCH net-next v14 00/14] net: Make timestamping selectable
+Message-ID: <20240604123859.6fb08d2e@kmaincent-XPS-13-7390>
+In-Reply-To: <20240604-feature_ptp_netnext-v14-0-bfb4632429db@bootlin.com>
+References: <20240604-feature_ptp_netnext-v14-0-bfb4632429db@bootlin.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240604-feature_ptp_netnext-v14-1-bfb4632429db@bootlin.com>
-References: <20240604-feature_ptp_netnext-v14-0-bfb4632429db@bootlin.com>
-In-Reply-To: <20240604-feature_ptp_netnext-v14-0-bfb4632429db@bootlin.com>
-To: Florian Fainelli <florian.fainelli@broadcom.com>, 
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Radu Pirea <radu-nicolae.pirea@oss.nxp.com>, 
- Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, 
- Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, 
- Simon Horman <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
- Kory Maincent <kory.maincent@bootlin.com>, 
- Willem de Bruijn <willemb@google.com>
-X-Mailer: b4 0.13.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-GND-Sasl: kory.maincent@bootlin.com
 
-Timestamping software or hardware flags are often used as a group,
-therefore adding these masks will ease future use.
+On Tue, 04 Jun 2024 12:36:00 +0200
+Kory Maincent <kory.maincent@bootlin.com> wrote:
 
-I did not use SOF_TIMESTAMPING_SYS_HARDWARE flag as it is deprecated and
-not used at all.
+> Up until now, there was no way to let the user select the hardware
+> PTP provider at which time stamping occurs. The stack assumed that PHY ti=
+me
+> stamping is always preferred, but some MAC/PHY combinations were buggy.
+>=20
+> This series updates the default MAC/PHY default timestamping and aims to
+> allow the user to select the desired hwtstamp provider administratively.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
+I got an issue with my connection. I will resent it.
 
-Changes in v7:
-- Move the masks out of uapi to include/linux/net_tstamp.h
-
-Changes in v9:
-- Fix commit message typos
----
- include/linux/net_tstamp.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/include/linux/net_tstamp.h b/include/linux/net_tstamp.h
-index eb01c37e71e0..3799c79b6c83 100644
---- a/include/linux/net_tstamp.h
-+++ b/include/linux/net_tstamp.h
-@@ -5,6 +5,14 @@
- 
- #include <uapi/linux/net_tstamp.h>
- 
-+#define SOF_TIMESTAMPING_SOFTWARE_MASK	(SOF_TIMESTAMPING_RX_SOFTWARE | \
-+					 SOF_TIMESTAMPING_TX_SOFTWARE | \
-+					 SOF_TIMESTAMPING_SOFTWARE)
-+
-+#define SOF_TIMESTAMPING_HARDWARE_MASK	(SOF_TIMESTAMPING_RX_HARDWARE | \
-+					 SOF_TIMESTAMPING_TX_HARDWARE | \
-+					 SOF_TIMESTAMPING_RAW_HARDWARE)
-+
- enum hwtstamp_source {
- 	HWTSTAMP_SOURCE_NETDEV,
- 	HWTSTAMP_SOURCE_PHYLIB,
-
--- 
-2.34.1
-
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
