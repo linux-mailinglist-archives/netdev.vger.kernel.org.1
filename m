@@ -1,161 +1,234 @@
-Return-Path: <netdev+bounces-100555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1A5D8FB231
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 14:30:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9612E8FB246
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 14:32:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 689A22821C0
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 12:30:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48D412830DD
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 12:32:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25FDD146580;
-	Tue,  4 Jun 2024 12:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8562114658F;
+	Tue,  4 Jun 2024 12:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NnCYjX78"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="qrgTBynk";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="0Ec+ki0y";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="qrgTBynk";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="0Ec+ki0y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD303236;
-	Tue,  4 Jun 2024 12:30:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7130414658A;
+	Tue,  4 Jun 2024 12:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717504218; cv=none; b=Ulte5cl33K0eVQWLNnLoiIjpXxKcWxa/+alSd9PkEE8XtZio9dkqsGIAIGniXWMmWbxi9VFE8V+M8SImDGJ0ZG3zVXi7drLSlKLCAAIvj4Yp7D6SwtleV4TseYao+YU1OqgT55QH21szp9eYNNcf8vLHEx0GphBbs2zw8Tx5rXg=
+	t=1717504237; cv=none; b=obxV9BC566Gldq/ROfXy6Ren1tuPcZy1pCxKtt+qNU04ejahX/U3qKvXWSxYeCsLMmsR/coIyP3SndEH9nJ5eKRLow8tOBgjLyBaD/eiMl39e223i85iU+ovCdq5PSrlr5pQ50mJ15sJDyRSlpYL8z497E6/jU1g6hHWAI82DAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717504218; c=relaxed/simple;
-	bh=MV30rtHfPPlHnZDcV8Nv0rH4R7ufIL/lJb4TF1YRKPU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WzjZETh5p1FW0VFy81SIkDNsdU4jiiu+8nxxc/Ob+dZawAwcsSAR+3brOsmGNUFdm+/hK+qf2AY680Qfxm9x2knKEQOy7j1QlGFj9nog7DOrY8YynkmXgZ0784MbnpVnBRdr9/O6xzGBuv1N5ikmlz3qpEou1KUn4WGjJtTsxfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NnCYjX78; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-42111cf2706so5404725e9.0;
-        Tue, 04 Jun 2024 05:30:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717504215; x=1718109015; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QV5178kq3A+ohCLOgGIMrjEKOo8kZ9b5SnrcxWS2AG0=;
-        b=NnCYjX78rlXpRbqlEq3Wl2ORDRearjDGywJc5Hzvyv1LJGbCZMb4f5gVtmxtT4IP/3
-         If4YFbUXk5w9Zb/PpcwLWD4eAHEktALJfnTgONQDsESOWnw6SgJ1i4oC44d57h2ZqsQK
-         CuZdp5rZknTe3tTn/d8JvuVfvDyzcs9FFOBToiy7P1fIbhVFfot+ZOIvijFAbk+4JaIj
-         3ixOcEheaVumdLBy2Ml1jLrCXicyDuuEyUWMvb0y+SMvPaKXZIhcZFQXKaA3Ncvvq6XO
-         dEyV1Zqf/kGIKGKPEwCVjjlI1DNKYc4XydD3VGsCMzW2Hnt3LOcl5e/9nZIPPiYSVOue
-         B3+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717504215; x=1718109015;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QV5178kq3A+ohCLOgGIMrjEKOo8kZ9b5SnrcxWS2AG0=;
-        b=EudAoPC9ZwPwcmwn1MYngCSQwRF7L1EgYIfKA/BusEYdTr9ADtMh+gd8DkUZZDEY0H
-         mw7Jy1op0TMWapiqjDywsrY8xtJXfZRxVfAwlTddRInpczBG9+Bhx9y/AAZL/Wb/nlgA
-         zzDsjDNsFea9KpAAsmi/V77EkyHZETgih8m79eCtbrrrowH9WaCypa4l5FgyfROoo6q1
-         3/c37TpvZD6BrXbB9x6FODdfAE1/7yoPZ5u6BxieilWXkykP96jUQ3+YGdAWZvFRYDBO
-         5xp7BDszaCgsv7yVb9ROe10TZ/BgNIBtfe4Qzzg3SSZdCX5unuNeVwfO5Y/uInUJ2tvW
-         ptYg==
-X-Forwarded-Encrypted: i=1; AJvYcCVFCa2LBe+qap3vsOIca4tCdX6a3A7ZDfeo7tMNzlmX23xxMwbgckO+Rr88eEO6YepaGG6uJwkGbNEH3fD+KhiNqTcObM0v1JJyHLv2j2mc7mIMxjIho/MUWRVc
-X-Gm-Message-State: AOJu0YxHVW4qPlZ4Om0U/Rekvig5Na7PVPn7dj3/J27URobDYre+vGaX
-	9U6+kzDdFC74yyUYm8cMGK0zFF5Pvd8EUUwWSj3NncbOqSN1VaFiCx5w4qoms+o=
-X-Google-Smtp-Source: AGHT+IHhzkkFVpck0g22o5SFzatZ2y6OdCdEgwraAFEdBVUkp5jFwhWk8m8R2K4c3j0ORoqJPw7fzw==
-X-Received: by 2002:a5d:452b:0:b0:358:3a1:2643 with SMTP id ffacd0b85a97d-35e0f306439mr7994492f8f.3.1717504214333;
-        Tue, 04 Jun 2024 05:30:14 -0700 (PDT)
-Received: from localhost.localdomain (h-158-174-22-45.NA.cust.bahnhof.se. [158.174.22.45])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35dd04c10f2sm11409863f8f.10.2024.06.04.05.30.13
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Jun 2024 05:30:14 -0700 (PDT)
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-To: magnus.karlsson@intel.com,
-	bjorn@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	netdev@vger.kernel.org,
-	maciej.fijalkowski@intel.com,
-	bpf@vger.kernel.org
-Cc: YuvalE@radware.com
-Subject: [PATCH bpf 2/2] Revert "xsk: document ability to redirect to any socket bound to the same umem"
-Date: Tue,  4 Jun 2024 14:29:26 +0200
-Message-ID: <20240604122927.29080-3-magnus.karlsson@gmail.com>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240604122927.29080-1-magnus.karlsson@gmail.com>
-References: <20240604122927.29080-1-magnus.karlsson@gmail.com>
+	s=arc-20240116; t=1717504237; c=relaxed/simple;
+	bh=Bo7/QJgZa0lLbe4rhdZqjIEGy7jUxYnd4ZsDXWhgNVY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u9Bh7+P76FlieHzCpJRLhv2lQs1cTNWWJVV9YdRkh8G/vW39dJbNP8lotozg5ccnU7maM4zce56GIrq0NpC5sEm2s+7ywVGDGBeR61Zgds7JxUVXbBATJKepU5Mqp6xIQUHdfjHmilmtrceocIa8g9VFw6Aw0GGwK3llP8clZuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=qrgTBynk; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=0Ec+ki0y; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=qrgTBynk; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=0Ec+ki0y; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 40CA521A2D;
+	Tue,  4 Jun 2024 12:30:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1717504232; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=zErFyVpOm9HQgw1H14A/R9liqIrw91yZmlqc+PJt83g=;
+	b=qrgTBynk1rz+bSGZ0AN7gFs+BGPSxINZN2NUZllTQbQPweDztAp1VcAxYfYyUSFMqt7o3Q
+	LbOvAH5y0RfkfgA6w1CwcZ2QJ4EKlWDuLX6Ex5e28W/xGolgOZBe2h43uA+WCma9+kRO9Y
+	0XM59INl5I0UdJDh+836iA+8iMkQtXc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1717504232;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=zErFyVpOm9HQgw1H14A/R9liqIrw91yZmlqc+PJt83g=;
+	b=0Ec+ki0yVEX9DlPztOXV01BcnTwUlK5qtkDLP9WNHN0dz6q+wtmE/Gcrt64UGCcX9B60Ti
+	W9862t943M5F1DCw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=qrgTBynk;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=0Ec+ki0y
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1717504232; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=zErFyVpOm9HQgw1H14A/R9liqIrw91yZmlqc+PJt83g=;
+	b=qrgTBynk1rz+bSGZ0AN7gFs+BGPSxINZN2NUZllTQbQPweDztAp1VcAxYfYyUSFMqt7o3Q
+	LbOvAH5y0RfkfgA6w1CwcZ2QJ4EKlWDuLX6Ex5e28W/xGolgOZBe2h43uA+WCma9+kRO9Y
+	0XM59INl5I0UdJDh+836iA+8iMkQtXc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1717504232;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=zErFyVpOm9HQgw1H14A/R9liqIrw91yZmlqc+PJt83g=;
+	b=0Ec+ki0yVEX9DlPztOXV01BcnTwUlK5qtkDLP9WNHN0dz6q+wtmE/Gcrt64UGCcX9B60Ti
+	W9862t943M5F1DCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 16BD51398F;
+	Tue,  4 Jun 2024 12:30:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id OocIBegIX2auaAAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Tue, 04 Jun 2024 12:30:32 +0000
+Message-ID: <801d4833-6a29-4134-8ed6-5006d157af88@suse.cz>
+Date: Tue, 4 Jun 2024 14:30:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/6] mm/slab: Plumb kmem_buckets into
+ __do_kmalloc_node()
+Content-Language: en-US
+To: Kees Cook <kees@kernel.org>
+Cc: Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>,
+ David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+ jvoisin <julien.voisin@dustri.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Roman Gushchin <roman.gushchin@linux.dev>,
+ Hyeonggon Yoo <42.hyeyoo@gmail.com>, linux-mm@kvack.org,
+ linux-hardening@vger.kernel.org, "GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
+ Xiu Jianfeng <xiujianfeng@huawei.com>, Suren Baghdasaryan
+ <surenb@google.com>, Kent Overstreet <kent.overstreet@linux.dev>,
+ Jann Horn <jannh@google.com>, Matteo Rizzo <matteorizzo@google.com>,
+ Thomas Graf <tgraf@suug.ch>, Herbert Xu <herbert@gondor.apana.org.au>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20240531191304.it.853-kees@kernel.org>
+ <20240531191458.987345-2-kees@kernel.org>
+ <8c0c4af3-4782-4dbc-b413-e2f3b79c0246@suse.cz>
+ <202406031539.3A465006@keescook>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ EP+ylKVEKb0Q2A==
+In-Reply-To: <202406031539.3A465006@keescook>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Flag: NO
+X-Spam-Score: -3.00
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 40CA521A2D
+X-Spam-Level: 
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.00 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	MX_GOOD(-0.01)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[linux.com,kernel.org,google.com,lge.com,dustri.org,linux-foundation.org,linux.dev,gmail.com,kvack.org,vger.kernel.org,huaweicloud.com,huawei.com,suug.ch,gondor.apana.org.au];
+	RCVD_COUNT_TWO(0.00)[2];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
 
-From: Magnus Karlsson <magnus.karlsson@intel.com>
+On 6/4/24 12:44 AM, Kees Cook wrote:
+> On Mon, Jun 03, 2024 at 07:06:15PM +0200, Vlastimil Babka wrote:
+>> On 5/31/24 9:14 PM, Kees Cook wrote:
+>> > Introduce CONFIG_SLAB_BUCKETS which provides the infrastructure to
+>> > support separated kmalloc buckets (in the follow kmem_buckets_create()
+>> > patches and future codetag-based separation). Since this will provide
+>> > a mitigation for a very common case of exploits, enable it by default.
+>> 
+>> Are you sure? I thought there was a policy that nobody is special enough
+>> to have stuff enabled by default. Is it worth risking Linus shouting? :)
+> 
+> I think it's important to have this enabled given how common the
+> exploitation methodology is and how cheap this solution is. Regardless,
+> if you want it "default n", I can change it.
 
-This reverts commit 968595a93669b6b4f6d1fcf80cf2d97956b6868f.
+Yeah, I'd just recommend it in the help, noting it has a bit of memory
+overhead. Defaults are not that important anyway IMHO, either it's distro
+doing the config, and individually security conscious people should know
+what they are doing.
 
-Reported-by: Yuval El-Hanany <YuvalE@radware.com>
-Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
-Link: https://lore.kernel.org/xdp-newbies/8100DBDC-0B7C-49DB-9995-6027F6E63147@radware.com/
----
- Documentation/networking/af_xdp.rst | 33 ++++++++++++-----------------
- 1 file changed, 14 insertions(+), 19 deletions(-)
+> 
+> This looks really nice, thank you! This is well aligned with the codetag
+> followup, which also needs to have "size" be very easy to find (to the
+> macros can check for compile-time-constant or not).
+> 
+> I will go work from your branch...
 
-diff --git a/Documentation/networking/af_xdp.rst b/Documentation/networking/af_xdp.rst
-index 72da7057e4cf..dceeb0d763aa 100644
---- a/Documentation/networking/af_xdp.rst
-+++ b/Documentation/networking/af_xdp.rst
-@@ -329,24 +329,23 @@ XDP_SHARED_UMEM option and provide the initial socket's fd in the
- sxdp_shared_umem_fd field as you registered the UMEM on that
- socket. These two sockets will now share one and the same UMEM.
- 
--In this case, it is possible to use the NIC's packet steering
--capabilities to steer the packets to the right queue. This is not
--possible in the previous example as there is only one queue shared
--among sockets, so the NIC cannot do this steering as it can only steer
--between queues.
--
--In libxdp (or libbpf prior to version 1.0), you need to use the
--xsk_socket__create_shared() API as it takes a reference to a FILL ring
--and a COMPLETION ring that will be created for you and bound to the
--shared UMEM. You can use this function for all the sockets you create,
--or you can use it for the second and following ones and use
--xsk_socket__create() for the first one. Both methods yield the same
--result.
-+There is no need to supply an XDP program like the one in the previous
-+case where sockets were bound to the same queue id and
-+device. Instead, use the NIC's packet steering capabilities to steer
-+the packets to the right queue. In the previous example, there is only
-+one queue shared among sockets, so the NIC cannot do this steering. It
-+can only steer between queues.
-+
-+In libbpf, you need to use the xsk_socket__create_shared() API as it
-+takes a reference to a FILL ring and a COMPLETION ring that will be
-+created for you and bound to the shared UMEM. You can use this
-+function for all the sockets you create, or you can use it for the
-+second and following ones and use xsk_socket__create() for the first
-+one. Both methods yield the same result.
- 
- Note that a UMEM can be shared between sockets on the same queue id
- and device, as well as between queues on the same device and between
--devices at the same time. It is also possible to redirect to any
--socket as long as it is bound to the same umem with XDP_SHARED_UMEM.
-+devices at the same time.
- 
- XDP_USE_NEED_WAKEUP bind flag
- -----------------------------
-@@ -823,10 +822,6 @@ A: The short answer is no, that is not supported at the moment. The
-    switch, or other distribution mechanism, in your NIC to direct
-    traffic to the correct queue id and socket.
- 
--   Note that if you are using the XDP_SHARED_UMEM option, it is
--   possible to switch traffic between any socket bound to the same
--   umem.
--
- Q: My packets are sometimes corrupted. What is wrong?
- 
- A: Care has to be taken not to feed the same buffer in the UMEM into
--- 
-2.45.1
+Great!
+
+> Thanks!
+> 
+> -Kees
+> 
 
 
