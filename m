@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-100646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AB1D8FB7B8
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 17:44:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1210E8FB7B9
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 17:45:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8DFA1F21E09
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:44:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD3B62832A6
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBA25145A03;
-	Tue,  4 Jun 2024 15:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A2FA145FF8;
+	Tue,  4 Jun 2024 15:44:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ykJvDfut";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0m2WDrYZ"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="viC6lkgC";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="lbgcgTVT"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03635143C7B;
-	Tue,  4 Jun 2024 15:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 885EA144313;
+	Tue,  4 Jun 2024 15:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717515890; cv=none; b=DLdENCjKHsthxaliE5m/RGo9SWEZBJawNm699DhL6lIfjOjlH889R2LlNVkyEpEIt4q6Zf1uj0gXK4k7zCW93/KisKv6jTVo00jA2v9HzCXWBKf/w1CQP7yl/LBdGj58UaBBcK1zyKx9H3eH/13n03bLZnWK9ia4Emeev3+sZEE=
+	t=1717515890; cv=none; b=nMb7AkzQcaML8fr/VIUn/imvi2c/c95NIKugl4AzBAU4uWR2eHcEUuEB3LTp0lKP/sueauMpTMEIiCXA675cDC4w3ufgJzvs9whL7zPF8jWGqTjmTLW4NpaEKqvkieTTab/GpyyXMnjb6xy3LVESjv12ykGvYC1wwTqVIclCgYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717515890; c=relaxed/simple;
-	bh=CpjnF7NQ8ik/bsSLPjV6QCgLsAnODb+JFk1ApHKH3xY=;
+	bh=G+S7nMnQYP8Ub6wdwc/QdbVXpNg4qAepSUVQBtIndoo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Wxr/ttUwRvdgI/6/fEJA8Urdo7oxamfAprKiRIB4sA2hUb0bTLHt4L1RaUX70JQHQeta8GfUhZgl8GIM8G0q/weQq1blBuMdqCde/TW0lc5ZpDtnzALGAoP18aFr219xQDbchcgs7cMUiRyw46jeaxnXtjwoQ6kXwxNTlzumWOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ykJvDfut; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0m2WDrYZ; arc=none smtp.client-ip=193.142.43.55
+	 MIME-Version; b=OBuibUkGh198+0InCgl96yI3D3E+346GTv6/20BSiaylxMvbuTvkT3a9zPPVFmscDx2907baaRPh7h8niw3sRFmtToaG6VIT665NMh3lO4KZqhQZ+Nhua0CfForXDEBh8veuG8aBzyY3c3jLnrk3njta0Q4+sa/AjiMzXNzVTWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=viC6lkgC; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=lbgcgTVT; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
@@ -39,21 +39,21 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=xKeHb6yb6kbztXYTRHNbaIQnvhpfvhLJP9xjIPFBDgI=;
-	b=ykJvDfutE6xlOyMx3fhoUQoXlLDIbgaNgcp+N9vYoVHrNZHQ+Ma7JwXv24YabS9mmrn8M1
-	qP2jCV/92o9iRXYpi6I3sHLcuWyj9iVwslnKuLB7IPG+FLp+eqcppBW5BjUVSkyVYG90UV
-	DNyquZtbMN5nvludJK7qi7/uiqPmkSBlFh6YrIEe6QK5CzQ4MWS6z0iVL13VWxIs/f9+0X
-	K2txxv8N+497MO8IP0lrjdvzrlJKcryrUgEoZOQKUJnE7V4GLIKAPBZjGeLJGHN9nEtVn/
-	+PWJGvAV9wd9NR2PU9iyIHQ/FlrFR8fa3HNVE1zP5/5cI7zAb4NAPoWBNvOUJg==
+	bh=jc9kVwpT1wazRgJL8VSyOnTf3zyLearQK1DZf1xb140=;
+	b=viC6lkgCUzfivwQLWjonYU9EOhxsxw9uKJQ4t/Kcs7Xzabb6+7eKrTs+37I+KGYAUqcqhc
+	lrDIMHbXrkURGhjydBgxiMSSE5mWDvHBf4teXDZ5wRLO9n4g/YyOV4l975yPhKtLHEUtip
+	yxAdUv+azl+AxDRECQhcDok+JJyp2KKClPI8A1XHtLX6Ca+q5z6FhWQ8wVtu+z7V6NB7xG
+	gcgK1qXEuwT/dUVXRO5Wh8KyRRXBAfumD3U4jP+zyMfLmXny1DhCqqBeKH5EikkM46m/hq
+	ChGZbCv7N3WFWpu5MLkRsLr7aChJlOJgjk3H/VGo2QvS4Km3JHSvSw8HaFdHLQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
 	s=2020e; t=1717515887;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=xKeHb6yb6kbztXYTRHNbaIQnvhpfvhLJP9xjIPFBDgI=;
-	b=0m2WDrYZhNGsNSvPcM+spVvYS7MrOY4bDwFDf41hhrnFws022VE1XY+3y4YgWipbxdyCFL
-	l6LGiHXBpdaSZ3CQ==
+	bh=jc9kVwpT1wazRgJL8VSyOnTf3zyLearQK1DZf1xb140=;
+	b=lbgcgTVTF1uYDTgw0nRUB8a20nSfMZ7QTl1+70n3F97TPtC4vUKLCFrzYJP8J67wlDrAMk
+	7vMkY6vO8Kfn6QCg==
 To: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -70,9 +70,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Waiman Long <longman@redhat.com>,
 	Will Deacon <will@kernel.org>,
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH v4 net-next 01/14] locking/local_lock: Add local nested BH locking infrastructure.
-Date: Tue,  4 Jun 2024 17:24:08 +0200
-Message-ID: <20240604154425.878636-2-bigeasy@linutronix.de>
+Subject: [PATCH v4 net-next 02/14] net: Use __napi_alloc_frag_align() instead of open coding it.
+Date: Tue,  4 Jun 2024 17:24:09 +0200
+Message-ID: <20240604154425.878636-3-bigeasy@linutronix.de>
 In-Reply-To: <20240604154425.878636-1-bigeasy@linutronix.de>
 References: <20240604154425.878636-1-bigeasy@linutronix.de>
 Precedence: bulk
@@ -83,149 +83,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-Add local_lock_nested_bh() locking. It is based on local_lock_t and the
-naming follows the preempt_disable_nested() example.
+The else condition within __netdev_alloc_frag_align() is an open coded
+__napi_alloc_frag_align().
 
-For !PREEMPT_RT + !LOCKDEP it is a per-CPU annotation for locking
-assumptions based on local_bh_disable(). The macro is optimized away
-during compilation.
-For !PREEMPT_RT + LOCKDEP the local_lock_nested_bh() is reduced to
-the usual lock-acquire plus lockdep_assert_in_softirq() - ensuring that
-BH is disabled.
-
-For PREEMPT_RT local_lock_nested_bh() acquires the specified per-CPU
-lock. It does not disable CPU migration because it relies on
-local_bh_disable() disabling CPU migration.
-With LOCKDEP it performans the usual lockdep checks as with !PREEMPT_RT.
-Due to include hell the softirq check has been moved spinlock.c.
-
-The intention is to use this locking in places where locking of a per-CPU
-variable relies on BH being disabled. Instead of treating disabled
-bottom halves as a big per-CPU lock, PREEMPT_RT can use this to reduce
-the locking scope to what actually needs protecting.
-A side effect is that it also documents the protection scope of the
-per-CPU variables.
+Use __napi_alloc_frag_align() instead of open coding it.
+Move fragsz assignment before page_frag_alloc_align() invocation because
+__napi_alloc_frag_align() also contains this statement.
 
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 ---
- include/linux/local_lock.h          | 10 ++++++++++
- include/linux/local_lock_internal.h | 31 +++++++++++++++++++++++++++++
- include/linux/lockdep.h             |  3 +++
- kernel/locking/spinlock.c           |  8 ++++++++
- 4 files changed, 52 insertions(+)
+ net/core/skbuff.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/local_lock.h b/include/linux/local_lock.h
-index 82366a37f4474..091dc0b6bdfb9 100644
---- a/include/linux/local_lock.h
-+++ b/include/linux/local_lock.h
-@@ -62,4 +62,14 @@ DEFINE_LOCK_GUARD_1(local_lock_irqsave, local_lock_t __p=
-ercpu,
- 		    local_unlock_irqrestore(_T->lock, _T->flags),
- 		    unsigned long flags)
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 466999a7515e6..dda13fdffb697 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -318,19 +318,15 @@ void *__netdev_alloc_frag_align(unsigned int fragsz, =
+unsigned int align_mask)
+ {
+ 	void *data;
 =20
-+#define local_lock_nested_bh(_lock)				\
-+	__local_lock_nested_bh(_lock)
-+
-+#define local_unlock_nested_bh(_lock)				\
-+	__local_unlock_nested_bh(_lock)
-+
-+DEFINE_GUARD(local_lock_nested_bh, local_lock_t __percpu*,
-+	     local_lock_nested_bh(_T),
-+	     local_unlock_nested_bh(_T))
-+
- #endif
-diff --git a/include/linux/local_lock_internal.h b/include/linux/local_lock=
-_internal.h
-index 975e33b793a77..8dd71fbbb6d2b 100644
---- a/include/linux/local_lock_internal.h
-+++ b/include/linux/local_lock_internal.h
-@@ -62,6 +62,17 @@ do {								\
- 	local_lock_debug_init(lock);				\
- } while (0)
+-	fragsz =3D SKB_DATA_ALIGN(fragsz);
+ 	if (in_hardirq() || irqs_disabled()) {
+ 		struct page_frag_cache *nc =3D this_cpu_ptr(&netdev_alloc_cache);
 =20
-+#define __spinlock_nested_bh_init(lock)				\
-+do {								\
-+	static struct lock_class_key __key;			\
-+								\
-+	debug_check_no_locks_freed((void *)lock, sizeof(*lock));\
-+	lockdep_init_map_type(&(lock)->dep_map, #lock, &__key,  \
-+			      0, LD_WAIT_CONFIG, LD_WAIT_INV,	\
-+			      LD_LOCK_NORMAL);			\
-+	local_lock_debug_init(lock);				\
-+} while (0)
-+
- #define __local_lock(lock)					\
- 	do {							\
- 		preempt_disable();				\
-@@ -98,6 +109,15 @@ do {								\
- 		local_irq_restore(flags);			\
- 	} while (0)
-=20
-+#define __local_lock_nested_bh(lock)				\
-+	do {							\
-+		lockdep_assert_in_softirq();			\
-+		local_lock_acquire(this_cpu_ptr(lock));	\
-+	} while (0)
-+
-+#define __local_unlock_nested_bh(lock)				\
-+	local_lock_release(this_cpu_ptr(lock))
-+
- #else /* !CONFIG_PREEMPT_RT */
-=20
- /*
-@@ -138,4 +158,15 @@ typedef spinlock_t local_lock_t;
-=20
- #define __local_unlock_irqrestore(lock, flags)	__local_unlock(lock)
-=20
-+#define __local_lock_nested_bh(lock)				\
-+do {								\
-+	lockdep_assert_in_softirq_func();			\
-+	spin_lock(this_cpu_ptr(lock));				\
-+} while (0)
-+
-+#define __local_unlock_nested_bh(lock)				\
-+do {								\
-+	spin_unlock(this_cpu_ptr((lock)));			\
-+} while (0)
-+
- #endif /* CONFIG_PREEMPT_RT */
-diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
-index 5e51b0de4c4b5..fcc02812bf31e 100644
---- a/include/linux/lockdep.h
-+++ b/include/linux/lockdep.h
-@@ -605,6 +605,8 @@ do {									\
- 		     (!in_softirq() || in_irq() || in_nmi()));		\
- } while (0)
-=20
-+extern void lockdep_assert_in_softirq_func(void);
-+
- #else
- # define might_lock(lock) do { } while (0)
- # define might_lock_read(lock) do { } while (0)
-@@ -618,6 +620,7 @@ do {									\
- # define lockdep_assert_preemption_enabled() do { } while (0)
- # define lockdep_assert_preemption_disabled() do { } while (0)
- # define lockdep_assert_in_softirq() do { } while (0)
-+# define lockdep_assert_in_softirq_func() do { } while (0)
- #endif
-=20
- #ifdef CONFIG_PROVE_RAW_LOCK_NESTING
-diff --git a/kernel/locking/spinlock.c b/kernel/locking/spinlock.c
-index 8475a0794f8c5..438c6086d540e 100644
---- a/kernel/locking/spinlock.c
-+++ b/kernel/locking/spinlock.c
-@@ -413,3 +413,11 @@ notrace int in_lock_functions(unsigned long addr)
- 	&& addr < (unsigned long)__lock_text_end;
- }
- EXPORT_SYMBOL(in_lock_functions);
-+
-+#if defined(CONFIG_PROVE_LOCKING) && defined(CONFIG_PREEMPT_RT)
-+void notrace lockdep_assert_in_softirq_func(void)
-+{
-+	lockdep_assert_in_softirq();
-+}
-+EXPORT_SYMBOL(lockdep_assert_in_softirq_func);
-+#endif
++		fragsz =3D SKB_DATA_ALIGN(fragsz);
+ 		data =3D __page_frag_alloc_align(nc, fragsz, GFP_ATOMIC,
+ 					       align_mask);
+ 	} else {
+-		struct napi_alloc_cache *nc;
+-
+ 		local_bh_disable();
+-		nc =3D this_cpu_ptr(&napi_alloc_cache);
+-		data =3D __page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC,
+-					       align_mask);
++		data =3D __napi_alloc_frag_align(fragsz, align_mask);
+ 		local_bh_enable();
+ 	}
+ 	return data;
 --=20
 2.45.1
 
