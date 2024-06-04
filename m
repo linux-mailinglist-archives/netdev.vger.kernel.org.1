@@ -1,133 +1,137 @@
-Return-Path: <netdev+bounces-100431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AF348FAA00
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 07:31:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FC058FAA0D
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 07:36:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECFEF1F21689
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 05:31:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90D07B21E0D
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 05:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC981304B1;
-	Tue,  4 Jun 2024 05:31:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4E013DDD5;
+	Tue,  4 Jun 2024 05:36:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="WOCOjvy4"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="bK8/7ODJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDBB8BEC;
-	Tue,  4 Jun 2024 05:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A39113D2AB;
+	Tue,  4 Jun 2024 05:36:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717479070; cv=none; b=jXQwRD4xMMnV6AAlDk6d/dZO/0t51Mgll2ztM7qwlPoEPdK6frb9MofVKK+xwyvZ7QrBacnPffwKT2RgXvw6ld1lvDNcx6P4wFGLQitFbC7Qe7ebtneHLke/WDRINmEWPuYrv4C+5Jx3g+XsYtYhOh0FoxpvXusWhmjzPrHcUmo=
+	t=1717479410; cv=none; b=pRkccZA/97kEIwUi7Sr9IY7E/TYKeye2oPw3M0pqfavlQZykYkVsyZu4aMxTSl5gGAxu+etGOpz5yZ5df/jhB7DfGnO5IqRjJCTzI+0GpHaDi3gg0Hq7wXYmtwzi94DhVUQxfUh6agn76Jd5g3BgtAhAF+GVvMDPEibShlJZxlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717479070; c=relaxed/simple;
-	bh=0zbgKfvHTJ/R5q9ClkCPrLlxGR7Xha84YTV21PicIHU=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=GJOWnN+Y6AAouHRQ4vbRi+6TvoX6sSkNRMvvf2QS0Ko6kanCop+7yOuJqSuFoZ9mNAKA6I1GQ0hmG811kJhRQdoa8WPKQtvYvr+ewsrDqICIAZ63pa7BSrbpdkB5euKoqXmgepWBOpvEjdZeJ8I/jjeb4QLeQmA6tjNL1oKGAtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=WOCOjvy4; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1717479064; h=Message-ID:Subject:Date:From:To;
-	bh=on7QTAt93h/XfHQ169rkXSG1LnUtTKMC4HJvTpbfWk8=;
-	b=WOCOjvy4Aq8y6f9BuN6YpGq2rDn4pBCQX1TLsKKkMc0aG5SMOLDMfXbmIBzD037qiezGV9OkXI7rtkMnwaUg16F9HrZBoPbe9jbSYZok6U2G81yixDJtHC5b6Htlh3ljJd7o9nM6rA1yOs9c6IcVCnfwdAludiAbKGI/W9KVhr4=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R411e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033068173054;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=37;SR=0;TI=SMTPD_---0W7poCxp_1717479060;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W7poCxp_1717479060)
-          by smtp.aliyun-inc.com;
-          Tue, 04 Jun 2024 13:31:01 +0800
-Message-ID: <1717478006.038663-1-hengqi@linux.alibaba.com>
-Subject: Re: [PATCH net-next v14 3/5] ethtool: provide customized dim profile management
-Date: Tue, 4 Jun 2024 13:13:26 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: kernel test robot <lkp@intel.com>
-Cc: oe-kbuild-all@lists.linux.dev,
- Huacai Chen <chenhuacai@loongson.cn>,
- Xuerui Wang <kernel@xen0n.name>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Guo Ren <guoren@kernel.org>,
- loongarch@lists.linux.dev,
- Jakub Kicinski <kuba@kernel.org>,
- "David S . Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>,
- Jason Wang <jasowang@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>,
- Brett Creeley <bcreeley@amd.com>,
- Ratheesh Kannoth <rkannoth@marvell.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Tal Gilboa <talgi@nvidia.com>,
- Jonathan Corbet <corbet@lwn.net>,
- linux-doc@vger.kernel.org,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Jiri Pirko <jiri@resnulli.us>,
- Paul Greenwalt <paul.greenwalt@intel.com>,
- Ahmed Zaki <ahmed.zaki@intel.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Kory Maincent <kory.maincent@bootlin.com>,
- Andrew Lunn <andrew@lunn.ch>,
- justinstitt@google.com,
- donald.hunter@gmail.com,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Linux Memory Management List <linux-mm@kvack.org>,
- Dragos Tatulea <dtatulea@nvidia.com>,
- Rahul Rameshbabu <rrameshbabu@nvidia.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- netdev@vger.kernel.org,
- virtualization@lists.linux.dev
-References: <20240603154727.31998-1-hengqi@linux.alibaba.com>
- <20240603154727.31998-4-hengqi@linux.alibaba.com>
- <202406040645.6z95FW1f-lkp@intel.com>
-In-Reply-To: <202406040645.6z95FW1f-lkp@intel.com>
+	s=arc-20240116; t=1717479410; c=relaxed/simple;
+	bh=jXpqd3FK/H/WNfQ5ni71NMR/LyQjoR0FbNVZYK5g1pw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=II3WYOVDhkK+vDac/zno5K8erOT9nLyXLGXQebkz6p6u+i9BvhRs5CFmFsq0YUf1pEMRGZBE5YojB3orW38pvqnU6pQrXCeusl8G3I7QuBLJ3v9AXB9mCOqalcnnDBAeegpvcr0DUik0aX8ZKx2181G3u6l3UUjyRs3XQ/Jy+1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=bK8/7ODJ; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id CFE3120681E8; Mon,  3 Jun 2024 22:36:48 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com CFE3120681E8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1717479408;
+	bh=eG1FDBv4R7lC9lHB6vwHEI8Q/I2FDjn+gY+OQPTwEx4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bK8/7ODJAyp/AdqWEbg21wvN62rRE4DCYtKwZozOr0P9Y7uzei0iX0fVAX9g//0NR
+	 VNc8ZRp9gSDvEKQ1oAQiiSzO2Vy/SlCwo9znaQU1bmGC7ZL2kP6UJxktgZ684D/qsC
+	 Rv5rkF60/Dcq+Sa+B3rnqI5ulPNZ9o8+yBAhSQnk=
+Date: Mon, 3 Jun 2024 22:36:48 -0700
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: linux-hardening@vger.kernel.org, netdev@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, Colin Ian King <colin.i.king@gmail.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Kees Cook <keescook@chromium.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Long Li <longli@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH net-next v3] net: mana: Allow variable size indirection
+ table
+Message-ID: <20240604053648.GA14220@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1717169861-15825-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <20240603084122.GK3884@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240603084122.GK3884@unreal>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Tue, 4 Jun 2024 07:00:35 +0800, kernel test robot <lkp@intel.com> wrote:
-> Hi Heng,
+On Mon, Jun 03, 2024 at 11:41:22AM +0300, Leon Romanovsky wrote:
+> On Fri, May 31, 2024 at 08:37:41AM -0700, Shradha Gupta wrote:
+> > Allow variable size indirection table allocation in MANA instead
+> > of using a constant value MANA_INDIRECT_TABLE_SIZE.
+> > The size is now derived from the MANA_QUERY_VPORT_CONFIG and the
+> > indirection table is allocated dynamically.
+> > 
+> > Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> > Reviewed-by: Dexuan Cui <decui@microsoft.com>
+> > Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> > ---
+> >  Changes in v3:
+> >  * Fixed the memory leak(save_table) in mana_set_rxfh()
+> > 
+> >  Changes in v2:
+> >  * Rebased to latest net-next tree
+> >  * Rearranged cleanup code in mana_probe_port to avoid extra operations
+> > ---
+> >  drivers/infiniband/hw/mana/qp.c               | 10 +--
+> >  drivers/net/ethernet/microsoft/mana/mana_en.c | 68 ++++++++++++++++---
+> >  .../ethernet/microsoft/mana/mana_ethtool.c    | 27 +++++---
+> >  include/net/mana/gdma.h                       |  4 +-
+> >  include/net/mana/mana.h                       |  9 +--
+> >  5 files changed, 89 insertions(+), 29 deletions(-)
 > 
-> kernel test robot noticed the following build warnings:
+> <...>
 > 
-> [auto build test WARNING on net-next/main]
+> > +free_indir:
+> > +	apc->indir_table_sz = 0;
+> > +	kfree(apc->indir_table);
+> > +	apc->indir_table = NULL;
+> > +	kfree(apc->rxobj_table);
+> > +	apc->rxobj_table = NULL;
+> >  reset_apc:
+> >  	kfree(apc->rxqs);
+> >  	apc->rxqs = NULL;
+> > @@ -2897,6 +2936,7 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+> >  {
 > 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Heng-Qi/linux-dim-move-useful-macros-to-h-file/20240603-235834
-> base:   net-next/main
-> patch link:    https://lore.kernel.org/r/20240603154727.31998-4-hengqi%40linux.alibaba.com
-> patch subject: [PATCH net-next v14 3/5] ethtool: provide customized dim profile management
-> config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20240604/202406040645.6z95FW1f-lkp@intel.com/config)
-> compiler: loongarch64-linux-gcc (GCC) 13.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240604/202406040645.6z95FW1f-lkp@intel.com/reproduce)
+> <...>
 > 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202406040645.6z95FW1f-lkp@intel.com/
+> > @@ -2931,6 +2972,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+> >  		}
+> >  
+> >  		unregister_netdevice(ndev);
+> > +		apc->indir_table_sz = 0;
+> > +		kfree(apc->indir_table);
+> > +		apc->indir_table = NULL;
+> > +		kfree(apc->rxobj_table);
+> > +		apc->rxobj_table = NULL;
 > 
-> All warnings (new ones prefixed by >>):
-> 
-> >> net/ethtool/coalesce.o: warning: objtool: unexpected relocation symbol type in .rela.discard.reachable
+> Why do you need to NULLify here? Will apc is going to be accessible
+> after call to mana_remove? or port probe failure?
+Right, they won't be accessed. This is just for the sake of completeness
+and to prevent double free in case there are code bug in other place.
 
-
-I'm not sure if this seems to be related to the update of loongarch[1]?
-didn't find this warning on other architectures such as arm/openrisc/x86.
-
-+Cc:
-loongarch@lists.linux.dev, Guo Ren <guoren@kernel.org>,
-Xuerui Wang <kernel@xen0n.name>,
-Jiaxun Yang <jiaxun.yang@flygoat.com>,
-Huacai Chen <chenhuacai@loongson.cn>
-
-[1] https://lore.kernel.org/all/20240322135619.1423490-1-chenhuacai@loongson.cn/
-
+Regards,
+Shradha.
 > 
-> -- 
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
+> Thanks
 
