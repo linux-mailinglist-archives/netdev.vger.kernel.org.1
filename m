@@ -1,103 +1,154 @@
-Return-Path: <netdev+bounces-100485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 134F98FAE39
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 11:00:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42C2B8FAE3B
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 11:01:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43DB91C20CD1
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 09:00:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EE7D1C210C5
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 09:01:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A7B137778;
-	Tue,  4 Jun 2024 09:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5612B142E76;
+	Tue,  4 Jun 2024 09:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LO91OopL"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="AsidLimY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D13652
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 09:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE3E4652;
+	Tue,  4 Jun 2024 09:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717491629; cv=none; b=KYThN5RIrzFhY1JkJw/JOPh41ge7+3tn9erg0X4RIoM6VyFsL2mtoa7BtOaVus0ictUIYIdp40h8cDc4jWCIY7mXNIcN1nM8Q5YPk9fj9tWxuoCNaCM0wO3dFjruo+YIMdSyTo4+M41kvqaQWdT7svsWlDfcHKTODGv7IJM2ps4=
+	t=1717491672; cv=none; b=esVvlLyh4VYb0YAkKQ6yVLusHeROAhOR/qiYSVz5JJ+xjQesNXnEO5Rls/rukUM3fcguhWdpkhFri8+7dBVmeBGZ5zM1GpxQLsHthj2LjEnTz+TAltNc/hzzV408SWtd++BM2X2okxuUKl+pnRoe4xNE131D+SCaWJnZAi2SBAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717491629; c=relaxed/simple;
-	bh=b8hAMV6DAs149s5kSMBZZVsY2ihfBJxGeXAEa40e+SA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TzQdpVjS765Jpn2f0/6y2Pv8zmSX1eW0SNTG+54z85wd521o5shYsp3aw/bWRA3bWt4COn9uO2AiEaxE/klVpmKWI89n/j6uus+oQYfzxGz9LHui2epHelHrNA+1Cn8VRAywOP0VedYNEl6qVAjT1w8GwhlVQ9V2kXGqmS3cRDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LO91OopL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 76FF2C32782;
-	Tue,  4 Jun 2024 09:00:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717491628;
-	bh=b8hAMV6DAs149s5kSMBZZVsY2ihfBJxGeXAEa40e+SA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LO91OopLay657+evbImpnLeI41nBQGc9fW9w9l19JKWzXcH/QBS0QSyGka0k6EJI5
-	 n4hoCUtm8d5IiS6JKt+VPqw3fpo1PY0ntviUoE9Br5eQ16+7w8Vuo9GjNGYwPfxl9c
-	 RaXatFW8BX3XajKBvIaqg/09eYANZwema366k5Flv5mVPZ1ygbUXGBSkIqs3nAGTvq
-	 cOxcWokoFcwPUuGai4bU4TpbivTlTxmOTxd333LUmW4Z/zlj1r8fAdxOKUaFUj8cEd
-	 GvU2ic9/+Qgfm4mMLx1Gg1+wGMLhhCUGuUVjhB0XgMN+4sS9Ol1pDflWbsJH4BJuiJ
-	 6lj51njpbwFLA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 66498DEFB90;
-	Tue,  4 Jun 2024 09:00:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1717491672; c=relaxed/simple;
+	bh=77c9JqkTvByLnMHXjAWcS4jMhO6cdGjdlVGhwyYHjZQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TNpNMtgSDWFV/+CxXDfHKj6ZjERHtuMIFICfO3p50rlDZiYiF3Ss80f4frAhUb9kdsj8hc0pSTTdFbh6wbDyM1bgMUuOqH6lZp7gmok3VNoLyd4Lo8EwzWSJly14b9E+2vCXdPdkruqEQTXz2Scq1ePvTKY0Z9+ihXl8aCWFlyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=AsidLimY; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 45F2220B915A; Tue,  4 Jun 2024 02:01:10 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 45F2220B915A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1717491670;
+	bh=UQ3dE+N/0pFO6FIyT3FNM4hfEUPHqbcPEwjKMAJv84M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AsidLimY5TPpyvOLbjRWzCVqbqAUnF7dDloZafb856Z1DJsm5Z1Nq/RYsydZSy0ro
+	 DcOYptWLGpA7fc+3cMVqo+SQkxHI7EaFpLkJUr0xqAkc4WmoHwwoTQvhp+ZklDCxDH
+	 6JqNAXLTvTTWeLz5NgyF15mjLaiaH91MFA/oy7Aw=
+Date: Tue, 4 Jun 2024 02:01:10 -0700
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: linux-hardening@vger.kernel.org, netdev@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, Colin Ian King <colin.i.king@gmail.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Kees Cook <keescook@chromium.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Long Li <longli@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH net-next v3] net: mana: Allow variable size indirection
+ table
+Message-ID: <20240604090110.GA11436@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1717169861-15825-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <20240603084122.GK3884@unreal>
+ <20240604053648.GA14220@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20240604083205.GM3884@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: count drops due to missing qdisc as
- dev->tx_drops
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171749162841.1764.5078759869786870310.git-patchwork-notify@kernel.org>
-Date: Tue, 04 Jun 2024 09:00:28 +0000
-References: <20240529162527.3688979-1-kuba@kernel.org>
-In-Reply-To: <20240529162527.3688979-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240604083205.GM3884@unreal>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 29 May 2024 09:25:27 -0700 you wrote:
-> Catching and debugging missing qdiscs is pretty tricky. When qdisc
-> is deleted we replace it with a noop qdisc, which silently drops
-> all the packets. Since the noop qdisc has a single static instance
-> we can't count drops at the qdisc level. Count them as dev->tx_drops.
+On Tue, Jun 04, 2024 at 11:32:05AM +0300, Leon Romanovsky wrote:
+> On Mon, Jun 03, 2024 at 10:36:48PM -0700, Shradha Gupta wrote:
+> > On Mon, Jun 03, 2024 at 11:41:22AM +0300, Leon Romanovsky wrote:
+> > > On Fri, May 31, 2024 at 08:37:41AM -0700, Shradha Gupta wrote:
+> > > > Allow variable size indirection table allocation in MANA instead
+> > > > of using a constant value MANA_INDIRECT_TABLE_SIZE.
+> > > > The size is now derived from the MANA_QUERY_VPORT_CONFIG and the
+> > > > indirection table is allocated dynamically.
+> > > > 
+> > > > Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> > > > Reviewed-by: Dexuan Cui <decui@microsoft.com>
+> > > > Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> > > > ---
+> > > >  Changes in v3:
+> > > >  * Fixed the memory leak(save_table) in mana_set_rxfh()
+> > > > 
+> > > >  Changes in v2:
+> > > >  * Rebased to latest net-next tree
+> > > >  * Rearranged cleanup code in mana_probe_port to avoid extra operations
+> > > > ---
+> > > >  drivers/infiniband/hw/mana/qp.c               | 10 +--
+> > > >  drivers/net/ethernet/microsoft/mana/mana_en.c | 68 ++++++++++++++++---
+> > > >  .../ethernet/microsoft/mana/mana_ethtool.c    | 27 +++++---
+> > > >  include/net/mana/gdma.h                       |  4 +-
+> > > >  include/net/mana/mana.h                       |  9 +--
+> > > >  5 files changed, 89 insertions(+), 29 deletions(-)
+> > > 
+> > > <...>
+> > > 
+> > > > +free_indir:
+> > > > +	apc->indir_table_sz = 0;
+> > > > +	kfree(apc->indir_table);
+> > > > +	apc->indir_table = NULL;
+> > > > +	kfree(apc->rxobj_table);
+> > > > +	apc->rxobj_table = NULL;
+> > > >  reset_apc:
+> > > >  	kfree(apc->rxqs);
+> > > >  	apc->rxqs = NULL;
+> > > > @@ -2897,6 +2936,7 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+> > > >  {
+> > > 
+> > > <...>
+> > > 
+> > > > @@ -2931,6 +2972,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+> > > >  		}
+> > > >  
+> > > >  		unregister_netdevice(ndev);
+> > > > +		apc->indir_table_sz = 0;
+> > > > +		kfree(apc->indir_table);
+> > > > +		apc->indir_table = NULL;
+> > > > +		kfree(apc->rxobj_table);
+> > > > +		apc->rxobj_table = NULL;
+> > > 
+> > > Why do you need to NULLify here? Will apc is going to be accessible
+> > > after call to mana_remove? or port probe failure?
+> > Right, they won't be accessed. This is just for the sake of completeness
+> > and to prevent double free in case there are code bug in other place.
 > 
->   ip netns add red
->   ip link add type veth peer netns red
->   ip            link set dev veth0 up
->   ip -netns red link set dev veth0 up
->   ip            a a dev veth0 10.0.0.1/24
->   ip -netns red a a dev veth0 10.0.0.2/24
->   ping -c 2 10.0.0.2
->   #  2 packets transmitted, 2 received, 0% packet loss, time 1031ms
->   ip -s link show dev veth0
->   #  TX:  bytes packets errors dropped carrier collsns
->   #        1314      17      0       0       0       0
+> This coding patter is called defensive programming, which is discouraged
+> in the kernel. You are not preventing double free, but hiding bugs which
+> were possible to be found by various static analysis tools.
 > 
-> [...]
+> Please don't do it.
+> 
+> Thanks
+Understood, it makes sense. Let me fix this in the next version.
 
-Here is the summary with links:
-  - [net-next] net: count drops due to missing qdisc as dev->tx_drops
-    https://git.kernel.org/netdev/net-next/c/4fdb6b6063f0
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Regards,
+Shradha
+> 
+> > 
+> > Regards,
+> > Shradha.
+> > > 
+> > > Thanks
 
