@@ -1,76 +1,86 @@
-Return-Path: <netdev+bounces-100407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8530A8FA6D6
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 02:12:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C6378FA6D7
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 02:14:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9115B241F0
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 00:12:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53503281159
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 00:14:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34FC337C;
-	Tue,  4 Jun 2024 00:12:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED933182;
+	Tue,  4 Jun 2024 00:14:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="cST++06W"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="hbYQjJ2F"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2054.outbound.protection.outlook.com [40.107.100.54])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2082.outbound.protection.outlook.com [40.107.236.82])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CADCA182
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 00:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA4C7E2
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 00:14:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.82
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717459959; cv=fail; b=b66Slm1JkQZ8WAWuhsK1cmrh0AsUxwZz+RtCP18aQZtbtcKK/i/DuVBdz8HA2aXItWZO88Ph86wr2X1Z6iVvxrXznBCzRoRM2EJlrSr+dmMUxQqyhuq+7O5cAQpO9o15v+qjnbU3u1/a19k/dkvh9NIPhNKDlxG+mOK0Hn/69As=
+	t=1717460051; cv=fail; b=TMY689icq47TaqvXwXN7QgXEwulc8wCnh/aIdl/NV1CzOwasvVstKSMRnzeWamP22Ny+W6wi3AXqbXSQjvX+6e8KmnOfJwezePbgsbiafG00AgTQO5+457z8sCasNFc8kT7UN7dc67KYLewpolHJPpfBV+hhLS5wcmJ9byRG3cY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717459959; c=relaxed/simple;
-	bh=4O2iIJAQgUwnavy9vM4Dbk/mHGE8iwRsJ3ri0IadXWA=;
+	s=arc-20240116; t=1717460051; c=relaxed/simple;
+	bh=+sYLTEYzboBwXeIXmA4kZ3lZon6B6H5ln6Bv1WENwQM=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=nfliHkNdOIhOQnqMoZ0cg6B6HkcMZuj1zQdEh+/RInx19R8Q+DnQBiGCQfOU/gICAp7tMJYoDSZoAitelkGqUN1xcLcwNRWCJXYLJedSmdRTaA3E9Mn6DqerFmebFmEFdkzWaidkuQpBYb+A7s9NvImrXubpFpn1N/7+lZbkJS8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=cST++06W; arc=fail smtp.client-ip=40.107.100.54
+	 Content-Type:MIME-Version; b=TUpXgCH3GpK8cZjoqodrmV0FerHGAHJfj/fviGAe9pikdZXKUmvvG9vQ8C4h44am5eJW5uillerF8Q3h6aS1bGqRA/2l24MZSSUeS6OajRTSiFzcL35iytEEDqOq0HFBxk5YDlGk2nLgyh1CSMgiXJc0SsCv9pTU7MnLMyeRW+w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=hbYQjJ2F; arc=fail smtp.client-ip=40.107.236.82
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a+KB5194JzmDV+8hlMK4TiLCVMWz/ggUcb4CB1enYW1ckfwmKUOZNVeitTtTEVFGE/nnGP3u5Ki/BKSOzD8kiP81c5klZd+eTgtt8Y4j8KvzLgWP8xj12h3iZAycgrRFikzO8JlGkIVlNE7jljmOanuuEaKp+x7c/yDk+uMTPJxtRMV+MuUCKpTcILHWSPRbV1MdLJIv21c5fTg9v/QquT8xVnK5qVqZegtyNJejcDoLNqewqyNfHA+S16F7ncarXmQ7M7JQ7QywAcajpErQo9PvVKzKoxK+02SrytlSchvamKzpE+ft0N4HXYouE5H3ijbCgWAXjTcbVkx8gzMy1Q==
+ b=JWOGGPR+JET+maNz3oagsRbRmat2rV/SXT573AMtzbtVzYvNDL95Vzq8RcBddwCSckJqhbEfH77XQCjMWddZitQt/TwuER/ujijqUdiLTX+0LR770b6Ha3sO4UR3LRonzzTsQumxiqhVjGEC9cjgUjDMjjFo/Qec4NAlk/tt1p48Cwm/CcM5tGc4CG6J9ubVx0GtS2xwG3cSSz7iyn8xnChBSC/dvNyBsbUIjoBF0h+Ssink9FVKVcETzR3QpuE6+nXh/as4GvHleBE10UxBhuL6Cbz1pUSdiF9OfEm6Plu7db1/EcJOdglqC/nc7fdUD6KeWcM/HcoUdPFJrcJ1Dw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ijqR5V0xe96E5Ya3dGZim/IV48J1Ht6XwbwG13RcuGo=;
- b=nuKr+eabAdeMMbvgnz6nBqCZSHCcww5CX7msMKcMIE7PqHDVgH5MQCMtC8mWZGI/1cJ21vXWMdLLiIvHvQQEmzIjcZVMEzrjRpgzvpewJIstZ4GkqXk5XKo7A6hrf99BvEeb4JQ+mWz6j18uxZC7+BoKl9wQZ2FibRsiYBaNHI0kpUg43TfQfc/KQ/fRYyi7xfGPgA+A3brHy1g2e+gupdnxJSKTWMfS/rEDps6l23CUD/Cwyic1hIoiRqaPPcDm235IZYFqflB1JLbJknEg6l21w5c2zvZPeH7m3WlYDTqxHjhFlenifa++aDqvLgnT1GpIwHM/MYBhlm2OeX9Cug==
+ bh=RHFQ4G/5l0udxA7w0qfu/QCuPuDJVeB/R3nEnZCxXXU=;
+ b=AFkzTquK77pKY1WKzNW9DH6cRgsyEayVdJtkwwUJ4oco5l8BSZ0z8V2hhdBtJbQ+/R9mPZ0LJWNmMvilLQg5V6GXybBcLu6Iwy9ihuAsNUtnzw+nRfs2d0QHQNp7gQjx4gwTec6doVbP4R9+67kyrT1yFS2zP46RFbIoRfxRfq6Tjb85XrsYeH88w8GTeLiV8Eh7ByalKSbJU8NUFM3+0Uos6+F3uk8yuesn7C/4VFsyxq9QMDU3szHWl8Dq9Sh5oSVP5InCbIwXtW85ckrxc+iIBTfO+NjLCqol4zPeM8Cpml6ATCtkNRhLZ1xC8wA+aXIb/jYsqljbMDaCA8GzPA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ijqR5V0xe96E5Ya3dGZim/IV48J1Ht6XwbwG13RcuGo=;
- b=cST++06WRgTuvh3OhYOigS33XzAXOGrNpjsD5DtDIO+KZkISR/RIEmSReggEizArDX+9O9jMtmni4TEzCHh3pD424BTzN4zmORTMqhFjOb/BeCYdBVbRyqU05pOIqM4PagcSY7iHZt6ADLkUx12mkVgBx7/VnZWZCUBdFOXzUIQ=
+ bh=RHFQ4G/5l0udxA7w0qfu/QCuPuDJVeB/R3nEnZCxXXU=;
+ b=hbYQjJ2FzqYotFKJm0m6HmnkXAhhL1ecdVcX25rrY/HA0r0v6ZI5x4GjQhEFYdpNUeCJEguXvmNrvexFmowjTfVn+d+jPpB6ZAamI858BKpRMytkMA0GrxcKdS+QpkRE6h5krplNM4c1twtWngtGCtW1Op3pWgJAunnwAslQabk=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- CH3PR12MB8459.namprd12.prod.outlook.com (2603:10b6:610:139::14) with
+ MN2PR12MB4488.namprd12.prod.outlook.com (2603:10b6:208:24e::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.22; Tue, 4 Jun
- 2024 00:12:34 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.27; Tue, 4 Jun
+ 2024 00:14:06 +0000
 Received: from DS0PR12MB6583.namprd12.prod.outlook.com
  ([fe80::c8a9:4b0d:e1c7:aecb]) by DS0PR12MB6583.namprd12.prod.outlook.com
  ([fe80::c8a9:4b0d:e1c7:aecb%4]) with mapi id 15.20.7633.018; Tue, 4 Jun 2024
- 00:12:34 +0000
-Message-ID: <f8f8d5fb-68c1-4fd1-9e0b-04c661c98f25@amd.com>
-Date: Mon, 3 Jun 2024 17:12:31 -0700
+ 00:14:06 +0000
+Message-ID: <2e0cc718-38eb-47fb-ac02-150ecc9858d8@amd.com>
+Date: Mon, 3 Jun 2024 17:14:05 -0700
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 9/9] igc: add support for ethtool.set_phys_id
+Subject: Re: [PATCH 0/9] Intel Wired LAN Driver Updates 2024-06-03
+Content-Language: en-US
 To: Jacob Keller <jacob.e.keller@intel.com>,
  David Miller <davem@davemloft.net>, netdev <netdev@vger.kernel.org>,
  Jakub Kicinski <kuba@kernel.org>
-Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>,
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ Wojciech Drewek <wojciech.drewek@intel.com>,
+ Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>,
+ Michal Schmidt <mschmidt@redhat.com>, Sunil Goutham <sgoutham@marvell.com>,
+ Eric Joyner <eric.joyner@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Karen Ostrowska <karen.ostrowska@intel.com>,
+ Vitaly Lifshits <vitaly.lifshits@intel.com>,
  Menachem Fogel <menachem.fogel@intel.com>,
- Naama Meir <naamax.meir@linux.intel.com>
+ Naama Meir <naamax.meir@linux.intel.com>, Jiri Pirko <jiri@resnulli.us>
 References: <20240603-next-2024-06-03-intel-next-batch-v1-0-e0523b28f325@intel.com>
- <20240603-next-2024-06-03-intel-next-batch-v1-9-e0523b28f325@intel.com>
-Content-Language: en-US
 From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <20240603-next-2024-06-03-intel-next-batch-v1-9-e0523b28f325@intel.com>
+In-Reply-To: <20240603-next-2024-06-03-intel-next-batch-v1-0-e0523b28f325@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: BY5PR03CA0014.namprd03.prod.outlook.com
@@ -83,273 +93,188 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|CH3PR12MB8459:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4aeec370-2e49-4c4f-f7cb-08dc842b0864
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|MN2PR12MB4488:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3bb9d4af-f12b-4429-4ff4-08dc842b3f7b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|1800799015|366007;
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|376005|7416005|1800799015;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SERpMDNhaldEdzkzY2UrMXFBOElRYUZiSWVPSDZiL202UWZTTGtnS3kwYnBU?=
- =?utf-8?B?SDI2eTFwZU9xY0RxQk1md21Bb0Q1bVBvdlRnRVpmcUU5M3FzYnZKN3lOaU85?=
- =?utf-8?B?bVo0U20zYzd1RHd3ZEIyQjdkODlWak9oZnNVWEg5cEQ2NTFia2FsVXVsZ0lk?=
- =?utf-8?B?anFOQ2p3U1pGcVRsMjRYK25nTTg3TS9Fdk85M29Mc3lBS1VKN25vYkJTd0dY?=
- =?utf-8?B?TWF3MGhnbXFuM3pxbnBteGZ4L3ZmNnhWNEg2OElsSG84RjZ4NFRON1NEUWh1?=
- =?utf-8?B?R090QzZibWt1aCtnL3ZBdHVwdTdhWGhtYkNCMVJ3Uzhxc2czV1VCK0g3cmJY?=
- =?utf-8?B?eDZ6M3ozZDhUVk5EKzhNd0t0b2lKbkxCeGxpeE16RGtYNndxZXNuOG5oc0JH?=
- =?utf-8?B?bnREc2ZQUm1nZ1ozdjIyQTZBSlJCRWw5ZDlpVGtFTy8rdHZlYkdoUk1xTCtZ?=
- =?utf-8?B?cThNTFU1ZnFab0FHS05zSDRUajNZeDJGdXZxUzMyRWNjdkIzYzVmcmhPUU5m?=
- =?utf-8?B?WlNPMjArWkZOV3FpZ056L3JjcVJBdTZPcjV0eU9pVUFGWUZMQkVMMW1UcW1j?=
- =?utf-8?B?VndXZDZJdjV1ZWxGWkJMRU55a1RXV2VERkdudEsxd0grTzkrWTk1Tnh0Q3V1?=
- =?utf-8?B?YUh6dVpocnprZFhVR0xVU2xubEVMV1BXaFFCK2ovaUtjWTJtM3BJdlY3bE9X?=
- =?utf-8?B?Y0RndDl3NktFN2MzMktCTHovV3htRVNDTlNFNTQwUm9SN0Z4VnFrSmx6ZXJO?=
- =?utf-8?B?YnIyMXBCUXN2MkRTdHl1bFFXWENYaVpqRTVERHBqUUdJVTlFc3hQRS9rTEl5?=
- =?utf-8?B?SW9lM0ZhU3R5MHdkaUdNb0JRRHdDdTNYbksvRzhNUHZHUDN1cWtkUzhsYS9J?=
- =?utf-8?B?NnpLSGhqa1FrTEZ6UW5QYnFUZCtmeWlaTitYKzZ6Sk1xSHlNNUplN2dMVjJR?=
- =?utf-8?B?T0NRZEIvNDE5QzRRL20vNjJFQi9SWExnaHVHZ2lOaFpNOVNXOEVtT3FaY0hX?=
- =?utf-8?B?MkUxUENjL1M3aCswc0lYWW95RmxNR1Q4STd0ZTlqclFiMTJ5S1NCVjZNUWY1?=
- =?utf-8?B?YWRoODhSc1JzcFA5MWhHVUdmM0VYNzN0TStSa1pxYWlEbXBDeTNvclNQNU96?=
- =?utf-8?B?Z2pMQVpqc1QwOTk4dmUxVXV4a2tnQVZpdFlMYVg0NTNvS0xTMm5oNE5DelNI?=
- =?utf-8?B?d3BBeUszaG50NkJKdFBOUUhEME1nRHA5RCtPbFhkdmpWMVQ5V2dpV2JFUUE4?=
- =?utf-8?B?Z3FDd0k5MDdaN3ZkZmhES2xZS1JJQ2lXdGFpdS9yMlE4djlJbHpoeHBDcXRw?=
- =?utf-8?B?a0lkR3F3eWgva3N6STRiZ2NPWmIwdXRXZ3ZRSFpDbzF3SFpnRWFBZ3YvZjlr?=
- =?utf-8?B?cEdJSXhXd3JGeW1QbFhBVExBV3ZMMFRiaUNCVE5EaFM3cDhkc3dQS0VEQWkw?=
- =?utf-8?B?OFp6L1pBZzFWQ2laRnlBOUpYWVlMc0YzL1pGSElvQWRTTjRNczV4bEFkdnFI?=
- =?utf-8?B?c2NzYzhocWUxYVhlY0VidTRyZEhVdlBrL3BZMXR6dThWSkNIRjJ6ZzB0VW9h?=
- =?utf-8?B?ZmxxdUQ0RTk2WkhqMlVMMzFMQ0U5OEphRXdjSUt6bHI2NEtZODJQOUxGVFl2?=
- =?utf-8?B?eVBud25wRkNTajJabVZTc1BJT0ZoMUM2OTZ4a1c0aThxREI3eVpUa2NNYkJu?=
- =?utf-8?B?VXFTcEJLRFdGa21nd2ZqOXpKcUdiVmw2Y09pZ3RTcy8wS2RWczFhc2JRPT0=?=
+	=?utf-8?B?cVhUUlljc3o2Q0h1RkJ3OFNFYUhqR0pPcUhjTXlOQnAzS01vY2pWK1ZlS2tz?=
+ =?utf-8?B?UE1GNW5TemlDVWl4a3NMNUdNUjliS0VrV2F2VEF3QnFhWHYybytrSmo0dkxY?=
+ =?utf-8?B?V0RaUFpxUGlsWkdvcm5IcEFFV081dlhOOWNVaWNIOU1TZUVZeURwWVJYY3FX?=
+ =?utf-8?B?aU5ndUxWbUNVYktUR21oc3JRT0RObllET0l3SXJtMjljUE40dXJ3ekpxY3VW?=
+ =?utf-8?B?R2psSDErTXpRT3VzdjBBa21CYm9KeWlEM3R5eU1KeFBoaFdaa0dHa21wQjJQ?=
+ =?utf-8?B?TDlFdEZ6aHVsTHVYb2ZoUUI3dzR4UVpIZ21keFVlcUNoenFXTEJBNHRhczJL?=
+ =?utf-8?B?WHdyekozSUdubytxK0wrSXAxOWpoU20rMjUzZTNTb0lHejEyYTJyYVVvQWVO?=
+ =?utf-8?B?TUdITWVPREpGek5ERW9UV0ZCb05nTGJ1R0YxNlRoNG13RkZIcnFGUFIrZGM3?=
+ =?utf-8?B?bDV6VE5LS0JhU3hHaUJVemxhT255b3gvcURSMXYwWUZXbmlpcnhjVytHRmU2?=
+ =?utf-8?B?QUNzNWY5VEc5U3JDY3NPQWU4a0haZ0xRZFl2WWMzRjBmSkdnSGFnWk94eEs5?=
+ =?utf-8?B?L0JWWGR6TlVWVmxFVHdwa29QL2ZVWlFjQW56cUMrTjZ3RGNKVFdKd0EvcWIv?=
+ =?utf-8?B?OGZrU3ZPQjNqMGNOR1Evd1FGTk9MUUJubG9FdEJzMks3WXY3QXVEWjlJUDFO?=
+ =?utf-8?B?cjdCczFwd0ZjVjZ1RG54MXY5T1Q1Q2NncDNsZXJ4ZTJlc2o0Ti9FUGNtZkVP?=
+ =?utf-8?B?M0ZteG1wTjlrclptWWFBbHErL1hpandMVkZrQkhsTGd6YnZmKzMzM3FKckhO?=
+ =?utf-8?B?NFlJL01UVEF3aEhCL215eWx6ak5lOGtkcXo0V3RoVEErOFBXMVUrTXVOZUxR?=
+ =?utf-8?B?YWJkRStwUVM2SXBNTjFKWllQbVpMRUZWSjhZY0hENEJrSlFqUUVpU3FGR3VL?=
+ =?utf-8?B?UGtUWDV4dzlIOUZvR1ZpaU9tYXlac0VGb2hEckoyVmxmY1Nha0txR3gyblFY?=
+ =?utf-8?B?RUdmTzNUdUxob0cwVi84Um51dHNYTzFaelZSNlcwL09zNHlZb012a0F5SFQ0?=
+ =?utf-8?B?NHJMY2FvajJISjFDNXhvMnhTcllHdHVldDRoZURHNEtpMFdrUmxGb3ljUDVX?=
+ =?utf-8?B?OVNIKy9aYm1PeXNjT1U1UGtBMkQ5Wkh4aGl4KzZlamJreGZIaWI2UWhXT0dX?=
+ =?utf-8?B?bjFYVVN5Und1ZFNBKzE5NXhxWGpkRVM2RUQ2Qjl0SDFKbXZONzdOTmpiQkMx?=
+ =?utf-8?B?RnNQbElqL2FQZDZ2NXlrOFFyTnNLUmM3N3ZJTU1ZZ2NMaStoaVlRbStnK3hh?=
+ =?utf-8?B?Ym5jY2VadXhOWUljd3RsQnRMcGh2eHRiRUpMWjE3Wk9BTHpCY3FVUlhNSExi?=
+ =?utf-8?B?b1M1SzE2T2xCUVA4bXdSWEpqeG03YWcweW9xZW5BQ2s3RzB1S1g1Zmk0dUIw?=
+ =?utf-8?B?UlNHOGZrZWhWbnE4V09QRFJCcFBhR2NZbDFUM3VKUXkwTFlqSGlNQTFtalA1?=
+ =?utf-8?B?RXcxaXZzejhuNktJYldhbXhSYTJpNVBmcW41c29RTkZJMnVKN2F0RHppb2ls?=
+ =?utf-8?B?MVVmMmxWakNZWGU5bElTWDMvcUFCbW4wTSsyUnROM1NxRUl3STJ0TW5tL0pl?=
+ =?utf-8?B?cUt4djZkaTFoa292UEsvNDZMbWRnSlNCSFJHc3JLbFVnOWdJWGRwaVNMdnY4?=
+ =?utf-8?B?WG5OT2gxWlpEMzJFa3FWKzNBcEhtaVZZamhlOUhlRnZkOXdRTEQ3RXVRPT0=?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(7416005)(1800799015);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?L1puRDVmU21xQ1pzREw3ZzBITHBCY2swVy9ZS2lZSll1ZmdZb1FZSE5qVEhs?=
- =?utf-8?B?bGRGS2laOWkzeXMwaTVlRFNJY09vUEYzbW0yVTJtemlteUpWbkJ1eUVhVjBw?=
- =?utf-8?B?eHI3R1Y4a2JxeXMvSjBtZEE0OTlwc25DSTU4M0dMeFJsbHJBOUphd3lwdWFD?=
- =?utf-8?B?bXBDd1N3cnczQzM1Ym5UejhIV3pHYkVNcEFFQmhGVjlBNTlLeEtnOTVkM1lP?=
- =?utf-8?B?V3RzRXlmeTY3SjlxTGphMEc3N0Y3VkhKYWsvOC9UVnYzSkFhL0VtdVBpRUdQ?=
- =?utf-8?B?bnBpSGd4TnhpZjB0RHovbkcwZHg4VnFWQTFGRmdKLzJuUVVmNW1Bb2Z2V0t3?=
- =?utf-8?B?WjZ6dWZldWJXSnhwSDlTT282OHI0VjBMQ0JHOTV3d3lkam9JRngxSk1RbnZi?=
- =?utf-8?B?YmFoWng4eVhLOVMwazVDcytacWVKdnQ4cllvRE05eGhvOFRuKzhqdXg4TGxS?=
- =?utf-8?B?UWVjcFo4NnBzN2hsNDJQdHNjdnhvb0lPK09Nbm04WjdJUGNBclE4RGV1dmJv?=
- =?utf-8?B?TVVscWhRelZhMEZOZnJWTlp6cmxrSWZwZVB2czNZOFgyMVRUMzZqOFkySGky?=
- =?utf-8?B?MndONDdxNWVUSi9rR09JdzZ4RksrSzFIN2VTY2tYcUY4VFYyQ21GWXdvV3Vt?=
- =?utf-8?B?Kyt2aktJQVk5VmJpKzNQV2krZUxMcGxIWFFZTGx2dGFYL2JEVWhBNVNSaGZZ?=
- =?utf-8?B?M3R4WGplMkVZNTdUVDlOVzNGNHhIbHFncXhkZVZQT1M4Z3d0Y0RPUkpWVC9w?=
- =?utf-8?B?WENLbUFFbXdpa2huenZoVEpNa3lQWktPQ0xHQjJoa0JDQ3E2YmdNTVVEaGVO?=
- =?utf-8?B?QTlVbWlsVWdiY09ybDBleEdMcEh4Vk1JNU9pUTIyYjI4SUU2R2VEd1Y3RjF0?=
- =?utf-8?B?bTNMRGdIaGNhbzVldGU2b2x1VEpFMUtNMWVhNG0xQlZHWW5oNkQ0TGhqcW5M?=
- =?utf-8?B?MnlFUTBEeWh4SjRZd0xheEtleTFCMEdXUzlpVnVVUUs2RHVhZVhlM0Z6RmZL?=
- =?utf-8?B?akpXd28xSUVYWHc0dGlXUENoYWVPUUw4S2FHNTRWeDBWa3hnZVg5ME5rRHZ2?=
- =?utf-8?B?cmRRTnYvbnZnUFBWQkJubEFJMkVSUVFjSEp2WUJxVnMrN0xPL09KOERvYkxl?=
- =?utf-8?B?S2VtNm9lM0dTbmp0N3Rsa0ZXV0VHNHJqL2R4ZTBFRW15blhGekt5bVdHRmZG?=
- =?utf-8?B?UEpSZHNQbGVRRlVLVlA3N2dVZ1Z4TnVaQ0JiOHNIaW1sdjBRWUVBMFR5aFJo?=
- =?utf-8?B?T21xUHdaWW5zUTVEUWlHRStacGZncy9tTGJyd2daUlRsNjU4SVdnTDJZemxk?=
- =?utf-8?B?ZW5XVnlFOFVqQjNoVTNZOVUxZEZsNmcrbzF0a3lpejJ6V3B5SXFaYjk3MFBV?=
- =?utf-8?B?eGtnbFFUaWdXdHFTVGw3U3h4bW5SbUxGTHpXTFN5SkhuMGorM2FxNHpZWnFO?=
- =?utf-8?B?RWZPOEVsbHZhcENoQ29RVERNSDlDQTJtYmhKMG5aN0hORU5BbjBKMVFYMjBp?=
- =?utf-8?B?NlEyc2pWWGQzSVRvb1QvdVZDbFpRQ1orSml1SFJ3cVhyZmRjWXdYMndQMUFh?=
- =?utf-8?B?azR5ZXBYdlpzUnBIbU1ON3BCZkxZOHhzY3JST0E0VTV0S3ZiZkpLOGRlSmNB?=
- =?utf-8?B?VEM0OUQxMFkvSHEzVGRiK0R3RWM3YXBVVlZYUmh4Y3IvMWN0WTBOTVRGUXlV?=
- =?utf-8?B?eXRBSnl6VjVyTlZKNW5JaHRJMkEyd1ZaWHdMV1RCc2dvVWFUQ2IxK1MyOWl3?=
- =?utf-8?B?QVhqdWJNV0RRRE1EYXJVTFA4YXVEaXNqY01TdUJXNVhRN0lON3Y1TjhtRzlL?=
- =?utf-8?B?Z1R3Q3lTUFd4Rm5tZkk2aWwzdzk5aU5hT1hNNmVmdTQ0WlRmNitzTFVDM29u?=
- =?utf-8?B?ejU5YWE3T1JNV1FsN0JodzUxcGJSL2IrMEk0UEppVnIrcUJsQkZXeDhyOSsw?=
- =?utf-8?B?MlNrcWI2enFvSmMyQ2hGUlRMcVorVG9zMlBmNTlJcmN1QTIyVlprNFBUNFVI?=
- =?utf-8?B?MWVhRVJaSllZMmlDSkUzMmlhb0FPZVBmUVJHeldwOFdUYk5GaEo3UTNPdDdX?=
- =?utf-8?B?OE9vQmJ1OWFZM1BCNWVCOWNneTNsd0hZdzVpbDdUOFVjMUs2M1pJSlJJR00r?=
- =?utf-8?Q?YnI3c8rOCiJuNEPSIOejpZYlM?=
+	=?utf-8?B?Ylh5NEIxSVBLSXhva3h3RzBZV2trcmtKcnpQZlBKVmlOZER3QUlPUXhzS3BN?=
+ =?utf-8?B?WFhWczJXbktRdEtacHRMa0NyRVZyV0hKbmJod1loRDRha0w5Y1JmVndNeGlK?=
+ =?utf-8?B?amNwV0xITXhrTmV2RFVVdjBzSE8yYjZNYVdKZzk2UDdmL1A4VUhBbytsdFYx?=
+ =?utf-8?B?cjV5dDJiTnAvS1hVNm5lU1U3R1BCQk9iUmJUNktDeTZEa1NGVGMvYzNJeGlo?=
+ =?utf-8?B?N3lHekViNjdONUNNNU1Jdjd0aG9WMkZrbWIxRzhBdVhacjhyZEJtS0FIa1lJ?=
+ =?utf-8?B?bE1WWitxSmp2aSt5bk9NS24xR0RJYlZBMTkyd2ZTMHRsTUVDbjlUOWJRZmJI?=
+ =?utf-8?B?NlJkUXlrSU5Za1JZTW1uRGhuT2diKzJrSU1lNGRlOTYzWXFLcC9ISW5nL3dm?=
+ =?utf-8?B?Mmk5VHJQVndsRkMxUG8yRC9YcjY4bWgyYkY3blRLTEg5MXlhOVp3T2RrN0M4?=
+ =?utf-8?B?d1NGRG5mWjY3eXVuQlcwakVkbEtPRm1Bek9BSkxZeVdobGlxNEQzOUhuQ1pJ?=
+ =?utf-8?B?M0lPVU9IMTlSWlRzbUNuNVNZVC82NnJLK25YWGlPZTZ6SHRDVHdUVUptUjNv?=
+ =?utf-8?B?Mm5NbSs2MWgxS0hIaVlXa1RSSlRIK1Yrd2l1S3J1Ykw1dUYrTFBIa0hadHBK?=
+ =?utf-8?B?NjBIOGU4ajErVzNNUnpWV1JLUmp1ZWw2YU5oYW1RdndwUzlTR2xGODlHbHpk?=
+ =?utf-8?B?YVU3emVSdEVEVlRPU0FSK1IwVi9xS2NwYXR0UUY1cFc2UHdsM1hvUWk5c0Yy?=
+ =?utf-8?B?T21MOEtRNHhiTWd0MGRqckRRamlMa1lmOTNhUDF5aVgvb241U3hEaTBtcFMy?=
+ =?utf-8?B?OVA3M1NpVk4wUTdLVTNvRUJKdXN6eHZwSXAvM01xZTl3ZUpLYlg4dnZybG1U?=
+ =?utf-8?B?QndRL2JiYm5IRG4rWHZjRWdVengvZzVuVE5WTGxZZVU4UjFUVFpHeGQyL2ZX?=
+ =?utf-8?B?ZEZtQ01IeEZkTmYyVUlnZy8xRW4ydmJwdVBxRTM4c2lTMlhpOWs4OW1SZnl0?=
+ =?utf-8?B?c1VFUVZ6Q2xGVW9Tb0hiUy83ZDFRazRwMXRQOFlaR0s4cTA4YkhOWFBRMmF0?=
+ =?utf-8?B?dTNnaE9saEhQVjFNWFdPc2g5SGF5eTkyVWNtWldpYThDUWRoRGtkaGFrQ3h3?=
+ =?utf-8?B?SmVKVnNIWVFmOVJwYTdxTU9CQmFsaktOY1FSR2tLRXZlRVhLb2lFbVQ3aXMv?=
+ =?utf-8?B?cmxxYnVvQktTaG0zNzl5TWEzOWEzZ1I3TURMRGw2YWRwbkZQZE43aVkvblpM?=
+ =?utf-8?B?b1JjQVFQSzVxODdydmtXRGdSUnlBek1jbFVINnI4aWpWczN1SWdVd0pKN3dq?=
+ =?utf-8?B?Sk5xUDlja0JQWDFNUzFXZlNyaWU3dVBKVVpvSmUyNnlhNjkxQmdwL2RzMHJ5?=
+ =?utf-8?B?U09sTmMrNGdLUk8yQklmYktrd1lCY0tnelAyQ0wzd0ZhckFucms3N1RhM2xO?=
+ =?utf-8?B?Sml6T2dPOGxXbUovU05WTWNGSFZuQmJZM2hGR3BRWW53dmd1VmhMOCtEQm8v?=
+ =?utf-8?B?SStsdVVSOG55UW1xMHlkWUNTZ3NxV0w1dFJPNHpNbFIrZ0pnSzFRTkRVYnlm?=
+ =?utf-8?B?ZlI1d3BrSVZMRDFSK1NVZ2dZL2RiMzN0ZkV1c0paUStBcFg2dFRlbHd0SUFI?=
+ =?utf-8?B?T093cU9RRHpoWUlKK095NTRNVCtsb0ZNQ3MyOTRwYWkrVnZFRHdETUN0WFFF?=
+ =?utf-8?B?NUgxTzZGc1kxcU0vVnFkTmZxRjR6UHA0U0dhMEwwS1RhRGhCazU5MDgvUlZE?=
+ =?utf-8?B?NzFrV0hOQko3aW12QjFrb1UzdUFvSkxwZmczTFp1MUhiMFlJWVRONFNybmh6?=
+ =?utf-8?B?ZUExRE1XcXJYbGNwSWxXLzNzSGsvM0JBcmJuclJ2TmY3QmR3MEVDZ0Z5TzZw?=
+ =?utf-8?B?dmZZazgxeHM3SlhkOSsxeHhucENraGxCN2JzSjNaL29NWGlaUjVua3dZWnFV?=
+ =?utf-8?B?K3kxVkVxbjBiV0tPQ0Z2U2p1RGFHa0N6bHUxRHNTcXhaa1Q5V2krV2NwUXB3?=
+ =?utf-8?B?VTdiSTRHWGZFeS84STNQdm1FU09CNzVZWGI0TnBkQUhIMjlvUXpUN0t0Q2hj?=
+ =?utf-8?B?UTVtOEJGcEk1YUdsZFROYVJCZkR5T1h2M0k0MWdBMEF3ejFYY2Y4dHUvbXRt?=
+ =?utf-8?Q?ZjmvfFA5fz4+5NAIEZ859Wwrq?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4aeec370-2e49-4c4f-f7cb-08dc842b0864
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3bb9d4af-f12b-4429-4ff4-08dc842b3f7b
 X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2024 00:12:34.0635
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2024 00:14:06.4334
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /D3TdlSW2u7QQPvyLgmXvb+gDkNdyGUFvIb+gVbohzxBjq5Ym4XaHV3VCz9b2uPAr2kA1Q+NGnIFTzyGZYRxCg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8459
+X-MS-Exchange-CrossTenant-UserPrincipalName: UpkRxnKpuYrFk+StA3k36cb6I+zf/gsGnr6QLaBj8g+HnbN3z7EX3pAodxVhdT8qqtE5gY5IAfW9GzBBqtx3zg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4488
 
 On 6/3/2024 3:38 PM, Jacob Keller wrote:
 > 
-> From: Vitaly Lifshits <vitaly.lifshits@intel.com>
+> This series includes miscellaneous improvements for the ice and igc, as
+> well as a cleanup to the Makefiles for all Intel net drivers.
 > 
-> Add support for ethtool.set_phys_id callback to initiate LED blinking
-> and stopping them by the ethtool interface.
-> This is done by storing the initial LEDCTL register value and restoring
-> it when LED blinking is terminated.
+> Andy fixes all of the Intel net driver Makefiles to use the documented
+> '*-y' syntax for specifying object files to link into kernel driver
+> modules, rather than the '*-objs' syntax which works but is documented as
+> reserved for user-space host programs.
 > 
-> In addition, moved IGC_LEDCTL related defines from igc_leds.c to
-> igc_defines.h where they can be included by all of the igc module
-> files.
+> Michal Swiatkowski has four patches to prepare the ice driver for
+> supporting subfunctions. This includes some cleanups to the locking around
+> devlink port creation as well as improvements to the driver's handling of
+> port representor VSIs.
 > 
-> Co-developed-by: Menachem Fogel <menachem.fogel@intel.com>
-> Signed-off-by: Menachem Fogel <menachem.fogel@intel.com>
-> Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-> Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+> Jacob has a cleanup to refactor rounding logic in the ice driver into a
+> common roundup_u64 helper function.
+> 
+> Michal Schmidt replaces irq_set_affinity_hint() to use
+> irq_update_affinity_hint() which behaves better with user-applied affinity
+> settings.
+> 
+> Eric improves checks to the ice_vsi_rebuild() function, checking and
+> reporting failures when the function is called during a reset.
+> 
+> Vitaly adds support for ethtool .set_phys_id, used for blinking the device
+> LEDs to identify the physical port for which a device is connected to.
+> 
 > Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+
+Aside from a couple of minor questions on 9/9, these all look reasonable.
+
+For the set:
+Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+
+
 > ---
->   drivers/net/ethernet/intel/igc/igc_defines.h | 22 +++++++++++++++++++
->   drivers/net/ethernet/intel/igc/igc_ethtool.c | 32 ++++++++++++++++++++++++++++
->   drivers/net/ethernet/intel/igc/igc_hw.h      |  2 ++
->   drivers/net/ethernet/intel/igc/igc_leds.c    | 21 +-----------------
->   drivers/net/ethernet/intel/igc/igc_main.c    |  2 ++
->   5 files changed, 59 insertions(+), 20 deletions(-)
+> Andy Shevchenko (1):
+>        net: intel: Use *-y instead of *-objs in Makefile
 > 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
-> index 5f92b3c7c3d4..664d49f10427 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_defines.h
-> +++ b/drivers/net/ethernet/intel/igc/igc_defines.h
-> @@ -686,4 +686,26 @@
->   #define IGC_LTRMAXV_LSNP_REQ           0x00008000 /* LTR Snoop Requirement */
->   #define IGC_LTRMAXV_SCALE_SHIFT                10
+> Eric Joyner (1):
+>        ice: Check all ice_vsi_rebuild() errors in function
 > 
-> +/* LED ctrl defines */
-> +#define IGC_NUM_LEDS                   3
-> +
-> +#define IGC_LEDCTL_GLOBAL_BLINK_MODE   BIT(5)
-> +#define IGC_LEDCTL_LED0_MODE_SHIFT     0
-> +#define IGC_LEDCTL_LED0_MODE_MASK      GENMASK(3, 0)
-> +#define IGC_LEDCTL_LED0_BLINK          BIT(7)
-> +#define IGC_LEDCTL_LED1_MODE_SHIFT     8
-> +#define IGC_LEDCTL_LED1_MODE_MASK      GENMASK(11, 8)
-> +#define IGC_LEDCTL_LED1_BLINK          BIT(15)
-> +#define IGC_LEDCTL_LED2_MODE_SHIFT     16
-> +#define IGC_LEDCTL_LED2_MODE_MASK      GENMASK(19, 16)
-> +#define IGC_LEDCTL_LED2_BLINK          BIT(23)
-> +
-> +#define IGC_LEDCTL_MODE_ON             0x00
-> +#define IGC_LEDCTL_MODE_OFF            0x01
-> +#define IGC_LEDCTL_MODE_LINK_10                0x05
-> +#define IGC_LEDCTL_MODE_LINK_100       0x06
-> +#define IGC_LEDCTL_MODE_LINK_1000      0x07
-> +#define IGC_LEDCTL_MODE_LINK_2500      0x08
-> +#define IGC_LEDCTL_MODE_ACTIVITY       0x0b
-> +
->   #endif /* _IGC_DEFINES_H_ */
-> diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> index f2c4f1966bb0..82ece5f95f1e 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> @@ -1975,6 +1975,37 @@ static void igc_ethtool_diag_test(struct net_device *netdev,
->          msleep_interruptible(4 * 1000);
->   }
+> Jacob Keller (1):
+>        ice: add and use roundup_u64 instead of open coding equivalent
 > 
-> +static int igc_ethtool_set_phys_id(struct net_device *netdev,
-> +                                  enum ethtool_phys_id_state state)
-> +{
-> +       struct igc_adapter *adapter = netdev_priv(netdev);
-> +       struct igc_hw *hw = &adapter->hw;
-> +       u32 ledctl;
-> +
-> +       switch (state) {
-> +       case ETHTOOL_ID_ACTIVE:
-> +               ledctl = rd32(IGC_LEDCTL);
-> +
-> +               /* initiate LED1 blinking */
-> +               ledctl &= ~(IGC_LEDCTL_GLOBAL_BLINK_MODE |
-> +                          IGC_LEDCTL_LED1_MODE_MASK |
-> +                          IGC_LEDCTL_LED2_MODE_MASK);
-> +               ledctl |= IGC_LEDCTL_LED1_BLINK;
-> +               wr32(IGC_LEDCTL, ledctl);
-> +               break;
-> +
-> +       case ETHTOOL_ID_INACTIVE:
-> +               /* restore LEDCTL default value */
-> +               wr32(IGC_LEDCTL, hw->mac.ledctl_default);
-> +               break;
-> +
-> +       default:
-> +               break;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
->   static const struct ethtool_ops igc_ethtool_ops = {
->          .supported_coalesce_params = ETHTOOL_COALESCE_USECS,
->          .get_drvinfo            = igc_ethtool_get_drvinfo,
-> @@ -2013,6 +2044,7 @@ static const struct ethtool_ops igc_ethtool_ops = {
->          .get_link_ksettings     = igc_ethtool_get_link_ksettings,
->          .set_link_ksettings     = igc_ethtool_set_link_ksettings,
->          .self_test              = igc_ethtool_diag_test,
-> +       .set_phys_id            = igc_ethtool_set_phys_id,
->   };
+> Michal Schmidt (1):
+>        ice: use irq_update_affinity_hint()
 > 
->   void igc_ethtool_set_ops(struct net_device *netdev)
-> diff --git a/drivers/net/ethernet/intel/igc/igc_hw.h b/drivers/net/ethernet/intel/igc/igc_hw.h
-> index e1c572e0d4ef..45b68695bdb7 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_hw.h
-> +++ b/drivers/net/ethernet/intel/igc/igc_hw.h
-> @@ -95,6 +95,8 @@ struct igc_mac_info {
->          bool autoneg;
->          bool autoneg_failed;
->          bool get_link_status;
-> +
-> +       u32 ledctl_default;
->   };
+> Michal Swiatkowski (4):
+>        ice: store representor ID in bridge port
+>        ice: move devlink locking outside the port creation
+>        ice: move VSI configuration outside repr setup
+>        ice: update representor when VSI is ready
 > 
->   struct igc_nvm_operations {
-> diff --git a/drivers/net/ethernet/intel/igc/igc_leds.c b/drivers/net/ethernet/intel/igc/igc_leds.c
-> index 3929b25b6ae6..e5eeef240802 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_leds.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_leds.c
-> @@ -8,26 +8,7 @@
->   #include <uapi/linux/uleds.h>
+> Vitaly Lifshits (1):
+>        igc: add support for ethtool.set_phys_id
 > 
->   #include "igc.h"
-> -
-> -#define IGC_NUM_LEDS                   3
-> -
-> -#define IGC_LEDCTL_LED0_MODE_SHIFT     0
-> -#define IGC_LEDCTL_LED0_MODE_MASK      GENMASK(3, 0)
-> -#define IGC_LEDCTL_LED0_BLINK          BIT(7)
-> -#define IGC_LEDCTL_LED1_MODE_SHIFT     8
-> -#define IGC_LEDCTL_LED1_MODE_MASK      GENMASK(11, 8)
-> -#define IGC_LEDCTL_LED1_BLINK          BIT(15)
-> -#define IGC_LEDCTL_LED2_MODE_SHIFT     16
-> -#define IGC_LEDCTL_LED2_MODE_MASK      GENMASK(19, 16)
-> -#define IGC_LEDCTL_LED2_BLINK          BIT(23)
-> -
-> -#define IGC_LEDCTL_MODE_ON             0x00
-> -#define IGC_LEDCTL_MODE_OFF            0x01
-> -#define IGC_LEDCTL_MODE_LINK_10                0x05
-> -#define IGC_LEDCTL_MODE_LINK_100       0x06
-> -#define IGC_LEDCTL_MODE_LINK_1000      0x07
-> -#define IGC_LEDCTL_MODE_LINK_2500      0x08
-> -#define IGC_LEDCTL_MODE_ACTIVITY       0x0b
-> +#include "igc_defines.h"
+>   drivers/net/ethernet/intel/e1000/Makefile          |  2 +-
+>   drivers/net/ethernet/intel/e1000e/Makefile         |  7 +-
+>   drivers/net/ethernet/intel/i40e/Makefile           |  2 +-
+>   drivers/net/ethernet/intel/iavf/Makefile           |  5 +-
+>   drivers/net/ethernet/intel/ice/devlink/devlink.c   |  2 -
+>   .../net/ethernet/intel/ice/devlink/devlink_port.c  |  4 +-
+>   drivers/net/ethernet/intel/ice/ice_eswitch.c       | 85 ++++++++++++++++------
+>   drivers/net/ethernet/intel/ice/ice_eswitch.h       | 14 +++-
+>   drivers/net/ethernet/intel/ice/ice_eswitch_br.c    |  4 +-
+>   drivers/net/ethernet/intel/ice/ice_eswitch_br.h    |  1 +
+>   drivers/net/ethernet/intel/ice/ice_lib.c           |  4 +-
+>   drivers/net/ethernet/intel/ice/ice_main.c          | 17 ++++-
+>   drivers/net/ethernet/intel/ice/ice_ptp.c           |  3 +-
+>   drivers/net/ethernet/intel/ice/ice_repr.c          | 16 ++--
+>   drivers/net/ethernet/intel/ice/ice_repr.h          |  1 +
+>   drivers/net/ethernet/intel/ice/ice_vf_lib.c        |  2 +-
+>   drivers/net/ethernet/intel/igb/Makefile            |  6 +-
+>   drivers/net/ethernet/intel/igbvf/Makefile          |  6 +-
+>   drivers/net/ethernet/intel/igc/Makefile            |  6 +-
+>   drivers/net/ethernet/intel/igc/igc_defines.h       | 22 ++++++
+>   drivers/net/ethernet/intel/igc/igc_ethtool.c       | 32 ++++++++
+>   drivers/net/ethernet/intel/igc/igc_hw.h            |  2 +
+>   drivers/net/ethernet/intel/igc/igc_leds.c          | 21 +-----
+>   drivers/net/ethernet/intel/igc/igc_main.c          |  2 +
+>   drivers/net/ethernet/intel/ixgbe/Makefile          |  8 +-
+>   drivers/net/ethernet/intel/ixgbevf/Makefile        |  6 +-
+>   drivers/net/ethernet/intel/libeth/Makefile         |  2 +-
+>   drivers/net/ethernet/intel/libie/Makefile          |  2 +-
+>   include/linux/math64.h                             | 28 +++++++
+>   29 files changed, 214 insertions(+), 98 deletions(-)
+> ---
+> base-commit: 83042ce9b7c39b0e64094d86a70d62392ac21a06
+> change-id: 20240603-next-2024-06-03-intel-next-batch-4537be19dc21
 > 
->   #define IGC_SUPPORTED_MODES                                             \
->          (BIT(TRIGGER_NETDEV_LINK_2500) | BIT(TRIGGER_NETDEV_LINK_1000) | \
-> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-> index 12f004f46082..d0db302aa3eb 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_main.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-> @@ -7070,6 +7070,8 @@ static int igc_probe(struct pci_dev *pdev,
->                          goto err_register;
->          }
-> 
-> +       hw->mac.ledctl_default = rd32(IGC_LEDCTL);
-> +
->          return 0;
-
-Is this the only time the driver should read the register?  Are there 
-any other reasons/times that the LED register value might change while 
-the driver is loaded that shouldn't get lost?
-
-If someone leaves the LED blinking then unloads the driver, is the LED 
-left blinking?  Should igc_remove() restore the default value?
-
-Thanks,
-sln
-
-
-> 
->   err_register:
-> 
+> Best regards,
 > --
-> 2.44.0.53.g0f9d4d28b7e6
+> Jacob Keller <jacob.e.keller@intel.com>
 > 
 > 
 
