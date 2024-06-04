@@ -1,87 +1,64 @@
-Return-Path: <netdev+bounces-100500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 751128FAEB8
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 11:27:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FE028FAEC1
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 11:28:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E34C283DD5
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 09:27:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C09281F23B3E
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 09:28:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D69C143C4D;
-	Tue,  4 Jun 2024 09:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43E9A143724;
+	Tue,  4 Jun 2024 09:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DIC2be7d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GuULkdlD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DEAF143893
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 09:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201F4823BC
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 09:28:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717493233; cv=none; b=b81r2AT+tAeDJm9wfIBqgKBrklkWqwrErmD6BWBnrbzyygv9Psjp4k0zhkMDC6UePNWGBIfjG6Q630Y215kYYXhzJEV9Rax5OeGn4bKmlxirzb4UmHoCLUhpeItAgEWL2H1N41fREHujMBMZcnAy6rkk2BdwKIohEqljvE5J40M=
+	t=1717493333; cv=none; b=kac8SvqqhrlRt6/H/pjjoaaN2c+zMMqahAjDuydk5wKD6JC9q0d/ny7X79OT74IojZZDFn7W5VnH6dhrbLNY26N339IMFam8mcCGkfm/g6ZWX+B5QEcmki7mAaGsqVhwe12TG/atPE74FYFB7VYp6Kd4eIlnWEVXm7lgPQrrqKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717493233; c=relaxed/simple;
-	bh=D2jU5oSARChmNNCZuwg8yDcYXULvhyEIQRoV+s3GJ2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=tjst3CeU6uwO26U08wK5ATTdUoBc9XNVQRaax716LmctryOLBQIjhD0JRVZIDWI4Y+duwGducIizv3QNEmavnLz3aco9YmLzTfzurr65lPuwu3uNHpa4rHWVEX+gmM6j1rl+TNwQbeLvGxmdoMiAnI4PP+fMxXUCVQ+OI0Oj6Uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DIC2be7d; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a696cde86a4so32330466b.1
-        for <netdev@vger.kernel.org>; Tue, 04 Jun 2024 02:27:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1717493230; x=1718098030; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HFq7tpSqPveDiLxXj1+bXctSOmCsU5WM6G1TgLnMF4E=;
-        b=DIC2be7d1nXxXipAyVXD/Lkl1yyj01onmLsH0kARqDowXUAkepgjX5voKoY6znjuuj
-         qVo02AZFpNe6cLFNcgl1RmLO5AEHHmG8UeEV5IOoR8EDweXlQX5ZKeBnSB9e8SUgisz3
-         E/du194yP8uGt168wX3MDgWk51vlWoU1GngMIH4URDmetghpdE7JhZ40CNKm3+RSy1Aw
-         POCySDHHuSw+vUWtoOZ/VBBJ62Xf3wEXL5Jn+q7nJIaG8ZE4s1REGpPelF9zqirxjNwB
-         LqkKD98yiaicrBtHffV4Qpjg2dGTee9SkMqqb+TfKYaQ7C7fddGdrJPKNdymw65Z+Qgb
-         tuew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717493230; x=1718098030;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HFq7tpSqPveDiLxXj1+bXctSOmCsU5WM6G1TgLnMF4E=;
-        b=TT9X1aVGTggmeSczsx5RTU8k0T45z/spF1RIS0trEbm9tCjJcKLjJ7aivv9RDykyE+
-         ChnOIoqNH/sHvvLZklSqeZOELz/cmwqPXZghOjnZqs2/NJNJa3YmlPA1e8lloEXagOgs
-         LeK8ssXhWiz9s1X8cJuz8ERVkDBBkgbP5GCexWryTzHTJqsEOgZ5z2v+WKt16B7yDtXv
-         iqnJzskzwm4itqBhxTXNiCin5ZXQHklwDCBjPdZYvT/rJ71MD1cDp+o7Wdhm1wpwUZhS
-         hYxHU6QpZslR7DQZNhFlywBWVFtob5lj7S/8yXnYEYBt13eZ7AcY7IP5wsBkU7nfUF4p
-         oWdg==
-X-Forwarded-Encrypted: i=1; AJvYcCWfEuVY0OQQUvHASsLjO9PJtiXH31mMADHqZVVr1rA1EOXsRi+JSofHNOt9z+J0gZsLhN9/AydPx/mD7iKIGSd+IFKqCbDo
-X-Gm-Message-State: AOJu0YyyBxY3H+IiQVv4Egb10/LJ0Y/ghLV2SFoAhoDRlYgHM3GZ3bU5
-	aAuBxVmsbb6LfIkw+AxAieTsPFLApD1IJ0hOQIs+k7g0aBRYaD36f06MDUfA23Y=
-X-Google-Smtp-Source: AGHT+IH/8jHjvoRXRq9A58t2qMLFUxjDENPNcf1oh67gqs4xFNC0tXcrBM43MYq2iYNsnSI4K4Askg==
-X-Received: by 2002:a17:907:8690:b0:a69:2bce:e424 with SMTP id a640c23a62f3a-a692bcee4b3mr272176866b.1.1717493229789;
-        Tue, 04 Jun 2024 02:27:09 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a68e940ed6asm378573366b.22.2024.06.04.02.27.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jun 2024 02:27:09 -0700 (PDT)
-Date: Tue, 4 Jun 2024 12:27:06 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Lizhi Xu <lizhi.xu@windriver.com>,
-	ebiggers@kernel.org
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, adilger.kernel@dilger.ca,
-	coreteam@netfilter.org, davem@davemloft.net, fw@strlen.de,
-	jaegeuk@kernel.org, kadlec@netfilter.org, kuba@kernel.org,
-	linux-ext4@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lizhi.xu@windriver.com,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	pablo@netfilter.org,
-	syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com, tytso@mit.edu
-Subject: Re: [PATCH V3] ext4: check hash version and filesystem casefolded
- consistent
-Message-ID: <638bf33d-7ab0-4ff0-aece-ab877cff1694@moroto.mountain>
+	s=arc-20240116; t=1717493333; c=relaxed/simple;
+	bh=sgqip+PQIPw/49W9BLsHLBly53TzEuBcT6+IZxpV4Ik=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oFRlTuKWQw7Wwwf647ZJieOb+r/DZBWtI7H6w8A3EB+h/LTkRbGAkisKA6wgPzz08vYwhSNFmPAQC2Vcg46Qj4LP8+DY5N2At64eJddh16Ipl5hpBvXGx1uS7A4gKtUtl1ziwU+r9FaqN1woTelP0du9JK8Plhcjk92hqhiFXtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GuULkdlD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A025C2BBFC;
+	Tue,  4 Jun 2024 09:28:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717493332;
+	bh=sgqip+PQIPw/49W9BLsHLBly53TzEuBcT6+IZxpV4Ik=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GuULkdlDZIYhk5xKGVlxkMvLutnbtwsgBNZY4BJXYklJIa/mSzBaQiHLdjk9bj/Kg
+	 8pRxPeN4F5qb2zARQ1krXfAQndmvKf5gDfzaRE6t0Nik42KMfKMJXiwxKsCgxjG2rQ
+	 vkJq5O+zgaSrdd3a2/W3U6fPQxBMBPCQlA8UI7/YzRledIhEUR67kTRGeINd1w35c8
+	 QAATMlEzA6yEjwBnFMWDKlm8uw3ynkGJb4cQDBckYtWSn3wiK2EBtz588cmkfx+vS1
+	 pr5NV1H4Uq41ZI2HN3flDzURfd6/fwOOIcnYnrjhiKee2UQv6bHcsLN8nqjH/vWieh
+	 VOdwdV264iSSQ==
+Date: Tue, 4 Jun 2024 10:28:47 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	netdev <netdev@vger.kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
+	Michal Michalik <michal.michalik@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Subject: Re: [PATCH next 07/11] ice: Introduce ETH56G PHY model for E825C
+ products
+Message-ID: <20240604092847.GO491852@kernel.org>
+References: <20240528-next-2024-05-28-ptp-refactors-v1-0-c082739bb6f6@intel.com>
+ <20240528-next-2024-05-28-ptp-refactors-v1-7-c082739bb6f6@intel.com>
+ <20240601103519.GC491852@kernel.org>
+ <10ffa7ab-0121-48b7-9605-c45364d5d9d4@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,56 +67,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240531085647.2918240-1-lizhi.xu@windriver.com>
+In-Reply-To: <10ffa7ab-0121-48b7-9605-c45364d5d9d4@intel.com>
 
-Hi Lizhi,
+On Mon, Jun 03, 2024 at 12:47:42PM -0700, Jacob Keller wrote:
+> 
+> 
+> On 6/1/2024 3:35 AM, Simon Horman wrote:
+> > On Tue, May 28, 2024 at 04:03:57PM -0700, Jacob Keller wrote:
+> >> From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+> >>
+> >> E825C products feature a new PHY model - ETH56G.
+> >>
+> >> Introduces all necessary PHY definitions, functions etc. for ETH56G PHY,
+> >> analogous to E82X and E810 ones with addition of a few HW-specific
+> >> functionalities for ETH56G like one-step timestamping.
+> >>
+> >> It ensures correct PTP initialization and operation for E825C products.
+> >>
+> >> Co-developed-by: Jacob Keller <jacob.e.keller@intel.com>
+> >> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> >> Co-developed-by: Michal Michalik <michal.michalik@intel.com>
+> >> Signed-off-by: Michal Michalik <michal.michalik@intel.com>
+> >> Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+> >> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> >> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> >> Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> >> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> >> Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+> >> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> > 
+> > Hi Jacob,
+> > 
+> > This isn't a proper review, but I noticed that your signed-off
+> > appears twice above.
+> > 
+> 
+> Yes it does. I developed some of the original code which Sergey used
+> here (hence my Co-developed-by and Signed-off-by). But I am also
+> covering for Tony and submitting the patch so I added my sign-off-by to
+> the end of the sequence since I'm the one who submitted the full series
+> to netdev.
+> 
+> I'm not entirely sure how to handle this, since its a bit awkward. I
+> guess there are a couple of other ways we could have done this, from
+> dropping my co-developed-by tag, to moving it to the end..
 
-kernel test robot noticed the following build warnings:
+Thanks Jacob,
 
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I understand the problem you face.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Lizhi-Xu/ext4-check-hash-version-and-filesystem-casefolded-consistent/20240531-170046
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/tytso/ext4.git dev
-patch link:    https://lore.kernel.org/r/20240531085647.2918240-1-lizhi.xu%40windriver.com
-patch subject: [PATCH V3] ext4: check hash version and filesystem casefolded consistent
-config: i386-randconfig-141-20240601 (https://download.01.org/0day-ci/archive/20240602/202406020752.Ii2MU4KP-lkp@intel.com/config)
-compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+Perhaps you could move yourself to the bottom of the list of Co-developers,
+below Tested-by.  But perhaps that is worse.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202406020752.Ii2MU4KP-lkp@intel.com/
-
-smatch warnings:
-fs/ext4/super.c:5287 __ext4_fill_super() warn: missing error code 'err'
-
-vim +/err +5287 fs/ext4/super.c
-
-d4fab7b28e2f5d7 Theodore Ts'o           2023-04-27  5280  	err = ext4_block_group_meta_init(sb, silent);
-d4fab7b28e2f5d7 Theodore Ts'o           2023-04-27  5281  	if (err)
-0d1ee42f27d30ee Alexandre Ratchov       2006-10-11  5282  		goto failed_mount;
-0b8e58a140cae2b Andreas Dilger          2009-06-03  5283  
-db9345d9e6f075e Jason Yan               2023-03-23  5284  	ext4_hash_info_init(sb);
-66b3f078839bbdb Lizhi Xu                2024-05-31  5285  	if (es->s_def_hash_version == DX_HASH_SIPHASH && 
-66b3f078839bbdb Lizhi Xu                2024-05-31  5286  	    !ext4_has_feature_casefold(sb))
-66b3f078839bbdb Lizhi Xu                2024-05-31 @5287  		goto failed_mount;
-
-
-Should this be an error path?  err = something?
-
-ac27a0ec112a089 Dave Kleikamp           2006-10-11  5288  
-d4fab7b28e2f5d7 Theodore Ts'o           2023-04-27  5289  	err = ext4_handle_clustersize(sb);
-d4fab7b28e2f5d7 Theodore Ts'o           2023-04-27  5290  	if (err)
-281b59959707dfa Theodore Ts'o           2011-09-09  5291  		goto failed_mount;
-960fd856fdc3b08 Theodore Ts'o           2013-07-05  5292  
-d4fab7b28e2f5d7 Theodore Ts'o           2023-04-27  5293  	err = ext4_check_geometry(sb, es);
-d4fab7b28e2f5d7 Theodore Ts'o           2023-04-27  5294  	if (err)
-bfe0a5f47ada40d Theodore Ts'o           2018-06-17  5295  		goto failed_mount;
-bfe0a5f47ada40d Theodore Ts'o           2018-06-17  5296  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+No big deal on my side if you stick with what you have,
+although possibly it will be flagged again (by someone else).
 
