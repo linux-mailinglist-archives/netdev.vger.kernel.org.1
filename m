@@ -1,73 +1,79 @@
-Return-Path: <netdev+bounces-100576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A33208FB39F
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:24:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98D608FB3A2
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:25:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B5382884E9
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 13:24:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBB8A1C22CDA
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 13:25:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDB121465BE;
-	Tue,  4 Jun 2024 13:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A51145B27;
+	Tue,  4 Jun 2024 13:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Dou3ya0Q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="He82Ms1O"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C80F146019
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 13:24:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA173146A61
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 13:24:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717507495; cv=none; b=PpjWH0+LtjhZnnnz+JKO9eMCEPbFeaBOC3pnbJNjuyi2X6FT2Pq30aouF5bDZfZx6m6Nk395J4i3kJUt5XATcuyz1v9X6f5hhe+LYG2Eig5TFBsMjo29F9bfpPb2pVPiuJN04oIazdDIIEHUL3D1TwNIqGt1RM3l38OiPkoBLNA=
+	t=1717507497; cv=none; b=uQw29ZmAIuxa0y1xhw4Lnjvfg5wPmDRdoqjtEcfYW8N5UQA/vxqazXtIgfmahcUa45K0uiD5gZNVCSIm7Jm8r3mjE7sOowla+Ovw1ilFMyn5uaVxuszYKXXNVL7lii+XUWOzPgNslD+9in1CQcEl9SX0c/9qDE8WogYW9ZhotlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717507495; c=relaxed/simple;
-	bh=DS/KI3xMYtNzcbzUyEzBv/NVyRuMHUgq6ujsTOu9WEk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oyep8GJEQ6ySg0YUg8L0C7ySLcDEJslaVdFxOXwpO5T1Tgku9VMObbQxzA4BgIqTI0sqaJCg3cRcZ4PE7cZ69y3c5SAO2IJwrWrZTEtPz5CVOVno6TmhI0+/EBFMg2d55xgrGANb6CgnigyqBQFN7vIoWhoBc6nfcxrf+Y3Yy9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Dou3ya0Q; arc=none smtp.client-ip=192.198.163.15
+	s=arc-20240116; t=1717507497; c=relaxed/simple;
+	bh=DuE0/KwD597S9YWNi3r9R3JCaGlka8/O0Zj83FFbF9k=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=O5KqrDl7BUMdHZahML0tNE1H9p8xdjOwP/zFzGiAVObNtfGdkXL9iy1HAn84IBMqhxu0pgNoPpYBRpaR4cbGplaq6CcT7WrB5UQuLaP+Ro5G7cc+bLuDpy14lGZaYfFik33x2Q2lYht4MWikrqP7Dpp1WfgOdq/GA7W3u8Udd18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=He82Ms1O; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717507494; x=1749043494;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=DS/KI3xMYtNzcbzUyEzBv/NVyRuMHUgq6ujsTOu9WEk=;
-  b=Dou3ya0Qwi6rcct3Ouyy2fU1AT8KdPVybUsvSRWkm7VSMk9Y23eqadFK
-   HTVUvmD4PPQNRDCJCyw2PXVgxvxsu0QGNX+t3Sn5GmUA8li2dc5k7tK79
-   OvbP873zRoq8vsp9ItEuo4peU2nc4GoDQMsuS5ZiZOZRIwpkTPZPZWso/
-   vDmieJMNKncOQhK9SuFNRDr0dsTbmu2iTvjFGMNT0GPSOohCfrk/yMMMn
-   Gm2Bs1zpRvM338OKvx/0AG79APh6Hn7TxPawf+a+QmpiuGxI4Z8IA+HZS
-   IBC2fTw9+bb1qYXrRa9bpEF93W5HCcdaYi9WGpbTalJKPlE1ECBI1Zks0
-   w==;
-X-CSE-ConnectionGUID: AIL4BsDpRf+uOfCfMZ80bA==
-X-CSE-MsgGUID: MMjsfdD5TX6+XmY2Jd0Vpg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11093"; a="14245367"
+  t=1717507496; x=1749043496;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=DuE0/KwD597S9YWNi3r9R3JCaGlka8/O0Zj83FFbF9k=;
+  b=He82Ms1OX7uc7qrBiulgzc6fKZEQaVengCjrdbCLVzdlNV9bjWVzl/UG
+   vjqNQo0m9gLhq6XxkFUfbccnYPQaW57/kioxekbSNO2vVZGlxuIrHpN5t
+   G3HZi3Su8pavOxN0dJBWv2VOTBS2RiYaLA5WHLz8RqrVD4Vc4rXSLI8pl
+   N2JO/85MoNroYo3n1pzL254MRpPEkqcKmmJ9PCxOY68RG9aFkHNFlTGgr
+   lTsUUUUI0uplUIXvXmF33SYR8gZFjQ1GDD56D5YnEIaaVGWSN5J8u0Vj/
+   fnnsKMWlOCjZUDwvuhJKZrdpVbZTVWrvWCOzzVPPHYhXIBpMV3+0P7a5g
+   A==;
+X-CSE-ConnectionGUID: TsYJ+Yc0SlOeIK8RqOdsIQ==
+X-CSE-MsgGUID: aSEjh9xrR1WDcQKaqYFWkw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11093"; a="14245372"
 X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
-   d="scan'208";a="14245367"
+   d="scan'208";a="14245372"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 06:24:53 -0700
-X-CSE-ConnectionGUID: dR/fnQOMQvicCjJ8VgPrpg==
-X-CSE-MsgGUID: Fjk7r3QZQ82pYL6JEfQ8ag==
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 06:24:55 -0700
+X-CSE-ConnectionGUID: XpvmcI7qSVCucAOKPy2GEg==
+X-CSE-MsgGUID: DwEVTwBISnKQINl7nNWM1g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
-   d="scan'208";a="37109726"
+   d="scan'208";a="37109735"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa007.fm.intel.com with ESMTP; 04 Jun 2024 06:24:51 -0700
+  by fmviesa007.fm.intel.com with ESMTP; 04 Jun 2024 06:24:53 -0700
 Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 4B7CE125AF;
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id C1C03125B4;
 	Tue,  4 Jun 2024 14:24:44 +0100 (IST)
 From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
 	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-next v7 00/12] Add support for Rx timestamping for both ice and iavf drivers.
-Date: Tue,  4 Jun 2024 09:13:48 -0400
-Message-Id: <20240604131400.13655-1-mateusz.polchlopek@intel.com>
+Subject: [Intel-wired-lan] [PATCH iwl-next v7 01/12] virtchnl: add support for enabling PTP on iAVF
+Date: Tue,  4 Jun 2024 09:13:49 -0400
+Message-Id: <20240604131400.13655-2-mateusz.polchlopek@intel.com>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20240604131400.13655-1-mateusz.polchlopek@intel.com>
+References: <20240604131400.13655-1-mateusz.polchlopek@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,104 +82,135 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Initially, during VF creation it registers the PTP clock in
-the system and negotiates with PF it's capabilities. In the
-meantime the PF enables the Flexible Descriptor for VF.
-Only this type of descriptor allows to receive Rx timestamps.
+From: Jacob Keller <jacob.e.keller@intel.com>
 
-Enabling virtual clock would be possible, though it would probably
-perform poorly due to the lack of direct time access.
+Add support for allowing a VF to enable PTP feature - Rx timestamps
 
-Enable timestamping should be done using userspace tools, e.g.
-hwstamp_ctl -i $VF -r 14
+The new capability is gated by VIRTCHNL_VF_CAP_PTP, which must be
+set by the VF to request access to the new operations. In addition, the
+VIRTCHNL_OP_1588_PTP_CAPS command is used to determine the specific
+capabilities available to the VF.
 
-In order to report the timestamps to userspace, the VF extends
-timestamp to 40b.
+This support includes the following additional capabilities:
 
-To support this feature the flexible descriptors and PTP part
-in iavf driver have been introduced.
+* Rx timestamps enabled in the Rx queues (when using flexible advanced
+  descriptors)
+* Read access to PHC time over virtchnl using
+  VIRTCHNL_OP_1588_PTP_GET_TIME
 
+Extra space is reserved in most structures to allow for future
+extension (like set clock, Tx timestamps).  Additional opcode numbers
+are reserved and space in the virtchnl_ptp_caps structure is
+specifically set aside for this.
+Additionally, each structure has some space reserved for future
+extensions to allow some flexibility.
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 ---
-v7:
-- changed .ndo_eth_ioctl to .ndo_hwtstamp_get and .ndo_hwtstamp_set
-  (according to Kuba's suggestion) - patch 11
+ include/linux/avf/virtchnl.h | 66 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
 
-v6:
-- reordered tags
-- added RB tags where applicable
-- removed redundant instructions in ifs - patch 4 and patch 5
-- changed teardown to LIFO, adapter->ptp.initialized = false
-  moved to the top of function - patch 6
-- changed cpu-endianess for testing - patch 9
-- aligned to libeth changes - patch 9
-https://lore.kernel.org/netdev/20240528112301.5374-1-mateusz.polchlopek@intel.com/
-
-v5:
-- fixed all new issues generated by this series in kernel-doc
-https://lore.kernel.org/netdev/20240418052500.50678-1-mateusz.polchlopek@intel.com/
-
-v4:
-- fixed duplicated argument in iavf_virtchnl.c reported by coccicheck
-https://lore.kernel.org/netdev/20240410121706.6223-1-mateusz.polchlopek@intel.com/
-
-v3:
-- added RB in commit 6
-- removed inline keyword in commit 9
-- fixed sparse issues in commit 9 and commit 10
-- used GENMASK_ULL when possible in commit 9
-https://lore.kernel.org/netdev/20240403131927.87021-1-mateusz.polchlopek@intel.com/
-
-v2:
-- fixed warning related to wrong specifier to dev_err_once in
-  commit 7
-- fixed warnings related to unused variables in commit 9
-https://lore.kernel.org/netdev/20240327132543.15923-1-mateusz.polchlopek@intel.com/
-
-v1:
-- initial series
-https://lore.kernel.org/netdev/20240326115116.10040-1-mateusz.polchlopek@intel.com/
----
-
-Jacob Keller (10):
-  virtchnl: add support for enabling PTP on iAVF
-  virtchnl: add enumeration for the rxdid format
-  iavf: add support for negotiating flexible RXDID format
-  iavf: negotiate PTP capabilities
-  iavf: add initial framework for registering PTP clock
-  iavf: add support for indirect access to PHC time
-  iavf: periodically cache PHC time
-  iavf: refactor iavf_clean_rx_irq to support legacy and flex
-    descriptors
-  iavf: handle set and get timestamps ops
-  iavf: add support for Rx timestamps to hotpath
-
-Mateusz Polchlopek (1):
-  iavf: Implement checking DD desc field
-
-Simei Su (1):
-  ice: support Rx timestamp on flex descriptor
-
- drivers/net/ethernet/intel/iavf/Makefile      |   3 +-
- drivers/net/ethernet/intel/iavf/iavf.h        |  33 +-
- drivers/net/ethernet/intel/iavf/iavf_main.c   | 238 +++++++-
- drivers/net/ethernet/intel/iavf/iavf_ptp.c    | 543 ++++++++++++++++++
- drivers/net/ethernet/intel/iavf/iavf_ptp.h    |  49 ++
- drivers/net/ethernet/intel/iavf/iavf_txrx.c   | 425 +++++++++++---
- drivers/net/ethernet/intel/iavf/iavf_txrx.h   |  26 +-
- drivers/net/ethernet/intel/iavf/iavf_type.h   | 148 +++--
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 238 ++++++++
- drivers/net/ethernet/intel/ice/ice_base.c     |   3 -
- drivers/net/ethernet/intel/ice/ice_ptp.c      |   4 +-
- drivers/net/ethernet/intel/ice/ice_ptp.h      |   2 +
- drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   2 +
- drivers/net/ethernet/intel/ice/ice_virtchnl.c |  86 ++-
- drivers/net/ethernet/intel/ice/ice_virtchnl.h |   2 +
- .../intel/ice/ice_virtchnl_allowlist.c        |   6 +
- include/linux/avf/virtchnl.h                  | 127 +++-
- 17 files changed, 1776 insertions(+), 159 deletions(-)
- create mode 100644 drivers/net/ethernet/intel/iavf/iavf_ptp.c
- create mode 100644 drivers/net/ethernet/intel/iavf/iavf_ptp.h
-
+diff --git a/include/linux/avf/virtchnl.h b/include/linux/avf/virtchnl.h
+index f41395264dca..3663ad743de1 100644
+--- a/include/linux/avf/virtchnl.h
++++ b/include/linux/avf/virtchnl.h
+@@ -151,6 +151,9 @@ enum virtchnl_ops {
+ 	VIRTCHNL_OP_DISABLE_VLAN_STRIPPING_V2 = 55,
+ 	VIRTCHNL_OP_ENABLE_VLAN_INSERTION_V2 = 56,
+ 	VIRTCHNL_OP_DISABLE_VLAN_INSERTION_V2 = 57,
++	/* opcode 58 and 59 are reserved */
++	VIRTCHNL_OP_1588_PTP_GET_CAPS = 60,
++	VIRTCHNL_OP_1588_PTP_GET_TIME = 61,
+ 	VIRTCHNL_OP_MAX,
+ };
+ 
+@@ -261,6 +264,7 @@ VIRTCHNL_CHECK_STRUCT_LEN(16, virtchnl_vsi_resource);
+ #define VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC	BIT(26)
+ #define VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF		BIT(27)
+ #define VIRTCHNL_VF_OFFLOAD_FDIR_PF		BIT(28)
++#define VIRTCHNL_VF_CAP_PTP			BIT(31)
+ 
+ #define VF_BASE_MODE_OFFLOADS (VIRTCHNL_VF_OFFLOAD_L2 | \
+ 			       VIRTCHNL_VF_OFFLOAD_VLAN | \
+@@ -1416,6 +1420,62 @@ struct virtchnl_fdir_del {
+ 
+ VIRTCHNL_CHECK_STRUCT_LEN(12, virtchnl_fdir_del);
+ 
++#define VIRTCHNL_1588_PTP_CAP_RX_TSTAMP		BIT(1)
++#define VIRTCHNL_1588_PTP_CAP_READ_PHC		BIT(2)
++
++/**
++ * struct virtchnl_ptp_caps
++ *
++ * Structure that defines the PTP capabilities available to the VF. The VF
++ * sends VIRTCHNL_OP_1588_PTP_GET_CAPS, and must fill in the ptp_caps field
++ * indicating what capabilities it is requesting. The PF will respond with the
++ * same message with the virtchnl_ptp_caps structure indicating what is
++ * enabled for the VF.
++ *
++ * @caps: On send, VF sets what capabilities it requests. On reply, PF
++ *        indicates what has been enabled for this VF. The PF shall not set
++ *        bits which were not requested by the VF.
++ * @rsvd: Reserved bits for future extension.
++ *
++ * PTP capabilities
++ *
++ * VIRTCHNL_1588_PTP_CAP_RX_TSTAMP indicates that the VF receive queues have
++ * receive timestamps enabled in the flexible descriptors. Note that this
++ * requires a VF to also negotiate to enable advanced flexible descriptors in
++ * the receive path instead of the default legacy descriptor format.
++ *
++ * VIRTCHNL_1588_PTP_CAP_READ_PHC indicates that the VF may read the PHC time
++ * via the VIRTCHNL_OP_1588_PTP_GET_TIME command.
++ *
++ * Note that in the future, additional capability flags may be added which
++ * indicate additional extended support. All fields marked as reserved by this
++ * header will be set to zero. VF implementations should verify this to ensure
++ * that future extensions do not break compatibility.
++ */
++struct virtchnl_ptp_caps {
++	u32 caps;
++	u8 rsvd[44];
++};
++VIRTCHNL_CHECK_STRUCT_LEN(48, virtchnl_ptp_caps);
++
++/**
++ * struct virtchnl_phc_time
++ * @time: PHC time in nanoseconds
++ * @rsvd: Reserved for future extension
++ *
++ * Structure received with VIRTCHNL_OP_1588_PTP_GET_TIME. Contains the 64bits
++ * of PHC clock time in * nanoseconds.
++ *
++ * VIRTCHNL_OP_1588_PTP_GET_TIME may be sent to request the current time of
++ * the PHC. This op is available in case direct access via the PHC registers
++ * is not available.
++ */
++struct virtchnl_phc_time {
++	u64 time;
++	u8 rsvd[8];
++};
++VIRTCHNL_CHECK_STRUCT_LEN(16, virtchnl_phc_time);
++
+ #define __vss_byone(p, member, count, old)				      \
+ 	(struct_size(p, member, count) + (old - 1 - struct_size(p, member, 0)))
+ 
+@@ -1637,6 +1697,12 @@ virtchnl_vc_validate_vf_msg(struct virtchnl_version_info *ver, u32 v_opcode,
+ 	case VIRTCHNL_OP_DISABLE_VLAN_INSERTION_V2:
+ 		valid_len = sizeof(struct virtchnl_vlan_setting);
+ 		break;
++	case VIRTCHNL_OP_1588_PTP_GET_CAPS:
++		valid_len = sizeof(struct virtchnl_ptp_caps);
++		break;
++	case VIRTCHNL_OP_1588_PTP_GET_TIME:
++		valid_len = sizeof(struct virtchnl_phc_time);
++		break;
+ 	/* These are always errors coming from the VF. */
+ 	case VIRTCHNL_OP_EVENT:
+ 	case VIRTCHNL_OP_UNKNOWN:
 -- 
 2.38.1
 
