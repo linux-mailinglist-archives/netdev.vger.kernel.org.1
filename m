@@ -1,129 +1,151 @@
-Return-Path: <netdev+bounces-100513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A15548FAF91
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 12:08:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A052F8FAFA4
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 12:13:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5802A28389B
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 10:08:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92B281C2211C
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 10:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E70811448D9;
-	Tue,  4 Jun 2024 10:08:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32FA714533E;
+	Tue,  4 Jun 2024 10:13:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="dH0pYbAs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UnU/+GhY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C6913D29F;
-	Tue,  4 Jun 2024 10:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30AC1448EF
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 10:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717495703; cv=none; b=CnmXIGj6cU8HExr2bhXmcJ71LzOuX51Ucbqv4/yQa5uQ85sCiVY2c0YZRnjsw0xLmxCgBYFxcnBtHj4VU7TLOutWtycxApbJSNDlw3rtxX1AfkEWF8B5yTsMUKEbK5eAtGo6tYs7R0010lZORhTXDX0VfaIT1IVgRhRmSQGEsCQ=
+	t=1717496008; cv=none; b=mQ02g/IiIktOAZncEjbAhQaY79kZrVHkD2QzgwHAvz9ixHELnOrrPXuOGJqVn2CbpZBe9acMz2jlx/nbEiQTaAM9v3fXBk9cStBcP+oNlhxUfLbJETYnQmH23dm5UOARQ81UYKEA5A5FTtxnw6j4+APfMlGnNAaVHTOyXs2bmvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717495703; c=relaxed/simple;
-	bh=6avz5LUZ/inR3Uyxtt0j62Bs3F4d8DO/HyEZ6uiBHac=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Lk971raWZjq02e5YwdWFg4jSiyb12EamFF+PJzca3+fFMNyrHrQJIs5j4wJyzDYlboW/Z2yUeK9vhiwm1X/Y9ucENN+P7Df4j78R7CTdSjJ50BQo0b3xV1ZTE7vJpLesgkY9m9xhc4oe9qNOIBQIWX4VwE96CR4KibP/dHucpLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=dH0pYbAs; arc=none smtp.client-ip=109.73.34.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
-Received: from mx1.t-argos.ru (localhost [127.0.0.1])
-	by mx1.t-argos.ru (Postfix) with ESMTP id 56B52100002;
-	Tue,  4 Jun 2024 13:07:59 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
-	t=1717495679; bh=8vE6tl+i2CQkzPeTqs79Tzdv02wtzECjp6uIUogF75g=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=dH0pYbAsiDnGl6HYNaimqToe8De/PssZVo8Q8q2TmQ765dUJbpsqpCnmySq16fpo3
-	 /qcIpb9REOCOV8u/yT4W65KapglTZ/0y0qUC8Xj3LlC1V4Qy0+h0WUADdakg5YXo5a
-	 Za5DO73w4bXlYi6Doxw1PH83XVHNOwPSC6IdRNnR+ckGq+pr/tPnPLzAIpSUPpzgLc
-	 KzvwEYscSmOoXAd6nqr1XeGIFkDji1Mgcyd2LvN+Vi4GiAEayVsukYl6Fc6076Fw0b
-	 5UEOh2lt64trvM0I9yWleEpez6qj/W2aXFHvavNj9NyXEByueVBo3A64zbaPR9OJwr
-	 JbJgc//eVcfKw==
-Received: from mx1.t-argos.ru.ru (ta-mail-02.ta.t-argos.ru [172.17.13.212])
-	by mx1.t-argos.ru (Postfix) with ESMTP;
-	Tue,  4 Jun 2024 13:06:20 +0300 (MSK)
-Received: from localhost.localdomain (172.17.215.6) by ta-mail-02
- (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 4 Jun 2024
- 13:06:00 +0300
-From: Aleksandr Mishin <amishin@t-argos.ru>
-To: Mark Bloch <mbloch@nvidia.com>
-CC: Aleksandr Mishin <amishin@t-argos.ru>, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maor Gottlieb
-	<maorg@nvidia.com>, Jacob Keller <jacob.e.keller@intel.com>, Shay Drory
-	<shayd@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>, Jinjie Ruan
-	<ruanjinjie@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH net] net/mlx5: Fix tainted pointer delete is case of flow rules creation fail
-Date: Tue, 4 Jun 2024 13:05:52 +0300
-Message-ID: <20240604100552.25201-1-amishin@t-argos.ru>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1717496008; c=relaxed/simple;
+	bh=7pMGPoPFS6WXSOEYdjHiLZC8wz7D3xw7x/5rkBNplrY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=UBDqgWfEzI5X+JKFkVUf1zP9g1nbc1nX3Raj5tN89xppmND7SQYNnAR7a8ZANvBWhIKHEmZaxb4o7FbhAQWUNZBa0qeye+N6jEeoLAJPSz15TolmN+2olXLKiyHClEJSg9zSq93TUkEChvDXUeveA/XrWN0dgvWI0TENbEf7pck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UnU/+GhY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717496003;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Qj8vTI2LXR4HXBOizcBl1XW0VI7FRaOpZEigzFh4T+M=;
+	b=UnU/+GhYCKC9spnS3nzVBHR6F6RLwfZO75SvHthMaPQQbm1fYg70Q3gxGN9vHAMABhlK2U
+	vL2G18KECpY/GkWBdv1YIlZRpiWletUjM8Kb8Vp3UrK3EtSUrGr2gD6lf0AuMQAnta74bF
+	Z0omoYBzVVZPw4Ul595JTgTkiHvZ8Ls=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-465-ItTqC6WqNeyKp2vxhhjFlw-1; Tue, 04 Jun 2024 06:13:22 -0400
+X-MC-Unique: ItTqC6WqNeyKp2vxhhjFlw-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2eaa6d6b322so3956821fa.3
+        for <netdev@vger.kernel.org>; Tue, 04 Jun 2024 03:13:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717496000; x=1718100800;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qj8vTI2LXR4HXBOizcBl1XW0VI7FRaOpZEigzFh4T+M=;
+        b=l1Sf/pZzv3OJsuhqNFVq7DEv0d6Ox9dGt+kCTjsK7rdzoEhoch4J3XiusBn1yXrrGV
+         LFzGYxd09XUCItuIwQuf0bnTQnOWtWZXkKDAFygYhSmFfPapMwvzY4aMWmIJFXdM18UG
+         YOLZpx4NeglAqSch+wONqydetr0mNdzeyDuHrQ7JkL+jt50/Tv71X7ndvGueT9lrk0J7
+         JkuGW9bFNPFpA/ltJfHeBoWNguVo1nXjPaJ5DNG1TExoccE4uxFsuzBm51GutdtfNzG/
+         cqBeiKR8PsFHrDsYlxfPvmT/rz6dxosDTQ3GmUBAnQPAoWSfpvyATCE1WbPuNsSqEpEQ
+         KvuA==
+X-Forwarded-Encrypted: i=1; AJvYcCWavP12tV+Ibbu/agb7Ubby2LgPEDfTLarAZo0MCC87/BPEh06+HSTvL+A920+CcfVnNS8nbz5/N/LpWvv9lUoiI+saTWTj
+X-Gm-Message-State: AOJu0YyrMXhgrf27AwJwbEAsBauRX3ZbRRmYuR9bV3dX5ZjYa3Is14WB
+	UJ46IlD3XyCPLn5UXaQojUmX4np4mtmOSxRTuBJxLTxd1cWHXbngmEMvXc2q+MxWs+cmpO42AGZ
+	cf0Z23sEKdGCEYbp+bZcRkzx2aqEhqX6ubFhuFYcj5pGajCalQC0sCQ==
+X-Received: by 2002:a05:6512:3b25:b0:52b:8909:58b1 with SMTP id 2adb3069b0e04-52b89702d1emr10432025e87.3.1717496000633;
+        Tue, 04 Jun 2024 03:13:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF2KYZpo1PhJKQf4emed84mgFHvwqcq7vviZe/cQXCtmdquAQ4ToFV2c7RihQIOA2x+z432PQ==
+X-Received: by 2002:a05:6512:3b25:b0:52b:8909:58b1 with SMTP id 2adb3069b0e04-52b89702d1emr10431960e87.3.1717496000150;
+        Tue, 04 Jun 2024 03:13:20 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3344:1b74:3a10::f71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35e537da921sm6658518f8f.17.2024.06.04.03.13.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jun 2024 03:13:19 -0700 (PDT)
+Message-ID: <bea8b8bf1630309bb004f614e4a3c7f684a6acb6.camel@redhat.com>
+Subject: Re: [PATCH net-next v10 05/14] netdev: netdevice devmem allocator
+From: Paolo Abeni <pabeni@redhat.com>
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Donald Hunter
+ <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Richard
+ Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky
+ <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, Thomas
+ Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>, 
+ Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
+ <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>,  Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,  Shuah Khan
+ <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, Christian
+ =?ISO-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>, Pavel Begunkov
+ <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe
+ <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand
+ <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Date: Tue, 04 Jun 2024 12:13:15 +0200
+In-Reply-To: <20240530201616.1316526-6-almasrymina@google.com>
+References: <20240530201616.1316526-1-almasrymina@google.com>
+	 <20240530201616.1316526-6-almasrymina@google.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
- (172.17.13.212)
-X-KSMG-Rule-ID: 1
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 185699 [Jun 04 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.4
-X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 20 0.3.20 743589a8af6ec90b529f2124c2bbfc3ce1d2f20f, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;t-argos.ru:7.1.1;127.0.0.199:7.1.2;mx1.t-argos.ru.ru:7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2024/06/04 07:46:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/06/04 05:43:00 #25435061
-X-KSMG-AntiVirus-Status: Clean, skipped
 
-In case of flow rule creation fail in mlx5_lag_create_port_sel_table(),
-instead of previously created rules, the tainted pointer is deleted
-deveral times.
-Fix this bug by using correct flow rules pointers.
+On Thu, 2024-05-30 at 20:16 +0000, Mina Almasry wrote:
+> diff --git a/net/core/devmem.c b/net/core/devmem.c
+> index d82f92d7cf9ce..d5fac8edf621d 100644
+> --- a/net/core/devmem.c
+> +++ b/net/core/devmem.c
+> @@ -32,6 +32,14 @@ static void net_devmem_dmabuf_free_chunk_owner(struct =
+gen_pool *genpool,
+>  	kfree(owner);
+>  }
+> =20
+> +static inline dma_addr_t net_devmem_get_dma_addr(const struct net_iov *n=
+iov)
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+Minor nit: please no 'inline' keyword in c files.
 
-Fixes: 352899f384d4 ("net/mlx5: Lag, use buckets in hash mode")
-Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
----
- drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Thanks,
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
-index c16b462ddedf..ab2717012b79 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
-@@ -88,9 +88,13 @@ static int mlx5_lag_create_port_sel_table(struct mlx5_lag *ldev,
- 								      &dest, 1);
- 			if (IS_ERR(lag_definer->rules[idx])) {
- 				err = PTR_ERR(lag_definer->rules[idx]);
--				while (i--)
--					while (j--)
-+				do {
-+					while (j--) {
-+						idx = i * ldev->buckets + j;
- 						mlx5_del_flow_rules(lag_definer->rules[idx]);
-+					}
-+					j = ldev->buckets;
-+				} while (i--);
- 				goto destroy_fg;
- 			}
- 		}
--- 
-2.30.2
+Paolo
 
 
