@@ -1,315 +1,167 @@
-Return-Path: <netdev+bounces-100773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 095B78FBEA0
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 00:14:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4220E8FBEA2
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 00:14:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 341831C2275B
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 22:14:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94A3BB20E87
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 22:14:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CF014D42C;
-	Tue,  4 Jun 2024 22:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE5814D451;
+	Tue,  4 Jun 2024 22:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lIKLzfbD"
+	dkim=pass (2048-bit key) header.d=tycho.pizza header.i=@tycho.pizza header.b="IMrQfajn";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MFeTNtxF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from flow1-smtp.messagingengine.com (flow1-smtp.messagingengine.com [103.168.172.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B547A14D294;
-	Tue,  4 Jun 2024 22:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5815E14D2BC;
+	Tue,  4 Jun 2024 22:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717539220; cv=none; b=VZNQIgNB//w4Y+GwQ+WKJbFrXvSIUoeWrlUgFO643ehU5RvFKsGXeSwBl3Mb+pBnZYDtvyF03I80DTqF4F68dsUa1dZsW6xnutGZ3x+Uw4w3BtZtWV/f5OOsnYkmCA56dH/3CLaRKwWZWcVenRcY2hSxAkdIFCn/4IS+5xhZkWg=
+	t=1717539222; cv=none; b=JyvPIeJgHId8IdRRshs7AxY17Gf9O98I1WmjHNwtRSB6Dg+o9nBxepOcwDHLdxVBHcMUkkE3pknRuIT0JySSOZu8D0dDutJB0bXRr1hHSoW4eZluA+cGxz1536soIovrSmzChg3aB1LhQb+h5CN1K/MryI9RsZZPdMQNkoA5FMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717539220; c=relaxed/simple;
-	bh=fS98vqohV9oe9FbfzsYVfJwcOwXTsR8rG2R5oRi/hjk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=h08mAXoSdrWRwSD3AazGBpltQ8TfZGXtv6H/xvJ1AuVTzvgggcW5kj6rNpP0UAwQOwtOj+T7/TLJegHggKQT8wR524K5qkzlAhNIPwSTiN07Z8SDTGJEFIELk1pVfluVZVaAIapiUZdctZTxUKkrv0CIOKlUzTwXPXNiDi041ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lIKLzfbD; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717539219; x=1749075219;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=fS98vqohV9oe9FbfzsYVfJwcOwXTsR8rG2R5oRi/hjk=;
-  b=lIKLzfbDMnH7XPglHJDJukG5W66FxmYCyZpWRjUrCvG0nLB49ngYVgAB
-   11a/cdDZOJ9wL/Pc/cZ1fm0niSuk/mzYs5PJDLuZLlnX0RFiHgnHQWsNO
-   2Wn6H4nr0ohXVdMnT4o+73g6Yjwz2ZEsZfEQuRqLPfgCnmFOq5sNap/7f
-   Tg/Kdz4LxBIAzVqtuDz6BwBqtFollizPmH2/NFx8kEK/y3RlKSFyubIdX
-   Xd7nuIsL2VnvrBM44l73d01QELJhcR662uFfk7gIZDo/LDW+MhiHw01Yu
-   PIzB2pc/SD1S66AJQnsIG2TYb7/g5nCXYVd85syBptlW5+4Vynp7R9ChX
-   A==;
-X-CSE-ConnectionGUID: 9F7fTZVsT1ur/+XMRVB+ag==
-X-CSE-MsgGUID: B+ohG06lT5es3OtyVr1Jxw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11093"; a="36635269"
-X-IronPort-AV: E=Sophos;i="6.08,214,1712646000"; 
-   d="scan'208";a="36635269"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 15:13:34 -0700
-X-CSE-ConnectionGUID: yHK2DBGBRDK6I3osiZqexw==
-X-CSE-MsgGUID: OrFDi9UVS46mbqk8IAoQtA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,214,1712646000"; 
-   d="scan'208";a="37503250"
-Received: from jbrandeb-spr1.jf.intel.com ([10.166.28.233])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 15:13:33 -0700
-From: Jesse Brandeburg <jesse.brandeburg@intel.com>
-To: netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	corbet@lwn.net,
-	linux-doc@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH iwl-next v1 5/5] ice: refactor to use helpers
-Date: Tue,  4 Jun 2024 15:13:25 -0700
-Message-ID: <20240604221327.299184-6-jesse.brandeburg@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240604221327.299184-1-jesse.brandeburg@intel.com>
-References: <20240604221327.299184-1-jesse.brandeburg@intel.com>
+	s=arc-20240116; t=1717539222; c=relaxed/simple;
+	bh=lYwlsFpXaffIux9v8UtowemAJ7x4EV5zC+20r626z6Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kf52LgliuAkOFFvPdTXgKSBdsaFpEnsJCWBcCiHYqqHA5bwDRiCK5XGGqFjTMDExgrMQbaZTc751hZEi3hYvVi/1sP97zdFAbZjp9JpxLHBtVETGsiIVrr5zQ4PRdYy20BBUdp8I682mudKrYOI1HH+KjqS287kdZtZPzntHgSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tycho.pizza; spf=pass smtp.mailfrom=tycho.pizza; dkim=pass (2048-bit key) header.d=tycho.pizza header.i=@tycho.pizza header.b=IMrQfajn; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MFeTNtxF; arc=none smtp.client-ip=103.168.172.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tycho.pizza
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tycho.pizza
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailflow.nyi.internal (Postfix) with ESMTP id 33B85200178;
+	Tue,  4 Jun 2024 18:13:39 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Tue, 04 Jun 2024 18:13:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tycho.pizza; h=
+	cc:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1717539219; x=1717546419; bh=muU5qJkRVr
+	c/WJXrwBT0sJpUEwClb+SER/+HMwaSXbE=; b=IMrQfajnu+GoDRKlk7ICyJN2RB
+	df07iUJTJhJdTdXsskFVN2YBYUA0ThPeeOJem8mlAf9L/GG0pOaXA/mfnqMtNioG
+	Qg3eRDQefaetISlfIU3LvnYBFS+0WfChDyq/P0xWTWF51tbK50H/wqxB/DhcA16S
+	ESVlf1iBwEBLJtPI18jyJFnVr5yiVI4at14G7PWsafABea8ghLtpKp3bfz8cO6/t
+	O0WKTNLW57ZU36nkLt573ORKn1AUo/KT70eGo6mN4Y2LxhgmjlaNFtA0ZP9f2HmQ
+	UxyyOOm10AqNUBs8MGdFCAnMfEjrdZfoimbLr5GfyIa537l6G6SLZuOKapuQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1717539219; x=1717546419; bh=muU5qJkRVrc/WJXrwBT0sJpUEwCl
+	b+SER/+HMwaSXbE=; b=MFeTNtxFI2QMwDPKwN42XQzf9AsNmhYWklo3WTFDkq+5
+	O30Ex0pMTHobmgDJZPvk60WZp0Y9jCn6VNa9vEgyiOSzlNHUpOQDbOogCzi4Uu7Z
+	LBpp7nP4M9ACiqmwIWUnhzCxldVtsnGoId+TKQAYhl3S+zgxq+Wuss+OlxQoEyI/
+	cLsXZYNpL/7MFJ6/vrwp+JsjJrekEHgVZ7hbSAwqRFbaVkDYbUkLvGIAYafIRftJ
+	B6BtvThMJSEW4ZgPFzrmcDcEl36/UVQkZt1E0yaIPJO9pbgwusQ/npmm4pG/wEml
+	ssfZc73DIRmqIheoviOdqsABd1gYrWz1kn1tRms8og==
+X-ME-Sender: <xms:kZFfZkdczehyMxOFzsQWStdbFQ9b_QnsP8-cO963kDUl_5iQHuMzgw>
+    <xme:kZFfZmMwwotOef-QBESG11xPxv4kufSeBLHUnWfVipehkWwj2HYKMY7_aOgKjhdIs
+    NN_0UmcxggN_kWCURw>
+X-ME-Received: <xmr:kZFfZljky2XQYlmljv4plW43mwdPMdcXj1oXDsqjBpnx6m9OzEkTlSIS-h8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrvdelhedgtdejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepvfihtghh
+    ohcutehnuggvrhhsvghnuceothihtghhohesthihtghhohdrphhiiiiirgeqnecuggftrf
+    grthhtvghrnhepueettdetgfejfeffheffffekjeeuveeifeduleegjedutdefffetkeel
+    hfelleetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epthihtghhohesthihtghhohdrphhiiiiirg
+X-ME-Proxy: <xmx:kZFfZp-1-pydffRIz4D7o3Ys2rwPeXZDWXsz6edwEcpxSH78j0sH6Q>
+    <xmx:kZFfZgvzw6K8AoUay1km6TqbozmkIXVzkTjfxixAkdESpiw0RZJedA>
+    <xmx:kZFfZgH61HKuJqAWVBTl4U4ScrOzd--4_lbpEocMhnidVq0jL_PTdA>
+    <xmx:kZFfZvPp1AaskAuObiWsuU2zH7F8XYzrqL_GdJ-gG1Ka5nk-u4xyHA>
+    <xmx:k5FfZhMRoPPM3AKMDF8th_eGWbzp_pkz6ZrW8V0ZEi_kEBCeYT6ZplaT>
+Feedback-ID: i21f147d5:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 4 Jun 2024 18:13:35 -0400 (EDT)
+Date: Tue, 4 Jun 2024 16:13:32 -0600
+From: Tycho Andersen <tycho@tycho.pizza>
+To: Simon Horman <horms@kernel.org>
+Cc: Kees Cook <kees@kernel.org>, Vlastimil Babka <vbabka@suse.cz>,
+	Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>,
+	David Rientjes <rientjes@google.com>,
+	Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+	jvoisin <julien.voisin@dustri.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Hyeonggon Yoo <42.hyeyoo@gmail.com>, linux-mm@kvack.org,
+	"GONG, Ruiqi" <gongruiqi@huaweicloud.com>,
+	Xiu Jianfeng <xiujianfeng@huawei.com>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Jann Horn <jannh@google.com>, Matteo Rizzo <matteorizzo@google.com>,
+	Thomas Graf <tgraf@suug.ch>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v4 4/6] mm/slab: Introduce kmem_buckets_create() and
+ family
+Message-ID: <Zl+RjJDOX45DH6gR@tycho.pizza>
+References: <20240531191304.it.853-kees@kernel.org>
+ <20240531191458.987345-4-kees@kernel.org>
+ <20240604150228.GS491852@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240604150228.GS491852@kernel.org>
 
-Use the ice_netdev_to_pf() helper in more places and remove a bunch of
-boilerplate code. Not every instance could be replaced due to use of the
-netdev_priv() output or the vsi variable within a bunch of functions.
+On Tue, Jun 04, 2024 at 04:02:28PM +0100, Simon Horman wrote:
+> On Fri, May 31, 2024 at 12:14:56PM -0700, Kees Cook wrote:
+> > +	for (idx = 0; idx < ARRAY_SIZE(kmalloc_caches[KMALLOC_NORMAL]); idx++) {
+> > +		char *short_size, *cache_name;
+> > +		unsigned int cache_useroffset, cache_usersize;
+> > +		unsigned int size;
+> > +
+> > +		if (!kmalloc_caches[KMALLOC_NORMAL][idx])
+> > +			continue;
+> > +
+> > +		size = kmalloc_caches[KMALLOC_NORMAL][idx]->object_size;
+> > +		if (!size)
+> > +			continue;
+> > +
+> > +		short_size = strchr(kmalloc_caches[KMALLOC_NORMAL][idx]->name, '-');
+> > +		if (WARN_ON(!short_size))
+> > +			goto fail;
+> > +
+> > +		cache_name = kasprintf(GFP_KERNEL, "%s-%s", name, short_size + 1);
+> > +		if (WARN_ON(!cache_name))
+> > +			goto fail;
+> > +
+> > +		if (useroffset >= size) {
+> > +			cache_useroffset = 0;
+> > +			cache_usersize = 0;
+> > +		} else {
+> > +			cache_useroffset = useroffset;
+> > +			cache_usersize = min(size - cache_useroffset, usersize);
+> > +		}
+> > +		(*b)[idx] = kmem_cache_create_usercopy(cache_name, size,
+> > +					align, flags, cache_useroffset,
+> > +					cache_usersize, ctor);
+> > +		kfree(cache_name);
+> > +		if (WARN_ON(!(*b)[idx]))
+> > +			goto fail;
+> > +	}
+> > +
+> > +	return b;
+> > +
+> > +fail:
+> > +	for (idx = 0; idx < ARRAY_SIZE(kmalloc_caches[KMALLOC_NORMAL]); idx++) {
+> > +		if ((*b)[idx])
+> > +			kmem_cache_destroy((*b)[idx]);
+> 
+> nit: I don't think it is necessary to guard this with a check for NULL.
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ethtool.c  | 42 ++++++-------------
- .../net/ethernet/intel/ice/ice_flex_pipe.c    |  8 +---
- drivers/net/ethernet/intel/ice/ice_lag.c      |  5 +--
- drivers/net/ethernet/intel/ice/ice_main.c     |  7 +---
- drivers/net/ethernet/intel/ice/ice_sriov.c    |  3 +-
- 5 files changed, 19 insertions(+), 46 deletions(-)
+Isn't it? What if a kasprintf() fails halfway through the loop?
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 97a7a0632a1d..2d307e7d9863 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -469,8 +469,7 @@ static int ice_get_regs_len(struct net_device __always_unused *netdev)
- static void
- ice_get_regs(struct net_device *netdev, struct ethtool_regs *regs, void *p)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	struct ice_hw *hw = &pf->hw;
- 	u32 *regs_buf = (u32 *)p;
- 	unsigned int i;
-@@ -483,8 +482,7 @@ ice_get_regs(struct net_device *netdev, struct ethtool_regs *regs, void *p)
- 
- static u32 ice_get_msglevel(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- #ifndef CONFIG_DYNAMIC_DEBUG
- 	if (pf->hw.debug_mask)
-@@ -497,8 +495,7 @@ static u32 ice_get_msglevel(struct net_device *netdev)
- 
- static void ice_set_msglevel(struct net_device *netdev, u32 data)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- #ifndef CONFIG_DYNAMIC_DEBUG
- 	if (ICE_DBG_USER & data)
-@@ -512,8 +509,7 @@ static void ice_set_msglevel(struct net_device *netdev, u32 data)
- 
- static int ice_get_eeprom_len(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- 	return (int)pf->hw.flash.flash_size;
- }
-@@ -522,9 +518,7 @@ static int
- ice_get_eeprom(struct net_device *netdev, struct ethtool_eeprom *eeprom,
- 	       u8 *bytes)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	struct ice_hw *hw = &pf->hw;
- 	struct device *dev;
- 	int ret;
-@@ -623,8 +617,7 @@ static u64 ice_link_test(struct net_device *netdev)
-  */
- static u64 ice_eeprom_test(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- 	netdev_info(netdev, "EEPROM test\n");
- 	return !!(ice_nvm_validate_checksum(&pf->hw));
-@@ -938,9 +931,8 @@ static int ice_lbtest_receive_frames(struct ice_rx_ring *rx_ring)
-  */
- static u64 ice_loopback_test(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *orig_vsi = np->vsi, *test_vsi;
--	struct ice_pf *pf = orig_vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
-+	struct ice_vsi *test_vsi;
- 	u8 *tx_frame __free(kfree) = NULL;
- 	u8 broadcast[ETH_ALEN], ret = 0;
- 	int num_frames, valid_frames;
-@@ -1029,8 +1021,7 @@ static u64 ice_loopback_test(struct net_device *netdev)
-  */
- static u64 ice_intr_test(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	u16 swic_old = pf->sw_int_count;
- 
- 	netdev_info(netdev, "interrupt test\n");
-@@ -1058,9 +1049,8 @@ static void
- ice_self_test(struct net_device *netdev, struct ethtool_test *eth_test,
- 	      u64 *data)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	bool if_running = netif_running(netdev);
--	struct ice_pf *pf = np->vsi->back;
- 	struct device *dev;
- 
- 	dev = ice_pf_to_dev(pf);
-@@ -1384,9 +1374,7 @@ static int ice_nway_reset(struct net_device *netdev)
-  */
- static u32 ice_get_priv_flags(struct net_device *netdev)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	u32 i, ret_flags = 0;
- 
- 	for (i = 0; i < ICE_PRIV_FLAG_ARRAY_SIZE; i++) {
-@@ -4128,9 +4116,7 @@ static int
- ice_get_module_info(struct net_device *netdev,
- 		    struct ethtool_modinfo *modinfo)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	struct ice_hw *hw = &pf->hw;
- 	u8 sff8472_comp = 0;
- 	u8 sff8472_swap = 0;
-@@ -4202,12 +4188,10 @@ static int
- ice_get_module_eeprom(struct net_device *netdev,
- 		      struct ethtool_eeprom *ee, u8 *data)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- #define SFF_READ_BLOCK_SIZE 8
- 	u8 value[SFF_READ_BLOCK_SIZE] = { 0 };
- 	u8 addr = ICE_I2C_EEPROM_DEV_ADDR;
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
- 	struct ice_hw *hw = &pf->hw;
- 	bool is_sfp = false;
- 	unsigned int i, j;
-diff --git a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-index 20d5db88c99f..4c322bed716c 100644
---- a/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-+++ b/drivers/net/ethernet/intel/ice/ice_flex_pipe.c
-@@ -574,9 +574,7 @@ ice_destroy_tunnel(struct ice_hw *hw, u16 index, enum ice_tunnel_type type,
- int ice_udp_tunnel_set_port(struct net_device *netdev, unsigned int table,
- 			    unsigned int idx, struct udp_tunnel_info *ti)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	enum ice_tunnel_type tnl_type;
- 	int status;
- 	u16 index;
-@@ -598,9 +596,7 @@ int ice_udp_tunnel_set_port(struct net_device *netdev, unsigned int table,
- int ice_udp_tunnel_unset_port(struct net_device *netdev, unsigned int table,
- 			      unsigned int idx, struct udp_tunnel_info *ti)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	enum ice_tunnel_type tnl_type;
- 	int status;
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
-index 1ccb572ce285..cdb0e59aeb26 100644
---- a/drivers/net/ethernet/intel/ice/ice_lag.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lag.c
-@@ -1640,11 +1640,8 @@ static void ice_lag_chk_disabled_bond(struct ice_lag *lag, void *ptr)
-  */
- static void ice_lag_disable_sriov_bond(struct ice_lag *lag)
- {
--	struct ice_netdev_priv *np;
--	struct ice_pf *pf;
-+	struct ice_pf *pf = ice_netdev_to_pf(lag->netdev);
- 
--	np = netdev_priv(lag->netdev);
--	pf = np->vsi->back;
- 	ice_clear_feature_support(pf, ICE_F_SRIOV_LAG);
- }
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 4db3a6056f41..9d852b169ead 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -7798,8 +7798,7 @@ static int ice_change_mtu(struct net_device *netdev, int new_mtu)
-  */
- static int ice_eth_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 
- 	switch (cmd) {
- 	case SIOCGHWTSTAMP:
-@@ -8027,9 +8026,7 @@ static int
- ice_bridge_getlink(struct sk_buff *skb, u32 pid, u32 seq,
- 		   struct net_device *dev, u32 filter_mask, int nlflags)
- {
--	struct ice_netdev_priv *np = netdev_priv(dev);
--	struct ice_vsi *vsi = np->vsi;
--	struct ice_pf *pf = vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(dev);
- 	u16 bmode;
- 
- 	bmode = pf->first_sw->bridge_mode;
-diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-index 067712f4923f..adcc2f967bab 100644
---- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-@@ -1317,8 +1317,7 @@ ice_vf_lan_overflow_event(struct ice_pf *pf, struct ice_rq_event_info *event)
-  */
- int ice_set_vf_spoofchk(struct net_device *netdev, int vf_id, bool ena)
- {
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
-+	struct ice_pf *pf = ice_netdev_to_pf(netdev);
- 	struct ice_vsi *vf_vsi;
- 	struct device *dev;
- 	struct ice_vf *vf;
--- 
-2.43.0
-
+Tycho
 
