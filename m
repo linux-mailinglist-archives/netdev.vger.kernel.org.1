@@ -1,106 +1,144 @@
-Return-Path: <netdev+bounces-100673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2B978FB8A2
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:16:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 955BB8FB8A6
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:16:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D8D9281798
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:16:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E707282CE7
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:16:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53ACB1487DC;
-	Tue,  4 Jun 2024 16:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C904147C98;
+	Tue,  4 Jun 2024 16:16:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hRse4xFr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F246677A1E;
-	Tue,  4 Jun 2024 16:16:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9399913D635;
+	Tue,  4 Jun 2024 16:16:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717517771; cv=none; b=rPiW8RhofNu2QWwaT/Jj3Qq63DZpBwE+BJfE/FPe8H0HVo4MvDs9xBSKAmiC99AyaRTcdm3HdkHZ1sbMn3suvdUbcvvBq9Est7kf5MQ8YDjsJrfx3Jrp4O2YXNt70UZXBEn9AkgknkXtKFeX/6fE8TKKR+lsqMJ7kMnnKxiC2b4=
+	t=1717517781; cv=none; b=kn5Pdw+XilYtcnAZ8dWzujIEIhI+4WQ4WKj7kGu+w/zx6bzyEUyqH3ciieQkE4D3NPMEIV28l6uiNb7fBgTrk4e19agsRjCJvIowu8nCfp6aWAIk7itZVK5zDIs+GhOQGM4gS2TzV+Pa0wrf/d9JZWPIDMJEh6rjXkaTzgGoWp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717517771; c=relaxed/simple;
-	bh=invKrC589zcraP5ug/OrIxlSdk1/hQC0D+eJC5VrpC4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VoXHt25y652mWabH5Z8RQAh4gjqdZ+EuNfdReAazOw5N4BANeB7BfILFsix3njv0qqfnjGhodcBiM9WoPlTRgEpvn1xprZjVFuWeQ+W496n1xAvjv2QSH//IjrqTqbsFbKxCg7lm07bxCu8AJdP1Cn2zf7C4lAx+/DcP32LJElk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DB26C2BBFC;
-	Tue,  4 Jun 2024 16:15:53 +0000 (UTC)
-Date: Tue, 4 Jun 2024 12:15:51 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Richard Henderson
- <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
- Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer
- <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>,
- Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Masami
- Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, Arnd Bergmann <arnd@arndb.de>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
- <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan
- <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, Christian
- =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>, Pavel Begunkov
- <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe
- <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand
- <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Subject: Re: [PATCH net-next v10 05/14] netdev: netdevice devmem allocator
-Message-ID: <20240604121551.07192993@gandalf.local.home>
-In-Reply-To: <bea8b8bf1630309bb004f614e4a3c7f684a6acb6.camel@redhat.com>
-References: <20240530201616.1316526-1-almasrymina@google.com>
-	<20240530201616.1316526-6-almasrymina@google.com>
-	<bea8b8bf1630309bb004f614e4a3c7f684a6acb6.camel@redhat.com>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1717517781; c=relaxed/simple;
+	bh=XYwRliGG6vqwmqRscOEguPLD97v+obXl0lmknTVhOmU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nCoxELoJZscVBwgiQt79YRiwcQvzVsCl0PGIlXRgWj13k17SrFjKwIfs75TGKHE1tx9t5gJqaUSq8k5JCGdgNSHBgA1Mx5lsI136GzuifH1UheuBE4Z7O3PIPkkXHHVssA/+xCTUsYz4HPNaEWgD5BivSqUvoR5291rFTEYczmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hRse4xFr; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717517780; x=1749053780;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=XYwRliGG6vqwmqRscOEguPLD97v+obXl0lmknTVhOmU=;
+  b=hRse4xFrx9hvlmVeY5JYqBRgh4uN+o1N7FjbAVqUhrFNtfp9BNxVdTdl
+   RQcDhRTW0XdzmvP4JnJVBaKEJCJETDrE/C3McC5b/aP+I0oB3J5y5XuhN
+   UY7cHsCr5UJckSAphbS6VIiljCDCZL9R4k4HAgm+j7Wgmhbs9Ypox6Vd1
+   KcA8LvtTs3VVP5schKjkKzfPDC39YlRUGPpsp4mvfpxQSqFj/5o111qEF
+   sFhqxW0mvJEzzSqVdrYoa6XQJh1JhFW4jDqW2eKZzMkYnKakh7vUXQYya
+   P7c/aWyM7PkxVqfXz0+nEHJNd+d5aP3JEH4o3wov/GzhLXF0+Qc5aGjtb
+   g==;
+X-CSE-ConnectionGUID: 6CNgZH53Qs2WUhPoyTLBGg==
+X-CSE-MsgGUID: b1/wSVvBQGuWWjuoQ5h7rQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11093"; a="13919490"
+X-IronPort-AV: E=Sophos;i="6.08,214,1712646000"; 
+   d="scan'208";a="13919490"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 09:16:03 -0700
+X-CSE-ConnectionGUID: 7fkVkoAPR1a+blKuqpTKQA==
+X-CSE-MsgGUID: YOlWfs+USnOPzP+FZEWsSA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,214,1712646000"; 
+   d="scan'208";a="42400135"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orviesa004.jf.intel.com with ESMTP; 04 Jun 2024 09:15:59 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+	id 1948A2DC; Tue, 04 Jun 2024 19:15:57 +0300 (EEST)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH net v1 1/1] net dsa: qca8k: fix usages of device_get_named_child_node()
+Date: Tue,  4 Jun 2024 19:15:51 +0300
+Message-ID: <20240604161551.2409910-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.43.0.rc1.1336.g36b5255a03ac
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 04 Jun 2024 12:13:15 +0200
-Paolo Abeni <pabeni@redhat.com> wrote:
+The documentation for device_get_named_child_node() mentions this
+important point:
 
-> On Thu, 2024-05-30 at 20:16 +0000, Mina Almasry wrote:
-> > diff --git a/net/core/devmem.c b/net/core/devmem.c
-> > index d82f92d7cf9ce..d5fac8edf621d 100644
-> > --- a/net/core/devmem.c
-> > +++ b/net/core/devmem.c
-> > @@ -32,6 +32,14 @@ static void net_devmem_dmabuf_free_chunk_owner(struct gen_pool *genpool,
-> >  	kfree(owner);
-> >  }
-> >  
-> > +static inline dma_addr_t net_devmem_get_dma_addr(const struct net_iov *niov)  
-> 
-> Minor nit: please no 'inline' keyword in c files.
+"
+The caller is responsible for calling fwnode_handle_put() on the
+returned fwnode pointer.
+"
 
-I'm curious. Is this a networking rule? I use 'inline' in my C code all the
-time.
+Add fwnode_handle_put() to avoid leaked references.
 
--- Steve
+Fixes: 1e264f9d2918 ("net: dsa: qca8k: add LEDs basic support")
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/net/dsa/qca/qca8k-leds.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/dsa/qca/qca8k-leds.c b/drivers/net/dsa/qca/qca8k-leds.c
+index 811ebeeff4ed..ef529615237c 100644
+--- a/drivers/net/dsa/qca/qca8k-leds.c
++++ b/drivers/net/dsa/qca/qca8k-leds.c
+@@ -431,8 +431,10 @@ qca8k_parse_port_leds(struct qca8k_priv *priv, struct fwnode_handle *port, int p
+ 		init_data.devicename = kasprintf(GFP_KERNEL, "%s:0%d",
+ 						 priv->internal_mdio_bus->id,
+ 						 port_num);
+-		if (!init_data.devicename)
++		if (!init_data.devicename) {
++			fwnode_handle_put(leds);
+ 			return -ENOMEM;
++		}
+ 
+ 		ret = devm_led_classdev_register_ext(priv->dev, &port_led->cdev, &init_data);
+ 		if (ret)
+@@ -441,6 +443,7 @@ qca8k_parse_port_leds(struct qca8k_priv *priv, struct fwnode_handle *port, int p
+ 		kfree(init_data.devicename);
+ 	}
+ 
++	fwnode_handle_put(leds);
+ 	return 0;
+ }
+ 
+@@ -471,9 +474,13 @@ qca8k_setup_led_ctrl(struct qca8k_priv *priv)
+ 		 * the correct port for LED setup.
+ 		 */
+ 		ret = qca8k_parse_port_leds(priv, port, qca8k_port_to_phy(port_num));
+-		if (ret)
++		if (ret) {
++			fwnode_handle_put(port);
++			fwnode_handle_put(ports);
+ 			return ret;
++		}
+ 	}
+ 
++	fwnode_handle_put(ports);
+ 	return 0;
+ }
+-- 
+2.43.0.rc1.1336.g36b5255a03ac
+
 
