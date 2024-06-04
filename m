@@ -1,152 +1,118 @@
-Return-Path: <netdev+bounces-100598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E7908FB4B1
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:02:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C1938FB48F
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:57:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9058B2C76A
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 13:55:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFB591C20B04
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 13:57:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE681EEDE;
-	Tue,  4 Jun 2024 13:55:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65113D535;
+	Tue,  4 Jun 2024 13:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="IuQ1sKB9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZujWr5sA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f97.google.com (mail-wm1-f97.google.com [209.85.128.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3DAB669
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 13:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7C1DDB1
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 13:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717509319; cv=none; b=e9X6LVzVrJiyfOKOUAfWABMDWfCNsJwyzbyNYc2xmZ/hjGus6MycYeck1qt9ucb0tIfmXOONLC+nWkoNfvileHJN7hF6FUxg0/SaUpdvF/+5Sh9PO3T2q2F8SlCD72WhX+6yvEhfLKToLjsRCuKoacKO1lrUxZXUbuFoXiqWRyI=
+	t=1717509440; cv=none; b=l1ZQI+ZFpoZ8opzQBDsH8ACSjGBQ5JSO4lgjP51cO8HCbUdMW2/7OYk3FKE9vwfjT8nQDUy14EG9gn+1N5om5k+cHs9keQWOTqxQMUUtWPHfuI1QgA7tRbXr65zL6bpBpFbK0Y8+49n++JbNdYKV7ZHt51hItAlcSsCDr+ietCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717509319; c=relaxed/simple;
-	bh=sAa/ah+q9kv4YCy0OEzRUmiSV5CcvlO31jUJbv1UE1Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DADXRsrEElmzB2XCDf7YmuPefGE/8Q0Sj8kSNLtCFZltMAL60H5ejAguNsplJk151BfzmvhOMSJ9kSqx10lVazlEifwz8jJsnaynMZrLhL+atEYS4DEvOzXNUlTNOgB4B7dMdW/SRd70owdStLOAFPnNKa/UE+G6DQk9tvOfPfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=IuQ1sKB9; arc=none smtp.client-ip=209.85.128.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f97.google.com with SMTP id 5b1f17b1804b1-421338c4c3bso10750255e9.1
-        for <netdev@vger.kernel.org>; Tue, 04 Jun 2024 06:55:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1717509315; x=1718114115; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lD37MB5E3bI35OFv85LJReokwMRhrH26k764mcname4=;
-        b=IuQ1sKB9g0Tfezd2suagZMbSIuJQAjB52q72OB1Cq/k3wLB9kzT+pvvYmOdfk2sfC/
-         LKW52HLoQ+ih9u8pHrOjq4I63uSQ6ZOyMb4bI+LUsaHY+WC6zEjx+m5h/ovmm6iTlhYN
-         /N5itHn/Jp6yv4Xawo2h7GAJUHkiXTaVX8q9oiLYFAbagguNYadP+laikEvoWwcmmY0D
-         sAZQUeTyRIXP7LGoS7kB4O0FfwZ8LPZb6JCquRzIf5eJHNM6rG+F73C+2eJoJ+aqZP29
-         jaGkxY5k75zrvEDK3WpFxZk67c+plMtYtf1z05C3MbBKJ5UwW9Ti+K519yg24p3N7bsz
-         WkXA==
+	s=arc-20240116; t=1717509440; c=relaxed/simple;
+	bh=1qm/BCR+Qvtszdvpn1sqEPdVPjX886CnUH7k4u5TrsU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mwrlR90ZXop7cQCICvgBQ5Y+JeP67hx8Qxp2SyxWElFmZksAXFhwN5n5w4z5V/vXLIuUnNrtUOJKoW7zMU1uPa9t5lrQdGKZNlBuoDd2PhOY/iptTOhDvTLnkSG5ZANlVjMEHuABchd5CRrgkBoAJhLBOwaUYu9v5Y2Z2Q5l6vM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZujWr5sA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717509437;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=1cXfg53P7dT43sIDCbaMdwSo7I7mqqKX6XBExl/w+u0=;
+	b=ZujWr5sASyFQPYNFZ1BlaJL6/uhSx27MtMp/B5oKqpHTRtvub+O4ciftk28n7M8ErjoiG4
+	Ctn6sNzjg0qCrbpzsEUTn+P5TqfCG8Czk2bTpO29CD9YyISGQREpjA2lfbqVVQpsnFO+oy
+	WjMIOGMAe8hozN9o6deqviSMjgzYwgY=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-195-R7Lw3hIMPy2ncmMvCL2lGQ-1; Tue, 04 Jun 2024 09:57:16 -0400
+X-MC-Unique: R7Lw3hIMPy2ncmMvCL2lGQ-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2eab2099bbfso3955641fa.2
+        for <netdev@vger.kernel.org>; Tue, 04 Jun 2024 06:57:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717509315; x=1718114115;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lD37MB5E3bI35OFv85LJReokwMRhrH26k764mcname4=;
-        b=pwTz/nQp5OD7rN5RmZu33Ezs2k3NDNnk+Y758lYFmiz7UyrqjJhUp4C1rpthoxh8+U
-         2JYF+OjCfD6csooAXp4a1tar2VMnyMySt7hXz1I98ERpzD/lK6/cYiTEX8j+eLD/9QeU
-         fty0XW4cVsfZwh6AEKugd4xSOigFbQFzRS5Mw0y5AZkRiLYTBMSUQsuU9jaRg5QgKabW
-         XFu1O7e/Ww9a4mZsWS5pNixWK5RNhj2n1t+Hb01KzYZ5PEL//jAtRjA45PBWzeDkslwx
-         neywLKAD8pfJAbPT4IOHXe+zbthN5ZIRc1Y48yAD9oL85yxKcWzMGYeb9HgvPsRaLPGZ
-         25ow==
-X-Gm-Message-State: AOJu0Yy0qdgqhMv/Nsg86fhmXTcIGZhzE+HKTIluPIlHTikqf/FOFYFy
-	VO+mc7qU5t/pNb7gEI68VGTkWTU5wcdyi6jKgLVKTOdkpS+AIm3p3Rc7swxdX+ztuAeboiSLZi0
-	BNSXDVWalGdijZQB5skGgm6andzZh6MBl
-X-Google-Smtp-Source: AGHT+IHqE4IhljPE6P4ZIoi8g64yvlzeLgaKvqnJE/JgQARKzxd74jD1hdzKcvUbvFmn1ZoVww6Rucxscpku
-X-Received: by 2002:a05:600c:1550:b0:420:e4b:d9df with SMTP id 5b1f17b1804b1-4212e049f7bmr117882855e9.13.1717509315322;
-        Tue, 04 Jun 2024 06:55:15 -0700 (PDT)
-Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id ffacd0b85a97d-35dd052d64asm510177f8f.90.2024.06.04.06.55.15;
-        Tue, 04 Jun 2024 06:55:15 -0700 (PDT)
-X-Relaying-Domain: 6wind.com
-Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
-	by smtpservice.6wind.com (Postfix) with ESMTPS id 0BB68602B0;
-	Tue,  4 Jun 2024 15:55:15 +0200 (CEST)
-Received: from dichtel by bretzel with local (Exim 4.94.2)
-	(envelope-from <nicolas.dichtel@6wind.com>)
-	id 1sEUd8-00AxpK-No; Tue, 04 Jun 2024 15:55:14 +0200
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-To: Florian Westphal <fw@strlen.de>,
-	Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	stable@vger.kernel.org
-Subject: [PATCH nf] netfilter: restore default behavior for nf_conntrack_events
-Date: Tue,  4 Jun 2024 15:54:38 +0200
-Message-ID: <20240604135438.2613064-1-nicolas.dichtel@6wind.com>
-X-Mailer: git-send-email 2.43.1
+        d=1e100.net; s=20230601; t=1717509435; x=1718114235;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1cXfg53P7dT43sIDCbaMdwSo7I7mqqKX6XBExl/w+u0=;
+        b=L60koJoBE6vB7fmNCLnOif8GiIy9JPtHOOQ+T0BhX6VQZUAEDtHne5FIcrsZit0GUs
+         tMB905JGy3em1GD7obNRzmlo/Ck+06OUjdiPEV5St2ZrlKtPrhnIJb6dHAj9JMk8u4HJ
+         /7U7NgKPbwLQQb6pvvQ7ebfvS58/wZjmzN/Bm/iuE7A38qeiCOQ4WT9Q44cMv1avDvQU
+         3JgLpJBLe6vTLxeVBGiKssTnRRad69VJGJAOIucFp8yRyXNOYrmzjU7qEBouPsnG810M
+         xmy0HiIW2MqwLH5zX9B4Y8aCAZFPenhW3FvH3xflJkcFysmr7NhzNqUd5rvu9VQIg1oY
+         YJ8w==
+X-Forwarded-Encrypted: i=1; AJvYcCUaW1cwx8jLRFUP3Ta4xDdcSBfFkHFPdi8vbgEqcGk3nBdw/wQ+DDNiA8EupAhzPi33LTPUW0vmqa4gLEv25QbPukzc7rjv
+X-Gm-Message-State: AOJu0YwPkNpC+bLSVbxS954FRUd3qzfKNqfRhdMt4xWVxRbXxlfQHKIM
+	YAHemYhFeUOpyhHsda/XXWhVT+F4x98nhXJELiuijvIxJR/jPJAmsx2Mx9IBD3Sht+xpl5dIAUg
+	d6dHuo+fIv2yTdXfQ2XXgCK7aGBsXGiHsg8c7ZAvA5vYdJkAmQMfiYA==
+X-Received: by 2002:a2e:b8cb:0:b0:2ea:7e4a:d85b with SMTP id 38308e7fff4ca-2eabc194109mr17440461fa.5.1717509435103;
+        Tue, 04 Jun 2024 06:57:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE0jDCWxTQSdU4lSLEJNaReVTjxMLSSnfOFA4yPcavW0+bqlAauS8d51/RC+sINs8HkdJY+HA==
+X-Received: by 2002:a2e:b8cb:0:b0:2ea:7e4a:d85b with SMTP id 38308e7fff4ca-2eabc194109mr17440181fa.5.1717509434696;
+        Tue, 04 Jun 2024 06:57:14 -0700 (PDT)
+Received: from gerbillo.redhat.com ([2a0d:3344:1b74:3a10::f71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4214a4add5asm11759995e9.0.2024.06.04.06.57.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jun 2024 06:57:14 -0700 (PDT)
+Message-ID: <179c9ada55ae686f8142f3fc78dacece2db4f407.camel@redhat.com>
+Subject: Re: [PATCH net-next] net: bridge: fix an inconsistent indentation
+From: Paolo Abeni <pabeni@redhat.com>
+To: Chen Hanxiao <chenhx.fnst@fujitsu.com>, Roopa Prabhu <roopa@nvidia.com>,
+  Nikolay Aleksandrov <razor@blackwall.org>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>
+Cc: bridge@lists.linux.dev, netdev@vger.kernel.org
+Date: Tue, 04 Jun 2024 15:57:12 +0200
+In-Reply-To: <20240531085402.1838-1-chenhx.fnst@fujitsu.com>
+References: <20240531085402.1838-1-chenhx.fnst@fujitsu.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Since the below commit, there are regressions for legacy setups:
-1/ conntracks are created while there are no listener
-2/ a listener starts and dumps all conntracks to get the current state
-3/ conntracks deleted before the listener has started are not advertised
+On Fri, 2024-05-31 at 16:54 +0800, Chen Hanxiao wrote:
+> Smatch complains:
+> net/bridge/br_netlink_tunnel.c:
+>    318 br_process_vlan_tunnel_info() warn: inconsistent indenting
+>=20
+> Fix it with a proper indenting
+>=20
+> Signed-off-by: Chen Hanxiao <chenhx.fnst@fujitsu.com>
 
-This is problematic in containers, where conntracks could be created early.
-This sysctl is part of unsafe sysctl and could not be changed easily in
-some environments.
+My take is that purely format changes should be part of
+larger/features-based change, to avoid any later stable fix harder for
+no real reason.
 
-Let's switch back to the legacy behavior.
+Thanks,
 
-CC: stable@vger.kernel.org
-Fixes: 90d1daa45849 ("netfilter: conntrack: add nf_conntrack_events autodetect mode")
-Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
----
- Documentation/networking/nf_conntrack-sysctl.rst | 10 ++++++----
- net/netfilter/nf_conntrack_ecache.c              |  2 +-
- 2 files changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/Documentation/networking/nf_conntrack-sysctl.rst b/Documentation/networking/nf_conntrack-sysctl.rst
-index c383a394c665..edc04f99e1aa 100644
---- a/Documentation/networking/nf_conntrack-sysctl.rst
-+++ b/Documentation/networking/nf_conntrack-sysctl.rst
-@@ -34,13 +34,15 @@ nf_conntrack_count - INTEGER (read-only)
- 
- nf_conntrack_events - BOOLEAN
- 	- 0 - disabled
--	- 1 - enabled
--	- 2 - auto (default)
-+	- 1 - enabled (default)
-+	- 2 - auto
- 
- 	If this option is enabled, the connection tracking code will
- 	provide userspace with connection tracking events via ctnetlink.
--	The default allocates the extension if a userspace program is
--	listening to ctnetlink events.
-+	The 'auto' allocates the extension if a userspace program is
-+	listening to ctnetlink events. Note that conntracks created
-+	before the first listener has started won't trigger any netlink
-+	event.
- 
- nf_conntrack_expect_max - INTEGER
- 	Maximum size of expectation table.  Default value is
-diff --git a/net/netfilter/nf_conntrack_ecache.c b/net/netfilter/nf_conntrack_ecache.c
-index 69948e1d6974..4c8559529e18 100644
---- a/net/netfilter/nf_conntrack_ecache.c
-+++ b/net/netfilter/nf_conntrack_ecache.c
-@@ -334,7 +334,7 @@ bool nf_ct_ecache_ext_add(struct nf_conn *ct, u16 ctmask, u16 expmask, gfp_t gfp
- }
- EXPORT_SYMBOL_GPL(nf_ct_ecache_ext_add);
- 
--#define NF_CT_EVENTS_DEFAULT 2
-+#define NF_CT_EVENTS_DEFAULT 1
- static int nf_ct_events __read_mostly = NF_CT_EVENTS_DEFAULT;
- 
- void nf_conntrack_ecache_pernet_init(struct net *net)
--- 
-2.43.1
+Paolo
 
 
