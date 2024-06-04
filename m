@@ -1,201 +1,156 @@
-Return-Path: <netdev+bounces-100709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD8378FBA4B
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 19:27:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C375F8FB982
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 937E02871FC
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 17:27:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 779791F26FCB
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DB16149DE1;
-	Tue,  4 Jun 2024 17:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="C4ugqekL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18766148836;
+	Tue,  4 Jun 2024 16:50:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD32E1494D0;
-	Tue,  4 Jun 2024 17:27:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27334171BA;
+	Tue,  4 Jun 2024 16:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717522031; cv=none; b=sRpQgDuGDXffDeQP3JbsIE2+Vr2ci7uon4a3wTr8G0BRhysB9hkDKlcmmXFWo2NktSld9eRMCjBeVaatlepuzjA24VQ3YMVxjktOYnQaY9C2LZLcXhST8RFNGDU7cjXghFbO3UkHqsbekIECfNe9ESdrNmUHdbHwTRAAY3A/umg=
+	t=1717519833; cv=none; b=Fh03J4siX2asQ1o4wDjJV/GAKIeiVolhH+BWh4JisuAIp9BkXKG1/CYf3CLoWa8J/HETD0oAA+TSw/ahmtRBdeZvdCAw6zIVY2NJuStKxFMZ+xt/jExHFm6j0S+nQMM5C8h0wGc0dOvNL3+yxz1BGvXS9+ylYcnRIkJswMoY9Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717522031; c=relaxed/simple;
-	bh=Fw+R07Uhx4jBtZPSjYVknFQtrMkWMAZeU8GC561sY68=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fbpx5YBrU1xBjj+ICqVuTmmlNXiz0haznoVBma3f+d0IVqNUE42JvVmKTatDt0ndWT1X977Xq9/i81XuZrR4c4l+Z+0Sq+joYVZD+FunadK+uhwT/7JWS1C/feSzOu91sSNb+c87jDxRp0h2vyU4Fh1pVY4hygICDPXXderuVfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=C4ugqekL; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 92E1D8850A;
-	Tue,  4 Jun 2024 19:27:06 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1717522028;
-	bh=4f1pYqXRizqyxIM/L7FfRjUNFGAWVe3AOXcygF3r6BE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=C4ugqekL9DcBNfDMt7BMGmAnOJSHo8y5Sf9xjnQU5JxMTAc/w4Bg7RHuEwHQn4j7/
-	 tNNw3i8rS/9BpqfHrY8i1pt+HsfimWrhDbil1RYTwBuSAEVVj4MgWN1TlVXwX6sv0j
-	 AyW6bBuVAidz+I4xRsH7UjBuaXls9j3KoEaFq6tquqRzun9MLYOWDtfRH/7CV8QeBX
-	 GUi3vTWXAiTcpksuFnTMo0yC+Eo408n3eeTcB1BRazMJO9/TT55LLbMwIpiLuIxYcu
-	 o8C/G+xu+beETeQJHeLB9K6ld43u9V4cMENN7W7xIfw+JJ5fk0irtUsElPECL/YZ99
-	 7MzmQLpYiMHfA==
-Message-ID: <e8e69a34-b9b2-4b4c-9b2e-079c7a23b756@denx.de>
-Date: Tue, 4 Jun 2024 18:49:54 +0200
+	s=arc-20240116; t=1717519833; c=relaxed/simple;
+	bh=scGzEw8LUM23Rsoia9NpRlqNk4ZC/Hx5Vl1Dtn0KH6k=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CJ9aneLuRimWEDhL+7KzY+mUyVlyN9t/YHMu7Q1wP0WaoXdseWMo6AEHygrcsXdfTjjE/1KFFnc6lYWf8tZasAM1MiFsb8h4dC4ijMpecvTtZtK8/bjTCFEqEckwhNrjrN4Ey/+z8kEXcXFfkXPpDsp1L1W9+oc0b84n8tMfJ7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VtxQ34B16z6K8xj;
+	Wed,  5 Jun 2024 00:49:15 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5489A1400D4;
+	Wed,  5 Jun 2024 00:50:25 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 4 Jun
+ 2024 17:50:24 +0100
+Date: Tue, 4 Jun 2024 17:50:23 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Leon Romanovsky <leon@kernel.org>
+CC: Zhu Yanjun <zyjzyj2000@gmail.com>, Jason Gunthorpe <jgg@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan
+	<tariqt@nvidia.com>, Andy Gospodarek <andrew.gospodarek@broadcom.com>, "Aron
+ Silverton" <aron.silverton@oracle.com>, Dan Williams
+	<dan.j.williams@intel.com>, David Ahern <dsahern@kernel.org>, "Christoph
+ Hellwig" <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>, Leonid Bloch
+	<lbloch@nvidia.com>, <linux-cxl@vger.kernel.org>, <patches@lists.linux.dev>
+Subject: Re: [PATCH 2/8] fwctl: Basic ioctl dispatch for the character
+ device
+Message-ID: <20240604175023.000004e2@Huawei.com>
+In-Reply-To: <20240604122221.GR3884@unreal>
+References: <2-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+	<6cfe00ce-1860-4aba-bcb8-54f8d365d2dc@linux.dev>
+	<20240604122221.GR3884@unreal>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 08/11] ARM: dts: stm32: add ethernet1 and ethernet2
- support on stm32mp13
-To: Christophe Roullier <christophe.roullier@foss.st.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Richard Cochran <richardcochran@gmail.com>, Jose Abreu
- <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20240604143502.154463-1-christophe.roullier@foss.st.com>
- <20240604143502.154463-9-christophe.roullier@foss.st.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <20240604143502.154463-9-christophe.roullier@foss.st.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On 6/4/24 4:34 PM, Christophe Roullier wrote:
-> Both instances ethernet based on GMAC SNPS IP on stm32mp13.
-> GMAC IP version is SNPS 4.20.
+On Tue, 4 Jun 2024 15:22:21 +0300
+Leon Romanovsky <leon@kernel.org> wrote:
+
+> On Tue, Jun 04, 2024 at 02:16:12PM +0200, Zhu Yanjun wrote:
+> > On 03.06.24 17:53, Jason Gunthorpe wrote:  
+> > > Each file descriptor gets a chunk of per-FD driver specific context that
+> > > allows the driver to attach a device specific struct to. The core code
+> > > takes care of the memory lifetime for this structure.
+> > > 
+> > > The ioctl dispatch and design is based on what was built for iommufd. The
+> > > ioctls have a struct which has a combined in/out behavior with a typical
+> > > 'zero pad' scheme for future extension and backwards compatibility.
+> > > 
+> > > Like iommufd some shared logic does most of the ioctl marshalling and
+> > > compatibility work and tables diatches to some function pointers for
+> > > each unique iotcl.
+> > > 
+> > > This approach has proven to work quite well in the iommufd and rdma
+> > > subsystems.
+> > > 
+> > > Allocate an ioctl number space for the subsystem.
+> > > 
+> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > > ---
+> > >   .../userspace-api/ioctl/ioctl-number.rst      |   1 +
+> > >   MAINTAINERS                                   |   1 +
+> > >   drivers/fwctl/main.c                          | 124 +++++++++++++++++-
+> > >   include/linux/fwctl.h                         |  31 +++++
+> > >   include/uapi/fwctl/fwctl.h                    |  41 ++++++
+> > >   5 files changed, 196 insertions(+), 2 deletions(-)
+> > >   create mode 100644 include/uapi/fwctl/fwctl.h  
 > 
-> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
-> ---
->   arch/arm/boot/dts/st/stm32mp131.dtsi | 38 ++++++++++++++++++++++++++++
->   arch/arm/boot/dts/st/stm32mp133.dtsi | 31 +++++++++++++++++++++++
->   2 files changed, 69 insertions(+)
+> <...>
 > 
-> diff --git a/arch/arm/boot/dts/st/stm32mp131.dtsi b/arch/arm/boot/dts/st/stm32mp131.dtsi
-> index 6704ceef284d3..9d05853ececf7 100644
-> --- a/arch/arm/boot/dts/st/stm32mp131.dtsi
-> +++ b/arch/arm/boot/dts/st/stm32mp131.dtsi
-> @@ -979,6 +979,12 @@ ts_cal1: calib@5c {
->   			ts_cal2: calib@5e {
->   				reg = <0x5e 0x2>;
->   			};
-> +			ethernet_mac1_address: mac1@e4 {
-> +				reg = <0xe4 0x6>;
-> +			};
-> +			ethernet_mac2_address: mac2@ea {
-> +				reg = <0xea 0x6>;
-> +			};
->   		};
->   
->   		etzpc: bus@5c007000 {
-> @@ -1505,6 +1511,38 @@ sdmmc2: mmc@58007000 {
->   				status = "disabled";
->   			};
->   
-> +			ethernet1: ethernet@5800a000 {
-> +				compatible = "st,stm32mp13-dwmac", "snps,dwmac-4.20a";
-> +				reg = <0x5800a000 0x2000>;
-> +				reg-names = "stmmaceth";
-> +				interrupts-extended = <&intc GIC_SPI 62 IRQ_TYPE_LEVEL_HIGH>,
-> +						      <&exti 68 1>;
-> +				interrupt-names = "macirq", "eth_wake_irq";
-> +				clock-names = "stmmaceth",
-> +					      "mac-clk-tx",
-> +					      "mac-clk-rx",
-> +					      "ethstp",
-> +					      "eth-ck";
-> +				clocks = <&rcc ETH1MAC>,
-> +					 <&rcc ETH1TX>,
-> +					 <&rcc ETH1RX>,
-> +					 <&rcc ETH1STP>,
-> +					 <&rcc ETH1CK_K>;
-> +				st,syscon = <&syscfg 0x4 0xff0000>;
-> +				snps,mixed-burst;
-> +				snps,pbl = <2>;
-> +				snps,axi-config = <&stmmac_axi_config_1>;
-> +				snps,tso;
-> +				access-controllers = <&etzpc 48>;
+> > >   static int fwctl_fops_open(struct inode *inode, struct file *filp)
+> > >   {
+> > >   	struct fwctl_device *fwctl =
+> > >   		container_of(inode->i_cdev, struct fwctl_device, cdev);
+> > > +	struct fwctl_uctx *uctx __free(kfree) = NULL;
+> > > +	int ret;
+> > > +
+> > > +	guard(rwsem_read)(&fwctl->registration_lock);
+> > > +	if (!fwctl->ops)
+> > > +		return -ENODEV;
+> > > +
+> > > +	uctx = kzalloc(fwctl->ops->uctx_size, GFP_KERNEL |  GFP_KERNEL_ACCOUNT);
+> > > +	if (!uctx)
+> > > +		return -ENOMEM;
+> > > +
+> > > +	uctx->fwctl = fwctl;
+> > > +	ret = fwctl->ops->open_uctx(uctx);
+> > > +	if (ret)
+> > > +		return ret;  
+> > 
+> > When something is wrong, uctx is freed in "fwctl->ops->open_uctx(uctx);"?
+> > 
+> > If not, the allocated memory uctx leaks here.  
+> 
+> See how uctx is declared:
+> struct fwctl_uctx *uctx __free(kfree) = NULL;
+> 
+> It will be released automatically.
+> See include/linux/cleanup.h for more details.
 
-Please keep the list of properties sorted.
+I'm lazy so not finding the discussion now, but Linus has been pretty clear
+that he doesn't like this pattern because of possibility of additional cleanup
+magic getting introduced and then the cleanup happening in an order that
+causes problems. 
 
-> +				status = "disabled";
-> +
-> +				stmmac_axi_config_1: stmmac-axi-config {
-> +					snps,wr_osr_lmt = <0x7>;
-> +					snps,rd_osr_lmt = <0x7>;
-> +					snps,blen = <0 0 0 0 16 8 4>;
+Preferred option is drag the declaration to where is initialized so break
+with our tradition of declarations all at the top
 
-Sort here too.
+struct fwctl_uctx *uctx __free(kfree) =
+	kzalloc(...);
+etc
 
-> +				};
-> +			};
-> +
->   			usbphyc: usbphyc@5a006000 {
->   				#address-cells = <1>;
->   				#size-cells = <0>;
-> diff --git a/arch/arm/boot/dts/st/stm32mp133.dtsi b/arch/arm/boot/dts/st/stm32mp133.dtsi
-> index 3e394c8e58b92..09c7da1a2eda8 100644
-> --- a/arch/arm/boot/dts/st/stm32mp133.dtsi
-> +++ b/arch/arm/boot/dts/st/stm32mp133.dtsi
-> @@ -67,5 +67,36 @@ channel@18 {
->   				label = "vrefint";
->   			};
->   		};
-> +
-> +		ethernet2: ethernet@5800e000 {
-> +			compatible = "st,stm32mp13-dwmac", "snps,dwmac-4.20a";
-> +			reg = <0x5800e000 0x2000>;
-> +			reg-names = "stmmaceth";
-> +			interrupts-extended = <&intc GIC_SPI 97 IRQ_TYPE_LEVEL_HIGH>;
-> +			interrupt-names = "macirq";
-> +			clock-names = "stmmaceth",
-> +				      "mac-clk-tx",
-> +				      "mac-clk-rx",
-> +				      "ethstp",
-> +				      "eth-ck";
-> +			clocks = <&rcc ETH2MAC>,
-> +				 <&rcc ETH2TX>,
-> +				 <&rcc ETH2RX>,
-> +				 <&rcc ETH2STP>,
-> +				 <&rcc ETH2CK_K>;
-> +			st,syscon = <&syscfg 0x4 0xff000000>;
-> +			snps,mixed-burst;
-> +			snps,pbl = <2>;
-> +			snps,axi-config = <&stmmac_axi_config_2>;
-> +			snps,tso;
-> +			access-controllers = <&etzpc 49>;
 
-Sort here too.
+> 
+> Thanks
+> 
 
-> +			status = "disabled";
-> +
-> +			stmmac_axi_config_2: stmmac-axi-config {
-> +				snps,wr_osr_lmt = <0x7>;
-> +				snps,rd_osr_lmt = <0x7>;
-> +				snps,blen = <0 0 0 0 16 8 4>;
-
-Sort here too.
-
-[...]
 
