@@ -1,156 +1,163 @@
-Return-Path: <netdev+bounces-100686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C375F8FB982
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:50:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 566388FB988
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:52:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 779791F26FCB
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:50:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F2F91C21508
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18766148836;
-	Tue,  4 Jun 2024 16:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4340814883B;
+	Tue,  4 Jun 2024 16:51:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SKdfkJG0"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27334171BA;
-	Tue,  4 Jun 2024 16:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AB9149009
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 16:51:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717519833; cv=none; b=Fh03J4siX2asQ1o4wDjJV/GAKIeiVolhH+BWh4JisuAIp9BkXKG1/CYf3CLoWa8J/HETD0oAA+TSw/ahmtRBdeZvdCAw6zIVY2NJuStKxFMZ+xt/jExHFm6j0S+nQMM5C8h0wGc0dOvNL3+yxz1BGvXS9+ylYcnRIkJswMoY9Bw=
+	t=1717519915; cv=none; b=YcmmxrlNd1qtWYDYV6JTLLaQcFN8MLgGmVUxevdF3O8H5Wfjwm3jxZRUeRm03SiOy3cwZY4qH7zcxvgkaLnNqDlqpiwnu2Y99rO6iHiOWGbVrH2Jei4IDs53NlZ01ngG+9MJq+U71In0ncuNCCcTE+/AO29JUuDOpwHRJvwojtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717519833; c=relaxed/simple;
-	bh=scGzEw8LUM23Rsoia9NpRlqNk4ZC/Hx5Vl1Dtn0KH6k=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CJ9aneLuRimWEDhL+7KzY+mUyVlyN9t/YHMu7Q1wP0WaoXdseWMo6AEHygrcsXdfTjjE/1KFFnc6lYWf8tZasAM1MiFsb8h4dC4ijMpecvTtZtK8/bjTCFEqEckwhNrjrN4Ey/+z8kEXcXFfkXPpDsp1L1W9+oc0b84n8tMfJ7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VtxQ34B16z6K8xj;
-	Wed,  5 Jun 2024 00:49:15 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5489A1400D4;
-	Wed,  5 Jun 2024 00:50:25 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 4 Jun
- 2024 17:50:24 +0100
-Date: Tue, 4 Jun 2024 17:50:23 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Zhu Yanjun <zyjzyj2000@gmail.com>, Jason Gunthorpe <jgg@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>, "Jakub
- Kicinski" <kuba@kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan
-	<tariqt@nvidia.com>, Andy Gospodarek <andrew.gospodarek@broadcom.com>, "Aron
- Silverton" <aron.silverton@oracle.com>, Dan Williams
-	<dan.j.williams@intel.com>, David Ahern <dsahern@kernel.org>, "Christoph
- Hellwig" <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>, Leonid Bloch
-	<lbloch@nvidia.com>, <linux-cxl@vger.kernel.org>, <patches@lists.linux.dev>
-Subject: Re: [PATCH 2/8] fwctl: Basic ioctl dispatch for the character
- device
-Message-ID: <20240604175023.000004e2@Huawei.com>
-In-Reply-To: <20240604122221.GR3884@unreal>
-References: <2-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
-	<6cfe00ce-1860-4aba-bcb8-54f8d365d2dc@linux.dev>
-	<20240604122221.GR3884@unreal>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1717519915; c=relaxed/simple;
+	bh=SkTIiVAjvg4PPoe1ns9ndbfJeJuVPlELgie1jOTkmr4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gIobVALHaFRFhusNDdWu/b+89QDhk/JKRj6W+yI8rBND7fZw7g1vxKrfagQQlrMnFtHL0CkUu83EnsBRER4O23fHp0Q2d35GUur45fzTvhEM/qIQOxdELaeaGqu2c2mjJTiqaikO26TkrFDyILUlbxQzV6PeHit6hmEvgDvbU54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SKdfkJG0; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dfab38b7f6bso2383613276.0
+        for <netdev@vger.kernel.org>; Tue, 04 Jun 2024 09:51:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717519912; x=1718124712; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HAW5uMfok/6u/dUItmKRpn6Vj98nQYeSb+rNIdyrzQQ=;
+        b=SKdfkJG08tx7nNcTU8R+wL3iH9oYqfgGJNgyx2K90yx8MH23Oy+/8QGAME7A3aKaUl
+         ZKa+dN3Ep2hOVwarrFVlvv6WWtaARPXRUj5DrljXEv7UFOUpMLC2c38WG2Jzm9wwu3+0
+         +IGC0bjNIho8CfJAeI1HljxjWV9yjLi6paTUcPKj/Yxj7kcjkVG/Dc2/jEaG9ZEgdqRa
+         0IkkH1QXA2cS7G9oZ+gVktKb2xy1gcXItd/cvdfYeBoixuJe6NLbqfuYJNjNnSbJHK6k
+         SVQVcM8Put2x/EX+IQdO8TuJcCArnM3x5261fCUSPF9gava0iPPvDH2Z4MU3SS2e6fub
+         2vgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717519912; x=1718124712;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HAW5uMfok/6u/dUItmKRpn6Vj98nQYeSb+rNIdyrzQQ=;
+        b=ECgYTcGgq8tFEwv8i/DaBUGI6cn2b9aVYKCju1l7OzIG2TkyCFmkxY/glqISy/TgGt
+         say7qOurL/FMs3hOsVBicFOPaJtR+LchgfH4XiREqzNQzUcki7/n/gWn5xr5UUfSNZA+
+         1KgPV9/NVDD52hucoO8Bpn0NW/AJF+r9ok5icce70YHEAthX6HXLm0YwBn+SEReogzIZ
+         nWngSCxo57sM419+UbqE1aor/uqntzBaLit9Y0hpBKEOSp0opBD7WM3+PsexkS9W5aTQ
+         NsCNtkcEmcC03enO9QG7q/10hIslJWyhJ8508LMTpMU59Wj1rUNNWfC83kYcmz3Fk1PO
+         0Qlw==
+X-Gm-Message-State: AOJu0YxBM8zfbjF6RQPk3UdM1iq+th8g69IQO048/72UWw/Va8UEVDSa
+	/1baCeW5UHzCAft7rHPnWskdCL4yOgdNDShijIo2jHOPV42BH5WbWYyd7870HovG1sxlFN9W050
+	jPH9XQ9iAMA==
+X-Google-Smtp-Source: AGHT+IEpSVe8OLzuCQbUAV5V+HUMQDvyX1UvQSM4t31xJAzvW5wZcWDiC9+RMDWRetmVNV63hOMUeIA0P+NXXQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:20c4:b0:df7:6206:4bd6 with SMTP
+ id 3f1490d57ef6-dfa73bbc864mr3417275276.2.1717519912675; Tue, 04 Jun 2024
+ 09:51:52 -0700 (PDT)
+Date: Tue,  4 Jun 2024 16:51:50 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
+Message-ID: <20240604165150.726382-1-edumazet@google.com>
+Subject: [PATCH net-next] inet: remove (struct uncached_list)->quarantine
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 4 Jun 2024 15:22:21 +0300
-Leon Romanovsky <leon@kernel.org> wrote:
+This list is used to tranfert dst that are handled by
+rt_flush_dev() and rt6_uncached_list_flush_dev() out
+of the per-cpu lists.
 
-> On Tue, Jun 04, 2024 at 02:16:12PM +0200, Zhu Yanjun wrote:
-> > On 03.06.24 17:53, Jason Gunthorpe wrote:  
-> > > Each file descriptor gets a chunk of per-FD driver specific context that
-> > > allows the driver to attach a device specific struct to. The core code
-> > > takes care of the memory lifetime for this structure.
-> > > 
-> > > The ioctl dispatch and design is based on what was built for iommufd. The
-> > > ioctls have a struct which has a combined in/out behavior with a typical
-> > > 'zero pad' scheme for future extension and backwards compatibility.
-> > > 
-> > > Like iommufd some shared logic does most of the ioctl marshalling and
-> > > compatibility work and tables diatches to some function pointers for
-> > > each unique iotcl.
-> > > 
-> > > This approach has proven to work quite well in the iommufd and rdma
-> > > subsystems.
-> > > 
-> > > Allocate an ioctl number space for the subsystem.
-> > > 
-> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > > ---
-> > >   .../userspace-api/ioctl/ioctl-number.rst      |   1 +
-> > >   MAINTAINERS                                   |   1 +
-> > >   drivers/fwctl/main.c                          | 124 +++++++++++++++++-
-> > >   include/linux/fwctl.h                         |  31 +++++
-> > >   include/uapi/fwctl/fwctl.h                    |  41 ++++++
-> > >   5 files changed, 196 insertions(+), 2 deletions(-)
-> > >   create mode 100644 include/uapi/fwctl/fwctl.h  
-> 
-> <...>
-> 
-> > >   static int fwctl_fops_open(struct inode *inode, struct file *filp)
-> > >   {
-> > >   	struct fwctl_device *fwctl =
-> > >   		container_of(inode->i_cdev, struct fwctl_device, cdev);
-> > > +	struct fwctl_uctx *uctx __free(kfree) = NULL;
-> > > +	int ret;
-> > > +
-> > > +	guard(rwsem_read)(&fwctl->registration_lock);
-> > > +	if (!fwctl->ops)
-> > > +		return -ENODEV;
-> > > +
-> > > +	uctx = kzalloc(fwctl->ops->uctx_size, GFP_KERNEL |  GFP_KERNEL_ACCOUNT);
-> > > +	if (!uctx)
-> > > +		return -ENOMEM;
-> > > +
-> > > +	uctx->fwctl = fwctl;
-> > > +	ret = fwctl->ops->open_uctx(uctx);
-> > > +	if (ret)
-> > > +		return ret;  
-> > 
-> > When something is wrong, uctx is freed in "fwctl->ops->open_uctx(uctx);"?
-> > 
-> > If not, the allocated memory uctx leaks here.  
-> 
-> See how uctx is declared:
-> struct fwctl_uctx *uctx __free(kfree) = NULL;
-> 
-> It will be released automatically.
-> See include/linux/cleanup.h for more details.
+But quarantine list is not used later.
 
-I'm lazy so not finding the discussion now, but Linus has been pretty clear
-that he doesn't like this pattern because of possibility of additional cleanup
-magic getting introduced and then the cleanup happening in an order that
-causes problems. 
+If we simply use list_del_init(&rt->dst.rt_uncached),
+this also removes the dst from per-cpu list.
 
-Preferred option is drag the declaration to where is initialized so break
-with our tradition of declarations all at the top
+This patch also makes the future calls to rt_del_uncached_list()
+and rt6_uncached_list_del() faster, because no spinlock
+acquisition is needed anymore.
 
-struct fwctl_uctx *uctx __free(kfree) =
-	kzalloc(...);
-etc
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv4/route.c | 4 +---
+ net/ipv6/route.c | 5 +----
+ 2 files changed, 2 insertions(+), 7 deletions(-)
 
-
-> 
-> Thanks
-> 
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index b3073d1c8f8f71c88dc525eefb2b03be8f1f2945..cb0bdf34ed50c92688a3c0fe14c3e0c06d78b47c 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -1481,7 +1481,6 @@ static bool rt_cache_route(struct fib_nh_common *nhc, struct rtable *rt)
+ struct uncached_list {
+ 	spinlock_t		lock;
+ 	struct list_head	head;
+-	struct list_head	quarantine;
+ };
+ 
+ static DEFINE_PER_CPU_ALIGNED(struct uncached_list, rt_uncached_list);
+@@ -1532,7 +1531,7 @@ void rt_flush_dev(struct net_device *dev)
+ 			rt->dst.dev = blackhole_netdev;
+ 			netdev_ref_replace(dev, blackhole_netdev,
+ 					   &rt->dst.dev_tracker, GFP_ATOMIC);
+-			list_move(&rt->dst.rt_uncached, &ul->quarantine);
++			list_del_init(&rt->dst.rt_uncached);
+ 		}
+ 		spin_unlock_bh(&ul->lock);
+ 	}
+@@ -3661,7 +3660,6 @@ int __init ip_rt_init(void)
+ 		struct uncached_list *ul = &per_cpu(rt_uncached_list, cpu);
+ 
+ 		INIT_LIST_HEAD(&ul->head);
+-		INIT_LIST_HEAD(&ul->quarantine);
+ 		spin_lock_init(&ul->lock);
+ 	}
+ #ifdef CONFIG_IP_ROUTE_CLASSID
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index a504b88ec06b5aec6b0f915c3ff044cd98f864ab..7b3704ef401bbb258d9ac4380a934b8ad2031bbe 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -131,7 +131,6 @@ static struct fib6_info *rt6_get_route_info(struct net *net,
+ struct uncached_list {
+ 	spinlock_t		lock;
+ 	struct list_head	head;
+-	struct list_head	quarantine;
+ };
+ 
+ static DEFINE_PER_CPU_ALIGNED(struct uncached_list, rt6_uncached_list);
+@@ -189,8 +188,7 @@ static void rt6_uncached_list_flush_dev(struct net_device *dev)
+ 				handled = true;
+ 			}
+ 			if (handled)
+-				list_move(&rt->dst.rt_uncached,
+-					  &ul->quarantine);
++				list_del_init(&rt->dst.rt_uncached);
+ 		}
+ 		spin_unlock_bh(&ul->lock);
+ 	}
+@@ -6755,7 +6753,6 @@ int __init ip6_route_init(void)
+ 		struct uncached_list *ul = per_cpu_ptr(&rt6_uncached_list, cpu);
+ 
+ 		INIT_LIST_HEAD(&ul->head);
+-		INIT_LIST_HEAD(&ul->quarantine);
+ 		spin_lock_init(&ul->lock);
+ 	}
+ 
+-- 
+2.45.1.467.gbab1589fc0-goog
 
 
