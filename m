@@ -1,83 +1,118 @@
-Return-Path: <netdev+bounces-100405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DCA28FA6B0
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 01:59:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A3B7C8FA6BB
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 02:03:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C793C1C2220F
-	for <lists+netdev@lfdr.de>; Mon,  3 Jun 2024 23:59:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D12261C2335E
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 00:03:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D8DE13B5B7;
-	Mon,  3 Jun 2024 23:59:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE16DF71;
+	Tue,  4 Jun 2024 00:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qV4fpDT2"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="OGxfCwuH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3777D3BB24
-	for <netdev@vger.kernel.org>; Mon,  3 Jun 2024 23:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE26B441D;
+	Tue,  4 Jun 2024 00:02:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717459172; cv=none; b=dQn+bFKc5vGtblehD5z5R3Jf7EDbNo7OH/hYzHuOarwZYRO8k9VpFPWbbyyoALYlKFC+Mp+Zm81oL3EwDJdP1jVsP4E3sogQt5G1UditSU11HZrsMtHBV+O9CcfGQL4f4LkvdDY9xvPai3XOOwBFizJFkTpl2Y0+8f11JHFMcAQ=
+	t=1717459363; cv=none; b=B67X83kY3XY5o25jIf5lC1b0OWyF6NxwHAkajpwkJ6x6wY6tncvgaiTNdlVPMB8cueFmGXEbofd4VCBjUPuJBhq6ZqHK0SzOargViv46ue8ydS9b9CVdh2+j8oeXqlH11AFAmw93DrtP+kunGDVJQmEeKd2GVfClQCw2FarrHAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717459172; c=relaxed/simple;
-	bh=nGuV+/cY4yftgbgU9V6Az8zBTq9WVMkMFDggJ4nBCNk=;
+	s=arc-20240116; t=1717459363; c=relaxed/simple;
+	bh=aLunMNTt5lH5FqBRFl4O/fuhjwC2BTsbyebkuyXFTm4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X7tFqDQE/cLpceEqcblmAlnTwuXUjMLTlDkr/imlpugwsBheoXAn9urIAqjR/w9dTjLRXu4pd5pUf7Srpw1w/6ZIKCOmjWEXCwAYXuGqgzp9Qrm51P243arDItMtT9Fb58ebbCXYJLWIAZGuCxWUR5eOLZYMiGc329egYt5uaTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qV4fpDT2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 910D9C32781;
-	Mon,  3 Jun 2024 23:59:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717459171;
-	bh=nGuV+/cY4yftgbgU9V6Az8zBTq9WVMkMFDggJ4nBCNk=;
+	 MIME-Version:Content-Type; b=l4e3OnxPp5wOmlMp6hy9IKaHFKfap7peOvm8xtSa7o5l7lzZAT37AcZK3Y61rFHf7K3Hn0wpMmQJrIVrYHuJ9kErVdevGrKrBo44FCvz80PMP08XUKEM7LhXIsOgj8c0KBwfSzxu+ssSuroAIhaE4jQG0WwaKlvH8yZ3u2gcFok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=OGxfCwuH; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1717459353;
+	bh=bCFagXrRCEE0MItoRSIDIVyE4IOW9yE5PXYk68yv53s=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qV4fpDT2lqymxaZFSN5KaBHYiuQfQryyjfus/HOD7YWZxXc+u2TjVlAcNnQj9CY12
-	 iGlPKhLJqQFgNerOMJn3PuaWLV6ujLsJRUhuuhfC4OCCo8sr1SnUnWXzvzfDBqKmMh
-	 n1fwFsneo3FNia9/H3FlP49Vc0MjwPmyNxGB3R8VFKW6CG58IdHBu1jaDcg4GuBmOU
-	 FuzMK8a63hxVEKjp37DFIlDHzocd4e4s/lVOJF0/51BbxGWPG2Ed4HSZa3VZN20OJ3
-	 DmP2m4dpjW6UX49K87PtFgglgkIt2WUlkuN6Xt8M7R9k5F5Hu8g+EAbqwYRxKya1kY
-	 lwB1+uFRb8Tuw==
-Date: Mon, 3 Jun 2024 16:59:30 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ronak Doshi <ronak.doshi@broadcom.com>
-Cc: Matthias Stocker <mstocker@barracuda.com>, doshir@vmware.com,
- pv-drivers@vmware.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v2] vmxnet3: disable rx data ring on dma allocation
- failure
-Message-ID: <20240603165930.4a640f23@kernel.org>
-In-Reply-To: <CAP1Q3XSvz60Lo10j7RUJR7qmFLv=cMMkaN_EZ1q2YuP1VE6xxw@mail.gmail.com>
-References: <20240531103711.101961-1-mstocker@barracuda.com>
-	<CAP1Q3XSvz60Lo10j7RUJR7qmFLv=cMMkaN_EZ1q2YuP1VE6xxw@mail.gmail.com>
+	b=OGxfCwuH1usYsjdjeam50BnHVnrmQpsZJqdH1b9CHNQXD+dxtxjI+MPES9mT18VGY
+	 HwdC1hsF+1iTohBWVDtv4dW9n3+Z484gyAlNsclFhHMZqWUtcjDQcBE9OxamJOQrJ8
+	 6zohNQWfOdQnfOgwwbtq3XfB4kyuXxjpsZvr2SlUyQ/AHA/rOs6xM5OLijnptZwT8L
+	 wezqZJLzIqxiul1nB3sD2f17/0YDBN1SmZv9eO9MRe64HElr+jwgeI5kFhbEUjESZg
+	 YzidyReZsmMLNwfZ7VHgQ4NUAggOe6a+aW1Rc7yLImmdNTTDX0rDgxqPECiZ/rR6Px
+	 jX8kzIZPy0SJA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VtW4S3gvsz4wyf;
+	Tue,  4 Jun 2024 10:02:31 +1000 (AEST)
+Date: Tue, 4 Jun 2024 10:02:07 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
+ Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build failure after merge of the net-next tree
+Message-ID: <20240604100207.226f3ac3@canb.auug.org.au>
+In-Reply-To: <20240531152223.25591c8e@canb.auug.org.au>
+References: <20240531152223.25591c8e@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/.hfJQ/wOPe2dUoHzTBC6aTG";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/.hfJQ/wOPe2dUoHzTBC6aTG
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 2 Jun 2024 23:49:48 -0700 Ronak Doshi wrote:
-> Reviewed-by: Ronak Doshi <ronak.doshi@broadcom.com>
+Hi all,
 
-Thanks!
+On Fri, 31 May 2024 15:22:23 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
+>
+> After merging the net-next tree, today's linux-next build (x86_64
+> modules_install after an x86_64 allmodconfig build) failed like this:
+>=20
+> depmod: ERROR: Cycle detected: rvu_nicpf -> otx2_devlink -> rvu_nicpf
+> depmod: ERROR: Cycle detected: rvu_nicpf -> otx2_dcbnl -> rvu_nicpf
+> depmod: ERROR: Cycle detected: otx2_ptp
+> depmod: ERROR: Cycle detected: ptp
+> depmod: ERROR: Found 3 modules in dependency cycles!
+>=20
+> Caused by commit
+>=20
+>   727c94c9539a ("ethernet: octeontx2: avoid linking objects into multiple=
+ modules")
+>=20
+> I have reverted that commit for today.
 
-> This electronic communication and the information and any files transmitted 
-> with it, or attached to it, are confidential and are intended solely for 
-> the use of the individual or entity to whom it is addressed and may contain 
-> information that is confidential, legally privileged, protected by privacy 
-> laws, or otherwise restricted from disclosure to anyone else. If you are 
-> not the intended recipient or the person responsible for delivering the 
-> e-mail to the intended recipient, you are hereby notified that any use, 
-> copying, distributing, dissemination, forwarding, printing, or copying of 
-> this e-mail is strictly prohibited. If you received this e-mail in error, 
-> please return the e-mail to the sender, delete it from your computer, and 
-> destroy any printed copy of it.
+Any fix for this yet?
 
-Please get rid of this footer. NIC folks (Andy Gospodarek and Michael
-Chan) within Broadcom may know some tricks.
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/.hfJQ/wOPe2dUoHzTBC6aTG
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmZeWX8ACgkQAVBC80lX
+0GzDigf+I8NO4neDuZhWM/HXtN4YI2MLiloAq7zjo/tiI2vZNbVpwMiCUIQNaty+
++YOfZGNRNm0H/CIs0daXNDj29KiELChqyXA5MDCq2Ij/hdw4XFdcv+l7d+0gOHWo
+Vmla7nUoIhfeRZZoepjdTAvD4VHfeRnKdmf4fXJOFNrHNPy06+vuyAx7PzgHGKjP
+1c3n7YBzyZHNELYZtvJ7QWUE7CLl5SWWRiJLimIFbZpCqy3a2PoCkqLhhiNyD27A
+x2zyf0zMeRC+5C8zYkcvaBCWGv9vCi58HrpbVE/QeneIcS9BDH161yI+8E+DtHzi
+yyRhaGLIbEIhMUOtVhv4LItFq4Wi4g==
+=uzIa
+-----END PGP SIGNATURE-----
+
+--Sig_/.hfJQ/wOPe2dUoHzTBC6aTG--
 
