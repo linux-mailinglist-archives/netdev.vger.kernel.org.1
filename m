@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-100696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB3D58FB9A3
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:56:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB1068FB9A4
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 18:56:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6F1C1C219C4
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:56:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64582284881
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 16:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83703149001;
-	Tue,  4 Jun 2024 16:56:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B812149007;
+	Tue,  4 Jun 2024 16:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ij9Fn4N5"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="C3B7D6qP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E242AF16
-	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 16:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98A2149001
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 16:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717520172; cv=none; b=aww3lGkke7jGKlEntnsfvq2DDjKMpNlDQsNa3WrUFlJyi6/LHWi8/+NnIDdVQsQdB5c+uBcneQmBccx9U2xwdCFcPG6j53PYgUUlQ1TEVgC7O+AMK+hVgeFfNxa488Z9/cZ7mA5wFNrQ8AJc8etNyHrj7dT8KGWLh2iTdg+GyAI=
+	t=1717520195; cv=none; b=HYo3SK2iUd/hy9EX0ngWbvInREXmDcwO2IgEYEFTYfMltCshPy1ab/fAlWdgawUGWnkc5CzJqj2tIWYXfB0tsYcUJPj/dv1Sn4doHkhFhBQCeDPrjaHo5YdDDvu0BizkNNluoMGKrasy2nDC6wGgEHQJC8/FiwJTtgIRLPrNCaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717520172; c=relaxed/simple;
-	bh=1JoR++kFFnEw5BzWaUSyvtoqA6m+wCfje28Y+xcutKI=;
+	s=arc-20240116; t=1717520195; c=relaxed/simple;
+	bh=U+8ANBox0sRimElgtxl6vuFJA8j7eCblQF3rUBq3dmk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g4GLwO+h+qWlFTP7wGPLtjhHkEoH9Q/1BS3TYBuR+91B+aCCzqSeXzzlLcvbUf98wqXk1teJIbrwckqtoNHyhWLa2AdlEEsOrchIIlas4RNFCs/gXOLi7f96jtPiRqx6Hpb9U1Kp1AZ2avanJXHaoOgTq9zH1BPoSZTk7eyW9BQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ij9Fn4N5; arc=none smtp.client-ip=99.78.197.218
+	 MIME-Version:Content-Type; b=ffsEZb54kYNIcwCF+198z9BPTsix6anj2zpBmRoFw372i0Z8uQ4qroYvd7EIEAEfh6SZFKUgHf1aRuIr82V2i/6oeTwuLXrc1aUMfra2igEECQjAp/8T7Zu8FZR36Im0IFwW0odlGfhauYrj0wl+lEEskgwZdRjJpJUxQRulGss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=C3B7D6qP; arc=none smtp.client-ip=207.171.184.29
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1717520172; x=1749056172;
+  t=1717520194; x=1749056194;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=qs64HYU1HYnpKh4cUSPHsfuyIkN8My/ViozmWKS2G1I=;
-  b=ij9Fn4N5mUT62vNoM6y6tttV47lHd5PvGuP8gKpoCNBxX6jxBZupttsG
-   9jjLl9a0O19UP5eaLSxhL2/hkYjOd/f7eNZq3G+XXhcmFOIMs301nQIcI
-   mJvdkTS+dD38MYRLlQED6V5JzqWDjKc1yhEVYsC0mc7r+7nnYgzpOkI1d
-   Q=;
+  bh=sLVAZkUkeBChsczsFIfI9rbvAU+zutWF63NrlP8Rdu0=;
+  b=C3B7D6qP0XkGaSzQc9llwSsFva1zK/S4O8GG3aKpHXXTn/hVKDkDx2EF
+   XXURAJ69WJ6vp+1m+NjLYOJCbk3LtUNLQcUGJEl8DCytGb+6ExbVEStW0
+   Xca8IXbfCeM+v6HtxA0we3rp7TQ8U1zY1Ic52llnG4whzrXf5S9bCI3zK
+   A=;
 X-IronPort-AV: E=Sophos;i="6.08,214,1712620800"; 
-   d="scan'208";a="300895397"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 16:56:08 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:31395]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.106:2525] with esmtp (Farcaster)
- id 70138a48-49b6-4c8d-a121-0b1df45d10a6; Tue, 4 Jun 2024 16:56:07 +0000 (UTC)
-X-Farcaster-Flow-ID: 70138a48-49b6-4c8d-a121-0b1df45d10a6
+   d="scan'208";a="423764520"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 16:56:33 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:51317]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.111:2525] with esmtp (Farcaster)
+ id a8d99cc5-0610-4e43-953e-e4a393a75938; Tue, 4 Jun 2024 16:56:32 +0000 (UTC)
+X-Farcaster-Flow-ID: a8d99cc5-0610-4e43-953e-e4a393a75938
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Tue, 4 Jun 2024 16:56:07 +0000
+ 15.2.1258.28; Tue, 4 Jun 2024 16:56:31 +0000
 Received: from 88665a182662.ant.amazon.com (10.187.170.50) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Tue, 4 Jun 2024 16:56:04 +0000
+ 15.2.1258.34; Tue, 4 Jun 2024 16:56:28 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net 08/15] af_unix: Annotate data-race of sk->sk_state in unix_stream_read_skb().
-Date: Tue, 4 Jun 2024 09:52:34 -0700
-Message-ID: <20240604165241.44758-9-kuniyu@amazon.com>
+Subject: [PATCH v2 net 09/15] af_unix: Annotate data-races around sk->sk_state in UNIX_DIAG.
+Date: Tue, 4 Jun 2024 09:52:35 -0700
+Message-ID: <20240604165241.44758-10-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240604165241.44758-1-kuniyu@amazon.com>
 References: <20240604165241.44758-1-kuniyu@amazon.com>
@@ -77,33 +77,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWA003.ant.amazon.com (10.13.139.37) To
+X-ClientProxiedBy: EX19D044UWA002.ant.amazon.com (10.13.139.11) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-unix_stream_read_skb() is called from sk->sk_data_ready() context
-where unix_state_lock() is not held.
+While dumping AF_UNIX sockets via UNIX_DIAG, sk->sk_state is read
+locklessly.
 
 Let's use READ_ONCE() there.
 
-Fixes: 77462de14a43 ("af_unix: Add read_sock for stream socket types")
+Note that the result could be inconsistent if the socket is dumped
+during the state change.  This is common for other SOCK_DIAG and
+similar interfaces.
+
+Fixes: c9da99e6475f ("unix_diag: Fixup RQLEN extension report")
+Fixes: 2aac7a2cb0d9 ("unix_diag: Pending connections IDs NLA")
+Fixes: 45a96b9be6ec ("unix_diag: Dumping all sockets core")
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/unix/af_unix.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/unix/diag.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 4ef9c21783a5..e7b74207aa3b 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -2659,7 +2659,7 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
+diff --git a/net/unix/diag.c b/net/unix/diag.c
+index ae39538c5042..116cf508aea4 100644
+--- a/net/unix/diag.c
++++ b/net/unix/diag.c
+@@ -65,7 +65,7 @@ static int sk_diag_dump_icons(struct sock *sk, struct sk_buff *nlskb)
+ 	u32 *buf;
+ 	int i;
  
- static int unix_stream_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
+-	if (sk->sk_state == TCP_LISTEN) {
++	if (READ_ONCE(sk->sk_state) == TCP_LISTEN) {
+ 		spin_lock(&sk->sk_receive_queue.lock);
+ 
+ 		attr = nla_reserve(nlskb, UNIX_DIAG_ICONS,
+@@ -103,7 +103,7 @@ static int sk_diag_show_rqlen(struct sock *sk, struct sk_buff *nlskb)
  {
--	if (unlikely(sk->sk_state != TCP_ESTABLISHED))
-+	if (unlikely(READ_ONCE(sk->sk_state) != TCP_ESTABLISHED))
- 		return -ENOTCONN;
+ 	struct unix_diag_rqlen rql;
  
- 	return unix_read_skb(sk, recv_actor);
+-	if (sk->sk_state == TCP_LISTEN) {
++	if (READ_ONCE(sk->sk_state) == TCP_LISTEN) {
+ 		rql.udiag_rqueue = sk->sk_receive_queue.qlen;
+ 		rql.udiag_wqueue = sk->sk_max_ack_backlog;
+ 	} else {
+@@ -136,7 +136,7 @@ static int sk_diag_fill(struct sock *sk, struct sk_buff *skb, struct unix_diag_r
+ 	rep = nlmsg_data(nlh);
+ 	rep->udiag_family = AF_UNIX;
+ 	rep->udiag_type = sk->sk_type;
+-	rep->udiag_state = sk->sk_state;
++	rep->udiag_state = READ_ONCE(sk->sk_state);
+ 	rep->pad = 0;
+ 	rep->udiag_ino = sk_ino;
+ 	sock_diag_save_cookie(sk, rep->udiag_cookie);
+@@ -215,7 +215,7 @@ static int unix_diag_dump(struct sk_buff *skb, struct netlink_callback *cb)
+ 		sk_for_each(sk, &net->unx.table.buckets[slot]) {
+ 			if (num < s_num)
+ 				goto next;
+-			if (!(req->udiag_states & (1 << sk->sk_state)))
++			if (!(req->udiag_states & (1 << READ_ONCE(sk->sk_state))))
+ 				goto next;
+ 			if (sk_diag_dump(sk, skb, req, sk_user_ns(skb->sk),
+ 					 NETLINK_CB(cb->skb).portid,
 -- 
 2.30.2
 
