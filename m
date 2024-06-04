@@ -1,121 +1,145 @@
-Return-Path: <netdev+bounces-100447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 855FF8FAAD4
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 08:31:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5102F8FAAEA
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 08:34:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4181628C0EB
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 06:31:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB7EA1F21545
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 06:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DAB1422A7;
-	Tue,  4 Jun 2024 06:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F932132135;
+	Tue,  4 Jun 2024 06:34:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ov31VYfk"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="mHXpXP6G"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668F4140367;
-	Tue,  4 Jun 2024 06:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CDDA801
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 06:34:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717482600; cv=none; b=C0g3d5XJOhFlHfroMcZRuvu5ZmLOR0a2xh25a7+mZXpaPQrM1lc5U7rxLlyZ1PJKVFz6MXmz0Iqod+qo9fNdl/8oeGaZX53nOVj1dRgviqrO4//eXRN5LFjisvMvFK8/ITJk+Ftq1ZoOWg6z/MJPwJqxbDJt1KOtq9GjDcNpjcQ=
+	t=1717482869; cv=none; b=rGaHz+AOmDb1sTFK5GdJk0opKldedvdSRotGiZtnNdP3O7/dp4yOXQIk1qmfj4t+8mt++OPRMtx+2lhoDzFS+iSdNtKBsFgYVHTjDS/c+cqx8AL0By1QSg8/uTLTF5ddnKTgarbW7McRr7GxtVsf+zfBdX2K/uFcS8vPqCFYuSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717482600; c=relaxed/simple;
-	bh=JGQT+4p7AHY1M4o7zhyH0qaV8X0DJMDz7KyqjSiOFsU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=fD9jSjEg5bX437HfmoE+gkwaCBDGyAFpjotEoQbtSs5RsDwV/nPZ4BLbEpimw81OEGTFKbqvymtB7O5pK8S9BukYX1+wUPDEO4mdeuDfgyGlY8woXhxq0w8sP3GUZZ7bVc98DXs/4F00urXAEhnu4FvImNSyR66oeusk8QGbpew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ov31VYfk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EDCD8C4AF4D;
-	Tue,  4 Jun 2024 06:29:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717482600;
-	bh=JGQT+4p7AHY1M4o7zhyH0qaV8X0DJMDz7KyqjSiOFsU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=ov31VYfkZBszW6nagLY0k+JHZFiMxqJo3NcOel+En0isAe6LtNJ5y9FCZfVkctPXW
-	 7LZXgH+PAQIjLBC9dyOCddavt9rrNFFKGGv6IMMcx3bY8Q7DqGre74pUdfLFZfUeNM
-	 hWdD2xN6klufntacPQjGZGfzu330vz/iZu8Nc3CaU4JkedUXKFzApi9J+FforQvK3M
-	 YIsRBX7BW2vwUnsRrgTn1x7qKJ1Af+hCmT3ykgBjrSZvvSwXqLZCZpZmizxPBxJYGG
-	 KGkvDazh0oyOkjL0uXlmsNAYBbMUKCvHSgZAiHOeVFQsshxaeKy8d+QttD2HlqsDLO
-	 QJJeoHRH5qHfA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4B6CC25B7E;
-	Tue,  4 Jun 2024 06:29:59 +0000 (UTC)
-From: Joel Granados via B4 Relay <devnull+j.granados.samsung.com@kernel.org>
-Date: Tue, 04 Jun 2024 08:29:26 +0200
-Subject: [PATCH 8/8] sysctl: Warn on an empty procname element
+	s=arc-20240116; t=1717482869; c=relaxed/simple;
+	bh=l1x9O8lkXfY4/Q7yB+uFFc3dQR7pL2BbUfvnvuPWOKE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qpPOSw0nRQYcR04uCXHYwODQ4+spZLnUWq6CFBkU7Hi9EsPIATAXx5n8JFBHWI73eOhFTi8p9zOGUmz7zs5lya0wCAnZ7sBS8Yd0Tot373GMD2NUuQM23IJVfIKM3F7FdQcdiluaEe4Nr/oJla9PG9V6TKJtSdsUjhs9nG5y2X0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=mHXpXP6G; arc=none smtp.client-ip=220.197.31.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
+	Content-Type; bh=uH/HKko7zCdPRDWgsmYgWG3psrtg6r8HMizNEJWDIQ4=;
+	b=mHXpXP6GrYACZyJ8fJdPJiyppKInugKwFHiU9iTxgmSMAxTjolfPa2MCN58isR
+	mLBE80ZK3GRqQMOEIytbbhK6w1l5Ow8LW4aMp409mcfvPbCXAXh9tuGkPGOvGeTW
+	pSVZXnNZoB0glleG5naviiEz0gAPwq9gcGVWOpdJnA5oQ=
+Received: from [172.22.5.12] (unknown [27.148.194.72])
+	by gzga-smtp-mta-g2-5 (Coremail) with SMTP id _____wD3f9oktV5mOBN0DQ--.9032S2;
+	Tue, 04 Jun 2024 14:33:09 +0800 (CST)
+Message-ID: <7ae9a706-5d79-4f4d-963b-41bcdd8b7f7f@163.com>
+Date: Tue, 4 Jun 2024 14:33:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] seg6: fix parameter passing when calling
+ NF_HOOK() in End.DX4 and End.DX6 behaviors
+To: Simon Horman <horms@kernel.org>
+Cc: netdev <netdev@vger.kernel.org>, contact@proelbtn.com,
+ pablo@netfilter.org, David Ahern <dsahern@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <2a78f16a-0ff5-46bf-983b-9ab038f5a5cd@163.com>
+ <20240603182116.GJ491852@kernel.org>
+From: Jianguo Wu <wujianguo106@163.com>
+In-Reply-To: <20240603182116.GJ491852@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240604-jag-sysctl_remset-v1-8-2df7ecdba0bd@samsung.com>
-References: <20240604-jag-sysctl_remset-v1-0-2df7ecdba0bd@samsung.com>
-In-Reply-To: <20240604-jag-sysctl_remset-v1-0-2df7ecdba0bd@samsung.com>
-To: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
- Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
- Boqun Feng <boqun.feng@gmail.com>, Suren Baghdasaryan <surenb@google.com>, 
- Kent Overstreet <kent.overstreet@linux.dev>, 
- Andrew Morton <akpm@linux-foundation.org>, 
- Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <keescook@chromium.org>, 
- Joel Granados <j.granados@samsung.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
- linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=837;
- i=j.granados@samsung.com; h=from:subject:message-id;
- bh=kiBCYRLAjKste0XuHE2np63NWadPBoIGUUndp1NrN98=;
- b=owJ4nAHtARL+kA0DAAoBupfNUreWQU8ByyZiAGZetGXOjyV9+/Ko/a1TAa0g3yQtd6zwj6D29
- kW6R7OTXh/JPokBswQAAQoAHRYhBK5HCVcl5jElzssnkLqXzVK3lkFPBQJmXrRlAAoJELqXzVK3
- lkFPABkL/0chps6Tybj/Jceo6dk5TxaNFxxf/9U5ng/iiwgx4Aud25nQYC/AmsWbL/his/ClEv4
- 8BuIUh8G4fFijVL56/El1GEAVxd9J8z8s6c3d83lZ+7po/aWsz9lvgO6nh3tTe8U6TKKV+Rh0jL
- EKXjAJ+S4/CNLT4NBhCuIY4P4LyQIjgAxHx3p/ryNWc08tJJAK0bG+L3cllECbQ7X+usHu9Q9dq
- mg5tVGmxkunsrP/nLQNrlC+xpppGWp+fc5g9y/QeTAXHVHQMCZkeV5pJfgBWVGMUv9F7juRGJAB
- B5ySh3sHHaIo8scZIIYsRqWs1/4dR8vxgpa8iXykL41Px3oJuinO01eFG2gdAht/skleaLIIW5y
- k36ZfB4mYUmXBtSq/YEGDd4IerIixbbq7Hc5F+g+l7Eby59/gbzU06uOy3mGyuXFVzB0WHcZFiz
- +zN9loEzcIEe/WaIq9hQLiHtkj3fwCmwXLuAOl6RzQgKnNf/jXmyJJL30Dsd9/INhxAp1Tc7SA6
- 74=
-X-Developer-Key: i=j.granados@samsung.com; a=openpgp;
- fpr=F1F8E46D30F0F6C4A45FF4465895FAAC338C6E77
-X-Endpoint-Received: by B4 Relay for j.granados@samsung.com/default with
- auth_id=70
-X-Original-From: Joel Granados <j.granados@samsung.com>
-Reply-To: j.granados@samsung.com
+X-CM-TRANSID:_____wD3f9oktV5mOBN0DQ--.9032S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxXr1xXr4Uur4DuFWxCF17Wrg_yoW5CF1kpF
+	y5Ja4UZFs0qr15trWSvr4qyr17Wana9Fn8ur95Aryjva9Ivr1Ik3yxAr4Ykr17JrZxCFyj
+	yasFqw12kwn8Aw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U4SoAUUUUU=
+X-CM-SenderInfo: 5zxmxt5qjx0iiqw6il2tof0z/1tbiNwrzkGXAliXbnwAAsM
 
-From: Joel Granados <j.granados@samsung.com>
+Hi Simon,
+  Thanks for your review, I will fix the commit log, and send v2 with your Reviewed-by tag.
 
-Add a pr_err warning in case a ctl_table is registered with a sentinel
-element containing a NULL procname.
-
-Signed-off-by: Joel Granados <j.granados@samsung.com>
----
- fs/proc/proc_sysctl.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
-index 806700b70dea..f65098de5fcb 100644
---- a/fs/proc/proc_sysctl.c
-+++ b/fs/proc/proc_sysctl.c
-@@ -1119,6 +1119,8 @@ static int sysctl_check_table(const char *path, struct ctl_table_header *header)
- 	struct ctl_table *entry;
- 	int err = 0;
- 	list_for_each_table_entry(entry, header) {
-+		if (!entry->procname)
-+			err |= sysctl_err(path, entry, "procname is null");
- 		if ((entry->proc_handler == proc_dostring) ||
- 		    (entry->proc_handler == proc_dobool) ||
- 		    (entry->proc_handler == proc_dointvec) ||
-
--- 
-2.43.0
+On 2024/6/4 2:21, Simon Horman wrote:
+> On Thu, May 30, 2024 at 03:43:38PM +0800, Jianguo Wu wrote:
+>> From: Jianguo Wu <wujianguo@chinatelecom.cn>
+>>
+>> input_action_end_dx4() and input_action_end_dx6() call NF_HOOK() for PREROUTING hook,
+>> for PREROUTING hook, we should passing a valid indev, and a NULL outdev to NF_HOOK(),
+>> otherwise may trigger a NULL pointer dereference, as below:
+> 
+> nit: The text above should be line-wrapped so that it is
+>      no more than 75 columns wide.
+> 
+> Link: https://www.kernel.org/doc/html/latest/process/submitting-patches.html#describe-your-changes
+> 
+>>
+>>     [74830.647293] BUG: kernel NULL pointer dereference, address: 0000000000000090
+>>     [74830.655633] #PF: supervisor read access in kernel mode
+>>     [74830.657888] #PF: error_code(0x0000) - not-present page
+>>     [74830.659500] PGD 0 P4D 0
+>>     [74830.660450] Oops: 0000 [#1] PREEMPT SMP PTI
+>>     ...
+>>     [74830.664953] Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
+>>     [74830.666569] RIP: 0010:rpfilter_mt+0x44/0x15e [ipt_rpfilter]
+>>     ...
+>>     [74830.689725] Call Trace:
+>>     [74830.690402]  <IRQ>
+>>     [74830.690953]  ? show_trace_log_lvl+0x1c4/0x2df
+>>     [74830.692020]  ? show_trace_log_lvl+0x1c4/0x2df
+>>     [74830.693095]  ? ipt_do_table+0x286/0x710 [ip_tables]
+>>     [74830.694275]  ? __die_body.cold+0x8/0xd
+>>     [74830.695205]  ? page_fault_oops+0xac/0x140
+>>     [74830.696244]  ? exc_page_fault+0x62/0x150
+>>     [74830.697225]  ? asm_exc_page_fault+0x22/0x30
+>>     [74830.698344]  ? rpfilter_mt+0x44/0x15e [ipt_rpfilter]
+>>     [74830.699540]  ipt_do_table+0x286/0x710 [ip_tables]
+>>     [74830.700758]  ? ip6_route_input+0x19d/0x240
+>>     [74830.701752]  nf_hook_slow+0x3f/0xb0
+>>     [74830.702678]  input_action_end_dx4+0x19b/0x1e0
+>>     [74830.703735]  ? input_action_end_t+0xe0/0xe0
+>>     [74830.704734]  seg6_local_input_core+0x2d/0x60
+>>     [74830.705782]  lwtunnel_input+0x5b/0xb0
+>>     [74830.706690]  __netif_receive_skb_one_core+0x63/0xa0
+>>     [74830.707825]  process_backlog+0x99/0x140
+>>     [74830.709538]  __napi_poll+0x2c/0x160
+>>     [74830.710673]  net_rx_action+0x296/0x350
+>>     [74830.711860]  __do_softirq+0xcb/0x2ac
+>>     [74830.713049]  do_softirq+0x63/0x90
+>>
+>> input_action_end_dx4() passing a NULL indev to NF_HOOK(), and finally trigger a
+>> NULL dereference in rpfilter_mt()->rpfilter_is_loopback():
+>>     static bool
+>>     rpfilter_is_loopback(const struct sk_buff *skb, const struct net_device *in)
+>>     {
+>>             // in is NULL
+>>             return skb->pkt_type == PACKET_LOOPBACK || in->flags & IFF_LOOPBACK;
+>>     }
+>>
+>> Fixes: 7a3f5b0de364 ("netfilter: add netfilter hooks to SRv6 data plane")
+> 
+> nit: no blank line here.
+> 
+>>
+>> Signed-off-by: Jianguo Wu <wujianguo@chinatelecom.cn>
+> 
+> I am slightly puzzled that this bug was in
+> the tree for so long without being noticed.
+> 
+> But the above not withstanding, this looks good to me.
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> ...
 
 
 
