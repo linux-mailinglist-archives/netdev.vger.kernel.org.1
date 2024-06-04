@@ -1,217 +1,180 @@
-Return-Path: <netdev+bounces-100562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19CCC8FB317
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:01:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A33208FB39F
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 15:24:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CA521C2203A
-	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 13:01:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B5382884E9
+	for <lists+netdev@lfdr.de>; Tue,  4 Jun 2024 13:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082F0144D29;
-	Tue,  4 Jun 2024 13:01:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDB121465BE;
+	Tue,  4 Jun 2024 13:24:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Dou3ya0Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E82A1E519;
-	Tue,  4 Jun 2024 13:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C80F146019
+	for <netdev@vger.kernel.org>; Tue,  4 Jun 2024 13:24:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717506083; cv=none; b=uDaq9x1VYvihMHtckHa4ya2ZdVc7P14j2vhITmbCD2w7wrMuN/qd7j/gD+G3QSAivForJjs9DFaNuXnhSxoRUd+V3cQSfqM570fwUO1LgnbJhiYfEL//dxR06t8bm/YO0HBNIHN9tFnslBX4NI+wAer/Z8pTvVrZLmaU5ebIqGs=
+	t=1717507495; cv=none; b=PpjWH0+LtjhZnnnz+JKO9eMCEPbFeaBOC3pnbJNjuyi2X6FT2Pq30aouF5bDZfZx6m6Nk395J4i3kJUt5XATcuyz1v9X6f5hhe+LYG2Eig5TFBsMjo29F9bfpPb2pVPiuJN04oIazdDIIEHUL3D1TwNIqGt1RM3l38OiPkoBLNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717506083; c=relaxed/simple;
-	bh=q4Tr+AFR+WP7AGPpqaG/QKSTCGhZPx0fb7JxJHtzMi4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=lR+4plt67IxgOc3pqXqUwgzkzkGaUR2LArIUsV48NeTFfqKcUPQJMNmqC9USnC+sN92laimjOC0KkM2NUgLpb9uBvGX8SKCfBCGYzRLiNXj+vkFDZxCkUIEfvRA3mKU4IRzO1fFN/p/XSuBhBYT+dmQpB4KNePaeP3n6VGIroTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4210f0bb857so5430995e9.1;
-        Tue, 04 Jun 2024 06:01:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717506080; x=1718110880;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fxHXs7IG64cFNSoqIPh3h+fcJrQqZkul2851soVpEBU=;
-        b=jH4RvCan+YDykSraSvJTsPODWwtXC1CHh+ImZ9HUJXKtlRaYz6MYuKvm+OetM9B0Mg
-         dPtWv2fGYE3T9Ubp+YcDJNB7LVMoIWShsjmFeSgOsx+grvVGsO4kX0UCpS60weOxKAiS
-         fPRTkSKGghQF02aVUJxHXC4q6WhuKQmqpj2shDehZuq0L29KdRgwalyMNB7oqeU+Fmo1
-         9kWQtiD1C3k8fLjNrvSot9YQ1jQB9z8AjpR3e2gK340ITN1ZjsScaqfAo/RjeOjLYnVA
-         OBt+V7rjI9z93jS9bcdzhTUFg28Wo3OPUWoxlYx0NSFKB8AThIfrlsiql20PfT5Dadg7
-         aTIA==
-X-Forwarded-Encrypted: i=1; AJvYcCVKY9qkCW7DgRJzbcxuEzkxAukpz/WY1DZQyJplZG39n2ozKaASv1daGPi/pRGm05YdBgxtt9Yi0ndhjWdBCM3Pa3/u9A01mvZos02rVfyceKUZ/KleYYZGkitdAvHupn4Lu7d19YBL/T6PtgA47SE0Gsh7F49yXqp8T8mFEPNF
-X-Gm-Message-State: AOJu0Yx6TjGEcTVnoy+LbNDyW8jZHkB2+aCMEO5h47OI4Ph9bKFTjIaT
-	ufUpF9GkPRDU76e3ghrCpQFyV+7dGbSB+xO3bd833LW+qqpSnmUP
-X-Google-Smtp-Source: AGHT+IH9oq3dFpvLJVUKgEQQ0Vx9YEe7q6Q5Zb8A/OQIgbPFG2wSdi0d9xEzXrAJ0zX69KHy0U2C2g==
-X-Received: by 2002:a05:600c:1382:b0:41b:fdf9:98b5 with SMTP id 5b1f17b1804b1-4212e0c40a5mr92270135e9.4.1717506080292;
-        Tue, 04 Jun 2024 06:01:20 -0700 (PDT)
-Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-421542e207esm13638365e9.22.2024.06.04.06.01.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jun 2024 06:01:20 -0700 (PDT)
-Message-ID: <ef7ea4a8-c0e4-4fd9-9abb-42ae95090fc8@grimberg.me>
-Date: Tue, 4 Jun 2024 16:01:17 +0300
+	s=arc-20240116; t=1717507495; c=relaxed/simple;
+	bh=DS/KI3xMYtNzcbzUyEzBv/NVyRuMHUgq6ujsTOu9WEk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oyep8GJEQ6ySg0YUg8L0C7ySLcDEJslaVdFxOXwpO5T1Tgku9VMObbQxzA4BgIqTI0sqaJCg3cRcZ4PE7cZ69y3c5SAO2IJwrWrZTEtPz5CVOVno6TmhI0+/EBFMg2d55xgrGANb6CgnigyqBQFN7vIoWhoBc6nfcxrf+Y3Yy9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Dou3ya0Q; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717507494; x=1749043494;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=DS/KI3xMYtNzcbzUyEzBv/NVyRuMHUgq6ujsTOu9WEk=;
+  b=Dou3ya0Qwi6rcct3Ouyy2fU1AT8KdPVybUsvSRWkm7VSMk9Y23eqadFK
+   HTVUvmD4PPQNRDCJCyw2PXVgxvxsu0QGNX+t3Sn5GmUA8li2dc5k7tK79
+   OvbP873zRoq8vsp9ItEuo4peU2nc4GoDQMsuS5ZiZOZRIwpkTPZPZWso/
+   vDmieJMNKncOQhK9SuFNRDr0dsTbmu2iTvjFGMNT0GPSOohCfrk/yMMMn
+   Gm2Bs1zpRvM338OKvx/0AG79APh6Hn7TxPawf+a+QmpiuGxI4Z8IA+HZS
+   IBC2fTw9+bb1qYXrRa9bpEF93W5HCcdaYi9WGpbTalJKPlE1ECBI1Zks0
+   w==;
+X-CSE-ConnectionGUID: AIL4BsDpRf+uOfCfMZ80bA==
+X-CSE-MsgGUID: MMjsfdD5TX6+XmY2Jd0Vpg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11093"; a="14245367"
+X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
+   d="scan'208";a="14245367"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 06:24:53 -0700
+X-CSE-ConnectionGUID: dR/fnQOMQvicCjJ8VgPrpg==
+X-CSE-MsgGUID: Fjk7r3QZQ82pYL6JEfQ8ag==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
+   d="scan'208";a="37109726"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa007.fm.intel.com with ESMTP; 04 Jun 2024 06:24:51 -0700
+Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 4B7CE125AF;
+	Tue,  4 Jun 2024 14:24:44 +0100 (IST)
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Subject: [Intel-wired-lan] [PATCH iwl-next v7 00/12] Add support for Rx timestamping for both ice and iavf drivers.
+Date: Tue,  4 Jun 2024 09:13:48 -0400
+Message-Id: <20240604131400.13655-1-mateusz.polchlopek@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] net: introduce helper sendpages_ok()
-From: Sagi Grimberg <sagi@grimberg.me>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Ofir Gal <ofir.gal@volumez.com>, davem@davemloft.net,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, ceph-devel@vger.kernel.org, dhowells@redhat.com,
- edumazet@google.com, pabeni@redhat.com, kbusch@kernel.org, axboe@kernel.dk,
- philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
- christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
-References: <20240530142417.146696-1-ofir.gal@volumez.com>
- <20240530142417.146696-2-ofir.gal@volumez.com>
- <8d0c198f-9c15-4a8f-957a-2e4aecddd2e5@grimberg.me>
- <23821101-adf0-4e38-a894-fb05a19cb9c3@volumez.com>
- <86e60615-9286-4c9c-bffc-72304bd3cc1f@grimberg.me>
- <20240604042738.GA28853@lst.de>
- <62c2b8cd-ce6a-4e13-a58c-a6b30a0dcf17@grimberg.me>
-Content-Language: en-US
-In-Reply-To: <62c2b8cd-ce6a-4e13-a58c-a6b30a0dcf17@grimberg.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+Initially, during VF creation it registers the PTP clock in
+the system and negotiates with PF it's capabilities. In the
+meantime the PF enables the Flexible Descriptor for VF.
+Only this type of descriptor allows to receive Rx timestamps.
 
+Enabling virtual clock would be possible, though it would probably
+perform poorly due to the lack of direct time access.
 
-On 04/06/2024 11:24, Sagi Grimberg wrote:
->
->
-> On 04/06/2024 7:27, Christoph Hellwig wrote:
->> On Tue, Jun 04, 2024 at 12:27:06AM +0300, Sagi Grimberg wrote:
->>>>> I still don't understand how a page in the middle of a contiguous 
->>>>> range ends
->>>>> up coming from the slab while others don't.
->>>> I haven't investigate the origin of the IO
->>>> yet. I suspect the first 2 pages are the superblocks of the raid
->>>> (mdp_superblock_1 and bitmap_super_s) and the rest of the IO is the 
->>>> bitmap.
->>> Well, if these indeed are different origins and just *happen* to be a
->>> mixture
->>> of slab originated pages and non-slab pages combined together in a 
->>> single
->>> bio of a bvec entry,
->>> I'd suspect that it would be more beneficial to split the bvec 
->>> (essentially
->>> not allow bio_add_page
->>> to append the page to tail bvec depending on a queue limit (similar 
->>> to how
->>> we handle sg gaps).
->> So you want to add a PageSlab check to bvec_try_merge_page? That sounds
->> fairly expensive..
->>
->
-> The check needs to happen somewhere apparently, and given that it will 
-> be gated by a queue flag
-> only request queues that actually needed will suffer, but they will 
-> suffer anyways...
+Enable timestamping should be done using userspace tools, e.g.
+hwstamp_ctl -i $VF -r 14
 
-Something like the untested patch below:
---
-diff --git a/block/bio.c b/block/bio.c
-index 53f608028c78..e55a4184c0e6 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -18,6 +18,7 @@
-  #include <linux/highmem.h>
-  #include <linux/blk-crypto.h>
-  #include <linux/xarray.h>
-+#include <linux/net.h>
+In order to report the timestamps to userspace, the VF extends
+timestamp to 40b.
 
-  #include <trace/events/block.h>
-  #include "blk.h"
-@@ -960,6 +961,9 @@ bool bvec_try_merge_hw_page(struct request_queue *q, 
-struct bio_vec *bv,
-                 return false;
-         if (len > queue_max_segment_size(q) - bv->bv_len)
-                 return false;
-+       if (q->limits.splice_pages &&
-+           sendpage_ok(bv->bv_page) ^ sendpage_ok(page))
-+                       return false;
-         return bvec_try_merge_page(bv, page, len, offset, same_page);
-  }
+To support this feature the flexible descriptors and PTP part
+in iavf driver have been introduced.
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index a7e820840cf7..82e2719acb9c 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -1937,6 +1937,7 @@ static void nvme_set_ctrl_limits(struct nvme_ctrl 
-*ctrl,
-         lim->virt_boundary_mask = NVME_CTRL_PAGE_SIZE - 1;
-         lim->max_segment_size = UINT_MAX;
-         lim->dma_alignment = 3;
-+       lim->splice_pages = ctrl->splice_pages;
-  }
+---
+v7:
+- changed .ndo_eth_ioctl to .ndo_hwtstamp_get and .ndo_hwtstamp_set
+  (according to Kuba's suggestion) - patch 11
 
-  static bool nvme_update_disk_info(struct nvme_ns *ns, struct 
-nvme_id_ns *id,
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 3f3e26849b61..d9818330e236 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -398,6 +398,7 @@ struct nvme_ctrl {
+v6:
+- reordered tags
+- added RB tags where applicable
+- removed redundant instructions in ifs - patch 4 and patch 5
+- changed teardown to LIFO, adapter->ptp.initialized = false
+  moved to the top of function - patch 6
+- changed cpu-endianess for testing - patch 9
+- aligned to libeth changes - patch 9
+https://lore.kernel.org/netdev/20240528112301.5374-1-mateusz.polchlopek@intel.com/
 
-         enum nvme_ctrl_type cntrltype;
-         enum nvme_dctype dctype;
-+       bool splice_pages
-  };
+v5:
+- fixed all new issues generated by this series in kernel-doc
+https://lore.kernel.org/netdev/20240418052500.50678-1-mateusz.polchlopek@intel.com/
 
-  static inline enum nvme_ctrl_state nvme_ctrl_state(struct nvme_ctrl *ctrl)
-diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-index 02076b8cb4d8..618b8f20206a 100644
---- a/drivers/nvme/host/tcp.c
-+++ b/drivers/nvme/host/tcp.c
-@@ -2146,6 +2146,12 @@ static int nvme_tcp_configure_admin_queue(struct 
-nvme_ctrl *ctrl, bool new)
-         if (error)
-                 goto out_stop_queue;
+v4:
+- fixed duplicated argument in iavf_virtchnl.c reported by coccicheck
+https://lore.kernel.org/netdev/20240410121706.6223-1-mateusz.polchlopek@intel.com/
 
-+       /*
-+        * we want to prevent contig pages with conflicting 
-splice-ability with
-+        * respect to the network transmission
-+        */
-+       ctrl->splice_pages = true;
-+
-         nvme_unquiesce_admin_queue(ctrl);
+v3:
+- added RB in commit 6
+- removed inline keyword in commit 9
+- fixed sparse issues in commit 9 and commit 10
+- used GENMASK_ULL when possible in commit 9
+https://lore.kernel.org/netdev/20240403131927.87021-1-mateusz.polchlopek@intel.com/
 
-         error = nvme_init_ctrl_finish(ctrl, false);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 69c4f113db42..ec657ddad2a4 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -331,6 +331,12 @@ struct queue_limits {
-          * due to possible offsets.
-          */
-         unsigned int            dma_alignment;
-+
-+       /*
-+        * Drivers that use MSG_SPLICE_PAGES to send the bvec over the 
-network,
-+        * will need either bvec entry contig pages spliceable or not.
-+        */
-+       bool                    splice_pages;
-  };
+v2:
+- fixed warning related to wrong specifier to dev_err_once in
+  commit 7
+- fixed warnings related to unused variables in commit 9
+https://lore.kernel.org/netdev/20240327132543.15923-1-mateusz.polchlopek@intel.com/
 
-  typedef int (*report_zones_cb)(struct blk_zone *zone, unsigned int idx,
---
+v1:
+- initial series
+https://lore.kernel.org/netdev/20240326115116.10040-1-mateusz.polchlopek@intel.com/
+---
 
-What I now see is that we will check PageSlab twice (bvec last index and 
-append page)
-and skb_splice_from_iter checks it again... How many times check we 
-check this :)
+Jacob Keller (10):
+  virtchnl: add support for enabling PTP on iAVF
+  virtchnl: add enumeration for the rxdid format
+  iavf: add support for negotiating flexible RXDID format
+  iavf: negotiate PTP capabilities
+  iavf: add initial framework for registering PTP clock
+  iavf: add support for indirect access to PHC time
+  iavf: periodically cache PHC time
+  iavf: refactor iavf_clean_rx_irq to support legacy and flex
+    descriptors
+  iavf: handle set and get timestamps ops
+  iavf: add support for Rx timestamps to hotpath
 
-Would be great if the network stack can just check it once and fallback 
-to page copy...
+Mateusz Polchlopek (1):
+  iavf: Implement checking DD desc field
+
+Simei Su (1):
+  ice: support Rx timestamp on flex descriptor
+
+ drivers/net/ethernet/intel/iavf/Makefile      |   3 +-
+ drivers/net/ethernet/intel/iavf/iavf.h        |  33 +-
+ drivers/net/ethernet/intel/iavf/iavf_main.c   | 238 +++++++-
+ drivers/net/ethernet/intel/iavf/iavf_ptp.c    | 543 ++++++++++++++++++
+ drivers/net/ethernet/intel/iavf/iavf_ptp.h    |  49 ++
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c   | 425 +++++++++++---
+ drivers/net/ethernet/intel/iavf/iavf_txrx.h   |  26 +-
+ drivers/net/ethernet/intel/iavf/iavf_type.h   | 148 +++--
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 238 ++++++++
+ drivers/net/ethernet/intel/ice/ice_base.c     |   3 -
+ drivers/net/ethernet/intel/ice/ice_ptp.c      |   4 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |   2 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   2 +
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |  86 ++-
+ drivers/net/ethernet/intel/ice/ice_virtchnl.h |   2 +
+ .../intel/ice/ice_virtchnl_allowlist.c        |   6 +
+ include/linux/avf/virtchnl.h                  | 127 +++-
+ 17 files changed, 1776 insertions(+), 159 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/iavf/iavf_ptp.c
+ create mode 100644 drivers/net/ethernet/intel/iavf/iavf_ptp.h
+
+-- 
+2.38.1
+
 
