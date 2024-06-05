@@ -1,103 +1,130 @@
-Return-Path: <netdev+bounces-100796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F77B8FC12F
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 03:15:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E8EA8FC135
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 03:17:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1C281C2298C
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 01:15:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 263D11C228D0
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 01:17:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6DD79E1;
-	Wed,  5 Jun 2024 01:15:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="P4xBQZ6v"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 064233D66;
+	Wed,  5 Jun 2024 01:17:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58042F44
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 01:14:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D75A2107;
+	Wed,  5 Jun 2024 01:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717550101; cv=none; b=k7UhXllCc4ZCqJEKFGYUtTZt2F2uTSTLcF/2YvkAtpkgm8Tc5Fha5iwzULEhdpjaEnQJVtl8eYibRSejiiti/ATA0vPDlO4us1p8iWxZuS6Vps6pRhYCAM0LNBbeS+YzDGOQZGgLIq/XqYhZIalgl7vNY8m+2z/UJLKCai9WBls=
+	t=1717550243; cv=none; b=Gz0in5xG7w4wu6SqJ8afpSZTxUmnWAwUtKtnuUYJParsDb6TjpxijvFsvzyovfwl4QXjlqaFxVZlI+EbzmC/ypgzNwlC43BRm0Y3bJbvYPDZNKvKfRjsiMOHTAU+0bpvCGlKLvhpMoZrlyOHL+LhOd/Q0CtvHLMWWLfhSqu4NhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717550101; c=relaxed/simple;
-	bh=Bv4L9NrvSEK+N9qOU007Ygdlatbfv26G5Y2JiYaobwQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BW/CKY2TzR6Qzj1HRP/Nem2hVI7kHlcTRvlsK03Bg4tjk7hh7P7G5PyqH8SdoxGoRLjdgqFBZOr8VUYlR1grgxtJrFD/ckdCPqFAru2zPUNmeUtytxBZt8EjTIYWfOlPKFa+F/7f+9m2wrYRZn7Ge9PkLSQH6VKIdnHf6Yt0XL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=P4xBQZ6v; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=XR4iWXQMJ1j7H79vhf5bobV6/Eeyl57/HHXYOI+dLHU=; b=P4xBQZ6vbY5ZrqnzDZvA/djHFe
-	PyG8yVoP1bznQWTb79mOjtEnmNAI6NXXeTUUtEdtyGOfjzllpygcMrtXnZXSjTK5y5PAyROIUZvPQ
-	q4H6QbCCicKn5ut5mM/iNX1Eyxkp9b+iBIwQmPSMGMGNXX1XggrPH5/2dQESiZQX26HQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sEfEr-00GrEU-3Z; Wed, 05 Jun 2024 03:14:53 +0200
-Date: Wed, 5 Jun 2024 03:14:53 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: "Nelson, Shannon" <shannon.nelson@amd.com>,
-	David Miller <davem@davemloft.net>, netdev <netdev@vger.kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Vitaly Lifshits <vitaly.lifshits@intel.com>,
-	Menachem Fogel <menachem.fogel@intel.com>,
-	Naama Meir <naamax.meir@linux.intel.com>
-Subject: Re: [PATCH 9/9] igc: add support for ethtool.set_phys_id
-Message-ID: <d27f050a-26db-4f08-aa19-848ae2c6ed2d@lunn.ch>
-References: <20240603-next-2024-06-03-intel-next-batch-v1-0-e0523b28f325@intel.com>
- <20240603-next-2024-06-03-intel-next-batch-v1-9-e0523b28f325@intel.com>
- <f8f8d5fb-68c1-4fd1-9e0b-04c661c98f25@amd.com>
- <dc0cc2ca-d3f4-4387-88bd-b54ea6896e0f@intel.com>
+	s=arc-20240116; t=1717550243; c=relaxed/simple;
+	bh=HLpoLdstnucicsvT5jMONV0hC5aA5fX3wp6EmkQr7ro=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Fey+Z0FdNFjJnP/PlhgyizvOAQQOCH9ITAykAYr+OzlvvtzJ6XTiiOFO8rTolNebV5MfgI/ht96LyJWlB3iWuM2wqQwz+oPua4wawxSwgLbBy5Cx78aj3ydNELa2OmmOx/+LaYi97RdOWnb1JpnyzOyiJamhDEODBBhj+XRVzmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45518rnG006051;
+	Wed, 5 Jun 2024 01:16:52 GMT
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3yfruxbkk2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 05 Jun 2024 01:16:52 +0000 (GMT)
+Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 4 Jun 2024 18:16:51 -0700
+Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
+ 15.1.2507.39 via Frontend Transport; Tue, 4 Jun 2024 18:16:45 -0700
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <krisman@suse.de>
+CC: <adilger.kernel@dilger.ca>, <coreteam@netfilter.org>,
+        <davem@davemloft.net>, <ebiggers@kernel.org>, <fw@strlen.de>,
+        <jaegeuk@kernel.org>, <kadlec@netfilter.org>, <kuba@kernel.org>,
+        <linux-ext4@vger.kernel.org>, <linux-fscrypt@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <lizhi.xu@windriver.com>,
+        <lkp@intel.com>, <llvm@lists.linux.dev>, <netdev@vger.kernel.org>,
+        <netfilter-devel@vger.kernel.org>, <oe-kbuild-all@lists.linux.dev>,
+        <pablo@netfilter.org>,
+        <syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com>,
+        <syzkaller-bugs@googlegroups.com>, <tytso@mit.edu>
+Subject: Re: [PATCH V5] ext4: check hash version and filesystem casefolded consistent
+Date: Wed, 5 Jun 2024 09:16:44 +0800
+Message-ID: <20240605011644.1878-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <87le3kle87.fsf@mailhost.krisman.be>
+References: <87le3kle87.fsf@mailhost.krisman.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dc0cc2ca-d3f4-4387-88bd-b54ea6896e0f@intel.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: eSwt-QjaTDEty4IdYCpGVD27kbz6EKap
+X-Proofpoint-GUID: eSwt-QjaTDEty4IdYCpGVD27kbz6EKap
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-04_11,2024-06-04_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ lowpriorityscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ bulkscore=0 spamscore=0 mlxscore=0 priorityscore=1501 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.21.0-2405170001 definitions=main-2406050008
 
-On Tue, Jun 04, 2024 at 02:12:31PM -0700, Jacob Keller wrote:
+On Tue, 04 Jun 2024 15:06:32 -0400, Gabriel Krisman Bertazi wrote:
+> >> > When mounting the ext4 filesystem, if the hash version and casefolded are not
+> >> > consistent, exit the mounting.
+> >> >
+> >> > Reported-by: syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com
+> >> > Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+> >> > ---
+> >> >  fs/ext4/super.c | 5 +++++
+> >> >  1 file changed, 5 insertions(+)
+> >> >
+> >> > diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+> >> > index c682fb927b64..0ad326504c50 100644
+> >> > --- a/fs/ext4/super.c
+> >> > +++ b/fs/ext4/super.c
+> >> > @@ -5262,6 +5262,11 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
+> >> >  		goto failed_mount;
+> >> >  
+> >> >  	ext4_hash_info_init(sb);
+> >> > +	if (es->s_def_hash_version == DX_HASH_SIPHASH && 
+> >> > +	    !ext4_has_feature_casefold(sb)) {
+> >> 
+> >> Can we ever have DX_HASH_SIPHASH set up in the super block?  I thought
+> >> it was used solely for directories where ext4_hash_in_dirent(inode) is
+> >> true.
+> > The value of s'def_hash_version is obtained by reading the super block from the
+> > buffer cache of the block device in ext4_load_super().
 > 
+> Yes, I know.  My point is whether this check should just be:
+Based on the existing information, it cannot be confirmed that it is incorrect
+to separately determine the value of s_def_hash_version as DX_HASH_SIPHASH.
+Additionally, I have come up with a better solution, and I will issue the next
+fixed version in a while.
 > 
-> On 6/3/2024 5:12 PM, Nelson, Shannon wrote:
-> > On 6/3/2024 3:38 PM, Jacob Keller wrote:
-> >>
-> >> From: Vitaly Lifshits <vitaly.lifshits@intel.com>
-> >>
-> >> Add support for ethtool.set_phys_id callback to initiate LED blinking
-> >> and stopping them by the ethtool interface.
-> >> This is done by storing the initial LEDCTL register value and restoring
-> >> it when LED blinking is terminated.
-> >>
-> >> In addition, moved IGC_LEDCTL related defines from igc_leds.c to
-> >> igc_defines.h where they can be included by all of the igc module
-> >> files.
+> if (es->s_def_hash_version == DX_HASH_SIPHASH)
+> 	goto failed_mount;
+> 
+> Since, IIUC, DX_HASH_SIPHASH is done per-directory and not written to
+> the sb.
+> 
+> >> If this is only for the case of a superblock corruption, perhaps we
+> >> should always reject the mount, whether casefold is enabled or not?
+> > Based on the existing information, it cannot be confirmed whether the superblock
+> > is corrupt, but one thing is clear: if the default hash version of the superblock
+> > is set to DX_HASH_SIPHASH, but the casefold feature is not set at the same time,
+> > it is definitely an error.
 
-Sorry for the deep nesting. I missed the first post.
-
-This seems like a very Intel specific solution to a very generic
-problem. The LED code added by Kurt Kanzenbach follows the generic
-netdev way of controlling LEDs. Any MAC or PHY driver with LED support
-should be capable of blinking. Maybe in hardware, maybe it needs
-software support.
-
-So please write a generic ethtool helper which any MAC driver can use
-to make use of the generic sys class LEDs associated to it, not an
-Intel specific solution.
-
-    Andrew
-
----
-pw-bot: cr
+Lizhi
 
