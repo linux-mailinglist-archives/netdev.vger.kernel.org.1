@@ -1,140 +1,236 @@
-Return-Path: <netdev+bounces-101128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D33618FD6C4
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 21:51:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0BCB8FD6D3
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 21:55:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8304C1F27E88
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 19:51:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23E0DB25E32
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 19:55:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CBCE15443B;
-	Wed,  5 Jun 2024 19:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88919154449;
+	Wed,  5 Jun 2024 19:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IaqxZLI+"
+	dkim=pass (2048-bit key) header.d=malat-biz.20230601.gappssmtp.com header.i=@malat-biz.20230601.gappssmtp.com header.b="BJcDNcuZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E36154436;
-	Wed,  5 Jun 2024 19:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C9B154C11
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 19:54:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717617083; cv=none; b=T6UM2mD1+W+RSzgGN3n1UG0sNN2GODdBg1oM9IRmSTvPZGtOWpDM/3mUSeYcmX4bluBGuoIJz9xwGiMpzSdyg1IJ/nUFsFauqu/ik0IJxnVUM6q1pLgMTkPnlUqm/3uq/KkFTutVHAH7+zl4FVrhUW89iGiF6YlNLSv5A4FCJSM=
+	t=1717617303; cv=none; b=Mf/iSAjfUbmRWSaFI6M7jdJ0wtxnWSZqxZBZUE4UqCKCNuemIB6+DuykG3ehmJzloDv1G3nBoO6LbR8M4S0ENcGv6d2DScWz/e+mrXwQbP/iZj/HuTvYNCyfhHxdWK0t+7hPQW2/qILyGYvWBSqR8zjkEJZGfuTEsQpWElADJik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717617083; c=relaxed/simple;
-	bh=41iLXtRakTOZqv2vBnh0hQcqUw/AeJryNuhiaoedJ2U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iONyMQu8JOldhXx4b2TnNTAvSLBYeWxDPKOkvEnJBaavH5vw3jwTGw12vvt0NYZKj4nsz7lEYKCqbPD5eQHy6q0Pa6YaXPiLfCYkMR1ueV05C5dZFOsUOFMmXihiO3u5NpZ1rF+scEvP6DYuZOS0x8g8IJqWOZisskUVTQRhubU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IaqxZLI+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B281C2BD11;
-	Wed,  5 Jun 2024 19:51:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717617083;
-	bh=41iLXtRakTOZqv2vBnh0hQcqUw/AeJryNuhiaoedJ2U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IaqxZLI+2cB24EwHJTLJbXiihQiwYcxhN5QYLFPVeXsxCPAh7xv185XcWVOUoYHax
-	 3UT5mJDBVRO44xUCjiPIaPpugGOIGLEFLR0do+4FaFIDOD2o+MaRGodvBdq95hZ+dE
-	 9Yg3yRVrd3f+M3grquR+Awyd0QiZx2y+3+Lq0xRUVodMS87bc5khz28kk/FUUPwlD1
-	 iiSIdvgCB1IoZcW3VrmEK3EvAE6hBTFSNtUHZNdZwZ2Y6p5yABoeRDAehXVnMgaiLG
-	 dZkl04UBnywnZyzoo7IsOBis0HqVhb/s8vgwhaIw1YMemDBfSdFGVByAd4hh1dI8rZ
-	 DireAE1JRzXkw==
-Date: Wed, 5 Jun 2024 20:51:17 +0100
-From: Simon Horman <horms@kernel.org>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
-	i.maximets@ovn.org, dev@openvswitch.org,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Pravin B Shelar <pshelar@ovn.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 5/9] net: openvswitch: add emit_sample action
-Message-ID: <20240605195117.GY791188@kernel.org>
-References: <20240603185647.2310748-1-amorenoz@redhat.com>
- <20240603185647.2310748-6-amorenoz@redhat.com>
+	s=arc-20240116; t=1717617303; c=relaxed/simple;
+	bh=8+KzmAseRwYuap2YctBMNPnphwGzX37Qq/+HLRe5qrw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rc4zVdqywl6JkUNkDTQ8yu7krgn3GxZLbZki2gSJtX/oOtuTCq398yWaYKcJv1AozJ4sLUpOCyPGIQoA3Y78ZqaKCw9G0B8AIPf7OhtTzStfia+PkUaGPQdHZ22Zfhj1DL6sAJxmhx4kGDBhBu07+chdoGDJtjPz18ACBlKQfVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=malat.biz; spf=none smtp.mailfrom=malat.biz; dkim=pass (2048-bit key) header.d=malat-biz.20230601.gappssmtp.com header.i=@malat-biz.20230601.gappssmtp.com header.b=BJcDNcuZ; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=malat.biz
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=malat.biz
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-57a20c600a7so178103a12.3
+        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 12:54:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=malat-biz.20230601.gappssmtp.com; s=20230601; t=1717617298; x=1718222098; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aW60LEj6j9GwU2MV/alkjrJr7iIEbZOcwkGUz4aZGww=;
+        b=BJcDNcuZGmqO5Gm8iPaEyR0KSi2JGmIw0LhaJkOMTZpvF0bHGLNu1sAeuKY8cYMXxl
+         jVBNf1E1rP9BaVVy2N0srKRd835VX/wAIJkgOckVYA9sJqdUZNi98DuoA96IFW2yIBWt
+         zPZ/kj6PFs2QDkuT9GuInzm3SrNeVGxMyPg+n1bWmLHIXLwhe5A3491h41fdRsOlbLvV
+         geQjLU6K1SKJ1bFpf43tWLBnUPyR50P0QBY0GLYhcX97C2RSkqE/ginWmtno38V09uqa
+         T6nHIju+89DgJpKKS7isILRwF3sjVbeSTYz0kFi/Xce4IOlWGKuc6zLmXC/I/c1qjhYX
+         zGqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717617298; x=1718222098;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aW60LEj6j9GwU2MV/alkjrJr7iIEbZOcwkGUz4aZGww=;
+        b=XMPBS/88wd1WKBI9vFuTQXgI73t2oWjIZcg0cfgpD349yC6YZNOjn1rsbIPKIPXyCo
+         ArfhxHbsXb3iH7Wbtn7aQq3C19FamENRa5Aq4MLZpRVyVRXBO/nky+TS7sKFJS4X9qv4
+         /U2Bo/fGfFNJniBHjfKo6x9zoendRl/gq30slj4o8SbqWHhU1KMUphH43viSn5f3ucr8
+         iQNJHGny/5DzWmkk2mHnLr4JK5cno6Nm8Re0+ReWTi6GSIgrIjAYC8gzKF35V8l571wv
+         HdqEGpWTMv1evsSyxiuYepacZCFr4Uisy3mY6TLxOxxr7wtOBAL0tCrInuH17utIDJm1
+         3WuA==
+X-Gm-Message-State: AOJu0YwHbjgoTnhjHI89Kwsm7WOygPxyjEdAua9NNX+EbsMGLaR56Xqf
+	sm3jzg/FisUsFZ0sy1mpCeRgEcPdnbs7xKzH16zjnRnC4e9U/ItWYGnnx20ir2dLzsSxhuzToUS
+	umw==
+X-Google-Smtp-Source: AGHT+IHHL1tKrTtaTAINDfE/QNTh7PkGsKG05Gk3k6mtSz4qA9CpDGgq6e315B0wEYQZjxe/LVDAfw==
+X-Received: by 2002:a50:d6d4:0:b0:57a:303f:94c1 with SMTP id 4fb4d7f45d1cf-57a8bcb236fmr2374720a12.29.1717617297899;
+        Wed, 05 Jun 2024 12:54:57 -0700 (PDT)
+Received: from ntb.petris.klfree.czf (snat2.klfree.cz. [81.201.48.25])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-57a52f5cbd3sm7448769a12.12.2024.06.05.12.54.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jun 2024 12:54:57 -0700 (PDT)
+From: Petr Malat <oss@malat.biz>
+To: netdev@vger.kernel.org
+Cc: edumazet@google.com,
+	davem@davemloft.net,
+	Petr Malat <oss@malat.biz>
+Subject: [PATCH] ip6mr: Fix lockdep and sparse RCU warnings
+Date: Wed,  5 Jun 2024 21:53:55 +0200
+Message-Id: <20240605195355.363936-1-oss@malat.biz>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240603185647.2310748-6-amorenoz@redhat.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 03, 2024 at 08:56:39PM +0200, Adrian Moreno wrote:
-> Add support for a new action: emit_sample.
-> 
-> This action accepts a u32 group id and a variable-length cookie and uses
-> the psample multicast group to make the packet available for
-> observability.
-> 
-> The maximum length of the user-defined cookie is set to 16, same as
-> tc_cookie, to discourage using cookies that will not be offloadable.
-> 
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+ip6mr_vif_seq_start() must lock RCU even in a case of error, because
+stop callback is called unconditionally.
 
-Hi Adrian,
+When IPV6_MROUTE_MULTIPLE_TABLES is enabled, calls to ip6mr_get_table
+should be done under RCU or RTNL lock. Lock RCU before the call unless
+it's done already or RTNL lock is held.
 
-Some minor nits from my side.
+Signed-off-by: Petr Malat <oss@malat.biz>
+---
+ net/ipv6/ip6mr.c | 52 +++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 34 insertions(+), 18 deletions(-)
 
-...
+diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
+index cb0ee81a068a..bf6932535d6d 100644
+--- a/net/ipv6/ip6mr.c
++++ b/net/ipv6/ip6mr.c
+@@ -411,13 +411,14 @@ static void *ip6mr_vif_seq_start(struct seq_file *seq, loff_t *pos)
+ 	struct net *net = seq_file_net(seq);
+ 	struct mr_table *mrt;
+ 
++	rcu_read_lock();
++
+ 	mrt = ip6mr_get_table(net, RT6_TABLE_DFLT);
+ 	if (!mrt)
+ 		return ERR_PTR(-ENOENT);
+ 
+ 	iter->mrt = mrt;
+ 
+-	rcu_read_lock();
+ 	return mr_vif_seq_start(seq, pos);
+ }
+ 
+@@ -1885,17 +1886,21 @@ int ip6mr_ioctl(struct sock *sk, int cmd, void *arg)
+ 	struct net *net = sock_net(sk);
+ 	struct mr_table *mrt;
+ 
++	rcu_read_lock();
+ 	mrt = ip6mr_get_table(net, raw6_sk(sk)->ip6mr_table ? : RT6_TABLE_DFLT);
+-	if (!mrt)
++	if (!mrt) {
++		rcu_read_unlock();
+ 		return -ENOENT;
++	}
+ 
+ 	switch (cmd) {
+ 	case SIOCGETMIFCNT_IN6:
+ 		vr = (struct sioc_mif_req6 *)arg;
+-		if (vr->mifi >= mrt->maxvif)
++		if (vr->mifi >= mrt->maxvif) {
++			rcu_read_unlock();
+ 			return -EINVAL;
++		}
+ 		vr->mifi = array_index_nospec(vr->mifi, mrt->maxvif);
+-		rcu_read_lock();
+ 		vif = &mrt->vif_table[vr->mifi];
+ 		if (VIF_EXISTS(mrt, vr->mifi)) {
+ 			vr->icount = READ_ONCE(vif->pkt_in);
+@@ -1910,7 +1915,6 @@ int ip6mr_ioctl(struct sock *sk, int cmd, void *arg)
+ 	case SIOCGETSGCNT_IN6:
+ 		sr = (struct sioc_sg_req6 *)arg;
+ 
+-		rcu_read_lock();
+ 		c = ip6mr_cache_find(mrt, &sr->src.sin6_addr,
+ 				     &sr->grp.sin6_addr);
+ 		if (c) {
+@@ -1923,6 +1927,7 @@ int ip6mr_ioctl(struct sock *sk, int cmd, void *arg)
+ 		rcu_read_unlock();
+ 		return -EADDRNOTAVAIL;
+ 	default:
++		rcu_read_unlock();
+ 		return -ENOIOCTLCMD;
+ 	}
+ }
+@@ -1953,18 +1958,33 @@ int ip6mr_compat_ioctl(struct sock *sk, unsigned int cmd, void __user *arg)
+ 	struct net *net = sock_net(sk);
+ 	struct mr_table *mrt;
+ 
++	switch (cmd) {
++	case SIOCGETMIFCNT_IN6:
++		if (copy_from_user(&vr, arg, sizeof(vr)))
++			return -EFAULT;
++		break;
++	case SIOCGETSGCNT_IN6:
++		if (copy_from_user(&sr, arg, sizeof(sr)))
++			return -EFAULT;
++		break;
++	default:
++		return -ENOIOCTLCMD;
++	}
++
++	rcu_read_lock();
+ 	mrt = ip6mr_get_table(net, raw6_sk(sk)->ip6mr_table ? : RT6_TABLE_DFLT);
+-	if (!mrt)
++	if (!mrt) {
++		rcu_read_unlock();
+ 		return -ENOENT;
++	}
+ 
+ 	switch (cmd) {
+ 	case SIOCGETMIFCNT_IN6:
+-		if (copy_from_user(&vr, arg, sizeof(vr)))
+-			return -EFAULT;
+-		if (vr.mifi >= mrt->maxvif)
++		if (vr.mifi >= mrt->maxvif) {
++			rcu_read_unlock();
+ 			return -EINVAL;
++		}
+ 		vr.mifi = array_index_nospec(vr.mifi, mrt->maxvif);
+-		rcu_read_lock();
+ 		vif = &mrt->vif_table[vr.mifi];
+ 		if (VIF_EXISTS(mrt, vr.mifi)) {
+ 			vr.icount = READ_ONCE(vif->pkt_in);
+@@ -1980,10 +2000,6 @@ int ip6mr_compat_ioctl(struct sock *sk, unsigned int cmd, void __user *arg)
+ 		rcu_read_unlock();
+ 		return -EADDRNOTAVAIL;
+ 	case SIOCGETSGCNT_IN6:
+-		if (copy_from_user(&sr, arg, sizeof(sr)))
+-			return -EFAULT;
+-
+-		rcu_read_lock();
+ 		c = ip6mr_cache_find(mrt, &sr.src.sin6_addr, &sr.grp.sin6_addr);
+ 		if (c) {
+ 			sr.pktcnt = c->_c.mfc_un.res.pkt;
+@@ -1997,8 +2013,6 @@ int ip6mr_compat_ioctl(struct sock *sk, unsigned int cmd, void __user *arg)
+ 		}
+ 		rcu_read_unlock();
+ 		return -EADDRNOTAVAIL;
+-	default:
+-		return -ENOIOCTLCMD;
+ 	}
+ }
+ #endif
+@@ -2275,11 +2289,13 @@ int ip6mr_get_route(struct net *net, struct sk_buff *skb, struct rtmsg *rtm,
+ 	struct mfc6_cache *cache;
+ 	struct rt6_info *rt = (struct rt6_info *)skb_dst(skb);
+ 
++	rcu_read_lock();
+ 	mrt = ip6mr_get_table(net, RT6_TABLE_DFLT);
+-	if (!mrt)
++	if (!mrt) {
++		rcu_read_lock();
+ 		return -ENOENT;
++	}
+ 
+-	rcu_read_lock();
+ 	cache = ip6mr_cache_find(mrt, &rt->rt6i_src.addr, &rt->rt6i_dst.addr);
+ 	if (!cache && skb->dev) {
+ 		int vif = ip6mr_find_vif(mrt, skb->dev);
+-- 
+2.39.2
 
-> diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
-> index efc82c318fa2..a0e9dde0584a 100644
-> --- a/include/uapi/linux/openvswitch.h
-> +++ b/include/uapi/linux/openvswitch.h
-> @@ -914,6 +914,30 @@ struct check_pkt_len_arg {
->  };
->  #endif
->  
-> +#define OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE 16
-> +/**
-> + * enum ovs_emit_sample_attr - Attributes for %OVS_ACTION_ATTR_EMIT_SAMPLE
-> + * action.
-> + *
-> + * @OVS_EMIT_SAMPLE_ATTR_GROUP: 32-bit number to identify the source of the
-> + * sample.
-> + * @OVS_EMIT_SAMPLE_ATTR_COOKIE: A variable-length binary cookie that contains
-> + * user-defined metadata. The maximum length is 16 bytes.
-> + *
-> + * Sends the packet to the psample multicast group with the specified group and
-> + * cookie. It is possible to combine this action with the
-> + * %OVS_ACTION_ATTR_TRUNC action to limit the size of the packet being emitted.
-> + */
-> +enum ovs_emit_sample_attr {
-> +	OVS_EMIT_SAMPLE_ATTR_UNPSEC,
-> +	OVS_EMIT_SAMPLE_ATTR_GROUP,	/* u32 number. */
-> +	OVS_EMIT_SAMPLE_ATTR_COOKIE,	/* Optional, user specified cookie. */
-> +	__OVS_EMIT_SAMPLE_ATTR_MAX
-> +};
-> +
-> +#define OVS_EMIT_SAMPLE_ATTR_MAX (__OVS_EMIT_SAMPLE_ATTR_MAX - 1)
-> +
-> +
-
-nit: One blank line is enough.
-
-     Flagged by checkpatch.pl
-
->  /**
->   * enum ovs_action_attr - Action types.
->   *
-> @@ -1004,6 +1028,7 @@ enum ovs_action_attr {
->  	OVS_ACTION_ATTR_ADD_MPLS,     /* struct ovs_action_add_mpls. */
->  	OVS_ACTION_ATTR_DEC_TTL,      /* Nested OVS_DEC_TTL_ATTR_*. */
->  	OVS_ACTION_ATTR_DROP,         /* u32 error code. */
-> +	OVS_ACTION_ATTR_EMIT_SAMPLE,  /* Nested OVS_EMIT_SAMPLE_ATTR_*. */
-
-nit: Please add OVS_ACTION_ATTR_EMIT_SAMPLE to the Kenrel doc
-     for this structure.
-
->  
->  	__OVS_ACTION_ATTR_MAX,	      /* Nothing past this will be accepted
->  				       * from userspace. */
-
-...
 
