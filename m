@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-100974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 700458FCD2E
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 14:38:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1F258FCD5E
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 14:41:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6730B26A2F
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 12:37:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DAE0BB28373
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 12:40:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04DD71C451F;
-	Wed,  5 Jun 2024 12:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0F81A3BB8;
+	Wed,  5 Jun 2024 12:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GzBwDe8O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="msLWi3cc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D12581C451C;
-	Wed,  5 Jun 2024 12:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4643F1A3BB1;
+	Wed,  5 Jun 2024 12:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717589019; cv=none; b=rjqdF7G3ggSp8weeRf2uOyKdtodlDPRUaBjE6FGse4E2R1f8EP1C/EsvsKntb/XAaIMspYkyjSp26DzX/A3lATdgsDzBLYYqFOQdkV0ZXB1D71roankOA0UjaLJhXgy+vVA3sdMA4n0L5VR2XA5ZOkGVpwEIov6yxe9m0aNfocI=
+	t=1717589054; cv=none; b=ptwpX4LN4ViCPCqEzGZ+pTX7+3/kGwoX7KKrBzXeRHg9PXwLL/mOIgwI6ugV7DyM6UeyuJKgxGLwhe4l8NjNpkW/t1AOF0GSZ4p1fsy+wmBsasetqHkuI5EFv116xYNskOda7CPIWroe/UXQxWFjUSBIjGh6bPFNDTEhCojmBnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717589019; c=relaxed/simple;
-	bh=m3CfvU2t8e740CAdb6g+m9jKiMWSdqG1ZUq+ET575AA=;
+	s=arc-20240116; t=1717589054; c=relaxed/simple;
+	bh=IGgKpx5j1MkOyKp+cg7XNRPiZbHX1nqPZwkHTCb2kNA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Nevbl0si86ToX2dBEGHj8TR4+vW+r7t+a8xzPB5KPuvx+eGxb+qG0fRzQz4/uvzNDO5LX4Eq/BK9JGkmT0T2rh8LglEzJA06DT9Q2Fi3RLaJJxsbVjPwxmtl+PzP+uhcN9oiDzh9P+xG+Nyf2I7+0eBri7bNCHvfntfc85EPfTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GzBwDe8O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B17CCC3277B;
-	Wed,  5 Jun 2024 12:03:38 +0000 (UTC)
+	 MIME-Version; b=u9MFS3o6O+gqoVIQUHjf0AGVsauu67qoQ7oKaQPBc5vprRpUTE3fmALkrnn3LzTTPEqnOy0VqbuuezGS+2MoNnxa4rV7Ln0NaLjs3dPENlPv7yvblpWwScityrVwmtMNcBzKLFPiClISjYjQdAD2iK1Io1U6JETc1/IVnb1h7fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=msLWi3cc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B07BC4AF09;
+	Wed,  5 Jun 2024 12:04:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717589019;
-	bh=m3CfvU2t8e740CAdb6g+m9jKiMWSdqG1ZUq+ET575AA=;
+	s=k20201202; t=1717589054;
+	bh=IGgKpx5j1MkOyKp+cg7XNRPiZbHX1nqPZwkHTCb2kNA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GzBwDe8OXIMX47D8MN4A6q66RJYMYEI86hSfcvcMTyBUN/1Q5PVA/Wi/vODYaIKk/
-	 4MHSP4373n9NAKm6ly7PiMW/+C1CMlODySg2lTcMx6yeni3pSUKSBxdFgbA8OUugj8
-	 RTDqQaJQ5HPhQR3g8SkdneBmq59dYwI0lJBX/SlodyiIvgCJ2qCFyqoBulM41iG2/K
-	 WVq7kPAp5H2UfhBAakT2CN+noazS+d7ciDMR8hbOWl1GIeoSx8ma7pr3WyuMGu5Dho
-	 eLrYd04K686F/FF8w5U6+kiZIJby5cE9CvyLU98C0XolEc3uB+h9G7moCygO2uivC/
-	 5PFnJ4fMLaWcw==
+	b=msLWi3ccV/3Ru5YBzPqbhzcYAFjt9Z6G6P9Afw8tATAErSti3DSrxUOTd5haU/5Db
+	 yBeOp/5Hgw2pqsa3NuLBwkzMUGp/ANJrImLCGHllNnOGi2Gx580cfNM08YXr5Yo/hc
+	 burj9ckFVwlvhZeQajQbXuGXC/IjAlDn2lXZII+PnB3HXHilQiQgEhKMjwVUuIPbii
+	 XiAIPB3eUd6OfmO4DoZ18Ljyl7rvSHSWzyZJXPsyLrybWu4jxnlhVKtCcufBCh8nwR
+	 d1MX2576nsEwvEd/mJzK+5jMnRnfr6Z45d1DP1+3Xdv1g8y4jgMvBSKFk3HAfawCpB
+	 5Y0JMNAlm2HQw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Edward Adam Davis <eadavis@qq.com>,
-	syzbot+71bfed2b2bcea46c98f2@syzkaller.appspotmail.com,
+Cc: Matt Jan <zoo868e@gmail.com>,
 	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	bongsu.jeon@samsung.com,
-	krzk@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.8 12/18] nfc/nci: Add the inconsistency check between the input data length and count
-Date: Wed,  5 Jun 2024 08:03:02 -0400
-Message-ID: <20240605120319.2966627-12-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 03/18] connector: Fix invalid conversion in cn_proc.h
+Date: Wed,  5 Jun 2024 08:03:42 -0400
+Message-ID: <20240605120409.2967044-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240605120319.2966627-1-sashal@kernel.org>
-References: <20240605120319.2966627-1-sashal@kernel.org>
+In-Reply-To: <20240605120409.2967044-1-sashal@kernel.org>
+References: <20240605120409.2967044-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,45 +65,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.8.12
+X-stable-base: Linux 6.6.32
 Content-Transfer-Encoding: 8bit
 
-From: Edward Adam Davis <eadavis@qq.com>
+From: Matt Jan <zoo868e@gmail.com>
 
-[ Upstream commit 068648aab72c9ba7b0597354ef4d81ffaac7b979 ]
+[ Upstream commit 06e785aeb9ea8a43d0a3967c1ba6e69d758e82d4 ]
 
-write$nci(r0, &(0x7f0000000740)=ANY=[@ANYBLOB="610501"], 0xf)
+The implicit conversion from unsigned int to enum
+proc_cn_event is invalid, so explicitly cast it
+for compilation in a C++ compiler.
+/usr/include/linux/cn_proc.h: In function 'proc_cn_event valid_event(proc_cn_event)':
+/usr/include/linux/cn_proc.h:72:17: error: invalid conversion from 'unsigned int' to 'proc_cn_event' [-fpermissive]
+   72 |         ev_type &= PROC_EVENT_ALL;
+      |                 ^
+      |                 |
+      |                 unsigned int
 
-Syzbot constructed a write() call with a data length of 3 bytes but a count value
-of 15, which passed too little data to meet the basic requirements of the function
-nci_rf_intf_activated_ntf_packet().
-
-Therefore, increasing the comparison between data length and count value to avoid
-problems caused by inconsistent data length and count.
-
-Reported-and-tested-by: syzbot+71bfed2b2bcea46c98f2@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+Signed-off-by: Matt Jan <zoo868e@gmail.com>
 Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/nfc/virtual_ncidev.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/uapi/linux/cn_proc.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/nfc/virtual_ncidev.c b/drivers/nfc/virtual_ncidev.c
-index 590b038e449e5..6b89d596ba9af 100644
---- a/drivers/nfc/virtual_ncidev.c
-+++ b/drivers/nfc/virtual_ncidev.c
-@@ -125,6 +125,10 @@ static ssize_t virtual_ncidev_write(struct file *file,
- 		kfree_skb(skb);
- 		return -EFAULT;
- 	}
-+	if (strnlen(skb->data, count) != count) {
-+		kfree_skb(skb);
-+		return -EINVAL;
-+	}
+diff --git a/include/uapi/linux/cn_proc.h b/include/uapi/linux/cn_proc.h
+index f2afb7cc4926c..18e3745b86cd4 100644
+--- a/include/uapi/linux/cn_proc.h
++++ b/include/uapi/linux/cn_proc.h
+@@ -69,8 +69,7 @@ struct proc_input {
  
- 	nci_recv_frame(vdev->ndev, skb);
- 	return count;
+ static inline enum proc_cn_event valid_event(enum proc_cn_event ev_type)
+ {
+-	ev_type &= PROC_EVENT_ALL;
+-	return ev_type;
++	return (enum proc_cn_event)(ev_type & PROC_EVENT_ALL);
+ }
+ 
+ /*
 -- 
 2.43.0
 
