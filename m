@@ -1,71 +1,64 @@
-Return-Path: <netdev+bounces-101142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3B318FD773
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 22:24:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95BA68FD789
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 22:31:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6D851F2439D
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 20:24:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47597281372
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 20:31:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5005015ECCD;
-	Wed,  5 Jun 2024 20:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 180BB14EC52;
+	Wed,  5 Jun 2024 20:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="F5zRhWvT"
 X-Original-To: netdev@vger.kernel.org
-Received: from fgw20-7.mail.saunalahti.fi (fgw20-7.mail.saunalahti.fi [62.142.5.81])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7732E154445
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 20:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.142.5.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41E4153BC7
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 20:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717619089; cv=none; b=JWmr2m3Y4J8/t+H2zcFhQ+93H1tywwjx3lxExdHeNuC+e4iLK/dFoAq1Al0OfMpu8yNksl3GTmblzpsUsM+rBEWm9Z8cgVJX5w6Li28oc0/XlN0Wj3Tdl1aWBoOMpSt4RhpvWFsCPXzhik7cse/mZ/ru3TBYELCZMr13yq1v/FA=
+	t=1717619481; cv=none; b=f+NHiLj8/IaS8lS0hNw49EdzyoNcwve/P07lrKIs7qie5hOJEXzvWCaIJwO9gbIbocHI1KRz+VxQeWsw0NK+HNtt/DHuRFnwPBbLiFNyR2mQjVdw+YC/3vByXihNFUonQYrdIPyGRWR7q4KadbUIG+TW46DlXFmv3OO+1Y/ncGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717619089; c=relaxed/simple;
-	bh=dJT0IXIjAoLuqegKrl7wJhhJCx7h7wib/TJUPpQllBA=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XQZn8TtNQAaXNzh0huY2QXM1gl1C2lwcHSGB4AeXrqcHfX4IEg9LadHColNf8pj6btZyuMweydmWITLUWMSGBiackaCvczjG8B1OW+a/GYVejVjIigYAE+F6+QNCTDOCIpTg001OwgbG36QQq0x8QnNV4kx6bE0zbjUECPQpw7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=fail smtp.mailfrom=gmail.com; arc=none smtp.client-ip=62.142.5.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gmail.com
-Received: from localhost (88-113-26-230.elisa-laajakaista.fi [88.113.26.230])
-	by fgw22.mail.saunalahti.fi (Halon) with ESMTP
-	id a4ad9dfa-2379-11ef-8e41-005056bdf889;
-	Wed, 05 Jun 2024 23:24:45 +0300 (EEST)
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Wed, 5 Jun 2024 23:24:43 +0300
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Sai Krishna Gajula <saikrishnag@marvell.com>,
-	Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Allan Nielsen <allan.nielsen@microchip.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 18/19] mfd: Add support for LAN966x PCI device
-Message-ID: <ZmDJi__Ilp7zd-yJ@surfacebook.localdomain>
-References: <20240527161450.326615-1-herve.codina@bootlin.com>
- <20240527161450.326615-19-herve.codina@bootlin.com>
+	s=arc-20240116; t=1717619481; c=relaxed/simple;
+	bh=AG/hx8fOYwqKDhLkhKTgrZeqHCPj4BA1sltX/s4RzA8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u5VnbPV5xQNz89gSFOWWKShH1yaIl0g+XmBC6m1SnnXcN03/hcm3hAGJaIMxL5StQfDn97k8l7BR20tw4EM8GTosh77O3Rr0prghDf39DybZ06oiqGpSZKYQuyqeMj/vzelsxvUs+IWtFJnkxI/bmVhgw2LJ7I0N3rKMaUgSw+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=F5zRhWvT; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=yvnQRgkMrgaqcNhVBP1cbiqbFoOP1ZghiV1NOof1sRw=; b=F5zRhWvTnfoYDuh91hH+wCLZFv
+	NTaMmdxGeYZiJM+3cUdsDra6wfo6Ex19paMZqrpoNqm6HhAxw1D1j3/oE08ODm/ljCSZrcdq9wspX
+	UDn8WYCGOCB1c8NzGh/cToK99pc3anB1ISTUzIK0Z0crN3vigWK4Uf1q5VZ7hi8ExnJQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sExHq-00Gwhr-Pj; Wed, 05 Jun 2024 22:31:10 +0200
+Date: Wed, 5 Jun 2024 22:31:10 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: "Nelson, Shannon" <shannon.nelson@amd.com>,
+	David Miller <davem@davemloft.net>, netdev <netdev@vger.kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Vitaly Lifshits <vitaly.lifshits@intel.com>,
+	Menachem Fogel <menachem.fogel@intel.com>,
+	Naama Meir <naamax.meir@linux.intel.com>
+Subject: Re: [PATCH 9/9] igc: add support for ethtool.set_phys_id
+Message-ID: <202e55e2-be5f-4c7a-955e-fd726963c19c@lunn.ch>
+References: <20240603-next-2024-06-03-intel-next-batch-v1-0-e0523b28f325@intel.com>
+ <20240603-next-2024-06-03-intel-next-batch-v1-9-e0523b28f325@intel.com>
+ <f8f8d5fb-68c1-4fd1-9e0b-04c661c98f25@amd.com>
+ <dc0cc2ca-d3f4-4387-88bd-b54ea6896e0f@intel.com>
+ <d27f050a-26db-4f08-aa19-848ae2c6ed2d@lunn.ch>
+ <65068820-f8be-4093-800d-cec673d55b9f@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,184 +67,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240527161450.326615-19-herve.codina@bootlin.com>
+In-Reply-To: <65068820-f8be-4093-800d-cec673d55b9f@intel.com>
 
-Mon, May 27, 2024 at 06:14:45PM +0200, Herve Codina kirjoitti:
-> Add a PCI driver that handles the LAN966x PCI device using a device-tree
-> overlay. This overlay is applied to the PCI device DT node and allows to
-> describe components that are present in the device.
-> 
-> The memory from the device-tree is remapped to the BAR memory thanks to
-> "ranges" properties computed at runtime by the PCI core during the PCI
-> enumeration.
-> The PCI device itself acts as an interrupt controller and is used as the
-> parent of the internal LAN966x interrupt controller to route the
-> interrupts to the assigned PCI INTx interrupt.
+> Maybe I'm misunderstanding here. Are you asking us to expose the LEDs
+> via some other interface and extend ethtool to use that interface to
+> blink LEDs?
 
-...
+The LEDs are already exposed:
 
-> +#include <linux/irq.h>
-> +#include <linux/irqdomain.h>
+commit ea578703b03d5d651b091c39f717dc829155b520
+Author: Kurt Kanzenbach <kurt@linutronix.de>
+Date:   Tue Feb 13 10:41:37 2024 -0800
 
-> +#include <linux/kernel.h>
+    igc: Add support for LEDs on i225/i226
+    
+    Add support for LEDs on i225/i226. The LEDs can be controlled via sysfs
+    from user space using the netdev trigger. The LEDs are named as
+    igc-<bus><device>-<led> to be easily identified.
+    
+    Offloading link speed and activity are supported. Other modes are simulated
+    in software by using on/off. Tested on Intel i225.
+    
+    Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+    Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+    Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+    Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+    Link: https://lore.kernel.org/r/20240213184138.1483968-1-anthony.l.nguyen@intel.com
+    Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 
-Why do you need this?
+The Linux LED subsystem knows about them.
 
-> +#include <linux/module.h>
-> +#include <linux/of.h>
-> +#include <linux/of_platform.h>
-> +#include <linux/pci.h>
-> +#include <linux/slab.h>
+The Linux LED subsystem also knows about the qca8k LEDs, rtl8366rb
+LEDs, mediatek-ge-soc LEDs, air_en8811h LEDs, broadcom PHY LEDs,
+Marvell PHY LEDs, dp83867 LEDs, etc. There is nothing special here
+about igc. All these should be capable of blinking.
 
-General comment to the headers (in all your patches), try to follow IWYU
-principle, i.e. include what you use explicitly and don't use "proxy" headers
-such as kernel.h which basically shouldn't be used at all in the drivers.
+So what i'm asking for is you add an ethtool helper, which implements
+this using the Linux LED subsystem to blink the LEDs. The same helper
+can then be used by other MAC drivers to blink their LEDs when they
+use the Linux LED subsystem.
 
-...
+I'm sure there are a few different ways to implement this. One could
+be to extend the existing ledtrig-netdev.c. Add a call
 
-> +static irqreturn_t pci_dev_irq_handler(int irq, void *data)
-> +{
-> +	struct pci_dev_intr_ctrl *intr_ctrl = data;
-> +	int ret;
-> +
-> +	ret = generic_handle_domain_irq(intr_ctrl->irq_domain, 0);
-> +	return ret ? IRQ_NONE : IRQ_HANDLED;
+int netdev_trig_ethtool_phys_id(struct net_device *net_dev,
+          		       enum ethtool_phys_id_state state)
 
-There is a macro for that IRQ_RETVAL() IIRC.
+Which if passed ETHTOOL_ID_ON, ETHTOOL_ID_OFF, ETHTOOL_ID_ACTIVE,
+saves the current state and then sets the LEDs associated to the
+netdev to the requested state. If passed ETHTOOL_ID_INACTIVE it
+restores the previous state.
 
-> +}
-
-...
-
-> +static int devm_pci_dev_create_intr_ctrl(struct pci_dev *pdev)
-> +{
-> +	struct pci_dev_intr_ctrl *intr_ctrl;
-> +
-> +	intr_ctrl = pci_dev_create_intr_ctrl(pdev);
-
-> +
-
-Redundant blank line.
-
-> +	if (IS_ERR(intr_ctrl))
-> +		return PTR_ERR(intr_ctrl);
-> +
-> +	return devm_add_action_or_reset(&pdev->dev, devm_pci_dev_remove_intr_ctrl, intr_ctrl);
-> +}
-
-...
-
-> +static int lan966x_pci_load_overlay(struct lan966x_pci *data)
-> +{
-> +	u32 dtbo_size = __dtbo_lan966x_pci_end - __dtbo_lan966x_pci_begin;
-> +	void *dtbo_start = __dtbo_lan966x_pci_begin;
-> +	int ret;
-> +
-> +	ret = of_overlay_fdt_apply(dtbo_start, dtbo_size, &data->ovcs_id, data->dev->of_node);
-
-dev_of_node() ?
-
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
-> +}
-
-...
-
-> +static int lan966x_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct lan966x_pci *data;
-> +	int ret;
-
-> +	if (!dev->of_node) {
-> +		dev_err(dev, "Missing of_node for device\n");
-> +		return -EINVAL;
-> +	}
-
-Why do you need this? The code you have in _create_intr_ctrl() will take care
-already for this case.
-
-> +	/* Need to be done before devm_pci_dev_create_intr_ctrl.
-> +	 * It allocates an IRQ and so pdev->irq is updated
-
-Missing period at the end.
-
-> +	 */
-> +	ret = pcim_enable_device(pdev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = devm_pci_dev_create_intr_ctrl(pdev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
-> +	if (!data)
-> +		return -ENOMEM;
-> +
-> +	dev_set_drvdata(dev, data);
-> +	data->dev = dev;
-> +	data->pci_dev = pdev;
-> +
-> +	ret = lan966x_pci_load_overlay(data);
-> +	if (ret)
-> +		return ret;
-
-> +	pci_set_master(pdev);
-
-You don't use MSI, what is this for?
-
-> +	ret = of_platform_default_populate(dev->of_node, NULL, dev);
-
-dev_of_node()
-
-> +	if (ret)
-> +		goto err_unload_overlay;
-> +
-> +	return 0;
-> +
-> +err_unload_overlay:
-> +	lan966x_pci_unload_overlay(data);
-> +	return ret;
-> +}
-
-...
-
-> +static void lan966x_pci_remove(struct pci_dev *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct lan966x_pci *data = dev_get_drvdata(dev);
-
-platform_get_drvdata()
-
-> +	of_platform_depopulate(dev);
-> +
-> +	lan966x_pci_unload_overlay(data);
-
-> +	pci_clear_master(pdev);
-
-No need to call this excplicitly when pcim_enable_device() was called.
-
-> +}
-
-...
-
-> +static struct pci_device_id lan966x_pci_ids[] = {
-> +	{ PCI_DEVICE(0x1055, 0x9660) },
-
-Don't you have VENDOR_ID defined somewhere?
-
-> +	{ 0, }
-
-Unneeded ' 0, ' part
-
-> +};
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+	 Andrew
 
