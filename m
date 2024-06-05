@@ -1,246 +1,146 @@
-Return-Path: <netdev+bounces-100801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 614A58FC187
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 04:11:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2773B8FC197
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 04:16:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 852831C228E9
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 02:11:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A4681C22832
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 02:16:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 143934C62A;
-	Wed,  5 Jun 2024 02:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8368124B34;
+	Wed,  5 Jun 2024 02:16:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="jvyVgnac"
 X-Original-To: netdev@vger.kernel.org
-Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.58.6])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A9D17C79
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 02:11:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.58.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52951EB36;
+	Wed,  5 Jun 2024 02:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717553464; cv=none; b=efHHCJFqcsOCZ0GcJnU1WvcPtZHcAglaZY5u97oiAx4rVrFNJYMv5KD7/4EIvknGdbGMzza5N9VOLn8/wcEi2Ncpe9W8qoz3FSddIx3kVUpZJ+BOYzHlYA3aD2ovIvLbpFk5IDB/oDYYimsY5Il280QxBs/ATYaW0rBqhsh32No=
+	t=1717553807; cv=none; b=hFFka/51V+mIkUXUG6vBXltYggVqnGRixtCF0s/mWaL1crnAZR0Y+/HFM8atlwdCT0UvjDgPZJrK7eD5xmufsLl7+ZNS2CD5TgkzR8YJrBmkMpITIO8Nma4LcJEfGYFlqxX6Oyo6XIO1XPv3koe5JRGdxwEx8aba7kEQYRiQpFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717553464; c=relaxed/simple;
-	bh=H/68tBdX9mZemtxPe/ta6e4vNDJ6hIimSebhJYJMqmQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FnhVOk6iaoELUSPZu07AoKlG6rmayKi5AAujw5HFyluhQyMLhb3sh8xeuvaQoIdCaSeZsNea5/+vRDnUgFx4GhYF985FHJ92Ss/gDjorBf4xp1jS5H+g35lc2WU+/yq8kkl+rkuEEpYOSunOOXqmAtpET0b32Hdb9Oh+WYen9XI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=114.132.58.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtpsz3t1717553352txnpc9f
-X-QQ-Originating-IP: 4m0+pUaCJJIqX8WdzO7tvFFF6YG4GrWu9UBS4ClZEhs=
-Received: from lap-jiawenwu.trustnetic.com ( [183.159.169.220])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 05 Jun 2024 10:09:11 +0800 (CST)
-X-QQ-SSF: 01400000000000L0Z000000A0000000
-X-QQ-FEAT: s+2983eAE1N5dQiJTfz6HwRb3zpto4lb6w3IZqHQy+NYv1dANoHKBh2YCC4PI
-	wDkqSryycNZ5PNC3uqQOOmAl/p2UIJ4BHwTPX8du/B7TpZuujKavjZ4xdSrFp8m0O3Y+VEi
-	7PqC3SsATCydLblRA93/EPxCFxFjoSVX0eNKiwGnZbuifJOjZ2lqe7HQnbqRDlf5oQoJrC1
-	a9Fza6FS+4oZMZrUfLZV+WhT+1qUtVYF89vKOvIJKxUdhSxRTpBjUHHsmXvRpmu3sgB34+M
-	pVeuzK5cERM3+i/OWqhvQs/OmuvubxNErVvdVZvffNWl7KK8/9oVQ6vbVe2X0b9Emp8ksxJ
-	RA9Qx9tO5977+AVJ5fq1eOBO3AW2h5mS3LUK2jUNdZCG0dqP0w4zZK1Khz8zjotYYmcyJZ6
-	a4xiVPmBWK3oMGm3einw8g==
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 9157777561764943828
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	horms@kernel.org,
-	andrew@lunn.ch,
-	netdev@vger.kernel.org
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v2 3/3] net: txgbe: add FDIR info to ethtool ops
-Date: Wed,  5 Jun 2024 10:08:52 +0800
-Message-Id: <20240605020852.24144-4-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20240605020852.24144-1-jiawenwu@trustnetic.com>
-References: <20240605020852.24144-1-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1717553807; c=relaxed/simple;
+	bh=189mdYsXxsccLCMxzEslQckd9F6l5Pkg+vVbG5gSlLA=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=HbhT5a9E7p8ZMgJsDZIuKWi3yHDpDTJzVdS2SkicZYcWzipOghoeacgSBdMgeLGf2AYMrHpunQkgU9jP0MQ46elOABLtx9igxk7UfJTG1+Cpn+nGEXWjrHbQHjvYBdAWyfK/N8YtNibbQcX0qydsVqGVOlzIdTt2jTZg2G6gTXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=jvyVgnac; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1717553797; h=Message-ID:Subject:Date:From:To;
+	bh=ddRm+B+lk3X4PjmjFxIaCezOgjOl1Nl1gTwxZc1qjRA=;
+	b=jvyVgnaci7hNTu33Ryyfer/l281TFTFFufo7oysqY38Hmxzuyh9E5GifGR6crZ7bj3NFMQoK8nA3k+3m8IdAG70V7y2XMFuaFmq6OFOLfa7/0asJPmMx1BdVOFeQmLLqRos3UPInCqIIQZigq1vb4fadP4v1fmROfQpbGg7jUL8=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R281e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067112;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=38;SR=0;TI=SMTPD_---0W7sUjyI_1717553793;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W7sUjyI_1717553793)
+          by smtp.aliyun-inc.com;
+          Wed, 05 Jun 2024 10:16:34 +0800
+Message-ID: <1717553610.6275685-4-hengqi@linux.alibaba.com>
+Subject: Re: [PATCH net-next v14 3/5] ethtool: provide customized dim profile management
+Date: Wed, 5 Jun 2024 10:13:30 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: oe-kbuild-all@lists.linux.dev,
+ Huacai Chen <chenhuacai@loongson.cn>,
+ Xuerui Wang <kernel@xen0n.name>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Guo Ren <guoren@kernel.org>,
+ loongarch@lists.linux.dev,
+ Jakub Kicinski <kuba@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>,
+ Jason Wang <jasowang@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ Brett Creeley <bcreeley@amd.com>,
+ Ratheesh Kannoth <rkannoth@marvell.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Tal Gilboa <talgi@nvidia.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ linux-doc@vger.kernel.org,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Paul Greenwalt <paul.greenwalt@intel.com>,
+ Ahmed Zaki <ahmed.zaki@intel.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Kory Maincent <kory.maincent@bootlin.com>,
+ Andrew Lunn <andrew@lunn.ch>,
+ justinstitt@google.com,
+ donald.hunter@gmail.com,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Linux Memory Management List <linux-mm@kvack.org>,
+ Dragos Tatulea <dtatulea@nvidia.com>,
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ netdev@vger.kernel.org,
+ virtualization@lists.linux.dev,
+ kernel test robot <lkp@intel.com>
+References: <20240603154727.31998-1-hengqi@linux.alibaba.com>
+ <20240603154727.31998-4-hengqi@linux.alibaba.com>
+ <202406040645.6z95FW1f-lkp@intel.com>
+ <1717478006.038663-1-hengqi@linux.alibaba.com>
+In-Reply-To: <1717478006.038663-1-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-Add flow director filter match and miss statistics to ethtool -S.
-And change the number of queues when using flow director for ehtool -l.
+On Tue, 4 Jun 2024 13:13:26 +0800, Heng Qi <hengqi@linux.alibaba.com> wrote:
+> On Tue, 4 Jun 2024 07:00:35 +0800, kernel test robot <lkp@intel.com> wrote:
+> > Hi Heng,
+> > 
+> > kernel test robot noticed the following build warnings:
+> > 
+> > [auto build test WARNING on net-next/main]
+> > 
+> > url:    https://github.com/intel-lab-lkp/linux/commits/Heng-Qi/linux-dim-move-useful-macros-to-h-file/20240603-235834
+> > base:   net-next/main
+> > patch link:    https://lore.kernel.org/r/20240603154727.31998-4-hengqi%40linux.alibaba.com
+> > patch subject: [PATCH net-next v14 3/5] ethtool: provide customized dim profile management
+> > config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20240604/202406040645.6z95FW1f-lkp@intel.com/config)
+> > compiler: loongarch64-linux-gcc (GCC) 13.2.0
+> > reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240604/202406040645.6z95FW1f-lkp@intel.com/reproduce)
+> > 
+> > If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> > the same patch/commit), kindly add following tags
+> > | Reported-by: kernel test robot <lkp@intel.com>
+> > | Closes: https://lore.kernel.org/oe-kbuild-all/202406040645.6z95FW1f-lkp@intel.com/
+> > 
+> > All warnings (new ones prefixed by >>):
+> > 
+> > >> net/ethtool/coalesce.o: warning: objtool: unexpected relocation symbol type in .rela.discard.reachable
+> 
+> 
+> I'm not sure if this seems to be related to the update of loongarch[1]?
+> didn't find this warning on other architectures such as arm/openrisc/x86.
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 39 +++++++++++++++++--
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  5 +++
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  4 ++
- 3 files changed, 45 insertions(+), 3 deletions(-)
+I noticed that the loongarch community has submitted a fix[1], and after applying
+the fix, the robot no longer reports the warning. So the warning is specific
+to the loongarch architecture.
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index cc3bec42ed8e..a6241091e95c 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -43,6 +43,11 @@ static const struct wx_stats wx_gstrings_stats[] = {
- 	WX_STAT("alloc_rx_buff_failed", alloc_rx_buff_failed),
- };
- 
-+static const struct wx_stats wx_gstrings_fdir_stats[] = {
-+	WX_STAT("fdir_match", stats.fdirmatch),
-+	WX_STAT("fdir_miss", stats.fdirmiss),
-+};
-+
- /* drivers allocates num_tx_queues and num_rx_queues symmetrically so
-  * we set the num_rx_queues to evaluate to num_tx_queues. This is
-  * used because we do not have a good way to get the max number of
-@@ -55,12 +60,17 @@ static const struct wx_stats wx_gstrings_stats[] = {
- 		(WX_NUM_TX_QUEUES + WX_NUM_RX_QUEUES) * \
- 		(sizeof(struct wx_queue_stats) / sizeof(u64)))
- #define WX_GLOBAL_STATS_LEN  ARRAY_SIZE(wx_gstrings_stats)
-+#define WX_FDIR_STATS_LEN  ARRAY_SIZE(wx_gstrings_fdir_stats)
- #define WX_STATS_LEN (WX_GLOBAL_STATS_LEN + WX_QUEUE_STATS_LEN)
- 
- int wx_get_sset_count(struct net_device *netdev, int sset)
- {
-+	struct wx *wx = netdev_priv(netdev);
-+
- 	switch (sset) {
- 	case ETH_SS_STATS:
-+		if (wx->mac.type == wx_mac_sp)
-+			return WX_STATS_LEN + WX_FDIR_STATS_LEN;
- 		return WX_STATS_LEN;
- 	default:
- 		return -EOPNOTSUPP;
-@@ -70,6 +80,7 @@ EXPORT_SYMBOL(wx_get_sset_count);
- 
- void wx_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
- {
-+	struct wx *wx = netdev_priv(netdev);
- 	u8 *p = data;
- 	int i;
- 
-@@ -77,6 +88,10 @@ void wx_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
- 	case ETH_SS_STATS:
- 		for (i = 0; i < WX_GLOBAL_STATS_LEN; i++)
- 			ethtool_puts(&p, wx_gstrings_stats[i].stat_string);
-+		if (wx->mac.type == wx_mac_sp) {
-+			for (i = 0; i < WX_FDIR_STATS_LEN; i++)
-+				ethtool_puts(&p, wx_gstrings_fdir_stats[i].stat_string);
-+		}
- 		for (i = 0; i < netdev->num_tx_queues; i++) {
- 			ethtool_sprintf(&p, "tx_queue_%u_packets", i);
- 			ethtool_sprintf(&p, "tx_queue_%u_bytes", i);
-@@ -96,7 +111,7 @@ void wx_get_ethtool_stats(struct net_device *netdev,
- 	struct wx *wx = netdev_priv(netdev);
- 	struct wx_ring *ring;
- 	unsigned int start;
--	int i, j;
-+	int i, j, k;
- 	char *p;
- 
- 	wx_update_stats(wx);
-@@ -107,6 +122,14 @@ void wx_get_ethtool_stats(struct net_device *netdev,
- 			   sizeof(u64)) ? *(u64 *)p : *(u32 *)p;
- 	}
- 
-+	if (wx->mac.type == wx_mac_sp) {
-+		for (k = 0; k < WX_FDIR_STATS_LEN; k++) {
-+			p = (char *)wx + wx_gstrings_fdir_stats[k].stat_offset;
-+			data[i++] = (wx_gstrings_fdir_stats[k].sizeof_stat ==
-+				   sizeof(u64)) ? *(u64 *)p : *(u32 *)p;
-+		}
-+	}
-+
- 	for (j = 0; j < netdev->num_tx_queues; j++) {
- 		ring = wx->tx_ring[j];
- 		if (!ring) {
-@@ -172,17 +195,21 @@ EXPORT_SYMBOL(wx_get_pause_stats);
- 
- void wx_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *info)
- {
-+	unsigned int stats_len = WX_STATS_LEN;
- 	struct wx *wx = netdev_priv(netdev);
- 
-+	if (wx->mac.type == wx_mac_sp)
-+		stats_len += WX_FDIR_STATS_LEN;
-+
- 	strscpy(info->driver, wx->driver_name, sizeof(info->driver));
- 	strscpy(info->fw_version, wx->eeprom_id, sizeof(info->fw_version));
- 	strscpy(info->bus_info, pci_name(wx->pdev), sizeof(info->bus_info));
- 	if (wx->num_tx_queues <= WX_NUM_TX_QUEUES) {
--		info->n_stats = WX_STATS_LEN -
-+		info->n_stats = stats_len -
- 				   (WX_NUM_TX_QUEUES - wx->num_tx_queues) *
- 				   (sizeof(struct wx_queue_stats) / sizeof(u64)) * 2;
- 	} else {
--		info->n_stats = WX_STATS_LEN;
-+		info->n_stats = stats_len;
- 	}
- }
- EXPORT_SYMBOL(wx_get_drvinfo);
-@@ -383,6 +410,9 @@ void wx_get_channels(struct net_device *dev,
- 
- 	/* record RSS queues */
- 	ch->combined_count = wx->ring_feature[RING_F_RSS].indices;
-+
-+	if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags))
-+		ch->combined_count = wx->ring_feature[RING_F_FDIR].indices;
- }
- EXPORT_SYMBOL(wx_get_channels);
- 
-@@ -400,6 +430,9 @@ int wx_set_channels(struct net_device *dev,
- 	if (count > wx_max_channels(wx))
- 		return -EINVAL;
- 
-+	if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags))
-+		wx->ring_feature[RING_F_FDIR].limit = count;
-+
- 	wx->ring_feature[RING_F_RSS].limit = count;
- 
- 	return 0;
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-index 8fb38f83a615..44cd7a5866c1 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-@@ -2352,6 +2352,11 @@ void wx_update_stats(struct wx *wx)
- 	hwstats->b2ogprc += rd32(wx, WX_RDM_BMC2OS_CNT);
- 	hwstats->rdmdrop += rd32(wx, WX_RDM_DRP_PKT);
- 
-+	if (wx->mac.type == wx_mac_sp) {
-+		hwstats->fdirmatch += rd32(wx, WX_RDB_FDIR_MATCH);
-+		hwstats->fdirmiss += rd32(wx, WX_RDB_FDIR_MISS);
-+	}
-+
- 	for (i = 0; i < wx->mac.max_rx_queues; i++)
- 		hwstats->qmprc += rd32(wx, WX_PX_MPRC(i));
- }
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index b1f9bab06e90..e0b7866f96ec 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -157,6 +157,8 @@
- #define WX_RDB_RA_CTL_RSS_IPV6_TCP   BIT(21)
- #define WX_RDB_RA_CTL_RSS_IPV4_UDP   BIT(22)
- #define WX_RDB_RA_CTL_RSS_IPV6_UDP   BIT(23)
-+#define WX_RDB_FDIR_MATCH            0x19558
-+#define WX_RDB_FDIR_MISS             0x1955C
- 
- /******************************* PSR Registers *******************************/
- /* psr control */
-@@ -1018,6 +1020,8 @@ struct wx_hw_stats {
- 	u64 crcerrs;
- 	u64 rlec;
- 	u64 qmprc;
-+	u64 fdirmatch;
-+	u64 fdirmiss;
- };
- 
- enum wx_state {
--- 
-2.27.0
+[1] https://lore.kernel.org/all/20240604150741.30252-1-xry111@xry111.site/
 
+Thanks.
+
+> 
+> +Cc:
+> loongarch@lists.linux.dev, Guo Ren <guoren@kernel.org>,
+> Xuerui Wang <kernel@xen0n.name>,
+> Jiaxun Yang <jiaxun.yang@flygoat.com>,
+> Huacai Chen <chenhuacai@loongson.cn>
+> 
+> [1] https://lore.kernel.org/all/20240322135619.1423490-1-chenhuacai@loongson.cn/
+> 
+> > 
+> > -- 
+> > 0-DAY CI Kernel Test Service
+> > https://github.com/intel/lkp-tests/wiki
+> 
 
