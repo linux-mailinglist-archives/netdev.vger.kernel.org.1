@@ -1,150 +1,257 @@
-Return-Path: <netdev+bounces-101141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ADEC8FD759
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 22:15:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3B318FD773
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 22:24:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90F97285A23
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 20:15:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6D851F2439D
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 20:24:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A77C1158A38;
-	Wed,  5 Jun 2024 20:14:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5005015ECCD;
+	Wed,  5 Jun 2024 20:24:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from fgw20-7.mail.saunalahti.fi (fgw20-7.mail.saunalahti.fi [62.142.5.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F140915747A;
-	Wed,  5 Jun 2024 20:14:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7732E154445
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 20:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.142.5.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717618498; cv=none; b=FvUfs7MIFRMzU2mc2VQ47nH9RT2kj5gqmPysUlVKo/mCLhC+J37qe/XO2bvZNWdd7O+huLxWc07QqaSWO9yxvj5TaakOnnK6b/JQ5NmQ70ZKnabNGhzr/dmY7Hodw5nUS2TrXTI3pAW1bUnxGRw1XwQ+cOdZnA5AvCldBBFRAgI=
+	t=1717619089; cv=none; b=JWmr2m3Y4J8/t+H2zcFhQ+93H1tywwjx3lxExdHeNuC+e4iLK/dFoAq1Al0OfMpu8yNksl3GTmblzpsUsM+rBEWm9Z8cgVJX5w6Li28oc0/XlN0Wj3Tdl1aWBoOMpSt4RhpvWFsCPXzhik7cse/mZ/ru3TBYELCZMr13yq1v/FA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717618498; c=relaxed/simple;
-	bh=czaT3riewmwV9YjIqTwjHN+Vw/gRYXlQLIGHV9vRW8U=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=MPag8igdFBcbqHtvzfz//fFMKDKM71M+QQsAPfxjqsq08v01uW5ABcrHg19EOPC2NIplMN/bXsg3oBsB2AL/jFMYcrZAFwaXFhCyE/eZCKkTrMzG5rm/FXaVOYjm6GFZRYRfghki+R9EDoAMvvn8K/lqEhEYBEOesrTIja/v1A4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (31.173.84.195) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 5 Jun
- 2024 23:14:50 +0300
-Subject: Re: [net-next PATCH v5 7/7] net: ravb: Allocate RX buffers via page
- pool
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Simon Horman <horms@kernel.org>
-CC: Biju Das <biju.das.jz@bp.renesas.com>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
-	<yoshihiro.shimoda.uh@renesas.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240604072825.7490-1-paul.barker.ct@bp.renesas.com>
- <20240604072825.7490-8-paul.barker.ct@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <49755f09-66de-71f2-bf66-ccd0d94d3f04@omp.ru>
-Date: Wed, 5 Jun 2024 23:14:50 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1717619089; c=relaxed/simple;
+	bh=dJT0IXIjAoLuqegKrl7wJhhJCx7h7wib/TJUPpQllBA=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XQZn8TtNQAaXNzh0huY2QXM1gl1C2lwcHSGB4AeXrqcHfX4IEg9LadHColNf8pj6btZyuMweydmWITLUWMSGBiackaCvczjG8B1OW+a/GYVejVjIigYAE+F6+QNCTDOCIpTg001OwgbG36QQq0x8QnNV4kx6bE0zbjUECPQpw7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=fail smtp.mailfrom=gmail.com; arc=none smtp.client-ip=62.142.5.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gmail.com
+Received: from localhost (88-113-26-230.elisa-laajakaista.fi [88.113.26.230])
+	by fgw22.mail.saunalahti.fi (Halon) with ESMTP
+	id a4ad9dfa-2379-11ef-8e41-005056bdf889;
+	Wed, 05 Jun 2024 23:24:45 +0300 (EEST)
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Wed, 5 Jun 2024 23:24:43 +0300
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Simon Horman <horms@kernel.org>,
+	Sai Krishna Gajula <saikrishnag@marvell.com>,
+	Thomas Gleixner <tglx@linutronix.de>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 18/19] mfd: Add support for LAN966x PCI device
+Message-ID: <ZmDJi__Ilp7zd-yJ@surfacebook.localdomain>
+References: <20240527161450.326615-1-herve.codina@bootlin.com>
+ <20240527161450.326615-19-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240604072825.7490-8-paul.barker.ct@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 06/05/2024 19:37:21
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 185750 [Jun 05 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 20 0.3.20
- 743589a8af6ec90b529f2124c2bbfc3ce1d2f20f
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1;31.173.84.195:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.84.195
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 06/05/2024 19:41:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 6/5/2024 6:43:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240527161450.326615-19-herve.codina@bootlin.com>
 
-On 6/4/24 10:28 AM, Paul Barker wrote:
+Mon, May 27, 2024 at 06:14:45PM +0200, Herve Codina kirjoitti:
+> Add a PCI driver that handles the LAN966x PCI device using a device-tree
+> overlay. This overlay is applied to the PCI device DT node and allows to
+> describe components that are present in the device.
+> 
+> The memory from the device-tree is remapped to the BAR memory thanks to
+> "ranges" properties computed at runtime by the PCI core during the PCI
+> enumeration.
+> The PCI device itself acts as an interrupt controller and is used as the
+> parent of the internal LAN966x interrupt controller to route the
+> interrupts to the assigned PCI INTx interrupt.
 
-> This patch makes multiple changes that can't be separated:
-> 
->   1) Allocate plain RX buffers via a page pool instead of allocating
->      SKBs, then use build_skb() when a packet is received.
->   2) For GbEth IP, reduce the RX buffer size to 2kB.
->   3) For GbEth IP, merge packets which span more than one RX descriptor
->      as SKB fragments instead of copying data.
-> 
-> Implementing (1) without (2) would require the use of an order-1 page
-> pool (instead of an order-0 page pool split into page fragments) for
-> GbEth.
-> 
-> Implementing (2) without (3) would leave us no space to re-assemble
-> packets which span more than one RX descriptor.
-> 
-> Implementing (3) without (1) would not be possible as the network stack
-> expects to use put_page() or page_pool_put_page() to free SKB fragments
-> after an SKB is consumed.
-> 
-> RX checksum offload support is adjusted to handle both linear and
-> nonlinear (fragmented) packets.
-> 
-> This patch gives the following improvements during testing with iperf3.
-> 
->   * RZ/G2L:
->     * TCP RX: same bandwidth at -43% CPU load (70% -> 40%)
->     * UDP RX: same bandwidth at -17% CPU load (88% -> 74%)
-> 
->   * RZ/G2UL:
->     * TCP RX: +30% bandwidth (726Mbps -> 941Mbps)
->     * UDP RX: +417% bandwidth (108Mbps -> 558Mbps)
-> 
->   * RZ/G3S:
->     * TCP RX: +64% bandwidth (562Mbps -> 920Mbps)
->     * UDP RX: +420% bandwidth (90Mbps -> 468Mbps)
-> 
->   * RZ/Five:
->     * TCP RX: +217% bandwidth (145Mbps -> 459Mbps)
->     * UDP RX: +470% bandwidth (20Mbps -> 114Mbps)
-> 
-> There is no significant impact on bandwidth or CPU load in testing on
-> RZ/G2H or R-Car M3N.
-> 
-> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+...
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> +#include <linux/irq.h>
+> +#include <linux/irqdomain.h>
 
-[...]
+> +#include <linux/kernel.h>
 
-MBR, Sergey
+Why do you need this?
+
+> +#include <linux/module.h>
+> +#include <linux/of.h>
+> +#include <linux/of_platform.h>
+> +#include <linux/pci.h>
+> +#include <linux/slab.h>
+
+General comment to the headers (in all your patches), try to follow IWYU
+principle, i.e. include what you use explicitly and don't use "proxy" headers
+such as kernel.h which basically shouldn't be used at all in the drivers.
+
+...
+
+> +static irqreturn_t pci_dev_irq_handler(int irq, void *data)
+> +{
+> +	struct pci_dev_intr_ctrl *intr_ctrl = data;
+> +	int ret;
+> +
+> +	ret = generic_handle_domain_irq(intr_ctrl->irq_domain, 0);
+> +	return ret ? IRQ_NONE : IRQ_HANDLED;
+
+There is a macro for that IRQ_RETVAL() IIRC.
+
+> +}
+
+...
+
+> +static int devm_pci_dev_create_intr_ctrl(struct pci_dev *pdev)
+> +{
+> +	struct pci_dev_intr_ctrl *intr_ctrl;
+> +
+> +	intr_ctrl = pci_dev_create_intr_ctrl(pdev);
+
+> +
+
+Redundant blank line.
+
+> +	if (IS_ERR(intr_ctrl))
+> +		return PTR_ERR(intr_ctrl);
+> +
+> +	return devm_add_action_or_reset(&pdev->dev, devm_pci_dev_remove_intr_ctrl, intr_ctrl);
+> +}
+
+...
+
+> +static int lan966x_pci_load_overlay(struct lan966x_pci *data)
+> +{
+> +	u32 dtbo_size = __dtbo_lan966x_pci_end - __dtbo_lan966x_pci_begin;
+> +	void *dtbo_start = __dtbo_lan966x_pci_begin;
+> +	int ret;
+> +
+> +	ret = of_overlay_fdt_apply(dtbo_start, dtbo_size, &data->ovcs_id, data->dev->of_node);
+
+dev_of_node() ?
+
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+
+...
+
+> +static int lan966x_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	struct lan966x_pci *data;
+> +	int ret;
+
+> +	if (!dev->of_node) {
+> +		dev_err(dev, "Missing of_node for device\n");
+> +		return -EINVAL;
+> +	}
+
+Why do you need this? The code you have in _create_intr_ctrl() will take care
+already for this case.
+
+> +	/* Need to be done before devm_pci_dev_create_intr_ctrl.
+> +	 * It allocates an IRQ and so pdev->irq is updated
+
+Missing period at the end.
+
+> +	 */
+> +	ret = pcim_enable_device(pdev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = devm_pci_dev_create_intr_ctrl(pdev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
+> +	if (!data)
+> +		return -ENOMEM;
+> +
+> +	dev_set_drvdata(dev, data);
+> +	data->dev = dev;
+> +	data->pci_dev = pdev;
+> +
+> +	ret = lan966x_pci_load_overlay(data);
+> +	if (ret)
+> +		return ret;
+
+> +	pci_set_master(pdev);
+
+You don't use MSI, what is this for?
+
+> +	ret = of_platform_default_populate(dev->of_node, NULL, dev);
+
+dev_of_node()
+
+> +	if (ret)
+> +		goto err_unload_overlay;
+> +
+> +	return 0;
+> +
+> +err_unload_overlay:
+> +	lan966x_pci_unload_overlay(data);
+> +	return ret;
+> +}
+
+...
+
+> +static void lan966x_pci_remove(struct pci_dev *pdev)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	struct lan966x_pci *data = dev_get_drvdata(dev);
+
+platform_get_drvdata()
+
+> +	of_platform_depopulate(dev);
+> +
+> +	lan966x_pci_unload_overlay(data);
+
+> +	pci_clear_master(pdev);
+
+No need to call this excplicitly when pcim_enable_device() was called.
+
+> +}
+
+...
+
+> +static struct pci_device_id lan966x_pci_ids[] = {
+> +	{ PCI_DEVICE(0x1055, 0x9660) },
+
+Don't you have VENDOR_ID defined somewhere?
+
+> +	{ 0, }
+
+Unneeded ' 0, ' part
+
+> +};
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
