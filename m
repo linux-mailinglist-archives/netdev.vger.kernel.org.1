@@ -1,512 +1,369 @@
-Return-Path: <netdev+bounces-100857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9536B8FC492
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:31:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECB9E8FC49F
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:34:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 445C2281CA3
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 07:31:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A7321C20EF1
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 07:34:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D93FB1922FE;
-	Wed,  5 Jun 2024 07:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3764313AA51;
+	Wed,  5 Jun 2024 07:34:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UM/wjUsr"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="M+Vgtgfg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA4D138C
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 07:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675FA13AA4D
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 07:34:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717572686; cv=fail; b=a3zwsaRchClictujQce8yb5jzQdi2tD063tnWNubT0vCUKsW6zL2DcWNnk/9c1OQ5M/7chQKXZH2TC/is1H1T0bJVf7dAaQXtFJhhLb3+eocbbNEhju4S2Q7k/fM0TP3F5TAgmXi22jS48Ndg1tIgV3VEcA8zkwm4+++755RWCg=
+	t=1717572842; cv=fail; b=WPNN8w72sxx3H9RiOGYlCCsC8eZYK2l9/uTLTcoPOTi3ttUctc5wGl8jhzwD95plm9fJ4mwhmBw9v/VxMf/2Lf7mbl9BHsgK36JmTpy7YFDsJgRoqBqqxs1rWHidWvWUgiEyU5r+CYcIavvaO7PVoYqfAs8MgV0Zu1kF9DzSMKQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717572686; c=relaxed/simple;
-	bh=rQ0XbXCH/SEfE+v3ghVL4dKMZZmBrvrNek4KpjFTUOU=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=n/K1UoMPKjDmWeQ6gg15xMwk8aVQvvzjnB7B+MjnEqObu6U8w7d0TBhB5jdkSIVur5dl9HzyZJoi93Ic6RD2GtdvErzCzqBY7seB4njUtKHs0Y8rCghfUaKN8QWIuZjQnjYIbYqk6odUOSInVRMd4hDn2abtf2drr5I09s5ZSIs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UM/wjUsr; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717572685; x=1749108685;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=rQ0XbXCH/SEfE+v3ghVL4dKMZZmBrvrNek4KpjFTUOU=;
-  b=UM/wjUsrlyP0H4+xZwyogqWibHEUyxerOHuQMX9/UmbA7eyMSey5H8Pb
-   rE7sLkCuriNUsED+IleAEnw3lw2EajtOlIA8oEUEM7OVTkBZNm9lp2yAY
-   V7Vw9C09YgMRS4O88gA4NtURZzQ1BSFECLDVyefJIueyq6p/qCmWdG0vc
-   3Rycvm3byJAMzZhsMRB8GffOFiNhw1YALWQAxoGW9DrSCAKNdd+qtr9AW
-   hibbl/5cRqsPWPxFLvvb3z1ebiQbQyA8S1/I+fs0CWdCaKkAF3jOHtp3C
-   bEG4bKkil4bhMz7ZYGEo3f/sLL6OAnbtse6d9vYn+fFmn1iZYmJuBIKRv
-   Q==;
-X-CSE-ConnectionGUID: DOWt2tcHR9KO9R4X5dODLQ==
-X-CSE-MsgGUID: kW5AYpsITPuSogsxhNN0FQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11093"; a="25567417"
-X-IronPort-AV: E=Sophos;i="6.08,215,1712646000"; 
-   d="scan'208";a="25567417"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2024 00:31:24 -0700
-X-CSE-ConnectionGUID: GlwePAAfQ1KFV4TPlTuHAQ==
-X-CSE-MsgGUID: FGoWGw0OQqezbOKOYL9EXQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,215,1712646000"; 
-   d="scan'208";a="60686250"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Jun 2024 00:31:23 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 5 Jun 2024 00:31:23 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 5 Jun 2024 00:31:23 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.46) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 5 Jun 2024 00:31:23 -0700
+	s=arc-20240116; t=1717572842; c=relaxed/simple;
+	bh=48oT/PWc/ClSiWnE6vWcQzVFlaBx6ZNe1vwSLFoGOm0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ah9JxVCy0MvgLAjIHB2LtT/9qe3f4maS8i56CZjoML/uDSLNIzBta1mtLoGQKIZhlLuHzUgYaQhIrdC5axI2+C4oIzE78bh0etveUoDpzPzUTMrMr3QeqJ4rsU3pPkavqMp8DzCAN81y6pWItCh2QirYq41QL2mPcqOyP/h1CUw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=M+Vgtgfg; arc=fail smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 454KRqVJ004139;
+	Wed, 5 Jun 2024 00:33:34 -0700
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2169.outbound.protection.outlook.com [104.47.57.169])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3yj167cb39-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Jun 2024 00:33:34 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lFJATFe9KJ2FZHR4GLbMpSfTrmE3AXeP7v2Y3DcI23NBzs0x3iMxmEm7r8JaXc5J9IJw/j7Q87OarvgsLTVczlatiEkeT1K8DxRDDTXiXiQjtkLs+S6qUUVA+E7f01DQjGv/bwL3w/2tbsDT4yx+5yPS5J3MPSzwt5M/m9nE7vOfVVJFTaIFS+NCg4NFbIs1WtsO7KHnJoFstQj+zzy8+J5gnQ389LhGnofmUfi4tnKVlMEVou9XgHwKnyvCbiZRTbem7Ng+g0drfyBP2Xn/b7xSharqyhCpJ3RDX+0ggoZlBciWNEiVHUVAnbcqANt6yAPVLaVDOV0F+/9UA+k74w==
+ b=be/p50CAz2rxJ3wJDMJrZ2znYYIYzYiDHfWZH/21nRN97laPVAsIVL5MsVerqxUV4ussPZHvK2uf9xXsuyus05MDfkasvC6o2CcVl6UWWhF7T9yM9ZvQOHaxgEcr7WdKfGwOxR2qizcv8MqG6ID2z/76si+Glc+W9bSIlF0WZgPjSC7TwCM3J3/VYS20pwAxvuKxmCkM3H0BoijvMnQsWgozz3ormTfHBKi4mxZCwRtwky+f9A87VwADoyTvs3wbB9IiQNtPa/QDe1XgV9kKm1RWVApprGEhfNTIiHb+iMiiIa5ZpNuilbXs3ZleUnuah7n5eoLGe7n6N6udjNNgGA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=znx+sby2An3rR1fJXp+JCLK/W74s+Ns0PcccizKqdG4=;
- b=B8tI3E66FIJjuQnqsj3FU//MX3BMbPc0KNqPRgxGEL7J2KNj/d/s1q0I4F6hZEutGMQIoyQsLIqpt/2sd74FnfqoDAjL4OOj0s5DSmS5cCrORZHL5w8gN2TyG5N6HaNhTRTXR+mQ7Jw4+52A1hRH334Nd6O17lzf5MNwALTfZR6L4zibvZE77e+REW19w88hP1c0UHboWwm+TkuRDhpgEjt7m458UY/bX3W28d+t77itPUO7dU5i0rrrOjs/N0Bo+O+BSUsgWaV+jomX1vE1sVGnTamcnuvTbaqr8rIyfcHx449afyuTXwoOl3ciSZ6fzQG/Ia4EH2KyWx/B9d25AQ==
+ bh=jMvrvMyl3WsBSPKUi6aiaIiooxFsVHIhGZ4RFGMC2jI=;
+ b=jyorXDjdcmnp9m+x0R7cmmVwbmLIEKZG0KbTrwFtzcojjwIOw5v1D5GX0L1Z1RHxbVOymCRQXfql7djdqa8zCLUqUe7zp8DbOGlWicC+6sRWsG85MJ0DBJxcpSdJhBn8iAQyGZWdbDRZIelDZsqGIDG1xoqyudElWGHiKEXeHILNlGr3tA4w7upZdvzLs/RNnsocnFuUV09jAYbQdNmIqNumZIeJC3htjoK1buzarXtSoSPrF/G1TFDX+IKgKz6+JesrZSJWVSFmFWu7ytt3Lh4tX6ouLsSB5A8tLlaux4bgD04gG2+tiz33WX4VaQHqXGgCj8mQoWfevngCaKU2sQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by CO1PR11MB5186.namprd11.prod.outlook.com (2603:10b6:303:9b::24) with
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jMvrvMyl3WsBSPKUi6aiaIiooxFsVHIhGZ4RFGMC2jI=;
+ b=M+VgtgfgNTjA4Dc6hpb3mA/Pub460ptbSvPGG+g6Ww6bdiSF3r0xAuE/JlDqSCSWy2xzVNu8JxY976BHPOVYV6KGiE/adAeUelS072axZAryEuxcAYmI6iT+riDDBDwF5bIOaXs3HBhIdveWGVqrxNhr0t0SavOS7udrUpWiQg4=
+Received: from PH0PR18MB4474.namprd18.prod.outlook.com (2603:10b6:510:ea::22)
+ by SN4PR18MB4987.namprd18.prod.outlook.com (2603:10b6:806:21b::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.27; Wed, 5 Jun
- 2024 07:31:21 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::4bea:b8f6:b86f:6942]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::4bea:b8f6:b86f:6942%5]) with mapi id 15.20.7633.021; Wed, 5 Jun 2024
- 07:31:20 +0000
-Message-ID: <354d80c7-6255-455f-a295-70de64f7953c@intel.com>
-Date: Wed, 5 Jun 2024 09:31:13 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 1/6] net: libwx: Add malibox api for wangxun
- pf drivers
-To: Mengyuan Lou <mengyuanlou@net-swift.com>, <netdev@vger.kernel.org>
-CC: <jiawenwu@trustnetic.com>, <duanqiangwen@net-swift.com>
-References: <20240604155850.51983-1-mengyuanlou@net-swift.com>
- <F7B60244A9D27356+20240604155850.51983-2-mengyuanlou@net-swift.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.31; Wed, 5 Jun
+ 2024 07:33:32 +0000
+Received: from PH0PR18MB4474.namprd18.prod.outlook.com
+ ([fe80::ba6a:d051:575b:324e]) by PH0PR18MB4474.namprd18.prod.outlook.com
+ ([fe80::ba6a:d051:575b:324e%4]) with mapi id 15.20.7633.021; Wed, 5 Jun 2024
+ 07:33:32 +0000
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Jiawen Wu <jiawenwu@trustnetic.com>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+        "horms@kernel.org"
+	<horms@kernel.org>,
+        "andrew@lunn.ch" <andrew@lunn.ch>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+Subject: [PATCH net-next v2 3/3] net: txgbe: add FDIR info to ethtool ops
+Thread-Topic: [PATCH net-next v2 3/3] net: txgbe: add FDIR info to ethtool ops
+Thread-Index: AQHatxqq6TM2n8jp3k+PefG2Oc9tIA==
+Date: Wed, 5 Jun 2024 07:33:32 +0000
+Message-ID: 
+ <PH0PR18MB447474CD899ACBFECF63E9D7DEF92@PH0PR18MB4474.namprd18.prod.outlook.com>
+References: <20240605020852.24144-1-jiawenwu@trustnetic.com>
+ <20240605020852.24144-4-jiawenwu@trustnetic.com>
+In-Reply-To: <20240605020852.24144-4-jiawenwu@trustnetic.com>
+Accept-Language: en-US
 Content-Language: en-US
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-In-Reply-To: <F7B60244A9D27356+20240604155850.51983-2-mengyuanlou@net-swift.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR0P278CA0073.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:22::6) To MW4PR11MB5776.namprd11.prod.outlook.com
- (2603:10b6:303:183::9)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR18MB4474:EE_|SN4PR18MB4987:EE_
+x-ms-office365-filtering-correlation-id: 923c0f46-006d-4e1a-962a-08dc8531cd37
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: 
+ BCL:0;ARA:13230031|366007|376005|1800799015|7416005|38070700009;
+x-microsoft-antispam-message-info: 
+ =?us-ascii?Q?htUY/gjneA+ZoR62ceocHm3QYE8sivncd4E0pJM0hsAFJAwGETLKHWpNqykm?=
+ =?us-ascii?Q?tSqagEEepMP4C/B3SuAmb9/9M4MWQJMKul0QAgdI6qVna2UHK+ybfYa5Le+A?=
+ =?us-ascii?Q?VZeHaiiO+80+tAVIiIbqvxaVeyv6pHF1AOmobAXpn5CVQ4ax3awLVT1OoIHa?=
+ =?us-ascii?Q?74HY2BeywcgDkf+v0+M5GilKgGIhGcNPRoBvtiLmO+B8leqQxrXJbOTeICgy?=
+ =?us-ascii?Q?XH3vrCo6R+yPvqIZkIRmztltNuF7vtJthzH10rmmG/+4eAxkLmmYa1OMGdHE?=
+ =?us-ascii?Q?Ir0Pt+7jebnOQZI4N9aWPy3e24uRk7WK1ENixy+7ZIv65wKEweHnAgIX1aFx?=
+ =?us-ascii?Q?AhNcMxIdO8F60ibagFfYVxb4OEMeA1mPiC7X10zace0d6xEM8wX5NwM9lMj+?=
+ =?us-ascii?Q?ccNiYvRcn/d6DR6wbEz/M8QZ0CSwtubB6fx8voeWD/a5gtcH0Q4DON392260?=
+ =?us-ascii?Q?UgYRXmuXs3zg3o04kgHC+c6Z/KBf3xSd4VceXM7JBSHLLOcZHAsfgBxdaR4f?=
+ =?us-ascii?Q?hGocvsMqtLK2Y7OLE39KUdbmsetk3ucnqvEl2VvXQVHMHBw6ncbcMEGFhCEa?=
+ =?us-ascii?Q?uPwbY+jKfRrxo2PATcpF9rnzecZjS75SPKfAdity7PbXZ4gPBJqXxY4Iy4AU?=
+ =?us-ascii?Q?N2KP8eLSepLa+z+nUR6Ch+hPi8wGmYe/j8oIkgihZYymweijM4r7OgIwiyXw?=
+ =?us-ascii?Q?mZRym1ofinYxZoZBLpNMs0OueQgVS8meicCHL7wIVU+NDSx6l4VeJB9Nqoj0?=
+ =?us-ascii?Q?/6Mz0BQK/75uNwIweLG099EXIhd5CCfsffaukDOUUEpC9cg5qkjUXJ1fRH3H?=
+ =?us-ascii?Q?VvSQ9/3B8XwXUCGqhrmU+zmZklqmy1Rgs8dQ+c7Eor2oSALBIby8PlsoWIxB?=
+ =?us-ascii?Q?awPjqFD4OKEFOWqLStUc2VMg2zqWX/CM2QpOJ0Y2OnwpsQxPuks6utA5322/?=
+ =?us-ascii?Q?VvGXNmHU7SdCA2Em42Y/83dyN+Wi4c3iF4j40+xFvYI6B4CqfMc3Tt9kl3yZ?=
+ =?us-ascii?Q?exMche1BQLE+NteKZA8PL6FtjkLp9X1n/jvXZ3L+8sQQDfF5PDA7DDrUUqA4?=
+ =?us-ascii?Q?1O9839SDzFA747v6dPrIHv+hK3XKSNZhr/X0zrooIcdVDjI3B52UH4z2p877?=
+ =?us-ascii?Q?0jFMRGaNdRAkLjqE8OMkSpzV+kWbVwcC5ZNAy9YSm2xEt+Ql3vcyuTk/rLyv?=
+ =?us-ascii?Q?IKiGGce/BrO9vlDy5gYTKeVG5KFGu36flKKaQC8UEOS1VALh4J6lEXfS5ZbO?=
+ =?us-ascii?Q?4zn008HRBj4W1ct3JCtbsldxIN7SHh9bU/WCJ0DD/8oa8lwNVHpb+v0QZlJB?=
+ =?us-ascii?Q?4Q76GB6r8wVjLu0blM44HMS1zN2yqFSonTkqLMeEN9lKHA=3D=3D?=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4474.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015)(7416005)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?zCw98rE8PJatyBWgozjRZoHgB5Pu0U9VJNhRa6HpNH8QeXQdIlhO3eNiy71W?=
+ =?us-ascii?Q?ZjAhevDHfuu/i/3fBK5oMu/oUICPECEiasi8t+rG9RuwE9jUMV9OBnGAuuVe?=
+ =?us-ascii?Q?ro+adAp5naz8p5F0Jd2CVB5b8ene+l96MdtG4PzbyRHkBF+BOuMO8NPsaXLG?=
+ =?us-ascii?Q?ojzay/35osSlfa8UTMfteZOYnLYhAOa7J7hGJJC2MXs4O6a255FTQGyMmdeN?=
+ =?us-ascii?Q?rI59lId/xu2Edi0ILfenSqDa6Zq5SCCVcZ/SYPXPePsQAAUM3nheNkKfgRns?=
+ =?us-ascii?Q?Jl/1bhp83zoC9N/RgRsMH2BQhZDC9Sk1FtfoPowRpHT139/mhG2/2rUMstWO?=
+ =?us-ascii?Q?Io7+1yBddBP7jJPio45NcfpsOkxXkA7bPa7bxOrgWZld7v5owTXJ3FPonB7F?=
+ =?us-ascii?Q?SZTBLL1y8zb9t8SM6i9jt4tK1nVyWn+VPuy3aPpjR1EaxK/rT/mkyx8bhl3H?=
+ =?us-ascii?Q?pMRWPdy5WEnT50f1Pl8wNMxouuRZ8SNZamm6KEMJOZKpOWQD3/fAKSdgyvli?=
+ =?us-ascii?Q?LnF4UtTQP1zK0hTTnI9FeaQbxGKcvcb3msUTWBMewiwFRyePZEAektPthTgS?=
+ =?us-ascii?Q?OAhHqGW4q9x6TvllvvLbrBOL8Dcezv8Qp9XVSQnBc/yxnx+kZMoDBPUOjgKM?=
+ =?us-ascii?Q?UyLpZPYQCdZgbxwQBhPwPvKRCkRQTxxKELrxpmUOaluTRQJPGo41fZhtrh9/?=
+ =?us-ascii?Q?kzhTshYBcq02L5Q0WHiQuNMNr2e2pEDM5vfs2eoUY5ILcv4quLUlpavti4a6?=
+ =?us-ascii?Q?AEb5SptYqmXSQt+B4t3rliaLnEgEWhvuRnrzTok+tUAxXtrRlacdTEcoZU2h?=
+ =?us-ascii?Q?ce6k6pKE0g7Em0eVj7Wks/x4/P/XdiEcnMibl2i31VsjRpk3Gme4YT45/TwX?=
+ =?us-ascii?Q?4mPdhEn8p0Xd2SVntUcQCNlsVQBBtA9EfpT97Aa0ZiftRJcXIKZPRDMQI4t8?=
+ =?us-ascii?Q?BMRz7MybC327QUkiIaNbJz9lw47Z0sqvQBtU+qFtHedRfl9LB7mYX1zw+4id?=
+ =?us-ascii?Q?boyHtS47cxtLvgKPXXtipVc5AkUfdcuRfzVYillTOrFhlf1JpAqJKga+zh8y?=
+ =?us-ascii?Q?mH2TnhInl2yPxi+YR8uUoqgUVQACE0pL1f6DIySIE0ZFTFS70KOBF2FlPmjF?=
+ =?us-ascii?Q?exEYilip8/DZHF9Blydc9aoSFNld71C5AMBYyVG7JZ2B7FEflB0c9N+827Pe?=
+ =?us-ascii?Q?UH/2vukTD44CTBslfqAZgbkT/uAJ244RQQTulsWbGx1FvavJK5M7w8F0XWgN?=
+ =?us-ascii?Q?GOjdiObZjlqxgYHd2pAYcEBtMBf/SFM05Gzv+y8FBO2l60C077Kecmx1UcYz?=
+ =?us-ascii?Q?wG1GS5CJVFqFs57KLDC5KhytQ74b4AwXZFo6X3aBQxvF+I0sh5YrJ5f81EUT?=
+ =?us-ascii?Q?lXcME8kOEjbjcA7ORvK236/OFyP+JZV1d7mnto8atW5JVcgyZT1gkWd9vvlG?=
+ =?us-ascii?Q?GZ1wox/vrAW7bdKno320uG7xvDhQb+SDUh52lXPZoTDGqyKGoxmc+EwmmKSd?=
+ =?us-ascii?Q?j+upUZjVyiJby3vGy8pGwFj7mPt59RYDdBSBxLm+o4XQKJoX//VpZ4ItFTaK?=
+ =?us-ascii?Q?xnCVumu8fxQIk/IFT8U=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|CO1PR11MB5186:EE_
-X-MS-Office365-Filtering-Correlation-Id: d524e5b3-ca7c-4f9a-0955-08dc85317eb4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|1800799015|376005;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?Q3JvZFFJNGRqMkVaenV3RG9pRVd2UHBVRTN6ZWJ4eVoxNk02YlkzNzlFelky?=
- =?utf-8?B?ek9QWm41K3liQTAzUTh1UlNwckI4b29nVGhXQ1E1M2tWQVJPOFBIcFlNYlNO?=
- =?utf-8?B?bWtNVlptc2dXSU9zd1M4MUlEUEFYdU0wenFkTmJMTldBelQ4NXRON2FxS2FK?=
- =?utf-8?B?Z1hyRmRyWXYxY2JXVzA1M3FVTzVVNnFGUlZrL1FoSjZ5dlpKVGs3RFByK05H?=
- =?utf-8?B?RTRDV0ZlL0VkS1ZmaWVodUJud3RYNVlGV2JiaGlhUFY1V2grZGNWSzM0dW9o?=
- =?utf-8?B?ZDh2dUJ6VWVSL2Yra3pMUGFlSDNtU1RQQ3Q2U2lCcVAwNVFWdGlBVkVHbU0x?=
- =?utf-8?B?TUVVZTg4aHlUOWdQVXg0Smo3RUlOb3pHWTlQSHowdXBWSjhhZDd1WEdVQUFX?=
- =?utf-8?B?SHNGY3ZGK2dWQ0VveHB3djJucXpjZVBOVjZoYWwwZnd2WTl1RHNDbzg5bFRv?=
- =?utf-8?B?TnF4eU9QZ01nWTU4amVyV1l4WmxjZXJJQ3hhN3oyWmZLanlpOER5VGx0QTk1?=
- =?utf-8?B?ZmhoWlZxMnhvazhldlhnOVliQlhwcXliUDl1UFROeG9YT2taeGJVYjl2Mmpr?=
- =?utf-8?B?YmovMjU0NlZxTTIxQ1FMa1RzS1BTRFNGNVVHaVF2MG8veXYrd0lVeWRtcE01?=
- =?utf-8?B?VFplN3VLQTByTjFHVGNyMGVNaW9QUFVWR0tqR0FWdWVnZVByL1hRK24xeCtw?=
- =?utf-8?B?cTNrcjhIVDd3U0I3dGY5MEF1c1B4bXVQNk56L09YV1R2a0paNVlBRWhvOThs?=
- =?utf-8?B?V2VTTUdRYnNNcHppL3ZxRWwzL01mYVBxRkxNdks5VWpRNHlRRkJTdEI5bEVw?=
- =?utf-8?B?TEowTjBDS0dKbUZPRTdaVnVqUDVKMFI0bmZKM0RJRyt2ZWxubkIwL1QwdzhU?=
- =?utf-8?B?V1laWFBqZmU4YzN6WDl2aU4vRXNvcUgzODBra3JnRVRhQjFJaEE0TW5BRU5W?=
- =?utf-8?B?clVxTDRiT29NUHg0ZVR6aURzTy9CbmVhTnlOYzZRVElxNUU1czBwRHhhcmlK?=
- =?utf-8?B?NjQ0cjlwYml0ZUtWaWxPeUxWU2dydUs0L1pES1NrZjB4NWdLdlFNaVFFNEpS?=
- =?utf-8?B?UTVrbVQ4eUxzTUtOMVpIeEQ4MklmcVVydGJPRGw2eW0yVnIwK3pDVG50WFp3?=
- =?utf-8?B?VHBKVE1DYXJyZjVtM2x3dytST0xHWGhoaTkyWVRWY1hHeHMxRHNzVGdBMU5H?=
- =?utf-8?B?SHFNbkhVbkRWd3E2SnRIMnRldWFqYm5WZnVEcXNkODZWOEIwK1gzVmQ2OFRO?=
- =?utf-8?B?SnpGS3o1WDhqREp2NWtqOVFMOWJ0RjR6cCtPL3VHYXY2eVRRa2U2bE4wRWtl?=
- =?utf-8?B?d0lqSUxzUW4zREQ4SUkyZjlIbVNNM3Byc2FGbWF2NkNBVSs4aDAzdVg0SnEr?=
- =?utf-8?B?L0JDQzFHaTB5WlBja3ZkR3lMVUdTZlNEODhsME9qSlY0bVJPOHRIc3BGT1BR?=
- =?utf-8?B?cjBBdnRLT2ljNzZtUG8yQTZqMFhCUW9JSWhjLzQ2R09hWThyV0oyTG1KRGQ0?=
- =?utf-8?B?WXN1dyswbEYzOFZ5TDhES0o5cE5lR0hXRHNsSlZKRmZndklrN1BReWtjblkr?=
- =?utf-8?B?YnZjb1J3cm1sa1A2aVplVWRLbWFza0wxYUN5TFVnMWxvVmUwMzY4Yk9BZys5?=
- =?utf-8?B?QlpLU05qT21HMG9DUHVCbyttZnAyY3NtQjZqQ1I4VWY3NjJlNTAxbisxcWZz?=
- =?utf-8?B?WUFrYytMZ3QyUmZwTkdZWDhEMDkybmZJSWZGdzlsWjJmOStTNmxTYnNqa0g3?=
- =?utf-8?Q?Jt0kldgy5aNPns7Rt8=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?b2ZuaEVqc0RnS2c2cVFtQmpra1pzK1JJUXhvRXVObzkxUU1IeFpzd3JER1gr?=
- =?utf-8?B?TjRTM3VTMWN3VnIzNk4wZGp5RnBsNng3UnBkdHA0Zk45azY5cXNGeVJ6V2dy?=
- =?utf-8?B?ekFjWG1wOGpVaEp6NHhWaHBSYWdhTE10SnlacURTa2dORmhzb0oyeS9YVE9u?=
- =?utf-8?B?S3NUKzFLK0dwdGtZMThlMXNjVFZjb0hxZmRDWUZtamV4YkNnYUFPbjVnL3da?=
- =?utf-8?B?NHZvZnBBRGhLaWxIRmdrem9GdndwNUlqY2l1a3NqbnFsTnlDWDBjRlVEMk1O?=
- =?utf-8?B?d1lzcUZaWW1hVE5uT2RUYjk1UDhNSTRKNUtURXJsM1ZXZVdWVU0rVnNmNFpw?=
- =?utf-8?B?NzFIVERXZkw2dVFJOUt6MzBNZG5MVWRFdWkrc3RyWWZsNDkvSmExdVlsbWFt?=
- =?utf-8?B?VlhsdUpZNllzNTd3QVRPY3BlaEZrd25BamkrcXdDbGdlZGZnSXpDWlc5Sks0?=
- =?utf-8?B?dVJ0WSsreldzWG1CVit5andpdFFoQW91L3djUHA5K05wU0xMd004YkZQM3Zv?=
- =?utf-8?B?TzZYK05wTmwvdjRyR0Nud3FmUmJWNTh6bkdTRG16R1I1Yy9mcEJJNXhxY2lU?=
- =?utf-8?B?VkpUd1V6aWNzN0Vxa0ZsTWJwSndCSTMrQTNwNHRTT1hXRGtBa3FKZkdiTGRL?=
- =?utf-8?B?eVBkWllBZ1lBZVpqOUlXMDZQSGFjazNCc2crTTM5d1hISFVaTkt6RzN2NU82?=
- =?utf-8?B?bjVtWm10OFlueHBDNk1WNmJRNER3WGdzWnRPT2lkQWFnSUxJV1dveHhGUVBF?=
- =?utf-8?B?TmJIY3V3VnlFQmVXbzJoYXpMa0IreE91SmVOeUVSNTZKdityMFZ6OWNGdVU2?=
- =?utf-8?B?YVhpQ0Vqa2g0VSthLytqcktRdnIvSUo5dEFwUlI4NExDc3NOMWNkZmdpNXQv?=
- =?utf-8?B?WU4yVUw5YWFTbmxxRVBNbUlTZld4RHZVOUFZNjNPV1hIK3ZzaDd1UnUvMUZm?=
- =?utf-8?B?c0JoT1VKQ0R6dHBDam9tQno4elRjWHo3d0Jud1ZYU0dyVndVMVhZVE5Xc25y?=
- =?utf-8?B?Vmg0RnZGL1NzUDdsNXNCbVdLcFpheTV1LzhQTEYvQWhUdW9xRnpLd2pFQ0JI?=
- =?utf-8?B?K2FmNmFYSitLWEZHeUl3N0FabmUyNXdSbWllUFAxc3BYOS9yWXdCMExFWTB2?=
- =?utf-8?B?TWJCQjZINUVjSFRFRmQwVTIwakFRL0J6T2l4WnY5dllZbU9MSFgyTjhweVAx?=
- =?utf-8?B?NVZxMURVV2t1cDZBWXN0YmtvVG5Gb3RDaENYYkdhRkprVlpJeExVbGtnRzJC?=
- =?utf-8?B?VVc3S0JxczIvQU1EVERpdFl0YVloaGZoSFhDeXlrY01lTlhBN2dBaWJlam9Z?=
- =?utf-8?B?NGhVSEdTeGRMaS9Rem9WY2VyR29kOEFacHc4c0t4N2hjeU1qeE13ZXJDbnVJ?=
- =?utf-8?B?R1VhcTVKTU85bWFKdk11YmxNUEZuUzFNZGxqbTBGNWFaR1FTNUN4TnhsbGI2?=
- =?utf-8?B?cXFLbENhakhRSXpuVzZaYVpUQlJRNWdtU0JJc015QXZoTnFYdS9WWmpXM0xm?=
- =?utf-8?B?WU1tSHRiRWZHMEZWWlBrSm55V3I1V3pHc3FwMDZ1dTZnOTcwQkJ5eXArZXpF?=
- =?utf-8?B?aXRyOTRaVkxSN09qTFpqR1F5VWtZRmtQU3lHMm45TURmbkNZTFNzZlFZVEFo?=
- =?utf-8?B?aFFaVGE0NHR5YS9VVUdJNVVncWU3VU43aHBReEdFK1NZL21EcWZwRUE3cXB3?=
- =?utf-8?B?aldCQTBJNjI1bFd6TlVjbHJiVmlkdDJWRlE3UU1UZk5ZbFNSMlNzN3Y4cnJK?=
- =?utf-8?B?bG04djdjR2E1Um5aVytzbEZmWXZiVU9ZZERkc2hYTkM4N2NrR2s2UEZVTzJp?=
- =?utf-8?B?S2ovelpnWUJlbERsQ1NaVjJWanJKU05paURjY3VLaGN3KzVYUm02U2pLUWRt?=
- =?utf-8?B?Q2QvTmE4OUoydWNrWUh6b0d0K3FaSkVKR1pBYlNKVmd4ZEk4SkFxQ0hhZzBo?=
- =?utf-8?B?UTU4NVJhQVMxK0hzbHhaN3J5dmR1M1FpTUVGMmYyTDdrS1hOSjJhUUVaQjZj?=
- =?utf-8?B?MW01cDF5N293ZDVIQkU0TC95cXBCYnR5TUlpMEQ0L1R2RjdUczNlOVlvVVJO?=
- =?utf-8?B?ODJVT0JWbFZrSnJwTU1zSWxjZ2JvOHdGNGdGS1NuZDZ2RU9jTUI3dld2Ykxq?=
- =?utf-8?Q?HrL7euYHjqc5eZyxJUBBI51hY?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d524e5b3-ca7c-4f9a-0955-08dc85317eb4
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-OriginatorOrg: marvell.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2024 07:31:20.7940
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4474.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 923c0f46-006d-4e1a-962a-08dc8531cd37
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2024 07:33:32.2012
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: kkNfLYXOk20ebflEzHAX1zkYwpzUpKNOk/PgEJC+aT/GdKC2iZd1J7UG8clWIlLFi5H/sa65vxgvu7K8V1/fVbXlkO47zeRdCsdVPZ8dtG4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5186
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: X2bg4SMOIC/l/udp39HEUmY4zJFy5+OdcX+Js6GA/1OQQ8XZXWdPmuy5sAnKG4WVvzALb2ypVwV8ffDURfY+Pw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR18MB4987
+X-Proofpoint-ORIG-GUID: 5rOPx9kocKlOdmvX402PIPjc5_46gCQD
+X-Proofpoint-GUID: 5rOPx9kocKlOdmvX402PIPjc5_46gCQD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-04_11,2024-06-05_01,2024-05-17_01
 
 
-
-On 04.06.2024 17:57, Mengyuan Lou wrote:
-> Implements the mailbox interfaces for wangxun pf drivers
-> ngbe and txgbe.
-> 
-> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+> Add flow director filter match and miss statistics to ethtool -S.
+> And change the number of queues when using flow director for ehtool -l.
+>=20
+> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 > ---
->  drivers/net/ethernet/wangxun/libwx/Makefile  |   2 +-
->  drivers/net/ethernet/wangxun/libwx/wx_mbx.c  | 189 +++++++++++++++++++
->  drivers/net/ethernet/wangxun/libwx/wx_mbx.h  |  32 ++++
->  drivers/net/ethernet/wangxun/libwx/wx_type.h |   5 +
->  4 files changed, 227 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_mbx.c
->  create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_mbx.h
-> 
-> diff --git a/drivers/net/ethernet/wangxun/libwx/Makefile b/drivers/net/ethernet/wangxun/libwx/Makefile
-> index 42ccd6e4052e..913a978c9032 100644
-> --- a/drivers/net/ethernet/wangxun/libwx/Makefile
-> +++ b/drivers/net/ethernet/wangxun/libwx/Makefile
-> @@ -4,4 +4,4 @@
->  
->  obj-$(CONFIG_LIBWX) += libwx.o
->  
-> -libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o
-> +libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o wx_mbx.o
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_mbx.c b/drivers/net/ethernet/wangxun/libwx/wx_mbx.c
-> new file mode 100644
-> index 000000000000..e7d7178a1f13
-> --- /dev/null
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_mbx.c
-> @@ -0,0 +1,189 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (c) 2015 - 2024 Beijing WangXun Technology Co., Ltd. */
-> +#include <linux/pci.h>
-> +#include "wx_type.h"
-> +#include "wx_mbx.h"
-> +
-> +/**
-> + *  wx_obtain_mbx_lock_pf - obtain mailbox lock
-> + *  @wx: pointer to the HW structure
-> + *  @vf: the VF index
-> + *
-> + *  return: return SUCCESS if we obtained the mailbox lock
-> + **/
-> +static int wx_obtain_mbx_lock_pf(struct wx *wx, u16 vf)
-> +{
-> +	int ret = -EBUSY;
-> +	int count = 5;
-> +	u32 mailbox;
-> +
-> +	while (count--) {
-> +		/* Take ownership of the buffer */
-> +		wr32(wx, WX_PXMAILBOX(vf), WX_PXMAILBOX_PFU);
-> +
-> +		/* reserve mailbox for vf use */
-> +		mailbox = rd32(wx, WX_PXMAILBOX(vf));
-> +		if (mailbox & WX_PXMAILBOX_PFU) {
-> +			ret = 0;
-> +			break;
-> +		}
-> +		udelay(10);
-> +	}
-> +
-> +	if (ret)
-> +		wx_err(wx, "Failed to obtain mailbox lock for PF%d", vf);
-> +
-> +	return ret;
-> +}
-> +
-> +static int wx_check_for_bit_pf(struct wx *wx, u32 mask, int index)
-> +{
-> +	u32 mbvficr = rd32(wx, WX_MBVFICR(index));
-> +	int ret = -EBUSY;
-
-@ret is unnecessary...
-
-> +
-> +	if (mbvficr & mask) {
-> +		ret = 0;
-> +		wr32(wx, WX_MBVFICR(index), mask);
-
-return 0 here...
-
-> +	}
-> +
-> +	return ret;
-
-and return -EBUSY here
-
-> +}
-> +
-> +/**
-> + *  wx_check_for_ack_pf - checks to see if the VF has ACKed
-> + *  @wx: pointer to the HW structure
-> + *  @vf: the VF index
-> + *
-> + *  return: return SUCCESS if the VF has set the Status bit or else -EBUSY
-> + **/
-> +int wx_check_for_ack_pf(struct wx *wx, u16 vf)
-> +{
-> +	u32 index = vf / 16, vf_bit = vf % 16;
-> +
-> +	return wx_check_for_bit_pf(wx,
-> +				   FIELD_PREP(WX_MBVFICR_VFACK_MASK, BIT(vf_bit)),
-> +				   index);
-> +}
-> +EXPORT_SYMBOL(wx_check_for_ack_pf);
-> +
-> +/**
-> + *  wx_check_for_msg_pf - checks to see if the VF has sent mail
-> + *  @wx: pointer to the HW structure
-> + *  @vf: the VF index
-> + *
-> + *  return: return SUCCESS if the VF has set the Status bit or else -EBUSY
-> + **/
-> +int wx_check_for_msg_pf(struct wx *wx, u16 vf)
-> +{
-> +	u32 index = vf / 16, vf_bit = vf % 16;
-> +
-> +	return wx_check_for_bit_pf(wx,
-> +				   FIELD_PREP(WX_MBVFICR_VFREQ_MASK, BIT(vf_bit)),
-> +				   index);
-> +}
-> +EXPORT_SYMBOL(wx_check_for_msg_pf);
-> +
-> +/**
-> + *  wx_write_mbx_pf - Places a message in the mailbox
-> + *  @wx: pointer to the HW structure
-> + *  @msg: The message buffer
-> + *  @size: Length of buffer
-> + *  @vf: the VF index
-> + *
-> + *  return: return SUCCESS if it successfully copied message into the buffer
-> + **/
-> +int wx_write_mbx_pf(struct wx *wx, u32 *msg, u16 size, u16 vf)
-> +{
-> +	struct wx_mbx_info *mbx = &wx->mbx;
-> +	int ret, i;
-> +
-> +	if (size > mbx->size) {
-> +		wx_err(wx, "Invalid mailbox message size %d", size);
-> +		ret = -EINVAL;
-> +		goto out_no_write;
-
-you don't need goto. just return -EINVAL here...
-
-> +	}
-> +
-> +	/* lock the mailbox to prevent pf/vf race condition */
-> +	ret = wx_obtain_mbx_lock_pf(wx, vf);
-> +	if (ret)
-> +		goto out_no_write;
-
-return @ret here...
-
-> +
-> +	/* flush msg and acks as we are overwriting the message buffer */
-> +	wx_check_for_msg_pf(wx, vf);
-> +	wx_check_for_ack_pf(wx, vf);
-> +
-> +	/* copy the caller specified message to the mailbox memory buffer */
-> +	for (i = 0; i < size; i++)
-> +		wr32a(wx, WX_PXMBMEM(vf), i, msg[i]);
-> +
-> +	/* Interrupt VF to tell it a message has been sent and release buffer*/
-> +	/* set mirrored mailbox flags */
-> +	wr32a(wx, WX_PXMBMEM(vf), WX_VXMAILBOX_SIZE, WX_PXMAILBOX_STS);
-> +	wr32(wx, WX_PXMAILBOX(vf), WX_PXMAILBOX_STS);
-> +
-> +out_no_write:
-> +	return ret;
-
-and return 0 here
-
-> +}
-> +EXPORT_SYMBOL(wx_write_mbx_pf);
-> +
-> +/**
-> + *  wx_read_mbx_pf - Read a message from the mailbox
-> + *  @wx: pointer to the HW structure
-> + *  @msg: The message buffer
-> + *  @size: Length of buffer
-> + *  @vf: the VF index
-> + *
-> + *  return: return SUCCESS if VF copy a message from the mailbox buffer.
-> + **/
-> +int wx_read_mbx_pf(struct wx *wx, u32 *msg, u16 size, u16 vf)
-> +{
-> +	struct wx_mbx_info *mbx = &wx->mbx;
-> +	int ret;
-> +	u16 i;
-> +
-> +	/* limit read to size of mailbox */
-> +	if (size > mbx->size)
-> +		size = mbx->size;
-> +
-> +	/* lock the mailbox to prevent pf/vf race condition */
-> +	ret = wx_obtain_mbx_lock_pf(wx, vf);
-> +	if (ret)
-> +		goto out_no_read;
-
-just return @ret...
-
-> +
-> +	/* copy the message to the mailbox memory buffer */
-> +	for (i = 0; i < size; i++)
-> +		msg[i] = rd32a(wx, WX_PXMBMEM(vf), i);
-> +
-> +	/* Acknowledge the message and release buffer */
-> +	/* set mirrored mailbox flags */
-> +	wr32a(wx, WX_PXMBMEM(vf), WX_VXMAILBOX_SIZE, WX_PXMAILBOX_ACK);
-> +	wr32(wx, WX_PXMAILBOX(vf), WX_PXMAILBOX_ACK);
-> +out_no_read:
-> +	return ret;
-
-and return 0
-
-> +}
-> +EXPORT_SYMBOL(wx_read_mbx_pf);
-> +
-> +/**
-> + *  wx_check_for_rst_pf - checks to see if the VF has reset
-> + *  @wx: pointer to the HW structure
-> + *  @vf: the VF index
-> + *
-> + *  return: return SUCCESS if the VF has set the Status bit or else -EBUSY
-> + **/
-> +int wx_check_for_rst_pf(struct wx *wx, u16 vf)
-> +{
-> +	u32 reg_offset = vf / 32;
-> +	u32 vf_shift = vf % 32;
-> +	int ret = -EBUSY;
-
-Again @ret is not needed
-
-> +	u32 vflre = 0;
-> +
-> +	vflre = rd32(wx, WX_VFLRE(reg_offset));
-> +
-> +	if (vflre & BIT(vf_shift)) {
-> +		ret = 0;
-> +		wr32(wx, WX_VFLREC(reg_offset), BIT(vf_shift));
-> +	}
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL(wx_check_for_rst_pf);
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_mbx.h b/drivers/net/ethernet/wangxun/libwx/wx_mbx.h
-> new file mode 100644
-> index 000000000000..1579096fb6ad
-> --- /dev/null
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_mbx.h
-> @@ -0,0 +1,32 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/* Copyright (c) 2015 - 2024 Beijing WangXun Technology Co., Ltd. */
-> +#ifndef _WX_MBX_H_
-> +#define _WX_MBX_H_
-> +
-> +#define WX_VXMAILBOX_SIZE    15
-> +
-> +/* PF Registers */
-> +#define WX_PXMAILBOX(i)      (0x600 + (4 * (i))) /* i=[0,63] */
-> +#define WX_PXMAILBOX_STS     BIT(0) /* Initiate message send to VF */
-> +#define WX_PXMAILBOX_ACK     BIT(1) /* Ack message recv'd from VF */
-> +#define WX_PXMAILBOX_PFU     BIT(3) /* PF owns the mailbox buffer */
-> +
-> +#define WX_PXMBMEM(i)        (0x5000 + (64 * (i))) /* i=[0,63] */
-> +
-> +#define WX_VFLRE(i)          (0x4A0 + (4 * (i))) /* i=[0,1] */
-> +#define WX_VFLREC(i)         (0x4A8 + (4 * (i))) /* i=[0,1] */
-> +
-> +/* SR-IOV specific macros */
-> +#define WX_MBVFICR(i)         (0x480 + (4 * (i))) /* i=[0,3] */
-> +#define WX_MBVFICR_VFREQ_MASK GENMASK(15, 0)
-> +#define WX_MBVFICR_VFACK_MASK GENMASK(31, 16)
-> +
-> +#define WX_VT_MSGINFO_MASK    GENMASK(23, 16)
-> +
-> +int wx_write_mbx_pf(struct wx *wx, u32 *msg, u16 size, u16 vf);
-> +int wx_read_mbx_pf(struct wx *wx, u32 *msg, u16 size, u16 vf);
-> +int wx_check_for_rst_pf(struct wx *wx, u16 mbx_id);
-> +int wx_check_for_msg_pf(struct wx *wx, u16 mbx_id);
-> +int wx_check_for_ack_pf(struct wx *wx, u16 mbx_id);
-> +
-> +#endif /* _WX_MBX_H_ */
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> index 5aaf7b1fa2db..caa2f4157834 100644
-> --- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> @@ -674,6 +674,10 @@ struct wx_bus_info {
->  	u16 device;
->  };
->  
-> +struct wx_mbx_info {
-> +	u16 size;
+>  .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 39 +++++++++++++++++--
+>  drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  5 +++
+>  drivers/net/ethernet/wangxun/libwx/wx_type.h  |  4 ++
+>  3 files changed, 45 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+> b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+> index cc3bec42ed8e..a6241091e95c 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+> @@ -43,6 +43,11 @@ static const struct wx_stats wx_gstrings_stats[] =3D {
+>  	WX_STAT("alloc_rx_buff_failed", alloc_rx_buff_failed),  };
+>=20
+> +static const struct wx_stats wx_gstrings_fdir_stats[] =3D {
+> +	WX_STAT("fdir_match", stats.fdirmatch),
+> +	WX_STAT("fdir_miss", stats.fdirmiss),
 > +};
 > +
->  struct wx_thermal_sensor_data {
->  	s16 temp;
->  	s16 alarm_thresh;
-> @@ -995,6 +999,7 @@ struct wx {
->  	struct pci_dev *pdev;
->  	struct net_device *netdev;
->  	struct wx_bus_info bus;
-> +	struct wx_mbx_info mbx;
->  	struct wx_mac_info mac;
->  	enum em_mac_type mac_type;
->  	enum sp_media_type media_type;
+>  /* drivers allocates num_tx_queues and num_rx_queues symmetrically so
+>   * we set the num_rx_queues to evaluate to num_tx_queues. This is
+>   * used because we do not have a good way to get the max number of @@ -
+> 55,12 +60,17 @@ static const struct wx_stats wx_gstrings_stats[] =3D {
+>  		(WX_NUM_TX_QUEUES + WX_NUM_RX_QUEUES) * \
+>  		(sizeof(struct wx_queue_stats) / sizeof(u64)))  #define
+> WX_GLOBAL_STATS_LEN  ARRAY_SIZE(wx_gstrings_stats)
+> +#define WX_FDIR_STATS_LEN  ARRAY_SIZE(wx_gstrings_fdir_stats)
+>  #define WX_STATS_LEN (WX_GLOBAL_STATS_LEN + WX_QUEUE_STATS_LEN)
+>=20
+>  int wx_get_sset_count(struct net_device *netdev, int sset)  {
+> +	struct wx *wx =3D netdev_priv(netdev);
+> +
+>  	switch (sset) {
+>  	case ETH_SS_STATS:
+> +		if (wx->mac.type =3D=3D wx_mac_sp)
+> +			return WX_STATS_LEN + WX_FDIR_STATS_LEN;
+>  		return WX_STATS_LEN;
+
+             Better way is to use ternary operator.
+                 Return (wx->mac.type =3D=3D wx_mac_sp) ? WX_STATS_LEN + WX=
+_FDIR_STATS_LEN : WX_STATS_LEN;
+>  	default:
+>  		return -EOPNOTSUPP;
+> @@ -70,6 +80,7 @@ EXPORT_SYMBOL(wx_get_sset_count);
+>=20
+>  void wx_get_strings(struct net_device *netdev, u32 stringset, u8 *data) =
+ {
+> +	struct wx *wx =3D netdev_priv(netdev);
+>  	u8 *p =3D data;
+>  	int i;
+>=20
+> @@ -77,6 +88,10 @@ void wx_get_strings(struct net_device *netdev, u32
+> stringset, u8 *data)
+>  	case ETH_SS_STATS:
+>  		for (i =3D 0; i < WX_GLOBAL_STATS_LEN; i++)
+>  			ethtool_puts(&p, wx_gstrings_stats[i].stat_string);
+> +		if (wx->mac.type =3D=3D wx_mac_sp) {
+> +			for (i =3D 0; i < WX_FDIR_STATS_LEN; i++)
+> +				ethtool_puts(&p,
+> wx_gstrings_fdir_stats[i].stat_string);
+> +		}
+>  		for (i =3D 0; i < netdev->num_tx_queues; i++) {
+>  			ethtool_sprintf(&p, "tx_queue_%u_packets", i);
+>  			ethtool_sprintf(&p, "tx_queue_%u_bytes", i); @@ -
+> 96,7 +111,7 @@ void wx_get_ethtool_stats(struct net_device *netdev,
+>  	struct wx *wx =3D netdev_priv(netdev);
+>  	struct wx_ring *ring;
+>  	unsigned int start;
+> -	int i, j;
+> +	int i, j, k;
+>  	char *p;
+>=20
+>  	wx_update_stats(wx);
+> @@ -107,6 +122,14 @@ void wx_get_ethtool_stats(struct net_device
+> *netdev,
+>  			   sizeof(u64)) ? *(u64 *)p : *(u32 *)p;
+>  	}
+>=20
+> +	if (wx->mac.type =3D=3D wx_mac_sp) {
+> +		for (k =3D 0; k < WX_FDIR_STATS_LEN; k++) {
+> +			p =3D (char *)wx + wx_gstrings_fdir_stats[k].stat_offset;
+> +			data[i++] =3D (wx_gstrings_fdir_stats[k].sizeof_stat =3D=3D
+> +				   sizeof(u64)) ? *(u64 *)p : *(u32 *)p;
+          Since fdir_match/fdir_len are u64, do we need to check the size h=
+ere?                          =20
+Thanks,
+Hariprasad k
+
+> +		}
+> +	}
+> +
+>  	for (j =3D 0; j < netdev->num_tx_queues; j++) {
+>  		ring =3D wx->tx_ring[j];
+>  		if (!ring) {
+> @@ -172,17 +195,21 @@ EXPORT_SYMBOL(wx_get_pause_stats);
+>=20
+>  void wx_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *i=
+nfo)
+> {
+> +	unsigned int stats_len =3D WX_STATS_LEN;
+>  	struct wx *wx =3D netdev_priv(netdev);
+>=20
+> +	if (wx->mac.type =3D=3D wx_mac_sp)
+> +		stats_len +=3D WX_FDIR_STATS_LEN;
+> +
+>  	strscpy(info->driver, wx->driver_name, sizeof(info->driver));
+>  	strscpy(info->fw_version, wx->eeprom_id, sizeof(info->fw_version));
+>  	strscpy(info->bus_info, pci_name(wx->pdev), sizeof(info->bus_info));
+>  	if (wx->num_tx_queues <=3D WX_NUM_TX_QUEUES) {
+> -		info->n_stats =3D WX_STATS_LEN -
+> +		info->n_stats =3D stats_len -
+>  				   (WX_NUM_TX_QUEUES - wx-
+> >num_tx_queues) *
+>  				   (sizeof(struct wx_queue_stats) / sizeof(u64))
+> * 2;
+>  	} else {
+> -		info->n_stats =3D WX_STATS_LEN;
+> +		info->n_stats =3D stats_len;
+>  	}
+>  }
+>  EXPORT_SYMBOL(wx_get_drvinfo);
+> @@ -383,6 +410,9 @@ void wx_get_channels(struct net_device *dev,
+>=20
+>  	/* record RSS queues */
+>  	ch->combined_count =3D wx->ring_feature[RING_F_RSS].indices;
+> +
+> +	if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags))
+> +		ch->combined_count =3D wx-
+> >ring_feature[RING_F_FDIR].indices;
+>  }
+>  EXPORT_SYMBOL(wx_get_channels);
+>=20
+> @@ -400,6 +430,9 @@ int wx_set_channels(struct net_device *dev,
+>  	if (count > wx_max_channels(wx))
+>  		return -EINVAL;
+>=20
+> +	if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags))
+> +		wx->ring_feature[RING_F_FDIR].limit =3D count;
+> +
+>  	wx->ring_feature[RING_F_RSS].limit =3D count;
+>=20
+>  	return 0;
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> index 8fb38f83a615..44cd7a5866c1 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> @@ -2352,6 +2352,11 @@ void wx_update_stats(struct wx *wx)
+>  	hwstats->b2ogprc +=3D rd32(wx, WX_RDM_BMC2OS_CNT);
+>  	hwstats->rdmdrop +=3D rd32(wx, WX_RDM_DRP_PKT);
+>=20
+> +	if (wx->mac.type =3D=3D wx_mac_sp) {
+> +		hwstats->fdirmatch +=3D rd32(wx, WX_RDB_FDIR_MATCH);
+> +		hwstats->fdirmiss +=3D rd32(wx, WX_RDB_FDIR_MISS);
+> +	}
+> +
+>  	for (i =3D 0; i < wx->mac.max_rx_queues; i++)
+>  		hwstats->qmprc +=3D rd32(wx, WX_PX_MPRC(i));  } diff --git
+> a/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> index b1f9bab06e90..e0b7866f96ec 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+> @@ -157,6 +157,8 @@
+>  #define WX_RDB_RA_CTL_RSS_IPV6_TCP   BIT(21)
+>  #define WX_RDB_RA_CTL_RSS_IPV4_UDP   BIT(22)
+>  #define WX_RDB_RA_CTL_RSS_IPV6_UDP   BIT(23)
+> +#define WX_RDB_FDIR_MATCH            0x19558
+> +#define WX_RDB_FDIR_MISS             0x1955C
+>=20
+>  /******************************* PSR Registers
+> *******************************/
+>  /* psr control */
+> @@ -1018,6 +1020,8 @@ struct wx_hw_stats {
+>  	u64 crcerrs;
+>  	u64 rlec;
+>  	u64 qmprc;
+> +	u64 fdirmatch;
+> +	u64 fdirmiss;
+>  };
+>=20
+>  enum wx_state {
+> --
+> 2.27.0
+>=20
+
 
