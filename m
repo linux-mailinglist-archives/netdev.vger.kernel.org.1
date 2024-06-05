@@ -1,165 +1,128 @@
-Return-Path: <netdev+bounces-100803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60E3E8FC18C
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 04:13:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CB728FC1AC
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 04:20:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 112751F23BC5
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 02:13:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E85A1C2326D
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 02:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF46D60DEA;
-	Wed,  5 Jun 2024 02:13:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ACF361FC9;
+	Wed,  5 Jun 2024 02:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q03Z8iZE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tp4vdK6G"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED3728379;
-	Wed,  5 Jun 2024 02:13:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E912744E;
+	Wed,  5 Jun 2024 02:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717553629; cv=none; b=fpbsUTalx9GhqQ3+snXjKxt0U4dpg+ANbPow8aeIp3XH6vKmMBk+wDkSdhCKFK3gpjn88Yc1Gm2CiwYlMiYiNItby8K02EPs73xqELiKIq0dK01Hl8TW8ouX4/fzDRu9gVV8Va5A+h8lRgt1u3misefOiR+8jhADhlwzmbVHm9Q=
+	t=1717554032; cv=none; b=hJGAspW788u2YfRO3lIhDmgo33CLCkgTIbWeW9+90ccDqkHvtfp9ldCf/hi4OmctS+sLC7K7PqZ+PW7fI3yT5OLgVYLz1mAzcmbOYlq6DXPrxfEGjRIKGPKJUgQ+1eN2mjoDCr8BdGBqnkaPUgdtUjXiSMkET72ntuPMA1ArpN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717553629; c=relaxed/simple;
-	bh=xaa7l1NfnZNvrR1Y11Ee4Az8s1RlaLtd+KTNnjfYqG8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=VLVS4SE5uS3KcTAcIVd7bFSGRCCgBs9A7xF+b7tOajUMt+n6SCiuuxkmEaxIS4j17oM98VPK3ZFtnrApfSKCqCXsutpZX+B9/K4vX2uU6lcjec6ORp558G18Uk45AiDU3MZFox1+NAXinx5l0DnMJ2MBVd7g22hRutbLu9XXaAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q03Z8iZE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A75CC2BBFC;
-	Wed,  5 Jun 2024 02:13:48 +0000 (UTC)
+	s=arc-20240116; t=1717554032; c=relaxed/simple;
+	bh=08b//uzEqLqk0Nl2SSIOHmj2RvoFoSkpZUV6ZyaQgQY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=IaRazvz6OfSTBDNf815cLbeAz5ct2qIkJgs6kvAL00aQmBejbZfXYhAcS9WVA74hfOLKkKEY3kD2mnQkuHuixdPmlQiN4Tdb8chl+yuqHn/L6i3cHhnCMpW2he47JrJsF3Mool2R+uwsvtV84wbGs9X17ClMpsYJ44TOtjn8Cic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tp4vdK6G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 91474C2BBFC;
+	Wed,  5 Jun 2024 02:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717553628;
-	bh=xaa7l1NfnZNvrR1Y11Ee4Az8s1RlaLtd+KTNnjfYqG8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=Q03Z8iZEAuY+QpAQHiYOYDag25Z34ERDCiAYcBkiKQdauJxt5+QKHpAgoc8HAD8IF
-	 dD/nXOcaTCagWd/1XZXh8gzjyqR5OtebZ2lNNGU9a+SoyRVKfJ8cVBxiUwNwPHruKT
-	 Q+7IugR43QmE4UrgtdS2LdWlyfCnrzCizKvWzFyTLqqsNVW+kwhZwehbx7zvfljAU4
-	 ZLr/yL5pnsAh//MMHcnQnrkXaDnxnxbKvBEQBoxbvQqgiAaaO73CgbyeBAc5Xx80mk
-	 1EilMt/qEfeXAjM0hBw1bsbOcS2glyUzslXYlj0apDfdpLZUeP/3hoKSjIgQcVlyqZ
-	 84+Oi2MPblg7w==
-Date: Tue, 4 Jun 2024 21:13:46 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Rocky Liao <quic_rjliao@quicinc.com>, Kalle Valo <kvalo@kernel.org>,
-	Jeff Johnson <jjohnson@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Elliot Berman <quic_eberman@quicinc.com>,
-	Caleb Connolly <caleb.connolly@linaro.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Alex Elder <elder@kernel.org>, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
-	Jeff Johnson <quic_jjohnson@quicinc.com>,
-	ath12k@lists.infradead.org, linux-pm@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	kernel@quicinc.com, Amit Pundir <amit.pundir@linaro.org>
-Subject: Re: [PATCH v8 16/17] PCI/pwrctl: add a PCI power control driver for
- power sequenced devices
-Message-ID: <20240605021346.GA746121@bhelgaas>
+	s=k20201202; t=1717554031;
+	bh=08b//uzEqLqk0Nl2SSIOHmj2RvoFoSkpZUV6ZyaQgQY=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=Tp4vdK6G85uxI6PeMLSbifQinw4Acp0/UMmlwvW/KeOTaIq7EcVqymnnYa9MgS4q5
+	 cEeF4yYTXx91EGHK+dzkrnjl/XznapKRxMxH2GDXZITF5vMLReRB9nUwrvYr8/12oL
+	 Kx7mf1XT3f1xubgxAJimOjboTiq8k6lLabppB9GAhoU9YhXhj7NYSq6llH5phJEkdR
+	 LaC9D9sx5xSNdavQiviDzn4lV0acVPc6qb2dnkr7yhn57rW0h01jzSnQN/C/b4qAK4
+	 cjea4FunarRHQ0R5X02XsKqYXpLxyfsv24wyw3ifjdt8qUcVroGbdolraN1yCppdCn
+	 yLdjUr1RfvdlA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77DF0C25B78;
+	Wed,  5 Jun 2024 02:20:31 +0000 (UTC)
+From: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
+Subject: [PATCH net-next v2 0/6] net/tcp: TCP-AO and TCP-MD5 tracepoints
+Date: Wed, 05 Jun 2024 03:20:01 +0100
+Message-Id: <20240605-tcp_ao-tracepoints-v2-0-e91e161282ef@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAA8EJpomPLQmQbW8w3_ms_NMKHoSPcqBa7f2OhNTTOUSdB+9Eg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFHLX2YC/12OwQqDMBBEf0X23G2TqAg99T+KlDVuag4mkgSxi
+ P/eGOilx2GY92aHyMFyhHu1Q+DVRutdDupSgZ7IvRntmDMooRrR1hKTXl7kMQXSvHjrUkRDimX
+ D0ohxhDxcAhu7FegTHCd0vCXoczNQZBwCOT2d0F93m8m6cznZmHz4lDerLPsiVqo5xfgnXiUKl
+ K2p5dCZWlD3oJAJdNV+hv44ji81NbuC3wAAAA==
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+ Steven Rostedt <rostedt@goodmis.org>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, 
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+ Jonathan Corbet <corbet@lwn.net>
+Cc: Mohammad Nassiri <mnassiri@ciena.com>, Simon Horman <horms@kernel.org>, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-trace-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+ Dmitry Safonov <0x7f454c46@gmail.com>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1717554029; l=1682;
+ i=0x7f454c46@gmail.com; s=20240410; h=from:subject:message-id;
+ bh=08b//uzEqLqk0Nl2SSIOHmj2RvoFoSkpZUV6ZyaQgQY=;
+ b=udDy88sE7uRWWaTJ4YsZBsDtpsCY2MWcWS33lc++xo+jeEiE4cCGOkwYZUnFrEZaR9TvdCDN9TXr
+ 16ekEXZLCdDL19+LuYWiuXoXItVyhUUo6sBV3bGBA+GvGXA0r9nM
+X-Developer-Key: i=0x7f454c46@gmail.com; a=ed25519;
+ pk=cFSWovqtkx0HrT5O9jFCEC/Cef4DY8a2FPeqP4THeZQ=
+X-Endpoint-Received: by B4 Relay for 0x7f454c46@gmail.com/20240410 with
+ auth_id=152
+X-Original-From: Dmitry Safonov <0x7f454c46@gmail.com>
+Reply-To: 0x7f454c46@gmail.com
 
-On Wed, Jun 05, 2024 at 02:34:52AM +0300, Dmitry Baryshkov wrote:
-> On Wed, 5 Jun 2024 at 02:23, Bjorn Helgaas <helgaas@kernel.org> wrote:
-> >
-> > On Tue, May 28, 2024 at 09:03:24PM +0200, Bartosz Golaszewski wrote:
-> > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > >
-> > > Add a PCI power control driver that's capable of correctly powering up
-> > > devices using the power sequencing subsystem. The first users of this
-> > > driver are the ath11k module on QCA6390 and ath12k on WCN7850.
+Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
+---
+Changes in v2:
+- Fix the build with CONFIG_IPV6=m (Eric Dumazet)
+- Move unused keyid/rnext/maclen later in the series to the patch
+  that uses them (Simon Horman)
+- Reworked tcp_ao selftest lib to allow async tracing non-tcp events
+  (was working on a stress-test that needs trace_kfree_skb() event,
+   not in this series).
+- Separated selftest changes from kernel, as they now have a couple
+  of unrelated to tracepoints changes
+- Wrote a few lines of Documentation/
+- Link to v1: https://lore.kernel.org/r/20240224-tcp-ao-tracepoints-v1-0-15f31b7f30a7@arista.com
 
-> > > +static const struct of_device_id pci_pwrctl_pwrseq_of_match[] = {
-> > > +     {
-> > > +             /* ATH11K in QCA6390 package. */
-> > > +             .compatible = "pci17cb,1101",
-> > > +             .data = "wlan",
-> > > +     },
-> > > +     {
-> > > +             /* ATH12K in WCN7850 package. */
-> > > +             .compatible = "pci17cb,1107",
-> > > +             .data = "wlan",
-> > > +     },
-> >
-> > IIUC, "pci17cb,1101" and "pci17cb,1107" exist partly so we can check
-> > that a DTS conforms to the schema, e.g., a "pci17cb,1101" node
-> > contains all the required regulators.  For that use, we obviously need
-> > a very specific "compatible" string.
-> >
-> > Is there any opportunity to add a more generic "compatible" string in
-> > addition to those so this list doesn't have to be updated for every
-> > PMU?  The .data here is "wlan" in both cases, and for this purpose, we
-> > don't care whether it's "pci17cb,1101" or "pci17cb,1107".
-> 
-> These two devices have different set of regulators and different
-> requirements to power them on.
+---
+Dmitry Safonov (6):
+      net/tcp: Use static_branch_tcp_{md5,ao} to drop ifdefs
+      net/tcp: Add a helper tcp_ao_hdr_maclen()
+      net/tcp: Move tcp_inbound_hash() from headers
+      net/tcp: Add tcp-md5 and tcp-ao tracepoints
+      net/tcp: Remove tcp_hash_fail()
+      Documentation/tcp-ao: Add a few lines on tracepoints
 
-Right, but I don't think pci_pwrctl_pwrseq_probe() knows about those
-different sets.  It basically looks like:
+ Documentation/networking/tcp_ao.rst |   9 +
+ include/net/tcp.h                   |  79 +--------
+ include/net/tcp_ao.h                |  42 +----
+ include/trace/events/tcp.h          | 317 ++++++++++++++++++++++++++++++++++++
+ net/ipv4/tcp.c                      |  87 ++++++++--
+ net/ipv4/tcp_ao.c                   |  24 +--
+ net/ipv4/tcp_input.c                |   8 +-
+ net/ipv4/tcp_ipv4.c                 |   8 +-
+ net/ipv4/tcp_output.c               |   2 +
+ 9 files changed, 434 insertions(+), 142 deletions(-)
+---
+base-commit: a6ba5125f10bd7307e775e585ad21a8f7eda1b59
+change-id: 20240531-tcp_ao-tracepoints-fa2e14e1f0dd
 
-  pci_pwrctl_pwrseq_probe(struct platform_device *pdev)
-  {
-    struct pci_pwrctl_pwrseq_data *data;
-    struct device *dev = &pdev->dev;
+Best regards,
+-- 
+Dmitry Safonov <0x7f454c46@gmail.com>
 
-    data->pwrseq = devm_pwrseq_get(dev, of_device_get_match_data(dev));
-    pwrseq_power_on(data->pwrseq);
-    data->ctx.dev = dev;
-    devm_pci_pwrctl_device_set_ready(dev, &data->ctx);
-  }
 
-I think of_device_get_match_data(dev) will return "wlan" for both
-"pci17cb,1101" and "pci17cb,1107", so devm_pwrseq_get(),
-pwrseq_power_on(), and devm_pci_pwrctl_device_set_ready() don't see
-the distinction between them.
-
-Of course, they also get "dev", so they can find the device-specifc
-stuff that way, but I think that's on the drivers/power/sequencing/
-side, not in this pci-pwrctl-pwrseq driver itself.
-
-So what if there were a more generic "compatible" string, e.g., if the
-DT contained something like this:
-
-  wifi@0 {
-    compatible = "pci17cb,1101", "wlan-pwrseq";
-    ...
-  }
-
-and pci_pwrctl_pwrseq_of_match[] had this:
-
-  { .compatible = "wlan-pwrseq", .data = "wlan", }
-
-Wouldn't this pci-pwrctl-pwrseq driver work the same?  I'm not a DT
-whiz, so likely I'm missing something, but it would be nice if we
-didn't have to update this very generic-looking driver to add every
-device that needs it.
-
-Bjorn
 
