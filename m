@@ -1,199 +1,123 @@
-Return-Path: <netdev+bounces-100832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC3B58FC320
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 07:50:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 368608FC344
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 08:02:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E7331F25968
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 05:50:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6418E1C21053
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 06:02:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A33FA21C183;
-	Wed,  5 Jun 2024 05:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83B821C179;
+	Wed,  5 Jun 2024 06:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="EwG+dJZe"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="PiKQG1GB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6074B3DABEC;
-	Wed,  5 Jun 2024 05:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87DA9225D9;
+	Wed,  5 Jun 2024 06:02:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717566613; cv=none; b=jn5bTVUkCkaPdZ9gsBQWiW2Qmr1OD17PbFcryVkO6WV2xYNodZTiwGHzaqm7cxzjl11mEYVP3QGNse8Q7I61TPugA8ObKwb5CRbhqL7uf0LOfgr88emrxLBy6sS268hIvZwlstIfrV5a7lvY0H3yxoo9dMlEOK127ssypipOoMM=
+	t=1717567370; cv=none; b=WEEOn8JiGHgxGmoznlx71RKOaDK7dFAnLDwjFdq0j7K1qCloLDMdgD/O+lPbg9tPvAOUlFqhAA1pHcAVgcKvmoLMO2cEISLgs9W/rZBEW9L2NfOufilmCN3TL05YwteqkcMGsMu6x4l7/jyvkPYkGtVt3I0DAigh/cUa63ac2mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717566613; c=relaxed/simple;
-	bh=C6DHcioBtZO8Ft6NCOTxg1IFxOjJNDjKMUw66WUpIkE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YQb3tJXwvcZofoQDzDx71ZmoG2rdEKqO12W2xOOuQAy+gxGjMSepyzqQJLUAvwTH+c9CY2rapqgjIhf6i82bnYJGpstluD9nTS1ytyfk5FzkZ9O5LsIItGQkDGA8kByrVjt35ZnsA+jVr3dRS/to+eRo7qy520+JEVdS6kLCtfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=EwG+dJZe; arc=none smtp.client-ip=212.227.15.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1717566595; x=1718171395; i=wahrenst@gmx.net;
-	bh=LhDKqxW6L1Ssz9fZh25QjqFX4bDiK3gZ9H644lacdlk=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:
-	 MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=EwG+dJZe9AZ8h4sOdTiiUqUb55MqpyVLJfoA0J3dr9CUdsHX3lK6crSLJ0PpA4lW
-	 a4+z+XAvfGdI+FG2jiPR4gNNNf397tPCfNT9Q7yD/5JzKXo42+av1YZvFPMgzyFkv
-	 4OODgLQvOmav+jl7vvWhtcoQk16XOzqqFz2/Wc4fevAxMb1w6hvkpE9/5t2U66e0c
-	 8DPkUlyM0Ft7ycaK99psgv6mYE7+lClCrbWGTK89XPAmvJWO/fiWc4g7a9QxA5kpw
-	 Jq7KXsOEPNSzlNbsejneRH71v+1P9z45K518cvNSmqjUpKIUl2OtvezaxADssFhus
-	 HSXz+fOyGmeiBisAcA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from stefanw-SCHENKER ([37.4.248.43]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mnps0-1spNwf1BN4-00pKfz; Wed, 05
- Jun 2024 07:49:55 +0200
-From: Stefan Wahren <wahrenst@gmx.net>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Christoph Fritz <chf.fritz@googlemail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: [PATCH RFC] qca_spi: Make interrupt remembering atomic
-Date: Wed,  5 Jun 2024 07:49:39 +0200
-Message-Id: <20240605054939.34870-1-wahrenst@gmx.net>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1717567370; c=relaxed/simple;
+	bh=ubAy5Sy4LtO8IqXdFZ0dzy0l5V0OzL4Dtf9LaTvCzzg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=MP4cQYa+RaweD2WeJxDjsWy4fMgnF1zKkCfuWHrOLlDzO+q0FHIUV7cUHonEgVt+UI4XG9RNEBRNBwsKw7GW1nrnOkNm+qt6mw4VgFrPImbvpmoJH5hWjfMWcJ5A1dCKXqv86H6+UUXhTnfoUY0vYIijCUO0B0j3Tv/276kOF9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=PiKQG1GB; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4550MaE5012962;
+	Wed, 5 Jun 2024 08:02:13 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	4DjnJoPbo30AhugHUqFSm27VE7pFMVJlJLwMT373m9s=; b=PiKQG1GBRo57aejO
+	FnF4gTRb0IG3xnAWIAbBFCmvQH24hEykzo1zt84HDjp19atARc1OTRKd8Kc58H/K
+	q3ChX++VjuDHyubscb2+TMPU6o0FTmfTjIAoC742vD+8NXRZWViipY0xtVEWqFlo
+	qTG8IcvQwI9WKmj84cEmQKyLnWc/krPO+18HSfqSJ4I3YXzoWaxf5GFZHoQBtqQU
+	cbvAOJPzfkt1e9CIX9mC4RwLEWQH9ei36Yiv8oYQFeQHR+cvwUBUjDM7gmUpXaYC
+	SPax9jRQp9y5dMXNDWMbRqkiOqe1uW8uaeVP4NokCfUq5tKJW3lp0+WDTa0qpfa2
+	vyHTOQ==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yfw3wq3fp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Jun 2024 08:02:13 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 181B74004C;
+	Wed,  5 Jun 2024 08:02:07 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id A7D2C20F2DE;
+	Wed,  5 Jun 2024 08:00:52 +0200 (CEST)
+Received: from [10.48.86.164] (10.48.86.164) by SHFDAG1NODE2.st.com
+ (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 5 Jun
+ 2024 08:00:51 +0200
+Message-ID: <3a59b4cc-0c7b-47d6-8322-4ae12ddb3a4c@foss.st.com>
+Date: Wed, 5 Jun 2024 08:00:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:TuT0o4Osg9B9GIit4JJq9P9z292nEkgMNJiZFqaUKEvnfZERxhP
- HAHXOkS05v0XhlJYA6wim8PmXErup3tIbb1RApsMpkPAuxpexH9DtB872zV1XtRk6qOBL0G
- /Tj7+zesEquAkos5OYHqqjkU7qif8YgLA+AUjLORAQ9QOboLZaHqw+Ft3HBzTqC+2voC6uA
- VoBvQl21p8jVDefFHVg9g==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:3jhrT1xqADA=;mMaBq+QuCjkH2Ph8NfOyx7ednTR
- 56IF8YgBZxwgTRnyCDIJLjn/YmsyoeMatMlafB71XASkaoPDgqhXKk9pqMqEtvXBVAQH9My3o
- 70wqfDMoeTom6xgy5Fe30d5KWLhRVZk5cZg7TOv93Gf2mX6aVJJ8tAaqCUGbYOcooJIF3gFBW
- 0kAspYCU5MAMC50jUF/xVoWxbz/yuEq7kWb6j2QT4bRUr/5UW6KNkUyo/e9qYKzZpU2LSjPx3
- 2huG8Ur96AmsRA9Hf8rbKaxqeEHznA6NzSO5Fygx5UDC3xZzRJOn8bT2THwafvIMblIPcKdQL
- k7kAF2wPUDQyFJ0wyyBKn79GxQ3UFFIXWRGdqPqFgA9nsXdvPLAR6/tKasA/yJi3hjyCoxE8Q
- thxXc6qWcxzMOaBhfo9OnI36o+jSN1vzef06uhJvgUqmPc0ZYixir2vtpKef71HPnqRp4L70T
- D2fcHHuOTD+U8IvoV9liwXjYYYfOYzHW37jQo6g0Tsm4o0ZQjmhht5he90L8l2lOSx87MEdiu
- t9tYjc813plOy2DMrp+cr92gVvGhiG4R7DMHdFmejPYnlcRDSG3XBq5OSv1GOLYxfqtdqHqHm
- /ZP3ZQ0csrOM3cdhsBJ7cvbxjM8QYsuNT1no2nFyjKdYRGsRz82jOAZ+dCGOMDf9ZRD1IPXPz
- 4OzrkVGS0KXpDVd4UFvkxVo7b9Vb1j0balFTUJAvvoXnoCSkXTmjQcsKk7F0lFFw6hja3mcjC
- 5MrxIKPHZc1Hhwd7/ANQq5i2Fu0RlEYief0/tPVlcUw1n+bJpRuSk/kd+UPQinBT7Svr0Satb
- JJhx45mpFb0rSo7a3w2P5+z3QA305CiwOgGhfh+F6osto=
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 10/11] ARM: dts: stm32: add ethernet1 for
+ STM32MP135F-DK board
+To: Marek Vasut <marex@denx.de>, "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre
+ Torgue <alexandre.torgue@foss.st.com>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        Liam Girdwood
+	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20240604143502.154463-1-christophe.roullier@foss.st.com>
+ <20240604143502.154463-11-christophe.roullier@foss.st.com>
+ <c2242ba3-3692-4c5f-a979-0d0e80f23629@denx.de>
+Content-Language: en-US
+From: Christophe ROULLIER <christophe.roullier@foss.st.com>
+In-Reply-To: <c2242ba3-3692-4c5f-a979-0d0e80f23629@denx.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
+ (10.75.129.70)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-04_11,2024-06-05_01,2024-05-17_01
 
-The whole mechanism to remember occurred SPI interrupts is not atomic,
-which could lead to unexpected behavior. So fix this by using atomic bit
-operations instead.
 
-Fixes: 291ab06ecf67 ("net: qualcomm: new Ethernet over SPI driver for QCA7=
-000")
-Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
-=2D--
- drivers/net/ethernet/qualcomm/qca_debug.c |  6 ++----
- drivers/net/ethernet/qualcomm/qca_spi.c   | 16 ++++++++--------
- drivers/net/ethernet/qualcomm/qca_spi.h   |  3 +--
- 3 files changed, 11 insertions(+), 14 deletions(-)
+On 6/4/24 18:52, Marek Vasut wrote:
+> On 6/4/24 4:35 PM, Christophe Roullier wrote:
+>> Ethernet1: RMII with crystal
+>> PHY used is SMSC (LAN8742A)
+>
+> Doesn't the STM32MP135F-DK come with two ethernet ports ?
+> Why not enable both ?
 
-diff --git a/drivers/net/ethernet/qualcomm/qca_debug.c b/drivers/net/ether=
-net/qualcomm/qca_debug.c
-index ff3b89e9028e..ad06da0fdaa0 100644
-=2D-- a/drivers/net/ethernet/qualcomm/qca_debug.c
-+++ b/drivers/net/ethernet/qualcomm/qca_debug.c
-@@ -98,10 +98,8 @@ qcaspi_info_show(struct seq_file *s, void *what)
+Hi Marek,
 
- 	seq_printf(s, "IRQ              : %d\n",
- 		   qca->spi_dev->irq);
--	seq_printf(s, "INTR REQ         : %u\n",
--		   qca->intr_req);
--	seq_printf(s, "INTR SVC         : %u\n",
--		   qca->intr_svc);
-+	seq_printf(s, "INTR             : %lx\n",
-+		   qca->intr);
+As already discussed in V2, second ethernet have no cristal and need 
+"phy-supply" property to work, today this property is managed by 
+Ethernet glue, but
 
- 	seq_printf(s, "SPI max speed    : %lu\n",
- 		   (unsigned long)qca->spi_dev->max_speed_hz);
-diff --git a/drivers/net/ethernet/qualcomm/qca_spi.c b/drivers/net/etherne=
-t/qualcomm/qca_spi.c
-index 5799ecc88a87..8f7ce6b51a1c 100644
-=2D-- a/drivers/net/ethernet/qualcomm/qca_spi.c
-+++ b/drivers/net/ethernet/qualcomm/qca_spi.c
-@@ -35,6 +35,8 @@
-
- #define MAX_DMA_BURST_LEN 5000
-
-+#define SPI_INTR 0
-+
- /*   Modules parameters     */
- #define QCASPI_CLK_SPEED_MIN 1000000
- #define QCASPI_CLK_SPEED_MAX 16000000
-@@ -579,14 +581,14 @@ qcaspi_spi_thread(void *data)
- 			continue;
- 		}
-
--		if ((qca->intr_req =3D=3D qca->intr_svc) &&
-+		if (!test_bit(SPI_INTR, &qca->intr) &&
- 		    !qca->txr.skb[qca->txr.head])
- 			schedule();
-
- 		set_current_state(TASK_RUNNING);
-
--		netdev_dbg(qca->net_dev, "have work to do. int: %d, tx_skb: %p\n",
--			   qca->intr_req - qca->intr_svc,
-+		netdev_dbg(qca->net_dev, "have work to do. int: %lu, tx_skb: %p\n",
-+			   qca->intr,
- 			   qca->txr.skb[qca->txr.head]);
-
- 		qcaspi_qca7k_sync(qca, QCASPI_EVENT_UPDATE);
-@@ -600,8 +602,7 @@ qcaspi_spi_thread(void *data)
- 			msleep(QCASPI_QCA7K_REBOOT_TIME_MS);
- 		}
-
--		if (qca->intr_svc !=3D qca->intr_req) {
--			qca->intr_svc =3D qca->intr_req;
-+		if (test_and_clear_bit(SPI_INTR, &qca->intr)) {
- 			start_spi_intr_handling(qca, &intr_cause);
-
- 			if (intr_cause & SPI_INT_CPU_ON) {
-@@ -663,7 +664,7 @@ qcaspi_intr_handler(int irq, void *data)
- {
- 	struct qcaspi *qca =3D data;
-
--	qca->intr_req++;
-+	set_bit(SPI_INTR, &qca->intr);
- 	if (qca->spi_thread)
- 		wake_up_process(qca->spi_thread);
-
-@@ -679,8 +680,7 @@ qcaspi_netdev_open(struct net_device *dev)
- 	if (!qca)
- 		return -EINVAL;
-
--	qca->intr_req =3D 1;
--	qca->intr_svc =3D 0;
-+	set_bit(SPI_INTR, &qca->intr);
- 	qca->sync =3D QCASPI_SYNC_UNKNOWN;
- 	qcafrm_fsm_init_spi(&qca->frm_handle);
-
-diff --git a/drivers/net/ethernet/qualcomm/qca_spi.h b/drivers/net/etherne=
-t/qualcomm/qca_spi.h
-index d59cb2352cee..8f4808695e82 100644
-=2D-- a/drivers/net/ethernet/qualcomm/qca_spi.h
-+++ b/drivers/net/ethernet/qualcomm/qca_spi.h
-@@ -81,8 +81,7 @@ struct qcaspi {
- 	struct qcafrm_handle frm_handle;
- 	struct sk_buff *rx_skb;
-
--	unsigned int intr_req;
--	unsigned int intr_svc;
-+	unsigned long intr;
- 	u16 reset_count;
-
- #ifdef CONFIG_DEBUG_FS
-=2D-
-2.34.1
+should be present and managed in PHY node (as explained by Rob). So I 
+will push second Ethernet in next step ;-)
 
 
