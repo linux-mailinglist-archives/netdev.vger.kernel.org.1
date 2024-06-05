@@ -1,162 +1,168 @@
-Return-Path: <netdev+bounces-100946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 280EF8FC9B6
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:07:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9142E8FC9B8
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:07:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 886F81F224F0
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 11:07:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 249EE1F21DBC
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 11:07:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5EF71922CB;
-	Wed,  5 Jun 2024 11:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Vyt9OO2h"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AB8119149B;
+	Wed,  5 Jun 2024 11:07:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86BF61946D3;
-	Wed,  5 Jun 2024 11:07:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53750191475;
+	Wed,  5 Jun 2024 11:07:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717585651; cv=none; b=nq9FmceX/esM+hxo9QPbrnkTuV/FWAZZEFnMSGHkwhYhFmOQYsv7xTfe+6uhGVE0ubgX6ZdS9YzwJD4zY/I0gEBDbUdcS1Hki7FOL4I2i0/VdWNzd81fwVmeDknCpF1EbJ4gpcBZf9zlL0eMmvQhnBV/0tUvkAKHZQ1ekBJ74Bc=
+	t=1717585663; cv=none; b=TBWvBdRX6Lb4yANAxdahtoM1RMdek+FcNrncT1p97c09s2NgH546ab9UmW7vOaGRlI/sMxCx+5+SFtEOHzZ36EiH8wTRwX6czWtBNsjszCVExUAt/Pm72vzoECtkY7cnVrlOv43suOVe1UaXclyqYAbGbOdcf3gl8V7Ae0YUiZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717585651; c=relaxed/simple;
-	bh=BCz1j1uw7Qu6clSfJhdwXi4LoUZE+aSiJQFANu3tP8g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P542INMBlYfXnjhbFfdRZXYTd/9epzc5tG8izr5D+Vwk+m29+SmXa5xovNM/GyEWDANGLd5B7MghoN6DQbGq4N8XZOFPOL7UQDiR9RmLJI1qi+nVimtixgdFla6AbYiCP9fquT0t4lLHhQWgPVhZiN+lJGgRe46RhxeVWs6ATdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Vyt9OO2h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B480CC3277B;
-	Wed,  5 Jun 2024 11:07:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1717585650;
-	bh=BCz1j1uw7Qu6clSfJhdwXi4LoUZE+aSiJQFANu3tP8g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Vyt9OO2hX+0cPeFdGTXw+VCPs6QTQtRRjpEisnE79eNLjoqDIftZ4IHaRoGqdRqtv
-	 6JoDuJTjVBZQsSON0TlhoHwIvAYCtzl3o8tkXH1MzwIBgzzdj+pWVTU1MkikNyyNPs
-	 cB2FKbEZjGe0xrnsNAPeCVwhBj1qpnXxW2xDoaJ4=
-Date: Wed, 5 Jun 2024 13:07:30 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jiri Slaby <jirislaby@kernel.org>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	linux-serial@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net] ptp: ocp: adjust serial port symlink creation
-Message-ID: <2024060503-subsonic-pupil-bbee@gregkh>
-References: <20240510110405.15115-1-vadim.fedorenko@linux.dev>
- <2024051046-decimeter-devotee-076a@gregkh>
- <cf74065c-7b68-48d8-b1af-b18ab413f732@linux.dev>
- <2024060428-childcare-clunky-067c@gregkh>
- <d59e00e1-d390-4140-b34f-58eaf13baee7@linux.dev>
- <2024060505-expose-crouch-00b1@gregkh>
- <cbcf7cbb-809f-47f8-bd98-e140875bc2d1@linux.dev>
- <2024060514-recess-unblessed-431c@gregkh>
- <15f59e29-ac03-4018-bbc3-c4ac5a2964db@linux.dev>
+	s=arc-20240116; t=1717585663; c=relaxed/simple;
+	bh=fo7ouCkAbGykUNk6urigkRnK5QxRhvkX5PVDaVaCz44=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=U3enlAoBjGAZr7QP7w0u+3qiSBbzilPq0b/Ww7eV56wHbBI9tyWuDLT5ZY+MjzxdLnUhWxmjHaXEvGWjK6YNMjv+0I7LHx2tQTT/oExGiCT9v9VnqWcN0vvELdha71Aw4lDjfPE9o41MSaheXhmFl3bs6Fjhwwfunu9fXKK+Ang=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VvPhS4M8Wz6JBCy;
+	Wed,  5 Jun 2024 19:03:20 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id C50991400C9;
+	Wed,  5 Jun 2024 19:07:38 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 5 Jun
+ 2024 12:07:38 +0100
+Date: Wed, 5 Jun 2024 12:07:37 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Leon Romanovsky <leon@kernel.org>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan
+	<tariqt@nvidia.com>, Andy Gospodarek <andrew.gospodarek@broadcom.com>, Aron
+ Silverton <aron.silverton@oracle.com>, Dan Williams
+	<dan.j.williams@intel.com>, David Ahern <dsahern@kernel.org>, "Christoph
+ Hellwig" <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>, Leonid Bloch
+	<lbloch@nvidia.com>, <linux-cxl@vger.kernel.org>, <patches@lists.linux.dev>
+Subject: Re: [PATCH 2/8] fwctl: Basic ioctl dispatch for the character
+ device
+Message-ID: <20240605120737.00007472@Huawei.com>
+In-Reply-To: <20240604165844.GM19897@nvidia.com>
+References: <2-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+	<6cfe00ce-1860-4aba-bcb8-54f8d365d2dc@linux.dev>
+	<20240604122221.GR3884@unreal>
+	<20240604175023.000004e2@Huawei.com>
+	<20240604165844.GM19897@nvidia.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <15f59e29-ac03-4018-bbc3-c4ac5a2964db@linux.dev>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500002.china.huawei.com (7.191.160.78) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Wed, Jun 05, 2024 at 11:59:30AM +0100, Vadim Fedorenko wrote:
-> On 05/06/2024 11:41, Greg Kroah-Hartman wrote:
-> > On Wed, Jun 05, 2024 at 11:14:28AM +0100, Vadim Fedorenko wrote:
-> > > On 05/06/2024 11:05, Greg Kroah-Hartman wrote:
-> > > > On Wed, Jun 05, 2024 at 12:53:13AM +0100, Vadim Fedorenko wrote:
-> > > > > On 04/06/2024 12:50, Greg Kroah-Hartman wrote:
-> > > > > > On Wed, May 22, 2024 at 01:39:21PM +0100, Vadim Fedorenko wrote:
-> > > > > > > On 10/05/2024 12:13, Greg Kroah-Hartman wrote:
-> > > > > > > > On Fri, May 10, 2024 at 11:04:05AM +0000, Vadim Fedorenko wrote:
-> > > > > > > > > The commit b286f4e87e32 ("serial: core: Move tty and serdev to be children
-> > > > > > > > > of serial core port device") changed the hierarchy of serial port devices
-> > > > > > > > > and device_find_child_by_name cannot find ttyS* devices because they are
-> > > > > > > > > no longer directly attached. Add some logic to restore symlinks creation
-> > > > > > > > > to the driver for OCP TimeCard.
-> > > > > > > > > 
-> > > > > > > > > Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be children of serial core port device")
-> > > > > > > > > Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> > > > > > > > > ---
-> > > > > > > > > v2:
-> > > > > > > > >      add serial/8250 maintainers
-> > > > > > > > > ---
-> > > > > > > > >      drivers/ptp/ptp_ocp.c | 30 +++++++++++++++++++++---------
-> > > > > > > > >      1 file changed, 21 insertions(+), 9 deletions(-)
-> > > > > > > > 
-> > > > > > > > Hi,
-> > > > > > > > 
-> > > > > > > > This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-> > > > > > > > a patch that has triggered this response.  He used to manually respond
-> > > > > > > > to these common problems, but in order to save his sanity (he kept
-> > > > > > > > writing the same thing over and over, yet to different people), I was
-> > > > > > > > created.  Hopefully you will not take offence and will fix the problem
-> > > > > > > > in your patch and resubmit it so that it can be accepted into the Linux
-> > > > > > > > kernel tree.
-> > > > > > > > 
-> > > > > > > > You are receiving this message because of the following common error(s)
-> > > > > > > > as indicated below:
-> > > > > > > > 
-> > > > > > > > - You have marked a patch with a "Fixes:" tag for a commit that is in an
-> > > > > > > >       older released kernel, yet you do not have a cc: stable line in the
-> > > > > > > >       signed-off-by area at all, which means that the patch will not be
-> > > > > > > >       applied to any older kernel releases.  To properly fix this, please
-> > > > > > > >       follow the documented rules in the
-> > > > > > > >       Documentation/process/stable-kernel-rules.rst file for how to resolve
-> > > > > > > >       this.
-> > > > > > > > 
-> > > > > > > > If you wish to discuss this problem further, or you have questions about
-> > > > > > > > how to resolve this issue, please feel free to respond to this email and
-> > > > > > > > Greg will reply once he has dug out from the pending patches received
-> > > > > > > > from other developers.
-> > > > > > > 
-> > > > > > > Hi Greg!
-> > > > > > > 
-> > > > > > > Just gentle ping, I'm still looking for better solution for serial
-> > > > > > > device lookup in TimeCard driver.
-> > > > > > 
-> > > > > > See my comment on the other patch in this thread.
-> > > > > > 
-> > > > > > In short, you shouldn't need to do any of this.
-> > > > > 
-> > > > > Got it, thanks. I'll try to find another way.
-> > > > 
-> > > > Wait, no, please just remove all that, it should not be needed at all.
-> > > 
-> > > Do you mean remove symlinks from the driver? We have open-source
-> > > user-space software which relies on them to discover proper devices. If
-> > > I remove symlinks it will break the software.
-> > 
-> > the symlinks should be done in userspace in the /dev/serial/ directory,
-> > why would userspace need to know the symlink of the serial device in
-> > a sysfs tree?  What exactly are you trying to represent here that
-> > requires this to be a custom thing?
+On Tue, 4 Jun 2024 13:58:44 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Tue, Jun 04, 2024 at 05:50:23PM +0100, Jonathan Cameron wrote:
 > 
-> Well, the hardware exposes up to 4 different serial ports for different
-> functions. And only driver knows which feature is attached to which port
-> because of differences in the HW. There is no way for user-space to get
-> this information on it's own.
+> > > > >   static int fwctl_fops_open(struct inode *inode, struct file *filp)
+> > > > >   {
+> > > > >   	struct fwctl_device *fwctl =
+> > > > >   		container_of(inode->i_cdev, struct fwctl_device, cdev);
+> > > > > +	struct fwctl_uctx *uctx __free(kfree) = NULL;
+> > > > > +	int ret;
+> > > > > +
+> > > > > +	guard(rwsem_read)(&fwctl->registration_lock);
+> > > > > +	if (!fwctl->ops)
+> > > > > +		return -ENODEV;
+> > > > > +
+> > > > > +	uctx = kzalloc(fwctl->ops->uctx_size, GFP_KERNEL |  GFP_KERNEL_ACCOUNT);
+> > > > > +	if (!uctx)
+> > > > > +		return -ENOMEM;
+> > > > > +
+> > > > > +	uctx->fwctl = fwctl;
+> > > > > +	ret = fwctl->ops->open_uctx(uctx);
+> > > > > +	if (ret)
+> > > > > +		return ret;    
+> > > > 
+> > > > When something is wrong, uctx is freed in "fwctl->ops->open_uctx(uctx);"?
+> > > > 
+> > > > If not, the allocated memory uctx leaks here.    
+> > > 
+> > > See how uctx is declared:
+> > > struct fwctl_uctx *uctx __free(kfree) = NULL;
+> > > 
+> > > It will be released automatically.
+> > > See include/linux/cleanup.h for more details.  
+> > 
+> > I'm lazy so not finding the discussion now, but Linus has been pretty clear
+> > that he doesn't like this pattern because of possibility of additional cleanup
+> > magic getting introduced and then the cleanup happening in an order that
+> > causes problems.   
+> 
+> I saw that discussion, but I thought it was talking about the macro
+> behavior - ie guard() creates a variable hidden in the macro.
+> 
+> The point about order is interesting though - notice the above will
+> free the uctx after unlocking (which is the slightly more preferred
+> order here), but it is easy to imagine cases where that order would be
+> wrong.
+> 
+> > Preferred option is drag the declaration to where is initialized so break
+> > with our tradition of declarations all at the top
+> > 
+> > struct fwctl_uctx *uctx __free(kfree) =
+> > 	kzalloc(...);  
+> 
+> I don't recall that dramatic conclusion in the discussion, but it does
+> make alot of sense to me.
 
-The serial ports have a specific parent, why aren't those parents
-described differently in userspace?  Why not tell userspace those
-functions?
+I'll be less lazy (and today found the search foo to track it down).
 
-> And one more thing, some HW versions
-> expose special attributes in sysfs consumed by the same software.
-> And there are setups with several boards in the system. Currently we
-> separate them by providing different sysfs entries only, the software
-> then figures all details automatically.
+https://lore.kernel.org/all/CAHk-=wicfvWPuRVDG5R1mZSxD8Xg=-0nLOiHay2T_UJ0yDX42g@mail.gmail.com/
+Linus:
+> IOW, my current thinking is "let's always have the constructor and
+> destructor together", and see how it ends up going.
 
-Again, export that info to userspace and have it choose, don't create
-random symlinks in sysfs for your specific policy, that is not what
-sysfs is for at all.
+Not set in stone but I've not yet seen a suggestion of the opposite.
 
-thanks,
+The example from Bartosz that got that response was
+Bartosz:
+> void foo(void)
+> {
+>     char *s __free(kfree) = NULL;
+> 
+>     do_stuff();
+>     s = kmalloc(42, GFP_KERNEL);
+> }
+> 
+> Or does it always have to be:
+> 
+> void foo(void)
+> {
+>     do_stuff();
+>     char *s __free(kfree) = kmalloc(42, GFP_KERNEL);
+> }
+So option 2.
 
-greg k-h
+Jonathan
+
+> 
+> Thanks,
+> Jason
+
 
