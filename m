@@ -1,53 +1,52 @@
-Return-Path: <netdev+bounces-100805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 110508FC1AA
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 04:20:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 456178FC1AE
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 04:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 427391C22B3A
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 02:20:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7A101F25D43
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 02:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C0C55E49;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55B8961FE9;
 	Wed,  5 Jun 2024 02:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ijzrh2WK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n3faQiGw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E5A1EB36;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2136E2AE75;
 	Wed,  5 Jun 2024 02:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717554032; cv=none; b=S3rhccI4DOWD08yUvQylXWtJdgH/57LSILMhsIdplfASr2KhmXjnEiMrImEMLugCTySq/7KlvrUacUgs6HyJImltRyrZcUPlLcyWQJyFu+0ZO4rFfSbb2eNUzh9DUbpoCwNvEWWJry7ZtcPCIUZfBNSw8TLj/bgzB2SNasvMO9E=
+	t=1717554032; cv=none; b=kfwJjn+32IinvQ64Lm7zXvvAe9KdCa0F0zlFrZAzUmbcqcq2NGtwho7pEheG0FMCQw3k5wahAM0RMUpPABLDmbA9iaJYsyKJSXZsRjehOm2GwzoKC/6nQw+ztMNIE5k3RGLTCl8wuKiQpLRI5IWq4GQuvM7iTJrMB3SqclFPlbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717554032; c=relaxed/simple;
-	bh=tJ1awYP5L69e9xHMeuSbQ2+lYWQUK2O8SQPWa5BRTF8=;
+	bh=m1ODjAZVIal9y8K9wO0qbhWp8y4HHguHQ1q4lW0dScU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=bK0UiMXEkiEl42BmYccVLCJLRyUQbJl1nh6fg75XcL1oXgjb7+bU7zDbg9ol1+9OWJsJq4iVDAZHilpLRvQgyQg6/PhWrBM1I6SFxULEI6I/i8roCU/CTHdNzBxCkE62B38ww5QlyuEasM9gozi0PIWutK4/zQ6/v7c0IxXQIA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ijzrh2WK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A188FC4AF07;
+	 In-Reply-To:To:Cc; b=T8qm7c5pspmskBB0306WvtnvX+FrWRjxgQH8+WK3Wo0PUwVCJpJkYkoutC0ZNDkzZHLKpxLd1ljNtBadcCezQcksvZxNKs+HWcXipHSmb3qM6JqDey/Mh0dcoLgXiCvepiGzcss5ufAF1dnPT713N8yn1onpulYRcy7YC9WXzbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n3faQiGw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B081CC32782;
 	Wed,  5 Jun 2024 02:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1717554031;
-	bh=tJ1awYP5L69e9xHMeuSbQ2+lYWQUK2O8SQPWa5BRTF8=;
+	bh=m1ODjAZVIal9y8K9wO0qbhWp8y4HHguHQ1q4lW0dScU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=Ijzrh2WKXy11ljh1pIV0fU8jJMGYie94bsdE1J+mrXaN6hUJ1Yzc/EtJcuOzUmOTC
-	 mRoF7E4kbAee8vYR6KbIxsAZxCcPqtxWtLF1EkegTfO5LsagnGjUx3PlMyPgVMO5Gt
-	 l7asv7/zL3+qzt2Ex280lRTVnuAknTqiNTJEOR7ou/MuZTryb2mnD3k6gi7BJv6v7O
-	 J/p0U7/xgJQ+ziKepEPZk+i1pT524MqNckP9/WXopryAzx3wjVe+bR+BfjeHZkenNw
-	 DM9lPShYljj4HwtvE4w3dhgCy6rijobuDg9hZSnAaKhvpkoBJsDo6N7vBStTwMscHs
-	 kIaT5G4AVetzQ==
+	b=n3faQiGwgBW/++s6SMprvsUfOdVMYwc/ZAuQ5oMO5TKxNnmV3PGuM6Dd1nofOA+VR
+	 o9IBkYTQ21HGzfKm/yIjt79MSDcXaF3/bO1wROzNlkoYWgbk2NYm9z6UdZmgSsFpb+
+	 vwfOSD0+IIvMtxI3H3CnnXXgjAEDIZ5q7ZP8yCanOF8V9lnXM+aOE/tahuZkTZedC7
+	 0amDLozA2JpA+92yA1W9NcqVXCc4kz8i9ZO55Dyn+lV3PttecroOL1Fvf7zqo8nUsZ
+	 Zny+XyEJgDrkJWmRQTalJfT4c77JxQS9CYgY1DpmTBRBiCncqBF15nf2i1Xan9R/mm
+	 mRbluyojS31GQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C439C27C54;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EF1AC27C55;
 	Wed,  5 Jun 2024 02:20:31 +0000 (UTC)
 From: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
-Date: Wed, 05 Jun 2024 03:20:02 +0100
-Subject: [PATCH net-next v2 1/6] net/tcp: Use static_branch_tcp_{md5,ao} to
- drop ifdefs
+Date: Wed, 05 Jun 2024 03:20:03 +0100
+Subject: [PATCH net-next v2 2/6] net/tcp: Add a helper tcp_ao_hdr_maclen()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +55,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240605-tcp_ao-tracepoints-v2-1-e91e161282ef@gmail.com>
+Message-Id: <20240605-tcp_ao-tracepoints-v2-2-e91e161282ef@gmail.com>
 References: <20240605-tcp_ao-tracepoints-v2-0-e91e161282ef@gmail.com>
 In-Reply-To: <20240605-tcp_ao-tracepoints-v2-0-e91e161282ef@gmail.com>
 To: Eric Dumazet <edumazet@google.com>, 
@@ -71,11 +70,11 @@ Cc: Mohammad Nassiri <mnassiri@ciena.com>, Simon Horman <horms@kernel.org>,
  linux-trace-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
  Dmitry Safonov <0x7f454c46@gmail.com>
 X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1717554029; l=2385;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1717554029; l=1228;
  i=0x7f454c46@gmail.com; s=20240410; h=from:subject:message-id;
- bh=vprIUxoXS6O+nQsZYJ0TnN8AY1IxVix3tPSqfwEiZ4I=;
- b=vKqtpyxvZrc7sKLEyhxdDFQVM+OvC7W9pmwXl9I+h5yYG9H4K8nOFcJf4eG4CPPWPJUjb22sbl2L
- r/7fpIdMBtXDXjHKSj60A4AvgZtm6FrU5cpHi7h+DqBsCtSeg51M
+ bh=3r0GUti1sbRL2DmiJwhtJuQ4wZfREpceQasirqqFZEo=;
+ b=MEGR6XCVzVRWO/uGY5lE2aO868zcFl5U76lbEK0RzyZW3Ds+SdZ8SO9E1SK8p+ck86QnEfIv1JSp
+ 6oENjJQOAZIOsCK5WtyCVIf3NGYWHwz9qU3i43r2ztS/0lUlSzxz
 X-Developer-Key: i=0x7f454c46@gmail.com; a=ed25519;
  pk=cFSWovqtkx0HrT5O9jFCEC/Cef4DY8a2FPeqP4THeZQ=
 X-Endpoint-Received: by B4 Relay for 0x7f454c46@gmail.com/20240410 with
@@ -85,83 +84,44 @@ Reply-To: 0x7f454c46@gmail.com
 
 From: Dmitry Safonov <0x7f454c46@gmail.com>
 
-It's possible to clean-up some ifdefs by hiding that
-tcp_{md5,ao}_needed static branch is defined and compiled only
-under related configs, since commit 4c8530dc7d7d ("net/tcp: Only produce
-AO/MD5 logs if there are any keys").
+It's going to be used more in TCP-AO tracepoints.
 
 Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
 ---
- include/net/tcp.h   | 14 ++++----------
- net/ipv4/tcp_ipv4.c |  8 ++------
- 2 files changed, 6 insertions(+), 16 deletions(-)
+ include/net/tcp_ao.h | 5 +++++
+ net/ipv4/tcp_ao.c    | 2 +-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 08c3b99501cf..f6dd035e0fa9 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -2386,21 +2386,15 @@ static inline void tcp_get_current_key(const struct sock *sk,
+diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
+index 471e177362b4..6501ed1dfa1e 100644
+--- a/include/net/tcp_ao.h
++++ b/include/net/tcp_ao.h
+@@ -19,6 +19,11 @@ struct tcp_ao_hdr {
+ 	u8	rnext_keyid;
+ };
  
- static inline bool tcp_key_is_md5(const struct tcp_key *key)
++static inline u8 tcp_ao_hdr_maclen(const struct tcp_ao_hdr *aoh)
++{
++	return aoh->length - sizeof(struct tcp_ao_hdr);
++}
++
+ struct tcp_ao_counters {
+ 	atomic64_t	pkt_good;
+ 	atomic64_t	pkt_bad;
+diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+index 781b67a52571..7c9e90e531e3 100644
+--- a/net/ipv4/tcp_ao.c
++++ b/net/ipv4/tcp_ao.c
+@@ -884,8 +884,8 @@ tcp_ao_verify_hash(const struct sock *sk, const struct sk_buff *skb,
+ 		   const struct tcp_ao_hdr *aoh, struct tcp_ao_key *key,
+ 		   u8 *traffic_key, u8 *phash, u32 sne, int l3index)
  {
--#ifdef CONFIG_TCP_MD5SIG
--	if (static_branch_unlikely(&tcp_md5_needed.key) &&
--	    key->type == TCP_KEY_MD5)
--		return true;
--#endif
-+	if (static_branch_tcp_md5())
-+		return key->type == TCP_KEY_MD5;
- 	return false;
- }
+-	u8 maclen = aoh->length - sizeof(struct tcp_ao_hdr);
+ 	const struct tcphdr *th = tcp_hdr(skb);
++	u8 maclen = tcp_ao_hdr_maclen(aoh);
+ 	void *hash_buf = NULL;
  
- static inline bool tcp_key_is_ao(const struct tcp_key *key)
- {
--#ifdef CONFIG_TCP_AO
--	if (static_branch_unlikely(&tcp_ao_needed.key) &&
--	    key->type == TCP_KEY_AO)
--		return true;
--#endif
-+	if (static_branch_tcp_ao())
-+		return key->type == TCP_KEY_AO;
- 	return false;
- }
- 
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 04044605cadf..59c252b90b55 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -1052,12 +1052,10 @@ static void tcp_v4_timewait_ack(struct sock *sk, struct sk_buff *skb)
- #else
- 	if (0) {
- #endif
--#ifdef CONFIG_TCP_MD5SIG
--	} else if (static_branch_unlikely(&tcp_md5_needed.key)) {
-+	} else if (static_branch_tcp_md5()) {
- 		key.md5_key = tcp_twsk_md5_key(tcptw);
- 		if (key.md5_key)
- 			key.type = TCP_KEY_MD5;
--#endif
- 	}
- 
- 	tcp_v4_send_ack(sk, skb,
-@@ -1126,8 +1124,7 @@ static void tcp_v4_reqsk_send_ack(const struct sock *sk, struct sk_buff *skb,
- #else
- 	if (0) {
- #endif
--#ifdef CONFIG_TCP_MD5SIG
--	} else if (static_branch_unlikely(&tcp_md5_needed.key)) {
-+	} else if (static_branch_tcp_md5()) {
- 		const union tcp_md5_addr *addr;
- 		int l3index;
- 
-@@ -1136,7 +1133,6 @@ static void tcp_v4_reqsk_send_ack(const struct sock *sk, struct sk_buff *skb,
- 		key.md5_key = tcp_md5_do_lookup(sk, l3index, addr, AF_INET);
- 		if (key.md5_key)
- 			key.type = TCP_KEY_MD5;
--#endif
- 	}
- 
- 	tcp_v4_send_ack(sk, skb, seq,
+ 	if (maclen != tcp_ao_maclen(key)) {
 
 -- 
 2.42.0
