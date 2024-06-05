@@ -1,96 +1,153 @@
-Return-Path: <netdev+bounces-101004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2D188FCF3B
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:29:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34CAE8FCF49
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:31:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DCDA1C219FC
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:29:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC6B81F29DBC
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:31:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D053F1C53B5;
-	Wed,  5 Jun 2024 12:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628AF195B00;
+	Wed,  5 Jun 2024 12:56:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ch6eyEcl"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ssroWopL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6191ABE4D
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 12:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F29193097;
+	Wed,  5 Jun 2024 12:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717591831; cv=none; b=DMxF1OLi7DEsvx0ZgUSoqlBDzldk63CRsnOGZPzeeL6PbazSJaj36i8aMEX8YGX7zTLPtnQXwtgKTBWpM6fygsBtcHGCa5AMBxnTWjhpGeP/E6Lv9EoqgErY6a2abQmKhfSqOE3r9ET6RlhcrWu2d19VTND+j/T1j9z7r3qsMvo=
+	t=1717592197; cv=none; b=RAho19Z6kywOdK5VNX9tRxMXQWTgGuOt81G1BC0TBeB8ir8Q8PadCo5UTc8YBM4R2XUubFAE+07rRpTI2e3CHzc/fIfsLtef/4znU7O6oErn3bkcQrLUDwh+C/X8Y/VTEEz9Vz2uOtXeytx0RxFuZ4ImvsK0wHKaNRrVQefitFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717591831; c=relaxed/simple;
-	bh=rmYcYT25omKn7BnqJ3pv1NLklBv0JMgcuVbzfIWeb9k=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=IkicGIDubG6AXGbJoNqzQfFIjJInTwyyUYXn6YpPBLVqktMauJx9LliHy//U8zk37d0vJnnqrGsvkKZAOZTuwOFZB4Ko9L+irR4ldBfT1JW3+B5Pl8VVZrlrKpo2fDTYei+tLA/hcxoup6sx6yvWtBHx9O71xEu7rByrmUxZc64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ch6eyEcl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 55124C4AF07;
-	Wed,  5 Jun 2024 12:50:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717591830;
-	bh=rmYcYT25omKn7BnqJ3pv1NLklBv0JMgcuVbzfIWeb9k=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ch6eyEclQ94id+uAjDOIhDg4HFgR97VM5yAme9b9AYiJuescOhQDAbq100UYVreRU
-	 S4+vESeSLdESW97gO6OyIDiYgEKmU3aSYT+2jvg15Bre2XZ9gXb8gNDA8Eo/2KMKRv
-	 LMN5v+Xo3CcZjtcfz1hsfSGEGFIHoc+QOlzmri3ffqhgi1EJpV0bUO9rDnMog+vROa
-	 uUnkWVuXIUC+iyrT0vqQQwib9LbB8ILepa1izWcD6qY3AgVmDjdIRUbyFYAeADygLS
-	 uE7KRGkjFHEMO1U4j4zRc9sijtt7jyG85/IsbTFQTpa8Hs4CuAajRW9LKIjCzVziz8
-	 f9qfIRUgs3V0w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 43B8AD3E997;
-	Wed,  5 Jun 2024 12:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1717592197; c=relaxed/simple;
+	bh=1K4dH1eHpjrIN29Q6+8uGNmyDpqTAfSnBxCgnma3W9g=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=pGdcRV34ASPNKn0WCG2LaqwxrpC7dYHsdPUx0ECOQ+twbRqIuLszGcxmLopXNJxdMUSzoTCXzFVryhnFm164UiSNPtKeb36aNNDWpUelgwP0NMZfJovCVATxJGMKgzNiBy/PloPs/4E4N201YEtezDLJVtoZZ71fBwwxUUnelAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ssroWopL; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1717592185; h=From:To:Subject:Date:Message-Id;
+	bh=aK3s3lPTWSZJj9cwVrAXHMy94nqNUYxXABLMNFp4XnM=;
+	b=ssroWopLX7wzT4QZplmPBGrwUfx/OKNlek4Vp0B482RZMULSlyl4OHwOPI0ysnMf1xzAwC0pq9PZ8Ntt8VemMkoMfrvhvpFzcXIZzGwScInd/kWr0qCYkbingpqveb9ONwMxYw3bhziuOsCa/S+gCYBIrbcpjG/6dfpOTYAne3E=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067111;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W7vCi7g_1717592180;
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W7vCi7g_1717592180)
+          by smtp.aliyun-inc.com;
+          Wed, 05 Jun 2024 20:56:25 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	wintera@linux.ibm.com,
+	guwen@linux.alibaba.com
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	tonylu@linux.alibaba.com,
+	pabeni@redhat.com,
+	edumazet@google.com
+Subject: [PATCH net-next v6 0/3] Introduce IPPROTO_SMC
+Date: Wed,  5 Jun 2024 20:56:17 +0800
+Message-Id: <1717592180-66181-1-git-send-email-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/2] tcp: add sysctl_tcp_rto_min_us
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171759183027.5135.15471485198923065097.git-patchwork-notify@kernel.org>
-Date: Wed, 05 Jun 2024 12:50:30 +0000
-References: <20240603213054.3883725-1-yyd@google.com>
-In-Reply-To: <20240603213054.3883725-1-yyd@google.com>
-To: Kevin Yang <yyd@google.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- netdev@vger.kernel.org, ncardwell@google.com, ycheng@google.com,
- kerneljasonxing@gmail.com, pabeni@redhat.com, tonylu@linux.alibaba.com,
- horms@kernel.org, David.Laight@aculab.com
 
-Hello:
+From: "D. Wythe" <alibuda@linux.alibaba.com>
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+This patch allows to create smc socket via AF_INET,
+similar to the following code,
 
-On Mon,  3 Jun 2024 21:30:52 +0000 you wrote:
-> Adding a sysctl knob to allow user to specify a default
-> rto_min at socket init time.
-> 
-> After this patch series, the rto_min will has multiple sources:
-> route option has the highest precedence, followed by the
-> TCP_BPF_RTO_MIN socket option, followed by this new
-> tcp_rto_min_us sysctl.
-> 
-> [...]
+/* create v4 smc sock */
+v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
 
-Here is the summary with links:
-  - [net-next,v3,1/2] tcp: derive delack_max with tcp_rto_min helper
-    https://git.kernel.org/netdev/net-next/c/512bd0f9f926
-  - [net-next,v3,2/2] tcp: add sysctl_tcp_rto_min_us
-    https://git.kernel.org/netdev/net-next/c/f086edef71be
+/* create v6 smc sock */
+v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
 
-You are awesome, thank you!
+There are several reasons why we believe it is appropriate here:
+
+1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
+address. There is no AF_SMC address at all.
+
+2. Create smc socket in the AF_INET(6) path, which allows us to reuse
+the infrastructure of AF_INET(6) path, such as common ebpf hooks.
+Otherwise, smc have to implement it again in AF_SMC path. Such as:
+  1. Replace IPPROTO_TCP with IPPROTO_SMC in the socket() syscall
+     initiated by the user, without the use of LD-PRELOAD.
+  2. Select whether immediate fallback is required based on peer's port/ip
+     before connect().
+
+A very significant result is that we can now use eBPF to implement smc_run
+instead of LD_PRELOAD, who is completely ineffective in scenarios of static
+linking.
+
+Another potential value is that we are attempting to optimize the
+performance of fallback socks, where merging socks is an important part,
+and it relies on the creation of SMC sockets under the AF_INET path. 
+(More information :
+https://lore.kernel.org/netdev/1699442703-25015-1-git-send-email-alibuda@linux.alibaba.com/T/)
+
+v2 -> v1:
+
+- Code formatting, mainly including alignment and annotation repair.
+- move inet_smc proto ops to inet_smc.c, avoiding af_smc.c becoming too bulky.
+- Fix the issue where refactoring affects the initialization order.
+- Fix compile warning (unused out_inet_prot) while CONFIG_IPV6 was not set.
+
+v3 -> v2:
+
+- Add Alibaba's copyright information to the newfile
+
+v4 -> v3:
+
+- Fix some spelling errors
+- Align function naming style with smc_sock_init() to smc_sk_init()
+- Reversing the order of the conditional checks on clcsock to make the code more intuitive
+
+v5 -> v4:
+
+- Fix some spelling errors
+- Added comment, "/* CONFIG_IPV6 */", after the final #endif directive.
+- Rename smc_inet.h and smc_inet.c to smc_inet.h and smc_inet.c
+- Encapsulate the initialization and destruction of inet_smc in inet_smc.c,
+  rather than implementing it directly in af_smc.c.
+- Remove useless header files in smc_inet.h
+- Make smc_inet_prot_xxx and smc_inet_sock_init() to be static, since it's
+  only used in smc_inet.c
+
+
+v6 -> v5:
+
+- Wrapping lines to not exceed 80 characters
+- Combine initialization and error handling of smc_inet6 into the same #if
+  macro block.
+
+D. Wythe (3):
+  net/smc: refactoring initialization of smc sock
+  net/smc: expose smc proto operations
+  net/smc: Introduce IPPROTO_SMC
+
+ include/uapi/linux/in.h |   2 +
+ net/smc/Makefile        |   2 +-
+ net/smc/af_smc.c        | 162 ++++++++++++++++++++++++++--------------------
+ net/smc/smc.h           |  38 +++++++++++
+ net/smc/smc_inet.c      | 169 ++++++++++++++++++++++++++++++++++++++++++++++++
+ net/smc/smc_inet.h      |  22 +++++++
+ 6 files changed, 324 insertions(+), 71 deletions(-)
+ create mode 100644 net/smc/smc_inet.c
+ create mode 100644 net/smc/smc_inet.h
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+1.8.3.1
 
 
