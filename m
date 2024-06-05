@@ -1,136 +1,102 @@
-Return-Path: <netdev+bounces-100852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A2CF8FC456
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:18:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E4698FC44C
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:17:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18F711F21C2D
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 07:18:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D680FB2A41F
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 07:17:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A8A21C19D;
-	Wed,  5 Jun 2024 07:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7295A18C337;
+	Wed,  5 Jun 2024 07:16:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PUklBisJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wBxa0nEC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F71021C185;
-	Wed,  5 Jun 2024 07:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F304F18C355
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 07:15:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717571783; cv=none; b=Ojbx/YxMay+N8nuEWD5OYdjWCN3KeLwE4GvYgGZRGAdXs1UMXdT6YLc9LkXihE5GXSPkHH22N3g2kKU1nMufFkDtHkLbi2J+gpvnyP3vvGb/oOdlrHBx9chfvn/JOfJVxkvzX1FZs2wSeGnGgcDKOpcgR0msbkFtFBPmrAmyvfA=
+	t=1717571760; cv=none; b=XWDUs2TJKpaZ6iI3bwRAaQ7JkMBuPulMtx62ok9EeTklcOEU8H9sFOPUo/p4vM2k2W8yBThsACVpjHsWGftq54iYtot/4A6btDG/9OMqMHEsO+fhpdJiXZ5jyIotzT02yvDwwoKkggMXiZFveW1tIE+W/YVVzyqoxkFYCCGkJM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717571783; c=relaxed/simple;
-	bh=sxhJ+EeYfFnndf+P0KauzX3XfZr2LhOzY9YOAHJPD6w=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TG5NDo3POV8GRiovSBWb3dyJR3FxdEzJFS27Fsrm4xLc0gNK5vCCk4fWiYJBWbXxeUdMGPzemr+y0YhjheAa8XnDx0LgNJKTHxmxQELl1+WHFUPqEVq8YSD8fEcFoFgriMLAK7OTAN+HgHje4Ewc9ohY7Zr6mOpo50LKrPJ7/RQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PUklBisJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7577CC3277B;
-	Wed,  5 Jun 2024 07:16:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717571782;
-	bh=sxhJ+EeYfFnndf+P0KauzX3XfZr2LhOzY9YOAHJPD6w=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=PUklBisJrytmGj0XZcFRcCUwkYjPhYLL94hppWLuh5QfRoN6zA+hCICCGgdiTu6Et
-	 911xlyTYvfzLPe6SuFOxIPxd3ULHjWhh8g9zrzPRFgeDJAhmOTD4YRipCPBDViiHCx
-	 tYQBDGmtBTRVfpSvnDuPXhqn+bWBOZhgaMFYZSzAAdQQFVkLn8eSoEmLblLhkAsKjL
-	 LdeUP89jg+AnbK9CJbG2xTb90Nd9CTwXmeYArpTjPPT5VA04hPjhxxr7xumyvM8VD3
-	 J7bRzgYTL/FGQebqmotT7Dpm5yBDDiYDS/jG9kqSipUZ5afWHpzRYXYqbhSf/gZykw
-	 B0kFO25eBXwDw==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Wed, 05 Jun 2024 09:15:42 +0200
-Subject: [PATCH net-next 3/3] mptcp: refer to 'MPTCP' socket in comments
+	s=arc-20240116; t=1717571760; c=relaxed/simple;
+	bh=0dRMYl1jLA3P5+K/CiSvxRg5/KLEXOS0eVkyFvSUzYs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=VEhikqZT5j5pXqbuN+h2zzbsEJTt33zUkypXNouRIHQZ1jY5uvj8iN+QOoGPAD334gXIJ6b2s2gwe2bMAuaxk7acPd1Xb234rqgRIDtcOqPcIDX72/KFHBd4MWsytKDic0toKZbvpetPVUZPHYTbucRLJ/hFh3a8AHeaWOTlmE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wBxa0nEC; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-794aeada1faso710062085a.3
+        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 00:15:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717571758; x=1718176558; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JPO6//Ua7pFqRrR++Vzqmd3/qBt7cwC/060UIprlxPQ=;
+        b=wBxa0nECNdza7aKnImMaQqdkqkyeH4FRRwCn1iSfBNITPTudAF4Y9x5q/JxfVmlFp6
+         y+Y8Oh6uptDQNzUxAP3CO6yj3aLK9lmhLHxfuE2hhM9a0QgapbM7Gtqmw/npYsjVTj6l
+         1yDhbYfTT5ak+jJ4DVEZmOJIXinLfhAAbZQWGq/JlABDZlXYS67Vwxt2aNycbSpA0EM1
+         RWcP5cLFKLjMvRCz5jjma7IDOhhtoGkvkh2TpRGl5ggbt/zgCbiMnYOIEdea3wMu617C
+         dXsv+kZSgUaLblMipSQCes20Rs+oAH5k31oRtvz7Y1aQthSjiyiIMefDBXMPXGXvazXv
+         8qGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717571758; x=1718176558;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JPO6//Ua7pFqRrR++Vzqmd3/qBt7cwC/060UIprlxPQ=;
+        b=Z4mrg06BBOw3ogHLeN/tsy3H8ZzTSHaax3CKjfjv/5g6Ts3T84gHpKx18HSYi2fF/5
+         oD43ZFROgRReEtvQbzK7xMOW5MwdLtuh8zR7LMW+oTpE/g533j4Xm7cOLLl8efn3fkPL
+         IJpsveD+0sCrL4QAmSrzwPCpPs+yrwbMQuQg4bsGxiaVOOQtz31Ka1LUmWxWPzSYeW/S
+         8KDEtdzXNJ/zHEzyHbPF5sRlOjna1Rwx2zQD7CVxI2Ozrw3V9ELWtfGci69cSYsL/tw2
+         SEJOyRyKz2g+mw+PjGtIvtUEmGcq2XSEa3dX2T93rhd0AY5XQ4J71I3/FYjGajYJ0bem
+         5Leg==
+X-Gm-Message-State: AOJu0Yx5hRGPunSk0V848BsfOebPmnDOOz0jm4SoAxB8u2ItEr0g+hd8
+	61xa6vmnfFwMBUsSCSTdrm5YTdEbzERXsZdlm8cgYKxTGYhrRVQ1+bkykdCQ3wpdqsRv0zraaut
+	pz3jitFIdEg==
+X-Google-Smtp-Source: AGHT+IFpwFTvFyPVG/YsiPuISItKsYH1lRxOKloNp5poPu0V54ccJb6aweCI+ifemQJZcaz+iDAIFohpV2DHYg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:620a:40c9:b0:790:efaf:5bb6 with SMTP
+ id af79cd13be357-79523fd26aemr426785a.15.1717571757743; Wed, 05 Jun 2024
+ 00:15:57 -0700 (PDT)
+Date: Wed,  5 Jun 2024 07:15:50 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240605-upstream-net-next-20240604-misc-cleanup-v1-3-ae2e35c3ecc5@kernel.org>
-References: <20240605-upstream-net-next-20240604-misc-cleanup-v1-0-ae2e35c3ecc5@kernel.org>
-In-Reply-To: <20240605-upstream-net-next-20240604-misc-cleanup-v1-0-ae2e35c3ecc5@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Davide Caratti <dcaratti@redhat.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2058; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=Xd/BOnYnE8h1Cykv9cgIddsDI+Z+77oERfzWjuomB9I=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmYBC7HWWH3TEifZf4FmGVMWHnhruMbJ29zUlzn
- U6p/LIDWnyJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZmAQuwAKCRD2t4JPQmmg
- c5eUEAC2A6lQb6MHH4HnEJYrktKf4J/aM5++jxUXVHo9qmpgGdUTeCHtJnlYEUWWtNEZnUw3MTY
- iXC9SoqKo/ReBHdsqROzL1hG4tXoC9z4+SWjWogCQ5mf1AGmA55R2GqZNgtQPDNaiKZke/aGxTS
- p77YQg7OKhMvDwHPocOEmJSc2RLAa46xiLC8bCUrYaf9vxszaoAivinzzGFGXcAKQBBupHEBSqS
- WBpIjlX8zJ+MgFtr4BkGQB+fJDQiCVrArhMt2yrxJUbUgpRhiE612WaGqHxfrS00kqp/Y9HMw8E
- shS3h5jYhiuTT5A5+Uv5wIJXunyDnu/R8GiqBZtx44kBrh3I4FrFK3SOJ3rGvStLysxRz5PR+m6
- AGjNJc3kXFrmlqE2tFP+ygNuWk0eB26QGGjtrCciK/nS+ruxeuSChOjvXybRoOUcvvbwtYBjXab
- G/uoujC7VRzBbEnyOXZVJPVpLKtLWpDwigATMIN1did+tVzK9e4YNA57Mdsycg/Rfi2NFPL6UEj
- 32DLz7aCI8EgXDKr7d7A5/qLP9+RF61eYE6HojwIyF6YlIH64LTDguDp84QgguShL7qO95mIvi6
- YdJkmS2iqcrPXSB0Q6wz3EBQ9eJcixU0HN5HvGSwz2JsB11xT//vWqaBFktteMGINQtOLG78Qwy
- GSIuOFbF8NM+xUA==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
+Message-ID: <20240605071553.1365557-1-edumazet@google.com>
+Subject: [PATCH net-next 0/3] tcp: small code reorg
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Davide Caratti <dcaratti@redhat.com>
+Replace a WARN_ON_ONCE() that never triggered
+to DEBUG_NET_WARN_ON_ONCE() in reqsk_free().
 
-We used to call it 'master' socket at the early stages of MPTCP
-development, but the correct wording is 'MPTCP' socket opposed to 'TCP
-subflows': convert the last 3 comments to use a more appropriate term.
+Move inet_reqsk_alloc() and reqsk_alloc()
+to inet_connection_sock.c, to unclutter
+net/ipv4/tcp_input.c and include/net/request_sock.h
 
-Signed-off-by: Davide Caratti <dcaratti@redhat.com>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/protocol.c | 4 ++--
- net/mptcp/subflow.c  | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+Eric Dumazet (3):
+  tcp: small changes in reqsk_put() and reqsk_free()
+  tcp: move inet_reqsk_alloc() close to inet_reqsk_clone()
+  tcp: move reqsk_alloc() to inet_connection_sock.c
 
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 7ce11bee3b79..ead0bf63cf95 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -2202,7 +2202,7 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 		if (skb_queue_empty(&msk->receive_queue) && __mptcp_move_skbs(msk))
- 			continue;
- 
--		/* only the master socket status is relevant here. The exit
-+		/* only the MPTCP socket status is relevant here. The exit
- 		 * conditions mirror closely tcp_recvmsg()
- 		 */
- 		if (copied >= target)
-@@ -3521,7 +3521,7 @@ void mptcp_subflow_process_delegated(struct sock *ssk, long status)
- static int mptcp_hash(struct sock *sk)
- {
- 	/* should never be called,
--	 * we hash the TCP subflows not the master socket
-+	 * we hash the TCP subflows not the MPTCP socket
- 	 */
- 	WARN_ON_ONCE(1);
- 	return 0;
-diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
-index 612c38570a64..39e2cbdf3801 100644
---- a/net/mptcp/subflow.c
-+++ b/net/mptcp/subflow.c
-@@ -1719,7 +1719,7 @@ int mptcp_subflow_create_socket(struct sock *sk, unsigned short family,
- 	mptcp_sockopt_sync_locked(mptcp_sk(sk), sf->sk);
- 	release_sock(sf->sk);
- 
--	/* the newly created socket really belongs to the owning MPTCP master
-+	/* the newly created socket really belongs to the owning MPTCP
- 	 * socket, even if for additional subflows the allocation is performed
- 	 * by a kernel workqueue. Adjust inode references, so that the
- 	 * procfs/diag interfaces really show this one belonging to the correct
+ include/net/request_sock.h      | 37 ++-------------------
+ net/ipv4/inet_connection_sock.c | 58 +++++++++++++++++++++++++++++++++
+ net/ipv4/tcp_input.c            | 25 --------------
+ 3 files changed, 60 insertions(+), 60 deletions(-)
 
 -- 
-2.43.0
+2.45.2.505.gda0bf45e8d-goog
 
 
