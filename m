@@ -1,95 +1,114 @@
-Return-Path: <netdev+bounces-100891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A67D28FC793
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 11:22:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB6138FC79A
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 11:22:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBE761C23024
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:22:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 686FEB2839A
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1741318FDCF;
-	Wed,  5 Jun 2024 09:21:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A0118FC62;
+	Wed,  5 Jun 2024 09:21:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="A72h750k";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="wYQ7G8Md"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xd4Bwxh7"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9944419006D
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 09:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE6529401;
+	Wed,  5 Jun 2024 09:21:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717579269; cv=none; b=cJbmriU6Hxniop/MGIWxAs1CLe0nC3cHHyKzO5gN2Vrnrv3utBnWXO7LmFTxjjIL9rw+ld9C5dk09rEryxu1dYq8YCrXw3qq64Zs5Jgu3qHjFdmLcQalckJ8qw1Uq+vU14ErBaGDgrhlcFDg9LOhrMa2qTxkKWErS2UiFjyqqmA=
+	t=1717579307; cv=none; b=S8Wd21jYAzt912+ZRPuFCpkOucB9tCAeRkC5bwY6iS4DonbFL8lrymmM7tjDe5XcqPwTw++F6/INDZ+nmFe0URM7WE8yA7KT6SlHPJQrkFfIZm45/qwn+fjj3D0MWXMOtnAPq8/tclTesnq8HGpVCgZzROOTRg5GggtP5GtkZ04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717579269; c=relaxed/simple;
-	bh=fQAWaG8IjYwFoNJ/5ZQ8Lrp5eSNJNKrarceh1eOSO4c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZpxpegIrAeofXeJHGrOIJ972gANrVfONL+0UHO0Fl68eRay92wZv16si+hQUBt39NU9VINJvPrjfmO92DuMtlb8Kt/GKroMaAqXjIEU23RvXDiKguTN2oU7HdciBt4boGZWY7dpBNYdFT3IRikQNcBbFXBCBQXPQV9u+bQfYdHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=A72h750k; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=wYQ7G8Md; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 5 Jun 2024 11:21:04 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1717579265;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fxkoxRwLXgAKWp+FF/vf5zwvc9f2L3v10RH0DhQzJvk=;
-	b=A72h750kFYzKhpI9cljNPltENzhXpSuFbnHpPiMafM2zUU+J4IgJT/k0fBloOokASHfScM
-	XnvSrRUxgWDxymQcN/DkmfPlXdamTwJHtLKA8fKIoSWV9qLKkyDWuypxEtAWY/9ixc2Ujg
-	e21lKhaDNVLfaMtFBgwq4RT5+LEx1hbtc+tAEs/RGEyi0NgcPpvqJPi2ItTRbqN/KyCyeb
-	PmxZAl/Leu644ddt7+9F887oIKaTiUbk1nwhExaBtW//Jyb31D+2y6Ej75LF5DGMHefuBe
-	OSiXyshMS49d4FsEsu7tjAtJd7jGp8d86B5WZeObVhvfgoAkasv9dQyKX9AK0g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1717579265;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fxkoxRwLXgAKWp+FF/vf5zwvc9f2L3v10RH0DhQzJvk=;
-	b=wYQ7G8MdcIwUFR7q3ielcH/uBR4NPSFTsUd0VOnkuHd8xfzj45qJ44NJ6+v4ePHv/YuU09
-	KvAHX5VxQVIhSbBw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, vschneid@redhat.com,
-	tglozar@redhat.com
-Subject: Re: [PATCH net-next v7 1/3] net: tcp/dccp: prepare for tw_timer
- un-pinning
-Message-ID: <20240605092104.CKiGDh9T@linutronix.de>
-References: <20240604140903.31939-1-fw@strlen.de>
- <20240604140903.31939-2-fw@strlen.de>
+	s=arc-20240116; t=1717579307; c=relaxed/simple;
+	bh=YDtGg4BsHnCEn4QlYTR6VNrpbrmF3vkmv9Jip9H54PY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=nlGhK2Vp04yUn7+B1dR1T6B5NvU7WWAQC0qs5v1uvAhxD7Gh8Dro8w7xk3j2PR0HANwRQzRZK1X3zOVfMuVLZUE5nCMwfndwpASVRVc4hIKQAlBWrFHFUhVeZ2AvJtm3g+sO1R5Ca/R8mnzt4VQJE5jbYBOLohBl6mxUt//O3cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xd4Bwxh7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13080C3277B;
+	Wed,  5 Jun 2024 09:21:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717579306;
+	bh=YDtGg4BsHnCEn4QlYTR6VNrpbrmF3vkmv9Jip9H54PY=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Xd4Bwxh7y1HwvCsqCswFzc2PGPq2iJ5KRAvYZiD+IMiBgnT/PU0fMnF464WGnVfNI
+	 2SfiCOXZbAQsv6A67ROLOchznEpXoaMGuuF2s/KnrpOkszHqYjGCncotQ1nlbMMvcY
+	 1wFDK5wGD9hwZQuOsV8h4NkdyGgjqQgBbSEBtQwOtY+1Nz7QEQmJw2/NTTxaFHWoav
+	 AurLhilKb57r8DK4TPzFkYZibvw6n5+7hE8F8Mm116YVWmkWFvtWBNP6gxo6pklCZK
+	 bEssBanKlXQtkD1pvEdKY90NoSUEwdqhcffD3JVXGaQ7yxjhjjJXAiH+2/fDGOlBDY
+	 f7soPdq9yJsNg==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net 0/3] selftests: net: lib: small fixes
+Date: Wed, 05 Jun 2024 11:21:15 +0200
+Message-Id: <20240605-upstream-net-20240605-selftests-net-lib-fixes-v1-0-b3afadd368c9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240604140903.31939-2-fw@strlen.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAsuYGYC/z2MSwrCQBAFrxJ6bcNk8BevIi46zos2xDFMjxIIu
+ btNFi6r3qMWMhSF0aVZqOCrpu/s0O4auj8lP8CanCmGuA/HcODPZLVAXpxR+W8N41Bh1TY9as+
+ DzjA+SReklXPqUiRvTgXb4Mkr+ZVu6/oDDD89RIQAAAA=
+To: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ Petr Machata <petrm@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ stable@vger.kernel.org, Geliang Tang <geliang@kernel.org>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1212; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=YDtGg4BsHnCEn4QlYTR6VNrpbrmF3vkmv9Jip9H54PY=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmYC4nf467TLY3VysPNrU7384YestbUI6ojFOUW
+ lX8boAo69yJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZmAuJwAKCRD2t4JPQmmg
+ c9KmEACYZIpFdTBLEq6/z6VmOlhbroGK12DfHAvehxba+bDCodQjzBVce/XxINeCru+4c6AJQ27
+ hdx7K1uoOxQmmgTYRh4rQwdgLpUojU9feq2XrCQ1A5KIF9BNXMhrCOGfeJ5ro1prxN1wug/8jzV
+ 3ZgD2vowfjLMXl3XfVAEnP+oHGKLjlwLtb0HHEb/PRZqrbAQO1e264LbgIBURcIHRRE6PIVB1Oj
+ kWXhmhICnDwg0Tl1YHhMkAind6bndDBk6itzGM2xcDv/SwH6wkZprZ8rMxFR9VqbHkZ316WDuQN
+ 20/M4cuLWdYfFZzg0YeMIqvjXebQcqEDoFk3q5Oo5KQBKn1aWnCUVNWcY2uQFkHXmdZHtjc7n6y
+ fzmOmyXxlRcJiCewkYE68/Dn1kahooXJrKR9rw07cKifFGNhRzP6qF4bsfYqAPZ62pznis0RbdK
+ lxUlcWp3TMGXnnn3o5cg4rNsvnltokbX3LHZefvqjuhKLWSmjoyLsZZdDbiQbZIzevZFXh0qR2e
+ YlUUTupD5iChNzyrOcokyUj+thWPdmf9TviwvFFAGEdk1L3/N9mFCR9rBJfOkdajRKVRlML5br1
+ 5OjHNzUC4pL9p0cgkX0Y4tgDjBYOSs8mXSG/u5Mdxib3XWD6NuStPK6NeXrmoQ5K3M8/ZECsW+7
+ muNt92yjDxZ3vEA==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On 2024-06-04 16:08:47 [+0200], Florian Westphal wrote:
-> --- a/include/net/inet_timewait_sock.h
-> +++ b/include/net/inet_timewait_sock.h
-> @@ -93,8 +93,10 @@ struct inet_timewait_sock *inet_twsk_alloc(const struct sock *sk,
->  					   struct inet_timewait_death_row *dr,
->  					   const int state);
->  
-> -void inet_twsk_hashdance(struct inet_timewait_sock *tw, struct sock *sk,
-> -			 struct inet_hashinfo *hashinfo);
-> +void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
-> +				  struct sock *sk,
-> +				  struct inet_hashinfo *hashinfo,
-> +				  int timeo);
+While looking at using 'lib.sh' for the MPTCP selftests [1], we found
+some small issues with 'lib.sh'. Here they are:
 
-Since this is gone now, could please also update the reference to in
-tcp_twsk_unique().
+- Patch 1: fix 'errexit' (set -e) support with busywait. 'errexit' is
+  supported in some functions, not all. A fix for v6.8+.
 
-Sebastian
+- Patch 2: avoid confusing error messages linked to the cleaning part
+  when the netns setup fails. A fix for v6.8+.
+
+- Patch 3: set a variable as local to avoid accidentally changing the
+  value of a another one with the same name on the caller side. A fix
+  for v6.10-rc1+.
+
+Link: https://lore.kernel.org/mptcp/5f4615c3-0621-43c5-ad25-55747a4350ce@kernel.org/T/ [1]
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Matthieu Baerts (NGI0) (3):
+      selftests: net: lib: support errexit with busywait
+      selftests: net: lib: avoid error removing empty netns name
+      selftests: net: lib: set 'i' as local
+
+ tools/testing/selftests/net/lib.sh | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+---
+base-commit: a535d59432370343058755100ee75ab03c0e3f91
+change-id: 20240605-upstream-net-20240605-selftests-net-lib-fixes-7a90a1a8d9d2
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
