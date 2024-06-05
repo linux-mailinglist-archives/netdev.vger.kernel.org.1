@@ -1,115 +1,131 @@
-Return-Path: <netdev+bounces-101125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE4878FD6AB
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 21:43:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BC408FD6B5
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 21:45:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57E06B2226F
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 19:43:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F2DE284397
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 19:45:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C495C1527A4;
-	Wed,  5 Jun 2024 19:43:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kKaN2IFJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB3515381A;
+	Wed,  5 Jun 2024 19:45:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F99314EC56;
-	Wed,  5 Jun 2024 19:43:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4E312F373;
+	Wed,  5 Jun 2024 19:45:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717616600; cv=none; b=cUWfsP0Ij+nD/CQ4akf1cGsQcNAusInooZ7geKp0cueu1APzxT2r72yaA5OXVq6vhXIawiv4LZVajRS8pPjLJlV3nI7czodvRGgyOLG1vCsGUlaeANiPPL/VZg2iVmGB1pPWf1no0PGQa8nbpSSRQTKBBkKOcQhObU98hX15Pvs=
+	t=1717616717; cv=none; b=T7flflr5XUvGjky0ocYZ9PpdQH1ug2kL2J34hI8+amRL+YbmS0lQTAnO2+BF4hz7W+Xgr57CcaLsacADAZLmC58O1Rs8iqw/GqXld4WbVOmLsq7pTbkUeXQYkVVU+rqhnLvkTyOOoUPZNfQ6/coHYwSSHGc+8CjjW9lepnMXT6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717616600; c=relaxed/simple;
-	bh=KIGvffMFmtiF6JY2kPrxSLeoIMqNOQ0IhOPnWoh89qY=;
+	s=arc-20240116; t=1717616717; c=relaxed/simple;
+	bh=iw7MWP8NfZ99vapASmUgc+MfuhBAKaNFZejrXEEvg7U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bmQADH7JhkeLHgrSVCmfhl21f1n2MheQ2A5uSsSIcRRZYUU2kIbWPaiqzFWdHAUilx/YfZYBsmldwxvC5P5ihB5ssFbQWasMvhkN5LDiIM8xl6AORqvD+1st1wYk+Rnmw1eeqfLwHi2aUtO5whGZhJfcQnfL8Ev9bpeR4n7NKr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kKaN2IFJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A240C2BD11;
-	Wed,  5 Jun 2024 19:43:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717616600;
-	bh=KIGvffMFmtiF6JY2kPrxSLeoIMqNOQ0IhOPnWoh89qY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kKaN2IFJMH56DTxD6b+6O+4kWa3g6aTqMvBPs6i1mT30xPAXQPUWafP+1Jx1JdDsC
-	 62zCdOLvk+B+4F47V9wIoc4DqvdEWSHFK+QqmcbTq0LZ0D5jYCqLP8ob+kf6OYoYoR
-	 SYmUAgt2Tw+bgeAonl4E6Pf3lnr23fao+Y7cuT/IYfMYYQsuw4WLnkmJ5fTGuHESzo
-	 9v/9c4r9cjc1eD+pKoGANyTxd6Te+w5st6/Od/mlfu1aWfdjQZraJX/bo0Sgu7BAlz
-	 ScrGVKjA/5dCdATM/KN94ntYghEYAx5Wi7+NwWJFDzrmyX6yh6T/S40w6t4URGkR94
-	 nbYzdHe8ST2dw==
-Date: Wed, 5 Jun 2024 20:43:14 +0100
-From: Simon Horman <horms@kernel.org>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com,
-	i.maximets@ovn.org, dev@openvswitch.org,
-	Pravin B Shelar <pshelar@ovn.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 9/9] selftests: openvswitch: add emit_sample
- test
-Message-ID: <20240605194314.GX791188@kernel.org>
-References: <20240603185647.2310748-1-amorenoz@redhat.com>
- <20240603185647.2310748-10-amorenoz@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IaBBdsa1hddQbPcFiPWV+rFEHwO1AxyTXj1vBEKb2mKouBzj2u1Ei+UwOO4VM0mKbtCkhTwHW/gu6hZN0iBXsd9rY8iFbkI2z8u0UjCBx9/PVgJtDq32WIl7EJSu3QIATbsMU4WdIov7DqAmcNrZE0P488D9osI6wsjTDwubwV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [31.221.188.228] (port=12024 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1sEwZJ-00Ayr0-9A; Wed, 05 Jun 2024 21:45:11 +0200
+Date: Wed, 5 Jun 2024 21:45:07 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Christoph Paasch <cpaasch@apple.com>,
+	Netfilter <netfilter-devel@vger.kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	daniel@iogearbox.net, willemb@google.com
+Subject: Re: [PATCH nf] netfilter: nf_reject: init skb->dev for reset packet
+Message-ID: <ZmDAQ6r49kSgwaMm@calendula>
+References: <20240604120311.27300-1-fw@strlen.de>
+ <FF8A506F-6F0F-440E-9F52-B27D05731B77@apple.com>
+ <20240605181450.GA7176@breakpoint.cc>
+ <ZmCwlbF8BvLGNgRM@calendula>
+ <20240605190833.GB7176@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240603185647.2310748-10-amorenoz@redhat.com>
+In-Reply-To: <20240605190833.GB7176@breakpoint.cc>
+X-Spam-Score: -1.7 (-)
 
-On Mon, Jun 03, 2024 at 08:56:43PM +0200, Adrian Moreno wrote:
-> Add a test to verify sampling packets via psample works.
+On Wed, Jun 05, 2024 at 09:08:33PM +0200, Florian Westphal wrote:
+> Pablo Neira Ayuso <pablo@netfilter.org> wrote:
 > 
-> In order to do that, create a subcommand in ovs-dpctl.py to listen to
-> on the psample multicast group and print samples.
+> [ CC Willem ]
 > 
-> In order to also test simultaneous sFlow and psample actions and
-> packet truncation, add missing parsing support for "userspace" and
-> "trunc" actions.
+> > On Wed, Jun 05, 2024 at 08:14:50PM +0200, Florian Westphal wrote:
+> > > Christoph Paasch <cpaasch@apple.com> wrote:
+> > > > > Reported-by: Christoph Paasch <cpaasch@apple.com>
+> > > > > Suggested-by: Paolo Abeni <pabeni@redhat.com>
+> > > > > Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/494
+> > > > > Signed-off-by: Florian Westphal <fw@strlen.de>
+> > > >
+> > > > I just gave this one a shot in my syzkaller instances and am still hitting the issue.
+> > >
+> > > No, different bug, this patch is correct.
+> > >
+> > > I refuse to touch the flow dissector.
+> > 
+> > I see callers of ip_local_out() in the tree which do not set skb->dev.
+> > 
+> > I don't understand this:
+> > 
+> > bool __skb_flow_dissect(const struct net *net,
+> >                         const struct sk_buff *skb,
+> >                         struct flow_dissector *flow_dissector,
+> >                         void *target_container, const void *data,
+> >                         __be16 proto, int nhoff, int hlen, unsigned int flags)
+> > {
+> > [...]
+> >         WARN_ON_ONCE(!net);
+> >         if (net) {
+> > 
+> > it was added by 9b52e3f267a6 ("flow_dissector: handle no-skb use case")
+> > 
+> > Is this WARN_ON_ONCE() bogus?
 > 
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> When this was added (handle dissection from bpf prog, per netns), the correct
+> solution would have been to pass 'struct net' explicitly via skb_get_hash()
+> and all variants.  As that was likely deemed to be too much code churn it
+> tries to infer struct net via skb->{dev,sk}.
+> 
+> So there are several options here:
+> 1. remove the WARN_ON_ONCE and be done with it
+> 2. remove the WARN_ON_ONCE and pretend net was init_net
+> 3. also look at skb_dst(skb)->dev if skb->dev is unset, then back to 1)
+>    or 2)
+> 4. stop using skb_get_hash() from netfilter (but there are likely other
+>    callers that might hit this).
+> 5. fix up callers, one by one
+> 6. assign skb->dev inside netfilter if its unset
+> 
+> 3 and 2 combined are probably going to be the least invasive.
+> 
+> 5 might take some time, we now know two, namely tcp resets generated
+> from netfilter and igmp_send_report().  No idea if there are more.
 
-...
+Quickly browsing, synproxy and tee also calls ip_local_out() too.
 
-> @@ -803,6 +819,25 @@ class ovsactions(nla):
->                  self["attrs"].append(["OVS_ACTION_ATTR_EMIT_SAMPLE", emitact])
->                  parsed = True
->  
-> +            elif parse_starts_block(actstr, "userspace(", False):
-> +                uact = self.userspace()
-> +                actstr = uact.parse(actstr[len("userpsace(") : ])
+icmp_send() which is used, eg. to send destination unreachable too to
+reset.
 
-nit: userspace
+There is also __skb_get_hash_symmetric() that could hit this from
+nft_hash?
 
-     Flagged by checkpatch.pl --codespell
+No idea what more callers need to be adjusted to remove this splat,
+that was a cursory tree review.
 
-> +                self["attrs"].append(["OVS_ACTION_ATTR_USERSPACE", uact])
-> +                parsed = True
-> +
-> +            elif parse_starts_block(actstr, "trunc", False):
-> +                parencount += 1
-> +                actstr, val = parse_extract_field(
-> +                    actstr,
-> +                    "trunc(",
-> +                    r"([0-9]+)",
-> +                    int,
-> +                    False,
-> +                    None,
-> +                )
-> +                self["attrs"].append(["OVS_ACTION_ATTR_TRUNC", val])
-> +                parsed = True
-> +
->              actstr = actstr[strspn(actstr, ", ") :]
->              while parencount > 0:
->                  parencount -= 1
+And ip_output() sets on skb->dev from postrouting path, then if
+callers are fixed, then skb->dev would be once then again from output path?
 
