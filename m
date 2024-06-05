@@ -1,116 +1,80 @@
-Return-Path: <netdev+bounces-101109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 735D68FD60B
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 20:51:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DDD28FD618
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 20:54:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DADA1F22DBE
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 18:51:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C3B81F2294C
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 18:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F19013B5AB;
-	Wed,  5 Jun 2024 18:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A31F2E634;
+	Wed,  5 Jun 2024 18:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SmOKoi22"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5985C22615;
-	Wed,  5 Jun 2024 18:51:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56753DF43
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 18:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717613475; cv=none; b=amd9CbUCSFqIb72Mp4ztgpZkcvQ0uC5KonPSPAI6QkflyESCeSj1f485t4v9a9hW4/VoHqQYswhjVDp3uO8XNr0wgfiCMGXsbcFN1fFCKBPkpr7IV1hDBJ4OEf2gSWdSthcQVeSh+3k2tCBAiXRyo3DdX9xSyCH9QaInYw8eq8E=
+	t=1717613678; cv=none; b=Cijo6+As0s1jydY0HXmU6HH7dmyQ9QkoLOpKAzm6b9qmDQZ802xe8rzXUK5LLqdWfURt2uVdHW0sREfDRooeBi4vPt5VpSl/mfMY++PNiJ8PQTNBB8ns5/LFchKrjbejwtVzZjnl7cs2e/GHWya51oI3aS3EvZ/nJ8xJbaU3OsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717613475; c=relaxed/simple;
-	bh=zx9Pn72XW+0OyeDmaj8nqxeP/1TM/BNsr82eIksOpv8=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=FGAzRPu3eHxSG0S/BTpwBdBNxr33EE18VTMti11s6J/aHwlu/pe4mBg2bhj9MXN6WIwf/n+nSM3k2bIZSWlcJlU6NzCU4Pw/F+P9YOYViG0SoGpScGA7WILiiC4an7JgtthUpZSPVo3S5qc5LZjLbxbHEKrPml3vLKDHtxUJP38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (31.173.84.195) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 5 Jun
- 2024 21:51:02 +0300
-Subject: Re: [net-next PATCH v5 4/7] net: ravb: Refactor GbEth RX code path
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Simon Horman <horms@kernel.org>
-CC: Biju Das <biju.das.jz@bp.renesas.com>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
-	<yoshihiro.shimoda.uh@renesas.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240604072825.7490-1-paul.barker.ct@bp.renesas.com>
- <20240604072825.7490-5-paul.barker.ct@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <9fc54591-532e-2dc0-6f83-52a5d4a6312e@omp.ru>
-Date: Wed, 5 Jun 2024 21:51:02 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1717613678; c=relaxed/simple;
+	bh=yIFGNoUovXxvVpfbeNZt2oxdCFWufF+lsZ1uhtdDKo0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gpdai3lr/iiIux1TvhQ0hbFltqA9Z+KKwawbuYOnBQJoNUg9/vKy1h3HXb6n01y/NorVvm8wm7VrnAaeWkLVsiFfw0lRYJ12k5r8h2r80jiJ3KKCYHjFYWLdZbpJD0X9J5BFN2xumCVDnjLArz4r4Eo94UqkMtRkssNVD2c3nbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SmOKoi22; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 725F1C2BD11;
+	Wed,  5 Jun 2024 18:54:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717613677;
+	bh=yIFGNoUovXxvVpfbeNZt2oxdCFWufF+lsZ1uhtdDKo0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SmOKoi225JAlsMwSJG9XxR6zYBn1BI5kj6N7+W/gui9zottAH75BcazK4lVcSyb5t
+	 YZDIvZ4FAwjJKBgfVhPDaitSCLqeAFYiPTNYtWTuDTzlQb+KBGxofpyP65+xH9wK7+
+	 tD09VMLAj2lig/Ij+NsHfDVJgDEYJv9qVHQ6CGiz6bUno7t0xOxXgXqedMah82koq8
+	 Ydk8JP0eLXDTAFvTE9iZLRhppZpGIeEvjuSZzOLxZRiKj84Ca2/CiJo/1707btSfnV
+	 gZ+WW1rp6gTyhtLKoeY/JdUIF/cXiCX+qZynr4xSTKPPWXFwhLz720vYjCRW1vHjgt
+	 2S9GYqXY4xmkw==
+Date: Wed, 5 Jun 2024 19:54:34 +0100
+From: Simon Horman <horms@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next] inet: remove (struct uncached_list)->quarantine
+Message-ID: <20240605185434.GU791188@kernel.org>
+References: <20240604165150.726382-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240604072825.7490-5-paul.barker.ct@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 06/05/2024 18:28:34
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 185750 [Jun 05 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 20 0.3.20
- 743589a8af6ec90b529f2124c2bbfc3ce1d2f20f
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.195 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.195 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;31.173.84.195:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.84.195
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 06/05/2024 18:33:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 6/5/2024 4:42:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240604165150.726382-1-edumazet@google.com>
 
-On 6/4/24 10:28 AM, Paul Barker wrote:
-
-> We can reduce code duplication in ravb_rx_gbeth().
+On Tue, Jun 04, 2024 at 04:51:50PM +0000, Eric Dumazet wrote:
+> This list is used to tranfert dst that are handled by
+> rt_flush_dev() and rt6_uncached_list_flush_dev() out
+> of the per-cpu lists.
 > 
-> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+> But quarantine list is not used later.
+> 
+> If we simply use list_del_init(&rt->dst.rt_uncached),
+> this also removes the dst from per-cpu list.
+> 
+> This patch also makes the future calls to rt_del_uncached_list()
+> and rt6_uncached_list_del() faster, because no spinlock
+> acquisition is needed anymore.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-
-[...]
-
-MBR, Sergey
+Reviewed-by: Simon Horman <horms@kernel.org>
 
