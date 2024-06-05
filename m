@@ -1,90 +1,98 @@
-Return-Path: <netdev+bounces-101042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B84B8FD04A
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:59:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF8668FD05A
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 16:03:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C87B21F25255
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:59:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF0C31C21661
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 14:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A53819D8A0;
-	Wed,  5 Jun 2024 13:59:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC53D2E6;
+	Wed,  5 Jun 2024 14:03:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Y2FHIguy"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="aVlq55SL"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2071.outbound.protection.outlook.com [40.107.237.71])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5933717BC9;
-	Wed,  5 Jun 2024 13:59:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A00B19D8A6;
+	Wed,  5 Jun 2024 14:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717595961; cv=fail; b=iR8xdsvE0RFMouPUV6Fs5PywnvcvKxgmkIHSIiskdm8/BtY6jzl7d/bBk2hAZBqV4W0Ws5HZcAd+d17Z/BGenxhZXMrNtRFsAUCHuSVjkYpnGb90Upmc58dnTuR14Proy/yXpInRzv9vQYb2C4ftJwomW2CEo2otUpDG0Ukyy5w=
+	t=1717596204; cv=fail; b=EF2GB3+tqYfy5YDAWg0Kg+cwSlXp3rj6FsON0Byx5/G7d3Zahsq72+hl/vj3iMISB688F0eAoOp9ZgRSk4u2su11eo1T0C77rPegl8G+05T3tJIFyzo4vvGbNuQargy21qohbRGHTMm9dRPiE/8UT7xesdfzd7MueHD89hptAJE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717595961; c=relaxed/simple;
-	bh=uDTCEOAI2Oi90RNBCLrk66GxqaC3jVTCVbVuRVMx6O4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=LB8QC/0FTTxQ0VY2xF1B7WKQ6MHjo0Dfnq96XJANvStDPvBp8juZB1fpmZ06fwDv4ogQuVraL6awXfxkiiiNWwjnApzvC/wOgnEthhxz9JE2WCOYB/UlimKPPp9gILbt1LTb/R2rWURPSCYOyPbb1H9xCwItftCOQO9FBgWoF8U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Y2FHIguy; arc=fail smtp.client-ip=40.107.237.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1717596204; c=relaxed/simple;
+	bh=parNKc90cVzgOFO0WRHWXA4XEVQdQLdxXc8dHQsLOYk=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=bDMyX+TMZB4OkIovDmPsYERA2AFxgVMul3x+Es0ppat7Cx5e7yOolECz9dJtKgVvs//PS2BUW6/tYjVkZ0JP3YeKVARnWdu3r2WQJX5QPh/oCbH3YFl3ROcX2/btwO970pcHXLEVUShsJldkM2GPU/JRr88IFNFvQgA4XnY4xBc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=aVlq55SL; arc=fail smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 455DEnrB003943;
+	Wed, 5 Jun 2024 07:02:43 -0700
+Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2045.outbound.protection.outlook.com [104.47.70.45])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3yjrqug9wv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Jun 2024 07:02:43 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OlcnMQAGvDDk1ubOfFPV+qo9fhUITI18CBhGaqZOZTyGpkVK2D6DClkiKb7H3N8jRucIsAxGx/Lij0o8t2ECCW6QUJcVZDv4aFmX28zDdURfTdPbKJ1QWVfBzVLqZ5SPCseW3ZOOijd/VjFPFp8J/kM3QLLE7/LGsKKawEoKW0DkSdGq5ApSmbHM5LAVTr+d4omkT2O/Sh99P0JSc5ICgCgSOaXIetJEa534H9+RJYsVuPFlwtwm1K/WRAcsbjsY2uuzc1cuLBWuGLKUNPQgr8+1S3hwRKx13wHxNSCkwIS4/sWZCGg7pbodwzo6F+C/OkF0fD6j/WSeKsCYW44rHw==
+ b=R6bsWA4nsXbeNn47GVRRQedVkC5CTR5iQrNaVVGDBgw5hpKmXH4pFpNzzJJA3/N3MFc0679ooCAoC/T7VzZv4xkTNcmXEhiZdd7T5SFUxETnicS4yPxjjPWI1iV1/GXWcWITSDOgV4PqWUOjQWb+/WHgcD4jdnTCo/cPuQBgUyyseqlrnqlECqsztMlAy9jhuRPSx2xIW9A5ATkX6rBfiFdchLW7a34eQ4zqYptXJgmjfvQtx9r+UVtzDgJjIgUWIIGl/G6DvQOZLN321c1a4OGkdE/F6eaiBDi0nEeWpiLmPiTsWCn4q0/6zCPQWDngx7CZ152Q1wgGmbsxhYXLjQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fRXGFmqjmfCJJ7owtvw0e1rt/HgpdYskHBsa2EVyd0Q=;
- b=Pt3QgvbWuDUEC4bs3vHCfwen8VhI+2EZ8joZhoeRe3Iu97XKGwNG16utCFmACYC+mVGUTUhAjv0I9F7xa92hKk/DAzw6p0W6x0Re42YSDfUUavaH1aCq5tgIybqyzuG3XF1U9IJkG6H31BGjhe6qHmQTNaytJKNRjEQUI0VW8QDGVwTPEIFcoCpNN8UOnkbD8uwKy9eCNry2aSmXZdYKxqzi8XUuy+SvJGAsJv4dXZWYNbOhmB6XLV2W1NHtzSWhnJaKXK9lFk9GyveRgkDrpNZ7Itlujlyau1eLrN3GJOtJldX/zX5AMWUG+xyEHISuhZ5LeZGV/4D158YXmWXXjw==
+ bh=bDlaiUs3VU+WQhubdQXUCcdd4SsQ4qq/Ll35qpZAEHU=;
+ b=WqEwCmjG8z1fwtGvoMZ6YKsz/CUdaIncEkGCgO/MX024vtr6lwfgWC/ZUf1OLbQjYDICQKTvfVAVW/nYplpx96s8tMNd1QLqewGLx3pvimMQ7Qr6E8LGlHfa7HP6N3OQ2a1NyOMQ61HR6ULGgZfVXuOCYtal34hlfBHS5ioayoDjq3lDu+PtP7rRahVbUF4ppmT1UWPZkC29iFLC4oKNXYYSjjcf4WVJmtQr0jaut+HbYVfOb9L9ZNe3SLdk9IlQ/+ZTuyXSUuunmCWrd/XkSnrAn/U3W6uiFDxHtABb25wc9MYJPvn3VRKRrTM5H1t8akIXdwaxbRooC+E0PWXR3A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fRXGFmqjmfCJJ7owtvw0e1rt/HgpdYskHBsa2EVyd0Q=;
- b=Y2FHIguyHCgbmI8t5vnNhRiSOeVVI070P+Pq1DRjv3c/FwdCqBXsayUNOufNkHB2A8eRjtSRa10MEufdxVNTFumnwtGQQSkQhOWNvdWWtoU93wVO/Lus/pKuP/90tf12dYk0d5uVaowiV94aD/5ZT3Oh2X0l808jAoMCOhynZ0YLLRLuPq23B8IC0BQ9XOLaBhxZ75aVM4tIKVRGYf1fbDnk93evsbo1foUoN0et/6/4QFu9K5kiR9F0PGoP1B6puDZFBaXIWxfI8t3WhDAraeQ0s60T4Rmd4nOzIhfuLmDo5JfiyD4RFopUXv5HToBCXtpesmeE6Hmtt9xvZ+e44Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by PH7PR12MB5593.namprd12.prod.outlook.com (2603:10b6:510:133::9) with
+ bh=bDlaiUs3VU+WQhubdQXUCcdd4SsQ4qq/Ll35qpZAEHU=;
+ b=aVlq55SLIp/eTaKQxiIXEZxeYYLnHo99pYZXuRs1xaTHe5UKQPzZdzGAapWa2QWV6/7gYZgMOlABxx3qjr4nNJxakpURoFux41qc0PItKLhSn9axZgDFTsIG2wp8oska7of+4yA435WgOnbxzWz2oN8V/KmfRtCkjyuwBQzZLS8=
+Received: from MW4PR18MB5084.namprd18.prod.outlook.com (2603:10b6:303:1a7::8)
+ by LV8PR18MB5656.namprd18.prod.outlook.com (2603:10b6:408:182::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.22; Wed, 5 Jun
- 2024 13:59:13 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e%4]) with mapi id 15.20.7633.021; Wed, 5 Jun 2024
- 13:59:13 +0000
-Date: Wed, 5 Jun 2024 10:59:11 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, linux-doc@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
-	Leonid Bloch <lbloch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
-	patches@lists.linux.dev
-Subject: Re: [PATCH 0/8] Introduce fwctl subystem
-Message-ID: <20240605135911.GT19897@nvidia.com>
-References: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
- <20240603114250.5325279c@kernel.org>
- <214d7d82-0916-4c29-9012-04590e77df73@kernel.org>
- <20240604070451.79cfb280@kernel.org>
- <665fa9c9e69de_4a4e62941e@dwillia2-xfh.jf.intel.com.notmuch>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <665fa9c9e69de_4a4e62941e@dwillia2-xfh.jf.intel.com.notmuch>
-X-ClientProxiedBy: BL1PR13CA0431.namprd13.prod.outlook.com
- (2603:10b6:208:2c3::16) To DM6PR12MB3849.namprd12.prod.outlook.com
- (2603:10b6:5:1c7::26)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.33; Wed, 5 Jun
+ 2024 14:02:39 +0000
+Received: from MW4PR18MB5084.namprd18.prod.outlook.com
+ ([fe80::1fe2:3c84:eebf:a905]) by MW4PR18MB5084.namprd18.prod.outlook.com
+ ([fe80::1fe2:3c84:eebf:a905%5]) with mapi id 15.20.7633.018; Wed, 5 Jun 2024
+ 14:02:38 +0000
+Message-ID: <b3658a1a-4ab9-4673-8060-22bdeb39a9ce@marvell.com>
+Date: Wed, 5 Jun 2024 19:32:26 +0530
+User-Agent: Mozilla Thunderbird
+Subject: net: ethernet: stmmac: add management of stm32mp13 for stm32
+To: Christophe Roullier <christophe.roullier@foss.st.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Jose Abreu
+ <joabreu@synopsys.com>,
+        Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+        Marek Vasut <marex@denx.de>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240604143502.154463-1-christophe.roullier@foss.st.com>
+ <20240604143502.154463-8-christophe.roullier@foss.st.com>
+Content-Language: en-US
+From: Amit Singh Tomar <amitsinght@marvell.com>
+In-Reply-To: <20240604143502.154463-8-christophe.roullier@foss.st.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MA1P287CA0015.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a00:35::30) To MW4PR18MB5084.namprd18.prod.outlook.com
+ (2603:10b6:303:1a7::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,219 +100,254 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|PH7PR12MB5593:EE_
-X-MS-Office365-Filtering-Correlation-Id: c67dc920-9f13-4d8d-d619-08dc8567ae1e
+X-MS-TrafficTypeDiagnostic: MW4PR18MB5084:EE_|LV8PR18MB5656:EE_
+X-MS-Office365-Filtering-Correlation-Id: 31d5e637-bead-4aef-9bb7-08dc856828a9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|7416005|1800799015|366007|376005;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?CeEpL8mM9tKQBe//wXE+uFysQ/zPY4rkgslU1aPjtb4d+GRZmNF7YVHG/zO6?=
- =?us-ascii?Q?x0TVZRtXyMp1G+dXYp8KLR8MjGc1Yx/PvI6PuLrXWJmCLFcXvv3eg5ZhAxlX?=
- =?us-ascii?Q?/oXDfwZUJyOkMJroY+1fFJSBxd/s5QHPXmF2dDKIkMfhebQebTahzn197GFx?=
- =?us-ascii?Q?PIA2HKLtwlFj02LtL4Qh3TLMuZzz3kFAg+lHdW1gJ6peOB5l5Lo674B5+2O2?=
- =?us-ascii?Q?c+BYXU9yPqU8ptqMkNUShv1DzTVJnDgXzN5A+rTH9sY3VbNmpjxkG+tDgVke?=
- =?us-ascii?Q?cCQw/IFvnyzlHlIjebE+cIz4ODlqH3lrIExfmcHvyBhvCZZCcXNg8yGOWxAH?=
- =?us-ascii?Q?J/WAo0mRpbM0hhp38VuCpNDJ6w0Y+sjykNZzEv5+OrqXx6dbhgFP985iU10Z?=
- =?us-ascii?Q?FL2q+gPZ8YLhtWLJexeQHD4PmGGLPF37t68pq7ekvqV08Xa9Wie66ZeEqdQR?=
- =?us-ascii?Q?silaRx2juXJA/jNZlYSUDBn62IwadATp/sYNZscynwXsH9cnyS/3Mv/vV0DT?=
- =?us-ascii?Q?v7W+4XCbLoUS1x0v94n5H8dGmReXKbdNU8O0aNjqWNrSXVvgMSOL/SSe9h6F?=
- =?us-ascii?Q?R0CSQ0QdzCSlc+VazGzNiUbMATmbgN02ZLVHPWYMeVuwhUj/YI0JRYj58yk8?=
- =?us-ascii?Q?4ith5qauCArwnSq7NNlrmQT0h3gyym/bL8XkLVNXYCdr9EJYIjpliNkHYWUB?=
- =?us-ascii?Q?cpArLFnyDGFBJ2DnfMmD4i69y4TtiEREkTQUYuKXB2J0kJ2If2tdQxMWJCrG?=
- =?us-ascii?Q?F5M+uwQRymR0gE7vnM73+I2hHnHwlv1d3NqINfXC2z0nCWhyAJDNfnenOGHC?=
- =?us-ascii?Q?xjuOCau/pguMrrq0b3ZqReqJcVuVQRrxXcipd2uf3zbHJVMAih8MLPdME5is?=
- =?us-ascii?Q?F//ixvIqvKvM5risc2Sp0onIBL1wVesl7A2v4d04cpcb7iyrm8eZVdIAZ7ZJ?=
- =?us-ascii?Q?0BKzbnhegfm8/NE/rURKxz1SORojyI7rXr3UdTIKnloI0hXsFg6zOFcnS8TL?=
- =?us-ascii?Q?s9QThlXdbCdte7jTw+u7omSlFRh+I5EaE6ujXnOxVqDa5RsW8BssqTMHzeUp?=
- =?us-ascii?Q?dFVrIxakEhmNnwo0DwE64yxbFif06SUBVG2PC1U75ly5sd5qGZSuLOGjgBR6?=
- =?us-ascii?Q?lJZ0Cc6jiXlr2lk/mBrHFXPDhHjK2WvaWHsNU+ymH1XRSofpsUuszfcBZN0A?=
- =?us-ascii?Q?zMWbRFmErjLOUMfAYLhXUgNCZp2CYmQQmQ/kdllpBGgDFrX7k46G7u1J3YuC?=
- =?us-ascii?Q?7Exl/jJx1MeOGQ3k4FEQS8BiWeT6qSO1b9YKeXhIQqRfRfbTzCVyLdFrzlhy?=
- =?us-ascii?Q?fEKAdhgiTKZ8cbx0Yc1pYIKX?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(366007)(376005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: 
+	BCL:0;ARA:13230031|7416005|376005|366007|1800799015|921011;
+X-Microsoft-Antispam-Message-Info: 
+	=?utf-8?B?UTRDdWNUUGRWeDlXeUk0YVkrSlpYM3BsZ2ZzNEEvZkU3dDN1N1F0dHBud3lU?=
+ =?utf-8?B?SmluRGtLMGVUeStQSHdWaGRnbGNtUkRJMy8vZHU3elJHbXJySlZlTHRHQVlW?=
+ =?utf-8?B?ajlmRjIxQnFsYWdtakRmb050MVhVakJZeTVjYWY3QWZBQytpT05MK21QZHRM?=
+ =?utf-8?B?dHhnb25zV0FPT0R5M2lOREdDODVzSVI5VDVubGJ6dk5YNFUzcXJwYW9wbFcz?=
+ =?utf-8?B?cS9hbWlxNDRiN1VzYndKWThMekRJY1pLUnQ1d0w1RU4wQjlLTk42NEZKcjlY?=
+ =?utf-8?B?MlE4dlFzZithSHJ1bHdVTVJ5emRYc2NZcFlKME8ySW1GSkVGTmRRQkVJZmpC?=
+ =?utf-8?B?WUhHRzFlMkovejRoYlV6YnErZTd5eG95QmdtUXVoVzR3YnpWcjhOaTdwM3l5?=
+ =?utf-8?B?Mm9HakwyMVk3YUptenJkK2RhdTNoeEduTDVUV0plTUJ0WGNjMlk0QUkwUVhY?=
+ =?utf-8?B?Qk0xUUtYSEI4amUxZkVzNHdCUVllZkdWVEEvYWc1SEFEdGhpQzI1Q1l4UWpV?=
+ =?utf-8?B?VFNRSTJGbHJhNmNqWlpMdnQxL2toVG96V2k2Z3M1anR4TVUzZlMrUnZzMGNh?=
+ =?utf-8?B?VlhjZFJiTmVOenZPckd5UWdheDdNcWlFbW1uWUNvNXBZMXZ5VnlMbXhKZGI2?=
+ =?utf-8?B?SGlDYTludTZOZjNTQUhxbmg4NFhIc3FhbmFWUkJQNUVUMElPZHB0aXNkQjNj?=
+ =?utf-8?B?UHR5ZFg4bWNXQXUwcjBrT1FlV1lBOWlZVVQ5RDZYTVl5KzE4TGhMdndJdGlM?=
+ =?utf-8?B?UFhpSHZxbWdrb0VDcGlENndZOS9rT2NsalVudnBmNXB3Y2s3RlNZN1BISS9y?=
+ =?utf-8?B?VWNmUWVVRGNRL0xZeFlDb0pXN0ZaMEpuejRmeUczdjE3SmZqY0tpOWI5UWdX?=
+ =?utf-8?B?b2h6bENBcVdETjF0cE95VytJVmE4NitSckZ5YS9laVQ4MCsrQlJPTVJGVDlq?=
+ =?utf-8?B?cS9mRlcrT21pRTAwYWdxakF4aTJ1ZnNCY09wcURhWVlEbTgwMXFWTlpWRzNq?=
+ =?utf-8?B?KzM3WlBBeTFRbzdFSVJnb3JGQysxaGZlQ1BCbWpiQjk2ZmJhWHk2YWtvMDlp?=
+ =?utf-8?B?d2lWZ1JVZnJCTGJuMkZhNmVMcW15QjRhRkwyRXh3b1RzVGdPUy8vTFZkcEIw?=
+ =?utf-8?B?dlROUFpaSkcyL0tCMlZob3dvbDlRMEN5eGNEOXlxdVdIeGlXQUN5bjdLUWxh?=
+ =?utf-8?B?ZUF0Y3hVOHo0bjMxUzdlK1BXWVBiOXlsR21ZcWppUmpiMHY5S0lFOHdQejJj?=
+ =?utf-8?B?ekExaFExSHpjbm9nTWc3R0xtMGZRN1NtcFZYa0kvNThqd2RVbFN0Z0ZGWU5E?=
+ =?utf-8?B?OHZ5clJMY1I1OXB5N2JLTVpNVm5LNG5jZ0VIK3QrUHk0R1grd1RKRmp3SnQz?=
+ =?utf-8?B?d0V0Y2RjeEVsL05zVTJrQmk5TzlpNVdYQTVTQVJwL2NpUVNiSTVVSFRhcmxK?=
+ =?utf-8?B?VWJxMEJ0b3JFcis0ekt1OWdzTk9XT0phQ1dzODBLRUloSFFRVlpIMjVMbjg3?=
+ =?utf-8?B?bmc3bldtd0cvclNzYndaejZsNzV1VDhkNE82TnR2cGZ4TExyZ0V6b1RTQWJX?=
+ =?utf-8?B?ajBtdkpKQVY1SC94NjVrYnl3bVRtSks4dWNVRDRtKzhsbmN6bVcxTVhSK3F6?=
+ =?utf-8?B?WHMwN2ozTFJ1S0xKcVpCb0xGUDExRWI1RTVJYUQ0MWh5TXhrNEp1MjBMcUF2?=
+ =?utf-8?B?cXNuOEx1dFpHZUIzcFF5KzZRT1VOTnpmUFMxZDM3Y1pvRmpmTndPa3VmMHAz?=
+ =?utf-8?B?QWNkMTFQbVRydkVrUmtjWnExc2NyOUhFaWNLTXFUU0ZDcVVoRjJ0NTVxVkI4?=
+ =?utf-8?Q?08pmfQFRPT4SZfrZADw9LBS5WwI4xazmE3wos=3D?=
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR18MB5084.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(376005)(366007)(1800799015)(921011);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?17zLuypxL71dgcGCxLgeztNoLhk7oInwNGEyKaBvqVGwgqLxliWtOyGConDH?=
- =?us-ascii?Q?dz4NYH/WYEAAhsUDCWphopCnj60Ho1xU7JF9dUnTBdEnk7sMIuwcZeOi96TX?=
- =?us-ascii?Q?reNvtlJjinwdwJHd5ubHh5GXcnGb+SjudkSTff+cisD5n2mWdjBzNbRHE2N8?=
- =?us-ascii?Q?yEjrzQjdSIjDW/wS0bpwtIjffmnp7nfOIEgq5lsc6QnTKt8zpTDTNl0YgXLj?=
- =?us-ascii?Q?uhoZ0ZcHFPaRsBoy6NSR2LVM2wKT91NofcN6n39l0qmtM7P3gN+VXsOgn98d?=
- =?us-ascii?Q?gR86bzr1TqWEcbKTlE4vyaZMNYIeu6+JV5K0+FRP7O5or77ZoUAs42i0IEx1?=
- =?us-ascii?Q?wNTYTDMk2rrQJCzj9yIN0HbfqyMK8NiSsQo2EZ8u9nNhPuvkX3sIpFfKW0IZ?=
- =?us-ascii?Q?jZa2unLT29IqGlQe44qZIYRtIkn1d9uosDqJ7NLTmsTjTj4FZcfuJN/dZyvB?=
- =?us-ascii?Q?/xwbcLc3JymE9GGOao+Z8oAPEEhH2lzd7/OMoPzRt5LMFgW5jvUoCpz56w4B?=
- =?us-ascii?Q?lQ3DlF03run0gJ+Ix6ou1JjGvtkcCy7pauf3mj7FX7A8EYUa6YTSJAG83i7z?=
- =?us-ascii?Q?e52titTNg0+1aXn7gEBwvUtnSkxl8RqYOq5LujSa6uCUVDfOmgEyoQZJtqRq?=
- =?us-ascii?Q?OCheav7kdRrv/UvBNaF2jfsBfxpOmO2AUhITQ9bTSdpAwl9gkfSDKuOfGe8N?=
- =?us-ascii?Q?jmliYQeJ05JdJ3HMCnDbr2KTas3/lrzq6KrlOpjz3y8xwO9mVmkLLyBnE2aQ?=
- =?us-ascii?Q?L4f6EGWghR3BvOksG3O2TVlmud4tXaSeMbviFoiyhk+TcRxaWg4D7of/9kSm?=
- =?us-ascii?Q?Zif7AVEnkxTvvCheSY+0p+vkzhYN+M7zkPJpILWfa0jSQFsZFUuSL24SbSqf?=
- =?us-ascii?Q?LdmcgDTir0xi/bA3b+4OOJOKUOV231cdfMx/G4pnwv4O/SAV8MQZvCEUwOvr?=
- =?us-ascii?Q?39hTERq0BFGPnVTReLOcg7rAsNlUb+JROg40Rxj3FbHPgBiE8DbFgZJNjVJ1?=
- =?us-ascii?Q?wc49LdPXViPWo/c8/YdQKPnYaPSiFBV7zUuehYtL0RT9ibvSENsMHBqKU4Yj?=
- =?us-ascii?Q?YBLeTgmdoarXLuWwBE/4NlB8G1Fr1gkEdVxtB5TwXuXr8VgjECotUGSPFsZ3?=
- =?us-ascii?Q?2vAyzcTQLypAtYMFmCgZ/yryyuiuzqiPS7lI1ciumIJdXW3jRD8O15W1FqV8?=
- =?us-ascii?Q?pOkl5P3mMmtl+XrDIk5CG6SbqN/KSjk0dt4vHeHEgulnot2iWRKp5QY0cIoU?=
- =?us-ascii?Q?xKsPXuZTR59AsMzBguCPrZ0Ri/zHBg01lt/O9TLsXdb2HY7DjMEoPOJSnhgD?=
- =?us-ascii?Q?omSOJ0CIM+QvLb88QNSQG6t7+lYAtMc7qK+kZkaikUREF5j2PkWtJMpCufup?=
- =?us-ascii?Q?u2KO7jsu4elOOI3TQoGsQBRdGEcrjdR7xmqlWGVaHu9Zuz0DqOcjOZURLL7+?=
- =?us-ascii?Q?e7CKDC9z7NMe6YEEhcnQUMD15t1LUmsUQ/ArrnYPghfrKBw+nV25dZNuAsvK?=
- =?us-ascii?Q?9pNDhbfmjc6ZeCENIgfWX4aY9Sq0eoYHgL90Gt0Fkm75/kt20euH9b96Vmo/?=
- =?us-ascii?Q?vmSOgDaf23kT+dnRwkRHLxFPGOVWcPdbkZ0rfoB3?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c67dc920-9f13-4d8d-d619-08dc8567ae1e
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?V0I3OGwvRElYd2RaN1ZOOUpBUUMrYlhHVVU4NlIzcjgwK1gwdWdHSUdqbjlX?=
+ =?utf-8?B?aTI3RHN5ODJIVDl5bit3T2l1cWlqSzdWcm9XbWduSHJlK2hVdDJweVc0RXZx?=
+ =?utf-8?B?ekpvdmpFMlhlaitJUmhlZjNmd0N1aU43M0UrNk9BQkRXS3hxOW1QNXlHWTFW?=
+ =?utf-8?B?aTZhY1pGNHMvTjdteEM1cXZraXFUVHpKc0J5KzNmU2syRmVnNGRSRmpIakd2?=
+ =?utf-8?B?QS8xZVNGaXpmRFV2MkFOUUFrTVNiUDRuM3o3TE95ZTRjWlZHaTlkQjNWTjBP?=
+ =?utf-8?B?NmFHQ2JUeTlsNUN0YVlNVkM5Qk8yelUrT1ZEODl3M0hxQzZsdWszWkdkeHJt?=
+ =?utf-8?B?WGM4U2pFWUtVWDFZOURoWFNyM3RabXFuMGVlbDNGSXE1TnpwL3RJYmJ6ZmV0?=
+ =?utf-8?B?RUtTeXVBQjFpbVBZVTBwaXhjTW5NaVZNYnFiRy9QRU1zUW1TZ3VoM2pnNS8v?=
+ =?utf-8?B?cjBBWlNSd0JYaVdvOVlCaG05VmNZMTNYTndZalM1d2JNcG1RSWVSWStCNUxN?=
+ =?utf-8?B?VFpLTWdnWUZ5dytNTituYTg4Ym01Q0xPeHlpWWJMRzZyaDNwdVpEdXN6RUIy?=
+ =?utf-8?B?WUxYa29UVUZDb1JoUEVQRVB6OWVDaEdxYUowWURFS2hBRWdzc2JaT0srSjBp?=
+ =?utf-8?B?Rlp3bllqRFlMRDdJWXdIWjZnSzZTZXpyTkNDUE4zdzJ2c0Y0K2E3dkZSbk95?=
+ =?utf-8?B?WFN0ZXBOemRnTitIVGRDbFlPRW9JNW9CTGFhUzJQRnF3c29jSXluNDErTXFO?=
+ =?utf-8?B?NlNiTVBnc0NZdVN0UTNRTjJqMEg0UTkwNk1RdzNVL3FOZVBmOVRhZUJENkFL?=
+ =?utf-8?B?TzQ1UC9yY0toR0JZSWJZZjM3M0tOL3h6SzVpS2pYdmJjaWdsTlZTWTRkNWor?=
+ =?utf-8?B?ZEFVeXJWTmJZdUxncHg3aXMxcVFaY0c4UklYUUNKZlhERnJVY3g2Q3pEZDJo?=
+ =?utf-8?B?MGhwWUlhdjMrV3VsYzFqUUUxZE5NdTFDekVHTkI1MisvUFlYS2tqNWd3RDM4?=
+ =?utf-8?B?YmxydS9aaU5Wcm1KdU54KzJqcmltdURsT1NrbkVKVFgzaHVGUzZiQkpFd09k?=
+ =?utf-8?B?S0Izcy9VV1FXVEkraVBqcEs3eUdOeFFCczVlTWsyU0owbkVwVU9KY2tUQTJ5?=
+ =?utf-8?B?eHIweWZPMlJMM0xHNkVkZ3EwM2thb2NjRk9PUHJCUzM0RG1kY1NaSnFZS2VH?=
+ =?utf-8?B?bU5qVi8veW5YRzIxUnVnUlR1SERJSDQvMlpTYmJ6NnJOa3BWTWJBcE9GU25R?=
+ =?utf-8?B?K2IrRjdnRVNpaWNwZ3RBd0llUTdoOUNBOVkycm1acG5hK1RtQWpKallBenB4?=
+ =?utf-8?B?QXVzektxRWJwNkEyQWZucVRhZ2MvaTdlZDAwTDhJUUcrMFl6TUhXdzBVeEEw?=
+ =?utf-8?B?ZkRkRm5tYWFjOHVsWkRVM0tKVjBGSzdjeVg2ZS9OSlhyZEJKZWxwbHJSSWNJ?=
+ =?utf-8?B?MlNXVmpCZFFnd1N3VkpDbUNrRXJXNG9mZXFDU013MmtOOXgrY0Vab2lMQWVM?=
+ =?utf-8?B?YmxOYXpxMzQvRWpqK3I0S1JMZjZTd3lsR2dvQmVVK0xRWkc1Y0c5eE5VTDlQ?=
+ =?utf-8?B?WTJ0OE80YnRlQlFOMHRZWWdtL1RkUzhLdzlmbWUyWmRvejduOEVoNUtEMEFO?=
+ =?utf-8?B?OVFoWDBSMHY0bmJNY1FueVRIdWU2SGdWV1RRV29vZDFLbFFidkl0dmJ1Y0gv?=
+ =?utf-8?B?cWxWZnMrV2FaemorNHl4S2xwZitDRGtKUml0S0I2bnlJSFZGMlhNZVpIUkUr?=
+ =?utf-8?B?YjJoQ3VLTE56UWdHc3dpL1N4eWdVS1ViUWVSV1ZmaVFPU1J3VEkyK2VjZ1Vv?=
+ =?utf-8?B?OXdwTzIwOUNpM0tEME4rOEowT3lhWUY5ajc4ci9OTDcwUnFTbGlmVE5haHJ1?=
+ =?utf-8?B?NjduQzkwMUlwSDA3SVZPbUVSU0YzV3h1RkE2RlhKRzU0M21mNG92UVNlNG9z?=
+ =?utf-8?B?VkhoNms2V2doV3FmVDFSalE0Yk5SbjJZaklFc2FCdEFLQ2d5MHBvZHI1M3Aw?=
+ =?utf-8?B?ZDBJbnR3bnJlZG9WU3BjZlEySk9YRW5GaTE0dk9hRG0xS0lqYjd3NERNaE96?=
+ =?utf-8?B?R1pSQWNwM2VzZXZLalNpb3l6SUs3OWZWa2ExNm41YlR5ZnpORVc5cUlQZzJs?=
+ =?utf-8?Q?V15m6GQdNhkl2OENsttrnE6ey?=
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 31d5e637-bead-4aef-9bb7-08dc856828a9
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR18MB5084.namprd18.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2024 13:59:13.0982
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2024 14:02:38.7794
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2mdS6869gBCxQnemR+Omqlm3nKW6oBMOHL7jv/FiqAGHkp2VOmF1jJnOyZK5o5Mo
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5593
+X-MS-Exchange-CrossTenant-UserPrincipalName: xgWV8F8jPL6PhY4f44OGC8OR+b9SZJLaQ05xK/Yc7ebtjeNjsDhndTvH0DZijCUkSJDm93vSBDdL3183J6IBFw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR18MB5656
+X-Proofpoint-ORIG-GUID: 9nWqLb_JRi57zEIW64EVO_0ov2cjcyHp
+X-Proofpoint-GUID: 9nWqLb_JRi57zEIW64EVO_0ov2cjcyHp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-05_02,2024-06-05_02,2024-05-17_01
 
-On Tue, Jun 04, 2024 at 04:56:57PM -0700, Dan Williams wrote:
-> Jakub Kicinski wrote:
-> [..]
-> > I don't begrudge anyone building proprietary options, but leave
-> > upstream out of it.
+> Add Ethernet support for STM32MP13.
+> STM32MP13 is STM32 SOC with 2 GMACs instances.
+> GMAC IP version is SNPS 4.20.
+> GMAC IP configure with 1 RX and 1 TX queue.
+> DMA HW capability register supported
+> RX Checksum Offload Engine supported
+> TX Checksum insertion supported
+> Wake-Up On Lan supported
+> TSO supported
 > 
-> So I am of 2 minds here. In general, how is upstream benefited by
-> requiring every vendor command to be wrapped by a Linux command?
-
-People actually can use upstream :)
-
-Amazingly there is inherit benefit to people being able to use the
-software we produce.
-
-> 3 years on from that recommendation it seems no vendor has even needed
-> that level of distribution help. I.e. checking a few distro kernels
-> (Fedora, openSUSE) shows no uptake for CONFIG_CXL_MEM_RAW_COMMANDS=y in
-> their debug builds. I can only assume that locally compiled custom
-> kernel binaries are filling the need.
-
-My strong advice would be to be careful about this. Android-ism where
-nobody runs the upstream kernel is a real thing. For something
-emerging like CXL there is a real risk that the hyperscale folks will
-go off and do their own OOT stuff and in-tree CXL will be something
-usuable but inferior. I've seen this happen enough times..
-
-If people come and say we need X and the maintainer says no, they
-don't just give up and stop doing X, the go and do X anyhow out of
-tree. This has become especially true now that the center of business
-activity in server-Linux is driven by the hyperscale crowd that don't
-care much about upstream. Linux maintainer's don't actually have the
-power to force the industry to do things, though people do keep
-trying.. Maintainers can only lead, and productive leading is not done
-with a NO.
-
-You will start to see this pain in maybe 5-10 years if CXL starts to
-be something deployed in an enterprise RedHat/Dell/etc sort of
-environment. Then that missing X becomes a critical issue because it
-turns out the hyperscale folks long since figured out it is really
-important but didn't do anything to enable it upstream.
-
-There is merit in upstream being something people can and do actually
-use, not just an ivory tower of architectural perfection. There is
-merit in bringing code into the community instead of forcing things to
-be OOT.
-
-For instance the thread you linked where there was talk of needing the
-signal integrity data is a great example. Sure some of that is
-manufacturing time, but also if you deploy a million interfaces in a
-datacenter, then yes, there will be need to collect SI information
-from live systems and do some analysis on it. You wouldn't believe how
-much physically broken HW leaks out into data centers and needs
-manufacturing level debugging techniques to properly root cause :(
-
-> userpace-to-device-firmware tunnel?" to at least get all the various
-> concerns documented in one place, and provide guidance for how device
-> vendors should navigate this space across subsystems. 
-
-This is my effort here. If we document the expectations there is a
-much better chance that a standard body or device manufacturer can
-implement their interfaces in a way that works with the OS. There is a
-much higher chance they will attract CVEs and be forced to fix it if
-the security expectations are clearly laid out. You had a good
-observation in one of those links about how they are not OS
-people. Let's help them do better.
-
-Shunt the less robust stuff to fwctl and then people can also make
-their own security choices, don't enable or load the fwctl modules and
-you get more protection. It is closer to your
-CONFIG_CXL_MEM_RAW_COMMANDS=y but at runtime.
-
-I think I captured most of your commentary below here in patch 6.
-
->   Effects Log". In that "trust Command Effects" scenario the kernel still
->   has no idea what the command is actually doing, but it can at least
->   assert that the device does not claim that the command changes the
->   contents of system-memory. Now, you might say, "the device can just
->   lie", but that betrays a conceit of the kernel restriction. A device
->   could lie that a Linux wrapped command when passed certain payloads does
->   not in turn proxy to a restricted command.
-
-Yeah, we have to trust the device. If the device is hostile toward the
-OS then there are already big problems. We need to allow for
-unintentional defects in the devices, but we don't need to be
-paranoid.
-
-IMHO a command effects report, in conjunction with a robust OS centric
-defintion is something we can trust in.
-
-> * Introspection / validation: Subsystem community needs to be able to
->   audit behavior after the fact.
+> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
+> ---
+>   .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 50 +++++++++++++++----
+>   1 file changed, 40 insertions(+), 10 deletions(-)
 > 
->   To me this means even if the kernel is letting a command through based
->   on the stated Command Effect of "Configuration Change after Cold Reset"
->   upstream community has a need to be able to read the vendor
->   specification for that command. I.e. commands might be vendor-specific,
->   but never vendor-private. I see this as similar to the requirement for
->   open source userspace for sophisticated accelerators.
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+> index bed2be129b2d2..e59f8a845e01e 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+> @@ -84,12 +84,14 @@ struct stm32_dwmac {
+>   	struct clk *clk_eth_ck;
+>   	struct clk *clk_ethstp;
+>   	struct clk *syscfg_clk;
+> +	bool is_mp13;
+>   	int ext_phyclk;
+>   	int enable_eth_ck;
+>   	int eth_clk_sel_reg;
+>   	int eth_ref_clk_sel_reg;
+>   	int irq_pwr_wakeup;
+>   	u32 mode_reg;		 /* MAC glue-logic mode register */
+> +	u32 mode_mask;
+>   	struct regmap *regmap;
+>   	u32 speed;
+>   	const struct stm32_ops *ops;
+> @@ -102,8 +104,8 @@ struct stm32_ops {
+>   	void (*resume)(struct stm32_dwmac *dwmac);
+>   	int (*parse_data)(struct stm32_dwmac *dwmac,
+>   			  struct device *dev);
+> -	u32 syscfg_eth_mask;
+>   	bool clk_rx_enable_in_suspend;
+> +	u32 syscfg_clr_off;
+>   };
+>   
+>   static int stm32_dwmac_clk_enable(struct stm32_dwmac *dwmac, bool resume)
+> @@ -227,7 +229,14 @@ static int stm32mp1_configure_pmcr(struct plat_stmmacenet_data *plat_dat)
+>   
+>   	switch (plat_dat->mac_interface) {
+>   	case PHY_INTERFACE_MODE_MII:
+> -		val = SYSCFG_PMCR_ETH_SEL_MII;
+> +		/*
+> +		 * STM32MP15xx supports both MII and GMII, STM32MP13xx MII only.
+> +		 * SYSCFG_PMCSETR ETH_SELMII is present only on STM32MP15xx and
+> +		 * acts as a selector between 0:GMII and 1:MII. As STM32MP13xx
+> +		 * supports only MII, ETH_SELMII is not present.
+> +		 */
+> +		if (!dwmac->is_mp13)	/* Select MII mode on STM32MP15xx */
+> +			val |= SYSCFG_PMCR_ETH_SEL_MII;
+>   		break;
+>   	case PHY_INTERFACE_MODE_GMII:
+>   		val = SYSCFG_PMCR_ETH_SEL_GMII;
+> @@ -256,13 +265,16 @@ static int stm32mp1_configure_pmcr(struct plat_stmmacenet_data *plat_dat)
+>   
+>   	dev_dbg(dwmac->dev, "Mode %s", phy_modes(plat_dat->mac_interface));
+>   
+> +	/* Shift value at correct ethernet MAC offset in SYSCFG_PMCSETR */
+> +	val <<= ffs(dwmac->mode_mask) - ffs(SYSCFG_MP1_ETH_MASK);
+> +
+>   	/* Need to update PMCCLRR (clear register) */
+> -	regmap_write(dwmac->regmap, reg + SYSCFG_PMCCLRR_OFFSET,
+> -		     dwmac->ops->syscfg_eth_mask);
+> +	regmap_write(dwmac->regmap, dwmac->ops->syscfg_clr_off,
+> +		     dwmac->mode_mask);
+>   
+>   	/* Update PMCSETR (set register) */
+>   	return regmap_update_bits(dwmac->regmap, reg,
+> -				 dwmac->ops->syscfg_eth_mask, val);
+> +				 dwmac->mode_mask, val);
+>   }
+>   
+>   static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
+> @@ -303,7 +315,7 @@ static int stm32mcu_set_mode(struct plat_stmmacenet_data *plat_dat)
+>   	dev_dbg(dwmac->dev, "Mode %s", phy_modes(plat_dat->mac_interface));
+>   
+>   	return regmap_update_bits(dwmac->regmap, reg,
+> -				 dwmac->ops->syscfg_eth_mask, val << 23);
+> +				 SYSCFG_MCU_ETH_MASK, val << 23);
+>   }
+>   
+>   static void stm32_dwmac_clk_disable(struct stm32_dwmac *dwmac, bool suspend)
+> @@ -348,8 +360,15 @@ static int stm32_dwmac_parse_data(struct stm32_dwmac *dwmac,
+>   		return PTR_ERR(dwmac->regmap);
+>   
+>   	err = of_property_read_u32_index(np, "st,syscon", 1, &dwmac->mode_reg);
+> -	if (err)
+> +	if (err) {
+>   		dev_err(dev, "Can't get sysconfig mode offset (%d)\n", err);
 
-I'm less hard on this. As long as reasonable open userspace exists I
-think it is fine to let other stuff through too. I can appreciate the
-DRM stance on this, but IMHO, there is meaningfully more value for open
-source in trying get an open Vulkan implementation vs blocking users
-from reading their vendor'd diagnostic SI values.
+Shouldn't we decrement the refcount of np (‎of_node_put‎) before 
+returning from this point?
 
-I don't think we should get into some kind of extremism and insist
-that every single bit must be documented/standardized or Linux won't
-support it.
+> +		return err;
+> +	}
+> +
+> +	dwmac->mode_mask = SYSCFG_MP1_ETH_MASK;
+> +	err = of_property_read_u32_index(np, "st,syscon", 2, &dwmac->mode_mask);
+> +	if (err)
+> +		pr_debug("Warning sysconfig register mask not set\n");
+>   
+>   	return err;
+>   }
+> @@ -361,6 +380,8 @@ static int stm32mp1_parse_data(struct stm32_dwmac *dwmac,
+>   	struct device_node *np = dev->of_node;
+>   	int err = 0;
+>   
+> +	dwmac->is_mp13 = of_device_is_compatible(np, "st,stm32mp13-dwmac");
+> +
+>   	/* Ethernet PHY have no crystal */
+>   	dwmac->ext_phyclk = of_property_read_bool(np, "st,ext-phyclk");
+>   
+> @@ -540,8 +561,7 @@ static SIMPLE_DEV_PM_OPS(stm32_dwmac_pm_ops,
+>   	stm32_dwmac_suspend, stm32_dwmac_resume);
+>   
+>   static struct stm32_ops stm32mcu_dwmac_data = {
+> -	.set_mode = stm32mcu_set_mode,
+> -	.syscfg_eth_mask = SYSCFG_MCU_ETH_MASK
+> +	.set_mode = stm32mcu_set_mode
+>   };
+>   
+>   static struct stm32_ops stm32mp1_dwmac_data = {
+> @@ -549,13 +569,23 @@ static struct stm32_ops stm32mp1_dwmac_data = {
+>   	.suspend = stm32mp1_suspend,
+>   	.resume = stm32mp1_resume,
+>   	.parse_data = stm32mp1_parse_data,
+> -	.syscfg_eth_mask = SYSCFG_MP1_ETH_MASK,
+> +	.syscfg_clr_off = 0x44,
+> +	.clk_rx_enable_in_suspend = true
+> +};
+> +
+> +static struct stm32_ops stm32mp13_dwmac_data = {
+> +	.set_mode = stm32mp1_set_mode,
+> +	.suspend = stm32mp1_suspend,
+> +	.resume = stm32mp1_resume,
+> +	.parse_data = stm32mp1_parse_data,
+> +	.syscfg_clr_off = 0x08,
+>   	.clk_rx_enable_in_suspend = true
+>   };
+>   
+>   static const struct of_device_id stm32_dwmac_match[] = {
+>   	{ .compatible = "st,stm32-dwmac", .data = &stm32mcu_dwmac_data},
+>   	{ .compatible = "st,stm32mp1-dwmac", .data = &stm32mp1_dwmac_data},
+> +	{ .compatible = "st,stm32mp13-dwmac", .data = &stm32mp13_dwmac_data},
+>   	{ }
+>   };
+>   MODULE_DEVICE_TABLE(of, stm32_dwmac_match);
 
-This is why I envision fwctl as not being suitable for actual
-datapath/performance stuff.
-
-> * Collaboration: open standards support open driver maintenance.
-> 
->   Without standards we end up with awkward situations like Confidential
->   Computing where every vendor races to implement the same functionality
->   in arbitrarily different and vendor specific ways.
-
-Standard are important. Linux is not a standards body. Linux
-maintainers can only advise, not force, the industry to make
-standards. At a certain point Linux's job is to implement software to
-support what people have built. CC is a sad example where the industry
-did not get together enough, but still Linux will support the CC mess.
-
->   For CXL devices, and I believe the devices fwctl is targeting, there
->   are a whole class of commands for vendor specific configuration and
->   debug. Commands that the kernel really need not worry about.
-
-Right.
-
->   Some subsystems may want to allow high-performance science experiments
->   like what NVMe allows, but it seems worth asking the question if
->   standardizing device configuration and debug is really the best use of
->   upstream's limited time?
-
-From what I've been seeing it looks like a significant waste of
-time. For example there is minimal industry value in standardizing
-values stored in a device's boot time flash configuration. If some
-common software wants to access really generic configuration (like
-SRIOV enable) then sure there is merit, but that is really the
-minority.
-
-Jason
 
