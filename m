@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-100919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1532E8FC882
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 12:00:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B8828FC886
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 12:00:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AF6B282945
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 10:00:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF36D283784
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 10:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCAB18FDC3;
-	Wed,  5 Jun 2024 10:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E3A8190060;
+	Wed,  5 Jun 2024 10:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eeEhkQmI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eAAcd3H6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8594014BF85;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C7618FDDF;
 	Wed,  5 Jun 2024 10:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717581630; cv=none; b=XyU6wShn4YhJKAEYSYEQMl4yJUiTldd/Z/tCdr8VQuIpjTnrfXfkoqWYTg5QYrlxQq5brOD6bUGsT7b8Ir1PEg1+v+1HkuHWTl0Vxlt8Q3Ne4BJjhxM/S8eyv1fIs63+FrQlaUpcVwxEyeUwUYIkN5LN+mgc5R1vCc2xHs9JCmY=
+	t=1717581631; cv=none; b=ULHEjva4RNcqTvcuxn3eu3Liss3xQBeRrlZr0nkV9NQrr0Uq2vXrWKV/jM2QGjsd2EIWH2p0thILT9vS0T+cB5Ho8coyN0+jKc+DdzyVCsN2gCiH1yuTUNfT/t+YWX0uSVvlynGwJ4FZEaT03QezKu0O1tBHkOuUyYRQiIn6qhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717581630; c=relaxed/simple;
-	bh=qEGyT6i+dRnLZnMaKTAai7WVDQG00yIrKd8CMJQM+4U=;
+	s=arc-20240116; t=1717581631; c=relaxed/simple;
+	bh=V+FMW2fJa+68pVpNJIzkd3aueJVnJyq2tJ1HMpHrUW0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PA9phTxD0YgGohBW33LpjIeXPRGAg9JjMP7y4IiqgYOd745rJckqFNNhGKhwfihifHlAmlxHd1YWZRJIEQTIVFi1EFVLSSD83PkKGeiKZnIcs4TLwJ8oRheorCs+64hofgY82zq2sFFqe99l9f+709cIKrqV2BNNiXT/e1KtOC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eeEhkQmI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 04FD0C4AF08;
+	 In-Reply-To:To:Cc; b=HVTwwYbtMtIKdqITSctJ9+WTf2u0Y7bEQr12WW7O1WPWH+t6WjY4V7MKnqZNWtD6d6rtkWB1VUw1HzkoiKTVwCksMZBADS0wzCxqo5Z0NmXZE8OdFTXD7UpJbMyx+pN4osWTHkj7lsI8QX9RQXDXBuuVjcDV6VCpNIx4REwwZEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eAAcd3H6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8EBFCC4AF0A;
 	Wed,  5 Jun 2024 10:00:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1717581630;
-	bh=qEGyT6i+dRnLZnMaKTAai7WVDQG00yIrKd8CMJQM+4U=;
+	bh=V+FMW2fJa+68pVpNJIzkd3aueJVnJyq2tJ1HMpHrUW0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eeEhkQmI0IOUwKA0B/Wqyiap5jP+dC8gyc5i6R9xqNauMNPZ9KOlSWheflIWAdbfS
-	 iY0xYiovV2oBEVvyuS0jrtzFmAdGKVRpiYiMnPhvFFZSpae/krss6FLC20phTRDLGf
-	 y/snhNOz+W/gNeWAG3mRG65dtPCil1B8/LwQBz+rdEn528Vu7Oh3AvArbEVTbFFGn1
-	 q3GFmVLsStiwur8COlrL4qvRUa2Dvp56X/Y8to7EGbQnvr6UnN/GUlr3UB8Ofvhi+L
-	 SoUsdFEdjpgGKzRjRnnv1JJzqGEaQXaSHAcD8+kLPfwG7PoDUNvvJUhbgn/KKKZCMm
-	 AtP8eSE/Qje5A==
+	b=eAAcd3H6m47M0Weu2LNlupm8Jg8BKkPkHN9CyIV4JZ/0+dJMFjuI6ZBvCsClAPjJB
+	 /kNm9/jtC8Vx/eLAu3fXtX3Q1g/rnDATBSpELIr45XPQcm024Gwt4nSAScxNQOKloe
+	 nstDH9hlrrx9JuzhD4gWQOU/3LyXkMHo+slX11wjTksdTXCXR8i1y+jmQ7/GMJPlX1
+	 CNPaWremPNmKgypEGe6AG8uW1TzJUNXLfGecSJAmHbHbCCgjB9SaKmvSFUaL++CGuS
+	 aoQ1W7eoEXYdS23MTTSwJmF/qIp7gX3yYTRnE03Hk/kDJThGEp5KnZ0JW8uSA0LUlK
+	 KemGf+PLYRs9w==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EC828D3E996;
-	Wed,  5 Jun 2024 10:00:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 76B0BC4332C;
+	Wed,  5 Jun 2024 10:00:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: hsr: add missing config for CONFIG_BRIDGE
+Subject: Re: [PATCH v2 net] vxlan: Fix regression when dropping packets due to
+ invalid src addresses
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171758162996.24633.7399954746442463223.git-patchwork-notify@kernel.org>
-Date: Wed, 05 Jun 2024 10:00:29 +0000
-References: <20240603093019.2125266-1-liuhangbin@gmail.com>
-In-Reply-To: <20240603093019.2125266-1-liuhangbin@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, lukma@denx.de,
- linux-kselftest@vger.kernel.org
+ <171758163048.24633.17235199662445713297.git-patchwork-notify@kernel.org>
+Date: Wed, 05 Jun 2024 10:00:30 +0000
+References: <20240603085926.7918-1-daniel@iogearbox.net>
+In-Reply-To: <20240603085926.7918-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, mail@david-bauer.net,
+ idosch@nvidia.com, razor@blackwall.org, martin.lau@kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Mon,  3 Jun 2024 17:30:19 +0800 you wrote:
-> hsr_redbox.sh test need to create bridge for testing. Add the missing
-> config CONFIG_BRIDGE in config file.
+On Mon,  3 Jun 2024 10:59:26 +0200 you wrote:
+> Commit f58f45c1e5b9 ("vxlan: drop packets from invalid src-address")
+> has recently been added to vxlan mainly in the context of source
+> address snooping/learning so that when it is enabled, an entry in the
+> FDB is not being created for an invalid address for the corresponding
+> tunnel endpoint.
 > 
-> Fixes: eafbf0574e05 ("test: hsr: Extend the hsr_redbox.sh to have more SAN devices connected")
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->  tools/testing/selftests/net/hsr/config | 1 +
->  1 file changed, 1 insertion(+)
+> Before commit f58f45c1e5b9 vxlan was similarly behaving as geneve in
+> that it passed through whichever macs were set in the L2 header. It
+> turns out that this change in behavior breaks setups, for example,
+> Cilium with netkit in L3 mode for Pods as well as tunnel mode has been
+> passing before the change in f58f45c1e5b9 for both vxlan and geneve.
+> After mentioned change it is only passing for geneve as in case of
+> vxlan packets are dropped due to vxlan_set_mac() returning false as
+> source and destination macs are zero which for E/W traffic via tunnel
+> is totally fine.
+> 
+> [...]
 
 Here is the summary with links:
-  - [net] selftests: hsr: add missing config for CONFIG_BRIDGE
-    https://git.kernel.org/netdev/net/c/712115a24b1a
+  - [v2,net] vxlan: Fix regression when dropping packets due to invalid src addresses
+    https://git.kernel.org/netdev/net/c/1cd4bc987abb
 
 You are awesome, thank you!
 -- 
