@@ -1,199 +1,157 @@
-Return-Path: <netdev+bounces-101083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD08D8FD3BB
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 19:16:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB39A8FD3BE
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 19:19:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B26411C22212
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 17:16:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D137B23E03
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 17:18:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E7B425777;
-	Wed,  5 Jun 2024 17:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LF+ioGQ9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353D769D31;
+	Wed,  5 Jun 2024 17:18:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A61717BCB
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 17:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01D479DE;
+	Wed,  5 Jun 2024 17:18:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717607806; cv=none; b=kRZZ1xqmmfZwMJateDRqhnvZ+muV26oAvEvdduq8E/a468Mp9/e0evGnCmty9tsDY0eeOAcDU2IlxP8getigzmCHez6psyK9cQxPIegPR/tnfpvKRTy1zRUwSPjSGQvnNPAO8f02ZK5AdBgKleQTGy9/21vPsl/fX7XjU3tKPF0=
+	t=1717607932; cv=none; b=E72XI37a8O+5tRSh63rTS32pbTxk0aYqCwBjyCdCkKIo8lRwHEVF1pkibRBTl0Kds2I5jo8bMYwWF4FVoMO6C/HM2UOZwi8ezFiPaFu1GycrDqAetbCespXW3HSjir35yV7CvrB+zDOJKA4Wjc+rO5mD+ngUzIKS+7HDlV0crZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717607806; c=relaxed/simple;
-	bh=5orS7KFEABzG/pK5IWz8CzBAOlUZhOHLIrkRzh53WJA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YwzilLTExQhXjJ/NoI7s9JuOT/l9/PU3HgOoanNSyZ2jp/bLbW1Zp3hdeoVkFNMww+jdmvW2UyLFYMiZWwgCdEy1PhojnwxJJBp8jVIlpjqznZqJyy12uiaOwR9Y5VuZgsYzZtV+qOdKAVmnGOfUZxsvCPaLIetu0oeGq2WLZVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LF+ioGQ9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C150C2BD11;
-	Wed,  5 Jun 2024 17:16:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717607805;
-	bh=5orS7KFEABzG/pK5IWz8CzBAOlUZhOHLIrkRzh53WJA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=LF+ioGQ9VSLwFX/uL7aYFUt0qfKjfo7fW1QqVG3aQGrJjmOmuDS9zwO7sbZahOIcZ
-	 Dkmei+JUoTEH37vu5JvRLW8SSVUwv1olXAahQjg1eRrtVMofgL0rjvxxkoEZhN67TW
-	 z7uEvMxQP6njCDyhgLN9APpAf9OTZrVTL3SgDREw3TLAKAoQ3kZguw83lLeJL4Ywy7
-	 rdUV2761lwxHAsjrm42f6kK93Rzd96UgWw6FMbmkQlBc1LgQT9sMzjORCtHwa1/2uR
-	 qhEmOJnvtxwrkfeQ+Ci8DgBMJp9HxD9OczclT98UdOoOm11OeQeTH2QTbgk0E1wumM
-	 BVH3r5gCMdAyw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Dan Melnic <dmm@meta.com>,
-	donald.hunter@gmail.com,
-	nicolas.dichtel@6wind.com
-Subject: [PATCH net-next] tools: ynl: make user space policies const
-Date: Wed,  5 Jun 2024 10:16:44 -0700
-Message-ID: <20240605171644.1638533-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1717607932; c=relaxed/simple;
+	bh=CfOaJg5zpEDxXsvOH7x53ahefWZN6KU6Mu/FJ8+Hmjw=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=tsgnMawKfX5dskO9YPQeLRJmJyslkK8zLJw1A8u3bXoCftUY9ra2hg7NyZe1XdBOKU/cpWPw33efSIYJDjfR/yWhpTOIPZYBXWunJ6AoBkm35vNWfSuIe1QjCU3TqDmyQv1gm5PLSqyplXY/Ov7SSz+/GmdgLJna4aMxQynd324=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (31.173.84.195) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 5 Jun
+ 2024 20:18:38 +0300
+Subject: Re: [net-next PATCH v4 7/7] net: ravb: Allocate RX buffers via page
+ pool
+To: Paul Barker <paul.barker.ct@bp.renesas.com>, Simon Horman
+	<horms@kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, =?UTF-8?Q?Niklas_S=c3=b6derlund?=
+	<niklas.soderlund+renesas@ragnatech.se>, Biju Das
+	<biju.das.jz@bp.renesas.com>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
+	<yoshihiro.shimoda.uh@renesas.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240528150339.6791-1-paul.barker.ct@bp.renesas.com>
+ <20240528150339.6791-8-paul.barker.ct@bp.renesas.com>
+ <20240601101300.GA491852@kernel.org>
+ <6165a9a3-15ec-4a40-901a-17c2be64daf1@bp.renesas.com>
+ <20240603120757.GX491852@kernel.org>
+ <3eeff8ed-231c-4810-ba99-371524db2f90@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <444f035e-cd07-842d-aacd-b8f720c172da@omp.ru>
+Date: Wed, 5 Jun 2024 20:18:38 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <3eeff8ed-231c-4810-ba99-371524db2f90@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 06/05/2024 16:56:56
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 185750 [Jun 05 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 20 0.3.20
+ 743589a8af6ec90b529f2124c2bbfc3ce1d2f20f
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.195 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	31.173.84.195:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;www.kernel.org:7.1.1;127.0.0.199:7.1.2;patchwork.kernel.org:7.1.1;omp.ru:7.1.1;lore.kernel.org:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.84.195
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 06/05/2024 17:00:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 6/5/2024 11:45:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Dan, who's working on C++ YNL, pointed out that the C code
-does not make policies const. Sprinkle some 'const's around.
+On 6/3/24 3:15 PM, Paul Barker wrote:
+[...]
 
-Reported-by: Dan Melnic <dmm@meta.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: donald.hunter@gmail.com
-CC: nicolas.dichtel@6wind.com
----
- tools/net/ynl/lib/ynl-priv.h |  8 ++++----
- tools/net/ynl/lib/ynl.c      | 10 +++++-----
- tools/net/ynl/lib/ynl.h      |  2 +-
- tools/net/ynl/ynl-gen-c.py   |  6 +++---
- 4 files changed, 13 insertions(+), 13 deletions(-)
+>>>>> @@ -298,13 +269,14 @@ static void ravb_ring_free(struct net_device *ndev, int q)
+>>>>>  		priv->tx_ring[q] = NULL;
+>>>>>  	}
+>>>>>  
+>>>>> -	/* Free RX skb ringbuffer */
+>>>>> -	if (priv->rx_skb[q]) {
+>>>>> -		for (i = 0; i < priv->num_rx_ring[q]; i++)
+>>>>> -			dev_kfree_skb(priv->rx_skb[q][i]);
+>>>>> +	/* Free RX buffers */
+>>>>> +	for (i = 0; i < priv->num_rx_ring[q]; i++) {
+>>>>> +		if (priv->rx_buffers[q][i].page)
+>>>>> +			page_pool_put_page(priv->rx_pool[q], priv->rx_buffers[q][i].page, 0, true);
+>>>>
+>>>> nit: Networking still prefers code to be 80 columns wide or less.
+>>>>      It looks like that can be trivially achieved here.
+>>>>
+>>>>      Flagged by checkpatch.pl --max-line-length=80
+>>>
+>>> Sergey has asked me to wrap to 100 cols [1]. I can only find a reference
+>>> to 80 in the docs though [2], so I guess you may be right.
+>>>
+>>> [1]: https://lore.kernel.org/all/611a49b8-ecdb-6b91-9d3e-262bf3851f5b@omp.ru/
+>>> [2]: https://www.kernel.org/doc/html/latest/process/coding-style.html
+>>
+>> Hi Paul,
+>>
+>> If Sergey prefers 100 then I won't argue :)
+>>
+>> FWIIW, think what has happened here relates to the Kernel, at some point,
+>> going from 80 to 100 columns as the preferred maximum width, while Networking
+>> stuck with 80.
+> 
+> I saw that netdevbpf patchwork is configured for 80 cols and it has
+> warnings for v4 of this patch [1], so I've already re-wrapped the
+> changes in this series to 80 cols (excluding a couple of lines where
+> using slightly more than 80 cols significantly improves readability).
+> I'm planning to send that in the next hour or so, assuming my tests
+> pass.
+> 
+> [1]: https://patchwork.kernel.org/project/netdevbpf/patch/20240528150339.6791-8-paul.barker.ct@bp.renesas.com/
 
-diff --git a/tools/net/ynl/lib/ynl-priv.h b/tools/net/ynl/lib/ynl-priv.h
-index 80791c34730c..3c09a7bbfba5 100644
---- a/tools/net/ynl/lib/ynl-priv.h
-+++ b/tools/net/ynl/lib/ynl-priv.h
-@@ -45,17 +45,17 @@ struct ynl_policy_attr {
- 	enum ynl_policy_type type;
- 	unsigned int len;
- 	const char *name;
--	struct ynl_policy_nest *nest;
-+	const struct ynl_policy_nest *nest;
- };
- 
- struct ynl_policy_nest {
- 	unsigned int max_attr;
--	struct ynl_policy_attr *table;
-+	const struct ynl_policy_attr *table;
- };
- 
- struct ynl_parse_arg {
- 	struct ynl_sock *ys;
--	struct ynl_policy_nest *rsp_policy;
-+	const struct ynl_policy_nest *rsp_policy;
- 	void *data;
- };
- 
-@@ -119,7 +119,7 @@ struct ynl_dump_state {
- };
- 
- struct ynl_ntf_info {
--	struct ynl_policy_nest *policy;
-+	const struct ynl_policy_nest *policy;
- 	ynl_parse_cb_t cb;
- 	size_t alloc_sz;
- 	void (*free)(struct ynl_ntf_base_type *ntf);
-diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
-index 4b9c091fc86b..fcb18a5a6d70 100644
---- a/tools/net/ynl/lib/ynl.c
-+++ b/tools/net/ynl/lib/ynl.c
-@@ -46,7 +46,7 @@
- 
- /* -- Netlink boiler plate */
- static int
--ynl_err_walk_report_one(struct ynl_policy_nest *policy, unsigned int type,
-+ynl_err_walk_report_one(const struct ynl_policy_nest *policy, unsigned int type,
- 			char *str, int str_sz, int *n)
- {
- 	if (!policy) {
-@@ -75,8 +75,8 @@ ynl_err_walk_report_one(struct ynl_policy_nest *policy, unsigned int type,
- 
- static int
- ynl_err_walk(struct ynl_sock *ys, void *start, void *end, unsigned int off,
--	     struct ynl_policy_nest *policy, char *str, int str_sz,
--	     struct ynl_policy_nest **nest_pol)
-+	     const struct ynl_policy_nest *policy, char *str, int str_sz,
-+	     const struct ynl_policy_nest **nest_pol)
- {
- 	unsigned int astart_off, aend_off;
- 	const struct nlattr *attr;
-@@ -206,7 +206,7 @@ ynl_ext_ack_check(struct ynl_sock *ys, const struct nlmsghdr *nlh,
- 		bad_attr[n] = '\0';
- 	}
- 	if (tb[NLMSGERR_ATTR_MISS_TYPE]) {
--		struct ynl_policy_nest *nest_pol = NULL;
-+		const struct ynl_policy_nest *nest_pol = NULL;
- 		unsigned int n, off, type;
- 		void *start, *end;
- 		int n2;
-@@ -296,7 +296,7 @@ static int ynl_cb_done(const struct nlmsghdr *nlh, struct ynl_parse_arg *yarg)
- 
- int ynl_attr_validate(struct ynl_parse_arg *yarg, const struct nlattr *attr)
- {
--	struct ynl_policy_attr *policy;
-+	const struct ynl_policy_attr *policy;
- 	unsigned int type, len;
- 	unsigned char *data;
- 
-diff --git a/tools/net/ynl/lib/ynl.h b/tools/net/ynl/lib/ynl.h
-index eef7c6324ed4..6cd570b283ea 100644
---- a/tools/net/ynl/lib/ynl.h
-+++ b/tools/net/ynl/lib/ynl.h
-@@ -76,7 +76,7 @@ struct ynl_sock {
- 	struct ynl_ntf_base_type **ntf_last_next;
- 
- 	struct nlmsghdr *nlh;
--	struct ynl_policy_nest *req_policy;
-+	const struct ynl_policy_nest *req_policy;
- 	unsigned char *tx_buf;
- 	unsigned char *rx_buf;
- 	unsigned char raw_buf[];
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index a42d62b23ee0..374ca5e86e24 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -1507,12 +1507,12 @@ _C_KW = {
- 
- 
- def put_typol_fwd(cw, struct):
--    cw.p(f'extern struct ynl_policy_nest {struct.render_name}_nest;')
-+    cw.p(f'extern const struct ynl_policy_nest {struct.render_name}_nest;')
- 
- 
- def put_typol(cw, struct):
-     type_max = struct.attr_set.max_name
--    cw.block_start(line=f'struct ynl_policy_attr {struct.render_name}_policy[{type_max} + 1] =')
-+    cw.block_start(line=f'const struct ynl_policy_attr {struct.render_name}_policy[{type_max} + 1] =')
- 
-     for _, arg in struct.member_list():
-         arg.attr_typol(cw)
-@@ -1520,7 +1520,7 @@ _C_KW = {
-     cw.block_end(line=';')
-     cw.nl()
- 
--    cw.block_start(line=f'struct ynl_policy_nest {struct.render_name}_nest =')
-+    cw.block_start(line=f'const struct ynl_policy_nest {struct.render_name}_nest =')
-     cw.p(f'.max_attr = {type_max},')
-     cw.p(f'.table = {struct.render_name}_policy,')
-     cw.block_end(line=';')
--- 
-2.45.2
+   Sorry for misinforming you about 100 coulmns -- I had no idea netdev stuck
+to 80! :-)
 
+MBR, Sergey
 
