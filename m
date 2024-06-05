@@ -1,141 +1,103 @@
-Return-Path: <netdev+bounces-100926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80B6A8FC8BC
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 12:14:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D6DD78FC8C9
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 12:19:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D1051C20D84
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 10:14:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 098B91C21069
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 10:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5DAA18FDD7;
-	Wed,  5 Jun 2024 10:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE3C118FDDF;
+	Wed,  5 Jun 2024 10:19:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VfRHUZaA"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="w/vYexpZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5DA18FDC7
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 10:14:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51411946D5;
+	Wed,  5 Jun 2024 10:19:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717582477; cv=none; b=TRfrzg0+OEeMVEkLlloQLA8qFh9tcZQ2uf5DH+HreCuskjTFIYAMF8MhLjC/6N7zcXFi1Cbw1hXgU7bDd9Bzv4A0+lDMY/bndzfuaIYZ9+njh4ES64pvRHuS96nL6SBRvYfQnsQNBZwCpafKSkfi1UkmXbSTd6bxSu97+Q7WKQo=
+	t=1717582752; cv=none; b=dQSxav63ONYbd4rw3bB7/VFhJftL+PvhUdyJSuxiR+QQw42r7skyGm2i2Mr4Grynq1TpVUnCq13O5LvlpcHDid0nHFHQbjmNdXnRBIOE0hDuPFe3adWbfiDP34sdmmgXitjRLa7isP9BRl9Wq9N9ZTEYC91aztaDjWlMgWasJkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717582477; c=relaxed/simple;
-	bh=dyiu2jygZrrqEGYMOcxmE3p7uU2WBH9y3OBKX+yK/FA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iLYzEHAn1PVMkBc+x9MCR3urrfTgJZFUFg/0W4X/jtHRltCnN3ObafGjEvZBy5IvPvjpy7AYuwWyfd/WOecHTiqlnGP5K/hGREbHgsExTRAYEgZryTx1YIor3YzWTH6rTe9Hfzkfbbz31mCmmoRHv1ZhfDc7HKhgABoG+yC3L6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VfRHUZaA; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: gregkh@linuxfoundation.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1717582473;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PYrcYoOYU12n4o4UT6LL7Mri1GOEVpQDhK2VAJFdRGc=;
-	b=VfRHUZaABjFjbKbu6DW7PkvNCIy6N3DtqJ/UesXHbQvFpcpTxDfTdwyFm1UUQfyKY9IEx0
-	vm+RelIu7XbPpg7rnxWCghbXXPERBPC6gOr27Odf00MCQRYaLz8bO3+JoEr+Pbh3MkWNzE
-	EaFujBC1eq6Kv0MyX2Bk5fEJ5hUZEkg=
-X-Envelope-To: kuba@kernel.org
-X-Envelope-To: jirislaby@kernel.org
-X-Envelope-To: jonathan.lemon@gmail.com
-X-Envelope-To: linux-serial@vger.kernel.org
-X-Envelope-To: netdev@vger.kernel.org
-Message-ID: <cbcf7cbb-809f-47f8-bd98-e140875bc2d1@linux.dev>
-Date: Wed, 5 Jun 2024 11:14:28 +0100
+	s=arc-20240116; t=1717582752; c=relaxed/simple;
+	bh=IcBGzd2i5NFVkQBmEfgL5JoXdygRuf51+9PaFU0XsSo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GVQMpwQ0BtusDR6Iwbsrf/VaXs9V6sf31ko3jiRaxj7tKDDE31Lx25BxzlrG8ZMBYN+APq9FdE1asDDefYM3s8N5UWNgVfsLgHk7wpNSOGEnIduiB/n5A1THdSDuxtFIhePgLNPDrxfQxnOOezLHuhjOFUpU0VD6+CIXiC6GYZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=w/vYexpZ; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1717582750; x=1749118750;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=IcBGzd2i5NFVkQBmEfgL5JoXdygRuf51+9PaFU0XsSo=;
+  b=w/vYexpZ7CtbN5MUSAVugJKW1MUghTcKhnwa5yzWTKJc7XgEnxuDLB+p
+   2Vp06hb919w+AuqdS7VDN7VRjCndUK+jWaF+K1KJD7LTK9ncWqMi3EUoc
+   co9DFW8UgrciHGPUkDXbCOJnJX8fMNWseC5OpgoCSo25XZEDH+xnHw1Eu
+   XDECI0+nrYROZQhVloVG3EO2nb+j8BjIpio21KjA60xHaanSspBwNqzpQ
+   sIM1xCCtkc+xSTgMdaXjsZ//9qn1KHPgXGuLmR3L25I7Aw4JPUErZDaS0
+   0LCyfqkw5WYVyJroZa6Y2ZEwsLyJ5l2YWkixxG68sxLCikV+PIXJ8BsT5
+   g==;
+X-CSE-ConnectionGUID: t/O8Z945TGity0AczrxMxw==
+X-CSE-MsgGUID: UybH7n7aSKGF62NtQNBxuQ==
+X-IronPort-AV: E=Sophos;i="6.08,216,1712646000"; 
+   d="scan'208";a="29396149"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Jun 2024 03:19:04 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 5 Jun 2024 03:19:00 -0700
+Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 5 Jun 2024 03:18:56 -0700
+From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<bryan.whitehead@microchip.com>, <andrew@lunn.ch>, <linux@armlinux.org.uk>,
+	<sbauer@blackbox.su>, <hmehrtens@maxlinear.com>, <lxu@maxlinear.com>,
+	<hkallweit1@gmail.com>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<UNGLinuxDriver@microchip.com>
+Subject: [PATCH net V3 0/3] net: lan743x: Fixes for multiple WOL related issues
+Date: Wed, 5 Jun 2024 15:46:08 +0530
+Message-ID: <20240605101611.18791-1-Raju.Lakkaraju@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 net] ptp: ocp: adjust serial port symlink creation
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jiri Slaby <jirislaby@kernel.org>,
- Jonathan Lemon <jonathan.lemon@gmail.com>, linux-serial@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240510110405.15115-1-vadim.fedorenko@linux.dev>
- <2024051046-decimeter-devotee-076a@gregkh>
- <cf74065c-7b68-48d8-b1af-b18ab413f732@linux.dev>
- <2024060428-childcare-clunky-067c@gregkh>
- <d59e00e1-d390-4140-b34f-58eaf13baee7@linux.dev>
- <2024060505-expose-crouch-00b1@gregkh>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <2024060505-expose-crouch-00b1@gregkh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On 05/06/2024 11:05, Greg Kroah-Hartman wrote:
-> On Wed, Jun 05, 2024 at 12:53:13AM +0100, Vadim Fedorenko wrote:
->> On 04/06/2024 12:50, Greg Kroah-Hartman wrote:
->>> On Wed, May 22, 2024 at 01:39:21PM +0100, Vadim Fedorenko wrote:
->>>> On 10/05/2024 12:13, Greg Kroah-Hartman wrote:
->>>>> On Fri, May 10, 2024 at 11:04:05AM +0000, Vadim Fedorenko wrote:
->>>>>> The commit b286f4e87e32 ("serial: core: Move tty and serdev to be children
->>>>>> of serial core port device") changed the hierarchy of serial port devices
->>>>>> and device_find_child_by_name cannot find ttyS* devices because they are
->>>>>> no longer directly attached. Add some logic to restore symlinks creation
->>>>>> to the driver for OCP TimeCard.
->>>>>>
->>>>>> Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be children of serial core port device")
->>>>>> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->>>>>> ---
->>>>>> v2:
->>>>>>     add serial/8250 maintainers
->>>>>> ---
->>>>>>     drivers/ptp/ptp_ocp.c | 30 +++++++++++++++++++++---------
->>>>>>     1 file changed, 21 insertions(+), 9 deletions(-)
->>>>>
->>>>> Hi,
->>>>>
->>>>> This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
->>>>> a patch that has triggered this response.  He used to manually respond
->>>>> to these common problems, but in order to save his sanity (he kept
->>>>> writing the same thing over and over, yet to different people), I was
->>>>> created.  Hopefully you will not take offence and will fix the problem
->>>>> in your patch and resubmit it so that it can be accepted into the Linux
->>>>> kernel tree.
->>>>>
->>>>> You are receiving this message because of the following common error(s)
->>>>> as indicated below:
->>>>>
->>>>> - You have marked a patch with a "Fixes:" tag for a commit that is in an
->>>>>      older released kernel, yet you do not have a cc: stable line in the
->>>>>      signed-off-by area at all, which means that the patch will not be
->>>>>      applied to any older kernel releases.  To properly fix this, please
->>>>>      follow the documented rules in the
->>>>>      Documentation/process/stable-kernel-rules.rst file for how to resolve
->>>>>      this.
->>>>>
->>>>> If you wish to discuss this problem further, or you have questions about
->>>>> how to resolve this issue, please feel free to respond to this email and
->>>>> Greg will reply once he has dug out from the pending patches received
->>>>> from other developers.
->>>>
->>>> Hi Greg!
->>>>
->>>> Just gentle ping, I'm still looking for better solution for serial
->>>> device lookup in TimeCard driver.
->>>
->>> See my comment on the other patch in this thread.
->>>
->>> In short, you shouldn't need to do any of this.
->>
->> Got it, thanks. I'll try to find another way.
-> 
-> Wait, no, please just remove all that, it should not be needed at all.
+This patch series implement the following fixes:
+1. Disable WOL upon resume in order to restore full data path operation
+2. Support WOL at both the PHY and MAC appropriately 
+3. Remove interrupt mask clearing from config_init 
 
-Do you mean remove symlinks from the driver? We have open-source
-user-space software which relies on them to discover proper devices. If
-I remove symlinks it will break the software.
+Patch-3 was sent seperately earlier. Review comments in link: 
+https://lore.kernel.org/lkml/4a565d54-f468-4e32-8a2c-102c1203f72c@lunn.ch/T/
+
+Raju Lakkaraju (3):
+  net: lan743x: disable WOL upon resume to restore full data path
+    operation
+  net: lan743x: Support WOL at both the PHY and MAC appropriately
+  net: phy: mxl-gpy: Remove interrupt mask clearing from config_init
+
+ .../net/ethernet/microchip/lan743x_ethtool.c  | 44 ++++++++++++--
+ drivers/net/ethernet/microchip/lan743x_main.c | 46 ++++++++++++---
+ drivers/net/ethernet/microchip/lan743x_main.h | 28 +++++++++
+ drivers/net/phy/mxl-gpy.c                     | 58 ++++++++++++-------
+ 4 files changed, 144 insertions(+), 32 deletions(-)
+
+-- 
+2.34.1
 
 
