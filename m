@@ -1,238 +1,174 @@
-Return-Path: <netdev+bounces-100930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BED458FC8CF
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 12:20:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C45E38FC8D4
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 12:20:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68DC3282A1D
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 10:20:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43B6F1F21A5E
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 10:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D21619006D;
-	Wed,  5 Jun 2024 10:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72039190071;
+	Wed,  5 Jun 2024 10:20:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="aLxkiVqR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LO46pJCT"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B2D18FDDF;
-	Wed,  5 Jun 2024 10:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96F61946D5
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 10:20:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717582799; cv=none; b=sSgTBHWwC4M9OuVBdFzFQAnsWULSwxXAjo5re/+zgYGMdLJmL1vT0gGQ33l9OGdchoNR+hlE6rLoWGh/G6cPF/gJ8I1XDt95lRPHVt8e3KeOQeCFZ1WF6dZPl8LKOZMFsMirT3z+Rl19SFBHmrkNUIdTStNAAuN9ihks83eqkU4=
+	t=1717582843; cv=none; b=R7W06j/FyXGEwIOtl5CmZ7XeUGWuXPEwakcewAU9oRvuGYPNCBS+WXmKu7N/e3J8kbpMMfWgNM6HGGD1TPUhW0ZoE19VyTGD0+/ilVJ2IV61t0SMeIMIOM27MG7RRWHKxY1+r0iFYNP7DijijVz7uLyOkOnj5Srcz0KA/0QjmpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717582799; c=relaxed/simple;
-	bh=fvulcT5ydE4/+fPHuMlny3YejOv9UJqzp3ZviFsjn4U=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BC6v5HS6QWfzDjhk0gV5Ff+zMll8HZpVBjoHGsApYqRcMWT7jZG0ERQSQ81XjGq1ncZd8l9bkdIYf1q42D3rAgMPQ+r6hp4TWFCfQWdcDq6nLTSYGiFb9JOAK9rdgCRm0jA60F9o7kPtTgtnaDoIh8Nw98/mqYo2Ln0No2n0OE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=aLxkiVqR; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1717582797; x=1749118797;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=fvulcT5ydE4/+fPHuMlny3YejOv9UJqzp3ZviFsjn4U=;
-  b=aLxkiVqRHLvT/CZlBT95XCWT3RCpn07So/34j+pVepSAh7pYojWKnNyc
-   KdSvWmRMUnZDK4w4uCLsnhnH9DsHWEfTFldgc1XnY7dzI/Ru+0Xp7IFhU
-   5YRqDl6D7bFmH1p3iP3i7PwSuM0+4JHKn9WIH1V0qc3CxOK5lFWnCQA/9
-   56CRBV7r7aZnLCPBwYE2qVJibZlnLhCT2cDMq7mJsbr/woTpwDYO0DKVV
-   7GSoFM2oIh3ztwvUvCn38j3NwdDrALSi6EGxbunFZAtjEx2zPXgjvZSbK
-   iTNoQvpk3mBqX6K7YSPShM25NoeBJIKsJ4jVnfKqXkxsNr1Sgh96eqw1r
-   g==;
-X-CSE-ConnectionGUID: aaaIWFYxROaUetL+6c7EzQ==
-X-CSE-MsgGUID: 9GNMuAq5Qk6fvOayVAujrA==
-X-IronPort-AV: E=Sophos;i="6.08,216,1712646000"; 
-   d="scan'208";a="27005381"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Jun 2024 03:19:56 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 5 Jun 2024 03:19:16 -0700
-Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Wed, 5 Jun 2024 03:19:11 -0700
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<bryan.whitehead@microchip.com>, <andrew@lunn.ch>, <linux@armlinux.org.uk>,
-	<sbauer@blackbox.su>, <hmehrtens@maxlinear.com>, <lxu@maxlinear.com>,
-	<hkallweit1@gmail.com>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<UNGLinuxDriver@microchip.com>
-Subject: [PATCH net V3 3/3] net: phy: mxl-gpy: Remove interrupt mask clearing from config_init
-Date: Wed, 5 Jun 2024 15:46:11 +0530
-Message-ID: <20240605101611.18791-4-Raju.Lakkaraju@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240605101611.18791-1-Raju.Lakkaraju@microchip.com>
-References: <20240605101611.18791-1-Raju.Lakkaraju@microchip.com>
+	s=arc-20240116; t=1717582843; c=relaxed/simple;
+	bh=KchsD3JnU7DsaQ4R9YN5x/kCx7wa+/YGiI9tYcQcRYU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=DifwjiDfEqUx6y+B8chzCBIKueR8lz4vKfupmuCOmEkAjtdJZQxNKFYXVOXKKIwZC1t0/wzyv7NgodZlgKn5Sd5I9RrMkdVcZPQKar62iM3lslZwJiBMZxPV4PxIMY7/s2OwbIM3QZnVYfNJqF3N9zkoHQ7vONiF0OpttviIQ3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LO46pJCT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717582840;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tjjkFcz5nt2P4PDLXs8EVX3oErPCvXtoE8dmYvaKaqI=;
+	b=LO46pJCTUWaC6D4sGBoctRU7fYE4XNVYlAFv4WW+XANX0iRC02gk+2NcOoVDTVjjAFAq6B
+	OqHm9SR6AhMAwtxgF3SHY5A0we66GD/xzPwxunrtLQOa1ikRI/9nqew/5mnQ1FpEAjbFFq
+	m0KtLawRUOOiGCWrjqMvaYqwVbKTJ0s=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-472-Dc9eo1wtNdmWXUcNSKMbLg-1; Wed, 05 Jun 2024 06:20:39 -0400
+X-MC-Unique: Dc9eo1wtNdmWXUcNSKMbLg-1
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-7025fafc37eso824586b3a.0
+        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 03:20:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717582838; x=1718187638;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tjjkFcz5nt2P4PDLXs8EVX3oErPCvXtoE8dmYvaKaqI=;
+        b=wiQFCy8+3O6Gql/VcOTi3PQcJNlrbM5acr0054NJ4QMOBAD/67Wk0JLIE1allCBX9k
+         4yZZ7JBc+bSzUDwWdbObpwKRnCJTemcGVtq3/yFWnqfEybzjxtAh9JCvvtJ7FcA8jfdZ
+         xt6kUjCwkgeKXJOinRPfqbYadr7215ZcWQ6MbE6184yk9WE+vIAEcJb9P9BVm9erezxz
+         NnQqi8D0/dvCLHnLRNGu/3f9N9ApcCYQHm856uvl+PkjsWDfr5tFC5S82kUaag168jtu
+         C/ihPWbM2FoRTeViuQ5Tq/Otxd209ZU2SYaRCvFg2oogohjdTJVTOp9huM2t/ciZl5BT
+         6j9w==
+X-Forwarded-Encrypted: i=1; AJvYcCUNzf0sLIA36i4NEqEp6rIXJbTkBU9K9nvwrP1lMFKN69ddEGbDDME/udys26gzWYuB1GTlKSBLtW3LrBeF7VFnwg8CrUjz
+X-Gm-Message-State: AOJu0YyoLcaSc7/+IyaukISOJ/gpwitzjzwf2yv7Hxe2vJvGGB/xcwu9
+	B55Wy73biZBkwnAlh78sXhJs0ksA/Uwbp2QDmYY5EZSMNkLTZJLcMlNTX5SYmkUcDxRbIkvXVLJ
+	d+1UHZrrK/nz9ZtOGdyM1Sv/YiFqBSUcPl8vLwiS/VWbkUxJK3JsdpQ==
+X-Received: by 2002:a05:6a21:328d:b0:1af:fff9:1c59 with SMTP id adf61e73a8af0-1b2b6e2a25amr3331617637.2.1717582838324;
+        Wed, 05 Jun 2024 03:20:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEJfsc5Ha+Gm0UXE43JB22hMLFqLZJcDbQGdzxVIlVgK2HPL3ko4zVMM+J1PrkIsbsUAbmdpQ==
+X-Received: by 2002:a05:6a21:328d:b0:1af:fff9:1c59 with SMTP id adf61e73a8af0-1b2b6e2a25amr3331590637.2.1717582837895;
+        Wed, 05 Jun 2024 03:20:37 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70242b2c586sm8356415b3a.188.2024.06.05.03.20.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jun 2024 03:20:37 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 4AE7C13854FA; Wed, 05 Jun 2024 12:20:32 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Daniel Bristot de Oliveira
+ <bristot@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, Daniel Borkmann
+ <daniel@iogearbox.net>, Eric Dumazet <edumazet@google.com>, Frederic
+ Weisbecker <frederic@kernel.org>, Ingo Molnar <mingo@redhat.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Peter
+ Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>, Sebastian
+ Andrzej Siewior <bigeasy@linutronix.de>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
+ <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Jiri Olsa <jolsa@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Stanislav Fomichev
+ <sdf@google.com>, Yonghong Song <yonghong.song@linux.dev>,
+ bpf@vger.kernel.org
+Subject: Re: [PATCH v4 net-next 13/14] net: Reference bpf_redirect_info via
+ task_struct on PREEMPT_RT.
+In-Reply-To: <20240604154425.878636-14-bigeasy@linutronix.de>
+References: <20240604154425.878636-1-bigeasy@linutronix.de>
+ <20240604154425.878636-14-bigeasy@linutronix.de>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 05 Jun 2024 12:20:32 +0200
+Message-ID: <87frtradxr.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-When the system resumes from sleep, the phy_init_hw() function invokes
-config_init(), which clears all interrupt masks and causes wake events to be
-lost in subsequent wake sequences. Remove interrupt mask clearing from
-config_init() and preserve relevant masks in config_intr()
+Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
 
-Fixes: 7d901a1e878a ("net: phy: add Maxlinear GPY115/21x/24x driver")
-Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
----
-Change List:                                                                    
-------------                                                                    
-V0 -> V3:
-  - Address the https://lore.kernel.org/lkml/4a565d54-f468-4e32-8a2c-102c1203f72c@lunn.ch/T/
-    review comments
-  
- drivers/net/phy/mxl-gpy.c | 58 +++++++++++++++++++++++++--------------
- 1 file changed, 38 insertions(+), 20 deletions(-)
+> The XDP redirect process is two staged:
+> - bpf_prog_run_xdp() is invoked to run a eBPF program which inspects the
+>   packet and makes decisions. While doing that, the per-CPU variable
+>   bpf_redirect_info is used.
+>
+> - Afterwards xdp_do_redirect() is invoked and accesses bpf_redirect_info
+>   and it may also access other per-CPU variables like xskmap_flush_list.
+>
+> At the very end of the NAPI callback, xdp_do_flush() is invoked which
+> does not access bpf_redirect_info but will touch the individual per-CPU
+> lists.
+>
+> The per-CPU variables are only used in the NAPI callback hence disabling
+> bottom halves is the only protection mechanism. Users from preemptible
+> context (like cpu_map_kthread_run()) explicitly disable bottom halves
+> for protections reasons.
+> Without locking in local_bh_disable() on PREEMPT_RT this data structure
+> requires explicit locking.
+>
+> PREEMPT_RT has forced-threaded interrupts enabled and every
+> NAPI-callback runs in a thread. If each thread has its own data
+> structure then locking can be avoided.
+>
+> Create a struct bpf_net_context which contains struct bpf_redirect_info.
+> Define the variable on stack, use bpf_net_ctx_set() to save a pointer to
+> it. Use the __free() annotation to automatically reset the pointer once
+> function returns.
+> The bpf_net_ctx_set() may nest. For instance a function can be used from
+> within NET_RX_SOFTIRQ/ net_rx_action which uses bpf_net_ctx_set() and
+> NET_TX_SOFTIRQ which does not. Therefore only the first invocations
+> updates the pointer.
+> Use bpf_net_ctx_get_ri() as a wrapper to retrieve the current struct
+> bpf_redirect_info.
+>
+> On PREEMPT_RT the pointer to bpf_net_context is saved task's
+> task_struct. On non-PREEMPT_RT builds the pointer saved in a per-CPU
+> variable (which is always NODE-local memory). Using always the
+> bpf_net_context approach has the advantage that there is almost zero
+> differences between PREEMPT_RT and non-PREEMPT_RT builds.
+>
+> Cc: Alexei Starovoitov <ast@kernel.org>
+> Cc: Andrii Nakryiko <andrii@kernel.org>
+> Cc: Eduard Zingerman <eddyz87@gmail.com>
+> Cc: Hao Luo <haoluo@google.com>
+> Cc: Jesper Dangaard Brouer <hawk@kernel.org>
+> Cc: Jiri Olsa <jolsa@kernel.org>
+> Cc: John Fastabend <john.fastabend@gmail.com>
+> Cc: KP Singh <kpsingh@kernel.org>
+> Cc: Martin KaFai Lau <martin.lau@linux.dev>
+> Cc: Song Liu <song@kernel.org>
+> Cc: Stanislav Fomichev <sdf@google.com>
+> Cc: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> Cc: Yonghong Song <yonghong.song@linux.dev>
+> Cc: bpf@vger.kernel.org
+> Acked-by: Alexei Starovoitov <ast@kernel.org>
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-diff --git a/drivers/net/phy/mxl-gpy.c b/drivers/net/phy/mxl-gpy.c
-index b2d36a3a96f1..e5f8ac4b4604 100644
---- a/drivers/net/phy/mxl-gpy.c
-+++ b/drivers/net/phy/mxl-gpy.c
-@@ -107,6 +107,7 @@ struct gpy_priv {
- 
- 	u8 fw_major;
- 	u8 fw_minor;
-+	u32 wolopts;
- 
- 	/* It takes 3 seconds to fully switch out of loopback mode before
- 	 * it can safely re-enter loopback mode. Record the time when
-@@ -221,6 +222,15 @@ static int gpy_hwmon_register(struct phy_device *phydev)
- }
- #endif
- 
-+static int gpy_ack_interrupt(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* Clear all pending interrupts */
-+	ret = phy_read(phydev, PHY_ISTAT);
-+	return ret < 0 ? ret : 0;
-+}
-+
- static int gpy_mbox_read(struct phy_device *phydev, u32 addr)
- {
- 	struct gpy_priv *priv = phydev->priv;
-@@ -262,16 +272,8 @@ static int gpy_mbox_read(struct phy_device *phydev, u32 addr)
- 
- static int gpy_config_init(struct phy_device *phydev)
- {
--	int ret;
--
--	/* Mask all interrupts */
--	ret = phy_write(phydev, PHY_IMASK, 0);
--	if (ret)
--		return ret;
--
--	/* Clear all pending interrupts */
--	ret = phy_read(phydev, PHY_ISTAT);
--	return ret < 0 ? ret : 0;
-+	/* Nothing to configure. Configuration Requirement Placeholder */
-+	return 0;
- }
- 
- static int gpy21x_config_init(struct phy_device *phydev)
-@@ -627,11 +629,23 @@ static int gpy_read_status(struct phy_device *phydev)
- 
- static int gpy_config_intr(struct phy_device *phydev)
- {
-+	struct gpy_priv *priv = phydev->priv;
- 	u16 mask = 0;
-+	int ret;
-+
-+	ret = gpy_ack_interrupt(phydev);
-+	if (ret)
-+		return ret;
- 
- 	if (phydev->interrupts == PHY_INTERRUPT_ENABLED)
- 		mask = PHY_IMASK_MASK;
- 
-+	if (priv->wolopts & WAKE_MAGIC)
-+		mask |= PHY_IMASK_WOL;
-+
-+	if (priv->wolopts & WAKE_PHY)
-+		mask |= PHY_IMASK_LSTC;
-+
- 	return phy_write(phydev, PHY_IMASK, mask);
- }
- 
-@@ -678,6 +692,7 @@ static int gpy_set_wol(struct phy_device *phydev,
- 		       struct ethtool_wolinfo *wol)
- {
- 	struct net_device *attach_dev = phydev->attached_dev;
-+	struct gpy_priv *priv = phydev->priv;
- 	int ret;
- 
- 	if (wol->wolopts & WAKE_MAGIC) {
-@@ -725,6 +740,8 @@ static int gpy_set_wol(struct phy_device *phydev,
- 		ret = phy_read(phydev, PHY_ISTAT);
- 		if (ret < 0)
- 			return ret;
-+
-+		priv->wolopts |= WAKE_MAGIC;
- 	} else {
- 		/* Disable magic packet matching */
- 		ret = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2,
-@@ -732,6 +749,13 @@ static int gpy_set_wol(struct phy_device *phydev,
- 					 WOL_EN);
- 		if (ret < 0)
- 			return ret;
-+
-+		/* Disable the WOL interrupt */
-+		ret = phy_clear_bits(phydev, PHY_IMASK, PHY_IMASK_WOL);
-+		if (ret < 0)
-+			return ret;
-+
-+		priv->wolopts &= ~WAKE_MAGIC;
- 	}
- 
- 	if (wol->wolopts & WAKE_PHY) {
-@@ -748,9 +772,11 @@ static int gpy_set_wol(struct phy_device *phydev,
- 		if (ret & (PHY_IMASK_MASK & ~PHY_IMASK_LSTC))
- 			phy_trigger_machine(phydev);
- 
-+		priv->wolopts |= WAKE_PHY;
- 		return 0;
- 	}
- 
-+	priv->wolopts &= ~WAKE_PHY;
- 	/* Disable the link state change interrupt */
- 	return phy_clear_bits(phydev, PHY_IMASK, PHY_IMASK_LSTC);
- }
-@@ -758,18 +784,10 @@ static int gpy_set_wol(struct phy_device *phydev,
- static void gpy_get_wol(struct phy_device *phydev,
- 			struct ethtool_wolinfo *wol)
- {
--	int ret;
-+	struct gpy_priv *priv = phydev->priv;
- 
- 	wol->supported = WAKE_MAGIC | WAKE_PHY;
--	wol->wolopts = 0;
--
--	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, VPSPEC2_WOL_CTL);
--	if (ret & WOL_EN)
--		wol->wolopts |= WAKE_MAGIC;
--
--	ret = phy_read(phydev, PHY_IMASK);
--	if (ret & PHY_IMASK_LSTC)
--		wol->wolopts |= WAKE_PHY;
-+	wol->wolopts = priv->wolopts;
- }
- 
- static int gpy_loopback(struct phy_device *phydev, bool enable)
--- 
-2.34.1
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
 
