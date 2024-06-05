@@ -1,265 +1,283 @@
-Return-Path: <netdev+bounces-101135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 551EA8FD6FF
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 22:04:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F1F98FD70A
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 22:06:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AB4E1F21C2D
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 20:04:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C88528566A
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 20:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2110156F48;
-	Wed,  5 Jun 2024 20:04:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A063E1586C2;
+	Wed,  5 Jun 2024 20:05:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dX0J73Ye"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IShKNGtK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244D115533F
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 20:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717617852; cv=fail; b=AcuFIqhjQ6bsFbg2ZcQnClFpEOXycy8oq2v6zRqXC9cQyN2EuXOdMFwshOT+RAKMCSbGoV174Df5O7M5ZgPjTiXrIoV6++mka6lmY4sXfRHWghbdkaLYR42Fx03f74p2f9DZQsddnvYMYzwIMMDc7fsrce9wgfPES5oQjE27lXU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717617852; c=relaxed/simple;
-	bh=g4xrdYZzDZfPHLRDHvUkULep1pRCVFSfvEJ07X539Co=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ONamn3htuuvDgAp2VBhRY9VmqtmFIlpnTWXeYw8fJOL7+DPTqguDr1HR72cPtMmeuBBQAM7K3tXBVPFJ1F+b1azV0jKTgJSMQ/QcRofx99LnaW6t/Ch1iQjZRX8Ke8MiBT8R4fKtco1g9ksAGNS80oqZ+q0PhggihoDm6xTRnp8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dX0J73Ye; arc=fail smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717617852; x=1749153852;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=g4xrdYZzDZfPHLRDHvUkULep1pRCVFSfvEJ07X539Co=;
-  b=dX0J73YenXRDeB2mPznvWjsAnOxdw36Hf5Giyz5/Q9eFV2ahpvz2KYz+
-   vYDOueacd2Z/ZyDYzpGuPZ/33cgvQJfpw00DQaZUd+u1YRI8I0N8heCsc
-   6vglIGhMBQ/NpL+Apz7pNwlAP4versxFJdZGYlyyofzQcTeIigPei1g+v
-   9C9/6YBXsBso22H7P1kLI7bJ3qtyVWv3hj9wyqn4wvl9wvx4z3TDvdujY
-   Qm8V83GuVYJqps1VUCqRvCdcFva9LJXS3Xm6xqzj2ojVJYkgu1aENTnp8
-   hOUj9b5++a+IKnX9RFn/VPpqbpa6mYrb5t8q095GuGyrZXMaXsLsYAMO3
-   w==;
-X-CSE-ConnectionGUID: 1VTP8kv6QWW0pP4AttwfDQ==
-X-CSE-MsgGUID: 7BGseC4tSOmLFjFRN3nw0w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11094"; a="14372139"
-X-IronPort-AV: E=Sophos;i="6.08,217,1712646000"; 
-   d="scan'208";a="14372139"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jun 2024 13:04:08 -0700
-X-CSE-ConnectionGUID: 6coBGGlmQiW0tWGgBxrCMw==
-X-CSE-MsgGUID: dnw1ln5JTIyPOdw3+Tf8zA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,217,1712646000"; 
-   d="scan'208";a="60895557"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Jun 2024 13:04:08 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 5 Jun 2024 13:04:07 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 5 Jun 2024 13:04:06 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 5 Jun 2024 13:04:05 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 5 Jun 2024 13:04:01 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YoboCGarwSp6Eib7sn6frU2ApybtUW68nPZTp+0iI2Re2ZClhiNQQLhH5fPKaItLrT7iYPKTzvjrGD3E2A6KkqWxgYBuVnZAZl7W/ANOmgv12UW02BbX8iXtkKdODJiz6aO3sn5snPKwr9aAg/DtsikstLe7A24oI6l37O3cWDWAsZcYdApeEQhJi4PKc5Rh3V+bozVcGwR4GJCaVPiY4boJxRypE63zpMkCIkrMEPKr/q5UOJBXCN7AnmuysUzj9wj0CRs2vx7/1i0h7C8OVRTerfUEDlI8jxPIXUZzlLR49mzWltF89ze//7QSujdMBdQGDZFpwK98fypSIwnX1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1bfiZ4OPkzN0OP/uKzEyeBVMfiFAWpJ6zHhQvY/aVx8=;
- b=AtE/dkp6ja0dKCDSSRqf0dJ4V3+nNsrvjY1P34KBafz68ifOaksqnAbJcAiaF4klsgT83khSF2tTICBl8uIDVkpyCLqggh+FZ8BqOcw+9PI1qC3ByGvdGRbCdxAtQcg3RoNLaXkRCHPB8J+t6uPt7toJe7mHXOKt5fnzl5/YKV3AA2Ar/wEZZ5vLOaUdA6rMzCzIwJSdYWwSH1g6AfnfnSKddT1u140+pqjXru6VALgLtNKG3CFzzRPjiqSqqye/5lUXfGP40p9t9IC5t0k4SUdwDAGxnVv96b9fvcqhYS1Qo2r+4lmuhAEPkFyJ3A6WsKrdtv5nWFTC+WVzVdxkwA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by CY8PR11MB6939.namprd11.prod.outlook.com (2603:10b6:930:59::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.22; Wed, 5 Jun
- 2024 20:03:58 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%3]) with mapi id 15.20.7633.021; Wed, 5 Jun 2024
- 20:03:58 +0000
-Message-ID: <65068820-f8be-4093-800d-cec673d55b9f@intel.com>
-Date: Wed, 5 Jun 2024 13:03:57 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 9/9] igc: add support for ethtool.set_phys_id
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "Nelson, Shannon" <shannon.nelson@amd.com>, David Miller
-	<davem@davemloft.net>, netdev <netdev@vger.kernel.org>, Jakub Kicinski
-	<kuba@kernel.org>, Vitaly Lifshits <vitaly.lifshits@intel.com>, "Menachem
- Fogel" <menachem.fogel@intel.com>, Naama Meir <naamax.meir@linux.intel.com>
-References: <20240603-next-2024-06-03-intel-next-batch-v1-0-e0523b28f325@intel.com>
- <20240603-next-2024-06-03-intel-next-batch-v1-9-e0523b28f325@intel.com>
- <f8f8d5fb-68c1-4fd1-9e0b-04c661c98f25@amd.com>
- <dc0cc2ca-d3f4-4387-88bd-b54ea6896e0f@intel.com>
- <d27f050a-26db-4f08-aa19-848ae2c6ed2d@lunn.ch>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <d27f050a-26db-4f08-aa19-848ae2c6ed2d@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0293.namprd04.prod.outlook.com
- (2603:10b6:303:89::28) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5E0157A7D
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 20:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717617951; cv=none; b=i9uWryfylH/hNTrnKnNL2k6NB4qo01vLKJeeWrbdnyq/C/pJ95KO+VNxAEZ1D72pvjPtcVv2G20EeG7D/aLClbvJMbpiTCRtMTYVtqXhja+ZXwYhroUo6MJMnnLI/w/86LKuQ4pTaISL2QEIQ6pG3nwfryq3ZTYMVUsCHaYyr+Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717617951; c=relaxed/simple;
+	bh=HMuwmIyPn9oJxft/xILZyfZFYcfOK5nwIg8mBj+oVTA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LKO23sIXPAbWtbhC+9FF0r52o5EhOwyENJpaL8Q/hyY1o7yYxo8FOgkMIW8ohz28jrD+6JI+q+74qT5tlKevvlEnOL/u6C/wseY2N+il4sdyjDU6Q5j6P64r6zXjNl6zHypuobtbtfx81sny6jwTrLk7SWW5G7vk2/QRUr49WrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IShKNGtK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717617949;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PrdH88/0O98/W7d4Muvx4vjoUCcxM5TP1MAziR+qePQ=;
+	b=IShKNGtK5VQ69Tk0J9e+NCmBZGCHZHcqmBPwKzdelzZL3IuETpfxCLK1QEzQgy0WXzm9tE
+	pnuHIdIuAREPJcIz2eBEgMWOsMBYWFLgt/4S7F77jRUpABJLN9pwQypaZAZ6xiyFpHVCvR
+	cuNfvY80rwbL2xed5aAmO4sbotvtAqQ=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-671-eANzDuNiN8uJ54araAze2Q-1; Wed, 05 Jun 2024 16:05:47 -0400
+X-MC-Unique: eANzDuNiN8uJ54araAze2Q-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7952b4c5fb8so7259485a.3
+        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 13:05:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717617947; x=1718222747;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PrdH88/0O98/W7d4Muvx4vjoUCcxM5TP1MAziR+qePQ=;
+        b=tQLGp7rXTSwJE27rZP0uCpGKwL0jtW6alI+bAveshyOKtQ9m5G6Jig6jeLpYoOA4ub
+         XeOHyAKcjviq73Q1QGu1vHdMO00JJYB1LF9VE/ocvbfU8PQH8CoK6zHNrsSunpOfZ+ff
+         ZAYbp5GKdFKR8Br37iPSICUDWccZQnLnZYLhD7zaRSADoWxBj6RwPvOl6u37Xk0KDtJJ
+         /Z8UJIogXDrh90uW2xr4vPZoYM+sPoEpn++reLBWekEN/QzTrHETHayO2f2XhWP4xPKE
+         Vk4xCrKq9dIXPwS4as4sFV67+vxCVaIIO/WAVb7ygXTVvCOX20xwVLfEik3O59A4X9/P
+         l2JQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXqFiGvZ2EeJY2AlSyZr2V+TwV4bseC4t/GiXi6PPwtbITUGCJGy0MJhPF5W3dBEAiTJ+i4nE5sn3ARDcc+DLWoTxpo60N6
+X-Gm-Message-State: AOJu0YwE+u5YoAJGME+aYlDLCf5Ojl6wBwuvLge4ksk5PyCvTJVjUJy7
+	Nqpq6sC3HfLIdm+h+qF63Kmu9j/UKknSMnj6WEDQ/sFiMl4yEC6rtiM/o5hNmBfVbBilL+dYZms
+	ExOrV9K1J2GVSaBUyRVz4MaDAmrui4OcDFuUnJ+kdcYW5CMlz+nBB3Q==
+X-Received: by 2002:a05:620a:288b:b0:792:bc0b:e269 with SMTP id af79cd13be357-79523fd9b67mr449349685a.52.1717617946474;
+        Wed, 05 Jun 2024 13:05:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEMYwT4U14yD46Q+CgdugT284E/jRdYiZEAS6QBZe9UXDuAmP9vXDCSKxak9gLW7oyz9grJfA==
+X-Received: by 2002:a05:620a:288b:b0:792:bc0b:e269 with SMTP id af79cd13be357-79523fd9b67mr449345985a.52.1717617945960;
+        Wed, 05 Jun 2024 13:05:45 -0700 (PDT)
+Received: from x1gen2nano ([2600:1700:1ff0:d0e0::33])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79519a7ba98sm149204785a.119.2024.06.05.13.05.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jun 2024 13:05:45 -0700 (PDT)
+Date: Wed, 5 Jun 2024 15:05:43 -0500
+From: Andrew Halaney <ahalaney@redhat.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Serge Semin <fancer.lancer@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH RFC net-next v2 3/8] net: stmmac: dwmac1000: convert
+ sgmii/rgmii "pcs" to phylink
+Message-ID: <6n4xvu6b43aptstdevdkzx2uqblwabaqndle2omqx5tcxk4lnz@wm3zqdrcr6m5>
+References: <Zlmzu7/ANyZxOOQL@shell.armlinux.org.uk>
+ <E1sD0Ov-00EzBu-BC@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|CY8PR11MB6939:EE_
-X-MS-Office365-Filtering-Correlation-Id: e3a57156-2ba1-4f74-685f-08dc859aa2f1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|376005|366007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?T0h2U2EwcGRMcWh2eWdRWlpCY3JQQ2xEQ1M3b2xkU0llekxpNnc3eUVEVmxK?=
- =?utf-8?B?T1dUMjFMMGhkTDBGcXduclpYaHhEUmtjY2V3eFhyUEdTaGJaSlpDVFNaVGln?=
- =?utf-8?B?TkpFalNmQ0tiM25Oc1FIckFMbWtUYmF0TzhNSXNwR09NQlV4ZXQ5OXFaQlds?=
- =?utf-8?B?cFVPcHFNMlRCQnZFYUdtN1JnVmZDTkVFN29XTnhlb2tvbWRKeTU2VCt1R2ov?=
- =?utf-8?B?Z1pUZEJtSHNUUXJHU2pqb2N2TEhaaDNaSk5IcjM4TEl4aHc4emFUeVlSZUR3?=
- =?utf-8?B?Z3IzQmNIZGxoWVV2aHhCalAzTEJseTNtZTVXZW0zdG9KK1Y4QzNRR09nNFNi?=
- =?utf-8?B?RmR0cHVlcGErRDE2bDlFQTdSamIzSkplOGtncCs1a25UYXpySEhyMlBLVXpM?=
- =?utf-8?B?VlVVdnpMUkEzTHhUbCs0ZDFyLytqaTVlZGZrZGkyaGpMdUMxdlVvSmFvc0M1?=
- =?utf-8?B?NDlvRk16ZEZacDdyOFNGSittZkwzVkhKcHgwcTFCS1Bjc0owOWRqMlI0TVdY?=
- =?utf-8?B?WUdKZTE1MHZuU0lMOTFFdzQrQ1JSR3gyb0IvRG1BU0dWb2UxRTIrQUpRWXRj?=
- =?utf-8?B?RkNDVXR6NDBIZHpRN0RmTnRFbGpDaWVNbGk4NFlHTW5HZ2g2dGhxRTl2b0lh?=
- =?utf-8?B?cXY4ZFB1YWR0VURVRDEvUFpiYXdIOUNBVTlwMVEwVnIzTWpjajcxSFdBWUxn?=
- =?utf-8?B?V3p3KzF5d0t0SlBWcG9VSUhSbklxR2hibEFERHhtRTNiZ1RyeTNTNkxsaXMy?=
- =?utf-8?B?TEZjNHhSeE8xNlZ3Q3lKSmtsK092RzYrNlp6OFBDR3lIZzhMU21VczBVVmJF?=
- =?utf-8?B?eHo2ZzNWQjBFQ2xrSE91QTJycDdzUzZSZDJSSU1ZL1l3QkVEMktQOVFralEr?=
- =?utf-8?B?ZFRKVU10ZHlkTk80YnRPeDBVS1g4d0hsNUZCQTMrRTRvVW1MOWVRbkU2c2w3?=
- =?utf-8?B?ZmFmRVVGNEZGRnIrd0paaG12T09KUXNES3B4SDZQWnpZc0VaMzhqdkJGV3g4?=
- =?utf-8?B?UHh5eTBBYkZuQndiWXJEUjlBYXZxbVFxK3ZBWnFKejFNUVZ0ays4NnliZnNM?=
- =?utf-8?B?ZHdwekExSlhjRHc2MUEyeURrbGxhOXI3bmxXRzlIRWoraVpBeGdtSE8wR21K?=
- =?utf-8?B?VFBqdG50RS9yQnRtcmtTUmsrY0FHczVTd2JQWDZ5K0Z5dEdPeGVUSzlLanpK?=
- =?utf-8?B?TE9BbVpRZm94SlZNQXRpM3BqNzBSSktoeXZmVkVBZU93Mi9JK2k1SHpWR2Vy?=
- =?utf-8?B?VXJVWERIQmprc3QyN21LZFVGd3hyNDB1SjN1dDFlSVdNMmhmelFUYUIxcVY2?=
- =?utf-8?B?M2ZnSVB1SURJTjk0RllYdVBmQWxsaDV5V2ZSbWl6NDl5bFpUbFhvZ2laVWRC?=
- =?utf-8?B?YThtVjVBMWhQYUoxUlV1elFQLzg1Q0lqbUg0K0VZYWxiV0FzKzBNY3RhdVp2?=
- =?utf-8?B?Z0xQellUbFVKY1NzMlhlVDd0RlZDVzM3M21KYTNDZ0doZ2xFV3ljUFd2ZW1S?=
- =?utf-8?B?c3o2aCt6UW01U0VaK3RQd21Ud3NsVkZGMDdTWnpBeTlPS0lxSzZDWHhQSkdF?=
- =?utf-8?B?NFBCemtFR1JNbDVncUdBalZzU1E4MFpzblBXWW1tR204YlZtNHlvcTNxcHl2?=
- =?utf-8?B?ZXdkUjI1OGhyVE8raTlaM2kybXZJd0x0VmZKNlVlMWNvUE1NWnFkaWVvTWpw?=
- =?utf-8?B?VFNpMjlaSmVOZUdCeG02cS9RNi8vYTJiUW1pTGRCQ0grSUJLRE5YdGh3PT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M0tLWWhSaVpKQ0pSck95S3BjRlFjSENYSWZac0EydDlLWEQrV3cvYXp2OHZ4?=
- =?utf-8?B?SEo1L1ptMGxmc2hpc3VOV00rdEVVem85V2RLamovOGxycCtvbUFlM05MckxS?=
- =?utf-8?B?cStGc1J4dTkvdm96MWFrQTB0UGMwSjBHcUQxdUVOcCtJRzgzS2RXMm9XbnNN?=
- =?utf-8?B?UHgrT3BPVHNEMHJ3aTduUDZGTm5VSk0zeUVidUkxQzFIZ08rT0UxVmNGdnZX?=
- =?utf-8?B?Y01XVjl0MVVtbE5zWkprczQzcVhoVTArKzk2V2xjaDEwUlVibjJ6VWJsZ05L?=
- =?utf-8?B?ZWNQaVpuNTF0SjYxTlljOHQ3M056bXhYay9RU2dLcG8wNlZxTG9ydDNaaUty?=
- =?utf-8?B?NnM2aGxXai9uOGZmSnozMEVVbFF4MFFmVXc0dzFEWEZNcmRlamdMZDVKRlpI?=
- =?utf-8?B?ZWJuTHN6Z0hJOUFsNXVkdWY4QVczTDMwSlhBL3E4KzdKSXNyck1WRXJ5cTJJ?=
- =?utf-8?B?UnMrYXN2aWROTExWYkRpZk1pRDlwTEoxNUkxMjJONFp3OUxpVzBBWTNFTjcv?=
- =?utf-8?B?aGhqVlU0ZDdpTWtGSmR0MEl3eHl1bmVSR0pxM0RWVFdkTnAwYyt0aytZbjh6?=
- =?utf-8?B?YW95THFJaDV0UHpBcnBkRUc3UUhBU3RHN3pYWGpsdE9SK0VwV3hzQlpvUEhq?=
- =?utf-8?B?RjBWaHY5TjlVdzcwUWd3OUpoUGxFVE56OWhLNmQyVjZWQURYWjlWR2U5M3RN?=
- =?utf-8?B?WEpHNTRXcVFVclBycEZoYlYvVVdWRGUwVW1DMzhHU2VHREdxbkNuMlFoVGJX?=
- =?utf-8?B?R0JDTUtreXZZUEdRK3BJemRTSXdraUo4Vm9NSlM0cTl1MGQ4bUNIMy9qY3ky?=
- =?utf-8?B?MVlrUzNUYm1iV2NFSFgzRU9JeU9jdStJaTUyWDRjS05IcGk0aUNwNFZFUUR0?=
- =?utf-8?B?OEkyU1orclhsYzdTUzR3Z3cwRVdYenBmNTBPVUl2S0ZzeHE5bFB1NEJmOHpm?=
- =?utf-8?B?aldRSWJWZTREdHdkSlN6cmZFUko4SXpIR0xRRThvSzg0WERSMk1jME9sbjFK?=
- =?utf-8?B?YkttZkM3emJlUk5ob3JmODlkLzhHM3hZRklHemFOVER3SFhMaVFTTkxkRnVV?=
- =?utf-8?B?eHZ6bmcwd3EzTUN4MkEzbnhPZE9QNjROdkF5cWMrQm5ZeldFeXNET215QjZT?=
- =?utf-8?B?QjZEcEZUczVCcGZwbmprdUExdWhXSkx0RURGOUFtS3k2NjFnSENVRWFjVi9s?=
- =?utf-8?B?WGVGaENKZi9HN1dvcnNCcGtFaTVFaCtnRlgrSnZnOUk5UlFXaG1YemdWV3Nr?=
- =?utf-8?B?N1JoWHpXYy9QSzIwM2FuMU9lZVVMSURJNi9lSEluQXNhZFpzMUp3a0hRT3dI?=
- =?utf-8?B?M2FjR09wY3h0RE1hOHpyMEpuMmVpQ0g4Um5oS2paTW8wNVdKcFBtR2lEcTFZ?=
- =?utf-8?B?aS9wRktmSkVseWwyNlc2QTc5OGxKNFpOYWFFbk1naFpSbHVpKzV2NytvanRC?=
- =?utf-8?B?cDBoWVdLWUowaUhNL0VTQ3dabjhhRkxRT0pDNUxGTXAxbDcwcmp2OXFJZ0Mr?=
- =?utf-8?B?cWdqaldOYml5M21LU21VcDNkZU96SkJJcVpwNC9vNWlPOUFvTDh5RGY0aUpa?=
- =?utf-8?B?OXNnL2NzSHgrVHU5QnNRNGM1Q0d3Nms5amIzcXdQbFRNRHd1dXpXUzVyejl5?=
- =?utf-8?B?bDhZOHRBeVRCUThIWWlsVUpPQWRXUG9QRkx4ckdMYUJ2WCtVLys1REx2R1dF?=
- =?utf-8?B?Ti9XZ0dFQnMzeGFKT0o3Q0gvaDBNbkx6ZG9SRHp1STVNUUZFbXJPSXp0dUVq?=
- =?utf-8?B?dkxwU1UwWHgyT0sxSVgvcm1ZVlNCMmwwUDBsQjc3b2JYOG5lQmtmOGpUdXFW?=
- =?utf-8?B?QnhKM0FvYVZYMjBFRTFTVXVrNWQvZjF0c1p4SjVYVW5xdmJiTkMrb0lwUlRt?=
- =?utf-8?B?ZmhNNlpNQm9QS1RHeHFTVEVhQWNsZ0N3eVhlNmp5azZsNHA1MDJCbFFiZnd4?=
- =?utf-8?B?Y1VJRmcyMjBMUEg2R29DSi9uV0s0Q1dMQU82VHJGaVhkMmp1d3dOU1daNE1B?=
- =?utf-8?B?ay80Ly9PYUNGNXlPeHBJVWNNUkVFdUZNQTI4SmlsNTN3N0lsWHdaZjdiNjRW?=
- =?utf-8?B?b3I2dXBKTXkyTUEzOVZmREJ0REt3OTZoRmV2cXBncU9NcnZ0Y2hJaTcvN0d6?=
- =?utf-8?B?WTdtaWNrMjJmL09WeWVidEtoOHN2VSttZUQ0RDJBZktmd2txdmlFY00yMThw?=
- =?utf-8?B?VWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e3a57156-2ba1-4f74-685f-08dc859aa2f1
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2024 20:03:58.5904
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UE1AU5LkelN0oJtq8BCM3Qyj6E2x8tmbjaMdlW0oddd+e2Ir/xwX2u+nN8MnKbp95zT93HZMB8KTpN+P/Cjdyg55uL5VV0FQJXkezV6fLzI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB6939
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1sD0Ov-00EzBu-BC@rmk-PC.armlinux.org.uk>
 
-
-
-On 6/4/2024 6:14 PM, Andrew Lunn wrote:
-> On Tue, Jun 04, 2024 at 02:12:31PM -0700, Jacob Keller wrote:
->>
->>
->> On 6/3/2024 5:12 PM, Nelson, Shannon wrote:
->>> On 6/3/2024 3:38 PM, Jacob Keller wrote:
->>>>
->>>> From: Vitaly Lifshits <vitaly.lifshits@intel.com>
->>>>
->>>> Add support for ethtool.set_phys_id callback to initiate LED blinking
->>>> and stopping them by the ethtool interface.
->>>> This is done by storing the initial LEDCTL register value and restoring
->>>> it when LED blinking is terminated.
->>>>
->>>> In addition, moved IGC_LEDCTL related defines from igc_leds.c to
->>>> igc_defines.h where they can be included by all of the igc module
->>>> files.
+On Fri, May 31, 2024 at 12:26:25PM GMT, Russell King (Oracle) wrote:
+> Convert dwmac1000 sgmii/rgmii "pcs" implementation to use a phylink_pcs
+> so we can eventually get rid of the exceptional paths that conflict
+> with phylink.
 > 
-> Sorry for the deep nesting. I missed the first post.
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  .../ethernet/stmicro/stmmac/dwmac1000_core.c  | 113 ++++++++++++------
+>  1 file changed, 75 insertions(+), 38 deletions(-)
 > 
-> This seems like a very Intel specific solution to a very generic
-> problem. The LED code added by Kurt Kanzenbach follows the generic
-> netdev way of controlling LEDs. Any MAC or PHY driver with LED support
-> should be capable of blinking. Maybe in hardware, maybe it needs
-> software support.
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
+> index d413d76a8936..4a0572d5f865 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
+> @@ -16,6 +16,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/ethtool.h>
+>  #include <linux/io.h>
+> +#include <linux/phylink.h>
+>  #include "stmmac.h"
+>  #include "stmmac_pcs.h"
+>  #include "dwmac1000.h"
+> @@ -261,39 +262,6 @@ static void dwmac1000_pmt(struct mac_device_info *hw, unsigned long mode)
+>  	writel(pmt, ioaddr + GMAC_PMT);
+>  }
+>  
+> -/* RGMII or SMII interface */
+> -static void dwmac1000_rgsmii(void __iomem *ioaddr, struct stmmac_extra_stats *x)
+> -{
+> -	u32 status;
+> -
+> -	status = readl(ioaddr + GMAC_RGSMIIIS);
+> -	x->irq_rgmii_n++;
+> -
+> -	/* Check the link status */
+> -	if (status & GMAC_RGSMIIIS_LNKSTS) {
+> -		int speed_value;
+> -
+> -		x->pcs_link = 1;
+> -
+> -		speed_value = ((status & GMAC_RGSMIIIS_SPEED) >>
+> -			       GMAC_RGSMIIIS_SPEED_SHIFT);
+> -		if (speed_value == GMAC_RGSMIIIS_SPEED_125)
+> -			x->pcs_speed = SPEED_1000;
+> -		else if (speed_value == GMAC_RGSMIIIS_SPEED_25)
+> -			x->pcs_speed = SPEED_100;
+> -		else
+> -			x->pcs_speed = SPEED_10;
+> -
+> -		x->pcs_duplex = (status & GMAC_RGSMIIIS_LNKMOD_MASK);
+> -
+> -		pr_info("Link is Up - %d/%s\n", (int)x->pcs_speed,
+> -			x->pcs_duplex ? "Full" : "Half");
+> -	} else {
+> -		x->pcs_link = 0;
+> -		pr_info("Link is Down\n");
+> -	}
+> -}
+> -
+>  static int dwmac1000_irq_status(struct mac_device_info *hw,
+>  				struct stmmac_extra_stats *x)
+>  {
+> @@ -335,8 +303,12 @@ static int dwmac1000_irq_status(struct mac_device_info *hw,
+>  
+>  	dwmac_pcs_isr(ioaddr, GMAC_PCS_BASE, intr_status, x);
+>  
+> -	if (intr_status & PCS_RGSMIIIS_IRQ)
+> -		dwmac1000_rgsmii(ioaddr, x);
+> +	if (intr_status & PCS_RGSMIIIS_IRQ) {
+> +		/* TODO Dummy-read to clear the IRQ status */
+> +		readl(ioaddr + GMAC_RGSMIIIS);
+
+This seems to me that you're doing the TODO here? Maybe I'm
+misunderstanding... maybe not :)
+
+> +		phylink_pcs_change(&hw->mac_pcs, false);
+> +		x->irq_rgmii_n++;
+> +	}
+>  
+>  	return ret;
+>  }
+> @@ -404,9 +376,71 @@ static void dwmac1000_ctrl_ane(void __iomem *ioaddr, bool ane, bool srgmi_ral,
+>  	dwmac_ctrl_ane(ioaddr, GMAC_PCS_BASE, ane, srgmi_ral, loopback);
+>  }
+>  
+> -static void dwmac1000_get_adv_lp(void __iomem *ioaddr, struct rgmii_adv *adv)
+> +static int dwmac1000_mii_pcs_validate(struct phylink_pcs *pcs,
+> +				      unsigned long *supported,
+> +				      const struct phylink_link_state *state)
+> +{
+> +	/* Only support in-band */
+> +	if (!test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, state->advertising))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+> +static int dwmac1000_mii_pcs_config(struct phylink_pcs *pcs,
+> +				    unsigned int neg_mode,
+> +				    phy_interface_t interface,
+> +				    const unsigned long *advertising,
+> +				    bool permit_pause_to_mac)
+>  {
+> -	dwmac_get_adv_lp(ioaddr, GMAC_PCS_BASE, adv);
+> +	struct mac_device_info *hw = phylink_pcs_to_mac_dev_info(pcs);
+> +
+> +	return dwmac_pcs_config(hw, neg_mode, interface, advertising,
+> +				GMAC_PCS_BASE);
+> +}
+> +
+> +static void dwmac1000_mii_pcs_get_state(struct phylink_pcs *pcs,
+> +					struct phylink_link_state *state)
+> +{
+> +	struct mac_device_info *hw = phylink_pcs_to_mac_dev_info(pcs);
+> +	unsigned int spd_clk;
+> +	u32 status;
+> +
+> +	status = readl(hw->pcsr + GMAC_RGSMIIIS);
+> +
+> +	state->link = status & GMAC_RGSMIIIS_LNKSTS;
+> +	if (!state->link)
+> +		return;
+> +
+> +	spd_clk = FIELD_GET(GMAC_RGSMIIIS_SPEED, status);
+> +	if (spd_clk == GMAC_RGSMIIIS_SPEED_125)
+> +		state->speed = SPEED_1000;
+> +	else if (spd_clk == GMAC_RGSMIIIS_SPEED_25)
+> +		state->speed = SPEED_100;
+> +	else if (spd_clk == GMAC_RGSMIIIS_SPEED_2_5)
+> +		state->speed = SPEED_10;
+> +
+> +	state->duplex = status & GMAC_RGSMIIIS_LNKMOD_MASK ?
+> +			DUPLEX_FULL : DUPLEX_HALF;
+> +
+> +	dwmac_pcs_get_state(hw, state, GMAC_PCS_BASE);
+> +}
+> +
+> +static const struct phylink_pcs_ops dwmac1000_mii_pcs_ops = {
+> +	.pcs_validate = dwmac1000_mii_pcs_validate,
+> +	.pcs_config = dwmac1000_mii_pcs_config,
+> +	.pcs_get_state = dwmac1000_mii_pcs_get_state,
+> +};
+> +
+> +static struct phylink_pcs *
+> +dwmac1000_phylink_select_pcs(struct stmmac_priv *priv,
+> +			     phy_interface_t interface)
+> +{
+> +	if (priv->hw->pcs & STMMAC_PCS_RGMII ||
+> +	    priv->hw->pcs & STMMAC_PCS_SGMII)
+> +		return &priv->hw->mac_pcs;
+> +
+> +	return NULL;
+>  }
+>  
+>  static void dwmac1000_debug(struct stmmac_priv *priv, void __iomem *ioaddr,
+> @@ -499,6 +533,7 @@ static void dwmac1000_set_mac_loopback(void __iomem *ioaddr, bool enable)
+>  
+>  const struct stmmac_ops dwmac1000_ops = {
+>  	.core_init = dwmac1000_core_init,
+> +	.phylink_select_pcs = dwmac1000_phylink_select_pcs,
+>  	.set_mac = stmmac_set_mac,
+>  	.rx_ipc = dwmac1000_rx_ipc_enable,
+>  	.dump_regs = dwmac1000_dump_regs,
+> @@ -514,7 +549,6 @@ const struct stmmac_ops dwmac1000_ops = {
+>  	.set_eee_pls = dwmac1000_set_eee_pls,
+>  	.debug = dwmac1000_debug,
+>  	.pcs_ctrl_ane = dwmac1000_ctrl_ane,
+> -	.pcs_get_adv_lp = dwmac1000_get_adv_lp,
+>  	.set_mac_loopback = dwmac1000_set_mac_loopback,
+>  };
+>  
+> @@ -549,5 +583,8 @@ int dwmac1000_setup(struct stmmac_priv *priv)
+>  	mac->mii.clk_csr_shift = 2;
+>  	mac->mii.clk_csr_mask = GENMASK(5, 2);
+>  
+> +	mac->mac_pcs.ops = &dwmac1000_mii_pcs_ops;
+> +	mac->mac_pcs.neg_mode = true;
+> +
+>  	return 0;
+>  }
+> -- 
+> 2.30.2
 > 
-> So please write a generic ethtool helper which any MAC driver can use
-> to make use of the generic sys class LEDs associated to it, not an
-> Intel specific solution.
-> 
->     Andrew
 
-
-... Isn't that what the .set_phys_id ethtool callback is???
-
->  * @set_phys_id: Identify the physical devices, e.g. by flashing an LED
->  *      attached to it.  The implementation may update the indicator
->  *      asynchronously or synchronously, but in either case it must return
->  *      quickly.  It is initially called with the argument %ETHTOOL_ID_ACTIVE,
->  *      and must either activate asynchronous updates and return zero, return
->  *      a negative error or return a positive frequency for synchronous
->  *      indication (e.g. 1 for one on/off cycle per second).  If it returns
->  *      a frequency then it will be called again at intervals with the
->  *      argument %ETHTOOL_ID_ON or %ETHTOOL_ID_OFF and should set the state of
->  *      the indicator accordingly.  Finally, it is called with the argument
->  *      %ETHTOOL_ID_INACTIVE and must deactivate the indicator.  Returns a
->  *      negative error code or zero.
-
-Maybe I'm misunderstanding here. Are you asking us to expose the LEDs
-via some other interface and extend ethtool to use that interface to
-blink LEDs?
 
