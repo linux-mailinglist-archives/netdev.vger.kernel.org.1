@@ -1,369 +1,324 @@
-Return-Path: <netdev+bounces-100858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECB9E8FC49F
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:34:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8CA78FC4AE
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:37:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A7321C20EF1
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 07:34:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 440C01F22142
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 07:37:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3764313AA51;
-	Wed,  5 Jun 2024 07:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C3218C331;
+	Wed,  5 Jun 2024 07:37:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="M+Vgtgfg"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="kn5bhPLw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675FA13AA4D
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 07:34:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717572842; cv=fail; b=WPNN8w72sxx3H9RiOGYlCCsC8eZYK2l9/uTLTcoPOTi3ttUctc5wGl8jhzwD95plm9fJ4mwhmBw9v/VxMf/2Lf7mbl9BHsgK36JmTpy7YFDsJgRoqBqqxs1rWHidWvWUgiEyU5r+CYcIavvaO7PVoYqfAs8MgV0Zu1kF9DzSMKQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717572842; c=relaxed/simple;
-	bh=48oT/PWc/ClSiWnE6vWcQzVFlaBx6ZNe1vwSLFoGOm0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Ah9JxVCy0MvgLAjIHB2LtT/9qe3f4maS8i56CZjoML/uDSLNIzBta1mtLoGQKIZhlLuHzUgYaQhIrdC5axI2+C4oIzE78bh0etveUoDpzPzUTMrMr3QeqJ4rsU3pPkavqMp8DzCAN81y6pWItCh2QirYq41QL2mPcqOyP/h1CUw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=M+Vgtgfg; arc=fail smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 454KRqVJ004139;
-	Wed, 5 Jun 2024 00:33:34 -0700
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2169.outbound.protection.outlook.com [104.47.57.169])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3yj167cb39-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Jun 2024 00:33:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=be/p50CAz2rxJ3wJDMJrZ2znYYIYzYiDHfWZH/21nRN97laPVAsIVL5MsVerqxUV4ussPZHvK2uf9xXsuyus05MDfkasvC6o2CcVl6UWWhF7T9yM9ZvQOHaxgEcr7WdKfGwOxR2qizcv8MqG6ID2z/76si+Glc+W9bSIlF0WZgPjSC7TwCM3J3/VYS20pwAxvuKxmCkM3H0BoijvMnQsWgozz3ormTfHBKi4mxZCwRtwky+f9A87VwADoyTvs3wbB9IiQNtPa/QDe1XgV9kKm1RWVApprGEhfNTIiHb+iMiiIa5ZpNuilbXs3ZleUnuah7n5eoLGe7n6N6udjNNgGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jMvrvMyl3WsBSPKUi6aiaIiooxFsVHIhGZ4RFGMC2jI=;
- b=jyorXDjdcmnp9m+x0R7cmmVwbmLIEKZG0KbTrwFtzcojjwIOw5v1D5GX0L1Z1RHxbVOymCRQXfql7djdqa8zCLUqUe7zp8DbOGlWicC+6sRWsG85MJ0DBJxcpSdJhBn8iAQyGZWdbDRZIelDZsqGIDG1xoqyudElWGHiKEXeHILNlGr3tA4w7upZdvzLs/RNnsocnFuUV09jAYbQdNmIqNumZIeJC3htjoK1buzarXtSoSPrF/G1TFDX+IKgKz6+JesrZSJWVSFmFWu7ytt3Lh4tX6ouLsSB5A8tLlaux4bgD04gG2+tiz33WX4VaQHqXGgCj8mQoWfevngCaKU2sQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jMvrvMyl3WsBSPKUi6aiaIiooxFsVHIhGZ4RFGMC2jI=;
- b=M+VgtgfgNTjA4Dc6hpb3mA/Pub460ptbSvPGG+g6Ww6bdiSF3r0xAuE/JlDqSCSWy2xzVNu8JxY976BHPOVYV6KGiE/adAeUelS072axZAryEuxcAYmI6iT+riDDBDwF5bIOaXs3HBhIdveWGVqrxNhr0t0SavOS7udrUpWiQg4=
-Received: from PH0PR18MB4474.namprd18.prod.outlook.com (2603:10b6:510:ea::22)
- by SN4PR18MB4987.namprd18.prod.outlook.com (2603:10b6:806:21b::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.31; Wed, 5 Jun
- 2024 07:33:32 +0000
-Received: from PH0PR18MB4474.namprd18.prod.outlook.com
- ([fe80::ba6a:d051:575b:324e]) by PH0PR18MB4474.namprd18.prod.outlook.com
- ([fe80::ba6a:d051:575b:324e%4]) with mapi id 15.20.7633.021; Wed, 5 Jun 2024
- 07:33:32 +0000
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-        "horms@kernel.org"
-	<horms@kernel.org>,
-        "andrew@lunn.ch" <andrew@lunn.ch>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next v2 3/3] net: txgbe: add FDIR info to ethtool ops
-Thread-Topic: [PATCH net-next v2 3/3] net: txgbe: add FDIR info to ethtool ops
-Thread-Index: AQHatxqq6TM2n8jp3k+PefG2Oc9tIA==
-Date: Wed, 5 Jun 2024 07:33:32 +0000
-Message-ID: 
- <PH0PR18MB447474CD899ACBFECF63E9D7DEF92@PH0PR18MB4474.namprd18.prod.outlook.com>
-References: <20240605020852.24144-1-jiawenwu@trustnetic.com>
- <20240605020852.24144-4-jiawenwu@trustnetic.com>
-In-Reply-To: <20240605020852.24144-4-jiawenwu@trustnetic.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR18MB4474:EE_|SN4PR18MB4987:EE_
-x-ms-office365-filtering-correlation-id: 923c0f46-006d-4e1a-962a-08dc8531cd37
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: 
- BCL:0;ARA:13230031|366007|376005|1800799015|7416005|38070700009;
-x-microsoft-antispam-message-info: 
- =?us-ascii?Q?htUY/gjneA+ZoR62ceocHm3QYE8sivncd4E0pJM0hsAFJAwGETLKHWpNqykm?=
- =?us-ascii?Q?tSqagEEepMP4C/B3SuAmb9/9M4MWQJMKul0QAgdI6qVna2UHK+ybfYa5Le+A?=
- =?us-ascii?Q?VZeHaiiO+80+tAVIiIbqvxaVeyv6pHF1AOmobAXpn5CVQ4ax3awLVT1OoIHa?=
- =?us-ascii?Q?74HY2BeywcgDkf+v0+M5GilKgGIhGcNPRoBvtiLmO+B8leqQxrXJbOTeICgy?=
- =?us-ascii?Q?XH3vrCo6R+yPvqIZkIRmztltNuF7vtJthzH10rmmG/+4eAxkLmmYa1OMGdHE?=
- =?us-ascii?Q?Ir0Pt+7jebnOQZI4N9aWPy3e24uRk7WK1ENixy+7ZIv65wKEweHnAgIX1aFx?=
- =?us-ascii?Q?AhNcMxIdO8F60ibagFfYVxb4OEMeA1mPiC7X10zace0d6xEM8wX5NwM9lMj+?=
- =?us-ascii?Q?ccNiYvRcn/d6DR6wbEz/M8QZ0CSwtubB6fx8voeWD/a5gtcH0Q4DON392260?=
- =?us-ascii?Q?UgYRXmuXs3zg3o04kgHC+c6Z/KBf3xSd4VceXM7JBSHLLOcZHAsfgBxdaR4f?=
- =?us-ascii?Q?hGocvsMqtLK2Y7OLE39KUdbmsetk3ucnqvEl2VvXQVHMHBw6ncbcMEGFhCEa?=
- =?us-ascii?Q?uPwbY+jKfRrxo2PATcpF9rnzecZjS75SPKfAdity7PbXZ4gPBJqXxY4Iy4AU?=
- =?us-ascii?Q?N2KP8eLSepLa+z+nUR6Ch+hPi8wGmYe/j8oIkgihZYymweijM4r7OgIwiyXw?=
- =?us-ascii?Q?mZRym1ofinYxZoZBLpNMs0OueQgVS8meicCHL7wIVU+NDSx6l4VeJB9Nqoj0?=
- =?us-ascii?Q?/6Mz0BQK/75uNwIweLG099EXIhd5CCfsffaukDOUUEpC9cg5qkjUXJ1fRH3H?=
- =?us-ascii?Q?VvSQ9/3B8XwXUCGqhrmU+zmZklqmy1Rgs8dQ+c7Eor2oSALBIby8PlsoWIxB?=
- =?us-ascii?Q?awPjqFD4OKEFOWqLStUc2VMg2zqWX/CM2QpOJ0Y2OnwpsQxPuks6utA5322/?=
- =?us-ascii?Q?VvGXNmHU7SdCA2Em42Y/83dyN+Wi4c3iF4j40+xFvYI6B4CqfMc3Tt9kl3yZ?=
- =?us-ascii?Q?exMche1BQLE+NteKZA8PL6FtjkLp9X1n/jvXZ3L+8sQQDfF5PDA7DDrUUqA4?=
- =?us-ascii?Q?1O9839SDzFA747v6dPrIHv+hK3XKSNZhr/X0zrooIcdVDjI3B52UH4z2p877?=
- =?us-ascii?Q?0jFMRGaNdRAkLjqE8OMkSpzV+kWbVwcC5ZNAy9YSm2xEt+Ql3vcyuTk/rLyv?=
- =?us-ascii?Q?IKiGGce/BrO9vlDy5gYTKeVG5KFGu36flKKaQC8UEOS1VALh4J6lEXfS5ZbO?=
- =?us-ascii?Q?4zn008HRBj4W1ct3JCtbsldxIN7SHh9bU/WCJ0DD/8oa8lwNVHpb+v0QZlJB?=
- =?us-ascii?Q?4Q76GB6r8wVjLu0blM44HMS1zN2yqFSonTkqLMeEN9lKHA=3D=3D?=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4474.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015)(7416005)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?zCw98rE8PJatyBWgozjRZoHgB5Pu0U9VJNhRa6HpNH8QeXQdIlhO3eNiy71W?=
- =?us-ascii?Q?ZjAhevDHfuu/i/3fBK5oMu/oUICPECEiasi8t+rG9RuwE9jUMV9OBnGAuuVe?=
- =?us-ascii?Q?ro+adAp5naz8p5F0Jd2CVB5b8ene+l96MdtG4PzbyRHkBF+BOuMO8NPsaXLG?=
- =?us-ascii?Q?ojzay/35osSlfa8UTMfteZOYnLYhAOa7J7hGJJC2MXs4O6a255FTQGyMmdeN?=
- =?us-ascii?Q?rI59lId/xu2Edi0ILfenSqDa6Zq5SCCVcZ/SYPXPePsQAAUM3nheNkKfgRns?=
- =?us-ascii?Q?Jl/1bhp83zoC9N/RgRsMH2BQhZDC9Sk1FtfoPowRpHT139/mhG2/2rUMstWO?=
- =?us-ascii?Q?Io7+1yBddBP7jJPio45NcfpsOkxXkA7bPa7bxOrgWZld7v5owTXJ3FPonB7F?=
- =?us-ascii?Q?SZTBLL1y8zb9t8SM6i9jt4tK1nVyWn+VPuy3aPpjR1EaxK/rT/mkyx8bhl3H?=
- =?us-ascii?Q?pMRWPdy5WEnT50f1Pl8wNMxouuRZ8SNZamm6KEMJOZKpOWQD3/fAKSdgyvli?=
- =?us-ascii?Q?LnF4UtTQP1zK0hTTnI9FeaQbxGKcvcb3msUTWBMewiwFRyePZEAektPthTgS?=
- =?us-ascii?Q?OAhHqGW4q9x6TvllvvLbrBOL8Dcezv8Qp9XVSQnBc/yxnx+kZMoDBPUOjgKM?=
- =?us-ascii?Q?UyLpZPYQCdZgbxwQBhPwPvKRCkRQTxxKELrxpmUOaluTRQJPGo41fZhtrh9/?=
- =?us-ascii?Q?kzhTshYBcq02L5Q0WHiQuNMNr2e2pEDM5vfs2eoUY5ILcv4quLUlpavti4a6?=
- =?us-ascii?Q?AEb5SptYqmXSQt+B4t3rliaLnEgEWhvuRnrzTok+tUAxXtrRlacdTEcoZU2h?=
- =?us-ascii?Q?ce6k6pKE0g7Em0eVj7Wks/x4/P/XdiEcnMibl2i31VsjRpk3Gme4YT45/TwX?=
- =?us-ascii?Q?4mPdhEn8p0Xd2SVntUcQCNlsVQBBtA9EfpT97Aa0ZiftRJcXIKZPRDMQI4t8?=
- =?us-ascii?Q?BMRz7MybC327QUkiIaNbJz9lw47Z0sqvQBtU+qFtHedRfl9LB7mYX1zw+4id?=
- =?us-ascii?Q?boyHtS47cxtLvgKPXXtipVc5AkUfdcuRfzVYillTOrFhlf1JpAqJKga+zh8y?=
- =?us-ascii?Q?mH2TnhInl2yPxi+YR8uUoqgUVQACE0pL1f6DIySIE0ZFTFS70KOBF2FlPmjF?=
- =?us-ascii?Q?exEYilip8/DZHF9Blydc9aoSFNld71C5AMBYyVG7JZ2B7FEflB0c9N+827Pe?=
- =?us-ascii?Q?UH/2vukTD44CTBslfqAZgbkT/uAJ244RQQTulsWbGx1FvavJK5M7w8F0XWgN?=
- =?us-ascii?Q?GOjdiObZjlqxgYHd2pAYcEBtMBf/SFM05Gzv+y8FBO2l60C077Kecmx1UcYz?=
- =?us-ascii?Q?wG1GS5CJVFqFs57KLDC5KhytQ74b4AwXZFo6X3aBQxvF+I0sh5YrJ5f81EUT?=
- =?us-ascii?Q?lXcME8kOEjbjcA7ORvK236/OFyP+JZV1d7mnto8atW5JVcgyZT1gkWd9vvlG?=
- =?us-ascii?Q?GZ1wox/vrAW7bdKno320uG7xvDhQb+SDUh52lXPZoTDGqyKGoxmc+EwmmKSd?=
- =?us-ascii?Q?j+upUZjVyiJby3vGy8pGwFj7mPt59RYDdBSBxLm+o4XQKJoX//VpZ4ItFTaK?=
- =?us-ascii?Q?xnCVumu8fxQIk/IFT8U=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0E96A03F
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 07:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717573035; cv=none; b=JIQokKM5h7LzJXDnLvi86YPtrTxCS8JEPD+NXQQ4kxU+Xq35X4yQvS5iN5VHv4KBtFY7EdjYJpH+evZTKYrMo6jS5c++nzkycfdGD9GKSIBvvcsjqeXV1Ff+cVS/huhOOfPjpmFlnATWD4rnW5+Xr3N2LRGesxNZqIUNYBIGYUE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717573035; c=relaxed/simple;
+	bh=0bcrLTQX65w3+uAqgRwFhD9W+5+9d04Rnllfp2Q7OBY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r+f/wqUy5p5jX4OabSFXW34v2Vw52QTl1erFppZIdyV2nEN1Xdvoa4NGwc2it0gw5A1bizzJ86NPfgCIP2A/Tla0RFv5tGr/dxfQ0vZmIBbm1lO+IX4M5Gn6A+VqQXLNC0Bmi3hxhowdpgTULnsuVl0JEj7DQ1c3BBV2biHRTzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=kn5bhPLw; arc=none smtp.client-ip=209.85.210.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-6f8ef63714cso4162312a34.1
+        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 00:37:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1717573033; x=1718177833; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZPvDAH+YMalqInPfm8+iSZEqqgczyWUOtqvg5GoEtYE=;
+        b=kn5bhPLw+5ax4LDVdlIBwEVbiI5Piwp6e4JTSEzHBMwUkgXwGWKMwavD/JVuudpyJf
+         VvrJEmNWXalKvUHvidYPVXp/mYuyzRRBMgzPX9fAsIKsEIZ1eI3CvQ5JYGw5tGGqL3VH
+         4H1zN4yYkGVQnYaLGZGmVyCw8XDmoOCleiZFR/Htj5LDm53ezR0+Mmh/+WwOOmElbZd6
+         84K7Y/3XbpGfx7q92hO1XKt7iONYaL+OnDCwwOh4Sjhkq5S+48C0U8k13pTX/JQ6u/U6
+         FFdP2qDRvl9e/XPmINcwTimDEE+T09HNPnXrE9LlsInOooz6pxNgn5zic89MLi8US5ap
+         OUuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717573033; x=1718177833;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ZPvDAH+YMalqInPfm8+iSZEqqgczyWUOtqvg5GoEtYE=;
+        b=e8Z6wahMV9syfF/ODvH5fvImeqDES+B4fQDyFEesXtdaIeZ5K/fZSn3sxztYvojGSk
+         Nq8mrXr0tDunDtkkb3MZRLyTTXu9l5pPEgs875FyJ9X8zxYotHwEbcIzD0k6Z7MI9RQ9
+         xNmSdZj6gG580WPKtvQMdCFgQjCadvUyD+7OhykKEEiShpK4bLDCJ56ErIlOo/0Df+C8
+         QDWcM5eipGwUMh2qutAaYcTZggRtsHZ6mnfcAsKPzf9JAwGDh2DN5DnBB7xjSoKBkkNP
+         yoTvh8pozp97qN+XkiogH/oAGFnGAP8Q+vb2zcUuAR6Gn6/IZawD5h0Ah6SLdnIMOX0A
+         skTA==
+X-Forwarded-Encrypted: i=1; AJvYcCWQHKPBricf76M0+bsgdURYrLkejpueIfmcwpM0lk4UZuPveNF9FLKx9dRexRPX1h7xlHkhhQbvZb/Ky6HVNRT6E6OqGkhY
+X-Gm-Message-State: AOJu0Yyah7Pbz2DP8nyZ4aQD/zp2u72gn3LzXtIb9oVj5+maCwLpWT35
+	xFEmjiIalK4KvtDGv5QBgd/IuiJtPRxMC52nXIBJDFi0D7yVBvjudrtP8T2P01Y=
+X-Google-Smtp-Source: AGHT+IHOM+Hm4FbbQZQFmS6lBFh9A0mBVXXYXd6sNx2AlIYuuH2UdvbbngptVM/wrFldErC1pE/3+g==
+X-Received: by 2002:a05:6870:169e:b0:24f:d4b4:698f with SMTP id 586e51a60fabf-25121c77f82mr2124416fac.1.1717573032990;
+        Wed, 05 Jun 2024 00:37:12 -0700 (PDT)
+Received: from [10.68.123.4] ([203.208.167.149])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70242c245absm8044149b3a.200.2024.06.05.00.37.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Jun 2024 00:37:12 -0700 (PDT)
+Message-ID: <06bb3780-7ba0-4d88-b212-5e5b7a1b92cb@bytedance.com>
+Date: Wed, 5 Jun 2024 15:37:01 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4474.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 923c0f46-006d-4e1a-962a-08dc8531cd37
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2024 07:33:32.2012
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: X2bg4SMOIC/l/udp39HEUmY4zJFy5+OdcX+Js6GA/1OQQ8XZXWdPmuy5sAnKG4WVvzALb2ypVwV8ffDURfY+Pw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR18MB4987
-X-Proofpoint-ORIG-GUID: 5rOPx9kocKlOdmvX402PIPjc5_46gCQD
-X-Proofpoint-GUID: 5rOPx9kocKlOdmvX402PIPjc5_46gCQD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-04_11,2024-06-05_01,2024-05-17_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: Re: [PATCH bpf-next] bpf: tcp: Improve bpf write tcp opt
+ performance
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: edumazet@google.com, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@google.com, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ laoar.shao@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+References: <20240515081901.91058-1-zhoufeng.zf@bytedance.com>
+ <87seyjwgme.fsf@cloudflare.com>
+ <1803b7c0-bc56-46d6-835f-f3802b8b7e00@bytedance.com>
+ <87wmnty8yd.fsf@cloudflare.com>
+ <d66d58f1-219e-450a-91fc-bd08337db77d@bytedance.com>
+ <875xuuxntc.fsf@cloudflare.com>
+From: Feng Zhou <zhoufeng.zf@bytedance.com>
+In-Reply-To: <875xuuxntc.fsf@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+在 2024/5/31 18:45, Jakub Sitnicki 写道:
+> On Fri, May 17, 2024 at 03:27 PM +08, Feng Zhou wrote:
+>> 在 2024/5/17 01:15, Jakub Sitnicki 写道:
+>>> On Thu, May 16, 2024 at 11:15 AM +08, Feng Zhou wrote:
+>>>> 在 2024/5/15 17:48, Jakub Sitnicki 写道:
+> 
+> [...]
+> 
+>>> If it's not the BPF prog, which you have ruled out, then where are we
+>>> burining cycles? Maybe that is something that can be improved.
+>>> Also, in terms on quantifying the improvement - it is 20% in terms of
+>>> what? Throughput, pps, cycles? And was that a single data point? For
+>>> multiple measurements there must be some variance (+/- X pp).
+>>> Would be great to see some data to back it up.
+>>> [...]
+>>>
+>>
+>> Pressure measurement method:
+>>
+>> server: sockperf sr --tcp -i x.x.x.x -p 7654 --daemonize
+>> client: taskset -c 8 sockperf tp --tcp -i x.x.x.x -p 7654 -m 1200 -t 30
+>>
+>> Default mode, no bpf prog:
+>>
+>> taskset -c 8 sockperf tp --tcp -i x.x.x.x -p 7654 -m 1200 -t 30
+>> sockperf: == version #3.10-23.gited92afb185e6 ==
+>> sockperf[CLIENT] send on:
+>> [ 0] IP = x.x.x.x    PORT =  7654 # TCP
+>> sockperf: Warmup stage (sending a few dummy messages)...
+>> sockperf: Starting test...
+>> sockperf: Test end (interrupted by timer)
+>> sockperf: Test ended
+>> sockperf: Total of 71520808 messages sent in 30.000 sec
+>>
+>> sockperf: NOTE: test was performed, using msg-size=1200. For getting maximum
+>> throughput consider using --msg-size=1472
+>> sockperf: Summary: Message Rate is 2384000 [msg/sec]
+>> sockperf: Summary: BandWidth is 2728.271 MBps (21826.172 Mbps)
+>>
+>> perf record --call-graph fp -e cycles:k -C 8 -- sleep 10
+>> perf report
+>>
+>> 80.88%--sock_sendmsg
+>>   79.53%--tcp_sendmsg
+>>    42.48%--tcp_sendmsg_locked
+>>     16.23%--_copy_from_iter
+>>     4.24%--tcp_send_mss
+>>      3.25%--tcp_current_mss
+>>
+>>
+>> perf top -C 8
+>>
+>> 19.13%  [kernel]            [k] _raw_spin_lock_bh
+>> 11.75%  [kernel]            [k] copy_user_enhanced_fast_string
+>>   9.86%  [kernel]            [k] tcp_sendmsg_locked
+>>   4.44%  sockperf            [.]
+>>   _Z14client_handlerI10IoRecvfrom9SwitchOff13PongModeNeverEviii
+>>   4.16%  libpthread-2.28.so  [.] __libc_sendto
+>>   3.85%  [kernel]            [k] syscall_return_via_sysret
+>>   2.70%  [kernel]            [k] _copy_from_iter
+>>   2.48%  [kernel]            [k] entry_SYSCALL_64
+>>   2.33%  [kernel]            [k] native_queued_spin_lock_slowpath
+>>   1.89%  [kernel]            [k] __virt_addr_valid
+>>   1.77%  [kernel]            [k] __check_object_size
+>>   1.75%  [kernel]            [k] __sys_sendto
+>>   1.74%  [kernel]            [k] entry_SYSCALL_64_after_hwframe
+>>   1.42%  [kernel]            [k] __fget_light
+>>   1.28%  [kernel]            [k] tcp_push
+>>   1.01%  [kernel]            [k] tcp_established_options
+>>   0.97%  [kernel]            [k] tcp_send_mss
+>>   0.94%  [kernel]            [k] syscall_exit_to_user_mode_prepare
+>>   0.94%  [kernel]            [k] tcp_sendmsg
+>>   0.86%  [kernel]            [k] tcp_current_mss
+>>
+>> Having bpf prog to write tcp opt in all pkts:
+>>
+>> taskset -c 8 sockperf tp --tcp -i x.x.x.x -p 7654 -m 1200 -t 30
+>> sockperf: == version #3.10-23.gited92afb185e6 ==
+>> sockperf[CLIENT] send on:
+>> [ 0] IP = x.x.x.x    PORT =  7654 # TCP
+>> sockperf: Warmup stage (sending a few dummy messages)...
+>> sockperf: Starting test...
+>> sockperf: Test end (interrupted by timer)
+>> sockperf: Test ended
+>> sockperf: Total of 60636218 messages sent in 30.000 sec
+>>
+>> sockperf: NOTE: test was performed, using msg-size=1200. For getting maximum
+>> throughput consider using --msg-size=1472
+>> sockperf: Summary: Message Rate is 2021185 [msg/sec]
+>> sockperf: Summary: BandWidth is 2313.063 MBps (18504.501 Mbps)
+>>
+>> perf record --call-graph fp -e cycles:k -C 8 -- sleep 10
+>> perf report
+>>
+>> 80.30%--sock_sendmsg
+>>   79.02%--tcp_sendmsg
+>>    54.14%--tcp_sendmsg_locked
+>>     12.82%--_copy_from_iter
+>>     12.51%--tcp_send_mss
+>>      11.77%--tcp_current_mss
+>>       10.10%--tcp_established_options
+>>        8.75%--bpf_skops_hdr_opt_len.isra.54
+>>         5.71%--__cgroup_bpf_run_filter_sock_ops
+>>          3.32%--bpf_prog_e7ccbf819f5be0d0_tcpopt
+>>    6.61%--__tcp_push_pending_frames
+>>     6.60%--tcp_write_xmit
+>>      5.89%--__tcp_transmit_skb
+>>
+>> perf top -C 8
+>>
+>> 10.98%  [kernel]                           [k] _raw_spin_lock_bh
+>>   9.04%  [kernel]                           [k] copy_user_enhanced_fast_string
+>>   7.78%  [kernel]                           [k] tcp_sendmsg_locked
+>>   3.91%  sockperf                           [.]
+>>   _Z14client_handlerI10IoRecvfrom9SwitchOff13PongModeNeverEviii
+>>   3.46%  libpthread-2.28.so                 [.] __libc_sendto
+>>   3.35%  [kernel]                           [k] syscall_return_via_sysret
+>>   2.86%  [kernel]                           [k] bpf_skops_hdr_opt_len.isra.54
+>>   2.16%  [kernel]                           [k] __htab_map_lookup_elem
+>>   2.11%  [kernel]                           [k] _copy_from_iter
+>>   2.09%  [kernel]                           [k] entry_SYSCALL_64
+>>   1.97%  [kernel]                           [k] __virt_addr_valid
+>>   1.95%  [kernel]                           [k] __cgroup_bpf_run_filter_sock_ops
+>>   1.95%  [kernel]                           [k] lookup_nulls_elem_raw
+>>   1.89%  [kernel]                           [k] __fget_light
+>>   1.42%  [kernel]                           [k] __sys_sendto
+>>   1.41%  [kernel]                           [k] entry_SYSCALL_64_after_hwframe
+>>   1.31%  [kernel]                           [k] native_queued_spin_lock_slowpath
+>>   1.22%  [kernel]                           [k] __check_object_size
+>>   1.18%  [kernel]                           [k] tcp_established_options
+>>   1.04%  bpf_prog_e7ccbf819f5be0d0_tcpopt   [k] bpf_prog_e7ccbf819f5be0d0_tcpopt
+>>
+>> Compare the above test results, fill up a CPU, you can find that
+>> the upper limit of qps or BandWidth has a loss of nearly 18-20%.
+>> Then CPU occupancy, you can find that "tcp_send_mss" has increased
+>> significantly.
+> 
+> This helps prove the point, but what I actually had in mind is to check
+> "perf annotate bpf_skops_hdr_opt_len" and see if there any low hanging
+> fruit there which we can optimize.
+> 
+> For instance, when I benchmark it in a VM, I see we're spending cycles
+> mostly memset()/rep stos. I have no idea where the cycles are spent in
+> your case.
+> 
+>>
 
-> Add flow director filter match and miss statistics to ethtool -S.
-> And change the number of queues when using flow director for ehtool -l.
->=20
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> ---
->  .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 39 +++++++++++++++++--
->  drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  5 +++
->  drivers/net/ethernet/wangxun/libwx/wx_type.h  |  4 ++
->  3 files changed, 45 insertions(+), 3 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-> b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-> index cc3bec42ed8e..a6241091e95c 100644
-> --- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-> @@ -43,6 +43,11 @@ static const struct wx_stats wx_gstrings_stats[] =3D {
->  	WX_STAT("alloc_rx_buff_failed", alloc_rx_buff_failed),  };
->=20
-> +static const struct wx_stats wx_gstrings_fdir_stats[] =3D {
-> +	WX_STAT("fdir_match", stats.fdirmatch),
-> +	WX_STAT("fdir_miss", stats.fdirmiss),
-> +};
-> +
->  /* drivers allocates num_tx_queues and num_rx_queues symmetrically so
->   * we set the num_rx_queues to evaluate to num_tx_queues. This is
->   * used because we do not have a good way to get the max number of @@ -
-> 55,12 +60,17 @@ static const struct wx_stats wx_gstrings_stats[] =3D {
->  		(WX_NUM_TX_QUEUES + WX_NUM_RX_QUEUES) * \
->  		(sizeof(struct wx_queue_stats) / sizeof(u64)))  #define
-> WX_GLOBAL_STATS_LEN  ARRAY_SIZE(wx_gstrings_stats)
-> +#define WX_FDIR_STATS_LEN  ARRAY_SIZE(wx_gstrings_fdir_stats)
->  #define WX_STATS_LEN (WX_GLOBAL_STATS_LEN + WX_QUEUE_STATS_LEN)
->=20
->  int wx_get_sset_count(struct net_device *netdev, int sset)  {
-> +	struct wx *wx =3D netdev_priv(netdev);
-> +
->  	switch (sset) {
->  	case ETH_SS_STATS:
-> +		if (wx->mac.type =3D=3D wx_mac_sp)
-> +			return WX_STATS_LEN + WX_FDIR_STATS_LEN;
->  		return WX_STATS_LEN;
+How do you do your pressure test? Can you send it to me for a try? Or 
+you can try my pressure test method. Have you checked the calling 
+frequency of bpf_skops_hdr_opt_len and bpf_skops_write_hdr_opt?
 
-             Better way is to use ternary operator.
-                 Return (wx->mac.type =3D=3D wx_mac_sp) ? WX_STATS_LEN + WX=
-_FDIR_STATS_LEN : WX_STATS_LEN;
->  	default:
->  		return -EOPNOTSUPP;
-> @@ -70,6 +80,7 @@ EXPORT_SYMBOL(wx_get_sset_count);
->=20
->  void wx_get_strings(struct net_device *netdev, u32 stringset, u8 *data) =
- {
-> +	struct wx *wx =3D netdev_priv(netdev);
->  	u8 *p =3D data;
->  	int i;
->=20
-> @@ -77,6 +88,10 @@ void wx_get_strings(struct net_device *netdev, u32
-> stringset, u8 *data)
->  	case ETH_SS_STATS:
->  		for (i =3D 0; i < WX_GLOBAL_STATS_LEN; i++)
->  			ethtool_puts(&p, wx_gstrings_stats[i].stat_string);
-> +		if (wx->mac.type =3D=3D wx_mac_sp) {
-> +			for (i =3D 0; i < WX_FDIR_STATS_LEN; i++)
-> +				ethtool_puts(&p,
-> wx_gstrings_fdir_stats[i].stat_string);
-> +		}
->  		for (i =3D 0; i < netdev->num_tx_queues; i++) {
->  			ethtool_sprintf(&p, "tx_queue_%u_packets", i);
->  			ethtool_sprintf(&p, "tx_queue_%u_bytes", i); @@ -
-> 96,7 +111,7 @@ void wx_get_ethtool_stats(struct net_device *netdev,
->  	struct wx *wx =3D netdev_priv(netdev);
->  	struct wx_ring *ring;
->  	unsigned int start;
-> -	int i, j;
-> +	int i, j, k;
->  	char *p;
->=20
->  	wx_update_stats(wx);
-> @@ -107,6 +122,14 @@ void wx_get_ethtool_stats(struct net_device
-> *netdev,
->  			   sizeof(u64)) ? *(u64 *)p : *(u32 *)p;
->  	}
->=20
-> +	if (wx->mac.type =3D=3D wx_mac_sp) {
-> +		for (k =3D 0; k < WX_FDIR_STATS_LEN; k++) {
-> +			p =3D (char *)wx + wx_gstrings_fdir_stats[k].stat_offset;
-> +			data[i++] =3D (wx_gstrings_fdir_stats[k].sizeof_stat =3D=3D
-> +				   sizeof(u64)) ? *(u64 *)p : *(u32 *)p;
-          Since fdir_match/fdir_len are u64, do we need to check the size h=
-ere?                          =20
-Thanks,
-Hariprasad k
+>>>>>> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+>>>>>> index 90706a47f6ff..f2092de1f432 100644
+>>>>>> --- a/tools/include/uapi/linux/bpf.h
+>>>>>> +++ b/tools/include/uapi/linux/bpf.h
+>>>>>> @@ -6892,8 +6892,14 @@ enum {
+>>>>>>     	 * options first before the BPF program does.
+>>>>>>     	 */
+>>>>>>     	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
+>>>>>> +	/* Fast path to reserve space in a skb under
+>>>>>> +	 * sock_ops->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB.
+>>>>>> +	 * opt length doesn't change often, so it can save in the tcp_sock. And
+>>>>>> +	 * set BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG to no bpf call.
+>>>>>> +	 */
+>>>>>> +	BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG = (1<<7),
+>>>>> Have you considered a bpf_reserve_hdr_opt() flag instead?
+>>>>> An example or test coverage would to show this API extension in action
+>>>>> would help.
+>>>>>
+>>>>
+>>>> bpf_reserve_hdr_opt () flag can't finish this. I want to optimize
+>>>> that bpf prog will not be triggered frequently before TSO. Provide
+>>>> a way for users to not trigger bpf prog when opt len is unchanged.
+>>>> Then when writing opt, if len changes, clear the flag, and then
+>>>> change opt len in the next package.
+>>> I haven't seen a sample using the API extenstion that you're proposing,
+>>> so I can only guess. But you probably have something like:
+>>> SEC("sockops")
+>>> int sockops_prog(struct bpf_sock_ops *ctx)
+>>> {
+>>> 	if (ctx->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB &&
+>>> 	    ctx->args[0] == BPF_WRITE_HDR_TCP_CURRENT_MSS) {
+>>> 		bpf_reserve_hdr_opt(ctx, N, 0);
+>>> 		bpf_sock_ops_cb_flags_set(ctx,
+>>> 					  ctx->bpf_sock_ops_cb_flags |
+>>> 					  MY_NEW_FLAG);
+>>> 		return 1;
+>>> 	}
+>>> }
+>>
+>> Yes, that's what I expected.
+>>
+>>> I don't understand why you're saying it can't be transformed into:
+>>> int sockops_prog(struct bpf_sock_ops *ctx)
+>>> {
+>>> 	if (ctx->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB &&
+>>> 	    ctx->args[0] == BPF_WRITE_HDR_TCP_CURRENT_MSS) {
+>>> 		bpf_reserve_hdr_opt(ctx, N, MY_NEW_FLAG);
+>>> 		return 1;
+>>> 	}
+>>> }
+>>
+>> "bpf_reserve_hdr_opt (ctx, N, MY_NEW_FLAG);"
+>>
+>> I don't know what I can do to pass the flag parameter, let
+>> "bpf_reserve_hdr_opt" return quickly? But this is not useful,
+>> because the loss caused by the triggering of bpf prog is very
+>> expensive, and it is still on the hotspot function of sending
+>> packets, and the TSO has not been completed yet.
+>>
+>>> [...]
+> 
+> This is not what I'm suggesting.
+> 
+> bpf_reserve_hdr_opt() has access to bpf_sock_ops_kern and even the
+> sock. You could either signal through bpf_sock_ops_kern to
+> bpf_skops_hdr_opt_len() that it should not be called again
+> 
+> Or even configure the tcp_sock directly from bpf_reserve_hdr_opt()
+> because it has access to it via bpf_sock_ops_kern{}.sk.
 
-> +		}
-> +	}
-> +
->  	for (j =3D 0; j < netdev->num_tx_queues; j++) {
->  		ring =3D wx->tx_ring[j];
->  		if (!ring) {
-> @@ -172,17 +195,21 @@ EXPORT_SYMBOL(wx_get_pause_stats);
->=20
->  void wx_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *i=
-nfo)
-> {
-> +	unsigned int stats_len =3D WX_STATS_LEN;
->  	struct wx *wx =3D netdev_priv(netdev);
->=20
-> +	if (wx->mac.type =3D=3D wx_mac_sp)
-> +		stats_len +=3D WX_FDIR_STATS_LEN;
-> +
->  	strscpy(info->driver, wx->driver_name, sizeof(info->driver));
->  	strscpy(info->fw_version, wx->eeprom_id, sizeof(info->fw_version));
->  	strscpy(info->bus_info, pci_name(wx->pdev), sizeof(info->bus_info));
->  	if (wx->num_tx_queues <=3D WX_NUM_TX_QUEUES) {
-> -		info->n_stats =3D WX_STATS_LEN -
-> +		info->n_stats =3D stats_len -
->  				   (WX_NUM_TX_QUEUES - wx-
-> >num_tx_queues) *
->  				   (sizeof(struct wx_queue_stats) / sizeof(u64))
-> * 2;
->  	} else {
-> -		info->n_stats =3D WX_STATS_LEN;
-> +		info->n_stats =3D stats_len;
->  	}
->  }
->  EXPORT_SYMBOL(wx_get_drvinfo);
-> @@ -383,6 +410,9 @@ void wx_get_channels(struct net_device *dev,
->=20
->  	/* record RSS queues */
->  	ch->combined_count =3D wx->ring_feature[RING_F_RSS].indices;
-> +
-> +	if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags))
-> +		ch->combined_count =3D wx-
-> >ring_feature[RING_F_FDIR].indices;
->  }
->  EXPORT_SYMBOL(wx_get_channels);
->=20
-> @@ -400,6 +430,9 @@ int wx_set_channels(struct net_device *dev,
->  	if (count > wx_max_channels(wx))
->  		return -EINVAL;
->=20
-> +	if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags))
-> +		wx->ring_feature[RING_F_FDIR].limit =3D count;
-> +
->  	wx->ring_feature[RING_F_RSS].limit =3D count;
->=20
->  	return 0;
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-> b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-> index 8fb38f83a615..44cd7a5866c1 100644
-> --- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-> @@ -2352,6 +2352,11 @@ void wx_update_stats(struct wx *wx)
->  	hwstats->b2ogprc +=3D rd32(wx, WX_RDM_BMC2OS_CNT);
->  	hwstats->rdmdrop +=3D rd32(wx, WX_RDM_DRP_PKT);
->=20
-> +	if (wx->mac.type =3D=3D wx_mac_sp) {
-> +		hwstats->fdirmatch +=3D rd32(wx, WX_RDB_FDIR_MATCH);
-> +		hwstats->fdirmiss +=3D rd32(wx, WX_RDB_FDIR_MISS);
-> +	}
-> +
->  	for (i =3D 0; i < wx->mac.max_rx_queues; i++)
->  		hwstats->qmprc +=3D rd32(wx, WX_PX_MPRC(i));  } diff --git
-> a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> index b1f9bab06e90..e0b7866f96ec 100644
-> --- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> @@ -157,6 +157,8 @@
->  #define WX_RDB_RA_CTL_RSS_IPV6_TCP   BIT(21)
->  #define WX_RDB_RA_CTL_RSS_IPV4_UDP   BIT(22)
->  #define WX_RDB_RA_CTL_RSS_IPV6_UDP   BIT(23)
-> +#define WX_RDB_FDIR_MATCH            0x19558
-> +#define WX_RDB_FDIR_MISS             0x1955C
->=20
->  /******************************* PSR Registers
-> *******************************/
->  /* psr control */
-> @@ -1018,6 +1020,8 @@ struct wx_hw_stats {
->  	u64 crcerrs;
->  	u64 rlec;
->  	u64 qmprc;
-> +	u64 fdirmatch;
-> +	u64 fdirmiss;
->  };
->=20
->  enum wx_state {
-> --
-> 2.27.0
->=20
+Oh, I see what you mean, this will achieve the goal.
+
 
 
