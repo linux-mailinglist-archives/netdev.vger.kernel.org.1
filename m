@@ -1,106 +1,85 @@
-Return-Path: <netdev+bounces-101055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CFB38FD132
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 16:53:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4407E8FD13C
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 16:55:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D940828545F
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 14:53:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4F3A283D4F
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 14:55:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE5C02837A;
-	Wed,  5 Jun 2024 14:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F6902837A;
+	Wed,  5 Jun 2024 14:55:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="qSr1FNow"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C3F25774;
-	Wed,  5 Jun 2024 14:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE1319D88D
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 14:55:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717599179; cv=none; b=YuGkl7T5JZQqtgW9ZJXIcZy+yVVbplCK1rEoPSWnEUeimWL5rOD6cWHwoL/Wcb+EchK4/d4lMsy9WHd3W/bYehf1U64B+5U4fS7Yf1Y8ourBIZSDkQePiZT86xsojkUMlxr5k/3935tjmo7tLBSSSvhugGCjgDun+E10U/UtAcM=
+	t=1717599340; cv=none; b=L7hmvlbPaXFSauSh20D8RJcNpcc+jXsLMVtEV4TY2dHXa3KXp01hwucgSDf8I/E0jmiO/HCVM4hP1/51RWhCrri+3ExMSG8l06aCzNgItfZoiIva4UlQn7Yniczci5rSpl9sTmzsHNXA4Xhwsp0mVntlg98qUd5dQ2hFpQNNljw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717599179; c=relaxed/simple;
-	bh=yRIHKxkExUCcCNbOOTqd0FldNUHY9LI103BRj3sfAFE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JypRuyRDDq5iw/rBC9dBvCOKffB+LBnvKwSB9N4+glqPswQLO2YL1PNcyRmNnHVxZP2+LcQLQIjqy1Jn5vJ9vdU/7c51sRERAilDdA5bSI8oay2O2vBMQrSEHy6d1Iqw9VC5cyXex8Wx5LtuGp7kEJuP1vIkRDcAvQRX2T/Uw2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-Date: Wed, 5 Jun 2024 10:52:53 -0400
-From: Kenton Groombridge <concord@gentoo.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH v2] wifi: mac80211: Avoid address calculations via out of
- bounds array indexing
-Message-ID: <dbqrrkkitwhvmcpgcpapdw7a7zjgdkidr4cyyjxyr7mwiihygo@pqzstp2nl7zg>
-Mail-Followup-To: Johannes Berg <johannes@sipsolutions.net>, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, Kees Cook <keescook@chromium.org>
-References: <20240517145420.8891-1-concord@gentoo.org>
- <d1fea590e53cb1b00dc64f4f8a4c8aec84610401.camel@sipsolutions.net>
- <cx2oet5b5lavjywcbf7u4c32krtoglvt3xbe2sxac55e36iibw@lrd5iuhtxz2g>
- <ab59089feac4cfbc1d681fcaa4a828ca13088ce1.camel@sipsolutions.net>
+	s=arc-20240116; t=1717599340; c=relaxed/simple;
+	bh=yokiJV8p9dkMWxqbtWIOEv99O5LOULthUIzCQYKny84=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KUSh4LK9CPePHFzvE+FmKfD8h0ni0ypQSQ/hANCiZuII3jt+XAJgl3tWF94A1O8mO6HR5z7B8MWGxZuPXdlP/j4Biav1GAmTVkMcWqW8+ZdTFB45wAVD+gXuaYPwzjeybNICmm7guysfhk7GRrfZfiYZWb7JRf7GT8pjswMUqlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=qSr1FNow; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1717599334; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=SfcsuPQSNJSnC3bKPAJUEDlWamBHyYsQMPKp4RigRnw=;
+	b=qSr1FNow87UMoEkjIkdQkOqlC2rjxx6gDtsQLMF+g5m2t5wuFDVEx3u1IEO/p6yTPvgWKdqA376iMxJZ3KG+9oIyBL+Dc49AO2raZq4/USsLVRrKToz3aMYbs6eO5+xYzI0vwMjb2YxWLMCR7F1ts8mMfqtRuIy6hVdsXZpKqPg=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067109;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0W7vW.U5_1717599333;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W7vW.U5_1717599333)
+          by smtp.aliyun-inc.com;
+          Wed, 05 Jun 2024 22:55:34 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: netdev@vger.kernel.org,
+	virtualization@lists.linux.dev
+Cc: Jason Wang <jasowang@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v2 0/2] virtio_net: enable the irq for ctrlq
+Date: Wed,  5 Jun 2024 22:55:31 +0800
+Message-Id: <20240605145533.86229-1-hengqi@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="6uvcipftoi6mlx2a"
-Content-Disposition: inline
-In-Reply-To: <ab59089feac4cfbc1d681fcaa4a828ca13088ce1.camel@sipsolutions.net>
+Content-Transfer-Encoding: 8bit
 
+Ctrlq in polling mode may cause the virtual machine to hang and
+occupy additional CPU resources. Enabling the irq for ctrlq
+alleviates this problem and allows commands to be requested
+concurrently.
 
---6uvcipftoi6mlx2a
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Changelog
+=========
+v1->v2:
+  - Refactor the patch 1 and rephase the commit log.
 
-On 24/06/04 09:29PM, Johannes Berg wrote:
-> Looking at your patch again, this seems wrong?
->=20
-> > +				local->hw_scan_req->req.channels[*n_chans++] =3D
-> >  							req->channels[i];
-> >=20
->=20
-> This will increment n_chans rather than *n_chans, no?
->=20
+Heng Qi (2):
+  virtio_net: enable irq for the control vq
+  virtio_net: improve dim command request efficiency
 
-Ah ha! A silly mistake that I missed. V3 to follow soon.
+ drivers/net/virtio_net.c | 277 ++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 247 insertions(+), 30 deletions(-)
 
---=20
-Kenton Groombridge
-Gentoo Linux Developer, SELinux Project
+-- 
+2.32.0.3.g01195cf9f
 
---6uvcipftoi6mlx2a
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQKTBAABCgB9FiEEP+u3AkfbrORB/inCFt7v5V9Ft54FAmZge8BfFIAAAAAALgAo
-aXNzdWVyLWZwckBub3RhdGlvbnMub3BlbnBncC5maWZ0aGhvcnNlbWFuLm5ldDNG
-RUJCNzAyNDdEQkFDRTQ0MUZFMjlDMjE2REVFRkU1NUY0NUI3OUUACgkQFt7v5V9F
-t57bKhAAynN8R9v+lYN7ApnatMLAGRD244uYlzCDJPmBILAbfKcrg2vgm+qPJusl
-4Cwkwho370rRdRtaDqsgC9eWwRGQpJ1UZ/aq55KAI0PPtphAdXx5MqEmX7Od1aUb
-m9Nj9LLEZhL+zdIkNIP3bDRomHDCBaywzJ/mZZg+r2Edr2PUEPYsNhBM2zemvQ08
-s17K9eQooclY+fMxDGj08Em462cZ6vv5zHO4nEtTvThv+S1dPpCG9vFXreAnEckM
-sVzLDGLII97RlXIHgNKyIIN660fuIfc7O6si1W++KaDxd6j+x0NBovGwOkTPA5hM
-IDYLIt+1OG2MY4QlG32NQl3UvfsNtCjjraQcwyU5ZhT45r3W/eL6tD7JcBvLRb/4
-OKmO+sSzTAiXZ5sXOdTkIWbiqZno6vkLOsLNnxAwofHUcj0JKv8lvIHGdaxxvqhN
-yMDmKye1XdDviSggWn2cAyiovXHrcvZYYQP5LPc72DYmtXtbrIRZEKp+HmOksWBN
-ncr5VCfbcBjqeTYCUwoWU8dLE5bHR4pMZCDHUtLYAordXEB2YHavhLNKyB+QZ1m+
-s1ZyYZoz7mS6jKxphRaVrwLrQZaCn9hm9zbYx2LN6tfz3NCsV1AHoacoOUfLz/ah
-j1Av1LZFwOTw+pMmryTt/NI+kJvdGIp4yfEUSB8JCos3+m3zsJk=
-=6g5W
------END PGP SIGNATURE-----
-
---6uvcipftoi6mlx2a--
 
