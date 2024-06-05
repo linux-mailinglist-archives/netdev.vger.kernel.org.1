@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-100935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22EE78FC8EC
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 12:25:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B27718FC8EF
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 12:25:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39A451C23076
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 10:25:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C858F1C2314C
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 10:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0E51191461;
-	Wed,  5 Jun 2024 10:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B01519147F;
+	Wed,  5 Jun 2024 10:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="gxDndkwq"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="OG7lVFoS"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2089.outbound.protection.outlook.com [40.107.223.89])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2068.outbound.protection.outlook.com [40.107.243.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2DFC18C335;
-	Wed,  5 Jun 2024 10:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.89
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1AC1946D2;
+	Wed,  5 Jun 2024 10:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.68
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717583120; cv=fail; b=WsddA95uT/m5NtVq+bOT/c1E0a0W66EktaqVng7zhhk4cNJhxZVKinoe+y6pWZwLXXUTMN+yPJf7pqHFrPIMdOo3DlcwS7nWmcCGp2xpqkP3H1vFppvsbxtqlVqieA1mKe5h+ttDVHFt008KXuHd58O5+D63+43vTpJmqRLJ+i4=
+	t=1717583121; cv=fail; b=JqtnwzjSlIek+DnC6Ezxk3oQEX2PnsESwFWiuLxeDBXaYHrVTpPzH1in7lX9G979yywH3k8OA6YfnhQdwOFpcuc2LI+cctSnzmw7Q956GmVal5nm7F+rRI5S+MSQH0vJAFMW89P9U8ZTnn6Gel5N9T/BwrW1QOg1lgDUpJYPN5s=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717583120; c=relaxed/simple;
-	bh=ffkqLdBfq2fqlXlNwgWxVL8nQxw0tpEiCW/KLnNH73g=;
+	s=arc-20240116; t=1717583121; c=relaxed/simple;
+	bh=XkvGZ4z9JyJtatCY67LiCJHMnr4s82VSMC/95qmkROY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MXifgEAt+keFB2tXIRUCKWf6bLtfsrgzXWSdYkFdq0jWWdS0Psfuo41bI5ur8DTp8XA+5HcQpKdPoqESXRchvtQpoyFNX7Pni0CfnRIfQr/TRsSJn7pAl0g5kM2j8xpkDlqr8yoFs72g13H278hpraqm/+Tj8Ft2czNidJHg+5E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=gxDndkwq; arc=fail smtp.client-ip=40.107.223.89
+	 MIME-Version:Content-Type; b=rIROg9zHjz+8mPL8izwdYE7dI0CdCWI52J7gIdpmkZsA+ebWQYMEc83mUVXbyxvU2O2V36VPBGs3XgBeavZsZFJPiwqVUJQQrYbky1q1mMIMVZkVBXv/fHQpkwBiRnAlDSJVOGmjjcHkOYhFpYIEIUbbupt/VCVqwg8haxKwWd4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=OG7lVFoS; arc=fail smtp.client-ip=40.107.243.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Fpl70aQqxbHwOcfiveBfLc1g6Ft61AKsSOIIt1a9198+yxV8vwFmhD2FbxVrHg+cdrBAUng2LpkluQW0RPAJkAAnzML0I/KjV6JcEQWudn6ckKzqBoKb01D5laCWjwmsyExhkyKOCIRv4S37pl9b7dI3OIG5/4P3phk/2chqKoveGI+u/xTnlL1qvSFmnHaYf7Z6gpdmU4JKXnMjmGsoq5+0ghYLccCxMMw3+qt42KSEDBrOsjoc3Uc3Wghae9e3ytXCL1kQ4jUApfrDvesFEOayjwLoHBLfTeZdxI2fNtHq4mYQRNB8qAmNzN8up5tPJogX3El65DntWrnpKlnXGQ==
+ b=bIWNdu1mdfGWf+3F3fWJjnxVZ0ZGghREmIWTkk0xHvw0wlvi0i419vKTOVvH1rIpPShJFo/Lof2OKwGYWEHvBB620ZmVIBFVQxwmwu2vsggR/yakiSXIBgUPknApDg1LPvhLBGagKH7cp+fnQKDqUfOMvHWKaGv2bvZq796Ta5zCrqkdOTLmQHonsKXDEJ/sitskEo6G0f1M3jWe95alMDR8ixr1wnh95oq4Y9HppbA94HU4cdKxpPa8+7Yp08lfPBFVIHxyj1sVQsswrbfCj4RlyQZ1VMZ3i6fTEkfdn5JQ7nqzAGDqLnJEOVUaA+1YjILaV9Xf+9p+Thq2Zn6yaw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=B34uQO2cQgqVztamM4y+DM/0CUbtzsgsqDKKWoBgJL0=;
- b=jy0T4eGp/hZmGl+jDclYJKwP0YlSakniclgs0+w3PCiIcA9QD7QYSn6bxmW86+G6hoBaMSY/nfUtJ/W29Q6dcz1cKUNpRN3u+UgXwW0uXMYU0VAC64H8RAhznBjHLhLBS5Sg4pidpes1LllezpV9OokiI7nUOM03xo/LiBv9ZEMdos+i58UE+LeOevuGMgZR8EnL5/8bzVodzdRLfIaaKzPN4A4pLucSaKDrXizU63OYg3rmHWnDMt4RDWn81fy1w+YI/KpF55Ynbs0Kw0YbwAXI9EJ0SqrJTlhzS9/lu0mM/BpOuwCEwU3CSD3oz4sbF6FnkoPsqfzX4qlJlihh5g==
+ bh=/asj8pYTs580x0ZS0Vc/pnHSqYHgHw0IpaY0j11lw98=;
+ b=fovtq7YM2NvqnggPZZoSfWtKSJKkXUqTWFh3NBtoGr0DYsFQo34jgSB2bh5/K0jkxuY6qLVvciSBBSwS15AzsK2Qc56hfbnT917yzAchFnUvag0OUsjyEUIk7A/FdezNUR8o1pVWOln36hQoelQ9RT5oNcd4WLWmrTX4qTxhShV2XvIqf5YGkPavvRk4zUCFYzW/Vzo4wU6UdLevJqKjHxh7bzeGtZrZTIgYfSmiFNF9DQBGrBqaAuByPcTsBn4hGRe97T5FEjTJWK8utMrElojBr4G8k+a/Iwj/gSErBBmQtlWzpd2UZ5FfI7aJJ7UbqCAX9qrqxoF8WHJjSw3+YA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=microchip.com smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=B34uQO2cQgqVztamM4y+DM/0CUbtzsgsqDKKWoBgJL0=;
- b=gxDndkwqKNqv1wmZ6ejdRLjRO8fyjtreSmhr6NXnoKi5GC372ARDrBV+WkEq/ySDgUdBVNRAmTXXy2BIYdXAdrCGDbxKN6hp4kVHstRzJynoLLwSFRD2sGYj4lyezxoGiLdGAOFnDegRMxdZYt1l+UUlHC+xZqRv1k5EryH89no=
-Received: from CH0PR03CA0090.namprd03.prod.outlook.com (2603:10b6:610:cc::35)
- by MW4PR12MB7465.namprd12.prod.outlook.com (2603:10b6:303:212::18) with
+ bh=/asj8pYTs580x0ZS0Vc/pnHSqYHgHw0IpaY0j11lw98=;
+ b=OG7lVFoSuHzG2QWxrZpL2LgQG1rcObz+yXy0VodlyYBozpcfAkQz7zkUgX9qUBWlp2fjkNoKu5fkLWHeWIQfLoHNQl6BWBGwSc4HTOW3eF6IQ+JbC3jas5Yt0/0SXbzYhpX0P8nYWFkt8VpP6wKMtSdy0qG2jKecsvUoU4R/3wo=
+Received: from CH0PR03CA0087.namprd03.prod.outlook.com (2603:10b6:610:cc::32)
+ by PH0PR12MB7096.namprd12.prod.outlook.com (2603:10b6:510:21d::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.31; Wed, 5 Jun
- 2024 10:25:16 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.32; Wed, 5 Jun
+ 2024 10:25:17 +0000
 Received: from CH2PEPF0000014A.namprd02.prod.outlook.com
- (2603:10b6:610:cc:cafe::73) by CH0PR03CA0090.outlook.office365.com
- (2603:10b6:610:cc::35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.31 via Frontend
- Transport; Wed, 5 Jun 2024 10:25:15 +0000
+ (2603:10b6:610:cc:cafe::ed) by CH0PR03CA0087.outlook.office365.com
+ (2603:10b6:610:cc::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.30 via Frontend
+ Transport; Wed, 5 Jun 2024 10:25:16 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,14 +65,14 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  CH2PEPF0000014A.mail.protection.outlook.com (10.167.244.107) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7633.15 via Frontend Transport; Wed, 5 Jun 2024 10:25:15 +0000
+ 15.20.7633.15 via Frontend Transport; Wed, 5 Jun 2024 10:25:16 +0000
 Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 5 Jun
- 2024 05:25:11 -0500
+ 2024 05:25:15 -0500
 Received: from xhdvineethc40.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Wed, 5 Jun 2024 05:25:07 -0500
+ Transport; Wed, 5 Jun 2024 05:25:11 -0500
 From: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
 To: <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
 	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
@@ -81,9 +81,9 @@ To: <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
 	<linux@armlinux.org.uk>, <vadim.fedorenko@linux.dev>, <andrew@lunn.ch>
 CC: <vineeth.karumanchi@amd.com>, <netdev@vger.kernel.org>,
 	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <git@amd.com>
-Subject: [PATCH net-next v3 1/4] net: macb: queue tie-off or disable during WOL suspend
-Date: Wed, 5 Jun 2024 15:54:54 +0530
-Message-ID: <20240605102457.4050539-2-vineeth.karumanchi@amd.com>
+Subject: [PATCH net-next v3 2/4] net: macb: Enable queue disable
+Date: Wed, 5 Jun 2024 15:54:55 +0530
+Message-ID: <20240605102457.4050539-3-vineeth.karumanchi@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240605102457.4050539-1-vineeth.karumanchi@amd.com>
 References: <20240605102457.4050539-1-vineeth.karumanchi@amd.com>
@@ -99,226 +99,72 @@ Received-SPF: None (SATLEXMB04.amd.com: vineeth.karumanchi@amd.com does not
  designate permitted sender hosts)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000014A:EE_|MW4PR12MB7465:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7b628694-01b3-4b9f-edbb-08dc8549ca6e
+X-MS-TrafficTypeDiagnostic: CH2PEPF0000014A:EE_|PH0PR12MB7096:EE_
+X-MS-Office365-Filtering-Correlation-Id: 850e41c2-1056-4ad9-709c-08dc8549cb13
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|82310400017|376005|7416005|1800799015|36860700004|921011;
+	BCL:0;ARA:13230031|82310400017|36860700004|1800799015|376005|7416005|921011;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?lE3y3BwuMME06vDvpjsyYGBMFqVuaQl+mCZmD1wN3yXy0uN+ugsC8EwD1qwz?=
- =?us-ascii?Q?Qq8RLh1l5/BsSWR9LD70FsjBnTVaOHgfpcLl2Aqh9Mb6/tKA25eYjxJEGP6c?=
- =?us-ascii?Q?w+D8h75nYlcJ0vqIn+GbiV1Ze44YLMKTCvWopUlNMSB5V/pE8J5+rd+2mIhh?=
- =?us-ascii?Q?5BIU2TeMr6UC3/vXGc7mHrNgm/XAbuLHRDM+gvhoFuJP+5Gu80+LoH0W1F2o?=
- =?us-ascii?Q?ywJzxULfmZgn/WJ04jiD3ONQ0hCXD6OnwHV0+38W/jh4G/Oewz2pSAHs3x8N?=
- =?us-ascii?Q?tHKx99du1yYK8j0LGemnXve4Qh7Y+1tx5d7oXTCrf+Kkb3hLCdp3MqANHesI?=
- =?us-ascii?Q?wSX6Ams/Ze1WbM7I9qR0I4JeQARuqpqbdSchLXELbeYPgLV0aZu2+kAjNsCT?=
- =?us-ascii?Q?gB/Bg3/cwWp9PdbAiqlZRoZUd0g20ekBTFRS8+/89XdZHwY5BRcs6yKUhDs1?=
- =?us-ascii?Q?Ia2Bfhczaug1PMNDqrZPplXrsf1ZcCG0/bAPX31Zx9c/5MnF2PQ0V3IYkgX1?=
- =?us-ascii?Q?ApStQ2hZ7uN6FkhkGpZ/6OKvw2OvJxGbtmcVHhn7MpAuOxxzIY9NcEOxkVyy?=
- =?us-ascii?Q?W4MWgT3PUKpp/TMhHR0UFEBvFh+lAIt+a1O5BImDdIfp53IC02gXznACCFJH?=
- =?us-ascii?Q?HyjaVK837mSHlVzmmJl5wVMr/U3kWvF+3cnOuxOJCEGOndrVL8FatGglELQg?=
- =?us-ascii?Q?Y8k0sPFaDHwdhe7Dqewf59C7R//nvWHqr35+SzSctixut8FK3vI5y8BUzDIg?=
- =?us-ascii?Q?SceavdmjhTtCcWkBM1NCXJTn82e46wbK8qDfC8FWBovER8nsRwJBMmNcBqz/?=
- =?us-ascii?Q?s7pExNKVNGnPydXbH1JKgoQqIqKVd6Iku8pxEy//qAV91gHeVTvEy3TQC0rz?=
- =?us-ascii?Q?3/7rLiDiq/kRR7Pm9CCBCHVw+fldkjKHWnSSrcaRHl+17K4wh2tcf7bEWGpY?=
- =?us-ascii?Q?GsxlPa8U66VJy8OIBm+e4L68fVpyk02VHo3vv60pYzFxtgXt8EQ/Vy25d9Zj?=
- =?us-ascii?Q?uM73a26geUSyCLQU77EPCs+c+/yh4k5nbA145uP9GibA5TWKiEZ0mrV7lSXd?=
- =?us-ascii?Q?1br9McH23EdmjnhHfm125XZlpczsRM3QCTIW6hNUUdZT6KJk7Gd0rKyDzixC?=
- =?us-ascii?Q?DAI3klc5ws4GzwnuN/9/9pRICLTe1yzSgLIE6L/nutOuZo5BiGFYSQS0RJYT?=
- =?us-ascii?Q?OqMUm/9KVxOMWnCKUOziPze2Q/yHZbVyE9kq8O8FoBpqSSAY0AfWIbUpk++/?=
- =?us-ascii?Q?DcExoSdIij26qEwR1PVVRKBopiqrhEX79eP9MYZ8MQo5Nyb8SaKHXWr+CTZF?=
- =?us-ascii?Q?Qy7ZViDjAfeXGXDdjlrR2TfHSqUlnY0n45+hwGABhMCga+AGA9fZhT81Ifdr?=
- =?us-ascii?Q?x87YZXrOwEJMGWYLMGM5NR7A3Fg5?=
+	=?us-ascii?Q?JtiTaSBNQu0wivYwI1JVqR/5Lrs7BYi52NISkYdsBT5RfQOy2dCkjQV5MYhx?=
+ =?us-ascii?Q?3qvPZbCsd4IDQwv8+OOkJcYCixsX+AkAzTCQlJOcsa4Lzt8d2hjNataAU7S8?=
+ =?us-ascii?Q?4ZKG/xslXg5RDEqPAvK2gHg8HJnWwJgN1e3gIp2/Gw+tRrsue0MUZVry2SRf?=
+ =?us-ascii?Q?QSiHJtZX93dCsix4r1lmBv6a4pkhpiG/+Z0b/HP0aNl3r2yurxbuR/I/0i5t?=
+ =?us-ascii?Q?xR0363lVzBnoG8cuOXVqybcEHemtF9VZCuTFOuwZw4WHDJ0ZE+YR5u2FAZjp?=
+ =?us-ascii?Q?rjKSSkyfAgxbO2sWtWlbtQv15hiEobiylILT5PNXTU4D4pYE5Gc5d+BpMLmD?=
+ =?us-ascii?Q?6sA0jUBRTfuTVzl13j0ncsDNczpsySl+YIQp1WIeW/0YpMXkXRTgx4scjfdK?=
+ =?us-ascii?Q?df0EhaCylWpjrUD97jjgCgxNDYrweaLndl9GmeoUenSeJEXtuclqRGqnSEXo?=
+ =?us-ascii?Q?5PTEUI7aG0kY42Oi2R4HHM3wSfDcX+6oGFZSIwUhQVYI9F5QD4hCNj6T7Bzg?=
+ =?us-ascii?Q?1wwQ8Z1WfEbNX1y07y06FPxFCkzShbZYKfaOFBMCwCtrtn/j3Xzem5vkF7jj?=
+ =?us-ascii?Q?cna5O+Mk1sIQbQN138xZ9G3TkwS53ozMZtymsnby9P7e9/qYtM8sc24f+NbN?=
+ =?us-ascii?Q?dB/TSS/UaRUtZwU+O/7UREGlukPIB4feZwU1JC1sHu6jA1Vs7Cue3LFS7zYM?=
+ =?us-ascii?Q?nfWad8Pzv51oYLncV1+SNHHGR/HjMdsKcp70HuN6Af5gfnjxz+VV4mspGACT?=
+ =?us-ascii?Q?6EL9D7TyfCHBCpz+p12eOi8ynrtLCuhbe89M/A13tOTWw53Usa/9KZjuTylb?=
+ =?us-ascii?Q?caANULfk30rCgAPa5QQ8QhuZKNNau6IWr21uxXXW3XBnVBd3+DkcR1sHbam/?=
+ =?us-ascii?Q?mzHuxT2MJTRph209+O4SSm6ejRss9d7GPf3xGr4jVwtVSSKCrfwZA55gcVA6?=
+ =?us-ascii?Q?5MJ/5cGZ3SYS0xbDCez8+stzHjWuYtHICRqzLYvAeh5pYWIcYnGgjVKUv0Kb?=
+ =?us-ascii?Q?gC/oGRQXko3fVr8WURQwiNTSI5MSeOJmohwUjkBCIbadLA81oundFmOGCdm3?=
+ =?us-ascii?Q?nMgG+huhqrzmnKnUqBi0R64uPdbRqBIds2ze0HxjqMLrk4Fu60bSLXyNwU51?=
+ =?us-ascii?Q?bq86AzniCJv2YwpwhJTZjaG7WjEQUsDo+Kkt6+WZjTn5CY5OBaFLMPd8D/C3?=
+ =?us-ascii?Q?cR80EiFtr14cGpmGrQkOB2VVSkKobpXPn+8Upf5Y2LQIV30nv+14KzXyjS2H?=
+ =?us-ascii?Q?OuFyLQLNjyccW3WP6c7TJYGXkriAd+YrH0sFVMUkdrogiTzVLFoepbBHUZ45?=
+ =?us-ascii?Q?HF9gMguIuI0L4/f6J2s2IUBgv01ojxb2r4jBE5POqho061va21AXPfze+1bv?=
+ =?us-ascii?Q?MTuEgR823xYFb/2qGhOdh3l6n4DC?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400017)(376005)(7416005)(1800799015)(36860700004)(921011);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400017)(36860700004)(1800799015)(376005)(7416005)(921011);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2024 10:25:15.2485
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2024 10:25:16.4517
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7b628694-01b3-4b9f-edbb-08dc8549ca6e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 850e41c2-1056-4ad9-709c-08dc8549cb13
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	CH2PEPF0000014A.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7465
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7096
 
-When GEM is used as a wake device, it is not mandatory for the RX DMA
-to be active. The RX engine in IP only needs to receive and identify
-a wake packet through an interrupt. The wake packet is of no further
-significance; hence, it is not required to be copied into memory.
-By disabling RX DMA during suspend, we can avoid unnecessary DMA
-processing of any incoming traffic.
+Enable queue disable for Versal devices.
 
-During suspend, perform either of the below operations:
-
-- tie-off/dummy descriptor: Disable unused queues by connecting
-  them to a looped descriptor chain without free slots.
-
-- queue disable: The newer IP version allows disabling individual queues.
-
-Co-developed-by: Harini Katakam <harini.katakam@amd.com>
-Signed-off-by: Harini Katakam <harini.katakam@amd.com>
 Signed-off-by: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
 ---
- drivers/net/ethernet/cadence/macb.h      |  7 +++
- drivers/net/ethernet/cadence/macb_main.c | 60 ++++++++++++++++++++++--
- 2 files changed, 64 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/cadence/macb_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-index aa5700ac9c00..50cd35ef21ad 100644
---- a/drivers/net/ethernet/cadence/macb.h
-+++ b/drivers/net/ethernet/cadence/macb.h
-@@ -645,6 +645,10 @@
- #define GEM_T2OFST_OFFSET			0 /* offset value */
- #define GEM_T2OFST_SIZE				7
- 
-+/* Bitfields in queue pointer registers */
-+#define MACB_QUEUE_DISABLE_OFFSET		0 /* disable queue */
-+#define MACB_QUEUE_DISABLE_SIZE			1
-+
- /* Offset for screener type 2 compare values (T2CMPOFST).
-  * Note the offset is applied after the specified point,
-  * e.g. GEM_T2COMPOFST_ETYPE denotes the EtherType field, so an offset
-@@ -733,6 +737,7 @@
- #define MACB_CAPS_NEEDS_RSTONUBR		0x00000100
- #define MACB_CAPS_MIIONRGMII			0x00000200
- #define MACB_CAPS_NEED_TSUCLK			0x00000400
-+#define MACB_CAPS_QUEUE_DISABLE			0x00000800
- #define MACB_CAPS_PCS				0x01000000
- #define MACB_CAPS_HIGH_SPEED			0x02000000
- #define MACB_CAPS_CLK_HW_CHG			0x04000000
-@@ -1254,6 +1259,8 @@ struct macb {
- 	u32	(*macb_reg_readl)(struct macb *bp, int offset);
- 	void	(*macb_reg_writel)(struct macb *bp, int offset, u32 value);
- 
-+	struct macb_dma_desc	*rx_ring_tieoff;
-+	dma_addr_t		rx_ring_tieoff_dma;
- 	size_t			rx_buffer_size;
- 
- 	unsigned int		rx_ring_size;
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 241ce9a2fa99..9fc8c5a82bf8 100644
+index 9fc8c5a82bf8..4007b291526f 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -2477,6 +2477,12 @@ static void macb_free_consistent(struct macb *bp)
- 	unsigned int q;
- 	int size;
+@@ -4949,7 +4949,8 @@ static const struct macb_config sama7g5_emac_config = {
  
-+	if (bp->rx_ring_tieoff) {
-+		dma_free_coherent(&bp->pdev->dev, macb_dma_desc_get_size(bp),
-+				  bp->rx_ring_tieoff, bp->rx_ring_tieoff_dma);
-+		bp->rx_ring_tieoff = NULL;
-+	}
-+
- 	bp->macbgem_ops.mog_free_rx_buffers(bp);
- 
- 	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
-@@ -2568,6 +2574,16 @@ static int macb_alloc_consistent(struct macb *bp)
- 	if (bp->macbgem_ops.mog_alloc_rx_buffers(bp))
- 		goto out_err;
- 
-+	/* Required for tie off descriptor for PM cases */
-+	if (!(bp->caps & MACB_CAPS_QUEUE_DISABLE)) {
-+		bp->rx_ring_tieoff = dma_alloc_coherent(&bp->pdev->dev,
-+							macb_dma_desc_get_size(bp),
-+							&bp->rx_ring_tieoff_dma,
-+							GFP_KERNEL);
-+		if (!bp->rx_ring_tieoff)
-+			goto out_err;
-+	}
-+
- 	return 0;
- 
- out_err:
-@@ -2575,6 +2591,19 @@ static int macb_alloc_consistent(struct macb *bp)
- 	return -ENOMEM;
- }
- 
-+static void macb_init_tieoff(struct macb *bp)
-+{
-+	struct macb_dma_desc *desc = bp->rx_ring_tieoff;
-+
-+	if (bp->caps & MACB_CAPS_QUEUE_DISABLE)
-+		return;
-+	/* Setup a wrapping descriptor with no free slots
-+	 * (WRAP and USED) to tie off/disable unused RX queues.
-+	 */
-+	macb_set_addr(bp, desc, MACB_BIT(RX_WRAP) | MACB_BIT(RX_USED));
-+	desc->ctrl = 0;
-+}
-+
- static void gem_init_rings(struct macb *bp)
- {
- 	struct macb_queue *queue;
-@@ -2598,6 +2627,7 @@ static void gem_init_rings(struct macb *bp)
- 		gem_rx_refill(queue);
- 	}
- 
-+	macb_init_tieoff(bp);
- }
- 
- static void macb_init_rings(struct macb *bp)
-@@ -2615,6 +2645,8 @@ static void macb_init_rings(struct macb *bp)
- 	bp->queues[0].tx_head = 0;
- 	bp->queues[0].tx_tail = 0;
- 	desc->ctrl |= MACB_BIT(TX_WRAP);
-+
-+	macb_init_tieoff(bp);
- }
- 
- static void macb_reset_hw(struct macb *bp)
-@@ -5215,6 +5247,7 @@ static int __maybe_unused macb_suspend(struct device *dev)
- 	unsigned long flags;
- 	unsigned int q;
- 	int err;
-+	u32 tmp;
- 
- 	if (!device_may_wakeup(&bp->dev->dev))
- 		phy_exit(bp->sgmii_phy);
-@@ -5224,17 +5257,38 @@ static int __maybe_unused macb_suspend(struct device *dev)
- 
- 	if (bp->wol & MACB_WOL_ENABLED) {
- 		spin_lock_irqsave(&bp->lock, flags);
--		/* Flush all status bits */
--		macb_writel(bp, TSR, -1);
--		macb_writel(bp, RSR, -1);
-+
-+		/* Disable Tx and Rx engines before  disabling the queues,
-+		 * this is mandatory as per the IP spec sheet
-+		 */
-+		tmp = macb_readl(bp, NCR);
-+		macb_writel(bp, NCR, tmp & ~(MACB_BIT(TE) | MACB_BIT(RE)));
- 		for (q = 0, queue = bp->queues; q < bp->num_queues;
- 		     ++q, ++queue) {
-+			/* Disable RX queues */
-+			if (bp->caps & MACB_CAPS_QUEUE_DISABLE) {
-+				queue_writel(queue, RBQP, MACB_BIT(QUEUE_DISABLE));
-+			} else {
-+				/* Tie off RX queues */
-+				queue_writel(queue, RBQP,
-+					     lower_32_bits(bp->rx_ring_tieoff_dma));
-+#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-+				queue_writel(queue, RBQPH,
-+					     upper_32_bits(bp->rx_ring_tieoff_dma));
-+#endif
-+			}
- 			/* Disable all interrupts */
- 			queue_writel(queue, IDR, -1);
- 			queue_readl(queue, ISR);
- 			if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
- 				queue_writel(queue, ISR, -1);
- 		}
-+		/* Enable Receive engine */
-+		macb_writel(bp, NCR, tmp | MACB_BIT(RE));
-+		/* Flush all status bits */
-+		macb_writel(bp, TSR, -1);
-+		macb_writel(bp, RSR, -1);
-+
- 		/* Change interrupt handler and
- 		 * Enable WoL IRQ on queue 0
- 		 */
+ static const struct macb_config versal_config = {
+ 	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE | MACB_CAPS_JUMBO |
+-		MACB_CAPS_GEM_HAS_PTP | MACB_CAPS_BD_RD_PREFETCH | MACB_CAPS_NEED_TSUCLK,
++		MACB_CAPS_GEM_HAS_PTP | MACB_CAPS_BD_RD_PREFETCH | MACB_CAPS_NEED_TSUCLK |
++		MACB_CAPS_QUEUE_DISABLE,
+ 	.dma_burst_length = 16,
+ 	.clk_init = macb_clk_init,
+ 	.init = init_reset_optional,
 -- 
 2.34.1
 
