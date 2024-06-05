@@ -1,65 +1,47 @@
-Return-Path: <netdev+bounces-100834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 368608FC344
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 08:02:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D2D58FC340
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 08:01:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6418E1C21053
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 06:02:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E3251C215E5
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 06:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83B821C179;
-	Wed,  5 Jun 2024 06:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D8C1581E2;
+	Wed,  5 Jun 2024 06:01:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="PiKQG1GB"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="St/YVqDJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87DA9225D9;
-	Wed,  5 Jun 2024 06:02:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECEFB225D9;
+	Wed,  5 Jun 2024 06:01:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717567370; cv=none; b=WEEOn8JiGHgxGmoznlx71RKOaDK7dFAnLDwjFdq0j7K1qCloLDMdgD/O+lPbg9tPvAOUlFqhAA1pHcAVgcKvmoLMO2cEISLgs9W/rZBEW9L2NfOufilmCN3TL05YwteqkcMGsMu6x4l7/jyvkPYkGtVt3I0DAigh/cUa63ac2mw=
+	t=1717567293; cv=none; b=fGUxUmBNJ4gO20gPi9HdUMYhHkSJ4CbPICsuHH1R0FXNL713X0n8Aiwp5VKw21qybhT4G6ZfrS/tNyb4UB/b9C/uqJlp9+8q7YXN5pEIqAupfRX0fmV2wDjBFjJI1+stXP4tRG6b9ApGvy+MmU4dVdn4/htfAr8rIm0L/3fsB1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717567370; c=relaxed/simple;
-	bh=ubAy5Sy4LtO8IqXdFZ0dzy0l5V0OzL4Dtf9LaTvCzzg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=MP4cQYa+RaweD2WeJxDjsWy4fMgnF1zKkCfuWHrOLlDzO+q0FHIUV7cUHonEgVt+UI4XG9RNEBRNBwsKw7GW1nrnOkNm+qt6mw4VgFrPImbvpmoJH5hWjfMWcJ5A1dCKXqv86H6+UUXhTnfoUY0vYIijCUO0B0j3Tv/276kOF9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=PiKQG1GB; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4550MaE5012962;
-	Wed, 5 Jun 2024 08:02:13 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	4DjnJoPbo30AhugHUqFSm27VE7pFMVJlJLwMT373m9s=; b=PiKQG1GBRo57aejO
-	FnF4gTRb0IG3xnAWIAbBFCmvQH24hEykzo1zt84HDjp19atARc1OTRKd8Kc58H/K
-	q3ChX++VjuDHyubscb2+TMPU6o0FTmfTjIAoC742vD+8NXRZWViipY0xtVEWqFlo
-	qTG8IcvQwI9WKmj84cEmQKyLnWc/krPO+18HSfqSJ4I3YXzoWaxf5GFZHoQBtqQU
-	cbvAOJPzfkt1e9CIX9mC4RwLEWQH9ei36Yiv8oYQFeQHR+cvwUBUjDM7gmUpXaYC
-	SPax9jRQp9y5dMXNDWMbRqkiOqe1uW8uaeVP4NokCfUq5tKJW3lp0+WDTa0qpfa2
-	vyHTOQ==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yfw3wq3fp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Jun 2024 08:02:13 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 181B74004C;
-	Wed,  5 Jun 2024 08:02:07 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id A7D2C20F2DE;
-	Wed,  5 Jun 2024 08:00:52 +0200 (CEST)
-Received: from [10.48.86.164] (10.48.86.164) by SHFDAG1NODE2.st.com
- (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 5 Jun
- 2024 08:00:51 +0200
-Message-ID: <3a59b4cc-0c7b-47d6-8322-4ae12ddb3a4c@foss.st.com>
-Date: Wed, 5 Jun 2024 08:00:51 +0200
+	s=arc-20240116; t=1717567293; c=relaxed/simple;
+	bh=kspRoPiqT+60w/910CphqXYKi5/A7+b0R+YvgoUpxZc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DLXKgmW/eslF6jbeLaWu8Q/rH+MK7sFMZoXhbyvVajyw5IU7/QpOEm6ukI0uQ9d+gbTu6kfpOQocuUG5svhdDcYguQclHCnDS2K9AZC1rNwtbvWbMO2axYS77/5zK0TAh4w13CFLTOqm4vXOwHafP+g/m36ZJbfb1pn9xwgEvRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=St/YVqDJ; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1717567282; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=7770HT+DXXn2uXZuUaw8VKFeHVqNBA2X1DYZ7hOedW8=;
+	b=St/YVqDJe1lhFH2rmcg3mHt8YDInlq7ToOb77QOwpq3qha8rbSTPWt1yytlsMaWF//NmIVJcgVUe3Wdk1BrUdyiNxCFeW3JgV5nq9brwnbwDto8FsIxN6JoqLJHaMSY7gfRQkK8CvtKGSo61y9FCYJcnb4wensfOsqMfprcF8x8=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067110;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W7t4AJs_1717567280;
+Received: from 30.221.129.197(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W7t4AJs_1717567280)
+          by smtp.aliyun-inc.com;
+          Wed, 05 Jun 2024 14:01:21 +0800
+Message-ID: <1884a3ff-1a1a-419c-b474-4d37bf760a77@linux.alibaba.com>
+Date: Wed, 5 Jun 2024 14:01:20 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,57 +49,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 10/11] ARM: dts: stm32: add ethernet1 for
- STM32MP135F-DK board
-To: Marek Vasut <marex@denx.de>, "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre
- Torgue <alexandre.torgue@foss.st.com>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        Liam Girdwood
-	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20240604143502.154463-1-christophe.roullier@foss.st.com>
- <20240604143502.154463-11-christophe.roullier@foss.st.com>
- <c2242ba3-3692-4c5f-a979-0d0e80f23629@denx.de>
-Content-Language: en-US
-From: Christophe ROULLIER <christophe.roullier@foss.st.com>
-In-Reply-To: <c2242ba3-3692-4c5f-a979-0d0e80f23629@denx.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH net] net/smc: avoid overwriting when adjusting sock
+ bufsizes
+To: Gerd Bayer <gbayer@linux.ibm.com>, wenjia@linux.ibm.com,
+ jaka@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240531085417.43104-1-guwen@linux.alibaba.com>
+ <cc606c7b6fb53d00d80122b987c94bd7cb385af0.camel@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <cc606c7b6fb53d00d80122b987c94bd7cb385af0.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-04_11,2024-06-05_01,2024-05-17_01
 
 
-On 6/4/24 18:52, Marek Vasut wrote:
-> On 6/4/24 4:35 PM, Christophe Roullier wrote:
->> Ethernet1: RMII with crystal
->> PHY used is SMSC (LAN8742A)
->
-> Doesn't the STM32MP135F-DK come with two ethernet ports ?
-> Why not enable both ?
 
-Hi Marek,
+On 2024/6/5 00:16, Gerd Bayer wrote:
+> Hi Wen Gu,
+> 
+> sorry for the late reply, I'm just catching up after a bit of a
+> vacation.
 
-As already discussed in V2, second ethernet have no cristal and need 
-"phy-supply" property to work, today this property is managed by 
-Ethernet glue, but
+No worries at all, I hope you had a great vacation!
 
-should be present and managed in PHY node (as explained by Rob). So I 
-will push second Ethernet in next step ;-)
+> 
+> On Fri, 2024-05-31 at 16:54 +0800, Wen Gu wrote:
+>> When copying smc settings to clcsock, avoid setting clcsock's
+>> sk_sndbuf to sysctl_tcp_wmem[1], since this may overwrite the value
+>> set by tcp_sndbuf_expand() in TCP connection establishment.
+>>
+>> And the other setting sk_{snd|rcv}buf to sysctl value in
+>> smc_adjust_sock_bufsizes() can also be omitted since the
+>> initialization of smc sock and clcsock has set sk_{snd|rcv}buf to
+>> smc.sysctl_{w|r}mem or ipv4_sysctl_tcp_{w|r}mem[1].
+>>
+>> Fixes: 30c3c4a4497c ("net/smc: Use correct buffer sizes when
+>> switching between TCP and SMC")
+>> Link:
+>> https://lore.kernel.org/r/5eaf3858-e7fd-4db8-83e8-3d7a3e0e9ae2@linux.alibaba.com
+>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>> ---
+>> FYI,
+>> The detailed motivation and testing can be found in the link above.
+>> ---
 
+<...>
+
+> 
+> As Wenjia already said, we've discussed this a bit.
+> As I remember, I've added the sections to copy over the sysctl values
+> as a "safety measure" when moving between smc/clc sockets - but had the
+> wrong assumption in mind that e.g. in a fall-back a new TCP handshake
+> would be done. Apparently, we didn't test the buffer size behavior in
+> these scenarios enough to notice the "weird" behavior.
+> 
+> So we reviewed your initial report of the oddity per your message in
+> the link above, too.
+> 
+> We fully agree that if no connection at the SMC level could be
+> established, you should expect the socket buffersizes be used that had
+> been established for the TCP connection - regardless if the fallback is
+> due to the server or the client.
+> 
+> So feel free to add my
+> Reviewed-by: Gerd Bayer <gbayer@linux.ibm.com>, too.
+> 
+
+Hi, Gerd and Wenjia. Thanks a lot for your confirmation.
+
+And as for the last question in the initial report (link above), that
+why the server does not call smc_copy_sock_settings_to_clc() like the
+client when fallback happens, I guess it is because at the time that
+server fallback, the new_smc sock has not been accepted, so there will
+be no user's sock settings that needs to be copied to clcsock.
+
+Thanks!
+
+> Thanks,
+> Gerd
 
