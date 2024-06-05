@@ -1,119 +1,147 @@
-Return-Path: <netdev+bounces-100967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 590ED8FCC5D
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 14:18:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEEBB8FCC76
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 14:20:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 071631F21F5D
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 12:18:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7EF91C23BAC
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 12:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70A491991C6;
-	Wed,  5 Jun 2024 11:55:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632E61BBBCA;
+	Wed,  5 Jun 2024 11:55:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ihLNEHWW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YhIie8SS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4828E1991BF;
-	Wed,  5 Jun 2024 11:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3436C1BBBC3;
+	Wed,  5 Jun 2024 11:55:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717588514; cv=none; b=U1Oz7Ycq87rLASIujOi+OcpAPjyrEsGZYx5bjJj1dSMkCsSoV60t3YSGY+RCg6RyBumWBa3UHEqziK4DfEjsITYyzhtBBZfd61aFX66grOrJMHXskDlrA1PNCpzIyLmSzCofK3CcqJq3y8G+CWAPxJORn4KLNnP/iwh4jJ7YQjw=
+	t=1717588558; cv=none; b=KYyaGyHCuV0Hd314UDFYo2amu0r4TRbf25Da8jGByOnK0Z0YTSQwix5oTqmSmPRvhqpSbIj6YZrJEL6m8KElX9nUuqa/4ATV/32lBrMnRxroDuHLPnym0xX9PkfZtKhhKiLetKWBQHvpn7em84SNGu5f7UughTxCaT3zrSKpV5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717588514; c=relaxed/simple;
-	bh=vxNta2dXvygcPDnAOyNlvvdZasfoIV/rkHu+VVyVUxQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FDM9VM8WUjB+KnCF+j5zdAmMyeRL7m6uzg2PaAvDuDWyKoGYNxE8TV3XIMODk0p+hdl6+rVcc9DSYD2c2xtY6fdapDSc+sxHs6c1SAobB8cxjJSSbqIzsp3m7jVCBWqQ38Z7FycNX+00JOu1xmITwoqCiBl2a16/sve+K+NgR2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ihLNEHWW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C04B2C32781;
-	Wed,  5 Jun 2024 11:55:08 +0000 (UTC)
+	s=arc-20240116; t=1717588558; c=relaxed/simple;
+	bh=WTisGYSNvp17ebvku7IcULq8g4QnWshJd8J02Zl6YKw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Cki1iRWJjALcPt/m7Khvy5VAc7StY6Qd81A6thWiNNnZMFPnnmvT2dBUS/Wg6AwxBnKXK/LZt8j5KVRz/sx38P0XvmUHKIZZTl7qN1PpDmFDE4KMGahUCDooog8P69R4Lkqv3BuBCnd6+TwLdo16i9lo8TgDk5cp7FPTZHmH7WU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YhIie8SS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D02C6C32786;
+	Wed,  5 Jun 2024 11:55:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717588513;
-	bh=vxNta2dXvygcPDnAOyNlvvdZasfoIV/rkHu+VVyVUxQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ihLNEHWWeyMq3gPlOBgaF5Yr8+BSQTQupEqqMvROYRzEKQYZrf7equbZ5cgHjtHf3
-	 /bH29+vNWl3dLW4GrR3Au3z/zqxMQ1A/tjbEhu//vqflP3X+z7tpadFTQ8mQiIte3S
-	 wwmXgTo/zGr2YixlSlgp7uQxTi6Z6DcKm9ywvQg6PUlUCob/YGOaJhyABcE5kEqR51
-	 +jkebJYJU436NDgXyM+8dwJrHtOQ4fsHq3IVo3kwIl7NR/nign0GHFU4XjiLAXHgWk
-	 ogIs6rqg2A9MMkMglaRI/1A3vub6C53MZJ+1T7CrrKNoFTWB25/9z/nYLakhK4ZYQ0
-	 bpDJ9iE7wqFfw==
-Message-ID: <c71e0891-a187-4ad9-b554-8f28c15984fd@kernel.org>
-Date: Wed, 5 Jun 2024 13:55:07 +0200
+	s=k20201202; t=1717588557;
+	bh=WTisGYSNvp17ebvku7IcULq8g4QnWshJd8J02Zl6YKw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=YhIie8SSbnA2KqHzmnS7xAsUtRcBhgJlkoGAJ7/2O0LtCMClpHlRG304acbK+aPqr
+	 0QNnbdwen69Oo4VkI7cSCJQ5/57XvIvMm2rW4sqHXw50H8izEM4/NUQ1li9hoLAV5o
+	 +juKDxSfNrAxkXnDZCVvTy/cxEgfauAlt4tx4JcBtRrvslUnf4hfD6XrmIO+vnh9qT
+	 aU4ujK6NOMXbLH1MCXgQ5t0N70w6IEkQhRpFF6CvDhbR4pkLOe1MwiYmnPUU8XVcij
+	 t+H1QgtXHWlb67ShLoc/PxwVYDmEeRIrd/q3R7vsyxwunlQ+QwOhS5mykz0A2BoN4T
+	 R1YDUUAqc4DKg==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Mike Christie <michael.christie@oracle.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Sasha Levin <sashal@kernel.org>,
+	jasowang@redhat.com,
+	virtualization@lists.linux.dev,
+	kvm@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.9 6/6] vhost-scsi: Handle vhost_vq_work_queue failures for events
+Date: Wed,  5 Jun 2024 07:55:41 -0400
+Message-ID: <20240605115545.2964850-6-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240605115545.2964850-1-sashal@kernel.org>
+References: <20240605115545.2964850-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net-next 14/15] net: Reference bpf_redirect_info via
- task_struct on PREEMPT_RT.
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Boqun Feng <boqun.feng@gmail.com>,
- Daniel Borkmann <daniel@iogearbox.net>, Eric Dumazet <edumazet@google.com>,
- Frederic Weisbecker <frederic@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>,
- Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
- Song Liu <song@kernel.org>, Stanislav Fomichev <sdf@google.com>,
- Yonghong Song <yonghong.song@linux.dev>, bpf@vger.kernel.org
-References: <20240529162927.403425-1-bigeasy@linutronix.de>
- <20240529162927.403425-15-bigeasy@linutronix.de> <87y17sfey6.fsf@toke.dk>
- <20240531103807.QjzIOAOh@linutronix.de>
- <9afab1bb-43d6-4f17-b45d-7f4569d9db70@kernel.org>
- <20240605104128.Nn9Cp0CB@linutronix.de>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20240605104128.Nn9Cp0CB@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.9.3
 Content-Transfer-Encoding: 8bit
 
+From: Mike Christie <michael.christie@oracle.com>
 
+[ Upstream commit b1b2ce58ed23c5d56e0ab299a5271ac01f95b75c ]
 
-On 05/06/2024 12.41, Sebastian Andrzej Siewior wrote:
-> On 2024-06-05 12:28:08 [+0200], Jesper Dangaard Brouer wrote:
->>
->> Hmm, but how will this affect performance?
-> 
-> As I wrote in the changelog for v4, I haven't notice a difference. I
-> tried to move bpf_net_ctx_set() from cpu_map_bpf_prog_run() to
-> cpu_map_kthread_run() to have this assignment only once and I didn't see
-> a difference/ I couldn't tell the two kernels apart.
-> 
+Currently, we can try to queue an event's work before the vhost_task is
+created. When this happens we just drop it in vhost_scsi_do_plug before
+even calling vhost_vq_work_queue. During a device shutdown we do the
+same thing after vhost_scsi_clear_endpoint has cleared the backends.
 
-This would be my preferred solution.
-See below, your benchmark wasn't testing/measuring this changed code on
-remote CPU running kthread.
+In the next patches we will be able to kill the vhost_task before we
+have cleared the endpoint. In that case, vhost_vq_work_queue can fail
+and we will leak the event's memory. This has handle the failure by
+just freeing the event. This is safe to do, because
+vhost_vq_work_queue will only return failure for us when the vhost_task
+is killed and so userspace will not be able to handle events if we
+sent them.
 
-> This is what I have been using for testing
-> 
-> | xdp-bench redirect-cpu --cpu 3 --remote-action drop eth1 -e
-> 
-> in case I was changing the wrong part…
+Signed-off-by: Mike Christie <michael.christie@oracle.com>
+Message-Id: <20240316004707.45557-2-michael.christie@oracle.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/vhost/scsi.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-As we saw earlier (with your hardware setup) this test is benchmarking
-the RX-NAPI XDP-redirect code.  As the cpumap "remote" CPUs kthread had
-idle cycles.
-
-The extra clearing bpf_net_ctx_set() for each packet in the kthread on
-the remote CPU will not change the benchmark numbers (as it have idle
-cycles).
-
-Looking closer at kernel code + your patch, I see that this clearing
-isn't done for each packet, but per bulk (up-to CPUMAP_BATCH 8).  Given
-that, I'm more okay with this change.
-
---Jesper
-
+diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+index 282aac45c6909..f34f9895b8984 100644
+--- a/drivers/vhost/scsi.c
++++ b/drivers/vhost/scsi.c
+@@ -497,10 +497,8 @@ vhost_scsi_do_evt_work(struct vhost_scsi *vs, struct vhost_scsi_evt *evt)
+ 		vq_err(vq, "Faulted on vhost_scsi_send_event\n");
+ }
+ 
+-static void vhost_scsi_evt_work(struct vhost_work *work)
++static void vhost_scsi_complete_events(struct vhost_scsi *vs, bool drop)
+ {
+-	struct vhost_scsi *vs = container_of(work, struct vhost_scsi,
+-					vs_event_work);
+ 	struct vhost_virtqueue *vq = &vs->vqs[VHOST_SCSI_VQ_EVT].vq;
+ 	struct vhost_scsi_evt *evt, *t;
+ 	struct llist_node *llnode;
+@@ -508,12 +506,20 @@ static void vhost_scsi_evt_work(struct vhost_work *work)
+ 	mutex_lock(&vq->mutex);
+ 	llnode = llist_del_all(&vs->vs_event_list);
+ 	llist_for_each_entry_safe(evt, t, llnode, list) {
+-		vhost_scsi_do_evt_work(vs, evt);
++		if (!drop)
++			vhost_scsi_do_evt_work(vs, evt);
+ 		vhost_scsi_free_evt(vs, evt);
+ 	}
+ 	mutex_unlock(&vq->mutex);
+ }
+ 
++static void vhost_scsi_evt_work(struct vhost_work *work)
++{
++	struct vhost_scsi *vs = container_of(work, struct vhost_scsi,
++					     vs_event_work);
++	vhost_scsi_complete_events(vs, false);
++}
++
+ static int vhost_scsi_copy_sgl_to_iov(struct vhost_scsi_cmd *cmd)
+ {
+ 	struct iov_iter *iter = &cmd->saved_iter;
+@@ -1509,7 +1515,8 @@ vhost_scsi_send_evt(struct vhost_scsi *vs, struct vhost_virtqueue *vq,
+ 	}
+ 
+ 	llist_add(&evt->list, &vs->vs_event_list);
+-	vhost_vq_work_queue(vq, &vs->vs_event_work);
++	if (!vhost_vq_work_queue(vq, &vs->vs_event_work))
++		vhost_scsi_complete_events(vs, true);
+ }
+ 
+ static void vhost_scsi_evt_handle_kick(struct vhost_work *work)
+-- 
+2.43.0
 
 
