@@ -1,74 +1,54 @@
-Return-Path: <netdev+bounces-100859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8CA78FC4AE
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:37:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D9538FC4ED
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:48:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 440C01F22142
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 07:37:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FA541C2167A
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 07:48:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C3218C331;
-	Wed,  5 Jun 2024 07:37:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F58118C327;
+	Wed,  5 Jun 2024 07:48:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="kn5bhPLw"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="SBgvrLQf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0E96A03F
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 07:37:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7455418C33A
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 07:48:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717573035; cv=none; b=JIQokKM5h7LzJXDnLvi86YPtrTxCS8JEPD+NXQQ4kxU+Xq35X4yQvS5iN5VHv4KBtFY7EdjYJpH+evZTKYrMo6jS5c++nzkycfdGD9GKSIBvvcsjqeXV1Ff+cVS/huhOOfPjpmFlnATWD4rnW5+Xr3N2LRGesxNZqIUNYBIGYUE=
+	t=1717573695; cv=none; b=ajpnuUOgMebOCzRVPRv9qVE/6Te0DiIBG6Ldxd3q4NwVTcaiWygdaFYx/v1xAuheBmQHLnLsUB7Dfe+dqqsR+EoAnbsw9xEIhILfPB0lPtHyo+Ms3mXQKV3nNCaSnZwMJSQ2Vc2KHeHB69dn6L3YghP8SEoYqTfOGks76XmvK68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717573035; c=relaxed/simple;
-	bh=0bcrLTQX65w3+uAqgRwFhD9W+5+9d04Rnllfp2Q7OBY=;
+	s=arc-20240116; t=1717573695; c=relaxed/simple;
+	bh=mKqA4leOhmqKlL21mGvcc2CfivHSZyriFSBctRQlj6w=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r+f/wqUy5p5jX4OabSFXW34v2Vw52QTl1erFppZIdyV2nEN1Xdvoa4NGwc2it0gw5A1bizzJ86NPfgCIP2A/Tla0RFv5tGr/dxfQ0vZmIBbm1lO+IX4M5Gn6A+VqQXLNC0Bmi3hxhowdpgTULnsuVl0JEj7DQ1c3BBV2biHRTzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=kn5bhPLw; arc=none smtp.client-ip=209.85.210.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-6f8ef63714cso4162312a34.1
-        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 00:37:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1717573033; x=1718177833; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZPvDAH+YMalqInPfm8+iSZEqqgczyWUOtqvg5GoEtYE=;
-        b=kn5bhPLw+5ax4LDVdlIBwEVbiI5Piwp6e4JTSEzHBMwUkgXwGWKMwavD/JVuudpyJf
-         VvrJEmNWXalKvUHvidYPVXp/mYuyzRRBMgzPX9fAsIKsEIZ1eI3CvQ5JYGw5tGGqL3VH
-         4H1zN4yYkGVQnYaLGZGmVyCw8XDmoOCleiZFR/Htj5LDm53ezR0+Mmh/+WwOOmElbZd6
-         84K7Y/3XbpGfx7q92hO1XKt7iONYaL+OnDCwwOh4Sjhkq5S+48C0U8k13pTX/JQ6u/U6
-         FFdP2qDRvl9e/XPmINcwTimDEE+T09HNPnXrE9LlsInOooz6pxNgn5zic89MLi8US5ap
-         OUuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717573033; x=1718177833;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ZPvDAH+YMalqInPfm8+iSZEqqgczyWUOtqvg5GoEtYE=;
-        b=e8Z6wahMV9syfF/ODvH5fvImeqDES+B4fQDyFEesXtdaIeZ5K/fZSn3sxztYvojGSk
-         Nq8mrXr0tDunDtkkb3MZRLyTTXu9l5pPEgs875FyJ9X8zxYotHwEbcIzD0k6Z7MI9RQ9
-         xNmSdZj6gG580WPKtvQMdCFgQjCadvUyD+7OhykKEEiShpK4bLDCJ56ErIlOo/0Df+C8
-         QDWcM5eipGwUMh2qutAaYcTZggRtsHZ6mnfcAsKPzf9JAwGDh2DN5DnBB7xjSoKBkkNP
-         yoTvh8pozp97qN+XkiogH/oAGFnGAP8Q+vb2zcUuAR6Gn6/IZawD5h0Ah6SLdnIMOX0A
-         skTA==
-X-Forwarded-Encrypted: i=1; AJvYcCWQHKPBricf76M0+bsgdURYrLkejpueIfmcwpM0lk4UZuPveNF9FLKx9dRexRPX1h7xlHkhhQbvZb/Ky6HVNRT6E6OqGkhY
-X-Gm-Message-State: AOJu0Yyah7Pbz2DP8nyZ4aQD/zp2u72gn3LzXtIb9oVj5+maCwLpWT35
-	xFEmjiIalK4KvtDGv5QBgd/IuiJtPRxMC52nXIBJDFi0D7yVBvjudrtP8T2P01Y=
-X-Google-Smtp-Source: AGHT+IHOM+Hm4FbbQZQFmS6lBFh9A0mBVXXYXd6sNx2AlIYuuH2UdvbbngptVM/wrFldErC1pE/3+g==
-X-Received: by 2002:a05:6870:169e:b0:24f:d4b4:698f with SMTP id 586e51a60fabf-25121c77f82mr2124416fac.1.1717573032990;
-        Wed, 05 Jun 2024 00:37:12 -0700 (PDT)
-Received: from [10.68.123.4] ([203.208.167.149])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70242c245absm8044149b3a.200.2024.06.05.00.37.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Jun 2024 00:37:12 -0700 (PDT)
-Message-ID: <06bb3780-7ba0-4d88-b212-5e5b7a1b92cb@bytedance.com>
-Date: Wed, 5 Jun 2024 15:37:01 +0800
+	 In-Reply-To:Content-Type; b=Dmlrelj/4uzhHFRRKS/zhdIIIIWKOBHzIA4/7pUFRidp6E7cs4FJMmj0RjJ/Cj95fCAy30CbeglLQ8dj1xDKIEZ1TDeKN7VbFZ/LoWz4QwrschNVzRSNLa0N1+VAxiq1ya1+VAjix2LwkEAurxFxSIDII8R3eLmKSyfPHeutrZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=SBgvrLQf; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 76D79600A2;
+	Wed,  5 Jun 2024 07:38:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1717573100;
+	bh=mKqA4leOhmqKlL21mGvcc2CfivHSZyriFSBctRQlj6w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=SBgvrLQf8axaNLuMqDgPY3sPId32/COBY8kYJj8p1+K8UaDPbPeJfaVDP1fwdBapq
+	 s9HJcH+qogT41fhSLtFiEzPthkTPtaddLwSpxkTuRI8520VlrClYAr1TyT9d7PMNbU
+	 j6DXsnQrRBkwtNZUTFsPdBsW5rSczmel7SQN4OW+ZqbVCZGJUohTz+l2VSXqInHj1j
+	 u4I2VfvpRZu379Z0o9D3wI4hsp+0Ai2KWHSirJVumtgNHYnQSKHC97lBm0f1pagawv
+	 pgHM4fF65PBvKIwBWSyxSJ2XHv16vfxOZKRneuliuv9ofbfr2NIozvxEXEuDuPfPoF
+	 N0z/mbJo+llNQ==
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id 110612017EA;
+	Wed, 05 Jun 2024 07:37:14 +0000 (UTC)
+Message-ID: <d1e494b5-c537-4faa-8226-892718b736aa@fiberby.net>
+Date: Wed, 5 Jun 2024 07:37:13 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,249 +56,159 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Re: [PATCH bpf-next] bpf: tcp: Improve bpf write tcp opt
- performance
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: edumazet@google.com, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@google.com, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com,
- laoar.shao@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-References: <20240515081901.91058-1-zhoufeng.zf@bytedance.com>
- <87seyjwgme.fsf@cloudflare.com>
- <1803b7c0-bc56-46d6-835f-f3802b8b7e00@bytedance.com>
- <87wmnty8yd.fsf@cloudflare.com>
- <d66d58f1-219e-450a-91fc-bd08337db77d@bytedance.com>
- <875xuuxntc.fsf@cloudflare.com>
-From: Feng Zhou <zhoufeng.zf@bytedance.com>
-In-Reply-To: <875xuuxntc.fsf@cloudflare.com>
+Subject: Re: [PATCH net-next v4 2/2] net/sched: cls_flower: add support for
+ matching tunnel control flags
+To: Davide Caratti <dcaratti@redhat.com>, i.maximets@ovn.org
+Cc: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com,
+ jiri@resnulli.us, kuba@kernel.org, lucien.xin@gmail.com,
+ marcelo.leitner@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com,
+ xiyou.wangcong@gmail.com, echaudro@redhat.com,
+ Simon Horman <horms@kernel.org>
+References: <cover.1717088241.git.dcaratti@redhat.com>
+ <bc5449dc17cfebe90849c9daba8a078065f5ddf8.1717088241.git.dcaratti@redhat.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <bc5449dc17cfebe90849c9daba8a078065f5ddf8.1717088241.git.dcaratti@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-在 2024/5/31 18:45, Jakub Sitnicki 写道:
-> On Fri, May 17, 2024 at 03:27 PM +08, Feng Zhou wrote:
->> 在 2024/5/17 01:15, Jakub Sitnicki 写道:
->>> On Thu, May 16, 2024 at 11:15 AM +08, Feng Zhou wrote:
->>>> 在 2024/5/15 17:48, Jakub Sitnicki 写道:
-> 
-> [...]
-> 
->>> If it's not the BPF prog, which you have ruled out, then where are we
->>> burining cycles? Maybe that is something that can be improved.
->>> Also, in terms on quantifying the improvement - it is 20% in terms of
->>> what? Throughput, pps, cycles? And was that a single data point? For
->>> multiple measurements there must be some variance (+/- X pp).
->>> Would be great to see some data to back it up.
->>> [...]
->>>
->>
->> Pressure measurement method:
->>
->> server: sockperf sr --tcp -i x.x.x.x -p 7654 --daemonize
->> client: taskset -c 8 sockperf tp --tcp -i x.x.x.x -p 7654 -m 1200 -t 30
->>
->> Default mode, no bpf prog:
->>
->> taskset -c 8 sockperf tp --tcp -i x.x.x.x -p 7654 -m 1200 -t 30
->> sockperf: == version #3.10-23.gited92afb185e6 ==
->> sockperf[CLIENT] send on:
->> [ 0] IP = x.x.x.x    PORT =  7654 # TCP
->> sockperf: Warmup stage (sending a few dummy messages)...
->> sockperf: Starting test...
->> sockperf: Test end (interrupted by timer)
->> sockperf: Test ended
->> sockperf: Total of 71520808 messages sent in 30.000 sec
->>
->> sockperf: NOTE: test was performed, using msg-size=1200. For getting maximum
->> throughput consider using --msg-size=1472
->> sockperf: Summary: Message Rate is 2384000 [msg/sec]
->> sockperf: Summary: BandWidth is 2728.271 MBps (21826.172 Mbps)
->>
->> perf record --call-graph fp -e cycles:k -C 8 -- sleep 10
->> perf report
->>
->> 80.88%--sock_sendmsg
->>   79.53%--tcp_sendmsg
->>    42.48%--tcp_sendmsg_locked
->>     16.23%--_copy_from_iter
->>     4.24%--tcp_send_mss
->>      3.25%--tcp_current_mss
->>
->>
->> perf top -C 8
->>
->> 19.13%  [kernel]            [k] _raw_spin_lock_bh
->> 11.75%  [kernel]            [k] copy_user_enhanced_fast_string
->>   9.86%  [kernel]            [k] tcp_sendmsg_locked
->>   4.44%  sockperf            [.]
->>   _Z14client_handlerI10IoRecvfrom9SwitchOff13PongModeNeverEviii
->>   4.16%  libpthread-2.28.so  [.] __libc_sendto
->>   3.85%  [kernel]            [k] syscall_return_via_sysret
->>   2.70%  [kernel]            [k] _copy_from_iter
->>   2.48%  [kernel]            [k] entry_SYSCALL_64
->>   2.33%  [kernel]            [k] native_queued_spin_lock_slowpath
->>   1.89%  [kernel]            [k] __virt_addr_valid
->>   1.77%  [kernel]            [k] __check_object_size
->>   1.75%  [kernel]            [k] __sys_sendto
->>   1.74%  [kernel]            [k] entry_SYSCALL_64_after_hwframe
->>   1.42%  [kernel]            [k] __fget_light
->>   1.28%  [kernel]            [k] tcp_push
->>   1.01%  [kernel]            [k] tcp_established_options
->>   0.97%  [kernel]            [k] tcp_send_mss
->>   0.94%  [kernel]            [k] syscall_exit_to_user_mode_prepare
->>   0.94%  [kernel]            [k] tcp_sendmsg
->>   0.86%  [kernel]            [k] tcp_current_mss
->>
->> Having bpf prog to write tcp opt in all pkts:
->>
->> taskset -c 8 sockperf tp --tcp -i x.x.x.x -p 7654 -m 1200 -t 30
->> sockperf: == version #3.10-23.gited92afb185e6 ==
->> sockperf[CLIENT] send on:
->> [ 0] IP = x.x.x.x    PORT =  7654 # TCP
->> sockperf: Warmup stage (sending a few dummy messages)...
->> sockperf: Starting test...
->> sockperf: Test end (interrupted by timer)
->> sockperf: Test ended
->> sockperf: Total of 60636218 messages sent in 30.000 sec
->>
->> sockperf: NOTE: test was performed, using msg-size=1200. For getting maximum
->> throughput consider using --msg-size=1472
->> sockperf: Summary: Message Rate is 2021185 [msg/sec]
->> sockperf: Summary: BandWidth is 2313.063 MBps (18504.501 Mbps)
->>
->> perf record --call-graph fp -e cycles:k -C 8 -- sleep 10
->> perf report
->>
->> 80.30%--sock_sendmsg
->>   79.02%--tcp_sendmsg
->>    54.14%--tcp_sendmsg_locked
->>     12.82%--_copy_from_iter
->>     12.51%--tcp_send_mss
->>      11.77%--tcp_current_mss
->>       10.10%--tcp_established_options
->>        8.75%--bpf_skops_hdr_opt_len.isra.54
->>         5.71%--__cgroup_bpf_run_filter_sock_ops
->>          3.32%--bpf_prog_e7ccbf819f5be0d0_tcpopt
->>    6.61%--__tcp_push_pending_frames
->>     6.60%--tcp_write_xmit
->>      5.89%--__tcp_transmit_skb
->>
->> perf top -C 8
->>
->> 10.98%  [kernel]                           [k] _raw_spin_lock_bh
->>   9.04%  [kernel]                           [k] copy_user_enhanced_fast_string
->>   7.78%  [kernel]                           [k] tcp_sendmsg_locked
->>   3.91%  sockperf                           [.]
->>   _Z14client_handlerI10IoRecvfrom9SwitchOff13PongModeNeverEviii
->>   3.46%  libpthread-2.28.so                 [.] __libc_sendto
->>   3.35%  [kernel]                           [k] syscall_return_via_sysret
->>   2.86%  [kernel]                           [k] bpf_skops_hdr_opt_len.isra.54
->>   2.16%  [kernel]                           [k] __htab_map_lookup_elem
->>   2.11%  [kernel]                           [k] _copy_from_iter
->>   2.09%  [kernel]                           [k] entry_SYSCALL_64
->>   1.97%  [kernel]                           [k] __virt_addr_valid
->>   1.95%  [kernel]                           [k] __cgroup_bpf_run_filter_sock_ops
->>   1.95%  [kernel]                           [k] lookup_nulls_elem_raw
->>   1.89%  [kernel]                           [k] __fget_light
->>   1.42%  [kernel]                           [k] __sys_sendto
->>   1.41%  [kernel]                           [k] entry_SYSCALL_64_after_hwframe
->>   1.31%  [kernel]                           [k] native_queued_spin_lock_slowpath
->>   1.22%  [kernel]                           [k] __check_object_size
->>   1.18%  [kernel]                           [k] tcp_established_options
->>   1.04%  bpf_prog_e7ccbf819f5be0d0_tcpopt   [k] bpf_prog_e7ccbf819f5be0d0_tcpopt
->>
->> Compare the above test results, fill up a CPU, you can find that
->> the upper limit of qps or BandWidth has a loss of nearly 18-20%.
->> Then CPU occupancy, you can find that "tcp_send_mss" has increased
->> significantly.
-> 
-> This helps prove the point, but what I actually had in mind is to check
-> "perf annotate bpf_skops_hdr_opt_len" and see if there any low hanging
-> fruit there which we can optimize.
-> 
-> For instance, when I benchmark it in a VM, I see we're spending cycles
-> mostly memset()/rep stos. I have no idea where the cycles are spent in
-> your case.
-> 
->>
+Hi Davide and Ilva,
 
-How do you do your pressure test? Can you send it to me for a try? Or 
-you can try my pressure test method. Have you checked the calling 
-frequency of bpf_skops_hdr_opt_len and bpf_skops_write_hdr_opt?
-
->>>>>> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
->>>>>> index 90706a47f6ff..f2092de1f432 100644
->>>>>> --- a/tools/include/uapi/linux/bpf.h
->>>>>> +++ b/tools/include/uapi/linux/bpf.h
->>>>>> @@ -6892,8 +6892,14 @@ enum {
->>>>>>     	 * options first before the BPF program does.
->>>>>>     	 */
->>>>>>     	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
->>>>>> +	/* Fast path to reserve space in a skb under
->>>>>> +	 * sock_ops->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB.
->>>>>> +	 * opt length doesn't change often, so it can save in the tcp_sock. And
->>>>>> +	 * set BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG to no bpf call.
->>>>>> +	 */
->>>>>> +	BPF_SOCK_OPS_HDR_OPT_LEN_CACHE_CB_FLAG = (1<<7),
->>>>> Have you considered a bpf_reserve_hdr_opt() flag instead?
->>>>> An example or test coverage would to show this API extension in action
->>>>> would help.
->>>>>
->>>>
->>>> bpf_reserve_hdr_opt () flag can't finish this. I want to optimize
->>>> that bpf prog will not be triggered frequently before TSO. Provide
->>>> a way for users to not trigger bpf prog when opt len is unchanged.
->>>> Then when writing opt, if len changes, clear the flag, and then
->>>> change opt len in the next package.
->>> I haven't seen a sample using the API extenstion that you're proposing,
->>> so I can only guess. But you probably have something like:
->>> SEC("sockops")
->>> int sockops_prog(struct bpf_sock_ops *ctx)
->>> {
->>> 	if (ctx->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB &&
->>> 	    ctx->args[0] == BPF_WRITE_HDR_TCP_CURRENT_MSS) {
->>> 		bpf_reserve_hdr_opt(ctx, N, 0);
->>> 		bpf_sock_ops_cb_flags_set(ctx,
->>> 					  ctx->bpf_sock_ops_cb_flags |
->>> 					  MY_NEW_FLAG);
->>> 		return 1;
->>> 	}
->>> }
->>
->> Yes, that's what I expected.
->>
->>> I don't understand why you're saying it can't be transformed into:
->>> int sockops_prog(struct bpf_sock_ops *ctx)
->>> {
->>> 	if (ctx->op == BPF_SOCK_OPS_HDR_OPT_LEN_CB &&
->>> 	    ctx->args[0] == BPF_WRITE_HDR_TCP_CURRENT_MSS) {
->>> 		bpf_reserve_hdr_opt(ctx, N, MY_NEW_FLAG);
->>> 		return 1;
->>> 	}
->>> }
->>
->> "bpf_reserve_hdr_opt (ctx, N, MY_NEW_FLAG);"
->>
->> I don't know what I can do to pass the flag parameter, let
->> "bpf_reserve_hdr_opt" return quickly? But this is not useful,
->> because the loss caused by the triggering of bpf prog is very
->> expensive, and it is still on the hotspot function of sending
->> packets, and the TSO has not been completed yet.
->>
->>> [...]
+On 5/30/24 5:08 PM, Davide Caratti wrote:
+> extend cls_flower to match TUNNEL_FLAGS_PRESENT bits in tunnel metadata.
 > 
-> This is not what I'm suggesting.
+> Suggested-by: Ilya Maximets <i.maximets@ovn.org>
+> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+> ---
+>   include/uapi/linux/pkt_cls.h |  3 ++
+>   net/sched/cls_flower.c       | 56 +++++++++++++++++++++++++++++++++++-
+>   2 files changed, 58 insertions(+), 1 deletion(-)
 > 
-> bpf_reserve_hdr_opt() has access to bpf_sock_ops_kern and even the
-> sock. You could either signal through bpf_sock_ops_kern to
-> bpf_skops_hdr_opt_len() that it should not be called again
-> 
-> Or even configure the tcp_sock directly from bpf_reserve_hdr_opt()
-> because it has access to it via bpf_sock_ops_kern{}.sk.
+> diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
+> index 229fc925ec3a..b6d38f5fd7c0 100644
+> --- a/include/uapi/linux/pkt_cls.h
+> +++ b/include/uapi/linux/pkt_cls.h
+> @@ -554,6 +554,9 @@ enum {
+>   	TCA_FLOWER_KEY_SPI,		/* be32 */
+>   	TCA_FLOWER_KEY_SPI_MASK,	/* be32 */
+>   
+> +	TCA_FLOWER_KEY_ENC_FLAGS,	/* u32 */
+> +	TCA_FLOWER_KEY_ENC_FLAGS_MASK,	/* u32 */
+> +
+>   	__TCA_FLOWER_MAX,
+>   };
+>   
+> diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+> index fd9a6f20b60b..eef570c577ac 100644
+> --- a/net/sched/cls_flower.c
+> +++ b/net/sched/cls_flower.c
+> @@ -41,6 +41,12 @@
+>   #define TCA_FLOWER_KEY_CT_FLAGS_MASK \
+>   		(TCA_FLOWER_KEY_CT_FLAGS_MAX - 1)
+>   
+> +#define TUNNEL_FLAGS_PRESENT (\
+> +	_BITUL(IP_TUNNEL_CSUM_BIT) |		\
+> +	_BITUL(IP_TUNNEL_DONT_FRAGMENT_BIT) |	\
+> +	_BITUL(IP_TUNNEL_OAM_BIT) |		\
+> +	_BITUL(IP_TUNNEL_CRIT_OPT_BIT))
+> +
+>   struct fl_flow_key {
+>   	struct flow_dissector_key_meta meta;
+>   	struct flow_dissector_key_control control;
+> @@ -75,6 +81,7 @@ struct fl_flow_key {
+>   	struct flow_dissector_key_l2tpv3 l2tpv3;
+>   	struct flow_dissector_key_ipsec ipsec;
+>   	struct flow_dissector_key_cfm cfm;
+> +	struct flow_dissector_key_enc_flags enc_flags;
+>   } __aligned(BITS_PER_LONG / 8); /* Ensure that we can do comparisons as longs. */
+>   
+>   struct fl_flow_mask_range {
+> @@ -732,6 +739,10 @@ static const struct nla_policy fl_policy[TCA_FLOWER_MAX + 1] = {
+>   	[TCA_FLOWER_KEY_SPI_MASK]	= { .type = NLA_U32 },
+>   	[TCA_FLOWER_L2_MISS]		= NLA_POLICY_MAX(NLA_U8, 1),
+>   	[TCA_FLOWER_KEY_CFM]		= { .type = NLA_NESTED },
+> +	[TCA_FLOWER_KEY_ENC_FLAGS]	= NLA_POLICY_MASK(NLA_U32,
+> +							  TUNNEL_FLAGS_PRESENT),
+> +`	[TCA_FLOWER_KEY_ENC_FLAGS_MASK]	= NLA_POLICY_MASK(NLA_U32,
+> +							  TUNNEL_FLAGS_PRESENT),
+>   };
+>   
+>   static const struct nla_policy
+> @@ -1825,6 +1836,21 @@ static int fl_set_key_cfm(struct nlattr **tb,
+>   	return 0;
+>   }
+>   
+> +static int fl_set_key_enc_flags(struct nlattr **tb, u32 *flags_key,
+> +				u32 *flags_mask, struct netlink_ext_ack *extack)
+> +{
+> +	/* mask is mandatory for flags */
+> +	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, TCA_FLOWER_KEY_ENC_FLAGS_MASK)) {
+> +		NL_SET_ERR_MSG(extack, "missing enc_flags mask");
+> +		return -EINVAL;
+> +	}
+> +
+> +	*flags_key = nla_get_u32(tb[TCA_FLOWER_KEY_ENC_FLAGS]);
+> +	*flags_mask = nla_get_u32(tb[TCA_FLOWER_KEY_ENC_FLAGS_MASK]);
+> +
+> +	return 0;
+> +}
+> +
+>   static int fl_set_key(struct net *net, struct nlattr **tb,
+>   		      struct fl_flow_key *key, struct fl_flow_key *mask,
+>   		      struct netlink_ext_ack *extack)
+> @@ -2059,9 +2085,16 @@ static int fl_set_key(struct net *net, struct nlattr **tb,
+>   	if (ret)
+>   		return ret;
+>   
+> -	if (tb[TCA_FLOWER_KEY_FLAGS])
+> +	if (tb[TCA_FLOWER_KEY_FLAGS]) {
+>   		ret = fl_set_key_flags(tb, &key->control.flags,
+>   				       &mask->control.flags, extack);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	if (tb[TCA_FLOWER_KEY_ENC_FLAGS])
+> +		ret = fl_set_key_enc_flags(tb, &key->enc_flags.flags,
+> +					   &mask->enc_flags.flags, extack);
+>   
+>   	return ret;
 
-Oh, I see what you mean, this will achieve the goal.
+Sorry, that I am late to the party, I have been away camping at
+Electromagnetic Field in the UK.
 
+Why not use the already existing key->enc_control.flags with dissector
+key FLOW_DISSECTOR_KEY_ENC_CONTROL for storing the flags?
 
+Currently key->enc_control.flags are unused.
+
+I haven't fixed the drivers to validate that field yet, so currently
+only sfc does so.
+
+Look at include/uapi/linux/pkt_cls.h for netlink flags:
+
+enum {
+         TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT = (1 << 0),
+         TCA_FLOWER_KEY_FLAGS_FRAG_IS_FIRST = (1 << 1),
+};
+
+and at include/net/flow_dissector.h for the dissector flags:
+
+#define FLOW_DIS_IS_FRAGMENT    BIT(0)
+#define FLOW_DIS_FIRST_FRAG     BIT(1)
+#define FLOW_DIS_ENCAPSULATION  BIT(2)
+
+I would like to keep FLOW_DIS_ENCAPSULATION as the last flag, in order to
+keep parity with the netlink flags, since the dissector flags field is
+exposed to user space when some flags are not supported.
+
+I realize that since this series is now merged, then fixing this up will
+have to go in another series, are you up for that?
+
+-- 
+Best regards
+Asbjørn Sloth Tønnesen
+Network Engineer
+Fiberby - AS42541
 
