@@ -1,123 +1,97 @@
-Return-Path: <netdev+bounces-100880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66FAF8FC73F
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 11:09:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91CB58FC744
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 11:10:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6ACBB1C2279B
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:09:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B62D61C22AAF
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0430D18F2F2;
-	Wed,  5 Jun 2024 09:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCFED18FC74;
+	Wed,  5 Jun 2024 09:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="OKi2oKjX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWizGOeR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF2618F2DB
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 09:09:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A353418F2FF;
+	Wed,  5 Jun 2024 09:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717578575; cv=none; b=RivAPTpBYEInNysPk0Ew2l5ImS53bmH5eaYYMDF1RtUqKNO9bQ0H1G0W11xOEUllKbIMSKGx/3QmV4bI5KY9U+zNA5zvgEDj7vG2aDEmrIyl/wBEYuO93a69vMjs6MvRVvwuFMjcRYNmIiiLpWe8fT3UmoUj/w6lsXLSXOikJ7M=
+	t=1717578628; cv=none; b=CH5iY/jFEzZAycPRbST2iJA4aZa0d9UfueKHb8N0lMWpvafGGbmbT+o5TghbxRSaioHddjKEXbbcqL46WN/iUdnQvgp+dAUeg3uNLptHOi0Y1DUl1fH9/tgZQF1Ztwrq7aA0dGYe/X3KEur5FQSLFFiuvtpy8fSMkJ83Rgajsfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717578575; c=relaxed/simple;
-	bh=H/xOWZ5L4n5xAiHYw2Q4KfjoBz5ywAXTZXlV5booVn0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=leGuhfJ2N98p61DUKWS1kh1sL21ujCVz4qhZ4gb5Kgcilu1mhcglvJs3Gmww+xHr0fuK26ppRspK6KLI3aR3p2XDghFIStKqRC/3WDPnsD1y6VQuiJpCaUaPkjyNo1ObbMXbSDrJf1siIDkbSeZkc1k1dLxXJkUMdaA6EycyXZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=OKi2oKjX; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-35e573c0334so361380f8f.1
-        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 02:09:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1717578572; x=1718183372; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=+UmpGA+ZeMi4kfohJdgrNuGbikeEYkKaVXbYI+HeV3g=;
-        b=OKi2oKjXLSiCEhQQMwK0i7lhWxpjwASPfPZgW7c4YOqDsBzmmYXOG7z/j9M5DMloir
-         9iYZRfgkWdh3umQWcUCD9K1R1cu8Si56viYGGqueGGsrYf71OfOOa01ZSb661WZohyZE
-         omGrhlLyufgkwA0SP0zK0t3SP7YFP4ACq67ZMvSOln3xoV1YqCw9TDGh4CZKbSrboACR
-         +AsTJBx8i+4WidyJxyqTEAPNBNEadkV5bDXMYrEvE99EkqYru+JcBtxOlmKaDw+07kxG
-         VyFlHmWVpoDWOXoqv9G8CMiRzacPPX+46HhPIQBx/vi6p1CayiQhCoajpVbHo9g+UOnw
-         8tkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717578572; x=1718183372;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+UmpGA+ZeMi4kfohJdgrNuGbikeEYkKaVXbYI+HeV3g=;
-        b=hJDiJwpTHNUjHcfr0XfPWMl5p0JeuAA7G+vliC+yqgBeMnCeOnST4uEGgjeg2eFLey
-         5OyUsNduOMP8qJEsjwQeyhfzQR6msnUs4XXu1QsoQ7VDH6+dK30hO/dRayd3+6FcA67J
-         6kSLHhQgQR2/1MUKLMUGlxbdQKEudb8unb7Z3Leb67ARsvvqssMaKjdIK0qpbD1JzjLN
-         8BX7cKpRxo6TIjfhwhuyNe0aOmXpkE07URGgybgQs9EE8t3FnjkfXO1ddhxgxZAMKmkr
-         uf0z3BgihEAFurN76001Fg4UYkORqGh3mRyZ47Og29SUoN+vkEPaspbokINRqDlzAn3U
-         iWpw==
-X-Forwarded-Encrypted: i=1; AJvYcCXX6/RdG1cBGZRrfnFpNbnxIDLDB6MtOldGCZ3AZW/DnJY55MsIrp3Wp0u/Qat9UQQAIFv55kWrTY7kvOCADm9St+ko+/18
-X-Gm-Message-State: AOJu0Yw8qyN6kdzBT+sM9NQkDaWXybBK0sm07m8H9t+7/+pNZQTV7Qzj
-	xVqWRx6c0aa6R2ZaEYd1u+meaIXBbE9O9ZzyIEbWtgtRhjrQZnfMMVUesz+N9mk=
-X-Google-Smtp-Source: AGHT+IGigeZlMKJ5xlsed0h4vjvUJM8+w/gb50iEjVMBFpz47EWxxpTlL+2yqiHfs06YqiZSo8wp3w==
-X-Received: by 2002:a5d:460e:0:b0:354:dfd4:4f62 with SMTP id ffacd0b85a97d-35e8395b176mr1559128f8f.5.1717578572641;
-        Wed, 05 Jun 2024 02:09:32 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:a705:b9f1:ebc:16a5? ([2a01:e0a:b41:c160:a705:b9f1:ebc:16a5])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35dd04ca434sm13841259f8f.30.2024.06.05.02.09.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Jun 2024 02:09:31 -0700 (PDT)
-Message-ID: <c527582b-05dd-45bf-a9b1-2499b01280ee@6wind.com>
-Date: Wed, 5 Jun 2024 11:09:31 +0200
+	s=arc-20240116; t=1717578628; c=relaxed/simple;
+	bh=ghYtGslKc1bk6prdMqzaGE3ldvf4OpaAFUsroNQ/5TA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hLm93x/dUmmgWBKJCzi9mVsVefYdVoqbepnKdw8rEYOf1TkyGbR2pQII8XIbXXfLsndGkf7n1/NmqkvBpM8HBJvw92AVBbBhTmQkR86iS5UBtvfmgpPS/ul3CwEKAZm3I1EzfOJZR5VY1L+SOjFNCnCwnfWIYNAhbXXjxo+gxXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWizGOeR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3201FC32786;
+	Wed,  5 Jun 2024 09:10:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717578628;
+	bh=ghYtGslKc1bk6prdMqzaGE3ldvf4OpaAFUsroNQ/5TA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ZWizGOeRiSjM0Ar2HC/moePEoLKClXxSN7G2BpUtVSTsT+mb30Lrm1ox2X8kPQTeH
+	 yZVrO/LO/JAec4N+nOZymfTTYOmRmvtyPV0E3NCaiHn9j/6C2VY422X/M3Gix+6KI0
+	 XFWlE2/VfGjafnO7nk6Km/9YJZQMlzqllZWWELKGT6Ny5dTxSpfqSCCaY63SZ05qRm
+	 P8Tru3dRx8FWiQ6aTVsO7AgQywD95oXDDbRdCaTh3pN/fpXDYJqNUQCiZF87ZuSHl9
+	 bD1EtxaSp/VNRCikR8fD2sN2u2IWO/gVU7AiqM6JA4RjVHeO7XXOV9aQv1XFz4On21
+	 K12pq1PKFRgyw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1F6FFD3E997;
+	Wed,  5 Jun 2024 09:10:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH nf] netfilter: restore default behavior for
- nf_conntrack_events
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org, stable@vger.kernel.org
-References: <20240604135438.2613064-1-nicolas.dichtel@6wind.com>
- <ZmAn7VcLHsdAI8Xg@strlen.de>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <ZmAn7VcLHsdAI8Xg@strlen.de>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 net] net: phy: Micrel KSZ8061: fix errata solution not
+ taking effect problem
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171757862812.24611.15288736111467368389.git-patchwork-notify@kernel.org>
+Date: Wed, 05 Jun 2024 09:10:28 +0000
+References: <1717119481-3353-1-git-send-email-Tristram.Ha@microchip.com>
+In-Reply-To: <1717119481-3353-1-git-send-email-Tristram.Ha@microchip.com>
+To:  <Tristram.Ha@microchip.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, tristram.ha@microchip.com
 
-Le 05/06/2024 à 10:55, Florian Westphal a écrit :
-> Nicolas Dichtel <nicolas.dichtel@6wind.com> wrote:
->> Since the below commit, there are regressions for legacy setups:
->> 1/ conntracks are created while there are no listener
->> 2/ a listener starts and dumps all conntracks to get the current state
->> 3/ conntracks deleted before the listener has started are not advertised
->>
->> This is problematic in containers, where conntracks could be created early.
->> This sysctl is part of unsafe sysctl and could not be changed easily in
->> some environments.
->>
->> Let's switch back to the legacy behavior.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 30 May 2024 18:38:01 -0700 you wrote:
+> From: Tristram Ha <tristram.ha@microchip.com>
 > 
-> :-(
+> KSZ8061 needs to write to a MMD register at driver initialization to fix
+> an errata.  This worked in 5.0 kernel but not in newer kernels.  The
+> issue is the main phylib code no longer resets PHY at the very beginning.
+> Calling phy resuming code later will reset the chip if it is already
+> powered down at the beginning.  This wipes out the MMD register write.
+> Solution is to implement a phy resume function for KSZ8061 to take care
+> of this problem.
 > 
-> Would it be possible to resolve this for containers by setting
-> the container default to 1 if init_net had it changed to 1 at netns
-> creation time?
+> [...]
 
-When we have access to the host, it is possible to allow the configuration of
-this (unsafe) sysctl for the pod. But there are cases where we don't have access
-to the host.
+Here is the summary with links:
+  - [v1,net] net: phy: Micrel KSZ8061: fix errata solution not taking effect problem
+    https://git.kernel.org/netdev/net/c/0a8d3f2e3e8d
 
-https://docs.openshift.com/container-platform/4.9/nodes/containers/nodes-containers-sysctls.html#nodes-containers-sysctls-unsafe_nodes-containers-using
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Regards,
-Nicolas
 
