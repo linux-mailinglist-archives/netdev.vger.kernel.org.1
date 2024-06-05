@@ -1,128 +1,123 @@
-Return-Path: <netdev+bounces-101064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C36528FD1B4
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 17:33:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E587C8FD1BC
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 17:34:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA0AFB22EEF
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:31:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF4411C22FF5
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:34:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624911773D;
-	Wed,  5 Jun 2024 15:31:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 795DC481B3;
+	Wed,  5 Jun 2024 15:34:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hb2PPK7m"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G/PZ8Z/Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8033D2E6;
-	Wed,  5 Jun 2024 15:31:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F1327450;
+	Wed,  5 Jun 2024 15:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717601500; cv=none; b=hCb+kTXLFO4jikbIy/xcE8M9UJjitX4jSuFRwyO2htp6rmorW3tBptV0JKswUbZXOoUGFyBOUQUhh69aNZzPqTxyovDek7SsHoo1pPBpka4sszfvvbRZSOBTtmDrPcHO9FC8QsRxBTgUsMUIETMlOBm0JgnowBzUeaVI6QJautM=
+	t=1717601665; cv=none; b=MTphiYaARCFfTFv88uoYDVVHHPhuQWN5sPtrpigkLhr4/KciOZpZC8Ss1LcVZ5f9nMdkehEuSdJhKMh4mDfOpvceNUKGqVbGQ+C8HX5ZXiTR6n7pXaBNpv/rTjamohWtTCHvfXd0NfaA/2/KFya7lHwZXGRRHi/Ru+x38Ic79Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717601500; c=relaxed/simple;
-	bh=By8UN7bEgE6tHMTsl5RtwzENBGGtoe2bMTEaO/znMUc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ee6W0guWLQThQ5rFmkPILgNp4pS5rTM0Jr0bm4pKPylcNgYxe+oV/9ovODQkE11XpevarA9E5f7aFqt9RSzHynYSqu2F5SaSD6HIkFr5owVxZKW9r47cU31lQ1AOWPjSxSQ1vwfsftJ9pApn3nQUCz1zF7LPCNBJvMwhf2KPNd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hb2PPK7m; arc=none smtp.client-ip=209.85.167.41
+	s=arc-20240116; t=1717601665; c=relaxed/simple;
+	bh=ajRlHz4ISqja5UdXe1MvHhvYA/kLt79BL5wrslKLLUc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XM4ln1d0//vq74w0ZeAJQ99VmMusySHbnShCH8uUAGseydwBeESVtbyCG5nJT3n5zVKzP8bOAWWChYbL69bBSx4zy2mhHs7atYoEfTVoEN0NTfyF2MPufo7PADLs3E0aH5+hELh/uimX4vo0In/6MhHZqs5/sJysMzft6m/WKj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G/PZ8Z/Q; arc=none smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52b962c4bb6so5962930e87.3;
-        Wed, 05 Jun 2024 08:31:38 -0700 (PDT)
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-52b962c4bb6so5969038e87.3;
+        Wed, 05 Jun 2024 08:34:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717601497; x=1718206297; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8UVI+FJG+cytwZoj1NugeGBUyl9BCIHH6pWrnkmyvyA=;
-        b=hb2PPK7mBSNrQ/oXGhHUHSNYG5r/FZI+Yc/kcnMpBBD3PhZRMJlIM0bNcXUVF5ktLt
-         etITPYRV45lN4acva8vR3rm5kDZfgVh2vSdr79py0AvRadZH2u8txPloRzgi9m5m5+5l
-         B/kZdqpZ0brYo0SNGK722mOjj+jgcnYWpONJL/U6RQ4C+G8qtPk5tBAfcoiPbxti1O1T
-         0Bgspnr9JrJIItA1ZhnahZqkfAokNLHakorOU4JsLU7iNv3IQQEPFjJlNekYL41RPj9k
-         Km/ET5PkOMOg94g/T3RFTX4ZM61jZowICCqbjMMqPWdKfhjtrQBDDhxWx4yDoS8sUhTd
-         OCjA==
+        d=gmail.com; s=20230601; t=1717601662; x=1718206462; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/ozim78RZhEu9AGeHQuy80qkyfEbq6KZxgEz/yrejKE=;
+        b=G/PZ8Z/QziOgyFUEkJPTtXQlr7lGLfdtef/bzWewatpru89h8niRPNvx+lO1gInnaW
+         lEmxxbNDNcyEhghBEH0N3nck6Q/puN8s6gJ9k2G/oo/my3NEHW/u70db+JRPo6snhBb7
+         nBVDKJQKA0HTNVLBbo5QIXu95ojRDJu50N6/DMo19HULoZzeK7AOkf0Wnvp9rncI0i80
+         a9Czk+ayXKWvmq7NO2gDeAwieIhWVKYSbavsznHRW74WQywqacD+beE0mkywgcHkVjSz
+         rSHYC5Kr9mFIX2aonLpt/IgoGZdCWSGPVn6bNegDchpvH0+sGbU7EUoighDIlxrKLET7
+         1cJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717601497; x=1718206297;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8UVI+FJG+cytwZoj1NugeGBUyl9BCIHH6pWrnkmyvyA=;
-        b=m/32NRFUNHB17iREBkQspIQhf37TNFQUqJlvR6bmVOKsuUSyslLQjRi5UhReCet4lD
-         wV4llt6h1zHp2LczJP3iC3sw5W8Z1zzwmCMedlbpjFoxYqzkpfHw8d8adLC9ewwGYBYC
-         jS8Mmt6iKgYdTz937BXE7EJ8MmhcIpZFirfacYORTCuSni3fIVWEguo8fLOVH3glyPi6
-         WZlyCcANBiqj0hoEUkfFwSyp9iLMLe3PGJj75RpPMbtxFOfZY62JBDi2VWju8YWqRNle
-         vy7k1DP2/4awsrQZB3OL/Uw4c6VjahgYOlU5TFNFgv1SvACJR4Q+plKZzlgFTU6TIaZs
-         GH0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV/dS+0jwGFY3Hz0Gs4IiPLzyoIfWF7i+paZLV0D8vzJu5ChzRkU747XUYcJ5gjzC3p+YXxfQUg/U5jJM8bvJ8gvC32UJIvsMsdeGIV
-X-Gm-Message-State: AOJu0YzNZlWEsPbXt6grhBkBfz8NU4n3vjRAT3+Kg/0HT2mPxwgWpbGo
-	HdqJOboUy9bJOR9EdZmMmyRyUiFZDTQnPAPCBWdb2MacwVjJAsMh
-X-Google-Smtp-Source: AGHT+IFkGzUgT0m4yyFlD+rq2PxwrsZAnFic8ufJk/ij2VBoo48gtb5OdaSoLnDec68LWufwqDP34w==
-X-Received: by 2002:a05:6512:2253:b0:523:9515:4b74 with SMTP id 2adb3069b0e04-52bab4ca5e9mr2807710e87.14.1717601496450;
-        Wed, 05 Jun 2024 08:31:36 -0700 (PDT)
-Received: from skbuf ([188.25.55.166])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a690f03320csm449345866b.184.2024.06.05.08.31.35
+        d=1e100.net; s=20230601; t=1717601662; x=1718206462;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/ozim78RZhEu9AGeHQuy80qkyfEbq6KZxgEz/yrejKE=;
+        b=ifuwUFZHJzwlAAejIsg8uv8Jpk4JRJU23LpEnwn0P05r2l5Nrp+jUkd/k81IIf29KI
+         unXRdStXORm9ixm4MyD3LRYpmX0AjXznroC5KekbRUwzOv7xMp5eGLuNDH/lsy07xBpD
+         6YphYtRuRoW405BqzojBrO6hwc8zTr2SRVthcyQGmEY7/0+55c6r6NAh7zDgQZ9kiGn9
+         SnJhifHQnQEyYe1QhmNfwFrrFML1J3L8dVljAE0MIimdJpCfe9ULroFoYPMe47Wrpn5+
+         y2TPNBURYo4kPB6Hee8WwuMg1HbJEb86UE8TQOsuOPJqo5XwwmPPdkj8+tNHrvNRiqR9
+         e5ag==
+X-Gm-Message-State: AOJu0YzlrbCHtn/tKI/Ss6VRpXwAeAu00vtbw+wXdeDnvNzucRez1e9C
+	UwWdABCgW3joBPGFaDke1s+3g/9Fu/33ZRR6se5MqihB+eyy+Yyt33HEtPi/
+X-Google-Smtp-Source: AGHT+IG8Pjb61i3+lCBe9lvPfRRYjfCsCB5bXJ+nq2F+RPU5vnSIUhD2Izw4Y9m1QwYMPd59Z3TqWg==
+X-Received: by 2002:a05:6512:2253:b0:523:9515:4b74 with SMTP id 2adb3069b0e04-52bab4ca5e9mr2814781e87.14.1717601661592;
+        Wed, 05 Jun 2024 08:34:21 -0700 (PDT)
+Received: from sauvignon.fi.muni.cz (laomedon.fi.muni.cz. [2001:718:801:22a::6b])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6831a91b36sm764215266b.167.2024.06.05.08.34.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Jun 2024 08:31:35 -0700 (PDT)
-Date: Wed, 5 Jun 2024 18:31:33 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?Q3PDs2vDoXM=?= Bence <csokas.bence@prolan.hu>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	trivial@kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>
-Subject: Re: [RFC PATCH 2/2] net: include: mii: Refactor: Use BIT() for
- ADVERTISE_* bits
-Message-ID: <20240605153133.ronpeb2tcn3loqu5@skbuf>
-References: <20240605121648.69779-1-csokas.bence@prolan.hu>
- <20240605121648.69779-1-csokas.bence@prolan.hu>
- <20240605121648.69779-2-csokas.bence@prolan.hu>
- <20240605121648.69779-2-csokas.bence@prolan.hu>
- <20240605141342.262wgddrf4xjbbeu@skbuf>
- <52b9e3f4-8dd4-4696-9a47-0dc4eb59c013@prolan.hu>
+        Wed, 05 Jun 2024 08:34:21 -0700 (PDT)
+From: Milan Broz <gmazyland@gmail.com>
+To: linux-usb@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	grundler@chromium.org,
+	dianders@chromium.org,
+	hayeswang@realtek.com,
+	hkallweit1@gmail.com,
+	andrew@lunn.ch,
+	Milan Broz <gmazyland@gmail.com>
+Subject: [PATCH] r8152: Set NET_ADDR_STOLEN if using passthru MAC
+Date: Wed,  5 Jun 2024 17:33:40 +0200
+Message-ID: <20240605153340.25694-1-gmazyland@gmail.com>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <52b9e3f4-8dd4-4696-9a47-0dc4eb59c013@prolan.hu>
 
-On Wed, Jun 05, 2024 at 04:47:27PM +0200, Csókás Bence wrote:
-> Hi!
-> 
-> On 6/5/24 16:13, Vladimir Oltean wrote:
-> > On Wed, Jun 05, 2024 at 02:16:49PM +0200, Csókás, Bence wrote:
-> > > Replace hex values with BIT() and GENMASK() for readability
-> > > 
-> > > Cc: trivial@kernel.org
-> > > 
-> > > Signed-off-by: "Csókás, Bence" <csokas.bence@prolan.hu>
-> > > ---
-> > 
-> > You can't use BIT() and GENMASK() in headers exported to user space.
-> > 
-> > I mean you can, but the BIT() and GENMASK() macros themselves aren't
-> > exported to user space, and you would break any application which used
-> > values dependent on them.
-> > 
-> 
-> I thought the vDSO headers (which currently hold the definition for `BIT()`)
-> *are* exported. Though `GENMASK()`, and the headers which would normally
-> include vdso/bits.h, might not be... But then again, is uapi/linux/mii.h
-> itself even exported?
+Some docks support MAC pass-through - MAC address
+is taken from another device.
 
-grep through the output of "make -j 8 headers_install O=headers" is
-a good place to start.
+Driver should indicate that with NET_ADDR_STOLEN flag.
 
-> And if so, why aren't these macros? Is there any reason _not_ to
-> export the entire linux/bits.h?
+This should help to avoid collisions if network interface
+names are generated with MAC policy.
 
-Sorry, I'm not the person who can answer these questions.
+Reported and discussed here
+https://github.com/systemd/systemd/issues/33104
+
+Signed-off-by: Milan Broz <gmazyland@gmail.com>
+---
+ drivers/net/usb/r8152.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index 19df1cd9f072..ea5c5be4a958 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -1774,6 +1774,7 @@ static int vendor_mac_passthru_addr_read(struct r8152 *tp, struct sockaddr *sa)
+ 		goto amacout;
+ 	}
+ 	memcpy(sa->sa_data, buf, 6);
++	tp->netdev->addr_assign_type = NET_ADDR_STOLEN;
+ 	netif_info(tp, probe, tp->netdev,
+ 		   "Using pass-thru MAC addr %pM\n", sa->sa_data);
+ 
+-- 
+2.45.1
+
 
