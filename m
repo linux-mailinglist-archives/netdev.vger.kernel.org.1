@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-101162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9A568FD915
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 23:35:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C555B8FD912
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 23:35:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 258BD28B1BC
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 21:35:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CA2828B02D
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 21:35:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD88169AFB;
-	Wed,  5 Jun 2024 21:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31E7E168C0C;
+	Wed,  5 Jun 2024 21:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ul/9h/V1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B5pD0t5O"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29615169AE1
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 21:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04ADA4962E;
+	Wed,  5 Jun 2024 21:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717623033; cv=none; b=pCRkvogtSGDf8eAlbA/F1jGHDsD8ljwt3Q7TzUEz1amXA7lJ4b/Oy494qDYaDzFzcGtcDHGLjQU7tC3XtqbFdpl/B3DmD9mIJCba14zhgjF1hMHH+qJ0B6yUS0jPgY4rsT4s9Nwp/y0Hnt3cVFZaJqQfiGX1tP9aeXFnWXWBBG0=
+	t=1717623032; cv=none; b=Y6c46dRH8iyB+/lS7gx20bMfWgL4A3sm7sxCKiEL0MgudXVPzDk/CR2vxr2+EBx2C1bxmzRkeCCMLb1wQgBa+taFmsq3ycWdzBdGKnamCpgX9dQW+HDB7c9SmTCuN8Bux557TFkE0YMo0ecTqlSfxs1vJYdmwfIpAeGwO8muxac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717623033; c=relaxed/simple;
-	bh=TwljzjIRxQ/FtrM9SO2gW06EXoFqZapa5mp75LoYlkE=;
+	s=arc-20240116; t=1717623032; c=relaxed/simple;
+	bh=QwvAko4zpRbQR4SDkAviF8HJEOiuHXqiAOvLvCo/Bds=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=svAS+j79kFuZhJN3Ia7106czEukoueNOheN19zFCdaCssHEsBZfd4wkPjeuqI74nbBGODxMAqsmoFv+ezCDzsWCy+2bGpuOzenLxAaxUWjZNqDbUrgLERErGl2/ItsX1o3R6SwETz2+TzM+wIME+9GA03AEUkgyVeqTfLcgey/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ul/9h/V1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C0549C4AF0C;
+	 In-Reply-To:To:Cc; b=sIh6Sun1JhNYizxsFDrWIaGbu4iFTfy/+4eU9PpmmNpmMcL7TJWBa0/i25yWaqNFvwCDfmwZtffj5G3hoEpZ9I5Nid3vGO8zB0Mr/GmoA1Tb/D+OjTJVV8q8ecu00mJDyd/1zm81eJ5cBLhTIgu7jCmYG08r4En87jYiMyu261U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B5pD0t5O; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 82FBFC32782;
 	Wed,  5 Jun 2024 21:30:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1717623031;
-	bh=TwljzjIRxQ/FtrM9SO2gW06EXoFqZapa5mp75LoYlkE=;
+	bh=QwvAko4zpRbQR4SDkAviF8HJEOiuHXqiAOvLvCo/Bds=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ul/9h/V1JT34QNSyFH+4UBWsZkMPBvudleEjQWer6yRIqtEDC0Uk8AH0fAbevkkFL
-	 9QCiYJntreosFIW+97vcrrwSZz8+VnPPq4GL4PBOOLWza9b+/ANscGtJLIVuGNjBff
-	 n1ywInYlU0SvNaTscm4iWKlI4SUi1gaFRUe20bww70/ssNDAwLoBEfrjkuKZrooasx
-	 3PhnknL38c+TbZwjkP6It0Dd9CGCKCXBzflGwwCAKr7x0UM7Reryq3am2L6ZC/KP8M
-	 3yjONIi5o48DvImqMWimjXBmNeUmoeOBpSKnkdRrmxmHD7Mc2DJ8eleHB0R0v0jGWS
-	 JmWl9WzAiFugw==
+	b=B5pD0t5OThSfVYlbpjHSj9j9I4KAU1eHkpD6EuZ11w18FuvfvXQzbR5XGZ+qyUBUa
+	 iZY+FSYz7DzWM03W9cdHPcZ4eL+lM2xulhJk81QVC1rZa2vYVzUcsTGtO4Mg2+ufjX
+	 a+KDTs/hF3lxzknhvZwrwrrMF5kGKBCahtnDeyg1QGNStjCkQ+C/ZT7tZlk928UI+N
+	 phiQCn/xuDyR7k6oW0zjQUntooeHwJUoI+greKeL41pYOg2tABvP4bHSA5G/1rNHfx
+	 anZ/MdphWwVBWqF+cTJRcZypyRF5NqSM5euJB8GIXUqNiof+5jzr76JiNbrxdeyEhl
+	 XDGPy7Adw3nfA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B4A17D3E996;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6DCA4D3E997;
 	Wed,  5 Jun 2024 21:30:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] bnxt_en: fix atomic counter for ptp packets
+Subject: Re: [PATCH net] net/mlx5: Fix tainted pointer delete is case of flow
+ rules creation fail
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171762303173.24326.16199914725430660946.git-patchwork-notify@kernel.org>
+ <171762303144.24326.14850911837497875775.git-patchwork-notify@kernel.org>
 Date: Wed, 05 Jun 2024 21:30:31 +0000
-References: <20240604091939.785535-1-vadfed@meta.com>
-In-Reply-To: <20240604091939.785535-1-vadfed@meta.com>
-To: Vadim Fedorenko <vadfed@meta.com>
-Cc: vadim.fedorenko@linux.dev, michael.chan@broadcom.com, kuba@kernel.org,
- davem@davemloft.net, pabeni@redhat.com, richardcochran@gmail.com,
- netdev@vger.kernel.org, horms@kernel.org
+References: <20240604100552.25201-1-amishin@t-argos.ru>
+In-Reply-To: <20240604100552.25201-1-amishin@t-argos.ru>
+To: Aleksandr Mishin <amishin@t-argos.ru>
+Cc: mbloch@nvidia.com, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ maorg@nvidia.com, jacob.e.keller@intel.com, shayd@nvidia.com,
+ jianbol@nvidia.com, ruanjinjie@huawei.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 4 Jun 2024 02:19:39 -0700 you wrote:
-> atomic_dec_if_positive returns new value regardless if it is updated or
-> not. The commit in fixes changed the behavior of the condition to one
-> that differs from original code. Restore original condition to properly
-> maintain atomic counter.
+On Tue, 4 Jun 2024 13:05:52 +0300 you wrote:
+> In case of flow rule creation fail in mlx5_lag_create_port_sel_table(),
+> instead of previously created rules, the tainted pointer is deleted
+> deveral times.
+> Fix this bug by using correct flow rules pointers.
 > 
-> Fixes: 165f87691a89 ("bnxt_en: add timestamping statistics support")
-> Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] bnxt_en: fix atomic counter for ptp packets
-    https://git.kernel.org/netdev/net-next/c/c790275b5edf
+  - [net] net/mlx5: Fix tainted pointer delete is case of flow rules creation fail
+    https://git.kernel.org/netdev/net/c/229bedbf62b1
 
 You are awesome, thank you!
 -- 
