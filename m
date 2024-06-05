@@ -1,219 +1,104 @@
-Return-Path: <netdev+bounces-100873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 775E98FC6B5
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 10:39:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98F728FC6D4
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 10:44:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29B891F21C56
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 08:39:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9601B232BC
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 08:43:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FCE21946C2;
-	Wed,  5 Jun 2024 08:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 915C11946CD;
+	Wed,  5 Jun 2024 08:43:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="HanVOSjg"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="FVPItTTd"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C324963E;
-	Wed,  5 Jun 2024 08:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509544962C;
+	Wed,  5 Jun 2024 08:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717576748; cv=none; b=bBqgBXiHTKtnlmPGPGLsThf5q+nlPblj+RoNSQnDcxFvGogo1gSSdTBVAyfURlt9SXu5Juq+wODpwbT3vDhJfnXg7Ef6x3wpAdSbNXIwSSDO/+z/QuHIBnG7We/UhcbUka0TqXDNitp3+Tv0CCvLUVSbOrNH2sDNZdOGRuBnSIk=
+	t=1717577034; cv=none; b=IfF+1/Hb+V2g29tpwltsm8fV6YdK5t6sHdsi2BfXP6ulfCODQTa20WZLBKOtKZ2k0peARbGh6km2SFHwK2m8i0F5l0drtB6nSLHDYdNsYXG70fbZ3+ByZdy6FkCHO/c5fbjpA+0Sx+QBOoA7lULyQeaVZfv9y8RSWHuoZ/O4hFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717576748; c=relaxed/simple;
-	bh=CNAuilfiRwwKm0fGNUOB0FH43WBrxg4Srl1Cepe++Do=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ashag912Xmsgkj1v3d1VQakwdi438KNAGYLQtacsom2XSKIaWvXcsJ9j5jxCUbKxTUb6pLBomch2ei33E8hN+qtkz8xV+BybGqx78jagWqsUUBGNzw0LJqI9AVFj8QJl1uTLv4LW7Q3LCrm0+upQLMWVY8Lbcfagm7tTCYhfyiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=HanVOSjg; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 678D120B9260; Wed,  5 Jun 2024 01:39:06 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 678D120B9260
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1717576746;
-	bh=TrGB2Ttu+2GQP4P667beS3OkIPRmk8NFPGqeTHHLFWQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HanVOSjgakHW3wIPeXeqrGKQ1S3YE4V/rsqZcbU8ENuI6HzP2JbQ/gZM2NzgEAvV9
-	 yutTk2fmzDfEd/kXALFdNom5jAXN17IeP5kKUuv8Xwe4sB7CPBfj4TsdS90ZzkH58c
-	 fDqpCeXRUSUtle0vYZxpyFrajGZLw4X+sjyHRrpQ=
-Date: Wed, 5 Jun 2024 01:39:06 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Simon Horman <horms@kernel.org>
-Cc: linux-hardening@vger.kernel.org, netdev@vger.kernel.org,
-	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, Colin Ian King <colin.i.king@gmail.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Kees Cook <keescook@chromium.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Long Li <longli@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH net-next v3] net: mana: Allow variable size indirection
- table
-Message-ID: <20240605083906.GA15889@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1717169861-15825-1-git-send-email-shradhagupta@linux.microsoft.com>
- <20240604093349.GP491852@kernel.org>
+	s=arc-20240116; t=1717577034; c=relaxed/simple;
+	bh=jZ//xqLY5MABrAu+hTMq7OGpEIr0joF93MaJu/Iw+4c=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SaJP3e+UktlSXyYj41ssQur7qlxHK99P5ewse4ZmG8jB2TWjQtqtdCSyMVUwWtvcHl6PqqRJ/8THgrY1Cg4bKeBi5gwvfwKbNk6fhdNSfXty8farH5Gesatq/XKqtZRusIauZcbS6cCwrbU4rKvv4XX4USRRwiUvvSLXcG886gE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=FVPItTTd; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 7762EA0673;
+	Wed,  5 Jun 2024 10:43:41 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=g8zm70D3lRPSYVdgRgWMFlw4wLi2O0HtRTHjaSgr9q0=; b=
+	FVPItTTdNVcj+vJpv+0m6rnG7tOwf+ewvz9Ydm3KI+RuF/MB+vOBkDaSBCij3j6X
+	9swGmLQxULBjyxwQ/aLNk8MLocORTNLqVceL3Wpa7jpQv04rnzsG196xViATpVcf
+	86el0c+BNaOmymKHRT76h8v7GLuydDO2s4CzcL3Hr4Y2L2JVQzsWHPOsKvx4EKkI
+	JowHDcqLNtZwQy9hVwV3IglIwKh1iuq1JLG557oNFjp0OTBWYViVgTvXor1F5zBZ
+	NKjd71BoP1B7q6CGO+uByc1LUjx82eGXA6GxpJg1tSbZeBJwPE1mOEKOP2AxI5SH
+	tiGsnfua/6qmm3krNnk8gjs+lR2qOsfArTC6RuTuITJ319Btnx+o/k3pPSa+Mdga
+	j5DsQ0VxsxGPcEp+a+CEXkH2vgrRPDG1rrr5n0s6zC/PvRfy8dTuwtezLUpFTVZ8
+	/CNEtpXzsPs9Fk/buGlmh87bSyFo9aICCTfDL14+FbDQ5kMfXKdJwuWoKoVwqthd
+	uCsLKbu/mMS2+eVN/1I88L5zlEe+6pK66ZXOTSa44EJxr+GNA9Dep2E0psR1nuaj
+	tROM+EjQI07PHOxOKiqEzHv2J3onU/qgh40okvO9RtrlKNOu8EyFEjNLeE1b3i0m
+	4cQ4QxK0yhd9eWYDpc6u/A43ksdG4et/B32Wek5alQE=
+From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>, "Russell
+ King" <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
+	<hkallweit1@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+Subject: [PATCH] net: sfp: Always call `sfp_sm_mod_remove()` on remove
+Date: Wed, 5 Jun 2024 10:42:51 +0200
+Message-ID: <20240605084251.63502-1-csokas.bence@prolan.hu>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240604093349.GP491852@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1717577020;VERSION=7972;MC=1104090605;ID=105813;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2945A1295762776B
 
-On Tue, Jun 04, 2024 at 10:33:49AM +0100, Simon Horman wrote:
-> On Fri, May 31, 2024 at 08:37:41AM -0700, Shradha Gupta wrote:
-> > Allow variable size indirection table allocation in MANA instead
-> > of using a constant value MANA_INDIRECT_TABLE_SIZE.
-> > The size is now derived from the MANA_QUERY_VPORT_CONFIG and the
-> > indirection table is allocated dynamically.
-> > 
-> > Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> > Reviewed-by: Dexuan Cui <decui@microsoft.com>
-> > Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> 
-> ...
-> 
-> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> 
-> ...
-> 
-> > @@ -2344,11 +2352,33 @@ static int mana_create_vport(struct mana_port_context *apc,
-> >  	return mana_create_txq(apc, net);
-> >  }
-> >  
-> > +static int mana_rss_table_alloc(struct mana_port_context *apc)
-> > +{
-> > +	if (!apc->indir_table_sz) {
-> > +		netdev_err(apc->ndev,
-> > +			   "Indirection table size not set for vPort %d\n",
-> > +			   apc->port_idx);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	apc->indir_table = kcalloc(apc->indir_table_sz, sizeof(u32), GFP_KERNEL);
-> > +	if (!apc->indir_table)
-> > +		return -ENOMEM;
-> > +
-> > +	apc->rxobj_table = kcalloc(apc->indir_table_sz, sizeof(mana_handle_t), GFP_KERNEL);
-> > +	if (!apc->rxobj_table) {
-> > +		kfree(apc->indir_table);
-> 
-> Hi, Shradha
-> 
-> Perhaps I am on the wrong track here, but I have some concerns
-> about clean-up paths.
-> 
-> Firstly.  I think that apc->indir_table should be to NULL here for
-> consistency with other clean-up paths. Or alternatively, fields of apc
-> should not set to NULL elsewhere after being freed.
+If the module is in SFP_MOD_ERROR, `sfp_sm_mod_remove()` will
+not be run. As a consequence, `sfp_hwmon_remove()` is not getting
+run either, leaving a stale `hwmon` device behind. `sfp_sm_mod_remove()`
+itself checks `sfp->sm_mod_state` anyways, so this check was not
+really needed in the first place.
 
-Hi Simon,
+Signed-off-by: "Csókás, Bence" <csokas.bence@prolan.hu>
+---
+ drivers/net/phy/sfp.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Thanks for the comments. This makes sense, I am planning of consistently removing
-the NULLify from other places too as per Leon's comments.
-> 
-> In looking into this I noticed that mana_probe() does not call
-> mana_remove() or return an error in the cases where mana_probe_port() or
-> mana_attach() fail unless add_adev also fails. If so, is that intentional?
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index f75c9eb3958e..d999d9baadb2 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -2418,8 +2418,7 @@ static void sfp_sm_module(struct sfp *sfp, unsigned int event)
+ 
+ 	/* Handle remove event globally, it resets this state machine */
+ 	if (event == SFP_E_REMOVE) {
+-		if (sfp->sm_mod_state > SFP_MOD_PROBE)
+-			sfp_sm_mod_remove(sfp);
++		sfp_sm_mod_remove(sfp);
+ 		sfp_sm_mod_next(sfp, SFP_MOD_EMPTY, 0);
+ 		return;
+ 	}
+-- 
+2.34.1
 
-Right, so most calls like mana_probe_port(), mana_attach() cleanup after themselves
-in the code if there is any error. So, not having to call mana_remove() in these
-cases in mana_probe() is intentional. But I do agree that an error is returned in
-mana_probe() only if add_adev also fails. I'll fix that too in the next version
-> 
-> In any case, I would suggest as a follow-up, arranging things so that when
-> an error occurs in a function, anything that was allocated is unwound
-> before returning an error.
-> 
-> I think this would make allocation/deallocation easier to reason with.
-> And I suspect it would avoid both the need for fields of structures to be
-> zeroed after being freed, and the need to call mana_remove() from
-> mana_probe().
 
-Agreed
-> 
-> > +		return -ENOMEM;
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  static void mana_rss_table_init(struct mana_port_context *apc)
-> >  {
-> >  	int i;
-> >  
-> > -	for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++)
-> > +	for (i = 0; i < apc->indir_table_sz; i++)
-> >  		apc->indir_table[i] =
-> >  			ethtool_rxfh_indir_default(i, apc->num_queues);
-> >  }
-> 
-> ...
-> 
-> > @@ -2739,11 +2772,17 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
-> >  	err = register_netdev(ndev);
-> >  	if (err) {
-> >  		netdev_err(ndev, "Unable to register netdev.\n");
-> > -		goto reset_apc;
-> > +		goto free_indir;
-> >  	}
-> >  
-> >  	return 0;
-> >  
-> > +free_indir:
-> > +	apc->indir_table_sz = 0;
-> > +	kfree(apc->indir_table);
-> > +	apc->indir_table = NULL;
-> > +	kfree(apc->rxobj_table);
-> > +	apc->rxobj_table = NULL;
-> >  reset_apc:
-> >  	kfree(apc->rxqs);
-> >  	apc->rxqs = NULL;
-> 
-> nit: Not strictly related to this patch, but the reset_apc code should
->      probably be a call to mana_cleanup_port_context() as it is the dual of
->      mana_init_port_context() which is called earlier in mana_probe_port()
-
-Sure, let me do that too.
-> 
-> ...
-> 
-> > @@ -2931,6 +2972,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
-> >  		}
-> >  
-> >  		unregister_netdevice(ndev);
-> > +		apc->indir_table_sz = 0;
-> > +		kfree(apc->indir_table);
-> > +		apc->indir_table = NULL;
-> > +		kfree(apc->rxobj_table);
-> > +		apc->rxobj_table = NULL;
-> 
-> The code to free and zero indir_table_sz and indir_table appears twice
-> in this patch. Perhaps a helper to do this, which would be the dual
-> of mana_rss_table_alloc is in order.
-Makes sense, will change this too.
-
-Thanks,
-Shradha.
-> 
-> >  
-> >  		rtnl_unlock();
-> >  
-> 
-> ...
 
