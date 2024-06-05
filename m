@@ -1,122 +1,103 @@
-Return-Path: <netdev+bounces-100795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C161C8FC102
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 02:54:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F77B8FC12F
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 03:15:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E928B23678
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 00:54:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1C281C2298C
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 01:15:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBDF728EB;
-	Wed,  5 Jun 2024 00:54:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6DD79E1;
+	Wed,  5 Jun 2024 01:15:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SX8/4W+P"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="P4xBQZ6v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A269804
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 00:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58042F44
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 01:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717548884; cv=none; b=pgyH62hzQz8+87HKF9luiu3O40qck9lkLrP6xwH9iccfyvFjLeljaoMw343rjusEVmROpmUZxmNGcdQdiXNb+j9Ysh46dCndxkef7iSZ38TWLpkHkEu9ULtXS+Kei2W6Pt6z7kC5f2Sygt5nGhsVE/ADwR6UlO1rJczTh1VwBcs=
+	t=1717550101; cv=none; b=k7UhXllCc4ZCqJEKFGYUtTZt2F2uTSTLcF/2YvkAtpkgm8Tc5Fha5iwzULEhdpjaEnQJVtl8eYibRSejiiti/ATA0vPDlO4us1p8iWxZuS6Vps6pRhYCAM0LNBbeS+YzDGOQZGgLIq/XqYhZIalgl7vNY8m+2z/UJLKCai9WBls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717548884; c=relaxed/simple;
-	bh=ELFtQI28CDmj681A4xOEs5XCfOhTeUAjWt1q/p4lq6Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ven0aHqzdAAJw33eC+A0AUzZn2FNaihu99BzFqZDx3bI2ubfajRZKFX/Am5+qyJvDhGV6KzAqAe7lTCOGx7lck5MVV36WSyntm4Ydg55gqQqYK2btwWV9peIEepIq6Wyr+hn7RaonEb58Yo+J+XSUtcINIMcDzPwPHe2QfccbjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SX8/4W+P; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52b90038cf7so5103030e87.0
-        for <netdev@vger.kernel.org>; Tue, 04 Jun 2024 17:54:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717548881; x=1718153681; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ELFtQI28CDmj681A4xOEs5XCfOhTeUAjWt1q/p4lq6Q=;
-        b=SX8/4W+PFjNtQoIySm34JC8XlgP6UcCRCOS8OmpOCURbLV+b+q9SSr0BptEcKEhwOS
-         LiUXZrmDjcGHvVL31u6CgXXq4o2HqoMYs9SDIT6lb82qXmtdlciyTx6h5xk+ceFch7OE
-         2sHniI3yohaQQB1VXk57JxjTEPV1xK6ebD5oY0k0Mas/5D7JEUHL+bVrJkK4KRHPm4c3
-         mbuQKhOLCob8nigs6PqHRYFnsSCWYajZ6WjRwzM51R7hOHPSFUY+w5hS65kzCcxiCpKp
-         Zl1jXE5RPnFyjzVmAOqHGloaJe8+AtUIHrcjg4wT7TdxFhIkxl9jwvI7un3U5abvr6oG
-         fpSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717548881; x=1718153681;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ELFtQI28CDmj681A4xOEs5XCfOhTeUAjWt1q/p4lq6Q=;
-        b=pLnM5hGBG0VakbBZrrYhLE9oHWpj3qJGQx4YQqlE2FWOAfkklmDMP1EESAVYVt2kHg
-         35fJsMWzhVZ7XqNW+tBfLZg2RDtJNlqqlgFLcky9jib0e76AOCehS73M+ptwwHNpO/1k
-         a5Dj8aklyjT7X14v/qM8hv0F5BoQB1+ZcsxwBFYSV3Ob4UpnTKECfcisGjiaAdUzfVbW
-         f4E7b/Y2wGCXhixkBrfHX3rhmAhWvMa1s6qsS5eEHhPIKqyl+VSHETyGW2vXysDnB/tg
-         21634WoQ+Ky7Cp0Jb46ecObmUUfiQHMLswKx0ZcSaOJswftGWzTSMpkKP9p4I1AkHZvW
-         iIUg==
-X-Forwarded-Encrypted: i=1; AJvYcCWFtOjFk8UDnh6p8MYzAukmjcMgX1l/5J/GC0au1NelPb9mvIOGSxd+kDr8HubiVy7rhwqIM+zGVieV4jOISzxrLo0qquhh
-X-Gm-Message-State: AOJu0YwAhL8prYgjFYGuggbuxQ8HsOALhCTq4Yju57GD9tT3YnA72vsl
-	Zv80vlGnBX0+p0PoWM9WAWv+d087tlRj5T0KG3pt9moGxjKJcm+uJTd79YRhsYuusgjrfzqNlJR
-	irAi6kSpPf+GKps/9RsiLYwXT+iM=
-X-Google-Smtp-Source: AGHT+IGYzc8kHUiZFUukJhh1D0urbz7L9gQ4FJMjlePBtYM68CtYr17DGtBH8+gdzqcFKpOLDoGEyz8pt1PsA7SutrU=
-X-Received: by 2002:a05:6512:3ba7:b0:51a:b933:b297 with SMTP id
- 2adb3069b0e04-52bab4b1187mr697580e87.2.1717548881153; Tue, 04 Jun 2024
- 17:54:41 -0700 (PDT)
+	s=arc-20240116; t=1717550101; c=relaxed/simple;
+	bh=Bv4L9NrvSEK+N9qOU007Ygdlatbfv26G5Y2JiYaobwQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BW/CKY2TzR6Qzj1HRP/Nem2hVI7kHlcTRvlsK03Bg4tjk7hh7P7G5PyqH8SdoxGoRLjdgqFBZOr8VUYlR1grgxtJrFD/ckdCPqFAru2zPUNmeUtytxBZt8EjTIYWfOlPKFa+F/7f+9m2wrYRZn7Ge9PkLSQH6VKIdnHf6Yt0XL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=P4xBQZ6v; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=XR4iWXQMJ1j7H79vhf5bobV6/Eeyl57/HHXYOI+dLHU=; b=P4xBQZ6vbY5ZrqnzDZvA/djHFe
+	PyG8yVoP1bznQWTb79mOjtEnmNAI6NXXeTUUtEdtyGOfjzllpygcMrtXnZXSjTK5y5PAyROIUZvPQ
+	q4H6QbCCicKn5ut5mM/iNX1Eyxkp9b+iBIwQmPSMGMGNXX1XggrPH5/2dQESiZQX26HQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sEfEr-00GrEU-3Z; Wed, 05 Jun 2024 03:14:53 +0200
+Date: Wed, 5 Jun 2024 03:14:53 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: "Nelson, Shannon" <shannon.nelson@amd.com>,
+	David Miller <davem@davemloft.net>, netdev <netdev@vger.kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Vitaly Lifshits <vitaly.lifshits@intel.com>,
+	Menachem Fogel <menachem.fogel@intel.com>,
+	Naama Meir <naamax.meir@linux.intel.com>
+Subject: Re: [PATCH 9/9] igc: add support for ethtool.set_phys_id
+Message-ID: <d27f050a-26db-4f08-aa19-848ae2c6ed2d@lunn.ch>
+References: <20240603-next-2024-06-03-intel-next-batch-v1-0-e0523b28f325@intel.com>
+ <20240603-next-2024-06-03-intel-next-batch-v1-9-e0523b28f325@intel.com>
+ <f8f8d5fb-68c1-4fd1-9e0b-04c661c98f25@amd.com>
+ <dc0cc2ca-d3f4-4387-88bd-b54ea6896e0f@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240531164440.13292-1-kerneljasonxing@gmail.com> <20240604170357.GB791188@kernel.org>
-In-Reply-To: <20240604170357.GB791188@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 5 Jun 2024 08:54:03 +0800
-Message-ID: <CAL+tcoCCEdLEOJj9G=3nxTeCHarMhFbh9KTLHKLDVWfhqWXy2w@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: allow rps/rfs related configs to be switched
-To: Simon Horman <horms@kernel.org>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, dsahern@kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dc0cc2ca-d3f4-4387-88bd-b54ea6896e0f@intel.com>
 
-Hello Simon,
+On Tue, Jun 04, 2024 at 02:12:31PM -0700, Jacob Keller wrote:
+> 
+> 
+> On 6/3/2024 5:12 PM, Nelson, Shannon wrote:
+> > On 6/3/2024 3:38 PM, Jacob Keller wrote:
+> >>
+> >> From: Vitaly Lifshits <vitaly.lifshits@intel.com>
+> >>
+> >> Add support for ethtool.set_phys_id callback to initiate LED blinking
+> >> and stopping them by the ethtool interface.
+> >> This is done by storing the initial LEDCTL register value and restoring
+> >> it when LED blinking is terminated.
+> >>
+> >> In addition, moved IGC_LEDCTL related defines from igc_leds.c to
+> >> igc_defines.h where they can be included by all of the igc module
+> >> files.
 
-On Wed, Jun 5, 2024 at 1:04=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
-e:
->
-> On Sat, Jun 01, 2024 at 12:44:40AM +0800, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > After John Sperbeck reported a compile error if the CONFIG_RFS_ACCEL
-> > is off, I found that I cannot easily enable/disable the config
-> > because of lack of the prompt when using 'make menuconfig'. Therefore,
-> > I decided to change rps/rfc related configs altogether.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
->
-> Hi Jason,
->
-> FWIIW, I think it would be appropriate to also add help text for each opt=
-ion.
-> And I would drop "Enable", modeling Kdoc on, f.e. CONFIG_CGROUP_NET_CLASS=
-ID.
+Sorry for the deep nesting. I missed the first post.
 
-Thanks for your review.
+This seems like a very Intel specific solution to a very generic
+problem. The LED code added by Kurt Kanzenbach follows the generic
+netdev way of controlling LEDs. Any MAC or PHY driver with LED support
+should be capable of blinking. Maybe in hardware, maybe it needs
+software support.
 
-I will adjust as you suggest in the next submission.
+So please write a generic ethtool helper which any MAC driver can use
+to make use of the generic sys class LEDs associated to it, not an
+Intel specific solution.
 
->
-> Likewise for CONFIG_BQL, although that isn't strictly related to this
-> patch.
+    Andrew
 
-Yes, I can see. I think I could write another patch to do this since
-currently I would like to submit a rps/rfs related patch.
-
-Thanks,
-Jason
+---
+pw-bot: cr
 
