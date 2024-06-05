@@ -1,192 +1,128 @@
-Return-Path: <netdev+bounces-101063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 027578FD188
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 17:23:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C36528FD1B4
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 17:33:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A36DF1F24D42
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:23:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA0AFB22EEF
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:31:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9234A3F8E2;
-	Wed,  5 Jun 2024 15:23:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624911773D;
+	Wed,  5 Jun 2024 15:31:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hb2PPK7m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A4F1863F;
-	Wed,  5 Jun 2024 15:23:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8033D2E6;
+	Wed,  5 Jun 2024 15:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717600993; cv=none; b=YaKaPIbcHihlAUcVdmq3HpfTROo708LUd3lm5VZmLVhFkdlSjl9gMUhV9SKy7nUmK6nFp3f7gbNIttxHf044CtqhK5Pv75K+C5ZffCpLffzG4Q1wbgjJcFcowA05/8mXa16RUn88iH4Xm7crgNHTVZcgxTvNMjEViGwG93lv1pM=
+	t=1717601500; cv=none; b=hCb+kTXLFO4jikbIy/xcE8M9UJjitX4jSuFRwyO2htp6rmorW3tBptV0JKswUbZXOoUGFyBOUQUhh69aNZzPqTxyovDek7SsHoo1pPBpka4sszfvvbRZSOBTtmDrPcHO9FC8QsRxBTgUsMUIETMlOBm0JgnowBzUeaVI6QJautM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717600993; c=relaxed/simple;
-	bh=VPZkswdUi9IbeyGy87RvCLEp3+GYq472ghuyHCjHZVU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q3QMEk0rHJgthnAhXDFEd9ByQtU0S9zgniUeQ5xCA4xGjdywaGYWOmKFYvpk9O5cCObEMU1rDgK8RLT8h9B7uZQaqeGK45ne3/IB2VWYj+I8Ah64eDNfvCC1yjG8TT8DBpkpCG+cQTHzL0Vd+5Qrff/zycnpuNhINz4T6FzpCJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-From: Kenton Groombridge <concord@gentoo.org>
-To: johannes@sipsolutions.net
-Cc: concord@gentoo.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	Kees Cook <keescook@chromium.org>
-Subject: [PATCH v3] wifi: mac80211: Avoid address calculations via out of bounds array indexing
-Date: Wed,  5 Jun 2024 11:22:18 -0400
-Message-ID: <20240605152218.236061-1-concord@gentoo.org>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1717601500; c=relaxed/simple;
+	bh=By8UN7bEgE6tHMTsl5RtwzENBGGtoe2bMTEaO/znMUc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ee6W0guWLQThQ5rFmkPILgNp4pS5rTM0Jr0bm4pKPylcNgYxe+oV/9ovODQkE11XpevarA9E5f7aFqt9RSzHynYSqu2F5SaSD6HIkFr5owVxZKW9r47cU31lQ1AOWPjSxSQ1vwfsftJ9pApn3nQUCz1zF7LPCNBJvMwhf2KPNd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hb2PPK7m; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52b962c4bb6so5962930e87.3;
+        Wed, 05 Jun 2024 08:31:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717601497; x=1718206297; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8UVI+FJG+cytwZoj1NugeGBUyl9BCIHH6pWrnkmyvyA=;
+        b=hb2PPK7mBSNrQ/oXGhHUHSNYG5r/FZI+Yc/kcnMpBBD3PhZRMJlIM0bNcXUVF5ktLt
+         etITPYRV45lN4acva8vR3rm5kDZfgVh2vSdr79py0AvRadZH2u8txPloRzgi9m5m5+5l
+         B/kZdqpZ0brYo0SNGK722mOjj+jgcnYWpONJL/U6RQ4C+G8qtPk5tBAfcoiPbxti1O1T
+         0Bgspnr9JrJIItA1ZhnahZqkfAokNLHakorOU4JsLU7iNv3IQQEPFjJlNekYL41RPj9k
+         Km/ET5PkOMOg94g/T3RFTX4ZM61jZowICCqbjMMqPWdKfhjtrQBDDhxWx4yDoS8sUhTd
+         OCjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717601497; x=1718206297;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8UVI+FJG+cytwZoj1NugeGBUyl9BCIHH6pWrnkmyvyA=;
+        b=m/32NRFUNHB17iREBkQspIQhf37TNFQUqJlvR6bmVOKsuUSyslLQjRi5UhReCet4lD
+         wV4llt6h1zHp2LczJP3iC3sw5W8Z1zzwmCMedlbpjFoxYqzkpfHw8d8adLC9ewwGYBYC
+         jS8Mmt6iKgYdTz937BXE7EJ8MmhcIpZFirfacYORTCuSni3fIVWEguo8fLOVH3glyPi6
+         WZlyCcANBiqj0hoEUkfFwSyp9iLMLe3PGJj75RpPMbtxFOfZY62JBDi2VWju8YWqRNle
+         vy7k1DP2/4awsrQZB3OL/Uw4c6VjahgYOlU5TFNFgv1SvACJR4Q+plKZzlgFTU6TIaZs
+         GH0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV/dS+0jwGFY3Hz0Gs4IiPLzyoIfWF7i+paZLV0D8vzJu5ChzRkU747XUYcJ5gjzC3p+YXxfQUg/U5jJM8bvJ8gvC32UJIvsMsdeGIV
+X-Gm-Message-State: AOJu0YzNZlWEsPbXt6grhBkBfz8NU4n3vjRAT3+Kg/0HT2mPxwgWpbGo
+	HdqJOboUy9bJOR9EdZmMmyRyUiFZDTQnPAPCBWdb2MacwVjJAsMh
+X-Google-Smtp-Source: AGHT+IFkGzUgT0m4yyFlD+rq2PxwrsZAnFic8ufJk/ij2VBoo48gtb5OdaSoLnDec68LWufwqDP34w==
+X-Received: by 2002:a05:6512:2253:b0:523:9515:4b74 with SMTP id 2adb3069b0e04-52bab4ca5e9mr2807710e87.14.1717601496450;
+        Wed, 05 Jun 2024 08:31:36 -0700 (PDT)
+Received: from skbuf ([188.25.55.166])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a690f03320csm449345866b.184.2024.06.05.08.31.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jun 2024 08:31:35 -0700 (PDT)
+Date: Wed, 5 Jun 2024 18:31:33 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?Q3PDs2vDoXM=?= Bence <csokas.bence@prolan.hu>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	trivial@kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>
+Subject: Re: [RFC PATCH 2/2] net: include: mii: Refactor: Use BIT() for
+ ADVERTISE_* bits
+Message-ID: <20240605153133.ronpeb2tcn3loqu5@skbuf>
+References: <20240605121648.69779-1-csokas.bence@prolan.hu>
+ <20240605121648.69779-1-csokas.bence@prolan.hu>
+ <20240605121648.69779-2-csokas.bence@prolan.hu>
+ <20240605121648.69779-2-csokas.bence@prolan.hu>
+ <20240605141342.262wgddrf4xjbbeu@skbuf>
+ <52b9e3f4-8dd4-4696-9a47-0dc4eb59c013@prolan.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <52b9e3f4-8dd4-4696-9a47-0dc4eb59c013@prolan.hu>
 
-req->n_channels must be set before req->channels[] can be used.
+On Wed, Jun 05, 2024 at 04:47:27PM +0200, Csókás Bence wrote:
+> Hi!
+> 
+> On 6/5/24 16:13, Vladimir Oltean wrote:
+> > On Wed, Jun 05, 2024 at 02:16:49PM +0200, Csókás, Bence wrote:
+> > > Replace hex values with BIT() and GENMASK() for readability
+> > > 
+> > > Cc: trivial@kernel.org
+> > > 
+> > > Signed-off-by: "Csókás, Bence" <csokas.bence@prolan.hu>
+> > > ---
+> > 
+> > You can't use BIT() and GENMASK() in headers exported to user space.
+> > 
+> > I mean you can, but the BIT() and GENMASK() macros themselves aren't
+> > exported to user space, and you would break any application which used
+> > values dependent on them.
+> > 
+> 
+> I thought the vDSO headers (which currently hold the definition for `BIT()`)
+> *are* exported. Though `GENMASK()`, and the headers which would normally
+> include vdso/bits.h, might not be... But then again, is uapi/linux/mii.h
+> itself even exported?
 
-This patch fixes one of the issues encountered in [1].
+grep through the output of "make -j 8 headers_install O=headers" is
+a good place to start.
 
-[   83.964252] ------------[ cut here ]------------
-[   83.964255] UBSAN: array-index-out-of-bounds in net/mac80211/scan.c:364:4
-[   83.964258] index 0 is out of range for type 'struct ieee80211_channel *[]'
-[   83.964260] CPU: 0 PID: 1695 Comm: iwd Tainted: G           O    T 6.8.9-gentoo-hardened1 #1
-[   83.964262] Hardware name: System76 Pangolin/Pangolin, BIOS ARB928_V00.01_T0025ASY1_ms 04/20/2023
-[   83.964264] Call Trace:
-[   83.964267]  <TASK>
-[   83.964269]  dump_stack_lvl+0x3f/0xc0
-[   83.964274]  __ubsan_handle_out_of_bounds+0xec/0x110
-[   83.964278]  ieee80211_prep_hw_scan+0x2db/0x4b0
-[   83.964281]  __ieee80211_start_scan+0x601/0x990
-[   83.964284]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964287]  ? cfg80211_scan+0x149/0x250
-[   83.964291]  nl80211_trigger_scan+0x874/0x980
-[   83.964295]  genl_family_rcv_msg_doit+0xe8/0x160
-[   83.964298]  genl_rcv_msg+0x240/0x270
-[   83.964301]  ? __cfi_nl80211_trigger_scan+0x10/0x10
-[   83.964302]  ? __cfi_nl80211_post_doit+0x10/0x10
-[   83.964304]  ? __cfi_nl80211_pre_doit+0x10/0x10
-[   83.964307]  ? __cfi_genl_rcv_msg+0x10/0x10
-[   83.964309]  netlink_rcv_skb+0x102/0x130
-[   83.964312]  genl_rcv+0x23/0x40
-[   83.964314]  netlink_unicast+0x23b/0x340
-[   83.964316]  netlink_sendmsg+0x3a9/0x450
-[   83.964319]  __sys_sendto+0x3ae/0x3c0
-[   83.964324]  __x64_sys_sendto+0x21/0x40
-[   83.964326]  do_syscall_64+0x90/0x150
-[   83.964329]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964331]  ? syscall_exit_work+0xc2/0xf0
-[   83.964333]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964335]  ? syscall_exit_to_user_mode+0x74/0xa0
-[   83.964337]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964339]  ? do_syscall_64+0x9c/0x150
-[   83.964340]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964342]  ? syscall_exit_to_user_mode+0x74/0xa0
-[   83.964344]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964346]  ? do_syscall_64+0x9c/0x150
-[   83.964347]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964349]  ? do_syscall_64+0x9c/0x150
-[   83.964351]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964353]  ? syscall_exit_work+0xc2/0xf0
-[   83.964354]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964356]  ? syscall_exit_to_user_mode+0x74/0xa0
-[   83.964358]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964359]  ? do_syscall_64+0x9c/0x150
-[   83.964361]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964362]  ? do_user_addr_fault+0x488/0x620
-[   83.964366]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964367]  ? srso_alias_return_thunk+0x5/0xfbef5
-[   83.964369]  entry_SYSCALL_64_after_hwframe+0x55/0x5d
-[   83.964372] RIP: 0033:0x6200808578d7
-[   83.964374] Code: 00 00 90 f3 0f 1e fa 41 56 55 41 89 ce 48 83 ec 28 80 3d 7b f7 0d 00 00 74 29 45 31 c9 45 31 c0 41 89 ca b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 71 48 83 c4 28 5d 41 5e c3 66 0f 1f 84 00 00
-[   83.964375] RSP: 002b:0000730c4e821530 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-[   83.964378] RAX: ffffffffffffffda RBX: 000006dbc456c570 RCX: 00006200808578d7
-[   83.964379] RDX: 000000000000005c RSI: 000006dbc45884f0 RDI: 0000000000000004
-[   83.964381] RBP: 0000000000000004 R08: 0000000000000000 R09: 0000000000000000
-[   83.964382] R10: 0000000000000000 R11: 0000000000000246 R12: 000006dbc456c480
-[   83.964383] R13: 000006dbc456c450 R14: 0000000000000000 R15: 000006dbc456c610
-[   83.964386]  </TASK>
-[   83.964386] ---[ end trace ]---
+> And if so, why aren't these macros? Is there any reason _not_ to
+> export the entire linux/bits.h?
 
-[1] https://bugzilla.kernel.org/show_bug.cgi?id=218810
-
-v3:
-- Fix incorrect channel copying
-v2:
-- Drop changes in cfg80211 as requested by Johannes
-
-Co-authored-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: Kenton Groombridge <concord@gentoo.org>
----
- net/mac80211/scan.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
-
-diff --git a/net/mac80211/scan.c b/net/mac80211/scan.c
-index 73850312580f..56beed61d2b7 100644
---- a/net/mac80211/scan.c
-+++ b/net/mac80211/scan.c
-@@ -358,7 +358,8 @@ static bool ieee80211_prep_hw_scan(struct ieee80211_sub_if_data *sdata)
- 	struct cfg80211_scan_request *req;
- 	struct cfg80211_chan_def chandef;
- 	u8 bands_used = 0;
--	int i, ielen, n_chans;
-+	int i, ielen;
-+	u32 *n_chans;
- 	u32 flags = 0;
- 
- 	req = rcu_dereference_protected(local->scan_req,
-@@ -368,34 +369,34 @@ static bool ieee80211_prep_hw_scan(struct ieee80211_sub_if_data *sdata)
- 		return false;
- 
- 	if (ieee80211_hw_check(&local->hw, SINGLE_SCAN_ON_ALL_BANDS)) {
-+		local->hw_scan_req->req.n_channels = req->n_channels;
-+
- 		for (i = 0; i < req->n_channels; i++) {
- 			local->hw_scan_req->req.channels[i] = req->channels[i];
- 			bands_used |= BIT(req->channels[i]->band);
- 		}
--
--		n_chans = req->n_channels;
- 	} else {
- 		do {
- 			if (local->hw_scan_band == NUM_NL80211_BANDS)
- 				return false;
- 
--			n_chans = 0;
-+			n_chans = &local->hw_scan_req->req.n_channels;
-+			*n_chans = 0;
- 
- 			for (i = 0; i < req->n_channels; i++) {
- 				if (req->channels[i]->band !=
- 				    local->hw_scan_band)
- 					continue;
--				local->hw_scan_req->req.channels[n_chans] =
-+				local->hw_scan_req->req.channels[(*n_chans)++] =
- 							req->channels[i];
--				n_chans++;
-+
- 				bands_used |= BIT(req->channels[i]->band);
- 			}
- 
- 			local->hw_scan_band++;
--		} while (!n_chans);
-+		} while (!*n_chans);
- 	}
- 
--	local->hw_scan_req->req.n_channels = n_chans;
- 	ieee80211_prepare_scan_chandef(&chandef);
- 
- 	if (req->flags & NL80211_SCAN_FLAG_MIN_PREQ_CONTENT)
--- 
-2.45.2
-
+Sorry, I'm not the person who can answer these questions.
 
