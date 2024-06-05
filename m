@@ -1,102 +1,85 @@
-Return-Path: <netdev+bounces-101031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27F628FD001
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:50:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6488B8FCFC2
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:43:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D02651F22935
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:50:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02DAC1F26CBB
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D960B19E7D4;
-	Wed,  5 Jun 2024 13:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 131DA194091;
+	Wed,  5 Jun 2024 13:33:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JPveB5Pt"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD0319D08B;
-	Wed,  5 Jun 2024 13:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24E6194089
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 13:33:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717594602; cv=none; b=lvM03gmsogpcRLKxZ+Iq57lAn9obVd6ZXpasZborSpgnjYrNXRsvz5JaisZt8liKwpLL36qZHcpW7kSEYYc87JFL/CAFUqAdJjn76g1lUboIvLX/TCTf9jm2oUafn0eGEK0ma9QPV0qEwK5OInlaM/HZ5EhbJW+oSbiXpHmabps=
+	t=1717594414; cv=none; b=YIcBsIAfBOUvg8YNfCSco+TPBcaCQ1y58PffTY6dEfw2Quxo/7N0lpVBl7wwc5vL0rLWjFfpee824GrMDfa6asszB8fubu10i1416kRiQhW9sS9ffahWVJ4Ah3S3YIoZk6oQJPvm+daqjIXrjAsjtWkRD/QIuhmTudkRjOYRsJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717594602; c=relaxed/simple;
-	bh=6EwSfbEh0H1kuJai2tJ7JkQgGY5jSFOoFUJo9k9Tko4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XE7+knJAXw28i6vmw4e2a90C57LmNwIosFApyUO5NJb+57vPZl0DJtISY74zqKLtA8gRumqkINkPNfApuyNKr4ksbC3qIKnC+esywxm+WwW49vi1YWELxQdkixrdx2tUZKmqhHStHmsrazuRlfuB2lh1pmEV29GpSwqjqn1S+70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4VvT0n6wVsz1S8XV;
-	Wed,  5 Jun 2024 21:32:41 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 94E9F180085;
-	Wed,  5 Jun 2024 21:36:38 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 5 Jun 2024 21:36:38 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>
-Subject: [PATCH net-next v6 15/15] mm: page_frag: add a entry in MAINTAINERS for page_frag
-Date: Wed, 5 Jun 2024 21:33:05 +0800
-Message-ID: <20240605133306.11272-16-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240605133306.11272-1-linyunsheng@huawei.com>
-References: <20240605133306.11272-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1717594414; c=relaxed/simple;
+	bh=NWp1yGhPmvkZnfw+2z9/SPuFKJOd5FE42krpWSufYh0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dkVtCG8PkBg/FObwDBeXYlZLltDXTA1bwzTODPzkVSOen5z9/lK3u9EdByZrc3N+ZP7HWoeO7kpN7nSAgGyFURN6Ivj8+r4zmx9TarGZFVzsN+20ipcmzYqn1DIOOidSJr8H1VlpTH+1fnC6uMJZKSMtAOIV7xYlR7gbPDY2vqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JPveB5Pt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6065CC3277B;
+	Wed,  5 Jun 2024 13:33:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717594413;
+	bh=NWp1yGhPmvkZnfw+2z9/SPuFKJOd5FE42krpWSufYh0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JPveB5PtuuXLg++gBsfCYSi07EYWzuyuKGeqt47XkR7uZd8V6eoJe9zIC2OJOjYbU
+	 Nu4mzD1u84JbZZogD47Zc2dJiJJ2dG2m+quhcQr977XizJoMU7oHhXt9Ww+99xn8a6
+	 7BZMtRuKd5RfHCVVqIFEAEsKqDrLODG/COM9v1sFB4pitj3DmH89d/U8Qj1aHBMyIn
+	 zda4H/RxfPilq/voqMqplujYY/MyFZBCyT/25eVTti7Gb2SHRovfmawKLj1HNvRGZo
+	 AXObFRK357MZRp9UFgm+/9MffFNC5ajsPNjbv9dAKo7H9fCb5AnfLqWhV9axLKpESk
+	 bztzJ10lmvYqA==
+From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+To: netdev@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Cc: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+Subject: [PATCH net-next v3 0/2] Fix changing DSA conduit
+Date: Wed,  5 Jun 2024 15:33:27 +0200
+Message-ID: <20240605133329.6304-1-kabel@kernel.org>
+X-Mailer: git-send-email 2.44.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500005.china.huawei.com (7.185.36.74)
 
-After this patchset, page_frag is a small subsystem/library
-on its own, so add a entry in MAINTAINERS for to indicate
-the new subsystem/library's maintainer, maillist, status and
-file lists of page_frag.
+This series fixes an issue in the DSA code related to host interface UC
+address installed into port FDB and port conduit address database when
+live-changing port conduit.
 
-Alexander is the orginal author of page_frag, add him in the
-MAINTAINERS too.
+The first patch refactores/deduplicates the installation/uninstallation
+of the interface's MAC address and the second patch fixes the issue.
 
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
----
- MAINTAINERS | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Cover letter for v1 and v2:
+  https://patchwork.kernel.org/project/netdevbpf/cover/20240429163627.16031-1-kabel@kernel.org/
+  https://patchwork.kernel.org/project/netdevbpf/cover/20240502122922.28139-1-kabel@kernel.org/
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 27367ad339ea..bdc2cb1cdf5e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16953,6 +16953,17 @@ F:	mm/page-writeback.c
- F:	mm/readahead.c
- F:	mm/truncate.c
- 
-+PAGE FRAG
-+M:	Alexander Duyck <alexander.duyck@gmail.com>
-+M:	Yunsheng Lin <linyunsheng@huawei.com>
-+L:	linux-mm@kvack.org
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	Documentation/mm/page_frags.rst
-+F:	include/linux/page_frag_cache.h
-+F:	mm/page_frag_cache.c
-+F:	mm/page_frag_test.c
-+
- PAGE POOL
- M:	Jesper Dangaard Brouer <hawk@kernel.org>
- M:	Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Marek Behún (2):
+  net: dsa: deduplicate code adding / deleting the port address to fdb
+  net: dsa: update the unicast MAC address when changing conduit
+
+ net/dsa/port.c | 40 +++++++++++++++++++++
+ net/dsa/user.c | 97 ++++++++++++++++++++++++--------------------------
+ net/dsa/user.h |  2 ++
+ 3 files changed, 89 insertions(+), 50 deletions(-)
+
 -- 
-2.30.0
+2.43.2
 
 
