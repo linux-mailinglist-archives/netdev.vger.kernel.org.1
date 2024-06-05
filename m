@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-100970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9DD48FCC96
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 14:23:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D08348FCCC5
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 14:29:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78FE01F22B6B
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 12:23:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56A5728799F
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 12:29:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C57619AD74;
-	Wed,  5 Jun 2024 11:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CEFD19645C;
+	Wed,  5 Jun 2024 12:02:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NVM57fu2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="msG4FhQv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F12419AD6D;
-	Wed,  5 Jun 2024 11:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C48196457;
+	Wed,  5 Jun 2024 12:02:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717588588; cv=none; b=u4FgeLBw9Wtx9j4DAq2WlbQovH+IvdzQIKJhp3CfrAhqSDdyzh8VAkzedANALhRDe3Acb/+LRV1iXHsl15mAZr5ZTHO3xLrzlzzeYdMQ2R3KjcZfkEOUHfzY5mAZvCJw2bxp/nkj+3fGIm9KQ8EGxFGZkANkbFhS4yb/Qn5Y+Zk=
+	t=1717588950; cv=none; b=cdSwTbeFIs460rf7CbHXVjF64yk7vnOSefCbXcl36Evubj/SRQ2kYleURrUqY+HKKzHbqA3HHs2xsBbY6D5oc2LWi3xT9PSlftResRxDzFHxzE9DoLfOwMwCZyemoCrgx9ZNry5ekMTLItoUHbals2JFTODxmofrarAlbywyjTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717588588; c=relaxed/simple;
-	bh=SjwhFhT8i8cJyN+LotTWnGQb2FKVkJ8FhSqvcrbVnVI=;
+	s=arc-20240116; t=1717588950; c=relaxed/simple;
+	bh=IGgKpx5j1MkOyKp+cg7XNRPiZbHX1nqPZwkHTCb2kNA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aYiJc1K5cC1X75PjAx54l+rXsdsX80rPmEa+C1UwJYqbsUMiOfkOjSqql9SUnczl2FeQ3GuRXOvEkgiZoaqB2gorRx6iG8i3DzWc5nDEu2x5KcGVj3zzp2t5uV6Xt89Si9jAwU6/NJi4zSFtYMYo6aouSSJI0oeVD8rVFxB597o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NVM57fu2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE7E6C4AF08;
-	Wed,  5 Jun 2024 11:56:26 +0000 (UTC)
+	 MIME-Version; b=NbS+EiV81ucYXiHrsgo5Yw+onLKyzV3CVBGUGf2XYjFpw2UGLxtr3OhKltc0ymrdTeXkbc80CmPPO/DybQnJFfagBf/LcKdlBTZz+fmuaZ2BIPQBaP49x2J6ipe4T92aCIm+vTG4uEF387tEBVUxPHAh4XrXw7+RESpDydLgKow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=msG4FhQv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B843CC32781;
+	Wed,  5 Jun 2024 12:02:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717588587;
-	bh=SjwhFhT8i8cJyN+LotTWnGQb2FKVkJ8FhSqvcrbVnVI=;
+	s=k20201202; t=1717588949;
+	bh=IGgKpx5j1MkOyKp+cg7XNRPiZbHX1nqPZwkHTCb2kNA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NVM57fu2/NiNtxLzW9gEfkyruNTGrQd9YE5cWwGLXvBQ6eXiLsMTkXcTSw+gmPBl5
-	 UqkAMIDoLAwu7ceUEbqmH9x/qp8r9dQPiT0xkHgEq4F7I2Hbn1dJ/IvrALBRiGwr6w
-	 sC+BhV9gM2ZXArw5PhQ/6EcVq0mrr1FqDQc8k0Kvhr3Uq4LYxxKZeETBr4bQEg7hJ6
-	 1Q9H/sIA/u/sQRQdXx/ygWsr2K+Bxel7ICV6WA23hsSAjWYqFWSWvcOeU6FCnwk8dT
-	 LIDsDsgO0exSGQ64L+e6eBc8NG0hXXGyI1PzjBYSbIuF7rCNYTfOTf04gCOk/f59m0
-	 Y5cCoxlLZt2sA==
+	b=msG4FhQvxob4bhVwBzmsiH0lXTHWyvxOIsr0X6t1nQ0MSHSwryREx7rKEjlZtDf5h
+	 P49s+HtV6VQe0n2jDteXwrdc4PQuANjguPgz+hSLUFJr2aGfWYP6VgUkhK4+3+PBGS
+	 Uz8JWHotnojCKvZ7zIIQOFWKlfWVeMxaMtGACCfdaVm1jvmB/xICGXh5fXxXMCj+Ze
+	 hir9RMgXBv77fYyfLkvve9PJWFwq4Ec/CYNxZiZZKuQPIx/dByZ7AkPj3xdaKQg9Im
+	 eLwmD39Kxg8ShRT+p8hLUy6PiFKveQm/5uif3uv7SxVmaHn/m7y4a4Z40rncfWF0DZ
+	 k8qpQCS4yAF4w==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Mike Christie <michael.christie@oracle.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
+Cc: Matt Jan <zoo868e@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	jasowang@redhat.com,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 4/4] vhost-scsi: Handle vhost_vq_work_queue failures for events
-Date: Wed,  5 Jun 2024 07:56:16 -0400
-Message-ID: <20240605115619.2965224-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.9 04/23] connector: Fix invalid conversion in cn_proc.h
+Date: Wed,  5 Jun 2024 08:01:47 -0400
+Message-ID: <20240605120220.2966127-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240605115619.2965224-1-sashal@kernel.org>
-References: <20240605115619.2965224-1-sashal@kernel.org>
+In-Reply-To: <20240605120220.2966127-1-sashal@kernel.org>
+References: <20240605120220.2966127-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,82 +65,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.32
+X-stable-base: Linux 6.9.3
 Content-Transfer-Encoding: 8bit
 
-From: Mike Christie <michael.christie@oracle.com>
+From: Matt Jan <zoo868e@gmail.com>
 
-[ Upstream commit b1b2ce58ed23c5d56e0ab299a5271ac01f95b75c ]
+[ Upstream commit 06e785aeb9ea8a43d0a3967c1ba6e69d758e82d4 ]
 
-Currently, we can try to queue an event's work before the vhost_task is
-created. When this happens we just drop it in vhost_scsi_do_plug before
-even calling vhost_vq_work_queue. During a device shutdown we do the
-same thing after vhost_scsi_clear_endpoint has cleared the backends.
+The implicit conversion from unsigned int to enum
+proc_cn_event is invalid, so explicitly cast it
+for compilation in a C++ compiler.
+/usr/include/linux/cn_proc.h: In function 'proc_cn_event valid_event(proc_cn_event)':
+/usr/include/linux/cn_proc.h:72:17: error: invalid conversion from 'unsigned int' to 'proc_cn_event' [-fpermissive]
+   72 |         ev_type &= PROC_EVENT_ALL;
+      |                 ^
+      |                 |
+      |                 unsigned int
 
-In the next patches we will be able to kill the vhost_task before we
-have cleared the endpoint. In that case, vhost_vq_work_queue can fail
-and we will leak the event's memory. This has handle the failure by
-just freeing the event. This is safe to do, because
-vhost_vq_work_queue will only return failure for us when the vhost_task
-is killed and so userspace will not be able to handle events if we
-sent them.
-
-Signed-off-by: Mike Christie <michael.christie@oracle.com>
-Message-Id: <20240316004707.45557-2-michael.christie@oracle.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Matt Jan <zoo868e@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/vhost/scsi.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ include/uapi/linux/cn_proc.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-index abef0619c7901..8f17d29ab7e9c 100644
---- a/drivers/vhost/scsi.c
-+++ b/drivers/vhost/scsi.c
-@@ -497,10 +497,8 @@ vhost_scsi_do_evt_work(struct vhost_scsi *vs, struct vhost_scsi_evt *evt)
- 		vq_err(vq, "Faulted on vhost_scsi_send_event\n");
- }
+diff --git a/include/uapi/linux/cn_proc.h b/include/uapi/linux/cn_proc.h
+index f2afb7cc4926c..18e3745b86cd4 100644
+--- a/include/uapi/linux/cn_proc.h
++++ b/include/uapi/linux/cn_proc.h
+@@ -69,8 +69,7 @@ struct proc_input {
  
--static void vhost_scsi_evt_work(struct vhost_work *work)
-+static void vhost_scsi_complete_events(struct vhost_scsi *vs, bool drop)
+ static inline enum proc_cn_event valid_event(enum proc_cn_event ev_type)
  {
--	struct vhost_scsi *vs = container_of(work, struct vhost_scsi,
--					vs_event_work);
- 	struct vhost_virtqueue *vq = &vs->vqs[VHOST_SCSI_VQ_EVT].vq;
- 	struct vhost_scsi_evt *evt, *t;
- 	struct llist_node *llnode;
-@@ -508,12 +506,20 @@ static void vhost_scsi_evt_work(struct vhost_work *work)
- 	mutex_lock(&vq->mutex);
- 	llnode = llist_del_all(&vs->vs_event_list);
- 	llist_for_each_entry_safe(evt, t, llnode, list) {
--		vhost_scsi_do_evt_work(vs, evt);
-+		if (!drop)
-+			vhost_scsi_do_evt_work(vs, evt);
- 		vhost_scsi_free_evt(vs, evt);
- 	}
- 	mutex_unlock(&vq->mutex);
+-	ev_type &= PROC_EVENT_ALL;
+-	return ev_type;
++	return (enum proc_cn_event)(ev_type & PROC_EVENT_ALL);
  }
  
-+static void vhost_scsi_evt_work(struct vhost_work *work)
-+{
-+	struct vhost_scsi *vs = container_of(work, struct vhost_scsi,
-+					     vs_event_work);
-+	vhost_scsi_complete_events(vs, false);
-+}
-+
- static int vhost_scsi_copy_sgl_to_iov(struct vhost_scsi_cmd *cmd)
- {
- 	struct iov_iter *iter = &cmd->saved_iter;
-@@ -1509,7 +1515,8 @@ vhost_scsi_send_evt(struct vhost_scsi *vs, struct vhost_virtqueue *vq,
- 	}
- 
- 	llist_add(&evt->list, &vs->vs_event_list);
--	vhost_vq_work_queue(vq, &vs->vs_event_work);
-+	if (!vhost_vq_work_queue(vq, &vs->vs_event_work))
-+		vhost_scsi_complete_events(vs, true);
- }
- 
- static void vhost_scsi_evt_handle_kick(struct vhost_work *work)
+ /*
 -- 
 2.43.0
 
