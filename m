@@ -1,162 +1,161 @@
-Return-Path: <netdev+bounces-101169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E9908FD9BF
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 00:17:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC0E58FD9D2
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 00:24:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8C86289DA6
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 22:17:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 740D7285C53
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 22:24:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B29EC15539E;
-	Wed,  5 Jun 2024 22:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0583D155356;
+	Wed,  5 Jun 2024 22:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TJILipUC"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBA013C3F2;
-	Wed,  5 Jun 2024 22:16:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38206FD0
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 22:24:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717625792; cv=none; b=puWEIvarLKy3M6nXtJrMv0HteqN1/lU+wVJRVMgWE8zzC+/dwHwdRr7oNlm1AIH7SlVKaJZDSwN3QQkd/ewwrgtXmjoBbDKQKP0sgyCLWAT32d/0tNoW+mK/ySX00Nj8qhByChilkMQiStV1WVC0Fvz1P0C5zFNoLmESCwYPIZk=
+	t=1717626273; cv=none; b=dfYZqXqT30Q4Att0H9SwVliiJKr0DGIdHdd7ZfTqoNi6JNULXC965QE1LH2JhkKMapQMxUNZTTEJJLT5NDIILoBRBd1q6LHM4KnxHgVlxPRsXuh++QNGii2KlEe4o9eOls1f4NLPh0RcCx6vIsLBGN/kinHG7orwFO2LPRT2Hqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717625792; c=relaxed/simple;
-	bh=rLsApU6zWmiEjwsiKrRgAGLddwbSgAjSWWKpGuHoS3o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Omi5YgNNzvkJcppRFlp/mFeRqHhnuOWduPJ7Ep09dbIMQsdGKgCH93gNGhvxQBHB3/787vIhyjrOlMUqHpqJL1NugRykf999je1BxI7/1LNXvVkyUvccQIDIZseF++NpwjTJlv00mI0/NBf/ixIFXLeUyWtv6IVGgIh9J2vxtY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [31.221.188.228] (port=12056 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1sEyvg-00B8Th-0A; Thu, 06 Jun 2024 00:16:26 +0200
-Date: Thu, 6 Jun 2024 00:16:22 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Willem de Bruijn <willemb@google.com>
-Cc: Florian Westphal <fw@strlen.de>, Christoph Paasch <cpaasch@apple.com>,
-	Netfilter <netfilter-devel@vger.kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	daniel@iogearbox.net, Stanislav Fomichev <sdf@google.com>
-Subject: Re: [PATCH nf] netfilter: nf_reject: init skb->dev for reset packet
-Message-ID: <ZmDjtm27BnxQ0xRX@calendula>
-References: <20240604120311.27300-1-fw@strlen.de>
- <FF8A506F-6F0F-440E-9F52-B27D05731B77@apple.com>
- <20240605181450.GA7176@breakpoint.cc>
- <ZmCwlbF8BvLGNgRM@calendula>
- <20240605190833.GB7176@breakpoint.cc>
- <ZmDAQ6r49kSgwaMm@calendula>
- <CA+FuTSfAhHDedA68LOiiUpbBtQKV9E-W5o4TJibpCWokYii69A@mail.gmail.com>
+	s=arc-20240116; t=1717626273; c=relaxed/simple;
+	bh=3PiLjoOXPscodYtgfMCSdWfecpbOlvV3oAgW/zUZyRk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JPqjutF8TJHVKRm/RxFP6aMnfFjAAnzrJlBFYbngfMIJzj71RiKk2aJZAK6Y6zz/dlG0Gn6vvZ4KJpQ0DGS0hyb/7ylYuwLevUqzAG/GXPLaflu13l/gTqzyhmQWac9Vnxrl/awxri2XhAFIEae4uXG+bRsI5KiP0tcc8/jxqFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TJILipUC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5673C2BD11;
+	Wed,  5 Jun 2024 22:24:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717626273;
+	bh=3PiLjoOXPscodYtgfMCSdWfecpbOlvV3oAgW/zUZyRk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TJILipUC0S+oWO7FGfswjv37C7696iY8CFf4sdmCrd1vY2gyjla2yj9Dz4m+ekngB
+	 h6KVOgjPKt8Fsegkm5FxBTe2hkS1HhEy06cbyvsJ+xqfsXyI5d/nFBoZLK7XuuKF65
+	 ygWlCkYNd8JasmLeoYOiSZgywdPJRm8D59pl5Ir1JrAZsdg37pUkW17/KJsciL8w91
+	 GdJHh8cffsqyMIHQxthUIWAtkW4IDeZzVl8W9N/DiAjs582xepW+auttuBKKJS4ZTF
+	 mkvvarMU1xo2RiFsyat/RQpDjxMqqVmj/KpTvej5NdaJnnCT8SNnnlxgIm9Bi4eVe2
+	 gVvrieNHAklEg==
+Date: Wed, 5 Jun 2024 15:24:31 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, borisp@nvidia.com,
+ gal@nvidia.com, cratiu@nvidia.com, rrameshbabu@nvidia.com,
+ steffen.klassert@secunet.com, tariqt@nvidia.com, mingtao@meta.com,
+ knekritz@meta.com, Lance Richardson <lance604@gmail.com>
+Subject: Re: [RFC net-next 01/15] psp: add documentation
+Message-ID: <20240605152431.5f24cb45@kernel.org>
+In-Reply-To: <6660c673921ff_35916d294ef@willemb.c.googlers.com.notmuch>
+References: <20240510030435.120935-1-kuba@kernel.org>
+	<20240510030435.120935-2-kuba@kernel.org>
+	<66416bc7b2d10_1d6c6729475@willemb.c.googlers.com.notmuch>
+	<20240529103505.601872ea@kernel.org>
+	<6657cc86ddf97_37107c29438@willemb.c.googlers.com.notmuch>
+	<20240530125120.24dd7f98@kernel.org>
+	<6659d71adc259_3f8cab29433@willemb.c.googlers.com.notmuch>
+	<20240604170849.110d56c1@kernel.org>
+	<6660c673921ff_35916d294ef@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+FuTSfAhHDedA68LOiiUpbBtQKV9E-W5o4TJibpCWokYii69A@mail.gmail.com>
-X-Spam-Score: -1.7 (-)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 05, 2024 at 05:38:00PM -0400, Willem de Bruijn wrote:
-> On Wed, Jun 5, 2024 at 3:45 PM Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> >
-> > On Wed, Jun 05, 2024 at 09:08:33PM +0200, Florian Westphal wrote:
-> > > Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> > >
-> > > [ CC Willem ]
-> > >
-> > > > On Wed, Jun 05, 2024 at 08:14:50PM +0200, Florian Westphal wrote:
-> > > > > Christoph Paasch <cpaasch@apple.com> wrote:
-> > > > > > > Reported-by: Christoph Paasch <cpaasch@apple.com>
-> > > > > > > Suggested-by: Paolo Abeni <pabeni@redhat.com>
-> > > > > > > Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/494
-> > > > > > > Signed-off-by: Florian Westphal <fw@strlen.de>
-> > > > > >
-> > > > > > I just gave this one a shot in my syzkaller instances and am still hitting the issue.
-> > > > >
-> > > > > No, different bug, this patch is correct.
-> > > > >
-> > > > > I refuse to touch the flow dissector.
-> > > >
-> > > > I see callers of ip_local_out() in the tree which do not set skb->dev.
-> > > >
-> > > > I don't understand this:
-> > > >
-> > > > bool __skb_flow_dissect(const struct net *net,
-> > > >                         const struct sk_buff *skb,
-> > > >                         struct flow_dissector *flow_dissector,
-> > > >                         void *target_container, const void *data,
-> > > >                         __be16 proto, int nhoff, int hlen, unsigned int flags)
-> > > > {
-> > > > [...]
-> > > >         WARN_ON_ONCE(!net);
-> > > >         if (net) {
-> > > >
-> > > > it was added by 9b52e3f267a6 ("flow_dissector: handle no-skb use case")
-> > > >
-> > > > Is this WARN_ON_ONCE() bogus?
-> > >
-> > > When this was added (handle dissection from bpf prog, per netns), the correct
-> > > solution would have been to pass 'struct net' explicitly via skb_get_hash()
-> > > and all variants.  As that was likely deemed to be too much code churn it
-> > > tries to infer struct net via skb->{dev,sk}.
+On Wed, 05 Jun 2024 16:11:31 -0400 Willem de Bruijn wrote:
+> > The retansmissions of K-A are unencrypted, to avoid sending the same
+> > data in encrypted and unencrypted form. This poses a risk if an ACK
+> > gets lost but both hosts end up in the PSP Tx state. Assume that Host A
+> > did not send the RPC (line 12), and the retransmission (line 14)
+> > happens as an RTO or TLP. Host B may already reach PSP Tx state (line
+> > "20") and expect encrypted data. Plain text retransmissions (with
+> > sequence number before rcv_nxt) must be accepted until Host B sees
+> > encrypted data from Host A.  
 > 
-> It has been a while, but I think we just did not anticipate skb's with
-> neither dev nor sk set.
-> 
-> Digging through the layers from skb_hash to __skb_flow_dissect
-> now, it does look impractical to add such an explicit API.
-> 
-> > > So there are several options here:
-> > > 1. remove the WARN_ON_ONCE and be done with it
-> > > 2. remove the WARN_ON_ONCE and pretend net was init_net
-> > > 3. also look at skb_dst(skb)->dev if skb->dev is unset, then back to 1)
-> > >    or 2)
-> > > 4. stop using skb_get_hash() from netfilter (but there are likely other
-> > >    callers that might hit this).
-> > > 5. fix up callers, one by one
-> > > 6. assign skb->dev inside netfilter if its unset
-> 
-> Is 6 a realistic option?
+> Is that sufficient if an initial encrypted packet could get reordered
+> by the network to arrive before a plaintext retransmit of a lower
+> seqno?
 
-Postrouting path already sets on skb->dev via ip_output(), if callers
-are "fixed" then skb->dev will get set twice.
+Yes, I believe that's fine. 
 
-the netfilter tracing infrastructure only needs a hash identifier for
-this packet to be displayed from userspace when tracing rules, how is
-the running the custom bpf dissector hook useful in such case?
+I will document this clearer but both sides must be pretty precise in
+their understanding when the switchover happens. They must read what 
+they expect to be clear text, and then install the Tx key thus locking
+down the socket.
 
-the most correct solution is to pass struct net explicitly to the
-dissector API instead of guessing what net this packet belongs to.
+1. If they under-read and clear text data is already queued - the kernel
+   will error out.
+2. If they under-read and clear text arrives later - the connection will
+   hang.
+3. If they over-read they will presumably get PSP-protected data
+   which they have no way of validating, since it won't be secured by
+   user crypto.
 
-Else, remove this WARN_ON_ONCE which is just a oneliner.
+We could protect from over-read (case 3) by refusing to give out
+PSP-protected data until keys are installed. But it adds to the fast
+path and I don't think it's all that beneficial, since there's no way
+to protect a sloppy application from under-read (case 2).
 
-> > > 3 and 2 combined are probably going to be the least invasive.
-> > >
-> > > 5 might take some time, we now know two, namely tcp resets generated
-> > > from netfilter and igmp_send_report().  No idea if there are more.
-> >
-> > Quickly browsing, synproxy and tee also calls ip_local_out() too.
-> >
-> > icmp_send() which is used, eg. to send destination unreachable too to
-> > reset.
-> 
-> Since this uses ip_append_data the generated response should have
-> its skb->sk set.
+Back to your question about reordering plain text with cipher text:
+the application should not lock down the socket until it gets all
+its clear text. So clear text retransmissions _after_ lock down must be
+spurious. The only worry is that we lose an ACK and never tell
+the other side that we got all the clear text. But we're guaranteed
+to successfully ACK any PSP-protected data, so if we receive some
+there is no way to get stuck.  Let me copy / paste the diagram:
 
-thanks for explaining.
+01 p       Host A                         Host B
+02 l t        ~~~~~~~~~~~[TCP 3 WHS]~~~~~~~~~~
+03 a e        ~~~~~~[crypto negotiation]~~~~~~
+04 i x                             [Rx key alloc = K-B]
+05 n t                          <--- [app] K-B key send 
+06 ------[Rx key alloc = K-A]-
+07     [app] K-A key send -->|
+08        [TCP] K-B input <-----
+08 P      [TCP] K-B ACK ---->|
+09 S R [app] recv(K-B)       |
+10 P x [app] [Tx key set]    |  
+11 -------------------------- 
+12 P T [app] send(RPC) #####>|   
+13 S x                       |<----    [TCP] Seq OoO! queue RPC, SACK
+14 P      [TCP] retr K-A --->|   
+15                           |  `->    [TCP] K-A input
+16                           | <---    [TCP] K-A ACK (or FIN) 
+17                           |      [app] recv(K-A)
+18                           |      [app] [Tx key set]
+19                            -----------------------------------
+20
 
-> > There is also __skb_get_hash_symmetric() that could hit this from
-> > nft_hash?
-> >
-> > No idea what more callers need to be adjusted to remove this splat,
-> > that was a cursory tree review.
-> >
-> > And ip_output() sets on skb->dev from postrouting path, then if
-> > callers are fixed, then skb->dev would be once then again from output path?
+Looking as Host A, if we receive encrypted data, we must have
+allocated and sent key (line 7) so we will start accepting encrypted
+data. But at this point we are also accepting plain text (until we
+reach line 9). We will send a plain text (S)ACK to encrypted data, 
+but that's fine too since Host B hasn't seen any encrypted data from us
+and will accept such ACKs.
+
+> Both scenarios make sense. It is unfortunately harder to be sure that
+> we have captured all edge cases.
+
+Are you trying to say packetdrill without saying packetdrill? :)
+
+> An issue related to the rcv_nxt cut-point, not sure how important: the
+> plaintext packet contents are protected by user crypto before upgrade.
+> But the TCP headers are not. PSP relies on TCP PAWS against replay
+> protection. It is possible for a MITM to offset all seqno from the
+> start of connection establishment. I don't see an immediate issue. But
+> at a minimum it could be possible to insert or delete before PSP is
+> upgraded.
+
+Yes, the "cut off" point must be quite clearly defined, because both
+sides must precisely read out all the clear text. Then they install 
+the Tx key and anything they read must have been PSP-protected.
+
+Hope I understood the point.
 
