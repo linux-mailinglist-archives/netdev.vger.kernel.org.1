@@ -1,75 +1,90 @@
-Return-Path: <netdev+bounces-101186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC4318FDA81
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 01:29:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A0188FDACB
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 01:43:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F333286133
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 23:29:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEF1E287776
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 23:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 259221667EE;
-	Wed,  5 Jun 2024 23:29:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C94167DA2;
+	Wed,  5 Jun 2024 23:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QiC7jkMY"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NAPHVF8w"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2CE2AE7F;
-	Wed,  5 Jun 2024 23:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35097167268;
+	Wed,  5 Jun 2024 23:43:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717630160; cv=none; b=h/iW7f/ui2VP2vA6EBCaj7hwITW8EMNtEjuyOcNwhwWHomlU0Khat/ldD90eZmTllodxVqKz6hugGlvKkniFSG4PKjA/7e8+ipQ1CT1SGNlU4d08vGAxjdhrNsBzw5VArSqKyvwiZzXwp1L17gNpmkqMbEj8Xh1k2os239CwMf8=
+	t=1717631010; cv=none; b=e4oH+JbOBEO1k1Jb46W4ikDYLxmk0EG3eB41/S54A+JAU5es7GkgKkENwhbi0rBepoRmYNnmv4Jz++VpGY3zhC4w9FNefndVAgKjAhST1gUtH0xTe1BVplXd0GGvhwfHyI2dhT/wOYQ3gJ1iAthOr/tMMzBH/jXspfJZmnaJ4Qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717630160; c=relaxed/simple;
-	bh=XJoNnLa6bSjUpsAGuvnYZUrq8gMdzN/n/FdfKk2N5n0=;
+	s=arc-20240116; t=1717631010; c=relaxed/simple;
+	bh=iK3LAb+wliolnG3rKsU2JLIVpkEh3hwHDV0sMObCrZQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KKvV0+48dCW4d3iRWGYWZHvaghFnNnnMGeZ/cczD2yzKSEy4jd0Mxs1B8gIKCNipEQGh8QiyQA8gVTpBAK/yp7gCogk4mpnucpABRHxLHebi8o23BaF/TBH9N6RSlI9JGsF/kmU2J+WG5pnjuozorl3u0VcKCOjF1smrOC3QNC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QiC7jkMY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F23FC2BD11;
-	Wed,  5 Jun 2024 23:29:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717630159;
-	bh=XJoNnLa6bSjUpsAGuvnYZUrq8gMdzN/n/FdfKk2N5n0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QiC7jkMYzVmu4VMMt3O1dP83DWyLAQ33RZbx5KsVs7YE7Wdp0SumwfzRYsmKdD5R1
-	 Zhki8J8/jp6F6SpSxSKohmE0JEEVOAKdNtNp4zxXMHPAUDmTrqHQ+d4ZtzdkSHRcx5
-	 vg7bJdzoz4xt/AP0tDYa0TXvyoY0vazD7FTMdWv4+27W1udL5JZvthrgakw/PhYcKX
-	 GIfZRVKMuqYXTuxSshw2Owl7J6MHHMTNmK/2AFtyloBMcseHJBtY2rafbCl0EnPKOJ
-	 Fg6Xo5uXh/qxESg+lxH3JZfmw0wjgRndwOWXpV1d4wL+qqnbvRa+ieYusVa9rUn/2F
-	 NCjzAKOAkOVZg==
-Date: Wed, 5 Jun 2024 17:29:16 -0600
-From: Rob Herring <robh@kernel.org>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sagar Cheluvegowda <quic_scheluve@quicinc.com>,
-	Abhishek Chauhan <quic_abchauha@quicinc.com>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Tomer Maimon <tmaimon77@gmail.com>, openbmc@lists.ozlabs.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 06/10] dt-bindings: net: Add Synopsys DW xPCS
- bindings
-Message-ID: <20240605232916.GA3400992-robh@kernel.org>
-References: <20240602143636.5839-1-fancer.lancer@gmail.com>
- <20240602143636.5839-7-fancer.lancer@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qQgxASMRsFWd6zsvYw8DXgpHhhGyH//lkGt7vgnVEq5aoqvOlSHXbN2pDxnvGo/LVOsVweRFmgkydi/4pDu+mfKKzwH8t2os0g5HDpw+gu8jhCQ2JElph/oLn14HmPiQr1pSGHMbLutwroPWzmkUJYhM+fwgqpaksxgeQyWVUgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NAPHVF8w; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=u2cpct7+XFJzG7wX3keUvQVf0CUO4FB1mefATz3+4Jw=; b=NAPHVF8wRn7aVlrTHb60+BQh3v
+	qp7CjSe3+zo1HV6qf8fWIjxPzGBsRU8KJzte+rHlB4+9yLfPT+Yj72wJXTItgfwJqHb9qUI8wkA6P
+	K6WQpQwKHLlOJjJcCVvkVPJqmh6pdoSwhOrFvoOM4rY9nOlRlhR/i1yyEkx27PxdM+go=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sF0HX-00GxVp-0T; Thu, 06 Jun 2024 01:43:03 +0200
+Date: Thu, 6 Jun 2024 01:43:02 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+Cc: "Parthiban.Veerasooran@microchip.com" <Parthiban.Veerasooran@microchip.com>,
+	Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"saeedm@nvidia.com" <saeedm@nvidia.com>,
+	"anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"Horatiu.Vultur@microchip.com" <Horatiu.Vultur@microchip.com>,
+	"ruanjinjie@huawei.com" <ruanjinjie@huawei.com>,
+	"Steen.Hegelund@microchip.com" <Steen.Hegelund@microchip.com>,
+	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
+	"UNGLinuxDriver@microchip.com" <UNGLinuxDriver@microchip.com>,
+	"Thorsten.Kummermehr@microchip.com" <Thorsten.Kummermehr@microchip.com>,
+	"Nicolas.Ferre@microchip.com" <Nicolas.Ferre@microchip.com>,
+	"benjamin.bigler@bernformulastudent.ch" <benjamin.bigler@bernformulastudent.ch>,
+	Viliam Vozar <Viliam.Vozar@onsemi.com>,
+	Arndt Schuebel <Arndt.Schuebel@onsemi.com>
+Subject: Re: [PATCH net-next v4 00/12] Add support for OPEN Alliance
+ 10BASE-T1x MACPHY Serial Interface
+Message-ID: <732ce616-9ddc-4564-ab1f-ac7bbc591292@lunn.ch>
+References: <BYAPR02MB5958A4D667D13071E023B18F83F52@BYAPR02MB5958.namprd02.prod.outlook.com>
+ <6e4c8336-2783-45dd-b907-6b31cf0dae6c@lunn.ch>
+ <BY5PR02MB6786619C0A0FCB2BEDC2F90D9DF52@BY5PR02MB6786.namprd02.prod.outlook.com>
+ <0581b64a-dd7a-43d7-83f7-657ae93cefe5@lunn.ch>
+ <BY5PR02MB6786FC4808B2947CA03977429DF32@BY5PR02MB6786.namprd02.prod.outlook.com>
+ <39a62649-813a-426c-a2a6-4991e66de36e@microchip.com>
+ <585d7709-bcee-4a0e-9879-612bf798ed45@lunn.ch>
+ <BY5PR02MB6786649AEE8D66E4472BB9679DFC2@BY5PR02MB6786.namprd02.prod.outlook.com>
+ <cbe5043b-5bb5-4b9f-ac09-5c767ceced36@microchip.com>
+ <BYAPR02MB5958BD922DAE2D31F18241B283F92@BYAPR02MB5958.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,192 +93,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240602143636.5839-7-fancer.lancer@gmail.com>
+In-Reply-To: <BYAPR02MB5958BD922DAE2D31F18241B283F92@BYAPR02MB5958.namprd02.prod.outlook.com>
 
-On Sun, Jun 02, 2024 at 05:36:20PM +0300, Serge Semin wrote:
-> Synopsys DesignWare XPCS IP-core is a Physical Coding Sublayer (PCS) layer
-> providing an interface between the Media Access Control (MAC) and Physical
-> Medium Attachment Sublayer (PMA) through a Media independent interface.
-> >From software point of view it exposes IEEE std. Clause 45 CSR space and
-> can be accessible either by MDIO or MCI/APB3 bus interfaces. In the former
-> case the PCS device is supposed to be defined under the respective MDIO
-> bus DT-node. In the later case the DW xPCS will be just a normal IO
-> memory-mapped device.
-> 
-> Besides of that DW XPCS DT-nodes can have an interrupt signal and clock
-> source properties specified. The former one indicates the Clause 73/37
-> auto-negotiation events like: negotiation page received, AN is completed
-> or incompatible link partner. The clock DT-properties can describe up to
-> three clock sources: peripheral bus clock source, internal reference clock
-> and the externally connected reference clock.
-> 
-> Finally the DW XPCS IP-core can be optionally synthesized with a
-> vendor-specific interface connected to the Synopsys PMA (also called
-> DesignWare Consumer/Enterprise PHY). Alas that isn't auto-detectable in a
-> portable way. So if the DW XPCS device has the respective PMA attached
-> then it should be reflected in the DT-node compatible string so the driver
-> would be aware of the PMA-specific device capabilities (mainly connected
-> with CSRs available for the fine-tunings).
-> 
-> Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
-> 
-> ---
-> 
-> Changelog v2:
-> - Drop the Management Interface DT-node bindings. DW xPCS with MCI/APB3
->   interface is just a normal memory-mapped device.
-> ---
->  .../bindings/net/pcs/snps,dw-xpcs.yaml        | 133 ++++++++++++++++++
->  1 file changed, 133 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/pcs/snps,dw-xpcs.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/pcs/snps,dw-xpcs.yaml b/Documentation/devicetree/bindings/net/pcs/snps,dw-xpcs.yaml
-> new file mode 100644
-> index 000000000000..7927bceefbf3
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/pcs/snps,dw-xpcs.yaml
-> @@ -0,0 +1,133 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/pcs/snps,dw-xpcs.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Synopsys DesignWare Ethernet PCS
-> +
-> +maintainers:
-> +  - Serge Semin <fancer.lancer@gmail.com>
-> +
-> +description:
-> +  Synopsys DesignWare Ethernet Physical Coding Sublayer provides an interface
-> +  between Media Access Control and Physical Medium Attachment Sublayer through
-> +  the Media Independent Interface (XGMII, USXGMII, XLGMII, GMII, etc)
-> +  controlled by means of the IEEE std. Clause 45 registers set. The PCS can be
-> +  optionally synthesized with a vendor-specific interface connected to
-> +  Synopsys PMA (also called DesignWare Consumer/Enterprise PHY) although in
-> +  general it can be used to communicate with any compatible PHY.
-> +
-> +  The PCS CSRs can be accessible either over the Ethernet MDIO bus or directly
-> +  by means of the APB3/MCI interfaces. In the later case the XPCS can be mapped
-> +  right to the system IO memory space.
-> +
-> +properties:
-> +  compatible:
-> +    oneOf:
-> +      - description: Synopsys DesignWare XPCS with none or unknown PMA
-> +        const: snps,dw-xpcs
-> +      - description: Synopsys DesignWare XPCS with Consumer Gen1 3G PMA
-> +        const: snps,dw-xpcs-gen1-3g
-> +      - description: Synopsys DesignWare XPCS with Consumer Gen2 3G PMA
-> +        const: snps,dw-xpcs-gen2-3g
-> +      - description: Synopsys DesignWare XPCS with Consumer Gen2 6G PMA
-> +        const: snps,dw-xpcs-gen2-6g
-> +      - description: Synopsys DesignWare XPCS with Consumer Gen4 3G PMA
-> +        const: snps,dw-xpcs-gen4-3g
-> +      - description: Synopsys DesignWare XPCS with Consumer Gen4 6G PMA
-> +        const: snps,dw-xpcs-gen4-6g
-> +      - description: Synopsys DesignWare XPCS with Consumer Gen5 10G PMA
-> +        const: snps,dw-xpcs-gen5-10g
-> +      - description: Synopsys DesignWare XPCS with Consumer Gen5 12G PMA
-> +        const: snps,dw-xpcs-gen5-12g
-> +
-> +  reg:
-> +    items:
-> +      - description:
-> +          In case of the MDIO management interface this just a 5-bits ID
-> +          of the MDIO bus device. If DW XPCS CSRs space is accessed over the
-> +          MCI or APB3 management interfaces, then the space mapping can be
-> +          either 'direct' or 'indirect'. In the former case all Clause 45
-> +          registers are contiguously mapped within the address space
-> +          MMD '[20:16]', Reg '[15:0]'. In the later case the space is divided
-> +          to the multiple 256 register sets. There is a special viewport CSR
-> +          which is responsible for the set selection. The upper part of
-> +          the CSR address MMD+REG[20:8] is supposed to be written in there
-> +          so the corresponding subset would be mapped to the lowest 255 CSRs.
-> +
-> +  reg-names:
-> +    items:
-> +      - enum: [ direct, indirect ]
-> +
-> +  reg-io-width:
-> +    description:
-> +      The way the CSRs are mapped to the memory is platform depended. Since
-> +      each Clause 45 CSR is of 16-bits wide the access instructions must be
-> +      two bytes aligned at least.
-> +    default: 2
-> +    enum: [ 2, 4 ]
-> +
-> +  interrupts:
-> +    description:
-> +      System interface interrupt output (sbd_intr_o) indicating Clause 73/37
-> +      auto-negotiation events':' Page received, AN is completed or incompatible
-> +      link partner.
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    description:
-> +      Both MCI and APB3 interfaces are supposed to be equipped with a clock
-> +      source connected via the clk_csr_i line.
-> +
-> +      PCS/PMA layer can be clocked by an internal reference clock source
-> +      (phyN_core_refclk) or by an externally connected (phyN_pad_refclk) clock
-> +      generator. Both clocks can be supplied at a time.
-> +    minItems: 1
-> +    maxItems: 3
-> +
-> +  clock-names:
-> +    minItems: 1
-> +    maxItems: 3
-> +    anyOf:
-> +      - items:
-> +          enum: [ core, pad ]
 
-This has no effect. If it is true, then the 2nd entry is too.
-
-You are saying all the clocks are optional and any combination/order is 
-valid. Do we really need it so flexible? Doubtful the h/w is that 
-flexible.
-
-> +      - items:
-> +          enum: [ pclk, core, pad ]
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/interrupt-controller/irq.h>
-> +
-> +    ethernet-pcs@1f05d000 {
-> +      compatible = "snps,dw-xpcs";
-> +      reg = <0x1f05d000 0x1000>;
-> +      reg-names = "indirect";
-> +
-> +      reg-io-width = <4>;
-> +
-> +      interrupts = <79 IRQ_TYPE_LEVEL_HIGH>;
-> +
-> +      clocks = <&ccu_pclk>, <&ccu_core>, <&ccu_pad>;
-> +      clock-names = "pclk", "core", "pad";
-> +    };
-> +  - |
-> +    mdio-bus {
-> +      #address-cells = <1>;
-> +      #size-cells = <0>;
-> +
-> +      ethernet-pcs@0 {
-> +        compatible = "snps,dw-xpcs";
-> +        reg = <0>;
-> +
-> +        clocks = <&ccu_core>, <&ccu_pad>;
-> +        clock-names = "core", "pad";
-> +      };
-> +    };
-> +...
-> -- 
-> 2.43.0
+On Wed, Jun 05, 2024 at 09:40:12PM +0000, Selvamani Rajagopal wrote:
+> Parthiban/Andrew,
 > 
+> Couple of requests / suggestions after completing the integration of our drivers to the current framework.
+
+Please configure your email client to wrap lines at about 78
+characters.
+
+
+> 
+> 1) Can we move memory map selector definitions (OA_TC6_PHY_C45_PCS_MMS2 and other 4 definitions) to the header file
+>      include/linux/oa_tc6.h?
+>      Also, if possible, could we add the MMS0, MMS1?. Our driver is using them. Of course, we could add it when we submit our driver.
+
+Interesting. So you have vendor registers outside of MMS 10-15?
+
+Or do you need to access standard registers? I would prefer to see
+your use cases before deciding this. If you want to access standard
+registers, you are probably doing stuff other vendors also want to do,
+so we should add a helper in the framework.
+
+2) If it not too late to ask, Is it possible to move interrupt
+> handler to vendor's code?
+
+I would say no, not at the moment.
+
+What we can do in the future is allow a driver to register a function
+to handle the vendor interrupts, leaving the framework to handle the
+standard interrupts, and chain into the specific driver vendor
+interrupt handler when a vendor interrupt it indicated.
+
+> This way, it will provide vendors' code an ability to deal with some
+> of the interrupts. For example, our code deals with PHYINT bit.
+
+Please explain what you are doing here? What are you doing which the
+framework does not cover.
+
+	Andrew
 
