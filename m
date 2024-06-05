@@ -1,183 +1,109 @@
-Return-Path: <netdev+bounces-101044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C56028FD087
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 16:13:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A4368FD08C
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 16:13:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60A482876BB
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 14:13:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C2571F26BFB
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 14:13:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0F131755A;
-	Wed,  5 Jun 2024 14:12:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C7271755A;
+	Wed,  5 Jun 2024 14:13:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UrnsKbt+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q4tISxFL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE8A6FB0;
-	Wed,  5 Jun 2024 14:12:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1B5015AF1;
+	Wed,  5 Jun 2024 14:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717596777; cv=none; b=V1jT3HnwDJ50oyh9P3myghYs+Vy7mY0GMBjVwujBQyP//TJF/IxzhYIT0BsikKvym3Pb/PNk9t3TeFQpCQPIWehBb+q9miKLGvbWmYb9aRHxofMujN1/pGWbsBTdD9g5BDLgp3VbkR1RTLFiqhrFXA/6k49rOWnW9/n6N0Aden0=
+	t=1717596829; cv=none; b=rbmsAZIN31JV+ZTWzfy819Mehsz1iYOZT6h+hkHeNSfiWKmoiAqpEpPRCLXN30Six4LBzEQ52lXdkOh3tkg4rVu/tUXuCgE3dw+jsN6ZeMFJsfnWhnN6Uq0MMUl+RLWfUKGbNmgN70ZqNpYoPURJsEqjuOi/PQxWGuyMnvoo3rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717596777; c=relaxed/simple;
-	bh=ozvkOGgUaxgxta5ytOJ2UVPWZSX57s6TLs8ldu0HwZQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p+keQyTm2+TYerIlJK9WvtpawBYQNHkw4lSBWbsO/fDy5o5rl0niOwrAP1egzJLDiTqa50ynt/z9jyacoFdDXO7hXRd5pxvOnNdrO29F1kuuSfPLX05mJQTz3sY/ls/YCEBD3zlCUQNCymldbviLkskEhYEUvfmC7Zx8tG3RKC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UrnsKbt+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A920C2BD11;
-	Wed,  5 Jun 2024 14:12:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717596777;
-	bh=ozvkOGgUaxgxta5ytOJ2UVPWZSX57s6TLs8ldu0HwZQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=UrnsKbt+4SxFIHs9D7s0CLZz9RiwVy9uaPxcmHYlp8AO7wBrkAnAsiSWkBqnR8rAr
-	 ZFHnnMzUWLEpGNnoqLbWVMHsZwOE2VMqe8ujTBVCDjFCbuCE+HeL45a6qALbWxQd2U
-	 CZ1yVJ4i9TkWCZlKp3z/5Op32xwZdUR0tYhxAJqPw5WdlyPTl9E4P2dX9VC1gss8cc
-	 gk3xXKvbR4FU3Khm8+yZmSsX1rHlVVLCBk3gKH1O+ZiV3DsDhhRnq5iTDcxzafjKb8
-	 d7/JDIa5zfAKyCvrM1fgwzje/2comJeg91ZR65SEOFYSLljurnqludiVTkQQf5LaLq
-	 HsMx4QCGUDvEw==
-Message-ID: <0f85551f-dd67-4d88-abc2-cdf80293a604@kernel.org>
-Date: Wed, 5 Jun 2024 16:12:52 +0200
+	s=arc-20240116; t=1717596829; c=relaxed/simple;
+	bh=GHFmcIWwlPHBK7h/YNeH5HkMcMTK6uPyOkIxmyzATy8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nLsyNywU7mVpQh1MWeENgLPN5lxix1HTlV3QrzXGf1wZKN3llToA03OGTnioveCqANvZJZ+9Pn2YTvfq0BKPhwDMWfENEsHR6PK1NS1TSXM6n+OghY4Uk1knvCTd5Xv4RcBadIkF4gHx0cbwYRzpeVzPB9ZKzqM/z5vgDyJ0FRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q4tISxFL; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-572c65cea55so1894815a12.0;
+        Wed, 05 Jun 2024 07:13:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717596826; x=1718201626; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=vbzuReACK7at884YBCFNwf/OFIdQJpCwqd1m+LraEcI=;
+        b=Q4tISxFLJ6hnBrmI8f8olJuWorxIrRPaX+gHMMXODuuGMG4ioMxv6AfbCn+HnV0NPC
+         evvdx5dSEWfkipSzIfTH46FIn1DXsyOWYTtkTSnxYoko7pBdm5I5Xin4UZwV5lPI2wCO
+         VKGix+A/GMJSISxf88/vQ5KX4ZSaWdpgFl2MwJ5gmALQc6zGOkidKbfrM4r3cNetJ7Xx
+         CvaFPnjGut2GaaqoaICI9Udiqfbct5rq2OsgqORvpiszuZVbRotJbakKPIR6SEd7CkuY
+         MuR+EnabnDJ/tMbbNd6h6iYYj+p0DP1GlHD1+Ov7PMCf4e2C62iHhRa8s6YcZdXydnlV
+         2xEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717596826; x=1718201626;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vbzuReACK7at884YBCFNwf/OFIdQJpCwqd1m+LraEcI=;
+        b=xPDxuHQQoln9YcZZheD/qULJiv9wHR5lAH/1EU57NGVJ/w19uk3PYuQs1bA6iBk9OO
+         e+mlmF8r2axPrX6M0ZQiWiePImDr0twPlb5HLuoHa7BrDPhjjNeNNdt1vLk/uaeDUy4+
+         1ruXh/o1eARVtfzrorJZCZ/rkUrgr/wbJaEG1jYtUEJU0pzReYZL90CpEhvPZsnFtNxy
+         QbsOdHN8UjE5t6wEXpvkjP5F0buPZgInuPGiPoaWEVx8Hsd/6NgamzdcsVgmt0qLosDE
+         gwabK3B7gKHz4zqCmJoecqJ6+vSicUoTP4YWxNh3k+SL81UjuPko8X3aUPXUsDM4abBt
+         dcuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWkt4qlYIHC/kkEjRcsBmnsotRc8jjRdVH6etgVB0pcK1PTy0HzoNeZrF/HaQC6iuc5hHpmCVjKhUN8HOcHFnLod2dJnlAbYUGmJ3ZN
+X-Gm-Message-State: AOJu0YweUI+vqDjPgL0cf9DEQFRGhZJvXhxwREtVni25DhAaMGIlbE7u
+	2LipAms9mLEOFtJo3xPEHWTMH56LApb61gPAXTyyjI1kBatxJCix
+X-Google-Smtp-Source: AGHT+IHAMo4apfMNgMERqpXvmQyB0/TJQA9cp05lft7qdGZN749NBW6AOL8GMxa/Xif8hkOW4DukyQ==
+X-Received: by 2002:a50:cd93:0:b0:572:2efe:4d14 with SMTP id 4fb4d7f45d1cf-57a8b6b88d1mr2061068a12.10.1717596825684;
+        Wed, 05 Jun 2024 07:13:45 -0700 (PDT)
+Received: from skbuf ([188.25.55.166])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57a95ce2825sm1251442a12.60.2024.06.05.07.13.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jun 2024 07:13:44 -0700 (PDT)
+Date: Wed, 5 Jun 2024 17:13:42 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?Q3PDs2vDoXMs?= Bence <csokas.bence@prolan.hu>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	trivial@kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>
+Subject: Re: [RFC PATCH 2/2] net: include: mii: Refactor: Use BIT() for
+ ADVERTISE_* bits
+Message-ID: <20240605141342.262wgddrf4xjbbeu@skbuf>
+References: <20240605121648.69779-1-csokas.bence@prolan.hu>
+ <20240605121648.69779-1-csokas.bence@prolan.hu>
+ <20240605121648.69779-2-csokas.bence@prolan.hu>
+ <20240605121648.69779-2-csokas.bence@prolan.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net 2/3] selftests: net: lib: avoid error removing empty
- netns name
-Content-Language: en-GB
-To: Petr Machata <petrm@nvidia.com>
-Cc: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
- Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org, Geliang Tang <geliang@kernel.org>
-References: <20240605-upstream-net-20240605-selftests-net-lib-fixes-v1-0-b3afadd368c9@kernel.org>
- <20240605-upstream-net-20240605-selftests-net-lib-fixes-v1-2-b3afadd368c9@kernel.org>
- <877cf38yg5.fsf@nvidia.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <877cf38yg5.fsf@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240605121648.69779-2-csokas.bence@prolan.hu>
+ <20240605121648.69779-2-csokas.bence@prolan.hu>
 
-Hi Petr,
-
-Thank you for the review!
-
-On 05/06/2024 12:38, Petr Machata wrote:
+On Wed, Jun 05, 2024 at 02:16:49PM +0200, Csókás, Bence wrote:
+> Replace hex values with BIT() and GENMASK() for readability
 > 
-> "Matthieu Baerts (NGI0)" <matttbe@kernel.org> writes:
+> Cc: trivial@kernel.org
 > 
->> If there is an error to create the first netns with 'setup_ns()',
->> 'cleanup_ns()' will be called with an empty string as first parameter.
->>
->> The consequences is that 'cleanup_ns()' will try to delete an invalid
->> netns, and wait 20 seconds if the netns list is empty.
->>
->> Instead of just checking if the name is not empty, convert the string
->> separated by spaces to an array. Manipulating the array is cleaner, and
->> calling 'cleanup_ns()' with an empty array will be a no-op.
->>
->> Fixes: 25ae948b4478 ("selftests/net: add lib.sh")
->> Cc: stable@vger.kernel.org
->> Acked-by: Geliang Tang <geliang@kernel.org>
->> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
->> ---
->>  tools/testing/selftests/net/lib.sh | 13 +++++++------
->>  1 file changed, 7 insertions(+), 6 deletions(-)
->>
->> diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
->> index a422e10d3d3a..e2f51102d7e1 100644
->> --- a/tools/testing/selftests/net/lib.sh
->> +++ b/tools/testing/selftests/net/lib.sh
->> @@ -15,7 +15,7 @@ ksft_xfail=2
->>  ksft_skip=4
->>  
->>  # namespace list created by setup_ns
->> -NS_LIST=""
->> +NS_LIST=()
->>  
->>  ##############################################################################
->>  # Helpers
->> @@ -137,6 +137,7 @@ cleanup_ns()
->>  	fi
->>  
->>  	for ns in "$@"; do
->> +		[ -z "${ns}" ] && continue
-> 
-> I think this is now irrelevant though? Now cleanup_ns() will be called
-> with no arguments for an empty NS list, so the loop does not even kick in.
+> Signed-off-by: "Csókás, Bence" <csokas.bence@prolan.hu>
+> ---
 
-If you don't mind, I think it is "safer" to keep it: some selftests are
-using 'cleanup_ns()' directly, not via 'cleanup_all_ns()', e.g.
-netns-name.sh, cmsg-*.sh, fib-*.sh, etc. which can call it with the
-variables not set if 'setup_ns' failed during the init phase.
+You can't use BIT() and GENMASK() in headers exported to user space.
 
-For the moment, all these selftests are calling 'cleanup_ns()' with
-parameters added without double quotes: so it is fine. Until someone
-changes that to please shellcheck, like we did on our side with MPTCP
-selftests. So this line will be useful soon when we will publish the
-rest of our patches to use 'lib.sh' [1] :)
-
-Link:
-https://lore.kernel.org/mptcp/5f4615c3-0621-43c5-ad25-55747a4350ce@kernel.org/T/
-[1]
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+I mean you can, but the BIT() and GENMASK() macros themselves aren't
+exported to user space, and you would break any application which used
+values dependent on them.
 
