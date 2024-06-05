@@ -1,96 +1,93 @@
-Return-Path: <netdev+bounces-100876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D6FF8FC6F1
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 10:50:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 985DF8FC6F6
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 10:51:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 517101F25D13
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 08:50:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DDA71F25789
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 08:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EFC549653;
-	Wed,  5 Jun 2024 08:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18AB5812F;
+	Wed,  5 Jun 2024 08:51:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N6xtsRDk"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="rqSu7qyf";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="iwFAB6Dr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2002A1946AA;
-	Wed,  5 Jun 2024 08:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C04149C7E
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 08:51:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717577431; cv=none; b=MAR9CKn+buGPDZ/798OI6vszYt6xijbm7MdGHTuyUDE7YJUfQWXIaEcK0hZkKTzj4xhnOTyJ/pVgKNo5rTbhCHFXf+oXCS1xQB0toH5QrviK851wOKn4i/5IfRYju8GSB8Dbd3P4hokSW9PRnercvYP9EqfBgke5DQ/Cwhdy7QQ=
+	t=1717577475; cv=none; b=uhWia9zF+Q+d/AiJ99kGb2tA1i9GJdeLLMNlPJmRLkQDp2eSzEq6jDdSB1Gxa/03cgFLURMC9jS4s+3tEtBSWiFnXQrNFOyjTqEyKonWqjHLeb/om4TSZGq1FK1fzbkacZ3/iQdC4O1UEKsJfUPTvDO81pdqJVteJgj5Zi+wZA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717577431; c=relaxed/simple;
-	bh=cmMrnBLmILI34bSTEqGAFTuSRh1IzjExT7ZUARg/WJY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sj6H6zeq1AFWttKa080Y5HZ+PW3cPGzFjkN/2KhXgNN/ach2CNJYTRhTbXAf0afKVneo12ZdlrUNbxCmMmeUfDX8dBStNZmTMcsf81bCkwEuV0BQzjsslBh2Yin3cKvdik5VWg4eRi75Kq33BXx2LyE9qEeNUQUwXOC+2+mUDJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N6xtsRDk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A4210C32781;
-	Wed,  5 Jun 2024 08:50:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717577430;
-	bh=cmMrnBLmILI34bSTEqGAFTuSRh1IzjExT7ZUARg/WJY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=N6xtsRDkaq49UIDroEsNvxouCqW8q7CcDA3lpeYf6sY4DDrKSmIwwB8gZOtLJ8Rf7
-	 krBx8JxYUCWaDy2ekP3RhVd3dnmxxshy5iyj+9bWmqPgE2sO9PAfXWyiYNh8D5oXFs
-	 BQUy9B8C2lcrEOtRTR51BLfqClYlG8puJUyJDLpmNh3iCnH6XgfdhGUDWM+IG+XS7o
-	 23E66TDeg3Yh4Iu1beS1z/mNxel7paKJmXjC6Vqxeo0H+mveYzkNztNU2w0Vrlcvy3
-	 YOazODgZxAeRBsnaugeYXZbLfLuohruaKakbINlF2aXdKdn/Y//ZMvSSIt9OWF+AsH
-	 CwqyHcKug8BEg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 92768D3E997;
-	Wed,  5 Jun 2024 08:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1717577475; c=relaxed/simple;
+	bh=ESb3dwlj8tgBm+hnDEEmDhiL61kDeDwSaP1sFfGu7oM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mWRPlnW4DxMFnhDZBXR80r7tbGdVlA1KbGqFr8nKZEgrrnHoMvCXQIZJ80Tuvzaz9ovZg71pe4CetmBWX21ISsayiSVw5ZtHQvphXynRjghb6FRBSlLGcuY9uHeBbVy2y1QMlUFu5M14KNFbSTFPKK96Qp9v4wQPnjUQD8nnL+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=rqSu7qyf; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=iwFAB6Dr; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 5 Jun 2024 10:51:10 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1717577472;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V+L6o/re+9gWv2/FjqoQvMEvB92FJr+7TcrpHzksQdE=;
+	b=rqSu7qyfmt9Y8V6rH4BVHv/sa00JUv9nA/lSIf60MqSFgSAE/8kqdHXGlbjkLG7HuCuyAr
+	mctdRvaU8FALinm7FSSISaXoKTdcNp/KE3jQ3aEQapl04usSokHCi8EimZGjeheSgs7BHY
+	nZG87k1glk6Gg8Zy0F41/1QfaUmDzr2SHMS/07DEryQ5K0z6BmoAKQycKI3z2xp7qOa1Lt
+	KcnlEBSPCc7wA/rm0az+K64944SzM4Y1sikp590QuefLr+nwCvvoKkTwh6o96zfSseU5GI
+	fUR6EtSndDPRHcSIgeWVGiqIQPTCVvt4Gth0wfjs9hkAZGZgyvG/a75SmeMDDA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1717577472;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V+L6o/re+9gWv2/FjqoQvMEvB92FJr+7TcrpHzksQdE=;
+	b=iwFAB6DrNWvirMcA1BLvbH1hqGNU4aWySi2sNT0xvXrjGsmyzOA3jav+5RWDPJqdVq7tWw
+	8vzo+lsDaRpiEYCA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, vschneid@redhat.com,
+	tglozar@redhat.com
+Subject: Re: [PATCH net-next v7 2/3] net: tcp: un-pin the tw_timer
+Message-ID: <20240605085110.Udh71e7A@linutronix.de>
+References: <20240604140903.31939-1-fw@strlen.de>
+ <20240604140903.31939-3-fw@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/smc: avoid overwriting when adjusting sock bufsizes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171757743059.31154.18322845885224431622.git-patchwork-notify@kernel.org>
-Date: Wed, 05 Jun 2024 08:50:30 +0000
-References: <20240531085417.43104-1-guwen@linux.alibaba.com>
-In-Reply-To: <20240531085417.43104-1-guwen@linux.alibaba.com>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: gbayer@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240604140903.31939-3-fw@strlen.de>
 
-Hello:
+On 2024-06-04 16:08:48 [+0200], Florian Westphal wrote:
+> After previous patch, even if timer fires immediately on another CPU,
+> context that schedules the timer now holds the ehash spinlock, so timer
+> cannot reap tw socket until ehash lock is released.
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+The two callers of inet_twsk_hashdance_schedule() have the comment:
+| /* tw_timer is pinned, so we need to make sure BH are disabled
+|  * in following section, otherwise timer handler could run before
+|  * we complete the initialization.
+|  */
 
-On Fri, 31 May 2024 16:54:17 +0800 you wrote:
-> When copying smc settings to clcsock, avoid setting clcsock's sk_sndbuf
-> to sysctl_tcp_wmem[1], since this may overwrite the value set by
-> tcp_sndbuf_expand() in TCP connection establishment.
-> 
-> And the other setting sk_{snd|rcv}buf to sysctl value in
-> smc_adjust_sock_bufsizes() can also be omitted since the initialization
-> of smc sock and clcsock has set sk_{snd|rcv}buf to smc.sysctl_{w|r}mem
-> or ipv4_sysctl_tcp_{w|r}mem[1].
-> 
-> [...]
+This isn't accurate anymore. I would suggest to simply remove the
+comment. The only reason for local_bh_disable() is (are) the lock(s).
 
-Here is the summary with links:
-  - [net] net/smc: avoid overwriting when adjusting sock bufsizes
-    https://git.kernel.org/netdev/net/c/fb0aa0781a5f
+> Signed-off-by: Florian Westphal <fw@strlen.de>
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Sebastian
 
