@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-100849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02EB58FC450
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:17:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1225A8FC452
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:18:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 961701F26C8D
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 07:17:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA9472889E8
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 07:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39FCC18C33F;
-	Wed,  5 Jun 2024 07:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F34FA21C190;
+	Wed,  5 Jun 2024 07:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sHXojvJF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fgpvu7o8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E67619148A;
-	Wed,  5 Jun 2024 07:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C545621C187;
+	Wed,  5 Jun 2024 07:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717571775; cv=none; b=AfELpcC5le71iCkl/zyr26ys0WvQ4YO+723n2E+smsSubpurS6lKzyFFcpVQk8xZFcGB8kb+5oOn8GuPLjzxDBeYksqGYmxyTCIUaqrJYuWhS6z7nlRdN7W8vNu7QPtEnOxVZvDWXvh1pXD02zoCa2x6uxOwNOvjHa4fCLNEuhM=
+	t=1717571777; cv=none; b=tSn5McwzYJlpVaNBd8e61phn+Tj3BjPfTkM3+nD4x/cIzbCbCfgD0XXC1ipIxlqA/N8NpQ0HfdcOTPIf9zYw5QUWEYmhKFg94esZU88PghlYO4OvW14UOHD0n+drHZLETPCa8xKuLzoQeXV5NCU2dg97vCa0bYRrRwVywO9GC2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717571775; c=relaxed/simple;
-	bh=ej8v0/75YvFLQkYynFarXRgl/ZzJFpTxeBDUabEwZzM=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=OeHAFntMnq1MRQERN276JbOPkFftW+D4ownchITo7nrXoRAG1bM7RE4p8sovvrB0lxfuyigz+Q6GxUFculQ6vHpLOJx83JlmWLvV6TubxjO/+ZJbRwBFmZwLUheQwZbdSvJkmH/eMXF8phYkXQ7KtuHlyg9IqVUFANHAQ6gFSys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sHXojvJF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FE72C3277B;
-	Wed,  5 Jun 2024 07:16:11 +0000 (UTC)
+	s=arc-20240116; t=1717571777; c=relaxed/simple;
+	bh=LOBwy5aLlC0g+D8jrSC0hZDHeIAdkfdzQ+XApr6oUvY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=PNVztmU9u5U88FKYtRDO6i71hrakSG/vXvqdjHwgh4hoUP4nNn7AGxG1DX3kbwlEcddY3mTsjMQqM/er/lGGJfBC4hAfod1ib1tk0UHsWU1HL1bjHMYrfL5gSyJyOUzLvmxJxew8yJgugHiTYvuU2mqTb42WT/THLNDMHf9fcgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fgpvu7o8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3F9DC4AF07;
+	Wed,  5 Jun 2024 07:16:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717571774;
-	bh=ej8v0/75YvFLQkYynFarXRgl/ZzJFpTxeBDUabEwZzM=;
-	h=From:Subject:Date:To:Cc:From;
-	b=sHXojvJFueOpYA7pqNWbErqcw7UPxoVixwaVF3YSLX6K36eiZpYkVD4dYLzty8ic6
-	 qpCHT5aOSxhZPZWexNWNiVp3rSD8fOdb4L8phiuhYJPPcDFQ/BEj1Sm/HJAwdxgIc6
-	 lFfc4YYnXBRNIK0Q7KUs4U36jqap77Em+y61cMrHGaEbmdbIQ3EoSvZtIG4FEIYhq8
-	 BBFzKrNY2HLRIff7tOjfIxcAcgEzfmW8GdtFET3p+poZyMQ4C6NZBzQlHHdyIewROy
-	 OwOUefuMuumXaXit3hjW4CzbEir9DNZ4FH8cGACDboLshpTrqshUXwAfSBSnifKO0Z
-	 gLXXng/Ud7ZHQ==
+	s=k20201202; t=1717571777;
+	bh=LOBwy5aLlC0g+D8jrSC0hZDHeIAdkfdzQ+XApr6oUvY=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=fgpvu7o8JCxjr3nmQGh/TFcTCl+/Xv10MBugAQ8UP49s++gxsVXkp1hWtuSTwZhuW
+	 xukfvBJgfh3caJH9V+BAgUAy+iUrTo4R6WgZKn1FRWBQ+UOIrUN+4vimPHAZnBDVZJ
+	 0G+jvMkyewnYSavVQu8ZjqzUcFVYTZhbOT2lT6ltMGE/LHP0azWDDHPQpkcBRuxrwP
+	 xzpb0q3tWKd4avp1RXfmfjhkOIP4buoPmcHebzithY60fjTo53TJdbTuRyrJca9Jcj
+	 4KBaux0BunwX6omuzfJqMVWgda+J1+5N5yHNwufi3320sYN6HqAlAyyInxi6F0s5Il
+	 bOxEM6TEcnKHw==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Subject: [PATCH net-next 0/3] mptcp: misc. cleanups
-Date: Wed, 05 Jun 2024 09:15:39 +0200
-Message-Id: <20240605-upstream-net-next-20240604-misc-cleanup-v1-0-ae2e35c3ecc5@kernel.org>
+Date: Wed, 05 Jun 2024 09:15:40 +0200
+Subject: [PATCH net-next 1/3] mptcp: use mptcp_win_from_space helper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,64 +52,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAJsQYGYC/z2NwQqDMBBEf0X27EKMptL+ingIcW0XahqyiQjiv
- xsEe5jDY3gzOwhFJoFXtUOklYV/vkBTV+A+1r8JeSoMWulOPVSHOUiKZBf0lEq2hP9qYXHovmR
- 9Dtj3U6tN+3TGzFDWQqSZt+tpgNuF8ThOOh9DJ4MAAAA=
+Message-Id: <20240605-upstream-net-next-20240604-misc-cleanup-v1-1-ae2e35c3ecc5@kernel.org>
+References: <20240605-upstream-net-next-20240604-misc-cleanup-v1-0-ae2e35c3ecc5@kernel.org>
+In-Reply-To: <20240605-upstream-net-next-20240604-misc-cleanup-v1-0-ae2e35c3ecc5@kernel.org>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
  Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Geliang Tang <tanggeliang@kylinos.cn>, Davide Caratti <dcaratti@redhat.com>
+ Geliang Tang <tanggeliang@kylinos.cn>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=909; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=ej8v0/75YvFLQkYynFarXRgl/ZzJFpTxeBDUabEwZzM=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmYBC6giU7OqsLP9SRwngKz2nv8EwB1jWpW1LWI
- UyWeEluJi2JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZmAQugAKCRD2t4JPQmmg
- c5r3D/956rKFPfpm81mshDeIjhsjILlIJ+4T7jRszasXEwrmD1FFfM9zzRsHuLuhaGEKIqJGnZq
- qUt+2FwXyKXJlOWHcXOiQGczmHFfiSuSTk6QldvdZSqYziGVdqk7BgLboLDgf61Ncx5WE5K/hyf
- u9+3yVvgYlQMnNa+a8xhMwRHIy9cbhESkcDOdEbOfTPgc+/4g7ibMCeO9EdQiY9Fp82O3EU/DiQ
- +NrXgChZGwQgjPoiIuOcHNiw9TeWFJ9E1gVQyKKxLEgiVWkJokTrQWTo2eGLz0Lrni6nhrLpoUg
- Mt2hknqe+UdbXKvG6DuJfwNGc8apwZ7Oev5ZRmvAbmPqjCWze7X08+WYf6b7R/QJC0jx/QhAhYQ
- aOJighLrS/f+I8kBimeKb9ovX+ZGwxyX9lA3wZR3CAM9WV9583Kx1qqne6SErBkteYzQkEIFU0G
- bItoGG6aKBNHerCzESGOCEqLJmr4+SoYgi+rU+kIRG8cFN9CYv5qndTezY5OfwOqewKJiPvqkwW
- pqUebbmdEG7Sxte2aVC6f37RRP9Ky12kADxcoVcKHR5py9CtjbBtNZS5XMYFtTdoeukSdpV+53c
- 85Yv7G35rLLKlD4xonMQuuzMNAdA4Bn3nYmsQivRnhxLNPallUY5epqiJ/uVYhB5E6VEZv0jWXj
- gf8NDtpwtOdIRJQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1013; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=xSJg35UP/4cXaiH0S4yJZVk63acIeOzJ2YCZ8nw/uSk=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmYBC6tQGVmVNayvDuFQ0uSQcQKfSTGkOnywo74
+ kPdeTjTUO2JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZmAQugAKCRD2t4JPQmmg
+ c3FBEADKPoboOFju1iwc5k09MjSZt6izgwv36ugPM5NPh2oOglW9RqXzzqdf5FpSA8W11dW/dlh
+ +Cem2ztUZ+LerSpcLixoJTsr3GNgu15a9B0c9XHY0PQxwAAkWd7UYUFMJJ6JngqA8Bn1CRlLZAb
+ NJ1Qj7PB1GX2hvnEQXF9QdBV1dtfEEGH7VJDCOEkf2fSBWMuTuYwSFsET9BpX+lk2H0eoDmDhLb
+ e3QpYHplGNdVbzq7sgnIWoDiSPFvm5AwCMnP0h+jybNjkHXnLmv0BxINOb4Z6+LnguovBgT12Wi
+ bHtTwyzgQyHqCxb43YZI7KnyLbSKIwhdAT/edw6enaDMPi+UYs5XQhYVsAu6/K1KkN3lM6vZsa0
+ We1sEwx1K4REkjuuj2swerR1prKAuRLfrdtn8xnzIPxyEQ7tJ3kK1R9pX9N/uh93ETfEc+nwnar
+ tltlnZIENCCvthyNFEfMEKz6t6kjsXjdRcbW6nNObBwH22xO4rh1auohZ9noe2yfWjOCH1IhwWH
+ j2ahcBUvefWa/Q/+7EzOlraTf8X03+FSTOo3iTraYK4euD1DqNoZNl8g0PK+WrOu+PiSxO8x14F
+ lKmyqSkJvCHMHeGG0vlttZXmbXJc8/YmsU6MPs7LugS++f6yCu/xCtCTnocn6CKhEgUJ8b+NTOc
+ RMcZzK05n0VJT9g==
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-Here is a small collection of miscellaneous cleanups:
+From: Geliang Tang <tanggeliang@kylinos.cn>
 
-- Patch 1 uses an MPTCP helper, instead of a TCP one, to do the same
-  thing.
+The MPTCP dedicated win_from_space helper mptcp_win_from_space() is defined
+in protocol.h, use it in mptcp_rcv_space_adjust() instead of using the TCP
+one. Here scaling_ratio is the same as msk->scaling_ratio.
 
-- Patch 2 adds a similar MPTCP helper, instead of using a TCP one
-  directly.
-
-- Patch 3 uses more appropriated terms in comments.
-
+Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
+Reviewed-by: Mat Martineau <martineau@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
-Davide Caratti (1):
-      mptcp: refer to 'MPTCP' socket in comments
+ net/mptcp/protocol.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Geliang Tang (2):
-      mptcp: use mptcp_win_from_space helper
-      mptcp: add mptcp_space_from_win helper
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index 7d44196ec5b6..546c80c6702a 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -2046,7 +2046,7 @@ static void mptcp_rcv_space_adjust(struct mptcp_sock *msk, int copied)
+ 		if (rcvbuf > sk->sk_rcvbuf) {
+ 			u32 window_clamp;
+ 
+-			window_clamp = __tcp_win_from_space(scaling_ratio, rcvbuf);
++			window_clamp = mptcp_win_from_space(sk, rcvbuf);
+ 			WRITE_ONCE(sk->sk_rcvbuf, rcvbuf);
+ 
+ 			/* Make subflows follow along.  If we do not do this, we
 
- net/mptcp/protocol.c | 8 ++++----
- net/mptcp/protocol.h | 5 +++++
- net/mptcp/sockopt.c  | 2 +-
- net/mptcp/subflow.c  | 2 +-
- 4 files changed, 11 insertions(+), 6 deletions(-)
----
-base-commit: a6ba5125f10bd7307e775e585ad21a8f7eda1b59
-change-id: 20240604-upstream-net-next-20240604-misc-cleanup-77d32539c55f
-
-Best regards,
 -- 
-Matthieu Baerts (NGI0) <matttbe@kernel.org>
+2.43.0
 
 
