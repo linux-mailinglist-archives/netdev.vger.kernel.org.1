@@ -1,183 +1,189 @@
-Return-Path: <netdev+bounces-101165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BB618FD948
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 23:40:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDF7F8FD967
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 23:55:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60B101C255C9
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 21:40:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 631CB283FBB
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 21:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E55D16C426;
-	Wed,  5 Jun 2024 21:38:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F3EE15ECDE;
+	Wed,  5 Jun 2024 21:55:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mamKSLgt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OVk188Bu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07FC015FCFB
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 21:38:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93E7CE567
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 21:55:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717623524; cv=none; b=ccBwCP7b8Sgvq1zfMkZQqSDnqXXz6irE8slzrL/KtetDmn1LUw2JRjWs6Nfje7PM9JrLotgSkyDWpMZHkcIiuuCwqCakmWvcHbid92z5Blc8SkdRZ7QfEGGtWlKJ2UHFb5ZIpanxQocKMhY0sFf36eynOTPV9rDZh+VsJSfecbI=
+	t=1717624516; cv=none; b=ZeJc0mRiuvP3JUbCIfQjhdL1Dv9T1xhFg0mYSEr3zdZo01uWEtI3t5LOsmyPWfGLmEl/+jn+Kb/V70Ceenv0K/GeJwtODPewm/OYe+30EMN3AdUMprGsIdNIHbOKLkPGnVhr3bZ7XRpj1TAmhWFFaW2b/lnggBHjdTTeW9adpMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717623524; c=relaxed/simple;
-	bh=iFkPUwycPtMXY95Fsn6h0Cq5+b23g0Zkpwj3cwixKS8=;
+	s=arc-20240116; t=1717624516; c=relaxed/simple;
+	bh=UZPbW0IR5w36PFk3ukWzR4v3+jjQ/ha9eGYPOLhBOWo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YPNLboZvDD4nkHg7u6CTx91URUwrNb2e68o4q0R+dQn3r4JmjZhXVg+nR6e+bbsM851ksYtFL/aTfQBsCdVTLkfszi4BLIahOLrafUw5LeVNL0HAqJE46R8y/uzlr05ThrMI6icefTZI5B9RCpSkBDwBu9YMmHuVtmDc21mQS9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mamKSLgt; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-440075abc22so26251cf.1
-        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 14:38:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717623521; x=1718228321; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sNlsexQwemrp3YanWDx0EtmNkeLt675d7VKIepxZtwQ=;
-        b=mamKSLgtkGbxm/tSXVd7DRkaHPVAsKAEa62DE5FZ2fSTTFR7Cb3/i/Dav1udik/pye
-         ZAnfnS2CXmyWOeA/fLaowo74MPoyGxdVNF5rBc18wFGjWUqmj2zL4N4XpbKjt5ekuTun
-         N5xW0KbZpOgVJC4xjK2doYvOLsquo/tTwT/k01jhZxTb/FbZZ+QoL3k7X+T/XDPI8k2t
-         XU99rbF8tygpo8i/d+rCWUjNIyvlmY4xu2ObdIyfW50HDd76ZyVmM0sXRCUTqXuDOp/G
-         YHbdHxaRMnESNczF7PC+fiW1rYHknkvhFxmXUqxQaQhTNblrm3epY150Tdmgr7Qig97I
-         WIGA==
+	 To:Cc:Content-Type; b=D2/0fEcE9ZxXfX8WPYzO5HwUqv9JPmdOzmK00GYDDMuucmP0XoKbzh2cGX7ciNqDs+0jpcZ/OgCKAiyQXekN6S7U9/jusxgP+C8AjU69vQRWaOxYPZszCBB9932hxnUFxdhc2x1ALYMqStavKc8kPagl321yXZRx2gqCUmMVQJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OVk188Bu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717624513;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZV6Lkl8TnoF8BuIaryKVon5GWIOQyEZj6XsfC7CIoHI=;
+	b=OVk188BufIhcbRZMhThbUUvOhNDmmXP65xtUuyce+Js3CcL4LpZxsCLMIBGlQqZi2dv8AM
+	TAtOSATmG4y+MOXI22MoRKIPW1bcptOFVIqjcD/mQFIDD+C8R0QveslsrM9T+QbrsGPvOu
+	81x0GFcBtJQXZaBn5Cb1tuRK/C0MsIE=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-628-4FLU0yUfOsSwJY8O_b42Ng-1; Wed, 05 Jun 2024 17:55:12 -0400
+X-MC-Unique: 4FLU0yUfOsSwJY8O_b42Ng-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2eaad38d35bso1517591fa.1
+        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 14:55:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717623521; x=1718228321;
+        d=1e100.net; s=20230601; t=1717624511; x=1718229311;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sNlsexQwemrp3YanWDx0EtmNkeLt675d7VKIepxZtwQ=;
-        b=Twezthhi2dULsCRVAbzonoEI3Wozx3A5WgtS0lTKcNY6MzEHF8rnFFlwIDQip/ltAR
-         HRaDZxSGzlHICmutn9R7/MaoNjx6AxRGBAk/02lXoCtnkV9Bne82GQxqGXgtLFzTqKth
-         /JFBesrVcwGYqTOVjLZPrq5jH2GB8w7kaeWRJs+C9Od2qF1EfM2cGOB+6zCpyXKyRwAG
-         2g5mBSCIeYeRQJEpc/XoNq0HUveOm+8FrF8dFMbRIvo8JBtWrS+Vq/ZdAevE50zTxzj6
-         zCEzYvtvWCZzZpj11B+lwH9fojI3qdEP8+2pKuGL9g8ceKLVal3/woAj4ytJRau0FqDW
-         WjAA==
-X-Forwarded-Encrypted: i=1; AJvYcCUWXOOsJrsNzoNKdL/VWMM23AOhx9igS1N7HiWqZsc9D72GXpdwLMW6XrZRrxfP1Ai6ac+dmSulTbvDhSFKpqyRcVtuA9Iv
-X-Gm-Message-State: AOJu0YwnU7jWVd9vprHXcAf1zqauZvXwPMv9dmbuvrBqFd2EDxDlLrPl
-	ywKRmpwkc4RzNhKQ5fwNJyx+TF66+aVTjeUsoy1HxB/qRVZqt/1x63dqjcz/L9WnS20pV6q1gx5
-	JN34QcYIKTIbnq56MnNz3JlaHgirG/Nm8tr3x
-X-Google-Smtp-Source: AGHT+IEiuKACUaGLuSwGmJwkpMR0OPVSW4SzM49ZaIPJxW507njKclILP9f6lCQlKpo1klduo2oOWGSfKnf+UaubKEY=
-X-Received: by 2002:a05:622a:5a9b:b0:440:1451:d152 with SMTP id
- d75a77b69052e-4403730ebfamr1008921cf.28.1717623520568; Wed, 05 Jun 2024
- 14:38:40 -0700 (PDT)
+        bh=ZV6Lkl8TnoF8BuIaryKVon5GWIOQyEZj6XsfC7CIoHI=;
+        b=ETaDugOf6wbt1ipuEhAyAfhqE2cYDyUaLhhrw+ylzyRnJT7HZQC4VhKY/meoYxZ9vx
+         aQLR6q+oDL+GKUrsynff2CQKEh5EF/08k0yOFKftQ0+C2qCiX86x0iecZBNxf6JLY4qu
+         TJdznLbSCyYNXtz6K5dHvTlovaIspIL7PpqI+b4O8S3y2zk6RFEyeD+b/gaGKsA6Ctx6
+         +YyV8AbjIb/jSYmiRP8NpZnSurdZuU282z3fEFiDu2ZvS3sXZdjHMYlCb1WMVVlq7FM4
+         1hMaDSgVwi1d/QNv8Ly8TYiFVrMp1vYpZiaWl746kMS8vvMX+BbFIvcJ9Wuq4Otiu32+
+         ZaFg==
+X-Forwarded-Encrypted: i=1; AJvYcCWig+e1PeAGPxDK0WxfCRvuHmLMoWzIkxXwhWfqVLFiSeRFdmnsXrfGXig87pcTNsPaUcGBPtCgVnTfhWvmwv5RwEVM5Adj
+X-Gm-Message-State: AOJu0Yxf/7L+GedR3C8UcAlUP9Mtq5vCfPF1/OOG1xmJgYefCph5l0OW
+	ZEz1nTN1REiP5imh66V4GT12q7IVUmilCeOkYonV93IEsXBJ/zNeblJzCk4bfJGF+wdv9dCavwS
+	WrdC1TO5wDEvjo1CNI2hO4fpkk2Iq0BAlX5shfExhlvCGuBw9S2AJRJ1utltIel7Hs5Fh9GpYqp
+	uAYqmhT24M9TDG/idwi3IcE2opn2ID
+X-Received: by 2002:a2e:b0cd:0:b0:2e0:aaaa:e551 with SMTP id 38308e7fff4ca-2eac7a526fbmr24710281fa.37.1717624510873;
+        Wed, 05 Jun 2024 14:55:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFvLt/CiRPb5P9lD0+sOKcBCQ55vqYildzdGoOchGzeuB+TiwlAiSzLIpChot7zB6HH1kJrimAfbRzc2fsqGUk=
+X-Received: by 2002:a2e:b0cd:0:b0:2e0:aaaa:e551 with SMTP id
+ 38308e7fff4ca-2eac7a526fbmr24710171fa.37.1717624510451; Wed, 05 Jun 2024
+ 14:55:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240604120311.27300-1-fw@strlen.de> <FF8A506F-6F0F-440E-9F52-B27D05731B77@apple.com>
- <20240605181450.GA7176@breakpoint.cc> <ZmCwlbF8BvLGNgRM@calendula>
- <20240605190833.GB7176@breakpoint.cc> <ZmDAQ6r49kSgwaMm@calendula>
-In-Reply-To: <ZmDAQ6r49kSgwaMm@calendula>
-From: Willem de Bruijn <willemb@google.com>
-Date: Wed, 5 Jun 2024 17:38:00 -0400
-Message-ID: <CA+FuTSfAhHDedA68LOiiUpbBtQKV9E-W5o4TJibpCWokYii69A@mail.gmail.com>
-Subject: Re: [PATCH nf] netfilter: nf_reject: init skb->dev for reset packet
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Florian Westphal <fw@strlen.de>, Christoph Paasch <cpaasch@apple.com>, 
-	Netfilter <netfilter-devel@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, daniel@iogearbox.net, 
-	Stanislav Fomichev <sdf@google.com>
+References: <20240531080739.2608969-1-jiangyunshui@kylinos.cn>
+ <41e4b0e3-ecc0-43ca-a6cd-4a6beb0ceb8f@datenfreihafen.org> <20240603165543.46c7d3b4@kernel.org>
+ <CAK-6q+j7vBbeB5ZPdT6szgUzYhDiPyVuadLooOywOU7M0fpfzQ@mail.gmail.com> <cb91e5d3-7596-4564-9e0b-4819e437a692@datenfreihafen.org>
+In-Reply-To: <cb91e5d3-7596-4564-9e0b-4819e437a692@datenfreihafen.org>
+From: Alexander Aring <aahringo@redhat.com>
+Date: Wed, 5 Jun 2024 17:54:59 -0400
+Message-ID: <CAK-6q+hULQbxFGyJ2t29VqjgnHgvUJ7J+Hsf8Pv-_0QaiNCTCg@mail.gmail.com>
+Subject: Re: [PATCH] net: mac802154: Fix racy device stats updates by
+ DEV_STATS_INC() and DEV_STATS_ADD()
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Yunshui Jiang <jiangyunshui@kylinos.cn>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com, 
+	davem@davemloft.net
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 5, 2024 at 3:45=E2=80=AFPM Pablo Neira Ayuso <pablo@netfilter.o=
-rg> wrote:
+Hi,
+
+On Wed, Jun 5, 2024 at 4:02=E2=80=AFPM Stefan Schmidt <stefan@datenfreihafe=
+n.org> wrote:
 >
-> On Wed, Jun 05, 2024 at 09:08:33PM +0200, Florian Westphal wrote:
-> > Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> >
-> > [ CC Willem ]
-> >
-> > > On Wed, Jun 05, 2024 at 08:14:50PM +0200, Florian Westphal wrote:
-> > > > Christoph Paasch <cpaasch@apple.com> wrote:
-> > > > > > Reported-by: Christoph Paasch <cpaasch@apple.com>
-> > > > > > Suggested-by: Paolo Abeni <pabeni@redhat.com>
-> > > > > > Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/=
-494
-> > > > > > Signed-off-by: Florian Westphal <fw@strlen.de>
-> > > > >
-> > > > > I just gave this one a shot in my syzkaller instances and am stil=
-l hitting the issue.
-> > > >
-> > > > No, different bug, this patch is correct.
-> > > >
-> > > > I refuse to touch the flow dissector.
-> > >
-> > > I see callers of ip_local_out() in the tree which do not set skb->dev=
-.
-> > >
-> > > I don't understand this:
-> > >
-> > > bool __skb_flow_dissect(const struct net *net,
-> > >                         const struct sk_buff *skb,
-> > >                         struct flow_dissector *flow_dissector,
-> > >                         void *target_container, const void *data,
-> > >                         __be16 proto, int nhoff, int hlen, unsigned i=
-nt flags)
-> > > {
-> > > [...]
-> > >         WARN_ON_ONCE(!net);
-> > >         if (net) {
-> > >
-> > > it was added by 9b52e3f267a6 ("flow_dissector: handle no-skb use case=
-")
-> > >
-> > > Is this WARN_ON_ONCE() bogus?
-> >
-> > When this was added (handle dissection from bpf prog, per netns), the c=
-orrect
-> > solution would have been to pass 'struct net' explicitly via skb_get_ha=
-sh()
-> > and all variants.  As that was likely deemed to be too much code churn =
-it
-> > tries to infer struct net via skb->{dev,sk}.
-
-It has been a while, but I think we just did not anticipate skb's with
-neither dev nor sk set.
-
-Digging through the layers from skb_hash to __skb_flow_dissect
-now, it does look impractical to add such an explicit API.
-
-> > So there are several options here:
-> > 1. remove the WARN_ON_ONCE and be done with it
-> > 2. remove the WARN_ON_ONCE and pretend net was init_net
-> > 3. also look at skb_dst(skb)->dev if skb->dev is unset, then back to 1)
-> >    or 2)
-> > 4. stop using skb_get_hash() from netfilter (but there are likely other
-> >    callers that might hit this).
-> > 5. fix up callers, one by one
-> > 6. assign skb->dev inside netfilter if its unset
-
-Is 6 a realistic option?
-
-> >
-> > 3 and 2 combined are probably going to be the least invasive.
-> >
-> > 5 might take some time, we now know two, namely tcp resets generated
-> > from netfilter and igmp_send_report().  No idea if there are more.
+> Hello Jakub, Alex,
 >
-> Quickly browsing, synproxy and tee also calls ip_local_out() too.
+> On 04.06.24 15:52, Alexander Aring wrote:
+> > Hi,
+> >
+> > On Mon, Jun 3, 2024 at 7:56=E2=80=AFPM Jakub Kicinski <kuba@kernel.org>=
+ wrote:
+> >>
+> >> On Mon, 3 Jun 2024 11:33:28 +0200 Stefan Schmidt wrote:
+> >>> Hello.
+> >>>
+> >>> On 31.05.24 10:07, Yunshui Jiang wrote:
+> >>>> mac802154 devices update their dev->stats fields locklessly. Therefo=
+re
+> >>>> these counters should be updated atomically. Adopt SMP safe DEV_STAT=
+S_INC()
+> >>>> and DEV_STATS_ADD() to achieve this.
+> >>>>
+> >>>> Signed-off-by: Yunshui Jiang <jiangyunshui@kylinos.cn>
+> >>>> ---
+> >>>>    net/mac802154/tx.c | 8 ++++----
+> >>>>    1 file changed, 4 insertions(+), 4 deletions(-)
+> >>>>
+> >>>> diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+> >>>> index 2a6f1ed763c9..6fbed5bb5c3e 100644
+> >>>> --- a/net/mac802154/tx.c
+> >>>> +++ b/net/mac802154/tx.c
+> >>>> @@ -34,8 +34,8 @@ void ieee802154_xmit_sync_worker(struct work_struc=
+t *work)
+> >>>>      if (res)
+> >>>>              goto err_tx;
+> >>>>
+> >>>> -   dev->stats.tx_packets++;
+> >>>> -   dev->stats.tx_bytes +=3D skb->len;
+> >>>> +   DEV_STATS_INC(dev, tx_packets);
+> >>>> +   DEV_STATS_ADD(dev, tx_bytes, skb->len);
+> >>>>
+> >>>>      ieee802154_xmit_complete(&local->hw, skb, false);
+> >>>>
+> >>>> @@ -90,8 +90,8 @@ ieee802154_tx(struct ieee802154_local *local, stru=
+ct sk_buff *skb)
+> >>>>              if (ret)
+> >>>>                      goto err_wake_netif_queue;
+> >>>>
+> >>>> -           dev->stats.tx_packets++;
+> >>>> -           dev->stats.tx_bytes +=3D len;
+> >>>> +           DEV_STATS_INC(dev, tx_packets);
+> >>>> +           DEV_STATS_ADD(dev, tx_bytes, len);
+> >>>>      } else {
+> >>>>              local->tx_skb =3D skb;
+> >>>>              queue_work(local->workqueue, &local->sync_tx_work);
+> >>>
+> >>> This patch has been applied to the wpan tree and will be
+> >>> part of the next pull request to net. Thanks!
+> >>
+> >> Hi! I haven't looked in detail, but FWIW
+> >>
+> >> $ git grep LLTX net/mac802154/
+> >> $
+> >>
+> >> and similar patch from this author has been rejected:
+> >>
+> >> https://lore.kernel.org/all/CANn89iLPYoOjMxNjBVHY7GwPFBGuxwRoM9gZZ-fWU=
+UYFYjM1Uw@mail.gmail.com/
+> >
+> > In the case of ieee802154_tx() yes the tx lock is held so it's like
+> > what the mentioned link says. The workqueue is an ordered workqueue
+> > and you either have the driver async xmit option (the preferred
+> > option) or the driver sync xmit callback on a per driver (implies per
+> > interface) basis.
 >
-> icmp_send() which is used, eg. to send destination unreachable too to
-> reset.
+> When I reviewed and applied this I did indeed not realize the ordered
+> workqueue making this unnecessary.
+>
+> > I also don't see why there is currently a problem with the current
+> > non-atomic way.
+>
+> For me this looks more like a wrapper that could avoid future problems
+> for no cost. I would not mind if the patch stays. But you are right, its
+> not strictly needed. Want me to back it out again?
 
-Since this uses ip_append_data the generated response should have
-its skb->sk set.
+it's fine for me. I think atomic ops, depending on $ARCH will mess up
+your pipelines in some kind of way but it is better than using locks
+of course (but locks are here required for other things).
 
-> There is also __skb_get_hash_symmetric() that could hit this from
-> nft_hash?
->
-> No idea what more callers need to be adjusted to remove this splat,
-> that was a cursory tree review.
->
-> And ip_output() sets on skb->dev from postrouting path, then if
-> callers are fixed, then skb->dev would be once then again from output pat=
-h?
+- Alex
+
 
