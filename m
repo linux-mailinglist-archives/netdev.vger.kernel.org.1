@@ -1,143 +1,122 @@
-Return-Path: <netdev+bounces-100794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 341198FC0F9
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 02:52:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C161C8FC102
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 02:54:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C56BF1F2301B
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 00:52:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E928B23678
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 00:54:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A18274C85;
-	Wed,  5 Jun 2024 00:52:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBDF728EB;
+	Wed,  5 Jun 2024 00:54:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JcdyiTW3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SX8/4W+P"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DBC13D6D;
-	Wed,  5 Jun 2024 00:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A269804
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 00:54:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717548767; cv=none; b=rueklj6qToe6W7NN4XzHxknqq1NjbIA/kl+lCods/CbBErJMpTWSqFNoFTBagnJdlaUhriVNAxq4bdlmdWzehJYhyqy8eD5MsFWuPpRbszRNanFFXurIqb53znroVLjUO/Ija6swEHISv2RqLcEk1QRNxfWNq+KH58HnxEgzKgQ=
+	t=1717548884; cv=none; b=pgyH62hzQz8+87HKF9luiu3O40qck9lkLrP6xwH9iccfyvFjLeljaoMw343rjusEVmROpmUZxmNGcdQdiXNb+j9Ysh46dCndxkef7iSZ38TWLpkHkEu9ULtXS+Kei2W6Pt6z7kC5f2Sygt5nGhsVE/ADwR6UlO1rJczTh1VwBcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717548767; c=relaxed/simple;
-	bh=oazLP4EwnwtllawJhyAlk4/fZjyXr7WsdQvrcbP4gqk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mOTQCxpf2mWufjo70ZYgqol645/0Mc4vdj6/v3Lh/SuPFiaGQpl3D2DFx5C3O88Xf51kZlkL67+NrCmGqOk2cEZZyX4meeLmbQCP1SQMUoimO8sjm1vP7CsvtEiMbaguWKp8p0RL/AuxtpvWJzB3BWqaGsJ1B9YppVnqB3prreQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JcdyiTW3; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9gO28Na5Or7X4vcdl0zpmmA5fJQ1WvuUB+1qpfVVnOc=; b=JcdyiTW3Sf1oOPzPXSGG4A/aQI
-	WrKOAaIDGvv2yPHWxIHG9bpXlhSF04aVlo28aSx7pfIGBJe07oTz1j5n3BMr9xwV6BenDveB1ZG+I
-	lvQQG0JnvATnP7QejGGclwEinZqkyj419Id1bNa88gtcy7vPcHzBA8yiRWYFrUGsp/m8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sEetB-00GrAt-5E; Wed, 05 Jun 2024 02:52:29 +0200
-Date: Wed, 5 Jun 2024 02:52:29 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Paolo Abeni <pabeni@redhat.com>,
-	Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-	Matt Turner <mattst88@gmail.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Ahern <dsahern@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Shailend Chand <shailend@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Subject: Re: [PATCH net-next v10 05/14] netdev: netdevice devmem allocator
-Message-ID: <cbf3e752-8f7e-4e74-a709-8b812bdc36c0@lunn.ch>
-References: <20240530201616.1316526-1-almasrymina@google.com>
- <20240530201616.1316526-6-almasrymina@google.com>
- <bea8b8bf1630309bb004f614e4a3c7f684a6acb6.camel@redhat.com>
- <20240604121551.07192993@gandalf.local.home>
- <20240604163158.GB21513@ziepe.ca>
- <20240604124243.66203a46@gandalf.local.home>
- <3be107ce-3d9f-4528-b9f7-1c9e38da0688@lunn.ch>
- <20240604202738.3aab6308@gandalf.local.home>
+	s=arc-20240116; t=1717548884; c=relaxed/simple;
+	bh=ELFtQI28CDmj681A4xOEs5XCfOhTeUAjWt1q/p4lq6Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ven0aHqzdAAJw33eC+A0AUzZn2FNaihu99BzFqZDx3bI2ubfajRZKFX/Am5+qyJvDhGV6KzAqAe7lTCOGx7lck5MVV36WSyntm4Ydg55gqQqYK2btwWV9peIEepIq6Wyr+hn7RaonEb58Yo+J+XSUtcINIMcDzPwPHe2QfccbjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SX8/4W+P; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52b90038cf7so5103030e87.0
+        for <netdev@vger.kernel.org>; Tue, 04 Jun 2024 17:54:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717548881; x=1718153681; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ELFtQI28CDmj681A4xOEs5XCfOhTeUAjWt1q/p4lq6Q=;
+        b=SX8/4W+PFjNtQoIySm34JC8XlgP6UcCRCOS8OmpOCURbLV+b+q9SSr0BptEcKEhwOS
+         LiUXZrmDjcGHvVL31u6CgXXq4o2HqoMYs9SDIT6lb82qXmtdlciyTx6h5xk+ceFch7OE
+         2sHniI3yohaQQB1VXk57JxjTEPV1xK6ebD5oY0k0Mas/5D7JEUHL+bVrJkK4KRHPm4c3
+         mbuQKhOLCob8nigs6PqHRYFnsSCWYajZ6WjRwzM51R7hOHPSFUY+w5hS65kzCcxiCpKp
+         Zl1jXE5RPnFyjzVmAOqHGloaJe8+AtUIHrcjg4wT7TdxFhIkxl9jwvI7un3U5abvr6oG
+         fpSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717548881; x=1718153681;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ELFtQI28CDmj681A4xOEs5XCfOhTeUAjWt1q/p4lq6Q=;
+        b=pLnM5hGBG0VakbBZrrYhLE9oHWpj3qJGQx4YQqlE2FWOAfkklmDMP1EESAVYVt2kHg
+         35fJsMWzhVZ7XqNW+tBfLZg2RDtJNlqqlgFLcky9jib0e76AOCehS73M+ptwwHNpO/1k
+         a5Dj8aklyjT7X14v/qM8hv0F5BoQB1+ZcsxwBFYSV3Ob4UpnTKECfcisGjiaAdUzfVbW
+         f4E7b/Y2wGCXhixkBrfHX3rhmAhWvMa1s6qsS5eEHhPIKqyl+VSHETyGW2vXysDnB/tg
+         21634WoQ+Ky7Cp0Jb46ecObmUUfiQHMLswKx0ZcSaOJswftGWzTSMpkKP9p4I1AkHZvW
+         iIUg==
+X-Forwarded-Encrypted: i=1; AJvYcCWFtOjFk8UDnh6p8MYzAukmjcMgX1l/5J/GC0au1NelPb9mvIOGSxd+kDr8HubiVy7rhwqIM+zGVieV4jOISzxrLo0qquhh
+X-Gm-Message-State: AOJu0YwAhL8prYgjFYGuggbuxQ8HsOALhCTq4Yju57GD9tT3YnA72vsl
+	Zv80vlGnBX0+p0PoWM9WAWv+d087tlRj5T0KG3pt9moGxjKJcm+uJTd79YRhsYuusgjrfzqNlJR
+	irAi6kSpPf+GKps/9RsiLYwXT+iM=
+X-Google-Smtp-Source: AGHT+IGYzc8kHUiZFUukJhh1D0urbz7L9gQ4FJMjlePBtYM68CtYr17DGtBH8+gdzqcFKpOLDoGEyz8pt1PsA7SutrU=
+X-Received: by 2002:a05:6512:3ba7:b0:51a:b933:b297 with SMTP id
+ 2adb3069b0e04-52bab4b1187mr697580e87.2.1717548881153; Tue, 04 Jun 2024
+ 17:54:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240604202738.3aab6308@gandalf.local.home>
+References: <20240531164440.13292-1-kerneljasonxing@gmail.com> <20240604170357.GB791188@kernel.org>
+In-Reply-To: <20240604170357.GB791188@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 5 Jun 2024 08:54:03 +0800
+Message-ID: <CAL+tcoCCEdLEOJj9G=3nxTeCHarMhFbh9KTLHKLDVWfhqWXy2w@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: allow rps/rfs related configs to be switched
+To: Simon Horman <horms@kernel.org>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	davem@davemloft.net, dsahern@kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> How is the compiler going to know which path is going to be taken the most?
-> There's two main paths in the ring buffer logic. One when an event stays on
-> the sub-buffer, the other when the event crosses over to a new sub buffer.
-> As there's 100s of events that happen on the same sub-buffer for every one
-> time there's a cross over, I optimized the paths that stayed on the
-> sub-buffer, which caused the time for those events to go from 250ns down to
-> 150 ns!. That's a 40% speed up.
-> 
-> I added the unlikely/likely and 'always_inline' and 'noinline' paths to
-> make sure the "staying on the buffer" path was always the hot path, and
-> keeping it tight in cache.
-> 
-> How is a compiler going to know that?
+Hello Simon,
 
-It might have some heuristics to try to guess unlikely/likely, but
-that is not what we are talking about here.
+On Wed, Jun 5, 2024 at 1:04=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
+e:
+>
+> On Sat, Jun 01, 2024 at 12:44:40AM +0800, Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > After John Sperbeck reported a compile error if the CONFIG_RFS_ACCEL
+> > is off, I found that I cannot easily enable/disable the config
+> > because of lack of the prompt when using 'make menuconfig'. Therefore,
+> > I decided to change rps/rfc related configs altogether.
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+>
+> Hi Jason,
+>
+> FWIIW, I think it would be appropriate to also add help text for each opt=
+ion.
+> And I would drop "Enable", modeling Kdoc on, f.e. CONFIG_CGROUP_NET_CLASS=
+ID.
 
-How much difference did 'always_inline' and 'noinline' make? Hopefully
-the likely is enough of a clue it should prefer to inline whatever is
-in that branch, where as for the unlikely case it can do a function
-call.
+Thanks for your review.
 
-But compilers is not my thing, which is why i would reach out to the
-compiler people and ask them, is it expected to get this wrong, could
-it be made better?
+I will adjust as you suggest in the next submission.
 
-   Andrew
+>
+> Likewise for CONFIG_BQL, although that isn't strictly related to this
+> patch.
+
+Yes, I can see. I think I could write another patch to do this since
+currently I would like to submit a rps/rfs related patch.
+
+Thanks,
+Jason
 
