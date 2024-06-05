@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-100851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22BF58FC454
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:18:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A2CF8FC456
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 09:18:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 440731C20C30
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 07:18:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18F711F21C2D
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 07:18:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF2E18FDC7;
-	Wed,  5 Jun 2024 07:16:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A8A21C19D;
+	Wed,  5 Jun 2024 07:16:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WihXUOUt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PUklBisJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23CF18FDC2;
-	Wed,  5 Jun 2024 07:16:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F71021C185;
+	Wed,  5 Jun 2024 07:16:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717571780; cv=none; b=ZPmQvKLO7OzIXcVGeneo0791rCNytnUqJ067f4B6AcG3E7vZd4c+nhpZGJbJGbjwBlRCgOW6tfdqnj/13IWIYiZjgwO0ZC6e1d2q8zS42SNzu4T4qtClLYKwOck/sCznNPzOI7b/q7IS67T/hx6lQoaRndpyM7XwrsJFiDh5z8I=
+	t=1717571783; cv=none; b=Ojbx/YxMay+N8nuEWD5OYdjWCN3KeLwE4GvYgGZRGAdXs1UMXdT6YLc9LkXihE5GXSPkHH22N3g2kKU1nMufFkDtHkLbi2J+gpvnyP3vvGb/oOdlrHBx9chfvn/JOfJVxkvzX1FZs2wSeGnGgcDKOpcgR0msbkFtFBPmrAmyvfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717571780; c=relaxed/simple;
-	bh=1PI2nXrsvIcrYo4MrlKEOdaWNrzEuMuFERHCGG4asfI=;
+	s=arc-20240116; t=1717571783; c=relaxed/simple;
+	bh=sxhJ+EeYfFnndf+P0KauzX3XfZr2LhOzY9YOAHJPD6w=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=QS1sFf4d/I9PjD4l2MfuTCg0MuLGVXVt8yius+Lb5U1j2f55OBEW7yPhSoQH/03kmLv34uEFFOAQzy5Vai+/szOcP4jBWrur29rsi6PZxNYk/rx2yY7Yum5mE+TfHnn+fgf5CMZIoMAom+zPEzgPBWqWrVGLxeOzeE453JLgpDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WihXUOUt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4CC0C4AF0B;
-	Wed,  5 Jun 2024 07:16:17 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=TG5NDo3POV8GRiovSBWb3dyJR3FxdEzJFS27Fsrm4xLc0gNK5vCCk4fWiYJBWbXxeUdMGPzemr+y0YhjheAa8XnDx0LgNJKTHxmxQELl1+WHFUPqEVq8YSD8fEcFoFgriMLAK7OTAN+HgHje4Ewc9ohY7Zr6mOpo50LKrPJ7/RQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PUklBisJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7577CC3277B;
+	Wed,  5 Jun 2024 07:16:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717571780;
-	bh=1PI2nXrsvIcrYo4MrlKEOdaWNrzEuMuFERHCGG4asfI=;
+	s=k20201202; t=1717571782;
+	bh=sxhJ+EeYfFnndf+P0KauzX3XfZr2LhOzY9YOAHJPD6w=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=WihXUOUt6uD/x5X6EzdVxOeS4ehKCRai5kkzTcyxiARJgmmNTER85Fqu4AS6y2TWB
-	 iA9fj7TTROTpPIH+W+O1/1aTrbk41Rq4KinGVFIayj89DJi1Fud1gF65xTf7gVfPFH
-	 LGI4uAbbs0ycfWKKujrly6n5+RrOX9DsRG4UC+igAwMapZ67UP45yqQXjn6gOHRRyi
-	 6jJKSwIhvQsQAl8/0k0hxezMPz+SXVUEqBcfTCzUItbby/hdcv5WbOeRLl4qq/4gn9
-	 QoncAl7v6GH2+8HDiuzp6rT5UyNDNaay7mHpwTyOUo6X9HpSZGkbGPPuyl4Po3TirE
-	 TGf3M8gREmSzA==
+	b=PUklBisJrytmGj0XZcFRcCUwkYjPhYLL94hppWLuh5QfRoN6zA+hCICCGgdiTu6Et
+	 911xlyTYvfzLPe6SuFOxIPxd3ULHjWhh8g9zrzPRFgeDJAhmOTD4YRipCPBDViiHCx
+	 tYQBDGmtBTRVfpSvnDuPXhqn+bWBOZhgaMFYZSzAAdQQFVkLn8eSoEmLblLhkAsKjL
+	 LdeUP89jg+AnbK9CJbG2xTb90Nd9CTwXmeYArpTjPPT5VA04hPjhxxr7xumyvM8VD3
+	 J7bRzgYTL/FGQebqmotT7Dpm5yBDDiYDS/jG9kqSipUZ5afWHpzRYXYqbhSf/gZykw
+	 B0kFO25eBXwDw==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Wed, 05 Jun 2024 09:15:41 +0200
-Subject: [PATCH net-next 2/3] mptcp: add mptcp_space_from_win helper
+Date: Wed, 05 Jun 2024 09:15:42 +0200
+Subject: [PATCH net-next 3/3] mptcp: refer to 'MPTCP' socket in comments
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240605-upstream-net-next-20240604-misc-cleanup-v1-2-ae2e35c3ecc5@kernel.org>
+Message-Id: <20240605-upstream-net-next-20240604-misc-cleanup-v1-3-ae2e35c3ecc5@kernel.org>
 References: <20240605-upstream-net-next-20240604-misc-cleanup-v1-0-ae2e35c3ecc5@kernel.org>
 In-Reply-To: <20240605-upstream-net-next-20240604-misc-cleanup-v1-0-ae2e35c3ecc5@kernel.org>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
@@ -61,85 +61,74 @@ To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
  Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Geliang Tang <tanggeliang@kylinos.cn>
+ Davide Caratti <dcaratti@redhat.com>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2217; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=jC86ee13yk/lZldYs4U96bt6yIokZxBGLRjbV7iwlNc=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmYBC76jp890uaRvhriq27G9PKQKHzEOpBOGPsk
- k/lXHlTolyJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZmAQuwAKCRD2t4JPQmmg
- c9M6EACPNPWSz/sNvtP8/rRBmLoj19WNSOqAI+N9B4bqN4vWd9bbc3+PXBNNOk9jW3AEklxx3zh
- 0fDIFM1EyvSlUS7uwNRoxbYMk0ghDTye4gAvlYoKTbwxjZynAokOiwRVixnQLkTq0pFCFCyykUa
- s9IsjT4NYAzTeT6ujuHKs+hkjc1aVZDz9+ACBcrO5S8ELTxBXkTIBr080owwQ7HgE2SEp2FxmdX
- NEW/2+ORi9IrXSCblK0+kRXyo8qYoe/EOIy8M7dg0Hu9jLNJnPV2gSVcWTuNswigVHa9Jv453f4
- w1XAgPw/ye0vbogXq22OmaTe/tN+A7+TTY3QOPXt6MO7+SqlN9yGVFtLy8FOf4lXYEYBVnU2/N4
- fxiO+qf5Ew3+G6BVB4qUznA1iuCqvgHaevjAdQf3Tl1GeL1mt7HdwaeFhUojlrNNo5lQmufuMmT
- j5/vaaCpfZlhZjuzhRAvI3wOpG65y9IhDTZ2Inz4VUs7vXD6mWYfliJU94AT8WHyalj33rqmsQp
- VrnD/wxFbJKBiLaAsjJ0arYEMpb8nyewFddsK3SJr0Nm572Aw2oMuXf3Rneu/h4TiBa2iPGD9bz
- U6GtZBdlV5C5NZ4M8NM9spb1vZYN1BDPWuIJ9tHrBiy/m8cZoDxGjpuuK2AIxqaiyPzDZCBPp9v
- 7tygP0/ghxWbjIw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2058; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=Xd/BOnYnE8h1Cykv9cgIddsDI+Z+77oERfzWjuomB9I=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmYBC7HWWH3TEifZf4FmGVMWHnhruMbJ29zUlzn
+ U6p/LIDWnyJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZmAQuwAKCRD2t4JPQmmg
+ c5eUEAC2A6lQb6MHH4HnEJYrktKf4J/aM5++jxUXVHo9qmpgGdUTeCHtJnlYEUWWtNEZnUw3MTY
+ iXC9SoqKo/ReBHdsqROzL1hG4tXoC9z4+SWjWogCQ5mf1AGmA55R2GqZNgtQPDNaiKZke/aGxTS
+ p77YQg7OKhMvDwHPocOEmJSc2RLAa46xiLC8bCUrYaf9vxszaoAivinzzGFGXcAKQBBupHEBSqS
+ WBpIjlX8zJ+MgFtr4BkGQB+fJDQiCVrArhMt2yrxJUbUgpRhiE612WaGqHxfrS00kqp/Y9HMw8E
+ shS3h5jYhiuTT5A5+Uv5wIJXunyDnu/R8GiqBZtx44kBrh3I4FrFK3SOJ3rGvStLysxRz5PR+m6
+ AGjNJc3kXFrmlqE2tFP+ygNuWk0eB26QGGjtrCciK/nS+ruxeuSChOjvXybRoOUcvvbwtYBjXab
+ G/uoujC7VRzBbEnyOXZVJPVpLKtLWpDwigATMIN1did+tVzK9e4YNA57Mdsycg/Rfi2NFPL6UEj
+ 32DLz7aCI8EgXDKr7d7A5/qLP9+RF61eYE6HojwIyF6YlIH64LTDguDp84QgguShL7qO95mIvi6
+ YdJkmS2iqcrPXSB0Q6wz3EBQ9eJcixU0HN5HvGSwz2JsB11xT//vWqaBFktteMGINQtOLG78Qwy
+ GSIuOFbF8NM+xUA==
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+From: Davide Caratti <dcaratti@redhat.com>
 
-As a wrapper of __tcp_space_from_win(), this patch adds a MPTCP dedicated
-space_from_win helper mptcp_space_from_win() in protocol.h to paired with
-mptcp_win_from_space().
+We used to call it 'master' socket at the early stages of MPTCP
+development, but the correct wording is 'MPTCP' socket opposed to 'TCP
+subflows': convert the last 3 comments to use a more appropriate term.
 
-Use it instead of __tcp_space_from_win() in both mptcp_rcv_space_adjust()
-and mptcp_set_rcvlowat().
-
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Reviewed-by: Mat Martineau <martineau@kernel.org>
+Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- net/mptcp/protocol.c | 2 +-
- net/mptcp/protocol.h | 5 +++++
- net/mptcp/sockopt.c  | 2 +-
- 3 files changed, 7 insertions(+), 2 deletions(-)
+ net/mptcp/protocol.c | 4 ++--
+ net/mptcp/subflow.c  | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 546c80c6702a..7ce11bee3b79 100644
+index 7ce11bee3b79..ead0bf63cf95 100644
 --- a/net/mptcp/protocol.c
 +++ b/net/mptcp/protocol.c
-@@ -2040,7 +2040,7 @@ static void mptcp_rcv_space_adjust(struct mptcp_sock *msk, int copied)
- 		do_div(grow, msk->rcvq_space.space);
- 		rcvwin += (grow << 1);
+@@ -2202,7 +2202,7 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 		if (skb_queue_empty(&msk->receive_queue) && __mptcp_move_skbs(msk))
+ 			continue;
  
--		rcvbuf = min_t(u64, __tcp_space_from_win(scaling_ratio, rcvwin),
-+		rcvbuf = min_t(u64, mptcp_space_from_win(sk, rcvwin),
- 			       READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_rmem[2]));
- 
- 		if (rcvbuf > sk->sk_rcvbuf) {
-diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
-index 7aa47e2dd52b..b11a4e50d52b 100644
---- a/net/mptcp/protocol.h
-+++ b/net/mptcp/protocol.h
-@@ -386,6 +386,11 @@ static inline int mptcp_win_from_space(const struct sock *sk, int space)
- 	return __tcp_win_from_space(mptcp_sk(sk)->scaling_ratio, space);
- }
- 
-+static inline int mptcp_space_from_win(const struct sock *sk, int win)
-+{
-+	return __tcp_space_from_win(mptcp_sk(sk)->scaling_ratio, win);
-+}
-+
- static inline int __mptcp_space(const struct sock *sk)
+-		/* only the master socket status is relevant here. The exit
++		/* only the MPTCP socket status is relevant here. The exit
+ 		 * conditions mirror closely tcp_recvmsg()
+ 		 */
+ 		if (copied >= target)
+@@ -3521,7 +3521,7 @@ void mptcp_subflow_process_delegated(struct sock *ssk, long status)
+ static int mptcp_hash(struct sock *sk)
  {
- 	return mptcp_win_from_space(sk, READ_ONCE(sk->sk_rcvbuf) - __mptcp_rmem(sk));
-diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-index f9a4fb17b5b7..2026a9a36f80 100644
---- a/net/mptcp/sockopt.c
-+++ b/net/mptcp/sockopt.c
-@@ -1579,7 +1579,7 @@ int mptcp_set_rcvlowat(struct sock *sk, int val)
- 	if (sk->sk_userlocks & SOCK_RCVBUF_LOCK)
- 		return 0;
+ 	/* should never be called,
+-	 * we hash the TCP subflows not the master socket
++	 * we hash the TCP subflows not the MPTCP socket
+ 	 */
+ 	WARN_ON_ONCE(1);
+ 	return 0;
+diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+index 612c38570a64..39e2cbdf3801 100644
+--- a/net/mptcp/subflow.c
++++ b/net/mptcp/subflow.c
+@@ -1719,7 +1719,7 @@ int mptcp_subflow_create_socket(struct sock *sk, unsigned short family,
+ 	mptcp_sockopt_sync_locked(mptcp_sk(sk), sf->sk);
+ 	release_sock(sf->sk);
  
--	space = __tcp_space_from_win(mptcp_sk(sk)->scaling_ratio, val);
-+	space = mptcp_space_from_win(sk, val);
- 	if (space <= sk->sk_rcvbuf)
- 		return 0;
- 
+-	/* the newly created socket really belongs to the owning MPTCP master
++	/* the newly created socket really belongs to the owning MPTCP
+ 	 * socket, even if for additional subflows the allocation is performed
+ 	 * by a kernel workqueue. Adjust inode references, so that the
+ 	 * procfs/diag interfaces really show this one belonging to the correct
 
 -- 
 2.43.0
