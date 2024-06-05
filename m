@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-100992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C61C28FCF17
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:23:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7EE88FCF1A
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:24:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6C5D1C24D23
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:23:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56BBA29690C
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:24:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B0E1A2FD2;
-	Wed,  5 Jun 2024 12:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4661AB529;
+	Wed,  5 Jun 2024 12:49:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Em5BK/Di"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ayPRaL4r"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B581A2FCC;
-	Wed,  5 Jun 2024 12:49:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3511A3BCB;
+	Wed,  5 Jun 2024 12:49:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717591772; cv=none; b=aNdjRY47FX5VmiP2eNsg61QXIW0SnTcAxJ3QOA8Ge6LKBE1nNJpM+jwW7nqQmKAdnKMlILrbjcTlrCsJ5Sot0nLKQu9+2mzhVrLSiDnJR+tPzGCmBFOw5f03siwmT0Z5k9tuGvOv9FVWa81VGl+HQbVGc4so+VqwBhJTvUP/Als=
+	t=1717591774; cv=none; b=LLeNZU1qpzt7PW8AsxaFcAiLILSslTu9MqOXIsmJM6674JD3ShTCHD62wPzNDu/N9grR1soKMXy0Y/4tO0Ck47DyeOTP3E4xruxvG1AGwDI0kwwuVybpgnceAWQSvgQ3nz+YWWUhVXGycBYJPHBOdNNeb9NqGuAH3QCD2c0byMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717591772; c=relaxed/simple;
-	bh=x6g2mrUC9tUHfdpRqbgnEToJMEXi4fXzecxRgg516IE=;
+	s=arc-20240116; t=1717591774; c=relaxed/simple;
+	bh=u1qRU4ASjZ/VuK0avyxtwNgcfu+/iBHDSUUQh5ULDNM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R27XYUCP2nxSucTPtRqntcSk0D3zXYQayuCbtdunBaypAellDSaZ6zXCSCQ3Dc23o6+opnCbaPVlo5Hr2VH0Zn/02DL9E2/hCMykg17oNF83if1o9qj+P6zpWGC6UHvM8Sljtm9+jB/fiKU9whQ/Y7Yv3dKl+u9lUCscDTHfDcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Em5BK/Di; arc=none smtp.client-ip=217.70.183.200
+	 MIME-Version; b=rIXUSnDpzssm1YBZ4xt2UG8Ek6kIham3xiA4v/AiYFCiaLiM7EHtflrLOvQl0Ju8TJ26g6Yg/l5uBahc8RLoRZ3e9KV9XyEleB46qxeh4WSWjyruSWT4WyEnHgNiYwhXmhjFOcv8GPr5+KuizIRRv/rreaMAhAf/E+pLgCPhN4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ayPRaL4r; arc=none smtp.client-ip=217.70.183.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id ED0CB2000E;
-	Wed,  5 Jun 2024 12:49:26 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 792F620009;
+	Wed,  5 Jun 2024 12:49:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1717591768;
+	t=1717591769;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=agpjVJeRse9CurHPbbSQ2ntEGc7DXA3d+/CblOCv/MA=;
-	b=Em5BK/Di5SFUUGxS3p3o01rETTJN2FMDNG7Cdiyg09pzUJmU5C0z1tmY/TllztPhsooq0Y
-	knmUZHm3lz6UoTu8Rw/5Ki3Mlb0Sv0F7DAVvx3ROZmZj6OgGU/mu3f34KqXQqbTituERml
-	RhqI+/9Cymp6dJP0Jb8dBelVlxVfqoxrJCvll/RzVb9CW91oBJD7T1t5TOO/P7+TrtqvUf
-	yTCmOSNvOW29Zbn4D8D1RFUnI4RDTvKzbUn0d/biqiXTeLjYUTqxud/H8LuFfKPJYairIP
-	kD3yBsAh4VftLnZIcwtnxzCSg1vmU4vNQaesy8JFnoCLUDrdRLAYNCYsMSnzUQ==
+	bh=qhXdwwFrBOf2sVggxdb3tThwYPj1bqviErEGv82K1dE=;
+	b=ayPRaL4rUZsQWoHRFPz28L8VNGjjMn5NwLC4vPtToZCvA4t7/6yGMBap0yzvs8kTet9Fc/
+	gIb2fVBWMAZbRVmrx+f6OFV2X6HvJ8TYQrmO/EhEyN2tRcvGrCq43veYZbYep3zHZ5VZIq
+	FHyMWam4tQICnPLkGXX5R/Oyh7mzJbQNNEtNn0BKG4C7tb8/9e8holkN/OsAfN7rKu/IMt
+	/ockXL9Te66ldVZgEuvc1oPF/ltCKvOYARmQBoncVHBWU1lRlPFtFlUqXYW5zMutgYUE29
+	dNKu8SK4Y8pQZ6Gm8vxi2ufRk04KKTL2sxl+6e2DBhOJwhe2ykE4YaEXHT8x5g==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net
 Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
@@ -72,9 +72,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	mwojtas@chromium.org,
 	Nathan Chancellor <nathan@kernel.org>,
 	Antoine Tenart <atenart@kernel.org>
-Subject: [PATCH net-next v12 02/13] net: sfp: pass the phy_device when disconnecting an sfp module's PHY
-Date: Wed,  5 Jun 2024 14:49:07 +0200
-Message-ID: <20240605124920.720690-3-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v12 03/13] net: phy: add helpers to handle sfp phy connect/disconnect
+Date: Wed,  5 Jun 2024 14:49:08 +0200
+Message-ID: <20240605124920.720690-4-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20240605124920.720690-1-maxime.chevallier@bootlin.com>
 References: <20240605124920.720690-1-maxime.chevallier@bootlin.com>
@@ -87,67 +87,155 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Pass the phy_device as a parameter to the sfp upstream .disconnect_phy
-operation. This is preparatory work to help track phy devices across
-a net_device's link.
+There are a few PHY drivers that can handle SFP modules through their
+sfp_upstream_ops. Introduce Phylib helpers to keep track of connected
+SFP PHYs in a netdevice's namespace, by adding the SFP PHY to the
+upstream PHY's netdev's namespace.
+
+By doing so, these SFP PHYs can be enumerated and exposed to users,
+which will be able to use their capabilities.
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/phy/phylink.c | 3 ++-
- drivers/net/phy/sfp-bus.c | 4 ++--
- include/linux/sfp.h       | 2 +-
- 3 files changed, 5 insertions(+), 4 deletions(-)
+ drivers/net/phy/marvell-88x2222.c |  2 ++
+ drivers/net/phy/marvell.c         |  2 ++
+ drivers/net/phy/marvell10g.c      |  2 ++
+ drivers/net/phy/phy_device.c      | 40 +++++++++++++++++++++++++++++++
+ drivers/net/phy/qcom/at803x.c     |  2 ++
+ drivers/net/phy/qcom/qca807x.c    |  2 ++
+ include/linux/phy.h               |  2 ++
+ 7 files changed, 52 insertions(+)
 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 02427378acfd..6468f2676a52 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -3416,7 +3416,8 @@ static int phylink_sfp_connect_phy(void *upstream, struct phy_device *phy)
- 	return ret;
- }
- 
--static void phylink_sfp_disconnect_phy(void *upstream)
-+static void phylink_sfp_disconnect_phy(void *upstream,
-+				       struct phy_device *phydev)
- {
- 	phylink_disconnect_phy(upstream);
- }
-diff --git a/drivers/net/phy/sfp-bus.c b/drivers/net/phy/sfp-bus.c
-index 2f44fc51848f..56953e66bb7b 100644
---- a/drivers/net/phy/sfp-bus.c
-+++ b/drivers/net/phy/sfp-bus.c
-@@ -487,7 +487,7 @@ static void sfp_unregister_bus(struct sfp_bus *bus)
- 			bus->socket_ops->stop(bus->sfp);
- 		bus->socket_ops->detach(bus->sfp);
- 		if (bus->phydev && ops && ops->disconnect_phy)
--			ops->disconnect_phy(bus->upstream);
-+			ops->disconnect_phy(bus->upstream, bus->phydev);
- 	}
- 	bus->registered = false;
- }
-@@ -743,7 +743,7 @@ void sfp_remove_phy(struct sfp_bus *bus)
- 	const struct sfp_upstream_ops *ops = sfp_get_upstream_ops(bus);
- 
- 	if (ops && ops->disconnect_phy)
--		ops->disconnect_phy(bus->upstream);
-+		ops->disconnect_phy(bus->upstream, bus->phydev);
- 	bus->phydev = NULL;
- }
- EXPORT_SYMBOL_GPL(sfp_remove_phy);
-diff --git a/include/linux/sfp.h b/include/linux/sfp.h
-index a45da7eef9a2..0de85cadfa7c 100644
---- a/include/linux/sfp.h
-+++ b/include/linux/sfp.h
-@@ -544,7 +544,7 @@ struct sfp_upstream_ops {
- 	void (*link_down)(void *priv);
- 	void (*link_up)(void *priv);
- 	int (*connect_phy)(void *priv, struct phy_device *);
--	void (*disconnect_phy)(void *priv);
-+	void (*disconnect_phy)(void *priv, struct phy_device *);
+diff --git a/drivers/net/phy/marvell-88x2222.c b/drivers/net/phy/marvell-88x2222.c
+index b88398e6872b..0b777cdd7078 100644
+--- a/drivers/net/phy/marvell-88x2222.c
++++ b/drivers/net/phy/marvell-88x2222.c
+@@ -553,6 +553,8 @@ static const struct sfp_upstream_ops sfp_phy_ops = {
+ 	.link_down = mv2222_sfp_link_down,
+ 	.attach = phy_sfp_attach,
+ 	.detach = phy_sfp_detach,
++	.connect_phy = phy_sfp_connect_phy,
++	.disconnect_phy = phy_sfp_disconnect_phy,
  };
  
- #if IS_ENABLED(CONFIG_SFP)
+ static int mv2222_probe(struct phy_device *phydev)
+diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
+index b89fbffa6a93..9964bf3dea2f 100644
+--- a/drivers/net/phy/marvell.c
++++ b/drivers/net/phy/marvell.c
+@@ -3613,6 +3613,8 @@ static const struct sfp_upstream_ops m88e1510_sfp_ops = {
+ 	.module_remove = m88e1510_sfp_remove,
+ 	.attach = phy_sfp_attach,
+ 	.detach = phy_sfp_detach,
++	.connect_phy = phy_sfp_connect_phy,
++	.disconnect_phy = phy_sfp_disconnect_phy,
+ };
+ 
+ static int m88e1510_probe(struct phy_device *phydev)
+diff --git a/drivers/net/phy/marvell10g.c b/drivers/net/phy/marvell10g.c
+index ad43e280930c..6642eb642d4b 100644
+--- a/drivers/net/phy/marvell10g.c
++++ b/drivers/net/phy/marvell10g.c
+@@ -503,6 +503,8 @@ static int mv3310_sfp_insert(void *upstream, const struct sfp_eeprom_id *id)
+ static const struct sfp_upstream_ops mv3310_sfp_ops = {
+ 	.attach = phy_sfp_attach,
+ 	.detach = phy_sfp_detach,
++	.connect_phy = phy_sfp_connect_phy,
++	.disconnect_phy = phy_sfp_disconnect_phy,
+ 	.module_insert = mv3310_sfp_insert,
+ };
+ 
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 439d03f5774a..111434201545 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -1370,6 +1370,46 @@ phy_standalone_show(struct device *dev, struct device_attribute *attr,
+ }
+ static DEVICE_ATTR_RO(phy_standalone);
+ 
++/**
++ * phy_sfp_connect_phy - Connect the SFP module's PHY to the upstream PHY
++ * @upstream: pointer to the upstream phy device
++ * @phy: pointer to the SFP module's phy device
++ *
++ * This helper allows keeping track of PHY devices on the link. It adds the
++ * SFP module's phy to the phy namespace of the upstream phy
++ */
++int phy_sfp_connect_phy(void *upstream, struct phy_device *phy)
++{
++	struct phy_device *phydev = upstream;
++	struct net_device *dev = phydev->attached_dev;
++
++	if (dev)
++		return phy_link_topo_add_phy(dev, phy, PHY_UPSTREAM_PHY, phydev);
++
++	return 0;
++}
++EXPORT_SYMBOL(phy_sfp_connect_phy);
++
++/**
++ * phy_sfp_disconnect_phy - Disconnect the SFP module's PHY from the upstream PHY
++ * @upstream: pointer to the upstream phy device
++ * @phy: pointer to the SFP module's phy device
++ *
++ * This helper allows keeping track of PHY devices on the link. It removes the
++ * SFP module's phy to the phy namespace of the upstream phy. As the module phy
++ * will be destroyed, re-inserting the same module will add a new phy with a
++ * new index.
++ */
++void phy_sfp_disconnect_phy(void *upstream, struct phy_device *phy)
++{
++	struct phy_device *phydev = upstream;
++	struct net_device *dev = phydev->attached_dev;
++
++	if (dev)
++		phy_link_topo_del_phy(dev, phy);
++}
++EXPORT_SYMBOL(phy_sfp_disconnect_phy);
++
+ /**
+  * phy_sfp_attach - attach the SFP bus to the PHY upstream network device
+  * @upstream: pointer to the phy device
+diff --git a/drivers/net/phy/qcom/at803x.c b/drivers/net/phy/qcom/at803x.c
+index c8f83e5f78ab..105602581a03 100644
+--- a/drivers/net/phy/qcom/at803x.c
++++ b/drivers/net/phy/qcom/at803x.c
+@@ -770,6 +770,8 @@ static const struct sfp_upstream_ops at8031_sfp_ops = {
+ 	.attach = phy_sfp_attach,
+ 	.detach = phy_sfp_detach,
+ 	.module_insert = at8031_sfp_insert,
++	.connect_phy = phy_sfp_connect_phy,
++	.disconnect_phy = phy_sfp_disconnect_phy,
+ };
+ 
+ static int at8031_parse_dt(struct phy_device *phydev)
+diff --git a/drivers/net/phy/qcom/qca807x.c b/drivers/net/phy/qcom/qca807x.c
+index 672c6929119a..5eb0ab1cb70e 100644
+--- a/drivers/net/phy/qcom/qca807x.c
++++ b/drivers/net/phy/qcom/qca807x.c
+@@ -699,6 +699,8 @@ static const struct sfp_upstream_ops qca807x_sfp_ops = {
+ 	.detach = phy_sfp_detach,
+ 	.module_insert = qca807x_sfp_insert,
+ 	.module_remove = qca807x_sfp_remove,
++	.connect_phy = phy_sfp_connect_phy,
++	.disconnect_phy = phy_sfp_disconnect_phy,
+ };
+ 
+ static int qca807x_probe(struct phy_device *phydev)
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 8c848c79b1fd..3ddfe7fe781a 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -1758,6 +1758,8 @@ int phy_suspend(struct phy_device *phydev);
+ int phy_resume(struct phy_device *phydev);
+ int __phy_resume(struct phy_device *phydev);
+ int phy_loopback(struct phy_device *phydev, bool enable);
++int phy_sfp_connect_phy(void *upstream, struct phy_device *phy);
++void phy_sfp_disconnect_phy(void *upstream, struct phy_device *phy);
+ void phy_sfp_attach(void *upstream, struct sfp_bus *bus);
+ void phy_sfp_detach(void *upstream, struct sfp_bus *bus);
+ int phy_sfp_probe(struct phy_device *phydev,
 -- 
 2.45.1
 
