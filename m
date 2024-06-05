@@ -1,222 +1,177 @@
-Return-Path: <netdev+bounces-100984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA0068FCE50
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:06:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 302FE8FCE5A
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:07:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33A3D1F2C176
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:06:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E00B1C250D6
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 702361BB6A7;
-	Wed,  5 Jun 2024 12:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E07A319AA65;
+	Wed,  5 Jun 2024 12:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="pJunJXQP"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="DYjqA5Th"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF0C1BB681
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 12:21:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD56219A2B9;
+	Wed,  5 Jun 2024 12:22:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717590084; cv=none; b=n4UYVv3LHzT54wD7sTcHtWtgMeng9OGW4SHJrkYEC3TO//nGGIOa22BkJvtXjcBzwf7QFqkwTX+cYkpq6e7mhkZP57b5klUnVsZ+JPRGVwOns1xsuZYZvcmUzUx2i6mtCpp5xMXk960ZK4oYrXhE8ZFv/wD9osH/G/su4rAeO2I=
+	t=1717590149; cv=none; b=qPBVfR8NyBVUPzfBZlqxTw4DxVO5lM0ndveZdzCCidYo7XpIXcQWJzZO45WtxOA0TYV/PnlheUU50q4Q5I+X8MKCJOI+vTc5op2vBNP6JxzMF0HwADDD1spzFTFwu/u/0VXQ3ybY6kIlMX0bQIZ/FFGJPH0bovHm61iLE+1kkmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717590084; c=relaxed/simple;
-	bh=iSIJRYQoDeifOwpk0peo5NpP3jgdrZqBKDhv4/ZqD2I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=btqxsNO5qBJZRd8VfvsVcx7Nlz5Nu6TPIGS2zGlwukiAhNV7PNb0Cp2YgckqwANPoTmg1nHDTPCGthcTt11iVXC7BR9RhMzUz9rfSdXJ+pFOvw1LQ9zuFzbEY09g/BWFPDkA61R1bZ0MLa0rsvK2Dl7gB+9j5ltXzIAnSRlSf8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=pJunJXQP; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-421338c4c3bso21039935e9.1
-        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 05:21:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1717590081; x=1718194881; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ucQO5tSR+UUnqX3BARACo1yN9MzAT61u2WtozQUoIJg=;
-        b=pJunJXQP4hVXQEKfh779jvRcQGK9mw8RgdSfKpcU+3st17ilRZfgAahYsUl1oEwHJV
-         kM17NTI244Di86qs65Ti/KY6dCesbpxpo1KTA5uVo+xFAsvvjYLG6+e05BQNusR1vGog
-         SbVXaL84A/iLRi/aJubPamRiXgYpjYcR13QG2K510/1y3m+yHfwXLUJRGkXtR2SXCcoV
-         Vhbfd1+Du18hO6GMYvSO0GyU6RtGlAYKDQEBO8THWhoE2t3IvfTzeATT+3Ql+nBj8G+q
-         CC7kU/tFHL/V/XQn895/iOy7zY72CF0bnh43gFKcu52kZQx/+A+xy2Q8nxp2p5LMAqzE
-         96Gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717590081; x=1718194881;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ucQO5tSR+UUnqX3BARACo1yN9MzAT61u2WtozQUoIJg=;
-        b=Drrd9pkyqSfvzeQP9LwgrqAm3SIt3G0wLYQAwMLVYWAfvdNoQmVTpXdtbRyoOMUFlY
-         3MJ0+vEKULFfJbCqI2gJWgKeRlm1BneZZsx9COjBAeLcR35bzhLjPdnVnGLM3lTPV1zq
-         uk0M4YuE372kVKYMp29Jy8VhATduZwh+S2dKpDmwhNldh73ThN+3Ta09OLIzFwdMFRIf
-         daM5fhf3mEqP/WaapTQkp0uHeBOrmJW+MuePn+LcQ9QpWhE836SPxMufaPUnYy1brXmL
-         OazQo+UrXtbKvvx0ZYDZiIfBTyteLt3Ezzhz76nN7+eYRk6tHDVnXW7ttVSP77CsNEcQ
-         01ew==
-X-Forwarded-Encrypted: i=1; AJvYcCUFrdNfqvKEpd/YsJcUXTUQzISl62a6MTWIHTKYK57Abgu8KoB8KaIpbWXyF1tWc0I7UW8a11cOJpjbhzwIJRt/l9jT1TE0
-X-Gm-Message-State: AOJu0YyAjO9HLbvO4xTAdxoYXKtJL5NyOmrzBrnJXRDJ3cZcH9upb3lq
-	UE1OnxlfaqhC7BztUActBEhvDVd+tx1OFOXQ0GHAhrAVlM92javpRcI5aCkAbNg=
-X-Google-Smtp-Source: AGHT+IEzV4+qPAdbvBIVSDh25Kg43lXFdrbrVxygpt/spQBQn6auoyHk/Hs/OfBTW0kfE6X67LA+9A==
-X-Received: by 2002:a05:600c:46c4:b0:41f:b0e7:f299 with SMTP id 5b1f17b1804b1-421562cc205mr18573495e9.9.1717590081264;
-        Wed, 05 Jun 2024 05:21:21 -0700 (PDT)
-Received: from brgl-uxlite.home ([2a01:cb1d:75a:e000:d3dd:423:e1eb:d88b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4215813ce64sm19634485e9.44.2024.06.05.05.21.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Jun 2024 05:21:19 -0700 (PDT)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Kalle Valo <kvalo@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Jeff Johnson <jjohnson@kernel.org>
-Cc: linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	ath11k@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	ath12k@lists.infradead.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH v9 2/2] dt-bindings: net: wireless: describe the ath12k PCI module
-Date: Wed,  5 Jun 2024 14:21:05 +0200
-Message-ID: <20240605122106.23818-3-brgl@bgdev.pl>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240605122106.23818-1-brgl@bgdev.pl>
-References: <20240605122106.23818-1-brgl@bgdev.pl>
+	s=arc-20240116; t=1717590149; c=relaxed/simple;
+	bh=8TYpI0Sc6XL37qpMHuVUCVeU0MMlAF5i9HTwI7oGbHk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aHd5+3yCjAO4P2dwtPeVudVyiiZPRPEyT0jonu7t/O5skvEZZ6P9CWPfi4bqsdH9d0R76PrGKR3OfkMLlAX6A9eftlroZlbM79IAOEZTVrMeNUhnj7O1YBkMpnAKkiLtuKIiRp0pEDrPYjB9TWwX96Gom8UfjqxtVkmZ5IfRcZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=DYjqA5Th; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C532C32781;
+	Wed,  5 Jun 2024 12:22:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1717590149;
+	bh=8TYpI0Sc6XL37qpMHuVUCVeU0MMlAF5i9HTwI7oGbHk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DYjqA5Th+RA+f+HXfmD4LmI/DgBE+GFUESMjA8+cmKlO6g9MlxrGiewSKMacJFO4c
+	 kqFM9TCmCzLiZENjVewPgCoVREnBIqfyMFccmFe5ALuluOUoq4Tx4ueydy2FI8IUy5
+	 /bM2VIn5rcNVKI3pl2REybsJHlk6isrHslOGMUgY=
+Date: Wed, 5 Jun 2024 14:22:28 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Jakub Kicinski <kuba@kernel.org>, Jiri Slaby <jirislaby@kernel.org>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	linux-serial@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 net] ptp: ocp: adjust serial port symlink creation
+Message-ID: <2024060551-grazing-handling-e9ed@gregkh>
+References: <2024051046-decimeter-devotee-076a@gregkh>
+ <cf74065c-7b68-48d8-b1af-b18ab413f732@linux.dev>
+ <2024060428-childcare-clunky-067c@gregkh>
+ <d59e00e1-d390-4140-b34f-58eaf13baee7@linux.dev>
+ <2024060505-expose-crouch-00b1@gregkh>
+ <cbcf7cbb-809f-47f8-bd98-e140875bc2d1@linux.dev>
+ <2024060514-recess-unblessed-431c@gregkh>
+ <15f59e29-ac03-4018-bbc3-c4ac5a2964db@linux.dev>
+ <2024060503-subsonic-pupil-bbee@gregkh>
+ <f226b16c-e603-409b-a9a7-f1a201da10a0@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f226b16c-e603-409b-a9a7-f1a201da10a0@linux.dev>
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Wed, Jun 05, 2024 at 12:25:26PM +0100, Vadim Fedorenko wrote:
+> On 05/06/2024 12:07, Greg Kroah-Hartman wrote:
+> > On Wed, Jun 05, 2024 at 11:59:30AM +0100, Vadim Fedorenko wrote:
+> > > On 05/06/2024 11:41, Greg Kroah-Hartman wrote:
+> > > > On Wed, Jun 05, 2024 at 11:14:28AM +0100, Vadim Fedorenko wrote:
+> > > > > On 05/06/2024 11:05, Greg Kroah-Hartman wrote:
+> > > > > > On Wed, Jun 05, 2024 at 12:53:13AM +0100, Vadim Fedorenko wrote:
+> > > > > > > On 04/06/2024 12:50, Greg Kroah-Hartman wrote:
+> > > > > > > > On Wed, May 22, 2024 at 01:39:21PM +0100, Vadim Fedorenko wrote:
+> > > > > > > > > On 10/05/2024 12:13, Greg Kroah-Hartman wrote:
+> > > > > > > > > > On Fri, May 10, 2024 at 11:04:05AM +0000, Vadim Fedorenko wrote:
+> > > > > > > > > > > The commit b286f4e87e32 ("serial: core: Move tty and serdev to be children
+> > > > > > > > > > > of serial core port device") changed the hierarchy of serial port devices
+> > > > > > > > > > > and device_find_child_by_name cannot find ttyS* devices because they are
+> > > > > > > > > > > no longer directly attached. Add some logic to restore symlinks creation
+> > > > > > > > > > > to the driver for OCP TimeCard.
+> > > > > > > > > > > 
+> > > > > > > > > > > Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be children of serial core port device")
+> > > > > > > > > > > Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> > > > > > > > > > > ---
+> > > > > > > > > > > v2:
+> > > > > > > > > > >       add serial/8250 maintainers
+> > > > > > > > > > > ---
+> > > > > > > > > > >       drivers/ptp/ptp_ocp.c | 30 +++++++++++++++++++++---------
+> > > > > > > > > > >       1 file changed, 21 insertions(+), 9 deletions(-)
+> > > > > > > > > > 
+> > > > > > > > > > Hi,
+> > > > > > > > > > 
+> > > > > > > > > > This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
+> > > > > > > > > > a patch that has triggered this response.  He used to manually respond
+> > > > > > > > > > to these common problems, but in order to save his sanity (he kept
+> > > > > > > > > > writing the same thing over and over, yet to different people), I was
+> > > > > > > > > > created.  Hopefully you will not take offence and will fix the problem
+> > > > > > > > > > in your patch and resubmit it so that it can be accepted into the Linux
+> > > > > > > > > > kernel tree.
+> > > > > > > > > > 
+> > > > > > > > > > You are receiving this message because of the following common error(s)
+> > > > > > > > > > as indicated below:
+> > > > > > > > > > 
+> > > > > > > > > > - You have marked a patch with a "Fixes:" tag for a commit that is in an
+> > > > > > > > > >        older released kernel, yet you do not have a cc: stable line in the
+> > > > > > > > > >        signed-off-by area at all, which means that the patch will not be
+> > > > > > > > > >        applied to any older kernel releases.  To properly fix this, please
+> > > > > > > > > >        follow the documented rules in the
+> > > > > > > > > >        Documentation/process/stable-kernel-rules.rst file for how to resolve
+> > > > > > > > > >        this.
+> > > > > > > > > > 
+> > > > > > > > > > If you wish to discuss this problem further, or you have questions about
+> > > > > > > > > > how to resolve this issue, please feel free to respond to this email and
+> > > > > > > > > > Greg will reply once he has dug out from the pending patches received
+> > > > > > > > > > from other developers.
+> > > > > > > > > 
+> > > > > > > > > Hi Greg!
+> > > > > > > > > 
+> > > > > > > > > Just gentle ping, I'm still looking for better solution for serial
+> > > > > > > > > device lookup in TimeCard driver.
+> > > > > > > > 
+> > > > > > > > See my comment on the other patch in this thread.
+> > > > > > > > 
+> > > > > > > > In short, you shouldn't need to do any of this.
+> > > > > > > 
+> > > > > > > Got it, thanks. I'll try to find another way.
+> > > > > > 
+> > > > > > Wait, no, please just remove all that, it should not be needed at all.
+> > > > > 
+> > > > > Do you mean remove symlinks from the driver? We have open-source
+> > > > > user-space software which relies on them to discover proper devices. If
+> > > > > I remove symlinks it will break the software.
+> > > > 
+> > > > the symlinks should be done in userspace in the /dev/serial/ directory,
+> > > > why would userspace need to know the symlink of the serial device in
+> > > > a sysfs tree?  What exactly are you trying to represent here that
+> > > > requires this to be a custom thing?
+> > > 
+> > > Well, the hardware exposes up to 4 different serial ports for different
+> > > functions. And only driver knows which feature is attached to which port
+> > > because of differences in the HW. There is no way for user-space to get
+> > > this information on it's own.
+> > 
+> > The serial ports have a specific parent, why aren't those parents
+> > described differently in userspace?  Why not tell userspace those
+> > functions?
+> 
+> There is only 1 parent for the serial ports - the pci device driven by
+> ptp_ocp. The physical devices behind these serial ports are not able to
+> do proper pci function.
 
-Add device-tree bindings for the ATH12K module found in the WCN7850
-package.
+Then make those "physical devices" on the aux bus, splitting the PCI
+device "apart".  That's what the aux bus is for.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
----
- .../bindings/net/wireless/qcom,ath12k.yaml    | 99 +++++++++++++++++++
- 1 file changed, 99 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom,ath12k.yaml
+> > > And one more thing, some HW versions
+> > > expose special attributes in sysfs consumed by the same software.
+> > > And there are setups with several boards in the system. Currently we
+> > > separate them by providing different sysfs entries only, the software
+> > > then figures all details automatically.
+> > 
+> > Again, export that info to userspace and have it choose, don't create
+> > random symlinks in sysfs for your specific policy, that is not what
+> > sysfs is for at all.
+> 
+> Yes, that's what I'm thinking about now - export serial ports as another
+> attributes of the device.
 
-diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath12k.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k.yaml
-new file mode 100644
-index 000000000000..1b5884015b15
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k.yaml
-@@ -0,0 +1,99 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+# Copyright (c) 2024 Linaro Limited
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/wireless/qcom,ath12k.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Qualcomm Technologies ath12k wireless devices (PCIe)
-+
-+maintainers:
-+  - Jeff Johnson <quic_jjohnson@quicinc.com>
-+  - Kalle Valo <kvalo@kernel.org>
-+
-+description:
-+  Qualcomm Technologies IEEE 802.11be PCIe devices.
-+
-+properties:
-+  compatible:
-+    enum:
-+      - pci17cb,1107  # WCN7850
-+
-+  reg:
-+    maxItems: 1
-+
-+  vddaon-supply:
-+    description: VDD_AON supply regulator handle
-+
-+  vddwlcx-supply:
-+    description: VDD_WLCX supply regulator handle
-+
-+  vddwlmx-supply:
-+    description: VDD_WLMX supply regulator handle
-+
-+  vddrfacmn-supply:
-+    description: VDD_RFA_CMN supply regulator handle
-+
-+  vddrfa0p8-supply:
-+    description: VDD_RFA_0P8 supply regulator handle
-+
-+  vddrfa1p2-supply:
-+    description: VDD_RFA_1P2 supply regulator handle
-+
-+  vddrfa1p8-supply:
-+    description: VDD_RFA_1P8 supply regulator handle
-+
-+  vddpcie0p9-supply:
-+    description: VDD_PCIE_0P9 supply regulator handle
-+
-+  vddpcie1p8-supply:
-+    description: VDD_PCIE_1P8 supply regulator handle
-+
-+required:
-+  - compatible
-+  - reg
-+  - vddaon-supply
-+  - vddwlcx-supply
-+  - vddwlmx-supply
-+  - vddrfacmn-supply
-+  - vddrfa0p8-supply
-+  - vddrfa1p2-supply
-+  - vddrfa1p8-supply
-+  - vddpcie0p9-supply
-+  - vddpcie1p8-supply
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/clock/qcom,rpmh.h>
-+    #include <dt-bindings/gpio/gpio.h>
-+    pcie {
-+        #address-cells = <3>;
-+        #size-cells = <2>;
-+
-+        pcie@0 {
-+            device_type = "pci";
-+            reg = <0x0 0x0 0x0 0x0 0x0>;
-+            #address-cells = <3>;
-+            #size-cells = <2>;
-+            ranges;
-+
-+            bus-range = <0x01 0xff>;
-+
-+            wifi@0 {
-+                compatible = "pci17cb,1107";
-+                reg = <0x10000 0x0 0x0 0x0 0x0>;
-+
-+                vddaon-supply = <&vreg_pmu_aon_0p59>;
-+                vddwlcx-supply = <&vreg_pmu_wlcx_0p8>;
-+                vddwlmx-supply = <&vreg_pmu_wlmx_0p85>;
-+                vddrfacmn-supply = <&vreg_pmu_rfa_cmn>;
-+                vddrfa0p8-supply = <&vreg_pmu_rfa_0p8>;
-+                vddrfa1p2-supply = <&vreg_pmu_rfa_1p2>;
-+                vddrfa1p8-supply = <&vreg_pmu_rfa_1p8>;
-+                vddpcie0p9-supply = <&vreg_pmu_pcie_0p9>;
-+                vddpcie1p8-supply = <&vreg_pmu_pcie_1p8>;
-+            };
-+        };
-+    };
--- 
-2.40.1
+Or use the aux bus :)
 
+thanks,
+
+greg k-h
 
