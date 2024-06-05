@@ -1,92 +1,225 @@
-Return-Path: <netdev+bounces-100986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B06748FCE9F
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:12:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A02EC8FCEC5
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:16:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACEBC1C20FBB
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:12:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26A0C1F2B1D3
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:16:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 242E71BF8E3;
-	Wed,  5 Jun 2024 12:27:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC4C8199380;
+	Wed,  5 Jun 2024 12:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Pek2bJcX"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="APmbBRop"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B4319CD0F;
-	Wed,  5 Jun 2024 12:27:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C82219938D
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 12:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717590470; cv=none; b=giqijUleLTkYrpbXckljNbnpQp/AM7utuZP8xeigBkjff71A0Qz/NSCBYhxetIlXYn2BGNk6ekPrT2rACK2ghJz4FfYTJODL3fZjg75xgIIv8N/B298mKTgXnLwkiGSvhjKSz59snMuXmpml0AkGFI2/9bRfpdo6/Q3pIPMVlQo=
+	t=1717591175; cv=none; b=US7A7dDKM6ltiaoqTxpChNgZRwkO/OtqqDhlmx+m36iYG3H5eu7OwATEiFURwYSx5cffasZhl84xLRAYS7hjpjN+PoNXJPmIZbgMi4n/SWrzncWFxDr5KkwKbiIGeaQzHeysBbUlK47fk662kZdIJ+XtU1LU27rf4olbtPvPvsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717590470; c=relaxed/simple;
-	bh=vAfBbs/RE3A6rRHJDVOYFTEdlEOETIb1vUNfnhuTtSk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e12kXUglU0wvjmRXDmA9/Q7N50AnXdOMKDxCmr7Qd+TsxlwopPPbneoaBg6pJ79+loMDPUj6hLNgZxKZmqA6AAvsHBeGIbIBXFEjLHNy2y4pAkAB6sSyD5yvv6scVe/DPsH+92jC0oWTv8AtjN6BU71p3zjX4SlJPrGu/XscYMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Pek2bJcX; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=f+3E3BzuIwy3nzt7rPCLz2ZJt8+Iri1AkQe8yvM0D7Y=; b=Pek2bJcXAetLeba80NpZqCB3WZ
-	SwAmst1EdTciAd7vJLkCoF5TRBk+/RvfDUnxuI7PxjNmThA/UiaGnff6wEkeJiWfERCvhAWBXG7gh
-	EMnm03V7gsaHnwLGlv+Zc5CT+7XmKgQ2O+pHhe6E026CjZXIvuHEF5Zpyi2x91BLxwz8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sEpjp-00GuN0-Ln; Wed, 05 Jun 2024 14:27:33 +0200
-Date: Wed, 5 Jun 2024 14:27:33 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Diogo Ivo <diogo.ivo@siemens.com>,
-	Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1717591175; c=relaxed/simple;
+	bh=PN3w34drIVFY3EPIMuK3d7MloOEqH6vrNoCXQcodqfw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jyRdSQ1TnGpS9cwa4EejqRKUQnogC1JhR4XubWZW49CML3dL4fo0Duj7oLiE2nXe4765LAP9NIHRz0t7lOd8oa7/ZW/c6T6HzzAbb/1DHZJo0fj4343dBlUccCISVotlqL/lWM8QpkNFVVuQ9XsXn0Y9BVLtPl5ou7cbEyOmK9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=APmbBRop; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4212e341818so50017535e9.2
+        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 05:39:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1717591170; x=1718195970; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AsYvB5nRpR6ZIwbX5ZKQq6PXeotZMnLfWgyw/MJXre0=;
+        b=APmbBRop3ZoA/xyNiNARNuvmlyDAKlSv17U3fbW5Iluy3U1DQVmAuKlnBustljvjsS
+         1JRbEa1eqVEW0zK6dvt01Vt17jKXiYZrMcsJvtOWFKRzOH20i7cHvJie/v2oiyrDEjRz
+         GTBNJ2gGiupuD0AGFOnuCYzK/q8kLKoEVTq6SgK5jQV4SgkhkAyXAQ2qfNh2WzdzGoP0
+         QzKmhti2hOwlGcVMbHtY00RtDuX+Bp9HDZtDPmtyCPHWar/Q1slMm8y7SwEPpjw+gPBg
+         xBpnCl0dwwlV3r8ihyI2PMWWVT9UfmaktiSCgCCRaXu/o4KIB67/t7hTmoo9HJcZ54f7
+         +XKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717591170; x=1718195970;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AsYvB5nRpR6ZIwbX5ZKQq6PXeotZMnLfWgyw/MJXre0=;
+        b=HTO0B8hmFp21T4ZHbNO+zv/RljL7mP+jivw/5mIrhVUlGVeze2zKK+dqGyw14H/S7b
+         dTlla8jx8UYgIoO5d87fab3Ox2gDSS3DCwsla0ggl5dMgvCCIA36arEf1o8g93lyVgVW
+         iWtfzQE/mCk/qFYIPwWvtSDW7hkuR9GjhBrCr8fo6qx3ZRokqPRiDG08dgbCAV8kyjK2
+         +yiSIht9lXVYCTQM9BBQD5iG73NRcjZVi0/X6s2gRCNZ2so9FiOks5nH82Vv6/P8GtVF
+         CuGriWIt7z3JfKyJsmnl1Ix6pkC0ZPnJHnoEE6s7gTq9KHxB2WZRBxbYN+CrCzTrmymh
+         aSjA==
+X-Forwarded-Encrypted: i=1; AJvYcCWFDEflDwFtLfSWJ/pjGoEPkkaOCjkLw7atg0GV4CjlsIqrFYkrwr4HqTkzQH9OH6Gf/hgssxGxyv+tNKyxkRYk7lq7qh39
+X-Gm-Message-State: AOJu0YwKJiUzA3ix3bRItL5z/B4xuFFFyccc4i/h+c5n5JIK1BB76XLg
+	p89/dnYG03g7aOc8H6CaDlTY8zyf10DKbhiVhw31O8avbe2f5iLtjWqC+9Mxy7U=
+X-Google-Smtp-Source: AGHT+IGD/jtVA3Rdnq+bTWW2i+WoMmfuwV5XxVW4+NDqwpMdifM8PtmushixxRUAGEgebmaoZjpfYw==
+X-Received: by 2002:a05:600c:44d4:b0:41f:ed4b:93f9 with SMTP id 5b1f17b1804b1-421562dc3abmr17532165e9.19.1717591170461;
+        Wed, 05 Jun 2024 05:39:30 -0700 (PDT)
+Received: from brgl-uxlite.home ([2a01:cb1d:75a:e000:d3dd:423:e1eb:d88b])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42158148f66sm21992535e9.32.2024.06.05.05.39.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jun 2024 05:39:30 -0700 (PDT)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	kernel test robot <lkp@intel.com>,
-	Thorsten Leemhuis <linux@leemhuis.info>
-Subject: Re: [PATCH net-next] net: ethernet: ti: Makefile: Add icssg_queues.o
- in TI_ICSSG_PRUETH_SR1
-Message-ID: <28803aee-e3fe-4e9d-8410-4ac957d77dd6@lunn.ch>
-References: <20240605035617.2189393-1-danishanwar@ti.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Kalle Valo <kvalo@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Saravana Kannan <saravanak@google.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Abel Vesa <abel.vesa@linaro.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Lukas Wunner <lukas@wunner.de>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	Amit Pundir <amit.pundir@linaro.org>,
+	Xilin Wu <wuxilin123@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-pci@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: [PATCH v9 0/2] pwrseq: introduce the subsystem and first driver
+Date: Wed,  5 Jun 2024 14:38:48 +0200
+Message-ID: <20240605123850.24857-1-brgl@bgdev.pl>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240605035617.2189393-1-danishanwar@ti.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 05, 2024 at 09:26:17AM +0530, MD Danish Anwar wrote:
-> icssg_config.c uses some APIs that are defined in icssg_queue.c.
-> TI_ICSSG_PRUETH_SR1 uses icssg_config.o but not icssg_queues.o as a
-> result the below build error is seen
-> 
-> ERROR: modpost: "icssg_queue_pop"
-> [drivers/net/ethernet/ti/icssg-prueth-sr1.ko] undefined!
-> ERROR: modpost: "icssg_queue_push"
-> [drivers/net/ethernet/ti/icssg-prueth-sr1.ko] undefined!
-> 
-> Fix this by adding icssg_queues.o in TI_ICSSG_PRUETH_SR1
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Please take a look at
-https://patchwork.kernel.org/project/netdevbpf/patch/20240528161603.2443125-1-arnd@kernel.org/
+Hi!
 
+These are the power sequencing patches sent separately after some
+improvements suggested by Bjorn Helgaas. I intend to pick them up into a
+new branch and maintain the subsystem from now on. I then plan to
+provide an immutable tag to the Bluetooth and PCI subsystems so that the
+rest of the C changes can be applied. This new branch will then be
+directly sent to Linus Torvalds for the next merge window.
 
-    Andrew
+Changelog:
 
----
-pw-bot: cr
+Since v8:
+- split the pwrseq patches out into their own series
+- rename incref/decref functions to get/put for consistency
+- fix typos
+- make it very explicit in docs that arrays of targets and units must be
+  NULL-terminated
+- Link to v8: https://lore.kernel.org/r/20240528-pwrseq-v8-0-d354d52b763c@linaro.org
+
+Since v7:
+- added DTS changes for sm8650-hdk
+- added circular dependency detection for pwrseq units
+- fixed a KASAN reported use-after-free error in remove path
+- improve Kconfig descriptions
+- fix typos in bindings and Kconfig
+- fixed issues reported by smatch
+- fix the unbind path in PCI pwrctl
+- lots of minor improvements to the pwrseq core
+
+Since v6:
+- kernel doc fixes
+- drop myself from the DT bindings maintainers list for ath12k
+- wait until the PCI bridge device is fully added before creating the
+  PCI pwrctl platform devices for its sub-nodes, otherwise we may see
+  sysfs and procfs attribute failures (due to duplication, we're
+  basically trying to probe the same device twice at the same time)
+- I kept the regulators for QCA6390's ath11k as required as they only
+  apply to this specific Qualcomm package
+
+Since v5:
+- unify the approach to modelling the WCN WLAN/BT chips by always exposing
+  the PMU node on the device tree and making the WLAN and BT nodes become
+  consumers of its power outputs; this includes a major rework of the DT
+  sources, bindings and driver code; there's no more a separate PCI
+  pwrctl driver for WCN7850, instead its power-up sequence was moved
+  into the pwrseq driver common for all WCN chips
+- don't set load_uA from new regulator consumers
+- fix reported kerneldoc issues
+- drop voltage ranges for PMU outputs from DT
+- many minor tweaks and reworks
+
+v1: Original RFC:
+
+https://lore.kernel.org/lkml/20240104130123.37115-1-brgl@bgdev.pl/T/
+
+v2: First real patch series (should have been PATCH v2) adding what I
+    referred to back then as PCI power sequencing:
+
+https://lore.kernel.org/linux-arm-kernel/2024021413-grumbling-unlivable-c145@gregkh/T/
+
+v3: RFC for the DT representation of the PMU supplying the WLAN and BT
+    modules inside the QCA6391 package (was largely separate from the
+    series but probably should have been called PATCH or RFC v3):
+
+https://lore.kernel.org/all/CAMRc=Mc+GNoi57eTQg71DXkQKjdaoAmCpB=h2ndEpGnmdhVV-Q@mail.gmail.com/T/
+
+v4: Second attempt at the full series with changed scope (introduction of
+    the pwrseq subsystem, should have been RFC v4)
+
+https://lore.kernel.org/lkml/20240201155532.49707-1-brgl@bgdev.pl/T/
+
+v5: Two different ways of handling QCA6390 and WCN7850:
+
+https://lore.kernel.org/lkml/20240216203215.40870-1-brgl@bgdev.pl/
+
+Bartosz Golaszewski (2):
+  power: sequencing: implement the pwrseq core
+  power: pwrseq: add a driver for the PMU module on the QCom WCN
+    chipsets
+
+ MAINTAINERS                                |    8 +
+ drivers/power/Kconfig                      |    1 +
+ drivers/power/Makefile                     |    1 +
+ drivers/power/sequencing/Kconfig           |   29 +
+ drivers/power/sequencing/Makefile          |    6 +
+ drivers/power/sequencing/core.c            | 1105 ++++++++++++++++++++
+ drivers/power/sequencing/pwrseq-qcom-wcn.c |  336 ++++++
+ include/linux/pwrseq/consumer.h            |   56 +
+ include/linux/pwrseq/provider.h            |   75 ++
+ 9 files changed, 1617 insertions(+)
+ create mode 100644 drivers/power/sequencing/Kconfig
+ create mode 100644 drivers/power/sequencing/Makefile
+ create mode 100644 drivers/power/sequencing/core.c
+ create mode 100644 drivers/power/sequencing/pwrseq-qcom-wcn.c
+ create mode 100644 include/linux/pwrseq/consumer.h
+ create mode 100644 include/linux/pwrseq/provider.h
+
+-- 
+2.40.1
+
 
