@@ -1,190 +1,129 @@
-Return-Path: <netdev+bounces-101085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76E3A8FD418
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 19:27:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A2C18FD426
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 19:30:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02DC12824AE
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 17:27:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92771283F60
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 17:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E0513A3E6;
-	Wed,  5 Jun 2024 17:27:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719BC13AA36;
+	Wed,  5 Jun 2024 17:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OghaySav"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RQTXPWP8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3AA113A269
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 17:27:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA35813A86A;
+	Wed,  5 Jun 2024 17:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717608442; cv=none; b=e401B5ebvk8pDBKDSucmbISuwogFNODXxU6d5oUqRSsFlVzEUqNX7bXA1OkiAvzFcq1Ix+dfHdwDCpt5W3P/9gYrBV5KWpAuuiizcUV40rej/9bzkozQlu0gn5gxcJy5bwonr7dP3v8KrehUWUGh1Yo1FSZlITyTa/kjgK33g4Y=
+	t=1717608610; cv=none; b=K9tVw8TPJsweq97YLS/pwgripxTngYqfWe6qx62XK5bzlntUqi3bYLP74Q373O4wQESdxz0cLKiVMbS2p6ek133J4GvYKfNDCseFDrNnM0SkDOn+GCGqUkdRHWUggXjDpRMTwNxyHEBNRR+v5s149aiu3muqbdCt32q461yCPgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717608442; c=relaxed/simple;
-	bh=M60D1163nh1GUy0bZ4UyWiq6zkSS1gd2L/8crmtJR40=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=r71xlmG0ceLkIos5Oh2pm7jFHlFiLPN0fUCJTL/z3nrvfF/nwBC1fgPzj5xvR+a2mFeBf9WOSHZkc0IreX+vyTswAEEN/y2q5Gw3t89Ip9aXHx+89wF/uw+JtjNy7aoKM2PtdEgn50RdrtrFQaZOYglcilCH4HdwxvBpZhgyE6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OghaySav; arc=none smtp.client-ip=209.85.208.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
-Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-57a33a589b3so30370a12.0
-        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 10:27:20 -0700 (PDT)
+	s=arc-20240116; t=1717608610; c=relaxed/simple;
+	bh=TgPRCqa1WrwYIkeTFSrIx3FttbgFYBUrYsECYP8WLWs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Uj5ZcWg34b8l/Pptdyjy3CdM2WjcgXFxEcrRmNuow9CD71zTpWmHCLNqb5W6GPxTd8r7g/upcYV0eLsdb6KVrGNVemWc0eAKtcWNHzpbmkVf7NVVFiBLItzNd8u3R2YLJY/rxaDUvAdtOQeSR0E35YoVzqvRlZurHbJ7iaKIYHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RQTXPWP8; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-6c3b5c5e32cso32183a12.1;
+        Wed, 05 Jun 2024 10:30:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717608439; x=1718213239; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=a9djuyU8XHVzjv14Ti8jF3kGt+mqcvSEVysfl+kKShE=;
-        b=OghaySavfPCMBOhHNSRDzpkGGMnMAl8gLwxHxEjp0FQU2TibwsbjknCrPEBrj9W4WM
-         dEHszr+urrtL5+iJXcjS3ZLH9J86hY2Ab3Zx0znBslolCE9Mdp3CatPeNcgHWk1aNlu8
-         JakulJ7mHBFxcbnbqIX8VEcNefPELVOLt7AAgQG6ybe0GTIIBvw1ogZD5S0d1Wmxve8L
-         rG5um5vwI2EV0/djVlsqNe25uDqo2JHLu4ZGn+Y+Ccm2fflHq5fTj/9uL1HhcIq/VNwb
-         OVJvH4z6NtjSYOu+Sh4B5F28qRtQW4DRew90U9VVmXeqOIRUdjibp+sDio3focRobkbs
-         T6HA==
+        d=gmail.com; s=20230601; t=1717608608; x=1718213408; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=b51xKkNLJiZ1CSUfBqf69L0JrUG70vj/aLl7G7R2QSU=;
+        b=RQTXPWP8eJz6p1kfb89I/QomyP1FiYE0JMc+kS/QMrAaReW0hbDLfIN2cerNn5VyGc
+         JagBQTJPdZm7klNCzNnSMzVB/lwkcwtGmaqieP0Kncejf93HUusLh0va92wF+eRO/HXO
+         iPP7n1KRXzfGPqKjV5Y/PLYwjV/tD1IcL6U96o2NjTTHlJcBJUam6kxOHBUD1huxorMM
+         eZhvtwZZ2K707e4I0vnnwv8p2i2VvSaNo3c/XPLGmIU0ehnFPqHzbw/WFlpvbkVm77Wv
+         9vHZx6qgIaBF/0rnSb6BCr7EKu/IeXjlxx6Z7oqYnUg3Ir/GO/GykqTpgiC2GdwqbUd5
+         1KAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717608439; x=1718213239;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=a9djuyU8XHVzjv14Ti8jF3kGt+mqcvSEVysfl+kKShE=;
-        b=BP/7iuKzL26fB4ErNyO2EaMpS9YSU1CHlcHkZEiNKvT7jqgY6195W//jUDHczgCd6c
-         Ov2J/647mMD8P3X/2PRBCv3nrJuYlX3wzroC+TxJL3UvRh2oPzlf7hT1+z+KxTuFxlPs
-         WszQeCK0FkkU8Fku6JzU9ZHQ9dIDl9GZ0tOWznbzxjLRC5AXsqm61zlwIPbAx8o00rlE
-         NOoU9ypExLbh582Z9AqhIxWeqhjndAvqXyrB8n++QjNxVCAKki5Bdjd/y5RgZWQ+KFHr
-         olmBCBT9tjpt6CQjSQO0mqyohCnh21rlEVUD/1lZGqwq8FrHcADrQnL/s7swqgKh8nhz
-         LI4g==
-X-Forwarded-Encrypted: i=1; AJvYcCXifuNSLpHRYe6w252dmIwiJRI0svhKhj5qAJ6Vz3KivoOdyWpbf7GZjRf+MtV7Z4kcRBDA9KkJHMMxt9nAa2xO4NRNMZjW
-X-Gm-Message-State: AOJu0YxcfEuI2QR9FXtsJOtnAoLxMzvlnZ/Z9vno+AkOD2Ai6b1VHDIB
-	uvkRQLaaiP0SZeb+vs2Kdpa0WaPyQD2rprwVGcXJYwVfVPxcjhdkXFOZ/elMLER0TY5OD9VVxSJ
-	/4A==
-X-Google-Smtp-Source: AGHT+IF4n48l6BP6GkLuLDe8i8RvsCuSkqyur4Lg9eWseWiMAINhk55AV7DnJVNXUFyUZnx5x7+lzAgMzkI=
-X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
- (user=gnoack job=sendgmr) by 2002:a05:6402:3896:b0:572:32de:ac1d with SMTP id
- 4fb4d7f45d1cf-57a8b673ffdmr3753a12.2.1717608438880; Wed, 05 Jun 2024 10:27:18
- -0700 (PDT)
-Date: Wed, 5 Jun 2024 19:27:16 +0200
-In-Reply-To: <3cd4fad8-d72e-87cd-3cf9-2648a770f13c@huawei-partners.com>
+        d=1e100.net; s=20230601; t=1717608608; x=1718213408;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=b51xKkNLJiZ1CSUfBqf69L0JrUG70vj/aLl7G7R2QSU=;
+        b=kFxiybDPDCWWDQr5XPu4a7772KjYs9JLhp9MiWZkM4gCxHPSctCDZvUXXSuM1hJoAJ
+         rsALU2hRBn+Nn06ctvzp9sKY1XHc3qzhD7NLiz0ByBRNpOOd1/Xj0S8qA47LeRiNCC4R
+         3Na6Sm9dpMPId/JytyVB4oIUjyBO7wyynSHCeK8+XNcPnqcSI335I2aDSKCC6Eklhph0
+         pWT2u1Q0kd/dCPRC2fmlHrTtLCa5MIuyB52hEPTB7sgAbM36cs7US11PLXZV3MSp8hmn
+         Vcj2kh81AMJAwnxdhXObCAknFh/t0DDQLV2JM1Qgqq6rQHUImSVDd3H42gO4R0GIl/Vc
+         7aBw==
+X-Forwarded-Encrypted: i=1; AJvYcCXbB/db6w5LO8/t0iavUL2FKL9n5Txndjg45NerLCB6bCb1h3F9MI6jleb76hgxg/x1em4qtwZiV/1ue9WarpHYfn4baAMHhOVH72HYlquDkUJIjjiMGth2ll58m3LbaOHlv+ctEV7QWVCa9j6szQb79JBPy8JobQzA+v3hBP43OUiAlaFlN+81uUZIgeAZhmpwcSPlemH+tRAhJ5MSNGXLe5sl
+X-Gm-Message-State: AOJu0YxSPUjOinwVF2uGxXkC/cn4LnK+y0IVEIxof5HMxWfN907msKPZ
+	5YzsS1N7Wt5X0CAoAylCwAn+ae04Vsn2QZc1FtLxmqQ6OCrfDu5s+AMKwaB4AHLbnqs6tegzvAJ
+	MOQ0stWYXGFQJQoCDjjrsn0+10Ow=
+X-Google-Smtp-Source: AGHT+IE9HyrCbwFsn9zuGO3k2O4Obewg5pVr203HIBzni+5jUKor2tYqsw9lkRRThl2ghl7DFlA0Q8qbCdhIqsgDq4s=
+X-Received: by 2002:a17:90b:1018:b0:2c1:a052:d6b4 with SMTP id
+ 98e67ed59e1d1-2c27db1fc28mr3021809a91.27.1717608607995; Wed, 05 Jun 2024
+ 10:30:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240524093015.2402952-1-ivanov.mikhail1@huawei-partners.com>
- <20240524093015.2402952-3-ivanov.mikhail1@huawei-partners.com>
- <ZlRI-gqDNkYOV_Th@google.com> <3cd4fad8-d72e-87cd-3cf9-2648a770f13c@huawei-partners.com>
-Message-ID: <ZmCf9JVIXmRZrCWk@google.com>
-Subject: Re: [RFC PATCH v2 02/12] landlock: Add hook on socket creation
-From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+References: <20240605-tcp_ao-tracepoints-v2-0-e91e161282ef@gmail.com>
+ <20240605-tcp_ao-tracepoints-v2-1-e91e161282ef@gmail.com> <20240605044441.GA3452034@maili.marvell.com>
+In-Reply-To: <20240605044441.GA3452034@maili.marvell.com>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Wed, 5 Jun 2024 18:29:56 +0100
+Message-ID: <CAJwJo6YT6-jpomSAjs-1kwRNRQWkAYnPHDxoZF--vQxTpg2b2Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/6] net/tcp: Use static_branch_tcp_{md5,ao}
+ to drop ifdefs
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Mohammad Nassiri <mnassiri@ciena.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello!
+On Wed, 5 Jun 2024 at 05:50, Ratheesh Kannoth <rkannoth@marvell.com> wrote:
+>
+> On 2024-06-05 at 07:50:02, Dmitry Safonov via B4 Relay (devnull+0x7f454c46.gmail.com@kernel.org) wrote:
+> > From: Dmitry Safonov <0x7f454c46@gmail.com>
+> >
+> > It's possible to clean-up some ifdefs by hiding that
+> > tcp_{md5,ao}_needed static branch is defined and compiled only
+> > under related configs, since commit 4c8530dc7d7d ("net/tcp: Only produce
+> > AO/MD5 logs if there are any keys").
+> >
+> > Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
+> > ---
+> >  include/net/tcp.h   | 14 ++++----------
+> >  net/ipv4/tcp_ipv4.c |  8 ++------
+> >  2 files changed, 6 insertions(+), 16 deletions(-)
+> >
+> > diff --git a/include/net/tcp.h b/include/net/tcp.h
+> > index 08c3b99501cf..f6dd035e0fa9 100644
+> > --- a/include/net/tcp.h
+> > +++ b/include/net/tcp.h
+> > @@ -2386,21 +2386,15 @@ static inline void tcp_get_current_key(const struct sock *sk,
+> >
+> >  static inline bool tcp_key_is_md5(const struct tcp_key *key)
+> >  {
+> > -#ifdef CONFIG_TCP_MD5SIG
+> > -     if (static_branch_unlikely(&tcp_md5_needed.key) &&
+> > -         key->type == TCP_KEY_MD5)
+> > -             return true;
+> > -#endif
+> > +     if (static_branch_tcp_md5())
+> Seems that we lost unlikely hint. Dont we add that as well-> unlikely()
 
-On Thu, May 30, 2024 at 03:20:21PM +0300, Mikhail Ivanov wrote:
-> 5/27/2024 11:48 AM, G=C3=BCnther Noack wrote:
-> > On Fri, May 24, 2024 at 05:30:05PM +0800, Mikhail Ivanov wrote:
-> > > Add hook to security_socket_post_create(), which checks whether the s=
-ocket
-> > > type and family are allowed by domain. Hook is called after initializ=
-ing
-> > > the socket in the network stack to not wrongfully return EACCES for a
-> > > family-type pair, which is considered invalid by the protocol.
-> > >=20
-> > > Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-> >=20
-> > ## Some observations that *do not* need to be addressed in this commit,=
- IMHO:
-> >=20
-> > get_raw_handled_socket_accesses, get_current_socket_domain and
-> > current_check_access_socket are based on the similarly-named functions =
-from
-> > net.c (and fs.c), and it makes sense to stay consistent with these.
-> >=20
-> > There are some possible refactorings that could maybe be applied to tha=
-t code,
-> > but given that the same ones would apply to net.c as well, it's probabl=
-y best to
-> > address these separately.
-> >=20
-> >    * Should get_raw_handled_socket_accesses be inlined
-> It's a fairly simple and compact function, so compiler should inline it
-> without any problems. Micka=C3=ABl was against optional inlines [1].
->=20
-> [1] https://lore.kernel.org/linux-security-module/5c6c99f7-4218-1f79-477e=
--5d943c9809fd@digikod.net/
+Please, check the definition of static_branch_tcp_md5().
+This doesn't have any functional changes but hides ifdefs in
+the definition.
 
-Sorry for the confusion -- what I meant was not "should we add the inline
-keyword", but I meant "should we remove that function and place its
-implementation in the place where we are currently calling it"?
-
-
-> >    * Does the WARN_ON_ONCE(dom->num_layers < 1) check have the right re=
-turn code?
->=20
-> Looks like a rudimental check. `dom` is always NULL when `num_layers`< 1
-> (see get_*_domain functions).
-
-What I found irritating about it is that with 0 layers (=3D no Landlock pol=
-icy was
-ever enabled), you would logically assume that we return a success?  But th=
-en I
-realized that this code was copied verbatim from other places in fs.c and n=
-et.c,
-and it is actually checking for an internal inconsistency that is never sup=
-posed
-to happen.  If we were to actually hit that case at some point, we have pro=
-bably
-stumbled over our own feet and it might be better to not permit anything.
-
-
-> >    * Can we refactor out commonalities (probably not worth it right now=
- though)?
->=20
-> I had a few ideas about refactoring commonalities, as currently landlock
-> has several repetitive patterns in the code. But solution requires a
-> good design and a separate patch. Probably it's worth opening an issue
-> on github. WDYT?
-
-Absolutely, please do open one.  In my mind, patches in C which might not g=
-et
-accepted are an expensive way to iterate on such ideas, and it might make s=
-ense
-to collect some refactoring approaches on a bug or the mailing list before
-jumping into the implementation.
-
-(You might want to keep an eye on https://github.com/landlock-lsm/linux/iss=
-ues/1
-as well, which is about some ideas to refactor Landlock's internal data
-structures.)
-
-
-> > ## The only actionable feedback that I have that is specific to this co=
-mmit is:
-> >=20
-> > In the past, we have introduced new (non-test) Landlock functionality i=
-n a
-> > single commit -- that way, we have no "loose ends" in the code between =
-these two
-> > commits, and that simplifies it for people who want to patch your featu=
-re onto
-> > other kernel trees.  (e.g. I think we should maybe merge commit 01/12 a=
-nd 02/12
-> > into a single commit.)  WDYT?
->=20
-> Yeah, this two should be merged and tests commits as well. I just wanted
-> to do this in one of the latest patch versions to simplify code review.
-
-That sounds good, thanks!
-
-=E2=80=94G=C3=BCnther
+Thanks,
+             Dmitry
 
