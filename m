@@ -1,379 +1,556 @@
-Return-Path: <netdev+bounces-101008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD0258FCF4E
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:31:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 612978FCF7A
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 15:36:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2EBF1C23A86
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:31:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06392B28A14
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6899195B15;
-	Wed,  5 Jun 2024 12:56:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3566819414A;
+	Wed,  5 Jun 2024 13:02:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="IdXFpUBn"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="EFpxg2sq";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pepBbe65"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6825E19309E;
-	Wed,  5 Jun 2024 12:56:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011F41E89C;
+	Wed,  5 Jun 2024 13:02:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717592197; cv=none; b=KpCHLvqfnJNsorbCiXeux9wVfIwbOA/hYxS2Z5GeGTzE8RFCuW8VSyiHDEEVrfQ5RONfvWYm1V5pR3NmkZo4Dep0KpYbjfdfoKg4ol1GEUKdBD9QqZRUnbza1TyXWuXVlaTgmL2DhioaVP/ndSawpw2kqBwfCQttHfyhTXjEzCY=
+	t=1717592571; cv=none; b=HvCj4vg8tGRu+mn4SxCqrvoPKZEuPtHNgzYvi4IRE0o2TeQeFmnzalPeHvYibmr9CVLC9OqAt4DGpGkMj3hlKksDDoy4vK53C3Htww+zBjbsK9SC1W6PpkkCT5iTBDlzdxYy7Vd25J7si0M3tQVka9iJUMeVIDL4ZHNvbAdV3wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717592197; c=relaxed/simple;
-	bh=qGM5ZUeTkKUKvYat0NvVfuWmfxXAzgAZS8f3k//PF0g=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=BwKV5te0RTrbTRUkmiKocp8NyVA4bBaOcQkL97H4tyXGUTF1x6HVvJmK/J1dGPVKCSjcaWnqC1u8KXM2ld9mB94MWp6CsNeomuWbHUAl3sqL71map22lXL8VRXBw2jZ4ehdiBvZI38zcnAxesHaN2OdlrOA17Gn7yhQSplzdsZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=IdXFpUBn; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1717592187; h=From:To:Subject:Date:Message-Id;
-	bh=+D++LLxYuPWxjq7RYug+cI/d4/wX6eRFJ4wJchbjINk=;
-	b=IdXFpUBntwzrkAA2kKAm7mZmfJEL1L4l3oF1/ciFnEszXEGTDNHmdV0kQrLM+0oUQ+qgLvBWOcUkLF/3Nx/iExVA5hXLLGoDf6lXBlyx++3L+mSlfxFKAJI/6cD7+N3AmMVFfrJEr5N9jX0j+CgYVn+8hx0wpMsEMbxuqBPDW6g=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R231e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045046011;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W7vCi8t_1717592186;
-Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W7vCi8t_1717592186)
-          by smtp.aliyun-inc.com;
-          Wed, 05 Jun 2024 20:56:26 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-To: kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	wintera@linux.ibm.com,
-	guwen@linux.alibaba.com
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	tonylu@linux.alibaba.com,
-	pabeni@redhat.com,
-	edumazet@google.com
-Subject: [PATCH net-next v6 3/3] net/smc: Introduce IPPROTO_SMC
-Date: Wed,  5 Jun 2024 20:56:20 +0800
-Message-Id: <1717592180-66181-4-git-send-email-alibuda@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1717592180-66181-1-git-send-email-alibuda@linux.alibaba.com>
-References: <1717592180-66181-1-git-send-email-alibuda@linux.alibaba.com>
+	s=arc-20240116; t=1717592571; c=relaxed/simple;
+	bh=AsQ5dSTQksgTT8gijrM3vyVSHRh/Oa8eI/Z5hUKOQHg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=mEBF5ddW3ZQJfGf6Puceothvv7BQB9MkkOwh05QrQqvh4zI9r1ZJFlRaAW3PE9wa02xCAwYpaaO0LZKJen5oBz3Ir41N6fyAOos2Hv9RLN11n41Yf/ycsqvla/gPOQb6gQCAZjDMj1EuFmAC/uwaY2sww6c4QvmTR8nR6WCW9+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=EFpxg2sq; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pepBbe65; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1717592566;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NYSaBAIFrJaUpsP5G20xJAbfQKX5Ug/3BATokkBagWs=;
+	b=EFpxg2sqDdk79reB/xDRTChM+84kQ8jE2WgnfqFl71p45vQdEyBMWxbz4zC0m72HxP4atu
+	Ato9XvVbGlbyyNxbTRgKUTsVUZMtjomB0AFN4UdQhRwdCi0MxMYKfcKiF9oAGb+AnghN0B
+	+hwmEEJL+ietaLxoGc6GO1cibZn8ih8WQ0E66YHJrPxmf8IDKorgooztLrjL7XRJXKytx/
+	ctLi8yx4MVpIHfT3tDFmG2Drc82Sy2wJaqoJIKvEVAnfyW1RSZUb8PWwokcMJG7Vt0Dd+x
+	VrLLjrXRgU2G2uVij2hL9TFbVi6uMlZohmzAwfxmx2SLFrfIzntWWwgfjpWcKQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1717592566;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NYSaBAIFrJaUpsP5G20xJAbfQKX5Ug/3BATokkBagWs=;
+	b=pepBbe65/2QQTUlT2N49TJnBOuvfEoYX6Ff9Ad1bwrvD+aSjHP5vB6e1JnDq3OMk3lErJD
+	3A4lCFK6aLCMEbBw==
+To: Herve Codina <herve.codina@bootlin.com>, Simon Horman
+ <horms@kernel.org>, Sai Krishna Gajula <saikrishnag@marvell.com>, Herve
+ Codina <herve.codina@bootlin.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Lee Jones <lee@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Saravana Kannan <saravanak@google.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>, Lars
+ Povlsen <lars.povlsen@microchip.com>, Steen Hegelund
+ <Steen.Hegelund@microchip.com>, Daniel Machon
+ <daniel.machon@microchip.com>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>
+Cc: linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Allan Nielsen
+ <allan.nielsen@microchip.com>, Steen Hegelund
+ <steen.hegelund@microchip.com>, Luca Ceresoli <luca.ceresoli@bootlin.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 10/19] irqdomain: Introduce irq_domain_alloc() and
+ irq_domain_publish()
+In-Reply-To: <20240527161450.326615-11-herve.codina@bootlin.com>
+References: <20240527161450.326615-1-herve.codina@bootlin.com>
+ <20240527161450.326615-11-herve.codina@bootlin.com>
+Date: Wed, 05 Jun 2024 15:02:46 +0200
+Message-ID: <8734pr5yq1.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain
 
-From: "D. Wythe" <alibuda@linux.alibaba.com>
+On Mon, May 27 2024 at 18:14, Herve Codina wrote:
+> The irq_domain_add_*() family functions create an irq_domain and also
+> publish this newly created to domain. Once an irq_domain is published,
+> consumers can request IRQ in order to use them.
+>
+> Some interrupt controller drivers have to perform some more operations
+> with the created irq_domain in order to have it ready to be used.
+> For instance:
+>   - Allocate generic irq chips with irq_alloc_domain_generic_chips()
+>   - Retrieve the generic irq chips with irq_get_domain_generic_chip()
+>   - Initialize retrieved chips: set register base address and offsets,
+>     set several hooks such as irq_mask, irq_unmask, ...
+>
+> To avoid a window where the domain is published but not yet ready to be
 
-This patch allows to create smc socket via AF_INET,
-similar to the following code,
+I can see the point, but why is this suddenly a problem? There are tons
+of interrupt chip drivers which have exactly that pattern.
 
-/* create v4 smc sock */
-v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
+Also why is all of this burried in a series which aims to add a network
+driver and touches the world and some more. If you had sent the two irq
+domain patches seperately w/o spamming 100 people on CC then this would
+have been solved long ago. That's documented clearly, no?
 
-/* create v6 smc sock */
-v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
+>  void irq_domain_free_fwnode(struct fwnode_handle *fwnode);
+> +struct irq_domain *irq_domain_alloc(struct fwnode_handle *fwnode, unsigned int size,
+> +				    irq_hw_number_t hwirq_max, int direct_max,
+> +				    const struct irq_domain_ops *ops,
+> +				    void *host_data);
+> +
+> +static inline struct irq_domain *irq_domain_alloc_linear(struct fwnode_handle *fwnode,
+> +							 unsigned int size,
+> +							 const struct irq_domain_ops *ops,
+> +							 void *host_data)
+> +{
+> +	return irq_domain_alloc(fwnode, size, size, 0, ops, host_data);
+> +}
 
-There are several reasons why we believe it is appropriate here:
+So this creates exactly one wrapper, which means we'll grow another ton
+of wrappers if that becomes popular for whatever reason. We have already
+too many of variants for creating domains.
 
-1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
-address. There is no AF_SMC address at all.
+But what's worse is that this does not work for hierarchical domains and
+is just an ad hoc scratch my itch solution.
 
-2. Create smc socket in the AF_INET(6) path, which allows us to reuse
-the infrastructure of AF_INET(6) path, such as common ebpf hooks.
-Otherwise, smc have to implement it again in AF_SMC path.
+Also looking at the irq chip drivers which use generic interrupt
+chips. There are 24 instances of irq_alloc_domain_generic_chips() and
+most of this code is just boilerplate.
 
-Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-Tested-by: Niklas Schnelle <schnelle@linux.ibm.com>
+So what we really want is a proper solution to get rid of this mess
+instead of creating interfaces which just proliferate and extend it.
+
+Something like the uncompiled below allows to convert all the
+boilerplate into a template based setup/remove.
+
+I just converted a random driver over to it and the result is pretty
+neutral in terms of lines, but the amount of code to get wrong is
+significantly smaller. I'm sure that more complex drivers will benefit
+even more and your problem should be completely solved by that.
+
+The below is just an initial sketch which allows further consolidation
+in the irqdomain space. You get the idea.
+
+Thanks,
+
+        tglx
 ---
- include/uapi/linux/in.h |   2 +
- net/smc/Makefile        |   2 +-
- net/smc/af_smc.c        |  16 ++++-
- net/smc/smc_inet.c      | 169 ++++++++++++++++++++++++++++++++++++++++++++++++
- net/smc/smc_inet.h      |  22 +++++++
- 5 files changed, 208 insertions(+), 3 deletions(-)
- create mode 100644 net/smc/smc_inet.c
- create mode 100644 net/smc/smc_inet.h
-
-diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
-index e682ab6..0c6322b 100644
---- a/include/uapi/linux/in.h
-+++ b/include/uapi/linux/in.h
-@@ -83,6 +83,8 @@ enum {
- #define IPPROTO_RAW		IPPROTO_RAW
-   IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
- #define IPPROTO_MPTCP		IPPROTO_MPTCP
-+  IPPROTO_SMC = 263,		/* Shared Memory Communications		*/
-+#define IPPROTO_SMC		IPPROTO_SMC
-   IPPROTO_MAX
+--- a/include/linux/irq.h
++++ b/include/linux/irq.h
+@@ -1106,6 +1106,7 @@ enum irq_gc_flags {
+  * @irq_flags_to_set:	IRQ* flags to set on irq setup
+  * @irq_flags_to_clear:	IRQ* flags to clear on irq setup
+  * @gc_flags:		Generic chip specific setup flags
++ * FIXME
+  * @gc:			Array of pointers to generic interrupt chips
+  */
+ struct irq_domain_chip_generic {
+@@ -1114,9 +1115,26 @@ struct irq_domain_chip_generic {
+ 	unsigned int		irq_flags_to_clear;
+ 	unsigned int		irq_flags_to_set;
+ 	enum irq_gc_flags	gc_flags;
++	void			(*destroy)(struct irq_chip_generic *c);
+ 	struct irq_chip_generic	*gc[];
  };
- #endif
-diff --git a/net/smc/Makefile b/net/smc/Makefile
-index 2c510d54..60f1c87 100644
---- a/net/smc/Makefile
-+++ b/net/smc/Makefile
-@@ -4,6 +4,6 @@ obj-$(CONFIG_SMC)	+= smc.o
- obj-$(CONFIG_SMC_DIAG)	+= smc_diag.o
- smc-y := af_smc.o smc_pnet.o smc_ib.o smc_clc.o smc_core.o smc_wr.o smc_llc.o
- smc-y += smc_cdc.o smc_tx.o smc_rx.o smc_close.o smc_ism.o smc_netlink.o smc_stats.o
--smc-y += smc_tracepoint.o
-+smc-y += smc_tracepoint.o smc_inet.o
- smc-$(CONFIG_SYSCTL) += smc_sysctl.o
- smc-$(CONFIG_SMC_LO) += smc_loopback.o
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 8e3ce76..743c27e 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -54,6 +54,7 @@
- #include "smc_tracepoint.h"
- #include "smc_sysctl.h"
- #include "smc_loopback.h"
-+#include "smc_inet.h"
  
- static DEFINE_MUTEX(smc_server_lgr_pending);	/* serialize link group
- 						 * creation on server
-@@ -3593,10 +3594,15 @@ static int __init smc_init(void)
- 		pr_err("%s: tcp_ulp_register fails with %d\n", __func__, rc);
- 		goto out_lo;
++/**
++ * irq_domain_chip_generic_info - Init structure
++ * FIXME
++ */
++struct irq_domain_chip_generic_info {
++	const char		*name;
++	irq_flow_handler_t	handler;
++	void			(*init)(struct irq_chip_generic *d);
++	void			(*destroy)(struct irq_chip_generic *c);
++	unsigned int		irqs_per_chip;
++	unsigned int		num_chips;
++	unsigned int		irq_flags_to_clear;
++	unsigned int		irq_flags_to_set;
++	enum irq_gc_flags	gc_flags;
++};
++
+ /* Generic chip callback functions */
+ void irq_gc_noop(struct irq_data *d);
+ void irq_gc_mask_disable_reg(struct irq_data *d);
+@@ -1153,6 +1171,9 @@ int devm_irq_setup_generic_chip(struct d
+ 
+ struct irq_chip_generic *irq_get_domain_generic_chip(struct irq_domain *d, unsigned int hw_irq);
+ 
++int irq_domain_alloc_generic_chips(struct irq_domain *d, struct irq_domain_chip_generic_info *info);
++void irq_domain_remove_generic_chips(struct irq_domain *d);
++
+ int __irq_alloc_domain_generic_chips(struct irq_domain *d, int irqs_per_chip,
+ 				     int num_ct, const char *name,
+ 				     irq_flow_handler_t handler,
+--- a/include/linux/irqdomain.h
++++ b/include/linux/irqdomain.h
+@@ -41,13 +41,13 @@ struct device_node;
+ struct fwnode_handle;
+ struct irq_domain;
+ struct irq_chip;
++struct irq_chip_generic;
+ struct irq_data;
+ struct irq_desc;
+ struct cpumask;
+ struct seq_file;
+ struct irq_affinity_desc;
+ struct msi_parent_ops;
+-
+ #define IRQ_DOMAIN_IRQ_SPEC_PARAMS 16
+ 
+ /**
+@@ -169,6 +169,7 @@ struct irq_domain {
+ #ifdef CONFIG_GENERIC_MSI_IRQ
+ 	const struct msi_parent_ops	*msi_parent_ops;
+ #endif
++	void				(*destroy)(struct irq_domain *d);
+ 
+ 	/* reverse map data. The linear map gets appended to the irq_domain */
+ 	irq_hw_number_t			hwirq_max;
+@@ -208,6 +209,9 @@ enum {
+ 	/* Irq domain is a MSI device domain */
+ 	IRQ_DOMAIN_FLAG_MSI_DEVICE	= (1 << 9),
+ 
++	/* Irq domain must destroy generic chips when removed */
++	IRQ_DOMAIN_FLAG_DESTROY_GC	= (1 << 10),
++
+ 	/*
+ 	 * Flags starting from IRQ_DOMAIN_FLAG_NONCORE are reserved
+ 	 * for implementation specific purposes and ignored by the
+@@ -257,6 +261,28 @@ static inline struct fwnode_handle *irq_
+ }
+ 
+ void irq_domain_free_fwnode(struct fwnode_handle *fwnode);
++
++struct irq_domain_chip_generic_info;
++
++/**
++ * irq_domain_info - Init structure
++ * FIXME
++ */
++struct irq_domain_info {
++	struct fwnode_handle			*fwnode;
++	unsigned int				domain_flags;
++	unsigned int				size;
++	irq_hw_number_t				hwirq_max;
++	int					direct_max;
++	enum irq_domain_bus_token		bus_token;
++	const struct irq_domain_ops		*ops;
++	void					*host_data;
++	struct irq_domain_chip_generic_info	*gc_info;
++	void					(*init)(struct irq_domain *d);
++};
++
++struct irq_domain *irq_domain_instantiate(struct irq_domain_info *info);
++
+ struct irq_domain *__irq_domain_add(struct fwnode_handle *fwnode, unsigned int size,
+ 				    irq_hw_number_t hwirq_max, int direct_max,
+ 				    const struct irq_domain_ops *ops,
+--- a/kernel/irq/generic-chip.c
++++ b/kernel/irq/generic-chip.c
+@@ -274,23 +274,11 @@ irq_gc_init_mask_cache(struct irq_chip_g
+ 			*mskptr = irq_reg_readl(gc, mskreg);
  	}
+ }
 -
-+	rc = smc_inet_init();
-+	if (rc) {
-+		pr_err("%s: smc_inet_init fails with %d\n", __func__, rc);
-+		goto out_ulp;
-+	}
- 	static_branch_enable(&tcp_have_smc);
- 	return 0;
--
-+out_ulp:
-+	tcp_unregister_ulp(&smc_ulp_ops);
- out_lo:
- 	smc_loopback_exit();
- out_ib:
-@@ -3633,6 +3639,7 @@ static int __init smc_init(void)
- static void __exit smc_exit(void)
+ /**
+- * __irq_alloc_domain_generic_chips - Allocate generic chips for an irq domain
+- * @d:			irq domain for which to allocate chips
+- * @irqs_per_chip:	Number of interrupts each chip handles (max 32)
+- * @num_ct:		Number of irq_chip_type instances associated with this
+- * @name:		Name of the irq chip
+- * @handler:		Default flow handler associated with these chips
+- * @clr:		IRQ_* bits to clear in the mapping function
+- * @set:		IRQ_* bits to set in the mapping function
+- * @gcflags:		Generic chip specific setup flags
++ * irq_domain_alloc_generic_chips - Allocate generic chips for an irq domain
++ * FIXME
+  */
+-int __irq_alloc_domain_generic_chips(struct irq_domain *d, int irqs_per_chip,
+-				     int num_ct, const char *name,
+-				     irq_flow_handler_t handler,
+-				     unsigned int clr, unsigned int set,
+-				     enum irq_gc_flags gcflags)
++int irq_domain_alloc_generic_chips(struct irq_domain *d, struct irq_domain_chip_generic_info *info)
  {
- 	static_branch_disable(&tcp_have_smc);
-+	smc_inet_exit();
- 	tcp_unregister_ulp(&smc_ulp_ops);
- 	sock_unregister(PF_SMC);
- 	smc_core_exit();
-@@ -3660,4 +3667,9 @@ static void __exit smc_exit(void)
- MODULE_LICENSE("GPL");
- MODULE_ALIAS_NETPROTO(PF_SMC);
- MODULE_ALIAS_TCP_ULP("smc");
-+/* 263 for IPPROTO_SMC and 1 for SOCK_STREAM */
-+MODULE_ALIAS_NET_PF_PROTO_TYPE(PF_INET, 263, 1);
-+#if IS_ENABLED(CONFIG_IPV6)
-+MODULE_ALIAS_NET_PF_PROTO_TYPE(PF_INET6, 263, 1);
-+#endif /* CONFIG_IPV6 */
- MODULE_ALIAS_GENL_FAMILY(SMC_GENL_FAMILY_NAME);
-diff --git a/net/smc/smc_inet.c b/net/smc/smc_inet.c
-new file mode 100644
-index 00000000..bca57ae
---- /dev/null
-+++ b/net/smc/smc_inet.c
-@@ -0,0 +1,169 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ *  Shared Memory Communications over RDMA (SMC-R) and RoCE
-+ *
-+ *  Definitions for the IPPROTO_SMC (socket related)
-+ *
-+ *  Copyright IBM Corp. 2016, 2018
-+ *  Copyright (c) 2024, Alibaba Inc.
-+ *
-+ *  Author: D. Wythe <alibuda@linux.alibaba.com>
+ 	struct irq_domain_chip_generic *dgc;
+ 	struct irq_chip_generic *gc;
+@@ -304,23 +292,24 @@ int __irq_alloc_domain_generic_chips(str
+ 	if (d->gc)
+ 		return -EBUSY;
+ 
+-	numchips = DIV_ROUND_UP(d->revmap_size, irqs_per_chip);
++	numchips = DIV_ROUND_UP(d->revmap_size, info->irqs_per_chip);
+ 	if (!numchips)
+ 		return -EINVAL;
+ 
+ 	/* Allocate a pointer, generic chip and chiptypes for each chip */
+-	gc_sz = struct_size(gc, chip_types, num_ct);
++	gc_sz = struct_size(gc, chip_types, info->num_ct);
+ 	dgc_sz = struct_size(dgc, gc, numchips);
+ 	sz = dgc_sz + numchips * gc_sz;
+ 
+ 	tmp = dgc = kzalloc(sz, GFP_KERNEL);
+ 	if (!dgc)
+ 		return -ENOMEM;
+-	dgc->irqs_per_chip = irqs_per_chip;
++	dgc->irqs_per_chip = info->irqs_per_chip;
+ 	dgc->num_chips = numchips;
+-	dgc->irq_flags_to_set = set;
+-	dgc->irq_flags_to_clear = clr;
+-	dgc->gc_flags = gcflags;
++	dgc->irq_flags_to_set = info->irq_flags_to_set;
++	dgc->irq_flags_to_clear = info->irq_flags_to_clear;
++	dgc->gc_flags = info->gcflags;
++	dgc->destroy = info->destroy;
+ 	d->gc = dgc;
+ 
+ 	/* Calc pointer to the first generic chip */
+@@ -337,6 +326,9 @@ int __irq_alloc_domain_generic_chips(str
+ 			gc->reg_writel = &irq_writel_be;
+ 		}
+ 
++		if (info->init)
++			info->init(gc);
++
+ 		raw_spin_lock_irqsave(&gc_lock, flags);
+ 		list_add_tail(&gc->list, &gc_list);
+ 		raw_spin_unlock_irqrestore(&gc_lock, flags);
+@@ -345,6 +337,56 @@ int __irq_alloc_domain_generic_chips(str
+ 	}
+ 	return 0;
+ }
++
++/**
++ * irq_domain_remove_generic_chips - Remove generic chips from an interrupt domain
++ * FIXME
 + */
-+
-+#include <net/protocol.h>
-+#include <net/sock.h>
-+
-+#include "smc_inet.h"
-+#include "smc.h"
-+
-+static struct proto smc_inet_prot;
-+static const struct proto_ops smc_inet_stream_ops;
-+static struct inet_protosw smc_inet_protosw;
-+
-+#if IS_ENABLED(CONFIG_IPV6)
-+static struct proto smc_inet6_prot;
-+static const struct proto_ops smc_inet6_stream_ops;
-+static struct inet_protosw smc_inet6_protosw;
-+#endif /* CONFIG_IPV6 */
-+
-+static int smc_inet_init_sock(struct sock *sk);
-+
-+static struct proto smc_inet_prot = {
-+	.name		= "INET_SMC",
-+	.owner		= THIS_MODULE,
-+	.init		= smc_inet_init_sock,
-+	.hash		= smc_hash_sk,
-+	.unhash		= smc_unhash_sk,
-+	.release_cb	= smc_release_cb,
-+	.obj_size	= sizeof(struct smc_sock),
-+	.h.smc_hash	= &smc_v4_hashinfo,
-+	.slab_flags	= SLAB_TYPESAFE_BY_RCU,
-+};
-+
-+static const struct proto_ops smc_inet_stream_ops = {
-+	.family		= PF_INET,
-+	.owner		= THIS_MODULE,
-+	.release	= smc_release,
-+	.bind		= smc_bind,
-+	.connect	= smc_connect,
-+	.socketpair	= sock_no_socketpair,
-+	.accept		= smc_accept,
-+	.getname	= smc_getname,
-+	.poll		= smc_poll,
-+	.ioctl		= smc_ioctl,
-+	.listen		= smc_listen,
-+	.shutdown	= smc_shutdown,
-+	.setsockopt	= smc_setsockopt,
-+	.getsockopt	= smc_getsockopt,
-+	.sendmsg	= smc_sendmsg,
-+	.recvmsg	= smc_recvmsg,
-+	.mmap		= sock_no_mmap,
-+	.splice_read	= smc_splice_read,
-+};
-+
-+static struct inet_protosw smc_inet_protosw = {
-+	.type		= SOCK_STREAM,
-+	.protocol	= IPPROTO_SMC,
-+	.prot		= &smc_inet_prot,
-+	.ops		= &smc_inet_stream_ops,
-+	.flags		= INET_PROTOSW_ICSK,
-+};
-+
-+#if IS_ENABLED(CONFIG_IPV6)
-+static struct proto smc_inet6_prot = {
-+	.name		= "INET6_SMC",
-+	.owner		= THIS_MODULE,
-+	.init		= smc_inet_init_sock,
-+	.hash		= smc_hash_sk,
-+	.unhash		= smc_unhash_sk,
-+	.release_cb	= smc_release_cb,
-+	.obj_size	= sizeof(struct smc_sock),
-+	.h.smc_hash	= &smc_v6_hashinfo,
-+	.slab_flags	= SLAB_TYPESAFE_BY_RCU,
-+};
-+
-+static const struct proto_ops smc_inet6_stream_ops = {
-+	.family		= PF_INET6,
-+	.owner		= THIS_MODULE,
-+	.release	= smc_release,
-+	.bind		= smc_bind,
-+	.connect	= smc_connect,
-+	.socketpair	= sock_no_socketpair,
-+	.accept		= smc_accept,
-+	.getname	= smc_getname,
-+	.poll		= smc_poll,
-+	.ioctl		= smc_ioctl,
-+	.listen		= smc_listen,
-+	.shutdown	= smc_shutdown,
-+	.setsockopt	= smc_setsockopt,
-+	.getsockopt	= smc_getsockopt,
-+	.sendmsg	= smc_sendmsg,
-+	.recvmsg	= smc_recvmsg,
-+	.mmap		= sock_no_mmap,
-+	.splice_read	= smc_splice_read,
-+};
-+
-+static struct inet_protosw smc_inet6_protosw = {
-+	.type		= SOCK_STREAM,
-+	.protocol	= IPPROTO_SMC,
-+	.prot		= &smc_inet6_prot,
-+	.ops		= &smc_inet6_stream_ops,
-+	.flags		= INET_PROTOSW_ICSK,
-+};
-+#endif /* CONFIG_IPV6 */
-+
-+static int smc_inet_init_sock(struct sock *sk)
++void irq_domain_remove_generic_chips(struct irq_domain *d)
 +{
-+	struct net *net = sock_net(sk);
++	struct irq_domain_chip_generic *dgc = d->gc;
++	struct irq_domain_ops *ops = d->ops;
 +
-+	/* init common smc sock */
-+	smc_sk_init(net, sk, IPPROTO_SMC);
-+	/* create clcsock */
-+	return smc_create_clcsk(net, sk, sk->sk_family);
++	if (!dgc)
++		return;
++
++	for (unsigned int i = 0; i < dgc->num_chips, i++) {
++		if (dgc->destroy)
++			dgc->destroy_gc(dgc->gc + i);
++		irq_remove_generic_chip(dgc->gc + i, ~0U, 0, 0);
++	}
++	d->dgc = NULL;
++	kfree(dgc);
 +}
 +
-+int __init smc_inet_init(void)
++/**
++ * __irq_alloc_domain_generic_chips - Allocate generic chips for an irq domain
++ * @d:			irq domain for which to allocate chips
++ * @irqs_per_chip:	Number of interrupts each chip handles (max 32)
++ * @num_ct:		Number of irq_chip_type instances associated with this
++ * @name:		Name of the irq chip
++ * @handler:		Default flow handler associated with these chips
++ * @clr:		IRQ_* bits to clear in the mapping function
++ * @set:		IRQ_* bits to set in the mapping function
++ * @gcflags:		Generic chip specific setup flags
++ */
++int __irq_alloc_domain_generic_chips(struct irq_domain *d, int irqs_per_chip,
++				     int num_ct, const char *name,
++				     irq_flow_handler_t handler,
++				     unsigned int clr, unsigned int set,
++				     enum irq_gc_flags gcflags)
 +{
-+	int rc;
++	struct irq_domain_chip_generic_info info = {
++		.name			= name,
++		.handler		= handler,
++		.irqs_per_chip		= irqs_per_chip,
++		.irq_flags_to_set	= set,
++		.irq_flags_to_clear	= clr,
++		.gc_flags		= gcflags,
++	};
 +
-+	rc = proto_register(&smc_inet_prot, 1);
-+	if (rc) {
-+		pr_err("%s: proto_register smc_inet_prot fails with %d\n",
-+		       __func__, rc);
-+		return rc;
-+	}
-+	/* no return value */
-+	inet_register_protosw(&smc_inet_protosw);
-+
-+#if IS_ENABLED(CONFIG_IPV6)
-+	rc = proto_register(&smc_inet6_prot, 1);
-+	if (rc) {
-+		pr_err("%s: proto_register smc_inet6_prot fails with %d\n",
-+		       __func__, rc);
-+		goto out_inet6_prot;
-+	}
-+	rc = inet6_register_protosw(&smc_inet6_protosw);
-+	if (rc) {
-+		pr_err("%s: inet6_register_protosw smc_inet6_protosw fails with %d\n",
-+		       __func__, rc);
-+		goto out_inet6_protosw;
-+	}
-+	return rc;
-+out_inet6_protosw:
-+	proto_unregister(&smc_inet6_prot);
-+out_inet6_prot:
-+	inet_unregister_protosw(&smc_inet_protosw);
-+	proto_unregister(&smc_inet_prot);
-+#endif /* CONFIG_IPV6 */
-+	return rc;
++	return irq_domain_alloc_generic_chips(d, &info);
++}
+ EXPORT_SYMBOL_GPL(__irq_alloc_domain_generic_chips);
+ 
+ static struct irq_chip_generic *
+--- a/kernel/irq/irqdomain.c
++++ b/kernel/irq/irqdomain.c
+@@ -240,6 +240,47 @@ static void __irq_domain_publish(struct
+ 	pr_debug("Added domain %s\n", domain->name);
+ }
+ 
++static void irq_domain_free(struct irq_domain *domain)
++{
++	fwnode_dev_initialized(domain->fwnode, false);
++	fwnode_handle_put(domain->fwnode);
++	if (domain->flags & IRQ_DOMAIN_NAME_ALLOCATED)
++		kfree(domain->name);
++	kfree(domain);
 +}
 +
-+void smc_inet_exit(void)
++/**
++ * irq_domain_instantiate() - Instantiate a new irq_domain data structure
++ * FIXME
++ */
++struct irq_domain *irq_domain_instantiate(struct irq_domain_info *info)
 +{
-+#if IS_ENABLED(CONFIG_IPV6)
-+	inet6_unregister_protosw(&smc_inet6_protosw);
-+	proto_unregister(&smc_inet6_prot);
-+#endif /* CONFIG_IPV6 */
-+	inet_unregister_protosw(&smc_inet_protosw);
-+	proto_unregister(&smc_inet_prot);
++	struct irq_domain *domain;
++
++	// FIXME: Convert irq_domain_create() to use @info
++	domain = __irq_domain_create(info->fwnode, info->size, info->hwirq_max, info->direct_max,
++				     info->ops, info->host_data);
++	if (!domain)
++		return NULL;
++
++	domain->flags |= info->domain_flags;
++
++	if (info->gc_info) {
++		if (!irq_domain_alloc_generic_chips(domain, info->gc_info)) {
++			irq_domain_remove(domain);
++			return NULL;
++		}
++	}
++	if (info->init)
++		info->init(domain);
++	__irq_domain_publish(domain);
++
++	// FIXME: Make this part of irq_domain_create()
++	if (info->bus_token)
++		irq_domain_update_bus_token(domain, info->bus_token);
++	return domain;
 +}
-diff --git a/net/smc/smc_inet.h b/net/smc/smc_inet.h
-new file mode 100644
-index 00000000..a489c8a
---- /dev/null
-+++ b/net/smc/smc_inet.h
-@@ -0,0 +1,22 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ *  Shared Memory Communications over RDMA (SMC-R) and RoCE
-+ *
-+ *  Definitions for the IPPROTO_SMC (socket related)
 +
-+ *  Copyright IBM Corp. 2016
-+ *  Copyright (c) 2024, Alibaba Inc.
-+ *
-+ *  Author: D. Wythe <alibuda@linux.alibaba.com>
-+ */
-+#ifndef __INET_SMC
-+#define __INET_SMC
+ /**
+  * __irq_domain_add() - Allocate a new irq_domain data structure
+  * @fwnode: firmware node for the interrupt controller
+@@ -279,6 +320,9 @@ EXPORT_SYMBOL_GPL(__irq_domain_add);
+  */
+ void irq_domain_remove(struct irq_domain *domain)
+ {
++	if (domain->destroy)
++		domain->destroy(domain);
 +
-+/* Initialize protocol registration on IPPROTO_SMC,
-+ * @return 0 on success
-+ */
-+int smc_inet_init(void);
+ 	mutex_lock(&irq_domain_mutex);
+ 	debugfs_remove_domain_dir(domain);
+ 
+@@ -294,13 +338,11 @@ void irq_domain_remove(struct irq_domain
+ 
+ 	mutex_unlock(&irq_domain_mutex);
+ 
+-	pr_debug("Removed domain %s\n", domain->name);
++	if (domain->flags & IRQ_DOMAIN_FLAG_DESTROY_GC)
++		irq_domain_remove_generic_chips(domain);
+ 
+-	fwnode_dev_initialized(domain->fwnode, false);
+-	fwnode_handle_put(domain->fwnode);
+-	if (domain->flags & IRQ_DOMAIN_NAME_ALLOCATED)
+-		kfree(domain->name);
+-	kfree(domain);
++	pr_debug("Removed domain %s\n", domain->name);
++	irq_domain_free(domain);
+ }
+ EXPORT_SYMBOL_GPL(irq_domain_remove);
+ 
+--- a/drivers/irqchip/irq-al-fic.c
++++ b/drivers/irqchip/irq-al-fic.c
+@@ -133,32 +133,10 @@ static int al_fic_irq_retrigger(struct i
+ 	return 1;
+ }
+ 
+-static int al_fic_register(struct device_node *node,
+-			   struct al_fic *fic)
++static void al_fic_gc_init(struct irq_chip_generic *gc)
+ {
+-	struct irq_chip_generic *gc;
+-	int ret;
++	struct al_fic *fic = gc->domain->host_data;
+ 
+-	fic->domain = irq_domain_add_linear(node,
+-					    NR_FIC_IRQS,
+-					    &irq_generic_chip_ops,
+-					    fic);
+-	if (!fic->domain) {
+-		pr_err("fail to add irq domain\n");
+-		return -ENOMEM;
+-	}
+-
+-	ret = irq_alloc_domain_generic_chips(fic->domain,
+-					     NR_FIC_IRQS,
+-					     1, fic->name,
+-					     handle_level_irq,
+-					     0, 0, IRQ_GC_INIT_MASK_CACHE);
+-	if (ret) {
+-		pr_err("fail to allocate generic chip (%d)\n", ret);
+-		goto err_domain_remove;
+-	}
+-
+-	gc = irq_get_domain_generic_chip(fic->domain, 0);
+ 	gc->reg_base = fic->base;
+ 	gc->chip_types->regs.mask = AL_FIC_MASK;
+ 	gc->chip_types->regs.ack = AL_FIC_CAUSE;
+@@ -169,16 +147,37 @@ static int al_fic_register(struct device
+ 	gc->chip_types->chip.irq_retrigger = al_fic_irq_retrigger;
+ 	gc->chip_types->chip.flags = IRQCHIP_SKIP_SET_WAKE;
+ 	gc->private = fic;
++}
 +
-+void smc_inet_exit(void);
-+
-+#endif /* __INET_SMC */
--- 
-1.8.3.1
-
++static void al_fic_domain_init(struct irq_domain *d)
++{
++	struct al_fic *fic = d->host_data;
+ 
+-	irq_set_chained_handler_and_data(fic->parent_irq,
+-					 al_fic_irq_handler,
+-					 fic);
+-	return 0;
++	irq_set_chained_handler_and_data(fic->parent_irq, al_fic_irq_handler, fic);
++}
+ 
+-err_domain_remove:
+-	irq_domain_remove(fic->domain);
++static int al_fic_register(struct device_node *node, struct al_fic *fic)
++{
++	struct irq_domain_chip_generic_info gc_info = {
++		.irqs_per_chip		= NR_FIC_IRQS,
++		.num_chips		= 1,
++		.name			= fic->name,
++		.handler		= handle_level_irq,
++		.gc_flags		= IRQ_GC_INIT_MASK_CACHE,
++		.init			= al_fic_gc_init,
++	};
++	struct irq_domain_info info = {
++		.fwnode			= of_node_to_fwnode(node),
++		.size			= NR_FIC_IRQS,
++		.hwirq_max		= NR_FIC_IRQS,
++		.ops			= &irq_generic_chip_ops,
++		.host_data		= fic,
++		.gc_info		= &gc_info,
++		.init			= al_fic_domain_init,
++	};
+ 
+-	return ret;
++	fic->domain = irq_domain_instantiate(&info);
++	return fic->domain ? 0 : -ENOMEM;
+ }
+ 
+ /*
 
