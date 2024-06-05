@@ -1,117 +1,128 @@
-Return-Path: <netdev+bounces-101078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE4D78FD2CA
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 18:20:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 072C58FD2F3
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 18:31:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EEB91F24852
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 16:20:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E4F81C20B48
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 16:31:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEE50188CBB;
-	Wed,  5 Jun 2024 16:19:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD11661FD6;
+	Wed,  5 Jun 2024 16:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="WmTH1/0I"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AkBmNAha"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F28188CC0
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 16:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 541AE3BBEF
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 16:31:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717604368; cv=none; b=YJnfa0RonHhpCpazY/Qhm1/2b03otjYUkocKEBHldJ5FKcMgrfc91B5tddC8WuP5MyG7X2SebIW0DQhtPU4Uywr3J9fUW1LYlwbpJD/2jrN/5uZXqJowHj0CZaWzqxP9+iSTXIi9xHS/9xoRjcvwa/Eas/rgZlvqZSjEdRFT7LY=
+	t=1717605068; cv=none; b=rfjIncg7UxdUcTAURwYmBZ81iSm6adbAQ9FoNEo6BS6EXqSNTP5ZG/oExGCx97h1jFUjzbjnG5Lfy2ow5Flu540KWUnEXjXVPWxi9wJS9XdGAKkNokq3GVjCgn3ACVNl37wxGFDS6l1SsphjfFdVMnM5PAFfbZuMauUKds+ZiNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717604368; c=relaxed/simple;
-	bh=5qUaQkk47mgLGOEF2DXQyb/lq4V7UpIMZhzNEuIylS0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dm/Hh89naM12lSqr6W36LfWexHj4E9onY8FDJNUglUNTZM8B/ParREnxu40dg5yRhyOX9l2cTfm4T+95lvA1lwKieUnB6EWOQ/EYzBjC3kuvDVOknSWeZitNX7L7RDIhIxHFlwd2PRwooCITRniQVw9PVH3ZrRmBP4JDbG483iQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=WmTH1/0I; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6f4603237e0so713531b3a.0
-        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 09:19:27 -0700 (PDT)
+	s=arc-20240116; t=1717605068; c=relaxed/simple;
+	bh=yhGpvjqbeuSwV7lXibVowSKDmnAo86JFfhCCtodgLvs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uUmH7Q+ncdlZNp5tOvijTSdvCbkxaLy4sFboHQ8XNzDtIP/Fim12J38qiclWEJ1JtYa0LxBweD8ljELKUXm4C1rT4y2xVWoPiuVzSP78ezehUZ/jlQw4pm9NOVHsWi6X/2UiFlPTHbxR9zJco3HcflLW6M9y9o1ilAFSVLO+Hvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AkBmNAha; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a6269885572so200658666b.1
+        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 09:31:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1717604367; x=1718209167; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=llUYe07TgtX9pNzx/VwPY9IpXBVRel1c/RAIZQqo230=;
-        b=WmTH1/0Idnf9+tBrt9N+xTe/kV0IwW53aPAjLh8RHaUvQ8S+uAmFVbS3b8DFdax+gd
-         VlvbRb54B1FenqDjtNohKEt5iW+xPLK4t/500LCuOgd1bXb2Y9h1ymuOw51ign2FkX+y
-         cd9c0lkmTD+IlTiIRVgobcow6B2cKAXQdlA5xgR3+FLABuZJvV9BmtVvTgHS7JFslZ9B
-         Y4EmnTPKjk/nU5Bit4KoeDFbbgt9WvHZykBJL7MXfCMfEUQAUp74JNSQOviYM1aF46pX
-         33ajfdDXr1IKdfrMrNvEoHo3vIJREhoGyV+8za5c9d27mHEsPz2wwIcSBShRhiSXS3n8
-         qb1Q==
+        d=google.com; s=20230601; t=1717605064; x=1718209864; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IQnCw54eMmA3H32Op6/EczJodEAQxrcR34/bUU4xRqg=;
+        b=AkBmNAhaQ+PnLxg+/2uRNEXK6pmfuT/N/5hCFNcIC82PCScg3ilmS0zUqzsapo4elK
+         gF0wCXbfhgtj1PKm4Vh0qhndf+m0oUqKxo3Y8H8Htz6UyX+oEhJ8s8GjBt0hnbUzx/eR
+         d65dDgR7WwmyEZl4kO0yNKCfRJdvHAbt24H7tBQw9x06OuW3rWeI56GyfRYuaHy16qDs
+         EQ0G+IB978wsg6g6G6pYfbMZ7VDWjlwAQYDvPY+FYCcwtXrOQ1uUEle0IfwE+sq2WZRO
+         5psC4HZyHuVaaS4YjOKp+yW5wnHlnBK/w8Vh2udRr/h8v/5vigiKUzgUZAcySPCkNcd0
+         V1qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717604367; x=1718209167;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=llUYe07TgtX9pNzx/VwPY9IpXBVRel1c/RAIZQqo230=;
-        b=QvTPbB/jRRQ83a5G3Z/sYMbxhuANUAfkuaVx5l1PZvTqcooo10y2Mfx6P+KLkpGxa4
-         G4L63Ox3BoiKgwE8eg/r03Y99C944DRZT3zbnBKxhQSdzUntZsCM+HF/upIkNCN8uXF5
-         ESEB/VqkGeXFVoSEPJe+xiUSQLWGwTgTTtOCm0X/DJMvHqHqBHukxz9PnzPoUw4cLGdR
-         UTucoLJSNRlEauoUC/lIPcNI0h0aAtu2s3Vxh4qGTNXf4ZY095cSixd9R4sSkbeQGqr3
-         7UxZVQZhp5DP4GY4+JjRIseGORJPUYX+FRty7repcU/S8YafCmKGNOXuN1/xpLwWnTj4
-         c9rA==
-X-Forwarded-Encrypted: i=1; AJvYcCUHIUoZX0gHMSTScRM6omWbcOtmCY6E3igez8qDBcRfbvaicmACK7TEBj1PJz+x3pk5wUhcMzW89b4VyE/FnJ60HYtjK9JY
-X-Gm-Message-State: AOJu0YyULRz+7rPS8U1SLxQMBYylhgK2CTpgBHByPBtoxAf2+TTQTCxP
-	Z76BPFdlgm+uV77V2ReSx54y0N5SPl17x2rNcfnqaBpz9z+ehMqY2HfLj8O5MRBbRgu66dWt3AO
-	kFtw=
-X-Google-Smtp-Source: AGHT+IFkjbiChh2PdBp/SYXeqU06TNPqJDBpo2O6aFFs/U/ZFf0fOmtdpyi6Q1BXKe8Mh4NG1Wmklg==
-X-Received: by 2002:a05:6a00:6908:b0:702:5b22:531f with SMTP id d2e1a72fcca58-703f8625750mr143886b3a.8.1717604366589;
-        Wed, 05 Jun 2024 09:19:26 -0700 (PDT)
-Received: from localhost (fwdproxy-prn-117.fbsv.net. [2a03:2880:ff:75::face:b00c])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70242b2f9acsm8758706b3a.209.2024.06.05.09.19.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Jun 2024 09:19:26 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v1] page_pool: remove WARN_ON() with OR
-Date: Wed,  5 Jun 2024 09:19:24 -0700
-Message-ID: <20240605161924.3162588-1-dw@davidwei.uk>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1717605064; x=1718209864;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IQnCw54eMmA3H32Op6/EczJodEAQxrcR34/bUU4xRqg=;
+        b=XDpSu2iezS2XDEAbG7lppnqYSzbHfyapI5uTA250EYWANNmUkgrvmpv/q5QZm4GOJ/
+         Os/puj8wlKC8wfNbScdHVqMQIJsfjP2jB0u/JRiDlqu2u4vHtXLUmkj1LTf5/my3FFzZ
+         8DNp1t5PC6+2+14pKU0KJeoj/XuTusaiXtR7RYyxV5TAOvM20XNndeBY8reRDXeubi30
+         PsnNVvwH43r+A/KiKkxk21v6JbL9KFSmEE/gewMByEJ2XoLFpOaZXGQ99wFii6x7ddW2
+         b+D4qhjS2Ovfe57xsZJBWRa7ObHg+Tc6eDmgd6r4joluFI78iCOWWEjzUpkixgbjarLs
+         Tw4A==
+X-Forwarded-Encrypted: i=1; AJvYcCXCd//qwbbbwOFH1aS5/iZjBU/ZNcPgyYoVw7rF+GnAjLv/SL9PKeIfqQHvr6HeEceNgc41liEGm9/pEWviaNgRCOudH44v
+X-Gm-Message-State: AOJu0Yy6utZveGKiAK1vtRJm8jQtkuLK8MJAPhuzBCg65G03HQAw4GUC
+	TRvFMzAUZFB2N6G3YZM1AtaHOn20682sjcBmwBAlTUU6ga/900F7vxt5Em3uoLclxZ2vDXPRFer
+	5xjrNXI/ZAw64pFT7eXBc2NX5tG6MjtECsXjO
+X-Google-Smtp-Source: AGHT+IEMmzxHnPPmwQTu8f/YLMchXnCj+p1Jdq3Aj4yEt/3jcHLpwAb7gnJj38q4OJ2mrGGCbUEoLW2azquBrpvIygE=
+X-Received: by 2002:a17:906:dfd7:b0:a68:b073:14a5 with SMTP id
+ a640c23a62f3a-a6c75fabb5amr14362566b.9.1717605064284; Wed, 05 Jun 2024
+ 09:31:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240605161924.3162588-1-dw@davidwei.uk>
+In-Reply-To: <20240605161924.3162588-1-dw@davidwei.uk>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 5 Jun 2024 09:30:52 -0700
+Message-ID: <CAHS8izMWBDm5VDYOeJDy5J-pbLtsiBnP801PC17XAbzCb2oe-g@mail.gmail.com>
+Subject: Re: [PATCH net-next v1] page_pool: remove WARN_ON() with OR
+To: David Wei <dw@davidwei.uk>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, netdev@vger.kernel.org, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Having an OR in WARN_ON() makes me sad because it's impossible to tell
-which condition is true when triggered.
+On Wed, Jun 5, 2024 at 9:20=E2=80=AFAM David Wei <dw@davidwei.uk> wrote:
+>
+> Having an OR in WARN_ON() makes me sad because it's impossible to tell
+> which condition is true when triggered.
+>
+> Split a WARN_ON() with an OR in page_pool_disable_direct_recycling().
+>
+> Signed-off-by: David Wei <dw@davidwei.uk>
 
-Split a WARN_ON() with an OR in page_pool_disable_direct_recycling().
+Reviewed-by: Mina Almasry <almasrymina@google.com>
 
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- net/core/page_pool.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> ---
+>  net/core/page_pool.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index f4444b4e39e6..3927a0a7fa9a 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -1027,8 +1027,8 @@ static void page_pool_disable_direct_recycling(stru=
+ct page_pool *pool)
+>         /* To avoid races with recycling and additional barriers make sur=
+e
+>          * pool and NAPI are unlinked when NAPI is disabled.
+>          */
+> -       WARN_ON(!test_bit(NAPI_STATE_SCHED, &pool->p.napi->state) ||
+> -               READ_ONCE(pool->p.napi->list_owner) !=3D -1);
+> +       WARN_ON(!test_bit(NAPI_STATE_SCHED, &pool->p.napi->state));
+> +       WARN_ON(READ_ONCE(pool->p.napi->list_owner) !=3D -1);
+>
+>         WRITE_ONCE(pool->p.napi, NULL);
+>  }
+> --
+> 2.43.0
+>
+>
 
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index f4444b4e39e6..3927a0a7fa9a 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -1027,8 +1027,8 @@ static void page_pool_disable_direct_recycling(struct page_pool *pool)
- 	/* To avoid races with recycling and additional barriers make sure
- 	 * pool and NAPI are unlinked when NAPI is disabled.
- 	 */
--	WARN_ON(!test_bit(NAPI_STATE_SCHED, &pool->p.napi->state) ||
--		READ_ONCE(pool->p.napi->list_owner) != -1);
-+	WARN_ON(!test_bit(NAPI_STATE_SCHED, &pool->p.napi->state));
-+	WARN_ON(READ_ONCE(pool->p.napi->list_owner) != -1);
- 
- 	WRITE_ONCE(pool->p.napi, NULL);
- }
--- 
-2.43.0
 
+--=20
+Thanks,
+Mina
 
