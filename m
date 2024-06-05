@@ -1,152 +1,129 @@
-Return-Path: <netdev+bounces-100948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2E6A8FC9BC
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:08:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7D2A8FC9F0
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 13:13:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C079B22052
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 11:08:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7635A1F212E9
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 11:13:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37E11922EE;
-	Wed,  5 Jun 2024 11:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA20192B7F;
+	Wed,  5 Jun 2024 11:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aXvanTAi"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB921946D3;
-	Wed,  5 Jun 2024 11:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99FEA49645;
+	Wed,  5 Jun 2024 11:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717585724; cv=none; b=V4P7y5Q2oPkXnARuR6CPeSlLpp/R+c5D+xHpKxdDzZfBCZo4wKg79spmdqjCCypEU5DSsURUQECYnYs2qy/2BLVnhYoED0fuS3uL6U+ZWr1/kxvWqiW4ZaHFDBSRGoQvknnEjIiBrWgVN9ZX4BRSbmrDNJDCITEiIyv2WWIhgco=
+	t=1717585969; cv=none; b=IguG7bvOn1mvxk2FUp8si5mTrOl7IqibKr5xldbr5qOCWt2/A8UavpnFvMJTW4HfSgFj139WIznbCmei8I0IfPJh32LUTF2fHCiy4f8BXXU1ymYdfWGvMbFqeUdsImDQSnm+6PmAWCzqPtIfuWjA5leV91hhE3w+SouPF5JjUM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717585724; c=relaxed/simple;
-	bh=l4kG0ENxp5e/iTXDU0KZBxI0YMPvJKRQAC/Xg5l2eMQ=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P3kTy77CSKZe/wO2kq2y0+7shreRPx7175LQquEA60p4gq0Qa7gNzkm226Df1SnRInLIATeK7eyJ3NeB1KTZSiyNIM+GVoQfgcsEfwoALcZQpr/QLGbmftWkBnbOc+GlgVvrg0uwqUqwyFfpjTiF69+PrBwZxIcEiYCxIMRWbB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VvPjH3phJz6K67M;
-	Wed,  5 Jun 2024 19:04:03 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5A06E1400C9;
-	Wed,  5 Jun 2024 19:08:39 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 5 Jun
- 2024 12:08:38 +0100
-Date: Wed, 5 Jun 2024 12:08:38 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: Leon Romanovsky <leon@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Itay
- Avraham <itayavr@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed
-	<saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Andy Gospodarek
-	<andrew.gospodarek@broadcom.com>, Aron Silverton <aron.silverton@oracle.com>,
-	Dan Williams <dan.j.williams@intel.com>, "David Ahern" <dsahern@kernel.org>,
-	Christoph Hellwig <hch@infradead.org>, "Jiri Pirko" <jiri@nvidia.com>, Leonid
- Bloch <lbloch@nvidia.com>, <linux-cxl@vger.kernel.org>,
-	<patches@lists.linux.dev>
-Subject: Re: [PATCH 1/8] fwctl: Add basic structure for a class subsystem
- with a cdev
-Message-ID: <20240605120838.00000da5@Huawei.com>
-In-Reply-To: <20240604185200.GN19897@nvidia.com>
-References: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
-	<1-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
-	<20240604093219.GN3884@unreal>
-	<20240604155009.GJ19897@nvidia.com>
-	<20240604180555.000063c2@Huawei.com>
-	<20240604185200.GN19897@nvidia.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1717585969; c=relaxed/simple;
+	bh=yYAj163noFkob5L7lXkiWLT1nMsl/P7iRUgZ6mMxCvg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X/r3kWxi2xCG8MAIY1VVw2Z9EgybVDDoP767z1HRJCDACWEWpVeeyLbateOhqauwcazigChQd4g5b985hp3PWyrIpkQuZeLgtqn5C8nMJQwBr69O5dKDVO+czkTc9n/e+gag9odWfLz6SqoBsSiNlQ92stc2HDI1yN6+SfprJFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aXvanTAi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 314C4C32786;
+	Wed,  5 Jun 2024 11:12:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717585969;
+	bh=yYAj163noFkob5L7lXkiWLT1nMsl/P7iRUgZ6mMxCvg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aXvanTAihYAPX/RJQpmYDHZb43VOd2kMMK/Hi3Ffzhpmrs+iX8mOmJ93cqF6ZQO+9
+	 N2AH7FCTKu9GBr/SW4Bq0kfYXgJFDRpUPxsEdC1GLTxmBbsus3CmJKx4XXuBlBoOF4
+	 y/daZufRlf0Q2x2hYGl5PgYltv3WUuuWQqCOl31qsY826eQOplQep9OWxxhrHkoIYT
+	 NIApGI8rmQzjAtznelf2nu7sLBeNs31TUjBI1tef6CBmq2dqgRNDBH6NgyCPiT+eeF
+	 SrvdpFtgm3dYC0phg7owIH7IrrmbD6dIvyh5itRgsCZ14/J3QgOUUan3e+WDH2HL5R
+	 w+KruQVRvX7/Q==
+Date: Wed, 5 Jun 2024 12:12:38 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Rocky Liao <quic_rjliao@quicinc.com>, Kalle Valo <kvalo@kernel.org>,
+	Jeff Johnson <jjohnson@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Elliot Berman <quic_eberman@quicinc.com>,
+	Caleb Connolly <caleb.connolly@linaro.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	Alex Elder <elder@kernel.org>, linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
+	Jeff Johnson <quic_jjohnson@quicinc.com>,
+	ath12k@lists.infradead.org, linux-pm@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	kernel@quicinc.com,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH v8 01/17] regulator: dt-bindings: describe the PMU module
+ of the QCA6390 package
+Message-ID: <21a00ea1-1749-4fcc-87cd-1af8876a7efd@sirena.org.uk>
+References: <20240528-pwrseq-v8-1-d354d52b763c@linaro.org>
+ <20240604173021.GA732838@bhelgaas>
+ <CAMRc=MeNPvZUyu6rtsWtdvXFmOOpmjKCEpkoc5zBfJy6qBpxrg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500002.china.huawei.com (7.191.160.78) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Ja+GgII04rJlrfXo"
+Content-Disposition: inline
+In-Reply-To: <CAMRc=MeNPvZUyu6rtsWtdvXFmOOpmjKCEpkoc5zBfJy6qBpxrg@mail.gmail.com>
+X-Cookie: Simulated picture.
 
-On Tue, 4 Jun 2024 15:52:00 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> On Tue, Jun 04, 2024 at 06:05:55PM +0100, Jonathan Cameron wrote:
-> 
-> > Trick for this is often to define a small function that allocates both the
-> > ida and the device. With in that micro function handle the one error path
-> > or if you only have two things to do, you can use __free() for the allocation.  
-> 
-> This style is already followed here, the _alloc_device() is the
-> function that does everything before starting reference counting (IMHO
-> it is the best pattern to use). If we move the ida allocation to that
-> function then the if inside release is not needed.
-> 
-> Like this:
+--Ja+GgII04rJlrfXo
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-LGTM (this specific code, not commenting on fwctl in general yet as needs
-more thinking time!)
+On Wed, Jun 05, 2024 at 11:13:04AM +0200, Bartosz Golaszewski wrote:
+> On Tue, Jun 4, 2024 at 7:30=E2=80=AFPM Bjorn Helgaas <helgaas@kernel.org>=
+ wrote:
 
-> 
-> diff --git a/drivers/fwctl/main.c b/drivers/fwctl/main.c
-> index d25b5eb3aee73c..a26697326e6ced 100644
-> --- a/drivers/fwctl/main.c
-> +++ b/drivers/fwctl/main.c
-> @@ -267,8 +267,7 @@ static void fwctl_device_release(struct device *device)
->  	struct fwctl_device *fwctl =
->  		container_of(device, struct fwctl_device, dev);
->  
-> -	if (fwctl->dev.devt)
-> -		ida_free(&fwctl_ida, fwctl->dev.devt - fwctl_dev);
-> +	ida_free(&fwctl_ida, fwctl->dev.devt - fwctl_dev);
->  	mutex_destroy(&fwctl->uctx_list_lock);
->  	kfree(fwctl);
->  }
-> @@ -288,6 +287,7 @@ static struct fwctl_device *
->  _alloc_device(struct device *parent, const struct fwctl_ops *ops, size_t size)
->  {
->  	struct fwctl_device *fwctl __free(kfree) = kzalloc(size, GFP_KERNEL);
-> +	int devnum;
->  
->  	if (!fwctl)
->  		return NULL;
-> @@ -296,6 +296,12 @@ _alloc_device(struct device *parent, const struct fwctl_ops *ops, size_t size)
->  	init_rwsem(&fwctl->registration_lock);
->  	mutex_init(&fwctl->uctx_list_lock);
->  	INIT_LIST_HEAD(&fwctl->uctx_list);
-> +
-> +	devnum = ida_alloc_max(&fwctl_ida, FWCTL_MAX_DEVICES - 1, GFP_KERNEL);
-> +	if (devnum < 0)
-> +		return NULL;
-> +	fwctl->dev.devt = fwctl_dev + devnum;
-> +
->  	device_initialize(&fwctl->dev);
->  	return_ptr(fwctl);
->  }
-> @@ -307,16 +313,10 @@ struct fwctl_device *_fwctl_alloc_device(struct device *parent,
->  {
->  	struct fwctl_device *fwctl __free(fwctl) =
->  		_alloc_device(parent, ops, size);
-> -	int devnum;
->  
->  	if (!fwctl)
->  		return NULL;
->  
-> -	devnum = ida_alloc_max(&fwctl_ida, FWCTL_MAX_DEVICES - 1, GFP_KERNEL);
-> -	if (devnum < 0)
-> -		return NULL;
-> -	fwctl->dev.devt = fwctl_dev + devnum;
-> -
->  	cdev_init(&fwctl->cdev, &fwctl_fops);
->  	fwctl->cdev.owner = THIS_MODULE;
->  
-> Jason
+> > LDO?  Again below, but maybe this is obvious to everybody.
 
+> Yes, this is an acceptable abbreviation to use, it's all over the
+> bindings and regulator drivers.
+
+Vastly more people are going to understand LDO than would be able to
+expand the acronym.
+
+--Ja+GgII04rJlrfXo
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZgSCUACgkQJNaLcl1U
+h9ByZgf/TG0Lj2GpWhjqjqffaI1t0B0aafiDHRBlSOkaq9el1b4FEPEjjrECf1Qh
+ne5c8PYSt81tN22LJRsh4gK53Ff9ziSn2l0KjKes7LCUwu58zAXDKgrsji++9+Vw
+vqxnhPdP5to25T28H3ds9QoF2jluYqiT/aQXtpRxZWWkO2xHYZ7eAwJe0vOn4rx8
+cqMEBHu9a57G8kN5BIs6cwaNmwlorGxdPKyLdXx3F6+3NvqtbvHGT9XDAkIU+GtC
+2QjuqiW8jM+xvSVYi+ALcYY0djf8Q7J8gmhyQaZa6UNFwO1H8AibziDOF9X7v7nB
+oouRPtsj7Oma2IMcaDj8MW3Ry5Jhsw==
+=tpqW
+-----END PGP SIGNATURE-----
+
+--Ja+GgII04rJlrfXo--
 
