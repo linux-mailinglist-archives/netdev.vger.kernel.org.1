@@ -1,121 +1,191 @@
-Return-Path: <netdev+bounces-101073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D35DB8FD23D
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 18:00:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D6778FD263
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 18:03:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCF591C23556
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 16:00:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B55FB266D7
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 16:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF804779F;
-	Wed,  5 Jun 2024 16:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F38215EFA8;
+	Wed,  5 Jun 2024 16:03:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B2Lb9l+8"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZF48eKoR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B002743AB5
-	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 16:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66EE14D2BA;
+	Wed,  5 Jun 2024 16:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717603237; cv=none; b=TbAk42vzxsCj/hTqabUN/2Gj2Yxh8Evseijyrblj7qZMMiB/BqsRU4ldR16PDsDro9jBXa+ob316sP42ai32NZLJtmrMx54uhW14bnI2XvrQIXqXcWp1QS14H4NUEirOi1gtSKhz/0LniNUxuMJFAFfnwgKHc/JBec3SNxWOq3U=
+	t=1717603383; cv=none; b=j7DM7kaE+6XeakoHguYO2ag50q8uLrGmnjanVlJ2yqL+Oq2JhCB+UYjPDns0VxtZyELNIKgAPU9tJjIOioX99dgsqgGtjBI1zKTlQnCpFObdNdOzvxlulHHcjicdHq9fKYiyvtAa5iDl1qAHaX+MtuZTHyLlY05pkuGjDzTSjAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717603237; c=relaxed/simple;
-	bh=B+oO731SnbisJRO1Q+J6ZOwlEBycxwktQoCY4W0eTYg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ljFLBK/wFM+LXNj9rrCVmsoKNE0+Hr3A6KGG4U9ccg5BV5Ejq/5c5DzHi6DHVZfGFHurTsxaEZQVkL1b2WNCyaiU1GBes2PkrgdUJ393gtQwjUKc7ZtluI8yn4MD4EwrDLv5zpX5PE3JzhpQngLe3Aq9GGWP3mLcfeWbXSu/FuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B2Lb9l+8; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717603234;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/DvG576v+pU/FwzqiGvbmWt13NVWqzZTh6Ot5c76wYU=;
-	b=B2Lb9l+84LNnMlYRH3kAYlCx8RxXjMlDWWzM6m3t6rrVEuMFXpr7HzkQzdWzgxXU5XPAPg
-	X0lmS8CLLjH0GDouUm5O8xNEg+g4aJp5/CVaf0DFZ+yWd7ODjIiKA8apgPRDvq5DxOfSIE
-	/gt4/mJdzRgxzYgpvrsrrRRXb3hVA+E=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-493-mQzUj9hIPEeWJVEy2t99dg-1; Wed, 05 Jun 2024 12:00:32 -0400
-X-MC-Unique: mQzUj9hIPEeWJVEy2t99dg-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2eaa38c4396so19504901fa.2
-        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 09:00:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717603228; x=1718208028;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/DvG576v+pU/FwzqiGvbmWt13NVWqzZTh6Ot5c76wYU=;
-        b=t2wSg5G5gWUD+tYHs5HfXCxU2NgAC4BrdxtsHpTTH0BgfLR0v5wog/jG9IsoFJ0nDS
-         CdH+SmQ+Dr8xwcGGQqd1J4jbAuZNNFvnkgGtlCQ+Fa4P0H3NaHUsNq/NvnNgwkdJR4Tx
-         KGqIHZNI+sO2HqOI5T/fFOM3E6IznoKrwp6JJeihCb2TtE43GvPWboyFzorc52ySWfuL
-         czv/Dj9aqcFPxv4H9e6KVaSah6e3l6fpcGO28s1lJhlNyGRObyde01lOi0nRXDwN+lwj
-         SFCjGMnGwhn53cGuDgJFRmHgWKQdlyZ242k1ho5gTfs++CY4ZEy7G5iAx1Ld3I4hpzE4
-         F0ZA==
-X-Forwarded-Encrypted: i=1; AJvYcCWXEjouG6vNq8LCc80DNKnhIVIlHgyDq9vrBQEUfPEpSXsob3ybVrTK3lz4EvWYugVi+FC1/gBEnJwh6lAukk8X/0iH+rGd
-X-Gm-Message-State: AOJu0YwMGJgpClCHFuEKCu5ZxQP7aLlkLgjSw7s3En9y0BevqDa+D3Cv
-	wOf5XAFE/NrT5bFqOev5KBEDp1px25emXeh1TcAp4ODwr8RL06nTOn36NLHywmFcxmw5JY7ao+n
-	TfgGtaX5s1xS2VtDY9tqFs2D+gt6UTU7zZItLBJBAZ92W2FtdX/faSpjn+jFVgg==
-X-Received: by 2002:a2e:960b:0:b0:2ea:93f0:cc17 with SMTP id 38308e7fff4ca-2eac7a6efe8mr14509151fa.45.1717603228617;
-        Wed, 05 Jun 2024 09:00:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGB/t7C1jG2yeOmpE3Y/HaYLya6YvPHTFM6MjMUNPSu+tH5PdudahlML3n0yMTHgoaROZ7hng==
-X-Received: by 2002:a2e:960b:0:b0:2ea:93f0:cc17 with SMTP id 38308e7fff4ca-2eac7a6efe8mr14508951fa.45.1717603228175;
-        Wed, 05 Jun 2024 09:00:28 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-53-134-58.retail.telecomitalia.it. [82.53.134.58])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57a5ca00bddsm6621359a12.72.2024.06.05.09.00.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Jun 2024 09:00:27 -0700 (PDT)
-Date: Wed, 5 Jun 2024 18:00:25 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: namespaced vsock
-Message-ID: <myowlo6xpjrhbawt6sptwcqktm34zbfnsxzyo5eahcbspitwzq@ypssm5pe6q7m>
-References: <20240605075744.149fbf05@kernel.org>
+	s=arc-20240116; t=1717603383; c=relaxed/simple;
+	bh=C0bCEbIkgFeTXnBAOsl8boxV6hIyhsh9cdh4AjtWpAU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=CkZ7kuKSM77auTy+nm38apuiPpu/49QxMWhR0Lv6/UudU0kHasZF05LDPGYRQDgmiKxFmDOCMZKzRo0I0rVzjnlMb7hIbVE1xWpe+AGCu2gqv873GdG79c+YexkjLZdlyDyYwbrzI0xybhMTRRWfurJc+TPrkuCBAy/7VetYvBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ZF48eKoR; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 455FqccJ001302;
+	Wed, 5 Jun 2024 16:02:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
+ content-transfer-encoding : content-type : date : from : in-reply-to :
+ message-id : mime-version : references : subject : to; s=pp1;
+ bh=VoD8tX52FvDat9NcjNAX98NVbgaw2ECRczO9sAXN6Zk=;
+ b=ZF48eKoRnALAvrJbyJKK96YuFZev/7Sl78hii05OBMRBLG1NDxTRMShJlrsgIyr+FEWL
+ JKwSN+vLTyw95FbHtYvmO8ALatkPEDqBi8aBXsl+xofy24NxVP5B1NRyEKQ2/UaVH4HJ
+ 3YW/jjBgcHyh3x0yCTBoA8DElc6nHUsxms4Me7csTUzD4rrtuLDrkimgXfceCJ5XRVRu
+ t2sH9pJ2zIXbzqCjfeBkMn8AcHkWpUOASyCHOZLEx0vpIOIhdfi8dGR7Mz58qlXIzK+S
+ Hem5DcORgIfC/lc23ZBxlsox/JlGAN5wFsla11pdx0Z4jIc/CxI8nquMOFzeUqUQ7IAp tw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yju1j01w5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Jun 2024 16:02:44 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 455G2h42022506;
+	Wed, 5 Jun 2024 16:02:43 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yju1j01w2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Jun 2024 16:02:43 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 455EYUuw026521;
+	Wed, 5 Jun 2024 16:02:42 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3yggp34kx2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Jun 2024 16:02:42 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 455G2csL48628082
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 5 Jun 2024 16:02:41 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CC28A20043;
+	Wed,  5 Jun 2024 16:02:38 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6A10A20040;
+	Wed,  5 Jun 2024 16:02:38 +0000 (GMT)
+Received: from [9.155.200.166] (unknown [9.155.200.166])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  5 Jun 2024 16:02:38 +0000 (GMT)
+Message-ID: <ecde3264696efe9145ce0785e7c3c2c7d0182ea4.camel@linux.ibm.com>
+Subject: Re: [PATCH vhost v13 04/12] virtio_ring: support add premapped buf
+From: Ilya Leoshkevich <iii@linux.ibm.com>
+To: Alexander Potapenko <glider@google.com>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin"
+ <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov
+ <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard
+ Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+        bpf@vger.kernel.org, Christoph Hellwig
+ <hch@infradead.org>
+Date: Wed, 05 Jun 2024 18:02:38 +0200
+In-Reply-To: <CAG_fn=Wv4Tw8guW=mFYyV9T18C_qPZOxr3fwKcRkDVXm1e+iXg@mail.gmail.com>
+References: <20230810123057.43407-1-xuanzhuo@linux.alibaba.com>
+	 <20230810123057.43407-5-xuanzhuo@linux.alibaba.com>
+	 <0b726a75574ad98200b815f173e59a5378e9df04.camel@linux.ibm.com>
+	 <CAG_fn=Wv4Tw8guW=mFYyV9T18C_qPZOxr3fwKcRkDVXm1e+iXg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: xYTW5mHPVypOduDonLVEW2AGx82bOgi3
+X-Proofpoint-ORIG-GUID: ezpYYrInLL1W71wsacFlf4Y4GCv2Vv5B
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240605075744.149fbf05@kernel.org>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-05_02,2024-06-05_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ mlxlogscore=999 mlxscore=0 lowpriorityscore=0 malwarescore=0
+ suspectscore=0 priorityscore=1501 spamscore=0 impostorscore=0
+ clxscore=1015 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2406050121
 
-Hi Jakub,
+On Tue, 2024-06-04 at 18:17 +0200, Alexander Potapenko wrote:
+> On Tue, Jun 4, 2024 at 6:07=E2=80=AFPM Ilya Leoshkevich <iii@linux.ibm.co=
+m>
+> wrote:
+> >=20
+> > On Thu, 2023-08-10 at 20:30 +0800, Xuan Zhuo wrote:
+> > > If the vq is the premapped mode, use the sg_dma_address()
+> > > directly.
+> > >=20
+> > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > ---
+> > > =C2=A0drivers/virtio/virtio_ring.c | 19 +++++++++++++++++--
+> > > =C2=A01 file changed, 17 insertions(+), 2 deletions(-)
+> > >=20
+> > > diff --git a/drivers/virtio/virtio_ring.c
+> > > b/drivers/virtio/virtio_ring.c
+> > > index 8e81b01e0735..f9f772e85a38 100644
+> > > --- a/drivers/virtio/virtio_ring.c
+> > > +++ b/drivers/virtio/virtio_ring.c
+> > > @@ -361,6 +361,11 @@ static struct device *vring_dma_dev(const
+> > > struct
+> > > vring_virtqueue *vq)
+> > > =C2=A0static int vring_map_one_sg(const struct vring_virtqueue *vq,
+> > > struct
+> > > scatterlist *sg,
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 enum dma_data_direction direction,
+> > > dma_addr_t *addr)
+> > > =C2=A0{
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0 if (vq->premapped) {
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 *addr =3D sg_dma_address(sg);
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 return 0;
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0 }
+> > > +
+> >=20
+> > I wonder if something needs to be done for KMSAN here, like it's
+> > done
+> > by the next block in this function? I'm looking into what seems to
+> > be a
+> > KMSAN false positive on s390x:
+> >=20
+> > BUG: KMSAN: uninit-value in receive_buf+0x45ca/0x6990
+> > =C2=A0receive_buf+0x45ca/0x6990
+> > =C2=A0virtnet_poll+0x17e0/0x3130
+> > =C2=A0net_rx_action+0x832/0x26e0
+> > =C2=A0handle_softirqs+0x330/0x10f0
+> > =C2=A0[...]
+>=20
+> I think there's a similar problem on x86 as well:
+> https://syzkaller.appspot.com/bug?extid=3Dc5336dcd1b741349d27a
+>=20
+> I was going to look closer this week.
 
-On Wed, Jun 05, 2024 at 07:57:44AM GMT, Jakub Kicinski wrote:
->Hi Stefano!
->
->I found you patches from 2020 adding netns support to vsock.
->I got an internal ping from someone trying to run VMMs inside
->containers. Any plans on pushing that work forward? Is there
->a reason you stopped, or just EBUSY?
->
+Thanks! I bisected it in the meantime and the first failing commit is:
 
-IIRC nothing too difficult to solve, but as you guessed more EBUSY ;-)
+commit f9dac92ba9081062a6477ee015bd3b8c5914efc4
+Author: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Date:   Sat May 11 11:14:01 2024 +0800
 
-Maybe the more laborious one is somehow exporting a netdev interface 
-into the guest to assign the device to a netns. But I hadn't tried to 
-see if that was feasible yet. I have some notes here:
-https://gitlab.com/vsock/vsock/-/issues/2
+    virtio_ring: enable premapped mode whatever use_dma_api
 
-I've been planning to take it up several times but haven't found time 
-for now, if there's anyone interested I'm happy to share information and 
-help with review and feedback. Otherwise I try to allocate some time, 
-but I can't promise anything in the short term.
-
-Do you have time or anyone interested in continuing the work?
-
-Thanks,
-Stefano
-
+so it's definitely related.
 
