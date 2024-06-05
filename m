@@ -1,104 +1,212 @@
-Return-Path: <netdev+bounces-100874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-100875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98F728FC6D4
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 10:44:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9CF48FC6EB
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 10:48:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9601B232BC
-	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 08:43:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32A52B228B6
+	for <lists+netdev@lfdr.de>; Wed,  5 Jun 2024 08:47:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 915C11946CD;
-	Wed,  5 Jun 2024 08:43:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C8DC13AD39;
+	Wed,  5 Jun 2024 08:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="FVPItTTd"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="yzvJC92G"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509544962C;
-	Wed,  5 Jun 2024 08:43:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742474963C
+	for <netdev@vger.kernel.org>; Wed,  5 Jun 2024 08:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717577034; cv=none; b=IfF+1/Hb+V2g29tpwltsm8fV6YdK5t6sHdsi2BfXP6ulfCODQTa20WZLBKOtKZ2k0peARbGh6km2SFHwK2m8i0F5l0drtB6nSLHDYdNsYXG70fbZ3+ByZdy6FkCHO/c5fbjpA+0Sx+QBOoA7lULyQeaVZfv9y8RSWHuoZ/O4hFU=
+	t=1717577267; cv=none; b=DKMwNi/yOSDXq6akyTdj8GiDM5U7GZYXE1orOHVGHmQxcyIVUd4Ma9JIe7178Me/E3pNCaHuNsOjOjIrXLqiXo81SMcfwitRB9/9f11Bfp+Jgb/ODCgQJiRYWl4ioVyvJHvMiGJXHO0n5o7LVl+41U/RktEi31VXgf7D9Y4Dokc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717577034; c=relaxed/simple;
-	bh=jZ//xqLY5MABrAu+hTMq7OGpEIr0joF93MaJu/Iw+4c=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SaJP3e+UktlSXyYj41ssQur7qlxHK99P5ewse4ZmG8jB2TWjQtqtdCSyMVUwWtvcHl6PqqRJ/8THgrY1Cg4bKeBi5gwvfwKbNk6fhdNSfXty8farH5Gesatq/XKqtZRusIauZcbS6cCwrbU4rKvv4XX4USRRwiUvvSLXcG886gE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=FVPItTTd; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 7762EA0673;
-	Wed,  5 Jun 2024 10:43:41 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=mail; bh=g8zm70D3lRPSYVdgRgWMFlw4wLi2O0HtRTHjaSgr9q0=; b=
-	FVPItTTdNVcj+vJpv+0m6rnG7tOwf+ewvz9Ydm3KI+RuF/MB+vOBkDaSBCij3j6X
-	9swGmLQxULBjyxwQ/aLNk8MLocORTNLqVceL3Wpa7jpQv04rnzsG196xViATpVcf
-	86el0c+BNaOmymKHRT76h8v7GLuydDO2s4CzcL3Hr4Y2L2JVQzsWHPOsKvx4EKkI
-	JowHDcqLNtZwQy9hVwV3IglIwKh1iuq1JLG557oNFjp0OTBWYViVgTvXor1F5zBZ
-	NKjd71BoP1B7q6CGO+uByc1LUjx82eGXA6GxpJg1tSbZeBJwPE1mOEKOP2AxI5SH
-	tiGsnfua/6qmm3krNnk8gjs+lR2qOsfArTC6RuTuITJ319Btnx+o/k3pPSa+Mdga
-	j5DsQ0VxsxGPcEp+a+CEXkH2vgrRPDG1rrr5n0s6zC/PvRfy8dTuwtezLUpFTVZ8
-	/CNEtpXzsPs9Fk/buGlmh87bSyFo9aICCTfDL14+FbDQ5kMfXKdJwuWoKoVwqthd
-	uCsLKbu/mMS2+eVN/1I88L5zlEe+6pK66ZXOTSa44EJxr+GNA9Dep2E0psR1nuaj
-	tROM+EjQI07PHOxOKiqEzHv2J3onU/qgh40okvO9RtrlKNOu8EyFEjNLeE1b3i0m
-	4cQ4QxK0yhd9eWYDpc6u/A43ksdG4et/B32Wek5alQE=
-From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>, "Russell
- King" <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
-	<hkallweit1@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-Subject: [PATCH] net: sfp: Always call `sfp_sm_mod_remove()` on remove
-Date: Wed, 5 Jun 2024 10:42:51 +0200
-Message-ID: <20240605084251.63502-1-csokas.bence@prolan.hu>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1717577267; c=relaxed/simple;
+	bh=uSKkoIGoa2SrkckhNzNgT8KTYQPaLTtB710iSC/tAE0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ReZVw4uiKPJ5gqQbQR44VwZ6IC0pKb/NwC1eEoOF5d6PDnTre1taCL4usD4GeAODwnFwgGMr4btxrD6ZoJYRqD5jXwDn1XMM7DUV9QRSY0PVXh5O8iHNvRFiJgVnBwAJy6kSxF5P5qDCgmHH8WdfNx/Wxly7DhDopAM+pTN48sQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=yzvJC92G; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2eaccc0979cso2534161fa.3
+        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 01:47:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1717577264; x=1718182064; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nPra9VnPeBiNtl2fHAj/AHY/htZJd5zpefm5z/7mvlE=;
+        b=yzvJC92GX+CnQx7m4LPXyXYsNpBvK/idur5bYDpywh8Go7jQHrXy2gFaqm1K9hDcp+
+         RxJgnqtVk1pwaF88JnMjI68vVZuPrK3wPVivjqPPQrjHbPT8EqHKLt+7THl2eNqqUtku
+         A3Xz6vhJGFl1D+NVsA+4ugRneDGyK/wDAjILU/Trg1wqc9c4y+tcvmoD0PJuKKNqmoWY
+         NHoh1GL1anfB2oaJlnMuNZsi1syUrrgOdDe3NRxMe08Q+pd1IsXVryykPVrFCVT0avuf
+         W3WSu/oCgsVzfqKlx+V4PK4jmd6hAlfYSzFa5murwfQd4FvoqTlDsVOdCC6wTyvn3YGq
+         qpsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717577264; x=1718182064;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nPra9VnPeBiNtl2fHAj/AHY/htZJd5zpefm5z/7mvlE=;
+        b=HBYH4hzF3dE6LvfGbT12/vQ6oCNd5MRoyedadgTlTQzJtMEI85BQLvNCYYrQIXIevd
+         O+MA+L1/7Q1KtFBMZPZkUn7ZQKDP/kQ5Hln7o/qWhrCDE/aGMUb169JUdphBmBTGa0W3
+         1Bjtpepa8yFvawoBXsokyboJAoh8RxIli8s1Z9kRA6mdaJG3zFpRmtVsuNMETJDKUMe+
+         5DctSQqXxm6dUReGUeRH5a4czF4bgzK5SN4tuWi2nwIGrB/e17/nrKXv4wytaeA6Lunb
+         YuXyBitQKCeQegkzxN2J9SE9GJ/6ilVbVe3tyFtUib/U4txFEPZdLf21MuAuqCdQkIv+
+         Rntw==
+X-Forwarded-Encrypted: i=1; AJvYcCXVc4PFh4TsePPwmRU3q2twK6aLm8OYrQcuSRLeNS0IAA8myHU/uyZSMXTe6NznM4bAqA6j3KqnI+VgKrzOO3kgypsV8IiA
+X-Gm-Message-State: AOJu0YxeNYfDayYSDskBlzbyHV69DRUkC8/auelmFFvo749VPRVY4P/V
+	evMKSoQ4KMpoKMCNhPVIyZ1DKryyFR/9AQjV2dDBLXZ3t+6unaDGtlY310hPhKV3aC8teCbfljj
+	bZTHf3/mnmR3oz1OvHXN2pdwEwI50N6PEgLX2Zg==
+X-Google-Smtp-Source: AGHT+IFvAhNmZjR8e0W7tisE1L2rItCbACVQEOeSPIHCQ/2JT5Lzac0kUX9ZWXyqBUxDLGDW1jONb8JYHYsrWH/7fyo=
+X-Received: by 2002:a2e:7a0a:0:b0:2da:b59c:a94b with SMTP id
+ 38308e7fff4ca-2eac7a2299fmr11245531fa.25.1717577263571; Wed, 05 Jun 2024
+ 01:47:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <CAA8EJpomPLQmQbW8w3_ms_NMKHoSPcqBa7f2OhNTTOUSdB+9Eg@mail.gmail.com>
+ <20240605021346.GA746121@bhelgaas>
+In-Reply-To: <20240605021346.GA746121@bhelgaas>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Wed, 5 Jun 2024 10:47:32 +0200
+Message-ID: <CAMRc=Mckab1QYoBuE3iSv0x+GEjFNBQS5Hw_Mry=r7h5XGHZEQ@mail.gmail.com>
+Subject: Re: [PATCH v8 16/17] PCI/pwrctl: add a PCI power control driver for
+ power sequenced devices
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
+	Mark Brown <broonie@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	Kalle Valo <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Elliot Berman <quic_eberman@quicinc.com>, Caleb Connolly <caleb.connolly@linaro.org>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Alex Elder <elder@kernel.org>, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	ath11k@lists.infradead.org, Jeff Johnson <quic_jjohnson@quicinc.com>, 
+	ath12k@lists.infradead.org, linux-pm@vger.kernel.org, 
+	linux-pci@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, kernel@quicinc.com, 
+	Amit Pundir <amit.pundir@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1717577020;VERSION=7972;MC=1104090605;ID=105813;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
-X-ESET-Antispam: OK
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2945A1295762776B
+Content-Transfer-Encoding: quoted-printable
 
-If the module is in SFP_MOD_ERROR, `sfp_sm_mod_remove()` will
-not be run. As a consequence, `sfp_hwmon_remove()` is not getting
-run either, leaving a stale `hwmon` device behind. `sfp_sm_mod_remove()`
-itself checks `sfp->sm_mod_state` anyways, so this check was not
-really needed in the first place.
+On Wed, Jun 5, 2024 at 4:13=E2=80=AFAM Bjorn Helgaas <helgaas@kernel.org> w=
+rote:
+>
+> On Wed, Jun 05, 2024 at 02:34:52AM +0300, Dmitry Baryshkov wrote:
+> > On Wed, 5 Jun 2024 at 02:23, Bjorn Helgaas <helgaas@kernel.org> wrote:
+> > >
+> > > On Tue, May 28, 2024 at 09:03:24PM +0200, Bartosz Golaszewski wrote:
+> > > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > > >
+> > > > Add a PCI power control driver that's capable of correctly powering=
+ up
+> > > > devices using the power sequencing subsystem. The first users of th=
+is
+> > > > driver are the ath11k module on QCA6390 and ath12k on WCN7850.
+>
+> > > > +static const struct of_device_id pci_pwrctl_pwrseq_of_match[] =3D =
+{
+> > > > +     {
+> > > > +             /* ATH11K in QCA6390 package. */
+> > > > +             .compatible =3D "pci17cb,1101",
+> > > > +             .data =3D "wlan",
+> > > > +     },
+> > > > +     {
+> > > > +             /* ATH12K in WCN7850 package. */
+> > > > +             .compatible =3D "pci17cb,1107",
+> > > > +             .data =3D "wlan",
+> > > > +     },
+> > >
+> > > IIUC, "pci17cb,1101" and "pci17cb,1107" exist partly so we can check
+> > > that a DTS conforms to the schema, e.g., a "pci17cb,1101" node
+> > > contains all the required regulators.  For that use, we obviously nee=
+d
+> > > a very specific "compatible" string.
+> > >
+> > > Is there any opportunity to add a more generic "compatible" string in
+> > > addition to those so this list doesn't have to be updated for every
+> > > PMU?  The .data here is "wlan" in both cases, and for this purpose, w=
+e
+> > > don't care whether it's "pci17cb,1101" or "pci17cb,1107".
+> >
+> > These two devices have different set of regulators and different
+> > requirements to power them on.
+>
+> Right, but I don't think pci_pwrctl_pwrseq_probe() knows about those
+> different sets.  It basically looks like:
+>
+>   pci_pwrctl_pwrseq_probe(struct platform_device *pdev)
+>   {
+>     struct pci_pwrctl_pwrseq_data *data;
+>     struct device *dev =3D &pdev->dev;
+>
+>     data->pwrseq =3D devm_pwrseq_get(dev, of_device_get_match_data(dev));
+>     pwrseq_power_on(data->pwrseq);
+>     data->ctx.dev =3D dev;
+>     devm_pci_pwrctl_device_set_ready(dev, &data->ctx);
+>   }
+>
+> I think of_device_get_match_data(dev) will return "wlan" for both
+> "pci17cb,1101" and "pci17cb,1107", so devm_pwrseq_get(),
+> pwrseq_power_on(), and devm_pci_pwrctl_device_set_ready() don't see
+> the distinction between them.
+>
 
-Signed-off-by: "Csókás, Bence" <csokas.bence@prolan.hu>
----
- drivers/net/phy/sfp.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+These are only the first two users of this generic driver. We may end
+up adding more that will use different targets or even extend the
+match data with additional fields.
 
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index f75c9eb3958e..d999d9baadb2 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -2418,8 +2418,7 @@ static void sfp_sm_module(struct sfp *sfp, unsigned int event)
- 
- 	/* Handle remove event globally, it resets this state machine */
- 	if (event == SFP_E_REMOVE) {
--		if (sfp->sm_mod_state > SFP_MOD_PROBE)
--			sfp_sm_mod_remove(sfp);
-+		sfp_sm_mod_remove(sfp);
- 		sfp_sm_mod_next(sfp, SFP_MOD_EMPTY, 0);
- 		return;
- 	}
--- 
-2.34.1
+> Of course, they also get "dev", so they can find the device-specifc
+> stuff that way, but I think that's on the drivers/power/sequencing/
+> side, not in this pci-pwrctl-pwrseq driver itself.
+>
+> So what if there were a more generic "compatible" string, e.g., if the
+> DT contained something like this:
+>
+>   wifi@0 {
+>     compatible =3D "pci17cb,1101", "wlan-pwrseq";
 
+What even is "pwrseq" in the context of the hardware description? DT
+maintainers would like to have a word with you. :)
 
+>     ...
+>   }
+>
+> and pci_pwrctl_pwrseq_of_match[] had this:
+>
+>   { .compatible =3D "wlan-pwrseq", .data =3D "wlan", }
+>
+> Wouldn't this pci-pwrctl-pwrseq driver work the same?  I'm not a DT
+> whiz, so likely I'm missing something, but it would be nice if we
+> didn't have to update this very generic-looking driver to add every
+> device that needs it.
+>
+
+Device-tree describes hardware, not the implementation. You can see
+elsewhere in this series that we have the PMU described as a PMIC on
+the device tree but we never register with the regulator subsystem nor
+do we create actual regulators in C. The HW description does not have
+to match the C implementation 1:1 but has to be accurate. There's not
+such HW component as "wlan-pwrseq". If you want a good example of such
+generic fallback - it'll be the C45 ethernet PHYs as they actually
+exist: there's a HW definition of what a broader C45 PHY is, even
+though it can be extended in concrete HW designs.
+
+I'd leave this as is.
+
+Bart
 
