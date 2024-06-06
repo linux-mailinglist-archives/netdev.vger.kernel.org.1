@@ -1,275 +1,192 @@
-Return-Path: <netdev+bounces-101440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F8458FE9D7
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:16:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D3B68FEBE8
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:28:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEE401F2713F
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:16:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 288731F29820
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:28:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146A8198E63;
-	Thu,  6 Jun 2024 14:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 390441991C1;
+	Thu,  6 Jun 2024 14:15:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ceBZO1xW"
+	dkim=pass (2048-bit key) header.d=opensynergy.com header.i=@opensynergy.com header.b="P9MqYJmj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from refb02.tmes.trendmicro.eu (refb02.tmes.trendmicro.eu [18.185.115.60])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A21519B5B0;
-	Thu,  6 Jun 2024 14:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717683072; cv=none; b=icv+JIMx7oQWDUb1L9v/4IEkr1KmZJG2TeKO2WhXfjV8ibNcq71Pvw/hk3lLaOCQeCxhpuxiaIu6O4q1gQdIpqIUPog+DlOoMvpkHo4xGd0JJ+bZhLy7SjBdw9u/yYFLOnkwdNvLPi/uRjl+LB0ZlYTK3athUHEDK1AilOvep8c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717683072; c=relaxed/simple;
-	bh=fcBQjYioVUltQGvCZYRZa8rLmNoWhnsqh/6yL9atVp8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cBV/BHw290J2twNN70jX1NcKB10JkOotXVAdnwdf8/ULc4b0jPT46gKuRaVkJeEr2r0GrTrbTVdZipeExf20JZjEsVH7yggDs96mqbce00Yc9R/kH1v656whK1s1V6s2EvWiERTFzcvY4W27r9NKzxFndtEcYG3LpoUQK1lyf1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ceBZO1xW; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1f63642ab8aso9428395ad.3;
-        Thu, 06 Jun 2024 07:11:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717683070; x=1718287870; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kR3SI/2MLA0reUuRphqbW0P2EIeFEX7Al2MMDtpbjzY=;
-        b=ceBZO1xW4C1ea7aNw0k3euxlOvK7h74PQ87Eb/4sO6viGOsyvVAQsRMq8yuu4UTDkX
-         gtepZci1Oj4j6j8UIjzieyzjq8gwKcKdd4cyQheiYleDVrSqjOYw5+cveXIvQc+0gjOk
-         pBn9QtkwVtvwWfn+d/HKoHFt589DLPz5hwNpy5kBAudGDQDAVzk2hMNq08DUHA0l0Z5f
-         l1HAQum6cEOw01gxqzBaNjXPJrTFz1KevTq/C0frVtpluQqHOm/XZvRHkdtf1oRYf1bm
-         pQgvw3m56tF0M3VnUoc9spgE3d17WbWpNcQfy/q/fn2Qr/wzkqF4fGzaNIcp+mrfrEdl
-         +JBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717683070; x=1718287870;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kR3SI/2MLA0reUuRphqbW0P2EIeFEX7Al2MMDtpbjzY=;
-        b=qDjrMnKFkCkEqGFmScYzvv26gvctQSNh0HpCUcblLPj8PNa2/gcALo/tXBE79EMPLi
-         K9CllFbL9odjxsjcM8GSRgbW1xaYnnXFS8JFPB3oXArzcHBK8xD5FZqJh2HjCWzRhTSg
-         NKGpicq8aVSJYMntD7AtjpNmFb71yy39kGGMqxjHUzSa1gvFkTosT/NPlbQuzNINtMQ8
-         s60tat1/XIpt0I9ehJbrUJVqCrfibsA69xjv0UeIk94sZGoYG/5eWEFf17dmNb9RDXHF
-         nUzpkMIEM0ZQFYQTaEK5vpOBcUKssmlordr+y2AHM3GpII1zFrHtn7u+dlWzwefZ3Qe3
-         NF+A==
-X-Forwarded-Encrypted: i=1; AJvYcCU8HYMmNfVnToS5i80giECOga+RkGDMh7fonWBdXjN4JZKHtOSAwHr8OMQObL+Um6/wL3rqoCAhmRMt/CCCCFZIEPECKTDyYpi9MpCfeBcFpSg/N10xBaNpsFoodxMdisBxu/sy7DVGNV3iHgaIcx4VpdOK/EaqIZKwBaJ3Fi0x9YbTX1cJlnZlSexOppaNZUjN1GgigU+JuxIhPVt4FqepeO3Z
-X-Gm-Message-State: AOJu0YxBxADGVIH+XtzbBC5WkfZB5tYQ/nHOme5T1kRf4+jAS4liIypp
-	UG5ljOOf10M4qWj3w/JtC2ZnvquY1m7f5FiZNGnd/S2GoWdwmx8641pZ0KSDaIlINDEWWtp0ZQr
-	sLnlyvnwNP0HQU6UbqAcMeg7F0MQ=
-X-Google-Smtp-Source: AGHT+IENoX1Lgfbq+QM42oL4DR+kk/tMO4gvcmL0LAo6bkbFqSRadnxhf6EfvMJ1fy/O3tEd+g1vZ1ytDUG+ig1f23E=
-X-Received: by 2002:a17:903:2303:b0:1f6:3d8:cc09 with SMTP id
- d9443c01a7336-1f6a5a5c7e0mr68656045ad.45.1717683069513; Thu, 06 Jun 2024
- 07:11:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D20A1AC22C
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 14:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=18.185.115.60
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717683308; cv=fail; b=U7Huk6I+p4+NPa65MObmInQwcTPksLOrb3P79jGjFv9iJDeZ+wbsQt4e8dV09Yv3c++eUD8l2PbOOQSBZaCtsuyg+NytzyARkPaMAzYiXs0PitTXHARSBoli4FL8TfKI7eYLilqRl9pnAYtYfbBJkO/r4KlYmELDZC4g4C6rc7c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717683308; c=relaxed/simple;
+	bh=ZXv35xifz+hJm716XeIMbGKw4efsIvlgMuhBrLoADbc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=myE8EjJD7y5WkB+ODz3L9MO90MiFVQpVrn/cOkXBjYQBxJCugXvhfBGlKJIFG1xPCeOdmUzJxY+nF9gQtZDcAUJk1sCZnLvF4mR9/bF7fk+S4os/fv+w0LFlYw9vUa9Z3sh7UEdK8h9PxpJp/P2OikY5Tx3aaZFP+C/B7NcIkcE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=opensynergy.com; spf=pass smtp.mailfrom=opensynergy.com; dkim=pass (2048-bit key) header.d=opensynergy.com header.i=@opensynergy.com header.b=P9MqYJmj; arc=fail smtp.client-ip=18.185.115.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=opensynergy.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensynergy.com
+Received: from 104.47.11.168_.trendmicro.com (unknown [172.21.10.213])
+	by refb02.tmes.trendmicro.eu (Postfix) with ESMTPS id 61D821019EEC9
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 14:13:39 +0000 (UTC)
+Received: from 104.47.11.168_.trendmicro.com (unknown [172.21.163.121])
+	by repost01.tmes.trendmicro.eu (Postfix) with SMTP id CBA8D10001FB2;
+	Thu,  6 Jun 2024 14:13:31 +0000 (UTC)
+X-TM-MAIL-RECEIVED-TIME: 1717683210.892000
+X-TM-MAIL-UUID: b2d114a7-56b0-42fe-9394-aebe964cfdac
+Received: from DEU01-FR2-obe.outbound.protection.outlook.com (unknown [104.47.11.168])
+	by repre01.tmes.trendmicro.eu (Trend Micro Email Security) with ESMTPS id D9E651000031A;
+	Thu,  6 Jun 2024 14:13:30 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=f4x+IMA7qCFQ/3YMkVHJE+90gqwnxK1S8ZWj4v81Eq+fzLuE8hNDm4iM6ATTcNXmtXL92PMwBrWP8JorD35jEGg7xSvK7mtfKJX2BV5gLdGr4iDvR58+8yZLdXqtDbsKtQ4BH8iTCd3Ac3h/z6aCoB12Lz521JKVsWDih1VYz5fKF8bZVBlLPKWxwyneKCPkm0YBkolGfL6P/D9DE7rmo1l1rvh4ArVyLoyG22O8Kqpj60qpDRTHAZrfIL0qi5TYEpIXVeL1HiNn5QgDO3rCPJG9Im0vfpT4stLCeoo1LAEtxQT1F1VUynnqtkZ30pPeuSmR+X8eC1w3cpLeCB3DJQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4nu7ix7PCGKEAqZGthDLNSCsfM/y6b3m/vUkfP75TGQ=;
+ b=kw+anKL0k5jSiBtaPWFEVShcXapBM7TFP69+95Q+3Huri1Pi4xYPvb9vsBb5gpeLxvAjb8Iys+xiCRO/s5VUVRQwSpp8DzlvAcjv1qnl2lOWk8mvZnTUXvtbmnBXuk6u4FG5ggtkrJ4yWq33Ld3PJHdIk0ZAmjqsBahOrLmmHj4X9//s9py8+KUEGpS9mjvvvDjgS+ZZUhbY7rkGHgUV8dtgw8CrkiWN6+mQ+AWFjIEC0R/2Y8NTGIHFsrECDTsp2zqusGvn8FVPEVyadXSn0VfbLZ93Gp+A/V3/ra9xbkLw1Ma/++ENC//Kc2yU/GY8FzxC9v8Ab9rUi6WTTYdHig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 213.61.166.92) smtp.rcpttodomain=davemloft.net smtp.mailfrom=opensynergy.com;
+ dmarc=fail (p=reject sp=reject pct=100) action=oreject
+ header.from=opensynergy.com; dkim=none (message not signed); arc=none (0)
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 213.61.166.92)
+ smtp.mailfrom=opensynergy.com; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=oreject header.from=opensynergy.com;
+Received-SPF: Fail (protection.outlook.com: domain of opensynergy.com does not
+ designate 213.61.166.92 as permitted sender) receiver=protection.outlook.com;
+ client-ip=213.61.166.92; helo=SR-MAIL-03.open-synergy.com;
+From: Harald Mommer <Harald.Mommer@opensynergy.com>
+To: virtio-dev@lists.linux.dev,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Wolfgang Grandegger <wg@grandegger.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Dariusz Stojaczyk <Dariusz.Stojaczyk@opensynergy.com>,
+	Harald Mommer <Harald.Mommer@opensynergy.com>
+Subject: [PATCH 1/1] virtio-can: Add link to CAN specification from ISO.
+Date: Thu,  6 Jun 2024 16:12:22 +0200
+Message-Id: <20240606141222.11237-1-Harald.Mommer@opensynergy.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240606-tcp_ao-tracepoints-v3-0-13621988c09f@gmail.com>
- <20240606-tcp_ao-tracepoints-v3-3-13621988c09f@gmail.com> <92c1cb53-ec2b-4153-b97d-c2b8c0fdfaf2@kernel.org>
-In-Reply-To: <92c1cb53-ec2b-4153-b97d-c2b8c0fdfaf2@kernel.org>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Date: Thu, 6 Jun 2024 15:10:55 +0100
-Message-ID: <CAJwJo6akA4Oi2457qP-cK=Gi1hVLThwye6odgb7OuJZk1f119g@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/6] net/tcp: Move tcp_inbound_hash() from headers
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Mohammad Nassiri <mnassiri@ciena.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB1PEPF0003922E:EE_|BE1P281MB3013:EE_
+Content-Type: text/plain
+X-MS-Office365-Filtering-Correlation-Id: 482a6911-d7d7-40d0-b68d-08dc8632d56c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|82310400017|7416005|36860700004|1800799015|376005;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?S/USiP98O9D9oMvhHySeHzM5MJ9mhIrxjaHWBmKiWfCr9yaSk7D/mUrUhzFN?=
+ =?us-ascii?Q?Y4ZstUoqFGohPNDkk5NDPEkq2f9/Fz1jzu3VitCeejFrKs9erWLSO9ZHt/T/?=
+ =?us-ascii?Q?AZuR3azZszMyliutO7G6ILZSPIaVdelAU7/RJLkX+lR7lfDdx3hrLvubl03K?=
+ =?us-ascii?Q?R2qI8Tje+OUsYOHnHF443Fr+QQirq6FOnb3SVS8gEerrz68vtcyxktHjNYOV?=
+ =?us-ascii?Q?TDTCnwfG9ljD+LXiXM58mtKteTAAsd+anq5kK78Jd/nPFpsgZ7aQ1uqFihj+?=
+ =?us-ascii?Q?eMtHr9Z+Evr0JXAHm3V6BavBzKAMtCZGyfDQEnVAuhtuIQGlNXermxQuy9Gx?=
+ =?us-ascii?Q?BQbzwHuTG3l/NnOBjvDfmyJzILg6lG+fACGOsQYdWE+ivyfLHW+lSfxPj9Is?=
+ =?us-ascii?Q?yhcPHRbPnldoQ4ZVw31N3yysFSOB3bVGG6ILETJyerDD9dygeMLHJBg9mwkk?=
+ =?us-ascii?Q?TQEf6Y8/HXOo9Gj+ytxwGXlwRJIVRFR6VVpDesRJw2q7fJI+6jNnjiqLyDzK?=
+ =?us-ascii?Q?j5ZSq8vhNeAhx5VB7OMwRzqJW+Y7Mr5nrOGR2BZOr1eDu80C0zyYa5q/jSBo?=
+ =?us-ascii?Q?MBl4xS6HXDhoVp3Fgz5xXmMKrBD2v8UU5WvZBJ36Dr8t3/yaVpZxLsZtZFE4?=
+ =?us-ascii?Q?gyUqvcELlJKMkEGVdLrgc5eXJ7QTnrjYbvQ2tKxkbuU9kU3Qlrx7nGTRQmlC?=
+ =?us-ascii?Q?T+c2xMbEddsiPCXf7+WYk1+xcBUdgoibv+KujoejiktHwulXGApcq5unsMj5?=
+ =?us-ascii?Q?Y3QXHBRhWNiavnVaH0mg/9m/rIyukU5m5DiYYfjCzexHTcjixj8wG1XyGdfA?=
+ =?us-ascii?Q?4JUYcfShyYWVSpaoHdGKAav/QyGA2by+oXt/qPk/W8HSx3vJo+ij8aELYtkw?=
+ =?us-ascii?Q?5nKTAwRGQ3uwq8+V4BMEY7S8iXDrdefSn+n0kd/Ma1kMCjnhyd2qlL7FZ/F+?=
+ =?us-ascii?Q?Lt5Nr+P946JcfwnKR3dDyLVDVNrDthPjq+vFvS2MhoO1EWo8rjlaKslGpfTF?=
+ =?us-ascii?Q?ilkrqlVZOMqI3dlnPxZ/BO52NCgpnDIAVRtHhfqE0SBbxTmjOXGl2scmcmeY?=
+ =?us-ascii?Q?CHqocwX+Wzd7Ti3GfE8Hlf65uyUhJUYEW5C0Ne6v+zaWASJUWt1PyvURrUyY?=
+ =?us-ascii?Q?+FYpwoTijWsDdMfaW7P4T1y60N9sqHecfPelE3mCVXlqnOsMLr5PpmELg2vZ?=
+ =?us-ascii?Q?1zX8OW7SiT9xPajo5x+awbY8D/Y5SOkZJHnp0bZ9BXHtyscHKtHPZca60wpY?=
+ =?us-ascii?Q?0pz4c2SrPNuOh3azFuauS/gdC6MuJSxkraLmLI/TGwBZqLRJ4QkaHSj6JYY7?=
+ =?us-ascii?Q?XE+4ms/mZXY9QZPm2lk5O+hmhQWlw+zOWLK/QCHD02c8SmSA2XsPRpHuhu2S?=
+ =?us-ascii?Q?eGDku0CMASwMwytmaFMjmDa41Xi7EGq1ePCj+M2SweLC0vg40Q=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:213.61.166.92;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SR-MAIL-03.open-synergy.com;PTR:exchangeconnector.opensynergy.com;CAT:NONE;SFS:(13230031)(82310400017)(7416005)(36860700004)(1800799015)(376005);DIR:OUT;SFP:1102;
+X-OriginatorOrg: opensynergy.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2024 14:13:26.5832
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 482a6911-d7d7-40d0-b68d-08dc8632d56c
+X-MS-Exchange-CrossTenant-Id: 800fae25-9b1b-4edc-993d-c939c4e84a64
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=800fae25-9b1b-4edc-993d-c939c4e84a64;Ip=[213.61.166.92];Helo=[SR-MAIL-03.open-synergy.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DB1PEPF0003922E.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BE1P281MB3013
+X-TM-AS-ERS: 104.47.11.168-0.0.0.0
+X-TMASE-Version: StarCloud-1.3-9.1.1023-28436.000
+X-TMASE-Result: 10-1.047800-4.000000
+X-TMASE-MatchedRID: NGDYxnKYxb3J+P2VFrJmrKdMZMc4JlQbCsYnJzXwRoqL12p7cZqBWIvP
+	iBq/iW91MpPx8OFzfY1Ta75sGuqeWKi8PTAxIaqS7yR/hLt1y2iFU/rz+g+hxFtpNa0o3mGFqXN
+	pl1fc2dczrT87MhOW5dAxdIKEp2hCA3ASNiUtxi2wL+/cgG+7zMn4xfDEuqcVQUZlCPgOIPyF6z
+	UvsSpW6rEDulXIfwn2ckkZYKzf3mGfQEixngIIE2B6KL0WmlgVYppqMItbEgOI/kD+1oWNGb/a0
+	nd+hIFCI/NGWt0UYPAv8kOye9F0ID8aOpcAGK1zWClmBfZH1l0adwCj1QH6tsX55enpC3hi
+X-TMASE-XGENCLOUD: 8fd3d490-e00a-41d7-aab8-a1c43a45ac15-0-0-200-0
+X-TM-Deliver-Signature: C7A16AA34FA8A78513F2FD2AEEEB9E32
+X-TM-Addin-Auth: 1aCZQe/g7OGbQb8gWYKBQTEfmpX+jfFYL+p7mJAt2dl+mksNfThWsLoJMwH
+	Y3cC6H5EdD3EOpURaj8x0aTgfdCbN4kxSaLSWYsv1JnKviCdk7y3uZetMwc4+X0ZrLW05cqJBP5
+	8kEM4zdO2K/sOySFw4BKC10s5Ne4DAydfQ7zdaHT/VNYyij4kbuCpJCMnYyYFWrmQl7IIwIA6rG
+	+gRwYuyPV/l5J1BXIjT1kW4uZinE7dS36U8M7HoH6CweYm5gUGoS50rCvXFGwXkfznrtnakQncD
+	ng/F62CWzbPxX9M=.RKfypBes0KPGz17ya+9pF2Ja1WdanpdhAfiEk9EDYrHcTShZ5KSRkCUf1G
+	FfRjM1+uwYkekMKZyKEUR8m0s02jbQSuGTiFFXuZ4tFBctT4oqsBSMz8TnhVrCHXc01RjWSmCzi
+	Pei4bVMQO9pMaEONDCcRFcQboGBuguh33PwjTxW8XF3iSa9fOGRORDssc3ndRb1/Hv2kXkCDFLs
+	h/pXTPWBnFcozd8bYdQH7scdaBbuKuHOpsvSzK4wOGHiUiGmycfDokZlBP+q5KUQvM33kWJVOls
+	Y5t3tTAA7ms0510rTB0xNc3GXnP4sjLaU+Q7RxTJpSZreURpOzibPitF+Ug==
+X-TM-Addin-ProductCode: EMS
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=opensynergy.com;
+	s=TM-DKIM-20210503141657; t=1717683211;
+	bh=ZXv35xifz+hJm716XeIMbGKw4efsIvlgMuhBrLoADbc=; l=1043;
+	h=From:To:Date;
+	b=P9MqYJmj61pCmqiu8SaWJGOl2I3Gkc8ROrZ4JQ+GeGCkGKx1wrDVmofaunwtE3DeP
+	 z8ubQlcENbwt8esAPbd2hvXgNv7mSplg/k8JEF4CH0YExuT1SdjLBdntj+VzqGdyWP
+	 dB3crvClowBovJBPq5gAN2JR4Q65hSXB2LQnaySFyuNdJDzd7Z0cKq/Q8EXGLH/W5N
+	 HdwHdmU82exyMsKQv5QoAKlmX2UWm/pmGNM0wjZ9ajKlTK/Md0iiOSI71fm5ozzTcR
+	 UYCmRX4h57j7EdS1vMoS6Wrzmvjd+pGyLJNC2vyJpzgVFdm4XS+1FUY6j+z2Bty0Uw
+	 rTJVnoB4qJ/7Q==
 
-Hi Matthieu,
+Add link to the CAN specification in the ISO shop.
 
-[re-sending as replying from mobile phone never works in plain text]
+  ISO 11898-1:2015
+  Road vehicles
+  Controller area network (CAN)
+  Part 1: Data link layer and physical signalling
 
-On Thu, 6 Jun 2024 at 10:12, Matthieu Baerts <matttbe@kernel.org> wrote:
->
-> Hi Dmitry,
->
-> On 06/06/2024 02:58, Dmitry Safonov via B4 Relay wrote:
-> > From: Dmitry Safonov <0x7f454c46@gmail.com>
-> >
-> > Two reasons:
-> > 1. It's grown up enough
-> > 2. In order to not do header spaghetti by including
-> >    <trace/events/tcp.h>, which is necessary for TCP tracepoints.
-> >
-> > While at it, unexport and make static tcp_inbound_ao_hash().
->
-> Thank you for working on this.
->  > Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
-> > ---
-> >  include/net/tcp.h | 78 +++--------------------------------------------=
---------
-> >  net/ipv4/tcp.c    | 66 ++++++++++++++++++++++++++++++++++++++++++++--
-> >  2 files changed, 68 insertions(+), 76 deletions(-)
-> >
-> > diff --git a/include/net/tcp.h b/include/net/tcp.h
-> > index e5427b05129b..2aac11e7e1cc 100644
-> > --- a/include/net/tcp.h
-> > +++ b/include/net/tcp.h
-> > @@ -1863,12 +1863,6 @@ tcp_md5_do_lookup_any_l3index(const struct sock =
-*sk,
-> >       return __tcp_md5_do_lookup(sk, 0, addr, family, true);
-> >  }
-> >
-> > -enum skb_drop_reason
-> > -tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
-> > -                  const void *saddr, const void *daddr,
-> > -                  int family, int l3index, const __u8 *hash_location);
-> > -
-> > -
-> >  #define tcp_twsk_md5_key(twsk)       ((twsk)->tw_md5_key)
-> >  #else
-> >  static inline struct tcp_md5sig_key *
-> > @@ -1885,13 +1879,6 @@ tcp_md5_do_lookup_any_l3index(const struct sock =
-*sk,
-> >       return NULL;
-> >  }
-> >
-> > -static inline enum skb_drop_reason
-> > -tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
-> > -                  const void *saddr, const void *daddr,
-> > -                  int family, int l3index, const __u8 *hash_location)
-> > -{
-> > -     return SKB_NOT_DROPPED_YET;
-> > -}
->
-> It looks like this no-op is still needed, please see below.
->
-> >  #define tcp_twsk_md5_key(twsk)       NULL
-> >  #endif
-> >
->
-> (...)
->
-> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > index fa43aaacd92b..80ed5c099f11 100644
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@ -4456,7 +4456,7 @@ int tcp_md5_hash_key(struct tcp_sigpool *hp,
-> >  EXPORT_SYMBOL(tcp_md5_hash_key);
-> >
-> >  /* Called with rcu_read_lock() */
-> > -enum skb_drop_reason
-> > +static enum skb_drop_reason
-> >  tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
-> >                    const void *saddr, const void *daddr,
-> >                    int family, int l3index, const __u8 *hash_location)
-> > @@ -4510,10 +4510,72 @@ tcp_inbound_md5_hash(const struct sock *sk, con=
-st struct sk_buff *skb,
-> >       }
-> >       return SKB_NOT_DROPPED_YET;
-> >  }
-> > -EXPORT_SYMBOL(tcp_inbound_md5_hash);
-> >
-> >  #endif
-> >
-> > +/* Called with rcu_read_lock() */
-> > +enum skb_drop_reason
-> > +tcp_inbound_hash(struct sock *sk, const struct request_sock *req,
-> > +              const struct sk_buff *skb,
-> > +              const void *saddr, const void *daddr,
-> > +              int family, int dif, int sdif)
-> > +{
-> > +     const struct tcphdr *th =3D tcp_hdr(skb);
-> > +     const struct tcp_ao_hdr *aoh;
-> > +     const __u8 *md5_location;
-> > +     int l3index;
-> > +
-> > +     /* Invalid option or two times meet any of auth options */
-> > +     if (tcp_parse_auth_options(th, &md5_location, &aoh)) {
-> > +             tcp_hash_fail("TCP segment has incorrect auth options set=
-",
-> > +                           family, skb, "");
-> > +             return SKB_DROP_REASON_TCP_AUTH_HDR;
-> > +     }
-> > +
-> > +     if (req) {
-> > +             if (tcp_rsk_used_ao(req) !=3D !!aoh) {
-> > +                     NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOBAD);
-> > +                     tcp_hash_fail("TCP connection can't start/end usi=
-ng TCP-AO",
-> > +                                   family, skb, "%s",
-> > +                                   !aoh ? "missing AO" : "AO signed");
-> > +                     return SKB_DROP_REASON_TCP_AOFAILURE;
-> > +             }
-> > +     }
-> > +
-> > +     /* sdif set, means packet ingressed via a device
-> > +      * in an L3 domain and dif is set to the l3mdev
-> > +      */
-> > +     l3index =3D sdif ? dif : 0;
-> > +
-> > +     /* Fast path: unsigned segments */
-> > +     if (likely(!md5_location && !aoh)) {
-> > +             /* Drop if there's TCP-MD5 or TCP-AO key with any rcvid/s=
-ndid
-> > +              * for the remote peer. On TCP-AO established connection
-> > +              * the last key is impossible to remove, so there's
-> > +              * always at least one current_key.
-> > +              */
-> > +             if (tcp_ao_required(sk, saddr, family, l3index, true)) {
-> > +                     tcp_hash_fail("AO hash is required, but not found=
-",
-> > +                                   family, skb, "L3 index %d", l3index=
-);
-> > +                     return SKB_DROP_REASON_TCP_AONOTFOUND;
-> > +             }
-> > +             if (unlikely(tcp_md5_do_lookup(sk, l3index, saddr, family=
-))) {
-> > +                     NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5NOTFO=
-UND);
-> > +                     tcp_hash_fail("MD5 Hash not found",
-> > +                                   family, skb, "L3 index %d", l3index=
-);
-> > +                     return SKB_DROP_REASON_TCP_MD5NOTFOUND;
-> > +             }
-> > +             return SKB_NOT_DROPPED_YET;
-> > +     }
-> > +
-> > +     if (aoh)
-> > +             return tcp_inbound_ao_hash(sk, skb, family, req, l3index,=
- aoh);
-> > +
-> > +     return tcp_inbound_md5_hash(sk, skb, saddr, daddr, family,
-> > +                                 l3index, md5_location);
->
-> Many selftests are currently failing [1] because of this line: if
-> CONFIG_TCP_MD5SIG is not defined -- which is currently the case in many
-> selftests: tc, mptcp, forwarding, netfilter, drivers, etc. -- then this
-> tcp_inbound_md5_hash() function is not defined:
->
-> > net/ipv4/tcp.c: In function =E2=80=98tcp_inbound_hash=E2=80=99:
-> > net/ipv4/tcp.c:4570:16: error: implicit declaration of function =E2=80=
-=98tcp_inbound_md5_hash=E2=80=99; did you mean =E2=80=98tcp_inbound_ao_hash=
-=E2=80=99? [-Werror=3Dimplicit-function-declaration]
-> >  4570 |         return tcp_inbound_md5_hash(sk, skb, saddr, daddr, fami=
-ly,
-> >       |                ^~~~~~~~~~~~~~~~~~~~
-> >       |                tcp_inbound_ao_hash
->
-> Do you (or any maintainers) mind replying to this email with this line
-> [2] so future builds from the CI will no longer pick-up this series?
->
-> pw-bot: changes-requested
+The specification is not freely obtainable there.
+---
+ introduction.tex | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Ugh, it seems I can falter on a plain place.
-I should have rechecked this for v3.
+diff --git a/introduction.tex b/introduction.tex
+index 8bcef03..72573d6 100644
+--- a/introduction.tex
++++ b/introduction.tex
+@@ -142,7 +142,8 @@ \section{Normative References}\label{sec:Normative References}
+     TRANSMISSION CONTROL PROTOCOL
+ 	\newline\url{https://www.rfc-editor.org/rfc/rfc793}\\
+ 	\phantomsection\label{intro:CAN}\textbf{[CAN]} &
+-    ISO 11898-1:2015 Road vehicles -- Controller area network (CAN) -- Part 1: Data link layer and physical signalling\\
++    ISO 11898-1:2015 Road vehicles -- Controller area network (CAN) -- Part 1: Data link layer and physical signalling
++	\newline\url{https://www.iso.org/standard/63648.html}\\
+ \end{longtable}
+ 
+ \section{Non-Normative References}
+-- 
+2.34.1
 
-pw-bot: changes-requested
-
-Thanks for the report,
-           Dmitry
 
