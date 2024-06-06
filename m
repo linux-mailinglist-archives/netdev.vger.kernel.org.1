@@ -1,191 +1,143 @@
-Return-Path: <netdev+bounces-101456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8E388FEFF6
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:07:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 782618FEFF8
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:07:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14FD31F247B0
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:07:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA4031F230F6
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:07:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7213C19751B;
-	Thu,  6 Jun 2024 14:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D23A319752B;
+	Thu,  6 Jun 2024 14:43:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xCNBfre5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WpnVf+bP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 960413A8C0
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 14:43:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D3B19752A;
+	Thu,  6 Jun 2024 14:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717684983; cv=none; b=AY4tq2dJgqeQRIzr9z86xd4IW7gQVY2Bt+K9a2HMbxoiYzJmtcepVCXnYK0tQ8M/6iXcXY9N2ONYGp+Zn8saRlX0JMtnUU/vbX3rHwcsqCWEzXz0FQ31Ps4tlHM+xpClHOo9HluNvleK0PE6+OG++MXyFIW7K7PWdhNVJIqcP1s=
+	t=1717685030; cv=none; b=Djk8eRfJgVmRH7xxcRp3Mf6eWm3wJGK4WWa+acvY5BbVA87C5I4jmqcsSL3e6lGlCU9iYsoP6dStfUe+SzvwZAgsbkrztHIaeuyLJ3XM4ZmgkFDZZbsazzqFjb0WkeaMtlY1ZFYW5n4810cVauT0mKSvdJ6ky+ngk07P9tIjyJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717684983; c=relaxed/simple;
-	bh=ONW53m4ZycWO1OGtk0GeLM/2qht39lHSIfuM/kqo9lk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UsA6qNWAxzVtNVXNx0yjH2oY5kiscbzOEQZF+wbsCgbc8ROCRI8ObwmMhYK0BWIA2gy6JUtWVzW89dS+r4wisg4WIxJaJi/ymE8uvRiszozn5FrA5LmxPflpFgSDYMW5d+5XLS/rU03XPuQwgiqU61MdXJXOa4mrMRpEfEtiPp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xCNBfre5; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: daniel@iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1717684978;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OyjftdVLlqSs/0Ocru/73Avy/AEFY5TKCAK8RNKM7vI=;
-	b=xCNBfre5GyZDH2+KCsGM+3I2PIiduF9fFnPbIIVVzsrAIl9ILzELM/jdni4a2Wxwtz9G/C
-	KxpDHdGXIROFCca9drkniNf1SLdGZvGDfzEgEE1L6yKDSTVfCFYJtUQLE27GSKUhHYRDfg
-	Hug+9zPzWGIPO4d1sSmUu5A8uWJPevg=
-X-Envelope-To: bpf@vger.kernel.org
-X-Envelope-To: netdev@vger.kernel.org
-X-Envelope-To: kuba@kernel.org
-X-Envelope-To: mykolal@fb.com
-X-Envelope-To: andrii@kernel.org
-X-Envelope-To: martin.lau@linux.dev
-X-Envelope-To: ast@kernel.org
-Message-ID: <2b629bd6-a497-410d-9193-f5e0a8cb91e4@linux.dev>
-Date: Thu, 6 Jun 2024 15:42:54 +0100
+	s=arc-20240116; t=1717685030; c=relaxed/simple;
+	bh=JB1NevTXdv+UNsEQ6WfgHDPb8FWJM5nleNsoGLmDvwY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=HAJlsKEXM9c3J2jTD7/4b3+Cfd/44ZPRHTMl/hlk4wkK4tvvV/A0VRFIOUJeyHinANf8nwmgkKYNS+hN7dh7aF964Xyt6q2gMMl31hP2+omIVimcpLjEEZ4QBNOrHe/xocnXTYuqbSp4KI1sY7jdOirFloIQaWnFbue1SXwVcjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WpnVf+bP; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6afbf9c9bc0so5630026d6.3;
+        Thu, 06 Jun 2024 07:43:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717685028; x=1718289828; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dp3NsIAD5uVeKMXKm6Hi7+g1K8jYuPKZ1gkbAWgUwqw=;
+        b=WpnVf+bPVXpu71ipkKRoDt6mX0MIA0C/GtZgq5p7VnZAhqKOcmAaN8cDwzCuxkbLI2
+         Ogin1MlymRkgdaA8vhgZ6QaXqDk7q5nqSbL5V4VV7Ngt/rfQXSORPKo77JAVl0vGsPUv
+         EdW3zrz/+jYN0gFiehMMKdV8+TNixDOfGoS+gIPVaowhvzZKyjalPQrcdprbVjCUvFNu
+         DbKZFtgiz/hBUtumkFOZlkZo1sZJ4odYMtDF2LVAM9L3+rParjX0knjIWngmnNQH1WxX
+         jYxrWaE9QH6NTazI/cP5MfazfwpezbGyE4X4kWBx05S00MuSCGR2IhLEPHCtmAfLAEbk
+         ZfHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717685028; x=1718289828;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=dp3NsIAD5uVeKMXKm6Hi7+g1K8jYuPKZ1gkbAWgUwqw=;
+        b=ZPwq+ofRhL61m/Ji2aJaw1Czz2XQyfgiXAMg3+zXO+/NzV916EmXCMzXEIxCYOpc87
+         SqEl4Twx7t8XFiNAyrArNrBDNl3KNnORm3nw13CfBB5x77tqAgGNS92SQqLEeQ+6Xnpn
+         gqHoglxa8qRMRUr+aL2w0etxGjZ7TvyZvFDzoFeb6bx81uA3NwMBPKDxXjnP1p+6hGGD
+         +LYI0XmnG82D72bWTPpZ1SUWn5Bi7IBnClAfidhnh6el4TaovqfueMMrgm3OiGJwfwTP
+         VgUtvOxDghfxRx5UaKbIlE1pK2taNr1KftqqQ858SwqgVmkA3fMWgPC/1OzPlf0yshsm
+         5r7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWLWB/ptQUBgPU6QJIViobEBnTI+4UTop0Zkd85Hwp/LpWnXzufwTXd7fuGlDZQMxh+/CEDLRMMQOHvcbyFLbHY9bqMbksSkwsFJ1G/nA+NihPDhcCh51I1MruGeE7UvhoE+NHBdE8B
+X-Gm-Message-State: AOJu0YxegjyGS3q1kD/k9Tx1/qbVHUms4Q1IcqNrgUKndyM+2gy6FOP9
+	NSHMSmvy/2lh7Wa+UBKAumHCSW8Z6H7H9ny7ZH8qi81syElw42OL
+X-Google-Smtp-Source: AGHT+IFz7VpWfdXKTOre5xW5ScvKtvVshPrUNctrvmvVjvcf+ECV/tT7kx8p6xx3FxnJS7asAQWkwA==
+X-Received: by 2002:a05:6214:3902:b0:6af:cb9f:59dc with SMTP id 6a1803df08f44-6b020320c02mr60993506d6.1.1717685028129;
+        Thu, 06 Jun 2024 07:43:48 -0700 (PDT)
+Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b04f7046c2sm6859456d6.59.2024.06.06.07.43.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jun 2024 07:43:47 -0700 (PDT)
+Date: Thu, 06 Jun 2024 10:43:47 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Florian Westphal <fw@strlen.de>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Florian Westphal <fw@strlen.de>, 
+ Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Christoph Paasch <cpaasch@apple.com>, 
+ Netfilter <netfilter-devel@vger.kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ daniel@iogearbox.net, 
+ willemb@google.com
+Message-ID: <6661cb237158e_37d9572949b@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240606143816.GC9890@breakpoint.cc>
+References: <20240604120311.27300-1-fw@strlen.de>
+ <FF8A506F-6F0F-440E-9F52-B27D05731B77@apple.com>
+ <20240605181450.GA7176@breakpoint.cc>
+ <ZmCwlbF8BvLGNgRM@calendula>
+ <20240605190833.GB7176@breakpoint.cc>
+ <20240606092620.GC4688@breakpoint.cc>
+ <20240606130457.GA9890@breakpoint.cc>
+ <6661c313cf1fe_37b6f32942e@willemb.c.googlers.com.notmuch>
+ <20240606141516.GB9890@breakpoint.cc>
+ <6661c788553a4_37c46c294fc@willemb.c.googlers.com.notmuch>
+ <20240606143816.GC9890@breakpoint.cc>
+Subject: Re: [PATCH nf] netfilter: nf_reject: init skb->dev for reset packet
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 1/2] bpf: add CHECKSUM_COMPLETE to bpf test
- progs
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Alexei Starovoitov <ast@kernel.org>
-References: <20240527185928.1871649-1-vadfed@meta.com>
- <f7fe13a8-c379-495b-9e42-3a5ff50b50e3@linux.dev>
- <05dfb8f6-4325-62c9-b0b0-1bc22f0f8d93@iogearbox.net>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <05dfb8f6-4325-62c9-b0b0-1bc22f0f8d93@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On 05/06/2024 15:43, Daniel Borkmann wrote:
-> On 6/5/24 11:42 AM, Vadim Fedorenko wrote:
->> On 27/05/2024 19:59, Vadim Fedorenko wrote:
->>> Add special flag to validate that TC BPF program properly updates
->>> checksum information in skb.
->>>
->>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
->>> ---
->>>   include/uapi/linux/bpf.h       |  2 ++
->>>   net/bpf/test_run.c             | 18 +++++++++++++++++-
->>>   tools/include/uapi/linux/bpf.h |  2 ++
->>>   3 files changed, 21 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
->>> index 90706a47f6ff..f7d458d88111 100644
->>> --- a/include/uapi/linux/bpf.h
->>> +++ b/include/uapi/linux/bpf.h
->>> @@ -1425,6 +1425,8 @@ enum {
->>>   #define BPF_F_TEST_RUN_ON_CPU    (1U << 0)
->>>   /* If set, XDP frames will be transmitted after processing */
->>>   #define BPF_F_TEST_XDP_LIVE_FRAMES    (1U << 1)
->>> +/* If set, apply CHECKSUM_COMPLETE to skb and validate the checksum */
->>> +#define BPF_F_TEST_SKB_CHECKSUM_COMPLETE    (1U << 2)
->>>   /* type for BPF_ENABLE_STATS */
->>>   enum bpf_stats_type {
->>> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
->>> index f6aad4ed2ab2..4c21562ad526 100644
->>> --- a/net/bpf/test_run.c
->>> +++ b/net/bpf/test_run.c
->>> @@ -977,7 +977,8 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, 
->>> const union bpf_attr *kattr,
->>>       void *data;
->>>       int ret;
->>> -    if (kattr->test.flags || kattr->test.cpu || kattr->test.batch_size)
->>> +    if ((kattr->test.flags & ~BPF_F_TEST_SKB_CHECKSUM_COMPLETE) ||
->>> +        kattr->test.cpu || kattr->test.batch_size)
->>>           return -EINVAL;
->>>       data = bpf_test_init(kattr, kattr->test.data_size_in,
->>> @@ -1025,6 +1026,12 @@ int bpf_prog_test_run_skb(struct bpf_prog 
->>> *prog, const union bpf_attr *kattr,
->>>       skb_reserve(skb, NET_SKB_PAD + NET_IP_ALIGN);
->>>       __skb_put(skb, size);
->>> +
->>> +    if (kattr->test.flags & BPF_F_TEST_SKB_CHECKSUM_COMPLETE) {
->>> +        skb->csum = skb_checksum(skb, 0, skb->len, 0);
->>> +        skb->ip_summed = CHECKSUM_COMPLETE;
->>> +    }
->>> +
->>>       if (ctx && ctx->ifindex > 1) {
->>>           dev = dev_get_by_index(net, ctx->ifindex);
->>>           if (!dev) {
->>> @@ -1079,6 +1086,15 @@ int bpf_prog_test_run_skb(struct bpf_prog 
->>> *prog, const union bpf_attr *kattr,
->>>       }
->>>       convert_skb_to___skb(skb, ctx);
->>> +    if (kattr->test.flags & BPF_F_TEST_SKB_CHECKSUM_COMPLETE) {
->>> +        __wsum csum = skb_checksum(skb, 0, skb->len, 0);
->>> +
->>> +        if (skb->csum != csum) {
->>> +            ret = -EBADMSG;
->>> +            goto out;
->>> +        }
->>> +    }
->>> +
->>>       size = skb->len;
->>>       /* bpf program can never convert linear skb to non-linear */
->>>       if (WARN_ON_ONCE(skb_is_nonlinear(skb)))
->>> diff --git a/tools/include/uapi/linux/bpf.h 
->>> b/tools/include/uapi/linux/bpf.h
->>> index 90706a47f6ff..f7d458d88111 100644
->>> --- a/tools/include/uapi/linux/bpf.h
->>> +++ b/tools/include/uapi/linux/bpf.h
->>> @@ -1425,6 +1425,8 @@ enum {
->>>   #define BPF_F_TEST_RUN_ON_CPU    (1U << 0)
->>>   /* If set, XDP frames will be transmitted after processing */
->>>   #define BPF_F_TEST_XDP_LIVE_FRAMES    (1U << 1)
->>> +/* If set, apply CHECKSUM_COMPLETE to skb and validate the checksum */
->>> +#define BPF_F_TEST_SKB_CHECKSUM_COMPLETE    (1U << 2)
->>>   /* type for BPF_ENABLE_STATS */
->>>   enum bpf_stats_type {
->>
->> Hi Daniel!
->>
->> Have you had a chance to look at v3 of this patch?
->> I think I addressed all your comments form v2.
+Florian Westphal wrote:
+> Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
+> > > I named the copypasta as nf_skb_get_hash. If placed in sk_buff.h:
+> > > net_get_hash_net()?
+> > > skb_get_hash()?
+> > 
+> > Still passing an skb too, so skb_get_hash_net()?
 > 
-> Looks good, but I think there is something off given the test on arm64 
-> and s390x
-> fails in skb_pkt_end with EBADMSG. I wonder if we're missing a :
+> Sounds good to me.
 > 
->    skb_postpull_rcsum(skb, eth_hdr(skb), ETH_HLEN);
+> > > And if either of that exists, maybe then use
+> > > skb_get_hash_symmetric_net(net, skb)
+> > 
+> > If symmetric is equally good for nft, that would be preferable, as it
+> > avoids the extra function. But I suppose it aliases the two flow
+> > directions, which may be exactly what you don't want?
 > 
-> right after the eth_type_trans()?
+> It would actually be fine, but the more important part is that
+> skb->hash is set.
+> 
+> For the trace id, I want a stable identifier that won't change
+> (e.g. when nat rewrites addresses).
+> 
+> This currently works because skb_get_hash computes it at most once.
 
-Oh, thanks for bringing it up. Looks like it's a bit more complex.
-Apparently, CHECKSUM_COMPLETE covers everything after the ethernet
-header. That's why the code has to calculate checksum after network and
-transport offsets are set. And for L2 case we have to skip ethernet
-header.
+Probably not relevant to these skbs, that don't have an skb->sk.
 
-Another issue is that correct check should use folded checksums instead
-of raw values. I believe that was flagged by tests for other archs.
+But in case skbs coming from the TCP stack are also in scope: can
+sk_rethink_txhash cause problems?
+ 
+> skb_get_hash_symmetric_net() will be used from nft_hash.c as
+> __skb_get_hash_symmetric "replacement".
+> 
+> Pablo, you can drop this patch, I will try the 'pass net to dissector'
+> route.
 
-I'll do v4 soon and will be sure to have tests passing on all archs.
-
-Thanks,
-Vadim
-
-
-
-> Thanks,
-> Daniel
 
 
