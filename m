@@ -1,57 +1,76 @@
-Return-Path: <netdev+bounces-101272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BFFC8FDEA5
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:20:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 750218FDEA7
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:22:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7F77B23F18
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 06:20:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E08C1C2418F
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 06:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90D7D71742;
-	Thu,  6 Jun 2024 06:20:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 271004DA14;
+	Thu,  6 Jun 2024 06:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="vRU+Xrt7";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="87c6PaFT"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD6473465;
-	Thu,  6 Jun 2024 06:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9345019D8A1;
+	Thu,  6 Jun 2024 06:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717654837; cv=none; b=ihKWQHyHYzlp5xh8jgiUq+BSWQHzbFcwdeIzhpQ+L4Lvjaq5hFe4U1aQwBBGP/JzeYLhKo81fb85a5C+hOgjJlVNgmSff2e58AzixgYCbpFbRTQXyl7l9rPyriiI0GRrUtTZ9iWYSv9+y8QRVp1ns1aoHlGfwdHRvxnCyu89y+0=
+	t=1717654963; cv=none; b=hoVqeyGfAU4yVy/PTgn4rb/VZ0A5eENWvbXTigjr8PMUV6x4uewk0WXkepQVRTfDCm7ACIz+pSM9WpG5CFNdE/ST2crkVfnDAgl9/p+s+IluMmb/IHDSJkSKnZ+kW3y64owvlk0TKk4c+W1ysz3QcwvP8cXmWSZWfglWhhuoyv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717654837; c=relaxed/simple;
-	bh=wa/Y5z7S+OxoN3U5U/ujBKeym5MpVXkjvY8FYwuv3Nk=;
+	s=arc-20240116; t=1717654963; c=relaxed/simple;
+	bh=yB68uGLMaXT1YV1sbSThDoviU8YPb91HeMCIZFMJbgQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hPE9f2zANPzeAKBHho1JeXoL2iu7Sc3rPPh57C/j571enwj09kJt5P6gm94ERQVB7ojrJp8xoFrpFJqf5kVRHq3sqzCiuKim2gzxiwZIfQrWHD3NLxSi7Or1MTgbP7icd5kFofsMbY+8r+Ve+E/SYnG1pMRFUZ73AtM9kru5wOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [31.221.188.228] (port=12018 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1sF6U4-00Bkcr-5B; Thu, 06 Jun 2024 08:20:26 +0200
-Date: Thu, 6 Jun 2024 08:20:22 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Willem de Bruijn <willemb@google.com>
-Cc: Florian Westphal <fw@strlen.de>, Christoph Paasch <cpaasch@apple.com>,
-	Netfilter <netfilter-devel@vger.kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	daniel@iogearbox.net, Stanislav Fomichev <sdf@google.com>
-Subject: Re: [PATCH nf] netfilter: nf_reject: init skb->dev for reset packet
-Message-ID: <ZmFVJtJqKEyuuvbK@calendula>
-References: <20240604120311.27300-1-fw@strlen.de>
- <FF8A506F-6F0F-440E-9F52-B27D05731B77@apple.com>
- <20240605181450.GA7176@breakpoint.cc>
- <ZmCwlbF8BvLGNgRM@calendula>
- <20240605190833.GB7176@breakpoint.cc>
- <ZmDAQ6r49kSgwaMm@calendula>
- <CA+FuTSfAhHDedA68LOiiUpbBtQKV9E-W5o4TJibpCWokYii69A@mail.gmail.com>
- <ZmDjtm27BnxQ0xRX@calendula>
- <CA+FuTScK2cpgRdd5CjgE=z=XbH8Gb45i4kkMNKsCPN9rQa6GpQ@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q5XHAo9y54YWFsAGRBGskg9sW5zErO3qIF4Xkj3tVV1kmFSeTAyeVF53T8XBCFP5CRF2Hcap1MIai0dQDLigYATWiOk2hhHg2wKkorK/QWPUIfW8mRhdNtAuM9iJgBPC0Wj3DQAg350XZ90oBYZ2EkOvUShhENqtZhWmrKUbKHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=vRU+Xrt7; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=87c6PaFT; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 6 Jun 2024 08:22:37 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1717654959;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PZbspwahrReSiEYm4PJOvgqOfbLgJT+v5PtwhKLRS5Q=;
+	b=vRU+Xrt7qfOQCVY3ghd5wShqMojUHU2Scch7McyNsNbBycPTimJzgb6hrCTrgzVo7gFnz/
+	QZk4QInUEfFvPtfRmmtRiqpg5A/OIt0TKgiNuxH/kpoIb8HwswgOyZXem1kgjMyGo/BePo
+	YI1RJkl8x8xGJVUcitI9rr7YRzaAUmR7hL9z5sLsFExOTm8NL5PUXmihuTkrp6wa86iSJF
+	LFIyn73IDnn71pcppGenwuIvJK7tbBPGXDll1jM9JDH8wpu/TCGuXDuG7/ztVh4gKKN1zz
+	J7+LlDKVGCEJWxJXgw1M/AfM2WhWzFqQFtdeHFOVGDsHN/jhY3McCXoBiTI3QA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1717654959;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PZbspwahrReSiEYm4PJOvgqOfbLgJT+v5PtwhKLRS5Q=;
+	b=87c6PaFTSzuOuHDnarqFAleF2KS2afdlq8GLhiwo1iPMdlo3lj4MrafLsYp7Ao1MqnfWLZ
+	izXGRThGBs4B1KBQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Daniel Bristot de Oliveira <bristot@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 net-next 03/14] net: Use nested-BH locking for
+ napi_alloc_cache.
+Message-ID: <20240606062237.nuBoHreW@linutronix.de>
+References: <20240604154425.878636-1-bigeasy@linutronix.de>
+ <20240604154425.878636-4-bigeasy@linutronix.de>
+ <20240605195420.2f47e6a1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,142 +79,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+FuTScK2cpgRdd5CjgE=z=XbH8Gb45i4kkMNKsCPN9rQa6GpQ@mail.gmail.com>
-X-Spam-Score: -1.7 (-)
+In-Reply-To: <20240605195420.2f47e6a1@kernel.org>
 
-Hi Willem,
-
-On Wed, Jun 05, 2024 at 09:54:59PM -0400, Willem de Bruijn wrote:
-> On Wed, Jun 5, 2024 at 6:16 PM Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> >
-> > On Wed, Jun 05, 2024 at 05:38:00PM -0400, Willem de Bruijn wrote:
-> > > On Wed, Jun 5, 2024 at 3:45 PM Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> > > >
-> > > > On Wed, Jun 05, 2024 at 09:08:33PM +0200, Florian Westphal wrote:
-> > > > > Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> > > > >
-> > > > > [ CC Willem ]
-> > > > >
-> > > > > > On Wed, Jun 05, 2024 at 08:14:50PM +0200, Florian Westphal wrote:
-> > > > > > > Christoph Paasch <cpaasch@apple.com> wrote:
-> > > > > > > > > Reported-by: Christoph Paasch <cpaasch@apple.com>
-> > > > > > > > > Suggested-by: Paolo Abeni <pabeni@redhat.com>
-> > > > > > > > > Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/494
-> > > > > > > > > Signed-off-by: Florian Westphal <fw@strlen.de>
-> > > > > > > >
-> > > > > > > > I just gave this one a shot in my syzkaller instances and am still hitting the issue.
-> > > > > > >
-> > > > > > > No, different bug, this patch is correct.
-> > > > > > >
-> > > > > > > I refuse to touch the flow dissector.
-> > > > > >
-> > > > > > I see callers of ip_local_out() in the tree which do not set skb->dev.
-> > > > > >
-> > > > > > I don't understand this:
-> > > > > >
-> > > > > > bool __skb_flow_dissect(const struct net *net,
-> > > > > >                         const struct sk_buff *skb,
-> > > > > >                         struct flow_dissector *flow_dissector,
-> > > > > >                         void *target_container, const void *data,
-> > > > > >                         __be16 proto, int nhoff, int hlen, unsigned int flags)
-> > > > > > {
-> > > > > > [...]
-> > > > > >         WARN_ON_ONCE(!net);
-> > > > > >         if (net) {
-> > > > > >
-> > > > > > it was added by 9b52e3f267a6 ("flow_dissector: handle no-skb use case")
-> > > > > >
-> > > > > > Is this WARN_ON_ONCE() bogus?
-> > > > >
-> > > > > When this was added (handle dissection from bpf prog, per netns), the correct
-> > > > > solution would have been to pass 'struct net' explicitly via skb_get_hash()
-> > > > > and all variants.  As that was likely deemed to be too much code churn it
-> > > > > tries to infer struct net via skb->{dev,sk}.
-> > >
-> > > It has been a while, but I think we just did not anticipate skb's with
-> > > neither dev nor sk set.
-> > >
-> > > Digging through the layers from skb_hash to __skb_flow_dissect
-> > > now, it does look impractical to add such an explicit API.
-> > >
-> > > > > So there are several options here:
-> > > > > 1. remove the WARN_ON_ONCE and be done with it
-> > > > > 2. remove the WARN_ON_ONCE and pretend net was init_net
-> > > > > 3. also look at skb_dst(skb)->dev if skb->dev is unset, then back to 1)
-> > > > >    or 2)
-> > > > > 4. stop using skb_get_hash() from netfilter (but there are likely other
-> > > > >    callers that might hit this).
-> > > > > 5. fix up callers, one by one
-> > > > > 6. assign skb->dev inside netfilter if its unset
-> > >
-> > > Is 6 a realistic option?
-> >
-> > Postrouting path already sets on skb->dev via ip_output(), if callers
-> > are "fixed" then skb->dev will get set twice.
+On 2024-06-05 19:54:20 [-0700], Jakub Kicinski wrote:
+> On Tue,  4 Jun 2024 17:24:10 +0200 Sebastian Andrzej Siewior wrote:
+> > @@ -308,6 +311,7 @@ void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align_mask)
+> >  	struct napi_alloc_cache *nc = this_cpu_ptr(&napi_alloc_cache);
+> >  
+> >  	fragsz = SKB_DATA_ALIGN(fragsz);
+> > +	guard(local_lock_nested_bh)(&napi_alloc_cache.bh_lock);
+> >  
+> >  	return __page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC,
+> >  				       align_mask);
 > 
-> I meant to set it just before calling skb_get_hash and unset
-> right after. Just using the skb to piggy back the information.
-> 
-> > the netfilter tracing infrastructure only needs a hash identifier for
-> > this packet to be displayed from userspace when tracing rules, how is
-> > the running the custom bpf dissector hook useful in such case?
-> 
-> The BPF flow dissector is there as much to short circuit the
-> hard-coded C protocol dissectors as to expand on the existing
-> feature set. I did not want production machines exposed to
-> every protocol parser, as that set kept expanding.
-> 
-> Having different dissection algorithms depending on where the
-> packet enters the dissector is also surprising behavior?
+> We have decided to advise against the use of guard() in networking, 
+> at least for now.
 
-I would say: "having different dissection _operation modes_ depending on
-where the packets enters the dissector is the expected behaviour", so
-the dissector code adapts to the use-case.
+Understood.
 
-> If all that is needed is an opaque ID, and on egress skb->hash
-> is derived with skb_set_hash_from_sk from sk_txhash, then
-> this can even be pseudo-random from net_tx_rndhash().
+> Andrew, wasn't it on your TODO list to send the update to the docs? :)
+I can add it to
+	Documentation/process/maintainer-netdev.rst
 
-I think this will not work for the netfilter use-case, such
-pseudo-random number would be then generated in the scope of the chain
-and that packet could go over several chains while being processed.
-Thus, displaying different IDs for the same packet.
+Yes, no, Andrew?
 
-> > the most correct solution is to pass struct net explicitly to the
-> > dissector API instead of guessing what net this packet belongs to.
-> 
-> Unfortunately from skb_get_hash to __skb_flow_dissect is four
-> layers of indirections, including one with three underscores already,
-> that cannot be easily circumvented.
-> 
-> Temporarily passing it through skb (and unsetting after) seems
-> the simplest fix to me.
-
-it sounds like a temporary workaround. I understand your concern that
-it requires a much larger patch to pass net to the flow dissector
-infrastructure.
-
-> > Else, remove this WARN_ON_ONCE which is just a oneliner.
-> 
-> According to the commit that introduced it, this was to sniff out drivers
-> that don't set this (via eth_get_headlen).
-> 
-> The problem is that nothing else warns loudly, so you just quietly
-> lose the BPF dissection coverage.
-> 
-> This is the first time it warned. You point out that the value of BPF
-> is limited to you in this case. But that's not true for all such cases.
-> I'd rather dissection breaks hard than that it falls back quietly for
-> input from an untrusted network.
-> 
-> Maybe reduce it to DEBUG_NET_WARN_ON_ONCE?
-
-I am afraid syzkaller and such will still hit this for Christoph,
-since DEBUG_NET is usually recommended to be turned on in such case.
-
-Another possibility is that netfilter stops using the dissector code
-for the tracing infrastructure at the cost of replicating code.
-
-Thanks.
+Sebastian
 
