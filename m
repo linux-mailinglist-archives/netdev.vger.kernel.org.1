@@ -1,55 +1,58 @@
-Return-Path: <netdev+bounces-101197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 798458FDB97
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 02:42:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11FE48FDB9C
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 02:48:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D2821F24A07
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 00:42:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28EA5B2187D
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 00:48:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21BE748F;
-	Thu,  6 Jun 2024 00:42:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF77679D0;
+	Thu,  6 Jun 2024 00:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VZja4xWp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cxQOtYhF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE60BEED6
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 00:42:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F2C4683;
+	Thu,  6 Jun 2024 00:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717634547; cv=none; b=rpY0Vu3igtwPBni0LCrqSLYz4cPlk5vA1HV5ktVunQp6I+quxnK0Y+AOkOTB6HRA8mC9m4WY6deXtAKG3gdJxRpq8B3ZgyOwtPGQ0Hgapi7x7aSiPf79SX4VYewODh6iKj1fJoNJ7VqR7HcsNdmYmeIcgPJHxdMdesZbOCuboZs=
+	t=1717634884; cv=none; b=Ptzc91aY9uxjXqBJAbq3swNB/ngPtY2TIcha35jaFAvw1cw+bwajUUMfqpoxUvdI30cA6f4i+0CvKQPAodde+wFYyXz6QOCYc2ahLWMcjP85n8GSy17jW3KtO1C4F0+UcmQF6qVzuweVivG4OfDBPVU5k9ePyENzZuHNDQD1gf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717634547; c=relaxed/simple;
-	bh=mfk9t6OkOQ6FMiw+9Bp+lQSM+hSNtbVE4eiRYqs+J4w=;
+	s=arc-20240116; t=1717634884; c=relaxed/simple;
+	bh=iR7qCGvKa4GnFOsr+YD5UM3cwMIqnABlfcxvyTOVjrE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KvMk8QWrI/7ccwqU1alL6jwjE4m3xpSSEPzBZ+QAjD44BoLYmm0F9Yz+PSREpqj/F+OU0S9e64wxX6khLtGdeDXFNgIgIkQDT86//+PE/x7XZsFHZ6Rj9GUC/6sPmwWV3Bh/TLThhZrkM058llnO9OAmoCSnKforvvZhNNX71U4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VZja4xWp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BB8FC2BD11;
-	Thu,  6 Jun 2024 00:42:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Hbw85x9hD8e6/cSR9MtreDybBP+Db029rR/m1Obz/hAkzMX7rAVh26xnaNInrC5/0YmDJOub6R/M8YDd+hyzT1OzANwhfmnjVmL4oMXlLtzn2dOn3TnW1eqmMT30z1wuxeCn0XRM5NwASuGX/3t2Z74YNc8z6Xosj1tP3rXVz5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cxQOtYhF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2BBDC3277B;
+	Thu,  6 Jun 2024 00:48:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717634547;
-	bh=mfk9t6OkOQ6FMiw+9Bp+lQSM+hSNtbVE4eiRYqs+J4w=;
+	s=k20201202; t=1717634884;
+	bh=iR7qCGvKa4GnFOsr+YD5UM3cwMIqnABlfcxvyTOVjrE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VZja4xWp9PldlCLhBcYGc4Qj5MUb4aSC0vekod6CGWzi0aq5syNszwwI047yJUHu5
-	 nWPw02D5IHLm7EvfFRxnhk/HSYuag9rvk7q0hhwlZsv+Ik+Cx1MnASLHEcV43U3Vrw
-	 7zkmp87305DQ1trCxCVT2/HFIJUDFNXXcUsc6/DCzbozWCiyurXpXns47SF0OFbt+6
-	 rFyiHodUcAexMxxGMte0ezGJeoCwS1OiKaLhg4XaR0pnhq++nDopa1MtCUeLKGDMbc
-	 0lAHKTaTLLwuFtTRYWj4rn8GwkCKNl+ecMYa3Y3lTSLNxavNmpYnI/Je7K02g+7+gR
-	 P9OJdqDaONF+Q==
-Date: Wed, 5 Jun 2024 17:42:26 -0700
+	b=cxQOtYhFIW8MSns9cdM8Uwmas6i11mn/mUelZKrNhdRzSenZBRCt2ZwgbpRRe4KB+
+	 rM7CoHsvr25aF4VkzTFZ9R7O2u0hKr5CjbzrxdMps+xhgaXAEwyIvwJcdRo7p+d5wV
+	 MQk/2Pwktuh9Kj1qoA21sKkHR2nNhXD87R7feppv27C+qfq3vgFGPaXHUt4qXPUmoB
+	 CR3nVP1HL/a2uzgMu3rHOqWbQ0cTg5abnfLEPkajTUbHRJTlRGId5p5uVWezlCu0ZY
+	 ENhbwF0XGGwsGBBaupu1lMNDL8EalhhkYTmCLaoLqOkgdwCmSsDhhvHLX7q0vM9fKr
+	 gPISttyedlh0Q==
+Date: Wed, 5 Jun 2024 17:48:02 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mengyuan Lou <mengyuanlou@net-swift.com>
-Cc: netdev@vger.kernel.org, jiawenwu@trustnetic.com,
- duanqiangwen@net-swift.com
-Subject: Re: [PATCH net-next v4 0/6] add sriov support for wangxun NICs
-Message-ID: <20240605174226.2b55ebc4@kernel.org>
-In-Reply-To: <3601E5DE87D2BC4F+20240604155850.51983-1-mengyuanlou@net-swift.com>
-References: <3601E5DE87D2BC4F+20240604155850.51983-1-mengyuanlou@net-swift.com>
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ corbet@lwn.net, linux-doc@vger.kernel.org, Rahul Rameshbabu
+ <rrameshbabu@nvidia.com>, Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH iwl-next v1 1/5] net: docs: add missing features that
+ can have stats
+Message-ID: <20240605174802.0add2109@kernel.org>
+In-Reply-To: <20240604221327.299184-2-jesse.brandeburg@intel.com>
+References: <20240604221327.299184-1-jesse.brandeburg@intel.com>
+	<20240604221327.299184-2-jesse.brandeburg@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,14 +62,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue,  4 Jun 2024 23:57:29 +0800 Mengyuan Lou wrote:
-> Add sriov_configure for ngbe and txgbe drivers.
-> Reallocate queue and irq resources when sriov is enabled.
-> Add wx_msg_task in interrupts handler, which is used to process the
-> configuration sent by vfs.
-> Add ping_vf for wx_pf to tell vfs about pf link change.
+On Tue,  4 Jun 2024 15:13:21 -0700 Jesse Brandeburg wrote:
+> -  - `ETHTOOL_MSG_PAUSE_GET`
+>    - `ETHTOOL_MSG_FEC_GET`
+> +  - 'ETHTOOL_MSG_LINKSTATE_GET'
+>    - `ETHTOOL_MSG_MM_GET`
+> +  - `ETHTOOL_MSG_PAUSE_GET`
+> +  - 'ETHTOOL_MSG_TSINFO_GET'
 
-You have cut out the ndo_set_vf_* calls but you seem to add no uAPI
-access beyond just enabling the PCI SR-IOV capability. What's your plan
-of making this actually usable? It's a very strange submission.
+I was going to steal this directly but:
+` vs '
+so I'll let it go via the Intel tree :)
 
