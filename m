@@ -1,176 +1,97 @@
-Return-Path: <netdev+bounces-101302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F33F08FE152
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 10:42:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 925E58FE15E
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 10:45:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A9AE1F22AB0
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:42:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 984D91C247E6
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53BDA13C8F0;
-	Thu,  6 Jun 2024 08:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC0713AA5E;
+	Thu,  6 Jun 2024 08:45:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hgEcxUnq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GFlmEHOw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2EA3282FE
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 08:42:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7CA7347A
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 08:45:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717663329; cv=none; b=EYnp3P5E71zoBGfYG94NGsGLr6kkiH9w3vBmXwwbdAu0XJgFgVqUtCbrWuyEyodur5UDKKl3KELIJbx5xg8kPy3cioR9609Ij9Ltnr5wQhkoYxa5giCk2S10W4vRP/zVUv0Ro68BfgFKj9VJhl0kkvhfj9HK8Nb2kurMm+cKv/8=
+	t=1717663528; cv=none; b=qaVkkeZ1KCdVKEh4UYK4rIEJdxOj3Xp1uONUkZ9CYJlfb9wHa4yANNBz+qwjkO+rgXXAOO2jo662TLAxR6Q05JsVGkyjNOXGpiteAcx7Qxv11ulg0R9Iz2vSRXFaqcn6GGE5K+LTk3WfxWqKGXZuzIL4bO0ZfAJMtFCkr9bYQUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717663329; c=relaxed/simple;
-	bh=mAb+0Iv6Exl25GZ+qLNucVvBGjl2AXfSSYAlWqDLImc=;
-	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JwuG9Q189Nw4XTqJe1NHBhvQS9ai24j75FaJ552r23HQ3rrp627R4E8ZvC2BR7nfADKPrZraLlTDZDbnktq1jcAzQjH9haPp28vvtBZM3WNyboxIRZsJN4MMGIW7Ix0uJJJaRlYNn0VMxd68jctQtJAZfeGurP4qM9ihRwwdWWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hgEcxUnq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717663326;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3DTzxzZ6ElccSXzynyCH2s3XyyNG1vvqASU4bmMnRVo=;
-	b=hgEcxUnqtE78ulE25XoYy89BEJjra+xQQXO7j0RYWHcBDPC3DAlfxugKZUnEZvAAjAk3aw
-	XxZ02KbYe6i1+AJMl8otq3VVWsYr+6ZkFSXYRiRzsV+2qQQyskLqrJA+TABzzLnTR1JL22
-	sf4HVpMgy1HmnhAZmz9QBF3jK9OR1fw=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-550-qXBmucbkMPujzuAuuNGUng-1; Thu, 06 Jun 2024 04:42:05 -0400
-X-MC-Unique: qXBmucbkMPujzuAuuNGUng-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6ae259a01ffso9703386d6.0
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 01:42:05 -0700 (PDT)
+	s=arc-20240116; t=1717663528; c=relaxed/simple;
+	bh=KQW9JtQlekmnXbieobjmU0ltBqQKghgkYqKnFqj9Qlg=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=A9cgeNk7NcgJ6Q05D6+uu/rxf5ctZ31Fz8LkxUgtWu3Xs8pQnrMUnlyVQ67mC/Iy7bWfTNFCqxE1AgJjEXKxYg+v3PKNMEYBp0DNgDwY6ceqKTBtRrQ1hpzRDkVD94UsI33+sou/Xo7nWjaIDb3oTuDFTbot+8GA9P5g6o7Rh2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GFlmEHOw; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a696cde86a4so64237466b.1
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 01:45:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717663525; x=1718268325; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KQW9JtQlekmnXbieobjmU0ltBqQKghgkYqKnFqj9Qlg=;
+        b=GFlmEHOwjvnRrAH/jtc6HlAcdMqAJAJz8T6oH90mmS6ano6NM7fvd81FvB/nuQKGbU
+         dE5IFy8W6TkDr3sUrBpMEtDLcWQZ/a4fTgYBSwarNQc67Vs4plnQ3hWfYriKV4MJhLdc
+         iN9VoSazBAsmi6w7NuBdBN85foY4ajTeruXAk+NCuf8wVGXxFMks45H5Y6CBFR1I7ls9
+         8SGOAiHN36L+2J+ryzAlzQstSa5rLs+gNwkCEanrVoMcfJKXHtar/Hzyotb8Za8d/Iov
+         kFHyJi0biFikRWyl+mypO6TPfxpNrRx5NPVPg9Swgk5Zd+glgKdcIc8VxadIJictHZAw
+         zn3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717663325; x=1718268125;
-        h=cc:to:subject:message-id:date:in-reply-to:mime-version:references
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3DTzxzZ6ElccSXzynyCH2s3XyyNG1vvqASU4bmMnRVo=;
-        b=wD6hcQV36NbvrFswoftPsPsdT5J3+8/jgXg4ybXsf3/VdZiILC0QHI+/kJCgLow4gC
-         qwh+/D5lnxGajm1KCw9uVsVn//1FcqsWfneGkvZc879XPc9lsvaQeI+N7rgTrmhmTciw
-         W1Xzyd1Q/u2ntc7iaetya5HDUpxsoNxtHgknSW0TDT1NkV/ZfnexouvbHQ5HEFrwvJbe
-         yeyNwzgJl1SZqdx1pyXBoYkPUpY03Mby4Taf64KCn5TznGG5VnIjED/rDXQgiQ1XcnIe
-         MoyKTKiD1E/93yRC1hVQPS8b7qOR98hrCioPh+gJlNqHIcBEseX+de3DYs7Gc2dRIrKa
-         UQEg==
-X-Gm-Message-State: AOJu0YyjxqJ2DCE3RREzHts0mnZmTwpEHZhiQR9u24mFVGcaiHYh4CSf
-	CNXq57U3ZbjnvUrx/k1U/JF1wn7N0SkfIQ5Gaj4RaREYYG3twelx4ksn/eAKeAcWMYR/PpjllGR
-	UkQ96/iFRWAsOrsE9V2N0ruwZWOicrmvqvuGyfE+sbDsAtUM8TKjNmodUqxdjSQMDw2PE6dm+27
-	9EXck187losXqJzDydJbxhCY/QKlfH
-X-Received: by 2002:a05:6214:5989:b0:6af:2342:e15b with SMTP id 6a1803df08f44-6b02bf15cf4mr65772206d6.14.1717663324852;
-        Thu, 06 Jun 2024 01:42:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGnOAjXFejTbHf91B2AwD+zLjnOZXa/PeDCbknCOrG22l3HyZQ2rnnA1enJhnGJLoAEXVr6f0JTK6qz9JRxYxg=
-X-Received: by 2002:a05:6214:5989:b0:6af:2342:e15b with SMTP id
- 6a1803df08f44-6b02bf15cf4mr65772016d6.14.1717663324427; Thu, 06 Jun 2024
- 01:42:04 -0700 (PDT)
-Received: from 311643009450 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 6 Jun 2024 08:42:03 +0000
-From: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
-References: <20240603185647.2310748-1-amorenoz@redhat.com> <20240603185647.2310748-6-amorenoz@redhat.com>
- <20240605195117.GY791188@kernel.org>
+        d=1e100.net; s=20230601; t=1717663525; x=1718268325;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KQW9JtQlekmnXbieobjmU0ltBqQKghgkYqKnFqj9Qlg=;
+        b=gJJFsBBIx6Mc05nHRCfuNH5yiq0y98XaETkGFR9FO3FG3QFfT1J5vLLXZTeCINhWIO
+         aYG2NSzui4Mp1cHe7A9VcqkvopPq/FNviOlwGbEc06AIkazQWFJqodg90UkxPCoDvI8b
+         Fz7sz0BhcRbzthfWSJzoREJR2hcfQzV379B96ZwGtbmn0LTonOH9umw3swVvhtfwygEx
+         19CXbLnqAKO5I+gsYolT1ppu2C7f3SRKZPIyEIAxpK4kle1IcjDvIGuqEjQvb7ZhIZ2n
+         kqzgdFCLZJ/24wEiHk69/Wg8q/AO5cFfFpeYBiz+sAwjDQgmpfME6szVIw3El7weIG80
+         iZGg==
+X-Forwarded-Encrypted: i=1; AJvYcCVwm9YY3fgaQK8sxY10kRq+093EIjIeo4ZAlrOJyTIuKhMnfmigzXK+yy96j/dcpmooY4HvBo/Tjyy5itkhIMB86+YQ+5qh
+X-Gm-Message-State: AOJu0Yw3XqHdEe+rW9VRqj53LiQtJN6cR7wtgfjBJEI6IEs/G1YtGQ62
+	rNwiOToRldLxKEEMHkItZFyXHsWwBhWQavPas6vv3Tg+bwA2FkGx
+X-Google-Smtp-Source: AGHT+IESYv4P/Y8laCPDoWbjyUVlU74IqKnVqPL2GzqUV/ZmCeVcZ3QiCyz7ZaykqdG6C+EiaiEq0w==
+X-Received: by 2002:a17:907:c909:b0:a68:8784:e0d1 with SMTP id a640c23a62f3a-a699fcdf86emr262386466b.48.1717663525366;
+        Thu, 06 Jun 2024 01:45:25 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:e839:f9f4:6f15:88bc])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6c805c8bfesm64888166b.56.2024.06.06.01.45.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jun 2024 01:45:24 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  Dan Melnic <dmm@meta.com>,  nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next] tools: ynl: make user space policies const
+In-Reply-To: <20240605171644.1638533-1-kuba@kernel.org> (Jakub Kicinski's
+	message of "Wed, 5 Jun 2024 10:16:44 -0700")
+Date: Thu, 06 Jun 2024 09:44:59 +0100
+Message-ID: <m2jzj2mpdg.fsf@gmail.com>
+References: <20240605171644.1638533-1-kuba@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240605195117.GY791188@kernel.org>
-Date: Thu, 6 Jun 2024 08:42:03 +0000
-Message-ID: <CAG=2xmML3MusD-ro6advb389ctYwaObZE+PBEh14TcXP5AbZJA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 5/9] net: openvswitch: add emit_sample action
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, aconole@redhat.com, echaudro@redhat.com, 
-	i.maximets@ovn.org, dev@openvswitch.org, 
-	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Pravin B Shelar <pshelar@ovn.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-On Wed, Jun 05, 2024 at 08:51:17PM GMT, Simon Horman wrote:
-> On Mon, Jun 03, 2024 at 08:56:39PM +0200, Adrian Moreno wrote:
-> > Add support for a new action: emit_sample.
-> >
-> > This action accepts a u32 group id and a variable-length cookie and uses
-> > the psample multicast group to make the packet available for
-> > observability.
-> >
-> > The maximum length of the user-defined cookie is set to 16, same as
-> > tc_cookie, to discourage using cookies that will not be offloadable.
-> >
-> > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
->
-> Hi Adrian,
->
-> Some minor nits from my side.
->
-> ...
->
-> > diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
-> > index efc82c318fa2..a0e9dde0584a 100644
-> > --- a/include/uapi/linux/openvswitch.h
-> > +++ b/include/uapi/linux/openvswitch.h
-> > @@ -914,6 +914,30 @@ struct check_pkt_len_arg {
-> >  };
-> >  #endif
-> >
-> > +#define OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE 16
-> > +/**
-> > + * enum ovs_emit_sample_attr - Attributes for %OVS_ACTION_ATTR_EMIT_SAMPLE
-> > + * action.
-> > + *
-> > + * @OVS_EMIT_SAMPLE_ATTR_GROUP: 32-bit number to identify the source of the
-> > + * sample.
-> > + * @OVS_EMIT_SAMPLE_ATTR_COOKIE: A variable-length binary cookie that contains
-> > + * user-defined metadata. The maximum length is 16 bytes.
-> > + *
-> > + * Sends the packet to the psample multicast group with the specified group and
-> > + * cookie. It is possible to combine this action with the
-> > + * %OVS_ACTION_ATTR_TRUNC action to limit the size of the packet being emitted.
-> > + */
-> > +enum ovs_emit_sample_attr {
-> > +	OVS_EMIT_SAMPLE_ATTR_UNPSEC,
-> > +	OVS_EMIT_SAMPLE_ATTR_GROUP,	/* u32 number. */
-> > +	OVS_EMIT_SAMPLE_ATTR_COOKIE,	/* Optional, user specified cookie. */
-> > +	__OVS_EMIT_SAMPLE_ATTR_MAX
-> > +};
-> > +
-> > +#define OVS_EMIT_SAMPLE_ATTR_MAX (__OVS_EMIT_SAMPLE_ATTR_MAX - 1)
-> > +
-> > +
->
-> nit: One blank line is enough.
->
+Jakub Kicinski <kuba@kernel.org> writes:
 
-Ack.
-
->      Flagged by checkpatch.pl
+> Dan, who's working on C++ YNL, pointed out that the C code
+> does not make policies const. Sprinkle some 'const's around.
 >
-> >  /**
-> >   * enum ovs_action_attr - Action types.
-> >   *
-> > @@ -1004,6 +1028,7 @@ enum ovs_action_attr {
-> >  	OVS_ACTION_ATTR_ADD_MPLS,     /* struct ovs_action_add_mpls. */
-> >  	OVS_ACTION_ATTR_DEC_TTL,      /* Nested OVS_DEC_TTL_ATTR_*. */
-> >  	OVS_ACTION_ATTR_DROP,         /* u32 error code. */
-> > +	OVS_ACTION_ATTR_EMIT_SAMPLE,  /* Nested OVS_EMIT_SAMPLE_ATTR_*. */
->
-> nit: Please add OVS_ACTION_ATTR_EMIT_SAMPLE to the Kenrel doc
->      for this structure.
->
+> Reported-by: Dan Melnic <dmm@meta.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Thanks for spotting this. Will do.
-
-
-> >
-> >  	__OVS_ACTION_ATTR_MAX,	      /* Nothing past this will be accepted
-> >  				       * from userspace. */
->
-> ...
->
-
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
