@@ -1,93 +1,72 @@
-Return-Path: <netdev+bounces-101243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B7B48FDD18
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 05:01:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F20948FDD20
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 05:04:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F4861C21B39
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 03:01:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B213285462
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 03:04:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 445A8134B0;
-	Thu,  6 Jun 2024 03:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88158182BD;
+	Thu,  6 Jun 2024 03:04:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="PPdvN2fy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qwa9sk9l"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B4B3D71
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 03:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E4921340
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 03:04:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717642868; cv=none; b=lUcpBhhTHH4LUNYO4Zun20QbtOsGK/5ZV3G0cGMqrFzDdsJQzBZLK0OBJhloCIPxcU0nKSw2Al4+X75JdE8b/jy/OClQEedEUpXIpViOV5KBX1NwLtJwyke07P8zBD2IqR7LC5nl8s3Z6UtnGDUgoToWUKB0ytIhRu3NWdy2vzw=
+	t=1717643079; cv=none; b=cCVVTQma0YRYTkrneXFnPD0uy5CYyfwRyYQ15RkXBHmzoYCharUSD2kTyHjaLfajoHWuOAEc1w84RA5A17ml0hwF5jFxTe+fv34cRzhGMJobKkuvoYzHl41RGEaZBDfEV5ayeMKyOxux0n8ZMDHOHkRpoqicRoq74lqELYDovo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717642868; c=relaxed/simple;
-	bh=HdJ41HGpdoj7n5aT+4odLX6+KsIUsEQo8g2xK0DRhfE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WPEU/fJsOsFpqowBnfYL0pYQtGFHt9mSFvvWrkjVaw18OzEapnwwtgfJOEvR7Ha54lRfSW73QK/Mf0jm/Xx4zCQYZ7FiZBvxtXqvzZuodV7tUh89quHfQ+5MMdipLSGEQFzNC7LcuqfkM4d5MqJzmTrdFQtbWvofT10HpmxDb5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=PPdvN2fy; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-Received: from [192.168.2.60] (210-10-213-150.per.static-ipl.aapt.com.au [210.10.213.150])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 72F9720154;
-	Thu,  6 Jun 2024 11:01:01 +0800 (AWST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1717642861;
-	bh=HdJ41HGpdoj7n5aT+4odLX6+KsIUsEQo8g2xK0DRhfE=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=PPdvN2fy2k/KnSGUOOfYUXHP75olXi9pa0yRIPz1LXrWbbKVQA3F5sMhWzj6oy8FT
-	 +cefdGDCB8BO5qoMUWVW5pVAnkk0C2+GdPdqnmDlOMpI+VkHe+K77Fgfxyau8hsuwl
-	 XkPWKNQl6Flnlj2fsQfY5sp2j0f11P6gobumrAlkU7Z3hJ3u+6so9i0AHK/qdbBE2Y
-	 oJQAG8o0VvN/CPSRFfkY7vuo5XFPilRl0GphqG7nvWDfHXQjBJwo0ip2P2SDTLOGJy
-	 WFPFYv3gNzuXWXUcS5dwuzq+uxJRddDsP3bQg1f4ZysM/pe8u7872MgxGb0wgDPL2I
-	 IIgmoxEyUj+gQ==
-Message-ID: <fec284041a4a4ccc450fdfd504aae4f24458b79c.camel@codeconstruct.com.au>
-Subject: Re: [PATCH net-next v2 0/3] net: core: Unify dstats with tstats and
- lstats, add generic collection helper
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Ahern <dsahern@kernel.org>, "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org
-Date: Thu, 06 Jun 2024 11:01:01 +0800
-In-Reply-To: <20240605191800.2b12df8d@kernel.org>
-References: <20240605-dstats-v2-0-7fae03f813f3@codeconstruct.com.au>
-	 <20240605190212.7360a27a@kernel.org>
-	 <ccb2a7fc282d7874bc3862dad1ca7002b713ac33.camel@codeconstruct.com.au>
-	 <20240605191800.2b12df8d@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1717643079; c=relaxed/simple;
+	bh=ELFcCgD320MKHx4lJSn8D9lhl2ruW1n1pt0TALR8KcE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=O/+NJIfe3ghMx5FkrO2poaNbcjvQ9px2tsMcike6BKdTSg2NuGHZ+RTg491JsI+rjcLuPadNb+K31vu0BtM4PE22tIjv+HW7mEo35JrKxA+bN7/MPxFThJOekm0gPx1JG8gMhmQWq7Trb2w16wJECeqz2wSAd6FdCsdol87zsbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qwa9sk9l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC55CC3277B;
+	Thu,  6 Jun 2024 03:04:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717643079;
+	bh=ELFcCgD320MKHx4lJSn8D9lhl2ruW1n1pt0TALR8KcE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qwa9sk9lZkkAJ3mzwEO6VLBT0ewisiqghpjQGJZl/FRf8UGWzKczOFWe3GH71riFC
+	 m6QiqBAEMh1KsamRFyPN6Ix3Xdjp2ov0JUmyC8VE6domVNhQ6MFW0MmfANiB5ufFs+
+	 L06Bfxdra1BhURqNvjPycPwkhSrYplDeA9nvUj++u/pHKaLZXOQs0fkF7RRuUOVjAE
+	 n6oKFq4LQgsLS2DlnWnW/NdqewnOM2tS/x4JE+LdOTkaVfAFMILm2teyIHVMvvwcze
+	 Cv8QBMPBcJkYFNKO2zmT52hl5UtXmBsySSkGLwbKgpg91TfvZk+b+uK8Jf13OwtA+/
+	 CiOgZT/Yp5sRQ==
+Date: Wed, 5 Jun 2024 20:04:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ linux@armlinux.org.uk, horms@kernel.org, andrew@lunn.ch,
+ netdev@vger.kernel.org, mengyuanlou@net-swift.com
+Subject: Re: [PATCH net-next v2 0/3] add flow director for txgbe
+Message-ID: <20240605200437.602f6f4e@kernel.org>
+In-Reply-To: <20240605020852.24144-1-jiawenwu@trustnetic.com>
+References: <20240605020852.24144-1-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Jakub,
+On Wed,  5 Jun 2024 10:08:49 +0800 Jiawen Wu wrote:
+> Add flow director support for Wangxun 10Gb NICs.
 
-> > If we're not exporting the helpers, that means that drivers that
-> > use
-> > dstats wouldn't have a facility to customise the stats collection
-> > through a ndo_get_stats64() callback though (as can be done with
-> > tstats). Are you ok with that?
-> >=20
-> > [the set of drivers that need that is currently zero, so more of a
-> > hypothetical future problem...]
->=20
-> Right, but I think "no exports unless there is an in-tree user"
-> is still a rule. A bit of a risk that someone will roll their own
-> per-cpu stats pointlessly if we lack this export. But let's try
-> to catch that in review..
+Some nits:
+ - please wrap the code at 80 chars where possible
+ - please run ./scripts/kernel-doc -Wall -none $file; and make sure no
+   new warnings get added:
 
-OK, sounds good! I'll send a v3 shortly.
-
-Cheers,
-
-
-Jeremy
+drivers/net/ethernet/wangxun/txgbe/txgbe_fdir.c:114: warning: No description found for return value of 'txgbe_fdir_add_signature_filter'
 
