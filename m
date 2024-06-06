@@ -1,95 +1,83 @@
-Return-Path: <netdev+bounces-101419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F1368FE7C9
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:30:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29EA38FE7CA
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:30:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F2862858F4
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 13:30:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C272D286872
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 13:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6BA15FA7D;
-	Thu,  6 Jun 2024 13:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4938A19598F;
+	Thu,  6 Jun 2024 13:30:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KsfWG6xK"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CygLTZO9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50262A1C2
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 13:30:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94FA1D688;
+	Thu,  6 Jun 2024 13:30:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717680630; cv=none; b=IkBfKrGGTOJaYIfPdxDDPAy+46iNif2EZ9PdFZEChE2baqhucH3V8vtGrdNf1odHet0Mth3uMdp2Lzf8xA2NZdnklNPgSxfXrjkKukFIpafGfdE+8LJyMbwzWRAludXKs8Ja3x28pg8jpB1ghmTGExqDteExAPx9dSABPGpCB58=
+	t=1717680640; cv=none; b=DAaX5gVUHKveleX2+hf8WSmXpSUGBLXfkW3v+kJ/q6erB8M5fkRTXhfPFC5P8+ug8w2pHj6HtsKFyajRTnEzXG7Q8dH1JeNIhZYvl4OWT4kp5kuXR+x8JmBSE3SFl9Yw7Xk+SBSOEnr2UpwmsZN5lj/CsW3lGa5PL1IAZ2KitMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717680630; c=relaxed/simple;
-	bh=EF8YMWuTx+L1/JkF64ZUufZd4ZdPlw6TDFAnMue46MU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PHSRm8THQuwgYC2ORAz3Jg40tP0/53tLHnEPSARK6sGHhztWdcEEhKUz4lAVzrPDFD+W+w/q9EOKjBIG+/T2rEe9zy9JjHapqY79IYbGb4WxGjQNTaG85RM7/ltcRWx+MQpmWkAwd18MsjAaAuTw60XeVbWLesEA1hrGU2F40Tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KsfWG6xK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 18395C32782;
-	Thu,  6 Jun 2024 13:30:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717680630;
-	bh=EF8YMWuTx+L1/JkF64ZUufZd4ZdPlw6TDFAnMue46MU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KsfWG6xK4ZBEiIqseEgl7rX/K/GKgpUQwz/i8jrCrNJVnuIayOAnfBo4WBGWutios
-	 Uytya1H9OsudDyNbv9BpbQItqbntc6Hw89UP1HL3b2BPNaDvQ6sSO24pEDhY6CSQBh
-	 /6I5zm3ncTOLxgNJsmLgakABpKqmXJ3Ore3cBtK9ApDs13KqkDbt8FPk44t4RJpDlx
-	 MBQ5xA5VQDJETfttkulwduxl19NMqBFfamtknydeECfkRssfNv/sxG2gG64RlOG2YW
-	 2IPbzjAoTXAynEpJkmF8to6FozXjtB0Poms0Xu0N4ad/07Sk2UUsMoKFtSRLQ/kQ+h
-	 fWyFM/D2Kp4aA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 05DA8D20380;
-	Thu,  6 Jun 2024 13:30:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1717680640; c=relaxed/simple;
+	bh=Aw8mXRPRvqz8sD3PD2BMYJivDyo3YQgbnJEYWVzd2/k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z4jOvApCh8wPywgjnbGbM+aU4g+wRxb0YyBTSM9YuNX+rD3hz0j7URUPhI7zIlIBaVZQKuj2U92vMnlDu9LDpMDvdjHhcvAE+cwYS2hioYHhPY9r2vaASx/WtSkTYr0lPTKo8mJrPIl3jMaEZ+7vC/bJCoM3gnm8nntgzfN6D+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CygLTZO9; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=9XI9wH7c0OiiKuuV7PRZF9/baW0BWhqWDJc2QitLSPM=; b=CygLTZO9o2WozOhuihdVYu9TLp
+	FcbVEin+gAaHruSRNgRxK+Z7tLS3BIfb//O7t1e9vrIXgN/M6T7okJS2KB9XOq8VzhHfKfeMVydUx
+	ilvllNJJIMs+xIxzz48Q7HX899PT/rky8c/t1wuqNH6Y63wyhqaAk99glu+WPGO4XTFQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sFDCM-00H1Hj-1m; Thu, 06 Jun 2024 15:30:34 +0200
+Date: Thu, 6 Jun 2024 15:30:34 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Cc: kernel test robot <lkp@intel.com>, netdev@vger.kernel.org,
+	oe-kbuild-all@lists.linux.dev, davem@davemloft.net, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, bryan.whitehead@microchip.com,
+	linux@armlinux.org.uk, sbauer@blackbox.su, hmehrtens@maxlinear.com,
+	lxu@maxlinear.com, hkallweit1@gmail.com, edumazet@google.com,
+	pabeni@redhat.com, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net V3 2/3] net: lan743x: Support WOL at both the PHY and
+ MAC appropriately
+Message-ID: <95a302f0-1f46-465c-b3ab-63c9c3f4dda4@lunn.ch>
+References: <20240605101611.18791-3-Raju.Lakkaraju@microchip.com>
+ <202406052200.w3zuc32H-lkp@intel.com>
+ <ZmGN+2qysJGU/9+V@HYD-DK-UNGSW21.microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] tcp: small code reorg
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171768063002.13251.11653732250767367212.git-patchwork-notify@kernel.org>
-Date: Thu, 06 Jun 2024 13:30:30 +0000
-References: <20240605071553.1365557-1-edumazet@google.com>
-In-Reply-To: <20240605071553.1365557-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZmGN+2qysJGU/9+V@HYD-DK-UNGSW21.microchip.com>
 
-Hello:
+On Thu, Jun 06, 2024 at 03:52:51PM +0530, Raju Lakkaraju wrote:
+> The target architecture of alpha's config file miss the "CONFIG_PM=y"
+> cofiguration.
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+No. Your patch is missing support for CONFIG_PM = n. Or you need to
+add a depends on PM.
 
-On Wed,  5 Jun 2024 07:15:50 +0000 you wrote:
-> Replace a WARN_ON_ONCE() that never triggered
-> to DEBUG_NET_WARN_ON_ONCE() in reqsk_free().
-> 
-> Move inet_reqsk_alloc() and reqsk_alloc()
-> to inet_connection_sock.c, to unclutter
-> net/ipv4/tcp_input.c and include/net/request_sock.h
-> 
-> [...]
+We expect the kernel to build for any configuration. There are build
+bots which create random configurations and see if they build. Not
+having PM is a valid configuration, especially for a big iron server
+which never sleeps.
 
-Here is the summary with links:
-  - [net-next,1/3] tcp: small changes in reqsk_put() and reqsk_free()
-    https://git.kernel.org/netdev/net-next/c/c34506406dd5
-  - [net-next,2/3] tcp: move inet_reqsk_alloc() close to inet_reqsk_clone()
-    https://git.kernel.org/netdev/net-next/c/adbe695a9765
-  - [net-next,3/3] tcp: move reqsk_alloc() to inet_connection_sock.c
-    https://git.kernel.org/netdev/net-next/c/6971d2167282
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+    Andrew
 
