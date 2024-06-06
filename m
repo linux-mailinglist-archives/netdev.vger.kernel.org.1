@@ -1,130 +1,86 @@
-Return-Path: <netdev+bounces-101298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 970268FE0FF
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 10:33:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 552A98FE138
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 10:40:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF73A1C23E47
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:33:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C3E528B7D7
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:40:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378341327E5;
-	Thu,  6 Jun 2024 08:33:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="po1DSTJP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC6D913C69A;
+	Thu,  6 Jun 2024 08:39:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D05326292;
-	Thu,  6 Jun 2024 08:33:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD8513B7A9;
+	Thu,  6 Jun 2024 08:39:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717662810; cv=none; b=GFt/mn28PDRK45pWgkGN4rxYvuhkQcvLESgyELr9za6vVJPeJTwANACn11pc7dIgXSIqMkNF15uyq+90+ZwqlDuy5zzs8sN4PZZk58DkPvi/G2PdCVwjAWEq78/5zt3WLKST24LEFxvnXD/kq60l610mKhFAMu587bc9M+M62oA=
+	t=1717663154; cv=none; b=OtyIConxw/rbWTE+tM70sRhQY543JvL202d+94ogqdDxHvP7uVor+J2Sr4m3a8dJ6dJ0qE44E+9b8HqPCFwCeMLFqgVC0OL6g1ZcCI+A7NlZFFiq2aMz/NmqoWkux42X46zS+6ntY5CEupJnf2hQMz8HsYvicZ6xJ4adj+ilXRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717662810; c=relaxed/simple;
-	bh=YU8DtIKwHmMDfcku625+Vpqv5ex7ZLivp9rvHDTWByE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PB/GpTxnWCvccAD+thzOgtogGcq0a4qE9C57uVR1op6+8gM8RW9rVU9coSAcE+QW42I3v4L5pCV+bZlDR9ItvWb//4DO0MguPyn9BVGaNyFUPt7rkQYrpD0w5cGrZbc1kLLQPWvRvGWZgZmLd44kF8RwcO/oen8XyGXBr5Cdpzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=po1DSTJP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A330CC4AF0A;
-	Thu,  6 Jun 2024 08:33:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717662809;
-	bh=YU8DtIKwHmMDfcku625+Vpqv5ex7ZLivp9rvHDTWByE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=po1DSTJPR7pCkBP++C9n0OVIEUUHGYM4Clm7DsESYlFedwNWo0hXKL1ODuR+rsWoD
-	 a8MsvY8lCHPE0FFF8K+KlgQ+/PODp9A2/HbhcUulz9ytIXMGL2GznC3GG/nsq/q8ow
-	 Tle1vCwc96KAY4K7LOztRsxT8VRUrmZhe56jp2lEimu0gQd1OO9jJGPBoiSiXOdFmU
-	 aPluFG5dT8IkyqRn86PA/srqXRDEn8ZHVXqtfsL4opkcvnoiBe7ezBT44xFvt20pFG
-	 Kg81cK1Dmzo6SlWmcnn32f3lRgOMJ9zLVKz1bNAC0ja9Uje18dnEAuvGrLLHkju4o2
-	 8b+vcGLtxVqYA==
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2e6f2534e41so6961811fa.0;
-        Thu, 06 Jun 2024 01:33:29 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWeJg9MuGqxmmiV8mwi02uhIGutUR7xkeifRDRtgnpn/6laxV2mT75gGcEhWiGHdEahKyGKVNDOH1QkOwo3jL1BivqD9q9MqahC5hUjosEAp7U6xBo60lUy4aTZSoPI2Sp2lohL
-X-Gm-Message-State: AOJu0YxngvwrMSpfmKZUlpbS1VfXp5Om1uHooxo1G6I5IQA8l2XdjCl+
-	x+uzzpoEQBB01t+VAvwGSiUjRd1H2Bj+hZA5V5VoyTa2JoTkfmU7tURiqagFIB3jWeon1QKeO+B
-	Sfljq7ZdKIasFbsslEk/CFtSEl8k=
-X-Google-Smtp-Source: AGHT+IFrHl6y+9zDbUsyBzAkg+/OK1noLI5GhExckzXCAkObvxedgkVmF5FHs6vRCM1MElpokOpj+znX9hNmHP4O2WU=
-X-Received: by 2002:a05:651c:a11:b0:2df:b0e3:b548 with SMTP id
- 38308e7fff4ca-2eac7a52b32mr31799341fa.42.1717662808019; Thu, 06 Jun 2024
- 01:33:28 -0700 (PDT)
+	s=arc-20240116; t=1717663154; c=relaxed/simple;
+	bh=HKLQNbCiKO8GdgIRFLmoBkFsM576UeU3qL3YIZA/dsA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KSyl2liQJy/ENTQMxf2C+VtC8BUO7gD4x1W5vnxRYi1IqYvfgzEhhnK78RDnVq+q7s8N6+IMujWRoy1uVgZV+fWkff+IrIOZ62eam4AP6snwIbtR3Vs2hm3mUrVREJx3thhG1V8ZskTK3QL4KpM99u7iCGo3W1DQ6WZza9B+/g0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sF8eH-0001Jf-4n; Thu, 06 Jun 2024 10:39:05 +0200
+Date: Thu, 6 Jun 2024 10:39:05 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Willem de Bruijn <willemb@google.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Christoph Paasch <cpaasch@apple.com>,
+	Netfilter <netfilter-devel@vger.kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	daniel@iogearbox.net, Stanislav Fomichev <sdf@google.com>
+Subject: Re: [PATCH nf] netfilter: nf_reject: init skb->dev for reset packet
+Message-ID: <20240606083905.GA4688@breakpoint.cc>
+References: <20240604120311.27300-1-fw@strlen.de>
+ <FF8A506F-6F0F-440E-9F52-B27D05731B77@apple.com>
+ <20240605181450.GA7176@breakpoint.cc>
+ <ZmCwlbF8BvLGNgRM@calendula>
+ <20240605190833.GB7176@breakpoint.cc>
+ <ZmDAQ6r49kSgwaMm@calendula>
+ <CA+FuTSfAhHDedA68LOiiUpbBtQKV9E-W5o4TJibpCWokYii69A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZmAthcxC8V3V3sm3@gondor.apana.org.au> <ZmAuTceqwZlRJqHx@gondor.apana.org.au>
- <ZmAz8-glRX2wl13D@gondor.apana.org.au> <20240605191410.GB1222@sol.localdomain>
- <ZmEYJQFHQRFKC5JM@gondor.apana.org.au> <20240606052801.GA324380@sol.localdomain>
- <ZmFL-AXZ8lphOCUC@gondor.apana.org.au> <CAMj1kXHLt6v03qkpKfwbN34oyeeCnJb=tpG4GvTn6E1cJQRTOw@mail.gmail.com>
- <ZmFmiWZAposV5N1O@gondor.apana.org.au> <CAMj1kXFt_E9ghN7GfpYHR4-yaLsz_J-D1Nc3XsVqUamZ6yXHGQ@mail.gmail.com>
- <ZmFucW37DI6P6iYL@gondor.apana.org.au>
-In-Reply-To: <ZmFucW37DI6P6iYL@gondor.apana.org.au>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Thu, 6 Jun 2024 10:33:15 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXEpw5b3Rpfe+sRKbQQqVfgWjO_GsGd-EyFvB4_8Bk8T0Q@mail.gmail.com>
-Message-ID: <CAMj1kXEpw5b3Rpfe+sRKbQQqVfgWjO_GsGd-EyFvB4_8Bk8T0Q@mail.gmail.com>
-Subject: Re: [PATCH v4 6/8] fsverity: improve performance by using multibuffer hashing
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Eric Biggers <ebiggers@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	netdev@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	fsverity@lists.linux.dev, dm-devel@lists.linux.dev, x86@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, Sami Tolvanen <samitolvanen@google.com>, 
-	Bart Van Assche <bvanassche@acm.org>, Tim Chen <tim.c.chen@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+FuTSfAhHDedA68LOiiUpbBtQKV9E-W5o4TJibpCWokYii69A@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Thu, 6 Jun 2024 at 10:08, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Thu, Jun 06, 2024 at 09:55:56AM +0200, Ard Biesheuvel wrote:
+Willem de Bruijn <willemb@google.com> wrote:
+> On Wed, Jun 5, 2024 at 3:45 PM Pablo Neira Ayuso <pablo@netfilter.org> wrote:
 > >
-> > So again, how would that work for ahash falling back to shash. Are you
-> > saying every existing shash implementation should be duplicated into
-> > an ahash so that the multibuffer optimization can be added? shash is a
-> > public interface so we cannot just remove the existing ones and we'll
-> > end up carrying both forever.
->
-> It should do the same thing for ahash algorithms that do not support
-> multiple requests.  IOW it should process the requests one by one.
->
+> > On Wed, Jun 05, 2024 at 09:08:33PM +0200, Florian Westphal wrote:
+> > > So there are several options here:
+> > > 1. remove the WARN_ON_ONCE and be done with it
+> > > 2. remove the WARN_ON_ONCE and pretend net was init_net
+> > > 3. also look at skb_dst(skb)->dev if skb->dev is unset, then back to 1)
+> > >    or 2)
+> > > 4. stop using skb_get_hash() from netfilter (but there are likely other
+> > >    callers that might hit this).
+> > > 5. fix up callers, one by one
+> > > 6. assign skb->dev inside netfilter if its unset
+> 
+> Is 6 a realistic option?
 
-That is not what I am asking.
+The output hook has to outdev available (its skb_dst(skb)->dev, passed
+in from __ip_local_out()).
 
-Are you suggesting that, e.g., the arm64 sha2 shash implementation
-that is modified by this series should instead expose both an shash as
-before, and an ahash built around the same asm code that exposes the
-multibuffer capability?
-
-> > Sure, but the block I/O world is very different. Forcing it to use an
-> > API modeled after how IPsec might use it seems, again, unreasonable.
->
-> It's not different at all.  You can see that by the proliferation
-> of kmap calls in fs/verity.  It's a fundamental issue.  You can't
-> consistently get a large contiguous allocation beyond one page due
-> to fragmentation.  So large data is always going to be scattered.
->
-
-I don't think this is true for many uses of the block layer.
-
-> BTW, I'm all for elminating the overhead when you already have a
-> linear address for scattered memory, e.g., through vmalloc.  We
-> should definitely improve our interface for ahash/skcipher/aead so
-> that vmalloc addresses (as well as kmalloc virtual addresses by
-> extension) are supported as first class citizens, and we don't turn
-> them into SG lists unless it's necessary for DMA.
->
-
-Yes, this is something I've been pondering for a while. An
-ahash/skcipher/aead with CRYPTO_ALG_ASYNC cleared (which would
-guarantee that any provided VA would not be referenced after the algo
-invocation returns) should be able to consume a request that carries
-virtual addresses rather than SG lists. Given that it is up to the
-caller to choose between sync and async, it would be in a good
-position also to judge whether it wants to use stack/vmalloc
-addresses.
-
-I'll have a stab at this.
+So we could set skb->dev = outdev, before calling skb_get_hash and
+__skb_get_hash_symmetric.
 
