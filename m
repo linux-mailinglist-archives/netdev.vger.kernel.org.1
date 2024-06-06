@@ -1,79 +1,92 @@
-Return-Path: <netdev+bounces-101226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5652A8FDCA3
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 04:18:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 365B68FDCAD
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 04:20:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E41221F23DC7
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 02:18:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDCC31F24774
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 02:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D6571401B;
-	Thu,  6 Jun 2024 02:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877CF18638;
+	Thu,  6 Jun 2024 02:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NhdLg9sg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fpB9Z4rv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC75B8C0B
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 02:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E184440C;
+	Thu,  6 Jun 2024 02:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717640287; cv=none; b=L15zvnrCuJ07NAUN357fMxniyd16q/pi70KWZvx1704Jrj2IdFY1De/w8MLBbb3R3NUcGmLB7y6CN6+Xfvtl1+QfRHDTKgRgYsKdXAIh8T3C5PTeX9ccW8hNTk49F45aE6lELT/eYd+h+x+t0HBoRzs0wqg18A7iK4QBhd8Sbyg=
+	t=1717640439; cv=none; b=mndahq1ORhlYDrFo5W1cFnZJ1RZeDvBl1kkdmFksrkaFoxEMeqgAm5cgLjM6R07eF3gec7q4eTRe829Prmba0BOy7fpGCJF1erJ/HXtolBiXAWPSJCbTJW0/dlggWaW6Sbx3Ei+GYxP/a2SQf0tpiVp4dy6SHp8Nv4ExbD2dEvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717640287; c=relaxed/simple;
-	bh=KNkRuBYRNzRi7impR7KY6QWySIaI+z9K2BpA7wqgJ+c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tJdCrT2koy5aBeFee+2K5+kx5qYDdIB+GgBIziwxNJK/QapbA/rkcO6zx0Sb+7uzwqOuWicVTq+hqVs4IaxfC+ARWiwOib6LF7E7KxO+EVwP+xc1pmRQ3cvj8R0nGM4b8L7kRGSy/3uBG4aWVkNbMrTxzaeOt/dGnan1f1RXmPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NhdLg9sg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B826C2BD11;
-	Thu,  6 Jun 2024 02:18:06 +0000 (UTC)
+	s=arc-20240116; t=1717640439; c=relaxed/simple;
+	bh=yVM4UXYryD6+xTiJNedfKfni5JiHi3Zy13HliZUP5wA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=av6Ndd9M5D1NJtKPOvIF+N7ABva5jNO/XV5Oe9TOKoYKsKI9i3lHrb6+JL/2Kcy5DGXE58pd/U/O6XFyGfECOQVTctRLwXVaeJM4jic64DxrM+7MS7AUZ9KB3/HidaY804++CrbRLyz9qpbFqkYbzf+gjlUS9tuwZQlOgGuaDg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fpB9Z4rv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1C3D9C4AF11;
+	Thu,  6 Jun 2024 02:20:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717640286;
-	bh=KNkRuBYRNzRi7impR7KY6QWySIaI+z9K2BpA7wqgJ+c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NhdLg9sgmJI/JsJ2ZZvnLM2LEcrsx2JTbGlMdaOQD/F/U4ZWLXMt5aw+BmXYNqP6x
-	 5Yd6ay8aWuCmXQHEhiToC4WPg0pZ1UTlfcKf5sOAVSRnTOU3S1v3PKDCZtI1DDZTAh
-	 d3Q7DoHXysReodXRpWkzUE062eq/JvfDTbJm+fThiU325TvV2PcF3IAbQEzyvg7vNU
-	 PGHQl81h8/wlVjKX/KHv5nQibFDKme5kjedfW3vin0oX9u8caI9PFBZiaFBvKYQypW
-	 +jZTUwjXQGJdCHuNXeRkIOhCImPeTJ7igQYYp3NVUHzaolYgg68YveVfFeSggsWOd2
-	 Zz0T9wpoJBmzA==
-Date: Wed, 5 Jun 2024 19:18:00 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: David Ahern <dsahern@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 0/3] net: core: Unify dstats with tstats and
- lstats, add generic collection helper
-Message-ID: <20240605191800.2b12df8d@kernel.org>
-In-Reply-To: <ccb2a7fc282d7874bc3862dad1ca7002b713ac33.camel@codeconstruct.com.au>
-References: <20240605-dstats-v2-0-7fae03f813f3@codeconstruct.com.au>
-	<20240605190212.7360a27a@kernel.org>
-	<ccb2a7fc282d7874bc3862dad1ca7002b713ac33.camel@codeconstruct.com.au>
+	s=k20201202; t=1717640439;
+	bh=yVM4UXYryD6+xTiJNedfKfni5JiHi3Zy13HliZUP5wA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fpB9Z4rvACyJH1iAZsKR2+6IZ6+iDAzRQHrr3c3jQ5zutTmzSEAygcEqz1sbj/Edo
+	 w7+VCCEEZiLgEiJORLNNa9qjLXKCVd0pr1dnoMyRLNZ1ohrapIeSian6WzxwoJ9+UX
+	 /BkSdzK+Alx0ZCCWMcmYUQ1MFTyZKzMMT4tSGX3CjXB/hoW/UABOwXBElRAzOthIKs
+	 +zJmmdkvzjGphVarW7rFXbEVeLBKBEca2MG1dok0mGiF+d/znlZbLAwnC7Upsxnm92
+	 g4aDJTVX7wWPgQWOHC4rMz0515eydX4mE02cvhtUVapciSoFHfzaT+NwzpsEomghZ1
+	 D48pVaSKIpIRA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F2C1FD3E997;
+	Thu,  6 Jun 2024 02:20:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: bpf 2024-06-05
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171764043898.18622.17549557515869733799.git-patchwork-notify@kernel.org>
+Date: Thu, 06 Jun 2024 02:20:38 +0000
+References: <20240605091525.22628-1-daniel@iogearbox.net>
+In-Reply-To: <20240605091525.22628-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
-On Thu, 06 Jun 2024 10:11:51 +0800 Jeremy Kerr wrote:
-> If we're not exporting the helpers, that means that drivers that use
-> dstats wouldn't have a facility to customise the stats collection
-> through a ndo_get_stats64() callback though (as can be done with
-> tstats). Are you ok with that?
+Hello:
+
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed,  5 Jun 2024 11:15:25 +0200 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
 > 
-> [the set of drivers that need that is currently zero, so more of a
-> hypothetical future problem...]
+> The following pull-request contains BPF updates for your *net* tree.
+> 
+> We've added 8 non-merge commits during the last 6 day(s) which contain
+> a total of 9 files changed, 34 insertions(+), 35 deletions(-).
+> 
+> [...]
 
-Right, but I think "no exports unless there is an in-tree user"
-is still a rule. A bit of a risk that someone will roll their own
-per-cpu stats pointlessly if we lack this export. But let's try
-to catch that in review..
+Here is the summary with links:
+  - pull-request: bpf 2024-06-05
+    https://git.kernel.org/netdev/net/c/886bf9172da0
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
