@@ -1,165 +1,110 @@
-Return-Path: <netdev+bounces-101423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64D838FE7E6
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:34:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 680618FE7EC
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:34:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E55CBB21520
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 13:34:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BAC71C23053
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 13:34:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA07A195F10;
-	Thu,  6 Jun 2024 13:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d+0eQwGU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79F46196C8D;
+	Thu,  6 Jun 2024 13:34:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A88502A1C2;
-	Thu,  6 Jun 2024 13:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0055719642D;
+	Thu,  6 Jun 2024 13:34:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717680855; cv=none; b=idiaybcG2iWzre2SWmHXR8i40zM34PYhsTEuSoI/c59e8FyUJn4o+4V+ESTWHf+cztNjvqh8bWGaZxmbLp2W1+GwPT3QZkSf5e8bRCQxrBkZgLV7+pFtUogONijFdvNhHH87nj0tpjZC/YYkd4b9fdnZJjmsCqzyXUB+oqzRATU=
+	t=1717680871; cv=none; b=Kjh1Za6WjM0XLHSXuV6JtowAz8Xg/wKId++yive1lmWIv23C12mbT/9ESrpywWW4VaZHoLi6PMuaawXET9eK7dIHpS2Gh5v3cpu6hhH49J1h/EDe71VE8lxLr4mz5Quq4yA8OGx7VDfi2jdJmWuOKDnl+QubEAAe8fw+U+lvqbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717680855; c=relaxed/simple;
-	bh=eL/g/oUrAWm5JIaMO5q18too/EUOHHxjbv/SpSpADl4=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=FMxuT9pO27zjt6yJ1T62mTAP/hAblgEN9LK/WpAOsLzO7t7bYnTxE3u9b+y2FEV4OYy7gMVzKREAY9H0OD/E6Ejig8b6gGON1QLeoQXkwlikDdU9NmkefCjP8JRfdzmCu/LhwnU1f5ImFm1eEuFkTJpo8/M0KYJTzx4bMEM40fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d+0eQwGU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A6A4C2BD10;
-	Thu,  6 Jun 2024 13:34:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717680855;
-	bh=eL/g/oUrAWm5JIaMO5q18too/EUOHHxjbv/SpSpADl4=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=d+0eQwGUhHjyuIv5Un2Kh5AgnrMQxrjp3vUm9yQhUzbUSVggC7KM2eO1isMz0+ZH4
-	 h3SIDih8zMffIuN2H18ywEP4xtBpk9vTIqznukx66KVy1625U51Yeb/+DjJie3M4DG
-	 wfPHlv1XcQt1cP3FMg1OVQe4NVtTq5zUhzMVt9RLxe8z0HbYQyUcUHNOPLumi8JHjh
-	 TXzj0Fjhlz50HXH4a7wAnh4DKp/DHvB9YLI8Ie7xJ/HmI2g/LFK4J/2aORABAIj916
-	 I3EcTwiBBVAUHnSs/HVfsKdz8TVHD/w3k/PjHtoRhqFRjgmrt2DXDPuiml9Ys53+CU
-	 w+11WNBwY7kiQ==
-From: Kalle Valo <kvalo@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: "David S . Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski
- <krzk+dt@kernel.org>,  Conor Dooley <conor+dt@kernel.org>,  Jeff Johnson
- <jjohnson@kernel.org>,  linux-wireless@vger.kernel.org,
-  netdev@vger.kernel.org,  devicetree@vger.kernel.org,
-  ath11k@lists.infradead.org,  linux-kernel@vger.kernel.org,
-  ath12k@lists.infradead.org,  Bartosz Golaszewski
- <bartosz.golaszewski@linaro.org>,  Krzysztof Kozlowski
- <krzysztof.kozlowski@linaro.org>
-Subject: Re: [PATCH v9 2/2] dt-bindings: net: wireless: describe the ath12k
- PCI module
-References: <20240605122106.23818-1-brgl@bgdev.pl>
-	<20240605122106.23818-3-brgl@bgdev.pl>
-Date: Thu, 06 Jun 2024 16:34:09 +0300
-In-Reply-To: <20240605122106.23818-3-brgl@bgdev.pl> (Bartosz Golaszewski's
-	message of "Wed, 5 Jun 2024 14:21:05 +0200")
-Message-ID: <87cyouqjou.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1717680871; c=relaxed/simple;
+	bh=wVX5LN5wezgSA3E348Yymtojtevb4mWjLp7y2qc+kQw=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gYVBPoV+tcg0p7IEcEIh39hlx62Du1CSjJZwUDW0fuTBjsf/9HkaJWCXMM07FIblJOxTcREGKdyPYFEs8lRm7EEC2nqugdh2DgvrXT/YdfQ0q1tKrfVgefWKUH21dtwGb0LrdG7dzTP8UoyJlsQdNs7X/hWZlAIpXg52hnF3ODc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Vw4tz4dFjz6K6Lf;
+	Thu,  6 Jun 2024 21:29:47 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id EECED1400D4;
+	Thu,  6 Jun 2024 21:34:26 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 6 Jun
+ 2024 14:34:26 +0100
+Date: Thu, 6 Jun 2024 14:34:24 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Leon Romanovsky <leon@kernel.org>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan
+	<tariqt@nvidia.com>, Andy Gospodarek <andrew.gospodarek@broadcom.com>, Aron
+ Silverton <aron.silverton@oracle.com>, Dan Williams
+	<dan.j.williams@intel.com>, David Ahern <dsahern@kernel.org>, "Christoph
+ Hellwig" <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>, Leonid Bloch
+	<lbloch@nvidia.com>, <linux-cxl@vger.kernel.org>, <patches@lists.linux.dev>,
+	Peter Zijlstra <peterz@infradead.org>, "Julia Lawall" <julia.lawall@inria.fr>
+Subject: Re: [PATCH 2/8] fwctl: Basic ioctl dispatch for the character
+ device
+Message-ID: <20240606143424.00001fbd@Huawei.com>
+In-Reply-To: <20240605182726.GX19897@nvidia.com>
+References: <2-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+	<6cfe00ce-1860-4aba-bcb8-54f8d365d2dc@linux.dev>
+	<20240604122221.GR3884@unreal>
+	<20240604175023.000004e2@Huawei.com>
+	<20240604165844.GM19897@nvidia.com>
+	<20240605120737.00007472@Huawei.com>
+	<20240605182726.GX19897@nvidia.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-Bartosz Golaszewski <brgl@bgdev.pl> writes:
+On Wed, 5 Jun 2024 15:27:26 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->
-> Add device-tree bindings for the ATH12K module found in the WCN7850
-> package.
->
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
->  .../bindings/net/wireless/qcom,ath12k.yaml    | 99 +++++++++++++++++++
->  1 file changed, 99 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom,ath12k.yaml
->
-> diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath12k.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k.yaml
-> new file mode 100644
-> index 000000000000..1b5884015b15
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k.yaml
-> @@ -0,0 +1,99 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +# Copyright (c) 2024 Linaro Limited
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/wireless/qcom,ath12k.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Qualcomm Technologies ath12k wireless devices (PCIe)
-> +
-> +maintainers:
-> +  - Jeff Johnson <quic_jjohnson@quicinc.com>
-> +  - Kalle Valo <kvalo@kernel.org>
-> +
-> +description:
-> +  Qualcomm Technologies IEEE 802.11be PCIe devices.
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - pci17cb,1107  # WCN7850
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  vddaon-supply:
-> +    description: VDD_AON supply regulator handle
-> +
-> +  vddwlcx-supply:
-> +    description: VDD_WLCX supply regulator handle
-> +
-> +  vddwlmx-supply:
-> +    description: VDD_WLMX supply regulator handle
-> +
-> +  vddrfacmn-supply:
-> +    description: VDD_RFA_CMN supply regulator handle
-> +
-> +  vddrfa0p8-supply:
-> +    description: VDD_RFA_0P8 supply regulator handle
-> +
-> +  vddrfa1p2-supply:
-> +    description: VDD_RFA_1P2 supply regulator handle
-> +
-> +  vddrfa1p8-supply:
-> +    description: VDD_RFA_1P8 supply regulator handle
-> +
-> +  vddpcie0p9-supply:
-> +    description: VDD_PCIE_0P9 supply regulator handle
-> +
-> +  vddpcie1p8-supply:
-> +    description: VDD_PCIE_1P8 supply regulator handle
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - vddaon-supply
-> +  - vddwlcx-supply
-> +  - vddwlmx-supply
-> +  - vddrfacmn-supply
-> +  - vddrfa0p8-supply
-> +  - vddrfa1p2-supply
-> +  - vddrfa1p8-supply
-> +  - vddpcie0p9-supply
-> +  - vddpcie1p8-supply
+> On Wed, Jun 05, 2024 at 12:07:37PM +0100, Jonathan Cameron wrote:
+> 
+> > > I don't recall that dramatic conclusion in the discussion, but it does
+> > > make alot of sense to me.  
+> > 
+> > I'll be less lazy (and today found the search foo to track it down).
+> > 
+> > https://lore.kernel.org/all/CAHk-=wicfvWPuRVDG5R1mZSxD8Xg=-0nLOiHay2T_UJ0yDX42g@mail.gmail.com/  
+> 
+> Oh that is a bit different discussion than I was thinking of.. I fixed
+> all the cases to follow this advise and checked that all the free
+> functions are proper pairs of whatever is being allocated.
 
-Same comment here. To my understanding there are ath12k PCI devices
-which do not need the supplies. But I guess we change this to optional
-later?
+Yes. I think we are approaching the point where maybe we need
+a 'best practice guide' somewhere. It is sort of coding style, but
+it is perhaps rather complex perhaps to put in that doc.
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+I'm happy to help review such changes, but it would be too far down
+my todo list if I took on writing one.
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Maybe there is one I've missed?
+
+Jonathan
+> 
+> Thanks,
+> Jason
+
 
