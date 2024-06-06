@@ -1,231 +1,183 @@
-Return-Path: <netdev+bounces-101499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB9A88FF13A
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:51:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A03478FF144
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:53:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31069286020
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:51:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 130B81F259A6
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:53:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3803A198831;
-	Thu,  6 Jun 2024 15:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA772197525;
+	Thu,  6 Jun 2024 15:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EDFLZciL"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CHGEsgFQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E28E1974E7
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 15:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12F3196C7C;
+	Thu,  6 Jun 2024 15:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717689077; cv=none; b=GDYmVGBj74sKtIys7zr5Smwg0YgcsQUjM87yS/cvr+sTYLBQg15OPeasBUNmIZ4SJYfsNmGZ0RbmJrZFCt863IfPb9C3v+6OX7dyd2qzsRnUE31sdQWH85z67877H/CxrUCqRAuzXSIIQ+sNJ6mTtzpiOu/ujzJDLFTG661Z8lw=
+	t=1717689187; cv=none; b=FsQwW8NTo8JBhQTRROPh1s/GS1HES5b9Lx/bfnjZ/bZS789ruVTnW+VwCNJ/urOJ9Vkr8PybW+4Qmu3b4x9p++RgSBUr537nTrMOs8qYTwfQcIKMGKLA4Dwi9Yv9mpvy0bAUEkFQ9HzvK15fkeDkiBrx5+1hJBiBzn0LTbSiS1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717689077; c=relaxed/simple;
-	bh=BiaZpuXtE262MKkeXKMMBZ6Gsxt/ZA2uGimhSj3N1RM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tuvsCuRjfgiXCN8Qppbn9mZYVw/ZWwdW7wlu4/xEsksnEICM0NmJmEicBT5XNSy0oDnzctj/1S+iWNYRLPM/TmEUrHjIpF0e0NnacjdNdFBT0uyBtG267V9aJWZodSo3xQQX5/gbpNfgMKpncrKYFHg6ubM5L4r9fad0zbpUx4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EDFLZciL; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-57a50ac2ca1so1483142a12.0
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 08:51:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717689074; x=1718293874; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w3cUNUJBhtAkMvQkshenigi1QMNGnp2VQTGwzfrrrto=;
-        b=EDFLZciLseUE8RCO6o1idsgNQUjJZTWfKg/mGPzg2Quyv5RW6egGPAoC7wXr+Tvp3g
-         q2VbQ+0IXhCkhIDdLJoYwdbC+z60MPYQjc8Kr1H7okD9tTDbxXXELWQa13xeinFmUlGc
-         F0/3+TOhLW7s6daO0f2nZcZcwpJn6FkTLqPobWok/1s30PVsNIkQ+BAIssSilAwIZD4j
-         gjc7d2ffavPQoIN2X8AzGFUWggKhbWSgB8IUi0lKZJasRfqVBQxu/XwygvlAW5Zf04JE
-         xXzajxaiug5IGDeA9qBxr4qWcj6DTqPYtQU48pTAwnRXk9qOrIDTG2w0N1UpRyEZSgYd
-         tavw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717689074; x=1718293874;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w3cUNUJBhtAkMvQkshenigi1QMNGnp2VQTGwzfrrrto=;
-        b=PUulvK6BjoLhjifGiLiBbrFLpEEDoubBhGA9UWIze0Yi25RRfig8Xu8osJv/fR9g11
-         i55qUueapY4arE3LCX852XqYQLGEGXfSR0XI9aqmiNrUnlPCwvzfrYohD83rvUGQfs9D
-         vHWgALpcTZq0ditpu9mbfpjGrbaEEVJIb3zX7jnuMpZpmLNSw//GrlsWkc9z5jpD25yz
-         IlhkgF/EXLpQkHbdA1fGdw2FgmX3H+BsrdwAmVe51yfEw7TvnHz78/bSYVRcF7rb5j0J
-         c6To6Bjewi+xVJCIRVGtewh0XIhP7B8YSiAkV39Yl1iqfTWII8oc5SDzaGlUi3zUJwjQ
-         6QJg==
-X-Forwarded-Encrypted: i=1; AJvYcCXiusGo8Wk3rGcaQvHC6oxi/qZUfnTQi1GNgzvvmt4GmL97dsyBr9fhd7ppzCRJy9xCW37jJUbBz/MLQY8dmDlEoPzo2nQ5
-X-Gm-Message-State: AOJu0Yx6yy79Gj978ptjt9b0zXKEXuc04HXqHEJHvKv8hg9RMbQ53xBx
-	9BG15SN0MgAKCnNrD2SSreVRWdejaLW5XmBKUii5ukq0lIUxW9R6dWthmCq39hrLGcXfAOdma4H
-	B7V6qEsQwDVyik24sYgdbrC259+c=
-X-Google-Smtp-Source: AGHT+IH6NlOqQKsOAAsEW+SdBvJezgCaNwZ++ETVYxcbvYzlwLZBubVQrsDuq3msgsyhy++t76nggwaRgXgPgPa1cpQ=
-X-Received: by 2002:a17:906:cc5c:b0:a69:68db:6f39 with SMTP id
- a640c23a62f3a-a699fad1746mr412872266b.32.1717689073448; Thu, 06 Jun 2024
- 08:51:13 -0700 (PDT)
+	s=arc-20240116; t=1717689187; c=relaxed/simple;
+	bh=tTjASRihTSAqBdBo4miDRMTZLE7izCWc3a5OMOafW7I=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XUKdSVsartIT9vnrRmndwDNWL7uuC110CBNJzsiuNIFSQM71xJ2WFr13zTnyCL1n4Jb3IomENf0TZoYw2pHVhZGx/nGr7rXuThEGLlfJbTcCQb0mqFzijJudLExupe0z6AN4LCuiVYomzI2sxFmmWqkR/U/XILFnlKwsTanoY1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CHGEsgFQ; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1B8271BF20C;
+	Thu,  6 Jun 2024 15:52:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1717689183;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P1gsWIzttywwUfj8wVOsf1uZZgWknP5y8TDFvRDuZYk=;
+	b=CHGEsgFQhxmgI9kit9UsDWhmeYkm1SMTfF4HSpSA7M8iIVcSVCK/UyOZq6Gy2jZ2rR87iy
+	i4WYz6XtCmH99jmROTw+zPCWzvlakd/VZY3uWUitL6Mt0gOFiK65awIY1gDXmquhgHUcQW
+	iO3ZNIG1VIWM/NyCMHeGs3p2//LfaVeliifa5/9HOfF7+fgLu+v0nRcnXDd+yJKrmUL19n
+	dUhzhZNUZaWDNr8ORmOT+uj1yZFosizfn1V2Xh+hoHzgxLCwWnG0QGXkUct43JfJJ+rGu4
+	nU6OLVOZCMEDcgiCpaXDkS6Zkx6JvL154FuLaogp03TvT6quaxAiSbmgDQqBMQ==
+Date: Thu, 6 Jun 2024 17:52:58 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Simon Horman <horms@kernel.org>, Sai Krishna Gajula
+ <saikrishnag@marvell.com>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lee Jones
+ <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Horatiu Vultur
+ <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Saravana Kannan <saravanak@google.com>, Bjorn
+ Helgaas <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>, Lars
+ Povlsen <lars.povlsen@microchip.com>, Steen Hegelund
+ <Steen.Hegelund@microchip.com>, Daniel Machon
+ <daniel.machon@microchip.com>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Allan
+ Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli
+ <luca.ceresoli@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 10/19] irqdomain: Introduce irq_domain_alloc() and
+ irq_domain_publish()
+Message-ID: <20240606175258.0e36ea98@bootlin.com>
+In-Reply-To: <8734pr5yq1.ffs@tglx>
+References: <20240527161450.326615-1-herve.codina@bootlin.com>
+ <20240527161450.326615-11-herve.codina@bootlin.com>
+ <8734pr5yq1.ffs@tglx>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240606150307.78648-1-kerneljasonxing@gmail.com>
- <20240606150307.78648-2-kerneljasonxing@gmail.com> <CANn89iLe12LJrhsYB6sQ4m90HPeLL=H97Ju2nm+HzUmMqk+yVQ@mail.gmail.com>
- <CAL+tcoB3j7-uWVzYAcrcmn4Vg9Ng0xptk3-1hGuGWgVHwSYG=g@mail.gmail.com> <CANn89iJMx1ZAt4tuCKH6L33OgEcdjd6mLRWjuvRXvbWeckZmYg@mail.gmail.com>
-In-Reply-To: <CANn89iJMx1ZAt4tuCKH6L33OgEcdjd6mLRWjuvRXvbWeckZmYg@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 6 Jun 2024 23:50:35 +0800
-Message-ID: <CAL+tcoCS7_znUvpQY=s3m6cme8zwWn2N+jCaJw+nMBhg=43HcA@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] tcp: fix showing wrong rtomin in snmp file
- when using route option
-To: Eric Dumazet <edumazet@google.com>
-Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
-	dsahern@kernel.org, ncardwell@google.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-On Thu, Jun 6, 2024 at 11:43=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Thu, Jun 6, 2024 at 5:41=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
-> >
-> > On Thu, Jun 6, 2024 at 11:14=E2=80=AFPM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > On Thu, Jun 6, 2024 at 5:03=E2=80=AFPM Jason Xing <kerneljasonxing@gm=
-ail.com> wrote:
-> > > >
-> > > > From: Jason Xing <kernelxing@tencent.com>
-> > > >
-> > > > TCP_MIB_RTOMIN implemented in tcp mib definitions is always 200, wh=
-ich
-> > > > is true if without any method to tune rto min. In 2007, we got a wa=
-y to
-> > > > tune it globaly when setting rto_min route option, but TCP_MIB_RTOM=
-IN
-> > > > in /proc/net/snmp still shows the same, namely, 200.
-> > > >
-> > > > As RFC 1213 said:
-> > > >   "tcpRtoMin
-> > > >    ...
-> > > >    The minimum value permitted by a TCP implementation for the
-> > > >    retransmission timeout, measured in milliseconds."
-> > > >
-> > > > Since the lower bound of rto can be changed, we should accordingly
-> > > > adjust the output of /proc/net/snmp.
-> > > >
-> > > > Fixes: 05bb1fad1cde ("[TCP]: Allow minimum RTO to be configurable v=
-ia routing metrics.")
-> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > > ---
-> > > >  include/net/tcp.h  | 2 ++
-> > > >  net/ipv4/metrics.c | 4 ++++
-> > > >  net/ipv4/proc.c    | 3 +++
-> > > >  3 files changed, 9 insertions(+)
-> > > >
-> > > > diff --git a/include/net/tcp.h b/include/net/tcp.h
-> > > > index a70fc39090fe..a111a5d151b7 100644
-> > > > --- a/include/net/tcp.h
-> > > > +++ b/include/net/tcp.h
-> > > > @@ -260,6 +260,8 @@ static_assert((1 << ATO_BITS) > TCP_DELACK_MAX)=
-;
-> > > >  extern int sysctl_tcp_max_orphans;
-> > > >  extern long sysctl_tcp_mem[3];
-> > > >
-> > > > +extern unsigned int tcp_rtax_rtomin;
-> > > > +
-> > > >  #define TCP_RACK_LOSS_DETECTION  0x1 /* Use RACK to detect losses =
-*/
-> > > >  #define TCP_RACK_STATIC_REO_WND  0x2 /* Use static RACK reo wnd */
-> > > >  #define TCP_RACK_NO_DUPTHRESH    0x4 /* Do not use DUPACK threshol=
-d in RACK */
-> > > > diff --git a/net/ipv4/metrics.c b/net/ipv4/metrics.c
-> > > > index 8ddac1f595ed..61ca949b8281 100644
-> > > > --- a/net/ipv4/metrics.c
-> > > > +++ b/net/ipv4/metrics.c
-> > > > @@ -7,6 +7,8 @@
-> > > >  #include <net/net_namespace.h>
-> > > >  #include <net/tcp.h>
-> > > >
-> > > > +unsigned int tcp_rtax_rtomin __read_mostly;
-> > > > +
-> > > >  static int ip_metrics_convert(struct nlattr *fc_mx,
-> > > >                               int fc_mx_len, u32 *metrics,
-> > > >                               struct netlink_ext_ack *extack)
-> > > > @@ -60,6 +62,8 @@ static int ip_metrics_convert(struct nlattr *fc_m=
-x,
-> > > >         if (ecn_ca)
-> > > >                 metrics[RTAX_FEATURES - 1] |=3D DST_FEATURE_ECN_CA;
-> > > >
-> > > > +       tcp_rtax_rtomin =3D metrics[RTAX_RTO_MIN - 1];
-> > > > +
-> > > >         return 0;
-> > > >  }
-> > > >
-> > > > diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
-> > > > index 6c4664c681ca..ce387081a3c9 100644
-> > > > --- a/net/ipv4/proc.c
-> > > > +++ b/net/ipv4/proc.c
-> > > > @@ -428,6 +428,9 @@ static int snmp_seq_show_tcp_udp(struct seq_fil=
-e *seq, void *v)
-> > > >                 /* MaxConn field is signed, RFC 2012 */
-> > > >                 if (snmp4_tcp_list[i].entry =3D=3D TCP_MIB_MAXCONN)
-> > > >                         seq_printf(seq, " %ld", buff[i]);
-> > > > +               else if (snmp4_tcp_list[i].entry =3D=3D TCP_MIB_RTO=
-MTIN)
-> > > > +                       seq_printf(seq, " %lu",
-> > > > +                                  tcp_rtax_rtomin ? tcp_rtax_rtomi=
-n : buff[i]);
-> > > >                 else
-> > > >                         seq_printf(seq, " %lu", buff[i]);
-> > > >         }
-> > > > --
-> > > > 2.37.3
-> > > >
-> > >
-> > > I do not think we can accept this patch.
-> > >
-> > > 1) You might have missed that we have multiple network namespaces..
-> >
-> > Thanks for the review.
-> >
-> > For this patch, indeed, I think I need to consider namespaces...
-> > For the other one, I did.
-> >
-> > >
-> > > 2) You might have missed that we can have thousands of routes, with
-> > > different metrics.
-> >
-> > Oh, that's really complicated...
-> >
-> > >
-> > > I would leave /proc/net/snmp as it is, because no value can possibly =
-be right.
-> >
-> > It cannot be right if someone tries to set rto min by 'ip route' or 'sy=
-sctl -w'.
-> >
->
-> Or eBPF.
->
-> There is no way a /proc/net/snmp value can be right.
->
-> Why would anyone care, since thousands of TCP sockets can all have
-> different values ?
+Hi Thomas,
 
-I think you're right because there are too many kinds of situations.
+On Wed, 05 Jun 2024 15:02:46 +0200
+Thomas Gleixner <tglx@linutronix.de> wrote:
 
-For kernel developers or knowledgable admins, they are aware of this
-'issue' (If I remember correctly, there is one comment in iproute
-saying this field is obsolete.).
-For some normal users, they are confused because someone reported this
-'issue' to me.
+> On Mon, May 27 2024 at 18:14, Herve Codina wrote:
+> > The irq_domain_add_*() family functions create an irq_domain and also
+> > publish this newly created to domain. Once an irq_domain is published,
+> > consumers can request IRQ in order to use them.
+> >
+> > Some interrupt controller drivers have to perform some more operations
+> > with the created irq_domain in order to have it ready to be used.
+> > For instance:
+> >   - Allocate generic irq chips with irq_alloc_domain_generic_chips()
+> >   - Retrieve the generic irq chips with irq_get_domain_generic_chip()
+> >   - Initialize retrieved chips: set register base address and offsets,
+> >     set several hooks such as irq_mask, irq_unmask, ...
+> >
+> > To avoid a window where the domain is published but not yet ready to be  
+> 
+> I can see the point, but why is this suddenly a problem? There are tons
+> of interrupt chip drivers which have exactly that pattern.
+> 
 
-I'll drop this series. There's no good way to solve it.
+I thing the issue was not triggered because these interrupt chip driver
+are usually builtin compiled and the probe sequence is the linear one
+done at boot time. Consumers/supplier are probe sequentially without any
+parallel execution issues.
 
-Thanks, Eric.
+In the LAN966x PCI device driver use case, the drivers were built as
+modules. Modules loading and drivers .probe() calls for the irqs supplier
+and irqs consumers are done in parallel. This reveals the race condition.
+
+> Also why is all of this burried in a series which aims to add a network
+> driver and touches the world and some more. If you had sent the two irq
+> domain patches seperately w/o spamming 100 people on CC then this would
+> have been solved long ago. That's documented clearly, no?
+
+Yes, the main idea of the series, as mentioned in the cover letter, is to
+give the big picture of the LAN966x PCI device use case in order to have
+all the impacted subsystems and drivers maintainers be aware of the global
+use case: DT overlay on top of PCI device.
+Of course, the plan is to split this series into smaller ones once parts
+get discussed in the DT overlay on top of PCI use case and reach some kind
+of maturity at least on the way to implement a solution.
+
+Thomas, do you prefer to have all the IRQ related patches extracted right
+now from this big picture series ?
+
+> 
+> >  void irq_domain_free_fwnode(struct fwnode_handle *fwnode);
+> > +struct irq_domain *irq_domain_alloc(struct fwnode_handle *fwnode, unsigned int size,
+> > +				    irq_hw_number_t hwirq_max, int direct_max,
+> > +				    const struct irq_domain_ops *ops,
+> > +				    void *host_data);
+> > +
+> > +static inline struct irq_domain *irq_domain_alloc_linear(struct fwnode_handle *fwnode,
+> > +							 unsigned int size,
+> > +							 const struct irq_domain_ops *ops,
+> > +							 void *host_data)
+> > +{
+> > +	return irq_domain_alloc(fwnode, size, size, 0, ops, host_data);
+> > +}  
+> 
+> So this creates exactly one wrapper, which means we'll grow another ton
+> of wrappers if that becomes popular for whatever reason. We have already
+> too many of variants for creating domains.
+> 
+> But what's worse is that this does not work for hierarchical domains and
+> is just an ad hoc scratch my itch solution.
+> 
+> Also looking at the irq chip drivers which use generic interrupt
+> chips. There are 24 instances of irq_alloc_domain_generic_chips() and
+> most of this code is just boilerplate.
+> 
+> So what we really want is a proper solution to get rid of this mess
+> instead of creating interfaces which just proliferate and extend it.
+> 
+> Something like the uncompiled below allows to convert all the
+> boilerplate into a template based setup/remove.
+> 
+> I just converted a random driver over to it and the result is pretty
+> neutral in terms of lines, but the amount of code to get wrong is
+> significantly smaller. I'm sure that more complex drivers will benefit
+> even more and your problem should be completely solved by that.
+> 
+> The below is just an initial sketch which allows further consolidation
+> in the irqdomain space. You get the idea.
+
+Got it, thanks a lot for the idea, the sketch and the way to use it in
+drivers. I will rework my patches in that way.
+
+Thanks,
+Hervé
 
