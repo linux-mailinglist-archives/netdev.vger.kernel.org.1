@@ -1,83 +1,97 @@
-Return-Path: <netdev+bounces-101229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4459E8FDCB5
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 04:27:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 14DC38FDCBF
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 04:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF5F0282F3D
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 02:27:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B85C0283E2E
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 02:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C24E618C38;
-	Thu,  6 Jun 2024 02:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D93017C68;
+	Thu,  6 Jun 2024 02:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XE6ycHhF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YNQ6fN0u"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922848C0B;
-	Thu,  6 Jun 2024 02:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7119910A11;
+	Thu,  6 Jun 2024 02:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717640848; cv=none; b=nLKQ5m7tNE+SAh3Vxhc6LgNFHmAUe6a1DH7KqyH183XyFQT37eWIlx7Hp1GxcWlKR0tLT4o8J57POPlNSq0rXoauCOKJQQLkJqUrK9ObmSpQsYw/FlwBWAXrpwMRu+a4/7bfLpdIzw1U0KO6U/bwY54I7bt2YtM7c0mawcks4rE=
+	t=1717641032; cv=none; b=gp4JhZpYBbBEQMUhFcWMgmrNannnZef+FioAUTCM4Y2tA+atBrsrw1K8Gmkk1LU5Xj6zl5OHtoUsUWcG6isuigEsYJmLykdB+gpiDvNNAAX2zbO8t/HvVe06bnEyFxc6kaqVI8jwZSfnTSxongZ7laJn8QfwpmMAdvmKyA5q1zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717640848; c=relaxed/simple;
-	bh=/U1TE3SFt7bMT0N4580wNlLmxRudTmEaztuiiHNKSrM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fC6YoWUuqGHGjt0NALnzs+yMBDMCN35nlHHap6fMpMCHSWAcp777rZoY8sMVXu/nSeni34mp64LLOJxQJxENGemo03nOgUF3fMZXlpijHHMMWP1hy8czpnrXA6gAQFbjXCCbFp4xef9SZa5b8I3EgvHg0LP0M9JxCimlUtcThB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XE6ycHhF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CD3AC2BD11;
-	Thu,  6 Jun 2024 02:27:27 +0000 (UTC)
+	s=arc-20240116; t=1717641032; c=relaxed/simple;
+	bh=tbFbVUmAjxj4cpFV/yhRaRlsb15O2Q2McTWB1aiUZAw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TIKkTKvSoIfnylbd9D6H0Ak04NeSEm5lKCpTI1bzCqEsrYldaC83GDcBDez5ZnWlZ/96CrDfoQg4C1kiy3LG4VBY2Ue70scTToXw354TCguOz0g6afAhY8ORszCsXi4a7zqcuMT1HdK6zlunBie2/ktUJhaGXlBRSFQc85fcIYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YNQ6fN0u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 35DCDC4AF0E;
+	Thu,  6 Jun 2024 02:30:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717640848;
-	bh=/U1TE3SFt7bMT0N4580wNlLmxRudTmEaztuiiHNKSrM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XE6ycHhFZkVAdzSk9PobeBobzB7ULjbvbMetnc/CD7YJR6v4IdUuzkPun0p+qfHdq
-	 TYpWmT5GaCjTw/r2+U1ZUaemq9oJbLZ/xSQADKP+qlsABw8jH7wdVREOKxXLz/eO00
-	 BYAuDlRdBZwX8HaAnIJS1W4YxxGlEkkZ9TxpVPCH5pbZSVRH7YPIQfVCqH3zJjuzLE
-	 pbewAHJaw8xfUz3UzIkCF/CcMkqYiIEomTqLyrOVYra8bY4foIPFSmLMrkq8NbGLIK
-	 tSOURzSAwejYYmSPuXilp+bdkoonXbRPlY3uLh6vx3tQW1i+75iys+34BGisk2Wqut
-	 9mFE56kcx3A3w==
-Date: Wed, 5 Jun 2024 19:27:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, Vladimir Oltean <olteanv@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Tristram.Ha@microchip.com, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, Ravi Gunasekaran <r-gunasekaran@ti.com>, Simon
- Horman <horms@kernel.org>, Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
- Murali Karicheri <m-karicheri2@ti.com>, Arvid Brodin
- <Arvid.Brodin@xdin.com>, Dan Carpenter <dan.carpenter@linaro.org>, "Ricardo
- B. Marliere" <ricardo@marliere.net>, Casper Andersson
- <casper.casan@gmail.com>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Hangbin Liu <liuhangbin@gmail.com>,
- Geliang Tang <tanggeliang@kylinos.cn>, Shuah Khan <shuah@kernel.org>
-Subject: Re: [PATCH net-next] selftests: hsr: Extend the hsr_redbox.sh test
- to use fixed MAC addresses
-Message-ID: <20240605192726.58a48199@kernel.org>
-In-Reply-To: <20240603093322.3150030-2-lukma@denx.de>
-References: <20240603093322.3150030-1-lukma@denx.de>
-	<20240603093322.3150030-2-lukma@denx.de>
+	s=k20201202; t=1717641032;
+	bh=tbFbVUmAjxj4cpFV/yhRaRlsb15O2Q2McTWB1aiUZAw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YNQ6fN0uPh0hyAbDbb0Ve5hDpKbZktwmznJqOaKBohmtXTehcCVhz49ROrf6ws1DH
+	 e8S2dsKsTeLI2lGXjvLVbaiFTlkzwmO2jHY9qpfyCnq8ci1Py3ATVLSaTB+ogN7rnL
+	 ZTnC/ay2jBz5psd49UuSs7WLkUw6k9c32p3GgpbwLFyQKjrlOToYcCG/cLkZy14I1S
+	 9kfvLeGSodZHM1x71eE04Aw5NLb2/yCp1zoqUFJih9/TW8G3+ocPCm8OJzYh5gtrN4
+	 at64xMhag3zSmGnIjHzI6ArjcmINNglX/ZRhNr1R226Cw6U3hDTDZWT2r/E0GGahZ2
+	 qRq7J2vmPxD1A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1F64EC4332C;
+	Thu,  6 Jun 2024 02:30:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] selftests: hsr: Extend the hsr_ping.sh test to use
+ fixed MAC addresses
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171764103211.23267.2425387874478992852.git-patchwork-notify@kernel.org>
+Date: Thu, 06 Jun 2024 02:30:32 +0000
+References: <20240603093322.3150030-1-lukma@denx.de>
+In-Reply-To: <20240603093322.3150030-1-lukma@denx.de>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ edumazet@google.com, olteanv@gmail.com, davem@davemloft.net,
+ o.rempel@pengutronix.de, Tristram.Ha@microchip.com, bigeasy@linutronix.de,
+ r-gunasekaran@ti.com, horms@kernel.org, n.zhandarovich@fintech.ru,
+ m-karicheri2@ti.com, Arvid.Brodin@xdin.com, dan.carpenter@linaro.org,
+ ricardo@marliere.net, casper.casan@gmail.com, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, liuhangbin@gmail.com,
+ tanggeliang@kylinos.cn, shuah@kernel.org
 
-On Mon,  3 Jun 2024 11:33:22 +0200 Lukasz Majewski wrote:
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon,  3 Jun 2024 11:33:21 +0200 you wrote:
 > Fixed MAC addresses help with debugging as last four bytes identify the
 > network namespace.
 > 
-> Moreover, it allows to mimic the real life setup with for example bridge
-> having the same MAC address on each port.
+> Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> ---
+>  tools/testing/selftests/net/hsr/hsr_ping.sh | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 
-Doesn't seem like a particularly scalable method of making tests more
-debugable but alright...
+Here is the summary with links:
+  - [net-next] selftests: hsr: Extend the hsr_ping.sh test to use fixed MAC addresses
+    https://git.kernel.org/netdev/net-next/c/ed20142ed68c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
