@@ -1,86 +1,94 @@
-Return-Path: <netdev+bounces-101299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 552A98FE138
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 10:40:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 12B5B8FE13B
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 10:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C3E528B7D7
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:40:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FC0728B8CB
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC6D913C69A;
-	Thu,  6 Jun 2024 08:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5A113A418;
+	Thu,  6 Jun 2024 08:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BIhs+dZK"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD8513B7A9;
-	Thu,  6 Jun 2024 08:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1E9A3C28;
+	Thu,  6 Jun 2024 08:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717663154; cv=none; b=OtyIConxw/rbWTE+tM70sRhQY543JvL202d+94ogqdDxHvP7uVor+J2Sr4m3a8dJ6dJ0qE44E+9b8HqPCFwCeMLFqgVC0OL6g1ZcCI+A7NlZFFiq2aMz/NmqoWkux42X46zS+6ntY5CEupJnf2hQMz8HsYvicZ6xJ4adj+ilXRw=
+	t=1717663229; cv=none; b=bTrVFD2zMyf+V6EUIRUOPyly8sCbV4Ws1GaC/s7+uDd1JNmqHDfdFkBl2pAZ/Pyihzn3Q2P1ip3ICFbSsYse7C86G0FXllJsfq43W0rCpl1OyeWLkU4knLq1NvyORpc/TTRQsn46ADCgFThHScZi6D283Kxo56rUGHvRGDoDbW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717663154; c=relaxed/simple;
-	bh=HKLQNbCiKO8GdgIRFLmoBkFsM576UeU3qL3YIZA/dsA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KSyl2liQJy/ENTQMxf2C+VtC8BUO7gD4x1W5vnxRYi1IqYvfgzEhhnK78RDnVq+q7s8N6+IMujWRoy1uVgZV+fWkff+IrIOZ62eam4AP6snwIbtR3Vs2hm3mUrVREJx3thhG1V8ZskTK3QL4KpM99u7iCGo3W1DQ6WZza9B+/g0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1sF8eH-0001Jf-4n; Thu, 06 Jun 2024 10:39:05 +0200
-Date: Thu, 6 Jun 2024 10:39:05 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Willem de Bruijn <willemb@google.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Christoph Paasch <cpaasch@apple.com>,
-	Netfilter <netfilter-devel@vger.kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	daniel@iogearbox.net, Stanislav Fomichev <sdf@google.com>
-Subject: Re: [PATCH nf] netfilter: nf_reject: init skb->dev for reset packet
-Message-ID: <20240606083905.GA4688@breakpoint.cc>
-References: <20240604120311.27300-1-fw@strlen.de>
- <FF8A506F-6F0F-440E-9F52-B27D05731B77@apple.com>
- <20240605181450.GA7176@breakpoint.cc>
- <ZmCwlbF8BvLGNgRM@calendula>
- <20240605190833.GB7176@breakpoint.cc>
- <ZmDAQ6r49kSgwaMm@calendula>
- <CA+FuTSfAhHDedA68LOiiUpbBtQKV9E-W5o4TJibpCWokYii69A@mail.gmail.com>
+	s=arc-20240116; t=1717663229; c=relaxed/simple;
+	bh=0Y/L82EZCzB7GC6FsONHbm8i7buVGAVbnHUvf/I9Mz8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=WC1r8cVHJ9RUJlNm72YzUQgIEGBktXBg+y9Qo6CE5GkpoOLien0yqzZV05+EEoxZVo5rydhUqOJqcLzrauaK5maC/SXAIY6O4GdJ2n21gL0MZS4nbkvezOexuVKbSDeIQ7rFGKy0s8PrxLhebicmGt6WezZAJQrtpueevoSrk8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BIhs+dZK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5D8FFC4AF0E;
+	Thu,  6 Jun 2024 08:40:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717663228;
+	bh=0Y/L82EZCzB7GC6FsONHbm8i7buVGAVbnHUvf/I9Mz8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BIhs+dZKaa+O0ikeonaN4TrMCWY/cLqXOEj5R+Y2714/T30RknNkPRpI1Tkb+RF/8
+	 DAdSeivumD8qVifHs68rfAXsiN+X6R8NNmPPimt9hGboskkHRbAHZj1pwC577e3DlI
+	 W/Hup34OaQA+7nTlhYB6+CcyOY2xNz11KG/PIVNh+f6NEri8n9deiPJz6oqxCWGT4X
+	 FzpqNY7EkfMfVCvLhMmXDYKKWEcqG1Jpws5TQWOVmVKtDhUN/sfmS0YFeAKAE4/qYd
+	 THkQQLpZaYaq4BBzbsvml0NfB1exb91YSERmouXQSIeb/AXcjmpagfDLGzRiQmjSQ/
+	 3iqKa64b2ySHg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4B7D0C4332D;
+	Thu,  6 Jun 2024 08:40:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+FuTSfAhHDedA68LOiiUpbBtQKV9E-W5o4TJibpCWokYii69A@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Subject: Re: [PATCH net] net: wwan: iosm: Fix tainted pointer delete is case of
+ region creation fail
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171766322830.14664.190993997949157639.git-patchwork-notify@kernel.org>
+Date: Thu, 06 Jun 2024 08:40:28 +0000
+References: <20240604082500.20769-1-amishin@t-argos.ru>
+In-Reply-To: <20240604082500.20769-1-amishin@t-argos.ru>
+To: Aleksandr Mishin <amishin@t-argos.ru>
+Cc: m.chetan.kumar@intel.com, loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
+ johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
 
-Willem de Bruijn <willemb@google.com> wrote:
-> On Wed, Jun 5, 2024 at 3:45 PM Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> >
-> > On Wed, Jun 05, 2024 at 09:08:33PM +0200, Florian Westphal wrote:
-> > > So there are several options here:
-> > > 1. remove the WARN_ON_ONCE and be done with it
-> > > 2. remove the WARN_ON_ONCE and pretend net was init_net
-> > > 3. also look at skb_dst(skb)->dev if skb->dev is unset, then back to 1)
-> > >    or 2)
-> > > 4. stop using skb_get_hash() from netfilter (but there are likely other
-> > >    callers that might hit this).
-> > > 5. fix up callers, one by one
-> > > 6. assign skb->dev inside netfilter if its unset
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 4 Jun 2024 11:25:00 +0300 you wrote:
+> In case of region creation fail in ipc_devlink_create_region(), previously
+> created regions delete process starts from tainted pointer which actually
+> holds error code value.
+> Fix this bug by decreasing region index before delete.
 > 
-> Is 6 a realistic option?
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> [...]
 
-The output hook has to outdev available (its skb_dst(skb)->dev, passed
-in from __ip_local_out()).
+Here is the summary with links:
+  - [net] net: wwan: iosm: Fix tainted pointer delete is case of region creation fail
+    https://git.kernel.org/netdev/net/c/b0c9a2643541
 
-So we could set skb->dev = outdev, before calling skb_get_hash and
-__skb_get_hash_symmetric.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
