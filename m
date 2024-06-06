@@ -1,171 +1,210 @@
-Return-Path: <netdev+bounces-101550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E4978FF5B9
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 22:15:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 317C08FF5D3
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 22:26:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 683C4B2168F
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 20:15:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 459F81C22702
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 20:26:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FDA938F9C;
-	Thu,  6 Jun 2024 20:15:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7BB8745C0;
+	Thu,  6 Jun 2024 20:26:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R5Z1wIPj"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="M4XqnpXl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABE219D89B;
-	Thu,  6 Jun 2024 20:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0B64BA94;
+	Thu,  6 Jun 2024 20:26:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717704942; cv=none; b=n2TAmWRypFeDoJf+UGvbK7ZQSF9QM62D4hSIlbgJWi2+7fAvKl5DVcTyWAjkGIFHhQkS4grvH28vIEhrmNPWjE6DxtSw9RYueK7LRNnk7IVxipBIKn95VQuufwpYoAtLLuDleWY1F/aDn1cqFZMqbwSze5PR/P2kaAUhWwovPig=
+	t=1717705597; cv=none; b=mXhchGyAw9An3BuHYaPVUrv2vmA/kDiEWZXcnfTK4scAj/bNrWXuWO2bsRg0om7DP9HkgpCX1mK/G0w2vbXx7Titjj27cZtoBopwiz+M7NTg8ATm2EC3zCxgMsB9zKE17ntf4GntgkcXljq0GLhYvBAzCDQOv+6xfsEec7ckMbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717704942; c=relaxed/simple;
-	bh=AQ7GF4q/1Yb7iHnQ7ukC+hvO3kvAMdYOrcqxegTRy7w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YlWL5rQm/AUvo6DKqk+UUMdHeCN3jjtpjeGYm6MW8rCGmN6sCyIhnxepsIaLJiBRpzeyCoZTR8Pgw/s04RBRbG7a5Gv1ErlMrouFMYoyI7FcgfVz/+iPAmXhVaRClC1WjC/TbI0hXWKrhSHDpJ49/dylsFqT26VGnY1sZWyd/5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R5Z1wIPj; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-374a82e20deso8120365ab.1;
-        Thu, 06 Jun 2024 13:15:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717704939; x=1718309739; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3pYG/DVDnxzBFRqp9E2ijRMkZnIWCZqG6UTAVccwf7s=;
-        b=R5Z1wIPjJn+9rBUz1qdShNnhXdoNOQ/SiUZxLYfoHuZ+5nkgX1DvdkbZbMvPZnnM/n
-         YCJN4M4T9JGu0locgmpkkxDYcX4TmRQKoFrKPst4GC+nNsvDB1xH42RQ3ZGAVOj2kUEJ
-         D54KMfHEV1eyjMFHfJydgkFrPu8UAWczzqtJHLpx1xo34WSNcZ84HljBzaLO8HLofN0p
-         +QE/CEwBY0Q8+pEXmxoiVbtNI7ijFExhuBERAELez3Vjkx5Fh22HerbdaOOHIMUsi4rh
-         94PDecL3bxLQ2Z0+bRG6KgS6oGx+DSNDPVMQNusw8aDlaVP6iuKcojt8rKUIq4Qvwb++
-         zKUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717704939; x=1718309739;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3pYG/DVDnxzBFRqp9E2ijRMkZnIWCZqG6UTAVccwf7s=;
-        b=hd8lcy70not5vpy+NgcsHP2QSkjvEKekv+FvKCAvXm2rgg6Zw3vRH6VpK2n43OVCxb
-         Q6ZOixU52/lUwJtn3iRxsya6zXOA1PoEurDt2xXSLy1ec7pPUNCF++Dsoqypu4WEEIzj
-         G5luzwb+O5hlhpiyDI2tS8D78Mz3qbe/iV2x7ZCfUQlw2MoHY/Ir2YeQHEHh590cSpmD
-         O7NAgmmWNx3rkKGxbakeVY4a9OQXJirykmb5+GkwVIzoDyVBRbQzAXeGsm8rnj/K5qC/
-         SwmIQzBlP7HdNjuye1Dr+93CXXG0KNQunC6ERmdyw36KMBpC0kF9MVT0venLs3PBIz57
-         hF6A==
-X-Forwarded-Encrypted: i=1; AJvYcCXrP0YQw5GFbxouaWAtvzV1f4rYZJKrqGuAC5nEkyOSbIr2v83iGCYEWHsC+YsPV6UzBQYPvdy6HkGgVtDiZO8jlvy9y2va
-X-Gm-Message-State: AOJu0Yz1ZceWhYCCeRNqeJBDRin07IlatRAIF86CYMygxxnt0GovT3Ar
-	eSeFViNOKATO8MtZQf8d9UGhi9N7Pc5KeAzHzVIySSd8LfozfbZvgvCXoNJR6osl55Oh+eq6qR6
-	fnbbwGH0ewcyHZWFtYaZOSF97MaY=
-X-Google-Smtp-Source: AGHT+IEzhvRylgL4Lg5B9lACn7wqepAmw9N6nweq123PmCKJlorN11ofcRaDFsLRWTidec4KVIEwsLoM3DMq2B6kN0o=
-X-Received: by 2002:a05:6e02:1fe1:b0:374:9277:bfab with SMTP id
- e9e14a558f8ab-375803c3b43mr4066355ab.16.1717704939480; Thu, 06 Jun 2024
- 13:15:39 -0700 (PDT)
+	s=arc-20240116; t=1717705597; c=relaxed/simple;
+	bh=Xj7XTFZkj95fwztiRLT1cEo2Pr1iePDTIMXSz0TlfA4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=j/rMcygsILpFZUrPHu2TY+YU7dk8v5dg5JTGk23lL/16VwLZqxLgch10hk0coKJvBpoXUfmr0GY/23p8GbpXV8THog9HjQ9Ia7Cl3ktkams8M9b2sqJdLztis6XaitCCKPkhulcMZX+8tobm98EPA780C4977fNOdjhKdMTk3uI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=M4XqnpXl; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 456KMZ6W006436;
+	Thu, 6 Jun 2024 20:26:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
+ content-transfer-encoding : content-type : date : from : in-reply-to :
+ message-id : mime-version : references : subject : to; s=pp1;
+ bh=Z9snNBCsP4hB759QGyYELO1ciqENqF/ID3ZfpfY1WHs=;
+ b=M4XqnpXlgx0r/Li6o9UIc4miRJyLQmJk18+wJCkvHLcBEFIjNs64vfNGncvlhLliEwz5
+ cQq8pzC80BcDyp2eFoEVRTnZ3ZsPZpiPvAhSCyMvEZ+rE/GWvB0zdbKeu8DvYkndzk+0
+ E4kuwn4v+/jrf17cKU2Deg57N5UPtf+DToCDs8qmGR7pyAKSOeAdS8/QX8z0yDqCiutM
+ j65jh13rf4v64Mw7WEJ3NVsi+CAIjiJH3rf8od4oECjuFKEGcSgsWHk5b1jQD1kerx8i
+ j/5223NvxvxkVCLORg/EHoKizC7SvTHWb+RG3JP18HJalI54sfh0FoPyIRDjrY1mGBdj rQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ykm35r0e7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Jun 2024 20:26:25 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 456KQPJO012325;
+	Thu, 6 Jun 2024 20:26:25 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ykm35r0e3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Jun 2024 20:26:25 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 456HSsci026549;
+	Thu, 6 Jun 2024 20:26:24 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3yggp3c39j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Jun 2024 20:26:24 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 456KQKdA22610656
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 6 Jun 2024 20:26:22 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B66B05805C;
+	Thu,  6 Jun 2024 20:26:20 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 458405805B;
+	Thu,  6 Jun 2024 20:26:18 +0000 (GMT)
+Received: from [9.179.16.56] (unknown [9.179.16.56])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  6 Jun 2024 20:26:18 +0000 (GMT)
+Message-ID: <1edb2f86-5b8a-4fad-babe-e5f76bbcbf90@linux.ibm.com>
+Date: Thu, 6 Jun 2024 22:26:17 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 0/3] Introduce IPPROTO_SMC
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+        jaka@linux.ibm.com, wintera@linux.ibm.com, guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+        tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
+References: <1717592180-66181-1-git-send-email-alibuda@linux.alibaba.com>
+Content-Language: en-US
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <1717592180-66181-1-git-send-email-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: bGNA9BUt1i9urafpCAh5sXGQ1iEg1c-j
+X-Proofpoint-GUID: 0H60egWUIj0rgX4GD3P_LRnQ7PBMqEjA
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <4faeb583e1d44d82b4e16374b0ad583c@AcuMS.aculab.com>
-In-Reply-To: <4faeb583e1d44d82b4e16374b0ad583c@AcuMS.aculab.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 6 Jun 2024 16:15:28 -0400
-Message-ID: <CADvbK_emOEPZJ8GWtYpUDKAGLW2z84S81ZcW9qQCc=rYCiUbAA@mail.gmail.com>
-Subject: Re: SCTP doesn't seem to let you 'cancel' a blocking accept()
-To: David Laight <David.Laight@aculab.com>
-Cc: linux-sctp <linux-sctp@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-06_16,2024-06-06_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 phishscore=0 adultscore=0 impostorscore=0 malwarescore=0
+ spamscore=0 priorityscore=1501 mlxlogscore=999 suspectscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2406060141
 
-On Mon, Jun 3, 2024 at 11:42=E2=80=AFAM David Laight <David.Laight@aculab.c=
-om> wrote:
->
-> In a multithreaded program it is reasonable to have a thread blocked in a=
-ccept().
-> With TCP a subsequent shutdown(listen_fd, SHUT_RDWR) causes the accept to=
- fail.
-> But nothing happens for SCTP.
->
-> I think the 'magic' happens when tcp_disconnect() calls inet_csk_listen_s=
-top(sk)
-> but sctp_disconnect() is an empty function and nothing happens.
->
-> I can't see any calls to inet_csk_listen_stop() in the sctp code - so I s=
-uspect
-> it isn't possible at all.
-I guess SCTP doesn't take action due to the description
-in rfc6458#section-4.1.7:
 
-      SHUT_RD:  Disables further receive operations.  No SCTP protocol
-         action is taken.
 
->
-> This all relates to a very old (pre git) comment in inet_shutdown() that
-> shutdown needs to act on listening and connecting sockets until the VFS
-> layer is 'fixed' (presumably to let close() through - not going to happen=
-.)
-didn't know that, it's better to have it on some standard doc.
+On 05.06.24 14:56, D. Wythe wrote:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
+> 
+> This patch allows to create smc socket via AF_INET,
+> similar to the following code,
+> 
+> /* create v4 smc sock */
+> v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
+> 
+> /* create v6 smc sock */
+> v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
+> 
+> There are several reasons why we believe it is appropriate here:
+> 
+> 1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
+> address. There is no AF_SMC address at all.
+> 
+> 2. Create smc socket in the AF_INET(6) path, which allows us to reuse
+> the infrastructure of AF_INET(6) path, such as common ebpf hooks.
+> Otherwise, smc have to implement it again in AF_SMC path. Such as:
+>    1. Replace IPPROTO_TCP with IPPROTO_SMC in the socket() syscall
+>       initiated by the user, without the use of LD-PRELOAD.
+>    2. Select whether immediate fallback is required based on peer's port/ip
+>       before connect().
+> 
+> A very significant result is that we can now use eBPF to implement smc_run
+> instead of LD_PRELOAD, who is completely ineffective in scenarios of static
+> linking.
+> 
+> Another potential value is that we are attempting to optimize the
+> performance of fallback socks, where merging socks is an important part,
+> and it relies on the creation of SMC sockets under the AF_INET path.
+> (More information :
+> https://lore.kernel.org/netdev/1699442703-25015-1-git-send-email-alibuda@linux.alibaba.com/T/)
+> 
+> v2 -> v1:
+> 
+> - Code formatting, mainly including alignment and annotation repair.
+> - move inet_smc proto ops to inet_smc.c, avoiding af_smc.c becoming too bulky.
+> - Fix the issue where refactoring affects the initialization order.
+> - Fix compile warning (unused out_inet_prot) while CONFIG_IPV6 was not set.
+> 
+> v3 -> v2:
+> 
+> - Add Alibaba's copyright information to the newfile
+> 
+> v4 -> v3:
+> 
+> - Fix some spelling errors
+> - Align function naming style with smc_sock_init() to smc_sk_init()
+> - Reversing the order of the conditional checks on clcsock to make the code more intuitive
+> 
+> v5 -> v4:
+> 
+> - Fix some spelling errors
+> - Added comment, "/* CONFIG_IPV6 */", after the final #endif directive.
+> - Rename smc_inet.h and smc_inet.c to smc_inet.h and smc_inet.c
+> - Encapsulate the initialization and destruction of inet_smc in inet_smc.c,
+>    rather than implementing it directly in af_smc.c.
+> - Remove useless header files in smc_inet.h
+> - Make smc_inet_prot_xxx and smc_inet_sock_init() to be static, since it's
+>    only used in smc_inet.c
+> 
+> 
+> v6 -> v5:
+> 
+> - Wrapping lines to not exceed 80 characters
+> - Combine initialization and error handling of smc_inet6 into the same #if
+>    macro block.
+> 
+> D. Wythe (3):
+>    net/smc: refactoring initialization of smc sock
+>    net/smc: expose smc proto operations
+>    net/smc: Introduce IPPROTO_SMC
+> 
+>   include/uapi/linux/in.h |   2 +
+>   net/smc/Makefile        |   2 +-
+>   net/smc/af_smc.c        | 162 ++++++++++++++++++++++++++--------------------
+>   net/smc/smc.h           |  38 +++++++++++
+>   net/smc/smc_inet.c      | 169 ++++++++++++++++++++++++++++++++++++++++++++++++
+>   net/smc/smc_inet.h      |  22 +++++++
+>   6 files changed, 324 insertions(+), 71 deletions(-)
+>   create mode 100644 net/smc/smc_inet.c
+>   create mode 100644 net/smc/smc_inet.h
+> 
+Hi D.Wythe,
 
->
-> I also suspect that a blocking connect() can't be cancelled either?
-For connecting socket, it calls sctp_shutdown() where SHUT_WR causes
-the asoc to enter SHUTDOWN_SENT and cancel the blocking connect().
+This version of the code looks good to me!
+And I played with it on our platform, and did some basic testing for 
+SMCR and SMCD. It works pretty well. I like it. Thank you for your effort!
 
->
-> Clearly the application can avoid the issue by using poll() and an
-> extra eventfd() for the wakeup - but it is all a faff for code that
-> otherwise straight forward.
-I will try to prepare a patch to solve this for sctp accept() like:
+Please feel free to add my signs for the whole patches series.
+Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+Tested-by: Wenjia Zhang <wenjia@linux.ibm.com>
 
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index c67679a41044..f270a0a4c65d 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -4834,10 +4834,13 @@ int sctp_inet_connect(struct socket *sock,
-struct sockaddr *uaddr,
-        return sctp_connect(sock->sk, uaddr, addr_len, flags);
- }
-
--/* FIXME: Write comments. */
- static int sctp_disconnect(struct sock *sk, int flags)
- {
--       return -EOPNOTSUPP; /* STUB */
-+       if (!sctp_style(sk, TCP))
-+               return -EOPNOTSUPP;
-+
-+       sk->sk_shutdown |=3D RCV_SHUTDOWN;
-+       return 0;
- }
-
- /* 4.1.4 accept() - TCP Style Syntax
-@@ -4866,7 +4869,7 @@ static struct sock *sctp_accept(struct sock *sk,
-int flags, int *err, bool kern)
-                goto out;
-        }
-
--       if (!sctp_sstate(sk, LISTENING)) {
-+       if (!sctp_sstate(sk, LISTENING) || (sk->sk_shutdown & RCV_SHUTDOWN)=
-) {
-                error =3D -EINVAL;
-                goto out;
-        }
-@@ -9392,7 +9395,7 @@ static int sctp_wait_for_accept(struct sock *sk,
-long timeo)
-                }
-
-                err =3D -EINVAL;
--               if (!sctp_sstate(sk, LISTENING))
-+               if (!sctp_sstate(sk, LISTENING) || (sk->sk_shutdown &
-RCV_SHUTDOWN))
-                        break;
-
-                err =3D 0;
-
-Thanks.
+Thanks,
+Wenjia
 
