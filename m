@@ -1,72 +1,80 @@
-Return-Path: <netdev+bounces-101219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 429B68FDC74
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 04:02:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07BF38FDC78
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 04:04:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D25D52867AB
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 02:02:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E47F11C2176C
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 02:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9222A749A;
-	Thu,  6 Jun 2024 02:02:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5771401B;
+	Thu,  6 Jun 2024 02:04:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ngSH/oCh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Z1kygmFU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D971EAF6
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 02:02:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119F41373;
+	Thu,  6 Jun 2024 02:04:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717639334; cv=none; b=gtDEdg7h2JMIJqRhNtb/2hNGwWpmfWz4cuDWd9EvXdzufLDtV9FGLc/iYMYU5oIJ+tbnsyHwB+farTFbetAuF0hv3uTuDIIFthzyU0paMXV1hz6McCc3joZ1/l/hb4BQXdZXcFc4oNjp4BKJRachMogkqMWtD+a/V6D+1InDf4c=
+	t=1717639464; cv=none; b=U5oo9iCkQu9SR2iH6wi2/8pVE2E/4/rVUfoIgJNv6xXERGRYC9o6qH8wBWGDG2PKTfLWqdww19PooiyLSHS+GnE2AaP9C7IvjRlFayzTOT0GqdCTmRFDcZS2Lc1jj1pS1o0c+YI1xOtOO0yeUCzqEr4kGPWPTVjmvguK3PcgKfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717639334; c=relaxed/simple;
-	bh=qCUCIGRecLx0W1F7LiIGV5plJ8i42ruvexaLljJA8EI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JFdLKUbcN5qr9DSbjY4gLte2dp9IRVDnZjbQRcohGa3w6E0PASNeK0SJ6BTPc+TSIPHWb9iO2zgej9WZznZ9yde4wBr8OyQEKt/y9qDeH4olLnUtdkbXP5eKBIiMCZ5h/2ilv4Gj9UnI457caxG+j3LcFK69RJ4w27StlvLrnmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ngSH/oCh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9326AC2BD11;
-	Thu,  6 Jun 2024 02:02:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717639333;
-	bh=qCUCIGRecLx0W1F7LiIGV5plJ8i42ruvexaLljJA8EI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ngSH/oChJdFDjJqhNfXGKgpL/5Xm3aJF5NTvOhoZxSFzq84VWKzQXwdNAHJZtT0Xb
-	 oof0QqH1HPI5ZRHwORYBiRSh6tqoCNfVD41dRsC20QgLbr7ANg/fRNfeGZubDlwFWc
-	 bwNsnCuy3n5v1/rUc/MtlY5+VqM3ucv/nzTwYrNmCqXblXoMI23jZrvQA99Y4R7n1E
-	 fxIHY0bqnuEIObLRCwLvwUh9pDl/JNIcRQsgv9tXqO+k4dNcZl3Bo+KS1NsCobgVc8
-	 dtDEowLRsbtqD5QoyvBi5bJAMxfsPcR9uCVVS4U1BXwc9oPPbJtpxCQlL6RUeEY6kB
-	 Mgysus+4AbP6w==
-Date: Wed, 5 Jun 2024 19:02:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: David Ahern <dsahern@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 0/3] net: core: Unify dstats with tstats and
- lstats, add generic collection helper
-Message-ID: <20240605190212.7360a27a@kernel.org>
-In-Reply-To: <20240605-dstats-v2-0-7fae03f813f3@codeconstruct.com.au>
-References: <20240605-dstats-v2-0-7fae03f813f3@codeconstruct.com.au>
+	s=arc-20240116; t=1717639464; c=relaxed/simple;
+	bh=KchfyRw5yhyXWwSmy9ySHIAwLenL1pYcPWIufZuPhMo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gLsbXFqae09GXl5Le+hx+ChEed2GDkudCXdV4Wlk86FOCQzAawJeVsKACKe1kAOKczwO8ysMjrz37+vNLkUs1tzHnzswv+hs6iYGEZLHQxHZqnI3YUkOwf2afHW4qStU1Js7nK2/ua5SJPkT86d+aef2dOJ0D/dPuVHrtJXuL+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Z1kygmFU; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=jSY0bvOqtELArheckRfbvM1kpjDwefKlvF+Tb6ce0FM=; b=Z1
+	kygmFUugkDAgM/z2UdBLJ/wViHTWhRMHHs8zGh8DQMzMlzakXTribvSF1kb4jvv5XfSiGFDVEcd2s
+	wqkgdlOLWuwOgs2JH1QC7E/MQdavLaZZlKsE5nSFhp1dLrthIdk01T8UhMfDlvBW+sfrzy7XbsL9F
+	TyR+kTH1pMWZzDM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sF2UD-00Gy0R-HX; Thu, 06 Jun 2024 04:04:17 +0200
+Date: Thu, 6 Jun 2024 04:04:17 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kamil =?iso-8859-1?Q?Hor=E1k?= - 2N <kamilh@axis.com>
+Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+	hkallweit1@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 1/3] net: phy: bcm54811: New link mode for BroadR-Reach
+Message-ID: <3bd5c993-d763-4191-8a88-fcd56d9bfb4c@lunn.ch>
+References: <20240605095646.3924454-1-kamilh@axis.com>
+ <20240605095646.3924454-2-kamilh@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240605095646.3924454-2-kamilh@axis.com>
 
-On Wed, 05 Jun 2024 17:42:56 +0800 Jeremy Kerr wrote:
-> This change unifies dstats with the other types, adds a collection
-> helper (dev_get_dstats64) for ->ndo_get_stats64, and updates the single
-> driver (vrf) to use this helper.
+On Wed, Jun 05, 2024 at 11:56:44AM +0200, Kamil Horák - 2N wrote:
+> Introduce a new link mode necessary for 10 MBit single-pair
+> connection in BroadR-Reach mode on bcm5481x PHY by Broadcom.
+> This new link mode, 10baseT1BRR, is known as 1BR10 in the Broadcom
+> terminology. Another link mode to be used is 1BR100 and it is already
+> present as 100baseT1, because Broadcom's 1BR100 became 100baseT1
+> (IEEE 802.3bw).
+> 
+> Signed-off-by: Kamil Horák - 2N <kamilh@axis.com>
 
-I think you can go further, instead of exporting the helpers and
-hooking them in the driver, just add the handling based on
-pcpu_stat_type directly in dev_get_stats().
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
