@@ -1,69 +1,61 @@
-Return-Path: <netdev+bounces-101536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBF0F8FF4A4
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 20:28:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CB4B8FF4B4
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 20:32:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 694ECB244A9
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 18:28:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A9C428F67D
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 18:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CFA819A287;
-	Thu,  6 Jun 2024 18:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A199144C8C;
+	Thu,  6 Jun 2024 18:32:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="P3p84HvM"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GluwDzP0"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C781993B6
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 18:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A228821;
+	Thu,  6 Jun 2024 18:32:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717698498; cv=none; b=Rts9GPhD7PbxbGEMmKNHeXTm/fIpZ6bIue7BKsUCAcZxGS2H6niiDlPp6UctJlfsEByFW4yTqO4YZx10OHAH7mEZMKdv6QJlJaC0L7UmOnXkmk29Wg9X9MPjxko+aKSlRmWPERffMaZvYWLjSuTX4aAqxsPQ+g3Ppu75EMjEITk=
+	t=1717698726; cv=none; b=UfXQCHBG3tci/b19A5s0wVtHP5Rct3VCBSOxfEZH7GQ6Qs/HkaH7nom5rmBktIFYjb1eE4kJds7ROrja0xftx4XBOe2TbSU5fJaqMLRC3fTGSEN8Ob0PBkyDh8a0a1MMSf/1/RUaHqfM8AMBhICE3rvCDo1Q3Y15mcNX4uRyoN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717698498; c=relaxed/simple;
-	bh=UVM6VFOZv7lPN78CMq1Zq+5I3YSli6AaF8emodeIRO0=;
+	s=arc-20240116; t=1717698726; c=relaxed/simple;
+	bh=c8317Md13mBmS3nLncmRd43PS4wNRAjjAbEJxzLRCHA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J5VsBeFgGimT4lHo36FSX4/AZ4vuZiqWRe0V5j8yX5oDOjJ+ncth6QGwaltithjXyxZeNm7JZK8ysjFDkRHvfcT5MKuDttRvBWGjLS+3R9jFlC9DyTnoUA+P1WMuxDayjtOT3c0BGNBQcBsRYpqy4p0XWtkWDIiZ8yo9SQAsilY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=P3p84HvM; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=o7ND3h/LzeZsuGG055zHA6rQdJQsfVYiMKbUIbgJOHQ=; b=P3p84HvMHHAiyWhxzNW6UZjUes
-	usHF09k+UADRTiXitAuHI5wU3MG8LIMutirk4oaxzqv3xlKliGZMzblmJrN0hDleeKyIs4tXT+eWm
-	BAXO7E0ow8CTGjVGEuKqHfxWDVCJcsowABAd1NJZqBbTG9BtoAi9FwzvNDNfGsZ0XpdMg9IHVwkzA
-	nfTyJdMTiYkqWzyd0y3bUiXSGl5y+aBTmUXr2GGLQc9pqNJaGN2isoxd5mR3k7Sgxb7ACLTi4suVX
-	9yMGRPU+Ddj12nd8cm2Muv0sTm29kyLlWqjQM4iYMlVHAguqvGD609CuI2lkBV87PkIEZm0N+NJE8
-	3WJSfb4A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43750)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sFHq6-0006gr-1j;
-	Thu, 06 Jun 2024 19:27:54 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sFHq4-0003Pa-Em; Thu, 06 Jun 2024 19:27:52 +0100
-Date: Thu, 6 Jun 2024 19:27:52 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	fancer.lancer@gmail.com, Jose.Abreu@synopsys.com,
-	chenhuacai@kernel.org, guyinggang@loongson.cn,
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com,
-	si.yanteng@linux.dev
-Subject: Re: [PATCH net-next v13 00/15] stmmac: Add Loongson platform support
-Message-ID: <ZmH/qN6lKGA/tGTW@shell.armlinux.org.uk>
-References: <cover.1716973237.git.siyanteng@loongson.cn>
+	 Content-Type:Content-Disposition:In-Reply-To; b=E+vT0DtNuoKLyPIKpVcDKtfAaxsZcJHK4fOdhWhtFnjTQWNfy3ugAwfDWFq1W/2PbXm/B3+WmLuZ2VRgBOAxRUwAZ37hsO6jbjdM4G8tGEHG7mXq2+9CT8wMcpCDGDoI/E/v6fwk4M0b92UKWL6oSY1HhYVq1IkvbUwLHdIxtC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GluwDzP0; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=KS2oYQ6kEvwe+tStHjauZWJyl0wKHtSJW2cYetOHMQY=; b=GluwDzP0zbxIddz8/0rWtWfUnP
+	Ln4KiPloTvSPVnN8yiLLtHlYqh8rz0Jk8wsMbDT/9VSmeb4d3lPfYsukLdRZPYCkvXRKB0jEnwcKV
+	FwKqjeHY+qO2mKiCRJ9IGOvDwycriNLjaoJdyeIFPSxXEUPBmHctT/baE7rsilrMSIK4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sFHtn-00H2hc-F7; Thu, 06 Jun 2024 20:31:43 +0200
+Date: Thu, 6 Jun 2024 20:31:43 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: jackie.jone@alliedtelesis.co.nz, davem@davemloft.net,
+	jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+	kuba@kernel.org, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	chris.packham@alliedtelesis.co.nz
+Subject: Re: [PATCH] igb: Add MII write support
+Message-ID: <12b1febd-a634-43bb-8edf-79ccb4f9e3aa@lunn.ch>
+References: <20240604031020.2313175-1-jackie.jone@alliedtelesis.co.nz>
+ <ad56235d-d267-4477-9c35-210309286ff4@intel.com>
+ <1dbb8291-9004-4ec2-a01b-9dd5b2a8be39@lunn.ch>
+ <c12ffb8e-0606-442b-810a-69bf65624bf9@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,39 +64,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1716973237.git.siyanteng@loongson.cn>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <c12ffb8e-0606-442b-810a-69bf65624bf9@intel.com>
 
-On Wed, May 29, 2024 at 06:17:22PM +0800, Yanteng Si wrote:
->  3. Our priv->dma_cap.pcs is false, so let's use PHY_INTERFACE_MODE_NA;
+> Yea, its extremely easy to break things if you don't know what you're
+> doing here. So its more a question of "are we ok exposing yet another
+> way root can brick things?"
 
-Useful to note.
+Many MAC drivers allow it, and we have not had complaints. It is not
+really something i'm a fan of, it in theory allows user space drivers
+for PHYs, but it is full of race conditions so in practice unlikely to
+work reliably.
 
->  4. Our GMAC does not support Delay, so let's use PHY_INTERFACE_MODE_RGMII_ID,
->     the current dts is wrong, a fix patch will be sent to the LoongArch list
->     later.
+If you are worried about it causing additional support issues because
+it gets abused, you could make it taint the kernel. That makes it
+clear all bets are off if used. For the use case presented here, a
+tainted kernel does not matter, it for lab testing, not production.
 
-RGMII requires a delay somewhere in the system, and there are three
-options: at the MAC, in the board traces, or at the PHY. The
-PHY_INTERFACE_MODE_RGMII* passed to the PHY determines what delays the
-PHY uses, and thus what the GMAC uses has no bearing on this - if the
-board traces are adding the required delay, then
-PHY_INTERFACE_MODE_RGMII is sufficient.
+      Andrew
 
-If the board traces do not add the required delay, and the GMAC doesn't
-add a delay, then it is necessary to add the delay at the PHY, so
-using PHY_INTERFACE_MODE_RGMII_ID is appropriate.
-
-It's all detailed in Documentation/networking/phy.rst
-
-What isn't documented there (and arguably should be) is if the MAC
-adjusts its delays according to the PHY interface mode, then the MAC
-should pass PHY_INTERFACE_MODE_RGMII to the PHY _irrespective_ of
-which _ID/_TXID/ _RXID has been selected by firmware (since we don't
-want the PHY to be adding its own delays if they've already been taken
-care of by the MAC.)
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
