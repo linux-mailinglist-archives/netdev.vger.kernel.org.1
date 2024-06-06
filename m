@@ -1,120 +1,153 @@
-Return-Path: <netdev+bounces-101436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81DFD8FE846
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:59:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 002F18FE84D
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:02:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F358F2852D3
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 13:59:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D8182831A5
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49501196447;
-	Thu,  6 Jun 2024 13:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34D1119645B;
+	Thu,  6 Jun 2024 14:02:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N5mkjK4y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uGSpgk2S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25342196456
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 13:59:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E44195FC6;
+	Thu,  6 Jun 2024 14:02:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717682351; cv=none; b=mfS7mDOtoDxpo841Vnjeb7MGYzC76R+Hd8ox4msRyRnvtVvQsEGBkqxsd713PvrHIC+Wq/R+IdM/7JxcY5IY7/eY1piMlWb/pvlf9EHa+FDW9sM1q8mkv1eX/OajbEQtsSU7xra6EgkkeZFXJmBkUBpslSHx8s/rk7VsTGXrBYY=
+	t=1717682523; cv=none; b=pPhRGc3+eF02CE1hMBmAU0Izw00W2BddFeB3x6we6zmSJbTt5hF2ofO0GTAl4p9+7FE5wwKV9UUDLKM0AvEwesYEjWX+AWXurmBHrapTiKD3Fk4/G42MCXQBDdw3rMIYdK9yZ+mPrmgCls+m2lLE9RgiFfo16GFzT0fLsAQjjPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717682351; c=relaxed/simple;
-	bh=JGR9+WoyerZ7BvXcSd141t/mM9ZPFMBE6XZwWnix/is=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=au464fDKbH7sxOucEtd44T/1iBysc+TBnYUl0ftiQvqvdx50y453aJTy2kMsFhyzsmnPdN2fT9GtTfDF1XTOygsQvAMi96JxXLJSy3Y/oyZ8UUnbGCfnKn8G6vhvRqmy1ba62uIHsB2AUz5Hf8UblnF31weA8gGFUgCNxwhN/wA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N5mkjK4y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54A1CC32782;
-	Thu,  6 Jun 2024 13:59:08 +0000 (UTC)
+	s=arc-20240116; t=1717682523; c=relaxed/simple;
+	bh=ivsf4NbZZPAamDEi3OCHaSjrBCmG4UqHfSgu3HZ5PWY=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=uMgY8E7GdivOGj22MEvTL/nH38wYVkxLH1M+xh/FsAKW1V/jSq/f0XvfP230ZcoXNCmW+fsyIE23lA7VjvhC+CZLd90BgXe/ym0Vkf5OvCCMuowfkRC9A8D9Edd5TK6rwB6Wvhy7smsr39HPqOVXeG41O84BZ2+LSAaI2Kb9Bh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uGSpgk2S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55343C2BD10;
+	Thu,  6 Jun 2024 14:01:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717682350;
-	bh=JGR9+WoyerZ7BvXcSd141t/mM9ZPFMBE6XZwWnix/is=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=N5mkjK4yzH7SpyxCazT8Det3I2rmI3CBHrh59vWaoxBtTJDCapEPoOOHw3Tobob1w
-	 ugg01hcT5hCI9LO1K986bIwtdB/N6OMQAxtT7ZTyQ1dUT59bxfrUONqmgviDhQ0/7v
-	 cfcbMjOj/su+Awsr2tThntIpBF1nww7OmvFpNoAiaGkeY1U2SLW1w2WNyisr1tXnNM
-	 /q8on+RTroEhfecmTD98tudqT2x1vUR7npVNfUyn7sODAQviBN2dUO6JFGpDoS+ocJ
-	 hXmhuZJK8DxEDk/g+JnAPQSuiykR+GM562rmpDnDNasd4wNisnPrZa0DMqMxPGAvBL
-	 SZPMYt0OwWgsQ==
-Date: Thu, 6 Jun 2024 14:59:05 +0100
-From: Simon Horman <horms@kernel.org>
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Gal Pressman <gal@nvidia.com>, Yoray Zack <yorayz@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 08/15] net/mlx5e: SHAMPO, Skipping on duplicate
- flush of the same SHAMPO SKB
-Message-ID: <20240606135905.GL791188@kernel.org>
-References: <20240528142807.903965-1-tariqt@nvidia.com>
- <20240528142807.903965-9-tariqt@nvidia.com>
- <20240605134823.GK791188@kernel.org>
- <9957a6c3740e76c61b979038c6e984f9987bbd4c.camel@nvidia.com>
+	s=k20201202; t=1717682522;
+	bh=ivsf4NbZZPAamDEi3OCHaSjrBCmG4UqHfSgu3HZ5PWY=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=uGSpgk2S9Q99QsCDrnFKgKraNdbOOhYSONYIIH2BHVK2ycaCv0j+dmU4CbWH9oBsl
+	 /J8x10c81VUUGgH+F+o5iFK8iJ1N3/hdDgSJpOL1eMQ64ggEw7IYNBeyUIg1QS0kuY
+	 Lym15z8f+QhlPxGLzLuxIEHUmDvZAvWyIa8AQ9O+MCJ4+iA9TEZTreiq6kGUHPKhy2
+	 l5LxMFSLbsqNE1sagCmLT/7GMCy/HoZtA3CTZiOAwK5tf6EVyW4/g5jr+XaV5B9ReZ
+	 7Bsrq9LThBfrwDEkz9kIRyRY1w8DCgbIRo9Vfe2lwE9W2LSIGgnws/KaPOes7FDA1J
+	 YXpduBI7BQwFA==
+From: Kalle Valo <kvalo@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: "David S . Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski
+ <krzk+dt@kernel.org>,  Conor Dooley <conor+dt@kernel.org>,  Jeff Johnson
+ <jjohnson@kernel.org>,  linux-wireless@vger.kernel.org,
+  netdev@vger.kernel.org,  devicetree@vger.kernel.org,
+  ath11k@lists.infradead.org,  linux-kernel@vger.kernel.org,
+  ath12k@lists.infradead.org,  Bartosz Golaszewski
+ <bartosz.golaszewski@linaro.org>,  Krzysztof Kozlowski
+ <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH v9 1/2] dt-bindings: net: wireless: qcom,ath11k:
+ describe the ath11k on QCA6390
+References: <20240605122106.23818-1-brgl@bgdev.pl>
+	<20240605122106.23818-2-brgl@bgdev.pl> <87h6e6qjuh.fsf@kernel.org>
+	<CAMRc=MdiKxtnN+g92RUTXdOydaPV5M2u5iUdKyE2SNvDkdXAjg@mail.gmail.com>
+Date: Thu, 06 Jun 2024 17:01:57 +0300
+In-Reply-To: <CAMRc=MdiKxtnN+g92RUTXdOydaPV5M2u5iUdKyE2SNvDkdXAjg@mail.gmail.com>
+	(Bartosz Golaszewski's message of "Thu, 6 Jun 2024 15:35:47 +0200")
+Message-ID: <871q5aqiei.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9957a6c3740e76c61b979038c6e984f9987bbd4c.camel@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 05, 2024 at 05:55:24PM +0000, Dragos Tatulea wrote:
-> On Wed, 2024-06-05 at 14:48 +0100, Simon Horman wrote:
-> > On Tue, May 28, 2024 at 05:28:00PM +0300, Tariq Toukan wrote:
-> > > From: Yoray Zack <yorayz@nvidia.com>
-> > > 
-> > > SHAMPO SKB can be flushed in mlx5e_shampo_complete_rx_cqe().
-> > > If the SKB was flushed, rq->hw_gro_data->skb was also set to NULL.
-> > > 
-> > > We can skip on flushing the SKB in mlx5e_shampo_flush_skb
-> > > if rq->hw_gro_data->skb == NULL.
-> > > 
-> > > Signed-off-by: Yoray Zack <yorayz@nvidia.com>
-> > > Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> > > ---
-> > >  drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > > index 1e3a5b2afeae..3f76c33aada0 100644
-> > > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-> > > @@ -2334,7 +2334,7 @@ static void mlx5e_handle_rx_cqe_mpwrq_shampo(struct mlx5e_rq *rq, struct mlx5_cq
-> > >  	}
-> > >  
-> > >  	mlx5e_shampo_complete_rx_cqe(rq, cqe, cqe_bcnt, *skb);
-> > > -	if (flush)
-> > > +	if (flush && rq->hw_gro_data->skb)
-> > >  		mlx5e_shampo_flush_skb(rq, cqe, match);
-> > 
-> > nit: It seems awkward to reach inside rq like this
-> >      when mlx5e_shampo_flush_skb already deals with the skb in question.
-> > 
-> We don't need to reach inside the rq, we could use *skb instead (skb is &rq-
-> >hw_gro_data->skb). *skb is used often in this function.
+Bartosz Golaszewski <brgl@bgdev.pl> writes:
 
-So it is, thanks for pointing that out.
+> On Thu, Jun 6, 2024 at 3:30=E2=80=AFPM Kalle Valo <kvalo@kernel.org> wrot=
+e:
+>
+>>
+>> Bartosz Golaszewski <brgl@bgdev.pl> writes:
+>>
+>> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>> >
+>> > Add a PCI compatible for the ATH11K module on QCA6390 and describe the
+>> > power inputs from the PMU that it consumes.
+>> >
+>> > Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>
+>> [...]
+>>
+>> > +allOf:
+>> > +  - if:
+>> > +      properties:
+>> > +        compatible:
+>> > +          contains:
+>> > +            const: pci17cb,1101
+>> > +    then:
+>> > +      required:
+>> > +        - vddrfacmn-supply
+>> > +        - vddaon-supply
+>> > +        - vddwlcx-supply
+>> > +        - vddwlmx-supply
+>> > +        - vddrfa0p8-supply
+>> > +        - vddrfa1p2-supply
+>> > +        - vddrfa1p7-supply
+>> > +        - vddpcie0p9-supply
+>> > +        - vddpcie1p8-supply
+>>
+>> Not sure if we discussed this before, but based on this I understand
+>> that there can't be an DT entry for device pci17cb,1101 without all the
+>> supply properties? But there are QCA6390 devices with PCI id 17cb:1101
+>> which do not need these supplies and already work. For example, my Dell
+>> XPS 13 x86 laptop is one. Or anyone who manually installs QCA6390 board
+>> to their PCI slot and some of them might want to use DT, for example
+>> setting qcom,ath11k-calibration-variant.
+>>
+>> This is not a blocker for me, just making sure that we are not breaking
+>> any existing setups.
+>>
+>
+> If they are already powered up without the need for the PCI pwrctl
+> driver to do it, then they will work alright. Bindings don't affect
+> functionality.
 
-Clearly this is a pretty minor thing,
-so no need to respin just because of it.
+Sure, I'm not worried about functionality. I'm worried that if I
+there's, for example, an ARM based setup which uses DT and wants to use
+a similar QCA6390 board that I have, and set
+qcom,ath11k-calibration-variant in DT. In other words, I'm worried if
+you are looking at this only for Snapdragon family of boards?
 
-> 
-> >      Would it make esnse for the NULL skb check to
-> >      be moved inside mlx5e_shampo_flush_skb() ?
-> > 
-> 
-> Thanks,
-> Dragos
+Again, I don't see this as a blocker. I just want to understand how this
+should work for all types of devices there are out there.
+
+> But if you have a QCA6390 then you have its PMU too and the bindings
+> model the real-world hardware.
+>
+> IOW: your laptop should be alright but the supplies are really there
+> which warrants adding them to the bindings.
+
+Sorry, not following here. Can you clarify your comment "the supplies
+are really there"? You mean inside the PCI board? But that's not visible
+to the kernel in anyway, the PCI board just works after I plug it in.
+It's like a regular PCI device. So I don't understand why that should be
+visible in DT, but I can very well be missing something.
+
+--=20
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatc=
+hes
 
