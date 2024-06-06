@@ -1,122 +1,111 @@
-Return-Path: <netdev+bounces-101332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9438B8FE29A
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 11:26:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7993B8FE2D4
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 11:31:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94C271C213DB
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 09:26:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D00D1F23B97
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 09:31:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B5C13D25D;
-	Thu,  6 Jun 2024 09:26:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3812A15381A;
+	Thu,  6 Jun 2024 09:28:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="azz02lmp"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883EB13AA31;
-	Thu,  6 Jun 2024 09:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F6A153597;
+	Thu,  6 Jun 2024 09:28:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717665988; cv=none; b=Kqz93KnyuaVgPp/QNzE9XLojnBS1t4UwkSgRo+1MhD3FW7q5Oi9bLvoDb9WgdLgmPhlfg8E2vCLHYgGtPZo7B/08ZKxxFi2+QqV32YP0oKXRYvvojBZLsqryxFoT2vD/In+HXeJ5fuhO+eWoL/+mL+llbZEzZ5Bbvk9jsXphe3M=
+	t=1717666083; cv=none; b=se3NjrcTTkHPO3zwZL57bXJ+NwETGU72ARq8G0eTcx51R3AbmraVXbwhd8RSrjCuP7w4jGoLEdHw6IGc1LYB3MwR4UgNtbitxTvSpWzBe1XFGO9+s05/sPr/p598mz+8/TRRRLGA8vS/CKhzwCSqF3nldn7RRcwejQRWrdRt0l8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717665988; c=relaxed/simple;
-	bh=5XpcrG+TOKYFI4ePBqmfAJ/d5uRfaHB11848HdHFc9k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aS1SmE6S/kh3B5VPT3CcVCvAWNLeYJ0/JsRv9LDZTBBiMxL10+T50JyZk+45U8hIAOelUtUfx5Ceh27EaQw4kxiPpwW78Xks6P+Xg+qkpV7BVDvrwmJct4sMZ/W039QcaKZDrOINmm3y9K+axInsFOXix56u+Xfjk5x0eLqnpvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1sF9O0-0001n0-VU; Thu, 06 Jun 2024 11:26:20 +0200
-Date: Thu, 6 Jun 2024 11:26:20 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Christoph Paasch <cpaasch@apple.com>,
-	Netfilter <netfilter-devel@vger.kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	daniel@iogearbox.net, willemb@google.com
-Subject: Re: [PATCH nf] netfilter: nf_reject: init skb->dev for reset packet
-Message-ID: <20240606092620.GC4688@breakpoint.cc>
-References: <20240604120311.27300-1-fw@strlen.de>
- <FF8A506F-6F0F-440E-9F52-B27D05731B77@apple.com>
- <20240605181450.GA7176@breakpoint.cc>
- <ZmCwlbF8BvLGNgRM@calendula>
- <20240605190833.GB7176@breakpoint.cc>
+	s=arc-20240116; t=1717666083; c=relaxed/simple;
+	bh=3jtGlH/vJOZwEuic+3S8X/WuUsePedwqRR/gd3oODNk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=fRXB7Iu/vJuETaxxr0oclCRbQ31XCvu29a/nz5Iq9PxoDm7poRod+PwgriwlA6xXimS9CSngPbvyhcxIQGXFaBB8zRr9dD5e/N5LOSHa45W4eX14OTP6iBGGxgfLz2uSGPWQPDO4MPWFCnCoSlHkvu5OHrPJbYqTFmk1fnPsh/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=azz02lmp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 99EBFC4AF14;
+	Thu,  6 Jun 2024 09:28:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717666082;
+	bh=3jtGlH/vJOZwEuic+3S8X/WuUsePedwqRR/gd3oODNk=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=azz02lmp9OlVeAZAkKgpiBj3SjjpIG6XeMv5MFmRwo5BZWSp8LjwrBEFm5pR2aPr8
+	 rlq3VF+uUatjZT4RyiTgi7ntW/2f5MOWb+3BBEDzgobrH402umY9DpcnRVd9tLsJ6I
+	 zPqIkfbWJ1ywI1kKLBwuzE9jSWEG0ljFpdrteIoLTT9w2YU7vmcq0/ZlaAketpJCHE
+	 ncQ9RwqKDnEfPAeSXMqAvhKhGI+onx375MsdOrr+6Jh1qPaLuQI96HpjlUZKDfVXgk
+	 KrgMRkhRpwRc4XVNAwhkMGYdPXZ811HYDUJ2yGB+Xi9xbNNnCEnSKOKp3kFromW0i3
+	 zK/EBZ7lPTCzg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E589C27C52;
+	Thu,  6 Jun 2024 09:28:02 +0000 (UTC)
+From: Vincent Whitchurch via B4 Relay <devnull+vincent.whitchurch.datadoghq.com@kernel.org>
+Subject: [PATCH bpf-next 0/5] sockmap: Fix reading with splice(2)
+Date: Thu, 06 Jun 2024 11:27:51 +0200
+Message-Id: <20240606-sockmap-splice-v1-0-4820a2ab14b5@datadoghq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240605190833.GB7176@breakpoint.cc>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABeBYWYC/x3MSQqAMAxA0atI1gbqgAWvIi46RA1qLY2IIN7d4
+ vIt/n9AKDEJ9MUDiS4WPkJGVRbgFhNmQvbZUKu6VZ3qUA637iaixI0doW90ZZzSXtsWchQTTXz
+ /wwFsnDDQfcL4vh+tlFU+agAAAA==
+To: John Fastabend <john.fastabend@gmail.com>, 
+ Jakub Sitnicki <jakub@cloudflare.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+ Vincent Whitchurch <vincent.whitchurch@datadoghq.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1717666080; l=1284;
+ i=vincent.whitchurch@datadoghq.com; s=20240606; h=from:subject:message-id;
+ bh=3jtGlH/vJOZwEuic+3S8X/WuUsePedwqRR/gd3oODNk=;
+ b=YP59EoxHRvNGfrOBcds1lxe8/uU8MyogOBvjqnjGQz816BDh0Vy5G2V0QVA9zfffi/YpdJhyC
+ R5DQabnxMWcCCLaTQLT1yZgeQlD1tNOtd95jNCbWj+g0bl8ku+WDC80
+X-Developer-Key: i=vincent.whitchurch@datadoghq.com; a=ed25519;
+ pk=GwUiPK96WuxbUAD4UjapyK7TOt+aX0EqABOZ/BOj+/M=
+X-Endpoint-Received: by B4 Relay for
+ vincent.whitchurch@datadoghq.com/20240606 with auth_id=170
+X-Original-From: Vincent Whitchurch <vincent.whitchurch@datadoghq.com>
+Reply-To: vincent.whitchurch@datadoghq.com
 
-Florian Westphal <fw@strlen.de> wrote:
-> When this was added (handle dissection from bpf prog, per netns), the correct
-> solution would have been to pass 'struct net' explicitly via skb_get_hash()
-> and all variants.  As that was likely deemed to be too much code churn it
-> tries to infer struct net via skb->{dev,sk}.
-> 
-> So there are several options here:
-> 1. remove the WARN_ON_ONCE and be done with it
-> 2. remove the WARN_ON_ONCE and pretend net was init_net
-> 3. also look at skb_dst(skb)->dev if skb->dev is unset, then back to 1)
->    or 2)
-> 4. stop using skb_get_hash() from netfilter (but there are likely other
->    callers that might hit this).
+I noticed that if the verdict callback returns SK_PASS, using splice(2)
+to read from the socket doesn't work since it never sees the data queued
+on to it.  As far as I can see, this is not a regression but just
+something that has never worked.
 
-diff --git a/net/netfilter/nf_tables_trace.c b/net/netfilter/nf_tables_trace.c
---- a/net/netfilter/nf_tables_trace.c
-+++ b/net/netfilter/nf_tables_trace.c
-@@ -303,6 +303,30 @@ void nft_trace_notify(const struct nft_pktinfo *pkt,
-        kfree_skb(skb);
- }
- 
-+static u32 __nf_skb_get_hash(const struct net *net, struct sk_buff *skb)
-+{
-+       struct flow_keys keys;
-+       u32 hash;
-+
-+       memset(&keys, 0, sizeof(keys));
-+
-+       __skb_flow_dissect(net, skb, &flow_keys_dissector,
-+                          &keys, NULL, 0, 0, 0,
-+                          FLOW_DISSECTOR_F_STOP_AT_FLOW_LABEL);
-+
-+       hash = flow_hash_from_keys(&keys);
-+       __skb_set_sw_hash(skb, hash, flow_keys_have_l4(&keys));
-+       return hash;
-+}
-+
-+static u32 nf_skb_get_hash(const struct net *net, struct sk_buff *skb)
-+{
-+       if (!skb->l4_hash && !skb->sw_hash)
-+               return __nf_skb_get_hash(net, skb);
-+
-+       return skb->hash;
-+}
-+
- void nft_trace_init(struct nft_traceinfo *info, const struct nft_pktinfo *pkt,
-                    const struct nft_chain *chain)
- {
-@@ -317,7 +341,7 @@ void nft_trace_init(struct nft_traceinfo *info, const struct nft_pktinfo *pkt,
-        net_get_random_once(&trace_key, sizeof(trace_key));
- 
-        info->skbid = (u32)siphash_3u32(hash32_ptr(skb),
--                                       skb_get_hash(skb),
-+                                       nf_skb_get_hash(nft_net(pkt), skb),
-                                        skb->skb_iif,
-                                        &trace_key);
- }
+This series attempts to fix it and add a test for it.
+
+---
+Vincent Whitchurch (5):
+      net: Add splice_read to prot
+      tcp_bpf: Fix reading with splice(2)
+      selftests/bpf: sockmap: Exit with error on failure
+      selftests/bpf: sockmap: Allow SK_PASS in verdict
+      selftests/bpf: sockmap: Add basic splice(2) mode
+
+ include/net/inet_common.h                  |  3 ++
+ include/net/sock.h                         |  3 ++
+ net/ipv4/af_inet.c                         | 18 ++++++-
+ net/ipv4/tcp_bpf.c                         |  9 ++++
+ net/ipv4/tcp_ipv4.c                        |  1 +
+ net/ipv6/af_inet6.c                        |  2 +-
+ net/ipv6/tcp_ipv6.c                        |  1 +
+ tools/testing/selftests/bpf/test_sockmap.c | 78 +++++++++++++++++++++++++++++-
+ 8 files changed, 111 insertions(+), 4 deletions(-)
+---
+base-commit: 072088704433f75dacf9e33179dd7a81f0a238d4
+change-id: 20240606-sockmap-splice-d371ac07d7b4
+
+Best regards,
+-- 
+Vincent Whitchurch <vincent.whitchurch@datadoghq.com>
 
 
-... doesn't solve the nft_hash.c issue (which calls _symmetric version, and
-that uses flow_key definiton that isn't exported outside flow_dissector.o.
 
