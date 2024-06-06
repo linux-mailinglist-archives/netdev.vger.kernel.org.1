@@ -1,79 +1,178 @@
-Return-Path: <netdev+bounces-101521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 222838FF2A4
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 18:37:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C5528FF31A
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 18:57:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9278C2891DE
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:37:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A49E5B2DDB8
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:50:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB94197A88;
-	Thu,  6 Jun 2024 16:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0B1198A31;
+	Thu,  6 Jun 2024 16:49:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tM+kZ2YP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FJhdTGIx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14A2195F0F;
-	Thu,  6 Jun 2024 16:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30402198A3F
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 16:49:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717691823; cv=none; b=G0qHftEZ9sLJFmfA4ub/dDrdVbOvdzObOUJZG5wNFjVLieqRZNRR3OmAUoGXYvCyYxl2DJZkVrgA3RP+Uur81SSdIKNK19bUPfHjOZTHMsBSmEls8k6L4MtzxwO/DvUiFmmJ6b5IXq3T/O0TinIk76IyJ9KLcYGDg0gk2jm5zXY=
+	t=1717692594; cv=none; b=owqIcGGK5vRwo57cpI658CF7t8yKICuq+LFyRjp70jQKYaD6X5aTeRUPhhxOblzAlsoMewFS8JL40NxbXZdkFHaG7JDqE/QQtcg3leraCNOF6+zkkzuLbR3NUcUrgfp9ILnpYcf8pde7y31+C+jGV5UTRZNhEgj1a5ZIUy4/OW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717691823; c=relaxed/simple;
-	bh=x90P3hzoNNNwp8KKvp2Hc2+SCaeDe3DN744fkLDcrFA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xxp0oqq0Y4jgFanW4yDH2lx0tW0EvST9J857UCq1VLBeJAbpPlfY1hOpM01YlGfkZS+I6j0XIIEZWWatXkSYGQOTswv6Odtm1JkKX4n8iRhKyNeNitB/QmeLTrl22hEKYHLGA9YHJM4potzCQvSylbINeNLGU8wZPynU/wevkfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tM+kZ2YP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4F42C32782;
-	Thu,  6 Jun 2024 16:37:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717691823;
-	bh=x90P3hzoNNNwp8KKvp2Hc2+SCaeDe3DN744fkLDcrFA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tM+kZ2YPgyySJbzNTh5/B5daU4WCqiTxVq0IUU+Ve+LwNMHJx4mQYuK1/bMd7Ebo2
-	 NRuDcWxETMyo47nMI127C0FiTHXgAdekK2bk9dkpYloFFnDOT997JIS2dzxwHVYqUW
-	 lfVSPYB2nV2+IqGAOnrtRhF2dcXomxv8DX96ADUpN9XwnApdLZCXFINJxmO9Q6WkeX
-	 L96SQiKhoflWDEnZaC06W0e5R8T/Twk7plkvEzipAfCIN2kXB0iuf2b7evteeC4CIc
-	 V6pijITHJhZQiHOUdg/z3bExdGJeRsCO/3rbPH01kZ9t9WvxAYiDX4FfySq6GyxklG
-	 3QzE6kxcOGY5g==
-Date: Thu, 6 Jun 2024 09:37:01 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: <davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Alexander Duyck
- <alexander.duyck@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Andrew
- Morton <akpm@linux-foundation.org>, <linux-mm@kvack.org>,
- <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH net-next v6 14/15] mm: page_frag: update documentation
- for page_frag
-Message-ID: <20240606093701.43e3a09c@kernel.org>
-In-Reply-To: <20240605133306.11272-15-linyunsheng@huawei.com>
-References: <20240605133306.11272-1-linyunsheng@huawei.com>
-	<20240605133306.11272-15-linyunsheng@huawei.com>
+	s=arc-20240116; t=1717692594; c=relaxed/simple;
+	bh=QlINFaI4LTvEN0VfK5cNmlEbpI0ZCm9ojcKkqo+H+CY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=necRZ4Itlq/fWWQAWQR3s4PJI4B58aLTZyb+pUBIHvUTwSbZkrJuDIgJQ2u4eLcF/ptHoRE0mjf1fCBgXTLaC4hCV9EVUY0EkoGO41/KkhU0gGJ4tWKL5txmtBRO9xen3/x1vu/917bYAk+zRJO6wlyn8+h/kOVljn9ND5Wu+zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FJhdTGIx; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a63359aaaa6so170066166b.2
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 09:49:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717692590; x=1718297390; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kXklq3VgB30R+o4fq7okdZC1G76cerOH8ymTCu7s03o=;
+        b=FJhdTGIxctQIk6xOF7Zd1CW+slog1vE6ixCwSs90XTWdHvLrBkGDpnZvoFXFyz1T1o
+         V4F8vhBb8Z9pLu4Hey3uN7SpOw98HEw5zZfZg9nMeeIq15SzcDrkfc3yFfMIQ7cGDLhS
+         uzuog7ycVldhDgR/tnY8wgKRLn4ZW48PynK4NO30CtEOjuoJprXwbn/n4AAzAzVSv1eV
+         YT0AOV+hEMO0OE5fYOn1IKcOU5GzjY3ixs74XLG4XOqY9urvq4k+mtpko+C7uMZ+/mT5
+         RJdnLuvYqSwOku/GHAfZY23nQtqTtYRUtFX7oZeCPiXA05AnDfx9g6sPjP2AepkKYJom
+         UYfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717692590; x=1718297390;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kXklq3VgB30R+o4fq7okdZC1G76cerOH8ymTCu7s03o=;
+        b=bneop2HMXHL/pSDdjtIH50B2+xf20YSPlRGp+7vQbq/f8x8KutKfjtEKZINCsJVn2h
+         rd1hCvc0XnEh70fupNKrvC+HlHsKwhsviLA5VB1dKuXC1F9PjxG3g7RKUCUIwHmrfwyM
+         S/KBBTcFN7BL3HfXFU34tiiXvmS6Z5ALqWSKGYJsu2YhHAYSL9nVT1/Ow15VAyBLULPT
+         sN/wVsvPpIs1PI7GSBBqvM1zWROhVoCf5nXtHLMRaBsAwmDq83x49ZVcla8s0rlOraKS
+         EV/4CgIJC3D1efBEWcvusZowcKTTyseCILsvvTHGuGJ3JKv0MuhJhVq4Fj/mg2vkOoC7
+         Efyw==
+X-Gm-Message-State: AOJu0Yy1F3z1ndh8vNkRG48P++JRsMHoCmiDPEpg7SuwxODRwpOED57c
+	orBwtBG4XDNIWfc2bjYuMx6n+12rF1NKSPw2ScFyjZiJIVYvkhe8KzmdCTx7zIZqE8AznM5ctMe
+	nH1+YlV4b+z4xhQu5tvyNzDp9USYi9wrbkV4+
+X-Google-Smtp-Source: AGHT+IH2yDy4H26F3I2+8dO9xS+2+lL/iHck43y2iBW4jw1+n0fE7mBk6YXmrPpbRP2wxNUQ12+YElL3P5ewJrljwbU=
+X-Received: by 2002:a17:907:7786:b0:a68:c9fa:f19f with SMTP id
+ a640c23a62f3a-a6cdb0f542cmr7959966b.53.1717692590194; Thu, 06 Jun 2024
+ 09:49:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240530201616.1316526-1-almasrymina@google.com>
+ <20240530201616.1316526-11-almasrymina@google.com> <84162ef4c695cb764454087ca0bc81082d4fac8d.camel@redhat.com>
+In-Reply-To: <84162ef4c695cb764454087ca0bc81082d4fac8d.camel@redhat.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 6 Jun 2024 09:49:38 -0700
+Message-ID: <CAHS8izNupu9u1zx9YD9KaNxahBeZeaajOUUSFePbQk+rfUFn+Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v10 10/14] net: add support for skbs with
+ unreadable frags
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
+	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 5 Jun 2024 21:33:04 +0800 Yunsheng Lin wrote:
-> Update documentation about design, implementation and API usages
-> for page_frag.
+On Tue, Jun 4, 2024 at 3:46=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> On Thu, 2024-05-30 at 20:16 +0000, Mina Almasry wrote:
+> > diff --git a/net/core/gro.c b/net/core/gro.c
+> > index 26f09c3e830b7..7b9d018f552bd 100644
+> > --- a/net/core/gro.c
+> > +++ b/net/core/gro.c
+> > @@ -422,6 +422,9 @@ static void gro_pull_from_frag0(struct sk_buff *skb=
+, int grow)
+> >  {
+> >       struct skb_shared_info *pinfo =3D skb_shinfo(skb);
+> >
+> > +     if (WARN_ON_ONCE(!skb_frags_readable(skb)))
+> > +             return;
+> > +
+> >       BUG_ON(skb->end - skb->tail < grow);
+> >
+> >       memcpy(skb_tail_pointer(skb), NAPI_GRO_CB(skb)->frag0, grow);
+> > @@ -443,7 +446,7 @@ static void gro_try_pull_from_frag0(struct sk_buff =
+*skb)
+> >  {
+> >       int grow =3D skb_gro_offset(skb) - skb_headlen(skb);
+> >
+> > -     if (grow > 0)
+> > +     if (grow > 0 && skb_frags_readable(skb))
+> >               gro_pull_from_frag0(skb, grow);
+> >  }
+>
+> I'm unsure if this was already mentioned, so please pardon the eventual
+> duplicate...
+>
+> The above code is quite critical performance wise, and the previous
+> patch already prevent frag0 from being set to a non paged frag,
 
-Documentation/mm/page_frags.rst:75: WARNING: Explicit markup ends without a blank line; unexpected unindent.
-Documentation/mm/page_frags.rst:77: WARNING: Line block ends without a blank line.
-Documentation/mm/page_frags.rst:79: WARNING: Block quote ends without a blank line; unexpected unindent.
-Documentation/mm/page_frags.rst:82: ERROR: Unexpected indentation.
-Documentation/mm/page_frags.rst:93: WARNING: Line block ends without a blank line.
-Documentation/mm/page_frags.rst:95: WARNING: Block quote ends without a blank line; unexpected unindent.
--- 
-pw-bot: cr
+
+Hi Paolo!
+
+The last patch, d4d25dd237a61 ("net: support non paged skb frags"),
+AFAICT doesn't prevent frag0 from being a non-paged frag. What we do
+is set ->frag0=3Dskb->data, then prevent it from being reset to
+skb_frag_address() for non-paged skbs. ->frag0 will likely actually be
+a bad value for non-paged frags, so we need to check in
+gro_pul_from_frag0() so that we don't accidentally pull from a bad
+->frag0 value.
+
+What I think I should do here is what you said. I should make sure
+frag0 and frag0_len is not set if it's a non-paged frag. Then, we
+don't need special checks in gro_pull_from_frag0 I think, because
+skb_gro_may_pull() should detect that frag0_len is 0 and should
+prevent a pull.
+
+I will apply this fix to the next iteration for your review. Let me
+know if I missed something.
+
+
+> so what
+> about dropping the above additional checks?
+>
+
+
+--
+Thanks,
+Mina
 
