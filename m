@@ -1,162 +1,124 @@
-Return-Path: <netdev+bounces-101286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EC0E8FE046
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 09:57:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E32938FE056
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 09:59:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE4802870DE
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 07:57:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D22D286490
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 07:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECBEC13B2B9;
-	Thu,  6 Jun 2024 07:57:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD6113C663;
+	Thu,  6 Jun 2024 07:59:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ubwkp1KC"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="qG7OKZtk";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="/vlEsE7K"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 673D413AD0E
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 07:57:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337981327E5;
+	Thu,  6 Jun 2024 07:59:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717660632; cv=none; b=caCW54BvAIo22mFaQEDlWPIHSJrYIjAEroC8D1SgwQ802F/0UoXpLGY1tykyquxtj00zEgs0+NScgYQ19D4bO+k7HorwWkB+axaVRPjJRH2Vz6Ynm7tMhx09+ubWVyB2IjvsTOZIaZj2tFAOX0bKPA7KCVjFAX8n7Ac9rXXNumE=
+	t=1717660756; cv=none; b=C/9PAeD6Bhl3whbLNdMogXfwXn4raHwe1Qernv0+XRdxPMqKfNxsgrY0Clj5cw4hxq9n8LL5CmfNnXAkWBZtIZ81sjnC6Xvg7wIxcS06g4Z8jcprbrGCRZCKrJAo0NK5ja6gmgnz+qVfra7Tf8d4YQhsxEnJ2Jwt4BJgQkvl59w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717660632; c=relaxed/simple;
-	bh=fEctaKe23/K7WPGYjFfGzC2gcpDNq3frPQpRj0MtfrM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PUcoa5VCa8xz2+Ov9NZbQSYI5NXrrcmED5a7ic1wqbQpR8p/Mhi9NVi2G15n5fZ6Jcy3Eiir7g8fA5NWIfP6FqyK4+3/z2fGeZlFyUxz268X3on5rJ6kZG0FWzDKk4Tf0t3L5f+nTLc6Rr3ZUN+1XXsb8iE49fhVfIAkFGra8DQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ubwkp1KC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717660630;
+	s=arc-20240116; t=1717660756; c=relaxed/simple;
+	bh=ATccA5r9ES5LDi1RDOSSs0f1rgaAZyIufvadcuOLeFg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nUusVI166KnElkTJOzF/Bg80ZWMDUP7O2UqmTmcK8w8Z3tAyHSD8v9zWWGIzxibPH+hxI8grOZZe6YZQJymhy5qs5DTMGYJYhezGvtwlIt6zw/DwWY7Y/Mr94M8aLbituSSo6h0qOXZ2HtqPRivUjxWm5hjzpF1crsGS5AsZB5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=qG7OKZtk; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=/vlEsE7K; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 6 Jun 2024 09:59:11 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1717660753;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GaFEJRL2VRwXC7VyjrS58e/68QUO+dkEzJQeXtx2VPU=;
-	b=Ubwkp1KCeUFKc6Ha2thSHw+GwuMButT5HUL3fuJp7UspvDPr5psK+NGip5aNKj/F9kslce
-	Qcc34kXDXnnzoDhSJTcA2yKtROijc0fhdp4bkdov5Pwwd731c+uDBTEJz8HgX9lqn63bUb
-	8PJenZ35knFHWKETWRZbTlnnYDG/iO4=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-634-VyGVzWTUNH6WkFC6NAZxfw-1; Thu, 06 Jun 2024 03:57:09 -0400
-X-MC-Unique: VyGVzWTUNH6WkFC6NAZxfw-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2c2a64145c8so124003a91.3
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 00:57:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717660623; x=1718265423;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GaFEJRL2VRwXC7VyjrS58e/68QUO+dkEzJQeXtx2VPU=;
-        b=KvlQKHWP7jYmE/C18flDwa+wuK1cXgAaJF8Ut/5UwrgaXqhTupBLQS6jdR6BtYeHmx
-         Fyy3y6xvdOId0k0sm2W8p+AqdYCviauZ9oKT6H+Ec2UaTqdBOfkh6jPp8yWSLAhO5vQK
-         e/xHJqH4Kz9QAB4Kafr5MnFbU/cs1xIXi1yrvQx+x28VcQ+unQ3NOoAPCKd9HJWwn/6l
-         8IGNvPu4S6GxRmFfcoRbHe4n9Ei4ok+FZ9xPGj0Gmdffsrup/K00EI2RfcmGjU8m3t5Q
-         ZWUPeTXUhbkPhqtY4/5ln3OhM8MdzJGCVTkWEyTLUE6P6bfvbhH1Q0XYfbAyG+Ok6pKK
-         yNWw==
-X-Forwarded-Encrypted: i=1; AJvYcCUscnzHlY6MktytmUmL9aPxQx6yfaJmzlSOkxfVEgqRGhD0gA3ZTvJvJxOfGh/KpdcvjYHf6PKfyg1sakpEwChoAm0xI7om
-X-Gm-Message-State: AOJu0Yxfkz6w+bkxvkjV44G4us3k2OqrHdp26G5qwm6SB1l/8KTj15Nd
-	n4yWvGoDG9iCIo0RBBJaY6i7pmCtktOh/NfjHi2nY7kuqRH/fFRkd+NHFj2eO6j6jg2pD1VzYVv
-	Wbl58aEnf2JwpT96RUydWQG9PuMCC+FqpRiW5ylUqZiwZYDhliLD1X/ZnmY3muogBSyGdS+JTBw
-	3w8ZPB1qEzInYL6qNnJCze08Zqpw7v
-X-Received: by 2002:a17:90b:19d5:b0:2c2:29a2:9b08 with SMTP id 98e67ed59e1d1-2c27db68d96mr4631207a91.40.1717660623027;
-        Thu, 06 Jun 2024 00:57:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHx5FHfbmCVrZnzP5RH2OsZ/UgbANNHRFGgh64ntvVLDLJiWa5M5s21+OcBXx3ux62OTfutvdG9UWDZQFe7x5g=
-X-Received: by 2002:a17:90b:19d5:b0:2c2:29a2:9b08 with SMTP id
- 98e67ed59e1d1-2c27db68d96mr4631184a91.40.1717660622618; Thu, 06 Jun 2024
- 00:57:02 -0700 (PDT)
+	bh=30vocsfTuBFpsGaciPogg95G00+g0UfUEX+ZmA5rlwg=;
+	b=qG7OKZtkHJpbqIHTP6vxfQj8V7scoSssLhudVwaoRNmMxuNqyDVz0iYt59zlvq1xEQyViX
+	pAo0nsfe/fWaTjkiYBg09yUpxkocdAxbBNXvd4WZGqPxnYoJ9OrVoqt+io2e7GWHeZZiRo
+	nOuv538ixF+g7vr8BmdDzbx+xbldmjBq/7iq9AwHdPqvVGi/KCn/u10wSgcgLfUiTTgyRQ
+	Hd4TJseY++Ezq60frsHLNVxP8nR1hSmioXrsp53+nKKaQz0JnHZZ3lK8JYabVeZ4gOoKTj
+	K4PSPXcupatjR3JRZYyux/bM8JpPE1I7o8GZMex6tHDxLdbq9yk0RWdFgOdHiQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1717660753;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=30vocsfTuBFpsGaciPogg95G00+g0UfUEX+ZmA5rlwg=;
+	b=/vlEsE7KNVIsQeYT9HKWZ40jdf2xffBPU3Ix94pTZGc2VwmA1ydkvnSgKFpmSc6namZ0nr
+	SXN0zwMGrKiR5uCA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Daniel Bristot de Oliveira <bristot@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 net-next 01/14] locking/local_lock: Add local nested
+ BH locking infrastructure.
+Message-ID: <20240606075911.4eE4DdNS@linutronix.de>
+References: <20240604154425.878636-1-bigeasy@linutronix.de>
+ <20240604154425.878636-2-bigeasy@linutronix.de>
+ <20240606075244.GB8774@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240509114615.317450-1-jiri@resnulli.us> <1715325076.4219763-2-hengqi@linux.alibaba.com>
- <ZktGj4nDU4X0Lxtx@nanopsycho.orion> <ZmBMa7Am3LIYQw1x@nanopsycho.orion>
- <1717587768.1588957-5-hengqi@linux.alibaba.com> <CACGkMEsiosWxNCS=Jpb-H14b=-26UzPjw+sD3H21FwVh2ZTF5g@mail.gmail.com>
- <CAL+tcoB8y6ctDO4Ph8WM-19qAoNMcYTVWLKRqsJYYrmW9q41=w@mail.gmail.com>
- <CACGkMEvh6nKfFMp5fb6tbijrs88vgSofCNkwN1UzKHnf6RqURg@mail.gmail.com> <20240606020248-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240606020248-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 6 Jun 2024 15:56:50 +0800
-Message-ID: <CACGkMEsy37mg-GwRXJNBBkvhEuaEYw-g3wthv_XS7+t5=ALhiA@mail.gmail.com>
-Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Xing <kerneljasonxing@gmail.com>, Heng Qi <hengqi@linux.alibaba.com>, 
-	Jiri Pirko <jiri@resnulli.us>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, xuanzhuo@linux.alibaba.com, 
-	virtualization@lists.linux.dev, ast@kernel.org, daniel@iogearbox.net, 
-	hawk@kernel.org, john.fastabend@gmail.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240606075244.GB8774@noisy.programming.kicks-ass.net>
 
-On Thu, Jun 6, 2024 at 2:05=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->
-> On Thu, Jun 06, 2024 at 12:25:15PM +0800, Jason Wang wrote:
-> > > If the codes of orphan mode don't have an impact when you enable
-> > > napi_tx mode, please keep it if you can.
-> >
-> > For example, it complicates BQL implementation.
-> >
-> > Thanks
->
-> I very much doubt sending interrupts to a VM can
-> *on all benchmarks* compete with not sending interrupts.
+On 2024-06-06 09:52:44 [+0200], Peter Zijlstra wrote:
+> On Tue, Jun 04, 2024 at 05:24:08PM +0200, Sebastian Andrzej Siewior wrote:
+> > Add local_lock_nested_bh() locking. It is based on local_lock_t and the
+> > naming follows the preempt_disable_nested() example.
+> > 
+> > For !PREEMPT_RT + !LOCKDEP it is a per-CPU annotation for locking
+> > assumptions based on local_bh_disable(). The macro is optimized away
+> > during compilation.
+> > For !PREEMPT_RT + LOCKDEP the local_lock_nested_bh() is reduced to
+> > the usual lock-acquire plus lockdep_assert_in_softirq() - ensuring that
+> > BH is disabled.
+> > 
+> > For PREEMPT_RT local_lock_nested_bh() acquires the specified per-CPU
+> > lock. It does not disable CPU migration because it relies on
+> > local_bh_disable() disabling CPU migration.
+> 
+> should we assert this? lockdep_assert(current->migration_disabled) or
+> somesuch should do, rite?
 
-It should not differ too much from the physical NIC. We can have one
-more round of benchmarks to see the difference.
+local_lock_nested_bh() has lockdep_assert_in_softirq(). You want the
+migration check additionally or should that softirq assert work?
 
-But if NAPI mode needs to win all of the benchmarks in order to get
-rid of orphan, that would be very difficult. Considering various bugs
-will be fixed by dropping skb_orphan(), it would be sufficient if most
-of the benchmark doesn't show obvious differences.
+> > With LOCKDEP it performans the usual lockdep checks as with !PREEMPT_RT.
+> > Due to include hell the softirq check has been moved spinlock.c.
+> > 
+> > The intention is to use this locking in places where locking of a per-CPU
+> > variable relies on BH being disabled. Instead of treating disabled
+> > bottom halves as a big per-CPU lock, PREEMPT_RT can use this to reduce
+> > the locking scope to what actually needs protecting.
+> > A side effect is that it also documents the protection scope of the
+> > per-CPU variables.
+> > 
+> > Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> 
+> Otherwise I suppose sp.. not a fan of the whole nested thing, but I
+> don't really have an alternative proposal so yeah, whatever :-)
 
-Looking at git history, there're commits that removes skb_orphan(), for exa=
-mple:
+Cool.
 
-commit 8112ec3b8722680251aecdcc23dfd81aa7af6340
-Author: Eric Dumazet <edumazet@google.com>
-Date:   Fri Sep 28 07:53:26 2012 +0000
-
-    mlx4: dont orphan skbs in mlx4_en_xmit()
-
-    After commit e22979d96a55d (mlx4_en: Moving to Interrupts for TX
-    completions) we no longer need to orphan skbs in mlx4_en_xmit()
-    since skb wont stay a long time in TX ring before their release.
-
-    Orphaning skbs in ndo_start_xmit() should be avoided as much as
-    possible, since it breaks TCP Small Queue or other flow control
-    mechanisms (per socket limits)
-
-    Signed-off-by: Eric Dumazet <edumazet@google.com>
-    Acked-by: Yevgeny Petrilin <yevgenyp@mellanox.com>
-    Cc: Or Gerlitz <ogerlitz@mellanox.com>
-    Signed-off-by: David S. Miller <davem@davemloft.net>
-
->
-> So yea, it's great if napi and hardware are advanced enough
-> that the default can be changed, since this way virtio
-> is closer to a regular nic and more or standard
-> infrastructure can be used.
->
-> But dropping it will go against *no breaking userspace* rule.
-> Complicated? Tough.
-
-I don't know what kind of userspace is broken by this. Or why it is
-not broken since the day we enable NAPI mode by default.
-
-Thanks
-
->
-> --
-> MST
->
-
+Sebastian
 
