@@ -1,216 +1,152 @@
-Return-Path: <netdev+bounces-101325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EAB98FE1FA
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 11:04:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91C178FE232
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 11:12:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A30461F27AAA
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 09:04:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1830BB277ED
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 09:09:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A96913FD93;
-	Thu,  6 Jun 2024 08:58:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0712C15575C;
+	Thu,  6 Jun 2024 09:02:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="deUfUWsN"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Sno4N/Wn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 871F013E039
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 08:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DAC115573A
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 09:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717664312; cv=none; b=aMDlYK8PxWKmmDI9XCaTxcJRvRkAXzr3g2TbDIRHILaQ35zoEkja7OjIVgRxpc5QP1Lb7gMhl4+SfHp4UR36LzQvFdMZZO2fdaTji2n2XafkphDIVJd22oSJbZwna2fsRDiSrknqFDYL8Z9PuanYAiPCSxrmjdAiK/ccM3FFAPk=
+	t=1717664563; cv=none; b=TP0MvQLqYP1RwDe79ENOdBLGx0FoxXebGtwtNz/JHEzKJ+eKz6Z3XtX499ZeeRuEdK56r6Kua8Gijn4NoH7gWTPCVuiCvbnll8TCuESSqDIPhNWuJwBR3DJmnAExb2MeoewM7XBX1Jsbu+qr1xkF4u77rkw2nLd7UkhOka7rMfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717664312; c=relaxed/simple;
-	bh=EPeDsK6KuMBbuB6S5u77PfXNSUnY2hbcjjEC7Vyr3j8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N1ksIFt2Bh1sFkjQGo3vI8ZijfmzZGHki1cFzDrPD2AM8Z071ZFv7Mn2cMiZ9g0hC/0Y62GlaCOJgU0T3uW9iOgyQn3Hn1Rbr3xNGddBut0jUr1IMShZrxuBkUMQmB0EwES3ISADWXFYmNiK8lBeXoZgqzYHlQ40wIoNxGMcJIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=deUfUWsN; arc=none smtp.client-ip=209.85.222.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-808ea48ca46so233938241.3
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 01:58:30 -0700 (PDT)
+	s=arc-20240116; t=1717664563; c=relaxed/simple;
+	bh=mCpxfybVw+s5t6VAkDxz45g2sACkRSwSf/rV11JR9GM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=QjIdi8kV8staeBWIt0CHE54CQtQS9ka2SeQoisVnARwO0fOv7JGiRxyqtSOmx7uay44w4uM/YpiBdYRFtMOiu/g3LdoqdkSj5Mgmgjoz+8eFlI6sKjmzTRGa8GJGXLssj9i8EkGsCeQMFkX3KRfrQa/grtO65JgEXnTdqNT5Gu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Sno4N/Wn; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-57a68b0fbd0so716967a12.1
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 02:02:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1717664309; x=1718269109; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=LyD4zYWN0+Ixbmb4DFX7iy7Za9FM3vzSd5GpKeUrpXw=;
-        b=deUfUWsNED4MOUQabxUHX10A3o2xOw/7h+ij/x7S7he+3Bfbw1EP4V/rt1kIpdPLrf
-         HTOTIsgcN/7WkvM/Y6/SkOspbCh4vA4yQ6zsXYKpKgN8MWoXKzCf9ZQxpkY6DcH+eUZr
-         NDTH3N+YtTTPQ9U2oE/q08ixls+Vqwl6i/s94=
+        d=linaro.org; s=google; t=1717664560; x=1718269360; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3jhqJzVWKZBINGIderyOHidcYli4dqLXjpNqkP4LDD4=;
+        b=Sno4N/WnFaQINr8Gs0aaNwukx/lRXBuJ9NxlnuduyvFaKtcO7NfXQZCZBqsesPJtdr
+         VCtWpIGqlt8S9lPOYx//psQgympqg3euGtblr5HvagY4wPZ8fUeGcvJlu2Eyj9rkcOEW
+         95ly1pGMSy4rvDGsdD6mGrXRVhLEX6zJoIqoK9kLMWbx39GTKMHo9N4yJuI7+8iOtkvc
+         Pk5pGgP+h05oOSxa1iOjKgSprHdtSl2VGk+e5LJ6nNRt6MT/9RhDqrnzpveeUbI2+KGY
+         u3L8ln8r/dLaZHM1qDHFoWLv1O+a8vqKCkSgo4Tf0k3zUwj0pe4DMFzf0ajvq5vthhm+
+         meXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717664309; x=1718269109;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1717664560; x=1718269360;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=LyD4zYWN0+Ixbmb4DFX7iy7Za9FM3vzSd5GpKeUrpXw=;
-        b=pLCJ9+CKLtch7lg78jR2MdklvT/GuwzSZdu7qRIfP+cERDkY9dd8fuWYSm3M7s2SKn
-         zmtgspZdwRvBpwLjgXG7nfmaCptXz54O2KxNG11dcielubDgjAypY8nwixqN4A09MEJn
-         n1UXXsz9r+dInu1zCP04PDNj1c9LaIvnqU6yZzSwj0XsgP84V+YKfIQFhovG73knDeky
-         VxNeaAW8Uhf1JuJd5iYrt5zd3kKq5wFkpziOABuLxDPNDwNOZKVyKZaEJOtNzBIwkAcD
-         DqkCtQ6Z0RTAIcFwGfxPbY23euG3hNHfORh6D+mNnftlIFbnoF1g+ySPWXV9xVD38sld
-         QHZA==
-X-Forwarded-Encrypted: i=1; AJvYcCXy9qekvfFyUHchr/5CGOTs6AABXQ5VbjMsinIbSDEIz9MA/NIjvMRrAUlq/9183SZ73RNmAlmnmecamMI1+eQKqfl47VdE
-X-Gm-Message-State: AOJu0YyFX9At+nJ1F3oQ0MXpS6NCizTH7sIUGW78DOfZzp86jHvU8ZlS
-	3AZvtIWIp0QUy62uQoH4hQbjweva508vM29qEH+KD1zZCPHGUWOn6PiS9AWjHyfvG8QaYr1lKsk
-	5Tkn2GLV7ocMK/oGEmgjj4sqaq2hCG7b8rsMf
-X-Google-Smtp-Source: AGHT+IE8OlC5dMl2aGL/NyF+YLWRIIM/LqaW7TZFDKkJfpGQ8ZRwQyq60n8rwwMq+yDJVkOL+4PgMlWuRs/54ThpUqw=
-X-Received: by 2002:a05:6102:32cd:b0:47e:f811:747a with SMTP id
- ada2fe7eead31-48c0485d8c3mr6786310137.10.1717664307883; Thu, 06 Jun 2024
- 01:58:27 -0700 (PDT)
+        bh=3jhqJzVWKZBINGIderyOHidcYli4dqLXjpNqkP4LDD4=;
+        b=kaHIXqLGtqyyMLqARauDUMAqOecRz9d9AEK2v919Wsqe29CB7RgG9jWMUPsqP5k44x
+         5QJ3/EJYJY4uNFWFdApm6hPEKgKatyO/kv59mgtds/7NrUH1yJcRT1ShmtCIiefHdlkm
+         cFPo0Rs1uJZdwn9iH0s8G6f07mq6kVuSXotc23xASCHbfjmwh6NoZDfrF8I8wXKRCA5w
+         WYkYtCHH/IC5s/OVs/As5IV7/I0uARLP0rRfuKNx2qvG2cw+O3lmOu5195htWYS/jL3l
+         lkDW5aVIgtPY8HpLwV7r6EIDTbhWBas8ZgmgaYnsRdROGRZ1uuLJLkrtwEQMw8KwamYk
+         a1BA==
+X-Forwarded-Encrypted: i=1; AJvYcCV/EXvVQcB88RnIz4pSM6Cu+Jk5NWaDqJVX2dkPK5gchKgZrXeq/j/+oRwLSvbY8lx8FG5c++QwUYB/52zFBWUjm/ExpbVc
+X-Gm-Message-State: AOJu0Yxp9Yoo5Sq6iudJHmuzhVYZ/YhwP+aAXIr4xClK8nOFa4HpzVff
+	+UZuXX1y88Zsn0Pzw8w6NgjWFhOWTr6oPcamS8GAEzv9Ml4Je38k2AGgXfXGsMPhgRNSacMYCo9
+	n
+X-Google-Smtp-Source: AGHT+IFaVLx5dgwnC0TMCfiKkqRrwIvNS5Mx2Z2QJryQfdCTPctVUM2HpPWn3S2o+xJhrcNy53Wl+g==
+X-Received: by 2002:a50:aa93:0:b0:57a:27f5:1272 with SMTP id 4fb4d7f45d1cf-57a8b6b709fmr3119565a12.24.1717664560342;
+        Thu, 06 Jun 2024 02:02:40 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57aadf9b9d0sm740521a12.2.2024.06.06.02.02.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jun 2024 02:02:39 -0700 (PDT)
+Date: Thu, 6 Jun 2024 12:02:36 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev, Jeremy Kerr <jk@codeconstruct.com.au>,
+	David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH 2/3] net: core: Implement dstats-type stats collections
+Message-ID: <0510655b-f42e-47e0-81e6-29ab58645c51@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240605161924.3162588-1-dw@davidwei.uk> <CAHS8izMWBDm5VDYOeJDy5J-pbLtsiBnP801PC17XAbzCb2oe-g@mail.gmail.com>
-In-Reply-To: <CAHS8izMWBDm5VDYOeJDy5J-pbLtsiBnP801PC17XAbzCb2oe-g@mail.gmail.com>
-From: Somnath Kotur <somnath.kotur@broadcom.com>
-Date: Thu, 6 Jun 2024 14:28:15 +0530
-Message-ID: <CAOBf=mu=4TE3qd-p5J+fMPNud1cgqxrkAjYEw7JOpRycru6BHA@mail.gmail.com>
-Subject: Re: [PATCH net-next v1] page_pool: remove WARN_ON() with OR
-To: Mina Almasry <almasrymina@google.com>
-Cc: David Wei <dw@davidwei.uk>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, netdev@vger.kernel.org, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000000645f3061a34e3fc"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240605-dstats-v1-2-1024396e1670@codeconstruct.com.au>
 
---0000000000000645f3061a34e3fc
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi Jeremy,
 
-On Wed, Jun 5, 2024 at 10:01=E2=80=AFPM Mina Almasry <almasrymina@google.co=
-m> wrote:
->
-> On Wed, Jun 5, 2024 at 9:20=E2=80=AFAM David Wei <dw@davidwei.uk> wrote:
-> >
-> > Having an OR in WARN_ON() makes me sad because it's impossible to tell
-> > which condition is true when triggered.
-> >
-> > Split a WARN_ON() with an OR in page_pool_disable_direct_recycling().
-> >
-> > Signed-off-by: David Wei <dw@davidwei.uk>
->
-> Reviewed-by: Mina Almasry <almasrymina@google.com>
->
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> > ---
-> >  net/core/page_pool.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> > index f4444b4e39e6..3927a0a7fa9a 100644
-> > --- a/net/core/page_pool.c
-> > +++ b/net/core/page_pool.c
-> > @@ -1027,8 +1027,8 @@ static void page_pool_disable_direct_recycling(st=
-ruct page_pool *pool)
-> >         /* To avoid races with recycling and additional barriers make s=
-ure
-> >          * pool and NAPI are unlinked when NAPI is disabled.
-> >          */
-> > -       WARN_ON(!test_bit(NAPI_STATE_SCHED, &pool->p.napi->state) ||
-> > -               READ_ONCE(pool->p.napi->list_owner) !=3D -1);
-> > +       WARN_ON(!test_bit(NAPI_STATE_SCHED, &pool->p.napi->state));
-> > +       WARN_ON(READ_ONCE(pool->p.napi->list_owner) !=3D -1);
-> >
-> >         WRITE_ONCE(pool->p.napi, NULL);
-> >  }
-> > --
-> > 2.43.0
-> >
-> >
->
->
-> --
-> Thanks,
-> Mina
->
+kernel test robot noticed the following build warnings:
 
---0000000000000645f3061a34e3fc
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+url:    https://github.com/intel-lab-lkp/linux/commits/Jeremy-Kerr/net-core-vrf-Change-pcpu_dstat-fields-to-u64_stats_t/20240605-143942
+base:   32f88d65f01bf6f45476d7edbe675e44fb9e1d58
+patch link:    https://lore.kernel.org/r/20240605-dstats-v1-2-1024396e1670%40codeconstruct.com.au
+patch subject: [PATCH 2/3] net: core: Implement dstats-type stats collections
+config: x86_64-randconfig-161-20240606 (https://download.01.org/0day-ci/archive/20240606/202406061253.ZgaLHWWp-lkp@intel.com/config)
+compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
 
-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
-nSGLsSobByQoGh1GyLfFTXI7QOGn/6qvrJ7x9Oem5V7miUTD0wGAIozD7MCVoluf5Psa4Q2a5AFV
-gROLty059Ex4oK55Op/0e3Aa/a8hZD/tPBT3WE70owdiCwIDAQABo4IB2zCCAdcwDgYDVR0PAQH/
-BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3VyZS5nbG9i
-YWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEGCCsGAQUF
-BzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAy
-MDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xv
-YmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6hjhodHRw
-Oi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNybDAlBgNV
-HREEHjAcgRpzb21uYXRoLmtvdHVyQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAf
-BgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUabMpSsFcjDNUWMvGf76o
-yB7jBJUwDQYJKoZIhvcNAQELBQADggEBAJBDQpQ1TqY57vpQbwtXYP0N01q8J3tfNA/K2vOiNOpv
-IufqZ5WKdKEtmT21nujCeuaCQ6SmpWqCUJVkLd+u/sHR62vCo8j2fb1pTkA7jeuCAuT9YMPRE86M
-sUphsGDq2ylriQ7y5kvl728hZ0Oakm3xUCnZ9DYS/32sFGSZyrCGZipTBnjK4n5uLQ0yekSLACiD
-R0zi4nzkbhwXqDbDaB+Duk52ec/Vj4xuc2uWu9rTmJNVjdk0qu9vh48xcd/BzrlmwY0crGTijAC/
-r4x2/y9OfG0FyVmakU0qwDnZX982aa66tXnKNgae2k20WCDVMM5FPTrbMsQyz6Hrv3bg6qgxggJt
-MIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYD
-VQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgx6wAr6NdQY0sTG
-G7cwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEICm4keW9XHGYYGTH2rMlIkOVteEL
-qHhA7uRd5U03OXwcMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0
-MDYwNjA4NTgyOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
-CWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFl
-AwQCATANBgkqhkiG9w0BAQEFAASCAQCZPETVP+2dHrMy75fypiZ6Q982rvGuwRPySMW+ai13m74K
-BE1EIdU/Gj3bMTt8sFgZJBEF9KBPmrLtdHFcUBlGdSLL+8LlIlGPvqY0fCNxXwxgxlId58ilDjbD
-zchZgd6OQb1EoliTaDFQzPk/v4VkZZc8y0IwEv8zuKQOj5GW5IzxeAloYy/lI1bzf52a7zR2pmKc
-4ahm27H+pSktBphQ30SHiZ5+SpC1i3QjvBIwme8e8ANcBf0t/IOmggdXqz7AkEabizUC4cywFiGJ
-0JjsIcKbeVh2ml+xR7Cv5jx4VgMx+0wuOyWz/nIGnXjDA+atLJy1o+6lYNg9W6xVdqzo
---0000000000000645f3061a34e3fc--
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202406061253.ZgaLHWWp-lkp@intel.com/
+
+smatch warnings:
+net/core/dev.c:10871 dev_fetch_dstats() error: uninitialized symbol 'dstats'.
+
+vim +/dstats +10871 net/core/dev.c
+
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10860  void dev_fetch_dstats(struct rtnl_link_stats64 *s,
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10861  		      const struct pcpu_dstats __percpu *dstats)
+                                                                                                         ^^^^^^
+
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10862  {
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10863  	int cpu;
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10864  
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10865  	for_each_possible_cpu(cpu) {
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10866  		u64 rx_packets, rx_bytes, rx_drops;
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10867  		u64 tx_packets, tx_bytes, tx_drops;
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10868  		const struct pcpu_dstats *dstats;
+                                                                                          ^^^^^^
+Don't declare a local dstats which shadows the function scope variable.
+
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10869  		unsigned int start;
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10870  
+85bc70c64e8362d Jeremy Kerr     2024-06-05 @10871  		dstats = per_cpu_ptr(dstats, cpu);
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10872  		do {
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10873  			start = u64_stats_fetch_begin(&dstats->syncp);
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10874  			rx_packets = u64_stats_read(&dstats->rx_packets);
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10875  			rx_bytes   = u64_stats_read(&dstats->rx_bytes);
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10876  			rx_drops   = u64_stats_read(&dstats->rx_drops);
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10877  			tx_packets = u64_stats_read(&dstats->tx_packets);
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10878  			tx_bytes   = u64_stats_read(&dstats->tx_bytes);
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10879  			tx_drops   = u64_stats_read(&dstats->tx_drops);
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10880  		} while (u64_stats_fetch_retry(&dstats->syncp, start));
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10881  
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10882  		s->rx_packets += rx_packets;
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10883  		s->rx_bytes   += rx_bytes;
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10884  		s->rx_dropped += rx_drops;
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10885  		s->tx_packets += tx_packets;
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10886  		s->tx_bytes   += tx_bytes;
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10887  		s->tx_dropped += tx_drops;
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10888  	}
+85bc70c64e8362d Jeremy Kerr     2024-06-05  10889  }
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
 
