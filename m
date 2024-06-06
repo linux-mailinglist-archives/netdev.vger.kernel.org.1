@@ -1,92 +1,101 @@
-Return-Path: <netdev+bounces-101227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 365B68FDCAD
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 04:20:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E91C8FDCB1
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 04:23:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDCC31F24774
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 02:20:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E686E1F24ADC
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 02:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877CF18638;
-	Thu,  6 Jun 2024 02:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72B3C18638;
+	Thu,  6 Jun 2024 02:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fpB9Z4rv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mFeuFoDu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E184440C;
-	Thu,  6 Jun 2024 02:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CEEEEDB;
+	Thu,  6 Jun 2024 02:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717640439; cv=none; b=mndahq1ORhlYDrFo5W1cFnZJ1RZeDvBl1kkdmFksrkaFoxEMeqgAm5cgLjM6R07eF3gec7q4eTRe829Prmba0BOy7fpGCJF1erJ/HXtolBiXAWPSJCbTJW0/dlggWaW6Sbx3Ei+GYxP/a2SQf0tpiVp4dy6SHp8Nv4ExbD2dEvU=
+	t=1717640591; cv=none; b=nbhgrgl+Djb2LjrjrCdSBH90cbFgxyT3AuJ0tLyoW9BPsRh1ZpZBripc3GiN1/KTHZWL7xr/IfYw6RqDU42XhgVRWOuiTHB4BB1URznrF9U3EmKK0i5PrgAEtvEPlbfq8LObHrkoQWMyjlpl2vAXjkn304bOGJrvXWP+5aq8jYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717640439; c=relaxed/simple;
-	bh=yVM4UXYryD6+xTiJNedfKfni5JiHi3Zy13HliZUP5wA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=av6Ndd9M5D1NJtKPOvIF+N7ABva5jNO/XV5Oe9TOKoYKsKI9i3lHrb6+JL/2Kcy5DGXE58pd/U/O6XFyGfECOQVTctRLwXVaeJM4jic64DxrM+7MS7AUZ9KB3/HidaY804++CrbRLyz9qpbFqkYbzf+gjlUS9tuwZQlOgGuaDg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fpB9Z4rv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1C3D9C4AF11;
-	Thu,  6 Jun 2024 02:20:39 +0000 (UTC)
+	s=arc-20240116; t=1717640591; c=relaxed/simple;
+	bh=W0a+0ehrLAizO8ZEIWCINwV2FfHVY+xNX/I2byf9iyo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tuvUEg7h99ByxVMmNVzuog51XVFuWiImHu3XI3VuupZf1HLh3oh+oWCK9CVKCF7/TWpYj/7PwBmBwctVtQ79bdVbsNKnllihcvX4tMgWKAZHDg4vyQC9ntYucnrb/Mk2sNIz6Hd8UtYjjKwXN6V5rSjeYBOC57riVrWuHh2tAu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mFeuFoDu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 596C7C2BD11;
+	Thu,  6 Jun 2024 02:23:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717640439;
-	bh=yVM4UXYryD6+xTiJNedfKfni5JiHi3Zy13HliZUP5wA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fpB9Z4rvACyJH1iAZsKR2+6IZ6+iDAzRQHrr3c3jQ5zutTmzSEAygcEqz1sbj/Edo
-	 w7+VCCEEZiLgEiJORLNNa9qjLXKCVd0pr1dnoMyRLNZ1ohrapIeSian6WzxwoJ9+UX
-	 /BkSdzK+Alx0ZCCWMcmYUQ1MFTyZKzMMT4tSGX3CjXB/hoW/UABOwXBElRAzOthIKs
-	 +zJmmdkvzjGphVarW7rFXbEVeLBKBEca2MG1dok0mGiF+d/znlZbLAwnC7Upsxnm92
-	 g4aDJTVX7wWPgQWOHC4rMz0515eydX4mE02cvhtUVapciSoFHfzaT+NwzpsEomghZ1
-	 D48pVaSKIpIRA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F2C1FD3E997;
-	Thu,  6 Jun 2024 02:20:38 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1717640590;
+	bh=W0a+0ehrLAizO8ZEIWCINwV2FfHVY+xNX/I2byf9iyo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mFeuFoDuj8ijxhhFG+1Aofyt10d1UW7e48wIxqiXcpyUEpnceKTgNCcVQqquGFOxR
+	 cHij8qlyipcw7T204y9jZ+QTkFUJ5zKN2v1MlUBdKiE8a8Bi9xlh7dOCQdb2irBSWT
+	 DUXEq9SKM2IEuldNJb0rkQ5MKdQZTwg/LS+jT8+Ebs6hpukHCQl4g2HiOuTHonFf39
+	 JFh/htGXHHx0vDP23aSBCGR30+2kD3DRw9Lganvi9XhAnLMwj+RZsJchqKcX+ybMxJ
+	 2+vJCpUd0RWZoR8h7J7Ow7BeFbEIvue1EiZJ6T64Eya+zcgPg1nhR/1eXF8v3Y5fX7
+	 xTehPL1zfApkA==
+Date: Wed, 5 Jun 2024 19:23:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: Jianguo Wu <wujianguo106@163.com>, wujianguo
+ <wujianguo@chinatelecom.cn>, netdev@vger.kernel.org, edumazet@google.com,
+ contact@proelbtn.com, pablo@netfilter.org, dsahern@kernel.org,
+ pabeni@redhat.com, netfilter-devel@vger.kernel.org, fw@strlen.de
+Subject: Re: [PATCH net v2 2/3] selftests: add selftest for the SRv6 End.DX4
+ behavior with netfilter
+Message-ID: <20240605192309.591dfedb@kernel.org>
+In-Reply-To: <ZmEapORjk3v3FYke@Laptop-X1>
+References: <20240604144949.22729-1-wujianguo@chinatelecom.cn>
+	<20240604144949.22729-3-wujianguo@chinatelecom.cn>
+	<Zl_OWcrrEipnN_VP@Laptop-X1>
+	<eaf06c77-2457-46fc-aaf1-fb5ae0080072@163.com>
+	<20240605173532.304798bd@kernel.org>
+	<ZmEapORjk3v3FYke@Laptop-X1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf 2024-06-05
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171764043898.18622.17549557515869733799.git-patchwork-notify@kernel.org>
-Date: Thu, 06 Jun 2024 02:20:38 +0000
-References: <20240605091525.22628-1-daniel@iogearbox.net>
-In-Reply-To: <20240605091525.22628-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed,  5 Jun 2024 11:15:25 +0200 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
+On Thu, 6 Jun 2024 10:10:44 +0800 Hangbin Liu wrote:
+> > Please follow the instructions from here:
+> > https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+> > the kernel we build for testing is minimal.
+> > 
+> > We see this output:
+> > 
+> > # ################################################################################
+> > # TEST SECTION: SRv6 VPN connectivity test with netfilter enabled in routers
+> > # ################################################################################  
 > 
-> The following pull-request contains BPF updates for your *net* tree.
+> If I run the test specifically, I also got error:
+> sysctl: cannot stat /proc/sys/net/netfilter/nf_hooks_lwtunnel: No such file or directory
 > 
-> We've added 8 non-merge commits during the last 6 day(s) which contain
-> a total of 9 files changed, 34 insertions(+), 35 deletions(-).
+> This is because CONFIG_NF_CONNTRACK is build as module. The test need to load
+> nf_conntrack specifically. I guest the reason you don't have this error is
+> because you have run the netfilter tests first? Which has loaded this module.
+
+Ah, quite possibly, good catch! We don't reboot between tests,
+and the VM must have run 10 or so other tests before.
+
+> > # Warning: Extension rpfilter revision 0 not supported, missing kernel module?
+> > # iptables v1.8.8 (nf_tables):  RULE_APPEND failed (No such file or directory): rule in chain PREROUTING
+> > # Warning: Extension rpfilter revision 0 not supported, missing kernel module?
+> > # iptables v1.8.8 (nf_tables):  RULE_APPEND failed (No such file or directory): rule in chain PREROUTING  
 > 
-> [...]
+> Just checked, we need CONFIG_IP_NF_MATCH_RPFILTER=m in config file.
 
-Here is the summary with links:
-  - pull-request: bpf 2024-06-05
-    https://git.kernel.org/netdev/net/c/886bf9172da0
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+:( Must be lack of compat support then? I CCed netfilter, perhaps they
+can advise. I wonder if there is a iptables-nftables compatibility list
+somewhere.
 
