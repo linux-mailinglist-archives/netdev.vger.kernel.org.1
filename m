@@ -1,201 +1,121 @@
-Return-Path: <netdev+bounces-101490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF0F8FF14A
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:54:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3D5F8FF140
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:52:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6636BB22658
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:41:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 839DCB28B4B
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:41:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0BDC19751B;
-	Thu,  6 Jun 2024 15:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63408197522;
+	Thu,  6 Jun 2024 15:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F4gUBrfX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fhC17j66"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02AA2197517
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 15:41:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF58D197538;
+	Thu,  6 Jun 2024 15:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717688485; cv=none; b=GDkbAO4HvJ/ybkAq41MjMxKqdgwVmttLe674yOttFjqDWLj9I1LW4oYxyklB2yRsSGm7QX1DVCHZz0YsI4pcze/LG49RTmQX3fx81JCqbTUCNacFmq7GvpohPvcND1YOO+ujSIAw556HINzLtyaJZlFFn9RlaJ1PGuwy6jWLj2E=
+	t=1717688494; cv=none; b=mm8eIyiESWNHOgfFwYS5vLv/G7AWL8k3xXF9umpXZ3Q0nco17LME8HCDx0SpohvFfMnTv3WeAvn4dERUscicC6/asCKKqF34m31Fbm9nLCBoerJ8DHAVwKgwDSDNEXbJhy+WK254KMK/SV1iso4C/XDneU0SlJxUTsoFuGvTn34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717688485; c=relaxed/simple;
-	bh=+JKQBWeeIbMbBoYpG1guFUUwLherN61SVnlyIXc9AVs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ru4rDuzHDqeXs+v9uE3poQ0QCN9iesPbeyL91jI/HjTn2teWji8nlcEYzHtSsd9tgmFcAxXo6bHufKKuQe0Tog8lGytrDMl+PSM6ixLInTaRXPjGl4Mp+kqOsLD8oAq10V//KNcQe12lGqkGzSnlBu4TcfnOYJm4XmhQPSsnVaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F4gUBrfX; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-52b9dda4906so1566078e87.2
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 08:41:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717688482; x=1718293282; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kGOufUxQNt7/U6p3w/3M6YcJGX1Q8pi4ATw11ZF0r7s=;
-        b=F4gUBrfXq0N/tMl+xeoXF3UIPUK0kUg0SgOQYBgAlTfHprmBCZLHw7RzcTDm3IRMmk
-         VidmFSSAYtep/K0vQEKm7BuXqHRowRwIQjjhRSgvvGRQ2yB7FF8b9ufWJELDHMcuBGQl
-         SeIfAIM7X8H7SzZeJtJVHYeTzOTcWbWL7QKeZK7yVDDk3yyFeilhdyRe7soEy7manBcu
-         fZNJ+3C4yJi7fsaAxkoVupoDHPrb1zfQHMfhPYN1vSrSO/y1FLFVeM1VdH24x1JDboa5
-         pSQ/5I6cwF3dGX+umqPZEbZJlnl2vXMtvhuj7Bfq5tNbrFcbt4JFDJx9oI8kInAMpg1O
-         4v5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717688482; x=1718293282;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kGOufUxQNt7/U6p3w/3M6YcJGX1Q8pi4ATw11ZF0r7s=;
-        b=BdAorAIJFKQjiG+MogzDS8VBeg4MwBkCPJXXNOQTfUweVWDPAK8zbMuYbvHRIxrIBg
-         IAVQR1/QvQAuAuKgeBSfLtcSZUN6Wd1DjEDfWRz9D4V6WWnOmfQWxpIkeGzZ67YhhH5c
-         17AZCa21lWTr60jBhObqK+qHcuWjMh7zYEPFFDmIiRFrAJmWEAufCMFgM4wZHFQAaPkY
-         UHmx95yKdFEY1qzYOQBp4EMBHJLqtGa67F3KtS70OgEnJki/OZZJv5r624xj07QgIVWK
-         mVoPMmmV7WgqPLu6XZMYulkKaJRIl5no/FFBHxRkIZ6gNCw+swH98pPQo9fKkJ6XgzBa
-         Y6mw==
-X-Forwarded-Encrypted: i=1; AJvYcCWtBe9GwBCxi6zW5b1HGKhrbSL6zxUldIALf8OEwpaN9JWeKrK30IPqRq0mQk8xbNFi5jHqNrQvXBB293WOZD1HCcwCvdlh
-X-Gm-Message-State: AOJu0Yw+LNlrWacFcf1P4ZLOIbkUVAH3+vaUCgPUAxS2FzFY9Xr79CFp
-	KuEypJKzYOVKi2WB3zMkdIeWclWDqFM0TqM6JUkGVXMhlRPnJ7oJpFz5Pr0sHgoj8BqCCTSpq1r
-	OFCxhHhqgxeFIlmdvN2uMFA9rL9g=
-X-Google-Smtp-Source: AGHT+IFnsXYYhCfeGX+oqtI21eM5td9esYoB9/GUfDmrjj6P58jxWE+eqJo0wn1XxUO0Atnytp52u9Td1ah7PLCbDmE=
-X-Received: by 2002:a19:5207:0:b0:52a:5fa8:d565 with SMTP id
- 2adb3069b0e04-52bab511bb7mr4124968e87.68.1717688481823; Thu, 06 Jun 2024
- 08:41:21 -0700 (PDT)
+	s=arc-20240116; t=1717688494; c=relaxed/simple;
+	bh=U9/fTFa6AFZKFaYVobFDAx2u0wkfJM36d6EMcVyO/Lo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KEHhwziEoOJxT+/QDwrTFyhEFwnwwpTJI+NIU0cUOYVw3Mtdi7gftE/kgeAbQDhFJskooTqL1qHJv7l0WSKwmrIg6GSOGmyYHDkqpTkJPIjB0G7AJIrrMsQuXIfPZFB36c9uvwTkzdLHh0idlU5rWsSou6VmkEGfhFnMSuCE78k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fhC17j66; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=HtCXOhY+1iqYPYRg3w33pyQ6Llz91ckac8NBDvTBJTs=; b=fhC17j66D6okl9Nhe1UBE3BnQZ
+	7bLWt+spJnQsF5zMdnj9XdW9NlWojYvCHJDZK5NIn5xqQwQ5FjtmHoaYpTb7XJRVqU9pxjSlPnrOI
+	3aKO6dik/sUTbC5Mlq4MkQshpvCpIvgN++RXAaZr78AVYEGepPQxlFRqv/RhGK9PiZ8U=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sFFEu-00H22T-Eg; Thu, 06 Jun 2024 17:41:20 +0200
+Date: Thu, 6 Jun 2024 17:41:20 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: jackie.jone@alliedtelesis.co.nz, davem@davemloft.net,
+	jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+	kuba@kernel.org, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	chris.packham@alliedtelesis.co.nz
+Subject: Re: [PATCH] igb: Add MII write support
+Message-ID: <1dbb8291-9004-4ec2-a01b-9dd5b2a8be39@lunn.ch>
+References: <20240604031020.2313175-1-jackie.jone@alliedtelesis.co.nz>
+ <ad56235d-d267-4477-9c35-210309286ff4@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240606150307.78648-1-kerneljasonxing@gmail.com>
- <20240606150307.78648-2-kerneljasonxing@gmail.com> <CANn89iLe12LJrhsYB6sQ4m90HPeLL=H97Ju2nm+HzUmMqk+yVQ@mail.gmail.com>
-In-Reply-To: <CANn89iLe12LJrhsYB6sQ4m90HPeLL=H97Ju2nm+HzUmMqk+yVQ@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 6 Jun 2024 23:40:43 +0800
-Message-ID: <CAL+tcoB3j7-uWVzYAcrcmn4Vg9Ng0xptk3-1hGuGWgVHwSYG=g@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] tcp: fix showing wrong rtomin in snmp file
- when using route option
-To: Eric Dumazet <edumazet@google.com>
-Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
-	dsahern@kernel.org, ncardwell@google.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ad56235d-d267-4477-9c35-210309286ff4@intel.com>
 
-On Thu, Jun 6, 2024 at 11:14=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Thu, Jun 6, 2024 at 5:03=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
-> >
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > TCP_MIB_RTOMIN implemented in tcp mib definitions is always 200, which
-> > is true if without any method to tune rto min. In 2007, we got a way to
-> > tune it globaly when setting rto_min route option, but TCP_MIB_RTOMIN
-> > in /proc/net/snmp still shows the same, namely, 200.
-> >
-> > As RFC 1213 said:
-> >   "tcpRtoMin
-> >    ...
-> >    The minimum value permitted by a TCP implementation for the
-> >    retransmission timeout, measured in milliseconds."
-> >
-> > Since the lower bound of rto can be changed, we should accordingly
-> > adjust the output of /proc/net/snmp.
-> >
-> > Fixes: 05bb1fad1cde ("[TCP]: Allow minimum RTO to be configurable via r=
-outing metrics.")
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+On Wed, Jun 05, 2024 at 01:51:24PM -0700, Jacob Keller wrote:
+> 
+> 
+> On 6/3/2024 8:10 PM, jackie.jone@alliedtelesis.co.nz wrote:
+> > From: Jackie Jone <jackie.jone@alliedtelesis.co.nz>
+> > 
+> > To facilitate running PHY parametric tests, add support for the SIOCSMIIREG
+> > ioctl. This allows a userspace application to write to the PHY registers
+> > to enable the test modes.
+> > 
+> > Signed-off-by: Jackie Jone <jackie.jone@alliedtelesis.co.nz>
 > > ---
-> >  include/net/tcp.h  | 2 ++
-> >  net/ipv4/metrics.c | 4 ++++
-> >  net/ipv4/proc.c    | 3 +++
-> >  3 files changed, 9 insertions(+)
-> >
-> > diff --git a/include/net/tcp.h b/include/net/tcp.h
-> > index a70fc39090fe..a111a5d151b7 100644
-> > --- a/include/net/tcp.h
-> > +++ b/include/net/tcp.h
-> > @@ -260,6 +260,8 @@ static_assert((1 << ATO_BITS) > TCP_DELACK_MAX);
-> >  extern int sysctl_tcp_max_orphans;
-> >  extern long sysctl_tcp_mem[3];
-> >
-> > +extern unsigned int tcp_rtax_rtomin;
-> > +
-> >  #define TCP_RACK_LOSS_DETECTION  0x1 /* Use RACK to detect losses */
-> >  #define TCP_RACK_STATIC_REO_WND  0x2 /* Use static RACK reo wnd */
-> >  #define TCP_RACK_NO_DUPTHRESH    0x4 /* Do not use DUPACK threshold in=
- RACK */
-> > diff --git a/net/ipv4/metrics.c b/net/ipv4/metrics.c
-> > index 8ddac1f595ed..61ca949b8281 100644
-> > --- a/net/ipv4/metrics.c
-> > +++ b/net/ipv4/metrics.c
-> > @@ -7,6 +7,8 @@
-> >  #include <net/net_namespace.h>
-> >  #include <net/tcp.h>
-> >
-> > +unsigned int tcp_rtax_rtomin __read_mostly;
-> > +
-> >  static int ip_metrics_convert(struct nlattr *fc_mx,
-> >                               int fc_mx_len, u32 *metrics,
-> >                               struct netlink_ext_ack *extack)
-> > @@ -60,6 +62,8 @@ static int ip_metrics_convert(struct nlattr *fc_mx,
-> >         if (ecn_ca)
-> >                 metrics[RTAX_FEATURES - 1] |=3D DST_FEATURE_ECN_CA;
-> >
-> > +       tcp_rtax_rtomin =3D metrics[RTAX_RTO_MIN - 1];
-> > +
-> >         return 0;
-> >  }
-> >
-> > diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
-> > index 6c4664c681ca..ce387081a3c9 100644
-> > --- a/net/ipv4/proc.c
-> > +++ b/net/ipv4/proc.c
-> > @@ -428,6 +428,9 @@ static int snmp_seq_show_tcp_udp(struct seq_file *s=
-eq, void *v)
-> >                 /* MaxConn field is signed, RFC 2012 */
-> >                 if (snmp4_tcp_list[i].entry =3D=3D TCP_MIB_MAXCONN)
-> >                         seq_printf(seq, " %ld", buff[i]);
-> > +               else if (snmp4_tcp_list[i].entry =3D=3D TCP_MIB_RTOMTIN=
-)
-> > +                       seq_printf(seq, " %lu",
-> > +                                  tcp_rtax_rtomin ? tcp_rtax_rtomin : =
-buff[i]);
-> >                 else
-> >                         seq_printf(seq, " %lu", buff[i]);
-> >         }
-> > --
-> > 2.37.3
-> >
->
-> I do not think we can accept this patch.
->
-> 1) You might have missed that we have multiple network namespaces..
+> >  drivers/net/ethernet/intel/igb/igb_main.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+> > index 03a4da6a1447..7fbfcf01fbf9 100644
+> > --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> > +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> > @@ -8977,6 +8977,10 @@ static int igb_mii_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
+> >  			return -EIO;
+> >  		break;
+> >  	case SIOCSMIIREG:
+> > +		if (igb_write_phy_reg(&adapter->hw, data->reg_num & 0x1F,
+> > +				     data->val_in))
+> > +			return -EIO;
+> > +		break;
+> 
+> A handful of drivers seem to expose this. What are the consequences of
+> exposing this ioctl? What can user space do with it?
 
-Thanks for the review.
+User space can break the PHY configuration, cause the link to fail,
+all behind the MAC drivers back. The generic version of this call
+tries to see what registers are being written, and update state:
 
-For this patch, indeed, I think I need to consider namespaces...
-For the other one, I did.
+https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/phy.c#L325
 
->
-> 2) You might have missed that we can have thousands of routes, with
-> different metrics.
+But you can still break it.
 
-Oh, that's really complicated...
+> It looks like a few drivers also check something like CAP_NET_ADMIN to
+> avoid allowing write access to all users. Is that enforced somewhere else?
 
->
-> I would leave /proc/net/snmp as it is, because no value can possibly be r=
-ight.
+Only root is allowed to use it. So it is a classic 'You have the
+option to shoot yourself in the foot'.
 
-It cannot be right if someone tries to set rto min by 'ip route' or 'sysctl=
- -w'.
+For the use case being talked about here, there has been a few emails
+one the list about implementing the IEEE 802.3 test modes. But nobody
+has actually got around to doing it. Not that it would help in this
+case, Intel don't use the Linux PHY drivers, which is where i would
+expect to see such code implemented first. Maybe if the "Great Intel
+Ethernet driver refactoring" makes progress, it could swap to using
+the Linux PHY drivers.
 
-Thanks,
-Jason
+      Andrew
 
