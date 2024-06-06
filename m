@@ -1,82 +1,83 @@
-Return-Path: <netdev+bounces-101470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF9A18FF044
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:17:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B34E8FF04F
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:18:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E46BF1C2587E
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:17:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38B4D1C243F1
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:18:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A950B196431;
-	Thu,  6 Jun 2024 14:59:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E6B19B3D1;
+	Thu,  6 Jun 2024 15:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="0FCru1X+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QpvhNue/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567BA198E65
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 14:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56EF19ADB8
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 15:03:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717685964; cv=none; b=kKC6iE5elFrw+5p/zPAZRiAmDS8HcfWccLUEaaewcVj8VFfWK1W5x7uIyzv4wVEwjUhn/p9i4wnk6bYnldZf+hrNhoOw+o1WlwQ6S578DsSIb+V9XfA7ubNvLY6aFlknf2QvuPzUarjURks9j91rMJB1fyZCs6HunKfFCQTKEK0=
+	t=1717686201; cv=none; b=kPk4cUmy947/AT/d90V7ut+2t69xPvcA3iwn5tvL84jW4el1mayupdmxigDJ35XIqZE0rxEDaCvWKJgQ7eykAX9quYsdW9Xlyb56GPLCxWy+fWKS1EPVOIT1OL1pAiExuGhRilNQ8zyv2SPhQ7NZneEJrreTnud6/iscfSWdtCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717685964; c=relaxed/simple;
-	bh=GWUvPV+ShGdxr5ajGpsS4KtNOoHWujrvxxiM5o2bS+I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uKxMkjheP5ra5dgn3M0BcXTJMMSu3ubsG9VQOVTk96KeNdrtO/x1M/AYn9qNsGSSovAlAzHLfcsMtkO6+UludcaId2iR3pD/zWKC5le4hjnvt4HRfJ7HFV62eT346HZDGhaLuE8JcClDzdUk6LMJpmmKIf1A1uumQj96EGMwIK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=0FCru1X+; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-6cb6b9ada16so834186a12.0
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 07:59:23 -0700 (PDT)
+	s=arc-20240116; t=1717686201; c=relaxed/simple;
+	bh=HKbxcFzufS+xlM0Vvw6iD6QEvzl+/bBhXOdf7ZlPCxY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hKl81RzKGJZsFrt+rb+M6OeRH6XZ5YwNLvVDTaZfJ6ZE+Z61h+C9qnIzRfZg48zdUyCCwmc2XC7x3E5ck371zsN9u2YhPg15hjIu14Z+Ih8issb4vt0jS65jzX79buEGy2M84N4+nglyhEs+4v0LXrsnbeTHQ8igVakEesNOjgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QpvhNue/; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-6c4926bf9baso841007a12.2
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 08:03:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1717685962; x=1718290762; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1717686199; x=1718290999; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1HBRTga8Uvus+FDhaGj1c4ywlGMfhJMwS/oedJ4AAAY=;
-        b=0FCru1X+dAMAJuxTqGHET/6/22mAuvZjIbz7sAaeyRSv1hCqM+t4ZAzdbbMFRjsh9Y
-         mLQQ7gDNjARVq52H1DIFWxdD/d3WM6qdPw6Pz77qG4fl5jmvTijva2vzNhGyWTvqu+ZS
-         QFOrYJq95HDOuQLWZukx6QthZUv0L1QLS1cUpTrq5CmCN8Q3wJ8EB6fSofw6N3BoV9sS
-         tQK0bPIq97Qa3tKz6aahiVoKUNSaVhOMjQnq8T3AT0Tf8jH/6oRYYwVQuG0RNW7OqRdp
-         u/jxIQn+BI27sep8vGX0+lWvPTGjJQ79+UkEjHL/bn0NmpRNNv71xXkrsgFw2nTxFtHN
-         KT0A==
+        bh=FNe2uQWbBWpdMHa8ZHipYgZx5AAWi/oo8idhRXqluto=;
+        b=QpvhNue/ZDJWuQAS0S3o7Fs32c/Vq8bK7/zwWS1CWE83/mXDZk4nsaQwI6C/XhYnvp
+         OYfdYAvnCusmBmNK8ehS/qBsMDWA74rlZqAZFWAC7SHl2Wq12Xf5k5ECcHaxe93OJFYJ
+         ma5S9JfswS2OhvEoOzXa8jTvBd7QdHvZtY8KrR6aL0xD04XNHJjkP1PrkX3+F4y7YW47
+         QZhiZk210on0N1trKcDjF0IqTt+gmAnlCDxQD5Rfvgo6g+3QTlKqnwQldzHOZEAnWg5I
+         lOLjY1cuvInX1TBj4eiJT3b7SZElvBKV9ZW8QBAFY6oy55KewLPoFbdCAkKCTbQ4tq8J
+         Lpow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717685962; x=1718290762;
+        d=1e100.net; s=20230601; t=1717686199; x=1718290999;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=1HBRTga8Uvus+FDhaGj1c4ywlGMfhJMwS/oedJ4AAAY=;
-        b=ugBlJ2FAxqDj+IzMJf8DrzAWDfXMVyVoXzniBcvbCU2qeKLBtBTD+feG6Skvip9i94
-         rG8GbZ//YOT5+Uo10kpjzuErWFBGbtp0Xh/OXgr/Ps33MAdjxxz2oixYxT57ojUsNwx3
-         HrH/3VCD8Esi86KYB8r1kqbspRHPQ5oULC3Glz13trFsRee2QldouUcQgpQh4ZuiM8PX
-         jHa95Ojkzb/7M5p9OkDs8MYYwaR3aeHaKWnQl2lo1u7lSpPfo2/T1T8X1H3O42GDiLhD
-         p+Jmz3LxvlRSFKUu0Jsd4iGciULbh27BIrJx4mF2D8gDDJw2ISzFbQtTEz5xlLxxhtDy
-         W7Mg==
-X-Forwarded-Encrypted: i=1; AJvYcCU2Hy0s5GU/TM0bAelsZt+BBwll5N5NHwcYeg9D/GUNpWrFCJPW6+8YDUxE+SatJcGbiBjQRv+K79Hfqj+o5hfeRrSsfTMy
-X-Gm-Message-State: AOJu0YzTxVWBVzjJBwBSbVwCqdvj2fkCoFWVt/OMoJ54miLdRgqKkSQL
-	j3rU9/M4aK219OPQKDM8ySWcafD1Ph/qG2KyZqHk8NUkf/hhjYjcC+vcmTF0A7A=
-X-Google-Smtp-Source: AGHT+IE+N3+Ez4+pgbP5ANXxYle2Dm6EqpPibfaDjwD1bnVJmqIwEnvAuHV8WiCAs8n+lg596GcD4Q==
-X-Received: by 2002:a17:903:283:b0:1f6:8157:b52f with SMTP id d9443c01a7336-1f6a5905e51mr69642925ad.8.1717685962550;
-        Thu, 06 Jun 2024 07:59:22 -0700 (PDT)
-Received: from localhost (fwdproxy-prn-119.fbsv.net. [2a03:2880:ff:77::face:b00c])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd76c146sm16009795ad.106.2024.06.06.07.59.22
+        bh=FNe2uQWbBWpdMHa8ZHipYgZx5AAWi/oo8idhRXqluto=;
+        b=pla/BbdPUCqEovlgaocHW5D55a6Cmgs6cotqpMIT4Wd3jDbcAiu44m9Hnh81jihJL8
+         uyILIL7wXGX3jS6YDO1NuuMGSJR8slPimljh6Ohosmxb2+BFe0BYSU5a89/JEWHS4+qM
+         IPhRKqI4NXfM79EXz0ZpxbudsUYPOjKB/Rf6fsQKROrx6WUXRZ3daEZ1sftfQ2TmWfB2
+         GJ0heJu0DfSGWM50Qg2SEo3oEpERp6OimaMzVP5SH5fU9iobdPwnPWtBul5FY62tmJvv
+         FzH0eRYra3y5wiKRg4QUErbP7IpNqGzvALAuE5LFSbElBZnDpPQpreu6OMzxqwxUbEkx
+         cSVQ==
+X-Gm-Message-State: AOJu0YwVxMU+GaSoF5bAGtft5BrogbRc4355wG8tloyMa+BKBCEOlFQ1
+	xRzzPinzkX2OnRKv98bdrPRvuwzurmVOSeACv+PcCDJvH/GnxGvW
+X-Google-Smtp-Source: AGHT+IHI0MCL2jq9KOq94tzHlC6jsAU4094bDOepuIGuU6KenSHFge0oXhnB2puwv/v0yHEPGQQ+1g==
+X-Received: by 2002:a05:6a20:3d8f:b0:1af:d228:ca5b with SMTP id adf61e73a8af0-1b2b6fbedc5mr6901721637.21.1717686198753;
+        Thu, 06 Jun 2024 08:03:18 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([111.201.28.17])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6de264ae03csm1215853a12.68.2024.06.06.08.03.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jun 2024 07:59:22 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: Yu Watanabe <watanabe.yu@gmail.com>,
-	netdev@vger.kernel.org
-Cc: Maciek Machnikowski <maciek@machnikowski.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net] netdevsim: fix backwards compatibility in nsim_get_iflink()
-Date: Thu,  6 Jun 2024 07:59:08 -0700
-Message-ID: <20240606145908.720741-1-dw@davidwei.uk>
-X-Mailer: git-send-email 2.43.0
+        Thu, 06 Jun 2024 08:03:18 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	ncardwell@google.com
+Cc: netdev@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next 0/2] tcp: show the right value of TCP_MIB_RTOMIN
+Date: Thu,  6 Jun 2024 23:03:05 +0800
+Message-Id: <20240606150307.78648-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,37 +86,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The default ndo_get_iflink() implementation returns the current ifindex
-of the netdev. But the overridden nsim_get_iflink() returns 0 if the
-current nsim is not linked, breaking backwards compatibility for
-userspace that depend on this behaviour.
+From: Jason Xing <kernelxing@tencent.com>
 
-Fix the problem by returning the current ifindex if not linked to a
-peer.
+When doing 'cat /proc/net/snmp' if we already tune the tcp rto min by
+using 'sysctl -w' or 'ip route', the result always the same 200 ms.
+However, it cannot reflect the real situation because the minimum value
+of rto min can be changed smaller than TCP_RTO_MIN.
 
-Fixes: 8debcf5832c3 ("netdevsim: add ndo_get_iflink() implementation")
-Reported-by: Yu Watanabe <watanabe.yu@gmail.com>
-Suggested-by: Yu Watanabe <watanabe.yu@gmail.com>
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- drivers/net/netdevsim/netdev.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Jason Xing (2):
+  tcp: fix showing wrong rtomin in snmp file when using route option
+  tcp: fix showing wrong rtomin in snmp file when setting
+    sysctl_tcp_rto_min_us
 
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index c22897bf5509..017a6102be0a 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -324,7 +324,8 @@ static int nsim_get_iflink(const struct net_device *dev)
- 
- 	rcu_read_lock();
- 	peer = rcu_dereference(nsim->peer);
--	iflink = peer ? READ_ONCE(peer->netdev->ifindex) : 0;
-+	iflink = peer ? READ_ONCE(peer->netdev->ifindex) :
-+			READ_ONCE(dev->ifindex);
- 	rcu_read_unlock();
- 
- 	return iflink;
+ include/net/tcp.h  |  2 ++
+ net/ipv4/metrics.c |  4 ++++
+ net/ipv4/proc.c    | 15 +++++++++++++++
+ 3 files changed, 21 insertions(+)
+
 -- 
-2.43.0
+2.37.3
 
 
