@@ -1,107 +1,115 @@
-Return-Path: <netdev+bounces-101273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 750218FDEA7
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:22:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 25DC28FDEB0
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:27:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E08C1C2418F
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 06:22:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2549B1C237A1
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 06:27:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 271004DA14;
-	Thu,  6 Jun 2024 06:22:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4BE873465;
+	Thu,  6 Jun 2024 06:27:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="vRU+Xrt7";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="87c6PaFT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hMAxBSoY"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9345019D8A1;
-	Thu,  6 Jun 2024 06:22:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD0D2E3E5;
+	Thu,  6 Jun 2024 06:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717654963; cv=none; b=hoVqeyGfAU4yVy/PTgn4rb/VZ0A5eENWvbXTigjr8PMUV6x4uewk0WXkepQVRTfDCm7ACIz+pSM9WpG5CFNdE/ST2crkVfnDAgl9/p+s+IluMmb/IHDSJkSKnZ+kW3y64owvlk0TKk4c+W1ysz3QcwvP8cXmWSZWfglWhhuoyv0=
+	t=1717655225; cv=none; b=M2F7O0duzuxWRUZSHKSr5xeURBOnQ4v1DZWuWLqtXHkKaGjxw46PNxpzSQnBKOJL80Wt0hb23b3aj1xap+E3NYUvA9fhJ6+Q8y5zJX0BOXNyOs5JAnKdg0ymae642HrE+jRngz++JTmsZEXpU41RBzPvxR+BdAH0vChHE+zHznQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717654963; c=relaxed/simple;
-	bh=yB68uGLMaXT1YV1sbSThDoviU8YPb91HeMCIZFMJbgQ=;
+	s=arc-20240116; t=1717655225; c=relaxed/simple;
+	bh=8sTAUFN6ttVGBTSIkP0SK1wk1W07q2GV6zvcwY4KfEg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q5XHAo9y54YWFsAGRBGskg9sW5zErO3qIF4Xkj3tVV1kmFSeTAyeVF53T8XBCFP5CRF2Hcap1MIai0dQDLigYATWiOk2hhHg2wKkorK/QWPUIfW8mRhdNtAuM9iJgBPC0Wj3DQAg350XZ90oBYZ2EkOvUShhENqtZhWmrKUbKHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=vRU+Xrt7; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=87c6PaFT; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 6 Jun 2024 08:22:37 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1717654959;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PZbspwahrReSiEYm4PJOvgqOfbLgJT+v5PtwhKLRS5Q=;
-	b=vRU+Xrt7qfOQCVY3ghd5wShqMojUHU2Scch7McyNsNbBycPTimJzgb6hrCTrgzVo7gFnz/
-	QZk4QInUEfFvPtfRmmtRiqpg5A/OIt0TKgiNuxH/kpoIb8HwswgOyZXem1kgjMyGo/BePo
-	YI1RJkl8x8xGJVUcitI9rr7YRzaAUmR7hL9z5sLsFExOTm8NL5PUXmihuTkrp6wa86iSJF
-	LFIyn73IDnn71pcppGenwuIvJK7tbBPGXDll1jM9JDH8wpu/TCGuXDuG7/ztVh4gKKN1zz
-	J7+LlDKVGCEJWxJXgw1M/AfM2WhWzFqQFtdeHFOVGDsHN/jhY3McCXoBiTI3QA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1717654959;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PZbspwahrReSiEYm4PJOvgqOfbLgJT+v5PtwhKLRS5Q=;
-	b=87c6PaFTSzuOuHDnarqFAleF2KS2afdlq8GLhiwo1iPMdlo3lj4MrafLsYp7Ao1MqnfWLZ
-	izXGRThGBs4B1KBQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Daniel Bristot de Oliveira <bristot@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v4 net-next 03/14] net: Use nested-BH locking for
- napi_alloc_cache.
-Message-ID: <20240606062237.nuBoHreW@linutronix.de>
-References: <20240604154425.878636-1-bigeasy@linutronix.de>
- <20240604154425.878636-4-bigeasy@linutronix.de>
- <20240605195420.2f47e6a1@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hk+d+yd8PSr6Nu+wIs/iU8loloFlKwiANLUyN90K23/HW1N/qKR8g44rssy/jY2Eu9LBwpqaMMwBbbYHlbbpMdF8Qh2WdIbStIJMZQ4ZU7Ea9DVW4H4Jioj2vh2GCRNuI/Dc+6LcepoyxSugm9u7Ema1C/RJtJPN/brJ4i7tI1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hMAxBSoY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81C0CC3277B;
+	Thu,  6 Jun 2024 06:27:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717655225;
+	bh=8sTAUFN6ttVGBTSIkP0SK1wk1W07q2GV6zvcwY4KfEg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hMAxBSoYXBBoBY0kVL+6E1ZIwPc9R2E8g8BsWNAew0O67OH1Vdfh0MAJKtvwQwKuY
+	 nwJODBJ9IxbpJEQr0wK6EIyTyWnwCTxRpVcdqylsNxRCpLIfGH7StnLAJIqnYYZDzB
+	 MBgLOBBcKP4SjkHeLLJ2pvLXMrLzkUVR+Qu1kvpSVLjUZFxhsISQ/DfQS/Q2VOG0fd
+	 PjKalyhJ2coX1fOqJ7WIOV6BDMC0RjA8XZrCBSAraTf7amjb6RUHNqHUGxV48bGDCd
+	 TRj5iBRl8H0L69Et80wLxSWBzJZuROt3WysTC9Ek7qo83gVulHqKHzvKxaOLjbnZWB
+	 VT7gFRRky73QA==
+Date: Wed, 5 Jun 2024 23:27:02 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Gabriel Krisman Bertazi <krisman@suse.de>
+Cc: Lizhi Xu <lizhi.xu@windriver.com>, adilger.kernel@dilger.ca,
+	coreteam@netfilter.org, davem@davemloft.net, fw@strlen.de,
+	jaegeuk@kernel.org, kadlec@netfilter.org, kuba@kernel.org,
+	linux-ext4@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lkp@intel.com, llvm@lists.linux.dev,
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	oe-kbuild-all@lists.linux.dev, pablo@netfilter.org,
+	syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com, tytso@mit.edu
+Subject: Re: [PATCH V5] ext4: check hash version and filesystem casefolded
+ consistent
+Message-ID: <20240606062702.GB324380@sol.localdomain>
+References: <87plsym65w.fsf@mailhost.krisman.be>
+ <20240604011718.3360272-1-lizhi.xu@windriver.com>
+ <87le3kle87.fsf@mailhost.krisman.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240605195420.2f47e6a1@kernel.org>
+In-Reply-To: <87le3kle87.fsf@mailhost.krisman.be>
 
-On 2024-06-05 19:54:20 [-0700], Jakub Kicinski wrote:
-> On Tue,  4 Jun 2024 17:24:10 +0200 Sebastian Andrzej Siewior wrote:
-> > @@ -308,6 +311,7 @@ void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align_mask)
-> >  	struct napi_alloc_cache *nc = this_cpu_ptr(&napi_alloc_cache);
-> >  
-> >  	fragsz = SKB_DATA_ALIGN(fragsz);
-> > +	guard(local_lock_nested_bh)(&napi_alloc_cache.bh_lock);
-> >  
-> >  	return __page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC,
-> >  				       align_mask);
+On Tue, Jun 04, 2024 at 03:06:32PM -0400, Gabriel Krisman Bertazi wrote:
+> Lizhi Xu <lizhi.xu@windriver.com> writes:
 > 
-> We have decided to advise against the use of guard() in networking, 
-> at least for now.
+> > On Mon, 03 Jun 2024 10:50:51 -0400, Gabriel Krisman Bertazi wrote:
+> >> > When mounting the ext4 filesystem, if the hash version and casefolded are not
+> >> > consistent, exit the mounting.
+> >> >
+> >> > Reported-by: syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com
+> >> > Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+> >> > ---
+> >> >  fs/ext4/super.c | 5 +++++
+> >> >  1 file changed, 5 insertions(+)
+> >> >
+> >> > diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+> >> > index c682fb927b64..0ad326504c50 100644
+> >> > --- a/fs/ext4/super.c
+> >> > +++ b/fs/ext4/super.c
+> >> > @@ -5262,6 +5262,11 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
+> >> >  		goto failed_mount;
+> >> >  
+> >> >  	ext4_hash_info_init(sb);
+> >> > +	if (es->s_def_hash_version == DX_HASH_SIPHASH && 
+> >> > +	    !ext4_has_feature_casefold(sb)) {
+> >> 
+> >> Can we ever have DX_HASH_SIPHASH set up in the super block?  I thought
+> >> it was used solely for directories where ext4_hash_in_dirent(inode) is
+> >> true.
+> > The value of s'def_hash_version is obtained by reading the super block from the
+> > buffer cache of the block device in ext4_load_super().
+> 
+> Yes, I know.  My point is whether this check should just be:
+> 
+> if (es->s_def_hash_version == DX_HASH_SIPHASH)
+> 	goto failed_mount;
+> 
+> Since, IIUC, DX_HASH_SIPHASH is done per-directory and not written to
+> the sb.
+> 
 
-Understood.
+That seems right to me.  SipHash can never be the default because it's only used
+on directories that are both encrypted and casefolded.
 
-> Andrew, wasn't it on your TODO list to send the update to the docs? :)
-I can add it to
-	Documentation/process/maintainer-netdev.rst
-
-Yes, no, Andrew?
-
-Sebastian
+- Eric
 
