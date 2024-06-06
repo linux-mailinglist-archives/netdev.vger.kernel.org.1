@@ -1,212 +1,174 @@
-Return-Path: <netdev+bounces-101494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 027F78FF0FE
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:44:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E5FFB8FF109
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:45:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 196101C212DF
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:44:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECE911C2215B
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:45:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 869E4197A61;
-	Thu,  6 Jun 2024 15:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IJ4eTutM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EBD4196456;
+	Thu,  6 Jun 2024 15:45:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEAAB19752A
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 15:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00FFD153511
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 15:45:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717688641; cv=none; b=aA8H0obKOeMgLpAm/uz+bAiDcwfvoGc98asdDIY7kOWyfcsSoSCfRWEbWonp/J3SeAttjtn2/z4GTvyKMTIAluTJ4Doev6AQPPyDuGvDCgnKemAeDKeaoet5NH/cUjpmAXj6H8n8I4EH8I0EiDt12BYurgsElL80DYjRsLpBeHw=
+	t=1717688728; cv=none; b=a0ZMayodmbZgWq8Mlpizk6djkDAYJ56vkOLKK2LoXp2r6IK4P+D76yCUn1/7+0gpGzriwxiWMRZx4dmblkAcXJpSkBjsZ4rVtzXeXt1YFhTHZl2sTSd7Bm++AKW3cna/3/AgzEmR9ZgjeB7uiGBT9Gu4anQlDYJBb3ebtvSwFvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717688641; c=relaxed/simple;
-	bh=qZd5s/uMRWrIIDma4YAXKlZ0x2JKHE6nGefGlNRZ0f0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k+2HmxuP4PKJqBPMR9RFmsGxb8KgOrCatFmPfZcxvz4Hejeh9UWzmz4NpS9TCrtJkXg2LO/usXV2AaHuof9+bTAt7eUY/wZrjkwSzUFbJE7wPXAHEtvGdKS3T7ONYFNXRfgDEO2vsEc2jsLI76pbwnqmusg3Y7aNIXL/ltOOamo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IJ4eTutM; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-57a22af919cso14258a12.1
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 08:43:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717688638; x=1718293438; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=imIDWWcoMBVbwZlIPom94fAG+chtz1YGCZXWnnpacYA=;
-        b=IJ4eTutMoloSVYd43AfwXJcEg/sThDOIWlWbv2GZjH1soJ+MpAOfXBSMa3q3vQIGHh
-         cIwV7bmE5QZFfgiT/G6P+hE7r8KFYzoqJ1DA76KTeWTSV6dLpqBgs7zZdO2C2SYBN+Ke
-         +i3e8DHapih4jjUwddsS+rW0Bm9caBLKeKP0ERoXIwjOaPEBA4VgbDV44He15JQL7fvZ
-         ac+NbSIXmDjCxwUVwWCxoBRBHPI1WbxUvzvZ+y90C68Yhuu/5Fa4fESOZQMCBvM32Z5Q
-         c5GpboKruUiCg7BfIjk0pNgZhF59r7hRWaAr41YayAiS5rque6jPQfnN1tLa7k13FL7C
-         bfWA==
+	s=arc-20240116; t=1717688728; c=relaxed/simple;
+	bh=cS+w42K47jFJAEppSvASxFbtW1NbsLYSF4kln3BjWkU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=tG8OnmSAfmzbYXqXdoRItkXU4+e+W7m0kQUK1myn2DgiESn47Xwbk7agvM/DnjZa2EEmlpGoxpSPSWtOce4rL4ymHd+slZlTP5jshhrWyiNuo+gnNyEjzjNYDNe2tFX90KZnI3aPrX4sVTDbr5ZpTOEkuMrpMUvZEO8dGyAy7YQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3737b3ee909so10683385ab.2
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 08:45:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717688638; x=1718293438;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=imIDWWcoMBVbwZlIPom94fAG+chtz1YGCZXWnnpacYA=;
-        b=Cy+Ye8G+O7DXPkLMLOrbUsX6nq4QxQ2cgDfYloYC1XxshYuQbVXmyCFtaggP39WG7E
-         8fpK+9aTT/o7WkOgmHyI9Wj3W5YvpNzy8eFg40E0yitJbA0jtLX50bnANCPBnFToDR9S
-         NdHxvrBEiFpCpADWr+M8NAPIPy36/penuffp+z+PP6vzj9hfeVWA/ntJ2L+QkE13rLgM
-         Cu78QZo02mJg5vUnT+SgbFWHsAhprz0K9+jGfyIDVSzUehVF0m+azGpdGK9qazGSvO2/
-         FV0UTZzHHvUQOz9FoJriCmyWsveB01UzthPgDnEJq0szm+xCgpU6y1mp7L4Qa160drMD
-         MKbw==
-X-Forwarded-Encrypted: i=1; AJvYcCV3z4hciyC9NZOxHCNxkjZjDFnDLVkrhUW+e4TBrZYpl42T2yk7jhtQ/9Ir1FlDvWMWtSbRmDrCLusnEs1cM8sjlQjs+l5l
-X-Gm-Message-State: AOJu0YzqHUbN7FezcWISkgM5FxLUNO9X+OqSdPmhxwMjIyS0oX90zASG
-	BgnA53SVGvPCBGRtOMDc6OQsVWkuaG8hClYMOkgWcTsuKM92wHGEsi9FF02GNvpmQQcbbfN/V2k
-	xnD8Tl+RaSW6DQyL4z2Y+jawO6IuYdHblsysU
-X-Google-Smtp-Source: AGHT+IH8KGOjDt428nktOCRFgCBivqINuycBCLeC6n/MQZia+kIrF4pQUJS6jmwbho2u2beDUegr2swTzBKzB6ezFyQ=
-X-Received: by 2002:a05:6402:8c2:b0:57a:1a30:f5da with SMTP id
- 4fb4d7f45d1cf-57aa6bd3be2mr302548a12.2.1717688637685; Thu, 06 Jun 2024
- 08:43:57 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1717688726; x=1718293526;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BcJjBcQjsiomLxADg06X2dHReObIPOPPMgQFtADOjIQ=;
+        b=rUAgPuGEJBWHALl3zlvOlYx6eVLfKwiR3K7hrjgjXa+lCutTwUUHXRO2bbXJxCuPSK
+         NEX/kgVgBDTfkNqLLzT2d4m8LsXJ48Z96j/jzs3oFVlccJ7S56LudmKNG9IxGjRDEQw/
+         K4MQNZfqL35StmeEAan4wrzy97EXJ1uC65z0+Exa4O8Rs894IBkbvvSQ2C/TowjqaFXQ
+         9Kv81UR4trJZs5B8AuMmveNbr2Idn0ItSNpcpyxgB3vHJQWfNeavlc2+c8FhDTp6v5FE
+         h+65boEAi8DJueu18P/hhaED2RWfGbKG8bFCaYXPX3KmbWx3YUaH6qyWO5IrGX5VZTwi
+         BhLw==
+X-Forwarded-Encrypted: i=1; AJvYcCVbkhwQUYQMRo5y+6B2fAlGR7+2Jkm57vuOVhljaP3nsMi851niSqKNq3i9N+UeIqp5qt285m4LTWortz3NndzucWzc4SEi
+X-Gm-Message-State: AOJu0YzYtaUsjSgewRWJbJ4OOmM7FvCFAgeBGE9Z3fa5m3w1izv/CsbM
+	Bv3nIWfJ6cp6WVrS4kU/N81iBdqP2bBA+VycLWsct5a62Bq+yRMhPN0ymi94yHfHnICsSQrw7+F
+	vUutxE2pBFky9yEk3IT3KTQUzM7EivC64x8Wp+6op4htW09gXr8vq7IU=
+X-Google-Smtp-Source: AGHT+IEG+fp/6y3Je1YYAE9GzZIqKcEY+J2VkjnePlKVW2lAraFrdhU88X70CABdD4Jwqv0+4+blEtYRq/jy3INZR1RpATw9DHiO
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240606150307.78648-1-kerneljasonxing@gmail.com>
- <20240606150307.78648-2-kerneljasonxing@gmail.com> <CANn89iLe12LJrhsYB6sQ4m90HPeLL=H97Ju2nm+HzUmMqk+yVQ@mail.gmail.com>
- <CAL+tcoB3j7-uWVzYAcrcmn4Vg9Ng0xptk3-1hGuGWgVHwSYG=g@mail.gmail.com>
-In-Reply-To: <CAL+tcoB3j7-uWVzYAcrcmn4Vg9Ng0xptk3-1hGuGWgVHwSYG=g@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 6 Jun 2024 17:43:46 +0200
-Message-ID: <CANn89iJMx1ZAt4tuCKH6L33OgEcdjd6mLRWjuvRXvbWeckZmYg@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] tcp: fix showing wrong rtomin in snmp file
- when using route option
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
-	dsahern@kernel.org, ncardwell@google.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
+X-Received: by 2002:a92:cda4:0:b0:374:5a8c:c011 with SMTP id
+ e9e14a558f8ab-375803c3a16mr50445ab.4.1717688726325; Thu, 06 Jun 2024 08:45:26
+ -0700 (PDT)
+Date: Thu, 06 Jun 2024 08:45:26 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000005e23a3061a3a92b6@google.com>
+Subject: [syzbot] [wireless?] INFO: task hung in wiphy_unregister (2)
+From: syzbot <syzbot+abba31ed4fc4178349e9@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 6, 2024 at 5:41=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.co=
-m> wrote:
->
-> On Thu, Jun 6, 2024 at 11:14=E2=80=AFPM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > On Thu, Jun 6, 2024 at 5:03=E2=80=AFPM Jason Xing <kerneljasonxing@gmai=
-l.com> wrote:
-> > >
-> > > From: Jason Xing <kernelxing@tencent.com>
-> > >
-> > > TCP_MIB_RTOMIN implemented in tcp mib definitions is always 200, whic=
-h
-> > > is true if without any method to tune rto min. In 2007, we got a way =
-to
-> > > tune it globaly when setting rto_min route option, but TCP_MIB_RTOMIN
-> > > in /proc/net/snmp still shows the same, namely, 200.
-> > >
-> > > As RFC 1213 said:
-> > >   "tcpRtoMin
-> > >    ...
-> > >    The minimum value permitted by a TCP implementation for the
-> > >    retransmission timeout, measured in milliseconds."
-> > >
-> > > Since the lower bound of rto can be changed, we should accordingly
-> > > adjust the output of /proc/net/snmp.
-> > >
-> > > Fixes: 05bb1fad1cde ("[TCP]: Allow minimum RTO to be configurable via=
- routing metrics.")
-> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > ---
-> > >  include/net/tcp.h  | 2 ++
-> > >  net/ipv4/metrics.c | 4 ++++
-> > >  net/ipv4/proc.c    | 3 +++
-> > >  3 files changed, 9 insertions(+)
-> > >
-> > > diff --git a/include/net/tcp.h b/include/net/tcp.h
-> > > index a70fc39090fe..a111a5d151b7 100644
-> > > --- a/include/net/tcp.h
-> > > +++ b/include/net/tcp.h
-> > > @@ -260,6 +260,8 @@ static_assert((1 << ATO_BITS) > TCP_DELACK_MAX);
-> > >  extern int sysctl_tcp_max_orphans;
-> > >  extern long sysctl_tcp_mem[3];
-> > >
-> > > +extern unsigned int tcp_rtax_rtomin;
-> > > +
-> > >  #define TCP_RACK_LOSS_DETECTION  0x1 /* Use RACK to detect losses */
-> > >  #define TCP_RACK_STATIC_REO_WND  0x2 /* Use static RACK reo wnd */
-> > >  #define TCP_RACK_NO_DUPTHRESH    0x4 /* Do not use DUPACK threshold =
-in RACK */
-> > > diff --git a/net/ipv4/metrics.c b/net/ipv4/metrics.c
-> > > index 8ddac1f595ed..61ca949b8281 100644
-> > > --- a/net/ipv4/metrics.c
-> > > +++ b/net/ipv4/metrics.c
-> > > @@ -7,6 +7,8 @@
-> > >  #include <net/net_namespace.h>
-> > >  #include <net/tcp.h>
-> > >
-> > > +unsigned int tcp_rtax_rtomin __read_mostly;
-> > > +
-> > >  static int ip_metrics_convert(struct nlattr *fc_mx,
-> > >                               int fc_mx_len, u32 *metrics,
-> > >                               struct netlink_ext_ack *extack)
-> > > @@ -60,6 +62,8 @@ static int ip_metrics_convert(struct nlattr *fc_mx,
-> > >         if (ecn_ca)
-> > >                 metrics[RTAX_FEATURES - 1] |=3D DST_FEATURE_ECN_CA;
-> > >
-> > > +       tcp_rtax_rtomin =3D metrics[RTAX_RTO_MIN - 1];
-> > > +
-> > >         return 0;
-> > >  }
-> > >
-> > > diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
-> > > index 6c4664c681ca..ce387081a3c9 100644
-> > > --- a/net/ipv4/proc.c
-> > > +++ b/net/ipv4/proc.c
-> > > @@ -428,6 +428,9 @@ static int snmp_seq_show_tcp_udp(struct seq_file =
-*seq, void *v)
-> > >                 /* MaxConn field is signed, RFC 2012 */
-> > >                 if (snmp4_tcp_list[i].entry =3D=3D TCP_MIB_MAXCONN)
-> > >                         seq_printf(seq, " %ld", buff[i]);
-> > > +               else if (snmp4_tcp_list[i].entry =3D=3D TCP_MIB_RTOMT=
-IN)
-> > > +                       seq_printf(seq, " %lu",
-> > > +                                  tcp_rtax_rtomin ? tcp_rtax_rtomin =
-: buff[i]);
-> > >                 else
-> > >                         seq_printf(seq, " %lu", buff[i]);
-> > >         }
-> > > --
-> > > 2.37.3
-> > >
-> >
-> > I do not think we can accept this patch.
-> >
-> > 1) You might have missed that we have multiple network namespaces..
->
-> Thanks for the review.
->
-> For this patch, indeed, I think I need to consider namespaces...
-> For the other one, I did.
->
-> >
-> > 2) You might have missed that we can have thousands of routes, with
-> > different metrics.
->
-> Oh, that's really complicated...
->
-> >
-> > I would leave /proc/net/snmp as it is, because no value can possibly be=
- right.
->
-> It cannot be right if someone tries to set rto min by 'ip route' or 'sysc=
-tl -w'.
->
+Hello,
 
-Or eBPF.
+syzbot found the following issue on:
 
-There is no way a /proc/net/snmp value can be right.
+HEAD commit:    2ab795141095 Merge tag 'cxl-fixes-6.10-rc3' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1671b2f2980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f0e2e3f7ede77526
+dashboard link: https://syzkaller.appspot.com/bug?extid=abba31ed4fc4178349e9
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-Why would anyone care, since thousands of TCP sockets can all have
-different values ?
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/613f40485ad9/disk-2ab79514.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/5f6673b48420/vmlinux-2ab79514.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9659affc7dfc/bzImage-2ab79514.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+abba31ed4fc4178349e9@syzkaller.appspotmail.com
+
+INFO: task kworker/u8:2:35 blocked for more than 143 seconds.
+      Not tainted 6.10.0-rc2-syzkaller-00010-g2ab795141095 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/u8:2    state:D stack:23032 pid:35    tgid:35    ppid:2      flags:0x00004000
+Workqueue: netns cleanup_net
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5408 [inline]
+ __schedule+0x17e8/0x4a20 kernel/sched/core.c:6745
+ __schedule_loop kernel/sched/core.c:6822 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6837
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
+ wiphy_unregister+0x236/0xaa0 net/wireless/core.c:1096
+ ieee80211_unregister_hw+0x1e2/0x2c0 net/mac80211/main.c:1675
+ mac80211_hwsim_del_radio+0x2c2/0x4c0 drivers/net/wireless/virtual/mac80211_hwsim.c:5576
+ hwsim_exit_net+0x5c1/0x670 drivers/net/wireless/virtual/mac80211_hwsim.c:6453
+ ops_exit_list net/core/net_namespace.c:173 [inline]
+ cleanup_net+0x804/0xcc0 net/core/net_namespace.c:640
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2e/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3393
+ kthread+0x2f2/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+INFO: task dhcpcd:4754 blocked for more than 144 seconds.
+      Not tainted 6.10.0-rc2-syzkaller-00010-g2ab795141095 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:dhcpcd          state:D stack:20384 pid:4754  tgid:4754  ppid:4753   flags:0x00000002
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5408 [inline]
+ __schedule+0x17e8/0x4a20 kernel/sched/core.c:6745
+ __schedule_loop kernel/sched/core.c:6822 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6837
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
+ devinet_ioctl+0x2ce/0x1bc0 net/ipv4/devinet.c:1101
+ inet_ioctl+0x3d7/0x4f0 net/ipv4/af_inet.c:1003
+ sock_do_ioctl+0x15a/0x460 net/socket.c:1222
+ sock_ioctl+0x629/0x8e0 net/socket.c:1341
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl+0xfe/0x170 fs/ioctl.c:893
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f2f49d5ed49
+RSP: 002b:00007ffe50118268 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f2f49c906c0 RCX: 00007f2f49d5ed49
+RDX: 00007ffe50128458 RSI: 0000000000008914 RDI: 0000000000000011
+RBP: 00007ffe50138618 R08: 00007ffe50128418 R09: 00007ffe501283c8
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe50128458 R14: 0000000000000028 R15: 0000000000008914
+ </TASK>
+INFO: task kworker/0:7:5217 blocked for more than 144 seconds.
+      Not tainted 6.10.0-rc2-syzkaller-00010-g2ab795141095 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/0:7     state:D stack:19376 pid:5217 
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
