@@ -1,156 +1,134 @@
-Return-Path: <netdev+bounces-101394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E9EA8FE5FA
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:02:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4A958FE61C
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:10:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDE681F25204
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 12:02:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 621D11F2541A
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 12:10:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D58F168C10;
-	Thu,  6 Jun 2024 12:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C661195971;
+	Thu,  6 Jun 2024 12:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NG8m01Ef"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KpmuGGf2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91033178CC9
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 12:02:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3032F1953A4;
+	Thu,  6 Jun 2024 12:09:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717675324; cv=none; b=QBNduZHJFn34Y+Hzw9eRe8XSiEgBgL/qkyft5lZVZWHrPKvY8tGbSv/fnDQEhoohIcRTgcLYAAThYj7ehUbxjl/tA8M4XRWHfo2RW09jO41ygUm2f9hM8bNmYxWvfhX0/59hOk8nu5qtaYeVS1JF6/SjRAouBtAOCzhJza3YfpE=
+	t=1717675789; cv=none; b=HX0wPKEzDbGUTX77QCkZmp6+gUiVcKER+GIBw1P9l+NpE+BIWVzxNbUh2vQFOHiFBTXPynrCC9rEMHesI1UI9wHDRcTXG1wCdG9nAQmBigUqWBrIy20FREYkoXOo2hltXG8HiHWJdxAPLobKXLi+V2OQiVQJ4QXchLqYMaY9Ko0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717675324; c=relaxed/simple;
-	bh=XzA9XcS9J8/JaJGhY85xTyvzVAiJwfKIIBi3J6rxAwM=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=oSOX1XuGSIDs+z1jUIvzlXymCjxqMt1u9btTv8HR6s9v1nonMFhAEA/VYuBLA44miQAqQ+ey0BltIaECiRMLOJR5Dal/sAbtZIZyJ1lpYD4efeqjiYWAj5rHn0wvkKh8WggY/3c2Y747uKfaycfx4vCNIgv7KKjoZB6JqNahKhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NG8m01Ef; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717675321;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o1PVj6wl0RhMQ9aVu/kpZquF9TBmMzt7pDp7sPNrIU4=;
-	b=NG8m01EfkrXJkJGwgDbOjTdlf4hxxSxa9y8ubtHu/+BShqnf0n4BsSXvfUNrkzGI1uC1kg
-	iKqVUe3AmZpbH3D0TdclIGcpE71t1GWWeswoNLw9GYUOG9oo4lzbTGtlw5wVKX+W+FqQml
-	jZ1tetsFdVDT4OjaKZLc9S3bskTfDpE=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-665-JTd7b_KgNNee052XB_FukA-1; Thu, 06 Jun 2024 08:01:59 -0400
-X-MC-Unique: JTd7b_KgNNee052XB_FukA-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2eaa74bfc18so6433791fa.2
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 05:01:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717675317; x=1718280117;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o1PVj6wl0RhMQ9aVu/kpZquF9TBmMzt7pDp7sPNrIU4=;
-        b=iU82Ap2euemkP90KHxRp6Um5b8ELVCc0b3KsytZoP/Vswu+TFc1g62aKJoCeZeRwC7
-         pRko9IF+pLSmopSXOJYCHqeg44G0h23/6a9y68twtUmy9HlmxFqH5R9KXOuaIcFUrlJe
-         boWgAA3Plktf6hhSztPQIyiXORvoAaJHUHd+Xv/gwoMOFEorpfUce1Kj6H85dQVHso0z
-         iK9J4JwLdPsy1mwUkvl//4DQ+67HL6VAorneF0kKolAN8BWz6ZzgyvnU1T5JnIiVtKL0
-         5Uxmq/RKnjrKYlXQgpiGIJlPw0AI4w5nLlZCy61/09n3c30S09GROCi/7IiXIzHFJYEO
-         tWVw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZB54mSQxyq6LV94nO8wcFkwFOtUOyE6Q+zHLiaMhRjRaEXdj45RDStsYehqH6mSsqcPF8rlaI8aDKZyWEw9x3AacR4Iir
-X-Gm-Message-State: AOJu0YwPsjOrSuKS4lVZPudkbS0UUcGp4bu6A5V9eJFT0k9mRTwUWZuE
-	8qT8hdCPxB6YfVrHA0IAW2qY+oa6Lsgwns1zu94rn3NXyEKpY+XEY36n4DGRkgSBlBNXzeBgZPW
-	VgGUIs8w+IrIvbendivj+OUl1lbHpVCjadB3HgsmiWKN7KYoBIsaBqw==
-X-Received: by 2002:a2e:6804:0:b0:2d6:dba1:6d37 with SMTP id 38308e7fff4ca-2eac79c3350mr33444991fa.11.1717675317618;
-        Thu, 06 Jun 2024 05:01:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH2WITeGFROobQCTrCntY3Omdm5T0qGOCAwnVA1tvshsd8kmSQuctYu9lHc2+ZfKmWSvWTupQ==
-X-Received: by 2002:a2e:6804:0:b0:2d6:dba1:6d37 with SMTP id 38308e7fff4ca-2eac79c3350mr33444781fa.11.1717675317163;
-        Thu, 06 Jun 2024 05:01:57 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:c32:7800:5bfa:a036:83f0:f9ec? (2001-1c00-0c32-7800-5bfa-a036-83f0-f9ec.cable.dynamic.v6.ziggo.nl. [2001:1c00:c32:7800:5bfa:a036:83f0:f9ec])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57aadf9d296sm980451a12.7.2024.06.06.05.01.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Jun 2024 05:01:56 -0700 (PDT)
-Message-ID: <9d821cea-507f-4674-809c-a4640119c435@redhat.com>
-Date: Thu, 6 Jun 2024 14:01:55 +0200
+	s=arc-20240116; t=1717675789; c=relaxed/simple;
+	bh=X1m6b6lelnlNBB+WcqOljMIeenc6jY9qHrvKkYzdDQI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=tqKV1LmzTUCR77XPmizT/JkfnlwPsk7XHGFhFLgm2xE+ZpKT6m3uEOdFUAgaCgT4OqnXLA7kK6yKBHvAeDxWPeYsUzg9JY+OA949Kuk+Pnz4Z8DUYEx94eYywU28855pej9QHo+2s0pJqx7JxhULihvQr2IjOs81N9LQVjlJSmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KpmuGGf2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF0B0C4AF1D;
+	Thu,  6 Jun 2024 12:09:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717675788;
+	bh=X1m6b6lelnlNBB+WcqOljMIeenc6jY9qHrvKkYzdDQI=;
+	h=From:Subject:Date:To:Cc:From;
+	b=KpmuGGf2c+L7sS4JA9DpFtcYrsjYU3zBxW95LKTUNxYECbADNSSRgWTU6o+zm8aZ1
+	 lc/5hxEUkbtcDjiJPKd6yIM0C4iFP0YrYr3bmD42J/ivTZ498oJrTQSxZ359dd4KI5
+	 4ESwDvFxb2DIL24FjzPkJvCVTQPvap9WZjwLd1jqWHh9zzv4pJsrkGuQr+KDvlhvY5
+	 CMRjUA/28YjCy9IJrHm9Ch8XZ74dQSRNxH7Rj7fIFo/r8i+PCLjGN91sP4aGHnqYDt
+	 VKtENtoSoRd/6Fg1B7B6eRfOncHuEP3A4WacW8/yMu58ZsZak3VDSjps7rP6PuIA+s
+	 TfUbJDkPyfjVw==
+From: Roger Quadros <rogerq@kernel.org>
+Subject: [PATCH RFC net-next 0/7] net: ethernet: ti: am65-cpsw: Add multi
+ queue RX support
+Date: Thu, 06 Jun 2024 15:09:16 +0300
+Message-Id: <20240606-am65-cpsw-multi-rx-v1-0-0704b0cb6fdc@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Hans de Goede <hdegoede@redhat.com>
-Subject: Re: Hung tasks due to a AB-BA deadlock between the leds_list_lock
- rwsem and the rtnl mutex
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
- Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
- Linux LEDs <linux-leds@vger.kernel.org>,
- Heiner Kallweit <hkallweit1@gmail.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, johanneswueller@gmail.com,
- "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Genes Lists <lists@sapience.com>
-References: <9d189ec329cfe68ed68699f314e191a10d4b5eda.camel@sapience.com>
- <15a0bbd24cd01bd0b60b7047958a2e3ab556ea6f.camel@sapience.com>
- <ZliHhebSGQYZ/0S0@shell.armlinux.org.uk>
- <42d498fc-c95b-4441-b81a-aee4237d1c0d@leemhuis.info>
- <618601d8-f82a-402f-bf7f-831671d3d83f@redhat.com>
- <01fc2e30-eafe-495c-a62d-402903fd3e2a@lunn.ch>
-Content-Language: en-US, nl
-In-Reply-To: <01fc2e30-eafe-495c-a62d-402903fd3e2a@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAO2mYWYC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDMwMz3cRcM1Pd5ILict3c0pySTN2iCt20JLPkNIuU1ETT1CQloMaCotS
+ 0zAqwodFKQW7OCnmpJbp5qRUlSrG1tQBhvBqscgAAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, srk@ti.com, vigneshr@ti.com, 
+ danishanwar@ti.com, pekka Varis <p-varis@ti.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org, 
+ Roger Quadros <rogerq@kernel.org>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2148; i=rogerq@kernel.org;
+ h=from:subject:message-id; bh=X1m6b6lelnlNBB+WcqOljMIeenc6jY9qHrvKkYzdDQI=;
+ b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBmYacAETk11b9CoCcsF4T8hXWudESgQWgRlNsrs
+ ypx6I/ni0yJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZmGnAAAKCRDSWmvTvnYw
+ k/xtD/0Qg2wSJ84gHz13CawwmbxCntS8LAShukgHheXdAXEvM6620f95TSiBtpzCHjGrv9jgjoc
+ L1wEh972EsUde9YB99oiss24dqtJ2v4LLlW/gTFODCKr0V3SNmrF8Iue4nzTwYrLxVW2NQN9LC7
+ yOxl5fTkgICLfuFh1f7cv/oleMUeSKtUqpMRiWNVRhFH7Fb8F58mLvzU6ZSvKtbaWN4eDOdClRY
+ GJm9IGpC7JHgRYgkwtdEGzMGNZKu0Hs4wtt5ju75jYgrP8/6iFIUI6mqCuvdNMEezHeEpOJI8Xl
+ 9UQ/u8uaJFSncEdhxiT/tg3eg+ngaoGS7jZEmYOKQL0smqqdYyPmSgtsHZhWMhHGuJeckbG9Mn9
+ DuEzraB0aXjr7nTfJTYzYGVNS6iTouVz9/ZVH9KJmMTt5bqdvOo7av4RSZAm3PIfCZ6qtAYg/0I
+ 7+r7Mgz3qkCPJvzBZkVrMrSAQ/HmwSHtHyu3MhwZvFZlvG/4h6gYBPxnyQ7xXsNX73au737Tr7R
+ O3RbVliDR1BsCHqMrFDe3krxWxuezFwaB4+Nr9Q5OULkjs0B6Qp+utZvpMMSZ3rDF2/uL+meY8g
+ CVvGjYuO0DXurJjt6NfLU2WmIlddSWBsKTXAOD19XZYwWOfx5fWgYKZDrPHcBYJSzCTMWOj79Hv
+ kTNOdMzXeb3UwVw==
+X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
+ fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
 
-Hi all,
+Hi,
 
-On 5/31/24 2:54 PM, Andrew Lunn wrote:
->> I actually have been looking at a ledtrig-netdev lockdep warning yesterday
->> which I believe is the same thing. I'll include the lockdep trace below.
->>
->> According to lockdep there indeed is a ABBA (ish) cyclic deadlock with
->> the rtnl mutex vs led-triggers related locks. I believe that this problem
->> may be a pre-existing problem but this now actually gets hit in kernels >=
->> 6.9 because of commit 66601a29bb23 ("leds: class: If no default trigger is
->> given, make hw_control trigger the default trigger"). Before that commit
->> the "netdev" trigger would not be bound / set as phy LEDs trigger by default.
->>
->> +Cc Heiner Kallweit who authored that commit.
->>
->> The netdev trigger typically is not needed because the PHY LEDs are typically
->> under hw-control and the netdev trigger even tries to leave things that way
->> so setting it as the active trigger for the LED class device is basically
->> a no-op. I guess the goal of that commit is correctly have the triggers
->> file content reflect that the LED is controlled by a netdev and to allow
->> changing the hw-control mode without the user first needing to set netdev
->> as trigger before being able to change the mode.
-> 
-> It was not the intention that this triggers is loaded for all
-> systems.
+am65-cpsw can support up to 8 queues at Rx. So far we have
+been using only one queue (i.e. default flow) for all RX traffic.
 
-<snip>
+This series adds multi-queue support. The driver starts with
+1 RX queue by default. User can increase the RX queues via ethtool,
+e.g. 'ethtool ethx -L rx <N>'
 
-> Reverting this patch does seem like a good way forward, but i would
-> also like to give Heiner a little bit of time to see if he has a quick
-> real fix.
+The series also adds regmap and regfield support to some of the
+ALE registers. It adds Policer/Classifier registers and fields.
 
-So it has been almost a week and no reply from Heiner. Since this is
-causing real issues for users out there I think a revert of 66601a29bb23
-should be submitted to Linus and then backported to the stable kernels.
-to fix the immediate issue at hand.
+Converting the existing ALE control APIs to regfields can be a separate
+exercise.
 
-Once the underlying locking issue which is the real root cause here
-is fixed then we can reconsider re-applying 66601a29bb23.
+Some helper functions are added to read/write to the Policer/Classifier
+registers and a default Classifier setup function is added that
+routes packets based on their PCP/DSCP priority to different RX queues.
 
-Regards,
+'RFC' because I had to revert the RX coalesing patch [1] to
+apply this series. I still need to work out how this will work
+together with RX coalescing. Series is based on v6.9
 
-Hans
+[1] e4918f9d4882 ("net: ethernet: ti: am65-cpsw: add sw tx/rx irq coalescing based on hrtimers")
 
+Signed-off-by: Roger Quadros <rogerq@kernel.org>
+---
+Roger Quadros (7):
+      net: ethernet: ti: am65-cpsw: Introduce multi queue Rx
+      net: ethernet: ti: cpsw_ale: use regfields for ALE registers
+      net: ethernet: ti: cpsw_ale: use regfields for number of Entries and Policers
+      net: ethernet: ti: cpsw_ale: add Policer and Thread control register fields
+      net: ethernet: ti: cpsw_ale: add policer/classifier helpers
+      net: ethernet: ti: cpsw_ale: add helper to setup classifier defaults
+      net: ethernet: ti: am65-cpsw: setup priority to flow mapping
 
+ drivers/net/ethernet/ti/am65-cpsw-ethtool.c |   5 +-
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c    | 197 +++++++++++---------
+ drivers/net/ethernet/ti/am65-cpsw-nuss.h    |  25 ++-
+ drivers/net/ethernet/ti/cpsw_ale.c          | 273 +++++++++++++++++++++++++---
+ drivers/net/ethernet/ti/cpsw_ale.h          |  62 ++++++-
+ 5 files changed, 437 insertions(+), 125 deletions(-)
+---
+base-commit: bc4f675ad79dd6f081e36ca45b27eac8ee60e29f
+change-id: 20240606-am65-cpsw-multi-rx-fb6cf8dea5eb
 
-
+Best regards,
+-- 
+Roger Quadros <rogerq@kernel.org>
 
 
