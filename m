@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-101312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73E328FE1BB
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 10:57:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0B928FE1C0
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 10:57:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F02C6281047
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:57:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5A3A1C247F6
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:57:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2ABF145B09;
-	Thu,  6 Jun 2024 08:54:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3871494B6;
+	Thu,  6 Jun 2024 08:54:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
+Received: from mxout70.expurgate.net (mxout70.expurgate.net [91.198.224.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C303A14036B;
-	Thu,  6 Jun 2024 08:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5287E13F443;
+	Thu,  6 Jun 2024 08:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.224.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717664062; cv=none; b=ahXQhrchCJ5O1I3CWAae3TqTo4ko8XQPmWPrxqdVxBcy3tsqnsRK3RLpShZVmjEph5rv7qARnGlhS9IQQK4geUFcTvhB7a3jAgiFHmYtkK/++3ybPAkpg+DfFIool+o+dgkxveQPZS9VmQlywph4zJFI6NPmYMkq3LoQO7Z2mJc=
+	t=1717664070; cv=none; b=scou0LJ4tHgXcU97pyC4cu/WWIHFSMkeNzHKOm6KIwoolYpokZXvwsW5fYN6A2Jmjtz9FANv6Mlxoa7nFaLLGF6FIR1aXy1r88DOwUj3lvboUsPK0G0LOsiu1EIwCc4oMPPreUPbcWiIpja/QXAug+pII8KNyvTW2UzDUC7iGlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717664062; c=relaxed/simple;
-	bh=66urcvoEApM1CzR497m8zafhOLZ1hN5H/7AOLh3HeQw=;
+	s=arc-20240116; t=1717664070; c=relaxed/simple;
+	bh=r3iuti7lDwZ0oPfpVeo+fnC7tvxPcC58p6W6V9840pg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=raYrrnxAfjf3y9RZqEN7rOVIOudFzg4KmMM8cy3KF4zPLrTVy5MAFFfmjiTV1/oEskLqzjk4a2D82uwqGAXGIJdeMPBm+yrVghzn5rrvtdMA9Kiwqo81poWcJtsLs0n4q1XzoE+xT/h2VSS/sSTo/VUMwb2d/dqv25ZvxwKd4HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=194.37.255.70
+	 MIME-Version; b=DjLotNIv5kzWSDpJcUSkRD6Xgf9vMnqa8k+vcfyIk6fhv5KhjScLpKFVQv1Tawi5kYkVi3V7neTtoWDI9Ap/zptH9aA2xqK3BjOC4P5V11HX4o6QiKxWLrUtOv3wExgx/u3H3RipazSwAWq/1Me1Slq7lbrrADflwQjPfmYeQNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=91.198.224.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
 Received: from [127.0.0.1] (helo=localhost)
 	by relay.expurgate.net with smtp (Exim 4.92)
 	(envelope-from <prvs=9901b58ca3=ms@dev.tdt.de>)
-	id 1sF8t0-00C3w0-Aw; Thu, 06 Jun 2024 10:54:18 +0200
+	id 1sF8t6-002kyj-NB; Thu, 06 Jun 2024 10:54:24 +0200
 Received: from [195.243.126.94] (helo=securemail.tdt.de)
 	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ms@dev.tdt.de>)
-	id 1sF8sz-008wpl-PX; Thu, 06 Jun 2024 10:54:17 +0200
+	id 1sF8t6-00C3xA-5b; Thu, 06 Jun 2024 10:54:24 +0200
 Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id 7E49B240053;
-	Thu,  6 Jun 2024 10:54:17 +0200 (CEST)
+	by securemail.tdt.de (Postfix) with ESMTP id D9E0B240053;
+	Thu,  6 Jun 2024 10:54:23 +0200 (CEST)
 Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id 1299B240050;
-	Thu,  6 Jun 2024 10:54:17 +0200 (CEST)
+	by securemail.tdt.de (Postfix) with ESMTP id 6F4E2240050;
+	Thu,  6 Jun 2024 10:54:23 +0200 (CEST)
 Received: from mschiller1.dev.tdt.de (unknown [10.2.3.20])
-	by mail.dev.tdt.de (Postfix) with ESMTPSA id A6DD6379F6;
-	Thu,  6 Jun 2024 10:54:16 +0200 (CEST)
+	by mail.dev.tdt.de (Postfix) with ESMTPSA id 362A7379F6;
+	Thu,  6 Jun 2024 10:54:23 +0200 (CEST)
 From: Martin Schiller <ms@dev.tdt.de>
 To: martin.blumenstingl@googlemail.com,
 	hauke@hauke-m.de,
@@ -63,9 +63,9 @@ To: martin.blumenstingl@googlemail.com,
 Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 03/13] net: dsa: lantiq_gswip: Use dev_err_probe where appropriate
-Date: Thu,  6 Jun 2024 10:52:24 +0200
-Message-ID: <20240606085234.565551-4-ms@dev.tdt.de>
+Subject: [PATCH net-next 04/13] net: dsa: lantiq_gswip: Don't manually call gswip_port_enable()
+Date: Thu,  6 Jun 2024 10:52:25 +0200
+Message-ID: <20240606085234.565551-5-ms@dev.tdt.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240606085234.565551-1-ms@dev.tdt.de>
 References: <20240606085234.565551-1-ms@dev.tdt.de>
@@ -76,160 +76,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-purgate: clean
+X-purgate-ID: 151534::1717664064-7CEF3356-FB453595/0/0
 X-purgate-type: clean
-X-purgate-ID: 151534::1717664058-F1FD4148-1CAA412A/0/0
+X-purgate: clean
 
 From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 
-dev_err_probe() can be used to simplify the existing code. Also it means
-we get rid of the following warning which is seen whenever the PMAC
-(Ethernet controller which connects to GSWIP's CPU port) has not been
-probed yet:
-  gswip 1e108000.switch: dsa switch register failed: -517
+We don't need to manually call gswip_port_enable() from within
+gswip_setup() for the CPU port. DSA does this automatically for us.
 
 Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 ---
- drivers/net/dsa/lantiq_gswip.c | 53 ++++++++++++++++------------------
- 1 file changed, 25 insertions(+), 28 deletions(-)
+ drivers/net/dsa/lantiq_gswip.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/drivers/net/dsa/lantiq_gswip.c b/drivers/net/dsa/lantiq_gswi=
 p.c
-index b9c7076ce32f..fcb5929c9c88 100644
+index fcb5929c9c88..3fd5599fca52 100644
 --- a/drivers/net/dsa/lantiq_gswip.c
 +++ b/drivers/net/dsa/lantiq_gswip.c
-@@ -1931,11 +1931,9 @@ static int gswip_gphy_fw_load(struct gswip_priv *p=
-riv, struct gswip_gphy_fw *gph
- 	msleep(200);
+@@ -898,8 +898,6 @@ static int gswip_setup(struct dsa_switch *ds)
 =20
- 	ret =3D request_firmware(&fw, gphy_fw->fw_name, dev);
--	if (ret) {
--		dev_err(dev, "failed to load firmware: %s, error: %i\n",
--			gphy_fw->fw_name, ret);
--		return ret;
--	}
-+	if (ret)
-+		return dev_err_probe(dev, ret, "failed to load firmware: %s\n",
-+				     gphy_fw->fw_name);
+ 	ds->mtu_enforcement_ingress =3D true;
 =20
- 	/* GPHY cores need the firmware code in a persistent and contiguous
- 	 * memory area with a 16 kB boundary aligned start address.
-@@ -1948,9 +1946,9 @@ static int gswip_gphy_fw_load(struct gswip_priv *pr=
-iv, struct gswip_gphy_fw *gph
- 		dev_addr =3D ALIGN(dma_addr, XRX200_GPHY_FW_ALIGN);
- 		memcpy(fw_addr, fw->data, fw->size);
- 	} else {
--		dev_err(dev, "failed to alloc firmware memory\n");
- 		release_firmware(fw);
--		return -ENOMEM;
-+		return dev_err_probe(dev, -ENOMEM,
-+				     "failed to alloc firmware memory\n");
- 	}
+-	gswip_port_enable(ds, cpu_port, NULL);
+-
+ 	ds->configure_vlan_while_not_filtering =3D false;
 =20
- 	release_firmware(fw);
-@@ -1977,8 +1975,8 @@ static int gswip_gphy_fw_probe(struct gswip_priv *p=
-riv,
-=20
- 	gphy_fw->clk_gate =3D devm_clk_get(dev, gphyname);
- 	if (IS_ERR(gphy_fw->clk_gate)) {
--		dev_err(dev, "Failed to lookup gate clock\n");
--		return PTR_ERR(gphy_fw->clk_gate);
-+		return dev_err_probe(dev, PTR_ERR(gphy_fw->clk_gate),
-+				     "Failed to lookup gate clock\n");
- 	}
-=20
- 	ret =3D of_property_read_u32(gphy_fw_np, "reg", &gphy_fw->fw_addr_offse=
-t);
-@@ -1998,8 +1996,8 @@ static int gswip_gphy_fw_probe(struct gswip_priv *p=
-riv,
- 		gphy_fw->fw_name =3D priv->gphy_fw_name_cfg->ge_firmware_name;
- 		break;
- 	default:
--		dev_err(dev, "Unknown GPHY mode %d\n", gphy_mode);
--		return -EINVAL;
-+		return dev_err_probe(dev, -EINVAL, "Unknown GPHY mode %d\n",
-+				     gphy_mode);
- 	}
-=20
- 	gphy_fw->reset =3D of_reset_control_array_get_exclusive(gphy_fw_np);
-@@ -2050,8 +2048,9 @@ static int gswip_gphy_fw_list(struct gswip_priv *pr=
-iv,
- 			priv->gphy_fw_name_cfg =3D &xrx200a2x_gphy_data;
- 			break;
- 		default:
--			dev_err(dev, "unknown GSWIP version: 0x%x", version);
--			return -ENOENT;
-+			return dev_err_probe(dev, -ENOENT,
-+					     "unknown GSWIP version: 0x%x",
-+					     version);
- 		}
- 	}
-=20
-@@ -2059,10 +2058,9 @@ static int gswip_gphy_fw_list(struct gswip_priv *p=
-riv,
- 	if (match && match->data)
- 		priv->gphy_fw_name_cfg =3D match->data;
-=20
--	if (!priv->gphy_fw_name_cfg) {
--		dev_err(dev, "GPHY compatible type not supported");
--		return -ENOENT;
--	}
-+	if (!priv->gphy_fw_name_cfg)
-+		return dev_err_probe(dev, -ENOENT,
-+				     "GPHY compatible type not supported");
-=20
- 	priv->num_gphy_fw =3D of_get_available_child_count(gphy_fw_list_np);
- 	if (!priv->num_gphy_fw)
-@@ -2163,8 +2161,8 @@ static int gswip_probe(struct platform_device *pdev=
-)
- 			return -EINVAL;
- 		break;
- 	default:
--		dev_err(dev, "unknown GSWIP version: 0x%x", version);
--		return -ENOENT;
-+		return dev_err_probe(dev, -ENOENT,
-+				     "unknown GSWIP version: 0x%x", version);
- 	}
-=20
- 	/* bring up the mdio bus */
-@@ -2172,28 +2170,27 @@ static int gswip_probe(struct platform_device *pd=
-ev)
- 	if (gphy_fw_np) {
- 		err =3D gswip_gphy_fw_list(priv, gphy_fw_np, version);
- 		of_node_put(gphy_fw_np);
--		if (err) {
--			dev_err(dev, "gphy fw probe failed\n");
--			return err;
--		}
-+		if (err)
-+			return dev_err_probe(dev, err,
-+					     "gphy fw probe failed\n");
- 	}
-=20
- 	/* bring up the mdio bus */
- 	err =3D gswip_mdio(priv);
- 	if (err) {
--		dev_err(dev, "mdio probe failed\n");
-+		dev_err_probe(dev, err, "mdio probe failed\n");
- 		goto gphy_fw_remove;
- 	}
-=20
- 	err =3D dsa_register_switch(priv->ds);
- 	if (err) {
--		dev_err(dev, "dsa switch register failed: %i\n", err);
-+		dev_err_probe(dev, err, "dsa switch registration failed\n");
- 		goto gphy_fw_remove;
- 	}
- 	if (!dsa_is_cpu_port(priv->ds, priv->hw_info->cpu_port)) {
--		dev_err(dev, "wrong CPU port defined, HW only supports port: %i",
--			priv->hw_info->cpu_port);
--		err =3D -EINVAL;
-+		err =3D dev_err_probe(dev, -EINVAL,
-+				    "wrong CPU port defined, HW only supports port: %i",
-+				    priv->hw_info->cpu_port);
- 		goto disable_switch;
- 	}
-=20
+ 	return 0;
 --=20
 2.39.2
 
