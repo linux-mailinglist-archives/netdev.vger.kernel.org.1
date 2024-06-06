@@ -1,123 +1,100 @@
-Return-Path: <netdev+bounces-101487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FEC78FF0D2
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:38:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DC7E8FF12A
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:49:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C25C5285368
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:38:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C072B262EF
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:40:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46506197500;
-	Thu,  6 Jun 2024 15:38:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65AE419751B;
+	Thu,  6 Jun 2024 15:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EcrJbFlf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SEPwr7FX"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37A41974EC;
-	Thu,  6 Jun 2024 15:37:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7781667E6;
+	Thu,  6 Jun 2024 15:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717688280; cv=none; b=tHQHXGrHey7Vk8hevq0dEFxHyCJuiFF1MCimcDwieshm3DjZvdJlZRV2oEa+9vfKzrkKv2r/OpE08IKK1tHNKVSsXgnZvzELQvSPwCZ7fSkCeSQ0q+eQvQbtejZuqgIIU3rRM1GHi+FOhDOFZt5B1Gg3F1EXbm3NVj8f7TjAIcY=
+	t=1717688430; cv=none; b=T598l6q8l1XrSGpktGciCC47QSaHFNmCC5pvt2voQjT+5NZzazFki5aMckGrsdCTe0XNtqbYLGUeiXe5/mlprEDXWraP3T9O/ON4/KhuIKTYYNLsbfDhlOubwZiuo+XBAetaK25OgHr2JbhfXlTL9U45HH4pxY+3eUpZotxfchM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717688280; c=relaxed/simple;
-	bh=OO6oYJAW8pC8roD5DJjWf7tOAyCBn4io7jsoyroiUeU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DjfMX3fBMAaykgQRKJBKjfTXW9RQQJrFSoWbqWvoRiUqq1Fm4e48yoXE91m+y2N4VGMX9nujKaE6uPCHJkmEKXyl0Eqvqo73kh94YA2jDYqkEBn8eE951fAXb0+Ft8II9BJvAqaH8i7Qn4dkgcMAiJPt03CyjJZmMf1S7oRQXFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=EcrJbFlf; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=irDz+4gcio50Pp5r1x+2BPTF9AxJeW0Y2klp54euioc=; b=EcrJbFlfSdYFnCMT6xo0FK5/LT
-	43hnX1GHLeXHHe4yte581ygfmy7e/JIniI0mxEnGAUuCTMfqPcdtd45bR2wqTuN7LO0w7rBlNhO3I
-	mYcQCQO9agXrpT0s/8D0kznCGL7xm86nMtCmaUq7QLOwQZxaCD9u0eMZEVOrKUU5udxRmD7+5sdhF
-	2VFJWlP4Y2WAFUPYIxVMryvcM4mhIel6cDEKw6eOyvKyOgNK5FInhi3zx3SD7/il7CLehKp8jqp6P
-	bPn8+nE1XyyOOUahITpNCTase9sR5Y0T6XUeMXFfsYk/66DJ8Mad6SJnGqq07YZZgDZRBUZXdSIgu
-	y9ZTdHWQ==;
-Received: from [50.53.4.147] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sFFBW-0000000AKdn-41tL;
-	Thu, 06 Jun 2024 15:37:51 +0000
-Message-ID: <39bea11b-d28b-408d-ad8d-df8fe942fe4d@infradead.org>
-Date: Thu, 6 Jun 2024 08:37:49 -0700
+	s=arc-20240116; t=1717688430; c=relaxed/simple;
+	bh=bOtc9xpVQTwyQV8Z4EEgfw4s9RXLbG1zVlhp5cDRID4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RMj4Pjvci63WpelpAjHjGIwmU/Qh0FE/2oJbHKm8RKLe7wLmbyZXNu+v3KVBPp9gxecZxJ9/py1Irm69HKE8eS9QNeYF/N3LfANzu3URF/jpnvSkOg126Jsr7Mzbd/BOuL4pFje9GlDzgHj3rSz6oaUl+sIo2W3lEyO7YsryLo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SEPwr7FX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AEAEDC32781;
+	Thu,  6 Jun 2024 15:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717688429;
+	bh=bOtc9xpVQTwyQV8Z4EEgfw4s9RXLbG1zVlhp5cDRID4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SEPwr7FX0HO8InWEnb9M1muMB5t3cu9RxHr1O32+4uK1/KoTf75dY16jTu2f9kpfq
+	 xuZ7lcjYgUh2+NeszzhRILShEYeP4XOdigtWRbKe9H2jw6GFxJYGan/O50z2jSnABg
+	 2MqN5BBeYXFmIPBomJ1xHqbymRC7DkL31oCvk5HLeWP9sBgIvWF2sTTvZ2z885HJ0/
+	 iUqycHoQbMKs4rHN08ikwfO3C/sLTfnztUhwHXF3yq7OSIL3Ge6R4Pcuqx06IoVWeR
+	 BhQ04UYSwuXEC+pvC+QNzURR6Du9aUIVLo9JWZZQfT/7FVHLIKSlZUcbpZH9MqI6Vn
+	 kzq9xRgTAGjfg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 99D3BD20380;
+	Thu,  6 Jun 2024 15:40:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/8] fwctl: Basic ioctl dispatch for the character device
-To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
- Jason Gunthorpe <jgg@nvidia.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Zhu Yanjun <zyjzyj2000@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-doc@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>,
- Aron Silverton <aron.silverton@oracle.com>,
- Dan Williams <dan.j.williams@intel.com>, David Ahern <dsahern@kernel.org>,
- Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
- Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org,
- patches@lists.linux.dev, Peter Zijlstra <peterz@infradead.org>,
- Julia Lawall <julia.lawall@inria.fr>
-References: <2-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
- <6cfe00ce-1860-4aba-bcb8-54f8d365d2dc@linux.dev>
- <20240604122221.GR3884@unreal> <20240604175023.000004e2@Huawei.com>
- <20240604165844.GM19897@nvidia.com> <20240605120737.00007472@Huawei.com>
- <20240605182726.GX19897@nvidia.com> <20240606143424.00001fbd@Huawei.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20240606143424.00001fbd@Huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/3] selftests: net: lib: small fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171768842962.28804.8836141710421199665.git-patchwork-notify@kernel.org>
+Date: Thu, 06 Jun 2024 15:40:29 +0000
+References: <20240605-upstream-net-20240605-selftests-net-lib-fixes-v1-0-b3afadd368c9@kernel.org>
+In-Reply-To: <20240605-upstream-net-20240605-selftests-net-lib-fixes-v1-0-b3afadd368c9@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, petrm@nvidia.com,
+ liuhangbin@gmail.com, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org, geliang@kernel.org
 
+Hello:
 
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On 6/6/24 6:34 AM, Jonathan Cameron wrote:
-> On Wed, 5 Jun 2024 15:27:26 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Wed, 05 Jun 2024 11:21:15 +0200 you wrote:
+> While looking at using 'lib.sh' for the MPTCP selftests [1], we found
+> some small issues with 'lib.sh'. Here they are:
 > 
->> On Wed, Jun 05, 2024 at 12:07:37PM +0100, Jonathan Cameron wrote:
->>
->>>> I don't recall that dramatic conclusion in the discussion, but it does
->>>> make alot of sense to me.  
->>>
->>> I'll be less lazy (and today found the search foo to track it down).
->>>
->>> https://lore.kernel.org/all/CAHk-=wicfvWPuRVDG5R1mZSxD8Xg=-0nLOiHay2T_UJ0yDX42g@mail.gmail.com/  
->>
->> Oh that is a bit different discussion than I was thinking of.. I fixed
->> all the cases to follow this advise and checked that all the free
->> functions are proper pairs of whatever is being allocated.
+> - Patch 1: fix 'errexit' (set -e) support with busywait. 'errexit' is
+>   supported in some functions, not all. A fix for v6.8+.
 > 
-> Yes. I think we are approaching the point where maybe we need
-> a 'best practice guide' somewhere. It is sort of coding style, but
-> it is perhaps rather complex perhaps to put in that doc.
+> - Patch 2: avoid confusing error messages linked to the cleaning part
+>   when the netns setup fails. A fix for v6.8+.
 > 
-> I'm happy to help review such changes, but it would be too far down
-> my todo list if I took on writing one.
-> 
-> Maybe there is one I've missed?
+> [...]
 
+Here is the summary with links:
+  - [net,1/3] selftests: net: lib: support errexit with busywait
+    https://git.kernel.org/netdev/net/c/41b02ea4c0ad
+  - [net,2/3] selftests: net: lib: avoid error removing empty netns name
+    https://git.kernel.org/netdev/net/c/79322174bcc7
+  - [net,3/3] selftests: net: lib: set 'i' as local
+    https://git.kernel.org/netdev/net/c/84a8bc3ec225
 
-There is not a published one that I know of, other than one that I pasted into
-an email in Dec-2023, in this post:
-
-https://lore.kernel.org/lkml/34e27c57-fc18-4918-bf44-4f8a53825361@infradead.org/
-
-
+You are awesome, thank you!
 -- 
-#Randy
-https://people.kernel.org/tglx/notes-about-netiquette
-https://subspace.kernel.org/etiquette.html
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
