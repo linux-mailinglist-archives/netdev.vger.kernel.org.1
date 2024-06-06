@@ -1,208 +1,156 @@
-Return-Path: <netdev+bounces-101450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06F7A8FEF6F
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:52:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9A7C8FEF87
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:55:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4EA14B28AA5
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:52:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BABE11C20FD0
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B4B197A88;
-	Thu,  6 Jun 2024 14:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2BA195F10;
+	Thu,  6 Jun 2024 14:28:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=sapience.com header.i=@sapience.com header.b="gBXE4GSm";
-	dkim=pass (2048-bit key) header.d=sapience.com header.i=@sapience.com header.b="PXeQp2Zc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a3SKh3J0"
 X-Original-To: netdev@vger.kernel.org
-Received: from s1.sapience.com (s1.sapience.com [72.84.236.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9A9196434;
-	Thu,  6 Jun 2024 14:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=72.84.236.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717683960; cv=fail; b=U6oV3x38fnr4ThP37cJ756B9FY3zLCrU4bpG2IN9pilBJao+05mlbF1Gu0cWwvy0bzqRz7f7amh0BAWDM46pSCEKoyAU0Rxb79BFb5VlC2YzRkCRK4IEaln3pCCGNt1vZG7jnzM0BuaWEmk1J+hiakqZYaxvmjJoplnyBIJdkMc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717683960; c=relaxed/simple;
-	bh=mC5zzZnXp2icJU9R1Ck47Zcb5SXm4+9y/G4oy4zw/4o=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=iOfnxiUahlx7EltkrT9zVud5JykEyYY+pPaJQzSa2xRX4/r3EofizAPPdNXliHYe74YoAVjous4THUbbbz0/arepYSBBAqNEPyrLK5vURSPrYoU4yufKc7QB/QHhss/Srup6Ln5uPrQh89E3ISbWdzPqzA9+B6Rkm9aawoUrv4s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sapience.com; spf=pass smtp.mailfrom=sapience.com; dkim=permerror (0-bit key) header.d=sapience.com header.i=@sapience.com header.b=gBXE4GSm; dkim=pass (2048-bit key) header.d=sapience.com header.i=@sapience.com header.b=PXeQp2Zc; arc=fail smtp.client-ip=72.84.236.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sapience.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sapience.com
-Authentication-Results: dkim-srvy7; dkim=pass (Good ed25519-sha256 
-   signature) header.d=sapience.com header.i=@sapience.com 
-   header.a=ed25519-sha256; dkim=pass (Good 2048 bit rsa-sha256 signature) 
-   header.d=sapience.com header.i=@sapience.com header.a=rsa-sha256
-Received: from srv8.sapience.com (srv8.sapience.com [x.x.x.x])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (secp384r1) server-digest SHA384)
-	(No client certificate requested)
-	by s1.sapience.com (Postfix) with ESMTPS id B5F954809ED;
-	Thu, 06 Jun 2024 10:25:50 -0400 (EDT)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=sapience.com;
- i=@sapience.com; q=dns/txt; s=dk-ed25519-220413; t=1717683950;
- h=message-id : subject : from : to : cc : date : in-reply-to :
- references : content-type : mime-version : from;
- bh=rVcMiogOXnpri50rMG2S8WWLl7pdPRC8qsfAqNvpxeI=;
- b=gBXE4GSmtTnOlS1wQResZR16bqNMNofUVdIKy0cA015CUEl7vykJxVY9zZ/vBcwDLf1SK
- JlJZ5+LvlfYFDFRDA==
-ARC-Seal: i=1; a=rsa-sha256; d=sapience.com; s=arc6-rsa-220412; t=1717683950;
-	cv=none; b=jax5C4gXTO68gBl3s40G8JD+wDJ8CzyTh3YnFkYB0Ll3PGH7FuSydEK6h9x5S1cr/YFlkNjg6PT9B5xnOd58ey8US0SPtO8QyVBGoyd1jQDcVNdwtwpq1avp6IvqarTPRkFBJWsOZJvik4fwVJajqJp3y0rcaltNbTjRQs9ESkyxRx/rtsZ1JcCQS7G8NE0D0Gb7ImOAYkg9x/Z2TONTv17aMU34AQwDCuBD8iAc3JXqr2x5TLolm7pDtC0QUBZN51JbkUwDN5IZm/c3cM8CNHTlRb0od1iVktm9LWA6PHe6l3bwn+2IKo8wv7GN7y/mrSz7vVv2194Yq73fnXpp6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; d=sapience.com; s=arc6-rsa-220412;
-	t=1717683950; c=relaxed/simple;
-	bh=mC5zzZnXp2icJU9R1Ck47Zcb5SXm4+9y/G4oy4zw/4o=;
-	h=DKIM-Signature:DKIM-Signature:Message-ID:Subject:From:To:Cc:Date:
-	 In-Reply-To:References:Autocrypt:Content-Type:User-Agent:
-	 MIME-Version; b=JGvqGmU9asc8J8lwdIzlh9/zMm0yAnEpf8ctF/tqNcTcoYbdWOJczGJ1fHytycmDIask/pyBtXJOFSdoZrU8Un+bYFwuP1OaHggwBEYTZIOtM9aXHqJMwyksO53vLPMBM9bJ8w8wqVutoSYAkwtgUfisFZPLKBaxIpgj4LcfJlM6T/oJmwXFzgoHFiuxh/HFMZOXF1tnf4J9PwrE0OewGrTxtGpzEATSPAAl+lcsK2UrjJCojaJfUPjb+h9lyfn36ZggzjZZHDhY6b3S0oebXohmtUgApMlXd2G6e8k0wZ9OcIElah7ZfUIdF/qiFbO/WZgkd9gQuUhFkMQAC4M82A==
-ARC-Authentication-Results: i=1; arc-srv8.sapience.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sapience.com;
- i=@sapience.com; q=dns/txt; s=dk-rsa-220413; t=1717683950;
- h=message-id : subject : from : to : cc : date : in-reply-to :
- references : content-type : mime-version : from;
- bh=rVcMiogOXnpri50rMG2S8WWLl7pdPRC8qsfAqNvpxeI=;
- b=PXeQp2ZcP6zC6Lmhh7bHKNRDdASx4o0610zv96A9sXId+Z0wqg8mt6uRp3351jLNZ4Myr
- Apz1NRg6KjIFOfiJxiWUpgUgDmDxpMQEbtcRmenSEhbWGNqko4+F9v00c6yEGfNTdcSqxdh
- uoU/IhGCnm2vYWN9Jw3v6LxCUEY+iO+MKQoHdvROhVlDIpaNULEeBkjW6L5Ma9COR+NRFg0
- KIUvqxK+IzETZrKidd811TYV8a0sGvdIhzFJxiMb9AYiuRNDuu3Vnm1dq/OdqPR+C144kTK
- 0yoWjat66uXlMUGZy/v2M3GlCFLcUgD90pvd17UOEAUQJAx9bAMaiMdRsSLw==
-Received: from lap7.sapience.com (lap7w.sapience.com [x.x.x.x])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature ECDSA (secp384r1) server-digest SHA384)
-	(No client certificate requested)
-	by srv8.sapience.com (Postfix) with ESMTPS id 8C747280074;
-	Thu, 06 Jun 2024 10:25:50 -0400 (EDT)
-Message-ID: <d47dcc8b4e429c676db7ad6daf8024a97f725582.camel@sapience.com>
-Subject: Re: Hung tasks due to a AB-BA deadlock between the leds_list_lock
- rwsem and the rtnl mutex
-From: Genes Lists <lists@sapience.com>
-To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>, Hans de
- Goede <hdegoede@redhat.com>
-Cc: Linux regressions mailing list <regressions@lists.linux.dev>, Pavel
- Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>, Linux LEDs
- <linux-leds@vger.kernel.org>,  Heiner Kallweit <hkallweit1@gmail.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net, 
- edumazet@google.com, pabeni@redhat.com, johanneswueller@gmail.com, "Russell
- King (Oracle)" <linux@armlinux.org.uk>
-Date: Thu, 06 Jun 2024 10:25:49 -0400
-In-Reply-To: <20240606063902.776794d4@kernel.org>
-References: <9d189ec329cfe68ed68699f314e191a10d4b5eda.camel@sapience.com>
-	 <15a0bbd24cd01bd0b60b7047958a2e3ab556ea6f.camel@sapience.com>
-	 <ZliHhebSGQYZ/0S0@shell.armlinux.org.uk>
-	 <42d498fc-c95b-4441-b81a-aee4237d1c0d@leemhuis.info>
-	 <618601d8-f82a-402f-bf7f-831671d3d83f@redhat.com>
-	 <01fc2e30-eafe-495c-a62d-402903fd3e2a@lunn.ch>
-	 <9d821cea-507f-4674-809c-a4640119c435@redhat.com>
-	 <c912d1f7-7039-4f55-91ac-028a906c1387@lunn.ch>
-	 <20240606063902.776794d4@kernel.org>
-Autocrypt: addr=lists@sapience.com; prefer-encrypt=mutual;
- keydata=mDMEXSY9GRYJKwYBBAHaRw8BAQdAwzFfmp+m0ldl2vgmbtPC/XN7/k5vscpADq3BmRy5R
- 7y0LU1haWwgTGlzdHMgKEwwIDIwMTkwNzEwKSA8bGlzdHNAc2FwaWVuY2UuY29tPoiWBBMWCAA+Ah
- sBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEE5YMoUxcbEgQOvOMKc+dlCv6PxQAFAmPJfooFCRl
- vRHEACgkQc+dlCv6PxQAc/wEA/Dbmg91DOGXll0OW1GKaZQGQDl7fHibMOKRGC6X/emoA+wQR5FIz
- BnV/PrXbao8LS/h0tSkeXgPsYxrzvfZInIAC
-Content-Type: multipart/signed; micalg="pgp-sha384";
-	protocol="application/pgp-signature"; boundary="=-dCYAK6fKUZBbP2EluySH"
-User-Agent: Evolution 3.52.2 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A96E2A1D8;
+	Thu,  6 Jun 2024 14:28:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717684107; cv=none; b=Mcn7G5IhDxflEm1tcFSm+6kSFca+ALfvLGzzlzGM1tMmE8QE8Z5zUHEiqYLfQK1Sgu1aw//mttSY90FSik9OJ25WSRnnLdk9ugyZl3b1OJMSdGI/HyXDTp8I4uD8OddSBpkYXzPQrRSPH4lYgEKdnJS7rKox1cb2w6qKVJhj88M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717684107; c=relaxed/simple;
+	bh=hQBzhNObWU8aRXHk0bfsSKO8Qrhp01azpV/J00FvZQY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=tx6MPcEKEtc5jYpbLs71UjOusLSph/lXTUj5+kFcTv9WLBk9HIMXkx7CFrSBHT5BaPH9Q1EO4oPeGK9YB9m8pNg38bjF7F5dl2yhZL7QAvwQaaEaGBEgfqBSECWHRkw61b+bS815sSxysklScrXQFNDi0jvy7cqapEc1l7AXXxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a3SKh3J0; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6ad8344825cso3718206d6.0;
+        Thu, 06 Jun 2024 07:28:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717684105; x=1718288905; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2zfB3MoLrV5D7vjDIplljlPhLNJrctBwaNyhRn/7mkE=;
+        b=a3SKh3J0XkfPi4W2Xbyi1M1F3c5g8LBGN9Ap9Ue0o5ZzqgGbEZ/LQOtMJnBD3a88K+
+         9CvfItYuYZpaDW92b2ZNtBxEqdomPn1gC1UNbhbOEqmhpB/3mtJjuNQ5wNnUE0Dy0iiI
+         bYaiNnlepsReCf8BXv/IDqEKOul1nZgbR+Ly9JRWxCfunqQrfGiXGWgJp9+Y7hlUxC0N
+         vRY5GTnPrRS9X6x7BTcicaRCB0LktqYUaGNjTNt8rPozTBjr939im0fDrEBb1fbzkCI5
+         YDHGojzYsGk86TAkxO1rrBnUSFZsZCbodH6oHcimscpmyvUYwnK09LlpBV13zUlx3rcg
+         3YCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717684105; x=1718288905;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=2zfB3MoLrV5D7vjDIplljlPhLNJrctBwaNyhRn/7mkE=;
+        b=qKWmTwVewehbnMk/yNIUdQLlAAaL+2C0q9n9VuGViNkUdTdebPK+Ey+Gf0Tr872RNj
+         tbYuI77V36aXDPS3xy+2mUZPPm4guF+fQtKsbsAKirH6HSUMSasqrz8Cf/YhYqw8h2dO
+         GkBzxPeCLFd+zmHXxRunKnuAOJExHs4P5nb4jr8cSo4xzgCzE7A2w3AdPWeXfWocDRQl
+         XTqtSoNktUsAQZj9/qlTFeSjZN0Ib2mnNQgmRTXyK0ZsEICd3S3fRwf0dfvhn2ayW8NS
+         TKLiiVCC/Px5rNWWU4AOxFnJCwNA5n+/57rSTp4b9ucwXFLfIHhZcIVinxw8b26N7rJX
+         Nkwg==
+X-Forwarded-Encrypted: i=1; AJvYcCVwT8QorwL3pGQFQbA+Hiz0NiUoKMTfEMHRjRjccai49iTrO92jG12xVTwzrnUWPZUw+SlJ6OehzIqeXUIEN+9Zm8H1wP86oMBvJGl2blYxEZ99QMwlNL3V+iAC2SuSDWnHz1AB0rF0
+X-Gm-Message-State: AOJu0YyAepXSW6q07mr+tT97ycnWJQdiJGmeIQAmyWySsXPZ1T8ULg8f
+	dTsnybaxI7AS08vs8CNga/+MJyCIdYB3yQQ7xDTnL6Ia6ybuDaQy
+X-Google-Smtp-Source: AGHT+IEXjo2vdWuwKlB+RtehkJG3gyQ6cMFReM6S8gAFWkAZEAVLG91FarcqvdqseJhCRbxDpzxs9Q==
+X-Received: by 2002:a0c:f20a:0:b0:6af:c6bc:bdb5 with SMTP id 6a1803df08f44-6b030a96fbemr61872486d6.44.1717684105030;
+        Thu, 06 Jun 2024 07:28:25 -0700 (PDT)
+Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b04f6bbd06sm6817856d6.48.2024.06.06.07.28.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jun 2024 07:28:24 -0700 (PDT)
+Date: Thu, 06 Jun 2024 10:28:24 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Florian Westphal <fw@strlen.de>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Florian Westphal <fw@strlen.de>, 
+ Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Christoph Paasch <cpaasch@apple.com>, 
+ Netfilter <netfilter-devel@vger.kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ daniel@iogearbox.net, 
+ willemb@google.com
+Message-ID: <6661c788553a4_37c46c294fc@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240606141516.GB9890@breakpoint.cc>
+References: <20240604120311.27300-1-fw@strlen.de>
+ <FF8A506F-6F0F-440E-9F52-B27D05731B77@apple.com>
+ <20240605181450.GA7176@breakpoint.cc>
+ <ZmCwlbF8BvLGNgRM@calendula>
+ <20240605190833.GB7176@breakpoint.cc>
+ <20240606092620.GC4688@breakpoint.cc>
+ <20240606130457.GA9890@breakpoint.cc>
+ <6661c313cf1fe_37b6f32942e@willemb.c.googlers.com.notmuch>
+ <20240606141516.GB9890@breakpoint.cc>
+Subject: Re: [PATCH nf] netfilter: nf_reject: init skb->dev for reset packet
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
+Florian Westphal wrote:
+> Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
+> > Florian Westphal wrote:
+> > > Florian Westphal <fw@strlen.de> wrote:
+> > > > ... doesn't solve the nft_hash.c issue (which calls _symmetric version, and
+> > > > that uses flow_key definiton that isn't exported outside flow_dissector.o.
+> > > 
+> > > and here is the diff that would pass net for _symmetric, not too
+> > > horrible I think.
+> > > 
+> > > With that and the copypaste of skb_get_hash into nf_trace infra
+> > > netfilter can still pass skbs to the flow dissector with NULL skb->sk,dev
+> > > but the WARN would no longer trigger as struct net is non-null.
+> > 
+> > Thanks for coding this up Florian. This overall looks good to me.
+> 
+> Thanks for reviewing.
+> 
+> > One suggested change is to introduce a three underscore variant (yes
+> > really) ___skb_get_hash_symmetric that takes the optional net, and
+> > leave the existing callers of the two underscore version as is.
+> 
+> Okay, that reduces the code churn.
+> 
+> > The copypaste probably belongs with the other flow dissector wrappers
+> > in sk_buff.h.
+> 
+> skb_get_hash(skb);
+> __skb_get_hash_symmetric(skb);
+> ____skb_get_hash_symmetric(net, skb);
+> 
+> I named the copypasta as nf_skb_get_hash. If placed in sk_buff.h:
+> net_get_hash_net()?
+> skb_get_hash()?
 
---=-dCYAK6fKUZBbP2EluySH
-Content-Type: multipart/alternative; boundary="=-4jp6JUlsMS0E8HXI4hn3"
+Still passing an skb too, so skb_get_hash_net()?
+ 
+> And if either of that exists, maybe then use
+> skb_get_hash_symmetric_net(net, skb)
 
---=-4jp6JUlsMS0E8HXI4hn3
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+If symmetric is equally good for nft, that would be preferable, as it
+avoids the extra function. But I suppose it aliases the two flow
+directions, which may be exactly what you don't want?
 
-On Thu, 2024-06-06 at 06:39 -0700, Jakub Kicinski wrote:
-> On Thu, 6 Jun 2024 15:12:54 +0200 Andrew Lunn wrote:
-> > > So it has been almost a week and no reply from Heiner. Since this
-> > > is
-> > > causing real issues for users out there I think a revert of
-> > > 66601a29bb23
-> > > should be submitted to Linus and then backported to the stable
-> > > kernels.
-> > > to fix the immediate issue at hand.=C2=A0=20
-> >=20
-> > Agreed.
->=20
-> Please submit..
+> or similar?
+> 
+> (There is no skb_get_hash_symmetric, no idea why it
+>  uses __prefix).
 
-I assume this deadlock is unrelated to the filesystem stalls reported
-here:
+Perhaps because it is more closely analogous to __skb_get_hash, than
+to skb_get_hash.
 
-=C2=A0
-=C2=A0https://lore.kernel.org/lkml/da8710eddca32677cf3c195000416121045eb811=
-.camel@sapience.com/
-
-but thought it best to ask.
-
-thank you.
-
---=20
-Gene
-
-
---=-4jp6JUlsMS0E8HXI4hn3
-Content-Type: text/html; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-
-<html><head><style>pre,code,address {
-  margin: 0px;
-}
-h1,h2,h3,h4,h5,h6 {
-  margin-top: 0.2em;
-  margin-bottom: 0.2em;
-}
-ol,ul {
-  margin-top: 0em;
-  margin-bottom: 0em;
-}
-blockquote {
-  margin-top: 0em;
-  margin-bottom: 0em;
-}
-</style></head><body><div>On Thu, 2024-06-06 at 06:39 -0700, Jakub Kicinski=
- wrote:</div><blockquote type=3D"cite" style=3D"margin:0 0 0 .8ex; border-l=
-eft:2px #729fcf solid;padding-left:1ex"><div>On Thu, 6 Jun 2024 15:12:54 +0=
-200 Andrew Lunn wrote:<br></div><blockquote type=3D"cite" style=3D"margin:0=
- 0 0 .8ex; border-left:2px #729fcf solid;padding-left:1ex"><blockquote type=
-=3D"cite" style=3D"margin:0 0 0 .8ex; border-left:2px #729fcf solid;padding=
--left:1ex"><div>So it has been almost a week and no reply from Heiner. Sinc=
-e this is<br></div><div>causing real issues for users out there I think a r=
-evert of 66601a29bb23<br></div><div>should be submitted to Linus and then b=
-ackported to the stable kernels.<br></div><div>to fix the immediate issue a=
-t hand.&nbsp; <br></div></blockquote><div><br></div><div>Agreed.<br></div><=
-/blockquote><div><br></div><div>Please submit..<br></div></blockquote><div>=
-<br></div><div>I assume this deadlock is unrelated to the filesystem stalls=
- reported here:</div><div><br></div><div>&nbsp; &nbsp;<a href=3D"https://lo=
-re.kernel.org/lkml/da8710eddca32677cf3c195000416121045eb811.camel@sapience.=
-com/">https://lore.kernel.org/lkml/da8710eddca32677cf3c195000416121045eb811=
-.camel@sapience.com/</a></div><div><br></div><div>but thought it best to as=
-k.</div><div><br></div><div>thank you.</div><div><br></div><div><span><pre>=
--- <br></pre><div><span style=3D"background-color: inherit;">Gene</span></d=
-iv><div><br></div></span></div></body></html>
-
---=-4jp6JUlsMS0E8HXI4hn3--
-
---=-dCYAK6fKUZBbP2EluySH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYJAB0WIQRByXNdQO2KDRJ2iXo5BdB0L6Ze2wUCZmHG7QAKCRA5BdB0L6Ze
-25htAP0UvLjW80ObvibjGLL4OKpLvqrtJkkWUoyEsPV7K9YkCQD9FsS4R5lHcbRQ
-YKutNthSR6D0eGBP41WSQeY4zXTntQs=
-=y8qy
------END PGP SIGNATURE-----
-
---=-dCYAK6fKUZBbP2EluySH--
 
