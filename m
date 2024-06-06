@@ -1,113 +1,127 @@
-Return-Path: <netdev+bounces-101264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46A4E8FDE66
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 07:57:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B31388FDE7B
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:05:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B35C1C23EFC
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 05:57:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 564A3286C3A
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 06:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A8C03A1A8;
-	Thu,  6 Jun 2024 05:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60EA44087C;
+	Thu,  6 Jun 2024 06:05:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lgC91G2C"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ue2S92EQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5C628376;
-	Thu,  6 Jun 2024 05:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B238F3EA71
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 06:05:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717653423; cv=none; b=nDotJJ6jDf7GNhMpfjM78aJbE22mJC5jYyggDs8mSWsr9FLcJjlg3RhMXHEJWUZZR50sGMwjnsi1StrrIVzNzAgW9e4dlIu+jytwKfVxoUplS5ba0xk5kpr2OqI8jkKBCYI8zGIoxL+UK+/w3BJDZRMo5WL9eLq1knLLYvJkizk=
+	t=1717653936; cv=none; b=p2fIxZ9SPXND4sz5iM6uXM4VsMnwx0GMUQksaq4OPuPzN0nymt/WwIkzrpecJB4zgFeGLcdonmO37VjHHN0kOxvtGJjweKJ9twhmIYuONl2RlY+LfUDHUHa8B+ToyhogZQfSUL/J90T8BiMXmigyc1XFU929m6JuVP3bNGISK/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717653423; c=relaxed/simple;
-	bh=/t3HMt63rItxc4gjrIQ2pDjEkGz9nwhITQHO3zrMkGc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NGiBSfVI1V3FyldkGzOb83U0EEROhMyZQpEeZxWJX2h2fbHfu0yfgJdYdAIFe1FtSQ9NdI96sxVbmUdGkilsCzbnZfS7fFnyLmEsXxClzlnOyke7NUAPh3pJ71V79cOPVXo+ITh7qzhAzzaV+5y6aUVcIyFWYeJ5IoLBCpt+Ffo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lgC91G2C; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-35e573c0334so951701f8f.1;
-        Wed, 05 Jun 2024 22:57:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717653420; x=1718258220; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=67dVbFD/2DQF9usMWt43fKDwppvEBt20ndKl7bU0GFw=;
-        b=lgC91G2Cg7YWV9X2MYIWinhCJPCYTebabnCpiFaWxkcGDO7midUsv2j/UO4AFzvUIq
-         5DuOVGGPxjwEtCSubpqbP4mr6naoCe8zspeVaaeL6Sqdk3J1n63ITapFKBQZ8V1RLHwZ
-         2sJuPmH95VcOHfNcCjDYKTOrG/H4XrXx9DIYqLQgB5lta9DSee5ijcf1aOIkbAAH7oVj
-         /CfZLD3gSRM7w8BH6gB9iSjrdZAfrlwESoP5KvJUvntmKA4gSJCFOKMPEOw+M5IOnwCT
-         GN4MGnw1wqa3S6jslYczIoD2BEb1zL7fkAzaRcJF62Dr0Md4gVvKMmmqmVSTfvPmtp25
-         8SrQ==
+	s=arc-20240116; t=1717653936; c=relaxed/simple;
+	bh=xZKIrW8/SuE4qqD2uv3M3ACaJ92yjjULx+qrf+XjCxk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r+bf9IOWn9O4hc8gvPBEbtIVqqVupqwKMpQAbrlzF4RRbRyo9EmScVheDv8hkmH/2kSNnYqV/aDor8xYWZYJDpHZDRRqa5+o9gF+7pwd4fFFXO8IpD8wMku8kM/U87NEfso4XCjodDQ6m5ehzBfOD/Rno3uIW30xARADIyvQ+XM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ue2S92EQ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717653933;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TsrZUlxApod7nrUSmaJxIfXQuT4xkPv6XR1BlDjdQ14=;
+	b=Ue2S92EQBRfIuETzqCWxWXtyPS0KE2ZwifRY1u+/8uJWANHCZMhrD1V2OnNXFT0NxAET28
+	lzbR3mYDplDvujWSd/VsXUmeomK+JjC16JBuBZ/TbeHauGMmICbtI35iIFxDFvD28S3X7u
+	lM4eNVUKck470IAfvuZa4qtJE3wN/Ew=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-654-JxwKxuTLP0qfMzMhTP3Gog-1; Thu, 06 Jun 2024 02:05:27 -0400
+X-MC-Unique: JxwKxuTLP0qfMzMhTP3Gog-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a6b7bd3e92eso128445866b.1
+        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 23:05:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717653420; x=1718258220;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=67dVbFD/2DQF9usMWt43fKDwppvEBt20ndKl7bU0GFw=;
-        b=DD0mGrYk722cDaSzOSAwO1n7+Ywhxolt+7uOHvRFWFHY2LYZmntLtmqNqrLoIIm+XS
-         zN9ggZ3/h/HzWVy+UXcHAvaFs7awPkXx/Efv+42t6CPyguIZWJCjdxE/fQ1b8cOj7uZb
-         ArOEe4tbQ7H6kx6HUkoKCpp7zRF3u7yq3EM/CximEKi7SN7pCn6+oSi6AaArIGSjgSo+
-         nY3+77vmYqDqeAbAJrfK9RLvpi+CfKMyPv6tPrSu1HhAmrypLYrPmlRnKBN0b9Nz2ffJ
-         I1hLvnPkEq2mlyvuSJr/XyvpaJPjxO4KQNSHpfyWJdSETJhF9j43fReFrR6UlnrIlIJk
-         mxmw==
-X-Forwarded-Encrypted: i=1; AJvYcCVqtZUqPkA0RhnbMAUI23CKXtwBAarqqIgIhAQq/sqhHDozxhjugVdSKvHjQxx0X4KvBpQD2NyIDypsHgaegkI9lYMzNFUw2Ig0ELKZxi/KI+EJT5V/jn3D42IFEW9lO+ckrO2o
-X-Gm-Message-State: AOJu0YzncbuPzLcE9zwiEewbY/cSrP3krrEXOY63aAqAIWK2bJVoT72+
-	Me7M7KKzBQ8l3KSLQj+vGeOodauLunUxgIHfvJjtcWn2O4uAwDzdhODWgpqkmx76eA52jJTqupD
-	k0lhRLbd/ZGSo3jY8JYtOdDDjbeU=
-X-Google-Smtp-Source: AGHT+IFZepq3sEeQBCy5kZ48sBUfqe66PfQjpcYWZc5zSawvex/dg7mlw4aaY3fS0I9FAoKhuEtTLa3Rp4N1ejUG898=
-X-Received: by 2002:a5d:58ce:0:b0:35e:61b9:3037 with SMTP id
- ffacd0b85a97d-35ef0c7281amr1250796f8f.7.1717653420153; Wed, 05 Jun 2024
- 22:57:00 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1717653926; x=1718258726;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TsrZUlxApod7nrUSmaJxIfXQuT4xkPv6XR1BlDjdQ14=;
+        b=k4SAdCRMdsp7ZacARZGp2vbQXPbk4QQZElek+H+J3ZduMYeSnFEKOp/krclgKQi2W9
+         cL5M26JATLFA25HQyHyL+ZBsJQOnkQZq9o110yh7EBGnJfnI41gFRrODH0qomLGuernA
+         jEVePAKY1B+hFusfzLh44Nl+pe9zFu1g990O+VmXjBWQ5l/AHKHELwj0dNb+xyVv1Fo+
+         bdmQejBspo3jO2Z7+ZMS9XGRRC1XatEa2nBr+V2I0Ft3VeCJa0WAS9xAqcX/8MszVPix
+         RG4dUpjAeFLd6zzdS37wfcSmg9nd+EZwnYA9wDfJdWxRNV6XnWddOU1PnZhaIJLyLtpk
+         RtcA==
+X-Forwarded-Encrypted: i=1; AJvYcCXqdPgY3Hwz41SJXer62RJYwSJyuzo6paHG6g475kSAgcYljuXJGZnNqveZ6klaQnLL4d/4UR1rkOhyyNxE6NTavAYFv1BH
+X-Gm-Message-State: AOJu0YwYUZE0IoQopEKm9GRzA/81QQWgPr5yMLqg3ub1mFwee5Zws10B
+	gVGUef6FyIjY7cCEwBURpENIt6NpPYue3bdvOw37EnSm8FM9uvKNFqCsB6yScq/tf3oU44GXIr7
+	aL1aVg2gOQRe0y5ySzPxQuiaJVXShdT9pwPnjci4bi1J0lcTQl57Ytg==
+X-Received: by 2002:a17:906:b198:b0:a59:9f88:f1f1 with SMTP id a640c23a62f3a-a6c762bcb66mr147656066b.19.1717653925938;
+        Wed, 05 Jun 2024 23:05:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHK8HAAcmA9u09zvEwVLZTGKDryhlokys9J5BLeWli7B/moSHAoVGjthnoy2bJ5A/eL6Fnn6Q==
+X-Received: by 2002:a17:906:b198:b0:a59:9f88:f1f1 with SMTP id a640c23a62f3a-a6c762bcb66mr147653066b.19.1717653925439;
+        Wed, 05 Jun 2024 23:05:25 -0700 (PDT)
+Received: from redhat.com ([2.55.59.85])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6c806ec823sm44887766b.101.2024.06.05.23.05.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jun 2024 23:05:24 -0700 (PDT)
+Date: Thu, 6 Jun 2024 02:05:20 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Jason Xing <kerneljasonxing@gmail.com>,
+	Heng Qi <hengqi@linux.alibaba.com>, Jiri Pirko <jiri@resnulli.us>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
+	virtualization@lists.linux.dev, ast@kernel.org,
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+	netdev@vger.kernel.org
+Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
+Message-ID: <20240606020248-mutt-send-email-mst@kernel.org>
+References: <20240509114615.317450-1-jiri@resnulli.us>
+ <1715325076.4219763-2-hengqi@linux.alibaba.com>
+ <ZktGj4nDU4X0Lxtx@nanopsycho.orion>
+ <ZmBMa7Am3LIYQw1x@nanopsycho.orion>
+ <1717587768.1588957-5-hengqi@linux.alibaba.com>
+ <CACGkMEsiosWxNCS=Jpb-H14b=-26UzPjw+sD3H21FwVh2ZTF5g@mail.gmail.com>
+ <CAL+tcoB8y6ctDO4Ph8WM-19qAoNMcYTVWLKRqsJYYrmW9q41=w@mail.gmail.com>
+ <CACGkMEvh6nKfFMp5fb6tbijrs88vgSofCNkwN1UzKHnf6RqURg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240602173247.12651-1-eladwf@gmail.com> <20240605194305.194286d8@kernel.org>
-In-Reply-To: <20240605194305.194286d8@kernel.org>
-From: Elad Yifee <eladwf@gmail.com>
-Date: Thu, 6 Jun 2024 08:56:49 +0300
-Message-ID: <CA+SN3soxVEUUWZHMFX7OeMj56wEw7p9Q=eXXNJwiYz6Bh=pb7Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v5] net: ethernet: mtk_eth_soc: ppe: add support
- for multiple PPEs
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, 
-	Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, Daniel Golle <daniel@makrotopia.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACGkMEvh6nKfFMp5fb6tbijrs88vgSofCNkwN1UzKHnf6RqURg@mail.gmail.com>
 
-On Thu, Jun 6, 2024 at 5:43=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Sun,  2 Jun 2024 20:32:40 +0300 Elad Yifee wrote:
-> >  struct mtk_mac {
-> >       int                             id;
-> > +     u8                              ppe_idx;
->
-> I thought Daniel's suggestion was to remove this field.
-> I don't see your rebuke to that point or how it's addressed in the code.
-> Also it would be good if you CCed Daniel, always CC people who gave you
-> feedback.
-I talked to Daniel in private, I should have done that publicly.
-Relying solely on ifindex%ppe_num could potentially lead to more than
-one GMAC assigned to the same PPE.
-Since the ingress device could be a non mtk type, I added that sanity check=
-.
-I think the additional field is a small price to keep things clear and simp=
-le.
-(sorry for the previous HTML tags)
+On Thu, Jun 06, 2024 at 12:25:15PM +0800, Jason Wang wrote:
+> > If the codes of orphan mode don't have an impact when you enable
+> > napi_tx mode, please keep it if you can.
+> 
+> For example, it complicates BQL implementation.
+> 
+> Thanks
+
+I very much doubt sending interrupts to a VM can
+*on all benchmarks* compete with not sending interrupts.
+
+So yea, it's great if napi and hardware are advanced enough
+that the default can be changed, since this way virtio
+is closer to a regular nic and more or standard
+infrastructure can be used.
+
+But dropping it will go against *no breaking userspace* rule.
+Complicated? Tough.
+
+-- 
+MST
+
 
