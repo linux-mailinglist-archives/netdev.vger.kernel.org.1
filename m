@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-101415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B59418FE7A6
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:23:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6EF28FE7AE
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:26:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52C13B259C4
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 13:23:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D5A3287294
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 13:26:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF08195F10;
-	Thu,  6 Jun 2024 13:23:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDB0A195FCB;
+	Thu,  6 Jun 2024 13:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rKN9pVNQ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BEQ2Sg2h"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62408193080;
-	Thu,  6 Jun 2024 13:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201B4FC02;
+	Thu,  6 Jun 2024 13:26:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717680193; cv=none; b=GUoSJGKi1RzNcsms0Doj5rALqpl7n1iquR+uhigyyudrWAHNbwrCzy6ZypNZJUqp98TPoDfLhGJWlGvqKG498VukXQonO9w5ilETh4f5hNt9okwOUSzSl/i2j9e+q//5+xx+G+60Vw1o2fobRI5zBbLWcZEqbtzZLMLfPccSh8s=
+	t=1717680368; cv=none; b=mo3pgwldfb5GXUUe0+B5lOTTp2Tc1HyAChKY+yUxg0hIqVLytqcJ+bMpKzNGQr8KXnDxfey60e2XKB0bS3NlJr0u4LaiEzUuMSFwXAJFq94Q+a0cUbKkXdcKVST90PLGYIINyirS6/edOVoaWTa//jQyqG4YzNEXBwn0gG7jrLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717680193; c=relaxed/simple;
-	bh=00drqhebaHWCjS05Lbg4tmTQZPkOKshoCUutLfgZstY=;
+	s=arc-20240116; t=1717680368; c=relaxed/simple;
+	bh=Da94MbDvCzudQyDztnqyQOKY9skofvJFvAJNp1KTIcI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fl/JQA+QLJ7szGxKiI/A5/Jf/3MnNJTdfmW8mUrQNYVDSi74iRf4KQa6+TrIj7ng5bcgifdZNjyX59A/AW6XnfQaU2+spm1fpLTRe8YqA6xOjiJ8bw9jEwj3JTumlfG8baF72WTlUnzRLhYa2He+FnsrLbrVXe1no8Xi5NgpL3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rKN9pVNQ; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=gieaXsHP8HeHZ2Del1BwTAvXF15KAZ9DkHmDNOgwd3De+Yiig384+w/kuyPFDs5BE5xUSMOPyrW6WXJwdJegZDLMHAR8MEsJRANbWVaqzX/8qzoPv7NIEwZjHRGhrahVz9pSsAXBgOJ1j204dPpwHZrSAfELGYH4Kt+ths2OHcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BEQ2Sg2h; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=mhwoRV2RXqsiDHFrRm5Df2FNUcBIA3rXGBCyxZFRSdk=; b=rKN9pVNQpy9JdaYYfUdasjoWj3
-	B4SlMa28Ql1LIrX6cdnDqFHeEz7t9uskCc5VMipW6S/Ew/0fXrQgwQyEqXCyjMIXi3RVHn+84EBKC
-	IEZqxuQQolOWc5oxUnPCZnwB0DSZx6j8r9dKOX4PCCk6ie+N9QTgrE9k5RqKSsC3xGdE=;
+	bh=QehpudYNwQn/+EF5t8WXc8vQI3VYnM/EWDpwkUDEZHI=; b=BEQ2Sg2hRkMyI04nmbrlG0HbLo
+	QeO7iB/STgiK0VKfWXCGl2sd4tRbx5MAgMZ9LWf63lpyYEFkYk4g6YyOsCBRaL6wqcc/iMAGBoUZ0
+	+cN1km/L3X73Hqjk5o0FlagS1JwYR7HdhDrOZmTBtipc3cdJhEStoQJjYmllVZH48tYg=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sFD4x-00H1ED-R9; Thu, 06 Jun 2024 15:22:55 +0200
-Date: Thu, 6 Jun 2024 15:22:55 +0200
+	id 1sFD7o-00H1FE-DV; Thu, 06 Jun 2024 15:25:52 +0200
+Date: Thu, 6 Jun 2024 15:25:52 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Swathi K S <swathi.ks@samsung.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -54,17 +54,15 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	pankaj.dubey@samsung.com, ravi.patel@samsung.com,
 	netdev@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	'Jayati Sahu' <jayati.sahu@samsung.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>
-Subject: Re: [PATCH v3 3/4] arm64: dts: fsd: Add Ethernet support for FSYS0
- Block of FSD SoC
-Message-ID: <14887409-4c5e-4589-b188-564df42924c8@lunn.ch>
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v3 1/4] dt-bindings: net: Add FSD EQoS device tree
+ bindings
+Message-ID: <22eae086-0f77-4df7-9d70-e7249d67b106@lunn.ch>
 References: <20230814112539.70453-1-sriranjani.p@samsung.com>
- <CGME20230814112617epcas5p1bc094e9cf29da5dd7d1706e3f509ac28@epcas5p1.samsung.com>
- <20230814112539.70453-4-sriranjani.p@samsung.com>
- <323e6d03-f205-4078-a722-dd67c66e7805@lunn.ch>
- <000001dab7f2$18a499a0$49edcce0$@samsung.com>
+ <CGME20230814112605epcas5p31aca7b23e70e8d93df11414291f7ce66@epcas5p3.samsung.com>
+ <20230814112539.70453-2-sriranjani.p@samsung.com>
+ <4e745c2a-57bd-45da-8bd2-ee1cb2bab84f@lunn.ch>
+ <000201dab7f2$1c8d4580$55a7d080$@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,35 +71,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <000001dab7f2$18a499a0$49edcce0$@samsung.com>
+In-Reply-To: <000201dab7f2$1c8d4580$55a7d080$@samsung.com>
 
-> > > +&ethernet_0 {
-> > > +	status = "okay";
-> > > +
-> > > +	fixed-link {
-> > > +		speed = <1000>;
-> > > +		full-duplex;
-> > > +	};
-> > > +};
+> > > +  fsd-rx-clock-skew:
+> > > +    $ref: /schemas/types.yaml#/definitions/phandle-array
+> > > +    items:
+> > > +      - items:
+> > > +          - description: phandle to the syscon node
+> > > +          - description: offset of the control register
+> > > +    description:
+> > > +      Should be phandle/offset pair. The phandle to the syscon node.
 > > 
-> > A fixed link on its own is pretty unusual. Normally it is combined with an
-> > Ethernet switch. What is the link peer here?
+> > What clock are you skew-ing here? And why?
 > 
-> It is a direct connection to the Ethernet switch managed by an external
-> management unit.
+> As per customer's requirement, we need 2ns delay in fsys block both in TX
+> and RX path.
 
-Ah, interesting. This is the third example of this in about a
-month. Take a look at the Realtek and TI work in this area.
+Lots of people get RGMII delays wrong. Please look back at the mailing
+list where there is plenty of discussion about this. I don't want to
+have to repeat myself yet again...
 
-So, i will ask the same questions i put to Realtek and TI. Does Linux
-know about the switch in any way? Can it manage the switch, other than
-SNMP, HTTP from user space? Does it know about the state of the ports,
-etc?
-
-If you say this is just a colocated management switch, which Linux is
-not managing in any way, that is O.K. If you have Linux involved in
-some way, please join the discussion with TI about adding a new model
-for semi-autonomous switches.
-
-   Andrew
+     Andrew
 
