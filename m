@@ -1,108 +1,289 @@
-Return-Path: <netdev+bounces-101572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 575E98FF7AA
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 00:31:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23A058FF7AB
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 00:31:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9802285BE7
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 22:31:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C67702860B1
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 22:31:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A46744315F;
-	Thu,  6 Jun 2024 22:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214B97347F;
+	Thu,  6 Jun 2024 22:31:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LW7EWKCs"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="WEje9+0H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44EEF199A2
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 22:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE4CD53C;
+	Thu,  6 Jun 2024 22:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717713093; cv=none; b=KDprDFokDzuRzVzDNAZSsZl4xMpjL1UyTlIVQrZqQio7cvbcxGsSu7hv+R0Bo3Kq6aqZIz4+jo9qMsPMFahwPE9+aN5kcOush/npIZozjpzKbrqY5mL8BKxT/HD/V+W14g/inInhqxzamYck/ONBauv5keWYrdR4vnjwlzvkcnQ=
+	t=1717713114; cv=none; b=no3WuPVmlE5Zqgr3fjFhPhRdyqVk8q2TqaLiRDMj1vcU27y80iXM+dM0V7FAJSlCqnBqCi9IBHj/shr1njX/kyrTbxJ6FiphCc9tnksOVsL4l5ipTre2t8Slk6/nx9uqYaTiMGrV0JdsuXu7N2TN16RrlFAtvA5Jo34+YuHxIaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717713093; c=relaxed/simple;
-	bh=pMSRuVThWHHV/uvUGar3ef8M7/Bg77IqjLFUMCAvToI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QOgu3U9PoOJknw2QC4cLae06TpiZEGYePxDqroOAKC9zF9846BKiMxhC4IcRHT63zsZSOCEfNWKSKcCbzKPUUJppAJ80h7pTBZ8PUipVtfKFcJlTDKY0CzvDf+1ZV/bYgqp8ZE280Nrz1dDL0o7gzj43BUbcKRMNjF/IbmnhO0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LW7EWKCs; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3737dc4a669so6390455ab.0
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 15:31:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717713091; x=1718317891; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YCraPdOIhbqRWY0MP8+IVkSVbvl6gxt5Tm2c065L3C8=;
-        b=LW7EWKCs6Koxv9taemmvBj9rx/th0ZmVI9TWJDJ/8WOOVKJ9CgpAjwDwBqXv0fDXkb
-         L3m+eqdZ94Qda7TZ80Ho0tTzEaDL/suULp+L20IJ0cndj0jL9bVYauKLNqd2Us/RJCVK
-         yIT4nTADAGpT0YJ5J0ZZDZZS2SObWaVKXtf5E+fSKslrlJavD6b/1BVhybLV3ybHOgZp
-         qD9s9DsOVmYR6RE4zs1dGbIlQ/fFouoeAIAgcxyOWOYOISuPKq3p8Y7jReOLn7MX0bRo
-         zUPMUpIkgP30fq8/zsexCMCWuKQcxzfDCsSji4neF9nO6eHkBDlvcghUVPS7rbxl3aYd
-         NLaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717713091; x=1718317891;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YCraPdOIhbqRWY0MP8+IVkSVbvl6gxt5Tm2c065L3C8=;
-        b=LKXuvybX3kHatGhkpFR3SJxY2v3CqUm4EieCf89cDJfSSEXGwaxDh3ler2H+/ZORuU
-         7HUXQSU6iwPAJIr+BsGZ2jIjEK3hSZRM9+IuOxzFcgsieKXQvBe3SIqGgKpJJ+77yX6e
-         4BOmDX+4XTTX7B2CIw4Syrkl5Z690TKIDgkkspmuYBDaJx3u2+ZF6AlAzUnx/0Yyveei
-         5+lUsmRK9IfLYV1iHexoh6ZNP1TKK1x/tUpVxi8BmTehVQpGQ0Hxq4VvQZ51xVhKogWR
-         3FMnMByafx0MiZcOUbvWY0bzi2xJmC5s+IlgegapkCr/b1mJdFU+fD6ALt2/uXdSYgda
-         AI8w==
-X-Gm-Message-State: AOJu0YwoASp6eaX9ibtoEfjwQQ/eX0DOmRNUBpcLORpbrxwLHZsZ0a4/
-	3p19LwPiLzmoyXuitF6Y1OO+nBKZNC+ILqcA90YN+9g5XabB3G1l
-X-Google-Smtp-Source: AGHT+IGaMnV5KBibNhpcxzQwcj92OzQkBMQBcQhY9PGaKE5uJASbnXzd+SX2GGsYW8kj4O74aPhNfA==
-X-Received: by 2002:a92:d787:0:b0:374:93d5:e370 with SMTP id e9e14a558f8ab-375803a4e39mr9536315ab.23.1717713091300;
-        Thu, 06 Jun 2024 15:31:31 -0700 (PDT)
-Received: from ?IPV6:2601:282:1e02:1040:25ed:a50f:20b0:1405? ([2601:282:1e02:1040:25ed:a50f:20b0:1405])
-        by smtp.googlemail.com with ESMTPSA id e9e14a558f8ab-374bc12e5c8sm5033465ab.9.2024.06.06.15.31.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Jun 2024 15:31:30 -0700 (PDT)
-Message-ID: <49b29dbe-5a33-4b4b-9d48-91d12a425249@gmail.com>
-Date: Thu, 6 Jun 2024 16:31:29 -0600
+	s=arc-20240116; t=1717713114; c=relaxed/simple;
+	bh=ZAAHVF1zE5e16uz24lH0zQpf9wUpPOSxiAgHqnFh7Ro=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ohDeF2rV/EINN4RJb1/6BPPnXAPeh0XUT/xXGn/OXw76Ed4juxoqATyZdFZoMnPMMgj/EIkFWgSoOwykUpcTIachtJV7Du4y5nZccNEIUux52pM8Ok9NlCl+DNCm5EGoWMHpM1AzNop4skVjZ9aKbWp1IO4Y7O6rsih74S6/MZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=WEje9+0H; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=gYBbA5pYnYQ9t9RhSbMMXOUIhHRwfzMtNUg/R/4nd8E=; b=WEje9+0H6VaqresXe4a4BiuB7r
+	vHU3g+S92IKkjeUIjDXzYD19qeJJMDLvscSaBYf4+m4cgHp/JXNdL5kMI3clWb+LQKRHDBgn5KxUG
+	4bJgAG4cKYi0Y2pyLe7wqk1Ct8nKQjyPVmOAGa3wrUXEhRnUQYGfyehoKvFoTjiQ2IKgBCV0cRdxY
+	k93RBn7/uiVWJs+dJ+sXtRSa9uHfyY999gbnwCFfwG7s587XO/1We9W8EumI51g3I6qRAe1MA3EZT
+	z++WgoQ61l6K/XASQwMAr1AVWEnIuTj69cQhlJb/8vRctKGCcn/sqJ+nWZhhr15zXA/s7Pqia2TqD
+	AC1ZBIfA==;
+Received: from 32.249.197.178.dynamic.dsl-lte-bonding.lssmb00p-msn.res.cust.swisscom.ch ([178.197.249.32] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sFLe7-000Cxj-CQ; Fri, 07 Jun 2024 00:31:47 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf-next 2024-06-06
+Date: Fri,  7 Jun 2024 00:31:46 +0200
+Message-Id: <20240606223146.23020-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/2] rtnetlink: move rtnl_lock handling out of
- af_netlink
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- jiri@resnulli.us
-References: <20240606192906.1941189-1-kuba@kernel.org>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <20240606192906.1941189-1-kuba@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27298/Thu Jun  6 10:30:08 2024)
 
-On 6/6/24 1:29 PM, Jakub Kicinski wrote:
-> With the changes done in commit 5b4b62a169e1 ("rtnetlink: make
-> the "split" NLM_DONE handling generic") we can also move the
-> rtnl locking out of af_netlink.
-> 
-> Jakub Kicinski (2):
->   rtnetlink: move rtnl_lock handling out of af_netlink
->   net: netlink: remove the cb_mutex "injection" from netlink core
-> 
->  include/linux/netlink.h  |  1 -
->  net/core/rtnetlink.c     |  9 +++++++--
->  net/netlink/af_netlink.c | 20 +++-----------------
->  3 files changed, 10 insertions(+), 20 deletions(-)
-> 
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-both look good to me
-Reviewed-by: David Ahern <dsahern@kernel.org>
+The following pull-request contains BPF updates for your *net-next* tree.
 
+We've added 54 non-merge commits during the last 10 day(s) which contain
+a total of 50 files changed, 1887 insertions(+), 527 deletions(-).
+
+The main changes are:
+
+1) Add a user space notification mechanism via epoll when a struct_ops object
+   is getting detached/unregistered, from Kui-Feng Lee.
+
+2) Big batch of BPF selftest refactoring for sockmap and BPF congctl tests,
+   from Geliang Tang.
+
+3) Add BTF field (type and string fields, right now) iterator support to libbpf
+   instead of using existing callback-based approaches, from Andrii Nakryiko.
+
+4) Extend BPF selftests for the latter with a new btf_field_iter selftest,
+   from Alan Maguire.
+
+5) Add new kfuncs for a generic, open-coded bits iterator, from Yafang Shao.
+
+6) Fix BPF selftests' kallsyms_find() helper under kernels configured with
+   CONFIG_LTO_CLANG_THIN, from Yonghong Song.
+
+7) Remove a bunch of unused structs in BPF selftests, from David Alan Gilbert.
+
+8) Convert test_sockmap section names into names understood by libbpf so it
+   can deduce program type and attach type, from Jakub Sitnicki.
+
+9) Extend libbpf with the ability to configure log verbosity via LIBBPF_LOG_LEVEL
+   environment variable, from Mykyta Yatsenko.
+
+10) Fix BPF selftests with regards to bpf_cookie and find_vma flakiness
+    in nested VMs, from Song Liu.
+
+11) Extend riscv32/64 JITs to introduce shift/add helpers to generate Zba
+    optimization, from Xiao Wang.
+
+12) Enable BPF programs to declare arrays and struct fields with kptr,
+    bpf_rb_root, and bpf_list_head, from Kui-Feng Lee.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Alan Maguire, Alexei Starovoitov, Björn Töpel, Eduard Zingerman, Jakub 
+Sitnicki, Jiri Olsa, John Fastabend, Lennart Poettering, Quentin Monnet
+
+----------------------------------------------------------------
+
+The following changes since commit 4b3529edbb8ff069d762c6947e055e10c1748170:
+
+  Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next (2024-05-28 07:27:29 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+for you to fetch changes up to f85af9d955ac9601174e1c64f4b3308c1cae4a7e:
+
+  selftests/bpf: Drop useless arguments of do_test in bpf_tcp_ca (2024-06-06 23:04:06 +0200)
+
+----------------------------------------------------------------
+bpf-next-for-netdev
+
+----------------------------------------------------------------
+Alan Maguire (1):
+      selftests/bpf: Add btf_field_iter selftests
+
+Alexei Starovoitov (1):
+      Merge branch 'enable-bpf-programs-to-declare-arrays-of-kptr-bpf_rb_root-and-bpf_list_head'
+
+Andrii Nakryiko (7):
+      Merge branch 'bpf-add-a-generic-bits-iterator'
+      libbpf: keep FD_CLOEXEC flag when dup()'ing FD
+      libbpf: Add BTF field iterator
+      libbpf: Make use of BTF field iterator in BPF linker code
+      libbpf: Make use of BTF field iterator in BTF handling code
+      bpftool: Use BTF field iterator in btfgen
+      libbpf: Remove callback-based type/string BTF field visitor helpers
+
+Dr. David Alan Gilbert (3):
+      selftests/bpf: Remove unused struct 'scale_test_def'
+      selftests/bpf: Remove unused 'key_t' structs
+      selftests/bpf: Remove unused struct 'libcap'
+
+Geliang Tang (18):
+      selftests/bpf: Drop struct post_socket_opts
+      selftests/bpf: Add start_server_str helper
+      selftests/bpf: Use post_socket_cb in connect_to_fd_opts
+      selftests/bpf: Use post_socket_cb in start_server_str
+      selftests/bpf: Use start_server_str in do_test in bpf_tcp_ca
+      selftests/bpf: Fix tx_prog_fd values in test_sockmap
+      selftests/bpf: Drop duplicate definition of i in test_sockmap
+      selftests/bpf: Use bpf_link attachments in test_sockmap
+      selftests/bpf: Replace tx_prog_fd with tx_prog in test_sockmap
+      selftests/bpf: Drop prog_fd array in test_sockmap
+      selftests/bpf: Fix size of map_fd in test_sockmap
+      selftests/bpf: Check length of recv in test_sockmap
+      selftests/bpf: Drop duplicate bpf_map_lookup_elem in test_sockmap
+      selftests/bpf: Use connect_to_fd_opts in do_test in bpf_tcp_ca
+      selftests/bpf: Add start_test helper in bpf_tcp_ca
+      selftests/bpf: Use start_test in test_dctcp_fallback in bpf_tcp_ca
+      selftests/bpf: Use start_test in test_dctcp in bpf_tcp_ca
+      selftests/bpf: Drop useless arguments of do_test in bpf_tcp_ca
+
+Jakub Sitnicki (1):
+      selftests/bpf: use section names understood by libbpf in test_sockmap
+
+Jeff Johnson (1):
+      test_bpf: Add missing MODULE_DESCRIPTION()
+
+Kui-Feng Lee (15):
+      bpf: pass bpf_struct_ops_link to callbacks in bpf_struct_ops.
+      bpf: enable detaching links of struct_ops objects.
+      bpf: support epoll from bpf struct_ops links.
+      bpf: export bpf_link_inc_not_zero.
+      selftests/bpf: test struct_ops with epoll
+      bpftool: Change pid_iter.bpf.c to comply with the change of bpf_link_fops.
+      bpf: Remove unnecessary checks on the offset of btf_field.
+      bpf: Remove unnecessary call to btf_field_type_size().
+      bpf: refactor btf_find_struct_field() and btf_find_datasec_var().
+      bpf: create repeated fields for arrays.
+      bpf: look into the types of the fields of a struct type recursively.
+      bpf: limit the number of levels of a nested struct type.
+      selftests/bpf: Test kptr arrays and kptrs in nested struct fields.
+      selftests/bpf: Test global bpf_rb_root arrays and fields in nested struct types.
+      selftests/bpf: Test global bpf_list_head arrays.
+
+Martin KaFai Lau (2):
+      Merge branch 'use network helpers, part 5'
+      Merge branch 'Notify user space when a struct_ops object is detached/unregistered'
+
+Mykyta Yatsenko (2):
+      libbpf: Configure log verbosity with env variable
+      libbpf: Auto-attach struct_ops BPF maps in BPF skeleton
+
+Song Liu (1):
+      selftests/bpf: Fix bpf_cookie and find_vma in nested VM
+
+Swan Beaujard (1):
+      bpftool: Fix typo in MAX_NUM_METRICS macro name
+
+Xiao Wang (1):
+      riscv, bpf: Introduce shift add helper with Zba optimization
+
+Yafang Shao (2):
+      bpf: Add bits iterator
+      selftests/bpf: Add selftest for bits iter
+
+Yonghong Song (2):
+      selftests/bpf: Ignore .llvm.<hash> suffix in kallsyms_find()
+      selftests/bpf: Fix send_signal test with nested CONFIG_PARAVIRT
+
+ Documentation/bpf/libbpf/libbpf_overview.rst       |   8 +
+ arch/riscv/net/bpf_jit.h                           |  33 +++
+ arch/riscv/net/bpf_jit_comp32.c                    |   3 +-
+ arch/riscv/net/bpf_jit_comp64.c                    |   9 +-
+ include/linux/bpf.h                                |  13 +-
+ kernel/bpf/bpf_struct_ops.c                        |  75 ++++-
+ kernel/bpf/btf.c                                   | 310 ++++++++++++-------
+ kernel/bpf/helpers.c                               | 119 ++++++++
+ kernel/bpf/syscall.c                               |  34 ++-
+ kernel/bpf/verifier.c                              |   4 +-
+ lib/test_bpf.c                                     |   1 +
+ net/bpf/bpf_dummy_struct_ops.c                     |   4 +-
+ net/ipv4/bpf_tcp_ca.c                              |   6 +-
+ tools/bpf/bpftool/gen.c                            |  52 +++-
+ tools/bpf/bpftool/skeleton/pid_iter.bpf.c          |   7 +-
+ tools/bpf/bpftool/skeleton/profiler.bpf.c          |  14 +-
+ tools/lib/bpf/btf.c                                | 328 ++++++++++++---------
+ tools/lib/bpf/libbpf.c                             |  89 +++++-
+ tools/lib/bpf/libbpf.h                             |  23 +-
+ tools/lib/bpf/libbpf.map                           |   2 +
+ tools/lib/bpf/libbpf_internal.h                    |  36 ++-
+ tools/lib/bpf/linker.c                             |  58 ++--
+ .../bpf/bpf_test_no_cfi/bpf_test_no_cfi.c          |   4 +-
+ .../selftests/bpf/bpf_testmod/bpf_testmod.c        |   6 +-
+ tools/testing/selftests/bpf/network_helpers.c      |  32 +-
+ tools/testing/selftests/bpf/network_helpers.h      |   8 +-
+ .../testing/selftests/bpf/prog_tests/bpf_cookie.c  |   2 +-
+ .../testing/selftests/bpf/prog_tests/bpf_tcp_ca.c  | 196 ++++++++----
+ .../selftests/bpf/prog_tests/bpf_verif_scale.c     |   6 -
+ .../selftests/bpf/prog_tests/btf_field_iter.c      | 161 ++++++++++
+ tools/testing/selftests/bpf/prog_tests/cpumask.c   |   5 +
+ tools/testing/selftests/bpf/prog_tests/find_vma.c  |   4 +-
+ .../testing/selftests/bpf/prog_tests/linked_list.c |  12 +
+ tools/testing/selftests/bpf/prog_tests/rbtree.c    |  47 +++
+ .../testing/selftests/bpf/prog_tests/send_signal.c |   3 +-
+ .../selftests/bpf/prog_tests/sockopt_inherit.c     |   2 +-
+ .../bpf/prog_tests/test_struct_ops_module.c        |  57 ++++
+ tools/testing/selftests/bpf/prog_tests/verifier.c  |   2 +
+ .../selftests/bpf/progs/bpf_iter_bpf_array_map.c   |   6 -
+ .../bpf/progs/bpf_iter_bpf_percpu_array_map.c      |   6 -
+ .../testing/selftests/bpf/progs/cpumask_success.c  | 171 +++++++++++
+ tools/testing/selftests/bpf/progs/linked_list.c    |  42 +++
+ tools/testing/selftests/bpf/progs/rbtree.c         |  77 +++++
+ .../selftests/bpf/progs/struct_ops_detach.c        |  10 +
+ .../selftests/bpf/progs/test_sockmap_kern.h        |  20 +-
+ .../selftests/bpf/progs/verifier_bits_iter.c       | 153 ++++++++++
+ tools/testing/selftests/bpf/test_sockmap.c         | 132 ++++-----
+ .../selftests/bpf/test_tcp_check_syncookie_user.c  |   4 +-
+ tools/testing/selftests/bpf/test_verifier.c        |   5 -
+ tools/testing/selftests/bpf/trace_helpers.c        |  13 +-
+ 50 files changed, 1887 insertions(+), 527 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/btf_field_iter.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_detach.c
+ create mode 100644 tools/testing/selftests/bpf/progs/verifier_bits_iter.c
 
