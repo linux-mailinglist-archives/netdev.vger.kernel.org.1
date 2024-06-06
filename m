@@ -1,269 +1,275 @@
-Return-Path: <netdev+bounces-101439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CAC88FE902
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:12:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F8458FE9D7
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:16:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 297751C25222
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:12:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEE401F2713F
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:16:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6343E196C92;
-	Thu,  6 Jun 2024 14:09:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146A8198E63;
+	Thu,  6 Jun 2024 14:11:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rf5wYjdR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ceBZO1xW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A037119644F;
-	Thu,  6 Jun 2024 14:09:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A21519B5B0;
+	Thu,  6 Jun 2024 14:11:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717682968; cv=none; b=qDRNA2F3yz7Od1TD0xjAinrVcCVKMgEwfgHKV5vnlV26vrEmwil5c1MZ4RVVpHXSrYk6b0mUrVFYDA3MWd1qK+TiOLhZFfQsU3Z7c13gu20OcSq+cQKaoPpZEltKFRBKrmwdpERNWWnNrrVg8tENSRZNp8DI5E1M1kK57kMOHwo=
+	t=1717683072; cv=none; b=icv+JIMx7oQWDUb1L9v/4IEkr1KmZJG2TeKO2WhXfjV8ibNcq71Pvw/hk3lLaOCQeCxhpuxiaIu6O4q1gQdIpqIUPog+DlOoMvpkHo4xGd0JJ+bZhLy7SjBdw9u/yYFLOnkwdNvLPi/uRjl+LB0ZlYTK3athUHEDK1AilOvep8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717682968; c=relaxed/simple;
-	bh=ptVna0Kj72D8l1Q0rFXRV9/q/BSGoKZcuRnmKhVbcfU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=X6ApYvQBwSF2prEzpm2Z6onfdKlSOzTljW+Q8IyzQOquVVeS5jSXIjals5BfPIZO5PX8ZFHRHgrCrbXP3ozeXRY0FexAYZF/xzyICB7vyp6iFRCrwwKvA0ot2J0KMctEoDZYJ8H6+6ToG6Aemj2i6mq31JGOfwdqsh2dgT1PgWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rf5wYjdR; arc=none smtp.client-ip=209.85.160.175
+	s=arc-20240116; t=1717683072; c=relaxed/simple;
+	bh=fcBQjYioVUltQGvCZYRZa8rLmNoWhnsqh/6yL9atVp8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cBV/BHw290J2twNN70jX1NcKB10JkOotXVAdnwdf8/ULc4b0jPT46gKuRaVkJeEr2r0GrTrbTVdZipeExf20JZjEsVH7yggDs96mqbce00Yc9R/kH1v656whK1s1V6s2EvWiERTFzcvY4W27r9NKzxFndtEcYG3LpoUQK1lyf1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ceBZO1xW; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4402602a116so5165981cf.0;
-        Thu, 06 Jun 2024 07:09:25 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1f63642ab8aso9428395ad.3;
+        Thu, 06 Jun 2024 07:11:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717682965; x=1718287765; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1717683070; x=1718287870; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4akmxwipQbmjTYb7w37FoCOnBT3ApDVnDQZCkAgV2sQ=;
-        b=Rf5wYjdRgtIZmkzI18eAm6G731mk4EJdETT/XQWR1pCcz6dFsmipF040hSExSURMye
-         9LPthuospEi2a4oylE27yq5R9FSRzPoYUhChIKaKoB4jhXOL3qlKehO1f8nYMVuer2lj
-         IiSfiKauJkPbJ+rUvZ20d/OcklCOPW8qQZSic2qoAtvZx2pM6ler4omjUkCkO66cg7Ir
-         NGz3i3y9VFMcxtWGSeZW0x4O9ggXGK+MNuweI/2KLjqW4IbiD81LEF1J7GWG7NOGSPxx
-         LeI5JpbyHiHLu0fVpymLbE8M+OeZZKWjTt2n9BpcPJpmJ2gPOV/U/0M87Raq0oazZfPG
-         VJ1Q==
+        bh=kR3SI/2MLA0reUuRphqbW0P2EIeFEX7Al2MMDtpbjzY=;
+        b=ceBZO1xW4C1ea7aNw0k3euxlOvK7h74PQ87Eb/4sO6viGOsyvVAQsRMq8yuu4UTDkX
+         gtepZci1Oj4j6j8UIjzieyzjq8gwKcKdd4cyQheiYleDVrSqjOYw5+cveXIvQc+0gjOk
+         pBn9QtkwVtvwWfn+d/HKoHFt589DLPz5hwNpy5kBAudGDQDAVzk2hMNq08DUHA0l0Z5f
+         l1HAQum6cEOw01gxqzBaNjXPJrTFz1KevTq/C0frVtpluQqHOm/XZvRHkdtf1oRYf1bm
+         pQgvw3m56tF0M3VnUoc9spgE3d17WbWpNcQfy/q/fn2Qr/wzkqF4fGzaNIcp+mrfrEdl
+         +JBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717682965; x=1718287765;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=4akmxwipQbmjTYb7w37FoCOnBT3ApDVnDQZCkAgV2sQ=;
-        b=mLevPmzYbH06GyDx2hwv+MrDRow7xyVXEntkKtrdABf9JqEHErMvZhaoKdrXiACEou
-         sRoMxvskhIB/0icrpNQB95RvVayccK5Iy902IUtTyoQkh4vWlmKyMeq+WOOZh71jlX/m
-         jUliguUXlqbuGBhoz3469pdnnC1lAkydAcAEMjt8qA8now8QZlwg4AUaLAV+1W/qtNhx
-         1/mNbzoYfIVGE3gxIj0z3pJnHe6Xj7UpFJH7wFauQTKwwvZYF7ZqH7Mjj10ap7FTY1Xy
-         u6dShfoCakfUMJmcnY3wtYdnIQGdWzOkb3qiZCHxmrKlaiOoos1wJB/mjUM5KfqVqypw
-         ANWw==
-X-Forwarded-Encrypted: i=1; AJvYcCUhVVWbJUqN/iygFOz3iQsRLK6VExpj76zVOR4I0oNDZRI1vG1Tu1FjooOQtV/hNPTStGMQZkhsYHZijC7FqMTmyPSqB6SYvlUtxjCklPcDoijXbU5Kq7s6nrXFpg46I2SyFz7Jcem1
-X-Gm-Message-State: AOJu0YzD8RxBSVJ04K3P719QhZ9C/9xgXxGWOkZ90ELZ9XLAIRe+kQCw
-	6R7eCw7B9Zq2NZ9C8yFVSOVKQVzPqinxq+Kjbbl/ZdqDVeq4Izwu
-X-Google-Smtp-Source: AGHT+IEpGNoktN9UVnmRRZAFwqC/QqHyWhW8pj+SXXP9rtDMq8tSsKcDTB56epxTjXXTy3vXgDjjWg==
-X-Received: by 2002:a05:622a:40b:b0:43e:e6e:21dc with SMTP id d75a77b69052e-4402b5f6cbbmr61447431cf.12.1717682964555;
-        Thu, 06 Jun 2024 07:09:24 -0700 (PDT)
-Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79539c26295sm9745185a.8.2024.06.06.07.09.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jun 2024 07:09:24 -0700 (PDT)
-Date: Thu, 06 Jun 2024 10:09:23 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Florian Westphal <fw@strlen.de>, 
- Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, 
- Christoph Paasch <cpaasch@apple.com>, 
- Netfilter <netfilter-devel@vger.kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- daniel@iogearbox.net, 
- willemb@google.com
-Message-ID: <6661c313cf1fe_37b6f32942e@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240606130457.GA9890@breakpoint.cc>
-References: <20240604120311.27300-1-fw@strlen.de>
- <FF8A506F-6F0F-440E-9F52-B27D05731B77@apple.com>
- <20240605181450.GA7176@breakpoint.cc>
- <ZmCwlbF8BvLGNgRM@calendula>
- <20240605190833.GB7176@breakpoint.cc>
- <20240606092620.GC4688@breakpoint.cc>
- <20240606130457.GA9890@breakpoint.cc>
-Subject: Re: [PATCH nf] netfilter: nf_reject: init skb->dev for reset packet
+        d=1e100.net; s=20230601; t=1717683070; x=1718287870;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kR3SI/2MLA0reUuRphqbW0P2EIeFEX7Al2MMDtpbjzY=;
+        b=qDjrMnKFkCkEqGFmScYzvv26gvctQSNh0HpCUcblLPj8PNa2/gcALo/tXBE79EMPLi
+         K9CllFbL9odjxsjcM8GSRgbW1xaYnnXFS8JFPB3oXArzcHBK8xD5FZqJh2HjCWzRhTSg
+         NKGpicq8aVSJYMntD7AtjpNmFb71yy39kGGMqxjHUzSa1gvFkTosT/NPlbQuzNINtMQ8
+         s60tat1/XIpt0I9ehJbrUJVqCrfibsA69xjv0UeIk94sZGoYG/5eWEFf17dmNb9RDXHF
+         nUzpkMIEM0ZQFYQTaEK5vpOBcUKssmlordr+y2AHM3GpII1zFrHtn7u+dlWzwefZ3Qe3
+         NF+A==
+X-Forwarded-Encrypted: i=1; AJvYcCU8HYMmNfVnToS5i80giECOga+RkGDMh7fonWBdXjN4JZKHtOSAwHr8OMQObL+Um6/wL3rqoCAhmRMt/CCCCFZIEPECKTDyYpi9MpCfeBcFpSg/N10xBaNpsFoodxMdisBxu/sy7DVGNV3iHgaIcx4VpdOK/EaqIZKwBaJ3Fi0x9YbTX1cJlnZlSexOppaNZUjN1GgigU+JuxIhPVt4FqepeO3Z
+X-Gm-Message-State: AOJu0YxBxADGVIH+XtzbBC5WkfZB5tYQ/nHOme5T1kRf4+jAS4liIypp
+	UG5ljOOf10M4qWj3w/JtC2ZnvquY1m7f5FiZNGnd/S2GoWdwmx8641pZ0KSDaIlINDEWWtp0ZQr
+	sLnlyvnwNP0HQU6UbqAcMeg7F0MQ=
+X-Google-Smtp-Source: AGHT+IENoX1Lgfbq+QM42oL4DR+kk/tMO4gvcmL0LAo6bkbFqSRadnxhf6EfvMJ1fy/O3tEd+g1vZ1ytDUG+ig1f23E=
+X-Received: by 2002:a17:903:2303:b0:1f6:3d8:cc09 with SMTP id
+ d9443c01a7336-1f6a5a5c7e0mr68656045ad.45.1717683069513; Thu, 06 Jun 2024
+ 07:11:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20240606-tcp_ao-tracepoints-v3-0-13621988c09f@gmail.com>
+ <20240606-tcp_ao-tracepoints-v3-3-13621988c09f@gmail.com> <92c1cb53-ec2b-4153-b97d-c2b8c0fdfaf2@kernel.org>
+In-Reply-To: <92c1cb53-ec2b-4153-b97d-c2b8c0fdfaf2@kernel.org>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Thu, 6 Jun 2024 15:10:55 +0100
+Message-ID: <CAJwJo6akA4Oi2457qP-cK=Gi1hVLThwye6odgb7OuJZk1f119g@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 3/6] net/tcp: Move tcp_inbound_hash() from headers
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Mohammad Nassiri <mnassiri@ciena.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Florian Westphal wrote:
-> Florian Westphal <fw@strlen.de> wrote:
-> > ... doesn't solve the nft_hash.c issue (which calls _symmetric version, and
-> > that uses flow_key definiton that isn't exported outside flow_dissector.o.
-> 
-> and here is the diff that would pass net for _symmetric, not too
-> horrible I think.
-> 
-> With that and the copypaste of skb_get_hash into nf_trace infra
-> netfilter can still pass skbs to the flow dissector with NULL skb->sk,dev
-> but the WARN would no longer trigger as struct net is non-null.
+Hi Matthieu,
 
-Thanks for coding this up Florian. This overall looks good to me.
+[re-sending as replying from mobile phone never works in plain text]
 
-One suggested change is to introduce a three underscore variant (yes
-really) ___skb_get_hash_symmetric that takes the optional net, and
-leave the existing callers of the two underscore version as is.
+On Thu, 6 Jun 2024 at 10:12, Matthieu Baerts <matttbe@kernel.org> wrote:
+>
+> Hi Dmitry,
+>
+> On 06/06/2024 02:58, Dmitry Safonov via B4 Relay wrote:
+> > From: Dmitry Safonov <0x7f454c46@gmail.com>
+> >
+> > Two reasons:
+> > 1. It's grown up enough
+> > 2. In order to not do header spaghetti by including
+> >    <trace/events/tcp.h>, which is necessary for TCP tracepoints.
+> >
+> > While at it, unexport and make static tcp_inbound_ao_hash().
+>
+> Thank you for working on this.
+>  > Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
+> > ---
+> >  include/net/tcp.h | 78 +++--------------------------------------------=
+--------
+> >  net/ipv4/tcp.c    | 66 ++++++++++++++++++++++++++++++++++++++++++++--
+> >  2 files changed, 68 insertions(+), 76 deletions(-)
+> >
+> > diff --git a/include/net/tcp.h b/include/net/tcp.h
+> > index e5427b05129b..2aac11e7e1cc 100644
+> > --- a/include/net/tcp.h
+> > +++ b/include/net/tcp.h
+> > @@ -1863,12 +1863,6 @@ tcp_md5_do_lookup_any_l3index(const struct sock =
+*sk,
+> >       return __tcp_md5_do_lookup(sk, 0, addr, family, true);
+> >  }
+> >
+> > -enum skb_drop_reason
+> > -tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
+> > -                  const void *saddr, const void *daddr,
+> > -                  int family, int l3index, const __u8 *hash_location);
+> > -
+> > -
+> >  #define tcp_twsk_md5_key(twsk)       ((twsk)->tw_md5_key)
+> >  #else
+> >  static inline struct tcp_md5sig_key *
+> > @@ -1885,13 +1879,6 @@ tcp_md5_do_lookup_any_l3index(const struct sock =
+*sk,
+> >       return NULL;
+> >  }
+> >
+> > -static inline enum skb_drop_reason
+> > -tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
+> > -                  const void *saddr, const void *daddr,
+> > -                  int family, int l3index, const __u8 *hash_location)
+> > -{
+> > -     return SKB_NOT_DROPPED_YET;
+> > -}
+>
+> It looks like this no-op is still needed, please see below.
+>
+> >  #define tcp_twsk_md5_key(twsk)       NULL
+> >  #endif
+> >
+>
+> (...)
+>
+> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> > index fa43aaacd92b..80ed5c099f11 100644
+> > --- a/net/ipv4/tcp.c
+> > +++ b/net/ipv4/tcp.c
+> > @@ -4456,7 +4456,7 @@ int tcp_md5_hash_key(struct tcp_sigpool *hp,
+> >  EXPORT_SYMBOL(tcp_md5_hash_key);
+> >
+> >  /* Called with rcu_read_lock() */
+> > -enum skb_drop_reason
+> > +static enum skb_drop_reason
+> >  tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
+> >                    const void *saddr, const void *daddr,
+> >                    int family, int l3index, const __u8 *hash_location)
+> > @@ -4510,10 +4510,72 @@ tcp_inbound_md5_hash(const struct sock *sk, con=
+st struct sk_buff *skb,
+> >       }
+> >       return SKB_NOT_DROPPED_YET;
+> >  }
+> > -EXPORT_SYMBOL(tcp_inbound_md5_hash);
+> >
+> >  #endif
+> >
+> > +/* Called with rcu_read_lock() */
+> > +enum skb_drop_reason
+> > +tcp_inbound_hash(struct sock *sk, const struct request_sock *req,
+> > +              const struct sk_buff *skb,
+> > +              const void *saddr, const void *daddr,
+> > +              int family, int dif, int sdif)
+> > +{
+> > +     const struct tcphdr *th =3D tcp_hdr(skb);
+> > +     const struct tcp_ao_hdr *aoh;
+> > +     const __u8 *md5_location;
+> > +     int l3index;
+> > +
+> > +     /* Invalid option or two times meet any of auth options */
+> > +     if (tcp_parse_auth_options(th, &md5_location, &aoh)) {
+> > +             tcp_hash_fail("TCP segment has incorrect auth options set=
+",
+> > +                           family, skb, "");
+> > +             return SKB_DROP_REASON_TCP_AUTH_HDR;
+> > +     }
+> > +
+> > +     if (req) {
+> > +             if (tcp_rsk_used_ao(req) !=3D !!aoh) {
+> > +                     NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOBAD);
+> > +                     tcp_hash_fail("TCP connection can't start/end usi=
+ng TCP-AO",
+> > +                                   family, skb, "%s",
+> > +                                   !aoh ? "missing AO" : "AO signed");
+> > +                     return SKB_DROP_REASON_TCP_AOFAILURE;
+> > +             }
+> > +     }
+> > +
+> > +     /* sdif set, means packet ingressed via a device
+> > +      * in an L3 domain and dif is set to the l3mdev
+> > +      */
+> > +     l3index =3D sdif ? dif : 0;
+> > +
+> > +     /* Fast path: unsigned segments */
+> > +     if (likely(!md5_location && !aoh)) {
+> > +             /* Drop if there's TCP-MD5 or TCP-AO key with any rcvid/s=
+ndid
+> > +              * for the remote peer. On TCP-AO established connection
+> > +              * the last key is impossible to remove, so there's
+> > +              * always at least one current_key.
+> > +              */
+> > +             if (tcp_ao_required(sk, saddr, family, l3index, true)) {
+> > +                     tcp_hash_fail("AO hash is required, but not found=
+",
+> > +                                   family, skb, "L3 index %d", l3index=
+);
+> > +                     return SKB_DROP_REASON_TCP_AONOTFOUND;
+> > +             }
+> > +             if (unlikely(tcp_md5_do_lookup(sk, l3index, saddr, family=
+))) {
+> > +                     NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5NOTFO=
+UND);
+> > +                     tcp_hash_fail("MD5 Hash not found",
+> > +                                   family, skb, "L3 index %d", l3index=
+);
+> > +                     return SKB_DROP_REASON_TCP_MD5NOTFOUND;
+> > +             }
+> > +             return SKB_NOT_DROPPED_YET;
+> > +     }
+> > +
+> > +     if (aoh)
+> > +             return tcp_inbound_ao_hash(sk, skb, family, req, l3index,=
+ aoh);
+> > +
+> > +     return tcp_inbound_md5_hash(sk, skb, saddr, daddr, family,
+> > +                                 l3index, md5_location);
+>
+> Many selftests are currently failing [1] because of this line: if
+> CONFIG_TCP_MD5SIG is not defined -- which is currently the case in many
+> selftests: tc, mptcp, forwarding, netfilter, drivers, etc. -- then this
+> tcp_inbound_md5_hash() function is not defined:
+>
+> > net/ipv4/tcp.c: In function =E2=80=98tcp_inbound_hash=E2=80=99:
+> > net/ipv4/tcp.c:4570:16: error: implicit declaration of function =E2=80=
+=98tcp_inbound_md5_hash=E2=80=99; did you mean =E2=80=98tcp_inbound_ao_hash=
+=E2=80=99? [-Werror=3Dimplicit-function-declaration]
+> >  4570 |         return tcp_inbound_md5_hash(sk, skb, saddr, daddr, fami=
+ly,
+> >       |                ^~~~~~~~~~~~~~~~~~~~
+> >       |                tcp_inbound_ao_hash
+>
+> Do you (or any maintainers) mind replying to this email with this line
+> [2] so future builds from the CI will no longer pick-up this series?
+>
+> pw-bot: changes-requested
 
-The copypaste probably belongs with the other flow dissector wrappers
-in sk_buff.h.
+Ugh, it seems I can falter on a plain place.
+I should have rechecked this for v3.
 
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 9254bca2813d..e9e6cf3d148c 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -524,12 +524,13 @@ static inline void tun_flow_save_rps_rxhash(struct tun_flow_entry *e, u32 hash)
->   */
->  static u16 tun_automq_select_queue(struct tun_struct *tun, struct sk_buff *skb)
->  {
-> +	const struct net *net = dev_net(tun->dev);
->  	struct tun_flow_entry *e;
->  	u32 txq, numqueues;
->  
->  	numqueues = READ_ONCE(tun->numqueues);
->  
-> -	txq = __skb_get_hash_symmetric(skb);
-> +	txq = __skb_get_hash_symmetric(net, skb);
->  	e = tun_flow_find(&tun->flows[tun_hashfn(txq)], txq);
->  	if (e) {
->  		tun_flow_save_rps_rxhash(e, txq);
-> @@ -1038,10 +1039,11 @@ static void tun_automq_xmit(struct tun_struct *tun, struct sk_buff *skb)
->  		/* Select queue was not called for the skbuff, so we extract the
->  		 * RPS hash and save it into the flow_table here.
->  		 */
-> +		const struct net *net = dev_net(tun->dev);
->  		struct tun_flow_entry *e;
->  		__u32 rxhash;
->  
-> -		rxhash = __skb_get_hash_symmetric(skb);
-> +		rxhash = __skb_get_hash_symmetric(net, skb);
->  		e = tun_flow_find(&tun->flows[tun_hashfn(rxhash)], rxhash);
->  		if (e)
->  			tun_flow_save_rps_rxhash(e, rxhash);
-> @@ -1938,7 +1940,7 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
->  	 */
->  	if (!rcu_access_pointer(tun->steering_prog) && tun->numqueues > 1 &&
->  	    !tfile->detached)
-> -		rxhash = __skb_get_hash_symmetric(skb);
-> +		rxhash = __skb_get_hash_symmetric(dev_net(tun->dev), skb);
->  
->  	rcu_read_lock();
->  	if (unlikely(!(tun->dev->flags & IFF_UP))) {
-> @@ -2521,7 +2523,7 @@ static int tun_xdp_one(struct tun_struct *tun,
->  
->  	if (!rcu_dereference(tun->steering_prog) && tun->numqueues > 1 &&
->  	    !tfile->detached)
-> -		rxhash = __skb_get_hash_symmetric(skb);
-> +		rxhash = __skb_get_hash_symmetric(dev_net(tun->dev), skb);
->  
->  	if (tfile->napi_enabled) {
->  		queue = &tfile->sk.sk_write_queue;
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 1c2902eaebd3..60a4dc5586c8 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -1493,7 +1493,7 @@ __skb_set_sw_hash(struct sk_buff *skb, __u32 hash, bool is_l4)
->  }
->  
->  void __skb_get_hash(struct sk_buff *skb);
-> -u32 __skb_get_hash_symmetric(const struct sk_buff *skb);
-> +u32 __skb_get_hash_symmetric(const struct net *net, const struct sk_buff *skb);
->  u32 skb_get_poff(const struct sk_buff *skb);
->  u32 __skb_get_poff(const struct sk_buff *skb, const void *data,
->  		   const struct flow_keys_basic *keys, int hlen);
-> diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
-> index f82e9a7d3b37..634896129780 100644
-> --- a/net/core/flow_dissector.c
-> +++ b/net/core/flow_dissector.c
-> @@ -1831,14 +1831,14 @@ EXPORT_SYMBOL(make_flow_keys_digest);
->  
->  static struct flow_dissector flow_keys_dissector_symmetric __read_mostly;
->  
-> -u32 __skb_get_hash_symmetric(const struct sk_buff *skb)
-> +u32 __skb_get_hash_symmetric(const struct net *net, const struct sk_buff *skb)
->  {
->  	struct flow_keys keys;
->  
->  	__flow_hash_secret_init();
->  
->  	memset(&keys, 0, sizeof(keys));
-> -	__skb_flow_dissect(NULL, skb, &flow_keys_dissector_symmetric,
-> +	__skb_flow_dissect(net, skb, &flow_keys_dissector_symmetric,
->  			   &keys, NULL, 0, 0, 0, 0);
->  
->  	return __flow_hash_from_keys(&keys, &hashrnd);
-> diff --git a/net/netfilter/nft_hash.c b/net/netfilter/nft_hash.c
-> index 92d47e469204..3e7296ed5319 100644
-> --- a/net/netfilter/nft_hash.c
-> +++ b/net/netfilter/nft_hash.c
-> @@ -51,7 +51,8 @@ static void nft_symhash_eval(const struct nft_expr *expr,
->  	struct sk_buff *skb = pkt->skb;
->  	u32 h;
->  
-> -	h = reciprocal_scale(__skb_get_hash_symmetric(skb), priv->modulus);
-> +	h = reciprocal_scale(__skb_get_hash_symmetric(nft_net(pkt), skb),
-> +			     priv->modulus);
->  
->  	regs->data[priv->dreg] = h + priv->offset;
->  }
-> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-> index 964225580824..0e6166784972 100644
-> --- a/net/openvswitch/actions.c
-> +++ b/net/openvswitch/actions.c
-> @@ -1084,7 +1084,8 @@ static int clone(struct datapath *dp, struct sk_buff *skb,
->  			     !dont_clone_flow_key);
->  }
->  
-> -static void execute_hash(struct sk_buff *skb, struct sw_flow_key *key,
-> +static void execute_hash(const struct net *net,
-> +			 struct sk_buff *skb, struct sw_flow_key *key,
->  			 const struct nlattr *attr)
->  {
->  	struct ovs_action_hash *hash_act = nla_data(attr);
-> @@ -1097,7 +1098,7 @@ static void execute_hash(struct sk_buff *skb, struct sw_flow_key *key,
->  		/* OVS_HASH_ALG_SYM_L4 hashing type.  NOTE: this doesn't
->  		 * extend past an encapsulated header.
->  		 */
-> -		hash = __skb_get_hash_symmetric(skb);
-> +		hash = __skb_get_hash_symmetric(net, skb);
->  	}
->  
->  	hash = jhash_1word(hash, hash_act->hash_basis);
-> @@ -1359,7 +1360,7 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
->  			break;
->  
->  		case OVS_ACTION_ATTR_HASH:
-> -			execute_hash(skb, key, a);
-> +			execute_hash(ovs_dp_get_net(dp), skb, key, a);
->  			break;
->  
->  		case OVS_ACTION_ATTR_PUSH_MPLS: {
-> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> index ea3ebc160e25..b047fdb0c02c 100644
-> --- a/net/packet/af_packet.c
-> +++ b/net/packet/af_packet.c
-> @@ -1364,7 +1364,9 @@ static unsigned int fanout_demux_hash(struct packet_fanout *f,
->  				      struct sk_buff *skb,
->  				      unsigned int num)
->  {
-> -	return reciprocal_scale(__skb_get_hash_symmetric(skb), num);
-> +	struct net *net = read_pnet(&f->net);
-> +
-> +	return reciprocal_scale(__skb_get_hash_symmetric(net, skb), num);
->  }
->  
->  static unsigned int fanout_demux_lb(struct packet_fanout *f,
+pw-bot: changes-requested
 
-
+Thanks for the report,
+           Dmitry
 
