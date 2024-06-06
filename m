@@ -1,181 +1,191 @@
-Return-Path: <netdev+bounces-101565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D9098FF710
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 23:53:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30D468FF714
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 23:54:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8319282B89
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 21:53:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8201C1F22D02
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 21:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C16DF770EB;
-	Thu,  6 Jun 2024 21:53:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64C7F7173C;
+	Thu,  6 Jun 2024 21:53:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="RajqOgPB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KHnZa/PG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251D661FE3
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 21:53:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53246D1B9;
+	Thu,  6 Jun 2024 21:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717710809; cv=none; b=boYT7qu0VMu/Plv4ZCx1bcVX0JPogqCoozbhprzMZTYcEWs4hxw7ICjicnTA8utwGZArarylBBvC/j0V/rip9q7AeqmFRS8QFFHDBhpxiZwyAnsdPrdmy1T4McSXJ32PyiJ2CiwLcck45nQrb64WKvhPpKuHJ0GbfE8LKGlCg/8=
+	t=1717710835; cv=none; b=H5iFVIrcGha7KLdLI51UrnFTp8XykOvmrToQhHZ7q1HXcmqe7bXyQ6nTtNob7aFjt+I/pj/yh01xCdpSGb3+q9WNfgxmlIy6OknpxMzM9J/IYLc1KrAfDfyWeOSmykss8lM/bbCyQTwlJrQJBIobu+/G8CiyhqtTCJ6tKdlTMFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717710809; c=relaxed/simple;
-	bh=+FpI6vYpR5bbyxTEbYr9rtFq5rhJFeJhBlUYUqcnlgY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nERJIV+3heB5FbZ8ky4KPSYXiGLcKdGYnfxhEBP++MwnR6AK9UAttMBayNToM+KutEHRQ0ScVpj9EWY8Foo7sB521ssCbISNZ4sfNB59Dk4l73lQLUd7k/60c8drtxetomRMwX6MzBvwnXv7OrR21tiuJrArsmRJm8qLLpdWCQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=RajqOgPB; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-62a08092c4dso14758407b3.0
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 14:53:27 -0700 (PDT)
+	s=arc-20240116; t=1717710835; c=relaxed/simple;
+	bh=+Co+3LQoCWO1Xw8u2pGCzwkdJb7wrBqq6PbIkyE1eks=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=HnMkqHCl1s0K7UhLpJ10ssoqHDo+HG+0BXgaUbuM658uUbIxZa/CPg5uYrQOMee8vX5dt1vNRjQbowoiZnOkxhlFlT7SBoD3fsrY6zOXNYGFJYVkVxWMCKYuUNoWZVSfT8CWps2s2MUizML2uah5NV7iXxRRk3EmFyrz7wM9Cqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KHnZa/PG; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6af27d0c9f8so7174316d6.2;
+        Thu, 06 Jun 2024 14:53:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1717710807; x=1718315607; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1717710833; x=1718315633; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=y9/LZLrVCiBmLFl657w1ASVEfglGqQmKYkFf7dxmKcI=;
-        b=RajqOgPBwv8XJAwhXWZXlVonrRF/YPPRy9ozsRER3hLSkk6xn5+2NkLmVUpYWo4z24
-         vkdDuC+8GAi+qh9w4Q8U8gJqytgI1tFDxKjmY07/kt30zRk4SsHMnidS0/j80kJsZYJZ
-         e9uYsPru6kO6APku6GR8PEw+6fLvfsvBKhdW7NkohU3AbJ9ua2xvtoDbuMaFPC00pb5y
-         4aDAvy4mPm25RQfwi7BHcBrjo2H1pAYX0OFVEOYbCs/fmyHVX4I6gpN5bfjuRB1O1Ov+
-         87VlPFsC7ESewPLRCFIkMsnBlfW3xXJB4C9PpcBVxvg+1WLVZzfVBQGLcqG+xHyCgNS7
-         2gVg==
+        bh=s57Ttr3JhqgkOLOGotPGuFFobFGXuZzfpQyblp0rsAU=;
+        b=KHnZa/PG5IEb7Gzs5+RDf3Mt6tij+f8G03SN0Rmt42x1vj6Kwyeiw1+84xFCsfeG+B
+         s0aRyuz/U/8Qw9vuaW9u0t9AofjLlEfJCvkoDL5WbSWCnHUJUKM3fZuo9IANvsEYESUO
+         ofKRY36WkYKp7/70yqGtsUT/FwFygci2R4i1QcHO3cK1RaR+9qG1nvjHXIs2DXAzHD6N
+         xbyV3k0XtpsRkPVorkVN5eTcAbSjQMCaGdC2E2JFdvZ+5AjnrBrVxmWFeTmc4faKKUgf
+         qVofnBXdLwhdjXSQbmEBfKnb6Qyf6drRyAm50ydxPUj1BdtF6qdQjYVaRbDF11cfPd2j
+         OqEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717710807; x=1718315607;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y9/LZLrVCiBmLFl657w1ASVEfglGqQmKYkFf7dxmKcI=;
-        b=RNj86Z7teU2P9cOeYLqcM3qiL4cz5+mle+M4OkUlXc2cNCiZYU60fQ5PIFdiz8rK5P
-         L8sN6GmkvdaarNNfeC1ieGsiMA+8l9vWdxMH+xFuF/hiY1IUH9vfe1LJtvaY8b05XlGO
-         1G3dNM3rdt32/ZC+H3ReJ+8N36Mh6m8o62CqKrNuakZl2/LSrp8hihGGoeElybgDXfTD
-         2mpWOnnAo6uWbD/A9PoJAc0T1AoDpUTrUIyqg76nSMfGWR+GGMmTzBY1u578+W0K4nGw
-         vAuFXQEDqhDV3sNFl1ZS0QRMXmfuUSf9Nv35fcMFS26Kcz6kOzz7PAsSJIr2hR/5fV/z
-         GuTA==
-X-Forwarded-Encrypted: i=1; AJvYcCUuiDk4901MgkkYbxLsGwihQiqZ3BudMyp0TD7B8WHKGiFFlaYSS5b8SWYIRk6tZfXx7Hg95hmkADeJNLXwucKawg27XG03
-X-Gm-Message-State: AOJu0YwVvRwtPpj5XIdegaK4cHEXMFJPRq/wJtcIxSe9w7e1f3489bVp
-	Du42EYypFwTSoInYX+1yPwbDGjAyVClynTzm9Kpu55Y2+djHhDxBxm2AZ7XM41hd7hWQWI/Hc8U
-	X/5D5FlceJo/wb9Y1fOjN44sWBH42pBf5jwMG
-X-Google-Smtp-Source: AGHT+IHr+vEgrNOTl351kbnQRCFUgvkUIF6Lp0SFJ0/CR+WTO6ePRrwS52Q8I6+bzc57ubSMFu7oFmRulMZYl2piscY=
-X-Received: by 2002:a81:7b57:0:b0:622:df58:2cf6 with SMTP id
- 00721157ae682-62cd568be78mr5356547b3.50.1717710807083; Thu, 06 Jun 2024
- 14:53:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1717710833; x=1718315633;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=s57Ttr3JhqgkOLOGotPGuFFobFGXuZzfpQyblp0rsAU=;
+        b=YuPLb6BFSrBCdsnn/U3ARklFjgOwu0L9S5IAS/V01gz/a1KbHAwb9KzA5AOA6PBavS
+         gT2weyLu1UdkGe7qkYlmaUqtZJPJaLZR/BhCPKV+uFIIbr4c4idY1+IvkwmvWLfu92rc
+         Mrwy3bhh4vha47jeNt4fRXwkb9rjEolnFw0ZKuFf1SQKqYGVCeTxYPW6Fshhp+4hsl44
+         kgOakbzWjDVq+G1s7rOlVAvFAIiuUpqOfhPdjOfdb+5R1EKPKA7ai3VIa6iueI6hPtrD
+         reDa2zCnrtTVPSF1yF+Jja4uk0hiq9eRfHwEyeydvlAJ4vHPTFzzBhLFW1fGaTe7CcXM
+         74mg==
+X-Forwarded-Encrypted: i=1; AJvYcCWQTD6PtJ8a8P7nKuX9v1XE81+si0H8eseGq+FAnmDEjbuh3UxdWxry0QFRRwJr1GH+7N54qzALPg9I+NJjIZBhVSGUvPh+xG0Nqp+6s2hdDEY8Yxdh9HFPaWNL8hIgE6PGie6p
+X-Gm-Message-State: AOJu0YztQb+VUj5gDbAqIu/ppY7ZjQpqJA4EBssbYFAsnyEJwVOR9JGH
+	Bkysxt0xeMsIDzRcEyvFXyygdsDaxwYlaO/OawmRoXa/mbvsoZbU
+X-Google-Smtp-Source: AGHT+IESI/LNXKELGKm5sMKjBhfPLdMM3HXtMZiEvbteY5wnPr5/2V/foG6lsAOZK6ckJ3hcr79MLQ==
+X-Received: by 2002:a05:6214:3f8c:b0:6af:b998:1a87 with SMTP id 6a1803df08f44-6b059f2c47emr8287266d6.46.1717710832621;
+        Thu, 06 Jun 2024 14:53:52 -0700 (PDT)
+Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b04f660167sm10066966d6.33.2024.06.06.14.53.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jun 2024 14:53:52 -0700 (PDT)
+Date: Thu, 06 Jun 2024 17:53:51 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: joshwash@google.com, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ kuba@kernel.org, 
+ stable@kernel.org, 
+ Joshua Washington <joshwash@google.com>, 
+ Praveen Kaligineedi <pkaligineedi@google.com>, 
+ Harshitha Ramamurthy <hramamurthy@google.com>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jeroen de Borst <jeroendb@google.com>, 
+ Shailend Chand <shailend@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Rushil Gupta <rushilg@google.com>, 
+ Catherine Sullivan <csully@google.com>, 
+ Bailey Forrest <bcf@google.com>, 
+ open list <linux-kernel@vger.kernel.org>
+Message-ID: <66622fefeaeff_1013529462@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240606192139.1872461-1-joshwash@google.com>
+References: <20240606192139.1872461-1-joshwash@google.com>
+Subject: Re: [PATCH net] gve: ignore nonrelevant GSO type bits when processing
+ TSO headers
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240411122752.2873562-1-xukuohai@huaweicloud.com> <20240411122752.2873562-2-xukuohai@huaweicloud.com>
-In-Reply-To: <20240411122752.2873562-2-xukuohai@huaweicloud.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 6 Jun 2024 17:53:16 -0400
-Message-ID: <CAHC9VhRipBNd+G=RMPVeVOiYCx6FZwHSn0JNKv=+jYZtd5SdYg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 01/11] bpf, lsm: Annotate lsm hook return
- value range
-To: Xu Kuohai <xukuohai@huaweicloud.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>, 
-	Brendan Jackman <jackmanb@chromium.org>, James Morris <jmorris@namei.org>, 
-	"Serge E . Hallyn" <serge@hallyn.com>, Khadija Kamran <kamrankhadijadj@gmail.com>, 
-	Casey Schaufler <casey@schaufler-ca.com>, Ondrej Mosnacek <omosnace@redhat.com>, 
-	Kees Cook <keescook@chromium.org>, John Johansen <john.johansen@canonical.com>, 
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>, Roberto Sassu <roberto.sassu@huawei.com>, 
-	Shung-Hsi Yu <shung-hsi.yu@suse.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 11, 2024 at 8:24=E2=80=AFAM Xu Kuohai <xukuohai@huaweicloud.com=
-> wrote:
->
-> From: Xu Kuohai <xukuohai@huawei.com>
->
-> Add macro LSM_RET_INT to annotate lsm hook return integer type and the
-> default return value, and the expected return range.
->
-> The LSM_RET_INT is declared as:
->
-> LSM_RET_INT(defval, min, max)
->
-> where
->
-> - defval is the default return value
->
-> - min and max indicate the expected return range is [min, max]
->
-> The return value range for each lsm hook is taken from the description
-> in security/security.c.
->
-> The expanded result of LSM_RET_INT is not changed, and the compiled
-> product is not changed.
->
-> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
+joshwash@ wrote:
+> From: Joshua Washington <joshwash@google.com>
+> 
+> TSO currently fails when the skb's gso_type field has more than one bit
+> set.
+> 
+> TSO packets can be passed from userspace using PF_PACKET, TUNTAP and a
+> few others, using virtio_net_hdr (e.g., PACKET_VNET_HDR). This includes
+> virtualization, such as QEMU, a real use-case.
+> 
+> The gso_type and gso_size fields as passed from userspace in
+> virtio_net_hdr are not trusted blindly by the kernel. It adds gso_type
+> |= SKB_GSO_DODGY to force the packet to enter the software GSO stack
+> for verification.
+> 
+> This issue might similarly come up when the CWR bit is set in the TCP
+> header for congestion control, causing the SKB_GSO_TCP_ECN gso_type bit
+> to be set.
+> 
+> Fixes: a57e5de476be ("gve: DQO: Add TX path")
+
+nit: no empty line
+
+> Signed-off-by: Joshua Washington <joshwash@google.com>
+> Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
+> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+
 > ---
->  include/linux/lsm_hook_defs.h | 591 +++++++++++++++++-----------------
->  include/linux/lsm_hooks.h     |   6 -
->  kernel/bpf/bpf_lsm.c          |  10 +
->  security/security.c           |   1 +
->  4 files changed, 313 insertions(+), 295 deletions(-)
+>  drivers/net/ethernet/google/gve/gve_tx_dqo.c | 18 +++++++-----------
+>  1 file changed, 7 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+> index fe1b26a4d736..04cb43a97c96 100644
+> --- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+> +++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+> @@ -555,6 +555,10 @@ static int gve_prep_tso(struct sk_buff *skb)
+>  	if (unlikely(skb_shinfo(skb)->gso_size < GVE_TX_MIN_TSO_MSS_DQO))
+>  		return -1;
+>  
+> +	/* We only deal with TCP at this point. */
+> +	if (!(skb_shinfo(skb)->gso_type & (SKB_GSO_TCPV4 | SKB_GSO_TCPV6)))
+> +		return -EINVAL;
+> +
 
-...
+NETIF_F_TSO and NETIF_F_TSO6 are the only terminal/L4 segmentation
+offload types that gve advertises in hw_features. So I think that this
+will always be true.
 
-> diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.=
-h
-> index 334e00efbde4..708f515ffbf3 100644
-> --- a/include/linux/lsm_hook_defs.h
-> +++ b/include/linux/lsm_hook_defs.h
-> @@ -18,435 +18,448 @@
->   * The macro LSM_HOOK is used to define the data structures required by
->   * the LSM framework using the pattern:
->   *
-> - *     LSM_HOOK(<return_type>, <default_value>, <hook_name>, args...)
-> + *     LSM_HOOK(<return_type>, <return_description>, <hook_name>, args..=
-.)
->   *
->   * struct security_hook_heads {
-> - *   #define LSM_HOOK(RET, DEFAULT, NAME, ...) struct hlist_head NAME;
-> + *   #define LSM_HOOK(RET, RETVAL_DESC, NAME, ...) struct hlist_head NAM=
-E;
->   *   #include <linux/lsm_hook_defs.h>
->   *   #undef LSM_HOOK
->   * };
->   */
-> -LSM_HOOK(int, 0, binder_set_context_mgr, const struct cred *mgr)
-> -LSM_HOOK(int, 0, binder_transaction, const struct cred *from,
-> +LSM_HOOK(int, LSM_RET_INT(0, -MAX_ERRNO, 0), binder_set_context_mgr, con=
-st struct cred *mgr)
-> +LSM_HOOK(int, LSM_RET_INT(0, -MAX_ERRNO, 0), binder_transaction, const s=
-truct cred *from,
->          const struct cred *to)
-> -LSM_HOOK(int, 0, binder_transfer_binder, const struct cred *from,
-> +LSM_HOOK(int, LSM_RET_INT(0, -MAX_ERRNO, 0), binder_transfer_binder, con=
-st struct cred *from,
->          const struct cred *to)
-> -LSM_HOOK(int, 0, binder_transfer_file, const struct cred *from,
-> +LSM_HOOK(int, LSM_RET_INT(0, -MAX_ERRNO, 0), binder_transfer_file, const=
- struct cred *from,
->          const struct cred *to, const struct file *file)
+If nothing else, it documents the assumption, so fine to keep.
 
-I'm not overly excited about injecting these additional return value
-range annotations into the LSM hook definitions, especially since the
-vast majority of the hooks "returns 0 on success, negative values on
-error".  I'd rather see some effort put into looking at the
-feasibility of converting some (all?) of the LSM hook return value
-exceptions into the more conventional 0/-ERRNO format.  Unfortunately,
-I haven't had the time to look into that myself, but if you wanted to
-do that I think it would be a good thing.
+Careful about comments that just repeat what the code does. More
+informative are comments that why non-obvious code exists (where
+applicable, which is not here).
 
---=20
-paul-moore.com
+>  	/* Needed because we will modify header. */
+>  	err = skb_cow_head(skb, 0);
+>  	if (err < 0)
+> @@ -565,18 +569,10 @@ static int gve_prep_tso(struct sk_buff *skb)
+>  	/* Remove payload length from checksum. */
+>  	paylen = skb->len - skb_transport_offset(skb);
+>  
+> -	switch (skb_shinfo(skb)->gso_type) {
+> -	case SKB_GSO_TCPV4:
+> -	case SKB_GSO_TCPV6:
+> -		csum_replace_by_diff(&tcp->check,
+> -				     (__force __wsum)htonl(paylen));
+> +	csum_replace_by_diff(&tcp->check, (__force __wsum)htonl(paylen));
+>  
+> -		/* Compute length of segmentation header. */
+> -		header_len = skb_tcp_all_headers(skb);
+> -		break;
+> -	default:
+> -		return -EINVAL;
+> -	}
+> +	/* Compute length of segmentation header. */
+> +	header_len = skb_tcp_all_headers(skb);
+>  
+>  	if (unlikely(header_len > GVE_TX_MAX_HDR_SIZE_DQO))
+>  		return -EINVAL;
+> -- 
+> 2.45.1.288.g0e0cd299f1-goog
+> 
+
+
 
