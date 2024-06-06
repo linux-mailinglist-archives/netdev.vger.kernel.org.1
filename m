@@ -1,186 +1,156 @@
-Return-Path: <netdev+bounces-101393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E00108FE5F7
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:01:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E9EA8FE5FA
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:02:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CE54288ADB
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 12:01:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDE681F25204
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 12:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B3314D29E;
-	Thu,  6 Jun 2024 12:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D58F168C10;
+	Thu,  6 Jun 2024 12:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DFK7woP3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NG8m01Ef"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47028C153
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 12:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91033178CC9
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 12:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717675265; cv=none; b=SxsU0FRAvuk22di408BxbU+lrZY4UyuyT6LMq4fDKMrTVp00NfqUe8/DrgIGncZsKn8HJ8H8Ta7JCKUr219eRx0pTuBrzvck5X5ZnblKCbiflwYqm8btR1foxSemL1RWxXiXgRcAYIVy5aD1NJpvNyh79pmewXyfEQazlR76470=
+	t=1717675324; cv=none; b=QBNduZHJFn34Y+Hzw9eRe8XSiEgBgL/qkyft5lZVZWHrPKvY8tGbSv/fnDQEhoohIcRTgcLYAAThYj7ehUbxjl/tA8M4XRWHfo2RW09jO41ygUm2f9hM8bNmYxWvfhX0/59hOk8nu5qtaYeVS1JF6/SjRAouBtAOCzhJza3YfpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717675265; c=relaxed/simple;
-	bh=VE9LD88tG1B8qpR9VqW3jtsJJ1umFxLdZM4g0IpzOAg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nym27WpeJKvYXKcoo0JB9B9bF+wtHEBDN8amf13Xs8mwGpNYXQsc0NbXjDbbgiaq3Qf+lIRie8nliXwW+JUYJ5C1rrhKgK6BU9XLZAOOBGTTYAN6uHodXl7xN5liEEJXlmNvJkeNbTpE1lG+38Jdj7Knr1a5N+zzyyYaf9SlIg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DFK7woP3; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1717675324; c=relaxed/simple;
+	bh=XzA9XcS9J8/JaJGhY85xTyvzVAiJwfKIIBi3J6rxAwM=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=oSOX1XuGSIDs+z1jUIvzlXymCjxqMt1u9btTv8HR6s9v1nonMFhAEA/VYuBLA44miQAqQ+ey0BltIaECiRMLOJR5Dal/sAbtZIZyJ1lpYD4efeqjiYWAj5rHn0wvkKh8WggY/3c2Y747uKfaycfx4vCNIgv7KKjoZB6JqNahKhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NG8m01Ef; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717675262;
+	s=mimecast20190719; t=1717675321;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Y4S9PyIZ2WPPemiOD/j57hDL0LYoz1XGW158BpHw80Q=;
-	b=DFK7woP39nLLH9iEevtgV1yu5IT9a5bktxCedokQdiXYpvb9FFn46EpWxpUeoegl4+R9EE
-	2Kz0+q3Whprbe6ZE4gt82gMMhvAJjSvQ4JuQ4pjk1sVsMuNleWNfrXU819lZ6QKcqULCfN
-	VSWqu72oKywTFCFDOvXiDK8ZaqVHPCY=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=o1PVj6wl0RhMQ9aVu/kpZquF9TBmMzt7pDp7sPNrIU4=;
+	b=NG8m01EfkrXJkJGwgDbOjTdlf4hxxSxa9y8ubtHu/+BShqnf0n4BsSXvfUNrkzGI1uC1kg
+	iKqVUe3AmZpbH3D0TdclIGcpE71t1GWWeswoNLw9GYUOG9oo4lzbTGtlw5wVKX+W+FqQml
+	jZ1tetsFdVDT4OjaKZLc9S3bskTfDpE=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-619-VsKjFbSJNdupf-rYd2b6Ng-1; Thu, 06 Jun 2024 08:01:00 -0400
-X-MC-Unique: VsKjFbSJNdupf-rYd2b6Ng-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a68e85d466dso53055666b.1
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 05:01:00 -0700 (PDT)
+ us-mta-665-JTd7b_KgNNee052XB_FukA-1; Thu, 06 Jun 2024 08:01:59 -0400
+X-MC-Unique: JTd7b_KgNNee052XB_FukA-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2eaa74bfc18so6433791fa.2
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 05:01:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717675260; x=1718280060;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1717675317; x=1718280117;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y4S9PyIZ2WPPemiOD/j57hDL0LYoz1XGW158BpHw80Q=;
-        b=tEDM+gb9filHCwoFj6D8vS6uqi6wO0QunuKwoJBU80QppUYzZJpNiFCxF9BKTyHL5L
-         0b129EqF6kU+SoGu7TffhxH2uwj0WFXrqpf5bavdpG11g9V+Q3uC5V1ELSYhq/hKsW93
-         Dxj4/2Yi+gDJ49wsq815Z4yL0EvM1R6TM4bQwvpj0wSies+eR7AHUj/BoRzuTR+m+vLB
-         b+LihqUvDXKiVvcJkIVBwbGLHDZuWo1x4YgYNpDI9RlCAG0ATUszDNHZZvHdVFBWycUq
-         F1/66HvF/+1UJYOEroDoocLQKgd+rtV5U0GZEQqqU5FnOAJX5Bf6wtCvE+pJ0xuOg2qY
-         UoKg==
-X-Forwarded-Encrypted: i=1; AJvYcCVXUmB6FpqFm1aA2XE+UYi+OlDO4nBkWiG3qoq8eOQaWQh37QWFcV5kED0QgS6S4UgFCu200Vl7LeXjnOqCCU4HGbJIzxyy
-X-Gm-Message-State: AOJu0Yy2ZkfWFxpHMDroWMIdCsQ/tr7h8PWQRnAR+V71XBuOULrJva64
-	9ZT2B03v2GrJc+z0ClKR7Qg9LdNAmOSlUiG5B2CrY61rOlp4beE7HPnC6p4B1Pv6R2MUa1FTugk
-	uru957eLSphMit2gpDtZ2KTokuLKCibuzBfGezeNdcIaWthIAlRcSKQ==
-X-Received: by 2002:a50:c88a:0:b0:57a:321f:cc4f with SMTP id 4fb4d7f45d1cf-57a8b6f1b0emr3501157a12.19.1717675259564;
-        Thu, 06 Jun 2024 05:00:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGB7Vks4wFFWfi34BdrVfF+Y5s/7VwpN5xp0R8MpdVPxup8WU6P2hYMotoXBQEc2co8tC+S0Q==
-X-Received: by 2002:a50:c88a:0:b0:57a:321f:cc4f with SMTP id 4fb4d7f45d1cf-57a8b6f1b0emr3501139a12.19.1717675258923;
-        Thu, 06 Jun 2024 05:00:58 -0700 (PDT)
-Received: from redhat.com ([2.55.8.167])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57aae202396sm973075a12.74.2024.06.06.05.00.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jun 2024 05:00:53 -0700 (PDT)
-Date: Thu, 6 Jun 2024 08:00:47 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Jason Wang <jasowang@redhat.com>, Heng Qi <hengqi@linux.alibaba.com>,
-	Jiri Pirko <jiri@resnulli.us>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, netdev@vger.kernel.org
-Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
-Message-ID: <20240606075842-mutt-send-email-mst@kernel.org>
-References: <20240509114615.317450-1-jiri@resnulli.us>
- <1715325076.4219763-2-hengqi@linux.alibaba.com>
- <ZktGj4nDU4X0Lxtx@nanopsycho.orion>
- <ZmBMa7Am3LIYQw1x@nanopsycho.orion>
- <1717587768.1588957-5-hengqi@linux.alibaba.com>
- <CACGkMEsiosWxNCS=Jpb-H14b=-26UzPjw+sD3H21FwVh2ZTF5g@mail.gmail.com>
- <CAL+tcoB8y6ctDO4Ph8WM-19qAoNMcYTVWLKRqsJYYrmW9q41=w@mail.gmail.com>
- <CACGkMEvh6nKfFMp5fb6tbijrs88vgSofCNkwN1UzKHnf6RqURg@mail.gmail.com>
- <CAL+tcoA3JpS3S6Hzwpc5F0dzm92AnfYfqj-4uLmTsgQ5hj1fTA@mail.gmail.com>
+        bh=o1PVj6wl0RhMQ9aVu/kpZquF9TBmMzt7pDp7sPNrIU4=;
+        b=iU82Ap2euemkP90KHxRp6Um5b8ELVCc0b3KsytZoP/Vswu+TFc1g62aKJoCeZeRwC7
+         pRko9IF+pLSmopSXOJYCHqeg44G0h23/6a9y68twtUmy9HlmxFqH5R9KXOuaIcFUrlJe
+         boWgAA3Plktf6hhSztPQIyiXORvoAaJHUHd+Xv/gwoMOFEorpfUce1Kj6H85dQVHso0z
+         iK9J4JwLdPsy1mwUkvl//4DQ+67HL6VAorneF0kKolAN8BWz6ZzgyvnU1T5JnIiVtKL0
+         5Uxmq/RKnjrKYlXQgpiGIJlPw0AI4w5nLlZCy61/09n3c30S09GROCi/7IiXIzHFJYEO
+         tWVw==
+X-Forwarded-Encrypted: i=1; AJvYcCUZB54mSQxyq6LV94nO8wcFkwFOtUOyE6Q+zHLiaMhRjRaEXdj45RDStsYehqH6mSsqcPF8rlaI8aDKZyWEw9x3AacR4Iir
+X-Gm-Message-State: AOJu0YwPsjOrSuKS4lVZPudkbS0UUcGp4bu6A5V9eJFT0k9mRTwUWZuE
+	8qT8hdCPxB6YfVrHA0IAW2qY+oa6Lsgwns1zu94rn3NXyEKpY+XEY36n4DGRkgSBlBNXzeBgZPW
+	VgGUIs8w+IrIvbendivj+OUl1lbHpVCjadB3HgsmiWKN7KYoBIsaBqw==
+X-Received: by 2002:a2e:6804:0:b0:2d6:dba1:6d37 with SMTP id 38308e7fff4ca-2eac79c3350mr33444991fa.11.1717675317618;
+        Thu, 06 Jun 2024 05:01:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH2WITeGFROobQCTrCntY3Omdm5T0qGOCAwnVA1tvshsd8kmSQuctYu9lHc2+ZfKmWSvWTupQ==
+X-Received: by 2002:a2e:6804:0:b0:2d6:dba1:6d37 with SMTP id 38308e7fff4ca-2eac79c3350mr33444781fa.11.1717675317163;
+        Thu, 06 Jun 2024 05:01:57 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:c32:7800:5bfa:a036:83f0:f9ec? (2001-1c00-0c32-7800-5bfa-a036-83f0-f9ec.cable.dynamic.v6.ziggo.nl. [2001:1c00:c32:7800:5bfa:a036:83f0:f9ec])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57aadf9d296sm980451a12.7.2024.06.06.05.01.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Jun 2024 05:01:56 -0700 (PDT)
+Message-ID: <9d821cea-507f-4674-809c-a4640119c435@redhat.com>
+Date: Thu, 6 Jun 2024 14:01:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL+tcoA3JpS3S6Hzwpc5F0dzm92AnfYfqj-4uLmTsgQ5hj1fTA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+From: Hans de Goede <hdegoede@redhat.com>
+Subject: Re: Hung tasks due to a AB-BA deadlock between the leds_list_lock
+ rwsem and the rtnl mutex
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
+ Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
+ Linux LEDs <linux-leds@vger.kernel.org>,
+ Heiner Kallweit <hkallweit1@gmail.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, johanneswueller@gmail.com,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Genes Lists <lists@sapience.com>
+References: <9d189ec329cfe68ed68699f314e191a10d4b5eda.camel@sapience.com>
+ <15a0bbd24cd01bd0b60b7047958a2e3ab556ea6f.camel@sapience.com>
+ <ZliHhebSGQYZ/0S0@shell.armlinux.org.uk>
+ <42d498fc-c95b-4441-b81a-aee4237d1c0d@leemhuis.info>
+ <618601d8-f82a-402f-bf7f-831671d3d83f@redhat.com>
+ <01fc2e30-eafe-495c-a62d-402903fd3e2a@lunn.ch>
+Content-Language: en-US, nl
+In-Reply-To: <01fc2e30-eafe-495c-a62d-402903fd3e2a@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 06, 2024 at 07:42:35PM +0800, Jason Xing wrote:
-> On Thu, Jun 6, 2024 at 12:25 PM Jason Wang <jasowang@redhat.com> wrote:
-> >
-> > On Thu, Jun 6, 2024 at 10:59 AM Jason Xing <kerneljasonxing@gmail.com> wrote:
-> > >
-> > > Hello Jason,
-> > >
-> > > On Thu, Jun 6, 2024 at 8:21 AM Jason Wang <jasowang@redhat.com> wrote:
-> > > >
-> > > > On Wed, Jun 5, 2024 at 7:51 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
-> > > > >
-> > > > > On Wed, 5 Jun 2024 13:30:51 +0200, Jiri Pirko <jiri@resnulli.us> wrote:
-> > > > > > Mon, May 20, 2024 at 02:48:15PM CEST, jiri@resnulli.us wrote:
-> > > > > > >Fri, May 10, 2024 at 09:11:16AM CEST, hengqi@linux.alibaba.com wrote:
-> > > > > > >>On Thu,  9 May 2024 13:46:15 +0200, Jiri Pirko <jiri@resnulli.us> wrote:
-> > > > > > >>> From: Jiri Pirko <jiri@nvidia.com>
-> > > > > > >>>
-> > > > > > >>> Add support for Byte Queue Limits (BQL).
-> > > > > > >>
-> > > > > > >>Historically both Jason and Michael have attempted to support BQL
-> > > > > > >>for virtio-net, for example:
-> > > > > > >>
-> > > > > > >>https://lore.kernel.org/netdev/21384cb5-99a6-7431-1039-b356521e1bc3@redhat.com/
-> > > > > > >>
-> > > > > > >>These discussions focus primarily on:
-> > > > > > >>
-> > > > > > >>1. BQL is based on napi tx. Therefore, the transfer of statistical information
-> > > > > > >>needs to rely on the judgment of use_napi. When the napi mode is switched to
-> > > > > > >>orphan, some statistical information will be lost, resulting in temporary
-> > > > > > >>inaccuracy in BQL.
-> > > > > > >>
-> > > > > > >>2. If tx dim is supported, orphan mode may be removed and tx irq will be more
-> > > > > > >>reasonable. This provides good support for BQL.
-> > > > > > >
-> > > > > > >But when the device does not support dim, the orphan mode is still
-> > > > > > >needed, isn't it?
-> > > > > >
-> > > > > > Heng, is my assuption correct here? Thanks!
-> > > > > >
-> > > > >
-> > > > > Maybe, according to our cloud data, napi_tx=on works better than orphan mode in
-> > > > > most scenarios. Although orphan mode performs better in specific benckmark,
-> > > >
-> > > > For example pktgen (I meant even if the orphan mode can break pktgen,
-> > > > it can finish when there's a new packet that needs to be sent after
-> > > > pktgen is completed).
-> > > >
-> > > > > perf of napi_tx can be enhanced through tx dim. Then, there is no reason not to
-> > > > > support dim for devices that want the best performance.
-> > > >
-> > > > Ideally, if we can drop orphan mode, everything would be simplified.
-> > >
-> > > Please please don't do this. Orphan mode still has its merits. In some
-> > > cases which can hardly be reproduced in production, we still choose to
-> > > turn off the napi_tx mode because the delay of freeing a skb could
-> > > cause lower performance in the tx path,
-> >
-> > Well, it's probably just a side effect and it depends on how to define
-> > performance here.
-> 
-> Yes.
-> 
-> >
-> > > which is, I know, surely
-> > > designed on purpose.
-> >
-> > I don't think so and no modern NIC uses that. It breaks a lot of things.
-> 
-> To avoid confusion, I meant napi_tx mode can delay/slow down the speed
-> in the tx path and no modern nic uses skb_orphan().
+Hi all,
 
-Clearly it's been designed for software NICs and when the
-cost of interrupts is very high.
-
-> I think I will have some time to test BQL in virtio_net.
+On 5/31/24 2:54 PM, Andrew Lunn wrote:
+>> I actually have been looking at a ledtrig-netdev lockdep warning yesterday
+>> which I believe is the same thing. I'll include the lockdep trace below.
+>>
+>> According to lockdep there indeed is a ABBA (ish) cyclic deadlock with
+>> the rtnl mutex vs led-triggers related locks. I believe that this problem
+>> may be a pre-existing problem but this now actually gets hit in kernels >=
+>> 6.9 because of commit 66601a29bb23 ("leds: class: If no default trigger is
+>> given, make hw_control trigger the default trigger"). Before that commit
+>> the "netdev" trigger would not be bound / set as phy LEDs trigger by default.
+>>
+>> +Cc Heiner Kallweit who authored that commit.
+>>
+>> The netdev trigger typically is not needed because the PHY LEDs are typically
+>> under hw-control and the netdev trigger even tries to leave things that way
+>> so setting it as the active trigger for the LED class device is basically
+>> a no-op. I guess the goal of that commit is correctly have the triggers
+>> file content reflect that the LED is controlled by a netdev and to allow
+>> changing the hw-control mode without the user first needing to set netdev
+>> as trigger before being able to change the mode.
 > 
-> Thanks,
-> Jason
+> It was not the intention that this triggers is loaded for all
+> systems.
+
+<snip>
+
+> Reverting this patch does seem like a good way forward, but i would
+> also like to give Heiner a little bit of time to see if he has a quick
+> real fix.
+
+So it has been almost a week and no reply from Heiner. Since this is
+causing real issues for users out there I think a revert of 66601a29bb23
+should be submitted to Linus and then backported to the stable kernels.
+to fix the immediate issue at hand.
+
+Once the underlying locking issue which is the real root cause here
+is fixed then we can reconsider re-applying 66601a29bb23.
+
+Regards,
+
+Hans
+
+
+
+
 
 
