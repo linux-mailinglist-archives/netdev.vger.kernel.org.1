@@ -1,331 +1,191 @@
-Return-Path: <netdev+bounces-101455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98CB28FEFEC
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:06:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8E388FEFF6
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:07:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8112C1C2370F
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:06:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14FD31F247B0
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:07:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 765081B3F3B;
-	Thu,  6 Jun 2024 14:41:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7213C19751B;
+	Thu,  6 Jun 2024 14:43:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FLsJGeed"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xCNBfre5"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2064.outbound.protection.outlook.com [40.107.223.64])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6591B3F12;
-	Thu,  6 Jun 2024 14:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717684871; cv=fail; b=AgBRQW9Pzvi26lMYImxDPzfUAblb+spg+ck8//lvY8jYasBd1eXmMQifesMwpflJnb8EztRorF9sivh37cgG2JJcLFlBnAUBnVg1s+lUK04pTu0bCfd+scbKW6+2FaAU+aOUBt9G2LTc9Y3xl5yykrO07oH+VWUJ+CwKKezEDQc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717684871; c=relaxed/simple;
-	bh=nuXw+mKVF58vlrbZPQCqkIoo03U4GQ8kJsOLwF8gJ3U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=UVdiq/O18epe79mBcfpwXBvSv2gBu5kda7bx+vpMtS4JmMeWZFaSUXYaeSVY/v2TCcDaPVKGfggr+yXtvaf7+AiiaAT4HHPwp3kE8hM1xt5OoXL6/X7wtEjb1htCDMv9Y3KwrkojSQOGz34MbEg7y4ZLO4T6Bu/L2FfgLC27GzY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FLsJGeed; arc=fail smtp.client-ip=40.107.223.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jSXOLAXKpvfxvXWDacHweLw1ap6ClFZVmO3yMlpcDDUOBDLQ31+SWwraChoSe+YEwI1KoNoFh4yVWYUd4rkzPU/yBAaBDEeEJ//oK4ExI0WBF0x8Q0V9+OjFjCZvsbf+/K6xdNBSif5VqZk8Mmco4A8cJ7COb7mbCMXRwJe2oT54E2Dy7ugu2Y7WtFOKdGu2Em/w6zWOrBbK9uPq72RkTy/qOp0+HMJSW/wDwkItad5pcgG54dtTxCjwfCyFJUDeR36MZ7VUeam33vLAhFiwXNJfYcin51dLAXC3V4d0XHbmrcD4ef1rHefvuIhUueLbhzQwWA5wAb96ET8g1DRC4Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4lFTd0/k13dQope2W6dT2+/9+hW4KCuEFWcz5Dpp8Pc=;
- b=LA7XtUue66QWNJafM1YYWb/u/xhMInrIRxhYdUDXuNr/zgR0dmheYVIHVBmmw3Q22VffcM1fklVK4sonr7yhHJD+AHV/tAk7sjUO6axYGiJ7UZtTyNodAvz+3EtSjS6pdjDNFMTdcH9SYFHaldbUR2mESfRBdhSu+280EhbRaPgJutkKKAE3Ft4fnlnuF6UKTIoEyQP8djTIi83O9GHjfs1qIBsNjhXO3EDRAF9/QyzWbRqct4GNho5fUWt2fQPaK5RZapwjpcAzWEMAiXHk8wF2h0mrEoX5Ow3WkE/mNCUl1/UafffbeAmlUiNn3UHpyDytY33Q9i1t3ZfWMXElLg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4lFTd0/k13dQope2W6dT2+/9+hW4KCuEFWcz5Dpp8Pc=;
- b=FLsJGeedvF6pIYA3i/t4wvsU+difkjURWCWIbRk278bmhlsPSQl6IUjcmcKVVmrtLWC4dfpi1cV1vmQoiowA2hzSodcKx5eUpwjDH29vG1pS+1doCAnw07qmoxEl+Q4iVMat82Ch/yWfpnmN3VGi+cZCqQgTJfluxe41zBS2Izmu8nk/jEx6847uqV1tLMiWSxdqmU2Oh6fstHRoKZxaruwP0mGyP4WyGWBJ+/P+H7uO3wU+duTWF1PKAP8f4lrwl2JC1cTsGV+s8XnCvby5wVoWji/PODQAHIG+Ehi0Xy/T4MWGkoGAcmI1Ibj4Ayfn5TjNYTcoh3St6S0Dv7eRPA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by SJ2PR12MB9189.namprd12.prod.outlook.com (2603:10b6:a03:55b::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.34; Thu, 6 Jun
- 2024 14:41:04 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e%4]) with mapi id 15.20.7633.033; Thu, 6 Jun 2024
- 14:41:04 +0000
-Date: Thu, 6 Jun 2024 11:41:02 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, linux-doc@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
-	Leonid Bloch <lbloch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
-	patches@lists.linux.dev
-Subject: Re: [PATCH 0/8] Introduce fwctl subystem
-Message-ID: <20240606144102.GB19897@nvidia.com>
-References: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
- <20240603114250.5325279c@kernel.org>
- <214d7d82-0916-4c29-9012-04590e77df73@kernel.org>
- <20240604070451.79cfb280@kernel.org>
- <665fa9c9e69de_4a4e62941e@dwillia2-xfh.jf.intel.com.notmuch>
- <20240605135911.GT19897@nvidia.com>
- <6661416ed4334_2d412294a1@dwillia2-mobl3.amr.corp.intel.com.notmuch>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6661416ed4334_2d412294a1@dwillia2-mobl3.amr.corp.intel.com.notmuch>
-X-ClientProxiedBy: BLAPR03CA0150.namprd03.prod.outlook.com
- (2603:10b6:208:32e::35) To DM6PR12MB3849.namprd12.prod.outlook.com
- (2603:10b6:5:1c7::26)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 960413A8C0
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 14:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717684983; cv=none; b=AY4tq2dJgqeQRIzr9z86xd4IW7gQVY2Bt+K9a2HMbxoiYzJmtcepVCXnYK0tQ8M/6iXcXY9N2ONYGp+Zn8saRlX0JMtnUU/vbX3rHwcsqCWEzXz0FQ31Ps4tlHM+xpClHOo9HluNvleK0PE6+OG++MXyFIW7K7PWdhNVJIqcP1s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717684983; c=relaxed/simple;
+	bh=ONW53m4ZycWO1OGtk0GeLM/2qht39lHSIfuM/kqo9lk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UsA6qNWAxzVtNVXNx0yjH2oY5kiscbzOEQZF+wbsCgbc8ROCRI8ObwmMhYK0BWIA2gy6JUtWVzW89dS+r4wisg4WIxJaJi/ymE8uvRiszozn5FrA5LmxPflpFgSDYMW5d+5XLS/rU03XPuQwgiqU61MdXJXOa4mrMRpEfEtiPp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xCNBfre5; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: daniel@iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1717684978;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OyjftdVLlqSs/0Ocru/73Avy/AEFY5TKCAK8RNKM7vI=;
+	b=xCNBfre5GyZDH2+KCsGM+3I2PIiduF9fFnPbIIVVzsrAIl9ILzELM/jdni4a2Wxwtz9G/C
+	KxpDHdGXIROFCca9drkniNf1SLdGZvGDfzEgEE1L6yKDSTVfCFYJtUQLE27GSKUhHYRDfg
+	Hug+9zPzWGIPO4d1sSmUu5A8uWJPevg=
+X-Envelope-To: bpf@vger.kernel.org
+X-Envelope-To: netdev@vger.kernel.org
+X-Envelope-To: kuba@kernel.org
+X-Envelope-To: mykolal@fb.com
+X-Envelope-To: andrii@kernel.org
+X-Envelope-To: martin.lau@linux.dev
+X-Envelope-To: ast@kernel.org
+Message-ID: <2b629bd6-a497-410d-9193-f5e0a8cb91e4@linux.dev>
+Date: Thu, 6 Jun 2024 15:42:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|SJ2PR12MB9189:EE_
-X-MS-Office365-Filtering-Correlation-Id: f1ebe90e-2c92-4ce2-f284-08dc8636b107
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|7416005|366007|376005;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?o6ZacMwvtPs4v9hxNb6Qkk+VNs0MB5HU3rAGk4nY1MakExyTgI83ZoEtp8ap?=
- =?us-ascii?Q?Es+Wncy048C++kq1efjveHKRzwB7O1H41kM77wF6huGL6nqgioJP/p/cDPZ4?=
- =?us-ascii?Q?Bc7ucpZ3nGzOXRN2Y13FgDlV3F8o3saRi1diU/S1AVuULgYpQwaPmWYEi+Dz?=
- =?us-ascii?Q?hWq7ySGiZBuYw+q34j6phHRSl8HFP1LtUf3m1OuQDqXZdJSLlwuINDfC2L5w?=
- =?us-ascii?Q?h5sNhUWbHAnf0C3vUZhVwgdhdHu9aX4OH7buTvsvaTPRWH/SGY93JAWkDhKe?=
- =?us-ascii?Q?ptmSYHwXL6udMYV5AT0j9MBqJjDff9RZToF91nC0+Spc0XYPeJObB6QpeA3g?=
- =?us-ascii?Q?cNQtpE8P5Irw5kWQMCOBSrcrSj+hhve5VCnAB7vSujs4s5oMyurfZA5qFh0F?=
- =?us-ascii?Q?xi2CluFeJdQ7o21P3fa8IdQ0weIMv1DxVxjLS9QIoONVZg9Z5sSVErQ+piRC?=
- =?us-ascii?Q?ZhQRauQFRV731ZsSvk0ZId2w3q9gopu2PYa5Twwg/pm7eRCDCESieJfNiaec?=
- =?us-ascii?Q?G4FL6llsCsGsWhYCa1I0+t7SX49XfAWbWBTE5qEhDBsRF8d9zFzEVHB8bIE5?=
- =?us-ascii?Q?ix8XCyOY6iRpyknBXpIXDux86H/yyYRK4EKSoZTbmgzT5UpJSgZxICoB3lUi?=
- =?us-ascii?Q?jwvlXQCE0VrKQMR1f8PwC4Ex0YI6e3OUnGSUcC0XDzal0zI3xACujCG//o63?=
- =?us-ascii?Q?BL0R0vO8AJyd/dHgcEaeF2Caa387Rqr2jrY6TyaGP6wIoc3rI4w0l8R0Ebr4?=
- =?us-ascii?Q?3fbAGGYW5cyg1tz3yYJ7aLqJD/pGQTDNbr1Q11z6vcZr1UsiPk53tA8p61x/?=
- =?us-ascii?Q?kTWLxllG8Po9xFE+Ohdg1A4UTp5eFEuqtOSSNy6seSO3AyA0TsZX9Vut+zKe?=
- =?us-ascii?Q?me7n9tZFgQxdroWFueM5oEDlXaMfQOTLnRolSx4UuNP/XTU1qlXVHyaY6sYL?=
- =?us-ascii?Q?9fW/2aQD7GtUcU3i2MO+mZoSW/fpRJH/dcuWFsLiNH4rK7AZaa91b2cUsVQR?=
- =?us-ascii?Q?PErzE65+kuMmL+nBlIal7A0ZDc16SBNT+CZykVsNNYG+yO+R2ifcU/bp8eAT?=
- =?us-ascii?Q?aSMZ7sv8L41MU2nTbPU9cy26d3iU0cwupr6CgL/029/DzanpeE9lLj0Agxen?=
- =?us-ascii?Q?0geaYOqv7DbrDB6MdXJtFx1wdyzHc2umYFzC3uZy2+lwMLOJFfnmIHDJGXBB?=
- =?us-ascii?Q?mb9FKE02aqFeHGIrcfEUh7L0nmsC4lRc2NP5dXb53b2fNq3VA0XKweT3ECsX?=
- =?us-ascii?Q?HNL0jsRQ2OyTtWSn+dmjD8blTkWMOSUjo45e0JamTY2FErcVkmgyJvG4VEKS?=
- =?us-ascii?Q?/Dol3CX7+zAy4h240r9o3ckS?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(366007)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?egOY5GuiieeCfJH8PYaTm9rXtu9Yx2E5m9063h1jSCNbdFadXvPBJKWEw1N9?=
- =?us-ascii?Q?bWcFI3su+rwWRelT/oXDIAOftp2nGAYbCg50xElO1U/11Q+QsvxtTPzTgP02?=
- =?us-ascii?Q?pIEhnLwgc1kfBRLAybYqhstjDoERHdD4y8ruSR9pXptlGkwqutxpjfqJLf+a?=
- =?us-ascii?Q?ARkxlZOWLJvgJv0jZQToQWJ6941UkEuECWJ6AH0/MRSremixYDuPPox3Tgt7?=
- =?us-ascii?Q?dpU12sCmN+GbC825XqbuueHxrrJqlYPPNTntAsGQKNfxKXMOJixYX8b2jjOO?=
- =?us-ascii?Q?GfdeWFV/XLtAe3NIBwQJovhIQF1Kiby35tvrGfDrwaNE0mNg43Wh3LO0x7PM?=
- =?us-ascii?Q?h2HOCafNXpfj3WSHaaozUINJXbhtm3D3f7qIpTkPpRkStroAv+damgwiuguL?=
- =?us-ascii?Q?PPzP+s3i3ETPuL0Pn7hQxblOsGdiQPUfjlgiZS6REt02ALVBDxYaHMRUvZp5?=
- =?us-ascii?Q?sEyOr00lefcbYobB1IW01cCMof+HFGBZQIE0ln6TTa88Ow4Rix7mdi4bCtuI?=
- =?us-ascii?Q?mDoJC5w+OT32cKFSVqmYvLncoh7wdvyQ3eVGNu0RJiMa5GlexVQEpWokzcom?=
- =?us-ascii?Q?g7mb2H2552xalALnsujuA72vh07SHrZF+hC0VspYisUcRT9l2YTryY6gleUN?=
- =?us-ascii?Q?BvsKkwUwqqxc5EvvdWpALYG5ZYak/AzGqMWRFhVNnqI5nd6uizrY8TKj+qK2?=
- =?us-ascii?Q?J8lJ12fpNQ4fGl2DOUh/UiS09jTg2nQUNjszy08dlCN9mlcdN+FAWtgPLu5N?=
- =?us-ascii?Q?40gfhAMR2OdKYKYJCY5i85vzmG+O4MBXM9DzRxTjDY3hqd6EYcgLrx1krlMN?=
- =?us-ascii?Q?xehN2jj0A6byqBGOsBOVWckMV8pXlcBMVAw8H+X08QuBALDEuTp9Kp7ar24D?=
- =?us-ascii?Q?UEepTA6uC1HJeIGb14hGMFYKM4H3JyUgVp6bG7+k/4C436Zldu8b39UZq6uT?=
- =?us-ascii?Q?PEVClrMVaT21Fc88+owg0Tr462FvGo9XwzLBtchsx0m72Emg1NHKDW/E4FhG?=
- =?us-ascii?Q?h3XBg+Vw+lRw9BLrckpMjXwqH+yVuFjfdJwag6BjlO8diB2JfW+mkmrt48Fe?=
- =?us-ascii?Q?tABByWifFiU1Lq7bAv9AWbfC3UcN9kclUUHeotDyA2cNyFnxPW5itV769qvE?=
- =?us-ascii?Q?EpyMNnCQOl9DgZXSdpLbGyNsbDVF6I9LBLPKY64pMRPCUi8nXSrBr7YoO6Kc?=
- =?us-ascii?Q?BE/N7xzcc6qbXal8kMiE5MIqdLM/yAvAvLLa+ecqPaWi046aFGDwORIULATi?=
- =?us-ascii?Q?fxXrXVnYABJhsndlQGQBvvE5eScX9NqJ5PX4+oC6GYUrmJQZu3saD8H52O5l?=
- =?us-ascii?Q?3x8EGowqb6tUbiEuuE6u0benIc3G7xsI86LMcylPY3joRNJKr8rTpBbbe4Dn?=
- =?us-ascii?Q?YMSuyvSWD4N4QWxl6dLI7suI5reo7udLA1O6Y6Xu+/zrynLRJ14y3R2zTASa?=
- =?us-ascii?Q?xVI8ny5SoPw2OfwT+LImVR2Yp5AMkI0u7OZhHcQBKDqs7by3N561qD0Ta9xq?=
- =?us-ascii?Q?+iUFaGY9dKiYKyxL4PKwLn2gtaagiAlIxFLgQhtK2mJkugb6UMBJqJR3pqD3?=
- =?us-ascii?Q?i4Cq7yMDQbUQekLVqKyd1xoRN9miTcjflmNw6Hyd?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f1ebe90e-2c92-4ce2-f284-08dc8636b107
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2024 14:41:03.8900
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: A7lvoVL3cXAqr2kpY96Ig8sMaiuznYk/VEmakGhmqNc2p9md459HNoCbz3iho18Z
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9189
+Subject: Re: [PATCH bpf-next v3 1/2] bpf: add CHECKSUM_COMPLETE to bpf test
+ progs
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Alexei Starovoitov <ast@kernel.org>
+References: <20240527185928.1871649-1-vadfed@meta.com>
+ <f7fe13a8-c379-495b-9e42-3a5ff50b50e3@linux.dev>
+ <05dfb8f6-4325-62c9-b0b0-1bc22f0f8d93@iogearbox.net>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <05dfb8f6-4325-62c9-b0b0-1bc22f0f8d93@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jun 05, 2024 at 09:56:14PM -0700, Dan Williams wrote:
-
-> > If people come and say we need X and the maintainer says no, they
-> > don't just give up and stop doing X, the go and do X anyhow out of
-> > tree. This has become especially true now that the center of business
-> > activity in server-Linux is driven by the hyperscale crowd that don't
-> > care much about upstream.
+On 05/06/2024 15:43, Daniel Borkmann wrote:
+> On 6/5/24 11:42 AM, Vadim Fedorenko wrote:
+>> On 27/05/2024 19:59, Vadim Fedorenko wrote:
+>>> Add special flag to validate that TC BPF program properly updates
+>>> checksum information in skb.
+>>>
+>>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+>>> ---
+>>>   include/uapi/linux/bpf.h       |  2 ++
+>>>   net/bpf/test_run.c             | 18 +++++++++++++++++-
+>>>   tools/include/uapi/linux/bpf.h |  2 ++
+>>>   3 files changed, 21 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+>>> index 90706a47f6ff..f7d458d88111 100644
+>>> --- a/include/uapi/linux/bpf.h
+>>> +++ b/include/uapi/linux/bpf.h
+>>> @@ -1425,6 +1425,8 @@ enum {
+>>>   #define BPF_F_TEST_RUN_ON_CPU    (1U << 0)
+>>>   /* If set, XDP frames will be transmitted after processing */
+>>>   #define BPF_F_TEST_XDP_LIVE_FRAMES    (1U << 1)
+>>> +/* If set, apply CHECKSUM_COMPLETE to skb and validate the checksum */
+>>> +#define BPF_F_TEST_SKB_CHECKSUM_COMPLETE    (1U << 2)
+>>>   /* type for BPF_ENABLE_STATS */
+>>>   enum bpf_stats_type {
+>>> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+>>> index f6aad4ed2ab2..4c21562ad526 100644
+>>> --- a/net/bpf/test_run.c
+>>> +++ b/net/bpf/test_run.c
+>>> @@ -977,7 +977,8 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, 
+>>> const union bpf_attr *kattr,
+>>>       void *data;
+>>>       int ret;
+>>> -    if (kattr->test.flags || kattr->test.cpu || kattr->test.batch_size)
+>>> +    if ((kattr->test.flags & ~BPF_F_TEST_SKB_CHECKSUM_COMPLETE) ||
+>>> +        kattr->test.cpu || kattr->test.batch_size)
+>>>           return -EINVAL;
+>>>       data = bpf_test_init(kattr, kattr->test.data_size_in,
+>>> @@ -1025,6 +1026,12 @@ int bpf_prog_test_run_skb(struct bpf_prog 
+>>> *prog, const union bpf_attr *kattr,
+>>>       skb_reserve(skb, NET_SKB_PAD + NET_IP_ALIGN);
+>>>       __skb_put(skb, size);
+>>> +
+>>> +    if (kattr->test.flags & BPF_F_TEST_SKB_CHECKSUM_COMPLETE) {
+>>> +        skb->csum = skb_checksum(skb, 0, skb->len, 0);
+>>> +        skb->ip_summed = CHECKSUM_COMPLETE;
+>>> +    }
+>>> +
+>>>       if (ctx && ctx->ifindex > 1) {
+>>>           dev = dev_get_by_index(net, ctx->ifindex);
+>>>           if (!dev) {
+>>> @@ -1079,6 +1086,15 @@ int bpf_prog_test_run_skb(struct bpf_prog 
+>>> *prog, const union bpf_attr *kattr,
+>>>       }
+>>>       convert_skb_to___skb(skb, ctx);
+>>> +    if (kattr->test.flags & BPF_F_TEST_SKB_CHECKSUM_COMPLETE) {
+>>> +        __wsum csum = skb_checksum(skb, 0, skb->len, 0);
+>>> +
+>>> +        if (skb->csum != csum) {
+>>> +            ret = -EBADMSG;
+>>> +            goto out;
+>>> +        }
+>>> +    }
+>>> +
+>>>       size = skb->len;
+>>>       /* bpf program can never convert linear skb to non-linear */
+>>>       if (WARN_ON_ONCE(skb_is_nonlinear(skb)))
+>>> diff --git a/tools/include/uapi/linux/bpf.h 
+>>> b/tools/include/uapi/linux/bpf.h
+>>> index 90706a47f6ff..f7d458d88111 100644
+>>> --- a/tools/include/uapi/linux/bpf.h
+>>> +++ b/tools/include/uapi/linux/bpf.h
+>>> @@ -1425,6 +1425,8 @@ enum {
+>>>   #define BPF_F_TEST_RUN_ON_CPU    (1U << 0)
+>>>   /* If set, XDP frames will be transmitted after processing */
+>>>   #define BPF_F_TEST_XDP_LIVE_FRAMES    (1U << 1)
+>>> +/* If set, apply CHECKSUM_COMPLETE to skb and validate the checksum */
+>>> +#define BPF_F_TEST_SKB_CHECKSUM_COMPLETE    (1U << 2)
+>>>   /* type for BPF_ENABLE_STATS */
+>>>   enum bpf_stats_type {
+>>
+>> Hi Daniel!
+>>
+>> Have you had a chance to look at v3 of this patch?
+>> I think I addressed all your comments form v2.
 > 
-> "...don't care much about upstream...". This could be a whole separate
-> thread unto itself.
-
-Heh, it is a topic, but perhaps not one for polite company :)
-
-> > Linux maintainer's don't actually have the power to force the industry
-> > to do things, though people do keep trying.. Maintainers can only
-> > lead, and productive leading is not done with a NO.
-> > 
-> > You will start to see this pain in maybe 5-10 years if CXL starts to
-> > be something deployed in an enterprise RedHat/Dell/etc sort of
-> > environment. Then that missing X becomes a critical issue because it
-> > turns out the hyperscale folks long since figured out it is really
-> > important but didn't do anything to enable it upstream.
+> Looks good, but I think there is something off given the test on arm64 
+> and s390x
+> fails in skb_pkt_end with EBADMSG. I wonder if we're missing a :
 > 
-> This matches other feedback I have heard recently. Yes, distros hate
-> contending with every vendor's userspace toolkit, that was the
-> original
-
-I'm not sure that is 100% true. Sure nobody likes that you have to
-type 'abc X' and 'def Y' to do a similar thing, but from a distro
-perpective if abc and def are both open sourced and packaged in the
-distro it is still a far better outcome than users doing OOT drivers
-and binary-only tools.
-
-eg one of the long standing main Mellanox tools that is being ported
-to fwctl is open source and in all distros:
-
- https://rpmfind.net/linux/rpm2html/search.php?query=mstflint
-
-Projects have already experimented building tooling on top of it to
-make a more cross-vendor experience in some areas.
-
-In my view it is wrong to think the kernel is the only place we can
-make generic things or that allowing userspace to see the raw device
-interface immediately means fragmentation and chaos. The industry is
-more robust than that. Giving people working in userspace room to
-invent their own solutions is actually helpful to driving some
-commonality. There are already soft targets in the K8S that people
-need to fit into, if the first few steps are with abc/def tools and
-that brings us to an eventual true commonality, then great.
-
-> distro feedback motivating CONFIG_CXL_MEM_RAW_COMMANDS to have a poison
-> pill of WARN() on use. However, allowing more vendor commands is more
-> preferable than contending with vendor out-of-tree drivers that likely
-> help keep the enterprise-distro-kernel stable-ABI train rolling. In
-> other words, legalize it in order to centrally regulate it.
-
-I also liked Jakub's idea of putting a taint in for things that were
-likely to have an impact on support and debug, I included that concept
-in fwctl.
-
-> > >   Effects Log". In that "trust Command Effects" scenario the kernel still
-> > >   has no idea what the command is actually doing, but it can at least
-> > >   assert that the device does not claim that the command changes the
-> > >   contents of system-memory. Now, you might say, "the device can just
-> > >   lie", but that betrays a conceit of the kernel restriction. A device
-> > >   could lie that a Linux wrapped command when passed certain payloads does
-> > >   not in turn proxy to a restricted command.
-> > 
-> > Yeah, we have to trust the device. If the device is hostile toward the
-> > OS then there are already big problems. We need to allow for
-> > unintentional defects in the devices, but we don't need to be
-> > paranoid.
-> > 
-> > IMHO a command effects report, in conjunction with a robust OS centric
-> > defintion is something we can trust in.
+>    skb_postpull_rcsum(skb, eth_hdr(skb), ETH_HLEN);
 > 
-> So this is where I want to start and see if we can bridge the trust gap.
-> 
-> I am warming to your assertion that there is a wide array of
-> vendor-specific configuration and debug that are not an efficient use of
-> upstream's time to wrap in a shared Linux ABI. I want to explore fwctl
-> for CXL for that use case, I personally don't want to marshal a Linux
-> command to each vendor's slightly different backend CXL toggles.
+> right after the eth_type_trans()?
 
-Personally I think this idea to marshal/unmarshal everything in the
-kernel is often misguided. If it is truely obvious and actually shared
-multi-vendor capability then by all means go and do it.
+Oh, thanks for bringing it up. Looks like it's a bit more complex.
+Apparently, CHECKSUM_COMPLETE covers everything after the ethernet
+header. That's why the code has to calculate checksum after network and
+transport offsets are set. And for L2 case we have to skip ethernet
+header.
 
-But if you are spending weeks/months fighting about uAPI because all
-the vendors are so different, it isn't obvious what is "generic" then
-you've probably already lost. The very worst outcome is a per-device
-uAPI masquerading as an obfuscated "generic" uAPI that wasted ages of
-peoples time to argue out.
+Another issue is that correct check should use folded checksums instead
+of raw values. I believe that was flagged by tests for other archs.
 
-> At the same time, I also agree with the contention that a "do anything
-> you want and get away with it" tunnel invites shenanigans from folks
-> that may not care about the long term health of the Linux kernel vs
-> their short term interests.
-
-IMHO this is disproven by history. The above mstflint I linked to is
-as old as as mlx5 HW, it runs today over PCI config space and an OOT
-driver. Where is real the damage to the long term health of Linux or
-the ecosystem?
-
-Like I said before I view there is a difference between DRM wanting a
-Vulkan stack and doing some device specific
-configuration/debugging. One has vastly more open source value than
-the other.
-
-> So my questions to try to understand the specific sticking points more
-> are:
-> 
-> 1/ Can you think of a Command Effect that the device could enumerate to
-> address the specific shenanigan's that netdev is worried about? 
-
-Nothing comes to mind..
-
-> In other words if every command a device enables has the stated
-> effect of "Configuration Change after Reset" does that cut out a
-> significant portion of the concern?
-
-Related to configuration - one of Saeed's oringinal ideas was to
-implement a devlink command to set the configurables in the flash in a
-way that mlx5 could implement all of its options, ideally with
-configurables discovered dynamically from the running device. This LPC
-presentation was so agressively rejected by Jakub that Saeed abandoned
-it. In the discussion it was clear Jakub is requesting to review and
-possibly reject every configurable.
-
-On this topic, unfortunately, I don't see any technical middle ground
-between "netdev is the gatekeeper for all FLASH configurables" and
-"devices can be fully configured regardless of their design".
-
-> 2/ About the "what if the device lies?" question. We can't revert code
-> that used to work, but we can definitely work with enterprise distros to
-> turn off fwctl where there is concern it may lead or is leading to
-> shenanigans. 
-
-Security is the one place where Linus has tolerated userspace
-regressions. In this specific case I documented (or at least that was
-the intent) there would be regression consequences to breaking the
-security rules. Commands can be retroactively restricted to higher CAP
-levels and rejected from lockdown if the device attracts a CVE.
-
-IMHO the ecosystem is strongly motived to do security seriously these
-days, I am not so worried.
-
-> So, document what each subsystem's stance towards fwctl is,
-> like maybe a distro only wants fwctl to front publicly documented vendor
-> commands, or maybe private vendor commands ok, but only with a
-> constrained set of Command Effects (I potentially see CXL here). 
-
-I wouldn't say subsystem here, but techonology. I think it is
-reasonable that a CXL fwctl driver have some kconfig tunables like you
-already have. This idea works alot better if the underlying thing is
-already standards based.
-
-Linux subsystem isn't a meaningful concept for a multi-function device
-like mlx5 and others.
+I'll do v4 soon and will be sure to have tests passing on all archs.
 
 Thanks,
-Jason
+Vadim
+
+
+
+> Thanks,
+> Daniel
+
 
