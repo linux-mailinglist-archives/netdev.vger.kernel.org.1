@@ -1,113 +1,106 @@
-Return-Path: <netdev+bounces-101292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86EA28FE0C5
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 10:20:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F6BD8FE0D0
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 10:21:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29D82282A46
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:20:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDC881F25F4F
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:21:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A08F013A86E;
-	Thu,  6 Jun 2024 08:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C5913C835;
+	Thu,  6 Jun 2024 08:21:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JDNe2zSc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HbeIZ23h"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739001C6A5;
-	Thu,  6 Jun 2024 08:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54EA413AA48
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 08:21:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717662032; cv=none; b=oD+VGjgCY0yJoG10HjmCPdTHh/quoD1x/C1dbMvEhOwdnX+aMYRgb7xc1xlwNfB0VfObRGFXaVMBrMMfwJUcqmYNyfhUvt84tXrToi6XCOOIsEeiBoMnRmJ7rO4G+BBLLfKQIaiFLLn53lMXZFhoCdABKRfR1UL77hPkhbcfvc8=
+	t=1717662102; cv=none; b=KlWy3mTSFYHPwUzVM7HDr47S6Jauu7Hl2yCKmxHBvx5HDnvnSt5OyvdWV+hikOHUKbbMupfoagow8OdFQpX9MpUr1R5vMWvtV+QnJ3id9t1H3jkPR5lTs/VscKkNzxdXYq7CpnZWyzPyD6sy4cF7oLBB+y+V2MEAlpqhz//wn88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717662032; c=relaxed/simple;
-	bh=bfxpRNZtKe1C4PHdEOcPjLmS2P7p3xcUsikhdkzmyzs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YcoehZVqAUA79lQS3D6zfIzFXFzf31XwIt3OdpmdEJ0mYrUN5cbDV1RYmZ3L0pq/BoPxSLXTbEK9oJm6S3RqupymtFcOXgsVLlqOEA3vKAr6i9FYoVa3FNe7jX5gceD8PB5RO5xlG/D9DHx1uLTuZN2DijxgS57Pgw/5aa0RfbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JDNe2zSc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E724DC3277B;
-	Thu,  6 Jun 2024 08:20:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717662032;
-	bh=bfxpRNZtKe1C4PHdEOcPjLmS2P7p3xcUsikhdkzmyzs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JDNe2zSc0rdLpRlN+FzJcC3yr3R4SE0AqC479sCIzvesJUqNU8S9NI0XcMKGfVbQ4
-	 p8ezja60MVYKlHFl3dfqrkIpBP5Ksu8Da9llP+v/v3g8Ld9kpQUxHWUDoWsA6JrNrm
-	 LDEtd3jYMELFISCjkwbFS6q4fJG+FKSLFwKwflREkoUn+fF/c0A//dU3Sfm3hby8uA
-	 l4Nv459BgBBI/HcW5i9PwRXkJ+C2ZcmKNfAezNCTg/6X5K7aXm0Sk0vUR2njCEN6gD
-	 z2/FfL6cZnXxIRoPJnpWxJWMCMMIh9Z/1zWm4pt14QHloeLo6uLRfYVif8MAYOzr9T
-	 fFIihuKAZFAAQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D29C1D2039D;
-	Thu,  6 Jun 2024 08:20:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1717662102; c=relaxed/simple;
+	bh=aeK3bnvjs8VEJFtu6HdqB8LOAkT/9yDIQ2qbTFkOBF8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FjrF6IM8wGiQ8s3fXm5rxbqo2ZSvBeylR/mChyxkGkLNggaL3AF96w4k8v/Yy2P5hncP6M4Bzc9j2LP1bcsc3wOHyLtAtzGVnpNFRGxjH/oA/EFTgdNsJTlIaKvqaQCRTUee6c1PYtyS4rfv57PaL05OSWMId1ee4fT9Hp04YKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HbeIZ23h; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-57a1b122718so5670a12.1
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 01:21:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717662099; x=1718266899; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NHvKEz5JKdCznxSqHezsMu71OI+px6uSS61YT0rHfuU=;
+        b=HbeIZ23hH4Ka6f0sKo4cmwfPcRDkIuYnzfJ4YYdcdFAdHOyVlJHRQ7Q4GwCIFGS9NI
+         0zKVt0qSorWejr5JOpr9BSHR7kBSLdfnqh/4T/C7zP13ReUl4P/GOyqWnW+qCo8iucL0
+         EGB6lh8oVGUTv/lIM6LlrGL4xBsQm3mwP4EcqgXURRUpbTsgyJGaVyxKzl2tnJBPKLsH
+         zllNASFbBpxhLY+MGdzZqfjiNeWps8qQHAWmWUmW0Sn5obRn1M4ji++dLAHPh96iTAGA
+         2kxdX0wwhJXQAIy130emN5Oom2w3OQ1VsAVVLW5MJGIw0wnQFAp7QZQZ1wALR3UdCA35
+         lQ3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717662099; x=1718266899;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NHvKEz5JKdCznxSqHezsMu71OI+px6uSS61YT0rHfuU=;
+        b=Vkr5GiWUyjt1Vnw/YNypPTq1CnICgOuxZtHpyV8ou71sqnxAQrgwRDLpyrxyTV2QZk
+         IzS8Wf6ZC0wuCpQeyJ7FAJQCZawKsP7sXfgOwig8+Tt3YhKCl8znSyQuB0IXz0KeKbWu
+         KQVr6p4ohkK2zNLUMvty6endhDTGvbbuY4owHT9R5C3Ml0JiZI81kG3Wud6IPPx6MACX
+         rC1K4IY6uLDcGxd6ND9H5zgwuFoXBM6TVjCYjyna+bio29x+jgmYey4ZhenMJFM2XM3p
+         I+hSt7Voeo5YOAxbCzVU3elFH+dRY1ttZdu12zmYFwGsniOiEWJZnAVpQWAKniu5olPj
+         lpVA==
+X-Forwarded-Encrypted: i=1; AJvYcCXwyttOlO30S6OUqa7eH/tLpKZP19ilb9HBsG5kkDqTsJkyIiygWhmshnfoLK/QetO2GcMv/UY3aPFfvoI8FcZ9PNi7Pcp1
+X-Gm-Message-State: AOJu0Yw74ScgXLDgF3hC3ObTd+RmTtrxMAJ8OlH6C2DCusahsCGPvMeC
+	Zs6vkHwkAvHxG9UBE9v2rGBDm/4DgimiResxWcM5hv1WpZq2wvh6SIcfXuhBCWk7KteJ1Ny2bqs
+	JLv/XzFO2ju8Ov1RpY27Ygdkwc2sJB4tA8qBV
+X-Google-Smtp-Source: AGHT+IHh2yQO2i7W4TVOkZXhb8V7bKamRBQUc7Lc+uRHNVgFKKNhugjLVTkGob22mKGuMH+YwFRJbIKAat4YiCfDe/0=
+X-Received: by 2002:a05:6402:180e:b0:57a:9ea1:f92a with SMTP id
+ 4fb4d7f45d1cf-57aad34e850mr99772a12.7.1717662098423; Thu, 06 Jun 2024
+ 01:21:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next PATCH v5 0/7] Improve GbEth performance on Renesas RZ/G2L
- and related SoCs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171766203185.3557.7483807066243458681.git-patchwork-notify@kernel.org>
-Date: Thu, 06 Jun 2024 08:20:31 +0000
-References: <20240604072825.7490-1-paul.barker.ct@bp.renesas.com>
-In-Reply-To: <20240604072825.7490-1-paul.barker.ct@bp.renesas.com>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, niklas.soderlund+renesas@ragnatech.se,
- horms@kernel.org, biju.das.jz@bp.renesas.com,
- claudiu.beznea.uj@bp.renesas.com, yoshihiro.shimoda.uh@renesas.com,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org
+References: <20240606-tcp_ao-tracepoints-v3-0-13621988c09f@gmail.com> <20240606-tcp_ao-tracepoints-v3-3-13621988c09f@gmail.com>
+In-Reply-To: <20240606-tcp_ao-tracepoints-v3-3-13621988c09f@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 6 Jun 2024 10:21:26 +0200
+Message-ID: <CANn89iJyKWuZ4DtegJR99jYaSf-kbhr0gSosw_XGxjiaGT=00Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 3/6] net/tcp: Move tcp_inbound_hash() from headers
+To: 0x7f454c46@gmail.com
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Mohammad Nassiri <mnassiri@ciena.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Thu, Jun 6, 2024 at 2:58=E2=80=AFAM Dmitry Safonov via B4 Relay
+<devnull+0x7f454c46.gmail.com@kernel.org> wrote:
+>
+> From: Dmitry Safonov <0x7f454c46@gmail.com>
+>
+> Two reasons:
+> 1. It's grown up enough
+> 2. In order to not do header spaghetti by including
+>    <trace/events/tcp.h>, which is necessary for TCP tracepoints.
+>
+> While at it, unexport and make static tcp_inbound_ao_hash().
+>
+> Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue,  4 Jun 2024 08:28:18 +0100 you wrote:
-> This series aims to improve performance of the GbEth IP in the Renesas
-> RZ/G2L SoC family and the RZ/G3S SoC, which use the ravb driver. Along
-> the way, we do some refactoring and ensure that napi_complete_done() is
-> used in accordance with the NAPI documentation for both GbEth and R-Car
-> code paths.
-> 
-> Much of the performance improvement comes from enabling SW IRQ
-> Coalescing for all SoCs using the GbEth IP, and NAPI Threaded mode for
-> single core SoCs using the GbEth IP. These can be enabled/disabled at
-> runtime via sysfs, but our goal is to set sensible defaults which get
-> good performance on the affected SoCs.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v5,1/7] net: ravb: Simplify poll & receive functions
-    https://git.kernel.org/netdev/net-next/c/118e640af30c
-  - [net-next,v5,2/7] net: ravb: Align poll function with NAPI docs
-    https://git.kernel.org/netdev/net-next/c/b0e0e20dc60e
-  - [net-next,v5,3/7] net: ravb: Refactor RX ring refill
-    https://git.kernel.org/netdev/net-next/c/37a01c12e9e8
-  - [net-next,v5,4/7] net: ravb: Refactor GbEth RX code path
-    https://git.kernel.org/netdev/net-next/c/3ee43f09cb2c
-  - [net-next,v5,5/7] net: ravb: Enable SW IRQ Coalescing for GbEth
-    https://git.kernel.org/netdev/net-next/c/7b39c1814ce3
-  - [net-next,v5,6/7] net: ravb: Use NAPI threaded mode on 1-core CPUs with GbEth IP
-    https://git.kernel.org/netdev/net-next/c/65c482bc226a
-  - [net-next,v5,7/7] net: ravb: Allocate RX buffers via page pool
-    https://git.kernel.org/netdev/net-next/c/966726324b7b
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
