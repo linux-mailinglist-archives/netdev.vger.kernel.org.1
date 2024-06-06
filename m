@@ -1,96 +1,109 @@
-Return-Path: <netdev+bounces-101262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 927478FDE2F
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 07:41:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCC248FDE4A
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 07:47:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AED7B226EF
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 05:41:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79E011F2594C
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 05:47:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A5D3A1B5;
-	Thu,  6 Jun 2024 05:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DFBD17BD5;
+	Thu,  6 Jun 2024 05:47:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF091BDC8;
-	Thu,  6 Jun 2024 05:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55961078F;
+	Thu,  6 Jun 2024 05:46:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717652481; cv=none; b=UKGNpS4nsUMQ2rS1H7VV6UJ62Pe1j1q4AEJQmPGVIsNNEnO3AiF1DCEYu3yEH2QLbkb1o27nuwa+rJYasOuvXFtY8iWkkAk0bNXNkJ9zSz5mebdqPb77Jeka4z3xqHCNXTyfTg3vE/d56Sp3Ul8mHaVLQhRVxR5xRMwB1JnM65w=
+	t=1717652822; cv=none; b=ryaLrbQjdgmf274DGGsk0yJXUVTkvX3Zkl+avn19juQepnLvJaZhwLwfgnnJEu/UuLr8PB75uw6fxRY+STRruf+BCYkZoPwrP2+zfVAL5mcmx2zzr4T9plWZfZ1a8KbX+h2KgOb2ztNRofTb13ekLVZ8nYu512Pu/ausVKD402Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717652481; c=relaxed/simple;
-	bh=/VTOrt/1XHNs3a8jbXUgLT/8p5NnvBG8hPczolpeemI=;
+	s=arc-20240116; t=1717652822; c=relaxed/simple;
+	bh=SfCDJ1okbikEn/zgezFk+5rGI1NJPy+aymoZWXlPCGE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nO7m5wrBcTVDa5OV/Yp3PVG4acO5mel4ysETaJV8pJAK5x+oq0MYJ2ZhiwU7NoLbEh2IEV1Wll6RJ4vdDWbvhplltOdF2cFHGnZ4gzJIrnNZJRFAGfw7PLsLRNYVg9QAY442G9aEoDU4v6UrZcKXebw1FcKx/lLl/hwvD8QhhbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sF5s6-006GEb-1W;
-	Thu, 06 Jun 2024 13:41:11 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 06 Jun 2024 13:41:12 +0800
-Date: Thu, 6 Jun 2024 13:41:12 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org, fsverity@lists.linux.dev,
-	dm-devel@lists.linux.dev, x86@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Megha Dey <megha.dey@linux.intel.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH v4 6/8] fsverity: improve performance by using
- multibuffer hashing
-Message-ID: <ZmFL-AXZ8lphOCUC@gondor.apana.org.au>
-References: <20240603183731.108986-1-ebiggers@kernel.org>
- <20240603183731.108986-7-ebiggers@kernel.org>
- <Zl7gYOMyscYDKZ8_@gondor.apana.org.au>
- <20240604184220.GC1566@sol.localdomain>
- <ZmAthcxC8V3V3sm3@gondor.apana.org.au>
- <ZmAuTceqwZlRJqHx@gondor.apana.org.au>
- <ZmAz8-glRX2wl13D@gondor.apana.org.au>
- <20240605191410.GB1222@sol.localdomain>
- <ZmEYJQFHQRFKC5JM@gondor.apana.org.au>
- <20240606052801.GA324380@sol.localdomain>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KPGzNft56FmOijv+p4Ai+cnO1QxDnUBNKzUwA37e1qVioXaSCfk4o9XkpjaQ6XlaSnMBIosmFE9K6edPtOrA5TbyI+q99LeW0XcRL+loiHXXjXjZW84eQ6VEv92DSaxlA3hHcitMonXH5lK01XhmUR6J2nO8EYnxFCg01NUxC2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [31.221.188.228] (port=12096 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1sF5xb-00BiWO-9Z; Thu, 06 Jun 2024 07:46:53 +0200
+Date: Thu, 6 Jun 2024 07:46:49 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, Jianguo Wu <wujianguo106@163.com>,
+	wujianguo <wujianguo@chinatelecom.cn>, netdev@vger.kernel.org,
+	edumazet@google.com, contact@proelbtn.com, dsahern@kernel.org,
+	pabeni@redhat.com, netfilter-devel@vger.kernel.org, fw@strlen.de
+Subject: Re: [PATCH net v2 2/3] selftests: add selftest for the SRv6 End.DX4
+ behavior with netfilter
+Message-ID: <ZmFNSbHqOF96LtVO@calendula>
+References: <20240604144949.22729-1-wujianguo@chinatelecom.cn>
+ <20240604144949.22729-3-wujianguo@chinatelecom.cn>
+ <Zl_OWcrrEipnN_VP@Laptop-X1>
+ <eaf06c77-2457-46fc-aaf1-fb5ae0080072@163.com>
+ <20240605173532.304798bd@kernel.org>
+ <ZmEapORjk3v3FYke@Laptop-X1>
+ <20240605192309.591dfedb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240606052801.GA324380@sol.localdomain>
+In-Reply-To: <20240605192309.591dfedb@kernel.org>
+X-Spam-Score: -1.9 (-)
 
-On Wed, Jun 05, 2024 at 10:28:01PM -0700, Eric Biggers wrote:
->
-> With AES, interleaving would only help with non-parallelizable modes such as CBC
-> encryption.  Anyone who cares about IPsec performance should of course be using
-> AES-GCM, which is parallelizable.  Especially since my other patch
-> https://lore.kernel.org/linux-crypto/20240602222221.176625-2-ebiggers@kernel.org/
-> is making AES-GCM twice as fast...
+Hi,
 
-Algorithm selection may be limited by peer capability.  For IPsec,
-if SHA is being used, then most likely CBC is also being used.
+On Wed, Jun 05, 2024 at 07:23:09PM -0700, Jakub Kicinski wrote:
+> On Thu, 6 Jun 2024 10:10:44 +0800 Hangbin Liu wrote:
+> > > Please follow the instructions from here:
+> > > https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+> > > the kernel we build for testing is minimal.
+> > > 
+> > > We see this output:
+> > > 
+> > > # ################################################################################
+> > > # TEST SECTION: SRv6 VPN connectivity test with netfilter enabled in routers
+> > > # ################################################################################  
+> > 
+> > If I run the test specifically, I also got error:
+> > sysctl: cannot stat /proc/sys/net/netfilter/nf_hooks_lwtunnel: No such file or directory
+> > 
+> > This is because CONFIG_NF_CONNTRACK is build as module. The test need to load
+> > nf_conntrack specifically. I guest the reason you don't have this error is
+> > because you have run the netfilter tests first? Which has loaded this module.
 
-> In any case, it seems that what you're asking for at this point is far beyond
-> the scope of this patchset.
+Hm, this dependency with conntrack does not look good. This sysctl
+nf_hooks_lwtunnel should be in the netfilter core. The connection
+tracking gets loaded on demand, the availability of this sysctl is
+fragile.
 
-I'm more than happy to take this over if you don't wish to extend
-it beyond the storage usage cases.  According to the original Intel
-sha2-mb submission, this should result in at least a two-fold
-speed-up.
+> Ah, quite possibly, good catch! We don't reboot between tests,
+> and the VM must have run 10 or so other tests before.
+> 
+> > > # Warning: Extension rpfilter revision 0 not supported, missing kernel module?
+> > > # iptables v1.8.8 (nf_tables):  RULE_APPEND failed (No such file or directory): rule in chain PREROUTING
+> > > # Warning: Extension rpfilter revision 0 not supported, missing kernel module?
+> > > # iptables v1.8.8 (nf_tables):  RULE_APPEND failed (No such file or directory): rule in chain PREROUTING  
+> > 
+> > Just checked, we need CONFIG_IP_NF_MATCH_RPFILTER=m in config file.
+> 
+> :( Must be lack of compat support then? I CCed netfilter, perhaps they
+> can advise. I wonder if there is a iptables-nftables compatibility list
+> somewhere.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+iptables-nft potentially requires all CONFIG_IP_NF_MATCH_* and
+CONFIG_IP_NF_TARGET_* extensions, in this new testcase it uses
+rpfilter which seems not to be used in any of the existing tests so
+far, that is why CONFIG_IP_NF_MATCH_RPFILTER=m is required.
 
