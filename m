@@ -1,280 +1,225 @@
-Return-Path: <netdev+bounces-101519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B314E8FF27A
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 18:28:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EA3B8FF2E9
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 18:51:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6E0D1C25686
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:28:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CE4DB2565D
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:33:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46BF1B969;
-	Thu,  6 Jun 2024 16:28:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D672D374F1;
+	Thu,  6 Jun 2024 16:33:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UIHqc+SP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S7IgvyVy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235F910E9;
-	Thu,  6 Jun 2024 16:28:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717691289; cv=fail; b=tXRCMmDsU66IIvmG6h0lXDw4oAJxMHgAZbuOL71FZSWPccQIGR8Mv690Vi4aNVJ+oOzK4lZ4XCNc8Qw15lFoyiucRKX46hIAxN5pzN/g/5jAuY7cKaob8zuKqvbKxwuxE1xAzB4cHsGotWxkwty3F55jEagxpTECCwfQsOK/3Ts=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717691289; c=relaxed/simple;
-	bh=rZasSUfxkOVr/LTSd8UjI9GdxWA76XbZnYBM4na4E/s=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Pycjgdc1ArOpaLTxtAUQgzwy+mKnTFWndEueLvhTGeaYezX0bGEu0IUMx2rYyfyxFfyDM64pngUlTr21rDscH5ZQ11mc3YlbgcTOpYCPxDzcSqUAnmyokeq/rNLEFSJDr64Y8PHenJF+x3vIRdFQb1XineMezh9V8C0Z8STJrm4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UIHqc+SP; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717691288; x=1749227288;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=rZasSUfxkOVr/LTSd8UjI9GdxWA76XbZnYBM4na4E/s=;
-  b=UIHqc+SPadfU3YsEek65goJswJ4SOAN7hxR5fV6qhwiFj/wPE0AkoIws
-   kmKKbbZOcD2OhdGgM54ZPlrBfjc5qeLXcH5eap3wMWSWUUmE1BSJlNvSo
-   ma1fJr35JG4jWPOvsHYQiWSx17PmtRT/JDqZxrIhwLYJRQpUvexC3flTM
-   7i0m0bzGseRSSq0vU8nrvOmcORilKzK4sV+8eKauS6t0U2+1kDLR7OzWw
-   EKYD58ftMTNeG5uF46S8luskMq6uTfa7s9wWEpkX2cTg310VpFde6D3yt
-   AM+UHWtkBmwSEo097I7y6hMdz64yfw0jrm5NpMKHpJeOxsiA2zLhX7eDs
-   Q==;
-X-CSE-ConnectionGUID: UAKk7Tu0TZmPbt7QZtP8MQ==
-X-CSE-MsgGUID: BfSaP5A+SQSyNeD7PhvhHQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11095"; a="39779328"
-X-IronPort-AV: E=Sophos;i="6.08,219,1712646000"; 
-   d="scan'208";a="39779328"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2024 09:28:07 -0700
-X-CSE-ConnectionGUID: W1pi5cKoRmG40ztkE5x0+w==
-X-CSE-MsgGUID: R4kga8QFTKWvXn858Q0WWg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,219,1712646000"; 
-   d="scan'208";a="38104393"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Jun 2024 09:28:07 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 6 Jun 2024 09:28:06 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 6 Jun 2024 09:28:06 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Thu, 6 Jun 2024 09:28:06 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.43) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 6 Jun 2024 09:28:05 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IpNuMSF/Elx9786B0vJcWeCDcji6vjbgkDV+ofF1sMyemgfRFVh4trTixoICKkMVpscC2/oKB2NjBUSsG/gzCMFc8phzma8lh0VCTu8KStBtThwm5e7m5IbK747whz+/1MX9QU2QyKe8rfQwJKTagD2m9ixNiM1NFO7cdmSPyKU81EcjPt5nDx6R++2yu413Fgb5/61iJqckDEuNZOrbx4uz1UItX1WAm4KFF1o9ti024JHuHz/0F7cGCGeQ9SbbsknEV2iu+Sn4a+t6SAMDRiA9VG6vFhLn+YKCWyW4fUDRlUjZ0kDxRI9V5Zxqu17OQug5Ve+vEXTutIaPbxGbdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=p6SoUnzKNM8McSgm/Q/5leVGjC4sBScyuA2sAO6+SHc=;
- b=TcytfjuAg/XfcMkUPPMmfoVLOi1C42af/DYDCWfl6PnnBqB7fZh+RNju0blfj1TYcEmW4bFjrcyp9XMBEdddLm+NPcpLJNJhJnAnilvgb/TJvaqTlbJJjn1QN+w9c2ms99F4K7Pt07C7uiYu0Z4rwQL2ci2UE/5J78a/jZ26w+mPMD2lEkHTX1/i3imxM6TjXbp1sS36eJyRH5H8eCXFsZccNWsqB2xNBqH9uqRVHY9G7+orb0bxbo7rfTMcngEwvXpx9fhvK4eafuAvFEzAgYgJhlBFJZ9tybdDe7e+zHZpEzi8QLstIylH8eSNYTi3KD5LutyxHOYEhrYQ1ZRSOQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB4914.namprd11.prod.outlook.com (2603:10b6:303:90::24)
- by BL1PR11MB6051.namprd11.prod.outlook.com (2603:10b6:208:393::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.21; Thu, 6 Jun
- 2024 16:28:02 +0000
-Received: from CO1PR11MB4914.namprd11.prod.outlook.com
- ([fe80::c625:ce3f:cb4a:db14]) by CO1PR11MB4914.namprd11.prod.outlook.com
- ([fe80::c625:ce3f:cb4a:db14%5]) with mapi id 15.20.7633.033; Thu, 6 Jun 2024
- 16:28:02 +0000
-Message-ID: <a8017376-900c-4ad9-bdfc-ba0d711491d5@intel.com>
-Date: Thu, 6 Jun 2024 09:28:00 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v1 1/5] net: docs: add missing features that can
- have stats
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
-	<corbet@lwn.net>, <linux-doc@vger.kernel.org>, Rahul Rameshbabu
-	<rrameshbabu@nvidia.com>, Jacob Keller <jacob.e.keller@intel.com>
-References: <20240604221327.299184-1-jesse.brandeburg@intel.com>
- <20240604221327.299184-2-jesse.brandeburg@intel.com>
- <20240605174802.0add2109@kernel.org>
-Content-Language: en-US
-From: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Autocrypt: addr=jesse.brandeburg@intel.com; keydata=
- xsFNBE6J+2cBEACty2+nfMyjkmi/BxhDinCezJoRM8PkvXlIGZL7SXAn7yxYNc28FvOvVpmx
- DbgPYDSLly/Rks4WNnVgAQA+nGxgg+tqk8DpPROUmkxQO7EL5TkszjBusUvL98crsMJVzoE2
- RNTJZh3ClK8k7r5dEePM1LM4Hq1bNTwE6pzyHJ1QuHodzR1ifDL7+3pYwt5wowZjQr4uJXFA
- 5g5Xze8z0cnac+NpgIUqUdpEZ+3XmI92hIg2fUSRPUTgm+xEBijBv2OlTjZpzVfH8HlXeGCT
- E98Vuofvn2pgTZyJWJ6o0I9JUlxO+MMtMPuwL7Br0JqZQvvf80EFxbXnk+QSudg0sZAAec0g
- TSGWb7513siAqvAhxGjIf0cs2hEzRXbd4cVMZKPV2uai5g2LUsnS8m+zx/fzCC+KefKcxN8r
- Fs+9jNj2TOwmqahJqRBwxQZujNC96pkCQYzZtuz5BA7IMxC12TtnbvtUL6ef7GZVMv6b+rpe
- RmWnLIfGJItWefcse66l1wPQPi6tXmzBN6MaEDyVL6umiZTy7dnltaXsFZPPLapuk0qRoQtC
- aIjjk5VaK16t6pPUCRDW1um2anxOYBJCXzHrnzKf09hBgjbO2Tk5uKRQHpTEsm+38lIbSQ2r
- YUfOckMug/QHW05t+XVC2UuyAdjBamdvno7fhLaSTsqdEngqMQARAQABzTBKZXNzZSBDLiBC
- cmFuZGVidXJnIDxqZXNzZS5icmFuZGVidXJnQGludGVsLmNvbT7CwXgEEwECACIFAk6J+2cC
- GwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEKaiMWVzwKZycZ4QAIayWIWvnV2PiZ0E
- Kt7NMvSB3r3wx/X4TNmfTruURh24zrHcdrg6J8zSlXKt0fzxvvX7HYWgAEXD9BoVdPjh7TDy
- du9aMhFCFOfPHarz8DdGbT8UpGuX8bMZyd16/7nMqoGisK+OnmJubPxID2lDmXDRbxROahNF
- 0ZJVXd+mw44FefzyJigJnfXtwyDuIit6ludKAs2iW3z298PuL13wiiG8rg5hTdWANxcC6wEh
- sycdt1JcKO6y5wcDwBr/yDPsUKaQPZTxRyiBK6NmQEN4BXbcG90VSgziJDPuYQb9ZOv2d0lX
- yidkXe/U9SpTSEcC6/Z8KinBl/5X/roENz5gW0H27m52Ht1Yx6SRpA3kwdpkzd0r5dKLCOVQ
- IwrAec5oLZRQqrSVp9+6PH7Z7YVQzN52nsgioQT8Ke2yht2ehsaJ97k718XhIWACyJqqmo/k
- wkj+5aUAi3ZXVOw3TGOpsfuz50Ods8CtGDHsUFwKlH10wXxOFdTa4PG+G4LTZ5ptkdFzm2rb
- 9GJF2CSUS3ZMbBAQ/PZf1WpGUXBpOJMyD2AbWJQKTNn4yYMskMbnr4sGxitj6NHI4unlyd28
- 1FmaRbR98v66sXYVVSP1ERFS/521OwMvWkPNuPMpqZ1ir9Nq/kw4t+urpVKF7RR87yuT46Gx
- /h2NVEXa750f7pf2LfPLzsFNBE6J+2cBEACfkrEDSsQkIlZzFgAN/7g0VmjHDrxxQSmvuPmZ
- L9pI6B/nNtclaUBu+q3rKUYBJhOfMobsafKOV8jYkENqOXvOvpb21t8HJ0FgqpMs+VE98gkp
- BM+Nitd+ePRJNScB8DKFmTT97QLBB8AdTWGy1tCSncoqhIz15X4ALplQkIoCuxdKPEuTeiyV
- mJFwvS0pB/GdN8hQEddRIo3E61dtLmSCH0iw6Zd8m9UHoZdZLWjfG+3EyeQ2TK0AFU9GpxVY
- nJ8mDacZlpcq4mjbr4w0G2IyjGyO6iLHKdYe3lU5Hs7lxZGbtnGQbGKL9VimV4IkKsXmTE+4
- /Mi+hWNxFBbZ7f7DUO3B7mZOicxxf2dK+vioHUr9TkWFwXARPwQGlGc3nGPQBhfaso+Q0q+b
- ftLhcdVDJjfNXvptWK3HbXQDsnkZ61nOEvjHDjpLQyzToKTSRoDNvnou2d26l5Nr7MHsqgxd
- xRKIau5xOAqO87AWHnbof3JW6eO8EDSmAYNWsmBBWFO7bfcJLyouiPSkDpsUniLh6ZAHyljd
- tYLPWatBqzvj28tTnA++Jp1bKDpby92GXQE2jZJ+5JCT+iW6dGQwrB9oMILx4V0WAvFsZT4t
- bq1MdS1n0qZD3t4ogYVqmYJyiB5ubTngI+s+VhDw3KbdhURJkQQ8dmojVfJZmeEH3u/eawAR
- AQABwsFfBBgBAgAJBQJOiftnAhsMAAoJEKaiMWVzwKZyTWQP/AlWAnsKIQgzP234ivevPc8d
- MOrOFslJrIutYqIW0V+B6teIcr73lejBl1fWtxn0mGPiTdNg/tJ48uN8K38yDzpxxmDDaKJa
- GGW6VPRezSpreqFjoEIz5NtJOo2dl7iK/6y7bAdlAeQj2Dvwj7Y1lB/JIbw8yoDg5Xl8D2db
- I8hchtsSXs8bxReEP1BGGsg4uyceOUexa1vAIGy80JDobbcjRaAo7xdwCXQjfEoC5UJVGd8g
- k21zDAUw3Eh47qO216txWwvOi+fq9o0UnOOAJ0xTRnQt1r5rMxEa8nLlChgfOSAdvBfaKAkn
- lIeWKK9LuETsiLpbofrey42d3wUUXggHYleYr9gR/7kQze78OATUHcud00B6EnmGDTOpbykp
- fby8AwgfbmcGz3LzgoZM7W9fnAkfVRuBOF5ge48kZecjHGxE69VB9180Aq6Bo2QVBlp3Le0j
- 97DvMAwMgzyvfHHBPV0B9uzfxyBcxc9bRHXk0IiVIjm2e4gR+5WdsgXFd867ezQr3EiIe+6U
- +k7ZSjyrj7tsJOk1tKAvQKvMlxfRecw/yJDcKwwBHgEXVEnKgbu/Ci+ikbqsLCBWbOWs6eYq
- 6m1nRM6nj0pgRDHIOQIxdWEysPWgmY2xxHb4yUq5YWa5+xu59zXdG72FqGqN8+Mkdw+M9m4D
- /fnLfll98Nhx
-In-Reply-To: <20240605174802.0add2109@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0155.namprd04.prod.outlook.com
- (2603:10b6:303:85::10) To CO1PR11MB4914.namprd11.prod.outlook.com
- (2603:10b6:303:90::24)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A215210E9;
+	Thu,  6 Jun 2024 16:33:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717691621; cv=none; b=RSBhV/5fq+Eclg45OHpMARDhLih2v/PTWu5abktI6zOgmriSVhlIoeFuxG/pc6HsOgS89ykMalH22uUa+u2riqRA83M1hpQ+EVGtKRgizHvfU/uLDL9nMGlumLjnetK9ng8M1fblamh8KsT1gM/GcywVPHYwQ0glPeXNNZ1dTR4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717691621; c=relaxed/simple;
+	bh=Dd5xuQCXjQbAM4QC/1i17ToQ5z+UxwV8krZqgKleMYw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uXnKN5bM335cE7uWYGeMDN5AgGF4fBsGHDCjwfitlaE54wj7J68NKMfBpMvBRjvM7gDVDrqoAXlpKYTx50fiUjhJKD+X3BOQ2iGS7P5huADNsQZCKu/BfFaiVoULg/XBFleBu2u7vdtbJpQvxV9Ts665lZLuYIhXzYYBTYCJD7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S7IgvyVy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96CD4C32786;
+	Thu,  6 Jun 2024 16:33:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717691621;
+	bh=Dd5xuQCXjQbAM4QC/1i17ToQ5z+UxwV8krZqgKleMYw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=S7IgvyVyr7ONSY69TsofxX/n2zPzWdGiDcLRgwHNaOQnF4ChSokqEP6+OBPUZ4M2B
+	 koC4aXtmLTtI+gRNseSk1bhrMQBo4CfnYkPOEwOATqot2X0YSd0OyAT/mp8sAAP7TH
+	 bSV+3rqixQgyaDXW3hvpbA+1bCSRnmhKE7+ZbIJJmp5raQ/6l4XiPaiDh20wOESBHt
+	 TYqORfpFQu+hom7AZnFiGKKv4xwR4NY3MM7GQbxCDOXPFtpOhbNadzwYNI85vjaRpp
+	 rEf2QOO6Q6CJv80aHUhXQXetttQ+qYZ+oEPg8MoHqwPampnfw2vRyu1JcxfJOoreGw
+	 TxA2SMRKurJ5A==
+Date: Thu, 6 Jun 2024 17:33:34 +0100
+From: Simon Horman <horms@kernel.org>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: linux-hardening@vger.kernel.org, netdev@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, Colin Ian King <colin.i.king@gmail.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Kees Cook <keescook@chromium.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Long Li <longli@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH net-next v3] net: mana: Allow variable size indirection
+ table
+Message-ID: <20240606163334.GO791188@kernel.org>
+References: <1717169861-15825-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <20240604093349.GP491852@kernel.org>
+ <20240605083906.GA15889@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB4914:EE_|BL1PR11MB6051:EE_
-X-MS-Office365-Filtering-Correlation-Id: a9b57523-0684-4aa2-48f5-08dc8645a2ef
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|366007|376005;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?Z2Vzem9pZDZKbm1JZlJJWS96SlkydnY0OTQ0OXovQXJSN0NSN0ZzYXBsNEtw?=
- =?utf-8?B?OG1MaWFiUEpqcDFtNmlmTlFMRGRuMmxrdThrWEFSYVppS0tKdzhiNXQrMGh2?=
- =?utf-8?B?d3prNjBaaFUwT29YYm50M3pLYXVGZktvN0Z0YlBVUUNhNGpxdWNjOUNaU0FK?=
- =?utf-8?B?WVNXRmJkZ1JsV1lvVEtPTmx0WjlVOURRNElhQzNEYXJ5SEdETkM3M3hIYW1k?=
- =?utf-8?B?Z2cwa0hWOVRxY2l1RnkrWDVZZ284TmdMWXhWMVJET0NuaWJmZ2J4eTJSNjVq?=
- =?utf-8?B?ZkRNK2RMNHArY2llR2l6SC9XKzM3OXVaajVyMGtJV2JoK3ZBcEZWL2pVM2JV?=
- =?utf-8?B?dFZqeXUydVBtenA1K1BnUzBxeEY4cWM0Q0FkaDUzeDcvTUhqK1BERFJoMGF0?=
- =?utf-8?B?V2h6WkxqQXVIRSt0MTN2NTJBWEt5L3ZYVU1JWVNET2ZWR2Fpb1ZCdklLZStB?=
- =?utf-8?B?VVhteVBCWlgzOTkvTmJpZVJhTUVvd2ZxRmxGWFluWlorUWZLUmtMQWVDY2M4?=
- =?utf-8?B?YmRJemYyaVpwTkYvR1FRV1VROWlkZFVFRzdGQ3JqMWdXWFhsSVNweE9XUmV0?=
- =?utf-8?B?Um80ZWp2bnpDUmIrcHZqNjlwWWxGMmJkY2FkUm41anBZYlNIbWlEWXJpelYz?=
- =?utf-8?B?STVmdVhTZTB3dzBQZnFERDMwS0ZRWHEvQnR5alhwUEtqbHFQMEhDWkZkL3NU?=
- =?utf-8?B?WnJIUytNbHJkbTRJWHlRRXRKc09ybmhwbkZTeFFhSEtsdHU5eDJkVC9MZkQz?=
- =?utf-8?B?WTVIcFNIRW1KRnAvc1FCNG4xR1BpeUsxM0xCY3dPMUI5eDdCbWJaWkNjR3JC?=
- =?utf-8?B?M2t2ZHd6SWVGbXF5Q3drQmpZRU9va1llcEhUUTRycGt2eElGeVBXME51MUM0?=
- =?utf-8?B?RWphNk5jOGNPbDR0bkRsM2xndkNkd01KNUVtWUliR2orWndIOUJsR0J1TXdP?=
- =?utf-8?B?TmVGU0dNdTRLaXpOTWVUOThkamFkWHF6VEJYNlZVeWwyMjNrbUpaQVdacHlt?=
- =?utf-8?B?bUZmc1gza2xvT3JiWVk4TjJwS2lvekM4Y2JTQVFWcnAzaE85QjJFenZSYzNC?=
- =?utf-8?B?QU1ZWFdTM01MOW5CK2o2Yy9OTURqN0g2REFqTWNpS0RnbGxDaFpEYzVyRzVU?=
- =?utf-8?B?bEVtSTRYR2tIeVVBZ1NZY1V3RnU5MGUrQlN3WGRKcTlpOWJHZjF3Y2xYa0Yx?=
- =?utf-8?B?M3A1dURhWjg1bUhNNGV0MDB0RzlzeGNJb3FMWmxmakd2NXprTEg1NHZGZlZx?=
- =?utf-8?B?SmJaWGE0VDk2NEJ2WWRmSXBMTWd1Qnd4WVdjNXVVWmR2R08vaGdNOEx5Yk9F?=
- =?utf-8?B?aGZRek5KM3EzWXQrVUdQWnJ6bG5GWURYdDdZNDJvSXR1MDlBTTR4dlBBZXhz?=
- =?utf-8?B?d0xZSXlYa0lhdWZHUmE3MlIvVVZ4Y3VKOVcyUXJ0VkhpYldoQUNoZWp3b2J0?=
- =?utf-8?B?VWRJY3haeGFoZmJ4R01GQVp6a252em9RWGdxZlhLWHRhSlhJMWplQ3pieEor?=
- =?utf-8?B?UGgvVGVpRGh4V1hxeVRjRTlpS1d0TklEajBGUmtNSnNPZlFoeXpRQ2VRb1Fi?=
- =?utf-8?B?UmxMNzZBTFBmR1ZhYjQxMG9IU3NYOXVXdzFZcVllMHM3K1JnUW83OGVFT0FN?=
- =?utf-8?B?bGhjN1NiYkZlcVQ3Qmt6b1BRQnB0K0d3NWdWaEZzWWdJeXFMUGhMNUY4aTlH?=
- =?utf-8?B?dVpiR3h5YktEaFVaZGlqN1dkUm80SXpMeTJRYkRVK3pyZVZEbGtyVmdWWFF0?=
- =?utf-8?Q?PNxRDjZkpZT/7da7m52Sd28ZitJJkT2BIJ083Bg?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4914.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?alcyTEZUZkNsNmJIWkFndkxJMzQ5RVZRenBFdFJwd1JaM3dvU1ZiaTVwSXBp?=
- =?utf-8?B?NzhyYjJtZmlJKzV0SnFzcDRsclpxazhYOG9iYTAxb2FRdkVKUThSbTRlR1lG?=
- =?utf-8?B?Qk9WeG9lK0lQUWpnRjF6K0RvM25maWlyYWQxWmQxWGx4T2M2TkVRV0trK0Zl?=
- =?utf-8?B?ZDl6R1hhK2RnR200SmpmK3YrWXpMd1h3YWNTLzFGN3JNK2cycW8xOUNDNU5S?=
- =?utf-8?B?SEZ3VXU4L1hGQ04rYVFUR0graHgvLzhsR3hPVjFxSmcrNnJSWTUxaE8ySHpJ?=
- =?utf-8?B?U3FmYWpjbVBheUlSZ0RXTmhsR24xM0JhajVWQTJYczA4TERYN3llNHd2Ymhr?=
- =?utf-8?B?Um9SZFMwZkxzWXFMR3NpcFFFV09LWnFHT0FzZEhmSEd1Rms2YW5oaitmNFkz?=
- =?utf-8?B?NGF4MVphR2dHenpVTXhMOVFzOGxsd09GczgxWTcxWEJxeXZzdkI0WW5kREdL?=
- =?utf-8?B?N2RqZUFEOUp3Uzh6c1lLOW4xWmhPYWJUcGg3a3BDMXlWaDlKSFBLZ2luWWcz?=
- =?utf-8?B?ZDFRR3ltY0Y4c00vdHc4SGZsRHdJTTRlVGU2RVI2VWNSTmp6MkEzR2FPWVE2?=
- =?utf-8?B?MXVyUXdVd21Wam5mZlBrRjV0Y3BvcllhTEFrK1hqbTJIakxSbE9OejdQRWM2?=
- =?utf-8?B?KzgzYWZWa0JIWno2YmdaT20xWENwbXhOdEhUeEFqcmZCZHRpaEsyWWcrd1I2?=
- =?utf-8?B?UVJrYnVWTjZ6cUR2dVAyYUwvOFNJcVpyL0hZaUIvUG1SNEU3Q3B3d2x6VExX?=
- =?utf-8?B?TzJPRnhLUlFyelpqSzVvYTAzcHBQZjd1aEY1a3p2dUVxV1RRSG5EQXpIYVly?=
- =?utf-8?B?WVBYUzlhZWQxTk1xYzlEdjVnMk0zalU2aHNvdEh3cUE4aUNjUlJyRHc1MGdM?=
- =?utf-8?B?UHVobEpTWWRReVNtZlh0dXZiQmVlVTlyanhkUWNvR0JBSXV4N3BJbC9RZmZZ?=
- =?utf-8?B?dGp1NHBhSHl4eTJHWk5yb2IwMDJZR2VPczBUNTAvTDNvbEgrYmt0cnlXaXJp?=
- =?utf-8?B?MFY4cGt0aDJCZFFnWnRCS3F5dnY5a1hMeE0xUEZJNGxhSFJ3NCtLV0pKcnNZ?=
- =?utf-8?B?T0NRMytDOFQ3a3NXSHhSS2FPTk1ZVzQxOHF5cEhOVitHTml1VkdHUzZqZndy?=
- =?utf-8?B?dXhpSmM2QUQzeFhvZFZ5aXpqb1JTbWNDYmhGclZEQXBsdFVma0t1aXI1NG5a?=
- =?utf-8?B?WlFSUkVzcXJWNTRlbDYzRE5hN0lFUnQ5SFRnWi93MWN6TytjRWVxcnowR1B4?=
- =?utf-8?B?V1ZvK0luVUhtZ0RkcFhQbVkvNFFVak1LaERYZ3pIaFJhZURXK20vSVhubllq?=
- =?utf-8?B?aWdoTGNnL2FZaVZGQVpHVzJqbGNQWGc4OCtPT1ZaSWR3RlpsdEtRaDhYZjVM?=
- =?utf-8?B?UndwY0hmTTQzVDI1Y2UxR0xEeUpnTHA5Zk9vV1YremUyRWp4Q0hqcWVsQUFO?=
- =?utf-8?B?S2lBNURLTXZDZWFHWXRpY0IzUUpObzc4bzloL0JIdUt0M3JDSjFrenhOOS9Z?=
- =?utf-8?B?enB2QytzWm82aU1SbVppK1RGc214amRKZ2ZFWHRMaGgrYS81bWI1azI4ak5B?=
- =?utf-8?B?VnV1aDZoeFd4L3MzZjMvOGRsR3g1cnRTTno1NFNRWjFlVmU3WmpUVlhpdDh0?=
- =?utf-8?B?eXlaSnFLL3BYSTc1WXNXOUt2VTVzZGxwbkhiN0N4TVRwVjkySyt1c1R5bUJm?=
- =?utf-8?B?c0hSTlk5eW1naWgrZTZwU1UySXhrWnlFYzlCRU15RWI5Q3puU1hhYkZ5aDFa?=
- =?utf-8?B?MUUvQkNJbVNKWDdLOFgwOEZERWpNVk5hRTFVWmRQNWI4bkhSSkQ4MWlJRmlS?=
- =?utf-8?B?OFhXRDYxbGpRVTlyOC9wS2U2bGR2TFRQVWtSY1ZSSmx0OHlIOU9yL3hFRDZQ?=
- =?utf-8?B?SXpjS0JLMlFEN1FJc3VNSmI5Wm9UdHR4TkpuOURmRHlFZFJEb3cvaURDbmRC?=
- =?utf-8?B?Z1pqbzI0R3FCVkNpMXI2TjVEQXA3QWxHSzFZQStJSmxjamZlcHpjL2xPcnli?=
- =?utf-8?B?Yi9lbURNUW81ckJGOTVxTTc0Rm9VbWRXbTY4Wm9RbHI0VHZXcVg1UzFudU15?=
- =?utf-8?B?VFZlWGlwRk4zT1U0R28rdlgrWW5QSlNaZFhqa3E2ZjY1QnhMMW1RdUJSLzBp?=
- =?utf-8?B?Y3NCRjBUbUx3NnJhQ2lRTGJ3MnFJWmVYZ3E4SDIrb3NKL0I2K3o5MzlPcmxN?=
- =?utf-8?B?SlE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a9b57523-0684-4aa2-48f5-08dc8645a2ef
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4914.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2024 16:28:02.5405
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 295IZasaeZpjZpCYbkrvgce7VHl+7pelQv6Bet1Lpdror8DyrAD+meFH8SyURlSilBX+F/YFAe0CuSUIvKIJ7UUi9E1Rblhy/ofVxzr6UGk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB6051
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240605083906.GA15889@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 
-On 6/5/2024 5:48 PM, Jakub Kicinski wrote:
-> On Tue,  4 Jun 2024 15:13:21 -0700 Jesse Brandeburg wrote:
->> -  - `ETHTOOL_MSG_PAUSE_GET`
->>    - `ETHTOOL_MSG_FEC_GET`
->> +  - 'ETHTOOL_MSG_LINKSTATE_GET'
->>    - `ETHTOOL_MSG_MM_GET`
->> +  - `ETHTOOL_MSG_PAUSE_GET`
->> +  - 'ETHTOOL_MSG_TSINFO_GET'
+On Wed, Jun 05, 2024 at 01:39:06AM -0700, Shradha Gupta wrote:
+> On Tue, Jun 04, 2024 at 10:33:49AM +0100, Simon Horman wrote:
+> > On Fri, May 31, 2024 at 08:37:41AM -0700, Shradha Gupta wrote:
+> > > Allow variable size indirection table allocation in MANA instead
+> > > of using a constant value MANA_INDIRECT_TABLE_SIZE.
+> > > The size is now derived from the MANA_QUERY_VPORT_CONFIG and the
+> > > indirection table is allocated dynamically.
+> > > 
+> > > Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> > > Reviewed-by: Dexuan Cui <decui@microsoft.com>
+> > > Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> > 
+> > ...
+> > 
+> > > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > 
+> > ...
+> > 
+> > > @@ -2344,11 +2352,33 @@ static int mana_create_vport(struct mana_port_context *apc,
+> > >  	return mana_create_txq(apc, net);
+> > >  }
+> > >  
+> > > +static int mana_rss_table_alloc(struct mana_port_context *apc)
+> > > +{
+> > > +	if (!apc->indir_table_sz) {
+> > > +		netdev_err(apc->ndev,
+> > > +			   "Indirection table size not set for vPort %d\n",
+> > > +			   apc->port_idx);
+> > > +		return -EINVAL;
+> > > +	}
+> > > +
+> > > +	apc->indir_table = kcalloc(apc->indir_table_sz, sizeof(u32), GFP_KERNEL);
+> > > +	if (!apc->indir_table)
+> > > +		return -ENOMEM;
+> > > +
+> > > +	apc->rxobj_table = kcalloc(apc->indir_table_sz, sizeof(mana_handle_t), GFP_KERNEL);
+> > > +	if (!apc->rxobj_table) {
+> > > +		kfree(apc->indir_table);
+> > 
+> > Hi, Shradha
+> > 
+> > Perhaps I am on the wrong track here, but I have some concerns
+> > about clean-up paths.
+> > 
+> > Firstly.  I think that apc->indir_table should be to NULL here for
+> > consistency with other clean-up paths. Or alternatively, fields of apc
+> > should not set to NULL elsewhere after being freed.
 > 
-> I was going to steal this directly but:
-> ` vs '
-> so I'll let it go via the Intel tree :)
+> Hi Simon,
 > 
+> Thanks for the comments. This makes sense, I am planning of consistently
+> removing the NULLify from other places too as per Leon's comments.
 
-Thank you Jakub, I had to stare really deeply at that comment to
-understand "backtick vs single-quote" as for the longest time I couldn't
-understand why you were quoting the word "vs" - sheesh :-)
+Great!
 
-I didn't even know/remember the docs required backticks vs some other
-quote looking thing, it never even occurred to me, so thanks for calling
-that out.
+> > In looking into this I noticed that mana_probe() does not call
+> > mana_remove() or return an error in the cases where mana_probe_port()
+> > or mana_attach() fail unless add_adev also fails. If so, is that
+> > intentional?
+> 
+> Right, so most calls like mana_probe_port(), mana_attach() cleanup after
+> themselves in the code if there is any error. So, not having to call
+> mana_remove() in these cases in mana_probe() is intentional. But I do
+> agree that an error is returned in mana_probe() only if add_adev also
+> fails. I'll fix that too in the next version
 
-I'll send a v2 with the fix so Jake can pick it up while Tony is out.
+I'm not entirely sure, but perhaps that is a candidate for a separate patch.
 
--Jesse
+> > 
+> > In any case, I would suggest as a follow-up, arranging things so that
+> > when an error occurs in a function, anything that was allocated is
+> > unwound before returning an error.
+> > 
+> > I think this would make allocation/deallocation easier to reason with.
+> > And I suspect it would avoid both the need for fields of structures to
+> > be zeroed after being freed, and the need to call mana_remove() from
+> > mana_probe().
+> 
+> Agreed
+> > 
+> > > +		return -ENOMEM;
+> > > +	}
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +
+> > >  static void mana_rss_table_init(struct mana_port_context *apc)
+> > >  {
+> > >  	int i;
+> > >  
+> > > -	for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++)
+> > > +	for (i = 0; i < apc->indir_table_sz; i++)
+> > >  		apc->indir_table[i] =
+> > >  			ethtool_rxfh_indir_default(i, apc->num_queues);
+> > >  }
+> > 
+> > ...
+> > 
+> > > @@ -2739,11 +2772,17 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+> > >  	err = register_netdev(ndev);
+> > >  	if (err) {
+> > >  		netdev_err(ndev, "Unable to register netdev.\n");
+> > > -		goto reset_apc;
+> > > +		goto free_indir;
+> > >  	}
+> > >  
+> > >  	return 0;
+> > >  
+> > > +free_indir:
+> > > +	apc->indir_table_sz = 0;
+> > > +	kfree(apc->indir_table);
+> > > +	apc->indir_table = NULL;
+> > > +	kfree(apc->rxobj_table);
+> > > +	apc->rxobj_table = NULL;
+> > >  reset_apc:
+> > >  	kfree(apc->rxqs);
+> > >  	apc->rxqs = NULL;
+> > 
+> > nit: Not strictly related to this patch, but the reset_apc code should
+> >      probably be a call to mana_cleanup_port_context() as it is the dual of
+> >      mana_init_port_context() which is called earlier in mana_probe_port()
+> 
+> Sure, let me do that too.
 
+FWIIW, I think it would be appropriate to put that change in a separate patch.
+
+> > 
+> > ...
+> > 
+> > > @@ -2931,6 +2972,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+> > >  		}
+> > >  
+> > >  		unregister_netdevice(ndev);
+> > > +		apc->indir_table_sz = 0;
+> > > +		kfree(apc->indir_table);
+> > > +		apc->indir_table = NULL;
+> > > +		kfree(apc->rxobj_table);
+> > > +		apc->rxobj_table = NULL;
+> > 
+> > The code to free and zero indir_table_sz and indir_table appears twice
+> > in this patch. Perhaps a helper to do this, which would be the dual
+> > of mana_rss_table_alloc is in order.
+> Makes sense, will change this too.
+
+Thanks.
 
