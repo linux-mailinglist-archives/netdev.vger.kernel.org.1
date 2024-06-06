@@ -1,204 +1,139 @@
-Return-Path: <netdev+bounces-101452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87D448FEF91
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:56:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DA358FEF9C
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:57:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32BC528AAFD
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:56:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 311601C2521E
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:57:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D6E198848;
-	Thu,  6 Jun 2024 14:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 880CE1AC426;
+	Thu,  6 Jun 2024 14:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="Uqz4lGYx"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="ilP/R8dN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692E1198842
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 14:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C186F196DB4
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 14:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717684176; cv=none; b=QXws8eBSSMbeyqpJqQQhuRBzIJRf+f9hYjP1l5lsXs5D3t2vJsCkfKrXq3CNKfI1JYk3M9537qDtHjk8yK8cqqSmqjaWCUTrV4x5QqmdW9mrs0HAVLV6AdodLyMAqsh0Vw0hP55iZL20TZFW0t4dZmjO8bnJyCkkqa/JT8MhcWM=
+	t=1717684272; cv=none; b=ZZZ0p4QWMQB0H38+hQ+Gg1OFRgxH6q62H4sPSH0xiyDC/UUbAV/0Wt7L87tYjS4YgEQAHfQ7r3BjND1RRzcqB7dD4R+TRygOJBDIwY8rE0rd3WpvjJXQEnYn4RdU2PoYcLuYDA/xRluUChgvycTxcVvPx6qEbkcmbQxdUDPOXw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717684176; c=relaxed/simple;
-	bh=GimoAQIvtE/omE2LWe9rkmcZVAyFh7hH8t8gFFgucFY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S5X97Nuo/5cHvpkqsXOEYReRMUNffMDxshvAidCTJjrQvnOQoFMoHflE6yO3NYoh5z9DTd+/APaiBWZzyB/m2WYnZB+pr+7S9ByewdNz+l0cBBClEWdoqsHUxp+egmke+6GQL5h+GLVkTCRiGJ8GIE3UoeznFO4SuoKbeLgQzNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=Uqz4lGYx; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2ea903cd11bso13767191fa.1
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 07:29:33 -0700 (PDT)
+	s=arc-20240116; t=1717684272; c=relaxed/simple;
+	bh=Q9hNx3MC9qIV67ExxyFR040tvh0THXH2b2lqOk/NUcE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ssyLwvUM0T/N8PRDGLNdrcKQ12shtA71swfEIzcvSVfB15ROZTD+rw0MOZnThCF0FXbcRZPksXyOu47FyNF/4gkpMSTpGmIioXMsA9Jmf5fICxB2zWQWDMHVdWrs7S6hsMlWqsFiZxrBuqW3SmmQ1XKTd73lcPsqphEq2D7ie+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=ilP/R8dN; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a690161d3ccso103663066b.2
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 07:31:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1717684171; x=1718288971; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QWrHmrBVbxL2N+yjukzrB1xNIeLZkMy2NcMIU1+JPUg=;
-        b=Uqz4lGYxdcOmil+vyxA0jJrA8cR4Acx4g2UO2V6EZYsl4TmmK6DDITf7fJ19Fyv0jy
-         g2HD7ify7eEzsC2ZTQYfCj4yB4jVILVXjRLz+8sAXwo7c95uSQCqemDN97S6W2ka7ptz
-         MLoi08vZkJM9OR36t5ZunIDtGQyTYRnabAeEH5iXOjQOg2SEy1mbYGBK09+LG0GlYxRl
-         EUM/MFxFvrn5Yog8it2E+Qzp0Pub8E84clekP/wXhwfaJfR2a5UELn229IuXIjRLKDXe
-         j75Gudw/i91V2bTlHgkapKt8EJ0Eqi6VeDcv/K5bFgi8CN891He2hQ0j5LwHKzio2aRd
-         lO4w==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1717684269; x=1718289069; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ktj6aT/4mxxGwsRnUn5pU5ZN8m/vlGHJg1jius/H1IQ=;
+        b=ilP/R8dNh+onNOBY++aRbraoRtflYvhEUvmBPh9nMphrVhsNkTVOFme5dGFdxM2ihx
+         L+17PBuOGrm3D9AkuNyO1XUpSzj26ElSTs06MUbbqrE+ROuF88J0ulGK2dHL66iZGvFZ
+         SSNsebfBvefBQ3DUbvB5lN/n7QVnPeP1ra+hSDBlYVxglWCQDnoFIN7TXKpcCUoxdWAJ
+         p86j5isgaUkkA7oKmqnO75NuCbgMz0lhgLZHWs/3v5Fa+AfjyHMpobbRcd0V2zFfRVew
+         Wsr3AkQtFk2ae5n9BZj5OucddFEiCowd09de/7woINUSyb9erzcAmoBtV2WhTD9y9Puw
+         9a6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717684171; x=1718288971;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QWrHmrBVbxL2N+yjukzrB1xNIeLZkMy2NcMIU1+JPUg=;
-        b=RbHF+JRtIa0uOpxsZivtxxWAI/a3KVe0bi6ygW1JrY1dzEFD4Sl75FDwMTCGcVRDE1
-         IaYhgzN02JZK38tgeE9w0P1XVxE2m4pI6BGt2y6xNqaM3BDwGv97MHwzAeKa+Cg3PqQI
-         RPffpg1IN3f/5RdjQO7oGtYp2aBZlrNullTUPxWXOjVZcyP3f4XGsfuKbEWW9RdFNqjJ
-         KeZtxlT+rYDQiiE4obSnOAMo3AqQBz2T/SQar8BYJOudsKVkl6h2/rkCJweKymZaHRE8
-         Ckm9uWF0dUc7RsT+6NwKTXRA8jh5IjQ+n2i+yfaduleb2OJS0PVgne9IfpYgWrsWZ1pL
-         Sy8A==
-X-Forwarded-Encrypted: i=1; AJvYcCWhrasEQkQhSn2Z4pZBhoDDaRtpI8JAe9ApcOA1XeW7vgvw9VnYnqzfjJTzlElF7L08NN6b8bZJCog4yIRhKMeYEj0c8NOK
-X-Gm-Message-State: AOJu0Yzcw8SiZ9ivKXOl0ki1nbca9Q+T21rlK3Cz48mDri0B4mtJ/wxI
-	bXfa719QBtro3Y7ZYQRkgjEwPz2DGRtlxanFdimZIzfLGabdQYsmwNkueCJAaY9q2CtXC9AfcGZ
-	lTvf8iul+u0vEnUntexbVgDL0Ct9ncclhREBayA==
-X-Google-Smtp-Source: AGHT+IE7dV5ZV/18QS1Cl24O5VDU/AyKd8svwpktd8Gq/yIywl49RVlO2hEBVV/ZBTiMOrhqd5gtrUxmBJP66OQy6UM=
-X-Received: by 2002:a2e:a403:0:b0:2ea:903b:ca0e with SMTP id
- 38308e7fff4ca-2eac7a986abmr42490961fa.52.1717684171575; Thu, 06 Jun 2024
- 07:29:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1717684269; x=1718289069;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ktj6aT/4mxxGwsRnUn5pU5ZN8m/vlGHJg1jius/H1IQ=;
+        b=ZEeDxd6AZEzydB+NLBVaJljtKHWq7n4LfFMKZEZml8/yX/SDK7owc0HJi6A/ioPlp8
+         Kq1XFDaZ96xSCZV24Z+uSgkdFoszRebc2soF7zwjqi26ren3W91QREI8VKDAP/E3Sfkf
+         trItHxs5Y68c9VkqZvLay8HM78VEPXJzk8/2gvAEuq9bAF9SzXEH53dM+hzQd1EqPznD
+         +66mdq4quwGQemfMmYCxwuda183DSbh9qeGAvnUE6szSN7sfU9O78KFesxkSefJkMnY+
+         e/stn39WRptW2iP8UcjJ2tmVoTcAkfpqAoc+3/TH0Gg8EAjf8zz7Pp42qgXTvioAC165
+         w2nw==
+X-Forwarded-Encrypted: i=1; AJvYcCWzypuTu6S6wWSJhr91/VJvvEWqEEdXU6SDY3LPs9xrn4NiowIQD7GeFDjpXBTZTN1fTX+A+XtrSi4OKFXXLT2tJ17nRTLm
+X-Gm-Message-State: AOJu0YzzWRo+3iqdYs2jLip63AW0rFugxR33F8wrv0khEs5EMRjHLTPo
+	8CAjBsmGfPRF8Tku0u9wi4VKhaff9zbGeKyqnyBtreg5XWirTmc4i2KFRIORduk=
+X-Google-Smtp-Source: AGHT+IGfxO5oNkFoxTpRUdc5ZfmrzS6F9lQcbjQ7NCK9BZZjdnPZSUfJI1Ldh/IvgobuKe+ik9leGg==
+X-Received: by 2002:a17:906:fc01:b0:a59:9dbf:677b with SMTP id a640c23a62f3a-a69a0022d72mr415399666b.48.1717684268909;
+        Thu, 06 Jun 2024 07:31:08 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1126:4:82d:3bb6:71fa:929f? ([2620:10d:c092:500::5:a296])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6c80580f71sm105677966b.26.2024.06.06.07.31.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Jun 2024 07:31:08 -0700 (PDT)
+Message-ID: <a8ac00ed-4ec1-4adf-ad37-2efa1681847d@davidwei.uk>
+Date: Thu, 6 Jun 2024 15:31:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240605122106.23818-1-brgl@bgdev.pl> <20240605122106.23818-2-brgl@bgdev.pl>
- <87h6e6qjuh.fsf@kernel.org> <CAMRc=MdiKxtnN+g92RUTXdOydaPV5M2u5iUdKyE2SNvDkdXAjg@mail.gmail.com>
- <871q5aqiei.fsf@kernel.org>
-In-Reply-To: <871q5aqiei.fsf@kernel.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 6 Jun 2024 16:29:20 +0200
-Message-ID: <CAMRc=McacZMP-51hjH+d8=PVe+Wgw4a8xWcv0sRPLJKL_gP=KQ@mail.gmail.com>
-Subject: Re: [PATCH v9 1/2] dt-bindings: net: wireless: qcom,ath11k: describe
- the ath11k on QCA6390
-To: Kalle Valo <kvalo@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Jeff Johnson <jjohnson@kernel.org>, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	ath11k@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	ath12k@lists.infradead.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG] [PATCH net-next v3 0/2] netdevsim: add NAPI support
+To: Maciek Machnikowski <maciek@machnikowski.net>,
+ Jakub Kicinski <kuba@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <urn:uuid:d06a13bb-2b0d-5a01-067f-63ab4220cc82@localhost.localdomain>
+ <708b796a-6751-4c64-9ee6-4095be0b62f2@machnikowski.net>
+Content-Language: en-GB
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <708b796a-6751-4c64-9ee6-4095be0b62f2@machnikowski.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 6, 2024 at 4:02=E2=80=AFPM Kalle Valo <kvalo@kernel.org> wrote:
->
-> Bartosz Golaszewski <brgl@bgdev.pl> writes:
->
-> > On Thu, Jun 6, 2024 at 3:30=E2=80=AFPM Kalle Valo <kvalo@kernel.org> wr=
-ote:
-> >
-> >>
-> >> Bartosz Golaszewski <brgl@bgdev.pl> writes:
-> >>
-> >> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >> >
-> >> > Add a PCI compatible for the ATH11K module on QCA6390 and describe t=
-he
-> >> > power inputs from the PMU that it consumes.
-> >> >
-> >> > Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> >> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >>
-> >> [...]
-> >>
-> >> > +allOf:
-> >> > +  - if:
-> >> > +      properties:
-> >> > +        compatible:
-> >> > +          contains:
-> >> > +            const: pci17cb,1101
-> >> > +    then:
-> >> > +      required:
-> >> > +        - vddrfacmn-supply
-> >> > +        - vddaon-supply
-> >> > +        - vddwlcx-supply
-> >> > +        - vddwlmx-supply
-> >> > +        - vddrfa0p8-supply
-> >> > +        - vddrfa1p2-supply
-> >> > +        - vddrfa1p7-supply
-> >> > +        - vddpcie0p9-supply
-> >> > +        - vddpcie1p8-supply
-> >>
-> >> Not sure if we discussed this before, but based on this I understand
-> >> that there can't be an DT entry for device pci17cb,1101 without all th=
-e
-> >> supply properties? But there are QCA6390 devices with PCI id 17cb:1101
-> >> which do not need these supplies and already work. For example, my Del=
-l
-> >> XPS 13 x86 laptop is one. Or anyone who manually installs QCA6390 boar=
-d
-> >> to their PCI slot and some of them might want to use DT, for example
-> >> setting qcom,ath11k-calibration-variant.
-> >>
-> >> This is not a blocker for me, just making sure that we are not breakin=
-g
-> >> any existing setups.
-> >>
-> >
-> > If they are already powered up without the need for the PCI pwrctl
-> > driver to do it, then they will work alright. Bindings don't affect
-> > functionality.
->
-> Sure, I'm not worried about functionality. I'm worried that if I
-> there's, for example, an ARM based setup which uses DT and wants to use
-> a similar QCA6390 board that I have, and set
-> qcom,ath11k-calibration-variant in DT. In other words, I'm worried if
-> you are looking at this only for Snapdragon family of boards?
->
+On 2024-06-05 12:38, Maciek Machnikowski wrote:
+> 
+> 
+> On 24/04/2024 04:36, David Wei wrote:
+>> Add NAPI support to netdevsim and register its Rx queues with NAPI
+>> instances. Then add a selftest using the new netdev Python selftest
+>> infra to exercise the existing Netdev Netlink API, specifically the
+>> queue-get API.
+>>
+>> This expands test coverage and further fleshes out netdevsim as a test
+>> device. It's still my goal to make it useful for testing things like
+>> flow steering and ZC Rx.
+>>
+>> -----
+>> Changes since v2:
+>> * Fix null-ptr-deref on cleanup path if netdevsim is init as VF
+>> * Handle selftest failure if real netdev fails to change queues
+>> * Selftest addremove_queue test case:
+>>   * Skip if queues == 1
+>>   * Changes either combined or rx queue depending on how the netdev is
+>>     configured
+>>
+>> Changes since v1:
+>> * Use sk_buff_head instead of a list for per-rq skb queue
+>> * Drop napi_schedule() if skb queue is not empty in napi poll
+>> * Remove netif_carrier_on() in open()
+>> * Remove unused page pool ptr in struct netdevsim
+>> * Up the netdev in NetDrvEnv automatically
+>> * Pass Netdev Netlink as a param instead of using globals
+>> * Remove unused Python imports in selftest
+> 
+> Hi!
+> 
+> This change breaks netdevsim on my setup.
+> Tested on Parallels ARM VM running on Mac with Fedora 40.
+> 
+> When using netdevsim from the latest 6.10-rc2 (and -rc1) I can't pass
+> any traffic (not completing any pings) nor complete
+> tools/testing/selftests/drivers/net/netdevsim/peer.sh test (the test
+> hangs at socat step trying to send anything through).
 
-No, what I'm looking at is the entire QCA6390 package. That means WLAN
-*and* Bluetooth *and* the PMU that manages power.
+Hi Maciek, I'm trying to reproduce the issue.
 
-If you're using the QCA6390 on a device-tree system then you should
-probably model at least the WLAN node and the PMU and the problem with
-supplies is fixed. But if you don't have the supplies, that's alright
-for downstream.
+Can you please share how you're setting up netdevsim to pass traffic?
 
-> Again, I don't see this as a blocker. I just want to understand how this
-> should work for all types of devices there are out there.
->
-> > But if you have a QCA6390 then you have its PMU too and the bindings
-> > model the real-world hardware.
-> >
-> > IOW: your laptop should be alright but the supplies are really there
-> > which warrants adding them to the bindings.
->
-> Sorry, not following here. Can you clarify your comment "the supplies
-> are really there"? You mean inside the PCI board? But that's not visible
-> to the kernel in anyway, the PCI board just works after I plug it in.
-> It's like a regular PCI device. So I don't understand why that should be
-> visible in DT, but I can very well be missing something.
->
-
-I think you're thinking about some kind of detachable PCIe board with
-this chipset on it. I refer to the QCA6390 chipset itself which is
-also more than just PCI. The Bluetooth interface doesn't use PCI at
-all. On the boards I'm working on, the chipset is just soldered to the
-main board. If your detachable board "just works" then it must be
-wired in a way that enables WLAN the moment it's plugged in but this
-doesn't happen over PCI. The chipset has a power input and GPIOs to
-enable each module.
-
-Also: I doubt you need DT for your detachable board?
-
-Bart
-
-> --
-> https://patchwork.kernel.org/project/linux-wireless/list/
->
-> https://wireless.wiki.kernel.org/en/developers/documentation/submittingpa=
-tches
+> 
+> Regards
+> Maciek
 
