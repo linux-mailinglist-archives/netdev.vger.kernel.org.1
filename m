@@ -1,118 +1,117 @@
-Return-Path: <netdev+bounces-101207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F9E38FDBD0
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 02:59:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E7598FDC02
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 03:06:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFA221F247DD
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 00:59:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D182A1F247FB
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 01:06:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31201DFF5;
-	Thu,  6 Jun 2024 00:58:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5DC9CA6F;
+	Thu,  6 Jun 2024 01:06:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mJil99qE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Njmb+2zx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB151119A;
-	Thu,  6 Jun 2024 00:58:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66AE579F6;
+	Thu,  6 Jun 2024 01:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717635511; cv=none; b=olyP1nYDl3lj4t4KR3eVYQm/nVjNsO0G8WjIIi+XCPJyi4LRwPA7BH2IrVk4r3wgO80Om53N/7QLLGE/U0bhGJQ8xFmhsfKIMTFcD1pgeeU+n6d9Fe96hmw+jUIZGwP/KZ95w7uSrNPlL8JLoBVasfzDRCoNtCSVnABRm0dUAe8=
+	t=1717635961; cv=none; b=Ix2CQlnIA3NqIAIqFjuNq++7YBRDSZDS7VHshSKJHBLV7p4sqOAAylvBZ+lDye7cxY0EvZYCEsDj+ik7acE2yKd1JuwZpHOUb9i450weaTfw314Q98SlkfZ6wvC6HuUiL7vjIqMJ6ZL3elFWwWK7WFmqlk6wfWjU77OiKcPP9qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717635511; c=relaxed/simple;
-	bh=RJxbRfrwSVRgqNfS+0yMIlRN2XvFthWU7xqbwkPAwrc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qSeF0k1EYmnjd6x5PlZ9fJjBPAnSrNlzJGk8mc6S5sGmRTJlpdlR79+fijqfUTT0LRcaTMRDpA49NyR/xbyd1mkyY8b6mxoYpy/Pw219PuskKRasGTHcg+OY/BQIxBanmpvhA8nKKVcvfza5lo9GexylqGY3Kq4iYv+nRkNW0sM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mJil99qE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EE884C4AF17;
-	Thu,  6 Jun 2024 00:58:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717635511;
-	bh=RJxbRfrwSVRgqNfS+0yMIlRN2XvFthWU7xqbwkPAwrc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=mJil99qEScGbOydj4pAbYDB9P2e10ZgBPSjwz2+zZzp1vGvFd07vlQLMc93097yLP
-	 nLw4twQnpga1Ov495xVrlL1YbZxZcRggzx0pMfubbeDDcuA+wSEC58NNEe7Ueqr7uf
-	 9WbRFRGIly+DWPKv16jlkEpy6q0khZ7j5XguAHVrFBcM21qv6H6DxTiDmzdLqAMnsK
-	 m6vTNuMhsrAXCdIySOXBwr5SXFTDW1h5xxDLbxMTFIjVq/KSmSXdnAbA6Hi2/GA8L2
-	 kTjp7hdRV2VpUJs/SgEa88jMFrDIvdh2ihCH3Vy3/w9q2M2V37a7ELEiw8uiait20n
-	 8UQVzug9Lp+Qw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1187C27C53;
-	Thu,  6 Jun 2024 00:58:30 +0000 (UTC)
-From: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
-Date: Thu, 06 Jun 2024 01:58:23 +0100
-Subject: [PATCH net-next v3 6/6] Documentation/tcp-ao: Add a few lines on
- tracepoints
+	s=arc-20240116; t=1717635961; c=relaxed/simple;
+	bh=KXQcY/KUD/GXgOXdMxL/FSYabj4pqwzKiCsrOHYwN4M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q5xd86hQ6hAm98qYjJQEqcQd69Jz5BPHnVmq/lJM+PCKtbvpxR5Lw8HoMWVgc+iFAmMmSnePtoQl9RhqJvmDAOk2cAGE1HnmiVN/7/UW2cuiTR5/4k90wogYQ6GvPVMGkP0rz8/2szGsI1aXxj3r6lyfQNjshgU2tOucG9ifAz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Njmb+2zx; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2bfffa3c748so346285a91.3;
+        Wed, 05 Jun 2024 18:06:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717635960; x=1718240760; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vcR0/t5uYBIvdEQSeuqs0xUstXN/+KdnI45VENtwQfo=;
+        b=Njmb+2zxKrwMC3Bcrz7roRfIAxfQ6NJ32gduXkxiSyQv0gystbGzbI13VgzL1xfBx9
+         AYgZj6RmNwRKdEZxnIVHDRYk4CYtpgjv8KksEcDel1swd8f3qua9W6xBu3up4i09FCM+
+         DR6TRdLyW4mSVyjSQk7dZSioNyyEtb8DXo+2k+Rbmw/NX4MY127JHddafX35BBkjshj4
+         FQ+L6CARbCnJXZwLp9n26YHYKyPTuDVPlTLeHtrXvg8SRQwTrSnsHj/f7LlxcWHqjb0g
+         XnAYnrQmMNngkJj1CfYFrfqrj+Jkz5v8Ok0EtNrAqptifItNwyT7Kpc9C4C2fJQFBvH9
+         twfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717635960; x=1718240760;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vcR0/t5uYBIvdEQSeuqs0xUstXN/+KdnI45VENtwQfo=;
+        b=BqSOX6EVEgmGINymGGdo0d5W4OIqy621/WrGPv3ORzEUmtd3TCuK03QMxURXm8s5lB
+         dHcsy5viQACRBnxljOq52sh9okuXldERFfzMOBifvw0CAPd+iFP8LLvKMHamSrCtUFjg
+         mSBhFtIJvc4JLsKZwts18K2UP6fhYi20wCDGDKcU7sbLeTdueXPlwlqMG9vufxxcTh5v
+         hMY91XISSIUCR/sNmcJUUlFvn67BjZkOfhsNA2huXlhu+Hs5NiO6/2RfVIqq/xsAttzh
+         fPqD92C0MUvciwo6mSg18YaIKjl7pbAGpsKDMfUHOF4tVLlh28Cyi+6L1GX0/bMObWtl
+         lWPg==
+X-Forwarded-Encrypted: i=1; AJvYcCXumDXG7I2DUZ2eI6GFNC/OXDNeaXm7f3fHc6KpaImiDcxXVa/hyvIWAcojnzfDZVl2DjQzDY9CgqmVcBF2tz7oHYGdvj5+OG8GNmNWvTXKAJR6wU3LX9uNFG0Y2gRRVa3QKSzd/gzP89mH4EOV2oSJa+5xCNR+EDGQCvR8vVbYW6QKvQG74xjcTyPFyR/YWnbO258xZK8Qn2FxulpskXAbjwzz
+X-Gm-Message-State: AOJu0YxXnrnLPzgZfseUYLWrj0PRpXVsgYvH5ADT4X3ntNkT+g8Lb32R
+	kADP0K8sBvb39DqjHc9Wd2vBupwWFFBJACpWBEmFW3niRS3fR4870bARDQHvIFefME/5kF0cvzb
+	TizQPvAoYuaUi7EHQzhwsFdkaZT8=
+X-Google-Smtp-Source: AGHT+IGf/3ayjCPjRYJx47eHZM1uSmdwR03aG7nsKOkBUKFJf8afN6SS2wYJKWrtuZX+8vnrrV71fpGSU3kWnFC1NDE=
+X-Received: by 2002:a17:90a:bf0e:b0:2c2:4107:3a7b with SMTP id
+ 98e67ed59e1d1-2c27db68490mr4294176a91.46.1717635959629; Wed, 05 Jun 2024
+ 18:05:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240606-tcp_ao-tracepoints-v3-6-13621988c09f@gmail.com>
-References: <20240606-tcp_ao-tracepoints-v3-0-13621988c09f@gmail.com>
-In-Reply-To: <20240606-tcp_ao-tracepoints-v3-0-13621988c09f@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
- Steven Rostedt <rostedt@goodmis.org>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
- Jonathan Corbet <corbet@lwn.net>
-Cc: Mohammad Nassiri <mnassiri@ciena.com>, Simon Horman <horms@kernel.org>, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-trace-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
- Dmitry Safonov <0x7f454c46@gmail.com>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1717635508; l=1312;
- i=0x7f454c46@gmail.com; s=20240410; h=from:subject:message-id;
- bh=YTvLVmZiUq3+/gRlZqmFldpsbcd2Jw9oBAFB4f9XdXg=;
- b=spAE96jwHq10U5eIzCVaOaXRNUwYiydfcrtFMVOVm6V4AiROo4dFYanfAII8rodHFLA5CeInBo6b
- nPCW4jnmCOANbWV48zCP0lwAckHfHAnnkz3PYjaq/2lfyEcKtCpf
-X-Developer-Key: i=0x7f454c46@gmail.com; a=ed25519;
- pk=cFSWovqtkx0HrT5O9jFCEC/Cef4DY8a2FPeqP4THeZQ=
-X-Endpoint-Received: by B4 Relay for 0x7f454c46@gmail.com/20240410 with
- auth_id=152
-X-Original-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Reply-To: 0x7f454c46@gmail.com
-
+References: <20240605-tcp_ao-tracepoints-v2-0-e91e161282ef@gmail.com>
+ <20240605-tcp_ao-tracepoints-v2-3-e91e161282ef@gmail.com> <CANn89iLHGimJWRNcM8c=Ymec-+A3UG9rGy9Va_n7+eZ2WGHDiw@mail.gmail.com>
+ <CAJwJo6YVtBaCn+iUEvC7OWa7k9LtC9yReHM=RmuiDUACFympRw@mail.gmail.com> <CANn89i+em+sjuQE32bM2KWg=EFcf-jnfvzD=YekMviUSjARrnQ@mail.gmail.com>
+In-Reply-To: <CANn89i+em+sjuQE32bM2KWg=EFcf-jnfvzD=YekMviUSjARrnQ@mail.gmail.com>
 From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Thu, 6 Jun 2024 02:05:47 +0100
+Message-ID: <CAJwJo6YWf40BuWCc7rxBAAbzngFMuXeMXsj_Mmxe3W0rjNWDAQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/6] net/tcp: Move tcp_inbound_hash() from headers
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Mohammad Nassiri <mnassiri@ciena.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
----
- Documentation/networking/tcp_ao.rst | 9 +++++++++
- 1 file changed, 9 insertions(+)
+On Wed, 5 Jun 2024 at 18:37, Eric Dumazet <edumazet@google.com> wrote:
+>
+> On Wed, Jun 5, 2024 at 7:35=E2=80=AFPM Dmitry Safonov <0x7f454c46@gmail.c=
+om> wrote:
+> >
+> > Hi Eric,
+> >
+> > Thanks for the review,
+> >
+> > On Wed, 5 Jun 2024 at 09:07, Eric Dumazet <edumazet@google.com> wrote:
+[..]
+> > > Then we probably do not need EXPORT_SYMBOL(tcp_inbound_md5_hash); any=
+more ?
+> >
+> > Certainly, my bad. I will remove that in v3.
+> >
+>
+> No problem, also make it static, in case this was not clear from my comme=
+nt.
 
-diff --git a/Documentation/networking/tcp_ao.rst b/Documentation/networking/tcp_ao.rst
-index 8a58321acce7..e96e62d1dab3 100644
---- a/Documentation/networking/tcp_ao.rst
-+++ b/Documentation/networking/tcp_ao.rst
-@@ -337,6 +337,15 @@ TCP-AO per-socket counters are also duplicated with per-netns counters,
- exposed with SNMP. Those are ``TCPAOGood``, ``TCPAOBad``, ``TCPAOKeyNotFound``,
- ``TCPAORequired`` and ``TCPAODroppedIcmps``.
- 
-+For monitoring purposes, there are following TCP-AO trace events:
-+``tcp_hash_bad_header``, ``tcp_hash_ao_required``, ``tcp_ao_handshake_failure``,
-+``tcp_ao_wrong_maclen``, ``tcp_ao_wrong_maclen``, ``tcp_ao_key_not_found``,
-+``tcp_ao_rnext_request``, ``tcp_ao_synack_no_key``, ``tcp_ao_snd_sne_update``,
-+``tcp_ao_rcv_sne_update``. It's possible to separately enable any of them and
-+one can filter them by net-namespace, 4-tuple, family, L3 index, and TCP header
-+flags. If a segment has a TCP-AO header, the filters may also include
-+keyid, rnext, and maclen. SNE updates include the rolled-over numbers.
-+
- RFC 5925 very permissively specifies how TCP port matching can be done for
- MKTs::
- 
+Thanks!
 
--- 
-2.42.0
-
-
+--=20
+             Dmitry
 
