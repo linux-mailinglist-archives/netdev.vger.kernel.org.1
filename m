@@ -1,110 +1,92 @@
-Return-Path: <netdev+bounces-101474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BD788FF056
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:19:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 804128FF07C
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:22:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A032728D963
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:19:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34EF31F23253
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:22:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E87519B5BC;
-	Thu,  6 Jun 2024 15:06:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LJE2V8YE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77DBB196DAA;
+	Thu,  6 Jun 2024 15:18:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1063019B5AF;
-	Thu,  6 Jun 2024 15:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94031195B3F
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 15:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717686360; cv=none; b=Dl84akiRejCVwE/PO96SkKJzvsCc01p83e4G6yezPqqLn3pyyfPHb6Hja1vlrAZC5b84oCaDH+Ur3TiI7ov3sFOuR3eOsr+966CpbJMdvc6rKYENDRsJh/qh0Mo5TzXSKtWg5nKnCps2OZ6GTHAbRJ0xYRbx9RRT+n/dkh0E7w4=
+	t=1717687089; cv=none; b=BKqedOrzeQvIm9cYaHaotTEODEkhEplZmZAHJDOTzo06P9LFWnGXsHFh3vQZqY/Kirnv5pRycpzKUij00Uuc+oWNMlpuR6NoFkn8jBZnA/3fYGpO1D6PQN1EZRQJQiD/1MFjni3xpfDXhQLUeNprmYoIDV0mkxf6TpID0Dl8+k8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717686360; c=relaxed/simple;
-	bh=Cx1ASgr5Lh9FnhS81vNXx9ifwngxlnqb6mSkxtlQWLo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KoZiv1i5U2riKVY3i8WIifRLxOqXqz0iXpDceKtP3TNM3hK8yFXFOCdCjrUBSuxkz9iIT1i3aj+zet4CYsJROnOaznuXkM/hdShPK09tYWFTPct9kf77kHnRaOji54TV6z7oaUrBsgGAVIQDf8qUJy4/BVWrDDMi1SYFkH0unkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LJE2V8YE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DE65C32786;
-	Thu,  6 Jun 2024 15:05:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717686359;
-	bh=Cx1ASgr5Lh9FnhS81vNXx9ifwngxlnqb6mSkxtlQWLo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LJE2V8YEAvQg7dOKXsKEM5ZXvqkbYqfFpDavrIE6ibwGQcnoFfSGpEp8uH6O2dBXh
-	 ry6vAyt/lvcu4dyXJSiclI99AznFEB4pNXp6HGBksXMOjk30byH8gnCE5AR7SIVNSO
-	 Kg0dl7aWs5jSK0RUeDauQN0Ju+JQ+594Y3sUss5DvrhtJEsIO+8NAKaHnc/qONUpy6
-	 QVyI5Tz4Lqwh7/c3aVSsFsSevkBTGQbRV5t4hOIerNIAtSSu/LDA5j+SLQmBfCxJdI
-	 0p31Li9bp4O9xYsLd+rxa4GxL2m314+VzaGe2Q1k0q23qZ3DaiXKR2PQVg7zZ++SsW
-	 aMc6qVH8HvpOg==
-Date: Thu, 6 Jun 2024 08:05:57 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: David Ahern <dsahern@kernel.org>, Dan Williams
- <dan.j.williams@intel.com>, Jonathan Corbet <corbet@lwn.net>, Itay Avraham
- <itayavr@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed
- <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Andy Gospodarek
- <andrew.gospodarek@broadcom.com>, Aron Silverton
- <aron.silverton@oracle.com>, Christoph Hellwig <hch@infradead.org>, Jiri
- Pirko <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>, Leon Romanovsky
- <leonro@nvidia.com>, linux-cxl@vger.kernel.org, patches@lists.linux.dev
-Subject: Re: [PATCH 0/8] Introduce fwctl subystem
-Message-ID: <20240606080557.00f3163e@kernel.org>
-In-Reply-To: <20240606144818.GC19897@nvidia.com>
-References: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
-	<20240603114250.5325279c@kernel.org>
-	<214d7d82-0916-4c29-9012-04590e77df73@kernel.org>
-	<20240604070451.79cfb280@kernel.org>
-	<665fa9c9e69de_4a4e62941e@dwillia2-xfh.jf.intel.com.notmuch>
-	<20240605135911.GT19897@nvidia.com>
-	<d97144db-424f-4efd-bf10-513a0b895eca@kernel.org>
-	<20240606071811.34767cce@kernel.org>
-	<20240606144818.GC19897@nvidia.com>
+	s=arc-20240116; t=1717687089; c=relaxed/simple;
+	bh=rG9HzYiiz/OcYPeDBVk/sumkvmK49G0ZUDzKIs0EJ+4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gtH3b0L3rvvMpEBQcRUL9syQvBhUEfCRa4LbBPTwvZTC8gZDMDvTfwKSupQvDfSNIb1LejPJ+CvY569qRGBh7s+uE+EFD2IFU3pjajNRGKaCRBNWmGXAxcn/lga1j/wKlTZ2ZfOjHMohC9e2fg0/Rh/7Y0Yf9agekEFA6jNMJ3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1sFEsL-0004Bu-86; Thu, 06 Jun 2024 17:18:01 +0200
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	bigeasy@linutronix.de,
+	vschneid@redhat.com
+Subject: [PATCH net-next v8 0/3] net: tcp: un-pin tw timer
+Date: Thu,  6 Jun 2024 17:11:36 +0200
+Message-ID: <20240606151332.21384-1-fw@strlen.de>
+X-Mailer: git-send-email 2.44.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, 6 Jun 2024 11:48:18 -0300 Jason Gunthorpe wrote:
-> > An argument can be made that given somewhat mixed switchdev experience
-> > we should just stay out of the way and let that happen. But just make
-> > that argument then, instead of pretending the use of this API will be
-> > limited to custom very vendor specific things.  
-> 
-> Huh?
+Changes since previous iteration:
+ - Patch 1: update a comment, I copied Erics v7 RvB tag.
+ - Patch 2: move bh off/on into hashdance_schedule and get rid of
+   comment mentioning pinned tw timer.
+   I did not copy Erics RvB tag over from v7 because of the change.
+ - Patch 3 is unchanged, so I kept Erics RvB tag.
 
-I'm sorry, David as been working in netdev for a long time.
-I have a tendency to address the person I'm replying to,
-assuming their level of understanding of the problem space.
-Which makes it harder to understand for bystanders.
+This is v8 of the series where the tw_timer is un-pinned to get rid of
+interferences in isolated CPUs setups.
 
-> At least mlx5 already has a very robust userspace competition to
-> switchdev using RDMA APIs, available in DPDK. This is long since been
-> done and is widely deployed.
+First patch makes necessary preparations, existing code relies on
+TIMER_PINNED to avoid races.
 
-Yeah, we had this discussion multiple times
+Second patch un-pins the TW timer. Could be folded into the first one,
+but it might help wrt. bisection.
 
-> I have no idea where you get this made up idea that fwctl is somehow
-> about dataplane SDKs. The acclerated networking industry long ago
-> moved pasted netdev in upstream, it is well known to everyone. There
-> is no trick here.
-> 
-> fwctl is not some scheme to sneak dataplane SDKs into the kernel, you
-> are just making stuff up.
+Third patch is a minor cleanup to move a helper from .h to the only
+remaining compilation unit.
 
-By dataplane SDK you mean DOCA? I don't even want to go there.
-I just meant forwarding offload _which I said_. You didn't understand
-and now you're accusing me of "making stuff up".
+Tested with iperf3 and stress-ng socket mode.
 
-This whole conversation is such a damn waste of time.
+Florian Westphal (2):
+  net: tcp: un-pin the tw_timer
+  tcp: move inet_twsk_schedule helper out of header
+
+Valentin Schneider (1):
+  net: tcp/dccp: prepare for tw_timer un-pinning
+
+ include/net/inet_timewait_sock.h | 11 ++----
+ net/dccp/minisocks.c             |  9 +----
+ net/ipv4/inet_timewait_sock.c    | 63 +++++++++++++++++++++++++++-----
+ net/ipv4/tcp_ipv4.c              |  2 +-
+ net/ipv4/tcp_minisocks.c         |  9 +----
+ 5 files changed, 61 insertions(+), 33 deletions(-)
+
+-- 
+2.44.2
+
 
