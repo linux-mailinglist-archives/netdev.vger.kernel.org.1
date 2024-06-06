@@ -1,239 +1,83 @@
-Return-Path: <netdev+bounces-101213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3FF68FDC5D
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 03:55:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EFB68FDC64
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 03:58:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E826286C08
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 01:55:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC846B22D16
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 01:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1269513FEE;
-	Thu,  6 Jun 2024 01:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA7F81401B;
+	Thu,  6 Jun 2024 01:58:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ipTxbFOQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oZYsSnaw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6121C13C
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 01:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7058813FEE;
+	Thu,  6 Jun 2024 01:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717638942; cv=none; b=FrJZ2y64jo0ONoSIKGdCbTMJGc57XZ4dgIo2z1/D19jnKGBB4l9VLe4mCmPf5S7maLG+UssIog/IPdzY2GGl02V6i1Zu2HX+uZ7Ftk7fAp7xJ9S+iV6FtC+QOZlhJeCFjsrYzK3RUoziXxOJEfad8nAkaxrZ0e4DytYQflGiTeg=
+	t=1717639108; cv=none; b=vCFPfYl6d4G5XY8FRqSGWnizZjlsAlxAyts2jHGHw90PuxaY2lHdZOUPepYa9z93XLdxUy3XsMVQGkMq381axzckEcYk7CEYTevCnPb5BRWyG73HVh6pcWezfdtaZDM2UUktZ7ABoYk9pimYXpucXPWp+FLZFmV1WHJBFhjPIvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717638942; c=relaxed/simple;
-	bh=EbnCkFlmoIikZl/MUPpJTOMBQhQwsZz19Bv+l7q9w6M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hkDEJa/VeEWuD296VyQPp4IxOcsJZm5AwydKqtlZ4V6q7xo4VMlMjoKt8qpqSbCZwwF6LcENl221VvoDg7SW3m3uv8dvtm+Cn+UOIBDl1PqzFtZ4BhU4UU41xl146Hrss9/Pd3LY2ESteM/Phr6XCO2kjTr6cQ+6p4AuPGiS55c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ipTxbFOQ; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-44024f5271dso122301cf.1
-        for <netdev@vger.kernel.org>; Wed, 05 Jun 2024 18:55:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717638939; x=1718243739; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zUrSdBiduh4Db/1aD09S3T3SUCIp0AO2KNwZ81GBnvw=;
-        b=ipTxbFOQCttxppYpLo9CkOSaTBYedSP0AjDSAwuYC/p3bhFoqSgBEscUqPo5KGTSpk
-         TU2tnObP0FqKUvbVE9/TkDg7fFuYVUvmMFnIyqj50eE4F7SYAZlMrzxwMkLSgnjcGYex
-         WMZrUbwBWHhgG0hK8XlhZzv/8U3iUUC8sbTfWQQdldBB89r7f7jgIXs+jLKazqvFEZiy
-         VLsTvkp9mh/5PQi5vx4ZEN4b96R8cED2jlOPA60rL/cnmR70ryCbjJSXpkEiX/OPzwQ9
-         zBJ+irkZOR9F0Lwjaso6F4pvC3tRWOyQc2KiOsKY4jypQuaqFkBadDqqGx+TuXAFQY3S
-         0FEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717638939; x=1718243739;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zUrSdBiduh4Db/1aD09S3T3SUCIp0AO2KNwZ81GBnvw=;
-        b=UIQ/gtVve/pOMCeZt88mv9Wb0TGrnGk3GgOZKYbuIgBO4iBYa0lPdRbOBNKXDI9kSG
-         kmbmkaGfFdPNVcVZaJrVLMPYkiHKiPxDngPz2ydrbl5XSWUhddvlmHTj5UDHFZIRXdGO
-         zc2qRaWsRQI5Y3VmD2A/0/h/MTBRCDVeOcEjY2cjpHNPQrJDKXyR2JV0DC21Q68190pF
-         U/3ZHSG82OI7QxO3YV8Vmw03bWqsAB+jKMtQhk1Ia9FTtttlVQB8GTeyRhUD1XU0YS3O
-         DUMqnhd8iUJcOK8cDyRBwjDYlIy3/e+zUa49JOsscXdRS9P2VKuvCxAXXycTvXPrur0H
-         JZzw==
-X-Forwarded-Encrypted: i=1; AJvYcCU5e9Z/FTdPmS4e+QSUNE7v8761H0vM9Eet11ruWqQ2G8iotekAbDbi6so33PmLVYeLEKs2l3MbxBERJDjATHy8seVw8xBf
-X-Gm-Message-State: AOJu0Yy7bSHabSMtH0Gxi7RKf/DJKlwt6NDjZNK8D1W4Co0QAYF46Phq
-	Vi1b25i6NRb4YHhbsa2Q9qo4zS6YCdk0/clE0v7rhOFrtO6LT6xpQ65vP6FSmhAYQP7AWTAH20w
-	HEkTdN4HLCnMUoVyMdxo26AD1vtz7LMm9GNss
-X-Google-Smtp-Source: AGHT+IEnxpQafaT11+txElX9LAJY4Zol9ZDkzyHkuw5ULeFvU8PmZa/RhoOwmmIwg92466dT1oqryNZ74WjtIJTXU5Y=
-X-Received: by 2002:a05:622a:1dca:b0:43c:554e:b81 with SMTP id
- d75a77b69052e-440384ca86fmr860971cf.23.1717638938541; Wed, 05 Jun 2024
- 18:55:38 -0700 (PDT)
+	s=arc-20240116; t=1717639108; c=relaxed/simple;
+	bh=LMH/6S7ojwS+cNq5NMSC/XHKx8l4iSLOp0qY3slkayg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BtbzkpD1RCUpEPDl/O7y2tS0nW6NIL9WPwhiG49UIvle7Mg2+pAbDW7v3mDgf2zuwxrOl7n8rtGMQTYmCfBp8rTjvZfbdweRJoYCgxQHE62jzD2ERyn6qETWs+ZtODwwS1WuAIswgcCgHfGqKnvPqX9F9bPCDaYQ1DXBY2daKoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oZYsSnaw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75F87C2BD11;
+	Thu,  6 Jun 2024 01:58:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717639108;
+	bh=LMH/6S7ojwS+cNq5NMSC/XHKx8l4iSLOp0qY3slkayg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=oZYsSnaw5M1zbYtSpBXYqcqiSe6OOSUx3C9N3GRN6NCToBmMZerHm//iRV059iNd6
+	 lC7Z2A9alFc++kGCuBw6lfnebnI0oOafQTYIOxq1JrMjyFNcH9oic1PHTzYV3Lar6h
+	 sLDYJB0+3ZX2yQIFIyeRTel7gNJHWZocn6y5pLi2eHtbSjrLVC4w6TweWoKmh8jgBu
+	 qU3M+vbFFqCo1dJgTNL2plvxfhbmENIk9hCCJthz2oWP2aZDLjhf2z0FFtW1HYuZlc
+	 b5sEPir/V23weCpnk1ALxMXWDb4nU05FziOMithhTVKSg9y7PoMGJWuVdM+U1IwUhl
+	 ldTfzOSpDbbzg==
+Message-ID: <5fd15963-5678-4965-b19f-67cdb6def3f2@kernel.org>
+Date: Wed, 5 Jun 2024 19:58:25 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240604120311.27300-1-fw@strlen.de> <FF8A506F-6F0F-440E-9F52-B27D05731B77@apple.com>
- <20240605181450.GA7176@breakpoint.cc> <ZmCwlbF8BvLGNgRM@calendula>
- <20240605190833.GB7176@breakpoint.cc> <ZmDAQ6r49kSgwaMm@calendula>
- <CA+FuTSfAhHDedA68LOiiUpbBtQKV9E-W5o4TJibpCWokYii69A@mail.gmail.com> <ZmDjtm27BnxQ0xRX@calendula>
-In-Reply-To: <ZmDjtm27BnxQ0xRX@calendula>
-From: Willem de Bruijn <willemb@google.com>
-Date: Wed, 5 Jun 2024 21:54:59 -0400
-Message-ID: <CA+FuTScK2cpgRdd5CjgE=z=XbH8Gb45i4kkMNKsCPN9rQa6GpQ@mail.gmail.com>
-Subject: Re: [PATCH nf] netfilter: nf_reject: init skb->dev for reset packet
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Florian Westphal <fw@strlen.de>, Christoph Paasch <cpaasch@apple.com>, 
-	Netfilter <netfilter-devel@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, daniel@iogearbox.net, 
-	Stanislav Fomichev <sdf@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/8] Introduce fwctl subystem
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Jonathan Corbet <corbet@lwn.net>,
+ Itay Avraham <itayavr@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Aron Silverton <aron.silverton@oracle.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
+ Leonid Bloch <lbloch@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+ linux-cxl@vger.kernel.org, patches@lists.linux.dev
+References: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+ <20240603114250.5325279c@kernel.org>
+ <214d7d82-0916-4c29-9012-04590e77df73@kernel.org>
+ <20240604070451.79cfb280@kernel.org>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240604070451.79cfb280@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 5, 2024 at 6:16=E2=80=AFPM Pablo Neira Ayuso <pablo@netfilter.o=
-rg> wrote:
->
-> On Wed, Jun 05, 2024 at 05:38:00PM -0400, Willem de Bruijn wrote:
-> > On Wed, Jun 5, 2024 at 3:45=E2=80=AFPM Pablo Neira Ayuso <pablo@netfilt=
-er.org> wrote:
-> > >
-> > > On Wed, Jun 05, 2024 at 09:08:33PM +0200, Florian Westphal wrote:
-> > > > Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> > > >
-> > > > [ CC Willem ]
-> > > >
-> > > > > On Wed, Jun 05, 2024 at 08:14:50PM +0200, Florian Westphal wrote:
-> > > > > > Christoph Paasch <cpaasch@apple.com> wrote:
-> > > > > > > > Reported-by: Christoph Paasch <cpaasch@apple.com>
-> > > > > > > > Suggested-by: Paolo Abeni <pabeni@redhat.com>
-> > > > > > > > Closes: https://github.com/multipath-tcp/mptcp_net-next/iss=
-ues/494
-> > > > > > > > Signed-off-by: Florian Westphal <fw@strlen.de>
-> > > > > > >
-> > > > > > > I just gave this one a shot in my syzkaller instances and am =
-still hitting the issue.
-> > > > > >
-> > > > > > No, different bug, this patch is correct.
-> > > > > >
-> > > > > > I refuse to touch the flow dissector.
-> > > > >
-> > > > > I see callers of ip_local_out() in the tree which do not set skb-=
->dev.
-> > > > >
-> > > > > I don't understand this:
-> > > > >
-> > > > > bool __skb_flow_dissect(const struct net *net,
-> > > > >                         const struct sk_buff *skb,
-> > > > >                         struct flow_dissector *flow_dissector,
-> > > > >                         void *target_container, const void *data,
-> > > > >                         __be16 proto, int nhoff, int hlen, unsign=
-ed int flags)
-> > > > > {
-> > > > > [...]
-> > > > >         WARN_ON_ONCE(!net);
-> > > > >         if (net) {
-> > > > >
-> > > > > it was added by 9b52e3f267a6 ("flow_dissector: handle no-skb use =
-case")
-> > > > >
-> > > > > Is this WARN_ON_ONCE() bogus?
-> > > >
-> > > > When this was added (handle dissection from bpf prog, per netns), t=
-he correct
-> > > > solution would have been to pass 'struct net' explicitly via skb_ge=
-t_hash()
-> > > > and all variants.  As that was likely deemed to be too much code ch=
-urn it
-> > > > tries to infer struct net via skb->{dev,sk}.
-> >
-> > It has been a while, but I think we just did not anticipate skb's with
-> > neither dev nor sk set.
-> >
-> > Digging through the layers from skb_hash to __skb_flow_dissect
-> > now, it does look impractical to add such an explicit API.
-> >
-> > > > So there are several options here:
-> > > > 1. remove the WARN_ON_ONCE and be done with it
-> > > > 2. remove the WARN_ON_ONCE and pretend net was init_net
-> > > > 3. also look at skb_dst(skb)->dev if skb->dev is unset, then back t=
-o 1)
-> > > >    or 2)
-> > > > 4. stop using skb_get_hash() from netfilter (but there are likely o=
-ther
-> > > >    callers that might hit this).
-> > > > 5. fix up callers, one by one
-> > > > 6. assign skb->dev inside netfilter if its unset
-> >
-> > Is 6 a realistic option?
->
-> Postrouting path already sets on skb->dev via ip_output(), if callers
-> are "fixed" then skb->dev will get set twice.
+On 6/4/24 8:04 AM, Jakub Kicinski wrote:
+> Ooo, is that a sore spot?
 
-I meant to set it just before calling skb_get_hash and unset
-right after. Just using the skb to piggy back the information.
+Maintainer overreach? Absolutely.
 
-> the netfilter tracing infrastructure only needs a hash identifier for
-> this packet to be displayed from userspace when tracing rules, how is
-> the running the custom bpf dissector hook useful in such case?
-
-The BPF flow dissector is there as much to short circuit the
-hard-coded C protocol dissectors as to expand on the existing
-feature set. I did not want production machines exposed to
-every protocol parser, as that set kept expanding.
-
-Having different dissection algorithms depending on where the
-packet enters the dissector is also surprising behavior?
-
-If all that is needed is an opaque ID, and on egress skb->hash
-is derived with skb_set_hash_from_sk from sk_txhash, then
-this can even be pseudo-random from net_tx_rndhash().
-
-> the most correct solution is to pass struct net explicitly to the
-> dissector API instead of guessing what net this packet belongs to.
-
-Unfortunately from skb_get_hash to __skb_flow_dissect is four
-layers of indirections, including one with three underscores already,
-that cannot be easily circumvented.
-
-Temporarily passing it through skb (and unsetting after) seems
-the simplest fix to me.
-
-> Else, remove this WARN_ON_ONCE which is just a oneliner.
-
-According to the commit that introduced it, this was to sniff out drivers
-that don't set this (via eth_get_headlen).
-
-The problem is that nothing else warns loudly, so you just quietly
-lose the BPF dissection coverage.
-
-This is the first time it warned. You point out that the value of BPF
-is limited to you in this case. But that's not true for all such cases.
-I'd rather dissection breaks hard than that it falls back quietly for
-input from an untrusted network.
-
-Maybe reduce it to DEBUG_NET_WARN_ON_ONCE?
-
-> > > > 3 and 2 combined are probably going to be the least invasive.
-> > > >
-> > > > 5 might take some time, we now know two, namely tcp resets generate=
-d
-> > > > from netfilter and igmp_send_report().  No idea if there are more.
-> > >
-> > > Quickly browsing, synproxy and tee also calls ip_local_out() too.
-> > >
-> > > icmp_send() which is used, eg. to send destination unreachable too to
-> > > reset.
-> >
-> > Since this uses ip_append_data the generated response should have
-> > its skb->sk set.
->
-> thanks for explaining.
->
-> > > There is also __skb_get_hash_symmetric() that could hit this from
-> > > nft_hash?
-> > >
-> > > No idea what more callers need to be adjusted to remove this splat,
-> > > that was a cursory tree review.
-> > >
-> > > And ip_output() sets on skb->dev from postrouting path, then if
-> > > callers are fixed, then skb->dev would be once then again from output=
- path?
+The sky is not falling with this proposed subsystem; engineers are
+merely trying to solve real, customer problems.
 
