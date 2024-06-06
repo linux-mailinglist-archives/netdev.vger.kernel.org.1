@@ -1,156 +1,204 @@
-Return-Path: <netdev+bounces-101451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9A7C8FEF87
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:55:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87D448FEF91
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:56:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BABE11C20FD0
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:55:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32BC528AAFD
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:56:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2BA195F10;
-	Thu,  6 Jun 2024 14:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D6E198848;
+	Thu,  6 Jun 2024 14:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a3SKh3J0"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="Uqz4lGYx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A96E2A1D8;
-	Thu,  6 Jun 2024 14:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692E1198842
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 14:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717684107; cv=none; b=Mcn7G5IhDxflEm1tcFSm+6kSFca+ALfvLGzzlzGM1tMmE8QE8Z5zUHEiqYLfQK1Sgu1aw//mttSY90FSik9OJ25WSRnnLdk9ugyZl3b1OJMSdGI/HyXDTp8I4uD8OddSBpkYXzPQrRSPH4lYgEKdnJS7rKox1cb2w6qKVJhj88M=
+	t=1717684176; cv=none; b=QXws8eBSSMbeyqpJqQQhuRBzIJRf+f9hYjP1l5lsXs5D3t2vJsCkfKrXq3CNKfI1JYk3M9537qDtHjk8yK8cqqSmqjaWCUTrV4x5QqmdW9mrs0HAVLV6AdodLyMAqsh0Vw0hP55iZL20TZFW0t4dZmjO8bnJyCkkqa/JT8MhcWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717684107; c=relaxed/simple;
-	bh=hQBzhNObWU8aRXHk0bfsSKO8Qrhp01azpV/J00FvZQY=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=tx6MPcEKEtc5jYpbLs71UjOusLSph/lXTUj5+kFcTv9WLBk9HIMXkx7CFrSBHT5BaPH9Q1EO4oPeGK9YB9m8pNg38bjF7F5dl2yhZL7QAvwQaaEaGBEgfqBSECWHRkw61b+bS815sSxysklScrXQFNDi0jvy7cqapEc1l7AXXxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a3SKh3J0; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6ad8344825cso3718206d6.0;
-        Thu, 06 Jun 2024 07:28:26 -0700 (PDT)
+	s=arc-20240116; t=1717684176; c=relaxed/simple;
+	bh=GimoAQIvtE/omE2LWe9rkmcZVAyFh7hH8t8gFFgucFY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S5X97Nuo/5cHvpkqsXOEYReRMUNffMDxshvAidCTJjrQvnOQoFMoHflE6yO3NYoh5z9DTd+/APaiBWZzyB/m2WYnZB+pr+7S9ByewdNz+l0cBBClEWdoqsHUxp+egmke+6GQL5h+GLVkTCRiGJ8GIE3UoeznFO4SuoKbeLgQzNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=Uqz4lGYx; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2ea903cd11bso13767191fa.1
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 07:29:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717684105; x=1718288905; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1717684171; x=1718288971; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2zfB3MoLrV5D7vjDIplljlPhLNJrctBwaNyhRn/7mkE=;
-        b=a3SKh3J0XkfPi4W2Xbyi1M1F3c5g8LBGN9Ap9Ue0o5ZzqgGbEZ/LQOtMJnBD3a88K+
-         9CvfItYuYZpaDW92b2ZNtBxEqdomPn1gC1UNbhbOEqmhpB/3mtJjuNQ5wNnUE0Dy0iiI
-         bYaiNnlepsReCf8BXv/IDqEKOul1nZgbR+Ly9JRWxCfunqQrfGiXGWgJp9+Y7hlUxC0N
-         vRY5GTnPrRS9X6x7BTcicaRCB0LktqYUaGNjTNt8rPozTBjr939im0fDrEBb1fbzkCI5
-         YDHGojzYsGk86TAkxO1rrBnUSFZsZCbodH6oHcimscpmyvUYwnK09LlpBV13zUlx3rcg
-         3YCQ==
+        bh=QWrHmrBVbxL2N+yjukzrB1xNIeLZkMy2NcMIU1+JPUg=;
+        b=Uqz4lGYxdcOmil+vyxA0jJrA8cR4Acx4g2UO2V6EZYsl4TmmK6DDITf7fJ19Fyv0jy
+         g2HD7ify7eEzsC2ZTQYfCj4yB4jVILVXjRLz+8sAXwo7c95uSQCqemDN97S6W2ka7ptz
+         MLoi08vZkJM9OR36t5ZunIDtGQyTYRnabAeEH5iXOjQOg2SEy1mbYGBK09+LG0GlYxRl
+         EUM/MFxFvrn5Yog8it2E+Qzp0Pub8E84clekP/wXhwfaJfR2a5UELn229IuXIjRLKDXe
+         j75Gudw/i91V2bTlHgkapKt8EJ0Eqi6VeDcv/K5bFgi8CN891He2hQ0j5LwHKzio2aRd
+         lO4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717684105; x=1718288905;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=2zfB3MoLrV5D7vjDIplljlPhLNJrctBwaNyhRn/7mkE=;
-        b=qKWmTwVewehbnMk/yNIUdQLlAAaL+2C0q9n9VuGViNkUdTdebPK+Ey+Gf0Tr872RNj
-         tbYuI77V36aXDPS3xy+2mUZPPm4guF+fQtKsbsAKirH6HSUMSasqrz8Cf/YhYqw8h2dO
-         GkBzxPeCLFd+zmHXxRunKnuAOJExHs4P5nb4jr8cSo4xzgCzE7A2w3AdPWeXfWocDRQl
-         XTqtSoNktUsAQZj9/qlTFeSjZN0Ib2mnNQgmRTXyK0ZsEICd3S3fRwf0dfvhn2ayW8NS
-         TKLiiVCC/Px5rNWWU4AOxFnJCwNA5n+/57rSTp4b9ucwXFLfIHhZcIVinxw8b26N7rJX
-         Nkwg==
-X-Forwarded-Encrypted: i=1; AJvYcCVwT8QorwL3pGQFQbA+Hiz0NiUoKMTfEMHRjRjccai49iTrO92jG12xVTwzrnUWPZUw+SlJ6OehzIqeXUIEN+9Zm8H1wP86oMBvJGl2blYxEZ99QMwlNL3V+iAC2SuSDWnHz1AB0rF0
-X-Gm-Message-State: AOJu0YyAepXSW6q07mr+tT97ycnWJQdiJGmeIQAmyWySsXPZ1T8ULg8f
-	dTsnybaxI7AS08vs8CNga/+MJyCIdYB3yQQ7xDTnL6Ia6ybuDaQy
-X-Google-Smtp-Source: AGHT+IEXjo2vdWuwKlB+RtehkJG3gyQ6cMFReM6S8gAFWkAZEAVLG91FarcqvdqseJhCRbxDpzxs9Q==
-X-Received: by 2002:a0c:f20a:0:b0:6af:c6bc:bdb5 with SMTP id 6a1803df08f44-6b030a96fbemr61872486d6.44.1717684105030;
-        Thu, 06 Jun 2024 07:28:25 -0700 (PDT)
-Received: from localhost (112.49.199.35.bc.googleusercontent.com. [35.199.49.112])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b04f6bbd06sm6817856d6.48.2024.06.06.07.28.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jun 2024 07:28:24 -0700 (PDT)
-Date: Thu, 06 Jun 2024 10:28:24 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Florian Westphal <fw@strlen.de>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Florian Westphal <fw@strlen.de>, 
- Pablo Neira Ayuso <pablo@netfilter.org>, 
- Christoph Paasch <cpaasch@apple.com>, 
- Netfilter <netfilter-devel@vger.kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- daniel@iogearbox.net, 
- willemb@google.com
-Message-ID: <6661c788553a4_37c46c294fc@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240606141516.GB9890@breakpoint.cc>
-References: <20240604120311.27300-1-fw@strlen.de>
- <FF8A506F-6F0F-440E-9F52-B27D05731B77@apple.com>
- <20240605181450.GA7176@breakpoint.cc>
- <ZmCwlbF8BvLGNgRM@calendula>
- <20240605190833.GB7176@breakpoint.cc>
- <20240606092620.GC4688@breakpoint.cc>
- <20240606130457.GA9890@breakpoint.cc>
- <6661c313cf1fe_37b6f32942e@willemb.c.googlers.com.notmuch>
- <20240606141516.GB9890@breakpoint.cc>
-Subject: Re: [PATCH nf] netfilter: nf_reject: init skb->dev for reset packet
+        d=1e100.net; s=20230601; t=1717684171; x=1718288971;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QWrHmrBVbxL2N+yjukzrB1xNIeLZkMy2NcMIU1+JPUg=;
+        b=RbHF+JRtIa0uOpxsZivtxxWAI/a3KVe0bi6ygW1JrY1dzEFD4Sl75FDwMTCGcVRDE1
+         IaYhgzN02JZK38tgeE9w0P1XVxE2m4pI6BGt2y6xNqaM3BDwGv97MHwzAeKa+Cg3PqQI
+         RPffpg1IN3f/5RdjQO7oGtYp2aBZlrNullTUPxWXOjVZcyP3f4XGsfuKbEWW9RdFNqjJ
+         KeZtxlT+rYDQiiE4obSnOAMo3AqQBz2T/SQar8BYJOudsKVkl6h2/rkCJweKymZaHRE8
+         Ckm9uWF0dUc7RsT+6NwKTXRA8jh5IjQ+n2i+yfaduleb2OJS0PVgne9IfpYgWrsWZ1pL
+         Sy8A==
+X-Forwarded-Encrypted: i=1; AJvYcCWhrasEQkQhSn2Z4pZBhoDDaRtpI8JAe9ApcOA1XeW7vgvw9VnYnqzfjJTzlElF7L08NN6b8bZJCog4yIRhKMeYEj0c8NOK
+X-Gm-Message-State: AOJu0Yzcw8SiZ9ivKXOl0ki1nbca9Q+T21rlK3Cz48mDri0B4mtJ/wxI
+	bXfa719QBtro3Y7ZYQRkgjEwPz2DGRtlxanFdimZIzfLGabdQYsmwNkueCJAaY9q2CtXC9AfcGZ
+	lTvf8iul+u0vEnUntexbVgDL0Ct9ncclhREBayA==
+X-Google-Smtp-Source: AGHT+IE7dV5ZV/18QS1Cl24O5VDU/AyKd8svwpktd8Gq/yIywl49RVlO2hEBVV/ZBTiMOrhqd5gtrUxmBJP66OQy6UM=
+X-Received: by 2002:a2e:a403:0:b0:2ea:903b:ca0e with SMTP id
+ 38308e7fff4ca-2eac7a986abmr42490961fa.52.1717684171575; Thu, 06 Jun 2024
+ 07:29:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20240605122106.23818-1-brgl@bgdev.pl> <20240605122106.23818-2-brgl@bgdev.pl>
+ <87h6e6qjuh.fsf@kernel.org> <CAMRc=MdiKxtnN+g92RUTXdOydaPV5M2u5iUdKyE2SNvDkdXAjg@mail.gmail.com>
+ <871q5aqiei.fsf@kernel.org>
+In-Reply-To: <871q5aqiei.fsf@kernel.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Thu, 6 Jun 2024 16:29:20 +0200
+Message-ID: <CAMRc=McacZMP-51hjH+d8=PVe+Wgw4a8xWcv0sRPLJKL_gP=KQ@mail.gmail.com>
+Subject: Re: [PATCH v9 1/2] dt-bindings: net: wireless: qcom,ath11k: describe
+ the ath11k on QCA6390
+To: Kalle Valo <kvalo@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Jeff Johnson <jjohnson@kernel.org>, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	ath11k@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	ath12k@lists.infradead.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Florian Westphal wrote:
-> Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
-> > Florian Westphal wrote:
-> > > Florian Westphal <fw@strlen.de> wrote:
-> > > > ... doesn't solve the nft_hash.c issue (which calls _symmetric version, and
-> > > > that uses flow_key definiton that isn't exported outside flow_dissector.o.
-> > > 
-> > > and here is the diff that would pass net for _symmetric, not too
-> > > horrible I think.
-> > > 
-> > > With that and the copypaste of skb_get_hash into nf_trace infra
-> > > netfilter can still pass skbs to the flow dissector with NULL skb->sk,dev
-> > > but the WARN would no longer trigger as struct net is non-null.
-> > 
-> > Thanks for coding this up Florian. This overall looks good to me.
-> 
-> Thanks for reviewing.
-> 
-> > One suggested change is to introduce a three underscore variant (yes
-> > really) ___skb_get_hash_symmetric that takes the optional net, and
-> > leave the existing callers of the two underscore version as is.
-> 
-> Okay, that reduces the code churn.
-> 
-> > The copypaste probably belongs with the other flow dissector wrappers
-> > in sk_buff.h.
-> 
-> skb_get_hash(skb);
-> __skb_get_hash_symmetric(skb);
-> ____skb_get_hash_symmetric(net, skb);
-> 
-> I named the copypasta as nf_skb_get_hash. If placed in sk_buff.h:
-> net_get_hash_net()?
-> skb_get_hash()?
+On Thu, Jun 6, 2024 at 4:02=E2=80=AFPM Kalle Valo <kvalo@kernel.org> wrote:
+>
+> Bartosz Golaszewski <brgl@bgdev.pl> writes:
+>
+> > On Thu, Jun 6, 2024 at 3:30=E2=80=AFPM Kalle Valo <kvalo@kernel.org> wr=
+ote:
+> >
+> >>
+> >> Bartosz Golaszewski <brgl@bgdev.pl> writes:
+> >>
+> >> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >> >
+> >> > Add a PCI compatible for the ATH11K module on QCA6390 and describe t=
+he
+> >> > power inputs from the PMU that it consumes.
+> >> >
+> >> > Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> >> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >>
+> >> [...]
+> >>
+> >> > +allOf:
+> >> > +  - if:
+> >> > +      properties:
+> >> > +        compatible:
+> >> > +          contains:
+> >> > +            const: pci17cb,1101
+> >> > +    then:
+> >> > +      required:
+> >> > +        - vddrfacmn-supply
+> >> > +        - vddaon-supply
+> >> > +        - vddwlcx-supply
+> >> > +        - vddwlmx-supply
+> >> > +        - vddrfa0p8-supply
+> >> > +        - vddrfa1p2-supply
+> >> > +        - vddrfa1p7-supply
+> >> > +        - vddpcie0p9-supply
+> >> > +        - vddpcie1p8-supply
+> >>
+> >> Not sure if we discussed this before, but based on this I understand
+> >> that there can't be an DT entry for device pci17cb,1101 without all th=
+e
+> >> supply properties? But there are QCA6390 devices with PCI id 17cb:1101
+> >> which do not need these supplies and already work. For example, my Del=
+l
+> >> XPS 13 x86 laptop is one. Or anyone who manually installs QCA6390 boar=
+d
+> >> to their PCI slot and some of them might want to use DT, for example
+> >> setting qcom,ath11k-calibration-variant.
+> >>
+> >> This is not a blocker for me, just making sure that we are not breakin=
+g
+> >> any existing setups.
+> >>
+> >
+> > If they are already powered up without the need for the PCI pwrctl
+> > driver to do it, then they will work alright. Bindings don't affect
+> > functionality.
+>
+> Sure, I'm not worried about functionality. I'm worried that if I
+> there's, for example, an ARM based setup which uses DT and wants to use
+> a similar QCA6390 board that I have, and set
+> qcom,ath11k-calibration-variant in DT. In other words, I'm worried if
+> you are looking at this only for Snapdragon family of boards?
+>
 
-Still passing an skb too, so skb_get_hash_net()?
- 
-> And if either of that exists, maybe then use
-> skb_get_hash_symmetric_net(net, skb)
+No, what I'm looking at is the entire QCA6390 package. That means WLAN
+*and* Bluetooth *and* the PMU that manages power.
 
-If symmetric is equally good for nft, that would be preferable, as it
-avoids the extra function. But I suppose it aliases the two flow
-directions, which may be exactly what you don't want?
+If you're using the QCA6390 on a device-tree system then you should
+probably model at least the WLAN node and the PMU and the problem with
+supplies is fixed. But if you don't have the supplies, that's alright
+for downstream.
 
-> or similar?
-> 
-> (There is no skb_get_hash_symmetric, no idea why it
->  uses __prefix).
+> Again, I don't see this as a blocker. I just want to understand how this
+> should work for all types of devices there are out there.
+>
+> > But if you have a QCA6390 then you have its PMU too and the bindings
+> > model the real-world hardware.
+> >
+> > IOW: your laptop should be alright but the supplies are really there
+> > which warrants adding them to the bindings.
+>
+> Sorry, not following here. Can you clarify your comment "the supplies
+> are really there"? You mean inside the PCI board? But that's not visible
+> to the kernel in anyway, the PCI board just works after I plug it in.
+> It's like a regular PCI device. So I don't understand why that should be
+> visible in DT, but I can very well be missing something.
+>
 
-Perhaps because it is more closely analogous to __skb_get_hash, than
-to skb_get_hash.
+I think you're thinking about some kind of detachable PCIe board with
+this chipset on it. I refer to the QCA6390 chipset itself which is
+also more than just PCI. The Bluetooth interface doesn't use PCI at
+all. On the boards I'm working on, the chipset is just soldered to the
+main board. If your detachable board "just works" then it must be
+wired in a way that enables WLAN the moment it's plugged in but this
+doesn't happen over PCI. The chipset has a power input and GPIOs to
+enable each module.
 
+Also: I doubt you need DT for your detachable board?
+
+Bart
+
+> --
+> https://patchwork.kernel.org/project/linux-wireless/list/
+>
+> https://wireless.wiki.kernel.org/en/developers/documentation/submittingpa=
+tches
 
