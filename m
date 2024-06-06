@@ -1,134 +1,208 @@
-Return-Path: <netdev+bounces-101449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 802E18FEF61
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:50:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06F7A8FEF6F
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:52:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E0C6288626
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:50:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4EA14B28AA5
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:52:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24FAF1A2FA2;
-	Thu,  6 Jun 2024 14:24:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B4B197A88;
+	Thu,  6 Jun 2024 14:26:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WeROrlgf"
+	dkim=permerror (0-bit key) header.d=sapience.com header.i=@sapience.com header.b="gBXE4GSm";
+	dkim=pass (2048-bit key) header.d=sapience.com header.i=@sapience.com header.b="PXeQp2Zc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from s1.sapience.com (s1.sapience.com [72.84.236.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A631A2C2A
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 14:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717683875; cv=none; b=Nada5dhypzkcBdUV/oE6YX/4jTMrWeUEEhEnDUUjpbFwXeQy8jTkxYbU7ME6cHbJRLPTt+rJdIMR3uawNR/vLypwbsLxKYa8SrySPQe73pj9JVyiN5gg6paZqM6j4CC31csBB04kwK4hbiyqjEVZyuMtGmKHpedtzFZ/Bcics3s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717683875; c=relaxed/simple;
-	bh=8XJvY4PRNd7QP5IlcghDRm7uf8FuIIF+wmBZT8DMjQo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OVb50F44/Dhle8QvyGymHWEWyWsBJb3dtufVrYf4i2vpw8TCe2oFaMDWDNUwEX/9Ti1E1YqwlyqGITPaBbbiZdsEd1HZqQ0eRVMaitvUAgGnn7gC6XjwcsZzlrCNZbY4Wtj9fsoQ0Y5QDv1Iasg44cED0/yqPakLJV0McR13WIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WeROrlgf; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-52b9d062526so1181067e87.3
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 07:24:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1717683872; x=1718288672; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=++6vpzo3dEirc2BXnRm0i3mFbJVPl95CbYYtfzrVJSQ=;
-        b=WeROrlgfNQ1p0/j3NdlyeOT/+NO75Z1fur4SfX8sst39SBCzDJcHmKeKIxhpsn8SI+
-         currbqjo+DETlrHvAD+JuWpMLoTzVbIhHluRjtNeJ8OV9iBNEekCrXBNvR97GspzHPZ1
-         nffqEIjyRJuRRdKvOyIOLBuM3LMnCPRRz3mda8ObD/kJL4jzLKlR2kkYtcSnm6XG1SbL
-         eFUaOZ3H2KYiRvg1EOs3+e2GznVMLEIDzu/Bl68Vee9O+s/n3rq/Ar0JtJf68+DyZgsq
-         TTJ58EQFkFRihRSufULY9iRXzTre4Qssh/sJTTmxf5/kJvRkvq0AQJQhtBKC+0F4sxED
-         EtPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717683872; x=1718288672;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=++6vpzo3dEirc2BXnRm0i3mFbJVPl95CbYYtfzrVJSQ=;
-        b=Rsw/AMvnLvyjHz9GcwitWWiiKYdSdR2qDOG+Lo7b19YoH6udufCL1WvdPvuS5D+ASb
-         DR1hRqwHLv95fIByHf6rz6UYMx6xVBwaPRXhiKDk1P5KbdmlEqKc1hmrAinaX3nKCEWn
-         Z9Tf6B5XWaXCD6LHbud5HOaAaUubtPeZTn8cgPXmEi7hQgeTXEhX/lyAVPstc4uc6R14
-         790CD+HOy+ijpNpEg/+nisqj+v5M0n86rfuzQbIAfQtE5fSiQFRv5/KbWmNstnMCo0iC
-         zp4aHsyCIOKDqvoVDutIbWyk2EuANMNzyhhZbAeRAUq7tQ6Y+BzlTqh/lf5YQ0j63VmI
-         OSrg==
-X-Forwarded-Encrypted: i=1; AJvYcCXr6YmMh9O7eM2T084uHnNxttHYBG7oatijwhg34VYfCWeMdkkPHVuuT3+X8V1wO4f254CwT3S2Pk6kKzjiITBSsLNwotdh
-X-Gm-Message-State: AOJu0YzG6+xpVL2iHvNC2xwQVUqczhRuWaMN9izJypWVbs2fonYlGK60
-	IwZ55bkG/LIOEykp6g5gYqcicgeqnxIQiT9l0eXwe/NEm7lMVjM5YIocavvohK4=
-X-Google-Smtp-Source: AGHT+IGK6NHwjN3jn4VsJlrqvbN9hjMoiszVr84okdXBzSyf4bSyTjksFWYG+VZCJ382BSeLaVQeGw==
-X-Received: by 2002:a05:6512:2035:b0:529:b609:fa0c with SMTP id 2adb3069b0e04-52bab50b666mr2809751e87.67.1717683871828;
-        Thu, 06 Jun 2024 07:24:31 -0700 (PDT)
-Received: from krzk-bin.. ([110.93.11.116])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52bb423ceeasm211659e87.185.2024.06.06.07.24.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jun 2024 07:24:30 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Thomas Kopp <thomas.kopp@microchip.com>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH net-next 3/3] can: mcp251xfd: simplify with spi_get_device_match_data()
-Date: Thu,  6 Jun 2024 16:24:24 +0200
-Message-ID: <20240606142424.129709-3-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240606142424.129709-1-krzysztof.kozlowski@linaro.org>
-References: <20240606142424.129709-1-krzysztof.kozlowski@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F9A9196434;
+	Thu,  6 Jun 2024 14:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=72.84.236.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717683960; cv=fail; b=U6oV3x38fnr4ThP37cJ756B9FY3zLCrU4bpG2IN9pilBJao+05mlbF1Gu0cWwvy0bzqRz7f7amh0BAWDM46pSCEKoyAU0Rxb79BFb5VlC2YzRkCRK4IEaln3pCCGNt1vZG7jnzM0BuaWEmk1J+hiakqZYaxvmjJoplnyBIJdkMc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717683960; c=relaxed/simple;
+	bh=mC5zzZnXp2icJU9R1Ck47Zcb5SXm4+9y/G4oy4zw/4o=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=iOfnxiUahlx7EltkrT9zVud5JykEyYY+pPaJQzSa2xRX4/r3EofizAPPdNXliHYe74YoAVjous4THUbbbz0/arepYSBBAqNEPyrLK5vURSPrYoU4yufKc7QB/QHhss/Srup6Ln5uPrQh89E3ISbWdzPqzA9+B6Rkm9aawoUrv4s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sapience.com; spf=pass smtp.mailfrom=sapience.com; dkim=permerror (0-bit key) header.d=sapience.com header.i=@sapience.com header.b=gBXE4GSm; dkim=pass (2048-bit key) header.d=sapience.com header.i=@sapience.com header.b=PXeQp2Zc; arc=fail smtp.client-ip=72.84.236.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sapience.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sapience.com
+Authentication-Results: dkim-srvy7; dkim=pass (Good ed25519-sha256 
+   signature) header.d=sapience.com header.i=@sapience.com 
+   header.a=ed25519-sha256; dkim=pass (Good 2048 bit rsa-sha256 signature) 
+   header.d=sapience.com header.i=@sapience.com header.a=rsa-sha256
+Received: from srv8.sapience.com (srv8.sapience.com [x.x.x.x])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by s1.sapience.com (Postfix) with ESMTPS id B5F954809ED;
+	Thu, 06 Jun 2024 10:25:50 -0400 (EDT)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=sapience.com;
+ i=@sapience.com; q=dns/txt; s=dk-ed25519-220413; t=1717683950;
+ h=message-id : subject : from : to : cc : date : in-reply-to :
+ references : content-type : mime-version : from;
+ bh=rVcMiogOXnpri50rMG2S8WWLl7pdPRC8qsfAqNvpxeI=;
+ b=gBXE4GSmtTnOlS1wQResZR16bqNMNofUVdIKy0cA015CUEl7vykJxVY9zZ/vBcwDLf1SK
+ JlJZ5+LvlfYFDFRDA==
+ARC-Seal: i=1; a=rsa-sha256; d=sapience.com; s=arc6-rsa-220412; t=1717683950;
+	cv=none; b=jax5C4gXTO68gBl3s40G8JD+wDJ8CzyTh3YnFkYB0Ll3PGH7FuSydEK6h9x5S1cr/YFlkNjg6PT9B5xnOd58ey8US0SPtO8QyVBGoyd1jQDcVNdwtwpq1avp6IvqarTPRkFBJWsOZJvik4fwVJajqJp3y0rcaltNbTjRQs9ESkyxRx/rtsZ1JcCQS7G8NE0D0Gb7ImOAYkg9x/Z2TONTv17aMU34AQwDCuBD8iAc3JXqr2x5TLolm7pDtC0QUBZN51JbkUwDN5IZm/c3cM8CNHTlRb0od1iVktm9LWA6PHe6l3bwn+2IKo8wv7GN7y/mrSz7vVv2194Yq73fnXpp6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; d=sapience.com; s=arc6-rsa-220412;
+	t=1717683950; c=relaxed/simple;
+	bh=mC5zzZnXp2icJU9R1Ck47Zcb5SXm4+9y/G4oy4zw/4o=;
+	h=DKIM-Signature:DKIM-Signature:Message-ID:Subject:From:To:Cc:Date:
+	 In-Reply-To:References:Autocrypt:Content-Type:User-Agent:
+	 MIME-Version; b=JGvqGmU9asc8J8lwdIzlh9/zMm0yAnEpf8ctF/tqNcTcoYbdWOJczGJ1fHytycmDIask/pyBtXJOFSdoZrU8Un+bYFwuP1OaHggwBEYTZIOtM9aXHqJMwyksO53vLPMBM9bJ8w8wqVutoSYAkwtgUfisFZPLKBaxIpgj4LcfJlM6T/oJmwXFzgoHFiuxh/HFMZOXF1tnf4J9PwrE0OewGrTxtGpzEATSPAAl+lcsK2UrjJCojaJfUPjb+h9lyfn36ZggzjZZHDhY6b3S0oebXohmtUgApMlXd2G6e8k0wZ9OcIElah7ZfUIdF/qiFbO/WZgkd9gQuUhFkMQAC4M82A==
+ARC-Authentication-Results: i=1; arc-srv8.sapience.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sapience.com;
+ i=@sapience.com; q=dns/txt; s=dk-rsa-220413; t=1717683950;
+ h=message-id : subject : from : to : cc : date : in-reply-to :
+ references : content-type : mime-version : from;
+ bh=rVcMiogOXnpri50rMG2S8WWLl7pdPRC8qsfAqNvpxeI=;
+ b=PXeQp2ZcP6zC6Lmhh7bHKNRDdASx4o0610zv96A9sXId+Z0wqg8mt6uRp3351jLNZ4Myr
+ Apz1NRg6KjIFOfiJxiWUpgUgDmDxpMQEbtcRmenSEhbWGNqko4+F9v00c6yEGfNTdcSqxdh
+ uoU/IhGCnm2vYWN9Jw3v6LxCUEY+iO+MKQoHdvROhVlDIpaNULEeBkjW6L5Ma9COR+NRFg0
+ KIUvqxK+IzETZrKidd811TYV8a0sGvdIhzFJxiMb9AYiuRNDuu3Vnm1dq/OdqPR+C144kTK
+ 0yoWjat66uXlMUGZy/v2M3GlCFLcUgD90pvd17UOEAUQJAx9bAMaiMdRsSLw==
+Received: from lap7.sapience.com (lap7w.sapience.com [x.x.x.x])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by srv8.sapience.com (Postfix) with ESMTPS id 8C747280074;
+	Thu, 06 Jun 2024 10:25:50 -0400 (EDT)
+Message-ID: <d47dcc8b4e429c676db7ad6daf8024a97f725582.camel@sapience.com>
+Subject: Re: Hung tasks due to a AB-BA deadlock between the leds_list_lock
+ rwsem and the rtnl mutex
+From: Genes Lists <lists@sapience.com>
+To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>, Hans de
+ Goede <hdegoede@redhat.com>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>, Pavel
+ Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>, Linux LEDs
+ <linux-leds@vger.kernel.org>,  Heiner Kallweit <hkallweit1@gmail.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net, 
+ edumazet@google.com, pabeni@redhat.com, johanneswueller@gmail.com, "Russell
+ King (Oracle)" <linux@armlinux.org.uk>
+Date: Thu, 06 Jun 2024 10:25:49 -0400
+In-Reply-To: <20240606063902.776794d4@kernel.org>
+References: <9d189ec329cfe68ed68699f314e191a10d4b5eda.camel@sapience.com>
+	 <15a0bbd24cd01bd0b60b7047958a2e3ab556ea6f.camel@sapience.com>
+	 <ZliHhebSGQYZ/0S0@shell.armlinux.org.uk>
+	 <42d498fc-c95b-4441-b81a-aee4237d1c0d@leemhuis.info>
+	 <618601d8-f82a-402f-bf7f-831671d3d83f@redhat.com>
+	 <01fc2e30-eafe-495c-a62d-402903fd3e2a@lunn.ch>
+	 <9d821cea-507f-4674-809c-a4640119c435@redhat.com>
+	 <c912d1f7-7039-4f55-91ac-028a906c1387@lunn.ch>
+	 <20240606063902.776794d4@kernel.org>
+Autocrypt: addr=lists@sapience.com; prefer-encrypt=mutual;
+ keydata=mDMEXSY9GRYJKwYBBAHaRw8BAQdAwzFfmp+m0ldl2vgmbtPC/XN7/k5vscpADq3BmRy5R
+ 7y0LU1haWwgTGlzdHMgKEwwIDIwMTkwNzEwKSA8bGlzdHNAc2FwaWVuY2UuY29tPoiWBBMWCAA+Ah
+ sBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEE5YMoUxcbEgQOvOMKc+dlCv6PxQAFAmPJfooFCRl
+ vRHEACgkQc+dlCv6PxQAc/wEA/Dbmg91DOGXll0OW1GKaZQGQDl7fHibMOKRGC6X/emoA+wQR5FIz
+ BnV/PrXbao8LS/h0tSkeXgPsYxrzvfZInIAC
+Content-Type: multipart/signed; micalg="pgp-sha384";
+	protocol="application/pgp-signature"; boundary="=-dCYAK6fKUZBbP2EluySH"
+User-Agent: Evolution 3.52.2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Use spi_get_device_match_data() helper to simplify a bit the driver.
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+--=-dCYAK6fKUZBbP2EluySH
+Content-Type: multipart/alternative; boundary="=-4jp6JUlsMS0E8HXI4hn3"
 
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-index 1d9057dc44f2..4b7e08e8ed56 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-@@ -1989,7 +1989,6 @@ MODULE_DEVICE_TABLE(spi, mcp251xfd_id_table);
- 
- static int mcp251xfd_probe(struct spi_device *spi)
- {
--	const void *match;
- 	struct net_device *ndev;
- 	struct mcp251xfd_priv *priv;
- 	struct gpio_desc *rx_int;
-@@ -2081,13 +2080,7 @@ static int mcp251xfd_probe(struct spi_device *spi)
- 	priv->pll_enable = pll_enable;
- 	priv->reg_vdd = reg_vdd;
- 	priv->reg_xceiver = reg_xceiver;
--
--	match = device_get_match_data(&spi->dev);
--	if (match)
--		priv->devtype_data = *(struct mcp251xfd_devtype_data *)match;
--	else
--		priv->devtype_data = *(struct mcp251xfd_devtype_data *)
--			spi_get_device_id(spi)->driver_data;
-+	priv->devtype_data = *(struct mcp251xfd_devtype_data *)spi_get_device_match_data(spi);
- 
- 	/* Errata Reference:
- 	 * mcp2517fd: DS80000792C 5., mcp2518fd: DS80000789C 4.
--- 
-2.43.0
+--=-4jp6JUlsMS0E8HXI4hn3
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, 2024-06-06 at 06:39 -0700, Jakub Kicinski wrote:
+> On Thu, 6 Jun 2024 15:12:54 +0200 Andrew Lunn wrote:
+> > > So it has been almost a week and no reply from Heiner. Since this
+> > > is
+> > > causing real issues for users out there I think a revert of
+> > > 66601a29bb23
+> > > should be submitted to Linus and then backported to the stable
+> > > kernels.
+> > > to fix the immediate issue at hand.=C2=A0=20
+> >=20
+> > Agreed.
+>=20
+> Please submit..
+
+I assume this deadlock is unrelated to the filesystem stalls reported
+here:
+
+=C2=A0
+=C2=A0https://lore.kernel.org/lkml/da8710eddca32677cf3c195000416121045eb811=
+.camel@sapience.com/
+
+but thought it best to ask.
+
+thank you.
+
+--=20
+Gene
+
+
+--=-4jp6JUlsMS0E8HXI4hn3
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+<html><head><style>pre,code,address {
+  margin: 0px;
+}
+h1,h2,h3,h4,h5,h6 {
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+}
+ol,ul {
+  margin-top: 0em;
+  margin-bottom: 0em;
+}
+blockquote {
+  margin-top: 0em;
+  margin-bottom: 0em;
+}
+</style></head><body><div>On Thu, 2024-06-06 at 06:39 -0700, Jakub Kicinski=
+ wrote:</div><blockquote type=3D"cite" style=3D"margin:0 0 0 .8ex; border-l=
+eft:2px #729fcf solid;padding-left:1ex"><div>On Thu, 6 Jun 2024 15:12:54 +0=
+200 Andrew Lunn wrote:<br></div><blockquote type=3D"cite" style=3D"margin:0=
+ 0 0 .8ex; border-left:2px #729fcf solid;padding-left:1ex"><blockquote type=
+=3D"cite" style=3D"margin:0 0 0 .8ex; border-left:2px #729fcf solid;padding=
+-left:1ex"><div>So it has been almost a week and no reply from Heiner. Sinc=
+e this is<br></div><div>causing real issues for users out there I think a r=
+evert of 66601a29bb23<br></div><div>should be submitted to Linus and then b=
+ackported to the stable kernels.<br></div><div>to fix the immediate issue a=
+t hand.&nbsp; <br></div></blockquote><div><br></div><div>Agreed.<br></div><=
+/blockquote><div><br></div><div>Please submit..<br></div></blockquote><div>=
+<br></div><div>I assume this deadlock is unrelated to the filesystem stalls=
+ reported here:</div><div><br></div><div>&nbsp; &nbsp;<a href=3D"https://lo=
+re.kernel.org/lkml/da8710eddca32677cf3c195000416121045eb811.camel@sapience.=
+com/">https://lore.kernel.org/lkml/da8710eddca32677cf3c195000416121045eb811=
+.camel@sapience.com/</a></div><div><br></div><div>but thought it best to as=
+k.</div><div><br></div><div>thank you.</div><div><br></div><div><span><pre>=
+-- <br></pre><div><span style=3D"background-color: inherit;">Gene</span></d=
+iv><div><br></div></span></div></body></html>
+
+--=-4jp6JUlsMS0E8HXI4hn3--
+
+--=-dCYAK6fKUZBbP2EluySH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYJAB0WIQRByXNdQO2KDRJ2iXo5BdB0L6Ze2wUCZmHG7QAKCRA5BdB0L6Ze
+25htAP0UvLjW80ObvibjGLL4OKpLvqrtJkkWUoyEsPV7K9YkCQD9FsS4R5lHcbRQ
+YKutNthSR6D0eGBP41WSQeY4zXTntQs=
+=y8qy
+-----END PGP SIGNATURE-----
+
+--=-dCYAK6fKUZBbP2EluySH--
 
