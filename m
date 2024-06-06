@@ -1,127 +1,162 @@
-Return-Path: <netdev+bounces-101570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD4918FF798
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 00:17:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E70BD8FF7A8
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 00:30:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 021941C23D27
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 22:17:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73E761F24EE5
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 22:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5927A7345D;
-	Thu,  6 Jun 2024 22:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E07A482D3;
+	Thu,  6 Jun 2024 22:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nFNEEJkA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AZUWF0bi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A396544361;
-	Thu,  6 Jun 2024 22:17:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9943319D8B9;
+	Thu,  6 Jun 2024 22:30:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717712233; cv=none; b=Lx0L4BQKAa2G6xjxVJD0dv6wCh2tn3KtEtEjdK0+2QRlNlcBjoa3trfxmhL07eoDtMgRtGwlzAl3aJoj5mJcSPAgZAHG9vGESNoV/8KY2Z9cY6oPm3FT1LYLphPNHW+v70emH8VhWfRF/pQEeBodEHBdpIo7LSdyIh1/d808d18=
+	t=1717713041; cv=none; b=MXZTmRkl0d8HNgFbsAZ5ZLdI8YdPETlIJr0qIVTPWktxjrCqgwS3RoXfyuwH3mKP12ubEdHj/5vjU5PwEDplkuHjaPCGuAq6DvdcMSy+uNpcJRd1gwtu1ZkpT35eblzDBjm10alvi2lAvnnxLsyPgs7edVreWaykWNWV7N9hQrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717712233; c=relaxed/simple;
-	bh=rRNoLnOtuf7gXUiGUWdkytwKEObjq7nGLwrsqwLO2BQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GTLaaxpJedNrQIORY8r8V6QJOmbHRNiedZ1aKbuExbxeMimEVgOBNDELTA+5i45D+BhnzzDGL8mjq4zVH41GZqpFXiM8SRkgZ1uuD+aXkzmgJLBrnRjrNiWd6qWUit5QOS9OOmDWqXyPNiUe/dlpFTVFtOcD2n9aQw9nfYs00FA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nFNEEJkA; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2ead2c6b553so18825021fa.0;
-        Thu, 06 Jun 2024 15:17:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717712229; x=1718317029; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rRNoLnOtuf7gXUiGUWdkytwKEObjq7nGLwrsqwLO2BQ=;
-        b=nFNEEJkA7JKfytISyNn9EKl07X0RhbEnDWb0pi4raAOezvy0lmvOdj0qheqWpO5srM
-         EZDuxs9y7YSS5+FtpnQhzdpqSWtIlSTrPIWI8Hb8Ls7jdq7x/4an5usmq3Q4FB6YFvKl
-         UV/Bd1GmDfCI8JxpUYt11AB5SIEdNFZKA7CyVBCEzIQWB05AehaCI4P5g3ke5HiDvziy
-         +ZUz/S5Vd2TmVIY9LINnEn6DFSeCfsHdkrVV/IiKEPHA1Un9+PwnczXP05APfbmgiI+M
-         5ra0PEq4H2bY8ScJfpYr637rimi1dUMznAzilkAZLXJ9WpVAkYOdc3c4va68ujizTLQ2
-         +0ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717712229; x=1718317029;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rRNoLnOtuf7gXUiGUWdkytwKEObjq7nGLwrsqwLO2BQ=;
-        b=oEV6zgd2D/24d1WX/eL1a3uJnjxF084b63QnugGfy+T2OaTzoQSUZoMDBu5pKXDUdV
-         GlVgmVnactiYLEPQc8lIINWIkj99yTp9H9UZCZs+tGqDxZEJHh0mJt81TPZyOZBbFP9s
-         cYtlpuF/ifTQsp2FyGSpHAPMf5JIJXsj/CqoxcE4fsQWDhmcp1f/1OPatjF7hM4rQyHR
-         eWtbYPQhRj519tx+1wnWB648EL2p8Cprm1d9QIUAt56nqKxECHUjRkEiZY+XdT1ywgVl
-         GNFCaPDxo1AaaXKla7fAzNgyyEG8QmQlubGmXhUl0JAPnaoz3IXD7C7C6rlWb3Oi3mOe
-         2s/A==
-X-Forwarded-Encrypted: i=1; AJvYcCW+sawE0zFSDzEtilBCjk2oU6yNpaEu4w2m8r70551ROKH7NqQylWC4X+pjMMx78Q+G+5UR+qpdF3nI/Nk3dUe2PkqnooUR1o8AxBTC
-X-Gm-Message-State: AOJu0Yz9bc4FMw8wjz+8mTSTWHXlZaShx6zcoO4aBeu29XvZX8zZxPNP
-	GJmldzcTQ/O7604mv/Y4d9PS2tdISt8TywgJbjVn8UrCSJOEIpfn2LKrnG3H0hpGA1Zhjrihgp/
-	64Ez6fqpQS4mEutap0X+K1TvCECA=
-X-Google-Smtp-Source: AGHT+IEueW0/KsIz88ae9xQqkVdU8AYBJ3cVnbX/7Tb+QUYwbjsOqq7cLFErTdadWZHr3XnwskwnAfV9G9JZYUyni58=
-X-Received: by 2002:a2e:924d:0:b0:2e6:d1fb:4470 with SMTP id
- 38308e7fff4ca-2eadce7f992mr6629881fa.42.1717712228499; Thu, 06 Jun 2024
- 15:17:08 -0700 (PDT)
+	s=arc-20240116; t=1717713041; c=relaxed/simple;
+	bh=Lz5+wZ49vAR/azXrLnct2FWvU4U+hh5dMj/QxWj5AjA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SGN4masSVoxigQcEpUyNVWZI+pxxxmzwQsZFULWJdiMBWt+NmyqcaX+1szZtuaZ+yOGIKu4G0MVTp+CnIuz9+gRa7qMOTxO39EGsrsU3gX95eQMiwBHDVpJGLtr9JJPYOAUUbNxlEPIga37HMaObcFHSA9zVz8O59mv9zjgZ6K8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AZUWF0bi; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717713039; x=1749249039;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Lz5+wZ49vAR/azXrLnct2FWvU4U+hh5dMj/QxWj5AjA=;
+  b=AZUWF0biHmLarGWu7mwQdlzPp0Gt1tnr9w7Q6T9UULusF7qU5zjbcNdm
+   CTm5iQWEEuFrOtpw25GMrrE2ntOKjorDVQcMCMybZAazcdxzQJLfnZZly
+   8+2CEF6AUnJjWKLMj7r0R+ysw87zn0SglEAIm1nsKFYu9HKRTajvD1QxH
+   ZdR7/TTDXK83S1Dw+d0e/RS/DSac+nd3lpqz4dTByTyaPLVp2HVY5TEtX
+   yVz1/G3irRBRIaD4ATiX6MmZWvUg88b9lmGgEo0MPK5uu1XbIyOio8Zlz
+   gPpDYHF9oIM4f2mW8YRoaxQviTHJukPaVVAQXoZ/xjK3BUGHlf0wYwfD2
+   Q==;
+X-CSE-ConnectionGUID: lASWJykfTKeg0iX3RJfMNw==
+X-CSE-MsgGUID: F4gqdjR+RweURiCWiBfSkA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11095"; a="14596948"
+X-IronPort-AV: E=Sophos;i="6.08,219,1712646000"; 
+   d="scan'208";a="14596948"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2024 15:30:38 -0700
+X-CSE-ConnectionGUID: 2z5zrgD4QMuo60MP3iEFhQ==
+X-CSE-MsgGUID: h2PhUJP+Qgm2lTqoeZq3aQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,219,1712646000"; 
+   d="scan'208";a="68910874"
+Received: from unknown (HELO 0610945e7d16) ([10.239.97.151])
+  by orviesa002.jf.intel.com with ESMTP; 06 Jun 2024 15:30:33 -0700
+Received: from kbuild by 0610945e7d16 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sFLcs-0003ns-1m;
+	Thu, 06 Jun 2024 22:30:30 +0000
+Date: Fri, 7 Jun 2024 06:30:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: Wei Huang <wei.huang2@amd.com>, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, bhelgaas@google.com, corbet@lwn.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	wei.huang2@amd.com, vadim.fedorenko@linux.dev, horms@kernel.org,
+	bagasdotme@gmail.com
+Subject: Re: [PATCH V2 5/9] PCI/TPH: Introduce API functions to manage
+ steering tags
+Message-ID: <202406070602.DyLemS9q-lkp@intel.com>
+References: <20240531213841.3246055-6-wei.huang2@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240606192139.1872461-1-joshwash@google.com>
-In-Reply-To: <20240606192139.1872461-1-joshwash@google.com>
-From: Andrei Vagin <avagin@gmail.com>
-Date: Thu, 6 Jun 2024 15:16:56 -0700
-Message-ID: <CANaxB-wSegSBot-8YCeiw-CsfdubRJMacC6nmRPLyoD4eGSc-w@mail.gmail.com>
-Subject: Re: [PATCH net] gve: ignore nonrelevant GSO type bits when processing
- TSO headers
-To: joshwash@google.com
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	stable@kernel.org, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Eric Dumazet <edumazet@google.com>, 
-	Jeroen de Borst <jeroendb@google.com>, Shailend Chand <shailend@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
-	Rushil Gupta <rushilg@google.com>, Catherine Sullivan <csully@google.com>, Bailey Forrest <bcf@google.com>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240531213841.3246055-6-wei.huang2@amd.com>
 
-On Thu, Jun 6, 2024 at 12:22=E2=80=AFPM <joshwash@google.com> wrote:
->
-> From: Joshua Washington <joshwash@google.com>
->
-> TSO currently fails when the skb's gso_type field has more than one bit
-> set.
->
-> TSO packets can be passed from userspace using PF_PACKET, TUNTAP and a
-> few others, using virtio_net_hdr (e.g., PACKET_VNET_HDR). This includes
-> virtualization, such as QEMU, a real use-case.
+Hi Wei,
 
-Here is the bug report where this issue was triggered by gVisor:
-https://github.com/google/gvisor/issues/10344
+kernel test robot noticed the following build errors:
 
->
-> The gso_type and gso_size fields as passed from userspace in
-> virtio_net_hdr are not trusted blindly by the kernel. It adds gso_type
-> |=3D SKB_GSO_DODGY to force the packet to enter the software GSO stack
-> for verification.
->
-> This issue might similarly come up when the CWR bit is set in the TCP
-> header for congestion control, causing the SKB_GSO_TCP_ECN gso_type bit
-> to be set.
->
-> Fixes: a57e5de476be ("gve: DQO: Add TX path")
->
-> Signed-off-by: Joshua Washington <joshwash@google.com>
-> Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
-> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
-> Suggested-by: Eric Dumazet <edumazet@google.com>
+[auto build test ERROR on pci/next]
+[also build test ERROR on pci/for-linus awilliam-vfio/next linus/master awilliam-vfio/for-linus v6.10-rc2 next-20240606]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Acked-by: Andrei Vagin <avagin@gmail.com>
+url:    https://github.com/intel-lab-lkp/linux/commits/Wei-Huang/PCI-Introduce-PCIe-TPH-support-framework/20240601-054423
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git next
+patch link:    https://lore.kernel.org/r/20240531213841.3246055-6-wei.huang2%40amd.com
+patch subject: [PATCH V2 5/9] PCI/TPH: Introduce API functions to manage steering tags
+config: arm-randconfig-r122-20240607 (https://download.01.org/0day-ci/archive/20240607/202406070602.DyLemS9q-lkp@intel.com/config)
+compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project d7d2d4f53fc79b4b58e8d8d08151b577c3699d4a)
+reproduce: (https://download.01.org/0day-ci/archive/20240607/202406070602.DyLemS9q-lkp@intel.com/reproduce)
 
-Thanks,
-Andrei
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406070602.DyLemS9q-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from drivers/pci/pcie/tph.c:18:
+   In file included from include/linux/pci.h:1653:
+   In file included from include/linux/dmapool.h:14:
+   In file included from include/linux/scatterlist.h:8:
+   In file included from include/linux/mm.h:2253:
+   include/linux/vmstat.h:514:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     514 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+>> drivers/pci/pcie/tph.c:95:15: error: no member named 'msix_base' in 'struct pci_dev'; did you mean 'msix_cap'?
+      95 |         entry = dev->msix_base + msi_index * PCI_MSIX_ENTRY_SIZE;
+         |                      ^~~~~~~~~
+         |                      msix_cap
+   include/linux/pci.h:350:6: note: 'msix_cap' declared here
+     350 |         u8              msix_cap;       /* MSI-X capability offset */
+         |                         ^
+   1 warning and 1 error generated.
+
+
+vim +95 drivers/pci/pcie/tph.c
+
+    80	
+    81	/*
+    82	 * For a given device, return a pointer to the MSI table entry at msi_index.
+    83	 */
+    84	static void __iomem *tph_msix_table_entry(struct pci_dev *dev,
+    85						  u16 msi_index)
+    86	{
+    87		void __iomem *entry;
+    88		u16 tbl_sz;
+    89		int ret;
+    90	
+    91		ret = tph_get_table_size(dev, &tbl_sz);
+    92		if (ret || msi_index > tbl_sz)
+    93			return NULL;
+    94	
+  > 95		entry = dev->msix_base + msi_index * PCI_MSIX_ENTRY_SIZE;
+    96	
+    97		return entry;
+    98	}
+    99	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
