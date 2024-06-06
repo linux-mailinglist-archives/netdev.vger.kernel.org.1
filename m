@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-101472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D68F68FF051
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:18:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAD398FF0E8
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:40:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B13F71C221B9
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:18:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 509E1B3124E
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E74E19B3CE;
-	Thu,  6 Jun 2024 15:03:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2945719B3F4;
+	Thu,  6 Jun 2024 15:03:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="izP4Cj8Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TO8KEY3g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C832719307E
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 15:03:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B2819B3EF
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 15:03:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717686207; cv=none; b=GnacMYHOlkunGC59JP5R+B3hCq7IXLOWJhLzDTP8grigoMp9MiQKjK08+STSgqEpFc4YFjaF5aESFqasqunZEtEO8DBGlq1F5DWgUMZbSCZ6IcpprdLzLpd1+UV/1gH0jorQtYUZzs3hpBCk+2RX0nUvtNR1zr+JA/Ma2osCSDs=
+	t=1717686211; cv=none; b=tLPqsYI98kAWiZNtFB4nm1RNn9oUZde+zgIV5uh9iBUT81ZLEGjl/h/CIIwt/k9YC8vXn+OJr1TtK6FfGuASai3Xsd8t2gKuQX7pA3r5chEfD9cQUNBl5no2MAA6cB+/dhauWV7Aau+WIWhel2r+OaLUhJoqBHHowG7rp1nvMuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717686207; c=relaxed/simple;
-	bh=zc0lRE4HIsM+kEzvoXCmIQ7aMCxMIG/xZ9+VtekXT5c=;
+	s=arc-20240116; t=1717686211; c=relaxed/simple;
+	bh=xqEgjvYGXGrNumAT0Fkq0aykzig6+28oZTY3mAVDAwc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MOu7g9VzTnBy7JuQVNLcJrNHLtuzChf7gnmPXrYiya2oXPV6t56QXGgB3N3VW0vzOQxy2o2hs7qcPdKGLIyri+NTLOjVfbz91SeHtCKQwyXXzMa8NawOphHmAKOE7buBXK7VwVHhHQ84fKVCn2xX8xLmbUMbwPl+OLD+8Bhksf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=izP4Cj8Y; arc=none smtp.client-ip=209.85.214.181
+	 MIME-Version; b=QhZQy8qrMjosfCd9wQ8S1vU16Kz6FxwjzL1t+toYwd6L2DIYjVHHLwva2GysLt7EegK3YuJMh4KLs1Wp/qX+dnYacjhMUvIkTUzPTJ+1D3YWoJUDAb84pV54hz191ppWh4KVfMbHlXIGI3NRU06bRDXJLG4wFpH9yrbK1DjEDFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TO8KEY3g; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1f4a5344ec7so8031855ad.1
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 08:03:24 -0700 (PDT)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7024cd9dd3dso876899b3a.3
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 08:03:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717686204; x=1718291004; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1717686209; x=1718291009; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZfYJjjBtqofpxNk/4Tw/V4e/Q8e9et5dmP4zWmiUcl0=;
-        b=izP4Cj8YxAlVOlB6OkHmyqljc83Ndrx+t0vBwftV3dPi1tozraYG/zrj7YfuaWqgOV
-         jmz5SvNPFfa5pp32EXrMyll27FB9kHq9k2oqMlrJ4G327JweNpIyK7VWc7UYjqPMoSKd
-         AbO/IfprptoIp1J5wWaT4MJMqaszeQ8blFBT8fpY8hC2O0rcPiC4BiYrfkpsKsMi2Wou
-         9icY5Y3cCJ4W4PUvWZznxbUtTK+6UTUiqybCtsLGfFgfr348Y6d69H1q149MWoMsNsnt
-         WAw3JhndFXQZbZdj70g0L2TOoJWr4fzaLKyQn7WtxkL/L/TX81NyMvhYkGyODFWwZW9N
-         y/1A==
+        bh=8jwC5YEDMskJq3diNklq/1nR6Hy9TYkeOXFQhqyPobY=;
+        b=TO8KEY3gWQCwagUX14eRU8n6eNnfu7PlM7Clg4IEhzYWqlvqPGpeiGmmQYrlqTK9jE
+         j0RU2/WQytLHYwXNiIYe+/KMlojXv56lBNu0A7EK2rB0nCl3FV3/cD8D3kNq0RnoxBor
+         EX2UbPIb3PtYfanxBG9FZNj6g9dnf0YuRtyyHrlE/d5ZNz1KapLPfDbUt2sGlsiXh0C8
+         z1XZv6YhmesmIS4cfXKtiDQpwNKas0b+u7/z9SRRX4kbOv2PVcO3JiRkdi+vO7pMnvWU
+         QwWy7ZlnXmRmsniVxNtDec1ONaNxxViK8B5kX9ObhxgWAweywYI6i/SNd6B/KthxMCGQ
+         Cbmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717686204; x=1718291004;
+        d=1e100.net; s=20230601; t=1717686209; x=1718291009;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZfYJjjBtqofpxNk/4Tw/V4e/Q8e9et5dmP4zWmiUcl0=;
-        b=WclmDvxf648KcS2Thnaf7EvB4VgXZocNkzMYlii2Ol3xJI+1Zt1GJpxuXt23k5Mm4v
-         NMdrKhYTJUj3u+kBAoISrRqnyqOI7Il9erzWsG1hrIjMfIFfSvfCze3J1PwkSjf43VCr
-         k9OBvN0dWrCWqsE3GFt5OnKt2pzRn7bnte69EHgDbhlMbNnpB6WdYd62fUIWDoCsviyz
-         Sq0i6gXd5g+zl5L3dGMZnlClrbkyG/GJBoRO8Mhw9IWcFyYRuli0SmsgKqbCVGka3EZK
-         pJXSKxREOMzdqIXl/d3KhU7St1y8sK+PsoydOYAxxQ/P+3ayFKJ1T4meFjMb+uUPaepU
-         immQ==
-X-Gm-Message-State: AOJu0Yz7EiS7si6VRodEW6SbvoHLhNpO9lETvH3Bk500Gqw/WEx9mrmD
-	e+3gjVsDECtdlhA+/XET5wpjIq36KJjTP3bv+hjdPDWIVmMcX5nm
-X-Google-Smtp-Source: AGHT+IFm12OyVfS2QgPPLBeoFnnyKscsbb8AbCIGoNZOLlB0sxQPsXnMyjcS8NM1JfTtWbXY45xHJQ==
-X-Received: by 2002:a17:903:41c8:b0:1f4:58c6:d5b with SMTP id d9443c01a7336-1f6b8f1513dmr38019955ad.28.1717686203896;
-        Thu, 06 Jun 2024 08:03:23 -0700 (PDT)
+        bh=8jwC5YEDMskJq3diNklq/1nR6Hy9TYkeOXFQhqyPobY=;
+        b=lWQ4OrUW1kLPB8kGVFAR6ldFa/IEVKA08B9XT+dU/ukwLhD/oQNNb+wdEolrcR66A8
+         Zdm0aFh33467zNQOPXBy6jbuP/NtYOJFL/qLiXXACnU63nXDCgtSmyQO5v1FkGAKXKBn
+         Gv6In4NpcsGuOkTR/bwO+P3eLsB5JVAOCt8G3biuJ4zUJUz1dcBCAIzyH97JFePrIs0h
+         bnz2JqPhItpF2nntgIrwtJkR6BRx64V3yZDxLkbaZ3SR9hBOFDm43/DiW55DHCVdQcwT
+         6islhOgkg4008tKmZj4GjdQnF+uG+QQawz+aQex0FrN2mbBBO4TnjRwoZZsiC/6THykH
+         E5xg==
+X-Gm-Message-State: AOJu0YwYtlHs3kgjOcAaLeWqftu+twA2RCa8SYA32QL6TBVg1BdsicOx
+	dcVj/Qh74eGaNPQvYdFn0kStKHaNDiPg5esfWT64DyT6KtJdFeKt
+X-Google-Smtp-Source: AGHT+IHuZBaGeY0uixRNmsDOro3RnfvbRr9VDJukjHR0msFIHJok6h2jUDvWiYdrdRTVVJktxwpmVw==
+X-Received: by 2002:a05:6a20:2447:b0:1b0:25b6:a749 with SMTP id adf61e73a8af0-1b2b70fd7aamr6068451637.48.1717686208875;
+        Thu, 06 Jun 2024 08:03:28 -0700 (PDT)
 Received: from KERNELXING-MB0.tencent.com ([111.201.28.17])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6de264ae03csm1215853a12.68.2024.06.06.08.03.19
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6de264ae03csm1215853a12.68.2024.06.06.08.03.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jun 2024 08:03:23 -0700 (PDT)
+        Thu, 06 Jun 2024 08:03:28 -0700 (PDT)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: edumazet@google.com,
 	kuba@kernel.org,
@@ -76,9 +76,9 @@ To: edumazet@google.com,
 Cc: netdev@vger.kernel.org,
 	kerneljasonxing@gmail.com,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next 1/2] tcp: fix showing wrong rtomin in snmp file when using route option
-Date: Thu,  6 Jun 2024 23:03:06 +0800
-Message-Id: <20240606150307.78648-2-kerneljasonxing@gmail.com>
+Subject: [PATCH net-next 2/2] tcp: fix showing wrong rtomin in snmp file when setting sysctl_tcp_rto_min_us
+Date: Thu,  6 Jun 2024 23:03:07 +0800
+Message-Id: <20240606150307.78648-3-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20240606150307.78648-1-kerneljasonxing@gmail.com>
 References: <20240606150307.78648-1-kerneljasonxing@gmail.com>
@@ -92,74 +92,54 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-TCP_MIB_RTOMIN implemented in tcp mib definitions is always 200, which
-is true if without any method to tune rto min. In 2007, we got a way to
-tune it globaly when setting rto_min route option, but TCP_MIB_RTOMIN
-in /proc/net/snmp still shows the same, namely, 200.
+A few days ago, sysctl_tcp_rto_min_us has been introduced to allow user to
+tune the rto min value per netns. But the RtoMin field in /proc/net/snmp
+should have been adjusted accordingly. Or else, it will show 200 which is
+TCP_RTO_MIN.
 
-As RFC 1213 said:
-  "tcpRtoMin
-   ...
-   The minimum value permitted by a TCP implementation for the
-   retransmission timeout, measured in milliseconds."
+This patch can show the correct value even when user sets though using both
+'ip route' and 'sysctl -w'. The priority from high to low like what
+tcp_rto_min() shows to us is:
+1) ip route option rto_min
+2) icsk->icsk_rto_min
 
-Since the lower bound of rto can be changed, we should accordingly
-adjust the output of /proc/net/snmp.
-
-Fixes: 05bb1fad1cde ("[TCP]: Allow minimum RTO to be configurable via routing metrics.")
+Fixes: f086edef71be ("tcp: add sysctl_tcp_rto_min_us")
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
- include/net/tcp.h  | 2 ++
- net/ipv4/metrics.c | 4 ++++
- net/ipv4/proc.c    | 3 +++
- 3 files changed, 9 insertions(+)
+ net/ipv4/proc.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index a70fc39090fe..a111a5d151b7 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -260,6 +260,8 @@ static_assert((1 << ATO_BITS) > TCP_DELACK_MAX);
- extern int sysctl_tcp_max_orphans;
- extern long sysctl_tcp_mem[3];
- 
-+extern unsigned int tcp_rtax_rtomin;
-+
- #define TCP_RACK_LOSS_DETECTION  0x1 /* Use RACK to detect losses */
- #define TCP_RACK_STATIC_REO_WND  0x2 /* Use static RACK reo wnd */
- #define TCP_RACK_NO_DUPTHRESH    0x4 /* Do not use DUPACK threshold in RACK */
-diff --git a/net/ipv4/metrics.c b/net/ipv4/metrics.c
-index 8ddac1f595ed..61ca949b8281 100644
---- a/net/ipv4/metrics.c
-+++ b/net/ipv4/metrics.c
-@@ -7,6 +7,8 @@
- #include <net/net_namespace.h>
- #include <net/tcp.h>
- 
-+unsigned int tcp_rtax_rtomin __read_mostly;
-+
- static int ip_metrics_convert(struct nlattr *fc_mx,
- 			      int fc_mx_len, u32 *metrics,
- 			      struct netlink_ext_ack *extack)
-@@ -60,6 +62,8 @@ static int ip_metrics_convert(struct nlattr *fc_mx,
- 	if (ecn_ca)
- 		metrics[RTAX_FEATURES - 1] |= DST_FEATURE_ECN_CA;
- 
-+	tcp_rtax_rtomin = metrics[RTAX_RTO_MIN - 1];
-+
+diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
+index ce387081a3c9..4aeef3118442 100644
+--- a/net/ipv4/proc.c
++++ b/net/ipv4/proc.c
+@@ -409,6 +409,19 @@ static int snmp_seq_show_ipstats(struct seq_file *seq, void *v)
  	return 0;
  }
  
-diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
-index 6c4664c681ca..ce387081a3c9 100644
---- a/net/ipv4/proc.c
-+++ b/net/ipv4/proc.c
-@@ -428,6 +428,9 @@ static int snmp_seq_show_tcp_udp(struct seq_file *seq, void *v)
- 		/* MaxConn field is signed, RFC 2012 */
++static void snmp_seq_show_tcp_rtomin(struct seq_file *seq, struct net *net,
++				     unsigned long val)
++{
++	int sysctl_rtomin = READ_ONCE(net->ipv4.sysctl_tcp_rto_min_us);
++
++	if (tcp_rtax_rtomin)
++		seq_printf(seq, " %u", tcp_rtax_rtomin);
++	else if (sysctl_rtomin != jiffies_to_usecs(TCP_RTO_MIN))
++		seq_printf(seq, " %lu", usecs_to_jiffies(sysctl_rtomin));
++	else
++		seq_printf(seq, " %lu", val);
++}
++
+ static int snmp_seq_show_tcp_udp(struct seq_file *seq, void *v)
+ {
+ 	unsigned long buff[TCPUDP_MIB_MAX];
+@@ -429,8 +442,7 @@ static int snmp_seq_show_tcp_udp(struct seq_file *seq, void *v)
  		if (snmp4_tcp_list[i].entry == TCP_MIB_MAXCONN)
  			seq_printf(seq, " %ld", buff[i]);
-+		else if (snmp4_tcp_list[i].entry == TCP_MIB_RTOMIN)
-+			seq_printf(seq, " %lu",
-+				   tcp_rtax_rtomin ? tcp_rtax_rtomin : buff[i]);
+ 		else if (snmp4_tcp_list[i].entry == TCP_MIB_RTOMIN)
+-			seq_printf(seq, " %lu",
+-				   tcp_rtax_rtomin ? tcp_rtax_rtomin : buff[i]);
++			snmp_seq_show_tcp_rtomin(seq, net, buff[i]);
  		else
  			seq_printf(seq, " %lu", buff[i]);
  	}
