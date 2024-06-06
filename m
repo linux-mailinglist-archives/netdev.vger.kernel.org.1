@@ -1,91 +1,123 @@
-Return-Path: <netdev+bounces-101512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1EC88FF23C
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 18:19:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62D548FF244
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 18:20:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02AFD1C26058
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:19:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF58A1F26B41
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0837519885E;
-	Thu,  6 Jun 2024 16:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E747198E96;
+	Thu,  6 Jun 2024 16:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jJC88ykM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M5URKs/X"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9C3196D8C;
-	Thu,  6 Jun 2024 16:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10C91990A8;
+	Thu,  6 Jun 2024 16:15:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717690508; cv=none; b=DoDsC2yAscX+TI0KkKzcgkP6ETo0tBcIdBEyzadeHC/4xr0lbjkOX+pqFJ7JL2la7+/6YRrCa8CULG+Q1Johv1qMJymcsoyRMztf7ILy1uZbCQeYrAnZ6TB3vxTcuN7lSize+ZC6I8RE6PUBBd7ZIqaQ3Nq/5Vc7lsZhgSp3kks=
+	t=1717690559; cv=none; b=B8E8FiyNd6arXoLu7G/nTNEEbQw/QMGiX5E0KWL2esc5PiXOhBd0CMlJA6S/fwBmkgfjI6XngxXijmghXPQ9EHcCi955l7ShPttOdfOOGOqm8U6haNhTEo25Brwb1Tz/GUe1YnHEB+DBMrA1mydlby+bMgEVj0t6HCfaFHchVBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717690508; c=relaxed/simple;
-	bh=6v0CUPRfaXGAoLPrPrKauXw7CPWZ+MBBWv69fm/Az0s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MdPMwL+DJtIpl3MY+znVQGmnxa3Rhzeo8zxkzt/nGeiIJJ4GU/+eRMHjB04YiDciHQ427QIpy6g2+iZt4gTjIvG2lx5XA2hq1aakgDgjTXkkESFulzxJGzQr7wUyI2Am0upTQlo5zYXtDLIp5QEDFVmynb1DVpSuKI+A4KjYQJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jJC88ykM; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=mDaT/6dqllCZHo2gumWmEXOi5NqdI3/lfYccvH9BDkE=; b=jJC88ykMQtPQhL2WJaUqKKQ3OQ
-	2vavJMlgub9cow1wxW4ZK6+JCMiX5cuj0eWf1lP+mKMb4XCYxC1XGS9ujavcTrrmiWL9bKbQaIRqc
-	sX2pmN3KA2ak5W4iMcgMRzmkpK1KmVtcZHPFoG2UDpU6a1batT48h6/3nYURzwWrcNSs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sFFlX-00H2Fg-5T; Thu, 06 Jun 2024 18:15:03 +0200
-Date: Thu, 6 Jun 2024 18:15:03 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: =?iso-8859-1?B?Q3Pza+FzLFw=?= Bence <csokas.bence@prolan.hu>,
-	Russell King <rmk+kernel@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	s=arc-20240116; t=1717690559; c=relaxed/simple;
+	bh=tLHKMNNtrQ426bUGhUYVfREzh8JRc0nm5Ra/LTxjX3Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qmX+Swg7BDcKKZywrbls7scEMXYr7Y2jeq/FvTYRxpT6GxTWKVaNW7O0klGBfoZjtJlwyL+nX8M0bNgtibrnZRRVbWWoDo0+hNrJTHtmToJlOwf2HROmbx/Aq5vnwFefTP5jCozp3J3A1pKYsqy+pxH6i3dtPOhBpDzERRv5oYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M5URKs/X; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717690559; x=1749226559;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=tLHKMNNtrQ426bUGhUYVfREzh8JRc0nm5Ra/LTxjX3Q=;
+  b=M5URKs/XlcQxhMtcV7Rg0jqdFQb2QGYwfiBi7djgpT+XYjMUBJntzFj3
+   LjgiLHyjnSnvVnsDnxOh83zh3w0irX6IpQnsfoBGmYWivAjSLqUjZ6Rqy
+   Og/JAtkJGZSYEJadOYa6i6V9BhicOsaY9kB/y97AYO3aL+GWvvapGZJ6z
+   z0G2lezr/uRO0f94qa8TSa/pGoC0cmHIB601DZEzFGIm7YvTBQ8BaA6uy
+   xQmSIkHa75VIx1lZVmKGORSIZriuMvUnHqrbRRgEEmn14sqwRSFy48fJp
+   bo+wGwVzr6rN7iCBRPzx+rkHX3rymkj83ywScyexGMA5wosy1x15Lwb9t
+   A==;
+X-CSE-ConnectionGUID: 6xaLbLppQviKqh+AnckeBQ==
+X-CSE-MsgGUID: 9p87HlUrRcSRtRLIYf7Psw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11095"; a="14526393"
+X-IronPort-AV: E=Sophos;i="6.08,219,1712646000"; 
+   d="scan'208";a="14526393"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2024 09:15:58 -0700
+X-CSE-ConnectionGUID: 8sMfRC2NSBSngIq3Sd542A==
+X-CSE-MsgGUID: RcUaROZbTAqtd5so5aTGdw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,219,1712646000"; 
+   d="scan'208";a="38697898"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orviesa007.jf.intel.com with ESMTP; 06 Jun 2024 09:15:55 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+	id BB8F72A4; Thu, 06 Jun 2024 19:15:53 +0300 (EEST)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Kurt Kanzenbach <kurt@linutronix.de>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] net: sfp: Always call `sfp_sm_mod_remove()` on remove
-Message-ID: <7768e181-19a5-4579-9113-c6d70479c452@lunn.ch>
-References: <20240605084251.63502-1-csokas.bence@prolan.hu>
- <24a48e5a-efb3-4066-af6f-69f4a254b9c3@lunn.ch>
- <20240606082830.30e3a294@kernel.org>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v1 1/1] net: dsa: hellcreek: Replace kernel.h with what is used
+Date: Thu,  6 Jun 2024 19:15:49 +0300
+Message-ID: <20240606161549.2987587-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.43.0.rc1.1336.g36b5255a03ac
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240606082830.30e3a294@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jun 06, 2024 at 08:28:30AM -0700, Jakub Kicinski wrote:
-> On Thu, 6 Jun 2024 17:21:45 +0200 Andrew Lunn wrote:
-> > I was expecting Russell to review this. Maybe he missed it.
-> 
-> While it's fresh in your mind - does it look like a fix to you?
-> From a quick look - we're failing to unregister a device?
+kernel.h is included solely for some other existing headers.
+Include them directly and get rid of kernel.h.
 
-Yes. A Fixes of:
+While at it, sort headers alphabetically for easier maintenance.
 
-commit d2e816c0293fc263b3f168c14992a5f1a50d7593
-Author: Russell King <rmk+kernel@armlinux.org.uk>
-Date:   Sun Nov 10 14:06:28 2019 +0000
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/net/dsa/hirschmann/hellcreek.h | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-    net: sfp: handle module remove outside state machine
-    
-    Removing a module resets the module state machine back to its initial
-    state.  Rather than explicitly handling this in every state, handle it
-    early on outside of the state machine.
+diff --git a/drivers/net/dsa/hirschmann/hellcreek.h b/drivers/net/dsa/hirschmann/hellcreek.h
+index 6874cb9dc361..9c2ed2ba79da 100644
+--- a/drivers/net/dsa/hirschmann/hellcreek.h
++++ b/drivers/net/dsa/hirschmann/hellcreek.h
+@@ -12,14 +12,16 @@
+ 
+ #include <linux/bitmap.h>
+ #include <linux/bitops.h>
++#include <linux/container_of.h>
+ #include <linux/device.h>
+-#include <linux/kernel.h>
+-#include <linux/mutex.h>
+-#include <linux/workqueue.h>
+ #include <linux/leds.h>
++#include <linux/mutex.h>
+ #include <linux/platform_data/hirschmann-hellcreek.h>
+ #include <linux/ptp_clock_kernel.h>
+ #include <linux/timecounter.h>
++#include <linux/types.h>
++#include <linux/workqueue.h>
++
+ #include <net/dsa.h>
+ #include <net/pkt_sched.h>
+ 
+-- 
+2.43.0.rc1.1336.g36b5255a03ac
 
-is probably best, since that refactored to code.
-
-	Andrew
 
