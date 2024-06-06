@@ -1,110 +1,87 @@
-Return-Path: <netdev+bounces-101424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 680618FE7EC
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:34:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14F508FE7F2
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:35:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BAC71C23053
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 13:34:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CD17285DDD
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 13:35:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79F46196C8D;
-	Thu,  6 Jun 2024 13:34:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420C2195FDF;
+	Thu,  6 Jun 2024 13:35:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MI/8uVeD"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0055719642D;
-	Thu,  6 Jun 2024 13:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B217195F1C;
+	Thu,  6 Jun 2024 13:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717680871; cv=none; b=Kjh1Za6WjM0XLHSXuV6JtowAz8Xg/wKId++yive1lmWIv23C12mbT/9ESrpywWW4VaZHoLi6PMuaawXET9eK7dIHpS2Gh5v3cpu6hhH49J1h/EDe71VE8lxLr4mz5Quq4yA8OGx7VDfi2jdJmWuOKDnl+QubEAAe8fw+U+lvqbQ=
+	t=1717680916; cv=none; b=nk0WpkUB1wzYwUtsEpQmnl8JLKS2Ya/i5PiIkPUUjqKhM83pjszhfL6VXXskLFKlxd6/1GiVSmcghPPVSPkjSpuYdxzLXo9XJGXUXJP9jpyJ0mB6nA4zZpoyr29rTjDfP4/XhiOpJx5t/Po+aLx0cy6eTYxK7MltN0A+XDmSuMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717680871; c=relaxed/simple;
-	bh=wVX5LN5wezgSA3E348Yymtojtevb4mWjLp7y2qc+kQw=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gYVBPoV+tcg0p7IEcEIh39hlx62Du1CSjJZwUDW0fuTBjsf/9HkaJWCXMM07FIblJOxTcREGKdyPYFEs8lRm7EEC2nqugdh2DgvrXT/YdfQ0q1tKrfVgefWKUH21dtwGb0LrdG7dzTP8UoyJlsQdNs7X/hWZlAIpXg52hnF3ODc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Vw4tz4dFjz6K6Lf;
-	Thu,  6 Jun 2024 21:29:47 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id EECED1400D4;
-	Thu,  6 Jun 2024 21:34:26 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 6 Jun
- 2024 14:34:26 +0100
-Date: Thu, 6 Jun 2024 14:34:24 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: Leon Romanovsky <leon@kernel.org>, Zhu Yanjun <zyjzyj2000@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>, "Jakub
- Kicinski" <kuba@kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan
-	<tariqt@nvidia.com>, Andy Gospodarek <andrew.gospodarek@broadcom.com>, Aron
- Silverton <aron.silverton@oracle.com>, Dan Williams
-	<dan.j.williams@intel.com>, David Ahern <dsahern@kernel.org>, "Christoph
- Hellwig" <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>, Leonid Bloch
-	<lbloch@nvidia.com>, <linux-cxl@vger.kernel.org>, <patches@lists.linux.dev>,
-	Peter Zijlstra <peterz@infradead.org>, "Julia Lawall" <julia.lawall@inria.fr>
-Subject: Re: [PATCH 2/8] fwctl: Basic ioctl dispatch for the character
- device
-Message-ID: <20240606143424.00001fbd@Huawei.com>
-In-Reply-To: <20240605182726.GX19897@nvidia.com>
-References: <2-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
-	<6cfe00ce-1860-4aba-bcb8-54f8d365d2dc@linux.dev>
-	<20240604122221.GR3884@unreal>
-	<20240604175023.000004e2@Huawei.com>
-	<20240604165844.GM19897@nvidia.com>
-	<20240605120737.00007472@Huawei.com>
-	<20240605182726.GX19897@nvidia.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1717680916; c=relaxed/simple;
+	bh=g4hBhRJqi9bIx8jS0ly5UfYBFgfUA6hE9sFgGnJRl6Q=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=DSgFhrLG4rS2m2XzzO3uba27YHigFtKCKRkHfHp607/VIC2stf0+qFF5A+Rlm7myvYQvfgJm1CoXtbWDoQgnD5DzrsyeOb9gngb+XN3PCFI+51dK+4y6tkN/HDxf7r6tZAD/nhJFLgpAysKrHPIPTz1g57cyq53AIMraTfRwE1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MI/8uVeD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46FBFC32786;
+	Thu,  6 Jun 2024 13:35:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717680915;
+	bh=g4hBhRJqi9bIx8jS0ly5UfYBFgfUA6hE9sFgGnJRl6Q=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=MI/8uVeDWYEMCXL7mrddu/F6OFwCew54CFuTZaUQlMzthMjNfGOOnoSkG+XuO3oiK
+	 KlhiDnQEyFDVMjoj9ZogtTDeslThV0Ktvx8oJy2fwRE75TzmpOgtADBa+SeIXVdy8Z
+	 JDBwZGdUiTxEWsdTi0Vf4T8LkgddhOOca5aV7sEb0RUHdDRfnn0UiGHszoWhCwXUmU
+	 vzYZXOYn1aTLPKGglyLUfel9g93KFSA5FZM3zcf81Itkz2TdsG3X5ngihFJTeVTHSU
+	 0jcPtaweyEzGobZ+5zHRgAtqT/cFZSRWLhJTknkv3iI5W67WgoWbiKoKx5Rq4nXPoO
+	 Ivy0MmpaMFl6g==
+From: Kalle Valo <kvalo@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: "David S . Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski
+ <krzk+dt@kernel.org>,  Conor Dooley <conor+dt@kernel.org>,  Jeff Johnson
+ <jjohnson@kernel.org>,  linux-wireless@vger.kernel.org,
+  netdev@vger.kernel.org,  devicetree@vger.kernel.org,
+  ath11k@lists.infradead.org,  linux-kernel@vger.kernel.org,
+  ath12k@lists.infradead.org,  Bartosz Golaszewski
+ <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v9 0/2] dt-bindings: describe the ath1X modules on QCom
+ BT/WLAN chipsets
+References: <20240605122106.23818-1-brgl@bgdev.pl>
+Date: Thu, 06 Jun 2024 16:35:10 +0300
+In-Reply-To: <20240605122106.23818-1-brgl@bgdev.pl> (Bartosz Golaszewski's
+	message of "Wed, 5 Jun 2024 14:21:03 +0200")
+Message-ID: <878qziqjn5.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Content-Type: text/plain
 
-On Wed, 5 Jun 2024 15:27:26 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+Bartosz Golaszewski <brgl@bgdev.pl> writes:
 
-> On Wed, Jun 05, 2024 at 12:07:37PM +0100, Jonathan Cameron wrote:
-> 
-> > > I don't recall that dramatic conclusion in the discussion, but it does
-> > > make alot of sense to me.  
-> > 
-> > I'll be less lazy (and today found the search foo to track it down).
-> > 
-> > https://lore.kernel.org/all/CAHk-=wicfvWPuRVDG5R1mZSxD8Xg=-0nLOiHay2T_UJ0yDX42g@mail.gmail.com/  
-> 
-> Oh that is a bit different discussion than I was thinking of.. I fixed
-> all the cases to follow this advise and checked that all the free
-> functions are proper pairs of whatever is being allocated.
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>
+> Here are the two dt-binding patches from the power-sequencing series
+> targeting the wireless subsystem. To keep the cover-letter short, I
+> won't repeat all the details, they can be found in the cover-letter for
+> v8. Please consider picking them up into your tree, they were reviewed
+> by Krzysztof earlier.
 
-Yes. I think we are approaching the point where maybe we need
-a 'best practice guide' somewhere. It is sort of coding style, but
-it is perhaps rather complex perhaps to put in that doc.
+Is it ok for everyone that I'll take these to our ath.git tree?
 
-I'm happy to help review such changes, but it would be too far down
-my todo list if I took on writing one.
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
 
-Maybe there is one I've missed?
-
-Jonathan
-> 
-> Thanks,
-> Jason
-
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
