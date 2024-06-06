@@ -1,94 +1,118 @@
-Return-Path: <netdev+bounces-101249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C2A78FDD6D
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 05:25:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB91F8FDD77
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 05:30:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAE451F23978
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 03:25:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 670D71F24183
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 03:30:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF4E241E7;
-	Thu,  6 Jun 2024 03:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1AD19D89B;
+	Thu,  6 Jun 2024 03:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="iNpOkRcf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H1PAnXfJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E39D1EB35
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 03:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7631319D889
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 03:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717644290; cv=none; b=pWIPI3I9dQM3smqn62xIE0RbNV1uLp8A6GsZRBkdFdRuxRL/CGKDQiNQWpweB3JkI9UviAAw0hoyBIXyCpDGPyHWiTLM74Y1+wVdl7gAiUY6D1BvUN1RCSJ4WkkGjesC7qucaffFIwItZFs6jHOBs/LGVzv4jVZwEnCeT2/rSxI=
+	t=1717644637; cv=none; b=Qg7pChtUEg2Y3mGWF8+GMLBi47mmsKlgfgqgYASzdHKE44IPj/nRTC7kjt1AdPcpRn+c8BzK7vmuL8proHaQPI13lQcreibwVmNjmgyb6Ck2nTLxUvZWH/35o4WlJ0Pzw+fdmygjqb52FHLsTfv4EPSmf0SEmsutYhBlSwW9g+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717644290; c=relaxed/simple;
-	bh=vMi52FBFgiR77j21DNfYEGwAeaho6WnjiGnfa4Mdrb0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=PDYdrQ7C9iG+lrJXMUyR9i3mHDyIfGck/DasTHmct5TcVWdVq2Mj4K54xknCtIor60UX4lVDGghJVDZh1bhoTZUNAOo7pkmyi9OQYt3MdZIaFsjCU8KAV8B3GrbAYK6cnlSEsMxMkr56EHirzPTy/UFs57zNdan6+U4NVmIyV28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=iNpOkRcf; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-Received: from [192.168.2.60] (210-10-213-150.per.static-ipl.aapt.com.au [210.10.213.150])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 8F31B20154;
-	Thu,  6 Jun 2024 11:24:46 +0800 (AWST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1717644287;
-	bh=vMi52FBFgiR77j21DNfYEGwAeaho6WnjiGnfa4Mdrb0=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=iNpOkRcf1g5fXcZfrEV5JxgJtFDCrWs0inj/MMVv/Q5SIPKNOkjFnC0LkIcUkKpEH
-	 G5rhiQSQZQ6TA8VHvmBllyrWXupVht/B3Hx6P1DfPFDs5k+ko+kKO3xKY+uC+m8uGN
-	 T7Woo8C5iT9/97oknAq8PYUeZSYUrXUoGGupKG33a0uAnXew9FHH2oAgivXA6fiEfI
-	 OvzWHOOwH+oSZe1EwcJHGvMLOq7+SsXzCGDkGfNspJRLIksUOyPBCtems2bQ0gR1f5
-	 wqhRyvt1W+Lv3exhG0Vgu2OgDzaZjlFytaLHQ7lTy8qVAiIsz79lOL0ZlAshEg2mcv
-	 1YVilkwqZJhiw==
-Message-ID: <6be3ae893d81480c675e055435eeaf48c1d85937.camel@codeconstruct.com.au>
-Subject: Re: [PATCH net-next v2 0/3] net: core: Unify dstats with tstats and
- lstats, add generic collection helper
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Ahern <dsahern@kernel.org>, "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org
-Date: Thu, 06 Jun 2024 11:24:46 +0800
-In-Reply-To: <20240605200839.5127eb8a@kernel.org>
-References: <20240605-dstats-v2-0-7fae03f813f3@codeconstruct.com.au>
-	 <20240605190212.7360a27a@kernel.org>
-	 <ccb2a7fc282d7874bc3862dad1ca7002b713ac33.camel@codeconstruct.com.au>
-	 <20240605191800.2b12df8d@kernel.org>
-	 <fec284041a4a4ccc450fdfd504aae4f24458b79c.camel@codeconstruct.com.au>
-	 <20240605200839.5127eb8a@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1717644637; c=relaxed/simple;
+	bh=6V2RqtJZti5cDRokTQIqSU6LdcbUfi9LOQoz0ZL29vo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DFSaUzE3dBL1Ix0Q+RSQbU43YNiv2flaklo2yH5m8PIfM+8BRPLVJ6aEJXn/qXIrggniatubA7X3iAPr+cwKdH9IhzanwoD2P3O6BL+om3Z9q5o/PlcxJvpE47XH0AaI8G3QZh4qp4bkFeatq5bfYu25yL/2v+tphnT3yzKlNPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H1PAnXfJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F3DADC4AF08;
+	Thu,  6 Jun 2024 03:30:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717644637;
+	bh=6V2RqtJZti5cDRokTQIqSU6LdcbUfi9LOQoz0ZL29vo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=H1PAnXfJBNamlZo8abkbPeHY+5LO5rq0RajCDy4XZa9HwIGY2VIzGEE5bcQtAHhuF
+	 koD8JbWIFS4t8xdXwWdh6d/uy0RirF74/4niSwIfrP5wzpAV5qn8Q2gmRaCBWndPWy
+	 svR+uJU0aUKaavVVxN0Ye2UWi+rnK4ieC6fmNThSbFHjMF1M4avVOTVI7Oz6NA1YNq
+	 yu4ubg55jA1PApsXLHDDluXD5NSugtkrM03u0OFb0yXzU8uY1ZydFEiAQdE1dnRyDx
+	 Gh846bLSbpIaU2O4HZFJ/o8J7Qe5tqvG6ww336hPyDHAuIKDnt6GSeqa+Yq8uZhQvL
+	 PtPL1nu1mZjiA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D2ECDD3E997;
+	Thu,  6 Jun 2024 03:30:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next V2 00/14] net/mlx5e: SHAMPO, Enable HW GRO once more
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171764463685.22288.17396409353476710830.git-patchwork-notify@kernel.org>
+Date: Thu, 06 Jun 2024 03:30:36 +0000
+References: <20240603212219.1037656-1-tariqt@nvidia.com>
+In-Reply-To: <20240603212219.1037656-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, saeedm@nvidia.com,
+ gal@nvidia.com, leonro@nvidia.com
 
-Hi Jakub,
+Hello:
 
-> > > Right, but I think "no exports unless there is an in-tree user"
-> > > is still a rule. A bit of a risk that someone will roll their own
-> > > per-cpu stats pointlessly if we lack this export. But let's try
-> > > to catch that in review..=C2=A0=20
-> >=20
-> > OK, sounds good! I'll send a v3 shortly.
->=20
-> About that.. :) We do advise to wait 24 hours before sending next
-> versions in case there is more feedback / someone disagrees:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-OK, for large values of "shortly" then :D
+On Tue, 4 Jun 2024 00:22:05 +0300 you wrote:
+> This series enables hardware GRO for ConnectX-7 and newer NICs.
+> SHAMPO stands for Split Header And Merge Payload Offload.
+> 
+> The first part of the series contains important fixes and improvements.
+> 
+> The second part reworks the HW GRO counters.
+> 
+> [...]
 
-(sorry, I got a bit enthusiastic about v2, given the brown-paper-bag
-bug in v1)
+Here is the summary with links:
+  - [net-next,V2,01/14] net/mlx5e: SHAMPO, Use net_prefetch API
+    https://git.kernel.org/netdev/net-next/c/4e92d247418c
+  - [net-next,V2,02/14] net/mlx5e: SHAMPO, Fix incorrect page release
+    https://git.kernel.org/netdev/net-next/c/70bd03b89f20
+  - [net-next,V2,03/14] net/mlx5e: SHAMPO, Fix invalid WQ linked list unlink
+    https://git.kernel.org/netdev/net-next/c/fba8334721e2
+  - [net-next,V2,04/14] net/mlx5e: SHAMPO, Fix FCS config when HW GRO on
+    https://git.kernel.org/netdev/net-next/c/a64bbd8c286f
+  - [net-next,V2,05/14] net/mlx5e: SHAMPO, Disable gso_size for non GRO packets
+    https://git.kernel.org/netdev/net-next/c/083dbb54c480
+  - [net-next,V2,06/14] net/mlx5e: SHAMPO, Simplify header page release in teardown
+    https://git.kernel.org/netdev/net-next/c/e839ac9a89cb
+  - [net-next,V2,07/14] net/mlx5e: SHAMPO, Specialize mlx5e_fill_skb_data()
+    https://git.kernel.org/netdev/net-next/c/d34d7d1973c4
+  - [net-next,V2,08/14] net/mlx5e: SHAMPO, Skipping on duplicate flush of the same SHAMPO SKB
+    https://git.kernel.org/netdev/net-next/c/f5a699e00f04
+  - [net-next,V2,09/14] net/mlx5e: SHAMPO, Make GRO counters more precise
+    https://git.kernel.org/netdev/net-next/c/8f9eb8bb5c5a
+  - [net-next,V2,10/14] net/mlx5e: SHAMPO, Drop rx_gro_match_packets counter
+    https://git.kernel.org/netdev/net-next/c/16f448d47a86
+  - [net-next,V2,11/14] net/mlx5e: SHAMPO, Add header-only ethtool counters for header data split
+    https://git.kernel.org/netdev/net-next/c/e95c5b9e8912
+  - [net-next,V2,12/14] net/mlx5e: SHAMPO, Use KSMs instead of KLMs
+    https://git.kernel.org/netdev/net-next/c/758191c9ea7b
+  - [net-next,V2,13/14] net/mlx5e: SHAMPO, Re-enable HW-GRO
+    https://git.kernel.org/netdev/net-next/c/99be56171fa9
+  - [net-next,V2,14/14] net/mlx5e: SHAMPO, Coalesce skb fragments to page size
+    https://git.kernel.org/netdev/net-next/c/14ae2fd12be8
 
-Cheers,
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Jeremy
 
