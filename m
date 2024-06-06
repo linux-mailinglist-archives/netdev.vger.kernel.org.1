@@ -1,118 +1,74 @@
-Return-Path: <netdev+bounces-101589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F9558FF82A
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 01:27:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8335C8FF830
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 01:28:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E96541F263F3
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 23:27:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C4131C23C8F
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 23:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01BAC14A08E;
-	Thu,  6 Jun 2024 23:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hablaiup"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F19313DDC5;
+	Thu,  6 Jun 2024 23:28:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F0613E3FF;
-	Thu,  6 Jun 2024 23:26:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A81C13E8BE;
+	Thu,  6 Jun 2024 23:27:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717716374; cv=none; b=g14kQYaSXg8z20JMq2w+TESbz9Z2yUYJ7iScgUqUfPOeJSL0B1t4TWJkkYooTPdXBqCBsXxpC/wuk+Ya1DEeI3iZqk55CM4eGMADfg7CUxRHhiwFHGpOKSL09muOb/HMBn+u7g1uHUjL1Srtp9gd3FkCJaqFY8QCMzIlbMaofHw=
+	t=1717716485; cv=none; b=ItLGfhkw/bZ01DoI7o21KDHUZzjxZSMz4HV0R2YdTOPvEiTmuZnYBOBxEpDCX71eq14/EuEqALE1x4ATPbgSvMs6ZChROIS7vhn0oRnY2IEZKkByJQKVBEQUb7ZIc6gTZQncTd2LRUP6F4KvnY3yFBb925SGj/fxEquhs8Rw75Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717716374; c=relaxed/simple;
-	bh=RJxbRfrwSVRgqNfS+0yMIlRN2XvFthWU7xqbwkPAwrc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=cOWhWITYDbnz+5bx1AlycosB8jcmJcWp8bHJMQXWompowaAz9eKH/Qw2AcIekxeI3ea2XVfCTKMpALa3b8It/w8lItSy9/JH6UG+bGRaA7i0gqvfF3c8agsUUg5cWi2JPSjH+PH4lq9LTplh1fful6vEq9kCq/ByApeHomWGtrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hablaiup; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 65A91C4AF49;
-	Thu,  6 Jun 2024 23:26:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717716374;
-	bh=RJxbRfrwSVRgqNfS+0yMIlRN2XvFthWU7xqbwkPAwrc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=hablaiup5tuFY/nHjVpPMK7XMWflfCfDT5LOp2auDxk/IsWIMpVrtxJKZ3j9b4cJd
-	 Gd2k2Yl8CzyiF53jqxeUBxeRwuJbYYosXkacp5ZCsaM5eexSw4+zUGH9DurAIfsidQ
-	 4MMJsiwqJe5DYl7HmcCEZyJfQkUfkU6lPkFBaxJTVejCc3o1fp4sO2isKBq7pc1rns
-	 rSRKEUPVpt6jgFmHU4Uw1eB75UWDCIssjP/DT1ALOOV8GyJllbtg3yYt3Me1X1pGS4
-	 xRifQ35nCguu2hrudLrf354z7Kb2oBYMPnbYEFAvwOje05ObSX2bBsDAjYa5od5USc
-	 1XP2vxzpcJ+OQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A5E1C27C52;
-	Thu,  6 Jun 2024 23:26:14 +0000 (UTC)
-From: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
-Date: Fri, 07 Jun 2024 00:26:00 +0100
-Subject: [PATCH net-next v4 6/6] Documentation/tcp-ao: Add a few lines on
- tracepoints
+	s=arc-20240116; t=1717716485; c=relaxed/simple;
+	bh=nAjgE39YpiFL9x9R8xH5bStsiNkkwcXAPiGTXqoKAe8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g9nz5fpBWpjlDzYdMGQnLEip1klyTWCH147CQT5r61ToAOrNDpm+c5LVwtDoxhgB9h5UwVMD3SOF9w58GtjcHoS118p0l5Xx9zskoSmz2N5dFWzWrOcym2p+zVSkSR12F71oQLoP94088GxJFit6zYWx5rlkjHhgKOjoMXvBgC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sFMWJ-00071t-KB; Fri, 07 Jun 2024 01:27:47 +0200
+Date: Fri, 7 Jun 2024 01:27:47 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+	Cong Wang <cong.wang@bytedance.com>,
+	syzbot+0c4150bff9fff3bf023c@syzkaller.appspotmail.com,
+	Florian Westphal <fw@strlen.de>
+Subject: Re: [Patch net] net: remove the bogus overflow debug check in
+ pskb_may_pull()
+Message-ID: <20240606232747.GE9890@breakpoint.cc>
+References: <20240606221531.255224-1-xiyou.wangcong@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240607-tcp_ao-tracepoints-v4-6-88dc245c1f39@gmail.com>
-References: <20240607-tcp_ao-tracepoints-v4-0-88dc245c1f39@gmail.com>
-In-Reply-To: <20240607-tcp_ao-tracepoints-v4-0-88dc245c1f39@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
- Steven Rostedt <rostedt@goodmis.org>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
- Jonathan Corbet <corbet@lwn.net>
-Cc: Mohammad Nassiri <mnassiri@ciena.com>, Simon Horman <horms@kernel.org>, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-trace-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
- Dmitry Safonov <0x7f454c46@gmail.com>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1717716372; l=1312;
- i=0x7f454c46@gmail.com; s=20240410; h=from:subject:message-id;
- bh=YTvLVmZiUq3+/gRlZqmFldpsbcd2Jw9oBAFB4f9XdXg=;
- b=yBoZ3XI+U9N6yjIg9OPIw3XAbfb8H+9R7O49RdavjZgRFul6opVKoRDnbgKXoKGQovgFtKxRwu+n
- /JokHbbvCr7fWvjB6R2vjraI3PWvVf5wugCuxEAWZ2bR5C3ZQDss
-X-Developer-Key: i=0x7f454c46@gmail.com; a=ed25519;
- pk=cFSWovqtkx0HrT5O9jFCEC/Cef4DY8a2FPeqP4THeZQ=
-X-Endpoint-Received: by B4 Relay for 0x7f454c46@gmail.com/20240410 with
- auth_id=152
-X-Original-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Reply-To: 0x7f454c46@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240606221531.255224-1-xiyou.wangcong@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-From: Dmitry Safonov <0x7f454c46@gmail.com>
+Cong Wang <xiyou.wangcong@gmail.com> wrote:
+> From: Cong Wang <cong.wang@bytedance.com>
+> 
+> Commit 219eee9c0d16 ("net: skbuff: add overflow debug check to pull/push
+> helpers") introduced an overflow debug check for pull/push helpers.
+> For __skb_pull() this makes sense because its callers rarely check its
+> return value. But for pskb_may_pull() it does not make sense, since its
+> return value is properly taken care of. Remove the one in
+> pskb_may_pull(), we can continue rely on its return value.
 
-Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
----
- Documentation/networking/tcp_ao.rst | 9 +++++++++
- 1 file changed, 9 insertions(+)
+See 025f8ad20f2e3264d11683aa9cbbf0083eefbdcd which would not exist
+without this check, I would not give up yet.
 
-diff --git a/Documentation/networking/tcp_ao.rst b/Documentation/networking/tcp_ao.rst
-index 8a58321acce7..e96e62d1dab3 100644
---- a/Documentation/networking/tcp_ao.rst
-+++ b/Documentation/networking/tcp_ao.rst
-@@ -337,6 +337,15 @@ TCP-AO per-socket counters are also duplicated with per-netns counters,
- exposed with SNMP. Those are ``TCPAOGood``, ``TCPAOBad``, ``TCPAOKeyNotFound``,
- ``TCPAORequired`` and ``TCPAODroppedIcmps``.
- 
-+For monitoring purposes, there are following TCP-AO trace events:
-+``tcp_hash_bad_header``, ``tcp_hash_ao_required``, ``tcp_ao_handshake_failure``,
-+``tcp_ao_wrong_maclen``, ``tcp_ao_wrong_maclen``, ``tcp_ao_key_not_found``,
-+``tcp_ao_rnext_request``, ``tcp_ao_synack_no_key``, ``tcp_ao_snd_sne_update``,
-+``tcp_ao_rcv_sne_update``. It's possible to separately enable any of them and
-+one can filter them by net-namespace, 4-tuple, family, L3 index, and TCP header
-+flags. If a segment has a TCP-AO header, the filters may also include
-+keyid, rnext, and maclen. SNE updates include the rolled-over numbers.
-+
- RFC 5925 very permissively specifies how TCP port matching can be done for
- MKTs::
- 
+bpf_try_make_writable() could do an explicit check vs. skb->len.
 
--- 
-2.42.0
-
-
+If anyone needs it, splat is at
+https://syzkaller.appspot.com/bug?extid=0c4150bff9fff3bf023c
 
