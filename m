@@ -1,83 +1,118 @@
-Return-Path: <netdev+bounces-101420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29EA38FE7CA
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:30:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D0848FE7CF
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:31:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C272D286872
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 13:30:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CF8C28882E
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 13:31:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4938A19598F;
-	Thu,  6 Jun 2024 13:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13B21E4A9;
+	Thu,  6 Jun 2024 13:30:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CygLTZO9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="olnGGMhd"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94FA1D688;
-	Thu,  6 Jun 2024 13:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC7F2A1C2;
+	Thu,  6 Jun 2024 13:30:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717680640; cv=none; b=DAaX5gVUHKveleX2+hf8WSmXpSUGBLXfkW3v+kJ/q6erB8M5fkRTXhfPFC5P8+ug8w2pHj6HtsKFyajRTnEzXG7Q8dH1JeNIhZYvl4OWT4kp5kuXR+x8JmBSE3SFl9Yw7Xk+SBSOEnr2UpwmsZN5lj/CsW3lGa5PL1IAZ2KitMg=
+	t=1717680651; cv=none; b=XmsJf7SGvIlEtnk7zUaxRVeNf8ittc/uSJOcHywFzZMFYmT5OhK5Cn9L8VViFIYDAAXweTvyubNNf9Y/euicDmT8KttN1CrSJw4zp7zckPG4w7HdmbLtecQU2zN4Rw95uD4bWpE023XEdS5DtQETOz0zo/f73bFgL4KPhF8AJls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717680640; c=relaxed/simple;
-	bh=Aw8mXRPRvqz8sD3PD2BMYJivDyo3YQgbnJEYWVzd2/k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z4jOvApCh8wPywgjnbGbM+aU4g+wRxb0YyBTSM9YuNX+rD3hz0j7URUPhI7zIlIBaVZQKuj2U92vMnlDu9LDpMDvdjHhcvAE+cwYS2hioYHhPY9r2vaASx/WtSkTYr0lPTKo8mJrPIl3jMaEZ+7vC/bJCoM3gnm8nntgzfN6D+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CygLTZO9; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9XI9wH7c0OiiKuuV7PRZF9/baW0BWhqWDJc2QitLSPM=; b=CygLTZO9o2WozOhuihdVYu9TLp
-	FcbVEin+gAaHruSRNgRxK+Z7tLS3BIfb//O7t1e9vrIXgN/M6T7okJS2KB9XOq8VzhHfKfeMVydUx
-	ilvllNJJIMs+xIxzz48Q7HX899PT/rky8c/t1wuqNH6Y63wyhqaAk99glu+WPGO4XTFQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sFDCM-00H1Hj-1m; Thu, 06 Jun 2024 15:30:34 +0200
-Date: Thu, 6 Jun 2024 15:30:34 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: kernel test robot <lkp@intel.com>, netdev@vger.kernel.org,
-	oe-kbuild-all@lists.linux.dev, davem@davemloft.net, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, bryan.whitehead@microchip.com,
-	linux@armlinux.org.uk, sbauer@blackbox.su, hmehrtens@maxlinear.com,
-	lxu@maxlinear.com, hkallweit1@gmail.com, edumazet@google.com,
-	pabeni@redhat.com, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net V3 2/3] net: lan743x: Support WOL at both the PHY and
- MAC appropriately
-Message-ID: <95a302f0-1f46-465c-b3ab-63c9c3f4dda4@lunn.ch>
-References: <20240605101611.18791-3-Raju.Lakkaraju@microchip.com>
- <202406052200.w3zuc32H-lkp@intel.com>
- <ZmGN+2qysJGU/9+V@HYD-DK-UNGSW21.microchip.com>
+	s=arc-20240116; t=1717680651; c=relaxed/simple;
+	bh=Y6vvUZaqqNzDBcZyJb8uANrd/RPyO8bmsrI9Fy1N1Yk=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=R4zm549nCyL8PyqoMqoWmP0wX0e24e05/pd8XrdR5vvOuxcaS5GZaKphttRdQuOS/wrlDPvu1IOPTo7Qday24jDP8/cUHMLB3+5uQXs13kN8pIwmwTtso8lUPuK1l4dcXcmy87/w+qqZX0UJOaFP4Esq1Dx3GjOGR82jw/L343c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=olnGGMhd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5570C2BD10;
+	Thu,  6 Jun 2024 13:30:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717680651;
+	bh=Y6vvUZaqqNzDBcZyJb8uANrd/RPyO8bmsrI9Fy1N1Yk=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=olnGGMhdtaecQNsV+bM/3zqTVm/RI0w4RRa9vWACB38Wf0uBEOySr6sdZhR8A9cj7
+	 yn8cvLmk5kv2p75y9fLzVWJ/vXuSkXyq13NacoZehA7k/kRqH/S2FXD2W5V9XBK2zI
+	 wlV/A0d3b5IiNLGD+vDOTKaq6oNRq6ZFgCPxgV48XlK9URr7ahXL/2plk3xiqsVlGQ
+	 UBna/1PWchiqmOGgCkgELhFUs4TcihpzFBYACSfwQBoll0gaRt4abdXUNtkiHBZHOa
+	 SPOLYbINwGLq1O0bJv0oqR4AHFDiY52YaK2cKdtVt3jo24KuCWOa1N+OfPkMll4EjR
+	 GXpyN+IWu0hpg==
+From: Kalle Valo <kvalo@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: "David S . Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski
+ <krzk+dt@kernel.org>,  Conor Dooley <conor+dt@kernel.org>,  Jeff Johnson
+ <jjohnson@kernel.org>,  linux-wireless@vger.kernel.org,
+  netdev@vger.kernel.org,  devicetree@vger.kernel.org,
+  ath11k@lists.infradead.org,  linux-kernel@vger.kernel.org,
+  ath12k@lists.infradead.org,  Bartosz Golaszewski
+ <bartosz.golaszewski@linaro.org>,  Krzysztof Kozlowski
+ <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH v9 1/2] dt-bindings: net: wireless: qcom,ath11k:
+ describe the ath11k on QCA6390
+References: <20240605122106.23818-1-brgl@bgdev.pl>
+	<20240605122106.23818-2-brgl@bgdev.pl>
+Date: Thu, 06 Jun 2024 16:30:46 +0300
+In-Reply-To: <20240605122106.23818-2-brgl@bgdev.pl> (Bartosz Golaszewski's
+	message of "Wed, 5 Jun 2024 14:21:04 +0200")
+Message-ID: <87h6e6qjuh.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZmGN+2qysJGU/9+V@HYD-DK-UNGSW21.microchip.com>
+Content-Type: text/plain
 
-On Thu, Jun 06, 2024 at 03:52:51PM +0530, Raju Lakkaraju wrote:
-> The target architecture of alpha's config file miss the "CONFIG_PM=y"
-> cofiguration.
+Bartosz Golaszewski <brgl@bgdev.pl> writes:
 
-No. Your patch is missing support for CONFIG_PM = n. Or you need to
-add a depends on PM.
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>
+> Add a PCI compatible for the ATH11K module on QCA6390 and describe the
+> power inputs from the PMU that it consumes.
+>
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-We expect the kernel to build for any configuration. There are build
-bots which create random configurations and see if they build. Not
-having PM is a valid configuration, especially for a big iron server
-which never sleeps.
+[...]
 
-    Andrew
+> +allOf:
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            const: pci17cb,1101
+> +    then:
+> +      required:
+> +        - vddrfacmn-supply
+> +        - vddaon-supply
+> +        - vddwlcx-supply
+> +        - vddwlmx-supply
+> +        - vddrfa0p8-supply
+> +        - vddrfa1p2-supply
+> +        - vddrfa1p7-supply
+> +        - vddpcie0p9-supply
+> +        - vddpcie1p8-supply
+
+Not sure if we discussed this before, but based on this I understand
+that there can't be an DT entry for device pci17cb,1101 without all the
+supply properties? But there are QCA6390 devices with PCI id 17cb:1101
+which do not need these supplies and already work. For example, my Dell
+XPS 13 x86 laptop is one. Or anyone who manually installs QCA6390 board
+to their PCI slot and some of them might want to use DT, for example
+setting qcom,ath11k-calibration-variant.
+
+This is not a blocker for me, just making sure that we are not breaking
+any existing setups.
+
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
