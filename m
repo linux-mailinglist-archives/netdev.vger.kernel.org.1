@@ -1,113 +1,122 @@
-Return-Path: <netdev+bounces-101331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7560D8FE26D
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 11:21:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9438B8FE29A
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 11:26:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66DF51C213D5
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 09:21:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94C271C213DB
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 09:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D2413D25D;
-	Thu,  6 Jun 2024 09:19:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gNFRkMOe"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B5C13D25D;
+	Thu,  6 Jun 2024 09:26:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B0913C9AF;
-	Thu,  6 Jun 2024 09:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883EB13AA31;
+	Thu,  6 Jun 2024 09:26:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717665588; cv=none; b=k2eANuBla5ykAwliutTaE7Rs93+wxvhe24Bbtndb3PRanuny3DAsFc5m3eS+L8UdDwiQ4lbM8EqO0Ujk1mXTFCNmSOs7BjWIIp9vayXiQmXjwXaVCIPNF5WBTb4i9LXPSOyyDiTKYLztZEqR2SnZzSwgix7J9ywtMZYe2qI9HYY=
+	t=1717665988; cv=none; b=Kqz93KnyuaVgPp/QNzE9XLojnBS1t4UwkSgRo+1MhD3FW7q5Oi9bLvoDb9WgdLgmPhlfg8E2vCLHYgGtPZo7B/08ZKxxFi2+QqV32YP0oKXRYvvojBZLsqryxFoT2vD/In+HXeJ5fuhO+eWoL/+mL+llbZEzZ5Bbvk9jsXphe3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717665588; c=relaxed/simple;
-	bh=r5aJ1uJ56F46q+VkVNOqlugxkL6Sfo/qAYHjolzmWyY=;
+	s=arc-20240116; t=1717665988; c=relaxed/simple;
+	bh=5XpcrG+TOKYFI4ePBqmfAJ/d5uRfaHB11848HdHFc9k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H+ZgglQj1tWMi5hTN2YohdZ24omKWfa9ChuTZq86vatOQY9ghAskGoLwbzkJuWNXRPMKPyZ7JpTXQr53O3xtJE92nE2pstNzNPwM8k8ltX+s7RtU3bZta4JuGnM8sMW5GX7MQUQi23TRH1K7tfFU4ReIlSSkgTlKNuSMhXyrlJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gNFRkMOe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B864AC3277B;
-	Thu,  6 Jun 2024 09:19:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717665587;
-	bh=r5aJ1uJ56F46q+VkVNOqlugxkL6Sfo/qAYHjolzmWyY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gNFRkMOeyiX6t68BUwKPxemDQrnod3kOamM9s4oq4amR1rBLsgWQGsBGqQ9Ti6t4S
-	 S3Y0ZohSuEKo0nC2jXYUK5V4076P8HFJxWdBwqqPbkOHSu8Wpl9lqBxCmmDZWzHH7s
-	 DMDgytWiVFq3IqNuyBdhMNR0Zx2Cl4AtZTl9quzFuY61+P1OAbi5LOTSjXtYXG706B
-	 RkLaKg5QjCrBP2iwNyzWDsgHT5hnLDpocmOTJ/j62Eq14o7NtKdaoDFvKixIJwIupc
-	 3cZejljsWQ/JEZjhg06tAQSorbCnUwQz0QPgdLW/BPFUYi56H5cT+9ITmRfOlJk5Xk
-	 52wccGCrHYzaw==
-Date: Thu, 6 Jun 2024 10:19:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Kamil =?utf-8?B?SG9yw6Fr?= - 2N <kamilh@axis.com>
-Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
-	andrew@lunn.ch, hkallweit1@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] net: phy: bcm54811: New link mode for BroadR-Reach
-Message-ID: <20240606091943.GC791188@kernel.org>
-References: <20240604133654.2626813-1-kamilh@axis.com>
- <20240604133654.2626813-2-kamilh@axis.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=aS1SmE6S/kh3B5VPT3CcVCvAWNLeYJ0/JsRv9LDZTBBiMxL10+T50JyZk+45U8hIAOelUtUfx5Ceh27EaQw4kxiPpwW78Xks6P+Xg+qkpV7BVDvrwmJct4sMZ/W039QcaKZDrOINmm3y9K+axInsFOXix56u+Xfjk5x0eLqnpvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sF9O0-0001n0-VU; Thu, 06 Jun 2024 11:26:20 +0200
+Date: Thu, 6 Jun 2024 11:26:20 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Christoph Paasch <cpaasch@apple.com>,
+	Netfilter <netfilter-devel@vger.kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	daniel@iogearbox.net, willemb@google.com
+Subject: Re: [PATCH nf] netfilter: nf_reject: init skb->dev for reset packet
+Message-ID: <20240606092620.GC4688@breakpoint.cc>
+References: <20240604120311.27300-1-fw@strlen.de>
+ <FF8A506F-6F0F-440E-9F52-B27D05731B77@apple.com>
+ <20240605181450.GA7176@breakpoint.cc>
+ <ZmCwlbF8BvLGNgRM@calendula>
+ <20240605190833.GB7176@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240604133654.2626813-2-kamilh@axis.com>
+In-Reply-To: <20240605190833.GB7176@breakpoint.cc>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Jun 04, 2024 at 03:36:52PM +0200, Kamil Horák - 2N wrote:
-> Introduce a new link mode necessary for 10 MBit single-pair
-> connection in BroadR-Reach mode on bcm5481x PHY by Broadcom.
-> This new link mode, 10baseT1BRR, is known as 1BR10 in the Broadcom
-> terminology. Another link mode to be used is 1BR100 and it is already
-> present as 100baseT1, because Broadcom's 1BR100 became 100baseT1
-> (IEEE 802.3bw).
+Florian Westphal <fw@strlen.de> wrote:
+> When this was added (handle dissection from bpf prog, per netns), the correct
+> solution would have been to pass 'struct net' explicitly via skb_get_hash()
+> and all variants.  As that was likely deemed to be too much code churn it
+> tries to infer struct net via skb->{dev,sk}.
 > 
-> Signed-off-by: Kamil Horák - 2N <kamilh@axis.com>
-> ---
->  drivers/net/phy/phy-core.c   | 1 +
->  include/uapi/linux/ethtool.h | 1 +
->  net/ethtool/common.c         | 3 +++
->  3 files changed, 5 insertions(+)
-> 
-> diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
-> index 15f349e5995a..4a1972e94107 100644
-> --- a/drivers/net/phy/phy-core.c
-> +++ b/drivers/net/phy/phy-core.c
-> @@ -265,6 +265,7 @@ static const struct phy_setting settings[] = {
->  	PHY_SETTING(     10, FULL,     10baseT1S_Full		),
->  	PHY_SETTING(     10, HALF,     10baseT1S_Half		),
->  	PHY_SETTING(     10, HALF,     10baseT1S_P2MP_Half	),
-> +	PHY_SETTING(     10, FULL,     10baseT1BRR_Full		),
->  };
->  #undef PHY_SETTING
->  
-> diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-> index 8733a3117902..76813ca5cb1d 100644
-> --- a/include/uapi/linux/ethtool.h
-> +++ b/include/uapi/linux/ethtool.h
-> @@ -1845,6 +1845,7 @@ enum ethtool_link_mode_bit_indices {
->  	ETHTOOL_LINK_MODE_10baseT1S_Full_BIT		 = 99,
->  	ETHTOOL_LINK_MODE_10baseT1S_Half_BIT		 = 100,
->  	ETHTOOL_LINK_MODE_10baseT1S_P2MP_Half_BIT	 = 101,
-> +	ETHTOOL_LINK_MODE_10baseT1BRR_Full_BIT		 = 102,
+> So there are several options here:
+> 1. remove the WARN_ON_ONCE and be done with it
+> 2. remove the WARN_ON_ONCE and pretend net was init_net
+> 3. also look at skb_dst(skb)->dev if skb->dev is unset, then back to 1)
+>    or 2)
+> 4. stop using skb_get_hash() from netfilter (but there are likely other
+>    callers that might hit this).
 
-Hi Kamil,
+diff --git a/net/netfilter/nf_tables_trace.c b/net/netfilter/nf_tables_trace.c
+--- a/net/netfilter/nf_tables_trace.c
++++ b/net/netfilter/nf_tables_trace.c
+@@ -303,6 +303,30 @@ void nft_trace_notify(const struct nft_pktinfo *pkt,
+        kfree_skb(skb);
+ }
+ 
++static u32 __nf_skb_get_hash(const struct net *net, struct sk_buff *skb)
++{
++       struct flow_keys keys;
++       u32 hash;
++
++       memset(&keys, 0, sizeof(keys));
++
++       __skb_flow_dissect(net, skb, &flow_keys_dissector,
++                          &keys, NULL, 0, 0, 0,
++                          FLOW_DISSECTOR_F_STOP_AT_FLOW_LABEL);
++
++       hash = flow_hash_from_keys(&keys);
++       __skb_set_sw_hash(skb, hash, flow_keys_have_l4(&keys));
++       return hash;
++}
++
++static u32 nf_skb_get_hash(const struct net *net, struct sk_buff *skb)
++{
++       if (!skb->l4_hash && !skb->sw_hash)
++               return __nf_skb_get_hash(net, skb);
++
++       return skb->hash;
++}
++
+ void nft_trace_init(struct nft_traceinfo *info, const struct nft_pktinfo *pkt,
+                    const struct nft_chain *chain)
+ {
+@@ -317,7 +341,7 @@ void nft_trace_init(struct nft_traceinfo *info, const struct nft_pktinfo *pkt,
+        net_get_random_once(&trace_key, sizeof(trace_key));
+ 
+        info->skbid = (u32)siphash_3u32(hash32_ptr(skb),
+-                                       skb_get_hash(skb),
++                                       nf_skb_get_hash(nft_net(pkt), skb),
+                                        skb->skb_iif,
+                                        &trace_key);
+ }
 
-I will leave a full review to others, but I think that you need to make a
-corresponding change to the BUILD_BUG_ON_MSG() towards the top of
-phy_speed_to_str().
 
->  
->  	/* must be last entry */
->  	__ETHTOOL_LINK_MODE_MASK_NBITS
-
-...
+... doesn't solve the nft_hash.c issue (which calls _symmetric version, and
+that uses flow_key definiton that isn't exported outside flow_dissector.o.
 
