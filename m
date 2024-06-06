@@ -1,198 +1,83 @@
-Return-Path: <netdev+bounces-101428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 997228FE801
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:38:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAE478FE809
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:39:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D959BB22CAF
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 13:37:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 231FBB24D08
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 13:39:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B35919642A;
-	Thu,  6 Jun 2024 13:37:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69CE0196457;
+	Thu,  6 Jun 2024 13:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="GXwFajWW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Id1O2Qkw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7FD195FD4
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 13:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB21195F10;
+	Thu,  6 Jun 2024 13:39:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717681073; cv=none; b=L87SvdidSDAnFs4eEU1aFvwKi2zYeP/EoJEF0hYR2B0OGW7ErDXy82NRXaXUQIx7XXivhMg/PewXIwD/figfT7B7AltUM91L3BC4/iIteoSjfM8QOWZ70PE+3MO8iyv3QXJyU3zJ8WTg2+LxL/VGJeKQFn9n/X0KxqpsMHyQqLo=
+	t=1717681144; cv=none; b=Wu4HSIaGsH66CSXksDEbXv85+srBwr+baxvftE3F0EsHFwUlnnOwRPo09DI8AGMX2VT8hRh/Sg2k+P9p9aGXVHIraDr18VFpyDJcFPiSptIeKg2orcP8zJMEASz2wO3ij8gymaenSxOcfextMguMPx44kkI0UI4NmUmEmlBp/x0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717681073; c=relaxed/simple;
-	bh=zjZtV8HA3Vhf3+SRpbRkKIxbVSf+NUfL0NIXTkLvKoA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Bw33oMfzGTsJRlOG1yqry2wSg5zEbZfCbBBsULzfMfSAI3st9X14bNk54CR83dTttXd0JqOLq4svv7s6r7akPbspRlMxlcWMH9067g07Lw9AqAPuLtfM9SsIDsCg3L8fKb98W+RmYpAU4Us4JPjWkUTZB6Ee+nai+x+XG/AymrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=GXwFajWW; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2eadaac1d28so2662391fa.3
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 06:37:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1717681070; x=1718285870; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/BoBiv/oTzAdR1lIG+yWj+SGvl2JhVkHcJoQ9lqvUrc=;
-        b=GXwFajWWpKkS3kcer4HmUXrpVPlzwLgFtMKG8/A4+csjCpvixF0Ty1Ad/oj77qN2Me
-         JO87MMU494Bx0vFZ24lJf4KCnqgfrhl6A9C4kmxo16oa+jyp46+vjdzdRVoK/K/bhR9q
-         fAma7enWuOIpiUF8pFO0uL6y56UCKzLkVLaKr9dv0sWg03QanZjRtgrQA66RnFrg6rLa
-         zX8nytyo/ElyipZNPeu628jGgmYDY+rCTreuivwY9HE0TrAYGDQ0Gmqrlg2PMA4OkT+b
-         t8/KfqsLrcj0BOBo8CzT17GOjZALZWK0+CoX5Z6OABaK+90n4ItgJV1v4L+7mY+UM8wj
-         Wang==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717681070; x=1718285870;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/BoBiv/oTzAdR1lIG+yWj+SGvl2JhVkHcJoQ9lqvUrc=;
-        b=PeQiwRyckbFyrgbh5f2o1TGY1t4GMmXa85AaswvGBqhwsCz7BtQ/2BDHCCgQsVepnT
-         RzkKnMOQHF1SxHncL1Gs2Y9KGzk48ZIKS12v5MdJuy2SZ/3+z2N+S5MpNVDeRrDsOetM
-         Qfdc5BIpV5ux83KjAWSPXDabsmCbM5wcQrSrI42YXyNs6D4ozvGDluazCcrkjwqB1gFs
-         ijrqkCaPE4ikeLYQ2fthNZLnsDsS+VXrnlsHUf53/icvPVnCqOpvmGtLWdYl1KT1RBNH
-         feZOZ/TQl/25ccMG8eMEzE/USF3jicKsvWs+IqCS66V3aRK+vXM508nDAHyBVVkbI03a
-         srDw==
-X-Forwarded-Encrypted: i=1; AJvYcCUx6kGzZ8xXT344YKynBobE7x6h3+30wFS4SSRmRQk/HMK5A7cHFmeR9cHwy33QgLnd7RcPzaVu1Zgc/T85Zb3gpxKer6u5
-X-Gm-Message-State: AOJu0YwQ7w3aXNNRUCRIzRfoCST+4UCphjA5TrxYLPmOZucJeZbisHub
-	uS+FwCJiF7+MfpMKKUHqdm7PCGuHpuxtA8rfnxoVZ5QynlAlBLSWZkW9Q9LpeS02RhVtJLg+8/Q
-	osK7bvd1pvm/apiDQTCdNLCUy4yVFxQdVi61R7A==
-X-Google-Smtp-Source: AGHT+IGVi6SdXyjqLuNgspGsS7QS0koHqoI5qU5RsxFMIyqlWHAi0Sgl3JgDM1tnD4UfWiI8Hjt8tIufJO2+Xkfj3E4=
-X-Received: by 2002:a2e:8802:0:b0:2e5:67bc:739 with SMTP id
- 38308e7fff4ca-2eac79f22cbmr31439811fa.2.1717681070058; Thu, 06 Jun 2024
- 06:37:50 -0700 (PDT)
+	s=arc-20240116; t=1717681144; c=relaxed/simple;
+	bh=LJhHXwTof2ke/pYNJdYJXiWvVv487KuphHbWVEYAKLU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qE0qGPIAXsulob+p4xsLukkZffdwbGbb6xbNNI9sa03lhllKyVVssMbqymowbK6LwuKjuKtQN6O0sgfxH9x5ddAgcJdcaF6vIDCkM430bdb2APE/ZsLiw/0mJaBHOiXxTycwrsWGOxjyK7krnMj/DeEJLbd9f1qmcWVUiFJ4E4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Id1O2Qkw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B3DBC2BD10;
+	Thu,  6 Jun 2024 13:39:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717681144;
+	bh=LJhHXwTof2ke/pYNJdYJXiWvVv487KuphHbWVEYAKLU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Id1O2QkwmmLjokKffra2g3lVZqwo7wNsk0ZGfRDUMi+AOn1QwgWbq4u8TqlsO0D6/
+	 LvU6eKHd5dIftwQKWaqiaqIQmN61Is9rXL/PaM9iNPBUEBqaQ8JIKi5124xDgdy/IN
+	 Ml5mWx8MCmXEhC4RCfj9iQ57ZTi5n61xhvVZEbiTj8ey814muHzi/uq2xwHp2pZYGN
+	 vybkA8tKQeK4nYuic46rQjyJBFdHbENdWP+APegPEbDT8aexZd0MB1V1mw/CZy3AXF
+	 c+q4QdpdzHgvI4VgmiBg3BkCXawV4i4iOZEMIICqiyoU05wPX4t0iBu6ItGGuLFmoj
+	 PJzROU1Qy2v1g==
+Date: Thu, 6 Jun 2024 06:39:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>, Hans de Goede <hdegoede@redhat.com>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>, Pavel
+ Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>, Linux LEDs
+ <linux-leds@vger.kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, johanneswueller@gmail.com, "Russell
+ King (Oracle)" <linux@armlinux.org.uk>, Genes Lists <lists@sapience.com>
+Subject: Re: Hung tasks due to a AB-BA deadlock between the leds_list_lock
+ rwsem and the rtnl mutex
+Message-ID: <20240606063902.776794d4@kernel.org>
+In-Reply-To: <c912d1f7-7039-4f55-91ac-028a906c1387@lunn.ch>
+References: <9d189ec329cfe68ed68699f314e191a10d4b5eda.camel@sapience.com>
+	<15a0bbd24cd01bd0b60b7047958a2e3ab556ea6f.camel@sapience.com>
+	<ZliHhebSGQYZ/0S0@shell.armlinux.org.uk>
+	<42d498fc-c95b-4441-b81a-aee4237d1c0d@leemhuis.info>
+	<618601d8-f82a-402f-bf7f-831671d3d83f@redhat.com>
+	<01fc2e30-eafe-495c-a62d-402903fd3e2a@lunn.ch>
+	<9d821cea-507f-4674-809c-a4640119c435@redhat.com>
+	<c912d1f7-7039-4f55-91ac-028a906c1387@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240605122106.23818-1-brgl@bgdev.pl> <20240605122106.23818-3-brgl@bgdev.pl>
- <87cyouqjou.fsf@kernel.org>
-In-Reply-To: <87cyouqjou.fsf@kernel.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 6 Jun 2024 15:37:39 +0200
-Message-ID: <CAMRc=Mdpu=1GFR-KraxCVn4oZr5TwM3ptbY25OHNkGepcsWdcQ@mail.gmail.com>
-Subject: Re: [PATCH v9 2/2] dt-bindings: net: wireless: describe the ath12k
- PCI module
-To: Kalle Valo <kvalo@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Jeff Johnson <jjohnson@kernel.org>, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	ath11k@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	ath12k@lists.infradead.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 6, 2024 at 3:34=E2=80=AFPM Kalle Valo <kvalo@kernel.org> wrote:
->
-> Bartosz Golaszewski <brgl@bgdev.pl> writes:
->
-> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >
-> > Add device-tree bindings for the ATH12K module found in the WCN7850
-> > package.
-> >
-> > Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > ---
-> >  .../bindings/net/wireless/qcom,ath12k.yaml    | 99 +++++++++++++++++++
-> >  1 file changed, 99 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom=
-,ath12k.yaml
-> >
-> > diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath12k=
-.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k.yaml
-> > new file mode 100644
-> > index 000000000000..1b5884015b15
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath12k.yaml
-> > @@ -0,0 +1,99 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +# Copyright (c) 2024 Linaro Limited
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/wireless/qcom,ath12k.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Qualcomm Technologies ath12k wireless devices (PCIe)
-> > +
-> > +maintainers:
-> > +  - Jeff Johnson <quic_jjohnson@quicinc.com>
-> > +  - Kalle Valo <kvalo@kernel.org>
-> > +
-> > +description:
-> > +  Qualcomm Technologies IEEE 802.11be PCIe devices.
-> > +
-> > +properties:
-> > +  compatible:
-> > +    enum:
-> > +      - pci17cb,1107  # WCN7850
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  vddaon-supply:
-> > +    description: VDD_AON supply regulator handle
-> > +
-> > +  vddwlcx-supply:
-> > +    description: VDD_WLCX supply regulator handle
-> > +
-> > +  vddwlmx-supply:
-> > +    description: VDD_WLMX supply regulator handle
-> > +
-> > +  vddrfacmn-supply:
-> > +    description: VDD_RFA_CMN supply regulator handle
-> > +
-> > +  vddrfa0p8-supply:
-> > +    description: VDD_RFA_0P8 supply regulator handle
-> > +
-> > +  vddrfa1p2-supply:
-> > +    description: VDD_RFA_1P2 supply regulator handle
-> > +
-> > +  vddrfa1p8-supply:
-> > +    description: VDD_RFA_1P8 supply regulator handle
-> > +
-> > +  vddpcie0p9-supply:
-> > +    description: VDD_PCIE_0P9 supply regulator handle
-> > +
-> > +  vddpcie1p8-supply:
-> > +    description: VDD_PCIE_1P8 supply regulator handle
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +  - vddaon-supply
-> > +  - vddwlcx-supply
-> > +  - vddwlmx-supply
-> > +  - vddrfacmn-supply
-> > +  - vddrfa0p8-supply
-> > +  - vddrfa1p2-supply
-> > +  - vddrfa1p8-supply
-> > +  - vddpcie0p9-supply
-> > +  - vddpcie1p8-supply
->
-> Same comment here. To my understanding there are ath12k PCI devices
-> which do not need the supplies. But I guess we change this to optional
-> later?
->
+On Thu, 6 Jun 2024 15:12:54 +0200 Andrew Lunn wrote:
+> > So it has been almost a week and no reply from Heiner. Since this is
+> > causing real issues for users out there I think a revert of 66601a29bb23
+> > should be submitted to Linus and then backported to the stable kernels.
+> > to fix the immediate issue at hand.  
+> 
+> Agreed.
 
-Sure we can. But "pci17cb,1107" refers to a QCom variant and it always
-comes powered by a PMU so these supplies really are required.
-
-Bart
-
-> --
-> https://patchwork.kernel.org/project/linux-wireless/list/
->
-> https://wireless.wiki.kernel.org/en/developers/documentation/submittingpa=
-tches
+Please submit..
 
