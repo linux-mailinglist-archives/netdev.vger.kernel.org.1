@@ -1,411 +1,172 @@
-Return-Path: <netdev+bounces-101254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE6508FDDC9
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 06:36:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2A898FDDCB
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 06:38:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 475CCB239BF
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 04:36:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5368D1F240A2
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 04:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1197C26289;
-	Thu,  6 Jun 2024 04:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4D7A1DA4C;
+	Thu,  6 Jun 2024 04:38:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LRBNwY0f"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SefYi4xQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2068.outbound.protection.outlook.com [40.107.101.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7EB8821;
-	Thu,  6 Jun 2024 04:36:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717648576; cv=none; b=rpHaAvtaBVvTwJPfAqw2NwIpMbxwiXYgjlWq1xKC81b3ymY4h0xEsKtQF9Q5Qt9Qj6nusqDAWEzjKUJczfOQdPeHaUvw+sR/GHsAV5EOke0+SP0p9Xw7DRYf8wYhggAiEsEbSkNW6s3i5ZEeCH8ZBfRNYJpuZENs+otMAwdPrww=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717648576; c=relaxed/simple;
-	bh=zMAyk+pSE+4NQafLdJUNH4Iy60pBlPfnVpsQh7Ya378=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=lwFZfkMElcqAUU7qFiIFdqWGK7F6JYVooSL1NF1vU3SQcTW0Kc60enKGiikiQrDjMNdZ6GvMA40lOSPezQnD3vomJXtRrEzdU+wgSQ0lZ7qNBwhV7W+iTfuGJl6UCOKDAeZ1/ngd3rO3Un4yx0tAM04qC8lpESfG+OEXAcvvXT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LRBNwY0f; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-70260814b2dso375456b3a.1;
-        Wed, 05 Jun 2024 21:36:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717648574; x=1718253374; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+xcF8PFHFr/p434RkI6nR7otyk8YbjAtvIYLs5PV77k=;
-        b=LRBNwY0fdKIpFX7jlbttF36s4YMBtIplWwlC3zv6FlRvMtB7rqWCWg5IgcJRC8VRDS
-         zbY6KTgVG0+mBkstV4b4AxdoBF8R919EZDtNzLzpYLgmj4wWCFcX8Yz521RdNZpO87x0
-         b4wdSutnjzeMJ+CId0CNgCn+62WbheFzFMiAFgXUOretYSRoaAQqryWVx7SXEOPzD3ZD
-         xHUychVwAyqizFDBVptK6EdEf4Yk+IgTF37aTrwL1DVi/b1mikqjhuDX+WXJ69gxk3n4
-         fPoWuNvfZxMWDfT1+VyIPVsRqPVgrDq7lndGNUkEVBQq2a0jg0AJ8aONSCStZbwXZTs2
-         S3gQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717648574; x=1718253374;
-        h=content-disposition:mime-version:message-id:subject:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+xcF8PFHFr/p434RkI6nR7otyk8YbjAtvIYLs5PV77k=;
-        b=L6wtqzB7IOD/SePuHekKu6fSdDMqcpLI6xqtvTaxVwbqZ3Qz02gjXS9/S6U7v/4mtJ
-         l6bbRMwZvbXFJ1tjCmO9cO7UFFjVZUbiNCmbE2Is9H4HSsGbB0r96sMpa8Iv7Vx5U3d+
-         b9NKCeeV15bBUXVdEBJ92bPyl8vDZkp5cMzDNWnKAu6nbLjllMIu6G+odK07NX3G6KV5
-         Lbor2JCyP341SXe/L0b3vrH35LqzryFBRfbVxQAWcKKvlgQHYrOsyDfDQ2/fcnCjDzun
-         OshAB6KvCuCeUCCwArwcgTs/lUqSeY1Lpqpj1axm9JPq+ylSX8YldRliTDrWC6VEquKl
-         b8sg==
-X-Forwarded-Encrypted: i=1; AJvYcCX3tzuUIPlXM7oCUfvwPWqJM/rDyoBxd/JIt9mLzhAGZJF/e6W9BB9NZTFY/GeRO+XcWOoLiQ85fZb7HM3wQnpim142GchHdbFFlNBdvbuaMwMbezCSV4GRrPNrgMXlzk8ePD1JWCRixKo0Dh5fpQE9152r5GYpdkOY3SgFd2XEyu2AveuS+FmYLMNn
-X-Gm-Message-State: AOJu0YxAdcW/D0YjKErzACk+EwsB8U/0zbzFdXJOf0d+lIJ9KmsGUnZ7
-	QWu/9fhcn/OD9kMdxYyYgRls55vH/4caF2Ws7M4pR30VZTgd4ArY7QsWr3O5
-X-Google-Smtp-Source: AGHT+IHHaU940zCga72Pb/qf4xB7UDeXArgqcCyZZNnEWu4qofchBidngqbfNcPZ0ryDcbJr3971Gg==
-X-Received: by 2002:a05:6a00:18aa:b0:702:496d:d8b5 with SMTP id d2e1a72fcca58-703f8622841mr2599132b3a.6.1717648574353;
-        Wed, 05 Jun 2024 21:36:14 -0700 (PDT)
-Received: from tahera-OptiPlex-5000 ([136.159.49.123])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-703fd495175sm304247b3a.123.2024.06.05.21.36.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Jun 2024 21:36:13 -0700 (PDT)
-Date: Wed, 5 Jun 2024 22:36:11 -0600
-From: Tahera Fahimi <fahimitahera@gmail.com>
-To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Jann Horn <jannh@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	outreachy@lists.linux.dev
-Subject: [PATCH v3] landlock: Add abstract unix socket connect restriction
-Message-ID: <ZmE8u1LV6aOWV9tB@tahera-OptiPlex-5000>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5DDC13C
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 04:38:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717648721; cv=fail; b=M1i/fRw8DrEQX6cMjnn+8vMUm4ansEtLKhSnlRXVqqV2/Rs6pkJszCidGSvsWYfC75JsPvo6fvwAF8yeGPqT1BPhfujlRs9rI/5djqKAcYqRtY9nBuw0BI/DXxGAP+PTokwz2b6jmSxNk6urKLO/1joF47sSO6weT5DcdByqqhM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717648721; c=relaxed/simple;
+	bh=+tbKpv9hSphhMGrMcc+IR/+j+yGPEWagHr8Cuk/SAyw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NUCovCMFJ86Uu7F1m0zJWBuHYCDyE4eMHJxEGqjoR+QGVj3WGytn3Gq4AM8odZwZco289hFN6wg+kwaUUGXoTdzLaQB5/iS/5jjOk3Gd+Km4rC+KtRNHOyegTY3H+yAjOIVN9W9LeVDbPJk6Z5szquTyhg/pf1l8ouBt333dk0o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SefYi4xQ; arc=fail smtp.client-ip=40.107.101.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KRRgbvE7zxfM8nVW9WJsDCePk460i2dW4BGj2N4kknsCOzi+5BR1xFDFBYZysnMJ7XwOqJ5a837L7CmLC+hHhUltPYND4EtEEHPtqcbAlbrQuK6k0ApHyrHECdJ9hkQtdB8iwKMPBNaA2oYC28EqNl9zH71j+YYBPzYPFJC12Sl6TnN6rogqtQ2X9rr49hl92/xRKvOZvJ/zsuzaYaopvnGI8VSRLjiwKJNv0j9PHZIgo8w+UkIixHq0hl7A3A9woeACXbBjCsUPSpcX7wIJrD8AzBHcxa/Psv/CVBVdtzy4aqlkmbfdLnT4Hg5W5U9MGBUFgptiTH29YbsilDhG5g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cYlTW1VBzsaoLkD2eqCrX7eKhBokF9uKvcWQsoaMgXc=;
+ b=FmiCnRKIPQe9DxLNLBH4wFeV1y6U8a+yM96hQGz8STB4r0xCaqrLGdASr5sK/YeZqBtYU5bRGzlwcr09DnWrD+dtj5OLhrzvcXx4y4oaNL/wRUSh7ad8zJuVCEAeQfnBgj9msn0oHZSGZm6uGtR4+sE+duZnTH+9bh65mneHBbnpvF8KyChUWp98ibhmOrlanqBYP4wxaoMv7gJcDNm4NMoABloZsDZrkf88q+gnJYIDlQrkrY+SVKQWHNQE/sSL2xb1GkSkj8/uC1OFww/Zecty1/k+28TvBcGU90A5e7EGXEBs/FI88VSUD2KYFkPx72WdhdcmZOpd8saDA/RCaA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cYlTW1VBzsaoLkD2eqCrX7eKhBokF9uKvcWQsoaMgXc=;
+ b=SefYi4xQHSLoSeJZgBby9e1iZkyTrEk4Ae2b1Nx87LgJqC25KLiAdJq/G2gw1ANSFdZsFt3K57ECIQHljD179YHlOGe3icuLqrrfaS4uMs/MGEBElNeqq+4s0uNqTu1JM4gVIgI/qM4uj8Y6Z8j43aH40lYLzIsdIb52aEY1icZUvERal6nsOLeFuav2aetKJNm+DEYQlbLqzVCzEKI35fztSa0FNQFsOCFggVPC95OpbPhXvqS9RC9iGUElHUQRHEb8xvWRWOZj3VBbrW4qmyVQyhq8HbH5ONR7K2UOBTXrJT0zOwtjCcZNF2XcZHRFX30WTApl9ExN32WWSHaweA==
+Received: from MW3PR05CA0001.namprd05.prod.outlook.com (2603:10b6:303:2b::6)
+ by IA0PR12MB8694.namprd12.prod.outlook.com (2603:10b6:208:488::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.33; Thu, 6 Jun
+ 2024 04:38:37 +0000
+Received: from CO1PEPF000044F6.namprd21.prod.outlook.com
+ (2603:10b6:303:2b:cafe::a9) by MW3PR05CA0001.outlook.office365.com
+ (2603:10b6:303:2b::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.7 via Frontend
+ Transport; Thu, 6 Jun 2024 04:38:37 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1PEPF000044F6.mail.protection.outlook.com (10.167.241.196) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7677.0 via Frontend Transport; Thu, 6 Jun 2024 04:38:37 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 5 Jun 2024
+ 21:38:22 -0700
+Received: from sw-mtx-036.mtx.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 5 Jun 2024 21:38:21 -0700
+From: Parav Pandit <parav@nvidia.com>
+To: <netdev@vger.kernel.org>, <dsahern@kernel.org>,
+	<stephen@networkplumber.org>
+CC: <jiri@nvidia.com>, <shayd@nvidia.com>, Parav Pandit <parav@nvidia.com>
+Subject: [PATCH net] devlink: Fix setting max_io_eqs as the sole attribute
+Date: Thu, 6 Jun 2024 07:38:08 +0300
+Message-ID: <20240606043808.1330909-1-parav@nvidia.com>
+X-Mailer: git-send-email 2.26.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F6:EE_|IA0PR12MB8694:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3e76bbf5-6cfa-4277-d59a-08dc85e2880e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|82310400017|1800799015|376005|36860700004;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?UzEtFN/sNFCNBfZ/m9dqLE9xksC8x5f5x+jR6k98fO8wdnsNDqxm51GH94vu?=
+ =?us-ascii?Q?HQ3tMp3eqIzI0c/PIR1VjZY21EYMMbm8THJGFRnuyfa4wOkkzw9KnEV6ZGw5?=
+ =?us-ascii?Q?8xzTSc7fwR6HAXLJL7vgW/Ynqrja24ibOJeZSZc156mSrTDNdfgDNVDEOujJ?=
+ =?us-ascii?Q?8D5Nhxyf6EIpAbFRf1l7MFywayandl7wgFBpE37MaTaLDK0WHGr0CI+X2fDZ?=
+ =?us-ascii?Q?UjSwUrywUnotO+7fJubxhtxf6J7KcbJVptY00dwxvXNTnGurb0l+j4BF1zZE?=
+ =?us-ascii?Q?OdYBvhNXfM7TzIapz02gCW4KP4SdgJ1a2gp+LwzXktHsB0N/asQtx1KZZ2iT?=
+ =?us-ascii?Q?LgeQbSXlo8/PKKWqzYXIu93kFfe37cWglroq/9NmQdKswWScx+fvN/Res4Bf?=
+ =?us-ascii?Q?WtFvII68tuOeL9znhYA6IZL6QBrGKPAv9JTutIi5kGAlj1wVBeUUPPRcTDlY?=
+ =?us-ascii?Q?uaGn1tzHJhTBEmOM4VCzK4ySPzBDCU3/iYet3DHSvepKzIUq4vatLAkXEGZ8?=
+ =?us-ascii?Q?Ziu8GKZ+2VLdn8cADj5ry9BM4ZHxfhyLjefDDJ1FkKyuAx44EgWJUX0Ne9e8?=
+ =?us-ascii?Q?oVRCkt2xJyg+oOVTnEjobJHUwqBBlIR8Ft2R2aCBWAOZZlWru5aAgseUAx+o?=
+ =?us-ascii?Q?ohBSr0FZTFYLrmw3XxE/oU9s7gokZ/+FMkgXWyCtnT2XOJSoinvN+W+a8P21?=
+ =?us-ascii?Q?uqSbz/iMxy34K2N18f4LfBnkKlccLoQ4Lh2MeLALbOS7ACD2UHhfICGflGyP?=
+ =?us-ascii?Q?SzDL/0Nri9YyEEoRSLgskmn+NFGW8G6MgnLN8g5JxwoQj6JwGQPTHfJR+sA4?=
+ =?us-ascii?Q?ouHArIfV1kkoggKgDNCyuYChNohfu3d+tSODftij0jLpNzFFOIrWAAUTQNLJ?=
+ =?us-ascii?Q?/FqpMyoLK8nAttYdtArvPXuTewlU4+RWeXXsmzch20hznT4K9Bk6WfKnqFEB?=
+ =?us-ascii?Q?Z18BlTjFHWWjqbhbmh794K2SqwA30LJRhVTkOnXq2YMfyNJ/gd/SMSsyHzQ+?=
+ =?us-ascii?Q?TKtKVoZc6QkaN2nH4hG3E7ORG6noasDiXoOM5M8rpGACRMVaubLGC7dLsN6P?=
+ =?us-ascii?Q?8Dm0SFF/psONq21qzvlqECI8seHSFgsyXdoJylhU+QU/O83PtTAT4mdBL8M7?=
+ =?us-ascii?Q?V/UVsLh8Zj0Z9kPY3IrBnuxOEDC8kt2zgn6LedppWGq3aCXGK6OCxAul+HXC?=
+ =?us-ascii?Q?izkxZSRm/Dn4RYSA7Jy9R0/9BebrH9ZdSe5uATERYLiSiKIldoqUFt8ehyGt?=
+ =?us-ascii?Q?ayP0WaHmJeJ2hx6XN2ZzExhMvOq7PA70e+kTgrL1qXRDpQUk4aURkBmA8NnI?=
+ =?us-ascii?Q?RZ23CETn6uL3zUty07wQDSIct3SWDFCkvo8YeF6/YcV8jmohkEjYJxjnH1as?=
+ =?us-ascii?Q?kgPLeVixBVHzbYQuubXFJY3p3ofzGQQaChsYND5EhjGi2/89qg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(82310400017)(1800799015)(376005)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2024 04:38:37.1231
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3e76bbf5-6cfa-4277-d59a-08dc85e2880e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000044F6.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8694
 
-Abstract unix sockets are used for local inter-process communications
-without on a filesystem. Currently a sandboxed process can connect to a
-socket outside of the sandboxed environment, since landlock has no
-restriction for connecting to a unix socket in the abstract namespace.
-Access to such sockets for a sandboxed process should be scoped the same
-way ptrace is limited.
+dl_opts_put() function missed to consider IO eqs option flag.
+Due to this, when max_io_eqs setting is applied only when it
+is combined with other attributes such as roce/hw_addr.
+When max_io_eqs is the only attribute set, it missed to
+apply the attribute.
 
-Because of compatibility reasons and since landlock should be flexible,
-we extend the user space interface by adding a new "scoped" field. This
-field optionally contains a "LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET" to
-specify that the ruleset will deny any connection from within the
-sandbox to its parents(i.e. any parent sandbox or non-sandbox processes)
+Fix it by adding the missing flag.
 
-Closes: https://github.com/landlock-lsm/linux/issues/7
-
-Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
-
--------
-V3: Added "scoped" field to landlock_ruleset_attr
-V2: Remove wrapper functions
-
--------
+Fixes: e8add23c59b7 ("devlink: Support setting max_io_eqs")
+Signed-off-by: Parav Pandit <parav@nvidia.com>
 ---
- include/uapi/linux/landlock.h | 22 +++++++++++++++
- security/landlock/limits.h    |  5 ++++
- security/landlock/ruleset.c   | 16 +++++++----
- security/landlock/ruleset.h   | 31 ++++++++++++++++++--
- security/landlock/syscalls.c  |  9 ++++--
- security/landlock/task.c      | 53 ++++++++++++++++++-----------------
- 6 files changed, 102 insertions(+), 34 deletions(-)
+ devlink/devlink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
-index 68625e728f43..1641aeb9eeaa 100644
---- a/include/uapi/linux/landlock.h
-+++ b/include/uapi/linux/landlock.h
-@@ -37,6 +37,12 @@ struct landlock_ruleset_attr {
- 	 * rule explicitly allow them.
- 	 */
- 	__u64 handled_access_net;
-+	/**
-+	 * scoped: Bitmask of actions (cf. `Scope access flags`_)
-+	 * that is handled by this ruleset and should be permitted
-+	 * by default if no rule explicitly deny them.
-+	 */
-+	__u64 scoped;
- };
- 
- /*
-@@ -266,4 +272,20 @@ struct landlock_net_port_attr {
- #define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
- #define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
- /* clang-format on */
-+
-+/**
-+ * DOC: scoped
-+ *
-+ * Scope access flags
-+ * ~~~~~~~~~~~~~~~~~~~~
-+ * These flags enable to restrict a sandboxed process to a set of
-+ * inter-process communications actions. 
-+ *
-+ * IPCs with scoped actions:
-+ * - %LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET: Restrict a sandbox process to
-+ *   connect to another process through abstract unix sockets. 
-+ */
-+/* clang-format off */
-+#define LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET		(1ULL << 0)
-+/* clang-format on*/
- #endif /* _UAPI_LINUX_LANDLOCK_H */
-diff --git a/security/landlock/limits.h b/security/landlock/limits.h
-index 20fdb5ff3514..d6fb82fd1e67 100644
---- a/security/landlock/limits.h
-+++ b/security/landlock/limits.h
-@@ -28,6 +28,11 @@
- #define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
- #define LANDLOCK_SHIFT_ACCESS_NET	LANDLOCK_NUM_ACCESS_FS
- 
-+#define LANDLOCK_LAST_ACCESS_UNIX       LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET
-+#define LANDLOCK_MASK_ACCESS_UNIX	((LANDLOCK_LAST_ACCESS_UNIX << 1) - 1)
-+#define LANDLOCK_NUM_ACCESS_UNIX         __const_hweight64(LANDLOCK_MASK_ACCESS_UNIX)
-+#define LANDLOCK_SHIFT_ACCESS_UNIX      LANDLOCK_SHIFT_ACCESS_NET
-+
- /* clang-format on */
- 
- #endif /* _SECURITY_LANDLOCK_LIMITS_H */
-diff --git a/security/landlock/ruleset.c b/security/landlock/ruleset.c
-index e0a5fbf9201a..0592e53cdc9d 100644
---- a/security/landlock/ruleset.c
-+++ b/security/landlock/ruleset.c
-@@ -52,12 +52,13 @@ static struct landlock_ruleset *create_ruleset(const u32 num_layers)
- 
- struct landlock_ruleset *
- landlock_create_ruleset(const access_mask_t fs_access_mask,
--			const access_mask_t net_access_mask)
-+			const access_mask_t net_access_mask,
-+			const access_mask_t unix_access_mask)
- {
- 	struct landlock_ruleset *new_ruleset;
- 
- 	/* Informs about useless ruleset. */
--	if (!fs_access_mask && !net_access_mask)
-+	if (!fs_access_mask && !net_access_mask && !unix_access_mask)
- 		return ERR_PTR(-ENOMSG);
- 	new_ruleset = create_ruleset(1);
- 	if (IS_ERR(new_ruleset))
-@@ -66,6 +67,9 @@ landlock_create_ruleset(const access_mask_t fs_access_mask,
- 		landlock_add_fs_access_mask(new_ruleset, fs_access_mask, 0);
- 	if (net_access_mask)
- 		landlock_add_net_access_mask(new_ruleset, net_access_mask, 0);
-+	if (unix_access_mask)
-+		landlock_add_unix_socket_access_mask(new_ruleset,
-+						     unix_access_mask, 0);
- 	return new_ruleset;
- }
- 
-@@ -173,9 +177,11 @@ static void build_check_ruleset(void)
- 
- 	BUILD_BUG_ON(ruleset.num_rules < LANDLOCK_MAX_NUM_RULES);
- 	BUILD_BUG_ON(ruleset.num_layers < LANDLOCK_MAX_NUM_LAYERS);
--	BUILD_BUG_ON(access_masks <
--		     ((LANDLOCK_MASK_ACCESS_FS << LANDLOCK_SHIFT_ACCESS_FS) |
--		      (LANDLOCK_MASK_ACCESS_NET << LANDLOCK_SHIFT_ACCESS_NET)));
-+	BUILD_BUG_ON(
-+		access_masks <
-+		((LANDLOCK_MASK_ACCESS_FS << LANDLOCK_SHIFT_ACCESS_FS) |
-+		 (LANDLOCK_MASK_ACCESS_NET << LANDLOCK_SHIFT_ACCESS_NET) |
-+		 (LANDLOCK_MASK_ACCESS_UNIX << LANDLOCK_SHIFT_ACCESS_UNIX)));
- }
- 
- /**
-diff --git a/security/landlock/ruleset.h b/security/landlock/ruleset.h
-index c7f1526784fd..6e755d924a5e 100644
---- a/security/landlock/ruleset.h
-+++ b/security/landlock/ruleset.h
-@@ -35,6 +35,8 @@ typedef u16 access_mask_t;
- static_assert(BITS_PER_TYPE(access_mask_t) >= LANDLOCK_NUM_ACCESS_FS);
- /* Makes sure all network access rights can be stored. */
- static_assert(BITS_PER_TYPE(access_mask_t) >= LANDLOCK_NUM_ACCESS_NET);
-+/* Makes sure all abstract Unix Socket access rights can be stored*/
-+static_assert(BITS_PER_TYPE(access_mask_t) >= LANDLOCK_NUM_ACCESS_UNIX);
- /* Makes sure for_each_set_bit() and for_each_clear_bit() calls are OK. */
- static_assert(sizeof(unsigned long) >= sizeof(access_mask_t));
- 
-@@ -42,7 +44,8 @@ static_assert(sizeof(unsigned long) >= sizeof(access_mask_t));
- typedef u32 access_masks_t;
- /* Makes sure all ruleset access rights can be stored. */
- static_assert(BITS_PER_TYPE(access_masks_t) >=
--	      LANDLOCK_NUM_ACCESS_FS + LANDLOCK_NUM_ACCESS_NET);
-+	      LANDLOCK_NUM_ACCESS_FS + LANDLOCK_NUM_ACCESS_NET +
-+		      LANDLOCK_NUM_ACCESS_UNIX);
- 
- typedef u16 layer_mask_t;
- /* Makes sure all layers can be checked. */
-@@ -233,7 +236,8 @@ struct landlock_ruleset {
- 
- struct landlock_ruleset *
- landlock_create_ruleset(const access_mask_t access_mask_fs,
--			const access_mask_t access_mask_net);
-+			const access_mask_t access_mask_net,
-+			const access_mask_t access_mask_unix);
- 
- void landlock_put_ruleset(struct landlock_ruleset *const ruleset);
- void landlock_put_ruleset_deferred(struct landlock_ruleset *const ruleset);
-@@ -282,6 +286,18 @@ landlock_add_net_access_mask(struct landlock_ruleset *const ruleset,
- 		(net_mask << LANDLOCK_SHIFT_ACCESS_NET);
- }
- 
-+static inline void
-+landlock_add_unix_socket_access_mask(struct landlock_ruleset *const ruleset,
-+				     const access_mask_t unix_access_mask,
-+				     const u16 layer_level)
-+{
-+	access_mask_t unix_mask = unix_access_mask & LANDLOCK_MASK_ACCESS_UNIX;
-+
-+	WARN_ON_ONCE(unix_access_mask != unix_mask);
-+	ruleset->access_masks[layer_level] |=
-+		(unix_mask << LANDLOCK_SHIFT_ACCESS_UNIX);
-+}
-+
- static inline access_mask_t
- landlock_get_raw_fs_access_mask(const struct landlock_ruleset *const ruleset,
- 				const u16 layer_level)
-@@ -309,6 +325,17 @@ landlock_get_net_access_mask(const struct landlock_ruleset *const ruleset,
- 	       LANDLOCK_MASK_ACCESS_NET;
- }
- 
-+static inline access_mask_t
-+landlock_get_unix_access_mask(const struct landlock_ruleset *const ruleset,
-+			      const u16 layer_level)
-+{
-+	return landlock_get_raw_fs_access_mask(ruleset, layer_level) |
-+	       LANDLOCK_ACCESS_FS_INITIALLY_DENIED;
-+	return (ruleset->access_masks[layer_level] >>
-+		LANDLOCK_SHIFT_ACCESS_UNIX) &
-+	       LANDLOCK_MASK_ACCESS_UNIX;
-+}
-+
- bool landlock_unmask_layers(const struct landlock_rule *const rule,
- 			    const access_mask_t access_request,
- 			    layer_mask_t (*const layer_masks)[],
-diff --git a/security/landlock/syscalls.c b/security/landlock/syscalls.c
-index 03b470f5a85a..955d3d028963 100644
---- a/security/landlock/syscalls.c
-+++ b/security/landlock/syscalls.c
-@@ -97,8 +97,9 @@ static void build_check_abi(void)
- 	 */
- 	ruleset_size = sizeof(ruleset_attr.handled_access_fs);
- 	ruleset_size += sizeof(ruleset_attr.handled_access_net);
-+	ruleset_size += sizeof(ruleset_attr.scoped);
- 	BUILD_BUG_ON(sizeof(ruleset_attr) != ruleset_size);
--	BUILD_BUG_ON(sizeof(ruleset_attr) != 16);
-+	BUILD_BUG_ON(sizeof(ruleset_attr) != 24);
- 
- 	path_beneath_size = sizeof(path_beneath_attr.allowed_access);
- 	path_beneath_size += sizeof(path_beneath_attr.parent_fd);
-@@ -212,10 +213,14 @@ SYSCALL_DEFINE3(landlock_create_ruleset,
- 	if ((ruleset_attr.handled_access_net | LANDLOCK_MASK_ACCESS_NET) !=
- 	    LANDLOCK_MASK_ACCESS_NET)
- 		return -EINVAL;
-+	if ((ruleset_attr.scoped | LANDLOCK_MASK_ACCESS_UNIX) !=
-+	    LANDLOCK_MASK_ACCESS_UNIX)
-+		return -EINVAL;
- 
- 	/* Checks arguments and transforms to kernel struct. */
- 	ruleset = landlock_create_ruleset(ruleset_attr.handled_access_fs,
--					  ruleset_attr.handled_access_net);
-+					  ruleset_attr.handled_access_net,
-+					  ruleset_attr.scoped);
- 	if (IS_ERR(ruleset))
- 		return PTR_ERR(ruleset);
- 
-diff --git a/security/landlock/task.c b/security/landlock/task.c
-index 67528f87b7de..b42f31cca2ae 100644
---- a/security/landlock/task.c
-+++ b/security/landlock/task.c
-@@ -14,6 +14,7 @@
- #include <linux/rcupdate.h>
- #include <linux/sched.h>
- #include <net/sock.h>
-+#include <net/af_unix.h>
- 
- #include "common.h"
- #include "cred.h"
-@@ -109,32 +110,25 @@ static int hook_ptrace_traceme(struct task_struct *const parent)
- 	return task_ptrace(parent, current);
- }
- 
--static bool unix_sock_is_scoped(struct sock *const sock,
--				struct sock *const other)
-+static bool sock_is_scoped(struct sock *const sock, struct sock *const other)
- {
- 	bool is_scoped = true;
--
--	/* get the ruleset of connecting sock*/
--	const struct landlock_ruleset *const dom_sock =
--		landlock_get_current_domain();
--
--	if (!dom_sock)
--		return true;
--
--	/* get credential of listening sock*/
--	const struct cred *cred_other = get_cred(other->sk_peer_cred);
--
--	if (!cred_other)
--		return true;
--
--	/* retrieve the landlock_rulesets */
--	const struct landlock_ruleset *dom_parent;
--
--	rcu_read_lock();
--	dom_parent = landlock_cred(cred_other)->domain;
--	is_scoped = domain_scope_le(dom_parent, dom_sock);
--	rcu_read_unlock();
--
-+	const struct landlock_ruleset *dom_other;
-+	const struct cred *cred_other;
-+
-+	const struct landlock_ruleset *const dom = landlock_get_current_domain();
-+	if (!dom)
-+		goto out_put_cred;
-+
-+	
-+	lockdep_assert_held(&unix_sk(other)->lock);
-+	/* the credentials will not change */
-+	cred_other = get_cred(other->sk_peer_cred);
-+	dom_other = landlock_cred(cred_other)->domain;
-+	is_scoped = domain_scope_le(dom, dom_other);
-+
-+out_put_cred:
-+	put_cred(cred_other);
- 	return is_scoped;
- }
- 
-@@ -142,7 +136,15 @@ static int hook_unix_stream_connect(struct sock *const sock,
- 				    struct sock *const other,
- 				    struct sock *const newsk)
- {
--	if (unix_sock_is_scoped(sock, other))
-+	if (sock_is_scoped(sock, other))
-+		return 0;
-+	return -EPERM;
-+}
-+
-+static int hook_unix_may_send(struct socket *const sock,
-+			      struct socket *const other)
-+{
-+	if (sock_is_scoped(sock->sk, other->sk))
- 		return 0;
- 	return -EPERM;
- }
-@@ -151,6 +153,7 @@ static struct security_hook_list landlock_hooks[] __ro_after_init = {
- 	LSM_HOOK_INIT(ptrace_access_check, hook_ptrace_access_check),
- 	LSM_HOOK_INIT(ptrace_traceme, hook_ptrace_traceme),
- 	LSM_HOOK_INIT(unix_stream_connect, hook_unix_stream_connect),
-+	LSM_HOOK_INIT(unix_may_send, hook_unix_may_send),
- };
- 
- __init void landlock_add_task_hooks(void)
+diff --git a/devlink/devlink.c b/devlink/devlink.c
+index 03d27202..3ab5a85d 100644
+--- a/devlink/devlink.c
++++ b/devlink/devlink.c
+@@ -2637,7 +2637,7 @@ static void dl_opts_put(struct nlmsghdr *nlh, struct dl *dl)
+ 		mnl_attr_put_u64(nlh, DEVLINK_ATTR_TRAP_POLICER_BURST,
+ 				 opts->trap_policer_burst);
+ 	if (opts->present & (DL_OPT_PORT_FUNCTION_HW_ADDR | DL_OPT_PORT_FUNCTION_STATE |
+-			     DL_OPT_PORT_FN_CAPS))
++			     DL_OPT_PORT_FN_CAPS | DL_OPT_PORT_FN_MAX_IO_EQS))
+ 		dl_function_attr_put(nlh, opts);
+ 	if (opts->present & DL_OPT_PORT_FLAVOUR)
+ 		mnl_attr_put_u16(nlh, DEVLINK_ATTR_PORT_FLAVOUR, opts->port_flavour);
 -- 
-2.34.1
+2.26.2
 
 
