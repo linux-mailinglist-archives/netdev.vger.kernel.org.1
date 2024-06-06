@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-101217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A3A58FDC6E
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 04:00:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D05A28FDC71
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 04:00:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB3A0B22C62
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 02:00:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 330F1B23658
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 02:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD44A17580;
-	Thu,  6 Jun 2024 02:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6AE214AB8;
+	Thu,  6 Jun 2024 02:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ye8sFZ7n"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qDBkYi4l"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4446319D8A4;
-	Thu,  6 Jun 2024 02:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683D319D887;
+	Thu,  6 Jun 2024 02:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717639221; cv=none; b=DYkYH2FdZL4hbUMuD2wspTknqwq5TvHOLbcxJ66hnPfCYSbFzsmWp16Ljf1NHqRPNBkfdctlBGvJsDyYSff33hmiYo7xCLzAfcVbCOh1nv0ten/XUxt+eV5y4fsoJr5smI1f7kgPJrdmRKukBggPDBQXf3htloZZhm8mmn2lqgM=
+	t=1717639236; cv=none; b=WDFyO1UKKcgScr27Ks3k4sRs1VAPJHh2YDfPSDYr9iUXd5NsMgyMRP5yeb4thHJzOMT48cjd7fwDinzU8iP59OQ2Ee7tB2Nhmpj2m+3QjbifvbuKHt3sZcuZfBM/FNghjZDJFS0fVwcqOGaLc1SHIcGQwYczlHbaaRIlkxN5ing=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717639221; c=relaxed/simple;
-	bh=6+/R8Ql6dduByazHOFhqp4goj94V/FvcNQwRF8JK4dw=;
+	s=arc-20240116; t=1717639236; c=relaxed/simple;
+	bh=GxwTof/xiEtnERAH/rdJ01OpJnhQp6zYK5BVMtizFsw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s1CUbWd0ynFfqymTbaRTXrTy0dNPcf/vGvEAqZwrlwo8wFYpIbQHxtJUkunIRDPoTHKfKT+eSaRyI7uZvtowpn5CA0T7L+xErkCk83c0H63j6u8d+3wybQlP6kR6uBpUPvRsAU5KsYsDE3vGxpCPI2PRCoocZCLZe99uI5n8gWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ye8sFZ7n; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=RLodSjSlAAIw5jVKaJ9LHNhgei2P2+wOYwPUrLCBtngaaEjNGbpXSVU9ueQ7CYRB5dXao/bsLKx3oAyYuNtaZPsXj4CPzu925VVrpcnUEUrq2KIC9pN74kgIN1xrm+K3x6ebBWZjgfCd7/s9Z/e2Cfe+4yBkB71LmmpJPgKRs9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qDBkYi4l; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=o1tJShiCjUKTGOnGPoj6gaAEwK5rlY/9SPGoFARED5E=; b=ye8sFZ7n3Ow41VafXGesFb942C
-	T3PxLmIglTtRjrHqD3zBOpa7EX2GBUoglJdq1o483eKtnjo1jdIRQTHL8eqyQG/DrE8dbsfcreA+V
-	0u7248U3gd0alQbwNttvhDBdHNJOKS549yX5hc7M9uZbqUuQQxeg4JFoY+tNs4WWw7Do=;
+	bh=Gma+sWQuTLwNrfTWdXyOCOxaFEhdvQVdxotzlBsIOcc=; b=qDBkYi4lOxJYsDszvxZf+rFPY/
+	wgLD1OSTyAwVojBndR2P41cRtE+O1uyVNs9PO15an9r2n+nwQwLHLwp3FSZWo/CloX+DqzaPC4Bbg
+	taqOywUBQkLqP839ERHhZ1c70FNRREYPorTYcHpU4osWYA52TLnNcQGIWKdcDByyOVpw=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sF2QD-00GxxY-UK; Thu, 06 Jun 2024 04:00:09 +0200
-Date: Thu, 6 Jun 2024 04:00:09 +0200
+	id 1sF2QU-00GxyC-Gp; Thu, 06 Jun 2024 04:00:26 +0200
+Date: Thu, 6 Jun 2024 04:00:26 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
 Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
@@ -52,11 +52,10 @@ Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
 	linux@armlinux.org.uk, vadim.fedorenko@linux.dev,
 	netdev@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org, git@amd.com
-Subject: Re: [PATCH net-next v3 4/4] dt-bindings: net: cdns,macb: Deprecate
- magic-packet property
-Message-ID: <ce853496-5556-48eb-9953-d34d6c1cb514@lunn.ch>
+Subject: Re: [PATCH net-next v3 2/4] net: macb: Enable queue disable
+Message-ID: <cb1e50ec-d67e-4fce-9710-5b3380d266a3@lunn.ch>
 References: <20240605102457.4050539-1-vineeth.karumanchi@amd.com>
- <20240605102457.4050539-5-vineeth.karumanchi@amd.com>
+ <20240605102457.4050539-3-vineeth.karumanchi@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,14 +64,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240605102457.4050539-5-vineeth.karumanchi@amd.com>
+In-Reply-To: <20240605102457.4050539-3-vineeth.karumanchi@amd.com>
 
-On Wed, Jun 05, 2024 at 03:54:57PM +0530, Vineeth Karumanchi wrote:
-> WOL modes such as magic-packet should be an OS policy.
-> By default, advertise supported modes and use ethtool to activate
-> the required mode.
+On Wed, Jun 05, 2024 at 03:54:55PM +0530, Vineeth Karumanchi wrote:
+> Enable queue disable for Versal devices.
 > 
-> Suggested-by: Andrew Lunn <andrew@lunn.ch>
 > Signed-off-by: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
