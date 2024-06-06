@@ -1,290 +1,160 @@
-Return-Path: <netdev+bounces-101445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACD458FEEDF
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:47:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48F8D8FEF58
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:49:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09052B22E12
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:47:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40E281C2350E
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 14:49:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31D61C89E5;
-	Thu,  6 Jun 2024 14:21:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4549819925A;
+	Thu,  6 Jun 2024 14:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="8ML/ykKc"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TAuzFzh1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 695641A1870;
-	Thu,  6 Jun 2024 14:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57CC8197554
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 14:23:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717683711; cv=none; b=Oxr1oKr6hCsIT+1hN8s2QhLVbfOQiFcKKKjyyh5iBInhVR7pQ9f05nbYpKTY53pPHTNgOz83dltOlQI9Dx8VcqDiqfSHThfEHqMeXDjtL7a9DddP/QPpC8NBsdTpUsak4n9DDJvdj7oIwa8hHxnLpMzr5/kog++P3+C8Lbo5zdA=
+	t=1717683835; cv=none; b=lxwAI/76MMn0QQkzi7EZf7V7POVgRaEkLyZfGngazdvFZDGjcrLvi2btlWsFq4gKKSXWmN9b1Rv0IL7oKKg9Pt9SuwrUPYVQ767OnDzO4q8vt9Atc2XjnEzFuvEgt2Oa9f/hv4i3vuRySzMX8zrOa4zu3T9juCrXJ3fjPWFm4lU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717683711; c=relaxed/simple;
-	bh=asA+uMOznSQ+uh+OJ3HJvC8ffuxHhFvXpmLgqwzby2s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=WMEA9f6J6pQJB6+pXE7v/fz4ekTX654wND8rotGDIGWk+khASlpTgAuTnd46IW1x6i3Wo5ulIYd9bYl2Votc4sCNtp8ooTBja6vSsfBV5AURjNiZAHSMNIlLwcmxlaaVxU0fvs9ijH2quBCU+Zd9728KjFuQv2qwP9BPdmYUAHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=8ML/ykKc; arc=none smtp.client-ip=91.207.212.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 456DATsk011720;
-	Thu, 6 Jun 2024 16:21:01 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	YuWBowVYFdiavONSsRxqhorTe84oDx2sCtAFnnT47NE=; b=8ML/ykKcjyjJmz6l
-	4iDFAIR1sqVmecSVa6YEpkdePS0uOYmuYnFGXBzvlcSOGST35g5SpQrwEW4giOPd
-	5b7bnZEnTCHVB0FW1a9OlWLPgExMC6bAtmQYc8RA3hWX9k3NMuYnLs1AB8ALP6tx
-	U4TH+NOIcfy8mPEEwLLDpYrgAIqqMFG7uFGX7ayvGT2TMftQCSgtYA6gv+vCIylB
-	51xxQFA6dqoreCeYV4aMiOT4klBibSLeKyFSwKmbzBfYuocZ6x7VGXS+nlPWLAUp
-	5xEcCbjtyzmhesZ5HP5+jaCAO7B5BeN76+BYaXbGj570VWNtwAZJphftBZE9ftzz
-	2wiEtg==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ygekj4nex-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Jun 2024 16:21:00 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id A671B40044;
-	Thu,  6 Jun 2024 16:20:54 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id AF6C3217B8E;
-	Thu,  6 Jun 2024 16:19:38 +0200 (CEST)
-Received: from [10.48.86.164] (10.48.86.164) by SHFDAG1NODE2.st.com
- (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 6 Jun
- 2024 16:19:37 +0200
-Message-ID: <73f7b4a4-31d1-4907-b83b-2ac7758edf0d@foss.st.com>
-Date: Thu, 6 Jun 2024 16:19:36 +0200
+	s=arc-20240116; t=1717683835; c=relaxed/simple;
+	bh=ynPjpCEfE7qSWExl4NgQiPtqK2yUqs1tb2YKL7htCQc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=VRn/xAYULgbM1tJejLF3Fcq2tnXEAl+/XsOsE3eQpKbdYP7giBfKSin4V1ugvbXo3DbqfnjRX6enliKsjSJyMLJtYU7qhD5N9MQyvHa1XcYe9y72BX6hUNw1hheDRwqRbSKHmXlrC+++G6LKLlNuyuixIhSuep3beVQW/CNXloM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TAuzFzh1; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-57a30b3a6cbso1287919a12.1
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 07:23:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1717683831; x=1718288631; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=is6s/GpBASAFrFWj8/JczGtlu19laRTn68QOzHiY+QA=;
+        b=TAuzFzh1ztewaKlWOOkEAbU72MCh8tyQTPFVHKaTVRyBzukszqXCY7BzVBH2Y2HKFH
+         HJm65QOk6bF5jFHBMjb7aHsEBLnz/LGKW0+fs8mxQEYBcsDwmiNImgavpzgzTKLCQqDI
+         Tg2Dam0XheN2PZ011ZqfcKKWV0H+zHUu/7UzB20wptG2ZwOv6wyKff9WgvGmVYj9kVMX
+         ud7I7DQq3jMkHk/+t7YIADCooy38mZlvfKzF6+JiKuRFwDy5anHNl9CnMBFGDKFDU/D+
+         rHie/AAeArCl9iY+z7cjQQhiOkTx5OKvP6g9KTTNF7il/lO+zJ4QIpmid1uCDdgzSp7i
+         nHJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717683831; x=1718288631;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=is6s/GpBASAFrFWj8/JczGtlu19laRTn68QOzHiY+QA=;
+        b=Pqkyj6ui0OKt+TOfTxo6+8Gb6Du0xSizX3KComtTwnjxhy3xyMOxIVd866SGs4aC+S
+         osiFq1Dyht2OlfLW2DqJTkMtFY6x49ytwQPhLcXPGhIoA15tzxHAr1gd+mCl16l6L91n
+         n6vh7MGDqXCWjFXIwAmTOWzqgYJyS4PrpNn1NTmTUrfkaLVD0/aa6nrVL45JDCKS+/qJ
+         pgn35ijOcwC5EcIFhbH+g+1sM2NbjMdGEAakWzIi7dwbBnwDCUXgeI+WWtlBOmCSAyYv
+         yHa5mmJtHekLvZdrOyfuhzhitVtecWUJhPq6a33PDmtIPhfWH+CsgaS8vtZwzVWaajQm
+         c8vA==
+X-Forwarded-Encrypted: i=1; AJvYcCVwYav5dm6DPqeY3Xv9oEg8OrHEQfpzVI7YPxOpNhcUp/EEmCgpwSvg8A5C0oUZ9thB8eR00YpjWAzTAKn7DY66emlXqPBv
+X-Gm-Message-State: AOJu0YzZXMMrRK8hu1Fa2yCx3u67JQiC6DLpjHiFZvOq3igb3Jai14Uj
+	n5ybfw5428JSwEvH9RUw7tjkCWzzrJWzMddVLa5XVL0WsEoedwDN9Ft0Mujdb90=
+X-Google-Smtp-Source: AGHT+IHgstzJ2kZrCspX8fsFXWFYWZkQB0H/XNx5XJ20AdVItbU/LBbuTqT5RL9D/+AsyONocr+DnA==
+X-Received: by 2002:a50:d79b:0:b0:57a:259a:489a with SMTP id 4fb4d7f45d1cf-57a8b6a698fmr3514806a12.14.1717683830353;
+        Thu, 06 Jun 2024 07:23:50 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57aae2323f7sm1159364a12.85.2024.06.06.07.23.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jun 2024 07:23:49 -0700 (PDT)
+Date: Thu, 6 Jun 2024 17:23:44 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Peter Ujfalusi <peter.ujfalusi@gmail.com>
+Cc: Vinod Koul <vkoul@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	MD Danish Anwar <danishanwar@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	Julien Panis <jpanis@baylibre.com>,
+	Chintan Vankar <c-vankar@ti.com>, Diogo Ivo <diogo.ivo@siemens.com>,
+	Simon Horman <horms@kernel.org>, dmaengine@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net-next] dmaengine: ti: k3-udma-glue: clean up return in
+ k3_udma_glue_rx_get_irq()
+Message-ID: <2f28f769-6929-4fc2-b875-00bf1d8bf3c4@kili.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 07/11] net: ethernet: stmmac: add management of
- stm32mp13 for stm32
-To: Marek Vasut <marex@denx.de>, "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre
- Torgue <alexandre.torgue@foss.st.com>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        Liam Girdwood
-	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20240604143502.154463-1-christophe.roullier@foss.st.com>
- <20240604143502.154463-8-christophe.roullier@foss.st.com>
- <3c40352b-ad69-4847-b665-e7b2df86a684@denx.de>
-Content-Language: en-US
-From: Christophe ROULLIER <christophe.roullier@foss.st.com>
-In-Reply-To: <3c40352b-ad69-4847-b665-e7b2df86a684@denx.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-06_01,2024-06-06_02,2024-05-17_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
+Currently the k3_udma_glue_rx_get_irq() function returns either negative
+error codes or zero on error.  Generally, in the kernel, zero means
+success so this be confusing and has caused bugs in the past.  Also the
+"tx" version of this function only returns negative error codes.  Let's
+clean this "rx" function so both functions match.
 
-On 6/4/24 19:05, Marek Vasut wrote:
-> On 6/4/24 4:34 PM, Christophe Roullier wrote:
->> Add Ethernet support for STM32MP13.
->> STM32MP13 is STM32 SOC with 2 GMACs instances.
->> GMAC IP version is SNPS 4.20.
->> GMAC IP configure with 1 RX and 1 TX queue.
->> DMA HW capability register supported
->> RX Checksum Offload Engine supported
->> TX Checksum insertion supported
->> Wake-Up On Lan supported
->> TSO supported
->>
->> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
->> ---
->>   .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 50 +++++++++++++++----
->>   1 file changed, 40 insertions(+), 10 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c 
->> b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
->> index bed2be129b2d2..e59f8a845e01e 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
->> @@ -84,12 +84,14 @@ struct stm32_dwmac {
->>       struct clk *clk_eth_ck;
->>       struct clk *clk_ethstp;
->>       struct clk *syscfg_clk;
->> +    bool is_mp13;
->>       int ext_phyclk;
->>       int enable_eth_ck;
->>       int eth_clk_sel_reg;
->>       int eth_ref_clk_sel_reg;
->>       int irq_pwr_wakeup;
->>       u32 mode_reg;         /* MAC glue-logic mode register */
->> +    u32 mode_mask;
->>       struct regmap *regmap;
->>       u32 speed;
->>       const struct stm32_ops *ops;
->> @@ -102,8 +104,8 @@ struct stm32_ops {
->>       void (*resume)(struct stm32_dwmac *dwmac);
->>       int (*parse_data)(struct stm32_dwmac *dwmac,
->>                 struct device *dev);
->> -    u32 syscfg_eth_mask;
->>       bool clk_rx_enable_in_suspend;
->> +    u32 syscfg_clr_off;
->>   };
->>     static int stm32_dwmac_clk_enable(struct stm32_dwmac *dwmac, bool 
->> resume)
->> @@ -227,7 +229,14 @@ static int stm32mp1_configure_pmcr(struct 
->> plat_stmmacenet_data *plat_dat)
->>         switch (plat_dat->mac_interface) {
->>       case PHY_INTERFACE_MODE_MII:
->> -        val = SYSCFG_PMCR_ETH_SEL_MII;
->> +        /*
->> +         * STM32MP15xx supports both MII and GMII, STM32MP13xx MII 
->> only.
->> +         * SYSCFG_PMCSETR ETH_SELMII is present only on STM32MP15xx and
->> +         * acts as a selector between 0:GMII and 1:MII. As STM32MP13xx
->> +         * supports only MII, ETH_SELMII is not present.
->> +         */
->> +        if (!dwmac->is_mp13)    /* Select MII mode on STM32MP15xx */
->> +            val |= SYSCFG_PMCR_ETH_SEL_MII;
->>           break;
->>       case PHY_INTERFACE_MODE_GMII:
->>           val = SYSCFG_PMCR_ETH_SEL_GMII;
->> @@ -256,13 +265,16 @@ static int stm32mp1_configure_pmcr(struct 
->> plat_stmmacenet_data *plat_dat)
->>         dev_dbg(dwmac->dev, "Mode %s", 
->> phy_modes(plat_dat->mac_interface));
->>   +    /* Shift value at correct ethernet MAC offset in 
->> SYSCFG_PMCSETR */
->> +    val <<= ffs(dwmac->mode_mask) - ffs(SYSCFG_MP1_ETH_MASK);
->> +
->>       /* Need to update PMCCLRR (clear register) */
->> -    regmap_write(dwmac->regmap, reg + SYSCFG_PMCCLRR_OFFSET,
->> -             dwmac->ops->syscfg_eth_mask);
->> +    regmap_write(dwmac->regmap, dwmac->ops->syscfg_clr_off,
->> +             dwmac->mode_mask);
->>         /* Update PMCSETR (set register) */
->>       return regmap_update_bits(dwmac->regmap, reg,
->> -                 dwmac->ops->syscfg_eth_mask, val);
->> +                 dwmac->mode_mask, val);
->>   }
->>     static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
->> @@ -303,7 +315,7 @@ static int stm32mcu_set_mode(struct 
->> plat_stmmacenet_data *plat_dat)
->>       dev_dbg(dwmac->dev, "Mode %s", 
->> phy_modes(plat_dat->mac_interface));
->>         return regmap_update_bits(dwmac->regmap, reg,
->> -                 dwmac->ops->syscfg_eth_mask, val << 23);
->> +                 SYSCFG_MCU_ETH_MASK, val << 23);
->>   }
->>     static void stm32_dwmac_clk_disable(struct stm32_dwmac *dwmac, 
->> bool suspend)
->> @@ -348,8 +360,15 @@ static int stm32_dwmac_parse_data(struct 
->> stm32_dwmac *dwmac,
->>           return PTR_ERR(dwmac->regmap);
->>         err = of_property_read_u32_index(np, "st,syscon", 1, 
->> &dwmac->mode_reg);
->> -    if (err)
->> +    if (err) {
->>           dev_err(dev, "Can't get sysconfig mode offset (%d)\n", err);
->> +        return err;
->> +    }
->> +
->> +    dwmac->mode_mask = SYSCFG_MP1_ETH_MASK;
->> +    err = of_property_read_u32_index(np, "st,syscon", 2, 
->> &dwmac->mode_mask);
->> +    if (err)
->> +        pr_debug("Warning sysconfig register mask not set\n");
->
-> I _think_ you need to left-shift the mode mask by 8 for STM32MP13xx 
-> second GMAC somewhere in here, right ?
->
-The shift is performed in function stm32mp1_configure_pmcr:
+This patch has no effect on runtime.
 
-     /* Shift value at correct ethernet MAC offset in SYSCFG_PMCSETR */
-     val <<= ffs(dwmac->mode_mask) - ffs(SYSCFG_MP1_ETH_MASK);
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/dma/ti/k3-udma-glue.c                | 3 +++
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c     | 4 ++--
+ drivers/net/ethernet/ti/icssg/icssg_common.c | 4 +---
+ 3 files changed, 6 insertions(+), 5 deletions(-)
 
-In case of MP13 Ethernet1 or MP15, shift equal 0
+diff --git a/drivers/dma/ti/k3-udma-glue.c b/drivers/dma/ti/k3-udma-glue.c
+index c9b93055dc9d..b96b448a0e69 100644
+--- a/drivers/dma/ti/k3-udma-glue.c
++++ b/drivers/dma/ti/k3-udma-glue.c
+@@ -1531,6 +1531,9 @@ int k3_udma_glue_rx_get_irq(struct k3_udma_glue_rx_channel *rx_chn,
+ 		flow->virq = k3_ringacc_get_ring_irq_num(flow->ringrx);
+ 	}
+ 
++	if (!flow->virq)
++		return -ENXIO;
++
+ 	return flow->virq;
+ }
+ EXPORT_SYMBOL_GPL(k3_udma_glue_rx_get_irq);
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index 4e50b3792888..8c26acc9cde1 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -2424,10 +2424,10 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
+ 
+ 		rx_chn->irq = k3_udma_glue_rx_get_irq(rx_chn->rx_chn, i);
+ 
+-		if (rx_chn->irq <= 0) {
++		if (rx_chn->irq < 0) {
+ 			dev_err(dev, "Failed to get rx dma irq %d\n",
+ 				rx_chn->irq);
+-			ret = -ENXIO;
++			ret = rx_chn->irq;
+ 			goto err;
+ 		}
+ 	}
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+index 088ab8076db4..cac7863c5cb2 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_common.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+@@ -440,9 +440,7 @@ int prueth_init_rx_chns(struct prueth_emac *emac,
+ 			fdqring_id = k3_udma_glue_rx_flow_get_fdq_id(rx_chn->rx_chn,
+ 								     i);
+ 		ret = k3_udma_glue_rx_get_irq(rx_chn->rx_chn, i);
+-		if (ret <= 0) {
+-			if (!ret)
+-				ret = -ENXIO;
++		if (ret < 0) {
+ 			netdev_err(ndev, "Failed to get rx dma irq");
+ 			goto fail;
+ 		}
+-- 
+2.39.2
 
-In case of MP13 Ethernet2 , shift equal 8  ;-)
-
->>       return err;
->>   }
->> @@ -361,6 +380,8 @@ static int stm32mp1_parse_data(struct stm32_dwmac 
->> *dwmac,
->>       struct device_node *np = dev->of_node;
->>       int err = 0;
->>   +    dwmac->is_mp13 = of_device_is_compatible(np, 
->> "st,stm32mp13-dwmac");
->
-> You could make is_mp13 part of struct stm32_ops {} just like 
-> syscfg_clr_off is part of struct stm32_ops {} .
-ok
->
->>       /* Ethernet PHY have no crystal */
->>       dwmac->ext_phyclk = of_property_read_bool(np, "st,ext-phyclk");
->>   @@ -540,8 +561,7 @@ static SIMPLE_DEV_PM_OPS(stm32_dwmac_pm_ops,
->>       stm32_dwmac_suspend, stm32_dwmac_resume);
->>     static struct stm32_ops stm32mcu_dwmac_data = {
->> -    .set_mode = stm32mcu_set_mode,
->> -    .syscfg_eth_mask = SYSCFG_MCU_ETH_MASK
->> +    .set_mode = stm32mcu_set_mode
->
-> It is not necessary to remove the trailing comma ','
-ok
->
->>   };
->>     static struct stm32_ops stm32mp1_dwmac_data = {
->> @@ -549,13 +569,23 @@ static struct stm32_ops stm32mp1_dwmac_data = {
->>       .suspend = stm32mp1_suspend,
->>       .resume = stm32mp1_resume,
->>       .parse_data = stm32mp1_parse_data,
->> -    .syscfg_eth_mask = SYSCFG_MP1_ETH_MASK,
->> +    .syscfg_clr_off = 0x44,
->> +    .clk_rx_enable_in_suspend = true
->> +};
->> +
->> +static struct stm32_ops stm32mp13_dwmac_data = {
->> +    .set_mode = stm32mp1_set_mode,
->> +    .suspend = stm32mp1_suspend,
->> +    .resume = stm32mp1_resume,
->> +    .parse_data = stm32mp1_parse_data,
->> +    .syscfg_clr_off = 0x08,
->>       .clk_rx_enable_in_suspend = true
->>   };
->>     static const struct of_device_id stm32_dwmac_match[] = {
->>       { .compatible = "st,stm32-dwmac", .data = &stm32mcu_dwmac_data},
->>       { .compatible = "st,stm32mp1-dwmac", .data = 
->> &stm32mp1_dwmac_data},
->> +    { .compatible = "st,stm32mp13-dwmac", .data = 
->> &stm32mp13_dwmac_data},
->>       { }
->>   };
->>   MODULE_DEVICE_TABLE(of, stm32_dwmac_match);
->
-> This patch definitely looks MUCH better than what this series started 
-> with, it is much easier to grasp the MP13 specific changes.
->
-> You could possibly improve this further and split the 
-> dwmac->ops->syscfg_eth_mask to dwmac->mode_mask conversion into 
-> separate preparatory patch (as a 6.5/11 in context of this series), 
-> and then add the few MP13 changes on top (as 7/11 patch).
-ok
 
