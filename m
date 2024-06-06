@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-101220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07BF38FDC78
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 04:04:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D95028FDC8B
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 04:10:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E47F11C2176C
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 02:04:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CE121F246FD
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 02:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5771401B;
-	Thu,  6 Jun 2024 02:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A1A17580;
+	Thu,  6 Jun 2024 02:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Z1kygmFU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3FOQwrFn"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119F41373;
-	Thu,  6 Jun 2024 02:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47841640B;
+	Thu,  6 Jun 2024 02:10:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717639464; cv=none; b=U5oo9iCkQu9SR2iH6wi2/8pVE2E/4/rVUfoIgJNv6xXERGRYC9o6qH8wBWGDG2PKTfLWqdww19PooiyLSHS+GnE2AaP9C7IvjRlFayzTOT0GqdCTmRFDcZS2Lc1jj1pS1o0c+YI1xOtOO0yeUCzqEr4kGPWPTVjmvguK3PcgKfc=
+	t=1717639845; cv=none; b=fFd6Wwy3XKOZ/ScX1rYcWfyCOFW7p28EtymBKFSdMQiX6VXQYv2eAvv/vZcZzjs17ndSkhAdVhwb6F6+Mp5ISGV73xiAHNz413nMD9YjMBoI9P5oB6lfzZ1eZ1+H+/OaM4MZLXJoFrMDMqSKB0e32dvrm7cU8nT2oDno9qsCXxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717639464; c=relaxed/simple;
-	bh=KchfyRw5yhyXWwSmy9ySHIAwLenL1pYcPWIufZuPhMo=;
+	s=arc-20240116; t=1717639845; c=relaxed/simple;
+	bh=rzkXo4IiaYMRDDc4Kh6uXteBk5BmEOFOnfDbjMu0Pks=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gLsbXFqae09GXl5Le+hx+ChEed2GDkudCXdV4Wlk86FOCQzAawJeVsKACKe1kAOKczwO8ysMjrz37+vNLkUs1tzHnzswv+hs6iYGEZLHQxHZqnI3YUkOwf2afHW4qStU1Js7nK2/ua5SJPkT86d+aef2dOJ0D/dPuVHrtJXuL+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Z1kygmFU; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=U+Zm+I1zf99IiS2fgyCEIO+Ic0UqYsyHgt36KKdFIF4VS3nejHHN9zyACLvoU+NF9oBT7fi1Vqq8yAQ2JpeA5hDyzIh+jDbn95lXtwKkzfJeUhJGkUDvda7pgD6qWpANHTA8dh8NCxCpia4+Kdf24gszL3ystUj1xX5SNdGnBJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3FOQwrFn; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,23 +36,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
 	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=jSY0bvOqtELArheckRfbvM1kpjDwefKlvF+Tb6ce0FM=; b=Z1
-	kygmFUugkDAgM/z2UdBLJ/wViHTWhRMHHs8zGh8DQMzMlzakXTribvSF1kb4jvv5XfSiGFDVEcd2s
-	wqkgdlOLWuwOgs2JH1QC7E/MQdavLaZZlKsE5nSFhp1dLrthIdk01T8UhMfDlvBW+sfrzy7XbsL9F
-	TyR+kTH1pMWZzDM=;
+	In-Reply-To:References; bh=EiYcxxAUjvaXFSXD8Eyyj23c1fzGWFwSW2rcb3xgMqw=; b=3F
+	OQwrFnv1lMS+Ax3bpro3dfWTZhMVDenFAvHSiWuA5iliO1aKS2NCfJautCPMsx+jyXyinAJT2YDPG
+	rwV9/Z2RxGdwhx9ey29Gfwx75Zwp2LU8rTCCoOIW+aQkNHsKB2Hyk02vECSu0HcEuQhDIZKpuwTF+
+	AgPhUwyQ289RuBA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sF2UD-00Gy0R-HX; Thu, 06 Jun 2024 04:04:17 +0200
-Date: Thu, 6 Jun 2024 04:04:17 +0200
+	id 1sF2aO-00Gy1b-3w; Thu, 06 Jun 2024 04:10:40 +0200
+Date: Thu, 6 Jun 2024 04:10:40 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Kamil =?iso-8859-1?Q?Hor=E1k?= - 2N <kamilh@axis.com>
 Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
 	hkallweit1@gmail.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 1/3] net: phy: bcm54811: New link mode for BroadR-Reach
-Message-ID: <3bd5c993-d763-4191-8a88-fcd56d9bfb4c@lunn.ch>
+Subject: Re: [PATCH v5 3/3] net: phy: bcm-phy-lib: Implement BroadR-Reach
+ link modes
+Message-ID: <7a313ff6-574b-425d-be06-23bb588402c8@lunn.ch>
 References: <20240605095646.3924454-1-kamilh@axis.com>
- <20240605095646.3924454-2-kamilh@axis.com>
+ <20240605095646.3924454-4-kamilh@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,19 +63,74 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240605095646.3924454-2-kamilh@axis.com>
+In-Reply-To: <20240605095646.3924454-4-kamilh@axis.com>
 
-On Wed, Jun 05, 2024 at 11:56:44AM +0200, Kamil Horák - 2N wrote:
-> Introduce a new link mode necessary for 10 MBit single-pair
-> connection in BroadR-Reach mode on bcm5481x PHY by Broadcom.
-> This new link mode, 10baseT1BRR, is known as 1BR10 in the Broadcom
-> terminology. Another link mode to be used is 1BR100 and it is already
-> present as 100baseT1, because Broadcom's 1BR100 became 100baseT1
-> (IEEE 802.3bw).
+On Wed, Jun 05, 2024 at 11:56:46AM +0200, Kamil Horák - 2N wrote:
+> Implement single-pair BroadR-Reach modes on bcm5481x PHY by Broadcom.
+> Create set of functions alternative to IEEE 802.3 to handle configuration
+> of these modes on compatible Broadcom PHYs.
 > 
+> Change-Id: I592d261bc0d60aaa78fc1717a315b0b1c1449c81
 > Signed-off-by: Kamil Horák - 2N <kamilh@axis.com>
+> ---
+>  drivers/net/phy/bcm-phy-lib.c | 123 ++++++++++++
+>  drivers/net/phy/bcm-phy-lib.h |   4 +
+>  drivers/net/phy/broadcom.c    | 368 ++++++++++++++++++++++++++++++++--
+>  drivers/net/phy/phy-core.c    |   2 +-
+>  include/linux/brcmphy.h       |   9 +
+>  5 files changed, 488 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/net/phy/bcm-phy-lib.c b/drivers/net/phy/bcm-phy-lib.c
+> index 876f28fd8256..cc1b5e5a958c 100644
+> --- a/drivers/net/phy/bcm-phy-lib.c
+> +++ b/drivers/net/phy/bcm-phy-lib.c
+> @@ -794,6 +794,47 @@ static int _bcm_phy_cable_test_get_status(struct phy_device *phydev,
+>  	return ret;
+>  }
+>  
+> +static int bcm_setup_forced(struct phy_device *phydev)
+> +{
+> +	u16 ctl = 0;
+> +
+> +	phydev->pause = 0;
+> +	phydev->asym_pause = 0;
+> +
+> +	if (phydev->speed == SPEED_100)
+> +		ctl |= LRECR_SPEED100;
+> +
+> +	if (phydev->duplex != DUPLEX_FULL)
+> +		return -EOPNOTSUPP;
+> +
+> +	return phy_modify(phydev, MII_BCM54XX_LRECR, LRECR_SPEED100, ctl);
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+We should consider naming here. I assume this will not work for IEEE
+forced mode? So maybe this should have _lre_ or _brr_ in the name to
+make it clear what it actually does.
+
+> +}
+
+
+
+> +
+> +/**
+> + * bcm_linkmode_adv_to_mii_adv_t
+> + * @advertising: the linkmode advertisement settings
+> + * @return: LDS Auto-Negotiation Advertised Ability register value
+> + *
+> + * A small helper function that translates linkmode advertisement
+> + * settings to phy autonegotiation advertisements for the
+> + * MII_BCM54XX_LREANAA register of Broadcom PHYs capable of LDS
+> + */
+> +static u32 bcm_linkmode_adv_to_mii_adv_t(unsigned long *advertising)
+> +{
+> +	u32 result = 0;
+
+Make here, and maybe lre_advertising?
+
+Please go through all the functions and think about naming.
 
     Andrew
+
+---
+pw-bot: cr
 
