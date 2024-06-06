@@ -1,191 +1,407 @@
-Return-Path: <netdev+bounces-101566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30D468FF714
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 23:54:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FC448FF71A
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 23:54:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8201C1F22D02
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 21:53:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FEFA1C2122F
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 21:54:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64C7F7173C;
-	Thu,  6 Jun 2024 21:53:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC8513C67B;
+	Thu,  6 Jun 2024 21:54:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KHnZa/PG"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="JLRVJQOL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53246D1B9;
-	Thu,  6 Jun 2024 21:53:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48874481A3
+	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 21:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717710835; cv=none; b=H5iFVIrcGha7KLdLI51UrnFTp8XykOvmrToQhHZ7q1HXcmqe7bXyQ6nTtNob7aFjt+I/pj/yh01xCdpSGb3+q9WNfgxmlIy6OknpxMzM9J/IYLc1KrAfDfyWeOSmykss8lM/bbCyQTwlJrQJBIobu+/G8CiyhqtTCJ6tKdlTMFw=
+	t=1717710887; cv=none; b=Y9EjjEXiFLxdO/6MFsfElOo97cDYn8vP21mwPGhtrnWfMaSJYS9rXhXw4FKmPjXNhVq551bFsbxQcgcGu0ekbxjMKeXKdGoJL+crR44QXQ1GMAipWO42cbLBcpDqAPzjMWfoAc4u95gjJnzab7IYnvC/HZVoFO2I6mGiseCpexk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717710835; c=relaxed/simple;
-	bh=+Co+3LQoCWO1Xw8u2pGCzwkdJb7wrBqq6PbIkyE1eks=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=HnMkqHCl1s0K7UhLpJ10ssoqHDo+HG+0BXgaUbuM658uUbIxZa/CPg5uYrQOMee8vX5dt1vNRjQbowoiZnOkxhlFlT7SBoD3fsrY6zOXNYGFJYVkVxWMCKYuUNoWZVSfT8CWps2s2MUizML2uah5NV7iXxRRk3EmFyrz7wM9Cqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KHnZa/PG; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6af27d0c9f8so7174316d6.2;
-        Thu, 06 Jun 2024 14:53:53 -0700 (PDT)
+	s=arc-20240116; t=1717710887; c=relaxed/simple;
+	bh=mDagFXChBVcpHR+wLzC5wM9bMzN7oj68g+1GOs8ojLI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=khF9AEGKAATGz3lQ76eN5+MrfLlq4xbMo2l7rR7u40lweGVVIypGdCWmlbqfaJTjmEraa0rsBIAmEYCNjw2rWX+7tWwGWEsz7XvG6RN4f7VSwgWnQH37DiIPQXOIz4Q3Vpl94GCOPHilMY4BlAyIqbwSE0QW4vdmcqwOg0v/zro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=JLRVJQOL; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-703e5a09c11so1283300b3a.2
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 14:54:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717710833; x=1718315633; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s57Ttr3JhqgkOLOGotPGuFFobFGXuZzfpQyblp0rsAU=;
-        b=KHnZa/PG5IEb7Gzs5+RDf3Mt6tij+f8G03SN0Rmt42x1vj6Kwyeiw1+84xFCsfeG+B
-         s0aRyuz/U/8Qw9vuaW9u0t9AofjLlEfJCvkoDL5WbSWCnHUJUKM3fZuo9IANvsEYESUO
-         ofKRY36WkYKp7/70yqGtsUT/FwFygci2R4i1QcHO3cK1RaR+9qG1nvjHXIs2DXAzHD6N
-         xbyV3k0XtpsRkPVorkVN5eTcAbSjQMCaGdC2E2JFdvZ+5AjnrBrVxmWFeTmc4faKKUgf
-         qVofnBXdLwhdjXSQbmEBfKnb6Qyf6drRyAm50ydxPUj1BdtF6qdQjYVaRbDF11cfPd2j
-         OqEA==
+        d=fastly.com; s=google; t=1717710884; x=1718315684; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tVv1Qc4TM0+6AjuDwtHzIaIdzcyFOnd/Bm5wgzbgEN4=;
+        b=JLRVJQOL+QLw/c0DNvGatiqu1qMKvzA5jGF8XsMYXviPNbiZvkJxGsR/9lb38UHiCc
+         bRvOegp7sAr+L2zRDZbFMGelZvb3pfj/VLDAIyKDiusmIz1C6jSfd1rrf1zcx6VIXbm6
+         bcqVpmkObomHRLbG7lfwW82bT6FEEpybOf47U=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717710833; x=1718315633;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=s57Ttr3JhqgkOLOGotPGuFFobFGXuZzfpQyblp0rsAU=;
-        b=YuPLb6BFSrBCdsnn/U3ARklFjgOwu0L9S5IAS/V01gz/a1KbHAwb9KzA5AOA6PBavS
-         gT2weyLu1UdkGe7qkYlmaUqtZJPJaLZR/BhCPKV+uFIIbr4c4idY1+IvkwmvWLfu92rc
-         Mrwy3bhh4vha47jeNt4fRXwkb9rjEolnFw0ZKuFf1SQKqYGVCeTxYPW6Fshhp+4hsl44
-         kgOakbzWjDVq+G1s7rOlVAvFAIiuUpqOfhPdjOfdb+5R1EKPKA7ai3VIa6iueI6hPtrD
-         reDa2zCnrtTVPSF1yF+Jja4uk0hiq9eRfHwEyeydvlAJ4vHPTFzzBhLFW1fGaTe7CcXM
-         74mg==
-X-Forwarded-Encrypted: i=1; AJvYcCWQTD6PtJ8a8P7nKuX9v1XE81+si0H8eseGq+FAnmDEjbuh3UxdWxry0QFRRwJr1GH+7N54qzALPg9I+NJjIZBhVSGUvPh+xG0Nqp+6s2hdDEY8Yxdh9HFPaWNL8hIgE6PGie6p
-X-Gm-Message-State: AOJu0YztQb+VUj5gDbAqIu/ppY7ZjQpqJA4EBssbYFAsnyEJwVOR9JGH
-	Bkysxt0xeMsIDzRcEyvFXyygdsDaxwYlaO/OawmRoXa/mbvsoZbU
-X-Google-Smtp-Source: AGHT+IESI/LNXKELGKm5sMKjBhfPLdMM3HXtMZiEvbteY5wnPr5/2V/foG6lsAOZK6ckJ3hcr79MLQ==
-X-Received: by 2002:a05:6214:3f8c:b0:6af:b998:1a87 with SMTP id 6a1803df08f44-6b059f2c47emr8287266d6.46.1717710832621;
-        Thu, 06 Jun 2024 14:53:52 -0700 (PDT)
-Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b04f660167sm10066966d6.33.2024.06.06.14.53.52
+        d=1e100.net; s=20230601; t=1717710884; x=1718315684;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tVv1Qc4TM0+6AjuDwtHzIaIdzcyFOnd/Bm5wgzbgEN4=;
+        b=RMQt1LbUbh7PV7SMMxtAc5V5FJib9XIExlItdMZqYqtW7imCpNMJvGSUqD0xH0Mro0
+         Se/x3mo2mpX8WOPCL84+zkdRS6CVWhCqVmP+qlu0D8AvS8EHntAnNEf5hqzgrpI5txQL
+         ZMxGzY0W65pTyQYBgcVdkXF+ZKL+ihBlZm9Rr9RD2YwHkY6n5kizwlBqm9WR6dhWwF62
+         Yxr4Rw5/hVsvI99oX4f4CEAiIKONsismHFu9eyKLxAen3FQ5cS3ME6dvxLdlz0/0dJiT
+         ml6LJw78rAFQU6i9Yn/ky24QOb200+OWAV/oc6o05b2ZrjAfFPzpdrY+sYN81uDIig6R
+         dI5g==
+X-Gm-Message-State: AOJu0YypxQESpqvDThcRbqLkd5Dqi8DVywSQsbM8bFxwXWVyELmRfFqF
+	uFSyWpF+znwfon6e1Gy7RrpKOuKLwUX4mIH4GKHRqI63W1zxzu5gn1zfhSmK16I=
+X-Google-Smtp-Source: AGHT+IGbQWUbSg8uxdL6sn1f98rKX69lmpOdbNgRL44efMTCIjzInKv97HauHUmJmLf7qXpAEAr0nw==
+X-Received: by 2002:a05:6a21:81a7:b0:1b2:b02f:d145 with SMTP id adf61e73a8af0-1b2f9cbe236mr766742637.54.1717710884210;
+        Thu, 06 Jun 2024 14:54:44 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd778fc2sm20190725ad.119.2024.06.06.14.54.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jun 2024 14:53:52 -0700 (PDT)
-Date: Thu, 06 Jun 2024 17:53:51 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: joshwash@google.com, 
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, 
- kuba@kernel.org, 
- stable@kernel.org, 
- Joshua Washington <joshwash@google.com>, 
- Praveen Kaligineedi <pkaligineedi@google.com>, 
- Harshitha Ramamurthy <hramamurthy@google.com>, 
- Eric Dumazet <edumazet@google.com>, 
- Jeroen de Borst <jeroendb@google.com>, 
- Shailend Chand <shailend@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Rushil Gupta <rushilg@google.com>, 
- Catherine Sullivan <csully@google.com>, 
- Bailey Forrest <bcf@google.com>, 
- open list <linux-kernel@vger.kernel.org>
-Message-ID: <66622fefeaeff_1013529462@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240606192139.1872461-1-joshwash@google.com>
-References: <20240606192139.1872461-1-joshwash@google.com>
-Subject: Re: [PATCH net] gve: ignore nonrelevant GSO type bits when processing
- TSO headers
+        Thu, 06 Jun 2024 14:54:43 -0700 (PDT)
+Date: Thu, 6 Jun 2024 14:54:40 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	nalramli@fastly.com, Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [RFC net-next v4 2/2] net/mlx5e: Add per queue netdev-genl stats
+Message-ID: <ZmIwIJ9rxllqQT18@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Tariq Toukan <ttoukan.linux@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, nalramli@fastly.com,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>
+References: <20240604004629.299699-1-jdamato@fastly.com>
+ <20240604004629.299699-3-jdamato@fastly.com>
+ <11b9c844-a56e-427f-aab3-3e223d41b165@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <11b9c844-a56e-427f-aab3-3e223d41b165@gmail.com>
 
-joshwash@ wrote:
-> From: Joshua Washington <joshwash@google.com>
+On Thu, Jun 06, 2024 at 11:11:57PM +0300, Tariq Toukan wrote:
 > 
-> TSO currently fails when the skb's gso_type field has more than one bit
-> set.
 > 
-> TSO packets can be passed from userspace using PF_PACKET, TUNTAP and a
-> few others, using virtio_net_hdr (e.g., PACKET_VNET_HDR). This includes
-> virtualization, such as QEMU, a real use-case.
+> On 04/06/2024 3:46, Joe Damato wrote:
+> > ./cli.py --spec netlink/specs/netdev.yaml \
+> >           --dump qstats-get --json '{"scope": "queue"}'
+> > 
+> > ...snip
+> > 
+> >   {'ifindex': 7,
+> >    'queue-id': 62,
+> >    'queue-type': 'rx',
+> >    'rx-alloc-fail': 0,
+> >    'rx-bytes': 105965251,
+> >    'rx-packets': 179790},
+> >   {'ifindex': 7,
+> >    'queue-id': 0,
+> >    'queue-type': 'tx',
+> >    'tx-bytes': 9402665,
+> >    'tx-packets': 17551},
+> > 
+> > ...snip
+> > 
+> > Also tested with the script tools/testing/selftests/drivers/net/stats.py
+> > in several scenarios to ensure stats tallying was correct:
+> > 
+> > - on boot (default queue counts)
+> > - adjusting queue count up or down (ethtool -L eth0 combined ...)
+> > 
+> > The tools/testing/selftests/drivers/net/stats.py brings the device up,
+> > so to test with the device down, I did the following:
+> > 
+> > $ ip link show eth4
+> > 7: eth4: <BROADCAST,MULTICAST> mtu 9000 qdisc mq state DOWN [..snip..]
+> >    [..snip..]
+> > 
+> > $ cat /proc/net/dev | grep eth4
+> > eth4: 235710489  434811 [..snip rx..] 2878744 21227  [..snip tx..]
+> > 
+> > $ ./cli.py --spec ../../../Documentation/netlink/specs/netdev.yaml \
+> >             --dump qstats-get --json '{"ifindex": 7}'
+> > [{'ifindex': 7,
+> >    'rx-alloc-fail': 0,
+> >    'rx-bytes': 235710489,
+> >    'rx-packets': 434811,
+> >    'tx-bytes': 2878744,
+> >    'tx-packets': 21227}]
+> > 
+> > Compare the values in /proc/net/dev match the output of cli for the same
+> > device, even while the device is down.
+> > 
+> > Note that while the device is down, per queue stats output nothing
+> > (because the device is down there are no queues):
 > 
-> The gso_type and gso_size fields as passed from userspace in
-> virtio_net_hdr are not trusted blindly by the kernel. It adds gso_type
-> |= SKB_GSO_DODGY to force the packet to enter the software GSO stack
-> for verification.
+> This part is not true anymore.
+
+It is true with this patch applied and running the command below.
+Maybe I should have been more explicit that using cli.py outputs []
+when scope = queue, which could be an internal cli.py thing, but
+this is definitely true with this patch.
+
+Did you test it and get different results?
+
+> > 
+> > $ ./cli.py --spec ../../../Documentation/netlink/specs/netdev.yaml \
+> >             --dump qstats-get --json '{"scope": "queue", "ifindex": 7}'
+> > []
+> > 
+> > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > ---
+> >   .../net/ethernet/mellanox/mlx5/core/en_main.c | 138 ++++++++++++++++++
+> >   1 file changed, 138 insertions(+)
+> > 
+> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> > index d03fd1c98eb6..76d64bbcf250 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> > @@ -39,6 +39,7 @@
+> >   #include <linux/debugfs.h>
+> >   #include <linux/if_bridge.h>
+> >   #include <linux/filter.h>
+> > +#include <net/netdev_queues.h>
+> >   #include <net/page_pool/types.h>
+> >   #include <net/pkt_sched.h>
+> >   #include <net/xdp_sock_drv.h>
+> > @@ -5279,6 +5280,142 @@ static bool mlx5e_tunnel_any_tx_proto_supported(struct mlx5_core_dev *mdev)
+> >   	return (mlx5_vxlan_allowed(mdev->vxlan) || mlx5_geneve_tx_allowed(mdev));
+> >   }
+> > +static void mlx5e_get_queue_stats_rx(struct net_device *dev, int i,
+> > +				     struct netdev_queue_stats_rx *stats)
+> > +{
+> > +	struct mlx5e_priv *priv = netdev_priv(dev);
+> > +	struct mlx5e_channel_stats *channel_stats;
+> > +	struct mlx5e_rq_stats *xskrq_stats;
+> > +	struct mlx5e_rq_stats *rq_stats;
+> > +
+> > +	ASSERT_RTNL();
+> > +	if (mlx5e_is_uplink_rep(priv))
+> > +		return;
+> > +
+> > +	/* ptp was ever opened, is currently open, and channel index matches i
+> > +	 * then export stats
+> > +	 */
+> > +	if (priv->rx_ptp_opened && priv->channels.ptp) {
+> > +		if (test_bit(MLX5E_PTP_STATE_RX, priv->channels.ptp->state) &&
+> > +		    priv->channels.ptp->rq.ix == i) {
 > 
-> This issue might similarly come up when the CWR bit is set in the TCP
-> header for congestion control, causing the SKB_GSO_TCP_ECN gso_type bit
-> to be set.
+> PTP RQ index is naively assigned to zero:
+> rq->ix           = MLX5E_PTP_CHANNEL_IX;
 > 
-> Fixes: a57e5de476be ("gve: DQO: Add TX path")
+> but this isn't to be used as the stats index.
+> Today, the PTP-RQ has no matcing rxq in the kernel level.
+> i.e. turning PTP-RQ on won't add a kernel-level RXQ to the
+> real_num_rx_queues.
+> Maybe we better do.
+> If not, and the current state is kept, the best we can do is let the PTP-RQ
+> naively contribute its queue-stat to channel 0.
 
-nit: no empty line
+OK, it sounds like the easiest thing to do is just count PTP as
+channel 0, so if i == 0, I'll in the PTP stats.
 
-> Signed-off-by: Joshua Washington <joshwash@google.com>
-> Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
-> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
-> Suggested-by: Eric Dumazet <edumazet@google.com>
+But please see below regarding testing whether or not PTP is
+actually enabled or not.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-
-> ---
->  drivers/net/ethernet/google/gve/gve_tx_dqo.c | 18 +++++++-----------
->  1 file changed, 7 insertions(+), 11 deletions(-)
+> > +			rq_stats = &priv->ptp_stats.rq;
+> > +			stats->packets = rq_stats->packets;
+> > +			stats->bytes = rq_stats->bytes;
+> > +			stats->alloc_fail = rq_stats->buff_alloc_err;
+> > +			return;
+> > +		}
+> > +	}
+> > +
+> > +	channel_stats = priv->channel_stats[i];
+> > +	xskrq_stats = &channel_stats->xskrq;
+> > +	rq_stats = &channel_stats->rq;
+> > +
+> > +	stats->packets = rq_stats->packets + xskrq_stats->packets;
+> > +	stats->bytes = rq_stats->bytes + xskrq_stats->bytes;
+> > +	stats->alloc_fail = rq_stats->buff_alloc_err +
+> > +			    xskrq_stats->buff_alloc_err;
+> > +}
+> > +
+> > +static void mlx5e_get_queue_stats_tx(struct net_device *dev, int i,
+> > +				     struct netdev_queue_stats_tx *stats)
+> > +{
+> > +	struct mlx5e_priv *priv = netdev_priv(dev);
+> > +	struct mlx5e_sq_stats *sq_stats;
+> > +
+> > +	ASSERT_RTNL();
+> > +	/* no special case needed for ptp htb etc since txq2sq_stats is kept up
+> > +	 * to date for active sq_stats, otherwise get_base_stats takes care of
+> > +	 * inactive sqs.
+> > +	 */
+> > +	sq_stats = priv->txq2sq_stats[i];
+> > +	stats->packets = sq_stats->packets;
+> > +	stats->bytes = sq_stats->bytes;
+> > +}
+> > +
+> > +static void mlx5e_get_base_stats(struct net_device *dev,
+> > +				 struct netdev_queue_stats_rx *rx,
+> > +				 struct netdev_queue_stats_tx *tx)
+> > +{
+> > +	struct mlx5e_priv *priv = netdev_priv(dev);
+> > +	int i, tc;
+> > +
+> > +	ASSERT_RTNL();
+> > +	if (!mlx5e_is_uplink_rep(priv)) {
+> > +		rx->packets = 0;
+> > +		rx->bytes = 0;
+> > +		rx->alloc_fail = 0;
+> > +
+> > +		for (i = priv->channels.params.num_channels; i < priv->stats_nch; i++) {
+> > +			struct netdev_queue_stats_rx rx_i = {0};
+> > +
+> > +			mlx5e_get_queue_stats_rx(dev, i, &rx_i);
+> > +
+> > +			rx->packets += rx_i.packets;
+> > +			rx->bytes += rx_i.bytes;
+> > +			rx->alloc_fail += rx_i.alloc_fail;
+> > +		}
+> > +
+> > +		if (priv->rx_ptp_opened) {
+> > +			/* if PTP was opened, but is not currently open, then
+> > +			 * report the stats here. otherwise,
+> > +			 * mlx5e_get_queue_stats_rx will get it
+> > +			 */
 > 
-> diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-> index fe1b26a4d736..04cb43a97c96 100644
-> --- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-> +++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-> @@ -555,6 +555,10 @@ static int gve_prep_tso(struct sk_buff *skb)
->  	if (unlikely(skb_shinfo(skb)->gso_size < GVE_TX_MIN_TSO_MSS_DQO))
->  		return -1;
->  
-> +	/* We only deal with TCP at this point. */
-> +	if (!(skb_shinfo(skb)->gso_type & (SKB_GSO_TCPV4 | SKB_GSO_TCPV6)))
-> +		return -EINVAL;
-> +
+> We shouldn't care if the RQ is currently open. The stats are always there.
+> This applies to all RQs and SQs.
 
-NETIF_F_TSO and NETIF_F_TSO6 are the only terminal/L4 segmentation
-offload types that gve advertises in hw_features. So I think that this
-will always be true.
+The idea was that if PTP was opened before but the bit was set to
+signal that it is closed now, it would reported in base because it's
+inactive -- like other inactive RQs.
 
-If nothing else, it documents the assumption, so fine to keep.
+If it was opened before --AND-- the open bit was set, it'll be
+reported with channel 0 stats in mlx5e_get_queue_stats_rx.
 
-Careful about comments that just repeat what the code does. More
-informative are comments that why non-obvious code exists (where
-applicable, which is not here).
+That makes sense to me, but it sounds like you are saying something
+different?
 
->  	/* Needed because we will modify header. */
->  	err = skb_cow_head(skb, 0);
->  	if (err < 0)
-> @@ -565,18 +569,10 @@ static int gve_prep_tso(struct sk_buff *skb)
->  	/* Remove payload length from checksum. */
->  	paylen = skb->len - skb_transport_offset(skb);
->  
-> -	switch (skb_shinfo(skb)->gso_type) {
-> -	case SKB_GSO_TCPV4:
-> -	case SKB_GSO_TCPV6:
-> -		csum_replace_by_diff(&tcp->check,
-> -				     (__force __wsum)htonl(paylen));
-> +	csum_replace_by_diff(&tcp->check, (__force __wsum)htonl(paylen));
->  
-> -		/* Compute length of segmentation header. */
-> -		header_len = skb_tcp_all_headers(skb);
-> -		break;
-> -	default:
-> -		return -EINVAL;
-> -	}
-> +	/* Compute length of segmentation header. */
-> +	header_len = skb_tcp_all_headers(skb);
->  
->  	if (unlikely(header_len > GVE_TX_MAX_HDR_SIZE_DQO))
->  		return -EINVAL;
-> -- 
-> 2.45.1.288.g0e0cd299f1-goog
+Are you saying to always report it with channel 0 in
+mlx5e_get_queue_stats_rx even if:
+
+  - !priv->rx_ptp_opened  (meaning it was never opened, and thus
+    would be zero)
+
+        and
+
+  - (priv->rx_ptp_opened && !test_bit(MLX5E_PTP_STATE_RX,
+    priv->channels.ptp->state)) meaning it was opened before, but is
+    currently closed 
+
+If so, that means we never report PTP in base. Is that what you want
+me to do?
+
+I honestly don't care either way but this seems slightly
+inconsistent, doesn't it?
+
+If base is reporting inactive RQs, shouldn't PTP be reported here if
+its inactive ?
+
+Please let me know.
+
+> > +			if (priv->channels.ptp &&
+> > +			    !test_bit(MLX5E_PTP_STATE_RX, priv->channels.ptp->state)) {
+> > +				struct mlx5e_rq_stats *rq_stats = &priv->ptp_stats.rq;
+> > +
+> > +				rx->packets += rq_stats->packets;
+> > +				rx->bytes += rq_stats->bytes;
+> > +			}
+> > +		}
+> > +	}
+> > +
+> > +	tx->packets = 0;
+> > +	tx->bytes = 0;
+> > +
+> > +	for (i = 0; i < priv->stats_nch; i++) {
+> > +		struct mlx5e_channel_stats *channel_stats = priv->channel_stats[i];
+> > +
+> > +		/* while iterating through all channels [0, stats_nch], there
+> > +		 * are two cases to handle:
+> > +		 *
+> > +		 *  1. the channel is available, so sum only the unavailable TCs
+> > +		 *     [mlx5e_get_dcb_num_tc, max_opened_tc).
+> > +		 *
+> > +		 *  2. the channel is unavailable, so sum all TCs [0, max_opened_tc).
+> > +		 */
 > 
+> Even if the channel is not available, mlx5e_get_queue_stats_tx() accesses
+> and returns its stats.
 
+Ah, yes. My mistake.
 
+> Here you need to only cover SQs that have no mapping in range
+> [0..real_num_tx_queues - 1].
+
+So, that means the loops should be:
+
+outer loop: [0, priv->stats_nch)
+    inner loop: [ mlx5e_get_dcb_num_tc, max_opened_tc )
+
+Right? That would be only the SQs which have no mapping, I think.
+
+> > +		if (i < priv->channels.params.num_channels)
+> > +			tc = mlx5e_get_dcb_num_tc(&priv->channels.params);
+> > +		else
+> > +			tc = 0;
+> > +
+> > +		for (; tc < priv->max_opened_tc; tc++) {
+> > +			struct mlx5e_sq_stats *sq_stats = &channel_stats->sq[tc];
+> > +
+> > +			tx->packets += sq_stats->packets;
+> > +			tx->bytes += sq_stats->bytes;
+> > +		}
+> > +	}
+> > +
+> > +	if (priv->tx_ptp_opened) {
+> > +		/* only report PTP TCs if it was opened but is now closed */
+> > +		if (priv->channels.ptp && !test_bit(MLX5E_PTP_STATE_TX, priv->channels.ptp->state)) {
+> > +			for (tc = 0; tc < priv->channels.ptp->num_tc; tc++) {
+> > +				struct mlx5e_sq_stats *sq_stats = &priv->ptp_stats.sq[tc];
+> > +
+> > +				tx->packets += sq_stats->packets;
+> > +				tx->bytes   += sq_stats->bytes;
+> > +			}
+> > +		}
+> > +	}
+> > +}
+> > +
+> > +static const struct netdev_stat_ops mlx5e_stat_ops = {
+> > +	.get_queue_stats_rx  = mlx5e_get_queue_stats_rx,
+> > +	.get_queue_stats_tx  = mlx5e_get_queue_stats_tx,
+> > +	.get_base_stats      = mlx5e_get_base_stats,
+> > +};
+> > +
+> >   static void mlx5e_build_nic_netdev(struct net_device *netdev)
+> >   {
+> >   	struct mlx5e_priv *priv = netdev_priv(netdev);
+> > @@ -5296,6 +5433,7 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
+> >   	netdev->watchdog_timeo    = 15 * HZ;
+> > +	netdev->stat_ops	  = &mlx5e_stat_ops;
+> >   	netdev->ethtool_ops	  = &mlx5e_ethtool_ops;
+> >   	netdev->vlan_features    |= NETIF_F_SG;
 
