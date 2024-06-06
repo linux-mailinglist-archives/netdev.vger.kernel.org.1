@@ -1,111 +1,141 @@
-Return-Path: <netdev+bounces-101284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D62048FE02F
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 09:53:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 398FA8FE041
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 09:56:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7032FB23FA6
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 07:53:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC2BC285DE4
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 07:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEFF13AD04;
-	Thu,  6 Jun 2024 07:53:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A35B613BACD;
+	Thu,  6 Jun 2024 07:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Q2Pa3lV2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TP7ezMIE"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8683813A868;
-	Thu,  6 Jun 2024 07:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7313E13B28A;
+	Thu,  6 Jun 2024 07:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717660380; cv=none; b=reegTZBVIcvDsToa2hsMCdtEBAAQFsxReyrx36+DkH8frqNJPAJXTUP2L0/CfiEOugsEpAK8/WtX0W8EKvU9a4qF5LoLzEACO8gmwoxCFwfXN/HTGyHfMlZOxAHK/kccLqbyVgXNoMmW5Xhr0SLFieII42NI1Tu4j9DoOSir2F0=
+	t=1717660570; cv=none; b=oAOq7i6PwyE9u++EnNXcC6GpMIoCgSQs7lyaDdWiedgCFL68zu+fxMTHEHE/Z7hWue0cpKqvG9NobSk3OG3tnGEsG6T9f/osRznZz8h+PLqNJvNg13yDaYvAraNoaYufRNgJZDUzguKgzsBcpoMrGJd2s5bfzGuRE1F9LrwaXiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717660380; c=relaxed/simple;
-	bh=BwYxHHWvB1uZZP2ZgxoL/RFqtDAfYilZfWrjOdV4eOc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pTAXBDWf/DKMeGalwjoO5mQE+TaZDOqW2gGC5xxsSebpq1Q5izJD3HxxbSxCI3qnXOHrEIZ3ftJM/YHVbj+ygj7YnYcuITwodWbZZHGz7akYGGXQsbhl0qzP14d9Dq6iGNqFn56JlkTZFL5bk1auMMAad5kWl6Yzb8VZcbqML4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Q2Pa3lV2; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=SuQyD+sLDXV8oCXL9Pl1e8PdK2YOMCbBfYFAwTy1UYU=; b=Q2Pa3lV2tiP162lvLviNt5iklu
-	lu7XvOo8d2uTDhU62qpiYk08cT5huaHBCEWFXxAds9Ww+/nz/KhxzpRymhI71GDYq2ZWGZuaO/Rll
-	PJwPk4okR3gXoYHsR3cKT7G/KldCoZNaUJzvRS2l30OoFO50wRcNMD+08anfLtrQHJZ4ohuEtHE2I
-	fKtDNAcj3rs57+KmBDoikqE/MQXSMZnUXKSxPlyRO87qVvFOXeh8ii4p3mGWBET0UBtnjyYVEsAQ2
-	0Df7hCQOixeqMa9oyS+K+ksBDf/Xmf8Qn0/kogH7GWsnZ5yC2VmM6eHeTsCi8fmb/OSWFlFqfL4b9
-	Zx68klGQ==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sF7vT-00000009sY5-3ZjH;
-	Thu, 06 Jun 2024 07:52:47 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 7CCF030047C; Thu,  6 Jun 2024 09:52:44 +0200 (CEST)
-Date: Thu, 6 Jun 2024 09:52:44 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Daniel Bristot de Oliveira <bristot@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v4 net-next 01/14] locking/local_lock: Add local nested
- BH locking infrastructure.
-Message-ID: <20240606075244.GB8774@noisy.programming.kicks-ass.net>
-References: <20240604154425.878636-1-bigeasy@linutronix.de>
- <20240604154425.878636-2-bigeasy@linutronix.de>
+	s=arc-20240116; t=1717660570; c=relaxed/simple;
+	bh=CVkaqZl8ch00DGfkNJRMLiOVSK869YuGUN3ADO9UFOg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BlIjUlpxuACyECcPTwVqNkhMe2oO6U/UxnTO415HqQt4nwE2GKpBnJdHG6JtMKSGo/ne07VwRFWRXgBRDUEQaZMxPZkFW2BLwTPacxF1sXOukg7KUIXYlQk0jw9LRIjHMqoSbaFm/1LgPOk5VkjX0JfWeWlDZQLxX2G0PhdRHbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TP7ezMIE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20D45C32782;
+	Thu,  6 Jun 2024 07:56:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717660570;
+	bh=CVkaqZl8ch00DGfkNJRMLiOVSK869YuGUN3ADO9UFOg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=TP7ezMIEYo5tH6cqv6jM3GitTGHJyiZW+uodFmffXAGjrXgvBIijEQQOOnYux6EkY
+	 liAthHQH2lBRbXNvJW0APd8rVZWoFl+7Ftk37MCuU2kNRDVaS24ZgbtIh1YTiDKASJ
+	 EYKTni5J9PAe2axBB2sJ/BmvQMZpFKdwVVPz6D4bp7Zi2JhECFhdK/0CdwT9/d3ywi
+	 oO28PJRDGZjGWDNGNvUVtSvZ50oOV3WGUsaPBKi9H8gyYxhYohF2L28/gtMRCe1mJk
+	 vE/0XrnPbKBdARta+46Ypxrp2c2xhNi9oR8YmxZYe0dIcyCS1z0j2ypJS+/FqIdgW8
+	 Epe9H/ygqg2Dw==
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2eaccc097e2so6683721fa.0;
+        Thu, 06 Jun 2024 00:56:10 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVlTgcpJe0OTMTxJGlpHY396DDfjuJ6g13YJPr6+Tk5zntl7zhVCs6Em7d1jl4SnZZaKFO9v+pYu12zyWLUaRgz1XvAxtXH+WF+HpNAFlqM/6xukM/eaLVN0KLOZAmdISZb0c5P
+X-Gm-Message-State: AOJu0Yxm4Lk8F/7uIuBvRnjOC8JnTgw22GMwnMXsUTEZxe/VvAQJNTLY
+	JNmY8Lw4Kx3uSg2UREiWNoRJDiKJWMlNP1r0UFdA8gC6t2guKMm0OtZ1jjTSmdyoliDbb8kPzxB
+	OMDHCRgRe7SXVFrBzb03tohU1AMA=
+X-Google-Smtp-Source: AGHT+IFV+tAqQp09BODHzBNmtMi8MlvdHjCn2uBHKx0cTB133/EqPXtxB/XwMTtgflBRfXf6XRYzCruVskBjfCX1R8c=
+X-Received: by 2002:a2e:b704:0:b0:2ea:81cc:b146 with SMTP id
+ 38308e7fff4ca-2eac79dcb4bmr25794821fa.18.1717660568411; Thu, 06 Jun 2024
+ 00:56:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240604154425.878636-2-bigeasy@linutronix.de>
+References: <Zl7gYOMyscYDKZ8_@gondor.apana.org.au> <20240604184220.GC1566@sol.localdomain>
+ <ZmAthcxC8V3V3sm3@gondor.apana.org.au> <ZmAuTceqwZlRJqHx@gondor.apana.org.au>
+ <ZmAz8-glRX2wl13D@gondor.apana.org.au> <20240605191410.GB1222@sol.localdomain>
+ <ZmEYJQFHQRFKC5JM@gondor.apana.org.au> <20240606052801.GA324380@sol.localdomain>
+ <ZmFL-AXZ8lphOCUC@gondor.apana.org.au> <CAMj1kXHLt6v03qkpKfwbN34oyeeCnJb=tpG4GvTn6E1cJQRTOw@mail.gmail.com>
+ <ZmFmiWZAposV5N1O@gondor.apana.org.au>
+In-Reply-To: <ZmFmiWZAposV5N1O@gondor.apana.org.au>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 6 Jun 2024 09:55:56 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXFt_E9ghN7GfpYHR4-yaLsz_J-D1Nc3XsVqUamZ6yXHGQ@mail.gmail.com>
+Message-ID: <CAMj1kXFt_E9ghN7GfpYHR4-yaLsz_J-D1Nc3XsVqUamZ6yXHGQ@mail.gmail.com>
+Subject: Re: [PATCH v4 6/8] fsverity: improve performance by using multibuffer hashing
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	fsverity@lists.linux.dev, dm-devel@lists.linux.dev, x86@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Sami Tolvanen <samitolvanen@google.com>, 
+	Bart Van Assche <bvanassche@acm.org>, Tim Chen <tim.c.chen@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jun 04, 2024 at 05:24:08PM +0200, Sebastian Andrzej Siewior wrote:
-> Add local_lock_nested_bh() locking. It is based on local_lock_t and the
-> naming follows the preempt_disable_nested() example.
-> 
-> For !PREEMPT_RT + !LOCKDEP it is a per-CPU annotation for locking
-> assumptions based on local_bh_disable(). The macro is optimized away
-> during compilation.
-> For !PREEMPT_RT + LOCKDEP the local_lock_nested_bh() is reduced to
-> the usual lock-acquire plus lockdep_assert_in_softirq() - ensuring that
-> BH is disabled.
-> 
-> For PREEMPT_RT local_lock_nested_bh() acquires the specified per-CPU
-> lock. It does not disable CPU migration because it relies on
-> local_bh_disable() disabling CPU migration.
+On Thu, 6 Jun 2024 at 09:34, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Thu, Jun 06, 2024 at 08:58:47AM +0200, Ard Biesheuvel wrote:
+> >
+> > IPSec users relying on software crypto and authenc() and caring about
+> > performance seems like a rather niche use case to me.
+>
+> It's no more niche than fs/verity and dm-integrity.
 
-should we assert this? lockdep_assert(current->migration_disabled) or
-somesuch should do, rite?
+fsverity is used by Android, which is the diametrical opposite of
+niche when it comes to Linux distros.
 
-> With LOCKDEP it performans the usual lockdep checks as with !PREEMPT_RT.
-> Due to include hell the softirq check has been moved spinlock.c.
-> 
-> The intention is to use this locking in places where locking of a per-CPU
-> variable relies on BH being disabled. Instead of treating disabled
-> bottom halves as a big per-CPU lock, PREEMPT_RT can use this to reduce
-> the locking scope to what actually needs protecting.
-> A side effect is that it also documents the protection scope of the
-> per-CPU variables.
-> 
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> this could potentially be used for all algorithms.  Just the
+> reduction in the number of function calls may produce enough
+> of a benefit (this is something I observed when adding GSO,
+> even without any actual hardware offload, simply aggregating
+> packets into larger units produced a visible benefit).
+>
 
-Otherwise I suppose sp.. not a fan of the whole nested thing, but I
-don't really have an alternative proposal so yeah, whatever :-)
+Sure. But my point is that anyone who cares enough about IPsec
+performance would have stopped using authenc(cbc(aes),hmac(sha2)) long
+ago and moved to GCM or even ChaChaPoly. This is not just a matter of
+efficiency in the implementation - using a general purpose hash
+function such as SHA-256 [twice] rather than GHASH or Poly1305 is just
+overkill.
+
+So complicating the performance optimization of something that runs on
+every (non-Apple) phone for the benefit of something that is rarely
+used in a context where the performance matters seems unreasonable to
+me.
+
+> > I'm struggling to follow this debate. Surely, if this functionality
+> > needs to live in ahash, the shash fallbacks need to implement this
+> > parallel scheme too, or ahash would end up just feeding the requests
+> > into shash sequentially, defeating the purpose. It is then up to the
+> > API client to choose between ahash or shash, just as it can today.
+>
+> I've never suggested it adding it to shash at all.  In fact
+> that's my primary problem with this interface.  I think it
+> should be ahash only.  Just like skcipher and aead.
+>
+
+So again, how would that work for ahash falling back to shash. Are you
+saying every existing shash implementation should be duplicated into
+an ahash so that the multibuffer optimization can be added? shash is a
+public interface so we cannot just remove the existing ones and we'll
+end up carrying both forever.
+
+> My reasoning is that this should cater mostly to bulk data, i.e.,
+> multiple pages (e.g., for IPsec we're talking about 64K chunks,
+> actually that (the 64K limit) is something that we should really
+> extend, it's not 2014 anymore).  These typically will be more
+> easily accessed as a number of distinct pages rather than as a
+> contiguous mapping.
+>
+
+Sure, but the block I/O world is very different. Forcing it to use an
+API modeled after how IPsec might use it seems, again, unreasonable.
+
+So these 64k chunks are made up of 1500 byte frames that can be hashed
+in parallel?
 
