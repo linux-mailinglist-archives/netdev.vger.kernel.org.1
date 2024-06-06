@@ -1,94 +1,98 @@
-Return-Path: <netdev+bounces-101300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12B5B8FE13B
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 10:40:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62A7C8FE147
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 10:41:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FC0728B8CB
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:40:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 141D21F24396
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 08:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5A113A418;
-	Thu,  6 Jun 2024 08:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC2513C821;
+	Thu,  6 Jun 2024 08:41:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BIhs+dZK"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="f9BkKMe0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1E9A3C28;
-	Thu,  6 Jun 2024 08:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49FAE19D89A;
+	Thu,  6 Jun 2024 08:41:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717663229; cv=none; b=bTrVFD2zMyf+V6EUIRUOPyly8sCbV4Ws1GaC/s7+uDd1JNmqHDfdFkBl2pAZ/Pyihzn3Q2P1ip3ICFbSsYse7C86G0FXllJsfq43W0rCpl1OyeWLkU4knLq1NvyORpc/TTRQsn46ADCgFThHScZi6D283Kxo56rUGHvRGDoDbW8=
+	t=1717663301; cv=none; b=KTjkc2hJqxR1Zz8wwRwTcruTfbfmLRijIBfyzV8nvlEd/FTPHh/Ka3XfyvNcO80Ti76O5D8Xk/+oeSqT/jmmZHMGYMgUos9CTV4gb3ld3sKmoGqPe0+KU6Q/QvzjfoRtmH5aRNbnKATrFSPgRhJVf9cs/J5+tsAlEMX1NUPpHKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717663229; c=relaxed/simple;
-	bh=0Y/L82EZCzB7GC6FsONHbm8i7buVGAVbnHUvf/I9Mz8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WC1r8cVHJ9RUJlNm72YzUQgIEGBktXBg+y9Qo6CE5GkpoOLien0yqzZV05+EEoxZVo5rydhUqOJqcLzrauaK5maC/SXAIY6O4GdJ2n21gL0MZS4nbkvezOexuVKbSDeIQ7rFGKy0s8PrxLhebicmGt6WezZAJQrtpueevoSrk8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BIhs+dZK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5D8FFC4AF0E;
-	Thu,  6 Jun 2024 08:40:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717663228;
-	bh=0Y/L82EZCzB7GC6FsONHbm8i7buVGAVbnHUvf/I9Mz8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BIhs+dZKaa+O0ikeonaN4TrMCWY/cLqXOEj5R+Y2714/T30RknNkPRpI1Tkb+RF/8
-	 DAdSeivumD8qVifHs68rfAXsiN+X6R8NNmPPimt9hGboskkHRbAHZj1pwC577e3DlI
-	 W/Hup34OaQA+7nTlhYB6+CcyOY2xNz11KG/PIVNh+f6NEri8n9deiPJz6oqxCWGT4X
-	 FzpqNY7EkfMfVCvLhMmXDYKKWEcqG1Jpws5TQWOVmVKtDhUN/sfmS0YFeAKAE4/qYd
-	 THkQQLpZaYaq4BBzbsvml0NfB1exb91YSERmouXQSIeb/AXcjmpagfDLGzRiQmjSQ/
-	 3iqKa64b2ySHg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4B7D0C4332D;
-	Thu,  6 Jun 2024 08:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1717663301; c=relaxed/simple;
+	bh=EoyaGw1A4h+VCG9rJx8NmSKJzlh6fEw3DCXv7QkXl2M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BvYJUp6Z+YnIoHVtsITe3Vf/TiGPN7yllqzwRdB5Xx6M19RSyYJnhJ7ZHaxho4zjXiLLXuzJ+wKS3WyR0lNV23SdALaw+ztk8ORC8mahObm/eUHhkjtO2YHKP7LrxeDGeYsnEFUzlvbbrH3RdcTBzJBd+WOQ+MPlz6uUNOnamiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=f9BkKMe0; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id AEBCBC0002;
+	Thu,  6 Jun 2024 08:41:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1717663291;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sMtvqFFLEqL2SjbNwyELJMYS5t5iIw2nNf41UsERVgM=;
+	b=f9BkKMe0PdFR6PJ5U/70w1adfe0YuIzB0MeSC1RxKfJu9RbReWEeeK+mD7zHCILpSYGrfJ
+	tAPdtU4NWgRZH1iF1vbZtfrhrOqVNag0PPReZxAWuZF37fZKQH7KupxwK3kZOMwFk7ieik
+	n4izgVeKiZ/O66riUbr0IF2SVrmjXPZmzkdFmanIvhADdoz+BIAeuSbfIAKb+2OPL+40xI
+	OEqUcNWp/Yh6F+U4QAO4KKz2RW5arwvpJssbHTppWZvc4wyRoOSFuhEqPjaEb3EaIE6vfw
+	nhr50aTz4WbQ3b3fZmodZjT6ScoNE4DURregM4fgqeXg8KU5o5k63zC7vNnLdA==
+Date: Thu, 6 Jun 2024 10:41:25 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>, Marek =?UTF-8?B?QmVow7pu?=
+ <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
+ mwojtas@chromium.org, Nathan Chancellor <nathan@kernel.org>, Antoine Tenart
+ <atenart@kernel.org>
+Subject: Re: [PATCH net-next v12 10/13] net: ethtool: pse-pd: Target the
+ command to the requested PHY
+Message-ID: <20240606104125.4ece706a@kmaincent-XPS-13-7390>
+In-Reply-To: <20240605124920.720690-11-maxime.chevallier@bootlin.com>
+References: <20240605124920.720690-1-maxime.chevallier@bootlin.com>
+	<20240605124920.720690-11-maxime.chevallier@bootlin.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: wwan: iosm: Fix tainted pointer delete is case of
- region creation fail
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171766322830.14664.190993997949157639.git-patchwork-notify@kernel.org>
-Date: Thu, 06 Jun 2024 08:40:28 +0000
-References: <20240604082500.20769-1-amishin@t-argos.ru>
-In-Reply-To: <20240604082500.20769-1-amishin@t-argos.ru>
-To: Aleksandr Mishin <amishin@t-argos.ru>
-Cc: m.chetan.kumar@intel.com, loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
- johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Hello:
+On Wed,  5 Jun 2024 14:49:15 +0200
+Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+> PSE and PD configuration is a PHY-specific command. Instead of targeting
+> the command towards dev->phydev, use the request to pick the targeted
+> PHY device.
+>=20
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-On Tue, 4 Jun 2024 11:25:00 +0300 you wrote:
-> In case of region creation fail in ipc_devlink_create_region(), previously
-> created regions delete process starts from tainted pointer which actually
-> holds error code value.
-> Fix this bug by decreasing region index before delete.
-> 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
-> 
-> [...]
+Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
 
-Here is the summary with links:
-  - [net] net: wwan: iosm: Fix tainted pointer delete is case of region creation fail
-    https://git.kernel.org/netdev/net/c/b0c9a2643541
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
