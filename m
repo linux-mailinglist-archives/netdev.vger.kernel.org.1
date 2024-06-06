@@ -1,123 +1,218 @@
-Return-Path: <netdev+bounces-101513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62D548FF244
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 18:20:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 273938FF24A
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 18:21:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF58A1F26B41
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:20:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16B061C26239
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 16:21:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E747198E96;
-	Thu,  6 Jun 2024 16:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 085931991D3;
+	Thu,  6 Jun 2024 16:16:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M5URKs/X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f5t7JCWJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10C91990A8;
-	Thu,  6 Jun 2024 16:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9822197501;
+	Thu,  6 Jun 2024 16:16:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717690559; cv=none; b=B8E8FiyNd6arXoLu7G/nTNEEbQw/QMGiX5E0KWL2esc5PiXOhBd0CMlJA6S/fwBmkgfjI6XngxXijmghXPQ9EHcCi955l7ShPttOdfOOGOqm8U6haNhTEo25Brwb1Tz/GUe1YnHEB+DBMrA1mydlby+bMgEVj0t6HCfaFHchVBU=
+	t=1717690580; cv=none; b=lm3hVEn2zRr86stBrgY7aDJGDsGABHw86RUlMHXwf7/0+0dmXTFFTdDgFeSbGWUf6gVzrC2gAqJ8ZwNH4fLewfXtH4NsVTzALuZIS2YDwaXP4BF5RSYi2AhvDXbF5rRPzT/veKO9aSVEv5kkAImfFdoa63A3+FNyb1u7dwC4wMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717690559; c=relaxed/simple;
-	bh=tLHKMNNtrQ426bUGhUYVfREzh8JRc0nm5Ra/LTxjX3Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qmX+Swg7BDcKKZywrbls7scEMXYr7Y2jeq/FvTYRxpT6GxTWKVaNW7O0klGBfoZjtJlwyL+nX8M0bNgtibrnZRRVbWWoDo0+hNrJTHtmToJlOwf2HROmbx/Aq5vnwFefTP5jCozp3J3A1pKYsqy+pxH6i3dtPOhBpDzERRv5oYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M5URKs/X; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717690559; x=1749226559;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=tLHKMNNtrQ426bUGhUYVfREzh8JRc0nm5Ra/LTxjX3Q=;
-  b=M5URKs/XlcQxhMtcV7Rg0jqdFQb2QGYwfiBi7djgpT+XYjMUBJntzFj3
-   LjgiLHyjnSnvVnsDnxOh83zh3w0irX6IpQnsfoBGmYWivAjSLqUjZ6Rqy
-   Og/JAtkJGZSYEJadOYa6i6V9BhicOsaY9kB/y97AYO3aL+GWvvapGZJ6z
-   z0G2lezr/uRO0f94qa8TSa/pGoC0cmHIB601DZEzFGIm7YvTBQ8BaA6uy
-   xQmSIkHa75VIx1lZVmKGORSIZriuMvUnHqrbRRgEEmn14sqwRSFy48fJp
-   bo+wGwVzr6rN7iCBRPzx+rkHX3rymkj83ywScyexGMA5wosy1x15Lwb9t
-   A==;
-X-CSE-ConnectionGUID: 6xaLbLppQviKqh+AnckeBQ==
-X-CSE-MsgGUID: 9p87HlUrRcSRtRLIYf7Psw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11095"; a="14526393"
-X-IronPort-AV: E=Sophos;i="6.08,219,1712646000"; 
-   d="scan'208";a="14526393"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2024 09:15:58 -0700
-X-CSE-ConnectionGUID: 8sMfRC2NSBSngIq3Sd542A==
-X-CSE-MsgGUID: RcUaROZbTAqtd5so5aTGdw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,219,1712646000"; 
-   d="scan'208";a="38697898"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa007.jf.intel.com with ESMTP; 06 Jun 2024 09:15:55 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id BB8F72A4; Thu, 06 Jun 2024 19:15:53 +0300 (EEST)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Kurt Kanzenbach <kurt@linutronix.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v1 1/1] net: dsa: hellcreek: Replace kernel.h with what is used
-Date: Thu,  6 Jun 2024 19:15:49 +0300
-Message-ID: <20240606161549.2987587-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.43.0.rc1.1336.g36b5255a03ac
+	s=arc-20240116; t=1717690580; c=relaxed/simple;
+	bh=RKbbRu32NqEkkRGB9QCkrdA9I0E2J4HS53nellvn8CY=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=TiQlZpu03zOoGNYvP8eexSU3Xfhkrl4acHxv0EhOMwM4mc6LqPuZqkAdY0nEngbYnYyrd6fI005b19aCQu4stl9ggnjMy7jL8rRT/onhVFqJVaz85sO8Q2EtJm+ZKZornn9Vwb6AMqotRhMgKo4DCwhLlefGCT8TuiwvwxbQWLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f5t7JCWJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9D3CC2BD10;
+	Thu,  6 Jun 2024 16:16:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717690580;
+	bh=RKbbRu32NqEkkRGB9QCkrdA9I0E2J4HS53nellvn8CY=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=f5t7JCWJ3/NUie/wjRKHnFdMtylLBoAicpBk5UVpokhsTN5HvKo94nckgDiFI+N0l
+	 WpbcXDC9rUPdxsYtkArroDl79jYLyxLgsr9yEI75b5pp5f8w97FloGd+16dr0IMdqv
+	 idErwwGzB/4tTmfftnjrcprVtG0dUCbRhw1rnzmUqcGZm6vREOfenBw4ECXhoFkqeW
+	 FYUBmYpe3aXLgOy87Uxa/F6TuSnyw8NDW9kpsWPOBykVlWpU1Nrt1G+ck+lWW1ygzK
+	 7URLl805hcLei5FSC9wvAWPc7CZOqtQ2tCig/5Qw2EeO/gH0DvzHn0HCoaWxTQmN3K
+	 O7gQm0ww3/LXQ==
+From: Kalle Valo <kvalo@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: "David S . Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski
+ <krzk+dt@kernel.org>,  Conor Dooley <conor+dt@kernel.org>,  Jeff Johnson
+ <jjohnson@kernel.org>,  linux-wireless@vger.kernel.org,
+  netdev@vger.kernel.org,  devicetree@vger.kernel.org,
+  ath11k@lists.infradead.org,  linux-kernel@vger.kernel.org,
+  ath12k@lists.infradead.org,  Bartosz Golaszewski
+ <bartosz.golaszewski@linaro.org>,  Krzysztof Kozlowski
+ <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH v9 1/2] dt-bindings: net: wireless: qcom,ath11k:
+ describe the ath11k on QCA6390
+References: <20240605122106.23818-1-brgl@bgdev.pl>
+	<20240605122106.23818-2-brgl@bgdev.pl> <87h6e6qjuh.fsf@kernel.org>
+	<CAMRc=MdiKxtnN+g92RUTXdOydaPV5M2u5iUdKyE2SNvDkdXAjg@mail.gmail.com>
+	<871q5aqiei.fsf@kernel.org>
+	<CAMRc=McacZMP-51hjH+d8=PVe+Wgw4a8xWcv0sRPLJKL_gP=KQ@mail.gmail.com>
+Date: Thu, 06 Jun 2024 19:16:14 +0300
+In-Reply-To: <CAMRc=McacZMP-51hjH+d8=PVe+Wgw4a8xWcv0sRPLJKL_gP=KQ@mail.gmail.com>
+	(Bartosz Golaszewski's message of "Thu, 6 Jun 2024 16:29:20 +0200")
+Message-ID: <87sexqoxm9.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-kernel.h is included solely for some other existing headers.
-Include them directly and get rid of kernel.h.
+Bartosz Golaszewski <brgl@bgdev.pl> writes:
 
-While at it, sort headers alphabetically for easier maintenance.
+> On Thu, Jun 6, 2024 at 4:02=E2=80=AFPM Kalle Valo <kvalo@kernel.org> wrot=
+e:
+>
+>>
+>> Bartosz Golaszewski <brgl@bgdev.pl> writes:
+>>
+>> > On Thu, Jun 6, 2024 at 3:30=E2=80=AFPM Kalle Valo <kvalo@kernel.org> w=
+rote:
+>> >
+>> >>
+>> >> Bartosz Golaszewski <brgl@bgdev.pl> writes:
+>> >>
+>> >> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>> >> >
+>> >> > Add a PCI compatible for the ATH11K module on QCA6390 and describe =
+the
+>> >> > power inputs from the PMU that it consumes.
+>> >> >
+>> >> > Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>> >> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>> >>
+>> >> [...]
+>> >>
+>> >> > +allOf:
+>> >> > +  - if:
+>> >> > +      properties:
+>> >> > +        compatible:
+>> >> > +          contains:
+>> >> > +            const: pci17cb,1101
+>> >> > +    then:
+>> >> > +      required:
+>> >> > +        - vddrfacmn-supply
+>> >> > +        - vddaon-supply
+>> >> > +        - vddwlcx-supply
+>> >> > +        - vddwlmx-supply
+>> >> > +        - vddrfa0p8-supply
+>> >> > +        - vddrfa1p2-supply
+>> >> > +        - vddrfa1p7-supply
+>> >> > +        - vddpcie0p9-supply
+>> >> > +        - vddpcie1p8-supply
+>> >>
+>> >> Not sure if we discussed this before, but based on this I understand
+>> >> that there can't be an DT entry for device pci17cb,1101 without all t=
+he
+>> >> supply properties? But there are QCA6390 devices with PCI id 17cb:1101
+>> >> which do not need these supplies and already work. For example, my De=
+ll
+>> >> XPS 13 x86 laptop is one. Or anyone who manually installs QCA6390 boa=
+rd
+>> >> to their PCI slot and some of them might want to use DT, for example
+>> >> setting qcom,ath11k-calibration-variant.
+>> >>
+>> >> This is not a blocker for me, just making sure that we are not breaki=
+ng
+>> >> any existing setups.
+>> >>
+>> >
+>> > If they are already powered up without the need for the PCI pwrctl
+>> > driver to do it, then they will work alright. Bindings don't affect
+>> > functionality.
+>>
+>> Sure, I'm not worried about functionality. I'm worried that if I
+>> there's, for example, an ARM based setup which uses DT and wants to use
+>> a similar QCA6390 board that I have, and set
+>> qcom,ath11k-calibration-variant in DT. In other words, I'm worried if
+>> you are looking at this only for Snapdragon family of boards?
+>>
+>
+> No, what I'm looking at is the entire QCA6390 package. That means WLAN
+> *and* Bluetooth *and* the PMU that manages power.
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/net/dsa/hirschmann/hellcreek.h | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+I think we are just looking at this from different point of views. You
+are looking at a datasheet (most likely for a Snapdragon based system)
+and I'm looking what actual devices there are out in the field.
 
-diff --git a/drivers/net/dsa/hirschmann/hellcreek.h b/drivers/net/dsa/hirschmann/hellcreek.h
-index 6874cb9dc361..9c2ed2ba79da 100644
---- a/drivers/net/dsa/hirschmann/hellcreek.h
-+++ b/drivers/net/dsa/hirschmann/hellcreek.h
-@@ -12,14 +12,16 @@
- 
- #include <linux/bitmap.h>
- #include <linux/bitops.h>
-+#include <linux/container_of.h>
- #include <linux/device.h>
--#include <linux/kernel.h>
--#include <linux/mutex.h>
--#include <linux/workqueue.h>
- #include <linux/leds.h>
-+#include <linux/mutex.h>
- #include <linux/platform_data/hirschmann-hellcreek.h>
- #include <linux/ptp_clock_kernel.h>
- #include <linux/timecounter.h>
-+#include <linux/types.h>
-+#include <linux/workqueue.h>
-+
- #include <net/dsa.h>
- #include <net/pkt_sched.h>
- 
--- 
-2.43.0.rc1.1336.g36b5255a03ac
+> If you're using the QCA6390 on a device-tree system then you should
+> probably model at least the WLAN node and the PMU and the problem with
+> supplies is fixed.
 
+But why? If there are boards out there who don't need any of this why
+would they still need to model all this in DT?
+
+Based on the discussions I have heard only Snapdragon systems who
+require all this configuration you describe. Of course there can be
+other systems but I have not heard about those.
+
+> But if you don't have the supplies, that's alright for downstream.
+
+What do you mean downstream in this context?
+
+>> Again, I don't see this as a blocker. I just want to understand how this
+>> should work for all types of devices there are out there.
+>>
+>> > But if you have a QCA6390 then you have its PMU too and the bindings
+>> > model the real-world hardware.
+>> >
+>> > IOW: your laptop should be alright but the supplies are really there
+>> > which warrants adding them to the bindings.
+>>
+>> Sorry, not following here. Can you clarify your comment "the supplies
+>> are really there"? You mean inside the PCI board? But that's not visible
+>> to the kernel in anyway, the PCI board just works after I plug it in.
+>> It's like a regular PCI device. So I don't understand why that should be
+>> visible in DT, but I can very well be missing something.
+>>
+>
+> I think you're thinking about some kind of detachable PCIe board with
+> this chipset on it.
+
+Exactly, a lot of WLAN boards are like this.
+
+> I refer to the QCA6390 chipset itself which is also more than just
+> PCI. The Bluetooth interface doesn't use PCI at all. On the boards I'm
+> working on, the chipset is just soldered to the main board.
+
+And I guess you are looking at Snapdragon boards only?
+
+> If your detachable board "just works" then it must be wired in a way
+> that enables WLAN the moment it's plugged in but this doesn't happen
+> over PCI. The chipset has a power input and GPIOs to enable each
+> module.
+
+I don't know how the boards are implemented but it could be so. But from
+host system point of view it's just a regular PCI device.
+
+> Also: I doubt you need DT for your detachable board?
+
+Sure, I don't need DT but that's not my point. My point is why require
+these supplies for _all_ devices having PCI id 17cb:1101 (ie. QCA6390)
+then clearly there are such devices which don't need it? To me that's
+bad design and, if I'm understanding correctly, prevents use of
+qcom,ath11k-calibration-variant property. To me having the supplies
+optional in DT is more approriate.
+
+--=20
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatc=
+hes
 
