@@ -1,149 +1,110 @@
-Return-Path: <netdev+bounces-101473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAD398FF0E8
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:40:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BD788FF056
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 17:19:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 509E1B3124E
-	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:18:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A032728D963
+	for <lists+netdev@lfdr.de>; Thu,  6 Jun 2024 15:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2945719B3F4;
-	Thu,  6 Jun 2024 15:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E87519B5BC;
+	Thu,  6 Jun 2024 15:06:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TO8KEY3g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LJE2V8YE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B2819B3EF
-	for <netdev@vger.kernel.org>; Thu,  6 Jun 2024 15:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1063019B5AF;
+	Thu,  6 Jun 2024 15:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717686211; cv=none; b=tLPqsYI98kAWiZNtFB4nm1RNn9oUZde+zgIV5uh9iBUT81ZLEGjl/h/CIIwt/k9YC8vXn+OJr1TtK6FfGuASai3Xsd8t2gKuQX7pA3r5chEfD9cQUNBl5no2MAA6cB+/dhauWV7Aau+WIWhel2r+OaLUhJoqBHHowG7rp1nvMuE=
+	t=1717686360; cv=none; b=Dl84akiRejCVwE/PO96SkKJzvsCc01p83e4G6yezPqqLn3pyyfPHb6Hja1vlrAZC5b84oCaDH+Ur3TiI7ov3sFOuR3eOsr+966CpbJMdvc6rKYENDRsJh/qh0Mo5TzXSKtWg5nKnCps2OZ6GTHAbRJ0xYRbx9RRT+n/dkh0E7w4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717686211; c=relaxed/simple;
-	bh=xqEgjvYGXGrNumAT0Fkq0aykzig6+28oZTY3mAVDAwc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QhZQy8qrMjosfCd9wQ8S1vU16Kz6FxwjzL1t+toYwd6L2DIYjVHHLwva2GysLt7EegK3YuJMh4KLs1Wp/qX+dnYacjhMUvIkTUzPTJ+1D3YWoJUDAb84pV54hz191ppWh4KVfMbHlXIGI3NRU06bRDXJLG4wFpH9yrbK1DjEDFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TO8KEY3g; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7024cd9dd3dso876899b3a.3
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 08:03:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717686209; x=1718291009; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8jwC5YEDMskJq3diNklq/1nR6Hy9TYkeOXFQhqyPobY=;
-        b=TO8KEY3gWQCwagUX14eRU8n6eNnfu7PlM7Clg4IEhzYWqlvqPGpeiGmmQYrlqTK9jE
-         j0RU2/WQytLHYwXNiIYe+/KMlojXv56lBNu0A7EK2rB0nCl3FV3/cD8D3kNq0RnoxBor
-         EX2UbPIb3PtYfanxBG9FZNj6g9dnf0YuRtyyHrlE/d5ZNz1KapLPfDbUt2sGlsiXh0C8
-         z1XZv6YhmesmIS4cfXKtiDQpwNKas0b+u7/z9SRRX4kbOv2PVcO3JiRkdi+vO7pMnvWU
-         QwWy7ZlnXmRmsniVxNtDec1ONaNxxViK8B5kX9ObhxgWAweywYI6i/SNd6B/KthxMCGQ
-         Cbmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717686209; x=1718291009;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8jwC5YEDMskJq3diNklq/1nR6Hy9TYkeOXFQhqyPobY=;
-        b=lWQ4OrUW1kLPB8kGVFAR6ldFa/IEVKA08B9XT+dU/ukwLhD/oQNNb+wdEolrcR66A8
-         Zdm0aFh33467zNQOPXBy6jbuP/NtYOJFL/qLiXXACnU63nXDCgtSmyQO5v1FkGAKXKBn
-         Gv6In4NpcsGuOkTR/bwO+P3eLsB5JVAOCt8G3biuJ4zUJUz1dcBCAIzyH97JFePrIs0h
-         bnz2JqPhItpF2nntgIrwtJkR6BRx64V3yZDxLkbaZ3SR9hBOFDm43/DiW55DHCVdQcwT
-         6islhOgkg4008tKmZj4GjdQnF+uG+QQawz+aQex0FrN2mbBBO4TnjRwoZZsiC/6THykH
-         E5xg==
-X-Gm-Message-State: AOJu0YwYtlHs3kgjOcAaLeWqftu+twA2RCa8SYA32QL6TBVg1BdsicOx
-	dcVj/Qh74eGaNPQvYdFn0kStKHaNDiPg5esfWT64DyT6KtJdFeKt
-X-Google-Smtp-Source: AGHT+IHuZBaGeY0uixRNmsDOro3RnfvbRr9VDJukjHR0msFIHJok6h2jUDvWiYdrdRTVVJktxwpmVw==
-X-Received: by 2002:a05:6a20:2447:b0:1b0:25b6:a749 with SMTP id adf61e73a8af0-1b2b70fd7aamr6068451637.48.1717686208875;
-        Thu, 06 Jun 2024 08:03:28 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([111.201.28.17])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6de264ae03csm1215853a12.68.2024.06.06.08.03.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jun 2024 08:03:28 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	ncardwell@google.com
-Cc: netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next 2/2] tcp: fix showing wrong rtomin in snmp file when setting sysctl_tcp_rto_min_us
-Date: Thu,  6 Jun 2024 23:03:07 +0800
-Message-Id: <20240606150307.78648-3-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240606150307.78648-1-kerneljasonxing@gmail.com>
-References: <20240606150307.78648-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1717686360; c=relaxed/simple;
+	bh=Cx1ASgr5Lh9FnhS81vNXx9ifwngxlnqb6mSkxtlQWLo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KoZiv1i5U2riKVY3i8WIifRLxOqXqz0iXpDceKtP3TNM3hK8yFXFOCdCjrUBSuxkz9iIT1i3aj+zet4CYsJROnOaznuXkM/hdShPK09tYWFTPct9kf77kHnRaOji54TV6z7oaUrBsgGAVIQDf8qUJy4/BVWrDDMi1SYFkH0unkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LJE2V8YE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DE65C32786;
+	Thu,  6 Jun 2024 15:05:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717686359;
+	bh=Cx1ASgr5Lh9FnhS81vNXx9ifwngxlnqb6mSkxtlQWLo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LJE2V8YEAvQg7dOKXsKEM5ZXvqkbYqfFpDavrIE6ibwGQcnoFfSGpEp8uH6O2dBXh
+	 ry6vAyt/lvcu4dyXJSiclI99AznFEB4pNXp6HGBksXMOjk30byH8gnCE5AR7SIVNSO
+	 Kg0dl7aWs5jSK0RUeDauQN0Ju+JQ+594Y3sUss5DvrhtJEsIO+8NAKaHnc/qONUpy6
+	 QVyI5Tz4Lqwh7/c3aVSsFsSevkBTGQbRV5t4hOIerNIAtSSu/LDA5j+SLQmBfCxJdI
+	 0p31Li9bp4O9xYsLd+rxa4GxL2m314+VzaGe2Q1k0q23qZ3DaiXKR2PQVg7zZ++SsW
+	 aMc6qVH8HvpOg==
+Date: Thu, 6 Jun 2024 08:05:57 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: David Ahern <dsahern@kernel.org>, Dan Williams
+ <dan.j.williams@intel.com>, Jonathan Corbet <corbet@lwn.net>, Itay Avraham
+ <itayavr@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Andy Gospodarek
+ <andrew.gospodarek@broadcom.com>, Aron Silverton
+ <aron.silverton@oracle.com>, Christoph Hellwig <hch@infradead.org>, Jiri
+ Pirko <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>, Leon Romanovsky
+ <leonro@nvidia.com>, linux-cxl@vger.kernel.org, patches@lists.linux.dev
+Subject: Re: [PATCH 0/8] Introduce fwctl subystem
+Message-ID: <20240606080557.00f3163e@kernel.org>
+In-Reply-To: <20240606144818.GC19897@nvidia.com>
+References: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+	<20240603114250.5325279c@kernel.org>
+	<214d7d82-0916-4c29-9012-04590e77df73@kernel.org>
+	<20240604070451.79cfb280@kernel.org>
+	<665fa9c9e69de_4a4e62941e@dwillia2-xfh.jf.intel.com.notmuch>
+	<20240605135911.GT19897@nvidia.com>
+	<d97144db-424f-4efd-bf10-513a0b895eca@kernel.org>
+	<20240606071811.34767cce@kernel.org>
+	<20240606144818.GC19897@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Jason Xing <kernelxing@tencent.com>
+On Thu, 6 Jun 2024 11:48:18 -0300 Jason Gunthorpe wrote:
+> > An argument can be made that given somewhat mixed switchdev experience
+> > we should just stay out of the way and let that happen. But just make
+> > that argument then, instead of pretending the use of this API will be
+> > limited to custom very vendor specific things.  
+> 
+> Huh?
 
-A few days ago, sysctl_tcp_rto_min_us has been introduced to allow user to
-tune the rto min value per netns. But the RtoMin field in /proc/net/snmp
-should have been adjusted accordingly. Or else, it will show 200 which is
-TCP_RTO_MIN.
+I'm sorry, David as been working in netdev for a long time.
+I have a tendency to address the person I'm replying to,
+assuming their level of understanding of the problem space.
+Which makes it harder to understand for bystanders.
 
-This patch can show the correct value even when user sets though using both
-'ip route' and 'sysctl -w'. The priority from high to low like what
-tcp_rto_min() shows to us is:
-1) ip route option rto_min
-2) icsk->icsk_rto_min
+> At least mlx5 already has a very robust userspace competition to
+> switchdev using RDMA APIs, available in DPDK. This is long since been
+> done and is widely deployed.
 
-Fixes: f086edef71be ("tcp: add sysctl_tcp_rto_min_us")
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- net/ipv4/proc.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+Yeah, we had this discussion multiple times
 
-diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
-index ce387081a3c9..4aeef3118442 100644
---- a/net/ipv4/proc.c
-+++ b/net/ipv4/proc.c
-@@ -409,6 +409,19 @@ static int snmp_seq_show_ipstats(struct seq_file *seq, void *v)
- 	return 0;
- }
- 
-+static void snmp_seq_show_tcp_rtomin(struct seq_file *seq, struct net *net,
-+				     unsigned long val)
-+{
-+	int sysctl_rtomin = READ_ONCE(net->ipv4.sysctl_tcp_rto_min_us);
-+
-+	if (tcp_rtax_rtomin)
-+		seq_printf(seq, " %u", tcp_rtax_rtomin);
-+	else if (sysctl_rtomin != jiffies_to_usecs(TCP_RTO_MIN))
-+		seq_printf(seq, " %lu", usecs_to_jiffies(sysctl_rtomin));
-+	else
-+		seq_printf(seq, " %lu", val);
-+}
-+
- static int snmp_seq_show_tcp_udp(struct seq_file *seq, void *v)
- {
- 	unsigned long buff[TCPUDP_MIB_MAX];
-@@ -429,8 +442,7 @@ static int snmp_seq_show_tcp_udp(struct seq_file *seq, void *v)
- 		if (snmp4_tcp_list[i].entry == TCP_MIB_MAXCONN)
- 			seq_printf(seq, " %ld", buff[i]);
- 		else if (snmp4_tcp_list[i].entry == TCP_MIB_RTOMIN)
--			seq_printf(seq, " %lu",
--				   tcp_rtax_rtomin ? tcp_rtax_rtomin : buff[i]);
-+			snmp_seq_show_tcp_rtomin(seq, net, buff[i]);
- 		else
- 			seq_printf(seq, " %lu", buff[i]);
- 	}
--- 
-2.37.3
+> I have no idea where you get this made up idea that fwctl is somehow
+> about dataplane SDKs. The acclerated networking industry long ago
+> moved pasted netdev in upstream, it is well known to everyone. There
+> is no trick here.
+> 
+> fwctl is not some scheme to sneak dataplane SDKs into the kernel, you
+> are just making stuff up.
 
+By dataplane SDK you mean DOCA? I don't even want to go there.
+I just meant forwarding offload _which I said_. You didn't understand
+and now you're accusing me of "making stuff up".
+
+This whole conversation is such a damn waste of time.
 
