@@ -1,91 +1,183 @@
-Return-Path: <netdev+bounces-101619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C76618FF973
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 02:58:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDCE08FF976
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 03:02:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0C6D1C20A44
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 00:58:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5AE621F2556D
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 01:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70CE29443;
-	Fri,  7 Jun 2024 00:56:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05416C8CE;
+	Fri,  7 Jun 2024 01:02:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NIrvQ933"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="sr5yhIAG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2B72F37
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 00:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821D979DC
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 01:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717721796; cv=none; b=LYVzAO0/yDI/jIVN0uiDwHkxJP9gxGy0xLnszaPH25iINKWsrPrx0Yhio8fHpseUMeGe2QXTDa6R/pjZqup3+jKTe6UDlYhaNkjVn14f31+JR3wKcHZ3Zk9oM7ZX//HzCyroo9ENsIIfIe9pPPTQg4Fcp4Qh9Wm3JazzJjK+Q9Q=
+	t=1717722133; cv=none; b=U9bgFb499arKk7e5LNFt2kuoKyVd8q2RZ4D5vYi/28j56/34LTqQ4cVrfcKGqTsQrX70qe+zhyeywommMPMqfW4+ZDFFsIEqBksQPhoLkOyxOF07QAv5zGwO34PJSeECIWaOfdAxMEPpDsaKfbjC8YuuYgNyp7t6n68iUfPKqKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717721796; c=relaxed/simple;
-	bh=4zIN6yVfkke/97buSvUvyXvnBSv3QZEJepXEyHp1p0Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ozPsw2BAEE93pdDxWiqwOwPISNWPWMNqdL9v0O9DyFZo/fqlKK4pWUKp0w1rnUD4scvNdRwtzJoDO9z3q6rzgL8xekjn1HWJwEXl9Hf+U0oM8ekitXKEW12Fxf8DeRSXMt5cFzU6gCBqU6dqTJzG2Yw44/fBmarZ9fbFCu2h4Aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NIrvQ933; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89312C2BD10;
-	Fri,  7 Jun 2024 00:56:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717721795;
-	bh=4zIN6yVfkke/97buSvUvyXvnBSv3QZEJepXEyHp1p0Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NIrvQ933HjuuB+DYpKLT2KAAiM8/CSQhTLhhruqzn09qUeyL2fipROZOLClEBar//
-	 KaBxAwhPCwUTB+qZVgrMeFngxfy1S7zZ3dAJhphmqib3XFie/G3VIeVlJpJ+T/MlW/
-	 d2dXulkFKQkIFNZxrKewW6Jq8N51AIToK9GKe7BmWbNa5WsLbsRvvus7L7K7a29QdI
-	 GZ0VEiAYCeb2zeJVlub5B8rRPvQd8D/CzOxzxrCUseVhA8uHeO4QxQsrNW49NgEk+c
-	 qrDp1pbT49b783Fq8bvAUzkBMueFrOhQWe14H3XQ+qIMlhRY9Ugo08WBpGOreJwZpK
-	 qMY1JT22opwWw==
-Date: Thu, 6 Jun 2024 17:56:34 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: netdev <netdev@vger.kernel.org>, David Miller <davem@davemloft.net>,
- Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, Sujai Buvaneswaran
- <sujai.buvaneswaran@intel.com>, Jiri Pirko <jiri@resnulli.us>
-Subject: Re: [PATCH v2 3/7] ice: move devlink locking outside the port
- creation
-Message-ID: <20240606175634.2e42fca8@kernel.org>
-In-Reply-To: <20240605-next-2024-06-03-intel-next-batch-v2-3-39c23963fa78@intel.com>
-References: <20240605-next-2024-06-03-intel-next-batch-v2-0-39c23963fa78@intel.com>
-	<20240605-next-2024-06-03-intel-next-batch-v2-3-39c23963fa78@intel.com>
+	s=arc-20240116; t=1717722133; c=relaxed/simple;
+	bh=PymsS2+bwa3WplcCpWVaQsEHbhZcs6L5674DPfMY+OQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JVf6yg4VG1i4ERFZbyFlMs/UutNgbiXAnkUesbMeSOsDur9VTWzXtA0F7wsx8KlqxSkqmil2tNFDWltgrT6vqBrCPtsCLfHygqHxxQYPdYezhUojE9zYPn9UfQD50zNXEtHKFpfCUjnxFAuKFqfDualtHcPKK67DlGVnsrGVoo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=sr5yhIAG; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1f4a5344ec7so12123545ad.1
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 18:02:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1717722132; x=1718326932; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KUNbkcgn6ZFtJ0WPgugUHBmOtaRPBWaMM6dzuoXYIbI=;
+        b=sr5yhIAG41GN4+pdf9DWdTTx7BtQy9T6R28WJo9yWNGkmtPBmURrhnXyxSfQn8/977
+         wXzSmaM6EIGVX89LBnUXhcZ1qmP7I4abFTKNX3KFGgvdKHjEXiH3xdiHEvAmhHWjZ+DC
+         ALHP+Gw51FXCxYUhAW/J2LsI65mtKSs0C4g2I=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717722132; x=1718326932;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KUNbkcgn6ZFtJ0WPgugUHBmOtaRPBWaMM6dzuoXYIbI=;
+        b=ECE2LhWWKMPyHEBXQk48pAZYiL94D07pRcoCZ6delg6MB6/VI9YA69uxThmufifo/v
+         1QGsOQBBbzReeKIjwu0TiEGXXlt4H1HIactxR+kQ8tXywYlBisN49zqK3b7v/Be6xBGf
+         uD6k7KsqhM1JMcmSjeD1oxj85dAoTuY9wBJZZ2okezE6PLWKLJB/l/LBjS+1X89Oh9p4
+         ZQke0tmb1eb6jTDejVma2WASnusrz36NtLJOBYkWugCP2HBuE78tFyZYIiANrGPG95ay
+         iuhThzewV+WOoB5n84kBdgpcHDFKI+J5aKTmv8ssFFEOyPZQ6c8mbi1Hj2+dbQYb4GnN
+         x+/g==
+X-Forwarded-Encrypted: i=1; AJvYcCXOz4yP/1Hgt/cNyK+Npi7vivPJfiRMwOI3Kn0CaksB1PvfFNsInLcbRQBQ8M7LBvYHXCeB35ecHgZC659FU8JmH8XABKcA
+X-Gm-Message-State: AOJu0YzHERmqXY2cAmMmSXMAX6yx4kUkLmDbJDSDwAc77AJH+hdg8Ljj
+	5kLLQeR40AgtkgATkJ1bEFYZCwEralYISltzISzg8CW40r75+yGkzSJpLtToCOg=
+X-Google-Smtp-Source: AGHT+IFcBgdym20higsdPt+vBoI3sriQzqsZZxnlyi7NoJdl0XPH6dDC05Y4UuIX+LgQAMe7MRTE8g==
+X-Received: by 2002:a17:902:d2d2:b0:1f6:6c39:9714 with SMTP id d9443c01a7336-1f6b8f08786mr57694725ad.21.1717722131413;
+        Thu, 06 Jun 2024 18:02:11 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd76bf66sm21602655ad.104.2024.06.06.18.02.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jun 2024 18:02:11 -0700 (PDT)
+Date: Thu, 6 Jun 2024 18:02:08 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tariq Toukan <ttoukan.linux@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, nalramli@fastly.com,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [RFC net-next v4 2/2] net/mlx5e: Add per queue netdev-genl stats
+Message-ID: <ZmJcEM7brxivyDUV@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Tariq Toukan <ttoukan.linux@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, nalramli@fastly.com,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>
+References: <20240604004629.299699-1-jdamato@fastly.com>
+ <20240604004629.299699-3-jdamato@fastly.com>
+ <11b9c844-a56e-427f-aab3-3e223d41b165@gmail.com>
+ <ZmIwIJ9rxllqQT18@LQ3V64L9R2>
+ <20240606171942.4226a854@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240606171942.4226a854@kernel.org>
 
-On Wed, 05 Jun 2024 13:40:43 -0700 Jacob Keller wrote:
-> From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+On Thu, Jun 06, 2024 at 05:19:42PM -0700, Jakub Kicinski wrote:
+> On Thu, 6 Jun 2024 14:54:40 -0700 Joe Damato wrote:
+> > > > Compare the values in /proc/net/dev match the output of cli for the same
+> > > > device, even while the device is down.
+> > > > 
+> > > > Note that while the device is down, per queue stats output nothing
+> > > > (because the device is down there are no queues):  
+> > > 
+> > > This part is not true anymore.  
+> > 
+> > It is true with this patch applied and running the command below.
+> > Maybe I should have been more explicit that using cli.py outputs []
+> > when scope = queue, which could be an internal cli.py thing, but
+> > this is definitely true with this patch.
+> > 
+> > Did you test it and get different results?
 > 
-> In case of subfunction lock will be taken for whole port creation. Do
-> the same in VF case.
+> To avoid drivers having their own interpretations what "closed" means,
+> core hides all queues in closed state:
+> 
+> https://elixir.bootlin.com/linux/v6.10-rc1/source/net/core/netdev-genl.c#L582
+> 
+> > > PTP RQ index is naively assigned to zero:
+> > > rq->ix           = MLX5E_PTP_CHANNEL_IX;
+> > > 
+> > > but this isn't to be used as the stats index.
+> > > Today, the PTP-RQ has no matcing rxq in the kernel level.
+> > > i.e. turning PTP-RQ on won't add a kernel-level RXQ to the
+> > > real_num_rx_queues.
+> > > Maybe we better do.
+> > > If not, and the current state is kept, the best we can do is let the PTP-RQ
+> > > naively contribute its queue-stat to channel 0.  
+> > 
+> > OK, it sounds like the easiest thing to do is just count PTP as
+> > channel 0, so if i == 0, I'll in the PTP stats.
+> > 
+> > But please see below regarding testing whether or not PTP is
+> > actually enabled or not.
+> 
+> If we can I think we should avoid making queue 0 too special. 
+> If someone configures steering and only expects certain packets on
+> queue 0 - getting PTP counted there will be a surprise. 
+> I vote to always count it towards base.
 
-No interactions with other locks worth mentioning?
+I'm OK with reporting PTP RX in base and only in base.
 
-> diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> index 704e9ad5144e..f774781ab514 100644
-> --- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> +++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> @@ -794,10 +794,8 @@ int ice_devlink_rate_init_tx_topology(struct devlink *devlink, struct ice_vsi *v
->  
->  	tc_node = pi->root->children[0];
->  	mutex_lock(&pi->sched_lock);
-> -	devl_lock(devlink);
->  	for (i = 0; i < tc_node->num_children; i++)
->  		ice_traverse_tx_tree(devlink, tc_node->children[i], tc_node, pf);
-> -	devl_unlock(devlink);
->  	mutex_unlock(&pi->sched_lock);
+But, that would then leave PTP TX:
 
-Like this didn't use to cause a deadlock?
+PTP TX stats are reported in mlx5e_get_queue_stats_tx because
+the user will pass in an 'i' which refers to the PTP txq. This works
+fine with the mlx5e_get_queue_stats_tx code as-is because the PTP
+txqs are mapped in the new priv->txq2sq_stats array.
 
-Seems ice_devlink_rate_node_del() takes this lock and it's already
-holding the devlink instance lock.
+However.... if PTP is enabled and then disabled by the user, that
+leaves us in this state:
+
+  priv->tx_ptp_opened && !test_bit(MLX5E_PTP_STATE_TX, channels.ptp->state) 
+
+e.g. PTP TX was opened at some point but is currently disabled as
+the bit is unset.
+
+In this case, when the txq2sq_stats map is built, it'll exclude PTP
+stats struct from that mapping if MLX5E_PTP_STATE_TX is not set.
+
+So, in this case, the stats have to be reported in base with
+something like this (psuedo code):
+ 
+  if (priv->tx_ptp_opened &&
+     ! test_bit(MLX5E_PTP_STATE_TX, channels.ptp->state)) {
+      for (tc = 0; tc < priv->channels.ptp->num_tc; tc++) {
+         tx->packets += ...ptp_stats.sq[tc].packets;
+         tx->bytes += ...ptp_stats.sq[tc].bytes;
+      }
+  }
+
+Right? Or am I just way off here?
 
