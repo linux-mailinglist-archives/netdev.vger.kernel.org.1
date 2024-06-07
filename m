@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-101766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EADA90001B
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:02:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 639FF900019
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:02:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06923289195
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:02:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64F7D1C21CA2
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264DB15D5C3;
-	Fri,  7 Jun 2024 10:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0AA215D5B2;
+	Fri,  7 Jun 2024 10:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="PHFZ1N+t"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="WJ7M78dp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7CA15CD7D;
-	Fri,  7 Jun 2024 10:00:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D3115749A;
+	Fri,  7 Jun 2024 10:00:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717754460; cv=none; b=bDvxkXF9tdAGIG6q/dJFN8U07hUc7eOtY4cnMlSFvyxNvbmx4GgqbcByxNhlth0cmompuV2Ew/lyV+/LeL0U1O+OpEJgjb77gnqnyPIAn7VXtB41Pu3y+gaLmP5GP7PUfIenRKK0nzFYkH526CrtFIEt12gNSSR5RMk6FARmGvw=
+	t=1717754459; cv=none; b=k0c3z+v5//iTh8JdUMevEsE+LGGxwunqtxfn3v4JYxoCUTBuoWzVqaiMFGFKrQMlBh5ta6NSCA2Pj4a8PWmtg06LFsQ5iixfRHnA9d6u0baoSclY3OVmOb9QVxcdOo7tbotW1sKUgCyVZ958utJtIZoW7LwUwTMNuv5ilJb1QLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717754460; c=relaxed/simple;
-	bh=Goiu04tc2COWbv3MBLvmACwB631+sw/JwUriPCVXLz8=;
+	s=arc-20240116; t=1717754459; c=relaxed/simple;
+	bh=LxdLgGqPLf3s+kJUNXVv8BMrS7yHp/8IVNCuj2Iw0i4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TbAR1HsYI9881Yi6keUf5ULK3SPtWxWVUXPSodVvYSVBLTNi7ZIaUrHVNVBESTtZcjJ1Zjzy9cF7LXGDv6pj905g94c7qBBhrJ3ioxPppDt2otK7gA4/H9ONzUP+CUPeXEsdJU/XtlGLLQcL7yhckwHu/kVloxsmEyLM/IqXLcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=PHFZ1N+t; arc=none smtp.client-ip=91.207.212.93
+	 MIME-Version:Content-Type; b=ePDcY86tBiWU6Cq9f3rPL5hYBo9eJj4UesuJ6Qbb8e/Iks7JXM3Id72iUdBvGHCKozEydvPGLqq2YUthdp4cWV4znzZG5c4uPF371QDu2yC1fRm5JddQUpni+Pv/j4b/OB/cv7oYeHZagYxBeXibaOBa4wMr1oVNK3Mm0XTLPlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=WJ7M78dp; arc=none smtp.client-ip=91.207.212.93
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45791m44009520;
+Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45791dBJ002305;
 	Fri, 7 Jun 2024 12:00:35 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	1C54Z0DoOr3DgKzs0LAeK461GnGKNlUpIDnohi91J2c=; b=PHFZ1N+tQh5vcn17
-	WHpZJim58x8PWQgdZ1UQRkgqLDbUKZsex4t61JprCKiICTCy+c1yP8q4vqKbtXCt
-	yfdYwUaxgRGuPLtjxkBi/SHfFZOVa0Qz0SoW7VjE+GLBGQb2msqmxvCSUs0hwKfP
-	udJLmZR607oVDD8J+TpqLErL8XqSUI5l/AXANjwYYEMySKNEDjYEkRpGIEzSmvU1
-	133X3d1u7NjqJRAU80D389OxRwMrtYWHnhrVZ/Jf1XdFNYZ9c6zl9bXjRMiUB37z
-	p4igdrlmFVg3EeZ5m1jgHNNLdXAJ6mE7hVATMyJtaeMYck1xFFkvCEBDPu7oJYhq
-	5xsRrA==
+	I5eX1MiABAjtTHnD8DpDo4CymvKlEhXxzp8S24yq7DA=; b=WJ7M78dp/FboYY7x
+	k+ktG3Zxr1+h2Rb89+cuENHIKhWeCbpsz/3fmHL2LdyyZ8dcocNOygIYhc7iB7CF
+	730ysypsoRx1TnDv1VCSGqS4/bWVJqeR8NI/atQjU2jayD2GIT6cdvZ+KLwetRnq
+	9No1oAyDbKKvQ8e5PBt19VVh0iLSQsyas2TGTUDPvEXQOBBSFuSGjxP80wXuASfk
+	znGaKzmI8Tb0i6guNCDcMXipdsau1mcnJcv6EbdJlSAY+RLAQOH8DvIjSSYjFBVh
+	rQ10wN9sERMXn30Bexrvgkm8V9iuu3T/ATZMhjxPmCdp2Jgdh6aDM+Fkr5ZNSKj8
+	pzTe1Q==
 Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yfw91swjm-1
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ygekj86cu-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Fri, 07 Jun 2024 12:00:35 +0200 (MEST)
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 1B38B40048;
-	Fri,  7 Jun 2024 12:00:31 +0200 (CEST)
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id F0E5140045;
+	Fri,  7 Jun 2024 12:00:30 +0200 (CEST)
 Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 450B4214D13;
-	Fri,  7 Jun 2024 11:59:17 +0200 (CEST)
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 24D76214D14;
+	Fri,  7 Jun 2024 11:59:18 +0200 (CEST)
 Received: from localhost (10.252.19.205) by SHFDAG1NODE2.st.com (10.75.129.70)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 7 Jun
- 2024 11:59:16 +0200
+ 2024 11:59:17 +0200
 From: Christophe Roullier <christophe.roullier@foss.st.com>
 To: "David S . Miller" <davem@davemloft.net>,
         Eric Dumazet
@@ -80,9 +80,9 @@ To: "David S . Miller" <davem@davemloft.net>,
 CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-stm32@st-md-mailman.stormreply.com>,
         <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v5 08/12] net: stmmac: dwmac-stm32: add management of stm32mp13 for stm32
-Date: Fri, 7 Jun 2024 11:57:50 +0200
-Message-ID: <20240607095754.265105-9-christophe.roullier@foss.st.com>
+Subject: [PATCH v5 09/12] ARM: dts: stm32: add ethernet1 and ethernet2 support on stm32mp13
+Date: Fri, 7 Jun 2024 11:57:51 +0200
+Message-ID: <20240607095754.265105-10-christophe.roullier@foss.st.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240607095754.265105-1-christophe.roullier@foss.st.com>
 References: <20240607095754.265105-1-christophe.roullier@foss.st.com>
@@ -100,79 +100,111 @@ X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
  definitions=2024-06-07_04,2024-06-06_02,2024-05-17_01
 
-Add Ethernet support for STM32MP13.
-STM32MP13 is STM32 SOC with 2 GMACs instances.
+Both instances ethernet based on GMAC SNPS IP on stm32mp13.
 GMAC IP version is SNPS 4.20.
-GMAC IP configure with 1 RX and 1 TX queue.
-DMA HW capability register supported
-RX Checksum Offload Engine supported
-TX Checksum insertion supported
-Wake-Up On Lan supported
-TSO supported
 
 Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
 ---
- .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 24 +++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+ arch/arm/boot/dts/st/stm32mp131.dtsi | 38 ++++++++++++++++++++++++++++
+ arch/arm/boot/dts/st/stm32mp133.dtsi | 31 +++++++++++++++++++++++
+ 2 files changed, 69 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-index 96ba7bc73e823..064f73cbe3b45 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-@@ -104,6 +104,7 @@ struct stm32_ops {
- 	int (*parse_data)(struct stm32_dwmac *dwmac,
- 			  struct device *dev);
- 	bool clk_rx_enable_in_suspend;
-+	bool is_mp13;
- 	u32 syscfg_clr_off;
- };
+diff --git a/arch/arm/boot/dts/st/stm32mp131.dtsi b/arch/arm/boot/dts/st/stm32mp131.dtsi
+index 6704ceef284d3..e1a764d269d27 100644
+--- a/arch/arm/boot/dts/st/stm32mp131.dtsi
++++ b/arch/arm/boot/dts/st/stm32mp131.dtsi
+@@ -979,6 +979,12 @@ ts_cal1: calib@5c {
+ 			ts_cal2: calib@5e {
+ 				reg = <0x5e 0x2>;
+ 			};
++			ethernet_mac1_address: mac1@e4 {
++				reg = <0xe4 0x6>;
++			};
++			ethernet_mac2_address: mac2@ea {
++				reg = <0xea 0x6>;
++			};
+ 		};
  
-@@ -224,11 +225,18 @@ static int stm32mp1_configure_pmcr(struct plat_stmmacenet_data *plat_dat)
- {
- 	struct stm32_dwmac *dwmac = plat_dat->bsp_priv;
- 	u32 reg = dwmac->mode_reg;
--	int val;
-+	int val = 0;
+ 		etzpc: bus@5c007000 {
+@@ -1505,6 +1511,38 @@ sdmmc2: mmc@58007000 {
+ 				status = "disabled";
+ 			};
  
- 	switch (plat_dat->mac_interface) {
- 	case PHY_INTERFACE_MODE_MII:
--		val = SYSCFG_PMCR_ETH_SEL_MII;
-+		/*
-+		 * STM32MP15xx supports both MII and GMII, STM32MP13xx MII only.
-+		 * SYSCFG_PMCSETR ETH_SELMII is present only on STM32MP15xx and
-+		 * acts as a selector between 0:GMII and 1:MII. As STM32MP13xx
-+		 * supports only MII, ETH_SELMII is not present.
-+		 */
-+		if (!dwmac->ops->is_mp13)  /* Select MII mode on STM32MP15xx */
-+			val |= SYSCFG_PMCR_ETH_SEL_MII;
- 		break;
- 	case PHY_INTERFACE_MODE_GMII:
- 		val = SYSCFG_PMCR_ETH_SEL_GMII;
-@@ -560,12 +568,24 @@ static struct stm32_ops stm32mp1_dwmac_data = {
- 	.resume = stm32mp1_resume,
- 	.parse_data = stm32mp1_parse_data,
- 	.syscfg_clr_off = 0x44,
-+	.is_mp13 = false,
-+	.clk_rx_enable_in_suspend = true
-+};
++			ethernet1: ethernet@5800a000 {
++				compatible = "st,stm32mp13-dwmac", "snps,dwmac-4.20a";
++				reg = <0x5800a000 0x2000>;
++				reg-names = "stmmaceth";
++				interrupts-extended = <&intc GIC_SPI 62 IRQ_TYPE_LEVEL_HIGH>,
++						      <&exti 68 1>;
++				interrupt-names = "macirq", "eth_wake_irq";
++				clock-names = "stmmaceth",
++					      "mac-clk-tx",
++					      "mac-clk-rx",
++					      "ethstp",
++					      "eth-ck";
++				clocks = <&rcc ETH1MAC>,
++					 <&rcc ETH1TX>,
++					 <&rcc ETH1RX>,
++					 <&rcc ETH1STP>,
++					 <&rcc ETH1CK_K>;
++				st,syscon = <&syscfg 0x4 0xff0000>;
++				snps,mixed-burst;
++				snps,pbl = <2>;
++				snps,axi-config = <&stmmac_axi_config_1>;
++				snps,tso;
++				access-controllers = <&etzpc 48>;
++				status = "disabled";
 +
-+static struct stm32_ops stm32mp13_dwmac_data = {
-+	.set_mode = stm32mp1_set_mode,
-+	.suspend = stm32mp1_suspend,
-+	.resume = stm32mp1_resume,
-+	.parse_data = stm32mp1_parse_data,
-+	.syscfg_clr_off = 0x08,
-+	.is_mp13 = true,
- 	.clk_rx_enable_in_suspend = true
++				stmmac_axi_config_1: stmmac-axi-config {
++					snps,blen = <0 0 0 0 16 8 4>;
++					snps,rd_osr_lmt = <0x7>;
++					snps,wr_osr_lmt = <0x7>;
++				};
++			};
++
+ 			usbphyc: usbphyc@5a006000 {
+ 				#address-cells = <1>;
+ 				#size-cells = <0>;
+diff --git a/arch/arm/boot/dts/st/stm32mp133.dtsi b/arch/arm/boot/dts/st/stm32mp133.dtsi
+index 3e394c8e58b92..73e470019ce42 100644
+--- a/arch/arm/boot/dts/st/stm32mp133.dtsi
++++ b/arch/arm/boot/dts/st/stm32mp133.dtsi
+@@ -68,4 +68,35 @@ channel@18 {
+ 			};
+ 		};
+ 	};
++
++	ethernet2: ethernet@5800e000 {
++		compatible = "st,stm32mp13-dwmac", "snps,dwmac-4.20a";
++		reg = <0x5800e000 0x2000>;
++		reg-names = "stmmaceth";
++		interrupts-extended = <&intc GIC_SPI 97 IRQ_TYPE_LEVEL_HIGH>;
++		interrupt-names = "macirq";
++		clock-names = "stmmaceth",
++			      "mac-clk-tx",
++			      "mac-clk-rx",
++			      "ethstp",
++			      "eth-ck";
++		clocks = <&rcc ETH2MAC>,
++			 <&rcc ETH2TX>,
++			 <&rcc ETH2RX>,
++			 <&rcc ETH2STP>,
++			 <&rcc ETH2CK_K>;
++		st,syscon = <&syscfg 0x4 0xff000000>;
++		snps,mixed-burst;
++		snps,pbl = <2>;
++		snps,axi-config = <&stmmac_axi_config_2>;
++		snps,tso;
++		access-controllers = <&etzpc 49>;
++		status = "disabled";
++
++		stmmac_axi_config_2: stmmac-axi-config {
++			snps,blen = <0 0 0 0 16 8 4>;
++			snps,rd_osr_lmt = <0x7>;
++			snps,wr_osr_lmt = <0x7>;
++		};
++	};
  };
- 
- static const struct of_device_id stm32_dwmac_match[] = {
- 	{ .compatible = "st,stm32-dwmac", .data = &stm32mcu_dwmac_data},
- 	{ .compatible = "st,stm32mp1-dwmac", .data = &stm32mp1_dwmac_data},
-+	{ .compatible = "st,stm32mp13-dwmac", .data = &stm32mp13_dwmac_data},
- 	{ }
- };
- MODULE_DEVICE_TABLE(of, stm32_dwmac_match);
 -- 
 2.25.1
 
