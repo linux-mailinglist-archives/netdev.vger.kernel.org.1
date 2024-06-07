@@ -1,218 +1,496 @@
-Return-Path: <netdev+bounces-101724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E23C8FFE10
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:33:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C0CC8FFE0F
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:33:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4B2B1F2247F
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 08:33:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D2121C20F94
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 08:33:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2718D15B108;
-	Fri,  7 Jun 2024 08:33:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C1847A6B;
+	Fri,  7 Jun 2024 08:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="E+6pDkg7"
+	dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b="SQZzWcsQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mail.savoirfairelinux.com (mail.savoirfairelinux.com [208.88.110.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E00615AD9B;
-	Fri,  7 Jun 2024 08:33:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717749209; cv=fail; b=sMO59RBpZ5RzWuIjtySml9Df/Jh2hL4AluIg0AlVJkplS9Q7hEdBRqH0vjrm+P9DEB0PCvLwK+0xZaOiDIAu+DKja9dkGmtc5iCFO1XeZIfJzqODrB4m7AbPTCp984XEMZfkOq1z3bAsEs84KxQ0hBMdJ2+oeOyGkkGpCSFJZkY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717749209; c=relaxed/simple;
-	bh=70fIuuuF2riNxInrSvanvdK4hooldUF8yWAlJiYWGMM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=vGARg4ZL2hRacW/yvOgkqrH/QED3XPROmglOi/w1Mqa8CNqSrCCIlVLKV2VYo8efN5Gyy8dZiG+a73Wx0GKy+8GLCNvTqVZ0GKdQ81tQUmJf/hWmCDup6lIXvpCTmuapXq1GoAHA3rf7NMGzrly2tyzmaF4buE+rHl8zY/pXQaw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=E+6pDkg7; arc=fail smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4575BHLJ027639;
-	Fri, 7 Jun 2024 01:33:00 -0700
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2169.outbound.protection.outlook.com [104.47.59.169])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3ykuu20ft3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Jun 2024 01:32:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e9QHWn1Ls7dxtjLQLQ8M1wwi8hCgS6QZ0971AC5PneCmhKnvxR+JLT0lhBatUd3S2pkX05wQLo+bhctrw07MnUeyqrlLrwQoNo01/qqBltkiTUb0h1riWZBgR7W6D3H1eGoInBrRrWBUJiFgwT+gsZTZnlm/qJ/oTPuuRfd2czSLUUT35kjMqQ+3w37XeRlwvGL9Yf2LKsSEOwj4qe+f3GOFUriLwAYkt/b2Snr1uF+awc5H4ApBqPn3gWmWa9EHqqtn1vOgQKZWHgNEo/oSx6Y+EPW6YP3jtwKQM+vdK+SjSji3ZwyI/WjfFB7+hppcQuZ/S/XBu1rdWEnKieEtvg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=70fIuuuF2riNxInrSvanvdK4hooldUF8yWAlJiYWGMM=;
- b=fCPw4TGsuAcY3Ifzva/HNGoZ9hAdgJ6E1mUddyMTILQ5l6w0GNMAU+L3WMZDMdzRkghvFtKdCGlTHVNaSqTrvR/Cj0XhOsSA+ui4i2cIIXBeOYAb7486L1c2bKcfAs0vW7G6EMXXAg+lonU2OrKixn+b+9QydfyAHAQmu0Nprdm0qdtP0mjYyc+m//cskicE5euJyeb5XmovxvnzcABGI25EwICNYSfLL3wrrRACu+jsMlKCrTHuN0CyWJowI2LwFJI+GLcng6Y7qVtIscyDUCjFMVy0g4rV5VvMaBbF4jekreKxficURUkDyWkq7n7uZf5xcKSvGnQ7TLEqK+g5Vw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=70fIuuuF2riNxInrSvanvdK4hooldUF8yWAlJiYWGMM=;
- b=E+6pDkg7jRzK9A4/on8ITWk1FJtL+tEnONMPvOskntkVEPuUNg7cACSHdsikjwV98ao9QUtHmKvJlwU9DkWwUf9Q7CFmevOWCZNV9Xx1nasWZf2mCeSzhdIMq4b7yfFyq1W1V1vABB/KmZf0WrQOUR6YZxU6BuELuQ8HNOdhrsM=
-Received: from PH0PR18MB4474.namprd18.prod.outlook.com (2603:10b6:510:ea::22)
- by MW3PR18MB3500.namprd18.prod.outlook.com (2603:10b6:303:56::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.34; Fri, 7 Jun
- 2024 08:32:49 +0000
-Received: from PH0PR18MB4474.namprd18.prod.outlook.com
- ([fe80::ba6a:d051:575b:324e]) by PH0PR18MB4474.namprd18.prod.outlook.com
- ([fe80::ba6a:d051:575b:324e%4]) with mapi id 15.20.7633.021; Fri, 7 Jun 2024
- 08:32:49 +0000
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: =?utf-8?B?Q3PDs2vDoXMsIEJlbmNl?= <csokas.bence@prolan.hu>,
-        "imx@lists.linux.dev" <imx@lists.linux.dev>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
-        Clark
- Wang <xiaoning.wang@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>
-Subject: [PATCH v2] net: fec: Add ECR bit macros, fix FEC_ECR_EN1588 being
- cleared on link-down
-Thread-Topic: [PATCH v2] net: fec: Add ECR bit macros, fix FEC_ECR_EN1588
- being cleared on link-down
-Thread-Index: AQHauLVHxMAwfZ5cWEKU8wqwZe2dug==
-Date: Fri, 7 Jun 2024 08:32:48 +0000
-Message-ID: 
- <PH0PR18MB4474DC325887DE80C1A2D7F0DEFB2@PH0PR18MB4474.namprd18.prod.outlook.com>
-References: <20240607081855.132741-1-csokas.bence@prolan.hu>
-In-Reply-To: <20240607081855.132741-1-csokas.bence@prolan.hu>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR18MB4474:EE_|MW3PR18MB3500:EE_
-x-ms-office365-filtering-correlation-id: b099ec3b-e540-4248-db2c-08dc86cc6a19
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: 
- BCL:0;ARA:13230031|376005|7416005|1800799015|366007|38070700009;
-x-microsoft-antispam-message-info: 
- =?utf-8?B?VTh5Yk1Pekdic2Zncjl4THY4QTdOWWxKQ3pwTVlsbTZuUVlTQnM3ekpYUnhI?=
- =?utf-8?B?akRtd3kvMkFMYklCT1NhTU0vK0M4RFE4bFRNRGFweWVjQ28wZ242TFE5Q1Ex?=
- =?utf-8?B?RU1TOUo0ZmNuem9SNHZ4R05QMGtBN012bEhtQkpTcEJhUThIb3FtejdiTFQz?=
- =?utf-8?B?dUt4aGZwQnhaei8xTXBjU2laUUoya1crUlJNVHJyQm5zMkEwYktLVUlMaDRr?=
- =?utf-8?B?bStnZndMUmZ2STBQblhCcnB4UFdMRy8vQjNSLzVKc1E5WW53ZEFxZnE2Rlp2?=
- =?utf-8?B?dGl3K2NSNXc0emc1c3dscVlLeTNzcThzZjl6UnVRc2kyMFhTWHEyeGF1QnM1?=
- =?utf-8?B?eXIvV05aYWMzKytUamhiZi80YXdqMVZ3QXZGOHNnUG1xaXVGazI1MHhtQmg4?=
- =?utf-8?B?dnFqOEcwN1hEZ0Z0YkNocFNJaSthcElnTG9lT1BFTnhrQi9lSnBIQkhnSE96?=
- =?utf-8?B?bnlxN2g2SmFuRXVvTC84UEZONUp4TTFtY3o4bW1pRzdSbWlDME9ZeHpTdzRx?=
- =?utf-8?B?TTdZVlpIUXJ3Y0tNQzk0d3lrNk5wTXZVeUg0UEkvUzc5TW5Fa2RkU2VDWTRs?=
- =?utf-8?B?ZTJhZThwRDVwRjZ5blYvU0RmbHM5N2VHekRKSHovWGx3OWJ4blJFLzhMcUU3?=
- =?utf-8?B?SEx0aDVidUtDTi9yVHFSRnRBSmJnMzhFOHF3ZFFWaXZXWjVkRllJYXcxRTJV?=
- =?utf-8?B?TS8rVTg3L2lhaitsZzdtRC84Rjk0MW5lT1dlNnZ3dTNKdFQwWi9DMm4rTlJ5?=
- =?utf-8?B?UnAxQjBseUl1Zk1FYlZGQTRyOHpJVUFuUXZHN3I5T3h0L2lFVTNKczQyVGky?=
- =?utf-8?B?WThmM28vVlBvcVRpVmxiK0tCTXUzYjhhVWNZTDhBY1hSaUs5cERmYlBHVUN3?=
- =?utf-8?B?UUNJems1YkpDYTJVS2JqNnNrTENidU9UT1YwbmVvUWplSWRVNTlmTEJIRTJo?=
- =?utf-8?B?N2JSLzQ3WEZ4SUpSZ1dPZHl6RTV4alBVTUE3OHdYbk5UZHdmTnJZam9zSjBs?=
- =?utf-8?B?VTFRaUJsVEdnWmlzd2VLZHlVWkVyUFczanR2MWdIemR1dUFITEVzMFgxc3ZM?=
- =?utf-8?B?N3E3NlRIcW9sMGhiSUJ3K1pxT3hUWlBPSUpFeEhublZDTjFLSEpNOHBSRFEx?=
- =?utf-8?B?eUg2NC9CWUFjVFora2U0WlpsaC85TGRsMDJsdkRwRkgzSHc4Mk0vb1RFYnVS?=
- =?utf-8?B?WmtvNkVyM0p3OWh2QktWcU5tQ1pUUDlyT3NLODdtVWs4U0VUQmhtbnIrWEJ3?=
- =?utf-8?B?NzgrYnhFcFAvNWIrS1VvL29VSUI0cUhyYzk1eEdnc0ppNjlDWUZpWUpLTkI3?=
- =?utf-8?B?WnNsZStEVVZsNlVzL3lOSnVhK05EeUxScnFmTis4R2MzTmZiSTdRaHZPUjNq?=
- =?utf-8?B?KzhoY0Z0cVV5SW1xeGdoREhvQWtWV09NODJNVkFsUjUrYTFxaVE5Z0s5M3c0?=
- =?utf-8?B?Y3dFUENDKytNZnBKaytMcDB2QitIc2VxSXpRM0lGWFQ1M0d1NTZTOGRXdzcz?=
- =?utf-8?B?eWNLNWEwRWtGV2VuMmJWclRZYmJtTlpjMmZ6NTlYSXBkTys5YkJkS2QwemFL?=
- =?utf-8?B?OWlMdXhFU0NVa3grWU9EbnVwR09uanlPZUdZcWk3VFREQytDbDNQb0Q3aFVv?=
- =?utf-8?B?bEdUV1Q1TzFTcWNLaHZ6RjBzWGRjSERsWG9tYlBDNVYyL0JzdXUxbzFybzJ5?=
- =?utf-8?B?YnpRalRuZlpTaGF3SDZOcUVYMXNIMFZlbS9JWjVNclhKMGZkR3gxQ3prQW0v?=
- =?utf-8?B?Y0k2YlB1YTNXMXFlVGNwVlJGZFVad1lqMlpHclRRUkFTaTd2WmtrZHFjUy9V?=
- =?utf-8?Q?XPyx+A0nmSpDl/aNULHQKn7JDFq9VKmVMzmt8=3D?=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4474.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?utf-8?B?cm95eFd0UUxOR1hNQU85Z2lGZFp2dmdlQVdWSFBDeDV1ZnhqV004MTNvYzZs?=
- =?utf-8?B?OVpBb2tjcWpUNjhRMTMvS29YdjlwUzM2cEc5VlNhV0k3ZUJpRldncXRqR3BV?=
- =?utf-8?B?Um1iMlBHUklCODRGbVB6eU5WeUVick5JSDdDdHlqR1NJQ3JNY2R5MFh0M21u?=
- =?utf-8?B?cXF6RXJad01LazlqaU1kOXROUUZ3M0RnUU9CUzFoL0FYS29xclB2amg0MUlu?=
- =?utf-8?B?WFZjSGlZKy9SL1JYalhpdlpsQXBUVDdEdnFnUzlsTUx0T0pCcThCRlhTWS9n?=
- =?utf-8?B?Znp6VVpZeGhGNVpLRVpEbkJZdmM0YWh4Z0xlU3NDZ3BEbEswWDJOdFQyY2Yy?=
- =?utf-8?B?Y0lvVXdoNkFEdjUxZmlKazFvNEhEVXBESlVQQUFmWGorUUxlMW1ETXFTTGc1?=
- =?utf-8?B?RUYxUURONGs0alB0d1VUTmFKUFZBaDE4bUhyVEdqZDFEVFo0eGxtY0J5Vi9s?=
- =?utf-8?B?MnhLQUlGNlhtWHYrNnBETVhnZFk4WFpZc1hJSlpsSXZiREJJeGkxNEZpWkZB?=
- =?utf-8?B?eGFTdHl5c1A3VzBlR2VOYnBYMHZ1V3hLY1NMNTRHRmppSW5nQnRyNHF0ZGsw?=
- =?utf-8?B?QklvTVBYOVBFY2thUU9TVHBkZ3pQV3FlUDZlL25lZDBSTzBDTVBCMlFSTDJa?=
- =?utf-8?B?OUMzMUJUVm1pVnZsWjdYSHJFZjVsdTBVUEo2NWFKRjRJc0JnS3daTWo5a295?=
- =?utf-8?B?NGxMZmZmdE5IMlZKSlF0d1BrSlkxNEFuQ2M0TWRnTFFyZ0RxeE5oUnRKTjBJ?=
- =?utf-8?B?SS9oR1Y0OGg5V2l4cmYrajJaTzJpdXNyQ1V1L25YQXVETkZhbE14T0pHbUtE?=
- =?utf-8?B?VTNyUXNOaHlZU2xnRHRjaUtKN1dsN0VhNFNITjF2R045Njl5ZCtSZTlLUFhs?=
- =?utf-8?B?RVpVUm5KNFFpdkNXK2VrZEVRZXZoTzhyaDVsWjJJT0dnTTlmTnZlNUh3Qnl6?=
- =?utf-8?B?bVNvTllXYTc5R2dqQlZscVlUcEQzZVdrWTk4cXEyRnBkNjNXaHVHYUxUbEEv?=
- =?utf-8?B?aFZWMVdxZ2xWR3ZCK3V0YUwxc0Evem9ydGdGd0RiQVphTnI3a3RXMVFLNUor?=
- =?utf-8?B?Z29rbm91dlZrT042TnFHK01Ic08vQTkrbjhVTUh4NVhxM0V1YXY2cDlnWlZv?=
- =?utf-8?B?azZidm9NaFFYaGsrZWFmVGQwU1NBM1NyZXlqSGdySzhkYVNNSlNycjVnaHp6?=
- =?utf-8?B?MjRyU3dDTnFtY1Q0QVNLSlJ1eGk2VWxFd2xvMGhzVytEcXlMeWtDQm4wd1ZE?=
- =?utf-8?B?K0FXTi96YlFmMDlmVDJpaEZhYUgyanc5Rm5GTHl5RjRJekNxWnVMaHVOdUxS?=
- =?utf-8?B?ZEF2WGNmb2hEMkY4YzZIMXNtVGFxclRJR3NqN2NvL2IvTDBQRnBtZ1lyY2hs?=
- =?utf-8?B?S2gzajEyVDJ4TkpaWGhaSnNEMC9iaWNQeTcrYjlZYnNuVnZQSWw2dXFwUEJo?=
- =?utf-8?B?MG01VnNoeXd4N1d5UDVSWCtKSC9Ienp6Z1JFa1dpM002QUsxcWs5UkZ0R1Jo?=
- =?utf-8?B?cFREbEdQbkpBa28wTUR6aDFMVzdCK002R1N1L1p1Y2xpRkpsYWRTV04vZmY0?=
- =?utf-8?B?TGRMdUZEZFFlNEpwNzdHeUhrYVQzbUo2Vmh1L2tvWlNhZkpucmM2Sk5qVGVH?=
- =?utf-8?B?d2s5dXU0TTVBMC8rcUVmVlowMk1yRWtmQ2dud1VsejY5dFdQby9zZ3VJeEU1?=
- =?utf-8?B?Ny9ibldvVVU0cFlGazlYYXJNUml3Tm9qS1RaUEFpclhuNzd5VndRMldXVW9s?=
- =?utf-8?B?THZHOEp1b0lOV0FqRTluMHB6UXdSN1NEc2FNRU1lajI2RzJTbXRSWXlSQlda?=
- =?utf-8?B?REdZOUl3WnZ5YVZocjdZQlVqbE52azBMM1BFVW1CTTFmUEQ5WHhOMW5pQWZG?=
- =?utf-8?B?MXd0ZXpJbG9XMlU4b212dWRKTC83ZkZPWFUxSmZxWUttWXpOai9sZUgzOU5B?=
- =?utf-8?B?Y2k5N004MW1idkx5ZUpCRENiSld4WENaY1M1b3k3WW5GUGdHcXNaZ2dHNTFX?=
- =?utf-8?B?ZlUvVE5UR0pkcjBpR2kvVVBCV29UbFd4TzZrOUV4bm9HWFlMUmEvYThsdUJj?=
- =?utf-8?B?ODlLamQ0b0REVnhlelVORjAxMEZNVUtKMllYZyt4U3k5VU9DTFJJcGkyOUZM?=
- =?utf-8?Q?mPj4=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594ED15B0F7
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 08:32:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.88.110.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717749180; cv=none; b=d2JaS9D0DFPskOBxzhT0p/7cCEP+6dRR+ZuGOY7St7kTZ6eq+7ThnMI68nAZ190TuGklAyghcEyctnl8n72LLURB78ueoB2b1zLu8+CwKAa8tVkW4SP/c7mk3uBChW/68JStXoBE4Rn6Mg89LC0tGHjLD5m17OIuv6Edb8CENkA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717749180; c=relaxed/simple;
+	bh=n7vjazD7vhR6NqyBsdAjqx6OSxyzSA8TWRoNZRP54yo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=nhm95iBoMb75TDNDjGKqYSKCTFRZVMt/QwLJ/RY0D5HoCe9iRmcPIv008XSLBm8Msh9NyNP0BjWNufffcTiXxnbhalnvQGD/yPms9BSmJB+D38/+Q4SVhC8zfOWL/fRecfjhNU2ZNaHs/w0W53pYirfjS9KcMc2XD08yVpfzJQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com; spf=pass smtp.mailfrom=savoirfairelinux.com; dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b=SQZzWcsQ; arc=none smtp.client-ip=208.88.110.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=savoirfairelinux.com
+Received: from localhost (localhost [127.0.0.1])
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id EF5DE9C542E;
+	Fri,  7 Jun 2024 04:32:55 -0400 (EDT)
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+ by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id sBTE3zoUxnbU; Fri,  7 Jun 2024 04:32:53 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id 4B6929C590A;
+	Fri,  7 Jun 2024 04:32:53 -0400 (EDT)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.savoirfairelinux.com 4B6929C590A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=savoirfairelinux.com; s=DFC430D2-D198-11EC-948E-34200CB392D2;
+	t=1717749173; bh=X7pODirykHMN8FVXO9sjhcKunWq5M3HlLxyn9uIB+uo=;
+	h=Message-ID:Date:MIME-Version:From:To;
+	b=SQZzWcsQ0P2lfrp1AstvGTVc9GatcoH1i8esMVsRFZwOdexPCY+nIRpH9JNzG7/Qx
+	 NwY6cV+hwpwHLDVZoBDnYDuVCdR1ykbaEBLlSEhF0n556vVO+TgYrEBLncGPIWuDcW
+	 Vt7zVvb4urg//+ZCtmxdNzrChsv9z8cD8dVv9P/AjHbM4SIc6NkFyXq1E883fzKtFp
+	 CC0DKq+jSPidGib3jhPSOC2KNt2q/Jg6QlSUnn86TPfNtW88hJuhOHGLfDaL+xHJfS
+	 IVMpD9tHMbbx7bYabtjvXfpLlojdPWHIRgLk6xqJ031eRgxI3Ks/Rk/j9/RiyzxTiY
+	 OfI2MVRrP2Cbw==
+X-Virus-Scanned: amavis at mail.savoirfairelinux.com
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+ by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id esO2RC0bjuBv; Fri,  7 Jun 2024 04:32:53 -0400 (EDT)
+Received: from [192.168.216.123] (lmontsouris-657-1-69-118.w80-15.abo.wanadoo.fr [80.15.101.118])
+	by mail.savoirfairelinux.com (Postfix) with ESMTPSA id 13CA39C542E;
+	Fri,  7 Jun 2024 04:32:51 -0400 (EDT)
+Message-ID: <4bd9b6ba-2455-4456-bb2d-6f638547156d@savoirfairelinux.com>
+Date: Fri, 7 Jun 2024 10:32:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4474.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b099ec3b-e540-4248-db2c-08dc86cc6a19
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jun 2024 08:32:48.9887
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: V13G/leFtsnVY5S0vXsqDKGZjacSQyxko9pSKy7ZGRGfPLMgaz6NzUWNJ5/FOw52xbLLDgQWCb14Bgwv6L9JXg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR18MB3500
-X-Proofpoint-ORIG-GUID: A6ipA2np7aQbBWPj6VT3QGuvEfVT7bEc
-X-Proofpoint-GUID: A6ipA2np7aQbBWPj6VT3QGuvEfVT7bEc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-07_02,2024-06-06_02,2024-05-17_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v5 1/4] net: phy: micrel: add Microchip KSZ 9897
+ Switch PHY support
+From: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
+To: Woojung.Huh@microchip.com
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ UNGLinuxDriver@microchip.com, horms@kernel.org, Tristram.Ha@microchip.com,
+ Arun.Ramadoss@microchip.com, netdev@vger.kernel.org
+References: <20240530102436.226189-1-enguerrand.de-ribaucourt@savoirfairelinux.com>
+ <20240604092304.314636-2-enguerrand.de-ribaucourt@savoirfairelinux.com>
+ <BL0PR11MB2913D8FC28BA3569FDADD4A7E7F82@BL0PR11MB2913.namprd11.prod.outlook.com>
+ <19eef958-5222-4663-bd94-5a5fb3d65caf@savoirfairelinux.com>
+ <BL0PR11MB29133CF39DA619F1AAF1DE95E7FA2@BL0PR11MB2913.namprd11.prod.outlook.com>
+ <2e37f014-d9f5-4a09-93b2-81543399d2c4@savoirfairelinux.com>
+Content-Language: en-US
+In-Reply-To: <2e37f014-d9f5-4a09-93b2-81543399d2c4@savoirfairelinux.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-PiBGRUNfRUNSX0VOMTU4OCBiaXQgZ2V0cyBjbGVhcmVkIGFmdGVyIE1BQyByZXNldCBpbiBgZmVj
-X3N0b3AoKWAsIHdoaWNoIG1ha2VzDQo+IGFsbCAxNTg4IGZ1bmN0aW9uYWxpdHkgc2h1dCBkb3du
-IG9uIGxpbmstZG93bi4gSG93ZXZlciwgc29tZSBmdW5jdGlvbmFsaXR5DQo+IG5lZWRzIHRvIGJl
-IHJldGFpbmVkIChlLmcuIFBQUykgZXZlbiB3aXRob3V0IGxpbmsuDQo+IA0KDQoNCiAgICBTaW5j
-ZSB0aGlzIHBhdGNoIGlzIHRhcmdldGVkIGZvciBuZXQsIHBsZWFzZSBhZGQgZml4ZXMgdGFnLg0K
-DQoNClRoYW5rcywNCkhhcmlwcmFzYWQgaw0KPiBTaWduZWQtb2ZmLWJ5OiAiQ3PDs2vDoXMsIEJl
-bmNlIiA8Y3Nva2FzLmJlbmNlQHByb2xhbi5odT4NCj4gLS0tDQo+ICBkcml2ZXJzL25ldC9ldGhl
-cm5ldC9mcmVlc2NhbGUvZmVjX21haW4uYyB8IDYgKysrKysrDQo+ICAxIGZpbGUgY2hhbmdlZCwg
-NiBpbnNlcnRpb25zKCspDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvZXRoZXJuZXQv
-ZnJlZXNjYWxlL2ZlY19tYWluLmMNCj4gYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9mcmVlc2NhbGUv
-ZmVjX21haW4uYw0KPiBpbmRleCA4ODFlY2U3MzVkY2YuLmZiMTkyOTU1MjlhMiAxMDA2NDQNCj4g
-LS0tIGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvZnJlZXNjYWxlL2ZlY19tYWluLmMNCj4gKysrIGIv
-ZHJpdmVycy9uZXQvZXRoZXJuZXQvZnJlZXNjYWxlL2ZlY19tYWluLmMNCj4gQEAgLTEzNjEsNiAr
-MTM2MSwxMiBAQCBmZWNfc3RvcChzdHJ1Y3QgbmV0X2RldmljZSAqbmRldikNCj4gIAkJd3JpdGVs
-KEZFQ19FQ1JfRVRIRVJFTiwgZmVwLT5od3AgKyBGRUNfRUNOVFJMKTsNCj4gIAkJd3JpdGVsKHJt
-aWlfbW9kZSwgZmVwLT5od3AgKyBGRUNfUl9DTlRSTCk7DQo+ICAJfQ0KPiArDQo+ICsJaWYgKGZl
-cC0+YnVmZGVzY19leCkgew0KPiArCQl2YWwgPSByZWFkbChmZXAtPmh3cCArIEZFQ19FQ05UUkwp
-Ow0KPiArCQl2YWwgfD0gRkVDX0VDUl9FTjE1ODg7DQo+ICsJCXdyaXRlbCh2YWwsIGZlcC0+aHdw
-ICsgRkVDX0VDTlRSTCk7DQo+ICsJfQ0KPiAgfQ0KPiANCj4gIHN0YXRpYyB2b2lkDQo+IC0tDQo+
-IDIuMzQuMQ0KPiANCj4gDQoNCg==
+On 07/06/2024 10:11, Enguerrand de Ribaucourt wrote:
+>=20
+> Hello,
+>=20
+> The exact hardware is a Phycore-i.MX6ULL. ENET2 is directly the=20
+> i.MX6ULL's FEC that connects to port 6 of the KSZ9897R (GMAC6) in RMII:
+>=20
+>  =C2=A0- X_ENET2_TX_CLK -- TX_CLK6
+>  =C2=A0- X_ENET2_TX_EN=C2=A0 -- TX_CTL6
+>  =C2=A0- X_ENET2_TX_D1=C2=A0 -- TXD6_1
+>  =C2=A0- X_ENET2_TX_D0=C2=A0 -- TXD6_0
+>  =C2=A0- X_ENET2_RX_EN=C2=A0 -- RX_CTL6
+>  =C2=A0- X_ENET2_RX_ER=C2=A0 -- RX_ER6
+>  =C2=A0- X_ENET2_RX_D1=C2=A0 -- RXD6_1
+>  =C2=A0- X_ENET2_RX_D0=C2=A0 -- RXD6_0
+>=20
+> The DSA control is using SPI, but not involved in reading the phy_id in=
+=20
+> my case.
+>=20
+> This is materialized in my device tree:
+>=20
+> ```c
+> ethernet@20b4000 {
+>  =C2=A0=C2=A0=C2=A0=C2=A0compatible =3D "fsl,imx6ul-fec\0fsl,imx6q-fec"=
+;
+>  =C2=A0=C2=A0=C2=A0=C2=A0...
+>  =C2=A0=C2=A0=C2=A0=C2=A0phy-mode =3D "rmii";
+>  =C2=A0=C2=A0=C2=A0=C2=A0phy-handle =3D <0x15>;
+>  =C2=A0=C2=A0=C2=A0=C2=A0fixed-link {
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 speed =3D <0x64>;
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 full-duplex;
+>  =C2=A0=C2=A0=C2=A0=C2=A0};
+> };
+>=20
+> // MDIO bus is only defined on eth1 but shared with eth2
+> ethernet@2188000 {
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ...
+>  =C2=A0=C2=A0=C2=A0=C2=A0mdio {
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 ...
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ksz9897port5@1 {
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 com=
+patible =3D "ethernet-phy-ieee802.3-c22";
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ...
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 clo=
+ck-names =3D "rmii-ref";
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pha=
+ndle =3D <0x15>;
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 };
+> };
+>=20
+> spi@2010000 {
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ...
+>  =C2=A0=C2=A0=C2=A0=C2=A0ksz9897@0 {
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 compatible =3D "microchip,k=
+sz9897";
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ...
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ports {
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ...
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 // =
+GMAC6
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 por=
+t@5 {
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 reg =3D <0x05>;
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 label =3D "cpu";
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 ethernet =3D <0x0c>;
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 phy-mode =3D "rmii";
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 rx-internal-delay-ps =3D <0x5dc>;
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 fixed-link {
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 speed =3D <0x64>;
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 full-duplex;
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 };
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 };
+>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 };
+>  =C2=A0=C2=A0=C2=A0=C2=A0};
+> };
+> ```
+>=20
+
+I also checked using `phy-mode =3D "internal";` on both ends, but ended u=
+p=20
+with error "Unable to connect to phy".
+
+> Before I implemented the pseudo phy_id, it was read in the generic IEEE=
+=20
+> clause 22 PHY registers, through the compatible=20
+> "ethernet-phy-ieee802.3-c22". That would be implemented in=20
+> get_phy_c22_id() in MII_PHYSID1/2 registers at 0x2 of the MDIO device.
+>=20
+> It is not read through SPI registers 0x6104-0x6105 which are not define=
+d=20
+> in the datasheet for port 6/7 (section 5.2.2.3):
+>  =C2=A0=C2=A0=C2=A0=C2=A0Address: 0xN104, Size: 16 bits, Port N: 1-5
+>=20
+> Do you have other suggestions to read the phy_id?
+>=20
+> Thanks for your support,
+> Enguerrand de Ribaucourt
+>=20
+>=20
+> On 07/06/2024 00:57, Woojung.Huh@microchip.com wrote:
+>> Hi Enguerrand,
+>>
+>> We still can't reproduce what you observed with KSZ9897.
+>>
+>> Just to be sure, you accessed PHY register of Port 6 which is GMAC6.
+>> It is directly connected to MAC of i.MX6ULL over RMII.
+>> I guess the PHY ID access is register 0x6104-0x6105 of KSZ9897.
+>> And, return value of PHY ID is 0x0022-0x1561.
+>>
+>> Correct understanding?
+>> > Thanks.
+>> Woojung
+>>
+>>> -----Original Message-----
+>>> From: Enguerrand de Ribaucourt <enguerrand.de-
+>>> ribaucourt@savoirfairelinux.com>
+>>> Sent: Wednesday, June 5, 2024 4:34 AM
+>>> To: Woojung Huh - C21699 <Woojung.Huh@microchip.com>
+>>> Cc: andrew@lunn.ch; hkallweit1@gmail.com; linux@armlinux.org.uk;
+>>> UNGLinuxDriver <UNGLinuxDriver@microchip.com>; horms@kernel.org;=20
+>>> Tristram Ha
+>>> - C24268 <Tristram.Ha@microchip.com>; Arun Ramadoss - I17769
+>>> <Arun.Ramadoss@microchip.com>; netdev@vger.kernel.org
+>>> Subject: Re: [PATCH net v5 1/4] net: phy: micrel: add Microchip KSZ 9=
+897
+>>> Switch PHY support
+>>>
+>>> EXTERNAL EMAIL: Do not click links or open attachments unless you=20
+>>> know the
+>>> content is safe
+>>>
+>>> Hello,
+>>>
+>>> On 04/06/2024 22:49, Woojung.Huh@microchip.com wrote:
+>>>> Hi Enguerrand,
+>>>>
+>>>> Can you help me to understand your setup? I could see you are using
+>>>> =C2=A0=C2=A0 - Host CPU : i.MX6ULL
+>>>> =C2=A0=C2=A0 - DSA Switch : KSZ9897R=20
+>>>> (https://www.microchip.com/en-us/product/ksz9897)
+>>>> =C2=A0=C2=A0 - Host-to-KSZ interface : RGMII for data path & SPI for=
+ control
+>>>> Based on this, CPU port is either GMAC6 or GMAC7 (Figure 2-1 of [1])
+>>>>
+>>>> I have two questions for you.
+>>>> 1. PHY on CPU port
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 Which GMAC (or port number) is connected be=
+tween Host CPU and=20
+>>>> KSZ9897R?
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 If CPU port is either GMAC6 or GMAC7, it is=
+ just a MAC-to-MAC
+>>> connection over RGMII.
+>>>
+>>> I'm using port number 6 as the CPU port for KSZ9897R. GMAC6 is direct=
+ly
+>>> connected to the MAC of i.MX6ULL (driver is i.MX fec). I'm using RMII
+>>> since gigabit is not supported by the i.MX6ULL.
+>>>
+>>>> 2. PHY ID
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 Its PHY ID is different when checking datas=
+heet of KSZ9897 and=20
+>>>> KSZ8081.
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 PHY ID of Port 1-5 of KSZ9897 is 0x0022-0x1=
+631 per [1]
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0 PHY ID of KSZ8081 is 0x0022-0x0156x per [2]
+>>> That's true for port 1-5, however, I found out that the phy_id emitte=
+d
+>>> by GMAC6 is 0x00221561. It is the same as KSZ8081-revA3 according to =
+the
+>>> datasheet. I also studied all registers at runtime for a reliable
+>>> difference to implement something like ksz8051_ksz8795_match_phy_devi=
+ce
+>>> between GMAC6 and KSZ8081, but none appeared to me. Following
+>>> suggestions by Andrew Lunn, I added this virtual phy_id (0x002217ff) =
+to
+>>> hardcode in the devicetree. I'm happy with this solution.
+>>>>
+>>>> Beside patch, you can create a ticket to Microchip site
+>>> (https://microchipsupport.force.com/s/supportservice)
+>>>> if you think it is easier to solve your problem.
+>>> I created a joined ticket for tracking (Case number 01457279).
+>>>>
+>>>
+>>> Thank you very much for your time,
+>>>
+>>> Enguerrand de Ribaucourt
+>>>
+>>>> Best regards,
+>>>> Woojung
+>>>>
+>>>> [1]
+>>> https://ww1.microchip.com/downloads/aemDocuments/documents/OTH/Produc=
+tDocume
+>>> nts/DataSheets/KSZ9897R-Data-Sheet-DS00002330D.pdf
+>>>> [2] https://www.microchip.com/en-us/product/ksz8081#document-table
+>>>>
+>>>>> -----Original Message-----
+>>>>> From: Enguerrand de Ribaucourt <enguerrand.de-
+>>>>> ribaucourt@savoirfairelinux.com>
+>>>>> Sent: Tuesday, June 4, 2024 5:23 AM
+>>>>> To: netdev@vger.kernel.org
+>>>>> Cc: andrew@lunn.ch; hkallweit1@gmail.com; linux@armlinux.org.uk;=20
+>>>>> Woojung
+>>> Huh
+>>>>> - C21699 <Woojung.Huh@microchip.com>; UNGLinuxDriver
+>>>>> <UNGLinuxDriver@microchip.com>; horms@kernel.org; Tristram Ha - C24=
+268
+>>>>> <Tristram.Ha@microchip.com>; Arun Ramadoss - I17769
+>>>>> <Arun.Ramadoss@microchip.com>; Enguerrand de Ribaucourt=20
+>>>>> <enguerrand.de-
+>>>>> ribaucourt@savoirfairelinux.com>
+>>>>> Subject: [PATCH net v5 1/4] net: phy: micrel: add Microchip KSZ 989=
+7
+>>> Switch
+>>>>> PHY support
+>>>>>
+>>>>> EXTERNAL EMAIL: Do not click links or open attachments unless you k=
+now
+>>> the
+>>>>> content is safe
+>>>>>
+>>>>> There is a DSA driver for microchip,ksz9897 which can be controlled
+>>>>> through SPI or I2C. This patch adds support for it's CPU ports PHYs=
+ to
+>>>>> also allow network access to the switch's CPU port.
+>>>>>
+>>>>> The CPU ports PHYs of the KSZ9897 are not documented in the datashe=
+et.
+>>>>> They weirdly use the same PHY ID as the KSZ8081, which is a differe=
+nt
+>>>>> PHY and that driver isn't compatible with KSZ9897. Before this patc=
+h,
+>>>>> the KSZ8081 driver was used for the CPU ports of the KSZ9897 but th=
+e
+>>>>> link would never come up.
+>>>>>
+>>>>> A new driver for the KSZ9897 is added, based on the compatible=20
+>>>>> KSZ87XX.
+>>>>> I could not test if Gigabit Ethernet works, but the link comes up a=
+nd
+>>>>> can successfully allow packets to be sent and received with DSA tag=
+s.
+>>>>>
+>>>>> To resolve the KSZ8081/KSZ9897 phy_id conflicts, I could not find a=
+ny
+>>>>> stable register to distinguish them. Instead of a match_phy_device(=
+) ,
+>>>>> I've declared a virtual phy_id with the highest value in=20
+>>>>> Microchip's OUI
+>>>>> range.
+>>>>>
+>>>>> Example usage in the device tree:
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 compatible =3D=
+ "ethernet-phy-id0022.17ff";
+>>>>>
+>>>>> A discussion to find better alternatives had been opened with the
+>>>>> Microchip team, with no response yet.
+>>>>>
+>>>>> See https://lore.kernel.org/all/20220207174532.362781-1-enguerrand.=
+de-
+>>>>> ribaucourt@savoirfairelinux.com/
+>>>>>
+>>>>> Fixes: b987e98e50ab ("dsa: add DSA switch driver for Microchip=20
+>>>>> KSZ9477")
+>>>>> Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-
+>>>>> ribaucourt@savoirfairelinux.com>
+>>>>> ---
+>>>>> v5:
+>>>>> =C2=A0=C2=A0 - rewrap comments
+>>>>> =C2=A0=C2=A0 - restore suspend/resume for KSZ9897
+>>>>> v4: https://lore.kernel.org/all/20240531142430.678198-2-enguerrand.=
+de-
+>>>>> ribaucourt@savoirfairelinux.com/
+>>>>> =C2=A0=C2=A0 - rebase on net/main
+>>>>> =C2=A0=C2=A0 - add Fixes tag
+>>>>> =C2=A0=C2=A0 - use pseudo phy_id instead of of_tree search
+>>>>> v3: https://lore.kernel.org/all/20240530102436.226189-2-enguerrand.=
+de-
+>>>>> ribaucourt@savoirfairelinux.com/
+>>>>> ---
+>>>>> =C2=A0=C2=A0 drivers/net/phy/micrel.c=C2=A0=C2=A0 | 13 ++++++++++++=
+-
+>>>>> =C2=A0=C2=A0 include/linux/micrel_phy.h |=C2=A0 4 ++++
+>>>>> =C2=A0=C2=A0 2 files changed, 16 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+>>>>> index 8c20cf937530..11e58fc628df 100644
+>>>>> --- a/drivers/net/phy/micrel.c
+>>>>> +++ b/drivers/net/phy/micrel.c
+>>>>> @@ -16,7 +16,7 @@
+>>>>> =C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 ksz8081, ksz8091,
+>>>>> =C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 ksz8061,
+>>>>> =C2=A0=C2=A0=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 Switch : ksz8873, ksz886x
+>>>>> - *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ksz9477, lan=
+8804
+>>>>> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ksz9477, ksz=
+9897, lan8804
+>>>>> =C2=A0=C2=A0=C2=A0 */
+>>>>>
+>>>>> =C2=A0=C2=A0 #include <linux/bitfield.h>
+>>>>> @@ -5545,6 +5545,16 @@ static struct phy_driver ksphy_driver[] =3D =
+{
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .suspend=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D genphy_suspend,
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .resume=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D ksz9477_resume,
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .get_feature=
+s=C2=A0=C2=A0 =3D ksz9477_get_features,
+>>>>> +}, {
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .phy_id=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 =3D PHY_ID_KSZ9897,
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .phy_id_mask=C2=A0=C2=A0=C2=A0=
+ =3D MICREL_PHY_ID_MASK,
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .name=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D "Microchip KSZ9897 Switch",
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* PHY_BASIC_FEATURES */
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .config_init=C2=A0=C2=A0=C2=A0=
+ =3D kszphy_config_init,
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .config_aneg=C2=A0=C2=A0=C2=A0=
+ =3D ksz8873mll_config_aneg,
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .read_status=C2=A0=C2=A0=C2=A0=
+ =3D ksz8873mll_read_status,
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .suspend=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 =3D genphy_suspend,
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .resume=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 =3D genphy_resume,
+>>>>> =C2=A0=C2=A0 } };
+>>>>>
+>>>>> =C2=A0=C2=A0 module_phy_driver(ksphy_driver);
+>>>>> @@ -5570,6 +5580,7 @@ static struct mdio_device_id __maybe_unused
+>>>>> micrel_tbl[] =3D {
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { PHY_ID_LAN=
+8814, MICREL_PHY_ID_MASK },
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { PHY_ID_LAN=
+8804, MICREL_PHY_ID_MASK },
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { PHY_ID_LAN=
+8841, MICREL_PHY_ID_MASK },
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { PHY_ID_KSZ9897, MICREL_PHY_=
+ID_MASK },
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { }
+>>>>> =C2=A0=C2=A0 };
+>>>>>
+>>>>> diff --git a/include/linux/micrel_phy.h b/include/linux/micrel_phy.=
+h
+>>>>> index 591bf5b5e8dc..81cc16dc2ddf 100644
+>>>>> --- a/include/linux/micrel_phy.h
+>>>>> +++ b/include/linux/micrel_phy.h
+>>>>> @@ -39,6 +39,10 @@
+>>>>> =C2=A0=C2=A0 #define PHY_ID_KSZ87XX=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 0x00221550
+>>>>>
+>>>>> =C2=A0=C2=A0 #define=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PHY_=
+ID_KSZ9477=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x002216=
+31
+>>>>> +/* Pseudo ID to specify in compatible field of device tree.
+>>>>> + * Otherwise the device reports the same ID as KSZ8081 on CPU port=
+s.
+>>>>> + */
+>>>>> +#define=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PHY_ID_KSZ9897=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x002217ff
+>>>>>
+>>>>> =C2=A0=C2=A0 /* struct phy_device dev_flags definitions */
+>>>>> =C2=A0=C2=A0 #define MICREL_PHY_50MHZ_CLK=C2=A0=C2=A0 BIT(0)
+>>>>> --=20
+>>>>> 2.34.1
+>>>>
+>=20
+
+--=20
+Savoir-faire Linux
+Enguerrand de Ribaucourt
+Consultant en logiciel libre / Ing=C3=A9nieur syst=C3=A8mes embarqu=C3=A9=
+s | Rennes, Fr
+Site web <https://www.savoirfairelinux.com/>=C2=A0|=C2=A0Blog
+<https://blog.savoirfairelinux.com/fr-ca/>=C2=A0|=C2=A0Jami <https://jami=
+.net/>
+
+Messages de confidentialit=C3=A9 :=C2=A0Ce courriel (de m=C3=AAme que les=
+ fichiers
+joints) est strictement r=C3=A9serv=C3=A9 =C3=A0 l'usage de la personne o=
+u de l'entit=C3=A9
+=C3=A0 qui il est adress=C3=A9 et peut contenir de l'information privil=C3=
+=A9gi=C3=A9e et
+confidentielle. Toute divulgation, distribution ou copie de ce courriel
+est strictement prohib=C3=A9e. Si vous avez re=C3=A7u ce courriel par err=
+eur,
+veuillez nous en aviser sur-le-champ, d=C3=A9truire toutes les copies et =
+le
+supprimer de votre syst=C3=A8me informatique.
+
 
