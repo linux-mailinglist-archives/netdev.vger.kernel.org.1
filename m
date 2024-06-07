@@ -1,164 +1,87 @@
-Return-Path: <netdev+bounces-101947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 223BA900ADD
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:59:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 463F9900B16
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 19:16:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F9781F24224
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:59:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE5301F22FF2
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 17:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41DEF19AD84;
-	Fri,  7 Jun 2024 16:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3056F19AD9B;
+	Fri,  7 Jun 2024 17:15:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G2AVTqpi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L0xc0I85"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1169918059
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 16:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0245219AA66;
+	Fri,  7 Jun 2024 17:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717779573; cv=none; b=HqqK5rGgbQ5v1jacmJ5UoSMGzf+o1abJtKrGkdgNPIRJW2gjTXZT6xF+1l/YlURLyn0bPRq1PEyVUcEdPOr8b+Q257hNLRATuyLj0EygmwPDgf+WQIepltQ2RfsAPRjsSGzMoc/YKT/6sEiPSlDB46ll+XbFt54QLm/pxn3VXRE=
+	t=1717780554; cv=none; b=CtMjvZJpJDoGBqU5ck/F2/2bnPxcOBhNQfowejQ4wh4KLieNXoO4WToeZzrZ1F+r/RvvVreefXlmOQINBQjevsnh0kWq8Qm7RZILiMR5N0S6HO/RUwAxTyQd1Bs53YMXz+kUSpOzk6U5femqceoZN7NL7xVaALLFZ6mKMRpfWpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717779573; c=relaxed/simple;
-	bh=b716fHLqA+q2jVEnF0wQCq5rwwcoiNDI2tYRdVxGBJ8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oBScGNrlvTpYIXd7NEFfpZo3sxV/jPQ805fhdQZMC+9an7jhhULgqP+nixJzudzhbca2yi8G/FH/dSsgC+MWjiYB986pjprRcctQpL8yTCoguPfP1+eaolchtEgBb0vhITN2aR7OhiqH5FQiDbR0Aema3YwuCFVvikBocRB4CR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G2AVTqpi; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a6e0a499687so91349366b.2
-        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 09:59:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717779569; x=1718384369; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b716fHLqA+q2jVEnF0wQCq5rwwcoiNDI2tYRdVxGBJ8=;
-        b=G2AVTqpij2cJhN5HRQo3ptWXB/TQ9YDh9RGrpGeXVnp1CnL9i2DHQgrabHfRJ+vI4v
-         6rj8PhKQhbrqw08lFKhBQBeW3OEzxZgvZ0sM8DqYOCgzynh/TqX8zhUpecpLeveUgZe/
-         4WO2raT386olPe7+CqYN3aB+/KVKBRO+MtAq0XGvPQZgecLr0Yv0La164s3HFQRW75Oj
-         zZN4yPFMx3bgrVJwSDOEuMmEHfxotBiwl6JuetdpyYQLp0Ofu9L4f3YRHWKNySwxc9/Q
-         JR8ZXjlMx3qbDJacaMfkf8ysfsu1jvPB+cyZ9tvZ8GL8kf1mEaJBMzprr6qo856Q0ny6
-         yaFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717779569; x=1718384369;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b716fHLqA+q2jVEnF0wQCq5rwwcoiNDI2tYRdVxGBJ8=;
-        b=Wl9sfo+rMwdh1uwOKEeCcZmN5duw7rTiB2goOHcJmgUGeH5tc8VEf+S64xf1eKU4LP
-         SNGWgnCBsUqsGYiWYb4tNkWltCgeMmnd67qG1V0dsgmwoaE2PNdejoo9MiNhsuzq/HWd
-         72WPSPrmLibM7G2em8C2rF/wxNfxhFUbBwbLNnCJ4ZYF2oUe9tQKZrghPEEibHE+wGff
-         Zd8h89P6Vr6oi+a9z1yQeoVC0LezyNtCcWgeQBYaWEErcE7RqrIN4YMVuPnCs+dRwDM2
-         RonOudQ0fG3DEbcQwjQ3Ma/ACmb22NfVnFB2CTyIVRzRKr9eJGWvjM027hS7HCL54L1d
-         fL0A==
-X-Forwarded-Encrypted: i=1; AJvYcCUmJETV+e3CxcPhP+7EjKZ0pA5XevL8/SvJzKyycJRX/6ksCB4hkSPuEZ1x3r2CXwI8ZQIiPX4fwkftVx3rAKv4XFid1dTs
-X-Gm-Message-State: AOJu0YxK9tmLbhkktn+TGIr6NCgch8RvSwMKSYUKbtUmoq2QcafKfR0u
-	VJHDBbrlpyce1UqCgLc7z6A5yb906gefaZhpXzeuX3P9/9d6p3BiSrlsf3rTrCY2y0LTbFjfVN4
-	T3NWjuWmiu7Vx7XTn2zQ9tIKqEEGLOujj8er8WPusb5bDPPA3GybGtEESUw==
-X-Google-Smtp-Source: AGHT+IFO8pnZEEr0e5+OyIy57985L/vijoXMBq19GG2GOaDteqsHQMVykhBCrf2eEzDSRbH9iO1UMt7DJvGo0PZ4Mj4=
-X-Received: by 2002:a17:906:12c1:b0:a63:3cd4:97d2 with SMTP id
- a640c23a62f3a-a6cdbd0d2e5mr206803066b.63.1717779569136; Fri, 07 Jun 2024
- 09:59:29 -0700 (PDT)
+	s=arc-20240116; t=1717780554; c=relaxed/simple;
+	bh=3XYeD6IP8Z0vF8HLIMKW0yAmSge/3jtKexVmbtdSwsg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C7hBOb365SZo/CCENZIC2HUeQC2fEVqsHxNp9/c8kASa3Uvfoe/C4Aj1HPL+/AOpjdJpWkmY8mCMPo8E+tu7PxNWxiDm45a9sVlWfw/odxPSwCJ72CpcsmebkC8cRvd80FbAHvqvdIIPw26F8WU+TmsmxwVi8MPZhTmlEOem2Cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L0xc0I85; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C70CDC2BBFC;
+	Fri,  7 Jun 2024 17:15:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717780553;
+	bh=3XYeD6IP8Z0vF8HLIMKW0yAmSge/3jtKexVmbtdSwsg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=L0xc0I85TuSJ95cq4edqPXW9BPSXEG4M6aY7VreDWcRbE5R0JL/EtVBL8WlLwdj8Y
+	 DrzI/soOlN/jYH8CS7R/6giJ5yc6TKvMAEehrhflTHJ3zol2D0QNVfqXjYd0+Q859i
+	 17m74fg1luA9t/OtIyOJPOUerI+ugiF6aP6fEdLCKOJu0rbuhnSn9C1WIlBJu8npf0
+	 umUwoqbGdnLOazgSyUGeeIhOsA7zYAiQ5q1xxIxHrLRrHlRFwqe73j1bFxBr/IMVZN
+	 RpocuNtWHywOGCFwR8nkxbvkE3jC83RepqAM1SV7wKa0mERe8rEAlU/4hv5jATp6Gg
+	 iitwqYuJ39Bcw==
+Date: Fri, 7 Jun 2024 22:45:49 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Peter Ujfalusi <peter.ujfalusi@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	MD Danish Anwar <danishanwar@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	Julien Panis <jpanis@baylibre.com>,
+	Chintan Vankar <c-vankar@ti.com>, Diogo Ivo <diogo.ivo@siemens.com>,
+	Simon Horman <horms@kernel.org>, dmaengine@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net-next] dmaengine: ti: k3-udma-glue: clean up return in
+ k3_udma_glue_rx_get_irq()
+Message-ID: <ZmNARRlVwU6hLelB@matsya>
+References: <2f28f769-6929-4fc2-b875-00bf1d8bf3c4@kili.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240530201616.1316526-1-almasrymina@google.com>
- <20240530201616.1316526-3-almasrymina@google.com> <ZlqzER_ufrhlB28v@infradead.org>
- <CAHS8izMU_nMEr04J9kXiX6rJqK4nQKA+W-enKLhNxvK7=H2pgA@mail.gmail.com>
- <5aee4bba-ca65-443c-bd78-e5599b814a13@gmail.com> <CAHS8izNmT_NzgCu1pY1RKgJh+kP2rCL_90Gqau2Pkd3-48Q1_w@mail.gmail.com>
- <eb237e6e-3626-4435-8af5-11ed3931b0ac@gmail.com> <be2d140f-db0f-4d15-967c-972ea6586b5c@kernel.org>
- <8f44ca2a-8910-418f-b4a6-ca1e051484ba@gmail.com> <a8df4459-30bf-4414-aeca-2f67c461adc4@gmail.com>
-In-Reply-To: <a8df4459-30bf-4414-aeca-2f67c461adc4@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 7 Jun 2024 09:59:16 -0700
-Message-ID: <CAHS8izNcYMsSpTNVSGRJHK6u+kDxnFab5Km1rYy8b++0FeUNgA@mail.gmail.com>
-Subject: Re: [PATCH net-next v10 02/14] net: page_pool: create hooks for
- custom page providers
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: David Ahern <dsahern@kernel.org>, Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org, 
-	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2f28f769-6929-4fc2-b875-00bf1d8bf3c4@kili.mountain>
 
-On Fri, Jun 7, 2024 at 8:47=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.c=
-om> wrote:
->
-> On 6/7/24 16:42, Pavel Begunkov wrote:
-> > On 6/7/24 15:27, David Ahern wrote:
-> >> On 6/7/24 7:42 AM, Pavel Begunkov wrote:
-> >>> I haven't seen any arguments against from the (net) maintainers so
-> >>> far. Nor I see any objection against callbacks from them (considering
-> >>> that either option adds an if).
-> >>
-> >> I have said before I do not understand why the dmabuf paradigm is not
-> >> sufficient for both device memory and host memory. A less than ideal
-> >> control path to put hostmem in a dmabuf wrapper vs extra checks and
-> >> changes in the datapath. The former should always be preferred.
-> >
-> > If we're talking about types of memory specifically, I'm not strictly
-> > against wrapping into dmabuf in kernel, but that just doesn't give
-> > anything.
->
-> And the reason I don't have too strong of an opinion on that is
-> mainly because it's just setup/cleanup path.
->
+On 06-06-24, 17:23, Dan Carpenter wrote:
+> Currently the k3_udma_glue_rx_get_irq() function returns either negative
+> error codes or zero on error.  Generally, in the kernel, zero means
+> success so this be confusing and has caused bugs in the past.  Also the
+> "tx" version of this function only returns negative error codes.  Let's
+> clean this "rx" function so both functions match.
+> 
+> This patch has no effect on runtime.
 
-I agree wrapping io uring in dmabuf seems to be an unnecessary detour.
-I never understood the need or upside to do that, but it could be a
-lack of understanding on my part.
+Acked-by: Vinod Koul <vkoul@kernel.org>
 
-However, the concern that David brings up may materialize. I've had to
-spend a lot of time minimizing or justifying checks to the code with
-page pool benchmarks that detect even 1 cycle regressions. You may be
-asked to run the same benchmarks and minimize similar overhead.
-
-The benchmark in question is Jesper's bench_page_pool_simple. I've
-forked it and applied it on top of net-next here:
-https://github.com/mina/linux/commit/927596f87ab5791a8a6ba8597ba2189747396e=
-54
-
-As io_uring ZC comes close to merging, I suspect it would be good to
-run this to understand the regression in the fast path, if any. If
-there are no to little regressions, I have no concerns over io uring
-memory not being wrapped in dmabufs, and David may agree as well.
-
---
-Thanks,
-Mina
+-- 
+~Vinod
 
