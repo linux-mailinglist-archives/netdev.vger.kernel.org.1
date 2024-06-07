@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-101652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16C878FFB68
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:47:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2AA78FFB6E
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:50:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D61DB228AA
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 05:47:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50BD62846C8
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 05:50:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CC220328;
-	Fri,  7 Jun 2024 05:46:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB2B014EC7D;
+	Fri,  7 Jun 2024 05:50:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09A67E57D
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 05:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 294B217BB4
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 05:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717739219; cv=none; b=rGfwdNSRkVdWZMN8dKYCH0hinGW2mEO0O0KdKcRYImsW1ePZnek9o0nmxRHrZW//lWZzWhxo47cwOMomBQFYOii++GrLwEKSBbn/oPxQm8lBSdR2rSLIs8Gx6+Gk8vOsvmriezJOxs2Ftn993OQpOGwkiGkMK4G1HY40lzhs7/o=
+	t=1717739445; cv=none; b=f0sU1cYj8/cEHrdDYKigkOFkWsCv6O+J9wAMQrvxjN1715oXzshRoMyhBAFp0Q8p7m7K5DgNoAd4rgCYJ5VhfNZMJ6A4x76TMpzGlQT//WfFgDtaYJO5PsxZV06cRDvs9oLNYlnvrfY+fIM7Qp3YzvjQuOuZEO80eVXjFMrnFHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717739219; c=relaxed/simple;
-	bh=DnFrcQXJ/gvhnie03I7oD0lx1r7E/MSt9n2PME/rDJc=;
-	h=References:References:From:To:Cc:Subject:Date:In-reply-to:
-	 Message-ID:MIME-Version:Content-Type; b=tP4cJ0NQgPTnFN+3twS5513bw+80M+8gIOtqGWDoZRCkEbtwtgK5VeoG3O+l20HvAx2j487eGl9AjticVnPZxx1rIkjiMcuvapzEVtKS49rnU+KDC30V6VPYJn2we0ThoQr+qgCfZrQ1FTM5//5CxcuOq/7zm8rZ9vV0Sz4qY/g=
+	s=arc-20240116; t=1717739445; c=relaxed/simple;
+	bh=Ga/ZhAiIM2g6n9et08M9cn3x1tanfGe2QiwvGlLqQew=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=VIxfGdvF5AuCMNIH1zXTKYUhC1IWd4rPKetslZsyDDAlYVdymreh2YXUBTjUTp4LH1KUbcRl6xDeBSAaxbmSbk+nHI2A2Hlod18D/0GJFlL6ey7N0FKTSisvtMW/QTruHWOKeeeO+BPVmNnQWo0H4LAU+IF8UuHMm5eQu91JjAA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
@@ -31,144 +31,111 @@ Received: from ja.int.chopps.org.chopps.org (syn-172-222-091-149.res.spectrum.co
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id 113A97D10E;
-	Fri,  7 Jun 2024 05:46:57 +0000 (UTC)
-References: <20240607054041.2032352-1-chopps@chopps.org>
-References: <20240607054041.2032352-1-chopps@chopps.org>
+	by smtp.chopps.org (Postfix) with ESMTPSA id E6F6D7D10E;
+	Fri,  7 Jun 2024 05:50:42 +0000 (UTC)
+References: <20240520214255.2590923-1-chopps@chopps.org>
+ <20240520214255.2590923-9-chopps@chopps.org>
+ <Zl354nSbE5mOMC2h@Antony2201.local>
 User-agent: mu4e 1.8.14; emacs 28.3
 From: Christian Hopps <chopps@chopps.org>
-To: devel@linux-ipsec.org
-Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org,
- Christian Hopps <chopps@chopps.org>, Christian Hopps <chopps@labn.net>
-Subject: [PATCH ipsec-next v3 0/17] Add IP-TFS mode to xfrm
-Date: Fri, 07 Jun 2024 01:42:38 -0400
-In-reply-to: <20240607054041.2032352-1-chopps@chopps.org>
-Message-ID: <m27cf1gv8v.fsf@ja.int.chopps.org>
+To: Antony Antony <antony@phenome.org>
+Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org, Steffen
+ Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, Christian
+ Hopps <chopps@labn.net>
+Subject: Re: [devel-ipsec] [PATCH ipsec-next v2 08/17] xfrm: iptfs: add new
+ iptfs xfrm mode impl
+Date: Fri, 07 Jun 2024 01:49:40 -0400
+In-reply-to: <Zl354nSbE5mOMC2h@Antony2201.local>
+Message-ID: <m234ppgv2m.fsf@ja.int.chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+
+--=-=-=
 Content-Type: text/plain; format=flowed
 
-From: Christian Hopps <chopps@labn.net>
 
-* Summary of Changes:
+Antony Antony <antony@phenome.org> writes:
 
-This patchset adds a new xfrm mode implementing on-demand IP-TFS. IP-TFS
-(AggFrag encapsulation) has been standardized in RFC9347.
+> Hi Chris,
+>
+> On Mon, May 20, 2024 at 05:42:46PM -0400, Christian Hopps via Devel wrote:
 
-  Link: https://www.rfc-editor.org/rfc/rfc9347.txt
+>> From: Christian Hopps <chopps@labn.net>
+>> +static unsigned int iptfs_sa_len(const struct xfrm_state *x)
+>> +{
+>> +	struct xfrm_iptfs_data *xtfs = x->mode_data;
+>> +	struct xfrm_iptfs_config *xc = &xtfs->cfg;
+>> +	unsigned int l = 0;
+>> +
+>> +	l += nla_total_size(0);
+>> +	l += nla_total_size(sizeof(u16));
+>> +	l += nla_total_size(sizeof(xc->pkt_size));
+>> +	l += nla_total_size(sizeof(u32));
+>> +	l += nla_total_size(sizeof(u32)); /* drop time usec */
+>> +	l += nla_total_size(sizeof(u32)); /* init delay usec */
+>> +
+>> +	return l;
+>> +}
+>> +
+>> +static int iptfs_copy_to_user(struct xfrm_state *x, struct sk_buff *skb)
+>> +{
+>> +	struct xfrm_iptfs_data *xtfs = x->mode_data;
+>> +	struct xfrm_iptfs_config *xc = &xtfs->cfg;
+>> +	int ret;
+>> +
+>> +	ret = nla_put_flag(skb, XFRMA_IPTFS_DONT_FRAG);
+>> +	if (ret)
+>> +		return ret;
+>> +	ret = nla_put_u16(skb, XFRMA_IPTFS_REORDER_WINDOW, 0);
+>> +	if (ret)
+>> +		return ret;
+>> +	ret = nla_put_u32(skb, XFRMA_IPTFS_PKT_SIZE, xc->pkt_size);
+>> +	if (ret)
+>> +		return ret;
+>> +	ret = nla_put_u32(skb, XFRMA_IPTFS_MAX_QSIZE, 0);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	ret = nla_put_u32(skb, XFRMA_IPTFS_DROP_TIME, 0);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	ret = nla_put_u32(skb, XFRMA_IPTFS_INIT_DELAY, 0);
+>
+> Why copy all attributes? Only copy the ones relevant to the SA direction.
+> Also adjust in  iptfs_sa_len().
 
-This feature supports demand driven (i.e., non-constant send rate)
-IP-TFS to take advantage of the AGGFRAG ESP payload encapsulation. This
-payload type supports aggregation and fragmentation of the inner IP
-packet stream which in turn yields higher small-packet bandwidth as well
-as reducing MTU/PMTU issues. Congestion control is unimplementated as
-the send rate is demand driven rather than constant.
+Updated in new v3 patchset.
 
-In order to allow loading this fucntionality as a module a set of
-callbacks xfrm_mode_cbs has been added to xfrm as well.
+Thanks,
+Chris.
 
-Patchset Changes:
------------------
 
-  23 files changed, 3252 insertions(+), 19 deletions(-)
-  Documentation/networking/xfrm_sysctl.rst |   30 +
-  include/net/netns/xfrm.h                 |    6 +
-  include/net/xfrm.h                       |   40 +
-  include/uapi/linux/in.h                  |    2 +
-  include/uapi/linux/ip.h                  |   16 +
-  include/uapi/linux/ipsec.h               |    3 +-
-  include/uapi/linux/snmp.h                |    3 +
-  include/uapi/linux/xfrm.h                |    9 +-
-  net/ipv4/esp4.c                          |    3 +-
-  net/ipv6/esp6.c                          |    3 +-
-  net/netfilter/nft_xfrm.c                 |    3 +-
-  net/xfrm/Makefile                        |    1 +
-  net/xfrm/trace_iptfs.h                   |  218 +++
-  net/xfrm/xfrm_compat.c                   |   10 +-
-  net/xfrm/xfrm_device.c                   |    4 +-
-  net/xfrm/xfrm_input.c                    |   14 +-
-  net/xfrm/xfrm_iptfs.c                    | 2741 ++++++++++++++++++++++++++++++
-  net/xfrm/xfrm_output.c                   |    6 +
-  net/xfrm/xfrm_policy.c                   |   26 +-
-  net/xfrm/xfrm_proc.c                     |    3 +
-  net/xfrm/xfrm_state.c                    |   60 +
-  net/xfrm/xfrm_sysctl.c                   |   38 +
-  net/xfrm/xfrm_user.c                     |   32 +
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Patchset Structure:
--------------------
+-----BEGIN PGP SIGNATURE-----
 
-The first 7 commits are changes to the xfrm infrastructure to support
-the callbacks as well as more generic IP-TFS additions that may be used
-outside the actual IP-TFS implementation.
-
-  - iptfs: config: add CONFIG_XFRM_IPTFS
-  - iptfs: uapi: ip: add ip_tfs_*_hdr packet formats
-  - iptfs: uapi: IPPROTO_AGGFRAG AGGFRAG in ESP
-  - iptfs: sysctl: allow configuration of global default values
-  - iptfs: netlink: add config (netlink) options
-  - iptfs: xfrm: Add mode_cbs module functionality
-  - iptfs: xfrm: add generic iptfs defines and functionality
-
-The last 9+1 commits constitute the IP-TFS implementation constructed in
-layers to make review easier. The first 9 commits all apply to a single
-file `net/xfrm/xfrm_iptfs.c`, the last commit adds a new tracepoint
-header file along with the use of these new tracepoint calls.
-
-  - iptfs: impl: add new iptfs xfrm mode impl
-  - iptfs: impl: add user packet (tunnel ingress) handling
-  - iptfs: impl: share page fragments of inner packets
-  - iptfs: impl: add fragmenting of larger than MTU user packets
-  - iptfs: impl: add basic receive packet (tunnel egress) handling
-  - iptfs: impl: handle received fragmented inner packets
-  - iptfs: impl: add reusing received skb for the tunnel egress packet
-  - iptfs: impl: add skb-fragment sharing code
-  - iptfs: impl: handle reordering of received packets
-  - iptfs: impl: add tracepoint functionality
-
-Patchset History:
------------------
-
-RFCv1 (11/10/2023)
-
-RFCv1 -> RFCv2 (11/12/2023)
-
-  Updates based on feedback from Simon Horman, Antony,
-  Michael Richardson, and kernel test robot.
-
-RFCv2 -> v1 (2/19/2024)
-
-  Updates based on feedback from Sabrina Dubroca, kernel test robot
-
-v1 -> v2 (5/19/2024)
-
-  Updates based on feedback from Sabrina Dubroca, Simon Horman, Antony.
-
-  o Add handling of new netlink SA direction attribute (Antony).
-  o Split single patch/commit of xfrm_iptfs.c (the actual IP-TFS impl)
-    into 9+1 distinct layered functionality commits for aiding review.
-  - xfrm: fix return check on clone() callback
-  - xfrm: add sa_len() callback in xfrm_mode_cbs for copy to user
-  - iptfs: remove unneeded skb free count variable
-  - iptfs: remove unused variable and "breadcrumb" for future code.
-  - iptfs: use do_div() to avoid "__udivd13 missing" link failure.
-  - iptfs: remove some BUG_ON() assertions questioned in review.
-
-v2->v3
-
-  - iptfs: copy only the netlink attributes to user based on the
-    direction of the SA.
-
-  - xfrm: stats: in the output path check for skb->dev == NULL prior to
-    setting xfrm statistics on dev_net(skb->dev) as skb->dev may be NULL
-    for locally generated packets.
-
-  - xfrm: stats: fix an input use case where dev_net(skb->dev) is used
-    to inc stats after skb is possibly NULL'd earlier. Switch to using
-    existing saved `net` pointer.
-
+iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmZin7ESHGNob3Bwc0Bj
+aG9wcHMub3JnAAoJEC4dgw7XuDAlPT4P/1RSE0hQFiG/vcTNj1vbbYR+Zrl1qBy1
+NuLGpSX3k2DYlcctxLXp68FTij6+wCaGHqtQgnK2/qoDfnjWNtr0xMA0aXOlOWhq
+SoxzbnmRG3Ux153hyAvCSK8/5dnHiwvqTS5VL4zFWE/maYQQ22qTgOlMe52UCVWN
+d8whvAVxTfZx2Y7s+OjpSMq2PPrZ1cFE90nljXSr6N+wAm4P7jpYh6JjLS5n0bXm
+f3yQRI5BDYIrbfhlmEmh+TXuED1OMtbfuROL0B437IdyFUdMVf1AyZhTxbjhilTW
+/oK+1++FSLr1chAgRNlJazQMK+umFhXriYItEZ4lHDFBrTj85dgYR5Xxq9FtWEVH
+5vRSfgEqsXZ0Cj4QOj//swEx/k2oEr4+a6SwH79KgYPVEBOmEcTqQNu1ZdQ5oT1K
+akbOiiT9RbKDMoLHLgpCw0q0poa9KGn8n21JEt1S46d4jz6eCbbzkSv5Va0BKE5O
+rK1SZfxEvXNlBVm3Zk6tXDreaY57/mpYbf3g3TeOkhZk4yVnZUjZuUr+mUifIi5E
+CsJyJ3PPD3mV2Vw4cnJYdmKjXKwhvhmiWqFjt7VzU5cB4h/uwKsSBKfR31zFmgV9
+BgG+l7hga9xsKgMxTmYAOfAuCZIRDc8owPQD/uy7COnGPpAuYVO6AfPb8ZE6/A7m
+JBaUaxLGnEvY
+=5PWw
+-----END PGP SIGNATURE-----
+--=-=-=--
 
