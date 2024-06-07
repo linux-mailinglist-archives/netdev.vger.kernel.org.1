@@ -1,122 +1,142 @@
-Return-Path: <netdev+bounces-101817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B98369002F5
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:04:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADC48900309
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:09:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C63011C20CE7
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:04:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6321E1F22FAB
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:09:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A626618735F;
-	Fri,  7 Jun 2024 12:04:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WH37pSnV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85D3A187324;
+	Fri,  7 Jun 2024 12:09:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD461847;
-	Fri,  7 Jun 2024 12:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2351847;
+	Fri,  7 Jun 2024 12:09:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717761853; cv=none; b=uakrVCxC/GZv9LzvQxKLpzn9Sf0t/Php3DTkXq8APqdNrsvDq/KS3xAwNEp4+w59FDQV+FEQ8KDsRRyNA6ryO/Rif3/dOtbMrXN41hZzyKerBJjw3vwU9WeV3NcDeG3zJReJDCe+eSvueHPQHjz180xjksxHdUBymdxr4Orrus8=
+	t=1717762167; cv=none; b=kGVIeBGpeJZbmv71qswFjD1sbsbS65bgXt+jdVtB3NpKQ353txUuaJkmxmyBL1AK6f0dVY9OHCX1otXmNWw8tPApBVJ3rwnNpO9PjQzcD5RGEzzUtxuNltLHBt2epeA6g4R32TDB42oYJgm9VJMm3w+wSkmAa7vv3PjKIBE5U0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717761853; c=relaxed/simple;
-	bh=uzqPo3uX/uPKB0puXr+jSuRD830u4tgbdtzpw6nxbHA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EAniawdie1eP38iDVLxvRezjAt3UqhEb4LvRsghFYm94cygbPWv/LER7jve7p1Vmwz4WWn6F7nwKGCJSfLAHvJlvjvA4uKC4MVYnXssWfzTVLkbg6n8rtvUejaljlkhQkWqDLxTp2RwlrGPofao0ljpu95MY7yCG+kO3xvuHL1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WH37pSnV; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a68c5524086so234363266b.3;
-        Fri, 07 Jun 2024 05:04:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717761850; x=1718366650; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7yDPdh1hB7ZRbMcjAAQr7F6VbwKd5JcFkqyU5OREcZk=;
-        b=WH37pSnV9WeXmUNpXgnJUmJUyJ+PCSYsbc6DzTzIq/hpivj7LvqGWzGJA+s5HhA7W4
-         s5Gm/3UzLnI+mhjNWw65Xo0QBU7mhOIl5KcXoXo+PusS4YQiOR/Cv5YXpgNqygMpn55S
-         6i8Sk033u/1E/ZmMCChDUUlqG0dQjqwtaiHy8n6Ivubggay50QFe1L8BqYrSapDIDwT3
-         RUyfbbajEcLt07CobDPRX97v3zZaXBmSqgNM6z3jbtlKbdHhMfTaXEkORCnCuGN2U+ir
-         lZ//QmSFoM8Jkfucop6/hl7TANED3dmmxQYloNEGv/jADbQfy139J9ydZdCb17sXx38u
-         AiAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717761850; x=1718366650;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7yDPdh1hB7ZRbMcjAAQr7F6VbwKd5JcFkqyU5OREcZk=;
-        b=kfY0g266BkxnZzij/VUTWX0lLapOQsKJ1gCUn1Kqu/NsNT/yDf2Arw9qzX9/YRGh2e
-         wIZnceOLUjCuCsdeytX4Z+zpZDMOOGgdhESGvoH+NswWja1DB+H9v+pgHVX2kFOaS7Of
-         5rRLeBNzRL0TPL/cKHx03G14BJhpClqoPd43gxBVFyqy9gtTfvtvUdmbfOIPjdN6mI6C
-         Z14U4cTK21nek0cgLNezku3F+WdNu3LtV6iRxPK1K6DfNvD0cP89N3Lr7w4u5phm34KZ
-         +cuXBPgJkUEyzYnh2aN2x32XRJh2a7u1hWjUGq2WEjhfcRJUW8PUfyz/s7fvwqZs1pSr
-         aKUw==
-X-Forwarded-Encrypted: i=1; AJvYcCVrM0GUp0kZtXiIHdxuzwHQkTqnLNnZ9PcT6r/78QlW9IFFhlIQqI7CbVXVPe3cBJllvs2kac0QkJrWbRYIuZAO13Ed63PI6KDLnY69AKab/KxwF6TqcYIU2ZZN1pdjlli71NCAqaJenrjuSj5gbsvSroe2o4K9QU4TNojSwbL1Rw==
-X-Gm-Message-State: AOJu0YyVTqhUgzvHzZ3Qdr5LIQ9cJfIadrc3e6zLVZf/J8MI2hzDMRE5
-	3qEEvURJXMkJUVuIEjB9bJ+V8j8y7mIERwD1aM96DU1sU1wXCJlW
-X-Google-Smtp-Source: AGHT+IFDvLmbmEo8twcHfW7gQQaHvdhzEY0fA1Pqz3fcVUYOHyVjktM+pdWmeQe7BL7diQ3dkZ0VgA==
-X-Received: by 2002:a17:906:3289:b0:a69:1a11:d396 with SMTP id a640c23a62f3a-a6cdc0e252amr154780866b.71.1717761850068;
-        Fri, 07 Jun 2024 05:04:10 -0700 (PDT)
-Received: from skbuf ([188.25.55.166])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6c805ccf21sm234748766b.70.2024.06.07.05.04.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jun 2024 05:04:09 -0700 (PDT)
-Date: Fri, 7 Jun 2024 15:04:06 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Martin Schiller <ms@dev.tdt.de>
-Cc: martin.blumenstingl@googlemail.com, hauke@hauke-m.de, andrew@lunn.ch,
-	f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 02/13] net: dsa: lantiq_gswip: Only allow
- phy-mode = "internal" on the CPU port
-Message-ID: <20240607120406.dksbevig2k6vj6uu@skbuf>
-References: <20240606085234.565551-1-ms@dev.tdt.de>
- <20240606085234.565551-3-ms@dev.tdt.de>
- <20240607110318.jujco3liryl7om3v@skbuf>
- <bc660eb043143926ef267d1b96dee939@dev.tdt.de>
+	s=arc-20240116; t=1717762167; c=relaxed/simple;
+	bh=gwKwTD1WKix0cop8Lpfa38D2U/BH7EMvYjh2D2pY+1g=;
+	h=MIME-Version:Content-Type:Date:From:To:Cc:Subject:In-Reply-To:
+	 References:Message-ID; b=YWvWC0+i4Cgna+bDaYuMGzimD+0iOanBmLuLe9eP+FWdJuuOIZgU6oPj9UM9cpT2tpRyufdYCP2loQDd3J0c0ZLRgVNFUh6cYJkpxk+BwpZJFj6AxqeHcaT1ED0Z8rDZ8h1BU9h/EVv6ABP0y7c0xJXGbc8JYy5TwqhrgeMrgzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=194.37.255.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
+Received: from [127.0.0.1] (helo=localhost)
+	by relay.expurgate.net with smtp (Exim 4.92)
+	(envelope-from <prvs=990276a841=ms@dev.tdt.de>)
+	id 1sFYPD-00F0Vb-S9; Fri, 07 Jun 2024 14:09:15 +0200
+Received: from [195.243.126.94] (helo=securemail.tdt.de)
+	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ms@dev.tdt.de>)
+	id 1sFYPC-005Nrm-W0; Fri, 07 Jun 2024 14:09:15 +0200
+Received: from securemail.tdt.de (localhost [127.0.0.1])
+	by securemail.tdt.de (Postfix) with ESMTP id A5A7C240053;
+	Fri,  7 Jun 2024 14:09:14 +0200 (CEST)
+Received: from mail.dev.tdt.de (unknown [10.2.4.42])
+	by securemail.tdt.de (Postfix) with ESMTP id 35689240050;
+	Fri,  7 Jun 2024 14:09:14 +0200 (CEST)
+Received: from mail.dev.tdt.de (localhost [IPv6:::1])
+	by mail.dev.tdt.de (Postfix) with ESMTP id E10A43829D;
+	Fri,  7 Jun 2024 14:09:13 +0200 (CEST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bc660eb043143926ef267d1b96dee939@dev.tdt.de>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Fri, 07 Jun 2024 14:09:13 +0200
+From: Martin Schiller <ms@dev.tdt.de>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: martin.blumenstingl@googlemail.com, hauke@hauke-m.de, andrew@lunn.ch,
+ f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 03/13] net: dsa: lantiq_gswip: Use dev_err_probe
+ where appropriate
+Organization: TDT AG
+In-Reply-To: <20240607110747.zsiahnzge2bvxd4l@skbuf>
+References: <20240606085234.565551-1-ms@dev.tdt.de>
+ <20240606085234.565551-1-ms@dev.tdt.de>
+ <20240606085234.565551-4-ms@dev.tdt.de>
+ <20240606085234.565551-4-ms@dev.tdt.de>
+ <20240607110747.zsiahnzge2bvxd4l@skbuf>
+Message-ID: <9a9ca4e015446b9a0f76fa3d5e6e9f0b@dev.tdt.de>
+X-Sender: ms@dev.tdt.de
+User-Agent: Roundcube Webmail/1.3.17
+X-purgate-ID: 151534::1717762155-91E7E642-919E136F/0/0
+X-purgate: clean
+X-purgate-type: clean
 
-On Fri, Jun 07, 2024 at 02:01:57PM +0200, Martin Schiller wrote:
-> On 2024-06-07 13:03, Vladimir Oltean wrote:
-> > On Thu, Jun 06, 2024 at 10:52:23AM +0200, Martin Schiller wrote:
-> > > From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-> > > 
-> > > Add the CPU port to gswip_xrx200_phylink_get_caps() and
-> > > gswip_xrx300_phylink_get_caps(). It connects through a SoC-internal
-> > > bus,
-> > > so the only allowed phy-mode is PHY_INTERFACE_MODE_INTERNAL.
-> > > 
-> > > Signed-off-by: Martin Blumenstingl
-> > > <martin.blumenstingl@googlemail.com>
-> > > ---
-> > 
-> > This is for the case where those CPU port device tree properties are
-> > present, right? In the device trees in current circulation they are not,
-> > and DSA skips phylink registration.
+On 2024-06-07 13:07, Vladimir Oltean wrote:
+> On Thu, Jun 06, 2024 at 10:52:24AM +0200, Martin Schiller wrote:
+>> @@ -2050,8 +2048,9 @@ static int gswip_gphy_fw_list(struct gswip_priv 
+>> *priv,
+>>  			priv->gphy_fw_name_cfg = &xrx200a2x_gphy_data;
+>>  			break;
+>>  		default:
+>> -			dev_err(dev, "unknown GSWIP version: 0x%x", version);
+>> -			return -ENOENT;
+>> +			return dev_err_probe(dev, -ENOENT,
+>> +					     "unknown GSWIP version: 0x%x",
+>> +					     version);
+>>  		}
+>>  	}
+>> 
+>> @@ -2059,10 +2058,9 @@ static int gswip_gphy_fw_list(struct gswip_priv 
+>> *priv,
+>>  	if (match && match->data)
+>>  		priv->gphy_fw_name_cfg = match->data;
+>> 
+>> -	if (!priv->gphy_fw_name_cfg) {
+>> -		dev_err(dev, "GPHY compatible type not supported");
+>> -		return -ENOENT;
+>> -	}
+>> +	if (!priv->gphy_fw_name_cfg)
+>> +		return dev_err_probe(dev, -ENOENT,
+>> +				     "GPHY compatible type not supported");
+>> 
+>>  	priv->num_gphy_fw = of_get_available_child_count(gphy_fw_list_np);
+>>  	if (!priv->num_gphy_fw)
+>> @@ -2163,8 +2161,8 @@ static int gswip_probe(struct platform_device 
+>> *pdev)
+>>  			return -EINVAL;
+>>  		break;
+>>  	default:
+>> -		dev_err(dev, "unknown GSWIP version: 0x%x", version);
+>> -		return -ENOENT;
+>> +		return dev_err_probe(dev, -ENOENT,
+>> +				     "unknown GSWIP version: 0x%x", version);
+>>  	}
+>> 
+>>  	/* bring up the mdio bus */
+>> @@ -2172,28 +2170,27 @@ static int gswip_probe(struct platform_device 
+>> *pdev)
+>>  	if (!dsa_is_cpu_port(priv->ds, priv->hw_info->cpu_port)) {
+>> -		dev_err(dev, "wrong CPU port defined, HW only supports port: %i",
+>> -			priv->hw_info->cpu_port);
+>> -		err = -EINVAL;
+>> +		err = dev_err_probe(dev, -EINVAL,
+>> +				    "wrong CPU port defined, HW only supports port: %i",
+>> +				    priv->hw_info->cpu_port);
+>>  		goto disable_switch;
+>>  	}
 > 
-> Yes, as far as I know, this driver is mainly, if not exclusively, used in
-> the
-> openWrt environment. These functions were already added here in Oct. 2022
-> [1].
-> 
-> [1] https://git.openwrt.org/?p=openwrt/openwrt.git;a=commitdiff;h=2683cca5927844594f7835aa983e2690d1e343c6
+> Nitpick: there is no terminating \n here.
 
-Ok. You can add my
-
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Oh, thanks for the hint. I'll correct that (and also check the complete 
+source
+file for that kind of mistakes).
 
