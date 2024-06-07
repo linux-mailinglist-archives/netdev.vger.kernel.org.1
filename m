@@ -1,78 +1,83 @@
-Return-Path: <netdev+bounces-101717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 044888FFDAC
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:57:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDC518FFDC6
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:06:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6FF4288686
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:57:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDF271C22D60
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 08:06:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB9BA15A876;
-	Fri,  7 Jun 2024 07:57:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0403015AD9B;
+	Fri,  7 Jun 2024 08:06:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="o+yaSPp5"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PH0J6+8z"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45DEB155324;
-	Fri,  7 Jun 2024 07:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991A913C69B;
+	Fri,  7 Jun 2024 08:06:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717747046; cv=none; b=PdKZtC5K1r3eI3pyfdUOo2ZyR+hLf/d7qC46PZgobAXkKivVbiqgS3c2vs089UyZXRtojCN9BCsVIohEJQrmjQt7sZkTEf+0KcVNvPWY1YWib+77NAZPPepQDCkWG0E1rd4EyruRtSFJhMObEKn2YFtS7uY++0DGx4q9f6/sEyU=
+	t=1717747577; cv=none; b=QKatUUWifn/uTNSvXp+S3DiiJE1PnISy/HG7z/KiCKr7zE6Ymdo+n/stIuyLuOnfmc/6B1h3/Y3IQFYiDuEOqIRerV/cUD8aLf67IGCfqpPDRybvzIgojQZR2Tfxg7OF0FE28k0sLYXFY/Co3UFyKe5JidRdyH1Sg7awaSovAFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717747046; c=relaxed/simple;
-	bh=/rVVT93v1VgA2sZlK0W8IMOluwnn164CpDFtGBdE3ww=;
+	s=arc-20240116; t=1717747577; c=relaxed/simple;
+	bh=D+/UALLSv9oy4xrGrHjWW+E2Ia6tzKVJHvFUaGkGlwc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=imnLuh3zuOOumEe5iX8STvKdoiQChmYXHrfLNmlSkTNN3v2d8iubYR88IJk/Vx/wDLhDrrlRpx3jM9cQ1wslWg9N0xn4InlsKCv7Bp5BuoKOrhXSgEdUkJ2mOLpS8YckZlhAxjHsXCL8fNj43jW+Y8q5aoKpoZ9xcFc2XKN1YhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=o+yaSPp5; arc=none smtp.client-ip=217.70.183.200
+	 MIME-Version:Content-Type; b=OwiMoYODoGp5ua/dw5uCnvN/2vwxbstHqeFudM1qtnXT+P+JII+4BfO0nnPcR1KBalbV1I0gxp3MwuQoH4ANNPRa8OCHdU4eobYoSF3COWlG7BxZKQDnNEnzD2MGXWiN/9bZ+Uh6083yd9jFqShFyrs6dasEVk8edTCBkTAmH18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PH0J6+8z; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7049820002;
-	Fri,  7 Jun 2024 07:57:13 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3A06D1C0007;
+	Fri,  7 Jun 2024 08:06:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1717747036;
+	t=1717747571;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=G0iQZF+fCUGILMJfsI2XW5jxgsXGqak3K4quThjAXuY=;
-	b=o+yaSPp5GSiAk5XrXWOc4/wuaulu7pPFfkMsGzE+Fe8I7uASyQpXwPs0wXZ3Y4KBzUWUfJ
-	qaykxdmuLRick47EMukQ0UXJH/z/b1GiWSYAX0IcG0/LYfvH7lJA3Ij6XEsiN5TfIc0iKc
-	izgcx9i0V2hqRkd02JGaClSNNqZzzh+pZJ/vorUdinu5dwzCJ7GuUFMyokDPqDVCy+OkuP
-	mOOlZy2uDqvaK1AXlj5YC65KgXJyvxCdmaGEmcogOekUcu/sm1iTfNSWzPZwOTTrvm962O
-	5vDY1oaY7zRq+HxBsweJgseSySdzx+O3gud8aLImXDiKAoLQap3l06pn122m1w==
-Date: Fri, 7 Jun 2024 09:57:12 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
- kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+	bh=BFfuVjtrcTLRobaSH0psf6/I1QuxZBKYWSnIuQ5XmGY=;
+	b=PH0J6+8ztUFADaSZDGfHF5vJoDDUoehBQuL0rnhj6Ma8m2WkOuDaQiNIaA7QAPzuAC1Ym9
+	GoJdsST2eUkSP8+5iY6JrMym0qUGpiy+NqNvGnDi+/L49RlwfebD6AxcnAiQIhiyPo+sPs
+	ajtCZg98h/of8iYKa75/kDuP5ls7hcE1d8j758hYYQ8MpanGim680eb9TxamL8H6JzRxnP
+	gt8wsuEyueFEr94ynXLWrQvXsj+ef5qT1UD4y3ELSK4SGXLaHWnnqFYD2OmJXNu74GMXud
+	afFFmhjBoHAjvKS8ge/I1ku3JNZnqjBXujksJ/hOOc/g1AVw2yxw+zgk106yLg==
+Date: Fri, 7 Jun 2024 10:06:03 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Simon Horman <horms@kernel.org>, Sai Krishna Gajula
+ <saikrishnag@marvell.com>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lee Jones
+ <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Horatiu Vultur
+ <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com, Andrew Lunn
  <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
- Willem de Bruijn <willemb@google.com>, Alexandra Winter
- <wintera@linux.ibm.com>
-Subject: Re: [PATCH net-next v14 00/14] net: Make timestamping selectable
-Message-ID: <20240607095712.386c2b8c@kmaincent-XPS-13-7390>
-In-Reply-To: <eb5da634b85993977f086ee72c2a1056ea0f6bfc.camel@redhat.com>
-References: <20240604-feature_ptp_netnext-v14-0-77b6f6efea40@bootlin.com>
-	<eb5da634b85993977f086ee72c2a1056ea0f6bfc.camel@redhat.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+ <linux@armlinux.org.uk>, Saravana Kannan <saravanak@google.com>, Bjorn
+ Helgaas <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>, Lars
+ Povlsen <lars.povlsen@microchip.com>, Steen Hegelund
+ <Steen.Hegelund@microchip.com>, Daniel Machon
+ <daniel.machon@microchip.com>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Allan
+ Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli
+ <luca.ceresoli@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 10/19] irqdomain: Introduce irq_domain_alloc() and
+ irq_domain_publish()
+Message-ID: <20240607100603.660efc87@bootlin.com>
+In-Reply-To: <87v82m0wms.ffs@tglx>
+References: <20240527161450.326615-1-herve.codina@bootlin.com>
+	<20240527161450.326615-11-herve.codina@bootlin.com>
+	<8734pr5yq1.ffs@tglx>
+	<20240606175258.0e36ea98@bootlin.com>
+	<87v82m0wms.ffs@tglx>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,29 +85,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-Hello Paolo,
+On Thu, 06 Jun 2024 20:11:23 +0200
+Thomas Gleixner <tglx@linutronix.de> wrote:
 
-On Thu, 06 Jun 2024 15:28:28 +0200
-Paolo Abeni <pabeni@redhat.com> wrote:
+> Herve!
+> 
+> On Thu, Jun 06 2024 at 17:52, Herve Codina wrote:
+> > On Wed, 05 Jun 2024 15:02:46 +0200
+> > Thomas Gleixner <tglx@linutronix.de> wrote:  
+> >> On Mon, May 27 2024 at 18:14, Herve Codina wrote:  
+> >> > To avoid a window where the domain is published but not yet ready to be    
+> >> 
+> >> I can see the point, but why is this suddenly a problem? There are tons
+> >> of interrupt chip drivers which have exactly that pattern.  
+> >
+> > I thing the issue was not triggered because these interrupt chip driver
+> > are usually builtin compiled and the probe sequence is the linear one
+> > done at boot time. Consumers/supplier are probe sequentially without any
+> > parallel execution issues.
+> >
+> > In the LAN966x PCI device driver use case, the drivers were built as
+> > modules. Modules loading and drivers .probe() calls for the irqs supplier
+> > and irqs consumers are done in parallel. This reveals the race condition.  
+> 
+> So how is that supposed to work? There is clearly a requirement that the
+> interrupt controller is ready to use when the network driver is probed, no?
 
-> On Tue, 2024-06-04 at 12:39 +0200, Kory Maincent wrote:
->  [...] =20
->=20
-> I'm sorry to ask the question this late, but are there any plan to
-> introduce self-tests, eventually in a follow-up patch/series?
+Yes, EPROBE_DEFER mecanism.
+The race condition window leads to an other error code instead of the
+expected EPROBE_DEFER.
 
-There was no plan about it but it could change if it is needed.
-rxtimestamp.sh and txtimestammp.sh should still work. I will verify that ne=
-xt
-week.
-Before writing tests the next patch series will be in ethtool.
+> 
+> >> Also why is all of this burried in a series which aims to add a network
+> >> driver and touches the world and some more. If you had sent the two irq
+> >> domain patches seperately w/o spamming 100 people on CC then this would
+> >> have been solved long ago. That's documented clearly, no?  
+> >
+> > Yes, the main idea of the series, as mentioned in the cover letter, is to
+> > give the big picture of the LAN966x PCI device use case in order to have
+> > all the impacted subsystems and drivers maintainers be aware of the global
+> > use case: DT overlay on top of PCI device.
+> > Of course, the plan is to split this series into smaller ones once parts
+> > get discussed in the DT overlay on top of PCI use case and reach some kind
+> > of maturity at least on the way to implement a solution.  
+> 
+> Fair enough.
+> 
+> > Thomas, do you prefer to have all the IRQ related patches extracted right
+> > now from this big picture series ?  
+> 
+> I think the interrupt controller problem is completely orthogonal to the
+> PCI/DT issue.
+> 
+> So yes, please split them out as preparatory work which is probably also
+> not that interesting for the PCI/DT/net folks.
+> 
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Will do that.
+
+Best regards,
+Hervé
 
