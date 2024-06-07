@@ -1,107 +1,129 @@
-Return-Path: <netdev+bounces-101936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C98AB900A43
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:27:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30626900A6B
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:33:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5793DB24404
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:27:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA930282D53
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F9919A2A9;
-	Fri,  7 Jun 2024 16:27:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64DD219B3D4;
+	Fri,  7 Jun 2024 16:31:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A2ifAwwQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R8LJpdch"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D866D1B9;
-	Fri,  7 Jun 2024 16:27:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3310D134B2;
+	Fri,  7 Jun 2024 16:31:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717777655; cv=none; b=b5H+8S6M97063M2L7eqqd6He6557R4MI5QUqSr8p4goAHCxgViqP2xTsdRJWnye1ic7ZGgrchlMPfCNZdLRv+PEl+Q2g78CoqM7FiF78SW0QX+jBdOZY44a6LnMkCD2K0Yu502vTRl1WIiXjh4syuQcwsZ6KtwzEgAp3TRQGY9s=
+	t=1717777875; cv=none; b=iQiyrJ+PABt5dxEWVInA4dBhCjitzw2j1/L1ZCpF8gHXqldW1g5274fW+YQMsAAzaQ21jbKtWrDIB2AWZnKgTHjt/Ib+RI9GNKPVSCmTsCnGl0eaHptf7k1RAWKob4a6xmoWKmOYN0LupkN8lOyfokUuEYFaMZtUMhWWYzfttl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717777655; c=relaxed/simple;
-	bh=70WFcr3YZHLwEEqWuEFYuf3IHamdP8ojcxlq9+pNkuI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=f1u9EiKijiv2nKpNWnZfvKM07Of/TW9CY6XTTeR3CEfLS5qHQNIdQiTB1A17OJnmxD8M4LIZQhRCZm2ZWTM+/RlWLWqtBnD/lrvssFernnM9bIaZj5O259e0F+s3NgZKiwO79mxFVv6Nj7OYuVs2Y3XVFk7+DvPOYUnPj7euzmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A2ifAwwQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40999C2BBFC;
-	Fri,  7 Jun 2024 16:27:34 +0000 (UTC)
+	s=arc-20240116; t=1717777875; c=relaxed/simple;
+	bh=jhLtBrMAo8ryDnhWQTtDLfSSE4LNiPRN3afuSKN4v8Q=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=YAFH9N3SkjM9RbGz3Q0A9wptXjHmpVkMSOCYJDRIZdxMe6nU3q038gwY/RXQ64K9dwx255PsvTvCRKTMnEekmLI/UfbIxaCq3YIQDyB03Km1hawFZ6nIBbTaUoGNwKj7UE3TsVyQzBbd6+VL0PGMXRl7Za6d252UU1JcrbTOrBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R8LJpdch; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FDC1C2BBFC;
+	Fri,  7 Jun 2024 16:31:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717777654;
-	bh=70WFcr3YZHLwEEqWuEFYuf3IHamdP8ojcxlq9+pNkuI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=A2ifAwwQNjMrd1AqtONpXCSyvOdknl6boYk4Pw9p4ikc4NKZ8YGKRR1L0md2nPcPi
-	 m6kH8y2itDxknAKp65Y98T2MRAIXGe2/34JEAEdL5sFSTBzUPtiYUr7tSmPtR5JXNN
-	 9sKDMK7noCTja6zKbf+bDCHf8vENZsjUP9oSyMC3W99xGCTaHJpqsa4ds/kpaHe/8L
-	 euw+xkGrdiSo7cnFx5Dub7MvAlK9gSW4Q+dIrr0kHiKBAOO8TDZn3XnKebWatyMqg3
-	 D0fzdIn8t5StVG25HjdlKm5sgKYCK3KGAAKbDeuskRm3D1EL2GoXXnT0Wn5zhlsLSX
-	 VgvM7A9ZGM8Lw==
-Date: Fri, 7 Jun 2024 11:27:32 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Wei Huang <wei.huang2@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	bhelgaas@google.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com
-Subject: Re: [PATCH V2 1/9] PCI: Introduce PCIe TPH support framework
-Message-ID: <20240607162732.GA848790@bhelgaas>
+	s=k20201202; t=1717777874;
+	bh=jhLtBrMAo8ryDnhWQTtDLfSSE4LNiPRN3afuSKN4v8Q=;
+	h=From:Subject:Date:To:Cc:From;
+	b=R8LJpdchzAmPkZB3CQqsWbRchh4lBgCpjcc/u5EtLHj7wDjm+cSEYIIUysptV7xKc
+	 +lql0j496256hrtgYFdnnBX5qq91mn8vg2fb1aHJcjUb3tGrA9NE9ffdxlCLnxMiyX
+	 Ck9mlHo/H4I1lOs4PKXq+BwA2ZTgciY2Ye22e5tRkWI8ldkd9B7zm8iqj+3JwoKkuD
+	 X4L3xWhA6CIzDp+0Dfm2kQA7ZuZZQcm5q1hH0M5w0RY6KyjOFbrdyul3JGA2pSBIDe
+	 t/24waOtkijFzszzL2lmoHwjV7bv921rdKAZ5t4e7oiqCkUjo3L6j9fL+bT7jqHXGA
+	 0ZNgLbOrKxcOQ==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next 0/6] selftests: mptcp: use net/lib.sh to manage
+ netns
+Date: Fri, 07 Jun 2024 18:31:01 +0200
+Message-Id: <20240607-upstream-net-next-20240607-selftests-mptcp-net-lib-v1-0-e36986faac94@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240531213841.3246055-2-wei.huang2@amd.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMU1Y2YC/z2NwQrCMBBEf6Xs2YU0rRX8FfEQ41QX2hiyqxRK/
+ 91Q0MMcHjO8WUlRBErnZqWCj6i8UoX20FB8hvQAy70yeed7N7gTv7NaQZg5wWoW43+lmEaDmvK
+ cLeZ9McmNu+GIvoNHGwNVcS4YZdlPL/TT0HXbvqkbt9+OAAAA
+To: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Geliang Tang <tanggeliang@kylinos.cn>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1664; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=jhLtBrMAo8ryDnhWQTtDLfSSE4LNiPRN3afuSKN4v8Q=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmYzXPzkHF/dP9UOJPwz+3WRICf4XmqHzCwJCMy
+ ZGrKGQ0BxGJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZmM1zwAKCRD2t4JPQmmg
+ cw0vEADdwBa+vFOXcyCHnBWs8kybF7ImH9DJbc0enEgjonqQYfehgbizvU3ENFoJQlfqT7cC60A
+ h/EHNbo9BkOdyh8ZfaISU25EJqTe9dbVDA+f1lOYnqxQMWEtkIEnhGV5A9pV32fVgBLtuG8Q7iF
+ Huyz4W9yWD5a1c5xGz1fiz753EXts/qRuwJLbf2JPDHCP7zCHJoRNnDBotPjf0c3kRn9PkFK3bV
+ YmM7MmxLBvl0J1Ho/SR5S0+D8ocQiWPdx7Lt7S3w8uyA55YxrPf+SDCpwoIF4/9N2vyRHOe+2x9
+ S/yGZSkzJ60KtdCFJ55Anvf95U1SK9pjKZtLYPLyNmbEqiKnrLjpY7dofk/VqwKwF1gYhdthk4r
+ A3e/fekh+j2ChXRcKKYgGbfjsTS0A0/lBRj9jpTnnQ7XIUlwBl2PWZN2NuraQihI5xrgpUrpAOe
+ AiLSvugJMicSEQscVU8RPQ/YwVWiB5hONvuoyiy+M/zEgaaA+8yf3TM/o4N/1VEt8ZOT2auZd/i
+ 3qmLl1dINopja5k9dp5FEaVjPDGHCx+3zU6ynNnTPhRcPeAPSYji+/Qvstr4/msfPG9hQ6eudlq
+ um6qKw9RroBp04SbGptkHP3QpzMOtR5Ahm6hubzGl/R0dQ4nZZMLO90tMC46NEE+2nFJZWkCum1
+ HwlEb88ashD45MQ==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On Fri, May 31, 2024 at 04:38:33PM -0500, Wei Huang wrote:
-> This patch implements the framework for PCIe TPH support. It introduces
-> tph.c source file, along with CONFIG_PCIE_TPH, to Linux PCIe subsystem.
-> A new member, named tph_cap, is also introduced in pci_dev to cache TPH
-> capability offset.
+The goal of this series is to use helpers from net/lib.sh with MPTCP
+selftests.
 
-s/This patch implements/Implement/
-s/It introduces/Introduce/
-s/is also introduced/Add tph_cap .../
+- Patches 1 to 4 are some clean-ups and preparation in net/lib.sh:
 
-https://chris.beams.io/posts/git-commit/
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?id=v6.9#n94
+  - Patch 1 simplifies the code handling errexit by ignoring possible
+    errors instead of disabling errexit temporary.
 
-> +	  This option adds support for PCIE TLP Processing Hints (TPH).
-> +	  TPH allows endpoint devices to provide optimization hints, such as
-> +	  desired caching behavior, for requests that target memory space.
-> +	  These hints, called steering tags, can empower the system hardware
-> +	  to optimize the utilization of platform resources.
+  - Patch 2 removes the netns from the list after having cleaned it, not
+    to try to clean it twice.
 
-s/PCIE TLP/PCIe TLP/ to match context.
+  - Patch 3 removes the 'readonly' attribute for the netns variable, to
+    allow using the same name in local variables.
 
-> +++ b/drivers/pci/pcie/tph.c
+  - Patch 4 removes the local 'ns' var, not to conflict with the global
+    one it needs to setup.
 
-> +#define pr_fmt(fmt) "TPH: " fmt
-> +#define dev_fmt pr_fmt
+- Patch 5 uses helpers from net/lib.sh to create and delete netns in
+  MPTCP selftests.
 
-Add when used.
+- Patch 6 uses wait_local_port_listen helper from net/net_helper.sh.
 
-> +void pcie_tph_init(struct pci_dev *dev)
-> +{
-> +	dev->tph_cap = pci_find_ext_capability(dev, PCI_EXT_CAP_ID_TPH);
-> +}
-> +
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Geliang Tang (3):
+      selftests: net: lib: remove 'ns' var in setup_ns
+      selftests: mptcp: lib: use setup/cleanup_ns helpers
+      selftests: mptcp: lib: use wait_local_port_listen helper
 
-  $ git am m/v2_20240531_wei_huang2_pcie_tph_and_cache_direct_injection_support.mbx
-  Applying: PCI: Introduce PCIe TPH support framework
-  .git/rebase-apply/patch:88: new blank line at EOF.
-  +
-  warning: 1 line adds whitespace errors.
+Matthieu Baerts (NGI0) (3):
+      selftests: net: lib: ignore possible errors
+      selftests: net: lib: remove ns from list after clean-up
+      selftests: net: lib: do not set ns var as readonly
+
+ tools/testing/selftests/net/lib.sh             | 55 +++++++++++++++-----------
+ tools/testing/selftests/net/mptcp/mptcp_lib.sh | 33 +++++-----------
+ 2 files changed, 42 insertions(+), 46 deletions(-)
+---
+base-commit: a999973236543f0b8f6daeaa7ecba7488c3a593b
+change-id: 20240607-upstream-net-next-20240607-selftests-mptcp-net-lib-365e43e2e1ca
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
