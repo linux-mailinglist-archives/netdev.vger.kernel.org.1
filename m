@@ -1,119 +1,177 @@
-Return-Path: <netdev+bounces-101891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B751900738
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:46:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CF5590071B
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:44:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87F5C280E04
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:46:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1A87284376
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52D2C19FA7C;
-	Fri,  7 Jun 2024 14:40:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD3F19CD10;
+	Fri,  7 Jun 2024 14:40:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="WC/45YTZ"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="jKorOlBb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88C519EEC6;
-	Fri,  7 Jun 2024 14:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A1019B3C1
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 14:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717771258; cv=none; b=DYIyd17AOhCdC3Idb2zIqDpR6w51k9lQGeqW4wWETTbj/BVTUAE1bx26X8FvOWF2fBvU6v8nLUhs3QnsCWlYqHxf323kgl4SyX5jJ8+AwzznufJJlwU9z0SfnQ9h3cLlGH9l6kAOJ9qA1lvaKjCGciCXtU1OBNjqU8BlU/ALqoo=
+	t=1717771248; cv=none; b=Cc+CR9psHaucx3fZRhs8K5o01xEx4fV8t5bYDBNkscak7ClNqlByR26S7ZK4o7Q5F5l//m7ZnTre3UBBMeTAN0+2Y9l4S+jrCWOUGw4ueCQPdT/Qtint62Nf8AdsWHLDHPU8Abzu+hikMJxpYqHROIjT791JQuQf7dlpvU5TwlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717771258; c=relaxed/simple;
-	bh=/zjDu8rh/wUgt/DmxGtCncSizfiJTRqPGmLT5HLi8t0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WppradvpVLvVSOdjJhS6KTFoqqct8Em6Cv/OCRawiHy28dSDbDyd6ntSV0uPLHMMyARfVgqTOIrH3X8DoKXJ4Noia8MUt6FY5Pp/BsK1JKJtihKqWeHvPRBJdJDUfBISzIjaeA1359mBDiw2YSn8/Ss8kuLKBEW41eP9jeSU0OE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=WC/45YTZ; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 457Bc749026749;
-	Fri, 7 Jun 2024 14:40:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=ivghVXAN1Xab5TCyYe4iSL0z
-	XE99C1iS2kFiCNJgTKU=; b=WC/45YTZitkd1utK+kddp9b6cKdJnoR4H1w8xyRr
-	2UdTGJB/MAEavsZbpoPktuplewGBEmaNLZUZFWIJSOs2IRWwMJ5OpMbFnEneK5zt
-	VIxefxSsfg1PM2HxXkGnRebiupAzh+rvqFp3SZkOOdq85uq6XYjiR9PqL4xWizR0
-	oSovtGxKCU8EvCNswbQnXl/uKdAgHRAktXn0dENgW2ykaWDGD5013g5MFmWWMtje
-	VoZROcfOi/p0RhXssUoq20xZqMaQxuc635eezXSpXUdH8w0IvgR3uCw37U50axWp
-	sBD4gfN4p5tKDUUIXcjPtknUAHtAEFMyyr+H48rec7+41Q==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yjq2tp5s2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Jun 2024 14:40:45 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 457EejLK003259
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 7 Jun 2024 14:40:45 GMT
-Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Fri, 7 Jun 2024 07:40:42 -0700
-From: Zijun Hu <quic_zijuhu@quicinc.com>
-To: <johannes@sipsolutions.net>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <emmanuel.grumbach@intel.com>
-CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
-        Zijun Hu
-	<quic_zijuhu@quicinc.com>
-Subject: [PATCH v1 2/2] net: rfkill: Fix a logic error within rfkill_set_hw_state_reason()
-Date: Fri, 7 Jun 2024 22:40:12 +0800
-Message-ID: <1717771212-30723-3-git-send-email-quic_zijuhu@quicinc.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1717771212-30723-1-git-send-email-quic_zijuhu@quicinc.com>
-References: <1717771212-30723-1-git-send-email-quic_zijuhu@quicinc.com>
+	s=arc-20240116; t=1717771248; c=relaxed/simple;
+	bh=tMvx32liBAsbo3BHdxrAOT8YS16GICXyrVqXaTWCSP8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=BBCCDjH3sC+4ewiBkBTZjiJMsNNHrmmpV+eN6Qlg/6JdicQNVq5uh1Rze+ULDNxG+fF4XthIFQChM3Q7oGCSnOKfEUeM5UE3dKL6jYfKpwja6AReyOnmJaZdKCj45PtOMArfpYvcnwmAOBFtK7x6XnaZOl023ldUHtRGHC6GLz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=jKorOlBb; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=gENin/3ZcOVzeoBr/HK0BMTbeKFj4c8kV/7zRxRu7EE=;
+	t=1717771246; x=1718980846; b=jKorOlBbEu3YRN68sD7wbBlgIsZY6scjxZeGIiUZGKsA8hl
+	TeFU/FRbkWkaN28cOWCh7Mor/MIHjBwWdGYW/hot0t7dvCXMkFWYIdcjxMbOSV3HH/J4PUmX+Fc42
+	3CZ8AHYEOTNPHEDvdKYAtqj101FFd19Gz2XHfeS+C3Fp8VgMyRQQvP4P1X03CF0KSxhvbBG/hpVc7
+	mh/QL0oodljN2D2WsB+mbkFtJyuAhbD0RPsV4Y2J+KtdZB1Tefa1QeZkuyObsTMbgBAkle43KGOIb
+	/M/DhzwLYRq8IRq3Gz+CZBq79gO2eCwO8ugfCYp9mhtcWemTeGyuA6Dy0mfU9O2A==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1sFali-00000001DVl-2SCJ;
+	Fri, 07 Jun 2024 16:40:38 +0200
+Message-ID: <127148e766b177a470a397d9c1615fae19934141.camel@sipsolutions.net>
+Subject: Re: [PATCH net] net/sched: Fix mirred deadlock on device recursion
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Victor Nogueira <victor@mojatatu.com>, edumazet@google.com, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
+Cc: jhs@mojatatu.com, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
+	netdev@vger.kernel.org, renmingshuai@huawei.com, pctammela@mojatatu.com
+Date: Fri, 07 Jun 2024 16:40:36 +0200
+In-Reply-To: <20240415210728.36949-1-victor@mojatatu.com>
+References: <20240415210728.36949-1-victor@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.2 (3.52.2-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 2FHTj_MMi_T46cufvKidzxstmrlKQo6r
-X-Proofpoint-ORIG-GUID: 2FHTj_MMi_T46cufvKidzxstmrlKQo6r
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-07_08,2024-06-06_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 impostorscore=0 clxscore=1015 spamscore=0 malwarescore=0
- mlxlogscore=999 mlxscore=0 adultscore=0 lowpriorityscore=0 suspectscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406070108
+X-malware-bazaar: not-scanned
 
-Kernel API rfkill_set_hw_state_reason() wrongly gets previous block state
-by using its parameter @reason as reason mask.
+Hi all,
 
-Fixed by using @reason_mask as reason mask.
+I noticed today that this causes a userspace visible change in behaviour
+(and a regression in some of our tests) for transmitting to a device
+when it has no carrier, when noop_qdisc is assigned to it. Instead of
+silently dropping the packets, -ENOBUFS will be returned if the socket
+opted in to RECVERR.
 
-Fixes: 14486c82612a ("rfkill: add a reason to the HW rfkill state")
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
----
- net/rfkill/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The reason for this is that the static noop_qdisc:
 
-diff --git a/net/rfkill/core.c b/net/rfkill/core.c
-index 0dc982b4fce6..ee7a751b6c5a 100644
---- a/net/rfkill/core.c
-+++ b/net/rfkill/core.c
-@@ -554,7 +554,7 @@ bool rfkill_set_hw_state_reason(struct rfkill *rfkill,
+struct Qdisc noop_qdisc =3D {
+        .enqueue        =3D       noop_enqueue,
+        .dequeue        =3D       noop_dequeue,
+        .flags          =3D       TCQ_F_BUILTIN,
+        .ops            =3D       &noop_qdisc_ops,
+        .q.lock         =3D       __SPIN_LOCK_UNLOCKED(noop_qdisc.q.lock),
+        .dev_queue      =3D       &noop_netdev_queue,
+        .busylock       =3D       __SPIN_LOCK_UNLOCKED(noop_qdisc.busylock)=
+,
+        .gso_skb =3D {
+                .next =3D (struct sk_buff *)&noop_qdisc.gso_skb,
+                .prev =3D (struct sk_buff *)&noop_qdisc.gso_skb,
+                .qlen =3D 0,
+                .lock =3D __SPIN_LOCK_UNLOCKED(noop_qdisc.gso_skb.lock),
+        },
+        .skb_bad_txq =3D {
+                .next =3D (struct sk_buff *)&noop_qdisc.skb_bad_txq,
+                .prev =3D (struct sk_buff *)&noop_qdisc.skb_bad_txq,
+                .qlen =3D 0,
+                .lock =3D __SPIN_LOCK_UNLOCKED(noop_qdisc.skb_bad_txq.lock)=
+,
+        },
+};
+
+doesn't have an owner set, and it's obviously not allocated via
+qdisc_alloc(). Thus, it defaults to 0, so if you get to it on CPU 0 (I
+was using ARCH=3Dum which isn't even SMP) then it will just always run
+into the=20
+
+> +	if (unlikely(READ_ONCE(q->owner) =3D=3D smp_processor_id())) {
+> +		kfree_skb_reason(skb, SKB_DROP_REASON_TC_RECLASSIFY_LOOP);
+> +		return NET_XMIT_DROP;
+> +	}
+
+case.
+
+I'm not sure I understand the busylock logic well enough, so almost
+seems to me we shouldn't do this whole thing on the noop_qdisc at all,
+e.g. via tagging owner with -2 to say don't do it:
+
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3865,9 +3865,11 @@ static inline int __dev_xmit_skb(struct sk_buff *skb=
+, struct Qdisc *q,
+ 		qdisc_run_end(q);
+ 		rc =3D NET_XMIT_SUCCESS;
+ 	} else {
+-		WRITE_ONCE(q->owner, smp_processor_id());
++		if (q->owner !=3D -2)
++			WRITE_ONCE(q->owner, smp_processor_id());
+ 		rc =3D dev_qdisc_enqueue(skb, q, &to_free, txq);
+-		WRITE_ONCE(q->owner, -1);
++		if (q->owner !=3D -2)
++			WRITE_ONCE(q->owner, -1);
+ 		if (qdisc_run_begin(q)) {
+ 			if (unlikely(contended)) {
+ 				spin_unlock(&q->busylock);
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index 2a637a17061b..e857e4638671 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -657,6 +657,7 @@ static struct netdev_queue noop_netdev_queue =3D {
+ };
+=20
+ struct Qdisc noop_qdisc =3D {
++	.owner		=3D	-2,
+ 	.enqueue	=3D	noop_enqueue,
+ 	.dequeue	=3D	noop_dequeue,
+ 	.flags		=3D	TCQ_F_BUILTIN,
+
+
+(and yes, I believe it doesn't need to be READ_ONCE for the check
+against -2 since that's mutually exclusive with all other values)
+
+Or maybe simply ignoring the value for the noop_qdisc:
+
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3822,7 +3822,7 @@ static inline int __dev_xmit_skb(struct sk_buff *skb,=
+ struct Qdisc *q,
+ 		return rc;
  	}
- 
- 	spin_lock_irqsave(&rfkill->lock, flags);
--	prev = !!(rfkill->hard_block_reasons & reason);
-+	prev = !!(rfkill->hard_block_reasons & reason_mask);
- 	if (blocked) {
- 		rfkill->state |= RFKILL_BLOCK_HW;
- 		rfkill->hard_block_reasons |= reason;
--- 
-2.7.4
+=20
+-	if (unlikely(READ_ONCE(q->owner) =3D=3D smp_processor_id())) {
++	if (unlikely(q !=3D &noop_qdisc && READ_ONCE(q->owner) =3D=3D smp_process=
+or_id())) {
+ 		kfree_skb_reason(skb, SKB_DROP_REASON_TC_RECLASSIFY_LOOP);
+ 		return NET_XMIT_DROP;
+ 	}
 
+That's shorter, but I'm not sure if there might be other special
+cases...
+
+Or maybe someone can think of an even better fix?
+
+Thanks,
+johannes
 
