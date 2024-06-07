@@ -1,156 +1,245 @@
-Return-Path: <netdev+bounces-101668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 230858FFC71
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 08:49:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2D2C8FFC92
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:04:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10E621C27377
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 06:49:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83A9E289ED6
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:04:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB3B1527BA;
-	Fri,  7 Jun 2024 06:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BD7153BC2;
+	Fri,  7 Jun 2024 07:04:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="WHBNVDxL"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="axQCC1c6";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UnZIEtqU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E58D01527A4
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 06:48:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980CB153565;
+	Fri,  7 Jun 2024 07:04:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717742939; cv=none; b=Zn+cU9c88uap6diI00YeaJG++idCTMOBcLa+00i4isKAuRmGoWcOQRHr4wH0COAgTaGPzuGrShFX7w0diJN3YVO07bkY8xPFXsSGPw2NKPS5VPjPC/I035wHfCBYOi0L7egIIdjZLy4kviubvQpnMrRvEOzReYSYlcEa6XInmkc=
+	t=1717743875; cv=none; b=Tjxq2uKhgDMiEPuFqeAdOZ09L+2Gkjtjyr7R0TQjzvJGDRA0sPGn2DFXsvxtfbwhAiS8yfP9KXioSZ81RpJKetp07mseB4Kbsh/w+m1F0hUOaoo8X2DeVXSYS1pR0zSe5aqjGPVkuNAzyEWgdp4h5O/aAW9JBOpki1t4p+U+Zdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717742939; c=relaxed/simple;
-	bh=pgHe5e3ALK+cypFku6S3ieR5sW7SNUe2jaqsfcPIj20=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hHKLlbXT2UaIGTy8Ihu95Zez17RjDKwG8QIgG9p50BqY5xF+KDcAijbMqbUL69evZWUScDZRF5MYmZUZNRf6NjDmlhlWEU5W0nTN0YH0UI3t2IlUvQTdAHjtUBkXaJ4WdO8dJv8l/hi1uBbYH0AcKAjLK8UikvF779rZSKaqu1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=WHBNVDxL; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4216badde75so2379835e9.1
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 23:48:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1717742934; x=1718347734; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=43B/d4gP0SHROpUeDJVVbV3eXPrnkyyO5sotvbejxE8=;
-        b=WHBNVDxLb89t4vpBlCcek1GBq9Kmstv+1AVdjO59eaYkrCWcEI9nEDP9Q4cO+AAyPJ
-         HmDSto7YIA7d11bU+l+0wUTDUOEEdshw8yc2rWamSrSdTiVK4BXiXIcdpkdxnxtTj70G
-         yX0WWgxXHpb5WW+BdqOlQ11DlXUFJFHCmFnlWKRcVzgjm9iMJj9tpjeJAeu4DCl1vcBN
-         XtTf2Zl7Scs+Y97N64LNIuPgi+uJEvDBtHjLY43u1zXwglMusYxD/y1XP7Hy31V2r0D5
-         oP16PMPj9CdMEaFS65ZlsMHa+2q4HTc/9X2dkmtzSwRMDdXvAVeoVgHPcgujfUgEHlYe
-         ImIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717742934; x=1718347734;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=43B/d4gP0SHROpUeDJVVbV3eXPrnkyyO5sotvbejxE8=;
-        b=ELZVAuVLulInCikMJElGZpAlEkxTx0ZW3FPadWMGBPg+p7Cdt6RId3MAcOxevI8vmV
-         2QE+/QfVpOKpvg1fbvcBerGOenZslhkIEuReyuSPiJHKLklroGm/5SGBg1I328vxgEDp
-         GW52cVJ3W0kQeVMpjbJTVJm7ybzyJsEeovc4ZgV3d7Pf7Zh5J/GHfrGEUpH5yVAZz/Tc
-         ydcB8vqddveyg8sM5O6csOEuIqncvoEchedLQBakIeHwnHNhZ3xeJcPvxApt2Vg+9RnG
-         k8uQEiIHAevD88ZZ3kwDVdJcdp0XgsAs+dXJEmMwZrx9NyU+RnFW3Mq77Qel8ArC9o5x
-         X3ag==
-X-Forwarded-Encrypted: i=1; AJvYcCV+Qk9ZH0GW5n66D5mIemSJuplS+EUWDtolA/FB1s86aZWhxVxkLEzijrNzfRhg+rCiIKqGFsGc3EEH5/+2ROlfS01v0KTF
-X-Gm-Message-State: AOJu0Yz3cM3rCFn0PbePUdz2fe+a309wcofgOFsDx2OBXUr5EmQDJTA/
-	ZbdL8yvpH4exOflCdeGpyAFomwyu2iTV05Tl/LYLmjsTU6RLdkFOP4ygRiheCy8=
-X-Google-Smtp-Source: AGHT+IExgKcCS2E1XRnUmlAj3a3DUBu1u3NAJFz7KJXg88qiQxXnJkpQj85jyxqJhtNeIB0VGBuEdw==
-X-Received: by 2002:a05:600c:46cf:b0:418:969a:b316 with SMTP id 5b1f17b1804b1-421649ecb5amr16247315e9.1.1717742933988;
-        Thu, 06 Jun 2024 23:48:53 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4215c1aa954sm43832665e9.17.2024.06.06.23.48.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jun 2024 23:48:53 -0700 (PDT)
-Date: Fri, 7 Jun 2024 08:48:50 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: David Ahern <dsahern@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, linux-doc@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
-	Leonid Bloch <lbloch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
-	patches@lists.linux.dev
-Subject: Re: [PATCH 0/8] Introduce fwctl subystem
-Message-ID: <ZmKtUkeKiQMUvWhi@nanopsycho.orion>
-References: <20240603114250.5325279c@kernel.org>
- <214d7d82-0916-4c29-9012-04590e77df73@kernel.org>
- <20240604070451.79cfb280@kernel.org>
- <665fa9c9e69de_4a4e62941e@dwillia2-xfh.jf.intel.com.notmuch>
- <20240605135911.GT19897@nvidia.com>
- <d97144db-424f-4efd-bf10-513a0b895eca@kernel.org>
- <20240606071811.34767cce@kernel.org>
- <20240606144818.GC19897@nvidia.com>
- <20240606080557.00f3163e@kernel.org>
- <4724e6a1-2da1-4275-8807-b7fe6cd9b6c1@kernel.org>
+	s=arc-20240116; t=1717743875; c=relaxed/simple;
+	bh=pIvd/UG8cEx2HD52dn68NoQT1ixfLIkF0bK/EZDoj4M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bdbrEMcSZbJqHxKDq8GBZ7Gz7ABZMCNzWHqrFsA5NJluuWNBkXkAaIAt6sR3cvsr4ZbGuDXzglyS2Yka49zSx8tAR8CVIlMpEGxjq1JwIzvBwNjg7fem6KJC2+fluKLwSC9mgTeceYSQl9VMh1tOtHoAOuBKs4I8PXpSxpymzhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=axQCC1c6; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=UnZIEtqU; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1717743870;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=GIMJk0s+/GdtxaQIdOpgGsRKBn/6OfM/tdOLMaoEkBA=;
+	b=axQCC1c6FeaMEPS7gfnFgQdsue4cQZs7uBZYVKXOeVeFWMxRp9im0/QcsMP+HeWiPQw2do
+	eAkO2B64eczhw43QRcrRX+vYVkEGmlDML5iJpIAU65IC0SE0JBMxFhXj23bxZB2OY5CzgY
+	yXUqNNDoVNpIzlm0rZP2ZP7DNXKYbo9qR3OFDBMTYmKB5sfEi21epUdYvtqjwoyNz1SF7l
+	4dmUyul4xQRJ3tFqlWrPcfFzMNE2o20je9rW3dVXJ1sGmaQSXFYjY77EtsckoPYB5m+3yn
+	Vs8JiS09MNRuotAA1I1VHu5kvW0SJ02AbHaK+LPkZqRo6jowbdVn3gN3qQdieg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1717743870;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=GIMJk0s+/GdtxaQIdOpgGsRKBn/6OfM/tdOLMaoEkBA=;
+	b=UnZIEtqUWz/CSSyOqnd61ksRl37f4H0rcbfvijQ4gIvwUgsjYvLGPJBjf8s4O0Plzs+opC
+	QMI3an4VcQssgKAQ==
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Daniel Bristot de Oliveira <bristot@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH v5 net-next 00/15] locking: Introduce nested-BH locking.
+Date: Fri,  7 Jun 2024 08:53:03 +0200
+Message-ID: <20240607070427.1379327-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4724e6a1-2da1-4275-8807-b7fe6cd9b6c1@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Thu, Jun 06, 2024 at 07:47:20PM CEST, dsahern@kernel.org wrote:
->On 6/6/24 9:05 AM, Jakub Kicinski wrote:
->> On Thu, 6 Jun 2024 11:48:18 -0300 Jason Gunthorpe wrote:
->>>> An argument can be made that given somewhat mixed switchdev experience
->>>> we should just stay out of the way and let that happen. But just make
->>>> that argument then, instead of pretending the use of this API will be
->>>> limited to custom very vendor specific things.  
->>>
->>> Huh?
->> 
->> I'm sorry, David as been working in netdev for a long time.
->
->And I will continue working on Linux networking stack (netdev) while I
->also work with the IB S/W stack, fwctl, and any other part of Linux
->relevant to my job. I am not going to pick a silo (and should not be
->required to).
->
->> I have a tendency to address the person I'm replying to,
->> assuming their level of understanding of the problem space.
->> Which makes it harder to understand for bystanders.
->> 
->>> At least mlx5 already has a very robust userspace competition to
->>> switchdev using RDMA APIs, available in DPDK. This is long since been
->>> done and is widely deployed.
->> 
->> Yeah, we had this discussion multiple times
->
->The switchdev / sonic comparison came to mind as well during this
->thread. The existence of a kernel way (switchdev) has not stopped sonic
->(userspace SDK) from gaining traction. In some cases the SDK is required
+Disabling bottoms halves acts as per-CPU BKL. On PREEMPT_RT code within
+local_bh_disable() section remains preemtible. As a result high prior
+tasks (or threaded interrupts) will be blocked by lower-prio task (or
+threaded interrupts) which are long running which includes softirq
+sections.
 
-Is this discussion technical or policital? I'm asking because it makes
-huge difference. There is no technical reason why sonic does not use
-proper in-kernel solution from what I see
-Yes, they chose technically the wrong way, a shortcut, requiring kernel
-bypass. Honestly for reasons that are beyond my understanding :/
+The proposed way out is to introduce explicit per-CPU locks for
+resources which are protected by local_bh_disable() and use those only
+on PREEMPT_RT so there is no additional overhead for !PREEMPT_RT builds.
 
+The series introduces the infrastructure and converts large parts of
+networking which is largest stake holder here. Once this done the
+per-CPU lock from local_bh_disable() on PREEMPT_RT can be lifted.
 
->for device features that do not have a kernel uapi or vendors refuse to
->offer a kernel way, so it is the only option.
+Performance testing. Baseline is net-next as of commit 93bda33046e7a
+("Merge branch'net-constify-ctl_table-arguments-of-utility-functions'")
+plus v6.10-rc1. A 10GiG link is used between two hosts. The command
+   xdp-bench redirect-cpu --cpu 3 --remote-action drop eth1 -e
 
-Policical reasons.
+was invoked on the receiving side with a ixgbe. The sending side uses
+pktgen_sample03_burst_single_flow.sh on i40e.
 
+Baseline:
+| eth1->?                 9,018,604 rx/s                  0 err,drop/s
+|   receive total         9,018,604 pkt/s                 0 drop/s         =
+       0 error/s
+|     cpu:7               9,018,604 pkt/s                 0 drop/s         =
+       0 error/s
+|   enqueue to cpu 3      9,018,602 pkt/s                 0 drop/s         =
+    7.00 bulk-avg
+|     cpu:7->3            9,018,602 pkt/s                 0 drop/s         =
+    7.00 bulk-avg
+|   kthread total         9,018,606 pkt/s                 0 drop/s         =
+ 214,698 sched
+|     cpu:3               9,018,606 pkt/s                 0 drop/s         =
+ 214,698 sched
+|     xdp_stats                   0 pass/s        9,018,606 drop/s         =
+       0 redir/s
+|       cpu:3                     0 pass/s        9,018,606 drop/s         =
+       0 redir/s
+|   redirect_err                  0 error/s
+|   xdp_exception                 0 hit/s
 
->
->The bottom line to me is that these hardline, dogmatic approaches -
->resisting the recognition of reality - is only harming users. There is a
->middle ground, open source drivers and tools that offer more flexibility.
->
+perf top --sort cpu,symbol --no-children:
+|   18.14%  007  [k] bpf_prog_4f0ffbb35139c187_cpumap_l4_hash
+|   13.29%  007  [k] ixgbe_poll
+|   12.66%  003  [k] cpu_map_kthread_run
+|    7.23%  003  [k] page_frag_free
+|    6.76%  007  [k] xdp_do_redirect
+|    3.76%  007  [k] cpu_map_redirect
+|    3.13%  007  [k] bq_flush_to_queue
+|    2.51%  003  [k] xdp_return_frame
+|    1.93%  007  [k] try_to_wake_up
+|    1.78%  007  [k] _raw_spin_lock
+|    1.74%  007  [k] cpu_map_enqueue
+|    1.56%  003  [k] bpf_prog_57cd311f2e27366b_cpumap_drop
+
+With this series applied:
+| eth1->?                10,329,340 rx/s                  0 err,drop/s
+|   receive total        10,329,340 pkt/s                 0 drop/s         =
+       0 error/s
+|     cpu:6              10,329,340 pkt/s                 0 drop/s         =
+       0 error/s
+|   enqueue to cpu 3     10,329,338 pkt/s                 0 drop/s         =
+    8.00 bulk-avg
+|     cpu:6->3           10,329,338 pkt/s                 0 drop/s         =
+    8.00 bulk-avg
+|   kthread total        10,329,321 pkt/s                 0 drop/s         =
+  96,297 sched
+|     cpu:3              10,329,321 pkt/s                 0 drop/s         =
+  96,297 sched
+|     xdp_stats                   0 pass/s       10,329,321 drop/s         =
+       0 redir/s
+|       cpu:3                     0 pass/s       10,329,321 drop/s         =
+       0 redir/s
+|   redirect_err                  0 error/s
+|   xdp_exception                 0 hit/s
+
+perf top --sort cpu,symbol --no-children:
+|   20.90%  006  [k] bpf_prog_4f0ffbb35139c187_cpumap_l4_hash
+|   12.62%  006  [k] ixgbe_poll
+|    9.82%  003  [k] page_frag_free
+|    8.73%  003  [k] cpu_map_bpf_prog_run_xdp
+|    6.63%  006  [k] xdp_do_redirect
+|    4.94%  003  [k] cpu_map_kthread_run
+|    4.28%  006  [k] cpu_map_redirect
+|    4.03%  006  [k] bq_flush_to_queue
+|    3.01%  003  [k] xdp_return_frame
+|    1.95%  006  [k] _raw_spin_lock
+|    1.94%  003  [k] bpf_prog_57cd311f2e27366b_cpumap_drop
+
+This diff appears to be noise.
+
+v4=E2=80=A6v5 https://lore.kernel.org/all/20240604154425.878636-1-bigeasy@l=
+inutronix.de/:
+- Remove the guard() notation as well as __free() within the patches.
+  Patch #1 and #2 add the guard definition for local_lock_nested_bh()
+  but it remains unused with the series.
+  The __free() notation for bpf_net_ctx_clear has been removed entirely.
+
+- Collect Toke's Reviewed-by.
+
+v3=E2=80=A6v4 https://lore.kernel.org/all/20240529162927.403425-1-bigeasy@l=
+inutronix.de/:
+- Removed bpf_clear_redirect_map(), moved the comment to the caller.
+  Suggested by Toke.
+
+- The bpf_redirect_info structure is memset() each time it is assigned.
+  Suggested by Toke.
+
+- The bpf_net_ctx_set() in __napi_busy_loop() has been moved from the
+  top of the function to begin/ end of the BH-disabled section. This has
+  been done to remain in sync with other call sites.
+  After adding the memset() I've been looking at the perf-numbers in my
+  test-case and I haven't noticed an impact, the numbers are in the same
+  range with and without the change. Therefore I kept the numbers from
+  previous posting.
+
+- Collected Alexei's Acked-by.
+
+v2=E2=80=A6v3 https://lore.kernel.org/all/20240503182957.1042122-1-bigeasy@=
+linutronix.de/:
+- WARN checks checks for bpf_net_ctx_get() have been dropped and all
+  NULL checks around it. This means bpf_net_ctx_get_ri() assumes the
+  context has been set and will segfault if it is not the case.
+  Suggested by Alexei and Jesper. This should always work or always
+  segfault.
+
+- It has been suggested by Toke to embed struct bpf_net_context into
+  task_struct instead just a pointer to it. This would increase the size
+  of task_struct by 112 bytes instead just eight and Alexei didn't like
+  it due to the size impact with 1m threads. It is a pointer again.
+
+v1=E2=80=A6v2 https://lore.kernel.org/all/20231215171020.687342-1-bigeasy@l=
+inutronix.de/:
+- Jakub complained about touching networking drivers to make the
+  additional locking work. Alexei complained about the additional
+  locking within the XDP/eBFP case.
+  This led to a change in how the per-CPU variables are accessed for the
+  XDP/eBPF case. On PREEMPT_RT the variables are now stored on stack and
+  the task pointer to the structure is saved in the task_struct while
+  keeping every for !RT unchanged. This was proposed as a RFC in
+  	v1: https://lore.kernel.org/all/20240213145923.2552753-1-bigeasy@linutro=
+nix.de/
+
+  and then updated
+
+        v2: https://lore.kernel.org/all/20240229183109.646865-1-bigeasy@lin=
+utronix.de/
+	  - Renamed the container struct from xdp_storage to bpf_net_context.
+            Suggested by Toke H=C3=B8iland-J=C3=B8rgensen.
+	  - Use the container struct also on !PREEMPT_RT builds. Store the
+	    pointer to the on-stack struct in a per-CPU variable. Suggested by
+            Toke H=C3=B8iland-J=C3=B8rgensen.
+
+  This reduces the initial queue from 24 to 15 patches.
+
+- There were complains about the scoped_guard() which shifts the whole
+  block and makes it harder to review because the whole gets removed and
+  added again. The usage has been replaced with local_lock_nested_bh()+
+  its unlock counterpart.
+
+Sebastian
+
 
