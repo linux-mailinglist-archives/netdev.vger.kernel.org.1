@@ -1,100 +1,78 @@
-Return-Path: <netdev+bounces-101862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79C87900520
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 15:38:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C39B990052C
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 15:39:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E561528E73B
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 13:38:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 334E2B2A02B
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 13:39:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149EC197A68;
-	Fri,  7 Jun 2024 13:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8B7195965;
+	Fri,  7 Jun 2024 13:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="xXgKvdwz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TyvSM8Tk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A7B194A7D
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 13:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A345194A70;
+	Fri,  7 Jun 2024 13:38:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717767296; cv=none; b=licnpxxlFQORcL5QrN8vo2ngnlQU/g6Tp+jiYsvXrfLJq7KOHouhNZS2LSt7jYBvBdvKSqwXxlIcimpQvSrVKiA3G9TdKcnAvyK9+OZ5f7laVVP6LXtZnoKj2ektbVwM7Oca6wNZKh59PGPl/c23hJFAoLwbygvq85qii1HYeiQ=
+	t=1717767482; cv=none; b=YH6kFyBvWKr4z5V6iVZTjeBt8JMBV8Xmb/hWZgwhTCC/2OzQ5lc0HZ1U5CUaMSRn3CDOHWq2stYozON5rfUdx1KivBji0+k/WCGd52quWMe1HVZzIdiGYyoO6MbyF2UMDwNPs1S10EOgoy8qEntpWaxQzTAVTK79qp2q+ftB0RY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717767296; c=relaxed/simple;
-	bh=bNufWv8vnNTuzQBP8B1FhHjZF16KL0qL0xXs56Trvbg=;
+	s=arc-20240116; t=1717767482; c=relaxed/simple;
+	bh=3O1OghiGGIGnmwunwGyD+S8AwdzNTowvLS3lDkW+bfM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nApcXNIC8r1HPeZtG/FcJcGAXqya7Rf7FeeP8pvaLXNNorck6U6/DC3G313IzIU0E8YKXhsvug8inkAkPuIg6oYTpm4RxJehW+FPBUJtu2o45XQdbPNWYV5yrdeEm+Pob4k8azEUoD1NqcLnvO8ZzqHTztXJ3NSA171xt70qfHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=xXgKvdwz; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42163fed884so10675425e9.1
-        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 06:34:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1717767292; x=1718372092; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GDmNba19JEmqtuQ0a43R5+Iq4qr0QF4IDUZLXDfPhcQ=;
-        b=xXgKvdwzdZSoeiR2KDfaYRUnfdMnqnOBtYTG6iHMYcEXG3/7a5lcaMAlmY2Cv9WMVS
-         rGDpxSG2JeCv4JlRNIVzdLAgt7b2S7pEjn5bsTzzRJBTjXZpQ6mP5QwNWGjBOsMoYJRp
-         hfGmA2LDtV6p925d3o4sAoaHuHLWgzfeXmjHUpJZDK9qjuvslNfLEq+dS88bKIr8aCE7
-         5y0Z2eI9GxuDWOZoFWTIUfR4fHxoaOoZ6rRZlvP/vts4g8gbrfDllSXYZP8bMjzI43d1
-         ZP/u6ctKk4dLzkgLn8Kc1DHIzfEORe9MgtOvM+IvhG8/d+pYw3vPgDOc/MO4LLZAsphv
-         7XCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717767292; x=1718372092;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GDmNba19JEmqtuQ0a43R5+Iq4qr0QF4IDUZLXDfPhcQ=;
-        b=bWNG2IWmN2qyXkoabpVARg589FN2boLSGFbP6o/9dGYcR2FbP4u/fOo4J7Zna5HAEk
-         NRUutH3EMMrF7MiXtsEY6EaIi5F93HvNdHjC50K6XvdetzgR6VRCXOGNtrmQcmrW4W6K
-         aGLfxHtxZ21erju2NTpXHmlgvc3GPP4EuyIr3Xic9ufJtplZsbZxAxvWoyFPZJSj+c6y
-         Y6IqsWmagBOAMFEIKNyjUeBs3724vTD6Oq7ACwGp35vLfh0UkXP2J6IZNHrg+0fsAEUT
-         Q/b5YMF8CUY0Sr4WmNQ5Ruwmf872yMnQ3fnrQm2GH8a5/9vrcylBre07CPtt1kRvE9Ri
-         gVLw==
-X-Forwarded-Encrypted: i=1; AJvYcCViGTAy3PMd4anZeR/gFeZWatQtwtz0lhJmlzjqzOunU94DOO0gE0u5ZVsicYgv5CerFc9d0xQhVhemcrJM30E4NpArluta
-X-Gm-Message-State: AOJu0YwKnGZYZEvztOXnARmNJxgAYOC7C2nKvIap/DGoheKybD6h4q59
-	AZRSQyp0oZJsjGPv9MUzOlLYqgOf08J0OwLvLktV1UuUnbgj6SpE5GTH7wUtaVY=
-X-Google-Smtp-Source: AGHT+IHi1tHwQBfhV0uUWQFN3GhXIlVN/ECNJD2wDBwLl5ZAgAGIlbEAl/M8FEogX3A94+YwaHC0KQ==
-X-Received: by 2002:a05:600c:4f44:b0:421:205f:52de with SMTP id 5b1f17b1804b1-42164a32853mr21506065e9.26.1717767292321;
-        Fri, 07 Jun 2024 06:34:52 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-421580fe37csm88361985e9.3.2024.06.07.06.34.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jun 2024 06:34:51 -0700 (PDT)
-Date: Fri, 7 Jun 2024 15:34:48 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, linux-doc@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
-	Leonid Bloch <lbloch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
-	patches@lists.linux.dev
-Subject: Re: [PATCH 0/8] Introduce fwctl subystem
-Message-ID: <ZmMMeIuplzZl2Iyh@nanopsycho.orion>
-References: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
- <20240603114250.5325279c@kernel.org>
- <214d7d82-0916-4c29-9012-04590e77df73@kernel.org>
- <20240604070451.79cfb280@kernel.org>
- <665fa9c9e69de_4a4e62941e@dwillia2-xfh.jf.intel.com.notmuch>
- <20240605135911.GT19897@nvidia.com>
- <d97144db-424f-4efd-bf10-513a0b895eca@kernel.org>
- <20240606071811.34767cce@kernel.org>
- <ZmK3-rkibH8j4ZwM@nanopsycho.orion>
- <b023413e-d6e1-4a47-bdf2-98cc57a2e0ae@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wobox4RWxxq1n4t2yksEFUgPYcpgVV4HZbHfM8K4mx2+tAuGVHzvGZBuUPNkYBuvtI/4DCL6bVEOnnCQNWwgc/7/op3n1xf9kU1dcONzW87/ZBY9jxwysGcMYfpVvtBthHAXyBxIT8o6/9VxpDVPJvXCNOfKPcYn7XMCcweXklQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TyvSM8Tk; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717767481; x=1749303481;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=3O1OghiGGIGnmwunwGyD+S8AwdzNTowvLS3lDkW+bfM=;
+  b=TyvSM8TkvuxtB5fQndhPXvMdkmDkjx1AMYV8Q9/qX8gu/QijQYwtpLVq
+   oVp46lsF0FIWxOfPTBAeyrM9GbQrEP3iSHApgvKNC/N9ggNljgxY412qO
+   smvftrEo+UeeWIk2gb4EBxRqpvhenKqL9gXmtBxrJpQeKsUcJYuR3YT1D
+   7gmIARv30GRS8z3QOnlOwDS+COw8Jnqp0pFotnkN5L8YbWQodOyjeuxyH
+   iIHo/zlE5ARAlI8CTx4WLoxqwhRBrvIecjCqyLPg6fZc5I84h5HgPzj0S
+   Yjm8LJZrvAA7EooAgti9nXNbta68XtmLUUr/ecxQQ5aj9kdVH3gHj3dmR
+   Q==;
+X-CSE-ConnectionGUID: alBrKjLMRQed6OHxMIkkNQ==
+X-CSE-MsgGUID: kpVm4WaQQRWKOS5qmOP5Aw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11096"; a="39888372"
+X-IronPort-AV: E=Sophos;i="6.08,221,1712646000"; 
+   d="scan'208";a="39888372"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2024 06:38:00 -0700
+X-CSE-ConnectionGUID: 8dBgWMkUQS21WbMT7fgfOQ==
+X-CSE-MsgGUID: odaHmeo2Q0CXFVfJJ0VRHg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,221,1712646000"; 
+   d="scan'208";a="69494003"
+Received: from unknown (HELO 0610945e7d16) ([10.239.97.151])
+  by fmviesa001.fm.intel.com with ESMTP; 07 Jun 2024 06:37:58 -0700
+Received: from kbuild by 0610945e7d16 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sFZn2-0004qe-0P;
+	Fri, 07 Jun 2024 13:37:56 +0000
+Date: Fri, 7 Jun 2024 21:37:54 +0800
+From: kernel test robot <lkp@intel.com>
+To: Johannes Berg <johannes@sipsolutions.net>, linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	Johannes Berg <johannes.berg@intel.com>
+Subject: Re: [PATCH v3 1/4] tracing: add __print_sym() to replace
+ __print_symbolic()
+Message-ID: <202406072141.OLmqbch3-lkp@intel.com>
+References: <20240606203255.49433-7-johannes@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,45 +81,94 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b023413e-d6e1-4a47-bdf2-98cc57a2e0ae@lunn.ch>
+In-Reply-To: <20240606203255.49433-7-johannes@sipsolutions.net>
 
-Fri, Jun 07, 2024 at 02:49:19PM CEST, andrew@lunn.ch wrote:
->> >This API gives user space SDKs a trivial way of implementing all
->> >switching, routing, filtering, QoS offloads etc.
->> >An argument can be made that given somewhat mixed switchdev experience
->> 
->> Can you elaborabe a bit more what you mean by "mixed switchdev
->> experience" please?
->
->I don't want to put words in Jakubs mouth but, in my opinion,
->switchdev has been great for SoHo switches. We have over 100
->supported, mostly implemented by the community, but some vendors also
->supporting their own hardware.
->
->We have two enterprise switch families supported, each by its own
->vendor. And we have one TOR switch family supported by the vendor.
->
->So i would say switchdev has worked out great for SoHo, but kernel
->bypass is still the norm for most things bigger than SoHo.
->
->Why? My guess is, the products with a SoHo switch is not actually a
->switch. It is a wifi box, with a switch. It is a cable modem, with a
->switch. It is an inflight entertainment system, with a switch, etc.
->It is much easier to build such multi-purpose systems when everything
->is nicely integrated into the kernel, you don't have to fight with
->multiple vendors supplying SDKs which only work on a disjoint set of
->kernels, etc.
->
->For bigger, single purpose devices, it is just a switch, there is less
->inconvenience of using just one vendor SDK, on top of the vendor
->proscribed kernel.
+Hi Johannes,
 
-I'm aware of what you wrote and undertand it. I just thought Jakub's
-mixed experience is about the APIs more than the politics behind vedors
-adoptation process..
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on mcgrof/modules-next]
+[also build test ERROR on arnd-asm-generic/master tip/timers/core net/main net-next/main linus/master horms-ipvs/master v6.10-rc2 next-20240607]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Johannes-Berg/tracing-add-__print_sym-to-replace-__print_symbolic/20240607-043503
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git modules-next
+patch link:    https://lore.kernel.org/r/20240606203255.49433-7-johannes%40sipsolutions.net
+patch subject: [PATCH v3 1/4] tracing: add __print_sym() to replace __print_symbolic()
+config: arm64-randconfig-002-20240607 (https://download.01.org/0day-ci/archive/20240607/202406072141.OLmqbch3-lkp@intel.com/config)
+compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project d7d2d4f53fc79b4b58e8d8d08151b577c3699d4a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240607/202406072141.OLmqbch3-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406072141.OLmqbch3-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from kernel/trace/trace_events.c:15:
+   In file included from include/linux/security.h:33:
+   In file included from include/linux/mm.h:2210:
+   include/linux/vmstat.h:522:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     522 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+>> kernel/trace/trace_events.c:1586:17: error: incomplete definition of type 'struct module'
+    1586 |                 sym_defs = mod->trace_sym_defs;
+         |                            ~~~^
+   include/linux/printk.h:350:8: note: forward declaration of 'struct module'
+     350 | struct module;
+         |        ^
+   kernel/trace/trace_events.c:1587:19: error: incomplete definition of type 'struct module'
+    1587 |                 n_sym_defs = mod->num_trace_sym_defs;
+         |                              ~~~^
+   include/linux/printk.h:350:8: note: forward declaration of 'struct module'
+     350 | struct module;
+         |        ^
+   1 warning and 2 errors generated.
 
 
->
->	Andrew
->
+vim +1586 kernel/trace/trace_events.c
+
+  1575	
+  1576	/* note: @name is not NUL-terminated */
+  1577	static void show_sym_list(struct seq_file *m, struct trace_event_call *call,
+  1578				  const char *name, unsigned int name_len)
+  1579	{
+  1580		struct trace_sym_def **sym_defs;
+  1581		unsigned int n_sym_defs, i;
+  1582	
+  1583		if (call->module) {
+  1584			struct module *mod = call->module;
+  1585	
+> 1586			sym_defs = mod->trace_sym_defs;
+  1587			n_sym_defs = mod->num_trace_sym_defs;
+  1588		} else {
+  1589			sym_defs = __start_ftrace_sym_defs;
+  1590			n_sym_defs = __stop_ftrace_sym_defs - __start_ftrace_sym_defs;
+  1591		}
+  1592	
+  1593		for (i = 0; i < n_sym_defs; i++) {
+  1594			unsigned int sym_len;
+  1595	
+  1596			if (!sym_defs[i])
+  1597				continue;
+  1598			if (sym_defs[i]->system != call->class->system)
+  1599				continue;
+  1600			sym_len = strlen(sym_defs[i]->symbol_id);
+  1601			if (name_len != sym_len)
+  1602				continue;
+  1603			if (strncmp(sym_defs[i]->symbol_id, name, sym_len))
+  1604				continue;
+  1605			if (sym_defs[i]->show)
+  1606				sym_defs[i]->show(m);
+  1607			break;
+  1608		}
+  1609	}
+  1610	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
