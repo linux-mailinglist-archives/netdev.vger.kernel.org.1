@@ -1,229 +1,99 @@
-Return-Path: <netdev+bounces-101751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CCF88FFF22
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 11:20:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2CFD8FFF51
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 11:24:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD9CC286736
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:20:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 412C21F2290D
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:24:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED89C15B143;
-	Fri,  7 Jun 2024 09:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FAA615B996;
+	Fri,  7 Jun 2024 09:24:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="hmGhh3TD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oW5E3gVc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685C0525D;
-	Fri,  7 Jun 2024 09:20:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6808644C97
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 09:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717752021; cv=none; b=MRcRoHohGvQlt6fHkQgGqjnamw8KhfIv6XGsCXpwiAHRm4gzBLUN9gmbIK94ZcBI9SqUXEi1Cf6nH4KASWKfCnkc7dXpKtWvgdm3ajR32kUrNdgEOPjRZHUUE31OcWPSLMECIvHbxGt+sZLd8lK0XMFgmUnLdjX+JxgiAJDuZjg=
+	t=1717752259; cv=none; b=bHH1J//p2N7kNp+CsLppKcrk+LlsOUDr46bc3Oo/2kp1URmykpXChM1o0PY63aP/5icW1vb8Htivr+PL67D1DtNbMto9G+BUr0Tbe9QHvlfUUSVKoxvh5q1xe6R+9sLEQvvaBsPSQk55a5Pz38jRVxPAE7/3mje1Si2WFvva6ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717752021; c=relaxed/simple;
-	bh=5lhAGxbi1WkQqrBzui7aAjXB5BzgLd7FJ24TXfGuHaI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ZzbMph9kimQQMfU5D6OA68qjqZlAC3xZDZoom8hHQ7k9WacZSN8MtBk14Jmt7Y9uxGBqEHQ6USTz4YoUPXCg5CCpzdmm0kolv3w/GpRXQkdnsKusCx9lgyUdFlXVoEsLWvCDBb5016jR+jz+A7L+TiAjHcZAxL0JdpKBeTqHQIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=hmGhh3TD; arc=none smtp.client-ip=91.207.212.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45791ZeF002170;
-	Fri, 7 Jun 2024 11:19:46 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	d3Kov9mztOBAq1R8O1XYu0dkAhTelqCjkvoNBjjUVWM=; b=hmGhh3TDJB9G8snz
-	L5K5RwqNIWpHceqzBF1ct2BcIvol02o5LJ3j30qBCxtKcnwgmquWjFl1O09TLzPr
-	Eydbe7AZr/ipURjAd5X8Xla/9UBd9Dpa64NTB5fRDKF+HzrVnONfvoePLGU5T4Cn
-	nd3TTa/ZprsdHs0Z4ypXaqUkCDTyfAEBPVo4en3InsR4/6ayP1PQtTXi7z+fQ2K2
-	1zYEcMNtNe2wHmAfmlgCPohrhlDGLSXs3uM6AYbgj8k3ubEywwvPKLswyjIHIpwY
-	cRbsUmUWGd8Ig78xP5dm7sVSwYJn0zQQQN3fD4gGExmaVnNsgpw+p4aREqw2mMaU
-	1Oxx3Q==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ygekj809d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Jun 2024 11:19:46 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 5AEA340047;
-	Fri,  7 Jun 2024 11:19:38 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 05BD02138CA;
-	Fri,  7 Jun 2024 11:18:23 +0200 (CEST)
-Received: from [10.252.19.205] (10.252.19.205) by SHFDAG1NODE2.st.com
- (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 7 Jun
- 2024 11:18:19 +0200
-Message-ID: <3aeecd23-355e-4824-8706-a746e84b37b7@foss.st.com>
-Date: Fri, 7 Jun 2024 11:18:18 +0200
+	s=arc-20240116; t=1717752259; c=relaxed/simple;
+	bh=OMHsezmXHK1T9NJnx8PU7zKzao4dfGW/6bNpaR2FrOM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=llgRWVNCm5/lysOiL45C8qErOcPREtiPVgR/tjAPcSke2ZhY1LAMQh7j6ed/MxSwYODzwnAT888F3/T4m905HZ2By6g2JC409Mm1bV9Wy/c8vsihJrIz5ojrejEP8FAd1pnLLB2cLbdKVlritWdHsdjkb149iILFlGGOzbcC8/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oW5E3gVc; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-57a16f4b8bfso14878a12.0
+        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 02:24:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717752256; x=1718357056; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OMHsezmXHK1T9NJnx8PU7zKzao4dfGW/6bNpaR2FrOM=;
+        b=oW5E3gVcFVMgVuQcWVbme1lc4HZeTq/myZ3crxMRZQbI0eNHs7cpTIiAWV7axxjVSq
+         2ES5GJfY1oVoZyn++xbt02oZYR3cTCIfp6U7mzF03aeCq85rnpwEPN+w6z2pkZ/tsK+W
+         CGQp4BZyozHEMWjjorB/Fgo4MVhiRbg4FgudJX3y8kDp8D3w4vg9ilq1gMcmulvcAnoN
+         5wP5Ts8JyaGdPOl2+zHp7pETg5t1mgbF8jCSekqE4rnqAFykqr0vakxBC80yCu/HzeXx
+         1ji5uHiR1zSyuabSIXr7QA6475qgW3SHSdGDhJNLqHFRmL7q/BQu5X+nMkAKN05CFegq
+         b+cQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717752256; x=1718357056;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OMHsezmXHK1T9NJnx8PU7zKzao4dfGW/6bNpaR2FrOM=;
+        b=Vw27+yQivaIOt8lw3Zsuqh68VlsTFyBrYNSV3/fRWv5u5syXK+ZbvseHd35qcUl4VS
+         NOnOohZax8bN004rCt+2ZC4wLbIMqeTcvdZ1q5AHQE+t9XAaY3/3JmKgKai7yrg9aK+0
+         w5qRHDbpYx52CZQjXX7Igis3KWX4H3gPUxFyFFPSbnF7/RzP0CB449DvFvF0lA6D4wI2
+         xIaTYkykthAsqarHPIaubHM15wuRCnERQgKyBUdS4/B/i4Jf39Q2+5TAJS4ZHDyJqIbT
+         T01HQxLNJNhhBUdJ1udACPZ/Aaz8LueRr2nm3zh+dLFaiYOZGBvZ/tXLx6SiesHhO9FN
+         ihzA==
+X-Forwarded-Encrypted: i=1; AJvYcCUWG/LZv4fEdaPsa1wWU3syqmRXz6v9c3674JFbHk5hWA9MKzqbbmuu1gukOcUlZeBydN6CWuFlun4ToC2pz9u/YkPrGfs2
+X-Gm-Message-State: AOJu0YwaYOjMs7HWFXjwqRHJcCeCjke910E4tf32k3dfPW+X2yPmx/Aa
+	T6Ea+TQFsJ8ufEzixQWBXby2Ds/gH1BAL4wd6FS0mN2Aaizfead086lCRfX70Mmzq4nWtORNPf+
+	RuXQFDCaDvhIjQwuEFmsyezRKjGu5E68lYLqs
+X-Google-Smtp-Source: AGHT+IHaW2b60THkgdOX3J3B5JdXioWR9Zpah/4D37uNxuI3vd9xOzAf2LYu5jm513AJpOZ/q1bhV1k+hrkaoAW40E8=
+X-Received: by 2002:a50:ed0d:0:b0:57a:1a30:f5cf with SMTP id
+ 4fb4d7f45d1cf-57aa67f8125mr481307a12.0.1717752255364; Fri, 07 Jun 2024
+ 02:24:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 08/11] ARM: dts: stm32: add ethernet1 and ethernet2
- support on stm32mp13
-To: Marek Vasut <marex@denx.de>, "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre
- Torgue <alexandre.torgue@foss.st.com>,
-        Richard Cochran
-	<richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        Liam Girdwood
-	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20240604143502.154463-1-christophe.roullier@foss.st.com>
- <20240604143502.154463-9-christophe.roullier@foss.st.com>
- <e8e69a34-b9b2-4b4c-9b2e-079c7a23b756@denx.de>
-Content-Language: en-US
-From: Christophe ROULLIER <christophe.roullier@foss.st.com>
-In-Reply-To: <e8e69a34-b9b2-4b4c-9b2e-079c7a23b756@denx.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-07_04,2024-06-06_02,2024-05-17_01
+References: <20240606192906.1941189-1-kuba@kernel.org> <20240606192906.1941189-2-kuba@kernel.org>
+In-Reply-To: <20240606192906.1941189-2-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 7 Jun 2024 11:24:01 +0200
+Message-ID: <CANn89i+eBSoqoZ3oE7oBN5ZLf+7NtcrtcGyhT15icocMav2RYg@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] rtnetlink: move rtnl_lock handling out of af_netlink
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	dsahern@gmail.com, jiri@resnulli.us
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi
+On Thu, Jun 6, 2024 at 9:29=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> Now that we have an intermediate layer of code for handling
+> rtnl-level netlink dump quirks, we can move the rtnl_lock
+> taking there.
+>
+> For dump handlers with RTNL_FLAG_DUMP_SPLIT_NLM_DONE we can
+> avoid taking rtnl_lock just to generate NLM_DONE, once again.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-On 6/4/24 18:49, Marek Vasut wrote:
-> On 6/4/24 4:34 PM, Christophe Roullier wrote:
->> Both instances ethernet based on GMAC SNPS IP on stm32mp13.
->> GMAC IP version is SNPS 4.20.
->>
->> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
->> ---
->>   arch/arm/boot/dts/st/stm32mp131.dtsi | 38 ++++++++++++++++++++++++++++
->>   arch/arm/boot/dts/st/stm32mp133.dtsi | 31 +++++++++++++++++++++++
->>   2 files changed, 69 insertions(+)
->>
->> diff --git a/arch/arm/boot/dts/st/stm32mp131.dtsi 
->> b/arch/arm/boot/dts/st/stm32mp131.dtsi
->> index 6704ceef284d3..9d05853ececf7 100644
->> --- a/arch/arm/boot/dts/st/stm32mp131.dtsi
->> +++ b/arch/arm/boot/dts/st/stm32mp131.dtsi
->> @@ -979,6 +979,12 @@ ts_cal1: calib@5c {
->>               ts_cal2: calib@5e {
->>                   reg = <0x5e 0x2>;
->>               };
->> +            ethernet_mac1_address: mac1@e4 {
->> +                reg = <0xe4 0x6>;
->> +            };
->> +            ethernet_mac2_address: mac2@ea {
->> +                reg = <0xea 0x6>;
->> +            };
->>           };
->>             etzpc: bus@5c007000 {
->> @@ -1505,6 +1511,38 @@ sdmmc2: mmc@58007000 {
->>                   status = "disabled";
->>               };
->>   +            ethernet1: ethernet@5800a000 {
->> +                compatible = "st,stm32mp13-dwmac", "snps,dwmac-4.20a";
->> +                reg = <0x5800a000 0x2000>;
->> +                reg-names = "stmmaceth";
->> +                interrupts-extended = <&intc GIC_SPI 62 
->> IRQ_TYPE_LEVEL_HIGH>,
->> +                              <&exti 68 1>;
->> +                interrupt-names = "macirq", "eth_wake_irq";
->> +                clock-names = "stmmaceth",
->> +                          "mac-clk-tx",
->> +                          "mac-clk-rx",
->> +                          "ethstp",
->> +                          "eth-ck";
->> +                clocks = <&rcc ETH1MAC>,
->> +                     <&rcc ETH1TX>,
->> +                     <&rcc ETH1RX>,
->> +                     <&rcc ETH1STP>,
->> +                     <&rcc ETH1CK_K>;
->> +                st,syscon = <&syscfg 0x4 0xff0000>;
->> +                snps,mixed-burst;
->> +                snps,pbl = <2>;
->> +                snps,axi-config = <&stmmac_axi_config_1>;
->> +                snps,tso;
->> +                access-controllers = <&etzpc 48>;
->
-> Please keep the list of properties sorted.
->
-To be coherent with all other IP, I will keep "access-controllers" 
-property just before "status" property.
->> +                status = "disabled";
->> +
->> +                stmmac_axi_config_1: stmmac-axi-config {
->> +                    snps,wr_osr_lmt = <0x7>;
->> +                    snps,rd_osr_lmt = <0x7>;
->> +                    snps,blen = <0 0 0 0 16 8 4>;
->
-> Sort here too.
-ok
->
->> +                };
->> +            };
->> +
->>               usbphyc: usbphyc@5a006000 {
->>                   #address-cells = <1>;
->>                   #size-cells = <0>;
->> diff --git a/arch/arm/boot/dts/st/stm32mp133.dtsi 
->> b/arch/arm/boot/dts/st/stm32mp133.dtsi
->> index 3e394c8e58b92..09c7da1a2eda8 100644
->> --- a/arch/arm/boot/dts/st/stm32mp133.dtsi
->> +++ b/arch/arm/boot/dts/st/stm32mp133.dtsi
->> @@ -67,5 +67,36 @@ channel@18 {
->>                   label = "vrefint";
->>               };
->>           };
->> +
->> +        ethernet2: ethernet@5800e000 {
->> +            compatible = "st,stm32mp13-dwmac", "snps,dwmac-4.20a";
->> +            reg = <0x5800e000 0x2000>;
->> +            reg-names = "stmmaceth";
->> +            interrupts-extended = <&intc GIC_SPI 97 
->> IRQ_TYPE_LEVEL_HIGH>;
->> +            interrupt-names = "macirq";
->> +            clock-names = "stmmaceth",
->> +                      "mac-clk-tx",
->> +                      "mac-clk-rx",
->> +                      "ethstp",
->> +                      "eth-ck";
->> +            clocks = <&rcc ETH2MAC>,
->> +                 <&rcc ETH2TX>,
->> +                 <&rcc ETH2RX>,
->> +                 <&rcc ETH2STP>,
->> +                 <&rcc ETH2CK_K>;
->> +            st,syscon = <&syscfg 0x4 0xff000000>;
->> +            snps,mixed-burst;
->> +            snps,pbl = <2>;
->> +            snps,axi-config = <&stmmac_axi_config_2>;
->> +            snps,tso;
->> +            access-controllers = <&etzpc 49>;
->
-> Sort here too.
->
->> +            status = "disabled";
->> +
->> +            stmmac_axi_config_2: stmmac-axi-config {
->> +                snps,wr_osr_lmt = <0x7>;
->> +                snps,rd_osr_lmt = <0x7>;
->> +                snps,blen = <0 0 0 0 16 8 4>;
->
-> Sort here too.
->
-> [...]
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
