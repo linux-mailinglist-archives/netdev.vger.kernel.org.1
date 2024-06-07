@@ -1,399 +1,147 @@
-Return-Path: <netdev+bounces-101863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9587D900522
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 15:38:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79C87900520
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 15:38:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F72A1C24F81
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 13:38:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E561528E73B
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 13:38:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E296194AC6;
-	Fri,  7 Jun 2024 13:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149EC197A68;
+	Fri,  7 Jun 2024 13:34:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="xXgKvdwz"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019C1197A65;
-	Fri,  7 Jun 2024 13:34:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A7B194A7D
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 13:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717767299; cv=none; b=t0ECv15ADg/HPL3ylwCX6hobuKjQCLTqins0q69ZyqkDmZX4xpKx2AELSSQZOSIhDTa3vcep85q1tWz7zfekbCzEgbqlbaZGneR5tVjExxP95B2ldqPcKMhM2exRGs7hqR8anq7XDk7Co7Ksu8gHgfHPIVhgY7FmFcIdBpT0VXc=
+	t=1717767296; cv=none; b=licnpxxlFQORcL5QrN8vo2ngnlQU/g6Tp+jiYsvXrfLJq7KOHouhNZS2LSt7jYBvBdvKSqwXxlIcimpQvSrVKiA3G9TdKcnAvyK9+OZ5f7laVVP6LXtZnoKj2ektbVwM7Oca6wNZKh59PGPl/c23hJFAoLwbygvq85qii1HYeiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717767299; c=relaxed/simple;
-	bh=mWjQoEgi5kGmomjk0FuUp9W3PmdI8Zl7APK/Y1sOD3U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=GqgBbsgtH4wbCByRV2CH8Hhka+8IciX3BSuPbQXx5UjMGl/6JqzUfyx7B02wPweD094HqQLIVGYzavXBg1ttMS9qzLjez2GovlqMP1R8fKMhvvS3VGodzz/augQnvwqYfcok5ohgmwWV9bvY4CIadz+O4TGmS/Jk8+srdeS82Bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Vwhwl0bZ3zdZQn;
-	Fri,  7 Jun 2024 21:33:27 +0800 (CST)
-Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3044614011A;
-	Fri,  7 Jun 2024 21:34:52 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 7 Jun 2024 21:34:47 +0800
-Message-ID: <deeada6f-2538-027a-4922-8697fc59c43f@huawei-partners.com>
-Date: Fri, 7 Jun 2024 16:34:42 +0300
+	s=arc-20240116; t=1717767296; c=relaxed/simple;
+	bh=bNufWv8vnNTuzQBP8B1FhHjZF16KL0qL0xXs56Trvbg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nApcXNIC8r1HPeZtG/FcJcGAXqya7Rf7FeeP8pvaLXNNorck6U6/DC3G313IzIU0E8YKXhsvug8inkAkPuIg6oYTpm4RxJehW+FPBUJtu2o45XQdbPNWYV5yrdeEm+Pob4k8azEUoD1NqcLnvO8ZzqHTztXJ3NSA171xt70qfHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=xXgKvdwz; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42163fed884so10675425e9.1
+        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 06:34:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1717767292; x=1718372092; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GDmNba19JEmqtuQ0a43R5+Iq4qr0QF4IDUZLXDfPhcQ=;
+        b=xXgKvdwzdZSoeiR2KDfaYRUnfdMnqnOBtYTG6iHMYcEXG3/7a5lcaMAlmY2Cv9WMVS
+         rGDpxSG2JeCv4JlRNIVzdLAgt7b2S7pEjn5bsTzzRJBTjXZpQ6mP5QwNWGjBOsMoYJRp
+         hfGmA2LDtV6p925d3o4sAoaHuHLWgzfeXmjHUpJZDK9qjuvslNfLEq+dS88bKIr8aCE7
+         5y0Z2eI9GxuDWOZoFWTIUfR4fHxoaOoZ6rRZlvP/vts4g8gbrfDllSXYZP8bMjzI43d1
+         ZP/u6ctKk4dLzkgLn8Kc1DHIzfEORe9MgtOvM+IvhG8/d+pYw3vPgDOc/MO4LLZAsphv
+         7XCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717767292; x=1718372092;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GDmNba19JEmqtuQ0a43R5+Iq4qr0QF4IDUZLXDfPhcQ=;
+        b=bWNG2IWmN2qyXkoabpVARg589FN2boLSGFbP6o/9dGYcR2FbP4u/fOo4J7Zna5HAEk
+         NRUutH3EMMrF7MiXtsEY6EaIi5F93HvNdHjC50K6XvdetzgR6VRCXOGNtrmQcmrW4W6K
+         aGLfxHtxZ21erju2NTpXHmlgvc3GPP4EuyIr3Xic9ufJtplZsbZxAxvWoyFPZJSj+c6y
+         Y6IqsWmagBOAMFEIKNyjUeBs3724vTD6Oq7ACwGp35vLfh0UkXP2J6IZNHrg+0fsAEUT
+         Q/b5YMF8CUY0Sr4WmNQ5Ruwmf872yMnQ3fnrQm2GH8a5/9vrcylBre07CPtt1kRvE9Ri
+         gVLw==
+X-Forwarded-Encrypted: i=1; AJvYcCViGTAy3PMd4anZeR/gFeZWatQtwtz0lhJmlzjqzOunU94DOO0gE0u5ZVsicYgv5CerFc9d0xQhVhemcrJM30E4NpArluta
+X-Gm-Message-State: AOJu0YwKnGZYZEvztOXnARmNJxgAYOC7C2nKvIap/DGoheKybD6h4q59
+	AZRSQyp0oZJsjGPv9MUzOlLYqgOf08J0OwLvLktV1UuUnbgj6SpE5GTH7wUtaVY=
+X-Google-Smtp-Source: AGHT+IHi1tHwQBfhV0uUWQFN3GhXIlVN/ECNJD2wDBwLl5ZAgAGIlbEAl/M8FEogX3A94+YwaHC0KQ==
+X-Received: by 2002:a05:600c:4f44:b0:421:205f:52de with SMTP id 5b1f17b1804b1-42164a32853mr21506065e9.26.1717767292321;
+        Fri, 07 Jun 2024 06:34:52 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-421580fe37csm88361985e9.3.2024.06.07.06.34.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jun 2024 06:34:51 -0700 (PDT)
+Date: Fri, 7 Jun 2024 15:34:48 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, linux-doc@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
+	Leonid Bloch <lbloch@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
+	patches@lists.linux.dev
+Subject: Re: [PATCH 0/8] Introduce fwctl subystem
+Message-ID: <ZmMMeIuplzZl2Iyh@nanopsycho.orion>
+References: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+ <20240603114250.5325279c@kernel.org>
+ <214d7d82-0916-4c29-9012-04590e77df73@kernel.org>
+ <20240604070451.79cfb280@kernel.org>
+ <665fa9c9e69de_4a4e62941e@dwillia2-xfh.jf.intel.com.notmuch>
+ <20240605135911.GT19897@nvidia.com>
+ <d97144db-424f-4efd-bf10-513a0b895eca@kernel.org>
+ <20240606071811.34767cce@kernel.org>
+ <ZmK3-rkibH8j4ZwM@nanopsycho.orion>
+ <b023413e-d6e1-4a47-bdf2-98cc57a2e0ae@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 01/12] landlock: Support socket access-control
-Content-Language: ru
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
-CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
-	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-References: <20240524093015.2402952-1-ivanov.mikhail1@huawei-partners.com>
- <20240524093015.2402952-2-ivanov.mikhail1@huawei-partners.com>
- <ZlRY-W_30Kxd4RJd@google.com>
- <ff5ce842-7c67-d658-95b6-ba356dfcfeaf@huawei-partners.com>
- <ZmCantjZlyxL8jzh@google.com>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <ZmCantjZlyxL8jzh@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
- dggpemm500020.china.huawei.com (7.185.36.49)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b023413e-d6e1-4a47-bdf2-98cc57a2e0ae@lunn.ch>
 
-6/5/2024 8:04 PM, Günther Noack wrote:
-> Hello!
-> 
-> On Thu, May 30, 2024 at 03:05:56PM +0300, Mikhail Ivanov wrote:
->> 5/27/2024 12:57 PM, Günther Noack wrote:
->>> On Fri, May 24, 2024 at 05:30:04PM +0800, Mikhail Ivanov wrote:
->>>> +/**
->>>> + * struct landlock_socket_attr - Socket definition
->>>> + *
->>>> + * Argument of sys_landlock_add_rule().
->>>> + */
->>>> +struct landlock_socket_attr {
->>>> +	/**
->>>> +	 * @allowed_access: Bitmask of allowed access for a socket
->>>> +	 * (cf. `Socket flags`_).
->>>> +	 */
->>>> +	__u64 allowed_access;
->>>> +	/**
->>>> +	 * @family: Protocol family used for communication
->>>> +	 * (same as domain in socket(2)).
->>>> +	 */
->>>> +	int family;
->>>> +	/**
->>>> +	 * @type: Socket type (see socket(2)).
->>>> +	 */
->>>> +	int type;
->>>> +};
->>>
->>> Regarding the naming of struct landlock_socket_attr and the associated
->>> LANDLOCK_RULE_SOCKET enum:
->>>
->>> For the two existing rule types LANDLOCK_RULE_PATH_BENEATH (struct
->>> landlock_path_beneath_attr) and LANDLOCK_RULE_NET_PORT (struct
->>> landlock_net_port_attr), the names of the rule types are describing the
->>> *properties* by which we are filtering (path *beneath*, *network port*), rather
->>> than just the kind of object that we are filtering on.
->>>
->>> Should the new enum and struct maybe be called differently as well to match that
->>> convention?  Maybe LANDLOCK_RULE_SOCKET_FAMILY_TYPE and struct
->>> landlock_socket_family_type_attr?
->>>
->>> Are there *other* properties apart from family and type, by which you are
->>> thinking of restricting the use of sockets in the future?
->>
->> There was a thought about adding `protocol` (socket(2)) restriction,
->> but Mickaël noted that it would be useless [1]. Therefore, no other
->> properties are planned until someone has good use cases.
->>
->> I agree that current naming can be associated with socket objects. But i
->> don't think using family-type words for naming of this rule would be
->> convenient for users. In comparison with net port and path beneath
->> family-type pair doesn't represent a single semantic unit, so it would
->> be a little harder to read the code.
->>
->> Perhaps LANDLOCK_RULE_SOCKET_PROTO (struct landlock_socket_proto_attr)
->> would be more suitable here? Although socket(2) has `protocol` argument
->> to specify the socket protocol in some cases (e.g. RAW sockets), in most
->> cases family-type pair defines protocol itself. Since the purpose of
->> this patchlist is to restrict protocols used in a sandboxed process, I
->> think that in the presence of well-written documentation, such naming
->> may be appropriate here. WDYT?
->>
->> [1]
->> https://lore.kernel.org/all/a6318388-e28a-e96f-b1ae-51948c13de4d@digikod.net/
-> 
-> It is difficult, I also can't come up with a much better name.  In doubt, we
-> could stick with what you already have, I think.
-> 
-> LANDLOCK_RULE_SOCKET_PROTO alludes to "protocol" and even though that is the
-> general term, it can be confused with the third argument to socket(2), which is
-> also called "protocol" and is rarely used.
-> 
-> Mickaël, do you have any opinions on the naming of this?
-> 
-> 
->>> (More about the content)
->>>
->>> The Landlock documentation states the general approach up front:
->>>
->>>     A Landlock rule describes an *action* on an *object* which the process intends
->>>     to perform.
->>>
->>> (In your case, the object is a socket, and the action is the socket's creation.
->>> The Landlock rules describe predicates on objects to restrict the set of actions
->>> through the access_mask_t.)
->>>
->>> The implementation is perfectly in line with that, but it would help to phrase
->>> the documentation also in terms of that framework.  That means, what we are
->>> restricting are *actions*, not protocols.
->>>
->>> To make a more constructive suggestion:
->>>
->>>     "These flags restrict actions on sockets for a sandboxed process (e.g. socket
->>>     creation)."
->>
->> I think this has too general meaning (e.g. bind(2) is also an action on
->> socket). Probably this one would be more suitable:
->>
->>    "These flags restrict actions of adding sockets in a sandboxed
->>    process (e.g. socket creation, passing socket FDs to/from the
->>    process)."
-> 
-> Sounds good.  (Although I would not give "passing socket FDs to/from the
-> process" as an example, as long as it's not supported yet.)
+Fri, Jun 07, 2024 at 02:49:19PM CEST, andrew@lunn.ch wrote:
+>> >This API gives user space SDKs a trivial way of implementing all
+>> >switching, routing, filtering, QoS offloads etc.
+>> >An argument can be made that given somewhat mixed switchdev experience
+>> 
+>> Can you elaborabe a bit more what you mean by "mixed switchdev
+>> experience" please?
+>
+>I don't want to put words in Jakubs mouth but, in my opinion,
+>switchdev has been great for SoHo switches. We have over 100
+>supported, mostly implemented by the community, but some vendors also
+>supporting their own hardware.
+>
+>We have two enterprise switch families supported, each by its own
+>vendor. And we have one TOR switch family supported by the vendor.
+>
+>So i would say switchdev has worked out great for SoHo, but kernel
+>bypass is still the norm for most things bigger than SoHo.
+>
+>Why? My guess is, the products with a SoHo switch is not actually a
+>switch. It is a wifi box, with a switch. It is a cable modem, with a
+>switch. It is an inflight entertainment system, with a switch, etc.
+>It is much easier to build such multi-purpose systems when everything
+>is nicely integrated into the kernel, you don't have to fight with
+>multiple vendors supplying SDKs which only work on a disjoint set of
+>kernels, etc.
+>
+>For bigger, single purpose devices, it is just a switch, there is less
+>inconvenience of using just one vendor SDK, on top of the vendor
+>proscribed kernel.
 
-Agreed, thanks
+I'm aware of what you wrote and undertand it. I just thought Jakub's
+mixed experience is about the APIs more than the politics behind vedors
+adoptation process..
 
-> 
-> 
->>>> + * - %LANDLOCK_ACCESS_SOCKET_CREATE: Create a socket.
->>>
->>> Can we be more specific here what operations are affected by this?  It is rather
->>> obvious that this affects socket(2), but does this also affect accept(2) and
->>> connect(2)?
->>>
->>> A scenario that I could imagine being useful is to sandbox a TCP server like
->>> this:
->>>
->>>     * create a socket, bind(2) and listen(2)
->>>     * sandbox yourself so that no new sockets can be created with socket(2)
->>>     * go into the main loop and start accept(2)ing new connections
->>>
->>> Is this an approach that would work with this patch set?
->>
->> Yes, such scenario is possible. This rule should apply to all socket
->> creation requests in the user space (socket(2), socketpair(2), io_uring
->> request). Perhaps it's necessary to clarify here that only user space
->> sockets are restricted?
->>
->> Btw, current implementation doesn't check that the socket creation
->> request doesn't come from the kernel space. Will be fixed.
-> 
-> Two brief side side discussions:
-> 
-> * What are the scenarios where that creation request comes from kernel space?
->    If this is used under the hood for network-backed file systems like NFS, can
->    this result in surprising interactions when the program tries to access the
->    file system?
 
-Yes, i've figured out that NFS can use __sock_create() kernel method for
-allocating per-client socket. If kernel allocation of sockets would be
-restricted by Landlock that NFS client allocation may fail and proccess
-won't be able to connect to the NFS server.
-
-Some of the socket protocols uses kernel space methods like
-sock_create_lite() or sock_create_kern() for their own needs.
-For example netlink fou family uses sock_create_kern() for UDP
-tunneling.
-
-Landlock shouldn't allow to indirectly change the behavior of such
-mechanisms from user space.
-
-> 
-> * To be clear, I think it would be useful to support the scenario above, where
->    accept() continues to work. - It would make it easy to create sandboxed server
->    processes and they could still accept connections, but do no other networking.
-
-Yes, accept() should work with any restrictions.
-
-> 
-> But to bring it back to my original remark, and to unblock progress:
-> 
-> I think for this patch set (focused on userspace-requested socket creation), it
-> would be enough to clarify in the documentation which operations are affected by
-> the LANDLOCK_ACCESS_SOCKET_CREATE right.
-
-Ok, I'll do it.
-
-> 
-> 
->>> (It might make a neat sample tool as well, if something like this works :))
->>>
->>>
->>> Regarding the list of socket access rights with only one item in it:
->>>
->>> I am still unsure what other socket actions are in scope in the future; it would
->>> probably help to phrase the documentation in those terms.  (listen(2), bind(2),
->>> connect(2), shutdown(2)?  On the other hand, bind(2) and connect(2) for TCP are
->>> already restrictable differently.))
->>
->> I think it would be useful to restrict sending and receiving socket
->> FDs via unix domain sockets (see SCM_RIGHTS in unix(7)).
-> 
-> That seems like a reasonable idea.  Would you like to file an issue on the
-> Landlock bugtracker about it?
-> 
-> https://github.com/landlock-lsm/linux/issues
-
-Ofc: https://github.com/landlock-lsm/linux/issues/33.
-
-> 
-> 
->>>> +	/* Checks that all supported socket families and types can be stored in socket_key. */
->>>> +	BUILD_BUG_ON(AF_MAX > (typeof(socket_key.data.family))~0);
->>>> +	BUILD_BUG_ON(SOCK_MAX > (typeof(socket_key.data.type))~0);
->>>
->>> Off-by-one nit: AF_MAX and SOCK_MAX are one higher than the last permitted value,
->>> so technically it would be ok if they are one higher than (unsigned short)~0.
-> 
-> (Did you see this remark?)
-
-Yeah, sorry I've somehow lost my reply. This nit will be fixed.
-
-> 
-> 
->>> I see that this function traces back to Mickaël's comment in
->>> https://lore.kernel.org/all/20240412.phoh7laim7Th@digikod.net/
->>>
->>> In my understanding, the motivation was to keep the key size in check.
->>> But that does not mean that we need to turn it into a uintptr_t?
->>>
->>> Would it not have been possible to extend the union landlock_key in ruleset.h
->>> with a
->>>
->>>     struct {
->>>       unsigned short family, type;
->>>     }
->>>
->>> and then do the AF_MAX, SOCK_MAX build-time checks on that?
->>> It seems like that might be more in line with what we already have?
->>
->> I don't think that complicating general entity with such a specific
->> representation would be a good solution here. `landlock_key` shouldn't
->> contain any semantic information about the key content.
-> 
-> Hm, OK.  I think that is debatable, but these are all things that are
-> implementation details and can be changed later if needed.  Sounds good to me if
-> we fix the undefined behaviour in the key calculation.
-
-Ok, agreed! Mikael can probably give his opinion on this.
-
-> 
-> 
->>>> +	/* Denies inserting a rule with unsupported socket family and type. */
->                                          ^^^^^^^^^^^^^^^^^^^^^^^^^
-> 
-> Is the wording "unsupported socket family" misleading here?
-> 
-> (a) It is technically a "protocol family" and a "socket type", according to
->      socket(2). (BTW, the exact delineation between a "protocol family" and an
->      "address family" is not clear to me.)
-> 
-> (b) "unsupported" in the context of protocol families may mean that the kernel
->      does not know how to speak that protocol, which is slightly different than
->      saying that it's outside of the [0, AF_MAX) range.  If we wanted to check
->      for the protocol family being "supported", we should also probably return
->      -EAFNOSUPPORT, similar to what we already return when adding a "port" rule
->      with the wrong protocol [1]?
-> 
->      [1] https://docs.kernel.org/userspace-api/landlock.html#extending-a-ruleset
-> 
-> I suspect that -EINVAL is slightly more correct here, because this is not about
-> the protocols that the kernel supports, but only about the range.  If we wanted
-> to return errors about the protocol that the kernel supports, I realized that
-> we'd probably also have to check whether the *combination* of family and type
-> makes sense.  In my understanding, the equivalent errors for type and protocol,
-> ESOCKTNOSUPPORT and EPROTONOSUPPORT, only get returned based on whether they
-> make sense together with the other values.
-
-Thanks, "unsupported" is indeed an incorrect naming in this case.
-To check if the protocol is supported, we'll have to validate 
-family-type combination, which would be really ugly.
-
-Taking into account the thoughts below regarding family-type checking,
-the following description can be used.
-
-   /* Denies inserting a rule with family and type outside the range. */
-
-> 
-> 
->>>> +	if (family < 0 || family >= AF_MAX)
->>>> +		return -EINVAL;
->>>> +	if (type < 0 || type >= SOCK_MAX)
->>>> +		return -EINVAL;
->>>
->>> enum sock_type (include/linux/net.h) has "holes": values 7, 8 and 9 are not
->>> defined in the header.  Should we check more specifically for the supported
->>> values here?  (Is there already a helper function for that?)
->>
->> I think that a more detailed check of the family-type values may have a
->> good effect here, since the rules will contain real codes of families
->> and types.
->>
->> I haven't found any helper to check the supported socket type value.
->> Performing a check inside landlock can lead to several minor problems,
->> which theoretically should not lead to any costs.
->>
->> * There are would be a dependency with constants of enum sock_types. But
->>    we are unlikely to see new types of sockets in the next few years, so
->>    it wouldn't be a problem to maintain such check.
->>
->> * enum sock_types can be redefined (see ARCH_HAS_SOCKET_TYPES in net.h),
->>    but i haven't found anyone to actually change the constants of socket
->>    types. It would be wrong to have a different landlock behavior for
->>    arch that redefines sock_types for some purposes, so probably this
->>    should also be maintained.
->>
->> WDYT?
-> 
-> Thinking about it again, from a Landlock safety perspective, I believe it is
-> safe to keep the checks as they are and to check for the two values to be in the
-> ranges [0, AF_MAX) and [0, SOCK_MAX).
-> 
-> Even if we permit the rule to be added for an invalid socket type, there does
-> not seem to be any harm in that, as these sockets can't be created anyway.
-> Also, given the semantics of these errors in socket(2), where also the
-> *combinations* of the values are checked, it seems overly complicated to check
-> all these combinations.  I think it would be fine to keep as is, I was mostly
-> wondering whether you had done any deeper analysis?
-
-No, I think that checking only ranges is also a good solution. We won't
-care about maintaining valid type constants, and that would simplify
-behavior of this method for users. Let's take this approach.
-
-> 
-> It might be worth spelling out in the struct documentation that the values which
-> fulfil 0 <= family < AF_MAX and 0 <= type < SOCK_MAX are considered valid.  Does
-> that sound reasonable?
-
-Ofc, I'll add appropriate comments in the definition of struct
-landlock_socket_attr and in the socket rule documentation. Thanks!
-
-> 
-> P.S., it seems that the security/apparmor/Makefile is turning the "#define"s
-> into C code with lookup tables, but it seems that this is only used for
-> human-readable audit-logging, not for validating the policies.
-> 
-> —Günther
+>
+>	Andrew
+>
 
