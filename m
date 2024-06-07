@@ -1,73 +1,87 @@
-Return-Path: <netdev+bounces-101974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E367900D86
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 23:32:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC4B9900D9D
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 23:41:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 040F2285A48
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 21:32:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49635B23B5C
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 21:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD94154439;
-	Fri,  7 Jun 2024 21:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 704941553A1;
+	Fri,  7 Jun 2024 21:41:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="r6KBGmCS"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="er0iEPlp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057D54E1DD;
-	Fri,  7 Jun 2024 21:32:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06F5155338
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 21:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717795969; cv=none; b=UtPqq33jKtFaGFMQhK7z+v+oP8SEMxIxXN8JtTMYAhUlMZUT5KJwcaf0m7DBuCbRvKCaYVb70nvnQD2p0i+nSs83lrlO4LRJkoB/YMbZfHsjxn/8aNqkygbgD2PHjR6SXvdZrQ7c2yXhbhrsdImmojZdqgU1fxsYiKjgusMn4P8=
+	t=1717796475; cv=none; b=rBSDHJRN0CEdSK8crG3H2jCJCKHDS0zDCZ9quHZCASyN0UxUrvh0gCTXOagfgSBgLvvxmETcOikd6QEQEc14ieNZPAwKJLyN7iD8xfs2ZmOr963cG5uj1YUQvgQOgn2+qPn7YhHwcgvPehxqO0I3oomqBolumD8VmRiV5P6L4gY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717795969; c=relaxed/simple;
-	bh=DtFPPuJl5jobRcYlhii4Hbqy6pyJVCflNa8vQeo+ODw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=REWtmCwLqKjXxkGDK6zLfR79PaqKLnbepVuvHjDmflh+lbYnrx/MWoxOWiqDmoSfiv5SK5Vwf1xSNHMD4J0AGU6pP8hEem5Zj6/w8XwVHzb9GI2AkP6eBqOl+59u5TvQPvsQDJmZ4x73/s145ogX3s348crBbWMkGbFytou1r0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=r6KBGmCS; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1717796475; c=relaxed/simple;
+	bh=9ZiKY8Epob/6giwpHNtQhhAEigUlPvpphA0MlyV4bx4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AWugPBQpI3QtHZYzjrUBz1bbU57XTykEVuM+DFBE4AL1Qico8iRiktRmGFB9X1AQ9OPpEtNOSMjqz4ltqsnYFdMbkY7egh8jZEX6nM8Oj2HAKAbG5+D7sMY/59OZR0voQ4eV+oILs36SOpBtP4H2kK6vWvolpwrrUUy+gL5e53M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=er0iEPlp; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1f6c7cdec83so18384585ad.0
+        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 14:41:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1717795968; x=1749331968;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=tDYZoP3d8/zCpLPWQHHudMPrUF8rr9i3P8lcsIGhdv0=;
-  b=r6KBGmCSQitmi8h64oCnP1Smkrw5IoZtbkJVFNBeyam5Wb9QendXpen8
-   8Mi0coQOdZPAqTZDnSttgYaQ56lnuXrjqFyTlNywqDuzevv5x8A5TaBzN
-   +4lf/8/17vkxTd0VHdrdJGnf2XTSpxWg/hLHTvjdu7IVeC+0qMv35j01+
-   E=;
-X-IronPort-AV: E=Sophos;i="6.08,221,1712620800"; 
-   d="scan'208";a="300765059"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2024 21:32:45 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:15518]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.42.213:2525] with esmtp (Farcaster)
- id cb789800-7be3-4309-aa6b-c7438c91f728; Fri, 7 Jun 2024 21:32:45 +0000 (UTC)
-X-Farcaster-Flow-ID: cb789800-7be3-4309-aa6b-c7438c91f728
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 7 Jun 2024 21:32:41 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.48) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 7 Jun 2024 21:32:38 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <xiyou.wangcong@gmail.com>
-CC: <bpf@vger.kernel.org>, <cong.wang@bytedance.com>, <fw@strlen.de>,
-	<netdev@vger.kernel.org>,
-	<syzbot+0c4150bff9fff3bf023c@syzkaller.appspotmail.com>, <kuniyu@amazon.com>
-Subject: Re: [Patch net] net: remove the bogus overflow debug check in pskb_may_pull()
-Date: Fri, 7 Jun 2024 14:32:29 -0700
-Message-ID: <20240607213229.97602-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <ZmMxzPoDTNu06itR@pop-os.localdomain>
-References: <ZmMxzPoDTNu06itR@pop-os.localdomain>
+        d=broadcom.com; s=google; t=1717796472; x=1718401272; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6rtEKQFLHrlHDJmkNDb3CDrkqX4wEACzExxiz6etLTM=;
+        b=er0iEPlpZMNIBW8yqVIQvtdvxVeH9Ipzh8fKrdBbx0kxHxED+GTqHjqOemrJVujUgw
+         3IH/mwSqQxblNbLPGqANcSo4UFCPV0Tr12JvIuWW6Vw1rC/0Lqi7XF8zwdQ5peKbY75u
+         XyQ9biIegTACFMKoheCF1DnTgIREyfallX2Fw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717796472; x=1718401272;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6rtEKQFLHrlHDJmkNDb3CDrkqX4wEACzExxiz6etLTM=;
+        b=IkrGxF4dmkT9kSd7JwoKU3MTBAzwdu1yjKiOUvbh2dlBLlcr8AuDfkLt35P5PefREm
+         THKgZ+uI397WdmPFJW/6xyWE7PN9kGEejOvSQ8IrPxYOErebA0q04yvT0JiKqtgJnajO
+         y+0PiABeCZqICWnP1S9h2HNEXZB1R6Iko5uItLMxGzLOWEtkOvzUjauv4OuGj5OkgtkS
+         9jxPLhnhb7S+zA8rEp9a8hpgquSQQK39RY+dogj75kZa45fsMssqoohstALhMV/CxZp6
+         wFVJSvNnIwCDibupVr94wYdLkD0+YCOkVG9oDpkiou63BX2SHIrNuxMxte6AJJoZNQQc
+         7tVg==
+X-Forwarded-Encrypted: i=1; AJvYcCUPkumUO786pWgxOvm+apWDKo3vHOUa6u4IhGac+Va0C3YOtwkBclWwRifhIrrY93LQ920EWGwn0sYt/7+qBV176hMEWKCt
+X-Gm-Message-State: AOJu0Yx/avuIvfxun59PDAfXACt9U34bGPS10xgny8SEGHLTYirfQzVJ
+	583ngxPuwx4rgnM8IptSic4rA87o1Ab7vLGlua/jawTQJ0p8BkKmtf8dcl+eRA==
+X-Google-Smtp-Source: AGHT+IEhB0e/xeVbB/SJ0/O4X/sDV0ptLoLnyUoA1V/jZ3LOegzIrzlkFMAUJeY8ot2co/j616uTcw==
+X-Received: by 2002:a17:902:ea12:b0:1f6:70d6:d49a with SMTP id d9443c01a7336-1f6d02c0563mr46888165ad.11.1717796471979;
+        Fri, 07 Jun 2024 14:41:11 -0700 (PDT)
+Received: from ubuntu-vm.dhcp.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd7e189fsm38946805ad.215.2024.06.07.14.41.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jun 2024 14:41:11 -0700 (PDT)
+From: Kuntal Nayak <kuntal.nayak@broadcom.com>
+To: stable@vger.kernel.org,
+	gregkh@linuxfoundation.org
+Cc: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	fw@strlen.de,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ajay.kaher@broadcom.com,
+	alexey.makhalov@broadcom.com,
+	vasavi.sirnapalli@broadcom.com,
+	Kuntal Nayak <kuntal.nayak@broadcom.com>
+Subject: [PATCH 1/2 v5.10] netfilter: nf_tables: restrict tunnel object to NFPROTO_NETDEV
+Date: Fri,  7 Jun 2024 14:37:34 -0700
+Message-Id: <20240607213735.46127-1-kuntal.nayak@broadcom.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,31 +89,110 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWC004.ant.amazon.com (10.13.139.206) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Cong Wang <xiyou.wangcong@gmail.com>
-Date: Fri, 7 Jun 2024 09:14:04 -0700
-> On Fri, Jun 07, 2024 at 01:27:47AM +0200, Florian Westphal wrote:
-> > Cong Wang <xiyou.wangcong@gmail.com> wrote:
-> > > From: Cong Wang <cong.wang@bytedance.com>
-> > > 
-> > > Commit 219eee9c0d16 ("net: skbuff: add overflow debug check to pull/push
-> > > helpers") introduced an overflow debug check for pull/push helpers.
-> > > For __skb_pull() this makes sense because its callers rarely check its
-> > > return value. But for pskb_may_pull() it does not make sense, since its
-> > > return value is properly taken care of. Remove the one in
-> > > pskb_may_pull(), we can continue rely on its return value.
-> > 
-> > See 025f8ad20f2e3264d11683aa9cbbf0083eefbdcd which would not exist
-> > without this check, I would not give up yet.
-> 
-> What's the point of that commit?
+From: Pablo Neira Ayuso <pablo@netfilter.org>
 
-4b911a9690d7 would be better example.  The warning actually found a
-bug in NSH GSO.
+[ upstream commit 776d451648443f9884be4a1b4e38e8faf1c621f9 ]
 
-Here's splats triggered by syzkaller using NSH over various tunnels.
-https://lore.kernel.org/netdev/20240415222041.18537-2-kuniyu@amazon.com/
+Bail out on using the tunnel dst template from other than netdev family.
+Add the infrastructure to check for the family in objects.
+
+Fixes: af308b94a2a4 ("netfilter: nf_tables: add tunnel support")
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+[KN: Backport patch according to v5.10.x source]
+Signed-off-by: Kuntal Nayak <kuntal.nayak@broadcom.com>
+---
+ include/net/netfilter/nf_tables.h |  2 ++
+ net/netfilter/nf_tables_api.c     | 14 +++++++++-----
+ net/netfilter/nft_tunnel.c        |  1 +
+ 3 files changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
+index 2da11d8c0..ab8d84775 100644
+--- a/include/net/netfilter/nf_tables.h
++++ b/include/net/netfilter/nf_tables.h
+@@ -1174,6 +1174,7 @@ void nft_obj_notify(struct net *net, const struct nft_table *table,
+  *	@type: stateful object numeric type
+  *	@owner: module owner
+  *	@maxattr: maximum netlink attribute
++ *	@family: address family for AF-specific object types
+  *	@policy: netlink attribute policy
+  */
+ struct nft_object_type {
+@@ -1183,6 +1184,7 @@ struct nft_object_type {
+ 	struct list_head		list;
+ 	u32				type;
+ 	unsigned int                    maxattr;
++	u8				family;
+ 	struct module			*owner;
+ 	const struct nla_policy		*policy;
+ };
+diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
+index 858d09b54..de56f25dc 100644
+--- a/net/netfilter/nf_tables_api.c
++++ b/net/netfilter/nf_tables_api.c
+@@ -6234,11 +6234,15 @@ static int nft_object_dump(struct sk_buff *skb, unsigned int attr,
+ 	return -1;
+ }
+ 
+-static const struct nft_object_type *__nft_obj_type_get(u32 objtype)
++static const struct nft_object_type *__nft_obj_type_get(u32 objtype, u8 family)
+ {
+ 	const struct nft_object_type *type;
+ 
+ 	list_for_each_entry(type, &nf_tables_objects, list) {
++		if (type->family != NFPROTO_UNSPEC &&
++		    type->family != family)
++			continue;
++
+ 		if (objtype == type->type)
+ 			return type;
+ 	}
+@@ -6246,11 +6250,11 @@ static const struct nft_object_type *__nft_obj_type_get(u32 objtype)
+ }
+ 
+ static const struct nft_object_type *
+-nft_obj_type_get(struct net *net, u32 objtype)
++nft_obj_type_get(struct net *net, u32 objtype, u8 family)
+ {
+ 	const struct nft_object_type *type;
+ 
+-	type = __nft_obj_type_get(objtype);
++	type = __nft_obj_type_get(objtype, family);
+ 	if (type != NULL && try_module_get(type->owner))
+ 		return type;
+ 
+@@ -6343,7 +6347,7 @@ static int nf_tables_newobj(struct net *net, struct sock *nlsk,
+ 		if (nlh->nlmsg_flags & NLM_F_REPLACE)
+ 			return -EOPNOTSUPP;
+ 
+-		type = __nft_obj_type_get(objtype);
++		type = __nft_obj_type_get(objtype, family);
+ 		nft_ctx_init(&ctx, net, skb, nlh, family, table, NULL, nla);
+ 
+ 		return nf_tables_updobj(&ctx, type, nla[NFTA_OBJ_DATA], obj);
+@@ -6354,7 +6358,7 @@ static int nf_tables_newobj(struct net *net, struct sock *nlsk,
+ 	if (!nft_use_inc(&table->use))
+ 		return -EMFILE;
+ 
+-	type = nft_obj_type_get(net, objtype);
++	type = nft_obj_type_get(net, objtype, family);
+ 	if (IS_ERR(type)) {
+ 		err = PTR_ERR(type);
+ 		goto err_type;
+diff --git a/net/netfilter/nft_tunnel.c b/net/netfilter/nft_tunnel.c
+index 2ee50996d..c8822fa81 100644
+--- a/net/netfilter/nft_tunnel.c
++++ b/net/netfilter/nft_tunnel.c
+@@ -684,6 +684,7 @@ static const struct nft_object_ops nft_tunnel_obj_ops = {
+ 
+ static struct nft_object_type nft_tunnel_obj_type __read_mostly = {
+ 	.type		= NFT_OBJECT_TUNNEL,
++	.family		= NFPROTO_NETDEV,
+ 	.ops		= &nft_tunnel_obj_ops,
+ 	.maxattr	= NFTA_TUNNEL_KEY_MAX,
+ 	.policy		= nft_tunnel_key_policy,
+-- 
+2.39.3
+
 
