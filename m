@@ -1,67 +1,69 @@
-Return-Path: <netdev+bounces-101975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC4B9900D9D
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 23:41:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 874C3900DA0
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 23:41:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49635B23B5C
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 21:41:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B6FA1C214F6
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 21:41:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 704941553A1;
-	Fri,  7 Jun 2024 21:41:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 694C8155739;
+	Fri,  7 Jun 2024 21:41:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="er0iEPlp"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Z9DKg3SF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06F5155338
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 21:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9A8155341
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 21:41:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717796475; cv=none; b=rBSDHJRN0CEdSK8crG3H2jCJCKHDS0zDCZ9quHZCASyN0UxUrvh0gCTXOagfgSBgLvvxmETcOikd6QEQEc14ieNZPAwKJLyN7iD8xfs2ZmOr963cG5uj1YUQvgQOgn2+qPn7YhHwcgvPehxqO0I3oomqBolumD8VmRiV5P6L4gY=
+	t=1717796480; cv=none; b=ba8Aayhrh0YCtUOf6YHjG0EReIR1loHm81GLLA0as2YElQSKsJlUnEN66C8k1IYjRYugADH51O+oYGtTANAeVKdynmtwUUXchmQpXEtxq00BpUGdmSEwk3M7pfeg+DkEn0/yKdC9bmOtjR0V6GU+DHF4G056mIJJPvFYoIc03g0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717796475; c=relaxed/simple;
-	bh=9ZiKY8Epob/6giwpHNtQhhAEigUlPvpphA0MlyV4bx4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AWugPBQpI3QtHZYzjrUBz1bbU57XTykEVuM+DFBE4AL1Qico8iRiktRmGFB9X1AQ9OPpEtNOSMjqz4ltqsnYFdMbkY7egh8jZEX6nM8Oj2HAKAbG5+D7sMY/59OZR0voQ4eV+oILs36SOpBtP4H2kK6vWvolpwrrUUy+gL5e53M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=er0iEPlp; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1717796480; c=relaxed/simple;
+	bh=+zDHm0gqEYnNElTfpQqNXDS5sE+4HW2XfxQCpQQCbSE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=pyQHtQf02d7HCLiK9d7994oV2xRtwK1dOu5UMmT4AwVERee3vBEfBKeAIUVWkY2NRQ142MbLwCQrYICtx8cslcmOkObl1mNrg+j33WYymt1Zv837JVwbUGnKP/fiBKyw2LmZ5QZ6lgMwDAhlXlvTL4HFWCXc2Mx0BFMUGsRAHU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Z9DKg3SF; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1f6c7cdec83so18384585ad.0
-        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 14:41:12 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1f480624d10so24411005ad.1
+        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 14:41:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1717796472; x=1718401272; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6rtEKQFLHrlHDJmkNDb3CDrkqX4wEACzExxiz6etLTM=;
-        b=er0iEPlpZMNIBW8yqVIQvtdvxVeH9Ipzh8fKrdBbx0kxHxED+GTqHjqOemrJVujUgw
-         3IH/mwSqQxblNbLPGqANcSo4UFCPV0Tr12JvIuWW6Vw1rC/0Lqi7XF8zwdQ5peKbY75u
-         XyQ9biIegTACFMKoheCF1DnTgIREyfallX2Fw=
+        d=broadcom.com; s=google; t=1717796478; x=1718401278; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M6hr5Pgg5LYV8IvTkAUUqijfPi8ple/giWX7dtweBwU=;
+        b=Z9DKg3SFZv5D/L1UQYIGoZFTmyjArQ+DavEzSWG/A77KkhIYYrzIKCXeChJFXL3HrI
+         q0ocBiSI0p7j7VheYjrOKzdy91QRGaZSsGsZF+6Pa05N38HKd1k0NA6l+2MyX5ehLhhh
+         uxYxtc/y64gC8zpMQUhC7YDDSQhWokBTiKfsA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717796472; x=1718401272;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6rtEKQFLHrlHDJmkNDb3CDrkqX4wEACzExxiz6etLTM=;
-        b=IkrGxF4dmkT9kSd7JwoKU3MTBAzwdu1yjKiOUvbh2dlBLlcr8AuDfkLt35P5PefREm
-         THKgZ+uI397WdmPFJW/6xyWE7PN9kGEejOvSQ8IrPxYOErebA0q04yvT0JiKqtgJnajO
-         y+0PiABeCZqICWnP1S9h2HNEXZB1R6Iko5uItLMxGzLOWEtkOvzUjauv4OuGj5OkgtkS
-         9jxPLhnhb7S+zA8rEp9a8hpgquSQQK39RY+dogj75kZa45fsMssqoohstALhMV/CxZp6
-         wFVJSvNnIwCDibupVr94wYdLkD0+YCOkVG9oDpkiou63BX2SHIrNuxMxte6AJJoZNQQc
-         7tVg==
-X-Forwarded-Encrypted: i=1; AJvYcCUPkumUO786pWgxOvm+apWDKo3vHOUa6u4IhGac+Va0C3YOtwkBclWwRifhIrrY93LQ920EWGwn0sYt/7+qBV176hMEWKCt
-X-Gm-Message-State: AOJu0Yx/avuIvfxun59PDAfXACt9U34bGPS10xgny8SEGHLTYirfQzVJ
-	583ngxPuwx4rgnM8IptSic4rA87o1Ab7vLGlua/jawTQJ0p8BkKmtf8dcl+eRA==
-X-Google-Smtp-Source: AGHT+IEhB0e/xeVbB/SJ0/O4X/sDV0ptLoLnyUoA1V/jZ3LOegzIrzlkFMAUJeY8ot2co/j616uTcw==
-X-Received: by 2002:a17:902:ea12:b0:1f6:70d6:d49a with SMTP id d9443c01a7336-1f6d02c0563mr46888165ad.11.1717796471979;
-        Fri, 07 Jun 2024 14:41:11 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1717796478; x=1718401278;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M6hr5Pgg5LYV8IvTkAUUqijfPi8ple/giWX7dtweBwU=;
+        b=cdfgQuooeo9lFB1rZjfEFhQFAR4fyebn+BKjf5EV9KD2qhkWhtLiv603NPI+O1q+/N
+         QoRWjzeGtYczSu8yufrHUJvly/qDjwekIGF5jZdUCp6YhzU73lLqMMRUKZJRbrCAzWi4
+         xXX9F0yhWC0d7K8tWcuWgcrzJ+T7PTPannQpFOIX/kQT8IolMQEjYEXbZaA5siPVlXQ4
+         5qPdlhmryEhpPhISqdyI1XB15HN46D1Dl7GlOcf1l3dnUK6t4NI+Ae0OAg8c/9LxgXuG
+         S5n+cdpsCiO4Myy3QjDIEoBFI0CmOVQb8NIOP6PCeNo46m/ZGkG+W6A3f4JG13nZF7Jz
+         GfvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXaw1YFf513CZwP4xZWgW2uO4Uah3tPiaMX+jGoK0d42hMTylphTKE1M0u3Zi/f/+uWPUPIdvVJi3Exprf5l34CEDN+wRA0
+X-Gm-Message-State: AOJu0YxxL5RlKo/5Gn9cF6CURjWDwMSNOAhR9KumW2Qw1yEmbJu7HQnK
+	+tEpQLnNqew/WAzETVcyItV7x7+chF5yz4DW6iQPVaJE4gbl+uB58kjb+XsPVA==
+X-Google-Smtp-Source: AGHT+IGiZCcvwDTTBj7Ig57bQR4C0/0ASjRxvCbyRtjYCP4HgXPQ023nqZONfn0Hr6ef/ygn+LzbUg==
+X-Received: by 2002:a17:902:c94f:b0:1f6:8a19:4562 with SMTP id d9443c01a7336-1f6dfc426d6mr27231345ad.24.1717796478156;
+        Fri, 07 Jun 2024 14:41:18 -0700 (PDT)
 Received: from ubuntu-vm.dhcp.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd7e189fsm38946805ad.215.2024.06.07.14.41.08
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd7e189fsm38946805ad.215.2024.06.07.14.41.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jun 2024 14:41:11 -0700 (PDT)
+        Fri, 07 Jun 2024 14:41:17 -0700 (PDT)
 From: Kuntal Nayak <kuntal.nayak@broadcom.com>
 To: stable@vger.kernel.org,
 	gregkh@linuxfoundation.org
@@ -77,11 +79,14 @@ Cc: pablo@netfilter.org,
 	ajay.kaher@broadcom.com,
 	alexey.makhalov@broadcom.com,
 	vasavi.sirnapalli@broadcom.com,
+	Ziyang Xuan <william.xuanziyang@huawei.com>,
 	Kuntal Nayak <kuntal.nayak@broadcom.com>
-Subject: [PATCH 1/2 v5.10] netfilter: nf_tables: restrict tunnel object to NFPROTO_NETDEV
-Date: Fri,  7 Jun 2024 14:37:34 -0700
-Message-Id: <20240607213735.46127-1-kuntal.nayak@broadcom.com>
+Subject: [PATCH 2/2 v5.10] netfilter: nf_tables: Fix potential data-race in __nft_obj_type_get()
+Date: Fri,  7 Jun 2024 14:37:35 -0700
+Message-Id: <20240607213735.46127-2-kuntal.nayak@broadcom.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240607213735.46127-1-kuntal.nayak@broadcom.com>
+References: <20240607213735.46127-1-kuntal.nayak@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,108 +95,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Pablo Neira Ayuso <pablo@netfilter.org>
+From: Ziyang Xuan <william.xuanziyang@huawei.com>
 
-[ upstream commit 776d451648443f9884be4a1b4e38e8faf1c621f9 ]
+[ upstream commit d78d867dcea69c328db30df665be5be7d0148484 ]
 
-Bail out on using the tunnel dst template from other than netdev family.
-Add the infrastructure to check for the family in objects.
+nft_unregister_obj() can concurrent with __nft_obj_type_get(),
+and there is not any protection when iterate over nf_tables_objects
+list in __nft_obj_type_get(). Therefore, there is potential data-race
+of nf_tables_objects list entry.
 
-Fixes: af308b94a2a4 ("netfilter: nf_tables: add tunnel support")
+Use list_for_each_entry_rcu() to iterate over nf_tables_objects
+list in __nft_obj_type_get(), and use rcu_read_lock() in the caller
+nft_obj_type_get() to protect the entire type query process.
+
+Fixes: e50092404c1b ("netfilter: nf_tables: add stateful objects")
+Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
 Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-[KN: Backport patch according to v5.10.x source]
 Signed-off-by: Kuntal Nayak <kuntal.nayak@broadcom.com>
 ---
- include/net/netfilter/nf_tables.h |  2 ++
- net/netfilter/nf_tables_api.c     | 14 +++++++++-----
- net/netfilter/nft_tunnel.c        |  1 +
- 3 files changed, 12 insertions(+), 5 deletions(-)
+ net/netfilter/nf_tables_api.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
-index 2da11d8c0..ab8d84775 100644
---- a/include/net/netfilter/nf_tables.h
-+++ b/include/net/netfilter/nf_tables.h
-@@ -1174,6 +1174,7 @@ void nft_obj_notify(struct net *net, const struct nft_table *table,
-  *	@type: stateful object numeric type
-  *	@owner: module owner
-  *	@maxattr: maximum netlink attribute
-+ *	@family: address family for AF-specific object types
-  *	@policy: netlink attribute policy
-  */
- struct nft_object_type {
-@@ -1183,6 +1184,7 @@ struct nft_object_type {
- 	struct list_head		list;
- 	u32				type;
- 	unsigned int                    maxattr;
-+	u8				family;
- 	struct module			*owner;
- 	const struct nla_policy		*policy;
- };
 diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index 858d09b54..de56f25dc 100644
+index de56f25dc..f3cb5c920 100644
 --- a/net/netfilter/nf_tables_api.c
 +++ b/net/netfilter/nf_tables_api.c
-@@ -6234,11 +6234,15 @@ static int nft_object_dump(struct sk_buff *skb, unsigned int attr,
- 	return -1;
- }
- 
--static const struct nft_object_type *__nft_obj_type_get(u32 objtype)
-+static const struct nft_object_type *__nft_obj_type_get(u32 objtype, u8 family)
+@@ -6238,7 +6238,7 @@ static const struct nft_object_type *__nft_obj_type_get(u32 objtype, u8 family)
  {
  	const struct nft_object_type *type;
  
- 	list_for_each_entry(type, &nf_tables_objects, list) {
-+		if (type->family != NFPROTO_UNSPEC &&
-+		    type->family != family)
-+			continue;
-+
- 		if (objtype == type->type)
- 			return type;
- 	}
-@@ -6246,11 +6250,11 @@ static const struct nft_object_type *__nft_obj_type_get(u32 objtype)
- }
- 
- static const struct nft_object_type *
--nft_obj_type_get(struct net *net, u32 objtype)
-+nft_obj_type_get(struct net *net, u32 objtype, u8 family)
+-	list_for_each_entry(type, &nf_tables_objects, list) {
++	list_for_each_entry_rcu(type, &nf_tables_objects, list) {
+ 		if (type->family != NFPROTO_UNSPEC &&
+ 		    type->family != family)
+ 			continue;
+@@ -6254,9 +6254,13 @@ nft_obj_type_get(struct net *net, u32 objtype, u8 family)
  {
  	const struct nft_object_type *type;
  
--	type = __nft_obj_type_get(objtype);
-+	type = __nft_obj_type_get(objtype, family);
- 	if (type != NULL && try_module_get(type->owner))
++	rcu_read_lock();
+ 	type = __nft_obj_type_get(objtype, family);
+-	if (type != NULL && try_module_get(type->owner))
++	if (type != NULL && try_module_get(type->owner)) {
++		rcu_read_unlock();
  		return type;
++	}
++	rcu_read_unlock();
  
-@@ -6343,7 +6347,7 @@ static int nf_tables_newobj(struct net *net, struct sock *nlsk,
- 		if (nlh->nlmsg_flags & NLM_F_REPLACE)
- 			return -EOPNOTSUPP;
- 
--		type = __nft_obj_type_get(objtype);
-+		type = __nft_obj_type_get(objtype, family);
- 		nft_ctx_init(&ctx, net, skb, nlh, family, table, NULL, nla);
- 
- 		return nf_tables_updobj(&ctx, type, nla[NFTA_OBJ_DATA], obj);
-@@ -6354,7 +6358,7 @@ static int nf_tables_newobj(struct net *net, struct sock *nlsk,
- 	if (!nft_use_inc(&table->use))
- 		return -EMFILE;
- 
--	type = nft_obj_type_get(net, objtype);
-+	type = nft_obj_type_get(net, objtype, family);
- 	if (IS_ERR(type)) {
- 		err = PTR_ERR(type);
- 		goto err_type;
-diff --git a/net/netfilter/nft_tunnel.c b/net/netfilter/nft_tunnel.c
-index 2ee50996d..c8822fa81 100644
---- a/net/netfilter/nft_tunnel.c
-+++ b/net/netfilter/nft_tunnel.c
-@@ -684,6 +684,7 @@ static const struct nft_object_ops nft_tunnel_obj_ops = {
- 
- static struct nft_object_type nft_tunnel_obj_type __read_mostly = {
- 	.type		= NFT_OBJECT_TUNNEL,
-+	.family		= NFPROTO_NETDEV,
- 	.ops		= &nft_tunnel_obj_ops,
- 	.maxattr	= NFTA_TUNNEL_KEY_MAX,
- 	.policy		= nft_tunnel_key_policy,
+ 	lockdep_nfnl_nft_mutex_not_held();
+ #ifdef CONFIG_MODULES
 -- 
 2.39.3
 
