@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-101648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 603A58FFB65
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:46:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CB208FFB63
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:46:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5B5AB2251B
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 05:46:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C1461F25E39
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 05:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95E422324;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19D5225AF;
 	Fri,  7 Jun 2024 05:46:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 811151C290
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 810E21AAC4
 	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 05:46:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717739207; cv=none; b=e2TeqNKNlxmg3DW+YyjuK45DK0rtsvjleh6B6ipsCYzNgvMCGm8HqJfTURf2v1Xq+Ghq/TWm1ZP3kn6yav+YsvUV01tmeTLkPo/oTz43e0HQ3uWfiKITdawhooz9rxLi3uVkb+686lT3z8RJDhsXRh4TkefzCINqy0tBWQ6aWVw=
+	t=1717739207; cv=none; b=htEGtFvQWBc3+PXo0XOjUxnBmfx0z529/Ius+qTSPAm0VeHXPN/GlA8e9Ao3ZdhaYQQL+gzT0R8PTTakyDN7Hm575QHGkosJgB+y7Y8JedwGdknZdNBPI0l5c2Fo3fgSmuFPdTAmDCX9jeZsUORtd0oxVEoMTqY+G4aY0oFiQVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717739207; c=relaxed/simple;
-	bh=GKpg9IJjH78nB51uF4mTHZ1YxmUdjplj4h7OoAr7Aq4=;
+	bh=+YjmBB/UdldY18uDdX1oEn2KLPpT5AV9wMdDg6tUt20=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uX/th2P+p15jTNPJoiibN2pdTJYxnpWqg6vjPJmr7MK7CyGPXbY7FV7WV7ToquAZTqFKygxUL6dIyl3nOfi2PtXUCiQC+uR+TnZ2sQqU2UrTuEcWhPZiCFKlYL6yn0IEdR6XaqKlp8C8ISz6ngnh3wH50NTUupA7NbUrP4R1BPE=
+	 MIME-Version; b=dmxWvTS7liQv0tRwXORW5s9vxkzmH2yLDfjC/HVMZm5twzPlW80NT2jZtITzK1Inuis4XNAueKMwc6AIyNDcwrP+KZpfvmInk6/Ob/CxzWR2pwrrSt6pvMepQ4fbUSGiBBnN8X+RFoxSrg2zOhcv7qTRFDiRT/YyjHaPaE/jQuc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
@@ -31,17 +31,17 @@ Received: from labnh.int.chopps.org (syn-172-222-091-149.res.spectrum.com [172.2
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id D593A7D127;
-	Fri,  7 Jun 2024 05:41:09 +0000 (UTC)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 7039B7D128;
+	Fri,  7 Jun 2024 05:41:10 +0000 (UTC)
 From: Christian Hopps <chopps@chopps.org>
 To: devel@linux-ipsec.org
 Cc: Steffen Klassert <steffen.klassert@secunet.com>,
 	netdev@vger.kernel.org,
 	Christian Hopps <chopps@chopps.org>,
 	Christian Hopps <chopps@labn.net>
-Subject: [PATCH ipsec-next v3 03/17] include: uapi: add IPPROTO_AGGFRAG for AGGFRAG in ESP
-Date: Fri,  7 Jun 2024 01:40:27 -0400
-Message-ID: <20240607054041.2032352-4-chopps@chopps.org>
+Subject: [PATCH ipsec-next v3 04/17] xfrm: sysctl: allow configuration of global default values
+Date: Fri,  7 Jun 2024 01:40:28 -0400
+Message-ID: <20240607054041.2032352-5-chopps@chopps.org>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240607054041.2032352-1-chopps@chopps.org>
 References: <20240607054041.2032352-1-chopps@chopps.org>
@@ -55,26 +55,133 @@ Content-Transfer-Encoding: 8bit
 
 From: Christian Hopps <chopps@labn.net>
 
-Add the RFC assigned IP protocol number for AGGFRAG.
+Add sysctls for the changing the IPTFS default SA values.
 
 Signed-off-by: Christian Hopps <chopps@labn.net>
 ---
- include/uapi/linux/in.h | 2 ++
- 1 file changed, 2 insertions(+)
+ Documentation/networking/xfrm_sysctl.rst | 30 +++++++++++++++++++
+ include/net/netns/xfrm.h                 |  6 ++++
+ net/xfrm/xfrm_sysctl.c                   | 38 ++++++++++++++++++++++++
+ 3 files changed, 74 insertions(+)
 
-diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
-index e682ab628dfa..e6a1f3e4c58c 100644
---- a/include/uapi/linux/in.h
-+++ b/include/uapi/linux/in.h
-@@ -79,6 +79,8 @@ enum {
- #define IPPROTO_MPLS		IPPROTO_MPLS
-   IPPROTO_ETHERNET = 143,	/* Ethernet-within-IPv6 Encapsulation	*/
- #define IPPROTO_ETHERNET	IPPROTO_ETHERNET
-+  IPPROTO_AGGFRAG = 144,	/* AGGFRAG in ESP (RFC 9347)		*/
-+#define IPPROTO_AGGFRAG		IPPROTO_AGGFRAG
-   IPPROTO_RAW = 255,		/* Raw IP packets			*/
- #define IPPROTO_RAW		IPPROTO_RAW
-   IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
+diff --git a/Documentation/networking/xfrm_sysctl.rst b/Documentation/networking/xfrm_sysctl.rst
+index 47b9bbdd0179..4d900c74b405 100644
+--- a/Documentation/networking/xfrm_sysctl.rst
++++ b/Documentation/networking/xfrm_sysctl.rst
+@@ -9,3 +9,33 @@ XFRM Syscall
+ 
+ xfrm_acq_expires - INTEGER
+ 	default 30 - hard timeout in seconds for acquire requests
++
++xfrm_iptfs_max_qsize - UNSIGNED INTEGER
++        The default IPTFS max output queue size in octets. The output queue is
++        where received packets destined for output over an IPTFS tunnel are
++        stored prior to being output in aggregated/fragmented form over the
++        IPTFS tunnel.
++
++        Default 1M.
++
++xfrm_iptfs_drop_time - UNSIGNED INTEGER
++        The default IPTFS drop time in microseconds. The drop time is the amount
++        of time before a missing out-of-order IPTFS tunnel packet is considered
++        lost. See also the reorder window.
++
++        Default 1s (1000000).
++
++xfrm_iptfs_init_delay - UNSIGNED INTEGER
++        The default IPTFS initial output delay in microseconds. The initial
++        output delay is the amount of time prior to servicing the output queue
++        after queueing the first packet on said queue. This applies anytime
++        the output queue was previously empty.
++
++        Default 0.
++
++xfrm_iptfs_reorder_window - UNSIGNED INTEGER
++        The default IPTFS reorder window size. The reorder window size dictates
++        the maximum number of IPTFS tunnel packets in a sequence that may arrive
++        out of order.
++
++        Default 3.
+diff --git a/include/net/netns/xfrm.h b/include/net/netns/xfrm.h
+index 423b52eca908..e11e71c8ceef 100644
+--- a/include/net/netns/xfrm.h
++++ b/include/net/netns/xfrm.h
+@@ -66,6 +66,12 @@ struct netns_xfrm {
+ 	u32			sysctl_aevent_rseqth;
+ 	int			sysctl_larval_drop;
+ 	u32			sysctl_acq_expires;
++#if IS_ENABLED(CONFIG_XFRM_IPTFS)
++	u32			sysctl_iptfs_drop_time;
++	u32			sysctl_iptfs_init_delay;
++	u32			sysctl_iptfs_max_qsize;
++	u32			sysctl_iptfs_reorder_window;
++#endif
+ 
+ 	u8			policy_default[XFRM_POLICY_MAX];
+ 
+diff --git a/net/xfrm/xfrm_sysctl.c b/net/xfrm/xfrm_sysctl.c
+index 7fdeafc838a7..dddb1025b7de 100644
+--- a/net/xfrm/xfrm_sysctl.c
++++ b/net/xfrm/xfrm_sysctl.c
+@@ -10,6 +10,12 @@ static void __net_init __xfrm_sysctl_init(struct net *net)
+ 	net->xfrm.sysctl_aevent_rseqth = XFRM_AE_SEQT_SIZE;
+ 	net->xfrm.sysctl_larval_drop = 1;
+ 	net->xfrm.sysctl_acq_expires = 30;
++#if IS_ENABLED(CONFIG_XFRM_IPTFS)
++	net->xfrm.sysctl_iptfs_max_qsize = 1024 * 1024; /* 1M */
++	net->xfrm.sysctl_iptfs_drop_time = 1000000;	/* 1s */
++	net->xfrm.sysctl_iptfs_init_delay = 0;		/* no initial delay */
++	net->xfrm.sysctl_iptfs_reorder_window = 3;	/* tcp folks suggested */
++#endif
+ }
+ 
+ #ifdef CONFIG_SYSCTL
+@@ -38,6 +44,32 @@ static struct ctl_table xfrm_table[] = {
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec
+ 	},
++#if IS_ENABLED(CONFIG_XFRM_IPTFS)
++	{
++		.procname	= "xfrm_iptfs_drop_time",
++		.maxlen		= sizeof(uint),
++		.mode		= 0644,
++		.proc_handler	= proc_douintvec
++	},
++	{
++		.procname	= "xfrm_iptfs_init_delay",
++		.maxlen		= sizeof(uint),
++		.mode		= 0644,
++		.proc_handler	= proc_douintvec
++	},
++	{
++		.procname	= "xfrm_iptfs_max_qsize",
++		.maxlen		= sizeof(uint),
++		.mode		= 0644,
++		.proc_handler	= proc_douintvec
++	},
++	{
++		.procname	= "xfrm_iptfs_reorder_window",
++		.maxlen		= sizeof(uint),
++		.mode		= 0644,
++		.proc_handler	= proc_douintvec
++	},
++#endif
+ 	{}
+ };
+ 
+@@ -55,6 +87,12 @@ int __net_init xfrm_sysctl_init(struct net *net)
+ 	table[1].data = &net->xfrm.sysctl_aevent_rseqth;
+ 	table[2].data = &net->xfrm.sysctl_larval_drop;
+ 	table[3].data = &net->xfrm.sysctl_acq_expires;
++#if IS_ENABLED(CONFIG_XFRM_IPTFS)
++	table[4].data = &net->xfrm.sysctl_iptfs_drop_time;
++	table[5].data = &net->xfrm.sysctl_iptfs_init_delay;
++	table[6].data = &net->xfrm.sysctl_iptfs_max_qsize;
++	table[7].data = &net->xfrm.sysctl_iptfs_reorder_window;
++#endif
+ 
+ 	/* Don't export sysctls to unprivileged users */
+ 	if (net->user_ns != &init_user_ns) {
 -- 
 2.45.2
 
