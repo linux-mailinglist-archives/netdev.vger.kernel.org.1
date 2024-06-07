@@ -1,201 +1,274 @@
-Return-Path: <netdev+bounces-101664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0F088FFC58
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 08:40:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BFC18FFC5C
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 08:40:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D2D91F2837E
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 06:40:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A5AEB251BB
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 06:40:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE83153508;
-	Fri,  7 Jun 2024 06:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F23A15279C;
+	Fri,  7 Jun 2024 06:40:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="lXy1XKcS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T1d+RYtX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com [209.85.221.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225D2152530
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 06:40:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B3BB14EC79;
+	Fri,  7 Jun 2024 06:40:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717742423; cv=none; b=ddktz6UAR/jneb/WIJApHLkZK+cXZ58IXK6wngzvKz4ZR+RFpQHftmMQPpznQ1Mm3DAorNopkWnykednR5ShlkJ+VZkoDWHZ/zbNCE0sZd++aqpmAxwNUZAaEy8O1lLZbZmWKcqZr7imDDtUGc8gVZ1bZua8wfWpjRCwtjuuJBs=
+	t=1717742452; cv=none; b=nO/id2uteDuf760aKgzX/ffSi0wdUfTuEUx4GuYuuWw6ZF86h2yKpHIfsxNK/00kWmnsCfDMpeuC7Yu7ytVXE8eyXA3n6XBgxjt8xcgpc93I3Drtw1OA9t57HMteN+M+JM8clm29w+8vCGGBBsJaMuldCUv7crl6BJjnmBSnzFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717742423; c=relaxed/simple;
-	bh=/d3qW4gpJGu9Os/l+hCKKxUgircnCfPEEFpLhTQLvH0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JjMlyVOBJQC3Zm/mVViJfSCFtOdEs9qkHRYT7O86rKdrAbD/svMwvcZ8RFrTAmHuOPi8wC2FBgkRCV+a0TFLghvG1DgS/e1e88HzkclJIMioDurGEk26rs5KDR0cRHtZQshKCqW6xBhXHg3VUmoMbM06ru9lgTatRQFWNMX+ldU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=lXy1XKcS; arc=none smtp.client-ip=209.85.221.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f65.google.com with SMTP id ffacd0b85a97d-35dc7d0387cso2107131f8f.1
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 23:40:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1717742420; x=1718347220; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=6XEI8dLMpJdDM7JTfp7N8sVgu1+rTv4sqoDOCzXLd0w=;
-        b=lXy1XKcSqwGu3wvxI7vsTz3TqpgARitRV12FEHFQS7dBF57GvAB5cQkM15tWFvYPVW
-         4eDfr2Mka/WniHKEtuMQKmeDgqg/n3YvrvRz4MPOpWjW/0oHFNB9yWWCwekFcJaljDQr
-         VHHsLFlch1Qbb70U2oIhLr7GhKRXicSrWiQpE66uvwZX7GGKZDxp2k2Xry3vlmwsQLQJ
-         ondKLTHJhVo+bE+j/4VfSWNCebc9f5keQd+SM7EgPuSxnN/y45UpHwjleUDkQVbL3szh
-         QJ1gmotRYuIX8SkH0YcQxojdBjIQ6/+kvJzJfbhmnzycrY67B6WJ+/qbxpgvz7XflZqz
-         CDYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717742420; x=1718347220;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6XEI8dLMpJdDM7JTfp7N8sVgu1+rTv4sqoDOCzXLd0w=;
-        b=QkoC1Uvs4Ut2r1Tj0xAfBfIScWU9MbS+9GKyU+t481JjCHwEezPEJTTQNyiTlSRQ8g
-         UysdY8LbwwtY8glgreQDPHJloLx+zNOEevBFQNxv8hdcHPRAFQlKD8yU6qbjurEKg5JZ
-         MxMjreumQYlWqZzaA200o6Qr/Cqz+LjdULzKuursDjUosVmVC1VluHdEqVkChP5y5rm4
-         qjCpeHQpmKOJXWA85s0p0Jw36lqpF6P4GiPAvw2N+nUUjUMsR9iCaaOI7DCPrAAv1jED
-         N3NMdQHIYjOwQake4mxcT9oLvFzDReT3qfLcnizURhS3iPywa7+E4ydGPR/S09TsUYA2
-         QFLw==
-X-Forwarded-Encrypted: i=1; AJvYcCWoIeYkLINm79Fs+Ht9z84C29Z45Ry77qFbvQc14CZRw5iRrg3KACm15am17CLHB5oVICodXLRYZ8b5JM8zuYVEINkhE82S
-X-Gm-Message-State: AOJu0Yxv7R47tf1nAzgr4TuennSbu4ZR8dvp7I14g/eaggOV20Jq37iO
-	DExnC8lFR/PegrTP+uf9RhJJ/KbPjgfUZubZw2bQHMBiT5SoL/3a6dYN9byBYnw=
-X-Google-Smtp-Source: AGHT+IHUavIyWqadcBvafENMlXxkybMFx2G2vYtGOo2aeuGi1pPkT7U0AF/nyo5SZVx6FfgEmzaUQg==
-X-Received: by 2002:a5d:6b82:0:b0:35e:f2f7:8a44 with SMTP id ffacd0b85a97d-35efedd7c32mr1284241f8f.47.1717742420175;
-        Thu, 06 Jun 2024 23:40:20 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35f0b876d80sm163622f8f.109.2024.06.06.23.40.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jun 2024 23:40:19 -0700 (PDT)
-Date: Fri, 7 Jun 2024 08:40:16 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Jason Xing <kerneljasonxing@gmail.com>,
-	Heng Qi <hengqi@linux.alibaba.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	mst@redhat.com, xuanzhuo@linux.alibaba.com,
-	virtualization@lists.linux.dev, ast@kernel.org,
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
-	netdev@vger.kernel.org
-Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
-Message-ID: <ZmKrUJ23zBD7HZkF@nanopsycho.orion>
-References: <20240509114615.317450-1-jiri@resnulli.us>
- <1715325076.4219763-2-hengqi@linux.alibaba.com>
- <ZktGj4nDU4X0Lxtx@nanopsycho.orion>
- <ZmBMa7Am3LIYQw1x@nanopsycho.orion>
- <1717587768.1588957-5-hengqi@linux.alibaba.com>
- <CACGkMEsiosWxNCS=Jpb-H14b=-26UzPjw+sD3H21FwVh2ZTF5g@mail.gmail.com>
- <CAL+tcoB8y6ctDO4Ph8WM-19qAoNMcYTVWLKRqsJYYrmW9q41=w@mail.gmail.com>
- <CACGkMEvh6nKfFMp5fb6tbijrs88vgSofCNkwN1UzKHnf6RqURg@mail.gmail.com>
- <ZmG8eMl3E4GvGl2b@nanopsycho.orion>
- <CACGkMEv1+ZSPiy5w1SN=a73-XCwCR6vE35LWNpqhaVAom71afQ@mail.gmail.com>
+	s=arc-20240116; t=1717742452; c=relaxed/simple;
+	bh=o4pvJBigImph+/4WxTGAX2YQ/B+mm8RB+o9aqeUkiBk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kH34BIMXYXh4FXvVANb4EAyjHl2HUs/DtTWbhm3rJL6ycHHIPCve/dSopl4sLRj5vrAO9z4fcs7Ug9N3/4MF6KQd0LrJilHTlwEjX/n/z40W+w2S8M6uJaJGorRfhGQKxiDC+0PDPco9BB9MV/IQV2CAIpEM95ob5FSLLELcrhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T1d+RYtX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDE1BC2BBFC;
+	Fri,  7 Jun 2024 06:40:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717742451;
+	bh=o4pvJBigImph+/4WxTGAX2YQ/B+mm8RB+o9aqeUkiBk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=T1d+RYtXCMgCPqWf0bG8FaiDQ9qYrVNW9jgDiDEa63tl0QR9uvL7Bc6/2j08QP3Wj
+	 F+R2M1U0gLlwFkHy+YoLcQUe3UK3v1ZENu4/g1qpZ71Jz4Tf+AISiq+1wCQBGLn6fO
+	 m/bOnQgZ80INfygz+9JNBm19Yy07j56kuMjRsuivs5RjNQEIhNo0NZWV9KhmD/NUW+
+	 MypX18hbrzyHTyzEI4JOvQXzo/cjwuxtqr+ec5eTBbhOpK5obwam+SbzGL5U4MP71N
+	 YEISl5BFTS3g+Xah2Vh8ChcwVxkkO6bIWZyaZNceH0sstGSvVW38MZDgcK8mfehNfA
+	 sep3CsbS2KZsA==
+Message-ID: <8db01c97-1cb2-4a86-abff-55176449e264@kernel.org>
+Date: Fri, 7 Jun 2024 08:40:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 1/2] dt-bindings: net: wireless: qcom,ath11k: describe
+ the ath11k on QCA6390
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Kalle Valo <kvalo@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Jeff Johnson <jjohnson@kernel.org>,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, ath11k@lists.infradead.org,
+ linux-kernel@vger.kernel.org, ath12k@lists.infradead.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+References: <20240605122106.23818-1-brgl@bgdev.pl>
+ <20240605122106.23818-2-brgl@bgdev.pl> <87h6e6qjuh.fsf@kernel.org>
+ <CAMRc=MdiKxtnN+g92RUTXdOydaPV5M2u5iUdKyE2SNvDkdXAjg@mail.gmail.com>
+ <871q5aqiei.fsf@kernel.org>
+ <CAMRc=McacZMP-51hjH+d8=PVe+Wgw4a8xWcv0sRPLJKL_gP=KQ@mail.gmail.com>
+ <87sexqoxm9.fsf@kernel.org>
+ <CAMRc=McYAbhL5M1geYtf8LbgJG5x_+ZUFKXRuo7Vff_8ssNoUA@mail.gmail.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <CAMRc=McYAbhL5M1geYtf8LbgJG5x_+ZUFKXRuo7Vff_8ssNoUA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEv1+ZSPiy5w1SN=a73-XCwCR6vE35LWNpqhaVAom71afQ@mail.gmail.com>
 
-Fri, Jun 07, 2024 at 08:22:31AM CEST, jasowang@redhat.com wrote:
->On Thu, Jun 6, 2024 at 9:41 PM Jiri Pirko <jiri@resnulli.us> wrote:
+On 06/06/2024 20:08, Bartosz Golaszewski wrote:
+> On Thu, Jun 6, 2024 at 6:16 PM Kalle Valo <kvalo@kernel.org> wrote:
 >>
->> Thu, Jun 06, 2024 at 06:25:15AM CEST, jasowang@redhat.com wrote:
->> >On Thu, Jun 6, 2024 at 10:59 AM Jason Xing <kerneljasonxing@gmail.com> wrote:
->> >>
->> >> Hello Jason,
->> >>
->> >> On Thu, Jun 6, 2024 at 8:21 AM Jason Wang <jasowang@redhat.com> wrote:
->> >> >
->> >> > On Wed, Jun 5, 2024 at 7:51 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
->> >> > >
->> >> > > On Wed, 5 Jun 2024 13:30:51 +0200, Jiri Pirko <jiri@resnulli.us> wrote:
->> >> > > > Mon, May 20, 2024 at 02:48:15PM CEST, jiri@resnulli.us wrote:
->> >> > > > >Fri, May 10, 2024 at 09:11:16AM CEST, hengqi@linux.alibaba.com wrote:
->> >> > > > >>On Thu,  9 May 2024 13:46:15 +0200, Jiri Pirko <jiri@resnulli.us> wrote:
->> >> > > > >>> From: Jiri Pirko <jiri@nvidia.com>
->> >> > > > >>>
->> >> > > > >>> Add support for Byte Queue Limits (BQL).
->> >> > > > >>
->> >> > > > >>Historically both Jason and Michael have attempted to support BQL
->> >> > > > >>for virtio-net, for example:
->> >> > > > >>
->> >> > > > >>https://lore.kernel.org/netdev/21384cb5-99a6-7431-1039-b356521e1bc3@redhat.com/
->> >> > > > >>
->> >> > > > >>These discussions focus primarily on:
->> >> > > > >>
->> >> > > > >>1. BQL is based on napi tx. Therefore, the transfer of statistical information
->> >> > > > >>needs to rely on the judgment of use_napi. When the napi mode is switched to
->> >> > > > >>orphan, some statistical information will be lost, resulting in temporary
->> >> > > > >>inaccuracy in BQL.
->> >> > > > >>
->> >> > > > >>2. If tx dim is supported, orphan mode may be removed and tx irq will be more
->> >> > > > >>reasonable. This provides good support for BQL.
->> >> > > > >
->> >> > > > >But when the device does not support dim, the orphan mode is still
->> >> > > > >needed, isn't it?
->> >> > > >
->> >> > > > Heng, is my assuption correct here? Thanks!
->> >> > > >
->> >> > >
->> >> > > Maybe, according to our cloud data, napi_tx=on works better than orphan mode in
->> >> > > most scenarios. Although orphan mode performs better in specific benckmark,
->> >> >
->> >> > For example pktgen (I meant even if the orphan mode can break pktgen,
->> >> > it can finish when there's a new packet that needs to be sent after
->> >> > pktgen is completed).
->> >> >
->> >> > > perf of napi_tx can be enhanced through tx dim. Then, there is no reason not to
->> >> > > support dim for devices that want the best performance.
->> >> >
->> >> > Ideally, if we can drop orphan mode, everything would be simplified.
->> >>
->> >> Please please don't do this. Orphan mode still has its merits. In some
->> >> cases which can hardly be reproduced in production, we still choose to
->> >> turn off the napi_tx mode because the delay of freeing a skb could
->> >> cause lower performance in the tx path,
->> >
->> >Well, it's probably just a side effect and it depends on how to define
->> >performance here.
->> >
->> >> which is, I know, surely
->> >> designed on purpose.
->> >
->> >I don't think so and no modern NIC uses that. It breaks a lot of things.
->> >
->> >>
->> >> If the codes of orphan mode don't have an impact when you enable
->> >> napi_tx mode, please keep it if you can.
->> >
->> >For example, it complicates BQL implementation.
+>> Bartosz Golaszewski <brgl@bgdev.pl> writes:
 >>
->> Well, bql could be disabled when napi is not used. It is just a matter
->> of one "if" in the xmit path.
->
->Maybe, care to post a patch?
->
->The trick part is, a skb is queued when BQL is enabled but sent when
->BQL is disabled as discussed here:
->
->https://lore.kernel.org/netdev/21384cb5-99a6-7431-1039-b356521e1bc3@redhat.com/
->
->Thanks
+>>> On Thu, Jun 6, 2024 at 4:02 PM Kalle Valo <kvalo@kernel.org> wrote:
+>>>
+>>>>
+>>>> Bartosz Golaszewski <brgl@bgdev.pl> writes:
+>>>>
+>>>>> On Thu, Jun 6, 2024 at 3:30 PM Kalle Valo <kvalo@kernel.org> wrote:
+>>>>>
+>>>>>>
+>>>>>> Bartosz Golaszewski <brgl@bgdev.pl> writes:
+>>>>>>
+>>>>>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>>>>>
+>>>>>>> Add a PCI compatible for the ATH11K module on QCA6390 and describe the
+>>>>>>> power inputs from the PMU that it consumes.
+>>>>>>>
+>>>>>>> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>>>>>>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>>>>
+>>>>>> [...]
+>>>>>>
+>>>>>>> +allOf:
+>>>>>>> +  - if:
+>>>>>>> +      properties:
+>>>>>>> +        compatible:
+>>>>>>> +          contains:
+>>>>>>> +            const: pci17cb,1101
+>>>>>>> +    then:
+>>>>>>> +      required:
+>>>>>>> +        - vddrfacmn-supply
+>>>>>>> +        - vddaon-supply
+>>>>>>> +        - vddwlcx-supply
+>>>>>>> +        - vddwlmx-supply
+>>>>>>> +        - vddrfa0p8-supply
+>>>>>>> +        - vddrfa1p2-supply
+>>>>>>> +        - vddrfa1p7-supply
+>>>>>>> +        - vddpcie0p9-supply
+>>>>>>> +        - vddpcie1p8-supply
+>>>>>>
+>>>>>> Not sure if we discussed this before, but based on this I understand
+>>>>>> that there can't be an DT entry for device pci17cb,1101 without all the
+>>>>>> supply properties? But there are QCA6390 devices with PCI id 17cb:1101
+>>>>>> which do not need these supplies and already work. For example, my Dell
+>>>>>> XPS 13 x86 laptop is one. Or anyone who manually installs QCA6390 board
+>>>>>> to their PCI slot and some of them might want to use DT, for example
+>>>>>> setting qcom,ath11k-calibration-variant.
+>>>>>>
+>>>>>> This is not a blocker for me, just making sure that we are not breaking
+>>>>>> any existing setups.
+>>>>>>
+>>>>>
+>>>>> If they are already powered up without the need for the PCI pwrctl
+>>>>> driver to do it, then they will work alright. Bindings don't affect
+>>>>> functionality.
+>>>>
+>>>> Sure, I'm not worried about functionality. I'm worried that if I
+>>>> there's, for example, an ARM based setup which uses DT and wants to use
+>>>> a similar QCA6390 board that I have, and set
+>>>> qcom,ath11k-calibration-variant in DT. In other words, I'm worried if
+>>>> you are looking at this only for Snapdragon family of boards?
+>>>>
+>>>
+>>> No, what I'm looking at is the entire QCA6390 package. That means WLAN
+>>> *and* Bluetooth *and* the PMU that manages power.
+>>
+>> I think we are just looking at this from different point of views. You
+>> are looking at a datasheet (most likely for a Snapdragon based system)
+>> and I'm looking what actual devices there are out in the field.
+>>
+>>> If you're using the QCA6390 on a device-tree system then you should
+>>> probably model at least the WLAN node and the PMU and the problem with
+>>> supplies is fixed.
+>>
+>> But why? If there are boards out there who don't need any of this why
+>> would they still need to model all this in DT?
+>>
+> 
+> Because this is what is there? The goal of the device tree is to
+> describe the hardware. The fact we didn't describe it before doesn't
+> make it correct.
 
-Will try to go in orphan removal direction first.
+Correct.
 
->
+Kalle,
+All of the devices out there need these supplies, but they are sometimes
+provided by generic PCI supply and on-board regulators. Basically your
+PCI adapter is not the same as QCA6390 chip on Snapdragon board.
+
+
+> 
+>> Based on the discussions I have heard only Snapdragon systems who
+>> require all this configuration you describe. Of course there can be
+>> other systems but I have not heard about those.
 >>
+> 
+> DT is not configuration, it is description of actual hardware. It
+> doesn't matter if Snapdragon systems are the only ones that actually
+> *require* this description to make WLAN/BT functional upstream. The
+> chipset would be the same on any PCIe board, it's just that the host
+> systems wouldn't need to take care with its power sequence. But for a
+> dynamic board like this, you don't need DT.
+> 
+
+Correct.
+
+...
+
+> 
+>>> If your detachable board "just works" then it must be wired in a way
+>>> that enables WLAN the moment it's plugged in but this doesn't happen
+>>> over PCI. The chipset has a power input and GPIOs to enable each
+>>> module.
 >>
->> >
->> >Thanks
->> >
->> >>
->> >> Thank you.
->> >>
->> >
+>> I don't know how the boards are implemented but it could be so. But from
+>> host system point of view it's just a regular PCI device.
 >>
->
+> 
+> And you don't need DT anyway for this type of devices.
+
+Detechable board, like PCI adapter, derives these supplies from generic
+PCI whatever-3.3v through additional regulators. All these supplies are
+there - on the board.
+
+> 
+>>> Also: I doubt you need DT for your detachable board?
+>>
+>> Sure, I don't need DT but that's not my point. My point is why require
+>> these supplies for _all_ devices having PCI id 17cb:1101 (ie. QCA6390)
+>> then clearly there are such devices which don't need it? To me that's
+>> bad design and, if I'm understanding correctly, prevents use of
+>> qcom,ath11k-calibration-variant property. To me having the supplies
+>> optional in DT is more approriate.
+>>
+> 
+> We require them because *they are physically there*.
+
+I understand that for all known DT QCA6390 hardware, the supplies should
+be provided thus they should be required. If in the future we have
+different design or we represent some pluggable PCI card, then:
+1. Probably that PCI card does not need power sequencing, thus no DT
+description,
+2. If still needs power sequencing, you can always amend bindings and
+un-require the supplies.
+
+
+Best regards,
+Krzysztof
+
 
