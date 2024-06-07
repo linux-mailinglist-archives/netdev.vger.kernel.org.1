@@ -1,102 +1,94 @@
-Return-Path: <netdev+bounces-101623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 481A88FF9E5
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 04:09:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E4BB8FFA11
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 04:51:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C89E1C2223B
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 02:09:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DDC21F23E16
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 02:51:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E20FC171AD;
-	Fri,  7 Jun 2024 02:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="X8wpzBCj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3ACF12B87;
+	Fri,  7 Jun 2024 02:51:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FCD134B2
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 02:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DBDEDDD9
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 02:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717726143; cv=none; b=RmoMxvZMU/6Y8GT3z2bEolMigvQ0wMxZYftDA/6PSxjdnHoIOMPPmIhNAHlgbNyNoVS3SuGhAkHVzHbbRtxmlaDcvBp6+C2Os3c6t2Vyg+t9anDdzXKyGT1A3GkgLYsNyZ3JbOonZnWy8ttQqrn0Ht6qxAF9IEqxgWMUUeqEYjA=
+	t=1717728664; cv=none; b=teJ+icqJuOudfyOenmeBo6FA+izB+6ug81dtDVQJEFR91A7B+Qa7HUCfxmyW8mHBJmTQaZKjA69Ae0oC24BbGa5W10HVvR6PZcDRToDrQhK0JJazZa5Zu5TBOj1TgJV25H2T5972kzZVpEP1DOERLglUTVXszb8fyEoTmj9p2KI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717726143; c=relaxed/simple;
-	bh=owCDEYgpAWc0l0JdKFsdcT9L6Xwepv77DIO9mIUrx4o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ow59emnT2TAg/zNYrhKbIV+7pVEzJAot2XQ6f5Vb2GoOUtk3y/4pqeavnUBmdXuLDCo+/6iJBDltgEBIjGnP6ZvvwAtDOrMei1IPosrlKLMrWy1XuRblZHpebb6Zoo/tkwQ3PywXO4/ewZFjQ1WRasVLbM7MwTR6vf3aZah3J4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=X8wpzBCj; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id C05D12C00C1;
-	Fri,  7 Jun 2024 14:08:50 +1200 (NZST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1717726130;
-	bh=yr7OuagPNfYHTGXTYvStJk5e/5jIJ2plGQ91spVGzuo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=X8wpzBCjaLo11AYVxkeNV0Um9D2NhY5jxDwwHHK+SBTuQJw+i0WH+pPQB24EyAlsm
-	 6k5zehG791UhxBUHMH3gLCg4hbcSPA4sXmC/Dw48N/9tKRr8OmKwQOED8PN8X08VuP
-	 adSNMnLSoQWjtqw/mBWG9XeYfs84RU4tU7PHkt7EhQDFdk380EbrHUgZ6lJwpDH6Zf
-	 gnk9ACUlClTDCZCskrTq1i10kzWWysNHzZQSkwYyL2SeR1PuN+cujZUphHN1L80jwu
-	 d0pSBWrvnqsjEi0Zns3xLPP7ar99pUdAwToj01wTdhlDA++Nike2imQUM5DqMfNuZX
-	 pHfa32GvdnrHg==
-Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B66626bb20000>; Fri, 07 Jun 2024 14:08:50 +1200
-Received: from chrisp-dl.ws.atlnz.lc (chrisp-dl.ws.atlnz.lc [10.33.22.30])
-	by pat.atlnz.lc (Postfix) with ESMTP id 8BFB013ED0C;
-	Fri,  7 Jun 2024 14:08:50 +1200 (NZST)
-Received: by chrisp-dl.ws.atlnz.lc (Postfix, from userid 1030)
-	id 8653A280B5B; Fri,  7 Jun 2024 14:08:50 +1200 (NZST)
-From: Chris Packham <chris.packham@alliedtelesis.co.nz>
-To: andrew@lunn.ch,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chris Packham <chris.packham@alliedtelesis.co.nz>
-Subject: [PATCH] net: dsa: Fix typo in NET_DSA_TAG_RTL4_A Kconfig
-Date: Fri,  7 Jun 2024 14:08:43 +1200
-Message-ID: <20240607020843.1380735-1-chris.packham@alliedtelesis.co.nz>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1717728664; c=relaxed/simple;
+	bh=si+N1wuZ74OQmZXqp5VNrMsebBeEF3HgK7mZflWf8Ro=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=tvztczCo+9F+qlmyEYNSIFn2XOYveq0xrdNJTlnSsKBcbaikjl1w2vPhHFnFRazsXUb1kcmhHstKmMLOzvuO2m0ajIW2oZw5gfcJBffGEmsV4RO+yDCt7lRgFf78f4ANZhEmthkpz2y09FZge8s3UOCcmd9iREoGSrvvChDP998=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3748d50473cso14355425ab.1
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 19:51:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717728662; x=1718333462;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZoJDbmOuZCo7DgFMWx4zQY5bK5409kRcjvDvOGHuIw8=;
+        b=mgeOm8346XGgqmTYLNUAnF9kMzf2jlZi7XsNHTcD7HUzRwjjQEM7ToWD4z+ItL47Su
+         52ZAxohFbfsC9SgxxDJ9XlumAX3MKvwe8E/Jbnvi3bM3qyS2KMl9Pu6lo6X55ZPMW2sO
+         eqNiuaL5sWjmobSRWbn02AV1pfjRwA7YJGBkdLHG5tglH1dLmUNrERQqDNHLOBd6I6XC
+         lIEgdEJVR255dBaE7gsVdQon5kz6jFlhK0xL461DeOEEigvNMm+S/aSG97s1/0gvnEDQ
+         dex2njzgSPJL2zqGAmXezt8zWUy9FBw9fwLSyxz9lFVtCu18LEyFMUXyFiNttCTjRYlq
+         Ff7w==
+X-Forwarded-Encrypted: i=1; AJvYcCWSeCV9t5g0yOhEgTmquRM0KAQT6ntJqH6sv/ES+JxCuHuOJKN4ZK+pF6Tk+yLZvsp/eDqow6M0stauHF1IeXcjA1PyegL+
+X-Gm-Message-State: AOJu0YyJBuymSbdd/8eyFQckJabS0cxL6gq0AGBnSbOxc9/7UYZa36zc
+	vvHY6pYJukrClgwpLKHBn0fW9CiOodtjcfXYN+8hZU81MVxpMOKMKnP5szQXX9z8KvbRyNeYNbc
+	Am90Muq08wQ0H/ujRsC8hq2XylJmyhgXwo7n3VDdfjuyzyZRL/L0EqCQ=
+X-Google-Smtp-Source: AGHT+IEIUXUjMuT4JzACmagoV0Bo3SJsrvzkbMMX8Ie8P7ZaGp2FbUDMzisZObkuWRNwNUQdRkPEz5ZA6ZM2UMMjTWxNqJzvzG71
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=F9L0dbhN c=1 sm=1 tr=0 ts=66626bb2 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=T1WGqf2p2xoA:10 a=c7lDi4tbbdk9oVSNy0EA:9 a=3ZKOabzyN94A:10
-X-SEG-SpamProfiler-Score: 0
-x-atlnz-ls: pat
+X-Received: by 2002:a05:6e02:1d92:b0:374:9abd:2788 with SMTP id
+ e9e14a558f8ab-37580242e2bmr1025575ab.0.1717728662718; Thu, 06 Jun 2024
+ 19:51:02 -0700 (PDT)
+Date: Thu, 06 Jun 2024 19:51:02 -0700
+In-Reply-To: <00000000000002a89b06146e6ecb@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c31e9f061a43de90@google.com>
+Subject: Re: [syzbot] [kernel?] possible deadlock in __hrtimer_run_queues (2)
+From: syzbot <syzbot+bacb240dbeebb88518ae@syzkaller.appspotmail.com>
+To: boqun.feng@gmail.com, daniel@iogearbox.net, hdanton@sina.com, 
+	jakub@cloudflare.com, john.fastabend@gmail.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, penguin-kernel@i-love.sakura.ne.jp, 
+	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, 
+	torvalds@linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
 
-Fix a minor typo in the help text for the NET_DSA_TAG_RTL4_A config
-option.
+syzbot suspects this issue was fixed by commit:
 
-Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
----
- net/dsa/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+commit ff91059932401894e6c86341915615c5eb0eca48
+Author: Jakub Sitnicki <jakub@cloudflare.com>
+Date:   Tue Apr 2 10:46:21 2024 +0000
 
-diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
-index 8e698bea99a3..8d5bf869eb14 100644
---- a/net/dsa/Kconfig
-+++ b/net/dsa/Kconfig
-@@ -129,7 +129,7 @@ config NET_DSA_TAG_RTL4_A
- 	tristate "Tag driver for Realtek 4 byte protocol A tags"
- 	help
- 	  Say Y or M if you want to enable support for tagging frames for the
--	  Realtek switches with 4 byte protocol A tags, sich as found in
-+	  Realtek switches with 4 byte protocol A tags, such as found in
- 	  the Realtek RTL8366RB.
-=20
- config NET_DSA_TAG_RTL8_4
---=20
-2.45.2
+    bpf, sockmap: Prevent lock inversion deadlock in map delete elem
 
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1169a80a980000
+start commit:   61df575632d6 libbpf: Add new sec_def "sk_skb/verdict"
+git tree:       bpf-next
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
+dashboard link: https://syzkaller.appspot.com/bug?extid=bacb240dbeebb88518ae
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1793a2e6180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16c8dac9180000
+
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: bpf, sockmap: Prevent lock inversion deadlock in map delete elem
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
