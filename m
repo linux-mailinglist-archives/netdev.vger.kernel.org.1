@@ -1,94 +1,102 @@
-Return-Path: <netdev+bounces-101622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEFAB8FF97E
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 03:10:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 481A88FF9E5
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 04:09:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41EE41F224A2
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 01:10:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C89E1C2223B
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 02:09:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87748D2FF;
-	Fri,  7 Jun 2024 01:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E20FC171AD;
+	Fri,  7 Jun 2024 02:09:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hNQ1QfZ4"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="X8wpzBCj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B79D8F5C;
-	Fri,  7 Jun 2024 01:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FCD134B2
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 02:08:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717722628; cv=none; b=sK9DI/kXp1mmVDkJt0cwR8QDlOsUTk8ZeLUqsuGKYMrdtsfBQfh6XRh/gVAK98flmrQ5p+EROG6UH1PKdfAFxJtelus1WgtBIEAQFPAv0FubC/VbVDw1f/Q6dcBiyCtyfZEjvvKta1loiZcX3LPJ4+1qW2D+u1/A00R4E3e1AbE=
+	t=1717726143; cv=none; b=RmoMxvZMU/6Y8GT3z2bEolMigvQ0wMxZYftDA/6PSxjdnHoIOMPPmIhNAHlgbNyNoVS3SuGhAkHVzHbbRtxmlaDcvBp6+C2Os3c6t2Vyg+t9anDdzXKyGT1A3GkgLYsNyZ3JbOonZnWy8ttQqrn0Ht6qxAF9IEqxgWMUUeqEYjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717722628; c=relaxed/simple;
-	bh=umfdotGMRPJkROj3G3nY3qSksKWVh1Z2ZgINgnCnVR4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YVuXN9tkktzmzqQe+5/2TivYZBR97yuqMcmEt1Mb9+HtBRq6RI3Jyk8Qm0jgfBpWvzGLLIaVAV0KLNMKGRt40aQFsKe96tIu9/IMJrDtRUhXi9qNd7djVq6rVDPtVbAInfbrhfjdayBbb24xq5wkRmTDsiwUYp95yHMKdQiYR8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hNQ1QfZ4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DA258C4AF0B;
-	Fri,  7 Jun 2024 01:10:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717722627;
-	bh=umfdotGMRPJkROj3G3nY3qSksKWVh1Z2ZgINgnCnVR4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hNQ1QfZ4c0vLbAlfGpmIFwElomCbrQSKjkKzT5SJYjuWoPfwDQh0lHJk5HxjkXFw2
-	 cuvnJCuxj3letrHK5Wd1x61xE+mpmFad2iku6UONUPUiaEH68YQ0dfVYDbWfBd1K0T
-	 5GwWMwLtnXTWh+UPDT8iTR3soEogOd/kR3TXiZfAT3l2tV/yjxQbPexWiSDYq9YsJO
-	 1B2jTvNORqVD7Ev97wgc9V7A/XEXm9VfaPNSxFobx0w/3a3Bvh84OJmp7GzdcwqhFX
-	 Frlf1FG6WjbFA/HvFOo4u6f3IM6k0UTZa8Xfif/fJoOgfRue6lkLSmskYuKWMjjWNm
-	 oBP5Hwz7Io2rw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CC463C54BB2;
-	Fri,  7 Jun 2024 01:10:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1717726143; c=relaxed/simple;
+	bh=owCDEYgpAWc0l0JdKFsdcT9L6Xwepv77DIO9mIUrx4o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ow59emnT2TAg/zNYrhKbIV+7pVEzJAot2XQ6f5Vb2GoOUtk3y/4pqeavnUBmdXuLDCo+/6iJBDltgEBIjGnP6ZvvwAtDOrMei1IPosrlKLMrWy1XuRblZHpebb6Zoo/tkwQ3PywXO4/ewZFjQ1WRasVLbM7MwTR6vf3aZah3J4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=X8wpzBCj; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id C05D12C00C1;
+	Fri,  7 Jun 2024 14:08:50 +1200 (NZST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1717726130;
+	bh=yr7OuagPNfYHTGXTYvStJk5e/5jIJ2plGQ91spVGzuo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=X8wpzBCjaLo11AYVxkeNV0Um9D2NhY5jxDwwHHK+SBTuQJw+i0WH+pPQB24EyAlsm
+	 6k5zehG791UhxBUHMH3gLCg4hbcSPA4sXmC/Dw48N/9tKRr8OmKwQOED8PN8X08VuP
+	 adSNMnLSoQWjtqw/mBWG9XeYfs84RU4tU7PHkt7EhQDFdk380EbrHUgZ6lJwpDH6Zf
+	 gnk9ACUlClTDCZCskrTq1i10kzWWysNHzZQSkwYyL2SeR1PuN+cujZUphHN1L80jwu
+	 d0pSBWrvnqsjEi0Zns3xLPP7ar99pUdAwToj01wTdhlDA++Nike2imQUM5DqMfNuZX
+	 pHfa32GvdnrHg==
+Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B66626bb20000>; Fri, 07 Jun 2024 14:08:50 +1200
+Received: from chrisp-dl.ws.atlnz.lc (chrisp-dl.ws.atlnz.lc [10.33.22.30])
+	by pat.atlnz.lc (Postfix) with ESMTP id 8BFB013ED0C;
+	Fri,  7 Jun 2024 14:08:50 +1200 (NZST)
+Received: by chrisp-dl.ws.atlnz.lc (Postfix, from userid 1030)
+	id 8653A280B5B; Fri,  7 Jun 2024 14:08:50 +1200 (NZST)
+From: Chris Packham <chris.packham@alliedtelesis.co.nz>
+To: andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chris Packham <chris.packham@alliedtelesis.co.nz>
+Subject: [PATCH] net: dsa: Fix typo in NET_DSA_TAG_RTL4_A Kconfig
+Date: Fri,  7 Jun 2024 14:08:43 +1200
+Message-ID: <20240607020843.1380735-1-chris.packham@alliedtelesis.co.nz>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] r8152: Set NET_ADDR_STOLEN if using passthru MAC
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171772262783.19610.15082534688583179924.git-patchwork-notify@kernel.org>
-Date: Fri, 07 Jun 2024 01:10:27 +0000
-References: <20240605153340.25694-1-gmazyland@gmail.com>
-In-Reply-To: <20240605153340.25694-1-gmazyland@gmail.com>
-To: Milan Broz <gmazyland@gmail.com>
-Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- grundler@chromium.org, dianders@chromium.org, hayeswang@realtek.com,
- hkallweit1@gmail.com, andrew@lunn.ch
+Content-Transfer-Encoding: quoted-printable
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=F9L0dbhN c=1 sm=1 tr=0 ts=66626bb2 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=T1WGqf2p2xoA:10 a=c7lDi4tbbdk9oVSNy0EA:9 a=3ZKOabzyN94A:10
+X-SEG-SpamProfiler-Score: 0
+x-atlnz-ls: pat
 
-Hello:
+Fix a minor typo in the help text for the NET_DSA_TAG_RTL4_A config
+option.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
+---
+ net/dsa/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Wed,  5 Jun 2024 17:33:40 +0200 you wrote:
-> Some docks support MAC pass-through - MAC address
-> is taken from another device.
-> 
-> Driver should indicate that with NET_ADDR_STOLEN flag.
-> 
-> This should help to avoid collisions if network interface
-> names are generated with MAC policy.
-> 
-> [...]
-
-Here is the summary with links:
-  - r8152: Set NET_ADDR_STOLEN if using passthru MAC
-    https://git.kernel.org/netdev/net-next/c/cb6cf0820f22
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
+index 8e698bea99a3..8d5bf869eb14 100644
+--- a/net/dsa/Kconfig
++++ b/net/dsa/Kconfig
+@@ -129,7 +129,7 @@ config NET_DSA_TAG_RTL4_A
+ 	tristate "Tag driver for Realtek 4 byte protocol A tags"
+ 	help
+ 	  Say Y or M if you want to enable support for tagging frames for the
+-	  Realtek switches with 4 byte protocol A tags, sich as found in
++	  Realtek switches with 4 byte protocol A tags, such as found in
+ 	  the Realtek RTL8366RB.
+=20
+ config NET_DSA_TAG_RTL8_4
+--=20
+2.45.2
 
 
