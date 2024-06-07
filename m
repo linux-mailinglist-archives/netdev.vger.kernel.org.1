@@ -1,129 +1,417 @@
-Return-Path: <netdev+bounces-101977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D6E0900E09
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 00:28:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54DED900E45
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 01:02:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C47061C20D0D
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 22:28:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BCC88B225C0
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 23:02:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12122155354;
-	Fri,  7 Jun 2024 22:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FDAE225AF;
+	Fri,  7 Jun 2024 23:02:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N6PGMJVo"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="N3+k46vr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D30814533D;
-	Fri,  7 Jun 2024 22:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E4AE57D
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 23:02:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717799298; cv=none; b=H6a/tAGMof1fr5sTifMbq8oicmqD3q4DciVvuOfNgwxNvbE9DZ+itqtyEO/v1C/9b6kVPzsyMnLuzFF4MmXgVLoz5owBOPZDbBG+tpCCKB3xa+6zgVk0pkZkiK/r6E+5kPqbd5mIeAAO55QAfHwivsCjyNPmIJfR43q7drp41uA=
+	t=1717801346; cv=none; b=VMcS1u5NN8u4h7OahmAb+EIe6WOzeAohtCkq5tGLFVbLX7fH8gWV7MN29XhwZYjIFpvsEZtuNMYVz1tZpb1mDkKG6kSd2RNE51MJyCMc9DsbkYguFxoSA7jWE1pwfmtxJh/USm0ZLUEVHdMPgiPgKM+zc3K2/92dKlsegJJjXj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717799298; c=relaxed/simple;
-	bh=l/MrSi5lk5PVhPYbVtxedDFG6aG0Vvkjcl8AeXQ8zoI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bwLxaLTCdFwpi6IeHGrH5z6K9Ls6t6QHeA4+EERZ5KseMpp6vpRUUB38z4BrtCIz6agcjyh9Jbw3CC+htoU5lKCLwXAyw3G67sO16kcTiPzW2q+DksYrYe0GrPytHeuiC+oZBy6gWE1cf9Vs3xu7SsW6PLJ5nez0xcICBXXo1Dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N6PGMJVo; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52bd48cf36bso878194e87.3;
-        Fri, 07 Jun 2024 15:28:16 -0700 (PDT)
+	s=arc-20240116; t=1717801346; c=relaxed/simple;
+	bh=EsyqwKht6iI88gjk9LlG7t+qWQ8HgqRNU4avcg0nzr0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GiGe5jPKi7BoArjp89AwcnWPzcnblSHatp2GBOTdnI8SfGFX/M/FK+cImmtupcbfag9sfPSkjZtB0Mgm84J/rwh3Vv3txuAE2iuInFbt/VcfQEUIejyNLkHRpbcpBN+eTfbrixYbOh8NtbkxhtNW+2UZ31hiqGgIBVK5rkluscY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=N3+k46vr; arc=none smtp.client-ip=209.85.160.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-25487d915b8so433962fac.0
+        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 16:02:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717799294; x=1718404094; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=k4BkUg/TA3tRYPVfwl6zlyTMojUBhX6Gv43Vrpcb6ng=;
-        b=N6PGMJVoRUG/Z/4lhTKZv5P3bFloxFc0P1kBtYK9rK26wuWA1vTzWW+T4guDmW8zAs
-         uZkAw7S+vyDs1WS2YU3ugldvvxpRL2PpNImjTwH+qONltOXycMvpgksyeo/uxbrhckZg
-         0thbyWM8QDIJNGHKQPRy2WmzuC/KDMzoXiIE/ZgrqMk9ItrAhv/EjOUKAee4969f5K/6
-         7n1BMhyASS7zitBm3tge2PfC89hNhmHr2MdDod2lVKVNWzRh/6aZw0UfuZkrhgQlwuG/
-         TFZebLip7l+7M7Zc5CGkDCyatsuM6Wzb2OPP0wh0Xf/kacdXp3C3jNSyYZvnWbJCcmin
-         xlDg==
+        d=broadcom.com; s=google; t=1717801343; x=1718406143; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zlL/JZl1XZV1cOjn9hrGLfruPuOqI8kDA4KtcPFCazY=;
+        b=N3+k46vrV3/Bu1a4zpHqSp6lqqZMQqyEKITakvzm7cueS0tsGDbpbAcrTE7RA48flg
+         k7whj6oad8YIo3K5h/5YH0yoymo3g1eXoT9q5Vy40IaHQ11z2VEOYCmUsL2uLAXOGkIH
+         V1RlEAXd/kDJXFjx469bo/adUBRPlFWAAY9Ow=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717799294; x=1718404094;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k4BkUg/TA3tRYPVfwl6zlyTMojUBhX6Gv43Vrpcb6ng=;
-        b=hwGh+boWsNdppcmm3WnBfcpWEEhMgq/lactYXCqXi9qVyV2vf6UvcyhVJYxAnE5gTI
-         AUzApsYLWazntfuWP1Flphd4WJB99v4R5KeZsFd9iTEvr1BtQbz1qQzv7RQLoLGkiWmD
-         QDxqkCHdS97uEHc/ddnlhf9o7+PGp3OzMcYB/OxnQPvPHgVk/9KDJtVVDX5nIYdDzsqM
-         YUegFyFgKiI/Ek416Et78yCyLsmBBAYAr0I3wJ/OkNimtqc+YQXFKwReP8ehfxbF0k5X
-         Mc4A/cg+eIMimF1wSsGjrZWKbXyMHIEfZxtOW0lr8LIkxIo3NIFiJWNYFequpy5UFm4c
-         j9rA==
-X-Forwarded-Encrypted: i=1; AJvYcCV7uMDaxxj52Dq0z3QVyz0Z6kT6e+F7ODE0Md18W2cLUyYat+cA2FZT7Ny/S4ktZWy1HlmAjIwoVximjPB8NFLgMAxddWYzSV+hLQZT
-X-Gm-Message-State: AOJu0YyQNm3+7E7aGLrPkibr6/FLYXLXBkwrUHTw9QxSpcZ+HfA5SPY+
-	iDAd2Zz2v4GlLsocyzpq45ZjxQxREPtu1M5SNv7s6MeUonrsTnbW
-X-Google-Smtp-Source: AGHT+IFKhhMBptFKALqKje48pRi2hZGZ0cjPVsMJ6FqppKEsD8Zktc7poDtemXuD1UC1Dzh9PB46+w==
-X-Received: by 2002:ac2:4854:0:b0:522:2c9b:63b7 with SMTP id 2adb3069b0e04-52bb9f68965mr2292504e87.14.1717799294139;
-        Fri, 07 Jun 2024 15:28:14 -0700 (PDT)
-Received: from [192.168.0.5] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-421580fe343sm99432215e9.6.2024.06.07.15.28.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Jun 2024 15:28:13 -0700 (PDT)
-Message-ID: <30d71968-d32d-4121-b221-d95a4cdfedb8@gmail.com>
-Date: Sat, 8 Jun 2024 01:28:48 +0300
+        d=1e100.net; s=20230601; t=1717801343; x=1718406143;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zlL/JZl1XZV1cOjn9hrGLfruPuOqI8kDA4KtcPFCazY=;
+        b=Y72I46HGtPyZNDGcLs0mHpkxBk54BjeVDZ+H3ONNTzr0Ji9X+chD80nVDxazr3HKG9
+         pyldHlxUiW0sYdlumkC74i3EphHA4/+bfOSeTTs55ovdzPZnNq4t4/TKMgYrrFpz+v8e
+         RLtmEhWf+XwamjP9tqIMCAUcp3AwhMJKMwkgYlakNe78VKv1uJnFxYkDaIoWpZjwNEuD
+         r1W3iLOH4wyrCiD6WBzV8chbPfEVM5L6YzoNypLmKm1rZ7N1maFkFBF1jHRvtMc4oVR+
+         8cJmrmEFZaQwTquA+lUMNkJtuBkmTiH/OM07OVm7pV3c0nIPXSNwfhFgE1UuYrRvIfal
+         VO1g==
+X-Forwarded-Encrypted: i=1; AJvYcCXDPjahCQVRlnrGJn98XwpB7/J3ekxi6DzsLKYRFDj5lawrptXrSXSegrP9AzM3zL6lkjV9/feR3J2b9JzFHollzdXS01eY
+X-Gm-Message-State: AOJu0YzC2O/KqNtJhMkHmqPNl+MkyQafm3xRugGuxXB+YqxN9ejEi5oi
+	Go7jayPE7uihCSILAM8Fe8ZZc0PSnb3I/zRDKXlqDvtLz5+b9i7VwoRHOVw6wA==
+X-Google-Smtp-Source: AGHT+IFWt2YLSPWsPUebr6RomLvWokqGO6a/Lt/RkscjauOQhia9gK7XfpQg64YGSj31ye6JVD504A==
+X-Received: by 2002:a05:6870:a104:b0:22e:de2d:8c00 with SMTP id 586e51a60fabf-254644f1e6cmr4342089fac.24.1717801343386;
+        Fri, 07 Jun 2024 16:02:23 -0700 (PDT)
+Received: from ubuntu-vm.dhcp.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-795330b7607sm209267185a.85.2024.06.07.16.02.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jun 2024 16:02:22 -0700 (PDT)
+From: Kuntal Nayak <kuntal.nayak@broadcom.com>
+To: stable@vger.kernel.org,
+	gregkh@linuxfoundation.org
+Cc: ajay.kaher@broadcom.com,
+	alexey.makhalov@broadcom.com,
+	vasavi.sirnapalli@broadcom.com,
+	pablo@netfilter.org,
+	kadlec@netfilter.org,
+	fw@strlen.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kuntal Nayak <kuntal.nayak@broadcom.com>
+Subject: [PATCH v6.1] netfilter: nf_tables: use timestamp to check for set element timeout
+Date: Fri,  7 Jun 2024 16:01:46 -0700
+Message-Id: <20240607230146.47222-1-kuntal.nayak@broadcom.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/2] net: wwan: Fix SDX72 ping failure issue
-To: Slark Xiao <slark_xiao@163.com>, loic.poulain@linaro.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- manivannan.sadhasivam@linaro.org
-References: <20240607100309.453122-1-slark_xiao@163.com>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <20240607100309.453122-1-slark_xiao@163.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hello Slark,
+From: Pablo Neira Ayuso <pablo@netfilter.org>
 
-without the first patch it is close to impossible to understand this 
-one. Next time please send such tightly connected patches to both 
-mailing lists.
+commit 7395dfacfff65e9938ac0889dafa1ab01e987d15 upstream
 
-On 07.06.2024 13:03, Slark Xiao wrote:
-> For SDX72 MBIM device, it starts data mux id from 112 instead of 0.
-> This would lead to device can't ping outside successfully.
-> Also MBIM side would report "bad packet session (112)".
-> So we add a link id default value for these SDX72 products which
-> works in MBIM mode.
-> 
-> Signed-off-by: Slark Xiao <slark_xiao@163.com>
+Add a timestamp field at the beginning of the transaction, store it
+in the nftables per-netns area.
 
-Since it a but fix, it needs a 'Fixes:' tag.
+Update set backend .insert, .deactivate and sync gc path to use the
+timestamp, this avoids that an element expires while control plane
+transaction is still unfinished.
 
-> ---
->   drivers/net/wwan/mhi_wwan_mbim.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
-> index 3f72ae943b29..4ca5c845394b 100644
-> --- a/drivers/net/wwan/mhi_wwan_mbim.c
-> +++ b/drivers/net/wwan/mhi_wwan_mbim.c
-> @@ -618,7 +618,8 @@ static int mhi_mbim_probe(struct mhi_device *mhi_dev, const struct mhi_device_id
->   	mbim->rx_queue_sz = mhi_get_free_desc_count(mhi_dev, DMA_FROM_DEVICE);
->   
->   	/* Register wwan link ops with MHI controller representing WWAN instance */
-> -	return wwan_register_ops(&cntrl->mhi_dev->dev, &mhi_mbim_wwan_ops, mbim, 0);
-> +	return wwan_register_ops(&cntrl->mhi_dev->dev, &mhi_mbim_wwan_ops, mbim,
-> +		mhi_dev->mhi_cntrl->link_id ? mhi_dev->mhi_cntrl->link_id : 0);
+.lookup and .update, which are used from packet path, still use the
+current time to check if the element has expired. And .get path and dump
+also since this runs lockless under rcu read size lock. Then, there is
+async gc which also needs to check the current time since it runs
+asynchronously from a workqueue.
 
-Is it possible to drop the ternary operator and pass the link_id directly?
+Fixes: c3e1b005ed1c ("netfilter: nf_tables: add set element timeout support")
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+[ KN: Backport patch according to v6.1.x source. 'tstamp' retrieved 
+      after reading 'net' in nft_rbtree_gc() unlike master where 'net' 
+      is being set twice. This would not change logical behavior 
+      of the function. ]
+Signed-off-by: Kuntal Nayak <kuntal.nayak@broadcom.com>
+---
+ include/net/netfilter/nf_tables.h | 16 ++++++++++++++--
+ net/netfilter/nf_tables_api.c     |  4 +++-
+ net/netfilter/nft_set_hash.c      |  8 +++++++-
+ net/netfilter/nft_set_pipapo.c    | 18 +++++++++++-------
+ net/netfilter/nft_set_rbtree.c    | 10 +++++++---
+ 5 files changed, 42 insertions(+), 14 deletions(-)
 
->   }
->   
->   static void mhi_mbim_remove(struct mhi_device *mhi_dev)
+diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
+index 2fa344cb6..964cf7578 100644
+--- a/include/net/netfilter/nf_tables.h
++++ b/include/net/netfilter/nf_tables.h
+@@ -784,10 +784,16 @@ static inline struct nft_set_elem_expr *nft_set_ext_expr(const struct nft_set_ex
+ 	return nft_set_ext(ext, NFT_SET_EXT_EXPRESSIONS);
+ }
+ 
+-static inline bool nft_set_elem_expired(const struct nft_set_ext *ext)
++static inline bool __nft_set_elem_expired(const struct nft_set_ext *ext,
++					  u64 tstamp)
+ {
+ 	return nft_set_ext_exists(ext, NFT_SET_EXT_EXPIRATION) &&
+-	       time_is_before_eq_jiffies64(*nft_set_ext_expiration(ext));
++	       time_after_eq64(tstamp, *nft_set_ext_expiration(ext));
++}
++
++static inline bool nft_set_elem_expired(const struct nft_set_ext *ext)
++{
++	return __nft_set_elem_expired(ext, get_jiffies_64());
+ }
+ 
+ static inline struct nft_set_ext *nft_set_elem_ext(const struct nft_set *set,
+@@ -1711,6 +1717,7 @@ struct nftables_pernet {
+ 	struct list_head	notify_list;
+ 	struct mutex		commit_mutex;
+ 	u64			table_handle;
++	u64			tstamp;
+ 	unsigned int		base_seq;
+ 	u8			validate_state;
+ 	unsigned int		gc_seq;
+@@ -1723,6 +1730,11 @@ static inline struct nftables_pernet *nft_pernet(const struct net *net)
+ 	return net_generic(net, nf_tables_net_id);
+ }
+ 
++static inline u64 nft_net_tstamp(const struct net *net)
++{
++	return nft_pernet(net)->tstamp;
++}
++
+ #define __NFT_REDUCE_READONLY	1UL
+ #define NFT_REDUCE_READONLY	(void *)__NFT_REDUCE_READONLY
+ 
+diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
+index 1c4b7a8ec..e838a6617 100644
+--- a/net/netfilter/nf_tables_api.c
++++ b/net/netfilter/nf_tables_api.c
+@@ -9377,6 +9377,7 @@ struct nft_trans_gc *nft_trans_gc_catchall_async(struct nft_trans_gc *gc,
+ struct nft_trans_gc *nft_trans_gc_catchall_sync(struct nft_trans_gc *gc)
+ {
+ 	struct nft_set_elem_catchall *catchall, *next;
++	u64 tstamp = nft_net_tstamp(gc->net);
+ 	const struct nft_set *set = gc->set;
+ 	struct nft_set_elem elem;
+ 	struct nft_set_ext *ext;
+@@ -9386,7 +9387,7 @@ struct nft_trans_gc *nft_trans_gc_catchall_sync(struct nft_trans_gc *gc)
+ 	list_for_each_entry_safe(catchall, next, &set->catchall_list, list) {
+ 		ext = nft_set_elem_ext(set, catchall->elem);
+ 
+-		if (!nft_set_elem_expired(ext))
++		if (!__nft_set_elem_expired(ext, tstamp))
+ 			continue;
+ 
+ 		gc = nft_trans_gc_queue_sync(gc, GFP_KERNEL);
+@@ -10138,6 +10139,7 @@ static bool nf_tables_valid_genid(struct net *net, u32 genid)
+ 	bool genid_ok;
+ 
+ 	mutex_lock(&nft_net->commit_mutex);
++	nft_net->tstamp = get_jiffies_64();
+ 
+ 	genid_ok = genid == 0 || nft_net->base_seq == genid;
+ 	if (!genid_ok)
+diff --git a/net/netfilter/nft_set_hash.c b/net/netfilter/nft_set_hash.c
+index 2013de934..1fd3b4133 100644
+--- a/net/netfilter/nft_set_hash.c
++++ b/net/netfilter/nft_set_hash.c
+@@ -35,6 +35,7 @@ struct nft_rhash_cmp_arg {
+ 	const struct nft_set		*set;
+ 	const u32			*key;
+ 	u8				genmask;
++	u64				tstamp;
+ };
+ 
+ static inline u32 nft_rhash_key(const void *data, u32 len, u32 seed)
+@@ -61,7 +62,7 @@ static inline int nft_rhash_cmp(struct rhashtable_compare_arg *arg,
+ 		return 1;
+ 	if (nft_set_elem_is_dead(&he->ext))
+ 		return 1;
+-	if (nft_set_elem_expired(&he->ext))
++	if (__nft_set_elem_expired(&he->ext, x->tstamp))
+ 		return 1;
+ 	if (!nft_set_elem_active(&he->ext, x->genmask))
+ 		return 1;
+@@ -86,6 +87,7 @@ bool nft_rhash_lookup(const struct net *net, const struct nft_set *set,
+ 		.genmask = nft_genmask_cur(net),
+ 		.set	 = set,
+ 		.key	 = key,
++		.tstamp  = get_jiffies_64(),
+ 	};
+ 
+ 	he = rhashtable_lookup(&priv->ht, &arg, nft_rhash_params);
+@@ -104,6 +106,7 @@ static void *nft_rhash_get(const struct net *net, const struct nft_set *set,
+ 		.genmask = nft_genmask_cur(net),
+ 		.set	 = set,
+ 		.key	 = elem->key.val.data,
++		.tstamp  = get_jiffies_64(),
+ 	};
+ 
+ 	he = rhashtable_lookup(&priv->ht, &arg, nft_rhash_params);
+@@ -127,6 +130,7 @@ static bool nft_rhash_update(struct nft_set *set, const u32 *key,
+ 		.genmask = NFT_GENMASK_ANY,
+ 		.set	 = set,
+ 		.key	 = key,
++		.tstamp  = get_jiffies_64(),
+ 	};
+ 
+ 	he = rhashtable_lookup(&priv->ht, &arg, nft_rhash_params);
+@@ -170,6 +174,7 @@ static int nft_rhash_insert(const struct net *net, const struct nft_set *set,
+ 		.genmask = nft_genmask_next(net),
+ 		.set	 = set,
+ 		.key	 = elem->key.val.data,
++		.tstamp	 = nft_net_tstamp(net),
+ 	};
+ 	struct nft_rhash_elem *prev;
+ 
+@@ -212,6 +217,7 @@ static void *nft_rhash_deactivate(const struct net *net,
+ 		.genmask = nft_genmask_next(net),
+ 		.set	 = set,
+ 		.key	 = elem->key.val.data,
++		.tstamp	 = nft_net_tstamp(net),
+ 	};
+ 
+ 	rcu_read_lock();
+diff --git a/net/netfilter/nft_set_pipapo.c b/net/netfilter/nft_set_pipapo.c
+index 2299ced93..a56ed216c 100644
+--- a/net/netfilter/nft_set_pipapo.c
++++ b/net/netfilter/nft_set_pipapo.c
+@@ -504,6 +504,7 @@ bool nft_pipapo_lookup(const struct net *net, const struct nft_set *set,
+  * @set:	nftables API set representation
+  * @data:	Key data to be matched against existing elements
+  * @genmask:	If set, check that element is active in given genmask
++ * @tstamp:	timestamp to check for expired elements
+  *
+  * This is essentially the same as the lookup function, except that it matches
+  * key data against the uncommitted copy and doesn't use preallocated maps for
+@@ -513,7 +514,8 @@ bool nft_pipapo_lookup(const struct net *net, const struct nft_set *set,
+  */
+ static struct nft_pipapo_elem *pipapo_get(const struct net *net,
+ 					  const struct nft_set *set,
+-					  const u8 *data, u8 genmask)
++					  const u8 *data, u8 genmask,
++					  u64 tstamp)
+ {
+ 	struct nft_pipapo_elem *ret = ERR_PTR(-ENOENT);
+ 	struct nft_pipapo *priv = nft_set_priv(set);
+@@ -566,7 +568,7 @@ static struct nft_pipapo_elem *pipapo_get(const struct net *net,
+ 			goto out;
+ 
+ 		if (last) {
+-			if (nft_set_elem_expired(&f->mt[b].e->ext))
++			if (__nft_set_elem_expired(&f->mt[b].e->ext, tstamp))
+ 				goto next_match;
+ 			if ((genmask &&
+ 			     !nft_set_elem_active(&f->mt[b].e->ext, genmask)))
+@@ -603,7 +605,7 @@ static void *nft_pipapo_get(const struct net *net, const struct nft_set *set,
+ 			    const struct nft_set_elem *elem, unsigned int flags)
+ {
+ 	return pipapo_get(net, set, (const u8 *)elem->key.val.data,
+-			 nft_genmask_cur(net));
++			 nft_genmask_cur(net), get_jiffies_64());
+ }
+ 
+ /**
+@@ -1197,6 +1199,7 @@ static int nft_pipapo_insert(const struct net *net, const struct nft_set *set,
+ 	struct nft_pipapo *priv = nft_set_priv(set);
+ 	struct nft_pipapo_match *m = priv->clone;
+ 	u8 genmask = nft_genmask_next(net);
++	u64 tstamp = nft_net_tstamp(net);
+ 	struct nft_pipapo_field *f;
+ 	const u8 *start_p, *end_p;
+ 	int i, bsize_max, err = 0;
+@@ -1206,7 +1209,7 @@ static int nft_pipapo_insert(const struct net *net, const struct nft_set *set,
+ 	else
+ 		end = start;
+ 
+-	dup = pipapo_get(net, set, start, genmask);
++	dup = pipapo_get(net, set, start, genmask, tstamp);
+ 	if (!IS_ERR(dup)) {
+ 		/* Check if we already have the same exact entry */
+ 		const struct nft_data *dup_key, *dup_end;
+@@ -1228,7 +1231,7 @@ static int nft_pipapo_insert(const struct net *net, const struct nft_set *set,
+ 
+ 	if (PTR_ERR(dup) == -ENOENT) {
+ 		/* Look for partially overlapping entries */
+-		dup = pipapo_get(net, set, end, nft_genmask_next(net));
++		dup = pipapo_get(net, set, end, nft_genmask_next(net), tstamp);
+ 	}
+ 
+ 	if (PTR_ERR(dup) != -ENOENT) {
+@@ -1581,6 +1584,7 @@ static void pipapo_gc(const struct nft_set *_set, struct nft_pipapo_match *m)
+ 	struct nft_set *set = (struct nft_set *) _set;
+ 	struct nft_pipapo *priv = nft_set_priv(set);
+ 	struct net *net = read_pnet(&set->net);
++	u64 tstamp = nft_net_tstamp(net);
+ 	int rules_f0, first_rule = 0;
+ 	struct nft_pipapo_elem *e;
+ 	struct nft_trans_gc *gc;
+@@ -1615,7 +1619,7 @@ static void pipapo_gc(const struct nft_set *_set, struct nft_pipapo_match *m)
+ 		/* synchronous gc never fails, there is no need to set on
+ 		 * NFT_SET_ELEM_DEAD_BIT.
+ 		 */
+-		if (nft_set_elem_expired(&e->ext)) {
++		if (__nft_set_elem_expired(&e->ext, tstamp)) {
+ 			priv->dirty = true;
+ 
+ 			gc = nft_trans_gc_queue_sync(gc, GFP_ATOMIC);
+@@ -1786,7 +1790,7 @@ static void *pipapo_deactivate(const struct net *net, const struct nft_set *set,
+ {
+ 	struct nft_pipapo_elem *e;
+ 
+-	e = pipapo_get(net, set, data, nft_genmask_next(net));
++	e = pipapo_get(net, set, data, nft_genmask_next(net), nft_net_tstamp(net));
+ 	if (IS_ERR(e))
+ 		return NULL;
+ 
+diff --git a/net/netfilter/nft_set_rbtree.c b/net/netfilter/nft_set_rbtree.c
+index 5bf5572e9..c4c92192c 100644
+--- a/net/netfilter/nft_set_rbtree.c
++++ b/net/netfilter/nft_set_rbtree.c
+@@ -314,6 +314,7 @@ static int __nft_rbtree_insert(const struct net *net, const struct nft_set *set,
+ 	struct nft_rbtree *priv = nft_set_priv(set);
+ 	u8 cur_genmask = nft_genmask_cur(net);
+ 	u8 genmask = nft_genmask_next(net);
++	u64 tstamp = nft_net_tstamp(net);
+ 	int d;
+ 
+ 	/* Descend the tree to search for an existing element greater than the
+@@ -361,7 +362,7 @@ static int __nft_rbtree_insert(const struct net *net, const struct nft_set *set,
+ 		/* perform garbage collection to avoid bogus overlap reports
+ 		 * but skip new elements in this transaction.
+ 		 */
+-		if (nft_set_elem_expired(&rbe->ext) &&
++		if (__nft_set_elem_expired(&rbe->ext, tstamp) &&
+ 		    nft_set_elem_active(&rbe->ext, cur_genmask)) {
+ 			const struct nft_rbtree_elem *removed_end;
+ 
+@@ -548,6 +549,7 @@ static void *nft_rbtree_deactivate(const struct net *net,
+ 	const struct rb_node *parent = priv->root.rb_node;
+ 	struct nft_rbtree_elem *rbe, *this = elem->priv;
+ 	u8 genmask = nft_genmask_next(net);
++	u64 tstamp = nft_net_tstamp(net);
+ 	int d;
+ 
+ 	while (parent != NULL) {
+@@ -568,7 +570,7 @@ static void *nft_rbtree_deactivate(const struct net *net,
+ 				   nft_rbtree_interval_end(this)) {
+ 				parent = parent->rb_right;
+ 				continue;
+-			} else if (nft_set_elem_expired(&rbe->ext)) {
++			} else if (__nft_set_elem_expired(&rbe->ext, tstamp)) {
+ 				break;
+ 			} else if (!nft_set_elem_active(&rbe->ext, genmask)) {
+ 				parent = parent->rb_left;
+@@ -622,12 +624,14 @@ static void nft_rbtree_gc(struct work_struct *work)
+ 	struct nft_set *set;
+ 	unsigned int gc_seq;
+ 	struct net *net;
++	u64 tstamp;
+ 
+ 	priv = container_of(work, struct nft_rbtree, gc_work.work);
+ 	set  = nft_set_container_of(priv);
+ 	net  = read_pnet(&set->net);
+ 	nft_net = nft_pernet(net);
+ 	gc_seq  = READ_ONCE(nft_net->gc_seq);
++	tstamp = nft_net_tstamp(net);
+ 
+ 	if (nft_set_gc_is_pending(set))
+ 		goto done;
+@@ -659,7 +663,7 @@ static void nft_rbtree_gc(struct work_struct *work)
+ 			rbe_end = rbe;
+ 			continue;
+ 		}
+-		if (!nft_set_elem_expired(&rbe->ext))
++		if (!__nft_set_elem_expired(&rbe->ext, tstamp))
+ 			continue;
+ 
+ 		nft_set_elem_dead(&rbe->ext);
+-- 
+2.39.3
 
 
