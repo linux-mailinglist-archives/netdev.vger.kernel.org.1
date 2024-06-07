@@ -1,166 +1,207 @@
-Return-Path: <netdev+bounces-101896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A62869007C4
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:57:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 133719007E9
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 17:00:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26AB61F26DC6
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:57:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12A871C22E0D
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 15:00:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1AB619EEA8;
-	Fri,  7 Jun 2024 14:52:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89CB6193085;
+	Fri,  7 Jun 2024 14:53:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="hQJmj9FG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qql82WAN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA97619EEAB
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 14:52:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E534C197A68;
+	Fri,  7 Jun 2024 14:53:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717771971; cv=none; b=Q8AGn3PCl2+zlJ4tZWeh++4UAcEqSU6AHBk2n+vloL5RFwdaejAs8uWApZOSS7D1eQie+zXj9Hl4E90NxZZ12BUvqCLVRlncwuQ15I8f/PkxUqHpYUJKMEdGlrYYHV3rihqQPc61c2FbbCCryAQU/teYx8l4ZdDP75biICoA628=
+	t=1717772032; cv=none; b=oVGZ5IQTbEtWwg48dkC3DV6rq0eLA4RFIk+rXBGGoiuPp37Eza6wvPzk238b2W7cCEaws3iL2riLBZsdjDSZIE7QKkx425f8pvmqsfxan5lEoG6G8EEmvBFy/WSzuxKHvT3X+sJMarwT8DZm1T8u0JT/iUdwb67/w9ij/djKuJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717771971; c=relaxed/simple;
-	bh=lRtTAdTXNw3RVPrpvvNKKuuzE413bhtwKVpiQVvurek=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p04ZY4oTzEJqeUiCbPKRS3C2Vi9U23hvxxtp5+uPHKI41qJpIQkODxtgcC0p9eUKNy6dxJWnAcfTuIO1yrBJ37s9m57vMVTFISmXQH1cRMkruZ8ltmxIket32nmcsIFaW2KQxDGfQegGu6zYGEuksuG8hI0H2kqLicWJaxEwwfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=hQJmj9FG; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-79525719d8dso245498985a.1
-        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 07:52:49 -0700 (PDT)
+	s=arc-20240116; t=1717772032; c=relaxed/simple;
+	bh=qN0K4Vhm1CmfQJv8lTUuvuTmBDZntjnq3l4O0tLeuSE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fcGizZMpuPuvM+EzMpuB7Z6+4YvB2qf1oEXe9ZN7+eWVPKtyF4rcvb18DZpDU9Is1BXQtOsyIkMjvMrFw+IQFv+iClPLqHXSJKC7yVZnX+A63hB/bvquESEym7lbwU+ds6SqGfQMMkl3glyzvnNqoeQnYi6RpYf3jZLvq/BlXV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qql82WAN; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-37585fc3eebso2580605ab.0;
+        Fri, 07 Jun 2024 07:53:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1717771968; x=1718376768; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=be9t9+ReZ6YBtow20QbHH2FmkX+nC7rbtPeGa2mS4as=;
-        b=hQJmj9FGqkDWyCgt/SU+4tUjCosWn1r7jPWCOxSoQcFLTAHBHmCt1UPHWUfacLPk0A
-         J27M3PHiZT4a/3dgSP410VtO8nsNQzDfKUKFxJN3iIePAPaAXbaP+l6LyEKYF4CkTy48
-         W7AEcymnLWnS3+i8chqAC7sLqibivCTcSwkpGR1xtaFDOarqDm2RsDk88kHT7kdlDC/+
-         9Z8FIQqtXasRprzwCsdTxihilrlaHvGsr45MSTgHsNCW06TV4YSXg9RXEoJSh9JliJhN
-         EElPiNvBU31l6J6yWS1+Pv/JSZLa707wvYnKwDocL0pue06OzOB0p871OIuyts6x8rd8
-         zTsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717771968; x=1718376768;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1717772030; x=1718376830; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=be9t9+ReZ6YBtow20QbHH2FmkX+nC7rbtPeGa2mS4as=;
-        b=mvCLMO+qe5Fq/RZQ5Y9TdhFXXCNAgpo6dBGZOinGs5wLCj76fSn0VWhIgrmmVrDmOT
-         OzXzGE93pRnWG0uV4j8cfIF8/pxqJoP6IVua5ZUtaZwjotuvE5qFrbTwxhAkD68SlFqm
-         SeoWUmPoh+46Z0FS3eXWvICVx5M5ARMWgm7NqOkM3bClmzNts5wHJFUg6YiTTFhs4ZKa
-         0mw3QZfOERmcFwrzZsSOsyHpLzfFmSszVtZ1ZZyzE+kT9p/IrRSDmqNGnsK5/yr/HFPC
-         KUiSU8kM/T0urdb+7paJa3fAGaayXWZIjSJpgDtuWk1F4cxmPKtWS35n/WgDpQ3aQmhS
-         fd7w==
-X-Forwarded-Encrypted: i=1; AJvYcCVxUhaI6UP/f0mvHPzkCJY27OHJ2YXruGPpEyK52VCtW7HbynhxItTKOr4/F5ScY8ov6/Bv4cS7pZo6parS1vwJYOcLhl7g
-X-Gm-Message-State: AOJu0YwSt9oa0p5OlJxXgTGhxRI2A7deEY7iAmZ74Cb1hsrPmA5Uh0g/
-	BDCvHcQ9gTH21CUtNrBa3IEwKrdhAQ5rieB1+FZku18NyKqBAJkQ0gyg64Ado5A=
-X-Google-Smtp-Source: AGHT+IEol1YR1WI0zC3A5eIuWJjKcIm2ZGRprGfgrv26PYx2gMqkRphUST2lY2DmLHNeG4xW82MRzw==
-X-Received: by 2002:a05:620a:31a8:b0:795:4e67:1ef5 with SMTP id af79cd13be357-7954e672231mr106304685a.11.1717771968557;
-        Fri, 07 Jun 2024 07:52:48 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79532870231sm173090885a.60.2024.06.07.07.52.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jun 2024 07:52:48 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1sFaxT-00HGBa-Cf;
-	Fri, 07 Jun 2024 11:52:47 -0300
-Date: Fri, 7 Jun 2024 11:52:47 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: David Ahern <dsahern@kernel.org>
-Cc: Pavel Begunkov <asml.silence@gmail.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-	Matt Turner <mattst88@gmail.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	David Wei <dw@davidwei.uk>, Yunsheng Lin <linyunsheng@huawei.com>,
-	Shailend Chand <shailend@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Subject: Re: [PATCH net-next v10 02/14] net: page_pool: create hooks for
- custom page providers
-Message-ID: <20240607145247.GG791043@ziepe.ca>
-References: <20240530201616.1316526-1-almasrymina@google.com>
- <20240530201616.1316526-3-almasrymina@google.com>
- <ZlqzER_ufrhlB28v@infradead.org>
- <CAHS8izMU_nMEr04J9kXiX6rJqK4nQKA+W-enKLhNxvK7=H2pgA@mail.gmail.com>
- <5aee4bba-ca65-443c-bd78-e5599b814a13@gmail.com>
- <CAHS8izNmT_NzgCu1pY1RKgJh+kP2rCL_90Gqau2Pkd3-48Q1_w@mail.gmail.com>
- <eb237e6e-3626-4435-8af5-11ed3931b0ac@gmail.com>
- <be2d140f-db0f-4d15-967c-972ea6586b5c@kernel.org>
+        bh=zBo/lajgxqd57WhsKdw0GslmVGXqhBJ5KLjNbHAH6pQ=;
+        b=Qql82WANYdpNboaL1A8gcR0gF9ua5tFXOA7KErFG80sfbQsTrngUgy2kEyGq6/4bY+
+         fHfZw/qXJ+agMyugb6CM1+1vDncFYdRZBSxhbCy3x/+jEwXKRe/FkXir3sATxUxMApWL
+         bYU8vkapnjYK+5QNFIa4nTgixqzwxg4N3ChHS6g0QWZZW0MMF/5/2ngEfZLIEE+6nEKv
+         q6VOvHHfTNvE7BGWZnBB7IBLb+Z7syoDahvj2GOVVuKK4VOjBppbAE6Zimhoyi6kPnrx
+         K7rEqQkUm/UDGXikyWnh5tD6/VTbDgyWTyDZWbT9FPyW6zesAy2XOkQXXZn4SB9+PWHG
+         fPjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717772030; x=1718376830;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zBo/lajgxqd57WhsKdw0GslmVGXqhBJ5KLjNbHAH6pQ=;
+        b=jlSq8GxA6Shi5ld9uXPJG1UhmJmCpMXiq++867YuoMyzSVdkIIqfecaF0MTiCFWQZq
+         lAOfJiGx7m8y8ooTYft0OKQmOo8mMpNaWIWS19sT4a15+hS/SEVJyBNYvPvBIuYCoA+n
+         oKBMj95X0iWxpsiQPwPQWnN6V5KbhOH/1Q+FctdHNOsaSfSVMqVvWvnjw5Sn198Uvb3K
+         rp+08wvqBTIpmCSsettafwx/I+OErOY9p+tYrntjNOx5cXO5iJY/kaz274hAlJxXYsfE
+         AckKNWfYoEIuV9dmDKSprOcscGKZyxpUPcDSnTJeSORNWqufZiIf91uSkeznVactKYop
+         aNtw==
+X-Forwarded-Encrypted: i=1; AJvYcCWudAACp9QROGRCePRK/xD5XHtWa4Bvo8LUMB5hF9V2vHJvc9XqhjmhWDszAxYYQt86/srCqwBsKwmMoy/OfhV+jd32Dg5U
+X-Gm-Message-State: AOJu0YzA7lSvmYvflcwAPXJZ7sriztkqdIxzYGweoRVxIhiC2nLao5u6
+	vzLK9xCmerVheZcwEGhIBAyKIIE5HY11i9VXwri69wVilTiDVi+n9eBqcU6vJOEButkIczGQ4tm
+	YX6vjnIBoy6glCRV3c9kYf/TJ6+s/HrBFKPU=
+X-Google-Smtp-Source: AGHT+IFggGLap5bjvbfo6DzymifGGYaCdEH0Kgw/BqUTeDoJEegk34aWS+D513qZNeKZryzDFJVal7Mvcq2cAZxkcks=
+X-Received: by 2002:a05:6e02:dc9:b0:375:8af5:8d17 with SMTP id
+ e9e14a558f8ab-3758af58f87mr4157795ab.31.1717772029822; Fri, 07 Jun 2024
+ 07:53:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <be2d140f-db0f-4d15-967c-972ea6586b5c@kernel.org>
+References: <4faeb583e1d44d82b4e16374b0ad583c@AcuMS.aculab.com>
+ <CADvbK_emOEPZJ8GWtYpUDKAGLW2z84S81ZcW9qQCc=rYCiUbAA@mail.gmail.com> <0b42b8f085b84a7e8ffd5a9b71ed2932@AcuMS.aculab.com>
+In-Reply-To: <0b42b8f085b84a7e8ffd5a9b71ed2932@AcuMS.aculab.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Fri, 7 Jun 2024 10:53:38 -0400
+Message-ID: <CADvbK_cLMuLYA-ADXr2Vn5kRHZ0UpeL7G-u710g1En9t7h6SYw@mail.gmail.com>
+Subject: Re: SCTP doesn't seem to let you 'cancel' a blocking accept()
+To: David Laight <David.Laight@aculab.com>
+Cc: linux-sctp <linux-sctp@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 07, 2024 at 08:27:29AM -0600, David Ahern wrote:
-> On 6/7/24 7:42 AM, Pavel Begunkov wrote:
-> > I haven't seen any arguments against from the (net) maintainers so
-> > far. Nor I see any objection against callbacks from them (considering
-> > that either option adds an if).
-> 
-> I have said before I do not understand why the dmabuf paradigm is not
-> sufficient for both device memory and host memory. A less than ideal
-> control path to put hostmem in a dmabuf wrapper vs extra checks and
-> changes in the datapath. The former should always be preferred.
+On Fri, Jun 7, 2024 at 4:36=E2=80=AFAM David Laight <David.Laight@aculab.co=
+m> wrote:
+>
+> From: Xin Long
+> > Sent: 06 June 2024 21:15
+> >
+> > On Mon, Jun 3, 2024 at 11:42=E2=80=AFAM David Laight <David.Laight@acul=
+ab.com> wrote:
+> > >
+> > > In a multithreaded program it is reasonable to have a thread blocked =
+in accept().
+> > > With TCP a subsequent shutdown(listen_fd, SHUT_RDWR) causes the accep=
+t to fail.
+> > > But nothing happens for SCTP.
+> > >
+> > > I think the 'magic' happens when tcp_disconnect() calls inet_csk_list=
+en_stop(sk)
+> > > but sctp_disconnect() is an empty function and nothing happens.
+> > >
+> > > I can't see any calls to inet_csk_listen_stop() in the sctp code - so=
+ I suspect
+> > > it isn't possible at all.
+> ...
+> > >
+> > > I also suspect that a blocking connect() can't be cancelled either?
+> >
+> > For connecting socket, it calls sctp_shutdown() where SHUT_WR causes
+> > the asoc to enter SHUTDOWN_SENT and cancel the blocking connect().
+>
+> I'll test that later - the test I was running always connects.
+> I'm porting some kernel code that used signals to unblock synchronous
+> calls to userspace where you can't signal a thread.
+> The only problem with the kernel version is secure boot and driver
+> signing (especially for the windows build!).
+>
+> > > Clearly the application can avoid the issue by using poll() and an
+> > > extra eventfd() for the wakeup - but it is all a faff for code that
+> > > otherwise straight forward.
+> >
+> > I will try to prepare a patch to solve this for sctp accept() like:
+>
+> I'll test it for you.
+>
+> > diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+> > index c67679a41044..f270a0a4c65d 100644
+> > --- a/net/sctp/socket.c
+> > +++ b/net/sctp/socket.c
+> > @@ -4834,10 +4834,13 @@ int sctp_inet_connect(struct socket *sock,
+> > struct sockaddr *uaddr,
+> >         return sctp_connect(sock->sk, uaddr, addr_len, flags);
+> >  }
+> >
+> > -/* FIXME: Write comments. */
+> >  static int sctp_disconnect(struct sock *sk, int flags)
+> >  {
+> > -       return -EOPNOTSUPP; /* STUB */
+> > +       if (!sctp_style(sk, TCP))
+> > +               return -EOPNOTSUPP;
+> > +
+> > +       sk->sk_shutdown |=3D RCV_SHUTDOWN;
+> > +       return 0;
+>
+> I think you need to call something to unblock the thread as well
+> as changing the state.
+shutdown() will call inet_shutdown()/sk_state_change(sk) to awake the
+sleeping thread in sctp_accept()/connect().
 
-I think Pavel explained this - his project is principally to replace
-the lifetime policy of pages in the data plane. He wants to change
-when a page is considered available for re-allocation because
-userspace may continue to use the page after the netstack thinks it is
-done with it. It sounds like having a different source of the pages is
-the less important part.
+In sctp_accept() it checks sk->sk_shutdown & RCV_SHUTDOWN to return,
+while in sctp_connect() it check asoc->state >=3D SCTP_STATE_SHUTDOWN_PENDI=
+NG
+to return.
 
-IMHO it seems to compose poorly if you can only use the io_uring
-lifecycle model with io_uring registered memory, and not with DMABUF
-memory registered through Mina's mechanism.
+In inet_shutdown(), only with RCV_SHUTDOWN flag calls .disconnect() for
+LISTEN sockets, and SCTP doesn't do many things for RCV_SHUTDOWN, I would
+just set this flag to unlock the thread, and leave the real disconnection
+to close(listen_sk);
 
-Jason
+>
+> ...
+> > -       if (!sctp_sstate(sk, LISTENING)) {
+>
+> Any chance of making it much clearer that this is testing
+>                 if (sk->sk_state =3D=3D TCP_LISTEN)
+>
+> The token-pasting though
+>         SCTP_SS_CLOSED         =3D TCP_CLOSE,
+>         SCTP_SS_LISTENING      =3D TCP_LISTEN,
+>         SCTP_SS_ESTABLISHING   =3D TCP_SYN_SENT,
+>         SCTP_SS_ESTABLISHED    =3D TCP_ESTABLISHED,
+>         SCTP_SS_CLOSING        =3D TCP_CLOSE_WAIT,
+> makes grepping for changes to sk_state pretty impossible.
+>
+> You might argue that the sk_state values should be protocol neutral,
+> and that the wrapper gives strong typing - but together they make
+> the code hard to scan.
+>
+> The strong typing could be maintained by changing the constants to
+>         SCTP_SS_TCP_CLOSE =3D TCP_CLOSE
+> (etc) so that grepping for the constants still works.
+I understand.
+I guess the author didn't want to have TCP named things in SCTP.
+Maybe it's the inet layer that should use neutral names for states. :D
+
+Thanks.
+
+>
+> I keep thinking of ways to do strongly typed enum in C.
+> The main options seem to be embedding the value in a struct
+> or using a pointer to a struct.
+> Neither is ideal.
+>
+> OTOH the compiler can't default to strongly typed enum.
+> Although perhaps that could be a per-enum attribute.
+>
+>         David
+>
+> -
+> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1=
+ 1PT, UK
+> Registration No: 1397386 (Wales)
 
