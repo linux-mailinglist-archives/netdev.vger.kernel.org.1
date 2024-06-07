@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-101781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D52B59000BF
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:25:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EB3F9000BE
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:25:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFF481C2234F
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:25:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B20551F254A3
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB4DB15CD77;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CCF15CD6C;
 	Fri,  7 Jun 2024 10:25:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="ULvVldvj"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="l2JZcSiL"
 X-Original-To: netdev@vger.kernel.org
 Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F5D15B126
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB14115B967
 	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 10:25:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717755941; cv=none; b=hzq9cUnJ3LD2ptzB+hoShYFNE2Xpi5fLwgEu0vtCuIxBtuMQ+Uczi3eHDpbkiNo5xL23OrvBJtS3z+h2i8clTBDosSEzT9n6SGbIhxhd//PjZIkK4BhIMR/w4SIxXswa0wxwTf2aN+vD+fYMnaXdeOoeo+Fk068NigzlT+uwGSQ=
+	t=1717755941; cv=none; b=Al38hqsJHu82BaDBG9bSSqPBPnKQDO+eYAmp1FId63OJ07nwE3J0RlpYlpEbtUnSSBriNahb31iJzLtNmqSeP2XC1HpoK6xFpjKNGtQp2bWe+S/uqHOj2/wOzGRHOJd3J7EeOvyb6FSepOx496kZgNQh++3jS6MXVNTp20Z5V9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717755941; c=relaxed/simple;
-	bh=AaS0MVDHsIviwS80bGsw+6Ul/ToVvQJ9omBDanURioE=;
+	bh=0shH0MIpU/+fHe3BpvoegYg1ty2d8Q96t4AIpk9WppA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RcGasnYUCQRtDuWL0b5ST1r27Wi80wBJocAuEPNqfatTIW4y4wyIN9q4FazWhdNpOFdmmnhfH30LyaFCkCdHW1gMZzw9Isnpw6DFuz9RFmWVpadE5ulleaz98EnFN8ayalusRwjP7xUUACmn2Ne/pettkRvulFZPQJxlP0RwSXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=ULvVldvj; arc=none smtp.client-ip=203.29.241.158
+	 In-Reply-To:To:Cc; b=aWNzx9E1g4ARjOkJQ8dH7spPd+Y3kledj4JCQVYpBDJjTANz0rHoy/Sq1jKfvc8eK6pM4mzBWJSUNK3UxiMKE3i+bwJZ4eNsLdU0VgzwJl8UMNrQ5uER+CCTo/eS8mx6sz1jWkKDXJMN/Ago2+jCUApvFtD7UHDRBxwJ7KIyhx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=l2JZcSiL; arc=none smtp.client-ip=203.29.241.158
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id 8FDD920238; Fri,  7 Jun 2024 18:25:37 +0800 (AWST)
+	id DABBD20239; Fri,  7 Jun 2024 18:25:37 +0800 (AWST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=codeconstruct.com.au; s=2022a; t=1717755937;
-	bh=kPxrZD8ZnlmXNhcZBn+cUOOFrPj85ugqV8tA0BpTO7Y=;
+	bh=yd4IJp7KEoVXYbhKe9PO348L7pYanHh9Dhj573+5fWg=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=ULvVldvjHu4qimPaNBPWM9p0zhMO85nUV9Srcft1DXzjnGKpUh4eXbvqhWveEZVbn
-	 rqm3DqgAN7En76l/DV7FYc+8eVPppJ4MEVoDDFUfX6DYhFtL7xBr10/zXX3/de5c1H
-	 BZraNuIjwa32WcPW+UAz/9CbvDhoFiR4MVjr7EtQ5CSdwxr8IajwW9zXFXGyquffba
-	 WeMDjia1Y/W+GAzwo/MDcTIbDaYGGGsIQ1afQ6VhL2x8ViTCXDyR8DFrmcXy56/MBX
-	 rRlKeY4YpWN4hASHuC2UB53gYiRv5Bh2m3QBaWfvswE1iheFphxlQ83BtcYoP7o1pr
-	 r2OIWqWrvYXxQ==
+	b=l2JZcSiLp8fnkDCqR4wEQ22Ffr/fkAOT2JqAkC/vUB1dF2NIXjm6vDialcTSUng1D
+	 paorEcBU8VVcdL6O/UnFvDV7LyUo0Hn+XQZv9eBfyHGZVO3x7JBVEN0JyjU0eiAaS3
+	 racdRGl/bb1lmBYM32opWHNLevKiea/rDaZZTml2JtDHxx95IgEWzf8c2pHOxpxRYk
+	 bqmflaT9yp7doviuYfNtNvJn7lVe49+kGrGRrc2dx1zu2+iTjJg5Zrj3barlBETU34
+	 XpkUcE3S2ZPguRsRV3cETAlAqoLbUJ7hYwiSgMjlb2W1na3vrhhK2Kq3vMwbRV1ITE
+	 Vsmj+LlipwrXg==
 From: Jeremy Kerr <jk@codeconstruct.com.au>
-Date: Fri, 07 Jun 2024 18:25:24 +0800
-Subject: [PATCH net-next v3 1/3] net: core,vrf: Change pcpu_dstat fields to
- u64_stats_t
+Date: Fri, 07 Jun 2024 18:25:25 +0800
+Subject: [PATCH net-next v3 2/3] net: core: Implement dstats-type stats
+ collections
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,7 +55,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240607-dstats-v3-1-cc781fe116f7@codeconstruct.com.au>
+Message-Id: <20240607-dstats-v3-2-cc781fe116f7@codeconstruct.com.au>
 References: <20240607-dstats-v3-0-cc781fe116f7@codeconstruct.com.au>
 In-Reply-To: <20240607-dstats-v3-0-cc781fe116f7@codeconstruct.com.au>
 To: David Ahern <dsahern@kernel.org>, 
@@ -64,126 +64,100 @@ To: David Ahern <dsahern@kernel.org>,
 Cc: netdev@vger.kernel.org
 X-Mailer: b4 0.13.0
 
-The pcpu_sw_netstats and pcpu_lstats structs both contain a set of
-u64_stats_t fields for individual stats, but pcpu_dstats uses u64s
-instead.
+We currently have dev_get_tstats64() for collecting per-cpu stats of
+type pcpu_sw_netstats ("tstats"). However, tstats doesn't allow for
+accounting tx/rx drops. We do have a stats variant that does have stats
+for dropped packets: struct pcpu_dstats, but there are no core helpers
+for using those stats.
 
-Make this consistent by using u64_stats_t across all stats types.
+The VRF driver uses dstats, by providing its own collation/fetch
+functions to do so.
 
-The per-cpu dstats are only used by the vrf driver at present, so update
-that driver as part of this change.
+This change adds a common implementation for dstats-type collection,
+used when pcpu_stat_type == NETDEV_PCPU_STAT_DSTAT. This is based on the
+VRF driver's existing stats collator (plus the unused tx_drops stat from
+there). We will switch the VRF driver to use this in the next change.
 
 Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 
 ---
+v3:
+ - As suggested by Jakub: don't expose dev_get_dstats64 as a helper, but
+   invoke automatically for NETDEV_PCPU_STAT_DSTAT devices.
 v2:
- - use proper accessor in rx drop accounting
+ - use correct percpu var ("stats", not "dstats") in dev_fetch_dstats
 ---
- drivers/net/vrf.c         | 38 ++++++++++++++++++++++----------------
- include/linux/netdevice.h | 12 ++++++------
- 2 files changed, 28 insertions(+), 22 deletions(-)
+ net/core/dev.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
 
-diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
-index 3a252ac5dd28..5018831b2a79 100644
---- a/drivers/net/vrf.c
-+++ b/drivers/net/vrf.c
-@@ -126,8 +126,8 @@ static void vrf_rx_stats(struct net_device *dev, int len)
- 	struct pcpu_dstats *dstats = this_cpu_ptr(dev->dstats);
- 
- 	u64_stats_update_begin(&dstats->syncp);
--	dstats->rx_packets++;
--	dstats->rx_bytes += len;
-+	u64_stats_inc(&dstats->rx_packets);
-+	u64_stats_add(&dstats->rx_bytes, len);
- 	u64_stats_update_end(&dstats->syncp);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index e1bb6d7856d9..3dcfc8d6c51a 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -10702,6 +10702,54 @@ void netdev_run_todo(void)
+ 		wake_up(&netdev_unregistering_wq);
  }
  
-@@ -150,11 +150,11 @@ static void vrf_get_stats64(struct net_device *dev,
- 		dstats = per_cpu_ptr(dev->dstats, i);
- 		do {
- 			start = u64_stats_fetch_begin(&dstats->syncp);
--			tbytes = dstats->tx_bytes;
--			tpkts = dstats->tx_packets;
--			tdrops = dstats->tx_drops;
--			rbytes = dstats->rx_bytes;
--			rpkts = dstats->rx_packets;
-+			tbytes = u64_stats_read(&dstats->tx_bytes);
-+			tpkts = u64_stats_read(&dstats->tx_packets);
-+			tdrops = u64_stats_read(&dstats->tx_drops);
-+			rbytes = u64_stats_read(&dstats->rx_bytes);
-+			rpkts = u64_stats_read(&dstats->rx_packets);
- 		} while (u64_stats_fetch_retry(&dstats->syncp, start));
- 		stats->tx_bytes += tbytes;
- 		stats->tx_packets += tpkts;
-@@ -408,10 +408,15 @@ static int vrf_local_xmit(struct sk_buff *skb, struct net_device *dev,
- 
- 	skb->protocol = eth_type_trans(skb, dev);
- 
--	if (likely(__netif_rx(skb) == NET_RX_SUCCESS))
-+	if (likely(__netif_rx(skb) == NET_RX_SUCCESS)) {
- 		vrf_rx_stats(dev, len);
--	else
--		this_cpu_inc(dev->dstats->rx_drops);
-+	} else {
-+		struct pcpu_dstats *dstats = this_cpu_ptr(dev->dstats);
++/* Collate per-cpu network dstats statistics
++ *
++ * Read per-cpu network statistics from dev->dstats and populate the related
++ * fields in @s.
++ */
++static void dev_fetch_dstats(struct rtnl_link_stats64 *s,
++			     const struct pcpu_dstats __percpu *dstats)
++{
++	int cpu;
 +
-+		u64_stats_update_begin(&dstats->syncp);
-+		u64_stats_inc(&dstats->rx_drops);
-+		u64_stats_update_end(&dstats->syncp);
++	for_each_possible_cpu(cpu) {
++		u64 rx_packets, rx_bytes, rx_drops;
++		u64 tx_packets, tx_bytes, tx_drops;
++		const struct pcpu_dstats *stats;
++		unsigned int start;
++
++		stats = per_cpu_ptr(dstats, cpu);
++		do {
++			start = u64_stats_fetch_begin(&stats->syncp);
++			rx_packets = u64_stats_read(&stats->rx_packets);
++			rx_bytes   = u64_stats_read(&stats->rx_bytes);
++			rx_drops   = u64_stats_read(&stats->rx_drops);
++			tx_packets = u64_stats_read(&stats->tx_packets);
++			tx_bytes   = u64_stats_read(&stats->tx_bytes);
++			tx_drops   = u64_stats_read(&stats->tx_drops);
++		} while (u64_stats_fetch_retry(&stats->syncp, start));
++
++		s->rx_packets += rx_packets;
++		s->rx_bytes   += rx_bytes;
++		s->rx_dropped += rx_drops;
++		s->tx_packets += tx_packets;
++		s->tx_bytes   += tx_bytes;
++		s->tx_dropped += tx_drops;
 +	}
- 
- 	return NETDEV_TX_OK;
- }
-@@ -599,19 +604,20 @@ static netdev_tx_t is_ip_tx_frame(struct sk_buff *skb, struct net_device *dev)
- 
- static netdev_tx_t vrf_xmit(struct sk_buff *skb, struct net_device *dev)
- {
-+	struct pcpu_dstats *dstats = this_cpu_ptr(dev->dstats);
++}
 +
- 	int len = skb->len;
- 	netdev_tx_t ret = is_ip_tx_frame(skb, dev);
- 
-+	u64_stats_update_begin(&dstats->syncp);
- 	if (likely(ret == NET_XMIT_SUCCESS || ret == NET_XMIT_CN)) {
--		struct pcpu_dstats *dstats = this_cpu_ptr(dev->dstats);
- 
--		u64_stats_update_begin(&dstats->syncp);
--		dstats->tx_packets++;
--		dstats->tx_bytes += len;
--		u64_stats_update_end(&dstats->syncp);
-+		u64_stats_inc(&dstats->tx_packets);
-+		u64_stats_add(&dstats->tx_bytes, len);
++/* ndo_get_stats64 implementation for dtstats-based accounting.
++ *
++ * Populate @s from dev->stats and dev->dstats. This is used internally by the
++ * core for NETDEV_PCPU_STAT_DSTAT-type stats collection.
++ */
++static void dev_get_dstats64(const struct net_device *dev,
++			     struct rtnl_link_stats64 *s)
++{
++	netdev_stats_to_stats64(s, &dev->stats);
++	dev_fetch_dstats(s, dev->dstats);
++}
++
+ /* Convert net_device_stats to rtnl_link_stats64. rtnl_link_stats64 has
+  * all the same fields in the same order as net_device_stats, with only
+  * the type differing, but rtnl_link_stats64 may have additional fields
+@@ -10778,6 +10826,8 @@ struct rtnl_link_stats64 *dev_get_stats(struct net_device *dev,
+ 		netdev_stats_to_stats64(storage, ops->ndo_get_stats(dev));
+ 	} else if (dev->pcpu_stat_type == NETDEV_PCPU_STAT_TSTATS) {
+ 		dev_get_tstats64(dev, storage);
++	} else if (dev->pcpu_stat_type == NETDEV_PCPU_STAT_DSTATS) {
++		dev_get_dstats64(dev, storage);
  	} else {
--		this_cpu_inc(dev->dstats->tx_drops);
-+		u64_stats_inc(&dstats->tx_drops);
+ 		netdev_stats_to_stats64(storage, &dev->stats);
  	}
-+	u64_stats_update_end(&dstats->syncp);
- 
- 	return ret;
- }
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index d20c6c99eb88..f148a01dd1d1 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -2731,12 +2731,12 @@ struct pcpu_sw_netstats {
- } __aligned(4 * sizeof(u64));
- 
- struct pcpu_dstats {
--	u64			rx_packets;
--	u64			rx_bytes;
--	u64			rx_drops;
--	u64			tx_packets;
--	u64			tx_bytes;
--	u64			tx_drops;
-+	u64_stats_t		rx_packets;
-+	u64_stats_t		rx_bytes;
-+	u64_stats_t		rx_drops;
-+	u64_stats_t		tx_packets;
-+	u64_stats_t		tx_bytes;
-+	u64_stats_t		tx_drops;
- 	struct u64_stats_sync	syncp;
- } __aligned(8 * sizeof(u64));
- 
 
 -- 
 2.39.2
