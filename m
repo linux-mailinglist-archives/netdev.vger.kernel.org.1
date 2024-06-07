@@ -1,162 +1,147 @@
-Return-Path: <netdev+bounces-101712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F8DF8FFD56
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:40:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C0C8FFD73
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:49:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A682D1F21E3D
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:40:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF50E1C218C0
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:49:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 634F8155C99;
-	Fri,  7 Jun 2024 07:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9DA15A864;
+	Fri,  7 Jun 2024 07:49:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RVmhyIzO"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="BD/wuHLT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A655B154C17;
-	Fri,  7 Jun 2024 07:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD461502BE;
+	Fri,  7 Jun 2024 07:49:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717746045; cv=none; b=lGoCZ+bUpgu8USR9Fo7Ot9a7frVmtWCG8bloMbWkWUKmHaPTOH09G3O33xxpnV1guLZcsUOG/PhlN2EOB2uGWqjCszAoD667eOD+KOmmp9qXJYy9ZhQf/kjrYpDQjK19K0Xa1H7GgP/9DyJLi3ugB1E8O0Q3n7FVfzJ8ErpX7SA=
+	t=1717746552; cv=none; b=pOgbEJkr69teFc1u8xuVS4POHm2DU1iu6Vcizqc52X/8RW4MiUy50OBcDe2TLOdpuRNSDDI0NBWMGmlU6SdrEaalw8gpjkt1ktDy/8v0hc3l0JtaFNimDQ0/0NyRm8Z3qA9N4iyeCCCeiwO+ADr9boyx+ng6DVr18Y6fanY/skE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717746045; c=relaxed/simple;
-	bh=Gm3qXYT7sPdPu6m611tvaJ8w9yI0dFVyI6RzRJF+Wls=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K6KcsscjmEmb8qSqpjLhEDn0HRAKhF3OF2JMgQvFkMGnAkGYh4OJWKam8dHsnDzjc/Wdj+rAY/DDjtl7pe0Egsg/2Y1GQKbpH+NSi01D6iqJZS9BfAVafwqxnhsQn11V/aGzl6+Qx/0xjSIQjz1RMUnKLhxakKFmz+r2VHrN5DU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RVmhyIzO; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-52bbf73f334so178657e87.2;
-        Fri, 07 Jun 2024 00:40:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717746042; x=1718350842; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AS72jLuSxBJ0gHW3RNFPmyDKK389zQityL0CcC1+x9A=;
-        b=RVmhyIzOCdbRYr4jOZjChMeW8rFDoiET8bTmfs9uOne2caYcP2MTTINqLQu6UN91+H
-         X+RVSQ5myYvW6COLrdtA0DlyxzQwEKPEJg3RgP2Dq4l8vOAwCQ9eFJwPGf4atcQeat7H
-         UOjTqEgl/eo0glQ5o2rjDAdDd3/Kq4cME++QgM9HM8+VPLMxnFHQ6jENmP9a3vVKa6OC
-         O9O/7mXZ7sZHGM0cVViykEc//vE7oiltFNShCGlYfYROiFVD9tSqOfKheUG3h984M4lN
-         q0it7qRN6mNiM4B4UhG+9iq4u+C60hKYD6b78Q70Rkp0+HqHsfaTzD+g9LiMEZoHCjZC
-         Qvlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717746042; x=1718350842;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AS72jLuSxBJ0gHW3RNFPmyDKK389zQityL0CcC1+x9A=;
-        b=LL4mR5x5sFvFZr1BM+XVqIKbxRlsel6/k/og2fvx6uJkzKWGSGjsSbcV+HRBhCF7cR
-         gkZKA8yzaPzU35Va/KWfCjAlcJxWgC0aFhfR067+wTgx23L5B7Q2f9dcM/NUfE6IVnIA
-         X2QMx2gsfRK8lCxIGzB4b945nwu+WbD/ii9q9gMxpzuR7dvidxmLv6lcSYgdU5owFhu9
-         zzNhwIa36XhGZPV4s1r9K1G9B4PTKNMXxyLCSR0Hnd2UvoEMU8HUSbIg6aQ6h3Z0RXY7
-         xipcu/KlyIt8i+6D09/3HYc4RqbrllsGILM4z6iAo8C3i9Ejqp5RDqPedCoNfM2IDYvC
-         vXGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWQUd0Ob2/PTr4YepiLFrUhA9A+EjE7IQzD62XDuX6q0PXbCZWNp8jMmIgJ37KIus4i3Gwcwpbo+iJmoAG8ly0Dktu4uc5OiVnhljYEqvR3vcOPTfsfPxhtO0mMCgWOrNZsG3PnkHUiKdYNVUk/j4RRFenWkLr2+zFEW7IK34TvXg==
-X-Gm-Message-State: AOJu0YwiTiISmVc9bKFI63DQHOhqO1W0GBMJw/DSq0UkRPAukrxv1u0F
-	uV5c17PF0ElsferYHF2pj/450qQ3zNZ6As9x6pRSIelxSqD5PcSF
-X-Google-Smtp-Source: AGHT+IE145ugTmfzMkGbBgDc4EskumPPJu4aSr9T8VWy7YFERUgYNQr8opMDit+pmllO3+UDYOOu9w==
-X-Received: by 2002:ac2:4a9c:0:b0:52b:844f:dd10 with SMTP id 2adb3069b0e04-52bb9f83a84mr1115177e87.40.1717746041445;
-        Fri, 07 Jun 2024 00:40:41 -0700 (PDT)
-Received: from [172.27.33.107] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4215811d13esm76100585e9.24.2024.06.07.00.40.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Jun 2024 00:40:41 -0700 (PDT)
-Message-ID: <15007808-b5b1-441c-9a20-94195330b245@gmail.com>
-Date: Fri, 7 Jun 2024 10:40:38 +0300
+	s=arc-20240116; t=1717746552; c=relaxed/simple;
+	bh=xZWu/NogJC3RxPFHDArEqKEkVRgZjWbA3apIKj3gW48=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HPQstKOBuVctnL1uJa8GUx8D8fLXShRM+KTKQKgQDoj0d0vudtePGQZYes3htnSr3CtKnYcGoRDpDmLNGPX4O12mVpUk+f9JPPP9CM33zbmJVuP4BaErtVmnOnEZVkgBsCdEs0ShFQYrTqEC2wNsWqqVJAYR5sns/iMUw4hH+KA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=BD/wuHLT; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id DFE06A0A9B;
+	Fri,  7 Jun 2024 09:48:58 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=g5MlsUd6+2avonM+wjOiDCn9g5MLzJxI3u4nNsFggUo=; b=
+	BD/wuHLTH60HAn+UoL7pPGk5/mqRGVZ2tcerdfUwdCQSrsPvmavOhhe7uF4xnPuj
+	HYmA2e5/Zv0YnooV+H+gAnaC1B2yQLhAbDy8dkH51UGswqlTalTxbDZBGUzbp/dg
+	TLqmu7Sce+/jZB4CAfn+XhaPj7U5JAhgJqX/aGhn2AwJmRJXoDQgnH6VZy93a34x
+	k2uTGGITfSyibov9p0AM2BRZg3HRAUfKPBTlxWXVPOAK3kO7hziW0MnVfHffp3AR
+	lBsd2Tji8a8wyrMwfD94QfKfwZXSddjHuahwRP3F7S16E29JlP0RUUiVhvINXDL2
+	MjLkHQTuhxoRrJWPgjOb3XifIaTQgEVbr4lF64imClsBcmynZQZTJuHe0+Npdutl
+	J6M9kdDSga8ULJh02J06H5ROFp0/cIjSgu5UH6S7DysupQbnGmpkkq7pc3Rp4pvl
+	00ADGsyS0WvE/QnWlHHCWRoiwNChH4jaHqr6dOQ64UbQi0cIp4qVp1+OLuT71Gkj
+	X6eu0ql85kM5aaRC/2uy84MTpUDpvz4TdqPh9sDsoLUk1+6xIlc5KVNasf7pabyN
+	JMWxhPbTbrTB1Wu5oaJ2O8FWKFVXlmWcGXwntYOxTXa7j9p/7IXnZT7M2PJ0rO20
+	n64AD8vYnmH8Gg79/xQusCUw1nTM82MkMdyV8q0vN+M=
+From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>,
+	<trivial@kernel.org>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
+	<hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
+Subject: [RFC PATCH v2 2/2] net: include: mii: Refactor: Use bit ops for ADVERTISE_* bits
+Date: Fri, 7 Jun 2024 09:48:29 +0200
+Message-ID: <20240607074829.131378-2-csokas.bence@prolan.hu>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next v4 2/2] net/mlx5e: Add per queue netdev-genl stats
-To: Jakub Kicinski <kuba@kernel.org>, Joe Damato <jdamato@fastly.com>
-Cc: Tariq Toukan <ttoukan.linux@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, nalramli@fastly.com,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- "open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>
-References: <20240604004629.299699-1-jdamato@fastly.com>
- <20240604004629.299699-3-jdamato@fastly.com>
- <11b9c844-a56e-427f-aab3-3e223d41b165@gmail.com>
- <ZmIwIJ9rxllqQT18@LQ3V64L9R2> <20240606171942.4226a854@kernel.org>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20240606171942.4226a854@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1717746538;VERSION=7972;MC=3831874360;ID=410158;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29916D3B54627061
+
+Replace hex values with bit shift and __GENMASK() for readability
+
+Cc: trivial@kernel.org
+
+Signed-off-by: "Csókás, Bence" <csokas.bence@prolan.hu>
+---
+
+Notes:
+    Changes since v2:
+    * Replace BIT() with bit shift, as the macro is not exported to userspace
+    * Use __GENMASK(), exported into userspace in 3c7a8e190bc5
+    
+    (yesterday I accidentally sent v1 again, this is the correct v2)
+
+ include/uapi/linux/mii.h | 35 ++++++++++++++++++-----------------
+ 1 file changed, 18 insertions(+), 17 deletions(-)
+
+diff --git a/include/uapi/linux/mii.h b/include/uapi/linux/mii.h
+index 33e1b0c717e4..3fbc113a0f70 100644
+--- a/include/uapi/linux/mii.h
++++ b/include/uapi/linux/mii.h
+@@ -9,6 +9,7 @@
+ #ifndef _UAPI__LINUX_MII_H__
+ #define _UAPI__LINUX_MII_H__
+ 
++#include <linux/bits.h>
+ #include <linux/types.h>
+ #include <linux/ethtool.h>
+ 
+@@ -69,23 +70,23 @@
+ #define BMSR_100BASE4		0x8000	/* Can do 100mbps, 4k packets  */
+ 
+ /* Advertisement control register. */
+-#define ADVERTISE_SLCT		0x001f	/* Selector bits               */
+-#define ADVERTISE_CSMA		0x0001	/* Only selector supported     */
+-#define ADVERTISE_10HALF	0x0020	/* Try for 10mbps half-duplex  */
+-#define ADVERTISE_1000XFULL	0x0020	/* Try for 1000BASE-X full-duplex */
+-#define ADVERTISE_10FULL	0x0040	/* Try for 10mbps full-duplex  */
+-#define ADVERTISE_1000XHALF	0x0040	/* Try for 1000BASE-X half-duplex */
+-#define ADVERTISE_100HALF	0x0080	/* Try for 100mbps half-duplex */
+-#define ADVERTISE_1000XPAUSE	0x0080	/* Try for 1000BASE-X pause    */
+-#define ADVERTISE_100FULL	0x0100	/* Try for 100mbps full-duplex */
+-#define ADVERTISE_1000XPSE_ASYM	0x0100	/* Try for 1000BASE-X asym pause */
+-#define ADVERTISE_100BASE4	0x0200	/* Try for 100mbps 4k packets  */
+-#define ADVERTISE_PAUSE_CAP	0x0400	/* Try for pause               */
+-#define ADVERTISE_PAUSE_ASYM	0x0800	/* Try for asymetric pause     */
+-#define ADVERTISE_RESV		0x1000	/* Unused...                   */
+-#define ADVERTISE_RFAULT	0x2000	/* Say we can detect faults    */
+-#define ADVERTISE_LPACK		0x4000	/* Ack link partners response  */
+-#define ADVERTISE_NPAGE		0x8000	/* Next page bit               */
++#define ADVERTISE_SLCT		__GENMASK(4, 0)	/* Selector bits               */
++#define ADVERTISE_CSMA		(1 << 0)	/* Only selector supported     */
++#define ADVERTISE_10HALF	(1 << 5)	/* Try for 10mbps half-duplex  */
++#define ADVERTISE_1000XFULL	(1 << 5)	/* Try for 1000BASE-X full-duplex */
++#define ADVERTISE_10FULL	(1 << 6)	/* Try for 10mbps full-duplex  */
++#define ADVERTISE_1000XHALF	(1 << 6)	/* Try for 1000BASE-X half-duplex */
++#define ADVERTISE_100HALF	(1 << 7)	/* Try for 100mbps half-duplex */
++#define ADVERTISE_1000XPAUSE	(1 << 7)	/* Try for 1000BASE-X pause    */
++#define ADVERTISE_100FULL	(1 << 8)	/* Try for 100mbps full-duplex */
++#define ADVERTISE_1000XPSE_ASYM	(1 << 8)	/* Try for 1000BASE-X asym pause */
++#define ADVERTISE_100BASE4	(1 << 9)	/* Try for 100mbps 4k packets  */
++#define ADVERTISE_PAUSE_CAP	(1 << 10)	/* Try for pause               */
++#define ADVERTISE_PAUSE_ASYM	(1 << 11)	/* Try for asymmetric pause     */
++#define ADVERTISE_RESV		(1 << 12)	/* Unused...                   */
++#define ADVERTISE_RFAULT	(1 << 13)	/* Say we can detect faults    */
++#define ADVERTISE_LPACK		(1 << 14)	/* Ack link partners response  */
++#define ADVERTISE_NPAGE		(1 << 15)	/* Next page bit               */
+ 
+ #define ADVERTISE_FULL		(ADVERTISE_100FULL | ADVERTISE_10FULL | \
+ 				  ADVERTISE_CSMA)
+-- 
+2.34.1
 
 
-On 07/06/2024 3:19, Jakub Kicinski wrote:
-> On Thu, 6 Jun 2024 14:54:40 -0700 Joe Damato wrote:
->>>> Compare the values in /proc/net/dev match the output of cli for the same
->>>> device, even while the device is down.
->>>>
->>>> Note that while the device is down, per queue stats output nothing
->>>> (because the device is down there are no queues):
->>>
->>> This part is not true anymore.
->>
->> It is true with this patch applied and running the command below.
->> Maybe I should have been more explicit that using cli.py outputs []
->> when scope = queue, which could be an internal cli.py thing, but
->> this is definitely true with this patch.
->>
->> Did you test it and get different results?
-> 
-> To avoid drivers having their own interpretations what "closed" means,
-> core hides all queues in closed state:
-> 
-> https://elixir.bootlin.com/linux/v6.10-rc1/source/net/core/netdev-genl.c#L582
-> 
-
-Oh, so the kernel doesn't even call the driver's 
-mlx5e_get_queue_stats_rx/tx callbacks if interface is down. Although our 
-driver can easily satisfy the query and provide the stats.
-
-I think the kernel here makes some design assumption about the stats, 
-and enforces it on all vendor drivers.
-I don't think it's a matter of "closed channel" interpretation, it's 
-more about persistent stats.
-IMO the kernel should be generic enough to let both designs (persistent 
-and non-persistent stats) integrate naturally with this new queue 
-netdev-genl stats feature.
-
->>> PTP RQ index is naively assigned to zero:
->>> rq->ix           = MLX5E_PTP_CHANNEL_IX;
->>>
->>> but this isn't to be used as the stats index.
->>> Today, the PTP-RQ has no matcing rxq in the kernel level.
->>> i.e. turning PTP-RQ on won't add a kernel-level RXQ to the
->>> real_num_rx_queues.
->>> Maybe we better do.
->>> If not, and the current state is kept, the best we can do is let the PTP-RQ
->>> naively contribute its queue-stat to channel 0.
->>
->> OK, it sounds like the easiest thing to do is just count PTP as
->> channel 0, so if i == 0, I'll in the PTP stats.
->>
->> But please see below regarding testing whether or not PTP is
->> actually enabled or not.
-> 
-> If we can I think we should avoid making queue 0 too special.
-> If someone configures steering and only expects certain packets on
-> queue 0 - getting PTP counted there will be a surprise.
-> I vote to always count it towards base.
-
-+1, let's count PTP RX in the base, especially that it has no matching 
-kernel-level rxq.
-
-Another option is to add one more kernel rxq for it (i.e. set 
-real_num_rx_queues to num_channels + 1). But, that would be a bigger 
-change, we can keep it for a followup discussion.
 
