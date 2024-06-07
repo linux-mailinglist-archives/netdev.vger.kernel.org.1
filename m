@@ -1,150 +1,129 @@
-Return-Path: <netdev+bounces-101976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 874C3900DA0
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 23:41:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D6E0900E09
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 00:28:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B6FA1C214F6
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 21:41:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C47061C20D0D
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 22:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 694C8155739;
-	Fri,  7 Jun 2024 21:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12122155354;
+	Fri,  7 Jun 2024 22:28:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Z9DKg3SF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N6PGMJVo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9A8155341
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 21:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D30814533D;
+	Fri,  7 Jun 2024 22:28:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717796480; cv=none; b=ba8Aayhrh0YCtUOf6YHjG0EReIR1loHm81GLLA0as2YElQSKsJlUnEN66C8k1IYjRYugADH51O+oYGtTANAeVKdynmtwUUXchmQpXEtxq00BpUGdmSEwk3M7pfeg+DkEn0/yKdC9bmOtjR0V6GU+DHF4G056mIJJPvFYoIc03g0=
+	t=1717799298; cv=none; b=H6a/tAGMof1fr5sTifMbq8oicmqD3q4DciVvuOfNgwxNvbE9DZ+itqtyEO/v1C/9b6kVPzsyMnLuzFF4MmXgVLoz5owBOPZDbBG+tpCCKB3xa+6zgVk0pkZkiK/r6E+5kPqbd5mIeAAO55QAfHwivsCjyNPmIJfR43q7drp41uA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717796480; c=relaxed/simple;
-	bh=+zDHm0gqEYnNElTfpQqNXDS5sE+4HW2XfxQCpQQCbSE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pyQHtQf02d7HCLiK9d7994oV2xRtwK1dOu5UMmT4AwVERee3vBEfBKeAIUVWkY2NRQ142MbLwCQrYICtx8cslcmOkObl1mNrg+j33WYymt1Zv837JVwbUGnKP/fiBKyw2LmZ5QZ6lgMwDAhlXlvTL4HFWCXc2Mx0BFMUGsRAHU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Z9DKg3SF; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1f480624d10so24411005ad.1
-        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 14:41:18 -0700 (PDT)
+	s=arc-20240116; t=1717799298; c=relaxed/simple;
+	bh=l/MrSi5lk5PVhPYbVtxedDFG6aG0Vvkjcl8AeXQ8zoI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bwLxaLTCdFwpi6IeHGrH5z6K9Ls6t6QHeA4+EERZ5KseMpp6vpRUUB38z4BrtCIz6agcjyh9Jbw3CC+htoU5lKCLwXAyw3G67sO16kcTiPzW2q+DksYrYe0GrPytHeuiC+oZBy6gWE1cf9Vs3xu7SsW6PLJ5nez0xcICBXXo1Dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N6PGMJVo; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52bd48cf36bso878194e87.3;
+        Fri, 07 Jun 2024 15:28:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1717796478; x=1718401278; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M6hr5Pgg5LYV8IvTkAUUqijfPi8ple/giWX7dtweBwU=;
-        b=Z9DKg3SFZv5D/L1UQYIGoZFTmyjArQ+DavEzSWG/A77KkhIYYrzIKCXeChJFXL3HrI
-         q0ocBiSI0p7j7VheYjrOKzdy91QRGaZSsGsZF+6Pa05N38HKd1k0NA6l+2MyX5ehLhhh
-         uxYxtc/y64gC8zpMQUhC7YDDSQhWokBTiKfsA=
+        d=gmail.com; s=20230601; t=1717799294; x=1718404094; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=k4BkUg/TA3tRYPVfwl6zlyTMojUBhX6Gv43Vrpcb6ng=;
+        b=N6PGMJVoRUG/Z/4lhTKZv5P3bFloxFc0P1kBtYK9rK26wuWA1vTzWW+T4guDmW8zAs
+         uZkAw7S+vyDs1WS2YU3ugldvvxpRL2PpNImjTwH+qONltOXycMvpgksyeo/uxbrhckZg
+         0thbyWM8QDIJNGHKQPRy2WmzuC/KDMzoXiIE/ZgrqMk9ItrAhv/EjOUKAee4969f5K/6
+         7n1BMhyASS7zitBm3tge2PfC89hNhmHr2MdDod2lVKVNWzRh/6aZw0UfuZkrhgQlwuG/
+         TFZebLip7l+7M7Zc5CGkDCyatsuM6Wzb2OPP0wh0Xf/kacdXp3C3jNSyYZvnWbJCcmin
+         xlDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717796478; x=1718401278;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M6hr5Pgg5LYV8IvTkAUUqijfPi8ple/giWX7dtweBwU=;
-        b=cdfgQuooeo9lFB1rZjfEFhQFAR4fyebn+BKjf5EV9KD2qhkWhtLiv603NPI+O1q+/N
-         QoRWjzeGtYczSu8yufrHUJvly/qDjwekIGF5jZdUCp6YhzU73lLqMMRUKZJRbrCAzWi4
-         xXX9F0yhWC0d7K8tWcuWgcrzJ+T7PTPannQpFOIX/kQT8IolMQEjYEXbZaA5siPVlXQ4
-         5qPdlhmryEhpPhISqdyI1XB15HN46D1Dl7GlOcf1l3dnUK6t4NI+Ae0OAg8c/9LxgXuG
-         S5n+cdpsCiO4Myy3QjDIEoBFI0CmOVQb8NIOP6PCeNo46m/ZGkG+W6A3f4JG13nZF7Jz
-         GfvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXaw1YFf513CZwP4xZWgW2uO4Uah3tPiaMX+jGoK0d42hMTylphTKE1M0u3Zi/f/+uWPUPIdvVJi3Exprf5l34CEDN+wRA0
-X-Gm-Message-State: AOJu0YxxL5RlKo/5Gn9cF6CURjWDwMSNOAhR9KumW2Qw1yEmbJu7HQnK
-	+tEpQLnNqew/WAzETVcyItV7x7+chF5yz4DW6iQPVaJE4gbl+uB58kjb+XsPVA==
-X-Google-Smtp-Source: AGHT+IGiZCcvwDTTBj7Ig57bQR4C0/0ASjRxvCbyRtjYCP4HgXPQ023nqZONfn0Hr6ef/ygn+LzbUg==
-X-Received: by 2002:a17:902:c94f:b0:1f6:8a19:4562 with SMTP id d9443c01a7336-1f6dfc426d6mr27231345ad.24.1717796478156;
-        Fri, 07 Jun 2024 14:41:18 -0700 (PDT)
-Received: from ubuntu-vm.dhcp.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd7e189fsm38946805ad.215.2024.06.07.14.41.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jun 2024 14:41:17 -0700 (PDT)
-From: Kuntal Nayak <kuntal.nayak@broadcom.com>
-To: stable@vger.kernel.org,
-	gregkh@linuxfoundation.org
-Cc: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	fw@strlen.de,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	vasavi.sirnapalli@broadcom.com,
-	Ziyang Xuan <william.xuanziyang@huawei.com>,
-	Kuntal Nayak <kuntal.nayak@broadcom.com>
-Subject: [PATCH 2/2 v5.10] netfilter: nf_tables: Fix potential data-race in __nft_obj_type_get()
-Date: Fri,  7 Jun 2024 14:37:35 -0700
-Message-Id: <20240607213735.46127-2-kuntal.nayak@broadcom.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240607213735.46127-1-kuntal.nayak@broadcom.com>
-References: <20240607213735.46127-1-kuntal.nayak@broadcom.com>
+        d=1e100.net; s=20230601; t=1717799294; x=1718404094;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=k4BkUg/TA3tRYPVfwl6zlyTMojUBhX6Gv43Vrpcb6ng=;
+        b=hwGh+boWsNdppcmm3WnBfcpWEEhMgq/lactYXCqXi9qVyV2vf6UvcyhVJYxAnE5gTI
+         AUzApsYLWazntfuWP1Flphd4WJB99v4R5KeZsFd9iTEvr1BtQbz1qQzv7RQLoLGkiWmD
+         QDxqkCHdS97uEHc/ddnlhf9o7+PGp3OzMcYB/OxnQPvPHgVk/9KDJtVVDX5nIYdDzsqM
+         YUegFyFgKiI/Ek416Et78yCyLsmBBAYAr0I3wJ/OkNimtqc+YQXFKwReP8ehfxbF0k5X
+         Mc4A/cg+eIMimF1wSsGjrZWKbXyMHIEfZxtOW0lr8LIkxIo3NIFiJWNYFequpy5UFm4c
+         j9rA==
+X-Forwarded-Encrypted: i=1; AJvYcCV7uMDaxxj52Dq0z3QVyz0Z6kT6e+F7ODE0Md18W2cLUyYat+cA2FZT7Ny/S4ktZWy1HlmAjIwoVximjPB8NFLgMAxddWYzSV+hLQZT
+X-Gm-Message-State: AOJu0YyQNm3+7E7aGLrPkibr6/FLYXLXBkwrUHTw9QxSpcZ+HfA5SPY+
+	iDAd2Zz2v4GlLsocyzpq45ZjxQxREPtu1M5SNv7s6MeUonrsTnbW
+X-Google-Smtp-Source: AGHT+IFKhhMBptFKALqKje48pRi2hZGZ0cjPVsMJ6FqppKEsD8Zktc7poDtemXuD1UC1Dzh9PB46+w==
+X-Received: by 2002:ac2:4854:0:b0:522:2c9b:63b7 with SMTP id 2adb3069b0e04-52bb9f68965mr2292504e87.14.1717799294139;
+        Fri, 07 Jun 2024 15:28:14 -0700 (PDT)
+Received: from [192.168.0.5] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-421580fe343sm99432215e9.6.2024.06.07.15.28.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Jun 2024 15:28:13 -0700 (PDT)
+Message-ID: <30d71968-d32d-4121-b221-d95a4cdfedb8@gmail.com>
+Date: Sat, 8 Jun 2024 01:28:48 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 2/2] net: wwan: Fix SDX72 ping failure issue
+To: Slark Xiao <slark_xiao@163.com>, loic.poulain@linaro.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ manivannan.sadhasivam@linaro.org
+References: <20240607100309.453122-1-slark_xiao@163.com>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <20240607100309.453122-1-slark_xiao@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Ziyang Xuan <william.xuanziyang@huawei.com>
+Hello Slark,
 
-[ upstream commit d78d867dcea69c328db30df665be5be7d0148484 ]
+without the first patch it is close to impossible to understand this 
+one. Next time please send such tightly connected patches to both 
+mailing lists.
 
-nft_unregister_obj() can concurrent with __nft_obj_type_get(),
-and there is not any protection when iterate over nf_tables_objects
-list in __nft_obj_type_get(). Therefore, there is potential data-race
-of nf_tables_objects list entry.
+On 07.06.2024 13:03, Slark Xiao wrote:
+> For SDX72 MBIM device, it starts data mux id from 112 instead of 0.
+> This would lead to device can't ping outside successfully.
+> Also MBIM side would report "bad packet session (112)".
+> So we add a link id default value for these SDX72 products which
+> works in MBIM mode.
+> 
+> Signed-off-by: Slark Xiao <slark_xiao@163.com>
 
-Use list_for_each_entry_rcu() to iterate over nf_tables_objects
-list in __nft_obj_type_get(), and use rcu_read_lock() in the caller
-nft_obj_type_get() to protect the entire type query process.
+Since it a but fix, it needs a 'Fixes:' tag.
 
-Fixes: e50092404c1b ("netfilter: nf_tables: add stateful objects")
-Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-Signed-off-by: Kuntal Nayak <kuntal.nayak@broadcom.com>
----
- net/netfilter/nf_tables_api.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+> ---
+>   drivers/net/wwan/mhi_wwan_mbim.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
+> index 3f72ae943b29..4ca5c845394b 100644
+> --- a/drivers/net/wwan/mhi_wwan_mbim.c
+> +++ b/drivers/net/wwan/mhi_wwan_mbim.c
+> @@ -618,7 +618,8 @@ static int mhi_mbim_probe(struct mhi_device *mhi_dev, const struct mhi_device_id
+>   	mbim->rx_queue_sz = mhi_get_free_desc_count(mhi_dev, DMA_FROM_DEVICE);
+>   
+>   	/* Register wwan link ops with MHI controller representing WWAN instance */
+> -	return wwan_register_ops(&cntrl->mhi_dev->dev, &mhi_mbim_wwan_ops, mbim, 0);
+> +	return wwan_register_ops(&cntrl->mhi_dev->dev, &mhi_mbim_wwan_ops, mbim,
+> +		mhi_dev->mhi_cntrl->link_id ? mhi_dev->mhi_cntrl->link_id : 0);
 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index de56f25dc..f3cb5c920 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -6238,7 +6238,7 @@ static const struct nft_object_type *__nft_obj_type_get(u32 objtype, u8 family)
- {
- 	const struct nft_object_type *type;
- 
--	list_for_each_entry(type, &nf_tables_objects, list) {
-+	list_for_each_entry_rcu(type, &nf_tables_objects, list) {
- 		if (type->family != NFPROTO_UNSPEC &&
- 		    type->family != family)
- 			continue;
-@@ -6254,9 +6254,13 @@ nft_obj_type_get(struct net *net, u32 objtype, u8 family)
- {
- 	const struct nft_object_type *type;
- 
-+	rcu_read_lock();
- 	type = __nft_obj_type_get(objtype, family);
--	if (type != NULL && try_module_get(type->owner))
-+	if (type != NULL && try_module_get(type->owner)) {
-+		rcu_read_unlock();
- 		return type;
-+	}
-+	rcu_read_unlock();
- 
- 	lockdep_nfnl_nft_mutex_not_held();
- #ifdef CONFIG_MODULES
--- 
-2.39.3
+Is it possible to drop the ternary operator and pass the link_id directly?
+
+>   }
+>   
+>   static void mhi_mbim_remove(struct mhi_device *mhi_dev)
 
 
