@@ -1,133 +1,142 @@
-Return-Path: <netdev+bounces-101774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B2A190008C
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:20:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75CBF900093
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:21:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE2D4286435
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:20:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12025B22473
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9537B15B967;
-	Fri,  7 Jun 2024 10:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PfDtFfM2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A267115B55F;
+	Fri,  7 Jun 2024 10:21:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257CA433C7
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 10:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE802156F5A;
+	Fri,  7 Jun 2024 10:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717755602; cv=none; b=nUhM8MxHSIlp3C47rhP0kHjvFACRAUU56dWBpUGdPiVAl6ytCzKsWwqfdznlRTYTztJBQ3hhZxnNohYPDb3/x2+zW5MBD2zQWUcfJJqgeWaCP8KT2YOKRR3m2oXemhVaAcoWqwYAD8pL7Ems2qCqWEFDigPQ7lqoDMBB1KYExuc=
+	t=1717755662; cv=none; b=ojytE89jeLCSJ2zd/fDISk2RRySW2lAO0Iznwy7JTe4dfBsb/AIDRzwhZ7mD1Yrq+xu1VOR58dBUfTZS6Hu7ljswcl3uigytP1ZXLOjl1LuObDg7n6mC4AUEIQqv9SwiMcGrvDNffF/dwBdGNYwDilHqq/6ad9+ww1sIT2cpQ7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717755602; c=relaxed/simple;
-	bh=vTEZCukUMXcbXJO9IWA8dOisP930Ku2NFFH6hnITE2Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pXqWU01hozoU1Qi3y8eA1k/gmLL6kPizbsI0CbyTqniJgN3dS+znDYelkf6HYf6jZoDil4za/IVwQj6YIeJXw3drARVJMdh6kB5F9kS5n8YH5GtYADanC7fQ6LiCBPkl4SUCvYaVFtkOMpFTC3D5uyE42cstAgDT3xu0D18XkR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PfDtFfM2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717755600;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S/k0UOD2XzT93LwcNZDcZVp/aAS4aZSAyvm1MCnMlto=;
-	b=PfDtFfM2eG+cuDutfDMP6KR7ZkH5nt6fQIE4Nptr7BcITM0+QIjW4MbQ/9mWWQdq4ZsiIo
-	oRe6Ot2HC+7z8ToHKybl4xOg5OZXwMY0nwrfwwik1hnytlAoXX5+oxYzfB1FULWfcIJY7z
-	JAPrlR4l+swxMPzhD3pQcd14h/tPpcE=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-593-F165Pgr6OSOGRLz_Fe9ilA-1; Fri, 07 Jun 2024 06:19:59 -0400
-X-MC-Unique: F165Pgr6OSOGRLz_Fe9ilA-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a6c82d264ccso89255266b.2
-        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 03:19:58 -0700 (PDT)
+	s=arc-20240116; t=1717755662; c=relaxed/simple;
+	bh=nd+4BToiRJXLGGA3mTGlxCpZ4MPw9XkWR9N7avm/dGs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=evnW25N8fOvFbXhs+WUCAunc2eemQfQZ2EJhXl+I8M15PZaBq0s6IYArIE0mICGJ8xBH1TZJD0G13BFRMsnqgzjMDeqO9qOlWlljKXQapjB8X5Is+kgO3p1f4BBZ91xWC1GXVyPP70ymqCegvG4c+VqXAQWVLobNvMW9q3XzPRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a6e349c0f2bso41964866b.2;
+        Fri, 07 Jun 2024 03:21:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717755598; x=1718360398;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S/k0UOD2XzT93LwcNZDcZVp/aAS4aZSAyvm1MCnMlto=;
-        b=mtH5nPQoiidaWv/URuLAAqF+OV7Q6LfyvKidyym/QNyUFZ1N4MoUf7QuxjigFn+5EU
-         CjKySQ0QaAUxJb4wp96nYrugLcyYatCPNvjUvujKW+iqQoyYX/40uCeHKH4VcsFFsVB1
-         q7ikaxkrn+qsldXy/rMncj1mx0ybOmUtmFFXZfdEfJFocpVlSTlD183VEQ4+xe+52SiN
-         v2a63ZfbCMWrdKAT2D+4b5ZtHA63ANHHuypAfMM8kR8ritFQ62fbRI/bE1V+UBrTvwAv
-         MM+stLmFNPXS7gPWKXF0CwIDFWAOoubWfe33CwhfuoeWrC7f32AGulp9nqmbWCz56JOt
-         b3ig==
-X-Forwarded-Encrypted: i=1; AJvYcCX0WlUGXJvi3SI1StjDiREOQ9BPVi7v//5BSUjsWoxiK9070tQQIVvokhUycLvRsUmhF9rrBxaWf0W9Xy4cep/rH3kj4zmv
-X-Gm-Message-State: AOJu0YwPkI3jqqJLBu2A1vVjIkPSWaSuvirLBLfB87GWPSD+sz0gh8CY
-	yBNMYY4cc/86/J4mBh4o0nM1qGVuhp2qBRYsyag2pOhKrPcEhggT4AJtzy591xqyn9nNBY4igGg
-	wWY32RMXddpEddXcRDw3KMzsQLZvSgi0j4hDKX7yUxc6zw4A7ZzsrYg==
-X-Received: by 2002:a17:906:1115:b0:a68:c6e5:3574 with SMTP id a640c23a62f3a-a6cdc0e40cemr136190766b.75.1717755597987;
-        Fri, 07 Jun 2024 03:19:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGpxxlwVPDRCJiZJv2Ua4GosyAN37/Sah9MwXT24eqOxTcjruBidwO3ep0dAi45T+RHQ8P8dQ==
-X-Received: by 2002:a17:906:1115:b0:a68:c6e5:3574 with SMTP id a640c23a62f3a-a6cdc0e40cemr136188466b.75.1717755597601;
-        Fri, 07 Jun 2024 03:19:57 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:c32:7800:5bfa:a036:83f0:f9ec? (2001-1c00-0c32-7800-5bfa-a036-83f0-f9ec.cable.dynamic.v6.ziggo.nl. [2001:1c00:c32:7800:5bfa:a036:83f0:f9ec])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6c806eaedesm223566166b.119.2024.06.07.03.19.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Jun 2024 03:19:57 -0700 (PDT)
-Message-ID: <5d037003-a90b-4607-8eb6-6fdd5824e373@redhat.com>
-Date: Fri, 7 Jun 2024 12:19:56 +0200
+        d=1e100.net; s=20230601; t=1717755659; x=1718360459;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3wleu//OAE2cyfcBt+2g23v6CQm8bhtCW5SGTOJfzMc=;
+        b=sw0Oxrroaq2bA4fbpgrPmgkbPMuAOAKXKyXx8PNktZUlu3VUx8wdYlogreO+Dw5hdQ
+         CEy2gSsMCserFOBvI2mzpIxAkZT0ges901m7nrc8hU4wTCFVB1HTQ58gU/tJzNPDLQ2r
+         hMTWVE3FHupWkL1r/K01pJ1uAYpktXEaQJG+iF5FWzke2gFqw+A9FALF28K9arQtKRgj
+         nC4dq1w4b8EFNi+ft0mq38gu9wju2AUYYpxabewAQ9U9Q29lsolJePi/Y0XnTFgafGMC
+         m4B0AR7cDiwvsyTZBJN1f7HHCVrjZZE8I/GW/DIycejeb9bSE+43mx++jF5V6f5Nr7Lm
+         2Tow==
+X-Forwarded-Encrypted: i=1; AJvYcCVuPGD+TcfWfFgaBZ4VKu2VOU/c8AJIpE3LUJcT7m+PR+yLN2sIL5bq/tbxyXbj7q1AVWJ9xGP5e7gITeTUM7cexvhPhuKn8dFrfyF+lkJsjuU8ZvBOxDAoddrxSPdmMx9NZRZwEf8sshumVWeF0czX4r2oLxrOfl6fF0B0KQb0wEZh0vk=
+X-Gm-Message-State: AOJu0YxGOGI3JvJxfiBSc825ZOrWpHzlnUXSnN1E8NdB2ZPQ/w89XQiy
+	qLsALdMTVbg5dmYv9Eo7JfTeD+63/uo8OsGA3KR/htns9WYk12o7
+X-Google-Smtp-Source: AGHT+IEyyLJRYOtiSgR04GeTyfW24MKvLfnpXDDvS3JofL34QAj8qDmKfpKJ/W6nPTYpqmlU81mH7w==
+X-Received: by 2002:a17:906:11c8:b0:a6c:704b:cff1 with SMTP id a640c23a62f3a-a6cd76a9344mr136254766b.41.1717755657977;
+        Fri, 07 Jun 2024 03:20:57 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-008.fbsv.net. [2a03:2880:30ff:8::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6c80581a7esm226683666b.36.2024.06.07.03.20.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jun 2024 03:20:57 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: kvalo@kernel.org,
+	linux-wireless@vger.kernel.org,
+	Johannes Berg <johannes@sipsolutions.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: horms@kernel.org,
+	sbhatta@marvell.com,
+	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH wifi-next 1/2] wifi: mac80211: Move stats allocation to core
+Date: Fri,  7 Jun 2024 03:20:43 -0700
+Message-ID: <20240607102045.235071-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Hung tasks due to a AB-BA deadlock between the leds_list_lock
- rwsem and the rtnl mutex
-To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>
-Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
- Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
- Linux LEDs <linux-leds@vger.kernel.org>,
- Heiner Kallweit <hkallweit1@gmail.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, johanneswueller@gmail.com,
- "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Genes Lists <lists@sapience.com>
-References: <9d189ec329cfe68ed68699f314e191a10d4b5eda.camel@sapience.com>
- <15a0bbd24cd01bd0b60b7047958a2e3ab556ea6f.camel@sapience.com>
- <ZliHhebSGQYZ/0S0@shell.armlinux.org.uk>
- <42d498fc-c95b-4441-b81a-aee4237d1c0d@leemhuis.info>
- <618601d8-f82a-402f-bf7f-831671d3d83f@redhat.com>
- <01fc2e30-eafe-495c-a62d-402903fd3e2a@lunn.ch>
- <9d821cea-507f-4674-809c-a4640119c435@redhat.com>
- <c912d1f7-7039-4f55-91ac-028a906c1387@lunn.ch>
- <20240606063902.776794d4@kernel.org>
-Content-Language: en-US, nl
-From: Hans de Goede <hdegoede@redhat.com>
-In-Reply-To: <20240606063902.776794d4@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi,
+With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
+convert veth & vrf"), stats allocation could be done on net core instead
+of this driver.
 
-On 6/6/24 3:39 PM, Jakub Kicinski wrote:
-> On Thu, 6 Jun 2024 15:12:54 +0200 Andrew Lunn wrote:
->>> So it has been almost a week and no reply from Heiner. Since this is
->>> causing real issues for users out there I think a revert of 66601a29bb23
->>> should be submitted to Linus and then backported to the stable kernels.
->>> to fix the immediate issue at hand.  
->>
->> Agreed.
-> 
-> Please submit..
+With this new approach, the driver doesn't have to bother with error
+handling (allocation failure checking, making sure free happens in the
+right spot, etc). This is core responsibility now.
 
-Done: https://lore.kernel.org/linux-leds/20240607101847.23037-1-hdegoede@redhat.com/
+Move mac80211 driver to leverage the core allocation.
 
-Regards,
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ net/mac80211/iface.c | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
 
-Hans
-
-
-
+diff --git a/net/mac80211/iface.c b/net/mac80211/iface.c
+index dc42902e2693..605305cb3ff2 100644
+--- a/net/mac80211/iface.c
++++ b/net/mac80211/iface.c
+@@ -1458,11 +1458,6 @@ int ieee80211_do_open(struct wireless_dev *wdev, bool coming_up)
+ 	return res;
+ }
+ 
+-static void ieee80211_if_free(struct net_device *dev)
+-{
+-	free_percpu(dev->tstats);
+-}
+-
+ static void ieee80211_if_setup(struct net_device *dev)
+ {
+ 	ether_setup(dev);
+@@ -1470,7 +1465,6 @@ static void ieee80211_if_setup(struct net_device *dev)
+ 	dev->priv_flags |= IFF_NO_QUEUE;
+ 	dev->netdev_ops = &ieee80211_dataif_ops;
+ 	dev->needs_free_netdev = true;
+-	dev->priv_destructor = ieee80211_if_free;
+ }
+ 
+ static void ieee80211_iface_process_skb(struct ieee80211_local *local,
+@@ -2101,11 +2095,7 @@ int ieee80211_if_add(struct ieee80211_local *local, const char *name,
+ 
+ 		dev_net_set(ndev, wiphy_net(local->hw.wiphy));
+ 
+-		ndev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
+-		if (!ndev->tstats) {
+-			free_netdev(ndev);
+-			return -ENOMEM;
+-		}
++		ndev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+ 
+ 		ndev->needed_headroom = local->tx_headroom +
+ 					4*6 /* four MAC addresses */
+@@ -2118,7 +2108,6 @@ int ieee80211_if_add(struct ieee80211_local *local, const char *name,
+ 
+ 		ret = dev_alloc_name(ndev, ndev->name);
+ 		if (ret < 0) {
+-			ieee80211_if_free(ndev);
+ 			free_netdev(ndev);
+ 			return ret;
+ 		}
+-- 
+2.43.0
 
 
