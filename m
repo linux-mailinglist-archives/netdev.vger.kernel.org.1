@@ -1,237 +1,386 @@
-Return-Path: <netdev+bounces-101783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0BAC900102
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:35:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B2890011F
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:46:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8049D1C229AE
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:35:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 289601C22733
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:46:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BD415CD72;
-	Fri,  7 Jun 2024 10:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91BD117B40B;
+	Fri,  7 Jun 2024 10:46:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DYpV2JWi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB04C156972;
-	Fri,  7 Jun 2024 10:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.178.238
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717756465; cv=fail; b=Uu07jR3b1IiBm8IjpzB4wHDkmUTWuzO1wSsqn7K7DMEepYN4jKsStaLIktpHA1gGkUHhl3Pn/h4nr5xNWYGAcHxq4kdqNI1C/s5Cee5IKmqfL+K+wQiP6J93mSHvpzaCBIuRGGllvtPhCpLU/YkQg4L+0wy2wh7rE2R60GbPto8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717756465; c=relaxed/simple;
-	bh=rjZaXyjSausDnFlBhxOIDTpAKHQoXaReIRu3ZorQmfU=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=F6FIBjuk8T7xMnlkFB1Xz2IKouK5nep374ItB1xwegP0Og3iVekLOIf1L0b9Tb8atB+urt47R5q+SXbLe2i8rzfznfnILkCzZ4gCbCXiGOnJRh99HR7Lcmkxpeij7pan4Mfr8gtIuOpAZJF1NE3+YRTvyoYVbjQPj96ouDUUIkc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=fail smtp.client-ip=205.220.178.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 457AM6dh020553;
-	Fri, 7 Jun 2024 10:33:51 GMT
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2100.outbound.protection.outlook.com [104.47.58.100])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3yfruxea0h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Jun 2024 10:33:51 +0000 (GMT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P05tDPfStYc3s3lgO456eHJxNNbZd2ulWLrDHci+di2IQK8KoqviZohMKM/G31y0lxfDloUAvUweCkcZkVw8pJ/nUTEA0zkNsNzN/sTxZYCslsMBCJ5WizYRpRcd42We/yjyridLAXT2ZLnsCfJ3mFrTTpTgSz4zIsFeQkMHifnvh6dptJtOPv1zlswqM1a+xFLRjjijKLEs5AmZlQqUAnudpSL7H8PXTHSZGASeM6fQsaKKfTF9zeSVx4mbmIVT62MMEvMCT8/TmdLUhOWyxbO16FC0e65GBZZxSUw5i7kl9vEf3gBZC+0pPp5GYo0DI/ij6cEhWrr7H7TgS+4OJA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XG9vdgK7W6pW8fRdx3UMmAkUSvhpemsSO7K7VMLOQug=;
- b=GiXFOj/LSpUvZvHt8dYWH8aGFGh92Mgq5yGaP9O+iFUwU7Ve1F/N70NGC+3M3V4z9przOE4A7DSJH6+3hM8gpXkFWHo0mUxIXzDprfsQYWq4I2J622UCyBq0kmF2KJM7IoJY2SbQg5dzKNH9BTDtPkgGyMhGsmxNnJHuS9D4LjZcVVvEPB/7afAfg2afjsUrcaba5W4T4swHlLyFz6y8xuCiXeScrY1CHnGZqY45IMFUNTVbw31AZ6IRc+3573SVvsugBTxYls/V+GGRoAPCppwSso3uMm0i3pb9CbYmoECi5Ni5TLEWCHUE9ku7jvJgLONVP38Z9HidQTJe62dYCg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=windriver.com; dmarc=pass action=none
- header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
-Received: from MW5PR11MB5764.namprd11.prod.outlook.com (2603:10b6:303:197::8)
- by CO1PR11MB5137.namprd11.prod.outlook.com (2603:10b6:303:92::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.33; Fri, 7 Jun
- 2024 10:33:49 +0000
-Received: from MW5PR11MB5764.namprd11.prod.outlook.com
- ([fe80::3c2c:a17f:2516:4dc8]) by MW5PR11MB5764.namprd11.prod.outlook.com
- ([fe80::3c2c:a17f:2516:4dc8%4]) with mapi id 15.20.7633.021; Fri, 7 Jun 2024
- 10:33:48 +0000
-From: Xiaolei Wang <xiaolei.wang@windriver.com>
-To: olteanv@gmail.com, linux@armlinux.org.uk, andrew@lunn.ch,
-        alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, mcoquelin.stm32@gmail.com
-Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: [net PATCH] net: stmmac: replace priv->speed with the portTransmitRate from the tc-cbs parameters
-Date: Fri,  7 Jun 2024 18:33:27 +0800
-Message-Id: <20240607103327.438455-1-xiaolei.wang@windriver.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TY1PR01CA0190.jpnprd01.prod.outlook.com (2603:1096:403::20)
- To MW5PR11MB5764.namprd11.prod.outlook.com (2603:10b6:303:197::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C51817A937
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 10:45:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717757160; cv=none; b=WJ0OLzzSwZmmwJjjhPvtBaX0IDsg2A7uSE3NConnAysMiJ4MWe4X1Sf7lqM8A9fh61DQHsYd1LPORWrtLaZ73w5Vvk9RqjwJRhWBx2TGwWf4+d7s261ikL99QGIAVSucPJjjmN2SPclkzXSqLcVYYDY7kas/MS2EHkFtTRYvSD4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717757160; c=relaxed/simple;
+	bh=R+4LRs25tYmnNXdfcqR+SAshLXXAzIhOTEUVKL71VWA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZHFLTtmeWHlzok5dfUrSPYyh7BCmH95rlOytazuKHWfVBx/Y1OS2pFZwCfHoWMpvh6WiLKViMmiVuicCbT98/ka078aCrPNuMRY70kU8aak6tuDrctl6m9EPnO98BiOhBrky05hYOvzoGEKDGuhQXUDzg9/PGjjq2BiUaPljhy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DYpV2JWi; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717757159; x=1749293159;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=R+4LRs25tYmnNXdfcqR+SAshLXXAzIhOTEUVKL71VWA=;
+  b=DYpV2JWiCsWKFdiYul3acFf7GtmZ9G3tNOUQ9tPuWbOOxPEbs4Qq7tFs
+   i0+NWN4H6xqg4098f1NWNnBNsnztTy1W1TSdrn0OOH/L3JlG6u0UXmR8R
+   UgbgTj9QP8wURgpfyhsEmFHzljJGZCATlNQFU8zo59616d34LUhXBbAgQ
+   Ki2xSPG8HZWA7R869GdfU0oMB7DvuAqBFirTlPpdND+t5WKeuogaZN0MH
+   n269/Lzq4j0sU57S71b5zpVlb4g59/ni4r3u71aXlsUplUODC9dZMJvN3
+   QsCZrMlGMl+duKpRiPU2SXzIc5KdzdYDWrGyQQlskg3fIfQ/MQjgCQb2m
+   A==;
+X-CSE-ConnectionGUID: HYi/0GQjTMShoXkPkqF8AQ==
+X-CSE-MsgGUID: vDheITQqSk2mby8Eb8/ZMQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11095"; a="11962337"
+X-IronPort-AV: E=Sophos;i="6.08,220,1712646000"; 
+   d="scan'208";a="11962337"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2024 03:45:58 -0700
+X-CSE-ConnectionGUID: SJCL072sQtiarq1ois4ggQ==
+X-CSE-MsgGUID: bO6tg7efQa6Yekar8pOthA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,220,1712646000"; 
+   d="scan'208";a="75768340"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa001.jf.intel.com with ESMTP; 07 Jun 2024 03:45:52 -0700
+Received: from rozewie.igk.intel.com (unknown [10.211.8.69])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id AA3D412406;
+	Fri,  7 Jun 2024 11:45:48 +0100 (IST)
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+To: netdev@vger.kernel.org
+Cc: intel-wired-lan@lists.osuosl.org,
+	kuba@kernel.org,
+	jacob.e.keller@intel.com,
+	jiri@resnulli.us
+Subject: [PATCH iwl-next v4] ice: Add support for devlink local_forwarding param.
+Date: Fri,  7 Jun 2024 12:43:49 +0200
+Message-Id: <20240607104349.823255-1-wojciech.drewek@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW5PR11MB5764:EE_|CO1PR11MB5137:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6945d9ae-9fbf-4745-e520-08dc86dd50de
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: 
-	BCL:0;ARA:13230031|366007|52116005|7416005|376005|1800799015|38350700005|921011;
-X-Microsoft-Antispam-Message-Info: 
-	=?us-ascii?Q?sD7o+/fIrEA+ODTSUwRO2FTkC9Hxi4oWMtI6iKQncLWFRI87euaKImio07hc?=
- =?us-ascii?Q?LWe0ioRokHDfwFR7WGpOs9JbdfmUH1jJfAGv03B6MOpjhPcZFkSayFLw5WUv?=
- =?us-ascii?Q?MW5Oqf4WlK8QP0P0c/u6xWwmvVrXML5uyzk4g6pew9+9PXIp3aj2neHLPI3T?=
- =?us-ascii?Q?2HGRsgnbh7EM/1sQut7mbmktb3mW4cPzhTVEqeQPLVQbFO40RF+ToPsIxS7X?=
- =?us-ascii?Q?XZqiC/dxsvWSodrywpLRsWiZodW2/q/jisNO/lEcimySGhoHJ8ZTCluzD4aJ?=
- =?us-ascii?Q?Bw1Tv9jtpuL2s9GJY/ikCY69WxzthQYtYUZat0Di0M0p5exkyaZTx+dcqX5S?=
- =?us-ascii?Q?aGZV0o77dyAE2Sft+JaV6v5MX2NJrFyhtpOWcAyVuXqPpQyC1K39OB1K+HYu?=
- =?us-ascii?Q?6QoIKVJzcW4mHv/5ihns5Omg4H1fg/H+7xwO0bd5bH+Kc3bofdcuLbAI1A8f?=
- =?us-ascii?Q?xLTkgXMfZ+IHBDgRhTDV733Ovj7wk+mCqUJZDeEf6SqZJyFR5lAic0wftyh6?=
- =?us-ascii?Q?NQTFxnzZlyb5WbJWF9RKHPuY0udc73CL9QVyXu6w9hK0iZtxxcfRVWRK1GqK?=
- =?us-ascii?Q?Of5imOrXOkS8vhr/x4zi4d9A4h0+6cxKgwKKx3++tvFfQn8mGKH5YydcVg60?=
- =?us-ascii?Q?JtwRWHuA8ZB1PKY6suOyCyyJIYIicT6BEw5LwaB8mbvP9SR2EWLK14VsznwR?=
- =?us-ascii?Q?yedwe3YDbab6NNawv98DsvY+le4A5HCO6PRS8LX83lh4lX1wg6d9P1X0utkv?=
- =?us-ascii?Q?yfUTM52QYn5ChpqDt7uCwe40HeDSHCJ71dssF5bg5MNO69Iwhe2Yfd9SFWxc?=
- =?us-ascii?Q?Vge9vVUnKJ7os8C5SszKFsuTUCORMG+UA7QboZduZyYIiduF3/b+p1KqVsq/?=
- =?us-ascii?Q?GaUSSqTpOQoOqhgtay6AwxqKLTdupEKstNihaDaorwgCfNUXqd1eTrD2xOIs?=
- =?us-ascii?Q?nNO9332d5KUCG4PCa7gwny31AVRwwhjepXw6zEmPbmz2SQG1Ojd9+ay2rRXU?=
- =?us-ascii?Q?2TTVTfN0g+jlvOCr/E0T6YO84eRI8mN3B7fR7qOBOalt9uBL92K4FSsvrtwz?=
- =?us-ascii?Q?+x4qix1a6/c1FMQAjOiwWVMhmXOXvEtQaY+QpszG6AiVLzQZlERbfdReJHyf?=
- =?us-ascii?Q?3HTNoCIRxWbUGwQBUj18h4Dmi0/SKjExcuXg14sRUiwPq/hahb1TPrSIzZFI?=
- =?us-ascii?Q?oPJI16B0dyrwyvz19RWiGmNlh+Id+1yU3gXdsX8qMU8sYd/lkrLPgdIzIPwb?=
- =?us-ascii?Q?2mFYpZOKD1e5w728gAEuPZWbSVrv8eZdtu+NlnxomTJlPiB9G12AD8A+wusF?=
- =?us-ascii?Q?ZErmNmKg6xYQ5zsDEc4fxUJW3lpm01o8PiAijz65jnUOyEytu4yd4gWoKnZG?=
- =?us-ascii?Q?r2w+w90u5MoagxvK7bmP0Oma8yuV?=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR11MB5764.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(52116005)(7416005)(376005)(1800799015)(38350700005)(921011);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?nm4pWV1jlcfnFdSDVlHczStbVm6T8nJwvPmxoWzlMEJrTuDS2nC4e5gzOTaX?=
- =?us-ascii?Q?Pwq2EkF2H3Q/O/dSuRBVckzgWLYhTEsZ/mzrxSyuKVFFduMFjuQS/gI8CBsK?=
- =?us-ascii?Q?/qkBC/YLDmbYP+StjAMMqUkLk62isJ1SknwZJ71X2DCWAjeGgcg2Kq1mdegK?=
- =?us-ascii?Q?SRYpsW4KHyS6J1jCC/+qWbSYsmzBwria5p39BeT00oZe6wHw5wPNksIYQyXt?=
- =?us-ascii?Q?uKv+7966hUAofdPC07JjVFI3r3l6GUjyEynjWH/Jv5sYtPx5k1U46nbx7xMw?=
- =?us-ascii?Q?/ERWPMFGTO13Z5ZsAYwfUJnoCWdYwfd3T7zlcq+Yw1tch5PsAjzgw6KUtkYR?=
- =?us-ascii?Q?bVcPmHMAQllIJWZ5W0A+HdQj7GHKM21sV1K8nFVUxwhJxHwWdTGi0XNAtC+Q?=
- =?us-ascii?Q?InjCV0XGGAnIi6fcRk1fVxQn7GAJYSqEz9US4GtkrIPyuyIQIrw5ZyIQEKPq?=
- =?us-ascii?Q?30M1huojbWe7sn2Hl+5+PYMmYHpVx9LF6we1KBBd9h1aul+XCK6vjirHAmm0?=
- =?us-ascii?Q?MyUdVJ/uTK1EFUCzvycSxdzOzkPSPqs0B8BaGmseTu1LEQoX4pEA2enOhTgl?=
- =?us-ascii?Q?KSP1Rb1k5HqDi7MQn2ULWRMUwQKlxaDLSjNMONWUCmXIjHW+SkSC0NaGWL7+?=
- =?us-ascii?Q?HXUKbz2c8dq+kiERvaWlm7ey85OciobIcN6uDWGWP1Z0dnn69zF9Oj/5/RwQ?=
- =?us-ascii?Q?W3rnqiEg1v8Ff3tzcrHbyCCQjWTmq6UmN8a143xrf5cgsGlqs2FW6mnyi7gp?=
- =?us-ascii?Q?sijg+d/HjHWWgJsiESp9IqXpaNKwiMiKRkNHWxCXg9FpJ5BMSet2qA1nGzQC?=
- =?us-ascii?Q?TMPsK4ZbXGuY8hSPD9qIZTc+TMCmqxDkQ9VH0ai+FDayDKiWqamFcbegKfDf?=
- =?us-ascii?Q?rlB4VgcOFaX8YhyLLAD+PCLHq+PhUEI9hlvct8hUXzwYi/YPf+mrrrhOi9zQ?=
- =?us-ascii?Q?MNy5WseGtw8UYOyy4YJ7ZfX7vgE77+RblYawpbGp9vt2zfZTYoc9koXkzLqR?=
- =?us-ascii?Q?Z89Q2cVPR+Pd/XtuVYOO1lt33vWKDAHmlRKHboTu7AqcEn/g6sQDh5aVruhY?=
- =?us-ascii?Q?7AdHJyqx6WGyDVNOu1uqum6jxfcteTsF34qYDSL3rNFzb+EtFIdMrKKZxtBZ?=
- =?us-ascii?Q?WnFZ99IoumkCKvdodxl4NhYepG+C9tGxuO+l/KIyagPvgtraeC9IXNXZTdgz?=
- =?us-ascii?Q?9TMlakhist5Dz85F1qV5ygM6ysBFOargBgzISqU+LOUW1tow7Z8Kl5SoOZQW?=
- =?us-ascii?Q?6xASZ270PfC3iFxLxP1ReuroQaWRxtfzpb7WMmkgT3m3iPSXG5dKaAeoHKtn?=
- =?us-ascii?Q?CbBsqFJ0ncpuuTWnzR8D6KavLeAZkVBLZO4elIiJYxGEel6XBlzOTudbQ5ji?=
- =?us-ascii?Q?T95achWgH/xKM8fBzlQ6SHs6FF4L96OgtFpsjlBoVQvnxRFSSAaaMyLY3nse?=
- =?us-ascii?Q?fX8u3gCB7RQ/U21BfFmH92pNv1MNciYPmeNnAe+f6ZCwxfPga/h+5o+QcVbO?=
- =?us-ascii?Q?PMSlLWdyoF8PgSUC1PCYrpg8FMTcG/dRFgEnp0QxSpW3+ewrJKMkPtPujI5r?=
- =?us-ascii?Q?1BEanPZ608qlfk9TAuB06ffzFcytZsTbkmRg1IKHHuv5I+6Ce7+HDMQ0LIY4?=
- =?us-ascii?Q?vQ=3D=3D?=
-X-OriginatorOrg: windriver.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6945d9ae-9fbf-4745-e520-08dc86dd50de
-X-MS-Exchange-CrossTenant-AuthSource: MW5PR11MB5764.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jun 2024 10:33:48.4138
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HJaagEPUsLQPvJ4YPpsdra8A4UdCe15Olm0Nm2PC/mIRoPbS6ublBstF92jy1qJ7G9E0YxPdqhqQxujGssAbT8ALaiIquy4pEfTdamD4jQQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5137
-X-Proofpoint-ORIG-GUID: xZnOx9tPZMxnhTbQp3AwyqzWppBwN127
-X-Proofpoint-GUID: xZnOx9tPZMxnhTbQp3AwyqzWppBwN127
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-07_05,2024-06-06_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- lowpriorityscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- bulkscore=0 spamscore=0 mlxscore=0 priorityscore=1501 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.21.0-2405170001 definitions=main-2406070075
+Content-Transfer-Encoding: 8bit
 
-Since the given offload->sendslope only applies to the
-current link speed, and userspace may reprogram it when
-the link speed changes, don't even bother tracking the
-port's link speed, and deduce the port transmit rate
-from idleslope - sentslope instead.
+From: Pawel Kaminski <pawel.kaminski@intel.com>
 
-Signed-off-by: Xiaolei Wang <xiaolei.wang@windriver.com>
+Add support for driver-specific devlink local_forwarding param.
+Supported values are "enabled", "disabled" and "prioritized".
+Default configuration is set to "enabled".
+
+Add documentation in networking/devlink/ice.rst.
+
+In previous generations of Intel NICs the transmit scheduler was only
+limited by PCIe bandwidth when scheduling/assigning hairpin-badwidth
+between VFs. Changes to E810 HW design introduced scheduler limitation,
+so that available hairpin-bandwidth is bound to external port speed.
+In order to address this limitation and enable NFV services such as
+"service chaining" a knob to adjust the scheduler config was created.
+Driver can send a configuration message to the FW over admin queue and
+internal FW logic will reconfigure HW to prioritize and add more BW to
+VF to VF traffic. As end result for example 10G port will no longer limit
+hairpin-badwith to 10G and much higher speeds can be achieved.
+
+Devlink local_forwarding param set to "prioritized" enables higher
+hairpin-badwitdh on related PFs. Configuration is applicable only to
+8x10G and 4x25G cards.
+
+Changing local_forwarding configuration will trigger CORER reset in
+order to take effect.
+
+Example command to change current value:
+devlink dev param set pci/0000:b2:00.3 name local_forwarding \
+        value prioritized \
+        cmode runtime
+
+Co-developed-by: Michal Wilczynski <michal.wilczynski@intel.com>
+Signed-off-by: Michal Wilczynski <michal.wilczynski@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Pawel Kaminski <pawel.kaminski@intel.com>
+Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+v2: Extend documentation
+v3: rename loopback to local_forwarding
+v4: change in documentation about what types of functions
+    are affected
+---
+ Documentation/networking/devlink/ice.rst      |  25 ++++
+ .../net/ethernet/intel/ice/devlink/devlink.c  | 126 ++++++++++++++++++
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  11 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   |   4 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ 5 files changed, 166 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-index 222540b55480..48500864017b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-@@ -348,6 +348,7 @@ static int tc_setup_cbs(struct stmmac_priv *priv,
- 	u32 mode_to_use;
- 	u64 value;
- 	int ret;
-+	s64 port_transmit_rate_kbps;
+diff --git a/Documentation/networking/devlink/ice.rst b/Documentation/networking/devlink/ice.rst
+index 830c04354222..e3972d03cea0 100644
+--- a/Documentation/networking/devlink/ice.rst
++++ b/Documentation/networking/devlink/ice.rst
+@@ -11,6 +11,7 @@ Parameters
+ ==========
  
- 	/* Queue 0 is not AVB capable */
- 	if (queue <= 0 || queue >= tx_queues_count)
-@@ -355,27 +356,24 @@ static int tc_setup_cbs(struct stmmac_priv *priv,
- 	if (!priv->dma_cap.av)
- 		return -EOPNOTSUPP;
+ .. list-table:: Generic parameters implemented
++   :widths: 5 5 90
  
-+	port_transmit_rate_kbps = qopt->idleslope - qopt->sendslope;
+    * - Name
+      - Mode
+@@ -68,6 +69,30 @@ Parameters
+ 
+        To verify that value has been set:
+        $ devlink dev param show pci/0000:16:00.0 name tx_scheduling_layers
++.. list-table:: Driver specific parameters implemented
++    :widths: 5 5 90
 +
- 	/* Port Transmit Rate and Speed Divider */
--	switch (priv->speed) {
-+	switch (div_s64(port_transmit_rate_kbps, 1000)) {
- 	case SPEED_10000:
- 		ptr = 32;
--		speed_div = 10000000;
- 		break;
- 	case SPEED_5000:
- 		ptr = 32;
--		speed_div = 5000000;
- 		break;
- 	case SPEED_2500:
- 		ptr = 8;
--		speed_div = 2500000;
- 		break;
- 	case SPEED_1000:
- 		ptr = 8;
--		speed_div = 1000000;
- 		break;
- 	case SPEED_100:
- 		ptr = 4;
--		speed_div = 100000;
- 		break;
- 	default:
- 		return -EOPNOTSUPP;
-@@ -397,11 +395,13 @@ static int tc_setup_cbs(struct stmmac_priv *priv,
- 		priv->plat->tx_queues_cfg[queue].mode_to_use = MTL_QUEUE_DCB;
++    * - Name
++      - Mode
++      - Description
++    * - ``local_forwarding``
++      - runtime
++      - Controls loopback behavior by tuning scheduler bandwidth.
++        It impacts all kinds of functions: physical, virtual and
++        subfunctions.
++        Supported values are:
++
++        ``enabled`` - loopback traffic is allowed on port
++
++        ``disabled`` - loopback traffic is not allowed on this port
++
++        ``prioritized`` - loopback traffic is prioritized on this port
++
++        Default value of ``local_forwarding`` parameter is ``enabled``.
++        ``prioritized`` provides ability to adjust loopback traffic rate to increase
++        one port capacity at cost of the another. User needs to disable
++        local forwarding on one of the ports in order have increased capacity
++        on the ``prioritized`` port.
+ 
+ Info versions
+ =============
+diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+index f774781ab514..810a901d7afd 100644
+--- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
++++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+@@ -1381,9 +1381,129 @@ ice_devlink_enable_iw_validate(struct devlink *devlink, u32 id,
+ 	return 0;
+ }
+ 
++#define DEVLINK_LOCAL_FWD_DISABLED_STR "disabled"
++#define DEVLINK_LOCAL_FWD_ENABLED_STR "enabled"
++#define DEVLINK_LOCAL_FWD_PRIORITIZED_STR "prioritized"
++
++/**
++ * ice_devlink_local_fwd_mode_to_str - Get string for local_fwd mode.
++ * @mode: local forwarding for mode used in port_info struct.
++ *
++ * Return: Mode respective string or "Invalid".
++ */
++static const char *
++ice_devlink_local_fwd_mode_to_str(enum ice_local_fwd_mode mode)
++{
++	switch (mode) {
++	case ICE_LOCAL_FWD_MODE_ENABLED:
++		return DEVLINK_LOCAL_FWD_ENABLED_STR;
++	case ICE_LOCAL_FWD_MODE_PRIORITIZED:
++		return DEVLINK_LOCAL_FWD_PRIORITIZED_STR;
++	case ICE_LOCAL_FWD_MODE_DISABLED:
++		return DEVLINK_LOCAL_FWD_DISABLED_STR;
++	}
++
++	return "Invalid";
++}
++
++/**
++ * ice_devlink_local_fwd_str_to_mode - Get local_fwd mode from string name.
++ * @mode_str: local forwarding mode string.
++ *
++ * Return: Mode value or negative number if invalid.
++ */
++static int ice_devlink_local_fwd_str_to_mode(const char *mode_str)
++{
++	if (!strcmp(mode_str, DEVLINK_LOCAL_FWD_ENABLED_STR))
++		return ICE_LOCAL_FWD_MODE_ENABLED;
++	else if (!strcmp(mode_str, DEVLINK_LOCAL_FWD_PRIORITIZED_STR))
++		return ICE_LOCAL_FWD_MODE_PRIORITIZED;
++	else if (!strcmp(mode_str, DEVLINK_LOCAL_FWD_DISABLED_STR))
++		return ICE_LOCAL_FWD_MODE_DISABLED;
++
++	return -EINVAL;
++}
++
++/**
++ * ice_devlink_local_fwd_get - Get local_fwd parameter.
++ * @devlink: Pointer to the devlink instance.
++ * @id: The parameter ID to set.
++ * @ctx: Context to store the parameter value.
++ *
++ * Return: Zero.
++ */
++static int ice_devlink_local_fwd_get(struct devlink *devlink, u32 id,
++				     struct devlink_param_gset_ctx *ctx)
++{
++	struct ice_pf *pf = devlink_priv(devlink);
++	struct ice_port_info *pi;
++	const char *mode_str;
++
++	pi = pf->hw.port_info;
++	mode_str = ice_devlink_local_fwd_mode_to_str(pi->local_fwd_mode);
++	snprintf(ctx->val.vstr, sizeof(ctx->val.vstr), "%s", mode_str);
++
++	return 0;
++}
++
++/**
++ * ice_devlink_local_fwd_set - Set local_fwd parameter.
++ * @devlink: Pointer to the devlink instance.
++ * @id: The parameter ID to set.
++ * @ctx: Context to get the parameter value.
++ * @extack: Netlink extended ACK structure.
++ *
++ * Return: Zero.
++ */
++static int ice_devlink_local_fwd_set(struct devlink *devlink, u32 id,
++				     struct devlink_param_gset_ctx *ctx,
++				     struct netlink_ext_ack *extack)
++{
++	int new_local_fwd_mode = ice_devlink_local_fwd_str_to_mode(ctx->val.vstr);
++	struct ice_pf *pf = devlink_priv(devlink);
++	struct device *dev = ice_pf_to_dev(pf);
++	struct ice_port_info *pi;
++
++	pi = pf->hw.port_info;
++	if (pi->local_fwd_mode != new_local_fwd_mode) {
++		pi->local_fwd_mode = new_local_fwd_mode;
++		dev_info(dev, "Setting local_fwd to %s\n", ctx->val.vstr);
++		ice_schedule_reset(pf, ICE_RESET_CORER);
++	}
++
++	return 0;
++}
++
++/**
++ * ice_devlink_local_fwd_validate - Validate passed local_fwd parameter value.
++ * @devlink: Unused pointer to devlink instance.
++ * @id: The parameter ID to validate.
++ * @val: Value to validate.
++ * @extack: Netlink extended ACK structure.
++ *
++ * Supported values are:
++ * "enabled" - local_fwd is enabled, "disabled" - local_fwd is disabled
++ * "prioritized" - local_fwd traffic is prioritized in scheduling.
++ *
++ * Return: Zero when passed parameter value is supported. Negative value on
++ * error.
++ */
++static int ice_devlink_local_fwd_validate(struct devlink *devlink, u32 id,
++					  union devlink_param_value val,
++					  struct netlink_ext_ack *extack)
++{
++	if (ice_devlink_local_fwd_str_to_mode(val.vstr) < 0) {
++		NL_SET_ERR_MSG_MOD(extack, "Error: Requested value is not supported.");
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
+ enum ice_param_id {
+ 	ICE_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
+ 	ICE_DEVLINK_PARAM_ID_TX_SCHED_LAYERS,
++	ICE_DEVLINK_PARAM_ID_LOCAL_FWD,
+ };
+ 
+ static const struct devlink_param ice_dvl_rdma_params[] = {
+@@ -1405,6 +1525,12 @@ static const struct devlink_param ice_dvl_sched_params[] = {
+ 			     ice_devlink_tx_sched_layers_get,
+ 			     ice_devlink_tx_sched_layers_set,
+ 			     ice_devlink_tx_sched_layers_validate),
++	DEVLINK_PARAM_DRIVER(ICE_DEVLINK_PARAM_ID_LOCAL_FWD,
++			     "local_forwarding", DEVLINK_PARAM_TYPE_STRING,
++			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
++			     ice_devlink_local_fwd_get,
++			     ice_devlink_local_fwd_set,
++			     ice_devlink_local_fwd_validate),
+ };
+ 
+ static void ice_devlink_free(void *devlink_ptr)
+diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+index 621a2ca7093e..9683842f8880 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+@@ -232,6 +232,13 @@ struct ice_aqc_get_sw_cfg_resp_elem {
+ #define ICE_AQC_GET_SW_CONF_RESP_IS_VF		BIT(15)
+ };
+ 
++/* Loopback port parameter mode values. */
++enum ice_local_fwd_mode {
++	ICE_LOCAL_FWD_MODE_ENABLED = 0,
++	ICE_LOCAL_FWD_MODE_DISABLED = 1,
++	ICE_LOCAL_FWD_MODE_PRIORITIZED = 2,
++};
++
+ /* Set Port parameters, (direct, 0x0203) */
+ struct ice_aqc_set_port_params {
+ 	__le16 cmd_flags;
+@@ -240,7 +247,9 @@ struct ice_aqc_set_port_params {
+ 	__le16 swid;
+ #define ICE_AQC_PORT_SWID_VALID			BIT(15)
+ #define ICE_AQC_PORT_SWID_M			0xFF
+-	u8 reserved[10];
++	u8 local_fwd_mode;
++#define ICE_AQC_SET_P_PARAMS_LOCAL_FWD_MODE_VALID BIT(2)
++	u8 reserved[9];
+ };
+ 
+ /* These resource type defines are used for all switch resource
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 9ae61cd8923e..60ad7774812c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -1086,6 +1086,7 @@ int ice_init_hw(struct ice_hw *hw)
+ 		goto err_unroll_cqinit;
  	}
  
-+	port_transmit_rate_kbps = qopt->idleslope - qopt->sendslope;
++	hw->port_info->local_fwd_mode = ICE_LOCAL_FWD_MODE_ENABLED;
+ 	/* set the back pointer to HW */
+ 	hw->port_info->hw = hw;
+ 
+@@ -3070,6 +3071,9 @@ ice_aq_set_port_params(struct ice_port_info *pi, bool double_vlan,
+ 		cmd_flags |= ICE_AQC_SET_P_PARAMS_DOUBLE_VLAN_ENA;
+ 	cmd->cmd_flags = cpu_to_le16(cmd_flags);
+ 
++	cmd->local_fwd_mode = pi->local_fwd_mode |
++				ICE_AQC_SET_P_PARAMS_LOCAL_FWD_MODE_VALID;
 +
- 	/* Final adjustments for HW */
--	value = div_s64(qopt->idleslope * 1024ll * ptr, speed_div);
-+	value = div_s64(qopt->idleslope * 1024ll * ptr, port_transmit_rate_kbps);
- 	priv->plat->tx_queues_cfg[queue].idle_slope = value & GENMASK(31, 0);
+ 	return ice_aq_send_cmd(hw, &desc, NULL, 0, cd);
+ }
  
--	value = div_s64(-qopt->sendslope * 1024ll * ptr, speed_div);
-+	value = div_s64(-qopt->sendslope * 1024ll * ptr, port_transmit_rate_kbps);
- 	priv->plat->tx_queues_cfg[queue].send_slope = value & GENMASK(31, 0);
- 
- 	value = qopt->hicredit * 1024ll * 8;
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index 868d7d26a422..db4f93fd076e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -731,6 +731,7 @@ struct ice_port_info {
+ 	u16 sw_id;			/* Initial switch ID belongs to port */
+ 	u16 pf_vf_num;
+ 	u8 port_state;
++	u8 local_fwd_mode;
+ #define ICE_SCHED_PORT_STATE_INIT	0x0
+ #define ICE_SCHED_PORT_STATE_READY	0x1
+ 	u8 lport;
 -- 
-2.25.1
+2.40.1
 
 
