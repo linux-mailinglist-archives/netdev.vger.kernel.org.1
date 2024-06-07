@@ -1,57 +1,67 @@
-Return-Path: <netdev+bounces-101956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E69C900BAF
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 20:02:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B13B4900BDB
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 20:24:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CE1428416B
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:02:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCD131C214AD
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72FDF19CCFB;
-	Fri,  7 Jun 2024 18:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 514E113C694;
+	Fri,  7 Jun 2024 18:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X/0vXxb+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LM3uyI6H"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43582225AE;
-	Fri,  7 Jun 2024 18:01:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2389A481A3;
+	Fri,  7 Jun 2024 18:24:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717783292; cv=none; b=DEhmQesmdS4OmkEM0Uxtv9NMAUqXblhM8NbkB8KV68PVKwB0wfCqvhaoACX9nyTl5+0rTAi6PWtMfMoVytifrfuLIC68qz2YihuW3DtARWCUIe6e1oMeYojFd+yRXfkXJXyLrZzEEXWJPEfWiuxJk9maD+TFjpMT8ss3hyvH8Wg=
+	t=1717784661; cv=none; b=KT2T67AY287my7Xmnk7/mkyb1GSSFoc0TvujsWsiUQzyYT0I5QvLP4UmRF8po7mklHGgDTB3PAPaCM9B8Is1Q3xP7yiLpR4hXxQGjZ0mvB6440pJrN8LPzOxuHWiGD3RN89PLdkglZWCMVB5tafYojpUua69IyeMoSIhW7hI0aE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717783292; c=relaxed/simple;
-	bh=Q2240HndQG7pznYsjZBV4QwZL2FAj/M/TuJieHCfvUA=;
+	s=arc-20240116; t=1717784661; c=relaxed/simple;
+	bh=jXS45UQrPnM99RQ0JyTFd4KZqPVi2vCjrSX/9pcHsAg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tceBFnXixIYwLyhWL8dt0q11HK3NchqjtvpOjUg86FMLfBN6USDGEBIXpFK+UhdezFas2Svfd2RC82mhAXtPGrDPZaq6E0Cq9z+0tmOuJCRITJlexD2ate1EOcf4td2PvQUIYuIqgcO59hVZ7U0wk7oV/dePOsZTkW2Or/k8bro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X/0vXxb+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD14CC32781;
-	Fri,  7 Jun 2024 18:01:29 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=DrZH92IiqDjCIjXt8p3iLGpjkKEf/U/vT/SsTTR+ow3HIH38VmxnbRj7LzpB/OAHnipABGkACArVe5aNoURFbtHbJgmUbdC9hnf7xhtSW1RBiHQtlfmMRtRM+EPkmg0ki+nPqKTewURVD9dHVYt1KFW0lJJMEESLTJzWbQ+0pyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LM3uyI6H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7075C2BBFC;
+	Fri,  7 Jun 2024 18:24:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717783291;
-	bh=Q2240HndQG7pznYsjZBV4QwZL2FAj/M/TuJieHCfvUA=;
+	s=k20201202; t=1717784660;
+	bh=jXS45UQrPnM99RQ0JyTFd4KZqPVi2vCjrSX/9pcHsAg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=X/0vXxb+M4XcEfHxBu3m2ci+zkFX2M5+X6/atldRHqARKOdNrYNSkhGSDwpINX+t9
-	 tjqPBTMc1yHosbqcrP/HWutJavOJynDoUWo0fENnC6gefZ2iD51v4AmIXqReO8T6U5
-	 BfD0VNR075n8mehObEVAkwxTaaD4S9ydHMuMPlO1x3qkWA6pMlCFhVdK7IMM/MXnCf
-	 z6qzlWBayW7xInxMU98i5fjbZHP8uSfNfqsk8loJioNToUD8rOIlaDuPutJ1vKJw1S
-	 r8VgGaGJ/4AKTAhkwzA2fpiaQpl0adJqyJHdxO3Y/A0iMOdbypObREJJN8mD4Uh2wu
-	 mzb/waktMHUGg==
-Date: Fri, 7 Jun 2024 19:01:27 +0100
+	b=LM3uyI6HPiy6Y91PHyCpqMy1KohN4r2IHsdimU3+zCMGAaPl39CljmvqtPCB5Vc8O
+	 r2E5ewjYXjvTHpcb8J43FE0D1bruxW89Clj6mqGVBvaLhv1luzY5gM9FHVg5fnMrGx
+	 +lp6H1dgTd1A23QOXdvC9183UNMCBfFvNZAGgMNYTZbuUFCBupQO8R5k7mw999spRa
+	 oRzfv2GWTfHhp+ve6dntKUVFqxXdptQMundG6GDvbBBLQoPFepsKUzXoxWNRd7S4gv
+	 ZvzpiKvNzfQYG7ZfJSunbnJ39ZqC6JGl8CKHsSTrM9j9gkUBTcq1olNaCiWLrY0sBT
+	 eMaa6Ow2hFuyg==
+Date: Fri, 7 Jun 2024 19:24:14 +0100
 From: Simon Horman <horms@kernel.org>
-To: Abhinav Jain <jain.abhinav177@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org, javier.carrasco.cruz@gmail.com
-Subject: Re: [PATCH] selftests: net: Add on/off checks for network interface
- non fixed features
-Message-ID: <20240607180127.GG27689@kernel.org>
-References: <20240606212714.27472-1-jain.abhinav177@gmail.com>
+To: Diogo Ivo <diogo.ivo@siemens.com>
+Cc: MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jan Kiszka <jan.kiszka@siemens.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/4] net: ti: icss-iep: Remove spinlock-based
+ synchronization
+Message-ID: <20240607182414.GH27689@kernel.org>
+References: <20240607-iep-v3-0-4824224105bc@siemens.com>
+ <20240607-iep-v3-2-4824224105bc@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,81 +70,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240606212714.27472-1-jain.abhinav177@gmail.com>
+In-Reply-To: <20240607-iep-v3-2-4824224105bc@siemens.com>
 
-On Thu, Jun 06, 2024 at 09:27:14PM +0000, Abhinav Jain wrote:
-> This patch addresses the present TODO in the file.
-> I have tested it manually on my system and added relevant filtering to
-> ensure that the correct feature list is being checked.
+On Fri, Jun 07, 2024 at 02:02:43PM +0100, Diogo Ivo wrote:
+> As all sources of concurrency in hardware register access occur in
+> non-interrupt context eliminate spinlock-based synchronization and
+> rely on the mutex-based synchronization that is already present.
 > 
-> Signed-off-by: Abhinav Jain <jain.abhinav177@gmail.com>
+> Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
 > ---
->  tools/testing/selftests/net/netdevice.sh | 21 +++++++++++++++++++--
->  1 file changed, 19 insertions(+), 2 deletions(-)
+>  drivers/net/ethernet/ti/icssg/icss_iep.c | 10 ----------
+>  1 file changed, 10 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/net/netdevice.sh b/tools/testing/selftests/net/netdevice.sh
-> index e3afcb424710..cbe2573c3827 100755
-> --- a/tools/testing/selftests/net/netdevice.sh
-> +++ b/tools/testing/selftests/net/netdevice.sh
-> @@ -117,14 +117,31 @@ kci_netdev_ethtool()
->  		return 1
->  	fi
+> diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
+> index 3025e9c18970..1d6ccdf2583f 100644
+> --- a/drivers/net/ethernet/ti/icssg/icss_iep.c
+> +++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
+> @@ -110,7 +110,6 @@ struct icss_iep {
+>  	struct ptp_clock_info ptp_info;
+>  	struct ptp_clock *ptp_clock;
+>  	struct mutex ptp_clk_mutex;	/* PHC access serializer */
+> -	spinlock_t irq_lock; /* CMP IRQ vs icss_iep_ptp_enable access */
+>  	u32 def_inc;
+>  	s16 slow_cmp_inc;
+>  	u32 slow_cmp_count;
+> @@ -199,7 +198,6 @@ static void icss_iep_settime(struct icss_iep *iep, u64 ns)
+>  		return;
+>  	}
 >  
-> -	ethtool -k "$netdev" > "$TMP_ETHTOOL_FEATURES"
-> +	ethtool -k "$netdev" | tail -n +2 > "$TMP_ETHTOOL_FEATURES"
->  	if [ $? -ne 0 ];then
-
-Hi Abhinav,
-
-I suspect this will now only report a failure if tail fails,
-but ignore ethtool failures.
-
->  		echo "FAIL: $netdev: ethtool list features"
->  		rm "$TMP_ETHTOOL_FEATURES"
->  		return 1
->  	fi
->  	echo "PASS: $netdev: ethtool list features"
-> -	#TODO for each non fixed features, try to turn them on/off
-> +
-> +	for feature in $(grep -v fixed "$TMP_ETHTOOL_FEATURES" | \
-> +		awk '{print $1}' | sed 's/://'); do
-
-Shellcheck warns that the above reads words rather than lines,
-and recommends using read instead.
-
-I think that is ok, because the construction reduces lines to single words.
-But it does seem a bit awkward to call grep, awk and sed for this.
-
-I wonder if the following construction nicer:
-
-while read -r FEATURE VALUE FIXED; do
-	[ "$FEAT" != "Features" ] || continue # Skip "Features" line
-	[ "$FIXED" != "[fixed]" ] || continue # Skip fixed features
-	feature="${FEATURE%:*}"
-	...
-done < "$TMP_ETHTOOL_FEATURES"
-
-
-> +		ethtool --offload "$netdev" "$feature" off
-> +		if [ $? -eq 0 ]; then
-> +			echo "PASS: $netdev: Turned off feature: $feature"
-> +		else
-> +			echo "FAIL: $netdev: Failed to turn off feature: $feature"
-> +		fi
-> +
-> +		ethtool --offload "$netdev" "$feature" on
-> +		if [ $? -eq 0 ]; then
-> +			echo "PASS: $netdev: Turned on feature: $feature"
-> +		else
-> +			echo "FAIL: $netdev: Failed to turn on feature: $feature"
-> +		fi
-> +	done
-> +
->  	rm "$TMP_ETHTOOL_FEATURES"
+> -	spin_lock_irqsave(&iep->irq_lock, flags);
+>  	if (iep->pps_enabled || iep->perout_enabled)
+>  		writel(0, iep->base + iep->plat_data->reg_offs[ICSS_IEP_SYNC_CTRL_REG]);
 >  
->  	kci_netdev_ethtool_test 74 'dump' "ethtool -d $netdev"
-> -- 
-> 2.34.1
-> 
-> 
+> @@ -210,7 +208,6 @@ static void icss_iep_settime(struct icss_iep *iep, u64 ns)
+>  		writel(IEP_SYNC_CTRL_SYNC_N_EN(0) | IEP_SYNC_CTRL_SYNC_EN,
+>  		       iep->base + iep->plat_data->reg_offs[ICSS_IEP_SYNC_CTRL_REG]);
+>  	}
+> -	spin_unlock_irqrestore(&iep->irq_lock, flags);
+>  }
+>  
+>  /**
+
+Hi Diogo,
+
+This is not a full review, but flags is now unused in icss_iep_settime()
+and should be removed.  Likewise in icss_iep_perout_enable() and
+icss_iep_pps_enable().
+
+Flagged by W=1 builds with gcc-13 and clang-18.
+
+...
+
+-- 
+pw-bot: changes-requested
 
