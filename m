@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-101884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 362C09006A2
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:28:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B97749006A7
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:29:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7D5AB29111
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:28:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57FD0B29620
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:29:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC5BA199E85;
-	Fri,  7 Jun 2024 14:27:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439A3195B2E;
+	Fri,  7 Jun 2024 14:29:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rb7DMqcA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WISwcBMr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 799D5197A99;
-	Fri,  7 Jun 2024 14:27:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179BC194AD3;
+	Fri,  7 Jun 2024 14:29:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717770455; cv=none; b=P+d8uN1rueupnANN+Tx2fOFLxfBIx18FXDQdejiCSV+m7Wswa23PMmCQpkA1g1TiOquNnJZrN/60BhPKjgpOdDdOduvYZlbpPHJtfKTaMITy0e9qvTRJByEUAH1VqLdsRNslYQ9VGyhm5w0tRZ+nZaFSbpJ42wPFw7lpiNrZsmw=
+	t=1717770555; cv=none; b=AeY3cn3RPUN3uaVPqET/ci+PBByNsjDWiSyHJZ2zWyjwMq1oKGO5i70kSYUo/R7ifD2Ep7OhnhuC0Yjf4oElvkdmsac/4la7u2hVDFPmxL4+DIoT3KrOngMPM2D0UD7q7EuFkpAPj2RoQ87QaqqU4o7yKht9utH2GLWVQpvLAcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717770455; c=relaxed/simple;
-	bh=KPoMrsS5snh8BDGlOijeafq2go5qhS6jTOpT7vzHlQQ=;
+	s=arc-20240116; t=1717770555; c=relaxed/simple;
+	bh=dKD4INyKXeP5zXbI15q6iLNYwFvtOX/hgD4VslxEkyE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g1idzG+TscsfE4qdOTkNqE4eLLOfNo6WaEqI886aoAQNPOAeiTJUTYxE17jIJo8z5I59xpo1cu8W+56xXO4XjnX0Rv8X7l8et/gODHQzMsSzfyVnHCghuosrrAx11VIlE3X4YXke930sWnTGR/pOXIGI/Fp734eWZOaxJnifiFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rb7DMqcA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50BBCC32786;
-	Fri,  7 Jun 2024 14:27:31 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=bbjBauPJBqIc+lAASD/GpXB6o9XM9hq3dA1TLvgH0DxZ24jP/ug1PGK8Fz50RdYaZ0wRwMoYXSCbwQGDinWZ8q6d2ts+Fk+ZfH3MjER4PuT3IK0+CSCHGHLHFEXiOp6vUzPgCXjmsXWT/MJWPBLtqVH/4HNiBm+T28TFLgPrT8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WISwcBMr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16F37C3277B;
+	Fri,  7 Jun 2024 14:29:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717770455;
-	bh=KPoMrsS5snh8BDGlOijeafq2go5qhS6jTOpT7vzHlQQ=;
+	s=k20201202; t=1717770554;
+	bh=dKD4INyKXeP5zXbI15q6iLNYwFvtOX/hgD4VslxEkyE=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Rb7DMqcArkZvyfBzLSVJUlQlV/Ck/+6ESPZxN5arnY7H9q7XJGMPPBAE6V2HkFmBt
-	 ncwTlfI/t3hucXH/VxlO/fez1rU2hLs6i/UEpdUTN54W2IQMZ7n1U4OQrWgA1LmJR0
-	 zqDW98yT8BuLgAvCcObpxLiQFfHY2URX5ybVl931TqQhYmhE6iZq2PBE2DaWde/7Eq
-	 ovQkSS/Be7X8r3wJ/i72g+jHgwGd7hyJUkX9jN5/oboTDeg43lJjOz4IMLmY5nFrs6
-	 IyllF283aguUwgY+ZXHesUmBojvGPxRsoSaw6Pxmz4XZKaEL7YdgXyxtgphJeI0HVU
-	 EnAm4F9g8Gk9Q==
-Message-ID: <be2d140f-db0f-4d15-967c-972ea6586b5c@kernel.org>
-Date: Fri, 7 Jun 2024 08:27:29 -0600
+	b=WISwcBMrAlDtOZwQNGG7H8FM9ZvP+UGPYDCIUIKTqiMMcXsizYH1EYEEHDSPz5p0v
+	 dJhixKrlIUO1MxqfW7e1uRUlTc/F36SEg7I0WhWDEcle7mk69ivFU3bQbAHUR1TOfm
+	 tHI0KmjC1gKxrYugOD07N23v8LpCOrRD85d5aWYMupoumVX1nVScNWFXNkxlZKmHNp
+	 HVe3OBheGeM4fSRhqLATCDyIriWuI2Iii07Y0wD3zQwoXrzvQu2PjCkvFv5BIi7wog
+	 HXn/PaK8+9RYFxCFmcjhagwCpzIH7jPBMQqMjD75MmJHgQx21p8Bb6FR8G2B17QW2p
+	 Fw1zdllHqbjxw==
+Message-ID: <4533aea5-550a-454b-8b82-2ae28a97fd1c@kernel.org>
+Date: Fri, 7 Jun 2024 08:29:12 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,70 +50,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 02/14] net: page_pool: create hooks for
- custom page providers
+Subject: Re: [RFC v3 net-next 1/7] net: add rx_sk to trace_kfree_skb
 Content-Language: en-US
-To: Pavel Begunkov <asml.silence@gmail.com>,
- Mina Almasry <almasrymina@google.com>
-Cc: Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>,
- Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
-References: <20240530201616.1316526-1-almasrymina@google.com>
- <20240530201616.1316526-3-almasrymina@google.com>
- <ZlqzER_ufrhlB28v@infradead.org>
- <CAHS8izMU_nMEr04J9kXiX6rJqK4nQKA+W-enKLhNxvK7=H2pgA@mail.gmail.com>
- <5aee4bba-ca65-443c-bd78-e5599b814a13@gmail.com>
- <CAHS8izNmT_NzgCu1pY1RKgJh+kP2rCL_90Gqau2Pkd3-48Q1_w@mail.gmail.com>
- <eb237e6e-3626-4435-8af5-11ed3931b0ac@gmail.com>
+To: Yan Zhai <yan@cloudflare.com>, Steven Rostedt <rostedt@goodmis.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Abhishek Chauhan <quic_abchauha@quicinc.com>,
+ Mina Almasry <almasrymina@google.com>, Florian Westphal <fw@strlen.de>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ David Howells <dhowells@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Pavel Begunkov <asml.silence@gmail.com>, linux-kernel@vger.kernel.org,
+ kernel-team@cloudflare.com, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Neil Horman <nhorman@tuxdriver.com>, linux-trace-kernel@vger.kernel.org,
+ Dan Carpenter <dan.carpenter@linaro.org>
+References: <cover.1717529533.git.yan@cloudflare.com>
+ <983c54f98746bd42d778b99840435d0a93963cb3.1717529533.git.yan@cloudflare.com>
+ <20240605195750.1a225963@gandalf.local.home>
+ <CAO3-PbqRNRduSAyN9CtaxPFsOs9xtGHruu1ACfJ5e-mrvTo2Cw@mail.gmail.com>
 From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <eb237e6e-3626-4435-8af5-11ed3931b0ac@gmail.com>
+In-Reply-To: <CAO3-PbqRNRduSAyN9CtaxPFsOs9xtGHruu1ACfJ5e-mrvTo2Cw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 6/7/24 7:42 AM, Pavel Begunkov wrote:
-> I haven't seen any arguments against from the (net) maintainers so
-> far. Nor I see any objection against callbacks from them (considering
-> that either option adds an if).
+On 6/6/24 9:37 AM, Yan Zhai wrote:
+> # cat /sys/kernel/debug/tracing/events/skb/kfree_skb/format
+> name: kfree_skb
+> ID: 2260
+> format:
+>         field:unsigned short common_type;       offset:0;
+> size:2; signed:0;
+>         field:unsigned char common_flags;       offset:2;
+> size:1; signed:0;
+>         field:unsigned char common_preempt_count;       offset:3;
+>  size:1; signed:0;
+>         field:int common_pid;   offset:4;       size:4; signed:1;
+> 
+>         field:void * skbaddr;   offset:8;       size:8; signed:0;
+>         field:void * location;  offset:16;      size:8; signed:0;
+>         field:unsigned short protocol;  offset:24;      size:2; signed:0;
+>         field:enum skb_drop_reason reason;      offset:28;
+> size:4; signed:0;
+>         field:void * rx_skaddr; offset:32;      size:8; signed:0;
+> 
+> Do you think we still need to change the order?
+> 
 
-I have said before I do not understand why the dmabuf paradigm is not
-sufficient for both device memory and host memory. A less than ideal
-control path to put hostmem in a dmabuf wrapper vs extra checks and
-changes in the datapath. The former should always be preferred.
+yes. Keeping proper order now ensures no holes creep in with later changes.
 
-I also do not understand why the ifq cache and overloading xdp functions
-have stuck around; I always thought both were added by Jonathan to
-simplify kernel ports during early POC days.
 
