@@ -1,118 +1,115 @@
-Return-Path: <netdev+bounces-101845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8893C90042E
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:56:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCB4D900406
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:49:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35B2D28783F
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:56:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56C47B23929
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:49:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F6DB195FD7;
-	Fri,  7 Jun 2024 12:55:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDC7D188CD1;
+	Fri,  7 Jun 2024 12:49:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="kU8pnwoU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="icGmWSfV"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66791194ACF;
-	Fri,  7 Jun 2024 12:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC6721E4A1;
+	Fri,  7 Jun 2024 12:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717764909; cv=none; b=uvjAPtoyMvrk5sdTTGJaNCic+sLtznA7dp6GsGxHDfZCasqaTKgA7zK/Fw9CewneyCffApVoSbolzaRUKmMgxytBEBvEfHw8pkXkKE+Twbfa/Lsm2IlDHyC0N47H5ZVYBI7vsyPDgiCJDf2ro6HJEFKLgPer16JS6Icadzp5Uxk=
+	t=1717764586; cv=none; b=DFVvJV37hPMFzoMz4BXyVME4MUHghun5+aBYKJk0UvrZdtylGw9oMKB1hi8lW+wq4ShNofhh1W2lBNskloenbnyy/9PawnnfdYj21L8CU6IT0/6zHsUlVu4sCsV44Gn4qDw8I6syFIU77asx3LTQUJDSe9jinQH9/s4v4CpWwkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717764909; c=relaxed/simple;
-	bh=E0hadf3fJY0MOE4oIWDIY6R1dLTOP4xPK5XeYlJoO1k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TQ+/GFI5Zbr95eG/lJIv3dP/6YKxG7Nm3QocVGQme/oFGgPSrXERxFyd92NUrLH5DmsTX1VpaFMVJ7U6BKDTDaDq5gy0LOSDh1EO1W1+CDhGkurg9jikkL3bev4N1rcFkUVBYLKRrx1IJgeb8uW48JFmWf/5Kzq3rJgsrDJ4z4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=kU8pnwoU; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 6ACDB8841D;
-	Fri,  7 Jun 2024 14:54:59 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1717764900;
-	bh=xkJGBefc0fkNNjL/OHeRyUcUqgQcSbwLbav+7Ogt6gg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=kU8pnwoU8Te7ZPY/7WMfjdbgzFhkALkAuOFGmXYvd70fzPFlYKwt1oh2rI4eoPD1y
-	 QtivI5e6w4I51vudACZSaZljMpEYomnvFVv1+C58PztfyIs5elfP9MKtKr8YMruR1t
-	 LbvOhIlFa2ts5VZbLcOk69JergipO2633FwNccyYRtwXDxbS2bLvpfvMJyL+NHR/n7
-	 eTeZWmb2B2OJvbdosr9UkURv3s+mrxizPMPwbE5IE2/B5UQjoeiAwCIjpiP+p8dx7A
-	 x18X/EuB0cueo0SOWcMYTHh89TvRyEAx3ZyiULStZj9FgsH5aIe3vSX3bEYP3hzRzs
-	 6twdv8r/9hKKg==
-Message-ID: <6d60bbc6-5ed3-4bb1-ad72-18a2be140b81@denx.de>
-Date: Fri, 7 Jun 2024 14:48:58 +0200
+	s=arc-20240116; t=1717764586; c=relaxed/simple;
+	bh=Bfgfa143G4DHdrFe7lxSCSckblGF7uW5HXJRY2g1Q6g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pfiySXTGLgDlFyI1RQURHPw376xceLgwHWn9NDtTkTMNwep5a6NOd+VGWEn5wg8sO1W2oMNZCLkP2ko3JXhIc/qDRAtLtgAAqYD+o7ks4ICWifBi9Qanl8NbZJK85okhEBYKI+Pcdc9C6eIDw6e9kPF8U2vX306oGOrWhdnTIT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=icGmWSfV; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=G2qEK1PosUxBiovM8jMSdaJor4MsDmSI8cQfYuLb8v4=; b=icGmWSfVRWu/nowvbGDdkxIefB
+	Pw4kINXDgRgGLW6DDe/Pl8k00+2s7sv0+3jNHfilNvg7Nk91KDlypBb0rBGQV7kNRWULLnfu8t7X/
+	fP1VblNceZpzPlMvZEwiVHu1TRmveJpnB2He2leRmCO4K1lwcPBnDEcT/uX7zPnZ/8Ok=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sFZ20-00H7iB-0G; Fri, 07 Jun 2024 14:49:20 +0200
+Date: Fri, 7 Jun 2024 14:49:19 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, linux-doc@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
+	Leonid Bloch <lbloch@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
+	patches@lists.linux.dev
+Subject: Re: [PATCH 0/8] Introduce fwctl subystem
+Message-ID: <b023413e-d6e1-4a47-bdf2-98cc57a2e0ae@lunn.ch>
+References: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+ <20240603114250.5325279c@kernel.org>
+ <214d7d82-0916-4c29-9012-04590e77df73@kernel.org>
+ <20240604070451.79cfb280@kernel.org>
+ <665fa9c9e69de_4a4e62941e@dwillia2-xfh.jf.intel.com.notmuch>
+ <20240605135911.GT19897@nvidia.com>
+ <d97144db-424f-4efd-bf10-513a0b895eca@kernel.org>
+ <20240606071811.34767cce@kernel.org>
+ <ZmK3-rkibH8j4ZwM@nanopsycho.orion>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 09/12] ARM: dts: stm32: add ethernet1 and ethernet2
- support on stm32mp13
-To: Christophe Roullier <christophe.roullier@foss.st.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Richard Cochran <richardcochran@gmail.com>, Jose Abreu
- <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20240607095754.265105-1-christophe.roullier@foss.st.com>
- <20240607095754.265105-10-christophe.roullier@foss.st.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <20240607095754.265105-10-christophe.roullier@foss.st.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZmK3-rkibH8j4ZwM@nanopsycho.orion>
 
-On 6/7/24 11:57 AM, Christophe Roullier wrote:
+> >This API gives user space SDKs a trivial way of implementing all
+> >switching, routing, filtering, QoS offloads etc.
+> >An argument can be made that given somewhat mixed switchdev experience
+> 
+> Can you elaborabe a bit more what you mean by "mixed switchdev
+> experience" please?
 
-[...]
+I don't want to put words in Jakubs mouth but, in my opinion,
+switchdev has been great for SoHo switches. We have over 100
+supported, mostly implemented by the community, but some vendors also
+supporting their own hardware.
 
-> @@ -1505,6 +1511,38 @@ sdmmc2: mmc@58007000 {
->   				status = "disabled";
->   			};
->   
-> +			ethernet1: ethernet@5800a000 {
-> +				compatible = "st,stm32mp13-dwmac", "snps,dwmac-4.20a";
-> +				reg = <0x5800a000 0x2000>;
-> +				reg-names = "stmmaceth";
-> +				interrupts-extended = <&intc GIC_SPI 62 IRQ_TYPE_LEVEL_HIGH>,
-> +						      <&exti 68 1>;
-> +				interrupt-names = "macirq", "eth_wake_irq";
-> +				clock-names = "stmmaceth",
-> +					      "mac-clk-tx",
-> +					      "mac-clk-rx",
-> +					      "ethstp",
-> +					      "eth-ck";
-> +				clocks = <&rcc ETH1MAC>,
-> +					 <&rcc ETH1TX>,
-> +					 <&rcc ETH1RX>,
-> +					 <&rcc ETH1STP>,
-> +					 <&rcc ETH1CK_K>;
-> +				st,syscon = <&syscfg 0x4 0xff0000>;
-> +				snps,mixed-burst;
-> +				snps,pbl = <2>;
-> +				snps,axi-config = <&stmmac_axi_config_1>;
-> +				snps,tso;
-> +				access-controllers = <&etzpc 48>;
+We have two enterprise switch families supported, each by its own
+vendor. And we have one TOR switch family supported by the vendor.
 
-Keep the list sorted.
+So i would say switchdev has worked out great for SoHo, but kernel
+bypass is still the norm for most things bigger than SoHo.
+
+Why? My guess is, the products with a SoHo switch is not actually a
+switch. It is a wifi box, with a switch. It is a cable modem, with a
+switch. It is an inflight entertainment system, with a switch, etc.
+It is much easier to build such multi-purpose systems when everything
+is nicely integrated into the kernel, you don't have to fight with
+multiple vendors supplying SDKs which only work on a disjoint set of
+kernels, etc.
+
+For bigger, single purpose devices, it is just a switch, there is less
+inconvenience of using just one vendor SDK, on top of the vendor
+proscribed kernel.
+
+	Andrew
+
 
