@@ -1,63 +1,83 @@
-Return-Path: <netdev+bounces-101927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 272DF9009EE
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:06:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 225B4900A06
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:09:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15F9F1C221CB
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:06:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2BBE1F28F97
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDCB719B3CC;
-	Fri,  7 Jun 2024 16:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE1DA1993B5;
+	Fri,  7 Jun 2024 16:08:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="YeyzoXCH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z0EOIb+R"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334DC199EBB;
-	Fri,  7 Jun 2024 16:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311FE15ECD6
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 16:08:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717776337; cv=none; b=t9MAEXNUR75P+PZap1YFDNkkKjGrl4oVpXoVzkP43gYg5gCVGRXy2tH9ouQ9H7mNrEroYHCvsWmXFNT0XzJi5MONNrjW63C/QMTS/bcXErABv8Ks6wjCWkVkKrXIgisoFzO7cwb78WLhjjZpReb4mff0ZwyjnEVnZqPdxccP/XQ=
+	t=1717776482; cv=none; b=cpMgASm9IvuU5/dyKLgR9vHzzJITLSsYvwvTjFlEMhQJUxIxG73LalBF8JUKvJdvmDRIh+mefm4CaUyZLroBgonYOwGlUJMLXCZuIoe1+fXnAwhYTGc6ZBKIUfJxJ6SFEMoVqdccvyv7K0fQNF1zg72ceAL0fFx+97spjJOtuVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717776337; c=relaxed/simple;
-	bh=z9L/VT5UsQCivJ6SxdEVOVB2wfbgOMAG2X9WckMrwEM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sQ7aiFRTc2sEfSTQL5Q9SKKSFnjifC9nSzkVcDCS3l4FTc06piueVTusPLOLniWhvrHxQG9kq5senp/i/QZd/4yDCGMYruhhzJhNRSPk4VovhooSUsoQ8eUnJtxPBdPlFnXXJp3jpvbgCKBDyeyJknP+68NW1U8c0ww14B4Pzug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=YeyzoXCH; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=HFqbvy+yDIcOAsvFP2JAPAHPKAhf7Z1A8lonQFVNw84=;
-	t=1717776336; x=1718985936; b=YeyzoXCHvwBq9JqcIH8YqjejXCDzHMmvGR+Uc23fbjKMMr4
-	wiZ8EM1oTna/rjFZT3pD2GaVpKS2L8e7Iu8aDAawGHTsu30X0tUGjpiAvuhZaVTNp+O32D87UHL6k
-	EAaHphw+69MkJ+U4QcX4iNadwOsXfMkgLYP8vDi7YUBV92+mq7tDReosumgJGrmYtwkO7I+N3HBLd
-	GaqBEmGl6f2lPvopT1F8BRl7+mx9ak6ah/og1iE3kmG8qYb/kv4daEYvvSpad3sQaprs3MVtHZvuc
-	an6pcSgGGrbZlK3c/Vo5zG5Opk7goNH0GQrEJj293wE3H6RQGQYwcagc+9AXRFFw==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1sFc5t-00000001Iyu-11vF;
-	Fri, 07 Jun 2024 18:05:33 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: linux-kernel@vger.kernel.org
-Cc: linux-trace-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	Johannes Berg <johannes.berg@intel.com>
-Subject: [PATCH v4 4/4] net: drop_monitor: use drop_reason_lookup()
-Date: Fri,  7 Jun 2024 18:04:26 +0200
-Message-ID: <20240607160527.23624-10-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240607160527.23624-6-johannes@sipsolutions.net>
-References: <20240607160527.23624-6-johannes@sipsolutions.net>
+	s=arc-20240116; t=1717776482; c=relaxed/simple;
+	bh=TxZ62lRbGYR0AmZpOp1164ij9xgmLaqHEpZwVrf2BUU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LxWUFjY53lQLEXF4JRj8RxTDCLS/KRHtai2YVuH054yCI8BFvp8UveiuppG7ZI/rBio9aLuquygYqv+ChG11/UowrW8VJGbC5eNyws9Zj+T0Y5eeEU95PkB+mapyZGpiX4iLaVyPPMst2ccqKo2GfgVNE+1WooJyusK6yZm8nxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z0EOIb+R; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717776480;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=EBLE9WHJdPeMtGHEriSmKop5oZrT43bTfvmN1za5maQ=;
+	b=Z0EOIb+REkenkZGX9+xzTsf56dshY3ECCQz2wDKc648ulAuT/7eiHdca1sVAbC4qr7iEAk
+	tUIkxGFaKQBk0Igmus9y43ukg1XwpjXvlmv9xpc0LEM20te9S9VGpUDq42nz09KE5gnKch
+	HGS/rCRBRWnw2L77IkeUc2s5YapqQBU=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-1-erl8b5bpP8--_SGjXauWhg-1; Fri, 07 Jun 2024 12:07:58 -0400
+X-MC-Unique: erl8b5bpP8--_SGjXauWhg-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a6861bb1c0bso147581266b.3
+        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 09:07:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717776477; x=1718381277;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EBLE9WHJdPeMtGHEriSmKop5oZrT43bTfvmN1za5maQ=;
+        b=wzn6CaFGtDOLDANEd1y4LV89FWtky7u8tVMFtLgbeEzxuE8Bwl6PFtOmy1s0EctGZb
+         CLaRHb4quShI1Js6SYfeSRbH2mlb9XL9MrBEnSGAX279mIYRu54zbtJ7WZiP1RPwC6iJ
+         lXgznSdU1yZAYjob9xhAnoOoUXbdhzqqK2dDqNB3Gc+N2+EN2byKH8QjbQ7Imoo1fRkv
+         oGKXXcGDYDmUkoRgXN5AgM35VHKZrblaHX3Q5J+PRsOcZEVTa8ZlKUKc2taH0eQvTrzs
+         jfls0l/G23JlyU+48d5Wwb1dW/0dUQYQl93TjhevhKQd1OVPf35RP5wp8Eph0cWCzaIs
+         pDXw==
+X-Gm-Message-State: AOJu0YyyOF6ZoHBhzJeNt7fBoZ47RkC8Hv2xeJ72cksqfFvjy1UI7u8r
+	+SLVoDywdBg4/NHdKOr7gtCyIzcEwJ83TPrRViqa3iemY4zlD2upWkgQZgm0G1aC8xSsVZdElU9
+	9qPVgrreZXx9gqWCLK0MVhRdfAbldxzCmXdkU5DHUH6YcnXETc6Vq6Q==
+X-Received: by 2002:a17:906:f582:b0:a68:6032:463c with SMTP id a640c23a62f3a-a6cd65668b5mr284287366b.18.1717776477106;
+        Fri, 07 Jun 2024 09:07:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGuyKEHYo5TPUfVQg5eRCpyksPsAJrknMBehGQmuprA7HQfQFCf1RnS6OHoPTC28AUzT9y7uw==
+X-Received: by 2002:a17:906:f582:b0:a68:6032:463c with SMTP id a640c23a62f3a-a6cd65668b5mr284284866b.18.1717776476606;
+        Fri, 07 Jun 2024 09:07:56 -0700 (PDT)
+Received: from telekom.ip (adsl-dyn127.78-99-32.t-com.sk. [78.99.32.127])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6c806ebd59sm264672166b.116.2024.06.07.09.07.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jun 2024 09:07:55 -0700 (PDT)
+From: Ondrej Mosnacek <omosnace@redhat.com>
+To: Paul Moore <paul@paul-moore.com>
+Cc: netdev@vger.kernel.org,
+	linux-security-module@vger.kernel.org
+Subject: [PATCH v2 0/2] cipso: make cipso_v4_skbuff_delattr() fully remove the CIPSO options
+Date: Fri,  7 Jun 2024 18:07:51 +0200
+Message-ID: <20240607160753.1787105-1-omosnace@redhat.com>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,106 +86,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Johannes Berg <johannes.berg@intel.com>
+This series aims to improve cipso_v4_skbuff_delattr() to fully
+remove the CIPSO options instead of just clearing them with NOPs.
+That is implemented in the second patch, while the first patch is
+a bugfix for cipso_v4_delopt() that the second patch depends on.
 
-Now that we have drop_reason_lookup(), we can just use it for
-drop_monitor as well, rather than exporting the list itself.
+Tested using selinux-testsuite a TMT/Beakerlib test from this PR:
+https://src.fedoraproject.org/tests/selinux/pull-request/488
 
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
----
-v3:
- - look up SKB_DROP_REASON_NOT_SPECIFIED if initial lookup
-   returns NULL, to preserve previous behaviour
----
- include/net/dropreason.h |  4 ----
- net/core/drop_monitor.c  | 20 +++++---------------
- net/core/skbuff.c        |  6 +++---
- 3 files changed, 8 insertions(+), 22 deletions(-)
+Changes in v2:
+- drop the paranoid WARN_ON() usage
+- reword the description of the second patch
 
-diff --git a/include/net/dropreason.h b/include/net/dropreason.h
-index c157070b5303..0e2195ccf2cd 100644
---- a/include/net/dropreason.h
-+++ b/include/net/dropreason.h
-@@ -38,10 +38,6 @@ struct drop_reason_list {
- 	size_t n_reasons;
- };
- 
--/* Note: due to dynamic registrations, access must be under RCU */
--extern const struct drop_reason_list __rcu *
--drop_reasons_by_subsys[SKB_DROP_REASON_SUBSYS_NUM];
--
- #ifdef CONFIG_TRACEPOINTS
- const char *drop_reason_lookup(unsigned long long value);
- void drop_reason_show(struct seq_file *m);
-diff --git a/net/core/drop_monitor.c b/net/core/drop_monitor.c
-index 430ed18f8584..fddf6b68bf06 100644
---- a/net/core/drop_monitor.c
-+++ b/net/core/drop_monitor.c
-@@ -610,9 +610,8 @@ static int net_dm_packet_report_fill(struct sk_buff *msg, struct sk_buff *skb,
- 				     size_t payload_len)
- {
- 	struct net_dm_skb_cb *cb = NET_DM_SKB_CB(skb);
--	const struct drop_reason_list *list = NULL;
--	unsigned int subsys, subsys_reason;
- 	char buf[NET_DM_MAX_SYMBOL_LEN];
-+	const char *reason_str;
- 	struct nlattr *attr;
- 	void *hdr;
- 	int rc;
-@@ -630,19 +629,10 @@ static int net_dm_packet_report_fill(struct sk_buff *msg, struct sk_buff *skb,
- 		goto nla_put_failure;
- 
- 	rcu_read_lock();
--	subsys = u32_get_bits(cb->reason, SKB_DROP_REASON_SUBSYS_MASK);
--	if (subsys < SKB_DROP_REASON_SUBSYS_NUM)
--		list = rcu_dereference(drop_reasons_by_subsys[subsys]);
--	subsys_reason = cb->reason & ~SKB_DROP_REASON_SUBSYS_MASK;
--	if (!list ||
--	    subsys_reason >= list->n_reasons ||
--	    !list->reasons[subsys_reason] ||
--	    strlen(list->reasons[subsys_reason]) > NET_DM_MAX_REASON_LEN) {
--		list = rcu_dereference(drop_reasons_by_subsys[SKB_DROP_REASON_SUBSYS_CORE]);
--		subsys_reason = SKB_DROP_REASON_NOT_SPECIFIED;
--	}
--	if (nla_put_string(msg, NET_DM_ATTR_REASON,
--			   list->reasons[subsys_reason])) {
-+	reason_str = drop_reason_lookup(cb->reason);
-+	if (unlikely(!reason_str))
-+		reason_str = drop_reason_lookup(SKB_DROP_REASON_NOT_SPECIFIED);
-+	if (nla_put_string(msg, NET_DM_ATTR_REASON, reason_str)) {
- 		rcu_read_unlock();
- 		goto nla_put_failure;
- 	}
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index cd1ea6c3e0f8..bd4fb7410284 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -139,13 +139,11 @@ static const struct drop_reason_list drop_reasons_core = {
- 	.n_reasons = ARRAY_SIZE(drop_reasons),
- };
- 
--const struct drop_reason_list __rcu *
-+static const struct drop_reason_list __rcu *
- drop_reasons_by_subsys[SKB_DROP_REASON_SUBSYS_NUM] = {
- 	[SKB_DROP_REASON_SUBSYS_CORE] = RCU_INITIALIZER(&drop_reasons_core),
- };
--EXPORT_SYMBOL(drop_reasons_by_subsys);
- 
--#ifdef CONFIG_TRACEPOINTS
- const char *drop_reason_lookup(unsigned long long value)
- {
- 	unsigned long long subsys_id = value >> SKB_DROP_REASON_SUBSYS_SHIFT;
-@@ -162,7 +160,9 @@ const char *drop_reason_lookup(unsigned long long value)
- 		return NULL;
- 	return subsys->reasons[reason];
- }
-+EXPORT_SYMBOL(drop_reason_lookup);
- 
-+#ifdef CONFIG_TRACEPOINTS
- void drop_reason_show(struct seq_file *m)
- {
- 	u32 subsys_id;
+v1: https://lore.kernel.org/linux-security-module/20240416152913.1527166-1-omosnace@redhat.com/
+
+Ondrej Mosnacek (2):
+  cipso: fix total option length computation
+  cipso: make cipso_v4_skbuff_delattr() fully remove the CIPSO options
+
+ net/ipv4/cipso_ipv4.c | 75 +++++++++++++++++++++++++++++++------------
+ 1 file changed, 54 insertions(+), 21 deletions(-)
+
 -- 
-2.45.2
+2.45.1
 
 
