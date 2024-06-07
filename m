@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-101827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D31E9003CC
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:41:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DF779003D2
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:42:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E35F1F21D75
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:41:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BEEDFB246C2
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:42:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA1AB19413B;
-	Fri,  7 Jun 2024 12:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC817193090;
+	Fri,  7 Jun 2024 12:41:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04801194094;
-	Fri,  7 Jun 2024 12:41:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D357193087;
+	Fri,  7 Jun 2024 12:41:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717764072; cv=none; b=k3Wy2uBnst7BXbHlhlZ3OPvAH0Zg1pIPFjVeuSUMugPTF24CMvii0+9s618J4ZOSi5MosBvlQgZPEpP6qedKO385tFfwL6M8pwcwXsNKWenLIgeh+ZBQD+WgGhmRfuPqnzSPDUDkn+UR6FkFaNvdyWY9NWSRDUFJ1j+I5k3y26o=
+	t=1717764083; cv=none; b=fJVC/aQZi8G4PncCde2lTCatRP7hWiG6jRu2CrNhr9ciHNz7cLJIP7byVYFWMbGXurTyGB88hiVX8odXgdciQt85nGg4fvBS45dLaN4wfO/sgXRJDruxQ5CiYt42j2t3pVBB6pwRdxxEn4WDYQzeKD4+0Y1NTt+DjBLmCy9ygPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717764072; c=relaxed/simple;
-	bh=OrIkq1AVZqFMgqpsuATK8JT6HfobX9aSYaeOuLWVTnk=;
+	s=arc-20240116; t=1717764083; c=relaxed/simple;
+	bh=5HgQwssi4yGOshAmgPsuE1Ol4VzOtXV20lVjgj6dE7E=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g6PE2tNMMfGk2yCmF00jOqQPZwNCFrTI7KSqa294q0jQwdRRdQVP0za+1u6qpnlPmdmbmWw8KJfXF/TkaRR6krsgLigU5zA+5B+F32Oc58GG376wt5SLnZyGM7qczC5hhnrCdE2kk7FfE5LhZpEvNbLwzFsP8SO/tj383HFf8uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+	 MIME-Version:Content-Type; b=sQC/vXtwcWd5wj7ul0QXeqau1yvSIBOEd2mLrvi5Z8OcMNczJKIwm1lA22pFGeOfQi9nbS2oHvW9H59OGYgGEyqxGfkH3l9VUxg+dJeyPmSU2l8V+e1XLdKYK6xoS57pYWvBqH8CQIW07va7KaxCDppOGVJ6SbjFuGUnd0bhyCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Vwgg45QYWzmYZB;
-	Fri,  7 Jun 2024 20:36:32 +0800 (CST)
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Vwggt02qdzsTZL;
+	Fri,  7 Jun 2024 20:37:14 +0800 (CST)
 Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2118618007E;
-	Fri,  7 Jun 2024 20:41:09 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 10DAB18007A;
+	Fri,  7 Jun 2024 20:41:13 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 7 Jun 2024 20:41:08 +0800
+ 15.2.1544.11; Fri, 7 Jun 2024 20:41:10 +0800
 From: Yunsheng Lin <linyunsheng@huawei.com>
 To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>, Max
- Filippov <jcmvbkbc@gmail.com>, Chris Zankel <chris@zankel.net>
-Subject: [PATCH net-next v7 02/15] xtensa: remove the get_order() implementation
-Date: Fri, 7 Jun 2024 20:38:05 +0800
-Message-ID: <20240607123819.40694-3-linyunsheng@huawei.com>
+	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>, Andrew
+ Morton <akpm@linux-foundation.org>, <linux-mm@kvack.org>
+Subject: [PATCH net-next v7 03/15] mm: page_frag: use free_unref_page() to free page fragment
+Date: Fri, 7 Jun 2024 20:38:06 +0800
+Message-ID: <20240607123819.40694-4-linyunsheng@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20240607123819.40694-1-linyunsheng@huawei.com>
 References: <20240607123819.40694-1-linyunsheng@huawei.com>
@@ -61,56 +61,38 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  dggpemf200006.china.huawei.com (7.185.36.61)
 
-As the get_order() implemented by xtensa supporting 'nsau'
-instruction seems be the same as the generic implementation
-in include/asm-generic/getorder.h when size is not a constant
-value as the generic implementation calling the fls*() is also
-utilizing the 'nsau' instruction for xtensa.
+free_the_page() used by page_frag call free_unref_page() or
+__free_pages_ok() depending on pcp_allowed_order(), as the
+max order of page allocated for page_frag is 3, the checking
+in pcp_allowed_order() is unnecessary.
 
-So remove the get_order() implemented by xtensa, as using the
-generic implementation may enable the compiler to do the
-computing when size is a constant value instead of runtime
-computing and enable the using of get_order() in BUILD_BUG_ON()
-macro.
+So call free_unref_page() directly to free a page_frag page
+to aovid the unnecessary checking.
+
+As the free_the_page() is a static function in page_alloc.c,
+using the new one also allow moving page_frag related code
+to a new file in the next patch.
 
 CC: Alexander Duyck <alexander.duyck@gmail.com>
 Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-Acked-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- arch/xtensa/include/asm/page.h | 18 ------------------
- 1 file changed, 18 deletions(-)
+ mm/page_alloc.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/xtensa/include/asm/page.h b/arch/xtensa/include/asm/page.h
-index 4db56ef052d2..8665d57991dd 100644
---- a/arch/xtensa/include/asm/page.h
-+++ b/arch/xtensa/include/asm/page.h
-@@ -109,26 +109,8 @@ typedef struct page *pgtable_t;
- #define __pgd(x)	((pgd_t) { (x) } )
- #define __pgprot(x)	((pgprot_t) { (x) } )
+diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+index 2e22ce5675ca..0511c30bc265 100644
+--- a/mm/page_alloc.c
++++ b/mm/page_alloc.c
+@@ -4781,6 +4781,9 @@ static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
+ 	gfp_t gfp = gfp_mask;
  
--/*
-- * Pure 2^n version of get_order
-- * Use 'nsau' instructions if supported by the processor or the generic version.
-- */
--
--#if XCHAL_HAVE_NSA
--
--static inline __attribute_const__ int get_order(unsigned long size)
--{
--	int lz;
--	asm ("nsau %0, %1" : "=r" (lz) : "r" ((size - 1) >> PAGE_SHIFT));
--	return 32 - lz;
--}
--
--#else
--
- # include <asm-generic/getorder.h>
- 
--#endif
--
- struct page;
- struct vm_area_struct;
- extern void clear_page(void *page);
+ #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
++	/* Ensure free_unref_page() can be used to free the page fragment */
++	BUILD_BUG_ON(PAGE_FRAG_CACHE_MAX_ORDER > PAGE_ALLOC_COSTLY_ORDER);
++
+ 	gfp_mask = (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
+ 		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
+ 	page = alloc_pages_node(NUMA_NO_NODE, gfp_mask,
 -- 
 2.33.0
 
