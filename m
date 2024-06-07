@@ -1,108 +1,138 @@
-Return-Path: <netdev+bounces-101958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42119900BE9
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 20:33:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA0E3900BFD
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 20:43:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36D41B22721
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:33:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E349BB22962
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:43:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E5B13FD84;
-	Fri,  7 Jun 2024 18:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46BBF13E41D;
+	Fri,  7 Jun 2024 18:43:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="hZ136Q9m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lvClyOjf"
 X-Original-To: netdev@vger.kernel.org
-Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8487D13E41D;
-	Fri,  7 Jun 2024 18:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117CA1CD02;
+	Fri,  7 Jun 2024 18:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717785202; cv=none; b=Jfz0yZZ6e4TLX2RJSWslzjs7hec12RQZ2n1NL0QNmnF8F8Qk5eWRfj7hITTE6PH+i15sZKTnkMyvaMixm21BmCrVSEG3lRYOpLL/MWmB076mMKcsufJaRC1EDFs4YcESlXaGvScQBHO2IbUB40iyAZfWwCVbajOjcRxKeXcbF6c=
+	t=1717785804; cv=none; b=DmC4Zp0G5fs0h1wSHLM0fbObLtG6ztOS+69UzSORrP+QM4gXKZp5hW9o5oId7yyH4720ZqUDuriDZTjXFtd6hG3v9+MvUzJJJAssN8fqkhTbapVk52YjA+nIyOUoWe/ceSQpcrN0+ci2PwMOvK1HnADHTlqK3cOMtf7SwQUEUGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717785202; c=relaxed/simple;
-	bh=K3XX1ZGrNqgevvYtO1jhNZo5tT+1jItizRltt7qdc88=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d3PCnBpZMAJ6EA29xQfP2XMjokN/r7/BV6DzCHNPyToGXH3/gYnL+ZXbM034C2uPWG7hf70vE8KVKXd+DIi1pDAAsBA3JpUMeHUxii7zEeZFr+Vn0GO6vte5PpATBM2ck+9pT6oHhC0giCYpGVM/2FrkF+1wSVQoAuRBE80ytpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=hZ136Q9m; arc=none smtp.client-ip=213.160.73.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-	s=20121; t=1717785191;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FFEyK0DY8IpFcUTkeSbNeWt4t8L56sLzjHekE18/ezc=;
-	b=hZ136Q9m/YuxRSuKeRtrrdjnpbDqDlC0VZr5Soq51LKx+eI2e74hXat/0nxoBYDWn65akr
-	9JrqnR8/r6RKuvbfjU7MwCkuPxL22cJWF1EIf5KXKiE+2Wcx+/VAd+Z3d4kuoUaaGPBGTX
-	Iz7VCRzkYMkgkzYT+01PwTc2tOqRbIs=
-From: Sven Eckelmann <sven@narfation.org>
-To: Marek Lindner <mareklindner@neomailbox.ch>,
- Simon Wunderlich <sw@simonwunderlich.de>, Antonio Quartulli <a@unstable.cc>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>,
- Justin Stitt <justinstitt@google.com>, Kees Cook <keescook@chromium.org>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Erick Archer <erick.archer@outlook.com>
-Cc: Erick Archer <erick.archer@outlook.com>, b.a.t.m.a.n@lists.open-mesh.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-hardening@vger.kernel.org, llvm@lists.linux.dev
-Subject:
- Re: [PATCH v4] batman-adv: Add flex array to struct batadv_tvlv_tt_data
-Date: Fri, 07 Jun 2024 20:33:08 +0200
-Message-ID: <2529523.GKX7oQKdZx@ripper>
-In-Reply-To:
- <AS8PR02MB7237205E3231CD335CB988648BFB2@AS8PR02MB7237.eurprd02.prod.outlook.com>
-References:
- <AS8PR02MB7237205E3231CD335CB988648BFB2@AS8PR02MB7237.eurprd02.prod.outlook.com>
+	s=arc-20240116; t=1717785804; c=relaxed/simple;
+	bh=OCTLuk/DIpZjCuMdEwXD4ZYH2rU5XWljSDnPfquC+XQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=A3cODvTYj5se672LrLHBqRByxqbI9jDql5JxpDuZE55g97YucYTta71OIxGuuMZ6FhBUMezFy0QXvF+7leSailW+ZpICwsxomtm621MWTxRID0bb+cZhG+A3kw/TskSi++NIUxxvmiFuTT6SPfS49kBwQE9o5FhLi/EirwHMTQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lvClyOjf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 482B5C2BBFC;
+	Fri,  7 Jun 2024 18:43:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717785803;
+	bh=OCTLuk/DIpZjCuMdEwXD4ZYH2rU5XWljSDnPfquC+XQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=lvClyOjfiMvMLVUxa9M8Ra8v/0slconYbv+YKmVtK3DEaJ+0XlVZ1a5ZNQbMhHrV/
+	 zUkvlgZvjmAmvvNSKaLHuWsCmi+pIUZx/wj33h+5ulghxjxjhg2xwhgntLWGFRcQqs
+	 G0rqi3F5z8MCKS8h4laqhVbFRgZQaNHSGIMpUhZlmKUWXYTvFKtfzinZ/EuIHxMA/A
+	 fX4IwZmlBp1ZXPBM7HPFLb9MoOTUKH5zBcp9xH7ghMEiaqA1ejvioVeozxUZKIQKZb
+	 94pUicfCZMhWv8y/ln/FTP5v1WENEIgF9IP3kZ24kcj9yDWk30AKZOGH9DNs9R014x
+	 MWxhjTgsSMHCQ==
+Date: Fri, 7 Jun 2024 13:43:20 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Wei Huang <wei.huang2@amd.com>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	bhelgaas@google.com, corbet@lwn.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com
+Subject: Re: [PATCH V2 6/9] PCI/TPH: Retrieve steering tag from ACPI _DSM
+Message-ID: <20240607184320.GA853474@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart2954765.bcXerOTE6V";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240531213841.3246055-7-wei.huang2@amd.com>
 
---nextPart2954765.bcXerOTE6V
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
-From: Sven Eckelmann <sven@narfation.org>
-Date: Fri, 07 Jun 2024 20:33:08 +0200
-Message-ID: <2529523.GKX7oQKdZx@ripper>
-MIME-Version: 1.0
+On Fri, May 31, 2024 at 04:38:38PM -0500, Wei Huang wrote:
+> According to PCI SIG ECN, calling the _DSM firmware method for a given
+> CPU_UID returns the steering tags for different types of memory
+> (volatile, non-volatile). These tags are supposed to be used in ST
+> table entry for optimal results.
 
-On Friday, 7 June 2024 18:19:12 CEST Erick Archer wrote:
-> Hi,
-> 
-> As it was decided in version 3, I resend this path since -r2 has been
-> released. I hope that this time the patch can be applied ;)
+Cite PCI Firmware spec if possible.  If it hasn't been incorporated
+yet, at least include the exact name of the ECN and the date it was
+approved.
 
-Thanks, applied.
+Say what the patch does in the commit log (in addition to the subject
+line).
 
-Kind regards,
-	Sven
---nextPart2954765.bcXerOTE6V
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
+> +#define MIN_ST_DSM_REV		7
 
------BEGIN PGP SIGNATURE-----
+No useful value in this #define.  If the value ever changes, code
+changes will be required too.
 
-iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCZmNSZAAKCRBND3cr0xT1
-y5B6AQCskTowCR93AUyerf8R+T/LbG434M61OZgxyimamI09YAD8CmdPzu35Sh+O
-P7MqIU9qdXBCNKqbNf8jYJhR8W44awE=
-=+VlR
------END PGP SIGNATURE-----
+> +#define ST_DSM_FUNC_INDEX	0xf
 
---nextPart2954765.bcXerOTE6V--
+Move to the list in pci-acpi.h with name similar to others.
 
+> +static bool invoke_dsm(acpi_handle handle, u32 cpu_uid, u8 ph,
+> +		       u8 target_type, bool cache_ref_valid,
+> +		       u64 cache_ref, union st_info *st_out)
+> +{
 
+Return 0 or -errno.  "invoke_dsm" is not a predicate with an obvious
+true/false meaning.
 
+> +	union acpi_object in_obj, in_buf[3], *out_obj;
+> +
+> +	in_buf[0].integer.type = ACPI_TYPE_INTEGER;
+> +	in_buf[0].integer.value = 0; /* 0 => processor cache steering tags */
+> +
+> +	in_buf[1].integer.type = ACPI_TYPE_INTEGER;
+> +	in_buf[1].integer.value = cpu_uid;
+> +
+> +	in_buf[2].integer.type = ACPI_TYPE_INTEGER;
+> +	in_buf[2].integer.value = ph & 3;
+> +	in_buf[2].integer.value |= (target_type & 1) << 2;
+> +	in_buf[2].integer.value |= (cache_ref_valid & 1) << 3;
+> +	in_buf[2].integer.value |= (cache_ref << 32);
+> +
+> +	in_obj.type = ACPI_TYPE_PACKAGE;
+> +	in_obj.package.count = ARRAY_SIZE(in_buf);
+> +	in_obj.package.elements = in_buf;
+
+Must check whether this _DSM function is implemented first, e.g., see
+acpi_enable_dpc().
+
+> +	out_obj = acpi_evaluate_dsm(handle, &pci_acpi_dsm_guid, MIN_ST_DSM_REV,
+> +				    ST_DSM_FUNC_INDEX, &in_obj);
+> +
+> +	if (!out_obj)
+> +		return false;
+> +
+> +	if (out_obj->type != ACPI_TYPE_BUFFER) {
+> +		pr_err("invalid return type %d from TPH _DSM\n",
+> +		       out_obj->type);
+> +		ACPI_FREE(out_obj);
+> +		return false;
+> +	}
+> +
+> +	st_out->value = *((u64 *)(out_obj->buffer.pointer));
+> +
+> +	ACPI_FREE(out_obj);
+> +
+> +	return true;
+> +}
 
