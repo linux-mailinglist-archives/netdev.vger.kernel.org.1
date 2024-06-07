@@ -1,120 +1,108 @@
-Return-Path: <netdev+bounces-101858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F25C0900504
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 15:34:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6831D90050D
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 15:35:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 910961F21F45
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 13:34:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E876AB2929E
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 13:35:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25BF31946D0;
-	Fri,  7 Jun 2024 13:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3DF199398;
+	Fri,  7 Jun 2024 13:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F2JAi9iz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441BE19413D;
-	Fri,  7 Jun 2024 13:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 316261922F9;
+	Fri,  7 Jun 2024 13:32:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717767124; cv=none; b=lDnjOuxPeuMyh87CQ+qDoAwdNWBipa1KlWvEfyEJsvwklQSlBfm/qZiNbZnRKQ7sRlv9MiTtN6II9HVMR/HdTg1a+RgyGWWilSRUYwSTneT3WgHLdpu4/xtgThQMaUg9+/pqovkqhiOWTXbVsxc/Lt9MX1+6uuWxOWX1MOy8FMw=
+	t=1717767164; cv=none; b=Bmmm1A7GbmOye5UVLIKf+Ocyb+KWTsp3Xk2rGcQ4CAGf5m4MQ2liF8oPBhuJ03ENpp+my1pX6BJcBTJOTz6/DhF4uSFSEckqX1paAZiEXDpgjBDRFivtb+qQJy2B4bZdy8p6LhX7UmuZJOC0LktFHnBjMH4B7DkRCHhEasa9d0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717767124; c=relaxed/simple;
-	bh=jK1d3o1QAPsjxRL7F/RTi+01I3SDRcHu6QO1eAUSOe0=;
-	h=MIME-Version:Content-Type:Date:From:To:Cc:Subject:In-Reply-To:
-	 References:Message-ID; b=tkS7k2f0pt5AFvTH2Sgck3OwHPvzOU6EQbg6WAxl5DjH6SY8GSF9wrcC8yx4qet7GBs0BIC1xnCxg2CjzHSYHYkiLMFhrYLrZpYmZf1iqn2JF/Tkp4dsMvEc5q9etoryA7XKL19Atv6SHdP2iG2b7ICR98ZGyL/mmuzxoehcBFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=194.37.255.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
-Received: from [127.0.0.1] (helo=localhost)
-	by relay.expurgate.net with smtp (Exim 4.92)
-	(envelope-from <prvs=990276a841=ms@dev.tdt.de>)
-	id 1sFZhH-005xIM-G8; Fri, 07 Jun 2024 15:31:59 +0200
-Received: from [195.243.126.94] (helo=securemail.tdt.de)
-	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ms@dev.tdt.de>)
-	id 1sFZhG-00EM7R-UE; Fri, 07 Jun 2024 15:31:58 +0200
-Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id 8F565240053;
-	Fri,  7 Jun 2024 15:31:58 +0200 (CEST)
-Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id 1974C240050;
-	Fri,  7 Jun 2024 15:31:58 +0200 (CEST)
-Received: from mail.dev.tdt.de (localhost [IPv6:::1])
-	by mail.dev.tdt.de (Postfix) with ESMTP id 9D59A381D6;
-	Fri,  7 Jun 2024 15:31:57 +0200 (CEST)
+	s=arc-20240116; t=1717767164; c=relaxed/simple;
+	bh=6bVomJeklHfwq6dyxfuwrhU6D4+V79v408gXjcqI/WE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=i25ZV5a1OiNNZ7x8VfGKiuTCvTrw6Rvbx03pHpfyk/CTkvPE5BdhUlJiiwEG5ePWDEt5yzQ+gKUB0qmd8UOlVS3ux45PSLKCjkwvxOL2kYUZFkyVpciGfh7B7LfSjA/eCs9ABPhW2xR5dfHZi/cQQgS31h8aT7fuZVbFK6wCOD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F2JAi9iz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A041CC32782;
+	Fri,  7 Jun 2024 13:32:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717767163;
+	bh=6bVomJeklHfwq6dyxfuwrhU6D4+V79v408gXjcqI/WE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=F2JAi9izIP49nv1hbYQBXEoeMzNjjpvKLhmSMs9KWcvRREQUNWZBw4UDuNjdWftY7
+	 5RKwLxI1/f62DRJc2KFRg//tdnWsd8ip7Dihro57bf8WhaE4Re4cdNuKySnDP4Cllb
+	 baErUghfMyZggdOTf13cBzHOMytklcnR3Ok066BKNNvUChK90y6Ev0bPIzy4+i5gQy
+	 2hyYBH6F3+5aTyKbxACGzWAHpDz/Yxccy5IWELock/0J14xw3Zn+AQkdnPkJyqD98R
+	 +zYojWURTbDePkIbq+lLsUPnjBfn4zoFzlnQtRF2YvY7MGbEh40EcjMtCfTsyD0HX3
+	 /Bqjt88w+Watg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9178DCF3BA3;
+	Fri,  7 Jun 2024 13:32:43 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Fri, 07 Jun 2024 15:31:57 +0200
-From: Martin Schiller <ms@dev.tdt.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: martin.blumenstingl@googlemail.com, hauke@hauke-m.de, andrew@lunn.ch,
- f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 09/13] net: dsa: lantiq_gswip: Forbid
- gswip_add_single_port_br on the CPU port
-Organization: TDT AG
-In-Reply-To: <20240607112628.igcf6ytqe6wbmbq5@skbuf>
-References: <20240606085234.565551-1-ms@dev.tdt.de>
- <20240606085234.565551-10-ms@dev.tdt.de>
- <20240607112628.igcf6ytqe6wbmbq5@skbuf>
-Message-ID: <e2439e7d01c4484c59ce3df2707c2e00@dev.tdt.de>
-X-Sender: ms@dev.tdt.de
-User-Agent: Roundcube Webmail/1.3.17
-X-purgate-type: clean
-X-purgate-ID: 151534::1717767119-36129522-4EAB40DD/0/0
-X-purgate: clean
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] liquidio: Adjust a NULL pointer handling path in
+ lio_vf_rep_copy_packet
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171776716359.27999.7521949706547651629.git-patchwork-notify@kernel.org>
+Date: Fri, 07 Jun 2024 13:32:43 +0000
+References: <20240605101135.11199-1-amishin@t-argos.ru>
+In-Reply-To: <20240605101135.11199-1-amishin@t-argos.ru>
+To: Aleksandr Mishin <amishin@t-argos.ru>
+Cc: davem@davemloft.net, horms@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, keescook@chromium.org,
+ justinstitt@google.com, felix.manlunas@cavium.com,
+ satananda.burla@cavium.com, raghu.vatsavayi@cavium.com,
+ vijaya.guvva@cavium.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
 
-On 2024-06-07 13:26, Vladimir Oltean wrote:
-> On Thu, Jun 06, 2024 at 10:52:30AM +0200, Martin Schiller wrote:
->> From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
->> 
->> Calling gswip_add_single_port_br() with the CPU port would be a bug
->> because then only the CPU port could talk to itself. Add the CPU port 
->> to
->> the validation at the beginning of gswip_add_single_port_br().
->> 
->> Signed-off-by: Martin Blumenstingl 
->> <martin.blumenstingl@googlemail.com>
->> ---
->>  drivers/net/dsa/lantiq_gswip.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->> 
->> diff --git a/drivers/net/dsa/lantiq_gswip.c 
->> b/drivers/net/dsa/lantiq_gswip.c
->> index ee8296d5b901..d2195271ffe9 100644
->> --- a/drivers/net/dsa/lantiq_gswip.c
->> +++ b/drivers/net/dsa/lantiq_gswip.c
->> @@ -657,7 +657,7 @@ static int gswip_add_single_port_br(struct 
->> gswip_priv *priv, int port, bool add)
->>  	unsigned int max_ports = priv->hw_info->max_ports;
->>  	int err;
->> 
->> -	if (port >= max_ports) {
->> +	if (port >= max_ports || dsa_is_cpu_port(priv->ds, port)) {
->>  		dev_err(priv->dev, "single port for %i supported\n", port);
->>  		return -EIO;
->>  	}
->> --
->> 2.39.2
->> 
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Wed, 5 Jun 2024 13:11:35 +0300 you wrote:
+> In lio_vf_rep_copy_packet() pg_info->page is compared to a NULL value,
+> but then it is unconditionally passed to skb_add_rx_frag() which looks
+> strange and could lead to null pointer dereference.
 > 
-> Isn't the new check effectively dead code?
+> lio_vf_rep_copy_packet() call trace looks like:
+> 	octeon_droq_process_packets
+> 	 octeon_droq_fast_process_packets
+> 	  octeon_droq_dispatch_pkt
+> 	   octeon_create_recv_info
+> 	    ...search in the dispatch_list...
+> 	     ->disp_fn(rdisp->rinfo, ...)
+> 	      lio_vf_rep_pkt_recv(struct octeon_recv_info *recv_info, ...)
+> In this path there is no code which sets pg_info->page to NULL.
+> So this check looks unneeded and doesn't solve potential problem.
+> But I guess the author had reason to add a check and I have no such card
+> and can't do real test.
+> In addition, the code in the function liquidio_push_packet() in
+> liquidio/lio_core.c does exactly the same.
+> 
+> [...]
 
-As long as the dsa_switch_ops .port_bridge_join and .port_bridge_leave 
-are not
-executed for the cpu port, I agree with you.
+Here is the summary with links:
+  - [net,v3] liquidio: Adjust a NULL pointer handling path in lio_vf_rep_copy_packet
+    https://git.kernel.org/netdev/net/c/c44711b78608
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
