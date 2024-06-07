@@ -1,137 +1,184 @@
-Return-Path: <netdev+bounces-101822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE2AA900328
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:15:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3004790039E
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:31:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85408286A76
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:15:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A77361F29587
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:31:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 208D51922C4;
-	Fri,  7 Jun 2024 12:15:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7D819408E;
+	Fri,  7 Jun 2024 12:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l3NIgCE2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mtQAu4d4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80537190696
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 12:15:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9351850B7;
+	Fri,  7 Jun 2024 12:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717762505; cv=none; b=Vt+bZdRTiTngJP/MJsbBzf3nyPq7GgTqLZqqOym3Xbw5kvEBsmRTDQlL+iQebk91SeXUBaCVivvzWwIpH3uKpCWMWNy7n2FgbAkBvumoIXGIPHsloOSg3owOZs92GrRolRWBGEnEz63PM1m5IDEmv0r87iCJv0xGyGHrjD/E/Mw=
+	t=1717763469; cv=none; b=ihspyxSIkcpuqeAjV+svjm+SkQD9qNXYX9PJkfxVmIC+UWD9oys+w1j7+dWZavBsOxIpzshgJ1BxvcNHI+y5XEG+wifOv3T+MwunJVuYIR75/9556gnf6zzfP3iw3ZCl1jkiNxN4VHU3Vzta36xYVqPpyS+opBRpz8S0aJdNnn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717762505; c=relaxed/simple;
-	bh=HQUYtmzjk3nbtKwBo0iMqw6E+1YQOvSX8err0DHZcxU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hDgq04sWebOXLrDxJo2P6DD/SoielgEJb8ah6bm3UDlcTsf68oJdIlZ3KdqwgH0a3mXDE00IvBt4DGN3+BAzwN62Ssl9i1f4Sq+2gdT1QXtKrw94gb5h+VB8G3laf3uHq9r9/UY5iyZoQzhyIaIRK/pKabntQ6ZsqS5U2mE9y4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l3NIgCE2; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717762504; x=1749298504;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=HQUYtmzjk3nbtKwBo0iMqw6E+1YQOvSX8err0DHZcxU=;
-  b=l3NIgCE2068r76frM88ZpS0iWoOIFbOfNzzK5uJeM6MtRMGGhwxjL0ci
-   r3mmKuD4DvViTNMXm/pqJjkreiQU5gTCGjDpdF/hm2AdgBUwjp60Qu9M9
-   GLoLWMROwFHZIlAm9kg2frx/iXdX+n2ughrJIUv9MNy/cT05WQ/qfpeUs
-   NSeiOf1HyQKEDYfi5EhsEAag2Q4vefzMFn6R8rjymsy+j97Xf5fZo8hKN
-   ZIEJrc5+a9FuzCTp22o3tEFkWyD7EbUBkGdnjCSW+VfrbK7GRJ4INS5hd
-   P6PzDocM4kCKptjOPiJ3vxRn0fVgg+P0MkVHQ3dVKMhtP34gEjzM3FtNN
-   Q==;
-X-CSE-ConnectionGUID: aQSKfmq7THO6bTtuH4zYMw==
-X-CSE-MsgGUID: 6xcplEq+SJi7/56RRKw2ig==
-X-IronPort-AV: E=McAfee;i="6600,9927,11095"; a="14312978"
-X-IronPort-AV: E=Sophos;i="6.08,221,1712646000"; 
-   d="scan'208";a="14312978"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2024 05:15:03 -0700
-X-CSE-ConnectionGUID: gowl1lNuRrSYgMKN9jm7AQ==
-X-CSE-MsgGUID: SdhAQElOS1+QrFSfvKb8pw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,221,1712646000"; 
-   d="scan'208";a="38304095"
-Received: from unknown (HELO localhost.igk.intel.com) ([10.91.240.220])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2024 05:15:00 -0700
-From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Ngai-Mint Kwan <ngai-mint.kwan@intel.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	Pawel Chmielewski <pawel.chmielewski@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-Subject: [PATCH iwl-net v5] ice: Do not get coalesce settings while in reset
-Date: Fri,  7 Jun 2024 14:15:52 +0200
-Message-ID: <20240607121552.15127-1-dawid.osuchowski@linux.intel.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1717763469; c=relaxed/simple;
+	bh=RuDIhSbO/ax8zNd2ran6Gzbl4un6OLukSdQSWrPKP5s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a/zTJTJicgj4W/5Q/iphzeMeSZekEl003bNzHzMCLNpIAo9mkXFcy4U63VjHZcE2g6FeSklUFNyJ9VKakOtL/876BMoGTs9R2hljDJPqzv/KIZYijP6ntyTlyTbP/Msj6wEdANSSnEyY6qJZWOuUQj8kbICpjfv9/nba0aUBYC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mtQAu4d4; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57a4ce82f30so2517618a12.0;
+        Fri, 07 Jun 2024 05:31:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717763466; x=1718368266; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=N0t9qQNDQyMfGhvDGBq4R0rinqRtCXO9/OSll4uI/+M=;
+        b=mtQAu4d4XlKrMSJMuzE18hRv2rGbyDiD8PeDYFQlpjxKEyese7Q53wrKH5y7oUV0Vr
+         28Qp+AbcRgTV1Aj01fBvOek2LMZJJq+L1zIi+bVehdV1sc7kg/D3jeO5vx9U+4RPtgdj
+         yG5aQ4H8tE0lj9y4eoETprXJN5qaDbqIzTTuND1LdErfoZ7rBxqdXznx2oJ2T8QSIVy8
+         FtxPTyaQAF56ka1alhP2g8ln+GjH9WO/SAwT9RiEjJfjKjAQcNVLgGeujJ2EDs6C6vq2
+         ACzakRjCQ1ieHSg76vaxICyfybb0GzAyUmjCS3hazrsU6dcFucLDCGTE82AUtwFRdkjl
+         DhPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717763466; x=1718368266;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N0t9qQNDQyMfGhvDGBq4R0rinqRtCXO9/OSll4uI/+M=;
+        b=rVPli6S6EASMiI6mheun6Fu7IdqWS0g86MxC91RVtpvRtYzd0Ym6bXyXJdopMh/G9P
+         5YJ+6trasR1YR3mn+L32bD0RRjdqNIH6P0SYFA3WQtWR2d8DnYDGFQuYnPX9fbOwWS+h
+         Cr3WRu5Mognrwpf7qksd4cqnQ6S0B0Kxa0z83Z4p8mGLRMot/IXxo74XMOeovzpl+YeU
+         MBNdf8PyF6haaXaKF3sNI9bNM1bpem+TYKQ49voCMbNNqFiVhwQ+lSGmdHn4692gQXYi
+         eue+2+OfiQ2WAyD95yeAiaXm3WT2GKyxaFSm0a5G2PE1O+MjQ92W2zdn4Ao8hFuKVIHf
+         4dHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVUbzO0U9d0UxOjnBfIPvPW7Gdcbi5u0nij75sNJ5L4YyKV4sZgQGtHUeq66OaVOZa7o364L06hUFtvNsDFqd0vxSeLvmGOLo1MtNJTJ+7frSgpJW+i1+DS2na40+SehZOM37Mr0BiTz2FI9uZmKYRKTrBuYpgKhvqNwzvPBPnSE3kObE9hkFuLR2O9iTHySWC5pRHbhRvGESefDVs7oDwA30CdzphslEQ4djsZhDgKJ5Vns1ub9j68emOaQ6vR2havGFxd47HE5RbX8Tb3uC7C/CBW+2uiluVSaAhN8X6aCdj6sWrgqc18IhKFqOqYfx568thGB7uzkCvq3w6PSfuO/UrNtSX1OsAGWXr7V1S5Io+3nSWIfe5xXbJ47OUj0IuzqLa9Wn0EG8belrI7GHf8Sm1JjBcerIXKq7aHDqyzobGQz3oqz44ztxZ7Oe2GXxjq2aOFSecydfh5NrIpinOkmti1IUiuB051L4p+gA==
+X-Gm-Message-State: AOJu0YxgtfnolRWsE5AWPrSQtME2r7j+voX3VOENYEATnhwPyfy2SeV9
+	Mwgz4ifZaW31IES/mqKYgPTqjiMbshWU1djPEoUeIvXtVuWN1bp7
+X-Google-Smtp-Source: AGHT+IH5SNInb5yZq3Cuj7U8oACNWHmzMuuF2G63X2k2tjaQ/s20PtWq1uTiQglncTLckDH15vmQlg==
+X-Received: by 2002:a50:c181:0:b0:57c:5ec9:f5d9 with SMTP id 4fb4d7f45d1cf-57c5eca001emr1193325a12.31.1717763466203;
+        Fri, 07 Jun 2024 05:31:06 -0700 (PDT)
+Received: from [192.168.42.93] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57aadf9d8d0sm2682019a12.8.2024.06.07.05.31.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Jun 2024 05:31:05 -0700 (PDT)
+Message-ID: <ff4e0e14-9f3e-4d8b-a2a6-75dfc1f6e96b@gmail.com>
+Date: Fri, 7 Jun 2024 13:31:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v10 06/14] page_pool: convert to use netmem
+To: Steven Rostedt <rostedt@goodmis.org>,
+ Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
+ <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ linux-mm@kvack.org, Matthew Wilcox <willy@infradead.org>
+References: <20240530201616.1316526-1-almasrymina@google.com>
+ <20240530201616.1316526-7-almasrymina@google.com>
+ <20240605214837.44efcc6f@gandalf.local.home>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20240605214837.44efcc6f@gandalf.local.home>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Ngai-Mint Kwan <ngai-mint.kwan@intel.com>
+On 6/6/24 02:48, Steven Rostedt wrote:
+> On Thu, 30 May 2024 20:16:05 +0000
+> Mina Almasry <almasrymina@google.com> wrote:
+> 
+>> @@ -42,51 +42,52 @@ TRACE_EVENT(page_pool_release,
+>>   TRACE_EVENT(page_pool_state_release,
+>>   
+>>   	TP_PROTO(const struct page_pool *pool,
+>> -		 const struct page *page, u32 release),
+>> +		 netmem_ref netmem, u32 release),
+>>   
+>> -	TP_ARGS(pool, page, release),
+>> +	TP_ARGS(pool, netmem, release),
+>>   
+>>   	TP_STRUCT__entry(
+>>   		__field(const struct page_pool *,	pool)
+>> -		__field(const struct page *,		page)
+>> +		__field(netmem_ref,			netmem)
+> 
+> Why make this of type "netmem_ref" and not just "unsigned long"?
+> 
+>>   		__field(u32,				release)
+>>   		__field(unsigned long,			pfn)
+>>   	),
+>>   
+>>   	TP_fast_assign(
+>>   		__entry->pool		= pool;
+>> -		__entry->page		= page;
+>> +		__entry->netmem		= netmem;
+> 
+> You could have this be:
+> 
+> 		__entry->netmem		= (__force unsigned long)netmem;
+> 
+>>   		__entry->release	= release;
+>> -		__entry->pfn		= page_to_pfn(page);
+>> +		__entry->pfn		= netmem_to_pfn(netmem);
+>>   	),
+>>   
+>> -	TP_printk("page_pool=%p page=%p pfn=0x%lx release=%u",
+>> -		  __entry->pool, __entry->page, __entry->pfn, __entry->release)
+>> +	TP_printk("page_pool=%p netmem=%lu pfn=0x%lx release=%u",
+>> +		  __entry->pool, (__force unsigned long)__entry->netmem,
+> 
+> And not have to expose the above text to user space (look at the format
+> file it produces).
+> 
+> It being of type "netmem_ref" in the ring buffer is useless.
 
-Getting coalesce settings while reset is in progress can cause NULL
-pointer deference bug.
-If under reset, abort get coalesce for ethtool.
+netmem is a pointer with one bit serving as a flag, considering
+mangling it might be better to %p it and perhaps also print its
+type (page* vs iov) separately.
 
-We cannot use ice_wait_for_reset() since both the ethtool handler and the
-adapter reset flow call rtnl_lock() during operation. If we wait for
-reset completion inside of an ethtool handling function such as
-ice_get_coalesce(), the wait will always timeout due to reset being
-blocked by rtnl_lock() inside of ice_queue_set_napi() (which is called
-during reset process), and in turn we will always return -EBUSY anyways,
-with the added hang time of the timeout value.
-
-Fixes: 67fe64d78c43 ("ice: Implement getting and setting ethtool coalesce")
-Signed-off-by: Ngai-Mint Kwan <ngai-mint.kwan@intel.com>
-Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
----
-Changes since v1:
-* Added "Fixes:" tag
-Changes since v2:
-* Rebased over current IWL net branch
-* Confirmed that the issue previously reported for this patch [1] by
-Himasekhar Reddy Pucha was caused by other, internally tracked issue
-Changes since v3:
-* Using ice_wait_for_reset() instead of returning -EBUSY 
-Changes since v4:
-* Rebased over current IWL net branch
-* Rollback the use of ice_wait_for_reset() due to rtnl_lock() deadlock
-issue described in [2] and commit msg
-
-[1] https://lore.kernel.org/netdev/BL0PR11MB3122D70ABDE6C2ACEE376073BD90A@BL0PR11MB3122.namprd11.prod.outlook.com/
-[2] https://lore.kernel.org/netdev/20240501195641.1e606747@kernel.org/T/#m1629ecfe88d26551852c5c97982cd10314991422
----
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 62c8205fceba..2ffe864a364c 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -3810,6 +3810,9 @@ __ice_get_coalesce(struct net_device *netdev, struct ethtool_coalesce *ec,
- 	struct ice_netdev_priv *np = netdev_priv(netdev);
- 	struct ice_vsi *vsi = np->vsi;
- 
-+	if (ice_is_reset_in_progress(vsi->back->state))
-+		return -EBUSY;
-+
- 	if (q_num < 0)
- 		q_num = 0;
- 
 -- 
-2.44.0
-
+Pavel Begunkov
 
