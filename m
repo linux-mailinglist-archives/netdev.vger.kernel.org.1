@@ -1,207 +1,200 @@
-Return-Path: <netdev+bounces-101897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 133719007E9
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 17:00:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 657EF9007EB
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 17:00:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12A871C22E0D
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 15:00:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA4C028BA70
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 15:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89CB6193085;
-	Fri,  7 Jun 2024 14:53:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45CC418732D;
+	Fri,  7 Jun 2024 14:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qql82WAN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0YK8H7Mp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E534C197A68;
-	Fri,  7 Jun 2024 14:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78FF0194AD3
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 14:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717772032; cv=none; b=oVGZ5IQTbEtWwg48dkC3DV6rq0eLA4RFIk+rXBGGoiuPp37Eza6wvPzk238b2W7cCEaws3iL2riLBZsdjDSZIE7QKkx425f8pvmqsfxan5lEoG6G8EEmvBFy/WSzuxKHvT3X+sJMarwT8DZm1T8u0JT/iUdwb67/w9ij/djKuJY=
+	t=1717772069; cv=none; b=aIzcWDGkYfrpM++Yc33yZVub5mXAKs6rQLT5mQR9l6TG3ohckMW/03LrMNGdvu82zcMjs23khIMSAsUt4IeZeCy2bOQ4M6qrihSeNczYbYssfpZMkrdyBvFzyAqtgByDw1AQuzMCgMT6NfiRFDsbJTDtea8Z/RUdc07py4YXIlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717772032; c=relaxed/simple;
-	bh=qN0K4Vhm1CmfQJv8lTUuvuTmBDZntjnq3l4O0tLeuSE=;
+	s=arc-20240116; t=1717772069; c=relaxed/simple;
+	bh=lmK288VZ+Au6UYiggllrjx3A4mW0p+aY1rqBCbrC0MA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fcGizZMpuPuvM+EzMpuB7Z6+4YvB2qf1oEXe9ZN7+eWVPKtyF4rcvb18DZpDU9Is1BXQtOsyIkMjvMrFw+IQFv+iClPLqHXSJKC7yVZnX+A63hB/bvquESEym7lbwU+ds6SqGfQMMkl3glyzvnNqoeQnYi6RpYf3jZLvq/BlXV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qql82WAN; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-37585fc3eebso2580605ab.0;
-        Fri, 07 Jun 2024 07:53:50 -0700 (PDT)
+	 To:Cc:Content-Type; b=HcP2FwexdW7mvSHSJybFf/GaJKd07hSzEviyYTk48J2qzxmOU5f77f8DeJ00HUhiUqk6/KFtuUKIfTRZftUHREZAQel6AI5GAXvTgfZ8ivh0LbMKuvws5aGTcvJJC2IvvXSL7vLMpYn2NoA4a8nwMd+b6OHHF+zUx/AUijOr/ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0YK8H7Mp; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4216d9952d2so38385e9.0
+        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 07:54:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717772030; x=1718376830; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1717772065; x=1718376865; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zBo/lajgxqd57WhsKdw0GslmVGXqhBJ5KLjNbHAH6pQ=;
-        b=Qql82WANYdpNboaL1A8gcR0gF9ua5tFXOA7KErFG80sfbQsTrngUgy2kEyGq6/4bY+
-         fHfZw/qXJ+agMyugb6CM1+1vDncFYdRZBSxhbCy3x/+jEwXKRe/FkXir3sATxUxMApWL
-         bYU8vkapnjYK+5QNFIa4nTgixqzwxg4N3ChHS6g0QWZZW0MMF/5/2ngEfZLIEE+6nEKv
-         q6VOvHHfTNvE7BGWZnBB7IBLb+Z7syoDahvj2GOVVuKK4VOjBppbAE6Zimhoyi6kPnrx
-         K7rEqQkUm/UDGXikyWnh5tD6/VTbDgyWTyDZWbT9FPyW6zesAy2XOkQXXZn4SB9+PWHG
-         fPjg==
+        bh=IDVi+2ZBhcOD3G6Gj3CAdm/DYMI+dRngfz2rmLeWYr0=;
+        b=0YK8H7MpObBCV6BhjaW0shS6FTxHhqakXb0W/MgdxeBdH9pV87UIUitIT7AuCJ1T33
+         EbMEytOeCqs4F1QY0G/o/sPzgn5GDUnaZphq0a9KUozIECmCdvLdECqetc8SPO7+1Xvx
+         HQntFXmAWP0FgE/B9Ac6/d+xRaG34HUYB8lnfjo9C/P6QBkbTN5gLYVd7WuZ/SOV7iBa
+         nIlpWTVCel+AD4lM9HhVEDHm5XhGnILpZZMG/qRXW9Hawl5bkDi9H42RxnvVZb5FBbih
+         QLrIxTSqjQgRByNgq4i3PSLQ7FihrTlYTzRrtO1V3r4VaruhjAnNeaAxM5sNmaOa3v3Y
+         wZzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717772030; x=1718376830;
+        d=1e100.net; s=20230601; t=1717772065; x=1718376865;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zBo/lajgxqd57WhsKdw0GslmVGXqhBJ5KLjNbHAH6pQ=;
-        b=jlSq8GxA6Shi5ld9uXPJG1UhmJmCpMXiq++867YuoMyzSVdkIIqfecaF0MTiCFWQZq
-         lAOfJiGx7m8y8ooTYft0OKQmOo8mMpNaWIWS19sT4a15+hS/SEVJyBNYvPvBIuYCoA+n
-         oKBMj95X0iWxpsiQPwPQWnN6V5KbhOH/1Q+FctdHNOsaSfSVMqVvWvnjw5Sn198Uvb3K
-         rp+08wvqBTIpmCSsettafwx/I+OErOY9p+tYrntjNOx5cXO5iJY/kaz274hAlJxXYsfE
-         AckKNWfYoEIuV9dmDKSprOcscGKZyxpUPcDSnTJeSORNWqufZiIf91uSkeznVactKYop
-         aNtw==
-X-Forwarded-Encrypted: i=1; AJvYcCWudAACp9QROGRCePRK/xD5XHtWa4Bvo8LUMB5hF9V2vHJvc9XqhjmhWDszAxYYQt86/srCqwBsKwmMoy/OfhV+jd32Dg5U
-X-Gm-Message-State: AOJu0YzA7lSvmYvflcwAPXJZ7sriztkqdIxzYGweoRVxIhiC2nLao5u6
-	vzLK9xCmerVheZcwEGhIBAyKIIE5HY11i9VXwri69wVilTiDVi+n9eBqcU6vJOEButkIczGQ4tm
-	YX6vjnIBoy6glCRV3c9kYf/TJ6+s/HrBFKPU=
-X-Google-Smtp-Source: AGHT+IFggGLap5bjvbfo6DzymifGGYaCdEH0Kgw/BqUTeDoJEegk34aWS+D513qZNeKZryzDFJVal7Mvcq2cAZxkcks=
-X-Received: by 2002:a05:6e02:dc9:b0:375:8af5:8d17 with SMTP id
- e9e14a558f8ab-3758af58f87mr4157795ab.31.1717772029822; Fri, 07 Jun 2024
- 07:53:49 -0700 (PDT)
+        bh=IDVi+2ZBhcOD3G6Gj3CAdm/DYMI+dRngfz2rmLeWYr0=;
+        b=vkNGgxeEXdKoBi1se43hY0H3U4vb1phMF9hXfxngqKnk8UsIwhW5hqEjWp6l2+CX5u
+         nOi0Y7ovakUm9V4rri//u9PZokNuChhOAglQEuyKNjVugVjB0yRSyB6iaxrWKU23LXLq
+         1IEug8Au6R5h2S+97Mi2/GPn64SlyvUocxQG7Nq9Yq2TtmpYsOLqciqFMzdHtgIDYdw3
+         uqjVHcJo3rMvCr7ernUjGNC12ghX4RTVwy67Tc7C4F04/Nzn29rH/O02VbwLVABUgzps
+         MleypkvGO588Aad0ngQ/GjvIoEtdVttcnhL5tlzPtqscaOtiYXWQ39+bE8iW+Efqh9XD
+         VAkA==
+X-Forwarded-Encrypted: i=1; AJvYcCU94DHShkrMnU5ZzarsqtK/+u3etU8vFECoy6o/gXuZ0Wll3A30Y7qmgypyfL80GdSHLDedS8kqRf0jEG8y3W2gnyz36xU8
+X-Gm-Message-State: AOJu0YxKxF5QIwo+Us2nA6JrcXtOc/hEMo+GPbe6ypHPyWwY3BIDRjrE
+	qt29GW8GdqpGSq4toccntIfKf4O0zOn4zLZBGYdRsOGzX7AsHZ8rO9CT5GEdnDl8LR/b2msEX4U
+	FSpxe0s5OCgKWJhjbq0+d2Zp8zGrMf7LRmBat
+X-Google-Smtp-Source: AGHT+IHhjtFQr7/uCpnoTcDWiakgtql/TDb36sMa3eiVaH0v/oVDMMPuG6sxRwnu+MLy1eJlP+setAKoGZgq4oGViSY=
+X-Received: by 2002:a05:600c:1e0f:b0:421:719b:cb6c with SMTP id
+ 5b1f17b1804b1-421719bcd6cmr818615e9.5.1717772064413; Fri, 07 Jun 2024
+ 07:54:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <4faeb583e1d44d82b4e16374b0ad583c@AcuMS.aculab.com>
- <CADvbK_emOEPZJ8GWtYpUDKAGLW2z84S81ZcW9qQCc=rYCiUbAA@mail.gmail.com> <0b42b8f085b84a7e8ffd5a9b71ed2932@AcuMS.aculab.com>
-In-Reply-To: <0b42b8f085b84a7e8ffd5a9b71ed2932@AcuMS.aculab.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Fri, 7 Jun 2024 10:53:38 -0400
-Message-ID: <CADvbK_cLMuLYA-ADXr2Vn5kRHZ0UpeL7G-u710g1En9t7h6SYw@mail.gmail.com>
-Subject: Re: SCTP doesn't seem to let you 'cancel' a blocking accept()
-To: David Laight <David.Laight@aculab.com>
-Cc: linux-sctp <linux-sctp@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20240415210728.36949-1-victor@mojatatu.com> <127148e766b177a470a397d9c1615fae19934141.camel@sipsolutions.net>
+In-Reply-To: <127148e766b177a470a397d9c1615fae19934141.camel@sipsolutions.net>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 7 Jun 2024 16:54:10 +0200
+Message-ID: <CANn89iLyXx8iRScGr5zzBVJ+-BnN==3JJ7DivQE_VUpaQVO4iQ@mail.gmail.com>
+Subject: Re: [PATCH net] net/sched: Fix mirred deadlock on device recursion
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Victor Nogueira <victor@mojatatu.com>, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, 
+	xiyou.wangcong@gmail.com, netdev@vger.kernel.org, renmingshuai@huawei.com, 
+	pctammela@mojatatu.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 7, 2024 at 4:36=E2=80=AFAM David Laight <David.Laight@aculab.co=
-m> wrote:
+On Fri, Jun 7, 2024 at 4:40=E2=80=AFPM Johannes Berg <johannes@sipsolutions=
+.net> wrote:
 >
-> From: Xin Long
-> > Sent: 06 June 2024 21:15
-> >
-> > On Mon, Jun 3, 2024 at 11:42=E2=80=AFAM David Laight <David.Laight@acul=
-ab.com> wrote:
-> > >
-> > > In a multithreaded program it is reasonable to have a thread blocked =
-in accept().
-> > > With TCP a subsequent shutdown(listen_fd, SHUT_RDWR) causes the accep=
-t to fail.
-> > > But nothing happens for SCTP.
-> > >
-> > > I think the 'magic' happens when tcp_disconnect() calls inet_csk_list=
-en_stop(sk)
-> > > but sctp_disconnect() is an empty function and nothing happens.
-> > >
-> > > I can't see any calls to inet_csk_listen_stop() in the sctp code - so=
- I suspect
-> > > it isn't possible at all.
-> ...
-> > >
-> > > I also suspect that a blocking connect() can't be cancelled either?
-> >
-> > For connecting socket, it calls sctp_shutdown() where SHUT_WR causes
-> > the asoc to enter SHUTDOWN_SENT and cancel the blocking connect().
+> Hi all,
 >
-> I'll test that later - the test I was running always connects.
-> I'm porting some kernel code that used signals to unblock synchronous
-> calls to userspace where you can't signal a thread.
-> The only problem with the kernel version is secure boot and driver
-> signing (especially for the windows build!).
+> I noticed today that this causes a userspace visible change in behaviour
+> (and a regression in some of our tests) for transmitting to a device
+> when it has no carrier, when noop_qdisc is assigned to it. Instead of
+> silently dropping the packets, -ENOBUFS will be returned if the socket
+> opted in to RECVERR.
 >
-> > > Clearly the application can avoid the issue by using poll() and an
-> > > extra eventfd() for the wakeup - but it is all a faff for code that
-> > > otherwise straight forward.
-> >
-> > I will try to prepare a patch to solve this for sctp accept() like:
+> The reason for this is that the static noop_qdisc:
 >
-> I'll test it for you.
+> struct Qdisc noop_qdisc =3D {
+>         .enqueue        =3D       noop_enqueue,
+>         .dequeue        =3D       noop_dequeue,
+>         .flags          =3D       TCQ_F_BUILTIN,
+>         .ops            =3D       &noop_qdisc_ops,
+>         .q.lock         =3D       __SPIN_LOCK_UNLOCKED(noop_qdisc.q.lock)=
+,
+>         .dev_queue      =3D       &noop_netdev_queue,
+>         .busylock       =3D       __SPIN_LOCK_UNLOCKED(noop_qdisc.busyloc=
+k),
+>         .gso_skb =3D {
+>                 .next =3D (struct sk_buff *)&noop_qdisc.gso_skb,
+>                 .prev =3D (struct sk_buff *)&noop_qdisc.gso_skb,
+>                 .qlen =3D 0,
+>                 .lock =3D __SPIN_LOCK_UNLOCKED(noop_qdisc.gso_skb.lock),
+>         },
+>         .skb_bad_txq =3D {
+>                 .next =3D (struct sk_buff *)&noop_qdisc.skb_bad_txq,
+>                 .prev =3D (struct sk_buff *)&noop_qdisc.skb_bad_txq,
+>                 .qlen =3D 0,
+>                 .lock =3D __SPIN_LOCK_UNLOCKED(noop_qdisc.skb_bad_txq.loc=
+k),
+>         },
+> };
 >
-> > diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-> > index c67679a41044..f270a0a4c65d 100644
-> > --- a/net/sctp/socket.c
-> > +++ b/net/sctp/socket.c
-> > @@ -4834,10 +4834,13 @@ int sctp_inet_connect(struct socket *sock,
-> > struct sockaddr *uaddr,
-> >         return sctp_connect(sock->sk, uaddr, addr_len, flags);
-> >  }
-> >
-> > -/* FIXME: Write comments. */
-> >  static int sctp_disconnect(struct sock *sk, int flags)
-> >  {
-> > -       return -EOPNOTSUPP; /* STUB */
-> > +       if (!sctp_style(sk, TCP))
-> > +               return -EOPNOTSUPP;
-> > +
-> > +       sk->sk_shutdown |=3D RCV_SHUTDOWN;
-> > +       return 0;
+> doesn't have an owner set, and it's obviously not allocated via
+> qdisc_alloc(). Thus, it defaults to 0, so if you get to it on CPU 0 (I
+> was using ARCH=3Dum which isn't even SMP) then it will just always run
+> into the
 >
-> I think you need to call something to unblock the thread as well
-> as changing the state.
-shutdown() will call inet_shutdown()/sk_state_change(sk) to awake the
-sleeping thread in sctp_accept()/connect().
+> > +     if (unlikely(READ_ONCE(q->owner) =3D=3D smp_processor_id())) {
+> > +             kfree_skb_reason(skb, SKB_DROP_REASON_TC_RECLASSIFY_LOOP)=
+;
+> > +             return NET_XMIT_DROP;
+> > +     }
+>
+> case.
+>
+> I'm not sure I understand the busylock logic well enough, so almost
+> seems to me we shouldn't do this whole thing on the noop_qdisc at all,
+> e.g. via tagging owner with -2 to say don't do it:
+>
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -3865,9 +3865,11 @@ static inline int __dev_xmit_skb(struct sk_buff *s=
+kb, struct Qdisc *q,
+>                 qdisc_run_end(q);
+>                 rc =3D NET_XMIT_SUCCESS;
+>         } else {
+> -               WRITE_ONCE(q->owner, smp_processor_id());
+> +               if (q->owner !=3D -2)
+> +                       WRITE_ONCE(q->owner, smp_processor_id());
+>                 rc =3D dev_qdisc_enqueue(skb, q, &to_free, txq);
+> -               WRITE_ONCE(q->owner, -1);
+> +               if (q->owner !=3D -2)
+> +                       WRITE_ONCE(q->owner, -1);
+>                 if (qdisc_run_begin(q)) {
+>                         if (unlikely(contended)) {
+>                                 spin_unlock(&q->busylock);
+> diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+> index 2a637a17061b..e857e4638671 100644
+> --- a/net/sched/sch_generic.c
+> +++ b/net/sched/sch_generic.c
+> @@ -657,6 +657,7 @@ static struct netdev_queue noop_netdev_queue =3D {
+>  };
+>
+>  struct Qdisc noop_qdisc =3D {
+> +       .owner          =3D       -2,
+>         .enqueue        =3D       noop_enqueue,
+>         .dequeue        =3D       noop_dequeue,
+>         .flags          =3D       TCQ_F_BUILTIN,
+>
+>
+> (and yes, I believe it doesn't need to be READ_ONCE for the check
+> against -2 since that's mutually exclusive with all other values)
+>
+> Or maybe simply ignoring the value for the noop_qdisc:
+>
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -3822,7 +3822,7 @@ static inline int __dev_xmit_skb(struct sk_buff *sk=
+b, struct Qdisc *q,
+>                 return rc;
+>         }
+>
+> -       if (unlikely(READ_ONCE(q->owner) =3D=3D smp_processor_id())) {
+> +       if (unlikely(q !=3D &noop_qdisc && READ_ONCE(q->owner) =3D=3D smp=
+_processor_id())) {
+>                 kfree_skb_reason(skb, SKB_DROP_REASON_TC_RECLASSIFY_LOOP)=
+;
+>                 return NET_XMIT_DROP;
+>         }
+>
+> That's shorter, but I'm not sure if there might be other special
+> cases...
+>
+> Or maybe someone can think of an even better fix?
 
-In sctp_accept() it checks sk->sk_shutdown & RCV_SHUTDOWN to return,
-while in sctp_connect() it check asoc->state >=3D SCTP_STATE_SHUTDOWN_PENDI=
-NG
-to return.
-
-In inet_shutdown(), only with RCV_SHUTDOWN flag calls .disconnect() for
-LISTEN sockets, and SCTP doesn't do many things for RCV_SHUTDOWN, I would
-just set this flag to unlock the thread, and leave the real disconnection
-to close(listen_sk);
-
->
-> ...
-> > -       if (!sctp_sstate(sk, LISTENING)) {
->
-> Any chance of making it much clearer that this is testing
->                 if (sk->sk_state =3D=3D TCP_LISTEN)
->
-> The token-pasting though
->         SCTP_SS_CLOSED         =3D TCP_CLOSE,
->         SCTP_SS_LISTENING      =3D TCP_LISTEN,
->         SCTP_SS_ESTABLISHING   =3D TCP_SYN_SENT,
->         SCTP_SS_ESTABLISHED    =3D TCP_ESTABLISHED,
->         SCTP_SS_CLOSING        =3D TCP_CLOSE_WAIT,
-> makes grepping for changes to sk_state pretty impossible.
->
-> You might argue that the sk_state values should be protocol neutral,
-> and that the wrapper gives strong typing - but together they make
-> the code hard to scan.
->
-> The strong typing could be maintained by changing the constants to
->         SCTP_SS_TCP_CLOSE =3D TCP_CLOSE
-> (etc) so that grepping for the constants still works.
-I understand.
-I guess the author didn't want to have TCP named things in SCTP.
-Maybe it's the inet layer that should use neutral names for states. :D
-
-Thanks.
-
->
-> I keep thinking of ways to do strongly typed enum in C.
-> The main options seem to be embedding the value in a struct
-> or using a pointer to a struct.
-> Neither is ideal.
->
-> OTOH the compiler can't default to strongly typed enum.
-> Although perhaps that could be a per-enum attribute.
->
->         David
->
-> -
-> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1=
- 1PT, UK
-> Registration No: 1397386 (Wales)
+Why not simply initialize noop_qdisc.owner to -1 ?
 
