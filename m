@@ -1,141 +1,100 @@
-Return-Path: <netdev+bounces-101653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2AA78FFB6E
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:50:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F24B8FFB73
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:51:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50BD62846C8
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 05:50:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D1641C2439C
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 05:51:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB2B014EC7D;
-	Fri,  7 Jun 2024 05:50:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B27214EC78;
+	Fri,  7 Jun 2024 05:51:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WH5fFpZS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 294B217BB4
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 05:50:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E91A200A0
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 05:51:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717739445; cv=none; b=f0sU1cYj8/cEHrdDYKigkOFkWsCv6O+J9wAMQrvxjN1715oXzshRoMyhBAFp0Q8p7m7K5DgNoAd4rgCYJ5VhfNZMJ6A4x76TMpzGlQT//WfFgDtaYJO5PsxZV06cRDvs9oLNYlnvrfY+fIM7Qp3YzvjQuOuZEO80eVXjFMrnFHw=
+	t=1717739481; cv=none; b=DqbC9BkozH6QIk5baMoYX3VKTdFhImzrCKiie5qcb2l7611ViirzMTmr8/cnWg7f3tzU6k5aKdWE2zTx6+imLrVKvx93f04shud3qvL2ST87Di6hYnsdGgT+1HVf8y8PAhK8/MDjr/PqqmkrNVTlKu08DH93J3+UDbjQ9nX36wQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717739445; c=relaxed/simple;
-	bh=Ga/ZhAiIM2g6n9et08M9cn3x1tanfGe2QiwvGlLqQew=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=VIxfGdvF5AuCMNIH1zXTKYUhC1IWd4rPKetslZsyDDAlYVdymreh2YXUBTjUTp4LH1KUbcRl6xDeBSAaxbmSbk+nHI2A2Hlod18D/0GJFlL6ey7N0FKTSisvtMW/QTruHWOKeeeO+BPVmNnQWo0H4LAU+IF8UuHMm5eQu91JjAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from ja.int.chopps.org.chopps.org (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id E6F6D7D10E;
-	Fri,  7 Jun 2024 05:50:42 +0000 (UTC)
-References: <20240520214255.2590923-1-chopps@chopps.org>
- <20240520214255.2590923-9-chopps@chopps.org>
- <Zl354nSbE5mOMC2h@Antony2201.local>
-User-agent: mu4e 1.8.14; emacs 28.3
-From: Christian Hopps <chopps@chopps.org>
-To: Antony Antony <antony@phenome.org>
-Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org, Steffen
- Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, Christian
- Hopps <chopps@labn.net>
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v2 08/17] xfrm: iptfs: add new
- iptfs xfrm mode impl
-Date: Fri, 07 Jun 2024 01:49:40 -0400
-In-reply-to: <Zl354nSbE5mOMC2h@Antony2201.local>
-Message-ID: <m234ppgv2m.fsf@ja.int.chopps.org>
+	s=arc-20240116; t=1717739481; c=relaxed/simple;
+	bh=map90Hwl/wwt37B2rRDVaQJh9zrq+fwXiHG+LToCauc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QbaMyVUKTUBax4JayEO7/7cc3jf1QMZ9Ra7hCLGaxtUpDZ/T62wQ2KVP9n+0rwMced+XAOS0OZ6lfMLdectk4p6M13rKiltLZv04wAmXNFxN80FvcRHsTJIxQRGji1MjMzRFE/mENlNRqlS7/OdVBNcHby+MlYjkMQdS/C7mJ4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WH5fFpZS; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5750a8737e5so9295a12.0
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 22:51:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717739478; x=1718344278; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=map90Hwl/wwt37B2rRDVaQJh9zrq+fwXiHG+LToCauc=;
+        b=WH5fFpZSSr36yTeFCA2eNAOQaSYMmbGgLPeIZKgeem9dU0OKLUpZJpcFhu3zRH6Ebd
+         YzgyaK+gi70jrDhdrzzLfMHpY83MrB/WOGS1sZbY3eKy2ojRjkf6oS6g2lJpup0gt73w
+         JMaHiucFZ40wuKl6OaBLvzcU3JJJrnbWS8J9Jf5g2KqeOQv/bLQYHTI4E7oE9fIvnX9H
+         WNQw3QWCS+zwK2qLRWHjKQ/mMW70ZlTEwssqwhCmmdYxxgJQD7siovBUTPqf5ex8xt+A
+         bUNaxAuABH09vIp/0AKL9Ohe62plNoWbT4xDKvuyod0HLTNZCmojo06xuUxFxzgGn1cb
+         2AEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717739478; x=1718344278;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=map90Hwl/wwt37B2rRDVaQJh9zrq+fwXiHG+LToCauc=;
+        b=pTasDGVpmivxMWD7kEmeEqW3XZr7DiTSQKjeNYpBxInUpeCQo7h453Siu00I3e6irs
+         UirhGJkbpwZ0P4VOhrILtirOpXB+MEQA7miZf7yoH8lwL/+jBrdGRxWgwsJ8WT6YaXWG
+         dP2pHedyJ0FcOLs2MUnuEn1N8h2b22dS71dQgJ3OnpQUTHgi3Ix+K4yFs/nBIXIPbnPb
+         yeJqf1NFeRgcx0HojBE5yJcAKRmfHJUbUz553m1KUOpyjgnD47RIgZzGtaT06w9e6pWL
+         QVuAkK8Cd3lDUAhd5qJrzgDQOvSXq859lf+QTxqnIN8aMJ/5IzpQaACKB4dXH0AB3qGe
+         6sog==
+X-Gm-Message-State: AOJu0Yy5m2lJmAhycplkBw8Mg/lRiBdcSBVtYPdjemfszja3xHDugnUI
+	i8xVzeJ57DHnhiE2SbpmwhuFETB1LG0ECpfqJLxpawbwx3zytj/XDofCZo868ONZOQsNCyALYJs
+	/gDj0SVAEY+wlsodivM32p1b2TJABpREwYA8yZlxrTyqSc0h5tA==
+X-Google-Smtp-Source: AGHT+IGqWLOcez9nBFGpPo2weqioWP+XmCins7dZR9xd+TzSoSSY1ij3veGrCK03xY4kkQ1/Pm7SE3ZL63/aqNfMk7g=
+X-Received: by 2002:a05:6402:8c2:b0:57a:1a30:f5da with SMTP id
+ 4fb4d7f45d1cf-57aa6bd3be2mr456301a12.2.1717739477446; Thu, 06 Jun 2024
+ 22:51:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+References: <20240606151332.21384-1-fw@strlen.de> <20240606151332.21384-3-fw@strlen.de>
+In-Reply-To: <20240606151332.21384-3-fw@strlen.de>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 7 Jun 2024 07:51:03 +0200
+Message-ID: <CANn89iJ16zo1S7HByyUJKQhA_uQ9zr1PL4GvGCR0-tHdfQ2PnQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 2/3] net: tcp: un-pin the tw_timer
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, bigeasy@linutronix.de, 
+	vschneid@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---=-=-=
-Content-Type: text/plain; format=flowed
-
-
-Antony Antony <antony@phenome.org> writes:
-
-> Hi Chris,
+On Thu, Jun 6, 2024 at 5:18=E2=80=AFPM Florian Westphal <fw@strlen.de> wrot=
+e:
 >
-> On Mon, May 20, 2024 at 05:42:46PM -0400, Christian Hopps via Devel wrote:
-
->> From: Christian Hopps <chopps@labn.net>
->> +static unsigned int iptfs_sa_len(const struct xfrm_state *x)
->> +{
->> +	struct xfrm_iptfs_data *xtfs = x->mode_data;
->> +	struct xfrm_iptfs_config *xc = &xtfs->cfg;
->> +	unsigned int l = 0;
->> +
->> +	l += nla_total_size(0);
->> +	l += nla_total_size(sizeof(u16));
->> +	l += nla_total_size(sizeof(xc->pkt_size));
->> +	l += nla_total_size(sizeof(u32));
->> +	l += nla_total_size(sizeof(u32)); /* drop time usec */
->> +	l += nla_total_size(sizeof(u32)); /* init delay usec */
->> +
->> +	return l;
->> +}
->> +
->> +static int iptfs_copy_to_user(struct xfrm_state *x, struct sk_buff *skb)
->> +{
->> +	struct xfrm_iptfs_data *xtfs = x->mode_data;
->> +	struct xfrm_iptfs_config *xc = &xtfs->cfg;
->> +	int ret;
->> +
->> +	ret = nla_put_flag(skb, XFRMA_IPTFS_DONT_FRAG);
->> +	if (ret)
->> +		return ret;
->> +	ret = nla_put_u16(skb, XFRMA_IPTFS_REORDER_WINDOW, 0);
->> +	if (ret)
->> +		return ret;
->> +	ret = nla_put_u32(skb, XFRMA_IPTFS_PKT_SIZE, xc->pkt_size);
->> +	if (ret)
->> +		return ret;
->> +	ret = nla_put_u32(skb, XFRMA_IPTFS_MAX_QSIZE, 0);
->> +	if (ret)
->> +		return ret;
->> +
->> +	ret = nla_put_u32(skb, XFRMA_IPTFS_DROP_TIME, 0);
->> +	if (ret)
->> +		return ret;
->> +
->> +	ret = nla_put_u32(skb, XFRMA_IPTFS_INIT_DELAY, 0);
+> After previous patch, even if timer fires immediately on another CPU,
+> context that schedules the timer now holds the ehash spinlock, so timer
+> cannot reap tw socket until ehash lock is released.
 >
-> Why copy all attributes? Only copy the ones relevant to the SA direction.
-> Also adjust in  iptfs_sa_len().
+> BH disable is moved into hashdance_schedule.
+>
+> Signed-off-by: Florian Westphal <fw@strlen.de>
+> ---
+>
 
-Updated in new v3 patchset.
-
-Thanks,
-Chris.
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmZin7ESHGNob3Bwc0Bj
-aG9wcHMub3JnAAoJEC4dgw7XuDAlPT4P/1RSE0hQFiG/vcTNj1vbbYR+Zrl1qBy1
-NuLGpSX3k2DYlcctxLXp68FTij6+wCaGHqtQgnK2/qoDfnjWNtr0xMA0aXOlOWhq
-SoxzbnmRG3Ux153hyAvCSK8/5dnHiwvqTS5VL4zFWE/maYQQ22qTgOlMe52UCVWN
-d8whvAVxTfZx2Y7s+OjpSMq2PPrZ1cFE90nljXSr6N+wAm4P7jpYh6JjLS5n0bXm
-f3yQRI5BDYIrbfhlmEmh+TXuED1OMtbfuROL0B437IdyFUdMVf1AyZhTxbjhilTW
-/oK+1++FSLr1chAgRNlJazQMK+umFhXriYItEZ4lHDFBrTj85dgYR5Xxq9FtWEVH
-5vRSfgEqsXZ0Cj4QOj//swEx/k2oEr4+a6SwH79KgYPVEBOmEcTqQNu1ZdQ5oT1K
-akbOiiT9RbKDMoLHLgpCw0q0poa9KGn8n21JEt1S46d4jz6eCbbzkSv5Va0BKE5O
-rK1SZfxEvXNlBVm3Zk6tXDreaY57/mpYbf3g3TeOkhZk4yVnZUjZuUr+mUifIi5E
-CsJyJ3PPD3mV2Vw4cnJYdmKjXKwhvhmiWqFjt7VzU5cB4h/uwKsSBKfR31zFmgV9
-BgG+l7hga9xsKgMxTmYAOfAuCZIRDc8owPQD/uy7COnGPpAuYVO6AfPb8ZE6/A7m
-JBaUaxLGnEvY
-=5PWw
------END PGP SIGNATURE-----
---=-=-=--
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
