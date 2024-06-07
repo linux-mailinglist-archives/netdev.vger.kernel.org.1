@@ -1,115 +1,134 @@
-Return-Path: <netdev+bounces-101842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCB4D900406
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:49:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A99E4900432
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:57:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56C47B23929
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:49:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3085828C07E
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDC7D188CD1;
-	Fri,  7 Jun 2024 12:49:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 318B3197A68;
+	Fri,  7 Jun 2024 12:55:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="icGmWSfV"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="ywRycXCm"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC6721E4A1;
-	Fri,  7 Jun 2024 12:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A04B195990;
+	Fri,  7 Jun 2024 12:55:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717764586; cv=none; b=DFVvJV37hPMFzoMz4BXyVME4MUHghun5+aBYKJk0UvrZdtylGw9oMKB1hi8lW+wq4ShNofhh1W2lBNskloenbnyy/9PawnnfdYj21L8CU6IT0/6zHsUlVu4sCsV44Gn4qDw8I6syFIU77asx3LTQUJDSe9jinQH9/s4v4CpWwkQ=
+	t=1717764911; cv=none; b=NVDomysDYttiJx2ZBjZXclCtwY5Jw6ppEYmQ4kMCz7IqtOtC6h+pmop7Jhu9PmtVo1enJeihC/xpy/pMiu5Z3tiTxzy54y1eAot45f/jz40WwfLLH6acZt5l39UZ4gCmJIMXJIXGqp4mAi0lgcimpSyKRZKp9HIGEkIONEueOKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717764586; c=relaxed/simple;
-	bh=Bfgfa143G4DHdrFe7lxSCSckblGF7uW5HXJRY2g1Q6g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pfiySXTGLgDlFyI1RQURHPw376xceLgwHWn9NDtTkTMNwep5a6NOd+VGWEn5wg8sO1W2oMNZCLkP2ko3JXhIc/qDRAtLtgAAqYD+o7ks4ICWifBi9Qanl8NbZJK85okhEBYKI+Pcdc9C6eIDw6e9kPF8U2vX306oGOrWhdnTIT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=icGmWSfV; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=G2qEK1PosUxBiovM8jMSdaJor4MsDmSI8cQfYuLb8v4=; b=icGmWSfVRWu/nowvbGDdkxIefB
-	Pw4kINXDgRgGLW6DDe/Pl8k00+2s7sv0+3jNHfilNvg7Nk91KDlypBb0rBGQV7kNRWULLnfu8t7X/
-	fP1VblNceZpzPlMvZEwiVHu1TRmveJpnB2He2leRmCO4K1lwcPBnDEcT/uX7zPnZ/8Ok=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sFZ20-00H7iB-0G; Fri, 07 Jun 2024 14:49:20 +0200
-Date: Fri, 7 Jun 2024 14:49:19 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, linux-doc@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
-	Leonid Bloch <lbloch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
-	patches@lists.linux.dev
-Subject: Re: [PATCH 0/8] Introduce fwctl subystem
-Message-ID: <b023413e-d6e1-4a47-bdf2-98cc57a2e0ae@lunn.ch>
-References: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
- <20240603114250.5325279c@kernel.org>
- <214d7d82-0916-4c29-9012-04590e77df73@kernel.org>
- <20240604070451.79cfb280@kernel.org>
- <665fa9c9e69de_4a4e62941e@dwillia2-xfh.jf.intel.com.notmuch>
- <20240605135911.GT19897@nvidia.com>
- <d97144db-424f-4efd-bf10-513a0b895eca@kernel.org>
- <20240606071811.34767cce@kernel.org>
- <ZmK3-rkibH8j4ZwM@nanopsycho.orion>
+	s=arc-20240116; t=1717764911; c=relaxed/simple;
+	bh=UuBM8Xz97yEk76VltZa3LLHOiN+6wlsp5+H6GB3LX2w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ihQ4qOz3eoIIZRivJHWixn8X7U4FjKWCadfJYa3Ww64lftnDLKEW0PTq0FMY6tJJo/GWfQCEa2PCDRWdJ6GAobFvuSc+KgVhm6fy5zHUsGOFILhp7zItTLHQd2g62wol7mj8zEAZg0GKlckwGq8uNCdQKsWEQfXKdMENd3dr0Wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=ywRycXCm; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id CF90A88428;
+	Fri,  7 Jun 2024 14:55:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1717764902;
+	bh=H3pD+wrDGfjdRYDIP++BQRs9a9wH8JWsXe+QrM1Swu8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ywRycXCmxPSHsQukLDZQCBQkIQtomx8KYEyGQJ8ekmFP+ZWlCBBaKAUdXLXWB5NXs
+	 ynQryKbGm3yFWafgDo+n+Zf6080pAMbOZebo3Nxw01QOaImiQy36DDogCBOfUKIcgp
+	 5qTwVPwadGJ91KBIwWGQpW12zdUff2g/OmsHdZWepNGjS7unpRuqItCzE+goKJETaF
+	 1QKqtKTdDvFdkZyFvySPQ83u7vNojgRLPbCvFdxo+a6FOVeOE2e6i3xiW4DU8uQI5p
+	 e+9cOB/vxytjMEiFmbiCsw9uBbrct1h0ZlGtO1yaDKL8j2FZgIhudw27qSy+ZqFtkI
+	 P2C836a/ueOdA==
+Message-ID: <5b1a7185-2273-40e9-8451-ba9add689637@denx.de>
+Date: Fri, 7 Jun 2024 14:49:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZmK3-rkibH8j4ZwM@nanopsycho.orion>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 11/12] ARM: dts: stm32: add ethernet1 for
+ STM32MP135F-DK board
+To: Christophe Roullier <christophe.roullier@foss.st.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Richard Cochran <richardcochran@gmail.com>, Jose Abreu
+ <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240607095754.265105-1-christophe.roullier@foss.st.com>
+ <20240607095754.265105-12-christophe.roullier@foss.st.com>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <20240607095754.265105-12-christophe.roullier@foss.st.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-> >This API gives user space SDKs a trivial way of implementing all
-> >switching, routing, filtering, QoS offloads etc.
-> >An argument can be made that given somewhat mixed switchdev experience
+On 6/7/24 11:57 AM, Christophe Roullier wrote:
+> Ethernet1: RMII with crystal
+> Ethernet2: RMII with no cristal, need "phy-supply" property to work,
+> today this property was managed by Ethernet glue, but should be present
+> and managed in PHY node. So I will push second Ethernet in next step.
 > 
-> Can you elaborabe a bit more what you mean by "mixed switchdev
-> experience" please?
+> PHYs used are SMSC (LAN8742A)
+> 
+> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
+> ---
+>   arch/arm/boot/dts/st/stm32mp135f-dk.dts | 23 +++++++++++++++++++++++
+>   1 file changed, 23 insertions(+)
+> 
+> diff --git a/arch/arm/boot/dts/st/stm32mp135f-dk.dts b/arch/arm/boot/dts/st/stm32mp135f-dk.dts
+> index 567e53ad285fa..16e91b9d812d8 100644
+> --- a/arch/arm/boot/dts/st/stm32mp135f-dk.dts
+> +++ b/arch/arm/boot/dts/st/stm32mp135f-dk.dts
+> @@ -19,6 +19,7 @@ / {
+>   	compatible = "st,stm32mp135f-dk", "st,stm32mp135";
+>   
+>   	aliases {
+> +		ethernet0 = &ethernet1;
+>   		serial0 = &uart4;
+>   		serial1 = &usart1;
+>   		serial2 = &uart8;
+> @@ -141,6 +142,28 @@ &cryp {
+>   	status = "okay";
+>   };
+>   
+> +&ethernet1 {
+> +	status = "okay";
+> +	pinctrl-0 = <&eth1_rmii_pins_a>;
+> +	pinctrl-1 = <&eth1_rmii_sleep_pins_a>;
+> +	pinctrl-names = "default", "sleep";
+> +	phy-mode = "rmii";
+> +	phy-handle = <&phy0_eth1>;
+> +
+> +	mdio {
+> +		#address-cells = <1>;
+> +		#size-cells = <0>;
+> +		compatible = "snps,dwmac-mdio";
+> +
+> +		phy0_eth1: ethernet-phy@0 {
+> +			compatible = "ethernet-phy-id0007.c131";
+> +			reset-gpios = <&mcp23017 9 GPIO_ACTIVE_LOW>;
+> +			reg = <0>;
 
-I don't want to put words in Jakubs mouth but, in my opinion,
-switchdev has been great for SoHo switches. We have over 100
-supported, mostly implemented by the community, but some vendors also
-supporting their own hardware.
 
-We have two enterprise switch families supported, each by its own
-vendor. And we have one TOR switch family supported by the vendor.
-
-So i would say switchdev has worked out great for SoHo, but kernel
-bypass is still the norm for most things bigger than SoHo.
-
-Why? My guess is, the products with a SoHo switch is not actually a
-switch. It is a wifi box, with a switch. It is a cable modem, with a
-switch. It is an inflight entertainment system, with a switch, etc.
-It is much easier to build such multi-purpose systems when everything
-is nicely integrated into the kernel, you don't have to fight with
-multiple vendors supplying SDKs which only work on a disjoint set of
-kernels, etc.
-
-For bigger, single purpose devices, it is just a switch, there is less
-inconvenience of using just one vendor SDK, on top of the vendor
-proscribed kernel.
-
-	Andrew
-
+Keep the list sorted.
 
