@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-101681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31FBA8FFCA7
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:06:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A0CB8FFCA6
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:06:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E11EB21024
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:06:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10A071C26DD7
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:06:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C53B315687C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C319C156878;
 	Fri,  7 Jun 2024 07:04:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="mrtkINOP";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="IDFVa7sI"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="wZn3zjfC";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hw3LNSi8"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9363A15531A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927D0155317;
 	Fri,  7 Jun 2024 07:04:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717743879; cv=none; b=Xcj2NzPAY2hh1inbXq6R75B5E72T+QghQNJGkjCry6dqTU330KFk5u5LaTKNJw0pgC3/EpYDSorbHVFqY0VcATHjQKAX19KZAsFRPZkbI3iqgy6bIqOaMhE2lzoRyTK68L+VjUYRP/up+f+vhlt0nZxQ+/ePt1tj54TGDMKglD4=
+	t=1717743879; cv=none; b=q09IIF5k9qUDFDQNUvZ8SlmqBTjYq47BvKs7tAFS7mXzLY0H2lSmB8SNW/B13wTaDMscti69xYNEzx2qL7+R84IXa867R5SC7MSqibHpcCNahG6gGY5DA4OXg2P4EbfZuI85ffx2kN1p8WY9GpUbYpHzM+AAtdwGP9BZUD+ECiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717743879; c=relaxed/simple;
-	bh=oi4DoqovsixUFRVfCzGtZa5ipaDq/Cpe3T13qBLJFIA=;
+	bh=8mNx9FPoHj4JNcDCiK2qJg5jIW+93DxmgJLrP1yB8cs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oOEc44qQXYHXpeP3nUQdfEw2L0nF3QsHRADgF/uIyBeTFev6XQCo2qThfUiok4Y7vz+8a9mvcUYvIy3IZZV7qpRhtaocS1AMQZYCrdyETIrmdPXVyYzmOcgtCfKnh6jhckmKKaz7x76LDxTJQ2yppldzxBqCzuNMkw08b2LsrY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=mrtkINOP; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=IDFVa7sI; arc=none smtp.client-ip=193.142.43.55
+	 MIME-Version; b=EGU4/vyXE4n3buHid62AK59Ildhi/euitSfmIsAm74ullHy6pd2KfJEVDO9m1yzgDuX8oaey2zoEJsigV0E3SYbmEw+6716YTt4bAEx2EF4NsFyszjnaecZjFACdZa4Q9Qb6l8Jyzkac5LxtC4M/HUdqlYuTSZViFtormh8SCnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=wZn3zjfC; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=hw3LNSi8; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1717743873;
+	s=2020; t=1717743874;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ANCKiEga5l1DBuytNTefl4llHnehnchG20Prvletyy0=;
-	b=mrtkINOPc9CF6xHUwSClCHrhMbtel3ZXqAJ89OpPJcma+4INrjqOGdP0MNRAG/KHwJ3TuN
-	t1jarmJqSaoyDxswh35X6MJ41+CToLrstgBKbOYoDqEp+IqHjLKn2P7khVz4bgb0BEZ3hy
-	LFlTMEsgbKQ2PfqUraSlsHh0ALHjoOGQ5YVpncJgquWsxkJvfitrNFhorfR4KhhB5EcsaM
-	3QQIpV1krpIDqW16d7/yrH99rd7WDwtewo58JGKGHTL87VBV/+4e96e6AzaOA4tveh/jvC
-	XLyl1H8N/RCpSIxNc0W6BN+jnDnZ3YnxebeO2cUWzQQ9gn8zMsApNHg8QiFpow==
+	bh=IeTJF40iEq+NZZllVmnIBl8wcOsjOidTGbpcz9abXes=;
+	b=wZn3zjfC0JjUCuGcI56xvYDubm9z+4d3c7FjFSHgI4SrqjDCEoYNizfVhnD3sMCe5XNv1U
+	ULvQSMuhmonyDPVK6kBhSWS1gZ1WkKHX+gSILkgWnlzLFvvJ1sRk9sAc5omqILpQ5gnyM6
+	lRlkBZqFcxjjnySbNHSPx6F4DU+Or0KYgGFiXrrjfW0mJ8idvbHmSFGoNvdVUkLvgD43zT
+	zaL9vME772OuOhdMMxiPyFkFPdrxxX39d3p0m96BHRui8mYf2HmotyKTj+OwoVrCFH6cWL
+	iYPK8JnVeN41Hu27Fo84guxb+ps1Y0xGMWtF6w3F3UoBozVU3HpbIozijECQcw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1717743873;
+	s=2020e; t=1717743874;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ANCKiEga5l1DBuytNTefl4llHnehnchG20Prvletyy0=;
-	b=IDFVa7sIQzoY7lorlb4H3oIk5b/Tt6glMN6zlC0E8In8VuqnKrTf6MiQG3UHxwpZljjkfz
-	j23AUKVXIEJtEXAg==
+	bh=IeTJF40iEq+NZZllVmnIBl8wcOsjOidTGbpcz9abXes=;
+	b=hw3LNSi83nAf5T7GK8aLT+QJJhkdr3py2bXURvJN4cwNdQ0K4f8FVUGNm9hoUAoEPZutcZ
+	U7PwECCPN/XP8JDQ==
 To: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -70,17 +70,17 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Waiman Long <longman@redhat.com>,
 	Will Deacon <will@kernel.org>,
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Florian Westphal <fw@strlen.de>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	bridge@lists.linux.dev,
-	coreteam@netfilter.org,
-	netfilter-devel@vger.kernel.org
-Subject: [PATCH v5 net-next 07/15] netfilter: br_netfilter: Use nested-BH locking for brnf_frag_data_storage.
-Date: Fri,  7 Jun 2024 08:53:10 +0200
-Message-ID: <20240607070427.1379327-8-bigeasy@linutronix.de>
+	Ben Segall <bsegall@google.com>,
+	Daniel Bristot de Oliveira <bristot@redhat.com>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Mel Gorman <mgorman@suse.de>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>
+Subject: [PATCH v5 net-next 08/15] net: softnet_data: Make xmit.recursion per task.
+Date: Fri,  7 Jun 2024 08:53:11 +0200
+Message-ID: <20240607070427.1379327-9-bigeasy@linutronix.de>
 In-Reply-To: <20240607070427.1379327-1-bigeasy@linutronix.de>
 References: <20240607070427.1379327-1-bigeasy@linutronix.de>
 Precedence: bulk
@@ -91,107 +91,124 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-brnf_frag_data_storage is a per-CPU variable and relies on disabled BH
-for its locking. Without per-CPU locking in local_bh_disable() on
-PREEMPT_RT this data structure requires explicit locking.
+Softirq is preemptible on PREEMPT_RT. Without a per-CPU lock in
+local_bh_disable() there is no guarantee that only one device is
+transmitting at a time.
+With preemption and multiple senders it is possible that the per-CPU
+recursion counter gets incremented by different threads and exceeds
+XMIT_RECURSION_LIMIT leading to a false positive recursion alert.
 
-Add a local_lock_t to the data structure and use local_lock_nested_bh()
-for locking. This change adds only lockdep coverage and does not alter
-the functional behaviour for !PREEMPT_RT.
+Instead of adding a lock to protect the per-CPU variable it is simpler
+to make the counter per-task. Sending and receiving skbs happens always
+in thread context anyway.
 
-Cc: Florian Westphal <fw@strlen.de>
-Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Roopa Prabhu <roopa@nvidia.com>
-Cc: bridge@lists.linux.dev
-Cc: coreteam@netfilter.org
-Cc: netfilter-devel@vger.kernel.org
+Having a lock to protected the per-CPU counter would block/ serialize two
+sending threads needlessly. It would also require a recursive lock to
+ensure that the owner can increment the counter further.
+
+Make the recursion counter a task_struct member on PREEMPT_RT.
+
+Cc: Ben Segall <bsegall@google.com>
+Cc: Daniel Bristot de Oliveira <bristot@redhat.com>
+Cc: Dietmar Eggemann <dietmar.eggemann@arm.com>
+Cc: Juri Lelli <juri.lelli@redhat.com>
+Cc: Mel Gorman <mgorman@suse.de>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Valentin Schneider <vschneid@redhat.com>
+Cc: Vincent Guittot <vincent.guittot@linaro.org>
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 ---
- net/bridge/br_netfilter_hooks.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+ include/linux/netdevice.h | 11 +++++++++++
+ include/linux/sched.h     |  4 +++-
+ net/core/dev.h            | 20 ++++++++++++++++++++
+ 3 files changed, 34 insertions(+), 1 deletion(-)
 
-diff --git a/net/bridge/br_netfilter_hooks.c b/net/bridge/br_netfilter_hook=
-s.c
-index bf30c50b56895..3c9f6538990ea 100644
---- a/net/bridge/br_netfilter_hooks.c
-+++ b/net/bridge/br_netfilter_hooks.c
-@@ -137,6 +137,7 @@ static inline bool is_pppoe_ipv6(const struct sk_buff *=
-skb,
- #define NF_BRIDGE_MAX_MAC_HEADER_LENGTH (PPPOE_SES_HLEN + ETH_HLEN)
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index d20c6c99eb887..b5ec072ec2430 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -3223,7 +3223,9 @@ struct softnet_data {
+ #endif
+ 	/* written and read only by owning cpu: */
+ 	struct {
++#ifndef CONFIG_PREEMPT_RT
+ 		u16 recursion;
++#endif
+ 		u8  more;
+ #ifdef CONFIG_NET_EGRESS
+ 		u8  skip_txqueue;
+@@ -3256,10 +3258,19 @@ struct softnet_data {
 =20
- struct brnf_frag_data {
-+	local_lock_t bh_lock;
- 	char mac[NF_BRIDGE_MAX_MAC_HEADER_LENGTH];
- 	u8 encap_size;
- 	u8 size;
-@@ -144,7 +145,9 @@ struct brnf_frag_data {
- 	__be16 vlan_proto;
- };
+ DECLARE_PER_CPU_ALIGNED(struct softnet_data, softnet_data);
 =20
--static DEFINE_PER_CPU(struct brnf_frag_data, brnf_frag_data_storage);
-+static DEFINE_PER_CPU(struct brnf_frag_data, brnf_frag_data_storage) =3D {
-+	.bh_lock =3D INIT_LOCAL_LOCK(bh_lock),
-+};
-=20
- static void nf_bridge_info_free(struct sk_buff *skb)
++#ifdef CONFIG_PREEMPT_RT
++static inline int dev_recursion_level(void)
++{
++	return current->net_xmit_recursion;
++}
++
++#else
++
+ static inline int dev_recursion_level(void)
  {
-@@ -850,6 +853,7 @@ static int br_nf_dev_queue_xmit(struct net *net, struct=
- sock *sk, struct sk_buff
+ 	return this_cpu_read(softnet_data.xmit.recursion);
+ }
++#endif
+=20
+ void __netif_schedule(struct Qdisc *q);
+ void netif_schedule_queue(struct netdev_queue *txq);
+diff --git a/include/linux/sched.h b/include/linux/sched.h
+index 61591ac6eab6d..a9b0ca72db55f 100644
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -975,7 +975,9 @@ struct task_struct {
+ 	/* delay due to memory thrashing */
+ 	unsigned                        in_thrashing:1;
+ #endif
+-
++#ifdef CONFIG_PREEMPT_RT
++	u8				net_xmit_recursion;
++#endif
+ 	unsigned long			atomic_flags; /* Flags requiring atomic access. */
+=20
+ 	struct restart_block		restart_block;
+diff --git a/net/core/dev.h b/net/core/dev.h
+index b7b518bc2be55..2f96d63053ad0 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -150,6 +150,25 @@ struct napi_struct *napi_by_id(unsigned int napi_id);
+ void kick_defer_list_purge(struct softnet_data *sd, unsigned int cpu);
+=20
+ #define XMIT_RECURSION_LIMIT	8
++
++#ifdef CONFIG_PREEMPT_RT
++static inline bool dev_xmit_recursion(void)
++{
++	return unlikely(current->net_xmit_recursion > XMIT_RECURSION_LIMIT);
++}
++
++static inline void dev_xmit_recursion_inc(void)
++{
++	current->net_xmit_recursion++;
++}
++
++static inline void dev_xmit_recursion_dec(void)
++{
++	current->net_xmit_recursion--;
++}
++
++#else
++
+ static inline bool dev_xmit_recursion(void)
  {
- 	struct nf_bridge_info *nf_bridge =3D nf_bridge_info_get(skb);
- 	unsigned int mtu, mtu_reserved;
-+	int ret;
+ 	return unlikely(__this_cpu_read(softnet_data.xmit.recursion) >
+@@ -165,5 +184,6 @@ static inline void dev_xmit_recursion_dec(void)
+ {
+ 	__this_cpu_dec(softnet_data.xmit.recursion);
+ }
++#endif
 =20
- 	mtu_reserved =3D nf_bridge_mtu_reduction(skb);
- 	mtu =3D skb->dev->mtu;
-@@ -882,6 +886,7 @@ static int br_nf_dev_queue_xmit(struct net *net, struct=
- sock *sk, struct sk_buff
-=20
- 		IPCB(skb)->frag_max_size =3D nf_bridge->frag_max_size;
-=20
-+		local_lock_nested_bh(&brnf_frag_data_storage.bh_lock);
- 		data =3D this_cpu_ptr(&brnf_frag_data_storage);
-=20
- 		if (skb_vlan_tag_present(skb)) {
-@@ -897,7 +902,9 @@ static int br_nf_dev_queue_xmit(struct net *net, struct=
- sock *sk, struct sk_buff
- 		skb_copy_from_linear_data_offset(skb, -data->size, data->mac,
- 						 data->size);
-=20
--		return br_nf_ip_fragment(net, sk, skb, br_nf_push_frag_xmit);
-+		ret =3D br_nf_ip_fragment(net, sk, skb, br_nf_push_frag_xmit);
-+		local_unlock_nested_bh(&brnf_frag_data_storage.bh_lock);
-+		return ret;
- 	}
- 	if (IS_ENABLED(CONFIG_NF_DEFRAG_IPV6) &&
- 	    skb->protocol =3D=3D htons(ETH_P_IPV6)) {
-@@ -909,6 +916,7 @@ static int br_nf_dev_queue_xmit(struct net *net, struct=
- sock *sk, struct sk_buff
-=20
- 		IP6CB(skb)->frag_max_size =3D nf_bridge->frag_max_size;
-=20
-+		local_lock_nested_bh(&brnf_frag_data_storage.bh_lock);
- 		data =3D this_cpu_ptr(&brnf_frag_data_storage);
- 		data->encap_size =3D nf_bridge_encap_header_len(skb);
- 		data->size =3D ETH_HLEN + data->encap_size;
-@@ -916,8 +924,12 @@ static int br_nf_dev_queue_xmit(struct net *net, struc=
-t sock *sk, struct sk_buff
- 		skb_copy_from_linear_data_offset(skb, -data->size, data->mac,
- 						 data->size);
-=20
--		if (v6ops)
--			return v6ops->fragment(net, sk, skb, br_nf_push_frag_xmit);
-+		if (v6ops) {
-+			ret =3D v6ops->fragment(net, sk, skb, br_nf_push_frag_xmit);
-+			local_unlock_nested_bh(&brnf_frag_data_storage.bh_lock);
-+			return ret;
-+		}
-+		local_unlock_nested_bh(&brnf_frag_data_storage.bh_lock);
-=20
- 		kfree_skb(skb);
- 		return -EMSGSIZE;
+ #endif
 --=20
 2.45.1
 
