@@ -1,200 +1,162 @@
-Return-Path: <netdev+bounces-101713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E22258FFD5B
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:42:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F8DF8FFD56
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:40:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E65941C2134D
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:41:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A682D1F21E3D
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:40:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CB86156991;
-	Fri,  7 Jun 2024 07:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 634F8155C99;
+	Fri,  7 Jun 2024 07:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=frida-re.20230601.gappssmtp.com header.i=@frida-re.20230601.gappssmtp.com header.b="tTcLtCpO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RVmhyIzO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B516D156985
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 07:41:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A655B154C17;
+	Fri,  7 Jun 2024 07:40:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717746116; cv=none; b=J5bFdjkdUkJa+tqCRGwFAYH/vBBOSUC9ZVhrp/o/WbzU4LPJrAwLB+AyMqyy+KsnUyg2JLJKucyI0EfYTV0bVJwLNZT9XxXjMnwgU8eqOGlwz2q5c/iY/Gqa2TwBaRNXDk0Xc+mJxi7PxJwzTG5HXu6ik4Ctk2eXzhZbNamqo6E=
+	t=1717746045; cv=none; b=lGoCZ+bUpgu8USR9Fo7Ot9a7frVmtWCG8bloMbWkWUKmHaPTOH09G3O33xxpnV1guLZcsUOG/PhlN2EOB2uGWqjCszAoD667eOD+KOmmp9qXJYy9ZhQf/kjrYpDQjK19K0Xa1H7GgP/9DyJLi3ugB1E8O0Q3n7FVfzJ8ErpX7SA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717746116; c=relaxed/simple;
-	bh=bxHk5juL2BwApQbEfrDkXVE6NAyGLzESh9yj98zWu7E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sFpS4hiLg38ZCF4gVgnmBHP9/+so9aWA1D7n6hKT1UWRYX70M+p9ufWbCITgLmb2y7uI8E5aJzpTgYYhAKE4SbAv4i1LP2x1S+qoxplwIV6pKyTAGHEdI5yvcAfdFjL+5iPb/EikU6dHGHlnkBWNmMNJlOuavevbAI8HPEy/2UU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=frida.re; spf=none smtp.mailfrom=frida.re; dkim=pass (2048-bit key) header.d=frida-re.20230601.gappssmtp.com header.i=@frida-re.20230601.gappssmtp.com header.b=tTcLtCpO; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=frida.re
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=frida.re
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-52bc035a7ccso193562e87.2
-        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 00:41:54 -0700 (PDT)
+	s=arc-20240116; t=1717746045; c=relaxed/simple;
+	bh=Gm3qXYT7sPdPu6m611tvaJ8w9yI0dFVyI6RzRJF+Wls=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K6KcsscjmEmb8qSqpjLhEDn0HRAKhF3OF2JMgQvFkMGnAkGYh4OJWKam8dHsnDzjc/Wdj+rAY/DDjtl7pe0Egsg/2Y1GQKbpH+NSi01D6iqJZS9BfAVafwqxnhsQn11V/aGzl6+Qx/0xjSIQjz1RMUnKLhxakKFmz+r2VHrN5DU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RVmhyIzO; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-52bbf73f334so178657e87.2;
+        Fri, 07 Jun 2024 00:40:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=frida-re.20230601.gappssmtp.com; s=20230601; t=1717746113; x=1718350913; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RwY0JwFMiJzMlaWNetx19cuzpZpfePjhFAyTDmYWxao=;
-        b=tTcLtCpOCN5aAvir0/Z9s6ZJ8XHhAN49QqJGJ/6NZKs3nQzuQYBw9zztWC/cmAY8sl
-         g7x0sQr2kXS0mv0cLRbXrLT9Ibfh0SVTRhVsx4VT0IgFkB/D5BPD4C8/dIVQf6Onp7lh
-         2rNds3RQJqBbhW3x6Er8sMBzMzE+EayR36xEitYxasiTK6aYo2VdWvzwVd3QgYvCTN9n
-         N4x96egRHe8Pg93rezLjhxZPVNJWnO77RXmAAxc+bH6rRnBQlgV7gKYlgNgAT8WgHIiN
-         YV81fSjPuccSDWEfcZyB4ZoiN3RQ4ifS5pimmAupiZSzHv7CQqTvGzzfk+PhwykBp2VD
-         bhSQ==
+        d=gmail.com; s=20230601; t=1717746042; x=1718350842; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AS72jLuSxBJ0gHW3RNFPmyDKK389zQityL0CcC1+x9A=;
+        b=RVmhyIzOCdbRYr4jOZjChMeW8rFDoiET8bTmfs9uOne2caYcP2MTTINqLQu6UN91+H
+         X+RVSQ5myYvW6COLrdtA0DlyxzQwEKPEJg3RgP2Dq4l8vOAwCQ9eFJwPGf4atcQeat7H
+         UOjTqEgl/eo0glQ5o2rjDAdDd3/Kq4cME++QgM9HM8+VPLMxnFHQ6jENmP9a3vVKa6OC
+         O9O/7mXZ7sZHGM0cVViykEc//vE7oiltFNShCGlYfYROiFVD9tSqOfKheUG3h984M4lN
+         q0it7qRN6mNiM4B4UhG+9iq4u+C60hKYD6b78Q70Rkp0+HqHsfaTzD+g9LiMEZoHCjZC
+         Qvlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717746113; x=1718350913;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RwY0JwFMiJzMlaWNetx19cuzpZpfePjhFAyTDmYWxao=;
-        b=o61VH7odA1viihvEb17vNUs+WTFIJwyDHqiRigNig78bXQv/M6tg/6VCfZD2mIzBOe
-         UEJFIpKYz7OH5zCpZ9k7qfdhaPFgO6nccm8ZrrlBEa36tS2CESxs2kA4tweJuxzqItUX
-         aWVRKI2IBNEuQmQKqH8byvJ++JZxTVz5eVTt7yFTIW+MzQ5ZfC0oem7LhRjHyxjPMPN8
-         wrDsw+9EUy6CwhslF6NdvfPEPXZFQmkmNQCKuq27WV9Fz3Y4c/qyghuem8ANReWcNttP
-         n8/TfzLlD5ylh2gkvO4yO+NIgQQUBDW2ZHGAGPUc7zMqk8EppRxVqDcN37aM6ZYkIChV
-         zCfA==
-X-Forwarded-Encrypted: i=1; AJvYcCWVoUaL4h7Ww5eWXs/IM44Ll2J26UsKrxxtenmITixGXPi28LwhBd9hzpzGr6E3XlyuLqY38uM3bIXMwT9zDfiddM2J7PS0
-X-Gm-Message-State: AOJu0YxlvqPns2EH4mnlfuB2nS0+OJibshNb0lyyso0CAtSf5P03S+iU
-	5oB7TzsiJ/D9lo26w4vd2T4Nas+btYTLFLMDZsYKb+SZXctpYaOlEzQT+PqBqDBkpWs+cQDlr9s
-	PW0Q=
-X-Google-Smtp-Source: AGHT+IHuE937leKgNwyYXsF7/ru7SERRnRL9LfAh13X/fheWO4uiKX17Isn3y9RyhdCSIhWwfBMSnA==
-X-Received: by 2002:a05:6512:1cd:b0:52b:7c41:698 with SMTP id 2adb3069b0e04-52bb9f6ab36mr1174486e87.18.1717746112692;
-        Fri, 07 Jun 2024 00:41:52 -0700 (PDT)
-Received: from localhost.localdomain ([109.247.171.206])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52bb41e1d6esm438251e87.11.2024.06.07.00.41.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jun 2024 00:41:52 -0700 (PDT)
-From: =?UTF-8?q?Ole=20Andr=C3=A9=20Vadla=20Ravn=C3=A5s?= <oleavr@frida.re>
-To: linux-usb@vger.kernel.org
-Cc: oleavr@frida.re,
-	=?UTF-8?q?Ha=CC=8Avard=20S=C3=B8rb=C3=B8?= <havard@hsorbo.no>,
-	Oliver Neukum <oliver@neukum.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] CDC-NCM: add support for Apple's private interface
-Date: Fri,  7 Jun 2024 09:40:17 +0200
-Message-ID: <20240607074117.31322-1-oleavr@frida.re>
-X-Mailer: git-send-email 2.45.2
+        d=1e100.net; s=20230601; t=1717746042; x=1718350842;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AS72jLuSxBJ0gHW3RNFPmyDKK389zQityL0CcC1+x9A=;
+        b=LL4mR5x5sFvFZr1BM+XVqIKbxRlsel6/k/og2fvx6uJkzKWGSGjsSbcV+HRBhCF7cR
+         gkZKA8yzaPzU35Va/KWfCjAlcJxWgC0aFhfR067+wTgx23L5B7Q2f9dcM/NUfE6IVnIA
+         X2QMx2gsfRK8lCxIGzB4b945nwu+WbD/ii9q9gMxpzuR7dvidxmLv6lcSYgdU5owFhu9
+         zzNhwIa36XhGZPV4s1r9K1G9B4PTKNMXxyLCSR0Hnd2UvoEMU8HUSbIg6aQ6h3Z0RXY7
+         xipcu/KlyIt8i+6D09/3HYc4RqbrllsGILM4z6iAo8C3i9Ejqp5RDqPedCoNfM2IDYvC
+         vXGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWQUd0Ob2/PTr4YepiLFrUhA9A+EjE7IQzD62XDuX6q0PXbCZWNp8jMmIgJ37KIus4i3Gwcwpbo+iJmoAG8ly0Dktu4uc5OiVnhljYEqvR3vcOPTfsfPxhtO0mMCgWOrNZsG3PnkHUiKdYNVUk/j4RRFenWkLr2+zFEW7IK34TvXg==
+X-Gm-Message-State: AOJu0YwiTiISmVc9bKFI63DQHOhqO1W0GBMJw/DSq0UkRPAukrxv1u0F
+	uV5c17PF0ElsferYHF2pj/450qQ3zNZ6As9x6pRSIelxSqD5PcSF
+X-Google-Smtp-Source: AGHT+IE145ugTmfzMkGbBgDc4EskumPPJu4aSr9T8VWy7YFERUgYNQr8opMDit+pmllO3+UDYOOu9w==
+X-Received: by 2002:ac2:4a9c:0:b0:52b:844f:dd10 with SMTP id 2adb3069b0e04-52bb9f83a84mr1115177e87.40.1717746041445;
+        Fri, 07 Jun 2024 00:40:41 -0700 (PDT)
+Received: from [172.27.33.107] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4215811d13esm76100585e9.24.2024.06.07.00.40.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Jun 2024 00:40:41 -0700 (PDT)
+Message-ID: <15007808-b5b1-441c-9a20-94195330b245@gmail.com>
+Date: Fri, 7 Jun 2024 10:40:38 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next v4 2/2] net/mlx5e: Add per queue netdev-genl stats
+To: Jakub Kicinski <kuba@kernel.org>, Joe Damato <jdamato@fastly.com>
+Cc: Tariq Toukan <ttoukan.linux@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nalramli@fastly.com,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ "open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <20240604004629.299699-1-jdamato@fastly.com>
+ <20240604004629.299699-3-jdamato@fastly.com>
+ <11b9c844-a56e-427f-aab3-3e223d41b165@gmail.com>
+ <ZmIwIJ9rxllqQT18@LQ3V64L9R2> <20240606171942.4226a854@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20240606171942.4226a854@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Available on iOS/iPadOS >= 17, where this new interface is used by
-developer tools using the new RemoteXPC protocol.
 
-This private interface lacks a status endpoint, presumably because there
-isn't a physical cable that can be unplugged, nor any speed changes to
-be notified about.
+On 07/06/2024 3:19, Jakub Kicinski wrote:
+> On Thu, 6 Jun 2024 14:54:40 -0700 Joe Damato wrote:
+>>>> Compare the values in /proc/net/dev match the output of cli for the same
+>>>> device, even while the device is down.
+>>>>
+>>>> Note that while the device is down, per queue stats output nothing
+>>>> (because the device is down there are no queues):
+>>>
+>>> This part is not true anymore.
+>>
+>> It is true with this patch applied and running the command below.
+>> Maybe I should have been more explicit that using cli.py outputs []
+>> when scope = queue, which could be an internal cli.py thing, but
+>> this is definitely true with this patch.
+>>
+>> Did you test it and get different results?
+> 
+> To avoid drivers having their own interpretations what "closed" means,
+> core hides all queues in closed state:
+> 
+> https://elixir.bootlin.com/linux/v6.10-rc1/source/net/core/netdev-genl.c#L582
+> 
 
-Note that NCM interfaces are not exposed until a mode switch is
-requested, which macOS does automatically.
+Oh, so the kernel doesn't even call the driver's 
+mlx5e_get_queue_stats_rx/tx callbacks if interface is down. Although our 
+driver can easily satisfy the query and provide the stats.
 
-The mode switch can be performed like this:
+I think the kernel here makes some design assumption about the stats, 
+and enforces it on all vendor drivers.
+I don't think it's a matter of "closed channel" interpretation, it's 
+more about persistent stats.
+IMO the kernel should be generic enough to let both designs (persistent 
+and non-persistent stats) integrate naturally with this new queue 
+netdev-genl stats feature.
 
-        uint8_t status;
-        libusb_control_transfer(device_handle,
-                LIBUSB_RECIPIENT_DEVICE | LIBUSB_REQUEST_TYPE_VENDOR |
-                LIBUSB_ENDPOINT_IN,
-                82, /* bRequest */
-                0,  /* wValue   */
-                3,  /* wIndex   */
-                &status,
-                sizeof(status),
-                0);
+>>> PTP RQ index is naively assigned to zero:
+>>> rq->ix           = MLX5E_PTP_CHANNEL_IX;
+>>>
+>>> but this isn't to be used as the stats index.
+>>> Today, the PTP-RQ has no matcing rxq in the kernel level.
+>>> i.e. turning PTP-RQ on won't add a kernel-level RXQ to the
+>>> real_num_rx_queues.
+>>> Maybe we better do.
+>>> If not, and the current state is kept, the best we can do is let the PTP-RQ
+>>> naively contribute its queue-stat to channel 0.
+>>
+>> OK, it sounds like the easiest thing to do is just count PTP as
+>> channel 0, so if i == 0, I'll in the PTP stats.
+>>
+>> But please see below regarding testing whether or not PTP is
+>> actually enabled or not.
+> 
+> If we can I think we should avoid making queue 0 too special.
+> If someone configures steering and only expects certain packets on
+> queue 0 - getting PTP counted there will be a surprise.
+> I vote to always count it towards base.
 
-Newer versions of usbmuxd do this automatically.
++1, let's count PTP RX in the base, especially that it has no matching 
+kernel-level rxq.
 
-Co-developed-by: Håvard Sørbø <havard@hsorbo.no>
-Signed-off-by: Håvard Sørbø <havard@hsorbo.no>
-Signed-off-by: Ole André Vadla Ravnås <oleavr@frida.re>
----
- drivers/net/usb/cdc_ncm.c | 47 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 46 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/usb/cdc_ncm.c b/drivers/net/usb/cdc_ncm.c
-index bf76ecccc2e6..d5c47a2a62dc 100644
---- a/drivers/net/usb/cdc_ncm.c
-+++ b/drivers/net/usb/cdc_ncm.c
-@@ -933,7 +933,8 @@ int cdc_ncm_bind_common(struct usbnet *dev, struct usb_interface *intf, u8 data_
- 
- 	cdc_ncm_find_endpoints(dev, ctx->data);
- 	cdc_ncm_find_endpoints(dev, ctx->control);
--	if (!dev->in || !dev->out || !dev->status) {
-+	if (!dev->in || !dev->out ||
-+	    (!dev->status && dev->driver_info->flags & FLAG_LINK_INTR)) {
- 		dev_dbg(&intf->dev, "failed to collect endpoints\n");
- 		goto error2;
- 	}
-@@ -1925,6 +1926,34 @@ static const struct driver_info cdc_ncm_zlp_info = {
- 	.set_rx_mode = usbnet_cdc_update_filter,
- };
- 
-+/* Same as cdc_ncm_info, but with FLAG_SEND_ZLP */
-+static const struct driver_info apple_tethering_interface_info = {
-+	.description = "CDC NCM (Apple Tethering)",
-+	.flags = FLAG_POINTTOPOINT | FLAG_NO_SETINT | FLAG_MULTI_PACKET
-+			| FLAG_LINK_INTR | FLAG_ETHER | FLAG_SEND_ZLP,
-+	.bind = cdc_ncm_bind,
-+	.unbind = cdc_ncm_unbind,
-+	.manage_power = usbnet_manage_power,
-+	.status = cdc_ncm_status,
-+	.rx_fixup = cdc_ncm_rx_fixup,
-+	.tx_fixup = cdc_ncm_tx_fixup,
-+	.set_rx_mode = usbnet_cdc_update_filter,
-+};
-+
-+/* Same as apple_tethering_interface_info, but without FLAG_LINK_INTR */
-+static const struct driver_info apple_private_interface_info = {
-+	.description = "CDC NCM (Apple Private)",
-+	.flags = FLAG_POINTTOPOINT | FLAG_NO_SETINT | FLAG_MULTI_PACKET
-+			| FLAG_ETHER | FLAG_SEND_ZLP,
-+	.bind = cdc_ncm_bind,
-+	.unbind = cdc_ncm_unbind,
-+	.manage_power = usbnet_manage_power,
-+	.status = cdc_ncm_status,
-+	.rx_fixup = cdc_ncm_rx_fixup,
-+	.tx_fixup = cdc_ncm_tx_fixup,
-+	.set_rx_mode = usbnet_cdc_update_filter,
-+};
-+
- /* Same as cdc_ncm_info, but with FLAG_WWAN */
- static const struct driver_info wwan_info = {
- 	.description = "Mobile Broadband Network Device",
-@@ -1954,6 +1983,22 @@ static const struct driver_info wwan_noarp_info = {
- };
- 
- static const struct usb_device_id cdc_devs[] = {
-+	/* iPhone */
-+	{ USB_DEVICE_INTERFACE_NUMBER(0x05ac, 0x12a8, 2),
-+		.driver_info = (unsigned long)&apple_tethering_interface_info,
-+	},
-+	{ USB_DEVICE_INTERFACE_NUMBER(0x05ac, 0x12a8, 4),
-+		.driver_info = (unsigned long)&apple_private_interface_info,
-+	},
-+
-+	/* iPad */
-+	{ USB_DEVICE_INTERFACE_NUMBER(0x05ac, 0x12ab, 2),
-+		.driver_info = (unsigned long)&apple_tethering_interface_info,
-+	},
-+	{ USB_DEVICE_INTERFACE_NUMBER(0x05ac, 0x12ab, 4),
-+		.driver_info = (unsigned long)&apple_private_interface_info,
-+	},
-+
- 	/* Ericsson MBM devices like F5521gw */
- 	{ .match_flags = USB_DEVICE_ID_MATCH_INT_INFO
- 		| USB_DEVICE_ID_MATCH_VENDOR,
--- 
-2.45.2
-
+Another option is to add one more kernel rxq for it (i.e. set 
+real_num_rx_queues to num_channels + 1). But, that would be a bigger 
+change, we can keep it for a followup discussion.
 
