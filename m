@@ -1,177 +1,148 @@
-Return-Path: <netdev+bounces-101918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 303AC90098D
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 17:47:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FAC6900992
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 17:50:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A94E91F23143
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 15:47:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91B02285003
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 15:50:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 586B1198E86;
-	Fri,  7 Jun 2024 15:47:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627BE199EB2;
+	Fri,  7 Jun 2024 15:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g6IuiIJk"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="I1XLcZLe"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989771E52A
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 15:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56AED19885E
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 15:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717775246; cv=none; b=p+kg9MDqoGSwvYFqd6l+oF6tRhX3/pXFrJoWahomd3rBx3T4JdHC+fcfsUA7DopoDyK5oLd+0mGtS84BLe0FLUsYVqmIAp7IJ/Gj3v9GZ1PqyhXVz/jBTcEc8SAIydhtp6rFPWDiD+C8RhKngYPnE4iPbTwnga9+xeozSBiDnOk=
+	t=1717775449; cv=none; b=FQfSDXp2Dqf5xFMy49F7SaI1QfI1NbPFdGgkMyn5kv4tRuX40MCqH4a46K16ENnNGBSk16eiKmb2bBjsAqwVwKzUJjg9rVqFZy+MPBlcudChCAB6S4Iz4h8phhJlP2NM6hwnwqnL07Y+yPOLv99MeEwAKXxN54/6eol2h3no8LU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717775246; c=relaxed/simple;
-	bh=CShtKqBAKVaWF2SeSkDUPmUqFbx6AeJcpaTZSt41drk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GrS+loxRUh5R50PtoyxUT5A7LBHfRePAGkRq4/jsuLGlCxpi+jdq3KwzW8c8228fEQZdSPJfB4fAyFwj8ry6eDrT5vZoiCu7S3rCyB0PehS7syTnpJGUStU8DeZDvnlV0cdyoNvtKTTpJWbHhVaQIhYIJni0IeFvHemow9/Zh98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g6IuiIJk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717775243;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xQCecZL5TMRFpvq7f1WP4hnKckjUHkKLcuYm0ceE7N4=;
-	b=g6IuiIJkzViFC2l9FWRU0bHc6E2qKIUPKducMIavA6ib7D0PvB4vL/SBMsyzx/hQubM3qv
-	OUhzdWofTNB+6/k/qjhSSLofmU2Kg4jlhmnfw1M8nihw4HOD9ZbAKVpSNJjvXmQMc+NE7r
-	7eE6QKRmDbA33DVYuT+XHx4nAy6pjks=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-359-VfoMlvbrPTKtuWukiC44eA-1; Fri, 07 Jun 2024 11:47:21 -0400
-X-MC-Unique: VfoMlvbrPTKtuWukiC44eA-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2c1a23d1382so2173664a91.0
-        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 08:47:21 -0700 (PDT)
+	s=arc-20240116; t=1717775449; c=relaxed/simple;
+	bh=uZQQT0tWMLKpHLzpjA4+4RgpjpRE41cd6g0mqVVjBlM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lA0Z1HZ39QFko/g5I1mBZF6GY4Zpktt+zGYnmn2BqVDQN4wmQ8CZVoKHQ0A0aEioCw9QJgVJoBaDk0RucER+GqbR505TRvCZ8Q2mwdLJYtDVqqEykDaMXsuAlR6J4MxA2ml95/L4v5fek/vYDivKz/RGcHSMhvYlUT/xDNdc7/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=I1XLcZLe; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42155143cb0so26823735e9.2
+        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 08:50:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1717775445; x=1718380245; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8mLYWZnKH+z6ueZhuJkRBxm2z11CPZmpPTaPGv2cuj0=;
+        b=I1XLcZLeVsc6OMmjnn3QqWOxgtjpnis4rLhTWWXsO0wpAwNVCuza3LAeAv54Ln7tiQ
+         +x//nMH0a9fvHdDOfoHj0nMjAW8YahPWgsfBT76DOZHFJJneyfrkklHHsKbw5CaVlaJM
+         mPQO9SwxNlpW0lfy2nTnV7Dk/gwxaFQeT8fWjjIY/iVKPmBqmujoFsbfbsKTuT1TMHBl
+         hVV5glIw2QbN/MA5F/OmoGnFoqBobPxholl2UOsQULEKwqiGQsHKTot1S1JN5CV6aahL
+         Rc+TBVXagqrGgZBdAF5RNOScsYrEajkgo4bzCryBrIM3V8uH+3Bu/BjMsaqgK57hBIvp
+         AIxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717775240; x=1718380040;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xQCecZL5TMRFpvq7f1WP4hnKckjUHkKLcuYm0ceE7N4=;
-        b=mBkdP3cxwiana3uCndgfoENk1g9qSi1hPVrBithLYYDNPxuQiwpkPhwr0Q2R8y5dSQ
-         LOBhCvrEA5fMAfB7SbFCO5Uc7ncIOHGXPYylMgqzRh4Rwcb6uXJleh9rMsZmg7FO3lIv
-         X2XYXnzoZa+FbJ87GNGEV3VAwmV/OcKgKT/YNHVEMdory15TvCV3IkWujMQxz3jNzSVN
-         Eodg4mrbL7Xp8s1/SfqxCo2LU5d2IbRNv58yx2pC+Ucq3csrHMgU9zRLtLV1ujSZgxGA
-         bTTt9gnkQ2XX/G9E0+i7xVWz4sPz/QVGaPpw9CNxdgidJblPaK8Sh6DcKejR1J1EZ5fl
-         3+uA==
-X-Gm-Message-State: AOJu0YwGHKSeNBMbf3NHTL6SqesPWv1V6wCuXjoqOkdQslixTV4o/XK7
-	Uv0SpTOyacHYwEUuBVrRE3EMXb8Cux2u0DrGtAwOdQ9eCLEavAGDbC81wxLAnKoTh/Jt/RI9/q8
-	pUlHxsjcFfVmnOgwECVmGKNuhhGfduB9s86Tf7R1u/lXnlXclGXI7I7KcoRtmyg9tzqp/YCc3u/
-	8Z0j1QC+UOVHppnhllY7APChz9Jweb/HvX5ox6VV8=
-X-Received: by 2002:a17:90a:6541:b0:2c2:cfca:df5f with SMTP id 98e67ed59e1d1-2c2cfcae024mr1132756a91.36.1717775240639;
-        Fri, 07 Jun 2024 08:47:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEb87vcx2eefUnVvWfHkTcqB7wwLwFgHZRIdJn6Vi02LfBGmajNAAbYALuj51i52HcSdJLAdGZG0Iuqrxx7q7c=
-X-Received: by 2002:a17:90a:6541:b0:2c2:cfca:df5f with SMTP id
- 98e67ed59e1d1-2c2cfcae024mr1132740a91.36.1717775240258; Fri, 07 Jun 2024
- 08:47:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1717775445; x=1718380245;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8mLYWZnKH+z6ueZhuJkRBxm2z11CPZmpPTaPGv2cuj0=;
+        b=Tmu/2HGG5NMhVSN966mlUXUJLq1r4mHWBXCaNj3RIIkUWHHnttwlnZ/AC9hZlpHEL5
+         Bebl7asFlcJh3CbR0H05Scrul8GJ6x7gMx9alNfg1thrrvht2DFDR4Rh/EWffmtujX1n
+         A4CQOgGgvQa3H+3IN/oTvmg77s2VhUlD3ZpwWQ7MZZ7YIe5i9HakNU+eA5xplPW8zxbb
+         hUwxPVkFxb6QG2KkPpkmSLOSALYk0TsYXsQ+VfpRfb/lrRfLgvaJwG2K+5HSHOn9gbTX
+         M1ES31t3QaZ47VJv34tQYsfNAAEFuVHUsDlYmnPXiy+ovtaVqJXSWP11BI64yK2hYvuz
+         a1rw==
+X-Forwarded-Encrypted: i=1; AJvYcCWXu3QLFFBJssI9ZVOZOujs4QA9aJRz5NRn1hRIZM5/yzKWvlrz0dGYL3CnxSTR68SH7R6RP+fYSTl1+UXLsDuhvfYOH2wX
+X-Gm-Message-State: AOJu0Yx371vlkawTSFKyKvCVd/ozB7C2srQ2QF1B1cyL78QakYxyXUPO
+	1h7CEyRImLX73DMnzPc2ZOpn8NX6vQOjkwzFi5f5k1cy0zdszkLYBYXeShZ5YZs=
+X-Google-Smtp-Source: AGHT+IHG8WszpcEWn5y0Ergt20tKhSOz5/rJxXqP/p8U9bIooclfDP/A70icjjOiWOdZ+5jrSUBNHw==
+X-Received: by 2002:a05:600c:3496:b0:421:2429:7e46 with SMTP id 5b1f17b1804b1-421649fbb46mr33986435e9.13.1717775445415;
+        Fri, 07 Jun 2024 08:50:45 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35ef5d66cf6sm4237732f8f.49.2024.06.07.08.50.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jun 2024 08:50:44 -0700 (PDT)
+Date: Fri, 7 Jun 2024 17:50:41 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, linux-doc@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
+	Leonid Bloch <lbloch@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
+	patches@lists.linux.dev
+Subject: Re: [PATCH 0/8] Introduce fwctl subystem
+Message-ID: <ZmMsUYFvUOndiX8g@nanopsycho.orion>
+References: <665fa9c9e69de_4a4e62941e@dwillia2-xfh.jf.intel.com.notmuch>
+ <20240605135911.GT19897@nvidia.com>
+ <d97144db-424f-4efd-bf10-513a0b895eca@kernel.org>
+ <20240606071811.34767cce@kernel.org>
+ <20240606144818.GC19897@nvidia.com>
+ <20240606080557.00f3163e@kernel.org>
+ <4724e6a1-2da1-4275-8807-b7fe6cd9b6c1@kernel.org>
+ <ZmKtUkeKiQMUvWhi@nanopsycho.orion>
+ <887d1cb7-e9e9-4b12-aebb-651addc6b01c@kernel.org>
+ <20240607151451.GL19897@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240416152913.1527166-3-omosnace@redhat.com> <085faf37b4728d7c11b05f204b0d9ad6@paul-moore.com>
- <CAFqZXNvm6T9pdWmExgmuODaNupMu3zSfYyb0gebn5AwmJ+86oQ@mail.gmail.com>
- <CAHC9VhTxhcSDfYCK95UsuZixMSRNFtTGkDvBWjpagHw6328PMQ@mail.gmail.com>
- <CAFqZXNurJZ-q64gxh54YhoO_GZeFzxXE0Yta_X-DqF_CcRSvRA@mail.gmail.com> <CAHC9VhRjDn3yihw8fpmweWynE9nmcqaCCspM_SpM7ujUnqoGDw@mail.gmail.com>
-In-Reply-To: <CAHC9VhRjDn3yihw8fpmweWynE9nmcqaCCspM_SpM7ujUnqoGDw@mail.gmail.com>
-From: Ondrej Mosnacek <omosnace@redhat.com>
-Date: Fri, 7 Jun 2024 17:47:08 +0200
-Message-ID: <CAFqZXNsy86uN0J41HOhjH_Rq-WRU2DVzhbJOx3xtxtB5PbwFFA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] cipso: make cipso_v4_skbuff_delattr() fully remove
- the CIPSO options
-To: Paul Moore <paul@paul-moore.com>
-Cc: netdev@vger.kernel.org, linux-security-module@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240607151451.GL19897@nvidia.com>
 
-On Fri, May 17, 2024 at 9:49=E2=80=AFPM Paul Moore <paul@paul-moore.com> wr=
-ote:
+Fri, Jun 07, 2024 at 05:14:51PM CEST, jgg@nvidia.com wrote:
+>On Fri, Jun 07, 2024 at 08:50:17AM -0600, David Ahern wrote:
 >
-> On Tue, May 14, 2024 at 7:29=E2=80=AFAM Ondrej Mosnacek <omosnace@redhat.=
-com> wrote:
-> > I tried to test what you describe - hopefully I got close enough:
-> >
-> > My test setup has 3 VMs (running Fedora 39 from the stock qcow2 image)
-> > A, B, and R, connected via separate links as A <--> R <--> B, where R
-> > acts as a router between A and B (net.ipv4.ip_forward is set to 1 on
-> > R, and the appropriate routes are set on A, B, R).
-> >
-> > The A <--> R link has subnet 10.123.123.0/24, A having address
-> > 10.123.123.2 and R having 10.123.123.1.
-> > The B <--> R link has subnet 10.123.124.0/24, B having address
-> > 10.123.124.2 and R having 10.123.124.1.
-> >
-> > The links are implemented as GRE tunnels over the main network that is
-> > shared between the VMs.
-> >
-> > Netlabel configuration on A:
-> > netlabelctl cipsov4 add pass doi:16 tags:5
-> > netlabelctl map del default
-> > netlabelctl map add default address:0.0.0.0/0 protocol:unlbl
-> > netlabelctl map add default address:::/0 protocol:unlbl
-> > netlabelctl map add default address:10.123.123.0/24 protocol:cipsov4,16
-> > netlabelctl map add default address:10.123.124.0/24 protocol:cipsov4,16
-> >
-> > Netlabel configuration on R:
-> > netlabelctl cipsov4 add pass doi:16 tags:5
-> > netlabelctl map del default
-> > netlabelctl map add default address:0.0.0.0/0 protocol:unlbl
-> > netlabelctl map add default address:::/0 protocol:unlbl
-> > netlabelctl map add default address:10.123.123.0/24 protocol:cipsov4,16
-> >
-> > B has no netlabel configured.
-> >
-> > (I.e. A tries to send CIPSO-labeled packets to B, but R treats the
-> > 10.123.124.0/24 network as unlabeled, so should strip/add the CIPSO
-> > label when forwarding between A and B.)
-> >
-> > A basic TCP connection worked just fine in both directions with and
-> > without these patches applied (I installed the patched kernel on all
-> > machines, though it should only matter on machine R). I ignored the
-> > actual labels/CIPSO content - i.e. I didn't change the default SELinux
-> > policy and put SELinux into permissive mode on machines A and R.
-> >
-> > Capturing the packets on R showed the following IP option content
-> > without the patches:
-> > A -> R: CIPSO
-> > R -> B: NOPs
-> > B -> R: (empty)
-> > R -> A: CIPSO
-> >
-> > With the patches this changed to:
-> > A -> R: CIPSO
-> > R -> B: (empty)
-> > B -> R: (empty)
-> > R -> A: CIPSO
-> >
-> > Is this convincing enough or do you have different scenarios in mind?
+>> Mellanox offers both with the Spectrum line and should have a pretty
+>> good understanding of how many customers deploy with the SDK vs
+>> switchdev. Why is that? 
 >
-> Thanks for verifying your patch, the methodology looks good to me, but
-> as I mentioned in my previous email I would feel much better if you
-> verified this with a different client OS/stack.  Do you have access to
-> Windows/MacOS/BSD/non-Linux system you could use in place of B in your
-> test above?
+>We offer lots of options with mlx5 switching too, and switchdev is not
+>being selected by customers principally for performance reasons, in my
+>view.
+>
+>The OVS space wants to operate the switch much like a firewall and
+>this creates a high rate of database updates and exception
+>packets. DPDK can operate all the same offload HW from userspace and
+>avoid all the system call and other kernel overhead. It is much more
+>purpose built to what OVS wants to do. In the >50Gbps space this
+>matters a lot and overall DPDK performance notably wins over switchdev
+>for many OVS workloads - even though the high speed path is
+>near-identical.
+>
+>In this role DPDK is effectively a switch SDK, an open source one at
+>least.
+>
+>Sadly I'm seeing signs that proprietary OVS focused SDKs (think
+>various P4 offerings and others) are out competing open DPDK on
+>merit :(
+>
+>For whatever reason the market for switching is not strongly motivated
+>toward open SDKs, and the available open solutions are struggling a
+>bit to compete.
+>
+>But to repeat again, fwctl is not for dataplane, it is not for
+>implementing a switch SDK (go use RDMA if you want to do that). I will
 
-I don't think I can easily plug that into the framework I used for the
-testing (there doesn't seem to be a convenient way to install a
-FreeBSD VM without manual interaction and the rest is proprietary).
+switch sdk is all about control plane.
 
-I still don't quite understand what exactly you expect to break under
-that scenario and why - could you elaborate on that? If anything, I'd
-expect the IP header growing along the path (which already happens
-pretty much by design in the opposite direction) to be more likely to
-cause an issue.
 
---
-Ondrej Mosnacek
-Senior Software Engineer, Linux Security - SELinux kernel
-Red Hat, Inc.
-
+>write here a commitment to accept patches blocking such usages if
+>drivers try to abuse the purpose of the subsystem.
+>
+>Jason
 
