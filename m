@@ -1,132 +1,186 @@
-Return-Path: <netdev+bounces-101932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E24A9900A1B
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:14:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87BC0900A23
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:17:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E54B81C21E71
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:14:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 195C31F23BE0
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:17:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CE8C19A29A;
-	Fri,  7 Jun 2024 16:14:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gSEKpS2w"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4576B19007A;
+	Fri,  7 Jun 2024 16:17:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0028D27A;
-	Fri,  7 Jun 2024 16:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9647612E47;
+	Fri,  7 Jun 2024 16:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717776848; cv=none; b=hUMtuej/ZAdtDnUAni+EEFm4Sbp2YeE//ucf/FWOHosmUjZSbOW3GFKh/fsvmBdIGH0K0y9W1sjCfij0QjwwUHZHwbMgh12lRzcp1zdmy2Us3mTMNRVe9LLZHmSRbwE6GwT0d9bNuPCNE1vxVI3QiTzsnSOJ66B+1ejGQyE8a9E=
+	t=1717777047; cv=none; b=tjYstTbLjtIe+b0MSj0J2mzVkN84nzIEtXC7fUOaBh3XCZnIihjs1ZptfGbFMZjZkoHlQL483ii74R6JHowS3jdRWAKwp4EIlPaFkoozE/hgybRnmd+wX0MUKtaeJBShwgPQXrp3Xmzw2cKjx5R4NnNkbMySaGoePeA7S/cLM1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717776848; c=relaxed/simple;
-	bh=7X+i6/m5S/SZaDMGnWrwXOVyR4lYc9mbLna/qqbUphI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OjL3ngAjYHsKGU/i1yt6+mC5MTvIwdsUJwdSi9z6HvVvojUS70rzQmRiMhAkAuGdGeGpNovX7eJANgMY+ocHQWJPaGH80zASeuOihtHb/gpatqSe73VWHaOgNsO6urG6u+zO0o97IWhM3mSqDLcU51i3O7fkDCeFimjxJ27TiX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gSEKpS2w; arc=none smtp.client-ip=209.85.166.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-7eb41c9260dso101418339f.1;
-        Fri, 07 Jun 2024 09:14:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717776846; x=1718381646; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zZY8pZG0Qp10WbpZe6DVvOQtoLlFafQT2Cqu/dEYMTA=;
-        b=gSEKpS2wpUtdzryMtegMUPzTLc9M6yBIGvIu0K5D/7lj2vYEbDg58OuEx95wtbD/b5
-         spFdz/oW2zPLMJ+sNdFt3aaOBVVLHczAYgkc/usEAWnmG3bG9Uk3t3EBBzOOXo9s1WaA
-         StiH5AxC8jNJk9BYn/HCjhxGxjgZQ/b/+OQtB7kVbtasl4Fozo5MQQzfluk0yVziSL1J
-         M1KXREnfUMIYkAtSquzNQxvaOUiZ4oth/gMrKABilDDXc0jk0dmmn5eoxbkTDsZWjRg/
-         uNcLe4Lsd2OTTd+HIIfpHOx/hEy8ptTxFtA8RTfu5KjZ3e/Ia7uMBhBWHIG8TO273o1A
-         IC7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717776846; x=1718381646;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zZY8pZG0Qp10WbpZe6DVvOQtoLlFafQT2Cqu/dEYMTA=;
-        b=Fei5eWveAYOEr3VG6Dy4i4FMsp3buCCEESLXM+934xJy7r+mNFrxV5NORwGCkj3ldJ
-         kNDD8yzjqlKIWSWUNzaPJ75RHFJn1WXCp2OZFK3wMS4JfzeDGLHW+5h6C9oCiCYFyiGD
-         K4fjQDXViEmHTrOcgsbRxMsnM9oCaJwxuoyg/mHSKm8+ZC+abL2xvB4isVxCQdNdUmhz
-         54ZgsvLDbmZTQOMSqI4yReUkH8gY35R/aBqjOfpqh2FiHaYbzvPYltvB95DmgGN4i58a
-         VmzGIJwJVO5jghfKqbivh5soMoitR1CrsV2np8pnZYbuX7EMzVC9VDY5kL3jTVkHRx+X
-         W71Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXOdALC7d8/XnJez2Jzy6KfjhlVrd95j5g/kkCCiyhzp1ZE5wwJkOy/jWODOwC4+TJZgfF7HPxNBfhSWhAcA6eB9o0Z
-X-Gm-Message-State: AOJu0Yza4jkiNNOEEdYy0uXA/tZOApRdqCyI2kTEGyFOqXC3FuSEQSh0
-	LwM2jz94/XBQsIF+e7Q4mORFPkn1mw/4000XtlLbyTfU8F9Kdb9IOtbqbA==
-X-Google-Smtp-Source: AGHT+IFni9DAIrTiKXd/4rxrsPqbglxdvZ5w7j+R04nvowc8J5xDCu4rTfd+30pr//9eb3GOtSa+7A==
-X-Received: by 2002:a05:6602:3f8b:b0:7e2:181:a054 with SMTP id ca18e2360f4ac-7eb571d3377mr355942639f.5.1717776845734;
-        Fri, 07 Jun 2024 09:14:05 -0700 (PDT)
-Received: from localhost ([2601:647:6881:9060:ec8a:c212:32db:10a5])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6de28e23171sm2772526a12.93.2024.06.07.09.14.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jun 2024 09:14:04 -0700 (PDT)
-Date: Fri, 7 Jun 2024 09:14:04 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
-	Cong Wang <cong.wang@bytedance.com>,
-	syzbot+0c4150bff9fff3bf023c@syzkaller.appspotmail.com
-Subject: Re: [Patch net] net: remove the bogus overflow debug check in
- pskb_may_pull()
-Message-ID: <ZmMxzPoDTNu06itR@pop-os.localdomain>
-References: <20240606221531.255224-1-xiyou.wangcong@gmail.com>
- <20240606232747.GE9890@breakpoint.cc>
+	s=arc-20240116; t=1717777047; c=relaxed/simple;
+	bh=6NpbI6cVT/qBF0SqsyJAoESRZcL7nfvEkvqXgsuhiz4=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uWtLTNoO4hnwSdkHEKMKUBW7/LwqD9y+1k+xY55cH6kh2d9MxKj49Oag77btny/Iqaji4qOisXo03yhdYFeDKD0wnZgEMHDy1ixpL/HuZYW62GnsAvGCqw1EDZsVWVSrQpJP1roEk53AhCpV92FvU2pnGk0pGlcEdbaIR38/iqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VwmSj6Nqmz680ZP;
+	Sat,  8 Jun 2024 00:12:53 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5F3FB140A36;
+	Sat,  8 Jun 2024 00:17:18 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 7 Jun
+ 2024 17:17:17 +0100
+Date: Fri, 7 Jun 2024 17:17:16 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Wei Huang <wei.huang2@amd.com>
+CC: <linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <netdev@vger.kernel.org>, <bhelgaas@google.com>,
+	<corbet@lwn.net>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <alex.williamson@redhat.com>,
+	<gospo@broadcom.com>, <michael.chan@broadcom.com>,
+	<ajit.khaparde@broadcom.com>, <somnath.kotur@broadcom.com>,
+	<andrew.gospodarek@broadcom.com>, <manoj.panicker2@amd.com>,
+	<Eric.VanTassell@amd.com>, <vadim.fedorenko@linux.dev>, <horms@kernel.org>,
+	<bagasdotme@gmail.com>
+Subject: Re: [PATCH V2 2/9] PCI: Add TPH related register definition
+Message-ID: <20240607171716.0000216d@Huawei.com>
+In-Reply-To: <20240531213841.3246055-3-wei.huang2@amd.com>
+References: <20240531213841.3246055-1-wei.huang2@amd.com>
+	<20240531213841.3246055-3-wei.huang2@amd.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240606232747.GE9890@breakpoint.cc>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Fri, Jun 07, 2024 at 01:27:47AM +0200, Florian Westphal wrote:
-> Cong Wang <xiyou.wangcong@gmail.com> wrote:
-> > From: Cong Wang <cong.wang@bytedance.com>
-> > 
-> > Commit 219eee9c0d16 ("net: skbuff: add overflow debug check to pull/push
-> > helpers") introduced an overflow debug check for pull/push helpers.
-> > For __skb_pull() this makes sense because its callers rarely check its
-> > return value. But for pskb_may_pull() it does not make sense, since its
-> > return value is properly taken care of. Remove the one in
-> > pskb_may_pull(), we can continue rely on its return value.
+On Fri, 31 May 2024 16:38:34 -0500
+Wei Huang <wei.huang2@amd.com> wrote:
+
+> Linux has some basic, but incomplete, definition for the TPH Requester
+> capability registers. Also the control registers of TPH Requester and
+> the TPH Completer are missing. This patch adds all required definitions
+> to support TPH enablement.
 > 
-> See 025f8ad20f2e3264d11683aa9cbbf0083eefbdcd which would not exist
-> without this check, I would not give up yet.
+> Co-developed-by: Eric Van Tassell <Eric.VanTassell@amd.com>
+> Signed-off-by: Eric Van Tassell <Eric.VanTassell@amd.com>
+> Signed-off-by: Wei Huang <wei.huang2@amd.com>
+> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com> 
+> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 
-What's the point of that commit?
+As below, you can't modify uapi headers because we have no idea what
+userspace code is already using them.
+Also, (annoyingly) the field contents in this header tend (or maybe always are)
+in the shifted form.
 
-The "fix" (I doubt it fixes anything) you had is merely exiting a few
-lines earlier than pskb_may_pull():
-
- 30         if (!skb_inner_network_header_was_set(skb))
- 31                 goto out;
- 32 
- 33         skb_reset_network_header(skb);
- 34         mpls_hlen = skb_inner_network_header(skb) - skb_network_header(skb);
- 35         if (unlikely(!mpls_hlen || mpls_hlen % MPLS_HLEN))
- 36                 goto out;
- 37         if (unlikely(!pskb_may_pull(skb, mpls_hlen)))
- 38                 goto out;
-
-Before your "fix", we exit on line 37. After your "fix", we exit on line
-30. I don't see any difference here, it returns -EINVAL anyway.
-
+> ---
+>  drivers/vfio/pci/vfio_pci_config.c |  7 +++---
+>  include/uapi/linux/pci_regs.h      | 35 ++++++++++++++++++++++++++----
+>  2 files changed, 35 insertions(+), 7 deletions(-)
 > 
-> bpf_try_make_writable() could do an explicit check vs. skb->len.
+> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+> index 97422aafaa7b..de622cdfc2a4 100644
+> --- a/drivers/vfio/pci/vfio_pci_config.c
+> +++ b/drivers/vfio/pci/vfio_pci_config.c
+> @@ -1434,14 +1434,15 @@ static int vfio_ext_cap_len(struct vfio_pci_core_device *vdev, u16 ecap, u16 epo
+>  		if (ret)
+>  			return pcibios_err_to_errno(ret);
+>  
+> -		if ((dword & PCI_TPH_CAP_LOC_MASK) == PCI_TPH_LOC_CAP) {
+> +		if (((dword & PCI_TPH_CAP_LOC_MASK) >> PCI_TPH_CAP_LOC_SHIFT)
+> +			== PCI_TPH_LOC_CAP) {
+>  			int sts;
+>  
+>  			sts = dword & PCI_TPH_CAP_ST_MASK;
+>  			sts >>= PCI_TPH_CAP_ST_SHIFT;
+> -			return PCI_TPH_BASE_SIZEOF + (sts * 2) + 2;
+> +			return PCI_TPH_ST_TABLE + (sts * 2) + 2;
+>  		}
+> -		return PCI_TPH_BASE_SIZEOF;
+> +		return PCI_TPH_ST_TABLE;
+>  	case PCI_EXT_CAP_ID_DVSEC:
+>  		ret = pci_read_config_dword(pdev, epos + PCI_DVSEC_HEADER1, &dword);
+>  		if (ret)
+> diff --git a/include/uapi/linux/pci_regs.h b/include/uapi/linux/pci_regs.h
+> index 94c00996e633..ae1cf048b04a 100644
+> --- a/include/uapi/linux/pci_regs.h
+> +++ b/include/uapi/linux/pci_regs.h
+> @@ -657,6 +657,7 @@
+>  #define  PCI_EXP_DEVCAP2_ATOMIC_COMP64	0x00000100 /* 64b AtomicOp completion */
+>  #define  PCI_EXP_DEVCAP2_ATOMIC_COMP128	0x00000200 /* 128b AtomicOp completion */
+>  #define  PCI_EXP_DEVCAP2_LTR		0x00000800 /* Latency tolerance reporting */
+> +#define  PCI_EXP_DEVCAP2_TPH_COMP	0x00003000 /* TPH completer support */
+>  #define  PCI_EXP_DEVCAP2_OBFF_MASK	0x000c0000 /* OBFF support mechanism */
+>  #define  PCI_EXP_DEVCAP2_OBFF_MSG	0x00040000 /* New message signaling */
+>  #define  PCI_EXP_DEVCAP2_OBFF_WAKE	0x00080000 /* Re-use WAKE# for OBFF */
+> @@ -1020,15 +1021,41 @@
+>  #define  PCI_DPA_CAP_SUBSTATE_MASK	0x1F	/* # substates - 1 */
+>  #define PCI_DPA_BASE_SIZEOF	16	/* size with 0 substates */
+>  
+> +/* TPH Completer Support */
+> +#define PCI_EXP_DEVCAP2_TPH_COMP_SHIFT		12
+> +#define PCI_EXP_DEVCAP2_TPH_COMP_NONE		0x0 /* None */
+> +#define PCI_EXP_DEVCAP2_TPH_COMP_TPH_ONLY	0x1 /* TPH only */
+> +#define PCI_EXP_DEVCAP2_TPH_COMP_TPH_AND_EXT	0x3 /* TPH and Extended TPH */
+> +
+>  /* TPH Requester */
+>  #define PCI_TPH_CAP		4	/* capability register */
+> +#define  PCI_TPH_CAP_NO_ST	0x1	/* no ST mode supported */
+> +#define  PCI_TPH_CAP_NO_ST_SHIFT	0x0	/* no ST mode supported shift */
+> +#define  PCI_TPH_CAP_INT_VEC	0x2	/* interrupt vector mode supported */
+> +#define  PCI_TPH_CAP_INT_VEC_SHIFT	0x1	/* interrupt vector mode supported shift */
+> +#define  PCI_TPH_CAP_DS		0x4	/* device specific mode supported */
+> +#define  PCI_TPH_CAP_DS_SHIFT	0x4	/* device specific mode supported shift */
+>  #define  PCI_TPH_CAP_LOC_MASK	0x600	/* location mask */
+> -#define   PCI_TPH_LOC_NONE	0x000	/* no location */
+> -#define   PCI_TPH_LOC_CAP	0x200	/* in capability */
+> -#define   PCI_TPH_LOC_MSIX	0x400	/* in MSI-X */
 
-But why? I don't see the point of its existence. pskb_may_pull() already
-checks it very well:
+It's a userspace header, relatively unlikely to be safe to change it...
+This would also be inconsistent with how some other registers are defined in here.
 
-2741         if (unlikely(len > skb->len))
-2742                 return SKB_DROP_REASON_PKT_TOO_SMALL;
+I'd love it if we could tidy this up, but we are stuck by this being
+in uapi.
 
-Thanks.
+> +#define  PCI_TPH_CAP_LOC_SHIFT	9	/* location shift */
+> +#define   PCI_TPH_LOC_NONE	0x0	/*  no ST Table */
+> +#define   PCI_TPH_LOC_CAP	0x1	/*  ST Table in extended capability */
+> +#define   PCI_TPH_LOC_MSIX	0x2	/*  ST table in MSI-X table */
+>  #define PCI_TPH_CAP_ST_MASK	0x07FF0000	/* ST table mask */
+>  #define PCI_TPH_CAP_ST_SHIFT	16	/* ST table shift */
+> -#define PCI_TPH_BASE_SIZEOF	0xc	/* size with no ST table */
+> +
+> +#define PCI_TPH_CTRL		0x8	/* control register */
+> +#define  PCI_TPH_CTRL_MODE_SEL_MASK	0x7	/* ST Model Select mask */
+> +#define  PCI_TPH_CTRL_MODE_SEL_SHIFT	0x0	/* ST Model Select shift */
+> +#define   PCI_TPH_NO_ST_MODE		0x0	/*  No ST Mode */
+> +#define   PCI_TPH_INT_VEC_MODE		0x1	/*  Interrupt Vector Mode */
+> +#define   PCI_TPH_DEV_SPEC_MODE		0x2	/*  Device Specific Mode */
+> +#define  PCI_TPH_CTRL_REQ_EN_MASK	0x300	/* TPH Requester mask */
+> +#define  PCI_TPH_CTRL_REQ_EN_SHIFT	8	/* TPH Requester shift */
+> +#define   PCI_TPH_REQ_DISABLE		0x0	/*  No TPH request allowed */
+> +#define   PCI_TPH_REQ_TPH_ONLY		0x1	/*  8-bit TPH tags allowed */
+> +#define   PCI_TPH_REQ_EXT_TPH		0x3	/*  16-bit TPH tags allowed */
+> +
+> +#define PCI_TPH_ST_TABLE	0xc	/* base of ST table */
+>  
+>  /* Downstream Port Containment */
+>  #define PCI_EXP_DPC_CAP			0x04	/* DPC Capability */
+
 
