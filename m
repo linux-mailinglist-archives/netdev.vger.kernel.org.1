@@ -1,205 +1,164 @@
-Return-Path: <netdev+bounces-101946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32C3E900AB3
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:48:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 223BA900ADD
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:59:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A67942862CC
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:48:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F9781F24224
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:59:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E452B19AD57;
-	Fri,  7 Jun 2024 16:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41DEF19AD84;
+	Fri,  7 Jun 2024 16:59:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RbKQiXW9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G2AVTqpi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B940619AD48;
-	Fri,  7 Jun 2024 16:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1169918059
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 16:59:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717778878; cv=none; b=Cel90/7Dv2sZ71EjuoZm5lmhvIqeaDj/VqxelyNfhsVjOSLLR3rCd4Hu/U1q4n4Qf1fojnYzarnjb1aFBotxTyU+UZhdmxCbiWEtBWVaFNToyzHTvlbIx7PpRZxchOxL97ywFaJJoL9kfwI0aQB+5XEdtlBsJYy3dTSA4aBCWog=
+	t=1717779573; cv=none; b=HqqK5rGgbQ5v1jacmJ5UoSMGzf+o1abJtKrGkdgNPIRJW2gjTXZT6xF+1l/YlURLyn0bPRq1PEyVUcEdPOr8b+Q257hNLRATuyLj0EygmwPDgf+WQIepltQ2RfsAPRjsSGzMoc/YKT/6sEiPSlDB46ll+XbFt54QLm/pxn3VXRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717778878; c=relaxed/simple;
-	bh=9iL6D9ZDF9G5asbiclELPhk+Wwh+GRu/qUW2URC9UD0=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=V4BPZRdrk3ShI3zuXsDwhA5dsnSJkcJocA48bqC/CYAop65JPKmMA9SRQHjkf4OYL7LuOV4X9N6DtD40Olg8jJGs8CDjcecdrO6mhVWUwmHyHYs9gReK+5QKKa5CsL3Gkg/CPQYBR++N3ysyrCOHGmB+ynklXD9fRevfqR7gSak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RbKQiXW9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16720C2BBFC;
-	Fri,  7 Jun 2024 16:47:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717778878;
-	bh=9iL6D9ZDF9G5asbiclELPhk+Wwh+GRu/qUW2URC9UD0=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-	b=RbKQiXW9XQ5K/q87b4z56mzshQBPQB6l2r1z7ZROZKiNd26DQr56H+EHBFQCi93ZD
-	 7u6X1+AfLaLTb9iJXPYgMcHJiMhko6Gw6KdhlRbA5ngMzEZL4GfbG2WUZozl7NKGYL
-	 +D3jXQ2JSVSdT34v7A0FRdjz6gekiNFJWO6PH/HVlpkRGmDbssTZGU/HVdnAnVKi87
-	 na9EQ6tR1BFpcE4E/Fk6ufiz/0vyo5UkM1IuzNS6jYwjV00fMccn0e7DhBe6pfyFSL
-	 t+/hgBP6gM0rqzlTokRfLYnS1xz2qbXplpVtEKwNq1FMLrzDltONzYA+6uqVwnOj4r
-	 FVe8ml1lUFMbg==
-Date: Fri, 7 Jun 2024 09:47:57 -0700 (PDT)
-From: Mat Martineau <martineau@kernel.org>
-To: "D. Wythe" <alibuda@linux.alibaba.com>, 
-    Matthieu Baerts <matttbe@kernel.org>
-cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com, 
-    wintera@linux.ibm.com, guwen@linux.alibaba.com, kuba@kernel.org, 
-    davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org, 
-    linux-rdma@vger.kernel.org, tonylu@linux.alibaba.com, 
-    Paolo Abeni <pabeni@redhat.com>, edumazet@google.com
-Subject: Re: [PATCH net-next v6 3/3] net/smc: Introduce IPPROTO_SMC
-In-Reply-To: <ed6bde75-2783-446e-b667-204ed55071b5@kernel.org>
-Message-ID: <61b94bf6-a383-afff-db62-261cac7360c7@kernel.org>
-References: <1717592180-66181-1-git-send-email-alibuda@linux.alibaba.com> <1717592180-66181-4-git-send-email-alibuda@linux.alibaba.com> <6e0f1c4a-4911-51c3-02fa-a449f2434ef1@kernel.org> <ffe06909-6152-4349-9b60-5697a038ac19@linux.alibaba.com>
- <ed6bde75-2783-446e-b667-204ed55071b5@kernel.org>
+	s=arc-20240116; t=1717779573; c=relaxed/simple;
+	bh=b716fHLqA+q2jVEnF0wQCq5rwwcoiNDI2tYRdVxGBJ8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oBScGNrlvTpYIXd7NEFfpZo3sxV/jPQ805fhdQZMC+9an7jhhULgqP+nixJzudzhbca2yi8G/FH/dSsgC+MWjiYB986pjprRcctQpL8yTCoguPfP1+eaolchtEgBb0vhITN2aR7OhiqH5FQiDbR0Aema3YwuCFVvikBocRB4CR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G2AVTqpi; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a6e0a499687so91349366b.2
+        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 09:59:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717779569; x=1718384369; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b716fHLqA+q2jVEnF0wQCq5rwwcoiNDI2tYRdVxGBJ8=;
+        b=G2AVTqpij2cJhN5HRQo3ptWXB/TQ9YDh9RGrpGeXVnp1CnL9i2DHQgrabHfRJ+vI4v
+         6rj8PhKQhbrqw08lFKhBQBeW3OEzxZgvZ0sM8DqYOCgzynh/TqX8zhUpecpLeveUgZe/
+         4WO2raT386olPe7+CqYN3aB+/KVKBRO+MtAq0XGvPQZgecLr0Yv0La164s3HFQRW75Oj
+         zZN4yPFMx3bgrVJwSDOEuMmEHfxotBiwl6JuetdpyYQLp0Ofu9L4f3YRHWKNySwxc9/Q
+         JR8ZXjlMx3qbDJacaMfkf8ysfsu1jvPB+cyZ9tvZ8GL8kf1mEaJBMzprr6qo856Q0ny6
+         yaFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717779569; x=1718384369;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b716fHLqA+q2jVEnF0wQCq5rwwcoiNDI2tYRdVxGBJ8=;
+        b=Wl9sfo+rMwdh1uwOKEeCcZmN5duw7rTiB2goOHcJmgUGeH5tc8VEf+S64xf1eKU4LP
+         SNGWgnCBsUqsGYiWYb4tNkWltCgeMmnd67qG1V0dsgmwoaE2PNdejoo9MiNhsuzq/HWd
+         72WPSPrmLibM7G2em8C2rF/wxNfxhFUbBwbLNnCJ4ZYF2oUe9tQKZrghPEEibHE+wGff
+         Zd8h89P6Vr6oi+a9z1yQeoVC0LezyNtCcWgeQBYaWEErcE7RqrIN4YMVuPnCs+dRwDM2
+         RonOudQ0fG3DEbcQwjQ3Ma/ACmb22NfVnFB2CTyIVRzRKr9eJGWvjM027hS7HCL54L1d
+         fL0A==
+X-Forwarded-Encrypted: i=1; AJvYcCUmJETV+e3CxcPhP+7EjKZ0pA5XevL8/SvJzKyycJRX/6ksCB4hkSPuEZ1x3r2CXwI8ZQIiPX4fwkftVx3rAKv4XFid1dTs
+X-Gm-Message-State: AOJu0YxK9tmLbhkktn+TGIr6NCgch8RvSwMKSYUKbtUmoq2QcafKfR0u
+	VJHDBbrlpyce1UqCgLc7z6A5yb906gefaZhpXzeuX3P9/9d6p3BiSrlsf3rTrCY2y0LTbFjfVN4
+	T3NWjuWmiu7Vx7XTn2zQ9tIKqEEGLOujj8er8WPusb5bDPPA3GybGtEESUw==
+X-Google-Smtp-Source: AGHT+IFO8pnZEEr0e5+OyIy57985L/vijoXMBq19GG2GOaDteqsHQMVykhBCrf2eEzDSRbH9iO1UMt7DJvGo0PZ4Mj4=
+X-Received: by 2002:a17:906:12c1:b0:a63:3cd4:97d2 with SMTP id
+ a640c23a62f3a-a6cdbd0d2e5mr206803066b.63.1717779569136; Fri, 07 Jun 2024
+ 09:59:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="0-1537107791-1717778253=:88167"
-Content-ID: <2de7d536-e29e-8f93-ee53-6909024c177b@kernel.org>
+References: <20240530201616.1316526-1-almasrymina@google.com>
+ <20240530201616.1316526-3-almasrymina@google.com> <ZlqzER_ufrhlB28v@infradead.org>
+ <CAHS8izMU_nMEr04J9kXiX6rJqK4nQKA+W-enKLhNxvK7=H2pgA@mail.gmail.com>
+ <5aee4bba-ca65-443c-bd78-e5599b814a13@gmail.com> <CAHS8izNmT_NzgCu1pY1RKgJh+kP2rCL_90Gqau2Pkd3-48Q1_w@mail.gmail.com>
+ <eb237e6e-3626-4435-8af5-11ed3931b0ac@gmail.com> <be2d140f-db0f-4d15-967c-972ea6586b5c@kernel.org>
+ <8f44ca2a-8910-418f-b4a6-ca1e051484ba@gmail.com> <a8df4459-30bf-4414-aeca-2f67c461adc4@gmail.com>
+In-Reply-To: <a8df4459-30bf-4414-aeca-2f67c461adc4@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 7 Jun 2024 09:59:16 -0700
+Message-ID: <CAHS8izNcYMsSpTNVSGRJHK6u+kDxnFab5Km1rYy8b++0FeUNgA@mail.gmail.com>
+Subject: Re: [PATCH net-next v10 02/14] net: page_pool: create hooks for
+ custom page providers
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: David Ahern <dsahern@kernel.org>, Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
+	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
---0-1537107791-1717778253=:88167
-Content-Type: text/plain; CHARSET=UTF-8; format=flowed
-Content-Transfer-Encoding: 8BIT
-Content-ID: <5b21e5f9-e28d-1cfd-f572-72f95d66b58b@kernel.org>
-
-On Fri, 7 Jun 2024, Matthieu Baerts wrote:
-
-> Hi D.Wythe,
+On Fri, Jun 7, 2024 at 8:47=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.c=
+om> wrote:
 >
-> On 07/06/2024 07:09, D. Wythe wrote:
->>
->> On 6/7/24 5:22 AM, Mat Martineau wrote:
->>> On Wed, 5 Jun 2024, D. Wythe wrote:
->>>
->>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>>>
->>>> This patch allows to create smc socket via AF_INET,
->>>> similar to the following code,
->>>>
->>>> /* create v4 smc sock */
->>>> v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
->>>>
->>>> /* create v6 smc sock */
->>>> v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
->>>>
->>>> There are several reasons why we believe it is appropriate here:
->>>>
->>>> 1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
->>>> address. There is no AF_SMC address at all.
->>>>
->>>> 2. Create smc socket in the AF_INET(6) path, which allows us to reuse
->>>> the infrastructure of AF_INET(6) path, such as common ebpf hooks.
->>>> Otherwise, smc have to implement it again in AF_SMC path.
->>>>
->>>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->>>> Tested-by: Niklas Schnelle <schnelle@linux.ibm.com>
->>>> ---
->>>> include/uapi/linux/in.h |   2 +
->>>> net/smc/Makefile        |   2 +-
->>>> net/smc/af_smc.c        |  16 ++++-
->>>> net/smc/smc_inet.c      | 169 +++++++++++++++++++++++++++++++++++++++
->>>> +++++++++
->>>> net/smc/smc_inet.h      |  22 +++++++
->>>> 5 files changed, 208 insertions(+), 3 deletions(-)
->>>> create mode 100644 net/smc/smc_inet.c
->>>> create mode 100644 net/smc/smc_inet.h
->>>>
->>>> diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
->>>> index e682ab6..0c6322b 100644
->>>> --- a/include/uapi/linux/in.h
->>>> +++ b/include/uapi/linux/in.h
->>>> @@ -83,6 +83,8 @@ enum {
->>>> #define IPPROTO_RAW        IPPROTO_RAW
->>>>   IPPROTO_MPTCP = 262,        /* Multipath TCP connection */
->>>> #define IPPROTO_MPTCP        IPPROTO_MPTCP
->>>> +  IPPROTO_SMC = 263,        /* Shared Memory Communications        */
->>>> +#define IPPROTO_SMC        IPPROTO_SMC
->>>
->>> Hello,
->>>
->>> It's not required to assign IPPROTO_MPTCP+1 as your new IPPROTO_SMC
->>> value. Making IPPROTO_MAX larger does increase the size of the
->>> inet_diag_table. Values from 256 to 261 are usable for IPPROTO_SMC
->>> without increasing IPPROTO_MAX.
->>>
->>> Just for background: When we added IPPROTO_MPTCP, we chose 262 because
->>> it is IPPROTO_TCP+0x100. The IANA reserved protocol numbers are 8 bits
->>> wide so we knew we would not conflict with any future additions, and
->>> in the case of MPTCP is was convenient that truncating the proto value
->>> to 8 bits would match IPPROTO_TCP.
->>>
->>> - Mat
->>>
->>
->> Hi Mat,
->>
->> Thank you very much for your feedback, I have always been curious about
->> the origins of IPPROTO_MPTCP and I am glad to
->> have learned new knowledge.
->>
-
-Hi D. Whythe -
-
-Sure, you're welcome!
-
->> Regarding the size issue of inet_diag_tables, what you said does make
->> sense. However, we still hope to continue using 263,
->> although the rationale may not be fully sufficient, as this series has
->> been under community evaluation for quite some time now,
->> and we haven't received any feedback about this value, so we’ve been
->> using it in some user-space tools ... 🙁
->>
-
-It's definitely a tradeoff between the Linux UAPI that gets locked in 
-forever vs. handling a transition with your userspace tools. If you change 
-the numeric value of IPPROTO_SMC on the open source side you could 
-transition internally by carrying a kernel patch that allows both the new 
-and old value.
-
->> I would like to see what the community thinks. If everyone agrees that
->> using 263 will be completely unacceptable and a disaster,
->> then we will have no choice but to change it.
+> On 6/7/24 16:42, Pavel Begunkov wrote:
+> > On 6/7/24 15:27, David Ahern wrote:
+> >> On 6/7/24 7:42 AM, Pavel Begunkov wrote:
+> >>> I haven't seen any arguments against from the (net) maintainers so
+> >>> far. Nor I see any objection against callbacks from them (considering
+> >>> that either option adds an if).
+> >>
+> >> I have said before I do not understand why the dmabuf paradigm is not
+> >> sufficient for both device memory and host memory. A less than ideal
+> >> control path to put hostmem in a dmabuf wrapper vs extra checks and
+> >> changes in the datapath. The former should always be preferred.
+> >
+> > If we're talking about types of memory specifically, I'm not strictly
+> > against wrapping into dmabuf in kernel, but that just doesn't give
+> > anything.
 >
-> It will not be a disaster, but a small waste of space (even if
-> CONFIG_SMC is not set).
-
-Well stated Matthieu :)  I chose my "not required" wording carefully, as I 
-didn't want to demand a change here but to make you aware of some of the 
-tradeoffs to consider. And thankfully Matthieu remembered the userspace 
-issues below.
-
-Also, I see that one of the netdev maintainers flagged this v6 series as 
-"changes requested" in patchwork so that may indicate their preference?
-
+> And the reason I don't have too strong of an opinion on that is
+> mainly because it's just setup/cleanup path.
 >
-> Also, please note that the introduction of IPPROTO_MPTCP caused some
-> troubles in some userspace programs. That was mainly because IPPROTO_MAX
-> got updated, and they didn't expect that, e.g. a quick search on GitHub
-> gave me this:
->
->  https://github.com/systemd/systemd/issues/15604
->  https://github.com/strace/strace/issues/164
->  https://github.com/rust-lang/libc/issues/1896
->
-> I guess these userspace programs should now be ready for a new update,
-> but still, it might be better to avoid that if there is a "simple" solution.
->
-> I understand changing your userspace tools will be annoying. (On the
-> other hand, it is still time to do that :) )
 
-Agreed!
+I agree wrapping io uring in dmabuf seems to be an unnecessary detour.
+I never understood the need or upside to do that, but it could be a
+lack of understanding on my part.
 
+However, the concern that David brings up may materialize. I've had to
+spend a lot of time minimizing or justifying checks to the code with
+page pool benchmarks that detect even 1 cycle regressions. You may be
+asked to run the same benchmarks and minimize similar overhead.
 
-- Mat
---0-1537107791-1717778253=:88167--
+The benchmark in question is Jesper's bench_page_pool_simple. I've
+forked it and applied it on top of net-next here:
+https://github.com/mina/linux/commit/927596f87ab5791a8a6ba8597ba2189747396e=
+54
+
+As io_uring ZC comes close to merging, I suspect it would be good to
+run this to understand the regression in the fast path, if any. If
+there are no to little regressions, I have no concerns over io uring
+memory not being wrapped in dmabufs, and David may agree as well.
+
+--
+Thanks,
+Mina
 
