@@ -1,265 +1,120 @@
-Return-Path: <netdev+bounces-101701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5512E8FFCFD
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:23:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CDE18FFD1B
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:30:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4BF51F21A74
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:23:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F07128243E
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00ABD159598;
-	Fri,  7 Jun 2024 07:19:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F1F945C06;
+	Fri,  7 Jun 2024 07:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="S0D2ZLXI"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ow+EMRjp"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5A015885E;
-	Fri,  7 Jun 2024 07:19:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13901C2AF;
+	Fri,  7 Jun 2024 07:30:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717744748; cv=none; b=sTv1pUuWwT7rzWMDMiZ9j9hwHlUYBEO3b7qWjWXc/iHWaQzEdCmulVh0dYPL+/maB2lRl5z+OaqA8ZQRul2oZjPlJI+PJ0VYmbgSNXfJLOg+5d7ZOMvS7hscQRtEBkXyQUmMAAz1NxWrXJ1u1/f68/gVRM9knIObROawwngh1z8=
+	t=1717745441; cv=none; b=IQRov6c2oowe4LM5+QrgSW/yN0ZdMifDkd+D0ivmhXwdoxM59wy+7sDoGjbOTmWykLVumWKQ2oc09oXpVgV9D4FOwU0iTPPFdG2HsJFJLJ7DZguU4j5De4Iwdj8X1VIXclZyTrO6Bm1GoFf5xvJxxipC5snDqkY7tEHfRgzFMGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717744748; c=relaxed/simple;
-	bh=d/3n/F05WEctWRHZPxR7FqzTT6ljsXUpAO5ILtgDteM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Vn4uuX2P651PkTnr0ccSwOpnoV1F9LpCE2GHlvpXhgLwjHA+JAHOhynyq1gqkr4kJ2JGxzE6FLsl2TAKkw3Y2PMvRbnmUULxBwGjRO4wpCt+KLG5pvPoHmbGr9GjTJ5/ipQhsKfWm3JFUp02lwm3wBh9sHSRIH8esP7LfsFDFoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=S0D2ZLXI; arc=none smtp.client-ip=217.70.183.201
+	s=arc-20240116; t=1717745441; c=relaxed/simple;
+	bh=I7dGnuQJiK2CvEOG9kLQhbKFh6VzuIq7y1wWMbdusP0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=oO0KOi48idVYiYN2kdM4QiB7QoYqabUfA54BqzAq755cUwfZp7vjeg/ZQTm2h2lvOBGAlUztcileBLD7NerOCMDI1kRvFAaXV08/1I2eW645Jaeu7s6EaymvYph5MXV9H+bpi5l5QR6xFF0Dmjg+jk96ywDTL5kVkwP1pu2McP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ow+EMRjp; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 191521BF211;
-	Fri,  7 Jun 2024 07:19:04 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4ACAC4000A;
+	Fri,  7 Jun 2024 07:30:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1717744745;
+	t=1717745436;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ThpTx3ZgRJaJFV7Zugt3R3pOgcqwYFbbOx/z/wVuyI0=;
-	b=S0D2ZLXINbNNDMTKQn/4ye2AqbzHeQ7/vuzRVodv0IxJdD1/TTOJxGg/BlNqBMNwzs32lH
-	1JJBuWDJcMex+nec5FQtrMvN+QJyr0+ZeoBUN+S4RDdtWcRYzXIYn5I9Vmd9ruRh7U2gvB
-	MiZrWS+4nvuqA6WnjCy/EPtor4N7+/8BtnthRydeg0M2DoznIgn+AF5GrzCsoU182eR+J8
-	52R1jEVdsbqxJN8xsr+OXWAfc6VrvwDoHbRuvcjE4SNE2FlJnsMGy9ovSeRf6ITKvEb9Yn
-	TZ9hKNWSRxcMGp6D8YuOfp+uposOE49oe8co7bXVNMvpTlZujSUJWgxEmgWUVw==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	mwojtas@chromium.org,
-	Nathan Chancellor <nathan@kernel.org>,
-	Antoine Tenart <atenart@kernel.org>
-Subject: [PATCH net-next v13 13/13] Documentation: networking: document phy_link_topology
-Date: Fri,  7 Jun 2024 09:18:26 +0200
-Message-ID: <20240607071836.911403-14-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240607071836.911403-1-maxime.chevallier@bootlin.com>
-References: <20240607071836.911403-1-maxime.chevallier@bootlin.com>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oVZaeJ7ov8Q4H8A8zYRzgBLW0YPPkgkDaWGaynlwq8M=;
+	b=ow+EMRjpjUDhhs/GUIK/l856KA5gAKofv0wXJHvGy1iGL1e249/c5ZPWHjm5xmyUqDakD9
+	l3iKwHCjnTzT0bVsCb6o266RzKIdGpcKheRttNhRixqaDblh4qVC4cCPAh6NMuKbqdEX8T
+	KSE1z7FEkbPLBsJwpZpN+0ZfZctdF7+nWjn4WiQ+S53ca/CqD7bTxg29UbF1P8xX+/QGlV
+	xKW3vUFbByumCDfn2RfD0D8sKV/q91dCYSOzBUXtVtJMyN+RMYFK58PaO7YTGqoiJaVtNG
+	S4tteuyYKF1nwRsGItLMKbfnFYnVB79c/wl/2e+kPHAc5PEBtbo5o8M90Z7+Eg==
+From: Kory Maincent <kory.maincent@bootlin.com>
+Subject: [PATCH net-next v2 0/8] net: pse-pd: Add new PSE c33 features
+Date: Fri, 07 Jun 2024 09:30:17 +0200
+Message-Id: <20240607-feature_poe_power_cap-v2-0-c03c2deb83ab@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+X-B4-Tracking: v=1; b=H4sIAAm3YmYC/3WNQQ7CIBREr9L8tRhAiMWV9zBNA/TXkig0gLWm6
+ d1F9i5m8TKZNxskjA4TXJoNIi4uueAL8EMDdtL+jsQNhYFTLqjgkoyo8ytiP4df3hh7q2fCWlT
+ U6DNXwkDZzhFHt1bvDTxm4nHN0JVmcimH+KmHC6t9dUuu/rgXRiihVhg2SCVPpr2aEPLD+aMNT
+ +j2ff8CNDKOVMYAAAA=
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, 
+ Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, 
+ Kory Maincent <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>
+X-Mailer: b4 0.14-dev
+X-GND-Sasl: kory.maincent@bootlin.com
 
-The newly introduced phy_link_topology tracks all ethernet PHYs that are
-attached to a netdevice. Document the base principle, internal and
-external APIs. As the phy_link_topology is expected to be extended, this
-documentation will hold any further improvements and additions made
-relative to topology handling.
+From: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+This patch series adds new c33 features to the PSE API.
+- Expand the PSE PI informations status with power, class and failure
+  reason
+- Add the possibility to get and set the PSE PIs power limit
+
+Jakub could you check if patchwork works correctly with this patch series.
+
+Changes in v2:
+- Use uA and uV instead of mA and mV to have more precision in the power
+  calculation. Need to use 64bit variables for the calculation.
+- Modify the pd-92x0behavior in case of setting the current out of the
+  available ranges. Report an error now.
+- Link to v1: https://lore.kernel.org/r/20240529-feature_poe_power_cap-v1-0-0c4b1d5953b8@bootlin.com
+
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- Documentation/networking/ethtool-netlink.rst  |   3 +
- Documentation/networking/index.rst            |   1 +
- .../networking/phy-link-topology.rst          | 121 ++++++++++++++++++
- 3 files changed, 125 insertions(+)
- create mode 100644 Documentation/networking/phy-link-topology.rst
+Kory Maincent (8):
+      net: pse-pd: Use EOPNOTSUPP error code instead of ENOTSUPP
+      net: ethtool: pse-pd: Expand C33 PSE status with class, power and extended state
+      netlink: specs: Expand the PSE netlink command with C33 new features
+      net: pse-pd: pd692x0: Expand ethtool status message
+      net: pse-pd: Add new power limit get and set c33 features
+      net: ethtool: Add new power limit get and set features
+      netlink: specs: Expand the PSE netlink command with C33 pw-limit attributes
+      net: pse-pd: pd692x0: Enhance with new current limit and voltage read callbacks
 
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index dedda1ccf5a3..d16e6a5d0a1c 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -2047,10 +2047,13 @@ Retrieve information about a given Ethernet PHY sitting on the link. The DO
- operation returns all available information about dev->phydev. User can also
- specify a PHY_INDEX, in which case the DO request returns information about that
- specific PHY.
-+
- As there can be more than one PHY, the DUMP operation can be used to list the PHYs
- present on a given interface, by passing an interface index or name in
- the dump request.
- 
-+For more information, refer to :ref:`phy_link_topology`
-+
- Request contents:
- 
-   ====================================  ======  ==========================
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index a6443851a142..51e70b0a81c8 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -90,6 +90,7 @@ Contents:
-    operstates
-    packet_mmap
-    phonet
-+   phy-link-topology
-    pktgen
-    plip
-    ppp_generic
-diff --git a/Documentation/networking/phy-link-topology.rst b/Documentation/networking/phy-link-topology.rst
-new file mode 100644
-index 000000000000..4dec5d7d6513
---- /dev/null
-+++ b/Documentation/networking/phy-link-topology.rst
-@@ -0,0 +1,121 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+.. _phy_link_topology:
-+
-+=================
-+PHY link topology
-+=================
-+
-+Overview
-+========
-+
-+The PHY link topology representation in the networking stack aims at representing
-+the hardware layout for any given Ethernet link.
-+
-+An Ethernet interface from userspace's point of view is nothing but a
-+:c:type:`struct net_device <net_device>`, which exposes configuration options
-+through the legacy ioctls and the ethtool netlink commands. The base assumption
-+when designing these configuration APIs were that the link looks something like ::
-+
-+  +-----------------------+        +----------+      +--------------+
-+  | Ethernet Controller / |        | Ethernet |      | Connector /  |
-+  |       MAC             | ------ |   PHY    | ---- |    Port      | ---... to LP
-+  +-----------------------+        +----------+      +--------------+
-+  struct net_device               struct phy_device
-+
-+Commands that needs to configure the PHY will go through the net_device.phydev
-+field to reach the PHY and perform the relevant configuration.
-+
-+This assumption falls apart in more complex topologies that can arise when,
-+for example, using SFP transceivers (although that's not the only specific case).
-+
-+Here, we have 2 basic scenarios. Either the MAC is able to output a serialized
-+interface, that can directly be fed to an SFP cage, such as SGMII, 1000BaseX,
-+10GBaseR, etc.
-+
-+The link topology then looks like this (when an SFP module is inserted) ::
-+
-+  +-----+  SGMII  +------------+
-+  | MAC | ------- | SFP Module |
-+  +-----+         +------------+
-+
-+Knowing that some modules embed a PHY, the actual link is more like ::
-+
-+  +-----+  SGMII   +--------------+
-+  | MAC | -------- | PHY (on SFP) |
-+  +-----+          +--------------+
-+
-+In this case, the SFP PHY is handled by phylib, and registered by phylink through
-+its SFP upstream ops.
-+
-+Now some Ethernet controllers aren't able to output a serialized interface, so
-+we can't directly connect them to an SFP cage. However, some PHYs can be used
-+as media-converters, to translate the non-serialized MAC MII interface to a
-+serialized MII interface fed to the SFP ::
-+
-+  +-----+  RGMII  +-----------------------+  SGMII  +--------------+
-+  | MAC | ------- | PHY (media converter) | ------- | PHY (on SFP) |
-+  +-----+         +-----------------------+         +--------------+
-+
-+This is where the model of having a single net_device.phydev pointer shows its
-+limitations, as we now have 2 PHYs on the link.
-+
-+The phy_link topology framework aims at providing a way to keep track of every
-+PHY on the link, for use by both kernel drivers and subsystems, but also to
-+report the topology to userspace, allowing to target individual PHYs in configuration
-+commands.
-+
-+API
-+===
-+
-+The :c:type:`struct phy_link_topology <phy_link_topology>` is a per-netdevice
-+resource, that gets initialized at netdevice creation. Once it's initialized,
-+it is then possible to register PHYs to the topology through :
-+
-+:c:func:`phy_link_topo_add_phy`
-+
-+Besides registering the PHY to the topology, this call will also assign a unique
-+index to the PHY, which can then be reported to userspace to refer to this PHY
-+(akin to the ifindex). This index is a u32, ranging from 1 to U32_MAX. The value
-+0 is reserved to indicate the PHY doesn't belong to any topology yet.
-+
-+The PHY can then be removed from the topology through
-+
-+:c:func:`phy_link_topo_del_phy`
-+
-+These function are already hooked into the phylib subsystem, so all PHYs that
-+are linked to a net_device through :c:func:`phy_attach_direct` will automatically
-+join the netdev's topology.
-+
-+PHYs that are on a SFP module will also be automatically registered IF the SFP
-+upstream is phylink (so, no media-converter).
-+
-+PHY drivers that can be used as SFP upstream need to call :c:func:`phy_sfp_attach_phy`
-+and :c:func:`phy_sfp_detach_phy`, which can be used as a
-+.attach_phy / .detach_phy implementation for the
-+:c:type:`struct sfp_upstream_ops <sfp_upstream_ops>`.
-+
-+UAPI
-+====
-+
-+There exist a set of netlink commands to query the link topology from userspace,
-+see ``Documentation/networking/ethtool-netlink.rst``.
-+
-+The whole point of having a topology representation is to assign the phyindex
-+field in :c:type:`struct phy_device <phy_device>`. This index is reported to
-+userspace using the ``ETHTOOL_MSG_PHY_GET`` ethtnl command. Performing a DUMP operation
-+will result in all PHYs from all net_device being listed. The DUMP command
-+accepts either a ``ETHTOOL_A_HEADER_DEV_INDEX`` or ``ETHTOOL_A_HEADER_DEV_NAME``
-+to be passed in the request to filter the DUMP to a single net_device.
-+
-+The retrieved index can then be passed as a request parameter using the
-+``ETHTOOL_A_HEADER_PHY_INDEX`` field in the following ethnl commands :
-+
-+* ``ETHTOOL_MSG_STRSET_GET`` to get the stats string set from a given PHY
-+* ``ETHTOOL_MSG_CABLE_TEST_ACT`` and ``ETHTOOL_MSG_CABLE_TEST_ACT``, to perform
-+  cable testing on a given PHY on the link (most likely the outermost PHY)
-+* ``ETHTOOL_MSG_PSE_SET`` and ``ETHTOOL_MSG_PSE_GET`` for PHY-controlled PoE and PSE settings
-+* ``ETHTOOL_MSG_PLCA_GET_CFG``, ``ETHTOOL_MSG_PLCA_SET_CFG`` and ``ETHTOOL_MSG_PLCA_GET_STATUS``
-+  to set the PLCA (Physical Layer Collision Avoidance) parameters
-+
-+Note that the PHY index can be passed to other requests, which will silently
-+ignore it if present and irrelevant.
+ Documentation/netlink/specs/ethtool.yaml |  25 +++
+ drivers/net/pse-pd/pd692x0.c             | 283 ++++++++++++++++++++++++++++++-
+ drivers/net/pse-pd/pse_core.c            | 172 +++++++++++++++++--
+ include/linux/ethtool.h                  |  11 ++
+ include/linux/pse-pd/pse.h               |  46 ++++-
+ include/uapi/linux/ethtool.h             |  41 +++++
+ include/uapi/linux/ethtool_netlink.h     |   5 +
+ net/ethtool/pse-pd.c                     |  69 +++++++-
+ 8 files changed, 631 insertions(+), 21 deletions(-)
+---
+base-commit: c7309fc9b716c653dc37c8ebcdc6e9132c370076
+change-id: 20240425-feature_poe_power_cap-18e90ba7294b
+
+Best regards,
 -- 
-2.45.1
+Köry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
 
