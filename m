@@ -1,151 +1,119 @@
-Return-Path: <netdev+bounces-101883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78344900688
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:27:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 362C09006A2
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:28:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C6CF1F24044
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:27:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7D5AB29111
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66A501990B2;
-	Fri,  7 Jun 2024 14:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC5BA199E85;
+	Fri,  7 Jun 2024 14:27:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rb7DMqcA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483A8194AD3;
-	Fri,  7 Jun 2024 14:27:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 799D5197A99;
+	Fri,  7 Jun 2024 14:27:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717770431; cv=none; b=pX7rc7ttavXPOZbchLg67X9k8z0DbqiBHFyUfCDyLJFmJOZdV02wUBLeo91A2dDwyyZQc0fKcLAjGdMz2dqBvx8pH2VKNOZesinh9KjyUHdZqy9PZtVdS/aX4TwUpBC+l9kZEH2uOPKW+9JhhfEVKZRnFtiKOr3sTUFLZBHkIIY=
+	t=1717770455; cv=none; b=P+d8uN1rueupnANN+Tx2fOFLxfBIx18FXDQdejiCSV+m7Wswa23PMmCQpkA1g1TiOquNnJZrN/60BhPKjgpOdDdOduvYZlbpPHJtfKTaMITy0e9qvTRJByEUAH1VqLdsRNslYQ9VGyhm5w0tRZ+nZaFSbpJ42wPFw7lpiNrZsmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717770431; c=relaxed/simple;
-	bh=s/wAF2MKyNyCf80HDbawVNiWCXO6QMjFhK7UDLN3ixk=;
-	h=MIME-Version:Content-Type:Date:From:To:Cc:Subject:In-Reply-To:
-	 References:Message-ID; b=BvU+Hl0gOV6hFB5xKAbjda13Th5UrLY4AyxJ+IgqnZMFUDuUeqOk9yc8W5DLxLYIx3L7tMIA17nojS4NdmCOn2WVSshYicKcDY0KUq2Yr7G0krABl8SmAxQYq0A4XLRLBZ0o+2BMc9IakZCU1l1cgldkdZK8P0oF1c0yQk6p8vI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=194.37.255.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
-Received: from [127.0.0.1] (helo=localhost)
-	by relay.expurgate.net with smtp (Exim 4.92)
-	(envelope-from <prvs=990276a841=ms@dev.tdt.de>)
-	id 1sFaYc-008Qz7-Od; Fri, 07 Jun 2024 16:27:06 +0200
-Received: from [195.243.126.94] (helo=securemail.tdt.de)
-	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ms@dev.tdt.de>)
-	id 1sFaYc-00EhMZ-5Z; Fri, 07 Jun 2024 16:27:06 +0200
-Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id BF4D5240053;
-	Fri,  7 Jun 2024 16:27:05 +0200 (CEST)
-Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id 4A07B240050;
-	Fri,  7 Jun 2024 16:27:05 +0200 (CEST)
-Received: from mail.dev.tdt.de (localhost [IPv6:::1])
-	by mail.dev.tdt.de (Postfix) with ESMTP id D257E3849A;
-	Fri,  7 Jun 2024 16:27:04 +0200 (CEST)
+	s=arc-20240116; t=1717770455; c=relaxed/simple;
+	bh=KPoMrsS5snh8BDGlOijeafq2go5qhS6jTOpT7vzHlQQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g1idzG+TscsfE4qdOTkNqE4eLLOfNo6WaEqI886aoAQNPOAeiTJUTYxE17jIJo8z5I59xpo1cu8W+56xXO4XjnX0Rv8X7l8et/gODHQzMsSzfyVnHCghuosrrAx11VIlE3X4YXke930sWnTGR/pOXIGI/Fp734eWZOaxJnifiFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rb7DMqcA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50BBCC32786;
+	Fri,  7 Jun 2024 14:27:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717770455;
+	bh=KPoMrsS5snh8BDGlOijeafq2go5qhS6jTOpT7vzHlQQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Rb7DMqcArkZvyfBzLSVJUlQlV/Ck/+6ESPZxN5arnY7H9q7XJGMPPBAE6V2HkFmBt
+	 ncwTlfI/t3hucXH/VxlO/fez1rU2hLs6i/UEpdUTN54W2IQMZ7n1U4OQrWgA1LmJR0
+	 zqDW98yT8BuLgAvCcObpxLiQFfHY2URX5ybVl931TqQhYmhE6iZq2PBE2DaWde/7Eq
+	 ovQkSS/Be7X8r3wJ/i72g+jHgwGd7hyJUkX9jN5/oboTDeg43lJjOz4IMLmY5nFrs6
+	 IyllF283aguUwgY+ZXHesUmBojvGPxRsoSaw6Pxmz4XZKaEL7YdgXyxtgphJeI0HVU
+	 EnAm4F9g8Gk9Q==
+Message-ID: <be2d140f-db0f-4d15-967c-972ea6586b5c@kernel.org>
+Date: Fri, 7 Jun 2024 08:27:29 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v10 02/14] net: page_pool: create hooks for
+ custom page providers
+Content-Language: en-US
+To: Pavel Begunkov <asml.silence@gmail.com>,
+ Mina Almasry <almasrymina@google.com>
+Cc: Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+ Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
+ <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
+References: <20240530201616.1316526-1-almasrymina@google.com>
+ <20240530201616.1316526-3-almasrymina@google.com>
+ <ZlqzER_ufrhlB28v@infradead.org>
+ <CAHS8izMU_nMEr04J9kXiX6rJqK4nQKA+W-enKLhNxvK7=H2pgA@mail.gmail.com>
+ <5aee4bba-ca65-443c-bd78-e5599b814a13@gmail.com>
+ <CAHS8izNmT_NzgCu1pY1RKgJh+kP2rCL_90Gqau2Pkd3-48Q1_w@mail.gmail.com>
+ <eb237e6e-3626-4435-8af5-11ed3931b0ac@gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <eb237e6e-3626-4435-8af5-11ed3931b0ac@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Date: Fri, 07 Jun 2024 16:27:04 +0200
-From: Martin Schiller <ms@dev.tdt.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: martin.blumenstingl@googlemail.com, hauke@hauke-m.de, andrew@lunn.ch,
- f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 12/13] net: dsa: lantiq_gswip: Add and use a
- GSWIP_TABLE_MAC_BRIDGE_FID macro
-Organization: TDT AG
-In-Reply-To: <20240607113652.6ryt5gg72he2madn@skbuf>
-References: <20240606085234.565551-1-ms@dev.tdt.de>
- <20240606085234.565551-13-ms@dev.tdt.de>
- <20240607113652.6ryt5gg72he2madn@skbuf>
-Message-ID: <ae0811c79a126e9f034beccf37e61991@dev.tdt.de>
-X-Sender: ms@dev.tdt.de
-User-Agent: Roundcube Webmail/1.3.17
-X-purgate-ID: 151534::1717770426-CDC4D8CF-65FA3DE4/0/0
-X-purgate: clean
-X-purgate-type: clean
 
-On 2024-06-07 13:36, Vladimir Oltean wrote:
-> On Thu, Jun 06, 2024 at 10:52:33AM +0200, Martin Schiller wrote:
->> From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
->> 
->> Only bits [5:0] in mac_bridge.key[3] are reserved for the FID. Add a
->> macro so this becomes obvious when reading the driver code.
->> 
->> Signed-off-by: Martin Blumenstingl 
->> <martin.blumenstingl@googlemail.com>
->> ---
->>  drivers/net/dsa/lantiq_gswip.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->> 
->> diff --git a/drivers/net/dsa/lantiq_gswip.c 
->> b/drivers/net/dsa/lantiq_gswip.c
->> index f2faee112e33..4bb894e75b81 100644
->> --- a/drivers/net/dsa/lantiq_gswip.c
->> +++ b/drivers/net/dsa/lantiq_gswip.c
->> @@ -238,6 +238,7 @@
->>  #define GSWIP_TABLE_MAC_BRIDGE		0x0b
->>  #define  GSWIP_TABLE_MAC_BRIDGE_STATIC	BIT(0)		/* Static not, aging 
->> entry */
->>  #define  GSWIP_TABLE_MAC_BRIDGE_PORT	GENMASK(7, 4)	/* Port on learned 
->> entries */
->> +#define  GSWIP_TABLE_MAC_BRIDGE_FID	GENMASK(5, 0)	/* Filtering 
->> identifier */
->> 
->>  #define XRX200_GPHY_FW_ALIGN	(16 * 1024)
->> 
->> @@ -1385,7 +1386,7 @@ static int gswip_port_fdb(struct dsa_switch *ds, 
->> int port,
->>  	mac_bridge.key[0] = addr[5] | (addr[4] << 8);
->>  	mac_bridge.key[1] = addr[3] | (addr[2] << 8);
->>  	mac_bridge.key[2] = addr[1] | (addr[0] << 8);
->> -	mac_bridge.key[3] = fid;
->> +	mac_bridge.key[3] = FIELD_PREP(GSWIP_TABLE_MAC_BRIDGE_FID, fid);
->>  	mac_bridge.val[0] = add ? BIT(port) : 0; /* port map */
->>  	mac_bridge.val[1] = GSWIP_TABLE_MAC_BRIDGE_STATIC;
->>  	mac_bridge.valid = add;
->> --
->> 2.39.2
-> 
-> On second thought, I disagree with the naming scheme of the
-> GSWIP_TABLE_MAC_BRIDGE_* macros. It is completely non obvious that they
-> are non-overlapping, because they have the same name prefix, but:
-> _STATIC applies to gswip_pce_table_entry :: val[1]
-> _PORT applies to gswip_pce_table_entry :: val[0]
-> _FID applies to gswip_pce_table_entry :: key[3]
-> 
-> I think it's all too easy to use the wrong macro on the wrong register 
-> field.
-> If the macros incorporated names like VAL1, KEY3 etc, it would be much
-> more obvious. Could you please do that?
+On 6/7/24 7:42 AM, Pavel Begunkov wrote:
+> I haven't seen any arguments against from the (net) maintainers so
+> far. Nor I see any objection against callbacks from them (considering
+> that either option adds an if).
 
-OK, so I'll change the macro names to
+I have said before I do not understand why the dmabuf paradigm is not
+sufficient for both device memory and host memory. A less than ideal
+control path to put hostmem in a dmabuf wrapper vs extra checks and
+changes in the datapath. The former should always be preferred.
 
-GSWIP_TABLE_MAC_BRIDGE_KEY3_FID
-GSWIP_TABLE_MAC_BRIDGE_VAL0_PORT
-GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC
-
-Also the comment of GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC should be changed 
-to
-/* Static, not aging entry */
-
-While looking again at this diff above, I noticed that val[0] is set
-incorrectly. Shouldn't it be either "port << 4" or (after the previous 
-patch)
-"FIELD_PREP(GSWIP_TABLE_MAC_BRIDGE_PORT, port);" instead of "BIT(port)"?
-
-
+I also do not understand why the ifq cache and overloading xdp functions
+have stuck around; I always thought both were added by Jonathan to
+simplify kernel ports during early POC days.
 
