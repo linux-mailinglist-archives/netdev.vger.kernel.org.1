@@ -1,344 +1,189 @@
-Return-Path: <netdev+bounces-101710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A2D88FFD2E
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:33:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ED158FFD40
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:34:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F38E1F21B57
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:33:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 226E51C237E2
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 07:34:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83697156962;
-	Fri,  7 Jun 2024 07:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0EFF154C05;
+	Fri,  7 Jun 2024 07:34:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MT4HxJbg"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="q+Pz3Mhf"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 029F31553AF;
-	Fri,  7 Jun 2024 07:30:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E314750297
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 07:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717745446; cv=none; b=kT5dCIib7vkCEGYJG6Vh43Hus3HJHbMifefGurzA6KPgaAmB+wcQEzeUfqdfpKQZrloKzZ5a4e0mTRBlcc8hzVceB3nlkqDijQTwzpPA9C7YGcY9cwd08h76nplqYG4tDb2tNZ6XcAHSmnXvd0cqhTRQIzEbLoJLRmbsgjQGt/0=
+	t=1717745665; cv=none; b=YoAx4LpGOuAcz9RZPkvEM71x3DyXf4gbwhDJmvtaDJDwow2I0gJe9kcJGlGyvIBFqYfJlIRPeqWzULC2EVuWJrFTq3U90S0Q3z7YlI2RRhiN4leRZxpQa5wuMRLtZwilZR0Rq8RHNcg8RQVjo9L06ZF7GIGIjWsiAL+WBvktzys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717745446; c=relaxed/simple;
-	bh=nclUHiO5gvB5PY2/xvF2HtvGK7qS6AnG7bkx7YUzeGE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RCaehz9SE5yeQTevJ4TgOQ+83mx5UCxN3FJ1IXtJ2m2SxCC7yz1P4CmCdxYG2QVmdRprwNdLrr+i5oowph/yWlITxNUCewF5Pxyw//SG4zth2Yg8Ib4RNc2hawOICVjbi9yF5+7kJzxBlHr0if/0QzBnNZK6XyEpF1cpvWQsjRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MT4HxJbg; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id F26444000D;
-	Fri,  7 Jun 2024 07:30:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1717745442;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6ntSTNeXccNfT0VJp5Rsgt/AU8amS/pkFoZRsCOGOeU=;
-	b=MT4HxJbgmzKPOjxmyKZoBBYvTRsWYYqVZW2EYMUK+XwkkbAqlj15r7axMYXJgnz/0dqDPg
-	RPnXwV+3sJzdM45eYumQJ3q/SqYrsvU1XmRMvlmbB8lXonT+RQgik68MxglXisn1vFgHd8
-	bpPPx+WznI2TnQUteK3oZSUD+ImbQVdlOqhyGhiQOoh47X5/dkTIgKVwGBX35jRF2hwcva
-	m2Av59k3foq6Cn9MHrNkYvJd2IhP8lcIgPID+Xv8aAReL5WjIC/jp3g605xoUpaYbK1qou
-	p7f0wm/XtCJ+4NuD5t4bPqPT2mbZSmx+R8kXNC5IkAq1YUieNHpCZmlDij6f+A==
-From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Fri, 07 Jun 2024 09:30:25 +0200
-Subject: [PATCH net-next v2 8/8] net: pse-pd: pd692x0: Enhance with new
- current limit and voltage read callbacks
+	s=arc-20240116; t=1717745665; c=relaxed/simple;
+	bh=wc7V8buAFkBh3ydPjed2ipAWNFc5GmI1OVqByAfWSWU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jjQ3VrMFuN3ACXGSqGNo9riyHe7S8JE4KPi9aAZqasqkNjJG90CoQkRpO2KZUXcbFY4DN4luYrArmsctMAmYZd7Fk0+f9qDiHOOr1UzryaMFIJ9VlsLBfQluprEIS0cZxec4cFh7Zj3Pa7s1OGYeaci8cYkhMhE1qyjdBbPYHFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=q+Pz3Mhf; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4214f52b810so21988065e9.1
+        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 00:34:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1717745662; x=1718350462; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q9p6Ea3BEh/GCrntLXXZZkFilZ40QZybHi/QN5L8Zn8=;
+        b=q+Pz3MhfhJdXmKzduBXLRXoBo4ZJKF1Lc2nj5i8EWgeRMLJOu+Yb8ulvKkHtKd2a9b
+         oAreJr+aMnnQSewtWckAM30kjNoBouKNwZ+CB705d7ORxkv0chfReUltQNleeopnfdux
+         wOOcwtYCyqzpz7UvmJZ+gyQRgB79TgwV9mU74BgOeyRgmnmdqHC7EZ1umdjbCUwaU4n0
+         i/TpISZAlfgkWcLN4l7xAsAO0Nb5z0xE57/saHQT3wgLVWHLaQRyGHU01jvJxsXfwcFB
+         dWJJqYE/s7ccoXE54aOtHKFCOjEfcmkIbg9AAkoFvnc/oyyph69xU7LKOOBfxqz3Zv8a
+         A0jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717745662; x=1718350462;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q9p6Ea3BEh/GCrntLXXZZkFilZ40QZybHi/QN5L8Zn8=;
+        b=UrdPi+EApP/s63AXSb7M4vfeFPTktM4KxrSUsfXM3ix2QTmv0l6JEp1VHW+BDcXB46
+         5v9zABhjhjkY7l2ys+BxUCszTXXW/Mw3jSnLuM7Z4NDZMo8c5skVVuRJbXCaTCfJ7Zq+
+         IYHZgoZ+RDm6e9SeGUhrOpIsu/VGOZ6YLomDaoFrShBa/SFlCIBxASsP4NwND2fiGXBc
+         q6FWpSML9zli4fywJmi4xyRqUC5v/vp5nUyN/oXO4PsjSe9BO9ePmdieokFfLkysO+m2
+         6gIsnRPW+51hOzijxm64lUw9j3W1u0hYpqLnJTmCpQjsCpr5r7P7We9WjqPYZ9DX19z5
+         d2yg==
+X-Forwarded-Encrypted: i=1; AJvYcCWJyKJZUILEQbWOtjn70oGq8669KzAX4/s+H2VBgBhoQOvOfltIaY15tsfYnkFjVh3WTzVmsmhY2Zrec7a9KvP3F5qh1YTp
+X-Gm-Message-State: AOJu0YwHluAz+R/Pd5dfXBtokznwWH/0NqxxlnqY9dinkN6wd9ULEj1Q
+	dYzpq0JBnh8J8vpQGsjHJy3C/pU0MurqrE6OfzAI4SUv6N6FxvteKL1diOWFfpA=
+X-Google-Smtp-Source: AGHT+IH+3m7gv/wXKg1IjZX1gSf7JkbLx10qHeS1+1YDQg9+/tqA6LeQaS0aSWtLgR0eEgd8FaiPpw==
+X-Received: by 2002:a05:600c:1383:b0:420:182e:eb46 with SMTP id 5b1f17b1804b1-42164a44859mr21469665e9.38.1717745662064;
+        Fri, 07 Jun 2024 00:34:22 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-421580fe3bfsm79619795e9.8.2024.06.07.00.34.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jun 2024 00:34:21 -0700 (PDT)
+Date: Fri, 7 Jun 2024 09:34:18 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: David Ahern <dsahern@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, linux-doc@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
+	Leonid Bloch <lbloch@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
+	patches@lists.linux.dev
+Subject: Re: [PATCH 0/8] Introduce fwctl subystem
+Message-ID: <ZmK3-rkibH8j4ZwM@nanopsycho.orion>
+References: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+ <20240603114250.5325279c@kernel.org>
+ <214d7d82-0916-4c29-9012-04590e77df73@kernel.org>
+ <20240604070451.79cfb280@kernel.org>
+ <665fa9c9e69de_4a4e62941e@dwillia2-xfh.jf.intel.com.notmuch>
+ <20240605135911.GT19897@nvidia.com>
+ <d97144db-424f-4efd-bf10-513a0b895eca@kernel.org>
+ <20240606071811.34767cce@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240607-feature_poe_power_cap-v2-8-c03c2deb83ab@bootlin.com>
-References: <20240607-feature_poe_power_cap-v2-0-c03c2deb83ab@bootlin.com>
-In-Reply-To: <20240607-feature_poe_power_cap-v2-0-c03c2deb83ab@bootlin.com>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, 
- Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, 
- Kory Maincent <kory.maincent@bootlin.com>
-X-Mailer: b4 0.14-dev
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240606071811.34767cce@kernel.org>
 
-From: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
+Thu, Jun 06, 2024 at 04:18:11PM CEST, kuba@kernel.org wrote:
+>On Wed, 5 Jun 2024 20:35:49 -0600 David Ahern wrote:
+>> Until a feature is standardized and/or commoditized, it does not make
+>> sense to create a uapi for every H/W vendor whim.
+>
+>This is not about non-standard features. I work with multiple vendors
+>as my day job. I ask them how to set basic link configuration and the
+>support person gives me a link to the vendor tools! I wish I could show
+>you the emails.
 
-This patch expands PSE callbacks with newly introduced
-pi_get/set_current_limit() and pi_get_voltage() callback.
-The only way to set ps692x0 port power limit is by configure the power
-class plus a small power supplement which maximum depends on each class.
+Even without emails seen, I believe you. Well, isn't it just natural? I
+mean, it always takes a bigger (sometimes much bigger) effort to
+implement things properly introducing/extending apis/uapis.
+Implement things in vendor tool is easy, low hanging fruit, people
+naturally pick them.
 
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
+I've been around in netdev for better part of second decade.
+I think, for the sake of discussion, it is worth mentioning, that
+a big part of netdev success despite complexicity is that in the
+past, any attempt of kernel bypass (I recall few) was promptly rejected.
+There was always big push for proper abstracted solution. And I believe
+it helped a lot all over the place. Is this approach depleted?
+I don't know, maybe. (And yes, I'm aware not everything could be done
+this way).
 
-Change in v2:
-- Use uA and uV instead of mA and mV to have more precision in the power
-  calculation. Need to use 64bit variables for the calculation.
-- Modify the behavior in case of setting the current out of the available
-  ranges. Report an error now.
----
- drivers/net/pse-pd/pd692x0.c | 193 ++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 191 insertions(+), 2 deletions(-)
+I understand the reason and motivation for this patchset and what it
+will solve, don't get me wrong. I kind of like it, it will help to
+remove all painful detours we currenly have.
 
-diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
-index 6b7367d009d6..4425e4ba2cfb 100644
---- a/drivers/net/pse-pd/pd692x0.c
-+++ b/drivers/net/pse-pd/pd692x0.c
-@@ -74,6 +74,8 @@ enum {
- 	PD692X0_MSG_GET_PORT_STATUS,
- 	PD692X0_MSG_DOWNLOAD_CMD,
- 	PD692X0_MSG_GET_PORT_CLASS,
-+	PD692X0_MSG_GET_PORT_MEAS,
-+	PD692X0_MSG_GET_PORT_PARAM,
- 
- 	/* add new message above here */
- 	PD692X0_MSG_CNT
-@@ -135,7 +137,7 @@ static const struct pd692x0_msg pd692x0_msg_template_list[PD692X0_MSG_CNT] = {
- 	[PD692X0_MSG_SET_PORT_PARAM] = {
- 		.key = PD692X0_KEY_CMD,
- 		.sub = {0x05, 0xc0},
--		.data = {   0, 0xff, 0xff, 0xff,
-+		.data = { 0xf, 0xff, 0xff, 0xff,
- 			 0x4e, 0x4e, 0x4e, 0x4e},
- 	},
- 	[PD692X0_MSG_GET_PORT_STATUS] = {
-@@ -156,6 +158,18 @@ static const struct pd692x0_msg pd692x0_msg_template_list[PD692X0_MSG_CNT] = {
- 		.data = {0x4e, 0x4e, 0x4e, 0x4e,
- 			 0x4e, 0x4e, 0x4e, 0x4e},
- 	},
-+	[PD692X0_MSG_GET_PORT_MEAS] = {
-+		.key = PD692X0_KEY_REQ,
-+		.sub = {0x05, 0xc5},
-+		.data = {0x4e, 0x4e, 0x4e, 0x4e,
-+			 0x4e, 0x4e, 0x4e, 0x4e},
-+	},
-+	[PD692X0_MSG_GET_PORT_PARAM] = {
-+		.key = PD692X0_KEY_REQ,
-+		.sub = {0x05, 0xc0},
-+		.data = {0x4e, 0x4e, 0x4e, 0x4e,
-+			 0x4e, 0x4e, 0x4e, 0x4e},
-+	},
- };
- 
- static u8 pd692x0_build_msg(struct pd692x0_msg *msg, u8 echo)
-@@ -511,6 +525,85 @@ pd692x0_get_ext_state(struct ethtool_c33_pse_ext_state_info *c33_ext_state_info,
- 	}
- }
- 
-+struct pd692x0_class_pw {
-+	int class;
-+	int class_cfg_value;
-+	int class_pw;
-+	int max_added_class_pw;
-+};
-+
-+/* 4/2 pairs class configuration power table in compliance mode.
-+ * Need to be arranged in ascending order of power support.
-+ */
-+static const struct pd692x0_class_pw pd692x0_class_pw_table[] = {
-+	{.class = 3, .class_cfg_value = 0x3, .class_pw = 15000, .max_added_class_pw = 3100},
-+	{.class = 4, .class_cfg_value = 0x2, .class_pw = 30000, .max_added_class_pw = 8000},
-+	{.class = 6, .class_cfg_value = 0x1, .class_pw = 60000, .max_added_class_pw = 5000},
-+	{.class = 8, .class_cfg_value = 0x0, .class_pw = 90000, .max_added_class_pw = 7500},
-+	{ /* sentinel */ }
-+};
-+
-+static int pd692x0_pi_get_pw_from_table(int op_mode, int added_pw)
-+{
-+	const struct pd692x0_class_pw *pw_table;
-+
-+	pw_table = pd692x0_class_pw_table;
-+	while (pw_table->class) {
-+		if (pw_table->class_cfg_value == op_mode)
-+			return pw_table->class_pw + added_pw * 100;
-+
-+		pw_table++;
-+	}
-+
-+	return -ERANGE;
-+}
-+
-+static int pd692x0_pi_set_pw_from_table(struct device *dev,
-+					struct pd692x0_msg *msg, int pw)
-+{
-+	const struct pd692x0_class_pw *pw_table;
-+
-+	pw_table = pd692x0_class_pw_table;
-+	if (pw < pw_table->class_pw) {
-+		dev_err(dev,
-+			"Power limit %dmW not supported. Ranges minimal available: [%d-%d]\n",
-+			pw,
-+			pw_table->class_pw,
-+			pw_table->class_pw + pw_table->max_added_class_pw);
-+		return -ERANGE;
-+	}
-+
-+	while (pw_table->class) {
-+		if (pw > (pw_table->class_pw + pw_table->max_added_class_pw)) {
-+			pw_table++;
-+			continue;
-+		}
-+
-+		if (pw < pw_table->class_pw) {
-+			dev_err(dev,
-+				"Power limit %dmW not supported. Ranges availables: [%d-%d] or [%d-%d]\n",
-+				pw,
-+				(pw_table - 1)->class_pw,
-+				(pw_table - 1)->class_pw + (pw_table - 1)->max_added_class_pw,
-+				pw_table->class_pw,
-+				pw_table->class_pw + pw_table->max_added_class_pw);
-+			return -ERANGE;
-+		}
-+
-+		msg->data[2] = pw_table->class_cfg_value;
-+		msg->data[3] = (pw - pw_table->class_pw) / 100;
-+		return 0;
-+	}
-+
-+	pw_table--;
-+	dev_warn(dev,
-+		 "Power limit %dmW not supported. Set to highest power limit %dmW\n",
-+		 pw, pw_table->class_pw + pw_table->max_added_class_pw);
-+	msg->data[2] = pw_table->class_cfg_value;
-+	msg->data[3] = pw_table->max_added_class_pw / 100;
-+	return 0;
-+}
-+
- static int pd692x0_ethtool_get_status(struct pse_controller_dev *pcdev,
- 				      unsigned long id,
- 				      struct netlink_ext_ack *extack,
-@@ -549,9 +642,20 @@ static int pd692x0_ethtool_get_status(struct pse_controller_dev *pcdev,
- 	priv->admin_state[id] = status->c33_admin_state;
- 
- 	pd692x0_get_ext_state(&status->c33_ext_state_info, buf.sub[0]);
--
- 	status->c33_actual_pw = (buf.data[0] << 4 | buf.data[1]) * 100;
- 
-+	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_PORT_PARAM];
-+	msg.sub[2] = id;
-+	memset(&buf, 0, sizeof(buf));
-+	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = pd692x0_pi_get_pw_from_table(buf.data[0], buf.data[1]);
-+	if (ret < 0)
-+		return ret;
-+	status->c33_pw_limit = ret;
-+
- 	memset(&buf, 0, sizeof(buf));
- 	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_PORT_CLASS];
- 	msg.sub[2] = id;
-@@ -841,12 +945,97 @@ static int pd692x0_setup_pi_matrix(struct pse_controller_dev *pcdev)
- 	return ret;
- }
- 
-+static int pd692x0_pi_get_voltage(struct pse_controller_dev *pcdev, int id)
-+{
-+	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
-+	struct pd692x0_msg msg, buf = {0};
-+	int ret;
-+
-+	ret = pd692x0_fw_unavailable(priv);
-+	if (ret)
-+		return ret;
-+
-+	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_PORT_MEAS];
-+	msg.sub[2] = id;
-+	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
-+	if (ret < 0)
-+		return ret;
-+
-+	/* Convert 0.1V unit to uV */
-+	return (buf.sub[0] << 8 | buf.sub[1]) * 100000;
-+}
-+
-+static int pd692x0_pi_get_current_limit(struct pse_controller_dev *pcdev,
-+					int id)
-+{
-+	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
-+	struct pd692x0_msg msg, buf = {0};
-+	int mW, uV, uA, ret;
-+	s64 tmp_64;
-+
-+	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_PORT_PARAM];
-+	msg.sub[2] = id;
-+	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = pd692x0_pi_get_pw_from_table(buf.data[2], buf.data[3]);
-+	if (ret < 0)
-+		return ret;
-+	mW = ret;
-+
-+	ret = pd692x0_pi_get_voltage(pcdev, id);
-+	if (ret < 0)
-+		return ret;
-+	uV = ret;
-+
-+	tmp_64 = mW;
-+	tmp_64 *= 1000000000ull;
-+	/* uA = mW * 1000000000 / uV */
-+	uA = DIV_ROUND_CLOSEST_ULL(tmp_64, uV);
-+	return uA;
-+}
-+
-+static int pd692x0_pi_set_current_limit(struct pse_controller_dev *pcdev,
-+					int id, int max_uA)
-+{
-+	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
-+	struct device *dev = &priv->client->dev;
-+	struct pd692x0_msg msg, buf = {0};
-+	int uV, ret, mW;
-+	s64 tmp_64;
-+
-+	ret = pd692x0_fw_unavailable(priv);
-+	if (ret)
-+		return ret;
-+
-+	ret = pd692x0_pi_get_voltage(pcdev, id);
-+	if (ret < 0)
-+		return ret;
-+	uV = ret;
-+
-+	msg = pd692x0_msg_template_list[PD692X0_MSG_SET_PORT_PARAM];
-+	msg.sub[2] = id;
-+	tmp_64 = uV;
-+	tmp_64 *= max_uA;
-+	/* mW = uV * uA / 1000000000 */
-+	mW = DIV_ROUND_CLOSEST_ULL(tmp_64, 1000000000);
-+	ret = pd692x0_pi_set_pw_from_table(dev, &msg, mW);
-+	if (ret)
-+		return ret;
-+
-+	return pd692x0_sendrecv_msg(priv, &msg, &buf);
-+}
-+
- static const struct pse_controller_ops pd692x0_ops = {
- 	.setup_pi_matrix = pd692x0_setup_pi_matrix,
- 	.ethtool_get_status = pd692x0_ethtool_get_status,
- 	.pi_enable = pd692x0_pi_enable,
- 	.pi_disable = pd692x0_pi_disable,
- 	.pi_is_enabled = pd692x0_pi_is_enabled,
-+	.pi_get_voltage = pd692x0_pi_get_voltage,
-+	.pi_get_current_limit = pd692x0_pi_get_current_limit,
-+	.pi_set_current_limit = pd692x0_pi_set_current_limit,
- };
- 
- #define PD692X0_FW_LINE_MAX_SZ 0xff
+My concern is, it opens a pandora box for netdev *for sure*.
+It that desired and anticipated?
 
--- 
-2.34.1
+Do the gains overweight the potential losses? Will it help the
+ecosystem?
 
+What is motivation for vendor to take the hard way of using proper api
+(even existing ones) after?
+
+Moreover, wouldn't this serve for vendors to go out of leash and start
+to introduce even more H/W vendor whims?
+
+I think these are serious questions we need to ask before this is merged.
+
+
+>
+>> All of them are attempting to solve real problems; some of them will
+>> stick. We know which features are valuable when customers use them,
+>
+>Yes, once customers deploy a feature implemented via a vendor API
+>they will definitely migrate to a different API. Customers like risk
+>and wasting their engineering resources reimplementing and redeploying
+>things? And we have so much success move users to new APIs in Linux!
+>
+>> ask for them and other vendors copy them. Until then it is a 1-off by
+>> a vendor basically proposing a solution.
+>
+>Certainly. Because... who exactly will ask the second vendor to
+>implement the common API? 
+>
+>And the second vendor will most certainly not mind the extra delay and
+>inconvenience having their product shipped via the publicly reviewed,
+>and slow to deploy kernel, while the first one is happily selling
+>the same feature already.
+>
+>> Not all ideas are good ideas, and we do not need the burden of a uapi
+>> or the burden of out of tree drivers.
+>
+>This API gives user space SDKs a trivial way of implementing all
+>switching, routing, filtering, QoS offloads etc.
+>An argument can be made that given somewhat mixed switchdev experience
+
+Can you elaborabe a bit more what you mean by "mixed switchdev
+experience" please?
+
+
+
+>we should just stay out of the way and let that happen. But just make
+>that argument then, instead of pretending the use of this API will be
+>limited to custom very vendor specific things.
+>
+>Again, if someone needs this to ship their custom CXL/Infiniband 
+>AI fabric magic, which is un-interoperable by design -- none of 
+>my concern. But keep TCP/IP networking out of this :|
+>
 
