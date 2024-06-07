@@ -1,139 +1,125 @@
-Return-Path: <netdev+bounces-101943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34253900A80
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:35:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58C8F900A87
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:35:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACC49B2736B
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:35:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E93681F23226
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08C1D1A01AB;
-	Fri,  7 Jun 2024 16:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u6rxhvIF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D887919A29C;
+	Fri,  7 Jun 2024 16:32:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3DA19FA96;
-	Fri,  7 Jun 2024 16:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16AB217C73;
+	Fri,  7 Jun 2024 16:32:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717777892; cv=none; b=Kp+DSgwjJBgbs7HYlxRtCeSnjbLGxm2GWP92j5gnyemovnTBPsiw1tnJ9gk3VTziFGbjRTi3s9AIzOu5j2xBxZAgZ9A1NHIG51gUOffSex4x5zxHb38R81TOpmxZTopDgQtZAyJNmkzQTFg947zSRuA2EI5VzFJj8LBAxVuUzNQ=
+	t=1717777976; cv=none; b=nISM3ZAvWDGklnanBEu1shIeOYcdHyOKRRXuUBfq+rogT6fUKVJp1+yfNyL1XYcigKt1nBTDJyuceJYpF7Rg5DKkXqcQwlFYzG4HbgGSUIE9HTYW7pY0mnjUQB8QF7mtoG6lWPARDT1hepr8PyMalWxVUSr4ck/zLv/yWYOzyfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717777892; c=relaxed/simple;
-	bh=wQfj7qGRvIbdxyBHMllxfwfWwHu6K8la+zAXvBAGPhw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dfPbIHWSxlkUboUbx/idZeWmOTwAvQNYdilMqggz9GFmFZZ8UczQru4aWp0NEH8A5Ie00xeH67S0q9NAMjhYwXjNukG5sRsgQmdvdGpOc6qhLmSWbUU7DzchbuPQPTjvByJE2zQlhQ+XKZOm8zlXw+iiNTCAryBLhFFw1V31L0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u6rxhvIF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCE4FC2BBFC;
-	Fri,  7 Jun 2024 16:31:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717777892;
-	bh=wQfj7qGRvIbdxyBHMllxfwfWwHu6K8la+zAXvBAGPhw=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=u6rxhvIFAWPwvagwDcc3jbZfhN2UdYverQrMmjDQ2Q51Gmd2QFlaLqdnLrpssza8d
-	 CKMG/v6KwfjmjmugdNW2Lb+T6qPMi9kIoKHNtXcTi2FrTNlfn2j1YMUtsamT6xM0+C
-	 S6GmSWvm5bsd5nuprq7t/N/KNIyRJ+9E3pNAZz1Hv/FfhWTzCd9kxVi3XkrmPwwLGH
-	 26oxhX4SaqDjJEyoLz0XlOeUvvTR9Z0gB+XrUpPI2AngsxyBB98XzlxrP0oMS90sbK
-	 b5WAP+awRlCYEhmkvjzziJRGRwtKHFfJq5y6+538n0DTVEMG7XDo8cjwsHL0MHWzI0
-	 wJTHVgZmriiaw==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 07 Jun 2024 18:31:07 +0200
-Subject: [PATCH net-next 6/6] selftests: mptcp: lib: use
- wait_local_port_listen helper
+	s=arc-20240116; t=1717777976; c=relaxed/simple;
+	bh=xjv1zFkmCPNQYjWEzOpbV3VX1wRuOu9jH2q93dMSu1I=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RfF2AWoFwWrKfq5JfI7G4DKP8Y11AHWvBb3xmXtOJvYTHUfV/SelShLogeBXPr8hZwGmV8eM4sX0gWy/GftqatkMbWKnVRI0k5euE4VhSV3GEkmd0VjjE2DSRNTfXKqFjPFdgiGuWBIIZQ1cQsiy2/pFf0QIIFDWwbKxCsRZUsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VwmpJ5cDFz67RyC;
+	Sat,  8 Jun 2024 00:28:08 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id A9CAE140A70;
+	Sat,  8 Jun 2024 00:32:51 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 7 Jun
+ 2024 17:32:51 +0100
+Date: Fri, 7 Jun 2024 17:32:50 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Wei Huang <wei.huang2@amd.com>
+CC: <linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <netdev@vger.kernel.org>, <bhelgaas@google.com>,
+	<corbet@lwn.net>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <alex.williamson@redhat.com>,
+	<gospo@broadcom.com>, <michael.chan@broadcom.com>,
+	<ajit.khaparde@broadcom.com>, <somnath.kotur@broadcom.com>,
+	<andrew.gospodarek@broadcom.com>, <manoj.panicker2@amd.com>,
+	<Eric.VanTassell@amd.com>, <vadim.fedorenko@linux.dev>, <horms@kernel.org>,
+	<bagasdotme@gmail.com>
+Subject: Re: [PATCH V2 4/9] PCI/TPH: Implement a command line option to
+ force No ST Mode
+Message-ID: <20240607173250.000065d7@Huawei.com>
+In-Reply-To: <20240531213841.3246055-5-wei.huang2@amd.com>
+References: <20240531213841.3246055-1-wei.huang2@amd.com>
+	<20240531213841.3246055-5-wei.huang2@amd.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240607-upstream-net-next-20240607-selftests-mptcp-net-lib-v1-6-e36986faac94@kernel.org>
-References: <20240607-upstream-net-next-20240607-selftests-mptcp-net-lib-v1-0-e36986faac94@kernel.org>
-In-Reply-To: <20240607-upstream-net-next-20240607-selftests-mptcp-net-lib-v1-0-e36986faac94@kernel.org>
-To: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
- Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Geliang Tang <tanggeliang@kylinos.cn>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1644; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=hTVnbzEs/VsxAGCcCO2AuB217Q1JKbIP3pRwVKJ7PZs=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmYzXPBcA4sCxBfarG1xUmQxlXn00WagQs+0cnG
- Bvz5J5yA4aJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZmM1zwAKCRD2t4JPQmmg
- c9mkEACVy5tLLQfLIZnrOaRPz5yK4BDZvZJWeWO4rxg4yBH/tdAIZSqGzWmefLVbg0x1wJVj4sj
- KiVB+sFZdDX3a/WITR6wU5ze5HveNiRBRDbFjLYe0ALNNxvRna6WL/nfk/1o1wZl/Y0mrHJg13K
- l0d6ZR1IRynKefzs6xAv8dtwDik6KA7h/EWbyefIZd56PHmM3SwHffiQG0tD/mBAhrT/XvQ5V8e
- 3kF/ANYpGmnlfJdAcQY+0gpMC6PIc8LkbcJLmQRjGgnaGA7Nk1O8v7diEf5Nz6hVkvoA/CloFGU
- eYcM/SpYR2jtb2Cqa/v9IKOHMaDXX9Vnr/K61G/0rQHjfhiOj0a8vNw1xKtU/eT2aG6Sv3M8uN7
- uTdEE9mPGVC1RHF86ZB80KQ05G9gN9NBlQOx7W1H+hjzrSCPEa7lwpTGcRZWBzD4PC2nbt7MNn8
- LAtkCx+me0kyE17XYT7nlCVNBIX3zdn7HmtzxlvDVM8BdplCDxBqj6zGH3GtPsd8aZlfwwsFx97
- efUL/9qfZ3qn+DUvi6UlWOGEv8q4ildvas/qo6UrNT5VEw5ovZLb1N6klRLVs9uy653HttvAnde
- trzopBm5hHZcgeKjBlAITSmgsF4O4SNL4pC5COQGZlZaum9Oq3TdEol7O0OOJSshDz8Ji5pLNBd
- VcX9eTKX5m1K0nQ==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+On Fri, 31 May 2024 16:38:36 -0500
+Wei Huang <wei.huang2@amd.com> wrote:
 
-This patch includes net_helper.sh into mptcp_lib.sh, uses the helper
-wait_local_port_listen() defined in it to implement the similar mptcp
-helper. This can drop some duplicate code.
+> When "No ST mode" is enabled, end-point devices can generate TPH headers
+> but with all steering tags treated as zero. A steering tag of zero is
+> interpreted as "using the default policy" by the root complex. This is
+> essential to quantify the benefit of steering tags for some given
+> workloads.
 
-It looks like this helper from net_helper.sh was originally coming from
-MPTCP, but MPTCP selftests have not been updated to use it from this
-shared place.
+This is a good explanation. Need similar in the previous patch to
+justify the disable TPH entirely.
 
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- tools/testing/selftests/net/mptcp/mptcp_lib.sh | 16 ++--------------
- 1 file changed, 2 insertions(+), 14 deletions(-)
+> diff --git a/drivers/pci/pcie/tph.c b/drivers/pci/pcie/tph.c
+> index 5dc533b89a33..d5f7309fdf52 100644
+> --- a/drivers/pci/pcie/tph.c
+> +++ b/drivers/pci/pcie/tph.c
+> @@ -43,6 +43,27 @@ static int tph_set_reg_field_u32(struct pci_dev *dev, u8 offset, u32 mask,
+>  	return ret;
+>  }
+>  
+> +int tph_set_dev_nostmode(struct pci_dev *dev)
+> +{
+> +	int ret;
+> +
+> +	/* set ST Mode Select to "No ST Mode" */
+> +	ret = tph_set_reg_field_u32(dev, PCI_TPH_CTRL,
+> +				    PCI_TPH_CTRL_MODE_SEL_MASK,
+> +				    PCI_TPH_CTRL_MODE_SEL_SHIFT,
+> +				    PCI_TPH_NO_ST_MODE);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* set "TPH Requester Enable" to "TPH only" */
+> +	ret = tph_set_reg_field_u32(dev, PCI_TPH_CTRL,
+> +				    PCI_TPH_CTRL_REQ_EN_MASK,
+> +				    PCI_TPH_CTRL_REQ_EN_SHIFT,
+> +				    PCI_TPH_REQ_TPH_ONLY);
 
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_lib.sh b/tools/testing/selftests/net/mptcp/mptcp_lib.sh
-index d9e30516dc72..194c8fc2e55a 100644
---- a/tools/testing/selftests/net/mptcp/mptcp_lib.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_lib.sh
-@@ -2,6 +2,7 @@
- # SPDX-License-Identifier: GPL-2.0
- 
- . "$(dirname "${0}")/../lib.sh"
-+. "$(dirname "${0}")/../net_helper.sh"
- 
- readonly KSFT_PASS=0
- readonly KSFT_FAIL=1
-@@ -363,20 +364,7 @@ mptcp_lib_check_transfer() {
- 
- # $1: ns, $2: port
- mptcp_lib_wait_local_port_listen() {
--	local listener_ns="${1}"
--	local port="${2}"
--
--	local port_hex
--	port_hex="$(printf "%04X" "${port}")"
--
--	local _
--	for _ in $(seq 10); do
--		ip netns exec "${listener_ns}" cat /proc/net/tcp* | \
--			awk "BEGIN {rc=1} {if (\$2 ~ /:${port_hex}\$/ && \$4 ~ /0A/) \
--			     {rc=0; exit}} END {exit rc}" &&
--			break
--		sleep 0.1
--	done
-+	wait_local_port_listen "${@}" "tcp"
- }
- 
- mptcp_lib_check_output() {
+Unless these have to be two RMW operations. (if they do add a spec reference)
+then this is a good example of why a field update function may not be
+the right option.  We probably want to RMW once.
 
--- 
-2.43.0
+return tph_set_reg_field_u32()
+
+> +
+> +	return ret;
+> +}
+> +
+>  int pcie_tph_disable(struct pci_dev *dev)
+>  {
+>  	return  tph_set_reg_field_u32(dev, PCI_TPH_CTRL,
 
 
