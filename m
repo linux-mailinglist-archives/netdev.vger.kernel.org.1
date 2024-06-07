@@ -1,61 +1,57 @@
-Return-Path: <netdev+bounces-101955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E0D9900B7C
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 19:45:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E69C900BAF
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 20:02:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 113CE28C12B
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 17:45:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CE1428416B
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:02:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B92219AD66;
-	Fri,  7 Jun 2024 17:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72FDF19CCFB;
+	Fri,  7 Jun 2024 18:01:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xv4tADCc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X/0vXxb+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B57C190672;
-	Fri,  7 Jun 2024 17:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43582225AE;
+	Fri,  7 Jun 2024 18:01:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717782344; cv=none; b=t+HQUi4IMXaSSOg7HGHnmkYnyczVAGh/KBbWdmb1WUTw79L+8N+l9c9ejRny0zeI3VeUh6CWqpLQs++fSJwjOlM0AKa9oH8xLS/S7Xb5rQaRmNQ7h2AlfHAJm7Zy2AH7U74cBCiKDvAfJJyiu9wJdLX7Ff68MTaYCSjDRH2NBj8=
+	t=1717783292; cv=none; b=DEhmQesmdS4OmkEM0Uxtv9NMAUqXblhM8NbkB8KV68PVKwB0wfCqvhaoACX9nyTl5+0rTAi6PWtMfMoVytifrfuLIC68qz2YihuW3DtARWCUIe6e1oMeYojFd+yRXfkXJXyLrZzEEXWJPEfWiuxJk9maD+TFjpMT8ss3hyvH8Wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717782344; c=relaxed/simple;
-	bh=zCG8FQxsaI/w6vMFJhp8K3xWTo7Bswlks8CEu7zqit0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=NljP3LWWRNg9l7I3NDx+z69x+JYTD2l1jPw9gYnLW2JS0LVbWn9d6RpYrzb1bFJMZ/25FIKrvTw4tcHVbOX5bRHNgdJ6qj6ZlXi6FN3ZBy2I5equsm8HTQM5gtK1/Q7CZ0RiH8X1Pf+27LIPq7Tf8MS4o9aEmsHek05elYkKe34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xv4tADCc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA6B4C2BBFC;
-	Fri,  7 Jun 2024 17:45:43 +0000 (UTC)
+	s=arc-20240116; t=1717783292; c=relaxed/simple;
+	bh=Q2240HndQG7pznYsjZBV4QwZL2FAj/M/TuJieHCfvUA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tceBFnXixIYwLyhWL8dt0q11HK3NchqjtvpOjUg86FMLfBN6USDGEBIXpFK+UhdezFas2Svfd2RC82mhAXtPGrDPZaq6E0Cq9z+0tmOuJCRITJlexD2ate1EOcf4td2PvQUIYuIqgcO59hVZ7U0wk7oV/dePOsZTkW2Or/k8bro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X/0vXxb+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD14CC32781;
+	Fri,  7 Jun 2024 18:01:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717782344;
-	bh=zCG8FQxsaI/w6vMFJhp8K3xWTo7Bswlks8CEu7zqit0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=Xv4tADCcOcuqv6Lb0hkMlr6KfY8ZZAVX1NweUPXXrwO/A9LSokeflWwf5Z0CzmHZu
-	 umJynmWvTAhFDM55M84wu6wrXEpR8YwceWFTT30lGjCu3PSVSSZlhrhAoj+C9zX6Nn
-	 CRFWZF4xCvQF2jacp2/buepX4wL+H69iBxq/R3lqdiWPD6/KUfiyzCF7XvRFe3iZB/
-	 TLzCzcUtAESSSGP49tHVLU+/LJV20h+isLVpIooqd4nEHHg8nnqxmdLtASDvtkQysV
-	 7GhvJOyrbJZCb/mz+biBsFEz4ciyXk7QgVJ1xX1bQChbltDDuoH96Lf6GjTW41cKeA
-	 YsKyjLOKoo4VQ==
-Date: Fri, 7 Jun 2024 12:45:42 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Wei Huang <wei.huang2@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	bhelgaas@google.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com
-Subject: Re: [PATCH V2 5/9] PCI/TPH: Introduce API functions to manage
- steering tags
-Message-ID: <20240607174542.GA853103@bhelgaas>
+	s=k20201202; t=1717783291;
+	bh=Q2240HndQG7pznYsjZBV4QwZL2FAj/M/TuJieHCfvUA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=X/0vXxb+M4XcEfHxBu3m2ci+zkFX2M5+X6/atldRHqARKOdNrYNSkhGSDwpINX+t9
+	 tjqPBTMc1yHosbqcrP/HWutJavOJynDoUWo0fENnC6gefZ2iD51v4AmIXqReO8T6U5
+	 BfD0VNR075n8mehObEVAkwxTaaD4S9ydHMuMPlO1x3qkWA6pMlCFhVdK7IMM/MXnCf
+	 z6qzlWBayW7xInxMU98i5fjbZHP8uSfNfqsk8loJioNToUD8rOIlaDuPutJ1vKJw1S
+	 r8VgGaGJ/4AKTAhkwzA2fpiaQpl0adJqyJHdxO3Y/A0iMOdbypObREJJN8mD4Uh2wu
+	 mzb/waktMHUGg==
+Date: Fri, 7 Jun 2024 19:01:27 +0100
+From: Simon Horman <horms@kernel.org>
+To: Abhinav Jain <jain.abhinav177@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org, javier.carrasco.cruz@gmail.com
+Subject: Re: [PATCH] selftests: net: Add on/off checks for network interface
+ non fixed features
+Message-ID: <20240607180127.GG27689@kernel.org>
+References: <20240606212714.27472-1-jain.abhinav177@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,111 +60,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240531213841.3246055-6-wei.huang2@amd.com>
+In-Reply-To: <20240606212714.27472-1-jain.abhinav177@gmail.com>
 
-On Fri, May 31, 2024 at 04:38:37PM -0500, Wei Huang wrote:
-> This patch introduces three API functions, pcie_tph_intr_vec_supported(),
-> pcie_tph_get_st() and pcie_tph_set_st(), for a driver to query, retrieve
-> or configure device's steering tags. There are two possible locations for
-> steering tag table and the code automatically figure out the right
-> location to set the tags if pcie_tph_set_st() is called. Note the tag
-> value is always zero currently and will be extended in the follow-up
-> patches.
+On Thu, Jun 06, 2024 at 09:27:14PM +0000, Abhinav Jain wrote:
+> This patch addresses the present TODO in the file.
+> I have tested it manually on my system and added relevant filtering to
+> ensure that the correct feature list is being checked.
+> 
+> Signed-off-by: Abhinav Jain <jain.abhinav177@gmail.com>
+> ---
+>  tools/testing/selftests/net/netdevice.sh | 21 +++++++++++++++++++--
+>  1 file changed, 19 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/netdevice.sh b/tools/testing/selftests/net/netdevice.sh
+> index e3afcb424710..cbe2573c3827 100755
+> --- a/tools/testing/selftests/net/netdevice.sh
+> +++ b/tools/testing/selftests/net/netdevice.sh
+> @@ -117,14 +117,31 @@ kci_netdev_ethtool()
+>  		return 1
+>  	fi
+>  
+> -	ethtool -k "$netdev" > "$TMP_ETHTOOL_FEATURES"
+> +	ethtool -k "$netdev" | tail -n +2 > "$TMP_ETHTOOL_FEATURES"
+>  	if [ $? -ne 0 ];then
 
-> +static int tph_get_reg_field_u32(struct pci_dev *dev, u8 offset, u32 mask,
-> +				 u8 shift, u32 *field)
-> +{
-> +	u32 reg_val;
-> +	int ret;
+Hi Abhinav,
+
+I suspect this will now only report a failure if tail fails,
+but ignore ethtool failures.
+
+>  		echo "FAIL: $netdev: ethtool list features"
+>  		rm "$TMP_ETHTOOL_FEATURES"
+>  		return 1
+>  	fi
+>  	echo "PASS: $netdev: ethtool list features"
+> -	#TODO for each non fixed features, try to turn them on/off
 > +
-> +	if (!dev->tph_cap)
-> +		return -EINVAL;
+> +	for feature in $(grep -v fixed "$TMP_ETHTOOL_FEATURES" | \
+> +		awk '{print $1}' | sed 's/://'); do
+
+Shellcheck warns that the above reads words rather than lines,
+and recommends using read instead.
+
+I think that is ok, because the construction reduces lines to single words.
+But it does seem a bit awkward to call grep, awk and sed for this.
+
+I wonder if the following construction nicer:
+
+while read -r FEATURE VALUE FIXED; do
+	[ "$FEAT" != "Features" ] || continue # Skip "Features" line
+	[ "$FIXED" != "[fixed]" ] || continue # Skip fixed features
+	feature="${FEATURE%:*}"
+	...
+done < "$TMP_ETHTOOL_FEATURES"
+
+
+> +		ethtool --offload "$netdev" "$feature" off
+> +		if [ $? -eq 0 ]; then
+> +			echo "PASS: $netdev: Turned off feature: $feature"
+> +		else
+> +			echo "FAIL: $netdev: Failed to turn off feature: $feature"
+> +		fi
 > +
-> +	ret = pci_read_config_dword(dev, dev->tph_cap + offset, &reg_val);
-> +	if (ret)
-> +		return ret;
+> +		ethtool --offload "$netdev" "$feature" on
+> +		if [ $? -eq 0 ]; then
+> +			echo "PASS: $netdev: Turned on feature: $feature"
+> +		else
+> +			echo "FAIL: $netdev: Failed to turn on feature: $feature"
+> +		fi
+> +	done
 > +
-> +	*field = (reg_val & mask) >> shift;
-> +
-> +	return 0;
-> +}
-> +
-> +static int tph_get_table_size(struct pci_dev *dev, u16 *size_out)
-> +{
-> +	int ret;
-> +	u32 tmp;
-> +
-> +	ret = tph_get_reg_field_u32(dev, PCI_TPH_CAP,
-> +				    PCI_TPH_CAP_ST_MASK,
-> +				    PCI_TPH_CAP_ST_SHIFT, &tmp);
-
-Just use FIELD_GET() instead.
-
-> +	if (ret)
-> +		return ret;
-> +
-> +	*size_out = (u16)tmp;
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * For a given device, return a pointer to the MSI table entry at msi_index.
-
-s/MSI/MSI-X/ to avoid any possible confusion.
-
-> +static void __iomem *tph_msix_table_entry(struct pci_dev *dev,
-> +					  u16 msi_index)
-
-> +	ret = pcie_capability_read_dword(rp, PCI_EXP_DEVCAP2, &val);
-> +	if (ret) {
-> +		pr_err("cannot read device capabilities 2 of %s\n",
-> +		       dev_name(&dev->dev));
-
-Never use pr_err() when you can use pci_err() instead.  Obviously no
-dev_name() needed with pci_err().  Other instances below.
-
-> +	val &= PCI_EXP_DEVCAP2_TPH_COMP;
-> +
-> +	return val >> PCI_EXP_DEVCAP2_TPH_COMP_SHIFT;
-
-FIELD_GET()
-
-> + * The PCI Specification version 5.0 requires the "No ST Mode" mode
-> + * be supported by any compatible device.
-
-Cite r6.0 or newer and include section number.
-
-> +	/* clear the mode select and enable fields and set new values*/
-
-Space before closing */
-
-> +	ctrl_reg &= ~(PCI_TPH_CTRL_REQ_EN_MASK);
-> +	ctrl_reg |= (((u32)req_type << PCI_TPH_CTRL_REQ_EN_SHIFT) &
-> +			PCI_TPH_CTRL_REQ_EN_MASK);
-
-FIELD_GET()/FIELD_PREP()
-
-> +static bool pcie_tph_write_st(struct pci_dev *dev, unsigned int msix_nr,
-> +			      u8 req_type, u16 tag)
-
-This function is not a predicate and testing for true/false gives no
-indication of the sense.
-
-For typical functions that do read/write/etc, returning 0 means
-success and -errno means failure.  This is the opposite.
-
-> +	/*
-> +	 * disable TPH before updating the tag to avoid potential instability
-> +	 * as cautioned about in the "ST Table Programming" of PCI-E spec
-
-s/disable/Disable/
-
-"PCIe r6.0, sec ..."
-
-> +bool pcie_tph_set_st(struct pci_dev *dev, unsigned int msix_nr,
-> +		     unsigned int cpu, enum tph_mem_type mem_type,
-> +		     u8 req_type)
-
-Should return 0 or -errno.
+>  	rm "$TMP_ETHTOOL_FEATURES"
+>  
+>  	kci_netdev_ethtool_test 74 'dump' "ethtool -d $netdev"
+> -- 
+> 2.34.1
+> 
+> 
 
