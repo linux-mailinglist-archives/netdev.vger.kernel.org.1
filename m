@@ -1,61 +1,71 @@
-Return-Path: <netdev+bounces-101745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 586AB8FFE70
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:52:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 070EE8FFE37
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:44:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2678286888
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 08:52:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B121A1F26082
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 08:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CC815B134;
-	Fri,  7 Jun 2024 08:52:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A2715B12B;
+	Fri,  7 Jun 2024 08:44:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA2215B125;
-	Fri,  7 Jun 2024 08:52:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4052515B127;
+	Fri,  7 Jun 2024 08:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717750339; cv=none; b=UoMRgy76TVaUEGCBHCc5xAQP4b8RagAWOxeyzq4JhL7i6HoO6KyFwK1fxumnIPOk2iFzHdkFAeJoYlZRdmqKwGPxxmn4Jn2hTYuoSGcC/C27T+fCA/GHXy7gcE1LdvnlKEftIzlV6tlbklneMoVGw0b3w55v/kSiq+GBb/SRtYI=
+	t=1717749868; cv=none; b=uvNt4b6PoeywYU1HDtKibya33NwbwWolAw0IC7+KRxqrEv2m7jxzr7yo9PZXJ+cxVUg6oxLEWzp2QctaAEU1Ue3n5joEcLAuwcB8asqofcojpXtWnZZKDjpDM5PYZT4Cz0gcGwFNJpdH0Fdgmykk8qQH5mudTqHEPt06GqOfQp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717750339; c=relaxed/simple;
-	bh=OoA0HFNR+W1mfjX1VaSoU1w9Quq931ZHGxHflESjXEQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=onEG84Tvzty4syJJnCfHtt9ADVVrvYmsG3XelhF1lhyCTVp+G9hqPC++OtEqVqEVf4nSj4p07iDC017pyEsY9Ht5NnssGoT1jzzQ4Z9+oCPOOJfBsxLcxX6104q1ib65H2I8Jxi0ZG4Gl2FTdhjmAIhk6pedoYxMbOR2khQCgsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4578pn2jB3819962, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 4578pn2jB3819962
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 7 Jun 2024 16:51:49 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 7 Jun 2024 16:51:49 +0800
-Received: from RTDOMAIN (172.21.210.98) by RTEXMBS04.realtek.com.tw
- (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Fri, 7 Jun
- 2024 16:51:48 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <andrew@lunn.ch>, <jiri@resnulli.us>, <horms@kernel.org>,
-        <rkannoth@marvell.com>, <pkshih@realtek.com>, <larry.chiu@realtek.com>,
-        Justin Lai
-	<justinlai0215@realtek.com>
-Subject: [PATCH net-next v20 13/13] MAINTAINERS: Add the rtase ethernet driver entry
-Date: Fri, 7 Jun 2024 16:43:21 +0800
-Message-ID: <20240607084321.7254-14-justinlai0215@realtek.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240607084321.7254-1-justinlai0215@realtek.com>
-References: <20240607084321.7254-1-justinlai0215@realtek.com>
+	s=arc-20240116; t=1717749868; c=relaxed/simple;
+	bh=ZGIN+3jBdsxYLWxmKjRImDnEocFLP4dx/WNFCIBynME=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sbL1zrRhU2q5fr6zpFRSGLf4RWl06EFlYc8sLl/HIEO+FvM+ojB0+Dshq3/0WpFVICc3o++ItFTXPK4yRJYfKeKHMrjIlWlioOmCqvc2VJo1dRVoWcMPIinEyncC5KWf3btHNW/gFASUfXMc9ujzy23ptgafG6jLEgc3WSyvO+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a6e349c0f2bso29854766b.2;
+        Fri, 07 Jun 2024 01:44:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717749865; x=1718354665;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=o4K2z7NbHqX/9YFvaDXUZZSVRNBRpOe0GfnIPk5+1a8=;
+        b=GOwscALTrfBD5fV91VjII6Z0sNxJMliAzJnjq7L6BCeWWABbE7yTQ8H3GmRKGcP0cF
+         uTkj/BAab8VKSV8RCSDytHncGemkYjhv/uDZArK0Epm5N5LkPe/fmbHWykU6xo89O1t7
+         HHO5sOam2VUmRYKoJ1aCzTMtpDtLgZS+fO5c0dRSvwS1ix3veDz9NDeR+IiB/ntEo8Lw
+         U9slFy6F5RXb1frbfqxc4vZF4Rh+CyjbOArWQjCVcTufBnOkur5EQF2GnMquczhJrG0J
+         QEm5QDLqFHFNSnWy+Iq/M3QBwQNY9K1CO2gjhZw3PrSFFt+vfpCrzbLP9qppsmbVxkfF
+         kLcg==
+X-Forwarded-Encrypted: i=1; AJvYcCWSfQH1bj9QiJSeDuedOQxl+1HxV9LwMFVjoD1GzNK1+sLKqm71OsY0V+tEZAmL2OWhcwzYpZC7xhdSPOD0E2n127pRsXg7UC8Ck3g8
+X-Gm-Message-State: AOJu0YxXBj5/4QGduY+3+gZ9H9VXoEgIurN+nO+4w6BhmNVFBX8LUEMD
+	ytuQf7Hh9I0xgCwh3sQQBOYWIT/pgKYJ1DgWrciZUFTo8jA/9FDK
+X-Google-Smtp-Source: AGHT+IGOC8WKarSr1SDF9TztrVJzc005LX9HyTpLCm0LyrrM3frfZSG9Ck0GQ0GWIsIAS7ooPUM9IA==
+X-Received: by 2002:a17:906:2bdb:b0:a68:bcf6:5a57 with SMTP id a640c23a62f3a-a6cd7891d48mr130532966b.44.1717749865361;
+        Fri, 07 Jun 2024 01:44:25 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6c805f6e3bsm214832466b.92.2024.06.07.01.44.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jun 2024 01:44:24 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	horms@kernel.org,
+	sbhatta@marvell.com,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] ip_tunnel: Move stats allocation to core
+Date: Fri,  7 Jun 2024 01:44:19 -0700
+Message-ID: <20240607084420.3932875-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,36 +73,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-Add myself and Larry Chiu as the maintainer for the rtase ethernet driver.
+With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
+convert veth & vrf"), stats allocation could be done on net core instead
+of this driver.
 
-Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+With this new approach, the driver doesn't have to bother with error
+handling (allocation failure checking, making sure free happens in the
+right spot, etc). This is core responsibility now.
+
+Move ip_tunnel driver to leverage the core allocation.
+
+All the ip_tunnel_init() users call ip_tunnel_init() as part of their
+.ndo_init callback. The .ndo_init callback is called before the stats
+allocation in netdev_register(), thus, the allocation will happen before
+the netdev is visible.
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+ net/ipv4/ip_tunnel.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 94fddfcec2fb..5ee95a083591 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -19296,6 +19296,13 @@ L:	linux-remoteproc@vger.kernel.org
- S:	Maintained
- F:	drivers/tty/rpmsg_tty.c
+diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
+index bccef2fcf620..5cffad42fe8c 100644
+--- a/net/ipv4/ip_tunnel.c
++++ b/net/ipv4/ip_tunnel.c
+@@ -1099,7 +1099,6 @@ static void ip_tunnel_dev_free(struct net_device *dev)
  
-+RTASE ETHERNET DRIVER
-+M:	Justin Lai <justinlai0215@realtek.com>
-+M:	Larry Chiu <larry.chiu@realtek.com>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/ethernet/realtek/rtase/
-+
- RTL2830 MEDIA DRIVER
- L:	linux-media@vger.kernel.org
- S:	Orphan
+ 	gro_cells_destroy(&tunnel->gro_cells);
+ 	dst_cache_destroy(&tunnel->dst_cache);
+-	free_percpu(dev->tstats);
+ }
+ 
+ void ip_tunnel_dellink(struct net_device *dev, struct list_head *head)
+@@ -1313,20 +1312,15 @@ int ip_tunnel_init(struct net_device *dev)
+ 
+ 	dev->needs_free_netdev = true;
+ 	dev->priv_destructor = ip_tunnel_dev_free;
+-	dev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
+-	if (!dev->tstats)
+-		return -ENOMEM;
++	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+ 
+ 	err = dst_cache_init(&tunnel->dst_cache, GFP_KERNEL);
+-	if (err) {
+-		free_percpu(dev->tstats);
++	if (err)
+ 		return err;
+-	}
+ 
+ 	err = gro_cells_init(&tunnel->gro_cells, dev);
+ 	if (err) {
+ 		dst_cache_destroy(&tunnel->dst_cache);
+-		free_percpu(dev->tstats);
+ 		return err;
+ 	}
+ 
 -- 
-2.34.1
+2.43.0
 
 
