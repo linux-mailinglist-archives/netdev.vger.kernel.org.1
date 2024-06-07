@@ -1,130 +1,223 @@
-Return-Path: <netdev+bounces-101729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DA2F8FFE21
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:37:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A22788FFE35
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:44:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1B551F22539
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 08:37:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58DEA1F25A89
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 08:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B40E15B11F;
-	Fri,  7 Jun 2024 08:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A4315B125;
+	Fri,  7 Jun 2024 08:44:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A9815443A
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 08:37:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA5314EC7D;
+	Fri,  7 Jun 2024 08:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717749428; cv=none; b=VVthhrzIHblmQGCiGjpsT8mJA4VprHmTiZ8v0Zs89yyH+7dgDDzEYJlqIiIECWXHgOTHvugsefksGcC07wQmzqQbR+u2dcFOx/oqqqiKjekRZ+4XgbWal2auF0UyuBTBAcqJ9slYFyZEWxeWxiph8hh/VcGmVh+Jpg9zq3p+sjQ=
+	t=1717749849; cv=none; b=tTqgcGGtY03luVXJyiBma4LAEp5O7LBdm98owDV0MkQTjtrioEEIfhIj0jsnhfCe8XNxx1V1FU2DSkSflE/413Pen7YxtEdubFDRiERI39xTSnq/aqtv1zYiA+wzr+Aq8Z10ttMRkbRF2q3XXUWCCN9BqDejdQyiN+C9RY6VyDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717749428; c=relaxed/simple;
-	bh=CkKHSB/kpNeMmANPZeGUmTTs9lDJ7BraXRPWV0SFfng=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=WC1M0d7c9tp2plhxsgRLrwM4CLAXqDbaWC7nMwlvKltN3FVp9K+Tmps2Y/tn0p66Qt+4h4SDmDLRYuw5TAJAaeAwKahhOxrZiz/Lcn8JmszPf7AZXDbhiezvMFMK93MX+UlqrjLKnvDzU/UeqFB/M+etLH71B3U9aQbvtABLp4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-102-aAGw2SK1NwG3-1KqFJvVKg-1; Fri, 07 Jun 2024 09:36:56 +0100
-X-MC-Unique: aAGw2SK1NwG3-1KqFJvVKg-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 7 Jun
- 2024 09:36:24 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Fri, 7 Jun 2024 09:36:24 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Xin Long' <lucien.xin@gmail.com>
-CC: linux-sctp <linux-sctp@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: SCTP doesn't seem to let you 'cancel' a blocking accept()
-Thread-Topic: SCTP doesn't seem to let you 'cancel' a blocking accept()
-Thread-Index: Adq1ybjOUyi6xNR1Tiu+WEi2iGmOKwCfCtIAABryTuA=
-Date: Fri, 7 Jun 2024 08:36:23 +0000
-Message-ID: <0b42b8f085b84a7e8ffd5a9b71ed2932@AcuMS.aculab.com>
-References: <4faeb583e1d44d82b4e16374b0ad583c@AcuMS.aculab.com>
- <CADvbK_emOEPZJ8GWtYpUDKAGLW2z84S81ZcW9qQCc=rYCiUbAA@mail.gmail.com>
-In-Reply-To: <CADvbK_emOEPZJ8GWtYpUDKAGLW2z84S81ZcW9qQCc=rYCiUbAA@mail.gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1717749849; c=relaxed/simple;
+	bh=AaIXA8MjtT5hwDfIWAoPqUGP5jQYQJf9jiBjbQIYfjQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hVw5pIh6SWxrKemw2DkeG9ODX6wXnPqieC/5lYy5j7KE1WHHvYWCIJBBeZLFZ6/RFKZ5oZiF/CMYT8LKlpFscQe7kWOzPIz9JAgmDDfqx7nDxayJraiCPXFWvhcOeR2PSL/DUfGD1slCtuZakbVdATuMlb2R1ZzmS2BaXG/QJ20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4578hT6z93814699, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 4578hT6z93814699
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 7 Jun 2024 16:43:29 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 7 Jun 2024 16:43:29 +0800
+Received: from RTDOMAIN (172.21.210.98) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Fri, 7 Jun
+ 2024 16:43:29 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <andrew@lunn.ch>, <jiri@resnulli.us>, <horms@kernel.org>,
+        <rkannoth@marvell.com>, <pkshih@realtek.com>, <larry.chiu@realtek.com>,
+        Justin Lai
+	<justinlai0215@realtek.com>
+Subject: [PATCH net-next v20 00/13] Add Realtek automotive PCIe driver
+Date: Fri, 7 Jun 2024 16:43:08 +0800
+Message-ID: <20240607084321.7254-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-RnJvbTogWGluIExvbmcNCj4gU2VudDogMDYgSnVuZSAyMDI0IDIxOjE1DQo+IA0KPiBPbiBNb24s
-IEp1biAzLCAyMDI0IGF0IDExOjQy4oCvQU0gRGF2aWQgTGFpZ2h0IDxEYXZpZC5MYWlnaHRAYWN1
-bGFiLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBJbiBhIG11bHRpdGhyZWFkZWQgcHJvZ3JhbSBpdCBp
-cyByZWFzb25hYmxlIHRvIGhhdmUgYSB0aHJlYWQgYmxvY2tlZCBpbiBhY2NlcHQoKS4NCj4gPiBX
-aXRoIFRDUCBhIHN1YnNlcXVlbnQgc2h1dGRvd24obGlzdGVuX2ZkLCBTSFVUX1JEV1IpIGNhdXNl
-cyB0aGUgYWNjZXB0IHRvIGZhaWwuDQo+ID4gQnV0IG5vdGhpbmcgaGFwcGVucyBmb3IgU0NUUC4N
-Cj4gPg0KPiA+IEkgdGhpbmsgdGhlICdtYWdpYycgaGFwcGVucyB3aGVuIHRjcF9kaXNjb25uZWN0
-KCkgY2FsbHMgaW5ldF9jc2tfbGlzdGVuX3N0b3Aoc2spDQo+ID4gYnV0IHNjdHBfZGlzY29ubmVj
-dCgpIGlzIGFuIGVtcHR5IGZ1bmN0aW9uIGFuZCBub3RoaW5nIGhhcHBlbnMuDQo+ID4NCj4gPiBJ
-IGNhbid0IHNlZSBhbnkgY2FsbHMgdG8gaW5ldF9jc2tfbGlzdGVuX3N0b3AoKSBpbiB0aGUgc2N0
-cCBjb2RlIC0gc28gSSBzdXNwZWN0DQo+ID4gaXQgaXNuJ3QgcG9zc2libGUgYXQgYWxsLg0KLi4u
-DQo+ID4NCj4gPiBJIGFsc28gc3VzcGVjdCB0aGF0IGEgYmxvY2tpbmcgY29ubmVjdCgpIGNhbid0
-IGJlIGNhbmNlbGxlZCBlaXRoZXI/DQo+DQo+IEZvciBjb25uZWN0aW5nIHNvY2tldCwgaXQgY2Fs
-bHMgc2N0cF9zaHV0ZG93bigpIHdoZXJlIFNIVVRfV1IgY2F1c2VzDQo+IHRoZSBhc29jIHRvIGVu
-dGVyIFNIVVRET1dOX1NFTlQgYW5kIGNhbmNlbCB0aGUgYmxvY2tpbmcgY29ubmVjdCgpLg0KDQpJ
-J2xsIHRlc3QgdGhhdCBsYXRlciAtIHRoZSB0ZXN0IEkgd2FzIHJ1bm5pbmcgYWx3YXlzIGNvbm5l
-Y3RzLg0KSSdtIHBvcnRpbmcgc29tZSBrZXJuZWwgY29kZSB0aGF0IHVzZWQgc2lnbmFscyB0byB1
-bmJsb2NrIHN5bmNocm9ub3VzDQpjYWxscyB0byB1c2Vyc3BhY2Ugd2hlcmUgeW91IGNhbid0IHNp
-Z25hbCBhIHRocmVhZC4NClRoZSBvbmx5IHByb2JsZW0gd2l0aCB0aGUga2VybmVsIHZlcnNpb24g
-aXMgc2VjdXJlIGJvb3QgYW5kIGRyaXZlcg0Kc2lnbmluZyAoZXNwZWNpYWxseSBmb3IgdGhlIHdp
-bmRvd3MgYnVpbGQhKS4NCg0KPiA+IENsZWFybHkgdGhlIGFwcGxpY2F0aW9uIGNhbiBhdm9pZCB0
-aGUgaXNzdWUgYnkgdXNpbmcgcG9sbCgpIGFuZCBhbg0KPiA+IGV4dHJhIGV2ZW50ZmQoKSBmb3Ig
-dGhlIHdha2V1cCAtIGJ1dCBpdCBpcyBhbGwgYSBmYWZmIGZvciBjb2RlIHRoYXQNCj4gPiBvdGhl
-cndpc2Ugc3RyYWlnaHQgZm9yd2FyZC4NCj4NCj4gSSB3aWxsIHRyeSB0byBwcmVwYXJlIGEgcGF0
-Y2ggdG8gc29sdmUgdGhpcyBmb3Igc2N0cCBhY2NlcHQoKSBsaWtlOg0KDQpJJ2xsIHRlc3QgaXQg
-Zm9yIHlvdS4NCg0KPiBkaWZmIC0tZ2l0IGEvbmV0L3NjdHAvc29ja2V0LmMgYi9uZXQvc2N0cC9z
-b2NrZXQuYw0KPiBpbmRleCBjNjc2NzlhNDEwNDQuLmYyNzBhMGE0YzY1ZCAxMDA2NDQNCj4gLS0t
-IGEvbmV0L3NjdHAvc29ja2V0LmMNCj4gKysrIGIvbmV0L3NjdHAvc29ja2V0LmMNCj4gQEAgLTQ4
-MzQsMTAgKzQ4MzQsMTMgQEAgaW50IHNjdHBfaW5ldF9jb25uZWN0KHN0cnVjdCBzb2NrZXQgKnNv
-Y2ssDQo+IHN0cnVjdCBzb2NrYWRkciAqdWFkZHIsDQo+ICAgICAgICAgcmV0dXJuIHNjdHBfY29u
-bmVjdChzb2NrLT5zaywgdWFkZHIsIGFkZHJfbGVuLCBmbGFncyk7DQo+ICB9DQo+IA0KPiAtLyog
-RklYTUU6IFdyaXRlIGNvbW1lbnRzLiAqLw0KPiAgc3RhdGljIGludCBzY3RwX2Rpc2Nvbm5lY3Qo
-c3RydWN0IHNvY2sgKnNrLCBpbnQgZmxhZ3MpDQo+ICB7DQo+IC0gICAgICAgcmV0dXJuIC1FT1BO
-T1RTVVBQOyAvKiBTVFVCICovDQo+ICsgICAgICAgaWYgKCFzY3RwX3N0eWxlKHNrLCBUQ1ApKQ0K
-PiArICAgICAgICAgICAgICAgcmV0dXJuIC1FT1BOT1RTVVBQOw0KPiArDQo+ICsgICAgICAgc2st
-PnNrX3NodXRkb3duIHw9IFJDVl9TSFVURE9XTjsNCj4gKyAgICAgICByZXR1cm4gMDsNCg0KSSB0
-aGluayB5b3UgbmVlZCB0byBjYWxsIHNvbWV0aGluZyB0byB1bmJsb2NrIHRoZSB0aHJlYWQgYXMg
-d2VsbA0KYXMgY2hhbmdpbmcgdGhlIHN0YXRlLg0KDQouLi4NCj4gLSAgICAgICBpZiAoIXNjdHBf
-c3N0YXRlKHNrLCBMSVNURU5JTkcpKSB7DQoNCkFueSBjaGFuY2Ugb2YgbWFraW5nIGl0IG11Y2gg
-Y2xlYXJlciB0aGF0IHRoaXMgaXMgdGVzdGluZw0KCQlpZiAoc2stPnNrX3N0YXRlID09IFRDUF9M
-SVNURU4pDQoNClRoZSB0b2tlbi1wYXN0aW5nIHRob3VnaA0KCVNDVFBfU1NfQ0xPU0VEICAgICAg
-ICAgPSBUQ1BfQ0xPU0UsDQoJU0NUUF9TU19MSVNURU5JTkcgICAgICA9IFRDUF9MSVNURU4sDQoJ
-U0NUUF9TU19FU1RBQkxJU0hJTkcgICA9IFRDUF9TWU5fU0VOVCwNCglTQ1RQX1NTX0VTVEFCTElT
-SEVEICAgID0gVENQX0VTVEFCTElTSEVELA0KCVNDVFBfU1NfQ0xPU0lORyAgICAgICAgPSBUQ1Bf
-Q0xPU0VfV0FJVCwNCm1ha2VzIGdyZXBwaW5nIGZvciBjaGFuZ2VzIHRvIHNrX3N0YXRlIHByZXR0
-eSBpbXBvc3NpYmxlLg0KDQpZb3UgbWlnaHQgYXJndWUgdGhhdCB0aGUgc2tfc3RhdGUgdmFsdWVz
-IHNob3VsZCBiZSBwcm90b2NvbCBuZXV0cmFsLA0KYW5kIHRoYXQgdGhlIHdyYXBwZXIgZ2l2ZXMg
-c3Ryb25nIHR5cGluZyAtIGJ1dCB0b2dldGhlciB0aGV5IG1ha2UNCnRoZSBjb2RlIGhhcmQgdG8g
-c2Nhbi4NCg0KVGhlIHN0cm9uZyB0eXBpbmcgY291bGQgYmUgbWFpbnRhaW5lZCBieSBjaGFuZ2lu
-ZyB0aGUgY29uc3RhbnRzIHRvDQoJU0NUUF9TU19UQ1BfQ0xPU0UgPSBUQ1BfQ0xPU0UNCihldGMp
-IHNvIHRoYXQgZ3JlcHBpbmcgZm9yIHRoZSBjb25zdGFudHMgc3RpbGwgd29ya3MuDQoNCkkga2Vl
-cCB0aGlua2luZyBvZiB3YXlzIHRvIGRvIHN0cm9uZ2x5IHR5cGVkIGVudW0gaW4gQy4NClRoZSBt
-YWluIG9wdGlvbnMgc2VlbSB0byBiZSBlbWJlZGRpbmcgdGhlIHZhbHVlIGluIGEgc3RydWN0DQpv
-ciB1c2luZyBhIHBvaW50ZXIgdG8gYSBzdHJ1Y3QuDQpOZWl0aGVyIGlzIGlkZWFsLg0KDQpPVE9I
-IHRoZSBjb21waWxlciBjYW4ndCBkZWZhdWx0IHRvIHN0cm9uZ2x5IHR5cGVkIGVudW0uDQpBbHRo
-b3VnaCBwZXJoYXBzIHRoYXQgY291bGQgYmUgYSBwZXItZW51bSBhdHRyaWJ1dGUuDQoNCglEYXZp
-ZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQg
-RmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4
-NiAoV2FsZXMpDQo=
+This series includes adding realtek automotive ethernet driver
+and adding rtase ethernet driver entry in MAINTAINERS file.
+
+This ethernet device driver for the PCIe interface of 
+Realtek Automotive Ethernet Switch,applicable to 
+RTL9054, RTL9068, RTL9072, RTL9075, RTL9068, RTL9071.
+
+v1 -> v2:
+- Remove redundent debug message.
+- Modify coding rule.
+- Remove other function codes not related to netdev.
+
+v2 -> v3:
+- Remove SR-IOV function - We will add the SR-IOV function together when
+uploading the vf driver in the future.
+- Remove other unnecessary code and macro.
+
+v3 -> v4:
+- Remove function prototype - Our driver does not use recursion, so we
+have reordered the code and removed the function prototypes.
+- Define macro precisely - Improve macro code readability to make the
+source code cleaner.
+
+v4 -> v5:
+- Modify ethtool function - Remove some unnecessary code.
+- Don't use inline function - Let the compiler decide.
+
+v5 -> v6:
+- Some old macro definitions have been removed and replaced with the
+lastest usage.
+- Replace s32 with int to ensure consistency.
+- Clearly point out the objects of the service and remove unnecessary
+struct.
+
+v6 -> v7:
+- Split this driver into multiple patches.
+- Reorganize this driver code and remove redundant code to make this
+driver more concise.
+
+v7 -> v8:
+- Add the function to calculate time mitigation and the function to 
+calculate packet number mitigation. Users can use these two functions 
+to calculate the reg value that needs to be set for the mitigation value
+they want to set.
+- This device is usually used in automotive embedded systems. The page
+pool api will use more memory in receiving packets and requires more 
+verification, so we currently do not plan to use it in this patch.
+
+v8 -> v9:
+- Declare functions that are not extern as static functions and increase
+the size of the character array named name in the rtase_int_vector struct
+to correct the build warning noticed by the kernel test robot.
+
+v9 -> v10:
+- Currently we change to use the page pool api. However, when we allocate
+more than one page to an rx buffer, it will cause system errors
+in some cases. Therefore, we set the rx buffer to fixed size with 3776
+(PAGE_SIZE - SKB_DATA_ALIGN(sizeof(skb_shared_info) )), and the maximum 
+value of mtu is set to 3754(rx buffer size - VLAN_ETH_HLEN - ETH_FCS_LEN).
+- When ndo_tx_timeout is called, it will dump some device information,
+which can be used for debugging.
+- When the mtu is greater than 1500, the device supports checksums
+but not TSO.
+- Fix compiler warnning.
+
+v10 -> v11:
+- Added error handling of rtase_init_ring().
+- Modify the error related to asymmetric pause in rtase_get_settings.
+- Fix compiler error.
+
+v11 -> v12:
+- Use pm_sleep_ptr and related macros.
+- Remove multicast filter limit.
+- Remove VLAN support and CBS offload functions. 
+- Remove redundent code.
+- Fix compiler warnning.
+
+v12 -> v13:
+- Fixed the compiler warning of unuse rtase_suspend() and rtase_resume()
+when there is no define CONFIG_PM_SLEEP.
+
+v13 -> v14:
+- Remove unuse include.
+- call eth_hw_addr_random() to generate random MAC and set device flag 
+- use pci_enable_msix_exact() instead of pci_enable_msix_range() 
+- If dev->dma_mask is non-NULL, dma_set_mask_and_coherent with a 64-bit
+mask will never fail, so remove the part that determines the 32-bit mask.
+- set dev->pcpu_stat_type before register_netdev() and core will allocate
+stats 
+- call NAPI instance at the right location
+
+v14 -> v15:
+- In rtase_open, when the request interrupt fails, all request interrupts
+are freed.
+- When calling netif_device_detach, there is no need to call
+netif_stop_queue.
+- Call netif_tx_disable() instead of stop_queue(), it takes the tx lock so
+there is no need to worry about the packets being transmitted.
+- In rtase_tx_handler, napi budget is no longer used, but a customized
+tx budget is used.
+- Use the start / stop macros from include/net/netdev_queues.h. 
+- Remove redundent code.
+
+v15 -> v16:
+- Re-upload v15 patch set
+
+v16 -> v17:
+- Prefix the names of some rtase-specific macros, structs, and enums.
+- Fix the abnormal problem when returning page_pool resources.
+
+v17 -> v18:
+- Limit the width of each line to 80 colums.
+- Use reverse xmas tree order.
+- Modify the error handling of rtase_alloc_msix and rtase_alloc_interrupt.
+
+v18 -> v19:
+- Use dma_wmb() instead of wmb() to ensure the order of access
+instructions for a memory shared by DMA and CPU.
+- Add error message when allocate dma memory fails.
+- Add .get_eth_mac_stats function to report hardware information.
+- Remove .get_ethtool_stats function.
+- In rtase_tx_csum, when the packet is not ipv6 or ipv4, a warning will
+no longer be issued.
+
+v19 -> v20:    
+- Modify the description of switch architecture.
+
+Justin Lai (13):
+  rtase: Add pci table supported in this module
+  rtase: Implement the .ndo_open function
+  rtase: Implement the rtase_down function
+  rtase: Implement the interrupt routine and rtase_poll
+  rtase: Implement hardware configuration function
+  rtase: Implement .ndo_start_xmit function
+  rtase: Implement a function to receive packets
+  rtase: Implement net_device_ops
+  rtase: Implement pci_driver suspend and resume function
+  rtase: Implement ethtool function
+  rtase: Add a Makefile in the rtase folder
+  realtek: Update the Makefile and Kconfig in the realtek folder
+  MAINTAINERS: Add the rtase ethernet driver entry
+
+ MAINTAINERS                                   |    7 +
+ drivers/net/ethernet/realtek/Kconfig          |   19 +
+ drivers/net/ethernet/realtek/Makefile         |    1 +
+ drivers/net/ethernet/realtek/rtase/Makefile   |   10 +
+ drivers/net/ethernet/realtek/rtase/rtase.h    |  327 +++
+ .../net/ethernet/realtek/rtase/rtase_main.c   | 2366 +++++++++++++++++
+ 6 files changed, 2730 insertions(+)
+ create mode 100644 drivers/net/ethernet/realtek/rtase/Makefile
+ create mode 100644 drivers/net/ethernet/realtek/rtase/rtase.h
+ create mode 100644 drivers/net/ethernet/realtek/rtase/rtase_main.c
+
+-- 
+2.34.1
 
 
