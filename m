@@ -1,66 +1,67 @@
-Return-Path: <netdev+bounces-101972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5E94900D79
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 23:22:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF0C900D78
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 23:22:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A529284BC9
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 21:22:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9398C1F22D35
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 21:22:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B95C155341;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16DBB15532A;
 	Fri,  7 Jun 2024 21:22:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dDUxJbRj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N7xRwN/q"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3DD15530A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8441C14D717
 	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 21:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717795368; cv=none; b=POICTe7up+iLso7XmpoLfOmMDxSvwEvyhrMj4QerXmLYJzlzvSoWVZVcnoME7zKbAaUSlmhn8oVlJvxLXWjXmDxWYtcZvQD0xoVx6pNvLu7qxNpfIAoRjCdNR9VhikGZN2Kl5QqBlXvpo6OlRm99zSk8oQZQ3/qfT2lCpqlmuVY=
+	t=1717795368; cv=none; b=BTdaHZpqqS0Ddha+9cmIkm/Ava+Jbr1bVlsU7xfbctSFsD/farw9kcuUeieEdmzk6tOIp4UFwj/Stifgloqy9MUlTswrmulqM/UV2IM0h5K8ZVu0TzdaKLUhoPoVsr5uXSzmo48jk6XNOM5pF2VgEmPz3ODoxvJBVgYVjZVMWi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717795368; c=relaxed/simple;
-	bh=pwd/MVtitZ8Ps76FwPkFB4/aX/Fn6oW06hDofOADNXc=;
+	bh=nxV7DfHtVDVRR6GAnUgGY7qp4mmKPq9ffl0JokpKRTM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZNw7eVqI1fSbpF5rqS4fGFdjPBksPhbvNEzkNaIgSLyrDIaHSq6hqWgadd01IMDswsaxw+nmFlxVC7wGhtmuh0pAeJiLlffan9XxP7Ch3OBSlEX6xIRHu0jBzeoCVXLYRDLc0r+LsbcvPnQd/AUHuIOvUbJAzUfAMj1jgWGGP9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dDUxJbRj; arc=none smtp.client-ip=192.198.163.17
+	 In-Reply-To:To:Cc; b=QcaLJsBA96Yln9+GsFPQ0iP5HxMKPua3nzlTJrQf7idD7jr4EB/HKe1vFfBTOyO42DEDjB2XfPqCbM7lDwT0bVA7TWmJy76NwsHfTuVnZ6uvaHOtDDtQzya9hwvfLbCDmFS2i7Jb3s+YHhAV73GmwEtaz5q7iMcvRvtrx0t4ICo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N7xRwN/q; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717795367; x=1749331367;
+  t=1717795366; x=1749331366;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=pwd/MVtitZ8Ps76FwPkFB4/aX/Fn6oW06hDofOADNXc=;
-  b=dDUxJbRjLmIwUddY/Na9aqQ0joC4b5fyctItYNaR/Ul9wdSkUPXnltlB
-   TMy83QowjcK2+PaiRbYsOw5AbeyPhHc/PEIF5IJv2krrV8SlG7cZ4eDC4
-   0KtQ/19KhvNOj1stndyX76LyFWMCJAe3WCH/b0XFy54z5azgZ2XZu92Ix
-   UjAtJSjlFw6pLA4/+s8FT9P6EvEbSRIiSL5hNgd91s47L897iTMP1yYu3
-   8/KYKO+to0VUQqWBvfsA4zJd8OCp23TWbKZwgn0BDDnoYbwUGPiFMnYEY
-   ayo+NWOvgmmbwUSgVJMZmMdZA9t8/SruWjLX9CU+/JPIDcHjVQnuoN6J5
-   g==;
-X-CSE-ConnectionGUID: 1py0zH/PTc+3/6IjwzHAfQ==
-X-CSE-MsgGUID: crV8wyO/TMOVEtqToO+hGA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11096"; a="14417705"
+  bh=nxV7DfHtVDVRR6GAnUgGY7qp4mmKPq9ffl0JokpKRTM=;
+  b=N7xRwN/q7DCvdRW3YnC1tCuscAdmepVlVMCe+18tOLQxeEZyjqUtbbiK
+   QMWHsFtRZpGbUJ/JQVneCux+6Km0vVJ1CXnmnakJfGqGPW5ORnsGn3Kpd
+   EtA+pJvL2XD/lvR8x76ciQ218wZUTp3/BuSzJ1ctdAy2infGpzHcWF4MT
+   9r1nuRHmRSBmRNT5KlLKnc2kfKvTQb08iUwBB96Yc3lnkrjaO+OYiAaFY
+   Vu0v1cMtyhB/jlSjq7JgTs+NK7owGNXsX6AIXQxd/4xxPEcWE2XLlnKeh
+   rnneleG5/aqcEDpufjVsicJDY5OJrK7+ljYuBTembsMdNmNpxk84S5tIH
+   A==;
+X-CSE-ConnectionGUID: BdaUUjJwQIitxvyaZ/4ogQ==
+X-CSE-MsgGUID: YpVDTIv/RW+7PBnXz/noWQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11096"; a="14417708"
 X-IronPort-AV: E=Sophos;i="6.08,221,1712646000"; 
-   d="scan'208";a="14417705"
+   d="scan'208";a="14417708"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
   by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2024 14:22:44 -0700
-X-CSE-ConnectionGUID: D5fZ73NfSmmrDyqnvQo16Q==
-X-CSE-MsgGUID: aO4CXsUiQiKdjWIlE3r8mQ==
+X-CSE-ConnectionGUID: WzEGhdyIRGiWlPMCemm7IQ==
+X-CSE-MsgGUID: VVi6N4gJSG2BSGSj3koxaw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,221,1712646000"; 
-   d="scan'208";a="38571786"
+   d="scan'208";a="38571790"
 Received: from jekeller-desk.amr.corp.intel.com ([10.166.241.1])
   by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2024 14:22:44 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Fri, 07 Jun 2024 14:22:32 -0700
-Subject: [PATCH v3 1/3] net: intel: Use *-y instead of *-objs in Makefile
+Date: Fri, 07 Jun 2024 14:22:33 -0700
+Subject: [PATCH v3 2/3] ice: add and use roundup_u64 instead of open coding
+ equivalent
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,194 +70,109 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240607-next-2024-06-03-intel-next-batch-v3-1-d1470cee3347@intel.com>
+Message-Id: <20240607-next-2024-06-03-intel-next-batch-v3-2-d1470cee3347@intel.com>
 References: <20240607-next-2024-06-03-intel-next-batch-v3-0-d1470cee3347@intel.com>
 In-Reply-To: <20240607-next-2024-06-03-intel-next-batch-v3-0-d1470cee3347@intel.com>
 To: Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>, 
  netdev <netdev@vger.kernel.org>
 Cc: Jacob Keller <jacob.e.keller@intel.com>, 
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
  Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
 X-Mailer: b4 0.13.0
 
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+In ice_ptp_cfg_clkout(), the ice driver needs to calculate the nearest next
+second of a current time value specified in nanoseconds. It implements this
+using div64_u64, because the time value is a u64. It could use div_u64
+since NSEC_PER_SEC is smaller than 32-bits.
 
-*-objs suffix is reserved rather for (user-space) host programs while
-usually *-y suffix is used for kernel drivers (although *-objs works
-for that purpose for now).
+Ideally this would be implemented directly with roundup(), but that can't
+work on all platforms due to a division which requires using the specific
+macros and functions due to platform restrictions, and to ensure that the
+most appropriate and fast instructions are used.
 
-Let's correct the old usages of *-objs in Makefiles.
+The kernel doesn't currently provide any 64-bit equivalents for doing
+roundup. Attempting to use roundup() on a 32-bit platform will result in a
+link failure due to not having a direct 64-bit division.
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+The closest equivalent for this is DIV64_U64_ROUND_UP, which does a
+division always rounding up. However, this only computes the division, and
+forces use of the div64_u64 in cases where the divisor is a 32bit value and
+could make use of div_u64.
+
+Introduce DIV_U64_ROUND_UP based on div_u64, and then use it to implement
+roundup_u64 which takes a u64 input value and a u32 rounding value.
+
+The name roundup_u64 matches the naming scheme of div_u64, and future
+patches could implement roundup64_u64 if they need to round by a multiple
+that is greater than 32-bits.
+
+Replace the logic in ice_ptp.c which does this equivalent with the newly
+added roundup_u64.
+
 Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/e1000/Makefile   | 2 +-
- drivers/net/ethernet/intel/e1000e/Makefile  | 7 +++----
- drivers/net/ethernet/intel/i40e/Makefile    | 2 +-
- drivers/net/ethernet/intel/iavf/Makefile    | 5 ++---
- drivers/net/ethernet/intel/igb/Makefile     | 6 +++---
- drivers/net/ethernet/intel/igbvf/Makefile   | 6 +-----
- drivers/net/ethernet/intel/igc/Makefile     | 6 +++---
- drivers/net/ethernet/intel/ixgbe/Makefile   | 8 ++++----
- drivers/net/ethernet/intel/ixgbevf/Makefile | 6 +-----
- drivers/net/ethernet/intel/libeth/Makefile  | 2 +-
- drivers/net/ethernet/intel/libie/Makefile   | 2 +-
- 11 files changed, 21 insertions(+), 31 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ptp.c |  3 +--
+ include/linux/math64.h                   | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/e1000/Makefile b/drivers/net/ethernet/intel/e1000/Makefile
-index 314c52d44b7c..79491dec47e1 100644
---- a/drivers/net/ethernet/intel/e1000/Makefile
-+++ b/drivers/net/ethernet/intel/e1000/Makefile
-@@ -7,4 +7,4 @@
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index adbb9cffe20c..b7ab6fdf710d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -1773,8 +1773,7 @@ static int ice_ptp_cfg_clkout(struct ice_pf *pf, unsigned int chan,
+ 	 * maintaining phase
+ 	 */
+ 	if (start_time < current_time)
+-		start_time = div64_u64(current_time + NSEC_PER_SEC - 1,
+-				       NSEC_PER_SEC) * NSEC_PER_SEC + phase;
++		start_time = roundup_u64(current_time, NSEC_PER_SEC) + phase;
  
- obj-$(CONFIG_E1000) += e1000.o
+ 	if (ice_is_e810(hw))
+ 		start_time -= E810_OUT_PROP_DELAY_NS;
+diff --git a/include/linux/math64.h b/include/linux/math64.h
+index d34def7f9a8c..6aaccc1626ab 100644
+--- a/include/linux/math64.h
++++ b/include/linux/math64.h
+@@ -297,6 +297,19 @@ u64 mul_u64_u64_div_u64(u64 a, u64 mul, u64 div);
+ #define DIV64_U64_ROUND_UP(ll, d)	\
+ 	({ u64 _tmp = (d); div64_u64((ll) + _tmp - 1, _tmp); })
  
--e1000-objs := e1000_main.o e1000_hw.o e1000_ethtool.o e1000_param.o
-+e1000-y := e1000_main.o e1000_hw.o e1000_ethtool.o e1000_param.o
-diff --git a/drivers/net/ethernet/intel/e1000e/Makefile b/drivers/net/ethernet/intel/e1000e/Makefile
-index 0baa15503c38..18f22b6374d5 100644
---- a/drivers/net/ethernet/intel/e1000e/Makefile
-+++ b/drivers/net/ethernet/intel/e1000e/Makefile
-@@ -10,7 +10,6 @@ subdir-ccflags-y += -I$(src)
- 
- obj-$(CONFIG_E1000E) += e1000e.o
- 
--e1000e-objs := 82571.o ich8lan.o 80003es2lan.o \
--	       mac.o manage.o nvm.o phy.o \
--	       param.o ethtool.o netdev.o ptp.o
--
-+e1000e-y := 82571.o ich8lan.o 80003es2lan.o \
-+	    mac.o manage.o nvm.o phy.o \
-+	    param.o ethtool.o netdev.o ptp.o
-diff --git a/drivers/net/ethernet/intel/i40e/Makefile b/drivers/net/ethernet/intel/i40e/Makefile
-index cad93f323bd5..9faa4339a76c 100644
---- a/drivers/net/ethernet/intel/i40e/Makefile
-+++ b/drivers/net/ethernet/intel/i40e/Makefile
-@@ -10,7 +10,7 @@ subdir-ccflags-y += -I$(src)
- 
- obj-$(CONFIG_I40E) += i40e.o
- 
--i40e-objs := i40e_main.o \
-+i40e-y := i40e_main.o \
- 	i40e_ethtool.o	\
- 	i40e_adminq.o	\
- 	i40e_common.o	\
-diff --git a/drivers/net/ethernet/intel/iavf/Makefile b/drivers/net/ethernet/intel/iavf/Makefile
-index 2d154a4e2fd7..356ac9faa5bf 100644
---- a/drivers/net/ethernet/intel/iavf/Makefile
-+++ b/drivers/net/ethernet/intel/iavf/Makefile
-@@ -11,6 +11,5 @@ subdir-ccflags-y += -I$(src)
- 
- obj-$(CONFIG_IAVF) += iavf.o
- 
--iavf-objs := iavf_main.o iavf_ethtool.o iavf_virtchnl.o iavf_fdir.o \
--	     iavf_adv_rss.o \
--	     iavf_txrx.o iavf_common.o iavf_adminq.o
-+iavf-y := iavf_main.o iavf_ethtool.o iavf_virtchnl.o iavf_fdir.o \
-+	  iavf_adv_rss.o iavf_txrx.o iavf_common.o iavf_adminq.o
-diff --git a/drivers/net/ethernet/intel/igb/Makefile b/drivers/net/ethernet/intel/igb/Makefile
-index 394c1e0656b9..463c0d26b9d4 100644
---- a/drivers/net/ethernet/intel/igb/Makefile
-+++ b/drivers/net/ethernet/intel/igb/Makefile
-@@ -6,6 +6,6 @@
- 
- obj-$(CONFIG_IGB) += igb.o
- 
--igb-objs := igb_main.o igb_ethtool.o e1000_82575.o \
--	    e1000_mac.o e1000_nvm.o e1000_phy.o e1000_mbx.o \
--	    e1000_i210.o igb_ptp.o igb_hwmon.o
-+igb-y := igb_main.o igb_ethtool.o e1000_82575.o \
-+	 e1000_mac.o e1000_nvm.o e1000_phy.o e1000_mbx.o \
-+	 e1000_i210.o igb_ptp.o igb_hwmon.o
-diff --git a/drivers/net/ethernet/intel/igbvf/Makefile b/drivers/net/ethernet/intel/igbvf/Makefile
-index afd3e36eae75..902711d5e691 100644
---- a/drivers/net/ethernet/intel/igbvf/Makefile
-+++ b/drivers/net/ethernet/intel/igbvf/Makefile
-@@ -6,8 +6,4 @@
- 
- obj-$(CONFIG_IGBVF) += igbvf.o
- 
--igbvf-objs := vf.o \
--              mbx.o \
--              ethtool.o \
--              netdev.o
--
-+igbvf-y := vf.o mbx.o ethtool.o netdev.o
-diff --git a/drivers/net/ethernet/intel/igc/Makefile b/drivers/net/ethernet/intel/igc/Makefile
-index ebffd3054285..efc5e7983dad 100644
---- a/drivers/net/ethernet/intel/igc/Makefile
-+++ b/drivers/net/ethernet/intel/igc/Makefile
-@@ -6,7 +6,7 @@
- #
- 
- obj-$(CONFIG_IGC) += igc.o
--igc-$(CONFIG_IGC_LEDS) += igc_leds.o
- 
--igc-objs := igc_main.o igc_mac.o igc_i225.o igc_base.o igc_nvm.o igc_phy.o \
--igc_diag.o igc_ethtool.o igc_ptp.o igc_dump.o igc_tsn.o igc_xdp.o
-+igc-y := igc_main.o igc_mac.o igc_i225.o igc_base.o igc_nvm.o igc_phy.o \
-+	 igc_diag.o igc_ethtool.o igc_ptp.o igc_dump.o igc_tsn.o igc_xdp.o
-+igc-$(CONFIG_IGC_LEDS) += igc_leds.o
-diff --git a/drivers/net/ethernet/intel/ixgbe/Makefile b/drivers/net/ethernet/intel/ixgbe/Makefile
-index 4fb0d9e3f2da..965e5ce1b326 100644
---- a/drivers/net/ethernet/intel/ixgbe/Makefile
-+++ b/drivers/net/ethernet/intel/ixgbe/Makefile
-@@ -6,10 +6,10 @@
- 
- obj-$(CONFIG_IXGBE) += ixgbe.o
- 
--ixgbe-objs := ixgbe_main.o ixgbe_common.o ixgbe_ethtool.o \
--              ixgbe_82599.o ixgbe_82598.o ixgbe_phy.o ixgbe_sriov.o \
--              ixgbe_mbx.o ixgbe_x540.o ixgbe_x550.o ixgbe_lib.o ixgbe_ptp.o \
--              ixgbe_xsk.o
-+ixgbe-y := ixgbe_main.o ixgbe_common.o ixgbe_ethtool.o \
-+           ixgbe_82599.o ixgbe_82598.o ixgbe_phy.o ixgbe_sriov.o \
-+           ixgbe_mbx.o ixgbe_x540.o ixgbe_x550.o ixgbe_lib.o ixgbe_ptp.o \
-+           ixgbe_xsk.o
- 
- ixgbe-$(CONFIG_IXGBE_DCB) +=  ixgbe_dcb.o ixgbe_dcb_82598.o \
-                               ixgbe_dcb_82599.o ixgbe_dcb_nl.o
-diff --git a/drivers/net/ethernet/intel/ixgbevf/Makefile b/drivers/net/ethernet/intel/ixgbevf/Makefile
-index 186a4bb24fde..01d3e892f3fa 100644
---- a/drivers/net/ethernet/intel/ixgbevf/Makefile
-+++ b/drivers/net/ethernet/intel/ixgbevf/Makefile
-@@ -6,9 +6,5 @@
- 
- obj-$(CONFIG_IXGBEVF) += ixgbevf.o
- 
--ixgbevf-objs := vf.o \
--                mbx.o \
--                ethtool.o \
--                ixgbevf_main.o
-+ixgbevf-y := vf.o mbx.o ethtool.o ixgbevf_main.o
- ixgbevf-$(CONFIG_IXGBEVF_IPSEC) += ipsec.o
--
-diff --git a/drivers/net/ethernet/intel/libeth/Makefile b/drivers/net/ethernet/intel/libeth/Makefile
-index cb99203d1dd2..52492b081132 100644
---- a/drivers/net/ethernet/intel/libeth/Makefile
-+++ b/drivers/net/ethernet/intel/libeth/Makefile
-@@ -3,4 +3,4 @@
- 
- obj-$(CONFIG_LIBETH)		+= libeth.o
- 
--libeth-objs			+= rx.o
-+libeth-y			:= rx.o
-diff --git a/drivers/net/ethernet/intel/libie/Makefile b/drivers/net/ethernet/intel/libie/Makefile
-index bf42c5aeeedd..ffd27fab916a 100644
---- a/drivers/net/ethernet/intel/libie/Makefile
-+++ b/drivers/net/ethernet/intel/libie/Makefile
-@@ -3,4 +3,4 @@
- 
- obj-$(CONFIG_LIBIE)	+= libie.o
- 
--libie-objs		+= rx.o
-+libie-y			:= rx.o
++/**
++ * DIV_U64_ROUND_UP - unsigned 64bit divide with 32bit divisor rounded up
++ * @ll: unsigned 64bit dividend
++ * @d: unsigned 32bit divisor
++ *
++ * Divide unsigned 64bit dividend by unsigned 32bit divisor
++ * and round up.
++ *
++ * Return: dividend / divisor rounded up
++ */
++#define DIV_U64_ROUND_UP(ll, d)		\
++	({ u32 _tmp = (d); div_u64((ll) + _tmp - 1, _tmp); })
++
+ /**
+  * DIV64_U64_ROUND_CLOSEST - unsigned 64bit divide with 64bit divisor rounded to nearest integer
+  * @dividend: unsigned 64bit dividend
+@@ -342,4 +355,19 @@ u64 mul_u64_u64_div_u64(u64 a, u64 mul, u64 div);
+ 		div_s64((__x - (__d / 2)), __d);	\
+ }							\
+ )
++
++/**
++ * roundup_u64 - Round up a 64bit value to the next specified 32bit multiple
++ * @x: the value to up
++ * @y: 32bit multiple to round up to
++ *
++ * Rounds @x to the next multiple of @y. For 32bit @x values, see roundup and
++ * the faster round_up() for powers of 2.
++ *
++ * Return: rounded up value.
++ */
++static inline u64 roundup_u64(u64 x, u32 y)
++{
++	return DIV_U64_ROUND_UP(x, y) * y;
++}
+ #endif /* _LINUX_MATH64_H */
 
 -- 
 2.44.0.53.g0f9d4d28b7e6
