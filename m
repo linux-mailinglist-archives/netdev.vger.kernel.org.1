@@ -1,94 +1,134 @@
-Return-Path: <netdev+bounces-101624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E4BB8FFA11
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 04:51:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 238348FFA2C
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 05:26:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DDC21F23E16
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 02:51:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC70A1F24364
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 03:26:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3ACF12B87;
-	Fri,  7 Jun 2024 02:51:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD991643A;
+	Fri,  7 Jun 2024 03:26:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DBDEDDD9
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 02:51:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD9112B73;
+	Fri,  7 Jun 2024 03:26:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717728664; cv=none; b=teJ+icqJuOudfyOenmeBo6FA+izB+6ug81dtDVQJEFR91A7B+Qa7HUCfxmyW8mHBJmTQaZKjA69Ae0oC24BbGa5W10HVvR6PZcDRToDrQhK0JJazZa5Zu5TBOj1TgJV25H2T5972kzZVpEP1DOERLglUTVXszb8fyEoTmj9p2KI=
+	t=1717730787; cv=none; b=SnlDNbOGijQHCjMNfgTsppf/ubh85aTKy2wZqVVhQ9EZpwfqJG9nmRRYgzxlquCFauEv3dzBdOXlq+VgdqHjPvW6hWBHo9N50wOqf+YoLUM5lLc74IWZbTtmDe6QhYZIety3aJ0eP4Yv4w9H4xgsXcfhXx1VqxqpKtPXU9mPSwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717728664; c=relaxed/simple;
-	bh=si+N1wuZ74OQmZXqp5VNrMsebBeEF3HgK7mZflWf8Ro=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=tvztczCo+9F+qlmyEYNSIFn2XOYveq0xrdNJTlnSsKBcbaikjl1w2vPhHFnFRazsXUb1kcmhHstKmMLOzvuO2m0ajIW2oZw5gfcJBffGEmsV4RO+yDCt7lRgFf78f4ANZhEmthkpz2y09FZge8s3UOCcmd9iREoGSrvvChDP998=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3748d50473cso14355425ab.1
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 19:51:03 -0700 (PDT)
+	s=arc-20240116; t=1717730787; c=relaxed/simple;
+	bh=og1W7CQ5dnT/fxo+VgP79WpVi3mZdb507tWx9OolfGo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GW+J5b+tsAwfcjdg+fUjvlzWpcvYWwSnaS10RIN3UHlsE4CU4pldvJc4ZsPezk1VE1wFRTHJreOZ5qkvsCE+pYnqLDkIicWHlCpm4In/Qkmq9OBxj4l016oK1cXyAxFrG7evR+cFewi0ZCKqaSde57IUGgCkpAwVud17q+Pc51Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1f68834bfdfso13070705ad.3;
+        Thu, 06 Jun 2024 20:26:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717728662; x=1718333462;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZoJDbmOuZCo7DgFMWx4zQY5bK5409kRcjvDvOGHuIw8=;
-        b=mgeOm8346XGgqmTYLNUAnF9kMzf2jlZi7XsNHTcD7HUzRwjjQEM7ToWD4z+ItL47Su
-         52ZAxohFbfsC9SgxxDJ9XlumAX3MKvwe8E/Jbnvi3bM3qyS2KMl9Pu6lo6X55ZPMW2sO
-         eqNiuaL5sWjmobSRWbn02AV1pfjRwA7YJGBkdLHG5tglH1dLmUNrERQqDNHLOBd6I6XC
-         lIEgdEJVR255dBaE7gsVdQon5kz6jFlhK0xL461DeOEEigvNMm+S/aSG97s1/0gvnEDQ
-         dex2njzgSPJL2zqGAmXezt8zWUy9FBw9fwLSyxz9lFVtCu18LEyFMUXyFiNttCTjRYlq
-         Ff7w==
-X-Forwarded-Encrypted: i=1; AJvYcCWSeCV9t5g0yOhEgTmquRM0KAQT6ntJqH6sv/ES+JxCuHuOJKN4ZK+pF6Tk+yLZvsp/eDqow6M0stauHF1IeXcjA1PyegL+
-X-Gm-Message-State: AOJu0YyJBuymSbdd/8eyFQckJabS0cxL6gq0AGBnSbOxc9/7UYZa36zc
-	vvHY6pYJukrClgwpLKHBn0fW9CiOodtjcfXYN+8hZU81MVxpMOKMKnP5szQXX9z8KvbRyNeYNbc
-	Am90Muq08wQ0H/ujRsC8hq2XylJmyhgXwo7n3VDdfjuyzyZRL/L0EqCQ=
-X-Google-Smtp-Source: AGHT+IEIUXUjMuT4JzACmagoV0Bo3SJsrvzkbMMX8Ie8P7ZaGp2FbUDMzisZObkuWRNwNUQdRkPEz5ZA6ZM2UMMjTWxNqJzvzG71
+        d=1e100.net; s=20230601; t=1717730785; x=1718335585;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oRHXhwV5J6FLgsfFL2J905n4RcD+iK2n31FrCkpHF6A=;
+        b=nlskBK4kyU+QCtqgI0F2vqhUQvddldDhXR84XmNtxZPNN8RMB4NlS4FZ5rYW+D0Le6
+         xoYGMFSZ1qFSidIxNEDDrg/GyaZHJ5gBfVE7O7VbjcMzctlIDabt13ab39Mob1sKHKDb
+         ySkk/2EYJQImmuGmZPxzAtujCHYxO/BMfhPMSTQbN4YoU2xVUE/sKF7PAbDTFNyQw+AM
+         nwHyRA86IDCDwFV7rbWJ2vtngOvHecIbid/0FMCEl4xCpvnk1YgL+h6Iszhpeeg7Xf3T
+         S8Yy7UT5CRAoaAwFCfz1xAsnjSAy9NwB/W8fKATQrjxZBR5lAkGAcEgDUjx8xQEDA3lr
+         BM7w==
+X-Forwarded-Encrypted: i=1; AJvYcCX8v+Es8ODsJjbg8lsIe/xPN/scSUj+rSdhF/BLGUxFs7tjnPxyOLjVoabFXUIUMiSgfRY0ZqmTnrNb03+2p3hS3f7FptGF9LOViEPDRKItnhpsKuF51ApgH2lAmIdvTf1yVg5LG2NxaHwIQqV3EC6QgVbqGX2THVJQw9NSerj8
+X-Gm-Message-State: AOJu0Ywqdk9MQNj5vxMRy7/oM13IYGaGxWgMSWj+wDJitzi+uk7HiHf2
+	PC0SMsYZsHsvLFrT3kRHQfilW0d8+lZvh+b9ZMQa9yNFBGnvFm+jRHAo2Z8ljUwJk4+lIL83HoV
+	MRphVgxfdo9hJcmJE1yd7Uu8qHXs=
+X-Google-Smtp-Source: AGHT+IEcC+4RIunglw2wr0+8bQvV2bXA9Hu1tE0poFcN42DMBYLae/uLzBgvCm76tx8Dvg1VFSiJojtDZRkQneEAg+8=
+X-Received: by 2002:a17:903:2b0e:b0:1f4:5dc0:5fe8 with SMTP id
+ d9443c01a7336-1f6d02e22efmr16652065ad.15.1717730785287; Thu, 06 Jun 2024
+ 20:26:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d92:b0:374:9abd:2788 with SMTP id
- e9e14a558f8ab-37580242e2bmr1025575ab.0.1717728662718; Thu, 06 Jun 2024
- 19:51:02 -0700 (PDT)
-Date: Thu, 06 Jun 2024 19:51:02 -0700
-In-Reply-To: <00000000000002a89b06146e6ecb@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c31e9f061a43de90@google.com>
-Subject: Re: [syzbot] [kernel?] possible deadlock in __hrtimer_run_queues (2)
-From: syzbot <syzbot+bacb240dbeebb88518ae@syzkaller.appspotmail.com>
-To: boqun.feng@gmail.com, daniel@iogearbox.net, hdanton@sina.com, 
-	jakub@cloudflare.com, john.fastabend@gmail.com, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, penguin-kernel@i-love.sakura.ne.jp, 
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, 
-	torvalds@linux-foundation.org
+References: <20240606142424.129709-1-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20240606142424.129709-1-krzysztof.kozlowski@linaro.org>
+From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
+Date: Fri, 7 Jun 2024 12:26:13 +0900
+Message-ID: <CAMZ6RqKCWzzbd-P7rOMEryd=31pdD_PJJvtQFYcmS+wAf8q+CQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/3] can: hi311x: simplify with spi_get_device_match_data()
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Thomas Kopp <thomas.kopp@microchip.com>, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot suspects this issue was fixed by commit:
+Hi Krzysztof,
 
-commit ff91059932401894e6c86341915615c5eb0eca48
-Author: Jakub Sitnicki <jakub@cloudflare.com>
-Date:   Tue Apr 2 10:46:21 2024 +0000
+On Thu. 6 Jun. 2024 =C3=A0 23:24, Krzysztof Kozlowski
+<krzysztof.kozlowski@linaro.org> wrote:
+> Use spi_get_device_match_data() helper to simplify a bit the driver.
 
-    bpf, sockmap: Prevent lock inversion deadlock in map delete elem
+Thanks for this clean up.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1169a80a980000
-start commit:   61df575632d6 libbpf: Add new sec_def "sk_skb/verdict"
-git tree:       bpf-next
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
-dashboard link: https://syzkaller.appspot.com/bug?extid=bacb240dbeebb88518ae
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1793a2e6180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16c8dac9180000
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>  drivers/net/can/spi/hi311x.c | 7 +------
+>  1 file changed, 1 insertion(+), 6 deletions(-)
+>
+> diff --git a/drivers/net/can/spi/hi311x.c b/drivers/net/can/spi/hi311x.c
+> index e1b8533a602e..5d2c80f05611 100644
+> --- a/drivers/net/can/spi/hi311x.c
+> +++ b/drivers/net/can/spi/hi311x.c
+> @@ -830,7 +830,6 @@ static int hi3110_can_probe(struct spi_device *spi)
+>         struct device *dev =3D &spi->dev;
+>         struct net_device *net;
+>         struct hi3110_priv *priv;
+> -       const void *match;
+>         struct clk *clk;
+>         u32 freq;
+>         int ret;
+> @@ -874,11 +873,7 @@ static int hi3110_can_probe(struct spi_device *spi)
+>                 CAN_CTRLMODE_LISTENONLY |
+>                 CAN_CTRLMODE_BERR_REPORTING;
+>
+> -       match =3D device_get_match_data(dev);
+> -       if (match)
+> -               priv->model =3D (enum hi3110_model)(uintptr_t)match;
+> -       else
+> -               priv->model =3D spi_get_device_id(spi)->driver_data;
+> +       priv->model =3D (enum hi3110_model)spi_get_device_match_data(spi)=
+;
 
-If the result looks correct, please mark the issue as fixed by replying with:
+Here, you are dropping the (uintptr_t) cast. Casting a pointer to an
+enum type can trigger a zealous -Wvoid-pointer-to-enum-cast clang
+warning, and the (uintptr_t) cast is the defacto standard to silence
+such warnings, thus the double (enum hi3110_model)(uintptr_t) cast in
+the initial version.
 
-#syz fix: bpf, sockmap: Prevent lock inversion deadlock in map delete elem
+Refer to this thread for examples:
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+  https://lore.kernel.org/linux-can/20210527084532.1384031-12-mkl@pengutron=
+ix.de/
+
+Unless you are able to add a rationale in the patch description of why
+this cast can now be removed, I suggest you to keep it:
+
+          priv->model =3D (enum
+hi3110_model)(uintptr_t)spi_get_device_match_data(spi);
+
+>         priv->net =3D net;
+>         priv->clk =3D clk;
+
+Yours sincerely,
+Vincent Mailhol
 
