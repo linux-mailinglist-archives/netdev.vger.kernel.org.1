@@ -1,170 +1,267 @@
-Return-Path: <netdev+bounces-101951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3591D900B45
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 19:30:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 542C8900B55
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 19:39:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F0531F23E2B
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 17:30:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD2BE28906F
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 17:39:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C719619B5A3;
-	Fri,  7 Jun 2024 17:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OvQSsdSa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BBCB199EBE;
+	Fri,  7 Jun 2024 17:39:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2063.outbound.protection.outlook.com [40.107.94.63])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D20C19B59A;
-	Fri,  7 Jun 2024 17:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717781413; cv=fail; b=EY/Vi1CFfS5u9kfPrSXyJSzpdludzzt0NuIx2SxzFyMgPLKOIkHoRSPyn105K6d9ofnsPtWJFW8zYHudUsk/9veqUuYI0y4u8/561qZ1xmMpJYTp8RcVsO0DvLG/kWdmU+T2JU4vymkmurHWrp9oXpNf3+5sU2aF+ncld0IwSLg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717781413; c=relaxed/simple;
-	bh=VM1wuIth5tmM9rq9flvNYzJAZGj+31wZWcHVur1ePZo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=r932zSdDGjadMtuqzi9Vixsm0VspjlwIQB7KqPdbeHvkuL3sPjkKUekAi1Dv6ksYZwemQqSCoi8gEM6st8G5lh5uNiaFWya9fSMKSyquSGX5WjQwSxkQpA0fM5PrKnnhfi3rYI5vmPwb74vhJ4rZv2/EkuQDmt2qIIo0oK1BjTI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OvQSsdSa; arc=fail smtp.client-ip=40.107.94.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H8FtmifH0VauEzVq3MKvLEnLJUNwAAj6t91kbC4kOC3cgjzE4Tic4UQeywfTt1pZVP03m7vzft/P8cAbj0xhZ1u+P4ePvo7q4h+oi5FOnltWt1K1O9MhtcBZlsaykaar1f5x5UWeGJPlUJedsDZzvQSy0hbnZMUKFtjjmcD1kysfMAKYsP6lT1kS9p18Sm/wAwHTsCRCmFzLGMve7D9owmEm6BUeSysfcHhEAeLZecFTPZwyNR81FuzYY9WlkCPfQMlaFmVs2Cb+Cy8R++3QSNLVazW3wODkFwjaQ4XYHWYNC5RhTlwyvTLNtTwFtwEBlul/MQm49F9q4aCJ9nZSPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iZm/HPK2JorY4UQ4bsoU2FQ6APwsUTbk/4w4AASBPXo=;
- b=Uw0tOO9SK5woBeP9p15X01nH2tzf/XYLoFPPmd99PSBah2fnPDA9F+w/IlZeowZG4Js393zW5peO3Di62wtXN9UGEbNdtRzWyD3zgwqxCIDP+zMgMyMM83Byn49S83FWtmoWwbNaSwS+ewYYsGgTPyy9f2phX8rqqz7Spb9R5Nab9ATrUuRuZXlnzAtzKLdHcIYxUrnznUmGu24XrTfSkbm/jBFo5k+JK4FjXDaXnhkXvjrCzTsjD7NdH5gtep7IGQQBOeCR1JV+BNjM0mIIvKc0gNWax79NKO/faeFtG7I4dvgwG10+ST869aHJw5W8nTKkgdxDNDqjlhseBRms7Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iZm/HPK2JorY4UQ4bsoU2FQ6APwsUTbk/4w4AASBPXo=;
- b=OvQSsdSaL9/SKdGVY9pX4Eliu8qpXM/iEOps8ApSIki60e0TFc2zQaoJo1feyvbEFs2shNj1wtwbj3fYNQAXKc6nZO5iH4qTEQ3V7e/YljUM6OBWG8psSdFtThmDeGYjdF+DDXeC5PfVxCtC/rGt3vnrotG2OI+KPtoS8veO0yBJkH3A0uFExAXZ7+x1ZutWqOXXn9ctoCAkBXllfyZ9FJ9krfrRW4df5+OqQiPnSuKpMVr1vQekCoAVMe1jDzaXBrt6oxi/4T+bySS/ktn8CAZgQ4Yter26TiU4GSDjKdzJZc990u4No19kOOlo+eBrr+3xKI7wvaHcrHUoZd/5dg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by SN7PR12MB7911.namprd12.prod.outlook.com (2603:10b6:806:32a::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.22; Fri, 7 Jun
- 2024 17:30:04 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e%4]) with mapi id 15.20.7633.033; Fri, 7 Jun 2024
- 17:30:04 +0000
-Date: Fri, 7 Jun 2024 14:30:03 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jianbo Liu <jianbol@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH rdma-next 2/3] IB/mlx5: Create UMR QP just before first
- reg_mr occurs
-Message-ID: <20240607173003.GN19897@nvidia.com>
-References: <cover.1717409369.git.leon@kernel.org>
- <55d3c4f8a542fd974d8a4c5816eccfb318a59b38.1717409369.git.leon@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <55d3c4f8a542fd974d8a4c5816eccfb318a59b38.1717409369.git.leon@kernel.org>
-X-ClientProxiedBy: MN2PR10CA0036.namprd10.prod.outlook.com
- (2603:10b6:208:120::49) To DM6PR12MB3849.namprd12.prod.outlook.com
- (2603:10b6:5:1c7::26)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C847933C0;
+	Fri,  7 Jun 2024 17:39:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717781989; cv=none; b=oj+EHSUYA5fXDSfXrgR7SSsERkUBOiba8uHym20LsfV/6hpt1tPuK9aIEKtKxLbUOh6aAU57q4BhHmP/Pn6Bh+dCvk1QzlGdXeQHonkDM4C4NTiVb7oinnBE+wVFoKX9MIJD9DrtawtZqB7lv4p17rR4va5HT5/AIOb2vvjDScc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717781989; c=relaxed/simple;
+	bh=hHCLbeJy1KVlxQTrzoliQz/D6nGwI6Jw1hb6bigjbiA=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nREafgRSWPdNT6W4apa3KZJAKNgEGkFDpcJPrZqjs7ZKJlbMC/FxmMVC9G9Lqk1DsdOT13pgbDWHNsmNQbeVrMh+BUDQglof1GURB/luCZRHmB3/fp5lyULJySb2/EirvMWF+tG7KdeHdSUw9wXdE/5gXDLeBnc73RiYhLAj+Ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VwpHp0RmGz6J9r5;
+	Sat,  8 Jun 2024 01:35:18 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id B05691402CB;
+	Sat,  8 Jun 2024 01:39:42 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 7 Jun
+ 2024 18:39:42 +0100
+Date: Fri, 7 Jun 2024 18:39:41 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Wei Huang <wei.huang2@amd.com>
+CC: <linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <netdev@vger.kernel.org>, <bhelgaas@google.com>,
+	<corbet@lwn.net>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <alex.williamson@redhat.com>,
+	<gospo@broadcom.com>, <michael.chan@broadcom.com>,
+	<ajit.khaparde@broadcom.com>, <somnath.kotur@broadcom.com>,
+	<andrew.gospodarek@broadcom.com>, <manoj.panicker2@amd.com>,
+	<Eric.VanTassell@amd.com>, <vadim.fedorenko@linux.dev>, <horms@kernel.org>,
+	<bagasdotme@gmail.com>
+Subject: Re: [PATCH V2 6/9] PCI/TPH: Retrieve steering tag from ACPI _DSM
+Message-ID: <20240607183941.00005a96@Huawei.com>
+In-Reply-To: <20240531213841.3246055-7-wei.huang2@amd.com>
+References: <20240531213841.3246055-1-wei.huang2@amd.com>
+	<20240531213841.3246055-7-wei.huang2@amd.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|SN7PR12MB7911:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3d9ec9c5-02ed-4f4d-4398-08dc8717779a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|1800799015|376005;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?HogeLhlMj6p+czbLpBCgK474S3hRcD/GL3kQnFScb7a84jwu0rPv+vQyn5FW?=
- =?us-ascii?Q?ZvR9mk+4L5evtdXP/PlGsKbO4pAjVi57avmTSQUX0GrRw5FPUgdASB+T0WUL?=
- =?us-ascii?Q?8ybYnLPzrxGOPkksd1rDEvtY8MWGK3XoTQ8iudmvCXcrOy256/gmSY7ceDpm?=
- =?us-ascii?Q?ZVHh4QGldFc+eRctzRrlWxkCkM0br/10aTUh2cdLGV3wjFyad1nYBiIdl+qs?=
- =?us-ascii?Q?unA93FKAPzirbwMfJJdRJKVhSbt2/FavZBL6BguoxnuKiLue66f3db7rYQxD?=
- =?us-ascii?Q?sRYJ/dtadBikP0oWQDCOO4zQHFS5M94CYUQfioO7JMk6fm2UpVHCtJilxaSu?=
- =?us-ascii?Q?JCn6CWTb+N3THaQUtHxBj4uNZPb078xNP6bNs/ousb46ZA3Wfnb26usv5d3h?=
- =?us-ascii?Q?VHHyDilOx9xYXghYLcJBdDs67OoRl9EXE/ycikt/GItdYexNGruQA1YEPajN?=
- =?us-ascii?Q?cnSOKCHuiI96EOqOF1BnsKmstxfhmzcA/tCYAWP3cBs32Fibv/wcTmtAEg5+?=
- =?us-ascii?Q?NBSQBLfCuf7WLeUagIUZFQZimrSw85rVJuyH2bmLH9vfopN7gukMXUrYTqHR?=
- =?us-ascii?Q?5zYPb92Bw+gh53cXnpUbZsjorrFm0xagj5Fe0qnNtmAzFTttEmoPLuFEYQkE?=
- =?us-ascii?Q?oeM5NYnsg+5KWUzw5vnPpX9nM3aOWCyq7K7QzHMHtRy6CjEbRVcrsbUosBCo?=
- =?us-ascii?Q?YyuXMOR3l0pNTe9FSU/urpIwRpcOro64ML49XpJtQwmaPtsarKSGhcsbxHFO?=
- =?us-ascii?Q?//cCdo7kgipb3M4bqSg9PNtXSLaA/nVXwssre9fFCMpZdsCIPlESmTRW1xbz?=
- =?us-ascii?Q?U0d1BoUpThW8wZqdmQQKNB0B8Ljmb0tcIj7Z1q4dc3te6n3mynj6to8WiKKb?=
- =?us-ascii?Q?jbg5Vr8hO56IGfj/w6xrvAQJlQh1ruoHK3CwQYicBOb9LxgX0sQxX+p1lPpn?=
- =?us-ascii?Q?VAIJ0sadNmnoxgLra3qmlQdiNLRYMNrECpEGvdPK4IWx4FR2I++5vrI+O6NA?=
- =?us-ascii?Q?7PZJJgrCLxq8CiQsV449w6QLjivV7wz9fIOuDD7wPKJjxxS0ppKLWKZRDhDg?=
- =?us-ascii?Q?UWTdYd8ad7EXCx3/n1M+uMYe8a3hrvuBtmZJqB8+FhwjUjg/tZgkN4h29AJ0?=
- =?us-ascii?Q?Yy0c0/VmIPL7oMzGOVmgeW3a/vcVuuFBdsiKHpRLfQIjRxXqFLSa+3fZjDsj?=
- =?us-ascii?Q?uLM27GL8hRhHIPvrbv3zldXpnaDzwHhAqIZsjsx6T4M5MP42Fu7gICcmRZt1?=
- =?us-ascii?Q?j6pKv1piA0oA/9Rk0DhJIq46zg6jSucG66GjDPREX77qpEA6tuWimb7Si2G4?=
- =?us-ascii?Q?j6ydVP5Wakjd0+L6OtOmvfs9?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?JlL3fA5TIArX9aXsP4CjjZdEJK4htxOe8+IUaLdysivjN1oHzKcw9P12anwv?=
- =?us-ascii?Q?t0wglzhMzjE4Rbbxpq9aNeHIP4Tw2JZ+2WNRT2IVMVnE3P3bZDKrm1cCX0uC?=
- =?us-ascii?Q?qHWUgESSH1J1X02RapV675JEV5+sSjPQwnaaQcI9XnlkYMdew0uCBrpS379T?=
- =?us-ascii?Q?EmM0ZylKpG5/KAivqW7XnqxFAl4dZI2KLp3AXXU6/9+fNOcYRUzL0tvqQIpC?=
- =?us-ascii?Q?9l4AO7rdfn+pqOs9o+9a6EmwtIQqQvZ5M5Hi1hhSGmLR2NzhnHu0lefbLeXO?=
- =?us-ascii?Q?c3Wl/hydg0DxeQH2O/Tbh4sBUja4Qz8udnUL8TFhqGcmgdTe7VfX/PkbC0R+?=
- =?us-ascii?Q?WR6Ew1FxerZIGE95nPPFVUe+is+5zWfaMcZuIMBbgZlaomVYVp1LO/omZw2A?=
- =?us-ascii?Q?OCAP2vxtj4XDACJq97Y3HU+ocgRzZat1ByEfsh4l4zhHX27p+YScYJmCcAgX?=
- =?us-ascii?Q?52RhJT4a0A2X32TyBPy+7LO3GLyweRTGvwTS4fJ2z05QVZrcFqK12d5sPyPN?=
- =?us-ascii?Q?ct1u2eFoOIRGReuB/CuHL1b8N+v5usPVkVXkGedbIRCu0J5Enn1gL7qfLmTk?=
- =?us-ascii?Q?FIBavJxUBdeEpZdaRp/MT8+DEvFbNqfrEzTdsg0oM/I72vxfXdpFzCyMUHVn?=
- =?us-ascii?Q?qqbTlqVNCehI/qDRJIvoN/4dqhGPAlr4n/RufogAlUDIfygqGgiXzvia/kwp?=
- =?us-ascii?Q?xFgjy7M9xyIyAloZ1pg8YCW84Hdi1b6ja70aQqKJ7y8dxIIMJ9V8riYzgzG+?=
- =?us-ascii?Q?dfomarVCtgalfn3u6J9EeLpj5RnqvRwVJzXGpr0FFiBKCRmOcG0zoSss5BrA?=
- =?us-ascii?Q?Vm9bb+eSHSTyTmg5fd4EMMaEusFdnHmj1adNp2Q+RsDdVdx31USbzUwQXRIP?=
- =?us-ascii?Q?iwcoI39SucqhMlXq67Y1JCtxhrY+Jr6TN7Gv4jEEDmdxWCzhaJVtWIO6/50T?=
- =?us-ascii?Q?n8XkIaQBxwkliICxs+O+p2mGLW0jRinTX/TAz31G95C1OV8bL8+zd/VEq4hT?=
- =?us-ascii?Q?fgmZvOKXRWZ/aURoseN6JU9Pjpba0ULif1dwtGqfJomQrdTAShB/mQ2h+5XA?=
- =?us-ascii?Q?fuxfSf0Eo/nMVUaY4SJji5mJ5KGof65z700ssHWZT94jqDR4nJDQ7lDTYbPn?=
- =?us-ascii?Q?2CHLBhh+cuk5iv9sWTCebfdTXaeD55PWqHVDHKVOQ5co0OXTymNOZ4NaxOqd?=
- =?us-ascii?Q?FUbGIPygu+GqklzNZwOP2oJYp+wQkve4zGANVRCFAYiOCqkcpPm3pPYxbXO8?=
- =?us-ascii?Q?k6fpC1HoqqVfOws2INANbsm/sE3Jfdj/6moHBqG/9M1jawlttnfDl5nhRjOu?=
- =?us-ascii?Q?abrLK9vDGm+JnxkfE/1BKG/eqgEok3lIGbwJSpqRZ2XPKAINJhfm7x/Cog39?=
- =?us-ascii?Q?YCDBQXtQOSrA5eWAZPrjNcZbc9PTDtnjdgnIzNAtyenfgOUykmS/tP3sLFkV?=
- =?us-ascii?Q?+W2Jg6af/KbZjnxzOfVoXpTKqcz+bUNnkh0N66ohE4xjkn5eW1aIU/+qLswl?=
- =?us-ascii?Q?ZWy6wJbtOqCLiGOI5in1U0degZpath043/2JRIOvSgTJ7ZwPr1/ItKtpWy2P?=
- =?us-ascii?Q?Dib8vA/o2GC2/52MDLfP/+mi5qFAdywQ5qdHI2Sp?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d9ec9c5-02ed-4f4d-4398-08dc8717779a
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jun 2024 17:30:04.1641
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FVZcebcnxHI7LzHKibqQ2Wn1W4bfeTYlOhSSE/ecJG6EdDWpxb7/RxzfYf6gLMhr
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7911
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Mon, Jun 03, 2024 at 01:26:38PM +0300, Leon Romanovsky wrote:
-> From: Jianbo Liu <jianbol@nvidia.com>
+On Fri, 31 May 2024 16:38:38 -0500
+Wei Huang <wei.huang2@amd.com> wrote:
+
+> According to PCI SIG ECN, calling the _DSM firmware method for a given
+> CPU_UID returns the steering tags for different types of memory
+> (volatile, non-volatile). These tags are supposed to be used in ST
+> table entry for optimal results.
 > 
-> UMR QP is not used in some cases, so move QP and its CQ creations from
-> driver load flow to the time first reg_mr occurs, that is when MR
-> interfaces are first called.
+> Co-developed-by: Eric Van Tassell <Eric.VanTassell@amd.com>
+> Signed-off-by: Eric Van Tassell <Eric.VanTassell@amd.com>
+> Signed-off-by: Wei Huang <wei.huang2@amd.com>
+> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com> 
+> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Took a very quick look at this only due to lack of time..
 
-We use UMR for kernel MRs too, don't we?
+> ---
+>  drivers/pci/pcie/tph.c  | 103 +++++++++++++++++++++++++++++++++++++++-
+>  include/linux/pci-tph.h |  34 +++++++++++++
+>  2 files changed, 136 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/pci/pcie/tph.c b/drivers/pci/pcie/tph.c
+> index 320b99c60365..425935a14b62 100644
+> --- a/drivers/pci/pcie/tph.c
+> +++ b/drivers/pci/pcie/tph.c
+> @@ -158,6 +158,98 @@ static int tph_get_table_location(struct pci_dev *dev, u8 *loc_out)
+>  	return 0;
+>  }
+>  
+> +static u16 tph_extract_tag(enum tph_mem_type mem_type, u8 req_type,
+> +			   union st_info *st_tag)
+> +{
+> +	switch (req_type) {
+> +	case PCI_TPH_REQ_TPH_ONLY: /* 8 bit tags */
+> +		switch (mem_type) {
+> +		case TPH_MEM_TYPE_VM:
+> +			if (st_tag->vm_st_valid)
+> +				return st_tag->vm_st;
+> +			break;
+> +		case TPH_MEM_TYPE_PM:
+> +			if (st_tag->pm_st_valid)
+> +				return st_tag->pm_st;
+> +			break;
+> +		}
+> +		break;
+> +	case PCI_TPH_REQ_EXT_TPH: /* 16 bit tags */
+> +		switch (mem_type) {
+> +		case TPH_MEM_TYPE_VM:
+> +			if (st_tag->vm_xst_valid)
+> +				return st_tag->vm_xst;
+> +			break;
+> +		case TPH_MEM_TYPE_PM:
+> +			if (st_tag->pm_xst_valid)
+> +				return st_tag->pm_xst;
+> +			break;
+> +		}
+> +		break;
+> +	default:
+> +		pr_err("invalid steering tag in ACPI _DSM\n");
+> +		return 0;
+Not an error code?  If so need to explain why 0 is the right thing to
+return.
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +#define MIN_ST_DSM_REV		7
+> +#define ST_DSM_FUNC_INDEX	0xf
+> +static bool invoke_dsm(acpi_handle handle, u32 cpu_uid, u8 ph,
 
-Jason
+give that a pci / tph prefix of some type as it's a very generic
+name so potential future name clashes likely.
+
+> +		       u8 target_type, bool cache_ref_valid,
+> +		       u64 cache_ref, union st_info *st_out)
+> +{
+> +	union acpi_object in_obj, in_buf[3], *out_obj;
+
+I'm out of time for the day, so not checked this. Will look more
+closely in v3.
+
+> +
+> +	in_buf[0].integer.type = ACPI_TYPE_INTEGER;
+> +	in_buf[0].integer.value = 0; /* 0 => processor cache steering tags */
+> +
+> +	in_buf[1].integer.type = ACPI_TYPE_INTEGER;
+> +	in_buf[1].integer.value = cpu_uid;
+> +
+> +	in_buf[2].integer.type = ACPI_TYPE_INTEGER;
+> +	in_buf[2].integer.value = ph & 3;
+> +	in_buf[2].integer.value |= (target_type & 1) << 2;
+> +	in_buf[2].integer.value |= (cache_ref_valid & 1) << 3;
+> +	in_buf[2].integer.value |= (cache_ref << 32);
+> +
+> +	in_obj.type = ACPI_TYPE_PACKAGE;
+> +	in_obj.package.count = ARRAY_SIZE(in_buf);
+> +	in_obj.package.elements = in_buf;
+> +
+> +	out_obj = acpi_evaluate_dsm(handle, &pci_acpi_dsm_guid, MIN_ST_DSM_REV,
+> +				    ST_DSM_FUNC_INDEX, &in_obj);
+> +
+> +	if (!out_obj)
+> +		return false;
+> +
+> +	if (out_obj->type != ACPI_TYPE_BUFFER) {
+> +		pr_err("invalid return type %d from TPH _DSM\n",
+> +		       out_obj->type);
+> +		ACPI_FREE(out_obj);
+> +		return false;
+> +	}
+> +
+> +	st_out->value = *((u64 *)(out_obj->buffer.pointer));
+> +
+> +	ACPI_FREE(out_obj);
+> +
+> +	return true;
+> +}
+> +
+
+>  static bool msix_nr_in_bounds(struct pci_dev *dev, int msix_nr)
+>  {
+>  	u16 tbl_sz;
+> @@ -441,7 +533,16 @@ bool pcie_tph_get_st(struct pci_dev *dev, unsigned int cpu,
+>  		    enum tph_mem_type mem_type, u8 req_type,
+>  		    u16 *tag)
+Add this function in this patch as it's not used before here and all
+the logic is about the _DSM
+Note name needs to change though.
+
+>  {
+> -	*tag = 0;
+> +	union st_info info;
+> +
+> +	if (!invoke_dsm(root_complex_acpi_handle(dev), cpu, 0, 0, false, 0,
+> +			&info)) {
+> +		*tag = 0;
+> +		return false;
+> +	}
+> +
+> +	*tag = tph_extract_tag(mem_type, req_type, &info);
+> +	pr_debug("%s: cpu=%d tag=%d\n", __func__, cpu, *tag);
+>  
+>  	return true;
+>  }
+> diff --git a/include/linux/pci-tph.h b/include/linux/pci-tph.h
+> index 4fbd1e2fd98c..79533c6254c2 100644
+> --- a/include/linux/pci-tph.h
+> +++ b/include/linux/pci-tph.h
+> @@ -14,6 +14,40 @@ enum tph_mem_type {
+>  	TPH_MEM_TYPE_PM		/* persistent memory type */
+>  };
+>  
+> +/*
+> + * The st_info struct defines the steering tag returned by the firmware _DSM
+> + * method defined in PCI SIG ECN. The specification is available at:
+> + * https://members.pcisig.com/wg/PCI-SIG/document/15470.
+> +
+> + * @vm_st_valid:  8 bit tag for volatile memory is valid
+> + * @vm_xst_valid: 16 bit tag for volatile memory is valid
+> + * @vm_ignore:    1 => was and will be ignored, 0 => ph should be supplied
+> + * @vm_st:        8 bit steering tag for volatile mem
+> + * @vm_xst:       16 bit steering tag for volatile mem
+> + * @pm_st_valid:  8 bit tag for persistent memory is valid
+> + * @pm_xst_valid: 16 bit tag for persistent memory is valid
+> + * @pm_ignore:    1 => was and will be ignore, 0 => ph should be supplied
+pm_ph_ignore
+
+> + * @pm_st:        8 bit steering tag for persistent mem
+> + * @pm_xst:       16 bit steering tag for persistent mem
+> + */
+> +union st_info {
+> +	struct {
+> +		u64 vm_st_valid:1,
+> +		vm_xst_valid:1,
+> +		vm_ph_ignore:1,
+> +		rsvd1:5,
+> +		vm_st:8,
+> +		vm_xst:16,
+> +		pm_st_valid:1,
+> +		pm_xst_valid:1,
+> +		pm_ph_ignore:1,
+> +		rsvd2:5,
+> +		pm_st:8,
+> +		pm_xst:16;
+> +	};
+> +	u64 value;
+> +};
+Firstly why in a header? If it did want to be then pci-acpi.h might be reasonable.
+
+> +
+>  #ifdef CONFIG_PCIE_TPH
+>  int pcie_tph_disable(struct pci_dev *dev);
+>  int tph_set_dev_nostmode(struct pci_dev *dev);
+
 
