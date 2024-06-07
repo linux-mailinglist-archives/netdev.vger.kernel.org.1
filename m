@@ -1,201 +1,165 @@
-Return-Path: <netdev+bounces-101657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7D528FFBCD
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 08:03:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 141438FFBE2
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 08:10:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53C8FB23C39
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 06:03:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AC3B1C243DF
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 06:10:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 501CA14F102;
-	Fri,  7 Jun 2024 06:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AA7414F9C9;
+	Fri,  7 Jun 2024 06:10:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R9MzvXSY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD35C18AF4
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 06:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85AD14F13C
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 06:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717740201; cv=none; b=rltndFXuMpNdKe8oY6ehk9PYqacuc3u632aDvBXVjvNcqV0Lh2zvm/JLeLyXu8vLWO22gVmQ+oHJhWrSnX4S8AQEpNBD5dzw9GF0Y7taRSwVCGtuQ60psuS+qHRYdSDh/Ef3BUu8hBdygf+20qFE/IX5IwNIJY3K5IpLeuSsJyo=
+	t=1717740619; cv=none; b=RtVGAh/7Eu/NzpYh+usVlZE0wbXDn0Iou9ORWgMK8mHVQiVn8r7CfDl6ySqgPvtz8usu/3NcvJIBdDzGZRym5GeVRuRWBy0xNo0UmVmHIW3nqNV63Lf3FrVfvSnkmP5XIJIsGyEeuyHGme7CEEVgx84ay7NDKptG5sbkvPoqGig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717740201; c=relaxed/simple;
-	bh=SFJmRzdq7tEFU8yOOe/q0W7DCeJ/QLfi2njszS/hpgc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=U9ZwkQv1kQZ0MrW4sJfDSE1uNtBYILb/CFBxDRZoZqjMKce0kTIwUS/CAJI82Z3NV59T01TA8uz4xreHnuvw4iKug4MeJ3oNraObOFRKonPoAbALtn/SsTH6leHn3Nv0oRsI8mmIbbDX2PtkTiWSmsB7/CF+U3Wie1/+lubtZJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-374ad7fa4bbso18034115ab.2
-        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 23:03:19 -0700 (PDT)
+	s=arc-20240116; t=1717740619; c=relaxed/simple;
+	bh=+yNnUVafWEFHM6Vfhx3c/ikYL4GjYaVR1FLvegx+GN4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iuXWj9fbnM0nlhk9Pw5BtbWs8C/JWRAgPA0AVHadckGUpHzdsZ0S5sOScTgL0i+ZbHz5J3S/8os7QYGnsQfarZJuEvL4CaPLUwUDTmuy4gX0DJqvq8y/F7c6lVZ+tD+50DRTWFbsZZ67cdYEfNBSN1KVQtsowbwflWI9fDfVPHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R9MzvXSY; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-667fd2bf4feso1596572a12.3
+        for <netdev@vger.kernel.org>; Thu, 06 Jun 2024 23:10:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717740617; x=1718345417; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3IaxqkxoUHKrRAhQLcm0mCsfS9ca+q5nOq+ZwxnZnJs=;
+        b=R9MzvXSYGb3XeaVN1xdzz+MCDkgUmbY4+HIIo/RQfvh7ymY3hI+0Z/HXAR/2BppW+U
+         5vI+yoeRoK8jDlaigB87oZHfX38N7xfAM3I94o9yymeRjXPWq+TVF+6q+JB7GRT/VdNw
+         3XXrAZj6aAAJ1KpI3mRgk6PWeNQpA5jw21l9xPXY9cFhhC+0fZvEJYH5K1UYiQfxP193
+         uZZYdQM86gCONXjwMBdSiDOm/HT8z8bcss86ECIulVjcTo40v5Y8ybZCYPc92hxtGZ1T
+         WLE7y4aNRcVi3wasyo9VcGrgIXEGTLWtvrA9mps+tOMSeWAMJeemcgu3UlbI/fkRn221
+         eJrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717740199; x=1718344999;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vwDqcFGW6wzuDnM1PhkLbZaSGzwhVM71SbuWVC05qkA=;
-        b=XpvaM4SIfmA+Yo5M7JZ3BuTtjVq7GYeDjZKObZfHVttk6lj0Jd+SFAW8TzHQMxU5jr
-         XwwSFqM3eGDKdu2KjHyYDySCoQ38V+q5MOlHyv2/apCCdbLmdq4Jgy/OnUDvKN2JcXGe
-         cK67ujczF7U7UHB0CW5QkCe4DRyjuWjAYVbQXKR74V+twKJYZfR0/GeMEeKft9FcSR7S
-         h8uADHU+7Yyf+Yqy9UV7wzfdZ0eZMaM1XpLRIXjYAmPRyJDk9A12ae6IrAmEcpKFVnst
-         TGY8/oAq+LzuuEU28yqDBaNlhE5QxZbWn7J+kLRfDqOeHsaReLViaC9Te6fNaVLOCcSY
-         xaPw==
-X-Forwarded-Encrypted: i=1; AJvYcCVJQP/n+tZpPywJFdKDbc/gLeBb8PnpQqf1AKhfX12unIXdpHVw6UiKdOD07T96SRXhlqCikW+ghBbq95QB6eRXJG0COrN/
-X-Gm-Message-State: AOJu0Yx7/0Wu8jpWGJ48qj7WdBz8Z1eqIA5usl8eDIRzMPrk7ljGdTL1
-	ygchHFjp+rd5N6JsD69KhrPq6c0NDZaG1M0YmF2OVdcyBMu+a2Ajj7kzrGypBozvYZjPt8++P0G
-	ZnNOsIFD0vHu/874fkMwNQoee9JI2yhggqM7FuCgAAMWtQQf85grlguI=
-X-Google-Smtp-Source: AGHT+IEOtIL4LLp1zVxVdE2Vtemw3M/sNeD+OGVocWHXXbciZMuWddAfnaoUTsA31kNct1LoMlZnj7ao3VWqC73FFjZ/WMCz/i0L
+        d=1e100.net; s=20230601; t=1717740617; x=1718345417;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3IaxqkxoUHKrRAhQLcm0mCsfS9ca+q5nOq+ZwxnZnJs=;
+        b=nA158lfKxwKF2Md5SlFNGCu9S9UC4wQY4O5+fRGn5PZ7Nqk/0fojgZ8S8fLmB4OLA5
+         VbtkCOSQPMg5SBpLefqJeZ8D9FkKsmxPXNIv5fqd9679gs/3NVyFzx2D6OryenGF9Xtn
+         DSqqalxiJxvxRgdCeXHmomTNR7N8Oq+rceaCTSJPLqCpCRklWT5/aQKVNB5eyO+WfCSj
+         TpTBVdzB9bnjcCCjren7Uwpy8kmNnCWabc0nlB2Xo9VJe+UKMtjaC0aFZnQ3enCsoSql
+         Ut8a0v3gMfvqMRs4u0Ixlx8LztNiD8MHiyN7Moq0NLZz3OYZGXlUxd7Jdr7PZGFdcE/H
+         BO8Q==
+X-Gm-Message-State: AOJu0Yw9mrDWxFXSU2/BJ8uPeYezhtrGT3HcDVRmeWy6a3/1bMyNxBtm
+	k1VBWa3XUrssRivYJXVz9C/xhuBWvisKv4DqpMYBD/aJz4w7MV6VP8zFd0q3m9OeSvjsPwS0AoD
+	pssvC65CTbQRNKyVNzrgrIKls/uuvMGN2/iZbV3oUzsHjHCPSFAU56jzYAWLQcfcVyEw/ZOgv7x
+	VuYxYV15BfLxTMTwJOHMjkTc7NYhu62B1l9BVvFr6Zi5Y=
+X-Google-Smtp-Source: AGHT+IF0A60X0eGYChsWehMsLUt65JdkRv2Yk1dsUtkseIs2rFVb0B3papVQSfoUqB4VpiwZFIWs5WPQpoeOtg==
+X-Received: from joshwash.sea.corp.google.com ([2620:15c:11c:202:a3cf:7d53:6a60:be07])
+ (user=joshwash job=sendgmr) by 2002:a17:902:d488:b0:1f6:13fd:2473 with SMTP
+ id d9443c01a7336-1f6d02fc466mr1480655ad.10.1717740616671; Thu, 06 Jun 2024
+ 23:10:16 -0700 (PDT)
+Date: Thu,  6 Jun 2024 23:09:47 -0700
+In-Reply-To: <20240606192139.1872461-1-joshwash@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1aae:b0:374:a840:e5cf with SMTP id
- e9e14a558f8ab-37580234159mr1018295ab.0.1717740198792; Thu, 06 Jun 2024
- 23:03:18 -0700 (PDT)
-Date: Thu, 06 Jun 2024 23:03:18 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005d9e59061a468ed3@google.com>
-Subject: [syzbot] [net?] INFO: task hung in __tun_chr_ioctl (6)
-From: syzbot <syzbot+26c7b4c3afe5450b3e15@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, jasowang@redhat.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	willemdebruijn.kernel@gmail.com
+Mime-Version: 1.0
+References: <20240606192139.1872461-1-joshwash@google.com>
+X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
+Message-ID: <20240607060958.2789886-1-joshwash@google.com>
+Subject: [PATCH net v2] gve: ignore nonrelevant GSO type bits when processing
+ TSO headers
+From: joshwash@google.com
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, stable@kernel.org, 
+	Joshua Washington <joshwash@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Eric Dumazet <edumazet@google.com>, Andrei Vagin <avagin@gmail.com>, 
+	Jeroen de Borst <jeroendb@google.com>, Shailend Chand <shailend@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Rushil Gupta <rushilg@google.com>, Bailey Forrest <bcf@google.com>, 
+	Catherine Sullivan <csully@google.com>, open list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+From: Joshua Washington <joshwash@google.com>
 
-syzbot found the following issue on:
+TSO currently fails when the skb's gso_type field has more than one bit
+set.
 
-HEAD commit:    71d7b52cc33b Merge tag 'for-linus' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1259b316980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=399230c250e8119c
-dashboard link: https://syzkaller.appspot.com/bug?extid=26c7b4c3afe5450b3e15
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+TSO packets can be passed from userspace using PF_PACKET, TUNTAP and a
+few others, using virtio_net_hdr (e.g., PACKET_VNET_HDR). This includes
+virtualization, such as QEMU, a real use-case.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+The gso_type and gso_size fields as passed from userspace in
+virtio_net_hdr are not trusted blindly by the kernel. It adds gso_type
+|= SKB_GSO_DODGY to force the packet to enter the software GSO stack
+for verification.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/910b86eac08b/disk-71d7b52c.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a5a6ad2a9a6c/vmlinux-71d7b52c.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ad7485d12317/bzImage-71d7b52c.xz
+This issue might similarly come up when the CWR bit is set in the TCP
+header for congestion control, causing the SKB_GSO_TCP_ECN gso_type bit
+to be set.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+26c7b4c3afe5450b3e15@syzkaller.appspotmail.com
-
-INFO: task syz-executor.3:5788 blocked for more than 143 seconds.
-      Not tainted 6.10.0-rc2-syzkaller-00064-g71d7b52cc33b #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.3  state:D stack:28496 pid:5788  tgid:5786  ppid:5116   flags:0x00000006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0xf15/0x5d00 kernel/sched/core.c:6745
- __schedule_loop kernel/sched/core.c:6822 [inline]
- schedule+0xe7/0x350 kernel/sched/core.c:6837
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x5b8/0x9c0 kernel/locking/mutex.c:752
- __tun_chr_ioctl+0x4fc/0x4770 drivers/net/tun.c:3110
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl fs/ioctl.c:893 [inline]
- __x64_sys_ioctl+0x193/0x220 fs/ioctl.c:893
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f632567cf69
-RSP: 002b:00007f63263a70c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f63257b3f80 RCX: 00007f632567cf69
-RDX: 00000000200000c0 RSI: 00000000400454ca RDI: 0000000000000003
-RBP: 00007f63256da6fe R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f63257b3f80 R15: 00007ffc7df747b8
- </TASK>
-INFO: task syz-executor.3:5790 blocked for more than 143 seconds.
-      Not tainted 6.10.0-rc2-syzkaller-00064-g71d7b52cc33b #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.3  state:D stack:28480 pid:5790  tgid:5786  ppid:5116   flags:0x00004006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0xf15/0x5d00 kernel/sched/core.c:6745
- __schedule_loop kernel/sched/core.c:6822 [inline]
- schedule+0xe7/0x350 kernel/sched/core.c:6837
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x5b8/0x9c0 kernel/locking/mutex.c:752
- devinet_ioctl+0x26e/0x1f10 net/ipv4/devinet.c:1101
- inet_ioctl+0x3aa/0x3f0 net/ipv4/af_inet.c:1003
- packet_ioctl+0xb3/0x280 net/packet/af_packet.c:4256
- sock_do_ioctl+0x116/0x280 net/socket.c:1222
- sock_ioctl+0x22e/0x6c0 net/socket.c:1341
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl fs/ioctl.c:893 [inline]
- __x64_sys_ioctl+0x193/0x220 fs/ioctl.c:893
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f632567cf69
-RSP: 002b:00007f63263860c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f63257b4050 RCX: 00007f632567cf69
-RDX: 0000000020000180 RSI: 0000000000008914 RDI: 0000000000000004
-RBP: 00007f63256da6fe R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000006e R14: 00007f63257b4050 R15: 00007ffc7df747b8
- </TASK>
-INFO: task syz-executor.0:5798 blocked for more than 144 seconds.
-      Not tainted 6.10.0-rc2-syzkaller-00064-g71d7b52cc33b #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.0  state:D stack:27280 pid:5798  tgid:5796  ppid:5258   flags:0x00000006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5408 [inline]
- __schedule+0xf15/0x5d00 kernel/sched/core.c:6745
- __schedule_loop kernel/sched/core.c:6822 [inline]
- schedule+0xe7/0x350 kernel/sched/core.c:6837
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6894
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x5b8/0x9c0 kernel/locking/mutex.c:752
- nl80211_pre_doit+0xb4/0xb10 net/wireless/nl80211.c:16405
- genl_family_rcv_msg_doit+0x1be/0x2f0 net/netlink/genetlink.c:1110
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x565/0x800 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2564
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
- netlink_unicast+0x542/0x820 net/netlink/af_netlink.c:1361
- netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1905
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0xab5/0xc90 net/socket.c:2585
- ___sys_sendmsg+0x135/0x1e0 net/socket.c:2639
-
-
+Fixes: a57e5de476be ("gve: DQO: Add TX path")
+Signed-off-by: Joshua Washington <joshwash@google.com>
+Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
+Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Acked-by: Andrei Vagin <avagin@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c | 21 +++++---------------
+ 1 file changed, 5 insertions(+), 16 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+index fe1b26a4d736..a76b407a981b 100644
+--- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+@@ -551,32 +551,21 @@ static int gve_prep_tso(struct sk_buff *skb)
+ 	 * - Hypervisor enforces a limit of 9K MTU
+ 	 * - Kernel will not produce a TSO larger than 64k
+ 	 */
+-
+ 	if (unlikely(skb_shinfo(skb)->gso_size < GVE_TX_MIN_TSO_MSS_DQO))
+ 		return -1;
+ 
++	if (!(skb_shinfo(skb)->gso_type & (SKB_GSO_TCPV4 | SKB_GSO_TCPV6)))
++		return -EINVAL;
++
+ 	/* Needed because we will modify header. */
+ 	err = skb_cow_head(skb, 0);
+ 	if (err < 0)
+ 		return err;
+ 
+ 	tcp = tcp_hdr(skb);
+-
+-	/* Remove payload length from checksum. */
+ 	paylen = skb->len - skb_transport_offset(skb);
+-
+-	switch (skb_shinfo(skb)->gso_type) {
+-	case SKB_GSO_TCPV4:
+-	case SKB_GSO_TCPV6:
+-		csum_replace_by_diff(&tcp->check,
+-				     (__force __wsum)htonl(paylen));
+-
+-		/* Compute length of segmentation header. */
+-		header_len = skb_tcp_all_headers(skb);
+-		break;
+-	default:
+-		return -EINVAL;
+-	}
++	csum_replace_by_diff(&tcp->check, (__force __wsum)htonl(paylen));
++	header_len = skb_tcp_all_headers(skb);
+ 
+ 	if (unlikely(header_len > GVE_TX_MAX_HDR_SIZE_DQO))
+ 		return -EINVAL;
+-- 
+2.45.2.505.gda0bf45e8d-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
