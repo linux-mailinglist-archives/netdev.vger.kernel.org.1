@@ -1,553 +1,170 @@
-Return-Path: <netdev+bounces-101950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A583F900B3F
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 19:29:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3591D900B45
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 19:30:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 438B3288369
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 17:29:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F0531F23E2B
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 17:30:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9394F19AD84;
-	Fri,  7 Jun 2024 17:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C719619B5A3;
+	Fri,  7 Jun 2024 17:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OvQSsdSa"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2063.outbound.protection.outlook.com [40.107.94.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06DDD15ACB;
-	Fri,  7 Jun 2024 17:29:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717781378; cv=none; b=U+4BnQmoXc4z3kY7R4bFh9Q0Nwwetq6ktOy1ElVFCbaBCbEp5H/np+0YZ4egMXB7bnNO2su22uvqoEAKwJdScMANY+vDLRwTerl1T0AcGIPZ6Kvxl/g6CcHWRINXye7bnvFV9nHpr4ou66Ai9R/rTB7y4xEcv5DgGl0VNoBEfzM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717781378; c=relaxed/simple;
-	bh=b7LvUnYdln3xPJ+gz3I73XCAq+I5Eq6pfoEuPF+Ty1c=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e12LKIKvw20v5wNu+VpNIpw0QxN6fvQ9q/GRMS0ooP8T/Cs1eWkJODv9QH+t887/uTra9+x777TzxL2uZyB8DqxHcHO5SduSG9JgqvUSX1cr1tn9Its2sVScphBGtYjCjxXpYma7nOCpGIrdB2lGYCBN7MJUo2Fnl7AkhRxkdbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Vwp43239Hz6JB9C;
-	Sat,  8 Jun 2024 01:25:07 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id DFD4F140CB1;
-	Sat,  8 Jun 2024 01:29:31 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 7 Jun
- 2024 18:29:31 +0100
-Date: Fri, 7 Jun 2024 18:29:30 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Wei Huang <wei.huang2@amd.com>
-CC: <linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <netdev@vger.kernel.org>, <bhelgaas@google.com>,
-	<corbet@lwn.net>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <alex.williamson@redhat.com>,
-	<gospo@broadcom.com>, <michael.chan@broadcom.com>,
-	<ajit.khaparde@broadcom.com>, <somnath.kotur@broadcom.com>,
-	<andrew.gospodarek@broadcom.com>, <manoj.panicker2@amd.com>,
-	<Eric.VanTassell@amd.com>, <vadim.fedorenko@linux.dev>, <horms@kernel.org>,
-	<bagasdotme@gmail.com>
-Subject: Re: [PATCH V2 5/9] PCI/TPH: Introduce API functions to manage
- steering tags
-Message-ID: <20240607182930.000045d9@Huawei.com>
-In-Reply-To: <20240531213841.3246055-6-wei.huang2@amd.com>
-References: <20240531213841.3246055-1-wei.huang2@amd.com>
-	<20240531213841.3246055-6-wei.huang2@amd.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D20C19B59A;
+	Fri,  7 Jun 2024 17:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.63
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717781413; cv=fail; b=EY/Vi1CFfS5u9kfPrSXyJSzpdludzzt0NuIx2SxzFyMgPLKOIkHoRSPyn105K6d9ofnsPtWJFW8zYHudUsk/9veqUuYI0y4u8/561qZ1xmMpJYTp8RcVsO0DvLG/kWdmU+T2JU4vymkmurHWrp9oXpNf3+5sU2aF+ncld0IwSLg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717781413; c=relaxed/simple;
+	bh=VM1wuIth5tmM9rq9flvNYzJAZGj+31wZWcHVur1ePZo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=r932zSdDGjadMtuqzi9Vixsm0VspjlwIQB7KqPdbeHvkuL3sPjkKUekAi1Dv6ksYZwemQqSCoi8gEM6st8G5lh5uNiaFWya9fSMKSyquSGX5WjQwSxkQpA0fM5PrKnnhfi3rYI5vmPwb74vhJ4rZv2/EkuQDmt2qIIo0oK1BjTI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OvQSsdSa; arc=fail smtp.client-ip=40.107.94.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=H8FtmifH0VauEzVq3MKvLEnLJUNwAAj6t91kbC4kOC3cgjzE4Tic4UQeywfTt1pZVP03m7vzft/P8cAbj0xhZ1u+P4ePvo7q4h+oi5FOnltWt1K1O9MhtcBZlsaykaar1f5x5UWeGJPlUJedsDZzvQSy0hbnZMUKFtjjmcD1kysfMAKYsP6lT1kS9p18Sm/wAwHTsCRCmFzLGMve7D9owmEm6BUeSysfcHhEAeLZecFTPZwyNR81FuzYY9WlkCPfQMlaFmVs2Cb+Cy8R++3QSNLVazW3wODkFwjaQ4XYHWYNC5RhTlwyvTLNtTwFtwEBlul/MQm49F9q4aCJ9nZSPQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iZm/HPK2JorY4UQ4bsoU2FQ6APwsUTbk/4w4AASBPXo=;
+ b=Uw0tOO9SK5woBeP9p15X01nH2tzf/XYLoFPPmd99PSBah2fnPDA9F+w/IlZeowZG4Js393zW5peO3Di62wtXN9UGEbNdtRzWyD3zgwqxCIDP+zMgMyMM83Byn49S83FWtmoWwbNaSwS+ewYYsGgTPyy9f2phX8rqqz7Spb9R5Nab9ATrUuRuZXlnzAtzKLdHcIYxUrnznUmGu24XrTfSkbm/jBFo5k+JK4FjXDaXnhkXvjrCzTsjD7NdH5gtep7IGQQBOeCR1JV+BNjM0mIIvKc0gNWax79NKO/faeFtG7I4dvgwG10+ST869aHJw5W8nTKkgdxDNDqjlhseBRms7Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iZm/HPK2JorY4UQ4bsoU2FQ6APwsUTbk/4w4AASBPXo=;
+ b=OvQSsdSaL9/SKdGVY9pX4Eliu8qpXM/iEOps8ApSIki60e0TFc2zQaoJo1feyvbEFs2shNj1wtwbj3fYNQAXKc6nZO5iH4qTEQ3V7e/YljUM6OBWG8psSdFtThmDeGYjdF+DDXeC5PfVxCtC/rGt3vnrotG2OI+KPtoS8veO0yBJkH3A0uFExAXZ7+x1ZutWqOXXn9ctoCAkBXllfyZ9FJ9krfrRW4df5+OqQiPnSuKpMVr1vQekCoAVMe1jDzaXBrt6oxi/4T+bySS/ktn8CAZgQ4Yter26TiU4GSDjKdzJZc990u4No19kOOlo+eBrr+3xKI7wvaHcrHUoZd/5dg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
+ by SN7PR12MB7911.namprd12.prod.outlook.com (2603:10b6:806:32a::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.22; Fri, 7 Jun
+ 2024 17:30:04 +0000
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::c296:774b:a5fc:965e%4]) with mapi id 15.20.7633.033; Fri, 7 Jun 2024
+ 17:30:04 +0000
+Date: Fri, 7 Jun 2024 14:30:03 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jianbo Liu <jianbol@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH rdma-next 2/3] IB/mlx5: Create UMR QP just before first
+ reg_mr occurs
+Message-ID: <20240607173003.GN19897@nvidia.com>
+References: <cover.1717409369.git.leon@kernel.org>
+ <55d3c4f8a542fd974d8a4c5816eccfb318a59b38.1717409369.git.leon@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <55d3c4f8a542fd974d8a4c5816eccfb318a59b38.1717409369.git.leon@kernel.org>
+X-ClientProxiedBy: MN2PR10CA0036.namprd10.prod.outlook.com
+ (2603:10b6:208:120::49) To DM6PR12MB3849.namprd12.prod.outlook.com
+ (2603:10b6:5:1c7::26)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|SN7PR12MB7911:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3d9ec9c5-02ed-4f4d-4398-08dc8717779a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|1800799015|376005;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?HogeLhlMj6p+czbLpBCgK474S3hRcD/GL3kQnFScb7a84jwu0rPv+vQyn5FW?=
+ =?us-ascii?Q?ZvR9mk+4L5evtdXP/PlGsKbO4pAjVi57avmTSQUX0GrRw5FPUgdASB+T0WUL?=
+ =?us-ascii?Q?8ybYnLPzrxGOPkksd1rDEvtY8MWGK3XoTQ8iudmvCXcrOy256/gmSY7ceDpm?=
+ =?us-ascii?Q?ZVHh4QGldFc+eRctzRrlWxkCkM0br/10aTUh2cdLGV3wjFyad1nYBiIdl+qs?=
+ =?us-ascii?Q?unA93FKAPzirbwMfJJdRJKVhSbt2/FavZBL6BguoxnuKiLue66f3db7rYQxD?=
+ =?us-ascii?Q?sRYJ/dtadBikP0oWQDCOO4zQHFS5M94CYUQfioO7JMk6fm2UpVHCtJilxaSu?=
+ =?us-ascii?Q?JCn6CWTb+N3THaQUtHxBj4uNZPb078xNP6bNs/ousb46ZA3Wfnb26usv5d3h?=
+ =?us-ascii?Q?VHHyDilOx9xYXghYLcJBdDs67OoRl9EXE/ycikt/GItdYexNGruQA1YEPajN?=
+ =?us-ascii?Q?cnSOKCHuiI96EOqOF1BnsKmstxfhmzcA/tCYAWP3cBs32Fibv/wcTmtAEg5+?=
+ =?us-ascii?Q?NBSQBLfCuf7WLeUagIUZFQZimrSw85rVJuyH2bmLH9vfopN7gukMXUrYTqHR?=
+ =?us-ascii?Q?5zYPb92Bw+gh53cXnpUbZsjorrFm0xagj5Fe0qnNtmAzFTttEmoPLuFEYQkE?=
+ =?us-ascii?Q?oeM5NYnsg+5KWUzw5vnPpX9nM3aOWCyq7K7QzHMHtRy6CjEbRVcrsbUosBCo?=
+ =?us-ascii?Q?YyuXMOR3l0pNTe9FSU/urpIwRpcOro64ML49XpJtQwmaPtsarKSGhcsbxHFO?=
+ =?us-ascii?Q?//cCdo7kgipb3M4bqSg9PNtXSLaA/nVXwssre9fFCMpZdsCIPlESmTRW1xbz?=
+ =?us-ascii?Q?U0d1BoUpThW8wZqdmQQKNB0B8Ljmb0tcIj7Z1q4dc3te6n3mynj6to8WiKKb?=
+ =?us-ascii?Q?jbg5Vr8hO56IGfj/w6xrvAQJlQh1ruoHK3CwQYicBOb9LxgX0sQxX+p1lPpn?=
+ =?us-ascii?Q?VAIJ0sadNmnoxgLra3qmlQdiNLRYMNrECpEGvdPK4IWx4FR2I++5vrI+O6NA?=
+ =?us-ascii?Q?7PZJJgrCLxq8CiQsV449w6QLjivV7wz9fIOuDD7wPKJjxxS0ppKLWKZRDhDg?=
+ =?us-ascii?Q?UWTdYd8ad7EXCx3/n1M+uMYe8a3hrvuBtmZJqB8+FhwjUjg/tZgkN4h29AJ0?=
+ =?us-ascii?Q?Yy0c0/VmIPL7oMzGOVmgeW3a/vcVuuFBdsiKHpRLfQIjRxXqFLSa+3fZjDsj?=
+ =?us-ascii?Q?uLM27GL8hRhHIPvrbv3zldXpnaDzwHhAqIZsjsx6T4M5MP42Fu7gICcmRZt1?=
+ =?us-ascii?Q?j6pKv1piA0oA/9Rk0DhJIq46zg6jSucG66GjDPREX77qpEA6tuWimb7Si2G4?=
+ =?us-ascii?Q?j6ydVP5Wakjd0+L6OtOmvfs9?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?JlL3fA5TIArX9aXsP4CjjZdEJK4htxOe8+IUaLdysivjN1oHzKcw9P12anwv?=
+ =?us-ascii?Q?t0wglzhMzjE4Rbbxpq9aNeHIP4Tw2JZ+2WNRT2IVMVnE3P3bZDKrm1cCX0uC?=
+ =?us-ascii?Q?qHWUgESSH1J1X02RapV675JEV5+sSjPQwnaaQcI9XnlkYMdew0uCBrpS379T?=
+ =?us-ascii?Q?EmM0ZylKpG5/KAivqW7XnqxFAl4dZI2KLp3AXXU6/9+fNOcYRUzL0tvqQIpC?=
+ =?us-ascii?Q?9l4AO7rdfn+pqOs9o+9a6EmwtIQqQvZ5M5Hi1hhSGmLR2NzhnHu0lefbLeXO?=
+ =?us-ascii?Q?c3Wl/hydg0DxeQH2O/Tbh4sBUja4Qz8udnUL8TFhqGcmgdTe7VfX/PkbC0R+?=
+ =?us-ascii?Q?WR6Ew1FxerZIGE95nPPFVUe+is+5zWfaMcZuIMBbgZlaomVYVp1LO/omZw2A?=
+ =?us-ascii?Q?OCAP2vxtj4XDACJq97Y3HU+ocgRzZat1ByEfsh4l4zhHX27p+YScYJmCcAgX?=
+ =?us-ascii?Q?52RhJT4a0A2X32TyBPy+7LO3GLyweRTGvwTS4fJ2z05QVZrcFqK12d5sPyPN?=
+ =?us-ascii?Q?ct1u2eFoOIRGReuB/CuHL1b8N+v5usPVkVXkGedbIRCu0J5Enn1gL7qfLmTk?=
+ =?us-ascii?Q?FIBavJxUBdeEpZdaRp/MT8+DEvFbNqfrEzTdsg0oM/I72vxfXdpFzCyMUHVn?=
+ =?us-ascii?Q?qqbTlqVNCehI/qDRJIvoN/4dqhGPAlr4n/RufogAlUDIfygqGgiXzvia/kwp?=
+ =?us-ascii?Q?xFgjy7M9xyIyAloZ1pg8YCW84Hdi1b6ja70aQqKJ7y8dxIIMJ9V8riYzgzG+?=
+ =?us-ascii?Q?dfomarVCtgalfn3u6J9EeLpj5RnqvRwVJzXGpr0FFiBKCRmOcG0zoSss5BrA?=
+ =?us-ascii?Q?Vm9bb+eSHSTyTmg5fd4EMMaEusFdnHmj1adNp2Q+RsDdVdx31USbzUwQXRIP?=
+ =?us-ascii?Q?iwcoI39SucqhMlXq67Y1JCtxhrY+Jr6TN7Gv4jEEDmdxWCzhaJVtWIO6/50T?=
+ =?us-ascii?Q?n8XkIaQBxwkliICxs+O+p2mGLW0jRinTX/TAz31G95C1OV8bL8+zd/VEq4hT?=
+ =?us-ascii?Q?fgmZvOKXRWZ/aURoseN6JU9Pjpba0ULif1dwtGqfJomQrdTAShB/mQ2h+5XA?=
+ =?us-ascii?Q?fuxfSf0Eo/nMVUaY4SJji5mJ5KGof65z700ssHWZT94jqDR4nJDQ7lDTYbPn?=
+ =?us-ascii?Q?2CHLBhh+cuk5iv9sWTCebfdTXaeD55PWqHVDHKVOQ5co0OXTymNOZ4NaxOqd?=
+ =?us-ascii?Q?FUbGIPygu+GqklzNZwOP2oJYp+wQkve4zGANVRCFAYiOCqkcpPm3pPYxbXO8?=
+ =?us-ascii?Q?k6fpC1HoqqVfOws2INANbsm/sE3Jfdj/6moHBqG/9M1jawlttnfDl5nhRjOu?=
+ =?us-ascii?Q?abrLK9vDGm+JnxkfE/1BKG/eqgEok3lIGbwJSpqRZ2XPKAINJhfm7x/Cog39?=
+ =?us-ascii?Q?YCDBQXtQOSrA5eWAZPrjNcZbc9PTDtnjdgnIzNAtyenfgOUykmS/tP3sLFkV?=
+ =?us-ascii?Q?+W2Jg6af/KbZjnxzOfVoXpTKqcz+bUNnkh0N66ohE4xjkn5eW1aIU/+qLswl?=
+ =?us-ascii?Q?ZWy6wJbtOqCLiGOI5in1U0degZpath043/2JRIOvSgTJ7ZwPr1/ItKtpWy2P?=
+ =?us-ascii?Q?Dib8vA/o2GC2/52MDLfP/+mi5qFAdywQ5qdHI2Sp?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3d9ec9c5-02ed-4f4d-4398-08dc8717779a
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jun 2024 17:30:04.1641
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FVZcebcnxHI7LzHKibqQ2Wn1W4bfeTYlOhSSE/ecJG6EdDWpxb7/RxzfYf6gLMhr
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7911
 
-On Fri, 31 May 2024 16:38:37 -0500
-Wei Huang <wei.huang2@amd.com> wrote:
-
-> This patch introduces three API functions, pcie_tph_intr_vec_supported(),
-> pcie_tph_get_st() and pcie_tph_set_st(), for a driver to query, retrieve
-> or configure device's steering tags. There are two possible locations for
-> steering tag table and the code automatically figure out the right
-> location to set the tags if pcie_tph_set_st() is called. Note the tag
-> value is always zero currently and will be extended in the follow-up
-> patches.
+On Mon, Jun 03, 2024 at 01:26:38PM +0300, Leon Romanovsky wrote:
+> From: Jianbo Liu <jianbol@nvidia.com>
 > 
-> Co-developed-by: Eric Van Tassell <Eric.VanTassell@amd.com>
-> Signed-off-by: Eric Van Tassell <Eric.VanTassell@amd.com>
-> Signed-off-by: Wei Huang <wei.huang2@amd.com>
-> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
-> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com> 
-> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Hi. 
+> UMR QP is not used in some cases, so move QP and its CQ creations from
+> driver load flow to the time first reg_mr occurs, that is when MR
+> interfaces are first called.
 
-There are a lot of small functions in here.  I'd look at just calling
-the things they are wrapping more directly as with the register
-and field names inline it's pretty obvious what is going on.
-Wrapping that in a helper function doesn't necessarily help readablity
-and perhaps doubles the length of the code.
+We use UMR for kernel MRs too, don't we?
 
-Various other comments inline.
-
-Jonathan
-
-
-> ---
->  drivers/pci/pcie/tph.c  | 402 ++++++++++++++++++++++++++++++++++++++++
->  include/linux/pci-tph.h |  22 +++
->  2 files changed, 424 insertions(+)
-> 
-> diff --git a/drivers/pci/pcie/tph.c b/drivers/pci/pcie/tph.c
-> index d5f7309fdf52..320b99c60365 100644
-> --- a/drivers/pci/pcie/tph.c
-> +++ b/drivers/pci/pcie/tph.c
-> @@ -43,6 +43,336 @@ static int tph_set_reg_field_u32(struct pci_dev *dev, u8 offset, u32 mask,
->  	return ret;
->  }
->  
-> +static int tph_get_reg_field_u32(struct pci_dev *dev, u8 offset, u32 mask,
-> +				 u8 shift, u32 *field)
-> +{
-> +	u32 reg_val;
-> +	int ret;
-> +
-> +	if (!dev->tph_cap)
-> +		return -EINVAL;
-> +
-> +	ret = pci_read_config_dword(dev, dev->tph_cap + offset, &reg_val);
-> +	if (ret)
-> +		return ret;
-> +
-> +	*field = (reg_val & mask) >> shift;
-> +
-> +	return 0;
-> +}
-
-Similar to earlier, I'm not seeing as strong reason for this.
-Just do the tph_cap check at the external interface points rather than
-in register read paths.
-
-Mind you, if you do keep this a lot of the other helpers
-could be flattened as they are simply passing particular parameters
-to this and that could be done inline where the results are needed.
-
-
-> +
-> +static int tph_get_table_size(struct pci_dev *dev, u16 *size_out)
-> +{
-> +	int ret;
-> +	u32 tmp;
-> +
-> +	ret = tph_get_reg_field_u32(dev, PCI_TPH_CAP,
-> +				    PCI_TPH_CAP_ST_MASK,
-> +				    PCI_TPH_CAP_ST_SHIFT, &tmp);
-> +
-> +	if (ret)
-> +		return ret;
-> +
-> +	*size_out = (u16)tmp;
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * For a given device, return a pointer to the MSI table entry at msi_index.
-> + */
-> +static void __iomem *tph_msix_table_entry(struct pci_dev *dev,
-> +					  u16 msi_index)
-> +{
-> +	void __iomem *entry;
-> +	u16 tbl_sz;
-> +	int ret;
-> +
-> +	ret = tph_get_table_size(dev, &tbl_sz);
-> +	if (ret || msi_index > tbl_sz)
-> +		return NULL;
-Nice to return the error code via ERR_PTR() etc so ultimate caller gets
-some information.
-> +
-> +	entry = dev->msix_base + msi_index * PCI_MSIX_ENTRY_SIZE;
-
-return dev->msix_base + msi_index * PCI_MSIX_ENTRY_SIZE;
-
-> +
-> +	return entry;
-> +}
-> +
-> +/*
-> + * For a given device, return a pointer to the vector control register at
-> + * offset 0xc of MSI table entry at msi_index.
-> + */
-> +static void __iomem *tph_msix_vector_control(struct pci_dev *dev,
-> +					     u16 msi_index)
-> +{
-> +	void __iomem *vec_ctrl_addr = tph_msix_table_entry(dev, msi_index);
-> +
-> +	if (vec_ctrl_addr)
-> +		vec_ctrl_addr += PCI_MSIX_ENTRY_VECTOR_CTRL;
-
-I'd do this addition at the caller.  Then don't need this function.
-
-> +
-> +	return vec_ctrl_addr;
-> +}
-> +
-> +/*
-> + * Translate from MSI-X interrupt index to struct msi_desc *
-> + */
-> +static struct msi_desc *tph_msix_index_to_desc(struct pci_dev *dev, int index)
-> +{
-> +	struct msi_desc *entry;
-> +
-> +	msi_lock_descs(&dev->dev);
-
-I'd take the lock at the caller as not obvious this is going to keep holding it
-from the name.
-
-If you call it tph_msix_get_desc_from_index() that would help.
-
-> +	msi_for_each_desc(entry, &dev->dev, MSI_DESC_ASSOCIATED) {
-> +		if (entry->msi_index == index)
-> +			return entry;
-> +	}
-> +	msi_unlock_descs(&dev->dev);
-> +
-> +	return NULL;
-> +}
-
-> +
-> +static bool msix_nr_in_bounds(struct pci_dev *dev, int msix_nr)
-> +{
-> +	u16 tbl_sz;
-> +
-> +	if (tph_get_table_size(dev, &tbl_sz))
-> +		return false;
-> +
-> +	return msix_nr <= tbl_sz;
-
-Use the table entry request and just check reutrn for NULL.
-
-So instead of calling this function,
-
-if (!tph_msix_table_entry(dev, msix_nr));
-
-and drop this function.
-
-> +}
-> +
-> +/* Return root port capability - 0 means none */
-> +static int get_root_port_completer_cap(struct pci_dev *dev)
-
-I'd expect anything ending in _cap in PCI code to be giving
-me the offset of a capability. 
-
-static int root_port_tph_support() maybe?
-
-> +{
-> +	struct pci_dev *rp;
-> +	int ret;
-> +	int val;
-> +
-> +	rp = pcie_find_root_port(dev);
-> +	if (!rp) {
-> +		pr_err("cannot find root port of %s\n", dev_name(&dev->dev));
-> +		return 0;
-> +	}
-> +
-> +	ret = pcie_capability_read_dword(rp, PCI_EXP_DEVCAP2, &val);
-> +	if (ret) {
-> +		pr_err("cannot read device capabilities 2 of %s\n",
-> +		       dev_name(&dev->dev));
-> +		return 0;
-> +	}
-> +
-> +	val &= PCI_EXP_DEVCAP2_TPH_COMP;
-> +
-> +	return val >> PCI_EXP_DEVCAP2_TPH_COMP_SHIFT;
-> +}
-> +
-> +/*
-> + * TPH device needs to be below a rootport with the TPH Completer and
-> + * the completer must offer a compatible level of completer support to that
-> + * requested by the device driver.
-> + */
-> +static bool completer_support_ok(struct pci_dev *dev, u8 req)
-> +{
-> +	int rp_cap;
-> +
-> +	rp_cap = get_root_port_completer_cap(dev);
-> +
-> +	if (req > rp_cap) {
-> +		pr_err("root port lacks proper TPH completer capability\n");
-
-Assumption is that any driver getting to here should really have checked
-if this was fine before enabling TPH?  a pr_err() seems overly noisy
-otherwise.
-
-> +		return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +/*
-> + * The PCI Specification version 5.0 requires the "No ST Mode" mode
-> + * be supported by any compatible device.
-
-Why do we need to check something that 'must' be set to 1?
-Are there known buggy devices?  If not, just don't check it
-as we can assume this is true and save 20 lines of code.
-
-> + */
-> +static bool no_st_mode_supported(struct pci_dev *dev)
-> +{
-> +	bool no_st;
-> +	int ret;
-> +	u32 tmp;
-> +
-> +	ret = tph_get_reg_field_u32(dev, PCI_TPH_CAP, PCI_TPH_CAP_NO_ST,
-> +				    PCI_TPH_CAP_NO_ST_SHIFT, &tmp);
-> +	if (ret)
-> +		return false;
-> +
-> +	no_st = !!tmp;
-> +
-> +	if (!no_st) {
-> +		pr_err("TPH devices must support no ST mode\n");
-> +		return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static int tph_write_ctrl_reg(struct pci_dev *dev, u32 value)
-> +{
-> +	int ret;
-> +
-> +	ret = tph_set_reg_field_u32(dev, PCI_TPH_CTRL, ~0L, 0, value);
-> +
-> +	if (ret)
-> +		goto err_out;
-> +
-> +	return 0;
-> +
-> +err_out:
-> +	/* minimizing possible harm by disabling TPH */
-> +	pcie_tph_disable(dev);
-
-If the write failed, something is horribly wrong. Do we need
-to defend against that case?  It complicates the code a fair bit so
-it needs a strong reasoning.  Preferably why can this fail other
-than in bug cases or surprise removal or similar.
-
-> +	return ret;
-> +}
-> +
-> +/* Update the ST Mode Select field of the TPH Control Register */
-> +static int tph_set_ctrl_reg_mode_sel(struct pci_dev *dev, u8 st_mode)
-> +{
-> +	int ret;
-> +	u32 ctrl_reg;
-> +
-> +	ret = tph_get_reg_field_u32(dev, PCI_TPH_CTRL, ~0L, 0, &ctrl_reg);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* clear the mode select and enable fields */
-> +	ctrl_reg &= ~(PCI_TPH_CTRL_MODE_SEL_MASK);
-> +	ctrl_reg |= ((u32)(st_mode << PCI_TPH_CTRL_MODE_SEL_SHIFT) &
-> +		     PCI_TPH_CTRL_MODE_SEL_MASK);
-> +
-> +	ret = tph_write_ctrl_reg(dev, ctrl_reg);
-
-return tph_write_ctrl_reg()
-
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
-> +}
-> +
-> +/* Write the steering tag to MSI-X vector control register */
-> +static void tph_write_tag_to_msix(struct pci_dev *dev, int msix_nr, u16 tag)
-> +{
-> +	u32 val;
-> +	void __iomem *vec_ctrl;
-> +	struct msi_desc *msi_desc;
-> +
-> +	msi_desc = tph_msix_index_to_desc(dev, msix_nr);
-> +	if (!msi_desc) {
-> +		pr_err("MSI-X descriptor for #%d not found\n", msix_nr);
-> +		return;
-return an error so we can handle it at caller.
-
-> +	}
-> +
-> +	vec_ctrl = tph_msix_vector_control(dev, msi_desc->msi_index);
-
-Whilst this would have already failed, I'd still check for vec_ctrl == NULL
-as easier to read.
-
-> +
-> +	val = readl(vec_ctrl);
-> +	val &= 0xffff;
-> +	val |= (tag << 16);
-> +	writel(val, vec_ctrl);
-> +
-> +	/* read back to flush the update */
-> +	val = readl(vec_ctrl);
-> +	msi_unlock_descs(&dev->dev);
-Who took the lock? Not obvious from function naming - see above
-
-> +}
-> +
-
-> +static bool pcie_tph_write_st(struct pci_dev *dev, unsigned int msix_nr,
-> +			      u8 req_type, u16 tag)
-
-Why bool for error or not?  Better to return an error code.
-
-> +{
-> +	int offset;
-> +	u8  loc;
-
-Unusual to align the local variables like this. I'd just have a single space before
-loc..
-
-> +	int ret;
-> +
-> +	/* setting ST isn't needed - not an error, just return true */
-> +	if (!dev->tph_cap || pci_tph_disabled() || pci_tph_nostmode() ||
-> +	    !dev->msix_enabled || !tph_int_vec_mode_supported(dev))
-> +		return true;
-> +
-> +	/* setting ST is incorrect in the following cases - return error */
-> +	if (!no_st_mode_supported(dev) || !msix_nr_in_bounds(dev, msix_nr) ||
-> +	    !completer_support_ok(dev, req_type))
-> +		return false;
-> +
-> +	/*
-> +	 * disable TPH before updating the tag to avoid potential instability
-> +	 * as cautioned about in the "ST Table Programming" of PCI-E spec
-> +	 */
-> +	pcie_tph_disable(dev);
-> +
-> +	ret = tph_get_table_location(dev, &loc);
-> +	if (ret)
-> +		return false;
-> +
-> +	switch (loc) {
-> +	case PCI_TPH_LOC_MSIX:
-> +		tph_write_tag_to_msix(dev, msix_nr, tag);
-handle errors.
-> +		break;
-> +	case PCI_TPH_LOC_CAP:
-> +		offset = dev->tph_cap + PCI_TPH_ST_TABLE
-> +			  + msix_nr * sizeof(u16);
-> +		pci_write_config_word(dev, offset, tag);
-handle errors.
-> +		break;
-> +	default:
-> +		pr_err("unable to write steering tag for device %s\n",
-> +		       dev_name(&dev->dev));
-> +		return false;
-> +	}
-> +
-> +	/* select interrupt vector mode */
-> +	tph_set_ctrl_reg_mode_sel(dev, PCI_TPH_INT_VEC_MODE);
-handle errors
-> +	tph_set_ctrl_reg_en(dev, req_type);
-etc.
-
-> +
-> +	return true;
-> +}
-> +
-
-> +
-> +/**
-> + * pcie_tph_get_st() - Retrieve steering tag for a specific CPU
-> + * @dev: pci device
-> + * @cpu: the acpi cpu_uid.
-> + * @mem_type: memory type (vram, nvram)
-> + * @req_type: request type (disable, tph, extended tph)
-> + * @tag: steering tag return value
-> + *
-> + * Return:
-> + *        true : success
-> + *        false: failed
-> + */
-> +bool pcie_tph_get_st(struct pci_dev *dev, unsigned int cpu,
-
-Rename so that it's obvious this isn't just reading back the st
-previously set to the device (i.e. it isn't the opposite of
-pci_tph_set_st())
-
-pci_tph_get_st_to_use() or something like that.
-
-int so we can have some error information once implemented.
-I'm not keen on introducing a stub like this though that doesn't
-yet do anything. Bring it in when useful.
-
-
-
-
-> +		    enum tph_mem_type mem_type, u8 req_type,
-> +		    u16 *tag)
-> +{
-> +	*tag = 0;
-> +
-> +	return true;
-> +}
-> +EXPORT_SYMBOL(pcie_tph_get_st);
-> +
-> +/**
-> + * pcie_tph_set_st() - Set steering tag in ST table entry
-> + * @dev: pci device
-> + * @msix_nr: ordinal number of msix interrupt.
-> + * @cpu: the acpi cpu_uid.
-
-Given most linux CPU numbers are not necessarily the ACPI CPU ID
-I'd call it that.  e.g. cpu_acpi_uid.
-
-
-> + * @mem_type: memory type (vram, nvram)
-> + * @req_type: request type (disable, tph, extended tph)
-> + *
-> + * Return:
-> + *        true : success
-> + *        false: failed
-> + */
-> +bool pcie_tph_set_st(struct pci_dev *dev, unsigned int msix_nr,
-> +		     unsigned int cpu, enum tph_mem_type mem_type,
-> +		     u8 req_type)
-> +{
-> +	u16 tag;
-> +	bool ret = true;
-> +
-> +	ret = pcie_tph_get_st(dev, cpu, mem_type, req_type, &tag);
-> +
-> +	if (!ret)
-> +		return false;
-> +
-> +	pr_debug("%s: writing tag %d for msi-x intr %d (cpu: %d)\n",
-> +		 __func__, tag, msix_nr, cpu);
-> +
-> +	ret = pcie_tph_write_st(dev, msix_nr, req_type, tag);
-> +
-> +	return ret;
-return pcie_tph_write_st() but make it return an integer so caller
-gets some information on what when wrong.
-
-> +}
-> +EXPORT_SYMBOL(pcie_tph_set_st);
-
+Jason
 
