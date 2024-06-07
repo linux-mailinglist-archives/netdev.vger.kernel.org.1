@@ -1,93 +1,165 @@
-Return-Path: <netdev+bounces-101772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A2BA900043
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:06:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA255900059
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:10:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3856D1C20E26
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:06:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6849628DD00
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:10:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A404C15F303;
-	Fri,  7 Jun 2024 10:03:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B0C15AADA;
+	Fri,  7 Jun 2024 10:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Lh0rEY/A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i2rYfswI"
 X-Original-To: netdev@vger.kernel.org
-Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B7B15CD7D;
-	Fri,  7 Jun 2024 10:03:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.220
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18261CA85;
+	Fri,  7 Jun 2024 10:10:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717754628; cv=none; b=GNcbysluJZ+HzYaj0g4Y8/ETOtE863Z+QEBHtBxb50yLZm5rw1VcUSq99kN/Mx69m0Zzc6+TXc8mxgYQDxkN0ofkGz+TmdzkzOk4eRy1Y4gw7GV+AJKYpWeMobmFWNWdDgsrh9Iv+GROBElUf9mPyaiWhOR4dUaXKbQuxVgMEr4=
+	t=1717755010; cv=none; b=HauA/V73deMbyYH5TB+lq5KDQBc1DW21qslmKHA//Npk6rVo1prFLqx0Vk/jQ0bqmtY+/7FudhvgWjVMF9IKR34rZpsiOW/fBqleDuDhZDpabNyalSJ8X7rniG1BZbYD7SOcwrnt/rG0QtxFzOFqAoQ8VFBc5YUmkxxO2JYop10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717754628; c=relaxed/simple;
-	bh=rLfqKnBrl/JeZDlnCLR6XMpnZNF7Dk5Orfjdv9CwB+I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=moJ28iIgjtfp2CBFNYaZJfjWWMzTWltmElrzAeXZ86VlbHyMNvhyLYL+eV/VyrlGuvMGAVkkTlNnvPBn8LbUKr6+dSAdsaIDN+kvk9XW1XeaB2N8a6x5WnSQPjE9DeW5wjBNDVtgB+5emq+v4O3ylOBHPThtr7t90Vol3r74EUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Lh0rEY/A; arc=none smtp.client-ip=45.254.50.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=ezWsI
-	hM4Hh8p+QSv6p+yh190SDsAVLFSlr3UVPG0n3g=; b=Lh0rEY/Avpk51PMZDnOiN
-	DP7nOigge3P2OsGu31V4U3KIVXPrE/mZOcH21tNQP4uCbu6js2/HLKq2bplKqFN/
-	7+ypgabAtjWanzK6XlGN8fAnk1SMAUQrmdkOeZRwmR6NFeJrz2gg3+wZzdvq9lSu
-	Gn4d2zV/JfGZqFhFbMDPRw=
-Received: from localhost.localdomain (unknown [112.97.63.251])
-	by gzga-smtp-mta-g0-3 (Coremail) with SMTP id _____wD3fxzf2mJm_EwiBw--.9011S2;
-	Fri, 07 Jun 2024 18:03:12 +0800 (CST)
-From: Slark Xiao <slark_xiao@163.com>
-To: loic.poulain@linaro.org,
-	ryazanov.s.a@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	manivannan.sadhasivam@linaro.org,
-	Slark Xiao <slark_xiao@163.com>
-Subject: [PATCH v1 2/2] net: wwan: Fix SDX72 ping failure issue
-Date: Fri,  7 Jun 2024 18:03:09 +0800
-Message-Id: <20240607100309.453122-1-slark_xiao@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1717755010; c=relaxed/simple;
+	bh=aE4eaP6bHfiBKjViBn6+Ujbx5P3RY+W8dBRi8lIgZgQ=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=WBIERcymfeREB3K9q6Gv56sixA7Q/H+GciY/FxijneN0icYK1LcLIB62uCOBEYaL6rZT6Dxbi2ENLw0iQcS4YWcN7/c6IR2GdEYSmrDL0KCf2XaKI19mMm9Ofc16qLGydj8aaQ+L5Dr52J6iDmUO7A7GNSUBDghhEopBNJcyGBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i2rYfswI; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-354f3f6c3b1so1636283f8f.2;
+        Fri, 07 Jun 2024 03:10:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717755007; x=1718359807; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9doJyVU9qxOkAk1maiwctIn/+b2qh/iJuF285ssJygs=;
+        b=i2rYfswIaP4UR7EOonuz5WE0BfuFLaT/+6HfXO1i5tU0Ss7YB+g3L54syjydQQSWIy
+         VTspKpdBrArmpNimjGZir45Nqv/9+ylcbSFaJXpHJZK8mb6U3BeCtCp8MJB9ma/lUXCu
+         UXsRPx7LIlPsCjKCQjPQTrMZmE3jwjFhq3pqBl3acxEe6esS69XnttDAC7ufz9xE6qIt
+         /GJWR6R/I8AgIk4130eRAxMZJr8uyQaDxy+nTqO+2gMQTiyvpP40N91pVeadKifm0kbQ
+         bJoypROFLt3XaM65mGgayaPGCU647G2/Bp0Iudyt9u1KLBzxxMYB+LRgv4z/UI33sOfp
+         +PEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717755007; x=1718359807;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9doJyVU9qxOkAk1maiwctIn/+b2qh/iJuF285ssJygs=;
+        b=W6pJdKxgh56j0NVvZPQrsx0zJRE1DlpDWXCaCdFzOyG1d5NxPI/zk3UmRGVr37j2Wc
+         rqz4qh2o596tv5RrmoKBTP06j9ysvIM4VnhemrxjAHa1dn/MkgRuT3Mhsn0fH3Pw3pqM
+         JfxZEYb7HNepQ4lzPLPLAqsI+VLbdq2m97XMDRPw4vcfuk/zy+n+r+JyVzeuwIFu9OZN
+         Z3Zq/dz7nEqHhMTTruTLJvQDi3fAEBJyN34+RyoZHUmLAMGGv5iPTjdL3rqLLUy6am/a
+         a/AXl8Ygm7YbohU+wNX2gkzbGajb8ExYmMFWw8EwonRiWFXQypWPLJ4mYS6VWRT5pXAI
+         5G0g==
+X-Forwarded-Encrypted: i=1; AJvYcCXae4FOVdo8eAgixQFg5sFDHuAfcNTHiKGRlZ0/68z9YDQHMKmKW+Q0bkMJnBQz8ls4HdTSJm5ZJD9pMvhjgDwNE26IbSENwRwu43iEZo0R6QP0bDgbum2nI0gGbSVS5S45bMhA
+X-Gm-Message-State: AOJu0Yzl6zLAA9el8ElPeAOrh1HUKQiTYbUGrnSMMs/2bHQBlQWwFlpH
+	AKGx8Sn52IAGG3fzTCKFi5J/vtXQ8Oa7ZdOnzVOvp1XOve7+740C
+X-Google-Smtp-Source: AGHT+IHeuwI8aQpPF7FlWiipVfMQ+aCBdx+r827kcPTGG9R8HQodAdhRd5gkN78Go8ItaGb4vow3+A==
+X-Received: by 2002:adf:f00e:0:b0:35e:7dfc:345b with SMTP id ffacd0b85a97d-35efed65631mr1561970f8f.35.1717755007023;
+        Fri, 07 Jun 2024 03:10:07 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:4d:91d6:b27d:6a1b])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35ef5e989c9sm3658427f8f.73.2024.06.07.03.10.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jun 2024 03:10:06 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  Oleksij Rempel <o.rempel@pengutronix.de>,  Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>,  linux-kernel@vger.kernel.org,
+  netdev@vger.kernel.org,  Dent Project <dentproject@linuxfoundation.org>,
+  kernel@pengutronix.de
+Subject: Re: [PATCH net-next v2 3/8] netlink: specs: Expand the PSE netlink
+ command with C33 new features
+In-Reply-To: <20240607-feature_poe_power_cap-v2-3-c03c2deb83ab@bootlin.com>
+	(Kory Maincent's message of "Fri, 07 Jun 2024 09:30:20 +0200")
+Date: Fri, 07 Jun 2024 11:09:38 +0100
+Message-ID: <m2bk4dm5ct.fsf@gmail.com>
+References: <20240607-feature_poe_power_cap-v2-0-c03c2deb83ab@bootlin.com>
+	<20240607-feature_poe_power_cap-v2-3-c03c2deb83ab@bootlin.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3fxzf2mJm_EwiBw--.9011S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7JFWkWFy7JF4xXF1kZryUAwb_yoW8Jr4rpa
-	yUKFZIkrWxJ3yUWw4UJayaqFy5ua1qg34ak3yUuwnYqrn0vry3AFZ3XFyUJw1Yya4kAr4U
-	CFy8Ary3Xa1kCrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRLYFAUUUUU=
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbiJRP2ZGVOBlO3YwABsP
+Content-Type: text/plain
 
-For SDX72 MBIM device, it starts data mux id from 112 instead of 0.
-This would lead to device can't ping outside successfully.
-Also MBIM side would report "bad packet session (112)".
-So we add a link id default value for these SDX72 products which
-works in MBIM mode.
+Kory Maincent <kory.maincent@bootlin.com> writes:
 
-Signed-off-by: Slark Xiao <slark_xiao@163.com>
----
- drivers/net/wwan/mhi_wwan_mbim.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> From: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
+>
+> Expand the c33 PSE attributes with PSE class, extended state information
+> and power consumption.
+>
+> ./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --do pse-get
+> 	     --json '{"header":{"dev-name":"eth0"}}'
+> {'c33-pse-actual-pw': 1700,
+>  'c33-pse-admin-state': 3,
+>  'c33-pse-pw-class': 4,
+>  'c33-pse-pw-d-status': 4,
+>  'header': {'dev-index': 4, 'dev-name': 'eth0'}}
+>
+> ./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --do pse-get
+> 	     --json '{"header":{"dev-name":"eth0"}}'
+> {'c33-pse-admin-state': 3,
+>  'c33-pse-ext-state': 5,
+>  'c33-pse-ext-substate': 5,
+>  'c33-pse-pw-d-status': 2,
+>  'header': {'dev-index': 4, 'dev-name': 'eth0'}}
+>
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
+>  Documentation/netlink/specs/ethtool.yaml | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+>
+> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+> index 00dc61358be8..8aa064f2f466 100644
+> --- a/Documentation/netlink/specs/ethtool.yaml
+> +++ b/Documentation/netlink/specs/ethtool.yaml
+> @@ -922,6 +922,22 @@ attribute-sets:
+>          name: c33-pse-pw-d-status
+>          type: u32
+>          name-prefix: ethtool-a-
+> +      -
+> +        name: c33-pse-pw-class
+> +        type: u32
+> +        name-prefix: ethtool-a-
+> +      -
+> +        name: c33-pse-actual-pw
+> +        type: u32
+> +        name-prefix: ethtool-a-
+> +      -
+> +        name: c33-pse-ext-state
+> +        type: u8
+> +        name-prefix: ethtool-a-
+> +      -
+> +        name: c33-pse-ext-substate
+> +        type: u8
+> +        name-prefix: ethtool-a-
 
-diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
-index 3f72ae943b29..4ca5c845394b 100644
---- a/drivers/net/wwan/mhi_wwan_mbim.c
-+++ b/drivers/net/wwan/mhi_wwan_mbim.c
-@@ -618,7 +618,8 @@ static int mhi_mbim_probe(struct mhi_device *mhi_dev, const struct mhi_device_id
- 	mbim->rx_queue_sz = mhi_get_free_desc_count(mhi_dev, DMA_FROM_DEVICE);
- 
- 	/* Register wwan link ops with MHI controller representing WWAN instance */
--	return wwan_register_ops(&cntrl->mhi_dev->dev, &mhi_mbim_wwan_ops, mbim, 0);
-+	return wwan_register_ops(&cntrl->mhi_dev->dev, &mhi_mbim_wwan_ops, mbim,
-+		mhi_dev->mhi_cntrl->link_id ? mhi_dev->mhi_cntrl->link_id : 0);
- }
- 
- static void mhi_mbim_remove(struct mhi_device *mhi_dev)
--- 
-2.25.1
+I see this is consistent with existing pse attributes in the spec, but
+are there enumerations for the state and status attributes that could be
+added to the spec?
 
+>    -
+>      name: rss
+>      attributes:
+> @@ -1611,6 +1627,10 @@ operations:
+>              - c33-pse-admin-state
+>              - c33-pse-admin-control
+>              - c33-pse-pw-d-status
+> +            - c33-pse-pw-class
+> +            - c33-pse-actual-pw
+> +            - c33-pse-ext-state
+> +            - c33-pse-ext-substate
+>        dump: *pse-get-op
+>      -
+>        name: pse-set
 
