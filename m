@@ -1,222 +1,281 @@
-Return-Path: <netdev+bounces-101962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9F7F900C7F
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 21:35:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A41EF900C8C
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 21:41:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F6A6285AE8
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 19:35:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B5D71F2221A
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 19:41:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C190B13EFE0;
-	Fri,  7 Jun 2024 19:35:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8833214D704;
+	Fri,  7 Jun 2024 19:41:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="TC4CRYzI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NOF3AI62"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9CD71DFEB;
-	Fri,  7 Jun 2024 19:35:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB64A4DA08;
+	Fri,  7 Jun 2024 19:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717788921; cv=none; b=kD7KryjmiXNIQA+mOFe5Lld8xVb0oihvAhnUwO9ILYmQXuCAflVtL5SfUbXKK0YooxfEIpi7UWYWcqre1JuVeddmaHjbGSFnWYGL8d4Wg4u0avDMvRCjTQiIIZeW8Ttl9OJkAp+8EoK3P6Pel93jwx7Q8JphHUPk5xsXIJRhRFU=
+	t=1717789304; cv=none; b=b9NNDr2220Y3mZfanadLgykKUcSMMGaQAWY1egGLtc6UCmptCQGWGY+oDWgIVHnCmngRMhfS0IwCie7XcBBmvK0e9y1KJDYdCEtnGpyKqwKNz0PWMPBvtEEDNldm6l2tLUHEOkvdoRGz+1ddI980P1nWmY7WoHNEXxtiKS3wh0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717788921; c=relaxed/simple;
-	bh=XBRMhpg59H9dprFIE2ptSpdPgmlUDOwV7CBDdyfGn88=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nbn3EypKCbfCxF3MQkuSAyd98fGLT3bhbL9n2X5CBiJm5dglcEZXdMBdlOeFe/zCh2Futn+V0jF43wGbDbARKVlRxqyYQLof+vENGsofYtwlzntLFqIxDjIbRIJX3MTQvZPZwf/VfuGj6bL5AVajOAS5Vj/V4V/+p9qWFJJtV1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=TC4CRYzI; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1717788915; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=mfyg2R+Zj3SxdgDsXuviVuTj+JhLQZPhM5T31bO8YYk=;
-	b=TC4CRYzIpaZxE0ebjnCj3g3NgwrMgjfKKxWBeQrfLaA8ERoxyxMEi+oM6CIvSZgYp05IUFPWliMszcLifOQ4vG9E/APMgSYQrNt4bIRcrV5p2lvJvxNdcNOnIqu4l1UL3iu5A/oO5GXsMkVFYpsVKlf+YIlOt4NfAIMDrEVllYg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067112;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0W8.mmkB_1717788913;
-Received: from 30.39.248.33(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W8.mmkB_1717788913)
-          by smtp.aliyun-inc.com;
-          Sat, 08 Jun 2024 03:35:14 +0800
-Message-ID: <e6b66001-f3cb-4367-aeaf-600fbc5f77b2@linux.alibaba.com>
-Date: Sat, 8 Jun 2024 03:35:12 +0800
+	s=arc-20240116; t=1717789304; c=relaxed/simple;
+	bh=B5wpoJOAS1yCcn6AHTzXdnnzuJTU6sZuXi+k2Dj9i+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eFOV5DRGsfb7EpQW6e/NAmNVG3xCcxPeZxrHC6T8+iz9uI3xq1OXs1TArCLR5ZE5A1FV92ILG7DpeaaJJzvdHvamIPDIkRwIqEx2ulaU9w/G3JcV/CwkW/LkLRh2DtOzum79a4polaVmjdmwIYM7j/SfriA2kCIts1u/9gat0hI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NOF3AI62; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1f47f07acd3so23650615ad.0;
+        Fri, 07 Jun 2024 12:41:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717789302; x=1718394102; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RJJyaYN0sPbNug3PyyX1s3PiVD+hYAyOGyOGOym/UzI=;
+        b=NOF3AI62XrtyTBIES/6hzDoX3p2n36YH3SG2CBvuMUEtDo8CZkXIvsbcqkTwqMQw1W
+         iU1eEk90o7tanzVcv3dFgFAQA57j0qh1TyzafPS2gl7G0itBrIWnM7bBSMXkzPxA0Ej/
+         DTQj1olYtfbcNH16IO0q3R0lsT6WlB/v6o2Oi/SOBhpCp9Qhkx3clU558dwJ9QE5h4D+
+         iBgnVsALFv2PFIihIZGUZVHq7KaajAUOJU/xIiDSudi/OcLXzN2aurDsBhidJ1Ql6oeK
+         +onOGKjbd+DH7BL1tnn8MOEOAf++sueZSgNqVwUJy8AtH4A4xTC0cX6KOyZyqn/o2Ys8
+         GyXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717789302; x=1718394102;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RJJyaYN0sPbNug3PyyX1s3PiVD+hYAyOGyOGOym/UzI=;
+        b=bPjrYQu2Sv7znyXP9kQ1NMaYZNTpmOFs/JNsr8U4fZ4Mi4rEYk1rY+Pwo/cB5svXGj
+         GiAc/7DlbBXIkjcVVKoHK9H/fOpTfdcr6FHa9YtfmjJtQt1uTf2n/15C95HC4ilcHz6g
+         MN3plOuaGkER/oSz4zmvFr3hZUmGBsf5FKul+Cuj7nRSPar5w7SMw0SBzWyILQB9H3Nh
+         Cl7CnxuLYMHspwb4rXOThEA7aqGb2s0hMNcMKYjcsQbt+Mj0lZNB+l/FJQwWsKv747WG
+         kksT0jeXiJxSMch9YL+/9MTG4FI8h271Kz3tSbK12HI0M0wRkQQaIdgGOTrbRChIdZnd
+         bKmA==
+X-Forwarded-Encrypted: i=1; AJvYcCWfwBc6f5SJ7dogp5Jvj0O9V8Dh6n1gv9dRRyxS/YTUuqIpWb+J97jhEjaMvfZDFtn9SpuTEHzL8H+VUp9xUMkHxxEoskV3vrTox5CBF5yrl2kSQJ9Nvn4vLcpPnwINK4tASrieROBQToZGXELx+bgOr+iHf0K7WkNYdg8gYm9xrVVl02bftdLyP/wh
+X-Gm-Message-State: AOJu0Yw0FluOPucJcnmDCDXUsSBAYpZA5QFDzlJRSVAdIzr4A+k8xI7B
+	FWL3KYOA/jLDXALA2yvX8q01fL+qBUqABmLS1L43OCSJc4bkAtVa
+X-Google-Smtp-Source: AGHT+IGscUbgi37qbqXXc5w7y2H8tq5p/gmvxvvmo71C1+DhTMvyNutUQJaTF7RIefH0R+RKzJ5Hlw==
+X-Received: by 2002:a17:903:2445:b0:1f6:70fe:76bf with SMTP id d9443c01a7336-1f6d02d1a99mr41772155ad.14.1717789301946;
+        Fri, 07 Jun 2024 12:41:41 -0700 (PDT)
+Received: from tahera-OptiPlex-5000 ([136.159.49.123])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd769a2esm38410355ad.66.2024.06.07.12.41.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jun 2024 12:41:41 -0700 (PDT)
+Date: Fri, 7 Jun 2024 13:41:39 -0600
+From: Tahera Fahimi <fahimitahera@gmail.com>
+To: =?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>
+Cc: Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Jann Horn <jannh@google.com>, outreachy@lists.linux.dev,
+	netdev@vger.kernel.org,
+	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
+Subject: Re: [PATCH v3] landlock: Add abstract unix socket connect restriction
+Message-ID: <ZmNic8S1KtyLcp7i@tahera-OptiPlex-5000>
+References: <ZmJJ7lZdQuQop7e5@tahera-OptiPlex-5000>
+ <ZmLEoBfHyUR3nKAV@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 3/3] net/smc: Introduce IPPROTO_SMC
-To: Mat Martineau <martineau@kernel.org>, Matthieu Baerts <matttbe@kernel.org>
-Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
- wintera@linux.ibm.com, guwen@linux.alibaba.com, kuba@kernel.org,
- davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-rdma@vger.kernel.org, tonylu@linux.alibaba.com,
- Paolo Abeni <pabeni@redhat.com>, edumazet@google.com
-References: <1717592180-66181-1-git-send-email-alibuda@linux.alibaba.com>
- <1717592180-66181-4-git-send-email-alibuda@linux.alibaba.com>
- <6e0f1c4a-4911-51c3-02fa-a449f2434ef1@kernel.org>
- <ffe06909-6152-4349-9b60-5697a038ac19@linux.alibaba.com>
- <ed6bde75-2783-446e-b667-204ed55071b5@kernel.org>
- <61b94bf6-a383-afff-db62-261cac7360c7@kernel.org>
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <61b94bf6-a383-afff-db62-261cac7360c7@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZmLEoBfHyUR3nKAV@google.com>
 
+On Fri, Jun 07, 2024 at 10:28:35AM +0200, Günther Noack wrote:
+> Hello Tahera!
+> 
+> Thanks for sending another revision of your patch set!
+Hello Günther, 
+Thanks for your feedback.
 
+> On Thu, Jun 06, 2024 at 05:44:46PM -0600, Tahera Fahimi wrote:
+> > Abstract unix sockets are used for local inter-process communications
+> > without on a filesystem. Currently a sandboxed process can connect to a
+> > socket outside of the sandboxed environment, since landlock has no
+> > restriction for connecting to a unix socket in the abstract namespace.
+> > Access to such sockets for a sandboxed process should be scoped the same
+> > way ptrace is limited.
+> > 
+> > Because of compatibility reasons and since landlock should be flexible,
+> > we extend the user space interface by adding a new "scoped" field. This
+> > field optionally contains a "LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET" to
+> > specify that the ruleset will deny any connection from within the
+> > sandbox to its parents(i.e. any parent sandbox or non-sandbox processes)
+> > 
+> > Closes: https://github.com/landlock-lsm/linux/issues/7
+> > Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
+> > 
+> > -------
+> > V3: Added "scoped" field to landlock_ruleset_attr
+> > V2: Remove wrapper functions
+> > 
+> > -------
+> > ---
+> >  include/uapi/linux/landlock.h | 28 +++++++++++++++++++++++
+> >  security/landlock/limits.h    |  5 ++++
+> >  security/landlock/ruleset.c   | 15 ++++++++----
+> >  security/landlock/ruleset.h   | 28 +++++++++++++++++++++--
+> >  security/landlock/syscalls.c  | 12 +++++++---
+> >  security/landlock/task.c      | 43 +++++++++++++++++++++++++++++++++++
+> >  6 files changed, 121 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
+> > index 68625e728f43..d887e67dc0ed 100644
+> > --- a/include/uapi/linux/landlock.h
+> > +++ b/include/uapi/linux/landlock.h
+> > @@ -37,6 +37,12 @@ struct landlock_ruleset_attr {
+> >  	 * rule explicitly allow them.
+> >  	 */
+> >  	__u64 handled_access_net;
+> > +	/**
+> > +	 * scoped: Bitmask of actions (cf. `Scope access flags`_)
+> > +	 * that is handled by this ruleset and should be permitted
+> > +	 * by default if no rule explicitly deny them.
+> > +	 */
+> > +	__u64 scoped;
+> 
+> I have trouble understanding what this docstring means.
+> 
+> If those are "handled" things, shouldn't the name also start with "handled_", in
+> line with the other fields?  Also, I don't see any way to manipulate these
+> rights with a Landlock rule in this ?
 
-On 6/8/24 12:47 AM, Mat Martineau wrote:
-> On Fri, 7 Jun 2024, Matthieu Baerts wrote:
->
->> Hi D.Wythe,
->>
->> On 07/06/2024 07:09, D. Wythe wrote:
->>>
->>> On 6/7/24 5:22 AM, Mat Martineau wrote:
->>>> On Wed, 5 Jun 2024, D. Wythe wrote:
->>>>
->>>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>>>>
->>>>> This patch allows to create smc socket via AF_INET,
->>>>> similar to the following code,
->>>>>
->>>>> /* create v4 smc sock */
->>>>> v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
->>>>>
->>>>> /* create v6 smc sock */
->>>>> v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
->>>>>
->>>>> There are several reasons why we believe it is appropriate here:
->>>>>
->>>>> 1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
->>>>> address. There is no AF_SMC address at all.
->>>>>
->>>>> 2. Create smc socket in the AF_INET(6) path, which allows us to reuse
->>>>> the infrastructure of AF_INET(6) path, such as common ebpf hooks.
->>>>> Otherwise, smc have to implement it again in AF_SMC path.
->>>>>
->>>>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->>>>> Tested-by: Niklas Schnelle <schnelle@linux.ibm.com>
->>>>> ---
->>>>> include/uapi/linux/in.h |   2 +
->>>>> net/smc/Makefile        |   2 +-
->>>>> net/smc/af_smc.c        |  16 ++++-
->>>>> net/smc/smc_inet.c      | 169 +++++++++++++++++++++++++++++++++++++++
->>>>> +++++++++
->>>>> net/smc/smc_inet.h      |  22 +++++++
->>>>> 5 files changed, 208 insertions(+), 3 deletions(-)
->>>>> create mode 100644 net/smc/smc_inet.c
->>>>> create mode 100644 net/smc/smc_inet.h
->>>>>
->>>>> diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
->>>>> index e682ab6..0c6322b 100644
->>>>> --- a/include/uapi/linux/in.h
->>>>> +++ b/include/uapi/linux/in.h
->>>>> @@ -83,6 +83,8 @@ enum {
->>>>> #define IPPROTO_RAW        IPPROTO_RAW
->>>>>   IPPROTO_MPTCP = 262,        /* Multipath TCP connection */
->>>>> #define IPPROTO_MPTCP        IPPROTO_MPTCP
->>>>> +  IPPROTO_SMC = 263,        /* Shared Memory 
->>>>> Communications        */
->>>>> +#define IPPROTO_SMC        IPPROTO_SMC
->>>>
->>>> Hello,
->>>>
->>>> It's not required to assign IPPROTO_MPTCP+1 as your new IPPROTO_SMC
->>>> value. Making IPPROTO_MAX larger does increase the size of the
->>>> inet_diag_table. Values from 256 to 261 are usable for IPPROTO_SMC
->>>> without increasing IPPROTO_MAX.
->>>>
->>>> Just for background: When we added IPPROTO_MPTCP, we chose 262 because
->>>> it is IPPROTO_TCP+0x100. The IANA reserved protocol numbers are 8 bits
->>>> wide so we knew we would not conflict with any future additions, and
->>>> in the case of MPTCP is was convenient that truncating the proto value
->>>> to 8 bits would match IPPROTO_TCP.
->>>>
->>>> - Mat
->>>>
->>>
->>> Hi Mat,
->>>
->>> Thank you very much for your feedback, I have always been curious about
->>> the origins of IPPROTO_MPTCP and I am glad to
->>> have learned new knowledge.
->>>
->
-> Hi D. Whythe -
->
-> Sure, you're welcome!
->
->>> Regarding the size issue of inet_diag_tables, what you said does make
->>> sense. However, we still hope to continue using 263,
->>> although the rationale may not be fully sufficient, as this series has
->>> been under community evaluation for quite some time now,
->>> and we haven't received any feedback about this value, so we’ve been
->>> using it in some user-space tools ... 🙁
->>>
->
-> It's definitely a tradeoff between the Linux UAPI that gets locked in 
-> forever vs. handling a transition with your userspace tools. If you 
-> change the numeric value of IPPROTO_SMC on the open source side you 
-> could transition internally by carrying a kernel patch that allows 
-> both the new and old value.
->
->>> I would like to see what the community thinks. If everyone agrees that
->>> using 263 will be completely unacceptable and a disaster,
->>> then we will have no choice but to change it.
->>
->> It will not be a disaster, but a small waste of space (even if
->> CONFIG_SMC is not set).
->
-> Well stated Matthieu :)  I chose my "not required" wording carefully, 
-> as I didn't want to demand a change here but to make you aware of some 
-> of the tradeoffs to consider. And thankfully Matthieu remembered the 
-> userspace issues below.
->
-> Also, I see that one of the netdev maintainers flagged this v6 series 
-> as "changes requested" in patchwork so that may indicate their 
-> preference?
->
->>
->> Also, please note that the introduction of IPPROTO_MPTCP caused some
->> troubles in some userspace programs. That was mainly because IPPROTO_MAX
->> got updated, and they didn't expect that, e.g. a quick search on GitHub
->> gave me this:
->>
->>  https://github.com/systemd/systemd/issues/15604
->>  https://github.com/strace/strace/issues/164
->>  https://github.com/rust-lang/libc/issues/1896
->>
->> I guess these userspace programs should now be ready for a new update,
->> but still, it might be better to avoid that if there is a "simple" 
->> solution.
->>
->> I understand changing your userspace tools will be annoying. (On the
->> other hand, it is still time to do that :) )
->
-> Agreed!
->
->
-> - Mat
+.scoped attribute is not defined as .handled_scope since there is no
+rule to handle/manipulate it, simply because this attribute shows either
+action is permitted or denied. 
 
+> How about:
+> 
+> /**
+>  * handled_scoped: Bitmask of IPC actions (cf. `Scoped access flags`_)
+>  * which are confined to only affect the current Landlock domain.
+>  */
 
-Hi Mat and Matthieu,
+This is a good docstring. I will use it. 
 
-Thanks very much for your feedback!  The reasons you all have provided 
-are already quite convincing.
-In fact, as I mentioned earlier, I actually don't have sufficient 
-grounds to insist on 263.  It seems it's time for a change. 😉
+> __u64 handled_scoped;
+> 
+> >  };
+> >  
+> >  /*
+> > @@ -266,4 +272,26 @@ struct landlock_net_port_attr {
+> >  #define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
+> >  #define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
+> >  /* clang-format on */
+> > +
+> > +/**
+> > + * DOC: scoped
+> > + *
+> > + * Scoped handles a set of restrictions on kernel IPCs.
+> > + *
+> > + * Scope access flags
+> 
+> Scoped with a "d"?
+Scoped meant to point to .scoped attribute.  
+> > + * ~~~~~~~~~~~~~~~~~~~~
+> > + * 
+> > + * These flags enable to restrict a sandboxed process from a set of
+> > + * inter-process communications actions. Setting a flag in a landlock
+> > + * domain will isolate the Landlock domain to forbid connections
+> > + * to resources outside the domain.
+> > + *
+> > + * IPCs with scoped actions:
+> > + * - %LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET: Restrict a sandbox process to
+> > + *   connect to a process outside of the sandbox domain through abstract
+> > + *   unix sockets.
+> > + */
+> > +/* clang-format off */
+> > +#define LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET		(1ULL << 0)
+> 
+> Should the name of this #define indicate the direction that we are restricting?
 
-Regarding the new value of IPPROTO_SMC, do you have any recommendations?
-Which one might be better, 256 or 261?
+Since the domain of a process specifies if a process can connect or not,
+the direction of the connection does not matter. This restriction is the
+same as ptrace.
 
-Best wishes,
-D. Wythe
+> If I understand your documentation correctly, this is about *connecting out* of
+> the current Landlock domain, but incoming connections from more privileged
+> domains are OK, right?
 
+Yes, Incoming connections are allowed if they are from a higher
+privileged domain (or no domain). Consider two process P1 and P2 where
+P1 wants to connect to P2. If P1 is not landlocked, it can connect to P2
+regardless of whether P2 has a domain. If P1 is landlocked, it must have
+an equal or less domain than P2 to connect to P2. We disscussed about
+direction in [2]
+https://lore.kernel.org/outreachy/20240603.Quaes2eich5f@digikod.net/T/#m6d5c5e65e43eaa1c8c38309f1225d169be3d6f87
 
+> 
+> Also:
+> 
+> Is it intentional that you are both restricting the connection and the sending
+> with the same flag (security_unix_may_send)?  If an existing Unix Domain Socket
+> gets passed in to a program from the outside (e.g. as stdout), shouldn't it
+> still be possible that the program enables a Landlock policy and then still
+> writes to it?  (Does that work?  Am I mis-reading the patch?)
+
+security_unix_may_send checks if AF_UNIX socket can send datagrams, so
+connecting and sending datagrams happens at the same state. I am not
+sure if I understand your example correctly. Can you please explain a
+bit more?
+
+> The way that write access is normally checked for other files is at the time
+> when you open the file, not during write(), and I believe it would be more in
+> line with that normal "check at open" behaviour if we did the same here?
+
+It checks the ability to connect to a unix socket at the point of
+connecting, so I think it is aligned with the "check at point"
+behaviour. This security check is called right before finalizing the
+connection. 
+
+> 
+> > diff --git a/security/landlock/limits.h b/security/landlock/limits.h
+> > index 20fdb5ff3514..7b794b81ef05 100644
+> > --- a/security/landlock/limits.h
+> > +++ b/security/landlock/limits.h
+> > @@ -28,6 +28,11 @@
+> >  #define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
+> >  #define LANDLOCK_SHIFT_ACCESS_NET	LANDLOCK_NUM_ACCESS_FS
+> >  
+> > +#define LANDLOCK_LAST_ACCESS_SCOPE       LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET
+> > +#define LANDLOCK_MASK_ACCESS_SCOPE	((LANDLOCK_LAST_ACCESS_SCOPE << 1) - 1)
+> > +#define LANDLOCK_NUM_ACCESS_SCOPE         __const_hweight64(LANDLOCK_MASK_ACCESS_SCOPE)
+> > +#define LANDLOCK_SHIFT_ACCESS_SCOPE      LANDLOCK_SHIFT_ACCESS_NET
+>                                             ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 
+> I believe this #define has the wrong value, and as a consequence, the code
+> suffers from the same problem as we already had on the other patch set from
+> Mikhail Ivanov -- see [1] for that discussion.
+
+Thanks for the hint. I will definitly check this. 
+
+> The LANDLOCK_SHIFT_ACCESS_FOO variable is used for determining the position of
+> your flag in the access_masks_t type, where all access masks are combined
+> together in one big bit vector.  If you are defining this the same for _SCOPE as
+> for _NET, I believe that we will start using the same bits in that vector for
+> both the _NET flags and the _SCOPE flags, and that will manifest in unwanted
+> interactions between the different types of restrictions.  (e.g. you will create
+> a policy to restrict _SCOPE, and you will find yourself unable to do some things
+> with TCP ports)
+> 
+> Please also see the other thread for more discussions about how we can avoid
+> such problems in the future.  (This code is easy to get wrong,
+> apparently... When we don't test what happens across multiple types of
+> restrictions, everything looks fine.)
+> 
+> [1] https://lore.kernel.org/all/ebd680cc-25d6-ee14-4856-310f5e5e28e4@huawei-partners.com/
+> 
+> —Günther
+> 
 
