@@ -1,165 +1,133 @@
-Return-Path: <netdev+bounces-101773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA255900059
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:10:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B2A190008C
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 12:20:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6849628DD00
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:10:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE2D4286435
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 10:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B0C15AADA;
-	Fri,  7 Jun 2024 10:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9537B15B967;
+	Fri,  7 Jun 2024 10:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i2rYfswI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PfDtFfM2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18261CA85;
-	Fri,  7 Jun 2024 10:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257CA433C7
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 10:20:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717755010; cv=none; b=HauA/V73deMbyYH5TB+lq5KDQBc1DW21qslmKHA//Npk6rVo1prFLqx0Vk/jQ0bqmtY+/7FudhvgWjVMF9IKR34rZpsiOW/fBqleDuDhZDpabNyalSJ8X7rniG1BZbYD7SOcwrnt/rG0QtxFzOFqAoQ8VFBc5YUmkxxO2JYop10=
+	t=1717755602; cv=none; b=nUhM8MxHSIlp3C47rhP0kHjvFACRAUU56dWBpUGdPiVAl6ytCzKsWwqfdznlRTYTztJBQ3hhZxnNohYPDb3/x2+zW5MBD2zQWUcfJJqgeWaCP8KT2YOKRR3m2oXemhVaAcoWqwYAD8pL7Ems2qCqWEFDigPQ7lqoDMBB1KYExuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717755010; c=relaxed/simple;
-	bh=aE4eaP6bHfiBKjViBn6+Ujbx5P3RY+W8dBRi8lIgZgQ=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=WBIERcymfeREB3K9q6Gv56sixA7Q/H+GciY/FxijneN0icYK1LcLIB62uCOBEYaL6rZT6Dxbi2ENLw0iQcS4YWcN7/c6IR2GdEYSmrDL0KCf2XaKI19mMm9Ofc16qLGydj8aaQ+L5Dr52J6iDmUO7A7GNSUBDghhEopBNJcyGBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i2rYfswI; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-354f3f6c3b1so1636283f8f.2;
-        Fri, 07 Jun 2024 03:10:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717755007; x=1718359807; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9doJyVU9qxOkAk1maiwctIn/+b2qh/iJuF285ssJygs=;
-        b=i2rYfswIaP4UR7EOonuz5WE0BfuFLaT/+6HfXO1i5tU0Ss7YB+g3L54syjydQQSWIy
-         VTspKpdBrArmpNimjGZir45Nqv/9+ylcbSFaJXpHJZK8mb6U3BeCtCp8MJB9ma/lUXCu
-         UXsRPx7LIlPsCjKCQjPQTrMZmE3jwjFhq3pqBl3acxEe6esS69XnttDAC7ufz9xE6qIt
-         /GJWR6R/I8AgIk4130eRAxMZJr8uyQaDxy+nTqO+2gMQTiyvpP40N91pVeadKifm0kbQ
-         bJoypROFLt3XaM65mGgayaPGCU647G2/Bp0Iudyt9u1KLBzxxMYB+LRgv4z/UI33sOfp
-         +PEw==
+	s=arc-20240116; t=1717755602; c=relaxed/simple;
+	bh=vTEZCukUMXcbXJO9IWA8dOisP930Ku2NFFH6hnITE2Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pXqWU01hozoU1Qi3y8eA1k/gmLL6kPizbsI0CbyTqniJgN3dS+znDYelkf6HYf6jZoDil4za/IVwQj6YIeJXw3drARVJMdh6kB5F9kS5n8YH5GtYADanC7fQ6LiCBPkl4SUCvYaVFtkOMpFTC3D5uyE42cstAgDT3xu0D18XkR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PfDtFfM2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717755600;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S/k0UOD2XzT93LwcNZDcZVp/aAS4aZSAyvm1MCnMlto=;
+	b=PfDtFfM2eG+cuDutfDMP6KR7ZkH5nt6fQIE4Nptr7BcITM0+QIjW4MbQ/9mWWQdq4ZsiIo
+	oRe6Ot2HC+7z8ToHKybl4xOg5OZXwMY0nwrfwwik1hnytlAoXX5+oxYzfB1FULWfcIJY7z
+	JAPrlR4l+swxMPzhD3pQcd14h/tPpcE=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-593-F165Pgr6OSOGRLz_Fe9ilA-1; Fri, 07 Jun 2024 06:19:59 -0400
+X-MC-Unique: F165Pgr6OSOGRLz_Fe9ilA-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a6c82d264ccso89255266b.2
+        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 03:19:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717755007; x=1718359807;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9doJyVU9qxOkAk1maiwctIn/+b2qh/iJuF285ssJygs=;
-        b=W6pJdKxgh56j0NVvZPQrsx0zJRE1DlpDWXCaCdFzOyG1d5NxPI/zk3UmRGVr37j2Wc
-         rqz4qh2o596tv5RrmoKBTP06j9ysvIM4VnhemrxjAHa1dn/MkgRuT3Mhsn0fH3Pw3pqM
-         JfxZEYb7HNepQ4lzPLPLAqsI+VLbdq2m97XMDRPw4vcfuk/zy+n+r+JyVzeuwIFu9OZN
-         Z3Zq/dz7nEqHhMTTruTLJvQDi3fAEBJyN34+RyoZHUmLAMGGv5iPTjdL3rqLLUy6am/a
-         a/AXl8Ygm7YbohU+wNX2gkzbGajb8ExYmMFWw8EwonRiWFXQypWPLJ4mYS6VWRT5pXAI
-         5G0g==
-X-Forwarded-Encrypted: i=1; AJvYcCXae4FOVdo8eAgixQFg5sFDHuAfcNTHiKGRlZ0/68z9YDQHMKmKW+Q0bkMJnBQz8ls4HdTSJm5ZJD9pMvhjgDwNE26IbSENwRwu43iEZo0R6QP0bDgbum2nI0gGbSVS5S45bMhA
-X-Gm-Message-State: AOJu0Yzl6zLAA9el8ElPeAOrh1HUKQiTYbUGrnSMMs/2bHQBlQWwFlpH
-	AKGx8Sn52IAGG3fzTCKFi5J/vtXQ8Oa7ZdOnzVOvp1XOve7+740C
-X-Google-Smtp-Source: AGHT+IHeuwI8aQpPF7FlWiipVfMQ+aCBdx+r827kcPTGG9R8HQodAdhRd5gkN78Go8ItaGb4vow3+A==
-X-Received: by 2002:adf:f00e:0:b0:35e:7dfc:345b with SMTP id ffacd0b85a97d-35efed65631mr1561970f8f.35.1717755007023;
-        Fri, 07 Jun 2024 03:10:07 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:4d:91d6:b27d:6a1b])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35ef5e989c9sm3658427f8f.73.2024.06.07.03.10.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jun 2024 03:10:06 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Oleksij Rempel <o.rempel@pengutronix.de>,  Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>,  linux-kernel@vger.kernel.org,
-  netdev@vger.kernel.org,  Dent Project <dentproject@linuxfoundation.org>,
-  kernel@pengutronix.de
-Subject: Re: [PATCH net-next v2 3/8] netlink: specs: Expand the PSE netlink
- command with C33 new features
-In-Reply-To: <20240607-feature_poe_power_cap-v2-3-c03c2deb83ab@bootlin.com>
-	(Kory Maincent's message of "Fri, 07 Jun 2024 09:30:20 +0200")
-Date: Fri, 07 Jun 2024 11:09:38 +0100
-Message-ID: <m2bk4dm5ct.fsf@gmail.com>
-References: <20240607-feature_poe_power_cap-v2-0-c03c2deb83ab@bootlin.com>
-	<20240607-feature_poe_power_cap-v2-3-c03c2deb83ab@bootlin.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        d=1e100.net; s=20230601; t=1717755598; x=1718360398;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S/k0UOD2XzT93LwcNZDcZVp/aAS4aZSAyvm1MCnMlto=;
+        b=mtH5nPQoiidaWv/URuLAAqF+OV7Q6LfyvKidyym/QNyUFZ1N4MoUf7QuxjigFn+5EU
+         CjKySQ0QaAUxJb4wp96nYrugLcyYatCPNvjUvujKW+iqQoyYX/40uCeHKH4VcsFFsVB1
+         q7ikaxkrn+qsldXy/rMncj1mx0ybOmUtmFFXZfdEfJFocpVlSTlD183VEQ4+xe+52SiN
+         v2a63ZfbCMWrdKAT2D+4b5ZtHA63ANHHuypAfMM8kR8ritFQ62fbRI/bE1V+UBrTvwAv
+         MM+stLmFNPXS7gPWKXF0CwIDFWAOoubWfe33CwhfuoeWrC7f32AGulp9nqmbWCz56JOt
+         b3ig==
+X-Forwarded-Encrypted: i=1; AJvYcCX0WlUGXJvi3SI1StjDiREOQ9BPVi7v//5BSUjsWoxiK9070tQQIVvokhUycLvRsUmhF9rrBxaWf0W9Xy4cep/rH3kj4zmv
+X-Gm-Message-State: AOJu0YwPkI3jqqJLBu2A1vVjIkPSWaSuvirLBLfB87GWPSD+sz0gh8CY
+	yBNMYY4cc/86/J4mBh4o0nM1qGVuhp2qBRYsyag2pOhKrPcEhggT4AJtzy591xqyn9nNBY4igGg
+	wWY32RMXddpEddXcRDw3KMzsQLZvSgi0j4hDKX7yUxc6zw4A7ZzsrYg==
+X-Received: by 2002:a17:906:1115:b0:a68:c6e5:3574 with SMTP id a640c23a62f3a-a6cdc0e40cemr136190766b.75.1717755597987;
+        Fri, 07 Jun 2024 03:19:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGpxxlwVPDRCJiZJv2Ua4GosyAN37/Sah9MwXT24eqOxTcjruBidwO3ep0dAi45T+RHQ8P8dQ==
+X-Received: by 2002:a17:906:1115:b0:a68:c6e5:3574 with SMTP id a640c23a62f3a-a6cdc0e40cemr136188466b.75.1717755597601;
+        Fri, 07 Jun 2024 03:19:57 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:c32:7800:5bfa:a036:83f0:f9ec? (2001-1c00-0c32-7800-5bfa-a036-83f0-f9ec.cable.dynamic.v6.ziggo.nl. [2001:1c00:c32:7800:5bfa:a036:83f0:f9ec])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6c806eaedesm223566166b.119.2024.06.07.03.19.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Jun 2024 03:19:57 -0700 (PDT)
+Message-ID: <5d037003-a90b-4607-8eb6-6fdd5824e373@redhat.com>
+Date: Fri, 7 Jun 2024 12:19:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: Hung tasks due to a AB-BA deadlock between the leds_list_lock
+ rwsem and the rtnl mutex
+To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
+ Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
+ Linux LEDs <linux-leds@vger.kernel.org>,
+ Heiner Kallweit <hkallweit1@gmail.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, johanneswueller@gmail.com,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Genes Lists <lists@sapience.com>
+References: <9d189ec329cfe68ed68699f314e191a10d4b5eda.camel@sapience.com>
+ <15a0bbd24cd01bd0b60b7047958a2e3ab556ea6f.camel@sapience.com>
+ <ZliHhebSGQYZ/0S0@shell.armlinux.org.uk>
+ <42d498fc-c95b-4441-b81a-aee4237d1c0d@leemhuis.info>
+ <618601d8-f82a-402f-bf7f-831671d3d83f@redhat.com>
+ <01fc2e30-eafe-495c-a62d-402903fd3e2a@lunn.ch>
+ <9d821cea-507f-4674-809c-a4640119c435@redhat.com>
+ <c912d1f7-7039-4f55-91ac-028a906c1387@lunn.ch>
+ <20240606063902.776794d4@kernel.org>
+Content-Language: en-US, nl
+From: Hans de Goede <hdegoede@redhat.com>
+In-Reply-To: <20240606063902.776794d4@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Kory Maincent <kory.maincent@bootlin.com> writes:
+Hi,
 
-> From: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
->
-> Expand the c33 PSE attributes with PSE class, extended state information
-> and power consumption.
->
-> ./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --do pse-get
-> 	     --json '{"header":{"dev-name":"eth0"}}'
-> {'c33-pse-actual-pw': 1700,
->  'c33-pse-admin-state': 3,
->  'c33-pse-pw-class': 4,
->  'c33-pse-pw-d-status': 4,
->  'header': {'dev-index': 4, 'dev-name': 'eth0'}}
->
-> ./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --do pse-get
-> 	     --json '{"header":{"dev-name":"eth0"}}'
-> {'c33-pse-admin-state': 3,
->  'c33-pse-ext-state': 5,
->  'c33-pse-ext-substate': 5,
->  'c33-pse-pw-d-status': 2,
->  'header': {'dev-index': 4, 'dev-name': 'eth0'}}
->
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
->  Documentation/netlink/specs/ethtool.yaml | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
->
-> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-> index 00dc61358be8..8aa064f2f466 100644
-> --- a/Documentation/netlink/specs/ethtool.yaml
-> +++ b/Documentation/netlink/specs/ethtool.yaml
-> @@ -922,6 +922,22 @@ attribute-sets:
->          name: c33-pse-pw-d-status
->          type: u32
->          name-prefix: ethtool-a-
-> +      -
-> +        name: c33-pse-pw-class
-> +        type: u32
-> +        name-prefix: ethtool-a-
-> +      -
-> +        name: c33-pse-actual-pw
-> +        type: u32
-> +        name-prefix: ethtool-a-
-> +      -
-> +        name: c33-pse-ext-state
-> +        type: u8
-> +        name-prefix: ethtool-a-
-> +      -
-> +        name: c33-pse-ext-substate
-> +        type: u8
-> +        name-prefix: ethtool-a-
+On 6/6/24 3:39 PM, Jakub Kicinski wrote:
+> On Thu, 6 Jun 2024 15:12:54 +0200 Andrew Lunn wrote:
+>>> So it has been almost a week and no reply from Heiner. Since this is
+>>> causing real issues for users out there I think a revert of 66601a29bb23
+>>> should be submitted to Linus and then backported to the stable kernels.
+>>> to fix the immediate issue at hand.  
+>>
+>> Agreed.
+> 
+> Please submit..
 
-I see this is consistent with existing pse attributes in the spec, but
-are there enumerations for the state and status attributes that could be
-added to the spec?
+Done: https://lore.kernel.org/linux-leds/20240607101847.23037-1-hdegoede@redhat.com/
 
->    -
->      name: rss
->      attributes:
-> @@ -1611,6 +1627,10 @@ operations:
->              - c33-pse-admin-state
->              - c33-pse-admin-control
->              - c33-pse-pw-d-status
-> +            - c33-pse-pw-class
-> +            - c33-pse-actual-pw
-> +            - c33-pse-ext-state
-> +            - c33-pse-ext-substate
->        dump: *pse-get-op
->      -
->        name: pse-set
+Regards,
+
+Hans
+
+
+
+
 
