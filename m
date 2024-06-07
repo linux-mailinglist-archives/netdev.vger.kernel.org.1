@@ -1,121 +1,286 @@
-Return-Path: <netdev+bounces-101960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A2B8900C0A
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 20:50:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D017A900C2A
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 20:57:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 582DE1C216B8
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:50:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3984C1F21C1D
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 18:57:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 566924204F;
-	Fri,  7 Jun 2024 18:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F65614B951;
+	Fri,  7 Jun 2024 18:57:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="UrKcVMlS"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="dsnu5D+b"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic316-26.consmr.mail.ne1.yahoo.com (sonic316-26.consmr.mail.ne1.yahoo.com [66.163.187.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F7B139FFB
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 18:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.187.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A30114B083;
+	Fri,  7 Jun 2024 18:56:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717786224; cv=none; b=QHw+9jYxNKAf92L2uTkcvZQLNDGn5SZ4AxvWWs0g4xfGqbQRIT08sNmQcSKic4cx2WdMITRhSPcU1Gh5J4G1y9j8PMxoeEd18wzoSmHFcZw7iwKV2Rtu4wFJId0kKXFM6zjYN5fn8q9pqSYR5/0gNzoLFpm3RI1UBcLN5Lv+gX4=
+	t=1717786621; cv=none; b=d+drrX0g0UfjGjci8l2tKPxB1/ODbpeSV6SPdozGuG43rhsVpXSKyp9aBOhkpHSZy46dgoZJH+tnoPaibBXRI5naJiDgpK4WGFczjCqKA/2hnYDTdEzEZxpZcoIPdJ9r4tS7FWDpAtEFytrxzCZQifWXL5k9fcb+A+CsXFroBv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717786224; c=relaxed/simple;
-	bh=2Xi0RYnzigepioYMasZJzBhHuea8gcSwQ38nznxB8Dg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DYIzobrj22ZVBFCguMdbp/sbrHhk+WAXefUGOk3PoNulSHFHK2U0rBxpA5JxfmFETSE9SXrIsrsMINk3mgcf/K+QvLQHJYToCEQYgL7jbVO2ITxE/BY1HejD0aoEo4zzE4WKsvUcJEQ/hCdT4nbWus2W3eUQSPRZYY7K2WV6sHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=UrKcVMlS; arc=none smtp.client-ip=66.163.187.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1717786214; bh=jjpBRxkpMLr3gtmzed0KzCkC6MUwXaUW8Hfa5XmCu8o=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=UrKcVMlSfr26pw2N1absEnyk5Smty4CyiOl5E7rmORPk1XBQ4x72gnUBgrD5uX0pIgQFnFfHpfYjGG3JM/BEUJYQsXKnqJkUECnaRbhATnSpZb1zitlQQwcIuHU9QJaqr6loZCNvRhfdYNlAAodFs0GKZu0G28hH2VqQ9jnxlId+PikhKXKZX6mdOM414aBaExAohcnPJFZZoiYJL2eEsuF3fmBiMO/uo84gUb+VL9xoqR7D/c6iboK90CoRKZ4To6H8gr/QQDScCfn1DirBu5SNc5wfEH3oRTwT9LUIU4EB1tlSaDwstX2QKmuDWLATwSITGfRHekHGzV6oEIgOWQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1717786214; bh=dykRUqslyI0Td0onN6MwTln35FzTXIbhzNOvDrhIFFM=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=sPTF+br6JcwH8zSmJq8GAGHoKGtiFhQcIQSJaiVHWmQ3JRUtlZrkP2XKrOAFAnr9+/oIpCRluLlrY9Kw0CKq/3RhlNNX2g1mY42kV5iKIWKdIH8sqA9nSxuG+rcw7jP4U49MxEcqTg50utWsyuEUcFUndlJIrNdV2Kt6BZd/2GI1WcXjuHvlhDVn6CJK3k06zcIv8jzIBjsPk+vAY0jNiDHf0+8tnqO4AMC7EVyMSQVUxKJgo22z0g6P5a96JrimpidBrrG4LoUjFQsRpv2WH1KC3YSQ+FmXvIMczG7nGVamyS3jY60VUGi0dMjQ367zYR32KY7YjAl3Xg9f9rCWlg==
-X-YMail-OSG: 7xQSf.MVM1lEU0KLzg7s5h.3yRAXzEdHrrhop_4YUNh9nWE5qwgpdGQw_L4EKPL
- oKDIbZIXJ_h7cHrFICQwBwfvEzirAL8D2Y5KQShbjLhurGQvwEmY1_qpPcnLqPn8TQr7ERXHGPsx
- .La8X7eNjh4.MLbbupzLygRFfzU8cqwqmfioTvyDII683Bn.gKycDwa6JmXpfsfJ8e2Gk5a2zfqf
- DgNi8WSSS03R0pT3IrERyc6bbV0UJvGsaoTdVyPvc8YEVYjNZy9huLE3q6GZMA8b55zFZbXLhIPn
- gRe231FXw4kDFcBiUYpBY8Dh8FjVBiU0LTWouqMl301w7vcw44X4Fq8FIq9r_AGy3fGaFzr3Ex7.
- ZmrQZivSCeJPtBgiA3cNNiJ0RaFZOlPk2KjlTtqD6.LWPGlO2zSU5PpbC9VFiad9ftaqaYb_nvTy
- JXCglsZCwD_woDNMlHozJ8BCH_He25PlIsnpz0mmrz6GOXFEpPcYAzkt2gMLqGLVl.cUI6xg66W0
- 6ZvwJC0BcWVuNttlC4EMYiEytAXjipMbScPs7ATZaRZM8n9YwRblHOI5hdbfsapM_Swtbkd44Zfu
- 0D.5d0b4kSWm4.IiAmmvqmix3upf3FuAKNchgSjFyN79ozxDrUog9mirMlY8_ldVlWNh5M4LmTNd
- _DF2kLlGw57DmMS7oHBnD51l6ppuZ30TtE8WX_7DK5fs7ZLh2VpKylQSzPCqxS90fExclbQPWMxe
- ZtyYLk7ZiiEQd8gnfnsD5wDhozV8y_Sjmq4bUOPi.abXHXK7BJ8wf3rloMwWExQLAX9kdvCn.IWj
- WErXODWFJAjaAXtsGYhW4uQn460eAHsuj8JsIpmY.b5zhPVDgwSHH6EQRyHfzjRkASG2wGRjRydy
- A.SsuE9qu4DQTfEGcjyUn976ZuHNM4v1w38Vut.H3neaEjN7qzMNYh0A2C3ehEUbC3Ej9XyssMBi
- LTghljgVQj8dRj4RInMAVkDMkR9pkWw5ybucz3_GJ3aB9xsCe7Jfxs3r7BvG1cEIgez25zBs36ZJ
- xGc5bmQ5Qh1tBSu4EXKcv7kXPE9LscJBdMkvWqL5UqZx_H3wijcYbhe7nUu4iEZ.oYQkhW.VpDo5
- rb2A5qP1hB9I5q8CNWTGM9T0PuGNrRzCqXemvMbKjsj03P16eCLHQCqnJgYakpbdmnrGF09g0.dy
- sj2xRHJtpr7Z3_9rSaCQzED2miVvzzKC1BLWfuT.JUWUEMWx5Vx8Qqfft4ZLrpevXwoTP3h5FbUE
- 1_b6.yGoxdPWKtgytoQHMuwmaza2taDTGclQ4.OW2GfRrbD02I9t72IMCbbjg4w4W3rGU40uYm8X
- WTVQJ5tnPKtGxVOkl7fpyWEqcnW20WHBSpWkotJvQhrW1jwNmiWDgomVaSsI4G7m8IR4DejZtIRu
- uQziN23gghlbUM8UkIorsTo58ofUb5i1r9rKgL7B_Kk_akwo3RsTQwv4EJ5DgdOl63Yeu6ZH0iGq
- 4fXILxazHNmxYV0fqfMlJsloyqoPiy.4Z_bUS8tdEg5ZiKamHodzX.blvX.3rKX2p3xs3r9KcitS
- c4LSy5ILBu0isw9KgemukY9oq8C4gosgJdNZukXKJlrr3LWLzcv.Kh5tfPdlE9ezsFNrcBusGOqg
- p6svfyT836bJAf7ERcMRTiUyHvce10X.E04XH24fa1aW7A3B81NRlTLSJoKQFI91ccXUboxOpeRO
- lu2.Y35I4SaPzFgMuVSvsuvbZVD2P0Dc766gomc9ekQaoaBeIxwuOtYBqnmdQZOnEWgAIu5sUKbQ
- CbTtYXsHWvjmqkDadpeTge5OCpuL_TBybd_da7wSVaKMWi01.sGcOjwxtSszz_lQOlpuWsrLs.Mp
- JsYyZUhKaNxBiEmWOy5tHAXTckmgdBcly8fQBwvJHh4bS.0SGs482Umhrp660HMJpht7tyOmloiZ
- 4WcYV.NzE3r5dwdiopRJri_QbyfKFNtuKzfqpeLQSESpXeFgYu9syirZoK7iCibl9QmzcAaCEyLp
- v9Z994TxHBCrKy3pz.A3dYnnGlfPHt5wyBm3cdecJhna1a.jaVsfQR2.z6reiJK9wzKDnE5h03m3
- VL_IkirE7rItekj3XMJ_7PRDiRcbh1GtDPXk0D9omC1T6HxgvLLvV56zXvZ5M8_Sk4ueBHRe6gKp
- dMEKDJLA_xPHHKMrd09Uz7OWWSAvAqSMq3nY6iGOb6XL08FZsW9ofDYjgntf2PNdjgUee7mrmGnU
- 0KCQfO31UxASPV.PKveYAFjAKbod4g8JUyWEEfmtAYeLwA95MdW7O6bx9ZUaMahg2yOEBwlLZO5.
- d.mAmQfE-
-X-Sonic-MF: <casey@schaufler-ca.com>
-X-Sonic-ID: 6fd9d693-87b7-4c08-bd52-39d2e1236bab
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic316.consmr.mail.ne1.yahoo.com with HTTP; Fri, 7 Jun 2024 18:50:14 +0000
-Received: by hermes--production-gq1-59c575df44-8lqx4 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 112a64c8672692ce743352f04ced2bf3;
-          Fri, 07 Jun 2024 18:50:11 +0000 (UTC)
-Message-ID: <b764863b-6111-45ee-8364-66a4ca7e5d59@schaufler-ca.com>
-Date: Fri, 7 Jun 2024 11:50:10 -0700
+	s=arc-20240116; t=1717786621; c=relaxed/simple;
+	bh=cOHWxYXhS4QzE8FPRetOVqOidM7FNPnmXPV0JI8jboo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=fS8dC+bKMRtAQVB9nz8jI7hSVdu3CiLVA4soq40Euj9nYakTdGmEvGRc0QUedf1YMTC2cR5LrhQ7xpAArppNcgJlNJvtLjV76pknXKV3WgZpFv/U0nLalRObjvlJ+5glNZyFiGFT1TNFIUYFN5SzkJX+Ja9GDzoN+rtPCD88rUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=dsnu5D+b; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 457HZwoE008786;
+	Fri, 7 Jun 2024 18:56:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=UQvPbsNBuGyozGV8ZlE2kZ
+	OfZWaPoZTtzz/LxPOdJ0k=; b=dsnu5D+bGmwxBUjAW8fb4WoQMlsnhN+EkGivMq
+	hxObHG3kRlKLdCUfibFAKhlAtTIJLInrfy12f1NmI+1+bi6Dc8toGImJNtTsFrKy
+	gutmG1omNS9IHq7cniFySaqbwM/oFsTGpwnByCGeJSwwu54O8O42qJG1s8azdZFQ
+	SK43WUJheceQc0qshI/TvCbHCuAHC7ENAg3oR2OMl9vkfg/yBKm9/+IxQENo1OYl
+	/4vQG51CSFE4cQn+VKyDp/BBnw1kxayPHES7tol7FDgv6SWqrQkZJ119de5vXWd1
+	aCCK0q2HynCDFfbgTqw0lPfB6I8U9w2HSdUAZ9LdZLxdc04Q==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yk8tccg10-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Jun 2024 18:56:58 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 457Iuvae026378
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 7 Jun 2024 18:56:57 GMT
+Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 7 Jun 2024
+ 11:56:56 -0700
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Date: Fri, 7 Jun 2024 11:56:56 -0700
+Subject: [PATCH] isdn: add missing MODULE_DESCRIPTION() macros
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/2] cipso: make cipso_v4_skbuff_delattr() fully remove
- the CIPSO options
-To: Ondrej Mosnacek <omosnace@redhat.com>, Paul Moore <paul@paul-moore.com>
-Cc: netdev@vger.kernel.org, linux-security-module@vger.kernel.org,
- Casey Schaufler <casey@schaufler-ca.com>
-References: <20240607160753.1787105-1-omosnace@redhat.com>
-Content-Language: en-US
-From: Casey Schaufler <casey@schaufler-ca.com>
-In-Reply-To: <20240607160753.1787105-1-omosnace@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.22407 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+Message-ID: <20240607-md-drivers-isdn-v1-1-81fb7001bc3a@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIAPdXY2YC/x3MQQrCQAxA0auUrA2MY1vRq4iLSSdjAzZKoqVQe
+ nfHLt/i/xWcTdjh2qxgPIvLSyuOhwaGMemDUXI1xBDb0IczThmzyczmKJ4VL30s1FKJJ+qgVm/
+ jIst+vN2rKTkjWdJh/H+eot8Fp+QfNti2H9EZKCqAAAAA
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>
+CC: Jeff Johnson <quic_jjohnson@quicinc.com>
+X-Mailer: b4 0.13.0
+X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: PHbWhhGYVDJq93_2jcMDE6KIOzbm_RiQ
+X-Proofpoint-GUID: PHbWhhGYVDJq93_2jcMDE6KIOzbm_RiQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-07_11,2024-06-06_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ clxscore=1015 malwarescore=0 suspectscore=0 phishscore=0 impostorscore=0
+ mlxlogscore=857 priorityscore=1501 spamscore=0 adultscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2405170001
+ definitions=main-2406070138
 
-On 6/7/2024 9:07 AM, Ondrej Mosnacek wrote:
-> This series aims to improve cipso_v4_skbuff_delattr() to fully
-> remove the CIPSO options instead of just clearing them with NOPs.
-> That is implemented in the second patch, while the first patch is
-> a bugfix for cipso_v4_delopt() that the second patch depends on.
->
-> Tested using selinux-testsuite a TMT/Beakerlib test from this PR:
-> https://src.fedoraproject.org/tests/selinux/pull-request/488
+make allmodconfig && make W=1 C=1 reports:
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/hfcpci.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/hfcmulti.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/hfcsusb.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/avmfritz.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/speedfax.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/mISDNinfineon.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/w6692.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/netjet.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/mISDNipac.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/mISDNisar.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/mISDN/mISDN_core.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/mISDN/mISDN_dsp.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/mISDN/l1oip.o
 
-Smack also uses CIPSO. The Smack testsuite is:
-https://github.com/smack-team/smack-testsuite.git
+Add the missing invocations of the MODULE_DESCRIPTION() macro.
 
->
-> Changes in v2:
-> - drop the paranoid WARN_ON() usage
-> - reword the description of the second patch
->
-> v1: https://lore.kernel.org/linux-security-module/20240416152913.1527166-1-omosnace@redhat.com/
->
-> Ondrej Mosnacek (2):
->   cipso: fix total option length computation
->   cipso: make cipso_v4_skbuff_delattr() fully remove the CIPSO options
->
->  net/ipv4/cipso_ipv4.c | 75 +++++++++++++++++++++++++++++++------------
->  1 file changed, 54 insertions(+), 21 deletions(-)
->
+Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+---
+ drivers/isdn/hardware/mISDN/avmfritz.c      | 1 +
+ drivers/isdn/hardware/mISDN/hfcmulti.c      | 1 +
+ drivers/isdn/hardware/mISDN/hfcpci.c        | 1 +
+ drivers/isdn/hardware/mISDN/hfcsusb.c       | 1 +
+ drivers/isdn/hardware/mISDN/mISDNinfineon.c | 1 +
+ drivers/isdn/hardware/mISDN/mISDNipac.c     | 1 +
+ drivers/isdn/hardware/mISDN/mISDNisar.c     | 1 +
+ drivers/isdn/hardware/mISDN/netjet.c        | 1 +
+ drivers/isdn/hardware/mISDN/speedfax.c      | 1 +
+ drivers/isdn/hardware/mISDN/w6692.c         | 1 +
+ drivers/isdn/mISDN/core.c                   | 1 +
+ drivers/isdn/mISDN/dsp_core.c               | 1 +
+ drivers/isdn/mISDN/l1oip_core.c             | 1 +
+ 13 files changed, 13 insertions(+)
+
+diff --git a/drivers/isdn/hardware/mISDN/avmfritz.c b/drivers/isdn/hardware/mISDN/avmfritz.c
+index f68569bfef7a..509b362d6465 100644
+--- a/drivers/isdn/hardware/mISDN/avmfritz.c
++++ b/drivers/isdn/hardware/mISDN/avmfritz.c
+@@ -159,6 +159,7 @@ set_debug(const char *val, const struct kernel_param *kp)
+ }
+ 
+ MODULE_AUTHOR("Karsten Keil");
++MODULE_DESCRIPTION("mISDN driver for AVM FRITZ!CARD PCI ISDN cards");
+ MODULE_LICENSE("GPL v2");
+ MODULE_VERSION(AVMFRITZ_REV);
+ module_param_call(debug, set_debug, param_get_uint, &debug, S_IRUGO | S_IWUSR);
+diff --git a/drivers/isdn/hardware/mISDN/hfcmulti.c b/drivers/isdn/hardware/mISDN/hfcmulti.c
+index 2e5cb9dde3ec..0d2928d8aeae 100644
+--- a/drivers/isdn/hardware/mISDN/hfcmulti.c
++++ b/drivers/isdn/hardware/mISDN/hfcmulti.c
+@@ -221,6 +221,7 @@ static uint	hwid = HWID_NONE;
+ static int	HFC_cnt, E1_cnt, bmask_cnt, Port_cnt, PCM_cnt = 99;
+ 
+ MODULE_AUTHOR("Andreas Eversberg");
++MODULE_DESCRIPTION("mISDN driver for hfc-4s/hfc-8s/hfc-e1 based cards");
+ MODULE_LICENSE("GPL");
+ MODULE_VERSION(HFC_MULTI_VERSION);
+ module_param(debug, uint, S_IRUGO | S_IWUSR);
+diff --git a/drivers/isdn/hardware/mISDN/hfcpci.c b/drivers/isdn/hardware/mISDN/hfcpci.c
+index fe391de1aba3..ce7bccc9faa3 100644
+--- a/drivers/isdn/hardware/mISDN/hfcpci.c
++++ b/drivers/isdn/hardware/mISDN/hfcpci.c
+@@ -48,6 +48,7 @@ static struct timer_list hfc_tl;
+ static unsigned long hfc_jiffies;
+ 
+ MODULE_AUTHOR("Karsten Keil");
++MODULE_DESCRIPTION("mISDN driver for CCD's hfc-pci based cards");
+ MODULE_LICENSE("GPL");
+ module_param(debug, uint, S_IRUGO | S_IWUSR);
+ module_param(poll, uint, S_IRUGO | S_IWUSR);
+diff --git a/drivers/isdn/hardware/mISDN/hfcsusb.c b/drivers/isdn/hardware/mISDN/hfcsusb.c
+index b82b89888a5e..e54419a4e731 100644
+--- a/drivers/isdn/hardware/mISDN/hfcsusb.c
++++ b/drivers/isdn/hardware/mISDN/hfcsusb.c
+@@ -31,6 +31,7 @@ static DEFINE_RWLOCK(HFClock);
+ 
+ 
+ MODULE_AUTHOR("Martin Bachem");
++MODULE_DESCRIPTION("mISDN driver for Colognechip HFC-S USB chip");
+ MODULE_LICENSE("GPL");
+ module_param(debug, uint, S_IRUGO | S_IWUSR);
+ module_param(poll, int, 0);
+diff --git a/drivers/isdn/hardware/mISDN/mISDNinfineon.c b/drivers/isdn/hardware/mISDN/mISDNinfineon.c
+index 88d592bafdb0..30876a012711 100644
+--- a/drivers/isdn/hardware/mISDN/mISDNinfineon.c
++++ b/drivers/isdn/hardware/mISDN/mISDNinfineon.c
+@@ -245,6 +245,7 @@ set_debug(const char *val, const struct kernel_param *kp)
+ }
+ 
+ MODULE_AUTHOR("Karsten Keil");
++MODULE_DESCRIPTION("mISDN driver for cards based on Infineon ISDN chipsets");
+ MODULE_LICENSE("GPL v2");
+ MODULE_VERSION(INFINEON_REV);
+ module_param_call(debug, set_debug, param_get_uint, &debug, S_IRUGO | S_IWUSR);
+diff --git a/drivers/isdn/hardware/mISDN/mISDNipac.c b/drivers/isdn/hardware/mISDN/mISDNipac.c
+index 4f8d85bb3ce1..d0b7271fbda1 100644
+--- a/drivers/isdn/hardware/mISDN/mISDNipac.c
++++ b/drivers/isdn/hardware/mISDN/mISDNipac.c
+@@ -21,6 +21,7 @@
+ 
+ MODULE_AUTHOR("Karsten Keil");
+ MODULE_VERSION(ISAC_REV);
++MODULE_DESCRIPTION("mISDN driver for ISAC specific functions");
+ MODULE_LICENSE("GPL v2");
+ 
+ #define ReadISAC(is, o)		(is->read_reg(is->dch.hw, o + is->off))
+diff --git a/drivers/isdn/hardware/mISDN/mISDNisar.c b/drivers/isdn/hardware/mISDN/mISDNisar.c
+index 48b3d43e2502..b3e03c410544 100644
+--- a/drivers/isdn/hardware/mISDN/mISDNisar.c
++++ b/drivers/isdn/hardware/mISDN/mISDNisar.c
+@@ -22,6 +22,7 @@
+ #define ISAR_REV	"2.1"
+ 
+ MODULE_AUTHOR("Karsten Keil");
++MODULE_DESCRIPTION("mISDN driver for ISAR (Siemens PSB 7110) specific functions");
+ MODULE_LICENSE("GPL v2");
+ MODULE_VERSION(ISAR_REV);
+ 
+diff --git a/drivers/isdn/hardware/mISDN/netjet.c b/drivers/isdn/hardware/mISDN/netjet.c
+index 566c790a9481..d163850c295e 100644
+--- a/drivers/isdn/hardware/mISDN/netjet.c
++++ b/drivers/isdn/hardware/mISDN/netjet.c
+@@ -114,6 +114,7 @@ set_debug(const char *val, const struct kernel_param *kp)
+ }
+ 
+ MODULE_AUTHOR("Karsten Keil");
++MODULE_DESCRIPTION("mISDN driver for NETJet cards");
+ MODULE_LICENSE("GPL v2");
+ MODULE_VERSION(NETJET_REV);
+ module_param_call(debug, set_debug, param_get_uint, &debug, S_IRUGO | S_IWUSR);
+diff --git a/drivers/isdn/hardware/mISDN/speedfax.c b/drivers/isdn/hardware/mISDN/speedfax.c
+index b530c78eca8e..0c405261d940 100644
+--- a/drivers/isdn/hardware/mISDN/speedfax.c
++++ b/drivers/isdn/hardware/mISDN/speedfax.c
+@@ -97,6 +97,7 @@ set_debug(const char *val, const struct kernel_param *kp)
+ }
+ 
+ MODULE_AUTHOR("Karsten Keil");
++MODULE_DESCRIPTION("mISDN driver for Sedlbauer Speedfax+ cards");
+ MODULE_LICENSE("GPL v2");
+ MODULE_VERSION(SPEEDFAX_REV);
+ MODULE_FIRMWARE("isdn/ISAR.BIN");
+diff --git a/drivers/isdn/hardware/mISDN/w6692.c b/drivers/isdn/hardware/mISDN/w6692.c
+index f3b8db7b48fe..ee69212ac351 100644
+--- a/drivers/isdn/hardware/mISDN/w6692.c
++++ b/drivers/isdn/hardware/mISDN/w6692.c
+@@ -101,6 +101,7 @@ set_debug(const char *val, const struct kernel_param *kp)
+ }
+ 
+ MODULE_AUTHOR("Karsten Keil");
++MODULE_DESCRIPTION("mISDN driver for Winbond w6692 based cards");
+ MODULE_LICENSE("GPL v2");
+ MODULE_VERSION(W6692_REV);
+ module_param_call(debug, set_debug, param_get_uint, &debug, S_IRUGO | S_IWUSR);
+diff --git a/drivers/isdn/mISDN/core.c b/drivers/isdn/mISDN/core.c
+index ab8513a7acd5..e34a7a46754e 100644
+--- a/drivers/isdn/mISDN/core.c
++++ b/drivers/isdn/mISDN/core.c
+@@ -14,6 +14,7 @@
+ static u_int debug;
+ 
+ MODULE_AUTHOR("Karsten Keil");
++MODULE_DESCRIPTION("Modular ISDN core driver");
+ MODULE_LICENSE("GPL");
+ module_param(debug, uint, S_IRUGO | S_IWUSR);
+ 
+diff --git a/drivers/isdn/mISDN/dsp_core.c b/drivers/isdn/mISDN/dsp_core.c
+index fae95f166688..753232e9fc36 100644
+--- a/drivers/isdn/mISDN/dsp_core.c
++++ b/drivers/isdn/mISDN/dsp_core.c
+@@ -172,6 +172,7 @@ module_param(debug, uint, S_IRUGO | S_IWUSR);
+ module_param(options, uint, S_IRUGO | S_IWUSR);
+ module_param(poll, uint, S_IRUGO | S_IWUSR);
+ module_param(dtmfthreshold, uint, S_IRUGO | S_IWUSR);
++MODULE_DESCRIPTION("mISDN driver for Digital Audio Processing of transparent data");
+ MODULE_LICENSE("GPL");
+ 
+ /*int spinnest = 0;*/
+diff --git a/drivers/isdn/mISDN/l1oip_core.c b/drivers/isdn/mISDN/l1oip_core.c
+index f010b35a0531..a5ad88a960d0 100644
+--- a/drivers/isdn/mISDN/l1oip_core.c
++++ b/drivers/isdn/mISDN/l1oip_core.c
+@@ -245,6 +245,7 @@ static int debug;
+ static int ulaw;
+ 
+ MODULE_AUTHOR("Andreas Eversberg");
++MODULE_DESCRIPTION("mISDN driver for tunneling layer 1 over IP");
+ MODULE_LICENSE("GPL");
+ module_param_array(type, uint, NULL, S_IRUGO | S_IWUSR);
+ module_param_array(codec, uint, NULL, S_IRUGO | S_IWUSR);
+
+---
+base-commit: 19ca0d8a433ff37018f9429f7e7739e9f3d3d2b4
+change-id: 20240607-md-drivers-isdn-962fb4bf23b5
+
 
