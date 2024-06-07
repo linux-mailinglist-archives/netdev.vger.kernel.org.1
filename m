@@ -1,211 +1,159 @@
-Return-Path: <netdev+bounces-101879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C3549005C7
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 15:58:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 970059005E6
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 16:08:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFBB628468F
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 13:58:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20B34283273
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 14:08:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41D015B134;
-	Fri,  7 Jun 2024 13:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DDAD195999;
+	Fri,  7 Jun 2024 14:07:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SNsp2S+e"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9EC1667DE;
-	Fri,  7 Jun 2024 13:58:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E976D19413B;
+	Fri,  7 Jun 2024 14:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717768718; cv=none; b=VlFXwF7BYdrCouG01q5+lqO3x89oZRzqh7YRVWcFHrgJev0fm0KgEI5vnqu+fOoq6fMYnZFo3l2ZarFv3gvpgm5LY/W1IEaFSV9c+EpaPFWkTBQeZA0a7aGDgxJdX4OFeF63RjiPM6JNYKqTwsqpaBJTVQ1MLEqGv3+zu8AAYbw=
+	t=1717769279; cv=none; b=SA/CRH2eDnNDgHcDT9BVTFfLCUlAWXS8LYNH3h1qQy6yN5hEE3zaeCPWu7WcUvj8MF6gzBeTbV244Bjcs4vIc6ReVdf7ojzMdHsX4XAGNzPsCve3hwG4C2DyynUGc45dBhv3rXrbVKJcZ+Uz98xxFD11wUj2qgb4Vbhjg48IAqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717768718; c=relaxed/simple;
-	bh=4G3FDvumPPb0WEUrF2heN84BCxUEYbAoobu+s6ougQ0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=jsP30XqQVIuI99wB2FkF3da9TRLh69y7Tr598EeMxM9Yhsm9M9pVR/bpcMUu5nCw0fHSk9Kkt7vrYDQDjXjjVGemzyOxzvuf3PAaBuUfLmtMEMODyrIJGir89fre68hQtdC/cuVDqXurIeQrKKr048No+q/66n/nbhB/OnyzwZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4VwjNL4Rr8zmYYQ;
-	Fri,  7 Jun 2024 21:53:54 +0800 (CST)
-Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1337C18007B;
-	Fri,  7 Jun 2024 21:58:31 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 7 Jun 2024 21:58:26 +0800
-Message-ID: <a2514345-f6e0-c081-d285-1ce0f8885291@huawei-partners.com>
-Date: Fri, 7 Jun 2024 16:58:21 +0300
+	s=arc-20240116; t=1717769279; c=relaxed/simple;
+	bh=Q0qVcx6Lh/xX9m1Yek3cdXKhexjuZvDuIwtmNW3N5x0=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=A6u9ohqKxF1J5iWlwC+c4dRG2uJshdXcKPXGA4UT4OGDjGUhCVBvKeBD0unJ3AzKhdSychb3uHn94hiEYg0GJOZ24pw704M/R4UFustgAP5c4vxWoJKihKjy+iD+81nV7pq2UsOorEipl4R1rJfU1+Vyi7+CQPGrLXNpEahEjH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SNsp2S+e; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-79524f6693dso155515185a.0;
+        Fri, 07 Jun 2024 07:07:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717769277; x=1718374077; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=76G98oggkba1Pa7jOw98g00tlzrNcJsAPnhQ44HuPIY=;
+        b=SNsp2S+erFabSAzT+GGWiMueNXYfLFxCTHtn8U8mSf7xkbQXGzJqfTEX+9/E6ho95u
+         AXKJN9Bc6HjvtbkMdLC/E/2HtKAirh0UrgcNq4tdsiNxiHW5WjvsWAd96uvlsvMVd3jj
+         RDuvdSlLt+jmOsHFaxduPAWP4J8KslHxab17s58rm9d4CHwvup+DTNcKLuYC4aNaNT9J
+         JC9/5qPKFvSEuoMG8wmRqWzb3fzFqxM5xCBhdfrcjXeTdhZOYh83aobBZ8wZbn8YJ5FG
+         r/91CSCdHFgncXIWVmE96fSumLlCWlVkfe5B8bZ8Ik4bH0xho0WgCHS6kdQyobQNnrAn
+         QnCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717769277; x=1718374077;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=76G98oggkba1Pa7jOw98g00tlzrNcJsAPnhQ44HuPIY=;
+        b=uT/ALK57+V88fg/8KBb4bdiCsoDYAB7iNHHFz/JIs4f1dYYTjdUvMrxsd16alWgm9g
+         fytePJsJ8vw538Z1RsH5i9NI4ehTUrLUKviHg9T9cD4PS7jRITvF/aloyicH/bIPFAGy
+         mwt1mvqCuR8ESf+uXs/hoexoK7wCDKgB2ToPyCPMUAnvwe9nKWLujED5wBTIhjUGpcmM
+         zwUQjKxxSM9dSl5MwOsn9kemNJMBRLBg8vug9jXiQ1bPYy+xd1zaQGjPiWsC2JWjEfpl
+         MfZr0+H2XdyaY3pHSRB1zogMDC18Jhu2+IY3vizc66b/HFUpJ8pP7jlvQ6hCNgJfCHzP
+         rTrg==
+X-Forwarded-Encrypted: i=1; AJvYcCWsxnK6YLlVbUzv82ACZzm1chNM+/watTntkRKnWten+qM1qZ2uqiiGokpJN7eiHDGTWbgwyavx3mATHQKuTAmRUzAEmTKWlCh3Xx0oSskmsJ8ckSsnsXE7cOsft/GVPUI8+Kmp
+X-Gm-Message-State: AOJu0Yw9ZzsexVXxjhRAg3bT3JPZr366q232bWdp6Kljlb6LmjMkmZHj
+	zLsBfbx4DnY8D5FAEcmvRjWU2U6pOeVhupgOpS2mdCT9yyyQypZc
+X-Google-Smtp-Source: AGHT+IEx6jdJ6+Tq5s1qSCTBn11J1LjVDiMbsh0HZyTk5UwkDByBNXCQgJJ/nUreX4OfIFYG+w3vaQ==
+X-Received: by 2002:a05:620a:21dd:b0:794:eb25:708b with SMTP id af79cd13be357-7953c4d1ac8mr211497585a.75.1717769276592;
+        Fri, 07 Jun 2024 07:07:56 -0700 (PDT)
+Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79543f02d1bsm61637785a.34.2024.06.07.07.07.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jun 2024 07:07:55 -0700 (PDT)
+Date: Fri, 07 Jun 2024 10:07:55 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: joshwash@google.com, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ kuba@kernel.org, 
+ stable@kernel.org, 
+ Joshua Washington <joshwash@google.com>, 
+ Praveen Kaligineedi <pkaligineedi@google.com>, 
+ Harshitha Ramamurthy <hramamurthy@google.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Andrei Vagin <avagin@gmail.com>, 
+ Jeroen de Borst <jeroendb@google.com>, 
+ Shailend Chand <shailend@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Rushil Gupta <rushilg@google.com>, 
+ Bailey Forrest <bcf@google.com>, 
+ Catherine Sullivan <csully@google.com>, 
+ open list <linux-kernel@vger.kernel.org>
+Message-ID: <6663143b90996_2f27b2949@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240607060958.2789886-1-joshwash@google.com>
+References: <20240606192139.1872461-1-joshwash@google.com>
+ <20240607060958.2789886-1-joshwash@google.com>
+Subject: Re: [PATCH net v2] gve: ignore nonrelevant GSO type bits when
+ processing TSO headers
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 00/12] Socket type control for Landlock
-Content-Language: ru
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
-CC: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack3000@gmail.com>, <mic@digikod.net>,
-	<willemdebruijn.kernel@gmail.com>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-References: <20240524093015.2402952-1-ivanov.mikhail1@huawei-partners.com>
- <20240604.c18387da7a0e@gnoack.org>
- <ebd680cc-25d6-ee14-4856-310f5e5e28e4@huawei-partners.com>
- <ZmG6f1XCrdWE-O7y@google.com>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <ZmG6f1XCrdWE-O7y@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
- dggpemm500020.china.huawei.com (7.185.36.49)
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-6/6/2024 4:32 PM, Günther Noack wrote:
-> Hello Mikhail!
+joshwash@ wrote:
+> From: Joshua Washington <joshwash@google.com>
 > 
-> On Thu, Jun 06, 2024 at 02:44:23PM +0300, Mikhail Ivanov wrote:
->> 6/4/2024 11:22 PM, Günther Noack wrote:
->>> On Fri, May 24, 2024 at 05:30:03PM +0800, Mikhail Ivanov wrote:
->>>> Hello! This is v2 RFC patch dedicated to socket protocols restriction.
->>>>
->>>> It is based on the landlock's mic-next branch on top of v6.9 kernel
->>>> version.
->>>
->>> Hello Mikhail!
->>>
->>> I patched in your patchset and tried to use the feature with a small
->>> demo tool, but I ran into what I think is a bug -- do you happen to
->>> know what this might be?
->>>
->>> I used 6.10-rc1 as a base and patched your patches on top.
->>>
->>> The code is a small tool called "nonet", which does the following:
->>>
->>>     - Disable socket creation with a Landlock ruleset with the following
->>>       attributes:
->>>       struct landlock_ruleset_attr attr = {
->>>         .handled_access_socket = LANDLOCK_ACCESS_SOCKET_CREATE,
->>>       };
->>>
->>>     - open("/dev/null", O_WRONLY)
->>>
->>> Expected result:
->>>
->>>     - open() should work
->>>
->>> Observed result:
->>>
->>>     - open() fails with EACCES.
->>>
->>> I traced this with perf, and found that the open() gets rejected from
->>> Landlock's hook_file_open, whereas hook_socket_create does not get
->>> invoked.  This is surprising to me -- Enabling a policy for socket
->>> creation should not influence the outcome of opening files!
->>>
->>> Tracing commands:
->>>
->>>     sudo perf probe hook_socket_create '$params'
->>>     sudo perf probe 'hook_file_open%return $retval'
->>>     sudo perf record -e 'probe:*' -g -- ./nonet
->>>     sudo perf report
->>> You can find the tool in my landlock-examples repo in the nonet_bug branch:
->>> https://github.com/gnoack/landlock-examples/blob/nonet_bug/nonet.c
->>>
->>> Landlock is enabled like this:
->>> https://github.com/gnoack/landlock-examples/blob/nonet_bug/sandbox_socket.c
->>>
->>> Do you have a hunch what might be going on?
->>
->> Hello Günther!
->> Big thanks for this research!
->>
->> I figured out that I define LANDLOCK_SHIFT_ACCESS_SOCKET macro in
->> really strange way (see landlock/limits.h):
->>
->>    #define LANDLOCK_SHIFT_ACCESS_SOCKET	LANDLOCK_NUM_ACCESS_SOCKET
->>
->> With this definition, socket access mask overlaps the fs access
->> mask in ruleset->access_masks[layer_level]. That's why
->> landlock_get_fs_access_mask() returns non-zero mask in hook_file_open().
->>
->> So, the macro must be defined in this way:
->>
->>    #define LANDLOCK_SHIFT_ACCESS_SOCKET	(LANDLOCK_NUM_ACCESS_NET +
->>                                           LANDLOCK_NUM_ACCESS_FS)
->>
->> With this fix, open() doesn't fail in your example.
->>
->> I'm really sorry that I somehow made such a stupid typo. I will try my
->> best to make sure this doesn't happen again.
+> TSO currently fails when the skb's gso_type field has more than one bit
+> set.
 > 
-> Thanks for figuring it out so quickly.  With that change, I'm getting some
-> compilation errors (some bit shifts are becoming too wide for the underlying
-> types), but I'm sure you can address that easily for the next version of the
-> patch set.
+> TSO packets can be passed from userspace using PF_PACKET, TUNTAP and a
+> few others, using virtio_net_hdr (e.g., PACKET_VNET_HDR). This includes
+> virtualization, such as QEMU, a real use-case.
 > 
-> IMHO this shows that our reliance on bit manipulation is probably getting in the
-> way of code clarity. :-/ I hope we can simplify these internal structures at
-> some point.  Once we have a better way to check for performance changes [1], we
-> can try to change this and measure whether these comprehensibility/performance
-> tradeoff is really worth it.
+> The gso_type and gso_size fields as passed from userspace in
+> virtio_net_hdr are not trusted blindly by the kernel. It adds gso_type
+> |= SKB_GSO_DODGY to force the packet to enter the software GSO stack
+> for verification.
 > 
-> [1] https://github.com/landlock-lsm/linux/issues/24
+> This issue might similarly come up when the CWR bit is set in the TCP
+> header for congestion control, causing the SKB_GSO_TCP_ECN gso_type bit
+> to be set.
+> 
+> Fixes: a57e5de476be ("gve: DQO: Add TX path")
+> Signed-off-by: Joshua Washington <joshwash@google.com>
+> Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
+> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Acked-by: Andrei Vagin <avagin@gmail.com>
 
-Sounds great, probably this idea should be added to this issue [1].
+I did not mean to ask for a revision. When you send a v2, please do include
+a changelog
 
-[1] https://github.com/landlock-lsm/linux/issues/34
+> ---
+>  drivers/net/ethernet/google/gve/gve_tx_dqo.c | 21 +++++---------------
+>  1 file changed, 5 insertions(+), 16 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+> index fe1b26a4d736..a76b407a981b 100644
+> --- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+> +++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+> @@ -551,32 +551,21 @@ static int gve_prep_tso(struct sk_buff *skb)
+>  	 * - Hypervisor enforces a limit of 9K MTU
+>  	 * - Kernel will not produce a TSO larger than 64k
+>  	 */
+> -
 
-> 
-> The other takeaway in my mind is, we should probably have some tests for that,
-> to check that the enablement of one kind of policy does not affect the
-> operations that belong to other kinds of policies.  Like this, for instance (I
-> was about to send this test to help debugging):
-> 
-> TEST_F(mini, restricting_socket_does_not_affect_fs_actions)
-> {
-> 	const struct landlock_ruleset_attr ruleset_attr = {
-> 		.handled_access_socket = LANDLOCK_ACCESS_SOCKET_CREATE,
-> 	};
-> 	int ruleset_fd, fd;
-> 
-> 	ruleset_fd = landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
-> 	ASSERT_LE(0, ruleset_fd);
-> 
-> 	enforce_ruleset(_metadata, ruleset_fd);
-> 	ASSERT_EQ(0, close(ruleset_fd));
-> 
-> 	/*
-> 	 * Accessing /dev/null for writing should be permitted,
-> 	 * because we did not add any file system restrictions.
-> 	 */
-> 	fd = open("/dev/null", O_WRONLY);
-> 	EXPECT_LE(0, fd);
-> 
-> 	ASSERT_EQ(0, close(fd));
-> }
-> 
-> Since these kinds of tests are a bit at the intersection between the
-> fs/net/socket tests, maybe they could go into a separate test file?  The next
-> time we add a new kind of Landlock restriction, it would come more naturally to
-> add the matching test there and spot such issues earlier.  Would you volunteer
-> to add such a test as part of your patch set? :)
+Accidental removal?
 
-Good idea! This test should probably be a part of the patch I mentioned
-here [1]. WDYT?
+>  	if (unlikely(skb_shinfo(skb)->gso_size < GVE_TX_MIN_TSO_MSS_DQO))
+>  		return -1;
+>  
+> +	if (!(skb_shinfo(skb)->gso_type & (SKB_GSO_TCPV4 | SKB_GSO_TCPV6)))
+> +		return -EINVAL;
+> +
 
-(Btw, [1] should also be a part of the issue mentioned above).
-
-[1] 
-https://lore.kernel.org/all/f4b5e2b9-e960-fd08-fdf4-328bb475e2ef@huawei-partners.com/
-
-> 
-> Thanks,
-> Günther
 
