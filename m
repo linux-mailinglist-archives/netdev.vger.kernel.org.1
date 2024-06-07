@@ -1,114 +1,113 @@
-Return-Path: <netdev+bounces-101596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B45D68FF899
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 02:18:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5342A8FF89A
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 02:19:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45616B2132C
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 00:18:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1070C1F232C3
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 00:19:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42730802;
-	Fri,  7 Jun 2024 00:18:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58408A48;
+	Fri,  7 Jun 2024 00:19:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="lKTodlwc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oiIDII4P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C83EC2
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 00:18:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C78A802;
+	Fri,  7 Jun 2024 00:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717719513; cv=none; b=gWKJ24Jt1ihk9aLjA8WL4esRYk/iatMqh7E/pFZW0x80PXRXJEbb5GXD5dcutvSZ+8rFQfegQKCXY1VsPJn50z0lo6i3nfOfKg3yEkYYnvad/lEd9UmMnS2velhl44MQ7C4Y6ML5t+P3b2mEBF9KX+pqN/f540qDk9hiNq2oirI=
+	t=1717719584; cv=none; b=fGeYXMPJTx9Zv3EcJzYMd8H3QYBMdLEg8OfB955sCRApFpx9CDzutJ/+OdH7eahsQdpdpRKTS0RltLsBEF+JvOyZqDNwGAU3HqUvP317MF/rcIf+TEE6GcQOL70pbci5u3HWvFl23maC2AVrqBRI4Q5EGHqNaYhe+rpfOqWeQ9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717719513; c=relaxed/simple;
-	bh=P3tNmYZKCay5MgeTRCqP7XWrKhh4366MJ7lmJ+p7REA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oOAuZ28IhRXMcyFpV7tdpccL+YEf4yMPF0FGlg/dIFvoIcqwgoCNScsi3xbpz42cRRZmijxMIAAS3kMuKl9FzntCEJA9QQa1Jpvja3RE2Dj+I/EnXX6iFy0mDNSF2RX5kMVQMUWC4/KwWg3SWZsPjFRwmsrSHxkrDmkc10f21d4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=lKTodlwc; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1717719511; x=1749255511;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=123Uhej2ONTf62tgYIbN+8HWC4Neb9TRa0YlYT1wa90=;
-  b=lKTodlwcO1D/KKjpbKVA2neTCIZua6+D5jFlVpFkB4Rdz2zrvNslCzwg
-   GLip/dkoiII5mLpz1JIDT/nrIW1f4A6C3xpDRsZRZ18KwoG3dmr5xnxGl
-   6iivKo2O71oYTdfWj/dnQu8iJZOlEhNSLHAzGegna+0hfYTOugG+VkSYK
-   U=;
-X-IronPort-AV: E=Sophos;i="6.08,219,1712620800"; 
-   d="scan'208";a="94986303"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2024 00:18:29 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:52111]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.111:2525] with esmtp (Farcaster)
- id 80288a91-d58a-4e07-8b61-a586f91a3000; Fri, 7 Jun 2024 00:18:29 +0000 (UTC)
-X-Farcaster-Flow-ID: 80288a91-d58a-4e07-8b61-a586f91a3000
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 7 Jun 2024 00:18:29 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.42) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 7 Jun 2024 00:18:26 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <dsahern@gmail.com>, <edumazet@google.com>,
-	<jiri@resnulli.us>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [PATCH net-next 1/2] rtnetlink: move rtnl_lock handling out of af_netlink
-Date: Thu, 6 Jun 2024 17:18:15 -0700
-Message-ID: <20240607001815.42475-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240606170453.53f20d5b@kernel.org>
-References: <20240606170453.53f20d5b@kernel.org>
+	s=arc-20240116; t=1717719584; c=relaxed/simple;
+	bh=g3QH/J1UqGMMgv1UFdPgFNuujOHdUk7CBldWAmkk7JM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=An2lttabgbnJABaCj88d32LQ6UBBovfjVsv7G0D72akbIxytRyoMmRL93Ec4w8yULL3qR5O3cg4z/XtUtdC09CIT+JrDa6s3Aq8iAHsQ0Q6FnmIgzjql2TPrXFr9GORwPUxYkn2+8W7ODrcp3RfHYJrGoKybehJJEi6I6nYT4xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oiIDII4P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B6F6C2BD10;
+	Fri,  7 Jun 2024 00:19:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717719584;
+	bh=g3QH/J1UqGMMgv1UFdPgFNuujOHdUk7CBldWAmkk7JM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oiIDII4P8I3kgYt0Wf6S9xsjVebnxAwTbnApLdPnwJdv7o7zwSjjwbdoxUaGdQgSa
+	 1+rnYpLqGni4g7s2kiXo1VxNITAFaLZ160mNlCPP2AX06NXC5mg7Y9cDHivIG+v3i4
+	 DBTYq4x4H45ci4GnA3MCuRbo+IZ+6t+NHiwWO7hoEqwZ49EeHgcW6lDf4z8xTZUQIE
+	 RWEnefG15CzHvoBiAT3iSG6X3HCrXyJTQr4yPSpRRD+wEyK1k6j/4g8kOxQYxuXLxf
+	 HLKtKbvSyrlk74Up91TbD9tK9Sj5G8w5STIk25ccja88ZVhBgMimocXROJ4vdUlawq
+	 1dZgvVAMlbmnA==
+Date: Thu, 6 Jun 2024 17:19:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: Tariq Toukan <ttoukan.linux@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nalramli@fastly.com, Saeed Mahameed
+ <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, "open
+ list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>, Tariq
+ Toukan <tariqt@nvidia.com>
+Subject: Re: [RFC net-next v4 2/2] net/mlx5e: Add per queue netdev-genl
+ stats
+Message-ID: <20240606171942.4226a854@kernel.org>
+In-Reply-To: <ZmIwIJ9rxllqQT18@LQ3V64L9R2>
+References: <20240604004629.299699-1-jdamato@fastly.com>
+	<20240604004629.299699-3-jdamato@fastly.com>
+	<11b9c844-a56e-427f-aab3-3e223d41b165@gmail.com>
+	<ZmIwIJ9rxllqQT18@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWC001.ant.amazon.com (10.13.139.223) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Thu, 6 Jun 2024 17:04:53 -0700
-> On Thu, 6 Jun 2024 16:33:03 -0700 Kuniyuki Iwashima wrote:
-> > > +	if (needs_lock)
-> > > +		rtnl_lock();
-> > >  	err = dumpit(skb, cb);
-> > > +	if (needs_lock)
-> > > +		rtnl_unlock();  
+On Thu, 6 Jun 2024 14:54:40 -0700 Joe Damato wrote:
+> > > Compare the values in /proc/net/dev match the output of cli for the same
+> > > device, even while the device is down.
+> > > 
+> > > Note that while the device is down, per queue stats output nothing
+> > > (because the device is down there are no queues):  
 > > 
-> > This calls netdev_run_todo() now, is this change intended ?
+> > This part is not true anymore.  
 > 
-> Nice catch / careful thinking, indeed we're moving from pure unlock to
-> run_todo. I don't really recall if I thought of this when writing the
-> change (it was few days back). My guess is that the fact we weren't
-> calling full rtnl_unlock() was unintentional / out of laziness in the
-> first place. It didn't matter since dumps are unlikely to changes /
-> unregister / free things.
-
-This makes sense.  Probably due to cb_mutex interface constraint.
-
-
-> But still, someone may get caught off guard
-> as some point that we're holding rtnl but won't go via the usual unlock
-> path.
+> It is true with this patch applied and running the command below.
+> Maybe I should have been more explicit that using cli.py outputs []
+> when scope = queue, which could be an internal cli.py thing, but
+> this is definitely true with this patch.
 > 
-> Would you like me to add a note to the commit message?
+> Did you test it and get different results?
 
-That would be nice, but I'm fine with this version :)
+To avoid drivers having their own interpretations what "closed" means,
+core hides all queues in closed state:
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+https://elixir.bootlin.com/linux/v6.10-rc1/source/net/core/netdev-genl.c#L582
 
-Thanks!
+> > PTP RQ index is naively assigned to zero:
+> > rq->ix           = MLX5E_PTP_CHANNEL_IX;
+> > 
+> > but this isn't to be used as the stats index.
+> > Today, the PTP-RQ has no matcing rxq in the kernel level.
+> > i.e. turning PTP-RQ on won't add a kernel-level RXQ to the
+> > real_num_rx_queues.
+> > Maybe we better do.
+> > If not, and the current state is kept, the best we can do is let the PTP-RQ
+> > naively contribute its queue-stat to channel 0.  
+> 
+> OK, it sounds like the easiest thing to do is just count PTP as
+> channel 0, so if i == 0, I'll in the PTP stats.
+> 
+> But please see below regarding testing whether or not PTP is
+> actually enabled or not.
+
+If we can I think we should avoid making queue 0 too special. 
+If someone configures steering and only expects certain packets on
+queue 0 - getting PTP counted there will be a surprise. 
+I vote to always count it towards base.
 
