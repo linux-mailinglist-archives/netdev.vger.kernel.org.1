@@ -1,152 +1,99 @@
-Return-Path: <netdev+bounces-101753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5E078FFF5E
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 11:25:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E4818FFF65
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 11:26:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 429E12889AB
-	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:25:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CE9B28518C
+	for <lists+netdev@lfdr.de>; Fri,  7 Jun 2024 09:26:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB67815B986;
-	Fri,  7 Jun 2024 09:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8079915B567;
+	Fri,  7 Jun 2024 09:26:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UygIkChc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OphgJDtL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EBDE15B552
-	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 09:25:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D21E178C60
+	for <netdev@vger.kernel.org>; Fri,  7 Jun 2024 09:26:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717752323; cv=none; b=PtnzraA/DKJp7G07qQTNSxj3BFBebm4uzkhjqIzLlKORj0ipp8QxjTwnMj0CzA+H3XS9zOxfDsJt7uME+75Up8eNBkSdnkXOYgowG7otvvCkXnV7u9ghFuafnE4KuVFbH4YIFGjHNVQlLLL0YweLsggl9TeuPKRGd8jAhuFcqqw=
+	t=1717752399; cv=none; b=WMCk0TgHrUkJl8L7lPFDL+cvNTv+FwcgsQFqLkgUxuSG5UtDVdDXtoK2F7U54xVL1HpeGy2POTXKUMu0EPQ7Bau/ICqpsUebfgk/BPH5v5Ov8CN7w22nUNZPlTPhL4x9VokFntVzkPI2Pw8RuglxLZbrJYa44xqDj05IcG/sKGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717752323; c=relaxed/simple;
-	bh=ztnzsXMOnQoBzvV4D7EflV3YRxDgpe1NeDBVLAoLFso=;
+	s=arc-20240116; t=1717752399; c=relaxed/simple;
+	bh=vCe9YBcXrbrkkEU4n1P6qgUzd3O5BQ71r3zyOBwNwPg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SPM4yTtuC257N0NtBkMNu37a9fsHawKhFhM7FN6BYse0pGGPIqeRqosdfW9LqFr7gV8Vcqto2ZNEJEZD+6iw6I0jtABOF1gyJK7pvYuB3q4Ey/QRHkJmNlbO5SAaLlsQ67z3sCL0fVz6KMPCqGF/MdOiW/6bmaCAqOW9J72AR0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UygIkChc; arc=none smtp.client-ip=209.85.208.42
+	 To:Cc:Content-Type; b=aS0lPGbzK5Kaf/CnWjH+F+U5J5T7yTvM7iiSN5IYOYpmVIWyEhNjjlJAqiPe4VwmcStTv49F6PjkJfkp2lOs/8S9m+BwcCYr0tEsiZuWm+s2q/WypE3B5AXAx4C2MRgi08UiFiGjukXtdpa4e2fnibOMGdCA/HPasOjoUPxBJgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OphgJDtL; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-57a1b122718so6131a12.1
-        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 02:25:21 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-57a1b122718so6141a12.1
+        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 02:26:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717752320; x=1718357120; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1717752396; x=1718357196; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zyjd+vh3aiiXZ15aghWc+zKeIWazhMBZHSZywZPOjeI=;
-        b=UygIkChcqh1iUlgfA889ZxlRS6f0tVB/e2rbyVaP199rxoNyzEw4lET8AOjskbd1mF
-         bkxevdVbss3M/K6EcwtS9wOLY0Z+nSP5BqC+cbyCQHS0Jd14JjWJSEkoLE21txAjPBEo
-         aGuaN4ER4rQnXPxrqYVKqJ2/vxR+VxBmj4Q/Ez/PHQALmeZZ3KgnpoZH9qJvRwh/nCGH
-         y7ONeDfJfW3qf89T3gjqJ5mJjtd0iC4UzdrqMcbRFkdYqyEdVlITJ951oP8WyRKgtcpb
-         CVbeS5NF2nEXb/Lw/8+zLiywRQoA6K5/RWQMLF8FNc1yW1VVMhemUzXHVoJ7Usw5FqPz
-         7ezg==
+        bh=vCe9YBcXrbrkkEU4n1P6qgUzd3O5BQ71r3zyOBwNwPg=;
+        b=OphgJDtLTgZ+rFqFLsxGaZ/gIwJ7q9ss65UGANWx/Z8ge46xt7vjvVTgyoVNnpMdH9
+         8Iq7l/7t2s0IG5BvfRqwkAmALEZS/NhBiv4pSDA0iNyB7hx7BF7BLDdqTlE42cCX+vje
+         jH+6EblOzK1hOHNrRGhgnDJaYFFsG3gmjfm/VqTwJUKDOFSJZVqqC0kZTCcQ/59VItPH
+         z/jMaD25fIgmjYa/QH5uhwuGY98wa3sWrHxfLxMmZ3qhF4l0widxjhjrDN0RC4Gp7foA
+         L77POX/K0oLD4sAcYNdpCgMzkiETAmzJ40TcqjGq2RmD4uqH/jpvpzkAVxun6BAqO4Nv
+         itIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717752320; x=1718357120;
+        d=1e100.net; s=20230601; t=1717752396; x=1718357196;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zyjd+vh3aiiXZ15aghWc+zKeIWazhMBZHSZywZPOjeI=;
-        b=g4eo4V4BEpBOc2Oh9vdlMQIRElS85ySEh7SX36t1NrcadGhfQW9CFQ6517xNEqUCkb
-         W6jqDs4nDdGjBgUfDlPv84IhTudDC1vUzq1e5Gp5569PWsGoK18yw1E66Cvfpq4toHXm
-         TuKcr+8qqRyRTgPHn4oSg0UIVGNxZ5oNPMRUqlp/JCE7A8/UEZ9gfKzKsoEjLplzEmGg
-         /DWlZdPCAzW8+K0+eQeLdABnAZxy/xXbtjE1krGARRCDdrNxMtNRXiFElMjfhYDa9z+S
-         azkT8dd7cZJCSzrvWr6GpXX4o7x3UhimVu3oj66lVAKFIYqmEvztnfscTmbO4dMJtIQS
-         4x5Q==
-X-Gm-Message-State: AOJu0YwWxjfsRTuoEG9yQSW9T6L9SeRWtyJ1i1h6BzWgCUH2SY0ASK/U
-	mDhSLEv4hndOvYv6A9wzR85sMfM8Nz2ADgKBDjRsNOa70PllAC+c+LtzskNTAtwsXVi4f6OUQfX
-	KWgeVfTRhMrXu/FtKN2+evq44qPWgz9Abb0W1
-X-Google-Smtp-Source: AGHT+IFY+e05JglJssHOD0lwpr4BcdSqLx9yyuaiJwTq82TryzLJboei//mGj8DWkhTvn06RcdAPeFzYBkThn6e4LHc=
-X-Received: by 2002:a05:6402:5d94:b0:57a:1937:e2a4 with SMTP id
- 4fb4d7f45d1cf-57aacb86e0amr416565a12.3.1717752318649; Fri, 07 Jun 2024
- 02:25:18 -0700 (PDT)
+        bh=vCe9YBcXrbrkkEU4n1P6qgUzd3O5BQ71r3zyOBwNwPg=;
+        b=vYLTzp6RoYpKT0q9BQ0TsISav+OuyMRT9k6RnrZ3LwVqNHhjPmcoogjZnoTr5sQo2B
+         dGUeAwFd/t2+oEwNv62Cld/GeGkBzclSINJMJN/DyOBFYL/tTvY2GzWEUQu3dZzvr1om
+         Vriv+FLUlIJwJBQ6Obl+gHrjJTjNL8aVvoKwdgPPBYxS4mHidT8gio6yCe9UCibxx0rv
+         neY/yYiH7jwwD6wbEF/f2NLW5FA3Kiri9JKySbaDzYj2f2xAI6Z7yqGGCpACPthRY/yK
+         mybgwSqLOxPV5eFsoOKxboMtLLcfz6UBN68QiI0Jby/D+lV3vgqRfG6iyINoUnyvrMmP
+         wDUA==
+X-Gm-Message-State: AOJu0Yz7KmzmlqW63caEMRkkkBsx9yZ4QkGLnZmxx7aCUG5NhkFcaAoi
+	jmUZaTPKKDXAHoBffpY3GM8kDJS8w3kk7rHbHbf1sby/QmAZV7aavYC7BokhevrXNSUIjLcakXF
+	vIhi7JZ2XjKyyZvVQtmJtJPRA6llWeR4qPaAI
+X-Google-Smtp-Source: AGHT+IEqzLsmHvscS//RfHdNiM1ZmKjMELCt9XB7BoA7j/yHy8tVO4V9PH+EC2vof2t5ju2Rp+xhYWgMAhbF/agfhr8=
+X-Received: by 2002:aa7:de0e:0:b0:57c:57b3:6bb3 with SMTP id
+ 4fb4d7f45d1cf-57c57b37a69mr64039a12.6.1717752395829; Fri, 07 Jun 2024
+ 02:26:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240607083205.3000-1-fw@strlen.de> <20240607083205.3000-2-fw@strlen.de>
-In-Reply-To: <20240607083205.3000-2-fw@strlen.de>
+References: <20240607083205.3000-1-fw@strlen.de> <20240607083205.3000-3-fw@strlen.de>
+In-Reply-To: <20240607083205.3000-3-fw@strlen.de>
 From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 7 Jun 2024 11:25:07 +0200
-Message-ID: <CANn89i+50SE0Lnbpj1b1u62CyOfVxH25bneXnc3e=RJB0+jJ9g@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] net: add and use skb_get_hash_net
+Date: Fri, 7 Jun 2024 11:26:24 +0200
+Message-ID: <CANn89iJuSxe5fD7O_J0ZKXEQsyv64X1JH6un5eMZDmL43mJ+3g@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] net: add and use __skb_get_hash_symmetric_net
 To: Florian Westphal <fw@strlen.de>
 Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
 	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org, 
-	pablo@netfilter.org, willemb@google.com, Christoph Paasch <cpaasch@apple.com>
+	pablo@netfilter.org, willemb@google.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Fri, Jun 7, 2024 at 10:36=E2=80=AFAM Florian Westphal <fw@strlen.de> wro=
 te:
 >
-> Years ago flow dissector gained ability to delegate flow dissection
-> to a bpf program, scoped per netns.
+> Similar to previous patch: apply same logic for
+> __skb_get_hash_symmetric and let callers pass the netns to the dissector
+> core.
 >
-> Unfortunately, skb_get_hash() only gets an sk_buff argument instead
-> of both net+skb.  This means the flow dissector needs to obtain the
-> netns pointer from somewhere else.
+> Existing function is turned into a wrapper to avoid adjusting all
+> callers, nft_hash.c uses new function.
 >
-> The netns is derived from skb->dev, and if that is not available, from
-> skb->sk.  If neither is set, we hit a (benign) WARN_ON_ONCE().
->
-> Trying both dev and sk covers most cases, but not all, as recently
-> reported by Christoph Paasch.
->
-> In case of nf-generated tcp reset, both sk and dev are NULL:
->
-> WARNING: .. net/core/flow_dissector.c:1104
->  skb_flow_dissect_flow_keys include/linux/skbuff.h:1536 [inline]
->  skb_get_hash include/linux/skbuff.h:1578 [inline]
->  nft_trace_init+0x7d/0x120 net/netfilter/nf_tables_trace.c:320
->  nft_do_chain+0xb26/0xb90 net/netfilter/nf_tables_core.c:268
->  nft_do_chain_ipv4+0x7a/0xa0 net/netfilter/nft_chain_filter.c:23
->  nf_hook_slow+0x57/0x160 net/netfilter/core.c:626
->  __ip_local_out+0x21d/0x260 net/ipv4/ip_output.c:118
->  ip_local_out+0x26/0x1e0 net/ipv4/ip_output.c:127
->  nf_send_reset+0x58c/0x700 net/ipv4/netfilter/nf_reject_ipv4.c:308
->  nft_reject_ipv4_eval+0x53/0x90 net/ipv4/netfilter/nft_reject_ipv4.c:30
->  [..]
->
-> syzkaller did something like this:
-> table inet filter {
->   chain input {
->     type filter hook input priority filter; policy accept;
->     meta nftrace set 1                  # calls skb_get_hash
->     tcp dport 42 reject with tcp reset  # emits skb with NULL skb dev/sk
->    }
->    chain output {
->     type filter hook output priority filter; policy accept;
->     # empty chain is enough
->    }
-> }
->
-> ... then sends a tcp packet to port 42.
->
-> Initial attempt to simply set skb->dev from nf_reject_ipv4 doesn't cover
-> all cases: skbs generated via ipv4 igmp_send_report trigger similar splat=
-.
->
-> Moreover, Pablo Neira found that nft_hash.c uses __skb_get_hash_symmetric=
-()
-> which would trigger same warn splat for such skbs.
->
-> Lets allow callers to pass the current netns explicitly.
-> The nf_trace infrastructure is adjusted to use the new helper.
->
-> __skb_get_hash_symmetric is handled in the next patch.
->
-> Reported-by: Christoph Paasch <cpaasch@apple.com>
-> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/494
 > Signed-off-by: Florian Westphal <fw@strlen.de>
-
-Nice, I had an internal syzbot report about the same issue.
 
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 
