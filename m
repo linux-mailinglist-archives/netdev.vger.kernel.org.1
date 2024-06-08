@@ -1,161 +1,156 @@
-Return-Path: <netdev+bounces-101999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BE4F9010E7
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 11:06:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0600D9010FF
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 11:12:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F5391F21B61
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 09:06:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FF7C282F13
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 09:12:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0FC717D35E;
-	Sat,  8 Jun 2024 09:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19563176ABC;
+	Sat,  8 Jun 2024 09:12:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GmqB7I4T"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="HWVleL9c"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB03117D34E
-	for <netdev@vger.kernel.org>; Sat,  8 Jun 2024 09:01:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D2C1B813;
+	Sat,  8 Jun 2024 09:12:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717837314; cv=none; b=PAaIyAvUJhapCI2MBQ/jEZXP6B4Iu16MNC1GUXr2pyOuDXqJSX5kGf/m7gyeJzFqjL7TBQ4DuqT4t1FLT1tZGTPTQ258JnpQctDEKJTU80RTiiqiu7GfuoPtrITSXHjjv3Gq3vqMkAVGYtf2sgpXPGe1Hp6Dpzxf/aGu8WJLMM4=
+	t=1717837965; cv=none; b=Sc1zeUq86jDrWcNfNYxlwdjA41cOTeqDnB45s3PxcUp/2E/rNmJo2CoH40IapqvhWDMtNweV3t8eMlz3NP9yAjFSe3XUqvgC9dYK1hIMEA5Bkz50MRQu0kQjvMp+veIPwO4FgELflE8sT5yzgCLD54MSGSdGbn4yryp8J6WOCWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717837314; c=relaxed/simple;
-	bh=8JZQ3J6N4yPHAn/Ii/fcbQ1ADz1yJP7osgQWyIvN4xo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WomqXgPX96Rn++xJlh9Cj0XmCmSWiEukaV8K+NChJP2irLXz7StRrGfwsUiKBjT7/L3z3qr3MpDqQhgC/E6gaotcgONtoT9j3/oWZeEaIAIcYYiyEZPEI7u09AAhgvHdiRmqm33INlToOq4LdZan+i7kAcZ0oaQV0pMY9efHTgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GmqB7I4T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23F24C4AF07;
-	Sat,  8 Jun 2024 09:01:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717837314;
-	bh=8JZQ3J6N4yPHAn/Ii/fcbQ1ADz1yJP7osgQWyIvN4xo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GmqB7I4TUBkvEF6hoyEAuD10howINWVAlDsLrXdeTOFG7a/20oGUQxYU1vEnbwpt0
-	 l8+ES7/kUqCK3n1XUREPFay6deheQYfOYihSzF8JQN/Zc1gsMn4wqsGOHUyDeIcR5p
-	 HfSRcSJ0+Ro/P0q0TnQvUKkZs5eJs/Mn/GyRaJv1bie5zCAch62mzzjzOs0Q85XDGJ
-	 mmzg5fVi+JA6emmZzoNw+3cNPlkmn6vAqUDfXxmdYp93jyiTHLS6F03BeflKHsOwYK
-	 O5Be2HeXNkydZgnHLEJkwyt+sRobiu5X4bmvEhO6zpOK3KDFtluyqCNCgNAA2E+qS2
-	 /OHZkyxuqWMpQ==
-Date: Sat, 8 Jun 2024 10:01:50 +0100
-From: Simon Horman <horms@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Amit Cohen <amcohen@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@resnulli.us>,
-	Alexander Zubkov <green@qrator.net>, mlxsw@nvidia.com
-Subject: Re: [PATCH net 5/6] mlxsw: spectrum_acl_erp: Fix object nesting
- warning
-Message-ID: <20240608090150.GR27689@kernel.org>
-References: <cover.1717684365.git.petrm@nvidia.com>
- <c0c27909a09b9a47e03beb643b83784f75c7952c.1717684365.git.petrm@nvidia.com>
+	s=arc-20240116; t=1717837965; c=relaxed/simple;
+	bh=PySGkYwNjnZFT5rgrUnkIwJwoGCgLPW8v0mBTBsbDCA=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=pCmElGN7rw6kOdzumzLKTWsKWZXc8vEUndZvC2EbDDKw6uisKNn8I1eHI1nj3tBlaOzhtU5L652MZ+TBH2Y7Eul1JLN5jKBriVdqe0r7GOkUvoWOtRmFTT6YwWFr/VDQYJXqtXjS8sgbPGVE3BnWHhavf8ocoDXM4uotMPL0W2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=HWVleL9c; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1717837954; h=From:To:Subject:Date:Message-Id;
+	bh=cgd6ey7OgPlwLc5rt7UvPkd8PCmmRS9pNehw00KIcX8=;
+	b=HWVleL9cBu/iKNHD1pl2icCjWd9mD5hPz+XykVS0Q5rA9KDIPgauGJxZ/3KooP+dMvpArkL3lpb/BWAcCxsDo7xLS3qfDgzWMbPbmc9odRV1gsquEFkSk2zVwqKlzoDfNzsnSfoiavrxYqtqU/YiaefiCP+ICNmO0emdMpQ0xtU=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R841e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032014031;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W81AVHr_1717837949;
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W81AVHr_1717837949)
+          by smtp.aliyun-inc.com;
+          Sat, 08 Jun 2024 17:12:33 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	wintera@linux.ibm.com,
+	guwen@linux.alibaba.com
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	tonylu@linux.alibaba.com,
+	pabeni@redhat.com,
+	edumazet@google.com
+Subject: [PATCH net-next v7 0/3] Introduce IPPROTO_SMC
+Date: Sat,  8 Jun 2024 17:12:26 +0800
+Message-Id: <1717837949-88904-1-git-send-email-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c0c27909a09b9a47e03beb643b83784f75c7952c.1717684365.git.petrm@nvidia.com>
 
-On Thu, Jun 06, 2024 at 04:49:42PM +0200, Petr Machata wrote:
-> From: Ido Schimmel <idosch@nvidia.com>
-> 
-> ACLs in Spectrum-2 and newer ASICs can reside in the algorithmic TCAM
-> (A-TCAM) or in the ordinary circuit TCAM (C-TCAM). The former can
-> contain more ACLs (i.e., tc filters), but the number of masks in each
-> region (i.e., tc chain) is limited.
-> 
-> In order to mitigate the effects of the above limitation, the device
-> allows filters to share a single mask if their masks only differ in up
-> to 8 consecutive bits. For example, dst_ip/25 can be represented using
-> dst_ip/24 with a delta of 1 bit. The C-TCAM does not have a limit on the
-> number of masks being used (and therefore does not support mask
-> aggregation), but can contain a limited number of filters.
-> 
-> The driver uses the "objagg" library to perform the mask aggregation by
-> passing it objects that consist of the filter's mask and whether the
-> filter is to be inserted into the A-TCAM or the C-TCAM since filters in
-> different TCAMs cannot share a mask.
-> 
-> The set of created objects is dependent on the insertion order of the
-> filters and is not necessarily optimal. Therefore, the driver will
-> periodically ask the library to compute a more optimal set ("hints") by
-> looking at all the existing objects.
-> 
-> When the library asks the driver whether two objects can be aggregated
-> the driver only compares the provided masks and ignores the A-TCAM /
-> C-TCAM indication. This is the right thing to do since the goal is to
-> move as many filters as possible to the A-TCAM. The driver also forbids
-> two identical masks from being aggregated since this can only happen if
-> one was intentionally put in the C-TCAM to avoid a conflict in the
-> A-TCAM.
-> 
-> The above can result in the following set of hints:
-> 
-> H1: {mask X, A-TCAM} -> H2: {mask Y, A-TCAM} // X is Y + delta
-> H3: {mask Y, C-TCAM} -> H4: {mask Z, A-TCAM} // Y is Z + delta
-> 
-> After getting the hints from the library the driver will start migrating
-> filters from one region to another while consulting the computed hints
-> and instructing the device to perform a lookup in both regions during
-> the transition.
-> 
-> Assuming a filter with mask X is being migrated into the A-TCAM in the
-> new region, the hints lookup will return H1. Since H2 is the parent of
-> H1, the library will try to find the object associated with it and
-> create it if necessary in which case another hints lookup (recursive)
-> will be performed. This hints lookup for {mask Y, A-TCAM} will either
-> return H2 or H3 since the driver passes the library an object comparison
-> function that ignores the A-TCAM / C-TCAM indication.
-> 
-> This can eventually lead to nested objects which are not supported by
-> the library [1].
-> 
-> Fix by removing the object comparison function from both the driver and
-> the library as the driver was the only user. That way the lookup will
-> only return exact matches.
-> 
-> I do not have a reliable reproducer that can reproduce the issue in a
-> timely manner, but before the fix the issue would reproduce in several
-> minutes and with the fix it does not reproduce in over an hour.
-> 
-> Note that the current usefulness of the hints is limited because they
-> include the C-TCAM indication and represent aggregation that cannot
-> actually happen. This will be addressed in net-next.
-> 
-> [1]
-> WARNING: CPU: 0 PID: 153 at lib/objagg.c:170 objagg_obj_parent_assign+0xb5/0xd0
-> Modules linked in:
-> CPU: 0 PID: 153 Comm: kworker/0:18 Not tainted 6.9.0-rc6-custom-g70fbc2c1c38b #42
-> Hardware name: Mellanox Technologies Ltd. MSN3700C/VMOD0008, BIOS 5.11 10/10/2018
-> Workqueue: mlxsw_core mlxsw_sp_acl_tcam_vregion_rehash_work
-> RIP: 0010:objagg_obj_parent_assign+0xb5/0xd0
-> [...]
-> Call Trace:
->  <TASK>
->  __objagg_obj_get+0x2bb/0x580
->  objagg_obj_get+0xe/0x80
->  mlxsw_sp_acl_erp_mask_get+0xb5/0xf0
->  mlxsw_sp_acl_atcam_entry_add+0xe8/0x3c0
->  mlxsw_sp_acl_tcam_entry_create+0x5e/0xa0
->  mlxsw_sp_acl_tcam_vchunk_migrate_one+0x16b/0x270
->  mlxsw_sp_acl_tcam_vregion_rehash_work+0xbe/0x510
->  process_one_work+0x151/0x370
-> 
-> Fixes: 9069a3817d82 ("lib: objagg: implement optimization hints assembly and use hints for object creation")
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> Reviewed-by: Amit Cohen <amcohen@nvidia.com>
-> Tested-by: Alexander Zubkov <green@qrator.net>
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
+From: "D. Wythe" <alibuda@linux.alibaba.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+This patch allows to create smc socket via AF_INET,
+similar to the following code,
+
+/* create v4 smc sock */
+v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
+
+/* create v6 smc sock */
+v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
+
+There are several reasons why we believe it is appropriate here:
+
+1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
+address. There is no AF_SMC address at all.
+
+2. Create smc socket in the AF_INET(6) path, which allows us to reuse
+the infrastructure of AF_INET(6) path, such as common ebpf hooks.
+Otherwise, smc have to implement it again in AF_SMC path. Such as:
+  1. Replace IPPROTO_TCP with IPPROTO_SMC in the socket() syscall
+     initiated by the user, without the use of LD-PRELOAD.
+  2. Select whether immediate fallback is required based on peer's port/ip
+     before connect().
+
+A very significant result is that we can now use eBPF to implement smc_run
+instead of LD_PRELOAD, who is completely ineffective in scenarios of static
+linking.
+
+Another potential value is that we are attempting to optimize the
+performance of fallback socks, where merging socks is an important part,
+and it relies on the creation of SMC sockets under the AF_INET path. 
+(More information :
+https://lore.kernel.org/netdev/1699442703-25015-1-git-send-email-alibuda@linux.alibaba.com/T/)
+
+v2 -> v1:
+
+- Code formatting, mainly including alignment and annotation repair.
+- move inet_smc proto ops to inet_smc.c, avoiding af_smc.c becoming too bulky.
+- Fix the issue where refactoring affects the initialization order.
+- Fix compile warning (unused out_inet_prot) while CONFIG_IPV6 was not set.
+
+v3 -> v2:
+
+- Add Alibaba's copyright information to the newfile
+
+v4 -> v3:
+
+- Fix some spelling errors
+- Align function naming style with smc_sock_init() to smc_sk_init()
+- Reversing the order of the conditional checks on clcsock to make the code more intuitive
+
+v5 -> v4:
+
+- Fix some spelling errors
+- Added comment, "/* CONFIG_IPV6 */", after the final #endif directive.
+- Rename smc_inet.h and smc_inet.c to smc_inet.h and smc_inet.c
+- Encapsulate the initialization and destruction of inet_smc in inet_smc.c,
+  rather than implementing it directly in af_smc.c.
+- Remove useless header files in smc_inet.h
+- Make smc_inet_prot_xxx and smc_inet_sock_init() to be static, since it's
+  only used in smc_inet.c
+
+v6 -> v5:
+
+- Wrapping lines to not exceed 80 characters
+- Combine initialization and error handling of smc_inet6 into the same #if
+  macro block.
+
+v7 -> v6:
+
+- Modify the value of IPPROTO_SMC to 256 so that it does not affect IPPROTO-MAX
+
+D. Wythe (3):
+  net/smc: refactoring initialization of smc sock
+  net/smc: expose smc proto operations
+  net/smc: Introduce IPPROTO_SMC
+
+ include/uapi/linux/in.h |   2 +
+ net/smc/Makefile        |   2 +-
+ net/smc/af_smc.c        | 162 ++++++++++++++++++++++++++--------------------
+ net/smc/smc.h           |  38 +++++++++++
+ net/smc/smc_inet.c      | 169 ++++++++++++++++++++++++++++++++++++++++++++++++
+ net/smc/smc_inet.h      |  22 +++++++
+ 6 files changed, 324 insertions(+), 71 deletions(-)
+ create mode 100644 net/smc/smc_inet.c
+ create mode 100644 net/smc/smc_inet.h
+
+-- 
+1.8.3.1
 
 
