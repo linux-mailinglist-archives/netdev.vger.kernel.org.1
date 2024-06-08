@@ -1,83 +1,58 @@
-Return-Path: <netdev+bounces-102009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AB83901179
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 14:43:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D787C901183
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 14:55:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7229E1F212B4
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 12:43:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A8742827D4
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 12:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D7756B7C;
-	Sat,  8 Jun 2024 12:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B6E3176FA7;
+	Sat,  8 Jun 2024 12:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WWqHL8Bh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B/nimq3P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8211755896;
-	Sat,  8 Jun 2024 12:43:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B132BAE9
+	for <netdev@vger.kernel.org>; Sat,  8 Jun 2024 12:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717850593; cv=none; b=OGJaOCk9tWrqmvXBV9cjxXq05wlAWy3MbKv1E7WFEqQgRSadJ2VayQlT8wOH1P2DfXroUvU8WmJt8W4IjQe3z2S4npdSgbY92q8PFOW0EOmXyafhwrOjvKd9ofcIicZZcKxDvoXZ9Qfq9fdlza6NhHzW+7y+qjgb2kX8E83IV/4=
+	t=1717851334; cv=none; b=rmS2C4mAam7bySVqBI0myniUVJxuvQtAlanDxcGQwUy1F6tpz6z3paikyOlA77iBNd48ytydDxPabpQ+/JGniTd/5gy64v2ncJGm0VnphPT7EHKInaZxk7L6Qwfa0dD3+EhfaRtM3Vta0eB7i0HpfjPirLx6viXLyrNeV7BXDgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717850593; c=relaxed/simple;
-	bh=8nyWEsXGX2UC3fntWUZe5tv9qmwbftOOI1ptiVpeTlE=;
+	s=arc-20240116; t=1717851334; c=relaxed/simple;
+	bh=9KLc5ZWRKVzzD/hO+CFXAsPG5/vZtKSbef/xgGiW+6M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hUphpSJS63ksvEoCm9K7jFBYvzKvIdYghrC6ootVBP4T4q+jQUqixpagiLaozlbeBgISc8yL0kVopFCH8z1H1vNrWfboH8hPNTkiMC99C0hcLQR6phfk6HHvR3qQUFZzEmIuS0N90mb/FfS0Q7lbi3LNYW4zajsInygYaa+2eAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WWqHL8Bh; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a63359aaacaso455803866b.1;
-        Sat, 08 Jun 2024 05:43:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717850590; x=1718455390; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=u2jJpnazhyNnGAHA2J872EkU21KY+hirrOIRfP72bSc=;
-        b=WWqHL8Bhg8UlSSyGoa9DpFuLV47VbsmE+UIbPpvreWKExoeLgV+m8LSy9f+L/vniPN
-         KLm7op9lzFvUr74wDoon92sTKEfGQkrKknuI9cf6EBA/+jH83agVh/xp8i17e4oUWG6l
-         5/Tr86en0VaWdSD4T8KKITfwDXKzVX2ZPvAEbP5akE/7vkj/4Qyij1sYQXIiA/f/aDbQ
-         4zgE3ZCpSpRP/kmnZ6UWvc2Yt9+F5MMwA7+nmynAnexOinNsXOeu7NZXFNiLJpH0Jho4
-         BPlxv0YxoQ8f5UsHFCZsLtaHSTSixroOiNhlGBdbjdIK+l/+MqJ8OeEmxxk6GTN2rzmT
-         YslQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717850590; x=1718455390;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u2jJpnazhyNnGAHA2J872EkU21KY+hirrOIRfP72bSc=;
-        b=oGHvH03r+bRovhZF2eFOF70suUE416bA5Igploh/3beWifyjwdgvT7OB9roY8FnGrH
-         VbKHAPWeDl3p+XdV9/jCYgvCTeL32TmF9myEvOzbnUe35ZA/9WMZcnhJKdv7wVWIaOwS
-         qDmORotbLvDBIy6icv60h1AnKffS+oEhNDqCRPH75OW/Um4GdQ9+ut8p8SmHk/48DN5U
-         kEbv1N3pGNvyIeQKneZcbEgO0nsxgBmeU0rKfQQ+ErScsSfxzXtpMIBhDTDLz7AonE8w
-         egiemnrLR0mBpEqjuIWmJ7k8stFGhKIdEA9J86/kZXh2zknOqnPn328W6e9FFi3RSvOG
-         5HnA==
-X-Forwarded-Encrypted: i=1; AJvYcCUF3EXA6a/hWT5Z0pZNDRm/8sT7BAwsWJUXVHcsyx63kyq/8hcUSWhiIUNqPY2XQkTjGLy/q7a7ykEpFjMNooEyskYeVk2xECtM9C+fJk0FV2tIb0hBXC5O5wxlWDWy1WP5d3q4
-X-Gm-Message-State: AOJu0Yzu+tSete/woYFUAo7X9t8Vy7qkh2c6AdOCIGKaxz+ImnNstFem
-	Cz/ZE2aO1ye7tK4TkL0UG4EZXr9+psyuckd4xA4S0SUjWtxMFair
-X-Google-Smtp-Source: AGHT+IGDEYouqAB0pPS44aRwekYh9i439dQuEXVnbRKmELsUCwf2icDlFZh9N5imcqNACwiXv9tutg==
-X-Received: by 2002:a17:906:25c5:b0:a6c:8bc3:aabd with SMTP id a640c23a62f3a-a6cd7d684e9mr310486466b.46.1717850589544;
-        Sat, 08 Jun 2024 05:43:09 -0700 (PDT)
-Received: from skbuf ([188.25.55.166])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f10d1c044sm10633466b.163.2024.06.08.05.43.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Jun 2024 05:43:09 -0700 (PDT)
-Date: Sat, 8 Jun 2024 15:43:06 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Xiaolei Wang <xiaolei.wang@windriver.com>
-Cc: linux@armlinux.org.uk, andrew@lunn.ch, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	wojciech.drewek@intel.com, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [net v4 PATCH] net: stmmac: replace priv->speed with the
- portTransmitRate from the tc-cbs parameters
-Message-ID: <20240608124306.nh2olzpybffitw6w@skbuf>
-References: <20240608044557.1380550-1-xiaolei.wang@windriver.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zg1e3VzZC1Wjy0/kA0Zjtwbj7rjHHQXRa6jGzm5hy9ReM4LMvU75MjmdWs3W8jjBYBzsUb79zwGIqK0XtPZZF4bAi+oZ+5Xtzbp0AERgzQrisy69Kp/h8q0s2bOf9YddDMf+1BocwxbuMwbdrWWBU6qinlCIWPpOOOlhfNDOZKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B/nimq3P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C59FC2BD11;
+	Sat,  8 Jun 2024 12:55:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717851333;
+	bh=9KLc5ZWRKVzzD/hO+CFXAsPG5/vZtKSbef/xgGiW+6M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B/nimq3PGfrD4oEsSVvQ6yJVKPXKAcKFnJ3JEJ47B4AJJ3JjXsXWM+lmOB9w/dYSa
+	 6aj9TT3i+i+yfC1Ztk1DP/ntzmiem5sXpbsmGkzDDhC2EZIJLH4CsGHTEy4o5zqxv4
+	 W0aGY9ykTNXjExOeNtD7QA0vja3E/YWNlYDw958JIUnZBp9v9s/H0C/ooIOqOxg6z5
+	 HX6x75I8cFq9MhXeiy599noN8XUy7z3nUS7UNiq+Z/0Pih4GJvxW+zM/RN2mW92Dd5
+	 bEEjvsxb5Q7FKVoGQWR0VDvMJj4ICmJek1iIfj8nPX5MvS0E4473jIUyX9suEFRJtm
+	 9K/cALe3cko3g==
+Date: Sat, 8 Jun 2024 13:55:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v7 01/12] virtchnl: add
+ support for enabling PTP on iAVF
+Message-ID: <20240608125530.GS27689@kernel.org>
+References: <20240604131400.13655-1-mateusz.polchlopek@intel.com>
+ <20240604131400.13655-2-mateusz.polchlopek@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,97 +61,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240608044557.1380550-1-xiaolei.wang@windriver.com>
+In-Reply-To: <20240604131400.13655-2-mateusz.polchlopek@intel.com>
 
-On Sat, Jun 08, 2024 at 12:45:57PM +0800, Xiaolei Wang wrote:
-> The current cbs parameter depends on speed after uplinking,
-> which is not needed and will report a configuration error
-> if the port is not initially connected. The UAPI exposed by
-> tc-cbs requires userspace to recalculate the send slope anyway,
-> because the formula depends on port_transmit_rate (see man tc-cbs),
-> which is not an invariant from tc's perspective. Therefore, we
-> use offload->sendslope and offload->idleslope to derive the
-> original port_transmit_rate from the CBS formula.
+On Tue, Jun 04, 2024 at 09:13:49AM -0400, Mateusz Polchlopek wrote:
+> From: Jacob Keller <jacob.e.keller@intel.com>
 > 
-> Fixes: 1f705bc61aee ("net: stmmac: Add support for CBS QDISC")
-> Signed-off-by: Xiaolei Wang <xiaolei.wang@windriver.com>
+> Add support for allowing a VF to enable PTP feature - Rx timestamps
+> 
+> The new capability is gated by VIRTCHNL_VF_CAP_PTP, which must be
+> set by the VF to request access to the new operations. In addition, the
+> VIRTCHNL_OP_1588_PTP_CAPS command is used to determine the specific
+> capabilities available to the VF.
+> 
+> This support includes the following additional capabilities:
+> 
+> * Rx timestamps enabled in the Rx queues (when using flexible advanced
+>   descriptors)
+> * Read access to PHC time over virtchnl using
+>   VIRTCHNL_OP_1588_PTP_GET_TIME
+> 
+> Extra space is reserved in most structures to allow for future
+> extension (like set clock, Tx timestamps).  Additional opcode numbers
+> are reserved and space in the virtchnl_ptp_caps structure is
+> specifically set aside for this.
+> Additionally, each structure has some space reserved for future
+> extensions to allow some flexibility.
+> 
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 > Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> ---
-> 
-> Change log:
-> 
-> v1:
->     https://patchwork.kernel.org/project/linux-arm-kernel/patch/20240528092010.439089-1-xiaolei.wang@windriver.com/
-> v2:
->     Update CBS parameters when speed changes after linking up
->     https://patchwork.kernel.org/project/linux-arm-kernel/patch/20240530061453.561708-1-xiaolei.wang@windriver.com/
-> v3:
->     replace priv->speed with the  portTransmitRate from the tc-cbs parameters suggested by Vladimir Oltean
->     link: https://patchwork.kernel.org/project/linux-arm-kernel/patch/20240607103327.438455-1-xiaolei.wang@windriver.com/
-> v4:
->     Delete speed_div variable, delete redundant port_transmit_rate_kbps = qopt->idleslope - qopt->sendslope; and update commit log
-> 
->  .../net/ethernet/stmicro/stmmac/stmmac_tc.c   | 20 +++++++------------
->  1 file changed, 7 insertions(+), 13 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-> index 222540b55480..87af129a6a1d 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-> @@ -344,10 +344,11 @@ static int tc_setup_cbs(struct stmmac_priv *priv,
->  {
->  	u32 tx_queues_count = priv->plat->tx_queues_to_use;
->  	u32 queue = qopt->queue;
-> -	u32 ptr, speed_div;
-> +	u32 ptr;
->  	u32 mode_to_use;
->  	u64 value;
->  	int ret;
-> +	s64 port_transmit_rate_kbps;
->  
->  	/* Queue 0 is not AVB capable */
->  	if (queue <= 0 || queue >= tx_queues_count)
-> @@ -355,27 +356,20 @@ static int tc_setup_cbs(struct stmmac_priv *priv,
->  	if (!priv->dma_cap.av)
->  		return -EOPNOTSUPP;
->  
-> +	port_transmit_rate_kbps = qopt->idleslope - qopt->sendslope;
-> +
->  	/* Port Transmit Rate and Speed Divider */
-> -	switch (priv->speed) {
-> +	switch (div_s64(port_transmit_rate_kbps, 1000)) {
->  	case SPEED_10000:
-> -		ptr = 32;
-> -		speed_div = 10000000;
-> -		break;
->  	case SPEED_5000:
->  		ptr = 32;
-> -		speed_div = 5000000;
->  		break;
->  	case SPEED_2500:
-> -		ptr = 8;
-> -		speed_div = 2500000;
-> -		break;
->  	case SPEED_1000:
->  		ptr = 8;
-> -		speed_div = 1000000;
->  		break;
->  	case SPEED_100:
->  		ptr = 4;
-> -		speed_div = 100000;
->  		break;
->  	default:
->  		return -EOPNOTSUPP;
+> Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 
-I have one more request.
+Hi Mateusz, Jacob, all,
 
-It is very discouraging for a user to give invalid parameters and
-receive -EOPNOTSUPP, because this is indicative of other "usual
-suspects": "did I enable CONFIG_NET_SCH_CBS?"
+If you need to respin this for some reason, please consider updating
+the Kernel doc for the following to include a short description.
+Else, please consider doing so as a follow-up
 
-It is unfortunate that struct tc_cbs_qopt_offload does not carry a
-netlink extack, but I'm also not requesting you to add one here.
-Instead, please at least change the return code to something like
--EINVAL, and print something to the console along the lines of:
-"Invalid portTransmitRate %lld (idleSlope - sendSlope)\n".
+* struct virtchnl_ptp_caps
+* struct virtchnl_phc_time
+
+Likewise as a follow-up, as it was not introduced by this patch, for:
+
+* virtchnl_vc_validate_vf_msg
+
+Flagged by kernel-doc -none -Wall
+
+The above not withstanding, this looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+...
 
