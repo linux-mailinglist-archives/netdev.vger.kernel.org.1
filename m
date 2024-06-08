@@ -1,139 +1,89 @@
-Return-Path: <netdev+bounces-102046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CB3B9013E1
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 00:20:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 777AC9013EC
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 00:53:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DD041C20CD0
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 22:20:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B3AC1C20AEA
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 22:53:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6871A2D04E;
-	Sat,  8 Jun 2024 22:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241EB2D05D;
+	Sat,  8 Jun 2024 22:53:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD5281804E
-	for <netdev@vger.kernel.org>; Sat,  8 Jun 2024 22:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB377D520;
+	Sat,  8 Jun 2024 22:53:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717885245; cv=none; b=fSuDwxhwfmDJI9BFFxXaBZuJcPhWPMrxoj7M6Z49aEdR3tAWz2TcMrtXjVxsrfuXCbCCGwPzWue2NperzZL09e1rSDqoZIbpKCTtoA+0gpiIUPZ2sc/zxSEN+nXCf6rvnaDPAxr2jy34/1lTIhmnuOpaSaqukAAfMCjcrF8QbSM=
+	t=1717887211; cv=none; b=EPqSZEU22My1C10kB5UEXq/73P8Uth4eZ08Kg/yZsNK1uoxacuevrWUzXITdZ4IdWapwkyctlGgyfWSMtHllIK1aoHD9Qwfh+BKJIQyy0dd6oqbuATiB4TakDxGE/Lb7KAR+t+1wsXD4AQ7yP5/X6wJttKKj4GAT8qqNKC4MEV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717885245; c=relaxed/simple;
-	bh=/THOkb+pqF4RXvc0saAgPhix/AADZCEigr6HtTFyehA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q/Np2ssGns41l+unjaMgWNgVMtDUlkWjK9US9xk3dj6brSFMm1xEz5J7trS1ODbIj1+ZhOrmdXJlFtAAKvneqYPKNiVBSFBeGkphMNTpDq4AhSKgOHfWOsJLUcaGfaFGtVFoJvJNjRKLMG1//becpDI2gEGKWlOsJgLP09JOqvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+	s=arc-20240116; t=1717887211; c=relaxed/simple;
+	bh=uykDTuaQUD8mAUClJATe9bpt+V+PH7kV6mEuFVD6kX4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g1o1er7sLd1nGiaCHEOGtB7bay767j1RjqZ1tX5FEmIfdJu/6Sy3OBzXMf4UdgQN/yQXtkZ0/2F9GhtqU03yWj4suEg2IgS7Qhv8wMIzOAI6YyrkoVA9NnIR3gBT0QDoxmSVFJBWAJlI+GNvLUx7KAaIy5hpND/8lWf0Ucxo5DQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
 Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1sG4QU-0003iq-CW; Sun, 09 Jun 2024 00:20:42 +0200
+	(envelope-from <fw@strlen.de>)
+	id 1sG4NO-0003hV-ID; Sun, 09 Jun 2024 00:17:30 +0200
+Date: Sun, 9 Jun 2024 00:17:30 +0200
 From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, Florian Westphal <fw@strlen.de>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	willemb@google.com,
-	pablo@netfilter.org
-Subject: [PATCH net-next v2 2/2] net: add and use __skb_get_hash_symmetric_net
-Date: Sun,  9 Jun 2024 00:10:40 +0200
-Message-ID: <20240608221057.16070-3-fw@strlen.de>
-X-Mailer: git-send-email 2.44.2
-In-Reply-To: <20240608221057.16070-1-fw@strlen.de>
-References: <20240608221057.16070-1-fw@strlen.de>
+	Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org,
+	pablo@netfilter.org, willemb@google.com,
+	Christoph Paasch <cpaasch@apple.com>
+Subject: Re: [PATCH net-next 1/2] net: add and use skb_get_hash_net
+Message-ID: <20240608221730.GA13159@breakpoint.cc>
+References: <20240607083205.3000-1-fw@strlen.de>
+ <20240607083205.3000-2-fw@strlen.de>
+ <CANn89i+50SE0Lnbpj1b1u62CyOfVxH25bneXnc3e=RJB0+jJ9g@mail.gmail.com>
+ <6663159ab88ef_2f27b294c5@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6663159ab88ef_2f27b294c5@willemb.c.googlers.com.notmuch>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Similar to previous patch: apply same logic for
-__skb_get_hash_symmetric and let callers pass the netns to the dissector
-core.
+Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
+> > > syzkaller did something like this:
+> > > table inet filter {
+> > >   chain input {
+> > >     type filter hook input priority filter; policy accept;
+> > >     meta nftrace set 1                  # calls skb_get_hash
+> > >     tcp dport 42 reject with tcp reset  # emits skb with NULL skb dev/sk
+> > >    }
+> > >    chain output {
+> > >     type filter hook output priority filter; policy accept;
+> > >     # empty chain is enough
+> > >    }
+> > > }
+> > >
+> > > ... then sends a tcp packet to port 42.
+> > >
+> > > Initial attempt to simply set skb->dev from nf_reject_ipv4 doesn't cover
+> > > all cases: skbs generated via ipv4 igmp_send_report trigger similar splat.
+> 
+> Does this mean we have more non-nf callsites to convert?
 
-Existing function is turned into a wrapper to avoid adjusting all
-callers, nft_hash.c uses new function.
+There might be non-nf call sites that need skb_get_hash_net(),
+but I don't know of any.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- No changes.
-
- include/linux/skbuff.h    | 8 +++++++-
- net/core/flow_dissector.c | 6 +++---
- net/netfilter/nft_hash.c  | 3 ++-
- 3 files changed, 12 insertions(+), 5 deletions(-)
-
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 6e78019f899a..813406a9bd6c 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -1498,8 +1498,14 @@ __skb_set_sw_hash(struct sk_buff *skb, __u32 hash, bool is_l4)
- 	__skb_set_hash(skb, hash, true, is_l4);
- }
- 
-+u32 __skb_get_hash_symmetric_net(const struct net *net, const struct sk_buff *skb);
-+
-+static inline u32 __skb_get_hash_symmetric(const struct sk_buff *skb)
-+{
-+	return __skb_get_hash_symmetric_net(NULL, skb);
-+}
-+
- void __skb_get_hash_net(const struct net *net, struct sk_buff *skb);
--u32 __skb_get_hash_symmetric(const struct sk_buff *skb);
- u32 skb_get_poff(const struct sk_buff *skb);
- u32 __skb_get_poff(const struct sk_buff *skb, const void *data,
- 		   const struct flow_keys_basic *keys, int hlen);
-diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
-index 702b4f0a70b6..e479790db0f7 100644
---- a/net/core/flow_dissector.c
-+++ b/net/core/flow_dissector.c
-@@ -1845,19 +1845,19 @@ EXPORT_SYMBOL(make_flow_keys_digest);
- 
- static struct flow_dissector flow_keys_dissector_symmetric __read_mostly;
- 
--u32 __skb_get_hash_symmetric(const struct sk_buff *skb)
-+u32 __skb_get_hash_symmetric_net(const struct net *net, const struct sk_buff *skb)
- {
- 	struct flow_keys keys;
- 
- 	__flow_hash_secret_init();
- 
- 	memset(&keys, 0, sizeof(keys));
--	__skb_flow_dissect(NULL, skb, &flow_keys_dissector_symmetric,
-+	__skb_flow_dissect(net, skb, &flow_keys_dissector_symmetric,
- 			   &keys, NULL, 0, 0, 0, 0);
- 
- 	return __flow_hash_from_keys(&keys, &hashrnd);
- }
--EXPORT_SYMBOL_GPL(__skb_get_hash_symmetric);
-+EXPORT_SYMBOL_GPL(__skb_get_hash_symmetric_net);
- 
- /**
-  * __skb_get_hash_net: calculate a flow hash
-diff --git a/net/netfilter/nft_hash.c b/net/netfilter/nft_hash.c
-index 92d47e469204..868d68302d22 100644
---- a/net/netfilter/nft_hash.c
-+++ b/net/netfilter/nft_hash.c
-@@ -51,7 +51,8 @@ static void nft_symhash_eval(const struct nft_expr *expr,
- 	struct sk_buff *skb = pkt->skb;
- 	u32 h;
- 
--	h = reciprocal_scale(__skb_get_hash_symmetric(skb), priv->modulus);
-+	h = reciprocal_scale(__skb_get_hash_symmetric_net(nft_net(pkt), skb),
-+			     priv->modulus);
- 
- 	regs->data[priv->dreg] = h + priv->offset;
- }
--- 
-2.44.2
-
+The above comment was meant to say that I tried to patch this
+outside of flow dissector by setting skb->dev properly in nf_reject,
+but that still triggers a slightly different WARN trace, this time
+due to igmp_send_report also sending skb without dev+sk pointers.
 
