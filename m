@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-102011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC225901185
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 14:56:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41F72901187
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 14:57:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3E961C20EC8
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 12:56:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBD49282840
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 12:56:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC25176FC0;
-	Sat,  8 Jun 2024 12:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6C311779B8;
+	Sat,  8 Jun 2024 12:56:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CBH9ukbS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AZSmXmWn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D4226AF5
-	for <netdev@vger.kernel.org>; Sat,  8 Jun 2024 12:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2FBB15DBA3
+	for <netdev@vger.kernel.org>; Sat,  8 Jun 2024 12:56:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717851394; cv=none; b=oBMEl8vXGpZWwewKJ2bkl33esPjWfj0W1fX2uiikjle5kKcNNOF2wZLBek6z1VE8k8GOiqPwXyfd4yI9uAyIxDCZXcNTMKVeGEtXROeOksNF8XaiYvGUtSicHCFxD/YTE7wBQ9A9RB3aSjHtD3C7Rb70nCYJMFD2OTbxgzJBFfE=
+	t=1717851416; cv=none; b=RSC+OM8RLXtdwMEeOMZ8KhR3sVHaC1RohNpoMshTqqivqIT0xhb92EDBrfjYwsNg7T8EfBoyRNiJGfYCi+Ul/ih53vmGK4QhfkU1Ya49Hy9Ogxhq4qfFmjd08GWWCiI8QAL+taeLSwDD7euVzFCdnif/ZfLp8c/8hP5fPkmJwck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717851394; c=relaxed/simple;
-	bh=/RlJo9WnsSn1XLBS9ggjnNyuELQapyKJA1TQXRzbb/8=;
+	s=arc-20240116; t=1717851416; c=relaxed/simple;
+	bh=HZknWNSIIncSkXQCPrlGguunTHGTQQfSZWo9fAXhlSo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n1o/Rd/hzd8QajY8vDEUoTUn7BKIs21LJIcumGubiXJFreOrxIJ5z88t9rjc4/Hm1mfl7rLYFp0g2ZZYlhaaTvam7V8Gpe2FskWQLG/ISWgh6q9RGmoNsd9KIxfKnVp/gFFoE/qXikVrCNpt9BcybuMAEzoXPzmSrGdDPKVhQ5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CBH9ukbS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F367C2BD11;
-	Sat,  8 Jun 2024 12:56:32 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=b2VObGdgRx6F0ZChlbJcyq9VHpsPlTOnohGFGOiNeIQ0i3ApID3zjfoF1DAgGsn5X81O+P043G5hFx81Hwewv1UrYsLLGsda2UpHvKqj9fPelQ9p7QNbzSuYQ/cSxWotFEjxVKuNXDo2vIGbyMA3A4DZyv3yJGAnw0cGTV1EQ3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AZSmXmWn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C1E3C2BD11;
+	Sat,  8 Jun 2024 12:56:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717851394;
-	bh=/RlJo9WnsSn1XLBS9ggjnNyuELQapyKJA1TQXRzbb/8=;
+	s=k20201202; t=1717851416;
+	bh=HZknWNSIIncSkXQCPrlGguunTHGTQQfSZWo9fAXhlSo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CBH9ukbS+pWltnD58a99574ux2Cqp7Oj2cdcLWswGA2JX7apSIvtPjkWOdWPaG1E+
-	 oDiVmlmInCaW2MyLR60rOxKAk1RT+WHCNgFLoVU58N7sfcZKuwSkM+T7kKBzTjvhiJ
-	 mlL/F8+D9em/5xi22XWCluelGmndMDzaapIxrAtKkJ2jeujVkc5X7e5fDSOJEjpdm5
-	 O5GObw10hWQgcYFqOZxbvlpdnicVv2O7Og3DRSXv2/9Yi2oQ2CewXCC3UcGq6mNWLJ
-	 RL+WTz0lRQlfYxCqVwlcgmrmUjA24fN6YY7dqohz7CYvksAJ4ObMcpcziFF1ux5Eaw
-	 +e7kLoD6PrHPw==
-Date: Sat, 8 Jun 2024 13:56:30 +0100
+	b=AZSmXmWnf51RLe/wQY5EgMdlffbRhhtasVaV4kMHa1iyhVP8PS0p1ikfpBdvBe7yW
+	 CG4bspL/MC0qF13wnieGpoClvpHIIw6w5jnwaIZDvPhxA6Bg2hu6m3aiFKwy76QnxT
+	 quD5mbRn00NCK0mYI6NRd2FnrDmCsfdbzRPeHfez7nShKNaei0fVwyi2pZwDFsjey2
+	 MSTmdOqkXS8V0h47N5iaZcc/qCGqiNvS1D97EUsVQddHJzu0MV8RH+7Ph6PMCzKsZh
+	 Po0pDTOqC7E3kcCfHbxEEpg66wA8RJvcRZWJYcjQBtVUeRPd+20W1HxDtQvKfe+DkM
+	 zly6FgXGttJxg==
+Date: Sat, 8 Jun 2024 13:56:53 +0100
 From: Simon Horman <horms@kernel.org>
 To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>,
+	Simei Su <simei.su@intel.com>,
 	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v7 04/12] iavf: add support
- for negotiating flexible RXDID format
-Message-ID: <20240608125630.GT27689@kernel.org>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v7 02/12] ice: support Rx
+ timestamp on flex descriptor
+Message-ID: <20240608125653.GU27689@kernel.org>
 References: <20240604131400.13655-1-mateusz.polchlopek@intel.com>
- <20240604131400.13655-5-mateusz.polchlopek@intel.com>
+ <20240604131400.13655-3-mateusz.polchlopek@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,99 +60,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240604131400.13655-5-mateusz.polchlopek@intel.com>
+In-Reply-To: <20240604131400.13655-3-mateusz.polchlopek@intel.com>
 
-On Tue, Jun 04, 2024 at 09:13:52AM -0400, Mateusz Polchlopek wrote:
-> From: Jacob Keller <jacob.e.keller@intel.com>
+On Tue, Jun 04, 2024 at 09:13:50AM -0400, Mateusz Polchlopek wrote:
+> From: Simei Su <simei.su@intel.com>
 > 
-> Enable support for VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC, to enable the VF
-> driver the ability to determine what Rx descriptor formats are
-> available. This requires sending an additional message during
-> initialization and reset, the VIRTCHNL_OP_GET_SUPPORTED_RXDIDS. This
-> operation requests the supported Rx descriptor IDs available from the
-> PF.
+> To support Rx timestamp offload, VIRTCHNL_OP_1588_PTP_CAPS is sent by
+> the VF to request PTP capability and responded by the PF what capability
+> is enabled for that VF.
 > 
-> This is treated the same way that VLAN V2 capabilities are handled. Add
-> a new set of extended capability flags, used to process send and receipt
-> of the VIRTCHNL_OP_GET_SUPPORTED_RXDIDS message.
+> Hardware captures timestamps which contain only 32 bits of nominal
+> nanoseconds, as opposed to the 64bit timestamps that the stack expects.
+> To convert 32b to 64b, we need a current PHC time.
+> VIRTCHNL_OP_1588_PTP_GET_TIME is sent by the VF and responded by the
+> PF with the current PHC time.
 > 
-> This ensures we finish negotiating for the supported descriptor formats
-> prior to beginning configuration of receive queues.
-> 
-> This change stores the supported format bitmap into the iavf_adapter
-> structure. Additionally, if VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC is enabled
-> by the PF, we need to make sure that the Rx queue configuration
-> specifies the format.
-> 
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Simei Su <simei.su@intel.com>
 > Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 > Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 > Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 
-Hi Mateusz, Jacob, all,
-
-The nit below notwithstanding, this looks good to me.
-
 Reviewed-by: Simon Horman <horms@kernel.org>
 
-...
-
-> @@ -262,6 +276,45 @@ int iavf_get_vf_vlan_v2_caps(struct iavf_adapter *adapter)
->  	return err;
->  }
->  
-> +int iavf_get_vf_supported_rxdids(struct iavf_adapter *adapter)
-> +{
-> +	struct iavf_hw *hw = &adapter->hw;
-> +	struct iavf_arq_event_info event;
-> +	enum virtchnl_ops op;
-> +	enum iavf_status err;
-> +	u16 len;
-> +
-> +	len =  sizeof(struct virtchnl_supported_rxdids);
-> +	event.buf_len = len;
-> +	event.msg_buf = kzalloc(event.buf_len, GFP_KERNEL);
-> +	if (!event.msg_buf) {
-> +		err = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	while (1) {
-> +		/* When the AQ is empty, iavf_clean_arq_element will return
-> +		 * nonzero and this loop will terminate.
-> +		 */
-> +		err = iavf_clean_arq_element(hw, &event, NULL);
-> +		if (err != IAVF_SUCCESS)
-> +			goto out_alloc;
-> +		op = (enum virtchnl_ops)le32_to_cpu(event.desc.cookie_high);
-> +		if (op == VIRTCHNL_OP_GET_SUPPORTED_RXDIDS)
-> +			break;
-> +	}
-> +
-> +	err = (enum iavf_status)le32_to_cpu(event.desc.cookie_low);
-> +	if (err)
-> +		goto out_alloc;
-> +
-> +	memcpy(&adapter->supported_rxdids, event.msg_buf, min(event.msg_len, len));
-
-If you need to respin for some other reason,
-please consider wrapping the above to <= 80 columns wide.
-
-Likewise for the 2nd call to iavf_ptp_cap_supported() in
-iavf_ptp_process_caps() in
-[PATCH v7 06/12] iavf: add initial framework for registering PTP clock
-
-Flagged by: checkpatch.pl --max-line-length=80
-
-> +out_alloc:
-> +	kfree(event.msg_buf);
-> +out:
-> +	return err;
-> +}
-> +
->  /**
->   * iavf_configure_queues
->   * @adapter: adapter structure
-
-...
 
