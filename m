@@ -1,128 +1,296 @@
-Return-Path: <netdev+bounces-102038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FB56901337
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 20:19:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49C98901349
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 21:14:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 790F11C20B66
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 18:19:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82851B2111D
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 19:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45DD21CABA;
-	Sat,  8 Jun 2024 18:19:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F42081BF24;
+	Sat,  8 Jun 2024 19:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="s50xo1m0"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FxUBJ99T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788C71C696
-	for <netdev@vger.kernel.org>; Sat,  8 Jun 2024 18:19:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306723FEC
+	for <netdev@vger.kernel.org>; Sat,  8 Jun 2024 19:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717870791; cv=none; b=Q3BEEu6LD+RhOW9c012nu6rBohT3ZMTMPpf1Tox39vm+YUR7DP8TM+JJS9Nv8/UXLpZQYXKCsREO86rZPO2x83AJGF+Hhr6B6pKwYPdrkbmNO9Lyec+YhT26xKEBTWeJPLDfkp5ZOnpMFh6DxfwIBPYZ/gCfG1qdyfItaPXFRds=
+	t=1717874055; cv=none; b=Id6VwPO9pf02b0SmaGbM1M+/Fnd6cVQnkWvYjTWKrk8wEVl+iZUPOMD1f9ePQEA76nz6CvOC1K3NyK2OGNJK8PV3Z9rPYqaNxYRUvdTbbfZRih2licSvs+366NP7e0OQBeU8tAUXyRlDqt9YpllVTpyK5SxO/PKR30ztfQYKZ5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717870791; c=relaxed/simple;
-	bh=60kDRbMMvgm6QJOHPpiWh1H9Y8+f7TECVQuH+9otJ4I=;
-	h=Date:From:To:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=ZFyUodafzOy9VtlZilUrSh8I9nJLeL8AHP2dmB1wrSa/KtSNHlAu/FS6oLLPRlW8Z/3Lqw857FCGXvlZJBnFDwmdFJY3Iy7H3xgS+Ba03qjos+KHyNrE/asQU8buE8xnKGbX+OPLv63T5wpN3LYFpREZuorx40USj8UNW2x93Sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=s50xo1m0; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-57c68327d1aso1088990a12.3
-        for <netdev@vger.kernel.org>; Sat, 08 Jun 2024 11:19:49 -0700 (PDT)
+	s=arc-20240116; t=1717874055; c=relaxed/simple;
+	bh=nuouoVNlSuwdHC0vgoc4gNVJkKd6kYdGqUjG6dThl5c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lrBmu4KTrrKw99y6P/h3LjK6A1J8TAOv1KDauYmUjaXhJ9zZOUHzqCuKd1Yd4dvhiXIPFfxzjrKLSxFvae35mxt8Sl+oWPmQrFoLUGsFBuAAi5Ams+wNTpRu0ELJLBr9pBShzYYd1Xfs31n3F6ZCIRp2rcGOfP6+9t82+xfKgFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FxUBJ99T; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6b0652ece5dso6407606d6.2
+        for <netdev@vger.kernel.org>; Sat, 08 Jun 2024 12:14:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1717870788; x=1718475588; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J3QtwmDL0API+mZdKoSplk54d4aIIr/RT3oeBqPC2kY=;
-        b=s50xo1m0xTUCZuL6ilhQdJwE++gGvAtkPEtM/ZOpGaPCObh341JXiYKR9sXTiUzto5
-         PvfMeywFJw/jZfYu37ordxrGp69ALHfafvBFy33CJf7q0w+3HhegpRQzBpTLmKWSHrdZ
-         XJjij894XIXazbk5uYzleFqc6ZVZJ6xMVHOfyXL4KB777JIXh7PZmlXGg09SWVTbd8mH
-         5lXZRnAq+8cRHHolm2r+onQHymnxIGh8VyyRxj5HqvLiXX0IzwC9VYfIjMe7ko07RgJL
-         UKLEG2/rcLNBSHXGGINEuwwLt++mIWePl9u+unYlP+f+2pSv17AmQCIcdbF9tzN5QScs
-         HM4A==
+        d=broadcom.com; s=google; t=1717874053; x=1718478853; darn=vger.kernel.org;
+        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=xDmOsKmLfJVD9lE4QgKgWRD5aB9pgejG1bQPup1aRMk=;
+        b=FxUBJ99TuV34v7lDUmdelK8NVP44WBSUJjIpPj7t1ypv2maqstdVa81KPBxUH2ELxZ
+         Aa95mzUY14vO/Z1zlEmRHjv6eBf4hP3v5IEsH8fxlenjzn1G8BsOVOthWQzYVFW7HO8P
+         s2nU80RruO2KVhja2Q6eZDFbPxShiERjiHPE4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717870788; x=1718475588;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:to:from:date:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=J3QtwmDL0API+mZdKoSplk54d4aIIr/RT3oeBqPC2kY=;
-        b=RDaQfYNUYtCUMdbQS9L+NM2ChYVcFpFlBxBePgFpwbENE3KaQH+CFvqY6HkPb++Zek
-         X76sgSCG5qiwk2gzCs9YnzT16gQNeD7Z+x5lvH7IcpNweTLE+c43qH+wggUPgZy/h4dF
-         4dOpDXNSllbw8ce9p48G9sEEMAfMIEGuMpSenX0F1VkcjPtPcC13ICpFF7DWgZ4qWpRn
-         fVCGE/RDXWZXBJbi0rA+uKXo+PIYCbytqjN3+KtAznOKSKztTtb3PX4SJXbBtI1I/X5b
-         Ojs1jKw5PvQAeFFX+A8uBEaTO/GiTEA7F3gbVgShFSPqht/14GzGBEM3VyHVcDQXQkQn
-         peGA==
-X-Forwarded-Encrypted: i=1; AJvYcCUPCf2gIvuss47EzAanryoz2EJ8l9tqcG0RoC0ri2TwYX4mhNjsOD1ojPiU4CJZSjvbaoU3wPNxR2G5eGb6+MK75IYSa9IS
-X-Gm-Message-State: AOJu0YyCC6mVpFnzWM9ijFWQudBPEjdGajI8WNauPV0ahbQ0m/GKQcPt
-	BF9+SuiZeqC2ksUZEoIRCgl9+oa4O9SlXLkm+xwz52sFYnLJf9hM9FPlcyMrTAc=
-X-Google-Smtp-Source: AGHT+IEaFVDSEclURPDGjTFY7NKVfypetqC3fXT4pVooDvUfMianoN2oMx1tOrYoczutiQxbmTo50Q==
-X-Received: by 2002:a50:8a93:0:b0:57a:30fb:57f with SMTP id 4fb4d7f45d1cf-57c509a65efmr2956761a12.40.1717870787671;
-        Sat, 08 Jun 2024 11:19:47 -0700 (PDT)
-Received: from [127.0.0.1] (u13956.alfa-inet.net. [193.33.64.87])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57aae0c9f95sm4516437a12.28.2024.06.08.11.19.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 08 Jun 2024 11:19:47 -0700 (PDT)
-Date: Sat, 08 Jun 2024 21:19:42 +0300
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: syzbot <syzbot+9bbe2de1bc9d470eb5fe@syzkaller.appspotmail.com>,
- akpm@linux-foundation.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: =?US-ASCII?Q?Re=3A_=5Bsyzbot=5D_=5Bnet=3F=5D_WARNING=3A_suspici?=
- =?US-ASCII?Q?ous_RCU_usage_in_br=5Fmst=5Fset=5Fstate_=282=29?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <000000000000cfb785061a64415a@google.com>
-References: <000000000000cfb785061a64415a@google.com>
-Message-ID: <E54F417D-8F71-4A15-8A12-30D21AB3D08D@blackwall.org>
+        d=1e100.net; s=20230601; t=1717874053; x=1718478853;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xDmOsKmLfJVD9lE4QgKgWRD5aB9pgejG1bQPup1aRMk=;
+        b=F1Y87L2tpoCkUgl4CLAebzhHVzPO8czKRXCCiLxjaSl6LPWFlqwD/PbelgL/gUJ0jo
+         8QDaLtOu/YsoecyflBKGVHCSvHgkfvLGdbhurl+StvGteymsan/CLaOkaDa6eRqbjFJS
+         wK/28DXrNc0OWx01pJ9J6vriR8BUT49qAoqU+ue5sCvwu0qOWICIZz2yTXigmXwnJhKL
+         NSmTz8qp01EAU6cfjoKm2azFRClnuyYWFSOe/SQfYG6laR76SjLUqp788F+o12ry780I
+         I+7HcurmcPpH4E9kpWrkqUVfEKgKeIHgXHuvOO+/IOUFZpUdnfmM1fgFnp+L9VvrDV7M
+         COIg==
+X-Gm-Message-State: AOJu0Yz9p8OzriQ+7HUnth33kUNgmtYXU8BjcuaK99Xo8SMFVOPshKNw
+	6oDwv7uGiGF7QrNcJdXrn6Q6PYD45ETIs+9k1r/tjXIZn9Dy9HiffArJTuasbg==
+X-Google-Smtp-Source: AGHT+IGNu3POxIv2UO6VV4KEpmaAa9iHw3/CrV9ff8JG2RA95HSwrN2p38BJKj+yh5P+LT3e/sGypw==
+X-Received: by 2002:a05:6214:4a04:b0:6af:c308:ee45 with SMTP id 6a1803df08f44-6b059b6a787mr64030246d6.6.1717874052849;
+        Sat, 08 Jun 2024 12:14:12 -0700 (PDT)
+Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b076778790sm333766d6.135.2024.06.08.12.14.11
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 08 Jun 2024 12:14:12 -0700 (PDT)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew.gospodarek@broadcom.com,
+	horms@kernel.org,
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>
+Subject: [PATCH net v2] bnxt_en: Cap the size of HWRM_PORT_PHY_QCFG forwarded response
+Date: Sat,  8 Jun 2024 12:13:35 -0700
+Message-ID: <20240608191335.52174-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.43.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000b8dfdf061a65b8d5"
 
-On June 8, 2024 8:29:23 PM GMT+03:00, syzbot <syzbot+9bbe2de1bc9d470eb5fe@s=
-yzkaller=2Eappspotmail=2Ecom> wrote:
->Hello,
->
->syzbot found the following issue on:
->
->HEAD commit:    8a92980606e3 Merge tag 'scsi-fixes' of git://git=2Ekernel=
-=2Eor=2E=2E
->git tree:       upstream
->console output: https://syzkaller=2Eappspot=2Ecom/x/log=2Etxt?x=3D14f9eab=
-a980000
->kernel config:  https://syzkaller=2Eappspot=2Ecom/x/=2Econfig?x=3D9a6ac42=
-77fffe3ea
->dashboard link: https://syzkaller=2Eappspot=2Ecom/bug?extid=3D9bbe2de1bc9=
-d470eb5fe
->compiler:       Debian clang version 15=2E0=2E6, GNU ld (GNU Binutils for=
- Debian) 2=2E40
->
->Unfortunately, I don't have any reproducer for this issue yet=2E
->
->Downloadable assets:
->disk image: https://storage=2Egoogleapis=2Ecom/syzbot-assets/e77750e429bf=
-/disk-8a929806=2Eraw=2Exz
->vmlinux: https://storage=2Egoogleapis=2Ecom/syzbot-assets/910e4410cf78/vm=
-linux-8a929806=2Exz
->kernel image: https://storage=2Egoogleapis=2Ecom/syzbot-assets/85542820b0=
-d5/bzImage-8a929806=2Exz
->
->IMPORTANT: if you fix the issue, please add the following tag to the comm=
-it:
->Reported-by: syzbot+9bbe2de1bc9d470eb5fe@:=20
+--000000000000b8dfdf061a65b8d5
+Content-Transfer-Encoding: 8bit
 
-Oh, my fix was incomplete, I should've changed the deref helper as well=2E
-I will send a patch tomorrow=2E
+Firmware interface 1.10.2.118 has increased the size of
+HWRM_PORT_PHY_QCFG response beyond the maximum size that can be
+forwarded.  When the VF's link state is not the default auto state,
+the PF will need to forward the response back to the VF to indicate
+the forced state.  This regression may cause the VF to fail to
+initialize.
 
-Thanks!
+Fix it by capping the HWRM_PORT_PHY_QCFG response to the maximum
+96 bytes.  The SPEEDS2_SUPPORTED flag needs to be cleared because the
+new speeds2 fields are beyond the legacy structure.  Also modify
+bnxt_hwrm_fwd_resp() to print a warning if the message size exceeds 96
+bytes to make this failure more obvious.
 
+Fixes: 84a911db8305 ("bnxt_en: Update firmware interface to 1.10.2.118")
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+---
+v2: Remove Bug and ChangeID from ChangeLog
+    Add comment to explain the clearing of the SPEEDS2_SUPPORTED flag
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     | 48 +++++++++++++++++++
+ .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   | 12 ++++-
+ 2 files changed, 58 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index 656ab81c0272..94d242aca8d5 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -1434,6 +1434,54 @@ struct bnxt_l2_filter {
+ 	atomic_t		refcnt;
+ };
+ 
++/* hwrm_port_phy_qcfg_output (size:96 bytes) */
++struct hwrm_port_phy_qcfg_output_compat {
++	__le16	error_code;
++	__le16	req_type;
++	__le16	seq_id;
++	__le16	resp_len;
++	u8	link;
++	u8	active_fec_signal_mode;
++	__le16	link_speed;
++	u8	duplex_cfg;
++	u8	pause;
++	__le16	support_speeds;
++	__le16	force_link_speed;
++	u8	auto_mode;
++	u8	auto_pause;
++	__le16	auto_link_speed;
++	__le16	auto_link_speed_mask;
++	u8	wirespeed;
++	u8	lpbk;
++	u8	force_pause;
++	u8	module_status;
++	__le32	preemphasis;
++	u8	phy_maj;
++	u8	phy_min;
++	u8	phy_bld;
++	u8	phy_type;
++	u8	media_type;
++	u8	xcvr_pkg_type;
++	u8	eee_config_phy_addr;
++	u8	parallel_detect;
++	__le16	link_partner_adv_speeds;
++	u8	link_partner_adv_auto_mode;
++	u8	link_partner_adv_pause;
++	__le16	adv_eee_link_speed_mask;
++	__le16	link_partner_adv_eee_link_speed_mask;
++	__le32	xcvr_identifier_type_tx_lpi_timer;
++	__le16	fec_cfg;
++	u8	duplex_state;
++	u8	option_flags;
++	char	phy_vendor_name[16];
++	char	phy_vendor_partnumber[16];
++	__le16	support_pam4_speeds;
++	__le16	force_pam4_link_speed;
++	__le16	auto_pam4_link_speed_mask;
++	u8	link_partner_pam4_adv_speeds;
++	u8	valid;
++};
++
+ struct bnxt_link_info {
+ 	u8			phy_type;
+ 	u8			media_type;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
+index 175192ebaa77..b28073777ef5 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
+@@ -950,8 +950,11 @@ static int bnxt_hwrm_fwd_resp(struct bnxt *bp, struct bnxt_vf_info *vf,
+ 	struct hwrm_fwd_resp_input *req;
+ 	int rc;
+ 
+-	if (BNXT_FWD_RESP_SIZE_ERR(msg_size))
++	if (BNXT_FWD_RESP_SIZE_ERR(msg_size)) {
++		netdev_warn_once(bp->dev, "HWRM fwd response too big (%d bytes)\n",
++				 msg_size);
+ 		return -EINVAL;
++	}
+ 
+ 	rc = hwrm_req_init(bp, req, HWRM_FWD_RESP);
+ 	if (!rc) {
+@@ -1085,7 +1088,7 @@ static int bnxt_vf_set_link(struct bnxt *bp, struct bnxt_vf_info *vf)
+ 		rc = bnxt_hwrm_exec_fwd_resp(
+ 			bp, vf, sizeof(struct hwrm_port_phy_qcfg_input));
+ 	} else {
+-		struct hwrm_port_phy_qcfg_output phy_qcfg_resp = {0};
++		struct hwrm_port_phy_qcfg_output_compat phy_qcfg_resp = {0};
+ 		struct hwrm_port_phy_qcfg_input *phy_qcfg_req;
+ 
+ 		phy_qcfg_req =
+@@ -1096,6 +1099,11 @@ static int bnxt_vf_set_link(struct bnxt *bp, struct bnxt_vf_info *vf)
+ 		mutex_unlock(&bp->link_lock);
+ 		phy_qcfg_resp.resp_len = cpu_to_le16(sizeof(phy_qcfg_resp));
+ 		phy_qcfg_resp.seq_id = phy_qcfg_req->seq_id;
++		/* New SPEEDS2 fields are beyond the legacy structure, so
++		 * clear the SPEEDS2_SUPPORTED flag.
++		 */
++		phy_qcfg_resp.option_flags &=
++			~PORT_PHY_QCAPS_RESP_FLAGS2_SPEEDS2_SUPPORTED;
+ 		phy_qcfg_resp.valid = 1;
+ 
+ 		if (vf->flags & BNXT_VF_LINK_UP) {
+-- 
+2.30.1
+
+
+--000000000000b8dfdf061a65b8d5
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEICacgxdfE2KvPYNeBp9qu0STzt3Xs8pO
+P13lBLW1guPEMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDYw
+ODE5MTQxM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQAvCmNBvL961bMcPNM7qtorUME23sAV8ucH4Wt7E9lslN9uhuNU
+xke2AJjTLi4+1sS4Z4HxpQ8+9OWVU3EKNWoOq5ih5pMioInyM1VLGB2Dh5E/kuHeXHslU+zC3lpq
+4AqJ5mhn795EvmBU9Y864S5okzSzdH73/OHw+v578J45XCCOt089jqhfk9jSCuR4NF5l9DcuRhsT
+W4y1RAjRKAshscaXkIekY86j5GGeKVyQ60pPafhNXeT0LB5TIkkH7EZ441Bx40pa5QOvaDFH1CRi
+d2W8C4nuMtqXxLCm6y05J2K6MNAqQWCz5kdFvomExIHzpyHuZrONUdNHPpapV4sY
+--000000000000b8dfdf061a65b8d5--
 
