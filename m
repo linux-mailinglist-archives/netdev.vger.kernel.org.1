@@ -1,172 +1,171 @@
-Return-Path: <netdev+bounces-101985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A5E5900F72
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 06:18:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 083FA900F77
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 06:24:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBA821F229B2
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 04:18:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FD4A1C215D7
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 04:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D5ADDDA;
-	Sat,  8 Jun 2024 04:18:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63C8CFC18;
+	Sat,  8 Jun 2024 04:24:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mTtAnQj9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y9rl2B8X"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03489E57E;
-	Sat,  8 Jun 2024 04:17:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D21E9B64E;
+	Sat,  8 Jun 2024 04:24:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717820281; cv=none; b=ddhKeCKkPHHyy5l4X+YEBwqGWN90s3B3gPrLHduO0O+dSfS/NL78LfdEkIu94JoM94qH+F6yBgHGKxGiDdN8OVOGShzrlDstbMpp9k3vE1Tl7XbeAWFGRpH2aRHInMhvwWKFgz95v5xN3pDZruX1S/Dt3MoAeudWtMsjNnVpLU0=
+	t=1717820651; cv=none; b=hY91xNNTFm232tLUkiSzi1xKZgoseKY3nQmiTLIPMo6sepZ2fOCth9esHBvvScBgBbouDrxq2y7tlbeZBXaKlfr2t7Wwwa/WU/QdD6qeDxX3yA4O1v8a7LqSONm/HB7abqSbFYmRbWO74nLzyDO1qVkE9j5xBkHbClSN2uwxQsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717820281; c=relaxed/simple;
-	bh=ekmqOcLE4iH6H9/1UXBJARqZityuqrevYo5eanX1HBg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=dvxr6anWLqfL+M8m4kYdCOGjP9KCf73wOx2aatH57VQQRqv6erhMSuq80vUAvGik/4e005wJ6uX9SSxTcthKQ/zsMtav0GuNkDgWPZ73xGzAcBTFHPq8njBDrNSmJM4PqBnHVt/J3b6vUW0kgBbug4DnfdbI1iBCtwRtMScvzqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mTtAnQj9; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1717820270; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
-	bh=Ttp/o9fQaKCeIOlWsO2k2ss4apRk3x0NTTyLGlgh39o=;
-	b=mTtAnQj9U2IIMqAM8uD89YfVxCnX5XgIO59S17LHUEa3VaPVG5tRadtSALzWRZ/mL7bPwOymnUpXP61t0sx5h9OjIFfOZdiDJsv9zvlPqxcOVTsI+4/q5eJj/eNMcggm8/U6BItqhVx/dd0Fe2sRJTz04HNncsthJCs+o/DJTaU=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R631e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045046011;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=31;SR=0;TI=SMTPD_---0W80ed0T_1717820266;
-Received: from 30.39.231.133(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W80ed0T_1717820266)
-          by smtp.aliyun-inc.com;
-          Sat, 08 Jun 2024 12:17:48 +0800
-Message-ID: <2279297c-ac6e-46ed-b1a7-5229bc622f09@linux.alibaba.com>
-Date: Sat, 8 Jun 2024 12:17:46 +0800
+	s=arc-20240116; t=1717820651; c=relaxed/simple;
+	bh=HoIBiSVlyaYUy4do0V2wz4HWBYTIE8ZePp7n/kH8yGk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JIWaqfaVkSXlcOYzQKct/dnr9jRqIky+kbPKAqYQL4cmoeUmNXJSXKg4IR5UbeOa3PSe9C4XkeWTmli4N9dGaNf8mnUUbpCnf/3WQ4qGUHvcMN1/0WrE7NnA/IWgK0KY1R1ZGDmxCAjyv39tpL+QTW3exUBYj9kZ26oHU+1Wm+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y9rl2B8X; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717820648; x=1749356648;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HoIBiSVlyaYUy4do0V2wz4HWBYTIE8ZePp7n/kH8yGk=;
+  b=Y9rl2B8XPB/cD5MmPfvY5hYC5eHgOC1xG4fBoKADQcUDRjNludnQsPkZ
+   RNRDGNj4gH3UWZ/V/rL+79FNuH66etFOG5MuBuAb/2MGnpbdg7Lnr4hVD
+   mvt7/im9MA6Z54vfiEqfJg+lBXGoDsgHV6PuAVaCxRaG9vc/6n+8km9h2
+   jlbQIVgtFQKo0RwbJ6Kg0tbvUh1BV1PPHzpR023IF7g1lx+FbsngHsDbT
+   IoVUcBnnvx9x/d2se8vUnzDCFOvHIDhcns+rHObdR3Hi0npl5SUDZsBCs
+   Y6jWbvjShUT9Pw3reGyNTjeko86QP1brq1NryTEuTp7pjBpggvnUrPRyS
+   Q==;
+X-CSE-ConnectionGUID: FhZlvdiKQY2xDHs7+avgKw==
+X-CSE-MsgGUID: xgnCSMy9SvCk8HNrc5XH4Q==
+X-IronPort-AV: E=McAfee;i="6600,9927,11096"; a="25970566"
+X-IronPort-AV: E=Sophos;i="6.08,222,1712646000"; 
+   d="scan'208";a="25970566"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jun 2024 21:24:08 -0700
+X-CSE-ConnectionGUID: laP+KoQJQsOb6kbwAYEetA==
+X-CSE-MsgGUID: vKjSdE7hRku0mbO9S69tvQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,222,1712646000"; 
+   d="scan'208";a="43456632"
+Received: from lkp-server01.sh.intel.com (HELO 472b94a103a1) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 07 Jun 2024 21:24:06 -0700
+Received: from kbuild by 472b94a103a1 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sFncZ-0000yj-0N;
+	Sat, 08 Jun 2024 04:24:03 +0000
+Date: Sat, 8 Jun 2024 12:23:36 +0800
+From: kernel test robot <lkp@intel.com>
+To: Johannes Berg <johannes@sipsolutions.net>, linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	Johannes Berg <johannes.berg@intel.com>
+Subject: Re: [PATCH v4 1/4] tracing: add __print_sym() to replace
+ __print_symbolic()
+Message-ID: <202406081255.2FEQDvBK-lkp@intel.com>
+References: <20240607160527.23624-7-johannes@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v14 0/5] ethtool: provide the dim profile
- fine-tuning channel
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: netdev@vger.kernel.org, virtualization@lists.linux.dev,
- Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- Brett Creeley <bcreeley@amd.com>, Ratheesh Kannoth <rkannoth@marvell.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Tal Gilboa <talgi@nvidia.com>,
- Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Jiri Pirko <jiri@resnulli.us>, Paul Greenwalt <paul.greenwalt@intel.com>,
- Ahmed Zaki <ahmed.zaki@intel.com>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, Kory Maincent <kory.maincent@bootlin.com>,
- Andrew Lunn <andrew@lunn.ch>, justinstitt@google.com,
- donald.hunter@gmail.com, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
- Dragos Tatulea <dtatulea@nvidia.com>,
- Rahul Rameshbabu <rrameshbabu@nvidia.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- awel Dembicki <paweldembicki@gmail.com>
-References: <20240603154727.31998-1-hengqi@linux.alibaba.com>
-In-Reply-To: <20240603154727.31998-1-hengqi@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240607160527.23624-7-johannes@sipsolutions.net>
 
-Gentle ping.
+Hi Johannes,
 
-Thanks.
+kernel test robot noticed the following build warnings:
 
-在 2024/6/3 下午11:47, Heng Qi 写道:
-> The NetDIM library provides excellent acceleration for many modern
-> network cards. However, the default profiles of DIM limits its maximum
-> capabilities for different NICs, so providing a way which the NIC can
-> be custom configured is necessary.
->
-> Currently, the way is based on the commonly used "ethtool -C".
->
-> Please review, thank you very much!
->
-> Changelog
-> =====
-> v13->v14:
->    - Make DIMLIB dependent on NET (patch 2/5).
->
-> v12->v13:
->    - Rebase net-next to fix the one-line conflict.
->    - Update tiny comments.
->    - Config ETHTOOL_NETLINK to select DIMLIB.
->
-> v11->v12:
->    - Remove the use of IS_ENABLED(DIMLIB).
->    - Update Simon's htmldoc hint.
->
-> v10->v11:
->    - Fix and clean up some issues from Kuba, thanks.
->    - Rebase net-next/main
->
-> v9->v10:
->    - Collect dim related flags/mode/work into one place.
->    - Use rx_profile + tx_profile instead of four profiles.
->    - Add several helps.
->    - Update commit logs.
->
-> v8->v9:
->    - Fix the compilation error of conflicting names of rx_profile in
->      dim.h and ice driver: in dim.h, rx_profile is replaced with
->      dim_rx_profile. So does tx_profile.
->
-> v7->v8:
->    - Use kmemdup() instead of kzalloc()/memcpy() in dev_dim_profile_init().
->
-> v6->v7:
->    - A new wrapper struct pointer is used in struct net_device.
->    - Add IS_ENABLED(CONFIG_DIMLIB) to avoid compiler warnings.
->    - Profile fields changed from u16 to u32.
->
-> v5->v6:
->    - Place the profile in netdevice to bypass the driver.
->      The interaction code of ethtool <-> kernel has not changed at all,
->      only the interaction part of kernel <-> driver has changed.
->
-> v4->v5:
->    - Update some snippets from Kuba.
->
-> v3->v4:
->    - Some tiny updates and patch 1 only add a new comment.
->
-> v2->v3:
->    - Break up the attributes to avoid the use of raw c structs.
->    - Use per-device profile instead of global profile in the driver.
->
-> v1->v2:
->    - Use ethtool tool instead of net-sysfs.
->
-> Heng Qi (5):
->    linux/dim: move useful macros to .h file
->    dim: make DIMLIB dependent on NET
->    ethtool: provide customized dim profile management
->    dim: add new interfaces for initialization and getting results
->    virtio-net: support dim profile fine-tuning
->
->   Documentation/netlink/specs/ethtool.yaml     |  31 +++
->   Documentation/networking/ethtool-netlink.rst |   4 +
->   Documentation/networking/net_dim.rst         |  42 +++
->   drivers/net/virtio_net.c                     |  54 +++-
->   drivers/soc/fsl/Kconfig                      |   2 +-
->   include/linux/dim.h                          | 113 ++++++++
->   include/linux/ethtool.h                      |   4 +-
->   include/linux/netdevice.h                    |   3 +
->   include/uapi/linux/ethtool_netlink.h         |  22 ++
->   lib/Kconfig                                  |   1 +
->   lib/dim/net_dim.c                            | 144 +++++++++-
->   net/Kconfig                                  |   1 +
->   net/ethtool/coalesce.c                       | 263 ++++++++++++++++++-
->   13 files changed, 667 insertions(+), 17 deletions(-)
->
+[auto build test WARNING on mcgrof/modules-next]
+[also build test WARNING on arnd-asm-generic/master tip/timers/core net/main net-next/main linus/master horms-ipvs/master v6.10-rc2 next-20240607]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Johannes-Berg/tracing-add-__print_sym-to-replace-__print_symbolic/20240608-000918
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git modules-next
+patch link:    https://lore.kernel.org/r/20240607160527.23624-7-johannes%40sipsolutions.net
+patch subject: [PATCH v4 1/4] tracing: add __print_sym() to replace __print_symbolic()
+config: i386-buildonly-randconfig-005-20240608 (https://download.01.org/0day-ci/archive/20240608/202406081255.2FEQDvBK-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240608/202406081255.2FEQDvBK-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406081255.2FEQDvBK-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> kernel/trace/trace_events.c:1583:6: warning: variable 'n_sym_defs' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+    1583 |         if ((call->flags & TRACE_EVENT_FL_DYNAMIC) || !call->module) {
+         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   kernel/trace/trace_events.c:1595:18: note: uninitialized use occurs here
+    1595 |         for (i = 0; i < n_sym_defs; i++) {
+         |                         ^~~~~~~~~~
+   kernel/trace/trace_events.c:1583:2: note: remove the 'if' if its condition is always true
+    1583 |         if ((call->flags & TRACE_EVENT_FL_DYNAMIC) || !call->module) {
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   kernel/trace/trace_events.c:1581:25: note: initialize the variable 'n_sym_defs' to silence this warning
+    1581 |         unsigned int n_sym_defs, i;
+         |                                ^
+         |                                 = 0
+   1 warning generated.
+
+
+vim +1583 kernel/trace/trace_events.c
+
+  1575	
+  1576	/* note: @name is not NUL-terminated */
+  1577	static void show_sym_list(struct seq_file *m, struct trace_event_call *call,
+  1578				  const char *name, unsigned int name_len)
+  1579	{
+  1580		struct trace_sym_def **sym_defs;
+  1581		unsigned int n_sym_defs, i;
+  1582	
+> 1583		if ((call->flags & TRACE_EVENT_FL_DYNAMIC) || !call->module) {
+  1584			sym_defs = __start_ftrace_sym_defs;
+  1585			n_sym_defs = __stop_ftrace_sym_defs - __start_ftrace_sym_defs;
+  1586	#ifdef CONFIG_MODULES
+  1587		} else {
+  1588			struct module *mod = call->module;
+  1589	
+  1590			sym_defs = mod->trace_sym_defs;
+  1591			n_sym_defs = mod->num_trace_sym_defs;
+  1592	#endif /* CONFIG_MODULES */
+  1593		}
+  1594	
+  1595		for (i = 0; i < n_sym_defs; i++) {
+  1596			unsigned int sym_len;
+  1597	
+  1598			if (!sym_defs[i])
+  1599				continue;
+  1600			if (sym_defs[i]->system != call->class->system)
+  1601				continue;
+  1602			sym_len = strlen(sym_defs[i]->symbol_id);
+  1603			if (name_len != sym_len)
+  1604				continue;
+  1605			if (strncmp(sym_defs[i]->symbol_id, name, sym_len))
+  1606				continue;
+  1607			if (sym_defs[i]->show)
+  1608				sym_defs[i]->show(m);
+  1609			break;
+  1610		}
+  1611	}
+  1612	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
