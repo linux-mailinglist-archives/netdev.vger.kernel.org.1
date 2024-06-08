@@ -1,104 +1,93 @@
-Return-Path: <netdev+bounces-101982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B507D900F24
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 03:47:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C8FA900F48
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 04:54:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21A6EB2379F
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 01:47:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C3891F21A89
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 02:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D487A8465;
-	Sat,  8 Jun 2024 01:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD8D8D27A;
+	Sat,  8 Jun 2024 02:54:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fastmail.com.au header.i=@fastmail.com.au header.b="hdTzjzyc";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WybPuoCO"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="k2gM+dqy"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout5-smtp.messagingengine.com (fout5-smtp.messagingengine.com [103.168.172.148])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8656FC6;
-	Sat,  8 Jun 2024 01:47:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08DAD8C1A
+	for <netdev@vger.kernel.org>; Sat,  8 Jun 2024 02:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717811269; cv=none; b=hGiHJU6cwTXveVgaltl4zez+0nF4EMJ/YgIDEALNLLd3Szt5H81+7MfG7eVYpghZpHD3z9ZmSG/WvhC7QSQi86zs7wSZxVrYzCSoxeHQJs48Yh0I9dyBIVMNq8lvMmH7WcSINmPejFanO3+a0sVvNrusTEMeRfXAFQuN0HJTnBs=
+	t=1717815259; cv=none; b=F7R71Ie8/bIOSeCzh2oNYImFxVrqsN+gYDr4RDuWAgFd03bmDnU0BDho493+ww2gJtU/kxdRw+dcEyJ71CEnvXJWOw/P3Lpu/Gxx9PAnSodkpOXhOWM0HRcYIPzoKGv+w3npEgCWfutqEpSiKteUCOEeDuUUKMsJfGc09fPBZl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717811269; c=relaxed/simple;
-	bh=3hAKft0IpTlaATaf6B4KLpVNg79DZ5h1pzjABHPAuk0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NeKIaml8OOHw+iWi1mv2g8CJKlpfg4cBNpia8JlXHN6iJ/jKNzkoxG8GEH/FfJxJge1G7dnE9oOTlXUy2OgbwK1FAUvqufldrZG3B3qxydz3Cm8Kwza3HrzQwPB+ZObGNswBB3anK6oeXCpG153M0ivBOCPpA2f1Dkti5za6nkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=johnthomson.fastmail.com.au; spf=pass smtp.mailfrom=johnthomson.fastmail.com.au; dkim=pass (2048-bit key) header.d=fastmail.com.au header.i=@fastmail.com.au header.b=hdTzjzyc; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WybPuoCO; arc=none smtp.client-ip=103.168.172.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=johnthomson.fastmail.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=johnthomson.fastmail.com.au
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailfout.nyi.internal (Postfix) with ESMTP id 75A13138019E;
-	Fri,  7 Jun 2024 21:47:46 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Fri, 07 Jun 2024 21:47:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com.au;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to; s=fm1; t=1717811266; x=1717897666; bh=wVtkKE02aG
-	BtUM4XVJj9v4PooiUi8hPGO3tB8GgDw7E=; b=hdTzjzycTW0W5sG4FreOYRTMaF
-	9r3BiaiIiAZoTUa/iDwQlVvTtw2mF5dVk+7uiS+OAoRRWf87LcPi5PER4f/p9l7o
-	+ic2UISgdAfXGoN1veCJfWCvcmAQN41DHRxrAgieont0uIT3Po/bawxhqHw37Rqi
-	ENe//xnQMZb7B6jlq9/vFJ9gRtbS3iSMtyWk8w0oIAAAr9aQh4L/ztEM1spFQAU4
-	1bXrsmnIPetZdE5/IAdb8kvsV9FtiACZ4gCnAvgKM4iwMvrdqrRblMYa97OhOLTo
-	WIv7GylXyQFED8GNk3I2vFZ1FTqeukVTSaTfcBDIM/TAu6joXYTyWjXGqJ/w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm1; t=1717811266; x=1717897666; bh=wVtkKE02aGBtUM4XVJj9v4PooiUi
-	8hPGO3tB8GgDw7E=; b=WybPuoCOmiH6K2dnfgpCvA4vI8Z9IkaN4tqIcY5di8Pm
-	RGORf+bfZpi2Q2eopd7ltknL5w28c5A9t/jt2Tczsn3+npD9zpZ4l1AKuQSR81Yz
-	y4+bj6SNKYLn669v9J5GPrnXph20Lie5/YRezb0CKW19o4ApzjaLWz5Mt0nNHcbN
-	kSTTtQLzH0YUhH3Q8MEOZ2pgo1cHHh/WLp7NBt0hjBAw6dgHvFo65EG8DYaiRYiF
-	6I7gTNp82xu6d0qyoI5umfIOy2tZQkwKsH3Hx+wQUdiP9TE4JjYqwn5KvRqPGWb+
-	XKGB378X6bx6mVhVh9vQuu2+05eQqLm/HD1MyAYYug==
-X-ME-Sender: <xms:QbhjZjTTm8Pg0y9AlgwqVYUUdKbMi9sipOYi7Y2youjo3a3bhbDZfQ>
-    <xme:QbhjZkzB_1z1vF0T9ty83Bl-eEGdIAlnycxOE-5RjVcNiI_JwVo4s3HU6wx9JRHZ-
-    YTTFaaKkPjARYG8kg>
-X-ME-Received: <xmr:QbhjZo3t_3GU1qZmgJ__-j7mXL3lca2uCGxcHiWHkXkUNU6F5gzqsmaeRu9v6CsYHl12FFynEPnAqXk7W0KGz5NpZwxdeBSroBGSeQWbXDOXxRdmhAgwSXp-Mg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrfedtvddggeelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucenucfjughrpefhvfevufffkffoggfgsedtkeertd
-    ertddtnecuhfhrohhmpeflohhhnhcuvfhhohhmshhonhcuoehgihhtsehjohhhnhhthhho
-    mhhsohhnrdhfrghsthhmrghilhdrtghomhdrrghuqeenucggtffrrghtthgvrhhnpeefvd
-    ekveeggfekgeehvdelteeiffehgfeihfelgfdvkeefvdetkeeuueevleehveenucffohhm
-    rghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepghhithesjhhohhhnthhhohhmshhonhdrfhgrshhtmhgrihhl
-    rdgtohhmrdgruh
-X-ME-Proxy: <xmx:QbhjZjA_RAISdoskpNW2efmv-pAul3XpVgE29J_Kkb7LmOXPmxCNfA>
-    <xmx:QbhjZsjLV2RbFUka9q8VxReyviuwlp_7Z4koRLNU_JxpI6G66j6RoQ>
-    <xmx:QbhjZnoQvmcO9cYfO7ZYhyRaN6jKbkmbIJ7qDuCBoeJa6xwyKY9mXA>
-    <xmx:QbhjZngx0F34ySU9YZ-12hAFsB5jaR6t2A5Y44QP61EdzBjF4cKZRw>
-    <xmx:QrhjZoyLNwbENlmanbnJaMrTKai9grgA6-kNv2CZ8DESQ3u7iFIorhnx>
-Feedback-ID: ic081425d:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 7 Jun 2024 21:47:40 -0400 (EDT)
-From: John Thomson <git@johnthomson.fastmail.com.au>
-To: daniel@makrotopia.org,
-	andrew@lunn.ch,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com,
-	davem@davemloft.net,
+	s=arc-20240116; t=1717815259; c=relaxed/simple;
+	bh=XCq98BdW69m3pSWZHjycAMDpvLfIsaMbXaCFIS2C+3k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oPNk7q5q1gZMbV7NY+uOms21eISDrlPLM6Xo/pRFbhF17s8plfQTtvC9uL/8F+SPeVddrhWknXeOKdzcMVoL39U/gSxp0mU+at5iG/fM0fD7OeEXjn/surn4BUl3U70OJVKpxX0Yl46PR3/0opXeHQ1N+S9R0Hhg4ealxPzU3jY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=k2gM+dqy; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 19B123F68D
+	for <netdev@vger.kernel.org>; Sat,  8 Jun 2024 02:54:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1717815249;
+	bh=eG9eAD1eUsRWubPosFB8FQEEdV1lJ1Ey5T3UFqQEt+8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
+	b=k2gM+dqyDfQfUvY5hGp4CJb+UJwPttj9cxehKvFan2rGOjV0Lm+08G0dSXKHPW7h2
+	 jOD3qVx+hrFZ3a7qkUPUxYlDCYvVC9wKhrd5sOCFlF/AjX1MygKu+8a3h7FGd5Zd8l
+	 mRu0JMti38Nvunom9OyvQiGRS4n+DQckS+PnIKJJTg/EsNm5n8oIitAktCe3wqn2Ct
+	 MJWRPmei1wyMq7oGNjOzgNKEmb1mVUPUfU9AMyAwnmObFx19Poem+NwWE9orLrnjaA
+	 R0KrBGGzaOsPw9vmp2DxLycIlAIUZWRiwltOBIKrrbbgx58EgW7WRK/87ZwN8gWun7
+	 s/AgxiM9aHrlA==
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1f6174cfcf8so31588385ad.3
+        for <netdev@vger.kernel.org>; Fri, 07 Jun 2024 19:54:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717815247; x=1718420047;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eG9eAD1eUsRWubPosFB8FQEEdV1lJ1Ey5T3UFqQEt+8=;
+        b=r7HlryPzfczw+cUMgcRqp7Y2b9L3Yw+f5SUI45cCHvXhMpLddXam63vZ2JHqzM/sWK
+         1dirMQ+SS+Nh4Pczd+DVAo66kGrpNzvBBn13LOspGL7gjlyfFFOKrvHNaXtScIN8g/rI
+         RazuFIIWsUp1sMCGbb05/dGZAxjPPFfP/VlFtWidZy6tA5UpjbicrPoWwsQy3YemgYcV
+         kjnhznHvde3g2KHgG8xiSxCBC3xg8LO7V3HVNtn85iAzChfvPnZX6gzbx83zOrtkhXUh
+         to8WkgqsILAfp4+KC/iWSBtBLTsE/1OqEMgnpX2KBK5pMJjJ5hlBhAOh4JOMQ10XWCjB
+         CwNA==
+X-Forwarded-Encrypted: i=1; AJvYcCUspboIvpq+TARwVmf47+l/msBVWXPh2soSHIFdRCs/A4NzH8RWDCBr41h0mGgsansrwJEcmauLBLJWipj+E0oLqPbwEgqU
+X-Gm-Message-State: AOJu0Yz1LjMsD7T+7dNyqaBBnelN/nZXQqah6FyZUmvsPmBaOh+Xm9xj
+	fhzlJH7n4KEGf1MyezSRzvNfA+wyLxqSSTbdGJC5TaDdjrfCMptXfPD1paslfYQ3gVimerwJ1xF
+	vVF6pTWZ944YGw+Z66L4DegluV1rsCAeMkkw/4fNAuLWQ9IExx74Zfj92B25ZwChh/sdkTw==
+X-Received: by 2002:a17:902:a3cf:b0:1f6:dfbc:7f1c with SMTP id d9443c01a7336-1f6dfbc819amr23641475ad.35.1717815246777;
+        Fri, 07 Jun 2024 19:54:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG8vB8lIDvNuDmz13l9a3GnvHasLxIcGIP48bamhmPvhcSNiJhTktjZFfgapif4JbMagIYpkw==
+X-Received: by 2002:a17:902:a3cf:b0:1f6:dfbc:7f1c with SMTP id d9443c01a7336-1f6dfbc819amr23641255ad.35.1717815245929;
+        Fri, 07 Jun 2024 19:54:05 -0700 (PDT)
+Received: from chengendu.. (2001-b011-381c-b87f-87a2-26e8-842b-6eef.dynamic-ip6.hinet.net. [2001:b011:381c:b87f:87a2:26e8:842b:6eef])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd7e07edsm41614665ad.214.2024.06.07.19.54.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jun 2024 19:54:05 -0700 (PDT)
+From: Chengen Du <chengen.du@canonical.com>
+To: willemdebruijn.kernel@gmail.com
+Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
+	kaber@trash.net,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	John Thomson <git@johnthomson.fastmail.com.au>
-Subject: [RFC net-next] net: dsa: generate port ifname if exists or invalid
-Date: Sat,  8 Jun 2024 11:47:24 +1000
-Message-ID: <20240608014724.2541990-1-git@johnthomson.fastmail.com.au>
-X-Mailer: git-send-email 2.45.1
+	Chengen Du <chengen.du@canonical.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v6] af_packet: Handle outgoing VLAN packets without hardware offloading
+Date: Sat,  8 Jun 2024 10:53:47 +0800
+Message-ID: <20240608025347.90680-1-chengen.du@canonical.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,103 +96,140 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In the case where a DSA port (via DTB label) had an interface name
-that collided with an existing netdev name, register_netdevice failed
-with -EEXIST, and the port was not usable. While this did correctly
-identify a configuration error in DTB, rather bringup the port with an
-enumerated interface name, which can be renamed later from userspace
-where required.
-While this does change the implicit expectation that it is an error if
-the DSA port cannot use it's predictable (DTS label) name, there is no
-functionality to stop netdev from allocating one of these (perhaps
-poorly selected) DSA port names to a non-DSA device before the DSA
-device can.
+The issue initially stems from libpcap. The ethertype will be overwritten
+as the VLAN TPID if the network interface lacks hardware VLAN offloading.
+In the outbound packet path, if hardware VLAN offloading is unavailable,
+the VLAN tag is inserted into the payload but then cleared from the sk_buff
+struct. Consequently, this can lead to a false negative when checking for
+the presence of a VLAN tag, causing the packet sniffing outcome to lack
+VLAN tag information (i.e., TCI-TPID). As a result, the packet capturing
+tool may be unable to parse packets as expected.
 
-While at it, also test that the port name is a valid interface name,
-before doing the work to setup the device, and use an enumerated name
-otherwise.
+The TCI-TPID is missing because the prb_fill_vlan_info() function does not
+modify the tp_vlan_tci/tp_vlan_tpid values, as the information is in the
+payload and not in the sk_buff struct. The skb_vlan_tag_present() function
+only checks vlan_all in the sk_buff struct. In cooked mode, the L2 header
+is stripped, preventing the packet capturing tool from determining the
+correct TCI-TPID value. Additionally, the protocol in SLL is incorrect,
+which means the packet capturing tool cannot parse the L3 header correctly.
 
-This was seen recently (for the EdgeRouter X device) in OpenWrt when a
-downstream hack [1] was removed, which had used DTS label for ifname
-in an ethernet device driver, in favour of renaming ifnames in userspace.
-At the time the device was added to OpenWrt, it only used one network
-device driver interface, plus the switch ports, so eth1 (matching physical
-labelling) was used as a switch port label. Since, this device has
-been adjusted to use phy muxing, exposing a switch port instead as the
-second network device, so at bringup for this DSA port, eth1
-(which is later renamed in userspace) exists, and the eth1 labelled
-DSA port cannot be used.
-
-[1]: https://lore.kernel.org/netdev/20210419154659.44096-3-ilya.lipnitskiy@gmail.com/
-
-Signed-off-by: John Thomson <git@johnthomson.fastmail.com.au>
+Link: https://github.com/the-tcpdump-group/libpcap/issues/1105
+Link: https://lore.kernel.org/netdev/20240520070348.26725-1-chengen.du@canonical.com/T/#u
+Fixes: 393e52e33c6c ("packet: deliver VLAN TCI to userspace")
+Cc: stable@vger.kernel.org
+Signed-off-by: Chengen Du <chengen.du@canonical.com>
 ---
+ net/packet/af_packet.c | 57 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 55 insertions(+), 2 deletions(-)
 
-RFC:
-Not a full solution.
-
-Not sure if supported, I cannot see any users in tree DTS,
-but I guess I would need to skip these checks (and should mark as
-NEM_NAME_ENUM) if port->name contains '%'.
-
-name is also used in alloc_netdev_mqs, and I have not worked out if any
-of the functionality between alloc_netdev_mqs and the register_netdevice
-uses name, so I added these test early, but believe without a rntl lock,
-a colliding name could still be allocated to another device between this
-introduced test, and where this device does lock and register_netdevice
-near the end of this function.
-To deal with this looks to require moving the rntl_lock before
-these tests, which would lock around significantly more.
-
-As an alternative, could we possibly always register an enumerated name,
-then (if name valid) dev_change_name (not exported), while still within
-the lock after register_netdevice?
-
-Or could we introduce a parameter or switch-level DTS property that forces
-DSA to ignore port labels, so that all network devices names can be
-managed from userspace (using the existing port DSA label as intended name,
-as this still seems the best place to define device labels, even if the
-driver does not use this label)?
-
-Cheers
----
- net/dsa/user.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/net/dsa/user.c b/net/dsa/user.c
-index 867c5fe9a4da..347d2d8eb219 100644
---- a/net/dsa/user.c
-+++ b/net/dsa/user.c
-@@ -2684,6 +2684,7 @@ int dsa_user_create(struct dsa_port *port)
- 	struct dsa_switch *ds = port->ds;
- 	struct net_device *user_dev;
- 	struct dsa_user_priv *p;
-+	bool valid_name = false;
- 	const char *name;
- 	int assign_type;
- 	int ret;
-@@ -2692,6 +2693,20 @@ int dsa_user_create(struct dsa_port *port)
- 		ds->num_tx_queues = 1;
+diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+index ea3ebc160e25..8cffbe1f912d 100644
+--- a/net/packet/af_packet.c
++++ b/net/packet/af_packet.c
+@@ -538,6 +538,43 @@ static void *packet_current_frame(struct packet_sock *po,
+ 	return packet_lookup_frame(po, rb, rb->head, status);
+ }
  
- 	if (port->name) {
-+		if (!netdev_name_in_use(&init_net, port->name))
-+			valid_name = true;
-+		else
-+			netdev_warn(conduit, "port %d set name: %s: already in use\n",
-+				    port->index, port->name);
-+		if (dev_valid_name(port->name)) {
-+			valid_name &= true;
-+		} else {
-+			valid_name = false;
-+			netdev_warn(conduit, "port %d set name: %s: is invalid\n",
-+				    port->index, port->name);
++static u16 vlan_get_tci(struct sk_buff *skb)
++{
++	struct vlan_hdr vhdr, *vh;
++	u8 *skb_orig_data = skb->data;
++	int skb_orig_len = skb->len;
++
++	skb_push(skb, skb->data - skb_mac_header(skb));
++	vh = skb_header_pointer(skb, ETH_HLEN, sizeof(vhdr), &vhdr);
++	if (skb_orig_data != skb->data) {
++		skb->data = skb_orig_data;
++		skb->len = skb_orig_len;
++	}
++	if (unlikely(!vh))
++		return 0;
++
++	return ntohs(vh->h_vlan_TCI);
++}
++
++static __be16 vlan_get_protocol_dgram(struct sk_buff *skb)
++{
++	__be16 proto = skb->protocol;
++
++	if (unlikely(eth_type_vlan(proto))) {
++		u8 *skb_orig_data = skb->data;
++		int skb_orig_len = skb->len;
++
++		skb_push(skb, skb->data - skb_mac_header(skb));
++		proto = __vlan_get_protocol(skb, proto, NULL);
++		if (skb_orig_data != skb->data) {
++			skb->data = skb_orig_data;
++			skb->len = skb_orig_len;
 +		}
 +	}
-+	if (valid_name) {
- 		name = port->name;
- 		assign_type = NET_NAME_PREDICTABLE;
++
++	return proto;
++}
++
+ static void prb_del_retire_blk_timer(struct tpacket_kbdq_core *pkc)
+ {
+ 	del_timer_sync(&pkc->retire_blk_timer);
+@@ -1007,10 +1044,16 @@ static void prb_clear_rxhash(struct tpacket_kbdq_core *pkc,
+ static void prb_fill_vlan_info(struct tpacket_kbdq_core *pkc,
+ 			struct tpacket3_hdr *ppd)
+ {
++	struct packet_sock *po = container_of(pkc, struct packet_sock, rx_ring.prb_bdqc);
++
+ 	if (skb_vlan_tag_present(pkc->skb)) {
+ 		ppd->hv1.tp_vlan_tci = skb_vlan_tag_get(pkc->skb);
+ 		ppd->hv1.tp_vlan_tpid = ntohs(pkc->skb->vlan_proto);
+ 		ppd->tp_status = TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
++	} else if (unlikely(po->sk.sk_type == SOCK_DGRAM && eth_type_vlan(pkc->skb->protocol))) {
++		ppd->hv1.tp_vlan_tci = vlan_get_tci(pkc->skb);
++		ppd->hv1.tp_vlan_tpid = ntohs(pkc->skb->protocol);
++		ppd->tp_status = TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
  	} else {
+ 		ppd->hv1.tp_vlan_tci = 0;
+ 		ppd->hv1.tp_vlan_tpid = 0;
+@@ -2428,6 +2471,10 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+ 			h.h2->tp_vlan_tci = skb_vlan_tag_get(skb);
+ 			h.h2->tp_vlan_tpid = ntohs(skb->vlan_proto);
+ 			status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
++		} else if (unlikely(sk->sk_type == SOCK_DGRAM && eth_type_vlan(skb->protocol))) {
++			h.h2->tp_vlan_tci = vlan_get_tci(skb);
++			h.h2->tp_vlan_tpid = ntohs(skb->protocol);
++			status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
+ 		} else {
+ 			h.h2->tp_vlan_tci = 0;
+ 			h.h2->tp_vlan_tpid = 0;
+@@ -2457,7 +2504,8 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	sll->sll_halen = dev_parse_header(skb, sll->sll_addr);
+ 	sll->sll_family = AF_PACKET;
+ 	sll->sll_hatype = dev->type;
+-	sll->sll_protocol = skb->protocol;
++	sll->sll_protocol = (sk->sk_type == SOCK_DGRAM) ?
++		vlan_get_protocol_dgram(skb) : skb->protocol;
+ 	sll->sll_pkttype = skb->pkt_type;
+ 	if (unlikely(packet_sock_flag(po, PACKET_SOCK_ORIGDEV)))
+ 		sll->sll_ifindex = orig_dev->ifindex;
+@@ -3482,7 +3530,8 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+ 		/* Original length was stored in sockaddr_ll fields */
+ 		origlen = PACKET_SKB_CB(skb)->sa.origlen;
+ 		sll->sll_family = AF_PACKET;
+-		sll->sll_protocol = skb->protocol;
++		sll->sll_protocol = (sock->type == SOCK_DGRAM) ?
++			vlan_get_protocol_dgram(skb) : skb->protocol;
+ 	}
+ 
+ 	sock_recv_cmsgs(msg, sk, skb);
+@@ -3539,6 +3588,10 @@ static int packet_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+ 			aux.tp_vlan_tci = skb_vlan_tag_get(skb);
+ 			aux.tp_vlan_tpid = ntohs(skb->vlan_proto);
+ 			aux.tp_status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
++		} else if (unlikely(sock->type == SOCK_DGRAM && eth_type_vlan(skb->protocol))) {
++			aux.tp_vlan_tci = vlan_get_tci(skb);
++			aux.tp_vlan_tpid = ntohs(skb->protocol);
++			aux.tp_status |= TP_STATUS_VLAN_VALID | TP_STATUS_VLAN_TPID_VALID;
+ 		} else {
+ 			aux.tp_vlan_tci = 0;
+ 			aux.tp_vlan_tpid = 0;
 -- 
-2.45.1
+2.43.0
 
 
