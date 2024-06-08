@@ -1,45 +1,74 @@
-Return-Path: <netdev+bounces-101989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-101990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A255C901013
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 10:04:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1C97901016
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 10:05:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DB2F282E30
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 08:04:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 803251F22013
+	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 08:05:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E66E176AA6;
-	Sat,  8 Jun 2024 08:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0123B157A42;
+	Sat,  8 Jun 2024 08:05:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="guyy3sjb"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4824ACA40;
-	Sat,  8 Jun 2024 08:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D54CA40
+	for <netdev@vger.kernel.org>; Sat,  8 Jun 2024 08:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717833875; cv=none; b=tzRRYUN6sY2/WzKvaE42C/H8LOssuOkeEWIjHEY6QyKvg0pxxuP5vfss2AztXOVgwJgpLoLn+0+0MrlniFRG9TR6NVZca8ODZqjF6Ww2jO1VxUcjmnO92vMckHdhxhsHg660Tk5Lj3McHU6adsjAnt61YHAAuNf2DD294QG5FTg=
+	t=1717833917; cv=none; b=jGxRVqMJry57HfkGraSe7c3ZVBLnPjseV/xPUWDnnh2pycpVbX/0m1LcQx8QoytXVPiTaESmAh9vnsioaW0ubaj2MSC9zjRzQ9/bxTs9seDeRMTuLIPHxCIdXR8TDxLDap74/JTGmNVqdntZt+WsX8bt5L/tjjCMYeGH8P82umI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717833875; c=relaxed/simple;
-	bh=Wrgs+ZE7cmrZBquFV5k8uyVqzNDWOPnRTG9hcmXBzsE=;
+	s=arc-20240116; t=1717833917; c=relaxed/simple;
+	bh=APRhzOIJ7x6eZpRT+NQUfIFNeuNwCdIi2tW7Cm1PfZM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IL/xbzbsuA88yT4XisyIYN95RFTd94BTBnydXfgjVlA77v4yp0gCaU8VkzK40BLG++qN27aHYGmREqAiWqHNj9Th/5k3THZrCgpxKddSI22FVQFSkmigXh1TykDMzrXrm7mNyznRBUpb2n3qj8Ut3Y7E/fnteEtc2q16gNExypQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Vx9ZT5SdMz4f3jsq;
-	Sat,  8 Jun 2024 16:04:17 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 8F4FF1A016E;
-	Sat,  8 Jun 2024 16:04:27 +0800 (CST)
-Received: from [10.67.111.192] (unknown [10.67.111.192])
-	by APP1 (Coremail) with SMTP id cCh0CgDH4AmJEGRmD5OVOw--.47038S2;
-	Sat, 08 Jun 2024 16:04:27 +0800 (CST)
-Message-ID: <b4484882-0de5-4515-8c40-41891ac4b21e@huaweicloud.com>
-Date: Sat, 8 Jun 2024 16:04:25 +0800
+	 In-Reply-To:Content-Type; b=QoyFUNGfqBcH//eRWzmttohvjRzTcJsOypr1+7VU8j8CsXSiiCoWLjJ5UIDqC0tOhgqD8v185ETcmotqu6Ku6IYYtxbbSPf6d7WHj7xFCtEzs5v8WwR0miVrrhLGGZjMhMwXTVtA17lDK30d/KkgBSkGfA6ucWO/roRphHBQvEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=guyy3sjb; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3579ef2d436so124753f8f.2
+        for <netdev@vger.kernel.org>; Sat, 08 Jun 2024 01:05:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717833915; x=1718438715; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=APRhzOIJ7x6eZpRT+NQUfIFNeuNwCdIi2tW7Cm1PfZM=;
+        b=guyy3sjbi38OwCet0Xn9zV43/OrygYoiHBwmF5pA7o0GiI1hgzPA3DlyM5RT39MVKE
+         ySJs7JNMvWneBhgiHej7mXNK3eQcpSvo0TIn22vZsDj63K23lqPBcdmjW6iYRAluCT4m
+         xbb307cnSMU7nug/K3Enwb42orK5pxD2lKP42be6lDJU3d7VPVVIlz4zH8EcKoy3UFMN
+         9oxg41YfpdNo0IrEJF4EjtKFHAQX+NfDTPqFQKuPWk44KiTV0ckSarKH8DbXLrgqwiqa
+         ykBBvasBjf5MzAzsCca/FluYLhzO7oiIK9WoWGtiwmvEyuFTx5B6oZS0AucrazRkuJ3v
+         hNow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717833915; x=1718438715;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=APRhzOIJ7x6eZpRT+NQUfIFNeuNwCdIi2tW7Cm1PfZM=;
+        b=BKLaPKfjMKnZGuDmY+psBM63ziSU0hNLbbCThqoOaGgREiFUAmdJcHlttB2UBDpbFV
+         TbQw43fdMb6KeJpQoEBTPeCWFECVRnmpP82/3FphXgYcUbeNRUOLiyVImW+jMmlsnxjw
+         AwXg/PG174aWTv8aVAh5qHHS2qcuHzbHNbWb2/7ccPOPA9CMvM1qwYoyqgcFyHWwusNR
+         ja9yDM1YcFuYXRoYILzmWN/wbUhR5VpCOZjQLw2M9g/ylyBSuasNg4B2hvq2yjQXQfsR
+         jrrhxSeTbXkM12wtdicCHypyQm5MuAJr+PZmMJ//FiGJrJkUkixoEmmEtGYBNzcANLjI
+         ZlWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV4eyDTvolC1McRMBblWWItuPwouKBqyX94Iy/kySAgAx7gDbWwyy++KA1vN87cv1twK6bEeCAxGmzxAZAG/mn0Z5bQ14sx
+X-Gm-Message-State: AOJu0Yz/5akIfENvHEJ5aAekSNdK/qtcGt0H1NLVqTmKM6JUblQH2nma
+	iHBUC7qhOmy6/8WJmNPQU3OMv1Oi0gIfvVDi+Ep3IUjEV8ExgP4YXTeGPA==
+X-Google-Smtp-Source: AGHT+IGLR4CH5vKgALCYJii0ToaErWVzgpIWV2Q+4xz/TXyB5THOq/fGfA2BnTZqgCe9bhC3jTSZSA==
+X-Received: by 2002:a5d:6c65:0:b0:354:fc97:e6e3 with SMTP id ffacd0b85a97d-35efee1d38fmr3324528f8f.5.1717833914579;
+        Sat, 08 Jun 2024 01:05:14 -0700 (PDT)
+Received: from [10.0.0.4] ([37.166.160.110])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35efe03596fsm4135955f8f.96.2024.06.08.01.05.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 08 Jun 2024 01:05:14 -0700 (PDT)
+Message-ID: <541b6a89-bd1c-4e7f-a694-392649dbd778@gmail.com>
+Date: Sat, 8 Jun 2024 10:05:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,148 +76,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v3 01/11] bpf, lsm: Annotate lsm hook return
- value range
+Subject: Re: [PATCH] net/sched: initialize noop_qdisc owner
+To: Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org
+Cc: Johannes Berg <johannes.berg@intel.com>
+References: <CANn89iLyXx8iRScGr5zzBVJ+-BnN==3JJ7DivQE_VUpaQVO4iQ@mail.gmail.com>
+ <20240607175340.786bfb938803.I493bf8422e36be4454c08880a8d3703cea8e421a@changeid>
 Content-Language: en-US
-To: Paul Moore <paul@paul-moore.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>,
- Brendan Jackman <jackmanb@chromium.org>, James Morris <jmorris@namei.org>,
- "Serge E . Hallyn" <serge@hallyn.com>,
- Khadija Kamran <kamrankhadijadj@gmail.com>,
- Casey Schaufler <casey@schaufler-ca.com>,
- Ondrej Mosnacek <omosnace@redhat.com>, Kees Cook <keescook@chromium.org>,
- John Johansen <john.johansen@canonical.com>,
- Lukas Bulwahn <lukas.bulwahn@gmail.com>,
- Roberto Sassu <roberto.sassu@huawei.com>,
- Shung-Hsi Yu <shung-hsi.yu@suse.com>
-References: <20240411122752.2873562-1-xukuohai@huaweicloud.com>
- <20240411122752.2873562-2-xukuohai@huaweicloud.com>
- <CAHC9VhRipBNd+G=RMPVeVOiYCx6FZwHSn0JNKv=+jYZtd5SdYg@mail.gmail.com>
-From: Xu Kuohai <xukuohai@huaweicloud.com>
-In-Reply-To: <CAHC9VhRipBNd+G=RMPVeVOiYCx6FZwHSn0JNKv=+jYZtd5SdYg@mail.gmail.com>
+From: Eric Dumazet <eric.dumazet@gmail.com>
+In-Reply-To: <20240607175340.786bfb938803.I493bf8422e36be4454c08880a8d3703cea8e421a@changeid>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgDH4AmJEGRmD5OVOw--.47038S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxWry8ur1xZr43Gr4rGr4Durg_yoWrAF43pF
-	sYka43KFWvyFWa9rn2yan8ZayakrWfCr47tr17KwnFy3WSqrnFva17tw4Y9FWrCry8K34j
-	9F4j93yrCw4DAa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUk0b4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI
-	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
-	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY
-	6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6x
-	AIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv
-	6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUFYFCUUUUU
-X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
+Content-Transfer-Encoding: 7bit
 
-On 6/7/2024 5:53 AM, Paul Moore wrote:
-> On Thu, Apr 11, 2024 at 8:24 AM Xu Kuohai <xukuohai@huaweicloud.com> wrote:
->>
->> From: Xu Kuohai <xukuohai@huawei.com>
->>
->> Add macro LSM_RET_INT to annotate lsm hook return integer type and the
->> default return value, and the expected return range.
->>
->> The LSM_RET_INT is declared as:
->>
->> LSM_RET_INT(defval, min, max)
->>
->> where
->>
->> - defval is the default return value
->>
->> - min and max indicate the expected return range is [min, max]
->>
->> The return value range for each lsm hook is taken from the description
->> in security/security.c.
->>
->> The expanded result of LSM_RET_INT is not changed, and the compiled
->> product is not changed.
->>
->> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
->> ---
->>   include/linux/lsm_hook_defs.h | 591 +++++++++++++++++-----------------
->>   include/linux/lsm_hooks.h     |   6 -
->>   kernel/bpf/bpf_lsm.c          |  10 +
->>   security/security.c           |   1 +
->>   4 files changed, 313 insertions(+), 295 deletions(-)
-> 
-> ...
-> 
->> diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
->> index 334e00efbde4..708f515ffbf3 100644
->> --- a/include/linux/lsm_hook_defs.h
->> +++ b/include/linux/lsm_hook_defs.h
->> @@ -18,435 +18,448 @@
->>    * The macro LSM_HOOK is used to define the data structures required by
->>    * the LSM framework using the pattern:
->>    *
->> - *     LSM_HOOK(<return_type>, <default_value>, <hook_name>, args...)
->> + *     LSM_HOOK(<return_type>, <return_description>, <hook_name>, args...)
->>    *
->>    * struct security_hook_heads {
->> - *   #define LSM_HOOK(RET, DEFAULT, NAME, ...) struct hlist_head NAME;
->> + *   #define LSM_HOOK(RET, RETVAL_DESC, NAME, ...) struct hlist_head NAME;
->>    *   #include <linux/lsm_hook_defs.h>
->>    *   #undef LSM_HOOK
->>    * };
->>    */
->> -LSM_HOOK(int, 0, binder_set_context_mgr, const struct cred *mgr)
->> -LSM_HOOK(int, 0, binder_transaction, const struct cred *from,
->> +LSM_HOOK(int, LSM_RET_INT(0, -MAX_ERRNO, 0), binder_set_context_mgr, const struct cred *mgr)
->> +LSM_HOOK(int, LSM_RET_INT(0, -MAX_ERRNO, 0), binder_transaction, const struct cred *from,
->>           const struct cred *to)
->> -LSM_HOOK(int, 0, binder_transfer_binder, const struct cred *from,
->> +LSM_HOOK(int, LSM_RET_INT(0, -MAX_ERRNO, 0), binder_transfer_binder, const struct cred *from,
->>           const struct cred *to)
->> -LSM_HOOK(int, 0, binder_transfer_file, const struct cred *from,
->> +LSM_HOOK(int, LSM_RET_INT(0, -MAX_ERRNO, 0), binder_transfer_file, const struct cred *from,
->>           const struct cred *to, const struct file *file)
-> 
-> I'm not overly excited about injecting these additional return value
-> range annotations into the LSM hook definitions, especially since the
-> vast majority of the hooks "returns 0 on success, negative values on
-> error".  I'd rather see some effort put into looking at the
-> feasibility of converting some (all?) of the LSM hook return value
-> exceptions into the more conventional 0/-ERRNO format.  Unfortunately,
-> I haven't had the time to look into that myself, but if you wanted to
-> do that I think it would be a good thing.
-> 
 
-I agree that keeping all hooks return a consistent range of 0/-ERRNO
-is more elegant than adding return value range annotations. However, there
-are two issues that might need to be addressed first:
+On 6/7/24 17:53, Johannes Berg wrote:
+> From: Johannes Berg <johannes.berg@intel.com>
+>
+> When the noop_qdisc owner isn't initialized, then it will be 0,
+> so packets will erroneously be regarded as having been subject
+> to recursion as long as only CPU 0 queues them. For non-SMP,
+> that's all packets, of course. This causes a change in what's
+> reported to userspace, normally noop_qdisc would drop packets
+> silently, but with this change the syscall returns -ENOBUFS if
+> RECVERR is also set on the socket.
+>
+> Fix this by initializing the owner field to -1, just like it
+> would be for dynamically allocated qdiscs by qdisc_alloc().
+>
+> Fixes: 0f022d32c3ec ("net/sched: Fix mirred deadlock on device recursion")
+> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 
-1. Compatibility
 
-For instance, security_vm_enough_memory_mm() determines whether to
-set cap_sys_admin by checking if the hook vm_enough_memory returns
-a positive number. If we were to change the hook vm_enough_memory
-to return 0 to indicate the need for cap_sys_admin, then for the
-LSM BPF program currently returning 0, the interpretation of its
-return value would be reversed after the modification.
+I found this quite by luck.
 
-2. Expressing multiple non-error states using 0/-ERRNO
+Please CC maintainers next time, and blamed patch authors :/
 
-IIUC, although 0/-ERRNO can be used to express different errors,
-only 0 can be used for non-error state. If there are multiple
-non-error states, they cannot be distinguished. For example,
-security_inode_need_killpriv() returns < 0 on error, 0 if
-security_inode_killpriv() doesn't need to be called, and > 0
-if security_inode_killpriv() does need to be called.
+Believe it or not, I do not follow netdev@ traffic.
+
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+
+Thanks.
+
 
 
