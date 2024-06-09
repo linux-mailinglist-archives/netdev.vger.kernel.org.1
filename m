@@ -1,246 +1,87 @@
-Return-Path: <netdev+bounces-102069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A975901524
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 10:33:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78BE2901529
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 10:34:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6922B1C21AAF
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 08:33:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0575B28331C
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 08:34:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D31D6F067;
-	Sun,  9 Jun 2024 08:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="PQ8uixq9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58654D520;
+	Sun,  9 Jun 2024 08:29:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1BA5337C;
-	Sun,  9 Jun 2024 08:28:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.83
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9635118EB0
+	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 08:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717921695; cv=none; b=bBFQM2MB6rJwgtyJvdsaG5EsmenFo2HKL8ZrqMmVd6v68zHQP+dHeakmw281fOmv5CmJuNn9gz5QM6w5FDNL82k7NBRKMOZSxD8H5wyDn+068Y/LBElPIiDtEUlKFrySyfD6b8wsmZndOX2nucMmi8AQYsIP2kLZJKP/yaXYKDU=
+	t=1717921752; cv=none; b=Ob5LQyt9rVnSPRSSvvOV+752xPtSIsFQZa6Dj3bL8WscU0OnLFvZrSXLzxFA6qmE3BP3HqhMBJxJHf1AfTFaDsJNIb2BonfeFaCqKaLHKcA+zeQmokw/vkX5pw8fA63NzK+du+1UMjASI3de0qJ3h1rwjVjMLlp/9BYiLXLdfx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717921695; c=relaxed/simple;
-	bh=XjSGzBEEN4R1uM6+FzoVLzsuvTNxmayPngOiT1u3sG0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=irqZFMnBerrKO9/dHkCbHAgcjTyzMDE6dZIul0kBZpPCtsoXXS//pDPBFbLde8tm6Q7mWXuQczy6gAS3dGuuR+Q5kv9WLx2RHyM6hQbV8S2O9tMPgLK2KIXGA2sGfgAoy4WSLdm8GF+Fxd0LPowO9Dc7IZmvK88Uy7yntxsGK+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=PQ8uixq9; arc=none smtp.client-ip=192.134.164.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=UDrliNsi6qf9iZ0cJTSfrv8FntRHZmJcOSPF/U9CCyU=;
-  b=PQ8uixq9gJb8XJ5kYQyD9s/ymp/dqHay+TNM4exQnNxtZvPryBNvScc0
-   yKx1TUYcF+ilJUMjUqmuURKc0OVGwc7MvninM1ky5jsSke9R2PMmzcoBq
-   5PKM4rmRoXEoS5gWDJL6KrtSpCRSd6OHyLzDTxvaFTRnqD67aFFemBGjC
-   w=;
-Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.08,225,1712613600"; 
-   d="scan'208";a="169696909"
-Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.90.48])
-  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2024 10:27:49 +0200
-From: Julia Lawall <Julia.Lawall@inria.fr>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: kernel-janitors@vger.kernel.org,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Paul E . McKenney" <paulmck@kernel.org>,
-	Vlastimil Babka <vbabka@suse.cz>
-Subject: [PATCH 14/14] netfilter: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-Date: Sun,  9 Jun 2024 10:27:26 +0200
-Message-Id: <20240609082726.32742-15-Julia.Lawall@inria.fr>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20240609082726.32742-1-Julia.Lawall@inria.fr>
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
+	s=arc-20240116; t=1717921752; c=relaxed/simple;
+	bh=PgLtKB0Flcsp7lbTudt3pU2wFfHocXN5o9cXHqw0It4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=kmRmYq0EaiecJ5CdUvxHjYDwUTGrKjQEP8Id2BK7mKxERT5u9/Fcaoy4Gs8/m07BhxuZUgO4Q0ngiR0h6L45AVUV+ZQNZA/hYliDtxeJJ8kmROVLIB1f/x1bqcrYWnVrdT7u/ByKPTEqllNEYQQytqT7zUxItmDAlGwSjdl33BM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from fsav411.sakura.ne.jp (fsav411.sakura.ne.jp [133.242.250.110])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 4598T8RU003695;
+	Sun, 9 Jun 2024 17:29:08 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav411.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav411.sakura.ne.jp);
+ Sun, 09 Jun 2024 17:29:08 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav411.sakura.ne.jp)
+Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 4598T8XY003692
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Sun, 9 Jun 2024 17:29:08 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <628624ea-d815-4866-9711-70d096ea801d@I-love.SAKURA.ne.jp>
+Date: Sun, 9 Jun 2024 17:29:08 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 06/14] netlink: hold nlk->cb_mutex longer in
+ __netlink_dump_start()
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: Jiri Pirko <jiri@resnulli.us>, Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
+        Jiri Pirko <jiri@nvidia.com>, eric.dumazet@gmail.com
+References: <20240222105021.1943116-1-edumazet@google.com>
+ <20240222105021.1943116-7-edumazet@google.com> <Zdd0SWlx4wH-sXbe@nanopsycho>
+ <cbbd6e2d-39da-4da3-b239-1248ac8ded10@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+In-Reply-To: <cbbd6e2d-39da-4da3-b239-1248ac8ded10@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Since SLOB was removed, it is not necessary to use call_rcu
-when the callback only performs kmem_cache_free. Use
-kfree_rcu() directly.
+On 2024/06/09 17:17, Tetsuo Handa wrote:
+> Hello.
+> 
+> While investigating hung task reports involving rtnl_mutex, I came to
+> suspect that commit b5590270068c ("netlink: hold nlk->cb_mutex longer
+> in __netlink_dump_start()") is buggy, for that commit made only
+> mutex_lock(nlk->cb_mutex) side conditionally. Why don't we need to make
+> mutex_unlock(nlk->cb_mutex) side conditionally?
+> 
 
-The changes were done using the following Coccinelle semantic patch.
-This semantic patch is designed to ignore cases where the callback
-function is used in another way.
+Sorry for the noise. That commit should be correct, for the caller
+no longer calls mutex_unlock(nlk->cb_mutex).
 
-// <smpl>
-@r@
-expression e;
-local idexpression e2;
-identifier cb,f;
-position p;
-@@
-
-(
-call_rcu(...,e2)
-|
-call_rcu(&e->f,cb@p)
-)
-
-@r1@
-type T;
-identifier x,r.cb;
-@@
-
- cb(...) {
-(
-   kmem_cache_free(...);
-|
-   T x = ...;
-   kmem_cache_free(...,x);
-|
-   T x;
-   x = ...;
-   kmem_cache_free(...,x);
-)
- }
-
-@s depends on r1@
-position p != r.p;
-identifier r.cb;
-@@
-
- cb@p
-
-@script:ocaml@
-cb << r.cb;
-p << s.p;
-@@
-
-Printf.eprintf "Other use of %s at %s:%d\n"
-   cb (List.hd p).file (List.hd p).line
-
-@depends on r1 && !s@
-expression e;
-identifier r.cb,f;
-position r.p;
-@@
-
-- call_rcu(&e->f,cb@p)
-+ kfree_rcu(e,f)
-
-@r1a depends on !s@
-type T;
-identifier x,r.cb;
-@@
-
-- cb(...) {
-(
--  kmem_cache_free(...);
-|
--  T x = ...;
--  kmem_cache_free(...,x);
-|
--  T x;
--  x = ...;
--  kmem_cache_free(...,x);
-)
-- }
-// </smpl>
-
-Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
-Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
-Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
-
----
- net/netfilter/nf_conncount.c        |   10 +---------
- net/netfilter/nf_conntrack_expect.c |   10 +---------
- net/netfilter/xt_hashlimit.c        |    9 +--------
- 3 files changed, 3 insertions(+), 26 deletions(-)
-
-diff --git a/net/netfilter/nf_conncount.c b/net/netfilter/nf_conncount.c
-index 8715617b02fe..587bfcb79723 100644
---- a/net/netfilter/nf_conncount.c
-+++ b/net/netfilter/nf_conncount.c
-@@ -275,14 +275,6 @@ bool nf_conncount_gc_list(struct net *net,
- }
- EXPORT_SYMBOL_GPL(nf_conncount_gc_list);
- 
--static void __tree_nodes_free(struct rcu_head *h)
--{
--	struct nf_conncount_rb *rbconn;
--
--	rbconn = container_of(h, struct nf_conncount_rb, rcu_head);
--	kmem_cache_free(conncount_rb_cachep, rbconn);
--}
--
- /* caller must hold tree nf_conncount_locks[] lock */
- static void tree_nodes_free(struct rb_root *root,
- 			    struct nf_conncount_rb *gc_nodes[],
-@@ -295,7 +287,7 @@ static void tree_nodes_free(struct rb_root *root,
- 		spin_lock(&rbconn->list.list_lock);
- 		if (!rbconn->list.count) {
- 			rb_erase(&rbconn->node, root);
--			call_rcu(&rbconn->rcu_head, __tree_nodes_free);
-+			kfree_rcu(rbconn, rcu_head);
- 		}
- 		spin_unlock(&rbconn->list.list_lock);
- 	}
-diff --git a/net/netfilter/nf_conntrack_expect.c b/net/netfilter/nf_conntrack_expect.c
-index 21fa550966f0..9dcaef6f3663 100644
---- a/net/netfilter/nf_conntrack_expect.c
-+++ b/net/netfilter/nf_conntrack_expect.c
-@@ -367,18 +367,10 @@ void nf_ct_expect_init(struct nf_conntrack_expect *exp, unsigned int class,
- }
- EXPORT_SYMBOL_GPL(nf_ct_expect_init);
- 
--static void nf_ct_expect_free_rcu(struct rcu_head *head)
--{
--	struct nf_conntrack_expect *exp;
--
--	exp = container_of(head, struct nf_conntrack_expect, rcu);
--	kmem_cache_free(nf_ct_expect_cachep, exp);
--}
--
- void nf_ct_expect_put(struct nf_conntrack_expect *exp)
- {
- 	if (refcount_dec_and_test(&exp->use))
--		call_rcu(&exp->rcu, nf_ct_expect_free_rcu);
-+		kfree_rcu(exp, rcu);
- }
- EXPORT_SYMBOL_GPL(nf_ct_expect_put);
- 
-diff --git a/net/netfilter/xt_hashlimit.c b/net/netfilter/xt_hashlimit.c
-index 0859b8f76764..c2b9b954eb53 100644
---- a/net/netfilter/xt_hashlimit.c
-+++ b/net/netfilter/xt_hashlimit.c
-@@ -256,18 +256,11 @@ dsthash_alloc_init(struct xt_hashlimit_htable *ht,
- 	return ent;
- }
- 
--static void dsthash_free_rcu(struct rcu_head *head)
--{
--	struct dsthash_ent *ent = container_of(head, struct dsthash_ent, rcu);
--
--	kmem_cache_free(hashlimit_cachep, ent);
--}
--
- static inline void
- dsthash_free(struct xt_hashlimit_htable *ht, struct dsthash_ent *ent)
- {
- 	hlist_del_rcu(&ent->node);
--	call_rcu(&ent->rcu, dsthash_free_rcu);
-+	kfree_rcu(ent, rcu);
- 	ht->count--;
- }
- static void htable_gc(struct work_struct *work);
+I'll try a debug printk() patch for linux-next.
 
 
