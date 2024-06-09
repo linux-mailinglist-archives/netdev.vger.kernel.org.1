@@ -1,130 +1,146 @@
-Return-Path: <netdev+bounces-102085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 472D2901602
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:41:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 879F4901607
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:54:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BF98B21429
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 11:41:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 367371F213AC
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 11:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 840E83D57A;
-	Sun,  9 Jun 2024 11:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B5F24B5B;
+	Sun,  9 Jun 2024 11:54:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="YuJxtc0i"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSgCBlJ0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1751C37700
-	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 11:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2A520B33
+	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 11:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717933299; cv=none; b=cdP/62HFbdQ5ayTF4l7twHWS8OObb+AzZ+q6qe66NbI2J3lHnJiG9C/GnafqnUCO+mdTNlK3nB0lzlXeFdN4ymSC7EaJAaMivrYoNDEGmQ0IdSkNIwI4rWU/5wHp8CAhjOcFktySci1aEUF08C/vK0Z4xI6x15+uY/8DnbPxREw=
+	t=1717934055; cv=none; b=oWTKldz6qKsa/NI8CvSxxKTOAgOtTFnMGdZPUhP7D090IQU2Z5v+XoK0RWuPebYDl8xhZvHRylSuaFAoy+t4eUBlk/gtB7Ef4HQBPH+Y2/2vgsTsU1meVLiobBPri4eXn5Va0MC2xp2GA62P79G8ISdYJLlf54yGgPFMTVnAJOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717933299; c=relaxed/simple;
-	bh=+h9RGuZKE588sElun1MmFTpXxG6FHjZmB9t5+Y8+r0Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bgjF+migqDIG8MjV9RV5sJMvE7FzzGTy5Wmz2OrgRIsy9XFm1j8gkTr2K2aaf2KlYFrmKkhWMV247AHb9LWOG6n2YkUaOrn3O9CfI+7y8ODPFDSPsJL2CuIdmBaOgX78J248AaXGtaZOhxVHTPy+uuBcONDrA1IkrF/+0EDL4HY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=YuJxtc0i; arc=none smtp.client-ip=212.227.15.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1717933281; x=1718538081; i=hfdevel@gmx.net;
-	bh=o1buYnkk3rT8KCCEkir/g/xC5NxFMu1cJckK9Y8p4lY=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=YuJxtc0iTrIiuFBzwMtNlSWPAwYStKfHNEvlXGAjRndOdkas1G7kQ8eunj+1i2HY
-	 Yc9WkneFS5RiML/QHG4yPam81UK+03S6eGegFV2p/mVoYEmbjBRzEU3oykpjrmjKI
-	 Lcs3NsDVzuyXaPfcJ9+80CDUJU0iYrAToiznsa83MYKNhUbGc5w0wt3CbLSh1cM6T
-	 UYaHMuF0ZyMPHMSWcYJGr4ZYECz0Mel6jfkGmevdOAgAY2dI0xpmFExZZ3ghrghGt
-	 kGahzk+9Z1LjeWsoqhGrJhMGYY9L+PruPWUKidR1EEwB1WlPHI+hAEiUsxjVXDoR3
-	 YqdLvO7LzeueO+z3zQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [10.0.0.23] ([77.33.175.99]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MIdeR-1sAVl62mV3-0049N7; Sun, 09
- Jun 2024 13:41:21 +0200
-Message-ID: <78ecc7a9-bb33-4c2d-a797-87f782b6a382@gmx.net>
-Date: Sun, 9 Jun 2024 13:41:20 +0200
+	s=arc-20240116; t=1717934055; c=relaxed/simple;
+	bh=U8nub1PQ401/rllW1fTbwvlY7Chd20gj3o+9pi6S3Xo=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=BB0I6HI08CU3nh+ccmCaaMMrBcn/AmI9bYvaO1yt6DKbDQvf6XnTPH24PFaoQxkikwEq3YilKMTyHRQy2NB4WTscWLTqZYw6jyC1WB9tP8J/S31L28l+Va8sCMlzBhLv7L7brM+jy0yKiT9M5+PTPAhVrnU+duPeO62sDUGfK6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nSgCBlJ0; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1f60a17e3e7so4060265ad.1
+        for <netdev@vger.kernel.org>; Sun, 09 Jun 2024 04:54:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717934053; x=1718538853; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TFKprugPlHLSx3yHmNg5VyI9ekssfoPm+mrgBG/Csdg=;
+        b=nSgCBlJ0x7uXhmZt+r14T0mRRReLOZixA1wMhkN/Onkrvjl+FceaxwEGXxotv92RZw
+         aYrO/TNeozf3qWYdfkAnusngdLDwOpPznu45LsWNWNhTn7mB30FYyzNNc+5LhgN3WUxc
+         ogwREvXfZpQOOO6uVis2GnuzK/ijbjVN+wc9e8iU3Y0IpKPzPVUAQme5EIfLwqM7YJRo
+         TmB6RIZhd9CGjqzoeSu+4xjJDLjS7s7rCf+OSGyctr1Cgnx9ZFcVjvXSZXwjrOyTx0FS
+         6NCbLQGy562Np5pEgYsC0/57vsU764Bz3Aqvi4DJlwpFnCBHxLASfY1Pis7azlBb0l3a
+         hKnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717934053; x=1718538853;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=TFKprugPlHLSx3yHmNg5VyI9ekssfoPm+mrgBG/Csdg=;
+        b=CHHlrVOnrhalhyfMorstpB9KriMggLOGBDWga1ZAC7YGMnJYknxlG1hAor7ShR8BtI
+         kRvvRWJJArTb89iW0HlJAzJnreDRr6REkJsxSxcON/DEhvzjR9eMwwRzlsBqCldJikYf
+         M+3XOEmrC27yi+fuS2TjvYsoyGv2p4Ie5g5doFLD2t3CfoCuv3K/2cOQohQLNydNPZ0H
+         IZpRnZ7K/CF7/GlTV2tnIyn93DQC/Nxhei+CswkOUO1YVKl1wFDmzKNxEmpE/7UKr3fx
+         UyLoZiMJ9kC86YJ7k+GGV16qY+qlYTNFoJuxSmBJnAvSTUx0JFB4gnOGE0Hfo7eUTUU0
+         05RQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWvgQZs5WQ2QIEBEeQwhYpODA3kHa8kXxorqBs6pKVkrYt0Pxjn/puBUfsID3k6zCXkGpddPkXeLVPTxNDKYBUixUAgEfvL
+X-Gm-Message-State: AOJu0YxW+4jQatDYoBP+n0tRcU00mPSeYay8ijnnxROS3U9IABZYldeP
+	H76pyTZw4v11iU7ww+EMZ4nepQuxGrc4TRH6Aoka0xGhvewZAAGU
+X-Google-Smtp-Source: AGHT+IEoKBvWcZW5SR8A2gpq+HLtu3R8geCophZfLZq2tXISiRPLRHIyEG7WrKD87UsFqcw1ZsulSg==
+X-Received: by 2002:a17:903:2349:b0:1f7:12c9:9426 with SMTP id d9443c01a7336-1f712c9974fmr3758975ad.3.1717934053295;
+        Sun, 09 Jun 2024 04:54:13 -0700 (PDT)
+Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6f4bda999sm23550695ad.244.2024.06.09.04.54.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Jun 2024 04:54:12 -0700 (PDT)
+Date: Sun, 09 Jun 2024 20:53:58 +0900 (JST)
+Message-Id: <20240609.205358.1673083013074950109.fujita.tomonori@gmail.com>
+To: hfdevel@gmx.net
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch,
+ horms@kernel.org, kuba@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
+ linux@armlinux.org.uk, naveenm@marvell.com, jdamato@fastly.com
+Subject: Re: [PATCH net-next v9 0/6] add ethernet driver for Tehuti
+ Networks TN40xx chips
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <7fbf409d-a3bc-42e0-ba32-47a1db017b57@gmx.net>
+References: <20240605232608.65471-1-fujita.tomonori@gmail.com>
+	<7fbf409d-a3bc-42e0-ba32-47a1db017b57@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 3/6] net: tn40xx: add basic Tx handling
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: andrew@lunn.ch, horms@kernel.org, kuba@kernel.org, jiri@resnulli.us,
- pabeni@redhat.com, linux@armlinux.org.uk, naveenm@marvell.com,
- jdamato@fastly.com, netdev@vger.kernel.org
-References: <20240605232608.65471-1-fujita.tomonori@gmail.com>
- <20240605232608.65471-4-fujita.tomonori@gmail.com>
-Content-Language: en-US
-From: Hans-Frieder Vogt <hfdevel@gmx.net>
-In-Reply-To: <20240605232608.65471-4-fujita.tomonori@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:Wq1HA6+lYD+6cWAo2qgYz9Gj8x8D5U6hTMx05/OSm/w108eLl4A
- sT0snxVX2C6tsjiB7KKN4LevLUo4gKJB0aM3atJd4KdMi3JrXyabj1Bq8yAsvXKygr2YWMb
- FMNy/77o1RcF44Pz+fzKJiLcNJwFUMuP8uMJe/oS0ZsTyNKxcSm+cnSJUrHJKtm5hcDQEH5
- GICvE67ZtgIGqNLfZjM8g==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:sxkErPTtnmo=;kdo+u6XTbxSPLfTSIqrJZItwwvW
- TDLOuVEEPnmUcyL5rED15dJ6brCYqw8SihPqoseGxkZPiUeEhdlyyPj9c8a9H9hbaAprL2g4r
- gld6/9I5yJ4m6wyFOMWa1HviKXWsowJSf8Z8D6+Tr0hUWGreVNgtUXh1qwtCLZ4E4xpT6lrRk
- lyzl8Io+hUxqyE3g7OfGylZM6g7hN3WQ+Z0zw/wqBXhLQhJy6IYXuwYUhcCczsaPslJbu8ZW0
- DPbe528JyjTjPgJSZbdgNECCEjMqRInwJ9yb4uHlSolqau8zvgUsoTADg+gds/9JMqo7YHDYr
- S861gOlW8C9tiyK8l0p2pSz9vgQYMUZKsd44UzBZxoT5fLfq9VyUyLUu5/JLSqiuExbUbc4uo
- RQtq2ZGu5qSvDJ302TLPDwpkx6LxTolf6oIOi662dDctKHCpoh86B4BjVMGii66CuaPlA6Plf
- jqqapBjGPp0JaC/FZg3znX5EqNyK+3v1aXdw8iHbnV3PU1aWD99DMnTQhKecUC72y18Fr5RT+
- D8Uu4Ob9xTEzoUpYBoQzIRGgRElaRUY0JDB4AhE9ruMYFAWp5RqdLTChFIo3jtyr8zOvGGegz
- C7PUzn81dBVqXXkk3dGGSXfZ5dUyToJGP34cj3hr8eXQtkKS3+/pa+fNb8y6kfZMpjulc2apF
- cGOGiZWsTZT5P/dwiwI+8kOuAeVE/scOO54wCbN6mTIFlqzA1Ci7ZVj3mgXnKtBo8rQ2X0JaS
- IeGeKdhrizPZUl1b/K1nvqILD7rPQIFuTOW0AWyZgCLapLnYEqO9AxDvErx8bKZAkLXLCQoJ2
- Pgf5ffBnk8L7peUrAn35T6eosIwVv/jqzNOk5rV0DvfXY=
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On 06.06.2024 01.26, FUJITA Tomonori wrote:
-(deleted quite a few lines, because the relevant topic is nearly at the
-end).
-> +
-> +static int tn40_priv_init(struct tn40_priv *priv)
-> +{
-> +	int ret;
-> +
-> +	tn40_set_link_speed(priv, 0);
-> +
-> +	ret =3D tn40_hw_reset(priv);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Set GPIO[9:0] to output 0 */
-> +	tn40_write_reg(priv, 0x51E0, 0x30010006);	/* GPIO_OE_ WR CMD */
-> +	tn40_write_reg(priv, 0x51F0, 0x0);	/* GPIO_OE_ DATA */
-> +	tn40_write_reg(priv, TN40_REG_MDIO_CMD_STAT, 0x3ec8);
+Hi,
 
-the last tn40_write_reg (to TN40_REG_MDIO_CMD_STAT) is in fact the same as=
-:
+On Sun, 9 Jun 2024 11:10:54 +0200
+Hans-Frieder Vogt <hfdevel@gmx.net> wrote:
 
-tn40_mdio_set_speed(priv, TN40_MDIO_SPEED_1MHZ);
+>> FUJITA Tomonori (6):
+>>    net: tn40xx: add pci driver for Tehuti Networks TN40xx chips
+>>    net: tn40xx: add register defines
+>>    net: tn40xx: add basic Tx handling
+>>    net: tn40xx: add basic Rx handling
+>>    net: tn40xx: add mdio bus support
+>>    net: tn40xx: add phylink support
+>>
+>>   MAINTAINERS                             |    8 +-
+>>   drivers/net/ethernet/tehuti/Kconfig     |   15 +
+>>   drivers/net/ethernet/tehuti/Makefile    |    3 +
+>>   drivers/net/ethernet/tehuti/tn40.c      | 1771 +++++++++++++++++++++++
+>>   drivers/net/ethernet/tehuti/tn40.h      |  233 +++
+>>   drivers/net/ethernet/tehuti/tn40_mdio.c |  143 ++
+>>   drivers/net/ethernet/tehuti/tn40_phy.c  |   76 +
+>>   drivers/net/ethernet/tehuti/tn40_regs.h |  245 ++++
+>>   8 files changed, 2493 insertions(+), 1 deletion(-)
+>>   create mode 100644 drivers/net/ethernet/tehuti/tn40.c
+>>   create mode 100644 drivers/net/ethernet/tehuti/tn40.h
+>>   create mode 100644 drivers/net/ethernet/tehuti/tn40_mdio.c
+>>   create mode 100644 drivers/net/ethernet/tehuti/tn40_phy.c
+>>   create mode 100644 drivers/net/ethernet/tehuti/tn40_regs.h
+>>
+>>
+>> base-commit: c790275b5edf5d8280ae520bda7c1f37da460c00
+> 
+> Hi Tomonori,
+> 
+> feel free to add my
+> 
+> Reviewed-by: Hans-Frieder Vogt <hfdevel@gmx.net>
 
-Use of this function would IMHO enhance readability of the code
-(obviously will need making tn40_mdio_set_speed non-static in
-tn40_mdio.c and adding the function to tn40.h).
+Thanks a lot!
 
-> +
-> +	// we use tx descriptors to load a firmware.
-> +	ret =3D tn40_create_tx_ring(priv);
-> +	if (ret)
-> +		return ret;
-> +	ret =3D tn40_fw_load(priv);
-> +	tn40_destroy_tx_ring(priv);
-> +	return ret;
-> +}
-> +
+> to your patch series.
+> I have also tested your driver, however since I have 10GBASE-T cards
+> with x3310 and aqr105 phys I had to add a few lines (very few!) to
+> make
+> them work. Therefore, formally I cannot claim to have tested exactly
+> your patches.
+
+With few changes, the driver works in-tree Aquantia PHYs driver
+(drivers/net/phy/aquantia)?
+
+
+> Once your driver is out, I will post patches for supporting the other
+> phys.
+> Thanks for taking the effort of mainlining this driver!
+
+Great!
 
