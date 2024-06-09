@@ -1,207 +1,180 @@
-Return-Path: <netdev+bounces-102083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 886A59015F6
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:29:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 130F49015F8
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:34:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BA15281516
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 11:29:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB7EB1C208FE
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 11:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796A62D030;
-	Sun,  9 Jun 2024 11:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="cL373MHo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398FE374F6;
+	Sun,  9 Jun 2024 11:34:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869E83C08A
-	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 11:29:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A459D36134
+	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 11:34:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717932552; cv=none; b=Q8cbaRtgZ3ftw8nScVJ/CG91WYWatWKvCBwHGjJ/zA6EdhiLmFjCsv4ob/kBHQCoKmI6H1PZODXsE8RhupuvXelURcKzFQHIq3qmKApE/DJgOI8Lb0PM5LGUGy8Yh2DzcmxSaTMGrg11KRmYnkXIGJeYKDgYVaVHkBI7ygw9EzY=
+	t=1717932868; cv=none; b=T1qJcpqK/3zPP2t1HUuxQITasqbkamzNJhxT4qb+KJ9pm335J6j1MWF1PILP0r9IYEAuLWh1P/AP1z03Ny548Z9hWboW7onH1w4QgO8GTpNcixaY9ocx6ZkLWQDTAzl7/KnwMIsQffZqUdJxNOdCsoCrRdxAlaRwRSBhWCcidPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717932552; c=relaxed/simple;
-	bh=64n82kJHnSe1dAAVHYhxKNQwMXDd4o7hsqHIky8hZSU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iuV2WvXwcnHjrJTaWNuBXcrq3vD4MnJpQyOzSkGa0lu89nHjPNc4Q9C6vPbG03a++4PmiNJWmCZEX5L9GvHdunGzy8u79MCWaJ/MSngQH9PRs4HpqhRXhOJ/mZtjpPOhsI5jxEs5kxgsUkA5zXCiu9CiDjhmQ1BEz2LNh+ZHKcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=cL373MHo; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1sGGjF-0082jP-PH; Sun, 09 Jun 2024 13:28:53 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=0HXIpayi735m1jY+PNIhxE51hQbf92/H3KbdQ0s/YCs=; b=cL373MHoVnUiu+oeo7Slns/QNy
-	l0B2CKU9js1ii9AwMiJFdvRYDJMKE0CHxdZrth9xahPqODfuMLnmL7Xk6UJTBydqbXvaqkbIoG765
-	eKHZ6XysEU4w/ZUANLFOKwW0kHETYGOX+Z/M5dQJ+uP+n6unu1K0J3frM8uBdJyUgW9PGHSh5L5BH
-	XODXGx19bs4W3NSQqSbFtYnbwh1GxwOOtIhrciQgGyPaU73cX2H+gQ0LnOt2n4Ss4dhT7/4fsrYgd
-	lbc3e1NThAiTff52ql+XluOoPhcBNY/0QtcJrV7Ed+Ch7ylRNQnZ77fV+t37Y5mQqy1C3cuKUAOMA
-	j1wqg9cw==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1sGGjE-0002vf-Mv; Sun, 09 Jun 2024 13:28:52 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1sGGix-00BXde-5y; Sun, 09 Jun 2024 13:28:35 +0200
-Message-ID: <ba5c50aa-1df4-40c2-ab33-a72022c5a32e@rbox.co>
-Date: Sun, 9 Jun 2024 13:28:34 +0200
+	s=arc-20240116; t=1717932868; c=relaxed/simple;
+	bh=Y1+ti1mbb9MNw7nNtpV56B0Q6eW+P17Im7g7i/SEQzs=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=UB8YxAXPNXAtnricvSCeF3THF19LGzFy52q799faT9zp8GRAHfCJGBmdAdabGVZ2VDczA+iHaku9g47foBOfCOrVaq7Ap1KjRhfEC0qA7gOQqnArZEzwsOYjl6TFsw8F2YII7114syPzxO4IWrviwDftHMpaivMXv/EI6o8g5hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-375a4dc31cbso859685ab.1
+        for <netdev@vger.kernel.org>; Sun, 09 Jun 2024 04:34:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717932866; x=1718537666;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YZV4E2L8maI6s7zq2yrwNQ7hph7xAqxH7JzWM8hda4Q=;
+        b=dI6H9qANC35v8ZMW8oe4iQlnqdehUzNakb2sXJKRy87gNfDm0y8AlaKwC/EBxkve5w
+         e65ehFieVpfZPS+25Kyok/g3ExvoM14vxwaOKyRp8pm4s/AO0CVBZjgqDDWTRiNaxntY
+         imzWpYjvAXys9lIflZIhzyhJWoxA8UAmClN5gL62AI/HiT6hMiGYZYUq/pGNR7Sjrvi0
+         OQKfpHKIOcUToYsbr12GIxfMxR/nReAwJKd3Orb9joea7NHi1z/osVCazak/Qpd1KlsP
+         VMJ4bb4CgaiddV8RewzP6dhAi0EVwP3xWNi1svY2b70rEr1ZAv7D2hSNfHkzDsCupRFb
+         uLWw==
+X-Forwarded-Encrypted: i=1; AJvYcCW9NxI3WYG9MkajL65RgDF6NP79cDpGcN2+Q1MjYXNxcB8YqVWuVXukKivc9dXw72RjSiQZX+yw6CLUOXi1+SIInBf9Fhr1
+X-Gm-Message-State: AOJu0Yx1DMMSeDrB/R7e/jujSXJD/fwzl1EBqeBg6VeWKdSUxOgT6N8t
+	XnpRgF5oV1QiwMKRgQYeMBbUbvWIU8bohFYkYEDZa6KLNymv3ULOVUfx2UzQgY0fJLo9+I+R5sJ
+	G/gRYb9jhOcJib3BhwpJ55Sc5tD4U70hpgdH5pzT0c4++sjler7+UFjQ=
+X-Google-Smtp-Source: AGHT+IGbhhOsz75IpMUaqd4IQp6/f84Ci5jbYbl1vq4N3CB8GmF1Ph8Ht43avaioasT7zxVpLi/qG21XDDP+AWCbfVPf8+NAGXY8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net 01/15] af_unix: Set sk->sk_state under
- unix_state_lock() for truly disconencted peer.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
- Cong Wang <cong.wang@bytedance.com>
-References: <20240604165241.44758-1-kuniyu@amazon.com>
- <20240604165241.44758-2-kuniyu@amazon.com>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-Autocrypt: addr=regenrecht@o2.pl; keydata=
- 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
-In-Reply-To: <20240604165241.44758-2-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1fc9:b0:374:a840:e5be with SMTP id
+ e9e14a558f8ab-375802379b1mr3680665ab.0.1717932865811; Sun, 09 Jun 2024
+ 04:34:25 -0700 (PDT)
+Date: Sun, 09 Jun 2024 04:34:25 -0700
+In-Reply-To: <00000000000099cf25061964d113@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000371fcb061a736a5b@google.com>
+Subject: Re: [syzbot] [bpf?] [net?] general protection fault in
+ dev_map_enqueue (2)
+From: syzbot <syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On 6/4/24 18:52, Kuniyuki Iwashima wrote:
-> When a SOCK_DGRAM socket connect()s to another socket, the both sockets'
-> sk->sk_state are changed to TCP_ESTABLISHED so that we can register them
-> to BPF SOCKMAP. (...)
+syzbot has found a reproducer for the following issue on:
 
-Speaking of af_unix and sockmap, SOCK_STREAM has a tiny window for
-bpf(BPF_MAP_UPDATE_ELEM) and unix_stream_connect() to race: when
-sock_map_sk_state_allowed() passes (sk_state == TCP_ESTABLISHED), but
-unix_peer(sk) in unix_stream_bpf_update_proto() _still_ returns NULL:
+HEAD commit:    c44711b78608 liquidio: Adjust a NULL pointer handling path..
+git tree:       net
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1175e6f6980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=333ebe38d43c42e2
+dashboard link: https://syzkaller.appspot.com/bug?extid=cca39e6e84a367a7e6f6
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=172b3126980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17caa30a980000
 
-	T0 bpf				T1 connect
-	======				==========
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/47ff53e982e7/disk-c44711b7.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7b10dcb52f35/vmlinux-c44711b7.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b4a6bf6f87c5/bzImage-c44711b7.xz
 
-				WRITE_ONCE(sk->sk_state, TCP_ESTABLISHED)
-sock_map_sk_state_allowed(sk)
-...
-sk_pair = unix_peer(sk)
-sock_hold(sk_pair)
-				sock_hold(newsk)
-				smp_mb__after_atomic()
-				unix_peer(sk) = newsk
-				unix_state_unlock(sk)
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com
 
-With mdelay(1) stuffed in unix_stream_connect():
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 1 PID: 5098 Comm: syz-executor784 Not tainted 6.10.0-rc2-syzkaller-00228-gc44711b78608 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+RIP: 0010:dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
+Code: 41 56 41 55 41 54 53 48 83 ec 18 49 89 d4 49 89 f5 48 89 fd 49 be 00 00 00 00 00 fc ff df e8 46 9c d7 ff 48 89 e8 48 c1 e8 03 <42> 80 3c 30 00 74 08 48 89 ef e8 a0 5e 3d 00 4c 8b 7d 00 48 83 c5
+RSP: 0018:ffffc9000343f678 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff88807eb31e00
+RDX: 0000000000000000 RSI: ffff88802224a070 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffffffff89625806 R09: ffffffff896257c3
+R10: 0000000000000004 R11: ffff88807eb31e00 R12: ffff8880151d8000
+R13: ffff88802224a070 R14: dffffc0000000000 R15: 0000000000000000
+FS:  00005555867d5380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fdc79c59303 CR3: 0000000022bc8000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __xdp_do_redirect_frame net/core/filter.c:4397 [inline]
+ xdp_do_redirect_frame+0x2a6/0x660 net/core/filter.c:4451
+ xdp_test_run_batch net/bpf/test_run.c:336 [inline]
+ bpf_test_run_xdp_live+0xe60/0x1e60 net/bpf/test_run.c:384
+ bpf_prog_test_run_xdp+0x80e/0x11b0 net/bpf/test_run.c:1281
+ bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4292
+ __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5706
+ __do_sys_bpf kernel/bpf/syscall.c:5795 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5793 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5793
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fdc79c5b239
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff5780f908 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fdc79c5b239
+RDX: 0000000000000050 RSI: 0000000020000240 RDI: 000000000000000a
+RBP: 0000000000000000 R08: 0000000000000006 R09: 0000000000000006
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
+Code: 41 56 41 55 41 54 53 48 83 ec 18 49 89 d4 49 89 f5 48 89 fd 49 be 00 00 00 00 00 fc ff df e8 46 9c d7 ff 48 89 e8 48 c1 e8 03 <42> 80 3c 30 00 74 08 48 89 ef e8 a0 5e 3d 00 4c 8b 7d 00 48 83 c5
+RSP: 0018:ffffc9000343f678 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff88807eb31e00
+RDX: 0000000000000000 RSI: ffff88802224a070 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffffffff89625806 R09: ffffffff896257c3
+R10: 0000000000000004 R11: ffff88807eb31e00 R12: ffff8880151d8000
+R13: ffff88802224a070 R14: dffffc0000000000 R15: 0000000000000000
+FS:  00005555867d5380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fdc79c59303 CR3: 0000000022bc8000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	41 56                	push   %r14
+   2:	41 55                	push   %r13
+   4:	41 54                	push   %r12
+   6:	53                   	push   %rbx
+   7:	48 83 ec 18          	sub    $0x18,%rsp
+   b:	49 89 d4             	mov    %rdx,%r12
+   e:	49 89 f5             	mov    %rsi,%r13
+  11:	48 89 fd             	mov    %rdi,%rbp
+  14:	49 be 00 00 00 00 00 	movabs $0xdffffc0000000000,%r14
+  1b:	fc ff df
+  1e:	e8 46 9c d7 ff       	call   0xffd79c69
+  23:	48 89 e8             	mov    %rbp,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	42 80 3c 30 00       	cmpb   $0x0,(%rax,%r14,1) <-- trapping instruction
+  2f:	74 08                	je     0x39
+  31:	48 89 ef             	mov    %rbp,%rdi
+  34:	e8 a0 5e 3d 00       	call   0x3d5ed9
+  39:	4c 8b 7d 00          	mov    0x0(%rbp),%r15
+  3d:	48                   	rex.W
+  3e:	83                   	.byte 0x83
+  3f:	c5                   	.byte 0xc5
 
-[  902.277593] BUG: kernel NULL pointer dereference, address: 0000000000000080
-[  902.277633] #PF: supervisor write access in kernel mode
-[  902.277661] #PF: error_code(0x0002) - not-present page
-[  902.277688] PGD 107191067 P4D 107191067 PUD 10f63c067 PMD 0
-[  902.277716] Oops: Oops: 0002 [#23] PREEMPT SMP NOPTI
-[  902.277742] CPU: 2 PID: 1505 Comm: a.out Tainted: G      D            6.10.0-rc1+ #130
-[  902.277769] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
-[  902.277793] RIP: 0010:unix_stream_bpf_update_proto+0xa1/0x150
 
-Setting TCP_ESTABLISHED _after_ unix_peer() fixes the issue, so how about
-something like
-
-@@ -1631,12 +1631,13 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
-        /* Set credentials */
-        copy_peercred(sk, other);
-
--       sock->state     = SS_CONNECTED;
--       WRITE_ONCE(sk->sk_state, TCP_ESTABLISHED);
-        sock_hold(newsk);
-+       smp_mb__after_atomic(); /* sock_hold() does an atomic_inc() */
-+       WRITE_ONCE(unix_peer(sk), newsk);
-+       smp_wmb(); /* ensure peer is set before sk_state */
-
--       smp_mb__after_atomic(); /* sock_hold() does an atomic_inc() */
--       unix_peer(sk)   = newsk;
-+       sock->state = SS_CONNECTED;
-+       WRITE_ONCE(sk->sk_state, TCP_ESTABLISHED);
-
-        unix_state_unlock(sk);
-
-@@ -180,7 +180,8 @@ int unix_stream_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool r
-         * be a single matching destroy operation.
-         */
-        if (!psock->sk_pair) {
--               sk_pair = unix_peer(sk);
-+               smp_rmb();
-+               sk_pair = READ_ONCE(unix_peer(sk));
-                sock_hold(sk_pair);
-                psock->sk_pair = sk_pair;
-        }
-
-This should keep things ordered and lockless... I hope.
-
-Alternatively, maybe it would be better just to make BPF respect the unix
-state lock?
-
-@@ -180,6 +180,8 @@ int unix_stream_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool r
- 	 * be a single matching destroy operation.
- 	 */
- 	if (!psock->sk_pair) {
-+               unix_state_lock(sk);
-                sk_pair = unix_peer(sk);
-+               unix_state_unlock(sk);
- 		sock_hold(sk_pair);
- 		psock->sk_pair = sk_pair;
-
-What do you think?
-
-Thanks,
-Michal
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
