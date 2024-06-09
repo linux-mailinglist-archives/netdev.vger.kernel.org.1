@@ -1,198 +1,189 @@
-Return-Path: <netdev+bounces-102088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C85A90161B
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 14:40:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31875901631
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 15:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF409B20DDE
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 12:40:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88FC82817F3
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:17:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E1035894;
-	Sun,  9 Jun 2024 12:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25CB3CF65;
+	Sun,  9 Jun 2024 13:17:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="I37Lfytf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KJrNfhBV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C621D69E
-	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 12:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 773B317E9
+	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 13:17:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717936827; cv=none; b=UooYzT2Qo5jBWJXwGu2WXz3MV0ADDhHA3QMIvTHCX81RbkrJFDwCw2aA3z01W7Ii46syuP4AS6354YWljY85oeNCrmemFSbk+29GZU0d27rc8ksG1MM3xjfRZRoDshPWlcCi1TKAXgkAxYOG3W8r/cmoQ3gCBcBwiV4a+WZVOXc=
+	t=1717939064; cv=none; b=FuysCnl4XqutvIKfrrBFNcDKLYFAlbpnEEOdGPuNjYcJ6tjXmWS8gpe1iP9CAeuXSr2Pi3vxmKM3t+eQ6y7rRLElC36CV4dF4Q9SEN+FZdhd5j9trsWx4fWQCfUCauMihroexpLrolL8CjG5njLLlh1CQ9pqBOla6r74YbA0fh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717936827; c=relaxed/simple;
-	bh=tt3r7CEEOjxSx01964nW0EAQKLF5914Bo28XIMZwWGA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i1gbK8SUkHjZzowJLBkz5jpF+UtCDygSfMkPesjN31G/jCLwCN1OBPRAxcx6IX+W50NgSPrqISrpP0JQ6ENdgmOgPkjXmEVbIofaB9h3TrjX3RpT7fkmI9R3eyfmEE/eH2nYQACl8UEojZmxlL+iUp+oq4sD4/lkFU8YHhsZjEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=I37Lfytf; arc=none smtp.client-ip=212.227.15.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1717936804; x=1718541604; i=hfdevel@gmx.net;
-	bh=tt3r7CEEOjxSx01964nW0EAQKLF5914Bo28XIMZwWGA=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=I37LfytfnXUHb3GA86Pvc69O6EFyDdXUHvQpRudooQTTfZCMCHo7porjLgyb9aMb
-	 diaVGuhg2UCD8hmZ4EgrN5Ayg8AoSH3k8JagNvdPBEgpHhva8OhHOej+ci17LeYaa
-	 yU1AskR0wd/v8NGhWs+51bo3bLRaWhb9pNT22cVQb3jr266EB9elaO34MhACTADeX
-	 0XUup3HYUBJVmnWVoOZ6Jt21TsCcPC50IUQ6Xp3yp2lN7qKdZJCpoFbfjAbFQicnj
-	 Tk2yLxTW3A4NCQkPsLHItqspM344s1OjSHJ4NzKbCJ97MCFIMm+YzhP6zoa4g17Z2
-	 1oPWNL07oQLhZYKUJw==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [10.0.0.23] ([77.33.175.99]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MoO2E-1sn8cG1hP6-00qLC9; Sun, 09
- Jun 2024 14:40:04 +0200
-Message-ID: <e461ce5b-e8d0-413f-a872-2394f41a15d4@gmx.net>
-Date: Sun, 9 Jun 2024 14:40:03 +0200
+	s=arc-20240116; t=1717939064; c=relaxed/simple;
+	bh=skmwMXi8kAEMyCrhhGcH/OZjY7wPIsNpAHXSx8oGsww=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ABuXZ07TcdaZHX40LH2Dq+YDOwLjDDHO95IAj0qYq+RGQBHATMdvjCFgoJE7P/Mz4xdbR3wNJcTqV+qpxoH+2X4SQivK6Qjn3xcMp98Ar31V/Wbjr8sJKXxEUi04rnJqa2xdO32681x946UrK/IAMxcwQFXeMzS6QDKwq8AYmRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KJrNfhBV; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-704189f1225so1488873b3a.0
+        for <netdev@vger.kernel.org>; Sun, 09 Jun 2024 06:17:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717939063; x=1718543863; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yjxt4NWAvaamGZW7AUUoaTNwwiKOEAfHLcMVlnfmIVE=;
+        b=KJrNfhBVjA+gv8f1Bvquu60tcbH3JUIT8NhXnb4NrJ0emPtnoRlIvovoFsovnvyipl
+         DEDS7chJ7gdegLDM1J4i46WG+3pDLLnVvWoKELOo4OKDfXE01ZKhXqg8ptyPDm+NY7eQ
+         y3EZPozoX6vZT274efF/9lepgC/CepkJk+vhsU7tcaqxHBOCmXYPWYrUkKhgUn/p2Jib
+         AczG+8hs8cshmUGugl0+VwI+HKqOhC6nPwxFXBQ4Ky5naaBOgAthiaPhME/RSDeqnBOo
+         M9VR6LiXm26TS3ZE4m2IqDOYR1mX/gz8AFrqA1fEeSmZTAQD1gvhHseV9Zz3icR7MJhB
+         mp2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717939063; x=1718543863;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yjxt4NWAvaamGZW7AUUoaTNwwiKOEAfHLcMVlnfmIVE=;
+        b=tZGk7uwc+9OiwEz5gpnvxcHMj22pBqot7Q+fmOZbTBvS9isVzqrEEJt0KX+or9TPj9
+         PvAKQTSRi2khMihf5NEYIejuOKJzYMpdM2EwK395vdmSOtfm7LLs0yyvnRUjcEnKc+ac
+         tKylKCI9RXJDyk2Azztqm2CtK0g6nWEoSwJXolgFGngBAXIo+TAdSU0vujG126lr6iU+
+         YekLI8fjtudoZlhME8k4mGLjE6xh2ZAcF0hOHLIQonYR/rdPCqkqpqBep6yA71PAXp6a
+         034MBCEHKbyIS3Rm6RHWa9oTUABOXQagz+qgyCwz7lhSgg0S9gS80IHAt1L5YzWlMLp7
+         76Yg==
+X-Gm-Message-State: AOJu0Yznx0UVRCNmG1PQsil2jrlLPm3F5VtGwDDu8jk29gohKO1FJ3h4
+	XwpUqYN5p5+8t+SaDzfCxyjzJ5WjBLl8U6GEIQf6XDmrKd8djP15
+X-Google-Smtp-Source: AGHT+IFvZ9ARLcJIdJ1NTa5flp5NbsdqX9gcFA3fPPID/tVQPWlWixhgOgxKp7lpw/oCjaaKoQuzDw==
+X-Received: by 2002:a05:6a00:2e05:b0:702:7cf0:e1a1 with SMTP id d2e1a72fcca58-7040c7489b5mr8203716b3a.32.1717939062534;
+        Sun, 09 Jun 2024 06:17:42 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([111.201.28.17])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-703fd50beb6sm5412109b3a.176.2024.06.09.06.17.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Jun 2024 06:17:41 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com,
+	leitao@debian.org
+Cc: netdev@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next] net: dqs: introduce NETIF_F_NO_BQL device feature
+Date: Sun,  9 Jun 2024 21:17:32 +0800
+Message-Id: <20240609131732.73156-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 0/6] add ethernet driver for Tehuti Networks
- TN40xx chips
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
- andrew@lunn.ch, horms@kernel.org, kuba@kernel.org, jiri@resnulli.us,
- pabeni@redhat.com, naveenm@marvell.com, jdamato@fastly.com
-References: <20240605232608.65471-1-fujita.tomonori@gmail.com>
- <7fbf409d-a3bc-42e0-ba32-47a1db017b57@gmx.net>
- <ZmWG/ZQ4e/susuo6@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Hans-Frieder Vogt <hfdevel@gmx.net>
-In-Reply-To: <ZmWG/ZQ4e/susuo6@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:sCcwGQc+8abDxwvdLPDYWXBZ5c0cyN0VPzXe6KjTSqS1MQKD8av
- z5bbyR7PwRlYOhbLtQEQ3RwAc31CXmq1avvjVNMHlCcC5S1/UmZGI1Yp1776NOuOsawtFBp
- XEsgFBA7DNES5ueS8Egx5ZBX2wF4oTYYtIxVyJw3E7hWF1YbI2vBjlgaTjX7FFb3yWZf35i
- 4t9cr58EGw96xi+pJIptw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:Y42nHrpUswI=;OTdq4cwu9VVmY4jF2gFJUve3lDR
- BWGDDMOjYhQtAOOehqeKfg+cMr70spUmnYiG3BxCHX4Kd4MC+RNKoCbq78UFtwuXet5TLzXES
- IovjqilR+wWQ6OmtXBu7Dm1kzzs2wzmDvlv/NoXqqxDFnLGxDVtz7nWHFADgApRO8Yu0gnO/w
- J4xCtPeW7p2IL2WGslwmNEwJifhzERfonTpggAfRVgvgX9cyasn2/Q5LQ8vfUIkg1hGApAlG4
- oo04CIcUnl4BSWF6iOk6qgajEMHQA0VQXfdHo4GFyiBMmHbeDE/oJoduBIv1uL9wueTbEC/kn
- pGUFZJrQdq7zxAlCg9Ut1ep+xg1Q6cXUr0Yt3QCmarT2iKBS/DxIr0Te3nbvjEcTLN03lKfvq
- Plb98n+U1I5Qjb6vdEU7Nv8BvcW9Bytxqa3BwfhJAObE3qm3FW8JHtClPCzdyDCvxkAPnNutx
- imj0Gp7rWjnwEqsrYKFbQuKZD73fcGC4iScqJk/UtSSxC9yayX1l7f2Jt7onPcwRK45v1Sjdh
- yQ+QHccszc9KV4Zk7XmZmdLx2z97s52Hw30ENzuEh2c8qWHEzMEQK0Hg1/I6uW57tDBXRtftX
- E199MteHvOxkLhjUt8evsx2rhVbH7jSOFpJ5HnqXUU44ZprA9qYQnh0Iwb1cI2ULfP4BdrhAk
- 8mws21ks0j21Af2+NlqqiDvKnW8FwW5IuBhbYKdpkPrHJU22wEK8QQ0npxJwlQADN6PPFc5fA
- 2uO6iaGCkctTdJ6SUsfPhypHmUPB18v9gRoUSYfS1HspJ2e+5g5n4Z1x1XephOcNYIzBBaAXp
- FUxdyZ5ZIsifWM589hrM+9lZVgEvBOzY4zr2BPlRtRauY=
+Content-Transfer-Encoding: 8bit
 
-On 09.06.2024 12.42, Russell King (Oracle) wrote:
-> On Sun, Jun 09, 2024 at 11:10:54AM +0200, Hans-Frieder Vogt wrote:
->> I have also tested your driver, however since I have 10GBASE-T cards
->> with x3310 and aqr105 phys I had to add a few lines (very few!) to make
->> them work. Therefore, formally I cannot claim to have tested exactly
->> your patches.
->> Once your driver is out, I will post patches for supporting the other p=
-hys.
->> Thanks for taking the effort of mainlining this driver!
-> Still, it would be useful to know what those changes were, even if they
-> aren't formal patches.
->
-> Thanks.
->
-Sure. So, here, for info (and later addition to the driver), small
-adjustments needed in the tn40 driver to support cards with Marvell
-88X3310 and Aquantia/Marvell AQR105:
+From: Jason Xing <kernelxing@tencent.com>
 
-First the trivial change (I just also added also the e2010 phy, because
-it seems to have a lot of commonality with the x3310, but I don't have a
-card with this phy, so it is atm just speculation. Same applies to the
-Promise card):
+Since commit 74293ea1c4db6 ("net: sysfs: Do not create sysfs for non
+BQL device") limits the non-BQL driver not creating byte_queue_limits
+directory, I found there is one exception, namely, virtio-net driver,
+which should also be limited in netdev_uses_bql().
 
-in tn40.c:
+I decided to introduce a NO_BQL bit in device feature because
+1) it can help us limit virtio-net driver for now.
+2) if we found another non-BQL driver, we can take it into account.
+3) we can replace all the driver meeting those two statements in
+netdev_uses_bql() in future.
 
-@@ -1752,6 +1754,10 @@ static const struct pci_device_id tn40_i
- =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0PCI_=
-VENDOR_ID_ASUSTEK, 0x8709) },
- =C2=A0=C2=A0=C2=A0=C2=A0 { PCI_DEVICE_SUB(PCI_VENDOR_ID_TEHUTI, 0x4022,
- =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0PCI_=
-VENDOR_ID_EDIMAX, 0x8103) },
-+=C2=A0=C2=A0=C2=A0 { PCI_VDEVICE(TEHUTI, 0x4025), 0 }, /* AQR105 */
-+=C2=A0=C2=A0=C2=A0 { PCI_VDEVICE(TEHUTI, 0x4027), 0 }, /* MV88X3310 */
-+=C2=A0=C2=A0=C2=A0 { PCI_VDEVICE(TEHUTI, 0x4527), 0 }, /* MV88E2010 */
-+=C2=A0=C2=A0=C2=A0 { PCI_VDEVICE(PROMISE, 0x7203), 0 }, /* AQR105 */
- =C2=A0=C2=A0=C2=A0=C2=A0 { }
- =C2=A0};
+For now, I would like to make the first step to use this new bit for dqs
+use instead of replacing/applying all the non-BQL drivers.
 
-then the AQR105 seems to need the MDIO bus set at 1MHz to allow for
-detection:
+After this patch, 1) there is no byte_queue_limits directory in virtio-net
+driver. 2) running ethtool -k eth1 shows "no-bql: on [fixed]".
 
-@@ -1681,6 +1681,8 @@ static int tn40_probe(struct pci_dev *pd
- =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 goto err_unset_drvdata;
- =C2=A0=C2=A0=C2=A0=C2=A0 }
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+ drivers/net/virtio_net.c        | 2 +-
+ include/linux/netdev_features.h | 3 ++-
+ net/core/net-sysfs.c            | 2 +-
+ net/ethtool/common.c            | 1 +
+ 4 files changed, 5 insertions(+), 3 deletions(-)
 
-+=C2=A0=C2=A0=C2=A0 tn40_mdio_set_speed(priv, TN40_MDIO_SPEED_1MHZ);
-+
- =C2=A0=C2=A0=C2=A0=C2=A0 ret =3D tn40_mdiobus_init(priv);
- =C2=A0=C2=A0=C2=A0=C2=A0 if (ret) {
- =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 dev_err(&pdev->dev, "failed t=
-o initialize mdio bus.\n");
-
-This is not needed for the x3310 and may be related to, that the AQR105
-is connected to phy address 1 on my card. Strange enough the
-manufacturer's offline driver seems not to need this (but there the
-sequence of initialization is also different, so it is likely due to
-this reason).
-Note: having set the speed to 1MHz here does NOT allow to skip the
-similar call in tn40_priv_init, because BIT(3) seems to be lost on the
-way, but is needed for the AQR phy to finish probing, but not for the
-x3310 (don't really understand this).
-
-On the other hand, the x3310 requires to add XAUI to host_interfaces.
-Otherwise it will not switch to this interface on its own. So, adding
-this to tn40_phy.c.
-
-=2D-- a/drivers/net/ethernet/tehuti/tn40_phy.c=C2=A0=C2=A0=C2=A0 2024-06-0=
-6
-06:43:40.865474664 +0200
-+++ b/drivers/net/ethernet/tehuti/tn40_phy.c=C2=A0=C2=A0=C2=A0 2024-06-06
-18:57:01.978776712 +0200
-@@ -54,6 +54,8 @@ int tn40_phy_register(struct tn40_priv *
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 return -1;
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __set_bit(PHY_INTERFACE_MODE_XAUI, p=
-hydev->host_interfaces);
-+
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 config =3D &priv->phylink_conf=
-ig;
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 config->dev =3D &priv->ndev->d=
-ev;
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 config->type =3D PHYLINK_NETDE=
-V;
-
-I have to mention, though, that the phy-drivers for x3310 and aqr105 are
-not yet ready and will also need some changes related to the firmware
-loading, because for most (all?) of the Tehuti-based cards the phy
-firmware has to be uploaded via MDIO.
-
-For AQR phys there is already support for firmware loading in the
-driver. However, this is so far only working for systems using
-device-tree. A few rather trivial changes (sorry, I know I should have
-posted them already) will sort this. Further to this I have
-"switched-on" some features coming from AQR107. I need to investigate
-whether they are essential for operation.
-
-For x3310 the patch provided by Tobias Waldekranz (or a similar patch
-posted some year or two ago) will be needed for firmware-uploading.
-
-I'll prepare a patch for the AQR105. Then we have at least one BASE-T
-card fully supported.
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 61a57d134544..619908fed14b 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -5634,7 +5634,7 @@ static int virtnet_probe(struct virtio_device *vdev)
+ 			   IFF_TX_SKB_NO_LINEAR;
+ 	dev->netdev_ops = &virtnet_netdev;
+ 	dev->stat_ops = &virtnet_stat_ops;
+-	dev->features = NETIF_F_HIGHDMA;
++	dev->features = NETIF_F_HIGHDMA | NETIF_F_NO_BQL;
+ 
+ 	dev->ethtool_ops = &virtnet_ethtool_ops;
+ 	SET_NETDEV_DEV(dev, &vdev->dev);
+diff --git a/include/linux/netdev_features.h b/include/linux/netdev_features.h
+index 7c2d77d75a88..9bc603bb4227 100644
+--- a/include/linux/netdev_features.h
++++ b/include/linux/netdev_features.h
+@@ -14,7 +14,6 @@ typedef u64 netdev_features_t;
+ enum {
+ 	NETIF_F_SG_BIT,			/* Scatter/gather IO. */
+ 	NETIF_F_IP_CSUM_BIT,		/* Can checksum TCP/UDP over IPv4. */
+-	__UNUSED_NETIF_F_1,
+ 	NETIF_F_HW_CSUM_BIT,		/* Can checksum all the packets. */
+ 	NETIF_F_IPV6_CSUM_BIT,		/* Can checksum TCP/UDP over IPV6 */
+ 	NETIF_F_HIGHDMA_BIT,		/* Can DMA to high memory. */
+@@ -91,6 +90,7 @@ enum {
+ 	NETIF_F_HW_HSR_FWD_BIT,		/* Offload HSR forwarding */
+ 	NETIF_F_HW_HSR_DUP_BIT,		/* Offload HSR duplication */
+ 
++	NETIF_F_NO_BQL_BIT,		/* non-BQL driver */
+ 	/*
+ 	 * Add your fresh new feature above and remember to update
+ 	 * netdev_features_strings[] in net/ethtool/common.c and maybe
+@@ -168,6 +168,7 @@ enum {
+ #define NETIF_F_HW_HSR_TAG_RM	__NETIF_F(HW_HSR_TAG_RM)
+ #define NETIF_F_HW_HSR_FWD	__NETIF_F(HW_HSR_FWD)
+ #define NETIF_F_HW_HSR_DUP	__NETIF_F(HW_HSR_DUP)
++#define NETIF_F_NO_BQL		__NETIF_F(NO_BQL)
+ 
+ /* Finds the next feature with the highest number of the range of start-1 till 0.
+  */
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index 4c27a360c294..ff397a76f1fe 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -1764,7 +1764,7 @@ static const struct kobj_type netdev_queue_ktype = {
+ 
+ static bool netdev_uses_bql(const struct net_device *dev)
+ {
+-	if (dev->features & NETIF_F_LLTX ||
++	if (dev->features & (NETIF_F_LLTX | NETIF_F_NO_BQL) ||
+ 	    dev->priv_flags & IFF_NO_QUEUE)
+ 		return false;
+ 
+diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+index 6b2a360dcdf0..efa7ac4158ce 100644
+--- a/net/ethtool/common.c
++++ b/net/ethtool/common.c
+@@ -74,6 +74,7 @@ const char netdev_features_strings[NETDEV_FEATURE_COUNT][ETH_GSTRING_LEN] = {
+ 	[NETIF_F_HW_HSR_TAG_RM_BIT] =	 "hsr-tag-rm-offload",
+ 	[NETIF_F_HW_HSR_FWD_BIT] =	 "hsr-fwd-offload",
+ 	[NETIF_F_HW_HSR_DUP_BIT] =	 "hsr-dup-offload",
++	[NETIF_F_NO_BQL_BIT] =		 "no-bql",
+ };
+ 
+ const char
+-- 
+2.37.3
 
 
