@@ -1,140 +1,163 @@
-Return-Path: <netdev+bounces-102074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9558B90158A
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 12:34:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB31590158B
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 12:37:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A3E21F212BA
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 10:34:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0FAB1C20A38
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 10:37:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8745620B33;
-	Sun,  9 Jun 2024 10:34:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C864224EF;
+	Sun,  9 Jun 2024 10:37:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="W1Aw8BiC"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="abVBjozx"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB755B65E
-	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 10:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D457F1CD13
+	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 10:37:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717929287; cv=none; b=aJUqo61MuVvCrlyhBOy7IYLktapquTqf3hPASvgVLnQLfdFInYwMcsUlzE/65nlnVHQd5YxORWRWM4R6PczimID+xo+8vpOpEYN+g2lZ6CN3ST5QWBWBJCsih5dGAAdPuiZD4eothc3NSjD/0P+N+U1lNqK4yH8gJqirGOnPgKY=
+	t=1717929436; cv=none; b=gYZ5ISzB1wv8FRJCSxLTQi7ZXJeyOK3eoZyOko38YBXMxE2/lPtvufjo769uGwZdy6pEA/wGs7/6YDbB+G3z1/NJpIiuVafkj91B87xlXi97v4DzX/F4IY/8Kmvk6nsC58PFpn9YzzDHVKXtOT2McZ9D7U6gqXY3cH0FuA24fGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717929287; c=relaxed/simple;
-	bh=SDoZSez7Y+K/BBQCvO6xJkuWJ3v2hXTNv3SBVvsPjGo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FIQ4MGay00C+7Xf3h9DS8A1ACV0E1ckk7NpjqgCi58t8j5QAbEmLhhyjmFQeX2c3b+FtKIXHVve1bSRMXv6yU7WGEK0hm4xkbiRTB38v8proaCj01710BRdlA9TDBr+b0Bio9S2hlVfUAWt8hx1UZKhAXH58bky1UUOXlYzB3ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=W1Aw8BiC; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=7CYQvWtyUu2WhQUKzyRn/qQoFWT4tGvIr+hLmncgYIs=; b=W1Aw8BiCB8DWE+d2BaFnBCbqh7
-	lAotIAvP4vlzxJ4BvAnL0gopsE5ai4ARz35Za1UH1dAE7RXvZqGcLDuevsHQ1n5X4iI6Y7jBUj0zs
-	RG9he47THI18BptpuhU27OE42mp+bJeT+BZiJaOZnWJxNtT4getuasnOG2qaB2YuL/Ifa2BB5fm2Z
-	hEgGU9MzUbgXrLKVy/1+vhZEu/3BZjY0FgKUKXBn8eN0HQzkSjTs6ZcH/pm9YTtLXRp89NpAX96tr
-	xaBEVd1sBvu4oVmWOzaf5EJYoxov+04H0+3DT+YqM8PfsvfLb9/ulAgI0wrG62Hq8uUDm+oyKcy65
-	pEI3cIHQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56618)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sGFsa-0000Qj-1P;
-	Sun, 09 Jun 2024 11:34:28 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sGFsa-0005sk-7d; Sun, 09 Jun 2024 11:34:28 +0100
-Date: Sun, 9 Jun 2024 11:34:28 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, horms@kernel.org,
-	kuba@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
-	hfdevel@gmx.net, naveenm@marvell.com, jdamato@fastly.com
-Subject: Re: [PATCH net-next v9 6/6] net: tn40xx: add phylink support
-Message-ID: <ZmWFNATfPWEPSLyf@shell.armlinux.org.uk>
-References: <20240605232608.65471-1-fujita.tomonori@gmail.com>
- <20240605232608.65471-7-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1717929436; c=relaxed/simple;
+	bh=L2s03dhFeMytPwGmI5YvhNUtbDtRRLCjBJwQDgtWHJY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GOVa3QW2H8XvUQLMAe47CaXWzZz3OJoQQzRQZXRnZPemEDCfALJi/+uEXzkhp3aM61OBdE8JD1DqhzLUt+XXhkE8oRcHZSxs71H5iMr68ue2nNfWuZ4mumAc31EbbcAjahiV6EN/cNk9KUXn4F3kdUR7hr803JgfTkLTUG0Hw8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=abVBjozx; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a6f09b457fdso85097966b.2
+        for <netdev@vger.kernel.org>; Sun, 09 Jun 2024 03:37:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1717929432; x=1718534232; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KUIEGxGg8eY95ds7QR7Av+9t23TMyKmwO6BqnjfUYo4=;
+        b=abVBjozxbmtndiS2t0F62p6TrVXcx3FgoaoaoLtCZzF0ttosRY1co+lRRpFm64Rpm1
+         f7t/bKlOXb6wVPRiFgIM9zatikNg4jB97/KD2Xr6H3QnMVEEYEpz4HJM43x7teo3JVxI
+         +0HIBJpokjvUtU3Qxy7dhX82wlW6+DrBS4EHGm4caNNcLMUiu8VSzbDVggmZIe2SC7P+
+         sfVWGnPFJprB9xnJuJybL6+kigBWrpO4w9iLRyhmwJEjBubVhaIu6YbW5ms8ielGoxzd
+         +/bfV6H1uxsTHTZFFQnvewIhxVNs63hQCxbh31IxNggqQujy0w5qM84Ui46ySZ1fYECp
+         4zfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717929432; x=1718534232;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KUIEGxGg8eY95ds7QR7Av+9t23TMyKmwO6BqnjfUYo4=;
+        b=e1uWhOHL+imHw832we/zmr6e6mgfT7Ru7JQJZx9R9ZsizPD61lGfLaVFqMDgRK8WWs
+         pGHH7JCE2U79SFl0cBUjU30S6hW6UYAW+/lb5+TSufZF5JkVjUEV+7yzyRShYIGOou+D
+         L0A0xH+ocbRJ07nzuDwO9hSQHdZKhfq8hNWtmCkYhBsjfH2wqyc2SoxAg0/R9gWMF3Kp
+         acQxDyEdZ8FyZ/RhmppErKDHDP6bRmI2G6tcIB9c9IeSl82pKHoW1DKuSgpb9k1W5VSB
+         RgzUy1sI0mE+g9f7ATEyRSYw+enjxVSsw7ImsiFoYD2zyMdlVJtdkom/i3WviOjSevPk
+         AgUg==
+X-Gm-Message-State: AOJu0Yw3uhfNuhjHf6Rjsw2XiXay9ySVUwg0wN6ZEgNO2UICiV0zv3Ht
+	OXzYvG2GOs51N/kuPCOCjhV+/jPbWQx22MMOx4Wk642RynIuY9ckMLwz/PhxE8E1tvRmgFjcAHp
+	wnz+DKg==
+X-Google-Smtp-Source: AGHT+IGfArVuUpG9mwzGQ2LT7Rw4nAR48CIY/0eQnNI4FvUnHk8G0KF+1MZKIWsjivMpclNzBucKbQ==
+X-Received: by 2002:a17:906:5ac7:b0:a68:cf56:aaed with SMTP id a640c23a62f3a-a6cdc0e4ac5mr465844766b.74.1717929432294;
+        Sun, 09 Jun 2024 03:37:12 -0700 (PDT)
+Received: from dev.. ([62.205.150.185])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6ef8c01579sm259579966b.155.2024.06.09.03.37.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Jun 2024 03:37:11 -0700 (PDT)
+From: Nikolay Aleksandrov <razor@blackwall.org>
+To: netdev@vger.kernel.org
+Cc: tobias@waldekranz.com,
+	kuba@kernel.org,
+	roopa@nvidia.com,
+	bridge@lists.linux.dev,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	Nikolay Aleksandrov <razor@blackwall.org>
+Subject: [PATCH net 0/2] net: bridge: mst: fix suspicious rcu usage warning
+Date: Sun,  9 Jun 2024 13:36:52 +0300
+Message-ID: <20240609103654.914987-1-razor@blackwall.org>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240605232608.65471-7-fujita.tomonori@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jun 06, 2024 at 08:26:08AM +0900, FUJITA Tomonori wrote:
-> @@ -1670,6 +1681,12 @@ static int tn40_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  		goto err_unset_drvdata;
->  	}
->  
-> +	ret = tn40_mdiobus_init(priv);
-> +	if (ret) {
-> +		dev_err(&pdev->dev, "failed to initialize mdio bus.\n");
-> +		goto err_free_irq;
-> +	}
-> +
-...
-> +err_unregister_phydev:
-> +	tn40_phy_unregister(priv);
->  err_free_irq:
->  	pci_free_irq_vectors(pdev);
->  err_unset_drvdata:
+Hi all,
+This set fixes a suspicious RCU usage warning triggered by syzbot[1] in
+the bridge's MST code. After I converted br_mst_set_state to RCU, I
+forgot to update the vlan group dereference helper. Fix it by using
+the proper helper, in order to do that we need to pass the vlan group
+which is already obtained correctly by the callers for their respective
+context. Patch 01 is a requirement for the fix in patch 02.
 
-and from previous patches:
+Note I did consider rcu_dereference_rtnl() but the churn is much bigger
+and in every part of the bridge. We can do that as a cleanup in
+net-next.
 
-+       pci_set_drvdata(pdev, NULL);
-+err_iounmap:
-+       iounmap(regs);
-+err_free_regions:
-+       pci_release_regions(pdev);
-+err_disable_device:
-+       pci_disable_device(pdev);
-+       return ret;
-+}
+Cheers,
+ Nik
 
-So, if tn40_mdiobus_init() returns non-zero, this value will be returned
-to higher kernel levels via tn40_probe().
+[1] https://syzkaller.appspot.com/bug?extid=9bbe2de1bc9d470eb5fe
+ =============================
+ WARNING: suspicious RCU usage
+ 6.10.0-rc2-syzkaller-00235-g8a92980606e3 #0 Not tainted
+ -----------------------------
+ net/bridge/br_private.h:1599 suspicious rcu_dereference_protected() usage!
 
-...
-> +int tn40_phy_register(struct tn40_priv *priv)
-> +{
-> +	struct phylink_config *config;
-> +	struct phy_device *phydev;
-> +	struct phylink *phylink;
-> +
-> +	phydev = phy_find_first(priv->mdio);
-> +	if (!phydev) {
-> +		dev_err(&priv->pdev->dev, "PHY isn't found\n");
-> +		return -1;
+ other info that might help us debug this:
 
-And my email client, setup with rules to catch common programming
-mistakes, highlights the above line. I have no idea why people do
-this... why people think "lets return -1 on error". It seems to be
-a very common pattern... but it's utterly wrong. -1 is -EPERM, aka
-"Operation not permitted". This is not what you mean here. Please
-return a more suitable negative errno symbol... and please refrain
-from using "return -1" in kernel code.
+ rcu_scheduler_active = 2, debug_locks = 1
+ 4 locks held by syz-executor.1/5374:
+  #0: ffff888022d50b18 (&mm->mmap_lock){++++}-{3:3}, at: mmap_read_lock include/linux/mmap_lock.h:144 [inline]
+  #0: ffff888022d50b18 (&mm->mmap_lock){++++}-{3:3}, at: __mm_populate+0x1b0/0x460 mm/gup.c:2111
+  #1: ffffc90000a18c00 ((&p->forward_delay_timer)){+.-.}-{0:0}, at: call_timer_fn+0xc0/0x650 kernel/time/timer.c:1789
+  #2: ffff88805fb2ccb8 (&br->lock){+.-.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+  #2: ffff88805fb2ccb8 (&br->lock){+.-.}-{2:2}, at: br_forward_delay_timer_expired+0x50/0x440 net/bridge/br_stp_timer.c:86
+  #3: ffffffff8e333fa0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
+  #3: ffffffff8e333fa0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:781 [inline]
+  #3: ffffffff8e333fa0 (rcu_read_lock){....}-{1:2}, at: br_mst_set_state+0x171/0x7a0 net/bridge/br_mst.c:105
 
-(The only case where "return -1" may be permissible is where the
-value doesn't get propagated outside of the compilation unit, but
-even there, there is the possibility that later changes may end
-up propagating it outside... personally, I would like to see
-"return -1" totally banned from the kernel.)
+ stack backtrace:
+ CPU: 1 PID: 5374 Comm: syz-executor.1 Not tainted 6.10.0-rc2-syzkaller-00235-g8a92980606e3 #0
+ Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+ Call Trace:
+  <IRQ>
+  __dump_stack lib/dump_stack.c:88 [inline]
+  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+  lockdep_rcu_suspicious+0x221/0x340 kernel/locking/lockdep.c:6712
+  nbp_vlan_group net/bridge/br_private.h:1599 [inline]
+  br_mst_set_state+0x29e/0x7a0 net/bridge/br_mst.c:106
+  br_set_state+0x28a/0x7b0 net/bridge/br_stp.c:47
+  br_forward_delay_timer_expired+0x176/0x440 net/bridge/br_stp_timer.c:88
+  call_timer_fn+0x18e/0x650 kernel/time/timer.c:1792
+  expire_timers kernel/time/timer.c:1843 [inline]
+  __run_timers kernel/time/timer.c:2417 [inline]
+  __run_timer_base+0x66a/0x8e0 kernel/time/timer.c:2428
+  run_timer_base kernel/time/timer.c:2437 [inline]
+  run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2447
+  handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
+  __do_softirq kernel/softirq.c:588 [inline]
+  invoke_softirq kernel/softirq.c:428 [inline]
+  __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
+  irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
+  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+  sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1043
+  </IRQ>
+  <TASK>
 
-Thanks.
+Nikolay Aleksandrov (2):
+  net: bridge: mst: pass vlan group directly to br_mst_vlan_set_state
+  net: bridge: mst: fix suspicious rcu usage in br_mst_set_state
+
+ net/bridge/br_mst.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.45.1
+
 
