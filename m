@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-102080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48D689015EA
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:17:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0BA49015F2
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:23:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1C15281B07
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 11:17:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A7922810B2
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 11:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8201D29D05;
-	Sun,  9 Jun 2024 11:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C556D22626;
+	Sun,  9 Jun 2024 11:23:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="X3jxOSds"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="bPBtautZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57BA313FF6
-	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 11:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 687C41865C
+	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 11:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717931871; cv=none; b=n/YNd0MvIV3aUc0gM73Tv42jCqCBNydSgGJGNKF9yqNrzXblMsKfcWISbTz1tcWJHbcvKRskfVlisrtdE9JfqjrP91G3F/s6i6bD1dEmGgGCLY942PWCMuzPmUp//tNwt+3wW9hzWxFx+TNs+eC4YmRaN/mxE12Mhy2IDw12nFY=
+	t=1717932208; cv=none; b=LqVrVvz2m1HPgM7ohQryuvjWtuMccKOiaJ735tqjpPvMmsYKoXUFBz7VGMlzmZlYr3vQe4j4gkRH/nC1mF1hJFuhkfWi6NyKBqY644WKerfiCDxUKFjTg/gPeUcmRmcHO49EosXpv94f6feAXonOMlIbVCMe/Pz8QHvQOwGX5LI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717931871; c=relaxed/simple;
-	bh=sKdjORTXPQJbiQV+A/F0kNH6j18vVT83Q+bzs+TE3YA=;
+	s=arc-20240116; t=1717932208; c=relaxed/simple;
+	bh=s/1gzQD73zhQ5I54cicssp7mPuHgYqrDtOn+EZWnJzY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BpJ1npn92ZVZcOYPOwCYO1NQcVYs1Aaw9FGZoqZIdCarEDHKVjjXNOuaUG7KRmvj/8HXDdIfGp6Qk51v6uEyz8X89T8E1/2903oJ/j84e221iTGH9GipyVGkQdON07x+UHHhbmRsxKY4CMrVPlFzKqEUmxDmfgkcmbmyfyN78o8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=X3jxOSds; arc=none smtp.client-ip=212.227.15.15
+	 In-Reply-To:Content-Type; b=MAeXRW4G0QtU6fVZDgmouqrr3lvtOsyg1Z8W22ke1tT69+kI0z58roNn/NbbrdfbJ1QXgCW9f9DWeYXm+X2WsLIO4wJaeayZf0zOz50+7PFT8oQVJZpkRH53+KR+v7v/YYFFEOTWM67mSsvlduxbwZkfAVf09Fx2kqF3qHVJbzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=bPBtautZ; arc=none smtp.client-ip=212.227.15.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1717931852; x=1718536652; i=hfdevel@gmx.net;
-	bh=fkGOhrPF1pzRN8hSEqVCg9ngGplDwFx/beGrAOq8epo=;
+	s=s31663417; t=1717932179; x=1718536979; i=hfdevel@gmx.net;
+	bh=OySWXdbbCnbT8HcitiW07cGcpBzbyOTf5ern2Cyjp8Y=;
 	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
 	 References:From:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding:cc:content-transfer-encoding:
 	 content-type:date:from:message-id:mime-version:reply-to:subject:
 	 to;
-	b=X3jxOSds+rpeKb34W0uZ32HWzi52UiV3Uz8tYu33/duidL5Vt3NrOF0NCtkKeQjr
-	 5xLL5cz0iHruLjpiabduBh3W569uvX1/pyEzLlYn4/FTuPOtEfG8tthPU1zs2ZI7K
-	 wpgXtcOZuGPtwCeltQFme1C+YKd2N8dHnHEP10zuksI+5qm0UqEI50WhFYd9C4ndI
-	 C5N193APJ4dJg65+V8diHkdTl0Pc/YBeYwnSh94ftvv6/hONuksWZ28OPCoZnZK7p
-	 o5AlKoiUdsV1gSxw+WIhevBm2VSULzZoXHoStaPmMDlBqQ2pzVGFIXnR4i7aYRWYO
-	 2gL1ANEszoe85gnJCw==
+	b=bPBtautZckcks+uNIGuaOwY9wB5v5jeuf9AQgXvHZEfM142+1eCSprICl3qBTMQn
+	 PlqWU/AcN/qKNIPTDNWS8tr2xu1GKiavUw2BlOJnAdss4c9jGi1YxgkJzpL+WmDbd
+	 EStZC5R5NkXq+TEEmv6p+8UyAd3mgdUyti3FjOVsYamDUqWZ853jwgRdITcVJT8Mz
+	 rOMLzERho6Iup2kFod70GWYoFx5uCvNhMhLom7e7OJbXLAY3HsqzGXA7UoovkfMZo
+	 edVHz3sofn7bZeMPlgnhYCIJVAPlZ0H9zQm0wGxbCYptB4nLzZf9c6l74HqsX7jC0
+	 8aEwZX3T+Fyr6uHl1g==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [10.0.0.23] ([77.33.175.99]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1M89Kr-1sKxFg3pMB-005zcM; Sun, 09
- Jun 2024 13:17:32 +0200
-Message-ID: <7a3af149-89bd-4c9f-88fe-813e84dc98d9@gmx.net>
-Date: Sun, 9 Jun 2024 13:17:30 +0200
+Received: from [10.0.0.23] ([77.33.175.99]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mwfai-1sewMC457q-00zr1d; Sun, 09
+ Jun 2024 13:22:59 +0200
+Message-ID: <de03d402-306c-419d-a441-2fa3c3b63a89@gmx.net>
+Date: Sun, 9 Jun 2024 13:22:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,80 +58,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 1/6] net: tn40xx: add pci driver for Tehuti
- Networks TN40xx chips
+Subject: Re: [PATCH net-next v9 5/6] net: tn40xx: add mdio bus support
 To: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org
 Cc: andrew@lunn.ch, horms@kernel.org, kuba@kernel.org, jiri@resnulli.us,
  pabeni@redhat.com, linux@armlinux.org.uk, naveenm@marvell.com,
  jdamato@fastly.com
 References: <20240605232608.65471-1-fujita.tomonori@gmail.com>
- <20240605232608.65471-2-fujita.tomonori@gmail.com>
+ <20240605232608.65471-6-fujita.tomonori@gmail.com>
 Content-Language: en-US
 From: Hans-Frieder Vogt <hfdevel@gmx.net>
-In-Reply-To: <20240605232608.65471-2-fujita.tomonori@gmail.com>
+In-Reply-To: <20240605232608.65471-6-fujita.tomonori@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:er62m1HYiMcm9y2SrkvDsQdzwvwQxfMwwl7FZSvh4xXEOtVpKYM
- /oqvFln9K/Zx2u67JY3BgzSejRngrvzx6s05Ja1EOnxqsvaT/wFwq2QyVZQAuAfZsbLXg//
- eakxK/m+3Tpn++PFpD8RfQW7EFCUiEaJlm0ZchAFYYfhAXMaxIEyuJ5VdkxtzZoRZRKxkHk
- ggcnTeBiGpIpKZ97OagzQ==
+X-Provags-ID: V03:K1:gp7ouvpTXEEl7zIjgOThH9jrl5uUj+fqVl32QiJFeCDlg6Ge5bC
+ zBFZD+aYypQRifZ7qDnU/tA55O6HN5BkOCZXZvckdpt8aVZCuTjZt1Od8s0UrkaVIKCV3dx
+ +h9mzg3WNEBMOpfmhx6jRwTVXcrIuKsRMM0FDIqdthMU/WCt43V0OUZBZFO2qUd7XuZqXRc
+ xZ0WzqzwclWcZnKmSJYSg==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:r8qA06piquo=;746tSGC/CkLipLWV82Hjv5bVmbF
- Szq8DajydLar8WuFhGxrkxKM9X2CSUdYGungK6xn+5iOE5R3U0nmD7clIc4VMFY3+OAvmx8G2
- UJ2rOxYrJoAmztpyYBFxWjPUy6giQgdrTbJGLRjMhwuVzx5ly/mt4LyU5fL3bfRzMxwSbz+2x
- u9BFRe0WLj3/DUjzJnbPZxfbz2fCQPmBIcNJu6S+hQjk75GhSeSHiA6Q0YCVUSwPOyl106sc+
- KNr07gmW1AzVeyBX+YdnIGAo1Tcglbub5I1xqcgag1PvHoK94ganrt+HWRZkucPhk+sJSyhAa
- AXdxTvfutZAyfbWNeETc22ZAocCNf83IDlPPvGHYNx99UFNKymWaiuwyBZZybftDy3AyZsyxO
- sDUVMn8nIA0A6Aa9fMBdbfXvw/rvMBJiW5lv4p7AqR5qD0e/x9AB/zU6rA1CGPdT7wTwplFeC
- fiwUVI+eFaK55dryATM0Wn2LsFUrTHadeezAT35l4WGS/MCWGyhEHgmk5HNffhkMEQ9cUmmXj
- BWHNN+Rlrxkl46RygkafEJ+Q7a7h+EWsNVzch+MzugHZupUDPoMolk6i8eccYbkLdd/JIo/w8
- lmRdGB6ncP+/GG5KsqkTLiD7M7icKMwEYVxrkmnFRKeY3KOgfbOO+F4AMhOBEAaHD4UXJUTBB
- XttykpWqx0O9xKwgGcjDloUYohJmLpI0W9cInBqq0es/MREs9wgoB7MfQpr8jc7ea0PMAgc8Z
- eUydM7FjQLmVsjzUV5IwV3ndNJA5AGqwVoynj0JcXeSh+UyBySfQ9rJCx9G0uj5npIiD7iqlO
- 9uN9tu6tyaOxpHBm7BPr5ZRQ5MWx6JZ+LxbgUl/hueUUk=
+UI-OutboundReport: notjunk:1;M01:P0:JUNjmqM6Qj8=;K5WvdDM9JREpOoM5cENfF9nxHo6
+ RUz5UJHRPCJ/Tg3xc2l6fymFHOhoVnmgema9kTptuUATmGCdSH0QhK2ao+rQTNUeY6zrR+zPx
+ zc6o0evMG91F4qWxrHfIrtpxY+SuMjvDWUypmCOgnoc7cUnQgntKY4ORxvXoYHuM8rJ4kV2di
+ YeGLHW1ufR1vmQzW0/2otH2sU5FHvTz+XwGp47ZXpp4VB6i+cvT4N3eqV6knN88Y62MEfOHjY
+ IsXNSFwdXR2Nk/hfRzcI+nHicbzYlVzCNRw9UfhNINgkvnYAhUj6cDxvCeI7XJfXSseYAZ1gu
+ DboUkTKnzxxGDQgF3uSQqyGPgxBhghgeqy+eXGm/ZFc/PFAQBseELdJ8UQpjWEKxShuK1zM0r
+ S/LjEQvtlmz7Uts0q6kD2M9rJxWc2WqXjqeRnTPMWwQ1eE7/Sa8Gh1w6kY2eZgFIvt9sbtz0Z
+ jyiRxIiDgPq6zHv6sVWrnI58HhIH/ZjAiPUUdHBQDTci7zAh+TLsGki3E+MFXF3pRnXeOvvjG
+ O0GwawHkxNxoanCby6Puvj7LjJiwvOL1GbWoD6WDqVkqKkJsAV54tcIynLxm9U/xpqF4zedzy
+ 8J72+mzYhIRRP8TCLxtLxm/mCmyPsnePLPF+dEg/6EmvHu4GqzAAdU61lCjxRTsKsFFKmgER1
+ alpSlUA65FSj6z5sXbWo0nhYOsvZD83HHGgCklwKVljNjJ6CruiKrypLiyiqx2EshEOR8RliD
+ eF5+dnJc9KxkYS+9iHK0CxYo0Qbt9+fiwEXEB2fljvdrud1C7w9MxmkqPH79Lt39jf27ypW3S
+ NWNLw9kGeRFzzcb+TGHZZP+vIAlBpzWclMw3q/AqjBPVE=
 
 On 06.06.2024 01.26, FUJITA Tomonori wrote:
 > +
-> +static const struct pci_device_id tn40_id_table[] =3D {
-> +	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_TEHUTI, 0x4022,
-> +			 PCI_VENDOR_ID_TEHUTI, 0x3015) },
-> +	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_TEHUTI, 0x4022,
-> +			 PCI_VENDOR_ID_DLINK, 0x4d00) },
-> +	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_TEHUTI, 0x4022,
-> +			 PCI_VENDOR_ID_ASUSTEK, 0x8709) },
-> +	{ PCI_DEVICE_SUB(PCI_VENDOR_ID_TEHUTI, 0x4022,
-> +			 PCI_VENDOR_ID_EDIMAX, 0x8103) },
-> +	{ }
-> +};
+> +static void tn40_mdio_set_speed(struct tn40_priv *priv, u32 speed)
+> +{
+> +	void __iomem *regs =3D priv->regs;
+> +	int mdio_cfg;
 > +
-
-Now that it seems we will have another revision of your patches, maybe
-we can also continue to do a bit of cleanup:
-
-Is there any reason why you specifically detail every single card with
-vendor ids?
-Couldn't it just do with the generic Tehuti device number, i.e.:
-
-static const struct pci_device_id tn40_id_table[] =3D {
- =C2=A0=C2=A0=C2=A0 { PCI_VDEVICE(TEHUTI, 0x4022), 0},
- =C2=A0=C2=A0=C2=A0 { }
-};
-
-> --- /dev/null
-> +++ b/drivers/net/ethernet/tehuti/tn40.h
-> @@ -0,0 +1,11 @@
-> +/* SPDX-License-Identifier: GPL-2.0+ */
-> +/* Copyright (c) Tehuti Networks Ltd. */
+> +	mdio_cfg =3D readl(regs + TN40_REG_MDIO_CMD_STAT);
+the result of the readl is nowhere used. And as far as I have seen it is
+not needed to trigger anything. Therefore I suggest you delete this read
+operation.
+> +	if (speed =3D=3D 1)
+why not use the defined value TN40_MDIO_SPEED_1MHZ here? It would make
+the logic of the function even clearer.
+> +		mdio_cfg =3D (0x7d << 7) | 0x08;	/* 1MHz */
+> +	else
+> +		mdio_cfg =3D 0xA08;	/* 6MHz */
+> +	mdio_cfg |=3D (1 << 6);
+> +	writel(mdio_cfg, regs + TN40_REG_MDIO_CMD_STAT);
+> +	msleep(100);
+> +}
 > +
-> +#ifndef _TN40_H_
-> +#define _TN40_H_
-> +
-> +#define TN40_DRV_NAME "tn40xx"
-> +
-> +#define PCI_VENDOR_ID_EDIMAX 0x1432
-with my suggestion above, the definition of the vendor EDIMAX would
-become obsolete. If needed, it should probably anyway rather be placed
-in include/linux/pci_ids.h
-> +
-> +#endif /* _TN40XX_H */
 
