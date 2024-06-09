@@ -1,112 +1,193 @@
-Return-Path: <netdev+bounces-102060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B57769014EA
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 10:17:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 751A49014F7
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 10:28:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D77A51C20D1B
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 08:17:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EF1B1C20DE4
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 08:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B04D18EB0;
-	Sun,  9 Jun 2024 08:17:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BBFB1CAB9;
+	Sun,  9 Jun 2024 08:28:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="c3jg9XiA"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27ECDA3F
-	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 08:17:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB351CA89;
+	Sun,  9 Jun 2024 08:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.83
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717921075; cv=none; b=nMAiE7oisd8RsemVrc6wp2X/eAcfVHlymyF1edGvDJnKfA049vr7A8ofePgZ1Y2mayzLLu7P6wZAIgJHyc8xwoRaqD33dr4p6mjblt9YbbpPd4SnITWBYdmz4BdW0oF5EMBEBMQLt7uoehL8MsVXgRrfy/3JrizF8yYbbFr7nxk=
+	t=1717921680; cv=none; b=ZQPgzDDLcl/QSGo1gkIIy7VgMsEwPZA8zCyPrtXP8d8XXrYlQGU52loGAQ0YxcC1EyiSGobzedoZQIySNxC0PqYUjGZSC1rtprAhDXMfLSDsWxYpOiVw0IS/rMoBYRaXhDRne9RRYJyQOJdImTUKTtULF1unqy2Oy5ClxFcJuGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717921075; c=relaxed/simple;
-	bh=SFKUrA8AAGTjwnfzlh9Ce7Wk4QLXaabWszoMYiTbdGM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AjjzuvssHAlAxe26tE5Nu/aUzMCB4OciXR8tN00AnFKFgryDjjovHzrXWoZFJ5q1wLh3FHSsvkfeeY7YPs5rTUBicjMt5N6rWFAEBgrahDUBUXOijakXpRXG5q06n+y5qmaZQxhEQSj8/lLf4sG6YUYAQH+HYlAuhwbAM9Y0qg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from fsav313.sakura.ne.jp (fsav313.sakura.ne.jp [153.120.85.144])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 4598Hn96001113;
-	Sun, 9 Jun 2024 17:17:49 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav313.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp);
- Sun, 09 Jun 2024 17:17:49 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp)
-Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 4598HnKe001109
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Sun, 9 Jun 2024 17:17:49 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <cbbd6e2d-39da-4da3-b239-1248ac8ded10@I-love.SAKURA.ne.jp>
-Date: Sun, 9 Jun 2024 17:17:48 +0900
+	s=arc-20240116; t=1717921680; c=relaxed/simple;
+	bh=cl9fmVF+HqNubeETqLioP3KnvOsLThBpD2QkFmQe7ZM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cHqexTzfwS2VZtl2wgHwW7NnVCV5Gnx/7CQTtZRsC5mgR0Ol7JnCxa8A4u8T7CyPwakz4HnjxjPGmTmUbnRQ0AaANnLYziwdOYhlimmw+lh8MRBNh+wfJWswxtFtJey2YKpruKScdh8GjN0zpOZ5TyKP/iYvfERvpv8/36nDwrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=c3jg9XiA; arc=none smtp.client-ip=192.134.164.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=inria.fr; s=dc;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=REYx9XJxXex1wT0g8DdBknTJa5z8s+++8BsQM1tAkdE=;
+  b=c3jg9XiAgeKcNkg9Ypz1MXA57+I6z9Upi3oqzG67AIxQoc2Tb/l9+twd
+   o1xqjWHj9bZB/XffVTZ6y3Q5wlIBrpiRIuaxP20ZifTf9z4PP9a6/uHrQ
+   jbNAr8EHCg32T8reqfZHBfM1Bu9ssqsOLmK26M8DXHwpWqbgwQfkqJwz8
+   I=;
+Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="6.08,225,1712613600"; 
+   d="scan'208";a="169696895"
+Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.90.48])
+  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2024 10:27:48 +0200
+From: Julia Lawall <Julia.Lawall@inria.fr>
+To: linux-block@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com,
+	linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org,
+	Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	"Paul E . McKenney" <paulmck@kernel.org>,
+	Vlastimil Babka <vbabka@suse.cz>
+Subject: [PATCH 00/14] replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+Date: Sun,  9 Jun 2024 10:27:12 +0200
+Message-Id: <20240609082726.32742-1-Julia.Lawall@inria.fr>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 06/14] netlink: hold nlk->cb_mutex longer in
- __netlink_dump_start()
-To: Jiri Pirko <jiri@resnulli.us>, Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-        Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
-        Jiri Pirko <jiri@nvidia.com>, eric.dumazet@gmail.com
-References: <20240222105021.1943116-1-edumazet@google.com>
- <20240222105021.1943116-7-edumazet@google.com> <Zdd0SWlx4wH-sXbe@nanopsycho>
-Content-Language: en-US
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <Zdd0SWlx4wH-sXbe@nanopsycho>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hello.
+Since SLOB was removed, it is not necessary to use call_rcu
+when the callback only performs kmem_cache_free. Use
+kfree_rcu() directly.
 
-While investigating hung task reports involving rtnl_mutex, I came to
-suspect that commit b5590270068c ("netlink: hold nlk->cb_mutex longer
-in __netlink_dump_start()") is buggy, for that commit made only
-mutex_lock(nlk->cb_mutex) side conditionally. Why don't we need to make
-mutex_unlock(nlk->cb_mutex) side conditionally?
+The changes were done using the following Coccinelle semantic patch.
+This semantic patch is designed to ignore cases where the callback
+function is used in another way.
 
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index fa9c090cf629..c23a8d4ddcae 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -2352,7 +2352,8 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
- 
- 	if (nlk->dump_done_errno > 0 ||
- 	    skb_tailroom(skb) < nlmsg_total_size(sizeof(nlk->dump_done_errno))) {
--		mutex_unlock(&nlk->nl_cb_mutex);
-+		if (!lock_taken)
-+			mutex_unlock(&nlk->nl_cb_mutex);
- 
- 		if (sk_filter(sk, skb))
- 			kfree_skb(skb);
-@@ -2386,13 +2387,15 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
- 	WRITE_ONCE(nlk->cb_running, false);
- 	module = cb->module;
- 	skb = cb->skb;
--	mutex_unlock(&nlk->nl_cb_mutex);
-+	if (!lock_taken)
-+		mutex_unlock(&nlk->nl_cb_mutex);
- 	module_put(module);
- 	consume_skb(skb);
- 	return 0;
- 
- errout_skb:
--	mutex_unlock(&nlk->nl_cb_mutex);
-+	if (!lock_taken)
-+		mutex_unlock(&nlk->nl_cb_mutex);
- 	kfree_skb(skb);
- 	return err;
+// <smpl>
+@r@
+expression e;
+local idexpression e2;
+identifier cb,f;
+position p;
+@@
+
+(
+call_rcu(...,e2)
+|
+call_rcu(&e->f,cb@p)
+)
+
+@r1@
+type T;
+identifier x,r.cb;
+@@
+
+ cb(...) {
+(
+   kmem_cache_free(...);
+|
+   T x = ...;
+   kmem_cache_free(...,x);
+|
+   T x;
+   x = ...;
+   kmem_cache_free(...,x);
+)
  }
 
+@s depends on r1@
+position p != r.p;
+identifier r.cb;
+@@
+
+ cb@p
+
+@script:ocaml@
+cb << r.cb;
+p << s.p;
+@@
+
+Printf.eprintf "Other use of %s at %s:%d\n"
+   cb (List.hd p).file (List.hd p).line
+
+@depends on r1 && !s@
+expression e;
+identifier r.cb,f;
+position r.p;
+@@
+
+- call_rcu(&e->f,cb@p)
++ kfree_rcu(e,f)
+
+@r1a depends on !s@
+type T;
+identifier x,r.cb;
+@@
+
+- cb(...) {
+(
+-  kmem_cache_free(...);
+|
+-  T x = ...;
+-  kmem_cache_free(...,x);
+|
+-  T x;
+-  x = ...;
+-  kmem_cache_free(...,x);
+)
+- }
+// </smpl>
+
+Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
+Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
+Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
+
+---
+
+ arch/powerpc/kvm/book3s_mmu_hpte.c  |    8 +-------
+ block/blk-ioc.c                     |    9 +--------
+ drivers/net/wireguard/allowedips.c  |    9 ++-------
+ fs/ecryptfs/dentry.c                |    8 +-------
+ fs/nfsd/nfs4state.c                 |    9 +--------
+ fs/tracefs/inode.c                  |   10 +---------
+ kernel/time/posix-timers.c          |    9 +--------
+ kernel/workqueue.c                  |    8 +-------
+ net/bridge/br_fdb.c                 |    9 +--------
+ net/can/gw.c                        |   13 +++----------
+ net/ipv4/fib_trie.c                 |    8 +-------
+ net/ipv4/inetpeer.c                 |    9 ++-------
+ net/ipv6/ip6_fib.c                  |    9 +--------
+ net/ipv6/xfrm6_tunnel.c             |    8 +-------
+ net/kcm/kcmsock.c                   |   10 +---------
+ net/netfilter/nf_conncount.c        |   10 +---------
+ net/netfilter/nf_conntrack_expect.c |   10 +---------
+ net/netfilter/xt_hashlimit.c        |    9 +--------
+ 18 files changed, 22 insertions(+), 143 deletions(-)
 
