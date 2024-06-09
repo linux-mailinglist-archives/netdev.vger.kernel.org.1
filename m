@@ -1,195 +1,211 @@
-Return-Path: <netdev+bounces-102137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95DF990181C
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 22:21:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6310901833
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 23:03:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 141071F212DD
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 20:21:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71969281426
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 21:03:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73D0146441;
-	Sun,  9 Jun 2024 20:21:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76CF5134B1;
+	Sun,  9 Jun 2024 21:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N/ubQ1Fi"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NFKVWHp0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAAD338DD3;
-	Sun,  9 Jun 2024 20:21:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA8218C22
+	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 21:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717964487; cv=none; b=eNRlUqvsm3V06fOaPAOAb7rNaQFGLrRoi2vBHD5ggLWHc9dH82hBlaOVMoa4qeazRwtEbOV/8JZp9+WbXpfAXy6t8QitodDVJsn/4da5AODqgLMNJBQuvg1B0E9o1PqAWT0ODgiXRh+KY8Kpww38hXjhSEfDpgCHFcjL/KkpAZw=
+	t=1717967002; cv=none; b=XdpzSuBy/q1DR4tlnqePDMg0hXeWROvCcIi6t5bxK5gFKVJTmdtU5PFRUkcEs2SlkYpW2xGSdFMM42ZVybFMCLUCywvCn4Em0J8vLeOffy35UCtWEcKsA+nUVhcEOZlWtWq2i+vreZRrifrFq1cnXzXG/kc5FjJz+gokZk710Rg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717964487; c=relaxed/simple;
-	bh=+bzKM9EUcFNyUvWXeH4KuSku+qNeTDWylsL42zL5iDo=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Sj2mSF632XubCEYWcuzv+yCiBJIgRRT9OeCII4Kky+lUSC5fN3HqAdeS6QECw2s8P2PihD4Tmc9X8W+/iKOkPxKPtx1jwpI1LpKZ53YEU6zyuRRk46dOUe08wOqgr1qTJ6x8YEpX2DvUFI9thb297KDbh42fb47jLtraJIJGfCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N/ubQ1Fi; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-dfb0538e227so1957494276.2;
-        Sun, 09 Jun 2024 13:21:25 -0700 (PDT)
+	s=arc-20240116; t=1717967002; c=relaxed/simple;
+	bh=qE0HaZJtA8V3FYkoRgqg3VVBDeb0CfqWhdPcE1drZSs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YLyLlxffealkwdIzxihI7sY5Lkf4BBCiuD9O6yL60yQu9ol+FKLmxCrBD94/m5J5w03DvLDsUtiZohrQywMXmTvr4BEcIzG00xCRT6Ba2prnIyIPrHCRRB6SKR1A1WR+jkNDsDrO8hICmr7hmeFC6jVN6gJjNAlRT4TcLwjeiNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NFKVWHp0; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717964485; x=1718569285; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rSVhib7jKO8Jl77YAATJbfVUvW2x6LHh0YQnorGkKq8=;
-        b=N/ubQ1FiqBDlzhEJyMTETr6UcqT47azjc6pm1MieZg4ckYd3i1Q9TVXQpH6Kp0D9Iv
-         ghnlq70loyEVS7xPiKEzgMc1I7PZ3GA/TqyeYIWQQozVyL7cV+mFrUDrhm6NN/U7Nm3q
-         sAF3wHApmuzOIvi/4dmQTqlR2rRZWbAJaVw94Plkd7J8mv1Ya9Uzvf68/W/MOAty5j3+
-         dbS+aojWIqknAipQcqR1cejqAPHGNDi4uuQQ26xbZS+zr+UJmMcpLyfXg/+QfyCj21jF
-         +5sk0mHA7yVxo3IZU7mkxEGevz5esLVviY0tlcjSRZflc+SWT72FqIUMLqLIZOFLSMLI
-         PzTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717964485; x=1718569285;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=rSVhib7jKO8Jl77YAATJbfVUvW2x6LHh0YQnorGkKq8=;
-        b=Ozc8i//XnmNn7CnCCh8Y5itZIKFQPIqsE1T3DzpbM5U+jKjkOWTuIkgyYCQtHzhQQY
-         kAnHl+woR3mJGileZu5CScmQ2JZwwxjBOv1CNJ6X5d7XgH1lHc8S5JmSx1z47D9W4Mzl
-         HCaYmWpz0KR8DQgGTwUXwkKQW7P0BDtaXX4Czm0bjZorPyyw9T8oxXe+gT0oJ3MzkNKt
-         x/D+kzYAkDG9JY89ScUzpMfH2WzYSZfDkcur3d2C1P6epOLqiEau5wOVMMNKowpbxBVR
-         HoIEBeYlJ3cvoGinAe7tG0PiTz0x+zj+akrj1ZM/FOeBU6dJwF0y3PU1HdAMWXi80nMt
-         VcPA==
-X-Forwarded-Encrypted: i=1; AJvYcCVF1atCh2VxwzzXU0YLLX59gF8DLaAT2JPzrpPY7sM0vkl5nf1OjOjfjQ9pMKmcT88/q9f70zbRG3v9CmOBN0Ker4fA2zrhAYur2RcCDiXGFjNVyc/bd5MMLEP/POb+qNlqrwH40ajh+KVaea9y9s5rm/5/PZAueVrUyR54
-X-Gm-Message-State: AOJu0YxWCzI4GBs9ElJro0RuOwvuh4KUMQX54lKEmkELtG33B/kH2h80
-	zldYIIpxNryHHqG10LVOGl2eNrbtvQvATd5i2/rYqfV4q03w3UB4
-X-Google-Smtp-Source: AGHT+IF26bX+ph1/1s1eH5JB6xP553+SdKj51RRQ1tb2iaPpfDBA5NuYBTaR8QzkBK/QyeEKQGpk4Q==
-X-Received: by 2002:a05:6902:503:b0:dfb:4ae:27c with SMTP id 3f1490d57ef6-dfb04ae05b1mr5857844276.42.1717964484581;
-        Sun, 09 Jun 2024 13:21:24 -0700 (PDT)
-Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44052953a0fsm19666741cf.92.2024.06.09.13.21.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Jun 2024 13:21:24 -0700 (PDT)
-Date: Sun, 09 Jun 2024 16:21:23 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Chengen Du <chengen.du@canonical.com>, 
- willemdebruijn.kernel@gmail.com
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- kaber@trash.net, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org
-Message-ID: <66660ec3f3e22_8dbbb294ed@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAPza5qfuNhDbhV9mau9RE=cNKMwGtJcx4pmjkoHNwpfysnw5yw@mail.gmail.com>
-References: <20240608025347.90680-1-chengen.du@canonical.com>
- <CAPza5qfuNhDbhV9mau9RE=cNKMwGtJcx4pmjkoHNwpfysnw5yw@mail.gmail.com>
-Subject: Re: [PATCH v6] af_packet: Handle outgoing VLAN packets without
- hardware offloading
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1717967000; x=1749503000;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=FY8SpMb1Qsfaqt1AHawbl/VnqWxCfCjAuIZpAwsfuTc=;
+  b=NFKVWHp0KmtYb+Vx+ME9QCq1dgxJvYvbAEAMklWLl5MdMsj054rHzzu3
+   Dw0pA4TG0k47icftovNZ5zD4Cj+mBgmZ1sl3FuEWony+jk93SBiTUG8DY
+   y3tDlCGjl9BRlG+Gc/Ue75a8dXA7pAGwlsWSbXejv3eXl1amtpGEyMAdT
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.08,226,1712620800"; 
+   d="scan'208";a="95507074"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2024 21:03:18 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:10111]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.20.12:2525] with esmtp (Farcaster)
+ id 93804839-85c7-4a1d-bc95-de208c83cc74; Sun, 9 Jun 2024 21:03:18 +0000 (UTC)
+X-Farcaster-Flow-ID: 93804839-85c7-4a1d-bc95-de208c83cc74
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Sun, 9 Jun 2024 21:03:18 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.23) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Sun, 9 Jun 2024 21:03:15 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuniyu@amazon.com>
+CC: <cong.wang@bytedance.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <mhal@rbox.co>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v2 net 01/15] af_unix: Set sk->sk_state under unix_state_lock() for truly disconencted peer.
+Date: Sun, 9 Jun 2024 14:03:07 -0700
+Message-ID: <20240609210307.2919-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240609195320.95901-1-kuniyu@amazon.com>
+References: <20240609195320.95901-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Chengen Du wrote:
-> Hi,
-> =
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date: Sun, 9 Jun 2024 12:53:20 -0700
+> From: Michal Luczaj <mhal@rbox.co>
+> Date: Sun, 9 Jun 2024 13:28:34 +0200
+> > On 6/4/24 18:52, Kuniyuki Iwashima wrote:
+> > > When a SOCK_DGRAM socket connect()s to another socket, the both sockets'
+> > > sk->sk_state are changed to TCP_ESTABLISHED so that we can register them
+> > > to BPF SOCKMAP. (...)
+> > 
+> > Speaking of af_unix and sockmap, SOCK_STREAM has a tiny window for
+> > bpf(BPF_MAP_UPDATE_ELEM) and unix_stream_connect() to race: when
+> > sock_map_sk_state_allowed() passes (sk_state == TCP_ESTABLISHED), but
+> > unix_peer(sk) in unix_stream_bpf_update_proto() _still_ returns NULL:
+> > 
+> > 	T0 bpf				T1 connect
+> > 	======				==========
+> > 
+> > 				WRITE_ONCE(sk->sk_state, TCP_ESTABLISHED)
+> > sock_map_sk_state_allowed(sk)
+> > ...
+> > sk_pair = unix_peer(sk)
+> > sock_hold(sk_pair)
+> > 				sock_hold(newsk)
+> > 				smp_mb__after_atomic()
+> > 				unix_peer(sk) = newsk
+> > 				unix_state_unlock(sk)
+> > 
+> > With mdelay(1) stuffed in unix_stream_connect():
+> > 
+> > [  902.277593] BUG: kernel NULL pointer dereference, address: 0000000000000080
+> > [  902.277633] #PF: supervisor write access in kernel mode
+> > [  902.277661] #PF: error_code(0x0002) - not-present page
+> > [  902.277688] PGD 107191067 P4D 107191067 PUD 10f63c067 PMD 0
+> > [  902.277716] Oops: Oops: 0002 [#23] PREEMPT SMP NOPTI
+> > [  902.277742] CPU: 2 PID: 1505 Comm: a.out Tainted: G      D            6.10.0-rc1+ #130
+> > [  902.277769] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
+> > [  902.277793] RIP: 0010:unix_stream_bpf_update_proto+0xa1/0x150
+> > 
+> > Setting TCP_ESTABLISHED _after_ unix_peer() fixes the issue, so how about
+> > something like
+> > 
+> > @@ -1631,12 +1631,13 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
+> >         /* Set credentials */
+> >         copy_peercred(sk, other);
+> > 
+> > -       sock->state     = SS_CONNECTED;
+> > -       WRITE_ONCE(sk->sk_state, TCP_ESTABLISHED);
+> >         sock_hold(newsk);
+> > +       smp_mb__after_atomic(); /* sock_hold() does an atomic_inc() */
+> > +       WRITE_ONCE(unix_peer(sk), newsk);
+> > +       smp_wmb(); /* ensure peer is set before sk_state */
+> > 
+> > -       smp_mb__after_atomic(); /* sock_hold() does an atomic_inc() */
+> > -       unix_peer(sk)   = newsk;
+> > +       sock->state = SS_CONNECTED;
+> > +       WRITE_ONCE(sk->sk_state, TCP_ESTABLISHED);
+> > 
+> >         unix_state_unlock(sk);
+> > 
+> > @@ -180,7 +180,8 @@ int unix_stream_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool r
+> >          * be a single matching destroy operation.
+> >          */
+> >         if (!psock->sk_pair) {
+> > -               sk_pair = unix_peer(sk);
+> > +               smp_rmb();
+> > +               sk_pair = READ_ONCE(unix_peer(sk));
+> >                 sock_hold(sk_pair);
+> >                 psock->sk_pair = sk_pair;
+> >         }
+> > 
+> > This should keep things ordered and lockless... I hope.
+> 
+> sock_map_update_elem() assumes that the socket is protected
+> by lock_sock(), but AF_UNIX uses it only for the general path.
+> 
+> So, I think we should fix sock_map_sk_state_allowed() and
+> then use smp_store_release()/smp_load_acquire() rather than
+> smp_[rw]mb() for unix_peer(sk).
 
-> I would like to provide some additional explanations about the patch.
-> =
+Sorry, I think I was wrong and we can't use smp_store_release()
+and smp_load_acquire(), and smp_[rw]mb() is needed.
 
-> =
+Given we avoid adding code in the hotpath in the original fix
+8866730aed510 [0], I prefer adding unix_state_lock() in the SOCKMAP
+path again.
 
-> On Sat, Jun 8, 2024 at 10:54=E2=80=AFAM Chengen Du <chengen.du@canonica=
-l.com> wrote:
-> >
-> > The issue initially stems from libpcap. The ethertype will be overwri=
-tten
-> > as the VLAN TPID if the network interface lacks hardware VLAN offload=
-ing.
-> > In the outbound packet path, if hardware VLAN offloading is unavailab=
-le,
-> > the VLAN tag is inserted into the payload but then cleared from the s=
-k_buff
-> > struct. Consequently, this can lead to a false negative when checking=
- for
-> > the presence of a VLAN tag, causing the packet sniffing outcome to la=
-ck
-> > VLAN tag information (i.e., TCI-TPID). As a result, the packet captur=
-ing
-> > tool may be unable to parse packets as expected.
-> >
-> > The TCI-TPID is missing because the prb_fill_vlan_info() function doe=
-s not
-> > modify the tp_vlan_tci/tp_vlan_tpid values, as the information is in =
-the
-> > payload and not in the sk_buff struct. The skb_vlan_tag_present() fun=
-ction
-> > only checks vlan_all in the sk_buff struct. In cooked mode, the L2 he=
-ader
-> > is stripped, preventing the packet capturing tool from determining th=
-e
-> > correct TCI-TPID value. Additionally, the protocol in SLL is incorrec=
-t,
-> > which means the packet capturing tool cannot parse the L3 header corr=
-ectly.
-> >
-> > Link: https://github.com/the-tcpdump-group/libpcap/issues/1105
-> > Link: https://lore.kernel.org/netdev/20240520070348.26725-1-chengen.d=
-u@canonical.com/T/#u
-> > Fixes: 393e52e33c6c ("packet: deliver VLAN TCI to userspace")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Chengen Du <chengen.du@canonical.com>
-> > ---
-> >  net/packet/af_packet.c | 57 ++++++++++++++++++++++++++++++++++++++++=
---
-> >  1 file changed, 55 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> > index ea3ebc160e25..8cffbe1f912d 100644
-> > --- a/net/packet/af_packet.c
-> > +++ b/net/packet/af_packet.c
-> > @@ -538,6 +538,43 @@ static void *packet_current_frame(struct packet_=
-sock *po,
-> >         return packet_lookup_frame(po, rb, rb->head, status);
-> >  }
-> >
-> > +static u16 vlan_get_tci(struct sk_buff *skb)
-> > +{
-> > +       struct vlan_hdr vhdr, *vh;
-> > +       u8 *skb_orig_data =3D skb->data;
-> > +       int skb_orig_len =3D skb->len;
-> > +
-> > +       skb_push(skb, skb->data - skb_mac_header(skb));
-> > +       vh =3D skb_header_pointer(skb, ETH_HLEN, sizeof(vhdr), &vhdr)=
-;
-> > +       if (skb_orig_data !=3D skb->data) {
-> > +               skb->data =3D skb_orig_data;
-> > +               skb->len =3D skb_orig_len;
-> > +       }
-> =
+[0]: https://lore.kernel.org/bpf/6545bc9f7e443_3358c208ae@john.notmuch/
 
-> =
-
-> The reason for not directly using skb_header_pointer(skb,
-> skb_mac_header(skb) + ETH_HLEN, ...) to get the VLAN header is due to
-> the check logic in skb_header_pointer. In the SOCK_DGRAM and
-> PACKET_OUTGOING scenarios, the offset can be a negative number, which
-> causes the check logic (i.e., likely(hlen - offset >=3D len)) in
-> __skb_header_pointer() to not work as expected.
-
-The calculation is still correct?
-
-I think that this is not the first situation where negative offsets
-can be given to skb_header_pointer.
- =
-
-> While it is possible to modify __skb_header_pointer() to handle cases
-> where the offset is negative, this change could affect a wider range
-> of code.
-
+---8<---
+diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+index d3dbb92153f2..67794d2c7498 100644
+--- a/net/core/sock_map.c
++++ b/net/core/sock_map.c
+@@ -549,7 +549,7 @@ static bool sock_map_sk_state_allowed(const struct sock *sk)
+ 	if (sk_is_tcp(sk))
+ 		return (1 << sk->sk_state) & (TCPF_ESTABLISHED | TCPF_LISTEN);
+ 	if (sk_is_stream_unix(sk))
+-		return (1 << sk->sk_state) & TCPF_ESTABLISHED;
++		return (1 << READ_ONCE(sk->sk_state)) & TCPF_ESTABLISHED;
+ 	return true;
+ }
+ 
+diff --git a/net/unix/unix_bpf.c b/net/unix/unix_bpf.c
+index bd84785bf8d6..1db42cfee70d 100644
+--- a/net/unix/unix_bpf.c
++++ b/net/unix/unix_bpf.c
+@@ -159,8 +159,6 @@ int unix_dgram_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool re
+ 
+ int unix_stream_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
+ {
+-	struct sock *sk_pair;
+-
+ 	/* Restore does not decrement the sk_pair reference yet because we must
+ 	 * keep the a reference to the socket until after an RCU grace period
+ 	 * and any pending sends have completed.
+@@ -180,9 +178,9 @@ int unix_stream_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool r
+ 	 * be a single matching destroy operation.
+ 	 */
+ 	if (!psock->sk_pair) {
+-		sk_pair = unix_peer(sk);
+-		sock_hold(sk_pair);
+-		psock->sk_pair = sk_pair;
++		psock->sk_pair = unix_peer_get(sk);
++		if (WARN_ON_ONCE(!psock->sk_pair))
++			return -EINVAL;
+ 	}
+ 
+ 	unix_stream_bpf_check_needs_rebuild(psock->sk_proto);
+---8<---
 
