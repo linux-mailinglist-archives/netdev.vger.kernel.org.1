@@ -1,100 +1,103 @@
-Return-Path: <netdev+bounces-102096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF15890165F
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 16:36:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A4FF901666
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 17:00:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD8881C209B0
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 14:36:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1348328164B
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 15:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B1C4436A;
-	Sun,  9 Jun 2024 14:36:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBBA644384;
+	Sun,  9 Jun 2024 15:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="h6kIxiZW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o7Wu94en"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AE863C7;
-	Sun,  9 Jun 2024 14:36:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.83
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA086210E4;
+	Sun,  9 Jun 2024 15:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717943783; cv=none; b=egaU1ZXlMT7hy2P9WKQZIAm7IZiSo6AwZGeEYK+uceQ4+FwnXHmFrQmN0iMwnweps/jkhFrY8oICMwbqqwPiVnJ3lbRmd+CwgtAIi1vA5m7LI5MUNj8f5CceF+qjP9lubiA4vZ4HW7NdJ1AtikWNHcel9v4Txr8rqgln8jtsbYw=
+	t=1717945231; cv=none; b=IIJUNECuvegDShWiwshslLrL0f+AkNmQvjEwwkaXM1dTGRPN86PIGh9vn3QSWEwbUtQv0e8G3BIUJVYK/5oBz2PH6YZPUBIcCGfgAWh2wR3IiEnPAAOy+0Srdv5y5aI7WfLRwvmGsCEIo9sgVemN/Ne4SD9ollM1JrAnzWai5oA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717943783; c=relaxed/simple;
-	bh=qCa9AGh+fq/1VReLn9hghMXIAlqi9wewi4dObNvl2UE=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=VNeP4OtvwLc+QxLV6VSpON8NEpZf43q5ESi32gC8R54aCZDoMWcx16uTIm0I9Nljz7kWC11NC/MvpsMKquDpMJ9fqi3FRpF16smAjpBxGlvPTihtvzc3uTDCq6g5iwk0j2yhOph3tjeDc0nY4GtuS8A9857LHMkye1HtoPeYFBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=h6kIxiZW; arc=none smtp.client-ip=192.134.164.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=qCa9AGh+fq/1VReLn9hghMXIAlqi9wewi4dObNvl2UE=;
-  b=h6kIxiZW/dd5uSxCiMQ/CALnhPG8doWfxvHov7Bfnq8f9kW3czxcYGrS
-   mEPMuHLltMD3xw+m4HWBjt3QCCDle7/X0SuZWD3hD1jy/dg91fiWfINpK
-   jqi1Ts2BPOeiqQUZONpCbJQGgZrL+vyhNq+VNaR8jMW4r5Xi9iJrgXLJY
-   s=;
-Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=julia.lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.08,225,1712613600"; 
-   d="scan'208";a="169717092"
-Received: from 231.85.89.92.rev.sfr.net (HELO hadrien) ([92.89.85.231])
-  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2024 16:36:16 +0200
-Date: Sun, 9 Jun 2024 16:36:15 +0200 (CEST)
-From: Julia Lawall <julia.lawall@inria.fr>
-X-X-Sender: jll@hadrien
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-cc: Julia Lawall <Julia.Lawall@inria.fr>, kernel-janitors@vger.kernel.org, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, wireguard@lists.zx2c4.com, 
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-    "Paul E . McKenney" <paulmck@kernel.org>, Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu
- for simple kmem_cache_free callback
-In-Reply-To: <ZmW85kuO2Eje6gE9@zx2c4.com>
-Message-ID: <alpine.DEB.2.22.394.2406091636010.3474@hadrien>
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr> <20240609082726.32742-2-Julia.Lawall@inria.fr> <ZmW85kuO2Eje6gE9@zx2c4.com>
-User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
+	s=arc-20240116; t=1717945231; c=relaxed/simple;
+	bh=sEvuJelJntixemBHKj20oqZhgwHOot8BPhwBUz8Va0I=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=I4WZwozdA/o9Eneut5tks/SW62f2F2DL+0viyoTxkBvDxnpxEjvCnbH/P1uCyjpJjPz7rJ2BFdFWcWzGiQZpy8Hps6CoMuDyWgBHiWXq82aS1Nlta1aG3FnXgXn17Xo1PrA1ahfKvPoWplyalgyUQV+hF/ALRNv8JrPYVMCSKxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o7Wu94en; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2CAA9C4AF1D;
+	Sun,  9 Jun 2024 15:00:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717945231;
+	bh=sEvuJelJntixemBHKj20oqZhgwHOot8BPhwBUz8Va0I=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=o7Wu94engqJPD62reFT6OXz+oNclILQNOIe2LJ5yD2OtKS1skqbvsJqPK+6zE6TrJ
+	 yE9gWVCo6sEIpnsSomPs63Ux8EaJpp7YM3RJgj6EnKQINA5+qU1wCojX052/HRC46j
+	 XpDT8GCoQCkDXSeU1SOn6nt6dhFxheb3hkJMYjstRfsJdq//lIH9l+0ac99riW/G23
+	 +JMuRfKZEiF4pMIJc9o0R9382sGe2Sc7Ajf/o+fIt7UAEOx6RovCjYCClMLGkT2j3i
+	 MNwM7HJ/k5yfPfTTkW73m+SFhWFFElMDV3VTDuQX79+Trk6YBkL/+r5S0LK4BtX68Y
+	 MBVIKVLEzQCPg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 18321CF3BA5;
+	Sun,  9 Jun 2024 15:00:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: stmmac: dwmac-qcom-ethqos: Configure host DMA
+ width
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171794523109.27019.808801880558550935.git-patchwork-notify@kernel.org>
+Date: Sun, 09 Jun 2024 15:00:31 +0000
+References: <20240605-configure_ethernet_host_dma_width-v2-1-4cc34edfa388@quicinc.com>
+In-Reply-To: <20240605-configure_ethernet_host_dma_width-v2-1-4cc34edfa388@quicinc.com>
+To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+Cc: vkoul@kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, jh@henneberg-systemdesign.com,
+ linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ andrew@lunn.ch, ahalaney@redhat.com
+
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Wed, 5 Jun 2024 11:57:18 -0700 you wrote:
+> Commit 070246e4674b ("net: stmmac: Fix for mismatched host/device DMA
+> address width") added support in the stmmac driver for platform drivers
+> to indicate the host DMA width, but left it up to authors of the
+> specific platforms to indicate if their width differed from the addr64
+> register read from the MAC itself.
+> 
+> Qualcomm's EMAC4 integration supports only up to 36 bit width (as
+> opposed to the addr64 register indicating 40 bit width). Let's indicate
+> that in the platform driver to avoid a scenario where the driver will
+> allocate descriptors of size that is supported by the CPU which in our
+> case is 36 bit, but as the addr64 register is still capable of 40 bits
+> the device will use two descriptors as one address.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] net: stmmac: dwmac-qcom-ethqos: Configure host DMA width
+    https://git.kernel.org/netdev/net/c/0579f2724904
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-On Sun, 9 Jun 2024, Jason A. Donenfeld wrote:
-
-> Hi Julia & Vlastimil,
->
-> On Sun, Jun 09, 2024 at 10:27:13AM +0200, Julia Lawall wrote:
-> > Since SLOB was removed, it is not necessary to use call_rcu
-> > when the callback only performs kmem_cache_free. Use
-> > kfree_rcu() directly.
->
-> Thanks, I applied this to the wireguard tree, and I'll send this out as
-> a fix for 6.10. Let me know if this is unfavorable to you and if you'd
-> like to take this somewhere yourself, in which case I'll give you my
-> ack.
-
-Please push it onward.
-
-julia
-
->
-> Just a question, though, for Vlastimil -- I know that with the SLOB
-> removal, kfree() is now allowed on kmemcache'd objects. Do you plan to
-> do a blanket s/kmem_cache_free/kfree/g at some point, and then remove
-> kmem_cache_free all together?
->
-> Jason
->
 
