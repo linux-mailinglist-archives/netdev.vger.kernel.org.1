@@ -1,180 +1,130 @@
-Return-Path: <netdev+bounces-102084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 130F49015F8
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:34:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 472D2901602
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:41:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB7EB1C208FE
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 11:34:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BF98B21429
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 11:41:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398FE374F6;
-	Sun,  9 Jun 2024 11:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 840E83D57A;
+	Sun,  9 Jun 2024 11:41:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="YuJxtc0i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A459D36134
-	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 11:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1751C37700
+	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 11:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717932868; cv=none; b=T1qJcpqK/3zPP2t1HUuxQITasqbkamzNJhxT4qb+KJ9pm335J6j1MWF1PILP0r9IYEAuLWh1P/AP1z03Ny548Z9hWboW7onH1w4QgO8GTpNcixaY9ocx6ZkLWQDTAzl7/KnwMIsQffZqUdJxNOdCsoCrRdxAlaRwRSBhWCcidPo=
+	t=1717933299; cv=none; b=cdP/62HFbdQ5ayTF4l7twHWS8OObb+AzZ+q6qe66NbI2J3lHnJiG9C/GnafqnUCO+mdTNlK3nB0lzlXeFdN4ymSC7EaJAaMivrYoNDEGmQ0IdSkNIwI4rWU/5wHp8CAhjOcFktySci1aEUF08C/vK0Z4xI6x15+uY/8DnbPxREw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717932868; c=relaxed/simple;
-	bh=Y1+ti1mbb9MNw7nNtpV56B0Q6eW+P17Im7g7i/SEQzs=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=UB8YxAXPNXAtnricvSCeF3THF19LGzFy52q799faT9zp8GRAHfCJGBmdAdabGVZ2VDczA+iHaku9g47foBOfCOrVaq7Ap1KjRhfEC0qA7gOQqnArZEzwsOYjl6TFsw8F2YII7114syPzxO4IWrviwDftHMpaivMXv/EI6o8g5hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-375a4dc31cbso859685ab.1
-        for <netdev@vger.kernel.org>; Sun, 09 Jun 2024 04:34:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717932866; x=1718537666;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YZV4E2L8maI6s7zq2yrwNQ7hph7xAqxH7JzWM8hda4Q=;
-        b=dI6H9qANC35v8ZMW8oe4iQlnqdehUzNakb2sXJKRy87gNfDm0y8AlaKwC/EBxkve5w
-         e65ehFieVpfZPS+25Kyok/g3ExvoM14vxwaOKyRp8pm4s/AO0CVBZjgqDDWTRiNaxntY
-         imzWpYjvAXys9lIflZIhzyhJWoxA8UAmClN5gL62AI/HiT6hMiGYZYUq/pGNR7Sjrvi0
-         OQKfpHKIOcUToYsbr12GIxfMxR/nReAwJKd3Orb9joea7NHi1z/osVCazak/Qpd1KlsP
-         VMJ4bb4CgaiddV8RewzP6dhAi0EVwP3xWNi1svY2b70rEr1ZAv7D2hSNfHkzDsCupRFb
-         uLWw==
-X-Forwarded-Encrypted: i=1; AJvYcCW9NxI3WYG9MkajL65RgDF6NP79cDpGcN2+Q1MjYXNxcB8YqVWuVXukKivc9dXw72RjSiQZX+yw6CLUOXi1+SIInBf9Fhr1
-X-Gm-Message-State: AOJu0Yx1DMMSeDrB/R7e/jujSXJD/fwzl1EBqeBg6VeWKdSUxOgT6N8t
-	XnpRgF5oV1QiwMKRgQYeMBbUbvWIU8bohFYkYEDZa6KLNymv3ULOVUfx2UzQgY0fJLo9+I+R5sJ
-	G/gRYb9jhOcJib3BhwpJ55Sc5tD4U70hpgdH5pzT0c4++sjler7+UFjQ=
-X-Google-Smtp-Source: AGHT+IGbhhOsz75IpMUaqd4IQp6/f84Ci5jbYbl1vq4N3CB8GmF1Ph8Ht43avaioasT7zxVpLi/qG21XDDP+AWCbfVPf8+NAGXY8
+	s=arc-20240116; t=1717933299; c=relaxed/simple;
+	bh=+h9RGuZKE588sElun1MmFTpXxG6FHjZmB9t5+Y8+r0Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bgjF+migqDIG8MjV9RV5sJMvE7FzzGTy5Wmz2OrgRIsy9XFm1j8gkTr2K2aaf2KlYFrmKkhWMV247AHb9LWOG6n2YkUaOrn3O9CfI+7y8ODPFDSPsJL2CuIdmBaOgX78J248AaXGtaZOhxVHTPy+uuBcONDrA1IkrF/+0EDL4HY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=YuJxtc0i; arc=none smtp.client-ip=212.227.15.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1717933281; x=1718538081; i=hfdevel@gmx.net;
+	bh=o1buYnkk3rT8KCCEkir/g/xC5NxFMu1cJckK9Y8p4lY=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=YuJxtc0iTrIiuFBzwMtNlSWPAwYStKfHNEvlXGAjRndOdkas1G7kQ8eunj+1i2HY
+	 Yc9WkneFS5RiML/QHG4yPam81UK+03S6eGegFV2p/mVoYEmbjBRzEU3oykpjrmjKI
+	 Lcs3NsDVzuyXaPfcJ9+80CDUJU0iYrAToiznsa83MYKNhUbGc5w0wt3CbLSh1cM6T
+	 UYaHMuF0ZyMPHMSWcYJGr4ZYECz0Mel6jfkGmevdOAgAY2dI0xpmFExZZ3ghrghGt
+	 kGahzk+9Z1LjeWsoqhGrJhMGYY9L+PruPWUKidR1EEwB1WlPHI+hAEiUsxjVXDoR3
+	 YqdLvO7LzeueO+z3zQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [10.0.0.23] ([77.33.175.99]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MIdeR-1sAVl62mV3-0049N7; Sun, 09
+ Jun 2024 13:41:21 +0200
+Message-ID: <78ecc7a9-bb33-4c2d-a797-87f782b6a382@gmx.net>
+Date: Sun, 9 Jun 2024 13:41:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1fc9:b0:374:a840:e5be with SMTP id
- e9e14a558f8ab-375802379b1mr3680665ab.0.1717932865811; Sun, 09 Jun 2024
- 04:34:25 -0700 (PDT)
-Date: Sun, 09 Jun 2024 04:34:25 -0700
-In-Reply-To: <00000000000099cf25061964d113@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000371fcb061a736a5b@google.com>
-Subject: Re: [syzbot] [bpf?] [net?] general protection fault in
- dev_map_enqueue (2)
-From: syzbot <syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
-	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com, 
-	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 3/6] net: tn40xx: add basic Tx handling
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: andrew@lunn.ch, horms@kernel.org, kuba@kernel.org, jiri@resnulli.us,
+ pabeni@redhat.com, linux@armlinux.org.uk, naveenm@marvell.com,
+ jdamato@fastly.com, netdev@vger.kernel.org
+References: <20240605232608.65471-1-fujita.tomonori@gmail.com>
+ <20240605232608.65471-4-fujita.tomonori@gmail.com>
+Content-Language: en-US
+From: Hans-Frieder Vogt <hfdevel@gmx.net>
+In-Reply-To: <20240605232608.65471-4-fujita.tomonori@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:Wq1HA6+lYD+6cWAo2qgYz9Gj8x8D5U6hTMx05/OSm/w108eLl4A
+ sT0snxVX2C6tsjiB7KKN4LevLUo4gKJB0aM3atJd4KdMi3JrXyabj1Bq8yAsvXKygr2YWMb
+ FMNy/77o1RcF44Pz+fzKJiLcNJwFUMuP8uMJe/oS0ZsTyNKxcSm+cnSJUrHJKtm5hcDQEH5
+ GICvE67ZtgIGqNLfZjM8g==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:sxkErPTtnmo=;kdo+u6XTbxSPLfTSIqrJZItwwvW
+ TDLOuVEEPnmUcyL5rED15dJ6brCYqw8SihPqoseGxkZPiUeEhdlyyPj9c8a9H9hbaAprL2g4r
+ gld6/9I5yJ4m6wyFOMWa1HviKXWsowJSf8Z8D6+Tr0hUWGreVNgtUXh1qwtCLZ4E4xpT6lrRk
+ lyzl8Io+hUxqyE3g7OfGylZM6g7hN3WQ+Z0zw/wqBXhLQhJy6IYXuwYUhcCczsaPslJbu8ZW0
+ DPbe528JyjTjPgJSZbdgNECCEjMqRInwJ9yb4uHlSolqau8zvgUsoTADg+gds/9JMqo7YHDYr
+ S861gOlW8C9tiyK8l0p2pSz9vgQYMUZKsd44UzBZxoT5fLfq9VyUyLUu5/JLSqiuExbUbc4uo
+ RQtq2ZGu5qSvDJ302TLPDwpkx6LxTolf6oIOi662dDctKHCpoh86B4BjVMGii66CuaPlA6Plf
+ jqqapBjGPp0JaC/FZg3znX5EqNyK+3v1aXdw8iHbnV3PU1aWD99DMnTQhKecUC72y18Fr5RT+
+ D8Uu4Ob9xTEzoUpYBoQzIRGgRElaRUY0JDB4AhE9ruMYFAWp5RqdLTChFIo3jtyr8zOvGGegz
+ C7PUzn81dBVqXXkk3dGGSXfZ5dUyToJGP34cj3hr8eXQtkKS3+/pa+fNb8y6kfZMpjulc2apF
+ cGOGiZWsTZT5P/dwiwI+8kOuAeVE/scOO54wCbN6mTIFlqzA1Ci7ZVj3mgXnKtBo8rQ2X0JaS
+ IeGeKdhrizPZUl1b/K1nvqILD7rPQIFuTOW0AWyZgCLapLnYEqO9AxDvErx8bKZAkLXLCQoJ2
+ Pgf5ffBnk8L7peUrAn35T6eosIwVv/jqzNOk5rV0DvfXY=
 
-syzbot has found a reproducer for the following issue on:
+On 06.06.2024 01.26, FUJITA Tomonori wrote:
+(deleted quite a few lines, because the relevant topic is nearly at the
+end).
+> +
+> +static int tn40_priv_init(struct tn40_priv *priv)
+> +{
+> +	int ret;
+> +
+> +	tn40_set_link_speed(priv, 0);
+> +
+> +	ret =3D tn40_hw_reset(priv);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Set GPIO[9:0] to output 0 */
+> +	tn40_write_reg(priv, 0x51E0, 0x30010006);	/* GPIO_OE_ WR CMD */
+> +	tn40_write_reg(priv, 0x51F0, 0x0);	/* GPIO_OE_ DATA */
+> +	tn40_write_reg(priv, TN40_REG_MDIO_CMD_STAT, 0x3ec8);
 
-HEAD commit:    c44711b78608 liquidio: Adjust a NULL pointer handling path..
-git tree:       net
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1175e6f6980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=333ebe38d43c42e2
-dashboard link: https://syzkaller.appspot.com/bug?extid=cca39e6e84a367a7e6f6
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=172b3126980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17caa30a980000
+the last tn40_write_reg (to TN40_REG_MDIO_CMD_STAT) is in fact the same as=
+:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/47ff53e982e7/disk-c44711b7.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/7b10dcb52f35/vmlinux-c44711b7.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b4a6bf6f87c5/bzImage-c44711b7.xz
+tn40_mdio_set_speed(priv, TN40_MDIO_SPEED_1MHZ);
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com
+Use of this function would IMHO enhance readability of the code
+(obviously will need making tn40_mdio_set_speed non-static in
+tn40_mdio.c and adding the function to tn40.h).
 
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 1 PID: 5098 Comm: syz-executor784 Not tainted 6.10.0-rc2-syzkaller-00228-gc44711b78608 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-RIP: 0010:dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
-Code: 41 56 41 55 41 54 53 48 83 ec 18 49 89 d4 49 89 f5 48 89 fd 49 be 00 00 00 00 00 fc ff df e8 46 9c d7 ff 48 89 e8 48 c1 e8 03 <42> 80 3c 30 00 74 08 48 89 ef e8 a0 5e 3d 00 4c 8b 7d 00 48 83 c5
-RSP: 0018:ffffc9000343f678 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff88807eb31e00
-RDX: 0000000000000000 RSI: ffff88802224a070 RDI: 0000000000000000
-RBP: 0000000000000000 R08: ffffffff89625806 R09: ffffffff896257c3
-R10: 0000000000000004 R11: ffff88807eb31e00 R12: ffff8880151d8000
-R13: ffff88802224a070 R14: dffffc0000000000 R15: 0000000000000000
-FS:  00005555867d5380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fdc79c59303 CR3: 0000000022bc8000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __xdp_do_redirect_frame net/core/filter.c:4397 [inline]
- xdp_do_redirect_frame+0x2a6/0x660 net/core/filter.c:4451
- xdp_test_run_batch net/bpf/test_run.c:336 [inline]
- bpf_test_run_xdp_live+0xe60/0x1e60 net/bpf/test_run.c:384
- bpf_prog_test_run_xdp+0x80e/0x11b0 net/bpf/test_run.c:1281
- bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4292
- __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5706
- __do_sys_bpf kernel/bpf/syscall.c:5795 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5793 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5793
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fdc79c5b239
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff5780f908 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fdc79c5b239
-RDX: 0000000000000050 RSI: 0000000020000240 RDI: 000000000000000a
-RBP: 0000000000000000 R08: 0000000000000006 R09: 0000000000000006
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
-Code: 41 56 41 55 41 54 53 48 83 ec 18 49 89 d4 49 89 f5 48 89 fd 49 be 00 00 00 00 00 fc ff df e8 46 9c d7 ff 48 89 e8 48 c1 e8 03 <42> 80 3c 30 00 74 08 48 89 ef e8 a0 5e 3d 00 4c 8b 7d 00 48 83 c5
-RSP: 0018:ffffc9000343f678 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff88807eb31e00
-RDX: 0000000000000000 RSI: ffff88802224a070 RDI: 0000000000000000
-RBP: 0000000000000000 R08: ffffffff89625806 R09: ffffffff896257c3
-R10: 0000000000000004 R11: ffff88807eb31e00 R12: ffff8880151d8000
-R13: ffff88802224a070 R14: dffffc0000000000 R15: 0000000000000000
-FS:  00005555867d5380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fdc79c59303 CR3: 0000000022bc8000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	41 56                	push   %r14
-   2:	41 55                	push   %r13
-   4:	41 54                	push   %r12
-   6:	53                   	push   %rbx
-   7:	48 83 ec 18          	sub    $0x18,%rsp
-   b:	49 89 d4             	mov    %rdx,%r12
-   e:	49 89 f5             	mov    %rsi,%r13
-  11:	48 89 fd             	mov    %rdi,%rbp
-  14:	49 be 00 00 00 00 00 	movabs $0xdffffc0000000000,%r14
-  1b:	fc ff df
-  1e:	e8 46 9c d7 ff       	call   0xffd79c69
-  23:	48 89 e8             	mov    %rbp,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 80 3c 30 00       	cmpb   $0x0,(%rax,%r14,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	48 89 ef             	mov    %rbp,%rdi
-  34:	e8 a0 5e 3d 00       	call   0x3d5ed9
-  39:	4c 8b 7d 00          	mov    0x0(%rbp),%r15
-  3d:	48                   	rex.W
-  3e:	83                   	.byte 0x83
-  3f:	c5                   	.byte 0xc5
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+> +
+> +	// we use tx descriptors to load a firmware.
+> +	ret =3D tn40_create_tx_ring(priv);
+> +	if (ret)
+> +		return ret;
+> +	ret =3D tn40_fw_load(priv);
+> +	tn40_destroy_tx_ring(priv);
+> +	return ret;
+> +}
+> +
 
