@@ -1,109 +1,164 @@
-Return-Path: <netdev+bounces-102049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 301889013EE
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 00:58:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1808990142C
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 04:02:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A54601F217DE
-	for <lists+netdev@lfdr.de>; Sat,  8 Jun 2024 22:58:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16F011C20FB6
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 02:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F7FA3B182;
-	Sat,  8 Jun 2024 22:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED2374689;
+	Sun,  9 Jun 2024 02:01:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="muWYXXKN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VpYm57li"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9204FC19;
-	Sat,  8 Jun 2024 22:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B3C360;
+	Sun,  9 Jun 2024 02:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717887511; cv=none; b=AcDJCvmin6zXODPDGmlpyNo21zKmDMD4nbwqsja7MOBQkO2VxKenrzZ7VXSTBz+BqvQExuGAgz8RfYjTZUVWeOC6uHzpoL0Bw6lZCqzpYIBNg+SaQdUJWW322oAOuxnvPPtCyLccrGHCI8hnNxDySjmWoyxS2g4gmWAcrMBL300=
+	t=1717898515; cv=none; b=tW5GhG5ORX8IbWFHT5mjZENAI4O3Xi7NLd7huQMeKuOZN0SbUeeACl7JKtJa94AzBHQYU8atn/LIqq+It/uEMfNbiww7pM8i2/kURfdYopfjJWp1SWQVy7qHza0lHzkueZE/g+uVXfRXID9n5Jt6AwficKyxem+G58tappyLGvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717887511; c=relaxed/simple;
-	bh=XdcWb0sHax8NUfiRR8sBcfY/ZUDS/yJ5K90Wtm2ykyU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rrWOffoDdHT7S+a18DQocDfWYKwC4fGKEOfThXAGbaFiCuQ03AF8vBZW0bk+D2s91ZRJpGjcQrio6/9Q0BL2sF6n8NRyK2aA7cnT1sX9HXZ479T/yPibyj4+wOSRWBMlzGsDJ6miSTBd5PUPTwiAvorqyA+pZldu2cqClKf8tIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=muWYXXKN; arc=none smtp.client-ip=209.85.208.49
+	s=arc-20240116; t=1717898515; c=relaxed/simple;
+	bh=08AGbFoiIhT8CCWPQ5323YR9ofwOGzf3ofO49c39UQM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EOugglt8uO9e8Nw6T3orPKYyqFJmmT6lP48EzcvZdDxJgY2TgoFJg51JGajD2z0WsAMkW3ignoIhgr7CGMvHTuzRW/asL6bKmt1PrR7RSyxIlmnkdehI96qfWYSHOrKwPKkabCIR0C6FaShYm8JhyhaAHnQq+a0VGBICnb6rdtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VpYm57li; arc=none smtp.client-ip=209.85.208.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-57c614c572aso1494065a12.1;
-        Sat, 08 Jun 2024 15:58:29 -0700 (PDT)
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57c73a3b3d7so496558a12.1;
+        Sat, 08 Jun 2024 19:01:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717887508; x=1718492308; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xnNwc2LGbMmroe/knes/Yk2//+knIMtvNN3CoAHTpmU=;
-        b=muWYXXKN56dydvYALu9n833MZGWLzTg0tXeeJwuJnE9tArG6FQKlVsN7n+OCZO4Nbh
-         ZDjnuDSfKOMjytmSxYr5jAdcHXvPbbKSYCT66f8JlEVwlxorJHnldH3sw8Dz4Fb0KNBk
-         JZ733ds4UyLirq17jVDts6tClR0IwKIXzjJ+2kSew8d6IdToYbpbkPKxfjUo0dkPlhqZ
-         MtyyVab+dBMVQRZA8dchYgcbjnqowPFQpHUSYWT5gqh1u5KQt++5F1Npj9D0Wk2M4RYe
-         CIfni8sdzk2ODOYhIyUqaYdMocXJJGgGS53iS4Uno4mrx2h9Z6PIKiH5ykFLQc02NAjV
-         rjGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717887508; x=1718492308;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1717898512; x=1718503312; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xnNwc2LGbMmroe/knes/Yk2//+knIMtvNN3CoAHTpmU=;
-        b=p07pot20LqVw20oR8lOuKRFB7P2BirpVkrB6mlgaJ3HZ40IB2wNLF2e74p8rY+YVAN
-         fMzL875LEFSOs/BTsgQNUJKz6Zglaohd4AOASTnJFyzE5PTV1oRp8mW4ay+tIAz+DPk2
-         Errh8K3G3K4bwU+s3WjB6OFq9m5s1BvqQChpOfwfOlZGpwyBIP4hCpb2t7/3fg+769Kk
-         C67Q+ZGll4r5S8UszwQLZ3+EzcdFuTtD42KkeuWqoRFygqg6skFlPWixfwmmOwQ5RzN8
-         /Ix2cDvNC/r6ZeEwTIx5Ws18FUuK79haxEDrLH/mMuHxb/ZaLQdF8sl4YBfWxWm8u/eT
-         E9rg==
-X-Forwarded-Encrypted: i=1; AJvYcCWr4KNxbGcg5uYSCSHEBLMfZF+fJwRq5yPr3qLH80u3EVpBWe7yq/4CtqY3lqHum19vAUrT4SzK7pFEQ4Lr8vuLKke6ZRUgN6lzp4LsOryzxquUoQb02r2bNv30W1SjVa52Wu32
-X-Gm-Message-State: AOJu0YxGr1zOlbOoAb/NtG4+QbXST5USm7oDXLdwtlSAxyNEaTISMEdJ
-	uBYe3Ie7SAhphBncGzGtRQqwfu23qbkOVa/wwuTUQ4peGpoatDvL
-X-Google-Smtp-Source: AGHT+IHzT4dW0AQbWU8Ll27rAW1mMXU6/phWBWaFUZTgEyUAKve+QqneDBv9Atir+V20O1ejYoBo6A==
-X-Received: by 2002:a17:906:495a:b0:a6f:cce:4457 with SMTP id a640c23a62f3a-a6f0cce4ce2mr110771466b.71.1717887507926;
-        Sat, 08 Jun 2024 15:58:27 -0700 (PDT)
-Received: from skbuf ([188.25.55.166])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f16427842sm21529266b.100.2024.06.08.15.58.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Jun 2024 15:58:27 -0700 (PDT)
-Date: Sun, 9 Jun 2024 01:58:24 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Xiaolei Wang <xiaolei.wang@windriver.com>
-Cc: linux@armlinux.org.uk, andrew@lunn.ch, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	wojciech.drewek@intel.com, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [net v5 PATCH] net: stmmac: replace priv->speed with the
- portTransmitRate from the tc-cbs parameters
-Message-ID: <20240608225824.nae2ptctjzf5reee@skbuf>
-References: <20240608143524.2065736-1-xiaolei.wang@windriver.com>
- <20240608143524.2065736-1-xiaolei.wang@windriver.com>
+        bh=wfXDqZwDxD8KMJhtW0AkGu6qi+j8Yxaz8SLLYgYQRh0=;
+        b=VpYm57liBv3+3l3eHQEJm+GDyakMFdKR/CsUy3NUQvST1ZawiK7VjwPnoiW9yJ+MY2
+         23Je+SJ2a1Ks7UzNOBUeoDFsg6GxHxPdbc/iz6pAJQIkqUwDGombwl4x5vdRq7v/X548
+         wCE/VzTSbV56Ind6m+IZKigx9N7cqfJ8qpDMr/V/soida9CTY4QeXvuGZpVCtLarTfeS
+         OvnM398wRJd/418cOidpQLRQRpu0WAEGYJFgi/0BQ4pPYOFOJ8auLyazE8TBX2KznpDq
+         miy2uqmKBnHBIr5qwEJfBg+9FUJKmpCKJdFutjlZz5CEHTX1zdo7av5xI+2KFtjWznWd
+         4htw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717898512; x=1718503312;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wfXDqZwDxD8KMJhtW0AkGu6qi+j8Yxaz8SLLYgYQRh0=;
+        b=mq/IylfLAOwNMVwFPNGBmX+wP22NYHx8vsi6ooIP9Hlb8sV6B10ev1cggh+nrNOLnb
+         34etP0FWePv53CLdv9WJmHzZCjFtQNBCgZuNj24htBU5HTNDaO1xNwtjEnBz9r5xb5/r
+         5fmUqgv5tS1v2hKyjjGX0dzKx4bA9NhRIZJCb5Ilk4RDZrsvRkd+KUxUJfqvGerwF1NC
+         pRXZZUa5Dq/wDdv1LEG5TxvX+x1cBe96oHT67095iRJiWztRDMHk+BdgNvNF00GMrUJa
+         SH3fT870hSKXSFI0XMuWHd1OJPnsjP09dl58lqKvOnwylio/ql2wVS2efyhBQZMSf+5E
+         ZxWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVSSELe7EubuvSrOpD4nOsiAmsHVfSTY8bG6+qVQ6VAS/pSX82F16AMWrxwlYxxZCOFGbEXTvD9d947DrAoiAmSp9vBSUMNLItoU8qbypQbk0fUa2pT43MyDcBx
+X-Gm-Message-State: AOJu0YwPBViD6yVYzQnAwtvaYy8OvgEKUShUUA5JuxLfzStpnkPUoFV5
+	3geIBG2tbtkEJ4cJ7VQCLZy4L1iZU+QrZn5FoQluWv0S292qxTuq9zulDZvlqTVB8ApU6VBbp9a
+	6bS4hhDVcpNnNi78S8hgzj+9RbSt0HL6B
+X-Google-Smtp-Source: AGHT+IGd45m+2C9hnYWV2mEFTuUpDzvSnBlxlPAAzqNlpShpRcJf3vCbdqcj2Z3aizbL73yg0o/B6ULaP4K5bqtOpVw=
+X-Received: by 2002:a50:9b11:0:b0:57c:620d:7700 with SMTP id
+ 4fb4d7f45d1cf-57c620d7a2amr2385574a12.35.1717898512340; Sat, 08 Jun 2024
+ 19:01:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240608143524.2065736-1-xiaolei.wang@windriver.com>
- <20240608143524.2065736-1-xiaolei.wang@windriver.com>
+References: <ZmMxzPoDTNu06itR@pop-os.localdomain> <20240607213229.97602-1-kuniyu@amazon.com>
+ <9f254c96-54f2-4457-b7ab-1d9f6187939c@gmail.com>
+In-Reply-To: <9f254c96-54f2-4457-b7ab-1d9f6187939c@gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sun, 9 Jun 2024 10:01:14 +0800
+Message-ID: <CAL+tcoA1KvG_QcD_GZT_S20z5FhadjzO5ku1Hk9HP-SzhkeCzg@mail.gmail.com>
+Subject: Re: [Patch net] net: remove the bogus overflow debug check in pskb_may_pull()
+To: Eric Dumazet <eric.dumazet@gmail.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, xiyou.wangcong@gmail.com, bpf@vger.kernel.org, 
+	cong.wang@bytedance.com, fw@strlen.de, netdev@vger.kernel.org, 
+	syzbot+0c4150bff9fff3bf023c@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 08, 2024 at 10:35:24PM +0800, Xiaolei Wang wrote:
-> The current cbs parameter depends on speed after uplinking,
-> which is not needed and will report a configuration error
-> if the port is not initially connected. The UAPI exposed by
-> tc-cbs requires userspace to recalculate the send slope anyway,
-> because the formula depends on port_transmit_rate (see man tc-cbs),
-> which is not an invariant from tc's perspective. Therefore, we
-> use offload->sendslope and offload->idleslope to derive the
-> original port_transmit_rate from the CBS formula.
-> 
-> Fixes: 1f705bc61aee ("net: stmmac: Add support for CBS QDISC")
-> Signed-off-by: Xiaolei Wang <xiaolei.wang@windriver.com>
-> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> ---
+Hello Eric,
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+On Sat, Jun 8, 2024 at 4:01=E2=80=AFPM Eric Dumazet <eric.dumazet@gmail.com=
+> wrote:
+>
+>
+> On 6/7/24 23:32, Kuniyuki Iwashima wrote:
+> > From: Cong Wang <xiyou.wangcong@gmail.com>
+> > Date: Fri, 7 Jun 2024 09:14:04 -0700
+> >> On Fri, Jun 07, 2024 at 01:27:47AM +0200, Florian Westphal wrote:
+> >>> Cong Wang <xiyou.wangcong@gmail.com> wrote:
+> >>>> From: Cong Wang <cong.wang@bytedance.com>
+> >>>>
+> >>>> Commit 219eee9c0d16 ("net: skbuff: add overflow debug check to pull/=
+push
+> >>>> helpers") introduced an overflow debug check for pull/push helpers.
+> >>>> For __skb_pull() this makes sense because its callers rarely check i=
+ts
+> >>>> return value. But for pskb_may_pull() it does not make sense, since =
+its
+> >>>> return value is properly taken care of. Remove the one in
+> >>>> pskb_may_pull(), we can continue rely on its return value.
+> >>> See 025f8ad20f2e3264d11683aa9cbbf0083eefbdcd which would not exist
+> >>> without this check, I would not give up yet.
+> >> What's the point of that commit?
+> > 4b911a9690d7 would be better example.  The warning actually found a
+> > bug in NSH GSO.
+> >
+> > Here's splats triggered by syzkaller using NSH over various tunnels.
+> > https://lore.kernel.org/netdev/20240415222041.18537-2-kuniyu@amazon.com=
+/
+>
+>
+> Right. We discussed this before. I guess I forgot to send the fix.
+>
+> Florian could you submit the suggestion I made before ?
+>
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index
+> 358870408a51e61f3cbc552736806e4dfee1ec39..da7aae6fd8ba557c66699d1cfebd47f=
+18f442aa2
+> 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -1662,6 +1662,11 @@ static DEFINE_PER_CPU(struct bpf_scratchpad, bpf_s=
+p);
+>   static inline int __bpf_try_make_writable(struct sk_buff *skb,
+>                         unsigned int write_len)
+>   {
+> +#if defined(CONFIG_DEBUG_NET)
+
+I wonder why we want to avoid printing warning information especially
+when CONFIG_DEBUG_NET is on? Any reasons?
+
+> +    /* Avoid a splat in pskb_may_pull_reason() */
+> +    if (write_len > INT_MAX)
+
+I guess: if the purpose is to skip pskb_may_pull_reason and then
+return a proper value (-EINVAL) to its caller when the above statement
+is true, can we add the warning here on top of you patch:
+DEBUG_NET_WARN_ON_ONCE(len > INT_MAX);
+?
+
+After this, we can print useful information and let the caller catch
+the -EINVAL return value.
+
+Thanks,
+Jason
+
+> +        return -EINVAL;
+> +#endif
+>       return skb_ensure_writable(skb, write_len);
+>   }
+>
+>
+>
 
