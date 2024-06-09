@@ -1,56 +1,55 @@
-Return-Path: <netdev+bounces-102081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0BA49015F2
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:23:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 398BD9015F3
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:24:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A7922810B2
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 11:23:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFE831F2157E
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 11:24:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C556D22626;
-	Sun,  9 Jun 2024 11:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 784172E63B;
+	Sun,  9 Jun 2024 11:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="bPBtautZ"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="jaLH3p0j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+Received: from mout.web.de (mout.web.de [212.227.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 687C41865C
-	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 11:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D242233A;
+	Sun,  9 Jun 2024 11:24:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717932208; cv=none; b=LqVrVvz2m1HPgM7ohQryuvjWtuMccKOiaJ735tqjpPvMmsYKoXUFBz7VGMlzmZlYr3vQe4j4gkRH/nC1mF1hJFuhkfWi6NyKBqY644WKerfiCDxUKFjTg/gPeUcmRmcHO49EosXpv94f6feAXonOMlIbVCMe/Pz8QHvQOwGX5LI=
+	t=1717932263; cv=none; b=tlqAbQ1nKnutSvziP0VmrkGVG/yy3tXY03DZPhPb+OCkUdVeWT5aMS3Z2RuE68gSqtBmMnx+HAkkiOymy+VivhJHZLAmCJAKSF0S5cHSbzzzKVEkdxErmnsSZldVD8eG1YnIuW1khuMwKp8j+Tt9a8wnkjtZh+/e+zP+lJvxiTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717932208; c=relaxed/simple;
-	bh=s/1gzQD73zhQ5I54cicssp7mPuHgYqrDtOn+EZWnJzY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MAeXRW4G0QtU6fVZDgmouqrr3lvtOsyg1Z8W22ke1tT69+kI0z58roNn/NbbrdfbJ1QXgCW9f9DWeYXm+X2WsLIO4wJaeayZf0zOz50+7PFT8oQVJZpkRH53+KR+v7v/YYFFEOTWM67mSsvlduxbwZkfAVf09Fx2kqF3qHVJbzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=bPBtautZ; arc=none smtp.client-ip=212.227.15.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1717932179; x=1718536979; i=hfdevel@gmx.net;
-	bh=OySWXdbbCnbT8HcitiW07cGcpBzbyOTf5ern2Cyjp8Y=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=bPBtautZckcks+uNIGuaOwY9wB5v5jeuf9AQgXvHZEfM142+1eCSprICl3qBTMQn
-	 PlqWU/AcN/qKNIPTDNWS8tr2xu1GKiavUw2BlOJnAdss4c9jGi1YxgkJzpL+WmDbd
-	 EStZC5R5NkXq+TEEmv6p+8UyAd3mgdUyti3FjOVsYamDUqWZ853jwgRdITcVJT8Mz
-	 rOMLzERho6Iup2kFod70GWYoFx5uCvNhMhLom7e7OJbXLAY3HsqzGXA7UoovkfMZo
-	 edVHz3sofn7bZeMPlgnhYCIJVAPlZ0H9zQm0wGxbCYptB4nLzZf9c6l74HqsX7jC0
-	 8aEwZX3T+Fyr6uHl1g==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [10.0.0.23] ([77.33.175.99]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mwfai-1sewMC457q-00zr1d; Sun, 09
- Jun 2024 13:22:59 +0200
-Message-ID: <de03d402-306c-419d-a441-2fa3c3b63a89@gmx.net>
-Date: Sun, 9 Jun 2024 13:22:56 +0200
+	s=arc-20240116; t=1717932263; c=relaxed/simple;
+	bh=q/iXIOMyLJl5xphpYTwH3w/lEzJ3M4l/7/fmNTRAZeE=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=fWLRpn0oGWopYduWf1gNDP1nnJn2cWd9gDYHLJo8PnU6PCG0vCMYoB3Prw+V6IPwoUP+vWB5UQxLEFPvR3EYi7KEAYQLAzBOdMQ1SWwESWgdoz9yIKKua8Kj5/hqeTSnvLvomQafHcMF79eM+lR08dRCbX1QJliUKa/gFaT/QkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=jaLH3p0j; arc=none smtp.client-ip=212.227.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1717932221; x=1718537021; i=markus.elfring@web.de;
+	bh=HJ4zCaTWgNUn48MUERLAvrZ6HAXG3veuSDqVhXI7XfA=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=jaLH3p0jdorjs00Q+bnR9LcaaipNoRxj1XpVz0Ewhr5wHalsQbXvJhw3THTYALoI
+	 Hgmod/cz128I5G3gUsPWd6ELT676AL2OtJMAy2fc9aO+qyqP8VvqsO+cFgxWuoOSS
+	 T69QSplwPmdjP1Jyqme5LT5VXEyWZUyzTTFc9UKZe1UMvVeVvgp1t1c7FdKcKz4ZZ
+	 6uiajyILhQw/urG1RNhhrcf4qbeE0zaJoeJu0/v4BS8XESKbZdDusPOF/dOfMNH1i
+	 S7xCjp2pZ63ZsNJCTrsiZ7lFuTfVf2SB+kNmdIghjs+VHpRgN7Jtg9jfIChsdR1aV
+	 ZU5zcmcQcetvhcM4wg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1Melf5-1snxRB3Nsj-00q09r; Sun, 09
+ Jun 2024 13:23:40 +0200
+Message-ID: <4aa34452-4e13-4dc2-a67f-5bd821fd0498@web.de>
+Date: Sun, 9 Jun 2024 13:23:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,57 +57,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 5/6] net: tn40xx: add mdio bus support
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org
-Cc: andrew@lunn.ch, horms@kernel.org, kuba@kernel.org, jiri@resnulli.us,
- pabeni@redhat.com, linux@armlinux.org.uk, naveenm@marvell.com,
- jdamato@fastly.com
-References: <20240605232608.65471-1-fujita.tomonori@gmail.com>
- <20240605232608.65471-6-fujita.tomonori@gmail.com>
-Content-Language: en-US
-From: Hans-Frieder Vogt <hfdevel@gmx.net>
-In-Reply-To: <20240605232608.65471-6-fujita.tomonori@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Richard chien <richard.chien@hpe.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Richard chien <m8809301@gmail.com>, LKML <linux-kernel@vger.kernel.org>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+References: <20240609085735.6253-1-richard.chien@hpe.com>
+Subject: Re: [PATCH] ixgbe: Add support for firmware update
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240609085735.6253-1-richard.chien@hpe.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:gp7ouvpTXEEl7zIjgOThH9jrl5uUj+fqVl32QiJFeCDlg6Ge5bC
- zBFZD+aYypQRifZ7qDnU/tA55O6HN5BkOCZXZvckdpt8aVZCuTjZt1Od8s0UrkaVIKCV3dx
- +h9mzg3WNEBMOpfmhx6jRwTVXcrIuKsRMM0FDIqdthMU/WCt43V0OUZBZFO2qUd7XuZqXRc
- xZ0WzqzwclWcZnKmSJYSg==
+X-Provags-ID: V03:K1:2VFpPJBph9XiC5vhNiOmte11nZIZgjfOHt+kTXyb73NicWJP8kq
+ TmMkwWvE8pGeQ8GU5ABYb0vEeNgUL8EwlpiO+3pSgkgRaPGHYtxpunzeHJK6+vcr46mX0Cx
+ mnigvjhS9psZBvdkn4b28pmP2/U4S6ffcKwoCNK3vddo5oppRjskgueF1C8//ToVkWk8y/I
+ bVo6IL6MhZSBu9erevrxw==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:JUNjmqM6Qj8=;K5WvdDM9JREpOoM5cENfF9nxHo6
- RUz5UJHRPCJ/Tg3xc2l6fymFHOhoVnmgema9kTptuUATmGCdSH0QhK2ao+rQTNUeY6zrR+zPx
- zc6o0evMG91F4qWxrHfIrtpxY+SuMjvDWUypmCOgnoc7cUnQgntKY4ORxvXoYHuM8rJ4kV2di
- YeGLHW1ufR1vmQzW0/2otH2sU5FHvTz+XwGp47ZXpp4VB6i+cvT4N3eqV6knN88Y62MEfOHjY
- IsXNSFwdXR2Nk/hfRzcI+nHicbzYlVzCNRw9UfhNINgkvnYAhUj6cDxvCeI7XJfXSseYAZ1gu
- DboUkTKnzxxGDQgF3uSQqyGPgxBhghgeqy+eXGm/ZFc/PFAQBseELdJ8UQpjWEKxShuK1zM0r
- S/LjEQvtlmz7Uts0q6kD2M9rJxWc2WqXjqeRnTPMWwQ1eE7/Sa8Gh1w6kY2eZgFIvt9sbtz0Z
- jyiRxIiDgPq6zHv6sVWrnI58HhIH/ZjAiPUUdHBQDTci7zAh+TLsGki3E+MFXF3pRnXeOvvjG
- O0GwawHkxNxoanCby6Puvj7LjJiwvOL1GbWoD6WDqVkqKkJsAV54tcIynLxm9U/xpqF4zedzy
- 8J72+mzYhIRRP8TCLxtLxm/mCmyPsnePLPF+dEg/6EmvHu4GqzAAdU61lCjxRTsKsFFKmgER1
- alpSlUA65FSj6z5sXbWo0nhYOsvZD83HHGgCklwKVljNjJ6CruiKrypLiyiqx2EshEOR8RliD
- eF5+dnJc9KxkYS+9iHK0CxYo0Qbt9+fiwEXEB2fljvdrud1C7w9MxmkqPH79Lt39jf27ypW3S
- NWNLw9kGeRFzzcb+TGHZZP+vIAlBpzWclMw3q/AqjBPVE=
+UI-OutboundReport: notjunk:1;M01:P0:i1+OJLuE/48=;+swK+qIrek4neQqBpd9S0NH0hSm
+ T+OzBThB+w3qj8yo8EPxADKPfzRb9aDf+hV9w8ynvILLQqwZ37IcSYQZk0Ck7Mr0j+xJ3Ye0V
+ EGMIyeVJb90ouvgMZzHOgWwCHuqcS82mX6n/IvHW4v2TV/r//rw9hWULc+cjcyV9AXgAQ/7xi
+ HDvAxWpTh6HIPQiK3Ow2LAsbsffL2JbOgtfk06dZ8N2d4pnC55l/CDhgTcapdsKnPbtS2c6+I
+ dAofcBrEKuLAMp0STDXQtSLwDFwJWQlTxRcJ+4A33787VbhRpVMevar01vV1FWfMY1TW0SEjg
+ cajpVzZZbTJY8PjnOnvNUjQI8AO4OxNlDMC0f7QdScdikkOR5ltEwiEAzAq3sITMPxWfQED/E
+ dWm4E2iEHC0mvh7vHuyHe0I9qVjp/0wbgFfH5gmbJlkZw9ppN8sQr0xZAY4xQQl98rXlvu6ko
+ aWrxWzNBFeCCm8hUhi8kEY4116ZIlvgH5V4cszl91ZK2FybOgmvhp1vpWxj5M7/VFOUjfYTAd
+ 1cAE5vo7jRLFsCGcZ4F2Xg5wNpVe04JB8QX/u+VvnKo+p9tIGglnq5+6G47QTNENmqb8qiK8T
+ T7z2OWPefxeiojr8V6QBSiAkPudzeWPvWHF8RKgnT5JcjR2V6n65Rrh3DM6W+GxHF69vqGzcD
+ SkjE6NP9wGU0EObBJTNef6ZcFdM6FmkXLpG6BUEGyX2yp8typdbhBlwaAoXnzqk42YPRTL8+Y
+ KpLc1jpFk0nsboil81B8aPv0UQEptHjVU7vWhjXXxDS7yDaJoLMZ77wf7gobs5X4jvlDjSQxt
+ aknYOJ4U+bGnzWJ+eGGHV1uAr1r8gvX+mKopjIG2NFVyw=
 
-On 06.06.2024 01.26, FUJITA Tomonori wrote:
-> +
-> +static void tn40_mdio_set_speed(struct tn40_priv *priv, u32 speed)
-> +{
-> +	void __iomem *regs =3D priv->regs;
-> +	int mdio_cfg;
-> +
-> +	mdio_cfg =3D readl(regs + TN40_REG_MDIO_CMD_STAT);
-the result of the readl is nowhere used. And as far as I have seen it is
-not needed to trigger anything. Therefore I suggest you delete this read
-operation.
-> +	if (speed =3D=3D 1)
-why not use the defined value TN40_MDIO_SPEED_1MHZ here? It would make
-the logic of the function even clearer.
-> +		mdio_cfg =3D (0x7d << 7) | 0x08;	/* 1MHz */
-> +	else
-> +		mdio_cfg =3D 0xA08;	/* 6MHz */
-> +	mdio_cfg |=3D (1 << 6);
-> +	writel(mdio_cfg, regs + TN40_REG_MDIO_CMD_STAT);
-> +	msleep(100);
-> +}
-> +
+> This patch adds support for firmware update to the in-tree ixgbe driver =
+and it is actually a port
+> from the out-of-tree ixgbe driver. In-band firmware update is one of the=
+ essential system maintenance
+=E2=80=A6
+
+Please improve such a change description also according to word wrapping
+because of more desirable text line lengths.
+
+
+=E2=80=A6
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+> @@ -993,114 +993,292 @@ static void ixgbe_get_regs(struct net_device *ne=
+tdev,
+=E2=80=A6
+> +static int ixgbe_set_eeprom(struct net_device *netdev,
+> +                            struct ethtool_eeprom *eeprom, u8 *bytes)
+=E2=80=A6
+>  err:
+> -	kfree(eeprom_buff);
+> -	return ret_val;
+> +        kfree(eeprom_buff);
+> +        return ret_val;
+>  }
+
+Please keep these statements unmodified.
+
+Would you like to reconsider the indentation once more for your change app=
+roach?
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/coding-style.rst?h=3Dv6.10-rc2#n18
+
+Regards,
+Markus
 
