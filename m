@@ -1,127 +1,128 @@
-Return-Path: <netdev+bounces-102092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 893A1901639
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 15:23:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 351A490163E
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 15:28:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 083B9B20ADC
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:23:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0BE9B20C75
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:28:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA554436C;
-	Sun,  9 Jun 2024 13:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA3B41A80;
+	Sun,  9 Jun 2024 13:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Tv63ZLCh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hm07olwf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F376341C89;
-	Sun,  9 Jun 2024 13:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E3F3EA98;
+	Sun,  9 Jun 2024 13:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717939414; cv=none; b=kGdkRL6uiEwBR2B55rXlniiLR2+NFeLJW3UM3/RBy7p2CWqruExLDzhRK6Z17feMdMvih/aclYAO5tmqyEekPHkdmkZj6clRkbuWkHfDiab7/KXVYJ9rCKoCk7U4bSSEBdMcdChdgf2ijL0srZvRD2fQobwnkjhJ8vZVCR9s7Ag=
+	t=1717939721; cv=none; b=KVxE9VZfD6RgLTPijtKB79l7V6v2GLWdLB2ZT8Qb+dEoZrxF5bvuYpoTD2WxKg/5kFqz5ozm5TIINUyS0KRWZgusdCc66dWPUcbg2VbwhtnJZT1Fzp3pPqXgUB7vnKNq59H0j3lxNNvLKj7NciUp5KPAMaZ/DcteejPbihiEpuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717939414; c=relaxed/simple;
-	bh=tVK11C9kJ+Hk9fp+TR4FXWWOziEx80YrD6j+XXKzGY4=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=n7vHUqg9/8DkgmmRmsCgiloKzzZlFW1dytYH3d7Qg22aChB8aOAlBNm1pPDAH23MgwOzEOkTC+HVDdtEdDgH8ow6fnlyvDm87eNKZwn36/y3O1V2A5zoMdKbhush5L4xj+Ei4ZrDyl2nxjJB+QV0S5CgXg/1lF9lNKpaCc+0OmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Tv63ZLCh; arc=none smtp.client-ip=212.227.17.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1717939375; x=1718544175; i=markus.elfring@web.de;
-	bh=25tOwBxb8NrUCwMNgIyHSiPtABS50jsxg2aCEapBvJ0=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=Tv63ZLCh+AiQAEpCr2lPKO97YI1D6aZy7+1HJU5OeYjOR+kLXyhWop5dfdci7tuy
-	 5OoIj0+RF0/1nuGcW6twYpd1MMpmsz48qafJmjAZ0ktyozJMGNdHTOqLYd1dx0Dm3
-	 32b+weBTRZ+Bnme6+eJxP1dCjDI1OS5r4pa4lbyRhrUzqxmWSwfTND9OKz42cvCXD
-	 TUakUnAshr943/vRER4Z57oPLDfOZGBa4v7PVbaxCUGTJCVDDRqQa+gbDVDhqp3So
-	 5TuFsEFEF1N3IyXdHulzixuF0DNKuyWwqnlnfj6snjsc+G7J7RXlLuafdKAdBwxb0
-	 9Mli1YHwFKpUuT15IQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1N9LIc-1sSJ2o4BzY-00ys40; Sun, 09
- Jun 2024 15:22:55 +0200
-Message-ID: <9903f5cb-f4e6-42f1-a8b1-b3b5da593dc7@web.de>
-Date: Sun, 9 Jun 2024 15:22:52 +0200
+	s=arc-20240116; t=1717939721; c=relaxed/simple;
+	bh=HjRthhA97Bz7lNeAY511f0m9k5cC/vd8hSnK6MJWYZ4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=EWCIPvjwOELMXOw/bGnOXcoUj90WKAp4vaftfLkAZPwJF1EoKLTj9gHmWjk+8OCxd4fmIR0qlceCitfmkgf4yZ3NfQlyzzaner4sTAgO+wFtoiZ7sVP/VVEp9ByRE9Ie4jr6Zwf5X1sxRBZEl1o/WV1dAwPVqUNSFEoITUR5wEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hm07olwf; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1f7149671c3so406055ad.1;
+        Sun, 09 Jun 2024 06:28:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717939720; x=1718544520; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HFWQoeFLGCKUUNrklzY1UKW+3++YeF3pYLivK/wT1sg=;
+        b=hm07olwfnrsB/NJMrA6/k1c/T4zClu95vZrQZ42hE4yTq6wgLl1Ql9L5TLlAMOn4dV
+         h+pFJox9bdy6ZoyvmwopmFaZkFWEWrjcuDcNk2av/QNvjyHogE/1t8WdNxEeFBkenITO
+         oLkEG+HSC+A3m0uTuvDpeIIHdT7muofWDWodcFcFxCsjlGsAH6Wx2ahtpgvElisuOJde
+         IdCmD7zJzYuKMAdRG/9/pkH+74ab1vQqca2zFMUIUYD4H2+TFkZl9UpkVYujNgv2VPFq
+         ApfUirr3x6ZlcEHRi8sV9md4Mfk7VhkSjX+qMBbs8vlL9olhZwngbrcld6X+c8u4iRFz
+         5yxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717939720; x=1718544520;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HFWQoeFLGCKUUNrklzY1UKW+3++YeF3pYLivK/wT1sg=;
+        b=TIe3mLUo/DY3v8khGIMeG2c/bxa1jKRAmQfKsHdMtgzJaNCVEePDf7P64ExN4/t6wZ
+         eQLj97flKn1bGPMI394RrPZrTThEx+QblDBTyUGGtbdElgkpdDw0rHskeghGr2QhQpv/
+         38alVnAbDdBY+ie5jJW7iqRq2SP7k9/3IzKBBo0ZOaIZqytbyRZXsTo4OOchPbbob4lb
+         L/KF9Jnaj9fDapfQDVC7K1+lhGrvVB5patz+/q7m8LjAZeOiHrj0us5M2BX10dRCTE/v
+         1OCa/lJFNdaErOMOScmqG+G7aACpGygIobL8riNwc4kyCilTuYtJuHy5Fa1Pve1jYmQJ
+         XwQw==
+X-Forwarded-Encrypted: i=1; AJvYcCXhKR/LzIQ4ACmIpHd1JF5lpIM1tVjJwdr3Lzjg65f6KOxidBdxQY4O29TUduqGzUe/xD4F67v2++nI1k7isIm1XNHIaQOqgiZiZAiMw1/wu3TEr7jTihA7H3fBlKjO26w4n7bUPww3a3/DcX60UYBHIIsOVCZGRSPAjal8H7Dqb7y5seys
+X-Gm-Message-State: AOJu0Yz4daei47zUgs4UWiD63rW6QSFU8nlApBcfQOjzjnfRuTRkDgNH
+	7zeG1IFx3Ta7N1xmIAzPNGn5yNP5DAa0UYiRWi+Fm89aNgq95kJ5hqBD8YWu
+X-Google-Smtp-Source: AGHT+IHk0nZO38SxWp2jyyxF8uWie9wwCPvhDQxa5lJYc2pSXMTE4gAUxpzxkvWy00CiLN0us2xudw==
+X-Received: by 2002:a17:902:e842:b0:1f3:2f9c:bb72 with SMTP id d9443c01a7336-1f6d010ac6dmr110931455ad.5.1717939719662;
+        Sun, 09 Jun 2024 06:28:39 -0700 (PDT)
+Received: from dev0.. ([49.43.162.161])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6efa2a319sm28084215ad.108.2024.06.09.06.28.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Jun 2024 06:28:39 -0700 (PDT)
+From: Abhinav Jain <jain.abhinav177@gmail.com>
+To: horms@kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	jain.abhinav177@gmail.com,
+	javier.carrasco.cruz@gmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	skhan@linuxfoundation.org
+Subject: Re: [PATCH] selftests: net: Add on/off checks for network interface non fixed features
+Date: Sun,  9 Jun 2024 13:28:32 +0000
+Message-Id: <20240609132832.51890-1-jain.abhinav177@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240607180127.GG27689@kernel.org>
+References: <20240607180127.GG27689@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Richard chien <richard.chien@hpe.com>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Richard chien <m8809301@gmail.com>, LKML <linux-kernel@vger.kernel.org>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>
-References: <20240609081526.5621-1-richard.chien@hpe.com>
-Subject: Re: [PATCH] igb: Add support for firmware update
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240609081526.5621-1-richard.chien@hpe.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:z17MGjTFufmAsVzFpzvj8lSI7qMzlUGSGK5xS9coywFkv1zog+w
- Wp6dw5fNs1QCmj4Uv/rpGe5PQxd64GZk8rjmzdz1PhUDzoytNLOmHuzu55Opvkv+RkFYg6y
- jY8uS3C9DRGOdtH0pnTauSUyS4LmRfCRKdRLb4jnwsxKYM9G86cqOgSqr8I9BntdkscaOKW
- zx/RfKIKeqnNYJtNzLzAw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:ZxIL5KsKow0=;V6dCDFstKp0XHYVZ9/UBAwozoYr
- XECA/KOp+Ounl5M33wIPnBceHaFMeEL5wVzEkWC1LtlmBCmO2QE2eLycecuhIZzbWhnz2HNHV
- LRHyY76hU+/VmjoV1udf/f5C8TpktOm59wawaVWG0bgO3kTm2j9kmHi0cDCgyNqsjMqYm+6cB
- ptS/9tcTv7qLCDMxyonjFVyjaiPTEuQ4T1HYvOH5rjvBAJGGghs5LFM2y2aFsbHxs38IUVaWe
- MYJUsnmxPZT2BzisCu3drOteDWofKSc9NmAB7wZNZlIAPZBIo7dbgkTxA/bwqBdf5sITAMxpy
- Qxvc3fY3r+FZhFnVGdZt25LS6v6D9uKpZp+xaUrLM6SvnXoTNuKPVC90hvzkTNhqcHQ+Y0Iij
- hoz14aG9ckHx4Pq78NHW4vaDrHSh2ZaHK9RCG/GXfbcTSnQ2mOSwlkFPcoDCJcsyFtiqNQRs7
- SUOhLa3d/MCtS6DtpqYI7QsU28STwB0B7lTjawh8MPdSQ8vDnF3/V1VoIW9ra8fUZ2XGFyg10
- GPX24Km0AGrwdvSqxjnpZ+Y9lFKu3oxiYvdLf55gQ/IlnfPH+LL5n+5ELMgm8iw7SInKxj9lw
- bCQ5z48ZoSUweVVJMOPF38JgbEngj0RxSE79PTZ+5wULVhiOfXTX3YGIJ81eMTnHENBqmU9Ci
- auWzA3i9+HB8ZfjzI+5rSlu2olNdRaHKrDeNEaoNE+kJ7hQm2KaNp6sDoxPPgeX4nhjaVV9Aa
- cu4JQWXum7SBxpXnKiasJ2Qn8KivxlfviLn4o9CmJl/ihC9rn5deQRhpgs0NpJ8AQ/qCx9ery
- ntxfSLdxD+x5eQw15AHGjr71hJVJpd39Bmj/FtL60X+tg=
+Content-Transfer-Encoding: 8bit
 
-> This patch adds support for firmware update to the in-tree igb driver an=
-d it is actually a port from the out-of-tree igb driver.
-> In-band firmware update is one of the essential system maintenance tasks=
-. To simplify this task, the Intel online firmware update
-=E2=80=A6
+On Fri, 7 Jun 2024 19:01:27 +0100, Simon Horman wrote:
 
-Please improve such a change description also according to word wrapping
-because of more desirable text line lengths.
-
-
-=E2=80=A6
-> +++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-> @@ -724,128 +724,282 @@ static void igb_get_regs(struct net_device *netd=
-ev,
->  		regs_buff[739] =3D rd32(E1000_I210_RR2DCDELAY);
->  }
+> Hi Abhinav,
 >
-> -static int igb_get_eeprom_len(struct net_device *netdev)
-> -{
-> -	struct igb_adapter *adapter =3D netdev_priv(netdev);
-> -	return adapter->hw.nvm.word_size * 2;
-> +static u8 igb_nvmupd_get_module(u32 val)
-> +{
-> +        return (u8)(val & E1000_NVMUPD_MOD_PNT_MASK);
-> +}
-=E2=80=A6
+> I suspect this will now only report a failure if tail fails,
+> but ignore ethtool failures.
 
-Would you like to reconsider the indentation once more for your change app=
-roach?
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/coding-style.rst?h=3Dv6.10-rc2#n18
+Hi Simon,
 
-Regards,
-Markus
+I agree, I missed this part earlier. After taking other suggestion
+into account, we don't need this tail and I have removed it.
+
+> Shellcheck warns that the above reads words rather than lines,
+> and recommends using read instead.
+>
+> I think that is ok, because the construction reduces lines to single words.
+> But it does seem a bit awkward to call grep, awk and sed for this.
+>
+> I wonder if the following construction nicer:
+>
+> while read -r FEATURE VALUE FIXED; do
+> 	[ "$FEAT" != "Features" ] || continue # Skip "Features" line
+> 	[ "$FIXED" != "[fixed]" ] || continue # Skip fixed features
+> 	feature="${FEATURE%:*}"
+> 	...
+> done < "$TMP_ETHTOOL_FEATURES"
+
+I have re-submitted a v2 of patch here keeping the above change:
+https://lore.kernel.org/all/20240609132124.51683-1-jain.abhinav177@gmail.com/
+
+Please review. Thank you. 
 
