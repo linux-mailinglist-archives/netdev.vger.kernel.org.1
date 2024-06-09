@@ -1,189 +1,264 @@
-Return-Path: <netdev+bounces-102089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31875901631
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 15:17:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78892901632
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 15:20:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88FC82817F3
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:17:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D21A8B20EE1
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:20:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25CB3CF65;
-	Sun,  9 Jun 2024 13:17:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F663EA98;
+	Sun,  9 Jun 2024 13:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KJrNfhBV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XoYqPmr+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 773B317E9
-	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 13:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1249B17E9;
+	Sun,  9 Jun 2024 13:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717939064; cv=none; b=FuysCnl4XqutvIKfrrBFNcDKLYFAlbpnEEOdGPuNjYcJ6tjXmWS8gpe1iP9CAeuXSr2Pi3vxmKM3t+eQ6y7rRLElC36CV4dF4Q9SEN+FZdhd5j9trsWx4fWQCfUCauMihroexpLrolL8CjG5njLLlh1CQ9pqBOla6r74YbA0fh0=
+	t=1717939204; cv=none; b=jys+4LNjD8785PSbxyGtyK53S6jDdefIVdr9m8W5Z30dwMRnWRSaOg/WteNEZgMm/xJaJyaaJjMQkvjMLs3OYnIAUzgfR60IJ34/zq/r1+TiJENM46W077sWyS45Iz7Y+FCjjpp6zKYl2/h9XRCR83VHKgWB78E2PxiisfxQzzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717939064; c=relaxed/simple;
-	bh=skmwMXi8kAEMyCrhhGcH/OZjY7wPIsNpAHXSx8oGsww=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ABuXZ07TcdaZHX40LH2Dq+YDOwLjDDHO95IAj0qYq+RGQBHATMdvjCFgoJE7P/Mz4xdbR3wNJcTqV+qpxoH+2X4SQivK6Qjn3xcMp98Ar31V/Wbjr8sJKXxEUi04rnJqa2xdO32681x946UrK/IAMxcwQFXeMzS6QDKwq8AYmRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KJrNfhBV; arc=none smtp.client-ip=209.85.210.171
+	s=arc-20240116; t=1717939204; c=relaxed/simple;
+	bh=R8rf9gElSVWNbxaihuWSeJY2iohB/5mHKU+bJ2Mlk08=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bTDYf0wo5Zb4aCfsQfbTQP9CxsNw1bgwArvHMEOcDnPzLjKRdYMOcceXAOMu4x3mRFoyA9SYPlo250Rs9nzRVuEDME8xyItVB6geR54hdHbnOYZGG/eKdUr/MuGj8V67dm7VZDmbBK/+FTY32zt/R9HvGyQkD26oozLWVyMh85Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XoYqPmr+; arc=none smtp.client-ip=209.85.218.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-704189f1225so1488873b3a.0
-        for <netdev@vger.kernel.org>; Sun, 09 Jun 2024 06:17:43 -0700 (PDT)
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a62ef52e837so483531366b.3;
+        Sun, 09 Jun 2024 06:20:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717939063; x=1718543863; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yjxt4NWAvaamGZW7AUUoaTNwwiKOEAfHLcMVlnfmIVE=;
-        b=KJrNfhBVjA+gv8f1Bvquu60tcbH3JUIT8NhXnb4NrJ0emPtnoRlIvovoFsovnvyipl
-         DEDS7chJ7gdegLDM1J4i46WG+3pDLLnVvWoKELOo4OKDfXE01ZKhXqg8ptyPDm+NY7eQ
-         y3EZPozoX6vZT274efF/9lepgC/CepkJk+vhsU7tcaqxHBOCmXYPWYrUkKhgUn/p2Jib
-         AczG+8hs8cshmUGugl0+VwI+HKqOhC6nPwxFXBQ4Ky5naaBOgAthiaPhME/RSDeqnBOo
-         M9VR6LiXm26TS3ZE4m2IqDOYR1mX/gz8AFrqA1fEeSmZTAQD1gvhHseV9Zz3icR7MJhB
-         mp2A==
+        d=gmail.com; s=20230601; t=1717939201; x=1718544001; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uq2w4gNTRTICtQgQewJ8JOIDB4REwLjdALYvNIFCoKY=;
+        b=XoYqPmr+yYQykzkL49d9bh7cH65HPW10Va1L/IprCakgH6y/pbwMza1imHxXVxa9TO
+         vx2CmR+NjIaXdq/AvOtw7oieKJsGuoTuoLfI4zSS5em+9C+zmsvpX02YOeSFdrT+sf5f
+         B2vEyZl90HPf2vxmuZ7llgBI0XJt0s23+UzD9YS6ygw7FUenLumL8lcJPwtAED6xI2ox
+         KpSfGqTHPqKhmmPxzBk4IIX2l1BdgLsmwdxgvOHBckhhQLva1e+y1RW2FoTCbsDonDFM
+         HEwGmtc65Oc4MaIA9wRrgsQZyivdcWVuH1TsqND6v4otqrz5h8qozQ0Wvl5J4nU5kGv4
+         B4Rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717939063; x=1718543863;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yjxt4NWAvaamGZW7AUUoaTNwwiKOEAfHLcMVlnfmIVE=;
-        b=tZGk7uwc+9OiwEz5gpnvxcHMj22pBqot7Q+fmOZbTBvS9isVzqrEEJt0KX+or9TPj9
-         PvAKQTSRi2khMihf5NEYIejuOKJzYMpdM2EwK395vdmSOtfm7LLs0yyvnRUjcEnKc+ac
-         tKylKCI9RXJDyk2Azztqm2CtK0g6nWEoSwJXolgFGngBAXIo+TAdSU0vujG126lr6iU+
-         YekLI8fjtudoZlhME8k4mGLjE6xh2ZAcF0hOHLIQonYR/rdPCqkqpqBep6yA71PAXp6a
-         034MBCEHKbyIS3Rm6RHWa9oTUABOXQagz+qgyCwz7lhSgg0S9gS80IHAt1L5YzWlMLp7
-         76Yg==
-X-Gm-Message-State: AOJu0Yznx0UVRCNmG1PQsil2jrlLPm3F5VtGwDDu8jk29gohKO1FJ3h4
-	XwpUqYN5p5+8t+SaDzfCxyjzJ5WjBLl8U6GEIQf6XDmrKd8djP15
-X-Google-Smtp-Source: AGHT+IFvZ9ARLcJIdJ1NTa5flp5NbsdqX9gcFA3fPPID/tVQPWlWixhgOgxKp7lpw/oCjaaKoQuzDw==
-X-Received: by 2002:a05:6a00:2e05:b0:702:7cf0:e1a1 with SMTP id d2e1a72fcca58-7040c7489b5mr8203716b3a.32.1717939062534;
-        Sun, 09 Jun 2024 06:17:42 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([111.201.28.17])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-703fd50beb6sm5412109b3a.176.2024.06.09.06.17.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Jun 2024 06:17:41 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	leitao@debian.org
-Cc: netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next] net: dqs: introduce NETIF_F_NO_BQL device feature
-Date: Sun,  9 Jun 2024 21:17:32 +0800
-Message-Id: <20240609131732.73156-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+        d=1e100.net; s=20230601; t=1717939201; x=1718544001;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uq2w4gNTRTICtQgQewJ8JOIDB4REwLjdALYvNIFCoKY=;
+        b=QDZosW5dC2edPUss7hLggifUTVgZuzm0EEfGEbsATDfb56/R7hDDFidx1LLGybeax6
+         G34SGOir1H6ApJNCTWmlzZ0/UuseFrsho896FdSMg0dbkasrBGQdtmoYO6emA6+hzcBw
+         kE8HpMaPcQ6kF1+7UcaLnZn6X1tXWSERR3HUtLGOgF/R153fB6hGghwQe0Z5PIIEMIiv
+         hHOqx2UChbHdzN7rmgVPspkHT9EdsWKfWMYNNKz5u/kQI0QuT1t4r06h9kP2at15+KmU
+         OEd+c4L/9Jc7UZftyVuKjfv5vu0BlqKbG9LejSGuwWSyK5QwWweJVm2khMjlS9gWxclh
+         ZsYg==
+X-Forwarded-Encrypted: i=1; AJvYcCVu2nDez13pIUl28Qx6wcvqjf+jG/FVCNu4oHvzA8B2rpcBrMEDnVsn35+8Pb53ZLOmTg4+Qatl0LF8ASFbgQCDU1dFyAWUzHK6LfOvOuYPNvQ4imKobinIMJnMpsLE0RQ3TJOF
+X-Gm-Message-State: AOJu0YznA4CSRwVjg1O9pa7nkMr1VVvrUdUfx4jYrPeFa2HU5tuEC55y
+	PcNY4ZMbfUCC5Jao3F0lYlMuLvZYu3XtATB7IBuDMo53DHxXJukF3wRNDSa47V/wBy+j4RkdDw+
+	hHRyuhm6eiW+fLkR4+YXv+b1mnsg=
+X-Google-Smtp-Source: AGHT+IH/7cxvZQYiaBlD8/f3ysqDewNm0rEWbg/8tKXKhnCwDs0wxKL8DQTZjQWCZnTz6y+AcAgwXXnq1Qkui0s5AJw=
+X-Received: by 2002:a17:906:71c1:b0:a6a:6ed0:fbd7 with SMTP id
+ a640c23a62f3a-a6cd7891aeemr454044566b.37.1717939201028; Sun, 09 Jun 2024
+ 06:20:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240216094154.3263843-1-leitao@debian.org> <20240216092905.4e2d3c7c@hermes.local>
+ <0e0ba573-1ae0-4a4b-8286-fdbc8dbe7639@gmail.com> <CANn89i+5F7d4i7Ds4V6TtkzzAjQjNQ8xOeoYqZr8tY6tWWmMEg@mail.gmail.com>
+ <ZdMjaCSKFSkAoDOS@gmail.com> <CAL+tcoDqyYy7mE6W8qvDJZgMK_4sYwXPzpidvgEu=r-uJ46k4Q@mail.gmail.com>
+In-Reply-To: <CAL+tcoDqyYy7mE6W8qvDJZgMK_4sYwXPzpidvgEu=r-uJ46k4Q@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sun, 9 Jun 2024 21:19:23 +0800
+Message-ID: <CAL+tcoCfOnL4uv_0JQZvxsBogF+bTLxDEre9fORKDofMdfWDtQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: sysfs: Do not create sysfs for non BQL device
+To: Breno Leitao <leitao@debian.org>
+Cc: Eric Dumazet <edumazet@google.com>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Stephen Hemminger <stephen@networkplumber.org>, kuba@kernel.org, davem@davemloft.net, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	horms@kernel.org, Johannes Berg <johannes.berg@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jason Xing <kernelxing@tencent.com>
+On Sun, Jun 9, 2024 at 12:47=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> Hello Breno, Eric
+>
+> On Mon, Feb 19, 2024 at 5:47=E2=80=AFPM Breno Leitao <leitao@debian.org> =
+wrote:
+> >
+> > On Fri, Feb 16, 2024 at 07:45:37PM +0100, Eric Dumazet wrote:
+> > > On Fri, Feb 16, 2024 at 7:41=E2=80=AFPM Florian Fainelli <f.fainelli@=
+gmail.com> wrote:
+> > > >
+> > > > On 2/16/24 09:29, Stephen Hemminger wrote:
+> > > > > On Fri, 16 Feb 2024 01:41:52 -0800
+> > > > > Breno Leitao <leitao@debian.org> wrote:
+> > > > >
+> > > > >> +static bool netdev_uses_bql(const struct net_device *dev)
+> > > > >> +{
+> > > > >> +    if (dev->features & NETIF_F_LLTX ||
+> > > > >> +        dev->priv_flags & IFF_NO_QUEUE)
+> > > > >> +            return false;
+> > > > >> +
+> > > > >> +    return IS_ENABLED(CONFIG_BQL);
+> > > > >> +}
+> > > > >
+> > > > > Various compilers will warn about missing parens in that expressi=
+on.
+> > > > > It is valid but mixing & and || can be bug trap.
+> > > > >
+> > > > >       if ((dev->features & NETIF_F_LLTX) || (dev->priv_flags & IF=
+F_NO_QUEUE))
+> > > > >               return false;
+> > > > >
+> > > > > Not all drivers will be using bql, it requires driver to have tha=
+t code.
+> > > > > So really it means driver could be using BQL.
+> > > > > Not sure if there is a way to find out if driver has the required=
+ BQL bits.
+> > > >
+> > > > There is not a feature flag to be keying off if that is what you ar=
+e
+> > > > after, you would need to audit the drivers and see whether they mak=
+e
+> > > > calls to netdev_tx_sent_queue(), netdev_tx_reset_queue(),
+> > > > netdev_tx_completed_queue().
+> > > >
+> > > > I suppose you might be able to programmatically extract that inform=
+ation
+> > > > by looking at whether a given driver object file has a reference to
+> > > > dql_{reset,avail,completed} or do that at the source level, whichev=
+er is
+> > > > easier.
+> > >
+> > > Note that the suggested patch does not change current functionality.
+> > >
+> > > Traditionally, we had sysfs entries fpr BQL for all netdev, regardles=
+s of them
+> > > using BQL or not.
+> > >
+> > > The patch seems to be a good first step.
+> >
+> > Thanks Eric. I agree it solves the problem without creating a new
+> > feature flag, that could also be done, but maybe less important than
+> > this first step.
+>
+> When I'm reading and testing the dqs codes in my VM, I realize that
+> the virtio_net driver should have been excluded from BQL drivers,
+> which means VM using virtio_net driver should not have the
+> /sys/class/net/eth1/queues/tx-1/byte_queue_limits directory because It
+> has neither NETIF_F_LLTX nor IFF_NO_QUEUE.
+>
+> I'm trying to cook a patch to fix it without introducing a new feature
+> like NETIF_F_LOOPBACK, but I failed to have a good patch.
+>
+> I have two options in my mind:
+> 1) introduce a feature flag only for virtion_net [1]
+> 2) introduce a BQL flag, and then apply it to all the drivers which
+> has either NETIF_F_LLTX or IFF_NO_QUEUE bit, including virtio_net
+> driver
 
-Since commit 74293ea1c4db6 ("net: sysfs: Do not create sysfs for non
-BQL device") limits the non-BQL driver not creating byte_queue_limits
-directory, I found there is one exception, namely, virtio-net driver,
-which should also be limited in netdev_uses_bql().
+I decided to use this method. Please review :
+https://lore.kernel.org/all/20240609131732.73156-1-kerneljasonxing@gmail.co=
+m/
 
-I decided to introduce a NO_BQL bit in device feature because
-1) it can help us limit virtio-net driver for now.
-2) if we found another non-BQL driver, we can take it into account.
-3) we can replace all the driver meeting those two statements in
-netdev_uses_bql() in future.
+Thanks.
 
-For now, I would like to make the first step to use this new bit for dqs
-use instead of replacing/applying all the non-BQL drivers.
-
-After this patch, 1) there is no byte_queue_limits directory in virtio-net
-driver. 2) running ethtool -k eth1 shows "no-bql: on [fixed]".
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- drivers/net/virtio_net.c        | 2 +-
- include/linux/netdev_features.h | 3 ++-
- net/core/net-sysfs.c            | 2 +-
- net/ethtool/common.c            | 1 +
- 4 files changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 61a57d134544..619908fed14b 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -5634,7 +5634,7 @@ static int virtnet_probe(struct virtio_device *vdev)
- 			   IFF_TX_SKB_NO_LINEAR;
- 	dev->netdev_ops = &virtnet_netdev;
- 	dev->stat_ops = &virtnet_stat_ops;
--	dev->features = NETIF_F_HIGHDMA;
-+	dev->features = NETIF_F_HIGHDMA | NETIF_F_NO_BQL;
- 
- 	dev->ethtool_ops = &virtnet_ethtool_ops;
- 	SET_NETDEV_DEV(dev, &vdev->dev);
-diff --git a/include/linux/netdev_features.h b/include/linux/netdev_features.h
-index 7c2d77d75a88..9bc603bb4227 100644
---- a/include/linux/netdev_features.h
-+++ b/include/linux/netdev_features.h
-@@ -14,7 +14,6 @@ typedef u64 netdev_features_t;
- enum {
- 	NETIF_F_SG_BIT,			/* Scatter/gather IO. */
- 	NETIF_F_IP_CSUM_BIT,		/* Can checksum TCP/UDP over IPv4. */
--	__UNUSED_NETIF_F_1,
- 	NETIF_F_HW_CSUM_BIT,		/* Can checksum all the packets. */
- 	NETIF_F_IPV6_CSUM_BIT,		/* Can checksum TCP/UDP over IPV6 */
- 	NETIF_F_HIGHDMA_BIT,		/* Can DMA to high memory. */
-@@ -91,6 +90,7 @@ enum {
- 	NETIF_F_HW_HSR_FWD_BIT,		/* Offload HSR forwarding */
- 	NETIF_F_HW_HSR_DUP_BIT,		/* Offload HSR duplication */
- 
-+	NETIF_F_NO_BQL_BIT,		/* non-BQL driver */
- 	/*
- 	 * Add your fresh new feature above and remember to update
- 	 * netdev_features_strings[] in net/ethtool/common.c and maybe
-@@ -168,6 +168,7 @@ enum {
- #define NETIF_F_HW_HSR_TAG_RM	__NETIF_F(HW_HSR_TAG_RM)
- #define NETIF_F_HW_HSR_FWD	__NETIF_F(HW_HSR_FWD)
- #define NETIF_F_HW_HSR_DUP	__NETIF_F(HW_HSR_DUP)
-+#define NETIF_F_NO_BQL		__NETIF_F(NO_BQL)
- 
- /* Finds the next feature with the highest number of the range of start-1 till 0.
-  */
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 4c27a360c294..ff397a76f1fe 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -1764,7 +1764,7 @@ static const struct kobj_type netdev_queue_ktype = {
- 
- static bool netdev_uses_bql(const struct net_device *dev)
- {
--	if (dev->features & NETIF_F_LLTX ||
-+	if (dev->features & (NETIF_F_LLTX | NETIF_F_NO_BQL) ||
- 	    dev->priv_flags & IFF_NO_QUEUE)
- 		return false;
- 
-diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index 6b2a360dcdf0..efa7ac4158ce 100644
---- a/net/ethtool/common.c
-+++ b/net/ethtool/common.c
-@@ -74,6 +74,7 @@ const char netdev_features_strings[NETDEV_FEATURE_COUNT][ETH_GSTRING_LEN] = {
- 	[NETIF_F_HW_HSR_TAG_RM_BIT] =	 "hsr-tag-rm-offload",
- 	[NETIF_F_HW_HSR_FWD_BIT] =	 "hsr-fwd-offload",
- 	[NETIF_F_HW_HSR_DUP_BIT] =	 "hsr-dup-offload",
-+	[NETIF_F_NO_BQL_BIT] =		 "no-bql",
- };
- 
- const char
--- 
-2.37.3
-
+>
+> Do you have any ideas or suggestions?
+>
+> Thanks in advance!
+>
+> [1]
+> untested patch for now:
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 61a57d134544..e39417d99ea8 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -5634,7 +5634,7 @@ static int virtnet_probe(struct virtio_device *vdev=
+)
+>                            IFF_TX_SKB_NO_LINEAR;
+>         dev->netdev_ops =3D &virtnet_netdev;
+>         dev->stat_ops =3D &virtnet_stat_ops;
+> -       dev->features =3D NETIF_F_HIGHDMA;
+> +       dev->features =3D NETIF_F_HIGHDMA | NETIF_F_VIRTNET;
+>
+>         dev->ethtool_ops =3D &virtnet_ethtool_ops;
+>         SET_NETDEV_DEV(dev, &vdev->dev);
+> diff --git a/include/linux/netdev_features.h b/include/linux/netdev_featu=
+res.h
+> index 7c2d77d75a88..4ade9cdf079e 100644
+> --- a/include/linux/netdev_features.h
+> +++ b/include/linux/netdev_features.h
+> @@ -14,7 +14,7 @@ typedef u64 netdev_features_t;
+>  enum {
+>         NETIF_F_SG_BIT,                 /* Scatter/gather IO. */
+>         NETIF_F_IP_CSUM_BIT,            /* Can checksum TCP/UDP over IPv4=
+. */
+> -       __UNUSED_NETIF_F_1,
+> +       //__UNUSED_NETIF_F_1,
+>         NETIF_F_HW_CSUM_BIT,            /* Can checksum all the packets. =
+*/
+>         NETIF_F_IPV6_CSUM_BIT,          /* Can checksum TCP/UDP over IPV6=
+ */
+>         NETIF_F_HIGHDMA_BIT,            /* Can DMA to high memory. */
+> @@ -91,6 +91,7 @@ enum {
+>         NETIF_F_HW_HSR_FWD_BIT,         /* Offload HSR forwarding */
+>         NETIF_F_HW_HSR_DUP_BIT,         /* Offload HSR duplication */
+>
+> +       NETIF_F_VIRTNET_BIT,            /* Enable virtnet */
+>         /*
+>          * Add your fresh new feature above and remember to update
+>          * netdev_features_strings[] in net/ethtool/common.c and maybe
+> @@ -122,6 +123,7 @@ enum {
+>  #define NETIF_F_IPV6_CSUM      __NETIF_F(IPV6_CSUM)
+>  #define NETIF_F_LLTX           __NETIF_F(LLTX)
+>  #define NETIF_F_LOOPBACK       __NETIF_F(LOOPBACK)
+> +#define NETIF_F_VIRTNET                __NETIF_F(VIRTNET)
+>  #define NETIF_F_LRO            __NETIF_F(LRO)
+>  #define NETIF_F_NETNS_LOCAL    __NETIF_F(NETNS_LOCAL)
+>  #define NETIF_F_NOCACHE_COPY   __NETIF_F(NOCACHE_COPY)
+> diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+> index 4c27a360c294..d52d95ea6fb6 100644
+> --- a/net/core/net-sysfs.c
+> +++ b/net/core/net-sysfs.c
+> @@ -1764,7 +1764,7 @@ static const struct kobj_type netdev_queue_ktype =
+=3D {
+>
+>  static bool netdev_uses_bql(const struct net_device *dev)
+>  {
+> -       if (dev->features & NETIF_F_LLTX ||
+> +       if (dev->features & (NETIF_F_LLTX | NETIF_F_VIRTNET) ||
+>             dev->priv_flags & IFF_NO_QUEUE)
+>                 return false;
+>
+> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+> index 6b2a360dcdf0..efb39a185e4b 100644
+> --- a/net/ethtool/common.c
+> +++ b/net/ethtool/common.c
+> @@ -74,6 +74,7 @@ const char
+> netdev_features_strings[NETDEV_FEATURE_COUNT][ETH_GSTRING_LEN] =3D {
+>         [NETIF_F_HW_HSR_TAG_RM_BIT] =3D    "hsr-tag-rm-offload",
+>         [NETIF_F_HW_HSR_FWD_BIT] =3D       "hsr-fwd-offload",
+>         [NETIF_F_HW_HSR_DUP_BIT] =3D       "hsr-dup-offload",
+> +       [NETIF_F_VIRTNET_BIT] =3D         "virtnet",
+>  };
+>
+>  const char
+>
+> >
+> > Hoping this is OK, I am planning to send a v2 adding the extra
+> > parenthesis as reported above.
+> >
+> > Thanks
+> >
 
