@@ -1,128 +1,121 @@
-Return-Path: <netdev+bounces-102093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 351A490163E
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 15:28:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B60D9901649
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 15:48:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0BE9B20C75
-	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:28:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72F201F20FED
+	for <lists+netdev@lfdr.de>; Sun,  9 Jun 2024 13:48:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA3B41A80;
-	Sun,  9 Jun 2024 13:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 794C76AC0;
+	Sun,  9 Jun 2024 13:48:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hm07olwf"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="NGe2szpT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E3F3EA98;
-	Sun,  9 Jun 2024 13:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F085363C7
+	for <netdev@vger.kernel.org>; Sun,  9 Jun 2024 13:48:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717939721; cv=none; b=KVxE9VZfD6RgLTPijtKB79l7V6v2GLWdLB2ZT8Qb+dEoZrxF5bvuYpoTD2WxKg/5kFqz5ozm5TIINUyS0KRWZgusdCc66dWPUcbg2VbwhtnJZT1Fzp3pPqXgUB7vnKNq59H0j3lxNNvLKj7NciUp5KPAMaZ/DcteejPbihiEpuU=
+	t=1717940932; cv=none; b=bc8jGG7oN5ELAGRmi5+d1Ag63kuluQfaZAi00m4VcAMp+eEYMIWxFpEZ2L84SImsGVJpyAWIsjT11E1cuuT3Kid8MfZJVL4mVnKq5VR7BKrZEMIIeKtdw7bJlG7Va0kQ5rRYidDebW9jlexkivaBjla+bRGNKA/U1npTOsT3aQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717939721; c=relaxed/simple;
-	bh=HjRthhA97Bz7lNeAY511f0m9k5cC/vd8hSnK6MJWYZ4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EWCIPvjwOELMXOw/bGnOXcoUj90WKAp4vaftfLkAZPwJF1EoKLTj9gHmWjk+8OCxd4fmIR0qlceCitfmkgf4yZ3NfQlyzzaner4sTAgO+wFtoiZ7sVP/VVEp9ByRE9Ie4jr6Zwf5X1sxRBZEl1o/WV1dAwPVqUNSFEoITUR5wEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hm07olwf; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1f7149671c3so406055ad.1;
-        Sun, 09 Jun 2024 06:28:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717939720; x=1718544520; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HFWQoeFLGCKUUNrklzY1UKW+3++YeF3pYLivK/wT1sg=;
-        b=hm07olwfnrsB/NJMrA6/k1c/T4zClu95vZrQZ42hE4yTq6wgLl1Ql9L5TLlAMOn4dV
-         h+pFJox9bdy6ZoyvmwopmFaZkFWEWrjcuDcNk2av/QNvjyHogE/1t8WdNxEeFBkenITO
-         oLkEG+HSC+A3m0uTuvDpeIIHdT7muofWDWodcFcFxCsjlGsAH6Wx2ahtpgvElisuOJde
-         IdCmD7zJzYuKMAdRG/9/pkH+74ab1vQqca2zFMUIUYD4H2+TFkZl9UpkVYujNgv2VPFq
-         ApfUirr3x6ZlcEHRi8sV9md4Mfk7VhkSjX+qMBbs8vlL9olhZwngbrcld6X+c8u4iRFz
-         5yxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717939720; x=1718544520;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HFWQoeFLGCKUUNrklzY1UKW+3++YeF3pYLivK/wT1sg=;
-        b=TIe3mLUo/DY3v8khGIMeG2c/bxa1jKRAmQfKsHdMtgzJaNCVEePDf7P64ExN4/t6wZ
-         eQLj97flKn1bGPMI394RrPZrTThEx+QblDBTyUGGtbdElgkpdDw0rHskeghGr2QhQpv/
-         38alVnAbDdBY+ie5jJW7iqRq2SP7k9/3IzKBBo0ZOaIZqytbyRZXsTo4OOchPbbob4lb
-         L/KF9Jnaj9fDapfQDVC7K1+lhGrvVB5patz+/q7m8LjAZeOiHrj0us5M2BX10dRCTE/v
-         1OCa/lJFNdaErOMOScmqG+G7aACpGygIobL8riNwc4kyCilTuYtJuHy5Fa1Pve1jYmQJ
-         XwQw==
-X-Forwarded-Encrypted: i=1; AJvYcCXhKR/LzIQ4ACmIpHd1JF5lpIM1tVjJwdr3Lzjg65f6KOxidBdxQY4O29TUduqGzUe/xD4F67v2++nI1k7isIm1XNHIaQOqgiZiZAiMw1/wu3TEr7jTihA7H3fBlKjO26w4n7bUPww3a3/DcX60UYBHIIsOVCZGRSPAjal8H7Dqb7y5seys
-X-Gm-Message-State: AOJu0Yz4daei47zUgs4UWiD63rW6QSFU8nlApBcfQOjzjnfRuTRkDgNH
-	7zeG1IFx3Ta7N1xmIAzPNGn5yNP5DAa0UYiRWi+Fm89aNgq95kJ5hqBD8YWu
-X-Google-Smtp-Source: AGHT+IHk0nZO38SxWp2jyyxF8uWie9wwCPvhDQxa5lJYc2pSXMTE4gAUxpzxkvWy00CiLN0us2xudw==
-X-Received: by 2002:a17:902:e842:b0:1f3:2f9c:bb72 with SMTP id d9443c01a7336-1f6d010ac6dmr110931455ad.5.1717939719662;
-        Sun, 09 Jun 2024 06:28:39 -0700 (PDT)
-Received: from dev0.. ([49.43.162.161])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6efa2a319sm28084215ad.108.2024.06.09.06.28.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Jun 2024 06:28:39 -0700 (PDT)
-From: Abhinav Jain <jain.abhinav177@gmail.com>
-To: horms@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	jain.abhinav177@gmail.com,
-	javier.carrasco.cruz@gmail.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	skhan@linuxfoundation.org
-Subject: Re: [PATCH] selftests: net: Add on/off checks for network interface non fixed features
-Date: Sun,  9 Jun 2024 13:28:32 +0000
-Message-Id: <20240609132832.51890-1-jain.abhinav177@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240607180127.GG27689@kernel.org>
-References: <20240607180127.GG27689@kernel.org>
+	s=arc-20240116; t=1717940932; c=relaxed/simple;
+	bh=XTw88jV2qbvmRrobXjjz2+BJ57Rxi/8g2xEjK4KLvbY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X28L0um8GE5moDkhpCveg2iDg71t1Vv6ObaWKQ3rTJUfQOACaj2XFM9jwJ3V0A7FvRBE4x94enqJWX0kUhvCl2+y8W3IpTd5EPOy9z+5F6PfiiXb4ZcdGXs7NeOe9LoTRAVjgY/IgHO5EQ1Q4YaK1b0mNSmISGHh6JS0SjfPEWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=NGe2szpT; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=TReKwmOu0YYWw4kiU5LHEAhtAfp2hz2Q03SY8LvgGmw=; b=NGe2szpTBLRli/pCjjCmp5aU6u
+	xLh9yXhXaiIxgreE52MYex0LhSX9h0JbU5fEIrAx6eFtKtpD3J6hmnLAqCyDCVQV9u68taUquAB5n
+	a9WpEtFRnTNuO8leHhEvj4BNGjoa398pjhNDj/ORjVLroXQ5eJcZafGYlHNjwikVEbQE2ObAq/dhy
+	UuOfsP6bTDu8qWAavxiHDzui4NPGaTZg6SfB9TBMlEx8ovQZQX8oEwVSEzZwJ3NydWe6Xg0sL6ZGK
+	HbnMJKZwNhp2cSTZ5w6yVxgfFJSRYd7rRGksJXgCesyEwt/K85H9vEw8NtxwhgnwaFzyJZMIPOgg7
+	gs4muaoA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44406)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sGIuW-0000Yx-2A;
+	Sun, 09 Jun 2024 14:48:40 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sGIuX-0005zi-5M; Sun, 09 Jun 2024 14:48:41 +0100
+Date: Sun, 9 Jun 2024 14:48:41 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Hans-Frieder Vogt <hfdevel@gmx.net>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	andrew@lunn.ch, horms@kernel.org, kuba@kernel.org, jiri@resnulli.us,
+	pabeni@redhat.com, naveenm@marvell.com, jdamato@fastly.com
+Subject: Re: [PATCH net-next v9 0/6] add ethernet driver for Tehuti Networks
+ TN40xx chips
+Message-ID: <ZmWyufzdM9vKjBDc@shell.armlinux.org.uk>
+References: <20240605232608.65471-1-fujita.tomonori@gmail.com>
+ <7fbf409d-a3bc-42e0-ba32-47a1db017b57@gmx.net>
+ <ZmWG/ZQ4e/susuo6@shell.armlinux.org.uk>
+ <e461ce5b-e8d0-413f-a872-2394f41a15d4@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <e461ce5b-e8d0-413f-a872-2394f41a15d4@gmx.net>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, 7 Jun 2024 19:01:27 +0100, Simon Horman wrote:
+On Sun, Jun 09, 2024 at 02:40:03PM +0200, Hans-Frieder Vogt wrote:
+> --- a/drivers/net/ethernet/tehuti/tn40_phy.c    2024-06-06
+> 06:43:40.865474664 +0200
+> +++ b/drivers/net/ethernet/tehuti/tn40_phy.c    2024-06-06
+> 18:57:01.978776712 +0200
+> @@ -54,6 +54,8 @@ int tn40_phy_register(struct tn40_priv *
+>                 return -1;
+>         }
+> 
+> +       __set_bit(PHY_INTERFACE_MODE_XAUI, phydev->host_interfaces);
+> +
+>         config = &priv->phylink_config;
+>         config->dev = &priv->ndev->dev;
+>         config->type = PHYLINK_NETDEV;
 
-> Hi Abhinav,
->
-> I suspect this will now only report a failure if tail fails,
-> but ignore ethtool failures.
+This shouldn't be done - host_interfaces is really only for SFPs, and
+it suggests that the 88x3310 isn't properly configured with pinstrapping
+for the correct MAC type (which determines the interface mode to be used
+to communicate with the MAC.)
 
-Hi Simon,
+I'm not sure what to suggest here, other than further debug (e.g. what
+interface mode is the 88x3310 trying to use without this?)
 
-I agree, I missed this part earlier. After taking other suggestion
-into account, we don't need this tail and I have removed it.
+> I have to mention, though, that the phy-drivers for x3310 and aqr105 are
+> not yet ready and will also need some changes related to the firmware
+> loading, because for most (all?) of the Tehuti-based cards the phy
+> firmware has to be uploaded via MDIO.
 
-> Shellcheck warns that the above reads words rather than lines,
-> and recommends using read instead.
->
-> I think that is ok, because the construction reduces lines to single words.
-> But it does seem a bit awkward to call grep, awk and sed for this.
->
-> I wonder if the following construction nicer:
->
-> while read -r FEATURE VALUE FIXED; do
-> 	[ "$FEAT" != "Features" ] || continue # Skip "Features" line
-> 	[ "$FIXED" != "[fixed]" ] || continue # Skip fixed features
-> 	feature="${FEATURE%:*}"
-> 	...
-> done < "$TMP_ETHTOOL_FEATURES"
+That's problematical - as I understand it, the 88x3310 firmware at least
+is not freely redistributable (we've run into this with other
+platforms that do not program the SPI flash attached to the 88x3310
+and been told my Marvell that the firmware can't be made available as
+part of e.g. linux-firmware.)
 
-I have re-submitted a v2 of patch here keeping the above change:
-https://lore.kernel.org/all/20240609132124.51683-1-jain.abhinav177@gmail.com/
+So quite what we do with the 88x3310 based boards that don't have
+firmware, I'm not sure, but it seems given the non-distributable
+firmware issue, that's going to be hard.
 
-Please review. Thank you. 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
