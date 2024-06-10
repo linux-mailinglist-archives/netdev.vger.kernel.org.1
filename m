@@ -1,179 +1,155 @@
-Return-Path: <netdev+bounces-102163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 069B2901B78
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 08:56:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71B84901B89
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 09:07:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F38CB1C21080
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 06:56:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F3671C2113E
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 07:07:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 859111B5A4;
-	Mon, 10 Jun 2024 06:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Dst6LuXi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DD4B1C6AF;
+	Mon, 10 Jun 2024 07:07:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9AB1803A;
-	Mon, 10 Jun 2024 06:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F541BF2A
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 07:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718002568; cv=none; b=cFBMAVE7MDKbAwfNlEBHzV/gK0HRuUkAImfggglY4DeAlnInQyHuYe/VEvA1/r7zeep7HtwM7Rp7M0aj2nLnB1XWvNMynhOmqRRMrwDdzpT3adglZ2Gi7zUoW/DNGSHa4NEbAvXKrPR4p+b5SOEjFmh++YVknSLYLU837+fnMwM=
+	t=1718003254; cv=none; b=XKBfGRHBoyvR7ney9xGYRsCyX+c4Qm9NXhJFTY1JlLeiGf7lHZabEWJcQQjlDETrqnNyGcvY5rw6qLyDKe63907C6EnaULhufPl7u+2D+bh754jp8E5EYn8EsiY6+1WAt53KVPOdoWkZ2vpJLGysHEbF+7/jnP46a6IPcBwspwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718002568; c=relaxed/simple;
-	bh=9x5lfg5IbS2UuO0/g8a59A4OC0SvPJLLx6ic7z+Xr14=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=feoX356+eXtScsIFFCXBXfu0+ezha+r+VCnNVx4ypw9NGjQ8D8MsJw8bAhAVsGK7Lw4CproqHVvtFdsAXqXabT75GIrOvPojJhfRBxbTvtekB1ZwGR0QThFplY93cfGjjVqsXElsRrwPOKOVMXsWkP7aSQtwBfmAcAlfF/7VQa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Dst6LuXi; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718002565; x=1749538565;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9x5lfg5IbS2UuO0/g8a59A4OC0SvPJLLx6ic7z+Xr14=;
-  b=Dst6LuXigxP6RhLsFmHPU6jXxwa35csGmG0m316mDIh6AeauVKWdqOau
-   QUqvcmeR4oROwe3i3pzeZfFRw2jsOPAi6nlMKkZcePvcz0JUFW1EGaMCd
-   eNntt/JGIFJnjr5W2TSlNa1Ul57kUPAQKrjXZx+y5muHON/D42Zwt/8yh
-   8CAsoZq7W09TikxPBTeH0yKjF3qIUZP+1XQayOCGAQCW8GMLmncgJkFFb
-   9Adyj5T7cx6z5NV6+pMwSrffL1lAEWISk9F9oPIXtJ0zIhDZVFvppeqtv
-   Gmqd1TcSchDLi7FyevtOnAIC5twDUj7vqNROh11RcTMj955cXwbjjiPPD
-   w==;
-X-CSE-ConnectionGUID: Ua7UZcqNR1GUI1hTBkZ19A==
-X-CSE-MsgGUID: D4KHS+0rRSy1P86OYU+U/Q==
-X-IronPort-AV: E=McAfee;i="6600,9927,11098"; a="37173137"
-X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
-   d="scan'208";a="37173137"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2024 23:56:05 -0700
-X-CSE-ConnectionGUID: e8ykSEwdS3G3DA5FIAt9wA==
-X-CSE-MsgGUID: /5hJAPHkQaCvwzCCQyfC/w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
-   d="scan'208";a="76428104"
-Received: from lkp-server01.sh.intel.com (HELO 8967fbab76b3) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 09 Jun 2024 23:56:02 -0700
-Received: from kbuild by 8967fbab76b3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sGYwh-0001vE-2E;
-	Mon, 10 Jun 2024 06:55:59 +0000
-Date: Mon, 10 Jun 2024 14:55:15 +0800
-From: kernel test robot <lkp@intel.com>
-To: Richard chien <m8809301@gmail.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: oe-kbuild-all@lists.linux.dev, jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Richard chien <richard.chien@hpe.com>
-Subject: Re: [PATCH] igb: Add support for firmware update
-Message-ID: <202406101404.oWWqbJmG-lkp@intel.com>
-References: <20240609081526.5621-1-richard.chien@hpe.com>
+	s=arc-20240116; t=1718003254; c=relaxed/simple;
+	bh=RaHyHSxriqBbzMxLUty0EheUNUvcvMTdWobKqxk4+xE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=J0EvK3ajNd0r5ukRcRsDdwyLSl8p7mIRVxspJvlHoVPRGadDJ1hFdDaZbqwqHc1Tv/qngYetqm1ITJdd+LNcseTucF3Fg5dFG3I8XlFe7EfH8TmzQ9E0QpNkTT6kQbqOl2v9DxEiVrhQI2+avwf+6UWkS0EAl+smSsX21Kkivf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3745fb76682so44607325ab.2
+        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 00:07:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718003252; x=1718608052;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aOWDa8s7scwwzepO7HM8stjaYWxEuHOf7DjzQ2t/x20=;
+        b=qfu6Pfxd1uLqqPmy4uGmVef18hTy/3h9Uc4pKN5ftue3crzZgbKCAS2FczUl1wqS54
+         NNlh2apGLbNO45UUjvxD9t/7YMTYaBjfnH1uSkWTtILa17vctJanU8YremHk4MObh9Dh
+         qGNYC18/sLU22NmD2jaCiRXgNYVJnt6p5xa0gw3KHGdDSD2OvWDEt6L7MKbPYDdVYMIU
+         Zmkwxn2C3krzVQXZ9nIIh+odOC1rosimIURvl97EWXBZsj0ITNhU6S/Bsdp1gf6KN7rt
+         E0K90oRD9rAquunM4HbIQzza5k0HCq51Ym4H1jl9vUWpPwICjkARne4yJ5fTN6lr/8+X
+         TOqA==
+X-Forwarded-Encrypted: i=1; AJvYcCWpSNBwBJAtueBk8Mb63aYUjLGg8dnnPGwjQbzd6NR9DFxtaUKK06Mo+V0XeH3xTciGvUGKiKrdzfnsOA8sJVXvFN4ci4fZ
+X-Gm-Message-State: AOJu0YxG4K9FewL17pewTkDkq1VMr8h76d7n4BXgl9vmwqCmn6I6fRpY
+	vnOjsd+DjESvd2rXqzplvqvOXWttTqCUB8wmBa3lO4HH/e0u+JVkWnuqpQR0zoz3sGrnrgeMoGT
+	X/LWiquoxtOOXQSbvRrn3hMk2gU85q2JZV8rTEl1sQzXq5uAMCHi8zKY=
+X-Google-Smtp-Source: AGHT+IE2s84k+Qu3XNTICX1W0U0I076P1nY/KKjv8VFmf3d/qG9B0njUo8HMbxxfLpWDKLhXtSEGe0SLsTxUzC+wpEV7bO4IC+Ox
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240609081526.5621-1-richard.chien@hpe.com>
+X-Received: by 2002:a05:6e02:1561:b0:375:a50d:7f2d with SMTP id
+ e9e14a558f8ab-375a50d8283mr2045565ab.1.1718003252146; Mon, 10 Jun 2024
+ 00:07:32 -0700 (PDT)
+Date: Mon, 10 Jun 2024 00:07:32 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009140e4061a83cda3@google.com>
+Subject: [syzbot] [net?] WARNING in bond_xdp_get_xmit_slave (2)
+From: syzbot <syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com>
+To: andy@greyhouse.net, davem@davemloft.net, edumazet@google.com, 
+	j.vosburgh@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Richard,
+Hello,
 
-kernel test robot noticed the following build warnings:
+syzbot found the following issue on:
 
-[auto build test WARNING on tnguy-next-queue/dev-queue]
-[also build test WARNING on tnguy-net-queue/dev-queue linus/master v6.10-rc3 next-20240607]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+HEAD commit:    f8f0de9d58d9 Merge branch 'mlx5-fixes'
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=1638d2ce980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b9016f104992d69c
+dashboard link: https://syzkaller.appspot.com/bug?extid=c187823a52ed505b2257
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Richard-chien/igb-Add-support-for-firmware-update/20240609-162047
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git dev-queue
-patch link:    https://lore.kernel.org/r/20240609081526.5621-1-richard.chien%40hpe.com
-patch subject: [PATCH] igb: Add support for firmware update
-config: alpha-randconfig-r112-20240610 (https://download.01.org/0day-ci/archive/20240610/202406101404.oWWqbJmG-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20240610/202406101404.oWWqbJmG-lkp@intel.com/reproduce)
+Unfortunately, I don't have any reproducer for this issue yet.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202406101404.oWWqbJmG-lkp@intel.com/
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/f3fd9f91ee48/disk-f8f0de9d.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/4f0153e67f84/vmlinux-f8f0de9d.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/6abab02f18cf/bzImage-f8f0de9d.xz
 
-sparse warnings: (new ones prefixed by >>)
->> drivers/net/ethernet/intel/igb/igb_ethtool.c:923:34: sparse: sparse: cast to restricted __le16
-   drivers/net/ethernet/intel/igb/igb_ethtool.c: note: in included file (through include/linux/mmzone.h, include/linux/gfp.h, include/linux/stackdepot.h, ...):
-   include/linux/page-flags.h:240:46: sparse: sparse: self-comparison always evaluates to false
-   include/linux/page-flags.h:240:46: sparse: sparse: self-comparison always evaluates to false
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
 
-vim +923 drivers/net/ethernet/intel/igb/igb_ethtool.c
+bond9: Unknown bonding mode 6 for xdp xmit
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 14901 at drivers/net/bonding/bond_main.c:5502 bond_xdp_get_xmit_slave+0x519/0x690 drivers/net/bonding/bond_main.c:5502
+Modules linked in:
+CPU: 1 PID: 14901 Comm: syz-executor.1 Not tainted 6.10.0-rc1-syzkaller-00179-gf8f0de9d58d9 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+RIP: 0010:bond_xdp_get_xmit_slave+0x519/0x690 drivers/net/bonding/bond_main.c:5502
+Code: be 69 13 00 00 48 c7 c2 a0 73 54 8c e8 d0 35 1e fb eb 98 e8 69 96 41 fb 4c 89 e7 48 c7 c6 80 94 54 8c 89 da e8 48 50 31 05 90 <0f> 0b 90 eb a6 e8 4d 96 41 fb 48 85 db 74 0a e8 43 96 41 fb e9 72
+RSP: 0018:ffffc9000da6f6c8 EFLAGS: 00010246
+RAX: 2059da9abcd8c700 RBX: 0000000000000006 RCX: 2059da9abcd8c700
+RDX: ffffc9001616c000 RSI: 0000000000002218 RDI: 0000000000002219
+RBP: ffff888056026038 R08: ffffffff8176812c R09: fffffbfff1c3998c
+R10: dffffc0000000000 R11: fffffbfff1c3998c R12: ffff888057b5c000
+R13: ffff888057b5c000 R14: ffff888057b5cca0 R15: dffffc0000000000
+FS:  00007f8b32a0a6c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b30d22000 CR3: 00000000629b4000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ xdp_master_redirect+0x104/0x250 net/core/filter.c:4317
+ bpf_prog_run_xdp include/net/xdp.h:518 [inline]
+ xdp_test_run_batch net/bpf/test_run.c:313 [inline]
+ bpf_test_run_xdp_live+0x15eb/0x1e60 net/bpf/test_run.c:384
+ bpf_prog_test_run_xdp+0x80e/0x11b0 net/bpf/test_run.c:1275
+ bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4291
+ __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5705
+ __do_sys_bpf kernel/bpf/syscall.c:5794 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5792 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5792
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f8b31c7cf69
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f8b32a0a0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007f8b31db4050 RCX: 00007f8b31c7cf69
+RDX: 0000000000000050 RSI: 0000000020000040 RDI: 000000000000000a
+RBP: 00007f8b31cda6fe R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000006e R14: 00007f8b31db4050 R15: 00007fff9cacb078
+ </TASK>
 
-   874	
-   875	static int igb_get_eeprom(struct net_device *netdev,
-   876	                          struct ethtool_eeprom *eeprom, u8 *bytes)
-   877	{
-   878	        struct igb_adapter *adapter = netdev_priv(netdev);
-   879	        struct e1000_hw *hw = &adapter->hw;
-   880	        u16 *eeprom_buff;
-   881	        int first_word, last_word;
-   882	        int ret_val = 0;
-   883	        struct e1000_nvm_access *nvm;
-   884	        u32 magic;
-   885	        u16 i;
-   886	
-   887	        if (eeprom->len == 0)
-   888	                return -EINVAL;
-   889	
-   890	        magic = hw->vendor_id | (hw->device_id << 16);
-   891	        if (eeprom->magic && eeprom->magic != magic) {
-   892	                nvm = (struct e1000_nvm_access *)eeprom;
-   893	                ret_val = igb_nvmupd_command(hw, nvm, bytes);
-   894	                return ret_val;
-   895	        }
-   896	          
-   897	        /* normal ethtool get_eeprom support */
-   898	        eeprom->magic = hw->vendor_id | (hw->device_id << 16);
-   899	
-   900	        first_word = eeprom->offset >> 1;
-   901	        last_word = (eeprom->offset + eeprom->len - 1) >> 1;
-   902	
-   903	        eeprom_buff = kmalloc(sizeof(u16) *
-   904	                        (last_word - first_word + 1), GFP_KERNEL);
-   905	        if (!eeprom_buff)
-   906	                return -ENOMEM;
-   907	
-   908	        if (hw->nvm.type == e1000_nvm_eeprom_spi)
-   909	                ret_val = e1000_read_nvm(hw, first_word,
-   910	                                         last_word - first_word + 1,
-   911	                                         eeprom_buff);
-   912	        else {
-   913	                for (i = 0; i < last_word - first_word + 1; i++) {
-   914	                        ret_val = e1000_read_nvm(hw, first_word + i, 1,
-   915	                                                 &eeprom_buff[i]);
-   916	                        if (ret_val)
-   917	                                break;
-   918	                }
-   919	        }
-   920	
-   921	        /* Device's eeprom is always little-endian, word addressable */
-   922	        for (i = 0; i < last_word - first_word + 1; i++)
- > 923	                eeprom_buff[i] = le16_to_cpu(eeprom_buff[i]);
-   924	
-   925	        memcpy(bytes, (u8 *)eeprom_buff + (eeprom->offset & 1),
-   926	                        eeprom->len);
-   927	        kfree(eeprom_buff);
-   928	
-   929	        return ret_val;
-   930	}
-   931	
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
