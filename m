@@ -1,137 +1,124 @@
-Return-Path: <netdev+bounces-102335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDC0C9027E8
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 19:43:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C1E49027F8
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 19:49:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1D2C1C21EAD
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 17:43:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8A37B21F92
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 17:49:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3AC3147C74;
-	Mon, 10 Jun 2024 17:43:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5EF1422A2;
+	Mon, 10 Jun 2024 17:49:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="WQBUSD37"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="B4eb/UWl"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89B1142E79;
-	Mon, 10 Jun 2024 17:43:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A431EA85
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 17:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718041385; cv=none; b=a6J+4d+aDI+/wFeCm6CITIFUrBUdu19Wuk0hr0gM08rqxXwX7PCpTqnO1gRZyxeHQiuDpLuS38Mm5ExSpEadEWSbiIBkxK8e+zzVQdFfPgCWAW/Scb1Lp+FverM1p60QegVb9nU9dycCsCCEUecF7iaHrIHvxJD0/v2ZjOZpJI4=
+	t=1718041764; cv=none; b=c6KwNULsxbXjnegpez2hdaawjn4Ws/Cm0Q5TZ+O5N6R4yGOMVTJ4zcbKOI/ji+IEg5pYYEpax70nOjIx+FAU3Cy18xUMTgJ9BSQ0BshU7JkT1MoOHOAHGn4tEYEsuL+DgW0449nk86oIXANZhQBB03WZzmMWoWufZxxmLg9lD9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718041385; c=relaxed/simple;
-	bh=pukq89EYTWZWICSg4WGUTWv7xVz+jUHs/C8/2F8z0KM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HuwxqlTmhe2Mq2e40yNTk9LXPVw3NxflUJeHF8xt4GYrZzsJmJ1Q6Tu3y47nmYJLtm8cDKqlDiPWCZuEsEUlBK7XJDlB0+nDH3Au46qLrT5zMI62Qif/M2eOVDeqoYCGm7JskBwDSAPBbd3bVKvqwGIt2OAYLTPY9mWurKmHx/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=WQBUSD37; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 684A2885A5;
-	Mon, 10 Jun 2024 19:42:59 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1718041381;
-	bh=oaOQDVrDft+8XHfut53lIpAIfzu9c8ayaQ0+Eg7Nxow=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WQBUSD3704u5IksQ+4ToSk+UzpJxx5XDQUX1YPYUz2ydq/y8quhOFWlrcza8nueUx
-	 YjyxaYOzD3WEXXa6xqFxLJrdCr6zaNB9WgGZY/cwqTySfG2ktmoLSn+IAAWJ39aYaz
-	 lPQro+4RKDvhuztSWyu8q/z3j1tMDLNlwddixzQkrqjyXL2HnaTqIiulZaLTRSXTEv
-	 f8smfN95RqhPw7Oe0wrkOqrAfmJtowy0aeaOUH9SM+MfZjRXqzbNp6lgRvVKq1y57y
-	 RJ6FKOabNXnR1VORrukqhc/kzNhX7sErSjR5iOTp5aBK2NyQwk34IH9z00pYbnV5NW
-	 O/HppF4vFXwGA==
-Message-ID: <bf3238fb-4fad-49b2-975c-e35d93cafe7c@denx.de>
-Date: Mon, 10 Jun 2024 19:29:31 +0200
+	s=arc-20240116; t=1718041764; c=relaxed/simple;
+	bh=Wn7s5r2JjiZ4GOOzN7DyWFDxQLRnpwRqMwiu9nlSt4E=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Md1VdYisddr1IQO7x56udz3rKM4jdNhbo2PiD7ZHOxPBXK9217sdMExO/JBkP2uxouTRGYtebPsbt0EktuC0GOZQfsCch9Mog7ve6HK/npl5XcaapLnC2UQKO/1RZVRu80ZLCM/JiH4Gf2JjLJEyGEc+Icn4tHGqSh+XS1Y7+YU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=B4eb/UWl; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1718041759; x=1749577759;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=9tmlubi+Yiavj8N3FqCtngF9YPYqQoecZbHATLm5Fl4=;
+  b=B4eb/UWl0o7j/U3939AvyFJTMWzRcyU0n5riFKg01r+ost7d4dH9/1XZ
+   /earFdRRsm+a8pOddm6sOynhAnpTavAaVC1t09u9N50qDj0gyWuZXxlUL
+   8Ua45CzKM+XN3h8CTm0lv0KuYBx7vIfx4D8wBoscZ7rfhuGxqjBGABzEY
+   8=;
+X-IronPort-AV: E=Sophos;i="6.08,227,1712620800"; 
+   d="scan'208";a="95734468"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2024 17:49:17 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:18019]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.85:2525] with esmtp (Farcaster)
+ id c493672e-a981-4394-a83d-4942580e7162; Mon, 10 Jun 2024 17:49:17 +0000 (UTC)
+X-Farcaster-Flow-ID: c493672e-a981-4394-a83d-4942580e7162
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Mon, 10 Jun 2024 17:49:16 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.27) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Mon, 10 Jun 2024 17:49:14 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <mhal@rbox.co>
+CC: <cong.wang@bytedance.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v2 net 01/15] af_unix: Set sk->sk_state under unix_state_lock() for truly disconencted peer.
+Date: Mon, 10 Jun 2024 10:49:06 -0700
+Message-ID: <20240610174906.32921-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <cc8a0165-f2e9-43a7-a1a2-28808929d27e@rbox.co>
+References: <cc8a0165-f2e9-43a7-a1a2-28808929d27e@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,PATCH v6 7/8] net: stmmac: dwmac-stm32: Mask support
- for PMCR configuration
-To: Christophe ROULLIER <christophe.roullier@foss.st.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Richard Cochran <richardcochran@gmail.com>, Jose Abreu
- <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20240610071459.287500-1-christophe.roullier@foss.st.com>
- <20240610071459.287500-8-christophe.roullier@foss.st.com>
- <20139233-4e95-4fe5-84ca-734ee866afca@denx.de>
- <c5ea12e7-5ee6-4960-9141-e774ccd9977b@foss.st.com>
- <09105afe-1123-407a-96c3-2ea88602aad0@denx.de>
- <91af5c61-f23f-4f72-a8c8-f32b2c368768@foss.st.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <91af5c61-f23f-4f72-a8c8-f32b2c368768@foss.st.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 6/10/24 3:49 PM, Christophe ROULLIER wrote:
+From: Michal Luczaj <mhal@rbox.co>
+Date: Mon, 10 Jun 2024 14:55:08 +0200
+> On 6/9/24 23:03, Kuniyuki Iwashima wrote:
+> > (...)
+> > Sorry, I think I was wrong and we can't use smp_store_release()
+> > and smp_load_acquire(), and smp_[rw]mb() is needed.
+> > 
+> > Given we avoid adding code in the hotpath in the original fix
+> > 8866730aed510 [0], I prefer adding unix_state_lock() in the SOCKMAP
+> > path again.
+> >
+> > [0]: https://lore.kernel.org/bpf/6545bc9f7e443_3358c208ae@john.notmuch/
 > 
-> On 6/10/24 15:43, Marek Vasut wrote:
->> On 6/10/24 1:45 PM, Christophe ROULLIER wrote:
->>>
->>> On 6/10/24 12:39, Marek Vasut wrote:
->>>> On 6/10/24 9:14 AM, Christophe Roullier wrote:
->>>>
->>>> [...]
->>>>
->>>>>   static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
->>>>> @@ -303,7 +307,7 @@ static int stm32mcu_set_mode(struct 
->>>>> plat_stmmacenet_data *plat_dat)
->>>>>       dev_dbg(dwmac->dev, "Mode %s", 
->>>>> phy_modes(plat_dat->mac_interface));
->>>>>         return regmap_update_bits(dwmac->regmap, reg,
->>>>> -                 dwmac->ops->syscfg_eth_mask, val << 23);
->>>>> +                 SYSCFG_MCU_ETH_MASK, val << 23);
->>>>>   }
->>>>>     static void stm32_dwmac_clk_disable(struct stm32_dwmac *dwmac, 
->>>>> bool suspend)
->>>>> @@ -348,8 +352,15 @@ static int stm32_dwmac_parse_data(struct 
->>>>> stm32_dwmac *dwmac,
->>>>>           return PTR_ERR(dwmac->regmap);
->>>>>         err = of_property_read_u32_index(np, "st,syscon", 1, 
->>>>> &dwmac->mode_reg);
->>>>> -    if (err)
->>>>> +    if (err) {
->>>>>           dev_err(dev, "Can't get sysconfig mode offset (%d)\n", err);
->>>>> +        return err;
->>>>> +    }
->>>>> +
->>>>> +    dwmac->mode_mask = SYSCFG_MP1_ETH_MASK;
->>>>> +    err = of_property_read_u32_index(np, "st,syscon", 2, 
->>>>> &dwmac->mode_mask);
->>>>> +    if (err)
->>>>> +        dev_dbg(dev, "Warning sysconfig register mask not set\n");
->>>>
->>>> Isn't this an error , so dev_err() ?
->>> No, it is only "warning" information, for MP1 the mask is not needed 
->>> (and for backward compatibility is not planned to put mask parameter 
->>> mandatory)
->>
->> Should this be an error for anything newer than MP15 then ?
-> For MP25, no need of mask, so for moment it is specific to MP13.
+> You're saying smp_wmb() in connect() is too much for the hot path, do I
+> understand correctly?
 
-Make this a warning for MP15, error for MP13, do not check st,syscon 
-presence for MP2 at all. Would that work ?
+Yes, and now I think WARN_ON_ONCE() would be enough because it's unlikely
+that the delay happens between the two store ops and concurrent bpf()
+is in progress.
+
+If syzkaller was able to hit this on vanilla kernel, we can revisit.
+
+Then, probably we could just do s/WARN_ON_ONCE/unlikely/ because users
+who call bpf() in such a way know that the state was TCP_CLOSE while
+calling bpf().
+
+---8<---
+diff --git a/net/unix/unix_bpf.c b/net/unix/unix_bpf.c
+index bd84785bf8d6..46dc747349f2 100644
+--- a/net/unix/unix_bpf.c
++++ b/net/unix/unix_bpf.c
+@@ -181,6 +181,9 @@ int unix_stream_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool r
+ 	 */
+ 	if (!psock->sk_pair) {
+ 		sk_pair = unix_peer(sk);
++		if (WARN_ON_ONCE(!sk_pair))
++			return -EINVAL;
++
+ 		sock_hold(sk_pair);
+ 		psock->sk_pair = sk_pair;
+ 	}
+---8<---
 
