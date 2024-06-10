@@ -1,120 +1,137 @@
-Return-Path: <netdev+bounces-102298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B3E3902438
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 16:40:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B9EC90243A
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 16:40:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FB3FB2435C
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 14:40:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AED721F249C3
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 14:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D2212F5BE;
-	Mon, 10 Jun 2024 14:40:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F8F712FF86;
+	Mon, 10 Jun 2024 14:40:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="U6GF4YgN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="kfWY4TsC"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A930A80BE5
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 14:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195AB80BE5
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 14:40:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718030442; cv=none; b=Qq9yNSla+6ZMT3V7GtqWRYehu4X+Yv1xT9ghitnebKkQDU4eUh4rOqUXM24l5mpNnD1AHRFpgGsSasQtsqDWAdwbOxDncVq0oQ8LRjBPVmfkwzU2GvlZk+EFl/R/0aSYahVKCZpt5hdM2czXz6gHsfZnWLIOcL0UqMt2QxR25fE=
+	t=1718030446; cv=none; b=q9SaYhzJiXQrpdyZwwhb8za01a9IYU1ymGlRMRh6QROvNYUx83Nv84hr9om98vfcYnOjEPc9JyWQRCQty8OagQio22Wj2gxft291Ocyeb+9g7L7gIPoFtdt3B2Uqo1pFfIG62HC5WAgqOf4gQ1k8KoSdfGkgWh1Bi2ff1mZ/Am0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718030442; c=relaxed/simple;
-	bh=CG3E/lWa2HbQ5Ft+v2UKDjTAYRT4JPotru51yN4MBVw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=lKKzJxmCaaYpYjUHZ8hy2JaBPF56rIUujkJWE8wIN9o8Qm7Z4/zYxC7FHZdj1XzR+L56HBfDY3cuP34OjC06X9VDrOarN0MvhzUseNIpIngQTuupQSti2tjoEFL8unhGmKA7fYNlcIPZHRSNTWNv4aLX30fpZeqikZjSrhoEYF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=U6GF4YgN; arc=none smtp.client-ip=78.32.30.218
+	s=arc-20240116; t=1718030446; c=relaxed/simple;
+	bh=8cgXOuc05YqlvcSTRVt5oHwmke6xdfBgQiSijkGOGfg=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=I3NzxNRnYBWI2Iyirau7ztB7jAKWh3DyUFyWsNYOAfSnVyG7M/nFR4xnZBylJn3juFoL5JVJFO6i0e+WMvaJhnWNSUg4J7y9V/ozKr3bmqsCvqPr2enK8NzybBydGRcADUFB7CiSUZYl4D+VtXwh932BXU/F1kPRkDz2Vx1fxSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=kfWY4TsC; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=CAzlZ/VNndl4AKegQFi0JffzH+O3JQElVuoC5uZz9qc=; b=U6GF4YgN3Vi6k0LXMKBgQ2XAfR
-	20erK5ZVMUuBt9yBkPFzPKw1Sw82O5TxYQE2i15OZDIKrsLDBiw5/WAKehddfV/PhIIFpjn254xtN
-	ShpD12vsLP0yH9lx1xWgOdaK50M8k4APqbvxnyiDIbRh1L3lMbUIhzy0HzT1JdE01cnVdFZ/XT61u
-	69kttqT/fAWqj9YKWHSV6OzzJCl5h1N401eVE4ki0ENPquT6Mj57WmzeQbYegzqt0XHDju8fCAUmz
-	ectnd1NRBwT00YCqq2J1U3Rb/EFmcqwv7dmYgrsMQZrsnxp2qP5hV+UJg3PExC+LRqBm+7ralTQh4
-	IjCW/hRA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39964)
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Z2ysErSY7/KD9NFUvu+f/pl6Tbexshy7z97dxZsQWrs=; b=kfWY4TsCcc1grEGTbn+Brd+Lrn
+	m5o0JB6UbNBZhCHcgxPXyICBmOv1uKggVfJOplpzdr971WSYcvl+5mNLlHrUbG2eePp89y3jv2uYK
+	pdtXsgyGInPMZIOpZR06j9Fz3RKcchR9hMadm0Np5igW8Lft5oPCgGog2Mxy2vJgcsH2AKGFsHFId
+	3T5vf9RQfy9eOpiNGvUV4iZ8Dd5TPj8C/P8bsCUOCbuLobabkH3Bmg98wugOdciQgoZZwPkgjYMF0
+	/wK7Yd1iWTCLRMZNqEzzzLFP2JS03ADPRynhc2q9DA9623vdBUC5YRXEZaC5uXQFw2Z/rIdWuch/8
+	BzRn9qAg==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:46476 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sGgC0-0001eS-1p;
-	Mon, 10 Jun 2024 15:40:16 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sGgBy-0006xF-Fk; Mon, 10 Jun 2024 15:40:14 +0100
-Date: Mon, 10 Jun 2024 15:40:14 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1sGgCE-0001eh-2K;
+	Mon, 10 Jun 2024 15:40:31 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1sGgCH-00Facn-T6; Mon, 10 Jun 2024 15:40:33 +0100
+In-Reply-To: <ZmcQTuR5IKRp0pgy@shell.armlinux.org.uk>
+References: <ZmcQTuR5IKRp0pgy@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 To: Serge Semin <fancer.lancer@gmail.com>
 Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Halaney <ahalaney@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jose Abreu <joabreu@synopsys.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Romain Gantois <romain.gantois@bootlin.com>
-Subject: [PATCH net-next 0/5] net: stmmac: provide platform select_pcs method
-Message-ID: <ZmcQTuR5IKRp0pgy@shell.armlinux.org.uk>
+Subject: [PATCH net-next 1/5] net: stmmac: add select_pcs() platform method
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1sGgCH-00Facn-T6@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Mon, 10 Jun 2024 15:40:33 +0100
 
-Hi,
+Allow platform drivers to provide their logic to select an appropriate
+PCS.
 
-This series adds a select_pcs() method to the stmmac platform data to
-allow platforms that need to provide their own PCSes to do so, moving
-the decision making into platform code.
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 7 +++++++
+ include/linux/stmmac.h                            | 4 +++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-This avoids questions such as "what should the priority of XPCS vs
-some other platform PCS be?" and when we provide a PCS for the
-internal PCS, how that interacts with both the XPCS and platform
-provided PCS.
-
-Note that if a platform implements the select_pcs() method, then the
-return values are:
-- a phylink_pcs pointer - the PCS to be used.
-- NULL - no phylink_pcs to be used.
-Otherwise (if not implemented or returns an error-pointer), then
-allow the the stmmac internal PCS to be used if appropriate (once
-that patch set is merged.)
-
-Patch 1 introduces the new method.
-Patch 2 converts Intel mGBE to use this to provide the XPCS and
- removes the XPCS decision making from core code.
-Patch 3 provides an implementation for rzn1 to return its PCS.
-Patch 4 does the same for socfpga.
-Patch 5 removes the core code returning priv->hw->phylink_pcs.
-
-No functional change is anticipated. Once this has been merged, it
-will be expected that platforms should populate all three PCS
-methods or none of the PCS methods.
-
- drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c   | 11 +++++++++++
- drivers/net/ethernet/stmicro/stmmac/dwmac-rzn1.c    |  7 +++++++
- drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c |  7 +++++++
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c   | 10 +++++++---
- include/linux/stmmac.h                              |  4 +++-
- 5 files changed, 35 insertions(+), 4 deletions(-)
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index bbedf2a8c60f..302aa4080de3 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -949,6 +949,13 @@ static struct phylink_pcs *stmmac_mac_select_pcs(struct phylink_config *config,
+ 						 phy_interface_t interface)
+ {
+ 	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
++	struct phylink_pcs *pcs;
++
++	if (priv->plat->select_pcs) {
++		pcs = priv->plat->select_pcs(priv, interface);
++		if (!IS_ERR(pcs))
++			return pcs;
++	}
+ 
+ 	if (priv->hw->xpcs)
+ 		return &priv->hw->xpcs->pcs;
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index 8f0f156d50d3..9c54f82901a1 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -13,7 +13,7 @@
+ #define __STMMAC_PLATFORM_DATA
+ 
+ #include <linux/platform_device.h>
+-#include <linux/phy.h>
++#include <linux/phylink.h>
+ 
+ #define MTL_MAX_RX_QUEUES	8
+ #define MTL_MAX_TX_QUEUES	8
+@@ -271,6 +271,8 @@ struct plat_stmmacenet_data {
+ 	void (*dump_debug_regs)(void *priv);
+ 	int (*pcs_init)(struct stmmac_priv *priv);
+ 	void (*pcs_exit)(struct stmmac_priv *priv);
++	struct phylink_pcs *(*select_pcs)(struct stmmac_priv *priv,
++					  phy_interface_t interface);
+ 	void *bsp_priv;
+ 	struct clk *stmmac_clk;
+ 	struct clk *pclk;
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.30.2
+
 
