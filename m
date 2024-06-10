@@ -1,155 +1,145 @@
-Return-Path: <netdev+bounces-102164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71B84901B89
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 09:07:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC167901BA1
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 09:17:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F3671C2113E
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 07:07:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 970F01F22215
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 07:17:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DD4B1C6AF;
-	Mon, 10 Jun 2024 07:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CFDD1E876;
+	Mon, 10 Jun 2024 07:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="VeBkoF70"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F541BF2A
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 07:07:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA321946F;
+	Mon, 10 Jun 2024 07:17:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718003254; cv=none; b=XKBfGRHBoyvR7ney9xGYRsCyX+c4Qm9NXhJFTY1JlLeiGf7lHZabEWJcQQjlDETrqnNyGcvY5rw6qLyDKe63907C6EnaULhufPl7u+2D+bh754jp8E5EYn8EsiY6+1WAt53KVPOdoWkZ2vpJLGysHEbF+7/jnP46a6IPcBwspwY=
+	t=1718003851; cv=none; b=e29mNPcmxruetI1K/YLNKIx19E6K7Mi+twImpudIOCxGMuiNzf0ZxFLP/lf62wbGZJtrN1DeHj0+eica7J9l5nfDU5MDRAHkNhXZ1atdGZKA8NUJC/vXmGTV5v98M2H2jbHkrxouR+ynq+qaJ/l2CIy03jOAOc8UpXuDs5c5xSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718003254; c=relaxed/simple;
-	bh=RaHyHSxriqBbzMxLUty0EheUNUvcvMTdWobKqxk4+xE=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=J0EvK3ajNd0r5ukRcRsDdwyLSl8p7mIRVxspJvlHoVPRGadDJ1hFdDaZbqwqHc1Tv/qngYetqm1ITJdd+LNcseTucF3Fg5dFG3I8XlFe7EfH8TmzQ9E0QpNkTT6kQbqOl2v9DxEiVrhQI2+avwf+6UWkS0EAl+smSsX21Kkivf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3745fb76682so44607325ab.2
-        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 00:07:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718003252; x=1718608052;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aOWDa8s7scwwzepO7HM8stjaYWxEuHOf7DjzQ2t/x20=;
-        b=qfu6Pfxd1uLqqPmy4uGmVef18hTy/3h9Uc4pKN5ftue3crzZgbKCAS2FczUl1wqS54
-         NNlh2apGLbNO45UUjvxD9t/7YMTYaBjfnH1uSkWTtILa17vctJanU8YremHk4MObh9Dh
-         qGNYC18/sLU22NmD2jaCiRXgNYVJnt6p5xa0gw3KHGdDSD2OvWDEt6L7MKbPYDdVYMIU
-         Zmkwxn2C3krzVQXZ9nIIh+odOC1rosimIURvl97EWXBZsj0ITNhU6S/Bsdp1gf6KN7rt
-         E0K90oRD9rAquunM4HbIQzza5k0HCq51Ym4H1jl9vUWpPwICjkARne4yJ5fTN6lr/8+X
-         TOqA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpSNBwBJAtueBk8Mb63aYUjLGg8dnnPGwjQbzd6NR9DFxtaUKK06Mo+V0XeH3xTciGvUGKiKrdzfnsOA8sJVXvFN4ci4fZ
-X-Gm-Message-State: AOJu0YxG4K9FewL17pewTkDkq1VMr8h76d7n4BXgl9vmwqCmn6I6fRpY
-	vnOjsd+DjESvd2rXqzplvqvOXWttTqCUB8wmBa3lO4HH/e0u+JVkWnuqpQR0zoz3sGrnrgeMoGT
-	X/LWiquoxtOOXQSbvRrn3hMk2gU85q2JZV8rTEl1sQzXq5uAMCHi8zKY=
-X-Google-Smtp-Source: AGHT+IE2s84k+Qu3XNTICX1W0U0I076P1nY/KKjv8VFmf3d/qG9B0njUo8HMbxxfLpWDKLhXtSEGe0SLsTxUzC+wpEV7bO4IC+Ox
+	s=arc-20240116; t=1718003851; c=relaxed/simple;
+	bh=HL1/PgFcmvtq8Mgs03MygUKUe0HGx+ZKEBK7mpchO1c=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SWT2FGVQsAZdaiZkQS4paB7gyuOWqDACfTWuYF6KxmUwKTL6HekPNN2woAc8mQazc/gofRCt+Ch7WKBHAtxAtQXrPVG7a2t1g+WNC45G6T2G592kl2cJhz+kFA3RSo0Ck8BX4VG8iRGhUwOV9KPm19ZXFx+tHgWlOB+rqtUa7Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=VeBkoF70; arc=none smtp.client-ip=91.207.212.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 459Lv4or018093;
+	Mon, 10 Jun 2024 09:16:59 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=selector1; bh=ywgMJ0d2V3+vIlguLKK9it
+	AB89YC4L19ERf/9tF4bzM=; b=VeBkoF70/fwECtDm4mHRr0Zb2ky3B6Yvxu6Rj/
+	BVbEoElFZzv1eAOAYlfs5z6718PeInL+KrTc7o1TOkKScQFd6pH1wNfhg2EuCxFF
+	NzZMR+bUqseslvwu71xf0PJzXpe2qE8zdAWXZAHXyusuMcMX+199nWP/XHN8ZLke
+	Y4JsajJzcWgxvM7a+qCUy67pzhRzWBKJtX2dFRvHg7b0YxgKGeXmJXkpUrpX26OE
+	kD3Uy8xYQADW2zeIFbfGDwm0T7t+/Zx677yd2iLspK2S+Bl0u9PLCpU4YHAI0IMd
+	Rkt8n3NC8nHd04kzVRyMEQ59R5ixRIfP7f9WTLCuhoyoPpDQ==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yme6d5cb4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Jun 2024 09:16:55 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 2B42D40047;
+	Mon, 10 Jun 2024 09:16:22 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 75074210757;
+	Mon, 10 Jun 2024 09:15:07 +0200 (CEST)
+Received: from localhost (10.48.86.164) by SHFDAG1NODE2.st.com (10.75.129.70)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 10 Jun
+ 2024 09:15:07 +0200
+From: Christophe Roullier <christophe.roullier@foss.st.com>
+To: "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+        Mark
+ Brown <broonie@kernel.org>,
+        Christophe Roullier
+	<christophe.roullier@foss.st.com>,
+        Marek Vasut <marex@denx.de>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: [net-next,PATCH v6 0/8] Series to deliver Ethernet for STM32MP13
+Date: Mon, 10 Jun 2024 09:14:51 +0200
+Message-ID: <20240610071459.287500-1-christophe.roullier@foss.st.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1561:b0:375:a50d:7f2d with SMTP id
- e9e14a558f8ab-375a50d8283mr2045565ab.1.1718003252146; Mon, 10 Jun 2024
- 00:07:32 -0700 (PDT)
-Date: Mon, 10 Jun 2024 00:07:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000009140e4061a83cda3@google.com>
-Subject: [syzbot] [net?] WARNING in bond_xdp_get_xmit_slave (2)
-From: syzbot <syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com>
-To: andy@greyhouse.net, davem@davemloft.net, edumazet@google.com, 
-	j.vosburgh@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
+ (10.75.129.70)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-10_02,2024-06-06_02,2024-05-17_01
 
-Hello,
+STM32MP13 is STM32 SOC with 2 GMACs instances
+    GMAC IP version is SNPS 4.20.
+    GMAC IP configure with 1 RX and 1 TX queue.
+    DMA HW capability register supported
+    RX Checksum Offload Engine supported
+    TX Checksum insertion supported
+    Wake-Up On Lan supported
+    TSO supported
+Rework dwmac glue to simplify management for next stm32 (integrate RFC from Marek)
 
-syzbot found the following issue on:
+V2: - Remark from Rob Herring (add Krzysztof's ack in patch 02/11, update in yaml)
+      Remark from Serge Semin (upate commits msg)
+V3: - Remove PHY regulator patch and Ethernet2 DT because need to clarify how to
+      manage PHY regulator (in glue or PHY side)
+    - Integrate RFC from Marek
+    - Remark from Rob Herring in YAML documentation
+V4: - Remark from Marek (remove max-speed, extra space in DT, update commit msg)
+    - Remark from Rasmus (add sign-off, add base-commit)
+    - Remark from Sai Krishna Gajula
+V5: - Fix warning during build CHECK_DTBS
+    - Remark from Marek (glue + DT update)
+    - Remark from Krzysztof about YAML (Make it symmetric)
+V6: - Replace pr_debug by dev_dbg
+    - Split serie driver/DTs separately 
 
-HEAD commit:    f8f0de9d58d9 Merge branch 'mlx5-fixes'
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=1638d2ce980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b9016f104992d69c
-dashboard link: https://syzkaller.appspot.com/bug?extid=c187823a52ed505b2257
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Christophe Roullier (3):
+  dt-bindings: net: add STM32MP13 compatible in documentation for stm32
+  net: stmmac: dwmac-stm32: Mask support for PMCR configuration
+  net: stmmac: dwmac-stm32: add management of stm32mp13 for stm32
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Marek Vasut (5):
+  net: stmmac: dwmac-stm32: Separate out external clock rate validation
+  net: stmmac: dwmac-stm32: Separate out external clock selector
+  net: stmmac: dwmac-stm32: Extract PMCR configuration
+  net: stmmac: dwmac-stm32: Clean up the debug prints
+  net: stmmac: dwmac-stm32: Fix Mhz to MHz
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f3fd9f91ee48/disk-f8f0de9d.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4f0153e67f84/vmlinux-f8f0de9d.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/6abab02f18cf/bzImage-f8f0de9d.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
-
-bond9: Unknown bonding mode 6 for xdp xmit
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 14901 at drivers/net/bonding/bond_main.c:5502 bond_xdp_get_xmit_slave+0x519/0x690 drivers/net/bonding/bond_main.c:5502
-Modules linked in:
-CPU: 1 PID: 14901 Comm: syz-executor.1 Not tainted 6.10.0-rc1-syzkaller-00179-gf8f0de9d58d9 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-RIP: 0010:bond_xdp_get_xmit_slave+0x519/0x690 drivers/net/bonding/bond_main.c:5502
-Code: be 69 13 00 00 48 c7 c2 a0 73 54 8c e8 d0 35 1e fb eb 98 e8 69 96 41 fb 4c 89 e7 48 c7 c6 80 94 54 8c 89 da e8 48 50 31 05 90 <0f> 0b 90 eb a6 e8 4d 96 41 fb 48 85 db 74 0a e8 43 96 41 fb e9 72
-RSP: 0018:ffffc9000da6f6c8 EFLAGS: 00010246
-RAX: 2059da9abcd8c700 RBX: 0000000000000006 RCX: 2059da9abcd8c700
-RDX: ffffc9001616c000 RSI: 0000000000002218 RDI: 0000000000002219
-RBP: ffff888056026038 R08: ffffffff8176812c R09: fffffbfff1c3998c
-R10: dffffc0000000000 R11: fffffbfff1c3998c R12: ffff888057b5c000
-R13: ffff888057b5c000 R14: ffff888057b5cca0 R15: dffffc0000000000
-FS:  00007f8b32a0a6c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b30d22000 CR3: 00000000629b4000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- xdp_master_redirect+0x104/0x250 net/core/filter.c:4317
- bpf_prog_run_xdp include/net/xdp.h:518 [inline]
- xdp_test_run_batch net/bpf/test_run.c:313 [inline]
- bpf_test_run_xdp_live+0x15eb/0x1e60 net/bpf/test_run.c:384
- bpf_prog_test_run_xdp+0x80e/0x11b0 net/bpf/test_run.c:1275
- bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4291
- __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5705
- __do_sys_bpf kernel/bpf/syscall.c:5794 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5792 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5792
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f8b31c7cf69
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f8b32a0a0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007f8b31db4050 RCX: 00007f8b31c7cf69
-RDX: 0000000000000050 RSI: 0000000020000040 RDI: 000000000000000a
-RBP: 00007f8b31cda6fe R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000006e R14: 00007f8b31db4050 R15: 00007fff9cacb078
- </TASK>
+ .../devicetree/bindings/net/stm32-dwmac.yaml  |  43 ++++-
+ .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 174 +++++++++++++-----
+ 2 files changed, 169 insertions(+), 48 deletions(-)
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+base-commit: 28f961f9d5b7c3d9b9f93cc59e54477ba1278cf9
+-- 
+2.25.1
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
