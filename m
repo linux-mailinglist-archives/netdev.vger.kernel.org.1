@@ -1,99 +1,101 @@
-Return-Path: <netdev+bounces-102198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81566901DD4
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 11:08:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D002901DF0
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 11:16:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AFAAB265A7
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 09:08:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04DDD280F5B
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 09:16:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2EBB71B48;
-	Mon, 10 Jun 2024 09:07:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF5CD74054;
+	Mon, 10 Jun 2024 09:16:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aYT+xqOM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AFDE7404B;
-	Mon, 10 Jun 2024 09:07:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485E518C31
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 09:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718010446; cv=none; b=SZvKVHzDcZsR8+T+G9zRC/Pt90+QMcdC8xlJN5Q5V/oeVr+k516mX/3HC0iIFiSXLiLL9C3Kf8wAl2wuq+HWbBl4+eJvY7hh+cZtCX9HJNQTnSKXbIlcb9Av10/T9P5uIpSBzM+FbCn5vnzcX7cSah1gtUJ0RGw4hRQtpfxNKU0=
+	t=1718011007; cv=none; b=qlpZVc2nMvnCDeniiKHwiSugcFXOPmeDpaQNQjnvIkJK0FqcJGnQoih7Lc9MSAjvQxoxEo22bCbBhgCYLw32UZb5BmUVheCbRi8VIkRKceJ1vBNM/wfeWeYQvsjJxXA2nUMZ5DQylg0jXaN1NYAgJ93aTTZVxKKV01pkAjlpANw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718010446; c=relaxed/simple;
-	bh=SzjKD3HfHsc1onvN3RhcIqrm0rpUg3M9t6rNMB763Ik=;
-	h=MIME-Version:Content-Type:Date:From:To:Cc:Subject:In-Reply-To:
-	 References:Message-ID; b=TM5zs9UXCAYA/NEsRrwDDSiCmBlLoRsuv4ecruPn42+d8U1wODW76RsmK4RoJifhlTaMuQ+vU2XkFSg9J87q+2yH4dz1Pz9O2AfbiXT+94xf7nUF5vCS81fR8fqpsEIcSekHnJWqBgoZRFEazBP1oicmpK0sUXGqq6/7I3rYD5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=194.37.255.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
-Received: from [127.0.0.1] (helo=localhost)
-	by relay.expurgate.net with smtp (Exim 4.92)
-	(envelope-from <prvs=9905c7c8d6=ms@dev.tdt.de>)
-	id 1sGazm-004F3I-97; Mon, 10 Jun 2024 11:07:18 +0200
-Received: from [195.243.126.94] (helo=securemail.tdt.de)
-	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ms@dev.tdt.de>)
-	id 1sGazl-00HAGA-JS; Mon, 10 Jun 2024 11:07:17 +0200
-Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id 42BCC240053;
-	Mon, 10 Jun 2024 11:07:17 +0200 (CEST)
-Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id BA8BB240050;
-	Mon, 10 Jun 2024 11:07:16 +0200 (CEST)
-Received: from mail.dev.tdt.de (localhost [IPv6:::1])
-	by mail.dev.tdt.de (Postfix) with ESMTP id D56F426128;
-	Mon, 10 Jun 2024 11:07:15 +0200 (CEST)
+	s=arc-20240116; t=1718011007; c=relaxed/simple;
+	bh=R8putuANeMom2KWkTIAXljKxoh8gGh2IOBJmBybdgRQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hPG/5C+lrazHmmo8jm7GlSov+GbCn0L6RqmktkZ6ju+D9hD00nMxh0LMtGiPr+ZvQQygcT/4jv/M3mmmoSOM4vz7q7palm7oRnnhhooHhF4Dg0SdC9Y97xd5FdkNN689H0FDQBLnNjkb2L9GCr5ixGil5JeWcFUHOTsriRHxZ4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=aYT+xqOM; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=cm5RXgxrGyPx0HOxnj0oADHLpbubFzGyui01dq/eV+M=; b=aYT+xqOMm+MujVFCcpmFNmy578
+	TZcFmLK5hZ+5E2C1Yxnh9/hB8Uscvw7lDygmSQiSEZSVQN8veiUgHamVOpCSvvmTQqRoLno+P7SXe
+	Pa3TgT7KxaDVZ2Hr4pKozzH/9l84aU20hSSHxgboUyKaqkng7Sv3G+bCzr04bU/A0Wt18IpiEBtai
+	QoHMnocJlztKS2UgS6JiYXMqiLg5N7qC+hBQyutJFjyzeDYZ3CXQSrlJfIFodTTEyHw4rId6s2LCx
+	N4RwKLvxQxHcsQqd81urbHiD8FW7D7xTGULLFdXCPZ37COcquJ/MmVyBOvc6RqoHTi8FaG91mC/6e
+	QGgnIsAw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59778)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sGb8e-0001DJ-2T;
+	Mon, 10 Jun 2024 10:16:28 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sGb8e-0006lD-BD; Mon, 10 Jun 2024 10:16:28 +0100
+Date: Mon, 10 Jun 2024 10:16:28 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Halaney <ahalaney@redhat.com>
+Cc: Serge Semin <fancer.lancer@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH RFC net-next v2 1/8] net: stmmac: add infrastructure for
+ hwifs to provide PCS
+Message-ID: <ZmbEbIQY+6c/qadI@shell.armlinux.org.uk>
+References: <Zlmzu7/ANyZxOOQL@shell.armlinux.org.uk>
+ <E1sD0Ol-00EzBh-3f@rmk-PC.armlinux.org.uk>
+ <gyiomer5eqxtq7q7zo5lwtokvdugs4jlb3nux3ry6xf5j27wtp@wl6s643vbn75>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Mon, 10 Jun 2024 11:07:15 +0200
-From: Martin Schiller <ms@dev.tdt.de>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: martin.blumenstingl@googlemail.com, hauke@hauke-m.de, andrew@lunn.ch,
- f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 01/13] dt-bindings: net: dsa: lantiq_gswip: Add
- missing phy-mode and fixed-link
-Organization: TDT AG
-In-Reply-To: <ae996754-c7b9-4c46-a3dd-438ab35d6c67@kernel.org>
-References: <20240606085234.565551-1-ms@dev.tdt.de>
- <20240606085234.565551-2-ms@dev.tdt.de>
- <ae996754-c7b9-4c46-a3dd-438ab35d6c67@kernel.org>
-Message-ID: <c410ac7cce5fe6bf522bac6edb18440d@dev.tdt.de>
-X-Sender: ms@dev.tdt.de
-User-Agent: Roundcube Webmail/1.3.17
-X-purgate-ID: 151534::1718010438-2FD8C746-4AF8A988/0/0
-X-purgate-type: clean
-X-purgate: clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <gyiomer5eqxtq7q7zo5lwtokvdugs4jlb3nux3ry6xf5j27wtp@wl6s643vbn75>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 2024-06-10 10:55, Krzysztof Kozlowski wrote:
-> On 06/06/2024 10:52, Martin Schiller wrote:
->> From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
->> 
->> The CPU port has to specify a phy-mode and either a phy or a 
->> fixed-link.
->> Since GSWIP is connected using a SoC internal protocol there's no PHY
->> involved. Add phy-mode = "internal" and a fixed-link to describe the
->> communication between the PMAC (Ethernet controller) and GSWIP switch.
+On Wed, Jun 05, 2024 at 02:57:34PM -0500, Andrew Halaney wrote:
+> On Fri, May 31, 2024 at 12:26:15PM GMT, Russell King (Oracle) wrote:
+> > @@ -310,6 +315,9 @@ struct stmmac_ops {
+> >  	void (*core_init)(struct mac_device_info *hw, struct net_device *dev);
+> >  	/* Update MAC capabilities */
+> >  	void (*update_caps)(struct stmmac_priv *priv);
+> > +	/* Get phylink PCS (for MAC */
 > 
-> You did nothing in the binding to describe them. You only extended
-> example, which does not really matter if there is DTS with it.
-> 
-> Best regards,
-> Krzysztof
+> nit: unclosed parenthesis
 
-OK, so I'll update subject and commit message to signal that we only
-update the example code.
+Please learn to trim your review replies so your patch submitters don't
+have to waste time scroll through lots of useless context. This has
+been part of good netiquette for decades. Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
