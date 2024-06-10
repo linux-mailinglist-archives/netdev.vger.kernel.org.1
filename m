@@ -1,192 +1,167 @@
-Return-Path: <netdev+bounces-102344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07F2490291F
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 21:20:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D682902936
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 21:25:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96FDC282689
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 19:20:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CA93B229D2
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 19:25:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A3E14D449;
-	Mon, 10 Jun 2024 19:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D594147C6E;
+	Mon, 10 Jun 2024 19:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="el4krPbO"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TrvEcasP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2087.outbound.protection.outlook.com [40.107.223.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B42B14A85;
-	Mon, 10 Jun 2024 19:20:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718047215; cv=none; b=WKcj9cJrciRrIjg+mlI6OrzgcOxcDVj1o5q+vWozcDEB3/PDipYaZMxjX2eoniH+xsPANZpFrEtpcYmN7xYGJpQ6dIqfEE2gtog5MqO3YE2O7B2pg5dAmlyldPokM31rE5wr9vnEAGGC4tCyg3IRkVuIcejouZLq0MUZ3TcR+m0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718047215; c=relaxed/simple;
-	bh=Cy140D/wRN6P1O46vTjuDRmJh0MS1NceCS6uXkJqXLk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TJT7UAGD/rqbEbEP0IS5bq980Yc4GprU8esfga8gfn+T+89/xvz9GDjjN3EsyYE4d2/4qTOa/iorrNqGPYcLOYLHD2mI/erwtF/eDIxawFp5hSw2A9OgUfPkNZM1obNGqXwaPi+UZC+a+RrGBp2iyZhvhzqFJ4GK1+wJSub6f8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=el4krPbO; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-35f27eed98aso338505f8f.2;
-        Mon, 10 Jun 2024 12:20:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718047212; x=1718652012; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ds39/wk1Vz6prMfj1gC31qm8pnLcqbnW8HnwNU8zLQg=;
-        b=el4krPbOumDvyC9M1bKQh2oLjPIlVR0/xfL0Tvp+DhIET9QAhcdhmKTH118Yto2lnd
-         +HkbJ2b7Lr7Br9D/PwyTavSeg8h8uSIszeHJuItXQMyHyXABr1iIBu5L+ePvSy+Te6X2
-         gVfTbUTaFX6ArMv0MpTtQvZAM1GD6oykAZDwIuAc85tGsMZTT/Anro+x33Rw42jdltZF
-         qr3BSVsAS3BEf91deqHfgukGnCIggTA2+dT/v+yxQEI0fYMH74K6YCG11vlwF7Y21IaP
-         tLhAZQoaq/1mImHEoA/aIRAkHadxuYuA396ORIB64m1vfXHYiMHC+1s4FtozuCpQY1uO
-         PR5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718047212; x=1718652012;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ds39/wk1Vz6prMfj1gC31qm8pnLcqbnW8HnwNU8zLQg=;
-        b=dtpqOd+yp9ZPGSzchk2JrrDILAPlC6D5Rz6l7DxBZGMJkkJebKEGEsS+fHnlCcpvBs
-         cTNqiVMl/zRmRXZQfm3bA/euyXaZr4C13i3BkLQ5182No3Ose7itfyyVObZ9CivGZyle
-         hnYnIcFZpDXvItzLGEE9lLXACqQ2BTuERi3oAujxt2cIhVPSb5zh9/WgZQLsF73XiUC7
-         ZquiGZvKOg+SRw/O5V7Bw+NcndcPyi0glh56sg3HdvwJF4QrUgoCOpb6Pk+HT0B6kcuj
-         baAsTUkiPXDI+Nw0Kt0lJkkiCFIBBC9alZbw9SHZjlzzh04POdjtvN0+nGe6EiVhFuoB
-         XTZA==
-X-Forwarded-Encrypted: i=1; AJvYcCVU7f9FHVVmZH+K8Pri0GKi/2fQogNnqv/veYlP0xtPWoc+CvMj8z3apWndKqTEqUArzLsZgAW/Qwl2B9iEt2oNSn8pvsY7706u/KfHtX+PTcXlXx+MUkMb3Y060XCqaqS3ZtqJ/90PPqX5J1NroYX3eD8jNdsF99e8XSBj6mmGhUAR1ZEDwz5JruF3xDkjXrgKLipS5gInvNj9cpwFGsOw+JIBAONQtqVfbPwhpQvTPOHqpZJhc6AbQ0z7pH0uUyhlGoSO45wPmpMt2vD8PRDgkZFDrDcEafkXGU6SJWcXywTaCjddQCaQwLKnNDD+AAhAYpkCcv2CZIH2yqnwRQAT/gkIQKxE4+GeHEC2YsDWKy8iMaTmDQ1iE1eFTrPg9dEcqnflZDqUQWg1Oeb0JOuyP+XCCpZyvv+liI0ltRdFGW+JSdj1atOXwyif5uB3S+dnuEj+wSY1t242eDonKoBTKny0cfhQNyRfI++bXHzWf7a0fUth5qjRLYWdUNpV0heEZ4XpqA==
-X-Gm-Message-State: AOJu0YzKMvJLxWzt36ilC2Oo1WIg0ZVBLWYxtyuen7s/Bf01vJlQ1M7T
-	k3rgvG2UMz+LvHYI7EbrB6W7buc7WoPYl7YxIcH9b54IXGfXVdq8
-X-Google-Smtp-Source: AGHT+IHtyedrk98ou29Kg6rNsqOMEn95U01t7gSYrXBTrHwwR/KGG9pYFlYAQ/YJ7hVTZ+llph15Ng==
-X-Received: by 2002:a5d:4383:0:b0:35f:2af3:7843 with SMTP id ffacd0b85a97d-35f2af37959mr455787f8f.48.1718047211545;
-        Mon, 10 Jun 2024 12:20:11 -0700 (PDT)
-Received: from [192.168.42.64] ([148.252.129.53])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35f0d512556sm8313077f8f.29.2024.06.10.12.20.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Jun 2024 12:20:11 -0700 (PDT)
-Message-ID: <00c67cf0-2bf3-4eaf-b200-ffe00d91593b@gmail.com>
-Date: Mon, 10 Jun 2024 20:20:08 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A9D14A4FC
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 19:25:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718047537; cv=fail; b=LA0nOU/LOLnfAM77+mO7ZYDuTmc5j24PtEtCoHSqpHuCh1jb+LoItqlivunInOGoB97sC2kVwvKpQLTo6SUaFlpmt1rj/kWdOP8szVm787V9PHJdVj1kt5rzEiTEjZDVFJ1PQ9zhEvX1A20hLjymuu9Kj6cFjjUlnATtD/CGQLk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718047537; c=relaxed/simple;
+	bh=6fne+8UqHsGrGPIMcZNpL18EaHfnYVajgj3G/pcYzE8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sXZnmykYOMxcqgxfGfIVSCqeO4d3yHR1+/3NOdov+IY4+arWx2G35cgFxn9QtXsAPrOLrCY0l/oEM7botqOyjh8wzFo7widFosmmLbI84GONK3vdrYHmkNsYCxGf3+ZxRRL2/pydqp2wMMAzyqFzoIpz2W1t/gqSbQVCb2fEumo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TrvEcasP; arc=fail smtp.client-ip=40.107.223.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Eq1vXWwvpKTNeMNzWIoH3OoWs5sZpfdTkAxw2Sxe7CvQERU1OIkEvfw8wF8jHkUDTxLWNYqwfqdRYYedk64RT3V2QycG0l15Gb9qR3ba4iSSeuxfMgcn4+rydKfX+6TpHOsd/0lINKUgOxIqQnNl3SReinH9gVKlMg4mpuH2vmKcQ3pINVzt50BO5B13y+XAKUoiDj3ahzky0SQHpKQYqX1dT6+Bn2PADxhUK/s7GfQLow4tsuWQrMnGcC+ybvL7lzVJASm3/+VdV9CvLj1HQDujtVBNZLonJ+ZMwOHSpF+oF39cTQTq+wEgiq76qouEfXFlTDB5beAGPat+F4TWdg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WPbnT9544qLJc1nhGu8Ifw3rBxNJDltsp5eB26YfDzw=;
+ b=Qe4M3Cllv+jwPQTl+Z3UfJC6cnME4+9PCB1iH1ApT3xoIx2rlzBdbbqadIWTeh9Tunug0D9lnV8XxDMteOv3qiLXZj35wgIj9sxMQYsAUH670ISjDfmFc7//JMLJYmr21Ry8LDU/Ry6CMzHmNJfonPW7H7McJylVx2aFP7yhgEm0B7EI0lhtRIZHVnhLkmVyzTeIl057RFfj101nxjKztKGuJ55U42Rcul0oQLaI/ggpzXjeVXnsBVAAZwSQM7sql+YZBGpMXB1f7DY+Vpx97MD77F9p+KRUkdwYklOL13j5EhJ03FeYIo2KUTTkReZ/0G9zqlmTPjNU26tYz+EPuw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WPbnT9544qLJc1nhGu8Ifw3rBxNJDltsp5eB26YfDzw=;
+ b=TrvEcasPekv4ddzQbExHOkqjcO96K3Dw+msEo5A4hgoqNvQoPIxCD0COUljcSzrsdJvzwYUxwBziiPYoYVrhDwLTiNbMnkGRIFx+r4IOFpwMkyW8vEEye5bgoXBtd5Lg4ayRg6+qY+XNy1+TRFK+AoaGm78AhdqnQ8wmeX1UcGq6seWVjYjWGidKudxNLZHzm2sK+dLyuy5D6sUvvQRiJ6XW/63xP889yuIv9d3JUJtnqO2Uq6t5RaAfzv2gw7d5K4bR5PzuR2dovpf1XifJA4+zlXH1vPYiEMbewerwVffir3KqgL/ylRfNIEJu5Jcmv4Yn6PScNnfPhhEE7XNwOg==
+Received: from CH5P221CA0013.NAMP221.PROD.OUTLOOK.COM (2603:10b6:610:1f2::10)
+ by DM6PR12MB4155.namprd12.prod.outlook.com (2603:10b6:5:221::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.36; Mon, 10 Jun
+ 2024 19:25:27 +0000
+Received: from CH2PEPF00000144.namprd02.prod.outlook.com
+ (2603:10b6:610:1f2:cafe::c9) by CH5P221CA0013.outlook.office365.com
+ (2603:10b6:610:1f2::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7656.25 via Frontend
+ Transport; Mon, 10 Jun 2024 19:25:27 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH2PEPF00000144.mail.protection.outlook.com (10.167.244.101) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7677.15 via Frontend Transport; Mon, 10 Jun 2024 19:25:27 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 10 Jun
+ 2024 12:25:12 -0700
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 10 Jun
+ 2024 12:25:12 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Mon, 10 Jun
+ 2024 12:25:10 -0700
+From: William Tu <witu@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: William Tu <witu@nvidia.com>, <parav@nvidia.com>
+Subject: [iproute2-net] devlink: trivial: fix err format on max_io_eqs
+Date: Mon, 10 Jun 2024 22:24:51 +0300
+Message-ID: <20240610192451.58033-1-witu@nvidia.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 02/14] net: page_pool: create hooks for
- custom page providers
-To: David Ahern <dsahern@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>
-Cc: David Wei <dw@davidwei.uk>, Mina Almasry <almasrymina@google.com>,
- Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
- <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
-References: <20240530201616.1316526-3-almasrymina@google.com>
- <ZlqzER_ufrhlB28v@infradead.org>
- <CAHS8izMU_nMEr04J9kXiX6rJqK4nQKA+W-enKLhNxvK7=H2pgA@mail.gmail.com>
- <5aee4bba-ca65-443c-bd78-e5599b814a13@gmail.com>
- <CAHS8izNmT_NzgCu1pY1RKgJh+kP2rCL_90Gqau2Pkd3-48Q1_w@mail.gmail.com>
- <eb237e6e-3626-4435-8af5-11ed3931b0ac@gmail.com>
- <be2d140f-db0f-4d15-967c-972ea6586b5c@kernel.org>
- <20240607145247.GG791043@ziepe.ca>
- <45803740-442c-4298-b47e-2d87ae5a6012@davidwei.uk>
- <54975459-7a5a-46ff-a9ae-dc16ceffbab4@gmail.com>
- <20240610121625.GI791043@ziepe.ca>
- <59443d14-1f1d-42bb-8be3-73e6e4a0b683@kernel.org>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <59443d14-1f1d-42bb-8be3-73e6e4a0b683@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF00000144:EE_|DM6PR12MB4155:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8db954d3-e731-44bc-b32f-08dc89831561
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|82310400017|1800799015|376005|36860700004;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?uD2pWRNhergrBDCKNDhaK2ICvFQrIdoN2d8qJQNq556GGn3kQMVjPgWH81g2?=
+ =?us-ascii?Q?3Ot0TXAx8lpzQboKTdRup03NGEGdMn7J7Jyua1HFGl1SJpi0rkiB6TwWLLmm?=
+ =?us-ascii?Q?4DU330o7lXt5WgJ2Rr6HbQWmFeuWo4RViM5f9WF6xVTBYd5Nl6LzMfddu6C0?=
+ =?us-ascii?Q?Bb4OS2/P876qD9e3yYELmwDQD1/RBZywpjWv+jN/unyXf8WDtN8YQdNoh9Jm?=
+ =?us-ascii?Q?ZDmpNyrrPdzpajIg/FmyIIpwF9e125uaTtk7yakQdBFGr8euetk/MaaaKlVc?=
+ =?us-ascii?Q?WNKa7AcJsdSj9mvQUeM2x9EIcbXp5uzfQ8PISXZxtpE5mZstpkljFY2HPmCk?=
+ =?us-ascii?Q?rjp3LM8y9dlRqr8ZO0FYD+bFVZpatWG0pkzSorx4avtLK6hpM6iAcgVCmmmj?=
+ =?us-ascii?Q?nf+ha8IR8CpLwaMzzuW2Fh/RgzAQccXFtcU8oA7IzgXwp0ARSwH6LtPB+AAH?=
+ =?us-ascii?Q?WO3lR6oYtttiPLLb0kd5uLUx1U+v9JXTpnbjBgBcaRWoKz035/hnotURsrhu?=
+ =?us-ascii?Q?AbdWnm6Rqfh6aBr/o8yhkWixJGRd1L7ibXLK7xyq+o7v0mNEc7FfGpYJrtHi?=
+ =?us-ascii?Q?nlZqvKI2lLioSgCzOEOOIDo9yFqyiVZL/A8hQwddXDCiJ75fjUSSJLh8KKEs?=
+ =?us-ascii?Q?BReH0JoJN7wjE7R1GC68eNrx9s8pWNWUoTaczYH2xfcAbDGl1ZYilE0jm88W?=
+ =?us-ascii?Q?ljJOpvvlA8vmdanR33pibuyt8mSI0GEpiI2Ms3e9V3K+gsyIngN+tDR3awI4?=
+ =?us-ascii?Q?tv1t4bHgcdmdnWLH+qPxbuObRNimo0ykTrDxdHZe4jsL7dz8LDlwQOsnGs7S?=
+ =?us-ascii?Q?EuHbSI4QgNfMSmypzPPD6G8tbs97ShSAx5F4AcvLIFoQ7OL/j/0hio8e680c?=
+ =?us-ascii?Q?+qxnfUkkIOKtqSD/zK4ZZzyt/8mF39riR6ajIRVymfVKZaHZgydbGmeOuMfc?=
+ =?us-ascii?Q?NbiEL6BtInFbkID20A8vvPGMkmNCyC08fpoPhwUMMsIvBBVf9Rc0q3E5Edzn?=
+ =?us-ascii?Q?6uhWHuFBK8eZATQE0zai+gsn1CZLas6Ky1ru95AGNt7cZfrjuG0IMyvF/AaS?=
+ =?us-ascii?Q?QSPvjyeJc4bCcOrKBTXtHpn1MaaPY22eVi2ygBzkR9xGN+yREjpwk+qqiggd?=
+ =?us-ascii?Q?y2fmRmayHRiKhWakdG+Tfioz79LF4PKWMywX1UKWP3lt/egoG4buNa+k+TFE?=
+ =?us-ascii?Q?7JHxdoIPp7H+HLzV/Y/r8vRwUhC/O4ASMDBkg+KnPwWMGowmlOuba4nOmhq4?=
+ =?us-ascii?Q?BqseA7XY0oS368TK+UTn8orRTEnh0jNdr4dNj5vPrS4t8AsYDxKCxrnPFOTm?=
+ =?us-ascii?Q?nq3pqPprUDndBjQeIBXfcU1uVrUefv4b2yrQSqFhFnyDeZEDsSJGKFfXyLjL?=
+ =?us-ascii?Q?5GDUXQzh1jGzQlbnT6qq+4t/J8VAtXsRQIaFlDH/Evp3QA0g6A=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(82310400017)(1800799015)(376005)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2024 19:25:27.0495
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8db954d3-e731-44bc-b32f-08dc89831561
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF00000144.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4155
 
-On 6/10/24 16:16, David Ahern wrote:
-> On 6/10/24 6:16 AM, Jason Gunthorpe wrote:
->> On Mon, Jun 10, 2024 at 02:07:01AM +0100, Pavel Begunkov wrote:
->>> On 6/10/24 01:37, David Wei wrote:
->>>> On 2024-06-07 17:52, Jason Gunthorpe wrote:
->>>>> IMHO it seems to compose poorly if you can only use the io_uring
->>>>> lifecycle model with io_uring registered memory, and not with DMABUF
->>>>> memory registered through Mina's mechanism.
->>>>
->>>> By this, do you mean io_uring must be exclusively used to use this
->>>> feature?
->>>>
->>>> And you'd rather see the two decoupled, so userspace can register w/ say
->>>> dmabuf then pass it to io_uring?
->>>
->>> Personally, I have no clue what Jason means. You can just as
->>> well say that it's poorly composable that write(2) to a disk
->>> cannot post a completion into a XDP ring, or a netlink socket,
->>> or io_uring's main completion queue, or name any other API.
->>
->> There is no reason you shouldn't be able to use your fast io_uring
->> completion and lifecycle flow with DMABUF backed memory. Those are not
->> widly different things and there is good reason they should work
->> together.
+Add missing ']'.
 
-Let's not mix up devmem TCP and dmabuf specifically, as I see it
-your question was concerning the latter: "... DMABUF memory registered
-through Mina's mechanism". io_uring's zcrx can trivially get dmabuf
-support in future, as mentioned it's mostly the setup side. ABI,
-buffer workflow and some details is a separate issue, and I don't
-see how further integration aside from what we're already sharing
-is beneficial, on opposite it'll complicate things.
+Signed-off-by: William Tu <witu@nvidia.com>
+Fixes: e8add23c59b7 ("devlink: Support setting max_io_eqs")
+---
+ devlink/devlink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->> Pretending they are totally different just because two different
->> people wrote them is a very siloed view.
-io_uring zcrx and devmem? They are not, nobody is saying otherwise,
-_very_ similar approaches if anything but with different API, which
-is the reason we already use common infra.
-
->>> The devmem TCP callback can implement it in a way feasible to
->>> the project, but it cannot directly post events to an unrelated
->>> API like io_uring. And devmem attaches buffers to a socket,
->>> for which a ring for returning buffers might even be a nuisance.
->>
->> If you can't compose your io_uring completion mechanism with a DMABUF
->> provided backing store then I think it needs more work.
-
-As per above, it conflates devmem TCP with dmabuf.
-
-> exactly. io_uring, page_pool, dmabuf - all kernel building blocks for
-> solutions. This why I was pushing for Mina's set not to be using the
-> name `devmem` - it is but one type of memory and with dmabuf it should
-> not matter if it is gpu or host (or something else later on - cxl?).
-
+diff --git a/devlink/devlink.c b/devlink/devlink.c
+index 03d2720225a2..4929ab08ac40 100644
+--- a/devlink/devlink.c
++++ b/devlink/devlink.c
+@@ -4761,7 +4761,7 @@ static void cmd_port_help(void)
+ 	pr_err("       devlink port function set DEV/PORT_INDEX [ hw_addr ADDR ] [ state { active | inactive } ]\n");
+ 	pr_err("                      [ roce { enable | disable } ] [ migratable { enable | disable } ]\n");
+ 	pr_err("                      [ ipsec_crypto { enable | disable } ] [ ipsec_packet { enable | disable } ]\n");
+-	pr_err("                      [ max_io_eqs EQS\n");
++	pr_err("                      [ max_io_eqs EQS ]\n");
+ 	pr_err("       devlink port function rate { help | show | add | del | set }\n");
+ 	pr_err("       devlink port param set DEV/PORT_INDEX name PARAMETER value VALUE cmode { permanent | driverinit | runtime }\n");
+ 	pr_err("       devlink port param show [DEV/PORT_INDEX name PARAMETER]\n");
 -- 
-Pavel Begunkov
+2.38.1
+
 
