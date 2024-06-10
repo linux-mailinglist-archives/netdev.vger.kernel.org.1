@@ -1,96 +1,145 @@
-Return-Path: <netdev+bounces-102209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7026F901EC3
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 12:05:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F0F901EC6
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 12:05:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B1311F24EEE
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 10:05:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BE511F25F9A
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 10:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C09E757F5;
-	Mon, 10 Jun 2024 10:05:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="MuHTmKe8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C059D7603A;
+	Mon, 10 Jun 2024 10:05:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E6F282EA
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 10:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF2F7440B;
+	Mon, 10 Jun 2024 10:05:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718013903; cv=none; b=bGNAw3dgWNeCfAdM4K/z4oX+quA62gIItezCHMlzrqNa31+eM19JJf8GipFIJYiTnLyidHRUslnhiuDl4Vd4EbBvL8pO1qoV/vBzW6tS/of2773oUsahWCKCm3F37ng6oNlzVGp1OFmrCu/uvnuNDhbtXK8c2wuhEZGHbBYhwOM=
+	t=1718013919; cv=none; b=XoaZKfCuRZqjMiodv4Qz8stdP7oFGs9RUSdJnDVUSzaOTtUdgKrzOXT8ZUNQ709i/VEBdZHzQXyNjFG+m0t9DKltz4ID271VGGj8dP0BwyNBt1opgX85ayqFpbi8z1c+CeRqFc2qB1zrq5MUBMW/n6cug9zMvEVPx4KHDXls9yU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718013903; c=relaxed/simple;
-	bh=FZpDLIaQNYYC+V/79I1F+1i2/6aon2ON8wkYcedYZGE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wymj4KThiJULpiLL06afa/fO25grldsb+ohnpqqkF6MaeogTJ40MPrs7ZXJmfTvuQX56v+nvad0u3SCqLktlAIMfWjY50sFHW1nWhar3CJ969gTPZ2ZUxEqC8XQ5Hty0SN3qni5xrgHsOz6Gxm1uxmySJJIwX5q/12mULcEeO9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=MuHTmKe8; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=kUI3gByTEw2joAvwT8/bC/QAenRjydIn8iJvHCGbts0=; b=MuHTmKe8nR1rPKATuaeMG/HlPC
-	y7+FlhlFcOhQMzscoI/hw++PFUDaw/ryLc32g7hkWDJDmnDz7L9n5MuCYfUJPlFqnvkDCU+DJO8Ph
-	Qt/QwFdDOauamWyAnyauqzzPPlwYiZbe67op8A03BW4t5zIvMv8UEokafQ4luEhpnNyqTl91Yxn2z
-	jRndqriTWqhBPZQiF5P342oFbqXUIyq6OG/AS4zRGtjR84U2xJnNAOsOHQ94oEfNqwfDz/qKzPEZr
-	t4bjpmfHAmsvarlEFQB3G7J3Qg6u0Meplr27rsHkUORSAg8kgWafCvTZKQVVQHAB4W828zal4igDT
-	R6PDzXsw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51484)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sGbtU-0001Gp-2T;
-	Mon, 10 Jun 2024 11:04:52 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sGbtW-0006mi-BK; Mon, 10 Jun 2024 11:04:54 +0100
-Date: Mon, 10 Jun 2024 11:04:54 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, horms@kernel.org,
-	kuba@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
-	hfdevel@gmx.net, naveenm@marvell.com, jdamato@fastly.com
-Subject: Re: [PATCH net-next v9 5/6] net: tn40xx: add mdio bus support
-Message-ID: <ZmbPxgG7vqEyhxEc@shell.armlinux.org.uk>
-References: <20240605232608.65471-1-fujita.tomonori@gmail.com>
- <20240605232608.65471-6-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1718013919; c=relaxed/simple;
+	bh=AlIc3EQR7y+80/Ejg9RLFaGvxiBK2RPW8SK61+OQ71E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KzuvLgxFRlQ9/LFeeXSJ0k74Ow2JwsjE/SJVZUdTeqTdDvqthV8aiQlZJC/LQIRC70TUKbhqrz677Z5kHmINQ4j1r5O5r2OUc8OrP59I/B+SW14+YcIKoU/GQC2qJ/TKhFgqnhx2Z7DItmvepWAw8lR9XW2vQ1sU/kX07v5noRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-42111cf1ca1so2426105e9.3;
+        Mon, 10 Jun 2024 03:05:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718013916; x=1718618716;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wPxDOJtBGiXCEwsNw0PSamD2lxZ6+BuGL88bRkvKmGc=;
+        b=J2UcTCIxTNYtirp6rg9Rqg7+ofjmDrXXLI/p3esk4iWmOcc94kIr3FgOf8OlmXFqfG
+         vSdtdLsAOQam1KieJpZ6wi/eRirGonX4enS8N9sOW1tXtVQVcwbZ/D6e112xLmcAs1NE
+         w2SvjDfpn4hkCpsKCUpO5U2GJuU67EPkLpMJhCHIHQ+xI3qzuTlB3UyD8mNHMtKgbFu0
+         CvEuR+743C9yQOzhv6Ug8cyL64p1nTLW2ghhUt38Y4BH0qNX1jcuP/7vUoA/AqpIoBj+
+         47wTWqIlGwaLUCBdBzAGnX2G6mFQKR+IwVVQyTThje0WFbaE72fGmJR4IL0Lmll0Nf3A
+         s6Xg==
+X-Forwarded-Encrypted: i=1; AJvYcCVIPidb0grVnOu1OBjhiStaBBv6RqZmgD6P4xIesmi2z6WQ9290jKryl78M4zW7RL2fvB1iLz29uJpJmqqp7H+QDkeEcSWrjC7ctL7WQeyUAXkOuZIwe4Oa3Djr5sC0uNtA4UjIn4bVHHxVgyIguxJod2EZdLxudi7GsksEei8A
+X-Gm-Message-State: AOJu0YwMEh41Q+Ht8CwL5G4F1aAFVAia52WhCqvlunaOhwOA7CDvUgv2
+	g5waBXdGUXCibEbKiizho/83tr1s8d3lU2mkwMUENing19AdyQQr
+X-Google-Smtp-Source: AGHT+IE6UPZS8bKWfPcSCEvXL5Mn6tb7fajf/wnPYc9kjt0FZaI/nNLOOovqnumfJenKH3vEDaiJTA==
+X-Received: by 2002:a05:600c:5129:b0:420:29dd:84e2 with SMTP id 5b1f17b1804b1-42164a2a8c7mr63035595e9.2.1718013916264;
+        Mon, 10 Jun 2024 03:05:16 -0700 (PDT)
+Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4215814e7cbsm171616535e9.39.2024.06.10.03.05.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Jun 2024 03:05:15 -0700 (PDT)
+Message-ID: <5efdb532-2589-4327-9eb7-cfa0a40ed000@grimberg.me>
+Date: Mon, 10 Jun 2024 13:05:13 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240605232608.65471-6-fujita.tomonori@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/4] net: introduce helper sendpages_ok()
+To: Ofir Gal <ofir.gal@volumez.com>, davem@davemloft.net,
+ linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, ceph-devel@vger.kernel.org
+Cc: dhowells@redhat.com, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kbusch@kernel.org, axboe@kernel.dk, hch@lst.de,
+ philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+ christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
+References: <20240606161219.2745817-1-ofir.gal@volumez.com>
+ <20240606161219.2745817-2-ofir.gal@volumez.com>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20240606161219.2745817-2-ofir.gal@volumez.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 06, 2024 at 08:26:07AM +0900, FUJITA Tomonori wrote:
-> +static int tn40_mdio_get(struct tn40_priv *priv, u32 *val)
 
-I think this would be better named "tn40_mdio_wait_nonbusy()" because
-that seems to be this function's primary purpose.
 
-> +static int tn40_mdio_read_cb(struct mii_bus *mii_bus, int addr, int devnum,
-> +			     int regnum)
-> +static int tn40_mdio_write_cb(struct mii_bus *mii_bus, int addr, int devnum,
-> +			      int regnum, u16 val)
+On 06/06/2024 19:12, Ofir Gal wrote:
+> Network drivers are using sendpage_ok() to check the first page of an
+> iterator in order to disable MSG_SPLICE_PAGES. The iterator can
+> represent list of contiguous pages.
+>
+> When MSG_SPLICE_PAGES is enabled skb_splice_from_iter() is being used,
+> it requires all pages in the iterator to be sendable. Therefore it needs
+> to check that each page is sendable.
+>
+> The patch introduces a helper sendpages_ok(), it returns true if all the
+> contiguous pages are sendable.
+>
+> Drivers who want to send contiguous pages with MSG_SPLICE_PAGES may use
+> this helper to check whether the page list is OK. If the helper does not
+> return true, the driver should remove MSG_SPLICE_PAGES flag.
+>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Ofir Gal <ofir.gal@volumez.com>
+> ---
+>   include/linux/net.h | 22 ++++++++++++++++++++++
+>   1 file changed, 22 insertions(+)
+>
+> diff --git a/include/linux/net.h b/include/linux/net.h
+> index 688320b79fcc..421a6b5b9ad1 100644
+> --- a/include/linux/net.h
+> +++ b/include/linux/net.h
+> @@ -322,6 +322,28 @@ static inline bool sendpage_ok(struct page *page)
+>   	return !PageSlab(page) && page_count(page) >= 1;
+>   }
+>   
+> +/*
+> + * Check sendpage_ok on contiguous pages.
+> + */
+> +static inline bool sendpages_ok(struct page *page, size_t len, size_t offset)
+> +{
+> +	struct page *p;
+> +	size_t count;
+> +
+> +	p = page + (offset >> PAGE_SHIFT);
+> +
+> +	count = 0;
 
-I think it would be better to name these both with a _c45 suffix (which
-tells us that they're clause 45 accessors) rather than using _cb
-(presumably for callback which tells us nothing!)
+Assignment can move to the declaration.
 
-Thanks!
+> +	while (count < len) {
+> +		if (!sendpage_ok(p))
+> +			return false;
+> +
+> +		p++;
+> +		count += PAGE_SIZE;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+>   int kernel_sendmsg(struct socket *sock, struct msghdr *msg, struct kvec *vec,
+>   		   size_t num, size_t len);
+>   int kernel_sendmsg_locked(struct sock *sk, struct msghdr *msg,
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Other than that,
+
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 
