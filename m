@@ -1,159 +1,142 @@
-Return-Path: <netdev+bounces-102296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D523B9023E6
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 16:19:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CB1190241A
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 16:30:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73A812817FC
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 14:19:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C602F1F23091
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 14:30:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F94984E1F;
-	Mon, 10 Jun 2024 14:19:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J1yPhAsB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E381E219EA;
+	Mon, 10 Jun 2024 14:30:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9606D23B0
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 14:19:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA4D80BE5
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 14:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718029156; cv=none; b=ZBni6qjN4AkF0hVoE3vkyAwUpry7YfVKG76Vq+QrzEcIS6tvpoRc8AfcxEKm705XAuT9Eq9b9ZVVhLJMA0Fk+gLohklwLGopSdtmkkr2VTguJrGwu6OXiidHGgJL8QX3TJ43KfmFMPBuEigMEEceGzogS7VsleR4SLuV3Nu0FgQ=
+	t=1718029839; cv=none; b=RTw0J0tZfxBcJ8gR1lMzn3Yp840uKdggc2Z+rjNAG1CV+vPEizH/ifs8CY2V1pLsk3k60iWa8EJ+Uoswqlitih+nxEJBz04T26z2l8FDvD3lGeZ0/5NGogBD0Pli3MGmqQ3EnowXfj5uzrV1lwuTrWNnDBiKe99p/kTz/FCkXNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718029156; c=relaxed/simple;
-	bh=Rl2tVPiX9UWvnu+ZPwPmaHdP1YszauJ4RtH4EfVZS/M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EtnUZAyNEBesKZBiHIan660JJFUmWgZQAIFeVhuE96Q4zNV5o4Ze3VHRxgoLtG8wfww3q9ZP0NidXWPIEQwgabh8h2oWZeZoVmA3q06jE9UrmVfdYHBmeK7m7ROacQ9KKql9jK1AaH0ghWdxYSjg2hZKuTVXG+G5PWetDTek24M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J1yPhAsB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718029153;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5fQYADQiwQp5dfNvEaV5J/jkCAEg3Kh2jQNmcpyXbzo=;
-	b=J1yPhAsBQfyJHfCPEVbqKjv1AgJuBOnYLrUw2Ce3/ZMdBvoeM0CWQBS0CJa/ZLfU0ZxAua
-	pS3NZcJFD7HT3Hk/hDt65dDEqnBSYNkS2j6kWYTrAxkYYKzBBLyHQwwwR01Lba3/mbEB/F
-	W04a+cuNNsGR3iuboXDdAFlUoRHIMyA=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-557-QP7oqtkIM2KupHd3_ltSfQ-1; Mon, 10 Jun 2024 10:19:09 -0400
-X-MC-Unique: QP7oqtkIM2KupHd3_ltSfQ-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-57c753a879dso887203a12.3
-        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 07:19:08 -0700 (PDT)
+	s=arc-20240116; t=1718029839; c=relaxed/simple;
+	bh=4bVxaGP8kFkjKr+Ck+TYnxOMjMSrvTCJd9oRe1o4Qq8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P4dW/s4XKhQ7ss62JjJECXij5bK1z64GIKNZtd4u744FELrF/6K0VeZLHvBJlql9KhN47J8PwUOMG0zUPUHm90x7jHe7tdv/A9xR7I6HxP+92tR1QbmlCTb0vNRN3+PoJb03tMCKj64uWfXKFctAT/zi00WwZQanaQ2UxmZkKUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-42110872bf9so4918775e9.3
+        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 07:30:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718029148; x=1718633948;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5fQYADQiwQp5dfNvEaV5J/jkCAEg3Kh2jQNmcpyXbzo=;
-        b=hUavHVW6AXdPor/SCXMPuwE8yIuG1T7IfFhPi23KeV2Q4whjTaUauGxwUWqIlKNaQC
-         kXnOPkmm9ng9XMnGSgtf85mjqBoBqoUGb3bjuwySqh+UW+9LeAL3iTqfis3GsKfkSxQK
-         lo8LBXoH0MsAN2sZZVDSdURz8ssI/6w6qyzmI3XWVKg9AGZB706QI+UmtTLj7yb6KLLG
-         GQzTT1VJUM7mn6+HDs7xXUsXHm4d1EuJWma9WBd/BbCiNw77gTkxptClYu1OeW9IN23Z
-         IGu9zr4mCCs0XgqD2LOn1jAouzN1jHZLZTItNdfMeTDMNeVLXtH5UvhJ4Vx4OoxkKhgA
-         Uqvw==
-X-Forwarded-Encrypted: i=1; AJvYcCXT6f8eDs3eTm7k76UJj/ZnoGio7VSiQaUlj+SunCgTnBaEQZ34iG8zoyaRzsvUpvM5B1gQBtekKuqyHzcXVEDDGsl20BPM
-X-Gm-Message-State: AOJu0YzN2YiGM04KC3rB74D4fGd2FWqTj0sW0SGEHo3QqfqO6WU0NpRz
-	pIDPcI9jXkDopOsrt+59dGE8GA6q4TNRngAIqWtiVSlZT1s9VuPhY0r4GFurq4ThnF3syjQxLSM
-	65VGxm/k4Qp+oe/RHflZbf0psqn2//62mBrRkyqwBh9zfQkEoTvpTVQ==
-X-Received: by 2002:a50:cdc1:0:b0:57c:7641:72e2 with SMTP id 4fb4d7f45d1cf-57c76417319mr3169037a12.30.1718029147744;
-        Mon, 10 Jun 2024 07:19:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHCp3exlBA6B9Bw4Hrp54qJGJT7MsRMusp9B/hD6uoUg1sf4LnZ6GbChe4UfO/h6zYmtLS4hw==
-X-Received: by 2002:a50:cdc1:0:b0:57c:7641:72e2 with SMTP id 4fb4d7f45d1cf-57c76417319mr3169012a12.30.1718029147149;
-        Mon, 10 Jun 2024 07:19:07 -0700 (PDT)
-Received: from redhat.com ([2.52.131.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57c828dd0dfsm1807666a12.72.2024.06.10.07.18.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jun 2024 07:19:05 -0700 (PDT)
-Date: Mon, 10 Jun 2024 10:18:56 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Jason Xing <kerneljasonxing@gmail.com>,
-	Heng Qi <hengqi@linux.alibaba.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	xuanzhuo@linux.alibaba.com, virtualization@lists.linux.dev,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, netdev@vger.kernel.org
-Subject: Re: [patch net-next] virtio_net: add support for Byte Queue Limits
-Message-ID: <20240610101346-mutt-send-email-mst@kernel.org>
-References: <CACGkMEvh6nKfFMp5fb6tbijrs88vgSofCNkwN1UzKHnf6RqURg@mail.gmail.com>
- <20240606020248-mutt-send-email-mst@kernel.org>
- <CACGkMEsy37mg-GwRXJNBBkvhEuaEYw-g3wthv_XS7+t5=ALhiA@mail.gmail.com>
- <ZmG9YWUcaW4S94Eq@nanopsycho.orion>
- <CACGkMEug18UTJ4HDB+E4-U84UnhyrY-P5kW4et5tnS9E7Pq2Gw@mail.gmail.com>
- <ZmKrGBLiNvDVKL2Z@nanopsycho.orion>
- <CACGkMEvQ04NBUBwrc9AyvLqskSbQ_4OBUK=B9a+iktLcPLeyrg@mail.gmail.com>
- <ZmLZkVML2a3mT2Hh@nanopsycho.orion>
- <20240607062231-mutt-send-email-mst@kernel.org>
- <ZmLvWnzUBwgpbyeh@nanopsycho.orion>
+        d=1e100.net; s=20230601; t=1718029836; x=1718634636;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9r8TSxia5VOpRvq2ZH+KZFO+iNGYVhgl/TCGYdPnBV4=;
+        b=ixzElUyyRW9ZgWHTKv9ekmRipUMjcLzi6CgUz5Meo/DCfxCZpDUd+r8ryn57HBJjRf
+         Zr3p6zyd3ewl+IMw1oc75/KrWn4oAzs6q/4ZhxfedttaJkuaRAOr3dRk6hxUrLnW2SGE
+         JwqoVcTIPs4uB+jR9c720egj8nDvJTV0uG5s9iR3ygsQ/bGr3QetE7EZdVU2KwwhETMc
+         +2MLaEqA4ngfisymu/bmA640gk6az1T4QhrQScNleLqJWbcQlkFKmV3qYjmZEG6Slglz
+         2BJZJaSSuCa+xMzSiNTQ+V6qihdmCxZpJKqLWhNjAstaix7Otcr+pLjbeYu2PQVrgQKy
+         mr2g==
+X-Forwarded-Encrypted: i=1; AJvYcCWv7V4g3jjttvAghemzCTYT+AcWVeBORxNfJyvyipk4qlPB6RjwzXx92qs+r9bk51cculkg41L/qRC73g5l6XooUW9pQ/8x
+X-Gm-Message-State: AOJu0Yy5npKv53igy9jnk40LOzHFeXMn8JbREajZVYwF9W2qPyMjGe5w
+	fSrH5z/E1MyopU7bFbpksdz4J9imPrNdvTZeK/XZ/oivb/7H4ZGalWCT04RO
+X-Google-Smtp-Source: AGHT+IGNYwmKnUFOdEUBOUxTES955Io2GxJGmqmRpCkKr9SjdDxpdv9dXwhK1LcpQbQUyokSvA1QQA==
+X-Received: by 2002:a5d:6c65:0:b0:354:fc97:e6e3 with SMTP id ffacd0b85a97d-35efee1d38fmr7179815f8f.5.1718029836111;
+        Mon, 10 Jun 2024 07:30:36 -0700 (PDT)
+Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35f048dddddsm8554380f8f.111.2024.06.10.07.30.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Jun 2024 07:30:35 -0700 (PDT)
+Message-ID: <9a03d3bf-c48f-4758-9d7f-a5e7920ec68f@grimberg.me>
+Date: Mon, 10 Jun 2024 17:30:34 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZmLvWnzUBwgpbyeh@nanopsycho.orion>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v25 00/20] nvme-tcp receive offloads
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, Aurelien Aptel <aaptel@nvidia.com>,
+ linux-nvme@lists.infradead.org, netdev@vger.kernel.org, kbusch@kernel.org,
+ axboe@fb.com, chaitanyak@nvidia.com, davem@davemloft.net
+References: <20240529160053.111531-1-aaptel@nvidia.com>
+ <20240530183906.4534c029@kernel.org> <20240531061142.GB17723@lst.de>
+ <06d9c3c9-8d27-46bf-a0cf-0c3ea1a0d3ec@grimberg.me>
+ <20240610122939.GA21899@lst.de>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20240610122939.GA21899@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 07, 2024 at 01:30:34PM +0200, Jiri Pirko wrote:
-> Fri, Jun 07, 2024 at 12:23:37PM CEST, mst@redhat.com wrote:
-> >On Fri, Jun 07, 2024 at 11:57:37AM +0200, Jiri Pirko wrote:
-> >> >True. Personally, I would like to just drop orphan mode. But I'm not
-> >> >sure others are happy with this.
-> >> 
-> >> How about to do it other way around. I will take a stab at sending patch
-> >> removing it. If anyone is against and has solid data to prove orphan
-> >> mode is needed, let them provide those.
-> >
-> >Break it with no warning and see if anyone complains?
-> 
-> This is now what I suggested at all.
-> 
-> >No, this is not how we handle userspace compatibility, normally.
-> 
-> Sure.
-> 
-> Again:
-> 
-> I would send orphan removal patch containing:
-> 1) no module options removal. Warn if someone sets it up
-> 2) module option to disable napi is ignored
-> 3) orphan mode is removed from code
-> 
-> There is no breakage. Only, hypotetically performance downgrade in some
-> hypotetical usecase nobody knows of.
 
-Performance is why people use virtio. It's as much a breakage as any
-other bug. The main difference is, with other types of breakage, they
-are typically binary and we can not tolerate them at all.  A tiny,
-negligeable performance regression might be tolarable if it brings
-other benefits. I very much doubt avoiding interrupts is
-negligeable though. And making code simpler isn't a big benefit,
-users do not care.
 
-> My point was, if someone presents
-> solid data to prove orphan is needed during the patch review, let's toss
-> out the patch.
-> 
-> Makes sense?
+On 10/06/2024 15:29, Christoph Hellwig wrote:
+> On Mon, Jun 03, 2024 at 10:09:26AM +0300, Sagi Grimberg wrote:
+>>> IETF has standardized a generic data placement protocol, which is
+>>> part of iWarp.  Even if folks don't like RDMA it exists to solve
+>>> exactly these kinds of problems of data placement.
+>> iWARP changes the wire protocol.
+> Compared to plain NVMe over TCP that's a bit of an understatement :)
 
-It's not hypothetical - if anything, it's hypothetical that performance
-does not regress.  And we just got a report from users that see a
-regression without.  So, not really.
+Yes :) the comment was that people want to use NVMe/TCP, and adding
+DDP awareness inspired by iWARP would change the existing NVMe/TCP wire 
+protocol.
 
-> 
-> >
-> >-- 
-> >MST
-> >
+This offload, does not.
 
+>
+>> Is your comment to just go make people
+>> use iWARP instead of TCP? or extending NVMe/TCP to natively support DDP?
+> I don't know to be honest.  In many ways just using RDMA instead of
+> NVMe/TCP would solve all the problems this is trying to solve, but
+> there are enough big customers that have religious concerns about
+> the use of RDMA.
+>
+> So if people want to use something that looks non-RDMA but have the
+> same benefits we have to reinvent it quite similarly under a different
+> name.  Looking at DDP and what we can learn from it without bringing
+> the Verbs API along might be one way to do that.
+>
+> Another would be to figure out what amount of similarity and what
+> amount of state we need in an on the wire protocol to have an
+> efficient header splitting in the NIC, either hard coded or even
+> better downloadable using something like eBPF.
+
+ From what I understand, this is what this offload is trying to do. It uses
+the nvme command_id similar to how the read_stag is used in iwarp,
+it tracks the NVMe/TCP pdus to split pdus from data transfers, and maps
+the command_id to an internal MR for dma purposes.
+
+What I think you don't like about this is the interface that the offload 
+exposes
+to the TCP ulp driver (nvme-tcp in our case)?
+
+>
+>> That would be great, but what does a "vendor independent without hooks"
+>> look like from
+>> your perspective? I'd love having this translate to standard (and some new)
+>> socket operations,
+>> but I could not find a way that this can be done given the current
+>> architecture.
+> Any amount of calls into NIC/offload drivers from NVMe is a nogo.
+>
+
+Not following you here...
+*something* needs to program a buffer for DDP, *something* needs to
+invalidate this buffer, *something* needs to declare a TCP stream as DDP 
+capable.
+
+Unless I interpret what you're saying is that the interface needs to be 
+generalized to
+extend the standard socket operations (i.e. 
+[s|g]etsockopt/recvmsg/cmsghdr etc) ?
 
