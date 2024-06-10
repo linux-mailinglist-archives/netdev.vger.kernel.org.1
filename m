@@ -1,215 +1,167 @@
-Return-Path: <netdev+bounces-102398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82967902C6A
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 01:23:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0473A902C8E
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 01:39:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED3461F216AF
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 23:23:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD9E81C20F28
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 23:39:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82C62152176;
-	Mon, 10 Jun 2024 23:23:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C86E152189;
+	Mon, 10 Jun 2024 23:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DVE73clS"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="a1/NuHKL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4C618EAB;
-	Mon, 10 Jun 2024 23:23:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFAD33C0C
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 23:39:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718061831; cv=none; b=MERI2+IYhmfJeTy3n1E+SrokB69aidWarNK+3XLeeivtWLEhAKG2tURYOPP2xab9nJG+/vBdXk3gS5m9ixCroD+hmGTpKEwOXsZ2dCVYj49IKzduO53z1xRxoFymFyNOW0Bi/RDlrTSxe1wragIst38m6YIvPIkhTfQgTNNk88E=
+	t=1718062757; cv=none; b=mF9h8u3En/KWbQiWf5KBzIin24dhhtWqzACb4UOfnOGR3al4roq2/QDjwp0NAD5eoUa63FlcHHv2kUDKFAdJzm7tjmbDqHh7FiSg6iTErRCwL3COKC29XqtGVnocGiEQRFYkIIE+aby4kduHXI5Ezm0lQh6J1UDPt+shm+mWk/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718061831; c=relaxed/simple;
-	bh=GL519/OeTsVEfPoHY170KKRiJkajWab9ytI9diRYgiw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=g+i0Z9RtMiV+TosO/2sE5YfGk+80nCUGY2IAh8cl1pCTrZOi50dgI+pc4XFtSJ9s1KNh+gzaFlBr6ED518/ssNuwvj4jMrTo+Dss0gzHtCs0Mubcv6MuctLBp2aH1unsp5LCh3GqJmUUH/RxnvAJg01lB8q1TFUg8E1a/WNpFeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DVE73clS; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6ad8243dba8so25008716d6.3;
-        Mon, 10 Jun 2024 16:23:49 -0700 (PDT)
+	s=arc-20240116; t=1718062757; c=relaxed/simple;
+	bh=OqkA0UPvlRdQPJGUri/ZF92EwajdAT6XejacbGEXkOk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HIiwfmkfk+XIMt7S6TDwZRRKuHwzYD6aIPpRREVyb2e24mZBocpwyZobsuBxZqUDaKLEq92ruruTWm3LozpClKAuKDTgHYpQLCd4F75NPkwgv6mLPy2K6RgO5J1u05OClTSbRq3z7qxcG7QTNOKV3fnWq8o+giLCN0Q8Cv1U9ik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=a1/NuHKL; arc=none smtp.client-ip=207.171.188.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718061829; x=1718666629; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lV5PVanzcpddAlRBQgJHZpxu5JR0+D1qul/h4jTI5Sk=;
-        b=DVE73clSn0EdMByKbACpqs3LDazYnQMAUnLcBfJhVEQwI1fIpo+YVgG4acEVf3V+WR
-         v6bE6T84hrs1AeQZDKvKk0t9FDKPSLQNWs+7tnHI0qoMTSQilgC+MK2Zpf+0xgvXzlQD
-         vwyyq3A3mwRFJ2jKfx00enP7Q6xmyv5HRynuIIzEPX342IRv3hP2P0Uz2AsQKGjZcure
-         1ySgwcScyA+2g8ZPK/8ej7Mp4xAqdzdojhM2A8jGJRvED5rIUGrTtwlI579/Wu+YStbj
-         sEdihMizg7XCNpuF3xRd4aXnijA2lQ7yfac+elaJfypLLecFOee5eaZhYMmxx8sugOKH
-         vlZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718061829; x=1718666629;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=lV5PVanzcpddAlRBQgJHZpxu5JR0+D1qul/h4jTI5Sk=;
-        b=wK/E15xhvS9B1cfg33z3MAFBStsK5gbf5GSOszoEsJczhBbvQRnpaoFgfe3tFQZjmM
-         h5MhRlPtiI7BCLCV5i4Z01JVMZkjfZAxHLdD7DQCUqdwbtgWOPCFDbAW1Xh63LWXRQuW
-         kndk7WD8EiFX9yh3XO6gSSlJddqABGtFujmeAe/N330GvTRGe/tXDBix+urG2OdySgDe
-         2bIlDF+0BoquiXjMGonFLx0ugCeS5WprP0IJJNfGVPdFv1YKurnHMFa/f22DbcJBOntE
-         Ro8BqJIOTnMAUFeKBwzOibVn/saUY7bXsBZvnEytjAwrJ3yW1NVdVUpykq6T+bHVswV1
-         r6iQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU2T5Pv0/kabh+vrapWYPUJb1ESg9Z+HapIW0EFEBrqtuOYfl6AFP1Wt5fSzp+APo2J8/2W3R53i9/PIMVFubevpEkgko9HBy+WQ5upePXwDy5ECulzxmBlMAbyGTsoN3ul3mA7qafReid9Oz6M8a1LpqSAnTOhGDculPsD
-X-Gm-Message-State: AOJu0YxxRnLa3x6Yr4iwPb3ktqDzDm9ooH+hKMYJeW3cXrCjuj3I9bhG
-	CmBeTiG0ERfNUbdRsuPR8dRWcT7fq4gY33ah++BApPn1Nznuogs9
-X-Google-Smtp-Source: AGHT+IGvkE0Hdy2WFEEHZ5FqvV9BKqDeyVqKkJko9HLGbHvkz4+NgzZnRHCDEmPWeQAdw+IWpCgV0A==
-X-Received: by 2002:a05:6214:524a:b0:6b0:6b57:4c57 with SMTP id 6a1803df08f44-6b06b574fbbmr88520586d6.1.1718061828744;
-        Mon, 10 Jun 2024 16:23:48 -0700 (PDT)
-Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b053b13054sm48731596d6.138.2024.06.10.16.23.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jun 2024 16:23:48 -0700 (PDT)
-Date: Mon, 10 Jun 2024 19:23:48 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Chengen Du <chengen.du@canonical.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- kaber@trash.net, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org
-Message-ID: <66678b0413c20_bf52c2946d@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAPza5qfcXSQNxz2kNVWHqYBGgnFLDa-Ey5b9y5OenZndo2a0Og@mail.gmail.com>
-References: <20240608025347.90680-1-chengen.du@canonical.com>
- <CAPza5qfuNhDbhV9mau9RE=cNKMwGtJcx4pmjkoHNwpfysnw5yw@mail.gmail.com>
- <66660ec3f3e22_8dbbb294ed@willemb.c.googlers.com.notmuch>
- <CAPza5qfcXSQNxz2kNVWHqYBGgnFLDa-Ey5b9y5OenZndo2a0Og@mail.gmail.com>
-Subject: Re: [PATCH v6] af_packet: Handle outgoing VLAN packets without
- hardware offloading
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1718062756; x=1749598756;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=3bwz6Gs9x24OyB5KenPDoUiITL5Rl9a6PsxLsqZ+7Dw=;
+  b=a1/NuHKLOpRdY2QPC7TNFx6jyWWS0o9QxNnd+Du8xWbVP2jpvFHYHv4S
+   ov44LY8uOZ0sbnXP1I+7GbO4YdG77oXPEK6P3Xy3vCb8aZV+aw6OLMK6h
+   SGh5c6rcr+Br/rm6L64zpAhCRjQPz3jDJ4iDkV/ud9INk4x+ZgHsHmi+v
+   0=;
+X-IronPort-AV: E=Sophos;i="6.08,228,1712620800"; 
+   d="scan'208";a="732589013"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2024 23:39:10 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:43683]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.39.133:2525] with esmtp (Farcaster)
+ id 99e4ff76-908e-450c-be86-9e5a291c88f5; Mon, 10 Jun 2024 23:39:10 +0000 (UTC)
+X-Farcaster-Flow-ID: 99e4ff76-908e-450c-be86-9e5a291c88f5
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Mon, 10 Jun 2024 23:39:09 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.187.171.27) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Mon, 10 Jun 2024 23:39:07 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kent.overstreet@linux.dev>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>
+Subject: Re: [PATCH v1 net-next 01/11] af_unix: Define locking order for unix_table_double_lock().
+Date: Mon, 10 Jun 2024 16:38:57 -0700
+Message-ID: <20240610233857.78697-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <c2s2h5hd6obrraim5u7nbqu3wcp5pm5srtf4772qxmrlaugdps@7gjdbcf6v7dx>
+References: <c2s2h5hd6obrraim5u7nbqu3wcp5pm5srtf4772qxmrlaugdps@7gjdbcf6v7dx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D039UWB003.ant.amazon.com (10.13.138.93) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Chengen Du wrote:
-> Hi Willem,
-> =
+From: Kent Overstreet <kent.overstreet@linux.dev>
+Date: Mon, 10 Jun 2024 18:43:44 -0400
+> On Mon, Jun 10, 2024 at 03:34:51PM -0700, Kuniyuki Iwashima wrote:
+> > When created, AF_UNIX socket is put into net->unx.table.buckets[],
+> > and the hash is stored in sk->sk_hash.
+> > 
+> >   * unbound socket  : 0 <= sk_hash <= UNIX_HASH_MOD
+> > 
+> > When bind() is called, the socket could be moved to another bucket.
+> > 
+> >   * pathname socket : 0 <= sk_hash <= UNIX_HASH_MOD
+> >   * abstract socket : UNIX_HASH_MOD + 1 <= sk_hash <= UNIX_HASH_MOD * 2 + 1
+> > 
+> > Then, we call unix_table_double_lock() which locks a single bucket
+> > or two.
+> > 
+> > Let's define the order as unix_table_lock_cmp_fn() instead of using
+> > spin_lock_nested().
+> > 
+> > The locking is always done in ascending order of sk->sk_hash, which
+> > is the index of buckets/locks array allocated by kvmalloc_array().
+> > 
+> >   sk_hash_A < sk_hash_B
+> >   <=> &locks[sk_hash_A].dep_map < &locks[sk_hash_B].dep_map
+> > 
+> > So, the relation of two sk->sk_hash can be derived from the addresses
+> > of dep_map in the array of locks.
+> > 
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> >  net/unix/af_unix.c | 10 +++++++++-
+> >  1 file changed, 9 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> > index 3821f8945b1e..b0a9891c0384 100644
+> > --- a/net/unix/af_unix.c
+> > +++ b/net/unix/af_unix.c
+> > @@ -126,6 +126,13 @@ static spinlock_t bsd_socket_locks[UNIX_HASH_SIZE / 2];
+> >   *    hash table is protected with spinlock.
+> >   *    each socket state is protected by separate spinlock.
+> >   */
+> > +#ifdef CONFIG_PROVE_LOCKING
+> > +static int unix_table_lock_cmp_fn(const struct lockdep_map *a,
+> > +				  const struct lockdep_map *b)
+> > +{
+> > +	return a < b ? -1 : 0;
+> > +}
+> > +#endif
+> 
+> This should be a proper comparison function: -1 for less than, 0 for
+> equal, 1 for greater than.
+> 
+> I've got a cmp_int() macro in bcachefs that does this nicely.
 
-> On Mon, Jun 10, 2024 at 4:21=E2=80=AFAM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Chengen Du wrote:
-> > > Hi,
-> > >
-> > > I would like to provide some additional explanations about the patc=
-h.
-> > >
-> > >
-> > > On Sat, Jun 8, 2024 at 10:54=E2=80=AFAM Chengen Du <chengen.du@cano=
-nical.com> wrote:
-> > > >
-> > > > The issue initially stems from libpcap. The ethertype will be ove=
-rwritten
-> > > > as the VLAN TPID if the network interface lacks hardware VLAN off=
-loading.
-> > > > In the outbound packet path, if hardware VLAN offloading is unava=
-ilable,
-> > > > the VLAN tag is inserted into the payload but then cleared from t=
-he sk_buff
-> > > > struct. Consequently, this can lead to a false negative when chec=
-king for
-> > > > the presence of a VLAN tag, causing the packet sniffing outcome t=
-o lack
-> > > > VLAN tag information (i.e., TCI-TPID). As a result, the packet ca=
-pturing
-> > > > tool may be unable to parse packets as expected.
-> > > >
-> > > > The TCI-TPID is missing because the prb_fill_vlan_info() function=
- does not
-> > > > modify the tp_vlan_tci/tp_vlan_tpid values, as the information is=
- in the
-> > > > payload and not in the sk_buff struct. The skb_vlan_tag_present()=
- function
-> > > > only checks vlan_all in the sk_buff struct. In cooked mode, the L=
-2 header
-> > > > is stripped, preventing the packet capturing tool from determinin=
-g the
-> > > > correct TCI-TPID value. Additionally, the protocol in SLL is inco=
-rrect,
-> > > > which means the packet capturing tool cannot parse the L3 header =
-correctly.
-> > > >
-> > > > Link: https://github.com/the-tcpdump-group/libpcap/issues/1105
-> > > > Link: https://lore.kernel.org/netdev/20240520070348.26725-1-cheng=
-en.du@canonical.com/T/#u
-> > > > Fixes: 393e52e33c6c ("packet: deliver VLAN TCI to userspace")
-> > > > Cc: stable@vger.kernel.org
-> > > > Signed-off-by: Chengen Du <chengen.du@canonical.com>
-> > > > ---
-> > > >  net/packet/af_packet.c | 57 ++++++++++++++++++++++++++++++++++++=
-++++--
-> > > >  1 file changed, 55 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> > > > index ea3ebc160e25..8cffbe1f912d 100644
-> > > > --- a/net/packet/af_packet.c
-> > > > +++ b/net/packet/af_packet.c
-> > > > @@ -538,6 +538,43 @@ static void *packet_current_frame(struct pac=
-ket_sock *po,
-> > > >         return packet_lookup_frame(po, rb, rb->head, status);
-> > > >  }
-> > > >
-> > > > +static u16 vlan_get_tci(struct sk_buff *skb)
-> > > > +{
-> > > > +       struct vlan_hdr vhdr, *vh;
-> > > > +       u8 *skb_orig_data =3D skb->data;
-> > > > +       int skb_orig_len =3D skb->len;
-> > > > +
-> > > > +       skb_push(skb, skb->data - skb_mac_header(skb));
-> > > > +       vh =3D skb_header_pointer(skb, ETH_HLEN, sizeof(vhdr), &v=
-hdr);
-> > > > +       if (skb_orig_data !=3D skb->data) {
-> > > > +               skb->data =3D skb_orig_data;
-> > > > +               skb->len =3D skb_orig_len;
-> > > > +       }
-> > >
-> > >
-> > > The reason for not directly using skb_header_pointer(skb,
-> > > skb_mac_header(skb) + ETH_HLEN, ...) to get the VLAN header is due =
-to
-> > > the check logic in skb_header_pointer. In the SOCK_DGRAM and
-> > > PACKET_OUTGOING scenarios, the offset can be a negative number, whi=
-ch
-> > > causes the check logic (i.e., likely(hlen - offset >=3D len)) in
-> > > __skb_header_pointer() to not work as expected.
-> >
-> > The calculation is still correct?
-> >
-> > I think that this is not the first situation where negative offsets
-> > can be given to skb_header_pointer.
-> =
+So, should this be :
 
-> The check will pass even if the offset is negative, but I believe this
-> may not be the right approach. In my humble opinion, the expected
-> check should be similar to the skb_push check, which ensures that
-> after moving forward by the offset bytes, skb->data remains larger
-> than or equal to skb->head to avoid accessing out-of-bound data. It
-> might be worth considering adding a check in __skb_header_pointer to
-> handle negative offsets, as this seems logical. However, this change
-> could impact a wider range of code. Please correct me if I am
-> mistaken.
+  a < b ? -1 : 1
 
-Your current approach is fine too.
+?
 
-A negative offset greater than skb_headroom would certainly be a
-problem. But in these cases where skb->mac_header is known to be
-correct, the offset skb_mac_offset() against skb->data must be
-within bounds, even if it may be negative.
+or
 
+  ((a > b) - (b < a))
+
+?
+
+I think most double_lock functions eliminate the a == b case beforehand,
+and even ->cmp_fn() is not called for such a recursive case because
+debug_spin_lock_before() triggers BUG() then.
+
+Initially I added the same macro, but checkpatch complains about it,
+and I thought the current form is easier to understand because it's
+the actual comparison used in the double lock part.
+
+Also, there is a case, where we just want to return an error without
+classifying it into 0 or 1.
+
+I rather think we should define something like this on the lockdep side.
+
+  enum lockdep_cmp_result {
+    LOCKDEP_CMP_SAFE = -1,
+    LOCKDEP_CMP_DEADLOCK,
+  };
+
+What do you think ?
 
