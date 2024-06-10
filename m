@@ -1,65 +1,59 @@
-Return-Path: <netdev+bounces-102265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1974390220C
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 14:53:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17E4B902220
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 14:56:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C295F1F217C0
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 12:53:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 191B01C21EC8
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 12:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6A880C04;
-	Mon, 10 Jun 2024 12:53:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64F0A80C1D;
+	Mon, 10 Jun 2024 12:55:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="2rIOVClj"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="K7iR9UNL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 430ED80C1C;
-	Mon, 10 Jun 2024 12:53:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5DFC80C07
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 12:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718023989; cv=none; b=ij7HxQo8ZywDLPsQYyHO77V68P0K0ojPwusmt0P6mqyZAHVHCUWpf08JQOSJ9AcRE7Vl4O0q6ZIG4UByhYLmum9uu/aPi0K/FtQVJ8tFHCZY9M2YvW4Gh5I8/1y8NNbS6vPq9Li92aV4iWWMuAdi26RQevXOU2QInKjY2EqRBkc=
+	t=1718024156; cv=none; b=MhAfRQFzA2Sbo1RE8ZYIQmk7hwuBluqGOa3b5uOzoBwD7pcxPKoTtmqxnEqZpNMHwH16zaMPq5ytNFrAgQR9vorTMoGCYwyGVctwqE/qvWzxZ/aHpgjV2hzKXl41nSVOoqjyaIffFh9Yzf49m9TFmkcd83j9WMVilidoKVJD3Bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718023989; c=relaxed/simple;
-	bh=fNfXwJwCA5qp0u1hAX20H41g7q7fDhKBjQWSYMSdVFY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=vB8NCNBAhsXopWAjuDlMbhRHi6qmE7ukZIzJ05J3T6VrAMbfPQ4xAX9jZgWZsKgL0Kwpl/ieKSSTbnJk2ir3O4u/ZJi4NC11iAroae75En4oJFMw4ImKr1LsmWjVv34wQ1KtZ++FdmBZoO6e0yACvJzkjUByaVNLpO/TX6vic4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=2rIOVClj; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45ACQpDx023425;
-	Mon, 10 Jun 2024 14:52:41 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	4nQIhTEpp8eDIIoRXVmHoi9JKLGBN6G1TMA/hr/mDCI=; b=2rIOVCljVIVe7FZq
-	TbTuMPJwrmb18j6fZCtB6HBNyOEiIUXVCNUV6RrIlf8Nzw/YZmkVa6CawIo9M7Xu
-	nI68AfAeEgqHTjzzJaWhmQL0dIn/e0l83ojmflHjOvxC++Nv6Cu8fiQeoZ2Z/A8c
-	UuLlG5AEFw3DGJoARpQzwTKfZMPTSvitQ3z0l6fX+BMhW4x9+yVyLg02884+oR46
-	tWZH8u4SJX0WlgxlQS7lrfcgWFGg8wKNgipInKT0aUhxLwtFJ9ftvFsCKLjPcnQh
-	4MAlwNAVD1Xln8Vp8dQFwPOdUBbklLt2o3bGgo99WTpirPhhiEQSa6of842ymaJU
-	BIa1qw==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yn0v14ufk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Jun 2024 14:52:41 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id D9B2D40045;
-	Mon, 10 Jun 2024 14:52:37 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 1D5DD217B76;
-	Mon, 10 Jun 2024 14:52:09 +0200 (CEST)
-Received: from [10.48.86.164] (10.48.86.164) by SHFDAG1NODE2.st.com
- (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 10 Jun
- 2024 14:52:08 +0200
-Message-ID: <ede482e3-58a1-4664-84b1-f80e59841e28@foss.st.com>
-Date: Mon, 10 Jun 2024 14:52:07 +0200
+	s=arc-20240116; t=1718024156; c=relaxed/simple;
+	bh=UBV2W8SGGyjphPijFqfc5CnmiDyrA/XxsHXYlOGDX5Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VX0jcjJrVVuGOiSf/8lEY8RyT3W4ipRFQ0ZTskUgLFvxUYZsJkkij5NbS9ohfy+1/XoccuaW999hexUsP43o4K1KnS8pluHowyoeyd5ssLaXwCrjNfbkV82GbMfgtGDzC58Hlyme2v0m3ThmD784wBGYvzoytk/bR4WiOo1BOh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=K7iR9UNL; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1sGeYX-00Cifx-Q3; Mon, 10 Jun 2024 14:55:25 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=GMqknHH3RTp2fhruXwQr/m2wsqGoKeB9wsxcCNKn0tk=; b=K7iR9UNL9W+ZysVngAP3gyARSi
+	fluy+tadMZxVmw7hw5bGZMpcvejGKNFQGIFDpAGTVv7pAkpmwpdl7Ki8TZm29JmKYxJcdqsgAqa8F
+	dDkGoQgOi+4Q9SAKs1nf2FkFvQgjoMA2tmIRIhURmNUv+0yQTHXWsCEQMUFqdm6m/7bo166WeSSPY
+	fuO+HyCBzTEr+JQbRFZJ9C5M5ImxsRf4bOBc/0+LX1WNkCjePB28yqRYdrh7oNDTo+Tre4GFf2CtU
+	EbWha/BErTOjrM7s8wDoD334L15dkquLNh2vk8AgMTDMQwIJkbMQe+TQyCYxxj0yMUml4hQOhgIg5
+	uHzO0s7Q==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1sGeYW-0003Tl-Aq; Mon, 10 Jun 2024 14:55:24 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1sGeYH-00FQj6-Cs; Mon, 10 Jun 2024 14:55:09 +0200
+Message-ID: <cc8a0165-f2e9-43a7-a1a2-28808929d27e@rbox.co>
+Date: Mon, 10 Jun 2024 14:55:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,63 +61,87 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] ARM: multi_v7_defconfig: Add MCP23S08 pinctrl support
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        "David S . Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
-        Mark
- Brown <broonie@kernel.org>, Marek Vasut <marex@denx.de>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20240610080604.291102-1-christophe.roullier@foss.st.com>
- <06703c03-e1ce-4a94-942d-b556c6084728@linaro.org>
- <ef4d2ebb-dd2a-423d-acd1-43fdb42c1896@foss.st.com>
- <e7f1ea08-41af-47e0-b478-652e67e5aebb@linaro.org>
-Content-Language: en-US
-From: Christophe ROULLIER <christophe.roullier@foss.st.com>
-In-Reply-To: <e7f1ea08-41af-47e0-b478-652e67e5aebb@linaro.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH v2 net 01/15] af_unix: Set sk->sk_state under
+ unix_state_lock() for truly disconencted peer.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: cong.wang@bytedance.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org,
+ pabeni@redhat.com
+References: <20240609195320.95901-1-kuniyu@amazon.com>
+ <20240609210307.2919-1-kuniyu@amazon.com>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <20240609210307.2919-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-10_02,2024-06-10_01,2024-05-17_01
 
+On 6/9/24 23:03, Kuniyuki Iwashima wrote:
+> (...)
+> Sorry, I think I was wrong and we can't use smp_store_release()
+> and smp_load_acquire(), and smp_[rw]mb() is needed.
+> 
+> Given we avoid adding code in the hotpath in the original fix
+> 8866730aed510 [0], I prefer adding unix_state_lock() in the SOCKMAP
+> path again.
+>
+> [0]: https://lore.kernel.org/bpf/6545bc9f7e443_3358c208ae@john.notmuch/
 
-On 6/10/24 14:27, Krzysztof Kozlowski wrote:
-> On 10/06/2024 10:14, Christophe ROULLIER wrote:
->>>> @@ -469,6 +469,7 @@ CONFIG_SPI_XILINX=y
->>>>    CONFIG_SPI_SPIDEV=y
->>>>    CONFIG_SPMI=y
->>>>    CONFIG_PINCTRL_AS3722=y
->>>> +CONFIG_PINCTRL_MCP23S08=y
->>> This is not an on-SoC pinctrl, so it should be module (=m).
->> The stmmac is in built-in, if IO-Expander (MCP23S08) is on module, we
->> have huge of message during kernel boot
->>
->> because stmmac driver is deferred several times. (need to wait that
->> module are ready)
-> Which is normal and not a reason to change defconfig. It it was a
-> problem, you should solve it not in defconfig but in kernel. That's just
-> defconfig, an example, reference or debugging tool if you wish, so
-> fixing issue here is not a fix at all.
-Ok so it will not be possible to boot in NFS mode
->
-> Best regards,
-> Krzysztof
->
+You're saying smp_wmb() in connect() is too much for the hot path, do I
+understand correctly?
+
+> ---8<---
+> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+> index d3dbb92153f2..67794d2c7498 100644
+> --- a/net/core/sock_map.c
+> +++ b/net/core/sock_map.c
+> @@ -549,7 +549,7 @@ static bool sock_map_sk_state_allowed(const struct sock *sk)
+>  	if (sk_is_tcp(sk))
+>  		return (1 << sk->sk_state) & (TCPF_ESTABLISHED | TCPF_LISTEN);
+>  	if (sk_is_stream_unix(sk))
+> -		return (1 << sk->sk_state) & TCPF_ESTABLISHED;
+> +		return (1 << READ_ONCE(sk->sk_state)) & TCPF_ESTABLISHED;
+>  	return true;
+>  }
+>  
+> diff --git a/net/unix/unix_bpf.c b/net/unix/unix_bpf.c
+> index bd84785bf8d6..1db42cfee70d 100644
+> --- a/net/unix/unix_bpf.c
+> +++ b/net/unix/unix_bpf.c
+> @@ -159,8 +159,6 @@ int unix_dgram_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool re
+>  
+>  int unix_stream_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
+>  {
+> -	struct sock *sk_pair;
+> -
+>  	/* Restore does not decrement the sk_pair reference yet because we must
+>  	 * keep the a reference to the socket until after an RCU grace period
+>  	 * and any pending sends have completed.
+> @@ -180,9 +178,9 @@ int unix_stream_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool r
+>  	 * be a single matching destroy operation.
+>  	 */
+>  	if (!psock->sk_pair) {
+> -		sk_pair = unix_peer(sk);
+> -		sock_hold(sk_pair);
+> -		psock->sk_pair = sk_pair;
+> +		psock->sk_pair = unix_peer_get(sk);
+> +		if (WARN_ON_ONCE(!psock->sk_pair))
+> +			return -EINVAL;
+>  	}
+>  
+>  	unix_stream_bpf_check_needs_rebuild(psock->sk_proto);
+> ---8<---
+
+FWIW, we've passed sock_map_sk_state_allowed(), so critical section can be
+empty:
+
+	if (!psock->sk_pair) {
+		unix_state_lock(sk);
+		unix_state_unlock(sk);
+		sk_pair = READ_ONCE(unix_peer(sk));
+		...
+	}
+
+Thanks,
+Michal
+
 
