@@ -1,126 +1,137 @@
-Return-Path: <netdev+bounces-102334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 075E090278A
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 19:12:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDC0C9027E8
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 19:43:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D92DB22545
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 16:58:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1D2C1C21EAD
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 17:43:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00516152175;
-	Mon, 10 Jun 2024 16:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3AC3147C74;
+	Mon, 10 Jun 2024 17:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="WQBUSD37"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F8414AD3E;
-	Mon, 10 Jun 2024 16:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89B1142E79;
+	Mon, 10 Jun 2024 17:43:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718038467; cv=none; b=EMaclGYCNEHDHg/caw29vEAKHx8iaSu/lY5WHxZocHkchtrdLI9Ny75+ehTzVCaHdAfY32OWcMdnhkbbcBqhkYPW0Sipuci2C9zH7IBQ6oItClMzkrd1dlZpENX7iQidbTUl41+D2no6cOUBHZLfGY/A7VVIZynEzqkonSmIV/Y=
+	t=1718041385; cv=none; b=a6J+4d+aDI+/wFeCm6CITIFUrBUdu19Wuk0hr0gM08rqxXwX7PCpTqnO1gRZyxeHQiuDpLuS38Mm5ExSpEadEWSbiIBkxK8e+zzVQdFfPgCWAW/Scb1Lp+FverM1p60QegVb9nU9dycCsCCEUecF7iaHrIHvxJD0/v2ZjOZpJI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718038467; c=relaxed/simple;
-	bh=IHKjkJJmNUwQBgZoGJ0QQEMWCIHokZu18EE5Cx8Z+f8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GyCA0oUHdIJE5GpENnff5CrnAxFvYo6LJT5FYhdFdplqs2z6a0GYma6flsyVKlVbWpl98N1a2UmIdwHkXvJm4qyPc3ar56aZ9rwvS7IvRlNt2hyYhfzmOFQeWCzk19TQWsxqAmyW0fzlE5f6Di1GIPhZTcXL3o4vFgLLlNzwxw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 599B4C2BBFC;
-	Mon, 10 Jun 2024 16:54:24 +0000 (UTC)
-Date: Mon, 10 Jun 2024 12:54:22 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Yan Zhai <yan@cloudflare.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern
- <dsahern@kernel.org>, Abhishek Chauhan <quic_abchauha@quicinc.com>, Mina
- Almasry <almasrymina@google.com>, Florian Westphal <fw@strlen.de>,
- Alexander Lobakin <aleksander.lobakin@intel.com>, David Howells
- <dhowells@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Daniel Borkmann
- <daniel@iogearbox.net>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Pavel Begunkov
- <asml.silence@gmail.com>, linux-kernel@vger.kernel.org,
- kernel-team@cloudflare.com, Jesper Dangaard Brouer <hawk@kernel.org>,
- Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, Neil Horman <nhorman@tuxdriver.com>,
- linux-trace-kernel@vger.kernel.org, Dan Carpenter
- <dan.carpenter@linaro.org>
-Subject: Re: [RFC v3 net-next 1/7] net: add rx_sk to trace_kfree_skb
-Message-ID: <20240610125422.252da487@rorschach.local.home>
-In-Reply-To: <CAO3-PbqRNRduSAyN9CtaxPFsOs9xtGHruu1ACfJ5e-mrvTo2Cw@mail.gmail.com>
-References: <cover.1717529533.git.yan@cloudflare.com>
-	<983c54f98746bd42d778b99840435d0a93963cb3.1717529533.git.yan@cloudflare.com>
-	<20240605195750.1a225963@gandalf.local.home>
-	<CAO3-PbqRNRduSAyN9CtaxPFsOs9xtGHruu1ACfJ5e-mrvTo2Cw@mail.gmail.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1718041385; c=relaxed/simple;
+	bh=pukq89EYTWZWICSg4WGUTWv7xVz+jUHs/C8/2F8z0KM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HuwxqlTmhe2Mq2e40yNTk9LXPVw3NxflUJeHF8xt4GYrZzsJmJ1Q6Tu3y47nmYJLtm8cDKqlDiPWCZuEsEUlBK7XJDlB0+nDH3Au46qLrT5zMI62Qif/M2eOVDeqoYCGm7JskBwDSAPBbd3bVKvqwGIt2OAYLTPY9mWurKmHx/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=WQBUSD37; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 684A2885A5;
+	Mon, 10 Jun 2024 19:42:59 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1718041381;
+	bh=oaOQDVrDft+8XHfut53lIpAIfzu9c8ayaQ0+Eg7Nxow=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=WQBUSD3704u5IksQ+4ToSk+UzpJxx5XDQUX1YPYUz2ydq/y8quhOFWlrcza8nueUx
+	 YjyxaYOzD3WEXXa6xqFxLJrdCr6zaNB9WgGZY/cwqTySfG2ktmoLSn+IAAWJ39aYaz
+	 lPQro+4RKDvhuztSWyu8q/z3j1tMDLNlwddixzQkrqjyXL2HnaTqIiulZaLTRSXTEv
+	 f8smfN95RqhPw7Oe0wrkOqrAfmJtowy0aeaOUH9SM+MfZjRXqzbNp6lgRvVKq1y57y
+	 RJ6FKOabNXnR1VORrukqhc/kzNhX7sErSjR5iOTp5aBK2NyQwk34IH9z00pYbnV5NW
+	 O/HppF4vFXwGA==
+Message-ID: <bf3238fb-4fad-49b2-975c-e35d93cafe7c@denx.de>
+Date: Mon, 10 Jun 2024 19:29:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next,PATCH v6 7/8] net: stmmac: dwmac-stm32: Mask support
+ for PMCR configuration
+To: Christophe ROULLIER <christophe.roullier@foss.st.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Richard Cochran <richardcochran@gmail.com>, Jose Abreu
+ <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240610071459.287500-1-christophe.roullier@foss.st.com>
+ <20240610071459.287500-8-christophe.roullier@foss.st.com>
+ <20139233-4e95-4fe5-84ca-734ee866afca@denx.de>
+ <c5ea12e7-5ee6-4960-9141-e774ccd9977b@foss.st.com>
+ <09105afe-1123-407a-96c3-2ea88602aad0@denx.de>
+ <91af5c61-f23f-4f72-a8c8-f32b2c368768@foss.st.com>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <91af5c61-f23f-4f72-a8c8-f32b2c368768@foss.st.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Thu, 6 Jun 2024 10:37:46 -0500
-Yan Zhai <yan@cloudflare.com> wrote:
-
-> > name: kfree_skb
-> > ID: 1799
-> > format:
-> >         field:unsigned short common_type;       offset:0;       size:2; signed:0;
-> >         field:unsigned char common_flags;       offset:2;       size:1; signed:0;
-> >         field:unsigned char common_preempt_count;       offset:3;       size:1; signed:0;
-> >         field:int common_pid;   offset:4;       size:4; signed:1;
-> >
-> >         field:void * skbaddr;   offset:8;       size:8; signed:0;
-> >         field:void * location;  offset:16;      size:8; signed:0;
-> >         field:unsigned short protocol;  offset:24;      size:2; signed:0;
-> >         field:enum skb_drop_reason reason;      offset:28;      size:4; signed:0;
-> >
-> > Notice that "protocol" is 2 bytes in size at offset 24, but "reason" starts
-> > at offset 28. This means at offset 26, there's a 2 byte hole.
-> >  
-> The reason I added the pointer as the last argument is trying to
-> minimize the surprise to existing TP users, because for common ABIs
-> it's fine to omit later arguments when defining a function, but it
-> needs change and recompilation if the order of arguments changed.
-
-Nothing should be hard coding the offsets of the fields. This is
-exported to user space so that tools can see where the fields are.
-That's the purpose of libtraceevent. The fields should be movable and
-not affect anything. There should be no need to recompile.
-
+On 6/10/24 3:49 PM, Christophe ROULLIER wrote:
 > 
-> Looking at the actual format after the change, it does not add a new
-> hole since protocol and reason are already packed into the same 8-byte
-> block, so rx_skaddr starts at 8-byte aligned offset:
-> 
-> # cat /sys/kernel/debug/tracing/events/skb/kfree_skb/format
-> name: kfree_skb
-> ID: 2260
-> format:
->         field:unsigned short common_type;       offset:0;
-> size:2; signed:0;
->         field:unsigned char common_flags;       offset:2;
-> size:1; signed:0;
->         field:unsigned char common_preempt_count;       offset:3;
->  size:1; signed:0;
->         field:int common_pid;   offset:4;       size:4; signed:1;
-> 
->         field:void * skbaddr;   offset:8;       size:8; signed:0;
->         field:void * location;  offset:16;      size:8; signed:0;
->         field:unsigned short protocol;  offset:24;      size:2; signed:0;
->         field:enum skb_drop_reason reason;      offset:28;
-> size:4; signed:0;
->         field:void * rx_skaddr; offset:32;      size:8; signed:0;
-> 
-> Do you think we still need to change the order?
+> On 6/10/24 15:43, Marek Vasut wrote:
+>> On 6/10/24 1:45 PM, Christophe ROULLIER wrote:
+>>>
+>>> On 6/10/24 12:39, Marek Vasut wrote:
+>>>> On 6/10/24 9:14 AM, Christophe Roullier wrote:
+>>>>
+>>>> [...]
+>>>>
+>>>>>   static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
+>>>>> @@ -303,7 +307,7 @@ static int stm32mcu_set_mode(struct 
+>>>>> plat_stmmacenet_data *plat_dat)
+>>>>>       dev_dbg(dwmac->dev, "Mode %s", 
+>>>>> phy_modes(plat_dat->mac_interface));
+>>>>>         return regmap_update_bits(dwmac->regmap, reg,
+>>>>> -                 dwmac->ops->syscfg_eth_mask, val << 23);
+>>>>> +                 SYSCFG_MCU_ETH_MASK, val << 23);
+>>>>>   }
+>>>>>     static void stm32_dwmac_clk_disable(struct stm32_dwmac *dwmac, 
+>>>>> bool suspend)
+>>>>> @@ -348,8 +352,15 @@ static int stm32_dwmac_parse_data(struct 
+>>>>> stm32_dwmac *dwmac,
+>>>>>           return PTR_ERR(dwmac->regmap);
+>>>>>         err = of_property_read_u32_index(np, "st,syscon", 1, 
+>>>>> &dwmac->mode_reg);
+>>>>> -    if (err)
+>>>>> +    if (err) {
+>>>>>           dev_err(dev, "Can't get sysconfig mode offset (%d)\n", err);
+>>>>> +        return err;
+>>>>> +    }
+>>>>> +
+>>>>> +    dwmac->mode_mask = SYSCFG_MP1_ETH_MASK;
+>>>>> +    err = of_property_read_u32_index(np, "st,syscon", 2, 
+>>>>> &dwmac->mode_mask);
+>>>>> +    if (err)
+>>>>> +        dev_dbg(dev, "Warning sysconfig register mask not set\n");
+>>>>
+>>>> Isn't this an error , so dev_err() ?
+>>> No, it is only "warning" information, for MP1 the mask is not needed 
+>>> (and for backward compatibility is not planned to put mask parameter 
+>>> mandatory)
+>>
+>> Should this be an error for anything newer than MP15 then ?
+> For MP25, no need of mask, so for moment it is specific to MP13.
 
-Up to you, just wanted to point it out.
-
--- Steve
-
+Make this a warning for MP15, error for MP13, do not check st,syscon 
+presence for MP2 at all. Would that work ?
 
