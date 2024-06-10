@@ -1,110 +1,172 @@
-Return-Path: <netdev+bounces-102147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF98C90199B
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 05:53:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 147719019A7
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 06:07:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38A5D281D50
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 03:53:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E787E1C20D0B
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 04:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16BC98473;
-	Mon, 10 Jun 2024 03:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5D756FC7;
+	Mon, 10 Jun 2024 04:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="CLjZgoan"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DKXoZAtn"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B5363D0
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 03:53:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5142E2901
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 04:07:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717991597; cv=none; b=AuJfuJcflOAKkvOWi2bKomaObklhQ0sL5brZY4zWgPcgPFhO1WHEp7njXn92yqTTxXHyLjmDF4xfx/wKLO8S6eewevq/U9UnxnAw5Juik7gYHnn4aXJ0EnfeyhEsD226qy8/QlqjtfOnlnThSjcQZuKLYIdYcw1JHeUVKtMwbQc=
+	t=1717992438; cv=none; b=L6r8SiWV75sK4Bb0X4d1zq0CFyHEraCQESjFf9viHL3cRIEetJcFP/mjbRT/b1mQHhPLPsEbjteFZVidvJJCDLaBHwl/+IX+lee+kBF4ArtpCKhTtvrFSLpHxYtXFwLNcevsGzXzaAmuEN2cuDF0U3BbI8WQPo2QSrH4SymsSv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717991597; c=relaxed/simple;
-	bh=TeAxseHgIhV4LlKAD9dMBGR3KEwU2B9+0vggWoEPqtI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HoVkCpM9ds8A7dlc4ufAtr0CvZD7GNeOq4B7jxqlR7X6tWrRXGsNalZKyCqC0tzQbzBJnClGNXwxKt4zMsJLkAD43FzTfCU82FFuLVRsnsCdOAJrCBCYDwiO7Ouz+ySkw1fHaLpi28aH3jTiIkxPtGISgXqG3Nuj3i6YqzNKeSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=CLjZgoan; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 59B4D2C018D;
-	Mon, 10 Jun 2024 15:53:11 +1200 (NZST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1717991591;
-	bh=oHUsjC71nJ1K+8uGaI0bP00jxm56WVzoCDEG5LjsoWQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=CLjZgoankl/0C8uAWsXAU2Er4sxjW5K7VWnCwQeseuYMrdRsIurHPBZbHBWwLHcwC
-	 qQyMFkn00GrkoKAABvfGDSJPHqIS05Y3xKzylV1L8WCXE2/f7+PwjrREQDh2RFz+j9
-	 zc/ob5yL9+sODsyVB4E3aAwpLI8rokwhTnx4paXW/n2M7rWQ7pcch/NkaF/1zcgxqr
-	 cnRsBBdnhTwD2cH3BCCP0HkVkYozuxGy2NMwHmCXT8QhOUsTJbhpJVwBdjmbRtse5S
-	 zP6VMljMrPVKTD5uNycDETwc502RMSz3vE8Svq+TtRkQTx5Na6y1H9y6Pij+yqHqhN
-	 Tu8jR1/A4nGGg==
-Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B666678a70000>; Mon, 10 Jun 2024 15:53:11 +1200
-Received: from aryans-dl.ws.atlnz.lc (aryans-dl.ws.atlnz.lc [10.33.22.38])
-	by pat.atlnz.lc (Postfix) with ESMTP id 324F313EE2B;
-	Mon, 10 Jun 2024 15:53:11 +1200 (NZST)
-Received: by aryans-dl.ws.atlnz.lc (Postfix, from userid 1844)
-	id 2F3632A2270; Mon, 10 Jun 2024 15:53:11 +1200 (NZST)
-From: Aryan Srivastava <aryan.srivastava@alliedtelesis.co.nz>
-To: linux@armlinux.org.uk
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Aryan Srivastava <aryan.srivastava@alliedtelesis.co.nz>,
-	Marcin Wojtas <mw@semihalf.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH v0] net: mvpp2: use slab_build_skb for oversized frames
-Date: Mon, 10 Jun 2024 15:53:00 +1200
-Message-ID: <20240610035300.2366893-1-aryan.srivastava@alliedtelesis.co.nz>
-X-Mailer: git-send-email 2.43.2
+	s=arc-20240116; t=1717992438; c=relaxed/simple;
+	bh=T0nm3FRq9DrWMY8tfBGebXMruXtWooQbVspp64vsRQg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=okDsVwPgnezO0lvBcWIHgvEQvmoljtvXg/XuvEdo87QyGQZaqaxbEeGiRyY1cvwYgkf6wqyq6S6aMrhgvYAmIJetFk+fElfbb3oZUE6EKC9/CiBvy1pJqHpASq7Y69U+ApsGCl23XTzGyhEDacWLxjCF28m+yh6sqqQbm4kS2Fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DKXoZAtn; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2bfff08fc29so3312034a91.1
+        for <netdev@vger.kernel.org>; Sun, 09 Jun 2024 21:07:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717992436; x=1718597236; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2SSX/7We+MBs16amF+tjvRRQMsff4tgeFCcqSIpK4QM=;
+        b=DKXoZAtnMXHHCnAKISVXTGkFAPEy4bnPMITv0WEv17KEEwwt8qUwgCVwuAnESRzV/O
+         xxfcAag/DmNenQZqWCT4meaqQKlfgHbEUsm9atJDuxFd5CHv+SQALJ+CZFF9Ocb9KmCY
+         0KXJR5RH2GKKYRMNYADbqJsBpOa9oHDq/RXllGC7DjyTyV/nqwrkxwMAdpoq7z4VZ/1n
+         x/5XFWQuAgg6SScWjRTnHeIynfGF5Ro5yCtwj4+jodvSVgUqBYUI6ELQGptdnaYqXnuO
+         opkttidgmdsDlLVv8aEG6B5o6NrHfqYWcJ2UEC5BWu0r6Dum5J6nC+jDE8lV9bRKT69C
+         01pQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717992436; x=1718597236;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2SSX/7We+MBs16amF+tjvRRQMsff4tgeFCcqSIpK4QM=;
+        b=N+F+j6jnEdTf9ZbLFB9ERPUW2fP5xrxpxiZXJG8HRk33tRthEoYJKUAWKBc23wcvtJ
+         3cPmNykvck+ZSJrjgoSRFsM+eDO4kE6EpUv+V/Yz5I865dr7AdzY/3ggf+pjkh3Tklsh
+         hSPWh2C1+I/TDnHD7Yiv489sbPOWLWC8QEtzvWj31jUFVlBfWGvMxGuHi8He5352vLhx
+         ugmC9tMm6XcY+IKe5P9AInrjCPkoOQ7wm/hg4ZydBy2R0sDkIFgrkXeJL4ImEtiqZzl+
+         D0TYdzyK/G5Hy0CczahfuAzkkgLQxApwEGniMss3RwiLX2kTX8JE7iwKcWrD0E5ZYwXk
+         O+Pw==
+X-Forwarded-Encrypted: i=1; AJvYcCUwQppiLoIApI1bopRwrcJQRxQEW4Jln86Kr4ZPKjx71TaeN5yir5QJ/qOcotfX9hm08Rt49By24AMw0+UAzWkOeYw2zI9d
+X-Gm-Message-State: AOJu0Yye5PFXW+BQQ6BLYFboGHVAwZm5Bd6L9vjJ6/NjoRm0b2AcK0rD
+	pikoNOpNGRNJMvEGS673gjYErb8YTJvUS0o5QjxnGk+07dYRjZ+7
+X-Google-Smtp-Source: AGHT+IEh8lF9/8nodH7H7OcUDz5kQnHzUk/8now69uRiXq/O3OUtQeCScNDWPnfGo6yvy60hCYBJMA==
+X-Received: by 2002:a17:90b:4f90:b0:2bf:8fbf:e4c7 with SMTP id 98e67ed59e1d1-2c2bcafac1bmr7840339a91.16.1717992436489;
+        Sun, 09 Jun 2024 21:07:16 -0700 (PDT)
+Received: from ap.. ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c3094cfe3dsm1038575a91.15.2024.06.09.21.07.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Jun 2024 21:07:15 -0700 (PDT)
+From: Taehee Yoo <ap420073@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	shannon.nelson@amd.com,
+	brett.creeley@amd.com,
+	drivers@pensando.io,
+	netdev@vger.kernel.org
+Cc: ap420073@gmail.com,
+	jacob.e.keller@intel.com,
+	nitya.sunkad@amd.com
+Subject: [PATCH net] ionic: fix use after netif_napi_del()
+Date: Mon, 10 Jun 2024 04:07:06 +0000
+Message-Id: <20240610040706.1385890-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=F9L0dbhN c=1 sm=1 tr=0 ts=666678a7 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=T1WGqf2p2xoA:10 a=nUjTbgbENZD28nTSGwIA:9 a=3ZKOabzyN94A:10
-X-SEG-SpamProfiler-Score: 0
-x-atlnz-ls: pat
+Content-Transfer-Encoding: 8bit
 
-Setting frag_size to 0 to indicate kmalloc has been deprecated,
-use slab_build_skb directly.
+When queues are started, netif_napi_add() and napi_enable() are called.
+If there are 4 queues and only 3 queues are used for the current
+configuration, only 3 queues' napi should be registered and enabled.
+The ionic_qcq_enable() checks whether the .poll pointer is not NULL for
+enabling only the using queue' napi. Unused queues' napi will not be
+registered by netif_napi_add(), so the .poll pointer indicates NULL.
+But it couldn't distinguish whether the napi was unregistered or not
+because netif_napi_del() doesn't reset the .poll pointer to NULL.
+So, ionic_qcq_enable() calls napi_enable() for the queue, which was
+unregistered by netif_napi_del().
 
-Signed-off-by: Aryan Srivastava <aryan.srivastava@alliedtelesis.co.nz>
+Reproducer:
+   ethtool -L <interface name> rx 1 tx 1 combined 0
+   ethtool -L <interface name> rx 0 tx 0 combined 1
+   ethtool -L <interface name> rx 0 tx 0 combined 4
+
+Splat looks like:
+kernel BUG at net/core/dev.c:6666!
+Oops: invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+CPU: 3 PID: 1057 Comm: kworker/3:3 Not tainted 6.10.0-rc2+ #16
+Workqueue: events ionic_lif_deferred_work [ionic]
+RIP: 0010:napi_enable+0x3b/0x40
+Code: 48 89 c2 48 83 e2 f6 80 b9 61 09 00 00 00 74 0d 48 83 bf 60 01 00 00 00 74 03 80 ce 01 f0 4f
+RSP: 0018:ffffb6ed83227d48 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffff97560cda0828 RCX: 0000000000000029
+RDX: 0000000000000001 RSI: 0000000000000000 RDI: ffff97560cda0a28
+RBP: ffffb6ed83227d50 R08: 0000000000000400 R09: 0000000000000001
+R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000000
+R13: ffff97560ce3c1a0 R14: 0000000000000000 R15: ffff975613ba0a20
+FS:  0000000000000000(0000) GS:ffff975d5f780000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f8f734ee200 CR3: 0000000103e50000 CR4: 00000000007506f0
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ ? die+0x33/0x90
+ ? do_trap+0xd9/0x100
+ ? napi_enable+0x3b/0x40
+ ? do_error_trap+0x83/0xb0
+ ? napi_enable+0x3b/0x40
+ ? napi_enable+0x3b/0x40
+ ? exc_invalid_op+0x4e/0x70
+ ? napi_enable+0x3b/0x40
+ ? asm_exc_invalid_op+0x16/0x20
+ ? napi_enable+0x3b/0x40
+ ionic_qcq_enable+0xb7/0x180 [ionic 59bdfc8a035436e1c4224ff7d10789e3f14643f8]
+ ionic_start_queues+0xc4/0x290 [ionic 59bdfc8a035436e1c4224ff7d10789e3f14643f8]
+ ionic_link_status_check+0x11c/0x170 [ionic 59bdfc8a035436e1c4224ff7d10789e3f14643f8]
+ ionic_lif_deferred_work+0x129/0x280 [ionic 59bdfc8a035436e1c4224ff7d10789e3f14643f8]
+ process_one_work+0x145/0x360
+ worker_thread+0x2bb/0x3d0
+ ? __pfx_worker_thread+0x10/0x10
+ kthread+0xcc/0x100
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork+0x2d/0x50
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork_asm+0x1a/0x30
+
+Fixes: 0f3154e6bcb3 ("ionic: Add Tx and Rx handling")
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/pensando/ionic/ionic_lif.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/ne=
-t/ethernet/marvell/mvpp2/mvpp2_main.c
-index aca17082b9ec..05f4aa11b95c 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-@@ -4001,7 +4001,10 @@ static int mvpp2_rx(struct mvpp2_port *port, struc=
-t napi_struct *napi,
- 			}
- 		}
-=20
--		skb =3D build_skb(data, frag_size);
-+		if (frag_size)
-+			skb =3D build_skb(data, frag_size);
-+		else
-+			skb =3D slab_build_skb(data);
- 		if (!skb) {
- 			netdev_warn(port->dev, "skb build failed\n");
- 			goto err_drop_frame;
---=20
-2.43.2
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+index 24870da3f484..b66c907d88e6 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+@@ -304,7 +304,7 @@ static int ionic_qcq_enable(struct ionic_qcq *qcq)
+ 	if (ret)
+ 		return ret;
+ 
+-	if (qcq->napi.poll)
++	if (test_bit(NAPI_STATE_LISTED, &qcq->napi.state))
+ 		napi_enable(&qcq->napi);
+ 
+ 	if (qcq->flags & IONIC_QCQ_F_INTR) {
+-- 
+2.34.1
 
 
