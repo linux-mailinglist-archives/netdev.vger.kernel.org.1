@@ -1,337 +1,262 @@
-Return-Path: <netdev+bounces-102325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE31A9025F6
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 17:46:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E5CC902694
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 18:22:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 797DC283F17
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 15:46:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1AFE1F265D9
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 16:22:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D64E140E4D;
-	Mon, 10 Jun 2024 15:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B1E7143736;
+	Mon, 10 Jun 2024 16:22:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iv9SZ0HF"
+	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="CbMdslNe"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E4012F5B3
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 15:46:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7031D142E97
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 16:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718034389; cv=none; b=R1Xch1GWCmSC9f39BBtHZHO6v56vkSJ1/5IdAhBt2diOykKYXsJYeAYuqG58zksnNvqVT6VfVfhRHyU/hOBND15J7PwQfs+UMMHSzw6y07gKRAHYWZAgyx+kQudv0ptwRijdL00u8dGYQgnuks9ug6XE+eCgmGbnsWc7kOUQ9sU=
+	t=1718036536; cv=none; b=UhwiupzFAQk21rS962xmyBnCDfWOmC09hSXKuAvZTDcN7rE+MPPXGB1aglL6mUPtrjrorxOpyNSSgaHieQnQXXA36biksHIAI47mrxKuHnaQQ+c+ER4Bd4J0x0G20VJa9a/5TgLk2JrcWiwxoiEejcIKccf9jPaQ2ogGjgjNyd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718034389; c=relaxed/simple;
-	bh=YuQg2CmuQIFxyJB/IJAzJ1AY1yVg8OFQ73lw+4/Rjag=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Oo+QIFPHqWp2aZPzVdF95o+TKOm2PrIJQc8RZWXdfgQ047AAEwbgavK0spEMz2EwL8bk0XCu6qmIgfNllMTM+KGxZKXFCfa7ti3+XPRV3I1oEWvC4ICgjZPgeNGQx64C9+RJAcqZFpianyyhnemSe55NuAC6Q5mhLkozCP+h5RU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iv9SZ0HF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718034386;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TW7A+pbVuZ7mrt5C8kjm1+mKBDQa2Val5XYX/apHDUk=;
-	b=iv9SZ0HF2RlZ8BCExKXGw0AWwUEoVZPlkLGoqAQQpu5G+DvCOPK1Nnni4Ll8kLLkmkwIuU
-	gou1fRwH2QF0OsRy9dXzOxkWw5kjBMxJaQzBUgbULGIWUdrkMYEf8VHpsTJMSjmXQ49ZjM
-	SYPvPqQejF8GuaTnsQ7cJ1K/HEeYy+E=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-353-SERSt8DuM3ajapck7RcKPQ-1; Mon,
- 10 Jun 2024 11:46:21 -0400
-X-MC-Unique: SERSt8DuM3ajapck7RcKPQ-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CDE2319560B6;
-	Mon, 10 Jun 2024 15:46:19 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.10.68])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D18A21956048;
-	Mon, 10 Jun 2024 15:46:16 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org,  dev@openvswitch.org,  Paolo Abeni
- <pabeni@redhat.com>,  Donald Hunter <donald.hunter@gmail.com>,
-  linux-kernel@vger.kernel.org,  i.maximets@ovn.org,  Eric Dumazet
- <edumazet@google.com>,  horms@kernel.org,  Jakub Kicinski
- <kuba@kernel.org>,  "David S. Miller" <davem@davemloft.net>
-Subject: Re: [ovs-dev] [PATCH net-next v2 5/9] net: openvswitch: add
- emit_sample action
-In-Reply-To: <20240603185647.2310748-6-amorenoz@redhat.com> (Adrian Moreno's
-	message of "Mon, 3 Jun 2024 20:56:39 +0200")
-References: <20240603185647.2310748-1-amorenoz@redhat.com>
-	<20240603185647.2310748-6-amorenoz@redhat.com>
-Date: Mon, 10 Jun 2024 11:46:14 -0400
-Message-ID: <f7ted94rebd.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1718036536; c=relaxed/simple;
+	bh=bxsg4DNdFkYFmIgYwjazkLg1QZ0/79fRk9dWu4LWVVQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UEwQ1OcW8/mboxvUSFsS4aXIoonFXfhBIDDYzBk6WvzZndgsaIzyjAbY+CCKJDWo8/uyhDPC2j9cuEMqeBbQZbsDrRzjfa25VxzyH2MgU4yl4p3NZHClKzi7waHYYtCV2ZVx4yOXPItC/TvxySo5tud4PfOHH8zxV9Kp4VajeSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=CbMdslNe; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-52bc88fb243so247392e87.3
+        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 09:22:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google; t=1718036533; x=1718641333; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4FQOUy6eQVbn2rNLxqez3pRfyzUAVY5hKRfgcqQacv4=;
+        b=CbMdslNexg/lqMGvcz9EOs7GczC7ZsErEpZuX5EE7mc/TvOCgrdEdtuN+shIIBkZfg
+         jE/k9pUF/wE0lzxXJAGbZUFWbgHUZW1CRXIIFvOGWRpYe+4BTrz41dIfimSzQLOkEH6O
+         w42rU8pwt83wT+fwFpjh/p3NbvNiS4JONxgxo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718036533; x=1718641333;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4FQOUy6eQVbn2rNLxqez3pRfyzUAVY5hKRfgcqQacv4=;
+        b=IIS3rXJSqp1ndEzopiUXz28pydRbKgFEfJcTWWbjTg1RXBLMbv/JILJu7I545P0k50
+         Om3r1ITk8FaQyw6We0nlMKRESC+LPC9couj5WxeXDQ1rAuRVzKIWmyySSl0iwbkqAsMf
+         6s6s8v7xvtHIZgLahiCU5Gs4Zu43EM+Csi1NmvpGj1nzF+BFHxnxtMH/kRq8WuzcFwRh
+         zivJRyqElPDjPzsbTBw124eTWOhTO5Lz+VC+oAr/gooWISryxXyikljmzSVsEho1gQDw
+         XhvAyAjDgpAcfUf41QgikY77Ve+oVNNkN+uN72hdrWQH64Wc3tG1I0fbbJ0iwFOSVMDm
+         6SPA==
+X-Forwarded-Encrypted: i=1; AJvYcCW6pwmJzATbL0oKqgNLAfNB3N1mEQpsccFd/gMBs+PjlGlmCVe0lls9mqzPXpbHL75wplBSIimdOJzzWCH7iMAR9QL4k0xr
+X-Gm-Message-State: AOJu0YwqMT2dn+E+ntErymLFxNoW+p0S+4RaDaoYsQ4mDjjM3/njxMNi
+	7grXUxORtfIwLscJ37jeODdFG+nG/y0ZBUOsUT4bsyfZfxdx+PmLGK0hvEQ4quU=
+X-Google-Smtp-Source: AGHT+IGSIZFW5ug9A4F5elNqmArwptwwiWCm04nlIpH7pIYvmM7NziR+tlCEqa6BBIkNpwvoHu1pmQ==
+X-Received: by 2002:a05:6512:310c:b0:52c:8e13:a830 with SMTP id 2adb3069b0e04-52c8e13a898mr1364204e87.0.1718036532505;
+        Mon, 10 Jun 2024 09:22:12 -0700 (PDT)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4220ce52c32sm21707585e9.48.2024.06.10.09.22.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jun 2024 09:22:11 -0700 (PDT)
+Date: Mon, 10 Jun 2024 18:22:08 +0200
+From: Daniel Vetter <daniel@ffwll.ch>
+To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Pavel Begunkov <asml.silence@gmail.com>,
+	David Wei <dw@davidwei.uk>, David Ahern <dsahern@kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Matt Turner <mattst88@gmail.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Shailend Chand <shailend@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Subject: Re: [PATCH net-next v10 02/14] net: page_pool: create hooks for
+ custom page providers
+Message-ID: <ZmcoMADenEFtuL6c@phenom.ffwll.local>
+Mail-Followup-To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
+	David Ahern <dsahern@kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Matt Turner <mattst88@gmail.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Shailend Chand <shailend@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>
+References: <CAHS8izMU_nMEr04J9kXiX6rJqK4nQKA+W-enKLhNxvK7=H2pgA@mail.gmail.com>
+ <5aee4bba-ca65-443c-bd78-e5599b814a13@gmail.com>
+ <CAHS8izNmT_NzgCu1pY1RKgJh+kP2rCL_90Gqau2Pkd3-48Q1_w@mail.gmail.com>
+ <eb237e6e-3626-4435-8af5-11ed3931b0ac@gmail.com>
+ <be2d140f-db0f-4d15-967c-972ea6586b5c@kernel.org>
+ <20240607145247.GG791043@ziepe.ca>
+ <45803740-442c-4298-b47e-2d87ae5a6012@davidwei.uk>
+ <54975459-7a5a-46ff-a9ae-dc16ceffbab4@gmail.com>
+ <20240610121625.GI791043@ziepe.ca>
+ <cdbc0d5f-bfbc-4f58-a6dd-c13b0bb5ff1c@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cdbc0d5f-bfbc-4f58-a6dd-c13b0bb5ff1c@amd.com>
+X-Operating-System: Linux phenom 6.8.9-amd64 
 
-Adrian Moreno <amorenoz@redhat.com> writes:
+On Mon, Jun 10, 2024 at 02:38:18PM +0200, Christian König wrote:
+> Am 10.06.24 um 14:16 schrieb Jason Gunthorpe:
+> > On Mon, Jun 10, 2024 at 02:07:01AM +0100, Pavel Begunkov wrote:
+> > > On 6/10/24 01:37, David Wei wrote:
+> > > > On 2024-06-07 17:52, Jason Gunthorpe wrote:
+> > > > > IMHO it seems to compose poorly if you can only use the io_uring
+> > > > > lifecycle model with io_uring registered memory, and not with DMABUF
+> > > > > memory registered through Mina's mechanism.
+> > > > By this, do you mean io_uring must be exclusively used to use this
+> > > > feature?
+> > > > 
+> > > > And you'd rather see the two decoupled, so userspace can register w/ say
+> > > > dmabuf then pass it to io_uring?
+> > > Personally, I have no clue what Jason means. You can just as
+> > > well say that it's poorly composable that write(2) to a disk
+> > > cannot post a completion into a XDP ring, or a netlink socket,
+> > > or io_uring's main completion queue, or name any other API.
+> > There is no reason you shouldn't be able to use your fast io_uring
+> > completion and lifecycle flow with DMABUF backed memory. Those are not
+> > widly different things and there is good reason they should work
+> > together.
+> 
+> Well there is the fundamental problem that you can't use io_uring to
+> implement the semantics necessary for a dma_fence.
+> 
+> That's why we had to reject the io_uring work on DMA-buf sharing from Google
+> a few years ago.
+> 
+> But this only affects the dma_fence synchronization part of DMA-buf, but
+> *not* the general buffer sharing.
 
-> Add support for a new action: emit_sample.
->
-> This action accepts a u32 group id and a variable-length cookie and uses
-> the psample multicast group to make the packet available for
-> observability.
->
-> The maximum length of the user-defined cookie is set to 16, same as
-> tc_cookie, to discourage using cookies that will not be offloadable.
->
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> ---
+More precisely, it only impacts the userspace/data access implicit
+synchronization part of dma-buf. For tracking buffer movements like on
+invalidations/refault with a dynamic dma-buf importer/exporter I think the
+dma-fence rules are acceptable. At least they've been for rdma drivers.
 
-I saw some of the nits Simon raised - I'll add one more below.
+But the escape hatch is to (temporarily) pin the dma-buf, which is exactly
+what direct I/O also does when accessing pages. So aside from the still
+unsolved question on how we should account/track pinned dma-buf, there
+shouldn't be an issue. Or at least I'm failing to see one.
 
-I haven't gone through the series thoroughly enough to make a detailed
-review.
+And for synchronization to data access the dma-fence stuff on dma-buf is
+anyway rather deprecated on the gpu side too, exactly because of all these
+limitations. On the gpu side we've been moving to free-standing
+drm_syncobj instead, but those are fairly gpu specific and any other
+subsystem should be able to just reuse what they have already to signal
+transaction completions.
 
->  Documentation/netlink/specs/ovs_flow.yaml | 17 ++++++++
->  include/uapi/linux/openvswitch.h          | 25 ++++++++++++
->  net/openvswitch/actions.c                 | 50 +++++++++++++++++++++++
->  net/openvswitch/flow_netlink.c            | 33 ++++++++++++++-
->  4 files changed, 124 insertions(+), 1 deletion(-)
->
-> diff --git a/Documentation/netlink/specs/ovs_flow.yaml b/Documentation/netlink/specs/ovs_flow.yaml
-> index 4fdfc6b5cae9..a7ab5593a24f 100644
-> --- a/Documentation/netlink/specs/ovs_flow.yaml
-> +++ b/Documentation/netlink/specs/ovs_flow.yaml
-> @@ -727,6 +727,12 @@ attribute-sets:
->          name: dec-ttl
->          type: nest
->          nested-attributes: dec-ttl-attrs
-> +      -
-> +        name: emit-sample
-> +        type: nest
-> +        nested-attributes: emit-sample-attrs
-> +        doc: |
-> +          Sends a packet sample to psample for external observation.
->    -
->      name: tunnel-key-attrs
->      enum-name: ovs-tunnel-key-attr
-> @@ -938,6 +944,17 @@ attribute-sets:
->        -
->          name: gbp
->          type: u32
-> +  -
-> +    name: emit-sample-attrs
-> +    enum-name: ovs-emit-sample-attr
-> +    name-prefix: ovs-emit-sample-attr-
-> +    attributes:
-> +      -
-> +        name: group
-> +        type: u32
-> +      -
-> +        name: cookie
-> +        type: binary
->  
->  operations:
->    name-prefix: ovs-flow-cmd-
-> diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
-> index efc82c318fa2..a0e9dde0584a 100644
-> --- a/include/uapi/linux/openvswitch.h
-> +++ b/include/uapi/linux/openvswitch.h
-> @@ -914,6 +914,30 @@ struct check_pkt_len_arg {
->  };
->  #endif
->  
-> +#define OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE 16
-> +/**
-> + * enum ovs_emit_sample_attr - Attributes for %OVS_ACTION_ATTR_EMIT_SAMPLE
-> + * action.
-> + *
-> + * @OVS_EMIT_SAMPLE_ATTR_GROUP: 32-bit number to identify the source of the
-> + * sample.
-> + * @OVS_EMIT_SAMPLE_ATTR_COOKIE: A variable-length binary cookie that contains
-> + * user-defined metadata. The maximum length is 16 bytes.
-> + *
-> + * Sends the packet to the psample multicast group with the specified group and
-> + * cookie. It is possible to combine this action with the
-> + * %OVS_ACTION_ATTR_TRUNC action to limit the size of the packet being emitted.
-> + */
-> +enum ovs_emit_sample_attr {
-> +	OVS_EMIT_SAMPLE_ATTR_UNPSEC,
-> +	OVS_EMIT_SAMPLE_ATTR_GROUP,	/* u32 number. */
-> +	OVS_EMIT_SAMPLE_ATTR_COOKIE,	/* Optional, user specified cookie. */
-> +	__OVS_EMIT_SAMPLE_ATTR_MAX
-> +};
-> +
-> +#define OVS_EMIT_SAMPLE_ATTR_MAX (__OVS_EMIT_SAMPLE_ATTR_MAX - 1)
-> +
-> +
->  /**
->   * enum ovs_action_attr - Action types.
->   *
-> @@ -1004,6 +1028,7 @@ enum ovs_action_attr {
->  	OVS_ACTION_ATTR_ADD_MPLS,     /* struct ovs_action_add_mpls. */
->  	OVS_ACTION_ATTR_DEC_TTL,      /* Nested OVS_DEC_TTL_ATTR_*. */
->  	OVS_ACTION_ATTR_DROP,         /* u32 error code. */
-> +	OVS_ACTION_ATTR_EMIT_SAMPLE,  /* Nested OVS_EMIT_SAMPLE_ATTR_*. */
->  
->  	__OVS_ACTION_ATTR_MAX,	      /* Nothing past this will be accepted
->  				       * from userspace. */
-> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-> index 964225580824..3b4dba0ded59 100644
-> --- a/net/openvswitch/actions.c
-> +++ b/net/openvswitch/actions.c
-> @@ -24,6 +24,11 @@
->  #include <net/checksum.h>
->  #include <net/dsfield.h>
->  #include <net/mpls.h>
-> +
-> +#if IS_ENABLED(CONFIG_PSAMPLE)
-> +#include <net/psample.h>
-> +#endif
-> +
->  #include <net/sctp/checksum.h>
->  
->  #include "datapath.h"
-> @@ -1299,6 +1304,46 @@ static int execute_dec_ttl(struct sk_buff *skb, struct sw_flow_key *key)
->  	return 0;
->  }
->  
-> +static int execute_emit_sample(struct datapath *dp, struct sk_buff *skb,
-> +			       const struct sw_flow_key *key,
-> +			       const struct nlattr *attr)
-> +{
-> +#if IS_ENABLED(CONFIG_PSAMPLE)
-> +	struct psample_group psample_group = {};
-> +	struct psample_metadata md = {};
-> +	struct vport *input_vport;
-> +	const struct nlattr *a;
-> +	int rem;
-> +
-> +	for (a = nla_data(attr), rem = nla_len(attr); rem > 0;
-> +	     a = nla_next(a, &rem)) {
-> +		switch (nla_type(a)) {
-> +		case OVS_EMIT_SAMPLE_ATTR_GROUP:
-> +			psample_group.group_num = nla_get_u32(a);
-> +			break;
-> +
-> +		case OVS_EMIT_SAMPLE_ATTR_COOKIE:
-> +			md.user_cookie = nla_data(a);
-> +			md.user_cookie_len = nla_len(a);
-> +			break;
-> +		}
-> +	}
-> +
-> +	psample_group.net = ovs_dp_get_net(dp);
-> +
-> +	input_vport = ovs_vport_rcu(dp, key->phy.in_port);
-> +	if (!input_vport)
-> +		input_vport = ovs_vport_rcu(dp, OVSP_LOCAL);
-> +
-> +	md.in_ifindex = input_vport->dev->ifindex;
-> +	md.trunc_size = skb->len - OVS_CB(skb)->cutlen;
-> +
-> +	psample_sample_packet(&psample_group, skb, 0, &md);
-> +#endif
-> +
-> +	return 0;
+Cheers, Sima
 
-Why this return here?  Doesn't seem used anywhere else.
+> 
+> Regards,
+> Christian.
+> 
+> > 
+> > Pretending they are totally different just because two different
+> > people wrote them is a very siloed view.
+> > 
+> > > The devmem TCP callback can implement it in a way feasible to
+> > > the project, but it cannot directly post events to an unrelated
+> > > API like io_uring. And devmem attaches buffers to a socket,
+> > > for which a ring for returning buffers might even be a nuisance.
+> > If you can't compose your io_uring completion mechanism with a DMABUF
+> > provided backing store then I think it needs more work.
+> > 
+> > Jason
+> 
 
-> +}
-> +
->  /* Execute a list of actions against 'skb'. */
->  static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
->  			      struct sw_flow_key *key,
-> @@ -1502,6 +1547,11 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
->  			ovs_kfree_skb_reason(skb, reason);
->  			return 0;
->  		}
-> +
-> +		case OVS_ACTION_ATTR_EMIT_SAMPLE:
-> +			err = execute_emit_sample(dp, skb, key, a);
-> +			OVS_CB(skb)->cutlen = 0;
-> +			break;
->  		}
->  
->  		if (unlikely(err)) {
-> diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
-> index f224d9bcea5e..eb59ff9c8154 100644
-> --- a/net/openvswitch/flow_netlink.c
-> +++ b/net/openvswitch/flow_netlink.c
-> @@ -64,6 +64,7 @@ static bool actions_may_change_flow(const struct nlattr *actions)
->  		case OVS_ACTION_ATTR_TRUNC:
->  		case OVS_ACTION_ATTR_USERSPACE:
->  		case OVS_ACTION_ATTR_DROP:
-> +		case OVS_ACTION_ATTR_EMIT_SAMPLE:
->  			break;
->  
->  		case OVS_ACTION_ATTR_CT:
-> @@ -2409,7 +2410,7 @@ static void ovs_nla_free_nested_actions(const struct nlattr *actions, int len)
->  	/* Whenever new actions are added, the need to update this
->  	 * function should be considered.
->  	 */
-> -	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 24);
-> +	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 25);
->  
->  	if (!actions)
->  		return;
-> @@ -3157,6 +3158,29 @@ static int validate_and_copy_check_pkt_len(struct net *net,
->  	return 0;
->  }
->  
-> +static int validate_emit_sample(const struct nlattr *attr)
-> +{
-> +	static const struct nla_policy policy[OVS_EMIT_SAMPLE_ATTR_MAX + 1] = {
-> +		[OVS_EMIT_SAMPLE_ATTR_GROUP] = { .type = NLA_U32 },
-> +		[OVS_EMIT_SAMPLE_ATTR_COOKIE] = {
-> +			.type = NLA_BINARY,
-> +			.len = OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE
-> +		},
-> +	};
-> +	struct nlattr *a[OVS_EMIT_SAMPLE_ATTR_MAX  + 1];
-> +	int err;
-> +
-> +	if (!IS_ENABLED(CONFIG_PSAMPLE))
-> +		return -EOPNOTSUPP;
-> +
-> +	err = nla_parse_nested(a, OVS_EMIT_SAMPLE_ATTR_MAX, attr, policy,
-> +			       NULL);
-> +	if (err)
-> +		return err;
-> +
-> +	return a[OVS_EMIT_SAMPLE_ATTR_GROUP] ? 0 : -EINVAL;
-> +}
-> +
->  static int copy_action(const struct nlattr *from,
->  		       struct sw_flow_actions **sfa, bool log)
->  {
-> @@ -3212,6 +3236,7 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
->  			[OVS_ACTION_ATTR_ADD_MPLS] = sizeof(struct ovs_action_add_mpls),
->  			[OVS_ACTION_ATTR_DEC_TTL] = (u32)-1,
->  			[OVS_ACTION_ATTR_DROP] = sizeof(u32),
-> +			[OVS_ACTION_ATTR_EMIT_SAMPLE] = (u32)-1,
->  		};
->  		const struct ovs_action_push_vlan *vlan;
->  		int type = nla_type(a);
-> @@ -3490,6 +3515,12 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
->  				return -EINVAL;
->  			break;
->  
-> +		case OVS_ACTION_ATTR_EMIT_SAMPLE:
-> +			err = validate_emit_sample(a);
-> +			if (err)
-> +				return err;
-> +			break;
-> +
->  		default:
->  			OVS_NLERR(log, "Unknown Action type %d", type);
->  			return -EINVAL;
-
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
 
