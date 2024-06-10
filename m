@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-102233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A62C29020C9
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 13:55:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 720069020CE
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 13:55:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 535331F22A34
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 11:55:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C257B26C2D
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 11:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9BBD80630;
-	Mon, 10 Jun 2024 11:54:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00908811F7;
+	Mon, 10 Jun 2024 11:54:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout70.expurgate.net (mxout70.expurgate.net [91.198.224.70])
+Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 669898060B;
-	Mon, 10 Jun 2024 11:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.224.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50CFA80C1D;
+	Mon, 10 Jun 2024 11:54:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718020490; cv=none; b=QtfM/fpENLJ/MEN6zuFJcYgqWcxvlIadc25RHok2xMgLMAPPH0iRqPSNRRDDSJMX4KrEIV2RClXkr+8QdIt2TwSk0gxtG0xCs+n/Uufdgs06U6b4Kz3tjUJCKlXKKwiNh9/Q+8fDuisI1pBjbDRJibJoRuphliXdQjTYJYwrntU=
+	t=1718020493; cv=none; b=SoYfaLEtMT86XQrT/r+iT5bBFcE6J97lgjMYbWGmfB1dwGibZRIEt9+e+2a7Ad+0tNVHxZpNCjOTlhPtKKo/7YHu9ntGDefyQ7oIAVoODJLPGL4b1WjbjSugrOh0rhjLiFvDoBFAc9Sq4VRZha37x+BywjfjDwxiVULD5iBfYsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718020490; c=relaxed/simple;
-	bh=1E/QCPVAo3zQph0r+GGS/Za4870aqIcUJG8oVPfg6Is=;
+	s=arc-20240116; t=1718020493; c=relaxed/simple;
+	bh=6nVh/RFHPpP/ApwFY6kktPoPTdT7kWzFRFeS0hlqlNM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S3lmxqipKa4CXP4UHaNZrLZOjKQRDUXJjehYHE6O+wM+zcAk+rJG5u4EfNVvKRFPKj2rngWRfZ7IzmGDqjCUPpNRfdqkqmSysElxf6OAMKbMVP2M0G9TlLT7LzsyttibL88HKJdBoyA/Uf9a/AyKn1LOWLL4pR9Xj++bEr6GEd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=91.198.224.70
+	 MIME-Version; b=psTUObMJ4ILCDgQmP+eki8qHT4Ax6Rm+05Dowau22X0tIVJRyP4qwQd7lvfSlApTXKVHQE2o8QBEBAeIhtsNH5762ey89tIrYszzqylnRlzuRmR8vf7EA3kemaWFYt9aYei5w4JHMXjssgwqykRO+NxyJYBLYUnr0nsUdReQ8eA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=194.37.255.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
 Received: from [127.0.0.1] (helo=localhost)
 	by relay.expurgate.net with smtp (Exim 4.92)
 	(envelope-from <prvs=9905c7c8d6=ms@dev.tdt.de>)
-	id 1sGdbr-00ADpu-9V; Mon, 10 Jun 2024 13:54:47 +0200
+	id 1sGdbt-00BAYJ-C3; Mon, 10 Jun 2024 13:54:49 +0200
 Received: from [195.243.126.94] (helo=securemail.tdt.de)
 	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ms@dev.tdt.de>)
-	id 1sGdbq-005YZw-Nk; Mon, 10 Jun 2024 13:54:46 +0200
+	id 1sGdbs-005Yao-RL; Mon, 10 Jun 2024 13:54:48 +0200
 Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id 725FD240053;
-	Mon, 10 Jun 2024 13:54:46 +0200 (CEST)
+	by securemail.tdt.de (Postfix) with ESMTP id 8D386240053;
+	Mon, 10 Jun 2024 13:54:48 +0200 (CEST)
 Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id 05391240050;
-	Mon, 10 Jun 2024 13:54:46 +0200 (CEST)
+	by securemail.tdt.de (Postfix) with ESMTP id 2314D240050;
+	Mon, 10 Jun 2024 13:54:48 +0200 (CEST)
 Received: from mschiller1.dev.tdt.de (unknown [10.2.3.20])
-	by mail.dev.tdt.de (Postfix) with ESMTPSA id B13B826128;
-	Mon, 10 Jun 2024 13:54:45 +0200 (CEST)
+	by mail.dev.tdt.de (Postfix) with ESMTPSA id BA73A26128;
+	Mon, 10 Jun 2024 13:54:47 +0200 (CEST)
 From: Martin Schiller <ms@dev.tdt.de>
 To: martin.blumenstingl@googlemail.com,
 	hauke@hauke-m.de,
@@ -64,9 +64,9 @@ Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ms@dev.tdt.de
-Subject: [PATCH net-next v2 02/12] net: dsa: lantiq_gswip: Only allow phy-mode = "internal" on the CPU port
-Date: Mon, 10 Jun 2024 13:53:50 +0200
-Message-ID: <20240610115400.2759500-3-ms@dev.tdt.de>
+Subject: [PATCH net-next v2 03/12] net: dsa: lantiq_gswip: add terminating \n where missing
+Date: Mon, 10 Jun 2024 13:53:51 +0200
+Message-ID: <20240610115400.2759500-4-ms@dev.tdt.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240610115400.2759500-1-ms@dev.tdt.de>
 References: <20240610115400.2759500-1-ms@dev.tdt.de>
@@ -78,44 +78,91 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-purgate: clean
+X-purgate-ID: 151534::1718020489-7345A34D-AEC2B5FE/0/0
 X-purgate-type: clean
-X-purgate-ID: 151534::1718020487-1B4A162D-C3367F85/0/0
 
-From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Some dev_err are missing the terminating \n. Let's add that.
 
-Add the CPU port to gswip_xrx200_phylink_get_caps() and
-gswip_xrx300_phylink_get_caps(). It connects through a SoC-internal bus,
-so the only allowed phy-mode is PHY_INTERFACE_MODE_INTERNAL.
-
-Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Suggested-by: Vladimir Oltean <olteanv@gmail.com>
+Signed-off-by: Martin Schiller <ms@dev.tdt.de>
 ---
- drivers/net/dsa/lantiq_gswip.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/dsa/lantiq_gswip.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/dsa/lantiq_gswip.c b/drivers/net/dsa/lantiq_gswi=
 p.c
-index a557049e34f5..b9c7076ce32f 100644
+index b9c7076ce32f..fe64baf0d7f1 100644
 --- a/drivers/net/dsa/lantiq_gswip.c
 +++ b/drivers/net/dsa/lantiq_gswip.c
-@@ -1516,6 +1516,7 @@ static void gswip_xrx200_phylink_get_caps(struct ds=
-a_switch *ds, int port,
- 	case 2:
- 	case 3:
- 	case 4:
-+	case 6:
- 		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
- 			  config->supported_interfaces);
+@@ -836,7 +836,7 @@ static int gswip_setup(struct dsa_switch *ds)
+=20
+ 	err =3D gswip_pce_load_microcode(priv);
+ 	if (err) {
+-		dev_err(priv->dev, "writing PCE microcode failed, %i", err);
++		dev_err(priv->dev, "writing PCE microcode failed, %i\n", err);
+ 		return err;
+ 	}
+=20
+@@ -1792,7 +1792,7 @@ static u32 gswip_bcm_ram_entry_read(struct gswip_pr=
+iv *priv, u32 table,
+ 	err =3D gswip_switch_r_timeout(priv, GSWIP_BM_RAM_CTRL,
+ 				     GSWIP_BM_RAM_CTRL_BAS);
+ 	if (err) {
+-		dev_err(priv->dev, "timeout while reading table: %u, index: %u",
++		dev_err(priv->dev, "timeout while reading table: %u, index: %u\n",
+ 			table, index);
+ 		return 0;
+ 	}
+@@ -2021,7 +2021,7 @@ static void gswip_gphy_fw_remove(struct gswip_priv =
+*priv,
+=20
+ 	ret =3D regmap_write(priv->rcu_regmap, gphy_fw->fw_addr_offset, 0);
+ 	if (ret)
+-		dev_err(priv->dev, "can not reset GPHY FW pointer");
++		dev_err(priv->dev, "can not reset GPHY FW pointer\n");
+=20
+ 	clk_disable_unprepare(gphy_fw->clk_gate);
+=20
+@@ -2050,7 +2050,7 @@ static int gswip_gphy_fw_list(struct gswip_priv *pr=
+iv,
+ 			priv->gphy_fw_name_cfg =3D &xrx200a2x_gphy_data;
+ 			break;
+ 		default:
+-			dev_err(dev, "unknown GSWIP version: 0x%x", version);
++			dev_err(dev, "unknown GSWIP version: 0x%x\n", version);
+ 			return -ENOENT;
+ 		}
+ 	}
+@@ -2060,7 +2060,7 @@ static int gswip_gphy_fw_list(struct gswip_priv *pr=
+iv,
+ 		priv->gphy_fw_name_cfg =3D match->data;
+=20
+ 	if (!priv->gphy_fw_name_cfg) {
+-		dev_err(dev, "GPHY compatible type not supported");
++		dev_err(dev, "GPHY compatible type not supported\n");
+ 		return -ENOENT;
+ 	}
+=20
+@@ -2163,7 +2163,7 @@ static int gswip_probe(struct platform_device *pdev=
+)
+ 			return -EINVAL;
  		break;
-@@ -1547,6 +1548,7 @@ static void gswip_xrx300_phylink_get_caps(struct ds=
-a_switch *ds, int port,
- 	case 2:
- 	case 3:
- 	case 4:
-+	case 6:
- 		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
- 			  config->supported_interfaces);
- 		break;
+ 	default:
+-		dev_err(dev, "unknown GSWIP version: 0x%x", version);
++		dev_err(dev, "unknown GSWIP version: 0x%x\n", version);
+ 		return -ENOENT;
+ 	}
+=20
+@@ -2191,7 +2191,7 @@ static int gswip_probe(struct platform_device *pdev=
+)
+ 		goto gphy_fw_remove;
+ 	}
+ 	if (!dsa_is_cpu_port(priv->ds, priv->hw_info->cpu_port)) {
+-		dev_err(dev, "wrong CPU port defined, HW only supports port: %i",
++		dev_err(dev, "wrong CPU port defined, HW only supports port: %i\n",
+ 			priv->hw_info->cpu_port);
+ 		err =3D -EINVAL;
+ 		goto disable_switch;
 --=20
 2.39.2
 
