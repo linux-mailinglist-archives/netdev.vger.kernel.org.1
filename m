@@ -1,95 +1,204 @@
-Return-Path: <netdev+bounces-102316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54D2C9025DA
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 17:42:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B98EB9025BB
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 17:33:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20AA9B2DA36
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 15:30:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38593284519
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 15:33:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3DD5137747;
-	Mon, 10 Jun 2024 15:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA61D13DDBF;
+	Mon, 10 Jun 2024 15:33:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="th/ONnBQ"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="iD8M5pMs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9066A12FB34
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 15:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D3A757EE
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 15:33:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718033410; cv=none; b=kFsuzyRZKl7JdALTR7D5g/K8ioXf1n2b4sJyILTpXtLHF72bVylSGuTqVGp8sEU24n74ZtliXCz+8AS5yDUJ1+L7Lo/t2UpMqIgpN13TV3XQ0b9nAQoZAKo/WiFY3zCldfakm7giGmYLAzavP8hcZs3qp5RryAldTL+zEQJ49BY=
+	t=1718033620; cv=none; b=sikB6od+Mkb2UwpEfJ/Qj4IFQseEOMdD6xhF+pX5Pb5fPuIIfX5aLGyYC/gtJAv53BnXNP6196TdP9aMt6e809r0FAij1OUAc2m083aZ56MAMFGj6nK45ScjbCTQvyKgYOAuZ6l6c4f4tCEvQiVnnsXTQeUGDVKYd0uCf11X6UU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718033410; c=relaxed/simple;
-	bh=M0zD/QABCewA709z0OEV4h/f7zo6w9P0d7rCbrKqa7c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WFf2PeAAwZh6WySw2Bl9CgdcYOXMUHcw9HC3HJwPflsXWEzFovL3Ad9BFUjVdDUw8MjJB+mFvVD2Jz1yO854r4GFO6u4Z/lejYBD1WOM2ajAoI1zPWyXFeILKfmB/qa8T3jeGpLeJGIm8H/HtbRNW0arjGfJ53KnrWMHwgeQCzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=th/ONnBQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1DE8C2BBFC;
-	Mon, 10 Jun 2024 15:30:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718033410;
-	bh=M0zD/QABCewA709z0OEV4h/f7zo6w9P0d7rCbrKqa7c=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=th/ONnBQ5G6K+DiO0E8/EPfe3HO0gsPc/x9p5AK6C/q2WdJ8Wkror8Q/7X8hnPdYC
-	 A68H21L+vZGu2ao2ERjty4m/2K1/d1UadpRzAsS0Lir4zX5h9t4U75ZupyY6IeNDlm
-	 6jzMROw1gqm8KYo2lZ0uX7+/A+cZLQyd4kLjaRpLCvVMfGl40gST2Ja6oSsfCeMnUf
-	 PAdR8KNcWvgKkJhTjEpRa5/0uypwBJVwe9EXNqvCD1NzT89ZU3LY4Q5sK1AyjZxUP/
-	 Ruvj4iyAP6lLKW2t5f4hjM98lnWRmNrPD1TPfHdoihrW0IAQ37ti5tkY2LLp/33diw
-	 eoBVKv9hsaA5g==
-Message-ID: <503e65af-1cc7-4893-8569-632790171de8@kernel.org>
-Date: Mon, 10 Jun 2024 09:30:08 -0600
+	s=arc-20240116; t=1718033620; c=relaxed/simple;
+	bh=+d4qcBQ5TqLmgZeUZlWX/ETnIPEWZGFBORlIObrELcg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OSa2nD4e6jP1aPN7oebpUP7goc5PWFpYFgspLmWYw9dJwvRJY5j6EPvkForTNHou5Fx3dGLbogyUiBYf7vASSv9uEfr/Robz744EwAlZx+CpNKdwXkZWfZ1UCFJDF2tChRquoIAGMCQR7G/WAFfaz2ofSd10Vrv/D+wwy9ndm1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=iD8M5pMs; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id C11D23F72E
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 15:33:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1718033616;
+	bh=OLB74RFEpAPPIbjErc3qPF1SfWkaR9gNaZrKnhtRg+Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=iD8M5pMs+c4Tjt1Xg29vJ3uInt5LwfNdd3OGGUVCOAlS10Jlwv1x+mmJZbrHK8IOT
+	 X/XJW15LsC6Ln1rV1tAcEFsgGL9Xyjd55ng42i6JZemz+bJhlhxGEDAZ2J/AyN68IP
+	 SNoEhT1hJI7zx8XMHw/NYPHki3Fa+0ehECkdpVfv+vmbmw6RmxxcOH4GNmnjtkf6Ou
+	 vbGfjLmEXzoI7kKwyCLF8YK9U2ec3gZ1814uTm+oIuV3+ebMzCeiRgNd5NJoTUwOg4
+	 G/GS8+RBqsMwX2cVTYJzayDrm5a9Z3THaD8uyc/mKwXlOk+EmxNDDmanA/XmPXsPXd
+	 dCt5gnCIGeJvg==
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a6f10c613b8so94574866b.3
+        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 08:33:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718033614; x=1718638414;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OLB74RFEpAPPIbjErc3qPF1SfWkaR9gNaZrKnhtRg+Q=;
+        b=CldwBWvofzGNYHJWP7cqRsUT43bIpWtXviYrse+vtHtRkEVZep/NBpks5tSGJuuR/C
+         niQ8c5w83f95HdBOl2IEEyBvm6dOi+2KL91WmdFjTdwZxjWATBK4LeQn1Dfd3oastTDc
+         nKFvwRgLWI3YNohE1LDnBIWleCiQFneM5LIEJbqq3mBHiuQW0PXWexWql3jPQw2NWNTZ
+         k0NivhSWPOe4EQ974rEQB24HqewqJ7jal3JKKpmL0HBrotHm8IIQMK5z6ojKokWisxkV
+         YBwYe63zX0/bEbFX7j316fx5VX/WFFmvV8xZ3HY/Mh00FwA7xkst+Off10bl+ptuZbli
+         72Bg==
+X-Forwarded-Encrypted: i=1; AJvYcCUr4Ek7RFj2bKEctuPv4vmNf2agLJSRPHr0+W7mJRV0BRgqKIg/AdDLU1MXBGfGL3/Jwo62x+vLIkWjbgPimW7i5K1QVxDa
+X-Gm-Message-State: AOJu0YywOKM7vkMZQ591OmNv12z7+sN9XudoFbQ9rDIfSsAp16Vvzanp
+	NlW2di9ph+sdBEnClzuu0QmvkoubMZl8jcDU4wst901nU1UcfrRjLSIUqLFcUtwCMdw6V04UOS0
+	VA3BAPFoJYNlKV8vUweNxIa9EupVM4Exye2vT2bICIH3pgWQgrp6iTyxBQK1LqmrTOIAhdwjRGs
+	3pBDzhujx0gloY9KMRevOrf3iOo2LN66jB25aQHJmHJ2mS
+X-Received: by 2002:a17:907:b9da:b0:a6f:11a4:a451 with SMTP id a640c23a62f3a-a6f11a4abd0mr287154466b.46.1718033614584;
+        Mon, 10 Jun 2024 08:33:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH0KH9vPXFO8cqAQUSJqHoFXu2nuzjTT2yMRIdMJhxAJ2NY4ei/6rxqDg9O7INg3LgoA52CjHlAspUQcSvhW34=
+X-Received: by 2002:a17:907:b9da:b0:a6f:11a4:a451 with SMTP id
+ a640c23a62f3a-a6f11a4abd0mr287152766b.46.1718033614222; Mon, 10 Jun 2024
+ 08:33:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] tcp: fix race in tcp_v6_syn_recv_sock()
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>, Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- Neal Cardwell <ncardwell@google.com>, eric.dumazet@gmail.com
-References: <20240606154652.360331-1-edumazet@google.com>
- <20240608132544.GF27689@kernel.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240608132544.GF27689@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240608025347.90680-1-chengen.du@canonical.com>
+ <CAPza5qfuNhDbhV9mau9RE=cNKMwGtJcx4pmjkoHNwpfysnw5yw@mail.gmail.com> <66660ec3f3e22_8dbbb294ed@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66660ec3f3e22_8dbbb294ed@willemb.c.googlers.com.notmuch>
+From: Chengen Du <chengen.du@canonical.com>
+Date: Mon, 10 Jun 2024 23:33:23 +0800
+Message-ID: <CAPza5qfcXSQNxz2kNVWHqYBGgnFLDa-Ey5b9y5OenZndo2a0Og@mail.gmail.com>
+Subject: Re: [PATCH v6] af_packet: Handle outgoing VLAN packets without
+ hardware offloading
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, kaber@trash.net, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/8/24 7:25 AM, Simon Horman wrote:
-> + David Ahern
-> 
-> On Thu, Jun 06, 2024 at 03:46:51PM +0000, Eric Dumazet wrote:
->> tcp_v6_syn_recv_sock() calls ip6_dst_store() before
->> inet_sk(newsk)->pinet6 has been set up.
->>
->> This means ip6_dst_store() writes over the parent (listener)
->> np->dst_cookie.
->>
->> This is racy because multiple threads could share the same
->> parent and their final np->dst_cookie could be wrong.
->>
->> Move ip6_dst_store() call after inet_sk(newsk)->pinet6
->> has been changed and after the copy of parent ipv6_pinfo.
->>
->> Fixes: e994b2f0fb92 ("tcp: do not lock listener to process SYN packets")
->> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> 
->> ---
->>  net/ipv6/tcp_ipv6.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
+Hi Willem,
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+On Mon, Jun 10, 2024 at 4:21=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Chengen Du wrote:
+> > Hi,
+> >
+> > I would like to provide some additional explanations about the patch.
+> >
+> >
+> > On Sat, Jun 8, 2024 at 10:54=E2=80=AFAM Chengen Du <chengen.du@canonica=
+l.com> wrote:
+> > >
+> > > The issue initially stems from libpcap. The ethertype will be overwri=
+tten
+> > > as the VLAN TPID if the network interface lacks hardware VLAN offload=
+ing.
+> > > In the outbound packet path, if hardware VLAN offloading is unavailab=
+le,
+> > > the VLAN tag is inserted into the payload but then cleared from the s=
+k_buff
+> > > struct. Consequently, this can lead to a false negative when checking=
+ for
+> > > the presence of a VLAN tag, causing the packet sniffing outcome to la=
+ck
+> > > VLAN tag information (i.e., TCI-TPID). As a result, the packet captur=
+ing
+> > > tool may be unable to parse packets as expected.
+> > >
+> > > The TCI-TPID is missing because the prb_fill_vlan_info() function doe=
+s not
+> > > modify the tp_vlan_tci/tp_vlan_tpid values, as the information is in =
+the
+> > > payload and not in the sk_buff struct. The skb_vlan_tag_present() fun=
+ction
+> > > only checks vlan_all in the sk_buff struct. In cooked mode, the L2 he=
+ader
+> > > is stripped, preventing the packet capturing tool from determining th=
+e
+> > > correct TCI-TPID value. Additionally, the protocol in SLL is incorrec=
+t,
+> > > which means the packet capturing tool cannot parse the L3 header corr=
+ectly.
+> > >
+> > > Link: https://github.com/the-tcpdump-group/libpcap/issues/1105
+> > > Link: https://lore.kernel.org/netdev/20240520070348.26725-1-chengen.d=
+u@canonical.com/T/#u
+> > > Fixes: 393e52e33c6c ("packet: deliver VLAN TCI to userspace")
+> > > Cc: stable@vger.kernel.org
+> > > Signed-off-by: Chengen Du <chengen.du@canonical.com>
+> > > ---
+> > >  net/packet/af_packet.c | 57 ++++++++++++++++++++++++++++++++++++++++=
+--
+> > >  1 file changed, 55 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> > > index ea3ebc160e25..8cffbe1f912d 100644
+> > > --- a/net/packet/af_packet.c
+> > > +++ b/net/packet/af_packet.c
+> > > @@ -538,6 +538,43 @@ static void *packet_current_frame(struct packet_=
+sock *po,
+> > >         return packet_lookup_frame(po, rb, rb->head, status);
+> > >  }
+> > >
+> > > +static u16 vlan_get_tci(struct sk_buff *skb)
+> > > +{
+> > > +       struct vlan_hdr vhdr, *vh;
+> > > +       u8 *skb_orig_data =3D skb->data;
+> > > +       int skb_orig_len =3D skb->len;
+> > > +
+> > > +       skb_push(skb, skb->data - skb_mac_header(skb));
+> > > +       vh =3D skb_header_pointer(skb, ETH_HLEN, sizeof(vhdr), &vhdr)=
+;
+> > > +       if (skb_orig_data !=3D skb->data) {
+> > > +               skb->data =3D skb_orig_data;
+> > > +               skb->len =3D skb_orig_len;
+> > > +       }
+> >
+> >
+> > The reason for not directly using skb_header_pointer(skb,
+> > skb_mac_header(skb) + ETH_HLEN, ...) to get the VLAN header is due to
+> > the check logic in skb_header_pointer. In the SOCK_DGRAM and
+> > PACKET_OUTGOING scenarios, the offset can be a negative number, which
+> > causes the check logic (i.e., likely(hlen - offset >=3D len)) in
+> > __skb_header_pointer() to not work as expected.
+>
+> The calculation is still correct?
+>
+> I think that this is not the first situation where negative offsets
+> can be given to skb_header_pointer.
 
+The check will pass even if the offset is negative, but I believe this
+may not be the right approach. In my humble opinion, the expected
+check should be similar to the skb_push check, which ensures that
+after moving forward by the offset bytes, skb->data remains larger
+than or equal to skb->head to avoid accessing out-of-bound data. It
+might be worth considering adding a check in __skb_header_pointer to
+handle negative offsets, as this seems logical. However, this change
+could impact a wider range of code. Please correct me if I am
+mistaken.
 
+>
+> > While it is possible to modify __skb_header_pointer() to handle cases
+> > where the offset is negative, this change could affect a wider range
+> > of code.
+>
 
