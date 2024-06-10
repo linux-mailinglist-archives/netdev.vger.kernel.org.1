@@ -1,144 +1,256 @@
-Return-Path: <netdev+bounces-102206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA88B901E8E
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 11:45:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCCB7901E99
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 11:54:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FF5C283ABD
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 09:45:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7E181C213A3
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 09:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F6E442AA1;
-	Mon, 10 Jun 2024 09:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 374707406A;
+	Mon, 10 Jun 2024 09:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gbDGeBhT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5728C1DA4C
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 09:45:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718012750; cv=none; b=ILU8CVr52DIxDm1tQO8ZgpHB4dm9tlLI0jwRn1GOvb8Aav6raSpcf+TJpQVU9v3qiQXbNW3ygJCRdlIDuP/XePGW8rCgB2i3CdUh0ko427jniorH3K0wm0U9mZRVVRCBWDhg92ivQ02xi1tkTLqlyfv2PbGn7Ss+BnReyuWh3jI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718012750; c=relaxed/simple;
-	bh=tE0urKDo1iCeCScMovRS4kWxooEg5E+Xm6Hbn/awP9M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jiCKYAJ62rOELuuK9jvXvoJIPVyl2ehdJAZu7KZ0lRHm4Z6IVkglriU9nZl4IB5IGBKkDs2VOxa1f62rR0A8lY8hnAGEBpEo9TjHbrVsa2YCWmRbze04tcVeBYmQ8VfQP/a1COmBizbNQHfOOYMKA2fkwEZrBnOioQu36kz+tic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id B7BBC61E5FE01;
-	Mon, 10 Jun 2024 11:45:17 +0200 (CEST)
-Message-ID: <a2ad5189-10d1-4e6b-8509-b1ce4e1e7526@molgen.mpg.de>
-Date: Mon, 10 Jun 2024 11:45:17 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E3ECA62
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 09:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718013291; cv=fail; b=C1HzajTlVug16EQETzgEE1Mfzrmwu3tj+DWBx91CmmUCUzguuug93tDE2FK5e7rg1IoIx0fR5dVCgayRVMlbN0CenrjF9jc39i1VeYn2bcgI7moYW874xuxtqPTStXfaEzhw4uO1+L0Ohv6nCrh2kgDWe0/ou3GyH7yTNjAk6N4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718013291; c=relaxed/simple;
+	bh=v8S15YgKDdopcA3jzyqTrx8g+ht2EDQcePEdztm9yME=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=sNZF1SbIk/paDpqyZubPLL8EKK/ksdK92nCT//duwPdyY1N4WYHQPDymyxeQojcX7/iBsjOuTFKhUNAT15e2byj6FdtBIU0YEAxxZSaBjGqF68qR2WB1m9lKUg+4A3fCzMBldv3fchM331KtTMmU4pMloJTBKWpGKFPn4WXbEvU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gbDGeBhT; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718013290; x=1749549290;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=v8S15YgKDdopcA3jzyqTrx8g+ht2EDQcePEdztm9yME=;
+  b=gbDGeBhTLv3dU7DGKpw46YyQ+UDFL1thWsA8qC/GXcGHksmUkH+EICWN
+   +Ef8X9XAguKZm0lY5V8RrerV1L8MlzTn9WcYEqYF8jxhvyEU2DVfXtQIS
+   D1QOdQUBdyrstJjvxSTflB3EF0ehSh2FzJiD3xencK/CKB7Xt6Q3qYyJk
+   uXRS40i1LefrIC0+P4QhlWnnDAprIXER0lWuHe21z457bcw2wKT+BfQ3+
+   fDDdXmYNzfscSeWwly+dLMdBnqOvcYHl877CfUHfV6fRHoy2oY2FR2uWk
+   YCxCgMIQDgCr0jQC/Jgp1sSQuQpd6n0YcDARheuAbdb0Aieh/cBWA0iTm
+   g==;
+X-CSE-ConnectionGUID: 6OGe7AU/Rxug8s4eojUxSw==
+X-CSE-MsgGUID: tWXZJeRSQKunx/nWaBmEBw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11098"; a="14615716"
+X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
+   d="scan'208";a="14615716"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2024 02:54:49 -0700
+X-CSE-ConnectionGUID: 10w0ucZIQF6DajYTSSZYdw==
+X-CSE-MsgGUID: vs8oUNmoSyiN9m5fZNFhdQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
+   d="scan'208";a="43953961"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Jun 2024 02:54:49 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 10 Jun 2024 02:54:48 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 10 Jun 2024 02:54:48 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 10 Jun 2024 02:54:48 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 10 Jun 2024 02:53:53 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YEPEc4pbEAT+gNn7Ci/CBl6WbN3pdsvo8uw0xj9amd72qy3s0pLq0GEJHoaqsnwYJW2Jem9lnpChMhVgxdilleVEc3efLuAc9xeiEj6+ff3ebv7Gf4cWOsVdBqctD3w0fSdDXo3cZnwU5z5yRinzBvuQOkjAzVjYqgAvk4MY+gdvIzKOg8GCPsInFMVdBKZ2+BKBW7lCDdXofT+2RxbUI4zuZw0k65GRv74+BARV+BvwGuyjZh01qrszIxCJ+qRiSKpIcQoGeKgmlRf5SJTbwDR1zHdUbVfrNwYqIbDGZR8nM6mpbx8zV/ivmvcNXHnREX7mg179WsU3p3ecvKDASw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dQ6Zx0CYcl9NMOUxGRrqrmfkKi4RbZ039XT8tl+NJjU=;
+ b=VKeDCr/0kt7ilVMPdzTSHL9tQb8adwa6QdG8Ed2X46jlZ1oEki9mk4iiExCLOV1VY+Tezo/FlPPp7Tj02bpxaWsPZ6lw0aDfJAM+YzOq7hjsi+mCxG7cCRBEDISV41d1qg98ugrniC5MR4u1wqoE4rlGU23dQMBzbNDmAd0IlERqYLshsa5lMzIhvluuwCT+XPPs+SI6R73S0XCkBmYRfB64YWV+joa0/5IxlcM7TpeaYy+e5I6C2AafhTeJjfrmnNt/6hW9O7dZzsoF0/pnA3V7DOFO3J6A4/fDzRPlFKtRnM7+Itvbjgf6LZWojabkIKVwTm62d0IHY+V9Nf0evQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
+ by DM4PR11MB7373.namprd11.prod.outlook.com (2603:10b6:8:103::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.36; Mon, 10 Jun
+ 2024 09:53:52 +0000
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4f97:ad9d:79a9:899f]) by CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4f97:ad9d:79a9:899f%5]) with mapi id 15.20.7633.036; Mon, 10 Jun 2024
+ 09:53:52 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "Kwan, Ngai-mint" <ngai-mint.kwan@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Chmielewski, Pawel" <pawel.chmielewski@intel.com>,
+	Simon Horman <horms@kernel.org>, "Polchlopek, Mateusz"
+	<mateusz.polchlopek@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net v5] ice: Do not get coalesce
+ settings while in reset
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v5] ice: Do not get coalesce
+ settings while in reset
+Thread-Index: AQHauNRoN6FzpoM54Uq65PsA4ND2+7HAxgSA
+Date: Mon, 10 Jun 2024 09:53:51 +0000
+Message-ID: <CYYPR11MB8429BE3AF9299834A36B53AABDC62@CYYPR11MB8429.namprd11.prod.outlook.com>
+References: <20240607121552.15127-1-dawid.osuchowski@linux.intel.com>
+In-Reply-To: <20240607121552.15127-1-dawid.osuchowski@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|DM4PR11MB7373:EE_
+x-ms-office365-filtering-correlation-id: 7ab39916-9ef0-42c1-6363-08dc89333bdb
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|366007|1800799015|376005|38070700009;
+x-microsoft-antispam-message-info: =?us-ascii?Q?NRu7ptfJRbkKoKSfeERn76RLlPADcDge8OXYKsJlhUYp/ZO1pII/EtjJRjAM?=
+ =?us-ascii?Q?7BzWGGbj4ALQaQzIf9fk3R8Um8Zb0Icf0sRfVew74lYanP0LnLGQOuybCZfv?=
+ =?us-ascii?Q?k74Iqtd7tKfUcaITW4jajtZY1ZEMXEVA5JImRAvtHPZJx/m4K1YdFz6KsPSv?=
+ =?us-ascii?Q?FM2VolPBxgF5C8dqxx3uxbhzAV7ZOIE71pw0qP+D5I9S1cScWPpFVjNVNn4d?=
+ =?us-ascii?Q?uDYTRzKQkwp3sXmt9b2SC3V8rtE0b4uv31lfVMVbHQ/avMrHNCp9jrijSeWv?=
+ =?us-ascii?Q?zFvLNQ0b3AUrNVqiImJfDNJGPfVIvkRv+34oQryPf51yv1RdTyYwFdNc4ai5?=
+ =?us-ascii?Q?RwSfXmFLkl73V0a57OSk7JuKfDbTyvOf84dQXHctGy9dWqjbkMHswlB01ytp?=
+ =?us-ascii?Q?8PZhoDOKzCMNJ1YGtYWTXOzI2BbgrGNh36ijGd1cjTNxgod1dw9EHiD+aY03?=
+ =?us-ascii?Q?qPNYPIkRO0czq3ZlBEe2tPZZCLUEdh7NS79V84ATjBTYeoRBdZW8hBbx0w59?=
+ =?us-ascii?Q?UvMgmxo5NecLre+U1jQulDk+OpmfP9yTePsRdoonp+5374jQ0PZrWGP2V//k?=
+ =?us-ascii?Q?4tZ1d92hnz4bkBxEiu5aM+zStvPnk+6BBrQHX+/5zx75FQLuIIRyDjmcnuC5?=
+ =?us-ascii?Q?IOTZGSGG8j2k32kSH5RwVOqdV8u4DW53Ioz9nGTZSMhTX9i55w8E5QhdJdPB?=
+ =?us-ascii?Q?OVqtSfC2Gx5qeVLZJd8GKSVQf5t1dQZf1DjmnFjdhBFnN10mKd+MgEld62xO?=
+ =?us-ascii?Q?pNmthDo6YOFh7P7mkrGePctWu/NpvX4Ea3M/GOAUuvkWFrc0V5WOo54Ww+Wj?=
+ =?us-ascii?Q?Ve0137U33pcMAiOcPGH7R2IjnQWfVSdR7U7tvyK+05X90VPy98q3DCEYhdNE?=
+ =?us-ascii?Q?i182iLGZBcELOb7ELaOjHz1efGuIpJ7VPO4qNrVoqg5GdEKXT+CRE+U3j71b?=
+ =?us-ascii?Q?RNOAV+vPMv76JGt6jcxP9rBkVGXv9U9kJoY1yppvZihopn6+reY7AlGl4YWh?=
+ =?us-ascii?Q?xuir7//THwrpcSNJepfnrJtSzVHX54EB7mruFIh3K2x6MBExuLSV/mlHL81m?=
+ =?us-ascii?Q?c/LaI531AjWoA9q1lpdbuuhlALQKhhu/HYVuFJSPRFFzGzhbZHMxcwwOUbwD?=
+ =?us-ascii?Q?ew198zYX7qzIcw8VIvHJQX1x3BEi4nSUfJUhRiddUeXvbtKt4ITYyxXCxQg8?=
+ =?us-ascii?Q?foCpvUQifoHO+a8minjpSpOdfO4XKvSYkVQbMChdNWp/bDLevXtaS03WeC3y?=
+ =?us-ascii?Q?FJMuQOaAttFJcPILxSZvCauaKYx9kp41cwTzWwA6EBagtx7eNRXAmwh3hAn4?=
+ =?us-ascii?Q?sh4j9Jj7dDaz1gl9KJ0V+mI9?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?wMelPvON/X7oCvhnAtuLWxKwmX+ltsiardsjDQA0dlvb7IzgclhlmpmmVABe?=
+ =?us-ascii?Q?aDCdA7yk2cUZDD7g08HIL8Po1IR0D4iBT1o+b13MWPEA+3rsgcXDh0qA73ly?=
+ =?us-ascii?Q?JBWasu+EXLR8pMx3b3cVeqHi6hzju1cvMxx5AT6mBhPlhraPLZP0FFILoMOj?=
+ =?us-ascii?Q?jM7Si2C1pkn26JfEe1MlS6du80lGxqjeyH1PJziObcyCgbE7RjiG0Xz6SoI7?=
+ =?us-ascii?Q?LzKTD7osOXv/pvq1Yqt44OGNaGWgGImktQlNzqh2V9touVr9BlbmzBfMgz00?=
+ =?us-ascii?Q?mv7nsogTAEgcAOf84R6/O5p04NWdgHeRa1nBiptDMR0mKSl0aLl6VkO4GlQd?=
+ =?us-ascii?Q?wejJDVfIxt3LPKNgzSZRbYekXiJJepOoAdcQ92cvw0yvg0wIw4diyMHofQqY?=
+ =?us-ascii?Q?rNQbJFF/lzAglILhyJ8EVObOkAVCAtrH8eg7ya8jygNu8izwFck6mbCyBoOJ?=
+ =?us-ascii?Q?fFWLU5aB8N5AGXBYszrq2XXw3Bky9F5eZMN0U7JT+8HSKx+bBOIyvMEl+xFv?=
+ =?us-ascii?Q?UFv8NNqkmpOiC25+QHy/b1Ihv83I9Vfit+bRNen210z8K9ClGX3lXaIGiIv9?=
+ =?us-ascii?Q?Rw/5jpkcB29WkMClq5nC4CeXAiP36fzP7A7WTQ1SfAYKq7nR8Dfn7ea+z5vB?=
+ =?us-ascii?Q?a6Wf/e9UPncB8Ki7VTmiLyVpkBDjYgapEjkbmdY1Q+wBzXXKlgkXKZJd2pq1?=
+ =?us-ascii?Q?KVkLu/qn++NSEzE9oEqbrax0N3z/LvLHgEdtzY1hwuAzsoWQzQfRMcjXT+zx?=
+ =?us-ascii?Q?jdjGjJI0XAnT/ueL1cdx7bjjlWxm0wrK6qQv/CdVabi+ighvHnNuE8xpWO1K?=
+ =?us-ascii?Q?MLqPlVyiu85g/dAmIGHKX9UKRMfbK6mm5QNLAZCz+jjdgteOyYTU2IpxOAAn?=
+ =?us-ascii?Q?7LqJKPTye6yypNWLoWDRsyGcvwJV333a1jCCRw8qHIgYj4/DbnFVeqXNerd0?=
+ =?us-ascii?Q?Pa8KTP3+U600hYKcMPcC3ox93FHYX0NYVqmuEP/MRB+pi2sBcOdvZRVHUVQC?=
+ =?us-ascii?Q?UnDep0y4Y2CgqYWWlyLoOH+7jqjmqlpShNu5mJ53lxpL4HU1wNvZzct7s0aV?=
+ =?us-ascii?Q?8pf4XbEsRqzN018Eivm3EWKJij4PjGTm7mr795hSxFvFmORPDmHJ9AcrjqbW?=
+ =?us-ascii?Q?eChg2Y6VXE0zefLUrfUVEGxE42M+ZDeaxs07UFIzdEmqwKqoKlqqgPeNbhEs?=
+ =?us-ascii?Q?ZxIDVF8gNtBe/1QzmzRHBQ/6+z6+N8ee2aykXgTY+aWW1GJu3noUdacNRFwR?=
+ =?us-ascii?Q?vRRZcDanU6yLJ9aXFiWGE2FDGFOG9uSLj9MY88ytH5GcMqmYQXToFqOKZTEv?=
+ =?us-ascii?Q?XfYU5kmvcTMtc4PFg/7swY5DCKHFE9bBZuaUSMyFGcfifEYWxaqpxCcKZcKg?=
+ =?us-ascii?Q?/pZF9mJNU3OvAb7k02V6m28D6YcAtv0NcnGEnJFJpwnXSFsZ1XcgFQl6GlwS?=
+ =?us-ascii?Q?VIFlsfpZFNVU9EggUqT8RqbSeybLCUlliXCjqlHiHt18Js+k4XrJkct0fPdS?=
+ =?us-ascii?Q?mW5qw4QavleCB+bn7EKIFVYMqEffbJBThrmOm9F03ECtk4OMSYK10W32VgCM?=
+ =?us-ascii?Q?NGa86aegNziTpFKuf0pCin5wk/bov/lZCYq5bDkQ+ZKpM/0hKcthTFnwuknY?=
+ =?us-ascii?Q?hg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] i40e: fix hot issue NVM content
- is corrupted after nvmupdate
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- Kelvin Kang <kelvin.kang@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
- netdev@vger.kernel.org, Arkadiusz Kubalewski
- <arkadiusz.kubalewski@intel.com>, Jan Sokolowski <jan.sokolowski@intel.com>,
- Leon Romanovsky <leonro@nvidia.com>
-References: <20240610092051.2030587-1-aleksandr.loktionov@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240610092051.2030587-1-aleksandr.loktionov@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8429.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ab39916-9ef0-42c1-6363-08dc89333bdb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2024 09:53:52.0012
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ihQM8jYnx6DRh73s23vYU7W7R8GmJEalLz6ebtZhI/5Ji8Le07XZeEHuGfiAPmypiQr0o2UJQQPGyu6g/aZTwsQilcJp6j1OYNPAL1+Ya1mwVqbyJRQEgPnwIg+In8AY
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7373
+X-OriginatorOrg: intel.com
 
-Dear Aleksandr, dear Kelvin,
-
-
-Thank you for your patch.
-
-
-Am 10.06.24 um 11:20 schrieb Aleksandr Loktionov:
-> After 230f3d53a547 patch all I/O errors are being converted into EAGAIN
-> which leads to retries until timeout so nvmupdate sometimes fails after
-> more than 20 minutes!
-> 
-> Remove misleading EIO to EGAIN conversion and pass all errors as is.
-> 
-> Fixes: 230f3d53a547 ("i40e: remove i40e_status")
-
-This commit is present since v6.6-rc1, released September last year 
-(2023). So until now, nobody noticed this?
-
-> Co-developed-by: Kelvin Kang <kelvin.kang@intel.com>
-> Signed-off-by: Kelvin Kang <kelvin.kang@intel.com>
-> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-
-Please give more details about your test setup. For me it’s also not 
-clear, how the NVM content gets corrupted as stated in the 
-summary/title. Could you please elaborate that in the commit message.
-
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of D=
+awid Osuchowski
+> Sent: Friday, June 7, 2024 5:46 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Kwan, Ngai-mint <ngai-mint.kwan@intel.com>; netdev@vger.kernel.org; C=
+hmielewski, Pawel <pawel.chmielewski@intel.com>; Simon Horman <horms@kernel=
+.org>; Polchlopek, Mateusz <mateusz.polchlopek@intel.com>; Dawid Osuchowski=
+ <dawid.osuchowski@linux.intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-net v5] ice: Do not get coalesce se=
+ttings while in reset
+>
+> From: Ngai-Mint Kwan <ngai-mint.kwan@intel.com>
+>
+> Getting coalesce settings while reset is in progress can cause NULL point=
+er deference bug.
+> If under reset, abort get coalesce for ethtool.
+>
+> We cannot use ice_wait_for_reset() since both the ethtool handler and the=
+ adapter reset flow call rtnl_lock() during operation. If we wait for reset=
+ completion inside of an ethtool handling function such as ice_get_coalesce=
+(), the wait will always timeout due to reset being blocked by rtnl_lock() =
+inside of ice_queue_set_napi() (which is called during reset process), and =
+in turn we will always return -EBUSY anyways, with the added hang time of t=
+he timeout value.
+>
+> Fixes: 67fe64d78c43 ("ice: Implement getting and setting ethtool coalesce=
+")
+> Signed-off-by: Ngai-Mint Kwan <ngai-mint.kwan@intel.com>
+> Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
 > ---
->   drivers/net/ethernet/intel/i40e/i40e_adminq.h | 4 ----
->   1 file changed, 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.h b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-> index ee86d2c..55b5bb8 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-> @@ -109,10 +109,6 @@ static inline int i40e_aq_rc_to_posix(int aq_ret, int aq_rc)
->   		-EFBIG,      /* I40E_AQ_RC_EFBIG */
->   	};
->   
-> -	/* aq_rc is invalid if AQ timed out */
-> -	if (aq_ret == -EIO)
-> -		return -EAGAIN;
-> -
->   	if (!((u32)aq_rc < (sizeof(aq_to_posix) / sizeof((aq_to_posix)[0]))))
->   		return -ERANGE;
+> Changes since v1:
+> * Added "Fixes:" tag
+> Changes since v2:
+> * Rebased over current IWL net branch
+> * Confirmed that the issue previously reported for this patch [1] by Hima=
+sekhar Reddy Pucha was caused by other, internally tracked issue Changes si=
+nce v3:
+> * Using ice_wait_for_reset() instead of returning -EBUSY Changes since v4=
+:
+> * Rebased over current IWL net branch
+> * Rollback the use of ice_wait_for_reset() due to rtnl_lock() deadlock is=
+sue described in [2] and commit msg
+>
+> [1] https://lore.kernel.org/netdev/BL0PR11MB3122D70ABDE6C2ACEE376073BD90A=
+@BL0PR11MB3122.namprd11.prod.outlook.com/
+> [2] https://lore.kernel.org/netdev/20240501195641.1e606747@kernel.org/T/#=
+m1629ecfe88d26551852c5c97982cd10314991422
+> ---
+>  drivers/net/ethernet/intel/ice/ice_ethtool.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
 
-The referenced commit 230f3d53a547 does:
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
-```
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.h 
-b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-index ee394aacef4d..267f2e0a21ce 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-@@ -5,7 +5,6 @@
-  #define _I40E_ADMINQ_H_
-
-  #include "i40e_osdep.h"
--#include "i40e_status.h"
-  #include "i40e_adminq_cmd.h"
-
-  #define I40E_ADMINQ_DESC(R, i)   \
-@@ -117,7 +116,7 @@ static inline int i40e_aq_rc_to_posix(int aq_ret, 
-int aq_rc)
-         };
-
-         /* aq_rc is invalid if AQ timed out */
--       if (aq_ret == I40E_ERR_ADMIN_QUEUE_TIMEOUT)
-+       if (aq_ret == -EIO)
-                 return -EAGAIN;
-
-         if (!((u32)aq_rc < (sizeof(aq_to_posix) / 
-sizeof((aq_to_posix)[0]))))
-```
-
-So I do not see yet, why removing the whole hunk is the solution.
-
-
-Kind regards,
-
-Paul
 
