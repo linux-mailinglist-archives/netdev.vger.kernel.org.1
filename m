@@ -1,99 +1,135 @@
-Return-Path: <netdev+bounces-102361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B02A902AE0
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 23:50:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7112E902B38
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 00:00:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CDE21C21707
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 21:50:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87FAC1C23105
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 22:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48637603F;
-	Mon, 10 Jun 2024 21:49:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D405142E62;
+	Mon, 10 Jun 2024 22:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RcAE+08L"
+	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="OA6qjiDA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender4-of-o54.zoho.com (sender4-of-o54.zoho.com [136.143.188.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A016AB6;
-	Mon, 10 Jun 2024 21:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718056195; cv=none; b=fXRrd/3p41jn4R7H4/0Me2Jp6BMv2v9ui3Ler5nsPXBBUSMUZWzyQUBIJn9M54eTQa2uuUxEFsCXu7/tOn3q+Pm4byoi8jiVNK7slAO+JR5ndnd9mLuKNHhlLRMooQfK6ZW2iL+28I1xK1/a08LOSBjjomDyhJeKkd3BOg6WMQs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718056195; c=relaxed/simple;
-	bh=iqoeqU7qrd7+cqZSSIW9HJHlvFu1ZrsTtWb1zfe2NEE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xr+XcsC1NFbRRAfCRz76tqALs0h/eefcxFb687X/RL7BPPgokM25OCW/hJveF3o6aSZkbH7SI2KNE3ORDeT/wDcWi7D2eXIYpx9KfNsuT7W3XmVU5FjS7+LU/J8lWeuBavnrp3065NW8dNcGD7aYm9cbAEnTqWb+pLsxVNXjtxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RcAE+08L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 071A9C2BBFC;
-	Mon, 10 Jun 2024 21:49:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718056195;
-	bh=iqoeqU7qrd7+cqZSSIW9HJHlvFu1ZrsTtWb1zfe2NEE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RcAE+08LJLvIeH1O5c/0fRi76GuNfP6Cuyb7ml4RWOzjFj8R1PrjnmA/XhR8Nmvn6
-	 n/jcXxhQly2HiTRB6BYiW+O5sYjqTQmaMtr7U5MUqxNb+++EtY4f4nWiCFPCZ8azAI
-	 6cJbGMov8EFNNT+TACSr4w6D4M35B4dH8yrm1n/HK0cFCzH2WvAdR2z8qU750YLIFV
-	 0oOQpMpf80gU6OOIpqKVGkNihXM3FddFKoMZqSIoX3feVs/wiK2xOjfERX9uvLAljU
-	 ieJzoFNUWpQgLx27C+0HIfz4GXHW0Bkio5izHEc0pkrdrt6Yd8TMfEySCeFDwPhhIj
-	 SLFZJAX9flCsw==
-Date: Mon, 10 Jun 2024 15:49:53 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Josua Mayer <josua@solid-run.com>
-Cc: Rob Herring <robh+dt@kernel.org>, Jonathan Cameron <jic23@kernel.org>,
-	linux-iio@vger.kernel.org,
-	Richard Cochran <richardcochran@gmail.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Yazan Shhady <yazan.shhady@solid-run.com>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	linux-phy@lists.infradead.org,
-	Gregory Clement <gregory.clement@bootlin.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Lars-Peter Clausen <lars@metafoo.de>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>, Daniel Baluta <daniel.baluta@nxp.com>,
-	linux-kernel@vger.kernel.org,
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Vinod Koul <vkoul@kernel.org>,
-	Konstantin Porotchkin <kostap@marvell.com>,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH v6 4/7] dt-bindings: phy: armada-cp110-utmi: add optional
- swap-dx-lanes property
-Message-ID: <171805619146.3132064.3390412132436424626.robh@kernel.org>
-References: <20240602-cn9130-som-v6-0-89393e86d4c7@solid-run.com>
- <20240602-cn9130-som-v6-4-89393e86d4c7@solid-run.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6DA76026
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 22:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718056834; cv=pass; b=WmkPPMSi8uMdEvWU2mtxPy+P0hk99O41r7ryZ7evpkUmCIIJyEqLX4NvHDZr1ShY1ZsThl9pKc0jEGnlRY2CVo7WeHLXglUZWPRYEuJqOTPGEhw39hU1QPYm10MBWzle2948jMhTUWaN8f/frKtO/lOE7tKMoo5rniD3SvlasXo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718056834; c=relaxed/simple;
+	bh=sKfHZ/qg1Rc4h0OWnen+dGyCkEU/N/2kgbelh1SfXVE=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=VjNs44tHZKPVPPyPU7wfgjTArGVw7yV4I3eTVRWiEwYJgaDB3ZLpdxS1lKKqIDTCfZhBspfzSMtE+9bKB3czZhMYNKIThH9NplFGz0fIocPgTyyMo7pvm5nfqZIcnLVucYHY1zlnIVTwWWUz0dwu1YGK53JOFU9JssrKZWMO2ok=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=OA6qjiDA; arc=pass smtp.client-ip=136.143.188.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
+ARC-Seal: i=1; a=rsa-sha256; t=1718056828; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=LX67qSS7jMiFrh9BjyyA2IUeSa2Pg2g5WQDcUVw/ae0KGp4bLxWahFLostM7afCKISDVV+EUa4ROq/6GPBnKnOJ7TI4ezTB6sTzB5Rzt2IVa+v5ZN3kqNttw+uOpqkR6CfAWEbrEuKGhnj5yE/xA509X5qcH+6892dR3nGkk8BM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1718056828; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=CLXrfSTyByipGm3k0/eSOVJWmxe0OETPD3nsGV0CWSc=; 
+	b=fa6Iq0XXo2R6ctEnsDIELDHCh0e4MwntjQ58aRVp8tvg7p5Zg1IfPIeY33hC19xfU5nTi59+gtMjA04+ZsTTDdJFbe6J5e0xCeKcO9J4wYTlMO0FROaifA09k4PPvnphbjZ4wU/sGgTnBvTQN2aY5L3biZoI8XJ7M57Xtl1A/tQ=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=machnikowski.net;
+	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
+	dmarc=pass header.from=<maciek@machnikowski.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1718056828;
+	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
+	h=Content-Type:Mime-Version:Subject:Subject:From:From:In-Reply-To:Date:Date:Cc:Cc:Content-Transfer-Encoding:Message-Id:Message-Id:References:To:To:Reply-To;
+	bh=CLXrfSTyByipGm3k0/eSOVJWmxe0OETPD3nsGV0CWSc=;
+	b=OA6qjiDAD5Myd8OlZNnUFHCFQKQuBzxuCCKcfcQlnZQBynBnGZw7UvZsJ0wW7PQ2
+	Vo31LIl0lmnmVw0NJUX9MEK4d+eWBKpzbxgCQDctL7+FNbQRTm8Sz1B/LZzQTZ3kPru
+	AGjLel6TDNgxaTKWTjzT5ZP9O6kJZ4kBYovD5L6rhA6uQZnfFfZgIKqZN8nlC1FkHFW
+	9je9beuX3+j4XnzaeBqPlVY/FPVaD5E/uHzhe6zlQVgsE/DQo/vyCz/RWzGTgtXNKp/
+	ArsW/fYCwjSQhSLZI0E7z+YK1Kpyvj/vgz0C0WTcVTM+GcCI5QgtLpPXOD+Hhlb+jwd
+	nKTt8wCHzA==
+Received: by mx.zohomail.com with SMTPS id 1718056826558477.3081338412985;
+	Mon, 10 Jun 2024 15:00:26 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240602-cn9130-som-v6-4-89393e86d4c7@solid-run.com>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
+Subject: Re: [BUG] [PATCH net-next v3 0/2] netdevsim: add NAPI support
+From: Maciek Machnikowski <maciek@machnikowski.net>
+In-Reply-To: <a8ac00ed-4ec1-4adf-ad37-2efa1681847d@davidwei.uk>
+Date: Tue, 11 Jun 2024 00:00:12 +0200
+Cc: Jakub Kicinski <kuba@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Transfer-Encoding: 7bit
+Message-Id: <58F03FAF-855C-4938-A97D-55587A0E2E14@machnikowski.net>
+References: <urn:uuid:d06a13bb-2b0d-5a01-067f-63ab4220cc82@localhost.localdomain>
+ <708b796a-6751-4c64-9ee6-4095be0b62f2@machnikowski.net>
+ <a8ac00ed-4ec1-4adf-ad37-2efa1681847d@davidwei.uk>
+To: David Wei <dw@davidwei.uk>
+X-Mailer: Apple Mail (2.3774.600.62)
+X-ZohoMailClient: External
 
 
-On Sun, 02 Jun 2024 17:49:39 +0200, Josua Mayer wrote:
-> Armada CP110 UTMI supports swapping D+ and D- signals.
-> usb251xb.yaml already describes a suitable device-tree property for the
-> same purpose but as child usb controller node.
-> 
-> Add optional swap-dx-lanes device-tree property to armada cp110 utmi phy
-> with same semantics as usb251xb:
-> The property lists all ports that swap D+ and D-, unlisted ports are
-> considered correct.
-> 
-> Signed-off-by: Josua Mayer <josua@solid-run.com>
-> ---
->  .../devicetree/bindings/phy/marvell,armada-cp110-utmi-phy.yaml      | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> On 6 Jun 2024, at 16:31, David Wei <dw@davidwei.uk> wrote:
+> 
+> On 2024-06-05 12:38, Maciek Machnikowski wrote:
+>> 
+>> 
+>> On 24/04/2024 04:36, David Wei wrote:
+>>> Add NAPI support to netdevsim and register its Rx queues with NAPI
+>>> instances. Then add a selftest using the new netdev Python selftest
+>>> infra to exercise the existing Netdev Netlink API, specifically the
+>>> queue-get API.
+>>> 
+>>> This expands test coverage and further fleshes out netdevsim as a test
+>>> device. It's still my goal to make it useful for testing things like
+>>> flow steering and ZC Rx.
+>>> 
+>>> -----
+>>> Changes since v2:
+>>> * Fix null-ptr-deref on cleanup path if netdevsim is init as VF
+>>> * Handle selftest failure if real netdev fails to change queues
+>>> * Selftest addremove_queue test case:
+>>>  * Skip if queues == 1
+>>>  * Changes either combined or rx queue depending on how the netdev is
+>>>    configured
+>>> 
+>>> Changes since v1:
+>>> * Use sk_buff_head instead of a list for per-rq skb queue
+>>> * Drop napi_schedule() if skb queue is not empty in napi poll
+>>> * Remove netif_carrier_on() in open()
+>>> * Remove unused page pool ptr in struct netdevsim
+>>> * Up the netdev in NetDrvEnv automatically
+>>> * Pass Netdev Netlink as a param instead of using globals
+>>> * Remove unused Python imports in selftest
+>> 
+>> Hi!
+>> 
+>> This change breaks netdevsim on my setup.
+>> Tested on Parallels ARM VM running on Mac with Fedora 40.
+>> 
+>> When using netdevsim from the latest 6.10-rc2 (and -rc1) I can't pass
+>> any traffic (not completing any pings) nor complete
+>> tools/testing/selftests/drivers/net/netdevsim/peer.sh test (the test
+>> hangs at socat step trying to send anything through).
+> 
+> Hi Maciek, I'm trying to reproduce the issue.
+> 
+> Can you please share how you're setting up netdevsim to pass traffic?
+
+I modified peer.sh to stop after creating and linking two netdevsim adapters
+and then ran the ping from one namespace to another. The same script
+and procedure worked fine when running 6.9.3, but failed with any 6.10-rc
+releases. And the only delta between these two netdevsims is this patch.
+
 
 
