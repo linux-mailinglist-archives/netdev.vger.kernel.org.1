@@ -1,93 +1,107 @@
-Return-Path: <netdev+bounces-102194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D9E6901CE3
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 10:27:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32115901D14
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 10:39:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FB811C20355
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 08:27:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB7431F21695
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 08:39:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D9E5FBB1;
-	Mon, 10 Jun 2024 08:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F331156452;
+	Mon, 10 Jun 2024 08:39:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SilQ93qf"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jaYxa65N"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A06E23B0;
-	Mon, 10 Jun 2024 08:27:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D8D55887;
+	Mon, 10 Jun 2024 08:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718008032; cv=none; b=a8RyirUqLcIZwoMVrRcwwChoAgxZw7mdaDnq3fsi0eCJPyZhyGRZ52gwfCt8WnYso1Awk5rIbx1Pqw7cGf5ZB5n6J19/2j/YaED/ju9reU6G71gSOPM3j/qYbiMHKafApR2EOQe15lk4oNdI6Xor9POMmiPcW+yJ3p3chLZeAbo=
+	t=1718008772; cv=none; b=DraGHvszZ0NIgiBUsNlZDQF7q+mryguKAlkzqQ0aEQKytr3nyHAdQYwHvnlB9PiC2BBF70Q5bBLRlWNO9AxSyxvRyhObzfxCkulmhCGjd1fqhX+rKGbdNgDI0OTKe36XNLz+m0J/9ghyZQwbFH0y1HPHKyAs+bGtzpiXsqvnN2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718008032; c=relaxed/simple;
-	bh=peNE9WghVFJ53LTT04oeeh7PiP05qmSgztBlTCMdvRA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N7hUFOnOtgR8hsqfetF3MLfg/XXgkHxCNbOZUBqrAAqmNdUnkyg/x8FyYc06lmthM4goMoHhnmRe2vLD1XxxNpp7FP9XHYZhq4A4lJAEehXp7YsMbIhRPcWMmU1A3Vf3uG+kK1grft+kQVOTpApLLTvd/1/TIwHC3Rw33Kd3/pQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SilQ93qf; arc=none smtp.client-ip=217.70.183.199
+	s=arc-20240116; t=1718008772; c=relaxed/simple;
+	bh=368XwNYZD0whAtsmeET0VZaclcSeD6ddAe2PyDhTmoM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=n8B8KzyKNSOxpS3BqO0xiA7LGDEebJtozzPNDbopcQ2SuM+W+PJHbWdRYYlww0W1jm6ZunpLK3AY9EC0JgtGizuneYewt+46uGjuornyOEARzCzuQmVLS7bLoJG+mQQ8ahohnuuzdz04vz9NA/Xnc7C4xGC7zvdzBNYXLMDML9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jaYxa65N; arc=none smtp.client-ip=217.70.178.240
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2E36FFF809;
-	Mon, 10 Jun 2024 08:27:00 +0000 (UTC)
+Received: from relay6-d.mail.gandi.net (unknown [217.70.183.198])
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id 95C4CC0CB4;
+	Mon, 10 Jun 2024 08:35:31 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id AFE59C0006;
+	Mon, 10 Jun 2024 08:35:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1718008021;
+	t=1718008523;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cs5fBvfGnXv3uJdz7evFmMOBKnqDQNaZOnxPokg8sp0=;
-	b=SilQ93qfnfOKuNQ4tSa8K9Me3P6SpCNiQPpS8qRYgPS67zKcJk/3IpDOBgBh75qB/Ds4jY
-	pTxSR73ffkrwpnip2sqVhg6OTxktGi/INLNZhAnrnVN880TR/i5a9DUJ48f088/mIqvByC
-	ZIZZRQ5zlNBO5bkQeFLeV4kHqo0Z2Evby+kukTXwgXFpogC3N90xDUb0cPSqI2/2d1wvEJ
-	z3ecyW7wQaW3O8e+1ylVWY9PoeTay6ueM8Yj5EV44u77WqxWW+Lx2EkRByQZdmV8nfU53n
-	Ltu5D2LtxsJKtQpfCZPsbRqYUkSCSQDUnszOKQQccys/ts58mBrIoGBmf6iQgQ==
-Date: Mon, 10 Jun 2024 10:26:59 +0200
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=4x4zWTd7CusdePzcDcFLJfurMsnhAhcRxR1EoRyEerA=;
+	b=jaYxa65NzGG0q0RJifMvIuGaA9nKgPajR0t86xHSqtWwNtR0Uv8Noh5nuYgblyFNH9sSWJ
+	NQVb/bWNF4gUdr5sev6tPKFlSUefXtD1kmu9e2JhvkZwpqGJYYDK1x/iQLQUhNVB1cd3qI
+	wUWyE6u8m756i/ukzq2qxUZRAYo6KZpmVAPRgceJhafb3uSUEcmAz4K2ZmgLY6Vv+uUOpk
+	e+XW6ao0mZI0NitQsVSN9AeCDAxzcDIIEWKESnlNOLQJauMOBfaKLS5vsthqWDeCLC2fDv
+	8a8ACYh3f+CKGYEJgE0D7hPVIb8S1sze6xChM6WSo5JU3Fxm4JA7C2Bfje+vJA==
 From: Kory Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Dent Project
- <dentproject@linuxfoundation.org>, kernel@pengutronix.de
-Subject: Re: [PATCH net-next v2 1/8] net: pse-pd: Use EOPNOTSUPP error code
- instead of ENOTSUPP
-Message-ID: <20240610102659.06a3bebf@kmaincent-XPS-13-7390>
-In-Reply-To: <ZmaMwrnUx-sqabFs@pengutronix.de>
-References: <20240607-feature_poe_power_cap-v2-0-c03c2deb83ab@bootlin.com>
-	<20240607-feature_poe_power_cap-v2-1-c03c2deb83ab@bootlin.com>
-	<ZmaMwrnUx-sqabFs@pengutronix.de>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+To: netdev@vger.kernel.org,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	kernel test robot <lkp@intel.com>,
+	linux-kernel@vger.kernel.org
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	thomas.petazzoni@bootlin.com
+Subject: [PATCH net] net: pse-pd: Use EOPNOTSUPP error code instead of ENOTSUPP
+Date: Mon, 10 Jun 2024 10:34:26 +0200
+Message-Id: <20240610083426.740660-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-GND-Sasl: kory.maincent@bootlin.com
 
-On Mon, 10 Jun 2024 07:18:58 +0200
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+ENOTSUPP is not a SUSV4 error code, prefer EOPNOTSUPP as reported by
+checkpatch script.
 
-> On Fri, Jun 07, 2024 at 09:30:18AM +0200, Kory Maincent wrote:
->  [...] =20
->=20
-> Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
->=20
-> This patch can go directly to net as fixes.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+Fixes: 18ff0bcda6d1 ("ethtool: add interface to interact with Ethernet Power Equipment")
+---
+ include/linux/pse-pd/pse.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Ok, I will resend it to net.
+diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
+index 6d07c95dabb9..6eec24ffa866 100644
+--- a/include/linux/pse-pd/pse.h
++++ b/include/linux/pse-pd/pse.h
+@@ -167,14 +167,14 @@ static inline int pse_ethtool_get_status(struct pse_control *psec,
+ 					 struct netlink_ext_ack *extack,
+ 					 struct pse_control_status *status)
+ {
+-	return -ENOTSUPP;
++	return -EOPNOTSUPP;
+ }
+ 
+ static inline int pse_ethtool_set_config(struct pse_control *psec,
+ 					 struct netlink_ext_ack *extack,
+ 					 const struct pse_control_config *config)
+ {
+-	return -ENOTSUPP;
++	return -EOPNOTSUPP;
+ }
+ 
+ static inline bool pse_has_podl(struct pse_control *psec)
+-- 
+2.34.1
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
