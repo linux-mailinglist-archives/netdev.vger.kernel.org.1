@@ -1,191 +1,148 @@
-Return-Path: <netdev+bounces-102180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 233F6901C09
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 09:40:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CBCD4901C25
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 09:57:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C78EB222E7
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 07:40:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58A3BB20EF9
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 07:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72613771C;
-	Mon, 10 Jun 2024 07:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36A763BBC9;
+	Mon, 10 Jun 2024 07:56:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DbhevrPR"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="4b+FObhI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E6C3F8FB
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 07:39:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2972CCB7;
+	Mon, 10 Jun 2024 07:56:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718005190; cv=none; b=RCTqzngVitJe53c1CXmIPC5Dn0MTLhuk7WH0cRFMctax8Irt82xw+9thcA0vqbuhyp2JCro5CHv3aCqottWPCZcg3bBzfr9MUKO1sLwJ81TGF3gkLuQWx94D/VMgTDwNDb7cjkJ9g2wqY3tgJxfTwi8OR6F/MrfEdy/MhbgpeqA=
+	t=1718006215; cv=none; b=VbpCyv3B6abXYdic8q4xAyIhnS1nyhriSpM24ZD1QReyJZFoHgURInh0o3yZUQLMBz1druGho5J7VqWqBPyNpXi6oQEUYiQTqUxbPZFRLYF0KQdqK+v9KTS6dFRTelwp9rrwzRSh5Ztwu2JeCOeeoB/I0KrgmMM8CxzEed9tRMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718005190; c=relaxed/simple;
-	bh=jwrUkSiP9mBvhULzR57jthYOrcdWsPsw+csazW5uF+s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jg7jeSGa+KUO8wYpqS8LXWNk2vJSpu4l+BHRfcyyg4sH0L1sLAFeK4ZbWfpDZJR3Nu+RSZ0UGN6cNK5Er7cmP54qvfi8rc064YJ0AjHwzUaFxXMXSDM225PV3i2DXJ7Brpl5EaLc2Lo7RAjqOJjKEIClplYcAHPnmVJX18xpID8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DbhevrPR; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718005189; x=1749541189;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=jwrUkSiP9mBvhULzR57jthYOrcdWsPsw+csazW5uF+s=;
-  b=DbhevrPRsjotUxzY5hODbZn/KfzHOqWr88jyIeOeBYidtFE+MJlYLHLL
-   fCHRSuo5BYGyjrw6UuTexLjaPtGjyrFP8IefHnLmThtGObD/eexzIq94l
-   IpAq1jc06PYokiHQEqmTlDojC1+/9lNQP2YsYmU4FksDZlhcQ8aKp1EZN
-   rKwMWX8tClYanONAftRmv8sFDBaPGcBD1ISNz+by3lWk/P8bC5mnYfmvq
-   86RC0Pbva/22gmQusuG/cCuNJ/a8jhQMn5PZus5yVxV6w+WBknWNtXS9/
-   eGw0cs2CBzZEmPSkK+L3J3qVMQGL5MQlLAXs1zoDdq5rfrF86nXhs1Xm1
-   A==;
-X-CSE-ConnectionGUID: fzO6338fRay2QZHwuJb6Dg==
-X-CSE-MsgGUID: MXQ1dM55Q+mPRE9uVnNuLA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11098"; a="14448590"
-X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
-   d="scan'208";a="14448590"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2024 00:39:49 -0700
-X-CSE-ConnectionGUID: DihFFycAQaikbMq0kGVOyg==
-X-CSE-MsgGUID: qqg71AivTxGC8pNN1ZWKHQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
-   d="scan'208";a="70151278"
-Received: from wasp.igk.intel.com (HELO GK3153-DR2-R750-36946.localdomain.com) ([10.102.20.192])
-  by fmviesa001.fm.intel.com with ESMTP; 10 Jun 2024 00:39:46 -0700
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	jacob.e.keller@intel.com,
-	michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com,
-	sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com,
-	wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com,
-	jiri@nvidia.com,
-	mateusz.polchlopek@intel.com,
-	shayd@nvidia.com,
-	kuba@kernel.org
-Subject: [iwl-next v3 4/4] ice: update representor when VSI is ready
-Date: Mon, 10 Jun 2024 09:44:34 +0200
-Message-ID: <20240610074434.1962735-5-michal.swiatkowski@linux.intel.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240610074434.1962735-1-michal.swiatkowski@linux.intel.com>
-References: <20240610074434.1962735-1-michal.swiatkowski@linux.intel.com>
+	s=arc-20240116; t=1718006215; c=relaxed/simple;
+	bh=dh3H2sVa5FYN8i0we4x3+R7a9sJ1pfHXhQg9MzCf3is=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=XUPV0JWt7JcviFp2oRXtIjBG4AAswv1z+nfmtatYVt8PpbaSJSZDiS7w4wDlXEaO1w9k9CxL1EGlVpMoNsd9N0khq9cKiLbXULsr/0Q5wO5UZLi4Gka064NYZHI6vwjezaQ4qmXJY9anC38MpjqlYghIlo0+qBZ8doMTwvnIxd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=4b+FObhI; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 459KxQcm013767;
+	Mon, 10 Jun 2024 09:56:25 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	yUKOFPOQwgaRW01h/tUPDgk5dTLq6HjrNeJuxMsBV3w=; b=4b+FObhIu7awR+Oj
+	axyQMwNtyspUjkysg4sAb4ZMzRR9eaHY+fccYwXqQQNk83L5UA7vGr12lHrxqjxY
+	Kxnelk55DtgzfmIt5fD0Cu/S/nFt+dmOsNcCndDwN20CvzgGHOLmKEoYqJ+X2+RN
+	Rcne6hOqisd/rwg/0bfweDNrhpYi/YpflY6mUTni5FYSOnyC5w6QdUHd/1hUnDAC
+	tstW9dpmalPvNhkgld9C9jHjbL1cD+YKdVGCgLEnuV+yI9empFO8RAUjzPXmppIh
+	UiPoo4GE23wFSDePOQCHPwaPj9rJdL5+hpfBG9Y9xztRQGHDX+4kLBe4IaNNOe8C
+	MdabPg==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ymemxnmtd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Jun 2024 09:56:25 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 2D57540044;
+	Mon, 10 Jun 2024 09:56:20 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 60AF7211940;
+	Mon, 10 Jun 2024 09:55:07 +0200 (CEST)
+Received: from [10.48.86.164] (10.48.86.164) by SHFDAG1NODE2.st.com
+ (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 10 Jun
+ 2024 09:55:06 +0200
+Message-ID: <908c2e86-8255-4e76-8665-0b7d02853681@foss.st.com>
+Date: Mon, 10 Jun 2024 09:55:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 09/12] ARM: dts: stm32: add ethernet1 and ethernet2
+ support on stm32mp13
+To: Marek Vasut <marex@denx.de>, "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre
+ Torgue <alexandre.torgue@foss.st.com>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        Liam Girdwood
+	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20240607095754.265105-1-christophe.roullier@foss.st.com>
+ <20240607095754.265105-10-christophe.roullier@foss.st.com>
+ <6d60bbc6-5ed3-4bb1-ad72-18a2be140b81@denx.de>
+Content-Language: en-US
+From: Christophe ROULLIER <christophe.roullier@foss.st.com>
+In-Reply-To: <6d60bbc6-5ed3-4bb1-ad72-18a2be140b81@denx.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
+ (10.75.129.70)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-10_02,2024-06-06_02,2024-05-17_01
 
-In case of reset of VF VSI can be reallocated. To handle this case it
-should be properly updated.
+On 6/7/24 14:48, Marek Vasut wrote:
+> On 6/7/24 11:57 AM, Christophe Roullier wrote:
+>
+> [...]
+>
+>> @@ -1505,6 +1511,38 @@ sdmmc2: mmc@58007000 {
+>>                   status = "disabled";
+>>               };
+>>   +            ethernet1: ethernet@5800a000 {
+>> +                compatible = "st,stm32mp13-dwmac", "snps,dwmac-4.20a";
+>> +                reg = <0x5800a000 0x2000>;
+>> +                reg-names = "stmmaceth";
+>> +                interrupts-extended = <&intc GIC_SPI 62 
+>> IRQ_TYPE_LEVEL_HIGH>,
+>> +                              <&exti 68 1>;
+>> +                interrupt-names = "macirq", "eth_wake_irq";
+>> +                clock-names = "stmmaceth",
+>> +                          "mac-clk-tx",
+>> +                          "mac-clk-rx",
+>> +                          "ethstp",
+>> +                          "eth-ck";
+>> +                clocks = <&rcc ETH1MAC>,
+>> +                     <&rcc ETH1TX>,
+>> +                     <&rcc ETH1RX>,
+>> +                     <&rcc ETH1STP>,
+>> +                     <&rcc ETH1CK_K>;
+>> +                st,syscon = <&syscfg 0x4 0xff0000>;
+>> +                snps,mixed-burst;
+>> +                snps,pbl = <2>;
+>> +                snps,axi-config = <&stmmac_axi_config_1>;
+>> +                snps,tso;
+>> +                access-controllers = <&etzpc 48>;
+>
+> Keep the list sorted.
 
-Reload representor as vsi->vsi_num can be different than the one stored
-when representor was created.
+Hi Marek,
 
-Instead of only changing antispoof do whole VSI configuration for
-eswitch.
+As already explained, all MP13 IPs have this property before "status". 
+If we must move this property, we will do it later and do it for all IPs.
 
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- drivers/net/ethernet/intel/ice/ice_eswitch.c | 21 +++++++++++++-------
- drivers/net/ethernet/intel/ice/ice_eswitch.h |  4 ++--
- drivers/net/ethernet/intel/ice/ice_vf_lib.c  |  2 +-
- 3 files changed, 17 insertions(+), 10 deletions(-)
+Thanks
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-index 3f73f46111fc..4f539b1c7781 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-@@ -178,16 +178,16 @@ void ice_eswitch_decfg_vsi(struct ice_vsi *vsi, const u8 *mac)
-  * @repr_id: representor ID
-  * @vsi: VSI for which port representor is configured
-  */
--void ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi)
-+void ice_eswitch_update_repr(unsigned long *repr_id, struct ice_vsi *vsi)
- {
- 	struct ice_pf *pf = vsi->back;
- 	struct ice_repr *repr;
--	int ret;
-+	int err;
- 
- 	if (!ice_is_switchdev_running(pf))
- 		return;
- 
--	repr = xa_load(&pf->eswitch.reprs, repr_id);
-+	repr = xa_load(&pf->eswitch.reprs, *repr_id);
- 	if (!repr)
- 		return;
- 
-@@ -197,12 +197,19 @@ void ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi)
- 	if (repr->br_port)
- 		repr->br_port->vsi = vsi;
- 
--	ret = ice_vsi_update_security(vsi, ice_vsi_ctx_clear_antispoof);
--	if (ret) {
--		ice_fltr_add_mac_and_broadcast(vsi, repr->parent_mac,
--					       ICE_FWD_TO_VSI);
-+	err = ice_eswitch_cfg_vsi(vsi, repr->parent_mac);
-+	if (err)
- 		dev_err(ice_pf_to_dev(pf), "Failed to update VSI of port representor %d",
- 			repr->id);
-+
-+	/* The VSI number is different, reload the PR with new id */
-+	if (repr->id != vsi->vsi_num) {
-+		xa_erase(&pf->eswitch.reprs, repr->id);
-+		repr->id = vsi->vsi_num;
-+		if (xa_insert(&pf->eswitch.reprs, repr->id, repr, GFP_KERNEL))
-+			dev_err(ice_pf_to_dev(pf), "Failed to reload port representor %d",
-+				repr->id);
-+		*repr_id = repr->id;
- 	}
- }
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.h b/drivers/net/ethernet/intel/ice/ice_eswitch.h
-index 9a25606e9740..09194d514f9b 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.h
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.h
-@@ -18,7 +18,7 @@ ice_eswitch_mode_set(struct devlink *devlink, u16 mode,
- 		     struct netlink_ext_ack *extack);
- bool ice_is_eswitch_mode_switchdev(struct ice_pf *pf);
- 
--void ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi);
-+void ice_eswitch_update_repr(unsigned long *repr_id, struct ice_vsi *vsi);
- 
- void ice_eswitch_stop_all_tx_queues(struct ice_pf *pf);
- 
-@@ -47,7 +47,7 @@ ice_eswitch_set_target_vsi(struct sk_buff *skb,
- 			   struct ice_tx_offload_params *off) { }
- 
- static inline void
--ice_eswitch_update_repr(unsigned long repr_id, struct ice_vsi *vsi) { }
-+ice_eswitch_update_repr(unsigned long *repr_id, struct ice_vsi *vsi) { }
- 
- static inline int ice_eswitch_configure(struct ice_pf *pf)
- {
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-index 48a8d462d76a..5635e9da2212 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-@@ -948,7 +948,7 @@ int ice_reset_vf(struct ice_vf *vf, u32 flags)
- 		goto out_unlock;
- 	}
- 
--	ice_eswitch_update_repr(vf->repr_id, vsi);
-+	ice_eswitch_update_repr(&vf->repr_id, vsi);
- 
- 	/* if the VF has been reset allow it to come up again */
- 	ice_mbx_clear_malvf(&vf->mbx_info);
--- 
-2.42.0
 
 
