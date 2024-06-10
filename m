@@ -1,142 +1,120 @@
-Return-Path: <netdev+bounces-102297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CB1190241A
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 16:30:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B3E3902438
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 16:40:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C602F1F23091
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 14:30:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FB3FB2435C
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 14:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E381E219EA;
-	Mon, 10 Jun 2024 14:30:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D2212F5BE;
+	Mon, 10 Jun 2024 14:40:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="U6GF4YgN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA4D80BE5
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 14:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A930A80BE5
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 14:40:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718029839; cv=none; b=RTw0J0tZfxBcJ8gR1lMzn3Yp840uKdggc2Z+rjNAG1CV+vPEizH/ifs8CY2V1pLsk3k60iWa8EJ+Uoswqlitih+nxEJBz04T26z2l8FDvD3lGeZ0/5NGogBD0Pli3MGmqQ3EnowXfj5uzrV1lwuTrWNnDBiKe99p/kTz/FCkXNw=
+	t=1718030442; cv=none; b=Qq9yNSla+6ZMT3V7GtqWRYehu4X+Yv1xT9ghitnebKkQDU4eUh4rOqUXM24l5mpNnD1AHRFpgGsSasQtsqDWAdwbOxDncVq0oQ8LRjBPVmfkwzU2GvlZk+EFl/R/0aSYahVKCZpt5hdM2czXz6gHsfZnWLIOcL0UqMt2QxR25fE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718029839; c=relaxed/simple;
-	bh=4bVxaGP8kFkjKr+Ck+TYnxOMjMSrvTCJd9oRe1o4Qq8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P4dW/s4XKhQ7ss62JjJECXij5bK1z64GIKNZtd4u744FELrF/6K0VeZLHvBJlql9KhN47J8PwUOMG0zUPUHm90x7jHe7tdv/A9xR7I6HxP+92tR1QbmlCTb0vNRN3+PoJb03tMCKj64uWfXKFctAT/zi00WwZQanaQ2UxmZkKUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-42110872bf9so4918775e9.3
-        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 07:30:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718029836; x=1718634636;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9r8TSxia5VOpRvq2ZH+KZFO+iNGYVhgl/TCGYdPnBV4=;
-        b=ixzElUyyRW9ZgWHTKv9ekmRipUMjcLzi6CgUz5Meo/DCfxCZpDUd+r8ryn57HBJjRf
-         Zr3p6zyd3ewl+IMw1oc75/KrWn4oAzs6q/4ZhxfedttaJkuaRAOr3dRk6hxUrLnW2SGE
-         JwqoVcTIPs4uB+jR9c720egj8nDvJTV0uG5s9iR3ygsQ/bGr3QetE7EZdVU2KwwhETMc
-         +2MLaEqA4ngfisymu/bmA640gk6az1T4QhrQScNleLqJWbcQlkFKmV3qYjmZEG6Slglz
-         2BJZJaSSuCa+xMzSiNTQ+V6qihdmCxZpJKqLWhNjAstaix7Otcr+pLjbeYu2PQVrgQKy
-         mr2g==
-X-Forwarded-Encrypted: i=1; AJvYcCWv7V4g3jjttvAghemzCTYT+AcWVeBORxNfJyvyipk4qlPB6RjwzXx92qs+r9bk51cculkg41L/qRC73g5l6XooUW9pQ/8x
-X-Gm-Message-State: AOJu0Yy5npKv53igy9jnk40LOzHFeXMn8JbREajZVYwF9W2qPyMjGe5w
-	fSrH5z/E1MyopU7bFbpksdz4J9imPrNdvTZeK/XZ/oivb/7H4ZGalWCT04RO
-X-Google-Smtp-Source: AGHT+IGNYwmKnUFOdEUBOUxTES955Io2GxJGmqmRpCkKr9SjdDxpdv9dXwhK1LcpQbQUyokSvA1QQA==
-X-Received: by 2002:a5d:6c65:0:b0:354:fc97:e6e3 with SMTP id ffacd0b85a97d-35efee1d38fmr7179815f8f.5.1718029836111;
-        Mon, 10 Jun 2024 07:30:36 -0700 (PDT)
-Received: from [10.50.4.180] (bzq-84-110-32-226.static-ip.bezeqint.net. [84.110.32.226])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35f048dddddsm8554380f8f.111.2024.06.10.07.30.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Jun 2024 07:30:35 -0700 (PDT)
-Message-ID: <9a03d3bf-c48f-4758-9d7f-a5e7920ec68f@grimberg.me>
-Date: Mon, 10 Jun 2024 17:30:34 +0300
+	s=arc-20240116; t=1718030442; c=relaxed/simple;
+	bh=CG3E/lWa2HbQ5Ft+v2UKDjTAYRT4JPotru51yN4MBVw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=lKKzJxmCaaYpYjUHZ8hy2JaBPF56rIUujkJWE8wIN9o8Qm7Z4/zYxC7FHZdj1XzR+L56HBfDY3cuP34OjC06X9VDrOarN0MvhzUseNIpIngQTuupQSti2tjoEFL8unhGmKA7fYNlcIPZHRSNTWNv4aLX30fpZeqikZjSrhoEYF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=U6GF4YgN; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=CAzlZ/VNndl4AKegQFi0JffzH+O3JQElVuoC5uZz9qc=; b=U6GF4YgN3Vi6k0LXMKBgQ2XAfR
+	20erK5ZVMUuBt9yBkPFzPKw1Sw82O5TxYQE2i15OZDIKrsLDBiw5/WAKehddfV/PhIIFpjn254xtN
+	ShpD12vsLP0yH9lx1xWgOdaK50M8k4APqbvxnyiDIbRh1L3lMbUIhzy0HzT1JdE01cnVdFZ/XT61u
+	69kttqT/fAWqj9YKWHSV6OzzJCl5h1N401eVE4ki0ENPquT6Mj57WmzeQbYegzqt0XHDju8fCAUmz
+	ectnd1NRBwT00YCqq2J1U3Rb/EFmcqwv7dmYgrsMQZrsnxp2qP5hV+UJg3PExC+LRqBm+7ralTQh4
+	IjCW/hRA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39964)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sGgC0-0001eS-1p;
+	Mon, 10 Jun 2024 15:40:16 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sGgBy-0006xF-Fk; Mon, 10 Jun 2024 15:40:14 +0100
+Date: Mon, 10 Jun 2024 15:40:14 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Romain Gantois <romain.gantois@bootlin.com>
+Subject: [PATCH net-next 0/5] net: stmmac: provide platform select_pcs method
+Message-ID: <ZmcQTuR5IKRp0pgy@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v25 00/20] nvme-tcp receive offloads
-To: Christoph Hellwig <hch@lst.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, Aurelien Aptel <aaptel@nvidia.com>,
- linux-nvme@lists.infradead.org, netdev@vger.kernel.org, kbusch@kernel.org,
- axboe@fb.com, chaitanyak@nvidia.com, davem@davemloft.net
-References: <20240529160053.111531-1-aaptel@nvidia.com>
- <20240530183906.4534c029@kernel.org> <20240531061142.GB17723@lst.de>
- <06d9c3c9-8d27-46bf-a0cf-0c3ea1a0d3ec@grimberg.me>
- <20240610122939.GA21899@lst.de>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20240610122939.GA21899@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+Hi,
 
+This series adds a select_pcs() method to the stmmac platform data to
+allow platforms that need to provide their own PCSes to do so, moving
+the decision making into platform code.
 
-On 10/06/2024 15:29, Christoph Hellwig wrote:
-> On Mon, Jun 03, 2024 at 10:09:26AM +0300, Sagi Grimberg wrote:
->>> IETF has standardized a generic data placement protocol, which is
->>> part of iWarp.  Even if folks don't like RDMA it exists to solve
->>> exactly these kinds of problems of data placement.
->> iWARP changes the wire protocol.
-> Compared to plain NVMe over TCP that's a bit of an understatement :)
+This avoids questions such as "what should the priority of XPCS vs
+some other platform PCS be?" and when we provide a PCS for the
+internal PCS, how that interacts with both the XPCS and platform
+provided PCS.
 
-Yes :) the comment was that people want to use NVMe/TCP, and adding
-DDP awareness inspired by iWARP would change the existing NVMe/TCP wire 
-protocol.
+Note that if a platform implements the select_pcs() method, then the
+return values are:
+- a phylink_pcs pointer - the PCS to be used.
+- NULL - no phylink_pcs to be used.
+Otherwise (if not implemented or returns an error-pointer), then
+allow the the stmmac internal PCS to be used if appropriate (once
+that patch set is merged.)
 
-This offload, does not.
+Patch 1 introduces the new method.
+Patch 2 converts Intel mGBE to use this to provide the XPCS and
+ removes the XPCS decision making from core code.
+Patch 3 provides an implementation for rzn1 to return its PCS.
+Patch 4 does the same for socfpga.
+Patch 5 removes the core code returning priv->hw->phylink_pcs.
 
->
->> Is your comment to just go make people
->> use iWARP instead of TCP? or extending NVMe/TCP to natively support DDP?
-> I don't know to be honest.  In many ways just using RDMA instead of
-> NVMe/TCP would solve all the problems this is trying to solve, but
-> there are enough big customers that have religious concerns about
-> the use of RDMA.
->
-> So if people want to use something that looks non-RDMA but have the
-> same benefits we have to reinvent it quite similarly under a different
-> name.  Looking at DDP and what we can learn from it without bringing
-> the Verbs API along might be one way to do that.
->
-> Another would be to figure out what amount of similarity and what
-> amount of state we need in an on the wire protocol to have an
-> efficient header splitting in the NIC, either hard coded or even
-> better downloadable using something like eBPF.
+No functional change is anticipated. Once this has been merged, it
+will be expected that platforms should populate all three PCS
+methods or none of the PCS methods.
 
- From what I understand, this is what this offload is trying to do. It uses
-the nvme command_id similar to how the read_stag is used in iwarp,
-it tracks the NVMe/TCP pdus to split pdus from data transfers, and maps
-the command_id to an internal MR for dma purposes.
+ drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c   | 11 +++++++++++
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rzn1.c    |  7 +++++++
+ drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c |  7 +++++++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c   | 10 +++++++---
+ include/linux/stmmac.h                              |  4 +++-
+ 5 files changed, 35 insertions(+), 4 deletions(-)
 
-What I think you don't like about this is the interface that the offload 
-exposes
-to the TCP ulp driver (nvme-tcp in our case)?
-
->
->> That would be great, but what does a "vendor independent without hooks"
->> look like from
->> your perspective? I'd love having this translate to standard (and some new)
->> socket operations,
->> but I could not find a way that this can be done given the current
->> architecture.
-> Any amount of calls into NIC/offload drivers from NVMe is a nogo.
->
-
-Not following you here...
-*something* needs to program a buffer for DDP, *something* needs to
-invalidate this buffer, *something* needs to declare a TCP stream as DDP 
-capable.
-
-Unless I interpret what you're saying is that the interface needs to be 
-generalized to
-extend the standard socket operations (i.e. 
-[s|g]etsockopt/recvmsg/cmsghdr etc) ?
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
