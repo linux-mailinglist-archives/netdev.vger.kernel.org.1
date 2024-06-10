@@ -1,175 +1,161 @@
-Return-Path: <netdev+bounces-102367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB291902B6F
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 00:15:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6E5A902BAB
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 00:29:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC3841C21F5C
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 22:15:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 322AC1F21E74
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 22:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BAEB1514D6;
-	Mon, 10 Jun 2024 22:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B2821514F2;
+	Mon, 10 Jun 2024 22:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="DV1B8yAB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qOsuBHUx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3421509B3
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 22:15:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0DB91514CC
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 22:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718057708; cv=none; b=CnRX5d5oMo1n92jBK43rRZtco7oTcRkHD8450O/4Ey850Bx2K2XFn6ZYQmT0HkzjGdBb2uJIw8PDAbruhxGYLpqlPf703b2uf6GqbrSHZ/f83iFSUrazeOucxDKmsJZb95eSXXakar+gM5E3nzCLOESYGu/c6lz+h3/9kRz75ys=
+	t=1718058520; cv=none; b=Exk2PY0e1sBVRmUJgpN7/sG9vjYQELnzdHkKlMtCsDBEeBIdh/Hb5e7SFihjkLYRfWGMRssXi1lMaDcu6c/pewkGGQsZcL4eFfnQ3FEgOfcCGw33VZIATWeaPenscfUr9P/6wPXPWo+u6JvfqkkJAYq03Mdy6VYekA63btvPX6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718057708; c=relaxed/simple;
-	bh=z+wd9sAGfEDNr43zUFts3rXiT7ShOZVNnrA/+9o7y3k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HK7nMcbau4K8/BqZMMv2K4vKmKIuYZncM5+yCprvrqvEDMrCvEeFF2d5q3wF+fJApYOiLrSvTkh7DfzYBZqTEvV/iHNVF17dIMhn+j702X7JDnSqFuPYbMvLdxHZz2cWelhUBzuyzPCquTc4P0ficI/v6/603hEQ7DRRCmNxDbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=DV1B8yAB; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6b06b78e716so13234116d6.3
-        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 15:15:06 -0700 (PDT)
+	s=arc-20240116; t=1718058520; c=relaxed/simple;
+	bh=//h+SQzpQEpDtNpeBuStauUMjF/1FnjkWddWusmEJoc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XDWm1DXfE3f7gOA7hnYxNleg8OTf1C3UnWxzfrhEZ5dbf4oueDVZFXu/goqWI9audldaQSir54+jTkOOD7FrcEmrOlxGDds46bkwYlby7ltpI2bPFjGOhM7UD63jm4zBOrgNwKdVTzL0AyvS8hGjYKAFeimp2sAER4JMytVORAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qOsuBHUx; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1f61742a024so66505ad.0
+        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 15:28:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1718057705; x=1718662505; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fYxIeKtLL3lQwNiFRr25O1e9GIX4G5slG5d4Uc4G46M=;
-        b=DV1B8yABKh8zcLUmgBZlPAFY0iTcPLR8YOx7LLCpFjMnV7rXNkaRxAYuvwk3C7PPOH
-         jZB05ZxEeozQlYPvsSKrdHH9XRsHaWMfRgA07nc67PzNRXJVUcgHaMaIwTLkn/0NBaej
-         Y+DkdkBwr03IdCK/sG3d/54s8BvaqhWBnl/jBki+4FuzFDk5MC/R7srQTW0MtfyTEffw
-         S/cazkXqzTrhTNLq77EhsuipjQDoKG+ONrmQBCCYr/YTuVzQ2K1qnCx+gVlmf+ptUByB
-         YHBold4jl4t0CXl3DWfVhfY0nGwvEmmEftLaTtJM4KO8eLCbZeisPO65pggAcwOIB0GE
-         jnmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718057705; x=1718662505;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1718058518; x=1718663318; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fYxIeKtLL3lQwNiFRr25O1e9GIX4G5slG5d4Uc4G46M=;
-        b=JZ8LFgVdjDFU31raZr3pBRrYufo7q2oN0mSSy9bj1PzqUM5TXG/cYaRM6hWr5T86TH
-         vKkJFuQXwBIkQ4CtK6Ja58lFLii6u2FGE0jbS2Y6F8KGscUyqzrITJj/winLhW/0+GJN
-         aTg9Iie9oP1kCV+475xisf0i1Ta+idebrWN4c3rmFm4EyErto/TQzCS3fnnb2Apo3gL6
-         GBCAMUuLuRWcndD4mCg3jQGn0dAWEn1l7CHT5Eq6Lh+sljvRBgr2WfDMuoJFYR/hZFSd
-         n+9FLuUrA+DQEoqjneAWNkS5+TUjyiXwQQwfkz82vV52MlyaqnEnA3JWRlwPMg9xyzNP
-         we4A==
-X-Forwarded-Encrypted: i=1; AJvYcCXU/VU7mTEaud30/yh4jffmq5qqLZBFoWLgjHfKq/zRQAUYvggluMoZV/HH4omyE3QQ38N3j3rdhcF8uihY8xz1m0Wln64g
-X-Gm-Message-State: AOJu0Yz5Q8EJySBm+7ZapPRbzLVThNSzqJLPh9f4GqBMSc2j0YmAzoqI
-	rGb0pokLPxThW8vmqot8g+3yXbQ/t4p0P8XWQ0ykbj1HdcWUJls8SSGyOOuSlPE=
-X-Google-Smtp-Source: AGHT+IGNwK7dorh82QSLW5MV/WzZAixZNPt6ZilaFo6ceP30TQ1KYPRJL2ImTAjvrOrdYOBtAU+f5Q==
-X-Received: by 2002:a05:6214:4a06:b0:6b0:72ef:2877 with SMTP id 6a1803df08f44-6b072ef2a2bmr79573716d6.40.1718057705068;
-        Mon, 10 Jun 2024 15:15:05 -0700 (PDT)
-Received: from ziepe.ca ([128.77.69.89])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b076a42242sm20947266d6.59.2024.06.10.15.15.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jun 2024 15:15:03 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1sGnI4-00FsKs-9Z;
-	Mon, 10 Jun 2024 19:15:00 -0300
-Date: Mon, 10 Jun 2024 19:15:00 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: David Ahern <dsahern@kernel.org>, David Wei <dw@davidwei.uk>,
-	Mina Almasry <almasrymina@google.com>,
-	Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-	Matt Turner <mattst88@gmail.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Shailend Chand <shailend@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Subject: Re: [PATCH net-next v10 02/14] net: page_pool: create hooks for
- custom page providers
-Message-ID: <20240610221500.GN791043@ziepe.ca>
-References: <5aee4bba-ca65-443c-bd78-e5599b814a13@gmail.com>
- <CAHS8izNmT_NzgCu1pY1RKgJh+kP2rCL_90Gqau2Pkd3-48Q1_w@mail.gmail.com>
- <eb237e6e-3626-4435-8af5-11ed3931b0ac@gmail.com>
- <be2d140f-db0f-4d15-967c-972ea6586b5c@kernel.org>
- <20240607145247.GG791043@ziepe.ca>
- <45803740-442c-4298-b47e-2d87ae5a6012@davidwei.uk>
- <54975459-7a5a-46ff-a9ae-dc16ceffbab4@gmail.com>
- <20240610121625.GI791043@ziepe.ca>
- <59443d14-1f1d-42bb-8be3-73e6e4a0b683@kernel.org>
- <00c67cf0-2bf3-4eaf-b200-ffe00d91593b@gmail.com>
+        bh=CltNPHp24X0YdbNxXIq1nZmVRV43NqFIhiiPqMk86LI=;
+        b=qOsuBHUxVv7JdC0fC1XPGmTCR1Gr/Yb2Fmt1DMNtBp7B299EnwZ0ABmihyCpphO9Di
+         5gs5C71Jok9EIQb3+NZ4XXSit4ZHgvUgKeInWrr8BthF4wqhHzGWsC+oGH6YjQrWqO9J
+         yjNehOoyoSZ3FdX80UnKtZ4TGx1CFX33e4I+9UOPSTNofxFAYieRE6ihQYOChBriInAX
+         imNZECoYSUB/0d8U9WTu7Jaf/jXfiQ3pqzf7nuRdNh8YIhXvB37Ulf/+bP3abRRBVtBn
+         L2jx7uRYMycBsMX1IfCBpU0ETM58P3Kqitx2/vlDPMyfz/RxDavOp9+iDB4OnnstaFMo
+         /zSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718058518; x=1718663318;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CltNPHp24X0YdbNxXIq1nZmVRV43NqFIhiiPqMk86LI=;
+        b=Rr9WapBElkybjVHtGoExdIZ7/+gmdhFM5lqhEayK10CJwkWZZ7ZCl2VZFagffibfs1
+         X++kBshwgUEInR3nCsJJ3ZrUxEGseZsM7qAIidE0vZGbqyHLTq1VUu8DHvk/haZq8XpA
+         hGEBlRtC0c2MdoSEL28rB3kBajPYJOWq5/YormIqoZHjKTp36N6dTJBpeYBc3fg6e0s5
+         luBmnlZMC3CBwHhLreoUrG9vXqXpLtEv/KLRa6+pJlkccguCg2yBmWvQf5zvzSAxJr2l
+         I+RI+XOqIxKuc+CptdFqN7lJMCeLPDMVq2JJ9LW2kzbSd+MoSNS6vl9bD+076n9mJDo1
+         ENNg==
+X-Forwarded-Encrypted: i=1; AJvYcCUG2m5ZxSaqO/6T+l/0YHFxN9KQDQn+8guKutnklvI/GFSjzllMmd9NWcHZrIDutAsCFTatYquqLlLfFVHHLMFTu+/es+e0
+X-Gm-Message-State: AOJu0YysDZZopu1gT/y6nBKqwK+w4IAcdpi+6p9gztB/iOmFuoitXDr+
+	KdKJHQpKe+sDJkw4hXFQPjRBX4yXaQF+KBowxJuGuBYYSudR6Bdou7Xn29eaY2JaVNdYRtSTMk9
+	9z43K5yZbE4TlvDwyocPiMq8VZBAcRsQcWQgE
+X-Google-Smtp-Source: AGHT+IG5DxgTD1WhUH3nJ9EmVhkKot+5sCCwTEAuekdiSfrw+FdsqlljtFn9AaT3xI8iDYGmH91HNrjaFh3g24AwBas=
+X-Received: by 2002:a17:902:6acc:b0:1f6:7fce:5684 with SMTP id
+ d9443c01a7336-1f72f726f4amr440435ad.3.1718058517742; Mon, 10 Jun 2024
+ 15:28:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00c67cf0-2bf3-4eaf-b200-ffe00d91593b@gmail.com>
+References: <ZmJJ7lZdQuQop7e5@tahera-OptiPlex-5000>
+In-Reply-To: <ZmJJ7lZdQuQop7e5@tahera-OptiPlex-5000>
+From: Jann Horn <jannh@google.com>
+Date: Tue, 11 Jun 2024 00:27:58 +0200
+Message-ID: <CAG48ez3NvVnonOqKH4oRwRqbSOLO0p9djBqgvxVwn6gtGQBPcw@mail.gmail.com>
+Subject: Re: [PATCH v3] landlock: Add abstract unix socket connect restriction
+To: Tahera Fahimi <fahimitahera@gmail.com>
+Cc: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, outreachy@lists.linux.dev, netdev@vger.kernel.org, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 10, 2024 at 08:20:08PM +0100, Pavel Begunkov wrote:
-> On 6/10/24 16:16, David Ahern wrote:
+Hi!
 
-> > > There is no reason you shouldn't be able to use your fast io_uring
-> > > completion and lifecycle flow with DMABUF backed memory. Those are not
-> > > widly different things and there is good reason they should work
-> > > together.
-> 
-> Let's not mix up devmem TCP and dmabuf specifically, as I see it
-> your question was concerning the latter: "... DMABUF memory registered
-> through Mina's mechanism". io_uring's zcrx can trivially get dmabuf
-> support in future, as mentioned it's mostly the setup side. ABI,
-> buffer workflow and some details is a separate issue, and I don't
-> see how further integration aside from what we're already sharing
-> is beneficial, on opposite it'll complicate things.
+Thanks for helping with making Landlock more comprehensive!
 
-Again, I am talking about composability here, duplicating the DMABUF
-stuff into io_uring is not composable, it is just duplicating things.
+On Fri, Jun 7, 2024 at 1:44=E2=80=AFAM Tahera Fahimi <fahimitahera@gmail.co=
+m> wrote:
+> Abstract unix sockets are used for local inter-process communications
+> without on a filesystem. Currently a sandboxed process can connect to a
+> socket outside of the sandboxed environment, since landlock has no
+> restriction for connecting to a unix socket in the abstract namespace.
+> Access to such sockets for a sandboxed process should be scoped the same
+> way ptrace is limited.
 
-It does not match the view that there should be two distinct layers
-here, one that provides the pages and one that manages the
-lifecycle. As HCH pushes for pages either come from the allocator and
-get to use the struct folio or the come from a dmabuf and they
-don't. That is it, the only two choices.
+This reminds me - from what I remember, Landlock also doesn't restrict
+access to filesystem-based unix sockets yet... I'm I'm right about
+that, we should probably at some point add code at some point to
+restrict that as part of the path-based filesystem access rules? (But
+to be clear, I'm not saying I expect you to do that as part of your
+patch, just commenting for context.)
 
-The iouring stuff is trying to confuse the source of the pages with
-the lifecycle - which is surely convenient, but is why Christoph is
-opposing it.
+> Because of compatibility reasons and since landlock should be flexible,
+> we extend the user space interface by adding a new "scoped" field. This
+> field optionally contains a "LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET" to
+> specify that the ruleset will deny any connection from within the
+> sandbox to its parents(i.e. any parent sandbox or non-sandbox processes)
 
-Jason
+You call the feature "LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET", but I
+don't see anything in this code that actually restricts it to abstract
+unix sockets (as opposed to path-based ones and unnamed ones, see the
+"Three types of address are distinguished" paragraph of
+https://man7.org/linux/man-pages/man7/unix.7.html). If the feature is
+supposed to be limited to abstract unix sockets, I guess you'd maybe
+have to inspect the unix_sk(other)->addr, check that it's non-NULL,
+and then check that `unix_sk(other)->addr->name->sun_path[0] =3D=3D 0`,
+similar to what unix_seq_show() does? (unix_seq_show() shows abstract
+sockets with an "@".)
+
+Separately, I wonder if it would be useful to have another mode for
+forbidding access to abstract unix sockets entirely; or alternatively
+to change the semantics of LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET so
+that it also forbids access from outside the landlocked domain as was
+discussed elsewhere in the thread. If a landlocked process starts
+listening on something like "@/tmp/.X11-unix/X0", maybe X11 clients
+elsewhere on my system shouldn't be confused into connecting to that
+landlocked socket...
+
+[...]
+> +static bool sock_is_scoped(struct sock *const other)
+> +{
+> +       bool is_scoped =3D true;
+> +       const struct landlock_ruleset *dom_other;
+> +       const struct cred *cred_other;
+> +
+> +       const struct landlock_ruleset *const dom =3D
+> +               landlock_get_current_domain();
+> +       if (!dom)
+> +               return true;
+> +
+> +       lockdep_assert_held(&unix_sk(other)->lock);
+> +       /* the credentials will not change */
+> +       cred_other =3D get_cred(other->sk_peer_cred);
+> +       dom_other =3D landlock_cred(cred_other)->domain;
+> +       is_scoped =3D domain_scope_le(dom, dom_other);
+> +       put_cred(cred_other);
+
+You don't have to use get_cred()/put_cred() here; as the comment says,
+the credentials will not change, so we don't need to take another
+reference to them.
+
+> +       return is_scoped;
+> +}
 
