@@ -1,204 +1,161 @@
-Return-Path: <netdev+bounces-102317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B98EB9025BB
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 17:33:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 764039025E6
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 17:45:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38593284519
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 15:33:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 260A71F2246C
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 15:45:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA61D13DDBF;
-	Mon, 10 Jun 2024 15:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3289113F450;
+	Mon, 10 Jun 2024 15:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="iD8M5pMs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VWn/11Ul"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D3A757EE
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 15:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3AB13C3E6;
+	Mon, 10 Jun 2024 15:45:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718033620; cv=none; b=sikB6od+Mkb2UwpEfJ/Qj4IFQseEOMdD6xhF+pX5Pb5fPuIIfX5aLGyYC/gtJAv53BnXNP6196TdP9aMt6e809r0FAij1OUAc2m083aZ56MAMFGj6nK45ScjbCTQvyKgYOAuZ6l6c4f4tCEvQiVnnsXTQeUGDVKYd0uCf11X6UU=
+	t=1718034303; cv=none; b=D92HjTXZwUv+XrxfvyeZevmENLnGnrFXaozl8ESVOvFDZcz76cM2yVGyxRCtD2zXd4vXP1Af9ToTiZU6TIwJNabuo4tJXcCCjz4s9xc/7xCUuKWTQRkZ9CKZTSY23aV8MV1Y8dAzIXJuh/rgEW1zpqH4oU5KOs8L6jSUF7+kumY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718033620; c=relaxed/simple;
-	bh=+d4qcBQ5TqLmgZeUZlWX/ETnIPEWZGFBORlIObrELcg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OSa2nD4e6jP1aPN7oebpUP7goc5PWFpYFgspLmWYw9dJwvRJY5j6EPvkForTNHou5Fx3dGLbogyUiBYf7vASSv9uEfr/Robz744EwAlZx+CpNKdwXkZWfZ1UCFJDF2tChRquoIAGMCQR7G/WAFfaz2ofSd10Vrv/D+wwy9ndm1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=iD8M5pMs; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id C11D23F72E
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 15:33:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1718033616;
-	bh=OLB74RFEpAPPIbjErc3qPF1SfWkaR9gNaZrKnhtRg+Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=iD8M5pMs+c4Tjt1Xg29vJ3uInt5LwfNdd3OGGUVCOAlS10Jlwv1x+mmJZbrHK8IOT
-	 X/XJW15LsC6Ln1rV1tAcEFsgGL9Xyjd55ng42i6JZemz+bJhlhxGEDAZ2J/AyN68IP
-	 SNoEhT1hJI7zx8XMHw/NYPHki3Fa+0ehECkdpVfv+vmbmw6RmxxcOH4GNmnjtkf6Ou
-	 vbGfjLmEXzoI7kKwyCLF8YK9U2ec3gZ1814uTm+oIuV3+ebMzCeiRgNd5NJoTUwOg4
-	 G/GS8+RBqsMwX2cVTYJzayDrm5a9Z3THaD8uyc/mKwXlOk+EmxNDDmanA/XmPXsPXd
-	 dCt5gnCIGeJvg==
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a6f10c613b8so94574866b.3
-        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 08:33:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718033614; x=1718638414;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OLB74RFEpAPPIbjErc3qPF1SfWkaR9gNaZrKnhtRg+Q=;
-        b=CldwBWvofzGNYHJWP7cqRsUT43bIpWtXviYrse+vtHtRkEVZep/NBpks5tSGJuuR/C
-         niQ8c5w83f95HdBOl2IEEyBvm6dOi+2KL91WmdFjTdwZxjWATBK4LeQn1Dfd3oastTDc
-         nKFvwRgLWI3YNohE1LDnBIWleCiQFneM5LIEJbqq3mBHiuQW0PXWexWql3jPQw2NWNTZ
-         k0NivhSWPOe4EQ974rEQB24HqewqJ7jal3JKKpmL0HBrotHm8IIQMK5z6ojKokWisxkV
-         YBwYe63zX0/bEbFX7j316fx5VX/WFFmvV8xZ3HY/Mh00FwA7xkst+Off10bl+ptuZbli
-         72Bg==
-X-Forwarded-Encrypted: i=1; AJvYcCUr4Ek7RFj2bKEctuPv4vmNf2agLJSRPHr0+W7mJRV0BRgqKIg/AdDLU1MXBGfGL3/Jwo62x+vLIkWjbgPimW7i5K1QVxDa
-X-Gm-Message-State: AOJu0YywOKM7vkMZQ591OmNv12z7+sN9XudoFbQ9rDIfSsAp16Vvzanp
-	NlW2di9ph+sdBEnClzuu0QmvkoubMZl8jcDU4wst901nU1UcfrRjLSIUqLFcUtwCMdw6V04UOS0
-	VA3BAPFoJYNlKV8vUweNxIa9EupVM4Exye2vT2bICIH3pgWQgrp6iTyxBQK1LqmrTOIAhdwjRGs
-	3pBDzhujx0gloY9KMRevOrf3iOo2LN66jB25aQHJmHJ2mS
-X-Received: by 2002:a17:907:b9da:b0:a6f:11a4:a451 with SMTP id a640c23a62f3a-a6f11a4abd0mr287154466b.46.1718033614584;
-        Mon, 10 Jun 2024 08:33:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH0KH9vPXFO8cqAQUSJqHoFXu2nuzjTT2yMRIdMJhxAJ2NY4ei/6rxqDg9O7INg3LgoA52CjHlAspUQcSvhW34=
-X-Received: by 2002:a17:907:b9da:b0:a6f:11a4:a451 with SMTP id
- a640c23a62f3a-a6f11a4abd0mr287152766b.46.1718033614222; Mon, 10 Jun 2024
- 08:33:34 -0700 (PDT)
+	s=arc-20240116; t=1718034303; c=relaxed/simple;
+	bh=ds9g/JKEqawI/ajkSavWOl6Obm7xM2HBK3q/teNQHeQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ACs58CJNvdr/S5T3txQlRAb+A7V5f0LXiIip69Hi8gzzKefcgnoRsnKpq9uLQqQmBnKR1CfAPsiEkO3p2sXO+gH4IdLNwnTKVsa5m3nbd+my1EbZG15LSvyO+cDooc426IqxdE82SFamYvEWZELUICCRb+c9XrrOiuyPyg3qAnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VWn/11Ul; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718034301; x=1749570301;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ds9g/JKEqawI/ajkSavWOl6Obm7xM2HBK3q/teNQHeQ=;
+  b=VWn/11Ul9DNMz5/EQxd2uxjzzOkShnIR7MSRgf2PgHQqVjw43+kjFJAo
+   Krg4WH9mf1z7+va/jQUasj11Mj5RR9xVxJ5mbkmfG2sh718gsj9E+nR2e
+   JQepmskEgcK1V0+eE8S0iJCcD447z7nZcJ9ZiYRCtla517qNwoOky1Ay/
+   IcQ5nafWFq7uIF+ZIXrz0nVFNyQEv3tWlmlq6ecO5lzqEzo0TgB4yO/+d
+   8jLIHOg3kNt1JlRfj14AmrIxNgydQqzhsoYJ7FdLXsm6/8EI6rEsIjzUR
+   IeVpfV7FE3zx7Hvs/QJPjOo+QANEDa6CocmE07A3MreAho9AqkQvhbN95
+   Q==;
+X-CSE-ConnectionGUID: psWTxMC2Sr2ReAiBFTdxBA==
+X-CSE-MsgGUID: 8pdGu4WxT22ze9YX4NAV0A==
+X-IronPort-AV: E=McAfee;i="6600,9927,11099"; a="26119830"
+X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
+   d="scan'208";a="26119830"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2024 08:45:00 -0700
+X-CSE-ConnectionGUID: YSJi+AyAS96z2cNVxtFXyg==
+X-CSE-MsgGUID: 5mxwVqsETaORA2iS9NgDPw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
+   d="scan'208";a="43679757"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa004.fm.intel.com with ESMTP; 10 Jun 2024 08:44:55 -0700
+Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 4A7AE312D4;
+	Mon, 10 Jun 2024 16:44:40 +0100 (IST)
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	magnus.karlsson@intel.com,
+	Michal Kubiak <michal.kubiak@intel.com>
+Subject: [PATCH iwl-net 0/3] ice: fix synchronization between .ndo_bpf() and reset
+Date: Mon, 10 Jun 2024 17:37:12 +0200
+Message-ID: <20240610153716.31493-1-larysa.zaremba@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240608025347.90680-1-chengen.du@canonical.com>
- <CAPza5qfuNhDbhV9mau9RE=cNKMwGtJcx4pmjkoHNwpfysnw5yw@mail.gmail.com> <66660ec3f3e22_8dbbb294ed@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66660ec3f3e22_8dbbb294ed@willemb.c.googlers.com.notmuch>
-From: Chengen Du <chengen.du@canonical.com>
-Date: Mon, 10 Jun 2024 23:33:23 +0800
-Message-ID: <CAPza5qfcXSQNxz2kNVWHqYBGgnFLDa-Ey5b9y5OenZndo2a0Og@mail.gmail.com>
-Subject: Re: [PATCH v6] af_packet: Handle outgoing VLAN packets without
- hardware offloading
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, kaber@trash.net, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Willem,
+Fix the problems that are triggered by tx_timeout and ice_xdp() calls,
+including both pool and program operations.
 
-On Mon, Jun 10, 2024 at 4:21=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Chengen Du wrote:
-> > Hi,
-> >
-> > I would like to provide some additional explanations about the patch.
-> >
-> >
-> > On Sat, Jun 8, 2024 at 10:54=E2=80=AFAM Chengen Du <chengen.du@canonica=
-l.com> wrote:
-> > >
-> > > The issue initially stems from libpcap. The ethertype will be overwri=
-tten
-> > > as the VLAN TPID if the network interface lacks hardware VLAN offload=
-ing.
-> > > In the outbound packet path, if hardware VLAN offloading is unavailab=
-le,
-> > > the VLAN tag is inserted into the payload but then cleared from the s=
-k_buff
-> > > struct. Consequently, this can lead to a false negative when checking=
- for
-> > > the presence of a VLAN tag, causing the packet sniffing outcome to la=
-ck
-> > > VLAN tag information (i.e., TCI-TPID). As a result, the packet captur=
-ing
-> > > tool may be unable to parse packets as expected.
-> > >
-> > > The TCI-TPID is missing because the prb_fill_vlan_info() function doe=
-s not
-> > > modify the tp_vlan_tci/tp_vlan_tpid values, as the information is in =
-the
-> > > payload and not in the sk_buff struct. The skb_vlan_tag_present() fun=
-ction
-> > > only checks vlan_all in the sk_buff struct. In cooked mode, the L2 he=
-ader
-> > > is stripped, preventing the packet capturing tool from determining th=
-e
-> > > correct TCI-TPID value. Additionally, the protocol in SLL is incorrec=
-t,
-> > > which means the packet capturing tool cannot parse the L3 header corr=
-ectly.
-> > >
-> > > Link: https://github.com/the-tcpdump-group/libpcap/issues/1105
-> > > Link: https://lore.kernel.org/netdev/20240520070348.26725-1-chengen.d=
-u@canonical.com/T/#u
-> > > Fixes: 393e52e33c6c ("packet: deliver VLAN TCI to userspace")
-> > > Cc: stable@vger.kernel.org
-> > > Signed-off-by: Chengen Du <chengen.du@canonical.com>
-> > > ---
-> > >  net/packet/af_packet.c | 57 ++++++++++++++++++++++++++++++++++++++++=
---
-> > >  1 file changed, 55 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> > > index ea3ebc160e25..8cffbe1f912d 100644
-> > > --- a/net/packet/af_packet.c
-> > > +++ b/net/packet/af_packet.c
-> > > @@ -538,6 +538,43 @@ static void *packet_current_frame(struct packet_=
-sock *po,
-> > >         return packet_lookup_frame(po, rb, rb->head, status);
-> > >  }
-> > >
-> > > +static u16 vlan_get_tci(struct sk_buff *skb)
-> > > +{
-> > > +       struct vlan_hdr vhdr, *vh;
-> > > +       u8 *skb_orig_data =3D skb->data;
-> > > +       int skb_orig_len =3D skb->len;
-> > > +
-> > > +       skb_push(skb, skb->data - skb_mac_header(skb));
-> > > +       vh =3D skb_header_pointer(skb, ETH_HLEN, sizeof(vhdr), &vhdr)=
-;
-> > > +       if (skb_orig_data !=3D skb->data) {
-> > > +               skb->data =3D skb_orig_data;
-> > > +               skb->len =3D skb_orig_len;
-> > > +       }
-> >
-> >
-> > The reason for not directly using skb_header_pointer(skb,
-> > skb_mac_header(skb) + ETH_HLEN, ...) to get the VLAN header is due to
-> > the check logic in skb_header_pointer. In the SOCK_DGRAM and
-> > PACKET_OUTGOING scenarios, the offset can be a negative number, which
-> > causes the check logic (i.e., likely(hlen - offset >=3D len)) in
-> > __skb_header_pointer() to not work as expected.
->
-> The calculation is still correct?
->
-> I think that this is not the first situation where negative offsets
-> can be given to skb_header_pointer.
+PF reset can be triggered asynchronously, e.g. by tx_timeout. With some
+unfortunate timings both reset and .ndo_bpf will try to access and modify
+XDP rings at the same time, causing system crash, such as the one below:
 
-The check will pass even if the offset is negative, but I believe this
-may not be the right approach. In my humble opinion, the expected
-check should be similar to the skb_push check, which ensures that
-after moving forward by the offset bytes, skb->data remains larger
-than or equal to skb->head to avoid accessing out-of-bound data. It
-might be worth considering adding a check in __skb_header_pointer to
-handle negative offsets, as this seems logical. However, this change
-could impact a wider range of code. Please correct me if I am
-mistaken.
+[ +1.999878] ice 0000:b1:00.0: Registered XDP mem model MEM_TYPE_XSK_BUFF_POOL on Rx ring 14
+[ +2.002992] ice 0000:b1:00.0: Registered XDP mem model MEM_TYPE_XSK_BUFF_POOL on Rx ring 18
+[Mar15 18:17] ice 0000:b1:00.0 ens801f0np0: NETDEV WATCHDOG: CPU: 38: transmit queue 14 timed out 80692736 ms
+[ +0.000093] ice 0000:b1:00.0 ens801f0np0: tx_timeout: VSI_num: 6, Q 14, NTC: 0x0, HW_HEAD: 0x0, NTU: 0x0, INT: 0x4000001
+[ +0.000012] ice 0000:b1:00.0 ens801f0np0: tx_timeout recovery level 1, txqueue 14
+[ +0.394718] ice 0000:b1:00.0: PTP reset successful
+[ +0.006184] BUG: kernel NULL pointer dereference, address: 0000000000000098
+[ +0.000045] #PF: supervisor read access in kernel mode
+[ +0.000023] #PF: error_code(0x0000) - not-present page
+[ +0.000023] PGD 0 P4D 0
+[ +0.000018] Oops: 0000 [#1] PREEMPT SMP NOPTI
+[ +0.000023] CPU: 38 PID: 7540 Comm: kworker/38:1 Not tainted 6.8.0-rc7 #1
+[ +0.000031] Hardware name: Intel Corporation S2600WFT/S2600WFT, BIOS SE5C620.86B.02.01.0014.082620210524 08/26/2021
+[ +0.000036] Workqueue: ice ice_service_task [ice]
+[ +0.000183] RIP: 0010:ice_clean_tx_ring+0xa/0xd0 [ice]
+[...]
+[ +0.000013] Call Trace:
+[ +0.000016] <TASK>
+[ +0.000014] ? __die+0x1f/0x70
+[ +0.000029] ? page_fault_oops+0x171/0x4f0
+[ +0.000029] ? schedule+0x3b/0xd0
+[ +0.000027] ? exc_page_fault+0x7b/0x180
+[ +0.000022] ? asm_exc_page_fault+0x22/0x30
+[ +0.000031] ? ice_clean_tx_ring+0xa/0xd0 [ice]
+[ +0.000194] ice_free_tx_ring+0xe/0x60 [ice]
+[ +0.000186] ice_destroy_xdp_rings+0x157/0x310 [ice]
+[ +0.000151] ice_vsi_decfg+0x53/0xe0 [ice]
+[ +0.000180] ice_vsi_rebuild+0x239/0x540 [ice]
+[ +0.000186] ice_vsi_rebuild_by_type+0x76/0x180 [ice]
+[ +0.000145] ice_rebuild+0x18c/0x840 [ice]
+[ +0.000145] ? delay_tsc+0x4a/0xc0
+[ +0.000022] ? delay_tsc+0x92/0xc0
+[ +0.000020] ice_do_reset+0x140/0x180 [ice]
+[ +0.000886] ice_service_task+0x404/0x1030 [ice]
+[ +0.000824] process_one_work+0x171/0x340
+[ +0.000685] worker_thread+0x277/0x3a0
+[ +0.000675] ? preempt_count_add+0x6a/0xa0
+[ +0.000677] ? _raw_spin_lock_irqsave+0x23/0x50
+[ +0.000679] ? __pfx_worker_thread+0x10/0x10
+[ +0.000653] kthread+0xf0/0x120
+[ +0.000635] ? __pfx_kthread+0x10/0x10
+[ +0.000616] ret_from_fork+0x2d/0x50
+[ +0.000612] ? __pfx_kthread+0x10/0x10
+[ +0.000604] ret_from_fork_asm+0x1b/0x30
+[ +0.000604] </TASK>
 
->
-> > While it is possible to modify __skb_header_pointer() to handle cases
-> > where the offset is negative, this change could affect a wider range
-> > of code.
->
+Larysa Zaremba (3):
+  ice: synchronize XDP setup with reset
+  ice: fix locking in ice_xsk_pool_setup()
+  ice: make NAPI setting code aware that rtnl-locked request is waiting
+
+ drivers/net/ethernet/intel/ice/ice.h      |  2 ++
+ drivers/net/ethernet/intel/ice/ice_lib.c  | 23 ++++++++++---
+ drivers/net/ethernet/intel/ice/ice_main.c | 39 ++++++++++++++++++++---
+ drivers/net/ethernet/intel/ice/ice_xsk.c  | 12 ++-----
+ 4 files changed, 57 insertions(+), 19 deletions(-)
+
+-- 
+2.43.0
+
 
