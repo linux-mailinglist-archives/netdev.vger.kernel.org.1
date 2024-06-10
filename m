@@ -1,173 +1,214 @@
-Return-Path: <netdev+bounces-102352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF34D9029EA
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 22:25:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 974FC902A07
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 22:38:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23C2E2847D4
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 20:25:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EC4B1F22F4F
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 20:38:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9725947A60;
-	Mon, 10 Jun 2024 20:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC8F4D8AD;
+	Mon, 10 Jun 2024 20:38:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="BS4mV88J"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eUo1fSH9";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="q+/oRSpq";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="eUo1fSH9";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="q+/oRSpq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44F03E47E
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 20:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59A3433B9;
+	Mon, 10 Jun 2024 20:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718051149; cv=none; b=bVmcTsxp3Ou3rMnQMAJ1mRbxoJeUhQu0qUSuc6KvX7+8patyu71i+dsuVmt3hoIyopA8hJtrx5yz1sSuLGFnW3CON6ZmgWTbw/G+VHpdBJIWmVdgPzAAZQrzZ+7QhRwyjx0VU/bsmUzZeUn+Qu7L+XPADoXv9op3/EAxH4u2Lso=
+	t=1718051892; cv=none; b=JHNwZ9t6Y2W16a2sAdR9b2pUyhylXKEjc52SSOYqjAHgKJ8FN/EwEFZNW2+U3+PnuzZ6fRl9NzACvmb+SQtZyv4S3NMACNOSM6QbTZ5/B37ZxCikleIiJGWnTvHFZdF71PudRaSX7PsBAktYk4vtfxl9CiHieeMlAfTM+BDG7Ao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718051149; c=relaxed/simple;
-	bh=SONlq9bXQbAkTw0EihI5/xjKerm7ff58Ryq6LfBbhF0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mDFrKfsCdIi2sAFe0+XqB0sKIMg90oC8S+infvPRtxYSpRcriyUmzyPJs9pSLvXDxdVZsHZ7/KgDi2CXsuLRUspf/a0bXU4AOMS827pPSYus94suFMWzo5Wjv1xPDkvYPvZaWVcStaycJ0aY617oT96Vzi8UWuv/j19qe7GXW30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=BS4mV88J; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57c61165af6so3758773a12.2
-        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 13:25:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1718051146; x=1718655946; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/wH3mYXJPFC56KG/UdINpo4FbUx5USQeX53C3PDh1Bk=;
-        b=BS4mV88JHJcQKOZH4AjD/VXAJRB4cGA+sC/iEuSHK1446agPTX8IyrvQxzYXAcDKrz
-         /jxI4dUEFadkJGS9o+OFujWmP8VmZ5LHersUiOFaltIVoPQORYzB3qfd6xeMnlIOACA1
-         7ociECb8aVwKYIzvu7VHQY1nu840AiC10HUeseLxS28KI1IgwqUa8QQTlKhs71S6+Zlw
-         XUZu4bfEmcnNt/X7iZF+Ext3RIfANRLjNA4G5sqHv0ketyjXscSebxmeLo5hoT2KVMP3
-         LdGLT1cItVzGnsZ3O8850AVnsYU8pW60fLbVNJgIf/sn1QdvyTKownzX3WKscDGgpMIs
-         ozrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718051146; x=1718655946;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/wH3mYXJPFC56KG/UdINpo4FbUx5USQeX53C3PDh1Bk=;
-        b=QMsm75HFKcKZkTB9pxqZHxIB5HZDeBL2WiUurVx2uq6PYxkvHR6dWGdbWs6uBHcqLl
-         kOmolAM81z6aL8YK8m5QMVItb63Hq+eIAEUNOfeKWQIyBLepOmS+l8vVKMWV/YRC3S25
-         tCLFvPfz1c6/uu2g2dFVfTruOVun341bhMh76FZF/uRu69K0HJ4HD2hrL+Cz0F9tReaX
-         4mMmKekuJadFaIEGxDHnLFP5AK3dXSKo1j4/+Z2noliKASdrcSbXAAEatFhLlzWeUiC1
-         EOgCw+Ddg5nLgBe9KKahgsKQK6NaafYa9MG7d6p9Q/QxSubyz+ukhE2L+GMKx+wM2qQb
-         an2w==
-X-Gm-Message-State: AOJu0YxpOcVyUPcaO6WnmFZMA6RikXcKV1c0NsHPg8akKdxXiQBITTV4
-	yOGPj34qoGEsUyxDRia0Z1MolxsF3wGz5rarN3BpAuxN8nLO/p3giIAHvBsY6LMyVZbOfoFc+X1
-	u8PPTE5gZKd5zShNj+p+iZLaDDgxSAunITC0PKw==
-X-Google-Smtp-Source: AGHT+IFeNM+vnJ0I5dqzaSHadBEEqlOnv2kTGQITQ/wXOYx520e/KZSJn/7E3GvgAEEb7/zIgfGp2FD5q2fX1wytAaQ=
-X-Received: by 2002:a50:8751:0:b0:57c:7f3b:6b9c with SMTP id
- 4fb4d7f45d1cf-57c7f3b6bbdmr2819913a12.5.1718051146118; Mon, 10 Jun 2024
- 13:25:46 -0700 (PDT)
+	s=arc-20240116; t=1718051892; c=relaxed/simple;
+	bh=Bc6grhxxoBIzR+kXYT94BIz0HLhVjnDl+vcaEYDuro4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Qzhb14u+T0PWN96y2vPR8xKJnD0/kqrctYfKSroSWQPc7QVbI7bI6Xy0/MCFFkDgzKE2gUMOUyHbodz2WQnV844jZBZC+ySp++JDf56XOdAxrvhO2g2yoy1qm+zwAvJe7NS4FPx5OFJa5nzFQw5oqz4Ow2xB/5oPUPvH+5bXhfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=eUo1fSH9; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=q+/oRSpq; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=eUo1fSH9; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=q+/oRSpq; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 92E13200C8;
+	Mon, 10 Jun 2024 20:38:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1718051888; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=XxeQrYK1W1CzQMoStEUsvSWuSb8kH7BgYf+vCDWtHuA=;
+	b=eUo1fSH9gLM/mt2MZ/Xqn0WQP6BqwcDEZ2Tn+n+7ZSpn9bvqBCa3dKM6AToMOjQGR6/qzr
+	Q3vFDrf3E9W2vnQ/jnA25lf3jg/ZnayYYcEG3BnCC99WKFhSmBd1kIJETKLla8+tl6TBF/
+	8Lik5O+rdZsRFhUev+SegfXDDULAXBM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1718051888;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=XxeQrYK1W1CzQMoStEUsvSWuSb8kH7BgYf+vCDWtHuA=;
+	b=q+/oRSpqBAlvQ2Bj4clV5NObxPCqLT87ozD/Mo+AY4A2eaZ1mOfQEbXkNaHDWGQ5BEK/bn
+	0lOfYSKCDU1EkfCQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=eUo1fSH9;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b="q+/oRSpq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1718051888; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=XxeQrYK1W1CzQMoStEUsvSWuSb8kH7BgYf+vCDWtHuA=;
+	b=eUo1fSH9gLM/mt2MZ/Xqn0WQP6BqwcDEZ2Tn+n+7ZSpn9bvqBCa3dKM6AToMOjQGR6/qzr
+	Q3vFDrf3E9W2vnQ/jnA25lf3jg/ZnayYYcEG3BnCC99WKFhSmBd1kIJETKLla8+tl6TBF/
+	8Lik5O+rdZsRFhUev+SegfXDDULAXBM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1718051888;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=XxeQrYK1W1CzQMoStEUsvSWuSb8kH7BgYf+vCDWtHuA=;
+	b=q+/oRSpqBAlvQ2Bj4clV5NObxPCqLT87ozD/Mo+AY4A2eaZ1mOfQEbXkNaHDWGQ5BEK/bn
+	0lOfYSKCDU1EkfCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 78F2013A7F;
+	Mon, 10 Jun 2024 20:38:08 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id LKoVHTBkZ2ZNKQAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 10 Jun 2024 20:38:08 +0000
+Message-ID: <3f58c9a6-614f-4188-9a38-72c26fb42c8e@suse.cz>
+Date: Mon, 10 Jun 2024 22:38:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1717529533.git.yan@cloudflare.com> <983c54f98746bd42d778b99840435d0a93963cb3.1717529533.git.yan@cloudflare.com>
- <20240605195750.1a225963@gandalf.local.home> <CAO3-PbqRNRduSAyN9CtaxPFsOs9xtGHruu1ACfJ5e-mrvTo2Cw@mail.gmail.com>
- <20240610125422.252da487@rorschach.local.home>
-In-Reply-To: <20240610125422.252da487@rorschach.local.home>
-From: Yan Zhai <yan@cloudflare.com>
-Date: Mon, 10 Jun 2024 15:25:34 -0500
-Message-ID: <CAO3-PbpX1RCcYgr_xKVoO=MYOrP6jBhtGuTbptjRMjR=VAvthQ@mail.gmail.com>
-Subject: Re: [RFC v3 net-next 1/7] net: add rx_sk to trace_kfree_skb
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Abhishek Chauhan <quic_abchauha@quicinc.com>, Mina Almasry <almasrymina@google.com>, 
-	Florian Westphal <fw@strlen.de>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	David Howells <dhowells@redhat.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Pavel Begunkov <asml.silence@gmail.com>, 
-	linux-kernel@vger.kernel.org, kernel-team@cloudflare.com, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Neil Horman <nhorman@tuxdriver.com>, 
-	linux-trace-kernel@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/14] wireguard: allowedips: replace call_rcu by
+ kfree_rcu for simple kmem_cache_free callback
+Content-Language: en-US
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+ Julia Lawall <Julia.Lawall@inria.fr>
+Cc: kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, wireguard@lists.zx2c4.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "Paul E . McKenney" <paulmck@kernel.org>,
+ Matthew Wilcox <willy@infradead.org>
+References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
+ <20240609082726.32742-2-Julia.Lawall@inria.fr> <ZmW85kuO2Eje6gE9@zx2c4.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ EP+ylKVEKb0Q2A==
+In-Reply-To: <ZmW85kuO2Eje6gE9@zx2c4.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.50 / 50.00];
+	BAYES_HAM(-3.00)[99.98%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DWL_DNSWL_BLOCKED(0.00)[suse.cz:dkim];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DKIM_TRACE(0.00)[suse.cz:+]
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 92E13200C8
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Score: -4.50
 
-On Mon, Jun 10, 2024 at 11:54=E2=80=AFAM Steven Rostedt <rostedt@goodmis.or=
-g> wrote:
->
-> On Thu, 6 Jun 2024 10:37:46 -0500
-> Yan Zhai <yan@cloudflare.com> wrote:
->
-> > > name: kfree_skb
-> > > ID: 1799
-> > > format:
-> > >         field:unsigned short common_type;       offset:0;       size:=
-2; signed:0;
-> > >         field:unsigned char common_flags;       offset:2;       size:=
-1; signed:0;
-> > >         field:unsigned char common_preempt_count;       offset:3;    =
-   size:1; signed:0;
-> > >         field:int common_pid;   offset:4;       size:4; signed:1;
-> > >
-> > >         field:void * skbaddr;   offset:8;       size:8; signed:0;
-> > >         field:void * location;  offset:16;      size:8; signed:0;
-> > >         field:unsigned short protocol;  offset:24;      size:2; signe=
-d:0;
-> > >         field:enum skb_drop_reason reason;      offset:28;      size:=
-4; signed:0;
-> > >
-> > > Notice that "protocol" is 2 bytes in size at offset 24, but "reason" =
-starts
-> > > at offset 28. This means at offset 26, there's a 2 byte hole.
-> > >
-> > The reason I added the pointer as the last argument is trying to
-> > minimize the surprise to existing TP users, because for common ABIs
-> > it's fine to omit later arguments when defining a function, but it
-> > needs change and recompilation if the order of arguments changed.
->
-> Nothing should be hard coding the offsets of the fields. This is
-> exported to user space so that tools can see where the fields are.
-> That's the purpose of libtraceevent. The fields should be movable and
-> not affect anything. There should be no need to recompile.
->
-Oh I misunderstood previously. I was also thinking about the argument
-order in TP_PROTO, but what you mentioned is just the order in
-TP_STRUCT__entry, correct? I'd prefer to not change the argument order
-but the struct field order can definitely be aligned better here.
+On 6/9/24 4:32 PM, Jason A. Donenfeld wrote:
+> Hi Julia & Vlastimil,
+> 
+> On Sun, Jun 09, 2024 at 10:27:13AM +0200, Julia Lawall wrote:
+>> Since SLOB was removed, it is not necessary to use call_rcu
+>> when the callback only performs kmem_cache_free. Use
+>> kfree_rcu() directly.
+> 
+> Thanks, I applied this to the wireguard tree, and I'll send this out as
+> a fix for 6.10. Let me know if this is unfavorable to you and if you'd
+> like to take this somewhere yourself, in which case I'll give you my
+> ack.
+> 
+> Just a question, though, for Vlastimil -- I know that with the SLOB
+> removal, kfree() is now allowed on kmemcache'd objects. Do you plan to
+> do a blanket s/kmem_cache_free/kfree/g at some point, and then remove
+> kmem_cache_free all together?
 
-Yan
+Hmm, not really, but obligatory Cc for willy who'd love to have "one free()
+to rule them all" IIRC.
 
-> >
-> > Looking at the actual format after the change, it does not add a new
-> > hole since protocol and reason are already packed into the same 8-byte
-> > block, so rx_skaddr starts at 8-byte aligned offset:
-> >
-> > # cat /sys/kernel/debug/tracing/events/skb/kfree_skb/format
-> > name: kfree_skb
-> > ID: 2260
-> > format:
-> >         field:unsigned short common_type;       offset:0;
-> > size:2; signed:0;
-> >         field:unsigned char common_flags;       offset:2;
-> > size:1; signed:0;
-> >         field:unsigned char common_preempt_count;       offset:3;
-> >  size:1; signed:0;
-> >         field:int common_pid;   offset:4;       size:4; signed:1;
-> >
-> >         field:void * skbaddr;   offset:8;       size:8; signed:0;
-> >         field:void * location;  offset:16;      size:8; signed:0;
-> >         field:unsigned short protocol;  offset:24;      size:2; signed:=
-0;
-> >         field:enum skb_drop_reason reason;      offset:28;
-> > size:4; signed:0;
-> >         field:void * rx_skaddr; offset:32;      size:8; signed:0;
-> >
-> > Do you think we still need to change the order?
->
-> Up to you, just wanted to point it out.
->
-> -- Steve
->
+My current thinking is that kmem_cache_free() can save the kmem_cache
+lookup, or serve as a double check if debugging is enabled, and doesn't have
+much downside. If someone wants to not care about the kmem_cache pointer,
+they can use kfree(). Even convert their subsystem at will. But a mass
+conversion of everything would be rather lot of churn for not much of a
+benefit, IMHO.
 
