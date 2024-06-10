@@ -1,179 +1,133 @@
-Return-Path: <netdev+bounces-102172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 049F3901BBA
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 09:19:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 080D7901BCE
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 09:21:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A47061F215C0
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 07:19:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B000D1F21A67
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 07:21:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 863CF5B69E;
-	Mon, 10 Jun 2024 07:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D40E020B0F;
+	Mon, 10 Jun 2024 07:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="qkUEsUrd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P85ZPg6o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B71F7225CE;
-	Mon, 10 Jun 2024 07:18:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF7B4776E
+	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 07:21:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718003895; cv=none; b=U3pie1/ZFYQloXjCXgYzXjH7GFzKyWbUKTz50VJTBGZR4T7VW3XbxzRUNr4+k3SxHAJw+w0lflIixi5RppooLOPWPbiMkB3EAR4yFEgtLDc34LLRcByDV00IZQMyTOCD2iWfRulFt8SjV5Y+UntX0s8CNLE5Lo515q9LaZGS1Rg=
+	t=1718004079; cv=none; b=rpP/1RHe+LkNqqQMd5Fdxsz4IlO1c8u6um1FAyaVi9DXwDt6AHVUUHsLAErhxPk2fjJNlX0ywM67ON57QdFsX86US+w3J0ZZ60sexmtm0nQwjMT4fFUJxK9N7OHz2sdmZ6cJ28bT8cUt0mWVIyQXDsQtGGKGx9rpJ9hn7xHEMPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718003895; c=relaxed/simple;
-	bh=hvTmYJeXRCa7YjqZ9W8Ny/Bvy3GoiYbqq4jHbid84Uc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FtTVwxgJpWK3geJXw99axwNS6z/7ISZok5DwTmcmuCh5mASntSSqq0/v0YMfChV5rtmWgehuGMMP0Y1sGvFynPqeKdEf8uK+mI+0a3Uii0nGRvzZ9LjbFLUiK2KEx0FRdDcQOfO4c9f2VNz3qZeudC/NRu3HX2spKdbuV3nUnFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=qkUEsUrd; arc=none smtp.client-ip=91.207.212.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 459LZncj007336;
-	Mon, 10 Jun 2024 09:17:53 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	CYOngEfmHe6b8YHe3S1okFn+ot5qSYTmSM0D/zq1qec=; b=qkUEsUrdJfYXc3zA
-	2PKjsQtYHwoGm2URhCpxmfEc5U8O9R25swgTz5gbV7BNh4Z/0qyu1Cgu00kYXpJM
-	hyJdiH9kGKJxcmoGL4o2XfQTmwEWa9gi1yXc53S/zdiIT9CXz4kd8krh71hd063e
-	nx2Z7SbEBoo2rQLwdzTdCWOGdiBo5ytgIM62dW7vTTndGN8ZmLk08PEaxscnizHd
-	xM+tt2O9sdF6338OqsRa7HE3icBjiITZfw66f8/fbqcVBx+IYaAJyC9xwYW0KY6L
-	WgpYzOj3TEzjysOw8EOTcPljVEX1Hc6S/Aymrmz6gRWIffHxc8E8o0MDFuEQsHfD
-	MBH2ag==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ymce5nk9e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Jun 2024 09:17:53 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id BDE4740048;
-	Mon, 10 Jun 2024 09:17:46 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id E564D210758;
-	Mon, 10 Jun 2024 09:16:33 +0200 (CEST)
-Received: from localhost (10.48.86.164) by SHFDAG1NODE2.st.com (10.75.129.70)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 10 Jun
- 2024 09:16:33 +0200
-From: Christophe Roullier <christophe.roullier@foss.st.com>
-To: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
-        Mark
- Brown <broonie@kernel.org>,
-        Christophe Roullier
-	<christophe.roullier@foss.st.com>,
-        Marek Vasut <marex@denx.de>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: [net-next,PATCH v6 8/8] net: stmmac: dwmac-stm32: add management of stm32mp13 for stm32
-Date: Mon, 10 Jun 2024 09:14:59 +0200
-Message-ID: <20240610071459.287500-9-christophe.roullier@foss.st.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240610071459.287500-1-christophe.roullier@foss.st.com>
-References: <20240610071459.287500-1-christophe.roullier@foss.st.com>
+	s=arc-20240116; t=1718004079; c=relaxed/simple;
+	bh=jXPKiXC/uIzPG3lo6IrKlpRKHxhZ1P35ap2Vzt0Hdpw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ue9R/OgmDVryOJbWkuVClMh8x7zZtoPDY8dY+mhfgfF4YIQyKGP0BEx+BNvCHtD9YBC6E/uRJnZFRK1nXWEQrVXklPfGsdLv2/qB7fZfWrPGcn5RWMpXeyiJIyDAK2Uu9cSZjPx4Tfp9pZBrwj4LAMx7fPhVH4jjk2jQr0cnhh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P85ZPg6o; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718004078; x=1749540078;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jXPKiXC/uIzPG3lo6IrKlpRKHxhZ1P35ap2Vzt0Hdpw=;
+  b=P85ZPg6ox5VGpuSvyMAwN/JW9lio7Dx36dLTctRiDDJwex5yTmmZ8dSo
+   0PwRpZd5m2WLCfbuzLzC/0E2+lPBdRh0pmX9G4WIvHV2UG/Gx3xE90Ig5
+   TjuqIPqyVz1hhoorZ260BHP0LyyJHqg0W6mi9dTOEIxSdUC8Dtre3LZXb
+   7GvPe9UKmmRk2+h1ozTDRZAZ8Gs6rLnv8MkI4FrWHcQtXPbFQe4Q9+7/E
+   NSqGfBbmM8iWiQ1iZtPu2c6prSACYq7CCThite4OIO8T0iG0nIb8S6zLr
+   8SRT9KxCYeTlOsT5J6rqhjO6w8OfEYQxFHpZetTIRGmXp7q9AORa8NUR7
+   A==;
+X-CSE-ConnectionGUID: w2Ywk5j3T6u1Ubdq+FN0VQ==
+X-CSE-MsgGUID: oY7fC0yOQFmyJFT+zDO+Xg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11098"; a="25760689"
+X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
+   d="scan'208";a="25760689"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2024 00:21:18 -0700
+X-CSE-ConnectionGUID: Nyf0iVaGTeysEcjBklIZVA==
+X-CSE-MsgGUID: srslRiIURqKdSG0Qj6U3Nw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
+   d="scan'208";a="39055729"
+Received: from unknown (HELO mev-dev) ([10.237.112.144])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2024 00:21:17 -0700
+Date: Mon, 10 Jun 2024 09:20:18 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev <netdev@vger.kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Subject: Re: [PATCH v2 3/7] ice: move devlink locking outside the port
+ creation
+Message-ID: <ZmapMiNznNSqGDvT@mev-dev>
+References: <20240605-next-2024-06-03-intel-next-batch-v2-0-39c23963fa78@intel.com>
+ <20240605-next-2024-06-03-intel-next-batch-v2-3-39c23963fa78@intel.com>
+ <20240606175634.2e42fca8@kernel.org>
+ <ZmKWNbY1V+ZvP/qX@mev-dev>
+ <49f3020a-1b2a-44c5-8ea5-938aa2195144@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-10_02,2024-06-06_02,2024-05-17_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <49f3020a-1b2a-44c5-8ea5-938aa2195144@intel.com>
 
-Add Ethernet support for STM32MP13.
-STM32MP13 is STM32 SOC with 2 GMACs instances.
-GMAC IP version is SNPS 4.20.
-GMAC IP configure with 1 RX and 1 TX queue.
-DMA HW capability register supported
-RX Checksum Offload Engine supported
-TX Checksum insertion supported
-Wake-Up On Lan supported
-TSO supported
+On Fri, Jun 07, 2024 at 02:20:01PM -0700, Jacob Keller wrote:
+> 
+> 
+> On 6/6/2024 10:10 PM, Michal Swiatkowski wrote:
+> > On Thu, Jun 06, 2024 at 05:56:34PM -0700, Jakub Kicinski wrote:
+> >> On Wed, 05 Jun 2024 13:40:43 -0700 Jacob Keller wrote:
+> >>> From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> >>>
+> >>> In case of subfunction lock will be taken for whole port creation. Do
+> >>> the same in VF case.
+> >>
+> >> No interactions with other locks worth mentioning?
+> >>
+> > 
+> > You right, I could have mentioned also removing path. The patch is only
+> > about devlink lock during port representor creation / removing.
+> > 
+> >>> diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+> >>> index 704e9ad5144e..f774781ab514 100644
+> >>> --- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
+> >>> +++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+> >>> @@ -794,10 +794,8 @@ int ice_devlink_rate_init_tx_topology(struct devlink *devlink, struct ice_vsi *v
+> >>>  
+> >>>  	tc_node = pi->root->children[0];
+> >>>  	mutex_lock(&pi->sched_lock);
+> >>> -	devl_lock(devlink);
+> >>>  	for (i = 0; i < tc_node->num_children; i++)
+> >>>  		ice_traverse_tx_tree(devlink, tc_node->children[i], tc_node, pf);
+> >>> -	devl_unlock(devlink);
+> >>>  	mutex_unlock(&pi->sched_lock);
+> >>
+> >> Like this didn't use to cause a deadlock?
+> >>
+> >> Seems ice_devlink_rate_node_del() takes this lock and it's already
+> >> holding the devlink instance lock.
+> > 
+> > ice_devlink_rate_init_tx_topology() wasn't (till now) called with
+> > devlink lock, because it is called from port representor creation flow,
+> > not from the devlink.
+> > 
+> > Thanks,
+> > Michal
+> 
+> I take it you will make a respin of the 4 subfunction patches in this
+> series then?
 
-Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
----
- .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 24 +++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-index 09ff0be0bdcdc..b8b3e04ca3ec8 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-@@ -104,6 +104,7 @@ struct stm32_ops {
- 	int (*parse_data)(struct stm32_dwmac *dwmac,
- 			  struct device *dev);
- 	bool clk_rx_enable_in_suspend;
-+	bool is_mp13;
- 	u32 syscfg_clr_off;
- };
- 
-@@ -224,11 +225,18 @@ static int stm32mp1_configure_pmcr(struct plat_stmmacenet_data *plat_dat)
- {
- 	struct stm32_dwmac *dwmac = plat_dat->bsp_priv;
- 	u32 reg = dwmac->mode_reg;
--	int val;
-+	int val = 0;
- 
- 	switch (plat_dat->mac_interface) {
- 	case PHY_INTERFACE_MODE_MII:
--		val = SYSCFG_PMCR_ETH_SEL_MII;
-+		/*
-+		 * STM32MP15xx supports both MII and GMII, STM32MP13xx MII only.
-+		 * SYSCFG_PMCSETR ETH_SELMII is present only on STM32MP15xx and
-+		 * acts as a selector between 0:GMII and 1:MII. As STM32MP13xx
-+		 * supports only MII, ETH_SELMII is not present.
-+		 */
-+		if (!dwmac->ops->is_mp13)  /* Select MII mode on STM32MP15xx */
-+			val |= SYSCFG_PMCR_ETH_SEL_MII;
- 		break;
- 	case PHY_INTERFACE_MODE_GMII:
- 		val = SYSCFG_PMCR_ETH_SEL_GMII;
-@@ -560,12 +568,24 @@ static struct stm32_ops stm32mp1_dwmac_data = {
- 	.resume = stm32mp1_resume,
- 	.parse_data = stm32mp1_parse_data,
- 	.syscfg_clr_off = 0x44,
-+	.is_mp13 = false,
-+	.clk_rx_enable_in_suspend = true
-+};
-+
-+static struct stm32_ops stm32mp13_dwmac_data = {
-+	.set_mode = stm32mp1_set_mode,
-+	.suspend = stm32mp1_suspend,
-+	.resume = stm32mp1_resume,
-+	.parse_data = stm32mp1_parse_data,
-+	.syscfg_clr_off = 0x08,
-+	.is_mp13 = true,
- 	.clk_rx_enable_in_suspend = true
- };
- 
- static const struct of_device_id stm32_dwmac_match[] = {
- 	{ .compatible = "st,stm32-dwmac", .data = &stm32mcu_dwmac_data},
- 	{ .compatible = "st,stm32mp1-dwmac", .data = &stm32mp1_dwmac_data},
-+	{ .compatible = "st,stm32mp13-dwmac", .data = &stm32mp13_dwmac_data},
- 	{ }
- };
- MODULE_DEVICE_TABLE(of, stm32_dwmac_match);
--- 
-2.25.1
-
+Ok, I will send.
 
