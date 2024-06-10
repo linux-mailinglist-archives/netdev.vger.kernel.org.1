@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-102186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2566F901C57
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 10:05:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83678901C54
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 10:05:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 749A8B217A1
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 08:05:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 217072823C0
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 08:05:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA346F2FB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A3846F06D;
 	Mon, 10 Jun 2024 08:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="utiECnGM"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="YPdWPJKz"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50A9558B6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B503355886;
 	Mon, 10 Jun 2024 08:05:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718006723; cv=none; b=Gyuauz17t3+G6CnCDk6Pr1mjNxJacVFkwqOXKDaGrzl4YKtV+o0FvNWDxERLI7I0+zo4IyGjIVgm/YLWG6b6RvNlEvWyv0yxhVFzWUNZuFlS+llBUCh2BdLRWxHvVxRl5ylrVvJFhmJBfqgO/jRHoAt+3epVcy2wDzJI253EDVA=
+	t=1718006723; cv=none; b=Ik7t3z/4wUQ+AZQj61QB5nLBZMKU0+Tl6qI14R30fEg58+IkCIoKTi4bMSiPgTRyOpqaewJhZ7U9rWzmwu61eORpOPIk2VRwiWkN89ytliN6JDFyecbXveWuobZJNmY9IHu7FmCNaCiSGnGac4ZCDk9nNQ6WDopk6P62wpaO7wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718006723; c=relaxed/simple;
-	bh=LxdLgGqPLf3s+kJUNXVv8BMrS7yHp/8IVNCuj2Iw0i4=;
+	bh=h5mN9hSq8pgjzcyt50z4SAsjS4rmHveIiM9R54ksBvM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tvyKDUu4eNcdE52jLBWlnsNg2CDdaW5WZTLqdmBfrv0QWWfekqcjvL2wgwbu0RspOO/ghQuWjUXr/V4ioNQ2e1ZyQ9H2k4fHcVAU7XpY9Nqbqx+1hePAezbNv2SzAkXskUeHUB4ie71jvNsD55rEvYCLGhzCZ4x8W+zT/0oSaaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=utiECnGM; arc=none smtp.client-ip=185.132.182.106
+	 MIME-Version:Content-Type; b=Bmonj8KWOSxMj6m+TFCaSrSRFH6Tv+X1cWlTJzBd+mVwupWYtB/5Qr0QXHsxSNrVXwNRy9zGiqyXn2iFlMx4WKnuyKCrUDm7RXv5LNRRg6T2ccfyq6o38U5R2syY3TSU8u9YolsERoUwXIzaKZh2WslmNy0KXS4Ho+RuDJwZxLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=YPdWPJKz; arc=none smtp.client-ip=185.132.182.106
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
 Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 459LMGqp022910;
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 459LQ905029276;
 	Mon, 10 Jun 2024 10:04:51 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	I5eX1MiABAjtTHnD8DpDo4CymvKlEhXxzp8S24yq7DA=; b=utiECnGMME/N0zD/
-	EAORaw5ZIf8eU9o1QmoGPkf9fpVtD27XSQu20INeRf0aSMH5eDx4St6lGiMUq/Gi
-	OalLE1Ljo45fNwFoZ2efFY3DeTskbHXzvmvR058SZ0ccCI1KRVZ9yr1jbk+8xebB
-	tC6SgptLD2iYEpY9kGzg46DQAR9lVRyTGzsvuQIg5agNBbZktABd3gQM7pGuSgfr
-	IpKGdanLo1q6ebX4nx/sGPtWb5ZTDWdjbdNicPTCCbHKCkHChIeNZmtTzJSy8XdL
-	qEAESI9dG0uvtur8y+928YutA73vlrNt9RzoJSw7gL2eZoMVQI27t0Q0f0hRuXxm
-	W2eFrA==
+	1Q35dkt89KWo1ea1imWMRpqWMEk/sfn0A6SfaG1T7t4=; b=YPdWPJKzwIhIlz6j
+	mPynwiPvNYYmHyPDGFLQauy446oxwdqBwuxyrMOvTuFcUk4EbD6l5L0HWStJS/LC
+	CaU8CQk/WuJDyoOEvdvTkMQZ3BBMUVqhK/HEVZgTR/dp5nmLj53EUf5tOPPP6UXf
+	ia2yP7T2nGjQDQCdNLY494LI+QPqftPnQd4BwXlhBolqkP2FEdY5wpDruZfcFB1n
+	dRKTt5d9Vua7CayzbqkrsMjlZZJ1EjTPcwb/n2ja94X8Jn7YPS2y4qoY8Gp5be9A
+	oyzBeFmqBjZ0VerlmJhIs6+9up7JoK4M/b0PvJDC1o8mwGFk5NRAbIXPR3G5zsyc
+	Sct6hw==
 Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yn0v13jc5-1
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3yn0v13jc6-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Mon, 10 Jun 2024 10:04:51 +0200 (MEST)
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id EFF1140044;
-	Mon, 10 Jun 2024 10:04:46 +0200 (CEST)
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 12D8240045;
+	Mon, 10 Jun 2024 10:04:47 +0200 (CEST)
 Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 04EC0211957;
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id C1900211962;
 	Mon, 10 Jun 2024 10:03:33 +0200 (CEST)
 Received: from localhost (10.48.86.164) by SHFDAG1NODE2.st.com (10.75.129.70)
  with Microsoft SMTP Server (version=TLS1_2,
@@ -80,9 +80,9 @@ To: "David S . Miller" <davem@davemloft.net>,
 CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-stm32@st-md-mailman.stormreply.com>,
         <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH 1/3] ARM: dts: stm32: add ethernet1 and ethernet2 support on stm32mp13
-Date: Mon, 10 Jun 2024 10:03:07 +0200
-Message-ID: <20240610080309.290444-2-christophe.roullier@foss.st.com>
+Subject: [PATCH 2/3] ARM: dts: stm32: add ethernet1/2 RMII pins for STM32MP13F-DK board
+Date: Mon, 10 Jun 2024 10:03:08 +0200
+Message-ID: <20240610080309.290444-3-christophe.roullier@foss.st.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240610080309.290444-1-christophe.roullier@foss.st.com>
 References: <20240610080309.290444-1-christophe.roullier@foss.st.com>
@@ -100,111 +100,99 @@ X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
  definitions=2024-06-10_02,2024-06-06_02,2024-05-17_01
 
-Both instances ethernet based on GMAC SNPS IP on stm32mp13.
-GMAC IP version is SNPS 4.20.
+Those pins are used for Ethernet 1 and 2 on STM32MP13F-DK board.
+ethernet1: RMII with crystal.
+ethernet2: RMII without crystal.
+Add analog gpio pin configuration ("sleep") to manage power mode on
+stm32mp13.
 
 Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
 ---
- arch/arm/boot/dts/st/stm32mp131.dtsi | 38 ++++++++++++++++++++++++++++
- arch/arm/boot/dts/st/stm32mp133.dtsi | 31 +++++++++++++++++++++++
- 2 files changed, 69 insertions(+)
+ arch/arm/boot/dts/st/stm32mp13-pinctrl.dtsi | 71 +++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
-diff --git a/arch/arm/boot/dts/st/stm32mp131.dtsi b/arch/arm/boot/dts/st/stm32mp131.dtsi
-index 6704ceef284d3..e1a764d269d27 100644
---- a/arch/arm/boot/dts/st/stm32mp131.dtsi
-+++ b/arch/arm/boot/dts/st/stm32mp131.dtsi
-@@ -979,6 +979,12 @@ ts_cal1: calib@5c {
- 			ts_cal2: calib@5e {
- 				reg = <0x5e 0x2>;
- 			};
-+			ethernet_mac1_address: mac1@e4 {
-+				reg = <0xe4 0x6>;
-+			};
-+			ethernet_mac2_address: mac2@ea {
-+				reg = <0xea 0x6>;
-+			};
- 		};
- 
- 		etzpc: bus@5c007000 {
-@@ -1505,6 +1511,38 @@ sdmmc2: mmc@58007000 {
- 				status = "disabled";
- 			};
- 
-+			ethernet1: ethernet@5800a000 {
-+				compatible = "st,stm32mp13-dwmac", "snps,dwmac-4.20a";
-+				reg = <0x5800a000 0x2000>;
-+				reg-names = "stmmaceth";
-+				interrupts-extended = <&intc GIC_SPI 62 IRQ_TYPE_LEVEL_HIGH>,
-+						      <&exti 68 1>;
-+				interrupt-names = "macirq", "eth_wake_irq";
-+				clock-names = "stmmaceth",
-+					      "mac-clk-tx",
-+					      "mac-clk-rx",
-+					      "ethstp",
-+					      "eth-ck";
-+				clocks = <&rcc ETH1MAC>,
-+					 <&rcc ETH1TX>,
-+					 <&rcc ETH1RX>,
-+					 <&rcc ETH1STP>,
-+					 <&rcc ETH1CK_K>;
-+				st,syscon = <&syscfg 0x4 0xff0000>;
-+				snps,mixed-burst;
-+				snps,pbl = <2>;
-+				snps,axi-config = <&stmmac_axi_config_1>;
-+				snps,tso;
-+				access-controllers = <&etzpc 48>;
-+				status = "disabled";
-+
-+				stmmac_axi_config_1: stmmac-axi-config {
-+					snps,blen = <0 0 0 0 16 8 4>;
-+					snps,rd_osr_lmt = <0x7>;
-+					snps,wr_osr_lmt = <0x7>;
-+				};
-+			};
-+
- 			usbphyc: usbphyc@5a006000 {
- 				#address-cells = <1>;
- 				#size-cells = <0>;
-diff --git a/arch/arm/boot/dts/st/stm32mp133.dtsi b/arch/arm/boot/dts/st/stm32mp133.dtsi
-index 3e394c8e58b92..73e470019ce42 100644
---- a/arch/arm/boot/dts/st/stm32mp133.dtsi
-+++ b/arch/arm/boot/dts/st/stm32mp133.dtsi
-@@ -68,4 +68,35 @@ channel@18 {
- 			};
+diff --git a/arch/arm/boot/dts/st/stm32mp13-pinctrl.dtsi b/arch/arm/boot/dts/st/stm32mp13-pinctrl.dtsi
+index 32c5d8a1e06ac..7f72c62da0a64 100644
+--- a/arch/arm/boot/dts/st/stm32mp13-pinctrl.dtsi
++++ b/arch/arm/boot/dts/st/stm32mp13-pinctrl.dtsi
+@@ -13,6 +13,77 @@ pins {
  		};
  	};
+ 
++	eth1_rmii_pins_a: eth1-rmii-0 {
++		pins1 {
++			pinmux = <STM32_PINMUX('G', 13, AF11)>, /* ETH_RMII_TXD0 */
++				 <STM32_PINMUX('G', 14, AF11)>, /* ETH_RMII_TXD1 */
++				 <STM32_PINMUX('B', 11, AF11)>, /* ETH_RMII_TX_EN */
++				 <STM32_PINMUX('A', 1, AF11)>, /* ETH_RMII_REF_CLK */
++				 <STM32_PINMUX('A', 2, AF11)>, /* ETH_MDIO */
++				 <STM32_PINMUX('G', 2, AF11)>; /* ETH_MDC */
++			bias-disable;
++			drive-push-pull;
++			slew-rate = <1>;
++		};
 +
-+	ethernet2: ethernet@5800e000 {
-+		compatible = "st,stm32mp13-dwmac", "snps,dwmac-4.20a";
-+		reg = <0x5800e000 0x2000>;
-+		reg-names = "stmmaceth";
-+		interrupts-extended = <&intc GIC_SPI 97 IRQ_TYPE_LEVEL_HIGH>;
-+		interrupt-names = "macirq";
-+		clock-names = "stmmaceth",
-+			      "mac-clk-tx",
-+			      "mac-clk-rx",
-+			      "ethstp",
-+			      "eth-ck";
-+		clocks = <&rcc ETH2MAC>,
-+			 <&rcc ETH2TX>,
-+			 <&rcc ETH2RX>,
-+			 <&rcc ETH2STP>,
-+			 <&rcc ETH2CK_K>;
-+		st,syscon = <&syscfg 0x4 0xff000000>;
-+		snps,mixed-burst;
-+		snps,pbl = <2>;
-+		snps,axi-config = <&stmmac_axi_config_2>;
-+		snps,tso;
-+		access-controllers = <&etzpc 49>;
-+		status = "disabled";
++		pins2 {
++			pinmux = <STM32_PINMUX('C', 4, AF11)>, /* ETH_RMII_RXD0 */
++				 <STM32_PINMUX('C', 5, AF11)>, /* ETH_RMII_RXD1 */
++				 <STM32_PINMUX('C', 1, AF10)>; /* ETH_RMII_CRS_DV */
++			bias-disable;
++		};
 +
-+		stmmac_axi_config_2: stmmac-axi-config {
-+			snps,blen = <0 0 0 0 16 8 4>;
-+			snps,rd_osr_lmt = <0x7>;
-+			snps,wr_osr_lmt = <0x7>;
++	};
++
++	eth1_rmii_sleep_pins_a: eth1-rmii-sleep-0 {
++		pins1 {
++			pinmux = <STM32_PINMUX('G', 13, ANALOG)>, /* ETH_RMII_TXD0 */
++				 <STM32_PINMUX('G', 14, ANALOG)>, /* ETH_RMII_TXD1 */
++				 <STM32_PINMUX('B', 11, ANALOG)>, /* ETH_RMII_TX_EN */
++				 <STM32_PINMUX('A', 1, ANALOG)>, /* ETH_RMII_REF_CLK */
++				 <STM32_PINMUX('A', 2, ANALOG)>, /* ETH_MDIO */
++				 <STM32_PINMUX('G', 2, ANALOG)>, /* ETH_MDC */
++				 <STM32_PINMUX('C', 4, ANALOG)>, /* ETH_RMII_RXD0 */
++				 <STM32_PINMUX('C', 5, ANALOG)>, /* ETH_RMII_RXD1 */
++				 <STM32_PINMUX('C', 1, ANALOG)>; /* ETH_RMII_CRS_DV */
 +		};
 +	};
- };
++
++	eth2_rmii_pins_a: eth2-rmii-0 {
++		pins1 {
++			pinmux = <STM32_PINMUX('F', 7, AF11)>, /* ETH_RMII_TXD0 */
++				 <STM32_PINMUX('G', 11, AF10)>, /* ETH_RMII_TXD1 */
++				 <STM32_PINMUX('G', 8, AF13)>, /* ETH_RMII_ETHCK */
++				 <STM32_PINMUX('F', 6, AF11)>, /* ETH_RMII_TX_EN */
++				 <STM32_PINMUX('B', 2, AF11)>, /* ETH_MDIO */
++				 <STM32_PINMUX('G', 5, AF10)>; /* ETH_MDC */
++			bias-disable;
++			drive-push-pull;
++			slew-rate = <1>;
++		};
++
++		pins2 {
++			pinmux = <STM32_PINMUX('F', 4, AF11)>, /* ETH_RMII_RXD0 */
++				 <STM32_PINMUX('E', 2, AF10)>, /* ETH_RMII_RXD1 */
++				 <STM32_PINMUX('A', 12, AF11)>; /* ETH_RMII_CRS_DV */
++			bias-disable;
++		};
++	};
++
++	eth2_rmii_sleep_pins_a: eth2-rmii-sleep-0 {
++		pins1 {
++			pinmux = <STM32_PINMUX('F', 7, ANALOG)>, /* ETH_RMII_TXD0 */
++				 <STM32_PINMUX('G', 11, ANALOG)>, /* ETH_RMII_TXD1 */
++				 <STM32_PINMUX('G', 8, ANALOG)>, /* ETH_RMII_ETHCK */
++				 <STM32_PINMUX('F', 6, ANALOG)>, /* ETH_RMII_TX_EN */
++				 <STM32_PINMUX('B', 2, ANALOG)>, /* ETH_MDIO */
++				 <STM32_PINMUX('G', 5, ANALOG)>, /* ETH_MDC */
++				 <STM32_PINMUX('F', 4, ANALOG)>, /* ETH_RMII_RXD0 */
++				 <STM32_PINMUX('E', 2, ANALOG)>, /* ETH_RMII_RXD1 */
++				 <STM32_PINMUX('A', 12, ANALOG)>; /* ETH_RMII_CRS_DV */
++		};
++	};
++
+ 	i2c1_pins_a: i2c1-0 {
+ 		pins {
+ 			pinmux = <STM32_PINMUX('D', 12, AF5)>, /* I2C1_SCL */
 -- 
 2.25.1
 
