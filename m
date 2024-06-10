@@ -1,118 +1,179 @@
-Return-Path: <netdev+bounces-102162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED2D7901B62
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 08:49:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 069B2901B78
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 08:56:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F410F1C20AD4
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 06:49:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F38CB1C21080
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 06:56:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094D314277;
-	Mon, 10 Jun 2024 06:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 859111B5A4;
+	Mon, 10 Jun 2024 06:56:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WRa3YWcr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Dst6LuXi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41D1EAC0
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 06:49:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9AB1803A;
+	Mon, 10 Jun 2024 06:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718002146; cv=none; b=P3MJ+hlOg9gGwBRuhBh8Lub8XQpZxG4O7hYZFSiBJLWu+cf7qsIrSaT/6yjWcoj41Cq37QvBSfgbAMRIIV6kbLL5s0yb8Q/4sqmcOd3+YEUffGLlXkrf/dHCDoY02bSOVVF0EzA1rAezmDRxdETzONdPKNAQQ603fAZ3NIFZzs0=
+	t=1718002568; cv=none; b=cFBMAVE7MDKbAwfNlEBHzV/gK0HRuUkAImfggglY4DeAlnInQyHuYe/VEvA1/r7zeep7HtwM7Rp7M0aj2nLnB1XWvNMynhOmqRRMrwDdzpT3adglZ2Gi7zUoW/DNGSHa4NEbAvXKrPR4p+b5SOEjFmh++YVknSLYLU837+fnMwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718002146; c=relaxed/simple;
-	bh=RxtFhDv7aazWQS/C2IL6CCUhG+lo0KNOcMWTNpr9UGc=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=I+YBN8R1ls8BVwS0RQLGXNtfvDCbCWk7aB7Afm2FKgR1AunFdM9S6lzY84WFdWsKdxwl+eYLstwePmmXuGh1G4lH3z1VyEyrdUbBHzwcmDG07uKGn3J/RY47/Q2nGFSjE4FYo9s4YITPs1tCEhf9SAEKx0kC6zFlw1toqrWJfr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WRa3YWcr; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-6dccc583e89so383621a12.1
-        for <netdev@vger.kernel.org>; Sun, 09 Jun 2024 23:49:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718002145; x=1718606945; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tiFCxbQmubccYDKzcVOwGtlOUgG6kDA7PwWy7xXhMzo=;
-        b=WRa3YWcr5lUOfou8VyLv/cdZGdGxIxhk0ynZgP2o6eyX/7ns/pGz7rzQQ1gEYatqfK
-         Sa2eqV2eWvULFbHRk9fErT3GKI05o6VEzGeoEioFS1DrQNPpa7Kq1QZVtyqSXuxjWRUO
-         C73F3QsOBDdXDeuUkCZq9d/8yq9Ug/G26IOExLdTgTv20dDQU6yLxjVtG5cOGjqdzrmG
-         XT2BAOvrVlkzwbVXLz/xGcXP0JTyKrDP+7icoV4SXnjiTaewUwre3f6gdNDXrRRqwdUr
-         3UT3U4RmiCQ+bs1Srkeb92pIDF2L8CGkNDMexDdWR/bUpgkQK/oYDjKbR3cUUP5c4JT0
-         uZog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718002145; x=1718606945;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=tiFCxbQmubccYDKzcVOwGtlOUgG6kDA7PwWy7xXhMzo=;
-        b=R2DfoR08RfCQeysZA8r/DgiAKCKvixyN1ZJPkLnm2IHpFhwahQHLnBL5uRP9pXTrJR
-         91EnTzMyxo9GCatqh+TfV6uw6sdPJbwhKu53tot5+YyCaHLRrZcucJVmuoeMvjcGohUk
-         wJG9CxU+lNEhHnz5lz9tgnqVU20l2MRo26PaKM9/ClPey5Uh60YrAK7kfyvBw/bMuFgn
-         1Qm+H3WnsTITAuDdbNN9suBX3DMQsm0fQ7Vexi21qdlqSl8EfxOut1NF5eCFy3nSjjCI
-         Op7o3BTr0CxVdPBG3CZMvU8BLDxxOYmWRE9LlhIwyvkwr8+RLEwQJVbk7fXf+G+wvZEa
-         7oAw==
-X-Forwarded-Encrypted: i=1; AJvYcCVF/QedsKEjDrY/JQzo0tA4QHzTxOlyWXgIgfPb8jwLtSbn5/MERuTk7VBDya3jP7CLlH80fJI6eVfW85xL3tzpcpEf3s/n
-X-Gm-Message-State: AOJu0YyI5Z8vdYmnRtviOL313pgHdYXodImMb6NTTUJcruB9RNv3Dx0K
-	l4QYKVhE8ldvi6K5CiwJ2J5lU6KGrfWAwdtvzDi46rYVbFQh08ak
-X-Google-Smtp-Source: AGHT+IGDpHRH0hsc9s3acoPsx99Zr72p2h+4R89+XviAwJKrqmK282aI/hNccPWHYIPba+SW30ezTg==
-X-Received: by 2002:a05:6a20:9498:b0:1b5:ae2c:c730 with SMTP id adf61e73a8af0-1b5ae2cc825mr4118456637.3.1718002144691;
-        Sun, 09 Jun 2024 23:49:04 -0700 (PDT)
-Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd75f711sm75305975ad.11.2024.06.09.23.49.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Jun 2024 23:49:04 -0700 (PDT)
-Date: Mon, 10 Jun 2024 15:48:50 +0900 (JST)
-Message-Id: <20240610.154850.1916370094900982618.fujita.tomonori@gmail.com>
-To: hfdevel@gmx.net
-Cc: fujita.tomonori@gmail.com, andrew@lunn.ch, horms@kernel.org,
- kuba@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
- linux@armlinux.org.uk, naveenm@marvell.com, jdamato@fastly.com,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v9 3/6] net: tn40xx: add basic Tx handling
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <78ecc7a9-bb33-4c2d-a797-87f782b6a382@gmx.net>
-References: <20240605232608.65471-1-fujita.tomonori@gmail.com>
-	<20240605232608.65471-4-fujita.tomonori@gmail.com>
-	<78ecc7a9-bb33-4c2d-a797-87f782b6a382@gmx.net>
+	s=arc-20240116; t=1718002568; c=relaxed/simple;
+	bh=9x5lfg5IbS2UuO0/g8a59A4OC0SvPJLLx6ic7z+Xr14=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=feoX356+eXtScsIFFCXBXfu0+ezha+r+VCnNVx4ypw9NGjQ8D8MsJw8bAhAVsGK7Lw4CproqHVvtFdsAXqXabT75GIrOvPojJhfRBxbTvtekB1ZwGR0QThFplY93cfGjjVqsXElsRrwPOKOVMXsWkP7aSQtwBfmAcAlfF/7VQa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Dst6LuXi; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718002565; x=1749538565;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=9x5lfg5IbS2UuO0/g8a59A4OC0SvPJLLx6ic7z+Xr14=;
+  b=Dst6LuXigxP6RhLsFmHPU6jXxwa35csGmG0m316mDIh6AeauVKWdqOau
+   QUqvcmeR4oROwe3i3pzeZfFRw2jsOPAi6nlMKkZcePvcz0JUFW1EGaMCd
+   eNntt/JGIFJnjr5W2TSlNa1Ul57kUPAQKrjXZx+y5muHON/D42Zwt/8yh
+   8CAsoZq7W09TikxPBTeH0yKjF3qIUZP+1XQayOCGAQCW8GMLmncgJkFFb
+   9Adyj5T7cx6z5NV6+pMwSrffL1lAEWISk9F9oPIXtJ0zIhDZVFvppeqtv
+   Gmqd1TcSchDLi7FyevtOnAIC5twDUj7vqNROh11RcTMj955cXwbjjiPPD
+   w==;
+X-CSE-ConnectionGUID: Ua7UZcqNR1GUI1hTBkZ19A==
+X-CSE-MsgGUID: D4KHS+0rRSy1P86OYU+U/Q==
+X-IronPort-AV: E=McAfee;i="6600,9927,11098"; a="37173137"
+X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
+   d="scan'208";a="37173137"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2024 23:56:05 -0700
+X-CSE-ConnectionGUID: e8ykSEwdS3G3DA5FIAt9wA==
+X-CSE-MsgGUID: /5hJAPHkQaCvwzCCQyfC/w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
+   d="scan'208";a="76428104"
+Received: from lkp-server01.sh.intel.com (HELO 8967fbab76b3) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 09 Jun 2024 23:56:02 -0700
+Received: from kbuild by 8967fbab76b3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sGYwh-0001vE-2E;
+	Mon, 10 Jun 2024 06:55:59 +0000
+Date: Mon, 10 Jun 2024 14:55:15 +0800
+From: kernel test robot <lkp@intel.com>
+To: Richard chien <m8809301@gmail.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Richard chien <richard.chien@hpe.com>
+Subject: Re: [PATCH] igb: Add support for firmware update
+Message-ID: <202406101404.oWWqbJmG-lkp@intel.com>
+References: <20240609081526.5621-1-richard.chien@hpe.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240609081526.5621-1-richard.chien@hpe.com>
 
-On Sun, 9 Jun 2024 13:41:20 +0200
-Hans-Frieder Vogt <hfdevel@gmx.net> wrote:
+Hi Richard,
 
->> +static int tn40_priv_init(struct tn40_priv *priv)
->> +{
->> +	int ret;
->> +
->> +	tn40_set_link_speed(priv, 0);
->> +
->> +	ret = tn40_hw_reset(priv);
->> +	if (ret)
->> +		return ret;
->> +
->> +	/* Set GPIO[9:0] to output 0 */
->> + tn40_write_reg(priv, 0x51E0, 0x30010006); /* GPIO_OE_ WR CMD */
->> +	tn40_write_reg(priv, 0x51F0, 0x0);	/* GPIO_OE_ DATA */
->> +	tn40_write_reg(priv, TN40_REG_MDIO_CMD_STAT, 0x3ec8);
-> 
-> the last tn40_write_reg (to TN40_REG_MDIO_CMD_STAT) is in fact the
-> same as:
-> 
-> tn40_mdio_set_speed(priv, TN40_MDIO_SPEED_1MHZ);
+kernel test robot noticed the following build warnings:
 
-This means that as the original driver does, this driver sets bus
-speed to 6MHZ for QT2025 PHY, however after that, this driver sets
-it to 1MHZ again?
+[auto build test WARNING on tnguy-next-queue/dev-queue]
+[also build test WARNING on tnguy-net-queue/dev-queue linus/master v6.10-rc3 next-20240607]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Richard-chien/igb-Add-support-for-firmware-update/20240609-162047
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git dev-queue
+patch link:    https://lore.kernel.org/r/20240609081526.5621-1-richard.chien%40hpe.com
+patch subject: [PATCH] igb: Add support for firmware update
+config: alpha-randconfig-r112-20240610 (https://download.01.org/0day-ci/archive/20240610/202406101404.oWWqbJmG-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 13.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20240610/202406101404.oWWqbJmG-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406101404.oWWqbJmG-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/net/ethernet/intel/igb/igb_ethtool.c:923:34: sparse: sparse: cast to restricted __le16
+   drivers/net/ethernet/intel/igb/igb_ethtool.c: note: in included file (through include/linux/mmzone.h, include/linux/gfp.h, include/linux/stackdepot.h, ...):
+   include/linux/page-flags.h:240:46: sparse: sparse: self-comparison always evaluates to false
+   include/linux/page-flags.h:240:46: sparse: sparse: self-comparison always evaluates to false
+
+vim +923 drivers/net/ethernet/intel/igb/igb_ethtool.c
+
+   874	
+   875	static int igb_get_eeprom(struct net_device *netdev,
+   876	                          struct ethtool_eeprom *eeprom, u8 *bytes)
+   877	{
+   878	        struct igb_adapter *adapter = netdev_priv(netdev);
+   879	        struct e1000_hw *hw = &adapter->hw;
+   880	        u16 *eeprom_buff;
+   881	        int first_word, last_word;
+   882	        int ret_val = 0;
+   883	        struct e1000_nvm_access *nvm;
+   884	        u32 magic;
+   885	        u16 i;
+   886	
+   887	        if (eeprom->len == 0)
+   888	                return -EINVAL;
+   889	
+   890	        magic = hw->vendor_id | (hw->device_id << 16);
+   891	        if (eeprom->magic && eeprom->magic != magic) {
+   892	                nvm = (struct e1000_nvm_access *)eeprom;
+   893	                ret_val = igb_nvmupd_command(hw, nvm, bytes);
+   894	                return ret_val;
+   895	        }
+   896	          
+   897	        /* normal ethtool get_eeprom support */
+   898	        eeprom->magic = hw->vendor_id | (hw->device_id << 16);
+   899	
+   900	        first_word = eeprom->offset >> 1;
+   901	        last_word = (eeprom->offset + eeprom->len - 1) >> 1;
+   902	
+   903	        eeprom_buff = kmalloc(sizeof(u16) *
+   904	                        (last_word - first_word + 1), GFP_KERNEL);
+   905	        if (!eeprom_buff)
+   906	                return -ENOMEM;
+   907	
+   908	        if (hw->nvm.type == e1000_nvm_eeprom_spi)
+   909	                ret_val = e1000_read_nvm(hw, first_word,
+   910	                                         last_word - first_word + 1,
+   911	                                         eeprom_buff);
+   912	        else {
+   913	                for (i = 0; i < last_word - first_word + 1; i++) {
+   914	                        ret_val = e1000_read_nvm(hw, first_word + i, 1,
+   915	                                                 &eeprom_buff[i]);
+   916	                        if (ret_val)
+   917	                                break;
+   918	                }
+   919	        }
+   920	
+   921	        /* Device's eeprom is always little-endian, word addressable */
+   922	        for (i = 0; i < last_word - first_word + 1; i++)
+ > 923	                eeprom_buff[i] = le16_to_cpu(eeprom_buff[i]);
+   924	
+   925	        memcpy(bytes, (u8 *)eeprom_buff + (eeprom->offset & 1),
+   926	                        eeprom->len);
+   927	        kfree(eeprom_buff);
+   928	
+   929	        return ret_val;
+   930	}
+   931	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
