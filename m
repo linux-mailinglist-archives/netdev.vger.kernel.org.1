@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-102384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A1DB902C2F
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 01:07:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D1C7902C30
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 01:07:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A79E1C21A54
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 23:07:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 044501F2349B
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 23:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C46F1514DA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B37F91514FD;
 	Mon, 10 Jun 2024 23:07:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uyy7C1Hk"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="rCC7zLAh"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2056.outbound.protection.outlook.com [40.107.94.56])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2078.outbound.protection.outlook.com [40.107.94.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604A1481C2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23161514C1
 	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 23:07:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.56
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.78
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718060854; cv=fail; b=c8jO3jV1DvvXIGTSW/DAFZbtddTfZh6/EQzyM6pPvfpNa3obQ5wn/aCZZ2hj7iF+l6/oNB2HEp/klqrYQWmGhR4aEdHHye6cgjvUIJeJmtVWUKIOQbE/jEdqaDp7jenNj6NvKUUyRU3TAnzMROrP8WqdBA1rOvi243xL+1+uGVY=
+	t=1718060854; cv=fail; b=HhTDOl3xWgPBTYhfs+rOvAIOHCmxWx2RZObMQI4wowF+YZoiYFZiXO5WsHKPGJ2VqPaAyxz8iZynrlW9z2rD6HhrqtLPka1QCyojL0xPEYgqD2fHZPJ1w3IiRrR1wnJgAPksT+ZH0M2NzoWdjh1CHBU6/Btd9KyrySc0XEMD/mM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718060854; c=relaxed/simple;
-	bh=dKxapnrhdowmoxQ8IMw7OSglZc0+2X717VriuOsZweo=;
+	bh=k3JXNLpsL3VjhJh6PEdaUo2wqY6Ng/RhyNLcUrPvFt0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r7pDdUbbxk/VMuxzTF9snIT6xBnPPz56O1CrqnGRbsccHCYwXaATjZ4gLvpjxG27OFxcdRdZXOWZj0FCI6E4C5H5mOyQpFI9OheSc1sNE4yQSIHacSHmE5wG5uhO16/3I7Ub2UefDwkFYGbU1GhZVREISZwKcdG+/eemNv0aX44=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uyy7C1Hk; arc=fail smtp.client-ip=40.107.94.56
+	 MIME-Version:Content-Type; b=c9DSOkdjrgNb+148PnPr+2Er5B5FsT5ScVUTdOcE2RWNoNK4Q+XPUEsJj3upCDKr4YWK1pCDJqyynyv5vPxB1adgzGB7BoacdR8EV1egT7eIN28Md1uqoFrzrR1J43f7gD1D8QREVW4CgF57Ch6k+mYWs1/6LTi4gJTm8nCNA8M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=rCC7zLAh; arc=fail smtp.client-ip=40.107.94.78
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Mt8PPM6Ky0BUv34B1NOLza9I06iGsiEZCE82P+TcVy5UfhV8Q2NQka+ERLLxoqFORLxfNzTxlHUpxX9mBYuqPPPdhTaXv6LqtWjj9i4AEu9mIL85KknU/Qk3YhF/1Tg7QFcmnXx6iYM+zTx8sxWU//VUFEGVClYHehARTUAQ74WsUCd+PMREWg8fz5FuXt+KQFTey+uLeOpqI6EePpU7gqe9iwiRliwcjFvjYT2kwmxTZkpMy0WXtzjQv05EgfZsS+rxfMpvX6AfITdiESN9clXjc19Hrz0Th/s4DD26DiyBzju79xSfhHmlx2wl8sBsIbBgDEPy+r+dZrzlLqW5fg==
+ b=VfQzD3t1tFZ9P2vyA8vgtg6MxcXFLc6g79s+CloGfpu8ohNB8yTK2BOOfmcHLy69S+0CKyEaUhCj14eF8TBijWoTHDIE7WXowXFbox1xPstGsAD1ESlgSym3db8+cmxMxAQHrkwLr/EwqzhqAT5vmHKEx1xknmQYqRhswZ9KRbQLbnPLwDnjggzXkNbyYhvZ8HkfkJVwKlfsIW1vt2l3MvxbLhyBLsWTZ/MSjKgfjUhmCKNPfiSo2QiLHxSRfZfYy6hDVb71plN38dcuOdzkqa21ZJs1V4xJLZ1baDOsTw9G0TEZrkblTn4sRgG6zxj9ZrMMOlzHxTRjruTLSiexEg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xKn9K+x9Z5vBF+EYyrlxoR/ajVU9EgIpu9/tZ8owzWY=;
- b=UPxebPuZH0AM5Udz16h7yjqH8MyKnDpYE98pLCh+PAHcM9twVj4raG9Su+vUlAVVJthrcmVLg+qsM2OlmgsVDKcyrUMkwsBBFAWYk4zB6FvpbmxE6IbnAQkCQgQgwA0o+keNnAHl/uOD5SAiDXXX5XTtbyGHIJgznET1/RCOZGuWkYC3hB6GCLg5XR62F5ZApJtP3aIYPxp6b2iDoykfD1uqhFocuI4EAt3ZZKahheCPIB4uozAlxKjq3bWICBgWtEjmOvITXyTYV46h7vG/v/awu8S94CgbWCmUPyeIPHQN1nCePZRMCf9WRrTPKK4ARJi12hcL5dryap5kLYV9ug==
+ bh=jgNyzCvUN5vvcMoEtMlZWFeiAdZfRPpKm1zVNnSTrf8=;
+ b=eVptxEmki9OLtaKGR9+hqeUEWYxgx/LhX+mCXyrmOWltwLJla+GyxwtPlTxhaeUS86HEyzkvmHPofo5ptrLwXZMngPNEPCx4BgtrQdMdhB1rW8MWEOA7eAZJyffmM49ub+u7+BmFCeYeaDTTBTtjPcsqRDURE0rYv3TLh5cKrWRa87ZGuZPA0sa+H1Cu8UWs7x3OxCnKwnT+uLe31ZkA4YlNZML8rReYIcbTjFEwxVuyo+IhI8vEBAsfe/z6CPu6+3nc5aGmuqWNIORO2J9BjEiOXVa/VdwEeh65SFOeRB+Tb1Z2AK1nCXIj/M090pSgAjiD75CMSdGz3a14gv5uJQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xKn9K+x9Z5vBF+EYyrlxoR/ajVU9EgIpu9/tZ8owzWY=;
- b=uyy7C1HkHYxRtQJnzscjDTzzd75AyKjhROsF05WTFLZ0FNrirPO4LMIX/muAEzct9Qs1DvFfXXPgzdTs3SSGnvwQoqzQHGNfQ4ivmqWD3fYNwbyU3TaG6cYfq/LqS52w34XHdkUR1TIYG81b/XbGiiQy+xd7ytAzfCD0b8ZxBzA=
-Received: from DM6PR11CA0030.namprd11.prod.outlook.com (2603:10b6:5:190::43)
- by SA1PR12MB7224.namprd12.prod.outlook.com (2603:10b6:806:2bb::20) with
+ bh=jgNyzCvUN5vvcMoEtMlZWFeiAdZfRPpKm1zVNnSTrf8=;
+ b=rCC7zLAhEbuZzSRBk0nxyIIfh8fG/K4r+CaDOEvJa54rSngTG5ms4vffs9dOQpwVT1AoT60+cAaqzfeNBkxtIDGbGPbLIjT6ECt+VJwG5djZevvdxjA7/3sPPouC6soryDdbKhB/87Zsw0MBOSbp+aGQm0L0fwXtSYYFaF8tx1w=
+Received: from DM6PR11CA0020.namprd11.prod.outlook.com (2603:10b6:5:190::33)
+ by DS0PR12MB7629.namprd12.prod.outlook.com (2603:10b6:8:13e::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.36; Mon, 10 Jun
  2024 23:07:30 +0000
 Received: from DS1PEPF00017099.namprd05.prod.outlook.com
- (2603:10b6:5:190:cafe::c4) by DM6PR11CA0030.outlook.office365.com
- (2603:10b6:5:190::43) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:5:190:cafe::ac) by DM6PR11CA0020.outlook.office365.com
+ (2603:10b6:5:190::33) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7656.25 via Frontend
- Transport; Mon, 10 Jun 2024 23:07:29 +0000
+ Transport; Mon, 10 Jun 2024 23:07:30 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,7 +65,7 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  DS1PEPF00017099.mail.protection.outlook.com (10.167.18.103) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7677.15 via Frontend Transport; Mon, 10 Jun 2024 23:07:29 +0000
+ 15.20.7677.15 via Frontend Transport; Mon, 10 Jun 2024 23:07:30 +0000
 Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 10 Jun
@@ -75,9 +75,9 @@ To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>
 CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
 	<shannon.nelson@amd.com>
-Subject: [PATCH net-next 1/8] ionic: remove missed doorbell per-queue timer
-Date: Mon, 10 Jun 2024 16:06:59 -0700
-Message-ID: <20240610230706.34883-2-shannon.nelson@amd.com>
+Subject: [PATCH net-next 2/8] ionic: Keep interrupt affinity up to date
+Date: Mon, 10 Jun 2024 16:07:00 -0700
+Message-ID: <20240610230706.34883-3-shannon.nelson@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20240610230706.34883-1-shannon.nelson@amd.com>
 References: <20240610230706.34883-1-shannon.nelson@amd.com>
@@ -92,251 +92,265 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017099:EE_|SA1PR12MB7224:EE_
-X-MS-Office365-Filtering-Correlation-Id: 313d1165-76bd-4bad-f6ee-08dc89a21a42
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017099:EE_|DS0PR12MB7629:EE_
+X-MS-Office365-Filtering-Correlation-Id: 218c342c-a0c9-40d5-19d7-08dc89a21aa7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|36860700004|376005|82310400017|1800799015;
+	BCL:0;ARA:13230031|82310400017|376005|1800799015|36860700004;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?nVrdZ2bqz95ArmHMbYvd7MPI8YotMIJUYDHnJOR5lk2pJfo8ntDz4K2Crcqy?=
- =?us-ascii?Q?hv6MtBmPdQuuDIxVw7PGsKmfgoC0nXGnvU5JzKfjhwRxlrL4cUBqQniHQmqa?=
- =?us-ascii?Q?AdxQWZJYExD+Fiy/97wSn+DgEHZJPvE+NQ2R048xiZDOYeamwnoQQC47dZyf?=
- =?us-ascii?Q?aei76KQpaylEBaTKbGV6riSJwiyBAKjTI9X7Jbl0Czap4GxM6fatEWe4Ef9M?=
- =?us-ascii?Q?ufOjwqS6I5wso4tZ0obmb3GPls6c3no/L2QoHmarTMD0njOrWKjnb3eTpDnF?=
- =?us-ascii?Q?Tsn7NtcIL+tnj2UOhh+JDWowsaZP3dLqer5QdzG4s2mrANcUn013ZMzfv2GB?=
- =?us-ascii?Q?ieMSuAh6fJFZT8f8HYuVPP84yIc06ffJolXIR7FwE3LRiFCi1/BT10hKmolg?=
- =?us-ascii?Q?k9EuoiQmj2BxxonSE8NskZ6vgaPcT8ngmgI64yuorMsbeHjlYBsbcb9NDMHz?=
- =?us-ascii?Q?HNY9PM7EWD42rAPseFNcd171xOCAwU8GPMNS9PleTTmp1XGMbswpzQKmjsuw?=
- =?us-ascii?Q?7T0lYdlp/BKAm3X2ePbuWHpPw6bRdQF+4w4kVYJ51mh9mT3Bk/EgXKgNLV18?=
- =?us-ascii?Q?l8tUG+pseePc3SzyEs7OtMN2Gqm7xVPR6Z0Rh7vguvfpkWeQnHde00D5gVcH?=
- =?us-ascii?Q?ZfceXmJtx2jGMNGO2ieklB38NkBohxP+1OjwXNVKsr94nEwHpyVBIqRxqvNx?=
- =?us-ascii?Q?MWj4OkGqQOQXUxMccSPeNEaXNaFoeHhIl+RvNKPhcMEnQhV8U1TSEaZxDEgo?=
- =?us-ascii?Q?P01+5Zkf2pmoUqsBMGsGYBlMGrF067KhUSyQHHOWiqEd2I6lcE1kU16TTLRK?=
- =?us-ascii?Q?jkCrR68/WthRLM6EVZY4ZGzx6OLC/uExP+3nM7TBIeq1YU0f/l5HV68ag8wW?=
- =?us-ascii?Q?rZNMuhZM9CR0fWLLaN7l0NoxmI76f1S0H4Wr3hGnghr0pJTbRtVHM45y9A01?=
- =?us-ascii?Q?XO5yFSErK7YcoS+1iarzkZY2s35aQV+H1ch6azF2TNorYQ+1BfRKOddh/WgD?=
- =?us-ascii?Q?X56RuuC2vzII18nYfkxsY/bxfrsnRiUyTz61huYjymDeB9Hr2j0c8Vt9bAPk?=
- =?us-ascii?Q?mOh30AJVNTx03Kzl8HJCb9BTSKEo0ZPk6zm6b2MP0cOSBb3TeTKZRtUntWbG?=
- =?us-ascii?Q?t6LLSnm3gP9B043oazApzgLs0c+o9CZJ5I+oEdwk7e4BMNMJh9lv6ad19cwK?=
- =?us-ascii?Q?SihKbbxUvL6pewgmTOt6c7c9DM4jRR+eo3pcXhbsbkx55yaiU9KdJK7ClYg4?=
- =?us-ascii?Q?V2oZhMfYODGQj1j01BWHey1wf78iW0HEQjuRukqYCLp6Q0r2nPBNlQ7M3HFS?=
- =?us-ascii?Q?HxVOUVqVHZmznR0bWQdSAyF2AGKy8hgsn5QryJe8NkeEUgL/NGVUpIZU6vgn?=
- =?us-ascii?Q?zzilnYfP2tviaOP5BGhvWl7WkDofT1juhyMhV9iyPqYJGwIS3Q=3D=3D?=
+	=?us-ascii?Q?QKunluBQk/+uv3eek2PDSrZIT3rcUcnycLaPhD+bo3FZqXHgv3L6MKfZ8odI?=
+ =?us-ascii?Q?RjeDabGb7JEK4a21jjmU1sASG+AFILafaDx9VqSM6MBFKW/DWhcv+y0XlDvT?=
+ =?us-ascii?Q?cEDwXrdikbyDTgPnRZUOId6Zkiq65qOB9FFZ4q+vM7GdBNW2wD1xzjZxGPCg?=
+ =?us-ascii?Q?FgZUneu4+pUEsz+W6DRpxogFIKMmOtAnIJlNQTGFDwryE12BIvhick/yZkdO?=
+ =?us-ascii?Q?MH9NH2eH7KZKov8g4ehI51nqpLgDp0iHZkgJG+ZQ0o5cXZrPzOsBEwmo6miX?=
+ =?us-ascii?Q?XLe9R7t4txISgvrHFDWvwRYBxrw5H/lKaNG0w05/c6qsXuHKnWoXcWYmidxB?=
+ =?us-ascii?Q?dTXHhVGnzc+r/qg0x9Sx2UJJiw5KIHV2SMIQidzTo/f9LQF18OftXvzy7VXA?=
+ =?us-ascii?Q?jBMjHj6+WYZmRjyau7KDvt70K0vDNa7L5ANZHJjmUHfhl5n56eMFFFM7dvVj?=
+ =?us-ascii?Q?BbxSOPl8gmlNtlPVEyBlyXAB8TAPY6XodwVs+ILPjMjrkMqiAhJjt2pPeUJP?=
+ =?us-ascii?Q?yw8xUqmvsQ7doGR5+Ra7zevA/RpUVEdQo6S7gvog0v/1tuvtmvbUni0bfGZ+?=
+ =?us-ascii?Q?mHvbzAwOedzyOtGyOC1UUYpaTEvB2PmqGDSZFRGqK4QH3kXmGrhBsp97Sb2/?=
+ =?us-ascii?Q?8LG+rK4s45Bc7xIESb+eCBL/20RBWiHiPtU+LyJGJCI4yLuNd8+bGl2C/qO5?=
+ =?us-ascii?Q?zsRYXmANuBTYEzoGUzbA6s8oX5gLaJe1vDyVlnY4jw2zLk3xT/9yhP6F4iyq?=
+ =?us-ascii?Q?DyaFcGY4JeXZtvgBOlrxyFgQKr1Zt75zagUKWFRBkdRoKAaDyyz2up83lzCB?=
+ =?us-ascii?Q?rcXWSADIYTeLYoykCcVMo7aIOWYtRbrcYnI6slBY8VdSPcdLP75iCvn628ze?=
+ =?us-ascii?Q?oetx0w63R3OOl6kxrvDE2GdBjg1g70abChphmC7xRzFpUl71oVw2g/hXtzVX?=
+ =?us-ascii?Q?3WXBAilJYZpAjnX9nIh8MFrl0sAfybV0gkPOmElHmmkWblpP8KJ9MIaqtLgX?=
+ =?us-ascii?Q?0AaEFAC7d5tpz5k+ijt8Z31mEeoPe8kU3yPtkM6cNtF7AJ16WS43FAlsU6Au?=
+ =?us-ascii?Q?UhfT5vZTPQxBs+a64KVoqPS9wgMRUJBYdXXtyQEX6QCjz5CCwtTnAAD12L7W?=
+ =?us-ascii?Q?hdQMQ9CG9m+9vLwwXbVM7ybBmLQ9nf5MfYUybCbo7DkBm8ccMiCDO9aDb8qU?=
+ =?us-ascii?Q?tLOHwaGYeRiMcFUOclrjpv7zwULtLdDXFfA2fyf7zWJV3fThlB5Th/opc4+2?=
+ =?us-ascii?Q?JD46wXUf05nfDXwiTwRMwPEL9PRl/3AOlckhqU1229TzGhTQy1tqiWDnxIaJ?=
+ =?us-ascii?Q?33wr/IL3Ljj9Xu21agNL9Gm6XjpjwM3IMEnsBqYkM7VHccTB2xgQ6DkrGqOt?=
+ =?us-ascii?Q?zCzsocjYf72qiAudITq0ZQ0uGSz29auOsrIQdlbWdph0K6V+sA=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(376005)(82310400017)(1800799015);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400017)(376005)(1800799015)(36860700004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2024 23:07:29.6977
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jun 2024 23:07:30.3540
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 313d1165-76bd-4bad-f6ee-08dc89a21a42
+X-MS-Exchange-CrossTenant-Network-Message-Id: 218c342c-a0c9-40d5-19d7-08dc89a21aa7
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	DS1PEPF00017099.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7224
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7629
 
-Remove the timer-per-queue mechanics from the missed doorbell
-check in preparation for the new missed doorbell fix.
+From: Brett Creeley <brett.creeley@amd.com>
 
+Currently the driver either sets the initial interrupt affinity for its
+adminq and tx/rx queues on probe or resets it on various
+down/up/reconfigure flows. If any user and/or user process
+(i.e. irqbalance) changes IRQ affinity for any of the driver's interrupts
+that will be reset to driver defaults whenever any down/up/reconfigure
+operation happens. This is incorrect and is fixed by making 2 changes:
+
+1. Allocate an array of cpumasks that's only allocated on probe and
+   destroyed on remove.
+2. Update the cpumask(s) for interrupts that are in use by registering
+   for affinity notifiers.
+
+Signed-off-by: Brett Creeley <brett.creeley@amd.com>
 Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 ---
- .../net/ethernet/pensando/ionic/ionic_dev.c   |  4 ---
- .../net/ethernet/pensando/ionic/ionic_lif.c   | 36 ++++---------------
- .../net/ethernet/pensando/ionic/ionic_lif.h   |  2 --
- .../net/ethernet/pensando/ionic/ionic_txrx.c  | 22 +++++-------
- 4 files changed, 15 insertions(+), 49 deletions(-)
+ drivers/net/ethernet/pensando/ionic/ionic.h   |  1 +
+ .../net/ethernet/pensando/ionic/ionic_dev.h   |  4 +-
+ .../net/ethernet/pensando/ionic/ionic_lif.c   | 85 +++++++++++++++++--
+ 3 files changed, 81 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.c b/drivers/net/ethernet/pensando/ionic/ionic_dev.c
-index 874499337132..89b4310f244c 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_dev.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.c
-@@ -703,10 +703,6 @@ void ionic_q_post(struct ionic_queue *q, bool ring_doorbell)
- 				 q->dbval | q->head_idx);
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic.h b/drivers/net/ethernet/pensando/ionic/ionic.h
+index 2ccc2c2a06e3..438172cfb170 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic.h
++++ b/drivers/net/ethernet/pensando/ionic/ionic.h
+@@ -54,6 +54,7 @@ struct ionic {
+ 	unsigned int nrxqs_per_lif;
+ 	unsigned int nintrs;
+ 	DECLARE_BITMAP(intrs, IONIC_INTR_CTRL_REGS_MAX);
++	cpumask_var_t *affinity_masks;
+ 	struct work_struct nb_work;
+ 	struct notifier_block nb;
+ 	struct rw_semaphore vf_op_lock;	/* lock for VF operations */
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.h b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
+index f30eee4a5a80..7dbd3b8b0e36 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_dev.h
++++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
+@@ -280,9 +280,9 @@ struct ionic_intr_info {
+ 	u64 rearm_count;
+ 	unsigned int index;
+ 	unsigned int vector;
+-	unsigned int cpu;
+ 	u32 dim_coal_hw;
+-	cpumask_t affinity_mask;
++	cpumask_var_t *affinity_mask;
++	struct irq_affinity_notify aff_notify;
+ };
  
- 		q->dbell_jiffies = jiffies;
--
--		if (q_to_qcq(q)->napi_qcq)
--			mod_timer(&q_to_qcq(q)->napi_qcq->napi_deadline,
--				  jiffies + IONIC_NAPI_DEADLINE);
- 	}
- }
- 
+ struct ionic_cq {
 diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-index 23e1f6638b38..48b2b150fbcc 100644
+index 48b2b150fbcc..ff6a7e86254c 100644
 --- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
 +++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-@@ -213,13 +213,6 @@ void ionic_link_status_check_request(struct ionic_lif *lif, bool can_sleep)
- 	}
+@@ -265,6 +265,18 @@ static void ionic_intr_free(struct ionic *ionic, int index)
+ 		clear_bit(index, ionic->intrs);
  }
  
--static void ionic_napi_deadline(struct timer_list *timer)
--{
--	struct ionic_qcq *qcq = container_of(timer, struct ionic_qcq, napi_deadline);
--
--	napi_schedule(&qcq->napi);
--}
--
- static irqreturn_t ionic_isr(int irq, void *data)
++static void ionic_irq_aff_notify(struct irq_affinity_notify *notify,
++				 const cpumask_t *mask)
++{
++	struct ionic_intr_info *intr = container_of(notify, struct ionic_intr_info, aff_notify);
++
++	cpumask_copy(*intr->affinity_mask, mask);
++}
++
++static void ionic_irq_aff_release(struct kref __always_unused *ref)
++{
++}
++
+ static int ionic_qcq_enable(struct ionic_qcq *qcq)
  {
- 	struct napi_struct *napi = data;
-@@ -345,7 +338,6 @@ static int ionic_qcq_disable(struct ionic_lif *lif, struct ionic_qcq *qcq, int f
- 		synchronize_irq(qcq->intr.vector);
- 		irq_set_affinity_hint(qcq->intr.vector, NULL);
- 		napi_disable(&qcq->napi);
--		del_timer_sync(&qcq->napi_deadline);
- 	}
- 
- 	/* If there was a previous fw communcation error, don't bother with
-@@ -480,7 +472,6 @@ static void ionic_link_qcq_interrupts(struct ionic_qcq *src_qcq,
- {
- 	n_qcq->intr.vector = src_qcq->intr.vector;
- 	n_qcq->intr.index = src_qcq->intr.index;
--	n_qcq->napi_qcq = src_qcq->napi_qcq;
- }
- 
- static int ionic_alloc_qcq_interrupt(struct ionic_lif *lif, struct ionic_qcq *qcq)
-@@ -834,11 +825,8 @@ static int ionic_lif_txq_init(struct ionic_lif *lif, struct ionic_qcq *qcq)
- 	q->dbell_deadline = IONIC_TX_DOORBELL_DEADLINE;
- 	q->dbell_jiffies = jiffies;
- 
--	if (test_bit(IONIC_LIF_F_SPLIT_INTR, lif->state)) {
-+	if (test_bit(IONIC_LIF_F_SPLIT_INTR, lif->state))
- 		netif_napi_add(lif->netdev, &qcq->napi, ionic_tx_napi);
--		qcq->napi_qcq = qcq;
--		timer_setup(&qcq->napi_deadline, ionic_napi_deadline, 0);
--	}
- 
- 	qcq->flags |= IONIC_QCQ_F_INITED;
- 
-@@ -911,9 +899,6 @@ static int ionic_lif_rxq_init(struct ionic_lif *lif, struct ionic_qcq *qcq)
- 	else
- 		netif_napi_add(lif->netdev, &qcq->napi, ionic_txrx_napi);
- 
--	qcq->napi_qcq = qcq;
--	timer_setup(&qcq->napi_deadline, ionic_napi_deadline, 0);
--
- 	qcq->flags |= IONIC_QCQ_F_INITED;
- 
- 	return 0;
-@@ -1168,7 +1153,6 @@ static int ionic_adminq_napi(struct napi_struct *napi, int budget)
- 	struct ionic_dev *idev = &lif->ionic->idev;
- 	unsigned long irqflags;
- 	unsigned int flags = 0;
--	bool resched = false;
- 	int rx_work = 0;
- 	int tx_work = 0;
- 	int n_work = 0;
-@@ -1205,15 +1189,12 @@ static int ionic_adminq_napi(struct napi_struct *napi, int budget)
- 		ionic_intr_credits(idev->intr_ctrl, intr->index, credits, flags);
- 	}
- 
--	if (!a_work && ionic_adminq_poke_doorbell(&lif->adminqcq->q))
--		resched = true;
--	if (lif->hwstamp_rxq && !rx_work && ionic_rxq_poke_doorbell(&lif->hwstamp_rxq->q))
--		resched = true;
--	if (lif->hwstamp_txq && !tx_work && ionic_txq_poke_doorbell(&lif->hwstamp_txq->q))
--		resched = true;
--	if (resched)
--		mod_timer(&lif->adminqcq->napi_deadline,
--			  jiffies + IONIC_NAPI_DEADLINE);
-+	if (!a_work)
-+		ionic_adminq_poke_doorbell(&lif->adminqcq->q);
-+	if (lif->hwstamp_rxq && !rx_work)
-+		ionic_rxq_poke_doorbell(&lif->hwstamp_rxq->q);
-+	if (lif->hwstamp_txq && !tx_work)
-+		ionic_txq_poke_doorbell(&lif->hwstamp_txq->q);
- 
- 	return work_done;
- }
-@@ -3504,9 +3485,6 @@ static int ionic_lif_adminq_init(struct ionic_lif *lif)
- 
- 	netif_napi_add(lif->netdev, &qcq->napi, ionic_adminq_napi);
- 
--	qcq->napi_qcq = qcq;
--	timer_setup(&qcq->napi_deadline, ionic_napi_deadline, 0);
--
- 	napi_enable(&qcq->napi);
+ 	struct ionic_queue *q = &qcq->q;
+@@ -301,8 +313,10 @@ static int ionic_qcq_enable(struct ionic_qcq *qcq)
+ 		napi_enable(&qcq->napi);
  
  	if (qcq->flags & IONIC_QCQ_F_INTR) {
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.h b/drivers/net/ethernet/pensando/ionic/ionic_lif.h
-index 08f4266fe2aa..a029206c0bc8 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_lif.h
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.h
-@@ -84,11 +84,9 @@ struct ionic_qcq {
- 	u32 cmb_pgid;
- 	u32 cmb_order;
- 	struct dim dim;
--	struct timer_list napi_deadline;
- 	struct ionic_queue q;
- 	struct ionic_cq cq;
- 	struct napi_struct napi;
--	struct ionic_qcq *napi_qcq;
- 	struct ionic_intr_info intr;
- 	struct dentry *dentry;
- };
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-index c3a6c4af52f1..3066eb4788f9 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-@@ -867,9 +867,6 @@ void ionic_rx_fill(struct ionic_queue *q)
++		irq_set_affinity_notifier(qcq->intr.vector,
++					  &qcq->intr.aff_notify);
+ 		irq_set_affinity_hint(qcq->intr.vector,
+-				      &qcq->intr.affinity_mask);
++				      *qcq->intr.affinity_mask);
+ 		ionic_intr_mask(idev->intr_ctrl, qcq->intr.index,
+ 				IONIC_INTR_MASK_CLEAR);
+ 	}
+@@ -336,6 +350,7 @@ static int ionic_qcq_disable(struct ionic_lif *lif, struct ionic_qcq *qcq, int f
+ 		ionic_intr_mask(idev->intr_ctrl, qcq->intr.index,
+ 				IONIC_INTR_MASK_SET);
+ 		synchronize_irq(qcq->intr.vector);
++		irq_set_affinity_notifier(qcq->intr.vector, NULL);
+ 		irq_set_affinity_hint(qcq->intr.vector, NULL);
+ 		napi_disable(&qcq->napi);
+ 	}
+@@ -476,6 +491,7 @@ static void ionic_link_qcq_interrupts(struct ionic_qcq *src_qcq,
  
- 	q->dbell_deadline = IONIC_RX_MIN_DOORBELL_DEADLINE;
- 	q->dbell_jiffies = jiffies;
--
--	mod_timer(&q_to_qcq(q)->napi_qcq->napi_deadline,
--		  jiffies + IONIC_NAPI_DEADLINE);
- }
+ static int ionic_alloc_qcq_interrupt(struct ionic_lif *lif, struct ionic_qcq *qcq)
+ {
++	cpumask_var_t *affinity_mask;
+ 	int err;
  
- void ionic_rx_empty(struct ionic_queue *q)
-@@ -952,8 +949,8 @@ int ionic_tx_napi(struct napi_struct *napi, int budget)
- 				   work_done, flags);
+ 	if (!(qcq->flags & IONIC_QCQ_F_INTR)) {
+@@ -507,10 +523,19 @@ static int ionic_alloc_qcq_interrupt(struct ionic_lif *lif, struct ionic_qcq *qc
  	}
  
--	if (!work_done && ionic_txq_poke_doorbell(&qcq->q))
--		mod_timer(&qcq->napi_deadline, jiffies + IONIC_NAPI_DEADLINE);
-+	if (!work_done)
-+		ionic_txq_poke_doorbell(&qcq->q);
+ 	/* try to get the irq on the local numa node first */
+-	qcq->intr.cpu = cpumask_local_spread(qcq->intr.index,
+-					     dev_to_node(lif->ionic->dev));
+-	if (qcq->intr.cpu != -1)
+-		cpumask_set_cpu(qcq->intr.cpu, &qcq->intr.affinity_mask);
++	affinity_mask = &lif->ionic->affinity_masks[qcq->intr.index];
++	if (cpumask_empty(*affinity_mask)) {
++		unsigned int cpu;
++
++		cpu = cpumask_local_spread(qcq->intr.index,
++					   dev_to_node(lif->ionic->dev));
++		if (cpu != -1)
++			cpumask_set_cpu(cpu, *affinity_mask);
++	}
++
++	qcq->intr.affinity_mask = affinity_mask;
++	qcq->intr.aff_notify.notify = ionic_irq_aff_notify;
++	qcq->intr.aff_notify.release = ionic_irq_aff_release;
  
- 	return work_done;
+ 	netdev_dbg(lif->netdev, "%s: Interrupt index %d\n", qcq->q.name, qcq->intr.index);
+ 	return 0;
+@@ -3122,6 +3147,44 @@ int ionic_reconfigure_queues(struct ionic_lif *lif,
+ 	return err;
  }
-@@ -995,8 +992,8 @@ int ionic_rx_napi(struct napi_struct *napi, int budget)
- 				   work_done, flags);
+ 
++static int ionic_affinity_masks_alloc(struct ionic *ionic)
++{
++	cpumask_var_t *affinity_masks;
++	int nintrs = ionic->nintrs;
++	int i;
++
++	affinity_masks = kcalloc(nintrs, sizeof(cpumask_var_t), GFP_KERNEL);
++	if (!affinity_masks)
++		return	-ENOMEM;
++
++	for (i = 0; i < nintrs; i++) {
++		if (!zalloc_cpumask_var_node(&affinity_masks[i], GFP_KERNEL,
++					     dev_to_node(ionic->dev)))
++			goto err_out;
++	}
++
++	ionic->affinity_masks = affinity_masks;
++
++	return 0;
++
++err_out:
++	for (--i; i >= 0; i--)
++		free_cpumask_var(affinity_masks[i]);
++	kfree(affinity_masks);
++
++	return -ENOMEM;
++}
++
++static void ionic_affinity_masks_free(struct ionic *ionic)
++{
++	int i;
++
++	for (i = 0; i < ionic->nintrs; i++)
++		free_cpumask_var(ionic->affinity_masks[i]);
++	kfree(ionic->affinity_masks);
++	ionic->affinity_masks = NULL;
++}
++
+ int ionic_lif_alloc(struct ionic *ionic)
+ {
+ 	struct device *dev = ionic->dev;
+@@ -3213,11 +3276,15 @@ int ionic_lif_alloc(struct ionic *ionic)
+ 
+ 	ionic_debugfs_add_lif(lif);
+ 
++	err = ionic_affinity_masks_alloc(ionic);
++	if (err)
++		goto err_out_free_lif_info;
++
+ 	/* allocate control queues and txrx queue arrays */
+ 	ionic_lif_queue_identify(lif);
+ 	err = ionic_qcqs_alloc(lif);
+ 	if (err)
+-		goto err_out_free_lif_info;
++		goto err_out_free_affinity_masks;
+ 
+ 	/* allocate rss indirection table */
+ 	tbl_sz = le16_to_cpu(lif->ionic->ident.lif.eth.rss_ind_tbl_sz);
+@@ -3239,6 +3306,8 @@ int ionic_lif_alloc(struct ionic *ionic)
+ 
+ err_out_free_qcqs:
+ 	ionic_qcqs_free(lif);
++err_out_free_affinity_masks:
++	ionic_affinity_masks_free(lif->ionic);
+ err_out_free_lif_info:
+ 	dma_free_coherent(dev, lif->info_sz, lif->info, lif->info_pa);
+ 	lif->info = NULL;
+@@ -3412,6 +3481,8 @@ void ionic_lif_free(struct ionic_lif *lif)
+ 	if (!test_bit(IONIC_LIF_F_FW_RESET, lif->state))
+ 		ionic_lif_reset(lif);
+ 
++	ionic_affinity_masks_free(lif->ionic);
++
+ 	/* free lif info */
+ 	kfree(lif->identity);
+ 	dma_free_coherent(dev, lif->info_sz, lif->info, lif->info_pa);
+@@ -3489,7 +3560,7 @@ static int ionic_lif_adminq_init(struct ionic_lif *lif)
+ 
+ 	if (qcq->flags & IONIC_QCQ_F_INTR) {
+ 		irq_set_affinity_hint(qcq->intr.vector,
+-				      &qcq->intr.affinity_mask);
++				      *qcq->intr.affinity_mask);
+ 		ionic_intr_mask(idev->intr_ctrl, qcq->intr.index,
+ 				IONIC_INTR_MASK_CLEAR);
  	}
- 
--	if (!work_done && ionic_rxq_poke_doorbell(&qcq->q))
--		mod_timer(&qcq->napi_deadline, jiffies + IONIC_NAPI_DEADLINE);
-+	if (!work_done)
-+		ionic_rxq_poke_doorbell(&qcq->q);
- 
- 	return work_done;
- }
-@@ -1009,7 +1006,6 @@ int ionic_txrx_napi(struct napi_struct *napi, int budget)
- 	struct ionic_qcq *txqcq;
- 	struct ionic_lif *lif;
- 	struct ionic_cq *txcq;
--	bool resched = false;
- 	u32 rx_work_done = 0;
- 	u32 tx_work_done = 0;
- 	u32 flags = 0;
-@@ -1041,12 +1037,10 @@ int ionic_txrx_napi(struct napi_struct *napi, int budget)
- 				   tx_work_done + rx_work_done, flags);
- 	}
- 
--	if (!rx_work_done && ionic_rxq_poke_doorbell(&rxqcq->q))
--		resched = true;
--	if (!tx_work_done && ionic_txq_poke_doorbell(&txqcq->q))
--		resched = true;
--	if (resched)
--		mod_timer(&rxqcq->napi_deadline, jiffies + IONIC_NAPI_DEADLINE);
-+	if (!rx_work_done)
-+		ionic_rxq_poke_doorbell(&rxqcq->q);
-+	if (!tx_work_done)
-+		ionic_txq_poke_doorbell(&txqcq->q);
- 
- 	return rx_work_done;
- }
 -- 
 2.17.1
 
