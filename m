@@ -1,120 +1,150 @@
-Return-Path: <netdev+bounces-102311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B31290252E
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 17:15:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24F4A902552
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 17:19:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29D201F21F3B
-	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 15:15:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C40701F25C3C
+	for <lists+netdev@lfdr.de>; Mon, 10 Jun 2024 15:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FACA13DDBF;
-	Mon, 10 Jun 2024 15:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8088314E2EC;
+	Mon, 10 Jun 2024 15:16:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ik9VoJlz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ETS5HpY/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3BBC13DDAA
-	for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 15:15:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1758D14372B;
+	Mon, 10 Jun 2024 15:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718032509; cv=none; b=fquNAE4XPTXiLbSXzqCDVkQ4rnm1poSP42xy7lwwesy4LYAs1N+20g/OlqUeLHscjC9Ns3vLji7B44u0oHx7TVEGXhYt8ehL3lvS/RvrkUlhkL2/+kWDQyvEXwJfhzQnnET1lFV6CG1J+xzj2FaA+P7J+JUThcUBzT8nUYYMxas=
+	t=1718032608; cv=none; b=ZhYILebKFCMEgzSN4EGBu+fvUU5Pw6mpMCH2wztUqfRDD+DM5kxAl4Stq6eg+jkffrA6eC7VnVoj0e2lqEuV9MPPxurzMfxcXRT7MNQKfkW4sgz348FIFW26ZLlbykX1I5iDcp9wf9THCKVWRl5eRCHgHW0mAwOncAZHrKGjdmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718032509; c=relaxed/simple;
-	bh=MKsQCqfN1ZQ4o2Ioge7OKkX52qONyWXvxqNAfzQqFbs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O2OHOkNLweazKNKDVWtBwwAvRwvSIm6wPoM6ZX2qzxukIPPAKF8v1yN/vDXs2ib3PYZsk0f+U3HBoRAYX6YnT9KwR5lyRnMKZV7MwBVvCKEytYZXPP9QcRpUPcjM+Tg6ZCDmGMByPynONLBUnhwC5Hs34vN9m59KxAVIA8fTW9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ik9VoJlz; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718032505;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MKsQCqfN1ZQ4o2Ioge7OKkX52qONyWXvxqNAfzQqFbs=;
-	b=Ik9VoJlzyTFHRyo4PcyyeHhojR530wZEO7bktzxgWXvMcMCwh70eMKKYDXjc2+pae1hm1v
-	fDHNrT1uCaVp1cwAaYvfUctf89kwOeNPrcDvOmzNkVkjLi2q3qtGCCTdASJe1If6oWb4S/
-	7yNS9vKGsxD9xeLW9b8PU/LGuEFwzyI=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-461-nNzU09hfMuWArcKJFNU9MA-1; Mon, 10 Jun 2024 11:15:03 -0400
-X-MC-Unique: nNzU09hfMuWArcKJFNU9MA-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2c2d0e695d7so2661999a91.1
-        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 08:15:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718032502; x=1718637302;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MKsQCqfN1ZQ4o2Ioge7OKkX52qONyWXvxqNAfzQqFbs=;
-        b=uGtUhvHnULEhJ2biuvJfva1eMTgNRH/WcTdH7Fl5FMOgXtMJw1SxUa5cb8GQ1Tby/J
-         5XjVtLvBdh+fx8OTRBu95vlsxhXDjxlSeXWesCi14oxK+36yhLu7JF5kYD8s9GmU7Qj0
-         tumAoxalnm+YfOIGbaTnuP8S94lHqOCLn3n/UneFrMfzzl4uNzeAWcCmZ7Fo28dt90yI
-         kwTQFBzCCuzdy0Bi+EudAEtWyxnfAZZe+KxzxhIgSjFimHwCH02yrOqb0EW53vw+sdlN
-         n1Jww1aVdhf+h8lQ7HT2DhvfMi1mtqwJLPrPcE6IK6t28nbvXbdQtV1q90g9BMBN8C/b
-         FeIw==
-X-Forwarded-Encrypted: i=1; AJvYcCUxtbOVD6cVpN8170/PW0DS8l3PFmBfQakmeChvWiryQP4GQ9C5gtc5Eq/GiikgkXuzp1cU0TopPQ+l9IaKdBCSxldUI9hr
-X-Gm-Message-State: AOJu0YyRfZpWSBUaP66YjAAEZ9GpRMST9A3eegMZgh/DQlNwt3wV0jp0
-	eCMLvT54DD8OAH4BaI8bIFWh02RvP6SegYjujQ1Klu6B6P6svt50Bv2q6nSvRMRG7v4zObo+7MS
-	iRtcaiNecfb+zWd2H8asRAqLjCMugb9yrwQdB/ucC9vk4+mzUw6baajlFT+zpluYFTsyURzaJAG
-	Ov8emm2OsqKi1tsQIH0S76q/oJZe2b
-X-Received: by 2002:a17:90a:cf16:b0:2c2:edc2:6021 with SMTP id 98e67ed59e1d1-2c2edc26151mr4212532a91.11.1718032502559;
-        Mon, 10 Jun 2024 08:15:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEUX+qE30sOtQcdPcBO6cllJjlpNJG1nFcZzFDbNKN76d+4g6+6h4LDFL2zf1CaTNmhGd2dMj97g14KHF/lYOE=
-X-Received: by 2002:a17:90a:cf16:b0:2c2:edc2:6021 with SMTP id
- 98e67ed59e1d1-2c2edc26151mr4212523a91.11.1718032502221; Mon, 10 Jun 2024
- 08:15:02 -0700 (PDT)
+	s=arc-20240116; t=1718032608; c=relaxed/simple;
+	bh=O4K2WVyffh0yFu7MqI9zVOz6iOMDjKw5eu0ZI4dIaVk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XUvcn3DdELyY03D87REYHx1VY9vm+OUjg+iJsv8rYbaod2/+9Gdqt7xWt/A0+cZiZOOvSKB2wGQbjqc3c8cgdIzBKmFbKcnhjoeAG9Q+swGp7HDTQw7C8J8IME/9ne9nrJW9x6l8JWLAJJIfM96tA9lauerGIrl6OHn4OF1pdJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ETS5HpY/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17272C32786;
+	Mon, 10 Jun 2024 15:16:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718032607;
+	bh=O4K2WVyffh0yFu7MqI9zVOz6iOMDjKw5eu0ZI4dIaVk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ETS5HpY/0Kf6xf4RQ1EeQ5ezwwa3Hu3a2SFdCj67odD7KI2UYD7Fs2d1r5g7y6wIf
+	 vTIqROSJQNRXs1n9kJDCdzxcS7+nLskAscR53y6Tg+D3s6zi6S/mSwJ7junGgMfPGz
+	 cFVN88hW7TnVgKXnCw7asGpLrZreR7IS4oFRMy+H9qtpSq3cfrL6cdUOlH8XQCjevL
+	 VdpqhB/9QWwIUedEYRuh4MevTomxzXE6ulQ6FOvNli9X5RdARoFkmIdzyPoMwtaZ2o
+	 jqiLoW+RrYZ9fTS86/FAROafJwR54RozEVCGgmVDPux00UDvaj3N87ZaAfFbOkWXsm
+	 4oYGUGuuH8ZZQ==
+Message-ID: <59443d14-1f1d-42bb-8be3-73e6e4a0b683@kernel.org>
+Date: Mon, 10 Jun 2024 09:16:43 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240607160753.1787105-1-omosnace@redhat.com> <b764863b-6111-45ee-8364-66a4ca7e5d59@schaufler-ca.com>
-In-Reply-To: <b764863b-6111-45ee-8364-66a4ca7e5d59@schaufler-ca.com>
-From: Ondrej Mosnacek <omosnace@redhat.com>
-Date: Mon, 10 Jun 2024 17:14:50 +0200
-Message-ID: <CAFqZXNumv+NNZjR4KSD-U7pDXszn1YwZoKwfYO2GxvHpaUnQHA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] cipso: make cipso_v4_skbuff_delattr() fully remove
- the CIPSO options
-To: Casey Schaufler <casey@schaufler-ca.com>
-Cc: Paul Moore <paul@paul-moore.com>, netdev@vger.kernel.org, 
-	linux-security-module@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v10 02/14] net: page_pool: create hooks for
+ custom page providers
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@ziepe.ca>, Pavel Begunkov <asml.silence@gmail.com>
+Cc: David Wei <dw@davidwei.uk>, Mina Almasry <almasrymina@google.com>,
+ Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+ Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Steffen Klassert
+ <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
+References: <20240530201616.1316526-3-almasrymina@google.com>
+ <ZlqzER_ufrhlB28v@infradead.org>
+ <CAHS8izMU_nMEr04J9kXiX6rJqK4nQKA+W-enKLhNxvK7=H2pgA@mail.gmail.com>
+ <5aee4bba-ca65-443c-bd78-e5599b814a13@gmail.com>
+ <CAHS8izNmT_NzgCu1pY1RKgJh+kP2rCL_90Gqau2Pkd3-48Q1_w@mail.gmail.com>
+ <eb237e6e-3626-4435-8af5-11ed3931b0ac@gmail.com>
+ <be2d140f-db0f-4d15-967c-972ea6586b5c@kernel.org>
+ <20240607145247.GG791043@ziepe.ca>
+ <45803740-442c-4298-b47e-2d87ae5a6012@davidwei.uk>
+ <54975459-7a5a-46ff-a9ae-dc16ceffbab4@gmail.com>
+ <20240610121625.GI791043@ziepe.ca>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240610121625.GI791043@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 7, 2024 at 8:50=E2=80=AFPM Casey Schaufler <casey@schaufler-ca.=
-com> wrote:
->
-> On 6/7/2024 9:07 AM, Ondrej Mosnacek wrote:
-> > This series aims to improve cipso_v4_skbuff_delattr() to fully
-> > remove the CIPSO options instead of just clearing them with NOPs.
-> > That is implemented in the second patch, while the first patch is
-> > a bugfix for cipso_v4_delopt() that the second patch depends on.
-> >
-> > Tested using selinux-testsuite a TMT/Beakerlib test from this PR:
-> > https://src.fedoraproject.org/tests/selinux/pull-request/488
->
-> Smack also uses CIPSO. The Smack testsuite is:
-> https://github.com/smack-team/smack-testsuite.git
+On 6/10/24 6:16 AM, Jason Gunthorpe wrote:
+> On Mon, Jun 10, 2024 at 02:07:01AM +0100, Pavel Begunkov wrote:
+>> On 6/10/24 01:37, David Wei wrote:
+>>> On 2024-06-07 17:52, Jason Gunthorpe wrote:
+>>>> IMHO it seems to compose poorly if you can only use the io_uring
+>>>> lifecycle model with io_uring registered memory, and not with DMABUF
+>>>> memory registered through Mina's mechanism.
+>>>
+>>> By this, do you mean io_uring must be exclusively used to use this
+>>> feature?
+>>>
+>>> And you'd rather see the two decoupled, so userspace can register w/ say
+>>> dmabuf then pass it to io_uring?
+>>
+>> Personally, I have no clue what Jason means. You can just as
+>> well say that it's poorly composable that write(2) to a disk
+>> cannot post a completion into a XDP ring, or a netlink socket,
+>> or io_uring's main completion queue, or name any other API.
+> 
+> There is no reason you shouldn't be able to use your fast io_uring
+> completion and lifecycle flow with DMABUF backed memory. Those are not
+> widly different things and there is good reason they should work
+> together.
+> 
+> Pretending they are totally different just because two different
+> people wrote them is a very siloed view.
+> 
+>> The devmem TCP callback can implement it in a way feasible to
+>> the project, but it cannot directly post events to an unrelated
+>> API like io_uring. And devmem attaches buffers to a socket,
+>> for which a ring for returning buffers might even be a nuisance.
+> 
+> If you can't compose your io_uring completion mechanism with a DMABUF
+> provided backing store then I think it needs more work.
+> 
 
-I tried to run it now, but 6 out of 114 tests fail for me already on
-the baseline kernel (I tried with the v6.9 tag from mainline). The
-output is not very verbose, so I'm not sure what is actually failing
-and if it's caused by something on my side... With my patches applied,
-the number of failed tests was the same, though, so there is no
-evidence of a regression, at least.
-
---=20
-Ondrej Mosnacek
-Senior Software Engineer, Linux Security - SELinux kernel
-Red Hat, Inc.
+exactly. io_uring, page_pool, dmabuf - all kernel building blocks for
+solutions. This why I was pushing for Mina's set not to be using the
+name `devmem` - it is but one type of memory and with dmabuf it should
+not matter if it is gpu or host (or something else later on - cxl?).
 
 
