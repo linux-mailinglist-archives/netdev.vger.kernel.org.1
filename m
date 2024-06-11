@@ -1,174 +1,118 @@
-Return-Path: <netdev+bounces-102531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FB5E90392F
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 12:46:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F43F903987
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:03:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84D421C23B67
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 10:46:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F0331C216FC
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 11:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E25178380;
-	Tue, 11 Jun 2024 10:46:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="hOU2iZ71"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E79C17B42B;
+	Tue, 11 Jun 2024 11:01:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C4A174EC1;
-	Tue, 11 Jun 2024 10:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CCB17B426
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 11:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718102778; cv=none; b=h89lVU5C+v9AQBZKbEq20Uooveaqko1k+yARan47IKd8r2iFdJ3mV+HzYBwjV2lXO9zucvO1Tqixk00h+JU28mwkUgvwEY7Lmpq3JzmjAfN+ALRdM8ln6a9POo70lh0byZxaFUZhDvHqONoL9zWv5FyizXKXAhVeCmd3xXRofxM=
+	t=1718103698; cv=none; b=Xu9CF5iO7GGnYzKVfQUJ99OvXCD/CUHJrry21ivaEBFqYJJlQghBXJGINIfaxnRezQBSIINUDiAg3ZhqeYO7BIYo2PWtR2AD+vQEQf82lR9WVYpEcFcCRmTR6MAu3VaAOBWiXMKlP6DBz9XU1iCZANKz8l3Rfd2euznTgCF9Xfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718102778; c=relaxed/simple;
-	bh=4TSoFH28pB7Lu+/lE2dCqcs0oPJH8qkuGmHC1tVnGC4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dcNpgZQPBxsgIP77meq8NQ+KlcK5xakNQkrmkTzSUajqvp5+vkpOfd7mLeP3DEP0x5k8SvwqQHt2BF2n1HiH2jos2rzK5PqGIgibcEwoeyEi35gA4rnQw9oCe3geTsqQitpIUpQ52e1O8nz924QdFmfl5R91kTQcRLfCZCQr8CE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=hOU2iZ71; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1718102776; x=1749638776;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4TSoFH28pB7Lu+/lE2dCqcs0oPJH8qkuGmHC1tVnGC4=;
-  b=hOU2iZ716RHX4AcynPgbl7r92GYBAhcl1ze0vwp6vg5IOcUpFZ/oqs2j
-   0xRpG+wIVpiKXvckHJcNQtSNX7B6wyWFadSoey4EqIM+CiB+uzLVqq/9Z
-   YSmubeKmKZRr0G/qltKJP06YNpQfBKJXHk0WD1P1jAtv5h+H7npcmG60o
-   NUPj5//xvXu6R/+LXpzNv2nUgITXUFBenVarXv3SoMJgNj1//+zzEgqxn
-   EAZx1/RUO6OergVrRmKPyD8M4jGMVykLhKUowyGNEttdiLNiQRCFJYXAR
-   Bkqu82J3GiihZsx62DTYxdv/RkaRLH6tPMP4z1uMk35tx5IhHSTzqJEdj
-   w==;
-X-CSE-ConnectionGUID: HKNdurkMQ2Ggz/eZHEil9w==
-X-CSE-MsgGUID: QrJi9OqDTUWo+/GXWEgcCg==
-X-IronPort-AV: E=Sophos;i="6.08,229,1712646000"; 
-   d="scan'208";a="27263922"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Jun 2024 03:46:15 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 11 Jun 2024 03:45:44 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Tue, 11 Jun 2024 03:45:44 -0700
-Date: Tue, 11 Jun 2024 12:45:44 +0200
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-CC: <lkp@intel.com>, <UNGLinuxDriver@microchip.com>, <andrew@lunn.ch>,
-	<bryan.whitehead@microchip.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <hkallweit1@gmail.com>, <hmehrtens@maxlinear.com>,
-	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <linux@armlinux.org.uk>,
-	<lxu@maxlinear.com>, <netdev@vger.kernel.org>,
-	<oe-kbuild-all@lists.linux.dev>, <pabeni@redhat.com>, <sbauer@blackbox.su>,
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: Re: [PATCH net V3 0/3] net: lan743x: Fixes for multiple WOL related
- issues
-Message-ID: <20240611104544.pjtqkx4dhdnngpaq@DEN-DL-M31836.microchip.com>
-References: <202406052200.w3zuc32H-lkp@intel.com>
- <20240611062753.12020-1-Raju.Lakkaraju@microchip.com>
- <20240611071051.65e5n3bn7e4zm7lq@DEN-DL-M31836.microchip.com>
- <ZmgEUrA6xM9vtDxD@HYD-DK-UNGSW21.microchip.com>
+	s=arc-20240116; t=1718103698; c=relaxed/simple;
+	bh=6Jsj4L1nIAWRumQjeO3YLOX+dSoC0GerJKMOnWQ2FLc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dLI2rCTO9ZOb2iS2T5h5m9m4RLCbTk4ePzgj5y6zMT6a9Mnej5xWY1DI8+nn3eSjTiF7LRcLc3Hf+tC43QtyxNYcLlUVliawgMddZNpH5pCy1X45E1ZYYqEabsgcVeYprgw/09LVfPSL5T7NojdGm6X6LunjClmBJpMvVEIXF9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52c1e33e283so613239e87.1
+        for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 04:01:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718103695; x=1718708495;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nkeWmt+Nx2AbtvOpSXf3xtCT93dTPkRd2wDT5Ci+nzc=;
+        b=cDlkdsckzUgR70tJeP+UpSt+BebMUD2SoVn8nt0GnJbzkwiZh+XLJ6dzN3fMkjJjDQ
+         UEvk+T91mplA+Rd0tpSq6xe0ckNLupEilHIszE5pf/J2tSNJjFDMz5l8DT6epcWkVILP
+         +bVYcaz2T1g1/N4XE9UdzGSGZacC+p4xU3bbTJSRdOQo1qAQR3LdxLZLSZ48PlpbmRrP
+         CDqiVNT3df3hai60KPoMqpKSQZVwZwmoIzv4oD8cr7Q9EB7YTZRJd5srxI+GRIKp3cOf
+         ziwcuAA6HceVEJ4QrvlH1VDtPd08/tdxf3X65Fp/7KH881xoOaXg5Q/zPEwVY/tiXqxY
+         qSdA==
+X-Forwarded-Encrypted: i=1; AJvYcCVcbelPpz+Nl394aBKP8TuruCcBv4juXXMQzWlSKr2GGiKvwWmfR30XlZPWCuoo1DGNAPMA+ztyAh/1PD8GfyedYiJMw0Ly
+X-Gm-Message-State: AOJu0Ywbsh5KHx3c2Fbzy8r+0EawOXfBcmrW2cFOTPAIyBNsWSDdP32C
+	WzwPbVmA2ud//IyT516ILCJw7QDEdDW4ftRbbnTJQn8esOZnit8+
+X-Google-Smtp-Source: AGHT+IFFGKrZiYwDzEvS9vPvXOK2ImQGbAVJIS92wSdCM0deuyAXrB/gzLfnFmjwDtgXbv+nUtewTQ==
+X-Received: by 2002:a2e:312:0:b0:2eb:de36:6775 with SMTP id 38308e7fff4ca-2ebde3668eamr39391041fa.4.1718103694508;
+        Tue, 11 Jun 2024 04:01:34 -0700 (PDT)
+Received: from [10.100.102.74] (85.65.205.146.dynamic.barak-online.net. [85.65.205.146])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35f0d6d5ed3sm9915406f8f.19.2024.06.11.04.01.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Jun 2024 04:01:33 -0700 (PDT)
+Message-ID: <6d53cf9e-a731-402c-8fc1-6dfe476bc35c@grimberg.me>
+Date: Tue, 11 Jun 2024 14:01:32 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <ZmgEUrA6xM9vtDxD@HYD-DK-UNGSW21.microchip.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v25 00/20] nvme-tcp receive offloads
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, Aurelien Aptel <aaptel@nvidia.com>,
+ linux-nvme@lists.infradead.org, netdev@vger.kernel.org, kbusch@kernel.org,
+ axboe@fb.com, chaitanyak@nvidia.com, davem@davemloft.net
+References: <20240529160053.111531-1-aaptel@nvidia.com>
+ <20240530183906.4534c029@kernel.org> <20240531061142.GB17723@lst.de>
+ <06d9c3c9-8d27-46bf-a0cf-0c3ea1a0d3ec@grimberg.me>
+ <20240610122939.GA21899@lst.de>
+ <9a03d3bf-c48f-4758-9d7f-a5e7920ec68f@grimberg.me>
+ <20240611064132.GA6727@lst.de>
+Content-Language: en-US
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20240611064132.GA6727@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The 06/11/2024 13:31, Raju Lakkaraju wrote:
-> Hi Horatiu,
-> 
-> There is no new changes except "kernel test robot" reported issue.
 
-So there is no change in the code, you just added the tags between this
-version and the previous one where the robot complained?
-Because to me it looks like you added an extra #ifdef in 2/3 patch.
 
-> 
-> I fix the issue and sent the patch along with other old patches.
-> Also add "Reported-by" and "Closes" tags to all patches and
-> --in-reply-to=202406052200.w3zuc32H-lkp@intel.com.
-> i.e.
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202406052200.w3zuc32H-lkp@intel.com/
+On 11/06/2024 9:41, Christoph Hellwig wrote:
+> On Mon, Jun 10, 2024 at 05:30:34PM +0300, Sagi Grimberg wrote:
+>>> efficient header splitting in the NIC, either hard coded or even
+>>> better downloadable using something like eBPF.
+>>  From what I understand, this is what this offload is trying to do. It uses
+>> the nvme command_id similar to how the read_stag is used in iwarp,
+>> it tracks the NVMe/TCP pdus to split pdus from data transfers, and maps
+>> the command_id to an internal MR for dma purposes.
+>>
+>> What I think you don't like about this is the interface that the offload
+>> exposes
+>> to the TCP ulp driver (nvme-tcp in our case)?
+> I don't see why a memory registration is needed at all.
 
-It doesn't say to add only if you fix the issue in a separate patch and
-not just for a new version of the patch/commit.
-Or I miss reading this?
+I don't see how you can do it without memory registration.
 
-> 
-> Is it sufficient? or
-> Do you need to generete new version of patches ?
+>
+> The by far biggest painpoint when doing storage protocols (including
+> file systems) over IP based storage is the data copy on the receive
+> path because the payload is not aligned to a page boundary.
+>
+> So we need to figure out a way that is as stateless as possible that
+> allows aligning the actual data payload on a page boundary in an
+> otherwise normal IP receive path.
 
-Every time when you do a change in your patch until is accepted, you
-will need to generate a new version.
-Don't forget about 24h rule. That you need to wait 24h before you can
-send a new version.
+But the device gets payload from the network, and needs a buffer
+to dma to. In order to dma to the "correct" buffer it needs some
+sort of pre-registration expressed with a tag, that the device can
+infer by some sort of stream inspection. The socket recv call from
+the ulp happens at a later stage.
 
-> 
-> Thanks,
-> Raju
-> The 06/11/2024 09:10, Horatiu Vultur wrote:
-> > Hi Raju,
-> > 
-> > Is this not supposed to be v4?
-> > Because I can see v3 here:
-> > https://www.spinics.net/lists/netdev/msg1002225.html
-> > 
-> > The 06/11/2024 11:57, Raju Lakkaraju wrote:
-> > > This patch series implement the following fixes:
-> > > 1. Disable WOL upon resume in order to restore full data path operation
-> > > 2. Support WOL at both the PHY and MAC appropriately 
-> > > 3. Remove interrupt mask clearing from config_init 
-> > > 
-> > > Patch-3 was sent seperately earlier. Review comments in link: 
-> > > https://lore.kernel.org/lkml/4a565d54-f468-4e32-8a2c-102c1203f72c@lunn.ch/T/
-> > > 
-> > > Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>                        
-> > > Reported-by: kernel test robot <lkp@intel.com>                                  
-> > > Closes: https://lore.kernel.org/oe-kbuild-all/202406052200.w3zuc32H-lkp@intel.com/
-> > 
-> > I think you should drop the 'Reported-by' and 'Closes' tags because the
-> > issue that is getting closed is the one that you introduced in one of
-> > your previous version of the patch series.
-> > 
-> > > 
-> > > Raju Lakkaraju (3):
-> > >   net: lan743x: disable WOL upon resume to restore full data path
-> > >     operation
-> > >   net: lan743x: Support WOL at both the PHY and MAC appropriately
-> > >   net: phy: mxl-gpy: Remove interrupt mask clearing from config_init
-> > > 
-> > >  .../net/ethernet/microchip/lan743x_ethtool.c  | 44 ++++++++++++--
-> > >  drivers/net/ethernet/microchip/lan743x_main.c | 46 ++++++++++++---
-> > >  drivers/net/ethernet/microchip/lan743x_main.h | 28 +++++++++
-> > >  drivers/net/phy/mxl-gpy.c                     | 58 ++++++++++++-------
-> > >  4 files changed, 144 insertions(+), 32 deletions(-)
-> > > 
-> > > -- 
-> > > 2.34.1
-> > > 
-> > > 
-> > 
-> > -- 
-> > /Horatiu
-> 
-> -- 
-> Thanks,                                                                         
-> Raju
-
--- 
-/Horatiu
+I am not sure I understand the alignment assurance help the NIC
+to dma payload from the network to the "correct" buffer
+(i.e. userspace doing O_DIRECT read).
 
