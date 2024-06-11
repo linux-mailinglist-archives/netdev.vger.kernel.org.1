@@ -1,116 +1,136 @@
-Return-Path: <netdev+bounces-102526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 848DA903798
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 11:14:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDC3B90380F
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 11:42:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BC9F28A39A
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 09:14:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB8131C231D3
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 09:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E7C5176AA5;
-	Tue, 11 Jun 2024 09:14:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B149317623B;
+	Tue, 11 Jun 2024 09:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eZ2kLVPU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MOH6AnyT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F3317625F;
-	Tue, 11 Jun 2024 09:14:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F288013777F
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 09:42:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718097250; cv=none; b=KkRPb51o4hOXaKH0H3ggZjz4driduJIQces3acggbL8DcoaC3FIJ73zFermpBDEQqq30WtsRUysuuFwC+qeybPzbL5mmHuB/L3UqJWoqKcMvOPCtxVTsGMzq4845pFnGPNeuzkZPYX9CtCMLr5OGhkrCNOsUd9TIAlZ8BIkErOw=
+	t=1718098938; cv=none; b=T726zOacHQq8LsB5j+Yvi+8UO2FEqA3tNiGTwPG4RB6DJEKGZLsyF6Ibq3cRaqajhC+RpWrau5GokzCnRntIxY+t0gzt4OcL3xta+5o4zIwUS3+4WWEADjG+vFpjYrc7Im26WN5dKnvmGnMoSPGRgJJDetbN3HqTZl9J+oKxhJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718097250; c=relaxed/simple;
-	bh=VWF2BN3M74sWgL4r0nHVKCmPDvs57NQeQDcbDpP5OYs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=syps506hIc52Y7MKUNXKhTJGM4/4isZCIrtDwDCLXyXHATs+763x9w1lm21upnqb6a5ezGBo3Yg38VTxmbJ0L8ug4iDeu6DNrwEjuWdoBTOaxuNO2V8zCGa22FTFcnnbMJaCRzRuYt86nV7/i3PWNnOCGT+WK8EZmieT+7BuJSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eZ2kLVPU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 797AFC2BD10;
-	Tue, 11 Jun 2024 09:14:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718097250;
-	bh=VWF2BN3M74sWgL4r0nHVKCmPDvs57NQeQDcbDpP5OYs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eZ2kLVPUiamJO4LB+z77wLYTVv+v3VraBW/u+gAsNhHG/ActUp1et+OsVEyDz34cR
-	 cbShcphc/reNow5ZpTBmVeKB2l4q1ZJ/ABDCsK/Q48AqhqQjfq8rwZJjw2Jmimxiah
-	 z8Pj28WGQZkz2b5w2LYVMvqV02narhxaKk6iw+AkgeOPaLCer4+kcAuux/jKhQyO/I
-	 98yR78dZCj1RKovDfPk+4HhExDVWhIRGRN7XyTSlsU6c/NjPl9Dxlo6t6yW6ruUABB
-	 1Axf5wzxawQqOPYrRaO+x+IHXkHZpSoGuc4D4uxFBvS0c7R/0P+ejV6aaCKp0ivvoc
-	 bEsLGOak71gTg==
-From: Geliang Tang <geliang@kernel.org>
-To: Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Boris Pismenny <borisp@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>
-Cc: Geliang Tang <tanggeliang@kylinos.cn>,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v6 2/2] selftests/bpf: Add F_SETFL for fcntl in test_sockmap
-Date: Tue, 11 Jun 2024 17:13:35 +0800
-Message-ID: <dfbbec2d3144d8fd1022fa8326d53a3e511d63cb.1718096691.git.tanggeliang@kylinos.cn>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1718096691.git.tanggeliang@kylinos.cn>
-References: <cover.1718096691.git.tanggeliang@kylinos.cn>
+	s=arc-20240116; t=1718098938; c=relaxed/simple;
+	bh=U5unDrRJ0O60368h3zCjbq1bA2ZHsRuYRLRviqIqcx8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CJAoCjqZGEpB3QGpvNB31jKNjCcMyUXD8rkGahAu46PAVsZTpcGxcHcDCRn43ME7bcaPTAat4IR7OQGbxEaHjyphOb1mqdxevgxCw8siBZ9oaegzdvRfqNxgmfGQuqpN8d7QnmfXlU/FSwOVlKf5Ey9YAtA6ORRHo3LGeFBgIIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MOH6AnyT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718098935;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U5unDrRJ0O60368h3zCjbq1bA2ZHsRuYRLRviqIqcx8=;
+	b=MOH6AnyTGNWaHKM8GzgI8e/VOkI0OHFBphbWYxeLUybP+fvIYdJVgfnBBs5lYwnGzcuOkL
+	mEj9tNkQ/D+M0Otcsip0RByP6hkpvQUAoktftfeXyx000DeS251Ho2cP2HxrYR9jxFrKUM
+	UJNslEelZxyRRk+4+j5xQIbJgMqfpbo=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-460-1V7P-XUKODWKYH4_FKR72w-1; Tue, 11 Jun 2024 05:42:13 -0400
+X-MC-Unique: 1V7P-XUKODWKYH4_FKR72w-1
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2c3213b3878so1140324a91.2
+        for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 02:42:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718098932; x=1718703732;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=U5unDrRJ0O60368h3zCjbq1bA2ZHsRuYRLRviqIqcx8=;
+        b=U8Tv7NmolTz4qtMKV1SAq+ZXYhUB6uwi1ynnrqgU/EX1369jK0XrAdfzrRuuAV2LdU
+         Jxztonlq/UpedndRdw6dOOEfjoDZBmvOCdIT6jsWzSXTF8pT6epyLvA4sZ59Ny1C/m3d
+         MJH3YJqz8USqzvQD8EjSMsDMe1/M56mpCgkrDyfu5bYmWmuQ5W1OF5fGobrMZVKYqFOd
+         4qHxEL75zYSdqKg4R8CcqHxziTBaZKC9WMQbeFNogWOth/Z2Zdzx+z25MmOsosGLpE92
+         dZyLrF4pZta02qZporhYHXkpovHuhCvo0eFcqtUIK42dcJF2vrYgrVoCI0rQNUnIxJ7X
+         UYtw==
+X-Forwarded-Encrypted: i=1; AJvYcCV/GYtC/pHXpCofO2a+9ljw04sQL6iNkq8sF8zHEdv2rzmNaXkXKwZivDo9GKQ7oogJF2UDQeBUlW3nfgSte9dQP9JcMCo+
+X-Gm-Message-State: AOJu0YxGq6p/HRa5mY9atEBULu/FFRq5nOsA/iz2/AC+TV1mcIIK7hVr
+	MtKhmC/3JJ6r2GIh5wndREGmBm4SymHQDQnM97fLGQFZBTLtvmZqlEKOU8ooCd1FAapLe33YMbv
+	PQbEuBlP6Uad4V63Ne4IyeoDpkUh3Dwt2TYsrrd1nEW446pXaHXT0dvhE9+HqeVThLRuL4bd3sK
+	iZf8/EMXG4f/cAEZn0ykyyoTfvkjmK
+X-Received: by 2002:a17:90a:bf15:b0:2c2:ce08:d0e4 with SMTP id 98e67ed59e1d1-2c2ce08d1cbmr9733680a91.23.1718098932311;
+        Tue, 11 Jun 2024 02:42:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEyzDYIkyxO8ToD8S9H2/1wx4M7N2ou+ok5olmea8867gAIpOUjLlGIlzn0XE2htX5QCza7k2rCZTyNncWAKtU=
+X-Received: by 2002:a17:90a:bf15:b0:2c2:ce08:d0e4 with SMTP id
+ 98e67ed59e1d1-2c2ce08d1cbmr9733667a91.23.1718098931890; Tue, 11 Jun 2024
+ 02:42:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240607160753.1787105-1-omosnace@redhat.com> <b764863b-6111-45ee-8364-66a4ca7e5d59@schaufler-ca.com>
+ <CAFqZXNumv+NNZjR4KSD-U7pDXszn1YwZoKwfYO2GxvHpaUnQHA@mail.gmail.com> <2812aeed-ab49-492b-8c93-c553c2a02775@schaufler-ca.com>
+In-Reply-To: <2812aeed-ab49-492b-8c93-c553c2a02775@schaufler-ca.com>
+From: Ondrej Mosnacek <omosnace@redhat.com>
+Date: Tue, 11 Jun 2024 11:42:00 +0200
+Message-ID: <CAFqZXNuYpe130gL2qurzEsxH69rdLuw27Atg963ZCWewU+q44A@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] cipso: make cipso_v4_skbuff_delattr() fully remove
+ the CIPSO options
+To: Casey Schaufler <casey@schaufler-ca.com>
+Cc: Paul Moore <paul@paul-moore.com>, netdev@vger.kernel.org, 
+	linux-security-module@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+On Mon, Jun 10, 2024 at 6:53=E2=80=AFPM Casey Schaufler <casey@schaufler-ca=
+.com> wrote:
+>
+> On 6/10/2024 8:14 AM, Ondrej Mosnacek wrote:
+> > On Fri, Jun 7, 2024 at 8:50=E2=80=AFPM Casey Schaufler <casey@schaufler=
+-ca.com> wrote:
+> >> On 6/7/2024 9:07 AM, Ondrej Mosnacek wrote:
+> >>> This series aims to improve cipso_v4_skbuff_delattr() to fully
+> >>> remove the CIPSO options instead of just clearing them with NOPs.
+> >>> That is implemented in the second patch, while the first patch is
+> >>> a bugfix for cipso_v4_delopt() that the second patch depends on.
+> >>>
+> >>> Tested using selinux-testsuite a TMT/Beakerlib test from this PR:
+> >>> https://src.fedoraproject.org/tests/selinux/pull-request/488
+> >> Smack also uses CIPSO. The Smack testsuite is:
+> >> https://github.com/smack-team/smack-testsuite.git
+> > I tried to run it now, but 6 out of 114 tests fail for me already on
+> > the baseline kernel (I tried with the v6.9 tag from mainline). The
+> > output is not very verbose, so I'm not sure what is actually failing
+> > and if it's caused by something on my side... With my patches applied,
+> > the number of failed tests was the same, though, so there is no
+> > evidence of a regression, at least.
+>
+> I assume you didn't select CONFIG_SECURITY_SMACK_NETFILTER, which
+> impacts some of the IPv6 test case. Thank you for running the tests.
 
-Incorrect arguments are passed to fcntl() in test_sockmap.c when invoking
-it to set file status flags. If O_NONBLOCK is used as 2nd argument and
-passed into fcntl, -EINVAL will be returned (See do_fcntl() in fs/fcntl.c).
-The correct approach is to use F_SETFL as 2nd argument, and O_NONBLOCK as
-3rd one.
+You're right, I only enabled SECURITY_SMACK and didn't look at the
+other options. Enabling SECURITY_SMACK_NETFILTER fixed most of the
+failures, but the audit-avc test is still failing:
 
-Fixes: 16962b2404ac ("bpf: sockmap, add selftests")
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Acked-by: Yonghong Song <yonghong.song@linux.dev>
----
- tools/testing/selftests/bpf/test_sockmap.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+./tests/audit-avc.sh:62 FAIL
+./tests/audit-avc.sh:78 PASS
+./tests/audit-avc.sh PASS=3D1 FAIL=3D1
 
-diff --git a/tools/testing/selftests/bpf/test_sockmap.c b/tools/testing/selftests/bpf/test_sockmap.c
-index 9cba4ec844a5..99d3ca8e44bb 100644
---- a/tools/testing/selftests/bpf/test_sockmap.c
-+++ b/tools/testing/selftests/bpf/test_sockmap.c
-@@ -604,7 +604,9 @@ static int msg_loop(int fd, int iov_count, int iov_length, int cnt,
- 		struct timeval timeout;
- 		fd_set w;
- 
--		fcntl(fd, fd_flags);
-+		if (fcntl(fd, F_SETFL, fd_flags))
-+			goto out_errno;
-+
- 		/* Account for pop bytes noting each iteration of apply will
- 		 * call msg_pop_data helper so we need to account for this
- 		 * by calculating the number of apply iterations. Note user
--- 
-2.43.0
+I didn't try the baseline kernel this time, but looking at the test
+script the failure doesn't appear to be related to the patches.
+
+--
+Ondrej Mosnacek
+Senior Software Engineer, Linux Security - SELinux kernel
+Red Hat, Inc.
 
 
