@@ -1,140 +1,277 @@
-Return-Path: <netdev+bounces-102727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A97DB904621
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 23:12:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F120904673
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 23:55:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A67FB1C2356E
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 21:12:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CB64B23ACE
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 21:55:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C29E2152E12;
-	Tue, 11 Jun 2024 21:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 350DB152E05;
+	Tue, 11 Jun 2024 21:55:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bBEfZAwa"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="dO50FHMy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4427A1514C9;
-	Tue, 11 Jun 2024 21:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC0BB3A8E4;
+	Tue, 11 Jun 2024 21:55:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718140345; cv=none; b=JeEYMgYfcjsfMuD3SKV7RUMhpIv5zKhKoXuEoFODRa72x1KhmjLohzjvHuwOZZqvid3aA9EKbX3AsloGwY30syvVqE2E7VZvDYLcczJp92cseLHR4h6oPZchmlZhWOSaK9mDwdZJeBOOmNTXokgmgnsDO1pOTRBiTYPfbuDPgqs=
+	t=1718142915; cv=none; b=CV1IMhCgSAlJzn8N28+WT2Snv8sTGYgRVGHaXYMV1668IBhP/lqJJ1WiXj1boa1NoCQjygSeEZbNObwKiEztIb33TgcsiKKbM7opuO/weNn+KASPeWI7Lszc5kuM+PS1qmuJZkhTeKd5OwZK730DWD25fTHDb22xGqeUT0+XeYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718140345; c=relaxed/simple;
-	bh=gABUjaIqxTdKPvs62Zv3vC0020OcVeLRR4OmLvIB1EQ=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=X8IQGK5aEr1Kjipk4vVMfY9b+GOy1Ky9QaVLbW6uNkXcGw6V6mo2AvXj53HQofWM+f+ARcfVjLDNJ/VtZ1SR6EofrQR/HanyYZ4tSmZi1HW5vsFoAqxzqJ48wnIIu8lKpRSwDHuK2pCBwXDir2tafHBLEX2ivwVtlYjsMy0uQSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bBEfZAwa; arc=none smtp.client-ip=209.85.210.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6f96445cfaeso860223a34.2;
-        Tue, 11 Jun 2024 14:12:24 -0700 (PDT)
+	s=arc-20240116; t=1718142915; c=relaxed/simple;
+	bh=TZk/B+Ox0N/GvpZ4dnBEu5GUQuXrO/D/UOTlsflWZkc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AClAtiKdWWLmb7xvF9A4dLGlfg5WOvKZTFBaO8PAlkr9ycUW/vGOQbLcCt1QyR+nOQfbdPxquPihcLhkfeeQT/voYXzkZAOZ1vNo6AbXRLIrMNVpY6GsIayUFuCYHy3jYZ+aDIRb4xtf2/3mabYc8LVzo831hBvre4ozi/RqqJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=dO50FHMy; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718140343; x=1718745143; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4f8iA+BT0JdT+xCtVM5QIlFnTXVcaJHgvzWFas2qCZg=;
-        b=bBEfZAwayXI43Dgf4xeZS/XGBkdG4fVLTP2oj8dcQSdUJIdHGS3elwcNLqMVFKUdrL
-         5OskYjKynca2cMD/P+2K5prcgCzvIrMuA7+OxaQ1DVLN5oyMGa3ZqHv0DPxVZYtKuTDW
-         vRe50bCB3JPK2tIwBOvFSUoF+Mo5FXJalpeDIWt9soONGCjmJC1HVs5g+Q0D5o/b5EEb
-         jZwH0xJxiDOCGyVB4VZKnfNO9jcY/iqEba3T7/1Wt4tyFol0h2HSAzXdwfO7STWmsrwH
-         Bh5DR8e3HZeBbcomWMLZSwNwsRflWacKgOdN9MluSBEx95gavPbxV8X3kgi3rrhNm3WO
-         c8Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718140343; x=1718745143;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=4f8iA+BT0JdT+xCtVM5QIlFnTXVcaJHgvzWFas2qCZg=;
-        b=oiVwJXesg3Z8m+du4roFmoS49kCEHY6v6CkV5Q66NIQ/kOIb5BoExlbScRXFrwcuqL
-         R/L+jlzSZaZJJ1MaQqBHKU4FYtF1K5NnUs7dzoGV2mWVokSBqzDbdu+jT68/QWwqpyop
-         DmGOey09DZD5IzDVrnQrYVq4zuAmvApQ70UB55QB/NX4QxSrPNbNLxqz/zVCeck2VMtx
-         Xc4DfH7hFSNQtdCnb9hmThstEUSm3gXmLzOAv/2ilftZgCSQkMZmjJQqfysX43CLo41R
-         Ol7wWS/V4rO9Q4Uj6LOKmnsRUGH3bT6LzSu78kr2FxEACJ+o+tTdRIgwLFbVRyO4ffEp
-         Brjg==
-X-Forwarded-Encrypted: i=1; AJvYcCWyORBladBTqxhWRVg4d5UCRo4Tti+xZOJrYceW4C1F153LhZRwtaZMGpBauhEs74+/Aej+77b5rDKOGCIh4cjT8b4n+GwC0mGVMmbZyZF5OPlsyY1eB5b0uBpJ
-X-Gm-Message-State: AOJu0Yyzedx+ZOHeV1P08A1vjy0dEcEJVun+d44Pmjsrkbcfu9RVl+jg
-	t8NRzQEjQeAh+duWoBGLNJ98NZmv4l+RwiQHjkfScHJKq7s+ly8c
-X-Google-Smtp-Source: AGHT+IEPlAD1O1VAe7Ad0WITLf8o8k5Jdn+TEIdSksTF8DDGfXFYOIyOMNIzrDppvgei50u3oBnRNw==
-X-Received: by 2002:a05:6830:1541:b0:6f9:a479:d160 with SMTP id 46e09a7af769-6f9a479d405mr8766328a34.25.1718140343222;
-        Tue, 11 Jun 2024 14:12:23 -0700 (PDT)
-Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7977e0eb111sm188859285a.89.2024.06.11.14.12.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jun 2024 14:12:22 -0700 (PDT)
-Date: Tue, 11 Jun 2024 17:12:22 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: YiFei Zhu <zhuyifei@google.com>, 
- netdev@vger.kernel.org, 
- bpf@vger.kernel.org
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
- Magnus Karlsson <magnus.karlsson@intel.com>, 
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
- Jonathan Lemon <jonathan.lemon@gmail.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Stanislav Fomichev <sdf@google.com>, 
- Willem de Bruijn <willemb@google.com>
-Message-ID: <6668bdb68eaf5_f6b0e29416@willemb.c.googlers.com.notmuch>
-In-Reply-To: <a932c40e59f648d9d2771f9533cbc01cd4c0935c.1718138187.git.zhuyifei@google.com>
-References: <cover.1718138187.git.zhuyifei@google.com>
- <a932c40e59f648d9d2771f9533cbc01cd4c0935c.1718138187.git.zhuyifei@google.com>
-Subject: Re: [RFC PATCH net-next 1/3] selftests/bpf: Move rxq_num helper from
- xdp_hw_metadata to network_helpers
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1718142913; x=1749678913;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=MPNuboNLzkPHklEZo6KpyfzpLs5e/J3FmAbgdqKG60I=;
+  b=dO50FHMySHXt2tjBtk72KhEpfmXW5zk75ucQgGHatRa2492VPJG8reho
+   lPXIpBKw06oKm9ws46fLkNZHhPft4aTCBUAHf5cL64W0en4Weod3r7/I6
+   FHMAQqK7+b+5bbe8T/uK5rS03qnrzSON1bTCfLt6BU4XVwnr2RKJK01x/
+   k=;
+X-IronPort-AV: E=Sophos;i="6.08,231,1712620800"; 
+   d="scan'208";a="412816594"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2024 21:55:10 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:36657]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.35.14:2525] with esmtp (Farcaster)
+ id b91b42e6-0532-49ed-8263-5b55b9dfc8dc; Tue, 11 Jun 2024 21:55:09 +0000 (UTC)
+X-Farcaster-Flow-ID: b91b42e6-0532-49ed-8263-5b55b9dfc8dc
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Tue, 11 Jun 2024 21:55:08 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.187.171.17) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Tue, 11 Jun 2024 21:55:05 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <ignat@cloudflare.com>
+CC: <davem@davemloft.net>, <dsa@cumulusnetworks.com>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <kernel-team@cloudflare.com>, <kraig@google.com>,
+	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <stable@vger.kernel.org>, <kuniyu@amazon.com>
+Subject: Re: [PATCH] net: do not leave dangling sk pointer in inet_create()/inet6_create()
+Date: Tue, 11 Jun 2024 14:54:57 -0700
+Message-ID: <20240611215457.30251-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240611184716.72113-1-ignat@cloudflare.com>
+References: <20240611184716.72113-1-ignat@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-YiFei Zhu wrote:
-> This helper may be useful for other AF_XDP tests, such as xsk_hw.
-> Moving it out so we don't need to copy-paste that function.
+From: Ignat Korchagin <ignat@cloudflare.com>
+Date: Tue, 11 Jun 2024 19:47:16 +0100
+> It is possible to trigger a use-after-free by:
+>   * attaching an fentry probe to __sock_release() and the probe calling the
+>     bpf_get_socket_cookie() helper
+>   * running traceroute -I 1.1.1.1 on a freshly booted VM
 > 
-> I also changed the function from directly calling error(1, errno, ...)
-> to returning an error because I don't think it makes sense for a
-> library function to outright kill the process if the function fails.
+> A KASAN enabled kernel will log something like below (decoded):
+> [   78.328507][  T299] ==================================================================
+> [ 78.329018][ T299] BUG: KASAN: slab-use-after-free in __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
+> [   78.329366][  T299] Read of size 8 at addr ffff888007110dd8 by task traceroute/299
+> [   78.329366][  T299]
+> [   78.329366][  T299] CPU: 2 PID: 299 Comm: traceroute Tainted: G            E      6.10.0-rc2+ #2
+> [   78.329366][  T299] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+> [   78.329366][  T299] Call Trace:
+> [   78.329366][  T299]  <TASK>
+> [ 78.329366][ T299] dump_stack_lvl (lib/dump_stack.c:117 (discriminator 1))
+> [ 78.329366][ T299] print_report (mm/kasan/report.c:378 mm/kasan/report.c:488)
+> [ 78.329366][ T299] ? __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
+> [ 78.329366][ T299] kasan_report (mm/kasan/report.c:603)
+> [ 78.329366][ T299] ? __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
+> [ 78.329366][ T299] kasan_check_range (mm/kasan/generic.c:183 mm/kasan/generic.c:189)
+> [ 78.329366][ T299] __sock_gen_cookie (./arch/x86/include/asm/atomic64_64.h:15 ./include/linux/atomic/atomic-arch-fallback.h:2583 ./include/linux/atomic/atomic-instrumented.h:1611 net/core/sock_diag.c:29)
+> [ 78.329366][ T299] bpf_get_socket_ptr_cookie (./arch/x86/include/asm/preempt.h:94 ./include/linux/sock_diag.h:42 net/core/filter.c:5094 net/core/filter.c:5092)
+> [ 78.329366][ T299] bpf_prog_875642cf11f1d139___sock_release+0x6e/0x8e
+> [ 78.329366][ T299] bpf_trampoline_6442506592+0x47/0xaf
+> [ 78.329366][ T299] __sock_release (net/socket.c:652)
+> [ 78.329366][ T299] __sock_create (net/socket.c:1601)
+> [ 78.329366][ T299] ? srso_return_thunk (arch/x86/lib/retpoline.S:224)
+> [ 78.329366][ T299] __sys_socket (net/socket.c:1660 net/socket.c:1644 net/socket.c:1706)
+> [ 78.329366][ T299] ? __pfx___sys_socket (net/socket.c:1702)
+> [ 78.329366][ T299] ? srso_return_thunk (arch/x86/lib/retpoline.S:224)
+> [ 78.329366][ T299] ? up_read (./arch/x86/include/asm/atomic64_64.h:79 ./include/linux/atomic/atomic-arch-fallback.h:2749 ./include/linux/atomic/atomic-long.h:184 ./include/linux/atomic/atomic-instrumented.h:3317 kernel/locking/rwsem.c:1347 kernel/locking/rwsem.c:1622)
+> [ 78.329366][ T299] ? srso_return_thunk (arch/x86/lib/retpoline.S:224)
+> [ 78.329366][ T299] ? do_user_addr_fault (arch/x86/mm/fault.c:1419)
+> [ 78.329366][ T299] __x64_sys_socket (net/socket.c:1718)
+> [ 78.329366][ T299] ? srso_return_thunk (arch/x86/lib/retpoline.S:224)
+> [ 78.329366][ T299] do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+> [ 78.329366][ T299] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+> [   78.329366][  T299] RIP: 0033:0x7f4022818ca7
+> [ 78.329366][ T299] Code: 73 01 c3 48 8b 0d 59 71 0c 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 b8 29 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 29 71 0c 00 f7 d8 64 89 01 48
+> All code
+> ========
+>    0:	73 01                	jae    0x3
+>    2:	c3                   	ret
+>    3:	48 8b 0d 59 71 0c 00 	mov    0xc7159(%rip),%rcx        # 0xc7163
+>    a:	f7 d8                	neg    %eax
+>    c:	64 89 01             	mov    %eax,%fs:(%rcx)
+>    f:	48 83 c8 ff          	or     $0xffffffffffffffff,%rax
+>   13:	c3                   	ret
+>   14:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
+>   1b:	00 00 00
+>   1e:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
+>   23:	b8 29 00 00 00       	mov    $0x29,%eax
+>   28:	0f 05                	syscall
+>   2a:*	48 3d 01 f0 ff ff    	cmp    $0xfffffffffffff001,%rax		<-- trapping instruction
+>   30:	73 01                	jae    0x33
+>   32:	c3                   	ret
+>   33:	48 8b 0d 29 71 0c 00 	mov    0xc7129(%rip),%rcx        # 0xc7163
+>   3a:	f7 d8                	neg    %eax
+>   3c:	64 89 01             	mov    %eax,%fs:(%rcx)
+>   3f:	48                   	rex.W
 > 
-> Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+> Code starting with the faulting instruction
+> ===========================================
+>    0:	48 3d 01 f0 ff ff    	cmp    $0xfffffffffffff001,%rax
+>    6:	73 01                	jae    0x9
+>    8:	c3                   	ret
+>    9:	48 8b 0d 29 71 0c 00 	mov    0xc7129(%rip),%rcx        # 0xc7139
+>   10:	f7 d8                	neg    %eax
+>   12:	64 89 01             	mov    %eax,%fs:(%rcx)
+>   15:	48                   	rex.W
+> [   78.329366][  T299] RSP: 002b:00007ffd57e63db8 EFLAGS: 00000246 ORIG_RAX: 0000000000000029
+> [   78.329366][  T299] RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007f4022818ca7
+> [   78.329366][  T299] RDX: 0000000000000001 RSI: 0000000000000002 RDI: 0000000000000002
+> [   78.329366][  T299] RBP: 0000000000000002 R08: 0000000000000000 R09: 0000564be3dc8ec0
+> [   78.329366][  T299] R10: 0c41e8ba3f6107df R11: 0000000000000246 R12: 0000564bbab801e0
+> [   78.329366][  T299] R13: 0000000000000000 R14: 0000564bbab7db18 R15: 00007f4022934020
+> [   78.329366][  T299]  </TASK>
+> [   78.329366][  T299]
+> [   78.329366][  T299] Allocated by task 299 on cpu 2 at 78.328492s:
+> [ 78.329366][ T299] kasan_save_stack (mm/kasan/common.c:48)
+> [ 78.329366][ T299] kasan_save_track (mm/kasan/common.c:68)
+> [ 78.329366][ T299] __kasan_slab_alloc (mm/kasan/common.c:312 mm/kasan/common.c:338)
+> [ 78.329366][ T299] kmem_cache_alloc_noprof (mm/slub.c:3941 mm/slub.c:4000 mm/slub.c:4007)
+> [ 78.329366][ T299] sk_prot_alloc (net/core/sock.c:2075)
+> [ 78.329366][ T299] sk_alloc (net/core/sock.c:2134)
+> [ 78.329366][ T299] inet_create (net/ipv4/af_inet.c:327 net/ipv4/af_inet.c:252)
+> [ 78.329366][ T299] __sock_create (net/socket.c:1572)
+> [ 78.329366][ T299] __sys_socket (net/socket.c:1660 net/socket.c:1644 net/socket.c:1706)
+> [ 78.329366][ T299] __x64_sys_socket (net/socket.c:1718)
+> [ 78.329366][ T299] do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+> [ 78.329366][ T299] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+> [   78.329366][  T299]
+> [   78.329366][  T299] Freed by task 299 on cpu 2 at 78.328502s:
+> [ 78.329366][ T299] kasan_save_stack (mm/kasan/common.c:48)
+> [ 78.329366][ T299] kasan_save_track (mm/kasan/common.c:68)
+> [ 78.329366][ T299] kasan_save_free_info (mm/kasan/generic.c:582)
+> [ 78.329366][ T299] poison_slab_object (mm/kasan/common.c:242)
+> [ 78.329366][ T299] __kasan_slab_free (mm/kasan/common.c:256)
+> [ 78.329366][ T299] kmem_cache_free (mm/slub.c:4437 mm/slub.c:4511)
+> [ 78.329366][ T299] __sk_destruct (net/core/sock.c:2117 net/core/sock.c:2208)
+> [ 78.329366][ T299] inet_create (net/ipv4/af_inet.c:397 net/ipv4/af_inet.c:252)
+> [ 78.329366][ T299] __sock_create (net/socket.c:1572)
+> [ 78.329366][ T299] __sys_socket (net/socket.c:1660 net/socket.c:1644 net/socket.c:1706)
+> [ 78.329366][ T299] __x64_sys_socket (net/socket.c:1718)
+> [ 78.329366][ T299] do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+> [ 78.329366][ T299] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+> [   78.329366][  T299]
+> [   78.329366][  T299] The buggy address belongs to the object at ffff888007110d80
+> [   78.329366][  T299]  which belongs to the cache PING of size 976
+> [   78.329366][  T299] The buggy address is located 88 bytes inside of
+> [   78.329366][  T299]  freed 976-byte region [ffff888007110d80, ffff888007111150)
+> [   78.329366][  T299]
+> [   78.329366][  T299] The buggy address belongs to the physical page:
+> [   78.329366][  T299] page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x7110
+> [   78.329366][  T299] head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+> [   78.329366][  T299] flags: 0x1ffff800000040(head|node=0|zone=1|lastcpupid=0x1ffff)
+> [   78.329366][  T299] page_type: 0xffffefff(slab)
+> [   78.329366][  T299] raw: 001ffff800000040 ffff888002f328c0 dead000000000122 0000000000000000
+> [   78.329366][  T299] raw: 0000000000000000 00000000801c001c 00000001ffffefff 0000000000000000
+> [   78.329366][  T299] head: 001ffff800000040 ffff888002f328c0 dead000000000122 0000000000000000
+> [   78.329366][  T299] head: 0000000000000000 00000000801c001c 00000001ffffefff 0000000000000000
+> [   78.329366][  T299] head: 001ffff800000003 ffffea00001c4401 ffffffffffffffff 0000000000000000
+> [   78.329366][  T299] head: 0000000000000008 0000000000000000 00000000ffffffff 0000000000000000
+> [   78.329366][  T299] page dumped because: kasan: bad access detected
+> [   78.329366][  T299]
+> [   78.329366][  T299] Memory state around the buggy address:
+> [   78.329366][  T299]  ffff888007110c80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> [   78.329366][  T299]  ffff888007110d00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> [   78.329366][  T299] >ffff888007110d80: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> [   78.329366][  T299]                                                     ^
+> [   78.329366][  T299]  ffff888007110e00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> [   78.329366][  T299]  ffff888007110e80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> [   78.329366][  T299] ==================================================================
+> [   78.366431][  T299] Disabling lock debugging due to kernel taint
+> 
+> Fix this by ensuring the error path of inet_create()/inet6_create do not leave
+> a dangling sk pointer after sk was released.
+> 
+> Fixes: 086c653f5862 ("sock: struct proto hash function may error")
+
+I think this tag is wrong as bpf_get_socket_cookie() does not exist at
+that time.
+
+
+> Fixes: 610236587600 ("bpf: Add new cgroup attach type to enable sock modifications")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
 > ---
->  tools/testing/selftests/bpf/network_helpers.c | 27 +++++++++++++++++++
->  tools/testing/selftests/bpf/network_helpers.h |  2 ++
->  tools/testing/selftests/bpf/xdp_hw_metadata.c | 27 ++-----------------
->  3 files changed, 31 insertions(+), 25 deletions(-)
+>  net/ipv4/af_inet.c  | 3 +++
+>  net/ipv6/af_inet6.c | 3 +++
+>  2 files changed, 6 insertions(+)
 > 
-> diff --git a/tools/testing/selftests/bpf/network_helpers.c b/tools/testing/selftests/bpf/network_helpers.c
-> index 35250e6cde7f..4c3bef07df23 100644
-> --- a/tools/testing/selftests/bpf/network_helpers.c
-> +++ b/tools/testing/selftests/bpf/network_helpers.c
-> @@ -569,6 +569,33 @@ int set_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param)
->  	return 0;
->  }
->  
-> +int rxq_num(const char *ifname)
-> +{
-> +	struct ethtool_channels ch = {
-> +		.cmd = ETHTOOL_GCHANNELS,
-> +	};
-> +	struct ifreq ifr = {
-> +		.ifr_data = (void *)&ch,
-> +	};
-> +	strncpy(ifr.ifr_name, ifname, IF_NAMESIZE - 1);
-> +	int fd, ret, err;
+> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+> index b24d74616637..db53701db29e 100644
+> --- a/net/ipv4/af_inet.c
+> +++ b/net/ipv4/af_inet.c
+> @@ -378,6 +378,7 @@ static int inet_create(struct net *net, struct socket *sock, int protocol,
+>  		err = sk->sk_prot->hash(sk);
+>  		if (err) {
+>  			sk_common_release(sk);
+> +			sock->sk = NULL;
+>  			goto out;
+>  		}
+>  	}
 
-Since sending this as RFC, when sending for inclusion let's move the
-strncpy, to not mix declarations and code.
+You can add a new label and call sk_common_release() and set
+NULL to sock->sk there, then reuse it for other two places.
+
+Same for IPv6.
+
+And curious if bpf_get_socket_cookie() can be called any socket
+family to trigger the splat.  e.g. ieee802154_create() seems to
+have the same bug.
+
+If so, how about clearing sock->sk in sk_common_release() ?
+
+---8<---
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 8629f9aecf91..bbc94954d9bf 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3754,6 +3754,9 @@ void sk_common_release(struct sock *sk)
+ 	 * until the last reference will be released.
+ 	 */
+ 
++	if (sk->sk_socket)
++		sk->sk_socket->sk = NULL;
++
+ 	sock_orphan(sk);
+ 
+ 	xfrm_sk_free_policy(sk);
+---8<---
 
