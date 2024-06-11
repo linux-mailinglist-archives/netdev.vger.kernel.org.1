@@ -1,195 +1,134 @@
-Return-Path: <netdev+bounces-102628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EFA090402A
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 17:37:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AE6090402D
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 17:37:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAEC21F24482
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:37:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A7C81C21E84
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:37:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 276593838A;
-	Tue, 11 Jun 2024 15:36:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462AF38FA1;
+	Tue, 11 Jun 2024 15:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="VpU2PriE"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pcPuA6Fp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61ACE36AEC
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 15:36:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B5F38FAD
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 15:36:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718120184; cv=none; b=UOYrcC2pL9xW2LRZasBfzP3J7Vw90pTE3BS1dyTM7sia30kS45T5AyBMJCd5eq15EH7tP29aic1DEQKwSCbIVY2X8jEsiBn2PHLXpLESjsxyRCt4pv+1wIh9CyDLBfY/fmS3QSiU+vWryT6yMzs3pn4UUvh5jS9KrlkgDnn9Q+8=
+	t=1718120200; cv=none; b=YZtshFFPcThtEnFRTXAoOSB5kfifYDPqQGW19Ptn6tRqNpQAFKVnsPkeJCzzg9fg3jS6xNX3siGZR2EMrnEGI/QdNrSeKCyVqJ31XwJrToOa1zbdQUYh2kX/otRwrJnzXc6HWJYJShQrhB33Owpvm1EvRPB55Mtgqaef1qCybvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718120184; c=relaxed/simple;
-	bh=sEvDMhi2LuNyC8HUxfzbzLy5zJ19f9pPX5EayeZseQI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TouTivutC0v6d6/rX9++e2gB60KEX/KXrCedsmBmA5HXmMP1MPRqZISgPjt0uwNZAK9zXMwUG4REVPFsHzu4Qn7WT4WOevq9xFIH6WFs5jlhS+j0ZfgXaz5hzOhh2sCGtmf/dudmx5w3WtXkz+6AuHORW9ndFLb83fLE8bZL8uQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=VpU2PriE; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52bc0236f04so828491e87.3
-        for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 08:36:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google; t=1718120181; x=1718724981; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zYiOKqOztGolPpdiFV4XN2+aPrwTQCSjwVf5L3ie3JA=;
-        b=VpU2PriEzpgMIFyyyzm+bvOy4kdakkYgKJgVXhD2Scn3XjwpDUJIU+3MT5meZ8HDlB
-         ZUzyin6R1YyFa7o4/K4XlHRgRbzy/9NSTv6mCMJQGebgsQLmKQQuaDinTgRfWNl7sZrK
-         c03Sk97VJc1sHHRd0hOS+yHlA+1UGjhjilErE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718120181; x=1718724981;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zYiOKqOztGolPpdiFV4XN2+aPrwTQCSjwVf5L3ie3JA=;
-        b=XzhLwtwhI9Vz/Cg+1zgb0XUfesMjzHLp1RGT0g2iahYH3k4ok3Gsh1LzCd9yvxlGxj
-         jZkSaA3h3+D6tHp5irQD/T/hiNn3PglXt1jqJiHMW3on0tVxQgpUIZ68TyZaKOPaDDyq
-         gb2cm+slzboQJkWfXfI1QhbPEdncpvLGpxCxQCCzClXMGC2xiwt2mFqzifJkfSusU/eH
-         KbNzHrdTHw8mANF8cgvKptfCpOD5yY/LkBYc86AoSLTa461Lt6d+rOz+Get4apR26Di+
-         PaSAzcv8Z3xgX4WoSam4qKgJ1GYnzt3R3PuvWn4mL4XMGzBJxv0C9DmzPpvoGBo2VNdT
-         cgLA==
-X-Forwarded-Encrypted: i=1; AJvYcCU+fAVDrWSvzmnjsUVNItqoOxo9LONPa+3bvhuUdZdQjQkbXHfLekocAOE6pk+NZIDjAAJeWwi9wSf34dHD6yue6g8gOHOD
-X-Gm-Message-State: AOJu0Yxs11I3GymfaoETBZDNDIAgmHZsHy95HT/Wcet/OcM9nr4erIRc
-	jKAgAzuVnIi+r8MHuPXvHlE9OZFaZyOI4gsfygzbZ1Cz+S0Cgh4MbIDivuJclgM=
-X-Google-Smtp-Source: AGHT+IEqvd8t7yV4Y08H9toKdWjldXNuJHx8xMhVZIiBly5rz0ehyy1t+vkdmGULc+LniJtZqK7xKQ==
-X-Received: by 2002:a19:9107:0:b0:52b:c06d:70cf with SMTP id 2adb3069b0e04-52bc06d7164mr5715253e87.4.1718120180437;
-        Tue, 11 Jun 2024 08:36:20 -0700 (PDT)
-Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42274379b83sm10409345e9.28.2024.06.11.08.36.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jun 2024 08:36:19 -0700 (PDT)
-Date: Tue, 11 Jun 2024 17:36:17 +0200
-From: Daniel Vetter <daniel@ffwll.ch>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Dan Williams <dan.j.williams@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, linux-doc@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
-	Leonid Bloch <lbloch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
-	patches@lists.linux.dev
-Subject: Re: [PATCH 0/8] Introduce fwctl subystem
-Message-ID: <Zmhu8egti-URPFoB@phenom.ffwll.local>
-References: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
- <20240603114250.5325279c@kernel.org>
- <214d7d82-0916-4c29-9012-04590e77df73@kernel.org>
- <20240604070451.79cfb280@kernel.org>
- <665fa9c9e69de_4a4e62941e@dwillia2-xfh.jf.intel.com.notmuch>
- <20240605135911.GT19897@nvidia.com>
+	s=arc-20240116; t=1718120200; c=relaxed/simple;
+	bh=r57qrLhmwHMKnHrFKmWypm9nE6+c8sNnIXim4c8y74s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kT5TIDOym3GydS5ugPPq1gSsyAN/J2kHkZunmTEDgDAJJGGSXGGhQ0TOV1xkY4tUHjfbZRxPGB/zDpvcDDv+Oc3dhOFwSH+7wgqsHx0Sn3HeZycq/djwmWJYozu5u6TNU6MKNDSLyEPmUBVuC9tuSvj8y0wUJj7UITEn3zHCj4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pcPuA6Fp; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: andrew@lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1718120196;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CDf/Var0If69rFPJqIDSKQIuhIfmeNAqiQ/6ESKmNKs=;
+	b=pcPuA6FptuahJYYDigDXzfvPCr9O1DORzHlUYC4NlO5Oie8SCuI7zLrkehHQs6qOGO0tuj
+	M+ht37ApsnW65T4u6kNmUAEV6yrjciG6KskOq39MuD+Loq5n8kgJ3i/YFWZiSq/6i3xPkl
+	STUEy3q1USjAcA/DBpzO/x+hUKG72Hw=
+X-Envelope-To: radhey.shyam.pandey@amd.com
+X-Envelope-To: netdev@vger.kernel.org
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: michal.simek@amd.com
+X-Envelope-To: kuba@kernel.org
+X-Envelope-To: linux@armlinux.org.uk
+X-Envelope-To: pabeni@redhat.com
+X-Envelope-To: edumazet@google.com
+X-Envelope-To: linux-kernel@vger.kernel.org
+X-Envelope-To: davem@davemloft.net
+Message-ID: <4d3871c1-afa1-4402-ad62-2fdb9d58dc3c@linux.dev>
+Date: Tue, 11 Jun 2024 11:36:31 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240605135911.GT19897@nvidia.com>
-X-Operating-System: Linux phenom 6.8.9-amd64 
+Subject: Re: [PATCH net-next 3/3] net: xilinx: axienet: Add statistics support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Michal Simek <michal.simek@amd.com>, Jakub Kicinski <kuba@kernel.org>,
+ Russell King <linux@armlinux.org.uk>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org,
+ "David S . Miller" <davem@davemloft.net>
+References: <20240610231022.2460953-1-sean.anderson@linux.dev>
+ <20240610231022.2460953-4-sean.anderson@linux.dev>
+ <40cff9a6-bad3-4f85-8cbc-6d4bc72f9b9f@lunn.ch>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <40cff9a6-bad3-4f85-8cbc-6d4bc72f9b9f@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jun 05, 2024 at 10:59:11AM -0300, Jason Gunthorpe wrote:
-> On Tue, Jun 04, 2024 at 04:56:57PM -0700, Dan Williams wrote:
-> > * Introspection / validation: Subsystem community needs to be able to
-> >   audit behavior after the fact.
-> > 
-> >   To me this means even if the kernel is letting a command through based
-> >   on the stated Command Effect of "Configuration Change after Cold Reset"
-> >   upstream community has a need to be able to read the vendor
-> >   specification for that command. I.e. commands might be vendor-specific,
-> >   but never vendor-private. I see this as similar to the requirement for
-> >   open source userspace for sophisticated accelerators.
+On 6/10/24 20:26, Andrew Lunn wrote:
+>> +static u64 axienet_stat(struct axienet_local *lp, enum temac_stat stat)
+>> +{
+>> +	return u64_stats_read(&lp->hw_stats[stat]);
+>> +}
+>> @@ -1695,6 +1760,35 @@ axienet_get_stats64(struct net_device *dev, struct rtnl_link_stats64 *stats)
+>>  		stats->tx_packets = u64_stats_read(&lp->tx_packets);
+>>  		stats->tx_bytes = u64_stats_read(&lp->tx_bytes);
+>>  	} while (u64_stats_fetch_retry(&lp->tx_stat_sync, start));
+>> +
+>> +	if (!(lp->features & XAE_FEATURE_STATS))
+>> +		return;
+>> +
+>> +	do {
+>> +		start = u64_stats_fetch_begin(&lp->hw_stat_sync);
+>> +		stats->rx_length_errors =
+>> +			axienet_stat(lp, STAT_RX_LENGTH_ERRORS);
 > 
-> I'm less hard on this. As long as reasonable open userspace exists I
-> think it is fine to let other stuff through too. I can appreciate the
-> DRM stance on this, but IMHO, there is meaningfully more value for open
-> source in trying get an open Vulkan implementation vs blocking users
-> from reading their vendor'd diagnostic SI values.
-> 
-> I don't think we should get into some kind of extremism and insist
-> that every single bit must be documented/standardized or Linux won't
-> support it.
+> I'm i reading this correctly. You are returning the counters from the
+> last refresh period. What is that? 2.5Gbps would wrapper around a 32
+> byte counter in 13 seconds. I hope these statistics are not 13 seconds
+> out of date?
 
-I figured it might be useful to paint what we do in DRM with a bit more
-nuance. In the principles, we're indeed fairly radical in what we require,
-but in practice we aim for a much more pragmatic approach in what we
-merge. There's two major axis here:
+By default we use a 1 Hz refresh period. You can of course configure this
+up to 13 seconds, but we refuse to raise it further since we risk missing
+a wrap-around. It's configurable by userspace so they can determine how
+out-of-date they like their stats (vs how often they want to wake up the
+CPU).
 
-1. One is ecosystem maturity. One end is 3d, with vulkan as the clear
-industry standard, and an upstream full-featured userspace driver in
-mesa3d is the only technically reasonable choice. And all gpu vendors
-agree and by this year even nvidia started hiring an upstream team. But
-this didn't happen magically overnight, it took 1-2 decades of background
-discussions and tactical push&pulling to get there.
+> Since axienet_stats_update() also uses the lp->hw_stat_sync, i don't
+> see why you cannot read the hardware counter value and update to the
+> latest value.
 
-The other end is currently AI accelerators. It's a complete mess, where
-across the platform (client, edge, cloud), customer and vendor dimension
-every point has a different stack. And the problem is so obvious that
-everyone is working to fix this, which means currently
-https://xkcd.com/927/ is happening in parallel. Just to get things going
-we're accepting pretty much anything that's a notch above total garbage
-for userspace and for merging into the kernel.
+We would need to synchronize against updates to hw_last_counter. Imagine
+a scenario like
 
-2. The other part is how much it impacts applications. If you can't run
-the same application across different vendors, the case for an upstream
-stack becomes a lot weaker. At the other end is infrastructure enabling
-like device configuration, error handling and recovery, hw debugging and
-reliablity/health reporting. That's a lot more vendor specific in nature
-and needs to be customized anyway per deployement. And only much higher in
-the stack, maybe in k8s, can a technically reasonable unification even
-happen.  So again we're much more lenient about infrastructure enabling
-and uapi than stuff applications will use directly.
+CPU 1					CPU 2
+__axienet_device_reset()
+	axienet_stats_update()
+					axienet_stat()
+						u64_stats_read()
+						axienet_ior()
+	/* device reset */
+	hw_last_counter = 0
+						stats->foo = ... - hw_last_counter[...]
 
-Currently that's enough of a mess in drm that I feel like enforcing
-something like fwctl is still too much. But maybe once fwctl is
-established with other subsystems/devices we can start the conversations
-with vendors to get this going a few years down the road.
+and now we have a glitch in the counter values, since we effectively are
+double-counting the current counter value. Alternatively, we could read
+the counter after reset but before hw_last_counter was updated and get a
+glitch due to underflow.
 
-Both together mean we land a lot of code that's questionable at best,
-clear garbage at worst. But since we've been in the merging garbage
-business just to get things going for decades, we've become pretty good at
-dealing with the kernel internal and uapi fallout, some say too good. But
-personally I don't think there's a path to where we are with 3d/vulkan
-that doesn't go through years of this kind of suck, and very much merged
-into upstream kind of suck.
-
-For all the concerns about trusting vendors/devices to not abuse very broad
-uapi interfaces: Modern accelerator command submission boils down to "run
-this context at this $addr", and the kernel never ever directly sees
-anything more fly by. That's the same interface you need for a no-op job
-as a full blown AI workload, so in theory maximal abuse potential.
-
-In practice, it doesn't seem to be an issue, at least not beyond the
-intentionally pragmatic choices where we merge kernel code with known
-sub-par/incomplete userspace. I'm not sure why, but to my knowledge all
-attempts to break the spirit of our userspace rules while following the
-letter die in vendor-internal discussions, at least for all the
-established upstream driver teams.
-
-And for new ones it takes years of private chats to get them going and
-fully established in upstream anyway.
-
-Maybe one reason we have a bit an extremist reputation is that all the
-public takes are the radical principled requirements, while the actual
-pragmatic discussions mostly happen in private.
-
-tldr; fwctl as I understand it feels like a bridge to far for drm today,
-but I'd very much like someone else to make this happen so we could
-eventually push towards adoption too.
-
-Cheers, Sima
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+--Sean
 
