@@ -1,123 +1,138 @@
-Return-Path: <netdev+bounces-102538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A19F903A77
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:38:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51CE8903A94
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:41:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 262E51C23DAE
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 11:38:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF629B229F8
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 11:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C04E17C9FE;
-	Tue, 11 Jun 2024 11:36:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7887117B4FA;
+	Tue, 11 Jun 2024 11:40:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F51E17C7D3;
-	Tue, 11 Jun 2024 11:36:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE59176222;
+	Tue, 11 Jun 2024 11:40:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718105763; cv=none; b=Nj/f8sxN4odXUGZvxbvLO09lV3Mnp592qt8Ikyk9Neb2IG4aS9igUl7YC+NcL0ZNxPKDBTDEdvqaRJK2XJ6BAf31RO7YWr1xgRbB6KQ4sOmWugarPyLb/xtG6EqCHs1M1PO6GxGCcl6cskty2xXKFhbiwBNNj+xHAnloB9FlncM=
+	t=1718106049; cv=none; b=uktYCnz65evCEUlBFVkrxvpS6myvDNZj01JTwA6wmrWaXJRoyj0AgVQpn1sJ2mkjn0ucPDPVoiT7YZWe+Igc1EiXzY3beyuF6W02/FacoGcx7lTPts87lkk99KgSpYgop9kKopt7ZRBzwO1zPfmBOKz40+45RTJCL9sIfqTcBrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718105763; c=relaxed/simple;
-	bh=X+Vr5x7b/jaeilN4C9JCZliYRRivqC4zJPAs6RBXedg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=dwVpnIOGa6LjvhUzHk1Fl2t1FfFg9Iu8y0Lzw3qF/h1SIgs2LKimsDiXM4lgzTLY/qN+dQdOLPtfO22qjBbK0qJ11atEsgK4afFURVbkLGBWsZSmWczb4qAqTOyCIs79355tn9VFeps7vKYLgR3/wQxrGDxXyXnSlYwl9urb5p4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Vz63H1gk6zPqgD;
-	Tue, 11 Jun 2024 19:32:27 +0800 (CST)
-Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3EDDE18006C;
-	Tue, 11 Jun 2024 19:35:51 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 11 Jun 2024 19:35:46 +0800
-Message-ID: <00f459b5-8aac-4312-8327-fa2bb4964ba6@huawei-partners.com>
-Date: Tue, 11 Jun 2024 14:35:41 +0300
+	s=arc-20240116; t=1718106049; c=relaxed/simple;
+	bh=F6aNZ82jzGo7qYFC7MrfPogbayEkCaiexBmsAELEUC0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OY0RyJ/jKb9HbDZ+b7TU+/2HaR7Wzivx7aOtIHd9nu4dVGa58bboV8jFhVftQ4Rj/RYxU/2oVtNeWgbub40Yjnelznk49tNMooTe2+hlaxhHd3TFik0AeQsMAhCWDA0GU3o4PiE8GG9tCWvQUWdEilMOCgsVk6eaGtMHAd43nkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=194.37.255.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
+Received: from [127.0.0.1] (helo=localhost)
+	by relay.expurgate.net with smtp (Exim 4.92)
+	(envelope-from <prvs=9906f4c1d5=ms@dev.tdt.de>)
+	id 1sGzrp-00EEyR-2L; Tue, 11 Jun 2024 13:40:45 +0200
+Received: from [195.243.126.94] (helo=securemail.tdt.de)
+	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ms@dev.tdt.de>)
+	id 1sGzro-0026E0-HT; Tue, 11 Jun 2024 13:40:44 +0200
+Received: from securemail.tdt.de (localhost [127.0.0.1])
+	by securemail.tdt.de (Postfix) with ESMTP id 3F6CB240053;
+	Tue, 11 Jun 2024 13:40:44 +0200 (CEST)
+Received: from mail.dev.tdt.de (unknown [10.2.4.42])
+	by securemail.tdt.de (Postfix) with ESMTP id C2EE7240050;
+	Tue, 11 Jun 2024 13:40:43 +0200 (CEST)
+Received: from mschiller1.dev.tdt.de (unknown [10.2.3.20])
+	by mail.dev.tdt.de (Postfix) with ESMTPSA id 823DA29768;
+	Tue, 11 Jun 2024 13:40:43 +0200 (CEST)
+From: Martin Schiller <ms@dev.tdt.de>
+To: martin.blumenstingl@googlemail.com,
+	hauke@hauke-m.de,
+	andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ms@dev.tdt.de
+Subject: [PATCH net-next v4 00/13] net: dsa: lantiq_gswip: code improvements
+Date: Tue, 11 Jun 2024 13:40:14 +0200
+Message-ID: <20240611114027.3136405-1-ms@dev.tdt.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 00/12] Socket type control for Landlock
-Content-Language: ru
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
-CC: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack3000@gmail.com>, <mic@digikod.net>,
-	<willemdebruijn.kernel@gmail.com>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>, Tahera Fahimi <fahimitahera@gmail.com>
-References: <20240524093015.2402952-1-ivanov.mikhail1@huawei-partners.com>
- <20240604.c18387da7a0e@gnoack.org>
- <ebd680cc-25d6-ee14-4856-310f5e5e28e4@huawei-partners.com>
- <ZmazTKVNlsH3crwP@google.com>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <ZmazTKVNlsH3crwP@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml500001.china.huawei.com (7.191.163.213) To
- dggpemm500020.china.huawei.com (7.185.36.49)
+Content-Transfer-Encoding: quoted-printable
+X-purgate-ID: 151534::1718106045-2DD88746-4E7E3647/0/0
+X-purgate: clean
+X-purgate-type: clean
 
-6/10/2024 11:03 AM, Günther Noack wrote:
-> On Thu, Jun 06, 2024 at 02:44:23PM +0300, Mikhail Ivanov wrote:
->> 6/4/2024 11:22 PM, Günther Noack wrote:
->> I figured out that I define LANDLOCK_SHIFT_ACCESS_SOCKET macro in
->> really strange way (see landlock/limits.h):
->>
->>    #define LANDLOCK_SHIFT_ACCESS_SOCKET	LANDLOCK_NUM_ACCESS_SOCKET
->>
->> With this definition, socket access mask overlaps the fs access
->> mask in ruleset->access_masks[layer_level]. That's why
->> landlock_get_fs_access_mask() returns non-zero mask in hook_file_open().
->>
->> So, the macro must be defined in this way:
->>
->>    #define LANDLOCK_SHIFT_ACCESS_SOCKET	(LANDLOCK_NUM_ACCESS_NET +
->>                                           LANDLOCK_NUM_ACCESS_FS)
->>
->> With this fix, open() doesn't fail in your example.
->>
->> I'm really sorry that I somehow made such a stupid typo. I will try my
->> best to make sure this doesn't happen again.
-> 
-> I found that we had the exact same bug with a wrongly defined "SHIFT" value in
-> [1].
-> 
-> Maybe we should define access_masks_t as a bit-field rather than doing the
-> bit-shifts by hand.  Then the compiler would keep track of the bit-offsets
-> automatically.
-> 
-> Bit-fields have a bad reputation, but in my understanding, this is largely
-> because they make it hard to control the exact bit-by-bit layout.  In our case,
-> we do not need such an exact control though, and it would be fine.
-> 
-> To quote Linus Torvalds on [2],
-> 
->    Bitfields are fine if you don't actually care about the underlying format,
->    and want gcc to just randomly assign bits, and want things to be
->    convenient in that situation.
-> 
-> Let me send you a proposal patch which replaces access_masks_t with a bit-field
-> and removes the need for the "SHIFT" definition, which we already got wrong in
-> two patch sets now.  It has the additional benefit of making the code a bit
-> shorter and also removing a few static_assert()s which are now guaranteed by the
-> compiler.
-> 
-> —Günther
-> 
-> [1] https://lore.kernel.org/all/ZmLEoBfHyUR3nKAV@google.com/
-> [2] https://yarchive.net/comp/linux/bitfields.html
 
-Thank you, Günther! It really looks more clear.
+This patchset for the lantiq_gswip driver is a collection of minor fixes
+and coding improvements by Martin Blumenstingl without any real changes
+in the actual functionality.
 
-This patch should be applied to Landlock separately, right?
+=3D=3D=3D Changelog =3D=3D=3D
+From v3:
+- convert lantiq,gswip bindings to YAML schema
+- Add Hauke's acked-by as mentioned in the cover letter in v1
+
+From v2:
+- removed unused variable max_ports in gswip_add_single_port_br()
+
+From v1:
+- signal that we only update example code in dt-bindings
+- don't use the word 'fix' if not appropriate
+- new patch: add terminating '\n' where missing
+- renamed MAC_BRIDGE macros to make it obvious which register field is
+  used
+- new patch: remove dead code from gswip_add_single_port_br()
+- updated error message if FID not found in gswip_port_fdb()
+
+Martin Blumenstingl (9):
+  dt-bindings: net: dsa: lantiq,gswip: Add missing CPU port phy-mode and
+    fixed-link to example
+  net: dsa: lantiq_gswip: Only allow phy-mode =3D "internal" on the CPU
+    port
+  net: dsa: lantiq_gswip: Use dev_err_probe where appropriate
+  net: dsa: lantiq_gswip: Don't manually call gswip_port_enable()
+  net: dsa: lantiq_gswip: Use dsa_is_cpu_port() in
+    gswip_port_change_mtu()
+  net: dsa: lantiq_gswip: Change literal 6 to ETH_ALEN
+  net: dsa: lantiq_gswip: Consistently use macros for the mac bridge
+    table
+  net: dsa: lantiq_gswip: Update comments in gswip_port_vlan_filtering()
+  net: dsa: lantiq_gswip: Improve error message in gswip_port_fdb()
+
+Martin Schiller (4):
+  dt-bindings: net: dsa: lantiq,gswip: convert to YAML schema
+  net: dsa: lantiq_gswip: add terminating \n where missing
+  net: dsa: lantiq_gswip: do also enable or disable cpu port
+  net: dsa: lantiq_gswip: Remove dead code from
+    gswip_add_single_port_br()
+
+ .../bindings/net/dsa/lantiq,gswip.yaml        | 201 ++++++++++++++++++
+ .../bindings/net/dsa/lantiq-gswip.txt         | 146 -------------
+ MAINTAINERS                                   |   1 +
+ drivers/net/dsa/lantiq_gswip.c                | 123 +++++------
+ 4 files changed, 257 insertions(+), 214 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/lantiq,gswi=
+p.yaml
+ delete mode 100644 Documentation/devicetree/bindings/net/dsa/lantiq-gswi=
+p.txt
+
+--=20
+2.39.2
+
 
