@@ -1,217 +1,117 @@
-Return-Path: <netdev+bounces-102610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCD59903E56
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 16:04:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1E2903E8F
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 16:21:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9D141C233E6
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 14:04:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DAA71C22084
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 14:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E106D17D37B;
-	Tue, 11 Jun 2024 14:04:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 347C317C7DA;
+	Tue, 11 Jun 2024 14:21:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jLOfO/Hl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="deiSql5b"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3952317C7BE
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 14:04:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A3EAD2C;
+	Tue, 11 Jun 2024 14:21:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718114680; cv=none; b=j/1LwJy3Er/KTMRPxMY0Lsc8PBdlE0GSY6fXdV/h+VnqHB4sZymhRcP39D6nTTwWsGrwhSVPc6SSAYTJPEAqdq/MC8/FA1r1NPQCwY1aHgbx9vI6gbo+KW4RbadaynVqMCqSZuVMYRAHic/LrnFCyPuA4irbk6wU6Q/62CSL+KA=
+	t=1718115670; cv=none; b=qx4KEemrT4k2kiYM/RypWyzQytCYmnD1IF2JE/24rVV03N9rgogWp0af4YZAGVnNahqh7VvjhcWd/ePKF3hi6ZO8eoHFxwMY9GHlnq+JBUKfS4lPaxjEppgFP11yjiEM4+zMk8xnoLLCJ8wAdB9DGu+p44AjPuRKet95IX1V4AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718114680; c=relaxed/simple;
-	bh=trGiPJjAG5Lg9A+UiUTAr6m2HCDMuWyJu8Xi/VJCwmY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=VgDNmtoPnH1vHspBju2+GTRcxCU4ASYMYmxjAehmw7lt+YPUdVnz5UZUOlD3fPbFmKYuJzWcV49Y/2HpM5CWHUKQ6xZ72Wj6dCiy8Q7xF4kUBaS14wKYHun3NXlb2OYrR+6u0+LEHAimksudqynmBhvii3NsbS8f6bjdrFVB0pQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jLOfO/Hl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718114678;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cAPflhf5z7yrHuZp8DNchU9pFtrCYnF+364utpEHSM8=;
-	b=jLOfO/HlmgO++2GHzjn+sRp8FQyk8wg4w4+8wsrghbOet4zW1jwtUlaNvsUY4gPCz5FD4u
-	sLLzy0gcEum+Q4/Tfif5DRH8TaQh/xVeL8wmHZ0RxXPOsP9F2mddkjJbjviiQmuALvtng7
-	3mK02XEb7CnpL/aC/+Kwla+vecTJEZg=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-610-HJAMWWwDOJS9XCUUIumP0Q-1; Tue,
- 11 Jun 2024 10:04:34 -0400
-X-MC-Unique: HJAMWWwDOJS9XCUUIumP0Q-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AE43E1955D82;
-	Tue, 11 Jun 2024 14:04:23 +0000 (UTC)
-Received: from RHTRH0061144 (dhcp-17-72.bos.redhat.com [10.18.17.72])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7BC9A1955E80;
-	Tue, 11 Jun 2024 14:04:16 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: =?utf-8?Q?Adri=C3=A1n?= Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org,  Pravin B Shelar <pshelar@ovn.org>,  "David S.
- Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Shuah Khan
- <shuah@kernel.org>,  dev@openvswitch.org,
-  linux-kselftest@vger.kernel.org,  linux-kernel@vger.kernel.org,  Simon
- Horman <horms@verge.net.au>
-Subject: Re: [PATCH net-next 1/2] selftests: openvswitch: fix action formatting
-In-Reply-To: <CAG=2xmNU4i5LwrfaSBNKODyOaR0OqVdxX3B5xhkrkNQX2v=S3Q@mail.gmail.com>
-	(=?utf-8?Q?=22Adri=C3=A1n?= Moreno"'s message of "Thu, 6 Jun 2024 09:05:01
- +0000")
-References: <20240603183121.2305013-1-amorenoz@redhat.com>
-	<f7ta5k126oc.fsf@redhat.com>
-	<CAG=2xmNU4i5LwrfaSBNKODyOaR0OqVdxX3B5xhkrkNQX2v=S3Q@mail.gmail.com>
-Date: Tue, 11 Jun 2024 10:04:14 -0400
-Message-ID: <f7tsexjpodd.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1718115670; c=relaxed/simple;
+	bh=h0cT46XFD18L3fdBOg889TlsdB4P2eXmaz/sVkaitBM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ms1FRHOurQRExHbeVLXh5cqT5IppwErFYrOfzxCMbj0BuB6qGspzD+jRix796w/jlCYnmx/y5iPms3bNIdx8VytNiAN1X2qvN8ND7ZXgyD6pYpfZiwXE2//M+QqxqsMUOa7rIxDM3g8z43SwVoW7vqkPUJd5AI3ir7liG7M+zf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=deiSql5b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB24CC32789;
+	Tue, 11 Jun 2024 14:21:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718115669;
+	bh=h0cT46XFD18L3fdBOg889TlsdB4P2eXmaz/sVkaitBM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=deiSql5bv/XD/n1Yvnliyt4y77RO7CctzLCs4B1aBReuTPEqwWdhpQrPuK4RlOoDt
+	 e/mj3nTok9jLhkjhi8rs8O7ZgvtTcusiDzzHruTJOJUZq3BfcmEP7ie+XDmZ4U3c/r
+	 LkHkQ2aXPUQbuFwmlzDR6ZfnExBTUfj95G/nBA5q8+wMRzerRMXgylsR2qoK3LDuJP
+	 pGnzs/fGhV4E8gcUhrDfxXkNVtC79Y7ZX5XLzc9hiMKO5vmzO9ArqOIpxnJ+ra5myn
+	 Wy3fOgW1LLxgt1s+9g0iZgaVUVkOo1TjUejqmKsOs2+PnKbyuyDeatyXqar/JOw3PJ
+	 xUnbjl/FXl9BA==
+Date: Tue, 11 Jun 2024 07:21:07 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com,
+ anjali.singhai@intel.com, namrata.limaye@intel.com, tom@sipanda.io,
+ mleitner@redhat.com, Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com,
+ jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, vladbu@nvidia.com,
+ horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, victor@mojatatu.com,
+ pctammela@mojatatu.com, Vipin.Jain@amd.com, dan.daly@intel.com,
+ andy.fingerhut@gmail.com, chris.sommers@keysight.com, mattyk@nvidia.com,
+ bpf@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH net-next v16  00/15] Introducing P4TC (series 1)
+Message-ID: <20240611072107.5a4d4594@kernel.org>
+In-Reply-To: <20240410140141.495384-1-jhs@mojatatu.com>
+References: <20240410140141.495384-1-jhs@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Adri=C3=A1n Moreno <amorenoz@redhat.com> writes:
+Since the inevitable LWN article has been written, let me put more
+detail into what I already mentioned here:
 
-> On Mon, Jun 03, 2024 at 03:00:03PM GMT, Aaron Conole wrote:
->> Adrian Moreno <amorenoz@redhat.com> writes:
->>
->> > In the action formatting function ("dpstr"), the iteration is made over
->> > the nla_map, so if there are more than one attribute from the same type
->> > we only print the first one.
->> >
->> > Fix this by iterating over the actual attributes.
->> >
->> > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
->> > ---
->> >  .../selftests/net/openvswitch/ovs-dpctl.py    | 48 +++++++++++--------
->> >  1 file changed, 27 insertions(+), 21 deletions(-)
->> >
->> > diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/to=
-ols/testing/selftests/net/openvswitch/ovs-dpctl.py
->> > index 1dd057afd3fb..b76907ac0092 100644
->> > --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
->> > +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
->> > @@ -437,40 +437,46 @@ class ovsactions(nla):
->> >      def dpstr(self, more=3DFalse):
->> >          print_str =3D ""
->> >
->> > -        for field in self.nla_map:
->> > -            if field[1] =3D=3D "none" or self.get_attr(field[0]) is N=
-one:
->> > +        for attr_name, value in self["attrs"]:
->> > +            attr_desc =3D next(filter(lambda x: x[0] =3D=3D attr_name=
-, self.nla_map),
->> > +                             None)
->> > +            if not attr_desc:
->> > +                raise ValueError("Unknown attribute: %s" % attr)
->> > +
->> > +            attr_type =3D attr_desc[1]
->> > +
->> > +            if attr_type =3D=3D "none":
->>
->> I agree, this is an issue.  BUT I think it might be better to just
->> filter by field type up front.  See:
->>
->> https://github.com/apconole/linux-next-work/commit/7262107de7170d44b6dbf=
-6c5ea6f7e6c0bb71d36#diff-3e72e7405c6bb4e9842bed5f63883ca930387086bb40d4034e=
-92ed83a5decb4bR441
->>
->> That version I think ends up being much easier to follow.  If you want
->> to take it for your series, feel free.  If you disagree, maybe there's
->> something I'm not considering about it.
->>
->
-> I agree. It's better to check field attribute names first. I found this
-> during manual testing of the "emit_sample" series but I ended up not
-> needing it for the automated one, so I'm OK waiting for your cleanup
-> series.
+https://lore.kernel.org/all/20240301090020.7c9ebc1d@kernel.org/
 
-I'll get stuff out this week for it.
+for the benefit of non-networking people.
 
-> In fact, I also have some patches that try some rework of this part. In
-> particular, I tried to unify all attributes under a common base class
-> that would handle printing and parsing. That way, most cases would fall
-> into "print_str +=3D datum.dpstr(more)" and the "if/elif" block would
-> shrink significantly.
+On Wed, 10 Apr 2024 10:01:26 -0400 Jamal Hadi Salim wrote:
+> P4TC builds on top of many years of Linux TC experiences of a netlink
+> control path interface coupled with a software datapath with an equivalent
+> offloadable hardware datapath.
 
-That sounds very good.
+The point of having SW datapath is to provide a blueprint for the
+behavior. This is completely moot for P4 which comes as a standard.
 
->> NOTE that version is just a bunch of independent changes that are
->> squashed together.  I have a cleaner version.
->>
->> I can also bundle up the series I have so far and submit, but I didn't
->> want to do that until I got all the pmtu.sh support working.  Maybe it
->> makes sense to send it now though.  Simon, Jakub - wdyt?
->>
->> >                  continue
->> >              if print_str !=3D "":
->> >                  print_str +=3D ","
->> >
->> > -            if field[1] =3D=3D "uint32":
->> > -                if field[0] =3D=3D "OVS_ACTION_ATTR_OUTPUT":
->> > -                    print_str +=3D "%d" % int(self.get_attr(field[0]))
->> > -                elif field[0] =3D=3D "OVS_ACTION_ATTR_RECIRC":
->> > -                    print_str +=3D "recirc(0x%x)" % int(self.get_attr=
-(field[0]))
->> > -                elif field[0] =3D=3D "OVS_ACTION_ATTR_TRUNC":
->> > -                    print_str +=3D "trunc(%d)" % int(self.get_attr(fi=
-eld[0]))
->> > -                elif field[0] =3D=3D "OVS_ACTION_ATTR_DROP":
->> > -                    print_str +=3D "drop(%d)" % int(self.get_attr(fie=
-ld[0]))
->> > -            elif field[1] =3D=3D "flag":
->> > -                if field[0] =3D=3D "OVS_ACTION_ATTR_CT_CLEAR":
->> > +            if attr_type =3D=3D "uint32":
->> > +                if attr_name =3D=3D "OVS_ACTION_ATTR_OUTPUT":
->> > +                    print_str +=3D "%d" % int(value)
->> > +                elif attr_name =3D=3D "OVS_ACTION_ATTR_RECIRC":
->> > +                    print_str +=3D "recirc(0x%x)" % int(value)
->> > +                elif attr_name =3D=3D "OVS_ACTION_ATTR_TRUNC":
->> > +                    print_str +=3D "trunc(%d)" % int(value)
->> > +                elif attr_name =3D=3D "OVS_ACTION_ATTR_DROP":
->> > +                    print_str +=3D "drop(%d)" % int(value)
->> > +            elif attr_type =3D=3D "flag":
->> > +                if attr_name =3D=3D "OVS_ACTION_ATTR_CT_CLEAR":
->> >                      print_str +=3D "ct_clear"
->> > -                elif field[0] =3D=3D "OVS_ACTION_ATTR_POP_VLAN":
->> > +                elif attr_name =3D=3D "OVS_ACTION_ATTR_POP_VLAN":
->> >                      print_str +=3D "pop_vlan"
->> > -                elif field[0] =3D=3D "OVS_ACTION_ATTR_POP_ETH":
->> > +                elif attr_name =3D=3D "OVS_ACTION_ATTR_POP_ETH":
->> >                      print_str +=3D "pop_eth"
->> > -                elif field[0] =3D=3D "OVS_ACTION_ATTR_POP_NSH":
->> > +                elif attr_name =3D=3D "OVS_ACTION_ATTR_POP_NSH":
->> >                      print_str +=3D "pop_nsh"
->> > -                elif field[0] =3D=3D "OVS_ACTION_ATTR_POP_MPLS":
->> > +                elif attr_name =3D=3D "OVS_ACTION_ATTR_POP_MPLS":
->> >                      print_str +=3D "pop_mpls"
->> >              else:
->> > -                datum =3D self.get_attr(field[0])
->> > -                if field[0] =3D=3D "OVS_ACTION_ATTR_CLONE":
->> > +                if attr_name =3D=3D "OVS_ACTION_ATTR_CLONE":
->> >                      print_str +=3D "clone("
->> > -                    print_str +=3D datum.dpstr(more)
->> > +                    print_str +=3D value.dpstr(more)
->> >                      print_str +=3D ")"
->> >                  else:
->> > -                    print_str +=3D datum.dpstr(more)
->> > +                    print_str +=3D value.dpstr(more)
->> >
->> >          return print_str
->>
+Besides we already have 5 (or more) flow offloads, we don't need
+a 6th, completely disconnected from the existing ones. Leaving
+users guessing which one to use, and how they interact.
 
+In my opinion, reasonable way to implement programmable parser for
+Linux is:
+
+ 1. User writes their parser in whatever DSL they want
+ 2. User compiles the parser in user space
+   2.1 Compiler embeds a representation of the graph in the blob
+ 3. User puts the blob in /lib/firmware
+ 4. devlink dev $dev reload action parser-fetch $filename
+ 5. devlink loads the file, parses it to extract the representation
+    from 2.1, and passes the blob to the driver
+   5.1 driver/fw reinitializes the HW parser
+   5.2 user can inspect the graph by dumping the common representation
+       from 2.1 (via something like devlink dpipe, perhaps)
+ 6. The parser tables are annotated with Linux offload targets (routes,
+    classic ntuple, nftables, flower etc.) with some tables being left
+    as "raw"* (* better name would be great)
+ 7. ethtool ntuple is extended to support insertion of arbitrary rules
+    into the "raw" tables
+ 8. The other tables can only be inserted into using the subsystem they
+    are annotated for
+
+This builds on how some devices _already_ operate. Gives the benefits
+of expressing parser information and ability to insert rules for
+uncommon protocols also for devices which are not programmable.
+And it uses ethtool ntuple, which SW people actually want to use.
+
+Before the tin foil hats gather - we have no use for any of this at
+Meta, I'm not trying to twist the design to fit the use cases of big
+bad hyperscalers.
 
