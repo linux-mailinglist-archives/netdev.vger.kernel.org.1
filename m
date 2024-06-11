@@ -1,270 +1,295 @@
-Return-Path: <netdev+bounces-102534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A3689039B3
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:10:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFE6E9039B4
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:10:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68DB61C21A92
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 11:10:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91D4F281BCB
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 11:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707E31791FC;
-	Tue, 11 Jun 2024 11:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB3FE179970;
+	Tue, 11 Jun 2024 11:10:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nwUBlInK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sakq/FE1"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397077407C
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 11:09:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718104201; cv=fail; b=oVnzqGfZxltaOJ2eelL+m+pagBwvIkCLczzaSY+mHaRbgZfABMO18DzR4++4abweVuR9+5t8UPhZL+UcMAuUnanWe6LHrCHaZxs61TffGHvVh8AGg1EtwVF5Ax5Efgx1ABMsIcWDuiNClOu5OyVQttJEri8uR28KMM66UNE10Zg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718104201; c=relaxed/simple;
-	bh=VT04l8ywEdJv+u8VDZ5T3PU+sK06FvhnVYNcZ5nGkyA=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=oRpmmdD7E+iH4Y17R0ZYx/vcmqP+fJVd/vRFaIKQuOnuKUMritdtn6PCDQataiCmVyo8XcENDJ3i4u9TX0EVGIpoGGRMS9ch9ogiF5SO4zbyWhP9v4wFha/uDXWPLIehbHF+R9IWHU0kspF7LraPE/2Mji9fEGncwL0uVXlDCJw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nwUBlInK; arc=fail smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1060179957
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 11:10:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718104222; cv=none; b=cEcms1BieuAk0c/a8+PNiEVi8ht5ao8qIxkSAYsRJ3hQbLkv3kopDtn+1VDRKOntox6scBX7Xp/m0dHBlP1GAZALaqTJwITeGXnXx6zV5PBDjvAoVQ4LYe/B/gsdo4ObLiLXNppexd0P6PU5y0bNHziHwn9UWypTWgU/1y68E7s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718104222; c=relaxed/simple;
+	bh=PujIJcgVmAL6tRyDjsLUnk7KbBQJmZ2zRZrUMPPtu74=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oRutc9uc3XKMHZn818vvY2ouameCsKhA6Xd3KHTCK8OQB/5Ot730JOLEkubcz00FoLYmwRTlMnCL0GB0SsC77GeGBo/yGIrle+p1OggmvyKAYf8jAJ71m/lG/kEFRff2t5kfNyoS0oHPB/aGVSqqSVyr0MkcMe4xR91Ordk2qJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Sakq/FE1; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718104199; x=1749640199;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=VT04l8ywEdJv+u8VDZ5T3PU+sK06FvhnVYNcZ5nGkyA=;
-  b=nwUBlInKKeukKBYavpBGu9bsU+I1zqCEW6kXIlEQZ0XS5pRhVm61WqlD
-   LwRnKgHPkHfH/snelsvLVMd8ZoC3msi5crZbq6LHe4l6B5NarVdRFyc1N
-   zFXhnuUcQlNbNPoPQ5SirCRHIpsCVCf10N9z2WK4oOdFrIPsBPMyiNnX9
-   opJnP54siisNI6lGPXuMbfbctl1kaDCbCzRm6z2AXSXHUNNK8JRvljyUz
-   j2u8EgvoCRAf+kKMAyGCEb0Ds2plaSsQ1tjYn90/pF9FpkYmv7LVfrQK0
-   PCPZbEUcyJ/A1TS9Oyx9KVgOzJqnAYZgXx7786ObVFLyvYIffrBnZfTP/
-   A==;
-X-CSE-ConnectionGUID: 2rd4ihMQQjePWDDcmh4eMw==
-X-CSE-MsgGUID: yIMcmDlLRwWWGnOBAUOl4g==
-X-IronPort-AV: E=McAfee;i="6600,9927,11099"; a="18636676"
+  t=1718104221; x=1749640221;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PujIJcgVmAL6tRyDjsLUnk7KbBQJmZ2zRZrUMPPtu74=;
+  b=Sakq/FE13vJoAI85rXrznjMt6En5GBwlm8HwHLxQnMjb6cPkyQNIQ+Dl
+   wxr9vcPmeVFZ7qQiJHNOjMwPqnPZCO89qwYRcIL86jMRd/fLGjnG+0YOE
+   qw+gJ0DV3U8zkgtyMMQ7h7hX8L+fspfDtQDBEHOSahhEf87aL88hgtfO5
+   aAW8XsJY2+jpC3pTCEkU+XtjohcH8LYhDf1mwgXU938nMg3FIvibn1ctS
+   vGKIFzNohz4FH++NHt4Znd5gDujqFrbR24PBlU2uZa+gPbmWGlQf2m9Z8
+   KlwElUxpg4rNADw+NRiNLlBECuimz9HpgC1ouRN4YVAiGpWNI74n6wkb4
+   g==;
+X-CSE-ConnectionGUID: rG3xCPw+Qw6qvs98SyaN3g==
+X-CSE-MsgGUID: mDhUXGo9TsSKEH8NHCd+KA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11099"; a="18636742"
 X-IronPort-AV: E=Sophos;i="6.08,229,1712646000"; 
-   d="scan'208";a="18636676"
+   d="scan'208";a="18636742"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2024 04:09:58 -0700
-X-CSE-ConnectionGUID: tXNJeQw7TxSR01LWhEE4Sg==
-X-CSE-MsgGUID: 8WHMPSb5QRWBh4Qmt0igew==
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2024 04:10:20 -0700
+X-CSE-ConnectionGUID: wCB1n7uOSKOwcZT+X524rw==
+X-CSE-MsgGUID: upC214k9Trejmen9uDz3BA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,229,1712646000"; 
-   d="scan'208";a="76868095"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Jun 2024 04:09:59 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 11 Jun 2024 04:09:58 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 11 Jun 2024 04:09:58 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 11 Jun 2024 04:09:58 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.44) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 11 Jun 2024 04:09:57 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RBqCD0A36ktfOMpoHeTtQsvU0Whgithd6jaR6vJ0igkdL2rx6c1o2hgJCN9m6z47jw8Nl9t0dD8dbceGuIFI05fzwo1RAukpYUJI5+FUvwcT741lWYlZC6BINxSldlT+ArgDsuFxNzS7EhvuG3m6OZqVJxjJyOi2CC7wRBO+Zhzqkr95LPanUSSYjURPpoEZ63eA0oh9bt4GFpUxdoBOZ2t4uaS8DfDrFNiXNzZ+PrhxTdzWe7W1BGIhYFRbaEO9EbLE+qGnnllIVeKLbbYckd3h1autEdFQElKn0ONYNsmSpGExEZ2C2+XmBLk9p21ihAR3Cru/JPw1eqOsYUUfdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9KHm3Z2YDin6x41X9PAzbZzoRPQ1njle5WbJtlnugVQ=;
- b=fgNvWX1IpoVjmn96b8BaJwDdv2PImumbqWtlcSXiVJ4mYalB8/YMnpj6iaFoJ/Apb1jQctT4s7gcjOiGF5f91q4vFmqf5N3h/uolzjgC/1b21L59Q5B91lZMUpSJwzVPixSoDXQSHm1djyrLDgLuz7nZquENJi0evB2G8JlXwS7sOiQcd4Z9EdF7SAsOHGknRnN3Lq86+YG0UgLZQaMFkOnfyo4OijUayeFFhNxxBojrc8Yc8OI1YKpYUlN1tl37a8TXGW2m2On32v52P3aLVVx+392uoFNPirT7BQbngsmRGQdGESUMrRT+/vOYh0zKPfiTH9yWxuA2hBYqUh3iPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by PH7PR11MB7514.namprd11.prod.outlook.com (2603:10b6:510:276::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.36; Tue, 11 Jun
- 2024 11:09:55 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.7633.036; Tue, 11 Jun 2024
- 11:09:54 +0000
-Message-ID: <37cf9088-b050-4788-b870-f28f0fb58b9e@intel.com>
-Date: Tue, 11 Jun 2024 13:09:47 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] bnxt_en: Cap the size of HWRM_PORT_PHY_QCFG
- forwarded response
-To: Michael Chan <michael.chan@broadcom.com>
-CC: <netdev@vger.kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew.gospodarek@broadcom.com>, <horms@kernel.org>,
-	Somnath Kotur <somnath.kotur@broadcom.com>, Pavan Chebbi
-	<pavan.chebbi@broadcom.com>, <davem@davemloft.net>
-References: <20240608191335.52174-1-michael.chan@broadcom.com>
- <0cece70f-a7ae-47e2-a4a2-602d37063890@intel.com>
- <CACKFLikFP=xCKnZC_V+oEeFeS-i7PAKHmDFgZKBy+Sb1rKuTkw@mail.gmail.com>
- <CACKFLimMfDTatETF+iTWkCBhVH80O=SC-u066XsREoQgVEmmpg@mail.gmail.com>
-Content-Language: en-US
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <CACKFLimMfDTatETF+iTWkCBhVH80O=SC-u066XsREoQgVEmmpg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ZR2P278CA0074.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:52::8) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+   d="scan'208";a="76868190"
+Received: from lkp-server01.sh.intel.com (HELO 628d7d8b9fc6) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 11 Jun 2024 04:10:17 -0700
+Received: from kbuild by 628d7d8b9fc6 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sGzOI-0000LK-10;
+	Tue, 11 Jun 2024 11:10:14 +0000
+Date: Tue, 11 Jun 2024 19:10:06 +0800
+From: kernel test robot <lkp@intel.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Serge Semin <fancer.lancer@gmail.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Romain Gantois <romain.gantois@bootlin.com>
+Subject: Re: [PATCH net-next 2/5] net: stmmac: dwmac-intel: provide a
+ select_pcs() implementation
+Message-ID: <202406111944.wTZ4iEdx-lkp@intel.com>
+References: <E1sGgCN-00Fact-0x@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PH7PR11MB7514:EE_
-X-MS-Office365-Filtering-Correlation-Id: e0a77e99-41b5-4891-8307-08dc8a07057b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|1800799015|376005|7416005;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?YUxrZXJHbWltMWJIT0w3QmlZczFMeTNZTkpXaTdWM3ROWS9icDQ1bEpRakk3?=
- =?utf-8?B?ZktSaUtndThLd2lYQWFTcXp2MEVRa2VPSFcxa2tDRW9CNTNCcy9ZRkFtSU15?=
- =?utf-8?B?aGJMdUxtNHkwdDRQbzF5L2twSDhnNGJZcmZSSkI1TE8zbW5SNVFtT0hSc3Vj?=
- =?utf-8?B?c3ZWK0lIS1ZDU0F6TXZHc2ZYUk1uM0MvaDdWL0tYZHBUNnhSaWRlRlRzQysy?=
- =?utf-8?B?emlGUnlKKzU3Mng2cjRpMmdyWjJ6cmRCeVlXaDdZZU9SZGpGWWJ4UEExckpl?=
- =?utf-8?B?QUUxeDZVbWQ0bjBodUVXSEZFT0pnd0prcnorQXdZMUlQakJ5bWNnT25BODFl?=
- =?utf-8?B?UkJxQWNZMzlSZDAwRW1mSjM1TkhWYzlrNFlGVFg5S2JMWTEraGhMc1pwNDJJ?=
- =?utf-8?B?TlBYMFJBMGFjYmxhNVZJUUw3WkdVVWtwcHowemNoME01dWMyKzhKYWZSbWhS?=
- =?utf-8?B?M0l6ZERQaWRJeDhKd1JJSjZRanF5TFBtRkVabzhVUU9qNGpmV05EbU9LWXN2?=
- =?utf-8?B?UDRxKzk4aFI5RVJLZnhXelBaZ1QyQ3Q4TTBzMmwrOGhlTFlHVzVYWjBycWMx?=
- =?utf-8?B?Z0kyQncrOFdPaWt1ZEdtR2h4SkNRV1phMXFaa2s0QUw2eTVGSXdkVFFSNTEx?=
- =?utf-8?B?TVNFUHFRNTJqRUo4ejZDV0xaSWZzNjdzbTlIS0tyWmpQRVV5NjBKTWIyTVUz?=
- =?utf-8?B?c3d5MEtUTGZCRzVwSGdUUG12ZnFGY2pCaEdUZ2ZSTmI4cEtlWGwxSlRtM2k1?=
- =?utf-8?B?RUlZOXFvMWZ1R295NjhxOStmMzFzUUozUnNqdlJUMWNMeVpYOWlMN21mTWNX?=
- =?utf-8?B?Y3lHVFRMSVNRWWRTRTM0aFVDN0tmMUw1Ny9GNmRwaHEvS3QxMUkzeFpFZ3Aw?=
- =?utf-8?B?TUVON2FZaDVSWlo0N3c1bmRFVHdyQmUyaEFGbHdkUDh0S2ZtUi9kd3BRQ2VT?=
- =?utf-8?B?RVJNRVVDcERKZkNhdzd4M01tTVlJUlNHa2E2ZHIrYmtoQTYxM01adVllNmRE?=
- =?utf-8?B?SDVwUVVyc1Y0clZHL2pDbWVUbGEyQXN2b0NyR0FTQmxYMHppT2FpblpGOWI3?=
- =?utf-8?B?VE9acG5UanptbVBvbXZPMXBObEtHZEdiRzZ4ZmRJQkY2QUo2TmxpTE1QbWFB?=
- =?utf-8?B?YmFOTGxBVmpqSDhLY0dDZlUwWlRaRW91OFBJbjBtTDZ5UklIMWxhNE9wQXE3?=
- =?utf-8?B?aGVQVTJRcHZwMVdsZzB3QlYrWnJBODhSRXhjZ3UxUzdvcllzYnExdEpLbHNi?=
- =?utf-8?B?WnErSVp1SHA5MVRtaGJYNHNxd0lPbHllS1VqSXpiT2h5cVMxUUhOYWRRSU9W?=
- =?utf-8?B?eWpGby9razNlcFk0R0FURTJoMG01cW9yMG1NSTJJV3FSQkZBKzhFNUhnRzht?=
- =?utf-8?B?eERQVVNDaG5oaUxqQXF1eEVGNXl5aVc0ZEowbTdGdGZHMENVWThyc1RBZUx1?=
- =?utf-8?B?UTlmSjVzVEx0LzhUT1NGZForZ1ppNEFHeE83akpLc01Jd2RvZVdqMWpseWJP?=
- =?utf-8?B?SHZ6eSs1OGswYmhtV3BGMTl1RHp2bStsMG9QREFhNStjTzdqMEE1b3V4YjJk?=
- =?utf-8?B?cDgyZ1lDK1BjaXdBU1MyalRsRnJEcHZOemJEU01FRXYycm94ZHpORXhKeWox?=
- =?utf-8?B?ZU82a25IV1IvV2F1RHRIYmZleHhwSW40VDc3MzhobTRBY2VkMjIwRTVLdE0v?=
- =?utf-8?B?VVRqUzcxSVdjclpIb1JheTYvTzVwUlM0OFZhWUdxOG1PVm9ML3RlaWZSYjRM?=
- =?utf-8?Q?Em15QHeBPcfnkH+BCA=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(7416005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eUF3NHBqL0VUeXFrc2ZLcWNlc2R5RERTUVkxYWJWYm1Ya0ZVaEg5RlhwSE5s?=
- =?utf-8?B?d01McmJVOFBId0hVUEFVZGZrL1RPajhkNXduRkl4b3J0cmVOUUE4bk1iUm1v?=
- =?utf-8?B?MXZrUTM4eHp4NkZqWGhieXMxWWZ6b1RCZlRsY2s3TUhrclVjd292eXZvUjNt?=
- =?utf-8?B?TmxDNHBWWURJYkhWSjRheEU4M1p4MVRIOEVUaXM3M0pVaWxYQk1Vam8wUllZ?=
- =?utf-8?B?T2xmbTRlM3h0RDYzK0YvYmtKcE8ybldkZDhrOWttdlNtRXE0OXNJSmMxK0Vz?=
- =?utf-8?B?Q0svOGUzR0tMUEgvMWZXN3EwcXVhbXpXSVFoYWZTMS9ZTDVsbU42dG5INUI4?=
- =?utf-8?B?WVUzNXRvb0xkd0dnUzlsWDJpNmZEYXNORDFPZ0ljcEsxd2dzcmlmbjRGR0cy?=
- =?utf-8?B?WmFvN3VhaTJjaHFOVVBZMVNKanBUVlNwWVhvc3dudlU5L1dZVmVubFhPU21p?=
- =?utf-8?B?R1lPeVBYNVl1SXZuU2JTQk1aZGpZR2dQS2tuUlRYNFhQRkhKWFhpcDdKMmxT?=
- =?utf-8?B?SkNxdUtXTm9JU3FSZU82ZE5VWXhmRW42THB6UnYydXlyd2hxWGxLYnFObklB?=
- =?utf-8?B?allsNExjRFpiMmlIRElIY3R0YVFYNmZOcDgxeVBBSHZabUZXalZtTVQvMHhx?=
- =?utf-8?B?RW1YQ0VRMVVaQnZyQkwzRzRzbEh1bHlDUU01SEZ1ZjFHRFczbkdnaDUvaG5x?=
- =?utf-8?B?b2pRUVN4WUhrK2hUV1NUWTdLQ0ZwQk5waDl5QytjN3F6bE9qbWxmenl0eEQ3?=
- =?utf-8?B?QUR1eUhKWXBscWVGNmxrUmZ1RmVJMVAxaGZiaVJLWUM4cmEvb1hxT0lJa0cy?=
- =?utf-8?B?N09aYThoUlczZUF4YjBjZXVMRDMvRkhIakVDcUYxT3JTdTUvODIwTTluKy9h?=
- =?utf-8?B?Wm9GdEVDMi9HODZhMUZGUjgrVnFDMWN1dXl6TUNCaExHUHVvUGllVFhwalZ0?=
- =?utf-8?B?eU16RWtYcWpPU1RacDhKeU93UkV2amkvaUdUVTFubFgvMlB3Q2llMkIrZlRE?=
- =?utf-8?B?dFZ6QnlsT25IVVNRZTl3V0hGM1dManFQRmdBREJVY1lTUDZQb2F5OTVZVTlS?=
- =?utf-8?B?SzdJRTBXTjB4YzRoNXIvano4dTVWdkNidHZKMEEzbjExZHVBZlBIdGZXQysy?=
- =?utf-8?B?RVRtczNrand3WFJJR0NKT3huWHU0Wk5xRmxOYm04TkJQL05YY0tpcmQxOU0v?=
- =?utf-8?B?ZDAxR0VnaUVyeS9LdjZUWkJrNHRCNGhDbi9ZaFN4YW42VUF6czdsR3I5KzZN?=
- =?utf-8?B?UVpMMTQ5UUNoVTlQNUlYVmNQTHYwOFJBbnBRQ1JXam9sd2d2N3BvWjNGM0RH?=
- =?utf-8?B?UTk1SWhUb1pCbVQvV0x0RXlmOU9pSGs3b3FYaVNtTm96YU1oOFdYdTRvM09P?=
- =?utf-8?B?WG03aWJGL0wva1kvVm40WVYxa3o4QktCbEQ1NzhDWVZvcFQ1eGJZV0F2Nnkw?=
- =?utf-8?B?T1c3c1A5R2E5aGltbU5iWG9NWk5WUkFOOUpyTEFlQTJoelZSaGFKNTRkc0VI?=
- =?utf-8?B?TSswdnlTZURhTzdJMFdiSEZnVHBHT25Ta01FNE11WGE0WGc2ZjZzR3NUSjdo?=
- =?utf-8?B?WGs0VEVmUkpGZ0xXMGl6NzdqdDI1aVUxTHZXSHdaMTY0a3h3eW9QbzR1WXFG?=
- =?utf-8?B?azR3V0d3N1A1akt3N3RSaXNVcFpSajlFeXNSaW90ZGxKVC8xMThsMXNCcVFs?=
- =?utf-8?B?UlpxMDhlZzNJcFhheEFib3lOdjR0UGl0amZTeERjNHBwNHhTTEZkd2tUUHpR?=
- =?utf-8?B?UlgwajhlQmRRdmZVQVNXNTh2QThxek44RzUxRXdGN0l2cElmdjRKeUFvYWEx?=
- =?utf-8?B?emhHT1BkNjVtaU1YdnVId1VKbCtjVGpLVFIwYis5WG92V1JlREZLaGNJMzZS?=
- =?utf-8?B?NE0xQU1WcXNzUWNoVWdVUkVXb3FDQzhvMGROd245YVJ6UGFwWHp0bEt5U0Nz?=
- =?utf-8?B?K0g0S2JtTHBjdEdmQWZrbWN1YzJZU2d3L2RzeWgydEl6S1RGUTZ0TEJZRU1H?=
- =?utf-8?B?SFd4TFozZk5VRTVUWWsrR3gzZTJrNEp0MGhQVmtIMFNIVzloY3J4TTFVL3pL?=
- =?utf-8?B?Q29EZ3V1eEY1RS9mYytZaDZLSm1ucXUyUGtZMEQyMG9iTlZ0d1g0Q3plY0pw?=
- =?utf-8?B?RGxuaEJwSHJndUh5dGd0S1pkVGVzemp5NFJPeGovdmFuWDRSaGl2aExVTm9N?=
- =?utf-8?B?THc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e0a77e99-41b5-4891-8307-08dc8a07057b
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2024 11:09:54.1903
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9DsGNWNtUrufocwMGJMDDjENMjeBR639OZg2QuVZu7pe4I4BkOcdv8L/x7HdBZn/ZXCKGtUxgaoCqZYUUwbvS/9mXI+ybIyT4IHOBCCeiPQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7514
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1sGgCN-00Fact-0x@rmk-PC.armlinux.org.uk>
 
-On 6/11/24 01:52, Michael Chan wrote:
-> On Mon, Jun 10, 2024 at 7:00 AM Michael Chan <michael.chan@broadcom.com> wrote:
->>
->> On Mon, Jun 10, 2024 at 4:38 AM Przemek Kitszel
->> <przemyslaw.kitszel@intel.com> wrote:
->>>
->>> I assume that the first 96 bytes of the current
->>> struct hwrm_port_phy_qcfg are the same as here; with that you could wrap
->>> those there by struct_group_tagged, giving the very same name as here,
->>> but without replicating all the content.
->>
->> Except for the valid bit at the end of the struct.  Let me see if I
->> can define the struct_group thing for 95 bytes and add the valid bit
->> here.  Thanks.
->>
-> 
-> The struct_group_tagged() idea works in general.  However, the
-> hwrm_port_phy_qcfg_output struct is generated from yaml and it
-> contains a lot of #define within the structure.  So it looks like this
-> with struct_group_tagged added:
-> 
-> struct hwrm_port_phy_qcfg_output {
->          struct_group_tagged(hwrm_port_phy_qcfg_output_legacy, legacy,
->                  __le16  error_code;
->                  __le16  req_type;
->                  __le16  seq_id;
->                  __le16  resp_len;
->                  u8      link;
->          #define PORT_PHY_QCFG_RESP_LINK_NO_LINK 0x0UL
->          #define PORT_PHY_QCFG_RESP_LINK_SIGNAL  0x1UL
->          #define PORT_PHY_QCFG_RESP_LINK_LINK    0x2UL
-> ....
->          );
-> ....
-> };
-> 
-> The #define within the struct_group generates a lot of warnings with make C=1:
-> 
->    CC [M]  drivers/net/ethernet/broadcom/bnxt/bnxt.o
->    CHECK   drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> drivers/net/ethernet/broadcom/bnxt/bnxt.c: note: in included file:
-> drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h:4211:9: warning:
-> directive in macro's argument list
-> 
-> Because it's a generated file, it's hard to make the drastic change to
+Hi Russell,
 
-is this generated as part of upstream build process or just manually?
+kernel test robot noticed the following build errors:
 
-> move all the #define macros.  Maybe in the future when we restructure
-> these generated structs, we can do it in a better way.
+[auto build test ERROR on net-next/main]
 
-You could also just split struct into two and combine them (packed)
-into hwrm_port_phy_qcfg_output and add compat one as combination of
-hwrm_port_phy_qcfg_output + valid bit
+url:    https://github.com/intel-lab-lkp/linux/commits/Russell-King-Oracle/net-stmmac-dwmac-intel-provide-a-select_pcs-implementation/20240610-224406
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/E1sGgCN-00Fact-0x%40rmk-PC.armlinux.org.uk
+patch subject: [PATCH net-next 2/5] net: stmmac: dwmac-intel: provide a select_pcs() implementation
+config: x86_64-randconfig-013-20240611 (https://download.01.org/0day-ci/archive/20240611/202406111944.wTZ4iEdx-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240611/202406111944.wTZ4iEdx-lkp@intel.com/reproduce)
 
-If you don't want to do so, please at least document in code that only 
-the first 95 bytes match and the last one is different
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406111944.wTZ4iEdx-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c:600:43: error: expected ';' after expression
+     600 |                 plat->select_pcs = intel_mgbe_select_pcs,
+         |                                                         ^
+         |                                                         ;
+   1 error generated.
+
+
+vim +600 drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+
+   455	
+   456	static int intel_mgbe_common_data(struct pci_dev *pdev,
+   457					  struct plat_stmmacenet_data *plat)
+   458	{
+   459		struct fwnode_handle *fwnode;
+   460		char clk_name[20];
+   461		int ret;
+   462		int i;
+   463	
+   464		plat->pdev = pdev;
+   465		plat->phy_addr = -1;
+   466		plat->clk_csr = 5;
+   467		plat->has_gmac = 0;
+   468		plat->has_gmac4 = 1;
+   469		plat->force_sf_dma_mode = 0;
+   470		plat->flags |= (STMMAC_FLAG_TSO_EN | STMMAC_FLAG_SPH_DISABLE);
+   471	
+   472		/* Multiplying factor to the clk_eee_i clock time
+   473		 * period to make it closer to 100 ns. This value
+   474		 * should be programmed such that the clk_eee_time_period *
+   475		 * (MULT_FACT_100NS + 1) should be within 80 ns to 120 ns
+   476		 * clk_eee frequency is 19.2Mhz
+   477		 * clk_eee_time_period is 52ns
+   478		 * 52ns * (1 + 1) = 104ns
+   479		 * MULT_FACT_100NS = 1
+   480		 */
+   481		plat->mult_fact_100ns = 1;
+   482	
+   483		plat->rx_sched_algorithm = MTL_RX_ALGORITHM_SP;
+   484	
+   485		for (i = 0; i < plat->rx_queues_to_use; i++) {
+   486			plat->rx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
+   487			plat->rx_queues_cfg[i].chan = i;
+   488	
+   489			/* Disable Priority config by default */
+   490			plat->rx_queues_cfg[i].use_prio = false;
+   491	
+   492			/* Disable RX queues routing by default */
+   493			plat->rx_queues_cfg[i].pkt_route = 0x0;
+   494		}
+   495	
+   496		for (i = 0; i < plat->tx_queues_to_use; i++) {
+   497			plat->tx_queues_cfg[i].mode_to_use = MTL_QUEUE_DCB;
+   498	
+   499			/* Disable Priority config by default */
+   500			plat->tx_queues_cfg[i].use_prio = false;
+   501			/* Default TX Q0 to use TSO and rest TXQ for TBS */
+   502			if (i > 0)
+   503				plat->tx_queues_cfg[i].tbs_en = 1;
+   504		}
+   505	
+   506		/* FIFO size is 4096 bytes for 1 tx/rx queue */
+   507		plat->tx_fifo_size = plat->tx_queues_to_use * 4096;
+   508		plat->rx_fifo_size = plat->rx_queues_to_use * 4096;
+   509	
+   510		plat->tx_sched_algorithm = MTL_TX_ALGORITHM_WRR;
+   511		plat->tx_queues_cfg[0].weight = 0x09;
+   512		plat->tx_queues_cfg[1].weight = 0x0A;
+   513		plat->tx_queues_cfg[2].weight = 0x0B;
+   514		plat->tx_queues_cfg[3].weight = 0x0C;
+   515		plat->tx_queues_cfg[4].weight = 0x0D;
+   516		plat->tx_queues_cfg[5].weight = 0x0E;
+   517		plat->tx_queues_cfg[6].weight = 0x0F;
+   518		plat->tx_queues_cfg[7].weight = 0x10;
+   519	
+   520		plat->dma_cfg->pbl = 32;
+   521		plat->dma_cfg->pblx8 = true;
+   522		plat->dma_cfg->fixed_burst = 0;
+   523		plat->dma_cfg->mixed_burst = 0;
+   524		plat->dma_cfg->aal = 0;
+   525		plat->dma_cfg->dche = true;
+   526	
+   527		plat->axi = devm_kzalloc(&pdev->dev, sizeof(*plat->axi),
+   528					 GFP_KERNEL);
+   529		if (!plat->axi)
+   530			return -ENOMEM;
+   531	
+   532		plat->axi->axi_lpi_en = 0;
+   533		plat->axi->axi_xit_frm = 0;
+   534		plat->axi->axi_wr_osr_lmt = 1;
+   535		plat->axi->axi_rd_osr_lmt = 1;
+   536		plat->axi->axi_blen[0] = 4;
+   537		plat->axi->axi_blen[1] = 8;
+   538		plat->axi->axi_blen[2] = 16;
+   539	
+   540		plat->ptp_max_adj = plat->clk_ptp_rate;
+   541		plat->eee_usecs_rate = plat->clk_ptp_rate;
+   542	
+   543		/* Set system clock */
+   544		sprintf(clk_name, "%s-%s", "stmmac", pci_name(pdev));
+   545	
+   546		plat->stmmac_clk = clk_register_fixed_rate(&pdev->dev,
+   547							   clk_name, NULL, 0,
+   548							   plat->clk_ptp_rate);
+   549	
+   550		if (IS_ERR(plat->stmmac_clk)) {
+   551			dev_warn(&pdev->dev, "Fail to register stmmac-clk\n");
+   552			plat->stmmac_clk = NULL;
+   553		}
+   554	
+   555		ret = clk_prepare_enable(plat->stmmac_clk);
+   556		if (ret) {
+   557			clk_unregister_fixed_rate(plat->stmmac_clk);
+   558			return ret;
+   559		}
+   560	
+   561		plat->ptp_clk_freq_config = intel_mgbe_ptp_clk_freq_config;
+   562	
+   563		/* Set default value for multicast hash bins */
+   564		plat->multicast_filter_bins = HASH_TABLE_SIZE;
+   565	
+   566		/* Set default value for unicast filter entries */
+   567		plat->unicast_filter_entries = 1;
+   568	
+   569		/* Set the maxmtu to a default of JUMBO_LEN */
+   570		plat->maxmtu = JUMBO_LEN;
+   571	
+   572		plat->flags |= STMMAC_FLAG_VLAN_FAIL_Q_EN;
+   573	
+   574		/* Use the last Rx queue */
+   575		plat->vlan_fail_q = plat->rx_queues_to_use - 1;
+   576	
+   577		/* For fixed-link setup, we allow phy-mode setting */
+   578		fwnode = dev_fwnode(&pdev->dev);
+   579		if (fwnode) {
+   580			int phy_mode;
+   581	
+   582			/* "phy-mode" setting is optional. If it is set,
+   583			 *  we allow either sgmii or 1000base-x for now.
+   584			 */
+   585			phy_mode = fwnode_get_phy_mode(fwnode);
+   586			if (phy_mode >= 0) {
+   587				if (phy_mode == PHY_INTERFACE_MODE_SGMII ||
+   588				    phy_mode == PHY_INTERFACE_MODE_1000BASEX)
+   589					plat->phy_interface = phy_mode;
+   590				else
+   591					dev_warn(&pdev->dev, "Invalid phy-mode\n");
+   592			}
+   593		}
+   594	
+   595		/* Intel mgbe SGMII interface uses pcs-xcps */
+   596		if (plat->phy_interface == PHY_INTERFACE_MODE_SGMII ||
+   597		    plat->phy_interface == PHY_INTERFACE_MODE_1000BASEX) {
+   598			plat->mdio_bus_data->has_xpcs = true;
+   599			plat->mdio_bus_data->default_an_inband = true;
+ > 600			plat->select_pcs = intel_mgbe_select_pcs,
+   601		}
+   602	
+   603		/* Ensure mdio bus scan skips intel serdes and pcs-xpcs */
+   604		plat->mdio_bus_data->phy_mask = 1 << INTEL_MGBE_ADHOC_ADDR;
+   605		plat->mdio_bus_data->phy_mask |= 1 << INTEL_MGBE_XPCS_ADDR;
+   606	
+   607		plat->int_snapshot_num = AUX_SNAPSHOT1;
+   608	
+   609		plat->crosststamp = intel_crosststamp;
+   610		plat->flags &= ~STMMAC_FLAG_INT_SNAPSHOT_EN;
+   611	
+   612		/* Setup MSI vector offset specific to Intel mGbE controller */
+   613		plat->msi_mac_vec = 29;
+   614		plat->msi_lpi_vec = 28;
+   615		plat->msi_sfty_ce_vec = 27;
+   616		plat->msi_sfty_ue_vec = 26;
+   617		plat->msi_rx_base_vec = 0;
+   618		plat->msi_tx_base_vec = 1;
+   619	
+   620		return 0;
+   621	}
+   622	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
