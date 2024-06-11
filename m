@@ -1,154 +1,112 @@
-Return-Path: <netdev+bounces-102497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84AA09034C5
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 10:05:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 040829034C7
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 10:05:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E9C21F22417
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 08:05:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82190282CEC
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 08:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58078175543;
-	Tue, 11 Jun 2024 08:04:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB96C17556F;
+	Tue, 11 Jun 2024 08:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="d34ckmkz"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="ihrH9Hfe"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1E5174EC9;
-	Tue, 11 Jun 2024 08:04:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7AD174ED2;
+	Tue, 11 Jun 2024 08:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718093088; cv=none; b=IEoLmG7CPGZzqK6BnaAfQ63k2NK9xsH8WQwsFUSG9jhkX5Y6Tt2bTKm2g9so1QnmWFGxSJU+avj/AExjKD2rb3f/+JOvJXFgia1HN0gjsTczK9zO5+8qfL8Eu3/J/WEh5J/TjCJhvIUMMIXQImopLISfUifXcj+fBsbb/zpYtA8=
+	t=1718093089; cv=none; b=FGUwOCgqGaECJG9Rc52ofFr/OzOyTSapkMPetQIp65eIrgqCM/aid59tinBcxkoXgTGbpgCuus51Iv/Fu+zWyLlm2sBy1VpoP/EmPTfmcFxdBYR8c3dal6rBzXvqRzEBUXpMuzSqIrG7oEejfuLZ9jVVDK3Bk9+OB3UUktXyJ2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718093088; c=relaxed/simple;
-	bh=cjDSq1fkfavKtAt7cAib4nKFIPpMZ1jL1K0Sm23/ubg=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mvVa/bFOzwJHT4NIrlZRF4Sy4aCz9bzw3mwKPjHzJY0Swo6SymEHn4efjayCBJCjhwgjCWMIwuPHBNbKYzslwPG03W7jbRawSuXksiyL5MdgBiVKshJ+XmoRTNogFktTQDOcXFrrJMuMaCkrdEMZSd42TtzNiFG828d+FrFRl3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=d34ckmkz; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1718093085; x=1749629085;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=cjDSq1fkfavKtAt7cAib4nKFIPpMZ1jL1K0Sm23/ubg=;
-  b=d34ckmkzBuzgnwgaEyERl8nGgTSGz6N676jUL5POrKM8LLuu4f0m78ac
-   vD0+pylwwbhi1Dd3DMYZ0oc8XGs7F3Kv5rM5I+s2FFMZpFLiBp9zg2XBG
-   8Pmxb32lToXe4qGJBEbXRfZPpFP01Zuy/qNRcwkHuRz0d6B39/cBYNTPg
-   Ia/nQkpZQuaVZMMJ4Ef81W/5YviUcmDAHz4FbvphNAUZ9NZ3/TQ/6QemF
-   /OroHw00DOy1RcXO9eWppLCwkG8Yg7IHIYPrunBHOrsNuOBbmKjzTXTOr
-   hBZpfLqPjVSStLHn6Mv2zdX+3ss31tyk725EanAOLYZxFG41tas+JfMui
-   Q==;
-X-CSE-ConnectionGUID: u76H7Qz2QNSGdqOn7lTiWw==
-X-CSE-MsgGUID: FGphlgQFRDye/ZbeONnACw==
-X-IronPort-AV: E=Sophos;i="6.08,229,1712646000"; 
-   d="scan'208";a="27247166"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Jun 2024 01:04:38 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 11 Jun 2024 01:04:06 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Tue, 11 Jun 2024 01:04:05 -0700
-Date: Tue, 11 Jun 2024 13:31:22 +0530
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-CC: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, <lkp@intel.com>,
-	<UNGLinuxDriver@microchip.com>, <andrew@lunn.ch>,
-	<bryan.whitehead@microchip.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <hkallweit1@gmail.com>, <hmehrtens@maxlinear.com>,
-	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <linux@armlinux.org.uk>,
-	<lxu@maxlinear.com>, <netdev@vger.kernel.org>,
-	<oe-kbuild-all@lists.linux.dev>, <pabeni@redhat.com>, <sbauer@blackbox.su>,
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: Re: [PATCH net V3 0/3] net: lan743x: Fixes for multiple WOL related
- issues
-Message-ID: <ZmgEUrA6xM9vtDxD@HYD-DK-UNGSW21.microchip.com>
-References: <202406052200.w3zuc32H-lkp@intel.com>
- <20240611062753.12020-1-Raju.Lakkaraju@microchip.com>
- <20240611071051.65e5n3bn7e4zm7lq@DEN-DL-M31836.microchip.com>
+	s=arc-20240116; t=1718093089; c=relaxed/simple;
+	bh=yYgTt6VYlpyrsw+D+VczHVk7t9so6lEWB9yYmW1KwQk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Oi6ZufArZi282/JfGKTFIcRWFq650TNw55qSZaO5XSbEsJ9OW+1OqeVtKg80XiWQGp1t6dBVhzOO53Z0latccbFUKMpyMRAVX8pOuXlcN1nicH5vUQEpjgBXsIzbhLyzc+xtxQ9R6rMSq5eHlj7nQzEYexU3AouzAZAGDRM3Cgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=ihrH9Hfe; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 98DC9A06AD;
+	Tue, 11 Jun 2024 10:04:46 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=Izsbb6raQToVG/aAGBJ/FcHgN/EZ3prel7zQ0hy+F3I=; b=
+	ihrH9HfemSg2O2YmL0yzx+eQQ1a+OmA9Ar9/h5Aw57XoQdR8rtGI7xbhIQHJlQFd
+	N7foldjGv8XBW8UeywUQksm7S/Wm9rKOJcmBIEaWNp5PfE8m2FhAqg+vamfH9gq6
+	Jr6Oih/CsMN6xIeZb/IBwYV+WY7I7/eCxgm7gxlhDKBfNsut5SL7FaWYEsggI5n+
+	2m9wpAm15zFknc2k3WCB9KK1A/WkEWIylO/PkAOI1l0zRiI1gFncQTAJrH8YBwja
+	mLfM1vGpr6f/s/2EUFhHIL9KDkVVOiA37+oGnh+0R874fH4UzunDac7RgusG0Wdg
+	7AlubpKjZ3Qr2UEFVjwm8yNltReLE9SWsSUx3oWwaO9SbQeO+ZbWEDZcnXs0Mr0V
+	aFeYG3Zgdm9V9m4JqYHGrKIziSp8yQUkyqvelHxteVqp4asftkavj8dKzsFXeHYf
+	jMlEhVM4CQR8jvSKjye7nDjO4MHx8OTsLUC/j5NaYXoo7s18o/LgsLYcYz0yRCtk
+	Tpj9RxrALUhobuzo8b9WRthmla3OE7FgpAG+7EH2wHFRXWWpwOq9iLAA0++GT3Pd
+	Xak1zv5ZDoU0aS2WplR7KdmmTwVbgLZIp+gHcZg3JLUT+WyBzfCQLYWyr9CTw6Ik
+	PLPIOhbLYLO1pYCt1SyFS5S2SUyWm847xx4+2/JBbh0=
+From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>
+To: Frank Li <Frank.Li@freescale.com>, "David S. Miller"
+	<davem@davemloft.net>, <imx@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>, "Richard
+ Cochran" <richardcochran@gmail.com>, Wei Fang <wei.fang@nxp.com>, Shenwei
+ Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+Subject: [PATCH resubmit 2] net: fec: Fix FEC_ECR_EN1588 being cleared on link-down
+Date: Tue, 11 Jun 2024 10:04:05 +0200
+Message-ID: <20240611080405.673431-1-csokas.bence@prolan.hu>
+X-Mailer: git-send-email 2.45.2.437.gf7de8c0566
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <20240611071051.65e5n3bn7e4zm7lq@DEN-DL-M31836.microchip.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1718093086;VERSION=7972;MC=1588675963;ID=228453;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2945A12957627C61
 
-Hi Horatiu,
+FEC_ECR_EN1588 bit gets cleared after MAC reset in `fec_stop()`, which
+makes all 1588 functionality shut down, and all the extended registers
+disappear, on link-down, making the adapter fall back to compatibility
+"dumb mode". However, some functionality needs to be retained (e.g. PPS)
+even without link.
 
-There is no new changes except "kernel test robot" reported issue.
+Fixes: 6605b730c061 ("FEC: Add time stamping code and a PTP hardware clock")
+Cc: Richard Cochran <richardcochran@gmail.com>
 
-I fix the issue and sent the patch along with other old patches.
-Also add "Reported-by" and "Closes" tags to all patches and
---in-reply-to=202406052200.w3zuc32H-lkp@intel.com.
-i.e.
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202406052200.w3zuc32H-lkp@intel.com/
+Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
+---
+ drivers/net/ethernet/freescale/fec_main.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Is it sufficient? or
-Do you need to generete new version of patches ?
-
-Thanks,
-Raju
-The 06/11/2024 09:10, Horatiu Vultur wrote:
-> Hi Raju,
-> 
-> Is this not supposed to be v4?
-> Because I can see v3 here:
-> https://www.spinics.net/lists/netdev/msg1002225.html
-> 
-> The 06/11/2024 11:57, Raju Lakkaraju wrote:
-> > This patch series implement the following fixes:
-> > 1. Disable WOL upon resume in order to restore full data path operation
-> > 2. Support WOL at both the PHY and MAC appropriately 
-> > 3. Remove interrupt mask clearing from config_init 
-> > 
-> > Patch-3 was sent seperately earlier. Review comments in link: 
-> > https://lore.kernel.org/lkml/4a565d54-f468-4e32-8a2c-102c1203f72c@lunn.ch/T/
-> > 
-> > Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>                        
-> > Reported-by: kernel test robot <lkp@intel.com>                                  
-> > Closes: https://lore.kernel.org/oe-kbuild-all/202406052200.w3zuc32H-lkp@intel.com/
-> 
-> I think you should drop the 'Reported-by' and 'Closes' tags because the
-> issue that is getting closed is the one that you introduced in one of
-> your previous version of the patch series.
-> 
-> > 
-> > Raju Lakkaraju (3):
-> >   net: lan743x: disable WOL upon resume to restore full data path
-> >     operation
-> >   net: lan743x: Support WOL at both the PHY and MAC appropriately
-> >   net: phy: mxl-gpy: Remove interrupt mask clearing from config_init
-> > 
-> >  .../net/ethernet/microchip/lan743x_ethtool.c  | 44 ++++++++++++--
-> >  drivers/net/ethernet/microchip/lan743x_main.c | 46 ++++++++++++---
-> >  drivers/net/ethernet/microchip/lan743x_main.h | 28 +++++++++
-> >  drivers/net/phy/mxl-gpy.c                     | 58 ++++++++++++-------
-> >  4 files changed, 144 insertions(+), 32 deletions(-)
-> > 
-> > -- 
-> > 2.34.1
-> > 
-> > 
-> 
-> -- 
-> /Horatiu
-
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index 881ece735dcf..fb19295529a2 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -1361,6 +1361,12 @@ fec_stop(struct net_device *ndev)
+ 		writel(FEC_ECR_ETHEREN, fep->hwp + FEC_ECNTRL);
+ 		writel(rmii_mode, fep->hwp + FEC_R_CNTRL);
+ 	}
++
++	if (fep->bufdesc_ex) {
++		val = readl(fep->hwp + FEC_ECNTRL);
++		val |= FEC_ECR_EN1588;
++		writel(val, fep->hwp + FEC_ECNTRL);
++	}
+ }
+ 
+ static void
 -- 
-Thanks,                                                                         
-Raju
+2.34.1
+
+
 
