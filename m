@@ -1,176 +1,104 @@
-Return-Path: <netdev+bounces-102450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 407C4902FB7
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 06:58:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01A38903130
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 07:34:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7D771F239EC
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 04:58:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FAAE2895EC
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 05:34:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2D1017082E;
-	Tue, 11 Jun 2024 04:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3937171076;
+	Tue, 11 Jun 2024 05:30:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fT6X6U6K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VgkPHXWa"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14BDE14290
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 04:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B23433C4
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 05:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718081922; cv=none; b=aGr2i3OngmpNuJYqepMywyGqvuLvwTcOoQYenjN97kgoakficu357JXFGqG2NHrZj9J7Z32oYPQoUIcUGX9oAm4pNVSn+wHax+7AZU0AZEhCRh+mFWlQ0McdWR8tBkTJ9jNB/bYG2AU7yxSM79MYXrsu+pR46Es/0vv/FIp+Srk=
+	t=1718083859; cv=none; b=Hh1At4CTqkaYQcQmLbIWVxJWtOmD3mLqq0obOWBwtospmSMoe9AEGw7Wm4CtQQ+uogCqtz0Vn/IxOB1p7jdV/eEoA2hUe9GXsgBDPNll3jOVmMs8dirOIXTktyH9yUO8SyRS9l//h2tBNRIQhcOPRwDIMxLXBpgViwrRpDKvfWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718081922; c=relaxed/simple;
-	bh=6RGwrNaaHr3z9VGDfzp14bTAGG202zfRdOc59P8l/S0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nU37h9tfW3pgY5kZSTUsV8ghDkt/McFhoqQr8RM5pK1fd1+xQdOW2apoW6RpTDBghV1p27t3GIgclS02Xwef7/1+XnAv63kTxk7RQ9XX3YfxhqcAAGkJ9AxIHN7X3dsQmcXu9vaIsXKWd4HADWtCV9OnoC56DaeJdzig1UbFOdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fT6X6U6K; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1718081912; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=UzqPJmuJBJVSGrRTHXc3s1XMNZUucZQwNji/b+ux6XE=;
-	b=fT6X6U6KXUByXWgGgp0qsYp2zv6124g+7hlGpLjg2vuCKBm977NY2vApw96TtuERWIChr5J/oaSr0DPygRARiF6OeR8UUPXm38AUNlv64Loxo2SDdDr96nOizFFtWv2UFVHToavyT76K3gu/vAkSreVhCT2DW5BOfqOt5+gRXRA=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067109;MF=lulie@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W8F5RRb_1718081910;
-Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0W8F5RRb_1718081910)
-          by smtp.aliyun-inc.com;
-          Tue, 11 Jun 2024 12:58:31 +0800
-From: Philo Lu <lulie@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: edumazet@google.com,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	dust.li@linux.alibaba.com
-Subject: [PATCH net-next] tcp: Add tracepoint for rxtstamp coalescing
-Date: Tue, 11 Jun 2024 12:58:30 +0800
-Message-Id: <20240611045830.67640-1-lulie@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	s=arc-20240116; t=1718083859; c=relaxed/simple;
+	bh=FRmLUy3vdWcYPP0sfg1A4589VGHXaeZ8BEmwZ0UZ+Yo=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=S/QdB5z9mwx0EdIyQMQenhyoyjMdkSFtwSFcsBTB4Y5NV0m73OQM/faeSbBjRZmrRzBcuiBGspDSxBaDD2Lm4/LC3UQuf8gJwUYs8UHaOZ4Et/BWvMWfyu0m2xvUq7UpJB8pqI8YIOJkYiCB5W8mHme68LF9/AaKogj5VkOeN7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VgkPHXWa; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2c30a527479so328654a91.3
+        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 22:30:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718083858; x=1718688658; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Jz7KJeRGLe3HMzvun5AT1c/3pa7cTHGJ/J1oz3p8vOw=;
+        b=VgkPHXWapdMDXDBKeLpSb+gwJUnhUIyah+E/04nsvX2paR4MqJEaru782nShJd8JCk
+         0f1wYgJh5MFcfjtrSMZhLwtvprkPLXoDUvZVS3Npt/4R8hHrGg09fpJlgs3oNuuB7CGs
+         2Ns2qh8r8Ai660L/chWrho2iZHtLmktVZ9g/pEMAGkDZZL8UXzbG6TLL1Z26S+W42UXl
+         Wc3gnMAI0CgjlgkvjOTBZJNk5tsSOZ+ZoN5A9kD2zUso7145+JkBEoZmC9YcWhG+xxfs
+         aSimM/Xub6+3JFR06NtWpgLBR+EBktW3IZR1bedaaLuNhNed5uc7wW1mbnD5xl/Ib1Hc
+         14YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718083858; x=1718688658;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Jz7KJeRGLe3HMzvun5AT1c/3pa7cTHGJ/J1oz3p8vOw=;
+        b=ewAlLrAzO5/1d59ouMRZeF2AlIyA+NRd2hKbd5BBc2aRavucJO1bLf9YK6aSwModqp
+         9NrlpM6NhqjErnXyEK7mLdHm7uFpfzbqben+YdVvYyCOozH4FBaNeRlobp/5cx42u56d
+         C5GKGE60do6Tk7ZyeNclZFtY1oyBHHPFn5tEoZckQu4w0lnwasgZ2Nfq+bfKgKiC64ZY
+         Xi//nQDiBvgMU2CV1cWudr/VAkLi/HizDeLPJFitXRjHMTr/0Fra0VLFiX2DNDWy63CP
+         j66GaeZTGx3yoZgfYJJa3GM9hTQt3n1btm7OjLpe/m7hS7ojkyRjEWlxz/I++czPKWBu
+         h4lA==
+X-Forwarded-Encrypted: i=1; AJvYcCXdL3mbuL3xL+5yg5D457SWN5W8hRd8bXlWFZ6Wp5tBGug3IK4kXYEK6Z4MJLlafFYEWCs6MLXqOaHR+LBNJx8Wq0CN/2zj
+X-Gm-Message-State: AOJu0YxTOV5pXxXnIqniDw4uVnHQKdZQouazc9BXZTt9IhcmmGMqdroU
+	O+TT6s7/lnxf4M+wIUrgaknPgccwCZkn/uM21EaKTbjg6CSaTW1v
+X-Google-Smtp-Source: AGHT+IEVE/P+GZyD4oxyvMb0a/pP1O778YuoW904tL3ndISSjt2NvvXpvXOcWHWZRwxwF2LWyLxuag==
+X-Received: by 2002:a17:90a:5ae1:b0:2c2:c352:5273 with SMTP id 98e67ed59e1d1-2c2c35254fdmr10147299a91.2.1718083857723;
+        Mon, 10 Jun 2024 22:30:57 -0700 (PDT)
+Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c31d46fe2dsm2011055a91.26.2024.06.10.22.30.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jun 2024 22:30:57 -0700 (PDT)
+Date: Tue, 11 Jun 2024 14:30:42 +0900 (JST)
+Message-Id: <20240611.143042.1029627013637247866.fujita.tomonori@gmail.com>
+To: fujita.tomonori@gmail.com
+Cc: hfdevel@gmx.net, netdev@vger.kernel.org, andrew@lunn.ch,
+ horms@kernel.org, kuba@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
+ linux@armlinux.org.uk, naveenm@marvell.com, jdamato@fastly.com
+Subject: Re: [PATCH net-next v9 0/6] add ethernet driver for Tehuti
+ Networks TN40xx chips
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <20240611.135442.1008031498769485601.fujita.tomonori@gmail.com>
+References: <20240605232608.65471-1-fujita.tomonori@gmail.com>
+	<7fbf409d-a3bc-42e0-ba32-47a1db017b57@gmx.net>
+	<20240611.135442.1008031498769485601.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-During tcp coalescence, rx timestamps of the former skb ("to" in
-tcp_try_coalesce), will be lost. This may lead to inaccurate
-timestamping results if skbs come out of order.
+On Tue, 11 Jun 2024 13:54:42 +0900 (JST)
+FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
 
-Here is an example.
-Assume a message consists of 3 skbs, namely A, B, and C. And these skbs
-are processed by tcp in the following order:
-A -(1us)-> C -(1ms)-> B
-If C is coalesced to B, the final rx timestamps of the message will be
-those of C. That is, the timestamps show that we received the message
-when C came (including hardware and software). However, we actually
-received it 1ms later (when B came).
+>> feel free to add my
+>> 
+>> Reviewed-by: Hans-Frieder Vogt <hfdevel@gmx.net>
+> 
+> I added your Reviewed-by except for patches that you've
+> reviewed. Please have look at the remaining patches in v10.
 
-With the added tracepoint, we can recognize such cases and report them
-if we want.
-
-Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
----
- include/trace/events/tcp.h | 61 ++++++++++++++++++++++++++++++++++++++
- net/ipv4/tcp_input.c       |  2 ++
- 2 files changed, 63 insertions(+)
-
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index 49b5ee091cf6..c4219ca2bcf0 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -411,6 +411,67 @@ TRACE_EVENT(tcp_cong_state_set,
- 		  __entry->cong_state)
- );
- 
-+/*
-+ * When called, TCP_SKB_CB(from)->has_rxtstamp must be true, but TCP_SKB_CB(to)->has_rxtstamp may
-+ * not. So has_rxtstamp is checked before reading timestamps of skb "to".
-+ */
-+TRACE_EVENT(tcp_rxtstamp_coalesce,
-+
-+	TP_PROTO(const struct sock *sk, const struct sk_buff *to, const struct sk_buff *from),
-+
-+	TP_ARGS(sk, to, from),
-+
-+	TP_STRUCT__entry(
-+		__field(__u16, sport)
-+		__field(__u16, dport)
-+		__field(__u16, family)
-+		__array(__u8, saddr, 4)
-+		__array(__u8, daddr, 4)
-+		__array(__u8, saddr_v6, 16)
-+		__array(__u8, daddr_v6, 16)
-+		__field(__u64, to_tstamp)
-+		__field(__u64, to_hwtstamp)
-+		__field(__u64, from_tstamp)
-+		__field(__u64, from_hwtstamp)
-+	),
-+
-+	TP_fast_assign(
-+		const struct inet_sock *inet = inet_sk(sk);
-+		__be32 *p32;
-+
-+		__entry->sport = ntohs(inet->inet_sport);
-+		__entry->dport = ntohs(inet->inet_dport);
-+		__entry->family = sk->sk_family;
-+
-+		p32 = (__be32 *) __entry->saddr;
-+		*p32 = inet->inet_saddr;
-+
-+		p32 = (__be32 *) __entry->daddr;
-+		*p32 = inet->inet_daddr;
-+
-+		TP_STORE_ADDRS(__entry, inet->inet_saddr, inet->inet_daddr,
-+			       sk->sk_v6_rcv_saddr, sk->sk_v6_daddr);
-+
-+		if (TCP_SKB_CB(to)->has_rxtstamp) {
-+			__entry->to_tstamp = to->tstamp;
-+			__entry->to_hwtstamp = skb_shinfo(to)->hwtstamps.hwtstamp;
-+		} else {
-+			__entry->to_tstamp = 0;
-+			__entry->to_hwtstamp = 0;
-+		}
-+
-+		__entry->from_tstamp = from->tstamp;
-+		__entry->from_hwtstamp = skb_shinfo(from)->hwtstamps.hwtstamp;
-+	),
-+
-+	TP_printk("family=%s sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c to_tstamp=%llu to_hwtstamp=%llu from_tstamp=%llu from_hwtstamp=%llu",
-+		  show_family_name(__entry->family),
-+		  __entry->sport, __entry->dport, __entry->saddr, __entry->daddr,
-+		  __entry->saddr_v6, __entry->daddr_v6,
-+		  __entry->to_tstamp, __entry->to_hwtstamp,
-+		  __entry->from_tstamp, __entry->from_hwtstamp)
-+);
-+
- #endif /* _TRACE_TCP_H */
- 
- /* This part must be outside protection */
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index eb187450e4d7..7024c6ba20ae 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -4827,6 +4827,8 @@ static bool tcp_try_coalesce(struct sock *sk,
- 	TCP_SKB_CB(to)->tcp_flags |= TCP_SKB_CB(from)->tcp_flags;
- 
- 	if (TCP_SKB_CB(from)->has_rxtstamp) {
-+		trace_tcp_rxtstamp_coalesce(sk, to, from);
-+
- 		TCP_SKB_CB(to)->has_rxtstamp = true;
- 		to->tstamp = from->tstamp;
- 		skb_hwtstamps(to)->hwtstamp = skb_hwtstamps(from)->hwtstamp;
--- 
-2.32.0.3.g01195cf9f
+Sorry, I meant, except for patches that you gave review comments on.
 
 
