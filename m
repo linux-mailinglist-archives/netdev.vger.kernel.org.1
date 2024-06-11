@@ -1,48 +1,45 @@
-Return-Path: <netdev+bounces-102494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08AD99034B4
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 10:03:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83CB4903482
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 09:59:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5AD40B27857
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 07:55:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 108E9283042
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 07:59:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3AB0172BC1;
-	Tue, 11 Jun 2024 07:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B08172BCE;
+	Tue, 11 Jun 2024 07:58:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FuymS0Mq"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ZOTj1mSF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A8E172798;
-	Tue, 11 Jun 2024 07:55:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E79173320;
+	Tue, 11 Jun 2024 07:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718092518; cv=none; b=bvTf+3nm/FiwcvYe8ckKPqO0dME9bhjawH2K25/lQ9i6HQP72cq3gxdGadPKWhQQNPF+AM0T5LeNGVdlYT9lrEQX5S/zPJjmj3zvpeuDyWSHLmSe1XnNJ9zPYgNjIe52VOkGV3awGVh8MAjQaVeVKxjbb7EjwviZvRnNTIaPWrA=
+	t=1718092728; cv=none; b=p/Ajnku+Rlg1pYbyaHuaXGAEgG0haW2uq+xOfXX5HKQAGyyLcZFZiX2rbQHX4TeEac18nkFyGNvgjB5/qYTkqaqj3x7aPS9CFNxgy0/7LNKlvNMrYotcydvbUsRFTTE5Uzdb1iffzXgcaaCP/L/fKo2DFpeA4vF+nVwun5OC7oY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718092518; c=relaxed/simple;
-	bh=Zi4uy1TUma6iabLgVVre8jD58HzqwP0vUE0xLv/7Wpk=;
+	s=arc-20240116; t=1718092728; c=relaxed/simple;
+	bh=CS7CMvTxSk7CyhSPH+19x6CjS6eE7Q7coTMCFgaeI+Y=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xr40RCX/GDLeiRjfCqsbt4ev1eA6nGzq3IQQCld42+HvBAbkVywLGZRhQT53EQ9heMB8H6x1OWYo5TCZDOezElBcxAutu8L4sKqtsPrA7SFG6BvklyuZK0hBV+NKXuhDTpconYgNMvcNiyPTB59hIT/WOsxpZgjnTI3j2ELSn+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FuymS0Mq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D390C2BD10;
-	Tue, 11 Jun 2024 07:55:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718092518;
-	bh=Zi4uy1TUma6iabLgVVre8jD58HzqwP0vUE0xLv/7Wpk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=FuymS0MqIHbqDgregRyzyDcz69F6eXl/Fo5BfNplmTGp86AAVEAMPAvf7h+mb+qO4
-	 fGS4OCL0zJNXL1MHqWQdqleAjMdklkBJf/MSuBpn4QXVv4SCf8OG0u75lvbMX1QLu+
-	 Pu61V5acO8Qfq0w+e4cvXfz+QjjlT8W+ycnaxMLUweE/0v0Tep5ys5AyYJBTxxba24
-	 qfqSPL4tCXY+e4ATgtBbX2jsAdjYCh7AfdxikFHQhVW7xe1C/wwjTVwFTkR4rPnMz1
-	 7q6pHPV68t/d3DVZh53YBKuTwpHe5nsMbmkSTw7JZq5NbjWh8C8JVK6AtHS6bX2IdS
-	 +2sCiwMbk0WYQ==
-Message-ID: <18328cc2-c135-4b69-8c5f-cd45998e970f@kernel.org>
-Date: Tue, 11 Jun 2024 09:55:11 +0200
+	 In-Reply-To:Content-Type; b=rRa9/j05VOWgZ9rOEyGfFMiXFdaoDPv8PTDTaHyEF1vulxMyqOpCTzxW5hKrfsQymXwVrTdM3ZGbgQcF4iGO3eG/PGQP8r+L0lYGk++bQdJiEPNDmadVLXt0bb9PTpb2GdJc8Yt7FUxdITKvD053fBNQ43e6udqEADg4I9LAI0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ZOTj1mSF; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
+	Content-Type; bh=yoRsE3XMCqVssz/yXETnkP2iLCRZh1VO87wImbfmzoE=;
+	b=ZOTj1mSFWeu190IXHKw2QR3wN2OPtUQezhvlRlRDMKY7WUg6jHQfrOrDOlu7rK
+	L3CDXag8zzpVLppKYsiW6mqVBM9lj+8QpAgMCTLQB+PAVRY4lZf3izdBIGNnbypR
+	2+csc/fmmPHpaUJ9Kdiy0OyEZzQkXAPhpLT+Xy1PqS9Dk=
+Received: from [172.22.5.12] (unknown [27.148.194.72])
+	by gzga-smtp-mta-g1-3 (Coremail) with SMTP id _____wA3PymGA2hmh78JHw--.60394S2;
+	Tue, 11 Jun 2024 15:57:59 +0800 (CST)
+Message-ID: <f30a9a63-5189-42d4-96e1-09f64a4fea37@163.com>
+Date: Tue, 11 Jun 2024 15:58:02 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,180 +47,298 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net-next 14/15] net: Reference bpf_redirect_info via
- task_struct on PREEMPT_RT.
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Daniel Bristot de Oliveira <bristot@kernel.org>,
- Boqun Feng <boqun.feng@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>,
- Eric Dumazet <edumazet@google.com>, Frederic Weisbecker
- <frederic@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>,
- Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
- Song Liu <song@kernel.org>, Stanislav Fomichev <sdf@google.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Yonghong Song <yonghong.song@linux.dev>, bpf@vger.kernel.org
-References: <20240607070427.1379327-1-bigeasy@linutronix.de>
- <20240607070427.1379327-15-bigeasy@linutronix.de>
- <045e3716-3c3a-4238-b38a-3616c8974e2c@kernel.org>
- <20240610165014.uWp_yZuW@linutronix.de>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20240610165014.uWp_yZuW@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 2/3] selftests: add selftest for the SRv6 End.DX4
+ behavior with netfilter
+To: Pablo Neira Ayuso <pablo@netfilter.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, wujianguo
+ <wujianguo@chinatelecom.cn>, netdev@vger.kernel.org, edumazet@google.com,
+ contact@proelbtn.com, dsahern@kernel.org, pabeni@redhat.com,
+ netfilter-devel@vger.kernel.org, fw@strlen.de
+References: <20240604144949.22729-1-wujianguo@chinatelecom.cn>
+ <20240604144949.22729-3-wujianguo@chinatelecom.cn>
+ <Zl_OWcrrEipnN_VP@Laptop-X1> <eaf06c77-2457-46fc-aaf1-fb5ae0080072@163.com>
+ <20240605173532.304798bd@kernel.org> <ZmEapORjk3v3FYke@Laptop-X1>
+ <20240605192309.591dfedb@kernel.org> <ZmFNSbHqOF96LtVO@calendula>
+From: Jianguo Wu <wujianguo106@163.com>
+In-Reply-To: <ZmFNSbHqOF96LtVO@calendula>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:_____wA3PymGA2hmh78JHw--.60394S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3Xr15tF4Dtw1DuF4fJFyDtrb_yoWfWF4UpF
+	s8G3y3tr4UWF1Yyw4vkryIvFnxtrZ3Ga4j9r98C34rAwnFgw1UGa1Skay7WanrWrWDtrW3
+	AF1Utw13Zws8t3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UOzV8UUUUU=
+X-CM-SenderInfo: 5zxmxt5qjx0iiqw6il2tof0z/1tbiRAr6kGVODLAC+QAAsI
+
+Hi, Pablo
+
+On 2024/6/6 13:46, Pablo Neira Ayuso wrote:
+> Hi,
+> 
+> On Wed, Jun 05, 2024 at 07:23:09PM -0700, Jakub Kicinski wrote:
+>> On Thu, 6 Jun 2024 10:10:44 +0800 Hangbin Liu wrote:
+>>>> Please follow the instructions from here:
+>>>> https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+>>>> the kernel we build for testing is minimal.
+>>>>
+>>>> We see this output:
+>>>>
+>>>> # ################################################################################
+>>>> # TEST SECTION: SRv6 VPN connectivity test with netfilter enabled in routers
+>>>> # ################################################################################  
+>>>
+>>> If I run the test specifically, I also got error:
+>>> sysctl: cannot stat /proc/sys/net/netfilter/nf_hooks_lwtunnel: No such file or directory
+>>>
+>>> This is because CONFIG_NF_CONNTRACK is build as module. The test need to load
+>>> nf_conntrack specifically. I guest the reason you don't have this error is
+>>> because you have run the netfilter tests first? Which has loaded this module.
+> 
+> Hm, this dependency with conntrack does not look good. This sysctl
+> nf_hooks_lwtunnel should be in the netfilter core. The connection
+> tracking gets loaded on demand, the availability of this sysctl is
+> fragile.
+> 
+
+How about this?
 
 
+[PATCH] netfilter: move the sysctl nf_hooks_lwtunnel into the netfilter core
 
-On 10/06/2024 18.50, Sebastian Andrzej Siewior wrote:
-> On 2024-06-07 13:51:25 [+0200], Jesper Dangaard Brouer wrote:
->> The memset can be further optimized as it currently clears 64 bytes, but
->> it only need to clear 40 bytes, see pahole below.
+Currently, the sysctl net.netfilter.nf_hooks_lwtunnel depends on the
+nf_conntrack module, but the nf_conntrack module is not always loaded.
+Therefore, accessing net.netfilter.nf_hooks_lwtunnel may have an error.
+
+Move sysctl nf_hooks_lwtunnel into the netfilter core.
+
+Fixes: 7a3f5b0de364 ("netfilter: add netfilter hooks to SRv6 data plane")
+Suggested-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Signed-off-by: Jianguo Wu <wujianguo@chinatelecom.cn>
+---
+ include/net/netns/netfilter.h           |  3 ++
+ net/netfilter/core.c                    | 13 ++++++-
+ net/netfilter/nf_conntrack_standalone.c | 15 --------
+ net/netfilter/nf_hooks_lwtunnel.c       | 68 +++++++++++++++++++++++++++++++++
+ net/netfilter/nf_internals.h            |  6 +++
+ 5 files changed, 88 insertions(+), 17 deletions(-)
+
+diff --git a/include/net/netns/netfilter.h b/include/net/netns/netfilter.h
+index 02bbdc5..a6a0bf4 100644
+--- a/include/net/netns/netfilter.h
++++ b/include/net/netns/netfilter.h
+@@ -15,6 +15,9 @@ struct netns_nf {
+ 	const struct nf_logger __rcu *nf_loggers[NFPROTO_NUMPROTO];
+ #ifdef CONFIG_SYSCTL
+ 	struct ctl_table_header *nf_log_dir_header;
++#ifdef CONFIG_LWTUNNEL
++	struct ctl_table_header *nf_lwtnl_dir_header;
++#endif
+ #endif
+ 	struct nf_hook_entries __rcu *hooks_ipv4[NF_INET_NUMHOOKS];
+ 	struct nf_hook_entries __rcu *hooks_ipv6[NF_INET_NUMHOOKS];
+diff --git a/net/netfilter/core.c b/net/netfilter/core.c
+index 3126911..b00fc28 100644
+--- a/net/netfilter/core.c
++++ b/net/netfilter/core.c
+@@ -815,12 +815,21 @@ int __init netfilter_init(void)
+ 	if (ret < 0)
+ 		goto err;
+
++#ifdef CONFIG_LWTUNNEL
++	ret = netfilter_lwtunnel_init();
++	if (ret < 0)
++		goto err_lwtunnel_pernet;
++#endif
+ 	ret = netfilter_log_init();
+ 	if (ret < 0)
+-		goto err_pernet;
++		goto err_log_pernet;
+
+ 	return 0;
+-err_pernet:
++err_log_pernet:
++#ifdef CONFIG_LWTUNNEL
++	netfilter_lwtunnel_fini();
++err_lwtunnel_pernet:
++#endif
+ 	unregister_pernet_subsys(&netfilter_net_ops);
+ err:
+ 	return ret;
+diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
+index 74112e9..6c40bdf 100644
+--- a/net/netfilter/nf_conntrack_standalone.c
++++ b/net/netfilter/nf_conntrack_standalone.c
+@@ -22,9 +22,6 @@
+ #include <net/netfilter/nf_conntrack_acct.h>
+ #include <net/netfilter/nf_conntrack_zones.h>
+ #include <net/netfilter/nf_conntrack_timestamp.h>
+-#ifdef CONFIG_LWTUNNEL
+-#include <net/netfilter/nf_hooks_lwtunnel.h>
+-#endif
+ #include <linux/rculist_nulls.h>
+
+ static bool enable_hooks __read_mostly;
+@@ -612,9 +609,6 @@ enum nf_ct_sysctl_index {
+ 	NF_SYSCTL_CT_PROTO_TIMEOUT_GRE,
+ 	NF_SYSCTL_CT_PROTO_TIMEOUT_GRE_STREAM,
+ #endif
+-#ifdef CONFIG_LWTUNNEL
+-	NF_SYSCTL_CT_LWTUNNEL,
+-#endif
+
+ 	NF_SYSCTL_CT_LAST_SYSCTL,
+ };
+@@ -946,15 +940,6 @@ enum nf_ct_sysctl_index {
+ 		.proc_handler   = proc_dointvec_jiffies,
+ 	},
+ #endif
+-#ifdef CONFIG_LWTUNNEL
+-	[NF_SYSCTL_CT_LWTUNNEL] = {
+-		.procname	= "nf_hooks_lwtunnel",
+-		.data		= NULL,
+-		.maxlen		= sizeof(int),
+-		.mode		= 0644,
+-		.proc_handler	= nf_hooks_lwtunnel_sysctl_handler,
+-	},
+-#endif
+ };
+
+ static struct ctl_table nf_ct_netfilter_table[] = {
+diff --git a/net/netfilter/nf_hooks_lwtunnel.c b/net/netfilter/nf_hooks_lwtunnel.c
+index 00e89ff..11712d2 100644
+--- a/net/netfilter/nf_hooks_lwtunnel.c
++++ b/net/netfilter/nf_hooks_lwtunnel.c
+@@ -3,6 +3,9 @@
+ #include <linux/sysctl.h>
+ #include <net/lwtunnel.h>
+ #include <net/netfilter/nf_hooks_lwtunnel.h>
++#include <linux/netfilter.h>
++
++#include "nf_internals.h"
+
+ static inline int nf_hooks_lwtunnel_get(void)
+ {
+@@ -50,4 +53,69 @@ int nf_hooks_lwtunnel_sysctl_handler(struct ctl_table *table, int write,
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(nf_hooks_lwtunnel_sysctl_handler);
++
++static struct ctl_table nf_lwtunnel_sysctl_table[] = {
++	{
++		.procname	= "nf_hooks_lwtunnel",
++		.data		= NULL,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= nf_hooks_lwtunnel_sysctl_handler,
++	},
++	{},
++};
++
++static int nf_lwtunnel_net_init(struct net *net)
++{
++	struct ctl_table *table;
++	struct ctl_table_header *hdr;
++
++	table = nf_lwtunnel_sysctl_table;
++	if (!net_eq(net, &init_net)) {
++		table = kmemdup(nf_lwtunnel_sysctl_table,
++				sizeof(nf_lwtunnel_sysctl_table),
++				GFP_KERNEL);
++		if (!table)
++			goto err_alloc;
++	}
++
++	hdr = register_net_sysctl_sz(net, "net/netfilter", table,
++				     ARRAY_SIZE(nf_lwtunnel_sysctl_table));
++	if (!hdr)
++		goto err_reg;
++
++	net->nf.nf_lwtnl_dir_header = hdr;
++	return 0;
++
++err_reg:
++	if (!net_eq(net, &init_net))
++		kfree(table);
++err_alloc:
++	return -ENOMEM;
++}
++
++static void __net_exit nf_lwtunnel_net_exit(struct net *net)
++{
++	const struct ctl_table *table;
++
++	table = net->nf.nf_lwtnl_dir_header->ctl_table_arg;
++	unregister_net_sysctl_table(net->nf.nf_lwtnl_dir_header);
++	if (!net_eq(net, &init_net))
++		kfree(table);
++}
++
++static struct pernet_operations nf_lwtunnel_net_ops = {
++	.init = nf_lwtunnel_net_init,
++	.exit = nf_lwtunnel_net_exit,
++};
++
++int __init netfilter_lwtunnel_init(void)
++{
++	return register_pernet_subsys(&nf_lwtunnel_net_ops);
++}
++
++void __exit netfilter_lwtunnel_fini(void)
++{
++	unregister_pernet_subsys(&nf_lwtunnel_net_ops);
++}
+ #endif /* CONFIG_SYSCTL */
+diff --git a/net/netfilter/nf_internals.h b/net/netfilter/nf_internals.h
+index 832ae64..5c281b7 100644
+--- a/net/netfilter/nf_internals.h
++++ b/net/netfilter/nf_internals.h
+@@ -29,6 +29,12 @@
+ /* nf_log.c */
+ int __init netfilter_log_init(void);
+
++#ifdef CONFIG_LWTUNNEL
++/* nf_hooks_lwtunnel.c */
++int __init netfilter_lwtunnel_init(void);
++void __exit netfilter_lwtunnel_fini(void);
++#endif
++
+ /* core.c */
+ void nf_hook_entries_delete_raw(struct nf_hook_entries __rcu **pp,
+ 				const struct nf_hook_ops *reg);
+-- 
+1.8.3.1
+
+
+>> Ah, quite possibly, good catch! We don't reboot between tests,
+>> and the VM must have run 10 or so other tests before.
 >>
->> Replace memset with something like:
->>   memset(&bpf_net_ctx->ri, 0, offsetof(struct bpf_net_context, ri.nh));
+>>>> # Warning: Extension rpfilter revision 0 not supported, missing kernel module?
+>>>> # iptables v1.8.8 (nf_tables):  RULE_APPEND failed (No such file or directory): rule in chain PREROUTING
+>>>> # Warning: Extension rpfilter revision 0 not supported, missing kernel module?
+>>>> # iptables v1.8.8 (nf_tables):  RULE_APPEND failed (No such file or directory): rule in chain PREROUTING  
+>>>
+>>> Just checked, we need CONFIG_IP_NF_MATCH_RPFILTER=m in config file.
 >>
->> This is an optimization, because with 64 bytes this result in a rep-stos
->> (repeated string store operation) that on Intel touch CPU-flags (to be
->> IRQ safe) which is slow, while clearing 40 bytes doesn't cause compiler
->> to use this instruction, which is faster.  Memset benchmarked with [1]
+>> :( Must be lack of compat support then? I CCed netfilter, perhaps they
+>> can advise. I wonder if there is a iptables-nftables compatibility list
+>> somewhere.
 > 
-> I've been playing along with this and have to say that "rep stosq" is
-> roughly 3x slower vs "movq" for 64 bytes on all x86 I've been looking
-> at.
+> iptables-nft potentially requires all CONFIG_IP_NF_MATCH_* and
+> CONFIG_IP_NF_TARGET_* extensions, in this new testcase it uses
+> rpfilter which seems not to be used in any of the existing tests so
+> far, that is why CONFIG_IP_NF_MATCH_RPFILTER=m is required.
 
-Thanks for confirming "rep stos" is 3x slower for small sizes.
+And this?
 
+diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
+index 04de7a6..d4891f7 100644
+--- a/tools/testing/selftests/net/config
++++ b/tools/testing/selftests/net/config
+@@ -101,3 +101,5 @@ CONFIG_NETFILTER_XT_MATCH_POLICY=m
+ CONFIG_CRYPTO_ARIA=y
+ CONFIG_XFRM_INTERFACE=m
+ CONFIG_XFRM_USER=m
++CONFIG_IP_NF_MATCH_RPFILTER=m
++CONFIG_IP6_NF_MATCH_RPFILTER=m
 
-> For gcc the stosq vs movq depends on the CPU settings. The generic uses
-> movq up to 40 bytes, skylake uses movq even for 64bytes. clang…
-> This could be tuned via -mmemset-strategy=libcall:64:align,rep_8byte:-1:align
-> 
-
-Cool I didn't know of this tuning.  Is this a compiler option?
-Where do I change this setting, as I would like to experiment with this
-for our prod kernels.
-
-My other finding is, this primarily a kernel compile problem, because
-for userspace compiler chooses to use MMX instructions (e.g. movaps
-xmmword ptr[rsp], xmm0).  The kernel compiler options (-mno-sse -mno-mmx
--mno-sse2 -mno-3dnow -mno-avx) disables this, which aparently changes
-the tipping point.
-
-
-> I folded this into the last two patches:
-> 
-> diff --git a/include/linux/filter.h b/include/linux/filter.h
-> index d2b4260d9d0be..1588d208f1348 100644
-> --- a/include/linux/filter.h
-> +++ b/include/linux/filter.h
-> @@ -744,27 +744,40 @@ struct bpf_redirect_info {
->   	struct bpf_nh_params nh;
->   };
->   
-> +enum bpf_ctx_init_type {
-> +	bpf_ctx_ri_init,
-> +	bpf_ctx_cpu_map_init,
-> +	bpf_ctx_dev_map_init,
-> +	bpf_ctx_xsk_map_init,
-> +};
-> +
->   struct bpf_net_context {
->   	struct bpf_redirect_info ri;
->   	struct list_head cpu_map_flush_list;
->   	struct list_head dev_map_flush_list;
->   	struct list_head xskmap_map_flush_list;
-> +	unsigned int flags;
-
-Why have yet another flags variable, when we already have two flags in 
-bpf_redirect_info ?
-
->   };
->   
-> +static inline bool bpf_net_ctx_need_init(struct bpf_net_context *bpf_net_ctx,
-> +					 enum bpf_ctx_init_type flag)
-> +{
-> +	return !(bpf_net_ctx->flags & (1 << flag));
-> +}
-> +
-> +static inline bool bpf_net_ctx_set_flag(struct bpf_net_context *bpf_net_ctx,
-> +					enum bpf_ctx_init_type flag)
-> +{
-> +	return bpf_net_ctx->flags |= 1 << flag;
-> +}
-> +
->   static inline struct bpf_net_context *bpf_net_ctx_set(struct bpf_net_context *bpf_net_ctx)
->   {
->   	struct task_struct *tsk = current;
->   
->   	if (tsk->bpf_net_context != NULL)
->   		return NULL;
-> -	memset(&bpf_net_ctx->ri, 0, sizeof(bpf_net_ctx->ri));
-> -
-> -	if (IS_ENABLED(CONFIG_BPF_SYSCALL)) {
-> -		INIT_LIST_HEAD(&bpf_net_ctx->cpu_map_flush_list);
-> -		INIT_LIST_HEAD(&bpf_net_ctx->dev_map_flush_list);
-> -	}
-> -	if (IS_ENABLED(CONFIG_XDP_SOCKETS))
-> -		INIT_LIST_HEAD(&bpf_net_ctx->xskmap_map_flush_list);
-> +	bpf_net_ctx->flags = 0;
->   
->   	tsk->bpf_net_context = bpf_net_ctx;
->   	return bpf_net_ctx;
-> @@ -785,6 +798,11 @@ static inline struct bpf_redirect_info *bpf_net_ctx_get_ri(void)
->   {
->   	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
->   
-> +	if (bpf_net_ctx_need_init(bpf_net_ctx, bpf_ctx_ri_init)) {
-> +		memset(&bpf_net_ctx->ri, 0, offsetof(struct bpf_net_context, ri.nh));
-> +		bpf_net_ctx_set_flag(bpf_net_ctx, bpf_ctx_ri_init);
-> +	}
-> +
->   	return &bpf_net_ctx->ri;
->   }
->   
-> @@ -792,6 +810,11 @@ static inline struct list_head *bpf_net_ctx_get_cpu_map_flush_list(void)
->   {
->   	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
->   
-> +	if (bpf_net_ctx_need_init(bpf_net_ctx, bpf_ctx_cpu_map_init)) {
-> +		INIT_LIST_HEAD(&bpf_net_ctx->cpu_map_flush_list);
-> +		bpf_net_ctx_set_flag(bpf_net_ctx, bpf_ctx_cpu_map_init);
-> +	}
-> +
->   	return &bpf_net_ctx->cpu_map_flush_list;
->   }
->   
-> @@ -799,6 +822,11 @@ static inline struct list_head *bpf_net_ctx_get_dev_flush_list(void)
->   {
->   	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
->   
-> +	if (bpf_net_ctx_need_init(bpf_net_ctx, bpf_ctx_dev_map_init)) {
-> +		INIT_LIST_HEAD(&bpf_net_ctx->dev_map_flush_list);
-> +		bpf_net_ctx_set_flag(bpf_net_ctx, bpf_ctx_dev_map_init);
-> +	}
-> +
->   	return &bpf_net_ctx->dev_map_flush_list;
->   }
->   
-> @@ -806,6 +834,11 @@ static inline struct list_head *bpf_net_ctx_get_xskmap_flush_list(void)
->   {
->   	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
->   
-> +	if (bpf_net_ctx_need_init(bpf_net_ctx, bpf_ctx_xsk_map_init)) {
-> +		INIT_LIST_HEAD(&bpf_net_ctx->xskmap_map_flush_list);
-> +		bpf_net_ctx_set_flag(bpf_net_ctx, bpf_ctx_xsk_map_init);
-> +	}
-> +
->   	return &bpf_net_ctx->xskmap_map_flush_list;
->   }
->   
-> 
-> Sebastian
 
