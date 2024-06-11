@@ -1,135 +1,154 @@
-Return-Path: <netdev+bounces-102717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B5619045E3
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 22:42:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB7779045E6
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 22:43:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3BBCB22478
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 20:42:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D2661F24939
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 20:43:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75F4E152533;
-	Tue, 11 Jun 2024 20:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A0415359B;
+	Tue, 11 Jun 2024 20:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="A+TABI7s"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0dj3vZld"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FEC315250A
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 20:42:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56322152E1D
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 20:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718138569; cv=none; b=rmkKUfw7ITMT7swdfFK5qwYZrdXQhEvN6IXAN3+eCOXaBg7cWwq3bwfr7YV/a/+EsF+dQ6ycXsKgRFzKgjkwF94VURQuDI+2UUCBnSpWtc3ipuPuEsVR0/MmirhYEVSdQ0Eevr8Q6CsMnE4Sw3zdnwLahP6dIFhS+ekGGXUIFXE=
+	t=1718138571; cv=none; b=JDubQVy5C7hbEfIuEkdH5JgE3anNGXSt5yyL1qAVKM9tsB+1Drwc3gqdtPwLzCj8Lyn5FkAWUPqod7s2MJdyxqEWNs1nig73G5H7dbmkBhNnwJ82RT9g7bDqJO43sz46whB9tmjQmJF/pgNK33Hvd6BBQ6+IVT43rHo0Hvax9ak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718138569; c=relaxed/simple;
-	bh=dxtVQ9ghcpp7bsx3aChn8pSuHxgJySVYGM26ugBSVjM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=SMOJ++1iqEAK6hzMy5wEhOlVbVKrv2Fj1Y5UAssJlu/IvzNatZRWNmj4wEkJ20GtQSC7FbnP0fuCcT7is2N4FdKr6HYKJmbpBbZQ1LYqsqxsu22wy5tNeIG1M2DUUkm8wNsPxlirM9xdj5MP35js1qMNxAFDTEIqZk4taPD3Exg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=A+TABI7s; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 2EA972C0980;
-	Wed, 12 Jun 2024 08:42:44 +1200 (NZST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1718138564;
-	bh=dxtVQ9ghcpp7bsx3aChn8pSuHxgJySVYGM26ugBSVjM=;
-	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=A+TABI7s7QXoJKk0UshzV7B2sy0UMidOCB1damG4YhBwVSNpQ/X0BqYz8p0OoZLmO
-	 uVn0E7/T0LO+Q/hLQfcAYIqHzcrvyk0gn/ogU8ouRwgErXT11NwvW19JrPwkr24MSv
-	 4zr2IJ0dxJr/JKfHMHchhbbdoetBgniBBUPEOcB2VC8Tlf/twOs6xvQEJD3kJ2kmB+
-	 HLA7ci9YCvjc4EQuZbCg2ec1oiqzpqNMU9NeWJsZMOlTcMFOtkYObVuYl++WHqW2o/
-	 A43LPPzmhj75MRDERl5jHbVjzhxjUVYGsXyOsr0iKMGvMbWu0V6fhqyUPNCz746QGX
-	 x6Umh14y7ZbeQ==
-Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B6668b6c40001>; Wed, 12 Jun 2024 08:42:44 +1200
-Received: from svr-chch-ex1.atlnz.lc (2001:df5:b000:bc8::77) by
- svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.1544.11; Wed, 12 Jun 2024 08:42:43 +1200
-Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) by
- svr-chch-ex1.atlnz.lc (2001:df5:b000:bc8::77) with Microsoft SMTP Server
- (TLS) id 15.0.1497.48; Wed, 12 Jun 2024 08:42:43 +1200
-Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
- svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
- 15.02.1544.011; Wed, 12 Jun 2024 08:42:43 +1200
-From: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
-To: "andrew@lunn.ch" <andrew@lunn.ch>, "hkallweit1@gmail.com"
-	<hkallweit1@gmail.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"ericwouds@gmail.com" <ericwouds@gmail.com>, =?utf-8?B?TWFyZWsgQmVow7pu?=
-	<kabel@kernel.org>
-Subject: Re: [PATCH next-next] net: phy: realtek: add support for rtl8224
- 2.5Gbps PHY
-Thread-Topic: [PATCH next-next] net: phy: realtek: add support for rtl8224
- 2.5Gbps PHY
-Thread-Index: AQHau8ECnGOzFCFnUUe89YjWXGoxMrHCPySA
-Date: Tue, 11 Jun 2024 20:42:43 +0000
-Message-ID: <c3d699a1-2f24-41c5-b0a7-65db025eedbc@alliedtelesis.co.nz>
-References: <20240611053415.2111723-1-chris.packham@alliedtelesis.co.nz>
-In-Reply-To: <20240611053415.2111723-1-chris.packham@alliedtelesis.co.nz>
-Accept-Language: en-NZ, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E4D44278CE5E0C44AA91A68C3D659BA3@atlnz.lc>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1718138571; c=relaxed/simple;
+	bh=WlznXMtSbdGKu8rLIix8aC6pcrpZ/n+hFKL5oX2CDVE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ouiCQES36qVHE6B/Lm0I0pNveqz5Wn2iAxEYhL9DXu7aY3omRoQqxnJ1KL5Otd98Q4ME5BBWeamCU6ZP6TbReQ3x1CTZW1284YCEk0DVQXhQSBa+u6sqKK4wrQmANPyUoebCbA+JOfDXgs7cRSgcoNHdFumn4PYHzTFjMsEVqZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--zhuyifei.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0dj3vZld; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--zhuyifei.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2bf8512aa8dso6371884a91.1
+        for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 13:42:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718138569; x=1718743369; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7RdAYUNPI1yDlhBKNejbzxVlP4TF3h6oLfHe0CjscKc=;
+        b=0dj3vZldNYGo19ik02IAtStgywPiInVuW11R2izQPsDenialQkMHtaAoEth1NkAWRg
+         mJhqvKL0/RFR65eEWxPWeyiYp7wj7dJcEhqKWY+gXfJV02An8ZqhcoQY4kUOvQwXd2Ch
+         ddMaV2nkbkWKfCVzDWBtB1LnCTUQrlJTG/SmNwyO0uO2PKKHhlptegQvwQ7kL/E93jPZ
+         sTC1Ei5iTxTsfXSVGE6tTpIsyozXMyVKdT/KYxRVj6LT2GIw9Ojt/Dsm4MJS/aeOPmhm
+         22q9kJgT5TxO+bzL5Gpd4gtzH3OoSZ7F6T5gWebSXujT/tiBfk+hjEqZ5+UJtNaI1h5j
+         g7iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718138569; x=1718743369;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7RdAYUNPI1yDlhBKNejbzxVlP4TF3h6oLfHe0CjscKc=;
+        b=Is/RbUcC8uKqDGou20VASuUy3b5dKi5owdI/etMGEQrdbqxXP4sUE1t3dFo/TO2TCK
+         Bbc3A1rjtxsnBaWJcQ1kvfMESHpN/ScJelBeRNUGoAnq5cw6Nb9SOH6rPMqOVlSMniRW
+         i4jpIN15Ee3w2U9kPMHxIJE2Yrf5/SWImlAJVm37imnQs+1lHVcwqPOVjqwYeUJCosSy
+         zoexM0+f+nWMhxv5Mg62XSpt5wmuOtn7CBGE3W9qUTwnTJu/CPcTTVo1BRQmzqifM8Rb
+         07CF38nmkHxRm+j0ehbfvkrTn1h8mLo/WvrMohWXRtK0nuyrgffEs5AQCWN3byveU6db
+         vM1A==
+X-Gm-Message-State: AOJu0Yxh/LptmPzoLjXvjnH1qWqM6ZnwqsdEO8eRDj0X6gG9zWniC43X
+	RTtT6RGg6/DbPzdEpU2OrzDXWg9tsN3HCpIA7qliLUnXHv9M7JYPwrCQx8cavCaqwt8dKTumB1/
+	AIFN110GWf9yKtHWvkam6OGQ1JYwxt2YHPF2Xwxzz74WJwGkTSNGBIBMl2791JXCNR0EETY2F4p
+	GeM877AvH516/fFOE6cuysjZPspMtxp7maPRq7IX561vY=
+X-Google-Smtp-Source: AGHT+IEVEQk6y30Cnzs9O7le2rcOssc9YOhcAKdkh7uIo/fmjXuF4j76p728y2wEGL9FdFSB3mebvMjxSzB5ow==
+X-Received: from zhuyifei-kvm.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2edc])
+ (user=zhuyifei job=sendgmr) by 2002:a17:90a:ee92:b0:2c2:1b98:94ee with SMTP
+ id 98e67ed59e1d1-2c4a7758861mr43a91.8.1718138568861; Tue, 11 Jun 2024
+ 13:42:48 -0700 (PDT)
+Date: Tue, 11 Jun 2024 20:42:44 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=F9L0dbhN c=1 sm=1 tr=0 ts=6668b6c4 a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=75chYTbOgJ0A:10 a=IkcTkHD0fZMA:10 a=T1WGqf2p2xoA:10 a=oaWfbxmcstGepVewQGkA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-SEG-SpamProfiler-Score: 0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
+Message-ID: <cover.1718138187.git.zhuyifei@google.com>
+Subject: [RFC PATCH net-next 0/3] selftests: Add AF_XDP functionality test
+From: YiFei Zhu <zhuyifei@google.com>
+To: netdev@vger.kernel.org, bpf@vger.kernel.org
+Cc: "=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?=" <bjorn@kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Andrii Nakryiko <andrii@kernel.org>, Stanislav Fomichev <sdf@google.com>, 
+	Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-K2NjIEVyaWMgVyBhbmQgTWFyZWsuDQoNCk9uIDExLzA2LzI0IDE3OjM0LCBDaHJpcyBQYWNraGFt
-IHdyb3RlOg0KPiBUaGUgUmVhbHRlayBSVEw4MjI0IFBIWSBpcyBhIDIuNUdicHMgY2FwYWJsZSBQ
-SFkuIEl0IG9ubHkgdXNlcyB0aGUNCj4gY2xhdXNlIDQ1IE1ESU8gaW50ZXJmYWNlIGFuZCBjYW4g
-bGV2ZXJhZ2UgdGhlIHN1cHBvcnQgdGhhdCBoYXMgYWxyZWFkeQ0KPiBiZWVuIGFkZGVkIGZvciB0
-aGUgb3RoZXIgODIyeCBQSFlzLg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBDaHJpcyBQYWNraGFtIDxj
-aHJpcy5wYWNraGFtQGFsbGllZHRlbGVzaXMuY28ubno+DQo+IC0tLQ0KPg0KPiBOb3RlczoNCj4g
-ICAgICBJJ20gY3VycmVudGx5IHRlc3RpbmcgdGhpcyBvbiBhbiBvbGRlciBrZXJuZWwgYmVjYXVz
-ZSB0aGUgYm9hcmQgSSdtDQo+ICAgICAgdXNpbmcgaGFzIGEgU09DL0RTQSBzd2l0Y2ggdGhhdCBo
-YXMgYSBkcml2ZXIgaW4gb3BlbndydCBmb3IgTGludXggNS4xNS4NCj4gICAgICBJIGhhdmUgdHJp
-ZWQgdG8gc2VsZWN0aXZlbHkgYmFjayBwb3J0IHRoZSBiaXRzIEkgbmVlZCBmcm9tIHRoZSBvdGhl
-cg0KPiAgICAgIHJ0bDgyMnggd29yayBzbyB0aGlzIHNob3VsZCBiZSBhbGwgdGhhdCBpcyByZXF1
-aXJlZCBmb3IgdGhlIHJ0bDgyMjQuDQo+ICAgICAgDQo+ICAgICAgVGhlcmUncyBxdWl0ZSBhIGxv
-dCB0aGF0IHdvdWxkIG5lZWQgZm9yd2FyZCBwb3J0aW5nIGdldCBhIHdvcmtpbmcgc3lzdGVtDQo+
-ICAgICAgYWdhaW5zdCBhIGN1cnJlbnQga2VybmVsIHNvIGhvcGVmdWxseSB0aGlzIGlzIHNtYWxs
-IGVub3VnaCB0aGF0IGl0IGNhbg0KPiAgICAgIGxhbmQgd2hpbGUgSSdtIHRyeWluZyB0byBmaWd1
-cmUgb3V0IGhvdyB0byB1bnRhbmdsZSBhbGwgdGhlIG90aGVyIGJpdHMuDQo+ICAgICAgDQo+ICAg
-ICAgT25lIHRoaW5nIHRoYXQgbWF5IGFwcGVhciBsYWNraW5nIGlzIHRoZSBsYWNrIG9mIHJhdGVf
-bWF0Y2hpbmcgc3VwcG9ydC4NCj4gICAgICBBY2NvcmRpbmcgdG8gdGhlIGRvY3VtZW50YXRpb24g
-SSBoYXZlIGtub3cgdGhlIGludGVyZmFjZSB1c2VkIG9uIHRoZQ0KPiAgICAgIFJUTDgyMjQgaXMg
-KHEpdXhzZ21paSBzbyBubyByYXRlIG1hdGNoaW5nIGlzIHJlcXVpcmVkLiBBcyBJJ20gc3RpbGwN
-Cj4gICAgICB0cnlpbmcgdG8gZ2V0IHRoaW5ncyBjb21wbGV0ZWx5IHdvcmtpbmcgdGhhdCBtYXkg
-Y2hhbmdlIGlmIEkgZ2V0IG5ldw0KPiAgICAgIGluZm9ybWF0aW9uLg0KPg0KPiAgIGRyaXZlcnMv
-bmV0L3BoeS9yZWFsdGVrLmMgfCA4ICsrKysrKysrDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDggaW5z
-ZXJ0aW9ucygrKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvcGh5L3JlYWx0ZWsuYyBi
-L2RyaXZlcnMvbmV0L3BoeS9yZWFsdGVrLmMNCj4gaW5kZXggN2FiNDFmOTVkYWU1Li4yMTc0ODkz
-Yzk3NGYgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvbmV0L3BoeS9yZWFsdGVrLmMNCj4gKysrIGIv
-ZHJpdmVycy9uZXQvcGh5L3JlYWx0ZWsuYw0KPiBAQCAtMTMxNyw2ICsxMzE3LDE0IEBAIHN0YXRp
-YyBzdHJ1Y3QgcGh5X2RyaXZlciByZWFsdGVrX2RydnNbXSA9IHsNCj4gICAJCS5yZXN1bWUgICAg
-ICAgICA9IHJ0bGdlbl9yZXN1bWUsDQo+ICAgCQkucmVhZF9wYWdlICAgICAgPSBydGw4MjF4X3Jl
-YWRfcGFnZSwNCj4gICAJCS53cml0ZV9wYWdlICAgICA9IHJ0bDgyMXhfd3JpdGVfcGFnZSwNCj4g
-Kwl9LCB7DQo+ICsJCVBIWV9JRF9NQVRDSF9FWEFDVCgweDAwMWNjYWQwKSwNCj4gKwkJLm5hbWUJ
-CT0gIlJUTDgyMjQgMi41R2JwcyBQSFkiLA0KPiArCQkuZ2V0X2ZlYXR1cmVzICAgPSBydGw4MjJ4
-X2M0NV9nZXRfZmVhdHVyZXMsDQo+ICsJCS5jb25maWdfYW5lZyAgICA9IHJ0bDgyMnhfYzQ1X2Nv
-bmZpZ19hbmVnLA0KPiArCQkucmVhZF9zdGF0dXMgICAgPSBydGw4MjJ4X2M0NV9yZWFkX3N0YXR1
-cywNCj4gKwkJLnN1c3BlbmQgICAgICAgID0gZ2VucGh5X2M0NV9wbWFfc3VzcGVuZCwNCj4gKwkJ
-LnJlc3VtZSAgICAgICAgID0gcnRsZ2VuX2M0NV9yZXN1bWUsDQo+ICAgCX0sIHsNCj4gICAJCVBI
-WV9JRF9NQVRDSF9FWEFDVCgweDAwMWNjOTYxKSwNCj4gICAJCS5uYW1lCQk9ICJSVEw4MzY2UkIg
-R2lnYWJpdCBFdGhlcm5ldCIs
+We have observed that hardware NIC drivers may have faulty AF_XDP
+implementations, and there seem to be a lack of a test of various modes
+in which AF_XDP could run. This series adds a test to verify that NIC
+drivers implements many AF_XDP features by performing a send / receive
+of a single UDP packet.
+
+I put the C code of the test under selftests/bpf because I'm not really
+sure how I'd build the BPF-related code without the selftests/bpf
+build infrastructure.
+
+Tested on Google Cloud, with GVE:
+
+  $ sudo NETIF=ens4 REMOTE_TYPE=ssh \
+    REMOTE_ARGS="root@10.138.15.235" \
+    LOCAL_V4="10.138.15.234" \
+    REMOTE_V4="10.138.15.235" \
+    LOCAL_NEXTHOP_MAC="42:01:0a:8a:00:01" \
+    REMOTE_NEXTHOP_MAC="42:01:0a:8a:00:01" \
+    python3 xsk_hw.py
+
+  KTAP version 1
+  1..22
+  ok 1 xsk_hw.ipv4_basic
+  ok 2 xsk_hw.ipv4_tx_skb_copy
+  ok 3 xsk_hw.ipv4_tx_skb_copy_force_attach
+  ok 4 xsk_hw.ipv4_rx_skb_copy
+  ok 5 xsk_hw.ipv4_tx_drv_copy
+  ok 6 xsk_hw.ipv4_tx_drv_copy_force_attach
+  ok 7 xsk_hw.ipv4_rx_drv_copy
+  [...]
+  # Exception| STDERR: b'/tmp/zzfhcqkg/pbgodkgjxsk_hw: recv_pfpacket: Timeout\n'
+  not ok 8 xsk_hw.ipv4_tx_drv_zerocopy
+  ok 9 xsk_hw.ipv4_tx_drv_zerocopy_force_attach
+  ok 10 xsk_hw.ipv4_rx_drv_zerocopy
+  [...]
+  # Exception| STDERR: b'/tmp/zzfhcqkg/pbgodkgjxsk_hw: connect sync client: max_retries\n'
+  [...]
+  # Exception| STDERR: b'/linux/tools/testing/selftests/bpf/xsk_hw: open_xsk: Device or resource busy\n'
+  not ok 11 xsk_hw.ipv4_rx_drv_zerocopy_fill_after_bind
+  ok 12 xsk_hw.ipv6_basic # SKIP Test requires IPv6 connectivity
+  [...]
+  ok 22 xsk_hw.ipv6_rx_drv_zerocopy_fill_after_bind # SKIP Test requires IPv6 connectivity
+  # Totals: pass:9 fail:2 xfail:0 xpass:0 skip:11 error:0
+
+YiFei Zhu (3):
+  selftests/bpf: Move rxq_num helper from xdp_hw_metadata to
+    network_helpers
+  selftests/bpf: Add xsk_hw AF_XDP functionality test
+  selftests: drv-net: Add xsk_hw AF_XDP functionality test
+
+ tools/testing/selftests/bpf/.gitignore        |   1 +
+ tools/testing/selftests/bpf/Makefile          |   7 +-
+ tools/testing/selftests/bpf/network_helpers.c |  27 +
+ tools/testing/selftests/bpf/network_helpers.h |  16 +
+ tools/testing/selftests/bpf/progs/xsk_hw.c    |  72 ++
+ tools/testing/selftests/bpf/xdp_hw_metadata.c |  27 +-
+ tools/testing/selftests/bpf/xsk_hw.c          | 844 ++++++++++++++++++
+ .../testing/selftests/drivers/net/hw/Makefile |   1 +
+ .../selftests/drivers/net/hw/xsk_hw.py        | 133 +++
+ 9 files changed, 1102 insertions(+), 26 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/xsk_hw.c
+ create mode 100644 tools/testing/selftests/bpf/xsk_hw.c
+ create mode 100755 tools/testing/selftests/drivers/net/hw/xsk_hw.py
+
+-- 
+2.45.2.505.gda0bf45e8d-goog
+
 
