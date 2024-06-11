@@ -1,244 +1,345 @@
-Return-Path: <netdev+bounces-102468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E0F19032A3
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 08:31:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86BF09032E1
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 08:39:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73AD91C23148
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 06:31:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E53328B1F6
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 06:39:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D19D171E5D;
-	Tue, 11 Jun 2024 06:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91836171672;
+	Tue, 11 Jun 2024 06:39:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="omWHgBU5"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="OQskwtzm"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AEBA171677;
-	Tue, 11 Jun 2024 06:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6F9170858
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 06:38:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718087494; cv=none; b=bMnFU/V4xbOTXMBLgwFWWczKP+DaMuoDuV4fIwEBkR7OL7sqpGbrH3AOwlYRQIvIUDQEeHyH8GtzsExqSuU0uvoj2gOnCa25JU4qW7LnCwzqj6x0uIpC82O3EWwu1a+2hNIo5sw6b5/lfSKTRtNRC/M9nFZrUpJEjbXulFBvPRY=
+	t=1718087940; cv=none; b=b97GgpgpSaL2SF41qc5K5inGvu0/9hXA4JWBPr2VRV36OP+mS5h9MQgm7wABDPRhzfzuouTEljV8c2f661qGVQSYEgc3v6tq86LE+OA8Sam/bqamKsFL7yRCAAaxXFgeoKQOjxxaYhQ/jxarXb4ZMyM6EIbHJ8TZW6MlPDLdrm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718087494; c=relaxed/simple;
-	bh=JCrCO6n2LwzUup92sO/dIW4I9KnZ2LnBJdgZ9OVY/QY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aquJix4izFgrtApLSbbu8UkPnn2GVlsLY9MSvT8yzmjZGqW8tX7CNYlbWnx+6eid+LFtImcyAWdpLeV4FXxM1VzKJFDi75wDNGiL4aSGuAOIhUeldbQOQz2ajUhOSiJeiZavvpNN0PORjoDPcmf/fp6J+7aqQw9BDzroUdczvcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=omWHgBU5; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1718087492; x=1749623492;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=JCrCO6n2LwzUup92sO/dIW4I9KnZ2LnBJdgZ9OVY/QY=;
-  b=omWHgBU5ejqT3e0BEJAvhy2JqxbGnGMjdf96eW/YfxQDk5/s3ou/4VxI
-   3saGZDy1rDSoRXarWKntbnG8SoDG3QwlcuDWSXKTw9Q+T1h/GgD9uAYVo
-   2p0QIchNVh568noUnXmbC8Pbbw5NU5qYPlRQm5PsusyFewFYzSDgibvSJ
-   rAoEFVVvq0EYoY2oBwOoUMGm7VW1GxEEOYnbt6ogHaeCt27GXNjM9qXgl
-   VREy1K2vLGfcZurHtI7M4h8JeynJLzf5sJ6htro6cBA0aw/nfBkfSrCdE
-   n6RLTmT5Z7VbN4Yg4XZakCwgdeDw1wmKS390Ez1MnwJVvBDeKlf1B+lbQ
-   A==;
-X-CSE-ConnectionGUID: Q3N2X1fHS0SOCLsGG11+zg==
-X-CSE-MsgGUID: evrT7dM0S+ie+CwwIFSeLg==
-X-IronPort-AV: E=Sophos;i="6.08,229,1712646000"; 
-   d="scan'208";a="27243365"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Jun 2024 23:31:30 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+	s=arc-20240116; t=1718087940; c=relaxed/simple;
+	bh=OwPLYoTAl/gK71g0k0SN3qPBDhHxqBZGp66axXzkEkw=;
+	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=fCGxeZlzxF7HiZ6uEw+QlIt6zzxIGhXRv14n0/pC+ARKMqiiE0Il1efMsK5pnrBvsHX1pzFDGh9zuRIDPdisiMTdtsQX3Swud1tPHdF/TKpS41BhJwZEVMaM7+FeqODzAoWTGKS1/dVt0eS64Qvyc3/CjvkV1EE3+pRgomQASdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=OQskwtzm; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 73038201E5;
+	Tue, 11 Jun 2024 08:31:37 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id bdzRz0BphnvY; Tue, 11 Jun 2024 08:31:36 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 67297201D3;
+	Tue, 11 Jun 2024 08:31:36 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 67297201D3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1718087496;
+	bh=6QO5tVVLTu9R/G7I+nn6d93irKU1OLAIS/ClUSyPYZI=;
+	h=Date:From:To:CC:Subject:Reply-To:From;
+	b=OQskwtzmRHJZG/Rra0svbLbtTOQ3EXulsty1fSPs8os2F7XCZjitdPfckwHqqd20I
+	 3W38K6+Y6z+BN3lh/chfM8BiS0lUA3WZnnoyGVA6Efxe6eBKp5UIZ3QQy68/5fOXpp
+	 sKGIGyoGsJ2LzONEKi4A2seZOPF2neOoTY8qHAEp03YQO0xrXnAfTEpifj8ZomibCO
+	 Sd7oTf8fHTAxn5V3HfP6tIPBcBtd2v1Vg8QGm5foAtidirLjimXUlmMzifko9aqGeh
+	 Jo1vH4bUauz1jzPmTEMtmygCsAg0pQQYNvDNSpx10zIspYSDndLEwxtd+Sq4JeAzXn
+	 3wA86KAP0mT+w==
+Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
+	by mailout1.secunet.com (Postfix) with ESMTP id 6298E80004A;
+	Tue, 11 Jun 2024 08:31:36 +0200 (CEST)
+Received: from mbx-essen-01.secunet.de (10.53.40.197) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 10 Jun 2024 23:31:03 -0700
-Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 10 Jun 2024 23:30:57 -0700
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: <lkp@intel.com>
-CC: <Raju.Lakkaraju@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<andrew@lunn.ch>, <bryan.whitehead@microchip.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <hkallweit1@gmail.com>, <hmehrtens@maxlinear.com>,
-	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <linux@armlinux.org.uk>,
-	<lxu@maxlinear.com>, <netdev@vger.kernel.org>,
-	<oe-kbuild-all@lists.linux.dev>, <pabeni@redhat.com>, <sbauer@blackbox.su>,
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: [PATCH net V3 3/3] net: phy: mxl-gpy: Remove interrupt mask clearing from config_init
-Date: Tue, 11 Jun 2024 11:57:53 +0530
-Message-ID: <20240611062753.12020-4-Raju.Lakkaraju@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240611062753.12020-1-Raju.Lakkaraju@microchip.com>
-References: <202406052200.w3zuc32H-lkp@intel.com>
- <20240611062753.12020-1-Raju.Lakkaraju@microchip.com>
+ 15.1.2507.39; Tue, 11 Jun 2024 08:31:36 +0200
+Received: from moon.secunet.de (172.18.149.1) by mbx-essen-01.secunet.de
+ (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 11 Jun
+ 2024 08:31:35 +0200
+Date: Tue, 11 Jun 2024 08:31:29 +0200
+From: Antony Antony <antony.antony@secunet.com>
+To: <netdev@vger.kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Antony Antony <antony.antony@secunet.com>, "Sabrina
+ Dubroca" <sd@queasysnail.net>
+Subject: [PATCH ipsec 1/2] xfrm: Fix input error path memory access
+Message-ID: <f8b541f7b9d361b951ae007e2d769f25cc9a9cdd.1718087437.git.antony.antony@secunet.com>
+Reply-To: <antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+Precedence: first-class
+Priority: normal
+Organization: secunet
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-01.secunet.de (10.53.40.197)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-When the system resumes from sleep, the phy_init_hw() function invokes
-config_init(), which clears all interrupt masks and causes wake events to be
-lost in subsequent wake sequences. Remove interrupt mask clearing from
-config_init() and preserve relevant masks in config_intr().
+When there is a misconfiguration of input state slow path
+KASAN report error. Fix this error.
+west login:
+[   52.987278] eth1: renamed from veth11
+[   53.078814] eth1: renamed from veth21
+[   53.181355] eth1: renamed from veth31
+[   54.921702] ==================================================================
+[   54.922602] BUG: KASAN: wild-memory-access in xfrmi_rcv_cb+0x2d/0x295
+[   54.923393] Read of size 8 at addr 6b6b6b6b00000000 by task ping/512
+[   54.924169]
+[   54.924386] CPU: 0 PID: 512 Comm: ping Not tainted 6.9.0-08574-gcd29a4313a1b #25
+[   54.925290] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[   54.926401] Call Trace:
+[   54.926731]  <IRQ>
+[   54.927009]  dump_stack_lvl+0x2a/0x3b
+[   54.927478]  kasan_report+0x84/0xa6
+[   54.927930]  ? xfrmi_rcv_cb+0x2d/0x295
+[   54.928410]  xfrmi_rcv_cb+0x2d/0x295
+[   54.928872]  ? xfrm4_rcv_cb+0x3d/0x5e
+[   54.929354]  xfrm4_rcv_cb+0x46/0x5e
+[   54.929804]  xfrm_rcv_cb+0x7e/0xa1
+[   54.930240]  xfrm_input+0x1b3a/0x1b96
+[   54.930715]  ? xfrm_offload+0x41/0x41
+[   54.931182]  ? raw_rcv+0x292/0x292
+[   54.931617]  ? nf_conntrack_confirm+0xa2/0xa2
+[   54.932158]  ? skb_sec_path+0xd/0x3f
+[   54.932610]  ? xfrmi_input+0x90/0xce
+[   54.933066]  xfrm4_esp_rcv+0x33/0x54
+[   54.933521]  ip_protocol_deliver_rcu+0xd7/0x1b2
+[   54.934089]  ip_local_deliver_finish+0x110/0x120
+[   54.934659]  ? ip_protocol_deliver_rcu+0x1b2/0x1b2
+[   54.935248]  NF_HOOK.constprop.0+0xf8/0x138
+[   54.935767]  ? ip_sublist_rcv_finish+0x68/0x68
+[   54.936317]  ? secure_tcpv6_ts_off+0x23/0x168
+[   54.936859]  ? ip_protocol_deliver_rcu+0x1b2/0x1b2
+[   54.937454]  ? __xfrm_policy_check2.constprop.0+0x18d/0x18d
+[   54.938135]  NF_HOOK.constprop.0+0xf8/0x138
+[   54.938663]  ? ip_sublist_rcv_finish+0x68/0x68
+[   54.939220]  ? __xfrm_policy_check2.constprop.0+0x18d/0x18d
+[   54.939904]  ? ip_local_deliver_finish+0x120/0x120
+[   54.940497]  __netif_receive_skb_one_core+0xc9/0x107
+[   54.941121]  ? __netif_receive_skb_list_core+0x1c2/0x1c2
+[   54.941771]  ? blk_mq_start_stopped_hw_queues+0xc7/0xf9
+[   54.942413]  ? blk_mq_start_stopped_hw_queue+0x38/0x38
+[   54.943044]  ? virtqueue_get_buf_ctx+0x295/0x46b
+[   54.943618]  process_backlog+0xb3/0x187
+[   54.944102]  __napi_poll.constprop.0+0x57/0x1a7
+[   54.944669]  net_rx_action+0x1cb/0x380
+[   54.945150]  ? __napi_poll.constprop.0+0x1a7/0x1a7
+[   54.945744]  ? vring_new_virtqueue+0x17a/0x17a
+[   54.946300]  ? note_interrupt+0x2cd/0x367
+[   54.946805]  handle_softirqs+0x13c/0x2c9
+[   54.947300]  do_softirq+0x5f/0x7d
+[   54.947727]  </IRQ>
+[   54.948014]  <TASK>
+[   54.948300]  __local_bh_enable_ip+0x48/0x62
+[   54.948832]  __neigh_event_send+0x3fd/0x4ca
+[   54.949361]  neigh_resolve_output+0x1e/0x210
+[   54.949896]  ip_finish_output2+0x4bf/0x4f0
+[   54.950410]  ? __ip_finish_output+0x171/0x1b8
+[   54.950956]  ip_send_skb+0x25/0x57
+[   54.951390]  raw_sendmsg+0xf95/0x10c0
+[   54.951850]  ? check_new_pages+0x45/0x71
+[   54.952343]  ? raw_hash_sk+0x21b/0x21b
+[   54.952815]  ? kernel_init_pages+0x42/0x51
+[   54.953337]  ? prep_new_page+0x44/0x51
+[   54.953811]  ? get_page_from_freelist+0x72b/0x915
+[   54.954390]  ? signal_pending_state+0x77/0x77
+[   54.954936]  ? preempt_count_sub+0x14/0xb3
+[   54.955450]  ? __might_resched+0x8a/0x240
+[   54.955951]  ? __might_sleep+0x25/0xa0
+[   54.956424]  ? first_zones_zonelist+0x2c/0x43
+[   54.956977]  ? __rcu_read_lock+0x2d/0x3a
+[   54.957476]  ? __pte_offset_map+0x32/0xa4
+[   54.957980]  ? __might_resched+0x8a/0x240
+[   54.958483]  ? __might_sleep+0x25/0xa0
+[   54.958963]  ? inet_send_prepare+0x54/0x54
+[   54.959478]  ? sock_sendmsg_nosec+0x42/0x6c
+[   54.960000]  sock_sendmsg_nosec+0x42/0x6c
+[   54.960502]  __sys_sendto+0x15d/0x1cc
+[   54.960966]  ? __x64_sys_getpeername+0x44/0x44
+[   54.961522]  ? __handle_mm_fault+0x679/0xae4
+[   54.962068]  ? find_vma+0x6b/0x8b
+[   54.962497]  ? find_vma_intersection+0x8a/0x8a
+[   54.963052]  ? handle_mm_fault+0x38/0x154
+[   54.963556]  ? handle_mm_fault+0xeb/0x154
+[   54.964059]  ? preempt_latency_start+0x29/0x34
+[   54.964613]  ? preempt_count_sub+0x14/0xb3
+[   54.965141]  ? up_read+0x4b/0x5c
+[   54.965557]  __x64_sys_sendto+0x76/0x82
+[   54.966041]  do_syscall_64+0x69/0xd5
+[   54.966497]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+[   54.967119] RIP: 0033:0x7f2d2fec9a73
+[   54.967572] Code: 8b 15 a9 83 0c 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 80 3d 71 0b 0d 00 00 41 89 ca 74 14 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 75 c3 0f 1f 40 00 55 48 83 ec 30 44 89 4c 24
+[   54.969747] RSP: 002b:00007ffe85756418 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
+[   54.970655] RAX: ffffffffffffffda RBX: 0000558bebad1340 RCX: 00007f2d2fec9a73
+[   54.971511] RDX: 0000000000000040 RSI: 0000558bebad73c0 RDI: 0000000000000003
+[   54.972366] RBP: 0000558bebad73c0 R08: 0000558bebad35c0 R09: 0000000000000010
+[   54.973234] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000040
+[   54.974091] R13: 00007ffe85757b00 R14: 0000001d00000001 R15: 0000558bebad4680
+[   54.974951]  </TASK>
+[   54.975244] ==================================================================
+[   54.976133] Disabling lock debugging due to kernel taint
+[   54.976784] Oops: stack segment: 0000 [#1] PREEMPT DEBUG_PAGEALLOC KASAN
+[   54.977603] CPU: 0 PID: 512 Comm: ping Tainted: G    B              6.9.0-08574-gcd29a4313a1b #25
+[   54.978654] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[   54.979750] RIP: 0010:xfrmi_rcv_cb+0x2d/0x295
+[   54.980293] Code: 00 00 41 57 41 56 41 89 f6 41 55 41 54 55 53 48 89 fb 51 85 f6 75 31 48 89 df e8 d7 e8 ff ff 48 89 c5 48 89 c7 e8 8b a4 4f ff <48> 8b 7d 00 48 89 ee e8 eb f3 ff ff 49 89 c5 b8 01 00 00 00 4d 85
+[   54.982462] RSP: 0018:ffffc90000007990 EFLAGS: 00010282
+[   54.983099] RAX: 0000000000000001 RBX: ffff8881126e9900 RCX: fffffbfff07b77cd
+[   54.983948] RDX: fffffbfff07b77cd RSI: fffffbfff07b77cd RDI: ffffffff83dbbe60
+[   54.984794] RBP: 6b6b6b6b00000000 R08: 0000000000000008 R09: 0000000000000001
+[   54.985647] R10: ffffffff83dbbe67 R11: fffffbfff07b77cc R12: 00000000ffffffff
+[   54.986512] R13: 00000000ffffffff R14: 00000000ffffffff R15: 0000000000000002
+[   54.987365] FS:  00007f2d2fc0dc40(0000) GS:ffffffff82eb2000(0000) knlGS:0000000000000000
+[   54.988329] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   54.989026] CR2: 00007ffe85755ff8 CR3: 0000000109941000 CR4: 0000000000350ef0
+[   54.989897] Call Trace:
+[   54.990223]  <IRQ>
+[   54.990500]  ? __die_body+0x1a/0x56
+[   54.990950]  ? die+0x30/0x49
+[   54.991326]  ? do_trap+0x9b/0x132
+[   54.991751]  ? do_error_trap+0x7d/0xaf
+[   54.992223]  ? exc_stack_segment+0x35/0x45
+[   54.992734]  ? asm_exc_stack_segment+0x22/0x30
+[   54.993294]  ? xfrmi_rcv_cb+0x2d/0x295
+[   54.993764]  ? xfrm4_rcv_cb+0x3d/0x5e
+[   54.994228]  xfrm4_rcv_cb+0x46/0x5e
+[   54.994670]  xfrm_rcv_cb+0x7e/0xa1
+[   54.995106]  xfrm_input+0x1b3a/0x1b96
+[   54.995572]  ? xfrm_offload+0x41/0x41
+[   54.996038]  ? raw_rcv+0x292/0x292
+[   54.996472]  ? nf_conntrack_confirm+0xa2/0xa2
+[   54.997011]  ? skb_sec_path+0xd/0x3f
+[   54.997466]  ? xfrmi_input+0x90/0xce
+[   54.997925]  xfrm4_esp_rcv+0x33/0x54
+[   54.998378]  ip_protocol_deliver_rcu+0xd7/0x1b2
+[   54.998944]  ip_local_deliver_finish+0x110/0x120
+[   54.999520]  ? ip_protocol_deliver_rcu+0x1b2/0x1b2
+[   55.000111]  NF_HOOK.constprop.0+0xf8/0x138
+[   55.000630]  ? ip_sublist_rcv_finish+0x68/0x68
+[   55.001195]  ? secure_tcpv6_ts_off+0x23/0x168
+[   55.001743]  ? ip_protocol_deliver_rcu+0x1b2/0x1b2
+[   55.002331]  ? __xfrm_policy_check2.constprop.0+0x18d/0x18d
+[   55.003008]  NF_HOOK.constprop.0+0xf8/0x138
+[   55.003527]  ? ip_sublist_rcv_finish+0x68/0x68
+[   55.004078]  ? __xfrm_policy_check2.constprop.0+0x18d/0x18d
+[   55.004755]  ? ip_local_deliver_finish+0x120/0x120
+[   55.005351]  __netif_receive_skb_one_core+0xc9/0x107
+[   55.005972]  ? __netif_receive_skb_list_core+0x1c2/0x1c2
+[   55.006626]  ? blk_mq_start_stopped_hw_queues+0xc7/0xf9
+[   55.007266]  ? blk_mq_start_stopped_hw_queue+0x38/0x38
+[   55.007899]  ? virtqueue_get_buf_ctx+0x295/0x46b
+[   55.008476]  process_backlog+0xb3/0x187
+[   55.008961]  __napi_poll.constprop.0+0x57/0x1a7
+[   55.009540]  net_rx_action+0x1cb/0x380
+[   55.010020]  ? __napi_poll.constprop.0+0x1a7/0x1a7
+[   55.010610]  ? vring_new_virtqueue+0x17a/0x17a
+[   55.011173]  ? note_interrupt+0x2cd/0x367
+[   55.011675]  handle_softirqs+0x13c/0x2c9
+[   55.012169]  do_softirq+0x5f/0x7d
+[   55.012597]  </IRQ>
+[   55.012882]  <TASK>
+[   55.013179]  __local_bh_enable_ip+0x48/0x62
+[   55.013704]  __neigh_event_send+0x3fd/0x4ca
+[   55.014227]  neigh_resolve_output+0x1e/0x210
+[   55.014761]  ip_finish_output2+0x4bf/0x4f0
+[   55.015278]  ? __ip_finish_output+0x171/0x1b8
+[   55.015823]  ip_send_skb+0x25/0x57
+[   55.016261]  raw_sendmsg+0xf95/0x10c0
+[   55.016729]  ? check_new_pages+0x45/0x71
+[   55.017229]  ? raw_hash_sk+0x21b/0x21b
+[   55.017708]  ? kernel_init_pages+0x42/0x51
+[   55.018225]  ? prep_new_page+0x44/0x51
+[   55.018704]  ? get_page_from_freelist+0x72b/0x915
+[   55.019292]  ? signal_pending_state+0x77/0x77
+[   55.019840]  ? preempt_count_sub+0x14/0xb3
+[   55.020357]  ? __might_resched+0x8a/0x240
+[   55.020860]  ? __might_sleep+0x25/0xa0
+[   55.021345]  ? first_zones_zonelist+0x2c/0x43
+[   55.021896]  ? __rcu_read_lock+0x2d/0x3a
+[   55.022396]  ? __pte_offset_map+0x32/0xa4
+[   55.022901]  ? __might_resched+0x8a/0x240
+[   55.023404]  ? __might_sleep+0x25/0xa0
+[   55.023879]  ? inet_send_prepare+0x54/0x54
+[   55.024391]  ? sock_sendmsg_nosec+0x42/0x6c
+[   55.024918]  sock_sendmsg_nosec+0x42/0x6c
+[   55.025428]  __sys_sendto+0x15d/0x1cc
+[   55.025892]  ? __x64_sys_getpeername+0x44/0x44
+[   55.026441]  ? __handle_mm_fault+0x679/0xae4
+[   55.026988]  ? find_vma+0x6b/0x8b
+[   55.027414]  ? find_vma_intersection+0x8a/0x8a
+[   55.027966]  ? handle_mm_fault+0x38/0x154
+[   55.028470]  ? handle_mm_fault+0xeb/0x154
+[   55.028972]  ? preempt_latency_start+0x29/0x34
+[   55.029532]  ? preempt_count_sub+0x14/0xb3
+[   55.030047]  ? up_read+0x4b/0x5c
+[   55.030463]  __x64_sys_sendto+0x76/0x82
+[   55.030949]  do_syscall_64+0x69/0xd5
+[   55.031406]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+[   55.032028] RIP: 0033:0x7f2d2fec9a73
+[   55.032481] Code: 8b 15 a9 83 0c 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 80 3d 71 0b 0d 00 00 41 89 ca 74 14 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 75 c3 0f 1f 40 00 55 48 83 ec 30 44 89 4c 24
+[   55.034660] RSP: 002b:00007ffe85756418 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
+[   55.035567] RAX: ffffffffffffffda RBX: 0000558bebad1340 RCX: 00007f2d2fec9a73
+[   55.036424] RDX: 0000000000000040 RSI: 0000558bebad73c0 RDI: 0000000000000003
+[   55.037293] RBP: 0000558bebad73c0 R08: 0000558bebad35c0 R09: 0000000000000010
+[   55.038153] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000040
+[   55.039012] R13: 00007ffe85757b00 R14: 0000001d00000001 R15: 0000558bebad4680
+[   55.039871]  </TASK>
+[   55.040167] Modules linked in:
+[   55.040585] ---[ end trace 0000000000000000 ]---
+[   55.041164] RIP: 0010:xfrmi_rcv_cb+0x2d/0x295
+[   55.041714] Code: 00 00 41 57 41 56 41 89 f6 41 55 41 54 55 53 48 89 fb 51 85 f6 75 31 48 89 df e8 d7 e8 ff ff 48 89 c5 48 89 c7 e8 8b a4 4f ff <48> 8b 7d 00 48 89 ee e8 eb f3 ff ff 49 89 c5 b8 01 00 00 00 4d 85
+[   55.043889] RSP: 0018:ffffc90000007990 EFLAGS: 00010282
+[   55.044528] RAX: 0000000000000001 RBX: ffff8881126e9900 RCX: fffffbfff07b77cd
+[   55.045386] RDX: fffffbfff07b77cd RSI: fffffbfff07b77cd RDI: ffffffff83dbbe60
+[   55.046250] RBP: 6b6b6b6b00000000 R08: 0000000000000008 R09: 0000000000000001
+[   55.047104] R10: ffffffff83dbbe67 R11: fffffbfff07b77cc R12: 00000000ffffffff
+[   55.047960] R13: 00000000ffffffff R14: 00000000ffffffff R15: 0000000000000002
+[   55.048820] FS:  00007f2d2fc0dc40(0000) GS:ffffffff82eb2000(0000) knlGS:0000000000000000
+[   55.049805] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   55.050507] CR2: 00007ffe85755ff8 CR3: 0000000109941000 CR4: 0000000000350ef0
+[   55.051366] Kernel panic - not syncing: Fatal exception in interrupt
+[   55.052136] Kernel Offset: disabled
+[   55.052577] ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
 
-Fixes: 7d901a1e878a ("net: phy: add Maxlinear GPY115/21x/24x driver")
-Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202406052200.w3zuc32H-lkp@intel.com/
+Fixes: 304b44f0d5a4 ("xfrm: Add dir validation to "in" data path lookup")
+Signed-off-by: Antony Antony <antony.antony@secunet.com>
 ---
-Change List:
-------------
-V0 -> V3:
-  - Address the https://lore.kernel.org/lkml/4a565d54-f468-4e32-8a2c-102c1203f72c@lunn.ch/T/
-    review comments
+ net/xfrm/xfrm_input.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
- drivers/net/phy/mxl-gpy.c | 58 +++++++++++++++++++++++++--------------
- 1 file changed, 38 insertions(+), 20 deletions(-)
-
-diff --git a/drivers/net/phy/mxl-gpy.c b/drivers/net/phy/mxl-gpy.c
-index b2d36a3a96f1..e5f8ac4b4604 100644
---- a/drivers/net/phy/mxl-gpy.c
-+++ b/drivers/net/phy/mxl-gpy.c
-@@ -107,6 +107,7 @@ struct gpy_priv {
+diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
+index d2ea18dcb0cb..63c004103912 100644
+--- a/net/xfrm/xfrm_input.c
++++ b/net/xfrm/xfrm_input.c
+@@ -585,8 +585,11 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
+ 		}
  
- 	u8 fw_major;
- 	u8 fw_minor;
-+	u32 wolopts;
+ 		if (unlikely(x->dir && x->dir != XFRM_SA_DIR_IN)) {
++			secpath_reset(skb);
+ 			XFRM_INC_STATS(net, LINUX_MIB_XFRMINSTATEDIRERROR);
++			xfrm_audit_state_notfound(skb, family, spi, seq);
+ 			xfrm_state_put(x);
++			x = NULL;
+ 			goto drop;
+ 		}
  
- 	/* It takes 3 seconds to fully switch out of loopback mode before
- 	 * it can safely re-enter loopback mode. Record the time when
-@@ -221,6 +222,15 @@ static int gpy_hwmon_register(struct phy_device *phydev)
- }
- #endif
- 
-+static int gpy_ack_interrupt(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	/* Clear all pending interrupts */
-+	ret = phy_read(phydev, PHY_ISTAT);
-+	return ret < 0 ? ret : 0;
-+}
-+
- static int gpy_mbox_read(struct phy_device *phydev, u32 addr)
- {
- 	struct gpy_priv *priv = phydev->priv;
-@@ -262,16 +272,8 @@ static int gpy_mbox_read(struct phy_device *phydev, u32 addr)
- 
- static int gpy_config_init(struct phy_device *phydev)
- {
--	int ret;
--
--	/* Mask all interrupts */
--	ret = phy_write(phydev, PHY_IMASK, 0);
--	if (ret)
--		return ret;
--
--	/* Clear all pending interrupts */
--	ret = phy_read(phydev, PHY_ISTAT);
--	return ret < 0 ? ret : 0;
-+	/* Nothing to configure. Configuration Requirement Placeholder */
-+	return 0;
- }
- 
- static int gpy21x_config_init(struct phy_device *phydev)
-@@ -627,11 +629,23 @@ static int gpy_read_status(struct phy_device *phydev)
- 
- static int gpy_config_intr(struct phy_device *phydev)
- {
-+	struct gpy_priv *priv = phydev->priv;
- 	u16 mask = 0;
-+	int ret;
-+
-+	ret = gpy_ack_interrupt(phydev);
-+	if (ret)
-+		return ret;
- 
- 	if (phydev->interrupts == PHY_INTERRUPT_ENABLED)
- 		mask = PHY_IMASK_MASK;
- 
-+	if (priv->wolopts & WAKE_MAGIC)
-+		mask |= PHY_IMASK_WOL;
-+
-+	if (priv->wolopts & WAKE_PHY)
-+		mask |= PHY_IMASK_LSTC;
-+
- 	return phy_write(phydev, PHY_IMASK, mask);
- }
- 
-@@ -678,6 +692,7 @@ static int gpy_set_wol(struct phy_device *phydev,
- 		       struct ethtool_wolinfo *wol)
- {
- 	struct net_device *attach_dev = phydev->attached_dev;
-+	struct gpy_priv *priv = phydev->priv;
- 	int ret;
- 
- 	if (wol->wolopts & WAKE_MAGIC) {
-@@ -725,6 +740,8 @@ static int gpy_set_wol(struct phy_device *phydev,
- 		ret = phy_read(phydev, PHY_ISTAT);
- 		if (ret < 0)
- 			return ret;
-+
-+		priv->wolopts |= WAKE_MAGIC;
- 	} else {
- 		/* Disable magic packet matching */
- 		ret = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2,
-@@ -732,6 +749,13 @@ static int gpy_set_wol(struct phy_device *phydev,
- 					 WOL_EN);
- 		if (ret < 0)
- 			return ret;
-+
-+		/* Disable the WOL interrupt */
-+		ret = phy_clear_bits(phydev, PHY_IMASK, PHY_IMASK_WOL);
-+		if (ret < 0)
-+			return ret;
-+
-+		priv->wolopts &= ~WAKE_MAGIC;
- 	}
- 
- 	if (wol->wolopts & WAKE_PHY) {
-@@ -748,9 +772,11 @@ static int gpy_set_wol(struct phy_device *phydev,
- 		if (ret & (PHY_IMASK_MASK & ~PHY_IMASK_LSTC))
- 			phy_trigger_machine(phydev);
- 
-+		priv->wolopts |= WAKE_PHY;
- 		return 0;
- 	}
- 
-+	priv->wolopts &= ~WAKE_PHY;
- 	/* Disable the link state change interrupt */
- 	return phy_clear_bits(phydev, PHY_IMASK, PHY_IMASK_LSTC);
- }
-@@ -758,18 +784,10 @@ static int gpy_set_wol(struct phy_device *phydev,
- static void gpy_get_wol(struct phy_device *phydev,
- 			struct ethtool_wolinfo *wol)
- {
--	int ret;
-+	struct gpy_priv *priv = phydev->priv;
- 
- 	wol->supported = WAKE_MAGIC | WAKE_PHY;
--	wol->wolopts = 0;
--
--	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, VPSPEC2_WOL_CTL);
--	if (ret & WOL_EN)
--		wol->wolopts |= WAKE_MAGIC;
--
--	ret = phy_read(phydev, PHY_IMASK);
--	if (ret & PHY_IMASK_LSTC)
--		wol->wolopts |= WAKE_PHY;
-+	wol->wolopts = priv->wolopts;
- }
- 
- static int gpy_loopback(struct phy_device *phydev, bool enable)
 -- 
-2.34.1
+2.30.2
 
 
