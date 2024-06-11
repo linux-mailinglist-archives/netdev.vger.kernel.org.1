@@ -1,70 +1,59 @@
-Return-Path: <netdev+bounces-102713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B3029045AA
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 22:19:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F11E9045C5
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 22:30:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBCE4281B33
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 20:19:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C377BB24C20
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 20:30:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E61480607;
-	Tue, 11 Jun 2024 20:19:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447F74D8A8;
+	Tue, 11 Jun 2024 20:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tg4w6+Jd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bW7O3OV8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48EFF12E61;
-	Tue, 11 Jun 2024 20:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19B5E63CB;
+	Tue, 11 Jun 2024 20:30:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718137141; cv=none; b=Dc3Ipx4aAB8RtTRoq+agM0Rq3pjM8PQfmAt3y9x7Hbl0yDRm5Y9rCtzWopCksAHfA+sAvC3M6u7WANsuCAw5g7ZB9HR7Q3ciZGbXupZfv2Ed+S2MN1vIWBy9zNRwInISnY7Njx+xsSP6BdW4BQO5/bQOJ6zBI3lJVlfOfMBq/cU=
+	t=1718137846; cv=none; b=fEYUxzFbLoyhJYz5cqNMstLkQgG3H+sv318ZEtFTfyt+BU+KpBoP4bxoPgCohhcpEgBLUKmSUOCJ2CP8+wRclUdBKGGsRrSPvBk0q5ohBvSrM/d0l/BXDabVS/r0Wy0Zdn22A7N26ORO7P9WTReBrLsYRLMC2Rjh5+w8/iwOpuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718137141; c=relaxed/simple;
-	bh=gtTMkJYRvzc11WF2seK68wjURAdaNya0C5PddHKpdUM=;
+	s=arc-20240116; t=1718137846; c=relaxed/simple;
+	bh=QJUAl/HXNGAn4ey6eyXBFTC8hrQJC413PQTjAxPjThk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j4pjcRsxja/dpEZIlpe8F9dCEVRpXHB7ATRTXFge6iKFemz+HKQF3xTD6WLj1DQQnBT42pe8gujseZNYM+Bw8ZquS1BUemu77NNnxoBITlOMIpjeWEh/1jSitG5nQUkI/a+lr4pB4SCBd+CzTpdYfywiurcFTVCg0X2y5GqMyEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tg4w6+Jd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F4D4C2BD10;
-	Tue, 11 Jun 2024 20:19:00 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=dzspR0eMCdqVDv3FcRJo6LQcTWbq0/SFoo/LqsnabL0F1eEVwa4Qf45zJaHqE9XLp2AgmXG27miZV/Gz0phBuglzW7OM7OOB7dwx04o+hZNEsL2hWfArjR6bB3dBuydPu8SX3e4ImIhM6BUqSbZ1CfpZ1AsRn6AvltbuQCBhqAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bW7O3OV8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43329C2BD10;
+	Tue, 11 Jun 2024 20:30:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718137140;
-	bh=gtTMkJYRvzc11WF2seK68wjURAdaNya0C5PddHKpdUM=;
+	s=k20201202; t=1718137845;
+	bh=QJUAl/HXNGAn4ey6eyXBFTC8hrQJC413PQTjAxPjThk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Tg4w6+JdHhFxJdi4TnsqqM/VB92iMDH+/U5LYjnE2oucxYyHNoYL6hd/t2ucaGpqi
-	 MoMgRkjwlMDaMU/QbFTds8e7j2TTxvqa7GWcWpN0QZuhI4R7S15A4YpMi+GXeIkju8
-	 ONuWoutk4kJTocbsp41zeLdPmpRfeldqNLgZ6RNufQ6kcR6Jo2FCvN2+7f0gd2ZktV
-	 a+mLDeyfRdQtGhbuQI1i7YJoVZ38wME27wLvflfJjcFKA3eMCh/QrUUjWcRoymhZ4a
-	 tPfpBeKRwt8nI9jOk4zvQl9T9nTOUaAl+M4rkU88SYx6HpP/b0s79oC+teD4onsnwP
-	 xzSfHlcvR7rIw==
-Date: Tue, 11 Jun 2024 13:18:58 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	fsverity@lists.linux.dev, dm-devel@lists.linux.dev, x86@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH v4 6/8] fsverity: improve performance by using
- multibuffer hashing
-Message-ID: <20240611201858.GA128642@sol.localdomain>
-References: <20240606052801.GA324380@sol.localdomain>
- <ZmFL-AXZ8lphOCUC@gondor.apana.org.au>
- <CAMj1kXHLt6v03qkpKfwbN34oyeeCnJb=tpG4GvTn6E1cJQRTOw@mail.gmail.com>
- <ZmFmiWZAposV5N1O@gondor.apana.org.au>
- <CAMj1kXFt_E9ghN7GfpYHR4-yaLsz_J-D1Nc3XsVqUamZ6yXHGQ@mail.gmail.com>
- <ZmFucW37DI6P6iYL@gondor.apana.org.au>
- <CAMj1kXEpw5b3Rpfe+sRKbQQqVfgWjO_GsGd-EyFvB4_8Bk8T0Q@mail.gmail.com>
- <ZmF-JHxCfMRuR05G@gondor.apana.org.au>
- <20240610164258.GA3269@sol.localdomain>
- <Zmhrh1nodUE-O6Jj@gondor.apana.org.au>
+	b=bW7O3OV8ugvr4+2JAkhQRVVzKvCrCFkqU+WdGxvW1Yl4oov2GnUwYBSXitB6a5fe7
+	 hwXyKd3MnF4wByIvv+LG9Ha9IMKjtGDamPJuoATnfPbXaFkim/vfaPDAcQx4wD0CW1
+	 +eh5xmSQAHaALYTYF0lHEHD47WgaiuioP8u+96T46uIOBNvLf5zSTKKh74MPoqnnkh
+	 FAQEbPyBS50fjHOvID67kjMxJy6kxtruxSL6z/twRdhflXJbGYIkScG6NjBvqCooKE
+	 V/LP+gY8sZWzuaTvuDVR9iwYmm4W7sbJJS7cEg4WMH0tqKE1Uzeb/TncwvmVIxwLum
+	 H1CTNT0/ch8GQ==
+Date: Tue, 11 Jun 2024 14:30:43 -0600
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Martin Schiller <ms@dev.tdt.de>
+Cc: netdev@vger.kernel.org, krzk+dt@kernel.org, davem@davemloft.net,
+	edumazet@google.com, olteanv@gmail.com, conor+dt@kernel.org,
+	kuba@kernel.org, devicetree@vger.kernel.org, pabeni@redhat.com,
+	hauke@hauke-m.de, martin.blumenstingl@googlemail.com,
+	f.fainelli@gmail.com, andrew@lunn.ch, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 01/12] dt-bindings: net: dsa: lantiq,gswip:
+ convert to YAML schema
+Message-ID: <171813784153.3020916.2558169964634930233.robh@kernel.org>
+References: <20240611135434.3180973-1-ms@dev.tdt.de>
+ <20240611135434.3180973-2-ms@dev.tdt.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,41 +62,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zmhrh1nodUE-O6Jj@gondor.apana.org.au>
+In-Reply-To: <20240611135434.3180973-2-ms@dev.tdt.de>
 
-On Tue, Jun 11, 2024 at 11:21:43PM +0800, Herbert Xu wrote:
+
+On Tue, 11 Jun 2024 15:54:23 +0200, Martin Schiller wrote:
+> Convert the lantiq,gswip bindings to YAML format.
 > 
-> BTW, I found an old Intel paper that claims through their multi-
-> buffer strategy they were able to make AES-CBC-XCBC beat AES-GCM.
-> I wonder if we could still replicate this today:
+> Also add this new file to the MAINTAINERS file.
 > 
-> https://github.com/intel/intel-ipsec-mb/wiki/doc/fast-multi-buffer-ipsec-implementations-ia-processors-paper.pdf
+> Furthermore, the CPU port has to specify a phy-mode and either a phy or
+> a fixed-link. Since GSWIP is connected using a SoC internal protocol
+> there's no PHY involved. Add phy-mode = "internal" and a fixed-link to
+> the example code to describe the communication between the PMAC
+> (Ethernet controller) and GSWIP switch.
+> 
+> Signed-off-by: Martin Schiller <ms@dev.tdt.de>
+> ---
+>  .../bindings/net/dsa/lantiq,gswip.yaml        | 202 ++++++++++++++++++
+>  .../bindings/net/dsa/lantiq-gswip.txt         | 146 -------------
+>  MAINTAINERS                                   |   1 +
+>  3 files changed, 203 insertions(+), 146 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+>  delete mode 100644 Documentation/devicetree/bindings/net/dsa/lantiq-gswip.txt
+> 
 
-No, not even close.  Even assuming that the lack of parallelizability in AES-CBC
-and AES-XCBC can be entirely compensated for via multibuffer crypto (which
-really it can't -- consider single packets, for example), doing AES twice is
-much more expensive than doing AES and GHASH.  GHASH is a universal hash
-function, and computing a universal hash function is inherently cheaper than
-computing a cryptographic hash function.  But also modern Intel CPUs have very
-fast carryless multiplication, and it uses a different execution port from what
-AES uses.  So the overhead of AES + GHASH over AES alone is very small.  By
-doing AES twice, you'd be entirely bottlenecked by the ports that can execute
-the AES instructions, while the other ports go nearly unused.  So it would
-probably be approaching twice as slow as AES-GCM.
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
-Westmere (2010) through Ivy Bridge (2012) are the only Intel CPUs where
-multibuffer AES-CBC-XCBC could plausibly be faster than AES-GCM (given a
-sufficiently large number of messages at once), due to the very slow pclmulqdq
-instruction on those CPUs.  This is long since fixed, as pclmulqdq became much
-faster in Haswell (2013), and faster still in Broadwell.  This is exactly what
-that Intel paper shows; they show AES-GCM becoming fastest in "Gen 4", i.e.
-Haswell.  The paper is from 2012, so of course they don't show anything after
-that.  But AES-GCM has only pulled ahead even more since then.
-
-In theory something like AES-CBC + SHA-256 could be slightly more competitive
-than AES-CBC + AES-XCBC.  But it would still be worse than simply doing AES-GCM
--- which again, doesn't need multibuffer, and my recent patches have already
-fully optimized for recent x86_64 CPUs.
-
-- Eric
 
