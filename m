@@ -1,110 +1,123 @@
-Return-Path: <netdev+bounces-102715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3598C9045C8
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 22:32:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2B0F9045DF
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 22:41:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A76CD1F2318B
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 20:32:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 977131F230A7
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 20:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4B11411ED;
-	Tue, 11 Jun 2024 20:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BA45CDF0;
+	Tue, 11 Jun 2024 20:41:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ITi6r1cQ"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="AizaDfic"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE2912E61;
-	Tue, 11 Jun 2024 20:32:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25962152503
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 20:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718137932; cv=none; b=FCFA2fbQbxnH37X/+7a1Q0Xkeg/AXJmkEXg7k4Qx8wkx5l3DCfZR0JHuwI8PdG6hq7SzVFzBer8dMjTF31H+4foHfeZW2FWvi8ARfTKOZMTRJdphj0ws3lUkG/aglvrOpbC4/rV3IWx5ZRkP3zWzFrQ/G5K6IX3BRAcAMktbiuw=
+	t=1718138506; cv=none; b=Dg5pM5VgVqq7UXLGQyGZ4TQXQQw/vyqMMIcEySDPTw6CaFV575srFXKyWacVkRPAsdkGBkrtXcsKpjJenL35PcNNRL46xakNtpatZI96QBvZAt8BDpxFI9LrEuuBApviwqcQVsVE+UrED2jdX/Zx579IletOWYOg+zmjLiBUp8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718137932; c=relaxed/simple;
-	bh=G8ObqV4GF1j+oexJE9NDUI3l/V6Cek7aJDyNu1zlm9o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qbezBctzYzGu/uH+bikVne1iMomqgTGbltFtMn5uz6JIObqz3YQLg2I+AZSZPFxF+FQ95HmTQ7qVG2CzShj5gE/qy9wCz4Yd/7OX1QgV4ZG5aKM+3MQJwWxT/7eac2kXygHE15OBqrw3A9gnw6KHfzegxgIQWYYHO/L+wlF7lBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ITi6r1cQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C199C2BD10;
-	Tue, 11 Jun 2024 20:32:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718137931;
-	bh=G8ObqV4GF1j+oexJE9NDUI3l/V6Cek7aJDyNu1zlm9o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ITi6r1cQKPeOmmodbECro67RGdiyNgpUQXFCIr/0smWwsxuIYn9Xy4mw4YVBstr9m
-	 gwOXW+aMNgxwWKlPP3+G7lJ+uUb6R6Ucy3ApqkiEJN1oAK+sq3Kht4M1HN9dtJJD/L
-	 vHfWynXI/OKQrluEnLQ5WrdUqadNP7RaNR9mu66RgaKT8ZDlR5u6fuKUEOgbmIeKFS
-	 F9QYV9+98uh94NzcPP8cwSBa3MGFfZr6RiMwvCP57VdC3YgllZyLZx+EiNJPx2gfgu
-	 7F1ZhKmfa2Bs3gUR0ckol1DgXS6LR86VGjwjo0d6lPWJe+N82YwApaSHld/JO9UIXX
-	 aYjWziC/8YcTA==
-Date: Tue, 11 Jun 2024 13:32:09 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	fsverity@lists.linux.dev, dm-devel@lists.linux.dev, x86@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [PATCH v4 6/8] fsverity: improve performance by using
- multibuffer hashing
-Message-ID: <20240611203209.GB128642@sol.localdomain>
-References: <ZmFL-AXZ8lphOCUC@gondor.apana.org.au>
- <CAMj1kXHLt6v03qkpKfwbN34oyeeCnJb=tpG4GvTn6E1cJQRTOw@mail.gmail.com>
- <ZmFmiWZAposV5N1O@gondor.apana.org.au>
- <CAMj1kXFt_E9ghN7GfpYHR4-yaLsz_J-D1Nc3XsVqUamZ6yXHGQ@mail.gmail.com>
- <ZmFucW37DI6P6iYL@gondor.apana.org.au>
- <CAMj1kXEpw5b3Rpfe+sRKbQQqVfgWjO_GsGd-EyFvB4_8Bk8T0Q@mail.gmail.com>
- <ZmF-JHxCfMRuR05G@gondor.apana.org.au>
- <20240610164258.GA3269@sol.localdomain>
- <Zmhrh1nodUE-O6Jj@gondor.apana.org.au>
- <ZmhvnBsqKe7AakY-@gondor.apana.org.au>
+	s=arc-20240116; t=1718138506; c=relaxed/simple;
+	bh=1C1JVN7pV8bQ/ukxRKGwFFcRQWzZiVMRqNTNB3nnmYU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=BcbH70Iwu/xjU8BIik8RgG4apR87x0dl+1IM2alWGjyQ9SEv5I2BumEwzaW5JnSCRl6NbI0c1rzA+oXSAGD7K9qcydyhlbHnoM/WJexI2pOcg2gjrnC1ifUFb0K0tib/lTGwHDPToTBeEefCUN2WgQSByad6kmGScs+YXhdZmqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=AizaDfic; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 9EFC42C0659;
+	Wed, 12 Jun 2024 08:41:40 +1200 (NZST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1718138500;
+	bh=1C1JVN7pV8bQ/ukxRKGwFFcRQWzZiVMRqNTNB3nnmYU=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=AizaDficE02ikCvs0EuYIZaM0Shi1sfLTFYFn+auleSMZAhl1grTGqdzmYUdsKQ7s
+	 ZFBUF1GTVQzx3gggEn4lDwUaCNYjqMeEzegN2vRecpa6LqDWGDLXNNganE5vhrZ6y3
+	 DcD9wJ6kqHgpLDdyjkwHXpi9MJDarpkxnn8Ri0XdiZRs03EzzJrEcGskwKuJIuVgzF
+	 PB/M38NjlTMNG0FGwauOdxmdYr11Z1Epw0bOkA0eFLNG+Om+eglWIcCFLTIjCAMJow
+	 f14B8gE04luFLYd3vBosikDHs0mJDbTdByW/CL5UBdq9UEZ7KmHjTa+bkbQzjGGFNt
+	 90Asa5E4T833Q==
+Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B6668b6840001>; Wed, 12 Jun 2024 08:41:40 +1200
+Received: from svr-chch-ex1.atlnz.lc (2001:df5:b000:bc8::77) by
+ svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.2.1544.11; Wed, 12 Jun 2024 08:41:40 +1200
+Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) by
+ svr-chch-ex1.atlnz.lc (2001:df5:b000:bc8::77) with Microsoft SMTP Server
+ (TLS) id 15.0.1497.48; Wed, 12 Jun 2024 08:41:40 +1200
+Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
+ svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
+ 15.02.1544.011; Wed, 12 Jun 2024 08:41:40 +1200
+From: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "hkallweit1@gmail.com" <hkallweit1@gmail.com>, "linux@armlinux.org.uk"
+	<linux@armlinux.org.uk>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH next-next] net: phy: realtek: add support for rtl8224
+ 2.5Gbps PHY
+Thread-Topic: [PATCH next-next] net: phy: realtek: add support for rtl8224
+ 2.5Gbps PHY
+Thread-Index: AQHau8ECnGOzFCFnUUe89YjWXGoxMrHBw8CAgAB7GIA=
+Date: Tue, 11 Jun 2024 20:41:39 +0000
+Message-ID: <f6f82e0c-5cf5-4a1c-891c-9e772f2403d4@alliedtelesis.co.nz>
+References: <20240611053415.2111723-1-chris.packham@alliedtelesis.co.nz>
+ <243d5e27-522d-408d-a551-d11073cf330b@lunn.ch>
+In-Reply-To: <243d5e27-522d-408d-a551-d11073cf330b@lunn.ch>
+Accept-Language: en-NZ, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6330DE92D0E9DB4A877E219CC31048C1@atlnz.lc>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZmhvnBsqKe7AakY-@gondor.apana.org.au>
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=F9L0dbhN c=1 sm=1 tr=0 ts=6668b684 a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=75chYTbOgJ0A:10 a=IkcTkHD0fZMA:10 a=T1WGqf2p2xoA:10 a=tzSt9rU13RPaQMf4fiUA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-SEG-SpamProfiler-Score: 0
 
-On Tue, Jun 11, 2024 at 11:39:08PM +0800, Herbert Xu wrote:
-> On Tue, Jun 11, 2024 at 11:21:43PM +0800, Herbert Xu wrote:
-> >
-> > Therefore if we switched to a linked-list API networking could
-> > give us the buffers with minimal changes.
-> 
-> BTW, this is not just about parallelising hashing.  Just as one of
-> the most significant benefits of GSO does not come from hardware
-> offload, but rather the amortisation of (network) stack overhead.
-> IOW you're traversing a very deep stack once instead of 40 times
-> (this is the factor for 64K vs MTU, if we extend beyond 64K (which
-> we absolute should do) the benefit would increase as well).
-> 
-> The same should apply to the Crypto API.  So even if this was a
-> purely software solution with no assembly code at all, it may well
-> improve GCM performance (at least for users able to feed us bulk
-> data, like networking).
-> 
-
-At best this would save an indirect call per message, if the underlying
-algorithm explicitly added support for it and the user of the API migrated to
-the multi-request model.  This alone doesn't seem worth the effort of migrating
-to multi-request, especially considering the many other already-possible
-optimizations that would not require API changes or migrating users to
-multi-request.  The x86_64 AES-GCM is pretty well optimized now after my recent
-patches, but there's still an indirect call associated with the use of the SIMD
-helper which could be eliminated, saving one per message (already as much as we
-could hope to get from multi-request).  authenc on the other hand is almost
-totally unoptimized, as I mentioned before; it makes little sense to talk about
-any sort of multi-request optimization for it at this point.
-
-- Eric
+DQpPbiAxMi8wNi8yNCAwMToyMSwgQW5kcmV3IEx1bm4gd3JvdGU6DQo+IE9uIFR1ZSwgSnVuIDEx
+LCAyMDI0IGF0IDA1OjM0OjE0UE0gKzEyMDAsIENocmlzIFBhY2toYW0gd3JvdGU6DQo+PiBUaGUg
+UmVhbHRlayBSVEw4MjI0IFBIWSBpcyBhIDIuNUdicHMgY2FwYWJsZSBQSFkuIEl0IG9ubHkgdXNl
+cyB0aGUNCj4+IGNsYXVzZSA0NSBNRElPIGludGVyZmFjZSBhbmQgY2FuIGxldmVyYWdlIHRoZSBz
+dXBwb3J0IHRoYXQgaGFzIGFscmVhZHkNCj4+IGJlZW4gYWRkZWQgZm9yIHRoZSBvdGhlciA4MjJ4
+IFBIWXMuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogQ2hyaXMgUGFja2hhbSA8Y2hyaXMucGFja2hh
+bUBhbGxpZWR0ZWxlc2lzLmNvLm56Pg0KPiBZb3UgcHJvYmFibHkgc2hvdWxkIENjOiBFcmljIFdv
+dWRzdHJhIGFuZCBNYXJlayBCZWjDum4gd2hvIGhhdmUgYm90aA0KPiB3b3JrZWQgb24gMi41RyB2
+YXJpYW50cyBvZiB0aGlzIFBIWS4NCj4NCkhtbSBnZXRfbWFpbnRhaW5lci5wbCBkaWRuJ3QgcGlj
+ayB0aGVtIHVwIGJ1dCBkb2VzIHdpdGggdGhlIC0tZ2l0IA0Kb3B0aW9uLiBEaWQgc29tZXRoaW5n
+IGNoYW5nZSB3aXRoIHRoYXQgcmVjZW50bHk/IE9yIG1heWJlIEknbSBqdXN0IA0KcnVubmluZyBp
+dCB3cm9uZy4gSSdsbCBhZGQgQ2MgdGhlbSBvbiB0aGUgb3JpZ2luYWwgcGF0Y2ggYW5kIGluY2x1
+ZGUgDQp0aGVtIGlmIHRoZXJlIGlzIGEgdjIuDQoNCj4+IE5vdGVzOg0KPj4gICAgICBJJ20gY3Vy
+cmVudGx5IHRlc3RpbmcgdGhpcyBvbiBhbiBvbGRlciBrZXJuZWwgYmVjYXVzZSB0aGUgYm9hcmQg
+SSdtDQo+PiAgICAgIHVzaW5nIGhhcyBhIFNPQy9EU0Egc3dpdGNoIHRoYXQgaGFzIGEgZHJpdmVy
+IGluIG9wZW53cnQgZm9yIExpbnV4IDUuMTUuDQo+PiAgICAgIEkgaGF2ZSB0cmllZCB0byBzZWxl
+Y3RpdmVseSBiYWNrIHBvcnQgdGhlIGJpdHMgSSBuZWVkIGZyb20gdGhlIG90aGVyDQo+PiAgICAg
+IHJ0bDgyMnggd29yayBzbyB0aGlzIHNob3VsZCBiZSBhbGwgdGhhdCBpcyByZXF1aXJlZCBmb3Ig
+dGhlIHJ0bDgyMjQuDQo+PiAgICAgIA0KPj4gICAgICBUaGVyZSdzIHF1aXRlIGEgbG90IHRoYXQg
+d291bGQgbmVlZCBmb3J3YXJkIHBvcnRpbmcgZ2V0IGEgd29ya2luZyBzeXN0ZW0NCj4+ICAgICAg
+YWdhaW5zdCBhIGN1cnJlbnQga2VybmVsIHNvIGhvcGVmdWxseSB0aGlzIGlzIHNtYWxsIGVub3Vn
+aCB0aGF0IGl0IGNhbg0KPj4gICAgICBsYW5kIHdoaWxlIEknbSB0cnlpbmcgdG8gZmlndXJlIG91
+dCBob3cgdG8gdW50YW5nbGUgYWxsIHRoZSBvdGhlciBiaXRzLg0KPiAgICAgICANCj4gSSBkb24n
+dCBzZWUgdGhpcyBhcyBiZWluZyBhIHByb2JsZW0uIEl0IHNob3VsZCBub3QgYmUgcG9zc2libGUg
+dG8NCj4gY2F1c2UgcmVncmVzc2lvbnMgYnkgYWRkaW5nIGEgbmV3IGRldmljZSBsaWtlIHRoaXMu
+IElmIGl0IHR1cm5zIG91dCB0bw0KPiBiZSBicm9rZW4sIHlvdSBjYW4gZml4IGl0IHVwIGxhdGVy
+Lg0KPg0KPiAJQW5kcmV3
 
