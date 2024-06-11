@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-102546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32020903AAD
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:43:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 099F3903AB3
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:44:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE83C28789E
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 11:43:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7E5C1F23241
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 11:44:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 718B417BB08;
-	Tue, 11 Jun 2024 11:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E97D17BB25;
+	Tue, 11 Jun 2024 11:41:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
+Received: from mxout70.expurgate.net (mxout70.expurgate.net [91.198.224.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67FD178CC1;
-	Tue, 11 Jun 2024 11:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31D617BB20;
+	Tue, 11 Jun 2024 11:41:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.224.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718106090; cv=none; b=UqNVvfLvuUsokJiVgj4jtC5GSGWZsA2hqk/CEpvLQ//ew12Y+A+bff/WDOueb7nDFwPZ+28qO/TcCyP54W29/AJj9Ce/4+aPUkdBZcjnFO4U0pOvzSHr2rJQfKCU2SpXQD4lYa2q3I3SvO9NgWZ3YdXLkQzrU/JCZY0lEjJhKI4=
+	t=1718106095; cv=none; b=oAT5uhlpqdwTwDibDrReor67BVAUMaDkeOaevc8Ysf9KKkG7hMV8OAEQrTDS8eQkd2f8nYMr0V6TSriiW7BWChWXLKbYSJ5W5EsD+Uwm5tgZKMBhBcz7IYw8IEF/FgA+MByi682aEyQNItDdbWoh2ashYMSI7xS+Uv5/XTeb5js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718106090; c=relaxed/simple;
-	bh=kxwZ0cw+FzmbsarNoyILQQVuOInUJpunM/01+HV2TG4=;
+	s=arc-20240116; t=1718106095; c=relaxed/simple;
+	bh=rf7bKxreywWaz36ihg44Ce5tNfgkoAMZ4b/VuvGSpv0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kZ45M9LG4XZDfo6an8EiNoFMCOxPJq142qXywd/7Tq/DKQ6lbfH0lCHYTulJXW4SEK2uhYGFs/rAiqBDdpRpxyyNmvj2NmN7iS1/lGBnU9Vm+8GQKZXjL7CWVe41g/EM98q/bll/70QwsrCdKi+zYE9qp+YBfNYqQ2NqQSaALxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=194.37.255.70
+	 MIME-Version; b=USWK1n1gH0AoXXl26VJPxgBpaY5m4yBZy1wOEMO0yxbtYsGHCnA71cDSU/ocjGOnPRmF7Cy6nt3uVQt44VoIdlZvbEkVott8GQoHRPvUEerlAIkKrUEG3iDkJitZVbOHf7g/NZnJUOYv0mqgBh2qQ2B8med00kv6d6eB91+5KkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=91.198.224.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
 Received: from [127.0.0.1] (helo=localhost)
 	by relay.expurgate.net with smtp (Exim 4.92)
 	(envelope-from <prvs=9906f4c1d5=ms@dev.tdt.de>)
-	id 1sGzsU-00037F-U1; Tue, 11 Jun 2024 13:41:26 +0200
+	id 1sGzsa-001KyY-3q; Tue, 11 Jun 2024 13:41:32 +0200
 Received: from [195.243.126.94] (helo=securemail.tdt.de)
 	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ms@dev.tdt.de>)
-	id 1sGzsU-001XVM-D1; Tue, 11 Jun 2024 13:41:26 +0200
+	id 1sGzsZ-0027hL-He; Tue, 11 Jun 2024 13:41:31 +0200
 Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id 1F205240053;
-	Tue, 11 Jun 2024 13:41:26 +0200 (CEST)
+	by securemail.tdt.de (Postfix) with ESMTP id 45C54240053;
+	Tue, 11 Jun 2024 13:41:31 +0200 (CEST)
 Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id AA4D5240050;
-	Tue, 11 Jun 2024 13:41:25 +0200 (CEST)
+	by securemail.tdt.de (Postfix) with ESMTP id CE64B240050;
+	Tue, 11 Jun 2024 13:41:30 +0200 (CEST)
 Received: from mschiller1.dev.tdt.de (unknown [10.2.3.20])
-	by mail.dev.tdt.de (Postfix) with ESMTPSA id 69DFC29768;
-	Tue, 11 Jun 2024 13:41:25 +0200 (CEST)
+	by mail.dev.tdt.de (Postfix) with ESMTPSA id 8C2D629768;
+	Tue, 11 Jun 2024 13:41:30 +0200 (CEST)
 From: Martin Schiller <ms@dev.tdt.de>
 To: martin.blumenstingl@googlemail.com,
 	hauke@hauke-m.de,
@@ -64,9 +64,9 @@ Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ms@dev.tdt.de
-Subject: [PATCH net-next v4 07/13] net: dsa: lantiq_gswip: do also enable or disable cpu port
-Date: Tue, 11 Jun 2024 13:40:21 +0200
-Message-ID: <20240611114027.3136405-8-ms@dev.tdt.de>
+Subject: [PATCH net-next v4 08/13] net: dsa: lantiq_gswip: Use dsa_is_cpu_port() in gswip_port_change_mtu()
+Date: Tue, 11 Jun 2024 13:40:22 +0200
+Message-ID: <20240611114027.3136405-9-ms@dev.tdt.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240611114027.3136405-1-ms@dev.tdt.de>
 References: <20240611114027.3136405-1-ms@dev.tdt.de>
@@ -79,79 +79,41 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-purgate: clean
 X-purgate-type: clean
-X-purgate-ID: 151534::1718106086-36936522-3C646042/0/0
+X-purgate-ID: 151534::1718106092-1B4A162D-2A226304/0/0
 
-Before commit 74be4babe72f ("net: dsa: do not enable or disable non user
-ports"), gswip_port_enable/disable() were also executed for the cpu port
-in gswip_setup() which disabled the cpu port during initialization.
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 
-Let's restore this by removing the dsa_is_user_port checks. Also, let's
-clean up the gswip_port_enable() function so that we only have to check
-for the cpu port once. The operation reordering done here is safe.
+Make the check for the CPU port in gswip_port_change_mtu() consistent
+with other areas of the driver by using dsa_is_cpu_port().
 
-Signed-off-by: Martin Schiller <ms@dev.tdt.de>
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 Acked-by: Hauke Mehrtens <hauke@hauke-m.de>
 ---
- drivers/net/dsa/lantiq_gswip.c | 24 ++++++++----------------
- 1 file changed, 8 insertions(+), 16 deletions(-)
+ drivers/net/dsa/lantiq_gswip.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/net/dsa/lantiq_gswip.c b/drivers/net/dsa/lantiq_gswi=
 p.c
-index c1f9419af35f..8ec329d0c136 100644
+index 8ec329d0c136..58c069f964dd 100644
 --- a/drivers/net/dsa/lantiq_gswip.c
 +++ b/drivers/net/dsa/lantiq_gswip.c
-@@ -695,13 +695,18 @@ static int gswip_port_enable(struct dsa_switch *ds,=
- int port,
- 	struct gswip_priv *priv =3D ds->priv;
- 	int err;
-=20
--	if (!dsa_is_user_port(ds, port))
--		return 0;
--
- 	if (!dsa_is_cpu_port(ds, port)) {
-+		u32 mdio_phy =3D 0;
-+
- 		err =3D gswip_add_single_port_br(priv, port, true);
- 		if (err)
- 			return err;
-+
-+		if (phydev)
-+			mdio_phy =3D phydev->mdio.addr & GSWIP_MDIO_PHY_ADDR_MASK;
-+
-+		gswip_mdio_mask(priv, GSWIP_MDIO_PHY_ADDR_MASK, mdio_phy,
-+				GSWIP_MDIO_PHYp(port));
- 	}
-=20
- 	/* RMON Counter Enable for port */
-@@ -714,16 +719,6 @@ static int gswip_port_enable(struct dsa_switch *ds, =
-int port,
- 	gswip_switch_mask(priv, 0, GSWIP_SDMA_PCTRL_EN,
- 			  GSWIP_SDMA_PCTRLp(port));
-=20
--	if (!dsa_is_cpu_port(ds, port)) {
--		u32 mdio_phy =3D 0;
--
--		if (phydev)
--			mdio_phy =3D phydev->mdio.addr & GSWIP_MDIO_PHY_ADDR_MASK;
--
--		gswip_mdio_mask(priv, GSWIP_MDIO_PHY_ADDR_MASK, mdio_phy,
--				GSWIP_MDIO_PHYp(port));
--	}
--
- 	return 0;
- }
-=20
-@@ -731,9 +726,6 @@ static void gswip_port_disable(struct dsa_switch *ds,=
- int port)
+@@ -1464,12 +1464,11 @@ static int gswip_port_max_mtu(struct dsa_switch *=
+ds, int port)
+ static int gswip_port_change_mtu(struct dsa_switch *ds, int port, int ne=
+w_mtu)
  {
  	struct gswip_priv *priv =3D ds->priv;
+-	int cpu_port =3D priv->hw_info->cpu_port;
 =20
--	if (!dsa_is_user_port(ds, port))
--		return;
--
- 	gswip_switch_mask(priv, GSWIP_FDMA_PCTRL_EN, 0,
- 			  GSWIP_FDMA_PCTRLp(port));
- 	gswip_switch_mask(priv, GSWIP_SDMA_PCTRL_EN, 0,
+ 	/* CPU port always has maximum mtu of user ports, so use it to set
+ 	 * switch frame size, including 8 byte special header.
+ 	 */
+-	if (port =3D=3D cpu_port) {
++	if (dsa_is_cpu_port(ds, port)) {
+ 		new_mtu +=3D 8;
+ 		gswip_switch_w(priv, VLAN_ETH_HLEN + new_mtu + ETH_FCS_LEN,
+ 			       GSWIP_MAC_FLEN);
 --=20
 2.39.2
 
