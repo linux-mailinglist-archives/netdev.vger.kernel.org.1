@@ -1,73 +1,50 @@
-Return-Path: <netdev+bounces-102410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC929902DBC
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 02:47:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 462E2902DCF
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 03:00:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE63E1C212E2
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 00:47:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F17431F22582
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 01:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90C4B3D69;
-	Tue, 11 Jun 2024 00:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 530845661;
+	Tue, 11 Jun 2024 01:00:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="hZXX2Eey"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l/Fvisrq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C761C06
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 00:47:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D63A934;
+	Tue, 11 Jun 2024 01:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718066869; cv=none; b=JrValzatPOgyILKkWPxCrlddxlec8S/Tb51xUbsnCtJ5PKqw5ODJqxfHdTOqJaWmfcS3AfBAiodL5TKzvLXGWIz7xVQautzHYB++jxn3YDJRxzCbbGZTrqKcVdNL+Z060WIJ0ikTs2YwyzMIHiYo7B7nZAfxtnYi/4Kz48AwNkw=
+	t=1718067642; cv=none; b=RM+GZ5vjnYVHbgjGtSG0k58v0LktAGJSnYrxjSX6JVLcfJpm7827KPNpgxqMYZrQE1MljBa1LoFanIPr39wH8wexuPgjkSZJ6zeJ4NuyVWs0ahaieO4zXOpdg/QdZ29Pa4p9kbvrTfklfPvvr6F83uGxGOJ9ghfGps/fNYw8WfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718066869; c=relaxed/simple;
-	bh=ZmS9j6Nm2lyHu0gu8ZNHt9YS8t4gLY5t+kk4xlFNYvI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HJJCcfjhjOH+YkQjKZZPWi/3gSp96YhgdI+PwsdgNwca+MrnvpXlxMrvl2Rg9wNzg4oEfGhysnqCtNMRaUgH4337dAoxc9MD3ZTbU4C5InnCK9JTbg0sb8K3XoxQD4Y2paz7TV5czpTxP/yu6tAxR8rS1KY0AscMmwDb8kMoWLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=hZXX2Eey; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1718066868; x=1749602868;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=S62+WCxcqPmJrmZefmiOvVIEx7Ly0yEXHkzywaCQLsE=;
-  b=hZXX2EeymcLYpBrn2TbGhNnb7YQdczEPYAkUSwin6ouy5b0MgUPspe4S
-   f9LpmkUq17jR/4ZamR39erD6jIS9DlRRZZPu0OFr9guyDP/Pk+ShR25rV
-   qrFzVBjB0SnwA4xs3fFiERHKHAc5o4tuaWawOzhvKNAy0gmF5Z2qFEcxA
-   E=;
-X-IronPort-AV: E=Sophos;i="6.08,228,1712620800"; 
-   d="scan'208";a="425342893"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2024 00:47:41 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:4585]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.23:2525] with esmtp (Farcaster)
- id 1cc2602b-b9dc-4fce-9512-33e54be01f7e; Tue, 11 Jun 2024 00:47:40 +0000 (UTC)
-X-Farcaster-Flow-ID: 1cc2602b-b9dc-4fce-9512-33e54be01f7e
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Tue, 11 Jun 2024 00:47:33 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.171.27) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Tue, 11 Jun 2024 00:47:31 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kent.overstreet@linux.dev>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [PATCH v1 net-next 01/11] af_unix: Define locking order for unix_table_double_lock().
-Date: Mon, 10 Jun 2024 17:47:23 -0700
-Message-ID: <20240611004723.86031-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <thzkgbuwuo3knevpipu4rzsh5qgmwhklihypdgziiruabvh46f@uwdkpcfxgloo>
-References: <thzkgbuwuo3knevpipu4rzsh5qgmwhklihypdgziiruabvh46f@uwdkpcfxgloo>
+	s=arc-20240116; t=1718067642; c=relaxed/simple;
+	bh=9pnZz3GjeOWVNl3ezAnbXvds+TY9JRbi79eQXLmcNyY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fPl5mUdLrHqA3fHmV8cb8ou4V7dHSUxLaICB3AZhDaz3/9VkLcw8jw8EnnxP+9kkO6lwDNiRq5aBTLYosODWUgFI5dO+ZFJZZUgiw6QfoR5B/+tsAUMr2h6oRylUIadEbU14IZzh3Zk8hxROQ16odwUr3HpjAe0lqlZwhDxmqxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l/Fvisrq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 95AAEC4AF1C;
+	Tue, 11 Jun 2024 01:00:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718067641;
+	bh=9pnZz3GjeOWVNl3ezAnbXvds+TY9JRbi79eQXLmcNyY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=l/FvisrqTz52VlWuD3vVcPfhVW9JnjmPyYvDiUmBEM11qcpdbcEDy9bV8gk0LI1ro
+	 qJSUPSmR280MxSa/yv5jAXWZxJz8h+sZrWvAOca0X0CrrBv5r9TygpeVUWCO3R8y1y
+	 jD1/uhR33i+tjVW9frLB94kbxKVy2J8kR04K0u69bSkTfO2YIBgCR2oCAu6dk0cDud
+	 T+CVy1KGoTI8jKgheDsjc72wjK4tVgPhYjoq68t/cjqn+UXuI2441/iwfia70W642D
+	 pAIFSgYEHTJBWV4jTd2TGhw9DLHMA18ZRsmKM7SCUafmzs3JJeYBADz3jpIBYFU4sq
+	 P4aQrTQO5L9jw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7B5AAC54BB3;
+	Tue, 11 Jun 2024 01:00:41 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,53 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWB001.ant.amazon.com (10.13.139.132) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Subject: Re: pull-request: wireless-next-2024-06-07
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171806764150.26535.12191712907196102676.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Jun 2024 01:00:41 +0000
+References: <20240607093517.41394C2BBFC@smtp.kernel.org>
+In-Reply-To: <20240607093517.41394C2BBFC@smtp.kernel.org>
+To: Kalle Valo <kvalo@kernel.org>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
-From: Kent Overstreet <kent.overstreet@linux.dev>
-Date: Mon, 10 Jun 2024 20:30:58 -0400
-> On Mon, Jun 10, 2024 at 04:58:36PM -0700, Kuniyuki Iwashima wrote:
-> > > No, we're defining an ordering, there's no need for an enum - this
-> > > should work exactly the same as a comparison function that you pass to
-> > > sort().
-> > > 
-> > > Comparison functions are no place to get fancy, they should be as
-> > > standard as possible: you can get _crazy_ bugs resulting from buggy
-> > > comparison functions that don't actually define a total ordering.
-> > 
-> > What should it return if we cannot define the total ordering like
-> > when we only define the allowed list of ordering ?
-> > 
-> > See patch 8, the rule there is
-> > 
-> >   if the nested order is listening socket -> child socket, then ok,
-> >   and otherwise, not.
-> > 
-> > So we don't know the clear ordering, equal or greater, but we know
-> > it's actually illegal.
-> > 
-> > https://lore.kernel.org/netdev/20240610223501.73191-9-kuniyu@amazon.com/
+Hello:
+
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri,  7 Jun 2024 09:35:17 +0000 (UTC) you wrote:
+> Hi,
 > 
-> Ok yeah, that's a tricky one, and it does come up elsewhere.
-
-Actually patch 3 & 4 is another example where we cannot define
-the ordering, and only one necessary rule out of three is defined.
-
-
-> I think we
-> can allow comparison functions to return "undefined", and define 0 ==
-> undefined for lockdep.
-
-I agree.
-
-
+> here's a pull request to net-next tree, more info below. Please let me know if
+> there are any problems.
 > 
-> The important thing I want to maintain is that comparison functions be
-> symmetric.
+> Kalle
+> 
+> [...]
 
-Ok, I'll use ((a > b) - (b < a)) for patch 1 & 2 where the odering
-can be well defined as numeric ascending order.
+Here is the summary with links:
+  - pull-request: wireless-next-2024-06-07
+    https://git.kernel.org/netdev/net-next/c/93d4e8bb3f13
 
-Thanks!
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
