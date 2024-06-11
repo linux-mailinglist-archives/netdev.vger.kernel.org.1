@@ -1,131 +1,176 @@
-Return-Path: <netdev+bounces-102449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66D91902FB6
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 06:54:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 407C4902FB7
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 06:58:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 791401C2276B
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 04:54:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7D771F239EC
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 04:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CB5116F90C;
-	Tue, 11 Jun 2024 04:54:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2D1017082E;
+	Tue, 11 Jun 2024 04:58:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YASbS5eM"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fT6X6U6K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A864314290
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 04:54:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14BDE14290
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 04:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718081688; cv=none; b=oSOLpLukSgaZRqYSjIkbFshnRH2jcCILkczeRJU2HHqJ2QrlB4r9OTFpwvUnFqhiWL8nW5GA+VGVDOUF0LhCT7jwlzF+aYfPTBv8TaQD/ZAzsCxfAajeTX0gCxP7rbSzjNOQD4NFVjsGKvyrmAZiUSpmQj8OuDqOY36j68qqnzg=
+	t=1718081922; cv=none; b=aGr2i3OngmpNuJYqepMywyGqvuLvwTcOoQYenjN97kgoakficu357JXFGqG2NHrZj9J7Z32oYPQoUIcUGX9oAm4pNVSn+wHax+7AZU0AZEhCRh+mFWlQ0McdWR8tBkTJ9jNB/bYG2AU7yxSM79MYXrsu+pR46Es/0vv/FIp+Srk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718081688; c=relaxed/simple;
-	bh=3kJactzqV+/HWX+Whc+gfJwULdSHj/mXBWYx1C9Vn94=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=URCO/nAKqnX09A+XagqPjTRmImNbDMnjUiZfHXF87d8G2Y/F9r7P7YnteHF0JEdbyyNYVRUFJiPc5lUZzBLKijN+jQGyHZWveLBgWi5vl5fnz1skwaNDSfPh/ZUM2JFlwB5PIXu6UtmisbxRilOCe1JqlJCME3+E/8vKYXgo71g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YASbS5eM; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2c2edc2611bso253647a91.0
-        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 21:54:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718081687; x=1718686487; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mgMT18t7rPBAclEtXVJ/0g0gS/SkzBSOXNapkKxBc2c=;
-        b=YASbS5eMIuyMZ/HSXk3lm9GJLllNU/MHiNuO1UjT3RZAPjmz97gzdWwqGia4sKNqsh
-         nGYOScFoCu8/7YxcNrFD8N+Bm/YkGwmh4nF84z56nxGTDdupKv4CPEwSqIypGvGX9ROQ
-         4DiF21Hlu2Wx+xsrp4RqHzvg17l6CMKeqHs4mshIhS4dxdej/qCHWYc/G61PZQRKNiLH
-         kN6WtSmhDVDY8IvufW+mSXpksSPQ2HdWpevPM7VJ4Tq7QUUoGZVGm/naOMAu1cPPWYiQ
-         FChsHEi2aWpaTMnthTL6K1RqHSXjhSic2fUgf9NzcijSym3t8oLa7FVpQiGwtXZ6ObRJ
-         TqvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718081687; x=1718686487;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=mgMT18t7rPBAclEtXVJ/0g0gS/SkzBSOXNapkKxBc2c=;
-        b=ASPcD720KjmGNA3PpwmiBvKPJQOt3WlrKQHM8gfeVa/jV0bCujcV9rYJnMfq4/YQXE
-         KBihcvKCDMBH8SkyazSUVJqFmLPuY8aGYBtup3ZzuBioLRCIijgsuw+rBYfIn6kZ84UN
-         shi0v/LqytKc3LM6V4/TFNvbLB/2YiOz9oWX7Ae49q3b9d3A29pNkhWa3c7JcSbAMotQ
-         eD2huAud6p0GS3oiRiTqLU2aG+HdkpfIhLzxeY+NseXJrQykWGggOmaxWD8e6dcSs9m6
-         yRSVJ25qEdwkR/cjHu/5JV1uR2Vn9dO+wpxMK0JjeC5yCCt2JOapI6PZQ5QrJ8k/kOMc
-         zMBw==
-X-Forwarded-Encrypted: i=1; AJvYcCW1WM2wfJltBXBRfb975WAlz14lqea1p7McIVA0D9GEPehBfFx3SoaA3ance/K8ZfEWFHXYE0bzScV7+KjEkIpDGLvvUWHT
-X-Gm-Message-State: AOJu0Yz8FaFo7LiqbcTIi6YEJ2sjBBoew+U19tEIYL7g+hG5UrkYvrs3
-	8EZx5+2heOr2HD3Q7+nVvN1xEKq8yglAwIcX/zt2oUEW/YTlgv/bBf3ZOVgY
-X-Google-Smtp-Source: AGHT+IG8Cdx/wFeSBnzb0FHRgfBWNe4cGg/NjeBFB+D/CP1bMAbBI/8LvDanro0CbhjXpcdcYQXs+Q==
-X-Received: by 2002:a17:902:ec8b:b0:1f7:414:d673 with SMTP id d9443c01a7336-1f70414dcbamr65692515ad.4.1718081686962;
-        Mon, 10 Jun 2024 21:54:46 -0700 (PDT)
-Received: from localhost (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6f336d172sm51581285ad.247.2024.06.10.21.54.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jun 2024 21:54:46 -0700 (PDT)
-Date: Tue, 11 Jun 2024 13:54:42 +0900 (JST)
-Message-Id: <20240611.135442.1008031498769485601.fujita.tomonori@gmail.com>
-To: hfdevel@gmx.net
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch,
- horms@kernel.org, kuba@kernel.org, jiri@resnulli.us, pabeni@redhat.com,
- linux@armlinux.org.uk, naveenm@marvell.com, jdamato@fastly.com
-Subject: Re: [PATCH net-next v9 0/6] add ethernet driver for Tehuti
- Networks TN40xx chips
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <7fbf409d-a3bc-42e0-ba32-47a1db017b57@gmx.net>
-References: <20240605232608.65471-1-fujita.tomonori@gmail.com>
-	<7fbf409d-a3bc-42e0-ba32-47a1db017b57@gmx.net>
+	s=arc-20240116; t=1718081922; c=relaxed/simple;
+	bh=6RGwrNaaHr3z9VGDfzp14bTAGG202zfRdOc59P8l/S0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nU37h9tfW3pgY5kZSTUsV8ghDkt/McFhoqQr8RM5pK1fd1+xQdOW2apoW6RpTDBghV1p27t3GIgclS02Xwef7/1+XnAv63kTxk7RQ9XX3YfxhqcAAGkJ9AxIHN7X3dsQmcXu9vaIsXKWd4HADWtCV9OnoC56DaeJdzig1UbFOdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fT6X6U6K; arc=none smtp.client-ip=115.124.30.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1718081912; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=UzqPJmuJBJVSGrRTHXc3s1XMNZUucZQwNji/b+ux6XE=;
+	b=fT6X6U6KXUByXWgGgp0qsYp2zv6124g+7hlGpLjg2vuCKBm977NY2vApw96TtuERWIChr5J/oaSr0DPygRARiF6OeR8UUPXm38AUNlv64Loxo2SDdDr96nOizFFtWv2UFVHToavyT76K3gu/vAkSreVhCT2DW5BOfqOt5+gRXRA=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067109;MF=lulie@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W8F5RRb_1718081910;
+Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0W8F5RRb_1718081910)
+          by smtp.aliyun-inc.com;
+          Tue, 11 Jun 2024 12:58:31 +0800
+From: Philo Lu <lulie@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: edumazet@google.com,
+	rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	dust.li@linux.alibaba.com
+Subject: [PATCH net-next] tcp: Add tracepoint for rxtstamp coalescing
+Date: Tue, 11 Jun 2024 12:58:30 +0800
+Message-Id: <20240611045830.67640-1-lulie@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Sun, 9 Jun 2024 11:10:54 +0200
-Hans-Frieder Vogt <hfdevel@gmx.net> wrote:
+During tcp coalescence, rx timestamps of the former skb ("to" in
+tcp_try_coalesce), will be lost. This may lead to inaccurate
+timestamping results if skbs come out of order.
 
->> FUJITA Tomonori (6):
->>    net: tn40xx: add pci driver for Tehuti Networks TN40xx chips
->>    net: tn40xx: add register defines
->>    net: tn40xx: add basic Tx handling
->>    net: tn40xx: add basic Rx handling
->>    net: tn40xx: add mdio bus support
->>    net: tn40xx: add phylink support
->>
->>   MAINTAINERS                             |    8 +-
->>   drivers/net/ethernet/tehuti/Kconfig     |   15 +
->>   drivers/net/ethernet/tehuti/Makefile    |    3 +
->>   drivers/net/ethernet/tehuti/tn40.c      | 1771 +++++++++++++++++++++++
->>   drivers/net/ethernet/tehuti/tn40.h      |  233 +++
->>   drivers/net/ethernet/tehuti/tn40_mdio.c |  143 ++
->>   drivers/net/ethernet/tehuti/tn40_phy.c  |   76 +
->>   drivers/net/ethernet/tehuti/tn40_regs.h |  245 ++++
->>   8 files changed, 2493 insertions(+), 1 deletion(-)
->>   create mode 100644 drivers/net/ethernet/tehuti/tn40.c
->>   create mode 100644 drivers/net/ethernet/tehuti/tn40.h
->>   create mode 100644 drivers/net/ethernet/tehuti/tn40_mdio.c
->>   create mode 100644 drivers/net/ethernet/tehuti/tn40_phy.c
->>   create mode 100644 drivers/net/ethernet/tehuti/tn40_regs.h
->>
->>
->> base-commit: c790275b5edf5d8280ae520bda7c1f37da460c00
-> 
-> Hi Tomonori,
-> 
-> feel free to add my
-> 
-> Reviewed-by: Hans-Frieder Vogt <hfdevel@gmx.net>
+Here is an example.
+Assume a message consists of 3 skbs, namely A, B, and C. And these skbs
+are processed by tcp in the following order:
+A -(1us)-> C -(1ms)-> B
+If C is coalesced to B, the final rx timestamps of the message will be
+those of C. That is, the timestamps show that we received the message
+when C came (including hardware and software). However, we actually
+received it 1ms later (when B came).
 
-I added your Reviewed-by except for patches that you've
-reviewed. Please have look at the remaining patches in v10.
+With the added tracepoint, we can recognize such cases and report them
+if we want.
 
-I'll add PHY specific data for initialization to the PCI id_table
-after merged.
+Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
+---
+ include/trace/events/tcp.h | 61 ++++++++++++++++++++++++++++++++++++++
+ net/ipv4/tcp_input.c       |  2 ++
+ 2 files changed, 63 insertions(+)
+
+diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
+index 49b5ee091cf6..c4219ca2bcf0 100644
+--- a/include/trace/events/tcp.h
++++ b/include/trace/events/tcp.h
+@@ -411,6 +411,67 @@ TRACE_EVENT(tcp_cong_state_set,
+ 		  __entry->cong_state)
+ );
+ 
++/*
++ * When called, TCP_SKB_CB(from)->has_rxtstamp must be true, but TCP_SKB_CB(to)->has_rxtstamp may
++ * not. So has_rxtstamp is checked before reading timestamps of skb "to".
++ */
++TRACE_EVENT(tcp_rxtstamp_coalesce,
++
++	TP_PROTO(const struct sock *sk, const struct sk_buff *to, const struct sk_buff *from),
++
++	TP_ARGS(sk, to, from),
++
++	TP_STRUCT__entry(
++		__field(__u16, sport)
++		__field(__u16, dport)
++		__field(__u16, family)
++		__array(__u8, saddr, 4)
++		__array(__u8, daddr, 4)
++		__array(__u8, saddr_v6, 16)
++		__array(__u8, daddr_v6, 16)
++		__field(__u64, to_tstamp)
++		__field(__u64, to_hwtstamp)
++		__field(__u64, from_tstamp)
++		__field(__u64, from_hwtstamp)
++	),
++
++	TP_fast_assign(
++		const struct inet_sock *inet = inet_sk(sk);
++		__be32 *p32;
++
++		__entry->sport = ntohs(inet->inet_sport);
++		__entry->dport = ntohs(inet->inet_dport);
++		__entry->family = sk->sk_family;
++
++		p32 = (__be32 *) __entry->saddr;
++		*p32 = inet->inet_saddr;
++
++		p32 = (__be32 *) __entry->daddr;
++		*p32 = inet->inet_daddr;
++
++		TP_STORE_ADDRS(__entry, inet->inet_saddr, inet->inet_daddr,
++			       sk->sk_v6_rcv_saddr, sk->sk_v6_daddr);
++
++		if (TCP_SKB_CB(to)->has_rxtstamp) {
++			__entry->to_tstamp = to->tstamp;
++			__entry->to_hwtstamp = skb_shinfo(to)->hwtstamps.hwtstamp;
++		} else {
++			__entry->to_tstamp = 0;
++			__entry->to_hwtstamp = 0;
++		}
++
++		__entry->from_tstamp = from->tstamp;
++		__entry->from_hwtstamp = skb_shinfo(from)->hwtstamps.hwtstamp;
++	),
++
++	TP_printk("family=%s sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c to_tstamp=%llu to_hwtstamp=%llu from_tstamp=%llu from_hwtstamp=%llu",
++		  show_family_name(__entry->family),
++		  __entry->sport, __entry->dport, __entry->saddr, __entry->daddr,
++		  __entry->saddr_v6, __entry->daddr_v6,
++		  __entry->to_tstamp, __entry->to_hwtstamp,
++		  __entry->from_tstamp, __entry->from_hwtstamp)
++);
++
+ #endif /* _TRACE_TCP_H */
+ 
+ /* This part must be outside protection */
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index eb187450e4d7..7024c6ba20ae 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -4827,6 +4827,8 @@ static bool tcp_try_coalesce(struct sock *sk,
+ 	TCP_SKB_CB(to)->tcp_flags |= TCP_SKB_CB(from)->tcp_flags;
+ 
+ 	if (TCP_SKB_CB(from)->has_rxtstamp) {
++		trace_tcp_rxtstamp_coalesce(sk, to, from);
++
+ 		TCP_SKB_CB(to)->has_rxtstamp = true;
+ 		to->tstamp = from->tstamp;
+ 		skb_hwtstamps(to)->hwtstamp = skb_hwtstamps(from)->hwtstamp;
+-- 
+2.32.0.3.g01195cf9f
+
 
