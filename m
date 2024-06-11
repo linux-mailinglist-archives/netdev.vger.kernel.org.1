@@ -1,358 +1,217 @@
-Return-Path: <netdev+bounces-102514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82C709036EC
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 10:45:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C22519036D1
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 10:42:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D316CB2D652
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 08:41:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 616E9285FA7
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 08:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E41C1176FCF;
-	Tue, 11 Jun 2024 08:39:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CC617BB01;
+	Tue, 11 Jun 2024 08:39:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ei1tERAE"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Frno7iWp";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="IjgjKKe7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD97176ACC
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 08:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B571B17B512;
+	Tue, 11 Jun 2024 08:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718095159; cv=none; b=avGXQNuPyU6tfJRhvBil1WmiRNnr3WvXwji8+p5gnUQhykKj07gfUk90TtRm4xI/2q6zdJ/aJhNTcK0NGiY4YuS11aaH/xgdSPxCCEf3nd8cQe9hamUkO/Mu2XyXqW/8THezXK/bKVYhtpISB/DY5iq4hwubGyvFBnB8INUjPRg=
+	t=1718095164; cv=none; b=N5CuhUxXcv+YqjQk2+L+w0zVAEAeFAVE+u4V9mf1xAwxkR/YRkOgSjkt4Ij9XK75pON4GfYZatkpVP2ZvWFow2rZucX1vwn0ukm2B5DYFmcB3uzW2P7akPs5PRKDEDhk+cR2lCn5PydjfPrbVgdnAUF59/n7bvkkRU3fjmn0BNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718095159; c=relaxed/simple;
-	bh=MHTOAsN37xqLncBGCUmqsVn4jEvRnk3b6bXGzaAVRK8=;
-	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KtMwETRkoM8pvqCR3XpEcOvM+pwjDd95JPGfdtMXF+nUk+CaIqdfZt38176DsEVT90wy2C7Zd9q4EmfhANe+MqZY5fV2RaLVnNOVADUfqaTL8MwC/Ji/ynaYUSz3+UNEwgoqILLTFNHI61cd0maODPz5db5/P0Yuv1ytj9d3t9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ei1tERAE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718095156;
+	s=arc-20240116; t=1718095164; c=relaxed/simple;
+	bh=1h24dx2JKVjERM1QFoE+eH8jakyUv1BrkTo7u7Cy1mc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DcSka17IjBTtGnMJ9XvKPlU3bgyFAqyxe04H2rBnx6glJ7AsSFTCYjkSkRydOL75wplXzBz4CmaH643LQT5h1dmdjAC2uNFglG0a/5JdW/5jbZAEMHGol4a5ZiIUWChVAbS7ToUum3ZJ/eDZyDFF6ZbyrnoKWdomIp7rNzQ+EAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Frno7iWp; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=IjgjKKe7; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Tue, 11 Jun 2024 10:39:18 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1718095160;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uCtC641JFfNQfpF4RLqFd780CF41WCD/8stofS+Eqf0=;
-	b=ei1tERAExesRTn3Q+JmHldbRvbHAp8aTkrRc7gciobaY/YJjgkaU4dQwO6NoJzd6CV/sah
-	eLNcwU+F5oBzaRDkaQnRvmDEAZu0TlKpB+N4lw2f+WFMpwwuWsdrCZWBuPs1HbOstJ7bT8
-	7aZlh+kJ/T4+m/6wbk1fdic/LO8EIXA=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-62-9aR6Z8C3O7e0gRm8lbxQUw-1; Tue, 11 Jun 2024 04:39:12 -0400
-X-MC-Unique: 9aR6Z8C3O7e0gRm8lbxQUw-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6b06d77bf8dso8773006d6.1
-        for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 01:39:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718095151; x=1718699951;
-        h=cc:to:subject:message-id:date:in-reply-to:mime-version:references
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uCtC641JFfNQfpF4RLqFd780CF41WCD/8stofS+Eqf0=;
-        b=jY/FH6PHfoEcuefHagqgs4IDDPL5I2rxCzfE6kitE3M4emfB+Zabj3XJdIsY83ZLks
-         7GRBxZZqPh/e6Un9YKlOs6x6hRlNHQJ69bBOKxlNuQeTNxHwe+7ABJhyHPsyRRZYwabC
-         xUIOb1mQQjoBbjCLUAJnQQPvcr42cyVY71Ks3WIWbm8WEJ2cU4vkG4X9FVStnu39MdGO
-         dPcWuF0TnrEPaGzZTtzWDIJlbIj3EXZQ1HBHEkb/T0YrMrmtnJ4tce5OTRFEvYL0FTjZ
-         kdUtt1ECTvYUK1lDexyZUpFFpg7AhUG0eHoJA57RkPuFgQbHUzBXTeRhkaxoUyruVhak
-         POew==
-X-Gm-Message-State: AOJu0YzF3T4clMhM1ts7IGyrpTQCzPWGrpOD0a+kh2nawb4e/SEWcmuv
-	Zs406pLukf3j4pzdLcB2fbrX0MBu7HJs7Hpx8kHdzwbi2vMx6uDyQ9k2bEjv2NYOAd2sHairFKT
-	AEE7shAItSjh4o+W6yL0t42hKSehebAjrB7iwdiegJSWAqqWwFUyn9MisAECkxhvK0j/drMgkHA
-	bipyomWOl4eytoM27KuuwswF2Ge8e6
-X-Received: by 2002:a05:6214:4a90:b0:6b0:74c6:4942 with SMTP id 6a1803df08f44-6b074c64a41mr96929006d6.5.1718095151390;
-        Tue, 11 Jun 2024 01:39:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEsbPtghgmB/Z5OVFvAqyDqkPGY0wtDkE3BulnRMElw3Q+oIAt1XspeQjA6956x8mAEcnz4Ne7s1U69K0nxPWc=
-X-Received: by 2002:a05:6214:4a90:b0:6b0:74c6:4942 with SMTP id
- 6a1803df08f44-6b074c64a41mr96928846d6.5.1718095151015; Tue, 11 Jun 2024
- 01:39:11 -0700 (PDT)
-Received: from 311643009450 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 11 Jun 2024 08:39:10 +0000
-From: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
-References: <20240603185647.2310748-1-amorenoz@redhat.com> <20240603185647.2310748-6-amorenoz@redhat.com>
- <f7ted94rebd.fsf@redhat.com>
+	bh=EuXplidRVKDZsJB5bk5rseBUPZqBqoh+LVXPB8Cujkk=;
+	b=Frno7iWpRpQcFkYJT4zVH82bPmWO9D4syoqcbYICV1B9X6BdEK26OvmZiDQt4X96TJQqNu
+	rjuJKpP9MxJbHqEWnWz9T4UAsM4uPkm6mUQQRDypZz2LG3TWurTQQWMSccuJ/0jdKgUoEx
+	n2cRMvY+w+rkHRHGSVdX1CBiIpvZYyXdMM5D2DIFXQ6BwW4/Gv/keDyXK1tHQeek+jLCMp
+	sFYodGZ4kON3mJp1KgDWWyvJyxfctiGcRoUZSbFa1jKkwwUEBPTtcS3CvMBaZrbyBvzXDd
+	X66aHOfb36YVeaTO+uWfV2rsX2fKh8DOhpCTfKU98o+TSw3dhvVb6Nc9bSQu1g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1718095160;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EuXplidRVKDZsJB5bk5rseBUPZqBqoh+LVXPB8Cujkk=;
+	b=IjgjKKe7IawJ4noewwKXmuCDbEdTRZBn5m43lPRy2ZCuZWwvDh6HUY0DPpXwS8YWPWtuJS
+	rR2yAxB3OF7kofAw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Daniel Bristot de Oliveira <bristot@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Yonghong Song <yonghong.song@linux.dev>, bpf@vger.kernel.org
+Subject: Re: [PATCH v5 net-next 14/15] net: Reference bpf_redirect_info via
+ task_struct on PREEMPT_RT.
+Message-ID: <20240611083918.fJTJJtBu@linutronix.de>
+References: <20240607070427.1379327-1-bigeasy@linutronix.de>
+ <20240607070427.1379327-15-bigeasy@linutronix.de>
+ <045e3716-3c3a-4238-b38a-3616c8974e2c@kernel.org>
+ <20240610165014.uWp_yZuW@linutronix.de>
+ <18328cc2-c135-4b69-8c5f-cd45998e970f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <f7ted94rebd.fsf@redhat.com>
-Date: Tue, 11 Jun 2024 08:39:10 +0000
-Message-ID: <CAG=2xmPqTLLWMq3GtG95Td=T6hjoV6TOcKdH6fyY0KGGAUMK9g@mail.gmail.com>
-Subject: Re: [ovs-dev] [PATCH net-next v2 5/9] net: openvswitch: add
- emit_sample action
-To: Aaron Conole <aconole@redhat.com>
-Cc: netdev@vger.kernel.org, dev@openvswitch.org, 
-	Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, 
-	linux-kernel@vger.kernel.org, i.maximets@ovn.org, 
-	Eric Dumazet <edumazet@google.com>, horms@kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <18328cc2-c135-4b69-8c5f-cd45998e970f@kernel.org>
 
-On Mon, Jun 10, 2024 at 11:46:14AM GMT, Aaron Conole wrote:
-> Adrian Moreno <amorenoz@redhat.com> writes:
->
-> > Add support for a new action: emit_sample.
-> >
-> > This action accepts a u32 group id and a variable-length cookie and uses
-> > the psample multicast group to make the packet available for
-> > observability.
-> >
-> > The maximum length of the user-defined cookie is set to 16, same as
-> > tc_cookie, to discourage using cookies that will not be offloadable.
-> >
-> > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> > ---
->
-> I saw some of the nits Simon raised - I'll add one more below.
->
-> I haven't gone through the series thoroughly enough to make a detailed
-> review.
->
-> >  Documentation/netlink/specs/ovs_flow.yaml | 17 ++++++++
-> >  include/uapi/linux/openvswitch.h          | 25 ++++++++++++
-> >  net/openvswitch/actions.c                 | 50 +++++++++++++++++++++++
-> >  net/openvswitch/flow_netlink.c            | 33 ++++++++++++++-
-> >  4 files changed, 124 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/Documentation/netlink/specs/ovs_flow.yaml b/Documentation/netlink/specs/ovs_flow.yaml
-> > index 4fdfc6b5cae9..a7ab5593a24f 100644
-> > --- a/Documentation/netlink/specs/ovs_flow.yaml
-> > +++ b/Documentation/netlink/specs/ovs_flow.yaml
-> > @@ -727,6 +727,12 @@ attribute-sets:
-> >          name: dec-ttl
-> >          type: nest
-> >          nested-attributes: dec-ttl-attrs
-> > +      -
-> > +        name: emit-sample
-> > +        type: nest
-> > +        nested-attributes: emit-sample-attrs
-> > +        doc: |
-> > +          Sends a packet sample to psample for external observation.
-> >    -
-> >      name: tunnel-key-attrs
-> >      enum-name: ovs-tunnel-key-attr
-> > @@ -938,6 +944,17 @@ attribute-sets:
-> >        -
-> >          name: gbp
-> >          type: u32
-> > +  -
-> > +    name: emit-sample-attrs
-> > +    enum-name: ovs-emit-sample-attr
-> > +    name-prefix: ovs-emit-sample-attr-
-> > +    attributes:
-> > +      -
-> > +        name: group
-> > +        type: u32
-> > +      -
-> > +        name: cookie
-> > +        type: binary
-> >
-> >  operations:
-> >    name-prefix: ovs-flow-cmd-
-> > diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
-> > index efc82c318fa2..a0e9dde0584a 100644
-> > --- a/include/uapi/linux/openvswitch.h
-> > +++ b/include/uapi/linux/openvswitch.h
-> > @@ -914,6 +914,30 @@ struct check_pkt_len_arg {
-> >  };
-> >  #endif
-> >
-> > +#define OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE 16
-> > +/**
-> > + * enum ovs_emit_sample_attr - Attributes for %OVS_ACTION_ATTR_EMIT_SAMPLE
-> > + * action.
-> > + *
-> > + * @OVS_EMIT_SAMPLE_ATTR_GROUP: 32-bit number to identify the source of the
-> > + * sample.
-> > + * @OVS_EMIT_SAMPLE_ATTR_COOKIE: A variable-length binary cookie that contains
-> > + * user-defined metadata. The maximum length is 16 bytes.
-> > + *
-> > + * Sends the packet to the psample multicast group with the specified group and
-> > + * cookie. It is possible to combine this action with the
-> > + * %OVS_ACTION_ATTR_TRUNC action to limit the size of the packet being emitted.
-> > + */
-> > +enum ovs_emit_sample_attr {
-> > +	OVS_EMIT_SAMPLE_ATTR_UNPSEC,
-> > +	OVS_EMIT_SAMPLE_ATTR_GROUP,	/* u32 number. */
-> > +	OVS_EMIT_SAMPLE_ATTR_COOKIE,	/* Optional, user specified cookie. */
-> > +	__OVS_EMIT_SAMPLE_ATTR_MAX
+On 2024-06-11 09:55:11 [+0200], Jesper Dangaard Brouer wrote:
+> > For gcc the stosq vs movq depends on the CPU settings. The generic uses
+> > movq up to 40 bytes, skylake uses movq even for 64bytes. clang=E2=80=A6
+> > This could be tuned via -mmemset-strategy=3Dlibcall:64:align,rep_8byte:=
+-1:align
+> >=20
+>=20
+> Cool I didn't know of this tuning.  Is this a compiler option?
+> Where do I change this setting, as I would like to experiment with this
+> for our prod kernels.
+
+This is what I play with right now, I'm not sure it is what I want=E2=80=A6=
+ For
+reference:
+
+---->8-----
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 1d7122a1883e8..b35b7b21598de 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -775,6 +775,9 @@ config SCHED_OMIT_FRAME_POINTER
+=20
+ 	  If in doubt, say "Y".
+=20
++config X86_OPT_MEMSET
++	bool "X86 memset playground"
++
+ menuconfig HYPERVISOR_GUEST
+ 	bool "Linux guest support"
+ 	help
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 801fd85c3ef69..bab37787fe5cd 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -151,6 +151,15 @@ else
+         KBUILD_AFLAGS +=3D -m64
+         KBUILD_CFLAGS +=3D -m64
+=20
++	ifeq ($(CONFIG_X86_OPT_MEMSET),y)
++		#export X86_MEMSET_CFLAGS :=3D -mmemset-strategy=3Dlibcall:64:align,rep_=
+8byte:-1:align
++		export X86_MEMSET_CFLAGS :=3D -mmemset-strategy=3Dlibcall:-1:align
++	else
++		export X86_MEMSET_CFLAGS :=3D
++	endif
++
++        KBUILD_CFLAGS +=3D $(X86_MEMSET_CFLAGS)
++
+         # Align jump targets to 1 byte, not the default 16 bytes:
+         KBUILD_CFLAGS +=3D $(call cc-option,-falign-jumps=3D1)
+=20
+diff --git a/arch/x86/entry/vdso/Makefile b/arch/x86/entry/vdso/Makefile
+index 215a1b202a918..d0c9a589885ef 100644
+--- a/arch/x86/entry/vdso/Makefile
++++ b/arch/x86/entry/vdso/Makefile
+@@ -121,6 +121,7 @@ KBUILD_CFLAGS_32 :=3D $(filter-out -m64,$(KBUILD_CFLAGS=
+))
+ KBUILD_CFLAGS_32 :=3D $(filter-out -mcmodel=3Dkernel,$(KBUILD_CFLAGS_32))
+ KBUILD_CFLAGS_32 :=3D $(filter-out -fno-pic,$(KBUILD_CFLAGS_32))
+ KBUILD_CFLAGS_32 :=3D $(filter-out -mfentry,$(KBUILD_CFLAGS_32))
++KBUILD_CFLAGS_32 :=3D $(filter-out $(X86_MEMSET_CFLAGS),$(KBUILD_CFLAGS_32=
+))
+ KBUILD_CFLAGS_32 :=3D $(filter-out $(RANDSTRUCT_CFLAGS),$(KBUILD_CFLAGS_32=
+))
+ KBUILD_CFLAGS_32 :=3D $(filter-out $(GCC_PLUGINS_CFLAGS),$(KBUILD_CFLAGS_3=
+2))
+ KBUILD_CFLAGS_32 :=3D $(filter-out $(RETPOLINE_CFLAGS),$(KBUILD_CFLAGS_32))
+
+
+---->8-----
+
+I dug this up in the gcc source code and initially played on the command
+line with it. The snippet compiles the kernel and it boots so=E2=80=A6
+
+> My other finding is, this primarily a kernel compile problem, because
+> for userspace compiler chooses to use MMX instructions (e.g. movaps
+> xmmword ptr[rsp], xmm0).  The kernel compiler options (-mno-sse -mno-mmx
+> -mno-sse2 -mno-3dnow -mno-avx) disables this, which aparently changes
+> the tipping point.
+
+sure.
+
+>=20
+> > I folded this into the last two patches:
+> >=20
+> > diff --git a/include/linux/filter.h b/include/linux/filter.h
+> > index d2b4260d9d0be..1588d208f1348 100644
+> > --- a/include/linux/filter.h
+> > +++ b/include/linux/filter.h
+> > @@ -744,27 +744,40 @@ struct bpf_redirect_info {
+> >   	struct bpf_nh_params nh;
+> >   };
+> > +enum bpf_ctx_init_type {
+> > +	bpf_ctx_ri_init,
+> > +	bpf_ctx_cpu_map_init,
+> > +	bpf_ctx_dev_map_init,
+> > +	bpf_ctx_xsk_map_init,
 > > +};
 > > +
-> > +#define OVS_EMIT_SAMPLE_ATTR_MAX (__OVS_EMIT_SAMPLE_ATTR_MAX - 1)
-> > +
-> > +
-> >  /**
-> >   * enum ovs_action_attr - Action types.
-> >   *
-> > @@ -1004,6 +1028,7 @@ enum ovs_action_attr {
-> >  	OVS_ACTION_ATTR_ADD_MPLS,     /* struct ovs_action_add_mpls. */
-> >  	OVS_ACTION_ATTR_DEC_TTL,      /* Nested OVS_DEC_TTL_ATTR_*. */
-> >  	OVS_ACTION_ATTR_DROP,         /* u32 error code. */
-> > +	OVS_ACTION_ATTR_EMIT_SAMPLE,  /* Nested OVS_EMIT_SAMPLE_ATTR_*. */
-> >
-> >  	__OVS_ACTION_ATTR_MAX,	      /* Nothing past this will be accepted
-> >  				       * from userspace. */
-> > diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-> > index 964225580824..3b4dba0ded59 100644
-> > --- a/net/openvswitch/actions.c
-> > +++ b/net/openvswitch/actions.c
-> > @@ -24,6 +24,11 @@
-> >  #include <net/checksum.h>
-> >  #include <net/dsfield.h>
-> >  #include <net/mpls.h>
-> > +
-> > +#if IS_ENABLED(CONFIG_PSAMPLE)
-> > +#include <net/psample.h>
-> > +#endif
-> > +
-> >  #include <net/sctp/checksum.h>
-> >
-> >  #include "datapath.h"
-> > @@ -1299,6 +1304,46 @@ static int execute_dec_ttl(struct sk_buff *skb, struct sw_flow_key *key)
-> >  	return 0;
-> >  }
-> >
-> > +static int execute_emit_sample(struct datapath *dp, struct sk_buff *skb,
-> > +			       const struct sw_flow_key *key,
-> > +			       const struct nlattr *attr)
-> > +{
-> > +#if IS_ENABLED(CONFIG_PSAMPLE)
-> > +	struct psample_group psample_group = {};
-> > +	struct psample_metadata md = {};
-> > +	struct vport *input_vport;
-> > +	const struct nlattr *a;
-> > +	int rem;
-> > +
-> > +	for (a = nla_data(attr), rem = nla_len(attr); rem > 0;
-> > +	     a = nla_next(a, &rem)) {
-> > +		switch (nla_type(a)) {
-> > +		case OVS_EMIT_SAMPLE_ATTR_GROUP:
-> > +			psample_group.group_num = nla_get_u32(a);
-> > +			break;
-> > +
-> > +		case OVS_EMIT_SAMPLE_ATTR_COOKIE:
-> > +			md.user_cookie = nla_data(a);
-> > +			md.user_cookie_len = nla_len(a);
-> > +			break;
-> > +		}
-> > +	}
-> > +
-> > +	psample_group.net = ovs_dp_get_net(dp);
-> > +
-> > +	input_vport = ovs_vport_rcu(dp, key->phy.in_port);
-> > +	if (!input_vport)
-> > +		input_vport = ovs_vport_rcu(dp, OVSP_LOCAL);
-> > +
-> > +	md.in_ifindex = input_vport->dev->ifindex;
-> > +	md.trunc_size = skb->len - OVS_CB(skb)->cutlen;
-> > +
-> > +	psample_sample_packet(&psample_group, skb, 0, &md);
-> > +#endif
-> > +
-> > +	return 0;
->
-> Why this return here?  Doesn't seem used anywhere else.
->
+> >   struct bpf_net_context {
+> >   	struct bpf_redirect_info ri;
+> >   	struct list_head cpu_map_flush_list;
+> >   	struct list_head dev_map_flush_list;
+> >   	struct list_head xskmap_map_flush_list;
+> > +	unsigned int flags;
+>=20
+> Why have yet another flags variable, when we already have two flags in
+> bpf_redirect_info ?
 
-It is being used in "do_execute_actions", right?
-All non-skb-consuming actions set the value of "err" and break from the
-switch-case so that the the packet is dropped with OVS_DROP_ACTION_ERROR reason.
+Ah you want to fold this into ri member including the status for the
+lists? Could try. It is splitted in order to delay the initialisation of
+the lists, too. We would need to be careful to not overwrite the
+flags if `ri' is initialized after the lists. That would be the case
+with CONFIG_DEBUG_NET=3Dy and not doing redirect (the empty list check
+initializes that).
 
-Am i missing something?
-
-> > +}
-> > +
-> >  /* Execute a list of actions against 'skb'. */
-> >  static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
-> >  			      struct sw_flow_key *key,
-> > @@ -1502,6 +1547,11 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
-> >  			ovs_kfree_skb_reason(skb, reason);
-> >  			return 0;
-> >  		}
-> > +
-> > +		case OVS_ACTION_ATTR_EMIT_SAMPLE:
-> > +			err = execute_emit_sample(dp, skb, key, a);
-> > +			OVS_CB(skb)->cutlen = 0;
-> > +			break;
-> >  		}
-> >
-> >  		if (unlikely(err)) {
-> > diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
-> > index f224d9bcea5e..eb59ff9c8154 100644
-> > --- a/net/openvswitch/flow_netlink.c
-> > +++ b/net/openvswitch/flow_netlink.c
-> > @@ -64,6 +64,7 @@ static bool actions_may_change_flow(const struct nlattr *actions)
-> >  		case OVS_ACTION_ATTR_TRUNC:
-> >  		case OVS_ACTION_ATTR_USERSPACE:
-> >  		case OVS_ACTION_ATTR_DROP:
-> > +		case OVS_ACTION_ATTR_EMIT_SAMPLE:
-> >  			break;
-> >
-> >  		case OVS_ACTION_ATTR_CT:
-> > @@ -2409,7 +2410,7 @@ static void ovs_nla_free_nested_actions(const struct nlattr *actions, int len)
-> >  	/* Whenever new actions are added, the need to update this
-> >  	 * function should be considered.
-> >  	 */
-> > -	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 24);
-> > +	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 25);
-> >
-> >  	if (!actions)
-> >  		return;
-> > @@ -3157,6 +3158,29 @@ static int validate_and_copy_check_pkt_len(struct net *net,
-> >  	return 0;
-> >  }
-> >
-> > +static int validate_emit_sample(const struct nlattr *attr)
-> > +{
-> > +	static const struct nla_policy policy[OVS_EMIT_SAMPLE_ATTR_MAX + 1] = {
-> > +		[OVS_EMIT_SAMPLE_ATTR_GROUP] = { .type = NLA_U32 },
-> > +		[OVS_EMIT_SAMPLE_ATTR_COOKIE] = {
-> > +			.type = NLA_BINARY,
-> > +			.len = OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE
-> > +		},
-> > +	};
-> > +	struct nlattr *a[OVS_EMIT_SAMPLE_ATTR_MAX  + 1];
-> > +	int err;
-> > +
-> > +	if (!IS_ENABLED(CONFIG_PSAMPLE))
-> > +		return -EOPNOTSUPP;
-> > +
-> > +	err = nla_parse_nested(a, OVS_EMIT_SAMPLE_ATTR_MAX, attr, policy,
-> > +			       NULL);
-> > +	if (err)
-> > +		return err;
-> > +
-> > +	return a[OVS_EMIT_SAMPLE_ATTR_GROUP] ? 0 : -EINVAL;
-> > +}
-> > +
-> >  static int copy_action(const struct nlattr *from,
-> >  		       struct sw_flow_actions **sfa, bool log)
-> >  {
-> > @@ -3212,6 +3236,7 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
-> >  			[OVS_ACTION_ATTR_ADD_MPLS] = sizeof(struct ovs_action_add_mpls),
-> >  			[OVS_ACTION_ATTR_DEC_TTL] = (u32)-1,
-> >  			[OVS_ACTION_ATTR_DROP] = sizeof(u32),
-> > +			[OVS_ACTION_ATTR_EMIT_SAMPLE] = (u32)-1,
-> >  		};
-> >  		const struct ovs_action_push_vlan *vlan;
-> >  		int type = nla_type(a);
-> > @@ -3490,6 +3515,12 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
-> >  				return -EINVAL;
-> >  			break;
-> >
-> > +		case OVS_ACTION_ATTR_EMIT_SAMPLE:
-> > +			err = validate_emit_sample(a);
-> > +			if (err)
-> > +				return err;
-> > +			break;
-> > +
-> >  		default:
-> >  			OVS_NLERR(log, "Unknown Action type %d", type);
-> >  			return -EINVAL;
->
-
+Sebastian
 
