@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-102408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5195902DAD
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 02:29:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B64D2902DAF
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 02:31:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D88A1F2202C
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 00:29:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37AD42819BC
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 00:31:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD0501109;
-	Tue, 11 Jun 2024 00:29:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D3B370;
+	Tue, 11 Jun 2024 00:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1RUpnTfi"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="w/aZNkPn"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1E1EDF;
-	Tue, 11 Jun 2024 00:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9910036D
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 00:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718065757; cv=none; b=AtGyv+7uQ8dfXx8QGKBgrmZLCtAXmMKB3Rqtr19gHEmXVb+GqOt4BRpvFCp0uaS/u8rQopmKd9vSwAJ/D9EJb2qoR0gorT47Vm3X799G082dgWCGhqUSwlMuXee0QCyklPuedH0HQpNMa1HRwoTst3hZe5ewM7sa2SnPvgF6bbo=
+	t=1718065868; cv=none; b=X4ZnJl77eFQiozzphHQjqG8Kjp0w5rvS90nmEib02vHKgMa98PQNwmFV729lRyemqrPY6/+G/3nnSzxUHoqU89cCva7Ia9dAxrfLqp6e2bA+/E0RKyXXxtNhri1lfur6oRQfr/3fJ6/W9y10h6PfZl3vLKRlIVVZvStu4dpT9jI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718065757; c=relaxed/simple;
-	bh=5i2/zbwVRP1igz/41njrXF7PwGq4eAlplJF8NeffXHU=;
+	s=arc-20240116; t=1718065868; c=relaxed/simple;
+	bh=SVXkzoI1blO9jAvqkJ9nCUQTQ8RBafjjEK6AJCLPAUM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tJIVLocXKK7dKP3/gLo5g5urwuDzVBm2eaUdUDqwngA4jsrlTp0Uqtth0U8iA/DMyKdsKTd1kHPbuVHCoRIXGtQwK/LQgEjT8CEK0FYEvDpfaz1IhtGPs2O4kbqQ0UmzNWBVALJZssnv+V5CIVINCkIVxxQdVWDiNQR01lVvXXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1RUpnTfi; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=FI8V6GbrcwcqNDoiQdYzznx5EeFgF0kW14MQ9g3uM74=; b=1RUpnTfixFI/LG/nXiAskkZSA1
-	U9xYDRtwIekyWRC/+7UaWvQ73dNRYjmaQs7e3wpgCybE/VX28Src4+MGAjkhOroK4oG+67c1ATwUB
-	BneeN7J1QIiSTIZZX/JJ5JEdTm1Z/QD4PWRL3U+QeJ1yiAROeQ0h04+tTrHPr2wnpAQk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sGpNp-00HLDV-Cl; Tue, 11 Jun 2024 02:29:05 +0200
-Date: Tue, 11 Jun 2024 02:29:05 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Michal Simek <michal.simek@amd.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	linux-kernel@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net-next 3/3] net: xilinx: axienet: Add statistics support
-Message-ID: <d2cc10a6-0c6a-471a-bd5b-3e939905fc41@lunn.ch>
-References: <20240610231022.2460953-1-sean.anderson@linux.dev>
- <20240610231022.2460953-4-sean.anderson@linux.dev>
- <7c06c9d7-ad11-4acd-8c80-fbeb902da40d@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TN9ftCnZ0Abbt4uDuFOy6qfA4oIwdEG4Q+RBL7Ulfp/T8qWzj+HINBBOYvvhQErAzTODJTinjKBeXvkRXdbeVVCAzhLORmmeFgW5s+oy+p/V6HrQQ03EqRlJaSQ/zaV+p1lI6SiqcMFdHRJHl7bivPRjaSWeUt4DSKOBoL/k86U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=w/aZNkPn; arc=none smtp.client-ip=91.218.175.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: kuniyu@amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1718065863;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GPA3dSCcGkztdukKEcz5rKm1vv6D5teuaGri0PCbHds=;
+	b=w/aZNkPnG5MY1OL1v9k8PP4tppfUZ+N+c2jQBaFZkG/+BG6yBvG+q74ELB5mjzFuzP/Gsg
+	Wg1XrfDoaE6sVVU3U/i3MlXu5FOffL0nXtZndmE/6wBoyQmNsClQ1+pyCpIPrqLSqpSVrv
+	fdrPbEwDaAfln/ar6ATJoc8P3I1v+LQ=
+X-Envelope-To: davem@davemloft.net
+X-Envelope-To: edumazet@google.com
+X-Envelope-To: kuba@kernel.org
+X-Envelope-To: kuni1840@gmail.com
+X-Envelope-To: netdev@vger.kernel.org
+X-Envelope-To: pabeni@redhat.com
+Date: Mon, 10 Jun 2024 20:30:58 -0400
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	kuni1840@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH v1 net-next 01/11] af_unix: Define locking order for
+ unix_table_double_lock().
+Message-ID: <thzkgbuwuo3knevpipu4rzsh5qgmwhklihypdgziiruabvh46f@uwdkpcfxgloo>
+References: <3vjpisr5vw5cts5h2wrtcqttgweyidtyjw5vgslhimtvy2oobu@b4hgsefmsmwj>
+ <20240610235836.81964-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,36 +66,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7c06c9d7-ad11-4acd-8c80-fbeb902da40d@lunn.ch>
+In-Reply-To: <20240610235836.81964-1-kuniyu@amazon.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jun 11, 2024 at 02:13:40AM +0200, Andrew Lunn wrote:
-> On Mon, Jun 10, 2024 at 07:10:22PM -0400, Sean Anderson wrote:
-> > Add support for reading the statistics counters, if they are enabled.
-> > The counters may be 64-bit, but we can't detect this as there's no
-> > ability bit for it and the counters are read-only. Therefore, we assume
-> > the counters are 32-bits.
+On Mon, Jun 10, 2024 at 04:58:36PM -0700, Kuniyuki Iwashima wrote:
+> > No, we're defining an ordering, there's no need for an enum - this
+> > should work exactly the same as a comparison function that you pass to
+> > sort().
+> > 
+> > Comparison functions are no place to get fancy, they should be as
+> > standard as possible: you can get _crazy_ bugs resulting from buggy
+> > comparison functions that don't actually define a total ordering.
 > 
-> > +static void axienet_stats_update(struct axienet_local *lp)
-> > +{
-> > +	enum temac_stat stat;
-> > +
-> > +	lockdep_assert_held(&lp->stats_lock);
-> > +
-> > +	u64_stats_update_begin(&lp->hw_stat_sync);
-> > +	for (stat = 0; stat < STAT_COUNT; stat++) {
-> > +		u32 counter = axienet_ior(lp, XAE_STATS_OFFSET + stat * 8);
+> What should it return if we cannot define the total ordering like
+> when we only define the allowed list of ordering ?
 > 
-> The * 8 here suggests the counters are spaced so that they could be 64
-> bit wide, even when only 32 bits are used. Does the documentation say
-> anything about the upper 32 bits when the counters are only 32 bits?
-> Are they guaranteed to read as zero? I'm just wondering if the code
-> should be forward looking and read all 64 bits? 
+> See patch 8, the rule there is
+> 
+>   if the nested order is listening socket -> child socket, then ok,
+>   and otherwise, not.
+> 
+> So we don't know the clear ordering, equal or greater, but we know
+> it's actually illegal.
+> 
+> https://lore.kernel.org/netdev/20240610223501.73191-9-kuniyu@amazon.com/
 
-Actually, if you read the upper 32 bits and they are not 0, you know
-you have 64 bit counters. You can then kill off your period task, it
-is not needed because your software counters will wrap around the same
-time as the hardware counters.
+Ok yeah, that's a tricky one, and it does come up elsewhere. I think we
+can allow comparison functions to return "undefined", and define 0 ==
+undefined for lockdep.
 
-     Andrew
-
+The important thing I want to maintain is that comparison functions be
+symmetric.
 
