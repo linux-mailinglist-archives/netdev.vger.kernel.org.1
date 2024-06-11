@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-102605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57CC1903E2E
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:58:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D019B903E31
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:58:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F26A21F242F5
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:58:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 799AF1F258FD
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:58:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBCB817DE34;
-	Tue, 11 Jun 2024 13:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F4317DE3F;
+	Tue, 11 Jun 2024 13:56:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mxout70.expurgate.net (mxout70.expurgate.net [91.198.224.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9C017DE30;
-	Tue, 11 Jun 2024 13:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A25817DE3D;
+	Tue, 11 Jun 2024 13:56:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.224.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718114165; cv=none; b=rcwD6vdMNuNgEryhZl/pYfnPbtlOEJsBGb0LUd+GbVpYIptkucAaW/SNsMWZ7wWZ5s4cP/4FPS9EG2XSx4OMhHKVYr4KugsHON1DSGY/7GgnEao7pZchKXHgtWq+2UCxG3m2wjzN+PRWd/GcDfTfZqGf3UE2i9j2IGx2VqRJ7+o=
+	t=1718114171; cv=none; b=uvi7GPJgyQvOeAVpKkVmndIdwSlKc6QuWOsybdaSUSFW1/Tb2M7K8AUcDqySW1fvjRY42G3zYZB79Ka0MnuQKY/aYb6hr1MzvImGRXP6V3mIMAqg6Ov4ZpH7kCfgeyfyW9ZovLhiKD3zN917fgA5feybqpqFogkyXd80Nm1aV4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718114165; c=relaxed/simple;
-	bh=9onUpucCUdaQ47RVEas5qURWppBYcOplNxRVA5xCvz8=;
+	s=arc-20240116; t=1718114171; c=relaxed/simple;
+	bh=I3jDDLhhE9CvNnNbIVh6mYYXoYpZ6qnnBn0WuqEZwZc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eXKEw/33n8zE4BhwLwp1oCvo7IStd0lGDOVIGb+0+21TZqZu8ohjaF3rDz9D8dHzu88J4mi0MvqrHmTJPgK0c4MTDBwqbHoCH9YPHVptv9eDAQlsJm4hn5cpiI2oWlaY9UpZB170i4r+hoWuuKIYj8bt87f/r3kWA4/dlqKz87k=
+	 MIME-Version; b=kKKl4ZEM+itrOzdRmbVkNG8HeunZBDud/df9c70McCbNl7w7avn6qcdRiYyBNDhHwswa3A3oIsZNnK9TU7622EE1AHGAFooPI1UfqOHeIvu2x/LQY42hldhwwgAEW3FerwXt++y1Pbyh1jAOAi1x/DdrM986sqw1ZvJvbq4vgeo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=91.198.224.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
 Received: from [127.0.0.1] (helo=localhost)
 	by relay.expurgate.net with smtp (Exim 4.92)
 	(envelope-from <prvs=9906f4c1d5=ms@dev.tdt.de>)
-	id 1sH1yk-009QBn-7k; Tue, 11 Jun 2024 15:56:02 +0200
+	id 1sH1yp-003Iqa-LZ; Tue, 11 Jun 2024 15:56:07 +0200
 Received: from [195.243.126.94] (helo=securemail.tdt.de)
 	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ms@dev.tdt.de>)
-	id 1sH1yj-0012HD-Lx; Tue, 11 Jun 2024 15:56:01 +0200
+	id 1sH1yp-003ZpJ-3p; Tue, 11 Jun 2024 15:56:07 +0200
 Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id 5AD11240053;
-	Tue, 11 Jun 2024 15:56:01 +0200 (CEST)
+	by securemail.tdt.de (Postfix) with ESMTP id CE181240053;
+	Tue, 11 Jun 2024 15:56:06 +0200 (CEST)
 Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id E2E94240050;
-	Tue, 11 Jun 2024 15:56:00 +0200 (CEST)
+	by securemail.tdt.de (Postfix) with ESMTP id 625B2240050;
+	Tue, 11 Jun 2024 15:56:06 +0200 (CEST)
 Received: from mschiller1.dev.tdt.de (unknown [10.2.3.20])
-	by mail.dev.tdt.de (Postfix) with ESMTPSA id ACD39376FA;
-	Tue, 11 Jun 2024 15:56:00 +0200 (CEST)
+	by mail.dev.tdt.de (Postfix) with ESMTPSA id 0F9B5376FA;
+	Tue, 11 Jun 2024 15:56:06 +0200 (CEST)
 From: Martin Schiller <ms@dev.tdt.de>
 To: martin.blumenstingl@googlemail.com,
 	hauke@hauke-m.de,
@@ -64,9 +64,9 @@ Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ms@dev.tdt.de
-Subject: [PATCH net-next v5 10/12] net: dsa: lantiq_gswip: Remove dead code from gswip_add_single_port_br()
-Date: Tue, 11 Jun 2024 15:54:32 +0200
-Message-ID: <20240611135434.3180973-11-ms@dev.tdt.de>
+Subject: [PATCH net-next v5 11/12] net: dsa: lantiq_gswip: Update comments in gswip_port_vlan_filtering()
+Date: Tue, 11 Jun 2024 15:54:33 +0200
+Message-ID: <20240611135434.3180973-12-ms@dev.tdt.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240611135434.3180973-1-ms@dev.tdt.de>
 References: <20240611135434.3180973-1-ms@dev.tdt.de>
@@ -79,38 +79,46 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-purgate-type: clean
 X-purgate: clean
-X-purgate-ID: 151534::1718114162-00EF9E81-FDCB0C6A/0/0
+X-purgate-ID: 151534::1718114167-A8EBED95-2AACA1E7/0/0
 
-The port validation in gswip_add_single_port_br() is superfluous and
-can be omitted.
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 
-Suggested-by: Vladimir Oltean <olteanv@gmail.com>
-Signed-off-by: Martin Schiller <ms@dev.tdt.de>
+Update the comments in gswip_port_vlan_filtering() so it's clear that
+there are two separate cases, one for "tag based VLAN" and another one
+for "port based VLAN".
+
+Suggested-by: Martin Schiller <ms@dev.tdt.de>
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Acked-by: Hauke Mehrtens <hauke@hauke-m.de>
 ---
- drivers/net/dsa/lantiq_gswip.c | 6 ------
- 1 file changed, 6 deletions(-)
+ drivers/net/dsa/lantiq_gswip.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/dsa/lantiq_gswip.c b/drivers/net/dsa/lantiq_gswi=
 p.c
-index cd88b00cfdc1..2bbc7dd45418 100644
+index 2bbc7dd45418..ec52c62eadce 100644
 --- a/drivers/net/dsa/lantiq_gswip.c
 +++ b/drivers/net/dsa/lantiq_gswip.c
-@@ -655,14 +655,8 @@ static int gswip_add_single_port_br(struct gswip_pri=
-v *priv, int port, bool add)
- 	struct gswip_pce_table_entry vlan_active =3D {0,};
- 	struct gswip_pce_table_entry vlan_mapping =3D {0,};
- 	unsigned int cpu_port =3D priv->hw_info->cpu_port;
--	unsigned int max_ports =3D priv->hw_info->max_ports;
- 	int err;
+@@ -780,7 +780,7 @@ static int gswip_port_vlan_filtering(struct dsa_switc=
+h *ds, int port,
+ 	}
 =20
--	if (port >=3D max_ports) {
--		dev_err(priv->dev, "single port for %i supported\n", port);
--		return -EIO;
--	}
--
- 	vlan_active.index =3D port + 1;
- 	vlan_active.table =3D GSWIP_TABLE_ACTIVE_VLAN;
- 	vlan_active.key[0] =3D 0; /* vid */
+ 	if (vlan_filtering) {
+-		/* Use port based VLAN tag */
++		/* Use tag based VLAN */
+ 		gswip_switch_mask(priv,
+ 				  GSWIP_PCE_VCTRL_VSR,
+ 				  GSWIP_PCE_VCTRL_UVR | GSWIP_PCE_VCTRL_VIMR |
+@@ -789,7 +789,7 @@ static int gswip_port_vlan_filtering(struct dsa_switc=
+h *ds, int port,
+ 		gswip_switch_mask(priv, GSWIP_PCE_PCTRL_0_TVM, 0,
+ 				  GSWIP_PCE_PCTRL_0p(port));
+ 	} else {
+-		/* Use port based VLAN tag */
++		/* Use port based VLAN */
+ 		gswip_switch_mask(priv,
+ 				  GSWIP_PCE_VCTRL_UVR | GSWIP_PCE_VCTRL_VIMR |
+ 				  GSWIP_PCE_VCTRL_VEMR,
 --=20
 2.39.2
 
