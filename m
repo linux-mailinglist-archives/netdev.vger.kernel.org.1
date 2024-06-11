@@ -1,79 +1,58 @@
-Return-Path: <netdev+bounces-102664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79E8B904232
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 19:13:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 326FD90424C
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 19:19:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12E2B1F2361F
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 17:13:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2323B22B7D
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 17:19:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 983034503B;
-	Tue, 11 Jun 2024 17:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YYJSgajD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60CCF44C6E;
+	Tue, 11 Jun 2024 17:19:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fgw22-7.mail.saunalahti.fi (fgw22-7.mail.saunalahti.fi [62.142.5.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A5C4207A;
-	Tue, 11 Jun 2024 17:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9958911720
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 17:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.142.5.83
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718125982; cv=none; b=gfZ011fhHXxIN2Q0244ubZx+qf5BV8dy/Q4NQUQACCw5UNqHtXEYv08+98Dv+TXBgxPtw/CcXsA2k+NoKeS71tDjuWeQhKD7E228zzENCyE8VzZvBBaIV927/MBKtyRMlz+sQBNIDKnhll2/emMPrrlj394h6X5YVNnseYNbbTw=
+	t=1718126379; cv=none; b=M0BFRO2YZcrlpjzz4whbuETKcN6xEECl4ETH+ZodQPVMMJScAIaWiy3VcqVuPNsMIE2EOvXQRrQLNX7M7Xm1IZ0KGVsI8D9oPFg9TA94n/DYjWw5I2JmZrNiWbyGXkTTmSBablsvK8PenGW/3gokCLREuVqihEcs2y/4Y0b4x3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718125982; c=relaxed/simple;
-	bh=VPJiEyN1LjxU1D7rLJKPD/845LAmaZGNHNFrrRwhQ2Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=Rp4eC+paGV9lMqqhVdyHypTbDVngyesJ6KjpU9KcP7hv56BWVixk9tba0HD489cf1s6zUk2GiYzqvE0uRLIF8eK2FpXy54Mkt0cS61qvl3Kkc87JxmZsMEr4GNFSZNZe9c33nWBzyuknHzqtjQl+yheqPoMYDA0zBltIaLLisR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YYJSgajD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AE42C2BD10;
-	Tue, 11 Jun 2024 17:13:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718125981;
-	bh=VPJiEyN1LjxU1D7rLJKPD/845LAmaZGNHNFrrRwhQ2Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=YYJSgajDnEwTI9UWwe+OfG3g4ifsQqHnPYOEk/a5k078qBJvllVmjvPZqyXJMYttu
-	 NzqjT0YViP/tvdgTVpnUYtKbAgLI+DzzVg6PjJ88iELDdgdZfMwXjAE1TzzwvaTI82
-	 4IFdoQBAdDPLzHighuW3XgN1+IL8MBr0ZGTTsfcW2JloXY7AFProGh18NIZGeTLvz6
-	 VvyTIxb7JubsQhcQOSaqoKBH+IQZG0vX+C1UBJkVIh5SnB7lOP0vqSPx8D3jg0dlmt
-	 2Fcc0mN9ZIsfmHmGQneiIjejDxwnEZ8kENbGn/ex+jQigrQabi04W3a/f65I+f/jNn
-	 duZZGW7RwJ5Mw==
-Date: Tue, 11 Jun 2024 12:13:00 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: Herve Codina <herve.codina@bootlin.com>,
-	Simon Horman <horms@kernel.org>,
-	Sai Krishna Gajula <saikrishnag@marvell.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1718126379; c=relaxed/simple;
+	bh=dlurBqN4FHYLeAMMj2H8k6rc3jwi4Ntwn2Vdp55SRGg=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uc9lq0gdMlP8kexConuoLjfV0XOIM4DRrBmG0t4N+eCD27CVmJnW+vFC8Iwp6vb40YHlNMJoiXWSk5QJN7fBxRcSi6obMBIpdLasVNE52+8ovRQiUJ8tOsTzS8fF6ZsV3v6Ti/rYMCOysgjEgXhymP6VBg9jGfd1aAGQvyo98Ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=fail smtp.mailfrom=gmail.com; arc=none smtp.client-ip=62.142.5.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gmail.com
+Received: from localhost (88-113-25-87.elisa-laajakaista.fi [88.113.25.87])
+	by fgw22.mail.saunalahti.fi (Halon) with ESMTP
+	id c1dcc4e0-2816-11ef-8e57-005056bdf889;
+	Tue, 11 Jun 2024 20:19:28 +0300 (EEST)
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Tue, 11 Jun 2024 20:19:27 +0300
+To: kernel test robot <lkp@intel.com>
+Cc: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	oe-kbuild-all@lists.linux.dev,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
 	linux-arm-kernel@lists.infradead.org,
-	Allan Nielsen <allan.nielsen@microchip.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 17/19] PCI: of_property: Add interrupt-controller
- property in PCI device nodes
-Message-ID: <20240611171300.GA990134@bhelgaas>
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Romain Gantois <romain.gantois@bootlin.com>
+Subject: Re: [PATCH net-next 2/5] net: stmmac: dwmac-intel: provide a
+ select_pcs() implementation
+Message-ID: <ZmiHH7hzV9eWZsCU@surfacebook.localdomain>
+References: <E1sGgCN-00Fact-0x@rmk-PC.armlinux.org.uk>
+ <202406112331.DvtIlhjT-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,40 +61,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240610213735.GA3112053-robh@kernel.org>
+In-Reply-To: <202406112331.DvtIlhjT-lkp@intel.com>
 
-On Mon, Jun 10, 2024 at 03:37:35PM -0600, Rob Herring wrote:
-> On Thu, Jun 06, 2024 at 02:26:12PM -0500, Bjorn Helgaas wrote:
-> > On Mon, May 27, 2024 at 06:14:44PM +0200, Herve Codina wrote:
-> > > PCI devices and bridges DT nodes created during the PCI scan are created
-> > > with the interrupt-map property set to handle interrupts.
-> > > 
-> > > In order to set this interrupt-map property at a specific level, a
-> > > phandle to the parent interrupt controller is needed. On systems that
-> > > are not fully described by a device-tree, the parent interrupt
-> > > controller may be unavailable (i.e. not described by the device-tree).
-> > > 
-> > > As mentioned in the [1], avoiding the use of the interrupt-map property
-> > > and considering a PCI device as an interrupt controller itself avoid the
-> > > use of a parent interrupt phandle.
-> > > 
-> > > In that case, the PCI device itself as an interrupt controller is
-> > > responsible for routing the interrupts described in the device-tree
-> > > world (DT overlay) to the PCI interrupts.
-> > > 
-> > > Add the 'interrupt-controller' property in the PCI device DT node.
-> > > 
-> > > [1]: https://lore.kernel.org/lkml/CAL_Jsq+je7+9ATR=B6jXHjEJHjn24vQFs4Tvi9=vhDeK9n42Aw@mail.gmail.com/
-> > > 
-> > > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> > 
-> > No objection from me, but I'd like an ack/review from Rob.
+Tue, Jun 11, 2024 at 11:41:38PM +0800, kernel test robot kirjoitti:
+> Hi Russell,
 > 
-> Given it is more DT patches in the series, how about I take them and 
-> this one with your ack instead?
+> kernel test robot noticed the following build errors:
+> 
+> [auto build test ERROR on net-next/main]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Russell-King-Oracle/net-stmmac-add-select_pcs-platform-method/20240611-024301
+> base:   net-next/main
+> patch link:    https://lore.kernel.org/r/E1sGgCN-00Fact-0x%40rmk-PC.armlinux.org.uk
+> patch subject: [PATCH net-next 2/5] net: stmmac: dwmac-intel: provide a select_pcs() implementation
+> config: x86_64-rhel-8.3-kunit (https://download.01.org/0day-ci/archive/20240611/202406112331.DvtIlhjT-lkp@intel.com/config)
+> compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240611/202406112331.DvtIlhjT-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202406112331.DvtIlhjT-lkp@intel.com/
+> 
+> All errors (new ones prefixed by >>):
+> 
+>    drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c: In function 'intel_mgbe_common_data':
+> >> drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c:601:9: error: expected expression before '}' token
+>      601 |         }
+>          |         ^
+> 
 
-Sure.  There's very little PCI content here, so I didn't plan to take
-them; I just thought this needed at least your ack :)
+...
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+> 7310fe538ea5c9 Ong Boon Leong             2021-03-15  595  	/* Intel mgbe SGMII interface uses pcs-xcps */
+> c82386310d9572 Ong Boon Leong             2022-06-15  596  	if (plat->phy_interface == PHY_INTERFACE_MODE_SGMII ||
+> c82386310d9572 Ong Boon Leong             2022-06-15  597  	    plat->phy_interface == PHY_INTERFACE_MODE_1000BASEX) {
+> 7310fe538ea5c9 Ong Boon Leong             2021-03-15  598  		plat->mdio_bus_data->has_xpcs = true;
+> 83f55b01dd9030 Russell King (Oracle       2024-05-29  599) 		plat->mdio_bus_data->default_an_inband = true;
+> 178a34a9b7ccb3 Russell King (Oracle       2024-06-10  600) 		plat->select_pcs = intel_mgbe_select_pcs,
+
+Yeah, compiler wants semicolon here.
+
+> 7310fe538ea5c9 Ong Boon Leong             2021-03-15 @601  	}
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
