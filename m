@@ -1,109 +1,80 @@
-Return-Path: <netdev+bounces-102404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE88D902D75
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 02:14:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1193902D9F
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 02:25:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FC291F2275E
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 00:14:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5C8E1C219D0
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 00:25:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A5C936D;
-	Tue, 11 Jun 2024 00:13:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18B95660;
+	Tue, 11 Jun 2024 00:22:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0SdWZn32"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fv6VGs9p"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF4E18E;
-	Tue, 11 Jun 2024 00:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972EE3FB2C;
+	Tue, 11 Jun 2024 00:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718064837; cv=none; b=RoEbR6gZktsR/56aXDmrk+RzxZ7FvpVaODAca/HqmqATi7w03Zs5JmhjBtawaOEUyWn+3fpX+t/w/LoQ/xxmddvTtBQOHd3gg00ueBljyxL/oj7BHgEay3LyshJgzczxlo7SB/3tQsaVzGR5vsphgTm1uANOFFwOLkMF4a7O3Rw=
+	t=1718065336; cv=none; b=UjzUzG8+6C2EeojFlY8njiEzsn+iSexCGxQvx6R8n4tTp1kUm2vrO8+36Hj86Ct/H0rlzEItWQC+q+YYWRl6ptwNgiu5to0O7Wb2WZu1ZG1IlBTZL13nvq/XqGnidiL4O+fKpzgY6DqxOMJMlAde4z2lxHc8MKWLH5LW0CPSc9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718064837; c=relaxed/simple;
-	bh=MMoChjlubO/CbVraXX3twISoR0b4Z6eqTKCHUDdUxC4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LwkTwERL3pozRuty2zEQG23Y39Hr5Jthe5xi+32KHa3S9lCIhTEuD0HIhDeyeNO/G92g1Bvbyb2MfzZomIg06lvrAZQUPO2zeRsEE5mw1JECxE6UpRuctkyL6PPjKVpjAucMp0rcuX6CjbCRkIvtUy7tS1kO+SpYJqMLVZ0G1DM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0SdWZn32; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6qqJ9a7fy1RSScoIqniM3oXpUHSrRaKPvWxc35OkLzU=; b=0SdWZn3202PSUPM5JzGe2tkxLj
-	i9hXcZkBqU+yZIPszxSJ736JtKiJvrjIpRHacnfgWUdnKPFL/uT8fjbIFI8TuNfvZpJZv0Ix0nslt
-	54navFKiPCmsnFvcZSmB14xoCS2MT6caLXYAxWYYJee5eCZyB9sv/nZ1Yhtmt1RZkGbg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sGp8u-00HL6z-Dw; Tue, 11 Jun 2024 02:13:40 +0200
-Date: Tue, 11 Jun 2024 02:13:40 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Michal Simek <michal.simek@amd.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	linux-kernel@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net-next 3/3] net: xilinx: axienet: Add statistics support
-Message-ID: <7c06c9d7-ad11-4acd-8c80-fbeb902da40d@lunn.ch>
-References: <20240610231022.2460953-1-sean.anderson@linux.dev>
- <20240610231022.2460953-4-sean.anderson@linux.dev>
+	s=arc-20240116; t=1718065336; c=relaxed/simple;
+	bh=yi8s0s8TC1pEMrWdl8G3ODuepnLCbim5xwOYcuofqX4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kG02xApTqwPjpTyjry0eB0PxkJeuCZIUjzs12eAq5Hl9GabcWQLtfJIvKeXzbZGb/Qn4HqgjIHkW06Nc9pPQCVkTgrNz0KJGLEQ4VI7Uz6r4RG/w/XJb0YlFuBKyog+OGtmHVba0+3lRNoQdQ7/KMTBbxJRQNLlhe8c9dzX3xHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fv6VGs9p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E219C32786;
+	Tue, 11 Jun 2024 00:22:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718065336;
+	bh=yi8s0s8TC1pEMrWdl8G3ODuepnLCbim5xwOYcuofqX4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fv6VGs9pxE9zt7PVu9lU7P5ZFYa7tZWD9PSOCR4+pGEv5FnQdwNMy7UVDtS04ouMM
+	 9K1URjtiG8BFHfY0vk3RwIkulpr6NIqlb7iELVXhA384WS8mW8HnC22xALr3EcVWvC
+	 Mn2zBS5ezhQecfvJyDcTU09sJn0JanHvtnm2mtg87PRnyPO9Q3xBSexaHZk9szjn21
+	 UM7ZaJE9PpvwFRF2y0s4rgYmH5vqGJCBb1SJTMiHN1bT92oI6r4bctYE7qa4+r/wyr
+	 DKLchRjvyyZIkkEIu+sEnYOGJasxtZBzNki0FPfmtiCViZj5PmnuL6joHXQwccBcJM
+	 61rfM6IsA45Gg==
+Date: Mon, 10 Jun 2024 17:22:14 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nalramli@fastly.com, Saeed Mahameed
+ <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, "open
+ list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>, Tariq
+ Toukan <tariqt@nvidia.com>
+Subject: Re: [RFC net-next v4 2/2] net/mlx5e: Add per queue netdev-genl
+ stats
+Message-ID: <20240610172214.17fc8d95@kernel.org>
+In-Reply-To: <fd788395-c936-49cf-a85d-d39d1d055131@gmail.com>
+References: <20240604004629.299699-1-jdamato@fastly.com>
+	<20240604004629.299699-3-jdamato@fastly.com>
+	<11b9c844-a56e-427f-aab3-3e223d41b165@gmail.com>
+	<ZmIwIJ9rxllqQT18@LQ3V64L9R2>
+	<20240606171942.4226a854@kernel.org>
+	<ZmJcEM7brxivyDUV@LQ3V64L9R2>
+	<fd788395-c936-49cf-a85d-d39d1d055131@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240610231022.2460953-4-sean.anderson@linux.dev>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 10, 2024 at 07:10:22PM -0400, Sean Anderson wrote:
-> Add support for reading the statistics counters, if they are enabled.
-> The counters may be 64-bit, but we can't detect this as there's no
-> ability bit for it and the counters are read-only. Therefore, we assume
-> the counters are 32-bits.
+On Fri, 7 Jun 2024 10:53:55 +0300 Tariq Toukan wrote:
+> I don't want to create more work for you, but IMO in the longterm I 
+> should follow it up with a patch that adds PTP-RX to real_num_rx_queues.
 
-> +static void axienet_stats_update(struct axienet_local *lp)
-> +{
-> +	enum temac_stat stat;
-> +
-> +	lockdep_assert_held(&lp->stats_lock);
-> +
-> +	u64_stats_update_begin(&lp->hw_stat_sync);
-> +	for (stat = 0; stat < STAT_COUNT; stat++) {
-> +		u32 counter = axienet_ior(lp, XAE_STATS_OFFSET + stat * 8);
-
-The * 8 here suggests the counters are spaced so that they could be 64
-bit wide, even when only 32 bits are used. Does the documentation say
-anything about the upper 32 bits when the counters are only 32 bits?
-Are they guaranteed to read as zero? I'm just wondering if the code
-should be forward looking and read all 64 bits? 
-
->  static int __axienet_device_reset(struct axienet_local *lp)
->  {
->  	u32 value;
->  	int ret;
->  
-> +	/* Save statistics counters in case they will be reset */
-> +	if (lp->features & XAE_FEATURE_STATS) {
-> +		mutex_lock(&lp->stats_lock);
-> +		axienet_stats_update(lp);
-> +	}
-
-It is a pretty unusual pattern to split a mutex lock/unlock like this
-on an if statement. Maybe just unconditionally hold the mutex? This
-does not appear to be anyway hot path, so the overhead should not
-matter.
-
-	Andrew
+Please don't. real_num_*x_queues is basically uAPI. Let's not modify
+behavior at the uAPI level to work around deficiencies of the device.
 
