@@ -1,51 +1,52 @@
-Return-Path: <netdev+bounces-102539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51CE8903A94
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:41:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FAC2903A9A
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:41:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF629B229F8
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 11:41:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 575ED1C21DBC
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 11:41:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7887117B4FA;
-	Tue, 11 Jun 2024 11:40:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5BA517C22A;
+	Tue, 11 Jun 2024 11:40:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
+Received: from mxout70.expurgate.net (mxout70.expurgate.net [91.198.224.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE59176222;
-	Tue, 11 Jun 2024 11:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77BA517C21D;
+	Tue, 11 Jun 2024 11:40:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.224.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718106049; cv=none; b=uktYCnz65evCEUlBFVkrxvpS6myvDNZj01JTwA6wmrWaXJRoyj0AgVQpn1sJ2mkjn0ucPDPVoiT7YZWe+Igc1EiXzY3beyuF6W02/FacoGcx7lTPts87lkk99KgSpYgop9kKopt7ZRBzwO1zPfmBOKz40+45RTJCL9sIfqTcBrs=
+	t=1718106058; cv=none; b=kzBhocQVO11hiYYcFxDLyOgbZFR69/QzUj/C6DOW/Z6HuZiyIe8IWA15XPKDkvfrKWj+ukOxzE5gNOBqNzRJXHKjB5u5tPtd/28O9FLd5Am6Us5+gBzNEkWHRijy96TXQN0k/tI+9LZW1aAhsDqChuJ9VlTa8aBx2+MOS0CbGtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718106049; c=relaxed/simple;
-	bh=F6aNZ82jzGo7qYFC7MrfPogbayEkCaiexBmsAELEUC0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OY0RyJ/jKb9HbDZ+b7TU+/2HaR7Wzivx7aOtIHd9nu4dVGa58bboV8jFhVftQ4Rj/RYxU/2oVtNeWgbub40Yjnelznk49tNMooTe2+hlaxhHd3TFik0AeQsMAhCWDA0GU3o4PiE8GG9tCWvQUWdEilMOCgsVk6eaGtMHAd43nkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=194.37.255.70
+	s=arc-20240116; t=1718106058; c=relaxed/simple;
+	bh=9LeKIJJsUQXyr3hksLnvvOz4U4uKfPe/bH5MsE+TiL8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=O4GjBgmNT8NgIReix6Nhwkd6+mVJqINM5BLkdokGu5IZ5rOHTuL5ms5wpt6Kunwtp0XRgfxPxJPBbC3ktwWhi7WTi/yuvkJtaq3361rKSfGcd3Hed/u9uIrZM0Bd6HqgXsWWhccZfaLpw3UD7umdKQcgKhY7zNpqmFs2yX8TByg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; arc=none smtp.client-ip=91.198.224.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dev.tdt.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
 Received: from [127.0.0.1] (helo=localhost)
 	by relay.expurgate.net with smtp (Exim 4.92)
 	(envelope-from <prvs=9906f4c1d5=ms@dev.tdt.de>)
-	id 1sGzrp-00EEyR-2L; Tue, 11 Jun 2024 13:40:45 +0200
+	id 1sGzrv-002YnG-Ep; Tue, 11 Jun 2024 13:40:51 +0200
 Received: from [195.243.126.94] (helo=securemail.tdt.de)
 	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ms@dev.tdt.de>)
-	id 1sGzro-0026E0-HT; Tue, 11 Jun 2024 13:40:44 +0200
+	id 1sGzru-00EF3p-SR; Tue, 11 Jun 2024 13:40:50 +0200
 Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id 3F6CB240053;
-	Tue, 11 Jun 2024 13:40:44 +0200 (CEST)
+	by securemail.tdt.de (Postfix) with ESMTP id 87F5A240053;
+	Tue, 11 Jun 2024 13:40:50 +0200 (CEST)
 Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id C2EE7240050;
-	Tue, 11 Jun 2024 13:40:43 +0200 (CEST)
+	by securemail.tdt.de (Postfix) with ESMTP id 18186240050;
+	Tue, 11 Jun 2024 13:40:50 +0200 (CEST)
 Received: from mschiller1.dev.tdt.de (unknown [10.2.3.20])
-	by mail.dev.tdt.de (Postfix) with ESMTPSA id 823DA29768;
-	Tue, 11 Jun 2024 13:40:43 +0200 (CEST)
+	by mail.dev.tdt.de (Postfix) with ESMTPSA id 6FC6B29768;
+	Tue, 11 Jun 2024 13:40:49 +0200 (CEST)
 From: Martin Schiller <ms@dev.tdt.de>
 To: martin.blumenstingl@googlemail.com,
 	hauke@hauke-m.de,
@@ -63,10 +64,12 @@ Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	ms@dev.tdt.de
-Subject: [PATCH net-next v4 00/13] net: dsa: lantiq_gswip: code improvements
-Date: Tue, 11 Jun 2024 13:40:14 +0200
-Message-ID: <20240611114027.3136405-1-ms@dev.tdt.de>
+Subject: [PATCH net-next v4 01/13] dt-bindings: net: dsa: lantiq,gswip: convert to YAML schema
+Date: Tue, 11 Jun 2024 13:40:15 +0200
+Message-ID: <20240611114027.3136405-2-ms@dev.tdt.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240611114027.3136405-1-ms@dev.tdt.de>
+References: <20240611114027.3136405-1-ms@dev.tdt.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,64 +77,396 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-purgate-ID: 151534::1718106045-2DD88746-4E7E3647/0/0
 X-purgate: clean
+X-purgate-ID: 151534::1718106051-36EB2D11-628F7943/0/0
 X-purgate-type: clean
 
+Convert the lantiq,gswip bindings to YAML format.
 
-This patchset for the lantiq_gswip driver is a collection of minor fixes
-and coding improvements by Martin Blumenstingl without any real changes
-in the actual functionality.
+Also add this new file to the MAINTAINERS file.
 
-=3D=3D=3D Changelog =3D=3D=3D
-From v3:
-- convert lantiq,gswip bindings to YAML schema
-- Add Hauke's acked-by as mentioned in the cover letter in v1
-
-From v2:
-- removed unused variable max_ports in gswip_add_single_port_br()
-
-From v1:
-- signal that we only update example code in dt-bindings
-- don't use the word 'fix' if not appropriate
-- new patch: add terminating '\n' where missing
-- renamed MAC_BRIDGE macros to make it obvious which register field is
-  used
-- new patch: remove dead code from gswip_add_single_port_br()
-- updated error message if FID not found in gswip_port_fdb()
-
-Martin Blumenstingl (9):
-  dt-bindings: net: dsa: lantiq,gswip: Add missing CPU port phy-mode and
-    fixed-link to example
-  net: dsa: lantiq_gswip: Only allow phy-mode =3D "internal" on the CPU
-    port
-  net: dsa: lantiq_gswip: Use dev_err_probe where appropriate
-  net: dsa: lantiq_gswip: Don't manually call gswip_port_enable()
-  net: dsa: lantiq_gswip: Use dsa_is_cpu_port() in
-    gswip_port_change_mtu()
-  net: dsa: lantiq_gswip: Change literal 6 to ETH_ALEN
-  net: dsa: lantiq_gswip: Consistently use macros for the mac bridge
-    table
-  net: dsa: lantiq_gswip: Update comments in gswip_port_vlan_filtering()
-  net: dsa: lantiq_gswip: Improve error message in gswip_port_fdb()
-
-Martin Schiller (4):
-  dt-bindings: net: dsa: lantiq,gswip: convert to YAML schema
-  net: dsa: lantiq_gswip: add terminating \n where missing
-  net: dsa: lantiq_gswip: do also enable or disable cpu port
-  net: dsa: lantiq_gswip: Remove dead code from
-    gswip_add_single_port_br()
-
- .../bindings/net/dsa/lantiq,gswip.yaml        | 201 ++++++++++++++++++
+Signed-off-by: Martin Schiller <ms@dev.tdt.de>
+---
+ .../bindings/net/dsa/lantiq,gswip.yaml        | 195 ++++++++++++++++++
  .../bindings/net/dsa/lantiq-gswip.txt         | 146 -------------
  MAINTAINERS                                   |   1 +
- drivers/net/dsa/lantiq_gswip.c                | 123 +++++------
- 4 files changed, 257 insertions(+), 214 deletions(-)
+ 3 files changed, 196 insertions(+), 146 deletions(-)
  create mode 100644 Documentation/devicetree/bindings/net/dsa/lantiq,gswi=
 p.yaml
  delete mode 100644 Documentation/devicetree/bindings/net/dsa/lantiq-gswi=
 p.txt
 
+diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml =
+b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+new file mode 100644
+index 000000000000..14ef48d6a0ee
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+@@ -0,0 +1,195 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/dsa/lantiq,gswip.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Lantiq GSWIP Ethernet switches
++
++allOf:
++  - $ref: dsa.yaml#/$defs/ethernet-ports
++
++maintainers:
++  - Hauke Mehrtens <hauke@hauke-m.de>
++
++properties:
++  compatible:
++    enum:
++      - lantiq,xrx200-gswip
++      - lantiq,xrx300-gswip
++      - lantiq,xrx330-gswip
++
++  reg:
++    minItems: 3
++    maxItems: 3
++  reg-names:
++    items:
++      - const: switch
++      - const: mdio
++      - const: mii
++
++  mdio:
++    $ref: /schemas/net/mdio.yaml#
++    unevaluatedProperties: false
++
++    properties:
++      compatible:
++        const: lantiq,xrx200-mdio
++
++    required:
++      - compatible
++
++  gphy-fw:
++    type: object
++    properties:
++      '#address-cells':
++        const: 1
++      '#size-cells':
++        const: 0
++
++      compatible:
++        allOf:
++          - items:
++              - enum:
++                  - lantiq,xrx200-gphy-fw
++                  - lantiq,xrx300-gphy-fw
++                  - lantiq,xrx330-gphy-fw
++              - const: lantiq,gphy-fw
++
++      lantiq,rcu:
++        $ref: /schemas/types.yaml#/definitions/phandle
++        description: phandle to the RCU syscon
++
++    patternProperties:
++      "^gphy@[0-9a-f]+$":
++        type: object
++
++        properties:
++          reg:
++            minimum: 0
++            maximum: 255
++            description:
++              Offset of the GPHY firmware register in the RCU register r=
+ange
++
++          resets:
++            items:
++              - description: GPHY reset line
++
++          reset-names:
++            items:
++              - const: gphy
++
++        required:
++          - reg
++
++        additionalProperties: false
++
++    required:
++      - compatible
++      - lantiq,rcu
++
++    additionalProperties: false
++
++required:
++  - compatible
++  - reg
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    switch@e108000 {
++            compatible =3D "lantiq,xrx200-gswip";
++            reg =3D <0xe108000 0x3100>,  /* switch */
++                  <0xe10b100 0xd8>,    /* mdio */
++                  <0xe10b1d8 0x130>;   /* mii */
++            dsa,member =3D <0 0>;
++
++            ports {
++                    #address-cells =3D <1>;
++                    #size-cells =3D <0>;
++
++                    port@0 {
++                            reg =3D <0>;
++                            label =3D "lan3";
++                            phy-mode =3D "rgmii";
++                            phy-handle =3D <&phy0>;
++                    };
++
++                    port@1 {
++                            reg =3D <1>;
++                            label =3D "lan4";
++                            phy-mode =3D "rgmii";
++                            phy-handle =3D <&phy1>;
++                    };
++
++                    port@2 {
++                            reg =3D <2>;
++                            label =3D "lan2";
++                            phy-mode =3D "internal";
++                            phy-handle =3D <&phy11>;
++                    };
++
++                    port@4 {
++                            reg =3D <4>;
++                            label =3D "lan1";
++                            phy-mode =3D "internal";
++                            phy-handle =3D <&phy13>;
++                    };
++
++                    port@5 {
++                            reg =3D <5>;
++                            label =3D "wan";
++                            phy-mode =3D "rgmii";
++                            phy-handle =3D <&phy5>;
++                    };
++
++                    port@6 {
++                            reg =3D <0x6>;
++                            ethernet =3D <&eth0>;
++                    };
++            };
++
++            mdio {
++                    #address-cells =3D <1>;
++                    #size-cells =3D <0>;
++                    compatible =3D "lantiq,xrx200-mdio";
++
++                    phy0: ethernet-phy@0 {
++                            reg =3D <0x0>;
++                    };
++                    phy1: ethernet-phy@1 {
++                            reg =3D <0x1>;
++                    };
++                    phy5: ethernet-phy@5 {
++                            reg =3D <0x5>;
++                    };
++                    phy11: ethernet-phy@11 {
++                            reg =3D <0x11>;
++                    };
++                    phy13: ethernet-phy@13 {
++                            reg =3D <0x13>;
++                    };
++            };
++
++            gphy-fw {
++                    #address-cells =3D <1>;
++                    #size-cells =3D <0>;
++                    compatible =3D "lantiq,xrx200-gphy-fw", "lantiq,gphy=
+-fw";
++                    lantiq,rcu =3D <&rcu0>;
++
++                    gphy@20 {
++                            reg =3D <0x20>;
++
++                            resets =3D <&reset0 31 30>;
++                            reset-names =3D "gphy";
++                    };
++
++                    gphy@68 {
++                            reg =3D <0x68>;
++
++                            resets =3D <&reset0 29 28>;
++                            reset-names =3D "gphy";
++                    };
++            };
++    };
+diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq-gswip.txt b=
+/Documentation/devicetree/bindings/net/dsa/lantiq-gswip.txt
+deleted file mode 100644
+index 8bb1eff21cb1..000000000000
+--- a/Documentation/devicetree/bindings/net/dsa/lantiq-gswip.txt
++++ /dev/null
+@@ -1,146 +0,0 @@
+-Lantiq GSWIP Ethernet switches
+-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+-
+-Required properties for GSWIP core:
+-
+-- compatible	: "lantiq,xrx200-gswip" for the embedded GSWIP in the
+-		  xRX200 SoC
+-		  "lantiq,xrx300-gswip" for the embedded GSWIP in the
+-		  xRX300 SoC
+-		  "lantiq,xrx330-gswip" for the embedded GSWIP in the
+-		  xRX330 SoC
+-- reg		: memory range of the GSWIP core registers
+-		: memory range of the GSWIP MDIO registers
+-		: memory range of the GSWIP MII registers
+-
+-See Documentation/devicetree/bindings/net/dsa/dsa.txt for a list of
+-additional required and optional properties.
+-
+-
+-Required properties for MDIO bus:
+-- compatible	: "lantiq,xrx200-mdio" for the MDIO bus inside the GSWIP
+-		  core of the xRX200 SoC and the PHYs connected to it.
+-
+-See Documentation/devicetree/bindings/net/mdio.txt for a list of additio=
+nal
+-required and optional properties.
+-
+-
+-Required properties for GPHY firmware loading:
+-- compatible	: "lantiq,xrx200-gphy-fw", "lantiq,gphy-fw"
+-		  "lantiq,xrx300-gphy-fw", "lantiq,gphy-fw"
+-		  "lantiq,xrx330-gphy-fw", "lantiq,gphy-fw"
+-		  for the loading of the firmware into the embedded
+-		  GPHY core of the SoC.
+-- lantiq,rcu	: reference to the rcu syscon
+-
+-The GPHY firmware loader has a list of GPHY entries, one for each
+-embedded GPHY
+-
+-- reg		: Offset of the GPHY firmware register in the RCU
+-		  register range
+-- resets	: list of resets of the embedded GPHY
+-- reset-names	: list of names of the resets
+-
+-Example:
+-
+-Ethernet switch on the VRX200 SoC:
+-
+-switch@e108000 {
+-	#address-cells =3D <1>;
+-	#size-cells =3D <0>;
+-	compatible =3D "lantiq,xrx200-gswip";
+-	reg =3D <	0xe108000 0x3100	/* switch */
+-		0xe10b100 0xd8		/* mdio */
+-		0xe10b1d8 0x130		/* mii */
+-		>;
+-	dsa,member =3D <0 0>;
+-
+-	ports {
+-		#address-cells =3D <1>;
+-		#size-cells =3D <0>;
+-
+-		port@0 {
+-			reg =3D <0>;
+-			label =3D "lan3";
+-			phy-mode =3D "rgmii";
+-			phy-handle =3D <&phy0>;
+-		};
+-
+-		port@1 {
+-			reg =3D <1>;
+-			label =3D "lan4";
+-			phy-mode =3D "rgmii";
+-			phy-handle =3D <&phy1>;
+-		};
+-
+-		port@2 {
+-			reg =3D <2>;
+-			label =3D "lan2";
+-			phy-mode =3D "internal";
+-			phy-handle =3D <&phy11>;
+-		};
+-
+-		port@4 {
+-			reg =3D <4>;
+-			label =3D "lan1";
+-			phy-mode =3D "internal";
+-			phy-handle =3D <&phy13>;
+-		};
+-
+-		port@5 {
+-			reg =3D <5>;
+-			label =3D "wan";
+-			phy-mode =3D "rgmii";
+-			phy-handle =3D <&phy5>;
+-		};
+-
+-		port@6 {
+-			reg =3D <0x6>;
+-			ethernet =3D <&eth0>;
+-		};
+-	};
+-
+-	mdio {
+-		#address-cells =3D <1>;
+-		#size-cells =3D <0>;
+-		compatible =3D "lantiq,xrx200-mdio";
+-		reg =3D <0>;
+-
+-		phy0: ethernet-phy@0 {
+-			reg =3D <0x0>;
+-		};
+-		phy1: ethernet-phy@1 {
+-			reg =3D <0x1>;
+-		};
+-		phy5: ethernet-phy@5 {
+-			reg =3D <0x5>;
+-		};
+-		phy11: ethernet-phy@11 {
+-			reg =3D <0x11>;
+-		};
+-		phy13: ethernet-phy@13 {
+-			reg =3D <0x13>;
+-		};
+-	};
+-
+-	gphy-fw {
+-		compatible =3D "lantiq,xrx200-gphy-fw", "lantiq,gphy-fw";
+-		lantiq,rcu =3D <&rcu0>;
+-		#address-cells =3D <1>;
+-		#size-cells =3D <0>;
+-
+-		gphy@20 {
+-			reg =3D <0x20>;
+-
+-			resets =3D <&reset0 31 30>;
+-			reset-names =3D "gphy";
+-		};
+-
+-		gphy@68 {
+-			reg =3D <0x68>;
+-
+-			resets =3D <&reset0 29 28>;
+-			reset-names =3D "gphy";
+-		};
+-	};
+-};
+diff --git a/MAINTAINERS b/MAINTAINERS
+index cd3277a98cfe..ca1050f6691b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -12449,6 +12449,7 @@ LANTIQ / INTEL Ethernet drivers
+ M:	Hauke Mehrtens <hauke@hauke-m.de>
+ L:	netdev@vger.kernel.org
+ S:	Maintained
++F:	Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+ F:	drivers/net/dsa/lantiq_gswip.c
+ F:	drivers/net/dsa/lantiq_pce.h
+ F:	drivers/net/ethernet/lantiq_xrx200.c
 --=20
 2.39.2
 
