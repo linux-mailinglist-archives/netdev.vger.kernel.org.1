@@ -1,186 +1,212 @@
-Return-Path: <netdev+bounces-102723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7802904607
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 23:01:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 975B890460A
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 23:01:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 565191F24D9D
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 21:01:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 539891C22738
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 21:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179735F874;
-	Tue, 11 Jun 2024 21:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0D81534E7;
+	Tue, 11 Jun 2024 21:01:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="IZZ4ptLW"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LdQLGz80"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6642C8488
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 21:01:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE8727D086
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 21:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718139682; cv=none; b=Hknxd2kapjhWL5LYSJuEY7bhiBt4j9eD6eRvfWSftW2vimZfH92H/1XlAftHZ4jOd4H8/Sa8mPy2n+4NhwjWSdGgp2z/5ET+74Nld2FFgFTTxOi0T0TDXlLruWnyQ/VEMVBvEhpK1kKLqmg/jN/SUhZ0f8KBJZjzaxkqSLbuA6o=
+	t=1718139712; cv=none; b=VfNaJ49nJQWlXXnvge6kJugWWBuo04mKQyQmf7d8dEiX6Ekzc7K3WmVrd1wWAp3riIjP+0MP78yb48pzPnG+y0vfZIho0KbU+/0j777iK2HrgPF7As+UXW+RN7be34pm9Rnfe3QsGIqOatDIbBdeI7+xO9GaL89I0RU+Po6fl0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718139682; c=relaxed/simple;
-	bh=6PW1nf/eWeFY2tKmIOQ1VuWT7fqIpneyYVorJAwQeL0=;
+	s=arc-20240116; t=1718139712; c=relaxed/simple;
+	bh=w1KluxEs1QV1PvCoK3yunkb1Skj3UpOBxumCDFI7xwc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n9YCbOx0u/mLEi82xYKO4z5Q5BemPI6Lr0r/filCKyAMzaV23zN3JGSd5A534X8qhs8se6tFcbsllhY4btkSdErY9Pf8zpdfwbFQrlwX8O7LNNs3VWXYj9sLHupMezhsulggc5c2bf/BUT6tIq5oTgCE/tVXU4hDWebvoVmqf1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=IZZ4ptLW; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-62a08099115so63183007b3.0
-        for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 14:01:20 -0700 (PDT)
+	 To:Cc:Content-Type; b=FF8qL3Dr6c9xjn0iW9kbSI8yFkziMxA/kN4HzEOw/zrAjmtNBiCaZC2gUIQUcF5KUKymk/EwoxWu01dlEKKijzVCBIONs30cuJq8WfOn8yuuPoYxV+bp2t+5WZDuZfbBHIPnv9VSsApSkAwKROK27c3ufy+H8U9+szdad+PYh4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=LdQLGz80; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2ebed33cb67so17203241fa.0
+        for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 14:01:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1718139679; x=1718744479; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lIc8quk+z80Oj5qJUtipwWH7RvxlN0ArT34YBzXHKug=;
-        b=IZZ4ptLW+OqUb8MStYpvMaLrYfUMJ8hPiTIpZdoJtwMGWhMhaJ0scu3lnkjMZFvOQy
-         MixwuHT9pmIAMdYYpDEllQGdq6nUqIHwolxRLthcqHFAwvQsVqURKmvkaeZP+q5N420m
-         uTNx5uHUeckPza9N9f8KXTk28zl70ePp/ozv+eD2NK5Yv5qWZJjPT8S2uFDUj4gV4+hI
-         +WNCI7ewzXymLXBNuLEB+N7CBjKHM47NlfLS5m3rzNZqzxaAf1m1Cuf5tYtiUNXMvJHs
-         HPPKrAqMGy2PkjwPosLsNGxdFj76XTJx7GpZubXRLStKWx5Eghj8ftmTlntBwlz4ZUaC
-         rC4A==
+        d=broadcom.com; s=google; t=1718139709; x=1718744509; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=31LNO7PEmgnOgIxWP1h2RhA4vdcED+tZG4Ps/lFnMxU=;
+        b=LdQLGz80ACF8j7E1OWZvZXrFn0cl1FScvS+QIowvX2h8BFx5UAvhOTIRWhSiWXBbfC
+         +sx3lmfBF5BDdL3Ry6fvoIB6NpyuEQleSZdmkuvra+U31fA1z2IPeyxSUZAp1iAwa+FJ
+         9+UrbnZdAcDnER0oKyNaMTCQWpF/Lu/exQt9o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718139679; x=1718744479;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lIc8quk+z80Oj5qJUtipwWH7RvxlN0ArT34YBzXHKug=;
-        b=TzEuUBJmsmRvYYeOMFc7o6valJzT+tnzdLJTKXc5b/vS8c3b/TaaaG96tv4GkWgfmV
-         dnPF1bQDOCGymVfUg9nBBIsftxStKemn4ZVTcqcyTSVwCZ6jGMq4j6Tk/OCyZCTPtICz
-         x4VjQtChuBrIjqeadfpFxvViFxQq4FHMaRFZP/jNkiLu0NSXiQ4JaZolqyUtVRHf3okA
-         3Osksq5rYgqDLS8G3J6BYedUCWPOEmu5yPxKTvDQOvCw/P41wIUPD9WwSgnbc1EUUeX6
-         U9tZsHtZGi/OMwTDYGSe1iaF3YADH2kezzht+30eLbub+NnLAmlRsVGU66yYOYxod/iZ
-         WY+g==
-X-Gm-Message-State: AOJu0YwWG35qFEOpNWqKeceSlQFu/zLdhA09ugElagcTYJMZnWtyTQA2
-	Q9hdebxCi3b2jeMvuN73c2DFWX4cQoEZCtAjX2H+7XF8ThMp2owF5MBo/5KENj9X+pxh5EymqjW
-	WYDTWSnfSWsMcFAlqOktFX8w9Kut9XrVQrixFGqxdobkQT1NX7w==
-X-Google-Smtp-Source: AGHT+IEWcUj9ep9xaBN0Bg4UlWx61XZpNTcHBtMw5fUITZAHNLDrUirNuGDY44SYa9fueZ78AZH0WB9O4j/xjXEXaGA=
-X-Received: by 2002:a81:91c5:0:b0:620:26f5:c97c with SMTP id
- 00721157ae682-62cd5652979mr119836597b3.35.1718139679016; Tue, 11 Jun 2024
- 14:01:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718139709; x=1718744509;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=31LNO7PEmgnOgIxWP1h2RhA4vdcED+tZG4Ps/lFnMxU=;
+        b=sZsY7w1BxcAa67JhsmpbIFnWjQxawb6J0+YPdosVDy0C7YpadBq+DbCFpIM5G0AHy2
+         cJ1z+q5vZVyuAvvwvA7Bp3M9sQy1RTaHUnmApVhtwHuH4Hsi0A7VyQWI00loz1FnpcxY
+         8V3Ai1QUrwhzPuya8fDBNPiMVt8KDLc/JKNBSnf/7GUjZLa/5ozcAj99usAqShLynbcV
+         IKlA9hiPoClZZiIngoNdWYMGclCFJTTq0gLNg95KK3YFiJbZpM9C+UlvWg/EqvvjKSTo
+         FvEgEhGbcM5aqV5KdzIzOi2uUQZKyCws/8/ZZn8EzdiL/lrUMlRz1kUi0VJSVOSM3pLC
+         wlHA==
+X-Gm-Message-State: AOJu0Yx8NAQoLrScf04XuAGW/RwH2ma3pdjDGHWL7bngS00MYfqL0S4L
+	Nl+CwqhguPMR00d0M3/hoQxsGz4b/OZ5Dn4K8tdSJ1EZOPON24OyLtjhL2q4xDwyrR5Vq1bSzct
+	MPhI5mpfnxHMZrCSvznXREjqh36lnKBUq74SX
+X-Google-Smtp-Source: AGHT+IEBsOOwObBSa6yIknF9yOOBT+CcJBhse7oVVUBJwHUpcgxmxqxlOMDOYZCbOJ//k8ZjQDbTph/El89a4QllFU0=
+X-Received: by 2002:a2e:740a:0:b0:2ea:ea79:4fa3 with SMTP id
+ 38308e7fff4ca-2eaea7951admr74429491fa.28.1718139708432; Tue, 11 Jun 2024
+ 14:01:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240416152913.1527166-3-omosnace@redhat.com> <085faf37b4728d7c11b05f204b0d9ad6@paul-moore.com>
- <CAFqZXNvm6T9pdWmExgmuODaNupMu3zSfYyb0gebn5AwmJ+86oQ@mail.gmail.com>
- <CAHC9VhTxhcSDfYCK95UsuZixMSRNFtTGkDvBWjpagHw6328PMQ@mail.gmail.com>
- <CAFqZXNurJZ-q64gxh54YhoO_GZeFzxXE0Yta_X-DqF_CcRSvRA@mail.gmail.com>
- <CAHC9VhRjDn3yihw8fpmweWynE9nmcqaCCspM_SpM7ujUnqoGDw@mail.gmail.com> <CAFqZXNsy86uN0J41HOhjH_Rq-WRU2DVzhbJOx3xtxtB5PbwFFA@mail.gmail.com>
-In-Reply-To: <CAFqZXNsy86uN0J41HOhjH_Rq-WRU2DVzhbJOx3xtxtB5PbwFFA@mail.gmail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Tue, 11 Jun 2024 17:01:08 -0400
-Message-ID: <CAHC9VhQzGx2bYpGh-7zMsVT4hh45zs7QFuU9GAOdnE7bJQOSJg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] cipso: make cipso_v4_skbuff_delattr() fully remove
- the CIPSO options
-To: Ondrej Mosnacek <omosnace@redhat.com>
-Cc: netdev@vger.kernel.org, linux-security-module@vger.kernel.org
+References: <20240608191335.52174-1-michael.chan@broadcom.com>
+ <0cece70f-a7ae-47e2-a4a2-602d37063890@intel.com> <CACKFLikFP=xCKnZC_V+oEeFeS-i7PAKHmDFgZKBy+Sb1rKuTkw@mail.gmail.com>
+ <CACKFLimMfDTatETF+iTWkCBhVH80O=SC-u066XsREoQgVEmmpg@mail.gmail.com> <37cf9088-b050-4788-b870-f28f0fb58b9e@intel.com>
+In-Reply-To: <37cf9088-b050-4788-b870-f28f0fb58b9e@intel.com>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Tue, 11 Jun 2024 14:01:36 -0700
+Message-ID: <CACKFLimHuwfwNcbFqGTJw1V62z7o+xfFJsTZvOT07uheDbEKig@mail.gmail.com>
+Subject: Re: [PATCH net v2] bnxt_en: Cap the size of HWRM_PORT_PHY_QCFG
+ forwarded response
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, andrew.gospodarek@broadcom.com, horms@kernel.org, 
+	Somnath Kotur <somnath.kotur@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+	davem@davemloft.net
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000000dc297061aa39387"
+
+--0000000000000dc297061aa39387
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 7, 2024 at 11:47=E2=80=AFAM Ondrej Mosnacek <omosnace@redhat.co=
-m> wrote:
-> On Fri, May 17, 2024 at 9:49=E2=80=AFPM Paul Moore <paul@paul-moore.com> =
-wrote:
-> >
-> > On Tue, May 14, 2024 at 7:29=E2=80=AFAM Ondrej Mosnacek <omosnace@redha=
-t.com> wrote:
-> > > I tried to test what you describe - hopefully I got close enough:
-> > >
-> > > My test setup has 3 VMs (running Fedora 39 from the stock qcow2 image=
-)
-> > > A, B, and R, connected via separate links as A <--> R <--> B, where R
-> > > acts as a router between A and B (net.ipv4.ip_forward is set to 1 on
-> > > R, and the appropriate routes are set on A, B, R).
-> > >
-> > > The A <--> R link has subnet 10.123.123.0/24, A having address
-> > > 10.123.123.2 and R having 10.123.123.1.
-> > > The B <--> R link has subnet 10.123.124.0/24, B having address
-> > > 10.123.124.2 and R having 10.123.124.1.
-> > >
-> > > The links are implemented as GRE tunnels over the main network that i=
-s
-> > > shared between the VMs.
-> > >
-> > > Netlabel configuration on A:
-> > > netlabelctl cipsov4 add pass doi:16 tags:5
-> > > netlabelctl map del default
-> > > netlabelctl map add default address:0.0.0.0/0 protocol:unlbl
-> > > netlabelctl map add default address:::/0 protocol:unlbl
-> > > netlabelctl map add default address:10.123.123.0/24 protocol:cipsov4,=
-16
-> > > netlabelctl map add default address:10.123.124.0/24 protocol:cipsov4,=
-16
-> > >
-> > > Netlabel configuration on R:
-> > > netlabelctl cipsov4 add pass doi:16 tags:5
-> > > netlabelctl map del default
-> > > netlabelctl map add default address:0.0.0.0/0 protocol:unlbl
-> > > netlabelctl map add default address:::/0 protocol:unlbl
-> > > netlabelctl map add default address:10.123.123.0/24 protocol:cipsov4,=
-16
-> > >
-> > > B has no netlabel configured.
-> > >
-> > > (I.e. A tries to send CIPSO-labeled packets to B, but R treats the
-> > > 10.123.124.0/24 network as unlabeled, so should strip/add the CIPSO
-> > > label when forwarding between A and B.)
-> > >
-> > > A basic TCP connection worked just fine in both directions with and
-> > > without these patches applied (I installed the patched kernel on all
-> > > machines, though it should only matter on machine R). I ignored the
-> > > actual labels/CIPSO content - i.e. I didn't change the default SELinu=
-x
-> > > policy and put SELinux into permissive mode on machines A and R.
-> > >
-> > > Capturing the packets on R showed the following IP option content
-> > > without the patches:
-> > > A -> R: CIPSO
-> > > R -> B: NOPs
-> > > B -> R: (empty)
-> > > R -> A: CIPSO
-> > >
-> > > With the patches this changed to:
-> > > A -> R: CIPSO
-> > > R -> B: (empty)
-> > > B -> R: (empty)
-> > > R -> A: CIPSO
-> > >
-> > > Is this convincing enough or do you have different scenarios in mind?
-> >
-> > Thanks for verifying your patch, the methodology looks good to me, but
-> > as I mentioned in my previous email I would feel much better if you
-> > verified this with a different client OS/stack.  Do you have access to
-> > Windows/MacOS/BSD/non-Linux system you could use in place of B in your
-> > test above?
+On Tue, Jun 11, 2024 at 4:10=E2=80=AFAM Przemek Kitszel
+<przemyslaw.kitszel@intel.com> wrote:
 >
-> I don't think I can easily plug that into the framework I used for the
-> testing (there doesn't seem to be a convenient way to install a
-> FreeBSD VM without manual interaction and the rest is proprietary).
+> On 6/11/24 01:52, Michael Chan wrote:
+> > The #define within the struct_group generates a lot of warnings with ma=
+ke C=3D1:
+> >
+> >    CC [M]  drivers/net/ethernet/broadcom/bnxt/bnxt.o
+> >    CHECK   drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > drivers/net/ethernet/broadcom/bnxt/bnxt.c: note: in included file:
+> > drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h:4211:9: warning:
+> > directive in macro's argument list
+> >
+> > Because it's a generated file, it's hard to make the drastic change to
+>
+> is this generated as part of upstream build process or just manually?
 
-Surely you can perform a manual unit test with some VMs on your local
-machine if whatever test automation you are using doesn't support
-this.
+This is generated internally for our firmware interface structures and
+definitions.
 
-> I still don't quite understand what exactly you expect to break under
-> that scenario and why - could you elaborate on that? If anything, I'd
-> expect the IP header growing along the path (which already happens
-> pretty much by design in the opposite direction) to be more likely to
-> cause an issue.
+>
+> > move all the #define macros.  Maybe in the future when we restructure
+> > these generated structs, we can do it in a better way.
+>
+> You could also just split struct into two and combine them (packed)
+> into hwrm_port_phy_qcfg_output and add compat one as combination of
+> hwrm_port_phy_qcfg_output + valid bit
 
-I'm concerned about potential oddities caused by the changes in IP
-header sizes while the packet is in flight.  Every OS's network stack
-is a bit different and I don't think it is too much to ask to test at
-least one non-Linux network stack as a client.
+What I tried to do was to use struct_group_tagged to wrap the first 95
+bytes of the structure.  No changes are required for the existing code
+using the structure and that's the good thing.  The new compat.
+structure uses the struct_group plus 1 more byte at the end for the
+valid bit.  This works fine except for the warning due to the embedded
+#define within the struct_group.
 
---=20
-paul-moore.com
+>
+> If you don't want to do so, please at least document in code that only
+> the first 95 bytes match and the last one is different
+
+Will do.  Thanks for the review.
+
+--0000000000000dc297061aa39387
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIDKKZrWBJS6fXXIBwisJ/E3i/Od3o3sD
+eF5mSOtGro6lMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDYx
+MTIxMDE0OVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQBB5EliNyxGyCm7bL8BNgx/3Vz3iZ31l/w1+rUe2CIVo1tEECQc
+BkQTtM5xf3KbenS/UH7YBIxuc3li8UUz7jzQIvE4ZubunD5wbFNrCkDxW9ETtr2Q2g05H9wcD8Oy
+O5h2NEIb/pLTjJuZHHHwD63TC2vwGAfQnjlIQbA2jVzXrgEGdMbEtoTqIxYfaCEtXcX+39iI6TBT
+XAY3IwtHe6k6vhdbL/pqfwYdKNt8pxSawlbiPlRue1YzxqhPzlenD4P4IXbuMVFIFZ+/GXE5RRLY
+61RsTyt2qVajBuLBB0K/BytmaWxYSKuasvNQql30pymOOJsrRc7Mo2HmJJBlVm4C
+--0000000000000dc297061aa39387--
 
