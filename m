@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-102434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9D24902ECF
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 05:00:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C310F902ED1
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 05:00:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDC4F1C22683
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 03:00:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C5371F226E3
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 03:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 737F57E782;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E46A15B0E2;
 	Tue, 11 Jun 2024 03:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Emfqem0i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MocUnV5q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EFD03307B
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 03:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F01341A84;
+	Tue, 11 Jun 2024 03:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718074833; cv=none; b=JQ/OHZQIxVxdHdFa8IA6Fp7oiYYaiRYmD0NBQqp8/29E+/4eRCA7KZ/7WypYvmwks6koFitExA9tTqM7Br907bKzcIrj7Ed0H4WGv9mTrrvZGtSg/HNV1k6iNolHeexauU8ItBqZpVkFqo7ABvCCECLiNWt6Qp2U2Emx2cnD65s=
+	t=1718074833; cv=none; b=e1marn4jn6s9YlS4JR9LGVEc58OojRANibHSw6/7+WJxpAheZkJjR9+nVH2foAkV53YIfPiw9OuameUyLUnUxZxerTasSDt1TYlboxQwdATatD6cjdjjyUGo2SOhZPkwHYv3FB/ByCUURz4mNdmP1mDV19LutzHF/hya1FQYwJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718074833; c=relaxed/simple;
-	bh=REJ5ALOALpaJLFtRFRmV/BfWAsXrlGInyh7JCBIdlVU=;
+	bh=pSvn6OcHpnhBY6s0/2yfy61tKQC/zFK2p4HFOCECfr0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QUliR2sS9ae5gWkfwuZG0TPxFIDQeE16FDB0q0N6n7pPGfc6JuD2h6xEkXw0Q9c1DbEjQGXEDkd60qcg3Gz4e/pYfHrSWxZTMCFKpCF6a3OddN4P628WfGNkGPPjYMoqltDlnGH3aiCWa6oweInQQnUvu2+F7dKiVPCrdn3AMpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Emfqem0i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DACC6C4AF48;
+	 In-Reply-To:To:Cc; b=kEXV5LLyrvSyY1mF6U3o4DHuYPWqB/kEmKkuPs2baMvEmUzi+WDV+M+NWTk946CR1drWQIYka5MIG7G4T2tFHYAshsROBqNUHklGsgsJGHFbfFnw1ELFp3nF/clmV4mwCznH54H7zV2i4ywdu+kItG1opHQJRGuF3V0rnSAKIYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MocUnV5q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C5ACAC4AF1A;
 	Tue, 11 Jun 2024 03:00:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718074832;
-	bh=REJ5ALOALpaJLFtRFRmV/BfWAsXrlGInyh7JCBIdlVU=;
+	bh=pSvn6OcHpnhBY6s0/2yfy61tKQC/zFK2p4HFOCECfr0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Emfqem0icuaMehxOvL7lj9uf4mrR9AloEoh2kG8YbNchNRe6jZYaTAmF6dX3Bmelv
-	 xrmuC0czMyHLJHgW36zoG0je2n5c+7NoyQWBvQyVdjB0DCjYAejJkXwxJadDLWe/vT
-	 pXcMmwxQczQsaaTtlLfZBH7s7+IGxq+8C9KkXqIobnI6oubnrk1r3iVBQZogeYFnLM
-	 tVwkkzWEA5X2AF64XJQRxzcLPKgOCGJjiGx+IqXYjktazeNuSk+NIdWopfODozg5fM
-	 dt0oq5FU1Ml8vurtR4kyKZoHr70U0M5+fsG08ZfqOx26YwyEdbut2GY3oGoyp8w97d
-	 K1ThB19EaJs7Q==
+	b=MocUnV5qoySoc/QFMiOWq8PTOLuEDhWCiDxxBMWVezCFzsKJ9sPalLg9CGowmVtKI
+	 Zh/hdw56oGBIk2TS9zoDUZVQEtcwoaaveEpd02k/sYuYFZ6JLVkQEiQHNhdCsHEwG8
+	 MjXxXeviK8Of+dVuy/8QnmRO/9H0PVxFaXWfUyvphSTXE5AIQ85mgF/j3yXQnXKyDV
+	 sqAu69UoPhXoXJ+5DR4dDyp89ruLzt/HUpAW5kruRStNQKmVRit747UXviMEMjlAn0
+	 kkwyO/kefGtttQK32Z4bdC1bpvelLMwFSLNJ+tp9o8wUr9FsRb3OSIudDeY3/6dLwE
+	 QjU/dTwpIjfSw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BC71CC43168;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ADC87E7C76F;
 	Tue, 11 Jun 2024 03:00:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] tcp: use signed arithmetic in tcp_rtx_probe0_timed_out()
+Subject: Re: [PATCH net 0/4] mptcp: various fixes
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171807483276.24718.7759930547771829374.git-patchwork-notify@kernel.org>
+ <171807483270.24718.9377090151074860472.git-patchwork-notify@kernel.org>
 Date: Tue, 11 Jun 2024 03:00:32 +0000
-References: <20240607125652.1472540-1-edumazet@google.com>
-In-Reply-To: <20240607125652.1472540-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, ncardwell@google.com, eric.dumazet@gmail.com,
- imagedong@tencent.com
+References: <20240607-upstream-net-20240607-misc-fixes-v1-0-1ab9ddfa3d00@kernel.org>
+In-Reply-To: <20240607-upstream-net-20240607-misc-fixes-v1-0-1ab9ddfa3d00@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ dcaratti@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ stable@vger.kernel.org, cpaasch@apple.com, liyonglong@chinatelecom.cn
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  7 Jun 2024 12:56:52 +0000 you wrote:
-> Due to timer wheel implementation, a timer will usually fire
-> after its schedule.
+On Fri, 07 Jun 2024 17:01:47 +0200 you wrote:
+> The different patches here are some unrelated fixes for MPTCP:
 > 
-> For instance, for HZ=1000, a timeout between 512ms and 4s
-> has a granularity of 64ms.
-> For this range of values, the extra delay could be up to 63ms.
+> - Patch 1 ensures 'snd_una' is initialised on connect in case of MPTCP
+>   fallback to TCP followed by retransmissions before the processing of
+>   any other incoming packets. A fix for v5.9+.
+> 
+> - Patch 2 makes sure the RmAddr MIB counter is incremented, and only
+>   once per ID, upon the reception of a RM_ADDR. A fix for v5.10+.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] tcp: use signed arithmetic in tcp_rtx_probe0_timed_out()
-    https://git.kernel.org/netdev/net/c/36534d3c5453
+  - [net,1/4] mptcp: ensure snd_una is properly initialized on connect
+    https://git.kernel.org/netdev/net/c/8031b58c3a9b
+  - [net,2/4] mptcp: pm: inc RmAddr MIB counter once per RM_ADDR ID
+    https://git.kernel.org/netdev/net/c/6a09788c1a66
+  - [net,3/4] mptcp: pm: update add_addr counters after connect
+    https://git.kernel.org/netdev/net/c/40eec1795cc2
+  - [net,4/4] mailmap: map Geliang's new email address
+    https://git.kernel.org/netdev/net/c/74acb250e103
 
 You are awesome, thank you!
 -- 
