@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-102726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03C91904612
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 23:10:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A97DB904621
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 23:12:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5ED78B2174D
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 21:10:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A67FB1C2356E
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 21:12:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8782B1509A7;
-	Tue, 11 Jun 2024 21:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C29E2152E12;
+	Tue, 11 Jun 2024 21:12:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IVqSm/hz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bBEfZAwa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1043D386;
-	Tue, 11 Jun 2024 21:09:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4427A1514C9;
+	Tue, 11 Jun 2024 21:12:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718140201; cv=none; b=R3YOPgCuV5mmkd3ywFhlKWlx7SBeHAU2iz+ZxUrOXxaoemYTmqLf8M2DogNcZUSG5qI95MrnUrtnBvGRXNnbvz3bnO0veUBHITKoHP7ERvTesH/CqxitLEqeKC0vceJXU2fBLdWdQAely6RALDDNwCiAi1KhyU2+AO9O4iASeNo=
+	t=1718140345; cv=none; b=JeEYMgYfcjsfMuD3SKV7RUMhpIv5zKhKoXuEoFODRa72x1KhmjLohzjvHuwOZZqvid3aA9EKbX3AsloGwY30syvVqE2E7VZvDYLcczJp92cseLHR4h6oPZchmlZhWOSaK9mDwdZJeBOOmNTXokgmgnsDO1pOTRBiTYPfbuDPgqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718140201; c=relaxed/simple;
-	bh=4QWD/NppNlyX7kfge6sQvP4g4K5j5/xtiUKrkX7W3Ic=;
+	s=arc-20240116; t=1718140345; c=relaxed/simple;
+	bh=gABUjaIqxTdKPvs62Zv3vC0020OcVeLRR4OmLvIB1EQ=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Scmf+ntYJTg277czrA+cW9PKb2Sl1GP3h+4+85aTI8BNBFA9M61Q7XgYes95t7c7v4eB+DNvvcVCl923fWSFjTXTTDAI8h1Cnrq25x9PNb3UtD9rHF5ViV9vVh+GCdjllEqZldww5WCvCm6V4lx5/osHVqcwiwJuziCkPLEz7Eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IVqSm/hz; arc=none smtp.client-ip=209.85.219.46
+	 Mime-Version:Content-Type; b=X8IQGK5aEr1Kjipk4vVMfY9b+GOy1Ky9QaVLbW6uNkXcGw6V6mo2AvXj53HQofWM+f+ARcfVjLDNJ/VtZ1SR6EofrQR/HanyYZ4tSmZi1HW5vsFoAqxzqJ48wnIIu8lKpRSwDHuK2pCBwXDir2tafHBLEX2ivwVtlYjsMy0uQSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bBEfZAwa; arc=none smtp.client-ip=209.85.210.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6b064841f81so39483846d6.1;
-        Tue, 11 Jun 2024 14:09:59 -0700 (PDT)
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6f96445cfaeso860223a34.2;
+        Tue, 11 Jun 2024 14:12:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718140199; x=1718744999; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1718140343; x=1718745143; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WNqy5Cf+UvpKzNVGMgI/JNd9dLFs+0wN96hFCPZnkT0=;
-        b=IVqSm/hzfkMAVhY5t1RALPPjdWR2X1jfZpooiv49mRRA0+2Tjmkbi3BxnRJF73YURA
-         drUMkU3Cev51C4IfpYvPPHfl/MA7aP0oTshJhWzWGM9Xf/4MOPB+CEl9ZCmb2KPCWRoH
-         VeP4trQMGBw0cLimFCB6tWDRPMINE4a8n148wDsrUZlOaHshorDY+ManWWk/wo0ZezlL
-         08JpoJXC3BebUScXwCRV6QnFJHdJYSBOFYRyxOgnSFYy3ellFRNyzBqYmw6qODfOBhy8
-         ruJedRP6LOiSR+ZzguqT6vIKK2Gf5D+sHm0D7JAZjxhqK4EStE0sHxWzFruWAjwB6lP3
-         taNA==
+        bh=4f8iA+BT0JdT+xCtVM5QIlFnTXVcaJHgvzWFas2qCZg=;
+        b=bBEfZAwayXI43Dgf4xeZS/XGBkdG4fVLTP2oj8dcQSdUJIdHGS3elwcNLqMVFKUdrL
+         5OskYjKynca2cMD/P+2K5prcgCzvIrMuA7+OxaQ1DVLN5oyMGa3ZqHv0DPxVZYtKuTDW
+         vRe50bCB3JPK2tIwBOvFSUoF+Mo5FXJalpeDIWt9soONGCjmJC1HVs5g+Q0D5o/b5EEb
+         jZwH0xJxiDOCGyVB4VZKnfNO9jcY/iqEba3T7/1Wt4tyFol0h2HSAzXdwfO7STWmsrwH
+         Bh5DR8e3HZeBbcomWMLZSwNwsRflWacKgOdN9MluSBEx95gavPbxV8X3kgi3rrhNm3WO
+         c8Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718140199; x=1718744999;
+        d=1e100.net; s=20230601; t=1718140343; x=1718745143;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=WNqy5Cf+UvpKzNVGMgI/JNd9dLFs+0wN96hFCPZnkT0=;
-        b=w0eana4M55Y2Y4Wpqc+kFW8BncOMFI+PJd1x6RETPitFANHJpivipT7oHb2VM+3Z3J
-         ADm4iHXMn1j4aG9yx19TXn55Z9vYGLC1qrCUinqhekBI2JI0mpqqg4s83f8GvT9K9V1M
-         DxxZGeC7Pk507lshktD+bOUOZgf/dsq/evbGH3Ede8VodVldp7tPEDSWxtgZEZ/V6XKz
-         /axup9paRwzjXbyYLnbPIH4NKH6fUvbequZ+zk40eNGy1b2TEPrE/DCI/kH299Wjg4hc
-         dwDk1xa7wuL0zpp+7QkPL19PjVAiU7dTQUAYRAdjMQZAhssCbIGTC9QsxSKJk+GKOdQ3
-         qEiA==
-X-Forwarded-Encrypted: i=1; AJvYcCWVL0wt9B+hLIyebuENDDLmw58EvTOfgkC358xWbKa8k1ohMFEsWfI3aBlPdjIDPLk5TCgiX4Ap46smDtKAzQKD2F6Mvh07UA4apPKb5lo5GFZK92VnoFAcMg7f
-X-Gm-Message-State: AOJu0YxLgG06Egel/r9FR15BCmZq5uxkVgm0wiwvGlgcuVyMw4GkhVaf
-	NXlQb5wIEgac0FsROj0xXQsyuG0MhkClrMBe+XohU97766uk15/iMCFHaA==
-X-Google-Smtp-Source: AGHT+IE5n9M5AmO+QBXgKWiCE2fo+MQpN9ryEyWphAUtUzvL9xfJqlmPoAJul+vNPrE4FBjfL5DzDg==
-X-Received: by 2002:a05:6214:318c:b0:6b0:9479:cdd7 with SMTP id 6a1803df08f44-6b09479cf95mr3335326d6.54.1718140198955;
-        Tue, 11 Jun 2024 14:09:58 -0700 (PDT)
+        bh=4f8iA+BT0JdT+xCtVM5QIlFnTXVcaJHgvzWFas2qCZg=;
+        b=oiVwJXesg3Z8m+du4roFmoS49kCEHY6v6CkV5Q66NIQ/kOIb5BoExlbScRXFrwcuqL
+         R/L+jlzSZaZJJ1MaQqBHKU4FYtF1K5NnUs7dzoGV2mWVokSBqzDbdu+jT68/QWwqpyop
+         DmGOey09DZD5IzDVrnQrYVq4zuAmvApQ70UB55QB/NX4QxSrPNbNLxqz/zVCeck2VMtx
+         Xc4DfH7hFSNQtdCnb9hmThstEUSm3gXmLzOAv/2ilftZgCSQkMZmjJQqfysX43CLo41R
+         Ol7wWS/V4rO9Q4Uj6LOKmnsRUGH3bT6LzSu78kr2FxEACJ+o+tTdRIgwLFbVRyO4ffEp
+         Brjg==
+X-Forwarded-Encrypted: i=1; AJvYcCWyORBladBTqxhWRVg4d5UCRo4Tti+xZOJrYceW4C1F153LhZRwtaZMGpBauhEs74+/Aej+77b5rDKOGCIh4cjT8b4n+GwC0mGVMmbZyZF5OPlsyY1eB5b0uBpJ
+X-Gm-Message-State: AOJu0Yyzedx+ZOHeV1P08A1vjy0dEcEJVun+d44Pmjsrkbcfu9RVl+jg
+	t8NRzQEjQeAh+duWoBGLNJ98NZmv4l+RwiQHjkfScHJKq7s+ly8c
+X-Google-Smtp-Source: AGHT+IEPlAD1O1VAe7Ad0WITLf8o8k5Jdn+TEIdSksTF8DDGfXFYOIyOMNIzrDppvgei50u3oBnRNw==
+X-Received: by 2002:a05:6830:1541:b0:6f9:a479:d160 with SMTP id 46e09a7af769-6f9a479d405mr8766328a34.25.1718140343222;
+        Tue, 11 Jun 2024 14:12:23 -0700 (PDT)
 Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b091670069sm5754776d6.96.2024.06.11.14.09.58
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7977e0eb111sm188859285a.89.2024.06.11.14.12.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jun 2024 14:09:58 -0700 (PDT)
-Date: Tue, 11 Jun 2024 17:09:58 -0400
+        Tue, 11 Jun 2024 14:12:22 -0700 (PDT)
+Date: Tue, 11 Jun 2024 17:12:22 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: YiFei Zhu <zhuyifei@google.com>, 
  netdev@vger.kernel.org, 
@@ -85,12 +85,12 @@ Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
  Andrii Nakryiko <andrii@kernel.org>, 
  Stanislav Fomichev <sdf@google.com>, 
  Willem de Bruijn <willemb@google.com>
-Message-ID: <6668bd2632a87_f6b0e294fd@willemb.c.googlers.com.notmuch>
-In-Reply-To: <8501fbbb7c61b62844c2f7e7fa5d7be3ee3aa259.1718138187.git.zhuyifei@google.com>
+Message-ID: <6668bdb68eaf5_f6b0e29416@willemb.c.googlers.com.notmuch>
+In-Reply-To: <a932c40e59f648d9d2771f9533cbc01cd4c0935c.1718138187.git.zhuyifei@google.com>
 References: <cover.1718138187.git.zhuyifei@google.com>
- <8501fbbb7c61b62844c2f7e7fa5d7be3ee3aa259.1718138187.git.zhuyifei@google.com>
-Subject: Re: [RFC PATCH net-next 3/3] selftests: drv-net: Add xsk_hw AF_XDP
- functionality test
+ <a932c40e59f648d9d2771f9533cbc01cd4c0935c.1718138187.git.zhuyifei@google.com>
+Subject: Re: [RFC PATCH net-next 1/3] selftests/bpf: Move rxq_num helper from
+ xdp_hw_metadata to network_helpers
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,23 +102,39 @@ Content-Type: text/plain;
 Content-Transfer-Encoding: 7bit
 
 YiFei Zhu wrote:
-> Run tools/testing/selftest/bpf/xsk_hw.c as part of drv-net.
+> This helper may be useful for other AF_XDP tests, such as xsk_hw.
+> Moving it out so we don't need to copy-paste that function.
 > 
-> A matrix of TX/RX, copy/zerocopy, and driver mode / skb mode, are
-> tested. Additionally, it tests some edge cases such as:
-> - Zerocopy TX with and without attaching an XDP prog.
-> - Zerocopy RX where binding happens before fillq gets filled.
-> 
-> TX and RX are tested separately, and the remote side always runs
-> the basic AF_PACKET handler rather than AF_XDP, in order to
-> isolate potential causes of test failures.
-> 
-> Currently the next-hop MAC address of each side must be manually
-> specified via LOCAL_NEXTHOP_MAC & REMOTE_NEXTHOP_MAC. It's probably
-> doable to detect these addresses automatically, but it's future work,
-> and probably library code since it is also applicable to csum.py.
+> I also changed the function from directly calling error(1, errno, ...)
+> to returning an error because I don't think it makes sense for a
+> library function to outright kill the process if the function fails.
 > 
 > Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+> ---
+>  tools/testing/selftests/bpf/network_helpers.c | 27 +++++++++++++++++++
+>  tools/testing/selftests/bpf/network_helpers.h |  2 ++
+>  tools/testing/selftests/bpf/xdp_hw_metadata.c | 27 ++-----------------
+>  3 files changed, 31 insertions(+), 25 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/bpf/network_helpers.c b/tools/testing/selftests/bpf/network_helpers.c
+> index 35250e6cde7f..4c3bef07df23 100644
+> --- a/tools/testing/selftests/bpf/network_helpers.c
+> +++ b/tools/testing/selftests/bpf/network_helpers.c
+> @@ -569,6 +569,33 @@ int set_hw_ring_size(char *ifname, struct ethtool_ringparam *ring_param)
+>  	return 0;
+>  }
+>  
+> +int rxq_num(const char *ifname)
+> +{
+> +	struct ethtool_channels ch = {
+> +		.cmd = ETHTOOL_GCHANNELS,
+> +	};
+> +	struct ifreq ifr = {
+> +		.ifr_data = (void *)&ch,
+> +	};
+> +	strncpy(ifr.ifr_name, ifname, IF_NAMESIZE - 1);
+> +	int fd, ret, err;
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Since sending this as RFC, when sending for inclusion let's move the
+strncpy, to not mix declarations and code.
 
