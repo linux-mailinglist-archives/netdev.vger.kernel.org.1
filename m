@@ -1,77 +1,78 @@
-Return-Path: <netdev+bounces-102427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C646E902E75
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 04:35:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8703902E84
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 04:40:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B0A31F23602
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 02:35:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED9421C214C4
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 02:40:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A394516F851;
-	Tue, 11 Jun 2024 02:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7D7116F851;
+	Tue, 11 Jun 2024 02:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/fylYEa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dfv6epNU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1C314F9FA;
-	Tue, 11 Jun 2024 02:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30DD15B0E2
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 02:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718073337; cv=none; b=PqV4NBhQYUvQ9MoPj4VQDcoau4NX0ozD5irXTGdnGp7qzVgmxbPPLQQ6XJ5sBmXFFAAXzwIaCVdLSL/UkDngjj0iS57NUQhzIUzVd1kVccCiq6mQ1+KQ6QL5LtGl/V9mc0wpkFVLTi/8+60PU5icgl/slxwacyHnJe13uziFNGk=
+	t=1718073623; cv=none; b=NiUMAGVqdUVMgg6ZTv3cJwY7AG32MQaysaTv9nHtV0UZQlCjD3RWLy5FwOBfwZP+HLx/fUJdCBTEDBe2yeZHf2iQSU8Rf9bFow944BYuEjh2LAf+6jLg0ro+2Jr0rSevr2qQab6moKa6MTApxl46HXkRD+TSMQb/SO2O/mhP6iE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718073337; c=relaxed/simple;
-	bh=UEyJAU3xAHorFHFJPY+I2aNVPhcLs0v3TggMBQJLdbA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VdqQkk5fNc7bG1OjhxAsAQET/b5/AYoQqkiha6h8cQcJG96Yma6uR5DOx3vOdYtl30PdrdYUjN7V/G5pMwknU+1VFKTiJDFoZnaGEJ9SR42+mQTbKrFOfXaazHgsXbxw8Jf+Yjp71rUkd8+IIUxC7EzWHG2EwYgxqffRY3skC5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/fylYEa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AFCBC2BBFC;
-	Tue, 11 Jun 2024 02:35:36 +0000 (UTC)
+	s=arc-20240116; t=1718073623; c=relaxed/simple;
+	bh=+ixkNcnnLiL7Y/7zHd/QgiMB4jGXEiiaajDFdPUs1XA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IjDDrCXq2D0nb6nhs0Y/53/LVojT+eXTQAC4hKItVY3Gp0YDV6gA/TYZ7NQbEw/opXjDH90vdlmfNkDANisp5lc4/lnQz5eoO/aUSPZhhSYs6Q3xObYCnI5hez1VZms91H/YhmUJTGCv38MQknd4HmMPSCGVqSx5+lkPx5Z9c9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dfv6epNU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC5BEC2BBFC;
+	Tue, 11 Jun 2024 02:40:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718073337;
-	bh=UEyJAU3xAHorFHFJPY+I2aNVPhcLs0v3TggMBQJLdbA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D/fylYEaA+X7RmWFqb1Q0J/YL7XZ/EN5IFNe1FqaQ2h21xLBBfXKfq5DItML8sNNE
-	 X898cpi0V9eBbKlo3Rd4XzHgGHxKIk2LJfp0Ixr1mZNmN5nWjFC9OosjZ53Zf5/qk+
-	 ffRfEOKJr6bS3f0IhaJiNK1H8RSfc74cunEF7hKmxRWmAMa9BloiloF2Zx0lEI5+rJ
-	 mFnEUlzr2IkVvDjlQPYxIoUvZxNqUHtoRIxVX6FD/AbEXmIgukjdm4BrqT1btrUmf+
-	 Xdm2E31z/D02oY/xt7grwGpI3ebcO4Rx5XpCXt+E/mwztzD5sRC324ITW7FgJ9xYKJ
-	 yYL9/cb3M65eA==
-Date: Mon, 10 Jun 2024 19:35:35 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joshua Washington <joshwash@google.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, stable@kernel.org, Praveen
- Kaligineedi <pkaligineedi@google.com>, Harshitha Ramamurthy
- <hramamurthy@google.com>, Willem de Bruijn <willemb@google.com>, Eric
- Dumazet <edumazet@google.com>, Andrei Vagin <avagin@gmail.com>, Jeroen de
- Borst <jeroendb@google.com>, Shailend Chand <shailend@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Rushil Gupta <rushilg@google.com>, Catherine
- Sullivan <csully@google.com>, Bailey Forrest <bcf@google.com>, open list
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v3] gve: ignore nonrelevant GSO type bits when
- processing TSO headers
-Message-ID: <20240610193535.31fcef71@kernel.org>
-In-Reply-To: <CALuQH+UtX2xqDCghHqPBckzC4k-GGi58NmOd4FNfeqOr+C4jWw@mail.gmail.com>
-References: <20240607060958.2789886-1-joshwash@google.com>
-	<20240610225729.2985343-1-joshwash@google.com>
-	<20240610172720.073d5912@kernel.org>
-	<CALuQH+UtX2xqDCghHqPBckzC4k-GGi58NmOd4FNfeqOr+C4jWw@mail.gmail.com>
+	s=k20201202; t=1718073623;
+	bh=+ixkNcnnLiL7Y/7zHd/QgiMB4jGXEiiaajDFdPUs1XA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=dfv6epNUllUN47+Fx8s7UxNEq749QJSkqAsXCElSPj/sWKonwq3FWF3nq2inGdShy
+	 zLiX9oufMOdvIdALGr28z57UXI+B748fMqtPHvmK0vGx9/K6SC+Zb71zRxSmpcvfQV
+	 A2P+yp2xiEaVq9I60Ht6+2eYD8OkGelXI8nP5UpaY+3M1tCZBnuTfOJDeiNwVotFUr
+	 pXfCuNx9FtDvPY222Gu23GpnOmUUeIoTRVJHENqQaR0Cr/CRF7cSzf8jfoUQnoIzIy
+	 eR6FLhTk+PATFI76ApxnnMPQ6110f57oXVcTe1woo++XiEj+kWsVWgj4JA7Kexwscv
+	 PTsNXsGLujNNQ==
+Message-ID: <e6617dc1-6b34-49f7-8637-f3b150318ae3@kernel.org>
+Date: Mon, 10 Jun 2024 20:40:21 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 0/3] bnxt_en: implement netdev_queue_mgmt_ops
+Content-Language: en-US
+To: David Wei <dw@davidwei.uk>, Michael Chan <michael.chan@broadcom.com>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Adrian Alvarado <adrian.alvarado@broadcom.com>,
+ Somnath Kotur <somnath.kotur@broadcom.com>, netdev@vger.kernel.org
+Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+References: <20240611023324.1485426-1-dw@davidwei.uk>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240611023324.1485426-1-dw@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Mon, 10 Jun 2024 19:26:32 -0700 Joshua Washington wrote:
-> My apologies. I'll send an updated patch tomorrow without --in-reply-to.
+On 6/10/24 8:33 PM, David Wei wrote:
+> Implement netdev_queue_mgmt_ops for bnxt added in [1]. This will be used
+> in the io_uring ZC Rx patchset to configure queues with a custom page
+> pool w/ a special memory provider for zero copy support.
+> 
 
-No need, it's still in patchwork, it was just a note for the future.
-I should have made that more clear, I realized that after hitting send.
+
+I do not see it explicitly called out, so asking here: does this change
+enable / require header split if using memory from this "special memory
+provider"?
 
