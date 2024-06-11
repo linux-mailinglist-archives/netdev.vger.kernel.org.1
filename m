@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-102447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7B8F902FB4
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 06:54:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0AA6902FB5
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 06:54:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9EF91C22F7B
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 04:54:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 302261F23874
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 04:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52CFB17106B;
-	Tue, 11 Jun 2024 04:54:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA48282E2;
+	Tue, 11 Jun 2024 04:54:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XAeyaxsU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m18eBkcg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D60170833
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 04:54:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ECAE170835
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 04:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718081647; cv=none; b=RxobicejpcmjPcdARb/qKBRyw6sT2YNz1NPIIiRGLcDWbgmJ0H1XVhnrikF8dtEjMCl7k9buWQvl4x4krLZTcUEXm7Lu1/jp0uKSFAfl3XJw4D2AqfEZQCCWLbpTZiAQEZiiEAqbG5OI7bEmKWGPz47pIQVhEyT0TrgQNtLz7YU=
+	t=1718081649; cv=none; b=JkQfsdxDUdxRazL4J0/qIHZ0IGm8KEr5dMHrCkVpTssg88AbVGB8maDX7P83FvYau+Y6dyn2X6QVU66T1WM82nONguiQZA+6qR7q+T06Kwgrpn7cKoep4O3rz6dEH8UmJtcO10B/48L5CeFRBC8cDp5oEL5L8zvHgwC9g0hbt54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718081647; c=relaxed/simple;
-	bh=BOYb54PHFn7BKH+jbU8GaQYL/d8ZY5V0HZ+UnPO0vv8=;
+	s=arc-20240116; t=1718081649; c=relaxed/simple;
+	bh=AAOXOuEpeM4K2+i6FURICGO8eSMG07ritt8TaR8PT/k=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FWt7hh0jZQ74PMYsnSzjpB1TYGzNwKFkJHlSFdqeUCVa9dl+uER3jVWM7FATjr8QfNsLRe4MKxBYkDabg8BxGAldsCLDDz+CV9wiZs6/L3NOY5lmEwfpgxmp7CHgAHf6pY6ABq8ZoNDzOzp0tJR2Oart8tai2z/mm03t6Lvk5QM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XAeyaxsU; arc=none smtp.client-ip=209.85.215.181
+	 MIME-Version; b=uSH/cud8et/U6e666XH+yKUgWyzMEhWmOW/INd9OVJZNkMvTKT8hfZvqaZWtEJufh053R+LOqhGadMPFBdNMmsxl6CZ2dQTAKk9xX+tIP8k3H7HaeMgmceZSdmdVZxdIiq9JFUOpqFBzomzk7A4QvspMZAJNiZxOE46Vn86tBhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m18eBkcg; arc=none smtp.client-ip=209.85.215.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-6c386a3ac43so409815a12.0
-        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 21:54:05 -0700 (PDT)
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-6c386a3ac43so409825a12.0
+        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 21:54:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718081645; x=1718686445; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1718081647; x=1718686447; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0Tpc2Q6ZjqGL9g+UmfnY7aZLsYjERMcmCF7JFhuPKTw=;
-        b=XAeyaxsUBGJBmCdJnsH4J7RI6FPxnktYeUF66sOm0mAiSGvYjhXEAtyKYOF/XAcztn
-         Y9Ap3g3niSlASVNRYS7nTsLcG9LbckwbQ0V0IZ/Y6FinTt6P9oHWH5DWRADQPatTj+8/
-         Qf/0lmexKcxZXcmukPdbLYFVC3uvLo3KGUgxIZU7jiaJMVUK5L91pHspuNKn0tOato/q
-         D6cBxbABmWlO/nVl6RHC6f+88WARSUDMuhPvcz0jdhWdr+Iy34MxIfV64IgEn70dNib1
-         RfXSlvG1sk0v48wXB1M1OASOhbAwJiwOzmmelOpB3zh3xtYoWBJzkObYVOOVLSEvH1R+
-         bE6A==
+        bh=Xi5/Akgz/e9h4LBMPcyMNUb1rss4AyQ47VlNREsyjtU=;
+        b=m18eBkcgbbvHDMev/NL387duzRbZT2lXwDaNZSB2tb7hErQHuCP6huREPwAbD80xrf
+         BsH8WBBWoujAErs4HYo0PkkcZfR0RkHaLrsyz8Aba+E5Euho0TLe8oIhM2CPkJfQQIgV
+         mWqjX4uNATopL/7BO0c9aGfcib3eWiJIKSFOpG+oqz81DizyK1KmQW7ATjLxLcHni/9u
+         ERD51Rk8z9c/IvkLE34fwA8Undzp+10xnozbCqxLgKexkklWhCbjaivCMIYykiumiJX4
+         HnAGO8WccL49Ei+ELrpWhy8a3f3ulab+ArFLMPr1wBo2M13BJF2+jKr8FeOIj/ZtpXrq
+         VMWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718081645; x=1718686445;
+        d=1e100.net; s=20230601; t=1718081647; x=1718686447;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0Tpc2Q6ZjqGL9g+UmfnY7aZLsYjERMcmCF7JFhuPKTw=;
-        b=O+hJXW8Y2gMCSyBw6Gmy567yEZCKx8d6HKBWRyL3zB7Jh91L6jvuO76YibD1gIL0gJ
-         yrrIML4aQYdrzOIlLpziXEh3BLtnpJNQk/42BcwKD8VRJH4eNPiW61fsMuXTJ9EdOIHK
-         FNXm7xEhcBJuO6FUMf5dN1TYjt1cW7uCEkL0kTTHJHS4Vy0QqNpf3Z2qm6iwtRcdsh5F
-         SXOEQTI3Ht9jSX1/ZP6kALLF46OzUg2sHnyaPZrhbO/w3z/DBX4jyFW2YtefCd27UEiP
-         zkTIxPNrsvBoF/UcGlJ3D3H7SZQ5Xa4d4fuRst15y7BW5pFAOnyFUb2ldW1DX63LYpfS
-         W4lw==
-X-Gm-Message-State: AOJu0YxQxnTtq4xjK8JeAXnU7y4GKbxxHs+v8fhJHu45C40VXFWNaw0L
-	i2TPiP+bmDgXVqsNwrOykse7dnRW//kdTQ4WktwPEK2gysdtYwfs365fqnHh
-X-Google-Smtp-Source: AGHT+IHZtnEZwcDsTBHYGQ8QFgqk8ybo/oq91cuCqcocLPVIA0+DEddvbxjVY2bHLBeAPSA1gdWuuQ==
-X-Received: by 2002:a05:6a21:3394:b0:1b4:4ed4:91f5 with SMTP id adf61e73a8af0-1b44ed49437mr11520734637.6.1718081644671;
-        Mon, 10 Jun 2024 21:54:04 -0700 (PDT)
+        bh=Xi5/Akgz/e9h4LBMPcyMNUb1rss4AyQ47VlNREsyjtU=;
+        b=GCvYUQqOti6RRthOBP5OnaJYMm+G/BzJ77Ul4T+kE2N1vl4JrTMNNDwSnnEggntAnT
+         l1yHlydD1vOlDI5+7PAkCpg3KII9RBIJNGA56Tr4U/kpbOuGhzTCUQyCNh6W30Ug5wLc
+         RfgOlk8B6TVHdhqvjEjQr3hI3sUxWtISBG2teW1D0vSvtDbK4JGnE1CThTsmiRcft1aR
+         u2warIhWUTebvjMXCXBH7tqrTbkUvLriMg7414ldg4TzCP+SKlfCEdKKHhYJuLOEYXHk
+         VnAMuUJIprK1rEqGymixGiR98S30pGPpBCb9Y1GxQ+O9m7EY0zireu3w0xyfUCtSPSwl
+         Wfnw==
+X-Gm-Message-State: AOJu0YzG1Kjxeits8Gt4r6XO7Hch9VlAgW1sjPjxDK1nivPwgT+z1Voa
+	Vx4mfk1cvGCcMn6+94j6VW62uKps4kMtVBWnS2JOgTzt3Oqqjnmxr907HEan
+X-Google-Smtp-Source: AGHT+IGuSz+ds2voDMu956y5BlQSoz7OITeKZGJ++fr+pZy7Ouo5/5YuR67mBhQefIUKgifjBcUUuw==
+X-Received: by 2002:a05:6a21:9991:b0:1b4:5605:ddf3 with SMTP id adf61e73a8af0-1b45605e209mr11787106637.4.1718081647414;
+        Mon, 10 Jun 2024 21:54:07 -0700 (PDT)
 Received: from rpi.. (p5261226-ipxg23801hodogaya.kanagawa.ocn.ne.jp. [180.15.241.226])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c31bb3c141sm1967277a91.10.2024.06.10.21.54.02
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c31bb3c141sm1967277a91.10.2024.06.10.21.54.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jun 2024 21:54:04 -0700 (PDT)
+        Mon, 10 Jun 2024 21:54:07 -0700 (PDT)
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -77,9 +77,9 @@ Cc: andrew@lunn.ch,
 	hfdevel@gmx.net,
 	naveenm@marvell.com,
 	jdamato@fastly.com
-Subject: [PATCH net-next v10 6/7] net: tn40xx: add mdio bus support
-Date: Tue, 11 Jun 2024 13:52:16 +0900
-Message-Id: <20240611045217.78529-7-fujita.tomonori@gmail.com>
+Subject: [PATCH net-next v10 7/7] net: tn40xx: add phylink support
+Date: Tue, 11 Jun 2024 13:52:17 +0900
+Message-Id: <20240611045217.78529-8-fujita.tomonori@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240611045217.78529-1-fujita.tomonori@gmail.com>
 References: <20240611045217.78529-1-fujita.tomonori@gmail.com>
@@ -91,54 +91,182 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch adds supports for mdio bus. A later path adds PHYLIB
-support on the top of this.
+This patch adds supports for multiple PHY hardware with phylink. The
+adapters with TN40xx chips use multiple PHY hardware; AMCC QT2025, TI
+TLK10232, Aqrate AQR105, and Marvell 88X3120, 88X3310, and MV88E2010.
+
+For now, the PCI ID table of this driver enables adapters using only
+QT2025 PHY. I've tested this driver and the QT2025 PHY driver (SFP+
+10G SR) with Edimax EN-9320 10G adapter.
 
 Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Reviewed-by: Hans-Frieder Vogt <hfdevel@gmx.net>
 ---
- drivers/net/ethernet/tehuti/Makefile    |   2 +-
- drivers/net/ethernet/tehuti/tn40.h      |   4 +
- drivers/net/ethernet/tehuti/tn40_mdio.c | 142 ++++++++++++++++++++++++
- 3 files changed, 147 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/tehuti/tn40_mdio.c
+ drivers/net/ethernet/tehuti/Kconfig    |  1 +
+ drivers/net/ethernet/tehuti/Makefile   |  2 +-
+ drivers/net/ethernet/tehuti/tn40.c     | 31 ++++++++++-
+ drivers/net/ethernet/tehuti/tn40.h     |  8 +++
+ drivers/net/ethernet/tehuti/tn40_phy.c | 76 ++++++++++++++++++++++++++
+ 5 files changed, 114 insertions(+), 4 deletions(-)
+ create mode 100644 drivers/net/ethernet/tehuti/tn40_phy.c
 
+diff --git a/drivers/net/ethernet/tehuti/Kconfig b/drivers/net/ethernet/tehuti/Kconfig
+index 2b3b5a8c7fbf..6db2c9817445 100644
+--- a/drivers/net/ethernet/tehuti/Kconfig
++++ b/drivers/net/ethernet/tehuti/Kconfig
+@@ -28,6 +28,7 @@ config TEHUTI_TN40
+ 	depends on PCI
+ 	select PAGE_POOL
+ 	select FW_LOADER
++	select PHYLINK
+ 	help
+ 	  This driver supports 10G Ethernet adapters using Tehuti Networks
+ 	  TN40xx chips. Currently, adapters with Applied Micro Circuits
 diff --git a/drivers/net/ethernet/tehuti/Makefile b/drivers/net/ethernet/tehuti/Makefile
-index 1c468d99e476..7a0fe586a243 100644
+index 7a0fe586a243..0d4f4d63a65c 100644
 --- a/drivers/net/ethernet/tehuti/Makefile
 +++ b/drivers/net/ethernet/tehuti/Makefile
 @@ -5,5 +5,5 @@
  
  obj-$(CONFIG_TEHUTI) += tehuti.o
  
--tn40xx-y := tn40.o
-+tn40xx-y := tn40.o tn40_mdio.o
+-tn40xx-y := tn40.o tn40_mdio.o
++tn40xx-y := tn40.o tn40_mdio.o tn40_phy.o
  obj-$(CONFIG_TEHUTI_TN40) += tn40xx.o
+diff --git a/drivers/net/ethernet/tehuti/tn40.c b/drivers/net/ethernet/tehuti/tn40.c
+index 3ffac217c9df..5a5aa6885dc0 100644
+--- a/drivers/net/ethernet/tehuti/tn40.c
++++ b/drivers/net/ethernet/tehuti/tn40.c
+@@ -7,6 +7,7 @@
+ #include <linux/if_vlan.h>
+ #include <linux/netdevice.h>
+ #include <linux/pci.h>
++#include <linux/phylink.h>
+ #include <linux/vmalloc.h>
+ #include <net/page_pool/helpers.h>
+ 
+@@ -942,7 +943,7 @@ static void tn40_tx_push_desc_safe(struct tn40_priv *priv, void *data, int size)
+ 	}
+ }
+ 
+-static int tn40_set_link_speed(struct tn40_priv *priv, u32 speed)
++int tn40_set_link_speed(struct tn40_priv *priv, u32 speed)
+ {
+ 	u32 val;
+ 	int i;
+@@ -1373,6 +1374,9 @@ static int tn40_close(struct net_device *ndev)
+ {
+ 	struct tn40_priv *priv = netdev_priv(ndev);
+ 
++	phylink_stop(priv->phylink);
++	phylink_disconnect_phy(priv->phylink);
++
+ 	napi_disable(&priv->napi);
+ 	netif_napi_del(&priv->napi);
+ 	tn40_stop(priv);
+@@ -1384,13 +1388,20 @@ static int tn40_open(struct net_device *dev)
+ 	struct tn40_priv *priv = netdev_priv(dev);
+ 	int ret;
+ 
++	ret = phylink_connect_phy(priv->phylink, priv->phydev);
++	if (ret) {
++		netdev_err(dev, "failed to connect to phy %d\n", ret);
++		return ret;
++	}
+ 	tn40_sw_reset(priv);
+ 	ret = tn40_start(priv);
+ 	if (ret) {
++		phylink_disconnect_phy(priv->phylink);
+ 		netdev_err(dev, "failed to start %d\n", ret);
+ 		return ret;
+ 	}
+ 	napi_enable(&priv->napi);
++	phylink_start(priv->phylink);
+ 	netif_start_queue(priv->ndev);
+ 	return 0;
+ }
+@@ -1667,6 +1678,12 @@ static int tn40_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto err_unset_drvdata;
+ 	}
+ 
++	ret = tn40_mdiobus_init(priv);
++	if (ret) {
++		dev_err(&pdev->dev, "failed to initialize mdio bus.\n");
++		goto err_free_irq;
++	}
++
+ 	priv->stats_flag =
+ 		((tn40_read_reg(priv, TN40_FPGA_VER) & 0xFFF) != 308);
+ 
+@@ -1675,19 +1692,26 @@ static int tn40_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		TN40_IR_TMR1;
+ 
+ 	tn40_mac_init(priv);
++	ret = tn40_phy_register(priv);
++	if (ret) {
++		dev_err(&pdev->dev, "failed to set up PHY.\n");
++		goto err_free_irq;
++	}
+ 
+ 	ret = tn40_priv_init(priv);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "failed to initialize tn40_priv.\n");
+-		goto err_free_irq;
++		goto err_unregister_phydev;
+ 	}
+ 
+ 	ret = register_netdev(ndev);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "failed to register netdev.\n");
+-		goto err_free_irq;
++		goto err_unregister_phydev;
+ 	}
+ 	return 0;
++err_unregister_phydev:
++	tn40_phy_unregister(priv);
+ err_free_irq:
+ 	pci_free_irq_vectors(pdev);
+ err_unset_drvdata:
+@@ -1708,6 +1732,7 @@ static void tn40_remove(struct pci_dev *pdev)
+ 
+ 	unregister_netdev(ndev);
+ 
++	tn40_phy_unregister(priv);
+ 	pci_free_irq_vectors(priv->pdev);
+ 	pci_set_drvdata(pdev, NULL);
+ 	iounmap(priv->regs);
 diff --git a/drivers/net/ethernet/tehuti/tn40.h b/drivers/net/ethernet/tehuti/tn40.h
-index f8091a1e817e..4c604c871993 100644
+index 4c604c871993..9aa4fd2f5227 100644
 --- a/drivers/net/ethernet/tehuti/tn40.h
 +++ b/drivers/net/ethernet/tehuti/tn40.h
-@@ -139,6 +139,8 @@ struct tn40_priv {
- 	u32 b0_len;
- 	dma_addr_t b0_dma; /* Physical address of buffer */
+@@ -141,6 +141,9 @@ struct tn40_priv {
  	char *b0_va; /* Virtual address of buffer */
-+
-+	struct mii_bus *mdio;
+ 
+ 	struct mii_bus *mdio;
++	struct phy_device *phydev;
++	struct phylink *phylink;
++	struct phylink_config phylink_config;
  };
  
  /* RX FREE descriptor - 64bit */
-@@ -216,4 +218,6 @@ static inline void tn40_write_reg(struct tn40_priv *priv, u32 reg, u32 val)
+@@ -218,6 +221,11 @@ static inline void tn40_write_reg(struct tn40_priv *priv, u32 reg, u32 val)
  	writel(val, priv->regs + reg);
  }
  
-+int tn40_mdiobus_init(struct tn40_priv *priv);
++int tn40_set_link_speed(struct tn40_priv *priv, u32 speed);
++
+ int tn40_mdiobus_init(struct tn40_priv *priv);
+ 
++int tn40_phy_register(struct tn40_priv *priv);
++void tn40_phy_unregister(struct tn40_priv *priv);
 +
  #endif /* _TN40XX_H */
-diff --git a/drivers/net/ethernet/tehuti/tn40_mdio.c b/drivers/net/ethernet/tehuti/tn40_mdio.c
+diff --git a/drivers/net/ethernet/tehuti/tn40_phy.c b/drivers/net/ethernet/tehuti/tn40_phy.c
 new file mode 100644
-index 000000000000..af18615d64a8
+index 000000000000..39eef7ca7958
 --- /dev/null
-+++ b/drivers/net/ethernet/tehuti/tn40_mdio.c
-@@ -0,0 +1,142 @@
++++ b/drivers/net/ethernet/tehuti/tn40_phy.c
+@@ -0,0 +1,76 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/* Copyright (c) Tehuti Networks Ltd. */
 +
@@ -148,138 +276,72 @@ index 000000000000..af18615d64a8
 +
 +#include "tn40.h"
 +
-+#define TN40_MDIO_DEVAD_MASK GENMASK(4, 0)
-+#define TN40_MDIO_PRTAD_MASK GENMASK(9, 5)
-+#define TN40_MDIO_CMD_VAL(device, port)			\
-+	(FIELD_PREP(TN40_MDIO_DEVAD_MASK, (device)) |	\
-+	 (FIELD_PREP(TN40_MDIO_PRTAD_MASK, (port))))
-+#define TN40_MDIO_CMD_READ BIT(15)
-+
-+static void tn40_mdio_set_speed(struct tn40_priv *priv, u32 speed)
++static struct tn40_priv *tn40_config_to_priv(struct phylink_config *config)
 +{
-+	void __iomem *regs = priv->regs;
-+	int mdio_cfg;
-+
-+	if (speed == TN40_MDIO_SPEED_1MHZ)
-+		mdio_cfg = (0x7d << 7) | 0x08;	/* 1MHz */
-+	else
-+		mdio_cfg = 0xA08;	/* 6MHz */
-+	mdio_cfg |= (1 << 6);
-+	writel(mdio_cfg, regs + TN40_REG_MDIO_CMD_STAT);
-+	msleep(100);
++	return container_of(config, struct tn40_priv, phylink_config);
 +}
 +
-+static u32 tn40_mdio_stat(struct tn40_priv *priv)
++static void tn40_link_up(struct phylink_config *config, struct phy_device *phy,
++			 unsigned int mode, phy_interface_t interface,
++			 int speed, int duplex, bool tx_pause, bool rx_pause)
 +{
-+	void __iomem *regs = priv->regs;
++	struct tn40_priv *priv = tn40_config_to_priv(config);
 +
-+	return readl(regs + TN40_REG_MDIO_CMD_STAT);
++	tn40_set_link_speed(priv, speed);
++	netif_wake_queue(priv->ndev);
 +}
 +
-+static int tn40_mdio_wait_nobusy(struct tn40_priv *priv, u32 *val)
++static void tn40_link_down(struct phylink_config *config, unsigned int mode,
++			   phy_interface_t interface)
 +{
-+	u32 stat;
-+	int ret;
++	struct tn40_priv *priv = tn40_config_to_priv(config);
 +
-+	ret = readx_poll_timeout_atomic(tn40_mdio_stat, priv, stat,
-+					TN40_GET_MDIO_BUSY(stat) == 0, 10,
-+					10000);
-+	if (val)
-+		*val = stat;
-+	return ret;
++	netif_stop_queue(priv->ndev);
++	tn40_set_link_speed(priv, 0);
 +}
 +
-+static int tn40_mdio_read(struct tn40_priv *priv, int port, int device,
-+			  u16 regnum)
++static void tn40_mac_config(struct phylink_config *config, unsigned int mode,
++			    const struct phylink_link_state *state)
 +{
-+	void __iomem *regs = priv->regs;
-+	u32 i;
-+
-+	/* wait until MDIO is not busy */
-+	if (tn40_mdio_wait_nobusy(priv, NULL))
-+		return -EIO;
-+
-+	i = TN40_MDIO_CMD_VAL(device, port);
-+	writel(i, regs + TN40_REG_MDIO_CMD);
-+	writel((u32)regnum, regs + TN40_REG_MDIO_ADDR);
-+	if (tn40_mdio_wait_nobusy(priv, NULL))
-+		return -EIO;
-+
-+	writel(TN40_MDIO_CMD_READ | i, regs + TN40_REG_MDIO_CMD);
-+	/* read CMD_STAT until not busy */
-+	if (tn40_mdio_wait_nobusy(priv, NULL))
-+		return -EIO;
-+
-+	return lower_16_bits(readl(regs + TN40_REG_MDIO_DATA));
 +}
 +
-+static int tn40_mdio_write(struct tn40_priv *priv, int port, int device,
-+			   u16 regnum, u16 data)
++static const struct phylink_mac_ops tn40_mac_ops = {
++	.mac_config = tn40_mac_config,
++	.mac_link_up = tn40_link_up,
++	.mac_link_down = tn40_link_down,
++};
++
++int tn40_phy_register(struct tn40_priv *priv)
 +{
-+	void __iomem *regs = priv->regs;
-+	u32 tmp_reg = 0;
-+	int ret;
++	struct phylink_config *config;
++	struct phy_device *phydev;
++	struct phylink *phylink;
 +
-+	/* wait until MDIO is not busy */
-+	if (tn40_mdio_wait_nobusy(priv, NULL))
-+		return -EIO;
-+	writel(TN40_MDIO_CMD_VAL(device, port), regs + TN40_REG_MDIO_CMD);
-+	writel((u32)regnum, regs + TN40_REG_MDIO_ADDR);
-+	if (tn40_mdio_wait_nobusy(priv, NULL))
-+		return -EIO;
-+	writel((u32)data, regs + TN40_REG_MDIO_DATA);
-+	/* read CMD_STAT until not busy */
-+	ret = tn40_mdio_wait_nobusy(priv, &tmp_reg);
-+	if (ret)
-+		return -EIO;
-+
-+	if (TN40_GET_MDIO_RD_ERR(tmp_reg)) {
-+		dev_err(&priv->pdev->dev, "MDIO error after write command\n");
-+		return -EIO;
++	phydev = phy_find_first(priv->mdio);
++	if (!phydev) {
++		dev_err(&priv->pdev->dev, "PHY isn't found\n");
++		return -ENODEV;
 +	}
++
++	config = &priv->phylink_config;
++	config->dev = &priv->ndev->dev;
++	config->type = PHYLINK_NETDEV;
++	config->mac_capabilities = MAC_10000FD;
++	__set_bit(PHY_INTERFACE_MODE_XAUI, config->supported_interfaces);
++
++	phylink = phylink_create(config, NULL, PHY_INTERFACE_MODE_XAUI,
++				 &tn40_mac_ops);
++	if (IS_ERR(phylink))
++		return PTR_ERR(phylink);
++
++	priv->phydev = phydev;
++	priv->phylink = phylink;
 +	return 0;
 +}
 +
-+static int tn40_mdio_read_c45(struct mii_bus *mii_bus, int addr, int devnum,
-+			      int regnum)
++void tn40_phy_unregister(struct tn40_priv *priv)
 +{
-+	return tn40_mdio_read(mii_bus->priv, addr, devnum, regnum);
-+}
-+
-+static int tn40_mdio_write_c45(struct mii_bus *mii_bus, int addr, int devnum,
-+			       int regnum, u16 val)
-+{
-+	return  tn40_mdio_write(mii_bus->priv, addr, devnum, regnum, val);
-+}
-+
-+int tn40_mdiobus_init(struct tn40_priv *priv)
-+{
-+	struct pci_dev *pdev = priv->pdev;
-+	struct mii_bus *bus;
-+	int ret;
-+
-+	bus = devm_mdiobus_alloc(&pdev->dev);
-+	if (!bus)
-+		return -ENOMEM;
-+
-+	bus->name = TN40_DRV_NAME;
-+	bus->parent = &pdev->dev;
-+	snprintf(bus->id, MII_BUS_ID_SIZE, "tn40xx-%x-%x",
-+		 pci_domain_nr(pdev->bus), pci_dev_id(pdev));
-+	bus->priv = priv;
-+
-+	bus->read_c45 = tn40_mdio_read_c45;
-+	bus->write_c45 = tn40_mdio_write_c45;
-+
-+	ret = devm_mdiobus_register(&pdev->dev, bus);
-+	if (ret) {
-+		dev_err(&pdev->dev, "failed to register mdiobus %d %u %u\n",
-+			ret, bus->state, MDIOBUS_UNREGISTERED);
-+		return ret;
-+	}
-+	tn40_mdio_set_speed(priv, TN40_MDIO_SPEED_6MHZ);
-+	priv->mdio = bus;
-+	return 0;
++	phylink_destroy(priv->phylink);
 +}
 -- 
 2.34.1
