@@ -1,429 +1,132 @@
-Return-Path: <netdev+bounces-102633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D588B904046
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 17:43:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2782904061
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 17:46:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D958B22703
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:42:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 923EB1F244BF
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:46:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDF9C376E9;
-	Tue, 11 Jun 2024 15:42:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C13D28E0F;
+	Tue, 11 Jun 2024 15:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TLzKsMOR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tGI2imw8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4AAD2E851
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 15:42:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558751D556;
+	Tue, 11 Jun 2024 15:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718120574; cv=none; b=SPWNa8ZW+edtTiD7mMHo3uAvUE1wAuKu8/p6CHkeemHK4GHPyj+D/C2kAJx0wyqIpO/umGhy1o2TvyIqhavL3LupLR1gL1u6s7ZZ3C8c3xcUjdR8j7W2BssGYgyAsEXCh+QpK/bxlqP00qHvRdtrGd7Ob54fWk01cqdGEe5J6TM=
+	t=1718120774; cv=none; b=stDc71qM3NDJvg1C+sLMr9A+vT0LNETqNh/9fmxgmzgH/aDRHPEWhLCTrVThKWGwC535L/+kdh9YbXQHGSz1iUCEGXVRrFdz85JxhNzQpFWRMUwsKuQeT4NhjEvp3yo2hCBUbJBFV6avpHmDXk2JfrEGmkv3TOvksdxcvneC+eA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718120574; c=relaxed/simple;
-	bh=mTvNb5mt3leiiESawd6Rfz5q+WjisfqDBEehDHdW3bs=;
-	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VEKhAPs4dXxf4lI6DtzoIGKKlEKoW+Ue8+KveE49qBs7uKSLxhHU2IvG/icXFrwsuWAJyUus7jglNESQUhcOPLQKfmirIHZG5Qr4dBu5Md+DC1H3lQreIZbhXIdaMSmoTO+VEaEKRM7vU65S8G7u64EsNQJqDHctIO6HEEWVnfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TLzKsMOR; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718120571;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kAHywwwbrMzldlhQQEcXBWTccM6gAGRZosqMu+WvVJE=;
-	b=TLzKsMORzxBm6vLxh/eaWktsJWaq7ZCx0msBXCGSqFQEN+3ubtldR/8Sr++VbTTRHMivGF
-	dTXaHtf6aoPiWO6G5g2peSM2QJz+3VemJBjOW/xT7Fx2+/ODfmpaPY46XM3WHyJA/SeBKJ
-	nM8qs6R+Xiahlfp6b4swFq/yHf1R/mY=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-682-HjLNxkP4OVm94xd-rV92og-1; Tue, 11 Jun 2024 11:42:50 -0400
-X-MC-Unique: HjLNxkP4OVm94xd-rV92og-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6b06307bbffso11801026d6.2
-        for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 08:42:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718120570; x=1718725370;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:in-reply-to
-         :mime-version:references:from:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=kAHywwwbrMzldlhQQEcXBWTccM6gAGRZosqMu+WvVJE=;
-        b=k3z2xRsEFia0C6kSlPvQH3pfXNT9piVdnnne0n00nE1Ccsmr9ZOJvGjY9VolRnq0GE
-         s9BkVKdAPMdpLtzoemgm9SkP3fmsLBVG8eUNpn/JwKtb6oN5bFLP4/ezjPugiR8gFqvb
-         J7oSVyIg96dNPxrNVSeGieUGayFqcB3oJoQ5y2GfLjxrfGYJzLVuaMw41sHoBGLGStFY
-         tI74ssveIjGo2YiNVrdE5rIF645f2AM0E6a7oN/aP7iC2s8bazCJDK8OrSUOkbOMUubE
-         A+3uHXXRIGEiviCamtAb4nXVjDYz0KgA6E6csorhHdrQJrja2mrdD6KSVsOJikvhu+Qo
-         9boA==
-X-Gm-Message-State: AOJu0YxVERP0IFcu+tOkEbffPExSHq7vmOzwzQj1iazDMTZ+SBg2WPi3
-	iFycWZRpDD/RoQAZwbj8UbuHknfqeLNbSJfycNMA/N949mVfbajTA99XQ78E47ZHEPGtSyxf8BI
-	jw1E/XGwq6OOMlR2hNcnrJfdOge70KMQ2uHfnjFUywQHhnzQPDrX2KjhZlrngFvlmPXuBZlb0+y
-	QKBO1cuLqL9TUYQMnvijL9dEDpYpU8
-X-Received: by 2002:a05:6214:3911:b0:6b0:90de:afd2 with SMTP id 6a1803df08f44-6b090deb141mr14194546d6.34.1718120569682;
-        Tue, 11 Jun 2024 08:42:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEIZTcu8RFE62S59ssmbWcPPTTJgmjKD5KgaihdseK5a6khdWSTK9viLKK7L4/QkNuEKFqivyQPfd8HXgChwAU=
-X-Received: by 2002:a05:6214:3911:b0:6b0:90de:afd2 with SMTP id
- 6a1803df08f44-6b090deb141mr14194276d6.34.1718120569275; Tue, 11 Jun 2024
- 08:42:49 -0700 (PDT)
-Received: from 311643009450 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 11 Jun 2024 15:42:48 +0000
-From: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
-References: <20240603185647.2310748-1-amorenoz@redhat.com> <20240603185647.2310748-6-amorenoz@redhat.com>
- <f7ted94rebd.fsf@redhat.com> <CAG=2xmPqTLLWMq3GtG95Td=T6hjoV6TOcKdH6fyY0KGGAUMK9g@mail.gmail.com>
- <f7ta5jrr3di.fsf@redhat.com>
+	s=arc-20240116; t=1718120774; c=relaxed/simple;
+	bh=nHYZzSrwzVkx0XliBhDrKJIYP1BW1UKKqywssutXd94=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n89taPUzsd1hSfcwRIFKcwsGm4FoxM/U70AM09ndMmO9EQjqyjXTfz5OurIWDuWuKw1GxmdCTZPujQAo6YCcCMyJUAcBLyANXeEqlb4pyh6UOERuh+IbWacDOrKfAA8kbwpJUHK8pwEAEQIqBC9MZKW3XLLnf2Zlo5n5MUAYxCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tGI2imw8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBDE6C4AF51;
+	Tue, 11 Jun 2024 15:46:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718120774;
+	bh=nHYZzSrwzVkx0XliBhDrKJIYP1BW1UKKqywssutXd94=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=tGI2imw8BDj+4k5dMama34vbhkrYM0hGn4oC1oHp4XumdIdItvvkhqcFZplFhkcjj
+	 lW+MyDYu7kt5NuZZ70y6eBB8X7Gj2Yy9hWXiwV9FlqY5kGjJHD49BLgVpSPVFjbpHy
+	 409FQPq2vZTFrozUQHMF82QpNoLD1gcXFnOU4uFLRiu796ebSz9nAmzHxLaXWBYeFF
+	 DR6Exu9ucdogcjynNguLN0fhZSxn7RZr6IMcJDsU8tcyS1Ts2CjrddxlCgVjZLrvrX
+	 QvGh8yKb6zQhhYBb8ykzyGNe/MNPN0/NjMJYYoZxLowDD9588PKFd0SgNuQI/EMXLy
+	 vkT0VsPMF7i4A==
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52bbdc237f0so1643808e87.0;
+        Tue, 11 Jun 2024 08:46:13 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVfm6CRKN9WZK1K5hopKiEANaz92T4sm25HJbOPgQ1NDgQFbVYaqFJ7anwZ0qp5P2208VqcS4eQ1PisEPZLvMEwe/eP120MMyfW4jA+Ucrv3Fr/W3d7Ca7eeh08at40RcB8DKto
+X-Gm-Message-State: AOJu0Yzkn22mPnnab4kyOluri+9BNnZhb5qHa2XuVgfnMh/TrfAY0Kic
+	30pK5NE8+FF9sfOuZt75mWcFRy5ZC171Z5BhM4Ldncc0ub7A+5mYBbl6NmyuxU0Bh0oLuXwyzo7
+	QX5p6YFhu8nypf1sCIF8mhF1F+Lo=
+X-Google-Smtp-Source: AGHT+IFNi8O7iGLGeMHQZ0NNyUR4jvtAz8icvQz3DDdQ33zLN72EpnmHYm0Y4njGv0rD+XUtdpM8PO1XuOoDfgzKsz0=
+X-Received: by 2002:a05:6512:3241:b0:52c:885a:f17 with SMTP id
+ 2adb3069b0e04-52c885a0fc9mr5168902e87.31.1718120772312; Tue, 11 Jun 2024
+ 08:46:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <f7ta5jrr3di.fsf@redhat.com>
-Date: Tue, 11 Jun 2024 15:42:48 +0000
-Message-ID: <CAG=2xmNHJf-=wG8atD=xTLPjMKbUyzNu8tObAG9PGUmCRvxk+A@mail.gmail.com>
-Subject: Re: [ovs-dev] [PATCH net-next v2 5/9] net: openvswitch: add
- emit_sample action
-To: Aaron Conole <aconole@redhat.com>
-Cc: netdev@vger.kernel.org, dev@openvswitch.org, 
-	Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, 
-	linux-kernel@vger.kernel.org, i.maximets@ovn.org, 
-	Eric Dumazet <edumazet@google.com>, horms@kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>
+References: <ZmEYJQFHQRFKC5JM@gondor.apana.org.au> <20240606052801.GA324380@sol.localdomain>
+ <ZmFL-AXZ8lphOCUC@gondor.apana.org.au> <CAMj1kXHLt6v03qkpKfwbN34oyeeCnJb=tpG4GvTn6E1cJQRTOw@mail.gmail.com>
+ <ZmFmiWZAposV5N1O@gondor.apana.org.au> <CAMj1kXFt_E9ghN7GfpYHR4-yaLsz_J-D1Nc3XsVqUamZ6yXHGQ@mail.gmail.com>
+ <ZmFucW37DI6P6iYL@gondor.apana.org.au> <CAMj1kXEpw5b3Rpfe+sRKbQQqVfgWjO_GsGd-EyFvB4_8Bk8T0Q@mail.gmail.com>
+ <ZmF-JHxCfMRuR05G@gondor.apana.org.au> <20240610164258.GA3269@sol.localdomain>
+ <Zmhrh1nodUE-O6Jj@gondor.apana.org.au>
+In-Reply-To: <Zmhrh1nodUE-O6Jj@gondor.apana.org.au>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Tue, 11 Jun 2024 17:46:01 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEwmHqKbde4_erjmdi=+nO13Qwu3nSbkU_77C3xcjxAjQ@mail.gmail.com>
+Message-ID: <CAMj1kXEwmHqKbde4_erjmdi=+nO13Qwu3nSbkU_77C3xcjxAjQ@mail.gmail.com>
+Subject: Re: [PATCH v4 6/8] fsverity: improve performance by using multibuffer hashing
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	fsverity@lists.linux.dev, dm-devel@lists.linux.dev, x86@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Sami Tolvanen <samitolvanen@google.com>, 
+	Bart Van Assche <bvanassche@acm.org>, Tim Chen <tim.c.chen@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 11, 2024 at 09:54:49AM GMT, Aaron Conole wrote:
-> Adri=C3=A1n Moreno <amorenoz@redhat.com> writes:
+On Tue, 11 Jun 2024 at 17:21, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> > On Mon, Jun 10, 2024 at 11:46:14AM GMT, Aaron Conole wrote:
-> >> Adrian Moreno <amorenoz@redhat.com> writes:
-> >>
-> >> > Add support for a new action: emit_sample.
-> >> >
-> >> > This action accepts a u32 group id and a variable-length cookie and =
-uses
-> >> > the psample multicast group to make the packet available for
-> >> > observability.
-> >> >
-> >> > The maximum length of the user-defined cookie is set to 16, same as
-> >> > tc_cookie, to discourage using cookies that will not be offloadable.
-> >> >
-> >> > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
-> >> > ---
-> >>
-> >> I saw some of the nits Simon raised - I'll add one more below.
-> >>
-> >> I haven't gone through the series thoroughly enough to make a detailed
-> >> review.
-> >>
-> >> >  Documentation/netlink/specs/ovs_flow.yaml | 17 ++++++++
-> >> >  include/uapi/linux/openvswitch.h          | 25 ++++++++++++
-> >> >  net/openvswitch/actions.c                 | 50 ++++++++++++++++++++=
-+++
-> >> >  net/openvswitch/flow_netlink.c            | 33 ++++++++++++++-
-> >> >  4 files changed, 124 insertions(+), 1 deletion(-)
-> >> >
-> >> > diff --git a/Documentation/netlink/specs/ovs_flow.yaml b/Documentati=
-on/netlink/specs/ovs_flow.yaml
-> >> > index 4fdfc6b5cae9..a7ab5593a24f 100644
-> >> > --- a/Documentation/netlink/specs/ovs_flow.yaml
-> >> > +++ b/Documentation/netlink/specs/ovs_flow.yaml
-> >> > @@ -727,6 +727,12 @@ attribute-sets:
-> >> >          name: dec-ttl
-> >> >          type: nest
-> >> >          nested-attributes: dec-ttl-attrs
-> >> > +      -
-> >> > +        name: emit-sample
-> >> > +        type: nest
-> >> > +        nested-attributes: emit-sample-attrs
-> >> > +        doc: |
-> >> > +          Sends a packet sample to psample for external observation=
-.
-> >> >    -
-> >> >      name: tunnel-key-attrs
-> >> >      enum-name: ovs-tunnel-key-attr
-> >> > @@ -938,6 +944,17 @@ attribute-sets:
-> >> >        -
-> >> >          name: gbp
-> >> >          type: u32
-> >> > +  -
-> >> > +    name: emit-sample-attrs
-> >> > +    enum-name: ovs-emit-sample-attr
-> >> > +    name-prefix: ovs-emit-sample-attr-
-> >> > +    attributes:
-> >> > +      -
-> >> > +        name: group
-> >> > +        type: u32
-> >> > +      -
-> >> > +        name: cookie
-> >> > +        type: binary
-> >> >
-> >> >  operations:
-> >> >    name-prefix: ovs-flow-cmd-
-> >> > diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/o=
-penvswitch.h
-> >> > index efc82c318fa2..a0e9dde0584a 100644
-> >> > --- a/include/uapi/linux/openvswitch.h
-> >> > +++ b/include/uapi/linux/openvswitch.h
-> >> > @@ -914,6 +914,30 @@ struct check_pkt_len_arg {
-> >> >  };
-> >> >  #endif
-> >> >
-> >> > +#define OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE 16
-> >> > +/**
-> >> > + * enum ovs_emit_sample_attr - Attributes for %OVS_ACTION_ATTR_EMIT=
-_SAMPLE
-> >> > + * action.
-> >> > + *
-> >> > + * @OVS_EMIT_SAMPLE_ATTR_GROUP: 32-bit number to identify the sourc=
-e of the
-> >> > + * sample.
-> >> > + * @OVS_EMIT_SAMPLE_ATTR_COOKIE: A variable-length binary cookie th=
-at contains
-> >> > + * user-defined metadata. The maximum length is 16 bytes.
-> >> > + *
-> >> > + * Sends the packet to the psample multicast group with the specifi=
-ed group and
-> >> > + * cookie. It is possible to combine this action with the
-> >> > + * %OVS_ACTION_ATTR_TRUNC action to limit the size of the packet be=
-ing emitted.
-> >> > + */
-> >> > +enum ovs_emit_sample_attr {
-> >> > +	OVS_EMIT_SAMPLE_ATTR_UNPSEC,
-> >> > +	OVS_EMIT_SAMPLE_ATTR_GROUP,	/* u32 number. */
-> >> > +	OVS_EMIT_SAMPLE_ATTR_COOKIE,	/* Optional, user specified cookie. *=
-/
-> >> > +	__OVS_EMIT_SAMPLE_ATTR_MAX
-> >> > +};
-> >> > +
-> >> > +#define OVS_EMIT_SAMPLE_ATTR_MAX (__OVS_EMIT_SAMPLE_ATTR_MAX - 1)
-> >> > +
-> >> > +
-> >> >  /**
-> >> >   * enum ovs_action_attr - Action types.
-> >> >   *
-> >> > @@ -1004,6 +1028,7 @@ enum ovs_action_attr {
-> >> >  	OVS_ACTION_ATTR_ADD_MPLS,     /* struct ovs_action_add_mpls. */
-> >> >  	OVS_ACTION_ATTR_DEC_TTL,      /* Nested OVS_DEC_TTL_ATTR_*. */
-> >> >  	OVS_ACTION_ATTR_DROP,         /* u32 error code. */
-> >> > +	OVS_ACTION_ATTR_EMIT_SAMPLE,  /* Nested OVS_EMIT_SAMPLE_ATTR_*. */
-> >> >
-> >> >  	__OVS_ACTION_ATTR_MAX,	      /* Nothing past this will be accepted
-> >> >  				       * from userspace. */
-> >> > diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-> >> > index 964225580824..3b4dba0ded59 100644
-> >> > --- a/net/openvswitch/actions.c
-> >> > +++ b/net/openvswitch/actions.c
-> >> > @@ -24,6 +24,11 @@
-> >> >  #include <net/checksum.h>
-> >> >  #include <net/dsfield.h>
-> >> >  #include <net/mpls.h>
-> >> > +
-> >> > +#if IS_ENABLED(CONFIG_PSAMPLE)
-> >> > +#include <net/psample.h>
-> >> > +#endif
-> >> > +
-> >> >  #include <net/sctp/checksum.h>
-> >> >
-> >> >  #include "datapath.h"
-> >> > @@ -1299,6 +1304,46 @@ static int execute_dec_ttl(struct sk_buff *sk=
-b, struct sw_flow_key *key)
-> >> >  	return 0;
-> >> >  }
-> >> >
-> >> > +static int execute_emit_sample(struct datapath *dp, struct sk_buff =
-*skb,
-> >> > +			       const struct sw_flow_key *key,
-> >> > +			       const struct nlattr *attr)
-> >> > +{
-> >> > +#if IS_ENABLED(CONFIG_PSAMPLE)
-> >> > +	struct psample_group psample_group =3D {};
-> >> > +	struct psample_metadata md =3D {};
-> >> > +	struct vport *input_vport;
-> >> > +	const struct nlattr *a;
-> >> > +	int rem;
-> >> > +
-> >> > +	for (a =3D nla_data(attr), rem =3D nla_len(attr); rem > 0;
-> >> > +	     a =3D nla_next(a, &rem)) {
-> >> > +		switch (nla_type(a)) {
-> >> > +		case OVS_EMIT_SAMPLE_ATTR_GROUP:
-> >> > +			psample_group.group_num =3D nla_get_u32(a);
-> >> > +			break;
-> >> > +
-> >> > +		case OVS_EMIT_SAMPLE_ATTR_COOKIE:
-> >> > +			md.user_cookie =3D nla_data(a);
-> >> > +			md.user_cookie_len =3D nla_len(a);
-> >> > +			break;
-> >> > +		}
-> >> > +	}
-> >> > +
-> >> > +	psample_group.net =3D ovs_dp_get_net(dp);
-> >> > +
-> >> > +	input_vport =3D ovs_vport_rcu(dp, key->phy.in_port);
-> >> > +	if (!input_vport)
-> >> > +		input_vport =3D ovs_vport_rcu(dp, OVSP_LOCAL);
-> >> > +
-> >> > +	md.in_ifindex =3D input_vport->dev->ifindex;
-> >> > +	md.trunc_size =3D skb->len - OVS_CB(skb)->cutlen;
-> >> > +
-> >> > +	psample_sample_packet(&psample_group, skb, 0, &md);
-> >> > +#endif
-> >> > +
-> >> > +	return 0;
-> >>
-> >> Why this return here?  Doesn't seem used anywhere else.
-> >>
+> On Mon, Jun 10, 2024 at 09:42:58AM -0700, Eric Biggers wrote:
 > >
-> > It is being used in "do_execute_actions", right?
-> > All non-skb-consuming actions set the value of "err" and break from the
-> > switch-case so that the the packet is dropped with OVS_DROP_ACTION_ERRO=
-R reason.
-> >
-> > Am i missing something?
+> > I understand that you think the ahash based API would make it easier to add
+> > multibuffer support to "authenc(hmac(sha256),cbc(aes))" for IPsec, which seems
+> > to be a very important use case for you (though it isn't relevant to nearly as
+> > many systems as dm-verity and fsverity are).  Regardless, the reality is that it
+> > would be much more difficult to take advantage of multibuffer crypto in the
+> > IPsec authenc use case than in dm-verity and fsverity.  authenc uses multiple
+> > underlying algorithms, AES-CBC and HMAC-SHA256, that would both have to use
+> > multibuffer crypto in order to see a significant benefit, seeing as even if the
+> > SHA-256 support could be wired up through HMAC-SHA256, encryption would be
+> > bottlenecked on AES-CBC, especially on Intel CPUs.  It also looks like the IPsec
+> > code would need a lot of updates to support multibuffer crypto.
 >
-> I think so.  For example, it isn't used when the function cannot
-> possibly error.
+> The linked-request thing feeds nicely into networking.  In fact
+> that's where I got the idea of linking them from.  In networking
+> a large GSO (currently limited to 64K but theoretically we could
+> make it unlimited) packet is automatically split up into a linked
+> list of MTU-sized skb's.
 >
-> see the following cases:
+> Therefore if we switched to a linked-list API networking could
+> give us the buffers with minimal changes.
 >
-> OVS_ACTION_ATTR_HASH
-> OVS_ACTION_ATTR_TRUNC
+> BTW, I found an old Intel paper that claims through their multi-
+> buffer strategy they were able to make AES-CBC-XCBC beat AES-GCM.
+> I wonder if we could still replicate this today:
 >
-> As you note, these can consume SKB so also don't bother setting err,
-> because they will need to return anyway:
->
-> OVS_ACTION_ATTR_USERSPACE
-> OVS_ACTION_ATTR_OUTPUT
-> OVS_ACTION_ATTR_DROP
->
-> And even the following does a weird thing:
->
-> OVS_ACTION_ATTR_CT
->
-> because sometimes it will consume, and sometimes not.
->
-> I think if there isn't a possibility of error being generated (and I
-> guess from the code I see there isn't), then it shouldn't return a
-> useless code, since err will be 0 on each iteration of the loop.
+> https://github.com/intel/intel-ipsec-mb/wiki/doc/fast-multi-buffer-ipsec-implementations-ia-processors-paper.pdf
 >
 
-Oh, so you meant it's actualy not being set. Now I get you.
-Yes. I figured that could change in the future so I left the structure
-of returning an error just in case, but it's true that currently the
-function cannot fail.
+This looks like the whitepaper that describes the buggy multibuffer
+code that we ripped out.
 
-I'll get rid of it.
-
-> >> > +}
-> >> > +
-> >> >  /* Execute a list of actions against 'skb'. */
-> >> >  static int do_execute_actions(struct datapath *dp, struct sk_buff *=
-skb,
-> >> >  			      struct sw_flow_key *key,
-> >> > @@ -1502,6 +1547,11 @@ static int do_execute_actions(struct datapath=
- *dp, struct sk_buff *skb,
-> >> >  			ovs_kfree_skb_reason(skb, reason);
-> >> >  			return 0;
-> >> >  		}
-> >> > +
-> >> > +		case OVS_ACTION_ATTR_EMIT_SAMPLE:
-> >> > +			err =3D execute_emit_sample(dp, skb, key, a);
-> >> > +			OVS_CB(skb)->cutlen =3D 0;
-> >> > +			break;
-> >> >  		}
-> >> >
-> >> >  		if (unlikely(err)) {
-> >> > diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_n=
-etlink.c
-> >> > index f224d9bcea5e..eb59ff9c8154 100644
-> >> > --- a/net/openvswitch/flow_netlink.c
-> >> > +++ b/net/openvswitch/flow_netlink.c
-> >> > @@ -64,6 +64,7 @@ static bool actions_may_change_flow(const struct n=
-lattr *actions)
-> >> >  		case OVS_ACTION_ATTR_TRUNC:
-> >> >  		case OVS_ACTION_ATTR_USERSPACE:
-> >> >  		case OVS_ACTION_ATTR_DROP:
-> >> > +		case OVS_ACTION_ATTR_EMIT_SAMPLE:
-> >> >  			break;
-> >> >
-> >> >  		case OVS_ACTION_ATTR_CT:
-> >> > @@ -2409,7 +2410,7 @@ static void ovs_nla_free_nested_actions(const =
-struct nlattr *actions, int len)
-> >> >  	/* Whenever new actions are added, the need to update this
-> >> >  	 * function should be considered.
-> >> >  	 */
-> >> > -	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX !=3D 24);
-> >> > +	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX !=3D 25);
-> >> >
-> >> >  	if (!actions)
-> >> >  		return;
-> >> > @@ -3157,6 +3158,29 @@ static int validate_and_copy_check_pkt_len(st=
-ruct net *net,
-> >> >  	return 0;
-> >> >  }
-> >> >
-> >> > +static int validate_emit_sample(const struct nlattr *attr)
-> >> > +{
-> >> > +	static const struct nla_policy policy[OVS_EMIT_SAMPLE_ATTR_MAX + 1=
-] =3D {
-> >> > +		[OVS_EMIT_SAMPLE_ATTR_GROUP] =3D { .type =3D NLA_U32 },
-> >> > +		[OVS_EMIT_SAMPLE_ATTR_COOKIE] =3D {
-> >> > +			.type =3D NLA_BINARY,
-> >> > +			.len =3D OVS_EMIT_SAMPLE_COOKIE_MAX_SIZE
-> >> > +		},
-> >> > +	};
-> >> > +	struct nlattr *a[OVS_EMIT_SAMPLE_ATTR_MAX  + 1];
-> >> > +	int err;
-> >> > +
-> >> > +	if (!IS_ENABLED(CONFIG_PSAMPLE))
-> >> > +		return -EOPNOTSUPP;
-> >> > +
-> >> > +	err =3D nla_parse_nested(a, OVS_EMIT_SAMPLE_ATTR_MAX, attr, policy=
-,
-> >> > +			       NULL);
-> >> > +	if (err)
-> >> > +		return err;
-> >> > +
-> >> > +	return a[OVS_EMIT_SAMPLE_ATTR_GROUP] ? 0 : -EINVAL;
-> >> > +}
-> >> > +
-> >> >  static int copy_action(const struct nlattr *from,
-> >> >  		       struct sw_flow_actions **sfa, bool log)
-> >> >  {
-> >> > @@ -3212,6 +3236,7 @@ static int __ovs_nla_copy_actions(struct net *=
-net, const struct nlattr *attr,
-> >> >  			[OVS_ACTION_ATTR_ADD_MPLS] =3D sizeof(struct ovs_action_add_mpls=
-),
-> >> >  			[OVS_ACTION_ATTR_DEC_TTL] =3D (u32)-1,
-> >> >  			[OVS_ACTION_ATTR_DROP] =3D sizeof(u32),
-> >> > +			[OVS_ACTION_ATTR_EMIT_SAMPLE] =3D (u32)-1,
-> >> >  		};
-> >> >  		const struct ovs_action_push_vlan *vlan;
-> >> >  		int type =3D nla_type(a);
-> >> > @@ -3490,6 +3515,12 @@ static int __ovs_nla_copy_actions(struct net =
-*net, const struct nlattr *attr,
-> >> >  				return -EINVAL;
-> >> >  			break;
-> >> >
-> >> > +		case OVS_ACTION_ATTR_EMIT_SAMPLE:
-> >> > +			err =3D validate_emit_sample(a);
-> >> > +			if (err)
-> >> > +				return err;
-> >> > +			break;
-> >> > +
-> >> >  		default:
-> >> >  			OVS_NLERR(log, "Unknown Action type %d", type);
-> >> >  			return -EINVAL;
-> >>
-> >
-> > _______________________________________________
-> > dev mailing list
-> > dev@openvswitch.org
-> > https://mail.openvswitch.org/mailman/listinfo/ovs-dev
+> > Ultimately, I need to have dm-verity and fsverity be properly optimized in the
+> > downstreams that are most relevant to me.  If you're not going to allow the
+> > upstream crypto API to provide the needed functionality in a reasonable way,
+> > then I'll need to shift my focus to getting this patchset into downstream
+> > kernels such as Android and Chrome OS instead.
+>
+> I totally understand that this is your priority.  But please give
+> me some time to see if we can devise something that works for both
+> scenarios.
 >
 
+The issue here is that the CPU based multibuffer approach has rather
+tight constraints in terms of input length and the shared prefix, and
+so designing a more generic API based on ahash doesn't help at all.
+The intel multibuffer code went off into the weeds entirely attempting
+to apply this parallel scheme to arbitrary combinations of inputs, so
+this is something we know we should avoid.
 
