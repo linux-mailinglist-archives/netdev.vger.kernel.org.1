@@ -1,95 +1,293 @@
-Return-Path: <netdev+bounces-102575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C60D4903C8A
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 14:57:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18D93903C92
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:01:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E72F1F23F17
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 12:57:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02B371C233C9
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:01:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B99517C7C1;
-	Tue, 11 Jun 2024 12:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A519117C9ED;
+	Tue, 11 Jun 2024 13:01:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RNrk4ENy"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ewCcNeFy"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5034B17C7A6;
-	Tue, 11 Jun 2024 12:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689B517C7D7;
+	Tue, 11 Jun 2024 13:01:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718110664; cv=none; b=gxnD28mAWB6XZSURuRkHAWN2ZCWwTtHxYw0OtsYGYxutNhJwwylqeLQUIMmZxHrz2c/jVxM5gDc0h3ivqMn/OFDuqzcmCYv9BRaFkO8Iw07DRYOmV4CyeGfO36vLwiqWqP9x4/PplfiZ0sWzqhm0M72CVylUzJMCWL182fk4lGc=
+	t=1718110876; cv=none; b=T8fSuv0X1pin51g13pIMlT9G7fgqs1fkpj5gPcvD+Q1EbIXFreZ6PptQy3KTLOyRsqZB5csTe+GcMbLT9+apU0+FWf1Hx8m++2Vu+NKLYd3KjDPLSkTLjnJQxcXyTutKh5MIQzJX32lU61nKRzzB9smnpoielCBS5GcBb2A3Ajw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718110664; c=relaxed/simple;
-	bh=2CHV3JqDCTzemfzBFGBrj/c0ALmTXYa8bakw+BsFzDM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AJd5YOVrqQP0YteYYLvU4lXASXs6QKUu9X8LT6qYSIFlAnmkymNsts9A2HQc57XgBwJ08RIC0M1iF/TIFrGXNQn6Caa8Nkzq3Kk9nXqEUB2/7B3CG1SuSy46Txjt38L26f/kHlRkBQgcwSQM8TYGzKQighWCq+nSU2Ke7mS+QIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RNrk4ENy; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=43M/sVt50RU4a9KtHKnWJdS5bCQ8XkR5rl3Sgok+z+Y=; b=RNrk4ENyXK9TwbH6pjcRUATroF
-	oIKSsEXmnKu0n1NjLvnG0dgEgtThhhGXxKut1BQNZNWfsMuLhUYm51woR2aF/iAeOaliuZtvlI0X+
-	ZDFx+88r3tzTtrMC70b6yTmkrHusdpj25JnW8sBShX1JwvrAghXoODdm2g2iVNjAsEJA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sH13t-00HO4O-T0; Tue, 11 Jun 2024 14:57:17 +0200
-Date: Tue, 11 Jun 2024 14:57:17 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
-Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	linux@armlinux.org.uk, vadim.fedorenko@linux.dev,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, git@amd.com
-Subject: Re: [PATCH net-next v4 3/4] net: macb: Add ARP support to WOL
-Message-ID: <a95e3b77-bdda-428e-9d25-f9be017fd40a@lunn.ch>
-References: <20240610053936.622237-1-vineeth.karumanchi@amd.com>
- <20240610053936.622237-4-vineeth.karumanchi@amd.com>
- <b46427d8-2b8c-4b26-b53a-6dcc3d0ea27f@lunn.ch>
- <6c01bed7-580e-4f1a-9986-39c20f063e67@amd.com>
+	s=arc-20240116; t=1718110876; c=relaxed/simple;
+	bh=0JZaCXW+n6H3OOec6ZC4VzANYpWXLrydYTlRC21cNoM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N+VPNxhPwld8iu9SoAEvlAvJVRXlT7aRnqE0pgErMQAcHuGh2r9gIRhsHAFbAffuq/ELM9p8+RlEuOzbDi+gZ0gSJjERUxuBUX2h1s7J2PcQ6BRGEX5D+NDqF2wngKCdaFzISjzJU3t9aQH4a6K7s3zCyvZhV7vN/vzS1oLZyDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ewCcNeFy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56AA5C4AF48;
+	Tue, 11 Jun 2024 13:01:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1718110875;
+	bh=0JZaCXW+n6H3OOec6ZC4VzANYpWXLrydYTlRC21cNoM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ewCcNeFyq/mkicN6HAoGxWW/7T93ZP4/IaputgZrzcjWFj9c2HBxYUhcfAQqoX31C
+	 UREfUSsaHshnuvVSUQbtPqJfdYurZf09CNnL7JSwdtKwwGJMsqTHWi7kntu2DvpL5c
+	 1pujHXfcrKtbc/IIPXwCcZcZ+iE3XWEUiZXBR390=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: linux-kernel@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Dave Ertman <david.m.ertman@intel.com>,
+	Ira Weiny <ira.weiny@intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Bingbu Cao <bingbu.cao@intel.com>,
+	Tianshu Qiu <tian.shu.qiu@intel.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Michael Chan <michael.chan@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
+	Bard Liao <yung-chuan.liao@linux.intel.com>,
+	Ranjani Sridharan <ranjani.sridharan@linux.intel.com>,
+	Daniel Baluta <daniel.baluta@nxp.com>,
+	Kai Vehmanen <kai.vehmanen@linux.intel.com>,
+	Mark Brown <broonie@kernel.org>,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	linux-media@vger.kernel.org,
+	netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-rdma@vger.kernel.org,
+	sound-open-firmware@alsa-project.org,
+	linux-sound@vger.kernel.org
+Subject: [PATCH 1/6] auxbus: make to_auxiliary_drv accept and return a constant pointer
+Date: Tue, 11 Jun 2024 15:01:04 +0200
+Message-ID: <20240611130103.3262749-7-gregkh@linuxfoundation.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6c01bed7-580e-4f1a-9986-39c20f063e67@amd.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=8097; i=gregkh@linuxfoundation.org; h=from:subject; bh=0JZaCXW+n6H3OOec6ZC4VzANYpWXLrydYTlRC21cNoM=; b=owGbwMvMwCRo6H6F97bub03G02pJDGkZXv377+23kF/wqELi4uFeuzsHjbJvzz76ZW5qgbOMi OnP0GzvjlgWBkEmBlkxRZYv23iO7q84pOhlaHsaZg4rE8gQBi5OAZjIBnaGBZM3XlC5buT2tvrZ 5hvTphh0fv18aQPDPMU/y30a3d71FF3fpOdu/J5pptniLAA=
+X-Developer-Key: i=gregkh@linuxfoundation.org; a=openpgp; fpr=F4B60CC5BF78C2214A313DCB3147D40DDB2DFB29
+Content-Transfer-Encoding: 8bit
 
-> > > +	/* Don't manage WoL on MAC if there's a failure in talking to the PHY */
-> > > +	if (!!ret && ret != -EOPNOTSUPP)
-> > >   		return ret;
-> > 
-> > The comment is wrong. You could be happily talking to the PHY, it just
-> > does not support what you asked it to do.
-> > 
-> 
-> 
-> These are the 3 possible return scenarios
-> 
-> 1. -EOPNOTSUPP. : When there is no PHY or no set_wol() in PHY driver.
-> 2. 0 : Success
-> 3. any error (-EINVAL, ... ) from set_wol()
-> 
-> we are returning in case 3.
-> 
-> The comment can be "Don't manage WoL on MAC, if PHY set_wol() fails"
+In the quest to make struct device constant, start by making
+to_auziliary_drv() return a constant pointer so that drivers that call
+this can be fixed up before the driver core changes.
 
-O.K.
+As the return type previously was not constant, also fix up all callers
+that were assuming that the pointer was not going to be a constant one
+in order to not break the build.
 
-You don't need the !! on ret.
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Dave Ertman <david.m.ertman@intel.com>
+Cc: Ira Weiny <ira.weiny@intel.com>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Sakari Ailus <sakari.ailus@linux.intel.com>
+Cc: Bingbu Cao <bingbu.cao@intel.com>
+Cc: Tianshu Qiu <tian.shu.qiu@intel.com>
+Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+Cc: Michael Chan <michael.chan@broadcom.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>
+Cc: Tariq Toukan <tariqt@nvidia.com>
+Cc: Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>
+Cc: Liam Girdwood <lgirdwood@gmail.com>
+Cc: Peter Ujfalusi <peter.ujfalusi@linux.intel.com>
+Cc: Bard Liao <yung-chuan.liao@linux.intel.com>
+Cc: Ranjani Sridharan <ranjani.sridharan@linux.intel.com>
+Cc: Daniel Baluta <daniel.baluta@nxp.com>
+Cc: Kai Vehmanen <kai.vehmanen@linux.intel.com>
+Cc: Mark Brown <broonie@kernel.org>
+Cc: Jaroslav Kysela <perex@perex.cz>
+Cc: Takashi Iwai <tiwai@suse.com>
+Cc: Richard Cochran <richardcochran@gmail.com>
+Cc: linux-media@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: intel-wired-lan@lists.osuosl.org
+Cc: linux-rdma@vger.kernel.org
+Cc: sound-open-firmware@alsa-project.org
+Cc: linux-sound@vger.kernel.org
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/base/auxiliary.c                      | 8 ++++----
+ drivers/media/pci/intel/ipu6/ipu6-bus.h       | 2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 4 ++--
+ drivers/net/ethernet/intel/ice/ice_ptp.c      | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/dev.c | 4 ++--
+ include/linux/auxiliary_bus.h                 | 2 +-
+ sound/soc/sof/sof-client.c                    | 4 ++--
+ 7 files changed, 13 insertions(+), 13 deletions(-)
 
-	Andrew
+diff --git a/drivers/base/auxiliary.c b/drivers/base/auxiliary.c
+index d3a2c40c2f12..5832e31bb77b 100644
+--- a/drivers/base/auxiliary.c
++++ b/drivers/base/auxiliary.c
+@@ -180,7 +180,7 @@ static const struct auxiliary_device_id *auxiliary_match_id(const struct auxilia
+ static int auxiliary_match(struct device *dev, struct device_driver *drv)
+ {
+ 	struct auxiliary_device *auxdev = to_auxiliary_dev(dev);
+-	struct auxiliary_driver *auxdrv = to_auxiliary_drv(drv);
++	const struct auxiliary_driver *auxdrv = to_auxiliary_drv(drv);
+ 
+ 	return !!auxiliary_match_id(auxdrv->id_table, auxdev);
+ }
+@@ -203,7 +203,7 @@ static const struct dev_pm_ops auxiliary_dev_pm_ops = {
+ 
+ static int auxiliary_bus_probe(struct device *dev)
+ {
+-	struct auxiliary_driver *auxdrv = to_auxiliary_drv(dev->driver);
++	const struct auxiliary_driver *auxdrv = to_auxiliary_drv(dev->driver);
+ 	struct auxiliary_device *auxdev = to_auxiliary_dev(dev);
+ 	int ret;
+ 
+@@ -222,7 +222,7 @@ static int auxiliary_bus_probe(struct device *dev)
+ 
+ static void auxiliary_bus_remove(struct device *dev)
+ {
+-	struct auxiliary_driver *auxdrv = to_auxiliary_drv(dev->driver);
++	const struct auxiliary_driver *auxdrv = to_auxiliary_drv(dev->driver);
+ 	struct auxiliary_device *auxdev = to_auxiliary_dev(dev);
+ 
+ 	if (auxdrv->remove)
+@@ -232,7 +232,7 @@ static void auxiliary_bus_remove(struct device *dev)
+ 
+ static void auxiliary_bus_shutdown(struct device *dev)
+ {
+-	struct auxiliary_driver *auxdrv = NULL;
++	const struct auxiliary_driver *auxdrv = NULL;
+ 	struct auxiliary_device *auxdev;
+ 
+ 	if (dev->driver) {
+diff --git a/drivers/media/pci/intel/ipu6/ipu6-bus.h b/drivers/media/pci/intel/ipu6/ipu6-bus.h
+index b26c6aee1621..bb4926dfdf08 100644
+--- a/drivers/media/pci/intel/ipu6/ipu6-bus.h
++++ b/drivers/media/pci/intel/ipu6/ipu6-bus.h
+@@ -21,7 +21,7 @@ struct ipu6_buttress_ctrl;
+ 
+ struct ipu6_bus_device {
+ 	struct auxiliary_device auxdev;
+-	struct auxiliary_driver *auxdrv;
++	const struct auxiliary_driver *auxdrv;
+ 	const struct ipu6_auxdrv_data *auxdrv_data;
+ 	struct list_head list;
+ 	void *pdata;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
+index ba3fa1c2e5d9..b9e7d3e7b15d 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
+@@ -239,7 +239,7 @@ void bnxt_ulp_stop(struct bnxt *bp)
+ 
+ 		adev = &aux_priv->aux_dev;
+ 		if (adev->dev.driver) {
+-			struct auxiliary_driver *adrv;
++			const struct auxiliary_driver *adrv;
+ 			pm_message_t pm = {};
+ 
+ 			adrv = to_auxiliary_drv(adev->dev.driver);
+@@ -277,7 +277,7 @@ void bnxt_ulp_start(struct bnxt *bp, int err)
+ 
+ 		adev = &aux_priv->aux_dev;
+ 		if (adev->dev.driver) {
+-			struct auxiliary_driver *adrv;
++			const struct auxiliary_driver *adrv;
+ 
+ 			adrv = to_auxiliary_drv(adev->dev.driver);
+ 			edev->en_state = bp->state;
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 0f17fc1181d2..7341e7c4ef24 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -2784,7 +2784,7 @@ static struct ice_pf *
+ ice_ptp_aux_dev_to_owner_pf(struct auxiliary_device *aux_dev)
+ {
+ 	struct ice_ptp_port_owner *ports_owner;
+-	struct auxiliary_driver *aux_drv;
++	const struct auxiliary_driver *aux_drv;
+ 	struct ice_ptp *owner_ptp;
+ 
+ 	if (!aux_dev->dev.driver)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/dev.c b/drivers/net/ethernet/mellanox/mlx5/core/dev.c
+index 47e7c2639774..9a79674d27f1 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/dev.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/dev.c
+@@ -349,7 +349,7 @@ int mlx5_attach_device(struct mlx5_core_dev *dev)
+ {
+ 	struct mlx5_priv *priv = &dev->priv;
+ 	struct auxiliary_device *adev;
+-	struct auxiliary_driver *adrv;
++	const struct auxiliary_driver *adrv;
+ 	int ret = 0, i;
+ 
+ 	devl_assert_locked(priv_to_devlink(dev));
+@@ -406,7 +406,7 @@ void mlx5_detach_device(struct mlx5_core_dev *dev, bool suspend)
+ {
+ 	struct mlx5_priv *priv = &dev->priv;
+ 	struct auxiliary_device *adev;
+-	struct auxiliary_driver *adrv;
++	const struct auxiliary_driver *adrv;
+ 	pm_message_t pm = {};
+ 	int i;
+ 
+diff --git a/include/linux/auxiliary_bus.h b/include/linux/auxiliary_bus.h
+index de21d9d24a95..bdff7b85f2ae 100644
+--- a/include/linux/auxiliary_bus.h
++++ b/include/linux/auxiliary_bus.h
+@@ -203,7 +203,7 @@ static inline struct auxiliary_device *to_auxiliary_dev(struct device *dev)
+ 	return container_of(dev, struct auxiliary_device, dev);
+ }
+ 
+-static inline struct auxiliary_driver *to_auxiliary_drv(struct device_driver *drv)
++static inline const struct auxiliary_driver *to_auxiliary_drv(const struct device_driver *drv)
+ {
+ 	return container_of(drv, struct auxiliary_driver, driver);
+ }
+diff --git a/sound/soc/sof/sof-client.c b/sound/soc/sof/sof-client.c
+index 99f74def4ab6..5d6005a88e79 100644
+--- a/sound/soc/sof/sof-client.c
++++ b/sound/soc/sof/sof-client.c
+@@ -357,7 +357,7 @@ EXPORT_SYMBOL_NS_GPL(sof_client_ipc4_find_module, SND_SOC_SOF_CLIENT);
+ 
+ int sof_suspend_clients(struct snd_sof_dev *sdev, pm_message_t state)
+ {
+-	struct auxiliary_driver *adrv;
++	const struct auxiliary_driver *adrv;
+ 	struct sof_client_dev *cdev;
+ 
+ 	mutex_lock(&sdev->ipc_client_mutex);
+@@ -380,7 +380,7 @@ EXPORT_SYMBOL_NS_GPL(sof_suspend_clients, SND_SOC_SOF_CLIENT);
+ 
+ int sof_resume_clients(struct snd_sof_dev *sdev)
+ {
+-	struct auxiliary_driver *adrv;
++	const struct auxiliary_driver *adrv;
+ 	struct sof_client_dev *cdev;
+ 
+ 	mutex_lock(&sdev->ipc_client_mutex);
+-- 
+2.45.2
+
 
