@@ -1,99 +1,93 @@
-Return-Path: <netdev+bounces-102415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E0A9902DFF
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 03:40:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D359902E09
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 03:45:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9FBC1F22A7E
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 01:40:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A57FE1C219DC
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 01:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B108F5A;
-	Tue, 11 Jun 2024 01:40:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 763579475;
+	Tue, 11 Jun 2024 01:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gszLsRIN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F4F2vqYm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1C28488;
-	Tue, 11 Jun 2024 01:40:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C631FA3
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 01:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718070039; cv=none; b=qr9fRdzdxeowrg+vcw5QNqiI6O+1cQGjffb5dB/szhAs8ppfjeg2uwCfrANaQ9Qz3aCUBYocgHLyPRSppmiXY5Aiul25i+svQjcGVR0CVd7EjkX98/y4aMzw+gwFMg+7X4lTzG0kI6b6RFQ0xQvSLbVdlTAcZlnpeh87wxMsRaQ=
+	t=1718070307; cv=none; b=IzFrGpKy5CPO7BTN+BDzJjRoYEs8G4satgGOWDLpnQAtJMS+RXOvVq7VNU18JWQr80ZZtZqKfJv/z90Vd/ovX9xXBiNsC2fyXUMPRGs+EOwvkqsgTTeTXqOFM5hbb6wvBxymVn9qFAIU4C7977MbVDWMDV+p0Ufzlc8r1luX25w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718070039; c=relaxed/simple;
-	bh=j7HCWuWgHbxnyKpBoHz9jiNnduHdqNBguHdWyEaUkeY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=E+/76Com0gcCJ+EyH2XQPusijYqFGosLoZKAFPfXHTHutw1Li79my463i78lz0naTm2d1Qop7FuvDoCco+I1YWkCeUSxG7QwCcjj/hYKtsU+wfYM6ziDQ+dr4RCShiNC3mKu7iHXUWeaDdKvrAktsn8PV39f38hcb8iDx5xOUlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gszLsRIN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AF96BC4AF49;
-	Tue, 11 Jun 2024 01:40:38 +0000 (UTC)
+	s=arc-20240116; t=1718070307; c=relaxed/simple;
+	bh=PL8O30wqaDPXSI3sRz9e2nqLDQOVP9S8inAYSWqhKts=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k06/L+ysBYgl60sN0nkXeK4adFHsM/xgWY+C6WxhwDbcJiv4J7E2aSZ7IHgwQ8cyeu4LRWVAXpHN4mug8lDF0ZvNcDPmRFxC+bJ5Lyc1O4A+NY2wPyym5zkRwPcRZO4zmLcfq1UD6vOjTs6Lqw9szmcKzSPMjLd8iHY2Lwn4Sq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F4F2vqYm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F866C2BBFC;
+	Tue, 11 Jun 2024 01:45:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718070038;
-	bh=j7HCWuWgHbxnyKpBoHz9jiNnduHdqNBguHdWyEaUkeY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gszLsRIN2CpfC5SXqU7SF8D7iD4hAZ/ntx8Yatxf+blU0aITsUww+695zk1JZnewo
-	 gtfDw9rmWZuHiHY32zuu97h4zs0eLZ8q/cEfooHUns47w53Cmx67jIUJ/1vdNLkDWv
-	 KDrxQOIb0scj/+IIS1e06BZWhqA2QxAiQAdlLatSI35GC71eXuNaXsp84M7Oa9dfkA
-	 uXU+0Y+1XP1Iq9BLhUn8hFNZMsXANyP0WKQ7MSeE1WjK7usZEwekWxb80SWRnUCjGq
-	 h7mvs30kqSnQDO5KJtOK18VoP2im3gC3kqWCInhXP7kkDB5kEVgXgHw1GFbKMeuf6u
-	 GLMyUO9f75a5g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9C39AC54BB3;
-	Tue, 11 Jun 2024 01:40:38 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1718070306;
+	bh=PL8O30wqaDPXSI3sRz9e2nqLDQOVP9S8inAYSWqhKts=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=F4F2vqYm36kvYzcng0MMpjSxgeU4nuS3SeoGfU4zfuFPHCa5nfWmzVq5ZgoOY754U
+	 tdUpY/yr8dYPgOqYwpmtmCmnTJQ3rMFaj69whKs6FXzyWejHonkqW/4seKuScAuabh
+	 +OFQG5tZYB0H2yoX81h7nCNTlhDn96lMtGsDGYdBD3vFJymgPiLs1bKDR1Nnd98vlo
+	 kJ75DDEeaJCuq+sNYvIA2vkvPfTsSaxteIDl7QKvl0N6SkX2Ds8ggtsSQite7kf0FM
+	 YwzXJITO1l/JNjBgI8kIWQI8lknsf/pCKLKc30I6wKb3JK/xrrqiLbsqaOdLH8aEO7
+	 aCHjo1SsT0gCw==
+Date: Mon, 10 Jun 2024 18:45:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, pabeni@redhat.com,
+ davem@davemloft.net, dsahern@kernel.org, mst@redhat.com,
+ jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+ leitao@debian.org, netdev@vger.kernel.org, Jason Xing
+ <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next] net: dqs: introduce NETIF_F_NO_BQL device
+ feature
+Message-ID: <20240610184505.35006364@kernel.org>
+In-Reply-To: <CAL+tcoCGumdRKgd_1bQj1U_sNPsvYmsNOKwSWxazU0FwmeNTwA@mail.gmail.com>
+References: <20240609131732.73156-1-kerneljasonxing@gmail.com>
+	<CANn89iK+UWubgdKYd3g7Q+UjibDqUD+Lv5kfmEpB+Rc0SxKT6w@mail.gmail.com>
+	<CAL+tcoCGumdRKgd_1bQj1U_sNPsvYmsNOKwSWxazU0FwmeNTwA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] isdn: add missing MODULE_DESCRIPTION() macros
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171807003863.13638.7461391442889099274.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Jun 2024 01:40:38 +0000
-References: <20240607-md-drivers-isdn-v1-1-81fb7001bc3a@quicinc.com>
-In-Reply-To: <20240607-md-drivers-isdn-v1-1-81fb7001bc3a@quicinc.com>
-To: Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 10 Jun 2024 07:55:55 +0800 Jason Xing wrote:
+> > (I think Vladimir was trying to make some room, this was a discussion
+> > we had last year)  
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+s/Vladimir/Olek/ ?
 
-On Fri, 7 Jun 2024 11:56:56 -0700 you wrote:
-> make allmodconfig && make W=1 C=1 reports:
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/hfcpci.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/hfcmulti.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/hfcsusb.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/avmfritz.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/speedfax.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/mISDNinfineon.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/w6692.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/netjet.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/mISDNipac.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/hardware/mISDN/mISDNisar.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/mISDN/mISDN_core.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/mISDN/mISDN_dsp.o
-> WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/isdn/mISDN/l1oip.o
+> Thanks for your reminder. When I was trying to introduce one new bit,
+> I noticed an overflow warning when compiling.
 > 
-> [...]
+> > I do not see the reason to report to ethtool the 'nobql bit' :
+> > If a driver opts-out, then the bql sysfs files will not be there, user
+> > space can see the absence of the files.  
+> 
+> The reason is that I just followed the comment to force myself to
+> report to ethtool. Now I see.
+> 
+> It seems not that easy to consider all the non-BQL drivers. Let me
+> think more about it.
 
-Here is the summary with links:
-  - isdn: add missing MODULE_DESCRIPTION() macros
-    https://git.kernel.org/netdev/net-next/c/2ebb87f45b3c
+All Eric was saying, AFAIU, is that you can for example add a bit 
+in somewhere towards the end of struct nedevice, no need to pack
+this info into feature bits.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+BTW the Fixes tag is a bit of an exaggeration here. The heuristic in
+netdev_uses_bql() is best effort, its fine to miss some devices.
 
