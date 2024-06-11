@@ -1,112 +1,92 @@
-Return-Path: <netdev+bounces-102414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BADAF902DFB
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 03:37:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8207E902E00
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 03:40:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A2A81F22B37
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 01:37:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA994B21F11
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 01:40:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F658488;
-	Tue, 11 Jun 2024 01:36:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AF6DA932;
+	Tue, 11 Jun 2024 01:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="h4KUG/VN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IG9vYEoV"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87160EDF;
-	Tue, 11 Jun 2024 01:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1F18493;
+	Tue, 11 Jun 2024 01:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718069815; cv=none; b=A/y0kmFoMctbXxYgKhgrQM1VTFQXqJFpi64q9bvSjxiNpGEUgh2Ip/vyMwCkPmqoUEEe+k5eUbmiRndFB4NQvEgBHlULhtR4mMUqvMog76a1G1vRN/7gdXFCuPErBidtWgJwUCv0r5Aqbm+UJO8zIJSpTAt7cRF1673ehJ/ndFo=
+	t=1718070039; cv=none; b=QLL34F5DeS8LgsKPjIb+GmpA+MAG7Ubr+KQfFcKlOijQoEKhntzEsHJYNBq7lMaiEQbyLynMUKGDxORi7SIH5/orYdGWe9E6Qe2IIZTGNVjKoU69dDEJUj8rSHVWZZbfRrhGh1s8y/XpvejkwvInjxRwDpSKEMJuyZSJAl2cEnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718069815; c=relaxed/simple;
-	bh=mf4qVlzMUzfRL9BvC3X0oZecvghDtTV1GYZ1nErXJHc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=qUjSGmP/Fy8oVIERrIJIx24AXJXJHpmR+o5k8U9p+WIvbL03A7A/XpTXGWiWosjfZoykYCApWcek1n8wW46y8LqFTQ6C/Qyz8+vJqYLeTz1jmpxAI7F+WEv92/Y/EAAdV1/gAL7FbfaRe5NOwZ+m8Z3blkl1uxjqJOcf3duiRSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=h4KUG/VN reason="signature verification failed"; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=QL5dZ9wzjqu7SD+S9DX03UlVdElUpOveLiguRCC/9Zc=; b=h
-	4KUG/VNBJ/AQPAzF0E8SHvU+q42nq1TQuMSgGfXC6CkWIGAmNJjXCBLvrdEv42H6
-	jOHcCx00Gw3tiNFI+JPn/GE1AJ0Ay8yZrwWnwAaseitZ6U7nt65ebZW2lL2CJ2Rs
-	L4tCIJD4EyQsqekrQKIWjUhiVzXskAyJMZgphG6fjo=
-Received: from slark_xiao$163.com ( [223.104.68.135] ) by
- ajax-webmail-wmsvr-40-148 (Coremail) ; Tue, 11 Jun 2024 09:36:26 +0800
- (CST)
-Date: Tue, 11 Jun 2024 09:36:26 +0800 (CST)
-From: "Slark Xiao" <slark_xiao@163.com>
-To: "Sergey Ryazanov" <ryazanov.s.a@gmail.com>, quic_jhugo@quicinc.com, 
-	"Qiang Yu" <quic_qianyu@quicinc.com>
-Cc: loic.poulain@linaro.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, manivannan.sadhasivam@linaro.org, 
-	"mhi@lists.linux.dev" <mhi@lists.linux.dev>, 
-	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>
-Subject: Re:Re: [PATCH v1 2/2] net: wwan: Fix SDX72 ping failure issue
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20230109(dcb5de15)
- Copyright (c) 2002-2024 www.mailtech.cn 163com
-In-Reply-To: <30d71968-d32d-4121-b221-d95a4cdfedb8@gmail.com>
-References: <20240607100309.453122-1-slark_xiao@163.com>
- <30d71968-d32d-4121-b221-d95a4cdfedb8@gmail.com>
-X-NTES-SC: AL_Qu2aCvydtk8j4CmaZukfmk8Sg+84W8K3v/0v1YVQOpF8jCHrxgkRXXVJP2bq0du3MRiqkxKdVzhnxtxTR5BccI0hd2jp34DAWcNsIPZQjnwBMQ==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	s=arc-20240116; t=1718070039; c=relaxed/simple;
+	bh=zNhu5pv74/0YgzcNxpZ0CEreH1xs1OhCRuHlie/CuRw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=YXeNtpT4mXd966pVjJJKS2ZNcaRmwW/mbUjs8ytHZjitYYg1CTptw6sDmRJWq9gqq+kfRdifhj/a2EgKjcO9j8xNxtGSdDaBPOXYPVHW/zAJIIw3MGFBp9Rg0XMwS2+k3ftCntD0abHVy1Q/Y6n9yvjMH8E9ErTShTBDS2Uya8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IG9vYEoV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A9C03C4AF48;
+	Tue, 11 Jun 2024 01:40:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718070038;
+	bh=zNhu5pv74/0YgzcNxpZ0CEreH1xs1OhCRuHlie/CuRw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=IG9vYEoVHE2dZnyaPlheX5Mb8SgccoCYVoQZ2Uc66VX9hYR1qhc+gNS1uheWfN3jg
+	 3EjiU6DOs3/7CSzpASjoYMVibEtsIaKw0BlUqrpTlt0JIEbDhw404DRWnLqUx7QELI
+	 ZLCNWK1405fqtiCj1B/ecU8dvOEZKag0x5fHR/Eu/nqK22nxMdpBBUYvpdEPFGYva2
+	 T4SJ07anUDnY1mw6C/qOO8OlCQ090ZuvhlFZ/y/o0YXtGi45RhUZUUiig/0ADPf2Fw
+	 QV0RumNLceTzZ5yNAQaswYuQWI5/TDQrp4WzWtOFz8U/iUN76m/e8YW9zDFh4/s6JB
+	 VMUeyR7yoYYkg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 91594C595C0;
+	Tue, 11 Jun 2024 01:40:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <97a4347.18d5.19004f07932.Coremail.slark_xiao@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:_____wD3H+saqmdmT_16AA--.4W
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbiRwP5ZGV4JtK1gQAFsB
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: bpf-next 2024-06-06
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171807003859.13638.9594019239427847256.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Jun 2024 01:40:38 +0000
+References: <20240606223146.23020-1-daniel@iogearbox.net>
+In-Reply-To: <20240606223146.23020-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
-CgorTW9yZSBtYWludGFpbmVyIHRvIHRoaXMgc2Vjb25kIHBhdGNoIGxpc3QuCgpBdCAyMDI0LTA2
-LTA4IDA2OjI4OjQ4LCAiU2VyZ2V5IFJ5YXphbm92IiA8cnlhemFub3Yucy5hQGdtYWlsLmNvbT4g
-d3JvdGU6Cj5IZWxsbyBTbGFyaywKPgo+d2l0aG91dCB0aGUgZmlyc3QgcGF0Y2ggaXQgaXMgY2xv
-c2UgdG8gaW1wb3NzaWJsZSB0byB1bmRlcnN0YW5kIHRoaXMgCj5vbmUuIE5leHQgdGltZSBwbGVh
-c2Ugc2VuZCBzdWNoIHRpZ2h0bHkgY29ubmVjdGVkIHBhdGNoZXMgdG8gYm90aCAKPm1haWxpbmcg
-bGlzdHMuCj4KU29ycnkgZm9yIHRoaXMgbWlzdGFrZSBzaW5jZSBpdCdzIG15IGZpcnN0IGNvbW1p
-dCBhYm91dCBjb21taXR0aW5nIGNvZGUgdG8gMgpkaWZmZXJlbmNlIGFyZWE6IG1oaSBhbmQgbWJp
-bS4gQm90aCB0aGUgbWFpbnRhaW5lcnMgYXJlIGRpZmZlcmVuY2UuCkluIGNhc2UgYSBuZXcgdmVy
-c2lvbiBjb21taXQgd291bGQgYmUgY3JlYXRlZCwgSSB3b3VsZCBsaWtlIHRvIGFzayBpZgpzaG91
-bGQgSSBhZGQgYm90aCBzaWRlIG1haW50YWluZXJzIG9uIHRoZXNlIDIgcGF0Y2hlcyA/CiAKPk9u
-IDA3LjA2LjIwMjQgMTM6MDMsIFNsYXJrIFhpYW8gd3JvdGU6Cj4+IEZvciBTRFg3MiBNQklNIGRl
-dmljZSwgaXQgc3RhcnRzIGRhdGEgbXV4IGlkIGZyb20gMTEyIGluc3RlYWQgb2YgMC4KPj4gVGhp
-cyB3b3VsZCBsZWFkIHRvIGRldmljZSBjYW4ndCBwaW5nIG91dHNpZGUgc3VjY2Vzc2Z1bGx5Lgo+
-PiBBbHNvIE1CSU0gc2lkZSB3b3VsZCByZXBvcnQgImJhZCBwYWNrZXQgc2Vzc2lvbiAoMTEyKSIu
-Cj4+IFNvIHdlIGFkZCBhIGxpbmsgaWQgZGVmYXVsdCB2YWx1ZSBmb3IgdGhlc2UgU0RYNzIgcHJv
-ZHVjdHMgd2hpY2gKPj4gd29ya3MgaW4gTUJJTSBtb2RlLgo+PiAKPj4gU2lnbmVkLW9mZi1ieTog
-U2xhcmsgWGlhbyA8c2xhcmtfeGlhb0AxNjMuY29tPgo+Cj5TaW5jZSBpdCBhIGJ1dCBmaXgsIGl0
-IG5lZWRzIGEgJ0ZpeGVzOicgdGFnLgo+CkFjdHVhbGx5LCBJIHRob3VnaHQgaXQncyBhIGZpeCBm
-b3IgY29tbW9uIFNEWDcyIHByb2R1Y3QuIEJ1dCBub3cgSSB0aGluawppdCBzaG91bGQgYmUgb25s
-eSBtZWV0IGZvciBteSBTRFg3MiBNQklNIHByb2R1Y3QuIFByZXZpb3VzIGNvbW1pdCAKaGFzIG5v
-dCBiZWVuIGFwcGxpZWQuIFNvIHRoZXJlIGlzIG5vIGNvbW1pdCBpZCBmb3IgIkZpeGVzIi4KQnV0
-IEkgdGhpbmsgSSBzaGFsbCBpbmNsdWRlIHRoYXQgcGF0Y2ggaW4gVjIgdmVyc2lvbi4KUGxlYXNl
-IHJlZjogCmh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xrbWwvMjAyNDA1MjAwNzA2MzMuMzA4OTEz
-LTEtc2xhcmtfeGlhb0AxNjMuY29tLwoKPj4gLS0tCj4+ICAgZHJpdmVycy9uZXQvd3dhbi9taGlf
-d3dhbl9tYmltLmMgfCAzICsrLQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyks
-IDEgZGVsZXRpb24oLSkKPj4gCj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC93d2FuL21oaV93
-d2FuX21iaW0uYyBiL2RyaXZlcnMvbmV0L3d3YW4vbWhpX3d3YW5fbWJpbS5jCj4+IGluZGV4IDNm
-NzJhZTk0M2IyOS4uNGNhNWM4NDUzOTRiIDEwMDY0NAo+PiAtLS0gYS9kcml2ZXJzL25ldC93d2Fu
-L21oaV93d2FuX21iaW0uYwo+PiArKysgYi9kcml2ZXJzL25ldC93d2FuL21oaV93d2FuX21iaW0u
-Ywo+PiBAQCAtNjE4LDcgKzYxOCw4IEBAIHN0YXRpYyBpbnQgbWhpX21iaW1fcHJvYmUoc3RydWN0
-IG1oaV9kZXZpY2UgKm1oaV9kZXYsIGNvbnN0IHN0cnVjdCBtaGlfZGV2aWNlX2lkCj4+ICAgCW1i
-aW0tPnJ4X3F1ZXVlX3N6ID0gbWhpX2dldF9mcmVlX2Rlc2NfY291bnQobWhpX2RldiwgRE1BX0ZS
-T01fREVWSUNFKTsKPj4gICAKPj4gICAJLyogUmVnaXN0ZXIgd3dhbiBsaW5rIG9wcyB3aXRoIE1I
-SSBjb250cm9sbGVyIHJlcHJlc2VudGluZyBXV0FOIGluc3RhbmNlICovCj4+IC0JcmV0dXJuIHd3
-YW5fcmVnaXN0ZXJfb3BzKCZjbnRybC0+bWhpX2Rldi0+ZGV2LCAmbWhpX21iaW1fd3dhbl9vcHMs
-IG1iaW0sIDApOwo+PiArCXJldHVybiB3d2FuX3JlZ2lzdGVyX29wcygmY250cmwtPm1oaV9kZXYt
-PmRldiwgJm1oaV9tYmltX3d3YW5fb3BzLCBtYmltLAo+PiArCQltaGlfZGV2LT5taGlfY250cmwt
-PmxpbmtfaWQgPyBtaGlfZGV2LT5taGlfY250cmwtPmxpbmtfaWQgOiAwKTsKPgo+SXMgaXQgcG9z
-c2libGUgdG8gZHJvcCB0aGUgdGVybmFyeSBvcGVyYXRvciBhbmQgcGFzcyB0aGUgbGlua19pZCBk
-aXJlY3RseT8KPgo+PiAgIH0KPj4gICAKPj4gICBzdGF0aWMgdm9pZCBtaGlfbWJpbV9yZW1vdmUo
-c3RydWN0IG1oaV9kZXZpY2UgKm1oaV9kZXYpCg==
+Hello:
+
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri,  7 Jun 2024 00:31:46 +0200 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
+> 
+> The following pull-request contains BPF updates for your *net-next* tree.
+> 
+> We've added 54 non-merge commits during the last 10 day(s) which contain
+> a total of 50 files changed, 1887 insertions(+), 527 deletions(-).
+> 
+> [...]
+
+Here is the summary with links:
+  - pull-request: bpf-next 2024-06-06
+    https://git.kernel.org/netdev/net-next/c/b1156532bc29
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
