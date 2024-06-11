@@ -1,72 +1,131 @@
-Return-Path: <netdev+bounces-102431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87D9F902E9E
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 04:54:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9699C902EA2
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 04:56:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BD6C1F21ED5
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 02:54:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E91DAB2133C
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 02:56:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93EB016F85D;
-	Tue, 11 Jun 2024 02:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52ABF15ADBB;
+	Tue, 11 Jun 2024 02:56:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RQTsI11q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eu1jqijJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B9FE8286B;
-	Tue, 11 Jun 2024 02:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4FDE1581E2
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 02:56:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718074459; cv=none; b=fx/PLyLVAmn9D5+mLAuIPHRlULe4f8TeYTeV/QS4BWy5a6FyVs/uH1TIfGNZ9BGxGySdH0/mRtrNenBeY4DibLyvy7oTLVyu7W1Rv2zNNjnTP8S9QmoE4FnV+FR8RFMG9CLzy4OQ7ID7gq77DVMRBu1lenNZRcj8Tg/sW3nKGZs=
+	t=1718074611; cv=none; b=cxg7qH+HEmqkKYOZXqeF2npwwHrllaIzA/PLzzHgwH1iR6elExGSel+qsOxj8GxWlpRN9CgNBdXznwQ41ulha2bjqHFLz+hkWIXwgMFwu+atkuCst2AQm2i2jie4wV8vjC+G4sdyvrCmR9pVdZjwMvl164EdTbpsPbSpVtGDonY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718074459; c=relaxed/simple;
-	bh=BACHajv8XfvegwB5hT1c4hcnhBTRLgPvz/ukzBeVJGc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=geE6dGHCxJ0x4LfOF4sKUGl6k1MygAc7a4Z3gJX/FzlVV3HK7AZtrn8z2fUuoqur8CWuxhYDtr7n6t4RNInwz41hFSa4EUHLjXboETdz+bYWf6M4YFl657ZZDlJlvdtODBcv47Lk63c9uc8dyxAnDAWh+pgANFyhWlpAcyIf3kE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RQTsI11q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 804F1C2BBFC;
-	Tue, 11 Jun 2024 02:54:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718074459;
-	bh=BACHajv8XfvegwB5hT1c4hcnhBTRLgPvz/ukzBeVJGc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RQTsI11qBbrzc8MjOJ+YV2bzWi4FqNKyLiyaFws5E60kxRiFZt8fe4Hu50qMwnymD
-	 ZKZhIRLv42LnU55YT/ERC7Cl8lMYpR4cysJqz3gLdoMABDMsn+a8bUsPZ8GUPfCSJ0
-	 JDoDZt5bZR65MBw2w7MMrcePJRRXQOPrhfSgnl5t6anBgNCvfIeLNZs232lDWzUtMU
-	 JhpMXVdl3kD0GKUmsCjSTKhnN63YCAZP40LCBh2RHZE1vQWkdR2IpF0/UHkULTjf/J
-	 HGKAdIbL+zAdX8DNwsmMRBayvXha2C4dfRya+wlobCz2NotHc2BVJ6z0QwrBrbC25M
-	 noJEzNS0t7TFQ==
-Date: Mon, 10 Jun 2024 19:54:17 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Aleksandr Mishin <amishin@t-argos.ru>
-Cc: Edwin Peer <edwin.peer@broadcom.com>, Michael Chan
- <michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <lvc-project@linuxtesting.org>, Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: Re: [PATCH net v2] bnxt_en: Adjust logging of firmware messages in
- case of released token in __hwrm_send()
-Message-ID: <20240610195417.693fb12e@kernel.org>
-In-Reply-To: <20240609070129.12364-1-amishin@t-argos.ru>
-References: <20240609070129.12364-1-amishin@t-argos.ru>
+	s=arc-20240116; t=1718074611; c=relaxed/simple;
+	bh=u19nYeukHLKbXEBOaaw+fkkUCtMPcISXCjD9zqHbg2M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ppvTE2yq4qwFF2AimKSfokusroEeUHrC8OZ8xgLj440+PJoaVavAEAwJtkf58c6u3EAuGSXpxjTucGlWwLSkFSDaMDfXGtTdlhnuaJiHxlzmZHL64fgfD0J4xjUF1IDzHoNPOuO7nPcuHuyv1fLZSkr7iqu5Fr9LIBqxTatp7Xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Eu1jqijJ; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-572c65cea55so910761a12.0
+        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 19:56:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718074608; x=1718679408; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u19nYeukHLKbXEBOaaw+fkkUCtMPcISXCjD9zqHbg2M=;
+        b=Eu1jqijJgGVBxANuWUw77kHi79nr8AV6UmdahjUorl7n7W8fmEyBuuOao0hqO7cL/F
+         jLkyEynMoIm/S/nTgzIC35CfYXPMj2hANAgatC6aH8fEOFoY81VTPX1d+4qN5e43JcOZ
+         qxFTD9EbiN71NOxJiZT0AliK7fAcfJdl3QBmePo5fbQ3HZmZiLvHtJuRkeiz/Ghw/FJs
+         xRUqcCIJvApUQpCo+uNn6M5h7AwlpGwiCUwCE9jLFRDB5/cFdT/0ZiFUghTFGBdROv8F
+         Rlu36Hy1LV2DC4eXQ3e2mKPlnVB7GRN1HEv+imO84Gphfn2xR1D8Cdgw9BFurIo1Lao0
+         w+AQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718074608; x=1718679408;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u19nYeukHLKbXEBOaaw+fkkUCtMPcISXCjD9zqHbg2M=;
+        b=k0gBjzdCv1bLY20NoCfvxbiWHM7ACh2AO+1CkJkZdLlACM6ftWppajM78klZ885xRB
+         Pi+FlFz1YXu5bWm7DbOJbEwKjCcwahew//BSCM8jd9wWL001YnrNMmDgevl7WptVZHis
+         L3nx8K/8RyXY0gTJ4dEplN2JF0MUFWRuLGMoNm7xsQP9x/JtKHisCt63EWvDleuyDPRa
+         IefBXg/e33TN5alYyPugs47UbAJk4hItsFBLGRNcfKtM4ZyRLOOkriatPIS7/5RaTyb8
+         AJ8DFW5YjxQ2B0IbsR71zPxXOGfgnKlJg66RHhqcWVMPyJGtsIzqNppFOl9S6d3Xk6qg
+         L1VQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVVOWg5rHhcprHo3ati0FYy8ww0J4M0uJpcK66tr6cxcfPC1KOKo+LAKZ2zfR9Xycs4eggQJmOvXXa4k+DFvgEVeT7JYc6o
+X-Gm-Message-State: AOJu0YxRbMcnVcU4hhreluadasLoJZo7mzOloj9VqbUaNTdU6cLr5uZp
+	9GqAKGH+UMCfVK3TXONLCk2yj2CxdOr0MytpSr+4YU0JeKojLpyj6VlTgRdWVPD9p0P7IMsS66D
+	0QPUIbEmHtjs/Kg2aVOoyDahktXc=
+X-Google-Smtp-Source: AGHT+IHixH8tpH74VFFtwCApwnQdwa6F/TYXNRnC1q2OY6uMmL8u0C9cTVuN33YXPzmR49QJUfT42+N/eKIWzJIBqQs=
+X-Received: by 2002:a05:6402:3196:b0:57c:6b49:aef with SMTP id
+ 4fb4d7f45d1cf-57c90d16fd9mr810565a12.11.1718074607878; Mon, 10 Jun 2024
+ 19:56:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240609131732.73156-1-kerneljasonxing@gmail.com>
+ <CANn89iK+UWubgdKYd3g7Q+UjibDqUD+Lv5kfmEpB+Rc0SxKT6w@mail.gmail.com>
+ <CAL+tcoCGumdRKgd_1bQj1U_sNPsvYmsNOKwSWxazU0FwmeNTwA@mail.gmail.com> <20240610184505.35006364@kernel.org>
+In-Reply-To: <20240610184505.35006364@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 11 Jun 2024 10:56:09 +0800
+Message-ID: <CAL+tcoCZ_pfv5g1P+x+gTeAseifJ=W6y+0GGgS31ih7BqGCrTw@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: dqs: introduce NETIF_F_NO_BQL device feature
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, pabeni@redhat.com, davem@davemloft.net, 
+	dsahern@kernel.org, mst@redhat.com, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com, leitao@debian.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 9 Jun 2024 10:01:29 +0300 Aleksandr Mishin wrote:
->  		hwrm_err(bp, ctx, "hwrm req_type 0x%x seq id 0x%x error 0x%x\n",
-> -			 req_type, token->seq_id, rc);
-> +			req_type, le16_to_cpu(ctx->req->seq_id), rc);
+On Tue, Jun 11, 2024 at 9:45=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 10 Jun 2024 07:55:55 +0800 Jason Xing wrote:
+> > > (I think Vladimir was trying to make some room, this was a discussion
+> > > we had last year)
+>
+> s/Vladimir/Olek/ ?
+>
+> > Thanks for your reminder. When I was trying to introduce one new bit,
+> > I noticed an overflow warning when compiling.
+> >
+> > > I do not see the reason to report to ethtool the 'nobql bit' :
+> > > If a driver opts-out, then the bql sysfs files will not be there, use=
+r
+> > > space can see the absence of the files.
+> >
+> > The reason is that I just followed the comment to force myself to
+> > report to ethtool. Now I see.
+> >
+> > It seems not that easy to consider all the non-BQL drivers. Let me
+> > think more about it.
+>
+> All Eric was saying, AFAIU, is that you can for example add a bit
+> in somewhere towards the end of struct nedevice, no need to pack
+> this info into feature bits.
 
-The alignment with the ( looks messed up
+Oh, thanks for pointing this out.
+
+I would like to add a new bit field in the enum netdev_priv_flags
+because it is better that it's grouped into an existing enum for
+future compatibility.
+
+>
+> BTW the Fixes tag is a bit of an exaggeration here. The heuristic in
+> netdev_uses_bql() is best effort, its fine to miss some devices.
+
+I see.
+
+Thanks,
+Jason
 
