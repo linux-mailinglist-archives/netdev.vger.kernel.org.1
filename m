@@ -1,111 +1,106 @@
-Return-Path: <netdev+bounces-102581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01843903CB6
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:07:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 766AB903D56
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:29:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73A63B21964
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:07:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1793C289377
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:29:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D5517BB3C;
-	Tue, 11 Jun 2024 13:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B914F17D378;
+	Tue, 11 Jun 2024 13:29:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oMU7D+Px"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="l4M1o7OC"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD99A17B406;
-	Tue, 11 Jun 2024 13:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF4617D34F;
+	Tue, 11 Jun 2024 13:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718111216; cv=none; b=r88X3xsjGn+DG7oSCD8qweKyjTirSdOqD1cvU5s2e6VTGwFGKMxO8YK95j95vYzCPsUifyMaRDaeRU0AIX4VHCyTvr3jLF9frgQ5Qa3dvSXslYIss745zKvbMUhT0LIrzOxofoQjRKs918Kd9/YBwTulMza27kB5E6Iw2sId56E=
+	t=1718112552; cv=none; b=O/Ru4NjVbBM9tvJkopGDFVJtRnv+3arDS/8BJ9UnXF78WXUnnRvVYEs8v4TwitgN37EvlSdnDLeljQlz9he/RKsaCRoOwDlQ87KvRJuxA/NAS/xkG9ldepnOGkXRSO7YjyyVUHumcxySWWsgAvaEiu+NC7X2Q/glstNC/hIko6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718111216; c=relaxed/simple;
-	bh=qeFyIhjyRVr3qLO9JcdFGRIv32av/Bt1hR6Zi26OP68=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OWvMvoP1RP4gK6sbgdpIyzqW51D+Rj378YnSdzTqOvx5uMySGPL5Q0wjcRWC2oooVEyNVa0DKBnlmM5RcGo3/cN2ePtrnn2bPXoPcrKR9hNp/qfWYy2skfcV9Bca9qnP/jv1+z/3b801RK6e49I60hEzxplwoHfb8IH4n7T6BKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oMU7D+Px; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=4RzQfhz9JM3uFuWXMZQu3myfhwQMauJsDyAR+I1tfCg=; b=oM
-	U7D+PxxIgKdbxS9Lf6Rj5kMt/vXWOCXaEvkwqxopuk2siBu53kzjYuhgw6ImVNHLHJqKkydW2z96s
-	CLFnQ19UPSdxPgwJ6v15/zcHHDTrQd/wbqAHFII7CgCHJIq+IeaVLGUhCUDDsFkzqdaw0Xs+WCcNS
-	af2/Zg2U+ZGmwQ4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sH1D9-00HO90-LP; Tue, 11 Jun 2024 15:06:51 +0200
-Date: Tue, 11 Jun 2024 15:06:51 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?B?Q3Pza+Fz?= Bence <csokas.bence@prolan.hu>
-Cc: imx@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Wei Fang <wei.fang@nxp.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH v2] net: fec: Add ECR bit macros, fix FEC_ECR_EN1588
- being cleared on link-down
-Message-ID: <c49a5e28-e030-4fc1-ab30-9afd997f03bc@lunn.ch>
-References: <20240607081855.132741-1-csokas.bence@prolan.hu>
- <46892275-619c-4dfb-9214-3bbb14b78093@lunn.ch>
- <d6d6c080-b001-4911-83bc-4aca7701cdff@prolan.hu>
+	s=arc-20240116; t=1718112552; c=relaxed/simple;
+	bh=S8kq1YKPY2YCYXE468OBoSzyuhbV4hblKCD/W3a2KBw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UpBy1Py3X/JkQ7rglYTjTLcMsnB3aaJ0zrcmyoptbxnqWa+xszAb2hvBmEkzyQcs9SJSK6aVSwnvGBd9rGTfJ5lOC2mAE12RNk8IMDcuEVPoUEfhf8kUf30QV8+Nc7RR2bs14r6A441T0kIIglKSCCGVoXWAAojCq2mYxSr9ItI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=l4M1o7OC; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 4D6D188660;
+	Tue, 11 Jun 2024 15:29:01 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1718112542;
+	bh=7LztJLOQjw+XAg+XEIr7kZCsERJxxOYihnXImFPkkvU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=l4M1o7OCYl/dvkVYQ/gVTUxO5H8WmdwW6wYCO18/FhCWi6iOhr24pSYUn+k8qvQP8
+	 fHesy9waWPJOAJPEAZWHRCr883+AT4Zj++F45dWOMtmtIAX2aITK76JXYrq/AHJaIy
+	 2kOr5BPz3dIVZ2n88vorYGBcXlaaZX+vVTGJ5a1Nqvax4dEs1oNuymGg0bPuauQCbU
+	 JSKIl4GVx7MEF7Z2B2tDyJfr07QITjIwMCTED7iiZJ8wo0IeafezCZ9nEPrj3AX68n
+	 OLepqilR0f5rtmQDJ4Yaz7ZYFRm8i1w5V14xT/6z+lq/Fph9cQrrVLydPk3n/pWXWu
+	 laQYJ2zEWl6Tw==
+Message-ID: <ee101ca5-4444-4610-9473-1a725a542c91@denx.de>
+Date: Tue, 11 Jun 2024 15:07:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d6d6c080-b001-4911-83bc-4aca7701cdff@prolan.hu>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next,PATCH v7 7/8] net: stmmac: dwmac-stm32: Mask support
+ for PMCR configuration
+To: Christophe Roullier <christophe.roullier@foss.st.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Richard Cochran <richardcochran@gmail.com>, Jose Abreu
+ <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240611083606.733453-1-christophe.roullier@foss.st.com>
+ <20240611083606.733453-8-christophe.roullier@foss.st.com>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <20240611083606.733453-8-christophe.roullier@foss.st.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Tue, Jun 11, 2024 at 10:04:39AM +0200, Csókás Bence wrote:
-> Hi!
-> 
-> On 6/10/24 21:13, Andrew Lunn wrote:
-> > On Fri, Jun 07, 2024 at 10:18:55AM +0200, Csókás, Bence wrote:
-> > > FEC_ECR_EN1588 bit gets cleared after MAC reset in `fec_stop()`, which
-> > > makes all 1588 functionality shut down on link-down. However, some
-> > > functionality needs to be retained (e.g. PPS) even without link.
-> > 
-> > I don't know much about PPS. Could you point to some documentation,
-> > list email etc, which indicated PPS without link is expected to work.
-> > 
-> > Please also Cc: Richard Cochran for changes like this.
-> > 
-> > Thanks
-> > 	Andrew
-> 
-> This is what Richard said two years ago on the now-reverted patch:
-> 
-> Link: https://lore.kernel.org/netdev/YvRdTwRM4JBc5RuV@hoboy.vegasvil.org
+On 6/11/24 10:36 AM, Christophe Roullier wrote:
 
-Thanks.
+[...]
 
-So when you have sync, you have a 1Hz clock, synchronised to the grand
-master. When the link is down, or communication with the grand master
-is lost, you get a free running clock of around 1Hz. I presume that if
-the link does up again and communication to the grand master is
-restored, there is a phase shift in the 1Hz clock, and a frequency
-correction? The hardware has to cope with this.
+>   static void stm32_dwmac_clk_disable(struct stm32_dwmac *dwmac, bool suspend)
+> @@ -348,8 +352,15 @@ static int stm32_dwmac_parse_data(struct stm32_dwmac *dwmac,
+>   		return PTR_ERR(dwmac->regmap);
+>   
+>   	err = of_property_read_u32_index(np, "st,syscon", 1, &dwmac->mode_reg);
+> -	if (err)
+> +	if (err) {
+>   		dev_err(dev, "Can't get sysconfig mode offset (%d)\n", err);
+> +		return err;
+> +	}
+> +
+> +	dwmac->mode_mask = SYSCFG_MP1_ETH_MASK;
+> +	err = of_property_read_u32_index(np, "st,syscon", 2, &dwmac->mode_mask);
+> +	if (err)
+> +		dev_dbg(dev, "Warning sysconfig register mask not set\n");
 
-> Plus, this patch doesn't even re-enable PPS or any other 1588 functions, it
-> just prevents the adapter from forgetting it is even 1588-capable. I'll
-> resubmit with more clear wording and appropriate "Fixes:" and "Cc:" tags.
-
-Thanks
-
-	Andrew
+My comment on V6 was not addressed I think ?
 
