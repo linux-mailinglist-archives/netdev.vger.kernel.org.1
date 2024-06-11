@@ -1,59 +1,70 @@
-Return-Path: <netdev+bounces-102714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F11E9045C5
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 22:30:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3598C9045C8
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 22:32:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C377BB24C20
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 20:30:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A76CD1F2318B
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 20:32:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447F74D8A8;
-	Tue, 11 Jun 2024 20:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4B11411ED;
+	Tue, 11 Jun 2024 20:32:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bW7O3OV8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ITi6r1cQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19B5E63CB;
-	Tue, 11 Jun 2024 20:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE2912E61;
+	Tue, 11 Jun 2024 20:32:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718137846; cv=none; b=fEYUxzFbLoyhJYz5cqNMstLkQgG3H+sv318ZEtFTfyt+BU+KpBoP4bxoPgCohhcpEgBLUKmSUOCJ2CP8+wRclUdBKGGsRrSPvBk0q5ohBvSrM/d0l/BXDabVS/r0Wy0Zdn22A7N26ORO7P9WTReBrLsYRLMC2Rjh5+w8/iwOpuo=
+	t=1718137932; cv=none; b=FCFA2fbQbxnH37X/+7a1Q0Xkeg/AXJmkEXg7k4Qx8wkx5l3DCfZR0JHuwI8PdG6hq7SzVFzBer8dMjTF31H+4foHfeZW2FWvi8ARfTKOZMTRJdphj0ws3lUkG/aglvrOpbC4/rV3IWx5ZRkP3zWzFrQ/G5K6IX3BRAcAMktbiuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718137846; c=relaxed/simple;
-	bh=QJUAl/HXNGAn4ey6eyXBFTC8hrQJC413PQTjAxPjThk=;
+	s=arc-20240116; t=1718137932; c=relaxed/simple;
+	bh=G8ObqV4GF1j+oexJE9NDUI3l/V6Cek7aJDyNu1zlm9o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dzspR0eMCdqVDv3FcRJo6LQcTWbq0/SFoo/LqsnabL0F1eEVwa4Qf45zJaHqE9XLp2AgmXG27miZV/Gz0phBuglzW7OM7OOB7dwx04o+hZNEsL2hWfArjR6bB3dBuydPu8SX3e4ImIhM6BUqSbZ1CfpZ1AsRn6AvltbuQCBhqAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bW7O3OV8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43329C2BD10;
-	Tue, 11 Jun 2024 20:30:44 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=qbezBctzYzGu/uH+bikVne1iMomqgTGbltFtMn5uz6JIObqz3YQLg2I+AZSZPFxF+FQ95HmTQ7qVG2CzShj5gE/qy9wCz4Yd/7OX1QgV4ZG5aKM+3MQJwWxT/7eac2kXygHE15OBqrw3A9gnw6KHfzegxgIQWYYHO/L+wlF7lBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ITi6r1cQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C199C2BD10;
+	Tue, 11 Jun 2024 20:32:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718137845;
-	bh=QJUAl/HXNGAn4ey6eyXBFTC8hrQJC413PQTjAxPjThk=;
+	s=k20201202; t=1718137931;
+	bh=G8ObqV4GF1j+oexJE9NDUI3l/V6Cek7aJDyNu1zlm9o=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bW7O3OV8ugvr4+2JAkhQRVVzKvCrCFkqU+WdGxvW1Yl4oov2GnUwYBSXitB6a5fe7
-	 hwXyKd3MnF4wByIvv+LG9Ha9IMKjtGDamPJuoATnfPbXaFkim/vfaPDAcQx4wD0CW1
-	 +eh5xmSQAHaALYTYF0lHEHD47WgaiuioP8u+96T46uIOBNvLf5zSTKKh74MPoqnnkh
-	 FAQEbPyBS50fjHOvID67kjMxJy6kxtruxSL6z/twRdhflXJbGYIkScG6NjBvqCooKE
-	 V/LP+gY8sZWzuaTvuDVR9iwYmm4W7sbJJS7cEg4WMH0tqKE1Uzeb/TncwvmVIxwLum
-	 H1CTNT0/ch8GQ==
-Date: Tue, 11 Jun 2024 14:30:43 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Martin Schiller <ms@dev.tdt.de>
-Cc: netdev@vger.kernel.org, krzk+dt@kernel.org, davem@davemloft.net,
-	edumazet@google.com, olteanv@gmail.com, conor+dt@kernel.org,
-	kuba@kernel.org, devicetree@vger.kernel.org, pabeni@redhat.com,
-	hauke@hauke-m.de, martin.blumenstingl@googlemail.com,
-	f.fainelli@gmail.com, andrew@lunn.ch, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 01/12] dt-bindings: net: dsa: lantiq,gswip:
- convert to YAML schema
-Message-ID: <171813784153.3020916.2558169964634930233.robh@kernel.org>
-References: <20240611135434.3180973-1-ms@dev.tdt.de>
- <20240611135434.3180973-2-ms@dev.tdt.de>
+	b=ITi6r1cQKPeOmmodbECro67RGdiyNgpUQXFCIr/0smWwsxuIYn9Xy4mw4YVBstr9m
+	 gwOXW+aMNgxwWKlPP3+G7lJ+uUb6R6Ucy3ApqkiEJN1oAK+sq3Kht4M1HN9dtJJD/L
+	 vHfWynXI/OKQrluEnLQ5WrdUqadNP7RaNR9mu66RgaKT8ZDlR5u6fuKUEOgbmIeKFS
+	 F9QYV9+98uh94NzcPP8cwSBa3MGFfZr6RiMwvCP57VdC3YgllZyLZx+EiNJPx2gfgu
+	 7F1ZhKmfa2Bs3gUR0ckol1DgXS6LR86VGjwjo0d6lPWJe+N82YwApaSHld/JO9UIXX
+	 aYjWziC/8YcTA==
+Date: Tue, 11 Jun 2024 13:32:09 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+	fsverity@lists.linux.dev, dm-devel@lists.linux.dev, x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Tim Chen <tim.c.chen@linux.intel.com>
+Subject: Re: [PATCH v4 6/8] fsverity: improve performance by using
+ multibuffer hashing
+Message-ID: <20240611203209.GB128642@sol.localdomain>
+References: <ZmFL-AXZ8lphOCUC@gondor.apana.org.au>
+ <CAMj1kXHLt6v03qkpKfwbN34oyeeCnJb=tpG4GvTn6E1cJQRTOw@mail.gmail.com>
+ <ZmFmiWZAposV5N1O@gondor.apana.org.au>
+ <CAMj1kXFt_E9ghN7GfpYHR4-yaLsz_J-D1Nc3XsVqUamZ6yXHGQ@mail.gmail.com>
+ <ZmFucW37DI6P6iYL@gondor.apana.org.au>
+ <CAMj1kXEpw5b3Rpfe+sRKbQQqVfgWjO_GsGd-EyFvB4_8Bk8T0Q@mail.gmail.com>
+ <ZmF-JHxCfMRuR05G@gondor.apana.org.au>
+ <20240610164258.GA3269@sol.localdomain>
+ <Zmhrh1nodUE-O6Jj@gondor.apana.org.au>
+ <ZmhvnBsqKe7AakY-@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,30 +73,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240611135434.3180973-2-ms@dev.tdt.de>
+In-Reply-To: <ZmhvnBsqKe7AakY-@gondor.apana.org.au>
 
-
-On Tue, 11 Jun 2024 15:54:23 +0200, Martin Schiller wrote:
-> Convert the lantiq,gswip bindings to YAML format.
+On Tue, Jun 11, 2024 at 11:39:08PM +0800, Herbert Xu wrote:
+> On Tue, Jun 11, 2024 at 11:21:43PM +0800, Herbert Xu wrote:
+> >
+> > Therefore if we switched to a linked-list API networking could
+> > give us the buffers with minimal changes.
 > 
-> Also add this new file to the MAINTAINERS file.
+> BTW, this is not just about parallelising hashing.  Just as one of
+> the most significant benefits of GSO does not come from hardware
+> offload, but rather the amortisation of (network) stack overhead.
+> IOW you're traversing a very deep stack once instead of 40 times
+> (this is the factor for 64K vs MTU, if we extend beyond 64K (which
+> we absolute should do) the benefit would increase as well).
 > 
-> Furthermore, the CPU port has to specify a phy-mode and either a phy or
-> a fixed-link. Since GSWIP is connected using a SoC internal protocol
-> there's no PHY involved. Add phy-mode = "internal" and a fixed-link to
-> the example code to describe the communication between the PMAC
-> (Ethernet controller) and GSWIP switch.
-> 
-> Signed-off-by: Martin Schiller <ms@dev.tdt.de>
-> ---
->  .../bindings/net/dsa/lantiq,gswip.yaml        | 202 ++++++++++++++++++
->  .../bindings/net/dsa/lantiq-gswip.txt         | 146 -------------
->  MAINTAINERS                                   |   1 +
->  3 files changed, 203 insertions(+), 146 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
->  delete mode 100644 Documentation/devicetree/bindings/net/dsa/lantiq-gswip.txt
+> The same should apply to the Crypto API.  So even if this was a
+> purely software solution with no assembly code at all, it may well
+> improve GCM performance (at least for users able to feed us bulk
+> data, like networking).
 > 
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+At best this would save an indirect call per message, if the underlying
+algorithm explicitly added support for it and the user of the API migrated to
+the multi-request model.  This alone doesn't seem worth the effort of migrating
+to multi-request, especially considering the many other already-possible
+optimizations that would not require API changes or migrating users to
+multi-request.  The x86_64 AES-GCM is pretty well optimized now after my recent
+patches, but there's still an indirect call associated with the use of the SIMD
+helper which could be eliminated, saving one per message (already as much as we
+could hope to get from multi-request).  authenc on the other hand is almost
+totally unoptimized, as I mentioned before; it makes little sense to talk about
+any sort of multi-request optimization for it at this point.
 
+- Eric
 
