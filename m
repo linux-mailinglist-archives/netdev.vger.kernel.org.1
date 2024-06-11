@@ -1,70 +1,103 @@
-Return-Path: <netdev+bounces-102620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0364903FB6
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 17:07:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C9F6903FBC
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 17:08:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E32B288060
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:07:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B9C61F2614D
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:08:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4792C6B7;
-	Tue, 11 Jun 2024 15:05:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6897518E1E;
+	Tue, 11 Jun 2024 15:06:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="XMaLq7Cm"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FRFMNOCB"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25306364AE
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 15:05:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9EE20DC8
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 15:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718118308; cv=none; b=bTugj51mzA6rogz0z+dhND2zI5BIckTyJGyfb0kZ0ZgNDrWnAM0Pc4X7J2LUkafCmG5IUMLef6YjmQywou0oLIxqoDepXdLLCt0GTAJaqMbJ6lB3mwuwJcmOzrzgwQthHTJyYz0phaQD5/4nIveJ+zsODswyYLX+u92aSaasun0=
+	t=1718118389; cv=none; b=G/FeHlwXCDuUtsmsrzRq9N4a3RufMbUX5MnLFF6VQ+UUiknCUhGM87xf+Ca9uOqK+IavARzRTYyGg8nlr1ArytVFpK1TBCg+ON/K4jv1ZznboH7YgIOMuNWpTSac43Zv9MQHJLD7FXhmn4vd4ZqfF1VYHZXIRBHw1cwC8RACbFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718118308; c=relaxed/simple;
-	bh=0VteprcEpDdYYjRfxuID7OusfAG5C43xjucL+btNqTQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=Ry8fz0g2ccT0q8Cat3+a0Jr0gQFlXZNM8cbkA057DYQYRe8t8tEe1Y1MPWdUem5zov70srq9VBTeG6v7E8UYnRlI8B6f6rmLRaiRyKpzmW3GK2A/Bb0BeuXZhMCK/Wy2InjFULplwVEco9BxYol7oQsCFailK3jKWj/684hSa0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=XMaLq7Cm; arc=none smtp.client-ip=220.197.31.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=0VteprcEpDdYYjRfxu
-	ID7OusfAG5C43xjucL+btNqTQ=; b=XMaLq7CmWLhH2wCA5JI8ofSlndvb3UtajW
-	OjK5E7jIXz/Dqh+/cs7+RUcu8lyAmt70nijFO+QL1dMe0d6cCxB8fSKDjwbRelLT
-	+ce0m4dDqDw56P5R+gaoUEqdJHgUFQIzHvp1KYRqFzSWrtAyXbXMfyd4Ue6zMqUZ
-	iq9Aoh0EA=
-Received: from yang-Virtual-Machine.mshome.net (unknown [175.2.43.125])
-	by gzga-smtp-mta-g1-1 (Coremail) with SMTP id _____wD3_9yJZ2hmWJzHAA--.35969S2;
-	Tue, 11 Jun 2024 23:04:42 +0800 (CST)
-From: yangfeng <yangfeng59949@163.com>
-To: andrew@lunn.ch
-Cc: netdev@vger.kernel.org,
-	yangfeng59949@163.com
-Subject: Re: Re: [PATCH] net: phy: rtl8211f add ethtool set wol function
-Date: Tue, 11 Jun 2024 23:04:41 +0800
-Message-Id: <20240611150441.6798-1-yangfeng59949@163.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <c5fe08f6-6aad-4b64-8925-8f8ae1b26482@lunn.ch>
-References: <c5fe08f6-6aad-4b64-8925-8f8ae1b26482@lunn.ch>
-X-CM-TRANSID:_____wD3_9yJZ2hmWJzHAA--.35969S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrZry5ArWUZw1DXF13tr47urg_yoWxArgEgF
-	4DAa98tw129ry0va43J3s5Xw4jkr4jgas2vrZI934xKw1Yy3WFkF98trZaqa45KayxK34S
-	y395tr1Igw4a9jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7VU1SdgDUUUUU==
-X-CM-SenderInfo: p1dqww5hqjkmqzuzqiywtou0bp/1tbiTg-6eGVODf8mRgAAs6
+	s=arc-20240116; t=1718118389; c=relaxed/simple;
+	bh=nOt5urHZ6YolUIcMwNLT/hdMPG5CeiZgEvDlqVxEjdA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lZw1BOH/ZyUiTJK2V8gGPAOHwBGkKE0VKegKfSH5EmR3KA+zRi2gik7x+gLV/EfydEnpytEvL7kry7lm2Wv9FZn4gIfw2zyxREwv+LiNGFZ9CXfplm4/kGQ7L/8Q3NE3ZKRL/KNKPgOVSkL1hue2CxsM9byj0D1fEQXzxSdDM4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FRFMNOCB; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: andrew@lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1718118385;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B0aa0B8ChIF+mHezAp/R9HTe7kWW9pZH2yyyhrXiFF0=;
+	b=FRFMNOCBURkGgNiRwdQjskn6JC0c3uRW0W52Sszed5ab4rK3EMuOb2lX1zLJw+gZ4/f4Oi
+	WblrkxY5Q8yAx838JJ5gvifUL1VI54QrRA7IXFlHRSNoprkWuE5BgRyNftiNJgx6drVdyo
+	tTtzOHtRFOCKwwI7UOuEiy5939UO/g0=
+X-Envelope-To: radhey.shyam.pandey@amd.com
+X-Envelope-To: netdev@vger.kernel.org
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: michal.simek@amd.com
+X-Envelope-To: kuba@kernel.org
+X-Envelope-To: linux@armlinux.org.uk
+X-Envelope-To: pabeni@redhat.com
+X-Envelope-To: edumazet@google.com
+X-Envelope-To: linux-kernel@vger.kernel.org
+X-Envelope-To: davem@davemloft.net
+Message-ID: <68c47426-f459-4b83-9cf9-b38cd9d65a94@linux.dev>
+Date: Tue, 11 Jun 2024 11:06:19 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Subject: Re: [PATCH net-next 1/3] net: xilinx: axienet: Use NL_SET_ERR_MSG
+ instead of netdev_err
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Michal Simek <michal.simek@amd.com>, Jakub Kicinski <kuba@kernel.org>,
+ Russell King <linux@armlinux.org.uk>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org,
+ "David S . Miller" <davem@davemloft.net>
+References: <20240610231022.2460953-1-sean.anderson@linux.dev>
+ <20240610231022.2460953-2-sean.anderson@linux.dev>
+ <42fff229-ee8c-4738-854b-6093f254408f@lunn.ch>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <42fff229-ee8c-4738-854b-6093f254408f@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-> Please explain in detail what you mean. Why cannot INTB be used?
+On 6/10/24 19:49, Andrew Lunn wrote:
+> On Mon, Jun 10, 2024 at 07:10:20PM -0400, Sean Anderson wrote:
+>> This error message can be triggered by userspace. Use NL_SET_ERR_MSG so
+>> the message is returned to the user and to avoid polluting the kernel
+>> logs.
+> 
+> This has nothing to do with statistics. So it would be better to post
+> it as a standalone patch. It is the sort of trivial patch that should
+> get merged quickly.
 
-The PMEB mode allows you to set up one of the wakeup events individually, such as link change event, magic packet event, unicast event, etc. And INTB mode is to enable all events.
+I included it in the series since patch 3 touches lines near it. But
+upon reviewing that patch, it seems that these lines are not in that
+patch's context. So I will resumbit this separately.
 
-> What happens when somebody else uses this PHY, say on an ARM system, and uboot does not set PMEB?
+> I would also comment about the change from EFAULT to EBUSY in the
+> commit message.
 
-This code does not affect the INTB even if the PMEB mode is not set. The INTB/PMEB pin is designed to notify in case of both interrupt and wol events. The default mode of this pin is INTB(page 0xd40, Reg 22, bit[5]=0), if PMEB mode is selected (page 0xd40, Reg 22, bit[5]=1), the pin becomes a fully functional PMEB pin.
+OK.
 
+--Sean
 
