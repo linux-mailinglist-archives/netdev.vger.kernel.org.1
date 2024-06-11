@@ -1,92 +1,118 @@
-Return-Path: <netdev+bounces-102583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A5A8903D02
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:21:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BECA903D0C
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:22:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1243D1F22522
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:21:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBDF22873B1
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4353317C9EF;
-	Tue, 11 Jun 2024 13:21:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB92717C9F9;
+	Tue, 11 Jun 2024 13:22:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hX++gOoL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OJvxpd51"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D55417C7D7;
-	Tue, 11 Jun 2024 13:21:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D6617C7C6;
+	Tue, 11 Jun 2024 13:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718112083; cv=none; b=jWTGmawK4pfzR+DdT9l/o9kvyJUgpY8SN9sc1BJ7Vdd8hDuxUHXtaXXR4UZJukHWQyOrknuWGvmG8x6wwMYXyAucF7yduid1IR/5E06d191D5/99ECm4gIhnbQTBAY9CzA5OdiB2cfN88ZbFrTsUoYroKdN+JQPVNbwBvEHS46M=
+	t=1718112161; cv=none; b=QeSr/gDBzHCYQyshOw4fDD/DYxLm7RobRq1x6cr49v/QZ1fJRyQ87TmaMo2Mqvd7eL1QEqwXq4ba4zKbvamwR/PgF0TQlbDYdCs04bR8lXeEbpWqCi21Jvcg4802Fv4pdcGc1HdPvXl0rUZBw1gNQ/ava5+ktWIxc503dk0FLNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718112083; c=relaxed/simple;
-	bh=yBk1izK7yPb+2BLQn/5bpktLFQpC0tjKDfxcjcrOTNk=;
+	s=arc-20240116; t=1718112161; c=relaxed/simple;
+	bh=jA9dvE7L9ZJmw9za/ZknPNMPAQ+nyOtSi6kn/GimkXY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ughbzw0zUjtimTbGN6wbWwoeshgNk11vcEyGQVTqNuyXRBNvXgykzNGaF+3ytzDAp2iCJ5JoalT1vJlfoe0lqF/q43gmYrGGKJP0lTig11jXnL5OkfMTCbSnxmxfIhEdC1Smmk0zaqiz/yVjbgiMwSQ6f8ZyBETEVNF9DTlYMlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hX++gOoL; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=+V9OrxfREx1kEorG7byrGojydV3IAsYO8seACV3xijQ=; b=hX
-	++gOoLYyBwkJbyP4qyqh6HbF3FaCGVTobhWZB2jsGS5h8TeWiDY4fZI8C8jDMdYmgyDSj8UtlIwPN
-	GPf9JZ+5CY1GbvzRw1MPj9sTYPsgAu2UHLidh79Q8enULgT44fs1Emr0coU6HRJzypmnVNNKYJEk+
-	IBETdPzE+xCgvvI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sH1Qv-00HODM-Gr; Tue, 11 Jun 2024 15:21:05 +0200
-Date: Tue, 11 Jun 2024 15:21:05 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH next-next] net: phy: realtek: add support for rtl8224
- 2.5Gbps PHY
-Message-ID: <243d5e27-522d-408d-a551-d11073cf330b@lunn.ch>
-References: <20240611053415.2111723-1-chris.packham@alliedtelesis.co.nz>
+	 Content-Type:Content-Disposition:In-Reply-To; b=g54z85g8RnxBY7o7Q2k1GWuk9F9q8BAMt2KKz/k99+luPOiKo/w7Ik97a3x3kLy9+af16mLnzWr4ChnBbjf+pxft1+uE6Chxux0kV8YGh6F0HwwSz0YEdvjZ2j/hPZZAXLJ/CEHPV0+dgX1yPtuTir1gayAEgwH3z4PH273vg7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OJvxpd51; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46807C2BD10;
+	Tue, 11 Jun 2024 13:22:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718112160;
+	bh=jA9dvE7L9ZJmw9za/ZknPNMPAQ+nyOtSi6kn/GimkXY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OJvxpd51vL1fgaAMZi+67oKms4QBWh1elR9Hk7cG6nG9e9gXGeFrMfWIIAEael+i3
+	 lAkE99VPxEfh5CyATJUju6DP+t3VIiBAQTucjgQ0ijMajJBcxew3jixbWnwkA4lB3w
+	 ugE0bmKSv4ByzTWhXiqCIEtwrFfOxt+cNpxRnb5kV3Pnz4F4fIUqKNgxjQoYWWx4Qh
+	 8zpY0odtnULrAV/ck1rMQnSKWXf63qG4qt6DqqFfTrBr+8cSR+V1A2y62QjUtMw5og
+	 nm+chU1m0V08cd11shPoWB/8gBRuAnigd/2INuHL6WAuyjUDRqmNsS6XCFFfwI6dMG
+	 6+fylC4MotZmw==
+Date: Tue, 11 Jun 2024 14:22:37 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-kernel@vger.kernel.org, Dave Ertman <david.m.ertman@intel.com>,
+	Ira Weiny <ira.weiny@intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Bingbu Cao <bingbu.cao@intel.com>,
+	Tianshu Qiu <tian.shu.qiu@intel.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Michael Chan <michael.chan@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
+	Bard Liao <yung-chuan.liao@linux.intel.com>,
+	Ranjani Sridharan <ranjani.sridharan@linux.intel.com>,
+	Daniel Baluta <daniel.baluta@nxp.com>,
+	Kai Vehmanen <kai.vehmanen@linux.intel.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	linux-media@vger.kernel.org, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
+	sound-open-firmware@alsa-project.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 1/6] auxbus: make to_auxiliary_drv accept and return a
+ constant pointer
+Message-ID: <ZmhPnQqYFXWP4heL@finisterre.sirena.org.uk>
+References: <20240611130103.3262749-7-gregkh@linuxfoundation.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Xh2Kj1DQz4GcFSrR"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240611053415.2111723-1-chris.packham@alliedtelesis.co.nz>
+In-Reply-To: <20240611130103.3262749-7-gregkh@linuxfoundation.org>
+X-Cookie: Your love life will be... interesting.
 
-On Tue, Jun 11, 2024 at 05:34:14PM +1200, Chris Packham wrote:
-> The Realtek RTL8224 PHY is a 2.5Gbps capable PHY. It only uses the
-> clause 45 MDIO interface and can leverage the support that has already
-> been added for the other 822x PHYs.
-> 
-> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
 
-You probably should Cc: Eric Woudstra and Marek Behún who have both
-worked on 2.5G variants of this PHY.
+--Xh2Kj1DQz4GcFSrR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> Notes:
->     I'm currently testing this on an older kernel because the board I'm
->     using has a SOC/DSA switch that has a driver in openwrt for Linux 5.15.
->     I have tried to selectively back port the bits I need from the other
->     rtl822x work so this should be all that is required for the rtl8224.
->     
->     There's quite a lot that would need forward porting get a working system
->     against a current kernel so hopefully this is small enough that it can
->     land while I'm trying to figure out how to untangle all the other bits.
-     
-I don't see this as being a problem. It should not be possible to
-cause regressions by adding a new device like this. If it turns out to
-be broken, you can fix it up later.
+On Tue, Jun 11, 2024 at 03:01:04PM +0200, Greg Kroah-Hartman wrote:
+> In the quest to make struct device constant, start by making
+> to_auziliary_drv() return a constant pointer so that drivers that call
+> this can be fixed up before the driver core changes.
 
-	Andrew
+Acked-by: Mark Brown <broonie@kernel.org>
+
+--Xh2Kj1DQz4GcFSrR
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZoT5wACgkQJNaLcl1U
+h9BOJwf/aeKGbgsNQMBhINPc1+PAR8b5cph+EiF+ikcvcatJwJlRp44vA9jbRubp
+RmTlt5cENNxdSPxZ4L1agVt+lbemBcTfLZFQLj+KvZjLhC2oeXhkcbjY3eLmIsVw
+yQjm6MBnwdVo/8KD/jHCX4VMeCIcqtyTSjXqy3Q7kWlquqICAer7jB2riTxPOsUA
+AZ8DvqF1TQees1OHELAdmRRkcSOufQXeZRHCfeiDTpAFFnOazvtPmeAPcQpA5c8v
+JITj6HWMZxHRs9efcbyOOTVYnUcE3cZY3lUuqKJqzEfI08F75CJiZvb1hS/fRrPU
+6Nig9Tiir3XUu0ajZMrfXBdbm+3HOg==
+=XJxc
+-----END PGP SIGNATURE-----
+
+--Xh2Kj1DQz4GcFSrR--
 
