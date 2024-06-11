@@ -1,266 +1,361 @@
-Return-Path: <netdev+bounces-102673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5275904369
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 20:22:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D11B390436E
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 20:23:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51C7C28469F
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 18:21:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6CE21C232C5
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 18:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F686EB74;
-	Tue, 11 Jun 2024 18:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4DD86FE16;
+	Tue, 11 Jun 2024 18:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="et7t+GfF"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="nDyykH1R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5A8605BA;
-	Tue, 11 Jun 2024 18:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718130116; cv=fail; b=A9RQ2zpNd5glta5fDohAsP23fhElACohzXnHI8YfZmVFFfA8a7FNL+M9ZGb7f2rZ9JwWoXotnLRyX/W8wKBdm+aVy0NhgKsdPFJgB7qUluSpzfMz7Hoh5KzIWcn34E1/QK3qPogk8tN/SE7IDrdtsgwb68VS06t4hFZgNyJF1gs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718130116; c=relaxed/simple;
-	bh=sd5KS2wN0kWH8XDBaEenJh5fJlHc0OzBQwUxwvuZ/P0=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=YTvmyAqvRyxcmtZaRBJynjXHGkSF0MEpXlmtqp7M/vn4tNLZ3avCerZ4pjPFbYKBWFueZUTq47TK7bWSQtSM14tlzdoeqixlY0iivkl9I8ZAi6e9Cv69fNwEUdLwRceYRV0Kako07CzuGMc2Ij71TqHFwf4pJC1nBzHW3vbK1mY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=et7t+GfF; arc=fail smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718130115; x=1749666115;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=sd5KS2wN0kWH8XDBaEenJh5fJlHc0OzBQwUxwvuZ/P0=;
-  b=et7t+GfFYDz41GNW+kGMK8ycCcsrTcuk1hQbFjrcI16+1cazIPPLWaWX
-   xXTnNzRdl9PuLxfjATLM1Ms/+0ApP/fwKtTDpTNtjR7D5RiKpJCcBoepf
-   csiYVzK/JgK91lujAR6OcZXzn6m8iy75o7MVxUmM7nT2Dvah0dts6dOzR
-   JYS4kziBxE9EYlgV8kwTJuwCOe1C++mZPGhbBtXOzx4T81GKhZhqIMeb0
-   gPYuLTEygK82I9qfpBZBpGkl1yBNKJerlPL9Oa+KfVwJ+/D9NDsTWWEqI
-   lvZPoV916hlaaW2ZtMmKlWl6wVRlPnLuz7vPKg6fX0kc0ldgju7W67/R5
-   Q==;
-X-CSE-ConnectionGUID: Hvb+4AjxQBGmWqyuGWpkAg==
-X-CSE-MsgGUID: NL/SZjvVTgCQKyd8iXpMNQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11100"; a="14989475"
-X-IronPort-AV: E=Sophos;i="6.08,230,1712646000"; 
-   d="scan'208";a="14989475"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2024 11:21:54 -0700
-X-CSE-ConnectionGUID: rG7jdUIYRFWpR5Pcv63vSQ==
-X-CSE-MsgGUID: PAEIugvRRQ6JagiBr0n6PA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,230,1712646000"; 
-   d="scan'208";a="44648414"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Jun 2024 11:21:55 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 11 Jun 2024 11:21:53 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 11 Jun 2024 11:21:53 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 11 Jun 2024 11:21:53 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.177)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 11 Jun 2024 11:21:53 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z1+1NJZkSYuMY0i2/vtD+97bfja9hOEsNdhNLavMr4Z7C9M1QnnIfxWEIYXBo0Pz8vtJtM+8iznEvdWRr0EArnDot51hij07TwRwwxsbWId7x9k/6k4iOaEXM9MgecfM0p3YnJv8MxCVuoesSZ6RzOzzzM7cRbzbjvdsctOqMu0bBydAIu5pBXcutBe0PmHcTmakOIMy8b+sF8LSEnjJjtmuOF0BSSj+LGI/IBID5g2aU8kmPJOiMa78TI5PzbosowlgfkGTyQYAMRc0/Sqhs9kSDJuTVcEN+1HFXOhikcAJjTJBBOh2QMugm+cWIPDJwcp+HtwlhptLtDBeIIHNQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pJMcb/A22n5kRoImxQ96Hm4l88J1Pv0mR6i8cKmPtzM=;
- b=ZLo1UDjeRx9eSxCPcqsmPFE/+NOq1OHMoDkY/h2pdg/2ai5nDNDOe7gi2a3JGnBZRBWqNHCqExEWtz0VH7TezjLmhRaJC2udCFFPrErxiXU78B0eLN7dO46koygOMqNL4hVNNZBX+kqsryiklE9ojipPzdMdVmqcmGekIEvu6SIOTvNJBOKeimTR5jX5tm8Uyyy6ziQVAckXRsRYl11FbYVi/ld3jKTbp3sxwrIVBN9GqHIOaGqeCY0HrV+diSlM48eC7SC2yWI0PO96pU0olcZ/KpErZMsij/h1olmV7mkHA6EGBxxOE7AOvbm9pwwNpdHIbL3ocdWjEQGeg5RodQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by CY8PR11MB6868.namprd11.prod.outlook.com (2603:10b6:930:5c::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.22; Tue, 11 Jun
- 2024 18:21:50 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%3]) with mapi id 15.20.7633.036; Tue, 11 Jun 2024
- 18:21:50 +0000
-Message-ID: <1b07a0c6-c973-45b5-94f7-f9234e244a11@intel.com>
-Date: Tue, 11 Jun 2024 11:21:48 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] igb: Add support for firmware update
-To: "Chien, Richard (Options Engineering)" <richard.chien@hpe.com>, "Richard
- chien" <m8809301@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-CC: "Brandeburg, Jesse" <jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-References: <20240609081526.5621-1-richard.chien@hpe.com>
- <4f2ec2fb-5d31-4a90-9ef6-a036d16a5cb4@intel.com>
- <PH7PR84MB15819CF12F71CB6D55F50576E8C72@PH7PR84MB1581.NAMPRD84.PROD.OUTLOOK.COM>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <PH7PR84MB15819CF12F71CB6D55F50576E8C72@PH7PR84MB1581.NAMPRD84.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0268.namprd03.prod.outlook.com
- (2603:10b6:303:b4::33) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D722628D
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 18:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718130190; cv=none; b=boBIsKI444wgG1Q0aLbSh6Kfyf6I+TH4zDhfSYWtHyfvP7BZe4q9p7+p1Okr3pHybwS1bFXP36qfFq743FEjisORB3steHpnEaIWjpDosCDxJqoTIAIJgi17tlbZf8qL2zM0CAzbzqDUgVYMimW3Kw2CIaI/iLMWMJYmPl6z2F0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718130190; c=relaxed/simple;
+	bh=OwT+mzZahiq6w4Ib5aGESPGjOU0M+MPL+Z8vR/USPcU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=fVtsmJfABUYRrp3FSng8WPHUxuSzh08l7kkEgMUzTXdTEQS2RguTj3zaUBbHDXN69GlkYDkon5hcQBoTVKsKK4fpKz0pZfoFNSwCy/qvPQ5gpLVhnmqtBaT7YbGd8JikewqdaUMRzFvpmIEma8PrFc5mRMW374RFW3i1Rt2M8dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=nDyykH1R; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45BBqGuh009912;
+	Tue, 11 Jun 2024 18:22:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	UVAASebRnti5XmMIPPNNwqFJAiSAUK/HajgZpQm+CWw=; b=nDyykH1R81q6+PGH
+	+5hWahfcqKe7IqEGQ33R31k098or7snqkqBMaf96IyEdjF2nEvvr13OM7PRn9LWP
+	ybhBct3EavG/2wC4CKnGPqJAFAvVuHPKXWZj7df+JpymtUALyDQjcS/uWuM9RPpt
+	qkXyuZrF/aqILrO4VlQ72gspA4fE+BIc95LObFQINriOV5Du23paD7sYZ3yDKhdK
+	ftjt/xlwSwg66PQjbDfyarzKjh5l7+J+6N/mJg+j1atSkcDDai2i0HitRrVlMndw
+	FyFIe0ZCRr3D8nnLCBFkIQph2TFa3VaDO4/rnoJsqFZoNB6dWV5FY1edZaCFSYvx
+	3wsZIQ==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ype9123xe-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Jun 2024 18:22:35 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45BIMXRb029851
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Jun 2024 18:22:33 GMT
+Received: from [10.110.56.35] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 11 Jun
+ 2024 11:22:33 -0700
+Message-ID: <f030e42f-6655-451c-9453-5026d27c0980@quicinc.com>
+Date: Tue, 11 Jun 2024 11:22:32 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|CY8PR11MB6868:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6212c0e6-9e1b-49ea-1984-08dc8a435ca4
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230032|376006|366008|1800799016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?bGNRUkNIQ3hzU0xMaDFpWGtlNGNVOWJvK09renFhV0lBWEdiRWx2SDh0bjhM?=
- =?utf-8?B?cjVLL2JwV0hUbTl6cTBwVE9vYWk5WGUxUFQyUUVUaUJXdlJPUDJrc2lnWExr?=
- =?utf-8?B?SnFkbkRwZlJQV20vTnZybnBCNG51VDh2b0dwQjRCbXdPemkzck5zTWRTYVZ3?=
- =?utf-8?B?ckRmdmZxUkV3Z1U3Y1N5SXBXSUtOV09VeWNrU00zcW9JazFkOHU3N05CNWpz?=
- =?utf-8?B?Q2ZNS0RTbk5JalQxZzFMYWdDR2xxclR3NHRveFN0MlE5eWNTT0FrNzdsQnQ0?=
- =?utf-8?B?dHJubGVGWnNPNDY0c0NhWXUvcElhcWR2cDJYSDVaQmhQamhrNVFaRTN1RXlM?=
- =?utf-8?B?MWVvbHhhR0FNRTBmVDJyd1R5OC9nZlNYRTg2OTByaXZnRG5XWFNtQ003UVNn?=
- =?utf-8?B?UTRCNFJKbTVnWFNZbEw4YzhkemVTTGxkbENQZ2xoc2pRVFZ3UVRLK0lNaDcy?=
- =?utf-8?B?MlhGWlU5eG9zTVZuNnRzSm5PNStNR3AvYUxZQTdNK1IzTll0OHArOHZDWXVD?=
- =?utf-8?B?dm9SMEJYTmlLQTdvelpVR2gxbEZ1SFBJK3M5L3hmUy9RVXIvVWJpcU5TRjQ2?=
- =?utf-8?B?MXoveHUwaFk5YTFrNkVsQ0lVSkVibWlYcjV4TXhUTkZvTTlub2NDU2Y1ZkR1?=
- =?utf-8?B?dk5pNHgvTjFDODRHb2pkUjNzRm5UTkZCRytWa0RTeWRKbXpKZEhidXo3Y0pK?=
- =?utf-8?B?OHY4N0lMenVGdzRrVjZ3K1czRG5nYjZraFEweFY4ZnRWbnBnSVlSOHVza2Zy?=
- =?utf-8?B?aTJBU082YUh1bTROUVBiaWJENGU4clRDNlZld1BoaXpGQWE1YjYzR3ZDc1oy?=
- =?utf-8?B?ZnFoOEU0emE5bTdEV0ZSemYvM2hZS0YvTEFnQ3JJQVF3K1VIL0dtQWFYK01k?=
- =?utf-8?B?L2p6UHNJWXlGeWtybHZvRFREaGR5b0V3bHBzS0g1QVM4SmNtNFZYekI3ZFpV?=
- =?utf-8?B?SXk4WWZ2NmhGa3BPVWE0OG14a3kvd29Ka3gwbmNqcUdmV0dqalAyQ1RNeFhN?=
- =?utf-8?B?b0hVbmh2NjVCQnVONTB1ZkErVDZvbmp4S0hETURjcVFBT3VPa0ZOa0tFdWE1?=
- =?utf-8?B?YUplQzl0ZGVoQXpRSTJKcnRWU0pwTHlienQ3SWdNZFZVWjlUV1pKWDNOaFpy?=
- =?utf-8?B?ODlFRUZEK3dRTTcvTmczVGh0ZHFGVG0wMXZoNjIyOGZiU0tlczljSm9UZ05L?=
- =?utf-8?B?a2tQWTdsMkxvRlMxM0Y3ZWt4S2pwdUMxdUtsYnhaNUswcnNFSFJMc2lpU05C?=
- =?utf-8?B?V3dLRFpOc1FseWtnMmRPam1Da2xQTmY5ajVZVU02OEZvWnhZZ0dyQXdvRFJ0?=
- =?utf-8?B?Zmh3a2VDblBoUXprT2h6Q3FpRGdUZUVXeSt3UUdkMGZTdUwyNUJNMFR6Q1FL?=
- =?utf-8?B?UjJlQVFTNVptTVZLVmhRK0lFSGZTSHV6bEtzdnVTZWVyMzFSSW1jRlhyWFRF?=
- =?utf-8?B?MjZHWkpaTVBJRkg0YkMybnVtc2FkK3F2ejgzZ1FlVHJBdDg2QURTcjhpYWxx?=
- =?utf-8?B?Vko1YnBwaEkwSS9wVmZIUEhpejBneDI5c1IzMXhSdXAwWjN0WUc5OUd0Ymtl?=
- =?utf-8?B?ZldwNm9uRmxEdzVadGxUNWV0WTgwY3A4SkZkSGUvS2xJdU5COHoxUUdUN2V0?=
- =?utf-8?B?dnZiaWQrb1JOVzdKZXF1c2ZhYmoxd2w4YnN5Kzl1cUxHakVVWjQvckhTZzNP?=
- =?utf-8?B?bnMzWlZpVnVpbEtTS3dBVjBXazBoaklyUTNaeGJIVW85Q2UvSTB5UDB4VDNL?=
- =?utf-8?Q?zEaiup5l1LhsErD1IZyT7/+O9l7YkIeGdtUVl/G?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230032)(376006)(366008)(1800799016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VXZwR1ExM25Ha05MeDdFSCtmbzF6eE45TDRGclNMM3dVLzNwY2U1ZHdKYjVn?=
- =?utf-8?B?MFBYazR3bVNBeGRiRzdYQkxuY0FnU005SXE4d2gvQ0VGenFldlJlL285K0U1?=
- =?utf-8?B?aWNkWlVUZFFQY1BzTG94bVlhc2tXVi94dzFVYldnTENNY2NVR3ZRT2szN0t0?=
- =?utf-8?B?Yk41Zzg1WFBQMjFzbld0dlhkcjJPcG1oVVVpT0ViaFVsWUMrTy9PcThrZFVy?=
- =?utf-8?B?RzJQcmdBeWpJMHlLWmN0SUFMbkN0ck91TGxRRyt6bzQwUzFJWlRVTWNzVXly?=
- =?utf-8?B?WDh1OEZWenZrL0dncy9jOWVFOGtNaXVSenZwKy9yK2N4cW5OSHVUbVFNY0NG?=
- =?utf-8?B?ZUpyRjAzRTYwK3JEbzlaRlJJZjBaSkF4TFBnMEZKNTk0ajVDcnc2Vm16QjhU?=
- =?utf-8?B?RC83ZDY2bW4xWTZJTnMxcHlJbjZodjlyaGd6TjlNWmEvelh3WjlFajFmdGNv?=
- =?utf-8?B?WnRUSU5aSUtXb2ZwK0pHVEF4ZjZOSTg3eE1OdXRBQjlCcWVIZ3luU1NQRVhZ?=
- =?utf-8?B?NThpSFlsWWZEdnNzR0JoR2ZIaUt4VXcwTDZ6c2xhR3NoWHJGSkVHcFJHWlN1?=
- =?utf-8?B?QnZ5azZoenRzZElrUGJaNHc1dExyMkF0QysvVURBbHVEdlZVV0pmUEQ3NGRj?=
- =?utf-8?B?RHNCRDEyMjdYcW5iL3FGRHRDOFpjbTV5VmM2TVhuaGJJOEZGbVkxWjg1R29B?=
- =?utf-8?B?eDVRcEtrc3E3dVN2NmpMbTZBZnhMV0UrSnNEV2ZnZjRiMVgwY1RKSmZUTnBF?=
- =?utf-8?B?cm5kSXBiRVBCMUw2blkzOFh6eThUTS9TZmNwOVJYZ0RZY1dEUVdZOSs0TTdW?=
- =?utf-8?B?RVcxdjBnZkhzVjUvZDhzU2ZsRVlrbGlDcnhMdEdxYXVhUGhtbmRXaVVlS0Rp?=
- =?utf-8?B?VC9MU2l2cDhleHVSNkoxcnpBUlFmcisvR28zMVpNcmUybkl3VXVQT0VEU2pN?=
- =?utf-8?B?Zk1CQjhwUmJweWNxZUZRVEFMTjN1d0p3K1lkUTNvOHVkY1MxS1Z6QnlHK2J0?=
- =?utf-8?B?bWJEY0FYSk9DMy9vdDRMMGxuVVU5Nnd1T1dFUlhnNGs3dllNL2c5ZUx6c3cx?=
- =?utf-8?B?MmR3MmpZa0tqbzBGUm5IbXlZcjJINkZUU0pzaDZJWER0cE5wQ1d2L01ta051?=
- =?utf-8?B?SU9tQ21iNlVYZ2tXWlowWTRmUXNkMjZHMFMzaUJqZU15c1hpUmdka1lCRWtI?=
- =?utf-8?B?QlYrQ09WbEVXR0RJTGZGOGY4UjArMXA1U3Q4ekMrOGJLbGZuQ0FOOHI4TlZJ?=
- =?utf-8?B?V0FaV2RnK0ZkQ0QzTjc1M2UyTmhHeXdzb3hQbC81MDVnWDdvS0VSaERRYTU1?=
- =?utf-8?B?MUFMRXg5dVd4U1J6OWtxbEhmMjhVbjVaVzA1RTdEQjZLU0hheU1xNnA1dGRm?=
- =?utf-8?B?MDNCK3VOYW5yYWFuU0h0MVdFUGZ1SXlvMHBIQ3Q0TzQvd01LeEJ4KzhXSk1O?=
- =?utf-8?B?N2ZSR0RuT1MwYzJzSVZuZ3N0S0ZsV2xpcWhXS1o0eGhFSzM5b3NSUkV1VUFW?=
- =?utf-8?B?TFlPRmUwWXRMRkk0eUFpZDlXZndLZkV4dnNxVlZLeUJsQ1lnbTZqQlpyYThw?=
- =?utf-8?B?ajRCbEZwSlhBR1NpcHZKMG1MSmZVMWg0UkdZblpDWk14d2xYRkZQVFZKWDhS?=
- =?utf-8?B?U0Y0QkFmQUt1SUFCOEw0OEZxS0NDT0xXN0YzTEhjL3FNVTVtM1lwdm1hQlFl?=
- =?utf-8?B?cTYwL2FRU3NmV3dWQzVFN1pqN1ArNmVsRjhWWEFhSENJR2dQbExTSit0UFc5?=
- =?utf-8?B?MUdVM0xEbGRGa2Q4b2I3QS96L2U0ZTQ4Z0JQeUFQcFFZb25hUndoaEhtUXVy?=
- =?utf-8?B?TmdtRU9VdVNwVXU3Yy9TVlJqOE1zbUdLTGtJQVd0RXM1UzZvMnljejJrSkdj?=
- =?utf-8?B?ZFFTYTlyaEF0MjRBQ2xoMWdUNG1MMkdoU1pRc2tuVGFLOWdQMnJVbkIxajZF?=
- =?utf-8?B?Q2RwS1VMU29DMXdwdWFEaGUwZTVxMjgyS3poQ0ltKzdxZW82OVlUa2trS0hY?=
- =?utf-8?B?U3pOMjhQOWMvQmRTMWxiaDZPempqdkJwTHV4K1RzV1hQK1RIb3FnRENaY21D?=
- =?utf-8?B?cGF4VDd2MEJVdE1hSTE4VWVIOFh5c3B5dms2bEVSUEFBQW9Ham9hUU9mc2NM?=
- =?utf-8?B?bzFMUnhKVlFKbTliYzNXZmhYUG5ReTkvRjhrbXgrdEFBY3JFRHZ6a2ZGR0pv?=
- =?utf-8?B?Snc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6212c0e6-9e1b-49ea-1984-08dc8a435ca4
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2024 18:21:50.2600
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: L1apIibgB12ZYJOO6IrqXcM8XfIhYhqo9t/SipNsmEwgC4b1EqdDRakyXKnohiu+WLLLtKnrSYYamgsTIJnsxFUke2LyEYaO9dSCvm3EGq0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB6868
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next v2 5/8] net: stmmac: dwmac4: convert
+ sgmii/rgmii "pcs" to phylink
+To: Andrew Halaney <ahalaney@redhat.com>,
+        "Russell King (Oracle)"
+	<rmk+kernel@armlinux.org.uk>,
+        Sneh Shah <quic_snehshah@quicinc.com>
+CC: Serge Semin <fancer.lancer@gmail.com>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <Zlmzu7/ANyZxOOQL@shell.armlinux.org.uk>
+ <E1sD0P5-00EzC6-Me@rmk-PC.armlinux.org.uk>
+ <zzevmhmwxrhs5yfv5srvcjxrue2d7wu7vjqmmoyd5mp6kgur54@jvmuv7bxxhqt>
+Content-Language: en-US
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+In-Reply-To: <zzevmhmwxrhs5yfv5srvcjxrue2d7wu7vjqmmoyd5mp6kgur54@jvmuv7bxxhqt>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: jTanxnBQfx0WIyNwwvCywqbgGhoOEpUx
+X-Proofpoint-ORIG-GUID: jTanxnBQfx0WIyNwwvCywqbgGhoOEpUx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-11_09,2024-06-11_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ adultscore=0 priorityscore=1501 malwarescore=0 phishscore=0 bulkscore=0
+ clxscore=1011 mlxlogscore=999 impostorscore=0 suspectscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2405170001
+ definitions=main-2406110125
 
 
 
-On 6/11/2024 12:55 AM, Chien, Richard (Options Engineering) wrote:
->> However, this implementation is wrong. It is exposing the
->> ETHTOOL_GEEPROM and ETHTOOL_SEEPROM interface and abusing it to
->> implement a non-standard interface that is custom to the out-of-tree Intel
->> drivers to support the flash update utility.
+On 6/5/2024 3:35 PM, Andrew Halaney wrote:
+> On Fri, May 31, 2024 at 12:26:35PM GMT, Russell King (Oracle) wrote:
+>> Convert dwmac4 sgmii/rgmii "pcs" implementation to use a phylink_pcs
+>> so we can eventually get rid of the exceptional paths that conflict
+>> with phylink.
 >>
->> This implementation was widely rejected when discovered in i40e and in
->> submissions for the  ice driver. It abuses the ETHTOOL_GEEPROM and
->> ETHTOOL_SEEPROM interface in order to allow tools to access the hardware.
->> The use violates the documented behavior of the ethtool interface and breaks
->> the intended functionality of ETHTOOL_GEEPROM and ETHTOOL_SEEPROM.
+>> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+>> ---
+>>  .../net/ethernet/stmicro/stmmac/dwmac4_core.c | 102 ++++++++++++------
+>>  1 file changed, 72 insertions(+), 30 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+>> index dbd9f93b2460..cb99cb69c52b 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+>> @@ -14,6 +14,7 @@
+>>  #include <linux/slab.h>
+>>  #include <linux/ethtool.h>
+>>  #include <linux/io.h>
+>> +#include <linux/phylink.h>
+>>  #include "stmmac.h"
+>>  #include "stmmac_pcs.h"
+>>  #include "dwmac4.h"
+>> @@ -758,42 +759,76 @@ static void dwmac4_ctrl_ane(void __iomem *ioaddr, bool ane, bool srgmi_ral,
+>>  	dwmac_ctrl_ane(ioaddr, GMAC_PCS_BASE, ane, srgmi_ral, loopback);
+>>  }
+>>  
+>> -static void dwmac4_get_adv_lp(void __iomem *ioaddr, struct rgmii_adv *adv)
+>> +static int dwmac4_mii_pcs_validate(struct phylink_pcs *pcs,
+>> +				   unsigned long *supported,
+>> +				   const struct phylink_link_state *state)
+>>  {
+>> -	dwmac_get_adv_lp(ioaddr, GMAC_PCS_BASE, adv);
+>> +	/* Only support in-band */
+>> +	if (!test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, state->advertising))
+>> +		return -EINVAL;
+>> +
+>> +	return 0;
+>>  }
+>>  
+>> -/* RGMII or SMII interface */
+>> -static void dwmac4_phystatus(void __iomem *ioaddr, struct stmmac_extra_stats *x)
+>> +static int dwmac4_mii_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+>> +				 phy_interface_t interface,
+>> +				 const unsigned long *advertising,
+>> +				 bool permit_pause_to_mac)
+>>  {
+>> +	struct mac_device_info *hw = phylink_pcs_to_mac_dev_info(pcs);
+>> +
+>> +	return dwmac_pcs_config(hw, neg_mode, interface, advertising,
+>> +				GMAC_PCS_BASE);
+>> +}
+>> +
+>> +static void dwmac4_mii_pcs_get_state(struct phylink_pcs *pcs,
+>> +				     struct phylink_link_state *state)
+>> +{
+>> +	struct mac_device_info *hw = phylink_pcs_to_mac_dev_info(pcs);
+>> +	unsigned int clk_spd;
+>>  	u32 status;
+>>  
+>> -	status = readl(ioaddr + GMAC_PHYIF_CONTROL_STATUS);
+>> -	x->irq_rgmii_n++;
+>> +	status = readl(hw->pcsr + GMAC_PHYIF_CONTROL_STATUS);
+>> +
+>> +	state->link = !!(status & GMAC_PHYIF_CTRLSTATUS_LNKSTS);
+>> +	if (!state->link)
+>> +		return;
+>>  
+>> -	/* Check the link status */
+>> -	if (status & GMAC_PHYIF_CTRLSTATUS_LNKSTS) {
+>> -		int speed_value;
+>> +	clk_spd = FIELD_GET(GMAC_PHYIF_CTRLSTATUS_SPEED, status);
+>> +	if (clk_spd == GMAC_PHYIF_CTRLSTATUS_SPEED_125)
+>> +		state->speed = SPEED_1000;
+>> +	else if (clk_spd == GMAC_PHYIF_CTRLSTATUS_SPEED_25)
+>> +		state->speed = SPEED_100;
+>> +	else if (clk_spd == GMAC_PHYIF_CTRLSTATUS_SPEED_2_5)
+>> +		state->speed = SPEED_10;
+>> +
+>> +	/* FIXME: Is this even correct?
+>> +	 * GMAC_PHYIF_CTRLSTATUS_TC = BIT(0)
+>> +	 * GMAC_PHYIF_CTRLSTATUS_LNKMOD = BIT(16)
+>> +	 * GMAC_PHYIF_CTRLSTATUS_LNKMOD_MASK = 1
+>> +	 *
+>> +	 * The result is, we test bit 0 for the duplex setting.
+>> +	 */
+>> +	state->duplex = status & GMAC_PHYIF_CTRLSTATUS_LNKMOD_MASK ?
+>> +			DUPLEX_FULL : DUPLEX_HALF;
 > 
-> Thank you for your detailed explanation.
+> My gut feeling is that this is/was wrong, and the LNKMOD_MASK expects you've
+> shifted / got the field out etc...
 > 
->> The correct way to implement flash update is via the devlink dev flash
->> interface, using request_firmware, and implementing the entire update
->> process in the driver. The common portions of this could be done in a shared
->> module.
+> Sneh, Abhishek, can you confirm this for us? I'd appreciate it.
 > 
-> In that case, does Intel have a plan to implement this mechanism
-> in in-kernel drivers?
-> 
+The status needs to be checked against Bit 16 which is GMAC_PHYIF_CTRLSTATUS_LNKMOD to determine the Duplex. 
+In the above logic the status is checked against GMAC_PHYIF_CTRLSTATUS_LNKMOD_MASK (value 1) which actually determines
+the link is up/down 
 
-I'm not aware of active plans right now :(
+//Correct logic
+state->duplex = status & GMAC_PHYIF_CTRLSTATUS_LNKMOD ?
+			DUPLEX_FULL : DUPLEX_HALF;
 
->> Attempting to support the broken legacy update that is supported by the out-
->> of-tree drivers is a non-starter for upstream. We (Intel) have known this for
->> some time, and this is why the patches and support have never been
->> published.
+Bit 16	LNKMOD		Link Mode
+
+This bit indicates the current mode of operation of the link.
+0x0: HDUPLX 
+0x1: FDUPLX 
+
+Bit 1	LUD	Link Up or Down
+
+This bit indicates whether the link is up or down during transmission of configuration in the RGMII, SGMII, or SMII interface.
+0x0: LINKDOWN  
+0x1: LINKUP 
+
+
+> I need to run for the evening soon, but tested taking sa8775p-ride,
+> making it have managed = "in-band-status", and remove the
+> HAS_INTEGRATED_PCS stuff... and then all of a sudden the link acts as if
+> its half duplex (but works otherwise I think? need to test more
+> throughly):
 > 
-> Although the utility in question has been enhanced to perform firmware
-> update against Intel 1G/10G NICs by using the /dev/mem, this method
-> would not work when the secure boot is enabled. Considering out-of-band
-> firmware update (via the BMC) is not supported for Intel 1G/10G NICs, it
-> would be desirable to have the support for the devlink dev flash interface
-> in in-kernel drivers (igb & ixgbe).
+>     [   11.458385] qcom-ethqos 23040000.ethernet end0: Link is Up - 1Gbps/Half - flow control rx/tx
 > 
-
-Yes it would be great. I've tried explaining why the existing support
-can't go upstream, and why this would be valuable. Unfortunately it
-hasn't led to action internally. I'm also not sure if all of the flash
-update logic is in anything released under public open source license,
-which makes it challenging for someone outside in the community to work
-on this.
-
-> Thanks
-> Richard
+> So I think it is probably wrong, and if I understand
+> correctly most of the special treatment for the qualcomm driver can be
+> dropped? I know it was mentioned that all the 2.5 Gpbs stuff is a
+> Qualcomm addition (and that you're chasing down some answers with the
+> hardware team), but hopefully you can confirm the register's bitfields
+> for us here!
+> 
+> 
+>>  
+>> -		x->pcs_link = 1;
+>> +	dwmac_pcs_get_state(hw, state, GMAC_PCS_BASE);
+>> +}
+>>  
+>> -		speed_value = ((status & GMAC_PHYIF_CTRLSTATUS_SPEED) >>
+>> -			       GMAC_PHYIF_CTRLSTATUS_SPEED_SHIFT);
+>> -		if (speed_value == GMAC_PHYIF_CTRLSTATUS_SPEED_125)
+>> -			x->pcs_speed = SPEED_1000;
+>> -		else if (speed_value == GMAC_PHYIF_CTRLSTATUS_SPEED_25)
+>> -			x->pcs_speed = SPEED_100;
+>> -		else
+>> -			x->pcs_speed = SPEED_10;
+>> +static const struct phylink_pcs_ops dwmac4_mii_pcs_ops = {
+>> +	.pcs_validate = dwmac4_mii_pcs_validate,
+>> +	.pcs_config = dwmac4_mii_pcs_config,
+>> +	.pcs_get_state = dwmac4_mii_pcs_get_state,
+>> +};
+>>  
+>> -		x->pcs_duplex = (status & GMAC_PHYIF_CTRLSTATUS_LNKMOD_MASK);
+>> +static struct phylink_pcs *
+>> +dwmac4_phylink_select_pcs(struct stmmac_priv *priv, phy_interface_t interface)
+>> +{
+>> +	if (priv->hw->pcs & STMMAC_PCS_RGMII ||
+>> +	    priv->hw->pcs & STMMAC_PCS_SGMII)
+>> +		return &priv->hw->mac_pcs;
+>>  
+>> -		pr_info("Link is Up - %d/%s\n", (int)x->pcs_speed,
+>> -			x->pcs_duplex ? "Full" : "Half");
+>> -	} else {
+>> -		x->pcs_link = 0;
+>> -		pr_info("Link is Down\n");
+>> -	}
+>> +	return NULL;
+>>  }
+>>  
+>>  static int dwmac4_irq_mtl_status(struct stmmac_priv *priv,
+>> @@ -867,8 +902,12 @@ static int dwmac4_irq_status(struct mac_device_info *hw,
+>>  	}
+>>  
+>>  	dwmac_pcs_isr(ioaddr, GMAC_PCS_BASE, intr_status, x);
+>> -	if (intr_status & PCS_RGSMIIIS_IRQ)
+>> -		dwmac4_phystatus(ioaddr, x);
+>> +	if (intr_status & PCS_RGSMIIIS_IRQ) {
+>> +		/* TODO Dummy-read to clear the IRQ status */
+>> +		readl(ioaddr + GMAC_PHYIF_CONTROL_STATUS);
+>> +		phylink_pcs_change(&hw->mac_pcs, false);
+> 
+> I'll just highlight it here, but same question as the dwmac1000 change.
+> We can discuss that question there, and if anything changes apply it
+> here too. It is probably fine and I'm fussing over nothing.
+> 
+>> +		x->irq_rgmii_n++;
+>> +	}
+>>  
+>>  	return ret;
+>>  }
+>> @@ -1186,6 +1225,7 @@ static void dwmac4_set_hw_vlan_mode(struct mac_device_info *hw)
+>>  const struct stmmac_ops dwmac4_ops = {
+>>  	.core_init = dwmac4_core_init,
+>>  	.update_caps = dwmac4_update_caps,
+>> +	.phylink_select_pcs = dwmac4_phylink_select_pcs,
+>>  	.set_mac = stmmac_set_mac,
+>>  	.rx_ipc = dwmac4_rx_ipc_enable,
+>>  	.rx_queue_enable = dwmac4_rx_queue_enable,
+>> @@ -1210,7 +1250,6 @@ const struct stmmac_ops dwmac4_ops = {
+>>  	.set_eee_timer = dwmac4_set_eee_timer,
+>>  	.set_eee_pls = dwmac4_set_eee_pls,
+>>  	.pcs_ctrl_ane = dwmac4_ctrl_ane,
+>> -	.pcs_get_adv_lp = dwmac4_get_adv_lp,
+>>  	.debug = dwmac4_debug,
+>>  	.set_filter = dwmac4_set_filter,
+>>  	.set_mac_loopback = dwmac4_set_mac_loopback,
+>> @@ -1230,6 +1269,7 @@ const struct stmmac_ops dwmac4_ops = {
+>>  const struct stmmac_ops dwmac410_ops = {
+>>  	.core_init = dwmac4_core_init,
+>>  	.update_caps = dwmac4_update_caps,
+>> +	.phylink_select_pcs = dwmac4_phylink_select_pcs,
+>>  	.set_mac = stmmac_dwmac4_set_mac,
+>>  	.rx_ipc = dwmac4_rx_ipc_enable,
+>>  	.rx_queue_enable = dwmac4_rx_queue_enable,
+>> @@ -1254,7 +1294,6 @@ const struct stmmac_ops dwmac410_ops = {
+>>  	.set_eee_timer = dwmac4_set_eee_timer,
+>>  	.set_eee_pls = dwmac4_set_eee_pls,
+>>  	.pcs_ctrl_ane = dwmac4_ctrl_ane,
+>> -	.pcs_get_adv_lp = dwmac4_get_adv_lp,
+>>  	.debug = dwmac4_debug,
+>>  	.set_filter = dwmac4_set_filter,
+>>  	.flex_pps_config = dwmac5_flex_pps_config,
+>> @@ -1278,6 +1317,7 @@ const struct stmmac_ops dwmac410_ops = {
+>>  const struct stmmac_ops dwmac510_ops = {
+>>  	.core_init = dwmac4_core_init,
+>>  	.update_caps = dwmac4_update_caps,
+>> +	.phylink_select_pcs = dwmac4_phylink_select_pcs,
+>>  	.set_mac = stmmac_dwmac4_set_mac,
+>>  	.rx_ipc = dwmac4_rx_ipc_enable,
+>>  	.rx_queue_enable = dwmac4_rx_queue_enable,
+>> @@ -1302,7 +1342,6 @@ const struct stmmac_ops dwmac510_ops = {
+>>  	.set_eee_timer = dwmac4_set_eee_timer,
+>>  	.set_eee_pls = dwmac4_set_eee_pls,
+>>  	.pcs_ctrl_ane = dwmac4_ctrl_ane,
+>> -	.pcs_get_adv_lp = dwmac4_get_adv_lp,
+>>  	.debug = dwmac4_debug,
+>>  	.set_filter = dwmac4_set_filter,
+>>  	.safety_feat_config = dwmac5_safety_feat_config,
+>> @@ -1391,5 +1430,8 @@ int dwmac4_setup(struct stmmac_priv *priv)
+>>  	mac->mii.clk_csr_mask = GENMASK(11, 8);
+>>  	mac->num_vlan = dwmac4_get_num_vlan(priv->ioaddr);
+>>  
+>> +	mac->mac_pcs.ops = &dwmac4_mii_pcs_ops;
+>> +	mac->mac_pcs.neg_mode = true;
+>> +
+>>  	return 0;
+>>  }
+>> -- 
+>> 2.30.2
+>>
 > 
 
