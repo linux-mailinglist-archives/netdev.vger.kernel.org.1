@@ -1,131 +1,166 @@
-Return-Path: <netdev+bounces-102686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE881904446
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 21:13:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E6379044D3
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 21:34:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0179B1C22F48
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 19:13:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD8582894E4
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 19:34:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5667E78B;
-	Tue, 11 Jun 2024 19:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C56762C9;
+	Tue, 11 Jun 2024 19:33:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="RjCrbj82"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H8bCdtln"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8AC47D3FA
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 19:13:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD2BA3839C;
+	Tue, 11 Jun 2024 19:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718133234; cv=none; b=PbNQ8g8Zc2QIiaofzp0CS/Crn6HEUOl0AAw60NsSRAE60qA2y2wcwmLSZeacn7fauyDFoLxsfJlBlZeInlAESB0v+5yxKaiE/SzKn0iAEb9ixVS3/PjenK/5LLLEX1yHn55znpC36phTBezJMbJQG1ydxQ2r4/w01MbkdbolT3M=
+	t=1718134434; cv=none; b=h8XwiUqmzJpPgCsZSoers4K1vosnquPI+W84e+pZpeK+Q8Gri9HMuCc4XZ64e9JjGdACXtvH8+mOM1fnLAPbQ6fDILq8vgyp/CxkABxfWcMM1Cw+bKHYl9Pu1V0jDjqMjLGzEPN2RqhBgVKI8k7iwl6rwc2wstq4gTjh1J3voFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718133234; c=relaxed/simple;
-	bh=wAIyEg2Pvor2USCqACYPAnI2Pivre+g+Lw9GIN+SQZc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oAT4cygth3ix58/7Iz55SxfBZNlyV048tmHpXndM0QP5XX4TVjCjpTI55+2Q7KCr7CwDKE0AXwu6a8xrrjTWHy2epoTH7vkekPgqLrRkjjYowZ30w+5bFUJAoYDm/PgplQ7uIZCnvnIBRHZ0AQ/97bi7nvRH2kDv/Sg0bIciOp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=RjCrbj82; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-62a2424ec39so61681167b3.1
-        for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 12:13:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1718133231; x=1718738031; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2msBxhPXXnBr1VfIw0JVRu445u6imiF8iI5GrfbCCDE=;
-        b=RjCrbj82bUE18/gjbjgjDiU2ooIVPG/ZeiYwsvapiNIctyGqVFVZmIox6RKW0BX2cL
-         eNMjFNfxMQ2gC8jd3c5Xf+F+/pySKJMMQN5MdCNUPil5MjHwYAlWlZOWdvFagkGDgqP0
-         oiWfOLzKCQHI6bPSnUoYeUUakAfVx0MDdym79uQFSdhL73oY2MnWheP9CaV14JROmZQr
-         f96YpbRcZEb+czGKAbHbhAApTq5BydZ31k+VhNT/flc3G4uprzAkJCu8Wy3BgYBVshLL
-         qKNfmBl4ldJ/gQtgPt5F+DApxwOisy6+TUBbCK9l0KthWbqs5JJiYTwwcbePvtPpltA4
-         cMfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718133231; x=1718738031;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2msBxhPXXnBr1VfIw0JVRu445u6imiF8iI5GrfbCCDE=;
-        b=ECa21mk5sZ0rd637k4TcRGi13agk66ShocVUaK0X2jruK5W77H0jnXMTVttRCuVLrj
-         rz+YkNRtxFs8Qt6jEWYytyZFCHCSu8l1Vg9yyl6xPqdAIRNWW15mngs9maooJEtXTBVy
-         LSmB5CT/9PiToeZSeTERPEMfTucbhrIycKYpuSr1ylYwr6XpvTeL5n/RAYqddfBKy+VB
-         3o5iuxaCEK7g/6IunW2gYjpQxzUlLlapB79lJSDxJfIRWZrn/NvzRoRNwnr4KpNgxA4A
-         Dxm9NyxgUv8K8Soc1ihv2sF3NAcQ99+F8QX8Z4LH0QpcOuse6QTG89p8QQFPYBxS+vHB
-         K4pg==
-X-Gm-Message-State: AOJu0YzvhXiFH42S+p+ow0EExWlExYvhydabRXDuHPRAzix+eWRkPiW7
-	5iHHUgDgwbetrXEvE7/ZbHSyNeLZ0/Px3lO+miwZUz3/MX+74S9BwK18PX5B51h2eaCRXSHHVWp
-	vVcO0ICRB4Q6ZPty9BLuBbm0ocCHes0zGaYtc
-X-Google-Smtp-Source: AGHT+IEumhb6kBnuB1pnAkTG8fXAX0G8rC35rzNND/HE779wkC8NsPqhWU3MUxqXwoCMVzY0M5HyfhLBtT5NjcmB7NQ=
-X-Received: by 2002:a0d:e802:0:b0:62c:f90d:3797 with SMTP id
- 00721157ae682-62cf90d3cb1mr77094597b3.37.1718133231595; Tue, 11 Jun 2024
- 12:13:51 -0700 (PDT)
+	s=arc-20240116; t=1718134434; c=relaxed/simple;
+	bh=+EFgFUSyU77OeDo23wZTQQSJd8WsSmFqgJx2eI4etnc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sDp5Wvo9UWlABr25f2Hg+8f+uIqPjgirR4Wk2yOD2Bd1AJNi4s13xOt+fj4reRt5SMNj9XD9WOybwlfWyLmSjlb+vG8HayFGfRJZ/qCYscHTyoH838askvz0v3vWDfnn27/qk6O+tp5XzAPoDGIJ6ecwI0SE+PlzHoGPyMhhBlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H8bCdtln; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2463C2BD10;
+	Tue, 11 Jun 2024 19:33:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718134433;
+	bh=+EFgFUSyU77OeDo23wZTQQSJd8WsSmFqgJx2eI4etnc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=H8bCdtlnV1PKPoYsXCinarlBu4cxYs9DVegPRf+75RuZClFXsTjCljzkiqEnS+wdE
+	 3oDTJspMhj0GR3klaRjrKzNfknmP9Dg7qcrptayhAs96i7sF3+2YrmD4Aqz2GLRnpo
+	 Jk2Rrfzg6tTeOGm4It/JuxPD5rEKxmo0krCTzbdtrhZeBEVkHyQiDSR25fAEAm0eN0
+	 42wgUt1fO6G/dAPpngnPvNb5ZPBiyqnnLVLReciefnJ6jIdiG8gtSYxFrnSGOsHNB2
+	 G/NFqeJXuf0PZuayfuxlVqZdJbjcsw2ST5503buhYWQ7ShEfWmijBjhJK3766oFe3j
+	 vIh3owb9VJ/5w==
+Date: Tue, 11 Jun 2024 13:33:51 -0600
+From: Rob Herring <robh@kernel.org>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Simon Horman <horms@kernel.org>,
+	Sai Krishna Gajula <saikrishnag@marvell.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v2 00/19] Add support for the LAN966x PCI device using a
+ DT overlay
+Message-ID: <20240611193351.GA2953067-robh@kernel.org>
+References: <20240527161450.326615-1-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240410140141.495384-1-jhs@mojatatu.com> <20240611072107.5a4d4594@kernel.org>
- <CAM0EoMkAQH+zNp3mJMfiszmcpwR3NHnEVr8SN_ysZhukc=vt8A@mail.gmail.com>
- <20240611083312.3f3522dd@kernel.org> <CAM0EoMkgxXX4sFJ98n_UTLLFjP3KHx00aaq76t4zJJsO9zNO4A@mail.gmail.com>
- <20240611105342.02805498@kernel.org>
-In-Reply-To: <20240611105342.02805498@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 11 Jun 2024 15:13:39 -0400
-Message-ID: <CAM0EoM=8gqdZXt02v0jmHTqnjru4Ocv6ddjzjBXhU6eFoN50ng@mail.gmail.com>
-Subject: Re: [PATCH net-next v16 00/15] Introducing P4TC (series 1)
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
-	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
-	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com, 
-	toke@redhat.com, victor@mojatatu.com, pctammela@mojatatu.com, 
-	Vipin.Jain@amd.com, dan.daly@intel.com, andy.fingerhut@gmail.com, 
-	chris.sommers@keysight.com, mattyk@nvidia.com, bpf@vger.kernel.org, 
-	Jonathan Corbet <corbet@lwn.net>, Oz Shlomo <ozsh@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240527161450.326615-1-herve.codina@bootlin.com>
 
-On Tue, Jun 11, 2024 at 1:53=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 11 Jun 2024 11:53:28 -0400 Jamal Hadi Salim wrote:
-> > > For me it's very much not "about P4". I don't care what DSL user pref=
-ers
-> > > and whether the device the offloads targets is built by a P4 vendor.
-> >
-> > I think it is an important detail though.
-> > You wouldnt say PSP shouldnt start small by first taking care of TLS
-> > or IPSec because it is not the target.
->
-> I really don't see any parallel with PSP. And it _is_ small, 4kLoC.
->
-> First you complain that community is "political" and doesn't give you
-> technical feedback, and then when you get technical feedback you attack
-> the work of the maintainer helping you.
->
+On Mon, May 27, 2024 at 06:14:27PM +0200, Herve Codina wrote:
+> Hi,
+> 
+> This series adds support for the LAN966x chip when used as a PCI
+> device.
+> 
+> For reference, the LAN996x chip is a System-on-chip that integrates an
+> Ethernet switch and a number of other traditional hardware blocks such
+> as a GPIO controller, I2C controllers, SPI controllers, etc. The
+> LAN996x can be used in two different modes:
+> 
+> - With Linux running on its Linux built-in ARM cores.
+>   This mode is already supported by the upstream Linux kernel, with the
+>   LAN996x described as a standard ARM Device Tree in
+>   arch/arm/boot/dts/microchip/lan966x.dtsi. Thanks to this support,
+>   all hardware blocks in the LAN996x already have drivers in the
+>   upstream Linux kernel.
+> 
+> - As a PCI device, thanks to its built-in PCI endpoint controller.
+>   In this case, the LAN996x ARM cores are not used, but all peripherals
+>   of the LAN996x can be accessed by the PCI host using memory-mapped
+>   I/O through the PCI BARs.
+> 
+> This series aims at supporting this second use-case. As all peripherals
+> of the LAN996x already have drivers in the Linux kernel, our goal is to
+> re-use them as-is to support this second use-case.
+> 
+> Therefore, this patch series introduces a PCI driver that binds on the
+> LAN996x PCI VID/PID, and when probed, instantiates all devices that are
+> accessible through the PCI BAR. As the list and characteristics of such
+> devices are non-discoverable, this PCI driver loads a Device Tree
+> overlay that allows to teach the kernel about which devices are
+> available, and allows to probe the relevant drivers in kernel, re-using
+> all existing drivers with no change.
+> 
+> This patch series for now adds a Device Tree overlay that describes an
+> initial subset of the devices available over PCI in the LAN996x, and
+> follow-up patch series will add support for more once this initial
+> support has landed.
+> 
+> In order to add this PCI driver, a number of preparation changes are
+> needed:
+> 
+>  - Patches 1 to 5 allow the reset driver used for the LAN996x to be
+>    built as a module. Indeed, in the case where Linux runs on the ARM
+>    cores, it is common to have the reset driver built-in. However, when
+>    the LAN996x is used as a PCI device, it makes sense that all its
+>    drivers can be loaded as modules.
+> 
+>  - Patches 6 and 7 improve the MDIO controller driver to properly
+>    handle its reset signal.
+> 
+>  - Patches 8 to 12 introduce the internal interrupt controller used in
+>    the LAN996x. It is one of the few peripherals in the LAN996x that
+>    are only relevant when the LAN996x is used as a PCI device, which is
+>    why this interrupt controller did not have a driver so far.
+> 
+>  - Patches 13 to 16 make some small additions to the OF core and
+>    PCI/OF core to consider the PCI device as an interrupt controller.
+>    This topic was previously mentioned in [1] to avoid the need of
+>    phandle interrupt parents which are not available at some points.
+> 
+>  - Patches 17 and 18 introduce the LAN996x PCI driver itself, together
+>    with its DT bindings.
+> 
+> We believe all items from the above list can be merged separately, with
+> no build dependencies. We expect:
+> 
+>  - Patches 1 to 5 to be taken by reset maintainers
+> 
+>  - Patches 6 and 7 to be taken by network driver maintainers
+> 
+>  - Patches 8 to 12 to be taken by irqchip maintainers
+> 
+>  - Patch 13 to 17 to be taken by DT/PCI maintainers
 
-You made a proposal saying it was a "start small" approach. I
-responded saying that it doesnt really cover our requirements and
-pointed to a sample h/w to show why. I only used PSP to illustrate why
-"start small" doesnt work for what we are targeting. I was not in any
-way attacking your work.
+I've applied patches 13-17.
 
-We are not trying to cover the whole world of offloads. It is a very
-specific niche -P4- which uses the existing tc model because that's
-how match-action tables are offloaded today. The actions and tables
-are dynamically defined by the users P4 program whereas in flower they
-are hardcoded in the kernel. I dont see any other way to achieve these
-goals with flower or other existing approaches.  Flower for example
-could be written as a single P4 program and the goal here is to
-support a wider range of programs without making kernel changes.
-
-cheers,
-jamal
+Rob
 
