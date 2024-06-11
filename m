@@ -1,98 +1,195 @@
-Return-Path: <netdev+bounces-102627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3BD890400F
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 17:33:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EFA090402A
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 17:37:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D050B1C21DB4
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:33:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAEC21F24482
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:37:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD67324B4A;
-	Tue, 11 Jun 2024 15:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 276593838A;
+	Tue, 11 Jun 2024 15:36:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iS/73RUV"
+	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="VpU2PriE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5BF71E531;
-	Tue, 11 Jun 2024 15:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61ACE36AEC
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 15:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718119994; cv=none; b=bktztNhDpvarM9KFSZ5OF/bT67a+3ow0kFTy+6wkNUHA590uk/LT9PzeLMYIRlkWKLWfjOV6BHyNuWWCFe2RiWjVHC1UFAnYpfZDS8eLfv8ElPV3wf6MUFk53N+/gWN8vyYrKow+XSQAP8Fak0zmIx2PErbVaTwjTo4PeQJa5nA=
+	t=1718120184; cv=none; b=UOYrcC2pL9xW2LRZasBfzP3J7Vw90pTE3BS1dyTM7sia30kS45T5AyBMJCd5eq15EH7tP29aic1DEQKwSCbIVY2X8jEsiBn2PHLXpLESjsxyRCt4pv+1wIh9CyDLBfY/fmS3QSiU+vWryT6yMzs3pn4UUvh5jS9KrlkgDnn9Q+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718119994; c=relaxed/simple;
-	bh=7c/3fzXwXu3tHa6Ldvlr4BSWvlNfTy9/XdOSafpSntk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZNTakYKoaDYeuuigTj7mbVqlxmYPG5Hn+G/qf3FyxADDX3ZIxVTV/32jpUGAvF2f/+dtjjUPkPxJvWgTDALWlooxA8OHBAHLeY9SZnuaOGACClb3MsqFsosFG1JfjPEoGydJQsX8Bc2ymBK+sPK+LQy5rmTlOYKWyS+yxWb922g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iS/73RUV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C486C2BD10;
-	Tue, 11 Jun 2024 15:33:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718119993;
-	bh=7c/3fzXwXu3tHa6Ldvlr4BSWvlNfTy9/XdOSafpSntk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iS/73RUVqWAIRwGTClV2e31QxDzfeYNDzl7SBAwUweI7cKXtCUaMtWDcBU2nONNSU
-	 rqKUanQW86j4r9IaixTia/PAohXIo/9ia3xbYOpbrjugScCFn/sA0NksOyQTLv/DXH
-	 jVY9LjC3on9ObIdB6f3HNBIHyWkQnWmaw27p4zXiB2S0Y318KFxqYOcYm2XXiZvfLa
-	 I0qmYa1cpNOyytv8we/SCWYvMARHNZSZKV2dxoNn6+sTOGkvgOMVivyQisAq1Dhomy
-	 btCBFOwO6LwZAX+Gsb9kE/tJCvBoD7lDvBcgj/ab/LB3tBXqyBrkMyEcQOV2UdACjX
-	 m+toR3/Hz60Dw==
-Date: Tue, 11 Jun 2024 08:33:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jamal P4 Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com,
- anjali.singhai@intel.com, namrata.limaye@intel.com, tom@sipanda.io,
- mleitner@redhat.com, Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com,
- jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, vladbu@nvidia.com,
- horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, victor@mojatatu.com,
- pctammela@mojatatu.com, Vipin.Jain@amd.com, dan.daly@intel.com,
- andy.fingerhut@gmail.com, chris.sommers@keysight.com, mattyk@nvidia.com,
- bpf@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH net-next v16 00/15] Introducing P4TC (series 1)
-Message-ID: <20240611083312.3f3522dd@kernel.org>
-In-Reply-To: <CAM0EoMkAQH+zNp3mJMfiszmcpwR3NHnEVr8SN_ysZhukc=vt8A@mail.gmail.com>
-References: <20240410140141.495384-1-jhs@mojatatu.com>
-	<20240611072107.5a4d4594@kernel.org>
-	<CAM0EoMkAQH+zNp3mJMfiszmcpwR3NHnEVr8SN_ysZhukc=vt8A@mail.gmail.com>
+	s=arc-20240116; t=1718120184; c=relaxed/simple;
+	bh=sEvDMhi2LuNyC8HUxfzbzLy5zJ19f9pPX5EayeZseQI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TouTivutC0v6d6/rX9++e2gB60KEX/KXrCedsmBmA5HXmMP1MPRqZISgPjt0uwNZAK9zXMwUG4REVPFsHzu4Qn7WT4WOevq9xFIH6WFs5jlhS+j0ZfgXaz5hzOhh2sCGtmf/dudmx5w3WtXkz+6AuHORW9ndFLb83fLE8bZL8uQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=VpU2PriE; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52bc0236f04so828491e87.3
+        for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 08:36:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google; t=1718120181; x=1718724981; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zYiOKqOztGolPpdiFV4XN2+aPrwTQCSjwVf5L3ie3JA=;
+        b=VpU2PriEzpgMIFyyyzm+bvOy4kdakkYgKJgVXhD2Scn3XjwpDUJIU+3MT5meZ8HDlB
+         ZUzyin6R1YyFa7o4/K4XlHRgRbzy/9NSTv6mCMJQGebgsQLmKQQuaDinTgRfWNl7sZrK
+         c03Sk97VJc1sHHRd0hOS+yHlA+1UGjhjilErE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718120181; x=1718724981;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zYiOKqOztGolPpdiFV4XN2+aPrwTQCSjwVf5L3ie3JA=;
+        b=XzhLwtwhI9Vz/Cg+1zgb0XUfesMjzHLp1RGT0g2iahYH3k4ok3Gsh1LzCd9yvxlGxj
+         jZkSaA3h3+D6tHp5irQD/T/hiNn3PglXt1jqJiHMW3on0tVxQgpUIZ68TyZaKOPaDDyq
+         gb2cm+slzboQJkWfXfI1QhbPEdncpvLGpxCxQCCzClXMGC2xiwt2mFqzifJkfSusU/eH
+         KbNzHrdTHw8mANF8cgvKptfCpOD5yY/LkBYc86AoSLTa461Lt6d+rOz+Get4apR26Di+
+         PaSAzcv8Z3xgX4WoSam4qKgJ1GYnzt3R3PuvWn4mL4XMGzBJxv0C9DmzPpvoGBo2VNdT
+         cgLA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+fAVDrWSvzmnjsUVNItqoOxo9LONPa+3bvhuUdZdQjQkbXHfLekocAOE6pk+NZIDjAAJeWwi9wSf34dHD6yue6g8gOHOD
+X-Gm-Message-State: AOJu0Yxs11I3GymfaoETBZDNDIAgmHZsHy95HT/Wcet/OcM9nr4erIRc
+	jKAgAzuVnIi+r8MHuPXvHlE9OZFaZyOI4gsfygzbZ1Cz+S0Cgh4MbIDivuJclgM=
+X-Google-Smtp-Source: AGHT+IEqvd8t7yV4Y08H9toKdWjldXNuJHx8xMhVZIiBly5rz0ehyy1t+vkdmGULc+LniJtZqK7xKQ==
+X-Received: by 2002:a19:9107:0:b0:52b:c06d:70cf with SMTP id 2adb3069b0e04-52bc06d7164mr5715253e87.4.1718120180437;
+        Tue, 11 Jun 2024 08:36:20 -0700 (PDT)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42274379b83sm10409345e9.28.2024.06.11.08.36.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jun 2024 08:36:19 -0700 (PDT)
+Date: Tue, 11 Jun 2024 17:36:17 +0200
+From: Daniel Vetter <daniel@ffwll.ch>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Dan Williams <dan.j.williams@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, linux-doc@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
+	Leonid Bloch <lbloch@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
+	patches@lists.linux.dev
+Subject: Re: [PATCH 0/8] Introduce fwctl subystem
+Message-ID: <Zmhu8egti-URPFoB@phenom.ffwll.local>
+References: <0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com>
+ <20240603114250.5325279c@kernel.org>
+ <214d7d82-0916-4c29-9012-04590e77df73@kernel.org>
+ <20240604070451.79cfb280@kernel.org>
+ <665fa9c9e69de_4a4e62941e@dwillia2-xfh.jf.intel.com.notmuch>
+ <20240605135911.GT19897@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240605135911.GT19897@nvidia.com>
+X-Operating-System: Linux phenom 6.8.9-amd64 
 
-On Tue, 11 Jun 2024 11:10:35 -0400 Jamal Hadi Salim wrote:
-> > Before the tin foil hats gather - we have no use for any of this at
-> > Meta, I'm not trying to twist the design to fit the use cases of big
-> > bad hyperscalers.  
+On Wed, Jun 05, 2024 at 10:59:11AM -0300, Jason Gunthorpe wrote:
+> On Tue, Jun 04, 2024 at 04:56:57PM -0700, Dan Williams wrote:
+> > * Introspection / validation: Subsystem community needs to be able to
+> >   audit behavior after the fact.
+> > 
+> >   To me this means even if the kernel is letting a command through based
+> >   on the stated Command Effect of "Configuration Change after Cold Reset"
+> >   upstream community has a need to be able to read the vendor
+> >   specification for that command. I.e. commands might be vendor-specific,
+> >   but never vendor-private. I see this as similar to the requirement for
+> >   open source userspace for sophisticated accelerators.
 > 
-> The scope is much bigger than just parsers though, it is about P4 in
-> which the parser is but one object.
+> I'm less hard on this. As long as reasonable open userspace exists I
+> think it is fine to let other stuff through too. I can appreciate the
+> DRM stance on this, but IMHO, there is meaningfully more value for open
+> source in trying get an open Vulkan implementation vs blocking users
+> from reading their vendor'd diagnostic SI values.
+> 
+> I don't think we should get into some kind of extremism and insist
+> that every single bit must be documented/standardized or Linux won't
+> support it.
 
-For me it's very much not "about P4". I don't care what DSL user prefers
-and whether the device the offloads targets is built by a P4 vendor.
+I figured it might be useful to paint what we do in DRM with a bit more
+nuance. In the principles, we're indeed fairly radical in what we require,
+but in practice we aim for a much more pragmatic approach in what we
+merge. There's two major axis here:
 
-> Limiting what we can do just to fit a narrow definition of "offload"
-> is not the right direction.
+1. One is ecosystem maturity. One end is 3d, with vulkan as the clear
+industry standard, and an upstream full-featured userspace driver in
+mesa3d is the only technically reasonable choice. And all gpu vendors
+agree and by this year even nvidia started hiring an upstream team. But
+this didn't happen magically overnight, it took 1-2 decades of background
+discussions and tactical push&pulling to get there.
 
-This is how Linux development works. You implement small, useful slice
-which helps the overall project. Then you implement the next, and
-another.
+The other end is currently AI accelerators. It's a complete mess, where
+across the platform (client, edge, cloud), customer and vendor dimension
+every point has a different stack. And the problem is so obvious that
+everyone is working to fix this, which means currently
+https://xkcd.com/927/ is happening in parallel. Just to get things going
+we're accepting pretty much anything that's a notch above total garbage
+for userspace and for merging into the kernel.
 
-On the technical level, putting the code into devlink rather than TC
-does not impose any meaningful limitations. But I really don't want
-you to lift and shift the entire pile of code at once.
+2. The other part is how much it impacts applications. If you can't run
+the same application across different vendors, the case for an upstream
+stack becomes a lot weaker. At the other end is infrastructure enabling
+like device configuration, error handling and recovery, hw debugging and
+reliablity/health reporting. That's a lot more vendor specific in nature
+and needs to be customized anyway per deployement. And only much higher in
+the stack, maybe in k8s, can a technically reasonable unification even
+happen.  So again we're much more lenient about infrastructure enabling
+and uapi than stuff applications will use directly.
 
-> P4 is well understood, hardware exists for P4 and is used to specify
-> hardware specs and is deployed(See Vipin's comment).
+Currently that's enough of a mess in drm that I feel like enforcing
+something like fwctl is still too much. But maybe once fwctl is
+established with other subsystems/devices we can start the conversations
+with vendors to get this going a few years down the road.
 
-"Hardware exists for P4" is about as meaningful as "hardware exists
-for C++".
+Both together mean we land a lot of code that's questionable at best,
+clear garbage at worst. But since we've been in the merging garbage
+business just to get things going for decades, we've become pretty good at
+dealing with the kernel internal and uapi fallout, some say too good. But
+personally I don't think there's a path to where we are with 3d/vulkan
+that doesn't go through years of this kind of suck, and very much merged
+into upstream kind of suck.
+
+For all the concerns about trusting vendors/devices to not abuse very broad
+uapi interfaces: Modern accelerator command submission boils down to "run
+this context at this $addr", and the kernel never ever directly sees
+anything more fly by. That's the same interface you need for a no-op job
+as a full blown AI workload, so in theory maximal abuse potential.
+
+In practice, it doesn't seem to be an issue, at least not beyond the
+intentionally pragmatic choices where we merge kernel code with known
+sub-par/incomplete userspace. I'm not sure why, but to my knowledge all
+attempts to break the spirit of our userspace rules while following the
+letter die in vendor-internal discussions, at least for all the
+established upstream driver teams.
+
+And for new ones it takes years of private chats to get them going and
+fully established in upstream anyway.
+
+Maybe one reason we have a bit an extremist reputation is that all the
+public takes are the radical principled requirements, while the actual
+pragmatic discussions mostly happen in private.
+
+tldr; fwctl as I understand it feels like a bridge to far for drm today,
+but I'd very much like someone else to make this happen so we could
+eventually push towards adoption too.
+
+Cheers, Sima
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
 
