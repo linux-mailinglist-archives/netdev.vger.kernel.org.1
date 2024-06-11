@@ -1,227 +1,235 @@
-Return-Path: <netdev+bounces-102452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A95C2903133
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 07:35:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8C1D90313E
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 07:35:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16D02B27629
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 05:35:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A3721F2B092
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 05:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E14F171092;
-	Tue, 11 Jun 2024 05:31:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3AF4172BC7;
+	Tue, 11 Jun 2024 05:32:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="OTXxlE4p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b3NbzL7z"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31C6433C4;
-	Tue, 11 Jun 2024 05:31:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF94517106C
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 05:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718083913; cv=none; b=awMWsy7AVbP5ctfCIGPfGD69m6sslidJdS14OFt47T518lGrHvSlCOZkX2Zuy/J95ay1LIy5TIvNrCvdXJ6wDqpyHal+SlsLTGcDjBBCEyksMVw0HcnDqyZNN+jrVnH3eRgYxlh0hZCylfrQh2etzt1vQvn6vp9pniGK10/MQkM=
+	t=1718083976; cv=none; b=e7KdndVRVqOLZ1GdYKfsPw6Jx0mPYtFEvRU3PAQMK4D2OUnY3r0KQAJ0qesPV1W02yDifyDciC/7gxIW/LUGeniD/MAUY0Nw4U6hexdvz1dE0Z9sT/99m+DjqkhhTOf0kOKJnMQBJ86lMQr5fDTU6e8wNBFBU7MyEJtu2ReN9Vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718083913; c=relaxed/simple;
-	bh=wTgHUoRXGB8qJoR4h9Pr5wfL0FU6959WzxM5R7bvukk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=di86FrygPfAL3c99FdhagLdezSjVCwjBXyL4zqdDehcvrPdtdlBmGUyt2zni4Phj/w4b+omo7NDsK9EXsmK0NmehuBkdYNPPULtHJES7MArAYzqpBmJCtAwUCDHEelYpBRaQKTB+TAwOZ1IB3WYW4nphG+Wuq4OdOBvUAfR648k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=OTXxlE4p; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 1174B20B915A; Mon, 10 Jun 2024 22:31:51 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1174B20B915A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1718083911;
-	bh=r6S0G3Lmx1ajN1WsB9gfo8FcV54B6HHSqOabKV392fw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OTXxlE4p5/ddsVzESS8fcIGl0XfyJJuNk+XTi6QFJPPGA7Qv12BK7PGS0N9ZMAnGB
-	 HTGg+2pKyxCAL+tEe11V62Af7jiC1pmwxhyL45/HUTM1BKRv552wfWzWvQLIVOoio+
-	 HUrt5B3mU9Hp5FB4UPO1Oz37rlaAQFFED+RwZPlU=
-Date: Mon, 10 Jun 2024 22:31:51 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Simon Horman <horms@kernel.org>
-Cc: linux-hardening@vger.kernel.org, netdev@vger.kernel.org,
-	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, Colin Ian King <colin.i.king@gmail.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Kees Cook <keescook@chromium.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Long Li <longli@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH net-next v3] net: mana: Allow variable size indirection
- table
-Message-ID: <20240611053151.GA7510@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1717169861-15825-1-git-send-email-shradhagupta@linux.microsoft.com>
- <20240604093349.GP491852@kernel.org>
- <20240605083906.GA15889@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <20240606163334.GO791188@kernel.org>
+	s=arc-20240116; t=1718083976; c=relaxed/simple;
+	bh=RxfXH2ZFb7Id4zlG5fVIVyfD9EzHBt+idquBieWGYcw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=MY8z1Lsce0iXlalGPc9IVup+AsQo11ql/SmKV0pMtTDycF7flWyxkjDfK9DUnQJytR85IyM8MD2TMTcMEGA+ghGCjt/iLI1lh1LPcgTN1+sHO9soqlhlijusluEP8WC34Nl6Z8j4G+oPK3PHsBm6OChE0o7FnDXODwuYAINZVBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b3NbzL7z; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718083973;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=rjMLPcN4lf4hILs75qKFb2X8tj4fMICRG7d9Mi8k40Q=;
+	b=b3NbzL7zyEWC28fAQjEA1wnAZKX+AwcCcWSaBOrpUrTXOU+NQcJ9gpYLHqLvVQcgWGy4kC
+	OqK6y44uZh/h7PzmRiX8wAaCrbcwVqhs4hbd4bkQHWFoXIFrAzfuwn+8yjkBFuiH5Ck3MS
+	UFVml2I059cfcibEoT9JodiQr6p91vA=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-111-_V8BYhHVPAey9ah6ri3acA-1; Tue,
+ 11 Jun 2024 01:32:50 -0400
+X-MC-Unique: _V8BYhHVPAey9ah6ri3acA-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 199A719560BD;
+	Tue, 11 Jun 2024 05:32:49 +0000 (UTC)
+Received: from server.redhat.com (unknown [10.72.112.77])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7CAC11956048;
+	Tue, 11 Jun 2024 05:32:42 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: lulu@redhat.com,
+	dtatulea@nvidia.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	virtualization@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH 1/2] vdpa: support set mac address from vdpa tool
+Date: Tue, 11 Jun 2024 13:32:32 +0800
+Message-ID: <20240611053239.516996-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240606163334.GO791188@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Thu, Jun 06, 2024 at 05:33:34PM +0100, Simon Horman wrote:
-> On Wed, Jun 05, 2024 at 01:39:06AM -0700, Shradha Gupta wrote:
-> > On Tue, Jun 04, 2024 at 10:33:49AM +0100, Simon Horman wrote:
-> > > On Fri, May 31, 2024 at 08:37:41AM -0700, Shradha Gupta wrote:
-> > > > Allow variable size indirection table allocation in MANA instead
-> > > > of using a constant value MANA_INDIRECT_TABLE_SIZE.
-> > > > The size is now derived from the MANA_QUERY_VPORT_CONFIG and the
-> > > > indirection table is allocated dynamically.
-> > > > 
-> > > > Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> > > > Reviewed-by: Dexuan Cui <decui@microsoft.com>
-> > > > Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> > > 
-> > > ...
-> > > 
-> > > > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> > > 
-> > > ...
-> > > 
-> > > > @@ -2344,11 +2352,33 @@ static int mana_create_vport(struct mana_port_context *apc,
-> > > >  	return mana_create_txq(apc, net);
-> > > >  }
-> > > >  
-> > > > +static int mana_rss_table_alloc(struct mana_port_context *apc)
-> > > > +{
-> > > > +	if (!apc->indir_table_sz) {
-> > > > +		netdev_err(apc->ndev,
-> > > > +			   "Indirection table size not set for vPort %d\n",
-> > > > +			   apc->port_idx);
-> > > > +		return -EINVAL;
-> > > > +	}
-> > > > +
-> > > > +	apc->indir_table = kcalloc(apc->indir_table_sz, sizeof(u32), GFP_KERNEL);
-> > > > +	if (!apc->indir_table)
-> > > > +		return -ENOMEM;
-> > > > +
-> > > > +	apc->rxobj_table = kcalloc(apc->indir_table_sz, sizeof(mana_handle_t), GFP_KERNEL);
-> > > > +	if (!apc->rxobj_table) {
-> > > > +		kfree(apc->indir_table);
-> > > 
-> > > Hi, Shradha
-> > > 
-> > > Perhaps I am on the wrong track here, but I have some concerns
-> > > about clean-up paths.
-> > > 
-> > > Firstly.  I think that apc->indir_table should be to NULL here for
-> > > consistency with other clean-up paths. Or alternatively, fields of apc
-> > > should not set to NULL elsewhere after being freed.
-> > 
-> > Hi Simon,
-> > 
-> > Thanks for the comments. This makes sense, I am planning of consistently
-> > removing the NULLify from other places too as per Leon's comments.
-> 
-> Great!
-> 
-> > > In looking into this I noticed that mana_probe() does not call
-> > > mana_remove() or return an error in the cases where mana_probe_port()
-> > > or mana_attach() fail unless add_adev also fails. If so, is that
-> > > intentional?
-> > 
-> > Right, so most calls like mana_probe_port(), mana_attach() cleanup after
-> > themselves in the code if there is any error. So, not having to call
-> > mana_remove() in these cases in mana_probe() is intentional. But I do
-> > agree that an error is returned in mana_probe() only if add_adev also
-> > fails. I'll fix that too in the next version
-> 
-> I'm not entirely sure, but perhaps that is a candidate for a separate patch.
-> 
-> > > 
-> > > In any case, I would suggest as a follow-up, arranging things so that
-> > > when an error occurs in a function, anything that was allocated is
-> > > unwound before returning an error.
-> > > 
-> > > I think this would make allocation/deallocation easier to reason with.
-> > > And I suspect it would avoid both the need for fields of structures to
-> > > be zeroed after being freed, and the need to call mana_remove() from
-> > > mana_probe().
-> > 
-> > Agreed
-> > > 
-> > > > +		return -ENOMEM;
-> > > > +	}
-> > > > +
-> > > > +	return 0;
-> > > > +}
-> > > > +
-> > > >  static void mana_rss_table_init(struct mana_port_context *apc)
-> > > >  {
-> > > >  	int i;
-> > > >  
-> > > > -	for (i = 0; i < MANA_INDIRECT_TABLE_SIZE; i++)
-> > > > +	for (i = 0; i < apc->indir_table_sz; i++)
-> > > >  		apc->indir_table[i] =
-> > > >  			ethtool_rxfh_indir_default(i, apc->num_queues);
-> > > >  }
-> > > 
-> > > ...
-> > > 
-> > > > @@ -2739,11 +2772,17 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
-> > > >  	err = register_netdev(ndev);
-> > > >  	if (err) {
-> > > >  		netdev_err(ndev, "Unable to register netdev.\n");
-> > > > -		goto reset_apc;
-> > > > +		goto free_indir;
-> > > >  	}
-> > > >  
-> > > >  	return 0;
-> > > >  
-> > > > +free_indir:
-> > > > +	apc->indir_table_sz = 0;
-> > > > +	kfree(apc->indir_table);
-> > > > +	apc->indir_table = NULL;
-> > > > +	kfree(apc->rxobj_table);
-> > > > +	apc->rxobj_table = NULL;
-> > > >  reset_apc:
-> > > >  	kfree(apc->rxqs);
-> > > >  	apc->rxqs = NULL;
-> > > 
-> > > nit: Not strictly related to this patch, but the reset_apc code should
-> > >      probably be a call to mana_cleanup_port_context() as it is the dual of
-> > >      mana_init_port_context() which is called earlier in mana_probe_port()
-> > 
-> > Sure, let me do that too.
-> 
-> FWIIW, I think it would be appropriate to put that change in a separate patch.
-Fixing this and other similar changes in a different patch. Thanks
-> 
-> > > 
-> > > ...
-> > > 
-> > > > @@ -2931,6 +2972,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
-> > > >  		}
-> > > >  
-> > > >  		unregister_netdevice(ndev);
-> > > > +		apc->indir_table_sz = 0;
-> > > > +		kfree(apc->indir_table);
-> > > > +		apc->indir_table = NULL;
-> > > > +		kfree(apc->rxobj_table);
-> > > > +		apc->rxobj_table = NULL;
-> > > 
-> > > The code to free and zero indir_table_sz and indir_table appears twice
-> > > in this patch. Perhaps a helper to do this, which would be the dual
-> > > of mana_rss_table_alloc is in order.
-> > Makes sense, will change this too.
-> 
-> Thanks.
+Add new UAPI to support the mac address from vdpa tool
+Function vdpa_nl_cmd_dev_config_set_doit() will get the
+MAC address from the vdpa tool and then set it to the device.
+
+The usage is: vdpa dev set name vdpa_name mac **:**:**:**:**:**
+
+Here is sample:
+root@L1# vdpa -jp dev config show vdpa0
+{
+    "config": {
+        "vdpa0": {
+            "mac": "82:4d:e9:5d:d7:e6",
+            "link ": "up",
+            "link_announce ": false,
+            "mtu": 1500
+        }
+    }
+}
+
+root@L1# vdpa dev set name vdpa0 mac 00:11:22:33:44:55
+
+root@L1# vdpa -jp dev config show vdpa0
+{
+    "config": {
+        "vdpa0": {
+            "mac": "00:11:22:33:44:55",
+            "link ": "up",
+            "link_announce ": false,
+            "mtu": 1500
+        }
+    }
+}
+
+Signed-off-by: Cindy Lu <lulu@redhat.com>
+---
+ drivers/vdpa/vdpa.c       | 71 +++++++++++++++++++++++++++++++++++++++
+ include/linux/vdpa.h      |  2 ++
+ include/uapi/linux/vdpa.h |  1 +
+ 3 files changed, 74 insertions(+)
+
+diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
+index a7612e0783b3..347ae6e7749d 100644
+--- a/drivers/vdpa/vdpa.c
++++ b/drivers/vdpa/vdpa.c
+@@ -1149,6 +1149,72 @@ static int vdpa_nl_cmd_dev_config_get_doit(struct sk_buff *skb, struct genl_info
+ 	return err;
+ }
+ 
++static int vdpa_nl_cmd_dev_config_set_doit(struct sk_buff *skb,
++					   struct genl_info *info)
++{
++	struct vdpa_dev_set_config set_config = {};
++	struct nlattr **nl_attrs = info->attrs;
++	struct vdpa_mgmt_dev *mdev;
++	const u8 *macaddr;
++	const char *name;
++	int err = 0;
++	struct device *dev;
++	struct vdpa_device *vdev;
++
++	if (!info->attrs[VDPA_ATTR_DEV_NAME])
++		return -EINVAL;
++
++	name = nla_data(info->attrs[VDPA_ATTR_DEV_NAME]);
++
++	down_write(&vdpa_dev_lock);
++	dev = bus_find_device(&vdpa_bus, NULL, name, vdpa_name_match);
++	if (!dev) {
++		NL_SET_ERR_MSG_MOD(info->extack, "device not found");
++		err = -ENODEV;
++		goto dev_err;
++	}
++	vdev = container_of(dev, struct vdpa_device, dev);
++	if (!vdev->mdev) {
++		NL_SET_ERR_MSG_MOD(
++			info->extack,
++			"Fail to find the specified management device");
++		err = -EINVAL;
++		goto mdev_err;
++	}
++	mdev = vdev->mdev;
++	if (nl_attrs[VDPA_ATTR_DEV_NET_CFG_MACADDR]) {
++		if (!(mdev->supported_features & BIT_ULL(VIRTIO_NET_F_MAC))) {
++			NL_SET_ERR_MSG_FMT_MOD(
++				info->extack,
++				"Missing features 0x%llx for provided attributes",
++				BIT_ULL(VIRTIO_NET_F_MAC));
++			err = -EINVAL;
++			goto mdev_err;
++		}
++		macaddr = nla_data(nl_attrs[VDPA_ATTR_DEV_NET_CFG_MACADDR]);
++		memcpy(set_config.net.mac, macaddr, ETH_ALEN);
++		set_config.mask |= BIT_ULL(VDPA_ATTR_DEV_NET_CFG_MACADDR);
++		if (mdev->ops->set_mac) {
++			err = mdev->ops->set_mac(mdev, vdev, &set_config);
++		} else {
++			NL_SET_ERR_MSG_FMT_MOD(
++				info->extack,
++				"%s device not support set mac address ", name);
++		}
++
++	} else {
++		NL_SET_ERR_MSG_FMT_MOD(info->extack,
++				       "%s device not support this config ",
++				       name);
++	}
++
++mdev_err:
++	put_device(dev);
++dev_err:
++	up_write(&vdpa_dev_lock);
++	return err;
++}
++
+ static int vdpa_dev_config_dump(struct device *dev, void *data)
+ {
+ 	struct vdpa_device *vdev = container_of(dev, struct vdpa_device, dev);
+@@ -1285,6 +1351,11 @@ static const struct genl_ops vdpa_nl_ops[] = {
+ 		.doit = vdpa_nl_cmd_dev_stats_get_doit,
+ 		.flags = GENL_ADMIN_PERM,
+ 	},
++	{
++		.cmd = VDPA_CMD_DEV_CONFIG_SET,
++		.doit = vdpa_nl_cmd_dev_config_set_doit,
++		.flags = GENL_ADMIN_PERM,
++	},
+ };
+ 
+ static struct genl_family vdpa_nl_family __ro_after_init = {
+diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+index db15ac07f8a6..c97f4f1da753 100644
+--- a/include/linux/vdpa.h
++++ b/include/linux/vdpa.h
+@@ -581,6 +581,8 @@ struct vdpa_mgmtdev_ops {
+ 	int (*dev_add)(struct vdpa_mgmt_dev *mdev, const char *name,
+ 		       const struct vdpa_dev_set_config *config);
+ 	void (*dev_del)(struct vdpa_mgmt_dev *mdev, struct vdpa_device *dev);
++	int (*set_mac)(struct vdpa_mgmt_dev *mdev, struct vdpa_device *dev,
++		       const struct vdpa_dev_set_config *config);
+ };
+ 
+ /**
+diff --git a/include/uapi/linux/vdpa.h b/include/uapi/linux/vdpa.h
+index 54b649ab0f22..53f249fb26bc 100644
+--- a/include/uapi/linux/vdpa.h
++++ b/include/uapi/linux/vdpa.h
+@@ -19,6 +19,7 @@ enum vdpa_command {
+ 	VDPA_CMD_DEV_GET,		/* can dump */
+ 	VDPA_CMD_DEV_CONFIG_GET,	/* can dump */
+ 	VDPA_CMD_DEV_VSTATS_GET,
++	VDPA_CMD_DEV_CONFIG_SET,
+ };
+ 
+ enum vdpa_attr {
+-- 
+2.45.0
+
 
