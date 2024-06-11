@@ -1,179 +1,120 @@
-Return-Path: <netdev+bounces-102436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D74C8902F23
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 05:32:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FBEB902F2C
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 05:42:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABFA8B20F0F
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 03:32:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C7E61C21884
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 03:42:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D8A5FEE4;
-	Tue, 11 Jun 2024 03:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9DB115B0E2;
+	Tue, 11 Jun 2024 03:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HagoDYnw"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="W15sL+Fv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDF22A1C0
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 03:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486B713DDCC
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 03:41:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718076748; cv=none; b=TPPlbYGKMnRFdB3WWrxOE+zsByEnSFqF0xX87Uz8TkJvJ7cpx8GN7G3bcTP2a8fMKx82t3RsI/TVxGVAP5mMbmMDauraCdAtWJu9R6fSEkGsx6iakTmW55myAceG2tcvBGDbQ/zDndx0QLJtrkskz/8/hvooDjvSs3hM0rM5I8U=
+	t=1718077318; cv=none; b=PIzAe3hxA/19XCgTJgBxsKbCrwlmm8baC4NGYCn5C7SU+JrC5IAIdILVyAcbIGY5xxLl9QjTQUs6JdbFa6V/PLzodKx6hZOSaxUZ+1FnS2L+jWIkX/tEFJQwRznjQfu5ukxvcT/1SurGGviaD2uuFUaZAHlWk8gbjgqy1mCE6LM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718076748; c=relaxed/simple;
-	bh=2QO5z4OcBxKUrfhrCLE652n/xmEu/8KzBWTmvbZbBCM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YKYA1ab4GJb/wH0HJpQ0DFie+RGxgn2nekFJ0PfkqCbAo1m1VGKGFxJnKLdJM1XfEGa4EqOa/iUsRdYh9DAKdxEIj9MTN2OTE6fMG2NftOOBD+klvE6yX9ya9fjsFE+fBxSFJIvYAMduoRBxBbvzl1L64ued5lSD3WonUqpP/J0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HagoDYnw; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1f4a5344ec7so38485225ad.1
-        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 20:32:26 -0700 (PDT)
+	s=arc-20240116; t=1718077318; c=relaxed/simple;
+	bh=I3khNMZl0PkFJuuLwfTuDhBvGbiX2BGXToOqxq+Ds+M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aJw8iL1M+9zb+nqDk5S5bJBMF1HJCzsDcSAXIbqWvYvc7smF1TTYtK+/QScxuyACh17bEoHu0U+hfnHifzpeCmgg5I7UGXoUN8gH3fHmB6svOiicclYelLOsc7aJcamrawUyu6nelraS/Q/b3iWMXUaNeBXjmPhNmA82IiLolso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=W15sL+Fv; arc=none smtp.client-ip=209.85.167.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3c9c36db8eeso335624b6e.0
+        for <netdev@vger.kernel.org>; Mon, 10 Jun 2024 20:41:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718076745; x=1718681545; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uI6Ut9gIbD/ucRCwl/DrjGu7HYdx7Zy6RpemUZL8aY8=;
-        b=HagoDYnwJxbLyAxGgB1VKWWcW8gkPXI+VH4sw9JlhrUZdqMIik4zrkand8klF9VeTi
-         v9eV9PrVcG2gHGzomcMn9dgxSz/OJWcSsqDh8ZPmxKVNJUTKYpcb9Qr3WYGt+MFJihEU
-         LlOKRLkmAx4HR15MZPc/Uy+zl3MB/lNkII/rvsCzOMUk/VAxdqWpnS9j9a18bUd9zV5W
-         W1x9Yv5p4YUmJOtZgibzqB6rmMRcvUZvj46wwqnEphLi5kqnvcHn7y7xwvSompxNiRhz
-         YRtt+p1ABtnbkab+x8xj4bNRb2GsDblcr2RaMl0vm4GVnD5XcfPHqYUovLIyDppelnaF
-         hHAw==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1718077316; x=1718682116; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=davzP0Io6xjz5I0QRv8FQB5a/+nQ+OD/Q8iXxEw30n4=;
+        b=W15sL+Fvv/mPnLnMagl7AjWx0jYw/kwqoXCwowWqBDHXZbThN3i8jwwds+7PcjehFK
+         4cWLdzI2e/zHFrhMHCb/R+vluSHY3Hk/7UzwFZa8Ue5wgb1dVhHhRbAFpY20jI0mtoeB
+         7BgkMnZefeoQGvkkpvFS0w2c3y14zhQuWuBDBDhei/wb+WlpJw/Dpp5TfivYGodPra32
+         Ya07ZI2LhTdWl8izopOw3Jny9dQ5Y07VS+M1Szvw5IUxQnNXPe5CnKr8mvc/4N2iuH3a
+         IiMOkfBLju50xx62BYunJ43MBZaNSt2/dLPrFi4AlYNWezFTPokEwUnsZSc5M0J3daSo
+         xZ7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718076745; x=1718681545;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uI6Ut9gIbD/ucRCwl/DrjGu7HYdx7Zy6RpemUZL8aY8=;
-        b=RGtUpD9VtY/78tMKJLsFI44Nb19cemfTF9pHWWr43Xx+b62LI61hiijF1+5zzK35hL
-         QKOkPMb+T9Igq001HaW6JQtTgVCp++BfUY7k1dM2V7aqvxOV1JXa9duDZBFnkEV0Frde
-         dmJom/7c23ZtUfzdiB4wqWNeofiPGp8M81Qx/5devkB0dNXXPAeG9L+lJqP3os16zVLl
-         t+0eZv2LnYs+xK2SY7R3J/VOiJxyNzfYngWm1Y4g5tkOs5DNp/t3HkPO8MT0emz3eTca
-         h1Bqih4UUInL47LcrvVTh9zXWXQOYAVLaJPPf3lNcoRoIUk7E+0eJMUv/Q5mSG9DE0bw
-         Xi0g==
-X-Gm-Message-State: AOJu0Yzp4Czk0sELWSzs553YuyTBfI1q+mER7sGqDG2SEV61kWGjNjzt
-	Qqqhx45YnczYFnCoaN141Cv0EOJ8n5AccE/xnxZtpr2gj/wncmpo
-X-Google-Smtp-Source: AGHT+IGqZ5gZtgM7t367LdXN9Xu1POTY4+j8oePK2xJEjjVeRhSou0gJNdiFxpMfNq+R9vFTYIok9A==
-X-Received: by 2002:a17:902:cec9:b0:1f6:f298:e6b with SMTP id d9443c01a7336-1f7287a763amr21940445ad.13.1718076745331;
-        Mon, 10 Jun 2024 20:32:25 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd7ccd20sm90081465ad.141.2024.06.10.20.32.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jun 2024 20:32:24 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	leitao@debian.org
-Cc: netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v2] net: dqs: introduce IFF_NO_BQL private flag for non-BQL drivers
-Date: Tue, 11 Jun 2024 11:32:03 +0800
-Message-Id: <20240611033203.54845-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+        d=1e100.net; s=20230601; t=1718077316; x=1718682116;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=davzP0Io6xjz5I0QRv8FQB5a/+nQ+OD/Q8iXxEw30n4=;
+        b=F39vuvLSWWFHkFBf2+zJhrpKkd7mZXY8lBGCx/wpFBLvYvuD1Ho9VWBFxqUsHwTUs6
+         5dRttwRXkSQV5oFrS/Mky2y7fbpesOQEsaBexNgG84gLI2T+J3AUx8uMFsT8FpeDP+KK
+         JV0kNQFe3WWPha0lhyeHV1s2lCWX3M8Sevr/DkoDBsNvwyt5QsI6f1O+s+Ul/qcikGbO
+         CyXYHAFRlV3BTz3+XL5A7Rp/an2w5ye0Rl14A+zu/u3SgX4xnN2nnuj1qGD/wnya6eME
+         9EMShxAaWGpWwJ8T+npwA+HcAP61KfD7p43pW95bYWNxaTofS4C2TKgBUsZjy8OvDMHs
+         Qemw==
+X-Forwarded-Encrypted: i=1; AJvYcCWb4fLoIpY90jtMn8Iz4UIc4jiZ5FOlOid80EEIM707ulmo45HQk6tPS8PUtz65+YIj/4B84MNSpUmyuPZOWdSj57wPj0Zz
+X-Gm-Message-State: AOJu0Yw8j8bcz8A7x5xu5BJPtUdttS4uH8zjNoDITlcvHPo2EEN6vHge
+	s9j37a1koGOunEiZr37LQhjhJmHi4nTVlYvjBhuCH9r1Uaec7pql7x85dJDNKiA=
+X-Google-Smtp-Source: AGHT+IG4vNtXaZ+drWQUjdBm1Z1V1fyaDNRu6oQ5ta/ksA+uT/jERiptBOrKbIjMWZv1XIthwtIrhg==
+X-Received: by 2002:a05:6808:ecd:b0:3d2:1db1:3e7f with SMTP id 5614622812f47-3d21db143c5mr10897878b6e.0.1718077316254;
+        Mon, 10 Jun 2024 20:41:56 -0700 (PDT)
+Received: from [192.168.1.8] (174-21-189-109.tukw.qwest.net. [174.21.189.109])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-704134b3ef6sm6005983b3a.50.2024.06.10.20.41.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Jun 2024 20:41:55 -0700 (PDT)
+Message-ID: <b2dadafd-48c3-4598-bee5-a088ae5a4bc7@davidwei.uk>
+Date: Mon, 10 Jun 2024 20:41:55 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 0/3] bnxt_en: implement netdev_queue_mgmt_ops
+Content-Language: en-GB
+To: David Ahern <dsahern@kernel.org>, Michael Chan
+ <michael.chan@broadcom.com>, Andy Gospodarek
+ <andrew.gospodarek@broadcom.com>,
+ Adrian Alvarado <adrian.alvarado@broadcom.com>,
+ Somnath Kotur <somnath.kotur@broadcom.com>, netdev@vger.kernel.org
+Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+References: <20240611023324.1485426-1-dw@davidwei.uk>
+ <e6617dc1-6b34-49f7-8637-f3b150318ae3@kernel.org>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <e6617dc1-6b34-49f7-8637-f3b150318ae3@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Jason Xing <kernelxing@tencent.com>
+On 2024-06-10 19:40, David Ahern wrote:
+> On 6/10/24 8:33 PM, David Wei wrote:
+>> Implement netdev_queue_mgmt_ops for bnxt added in [1]. This will be used
+>> in the io_uring ZC Rx patchset to configure queues with a custom page
+>> pool w/ a special memory provider for zero copy support.
+>>
+> 
+> 
+> I do not see it explicitly called out, so asking here: does this change
+> enable / require header split if using memory from this "special memory
+> provider"?
 
-Since commit 74293ea1c4db6 ("net: sysfs: Do not create sysfs for non
-BQL device") limits the non-BQL driver not creating byte_queue_limits
-directory, I found there is one exception, namely, virtio-net driver,
-which should also be limited in netdev_uses_bql(). Let me give it a
-try first.
+This patchset is orthogonal to header split and page pool memory
+providers. It implements netdev_queue_mgmt_ops which enables dynamically
+resetting a single Rx queue without needing a full device close/open,
+and pre-allocates queue descriptor memory _before_ stopping the queue to
+minimise downtime. It shows that, with FW support and carefully written
+code, it is possible for drivers to move away from doing full resets on
+changes.
 
-I decided to introduce a NO_BQL bit because:
-1) it can help us limit virtio-net driver for now.
-2) if we found another non-BQL driver, we can take it into account.
-3) we can replace all the driver meeting those two statements in
-netdev_uses_bql() in future.
-
-For now, I would like to make the first step to use this new bit for dqs
-use instead of replacing/applying all the non-BQL drivers in one go.
-
-As Jakub said, "netdev_uses_bql() is best effort", I think, we can add
-new non-BQL drivers as soon as we find one.
-
-After this patch, there is no byte_queue_limits directory in virtio-net
-driver.
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
-v2
-Link: https://lore.kernel.org/all/20240609131732.73156-1-kerneljasonxing@gmail.com/
-1. chose to add the new bit into enum netdev_priv_flags() instead of
-breaking the room of device feature.
----
- drivers/net/virtio_net.c  | 2 +-
- include/linux/netdevice.h | 4 ++++
- net/core/net-sysfs.c      | 2 +-
- 3 files changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 61a57d134544..728f4b9844cc 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -5631,7 +5631,7 @@ static int virtnet_probe(struct virtio_device *vdev)
- 
- 	/* Set up network device as normal. */
- 	dev->priv_flags |= IFF_UNICAST_FLT | IFF_LIVE_ADDR_CHANGE |
--			   IFF_TX_SKB_NO_LINEAR;
-+			   IFF_TX_SKB_NO_LINEAR | IFF_NO_BQL;
- 	dev->netdev_ops = &virtnet_netdev;
- 	dev->stat_ops = &virtnet_stat_ops;
- 	dev->features = NETIF_F_HIGHDMA;
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index d20c6c99eb88..6d379858d11f 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1649,6 +1649,9 @@ struct net_device_ops {
-  * @IFF_SEE_ALL_HWTSTAMP_REQUESTS: device wants to see calls to
-  *	ndo_hwtstamp_set() for all timestamp requests regardless of source,
-  *	even if those aren't HWTSTAMP_SOURCE_NETDEV.
-+ * @IFF_NO_BQL: driver doesn't use BQL for flow control for now. It's used
-+ *	to check if we should create byte_queue_limits directory in dqs
-+ *	(see netdev_uses_bql())
-  */
- enum netdev_priv_flags {
- 	IFF_802_1Q_VLAN			= 1<<0,
-@@ -1685,6 +1688,7 @@ enum netdev_priv_flags {
- 	IFF_TX_SKB_NO_LINEAR		= BIT_ULL(31),
- 	IFF_CHANGE_PROTO_DOWN		= BIT_ULL(32),
- 	IFF_SEE_ALL_HWTSTAMP_REQUESTS	= BIT_ULL(33),
-+	IFF_NO_BQL			= BIT_ULL(34),
- };
- 
- #define IFF_802_1Q_VLAN			IFF_802_1Q_VLAN
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 4c27a360c294..7d99fbbad6af 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -1765,7 +1765,7 @@ static const struct kobj_type netdev_queue_ktype = {
- static bool netdev_uses_bql(const struct net_device *dev)
- {
- 	if (dev->features & NETIF_F_LLTX ||
--	    dev->priv_flags & IFF_NO_QUEUE)
-+	    dev->priv_flags & (IFF_NO_QUEUE | IFF_NO_BQL))
- 		return false;
- 
- 	return IS_ENABLED(CONFIG_BQL);
--- 
-2.37.3
-
+My first intent is to use it for reconfiguring an Rx queue with a
+different page pool, but that isn't the only purpose. For example, it
+opens up the possibility of dynamically creating queues that share a
+single napi instance.
 
