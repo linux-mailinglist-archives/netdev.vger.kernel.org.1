@@ -1,99 +1,128 @@
-Return-Path: <netdev+bounces-102589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63485903DC4
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:42:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9A5E903DD5
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:44:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F245E281DA1
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:42:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31511B2679A
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 13:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D4617D8AB;
-	Tue, 11 Jun 2024 13:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED47D17D355;
+	Tue, 11 Jun 2024 13:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gFUo5a5V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26DA917D358
-	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 13:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2B717BB35;
+	Tue, 11 Jun 2024 13:44:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718113226; cv=none; b=UAh/L3V/P9S+fLljRTuA9iGiCQn8235tmNhwdxU7aTF6uwfWZ+SbBGGupBgTKkM+9C/KReKBigbWdqA/jzegsClrIcrYSpcIo34Pl4gTP+GBcC7YlboAd2vMROzikMtfMmjkg8I1+9sG9xMDuNb81LL4wlMS6Djxb69twaCSEgE=
+	t=1718113460; cv=none; b=jlpXlcMrlTQehkBw6c8Bod+XItxDw+JoZM+NPWC0AH8dje9V1KqG8pnJyd8ZPH3f3YxkpysgT9bCHIXtGAipoc1c9PGkA0h/lNIDlf/AlQrY5rVU3Lka4/ZY27qEfy2keEF+cBBimUkBJq2GIcqFQ2UHeHh36/sIbDHOg6JQgR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718113226; c=relaxed/simple;
-	bh=Q+spwWSJC9x9li46TIO+VakRkC5shkNw/e/ETJaivJQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=e/LQzuKkNn7VMn+UYS5LirDRK7Rjq0YCiq6qHYIO00+S//IQuQGGQtjI12MyBjRsIcftmzDBEKiRCslvyFRirCq/cIj9Mf/f81kxLFxcTmf25k65mINe/w9HuL5qt7U/q7DUch0onfTxIxVIOUVt/4GEDVtViOTFraBKEE2hJgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7ea8fc6bd4dso690999739f.1
-        for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 06:40:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718113224; x=1718718024;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=40gVOiowLJOudabCaHorAkpoqJRBZmmZN7J4HzK5TFQ=;
-        b=oBENRnUssx420/vmEYa4OeBFbyqzPM0/cOkGoMBIJtVhAJT+T9ms5lNhpUkXIIJRme
-         PSyp/904H5OcEaEIYno3q747DC914dYbFU5VO6BnicQgaDX3QSdQJJu7LbhtSoO6iLmb
-         i6yN6idOmfPCrHaAF/BfkWVkGZgnlWNxjkeQmsAQqOLaAu0D+8Svp6I+JP9/yavMjClF
-         QRGW5LSBsfmleZFg6ynZTWNfibl4apdo4cpisPzZJ+OYXXs80UgoTfM/ytUS64vApmFQ
-         1/OX9mFnxRkAFkEEMmPCAarUdrL0gmO35bBD+I/ATJOVqYLFE/F/MgIsmixNk2X8QTrW
-         qkUA==
-X-Forwarded-Encrypted: i=1; AJvYcCVTlsxaPyHpT3XDZvr8C6LoAsBMvVgxQZekQcXw6RlL6a4+Hj26lzrlbNYIJLTF07BYOEgPQRjuM+zUBzCrnKsWnVJ1a6ll
-X-Gm-Message-State: AOJu0YxcfHr6A8mU4VjIJ7wFPPdpZNCpzjk3S3oeh3+d4D3aBTjGK0Oe
-	RHZREZyMOvHLTP6TeKtGRPwnghLkfhJBZ9ioyD27tUucz5u1KFoYf1BxP4DBgrp50dayeCbzvO/
-	RYsFXegQr0zRs2n3UG3MgDXDtnnRI8fNcOSbnFVC082pG0+zQtJa6ni0=
-X-Google-Smtp-Source: AGHT+IH8SMgjq5IU+Dt5xKArR1nGq1tgA3n51pYNKcPNEzR4RzydNrCHnJiZr+7XwrIrgYWSylZDQhm/bO5m+r1JqVqh6NnTBx51
+	s=arc-20240116; t=1718113460; c=relaxed/simple;
+	bh=EQYSCqQXeZZSe0ClprwCP48eVWRMSRk0A6GlSCKcSkc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h+qAGPof3TKHJk/JUwWl1VTCeOLdppCDpLMoTEKX35TJ2ZjOCea1PPhX6Wan5wVZzgfmnhQEF6jbXY1Tl/s9jYLP3PNqmQuUO/hg52vt3blULdxB6nlQvHKIkTt/K8vMtgitWtwCd3Pm6sL/P1fdIHVvufKuEYnYbeId6W6JnLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gFUo5a5V; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718113459; x=1749649459;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=EQYSCqQXeZZSe0ClprwCP48eVWRMSRk0A6GlSCKcSkc=;
+  b=gFUo5a5V1GnX2XydgU5zF7EYC/KWkEQqcrVQid5phQOMglvU7IXa9vV9
+   udhVO/d6pGtMN6wkq+2qMu5mnyXBjF8np/hVcPWC2A43EZ4o78GuMrwXG
+   fQaclTvySDKjfYNL4CQ9+caTVUMiw2BWDijIoVhLnELhkdXmdr4b3hVTb
+   Cm77W4gso9l1jULWdT1nnRe3/Gpgz0Zv3VhoJnDzxENz7Ao+MELfuemUI
+   8HvIEJ6P/o4s/edanLLbwngG4+9U5oIdfIJyBPeGFWZxnLMjmt8NuRDjO
+   64YwA2srN9hY0IroYs75zz2VRSIeuFo/p2Eai7s9Kmf68D+7wVCvoAXzi
+   A==;
+X-CSE-ConnectionGUID: UAOWDUvCTvGumurKBIdWWg==
+X-CSE-MsgGUID: Fcg0EAiuQKGcv9F+EzxMmQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11099"; a="14622283"
+X-IronPort-AV: E=Sophos;i="6.08,230,1712646000"; 
+   d="scan'208";a="14622283"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2024 06:44:18 -0700
+X-CSE-ConnectionGUID: Q0NPPKiNQ7ane9wZalYhdQ==
+X-CSE-MsgGUID: U69eDlhwT8qu912gTuRt5A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,230,1712646000"; 
+   d="scan'208";a="39373309"
+Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2024 06:44:11 -0700
+Received: from kekkonen.localdomain (localhost [127.0.0.1])
+	by kekkonen.fi.intel.com (Postfix) with SMTP id CFDB711F855;
+	Tue, 11 Jun 2024 16:44:07 +0300 (EEST)
+Date: Tue, 11 Jun 2024 13:44:07 +0000
+From: Sakari Ailus <sakari.ailus@linux.intel.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-kernel@vger.kernel.org, Dave Ertman <david.m.ertman@intel.com>,
+	Ira Weiny <ira.weiny@intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Bingbu Cao <bingbu.cao@intel.com>,
+	Tianshu Qiu <tian.shu.qiu@intel.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Michael Chan <michael.chan@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
+	Bard Liao <yung-chuan.liao@linux.intel.com>,
+	Ranjani Sridharan <ranjani.sridharan@linux.intel.com>,
+	Daniel Baluta <daniel.baluta@nxp.com>,
+	Kai Vehmanen <kai.vehmanen@linux.intel.com>,
+	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	linux-media@vger.kernel.org, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
+	sound-open-firmware@alsa-project.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 1/6] auxbus: make to_auxiliary_drv accept and return a
+ constant pointer
+Message-ID: <ZmhUp-UclZkvQLqE@kekkonen.localdomain>
+References: <20240611130103.3262749-7-gregkh@linuxfoundation.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:2ccf:b0:7eb:a74b:8895 with SMTP id
- ca18e2360f4ac-7eba74b9f08mr17226239f.4.1718113224328; Tue, 11 Jun 2024
- 06:40:24 -0700 (PDT)
-Date: Tue, 11 Jun 2024 06:40:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006b9744061a9d68ce@google.com>
-Subject: [syzbot] Monthly hams report (Jun 2024)
-From: syzbot <syzbot+list7d9abc7f0e8798d518c5@syzkaller.appspotmail.com>
-To: linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240611130103.3262749-7-gregkh@linuxfoundation.org>
 
-Hello hams maintainers/developers,
+Hi Greg,
 
-This is a 31-day syzbot report for the hams subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/hams
+On Tue, Jun 11, 2024 at 03:01:04PM +0200, Greg Kroah-Hartman wrote:
+> In the quest to make struct device constant, start by making
+> to_auziliary_drv() return a constant pointer so that drivers that call
 
-During the period, 1 new issues were detected and 1 were fixed.
-In total, 9 issues are still open and 34 have been fixed so far.
+s/z/s/
 
-Some of the still happening issues:
+Acked-by: Sakari Ailus <sakari.ailus@linux.intel.com> # drivers/media/pci/intel/ipu6
 
-Ref Crashes Repro Title
-<1> 162     Yes   KMSAN: uninit-value in ax25cmp (3)
-                  https://syzkaller.appspot.com/bug?extid=74161d266475935e9c5d
-<2> 25      No    WARNING: refcount bug in ax25_release (3)
-                  https://syzkaller.appspot.com/bug?extid=33841dc6aa3e1d86b78a
-<3> 5       No    KASAN: slab-use-after-free Read in rose_get_neigh
-                  https://syzkaller.appspot.com/bug?extid=e04e2c007ba2c80476cb
+> this can be fixed up before the driver core changes.
+> 
+> As the return type previously was not constant, also fix up all callers
+> that were assuming that the pointer was not going to be a constant one
+> in order to not break the build.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+-- 
+Kind regards,
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+Sakari Ailus
 
