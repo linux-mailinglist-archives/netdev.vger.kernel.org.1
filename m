@@ -1,130 +1,166 @@
-Return-Path: <netdev+bounces-102618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F121F903F7D
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 17:03:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98328903F95
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 17:05:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9557C1F22248
-	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:03:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20580288311
+	for <lists+netdev@lfdr.de>; Tue, 11 Jun 2024 15:05:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA33B1BF53;
-	Tue, 11 Jun 2024 15:02:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D95E143AAE;
+	Tue, 11 Jun 2024 15:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="RS8balMM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AuymG5cx"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1D12628D;
-	Tue, 11 Jun 2024 15:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16AD6381DE
+	for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 15:03:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718118175; cv=none; b=HDUTSZ8YogVqAcpyLAFgVEwbgN+7WKrElbQ9EB32UjilxVPZmhk3FPW3JvuCNyA3DUWqHo2ZwoXnZ6R9qTilSSB8OrIixAwFBgmFL3rsstqI8xKhoRatFdoNvSfI4gP+TvhJsnH0uzb1FGxWBcHKooY9uFpvcJw/CbK5n4PCvt0=
+	t=1718118231; cv=none; b=UOPp6AvNFwaIiQYSiWP9/Bn9CkHYScBgDjczjm6/ccbHFP6w8GN3sK+8U7xUuga+PP+wqbOHc71D9N73bqy5KcCKny2r2iS+YLQZsa6jhd6fpxogykgxnrAS7NLpnSWdlq0x8dpgByjn6/4I4OuayGyXlG0gx2lcr6oFvp7A98Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718118175; c=relaxed/simple;
-	bh=+UbdLhSNYQv78MjKDiWzxOsZG+Gz2YXkxyOtDXrPCgw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=TS+pME7pAa8p31efc1x4edesB4vP+4WwhyK32RMpt5W2KJGYMdslVvupACXshIz5KSKAes6cIPBitG2B9ZB087YSce4h3QBoKvmiJhTp22BaBJ7oUWG4sBDdNwImrnolazC0b3XCAcrpSzi7gsL6VWBcRRKn8eDX7VBFfipiG9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=RS8balMM; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 196CEA0A9B;
-	Tue, 11 Jun 2024 17:02:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=mail; bh=Lfl1G8RKSgEODerdsMc2
-	QohfW3q4Aoax5ZnKXqVT58E=; b=RS8balMMGmSzN0u+cqYv75MBVl/svMTc1Tad
-	t87iAPcyrWFhi8cb17oaKlqKpC6tSxzTIkWQy76IQnUS0rRcwPO+abI3Y5Fxg0a/
-	ToLWg6O+/ADL09pY5h4sb+oVTZB3SZSgdZCr/mkW6TkMLJB+cxAZBoQHmyrrwKcg
-	ghZbdja6ACrHy0obFeNwIq+cSXKWuXqh45c8MLe86hWtdV5bDCN+PebnNoJZGTU6
-	Zf/UfeM9ju8z5hbIQgcuWxuge1M3i2CTOLYZP/vObxlnMxFPdbCRm3Bb9HA+tAec
-	ji78BrgThbTx3IQBWcVmTN+hjM3e6UsSjjrsPSPMTDga8h35utErrahrtxSLfwpy
-	tncXh8+SMXYoVaLAycdsYcd/CdF9sjkoHIqWtVFIiG3VlvZiPKFebSGHV359aUf8
-	JelA6jRZOn87QnkoRnDEc15k1h8bsITDmmn7+NOXeS/9TYoP1plPfmNuM0mr7T1W
-	JyGDbip/IU02oGgf/FVeVGigKGZTL+Y2CW21Fd2fl83KOOFCw2M9fYdD/D3BwnxR
-	VvIW9ZexnVqhcSfaYOcb+dfl0VAg1dFGVRjw6/Y0yqk2AX0lnLixkw2pZOg/YwNh
-	43j6L2i0MKGOqLbCptdANPFmpiVvJxTOtIpWNAxdiAxUof1c/ZnhsrD6H0jsyty/
-	RbfZL7Y=
-Message-ID: <7ce6bbf4-738b-4bd4-b842-7d3e97b57583@prolan.hu>
-Date: Tue, 11 Jun 2024 17:02:44 +0200
+	s=arc-20240116; t=1718118231; c=relaxed/simple;
+	bh=DxHuSRyS2182VbMMPg8ECusV9XWBUw9c0Ua7Tz0GQfQ=;
+	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=udXbMK1BQu0+m8fz605FvGrUcA6JDwyDN93OJ7cL1bayHic19qtmhP+PhBv1yprqf8A0Petd4FhZslj67uzIfH/19s6izc0XgeZskGGljzZo71YwX4QowAEzHT2fVCI+va5dCf5yvgUCLg98gQ5IzCmcbU3llkU7vDSVZQ6C7P8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AuymG5cx; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718118229;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1KOD3tvw2yUOuCBwejEuRkcEMN7XtQ6ZYq07uFnoBqQ=;
+	b=AuymG5cxKaOvyz314SY3mNHcTZLXKJJymaTtldiI1iISYTRrgM/tC8lMiUh4r4i5b83Bx3
+	QsjBmzBmZ5vuRqyMAMbd+wrsRFZXOHvScJGIaH+uc4Xz7m0xGdoYVPBaU4AXteZjguiaa7
+	XFubKaOCh6p9oWmJT7bLKWle4fkbZ2o=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-590-nNfUcz2DNsqrvq-fY4gg2Q-1; Tue, 11 Jun 2024 11:03:47 -0400
+X-MC-Unique: nNfUcz2DNsqrvq-fY4gg2Q-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6b06c8269fcso35882656d6.1
+        for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 08:03:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718118226; x=1718723026;
+        h=cc:to:subject:message-id:date:in-reply-to:mime-version:references
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1KOD3tvw2yUOuCBwejEuRkcEMN7XtQ6ZYq07uFnoBqQ=;
+        b=gsBTj0xE20rRpiRe6XfLCzbzRBiQMTZBpmDONz6ng1AGuA7eoix21mQ3WSGzXEr0+o
+         S/gKBjQgP4pc7dsWzRqCb+UQkk4hGiEzoZi4nS9LzFwDuOHrMy4/vzx4cRp0DRBJwTvh
+         MzERBAm3EmB5jlbGaPjd4jvmpX2rotpceTjPMERYSQdSI3jPlCqKYWUQOfJ55YdXCiU1
+         D01lD3N0FZrc1qXLrVQyTzdeySrGgJcYtQFH3sbB76d+j4est66XXA85V7IEVVKM6DjL
+         bVQsvYJ4bxFdYwph5e+ag5zrTKmSnnTmExW+Q6f77hevNAk2OcYqlBYKO5gurCzixtTe
+         c2fw==
+X-Gm-Message-State: AOJu0Yz8KoXVCm/ukLa0bhJrp/6RNRXTFa1RKz5JVWcPvCiIKa/YaUFu
+	wLJ3MAXUfL+OfqJehWW3uGfzOa61ExeQQ2QOwF4SeEFsQ3YllsW1uuOMgAtg4KKu3VrE1ZUGoNH
+	m4FJEuAXKnpxBgUIkrWklRQGXSrwDULY33psam4sOXFrrZqA5G+aB6JHvqzxkMHMce3uCSa3Y7B
+	lAUoZ43sZfGJjKuSg+gbUTt9wxkQ8H
+X-Received: by 2002:a05:6214:5889:b0:6af:cd13:3adf with SMTP id 6a1803df08f44-6b059f15a02mr146830766d6.41.1718118226566;
+        Tue, 11 Jun 2024 08:03:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE8Fk310YG6KaykuurRnRYjKcqZ4xXhNfdb+Ut2CJiNwgIs0lhWrDGpn077i7CC8byIrzT0pPeZlUrEsg7upM4=
+X-Received: by 2002:a05:6214:5889:b0:6af:cd13:3adf with SMTP id
+ 6a1803df08f44-6b059f15a02mr146830506d6.41.1718118226132; Tue, 11 Jun 2024
+ 08:03:46 -0700 (PDT)
+Received: from 311643009450 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 11 Jun 2024 15:03:45 +0000
+From: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
+References: <20240603183121.2305013-1-amorenoz@redhat.com> <20240603183121.2305013-2-amorenoz@redhat.com>
+ <f7t5xup26jt.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: fec: Add ECR bit macros, fix FEC_ECR_EN1588 being
- cleared on link-down
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <imx@lists.linux.dev>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
-	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
-	<richardcochran@gmail.com>
-References: <20240607081855.132741-1-csokas.bence@prolan.hu>
- <46892275-619c-4dfb-9214-3bbb14b78093@lunn.ch>
- <d6d6c080-b001-4911-83bc-4aca7701cdff@prolan.hu>
- <c49a5e28-e030-4fc1-ab30-9afd997f03bc@lunn.ch>
-Content-Language: en-US
-From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
-In-Reply-To: <c49a5e28-e030-4fc1-ab30-9afd997f03bc@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ATLAS.intranet.prolan.hu (10.254.0.229) To
- ATLAS.intranet.prolan.hu (10.254.0.229)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2945A12957627C65
+In-Reply-To: <f7t5xup26jt.fsf@redhat.com>
+Date: Tue, 11 Jun 2024 15:03:45 +0000
+Message-ID: <CAG=2xmN+fp5B_b1KQq2T9DKrTQ_+Kqr6WbmrY0Gk1j3zZnY1YA@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] selftests: openvswitch: set value to nla flags
+To: Aaron Conole <aconole@redhat.com>
+Cc: netdev@vger.kernel.org, Pravin B Shelar <pshelar@ovn.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	dev@openvswitch.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi!
+On Mon, Jun 03, 2024 at 03:02:46PM GMT, Aaron Conole wrote:
+> Adrian Moreno <amorenoz@redhat.com> writes:
+>
+> > Netlink flags, although they don't have payload at the netlink level,
+> > are represented as having a "True" value in pyroute2.
+> >
+> > Without it, trying to add a flow with a flag-type action (e.g: pop_vlan)
+> > fails with the following traceback:
+> >
+> > Traceback (most recent call last):
+> >   File "[...]/ovs-dpctl.py", line 2498, in <module>
+> >     sys.exit(main(sys.argv))
+> >              ^^^^^^^^^^^^^^
+> >   File "[...]/ovs-dpctl.py", line 2487, in main
+> >     ovsflow.add_flow(rep["dpifindex"], flow)
+> >   File "[...]/ovs-dpctl.py", line 2136, in add_flow
+> >     reply = self.nlm_request(
+> >             ^^^^^^^^^^^^^^^^^
+> >   File "[...]/pyroute2/netlink/nlsocket.py", line 822, in nlm_request
+> >     return tuple(self._genlm_request(*argv, **kwarg))
+> >                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> >   File "[...]/pyroute2/netlink/generic/__init__.py", line 126, in
+> > nlm_request
+> >     return tuple(super().nlm_request(*argv, **kwarg))
+> >            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> >   File "[...]/pyroute2/netlink/nlsocket.py", line 1124, in nlm_request
+> >     self.put(msg, msg_type, msg_flags, msg_seq=msg_seq)
+> >   File "[...]/pyroute2/netlink/nlsocket.py", line 389, in put
+> >     self.sendto_gate(msg, addr)
+> >   File "[...]/pyroute2/netlink/nlsocket.py", line 1056, in sendto_gate
+> >     msg.encode()
+> >   File "[...]/pyroute2/netlink/__init__.py", line 1245, in encode
+> >     offset = self.encode_nlas(offset)
+> >              ^^^^^^^^^^^^^^^^^^^^^^^^
+> >   File "[...]/pyroute2/netlink/__init__.py", line 1560, in encode_nlas
+> >     nla_instance.setvalue(cell[1])
+> >   File "[...]/pyroute2/netlink/__init__.py", line 1265, in setvalue
+> >     nlv.setvalue(nla_tuple[1])
+> >                  ~~~~~~~~~^^^
+> > IndexError: list index out of range
+> >
+> > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> > ---
+>
+> Acked-by: Aaron Conole <aconole@redhat.com>
+>
+> I don't know which pyroute2 version I had used when I tested this
+> previously, but even on my current system I get this error now.  Thanks
+> for the fix.
+>
 
-On 6/11/24 15:06, Andrew Lunn wrote:
-> On Tue, Jun 11, 2024 at 10:04:39AM +0200, Csókás Bence wrote:
->> Hi!
->>
->> On 6/10/24 21:13, Andrew Lunn wrote:
->>> On Fri, Jun 07, 2024 at 10:18:55AM +0200, Csókás, Bence wrote:
->>>> FEC_ECR_EN1588 bit gets cleared after MAC reset in `fec_stop()`, which
->>>> makes all 1588 functionality shut down on link-down. However, some
->>>> functionality needs to be retained (e.g. PPS) even without link.
->>>
->>> I don't know much about PPS. Could you point to some documentation,
->>> list email etc, which indicated PPS without link is expected to work.
->>>
->>> Please also Cc: Richard Cochran for changes like this.
->>>
->>> Thanks
->>> 	Andrew
->>
->> This is what Richard said two years ago on the now-reverted patch:
->>
->> Link: https://lore.kernel.org/netdev/YvRdTwRM4JBc5RuV@hoboy.vegasvil.org
-> 
-> Thanks.
-> 
-> So when you have sync, you have a 1Hz clock, synchronised to the grand
-> master. When the link is down, or communication with the grand master
-> is lost, you get a free running clock of around 1Hz. I presume that if
-> the link does up again and communication to the grand master is
-> restored, there is a phase shift in the 1Hz clock, and a frequency
-> correction? The hardware has to cope with this.
+Thanks Aaron. I'll resend as v2 with your ack as a stand-alone patch
+since the other patch of this series will be fixed by your soon-to-come
+series.
 
-Correct. And PTP4Linux is already capable of re-syncing (or at least it 
-would be, if it weren't for the ENET controller reset. We still need to 
-restore all the values of ATIME, ATCORR etc. registers, but that'll come 
-in a future patch, when I figure out how to get out of the locking hell).
-
-> Thanks
-> 
-> 	Andrew
-> 
-
-Bence
+> >  tools/testing/selftests/net/openvswitch/ovs-dpctl.py | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> > index b76907ac0092..a2395c3f37a1 100644
+> > --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> > +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> > @@ -537,7 +537,7 @@ class ovsactions(nla):
+> >              for flat_act in parse_flat_map:
+> >                  if parse_starts_block(actstr, flat_act[0], False):
+> >                      actstr = actstr[len(flat_act[0]):]
+> > -                    self["attrs"].append([flat_act[1]])
+> > +                    self["attrs"].append([flat_act[1], True])
+> >                      actstr = actstr[strspn(actstr, ", ") :]
+> >                      parsed = True
+>
 
 
