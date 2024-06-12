@@ -1,103 +1,115 @@
-Return-Path: <netdev+bounces-102930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 463E79057D2
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 18:00:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86CFB9057EC
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 18:02:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB2E61F218B4
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 16:00:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1502C1F21D24
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 16:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3653D181D04;
-	Wed, 12 Jun 2024 15:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6AA2185082;
+	Wed, 12 Jun 2024 15:59:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="HevoMQeH";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="pNgewxui"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="a7c31p/l";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="fzZNQ4gu"
 X-Original-To: netdev@vger.kernel.org
-Received: from wfout6-smtp.messagingengine.com (wfout6-smtp.messagingengine.com [64.147.123.149])
+Received: from wflow4-smtp.messagingengine.com (wflow4-smtp.messagingengine.com [64.147.123.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B807181CE2;
-	Wed, 12 Jun 2024 15:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3611018131C;
+	Wed, 12 Jun 2024 15:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718207935; cv=none; b=jSy4EmMmDEZ2RIDC/BlT5oqQaxtGQR+GVbw7Qqjxem/x5b5pqTybVc396rChMNDDTDEPThhv+6e5VrmdQOj6XKvBFvs2sDt+8mQOEtq4BVfRXev6zhS3aLzH2iWcQ0iTa1JkGNyN9FJQybfGeUUJrb8bh65SRFSxY50kF8fVDyU=
+	t=1718207965; cv=none; b=VbwQ2pUzDRsE88eQLnaRiBYsqbBax6bm7ebIDvrPD8PcTwAKJWm0KgvgN7QEVY5cN+mWisCbTubsc92EBDhKZzG7C1QxjiwYlvuE70rsGjCMdgLEK3GTUTtSnnzT+TdqH+SUhyX9qbFcETSAz2PHArAUAxX41txdQk4E7fFqZrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718207935; c=relaxed/simple;
-	bh=W+jeMBnxhS6jlPaTrEAMDVDFNqWeLN6ix77HMDsJyOE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FqvunDzDlYkB2WbvdbPTxqeDAaBh0Pq9l3yLzJG6542fr1Td9q2QaqR3fMxQkczxo0IM35ZQX+DfzI7lBEXM+BWDprF26p3+vozZzzM6YoPoCZZli6HggB16jjIQjF5DiK/p9vdLLpczkBMoVt3jF6Kb1EGoC0YT3FDiyFcpUpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=HevoMQeH; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=pNgewxui; arc=none smtp.client-ip=64.147.123.149
+	s=arc-20240116; t=1718207965; c=relaxed/simple;
+	bh=2PxUYPACBB3j7rUnIdYxnpc1oF1HWIXOaQvOgVlJgPg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XUD89blvN3sp4TsGEezrDXWmebIeuJKs+BnQWSFHrQ/0WYP75fvdRcFfos9iaZr6989XmNhhaJMOG177+wSJJXMXpQ9/9p6z8lVbj1t6f4z4RhTdh1BgGSS7zDfj2RNSuuUex0bLyXjcKAgXt/ZWqZA2l7j/gUs5oQQj+IJDhcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=a7c31p/l; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=fzZNQ4gu; arc=none smtp.client-ip=64.147.123.139
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailfout.west.internal (Postfix) with ESMTP id B0AF41C000FC;
-	Wed, 12 Jun 2024 11:58:51 -0400 (EDT)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	by mailflow.west.internal (Postfix) with ESMTP id 3B5552CC017B;
+	Wed, 12 Jun 2024 11:59:22 -0400 (EDT)
 Received: from mailfrontend1 ([10.202.2.162])
-  by compute6.internal (MEProxy); Wed, 12 Jun 2024 11:58:52 -0400
+  by compute2.internal (MEProxy); Wed, 12 Jun 2024 11:59:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
 	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm3; t=1718207931; x=1718294331; bh=lZNEnqp773uzAqziPN4z0
-	qNlf0lINbmqCuH/tcesE+g=; b=HevoMQeHXigG+6FXskHzOBLCeauAiRxC8h389
-	dej5hFVj6zR0aoICtH1AtSY+Ryt+tLMtszdrsDxP00dTkmqB7+9TtISMilMmBQIu
-	9HkEbwSseUZ8zWLs39Pe2Y5Xdui7FAVsFjLRoFZs9U9obAFcOvABgWKB2MoLwwlM
-	m2QJGfw/kjQbOqrwe2nvhYZBTZpoM+dMpBh+ncNo2dEdSSRS8QWdH8b6kKi6M61I
-	quylEi3QeddM8x2ra2R8Av8oU586A5e+5fkMapHOyoSxVWM5UOzU4VoLA/cSuD9s
-	Ma3tMuNyJt+mFPio/dIVZxzfYTY7fB+qpUMcwTZ8T0loBIJQg==
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1718207961; x=
+	1718215161; bh=Br3zSa1+u6JEEPxtcWDYsyp97xOiL5TCThHanNtpu1A=; b=a
+	7c31p/lpqkbEFr+tz3/+JKaLQ9UHP5w4Lyy7xGcUIPWza9SeUG2klmcCaby38eh9
+	QETVpsPkI6PHABLLnkm6mf9Ee9ZdYMJF/DDU1WeuejDc0HQ8R3oj3GfcDXG8QL9M
+	SVchaE1OSVpgBZaOZm3pVo+xTaiYaVwc3IHxfAnaA8lGAU7hJC5sQNL7Wz3dBNue
+	RLk4l9c9eykygcy/hiPXhy2zk8xJwYkpyjkkCaqX0znQUfcz0iYaD7o4GDBHjL4S
+	93m2zD83wAObhzSwVhvPjDnDF5OMcqwrHm2SIPoVo0PKuNAYdEbwOSS1t/WGshWm
+	6CHSYKn/l2/Jfw9Y/nQPg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm1; t=1718207931; x=1718294331; bh=lZNEnqp773uzAqziPN4z0qNlf0lI
-	NbmqCuH/tcesE+g=; b=pNgewxui531SonZy0q0p0krvK2Mlrb5HK89Ht4MzBaVb
-	J/d0QC4zarry+HE7mfOOKkRCpLQROBmxtEL2xa+MRweTqtPrpDNThCpoiZH4NNAL
-	58LxIwt/AsRkU/A2QRNG9NS8ipdJI/DtjSEu61whmv3iwroVsGFvfP3HDRwT/2HP
-	SrzuiHmOF3rG7SawQ+hJMNigPT3SWHLTkTXhcXapYL87404PLwm3DoGgasI9aJDy
-	28X26vh+up5KcXCrLrz/gK/rb3ZYqdVZBe6cS5amnJ/2nhGY3wzBm0XNEr9oZXLe
-	tNgMtwxU3/c2apvUTKVgp5BRWoB8pbvXlVyFH2gTFw==
-X-ME-Sender: <xms:u8VpZotBo2dKox_et4WZvAVIoUWMQjSyXlxY9Q_Tc2N7_QYcyHkzKw>
-    <xme:u8VpZlfmfwvxgPi7cDSe3uhMSvw02DCblQ5oweV5Px06L8MTthKpBH3_zruaMvL5V
-    JZVXDsueFRR2w6MYw>
-X-ME-Received: <xmr:u8VpZjyV-4-wxEqV0H4VULuGBundfv0mN98kowJNEwVJHbC0EneW63TYmv-5VziP5rOaw3Ed6PqA8YWfN4loBBv-_9GN_ev1EqNoHQjh>
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1718207961; x=
+	1718215161; bh=Br3zSa1+u6JEEPxtcWDYsyp97xOiL5TCThHanNtpu1A=; b=f
+	zZNQ4gu3cWPgtOFmt716xUnq0qgePSi3LI6nw2kH+eZm+MR3fEZa7Zrh1lQrR3ea
+	DoyZQ+e3MRnOhbs1JF0/KwiJU43l8Y9QClVQ0pSyEDTgTp8gae5TXCdd+7XPD8lA
+	LK5Ii7anmr7XfftOpi2988MgLFmEXpxrEGDHRgvZzrpmkDJ+AkGnc2u/wa1fApKV
+	2/01Z4VHeuyFn7wW1bYLOgcNJEFVcyalb8X5PqYvHlBgowiUcNkjm4e2SrQWperD
+	YtrjZrM5kW+4VCUf1raQ1DK6tRWlTPXZFKliy3AIUFaYMr3F3BI29l5NO7AamrSK
+	q9lQA+JOPSKk+daP5zR9Q==
+X-ME-Sender: <xms:2cVpZq1k7WEkydj9SgoqJ1X_VOwmN801K00kVSTLb39t3ZZQlQOqSQ>
+    <xme:2cVpZtFn-RdcibB5sf-JRVZJ7aEQw0BY87H2gFoOH7b3NDkzZayl3q31aKuSN9Io1
+    Jy8wVCvqciBk5sZ3w>
+X-ME-Received: <xmr:2cVpZi5SgzJ3dWy1MllKuTG-fcTAtyG1s2F24fXsVBWfqSHc471YJFrLr9YxYTB_t-nbJxEB_5qWaS3ShYbz5TbGyvV7S7SCG1ylIxK9>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrfedugedgleefucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdlfeehmdenucfjughrpefhvf
-    evufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeffrghnihgvlhcuighuuceougig
-    uhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepiedtkefgudevteevvefgue
-    fhgeeikeelgeehfedtkefffeejgfetteefueekgfeknecuffhomhgrihhnpehgihhthhhu
-    sgdrtghomhenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
-    hmpegugihusegugihuuhhurdighiii
-X-ME-Proxy: <xmx:u8VpZrPeZTa0_BTThRb8TMjH7qs4h8HOVhf-2Umj9f937OGIpEZSTg>
-    <xmx:u8VpZo9ovHLCV6UXcXBP1ronL5vDeMG-84e_n3TT3IS2zbD7W7P_ZA>
-    <xmx:u8VpZjWb4warsTUProQ4pWrwXIpLZih59TIWQDGr2KNqKASBupsPdg>
-    <xmx:u8VpZhdF1OklyRMXuRpJeZaExPEOjnv0QjR4zMbDa5yCnOD-x_YxHg>
-    <xmx:u8VpZrfXblp_gbyAPaTMb2ZoUUdzO7haAFmQGBSYXW9QTMVagDJQvXJS>
+    uceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdljedtmdenucfjughrpefhvf
+    evufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeffrghnihgvlhcuighuuceo
+    ugiguhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepgfefgfegjefhudeike
+    dvueetffelieefuedvhfehjeeljeejkefgffeghfdttdetnecuvehluhhsthgvrhfuihii
+    vgepudenucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihii
+X-ME-Proxy: <xmx:2cVpZr29Cmn_IruHF7Doi3Ot93o43pzHDMERPny1BGlBC0UhT_stkQ>
+    <xmx:2cVpZtFbimwijgBYNz5XOyQq-L1K2_JObnthremH5Enlhw0b4y6b5w>
+    <xmx:2cVpZk96-ej0d-eFFy9W4ABrV0CvB4aAgkAAfkLpMuVVAqEBk9pt5Q>
+    <xmx:2cVpZimfjQu3ZI-frYpCsFas_d7_WcuURSRtRBQmQcBkFW8gjGjrBA>
+    <xmx:2cVpZolgh5RMGbKPRUE0fd-sooWjxrEEg-CdVS5j3abz0t2EdG1EgBEB>
 Feedback-ID: i6a694271:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 12 Jun 2024 11:58:49 -0400 (EDT)
+ 12 Jun 2024 11:59:19 -0400 (EDT)
 From: Daniel Xu <dxu@dxuuu.xyz>
-To: bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	fsverity@lists.linux.dev,
+To: kuba@kernel.org,
 	andrii@kernel.org,
-	jolsa@kernel.org,
-	linux-kbuild@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	martin.lau@linux.dev,
+	hawk@kernel.org,
+	davem@davemloft.net,
+	john.fastabend@gmail.com,
 	olsajiri@gmail.com,
 	quentin@isovalent.com,
 	alan.maguire@oracle.com,
 	acme@kernel.org,
 	eddyz87@gmail.com
-Cc: kernel-team@meta.com
-Subject: [PATCH bpf-next v5 00/12] bpf: Support dumping kfunc prototypes from BTF
-Date: Wed, 12 Jun 2024 09:58:24 -0600
-Message-ID: <cover.1718207789.git.dxu@dxuuu.xyz>
+Cc: song@kernel.org,
+	yonghong.song@linux.dev,
+	kpsingh@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next v5 08/12] bpf: verifier: Relax caller requirements for kfunc projection type args
+Date: Wed, 12 Jun 2024 09:58:32 -0600
+Message-ID: <e2c025cb09ccfd4af1ec9e18284dc3cecff7514d.1718207789.git.dxu@dxuuu.xyz>
 X-Mailer: git-send-email 2.44.0
+In-Reply-To: <cover.1718207789.git.dxu@dxuuu.xyz>
+References: <cover.1718207789.git.dxu@dxuuu.xyz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,86 +118,96 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patchset enables both detecting as well as dumping compilable
-prototypes for kfuncs.
+Currently, if a kfunc accepts a projection type as an argument (eg
+struct __sk_buff *), the caller must exactly provide exactly the same
+type with provable provenance.
 
-The first commit instructs pahole to DECL_TAG kfuncs when available.
-This requires v1.27 which was released on 6/11/24. With it, users will
-be able to look at BTF inside vmlinux (or modules) and check if the
-kfunc they want is available.
+However in practice, kfuncs that accept projection types _must_ cast to
+the underlying type before use b/c projection type layouts are
+completely made up. Thus, it is ok to relax the verifier rules around
+implicit conversions.
 
-The final commit teaches bpftool how to dump kfunc prototypes. This
-is done for developer convenience.
+We will use this functionality in the next commit when we align kfuncs
+to user-facing types.
 
-The rest of the commits are fixups to enable selftests to use the
-newly dumped kfunc prototypes. With these, selftests will regularly
-exercise the newly added codepaths.
+Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+---
+ include/linux/btf.h   |  1 +
+ kernel/bpf/btf.c      | 13 ++++++++++---
+ kernel/bpf/verifier.c | 10 +++++++++-
+ 3 files changed, 20 insertions(+), 4 deletions(-)
 
-Tested with and without the required pahole changes:
-
-  * https://github.com/kernel-patches/bpf/pull/7186
-  * https://github.com/kernel-patches/bpf/pull/7187
-
-=== Changelog ===
-From v4:
-* Change bpf_session_cookie() return type
-* Only fixup used fentry test kfunc prototypes
-* Extract out projection detection into shared btf_is_projection_of()
-* Fix kernel test robot build warnings about doc comments
-
-From v3:
-* Teach selftests to use dumped prototypes
-
-From v2:
-* Update Makefile.btf with pahole flag
-* More error checking
-* Output formatting changes
-* Drop already-merged commit
-
-From v1:
-* Add __weak annotation
-* Use btf_dump for kfunc prototypes
-* Update kernel bpf_rdonly_cast() signature
-
-Daniel Xu (12):
-  kbuild: bpf: Tell pahole to DECL_TAG kfuncs
-  bpf: selftests: Fix bpf_iter_task_vma_new() prototype
-  bpf: selftests: Fix fentry test kfunc prototypes
-  bpf: selftests: Fix bpf_cpumask_first_zero() kfunc prototype
-  bpf: selftests: Fix bpf_map_sum_elem_count() kfunc prototype
-  bpf: Make bpf_session_cookie() kfunc return long *
-  bpf: selftests: Namespace struct_opt callbacks in bpf_dctcp
-  bpf: verifier: Relax caller requirements for kfunc projection type
-    args
-  bpf: treewide: Align kfunc signatures to prog point-of-view
-  bpf: selftests: nf: Opt out of using generated kfunc prototypes
-  bpf: selftests: xfrm: Opt out of using generated kfunc prototypes
-  bpftool: Support dumping kfunc prototypes from BTF
-
- fs/verity/measure.c                           |  5 +-
- include/linux/bpf.h                           |  8 +--
- include/linux/btf.h                           |  1 +
- kernel/bpf/btf.c                              | 13 ++++-
- kernel/bpf/crypto.c                           | 24 +++++---
- kernel/bpf/helpers.c                          | 39 +++++++++----
- kernel/bpf/verifier.c                         | 12 +++-
- kernel/trace/bpf_trace.c                      | 17 +++---
- net/core/filter.c                             | 32 +++++++----
- scripts/Makefile.btf                          |  2 +-
- tools/bpf/bpftool/btf.c                       | 55 +++++++++++++++++++
- .../testing/selftests/bpf/bpf_experimental.h  |  2 +-
- tools/testing/selftests/bpf/progs/bpf_dctcp.c | 36 ++++++------
- .../selftests/bpf/progs/get_func_ip_test.c    |  7 +--
- .../selftests/bpf/progs/ip_check_defrag.c     | 10 ++--
- .../selftests/bpf/progs/map_percpu_stats.c    |  2 +-
- .../selftests/bpf/progs/nested_trust_common.h |  2 +-
- .../testing/selftests/bpf/progs/test_bpf_nf.c |  1 +
- .../selftests/bpf/progs/test_bpf_nf_fail.c    |  1 +
- .../bpf/progs/verifier_netfilter_ctx.c        |  6 +-
- .../selftests/bpf/progs/xdp_synproxy_kern.c   |  1 +
- tools/testing/selftests/bpf/progs/xfrm_info.c |  1 +
- 22 files changed, 193 insertions(+), 84 deletions(-)
-
+diff --git a/include/linux/btf.h b/include/linux/btf.h
+index f9e56fd12a9f..56d91daacdba 100644
+--- a/include/linux/btf.h
++++ b/include/linux/btf.h
+@@ -531,6 +531,7 @@ s32 btf_find_dtor_kfunc(struct btf *btf, u32 btf_id);
+ int register_btf_id_dtor_kfuncs(const struct btf_id_dtor_kfunc *dtors, u32 add_cnt,
+ 				struct module *owner);
+ struct btf_struct_meta *btf_find_struct_meta(const struct btf *btf, u32 btf_id);
++bool btf_is_projection_of(const char *pname, const char *tname);
+ bool btf_is_prog_ctx_type(struct bpf_verifier_log *log, const struct btf *btf,
+ 			   const struct btf_type *t, enum bpf_prog_type prog_type,
+ 			   int arg);
+diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+index 7928d920056f..ce4707968217 100644
+--- a/kernel/bpf/btf.c
++++ b/kernel/bpf/btf.c
+@@ -5820,6 +5820,15 @@ static int find_kern_ctx_type_id(enum bpf_prog_type prog_type)
+ 	return ctx_type->type;
+ }
+ 
++bool btf_is_projection_of(const char *pname, const char *tname)
++{
++	if (strcmp(pname, "__sk_buff") == 0 && strcmp(tname, "sk_buff") == 0)
++		return true;
++	if (strcmp(pname, "xdp_md") == 0 && strcmp(tname, "xdp_buff") == 0)
++		return true;
++	return false;
++}
++
+ bool btf_is_prog_ctx_type(struct bpf_verifier_log *log, const struct btf *btf,
+ 			  const struct btf_type *t, enum bpf_prog_type prog_type,
+ 			  int arg)
+@@ -5882,9 +5891,7 @@ bool btf_is_prog_ctx_type(struct bpf_verifier_log *log, const struct btf *btf,
+ 	 * int socket_filter_bpf_prog(struct __sk_buff *skb)
+ 	 * { // no fields of skb are ever used }
+ 	 */
+-	if (strcmp(ctx_tname, "__sk_buff") == 0 && strcmp(tname, "sk_buff") == 0)
+-		return true;
+-	if (strcmp(ctx_tname, "xdp_md") == 0 && strcmp(tname, "xdp_buff") == 0)
++	if (btf_is_projection_of(ctx_tname, tname))
+ 		return true;
+ 	if (strcmp(ctx_tname, tname)) {
+ 		/* bpf_user_pt_regs_t is a typedef, so resolve it to
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index 20ac9cfd54dd..dcac6119d810 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -11265,6 +11265,8 @@ static int process_kf_arg_ptr_to_btf_id(struct bpf_verifier_env *env,
+ 	bool strict_type_match = false;
+ 	const struct btf *reg_btf;
+ 	const char *reg_ref_tname;
++	bool taking_projection;
++	bool struct_same;
+ 	u32 reg_ref_id;
+ 
+ 	if (base_type(reg->type) == PTR_TO_BTF_ID) {
+@@ -11308,7 +11310,13 @@ static int process_kf_arg_ptr_to_btf_id(struct bpf_verifier_env *env,
+ 
+ 	reg_ref_t = btf_type_skip_modifiers(reg_btf, reg_ref_id, &reg_ref_id);
+ 	reg_ref_tname = btf_name_by_offset(reg_btf, reg_ref_t->name_off);
+-	if (!btf_struct_ids_match(&env->log, reg_btf, reg_ref_id, reg->off, meta->btf, ref_id, strict_type_match)) {
++	struct_same = btf_struct_ids_match(&env->log, reg_btf, reg_ref_id, reg->off, meta->btf, ref_id, strict_type_match);
++	/* If kfunc is accepting a projection type (ie. __sk_buff), it cannot
++	 * actually use it -- it must cast to the underlying type. So we allow
++	 * caller to pass in the underlying type.
++	 */
++	taking_projection = btf_is_projection_of(ref_tname, reg_ref_tname);
++	if (!taking_projection && !struct_same) {
+ 		verbose(env, "kernel function %s args#%d expected pointer to %s %s but R%d has a pointer to %s %s\n",
+ 			meta->func_name, argno, btf_type_str(ref_t), ref_tname, argno + 1,
+ 			btf_type_str(reg_ref_t), reg_ref_tname);
 -- 
 2.44.0
 
