@@ -1,281 +1,304 @@
-Return-Path: <netdev+bounces-102938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88BC290594E
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 18:59:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F383A9059A0
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 19:10:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EAC73B26BC9
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 16:59:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16EE31C22753
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 17:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E5B31822EB;
-	Wed, 12 Jun 2024 16:58:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CDE51836ED;
+	Wed, 12 Jun 2024 17:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="TIDd5Z5f"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="yDzs+14r"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2076.outbound.protection.outlook.com [40.107.101.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987391822E9
-	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 16:58:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718211503; cv=fail; b=jwrieQWThAYYUJezHKYb0oFSCM6JqwjgXL8pgnOYPwvR+15BfI8Pb1wGG+GWDeGkVihEEYbOW/f4/+xfaKNtuDsC2zRE+/vRJmMweQr15e0x3RaLYv4sIBhQtzR0OmguiR+lI7TL0T/KYK/u2LTlcmXKgFDFC6LsW2YP7IyHWqE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718211503; c=relaxed/simple;
-	bh=yVBvpC/EFsEpHzXaH6XSI482OsH7UBEKNisu+O4sgMM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=s3NbRAZXeMUZsbTgtAWYBQXeupws0rs9L4iFFIkbNJqXrjA+D6jGRShI10oF3BId1MUuut7I16aGXY2eLtnJ1O8gb1km4Y3KpGUA5pd+89yrU9CbRnzJQABotA5ZY5bRImZ6UQ95aSV7ma6OBX/cqAwIf3GuDLKsCuQMm12lhkQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=TIDd5Z5f; arc=fail smtp.client-ip=40.107.101.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FrPePeauslAXW4gTHmilFighrh6DovvBQHfWMNWvWxeDeYjI5QCFAjkChoiBbeKP+nXyRe4YhwN3SpJq4TsnWeH+tEfyGVe05gvD/qd/ZIEYDK8/nexjZPhP1F9xQ/P3GAjJiwrisd108SL1XjUNZlrlkupLopbDId8vRxjHAJzXBL+StDDzHMWRkPq6JXLEJu+xiqnsqlCXs1hrbxk1GGamODIK2D16dUq0xysfdwVJiigt9w5nti51g9oY9tqLFLZCNzs2nMpjykN1UqaLrW/kScOVzPNmmPg2APaCy9K6kevCv+Z/fqfW1wqVDlMivUGz8gqoveToyl0Me5k3wA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=06k1QL9KsBjcSIOfBJ3Z2NwXZGdkInJnFMXSh3apvtg=;
- b=Vhfdr3hlzWzBv1zgEgSP14rCk654bkP4BoKFWuzRzeM6j9dALsQjUqanR5TLMVklEm0GkzZGMgQZvvU1UXLmENuw8jczP19xkZrwy8114X6cd0Ku8MkshxJoh3XhyGFn/7qhlh5ApbW+Z+sLyH8Zf57GvakPbZNT5GLr9nzsCHzSadR2Z9LFWS3WJ9QJdkUXyluXj44M4SS/E59a3J4t/osFlobFDNaF4sYReo0ZtdYs4sUlt//LMEotH0Nv1V+boMqIouNioyUdGHfnGGfU7QRjW7mQFQEZwRz+kxZribC7XDJS0hzKOok2LlNpk5jI+9i6DI1h/qJwaIMwLoPAAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=06k1QL9KsBjcSIOfBJ3Z2NwXZGdkInJnFMXSh3apvtg=;
- b=TIDd5Z5fDVjMmyFwns/lyhzb+LRkrtyUA0SjMi8u6P8VCxRh8ubFzi6d2Xmn0YwdejdXzrdOwibl1KQ+BXO5hnD/zxeAewQTmAZfc60aikRDbb3z97/Rs0xoGxil1r0xMUcrGhphOkuafPaUvWDqbUWmVSIGXLpwQq2E8TOphTY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- PH7PR12MB7258.namprd12.prod.outlook.com (2603:10b6:510:206::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7633.36; Wed, 12 Jun 2024 16:58:16 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb%4]) with mapi id 15.20.7633.037; Wed, 12 Jun 2024
- 16:58:16 +0000
-Message-ID: <ecc130f8-9dcd-45ab-a9a4-74643353b86e@amd.com>
-Date: Wed, 12 Jun 2024 09:58:13 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] ionic: fix use after netif_napi_del()
-To: Brett Creeley <bcreeley@amd.com>, Taehee Yoo <ap420073@gmail.com>,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, brett.creeley@amd.com, drivers@pensando.io,
- netdev@vger.kernel.org
-Cc: jacob.e.keller@intel.com
-References: <20240612060446.1754392-1-ap420073@gmail.com>
- <89643ab3-1950-4493-9993-3dd3d710be45@amd.com>
-Content-Language: en-US
-From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <89643ab3-1950-4493-9993-3dd3d710be45@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BY3PR05CA0001.namprd05.prod.outlook.com
- (2603:10b6:a03:254::6) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11EBA1836E9
+	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 17:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718212137; cv=none; b=lhf3oGA7WUkguQSq1m0SBEtXXdhIxO5usilGBdsqUhANngvZLY10Oj5RNlRqmJtbQRy6pj7iSMY5pSYaz2Ij7WhtZUzgF0BY8qg9DiQqdy5F9yOlyDxqoI4J9Hg1w37lZgQwdBPiiypYoh1n6xD0Z4uIpEtErcVkHGoXsDS1+lI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718212137; c=relaxed/simple;
+	bh=ehhpo/SsPl+jO5Cm/RZD7FkvtzJ8YrUg+VPu+Ir8zOs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uDmw0zIWfikWIhEF/x+7N6JpgxoHROug8uhOuOki/Xsaer/J/XAiYFXedX4AaEuwSISLbJ5vGv2IanSxUj/JfNCSa7XBIAJOARAgXjwMRZKUsGZ5CheysXyrP+x6lvwNg1nblJjtde2uI+RCG6nHnxYdnCdO8SbV8xLHJFRBQyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=yDzs+14r; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-42138eadf64so894725e9.3
+        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 10:08:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718212133; x=1718816933; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hs80+4gULAKFtbcZATRfAFutwZtvYFCLdFppd1JyzNg=;
+        b=yDzs+14rpAH3ZtRhFP42MNdUI1Mr8chi+S5ZagJWq9xRSwtFT3jSHRxy8Z14S4d9qv
+         tvBqZIhREByrRuf4GzMcQv/hW6iBKWwbMocVzzXv9HDdC2aLYBZegwACtipMvBNj0tWD
+         Q+SfDEmMchyyDFb6sovTNsTvHGRuAQ4a5lwE/nefx7/V76R4efH7/Yg/ZrLxX42/+JWJ
+         DaZstT7GTvaPGGLoFqT0X0E02RdHhZnqc10h3JXffrhllGm94swhzdOBnhuLYh7me12u
+         E6OR75tZyRqgcauIpzv8tw6WpfFTgY+ZP5M2xjzUviA4Mlhvl82byJ4uIOIfalVCMM7J
+         VRdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718212133; x=1718816933;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hs80+4gULAKFtbcZATRfAFutwZtvYFCLdFppd1JyzNg=;
+        b=GNkAaL14cbx0bOL3uOGgUwC0VMn4Q37qpF0TDGQzLDIbzGMkeUewbVtAcQOm/dHdNP
+         MsVy6EfvKdBppJ9xouXKboc97WePZMp6fEGPpBLW9tYjGh8JUx/E69+dqn8C7pYWdujw
+         pdH5jBhfQwHIeRLePpxxCQ2bTTbJXSIfFWFiWsLZ3eMpGCUi5RBpcCxV8ZXRNWWfczL5
+         snt8LXoo23RtWL/KndvbYnnY5SNJf8dbGwulh0JeTha0o88/Jh9tIgfzYh0V02MWvVBO
+         owHgGkG5DJ+CF01DUiI4Zj2YyA0syJ0+DrizXPFKRzLZGs3RwReeNi7VMB7paGiMbhOF
+         OYdg==
+X-Gm-Message-State: AOJu0YwTnPNeUDBLtP79lE2BGIXqeUiQibUQuAeu1gg2dyvzY5b6efoT
+	qQA/VL9vIbvVWkqu8x9wL1kprRkDFpCUuSgx+Jz4i0OvNs1vCDNJHEtWz0Es9IadAtdAoLe1WjM
+	I01s=
+X-Google-Smtp-Source: AGHT+IETaybsGXPKig6yyoOYHXuEFIM4ZppEUklkjbaecVf1wThk5HX0fOyzM26uVRTUqVB6Tz+Quw==
+X-Received: by 2002:a05:600c:4ec9:b0:421:7ee4:bbf0 with SMTP id 5b1f17b1804b1-42285c6d02bmr25298525e9.0.1718212132883;
+        Wed, 12 Jun 2024 10:08:52 -0700 (PDT)
+Received: from localhost (mail.chocen-mesto.cz. [85.163.43.2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35f1846574esm12175819f8f.117.2024.06.12.10.08.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jun 2024 10:08:52 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	virtualization@lists.linux.dev,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	dave.taht@gmail.com,
+	kerneljasonxing@gmail.com,
+	hengqi@linux.alibaba.com
+Subject: [PATCH net-next v2] virtio_net: add support for Byte Queue Limits
+Date: Wed, 12 Jun 2024 19:08:51 +0200
+Message-ID: <20240612170851.1004604-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|PH7PR12MB7258:EE_
-X-MS-Office365-Filtering-Correlation-Id: fa7a9d62-365b-48e3-72f6-08dc8b00da4a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230034|376008|1800799018|366010;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Q2lDVW9rT1BPdVdNVUlPUHY4aWQ2SC9jMDJXbmRCSUxVYk56SG0rRGpXbUd5?=
- =?utf-8?B?RFJWcUpCQnhKZU5JV2RxY2xUZVJPQW80ZW8vVzREYVZwbGV5TktYTHVxV3Vn?=
- =?utf-8?B?VVd6eEdZcGdvR2RyUnlES3liM2lUOXdCdlZVeGJvT0pKM1cvczR3RGYwQWZI?=
- =?utf-8?B?TlJ1VzB5Q3U2SGIveVZ6bFhxdVN4NjFrK3dVM0hiWDBoYWE2RzZPK2NtMTBD?=
- =?utf-8?B?SkR0ZEJPYm9pTGtVMVcyT0dMVFBueE5WUzM2WjBYYUJoa25zUE0rM1pMRHlW?=
- =?utf-8?B?ZFRDeWlnNmN3Z2dhcTFjM2pUZjA2L0tvY21ycW1kNjgrN295U09xMWljTnhI?=
- =?utf-8?B?dVNxZlQyWnBkWkJTYytuS1J6RXdYWEFBdnIxSjR1bXNOdUxKNzFTSDFUWWpr?=
- =?utf-8?B?NjdtMVBLUTl3elRNREVMQ0haVGZuNUZsektKdHh0QVE0bTBtU2dJTDN1U3JN?=
- =?utf-8?B?Y2krSXEzWlo5RHlCWU4ySWFCVTl0V1ZNSzFrNk9LNXhJQnBRWVlRck45WDNW?=
- =?utf-8?B?dnU1SS9sa1hBNFI3QzU5eXB6b1VhemMzL1hoWFJCQjlFQmFYN1Y0QVI4bE53?=
- =?utf-8?B?UFhHbFpVN1JlVU0vYXA2VkFYZnloNHBYdGlWVnFVSGJVT3M1NDZRaUtRalZM?=
- =?utf-8?B?NVk4c29MT2FKdmtXQmlycEt5a2wzTjdxWXpxRlV2cnJXYXU3VGJ0R0laUEc2?=
- =?utf-8?B?ejRaRHdVbWhjdHZ5Z3ovZG52SlQrTmt2Y2RSMnFrUUQ1M20vTzY4cVNlTUJR?=
- =?utf-8?B?alRCSlJ5UDBuZE5OQ254dmJDWG9nK28rV3kwbkdIS0YyWmpnYmt4QTNYak55?=
- =?utf-8?B?SlRzNnZjNjVSSTJnVUZUbjdhcGwvMkxGT3dXampXUmdoMVBaakZDQUJjVlFw?=
- =?utf-8?B?V2FhckVHOW5MWEtUay9FSCtXbi9sa0loUktsa2tZNkNqU2Vad0EzeTRHY0kv?=
- =?utf-8?B?RHJNYXJDSG0xTjNUUWhCeXJkM0NXQnIzUXdXOXJwTmFLb3MvQy9scEdPUFhr?=
- =?utf-8?B?aVRWVThqZndqbVNhMmZmdndvOGU1QWxGOGZkTXZ1U3BZZXg4ODFnWEkxckZk?=
- =?utf-8?B?NXk3VE5wSHpXOEhYZ0dpbUs5TWZVbGhsdy9QMnEwUzREd3A0TGV4MjR2MXhw?=
- =?utf-8?B?UExQWjBlTjh0cS81cXI4Y21ib0VOY1dWeEFLSTdFM1JSVVR6aVlmMy85dGNF?=
- =?utf-8?B?UWNaR1RFOUFyMjFlc1BJMUo4Q2xLNzlJVlJvMGlyNUc1aUJIbjFGemhvR05K?=
- =?utf-8?B?ZmJpeGY3MkVESVQ4b3BQRUNYS2pRYjRudlIwSVN3ellNUzl6OHg4ak5yWVBI?=
- =?utf-8?B?RG5ncFIwZUVoOWg2dGRSbFBGR2xQeWRCNHBSR0htWFlFcVVDUDNLOUJzQUUw?=
- =?utf-8?B?NUZRNDNnaXVacUxxN09DSHhGNWoyU1hDK2VMVGhLTHFlMjlYK3J2YXZFSEtz?=
- =?utf-8?B?enhGUGVjb1RraHc1OHZXWHZHYUhNOTJEdExWNk04aUNwUXRBaEk2QjJmVjk0?=
- =?utf-8?B?c29lb3JHT2pjTzZ2Ky8rZU8xVGNuZVBUdUYxN0k1aWJ1MnBBanNxd2t1UTFi?=
- =?utf-8?B?WjZNdDNZOWczYUMxQnVvMXZmemt0ekV3N1loMFBqRUZmTkQxM3JmNnFuVTVW?=
- =?utf-8?B?SUdyZkFwWE4wN3BodmZ4QTNTaEJzNytsejFveUE2VVNrR2RCeFBiY05FTHNR?=
- =?utf-8?B?V0RZSFNSRTliWW94ck5CNHFDYldTYjNyVVRyYW9ML0xtRnpxeEFTaVczalEr?=
- =?utf-8?Q?ppi143MuXP83u9R1KsH+/Pe6T0+JxDTI9imVO74?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230034)(376008)(1800799018)(366010);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?b1h0Z1cxRFFTQVl0emhoK096cE1DcUVZRmhnaVg0bVNDN2V1eFNNRGVzL2ll?=
- =?utf-8?B?YUpBcjRDdXhGNFJzL3E5VW05cUF5SGhIKy9JaGZjbHcxVjY3NlQ3V3NiT3p4?=
- =?utf-8?B?bU1nSmdqRmJPZTRmNmpvMFFsa21sdUY3Wk02MXowcDRDWVdDbUFxNDNJSmhR?=
- =?utf-8?B?MG5tRk5ZMEd5bVQ4OEw2WmdQWkJseStXN2x1Ynh0eW5KcGc3QnZ1MDNsNE5Y?=
- =?utf-8?B?NFc2VHdWRW42aE1PeU50eFYyUVZvVE5jbzhaNFFnQ2dOWTNGR3hEcTJwRnhG?=
- =?utf-8?B?OUQ3UVhnMC9Uam83V2xYUCtKRVZibDFTamkwNnpxMWlDVncwMHFYallkYzdP?=
- =?utf-8?B?dXhXdk1YaTJKTzBYMkpBNmlzUDNqYkhzZWJ3OVlzUW9GV3JhTEFZNkNEd3l1?=
- =?utf-8?B?VGhEVjJaQmZwZ3c1ZURvTU5TbUhaNWVRVEVnYXgwYTY2MGo5NEwrMjM3YlZ4?=
- =?utf-8?B?SlR4WCtlbzF0RU9TUjREODJqb3YyOFdtS2QySmhCR1dJa0o5OFpVTC9ncjNw?=
- =?utf-8?B?VEpjaFVKNFZiUG1vVTM0SFgzS0pXTkdBOGFORzZCU252dDhDVEt4U2tVeERw?=
- =?utf-8?B?azNNRHVkaWI2emIwcDU3eTFodlBuVlcxT3pOQ25EUnBDckpRMnV0TTNUNSta?=
- =?utf-8?B?NTVBNXUzTE92YXJ1c0Y4dERtVkxqZlpyNGQvLzJ0eUNjTTIrRjMyeFZmTnor?=
- =?utf-8?B?cnNyUnRoN2luR0t2QlUxeGhZbFZmYXgrQ1M0VkZEQmhCbTcra0M1OW5CUnZt?=
- =?utf-8?B?bTRpeTY1M0VCTXZlNk9JNGRndjVhcVhLTmlUMjZRdE1XcWk0cXF4aXZhcHR0?=
- =?utf-8?B?U0FicWVtendDdkJGM3FvbVNSZlBZV20yWWZpWkoyQ1JBcnZWNUhXY2tFZDB0?=
- =?utf-8?B?dkgwd0x5cDRoRzBlQ09OL0M4YnZvN2MycFA2NXdSYjIzYmRJUG01ekkrSXZh?=
- =?utf-8?B?TGlpWFVuc0YvVUxHckJTTHIwblkvWDQzdStSb1VhKzFMdWZsa1pzZ29WMXo4?=
- =?utf-8?B?Sjc1NzIrUU5iTGtDWm16OW5LVy8vUlFnZzl6QW5uaXpENnBid0MyQUhSQW5x?=
- =?utf-8?B?Wm1zaTZzWGZEYkZlMlRjK1hGbC93WCsweW1hUlhUam1pK2NTZWJwcmx3MUg2?=
- =?utf-8?B?d1haUDYvRitqa3Vkczd2N24wbUV2d3VvOCtZbFhVNmZ1Sjh1UmdJeHh0Qksz?=
- =?utf-8?B?M1c5eU5oMTRiRTlYR0U5UldIa2FadW12VTFySVovR0ZIYlltckJ0UmRZblZL?=
- =?utf-8?B?TjlDdk4ySm1Udk9rbDVUdTJla2JFOFlBZndPQ3djeWtnWFlsbEg1UVNFbVZU?=
- =?utf-8?B?aFkyWWFGUzBidTNOSlFrbnpQdWVXOHZqZlMycGVTQVJtZ2xHSzZRY1RTbWxW?=
- =?utf-8?B?TWVDSWVGdUd1MFJzMWRtR0o5UktVaXc0S2MvTW9naGtIV0wwTlRWa0Z3STI0?=
- =?utf-8?B?Y0RWQWVmZkFKbzc2LzRSbjVhbkRLb0xZQzIzYnd0bk81ZG16WHo5cWlaZ1VQ?=
- =?utf-8?B?S1gyMlpmZ2J2UEQya0NGOTFVVExLYWU5ZW85WlhTYnl4YVZES0hqUGI3Qkg2?=
- =?utf-8?B?bjA1eFlRTFZEWU1BdlNVSTA2TGlzT0xwV0tXNUprK0ZBSzhGdis0ekdlVEQr?=
- =?utf-8?B?bGVuL1ZDOStqOEhCZkpJYUF4L3FGU2JKNXpaenVtUjFqS2IwVVEwMW5EK3h5?=
- =?utf-8?B?SzVpWlFzekhmaWliL29PSjB6SjlmbVhzazdVQTZ4a3JIZEcwWnRGcXRpVHB5?=
- =?utf-8?B?bExtTVJuMStqQmZyZm4rbE9iRXpnM3NXTTNsNG1LRUd5TXlRbVoxVk4zUmtk?=
- =?utf-8?B?cm50YXM1Q1lDRGlEdnluUEs2V0ZyczVVc0cvVG9wNnd3RXhML2VLeElaSTFU?=
- =?utf-8?B?cGJJclZ1MCtLQ0JGNnBxeVZoOW9kVUxDU0hRKzBIZ3pBUk9vSlFIVkVsMEkx?=
- =?utf-8?B?V2JXY3A0eU1SRDNoekkvL09uZWwvY3o2VXF4TER3Mm5qOGRpSmJCOW5OUDlP?=
- =?utf-8?B?c250TDdKSFlHYkE2d1VrWWEreit1b1B3N1loZWtiUUtCdnI5RW41Zng2VWpw?=
- =?utf-8?B?aERibGkxdEtaQ0hYODlCRnY0QlZhQUlrWU43OVRZTjZxUDRNWnVwZW12VHQw?=
- =?utf-8?Q?1cX6IEnjcUllQLgMTF+pl8V3Q?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fa7a9d62-365b-48e3-72f6-08dc8b00da4a
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2024 16:58:16.0277
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: y7wrEJRaU7vNrp92etmVhhqqquKaKxyjYigMzatoEmXSnRZv3q9fkj6y9nfXLQoZLxWH4xdRAxtl50NUvh1Rug==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7258
+Content-Transfer-Encoding: 8bit
 
-On 6/12/2024 8:36 AM, Brett Creeley wrote:
-> On 6/11/2024 11:04 PM, Taehee Yoo wrote:
->> Caution: This message originated from an External Source. Use proper 
->> caution when opening attachments, clicking links, or responding.
->>
->>
->> When queues are started, netif_napi_add() and napi_enable() are called.
->> If there are 4 queues and only 3 queues are used for the current
->> configuration, only 3 queues' napi should be registered and enabled.
->> The ionic_qcq_enable() checks whether the .poll pointer is not NULL for
->> enabling only the using queue' napi. Unused queues' napi will not be
->> registered by netif_napi_add(), so the .poll pointer indicates NULL.
->> But it couldn't distinguish whether the napi was unregistered or not
->> because netif_napi_del() doesn't reset the .poll pointer to NULL.
->> So, ionic_qcq_enable() calls napi_enable() for the queue, which was
->> unregistered by netif_napi_del().
->>
->> Reproducer:
->>     ethtool -L <interface name> rx 1 tx 1 combined 0
->>     ethtool -L <interface name> rx 0 tx 0 combined 1
->>     ethtool -L <interface name> rx 0 tx 0 combined 4
->>
->> Splat looks like:
->> kernel BUG at net/core/dev.c:6666!
->> Oops: invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
->> CPU: 3 PID: 1057 Comm: kworker/3:3 Not tainted 6.10.0-rc2+ #16
->> Workqueue: events ionic_lif_deferred_work [ionic]
->> RIP: 0010:napi_enable+0x3b/0x40
->> Code: 48 89 c2 48 83 e2 f6 80 b9 61 09 00 00 00 74 0d 48 83 bf 60 01 
->> 00 00 00 74 03 80 ce 01 f0 4f
->> RSP: 0018:ffffb6ed83227d48 EFLAGS: 00010246
->> RAX: 0000000000000000 RBX: ffff97560cda0828 RCX: 0000000000000029
->> RDX: 0000000000000001 RSI: 0000000000000000 RDI: ffff97560cda0a28
->> RBP: ffffb6ed83227d50 R08: 0000000000000400 R09: 0000000000000001
->> R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000000
->> R13: ffff97560ce3c1a0 R14: 0000000000000000 R15: ffff975613ba0a20
->> FS:  0000000000000000(0000) GS:ffff975d5f780000(0000) 
->> knlGS:0000000000000000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 00007f8f734ee200 CR3: 0000000103e50000 CR4: 00000000007506f0
->> PKRU: 55555554
->> Call Trace:
->>   <TASK>
->>   ? die+0x33/0x90
->>   ? do_trap+0xd9/0x100
->>   ? napi_enable+0x3b/0x40
->>   ? do_error_trap+0x83/0xb0
->>   ? napi_enable+0x3b/0x40
->>   ? napi_enable+0x3b/0x40
->>   ? exc_invalid_op+0x4e/0x70
->>   ? napi_enable+0x3b/0x40
->>   ? asm_exc_invalid_op+0x16/0x20
->>   ? napi_enable+0x3b/0x40
->>   ionic_qcq_enable+0xb7/0x180 [ionic 
->> 59bdfc8a035436e1c4224ff7d10789e3f14643f8]
->>   ionic_start_queues+0xc4/0x290 [ionic 
->> 59bdfc8a035436e1c4224ff7d10789e3f14643f8]
->>   ionic_link_status_check+0x11c/0x170 [ionic 
->> 59bdfc8a035436e1c4224ff7d10789e3f14643f8]
->>   ionic_lif_deferred_work+0x129/0x280 [ionic 
->> 59bdfc8a035436e1c4224ff7d10789e3f14643f8]
->>   process_one_work+0x145/0x360
->>   worker_thread+0x2bb/0x3d0
->>   ? __pfx_worker_thread+0x10/0x10
->>   kthread+0xcc/0x100
->>   ? __pfx_kthread+0x10/0x10
->>   ret_from_fork+0x2d/0x50
->>   ? __pfx_kthread+0x10/0x10
->>   ret_from_fork_asm+0x1a/0x30
->>
->> Fixes: 0f3154e6bcb3 ("ionic: Add Tx and Rx handling")
->> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
->> ---
->>   v2:
->>    - Use ionic flag instead of napi flag.
->>
->>   drivers/net/ethernet/pensando/ionic/ionic_lif.c | 4 +---
->>   1 file changed, 1 insertion(+), 3 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c 
->> b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
->> index 24870da3f484..1934e9d6d9e4 100644
->> --- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
->> +++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
->> @@ -304,10 +304,8 @@ static int ionic_qcq_enable(struct ionic_qcq *qcq)
->>          if (ret)
->>                  return ret;
->>
->> -       if (qcq->napi.poll)
->> -               napi_enable(&qcq->napi);
->> -
->>          if (qcq->flags & IONIC_QCQ_F_INTR) {
->> +               napi_enable(&qcq->napi);
-> 
-> LGTM. Thanks for finding/fixing this!
-> 
-> Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+From: Jiri Pirko <jiri@nvidia.com>
 
-Yes, thanks.
+Add support for Byte Queue Limits (BQL).
 
-Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+Tested on qemu emulated virtio_net device with 1, 2 and 4 queues.
+Tested with fq_codel and pfifo_fast. Super netperf with 50 threads is
+running in background. Netperf TCP_RR results:
 
-> 
->>                  irq_set_affinity_hint(qcq->intr.vector,
->>                                        &qcq->intr.affinity_mask);
->>                  ionic_intr_mask(idev->intr_ctrl, qcq->intr.index,
->> -- 
->> 2.34.1
->>
+NOBQL FQC 1q:  159.56  159.33  158.50  154.31    agv: 157.925
+NOBQL FQC 2q:  184.64  184.96  174.73  174.15    agv: 179.62
+NOBQL FQC 4q:  994.46  441.96  416.50  499.56    agv: 588.12
+NOBQL PFF 1q:  148.68  148.92  145.95  149.48    agv: 148.2575
+NOBQL PFF 2q:  171.86  171.20  170.42  169.42    agv: 170.725
+NOBQL PFF 4q: 1505.23 1137.23 2488.70 3507.99    agv: 2159.7875
+  BQL FQC 1q: 1332.80 1297.97 1351.41 1147.57    agv: 1282.4375
+  BQL FQC 2q:  768.30  817.72  864.43  974.40    agv: 856.2125
+  BQL FQC 4q:  945.66  942.68  878.51  822.82    agv: 897.4175
+  BQL PFF 1q:  149.69  151.49  149.40  147.47    agv: 149.5125
+  BQL PFF 2q: 2059.32  798.74 1844.12  381.80    agv: 1270.995
+  BQL PFF 4q: 1871.98 4420.02 4916.59 13268.16   agv: 6119.1875
+
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+v1->v2:
+- moved netdev_tx_completed_queue() call into __free_old_xmit(),
+  propagate use_napi flag to __free_old_xmit() and only call
+  netdev_tx_completed_queue() in case it is true
+- added forgotten call to netdev_tx_reset_queue()
+- fixed stats for xdp packets
+- fixed bql accounting when __free_old_xmit() is called from xdp path
+- handle the !use_napi case in start_xmit() kick section
+---
+ drivers/net/virtio_net.c | 50 +++++++++++++++++++++++++---------------
+ 1 file changed, 32 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 61a57d134544..5863c663ccab 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -84,7 +84,9 @@ struct virtnet_stat_desc {
+ 
+ struct virtnet_sq_free_stats {
+ 	u64 packets;
++	u64 xdp_packets;
+ 	u64 bytes;
++	u64 xdp_bytes;
+ };
+ 
+ struct virtnet_sq_stats {
+@@ -506,29 +508,33 @@ static struct xdp_frame *ptr_to_xdp(void *ptr)
+ 	return (struct xdp_frame *)((unsigned long)ptr & ~VIRTIO_XDP_FLAG);
+ }
+ 
+-static void __free_old_xmit(struct send_queue *sq, bool in_napi,
++static void __free_old_xmit(struct send_queue *sq, struct netdev_queue *txq,
++			    bool in_napi, bool use_napi,
+ 			    struct virtnet_sq_free_stats *stats)
+ {
+ 	unsigned int len;
+ 	void *ptr;
+ 
+ 	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
+-		++stats->packets;
+-
+ 		if (!is_xdp_frame(ptr)) {
+ 			struct sk_buff *skb = ptr;
+ 
+ 			pr_debug("Sent skb %p\n", skb);
+ 
++			stats->packets++;
+ 			stats->bytes += skb->len;
+ 			napi_consume_skb(skb, in_napi);
+ 		} else {
+ 			struct xdp_frame *frame = ptr_to_xdp(ptr);
+ 
+-			stats->bytes += xdp_get_frame_len(frame);
++			stats->xdp_packets++;
++			stats->xdp_bytes += xdp_get_frame_len(frame);
+ 			xdp_return_frame(frame);
+ 		}
+ 	}
++	if (use_napi)
++		netdev_tx_completed_queue(txq, stats->packets, stats->bytes);
++
+ }
+ 
+ /* Converting between virtqueue no. and kernel tx/rx queue no.
+@@ -955,21 +961,22 @@ static void virtnet_rq_unmap_free_buf(struct virtqueue *vq, void *buf)
+ 	virtnet_rq_free_buf(vi, rq, buf);
+ }
+ 
+-static void free_old_xmit(struct send_queue *sq, bool in_napi)
++static void free_old_xmit(struct send_queue *sq, struct netdev_queue *txq,
++			  bool in_napi, bool use_napi)
+ {
+ 	struct virtnet_sq_free_stats stats = {0};
+ 
+-	__free_old_xmit(sq, in_napi, &stats);
++	__free_old_xmit(sq, txq, in_napi, use_napi, &stats);
+ 
+ 	/* Avoid overhead when no packets have been processed
+ 	 * happens when called speculatively from start_xmit.
+ 	 */
+-	if (!stats.packets)
++	if (!stats.packets && !stats.xdp_packets)
+ 		return;
+ 
+ 	u64_stats_update_begin(&sq->stats.syncp);
+-	u64_stats_add(&sq->stats.bytes, stats.bytes);
+-	u64_stats_add(&sq->stats.packets, stats.packets);
++	u64_stats_add(&sq->stats.bytes, stats.bytes + stats.xdp_bytes);
++	u64_stats_add(&sq->stats.packets, stats.packets + stats.xdp_packets);
+ 	u64_stats_update_end(&sq->stats.syncp);
+ }
+ 
+@@ -1003,7 +1010,9 @@ static void check_sq_full_and_disable(struct virtnet_info *vi,
+ 	 * early means 16 slots are typically wasted.
+ 	 */
+ 	if (sq->vq->num_free < 2+MAX_SKB_FRAGS) {
+-		netif_stop_subqueue(dev, qnum);
++		struct netdev_queue *txq = netdev_get_tx_queue(dev, qnum);
++
++		netif_tx_stop_queue(txq);
+ 		u64_stats_update_begin(&sq->stats.syncp);
+ 		u64_stats_inc(&sq->stats.stop);
+ 		u64_stats_update_end(&sq->stats.syncp);
+@@ -1012,7 +1021,7 @@ static void check_sq_full_and_disable(struct virtnet_info *vi,
+ 				virtqueue_napi_schedule(&sq->napi, sq->vq);
+ 		} else if (unlikely(!virtqueue_enable_cb_delayed(sq->vq))) {
+ 			/* More just got used, free them then recheck. */
+-			free_old_xmit(sq, false);
++			free_old_xmit(sq, txq, false, use_napi);
+ 			if (sq->vq->num_free >= 2+MAX_SKB_FRAGS) {
+ 				netif_start_subqueue(dev, qnum);
+ 				u64_stats_update_begin(&sq->stats.syncp);
+@@ -1138,7 +1147,8 @@ static int virtnet_xdp_xmit(struct net_device *dev,
+ 	}
+ 
+ 	/* Free up any pending old buffers before queueing new ones. */
+-	__free_old_xmit(sq, false, &stats);
++	__free_old_xmit(sq, netdev_get_tx_queue(dev, sq - vi->sq),
++			false, sq->napi.weight, &stats);
+ 
+ 	for (i = 0; i < n; i++) {
+ 		struct xdp_frame *xdpf = frames[i];
+@@ -2313,7 +2323,7 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
+ 
+ 		do {
+ 			virtqueue_disable_cb(sq->vq);
+-			free_old_xmit(sq, true);
++			free_old_xmit(sq, txq, true, true);
+ 		} while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
+ 
+ 		if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
+@@ -2412,6 +2422,7 @@ static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
+ 		goto err_xdp_reg_mem_model;
+ 
+ 	virtnet_napi_enable(vi->rq[qp_index].vq, &vi->rq[qp_index].napi);
++	netdev_tx_reset_queue(netdev_get_tx_queue(vi->dev, qp_index));
+ 	virtnet_napi_tx_enable(vi, vi->sq[qp_index].vq, &vi->sq[qp_index].napi);
+ 
+ 	return 0;
+@@ -2471,7 +2482,7 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
+ 	txq = netdev_get_tx_queue(vi->dev, index);
+ 	__netif_tx_lock(txq, raw_smp_processor_id());
+ 	virtqueue_disable_cb(sq->vq);
+-	free_old_xmit(sq, true);
++	free_old_xmit(sq, txq, true, true);
+ 
+ 	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
+ 		if (netif_tx_queue_stopped(txq)) {
+@@ -2559,17 +2570,18 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	struct send_queue *sq = &vi->sq[qnum];
+ 	int err;
+ 	struct netdev_queue *txq = netdev_get_tx_queue(dev, qnum);
+-	bool kick = !netdev_xmit_more();
++	bool xmit_more = netdev_xmit_more();
+ 	bool use_napi = sq->napi.weight;
++	bool kick;
+ 
+ 	/* Free up any pending old buffers before queueing new ones. */
+ 	do {
+ 		if (use_napi)
+ 			virtqueue_disable_cb(sq->vq);
+ 
+-		free_old_xmit(sq, false);
++		free_old_xmit(sq, txq, false, use_napi);
+ 
+-	} while (use_napi && kick &&
++	} while (use_napi && !xmit_more &&
+ 	       unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
+ 
+ 	/* timestamp packet in software */
+@@ -2598,7 +2610,9 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 
+ 	check_sq_full_and_disable(vi, dev, sq);
+ 
+-	if (kick || netif_xmit_stopped(txq)) {
++	kick = use_napi ? __netdev_tx_sent_queue(txq, skb->len, xmit_more) :
++			  !xmit_more && netif_xmit_stopped(txq);
++	if (kick) {
+ 		if (virtqueue_kick_prepare(sq->vq) && virtqueue_notify(sq->vq)) {
+ 			u64_stats_update_begin(&sq->stats.syncp);
+ 			u64_stats_inc(&sq->stats.kicks);
+-- 
+2.45.1
+
 
