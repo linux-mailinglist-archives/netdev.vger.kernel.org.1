@@ -1,115 +1,155 @@
-Return-Path: <netdev+bounces-102801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61A83904CA0
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 09:23:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1333B904CC0
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 09:26:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A53E1C234BA
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 07:23:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA6B3285E8E
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 07:26:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17FCF16D4CB;
-	Wed, 12 Jun 2024 07:22:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BE2316C84C;
+	Wed, 12 Jun 2024 07:25:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="CSpD9dy4"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="eNd5Ceix"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5C816B75D
-	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 07:22:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9C316C69A
+	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 07:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718176960; cv=none; b=L0bvpNZKz4n694Jy04JOl6LJ10m3ERYHODRYJoW7P0Vt3rzDRNjCCXsYbzH2eZun2bKQCi5QFWuj7JH0GG1UUWt9ycRw0UYq2JsbB0B9fO/rvUhI0P4PjLTPuQ5wekKjakmpIVLzihu96DxFQQHsgfZLS6wz2r4RSjDM6OiZVxs=
+	t=1718177103; cv=none; b=D9ukOTg0NPZ/K/sRZYvj3aYnMZYzAGuf/He9QxNzN2kDMPkZhrd7fs8wgg2Q85OGRQW8RJeS2TbNcdOefxDM4n4/eTKtX3A+2+h6kUrrFQfSpJ5qM4lsqu0riJdjMIQglnWFNAKZCQJoJta0Ku25d/Z1bgwikI9V6pdyvC+T86o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718176960; c=relaxed/simple;
-	bh=wkDVA2dK3+U+cA6W49NHBtQ20kiOyRc5qnKumZI2mZ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q6x3OhnRA3v2v8JGMweWjlmyuagwMhGnQE4osin8hslC6v98NXUdZY9pgFKhiZqL89J4Qc0uRAkNGUEYm/bGWz7YOtp8crMd01zviaI3GcPPiOCOGZzkq5QejHStGw3CelFyyKyMdN2ljGlP1t+eyOL6Lajz3WV3N36QHv0RQM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=CSpD9dy4; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2ebdfe26217so28818491fa.2
-        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 00:22:37 -0700 (PDT)
+	s=arc-20240116; t=1718177103; c=relaxed/simple;
+	bh=GV8vhLk5W+15Fu37cvfJGGkkE6AbEn/05xw+plQAHrs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hxHJ2CDfghp1HuJ+cCIwSaG/DnJxUSUwhQCM/asB4leyXr+2t3wZWbd3RPDYSiq3LTjR0NhV8IO+v//BDsCFLSmPNdjNT6FC/MWwwf/M/mbe0mv4Nd4oYHztQLydw2gnHE3Doum+EFCBh5FoSOb/Q7CqtLrZhuQKd+HLockUHe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=eNd5Ceix; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-35f1c490c13so4028214f8f.3
+        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 00:25:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718176956; x=1718781756; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XyAaGEtFFwkdm/QpmeEncAmUxjsc5CcFkHBcrT1qbjY=;
-        b=CSpD9dy4uJ1tvwuowHkLQayntpGdUohvr6xueFj/D1a/5fGv/mkoMcJYpzNmOozN00
-         u0wDdD+sB/NBft7PmOBci04IC+o6gcrWG7oi37w2mBErAOMEwW/VAGHWq+UPWd3HHcR4
-         W10/OwPBm7W3VNWvF486v6ekdHcp2UFZhw3G7c65/WCqjtJW6mfCkoz/DcPijtn2qK2F
-         1uWZwNs0O+qoKc920WjLetOHDH5omM4TLjFLe6P+HiBjizp95UfpOhZjz/6squ8T2/yV
-         G3gu6C0GSyzo5gikg2NISNJOtVB6r9Oi+mt+cRmAPoUl0X2W8n0lO5gaBW37l3ag0Bww
-         zFLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718176956; x=1718781756;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1718177100; x=1718781900; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XyAaGEtFFwkdm/QpmeEncAmUxjsc5CcFkHBcrT1qbjY=;
-        b=Z3f6KTSczDW8d5Rnk2a1rKcFeMWKcxPY97MMNMDd3YTOL8vS/N/QYaQSHgbwnBJ6U8
-         0x1M9sEr6pOMc/upsfZdA6Si9bFGbXZ8pmp3WsEZl7BhLmLURpJHNE/e/2xzc7Lb/CRl
-         cOD8B9DVeGqvU2qANzPv3M20q8p1GW1Cj3A9jzVdBlO4jOHhveUvTvDWOkf+8HEhK3+W
-         5MqcnLNUPClsxGgjYTBrRE7mJcDroESUy9YopmQ8NngFOKYrp9RI6NFKgoCEhHN3TUDL
-         0Nbu57mb88pddcbyDJsL9tOOuXj37w4qrD8W9TC+u8wySPEL3GGrEBwgvwk1Q3y1VaNZ
-         lbEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXSPoLyzN+H34lb6A3tlAdT5pbr5P3nNY2WKdHNFxgJMJW5QZXew8fcz3vi79vT2AhIbN9bJ/xZPP+8NBJKJZjxOYW/adk6
-X-Gm-Message-State: AOJu0YzBBaYzr0rVX3DGZyK2B4hcIvE+eaQplM3cWmeCMz0sILIsgBE2
-	UCeVhtji9dFg4dphe4GVOQornuCbAm1IauYQYIPq9ZlQQ/gzs2CiSyWq+5p/R8Q=
-X-Google-Smtp-Source: AGHT+IH7lMBz0iqDSWgr4Qo//hA7IRWAfAG/YjDjdEYPujMcic/KlfaHdqUt7roVwGJmVDixv7uEJw==
-X-Received: by 2002:a05:651c:8a:b0:2eb:efff:7729 with SMTP id 38308e7fff4ca-2ebfc8ffa4bmr5282021fa.6.1718176955743;
-        Wed, 12 Jun 2024 00:22:35 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35f1c958f9fsm9730922f8f.38.2024.06.12.00.22.34
+        bh=nZZ648vF2hGd45hekWosmU80qN8L5wlOVqhbijLkjGE=;
+        b=eNd5Ceixs5u/g3v6ODZjFyxjAEDPzadGTSf/6GUQL7AfM8wJycLhpqO50pAS875tqF
+         pg+mNBSeEF7bXrFHJo9gihBclpdBSOEVmvXZIOw+od0s+EhKU7y+XEdx8FQsmCZL/V9a
+         LeEY2OVP4QZOeFICVlJxoNQ61YWf5BHY63T+p624Daf1A8qank+N2v3o0rZSAykbW9W5
+         +vylme+bJks+NgvEyucWZ7G8dgWY3kT7Q4sJWubMgbPALPNtJsFcGzKYrP82VtCdiQs7
+         nh6saJxbGvhw+xi0l05gHc3uU/GxIAy12BRCGYvNigqyXA9PnY/DtWXlj0c4QURYFkpB
+         C6EA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718177100; x=1718781900;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nZZ648vF2hGd45hekWosmU80qN8L5wlOVqhbijLkjGE=;
+        b=NwA3xZtMgZvkN98I9SHqMUHT2tSkEeX8oZaRZFipjQ7GZuyYBPJcb6067iYXDVlM/I
+         pmAAErDg95gxYUfmF7CP3wN80jEEhZnrr1tlG/cJU7zvyZ4pfBRKtNaCoouUE+DNIt8D
+         f2L3phoRwIKDyhQYFqfNKimrZp8x/KA0GvNZR0YM1ghFXL4uxnImgD42qV0jCoVoIppF
+         GiRdf22RodK7QZWDgP9R3D2nKutHiB51z/fqL/wnLe2yAF3M2QPCYs3ww8s0nhtOc9d/
+         2KtgRwCANkzVfLHaxOWvnKsZCVa7KCqT7l6NjhvCsYksU9KUkhX4vldby9ly9p/CbaLz
+         vp/g==
+X-Forwarded-Encrypted: i=1; AJvYcCUin0IqQVD/pY9fRWp+uMI1O7khCV2lvSzDb3oQChQCxw9yFg3a3Fakl/5abEwJDfuMMd1Mlgv/mRzHXiRO/E7Bj8K6kz9P
+X-Gm-Message-State: AOJu0Yzw2CQX3CHQaODUUzzSv06eY8cFXF+4PtXp6B+kTwM/ATTp1Hyg
+	X7kvzydrD8kRAp3FNw87PknrqSHSwSlXTU5jMzGHRpDyxj//CZ1hY8NKWP2gpSg=
+X-Google-Smtp-Source: AGHT+IHzJQZOo7VhfwHUIA0Rvt2UNlF28rgiuiNCV0gXUegLqiznXfYjxQF2KbE4ePZs0+9rQ3O3JQ==
+X-Received: by 2002:adf:e6c1:0:b0:354:eb62:365a with SMTP id ffacd0b85a97d-35fdf7adcd2mr650626f8f.25.1718177100076;
+        Wed, 12 Jun 2024 00:25:00 -0700 (PDT)
+Received: from brgl-uxlite.home ([2a01:cb1d:8d3:3800:a172:4e8b:453e:2f03])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35f0f551c20sm11692172f8f.69.2024.06.12.00.24.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jun 2024 00:22:35 -0700 (PDT)
-Date: Wed, 12 Jun 2024 09:22:32 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Cindy Lu <lulu@redhat.com>,
-	dtatulea@nvidia.com, jasowang@redhat.com,
-	virtualization@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
-Message-ID: <ZmlMuGGY2po6LLCY@nanopsycho.orion>
-References: <20240611053239.516996-1-lulu@redhat.com>
- <20240611185810.14b63d7d@kernel.org>
- <ZmlAYcRHMqCgYBJD@nanopsycho.orion>
- <20240612031356-mutt-send-email-mst@kernel.org>
+        Wed, 12 Jun 2024 00:24:59 -0700 (PDT)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Kalle Valo <kvalo@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Abel Vesa <abel.vesa@linaro.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Lukas Wunner <lukas@wunner.de>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	Amit Pundir <amit.pundir@linaro.org>,
+	Xilin Wu <wuxilin123@gmail.com>,
+	Alex Elder <elder@kernel.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-pci@vger.kernel.org,
+	linux-pm@vger.kernel.org
+Subject: Re: [PATCH v9 0/2] pwrseq: introduce the subsystem and first driver
+Date: Wed, 12 Jun 2024 09:24:56 +0200
+Message-ID: <171817709104.16429.1270997690165832044.b4-ty@linaro.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240605123850.24857-1-brgl@bgdev.pl>
+References: <20240605123850.24857-1-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240612031356-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Wed, Jun 12, 2024 at 09:15:44AM CEST, mst@redhat.com wrote:
->On Wed, Jun 12, 2024 at 08:29:53AM +0200, Jiri Pirko wrote:
->> Wed, Jun 12, 2024 at 03:58:10AM CEST, kuba@kernel.org wrote:
->> >On Tue, 11 Jun 2024 13:32:32 +0800 Cindy Lu wrote:
->> >> Add new UAPI to support the mac address from vdpa tool
->> >> Function vdpa_nl_cmd_dev_config_set_doit() will get the
->> >> MAC address from the vdpa tool and then set it to the device.
->> >> 
->> >> The usage is: vdpa dev set name vdpa_name mac **:**:**:**:**:**
->> >
->> >Why don't you use devlink?
->> 
->> Fair question. Why does vdpa-specific uapi even exist? To have
->> driver-specific uapi Does not make any sense to me :/
->
->I am not sure which uapi do you refer to? The one this patch proposes or
->the existing one?
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Sure, I'm sure pointing out, that devlink should have been the answer
-instead of vdpa netlink introduction. That ship is sailed, now we have
-unfortunate api duplication which leads to questions like Jakub's one.
-That's all :/
+
+On Wed, 05 Jun 2024 14:38:48 +0200, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> Hi!
+> 
+> These are the power sequencing patches sent separately after some
+> improvements suggested by Bjorn Helgaas. I intend to pick them up into a
+> new branch and maintain the subsystem from now on. I then plan to
+> provide an immutable tag to the Bluetooth and PCI subsystems so that the
+> rest of the C changes can be applied. This new branch will then be
+> directly sent to Linus Torvalds for the next merge window.
+> 
+> [...]
+
+Applied, thanks!
+
+[1/2] power: sequencing: implement the pwrseq core
+      commit: 249ebf3f65f8530beb2cbfb91bff1d83ba88d23c
+[2/2] power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets
+      commit: 2f1630f437dff20d02e4b3f07e836f42869128dd
+
+Best regards,
+-- 
+Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
