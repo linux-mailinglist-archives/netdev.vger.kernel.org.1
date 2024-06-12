@@ -1,97 +1,122 @@
-Return-Path: <netdev+bounces-102830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C11B904F6C
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 11:40:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDD3B904F7F
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 11:44:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02C4E1F26B4E
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 09:40:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 298B2B25434
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 09:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 212D516DECA;
-	Wed, 12 Jun 2024 09:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F2316E86F;
+	Wed, 12 Jun 2024 09:44:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="kaIQcOzC"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="J5Xpwh2F"
 X-Original-To: netdev@vger.kernel.org
-Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2DD16DEBD;
-	Wed, 12 Jun 2024 09:40:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.220
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BD116DEDE;
+	Wed, 12 Jun 2024 09:44:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718185208; cv=none; b=KK1e2T10ZfB3uUFOMQzSl1wZSI/mvagvedAJNnAjI6lE1cYE5hT/ey0AJJN1BMN6dglQwuxn8cx919eb9Jh4+uL8WrUXX7X5CKqhtqPy1h565sBfoMf6clNNaZMOKTQHcNUU77yWn46/8LQDGW2U4D8+Sz3ydIZdIs8RwRxu6aU=
+	t=1718185443; cv=none; b=EDo4PaezyMwIgrqlqlxcB8N5CO57bHFuOSmK9bTKIeCF5GRK9dIyH4X7TRvVJ+9IYhh1ju/nALIMV/YdwHIQygEK+3y2V/M91cHR9tS7qFJm56Px8+khwUXavvmZRjg5McSVWWRuHaYtsk0gqodKBzm9xa1Qos7gTCTcZ7a8a6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718185208; c=relaxed/simple;
-	bh=CseckecvFHVYq5/Mi+eTnmliiolSYA/fTa5Hy15SGko=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WDLfCcTxczVXbYZyjSkZ1rv2BMlqdLiJDHU36xc9TCt0V1DsL/2Z+CbmcIiEIIJB6vOgGFkOY/eCZmJPgswCKJ/+5ov2AVXDxtB6WO4QtlJ1V0PonEjqdt93g3wP44Zc/0+1KlL8rDZzhpPX/jPBWLSYoAWQxWqRxlr5hulbq/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=kaIQcOzC; arc=none smtp.client-ip=45.254.50.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=dtUDZ
-	Mf38e7mWzd9Ay3BGQ/8e3RMt1YamowsisI+xss=; b=kaIQcOzCsSj7DeZtSqF3G
-	3yd4ErsVsEhlYaw+DHzDVuPydojnuGCILlEnl3GCasebdo1NSqec8jrISY3Cr1t3
-	Tcsfdxh2xOedJConjqb4JobaBft8RuhbjAZ2+spqcaaB4xPfGJ2bPqRe4H33c+Ei
-	19UiCBSuBkAwgcsfBRzXrM=
-Received: from localhost.localdomain (unknown [112.97.57.186])
-	by gzga-smtp-mta-g0-4 (Coremail) with SMTP id _____wDX37ngbGlmhhrDHw--.14951S2;
-	Wed, 12 Jun 2024 17:39:45 +0800 (CST)
-From: Slark Xiao <slark_xiao@163.com>
-To: manivannan.sadhasivam@linaro.org,
-	loic.poulain@linaro.org,
-	ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net,
-	quic_jhugo@quicinc.com
-Cc: netdev@vger.kernel.org,
-	mhi@lists.linux.dev,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Slark Xiao <slark_xiao@163.com>
-Subject: [PATCH v2 2/2] net: wwan: mhi: make default data link id configurable
-Date: Wed, 12 Jun 2024 17:39:41 +0800
-Message-Id: <20240612093941.359904-1-slark_xiao@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1718185443; c=relaxed/simple;
+	bh=HOEWpTbG2NqRO+k/zEHzp4vNTYwtb8eZrF3t6LNNOjY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=DsJHqRNWFPF+tNcnGdiAbJh525/M8GX97o8XV3SEvN0W2z7OBhlJtDTx/9ml/UdE0TF8D1gFTy0W14CsrcaIeVtUZKzLIlLHVFtWZ/+b54HZVU6vaIiT88AziszOHEKDXmjg1nTpOSSg+mwh+7rps+cG3T92Dt3V2ZTnWTtzacw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=J5Xpwh2F; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45C0eo2j001183;
+	Wed, 12 Jun 2024 09:43:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	amN2dOS0M+PtUNmJnl74lKoGPzhfXh6/HhqRWs0tLvA=; b=J5Xpwh2FUwBgOpWt
+	/3B+a56EZSzK4smnkOSxKHKHCjJKEUKfLZSTr4H6ztMuiEcZQaUJdYMBpQmomweq
+	4GRqXb+6uE1L+0+zZhywjDoLeaa43f/H5wj+aQ40Wgcfp87wxh6sTmZF/0iDl67I
+	BMJBYewmvsd4ON3bbNlYb8q00NghacKBs9fhBmjCx85C5Kh/g2W/YveM/eQb7DJu
+	0Ajx1lBHaaNUBx/jp6PqQbllurtPKQrF78DAJqzGfceTMJtxMWzKktG8/sVy0kr9
+	ble0HL6JaPRH2w05qNVwwzo61fIlP3frbcTT6kDILrfbezbpYC5YqKdFmi8ERqLi
+	25fwkw==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ypp87tr6g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Jun 2024 09:43:38 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA05.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45C9hbIj010792
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Jun 2024 09:43:37 GMT
+Received: from [10.253.72.168] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 12 Jun
+ 2024 02:43:35 -0700
+Message-ID: <b8610296-f8cf-4b61-9b64-ffb52b7ab251@quicinc.com>
+Date: Wed, 12 Jun 2024 17:43:33 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDX37ngbGlmhhrDHw--.14951S2
-X-Coremail-Antispam: 1Uf129KBjvdXoW7JFWkWFy7JF4xXF1kZryUAwb_yoWktrXE9r
-	1kuas7WF4UWr1rKr1j9F98ZrySkwnYqFZ2gr1ft395J3sxXFy7uay5Zr1UtrnF9w47Crn7
-	Wr47XFyakw48WjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRNoGQDUUUUU==
-X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbiNQH7ZGV4IDQMmgAAs0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 2/2] net: rfkill: Fix a logic error within
+ rfkill_set_hw_state_reason()
+To: Johannes Berg <johannes@sipsolutions.net>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <emmanuel.grumbach@intel.com>
+CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>
+References: <1717771212-30723-1-git-send-email-quic_zijuhu@quicinc.com>
+ <1717771212-30723-3-git-send-email-quic_zijuhu@quicinc.com>
+ <b3e0a55f0680b590537133bfb02cd1bbfd61a56e.camel@sipsolutions.net>
+Content-Language: en-US
+From: quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <b3e0a55f0680b590537133bfb02cd1bbfd61a56e.camel@sipsolutions.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 2AHeGtSqfRrq-5CdNCgtPP9EBLBkpQpv
+X-Proofpoint-ORIG-GUID: 2AHeGtSqfRrq-5CdNCgtPP9EBLBkpQpv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-12_06,2024-06-11_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
+ spamscore=0 suspectscore=0 mlxlogscore=959 priorityscore=1501 adultscore=0
+ bulkscore=0 mlxscore=0 clxscore=1015 impostorscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2405170001
+ definitions=main-2406120070
 
-For SDX72 MBIM device, it starts data mux id from 112 instead of 0.
-This would lead to device can't ping outside successfully.
-Also MBIM side would report "bad packet session (112)".
-So we add a link id default value for these SDX72 products which
-works in MBIM mode.
+On 6/12/2024 4:18 PM, Johannes Berg wrote:
+> On Fri, 2024-06-07 at 22:40 +0800, Zijun Hu wrote:
+>> Kernel API rfkill_set_hw_state_reason() wrongly gets previous block state
+>> by using its parameter @reason as reason mask.
+> 
+> Using reason as a mask is perfectly valid.
+> 
+> And checking that the bit changed also seems valid.
+> 
+i don't think so as explained below.
+let us assume @rfkill->hard_block_reasons has value
+RFKILL_HARD_BLOCK_SIGNAL which means block state before
+__rfkill_set_sw_state(..., true, RFKILL_HARD_BLOCK_NOT_OWNER) is invoked.
 
-Signed-off-by: Slark Xiao <slark_xiao@163.com>
----
- drivers/net/wwan/mhi_wwan_mbim.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+@prev should mean previous block state, @prev will have false based on
+current logic, it is wrong since rfkill have block state before the call.
 
-diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
-index 3f72ae943b29..c731fe20814f 100644
---- a/drivers/net/wwan/mhi_wwan_mbim.c
-+++ b/drivers/net/wwan/mhi_wwan_mbim.c
-@@ -618,7 +618,8 @@ static int mhi_mbim_probe(struct mhi_device *mhi_dev, const struct mhi_device_id
- 	mbim->rx_queue_sz = mhi_get_free_desc_count(mhi_dev, DMA_FROM_DEVICE);
- 
- 	/* Register wwan link ops with MHI controller representing WWAN instance */
--	return wwan_register_ops(&cntrl->mhi_dev->dev, &mhi_mbim_wwan_ops, mbim, 0);
-+	return wwan_register_ops(&cntrl->mhi_dev->dev, &mhi_mbim_wwan_ops, mbim,
-+		mhi_dev->mhi_cntrl->link_id);
- }
- 
- static void mhi_mbim_remove(struct mhi_device *mhi_dev)
--- 
-2.25.1
+> We might want to not schedule the worker if it's not needed, but that's
+> a different issue, I don't see a real bug here?
+> 
+the worker will be unneccessarily scheduled for above example based on
+current logic even if the rfkill always stay in block state.
+> johannes
+> 
 
 
