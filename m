@@ -1,164 +1,428 @@
-Return-Path: <netdev+bounces-102788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 416049049F8
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 06:27:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE323904A1C
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 06:39:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D92D4B23693
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 04:27:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEC4C1C2371E
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 04:39:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB9D20DF7;
-	Wed, 12 Jun 2024 04:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BF4723765;
+	Wed, 12 Jun 2024 04:39:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1061B10A0E;
-	Wed, 12 Jun 2024 04:27:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D7C22092;
+	Wed, 12 Jun 2024 04:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718166428; cv=none; b=g/VQgSCkXzZoBuDy74WGaDnS58lB5BO5dFnfZd53zCRNwCHN9mYS1TqhCklmb49IPOsM/vR/nLXSmzqPOqlXOT3qnlC0xq3ZbD0mt4zp39U/prhKbJL7v0wCt6yMVu/WEwCLfJ/wa9DxsBb6x+Tj/JLIQGPpoOH8nUZin0i50OM=
+	t=1718167145; cv=none; b=ErT+rhbFCtWI9IQbt9hEQQ5vrDBZdbf5WtoHwism/Z62jvsbpnXH/ZmnVrT2fhi6jBB+1eOp83IIdLBRPQoXe2mP4vQI4n2dWczdhSgnqgAYPyPHMhJImpubAZ/hgM9w4jhe7ywNVwzQMh5oN2B8psWQCa4ysJide6TeFZ34ZP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718166428; c=relaxed/simple;
-	bh=MBJunRKKZCYSzLIojD7Nl18fcwI5Ptviv8JR3p0uV4M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k/v22icvk1I4brtT37Zc816A0p/tDsfExsImhRHDDhoMxpLic09NN0HzJ93PLwuZGFmrdbHhZ/dGhQkoPH92X3RgIoy/Bh2VtCSvHU0oQTYKsEjaOPZXEB2GCEIHxY6bsxCXsDte7kzJ/9CNp75P8ECpeFQejnYBKP0Os5CUe6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13FFAC32786;
-	Wed, 12 Jun 2024 04:27:03 +0000 (UTC)
-Date: Wed, 12 Jun 2024 09:56:55 +0530
-From: "manivannan.sadhasivam@linaro.org" <manivannan.sadhasivam@linaro.org>
-To: Slark Xiao <slark_xiao@163.com>
-Cc: Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Loic Poulain <loic.poulain@linaro.org>, quic_jhugo@quicinc.com,
-	Qiang Yu <quic_qianyu@quicinc.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"mhi@lists.linux.dev" <mhi@lists.linux.dev>,
-	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>
-Subject: Re: Re: [PATCH v1 2/2] net: wwan: Fix SDX72 ping failure issue
-Message-ID: <20240612042655.GA2645@thinkpad>
-References: <20240607100309.453122-1-slark_xiao@163.com>
- <30d71968-d32d-4121-b221-d95a4cdfedb8@gmail.com>
- <97a4347.18d5.19004f07932.Coremail.slark_xiao@163.com>
- <c292fcdc-4e5b-4e6a-9317-e293e2b6b74e@gmail.com>
- <320ba7ec.38c9.1900a687ddc.Coremail.slark_xiao@163.com>
+	s=arc-20240116; t=1718167145; c=relaxed/simple;
+	bh=Z5h8icvoYedo6hC0W2Y8CNHVP99oxEKoJFR4miV1V3g=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=mR3pGYoHOxb+8Yortk2QM/tjgF2KC+6Etstd9yvuemfdepeOhGhKTqH3d/cHRWzVs71JGElnXcy43B6Do3c8NHVM/UH4hLGH28YW6q7vjVlETv/pbw7Go8eNZ0Tvhe6cwxm8Un+hcAHSTQ9GHRxMkKUXRTuEsgyh22RJNtAhglw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 45C4ZFx34888267, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 45C4ZFx34888267
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 12 Jun 2024 12:35:15 +0800
+Received: from RTEXMBS01.realtek.com.tw (172.21.6.94) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 12 Jun 2024 12:35:15 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS01.realtek.com.tw (172.21.6.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 12 Jun 2024 12:35:13 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Wed, 12 Jun 2024 12:35:13 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Hariprasad Kelam <hkelam@marvell.com>, "kuba@kernel.org" <kuba@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "andrew@lunn.ch"
+	<andrew@lunn.ch>,
+        "jiri@resnulli.us" <jiri@resnulli.us>,
+        "horms@kernel.org"
+	<horms@kernel.org>,
+        Ratheesh Kannoth <rkannoth@marvell.com>,
+        Ping-Ke Shih
+	<pkshih@realtek.com>,
+        Larry Chiu <larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v20 06/13] rtase: Implement .ndo_start_xmit function
+Thread-Topic: [PATCH net-next v20 06/13] rtase: Implement .ndo_start_xmit
+ function
+Thread-Index: AQHauLdmYuDGRjyaP0maBwRhxExTNLG7e7UAgAgWH6A=
+Date: Wed, 12 Jun 2024 04:35:13 +0000
+Message-ID: <89c92725271a4fa28dbf1e37f3fd5e99@realtek.com>
+References: <20240607084321.7254-1-justinlai0215@realtek.com>
+ <20240607084321.7254-7-justinlai0215@realtek.com>
+ <PH0PR18MB44745E2CFEA3CC1D9ADC5AC0DEFB2@PH0PR18MB4474.namprd18.prod.outlook.com>
+In-Reply-To: <PH0PR18MB44745E2CFEA3CC1D9ADC5AC0DEFB2@PH0PR18MB4474.namprd18.prod.outlook.com>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXMBS01.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <320ba7ec.38c9.1900a687ddc.Coremail.slark_xiao@163.com>
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On Wed, Jun 12, 2024 at 11:05:38AM +0800, Slark Xiao wrote:
-> 
-> At 2024-06-12 06:46:33, "Sergey Ryazanov" <ryazanov.s.a@gmail.com> wrote:
-> >On 11.06.2024 04:36, Slark Xiao wrote:
-> >> +More maintainer to this second patch list.
-> >> 
-> >> At 2024-06-08 06:28:48, "Sergey Ryazanov" <ryazanov.s.a@gmail.com> wrote:
-> >>> Hello Slark,
-> >>>
-> >>> without the first patch it is close to impossible to understand this
-> >>> one. Next time please send such tightly connected patches to both
-> >>> mailing lists.
-> >>>
-> >> Sorry for this mistake since it's my first commit about committing code to 2
-> >> difference area: mhi and mbim. Both the maintainers are difference.
-> >> In case a new version commit would be created, I would like to ask if
-> >> should I add both side maintainers on these 2 patches ?
+> > Implement .ndo_start_xmit function to fill the information of the
+> > packet to be transmitted into the tx descriptor, and then the hardware
+> > will transmit the packet using the information in the tx descriptor.
+> > In addition, we also implemented the tx_handler function to enable the
+> > tx descriptor to be reused.
 > >
-> >No worries. We finally got both sides of the puzzle. BTW, looks like the 
-> >first patch still lacks Linux netdev mailing list in the CC.
+> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> > ---
+> >  .../net/ethernet/realtek/rtase/rtase_main.c   | 285 ++++++++++++++++++
+> >  1 file changed, 285 insertions(+)
 > >
-> >Usually maintainers are responsible for applying patches to their 
-> >dedicated repositories (trees), and then eventually for sending them in 
-> >batch to the main tree. So, if a work consists of two patches, it is 
-> >better to apply them together to one of the trees. Otherwise, it can 
-> >cause a build failure in one tree due to lack of required changes that 
-> >have been applied to other. Sometimes contributors even specify a 
-> >preferred tree in a cover letter. However, it is still up to maintainers 
-> >to make a decision which tree is better when a work changes several 
-> >subsystems.
+> > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > index 23406c195cff..6bdb4edbfbc1 100644
+> > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > @@ -256,6 +256,68 @@ static void rtase_mark_to_asic(union
+> > rtase_rx_desc *desc, u32 rx_buf_sz)
+> >                  cpu_to_le32(RTASE_DESC_OWN | eor | rx_buf_sz));  }
 > >
-> 
-> Thanks for your detailed explanation. 
-> Since this change was modified mainly on mhi side, I prefer to commit it to
->  mhi side. 
-> @loic @mani, what's your opinion?
-> 
-
-There is a build dependency with the MHI patch. So I'll just take both patches
-through MHI tree once I get an ACK from WWAN maintainers.
-
-> >>> On 07.06.2024 13:03, Slark Xiao wrote:
-> >>>> For SDX72 MBIM device, it starts data mux id from 112 instead of 0.
-> >>>> This would lead to device can't ping outside successfully.
-> >>>> Also MBIM side would report "bad packet session (112)".
-> >>>> So we add a link id default value for these SDX72 products which
-> >>>> works in MBIM mode.
-> >>>>
-> >>>> Signed-off-by: Slark Xiao <slark_xiao@163.com>
-> >>>
-> >>> Since it a but fix, it needs a 'Fixes:' tag.
-> >>>
-> >> Actually, I thought it's a fix for common SDX72 product. But now I think
-> >> it should be only meet for my SDX72 MBIM product. Previous commit
-> >> has not been applied. So there is no commit id for "Fixes".
-> >> But I think I shall include that patch in V2 version.
-> >> Please ref:
-> >> https://lore.kernel.org/lkml/20240520070633.308913-1-slark_xiao@163.com/
+> > +static u32 rtase_tx_avail(struct rtase_ring *ring) {
+> > +     return READ_ONCE(ring->dirty_idx) + RTASE_NUM_DESC -
+> > +            READ_ONCE(ring->cur_idx); }
+> > +
+> > +static int tx_handler(struct rtase_ring *ring, int budget) {
+> > +     const struct rtase_private *tp =3D ring->ivec->tp;
+> > +     struct net_device *dev =3D tp->dev;
+> > +     u32 dirty_tx, tx_left;
+> > +     u32 bytes_compl =3D 0;
+> > +     u32 pkts_compl =3D 0;
+> > +     int workdone =3D 0;
+> > +
+> > +     dirty_tx =3D ring->dirty_idx;
+> > +     tx_left =3D READ_ONCE(ring->cur_idx) - dirty_tx;
+> > +
+> > +     while (tx_left > 0) {
+> > +             u32 entry =3D dirty_tx % RTASE_NUM_DESC;
+> > +             struct rtase_tx_desc *desc =3D ring->desc +
+> > +                                    sizeof(struct rtase_tx_desc) *
+> entry;
+> > +             u32 status;
+> > +
+> > +             status =3D le32_to_cpu(desc->opts1);
+> > +
+> > +             if (status & RTASE_DESC_OWN)
+> > +                     break;
+> > +
+> > +             rtase_unmap_tx_skb(tp->pdev, ring->mis.len[entry], desc);
+> > +             ring->mis.len[entry] =3D 0;
+> > +             if (ring->skbuff[entry]) {
+> > +                     pkts_compl++;
+> > +                     bytes_compl +=3D ring->skbuff[entry]->len;
+> > +                     napi_consume_skb(ring->skbuff[entry], budget);
+> > +                     ring->skbuff[entry] =3D NULL;
+> > +             }
+> > +
+> > +             dirty_tx++;
+> > +             tx_left--;
+> > +             workdone++;
+> > +
+> > +             if (workdone =3D=3D RTASE_TX_BUDGET_DEFAULT)
+> > +                     break;
+> > +     }
+> > +
+> > +     if (ring->dirty_idx !=3D dirty_tx) {
+> > +             dev_sw_netstats_tx_add(dev, pkts_compl, bytes_compl);
+> > +             WRITE_ONCE(ring->dirty_idx, dirty_tx);
+> > +
+> > +             netif_subqueue_completed_wake(dev, ring->index,
+> > pkts_compl,
+> > +                                           bytes_compl,
+> > +                                           rtase_tx_avail(ring),
+> > +
+> RTASE_TX_START_THRS);
+> > +
+> > +             if (ring->cur_idx !=3D dirty_tx)
+> > +                     rtase_w8(tp, RTASE_TPPOLL, BIT(ring->index));
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +
+> >  static void rtase_tx_desc_init(struct rtase_private *tp, u16 idx)  {
+> >       struct rtase_ring *ring =3D &tp->tx_ring[idx]; @@ -1014,6
+> > +1076,228 @@ static int rtase_close(struct net_device *dev)
+> >       return 0;
+> >  }
 > >
-> >There are nothing to fix yet. Great. Then you can resend the Foxconn 
-> >SDX72 introduction work as a series that also includes these mux id 
-> >changes. Just rename this specific patch to something less terrifying. 
-> >Mean, remove the "Fix" word from the subject, please.
+> > +static u32 rtase_tx_vlan_tag(const struct rtase_private *tp,
+> > +                          const struct sk_buff *skb) {
+> > +     return (skb_vlan_tag_present(skb)) ?
+> > +             (RTASE_TX_VLAN_TAG | swab16(skb_vlan_tag_get(skb))) :
+> > 0x00; }
+> > +
+>                Vlan protocol can be either 0x8100 or 0x88A8, how does
+> hardware know which header to insert?
+> Thanks,
+> Hariprasad k
+
+We only allow the hardware to add 0x8100, the VLAN must at least have
+0x8100 to potentially have 0x88a8, skb_vlan_tag_present indicates that
+VLAN exists, hence at least the 0x8100 VLAN would exist.
+>=20
+> > +static u32 rtase_tx_csum(struct sk_buff *skb, const struct net_device
+> > +*dev) {
+> > +     u32 csum_cmd =3D 0;
+> > +     u8 ip_protocol;
+> > +
+> > +     switch (vlan_get_protocol(skb)) {
+> > +     case htons(ETH_P_IP):
+> > +             csum_cmd =3D RTASE_TX_IPCS_C;
+> > +             ip_protocol =3D ip_hdr(skb)->protocol;
+> > +             break;
+> > +
+> > +     case htons(ETH_P_IPV6):
+> > +             csum_cmd =3D RTASE_TX_IPV6F_C;
+> > +             ip_protocol =3D ipv6_hdr(skb)->nexthdr;
+> > +             break;
+> > +
+> > +     default:
+> > +             ip_protocol =3D IPPROTO_RAW;
+> > +             break;
+> > +     }
+> > +
+> > +     if (ip_protocol =3D=3D IPPROTO_TCP)
+> > +             csum_cmd |=3D RTASE_TX_TCPCS_C;
+> > +     else if (ip_protocol =3D=3D IPPROTO_UDP)
+> > +             csum_cmd |=3D RTASE_TX_UDPCS_C;
+> > +
+> > +     csum_cmd |=3D u32_encode_bits(skb_transport_offset(skb),
+> > +                                 RTASE_TCPHO_MASK);
+> > +
+> > +     return csum_cmd;
+> > +}
+> > +
+> > +static int rtase_xmit_frags(struct rtase_ring *ring, struct sk_buff *s=
+kb,
+> > +                         u32 opts1, u32 opts2) {
+> > +     const struct skb_shared_info *info =3D skb_shinfo(skb);
+> > +     const struct rtase_private *tp =3D ring->ivec->tp;
+> > +     const u8 nr_frags =3D info->nr_frags;
+> > +     struct rtase_tx_desc *txd =3D NULL;
+> > +     u32 cur_frag, entry;
+> > +
+> > +     entry =3D ring->cur_idx;
+> > +     for (cur_frag =3D 0; cur_frag < nr_frags; cur_frag++) {
+> > +             const skb_frag_t *frag =3D &info->frags[cur_frag];
+> > +             dma_addr_t mapping;
+> > +             u32 status, len;
+> > +             void *addr;
+> > +
+> > +             entry =3D (entry + 1) % RTASE_NUM_DESC;
+> > +
+> > +             txd =3D ring->desc + sizeof(struct rtase_tx_desc) * entry=
+;
+> > +             len =3D skb_frag_size(frag);
+> > +             addr =3D skb_frag_address(frag);
+> > +             mapping =3D dma_map_single(&tp->pdev->dev, addr, len,
+> > +                                      DMA_TO_DEVICE);
+> > +
+> > +             if (unlikely(dma_mapping_error(&tp->pdev->dev,
+> > + mapping)))
+> > {
+> > +                     if (unlikely(net_ratelimit()))
+> > +                             netdev_err(tp->dev,
+> > +                                        "Failed to map TX
+> fragments
+> > DMA!\n");
+> > +
+> > +                     goto err_out;
+> > +             }
+> > +
+> > +             if (((entry + 1) % RTASE_NUM_DESC) =3D=3D 0)
+> > +                     status =3D (opts1 | len | RTASE_RING_END);
+> > +             else
+> > +                     status =3D opts1 | len;
+> > +
+> > +             if (cur_frag =3D=3D (nr_frags - 1)) {
+> > +                     ring->skbuff[entry] =3D skb;
+> > +                     status |=3D RTASE_TX_LAST_FRAG;
+> > +             }
+> > +
+> > +             ring->mis.len[entry] =3D len;
+> > +             txd->addr =3D cpu_to_le64(mapping);
+> > +             txd->opts2 =3D cpu_to_le32(opts2);
+> > +
+> > +             /* make sure the operating fields have been updated */
+> > +             dma_wmb();
+> > +             txd->opts1 =3D cpu_to_le32(status);
+> > +     }
+> > +
+> > +     return cur_frag;
+> > +
+> > +err_out:
+> > +     rtase_tx_clear_range(ring, ring->cur_idx + 1, cur_frag);
+> > +     return -EIO;
+> > +}
+> > +
+> > +static netdev_tx_t rtase_start_xmit(struct sk_buff *skb,
+> > +                                 struct net_device *dev) {
+> > +     struct skb_shared_info *shinfo =3D skb_shinfo(skb);
+> > +     struct rtase_private *tp =3D netdev_priv(dev);
+> > +     u32 q_idx, entry, len, opts1, opts2;
+> > +     struct netdev_queue *tx_queue;
+> > +     bool stop_queue, door_bell;
+> > +     u32 mss =3D shinfo->gso_size;
+> > +     struct rtase_tx_desc *txd;
+> > +     struct rtase_ring *ring;
+> > +     dma_addr_t mapping;
+> > +     int frags;
+> > +
+> > +     /* multiqueues */
+> > +     q_idx =3D skb_get_queue_mapping(skb);
+> > +     ring =3D &tp->tx_ring[q_idx];
+> > +     tx_queue =3D netdev_get_tx_queue(dev, q_idx);
+> > +
+> > +     if (unlikely(!rtase_tx_avail(ring))) {
+> > +             if (net_ratelimit())
+> > +                     netdev_err(dev, "BUG! Tx Ring full when queue
+> > awake!\n");
+> > +             goto err_stop;
+> > +     }
+> > +
+> > +     entry =3D ring->cur_idx % RTASE_NUM_DESC;
+> > +     txd =3D ring->desc + sizeof(struct rtase_tx_desc) * entry;
+> > +
+> > +     opts1 =3D RTASE_DESC_OWN;
+> > +     opts2 =3D rtase_tx_vlan_tag(tp, skb);
+> > +
+> > +     /* tcp segmentation offload (or tcp large send) */
+> > +     if (mss) {
+> > +             if (shinfo->gso_type & SKB_GSO_TCPV4) {
+> > +                     opts1 |=3D RTASE_GIANT_SEND_V4;
+> > +             } else if (shinfo->gso_type & SKB_GSO_TCPV6) {
+> > +                     if (skb_cow_head(skb, 0))
+> > +                             goto err_dma_0;
+> > +
+> > +                     tcp_v6_gso_csum_prep(skb);
+> > +                     opts1 |=3D RTASE_GIANT_SEND_V6;
+> > +             } else {
+> > +                     WARN_ON_ONCE(1);
+> > +             }
+> > +
+> > +             opts1 |=3D u32_encode_bits(skb_transport_offset(skb),
+> > +                                      RTASE_TCPHO_MASK);
+> > +             opts2 |=3D u32_encode_bits(mss, RTASE_MSS_MASK);
+> > +     } else if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) {
+> > +             opts2 |=3D rtase_tx_csum(skb, dev);
+> > +     }
+> > +
+> > +     frags =3D rtase_xmit_frags(ring, skb, opts1, opts2);
+> > +     if (unlikely(frags < 0))
+> > +             goto err_dma_0;
+> > +
+> > +     if (frags) {
+> > +             len =3D skb_headlen(skb);
+> > +             opts1 |=3D RTASE_TX_FIRST_FRAG;
+> > +     } else {
+> > +             len =3D skb->len;
+> > +             ring->skbuff[entry] =3D skb;
+> > +             opts1 |=3D RTASE_TX_FIRST_FRAG | RTASE_TX_LAST_FRAG;
+> > +     }
+> > +
+> > +     if (((entry + 1) % RTASE_NUM_DESC) =3D=3D 0)
+> > +             opts1 |=3D (len | RTASE_RING_END);
+> > +     else
+> > +             opts1 |=3D len;
+> > +
+> > +     mapping =3D dma_map_single(&tp->pdev->dev, skb->data, len,
+> > +                              DMA_TO_DEVICE);
+> > +
+> > +     if (unlikely(dma_mapping_error(&tp->pdev->dev, mapping))) {
+> > +             if (unlikely(net_ratelimit()))
+> > +                     netdev_err(dev, "Failed to map TX DMA!\n");
+> > +
+> > +             goto err_dma_1;
+> > +     }
+> > +
+> > +     ring->mis.len[entry] =3D len;
+> > +     txd->addr =3D cpu_to_le64(mapping);
+> > +     txd->opts2 =3D cpu_to_le32(opts2);
+> > +     txd->opts1 =3D cpu_to_le32(opts1 & ~RTASE_DESC_OWN);
+> > +
+> > +     /* make sure the operating fields have been updated */
+> > +     dma_wmb();
+> > +
+> > +     door_bell =3D __netdev_tx_sent_queue(tx_queue, skb->len,
+> > +                                        netdev_xmit_more());
+> > +
+> > +     txd->opts1 =3D cpu_to_le32(opts1);
+> > +
+> > +     skb_tx_timestamp(skb);
+> > +
+> > +     /* tx needs to see descriptor changes before updated cur_idx */
+> > +     smp_wmb();
+> > +
+> > +     WRITE_ONCE(ring->cur_idx, ring->cur_idx + frags + 1);
+> > +
+> > +     stop_queue =3D !netif_subqueue_maybe_stop(dev, ring->index,
+> > +                                             rtase_tx_avail(ring),
+> > +
+> RTASE_TX_STOP_THRS,
+> > +
+> RTASE_TX_START_THRS);
+> > +
+> > +     if (door_bell || stop_queue)
+> > +             rtase_w8(tp, RTASE_TPPOLL, BIT(ring->index));
+> > +
+> > +     return NETDEV_TX_OK;
+> > +
+> > +err_dma_1:
+> > +     ring->skbuff[entry] =3D NULL;
+> > +     rtase_tx_clear_range(ring, ring->cur_idx + 1, frags);
+> > +
+> > +err_dma_0:
+> > +     dev->stats.tx_dropped++;
+> > +     dev_kfree_skb_any(skb);
+> > +     return NETDEV_TX_OK;
+> > +
+> > +err_stop:
+> > +     netif_stop_queue(dev);
+> > +     dev->stats.tx_dropped++;
+> > +     return NETDEV_TX_BUSY;
+> > +}
+> > +
+> >  static void rtase_enable_eem_write(const struct rtase_private *tp)  {
+> >       u8 val;
+> > @@ -1065,6 +1349,7 @@ static void rtase_netpoll(struct net_device
+> > *dev) static const struct net_device_ops rtase_netdev_ops =3D {
+> >       .ndo_open =3D rtase_open,
+> >       .ndo_stop =3D rtase_close,
+> > +     .ndo_start_xmit =3D rtase_start_xmit,
+> >  #ifdef CONFIG_NET_POLL_CONTROLLER
+> >       .ndo_poll_controller =3D rtase_netpoll,  #endif
+> > --
+> > 2.34.1
 > >
-> >Looks like "net: wwan: mhi: make default data link id configurable" 
-> >subject also summarize the reason of the change.
-> >
-> 
-> Currently I don't know if my previous commit which has been reviewed still
-> be effective. Since this link_id changes only works for MBIM mode of SDX72.
-> If keeps the commit of [1], then I will update this patch with v2 version which just update
-> the subject . If not, then this SDX72 series would have 3 patches: [1] + first patch
-> + second patch[v2](or 2 patches: combine [1] with first patch + second patch[v2]).
-> Please let me know which solution would be better.
-> 
 
-Just send v2 of both patches. There are some comments in the MHI patch as well.
-
-> Thanks.
-> >>>> ---
-> >>>>    drivers/net/wwan/mhi_wwan_mbim.c | 3 ++-
-> >>>>    1 file changed, 2 insertions(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/drivers/net/wwan/mhi_wwan_mbim.c b/drivers/net/wwan/mhi_wwan_mbim.c
-> >>>> index 3f72ae943b29..4ca5c845394b 100644
-> >>>> --- a/drivers/net/wwan/mhi_wwan_mbim.c
-> >>>> +++ b/drivers/net/wwan/mhi_wwan_mbim.c
-> >>>> @@ -618,7 +618,8 @@ static int mhi_mbim_probe(struct mhi_device *mhi_dev, const struct mhi_device_id
-> >>>>    	mbim->rx_queue_sz = mhi_get_free_desc_count(mhi_dev, DMA_FROM_DEVICE);
-> >>>>    
-> >>>>    	/* Register wwan link ops with MHI controller representing WWAN instance */
-> >>>> -	return wwan_register_ops(&cntrl->mhi_dev->dev, &mhi_mbim_wwan_ops, mbim, 0);
-> >>>> +	return wwan_register_ops(&cntrl->mhi_dev->dev, &mhi_mbim_wwan_ops, mbim,
-> >>>> +		mhi_dev->mhi_cntrl->link_id ? mhi_dev->mhi_cntrl->link_id : 0);
-> >>>
-> >>> Is it possible to drop the ternary operator and pass the link_id directly?
-> >>>
-
-Yeah, just use link_id directly as it will be 0 by default.
-
-- Mani
-
--- 
-மணிவண்ணன் சதாசிவம்
 
