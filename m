@@ -1,87 +1,209 @@
-Return-Path: <netdev+bounces-102974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2016905BCF
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 21:16:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24934905C4D
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 21:49:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90AF8B26847
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 19:16:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 856C7B21271
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 19:49:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50FF65028C;
-	Wed, 12 Jun 2024 19:16:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6283A83CC9;
+	Wed, 12 Jun 2024 19:49:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TkMZJbTb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nPFgOPET"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C82E59B4E;
-	Wed, 12 Jun 2024 19:16:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CD90381C4
+	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 19:49:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718219791; cv=none; b=nYcG9E9NR5IFD+8t4UJD2v4F63xXxlff29fnLT4t7Yat0yRInBKZqdKnQZynXX8lb+4/oMRXpYSpi6foSYGdWN41FQi4bkuBmcDMhWvo9liBkVpkNr5TfL+8JByEMnf3pgy9bx9KxpQp8xqVi+LlNXWipOXQ865RY4gvA28HLb8=
+	t=1718221769; cv=none; b=T/4qHj5s4KYG2Pki5Gjw3gXV2dwNVWOGv8F0udByEhin2vMqWlzOSGcuiZ8aQdnHvrq1a4tOghaVYCTQfsZ+bqFVN1Ogg8A4UvVJY9qeeftmlpx2O2XBaMdQCZiEsOwDuo2HnTXumMZotOdj9B8TYI892E20zom5MmjRiaT5mDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718219791; c=relaxed/simple;
-	bh=h9OrCqNtDcSWplzbwmvzVv8Y1Pp41dr3XGTW2LGPiGk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=apGcGaTLD/XItXCuDICCJQiIcaIwAKmopAuIEefK5rne3NXOECTmJW4yMIZma3F2HbCRjay4CUOjgon7z0M0qbrXThswwCvBh08oatz9K1lLi9Ss0ctpftefErzn2DniBWUXJEFQZTFf38cQNwEh1voMqgjq3BDpZeRDP7K32kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TkMZJbTb; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=9B/Qk2uWCAxs4BHcvpRcMr2sP++AxA6OtnPjaYkILhc=; b=Tk
-	MZJbTbE7A6PhroebI9UO3cW97crXUkmkqufmCKhqFLQPrcrl4kbCK9C+IKtQpp6l6Su28hXZ6h5qG
-	8Cm9fNIa1vs9k8bRuUYcei+TeB5x8ekQySJEre2NyjrjlgnZuDVZL5aFNltvQydaU4z2OgwSgNR4b
-	57wQq8BLTGCv1Sw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sHTS9-00HUuE-Cb; Wed, 12 Jun 2024 21:16:13 +0200
-Date: Wed, 12 Jun 2024 21:16:13 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?B?Q3Pza+FzLA==?= Bence <csokas.bence@prolan.hu>
-Cc: Frank Li <Frank.Li@freescale.com>,
-	"David S. Miller" <davem@davemloft.net>, imx@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Richard Cochran <richardcochran@gmail.com>,
-	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH resubmit 2] net: fec: Fix FEC_ECR_EN1588 being cleared on
- link-down
-Message-ID: <5fa9fadc-a89d-467a-aae9-c65469ff5fe1@lunn.ch>
-References: <20240611080405.673431-1-csokas.bence@prolan.hu>
+	s=arc-20240116; t=1718221769; c=relaxed/simple;
+	bh=vdcTll95HYqQ4A5Lb6dhGfn/fHRvNXW4EaLsLqfCBuw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=BhlVX7u27Ra2EOWSo81qWSMpRAJeQ5EojaswZSyRsmqee1PflfVuIcA8wPjVY7HMA234o/zIc82sdnt7PtEe1rcpJ3DDJZsBvanuoo/wYfkYlE6KNPHGirraatc7Sn2ZK0RNUrllsk0Jsf8LRcfNWZa1TA26YUXjD2VmkJlptok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nPFgOPET; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718221767; x=1749757767;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=vdcTll95HYqQ4A5Lb6dhGfn/fHRvNXW4EaLsLqfCBuw=;
+  b=nPFgOPETGhEN03m+gFzCB94B6smjQMcYNsMtZeWY3v/qV6Kksp60rlfi
+   zdTNxUua9J//8r23kS8ujfx/mGMMqW2JC/7r/lCTTTFnzlNbmjEF/LdE+
+   ubxtcPeMwkrKvtiiaTMcnFNbMk+au1tMoI1ZUQ9+7uaVFkm/6KrJ9pkFd
+   z3+qACpAknNrbzK2btFCXlcRmn3vlZi9vEqJyv2U7QFm+plyP/N2b9hRN
+   4Ro8o2RPS0iO+RMXTAhI+BtHwvFosr/r0eR/abuqaVA304Ejx0V9/gTfe
+   w4dkQC4nQvCCy8sx0t9d5SJaTi1hQ4Ng5ogJuVCW5FvH11R3415zr9LIl
+   A==;
+X-CSE-ConnectionGUID: bWicDxTZTuaR8Eq4aCOkug==
+X-CSE-MsgGUID: FmSGEHrSTCicIGVfnBC/zQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11101"; a="14730590"
+X-IronPort-AV: E=Sophos;i="6.08,234,1712646000"; 
+   d="scan'208";a="14730590"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 12:49:22 -0700
+X-CSE-ConnectionGUID: wEqhUlUjS8ycowH9dLa9MA==
+X-CSE-MsgGUID: i1X0OC1qRymk+HYeu8D1nA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,234,1712646000"; 
+   d="scan'208";a="70694536"
+Received: from unknown (HELO vcostago-mobl3) ([10.124.222.220])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 12:49:22 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, Kurt Kanzenbach
+ <kurt@linutronix.de>
+Subject: Re: [PATCH iwl-next] igc: Get rid of spurious interrupts
+In-Reply-To: <20240611-igc_irq-v1-1-49763284cb57@linutronix.de>
+References: <20240611-igc_irq-v1-1-49763284cb57@linutronix.de>
+Date: Wed, 12 Jun 2024 12:49:21 -0700
+Message-ID: <87sexi2b7i.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240611080405.673431-1-csokas.bence@prolan.hu>
+Content-Type: text/plain
 
-On Tue, Jun 11, 2024 at 10:04:05AM +0200, Csókás, Bence wrote:
-> FEC_ECR_EN1588 bit gets cleared after MAC reset in `fec_stop()`, which
-> makes all 1588 functionality shut down, and all the extended registers
-> disappear, on link-down, making the adapter fall back to compatibility
-> "dumb mode". However, some functionality needs to be retained (e.g. PPS)
-> even without link.
-> 
-> Fixes: 6605b730c061 ("FEC: Add time stamping code and a PTP hardware clock")
-> Cc: Richard Cochran <richardcochran@gmail.com>
-> 
-> Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
+Kurt Kanzenbach <kurt@linutronix.de> writes:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> When running the igc with XDP/ZC in busy polling mode with deferral of hard
+> interrupts, interrupts still happen from time to time. That is caused by
+> the igc task watchdog which triggers Rx interrupts periodically.
+>
+> That mechanism has been introduced to overcome skb/memory allocation
+> failures [1]. So the Rx clean functions stop processing the Rx ring in case
+> of such failure. The task watchdog triggers Rx interrupts periodically in
+> the hope that memory became available in the mean time.
+>
+> The current behavior is undesirable for real time applications, because the
+> driver induced Rx interrupts trigger also the softirq processing. However,
+> all real time packets should be processed by the application which uses the
+> busy polling method.
+>
+> Therefore, only trigger the Rx interrupts in case of real allocation
+> failures. Introduce a new flag for signaling that condition.
+>
+> [1] - https://git.kernel.org/pub/scm/linux/kernel/git/tglx/history.git/commit/?id=3be507547e6177e5c808544bd6a2efa2c7f1d436
+>
+> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+> ---
 
-    Andrew
+Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+
+>  drivers/net/ethernet/intel/igc/igc.h      |  1 +
+>  drivers/net/ethernet/intel/igc/igc_main.c | 24 ++++++++++++++++++++----
+>  2 files changed, 21 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+> index 8b14c029eda1..7bfe5030e2c0 100644
+> --- a/drivers/net/ethernet/intel/igc/igc.h
+> +++ b/drivers/net/ethernet/intel/igc/igc.h
+> @@ -682,6 +682,7 @@ enum igc_ring_flags_t {
+>  	IGC_RING_FLAG_TX_DETECT_HANG,
+>  	IGC_RING_FLAG_AF_XDP_ZC,
+>  	IGC_RING_FLAG_TX_HWTSTAMP,
+> +	IGC_RING_FLAG_RX_ALLOC_FAILED,
+>  };
+>  
+>  #define ring_uses_large_buffer(ring) \
+> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+> index 305e05294a26..e666739dfac7 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_main.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+> @@ -2192,6 +2192,7 @@ static bool igc_alloc_mapped_page(struct igc_ring *rx_ring,
+>  	page = dev_alloc_pages(igc_rx_pg_order(rx_ring));
+>  	if (unlikely(!page)) {
+>  		rx_ring->rx_stats.alloc_failed++;
+> +		set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
+>  		return false;
+>  	}
+>  
+> @@ -2208,6 +2209,7 @@ static bool igc_alloc_mapped_page(struct igc_ring *rx_ring,
+>  		__free_page(page);
+>  
+>  		rx_ring->rx_stats.alloc_failed++;
+> +		set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
+>  		return false;
+>  	}
+>  
+> @@ -2659,6 +2661,7 @@ static int igc_clean_rx_irq(struct igc_q_vector *q_vector, const int budget)
+>  		if (!skb) {
+>  			rx_ring->rx_stats.alloc_failed++;
+>  			rx_buffer->pagecnt_bias++;
+> +			set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
+>  			break;
+>  		}
+>  
+> @@ -2739,6 +2742,7 @@ static void igc_dispatch_skb_zc(struct igc_q_vector *q_vector,
+>  	skb = igc_construct_skb_zc(ring, xdp);
+>  	if (!skb) {
+>  		ring->rx_stats.alloc_failed++;
+> +		set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &ring->flags);
+>  		return;
+>  	}
+>  
+> @@ -5811,11 +5815,23 @@ static void igc_watchdog_task(struct work_struct *work)
+>  	if (adapter->flags & IGC_FLAG_HAS_MSIX) {
+>  		u32 eics = 0;
+>  
+> -		for (i = 0; i < adapter->num_q_vectors; i++)
+> -			eics |= adapter->q_vector[i]->eims_value;
+> -		wr32(IGC_EICS, eics);
+> +		for (i = 0; i < adapter->num_q_vectors; i++) {
+> +			struct igc_ring *rx_ring = adapter->rx_ring[i];
+> +
+> +			if (test_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags)) {
+
+Minor and optional: I guess you can replace test_bit() -> clear_bit()
+with __test_and_clear_bit() here and below.
+
+In any case:
+
+Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+
+> +				eics |= adapter->q_vector[i]->eims_value;
+> +				clear_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
+> +			}
+> +		}
+> +		if (eics)
+> +			wr32(IGC_EICS, eics);
+>  	} else {
+> -		wr32(IGC_ICS, IGC_ICS_RXDMT0);
+> +		struct igc_ring *rx_ring = adapter->rx_ring[0];
+> +
+> +		if (test_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags)) {
+> +			clear_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
+> +			wr32(IGC_ICS, IGC_ICS_RXDMT0);
+> +		}
+>  	}
+>  
+>  	igc_ptp_tx_hang(adapter);
+>
+> ---
+> base-commit: bb678f01804ccaa861b012b2b9426d69673d8a84
+> change-id: 20240611-igc_irq-ccc1c8bc6890
+>
+> Best regards,
+> -- 
+> Kurt Kanzenbach <kurt@linutronix.de>
+>
+
+-- 
+Vinicius
 
