@@ -1,269 +1,154 @@
-Return-Path: <netdev+bounces-102881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5240F90549E
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 16:01:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70132905499
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 16:00:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98068B24807
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 14:01:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A0091C23D4B
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 14:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E204D17E458;
-	Wed, 12 Jun 2024 13:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D65A181BB3;
+	Wed, 12 Jun 2024 13:57:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="gNdFbF4g"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZXi0ZaeX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721D517E8E1
-	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 13:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C298317CA1D;
+	Wed, 12 Jun 2024 13:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718200663; cv=none; b=ejhaaey9mVkbidOWHWpceMoKndQXQeCD/Q5T5n77jK6OZQjUsQx/h7+vwrt7nhlYCiIOLM9HyJOkWCt8KsWoKNz28Y8u2fGcqUQH4u60sSOczTNpw9hJ6Ffp1L7gUJKrf99z6xVZ7P5vpkxKzZsz5ZWNE55Z8cBKlVcHFpe0B5Y=
+	t=1718200628; cv=none; b=VKYU5FZA6oBv26n0ouy9eMJFK1wCkyDIF16fqxDB80xd2TCH1rsW+H0cYrB8Vo+/anICUj0EEE42hzPKtHGnt7lnhfHakWehvB56SkIzDtuZ+05X+H7kWuTkzt/3CyCLMST1qYJjhXqvBI5QHdjVVKmUTfzikzOSfeiKJJzYWXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718200663; c=relaxed/simple;
-	bh=B/tz6F/uDM43AEh9FiNHITpH2lzDrglyTdjEEE9P03A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eAb0xxajWzkWnTVOgGCwmZxeR0qvSdqkum1Nk/njH/DeiOS4amAZ1JRHhkjOKVmRNgj3nrumBefE/HPewhkG7/zTlIOiw93nRLE4cZRRDkQoNcqxERWWBDpky1RxSeNEmkb1Tc4rWJSAN0xKxOo3pFpxbfNDN0kw6j4bYcQhAB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=gNdFbF4g; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com [209.85.221.70])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 0B8633F187
-	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 13:57:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1718200659;
-	bh=450QJdaFOD/ZEOKdhYp3ewa6MAAZ+MnyJ5yZ14liXb8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
-	b=gNdFbF4gQjQCUlH30PhHGBXkQ9GNxXsnYO/7A/fwmUu65uSOx7QgxemAnh9259IzA
-	 f+b+H+uK0p/Yia3mnXQ9WaHbkQ61cfADyCCourSMQwiISud12vlifjbFsCIYm25kXz
-	 nwovh7ncrhBH1iSckKMn7RBlB1NQwypLM3rG8hpsf6Xq4FZwN7D7HsINcYWBzbYmsp
-	 Ut4dSbRJtK0L5qQhdVUn5jh79RfU3jOj1BrlUvKIazBXlVwXXd+idZGD2+U7xVdo57
-	 LpJcwUSlJcAWqIKhytzOJXDnYAOCjd7HeX1uG9kIxvcFZQ1K3aT/Gqz8LOPn+HJplu
-	 OaU+VeWPrXSbg==
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-35f2030f868so2658998f8f.2
-        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 06:57:39 -0700 (PDT)
+	s=arc-20240116; t=1718200628; c=relaxed/simple;
+	bh=VgkpApAv0XWVhyeZqIVjDLA8e2kkKodnF461ysuPxNc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=UVe5I659XzF+CBqR8BnBTWXKblrtw20NS+L1/GLEQBeE+yQscSou9EAcMYMuFfWzi0j6uhdph6qaOfQzW2O+ez1mNyVUBFZ7+t3YlkwPF8NRfSoyXHM1l0+4BFmSZkDMRjAdhWoyqhcUA+daaXGRa5lMONn8p3SeBUSMY50Rvxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZXi0ZaeX; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6b08d661dbaso9017456d6.0;
+        Wed, 12 Jun 2024 06:57:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718200625; x=1718805425; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=myClNR6MZBQfRJrEDDf6nVsnfHCgfV4V7+aJY3JBsiw=;
+        b=ZXi0ZaeXhOWBFxufE3ziJORJC7umKYi4jJo7CtD2EZz8nmENsa03qPwuwBNzYzaqrS
+         KQj1Mf78isahy/g6xqWoXS0CIRpdh0YQSfoZzdPJrfdj/58vS7nxiAOMzT+10kJiXY4i
+         XMIOYf4b0LN6aFiUcN3Ifq+XlUO49VGaY0/+8Vg6+zEjKKqzpprbgv8hKKD8/IrdRUmw
+         Wau2JSSqevalmOo+5q8aLa7r3qow5MYk4FhHWaQqrFou6QzvW7JyNC64Hr2pclHZhBHV
+         Csq13RtZ4d9a2RBRf7WQt3PFYxCfNtjBqaJqr/kfX41GAPNms4C2N5IY8iAsfYnaeYAI
+         QOkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718200657; x=1718805457;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=450QJdaFOD/ZEOKdhYp3ewa6MAAZ+MnyJ5yZ14liXb8=;
-        b=a+6HtfY1+B4ZTTlt1KaImY2n7PZIT1/t5TvSjtTE2N1uZTlTmhhFwWBdLE6Uw5xWLg
-         f+jghForWM6eH47pi/n+90uM3Ttp9cyBSwtaStd5sgHklL1j/apx6oODJD1v/VCit0Ow
-         ZYTY1K9iZdb6EZbDgswJJRddcFYJCksYUJeswpYdF6pp3khRw3EeWK813ORDPd5RcFMs
-         b+80PsQeulkWpwFyo1t4+0ZUdRCDwEzOxJylF6hpM/LLpwGyM2Plkqhs1NhFx1nwyypM
-         LzWbGD5FZ6q9HQgdyJronpnFefAmcIyanAKRfr8ohVSp0aEANz1Qzaw75WOLft7bcPUW
-         pqLQ==
-X-Gm-Message-State: AOJu0YznhanwKGJLAndEvE+kiiUhibsFGlPMQ8BTfWfibsyAiYfCt6hG
-	Qvn0mV2nb8+2NJEXQgI/LVAH1cK4Olg4SoDIxGKIJybfjmS58VHwgI2/8RdbsHsOPKR0KEl5Gb5
-	jMz3QIl+vMO+pkuv3rdgzCbvTRan4IMnpCh8TCorqCzMlXahCw8tUdHalNZ5g29/j0gxxtw7eiJ
-	DhyZG8
-X-Received: by 2002:a05:600c:35cd:b0:422:683b:df31 with SMTP id 5b1f17b1804b1-422862b3c90mr21262015e9.7.1718200656765;
-        Wed, 12 Jun 2024 06:57:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHdpfOWSfB1/u6rk/gPaDhbIg4bOKTjwkTGoxK3fdoQ1JSH8FcOfwqkcf8jTDGOFJ8flsx6HQ==
-X-Received: by 2002:a05:600c:35cd:b0:422:683b:df31 with SMTP id 5b1f17b1804b1-422862b3c90mr21261785e9.7.1718200656350;
-        Wed, 12 Jun 2024 06:57:36 -0700 (PDT)
-Received: from XPS-17-9720.han-hoki.ts.net ([213.204.117.183])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42286eef970sm26985235e9.10.2024.06.12.06.57.35
+        d=1e100.net; s=20230601; t=1718200625; x=1718805425;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=myClNR6MZBQfRJrEDDf6nVsnfHCgfV4V7+aJY3JBsiw=;
+        b=BP4RWRAJbcaB3bsw4dcJ9AiJKK9KJ6HPlAqOgEv4Ul/p0r6bSQUNncS9V3EAVOXlxp
+         X9omAnA2z3qcpns52UzhYgHfiiz3mmP9caESXpjDXJ+x32S3GKNeMsMbzPGZdrAQBdaw
+         8f3fT0kMiUT4iR6mAvUdBsFBtPPt7HiZiH6zHrOCXpRR/xlzWwvEM4hP1vRFvauR98Iu
+         phDkJQWIMLq/yZiyzfbiMzb0k7gT/cQVh6E9LBnt79TmwnA7eRUAGfoNG1RwoUG1i70c
+         ZaadV+PkxgmYCMkyHrBTpXonwT74u5HBm6Bq3VKH6EtmkvYCCnQabFpWqniFeGdTp52F
+         ETEg==
+X-Forwarded-Encrypted: i=1; AJvYcCWZzFUbLTf7dlrY+Wut2NstSzNNct6G0wKWqcNXnVPan1hFlrL9PEH/f5Vxd05XlNKGjXeOHDtLpSOKpdcWI/603pcq
+X-Gm-Message-State: AOJu0Ywin3a2ozwpTr+ZbrjL2mFWE3CcJUZeqtyoiwlrex5bxnWat014
+	Ko2YCSDTk4s3QCX6jfGzJrNoyHFV+ebfWctSKsI46rTbY9uH8Mqf
+X-Google-Smtp-Source: AGHT+IHwfI47771c2CPntVeqBP3o3z5zPcr2t9lE8x3olznY0RBzzw3FHmqGLsuEir0oUYFPGHs40w==
+X-Received: by 2002:a05:6214:4a04:b0:6b0:7b24:56f0 with SMTP id 6a1803df08f44-6b0c9f256b2mr36066256d6.6.1718200625616;
+        Wed, 12 Jun 2024 06:57:05 -0700 (PDT)
+Received: from localhost (56.148.86.34.bc.googleusercontent.com. [34.86.148.56])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b082f55fd2sm26678886d6.71.2024.06.12.06.57.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jun 2024 06:57:35 -0700 (PDT)
-From: Ghadi Elie Rahme <ghadi.rahme@canonical.com>
-To: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org,
-	Ghadi Elie Rahme <ghadi.rahme@canonical.com>
-Subject: [PATCH net] bnx2x: Fix multiple UBSAN array-index-out-of-bounds
-Date: Wed, 12 Jun 2024 16:56:57 +0300
-Message-ID: <20240612135657.153658-1-ghadi.rahme@canonical.com>
-X-Mailer: git-send-email 2.43.0
+        Wed, 12 Jun 2024 06:57:05 -0700 (PDT)
+Date: Wed, 12 Jun 2024 09:57:04 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Magnus Karlsson <magnus.karlsson@gmail.com>, 
+ YiFei Zhu <zhuyifei@google.com>
+Cc: netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+ Magnus Karlsson <magnus.karlsson@intel.com>, 
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+ Jonathan Lemon <jonathan.lemon@gmail.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Stanislav Fomichev <sdf@google.com>, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <6669a930e1bce_125bdf294cf@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAJ8uoz2-Kt2o-v3CuLpf2VDv2VtUJL2T307rp04di5hY2ihYHg@mail.gmail.com>
+References: <cover.1718138187.git.zhuyifei@google.com>
+ <CAJ8uoz2-Kt2o-v3CuLpf2VDv2VtUJL2T307rp04di5hY2ihYHg@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next 0/3] selftests: Add AF_XDP functionality test
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Fix UBSAN warnings that occur when using a system with 32 physical
-cpu cores or more, or when the user defines a number of ethernet
-queues greater than or equal to FP_SB_MAX_E1x.
+Magnus Karlsson wrote:
+> On Tue, 11 Jun 2024 at 22:43, YiFei Zhu <zhuyifei@google.com> wrote:
+> >
+> > We have observed that hardware NIC drivers may have faulty AF_XDP
+> > implementations, and there seem to be a lack of a test of various modes
+> > in which AF_XDP could run. This series adds a test to verify that NIC
+> > drivers implements many AF_XDP features by performing a send / receive
+> > of a single UDP packet.
+> >
+> > I put the C code of the test under selftests/bpf because I'm not really
+> > sure how I'd build the BPF-related code without the selftests/bpf
+> > build infrastructure.
+> 
+> Happy to see that you are contributing a number of new tests. Would it
+> be possible for you to integrate this into the xskxceiver framework?
 
-The value of the maximum number of Ethernet queues should be limited
-to FP_SB_MAX_E1x in case FCOE is disabled or to [FP_SB_MAX_E1x-1] if
-enabled to avoid out of bounds reads and writes.
+Makes sense, we'll need to take a look.
 
-Stack trace:
+This is an internal test that we have been using for a long time in
+our test framework.
 
-UBSAN: array-index-out-of-bounds in /home/kernel/COD/linux/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c:1529:11
-index 20 is out of range for type 'stats_query_entry [19]'
-CPU: 12 PID: 858 Comm: systemd-network Not tainted 6.9.0-060900rc7-generic #202405052133
-Hardware name: HP ProLiant DL360 Gen9/ProLiant DL360 Gen9, BIOS P89 10/21/2019
-Call Trace:
- <TASK>
- dump_stack_lvl+0x76/0xa0
- dump_stack+0x10/0x20
- __ubsan_handle_out_of_bounds+0xcb/0x110
- bnx2x_prep_fw_stats_req+0x2e1/0x310 [bnx2x]
- bnx2x_stats_init+0x156/0x320 [bnx2x]
- bnx2x_post_irq_nic_init+0x81/0x1a0 [bnx2x]
- bnx2x_nic_load+0x8e8/0x19e0 [bnx2x]
- bnx2x_open+0x16b/0x290 [bnx2x]
- __dev_open+0x10e/0x1d0
- __dev_change_flags+0x1bb/0x240
- ? sock_def_readable+0x52/0xf0
- dev_change_flags+0x27/0x80
- do_setlink+0xab7/0xe50
- ? rtnl_getlink+0x3c7/0x470
- ? __nla_validate_parse+0x49/0x1d0
- rtnl_setlink+0x12f/0x1f0
- ? security_capable+0x47/0x80
- rtnetlink_rcv_msg+0x170/0x440
- ? ep_done_scan+0xe4/0x100
- ? __pfx_rtnetlink_rcv_msg+0x10/0x10
- netlink_rcv_skb+0x5d/0x110
- rtnetlink_rcv+0x15/0x30
- netlink_unicast+0x243/0x380
- netlink_sendmsg+0x213/0x460
- __sys_sendto+0x21e/0x230
- __x64_sys_sendto+0x24/0x40
- x64_sys_call+0x1c33/0x25c0
- do_syscall_64+0x7e/0x180
- ? __task_pid_nr_ns+0x6c/0xc0
- ? syscall_exit_to_user_mode+0x81/0x270
- ? do_syscall_64+0x8b/0x180
- ? do_syscall_64+0x8b/0x180
- ? __task_pid_nr_ns+0x6c/0xc0
- ? syscall_exit_to_user_mode+0x81/0x270
- ? do_syscall_64+0x8b/0x180
- ? do_syscall_64+0x8b/0x180
- ? exc_page_fault+0x93/0x1b0
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-RIP: 0033:0x736223927a0a
-Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 7e c3 0f 1f 44 00 00 41 54 48 83 ec 30 44 89
-RSP: 002b:00007ffc0bb2ada8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 0000583df50f9c78 RCX: 0000736223927a0a
-RDX: 0000000000000020 RSI: 0000583df50ee510 RDI: 0000000000000003
-RBP: 0000583df50d4940 R08: 00007ffc0bb2adb0 R09: 0000000000000080
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000583df5103ae0
-R13: 000000000000035a R14: 0000583df50f9c30 R15: 0000583ddddddf00
-</TASK>
----[ end trace ]---
-------------[ cut here ]------------
-UBSAN: array-index-out-of-bounds in /home/kernel/COD/linux/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c:1546:11
-index 28 is out of range for type 'stats_query_entry [19]'
-CPU: 12 PID: 858 Comm: systemd-network Not tainted 6.9.0-060900rc7-generic #202405052133
-Hardware name: HP ProLiant DL360 Gen9/ProLiant DL360 Gen9, BIOS P89 10/21/2019
-Call Trace:
-<TASK>
-dump_stack_lvl+0x76/0xa0
-dump_stack+0x10/0x20
-__ubsan_handle_out_of_bounds+0xcb/0x110
-bnx2x_prep_fw_stats_req+0x2fd/0x310 [bnx2x]
-bnx2x_stats_init+0x156/0x320 [bnx2x]
-bnx2x_post_irq_nic_init+0x81/0x1a0 [bnx2x]
-bnx2x_nic_load+0x8e8/0x19e0 [bnx2x]
-bnx2x_open+0x16b/0x290 [bnx2x]
-__dev_open+0x10e/0x1d0
-__dev_change_flags+0x1bb/0x240
-? sock_def_readable+0x52/0xf0
-dev_change_flags+0x27/0x80
-do_setlink+0xab7/0xe50
-? rtnl_getlink+0x3c7/0x470
-? __nla_validate_parse+0x49/0x1d0
-rtnl_setlink+0x12f/0x1f0
-? security_capable+0x47/0x80
-rtnetlink_rcv_msg+0x170/0x440
-? ep_done_scan+0xe4/0x100
-? __pfx_rtnetlink_rcv_msg+0x10/0x10
-netlink_rcv_skb+0x5d/0x110
-rtnetlink_rcv+0x15/0x30
-netlink_unicast+0x243/0x380
-netlink_sendmsg+0x213/0x460
-__sys_sendto+0x21e/0x230
-__x64_sys_sendto+0x24/0x40
-x64_sys_call+0x1c33/0x25c0
-do_syscall_64+0x7e/0x180
-? __task_pid_nr_ns+0x6c/0xc0
-? syscall_exit_to_user_mode+0x81/0x270
-? do_syscall_64+0x8b/0x180
-? do_syscall_64+0x8b/0x180
-? __task_pid_nr_ns+0x6c/0xc0
-? syscall_exit_to_user_mode+0x81/0x270
-? do_syscall_64+0x8b/0x180
-? do_syscall_64+0x8b/0x180
-? exc_page_fault+0x93/0x1b0
-entry_SYSCALL_64_after_hwframe+0x76/0x7e
-RIP: 0033:0x736223927a0a
-Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 7e c3 0f 1f 44 00 00 41 54 48 83 ec 30 44 89
-RSP: 002b:00007ffc0bb2ada8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 0000583df50f9c78 RCX: 0000736223927a0a
-RDX: 0000000000000020 RSI: 0000583df50ee510 RDI: 0000000000000003
-RBP: 0000583df50d4940 R08: 00007ffc0bb2adb0 R09: 0000000000000080
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000583df5103ae0
-R13: 000000000000035a R14: 0000583df50f9c30 R15: 0000583ddddddf00
- </TASK>
----[ end trace ]---
-bnx2x 0000:04:00.1: 32.000 Gb/s available PCIe bandwidth (5.0 GT/s PCIe x8 link)
-bnx2x 0000:04:00.1 eno50: renamed from eth0
-------------[ cut here ]------------
-UBSAN: array-index-out-of-bounds in /home/kernel/COD/linux/drivers/net/ethernet/broadcom/bnx2x/bnx2x_sriov.c:1895:8
-index 29 is out of range for type 'stats_query_entry [19]'
-CPU: 13 PID: 163 Comm: kworker/u96:1 Not tainted 6.9.0-060900rc7-generic #202405052133
-Hardware name: HP ProLiant DL360 Gen9/ProLiant DL360 Gen9, BIOS P89 10/21/2019
-Workqueue: bnx2x bnx2x_sp_task [bnx2x]
-Call Trace:
- <TASK>
- dump_stack_lvl+0x76/0xa0
- dump_stack+0x10/0x20
- __ubsan_handle_out_of_bounds+0xcb/0x110
- bnx2x_iov_adjust_stats_req+0x3c4/0x3d0 [bnx2x]
- bnx2x_storm_stats_post.part.0+0x4a/0x330 [bnx2x]
- ? bnx2x_hw_stats_post+0x231/0x250 [bnx2x]
- bnx2x_stats_start+0x44/0x70 [bnx2x]
- bnx2x_stats_handle+0x149/0x350 [bnx2x]
- bnx2x_attn_int_asserted+0x998/0x9b0 [bnx2x]
- bnx2x_sp_task+0x491/0x5c0 [bnx2x]
- process_one_work+0x18d/0x3f0
- worker_thread+0x304/0x440
- ? __pfx_worker_thread+0x10/0x10
- kthread+0xe4/0x110
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x47/0x70
- ? __pfx_kthread+0x10/0x10
- ret_from_fork_asm+0x1a/0x30
- </TASK>
----[ end trace ]---
+My mistake for not keeping up at all with the changes to xskxceiver.c
+in the meantime.
 
-Fixes: 7d0445d66a76 ("bnx2x: clamp num_queues to prevent passing a negative value")
-Signed-off-by: Ghadi Elie Rahme <ghadi.rahme@canonical.com>
----
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+We want to test each case independently. Including a few non obvious
+cases that we discovered from real use, notably
 
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-index a8e07e51418f..837617b99089 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-@@ -66,7 +66,12 @@ static int bnx2x_calc_num_queues(struct bnx2x *bp)
- 	if (is_kdump_kernel())
- 		nq = 1;
- 
--	nq = clamp(nq, 1, BNX2X_MAX_QUEUES(bp));
-+	int max_nq = FP_SB_MAX_E1x - 1;
-+
-+	if(NO_FCOE(bp))
-+		max_nq = FP_SB_MAX_E1x;
-+
-+	nq = clamp(nq, 1, max_nq);
- 	return nq;
- }
- 
--- 
-2.43.0
+- Using XSK only for Tx, without installing an Rx program
+- Using XSK with an empty fill queue, filling it after bind
 
+> You can find that in selftests/bpf too. By default, it will run its
+> tests using veth, but if you provide an interface name after the -i
+> option, it will run the tests over a real interface. I put the NIC in
+> loopback mode to use this feature, but feel free to add a new mode if
+> necessary.
+
+We do really want two machine tests, not loopback mode. Also to
+integrate into the drv-net infrastructure.
+
+Another non-obvious feature is to test one side AF_XDP and use
+PF_PACKET on the other side, to be able to isolate and exercise only
+the Tx or Rx path in a test.
+
+> A lot of the setup and data plane code that you add already
+> exists in xskxceiver, so I would prefer if you could reuse it. Your
+> tests are new though and they would be valuable to have.
+> 
+> You could make the default packet that is sent in xskxceiver be the
+> UDP packet that you want and then add all the other logic that you
+> have to a number of new tests that you introduce.
 
