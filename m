@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-102780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DE8790493C
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 05:00:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FD4790493E
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 05:00:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC6DC1C23003
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 03:00:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 533DD1C22FE2
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 03:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13ABFFBED;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1676A107A8;
 	Wed, 12 Jun 2024 03:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="egd7vYH1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FJXRyO8h"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7A3DF62;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7CCE566;
 	Wed, 12 Jun 2024 03:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718161234; cv=none; b=CJyStezkqIzkWmHb7SaSm/TVDtu9V/HnM2HMLfkxcPZH0oYUEjBORrW1Dl+E+B9Bn3rbKIobCNFxZ3zBDAP213NYlnmoaKVqNp/Dr+9d6hvSWmQOTZnJJ0JPmsYlMJjrheDDEFAUNv1iq2QD8u0zQLik+LeswZK/kh4Lchb7T30=
+	t=1718161234; cv=none; b=qPEIKCHpaCQc1Rr6Ew2eGyss6ShHXvUQKkr8Vab+GcH0HghpzKaIiOjLCodwEOHinHfqBngp//TOrkd1U3MvGAuChAvOZubyEcFXQF8V86W29wp1SkOp+CnCtgSAe188oqXFpMM+5VXgYA1TPzNkIXq9wF7AJ9zRErWdYMgg5j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718161234; c=relaxed/simple;
-	bh=RUXhIiQ650W0ISBjZa4FmMnAKv75xiQwfEYjljSa7Ys=;
+	bh=GiZ5FeQVXlCnlgnX5r2B7z2qC87zWrx2BoPI3z5NG68=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Xu15NcoygvclC+6cxTODXLIzzZtvu47iChHiRBe4WJwDGrUKFRDfMi7MvCpINs8Dgp5DbUrW7AgZGPlY5RG8/xYmqgec+wSS2dmNaoJ5Z+wd7q0wATQTml79n7e0hhKLioVbOt/CR4DlKy0Xla61DHttyojprwPdd19PUY5B0Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=egd7vYH1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 76F78C4AF1C;
+	 In-Reply-To:To:Cc; b=QFzpwD8X1FJcLlq2BOkETf6JNe36QWFmNBAwXsTPehr0pVeFdpeF185qBBx2MFQx6R9KRXd6lf1G7LXRrkgl6QI+i+xblDCBehXjJjUGawD5QfDcHn7d9BwabcNsOTveoJuQ3bgNsXjU4NP3PvRjp5SdIQ8mmVN1hIs+20qrhj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FJXRyO8h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 79F50C4AF48;
 	Wed, 12 Jun 2024 03:00:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718161233;
-	bh=RUXhIiQ650W0ISBjZa4FmMnAKv75xiQwfEYjljSa7Ys=;
+	bh=GiZ5FeQVXlCnlgnX5r2B7z2qC87zWrx2BoPI3z5NG68=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=egd7vYH1h06yWv8wIa6eIzpxyiFUxxsgc0Xa6iL2sUlaK5z+aOlL3Tf6Y8oMYUD5S
-	 FyT3vKJPg/pWFid861HMka3h4RIMx/eAjWQu6dp1lg85sGWvGoazpCugjZ6cb4LzWk
-	 SwUXIVazp6Z5EpI48fh4mjpncZbgu9atizAMR5dTqZnlLBCN0ldzTAHkQii6jnye8J
-	 tu0fy2/sIjNfiJqw9ZvtzFeS/ldiqSK8WJbYHdHeB77VC3BLcO3vrw6ha/0uXWLzi0
-	 uQvCt4Zh4/NIK2JtzeZAzqYvT1pNPU84Hfv0f2aU1DrNyaAG8Qv0B9CCtGlm8uB6yH
-	 Hk/Ec/XJtCs0A==
+	b=FJXRyO8h0nDWSeWN4Nc3VoN/OElpJCo+Uo5jPOYOHsYLGGhbwrriAATYRAL4WOiHg
+	 WA4TmA0p1HAuHTlIXtwjZ2UXpWnKc98vm5eEQOxBl5ldSoNar4xTcir0KWZRNAE8jR
+	 7rwWzCwUVF39qo/vYDEsgbHdt8SCPfMnfiAiuMgnw7XOGLPrEJDLvILO//pJMCVUu9
+	 7HPSygsccvKxY8Xpar6/H1NUVBdPNx6J/7Ly2Flkxqtqx5lHeL/5LC/YOZm4sQJDV3
+	 wYW3O2eSnGP8BoF/qrSLNLYxwEmIVgA4M3emZOoH2p4UuVWntWumpesIovzZlv46tV
+	 8DR/id5xdrrGw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 55327C43614;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 61B8CCF21FA;
 	Wed, 12 Jun 2024 03:00:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,41 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net v5 PATCH] net: stmmac: replace priv->speed with the
- portTransmitRate from the tc-cbs parameters
+Subject: Re: pull request: bluetooth 2024-06-10
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171816123334.11889.9944196119101092125.git-patchwork-notify@kernel.org>
+ <171816123339.11889.9702953848909886720.git-patchwork-notify@kernel.org>
 Date: Wed, 12 Jun 2024 03:00:33 +0000
-References: <20240608143524.2065736-1-xiaolei.wang@windriver.com>
-In-Reply-To: <20240608143524.2065736-1-xiaolei.wang@windriver.com>
-To: Xiaolei Wang <xiaolei.wang@windriver.com>
-Cc: olteanv@gmail.com, linux@armlinux.org.uk, andrew@lunn.ch,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, wojciech.drewek@intel.com, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240610135803.920662-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240610135803.920662-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This pull request was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat,  8 Jun 2024 22:35:24 +0800 you wrote:
-> The current cbs parameter depends on speed after uplinking,
-> which is not needed and will report a configuration error
-> if the port is not initially connected. The UAPI exposed by
-> tc-cbs requires userspace to recalculate the send slope anyway,
-> because the formula depends on port_transmit_rate (see man tc-cbs),
-> which is not an invariant from tc's perspective. Therefore, we
-> use offload->sendslope and offload->idleslope to derive the
-> original port_transmit_rate from the CBS formula.
+On Mon, 10 Jun 2024 09:58:03 -0400 you wrote:
+> The following changes since commit 93792130a9387b26d825aa78947e4065deb95d15:
+> 
+>   Merge branch 'geneve-fixes' (2024-06-10 13:18:09 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-06-10
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v5] net: stmmac: replace priv->speed with the portTransmitRate from the tc-cbs parameters
-    https://git.kernel.org/netdev/net/c/be27b8965297
+  - pull request: bluetooth 2024-06-10
+    https://git.kernel.org/netdev/net/c/f6b2f578df8d
 
 You are awesome, thank you!
 -- 
