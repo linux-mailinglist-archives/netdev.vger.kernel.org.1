@@ -1,177 +1,291 @@
-Return-Path: <netdev+bounces-102997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27EA6905EA2
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 00:40:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77CAA905EA6
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 00:40:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C28BB1F221D1
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 22:40:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4F0EB21120
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 22:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 405EE12BEBB;
-	Wed, 12 Jun 2024 22:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1704C12BF2B;
+	Wed, 12 Jun 2024 22:40:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0dbDj2M2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kck118Du"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF44321360;
-	Wed, 12 Jun 2024 22:40:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718232021; cv=none; b=cjDkcaVes8ikDowcMxM47oV+Ie7LA7P4/NcXYSwo79geqWQpBlmgzCtezkjFf0yVmqS3U5oSIS8ihTifAHftySL4xr7xkhL+supQW8E6CNLmPI+fVkWNXUclqm++gdLNidgZgoppY9Kf9oI96cGwpSzon0r9DucmgBfNZmgHRPs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718232021; c=relaxed/simple;
-	bh=rYC+czHxcKQYzM+1xUOS8jIq0Bj1p1M06sPe50hUMaw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DhsjxSlxpQIYUMs0rAu2mr1k9/s6flL8rIODDmaHxk6FMVR+XzjWyuW5Gfrv3tKv9gbMbyINESxVNQg3yZDxC+xznioYPrdiH3mYetrcbw7SzcpfdCIiA5qzjcfOowKUsCxGi0cQC1pgCJFV10xFwPUOqdr+ABniNMRlQpSGyHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0dbDj2M2; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MsPOlnETfMLsWfJG4LxUIQ4Q97ttuBHiEzDMtNO+4XY=; b=0dbDj2M2GnzRqlZohCLFCXyshs
-	kz6a08uiUUtFwsKJ4S2VRwr9OPhKpDPxdNxpKu0COUfbC6HjPduXU3Goo3+kZiPcnNdQMdWB7BLlE
-	EAxKVaItgAYvOeTYb8i+SDEJVqxHe+Mw8S1cz5I4tSlQ3jUSgEeEK9rAcHztCh/FLPGc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sHWdQ-00HVWQ-4G; Thu, 13 Jun 2024 00:40:04 +0200
-Date: Thu, 13 Jun 2024 00:40:04 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Siddharth Vadapalli <s-vadapalli@ti.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, corbet@lwn.net, rogerq@kernel.org,
-	danishanwar@ti.com, vladimir.oltean@nxp.com, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, vigneshr@ti.com,
-	misael.lopez@ti.com, srk@ti.com
-Subject: Re: [RFC PATCH net-next 01/28] docs: networking: ti: add driver doc
- for CPSW Proxy Client
-Message-ID: <1a966d5f-9eca-4d6d-812b-98ac17579cd7@lunn.ch>
-References: <20240518124234.2671651-1-s-vadapalli@ti.com>
- <20240518124234.2671651-2-s-vadapalli@ti.com>
- <642c8217-49fe-4c54-8d62-9550202c02c9@lunn.ch>
- <6e520ad0-0f9b-4fee-87fe-44477b01912b@ti.com>
- <287322d3-d3ee-4de6-9189-97067bc4835c@lunn.ch>
- <3586d2d1-1f03-47b0-94c0-258e48525a9d@ti.com>
- <b5d9f1ff-0b0f-4c97-9d1c-4ba4468ce6e3@lunn.ch>
- <77267e15-b986-4b54-9e12-fb9536432ac2@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2009221360
+	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 22:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718232034; cv=fail; b=H/I2lifzhboNW43hz4sbgf7gM4RJVWhpJvyeCzZOQZ9GY7FiCD9SuC1zV9G9zJc0JyKq0SRRcgTr25S0/X5EdM1SppFo2kycWQHsRMOcFM6QeqeU2OfybJEohm2tJHQXjs30wf6/bjPAzRHi5H4kesKSXNhDmk1mHM1ZNA7Nubk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718232034; c=relaxed/simple;
+	bh=uUnGKvpD8SLwgvCo1Csfg1ABmwiefObWh6WurmhTvv0=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=QFVyG4YKEooXBCgZQVXeV+VYjVCwofDjmzIlQ7o4Nwv2SV5Y8siFHdWSZSmei7u9fCw+3SQX046BX+CRvNkkKHd2R5Mg34tZa1I6EQlxacoDt2r/WqPyWO85mu9zIqwlNygxT3cje9APk2IR5L9XvW/oPl7bjxDuwhRrVgr87mQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kck118Du; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718232032; x=1749768032;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=uUnGKvpD8SLwgvCo1Csfg1ABmwiefObWh6WurmhTvv0=;
+  b=kck118Du4tKiVEayQr1yHaY+bO9K1usmtlAhnCICuCe5o3/hOWClKbqu
+   +ptsQDFiazgfQLI+3rchtisQjHrIFjfwLfVoO88UQ9AlogGFOl1HKbDIz
+   qcso+vowctxdsNcALND7XWVc8zPtPr6p0fW2AUPeW51VeD082hkoXPL8U
+   /JPSx1aHqiRbeW9NiODBlZwA7RpQ6ZM2brNHtFrOoerW4qJg6aRmhc+sJ
+   L9WbHw5w8VLB4RbPe9KVa4xS6d885Bjg2Wzygglkw326hoSrXgrRfRcEQ
+   M10NweNHF7piwvPLHaQMlteMOckqJ6U112oxu2ZtUQknvi9XZSg2kdkJr
+   Q==;
+X-CSE-ConnectionGUID: OjXP0NraTjC4SGDFTsVwJw==
+X-CSE-MsgGUID: MZCKP76aRq205wxc9MnYDg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11101"; a="15148827"
+X-IronPort-AV: E=Sophos;i="6.08,234,1712646000"; 
+   d="scan'208";a="15148827"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 15:40:32 -0700
+X-CSE-ConnectionGUID: YJoTCtGqQhCJdtoxF6Y24w==
+X-CSE-MsgGUID: e7m9j7ZYRMutwzFFu8gYuQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,234,1712646000"; 
+   d="scan'208";a="40632735"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Jun 2024 15:40:32 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 12 Jun 2024 15:40:31 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 12 Jun 2024 15:40:30 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 12 Jun 2024 15:40:30 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 12 Jun 2024 15:40:30 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iyGTM3NLzRbHFSZE6hrG0C/t9U25LxfNxEdRvAyH4QMxyWFrlYxFr8Z4cFsGMa1Phq1lthxJsRjwwKWT8C0SGOIL3kDSkfbEPpLFTy+KZ0QA2lw738DUaqd/EJ4oWoBmOMa1YJPEACjbEgAI9UkG/pnVeJLZxgdKJx2bNHVyZZqTsmXr2q4Lm5c5sec+ycM93Iepnpoll8gDsGqRaQlFxiJJULKNQUtHlYWbuMPK0UU9/SavNu5YzIITnxF9zT0EGygE44gtamfEl9diFVzCNwmJsbs7SFA7Pboc1x7tzrzUd3MrzTfyx4f0Sq1D6ysNukBEi8dg1werULaNGnHTZg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tV3W+edNI4JPUHbqQtH5uMXQmqhdvY/5icmnhuZQ32w=;
+ b=np7/glKVTfVWii/8wDjuKoldehvZrrdN+cCRu9LHmMnDHMDCZi/Se496H3N5YzI8fvNr9xyREfmMYcKh8qrViZffAHp73hNoPc516tovawHQV/UopII04ysU3eGcqzBAZ9SmAshtVdWkV5uAPe6l5/Ouc756GwLTZ6xoBjNsx8PWwIc8HmbT/wUpS27iNpXGLqhJtgNmx7I1xgf9ynZ70LI78jxn6P9L19Mkq5Zu5lMfqVahgK/ri2UsccgwnTY5xK5703XlSyrTJPRAC+k1MpBH3RPmVXAPLAWYJ6PNHl7YgKn1TZxq1m3hG6sCvzOitdRbDFapJGoV73Ry14thWw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by MW5PR11MB5860.namprd11.prod.outlook.com (2603:10b6:303:19f::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.37; Wed, 12 Jun
+ 2024 22:40:28 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%3]) with mapi id 15.20.7677.019; Wed, 12 Jun 2024
+ 22:40:28 +0000
+Message-ID: <a703f3f9-c430-4d12-a1b9-6acec27e1f8a@intel.com>
+Date: Wed, 12 Jun 2024 15:40:26 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next 05/12] idpf: strictly assert
+ cachelines of queue and queue vector structures
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: <intel-wired-lan@osuosl.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+References: <20240528134846.148890-1-aleksander.lobakin@intel.com>
+ <20240528134846.148890-6-aleksander.lobakin@intel.com>
+ <b25cab15-f73c-4df8-bfca-434a8f717a31@intel.com>
+ <7cdd9b21-e597-48ef-91a2-a45b99821b28@intel.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <7cdd9b21-e597-48ef-91a2-a45b99821b28@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0274.namprd03.prod.outlook.com
+ (2603:10b6:303:b5::9) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <77267e15-b986-4b54-9e12-fb9536432ac2@ti.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|MW5PR11MB5860:EE_
+X-MS-Office365-Filtering-Correlation-Id: c0840c12-76df-4e0f-3318-08dc8b30a89d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230034|366010|376008|1800799018;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?VUp1Q1JsWXJuVVk2bUFxekxCS0lxYU9RUGNSQkV1L1ljT05UVlNNRTNGVzV1?=
+ =?utf-8?B?dk9KcW5KWUJyMzgxanZ6SlB5WlczaCtidzhJY1VreWJFMFdYbTRmSnBBWktC?=
+ =?utf-8?B?WjNRMmJ4NTl3OGZlMmVBbGZqQzduZjNKaTB0QzFnMHRCWEtmODRiOW81dnF4?=
+ =?utf-8?B?S1lIUFoyeEtmSUdFclpPMHZLZmR4WVgzeHpiYWluUkhOejhKNTIxUEs0dTI0?=
+ =?utf-8?B?bFJpL3EvRlBTM25qN3ptM0FqYVlvOHNpSTMvcERIOUduNEF1Y2F3dzNBUmNG?=
+ =?utf-8?B?TGgweXJxUXJyUmU0U2ZPSnppRU85VHJtcDJhdWZhN1NycWU0dEJqRkd1d25t?=
+ =?utf-8?B?d0Q2V3ZnTVF3amNSeUFsazBKU2VvZkcreDNSbXg4dkFacWMzYnFaaDRPMVJr?=
+ =?utf-8?B?Uk91YkhmTWlkOXBSUGpudGppbGtXY1U5N3VQZ3ZIcHlBNEZmZE9jWmlqNG9w?=
+ =?utf-8?B?RThxelFpWWNVaVkrMFc1L1pXK2JXTlpYYThsQ1orcHNwUitiSSszZlhveTUv?=
+ =?utf-8?B?Y2h4WEhCUTF0R2sxN2ptdmQ4clg1QTl2Q0h0MFh4VG84YldSWXFyenRnS04w?=
+ =?utf-8?B?bkR6Q2tGTHFvS1MyWVJvdzFyZ0JyejVCMlhPcVpzd0ZOK1oxOHp2Y2l6cUhm?=
+ =?utf-8?B?cFlWTXBjU09GOG9FMnJkemFNKytjSDFlZFNzTk8yRUlaUjBGaVZELytzc1ha?=
+ =?utf-8?B?ajN2ajZ3eitBMzgvSzZoVzFiZ1dVUVlKNXFUMHE2WGdIUXh0dlRuaVVNRFM0?=
+ =?utf-8?B?N3N4QTExNVdnMW4zaE9mSTA4amFxMGUzZ0pVWXJXSFN0aTNUYlRwcm1IQlNz?=
+ =?utf-8?B?MFFjaHRTbEM1UkVTeVF6L29vOHg5Yy9iVCt1TUpUU0RFSXE3eGp3WGhxaCtm?=
+ =?utf-8?B?T1FHRVNYc2h0MjZaNjd3MlcvMzI4Zk04dkpraFdmQU55eG5waXUwY01YS3Fq?=
+ =?utf-8?B?VVRwL2dnNmJOU2Q4K1VwQlJldVR3cklJb2RvUCtzcEhUdHc2MTlLcnVMT2lR?=
+ =?utf-8?B?Zk9na2JSUDZENlVyTHhwTnNhNlhTWEV2dkpoOUVvU2FhaGllT01MMmlhT2py?=
+ =?utf-8?B?OEZWMlNLenN2Y3FrdmpydEt2VHBEUXF3TXUyam5zTlZTTk40U2RaY0pTVURu?=
+ =?utf-8?B?NzY1S3U0NUJIN0QwNFZhTlVBMU5DcWZCYlpGZ2Nkck8yMEdBKzJzNUQ4MjNL?=
+ =?utf-8?B?OXVkSzVpSjN5cDB3TGV0aVFpeTlXTFBhK3hsaTZQSldFQTJJbnR2dGU5UDFj?=
+ =?utf-8?B?RW05WFRpUlZPNkEzWkFZcGFGR2Z4cnE4ZG9FejVZL0tTUXgwWTB1cGJRT2ZE?=
+ =?utf-8?B?b3hOZFozK0xTY1RXUlBCVXhnYm0vT212Wm5FRWdCaENGTHA1NXFGN3J4NkUx?=
+ =?utf-8?B?VmsyakV2eWhNQ1Y5L1crL1p5RFVMYWRhMmxHcVBwTWE1ZmlURGQ2VmE0UTBq?=
+ =?utf-8?B?T1dnK2hWZDV0SVZKdnJlVkJyVTNheUdJaXNaYU9ta1d1UnZHb3loVDBlbEJP?=
+ =?utf-8?B?d0lXZ0NiVVNjUE9FUjIzVUtaKzFUV1MvbGlOZ3FReXkzcXpqWlp2S2Z1S3NY?=
+ =?utf-8?B?em9iSUo3M3N1M1NYSko1VWEzbVhQVkwrakZKemtLaDRaSzRCOUdBa3hXaGRh?=
+ =?utf-8?B?VjlCUityQlZXUUl4RnE2dUtDVEx6ODRzVDV1S3BLdFhpT3U0TUJjeml4WHRX?=
+ =?utf-8?B?MXpOOXZKMm8xaEVOREJ2U29RYTgyN25iOUNoOFpRSzJPS0VBeHpGOFpHKzVy?=
+ =?utf-8?Q?gLkU0CkK1s5e3vdpJw=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230034)(366010)(376008)(1800799018);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?T2NyVW1OaG9Ha05jNk96MlFHYlpyak4vc3lTZFVuWnFiTjJ3dXNlYmoyakJx?=
+ =?utf-8?B?WnJCU3h3L0ZSYkVTY2ZLYmdaTDVHWHlWTUhkQjR6UWNWNytUcy91S1VXcHNV?=
+ =?utf-8?B?c2FjRXJWTC9VMktBS1hCeUFiM3JMcHVCVUt4Tjd1YzBrN0JGMElyM2J1SWI0?=
+ =?utf-8?B?UjlsR0FEbmp6dUIrR1ZidXk0aXhwdGhsNjJ5V005eXNtZ0E4c0g5YWl2MFBC?=
+ =?utf-8?B?TGNEdWdibVM5b3J0VXZLaTdZTXhXTEJYbVg5cHpqMXB3M2RqN0c0ZitML1hQ?=
+ =?utf-8?B?UzhUYnFrSWRtSFc2MkdCWE9wNDNDK1lmTGVyUHZCME43YVdrdU5meitzRjJq?=
+ =?utf-8?B?ZG43ZHVhUlVOWlFJSXdHMDNhdkdnSUNUMmkvLy9ORHlnOWwzc2tjaXpKRjVa?=
+ =?utf-8?B?YTN1WVhiWGl2alNYZDROekEwTTYrYkd0THZHKzcyaldsZE1KQ2dMK295akx2?=
+ =?utf-8?B?MDJHelNTVWd5SnRpbldhTW5tYVQ2KzVEZGNZNXVnMFd5SFMvT3ZLL0hpYnY2?=
+ =?utf-8?B?MHQrTFRSaGx3QjQ4NjBpbFdaM2ZHcWNMeVJWYUNaN0c3KzR3ZGkvckVMVDJS?=
+ =?utf-8?B?bXFXSGJ6YWlFVTZ2NDg5b0xmQjVhbkZrajhJRFZFN3JUdWtQMHFScEtJbENO?=
+ =?utf-8?B?aHFqc0dFbjhwNTlIK3ZKb2lSMVFkNi96bFJSbFA4MkRwVnI0cUtVZkJESGRP?=
+ =?utf-8?B?a1J1ZWM5ODROQlJpcTUwQTNKazdMUkpIcFNncUNaWFdhL21kek1IWVNBeWRR?=
+ =?utf-8?B?Y0xSZndOQmRUbnE5YUFobDVjY0hjWUFpQ0Q3VG9EZ1NkdkpheDJ3YU9mZUZ5?=
+ =?utf-8?B?M0lSanFJNUFTL2ZaUVJSdENoN1RVRkNZWld2N3NYdXJzN3lPVXAxcHoyMnFC?=
+ =?utf-8?B?NWtKb1hvTEVROEtDRUxJTER3eHFkcHExY0FUUVRzZ1l0cEwraEV5ZGgyQUVq?=
+ =?utf-8?B?N3dtMXdTdDMyTjZ2NGRwakVSMkNjSTkwZExrY0VHKzZYSzZEaGRvSkFXTW1M?=
+ =?utf-8?B?OEkzTS9tNXhndUQzVlpKWU5YRGlOZWRqUXdXNEppME5LNHN1VGEwdVZxTVBZ?=
+ =?utf-8?B?dW1nazNPMG8yMUlFaXZPMlZDUWIyTWhGNTh4MC9OSDE3OXpmNnV6WjU3Rld0?=
+ =?utf-8?B?ZVpqV2puTkVJSDN2c3BxOG96R2c2Zk1zckNYdWc0TGVRRER3eCsyYjZTQzBG?=
+ =?utf-8?B?alJYKzVNRmMrb2ZWN1pxaThQcXNvYllNZXVTUzBvR1lNWXJibnRCdlJ1RjN5?=
+ =?utf-8?B?VVVvUmptRk1keXNubFBzNS9heFZYTkJDT2pEMlptb29wUEQxTjBoUTVaWHZ3?=
+ =?utf-8?B?Z0VkZHRQbjhXZVJmeWc0cDd5OUdlalBqYVhmU29hUVBZOXg2bis4OVpoK1dU?=
+ =?utf-8?B?Mm1vTGwyVVUyaXgvL00rVUlzd2lHZm90YVhtNXl5MUx6dFdNcW1qbks3dm9H?=
+ =?utf-8?B?ZVVxaTVPdkx3bVNyMTZGU1BTaTZ2dWRRdERvTURIbXJwTmRpbnZydzFuT2I1?=
+ =?utf-8?B?bU1tdS9WNTIwTnNEWTJGbEYxZTJjc3FyM2x0SXc5U01veVJYSjlzYUhuZVc0?=
+ =?utf-8?B?blRqUXdZZUFGK2lyUEJwR0dPd2FoY3cvMHVNMWIrSEZ0K1JGdk5Uc01rZUQx?=
+ =?utf-8?B?TGR5SXFRT0JGR0g0UG5rc0IveDJGV3lEcVNsQm51WEpRZ0xyR0dOdWliVEJC?=
+ =?utf-8?B?bEtsZUNMQmNoWjhvaDZtWTBKSXpOYmovWGtCUStsOXVtUm9TdkZBZDNvOVdR?=
+ =?utf-8?B?a0VoVjdCdGprbzZBR1ppcjlXdnZYemsrZlU3bm5QMW9NdWFQSUNISjNWL25l?=
+ =?utf-8?B?b2ozRFJsZXhnUTZxajNnV2xURGhtMVpDTEh4dVh4Qm1SYjg4bTJRVHpPcXhE?=
+ =?utf-8?B?SjZXODRjNnBKbVByQmYyNnhFTk1vMjZXMkRQbTdnVEpmcmNQVEJqUFBqQzNK?=
+ =?utf-8?B?b3Fkc0s3QnhRelNBaDRiR3M0bDRocGs4RjdIRlVjcC9mWXBVYnRRSUozV3RK?=
+ =?utf-8?B?MlZVMTRoQjIzNndUOGtUWlhFY2xrWHJlOENTT1lWV1VmQWVFRTZ4aEZNTGdN?=
+ =?utf-8?B?SHVoUkNVWkRCV0hid3luWEsyUVhoOENvZmQ5b2J6aFZiYjNia0V6Q2hKUUk0?=
+ =?utf-8?B?VmVJN2NhYVZ4NWtGRmpteEpoTXZBTVZXdWlVT3p2OEt2bFM3Y2k1MmpVakpy?=
+ =?utf-8?B?M0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0840c12-76df-4e0f-3318-08dc8b30a89d
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2024 22:40:28.4391
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NTLe7b+mRKJGmAcMTz6ZOAfFoFCpxHnTypR7+GqXSWh4bv8jO2jHbBVghW/WyhsD5mILbx4Ndy7dgqlamVYsOLcRSxA7c630+o6yxcDvV9I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5860
+X-OriginatorOrg: intel.com
 
-> The DMA Channels provide a path to/from CPSW's Host Port for each Host.
+
+
+On 6/12/2024 6:03 AM, Alexander Lobakin wrote:
+> From: Jacob Keller <jacob.e.keller@intel.com>
+> Date: Tue, 28 May 2024 17:43:34 -0700
 > 
-> Please refer to the following illustration corresponding to the data
-> movement from each of the Hosts to the CPSW's Host Port via the ALE and
-> then out of the MAC Ports:
+>>
+>>
+>> On 5/28/2024 6:48 AM, Alexander Lobakin wrote:
+>>> Now that the queue and queue vector structures are separated and laid
+>>> out optimally, group the fields as read-mostly, read-write, and cold
+>>> cachelines and add size assertions to make sure new features won't push
+>>> something out of its place and provoke perf regression.
+>>
+>>
+>>
+>>> Despite looking innocent, this gives up to 2% of perf bump on Rx.
+>>>
+>>
+>> Could you explain this a bit more for my education? This patch does
+>> clearly change the layout from what it was before this patch, but the
+>> commit message here claims it was already laid out optimally? I guess
+>> that wasn't 100% true? Or do these group field macros also provide
+>> further hints to the compiler about read_mostly or cold, etc?
 > 
->            -------      ---------            ---------   CONTROL-PATH
->            |Linux|      |AUTOSAR|            | EthFW | -------------
->            -------      ---------            ---------             |
->             |   |         |   |               |    |               |
-> DATA       TX   RX       TX   RX              TX   RX              |
-> PATH =>     |   |         |   |               |    |               |
-> (DMA)       |   |         |   |               |    |               |
-> 	    |   |         |   |               |    |               |
-> 	    \   \         \   \               /    /               |
-> 	     \   \         \   \             /    /                |
-> 	      \   \         \   \           /    /                 |
-> 	       \   \         \   \         /    /                  |
-> 	        \   \         \   \       /    /                   |
->                 ===============================                    |
->                ||        CPSW HOST PORT       ||                   V
->                 ===============================             -----------
-> 			     	|                           |CPSW     |
-> 			     TX + RX                        |CONTROL  |
-> 			     	|                           |REGISTERS|
-> 			     	|                           -----------
-> 			     	|
->                        ===================
-> 		      ||ALE & SWITCH CORE||
->                        ===================
->                         /  |      |    \
-> 		       /   |      |     \
-> 		      /    |      |      \
-> 		    TX+RX  |       \      -------
-> 		    /      |        \            \
-> 		   /     TX+RX     TX+RX        TX+RX
->                   /        |          \            \
->         ==========    ==========    ==========    ==========
->        |MAC Port 1|  |MAC Port 2|  |MAC Port 3|  |MAC Port 4|
->         ==========    ==========    ==========    ==========
+> Queue structure split placed fields grouped more optimally, but didn't
+> place ro/rw/cold into separate cachelines. This commit performs the
+> separation via libeth_cacheline_group(). Doing that in one commit didn't
+> look atomically, especially given that the queue split is already big
+> enough.
+> 
 
+Makes sense, thanks for the clarification!
 
-So, in summary, you have one host port, and on top of that a number of
-virtual ports. Because of limitations in the ALE, those virtual ports
-don't work in the same way as real ports, replication is not possible,
-nor learning for individual virtual ports. The typical 1990 solution
-to that would be to flood packets to all hosts, and let them filter
-out the packets they are not interested in. 1990 Ethernet was a shared
-medium, you expect to see packets for other hosts. But the hardware
-also cannot do that.
+>>
+>>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>>> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+>>> ---
+>>
+>> Having the compiler assert some of this so that we can more easily spot
+>> regressions in the layout is a big benefit.
+> 
+> [...]
+> 
+>>> @@ -504,59 +505,70 @@ struct idpf_intr_reg {
+>>>  
+>>>  /**
+>>>   * struct idpf_q_vector
+>>> + * @read_mostly: CL group with rarely written hot fields
+>>
+>> I wonder if there is a good way to format the doc here since we almost
+>> want read_mostly to be some sort of header making it clear which fields
+>> belong to it? I don't know how we'd achieve that with current kdoc though.
+> 
+> Since commit [0], we need to explicitly describe struct groups in kdocs.
+> @read_mostly and friends are struct groups themselves and in the first
+> patch, where I add these macros, I also add them to the kdoc script, so
+> that it treats them as struct groups, thus they also need to be described.
+> Given that one may use libeth_cacheline_group() to declare some custom
+> groups, like
+> 
+> 	libeth_cacheline_group(my_cl,
+> 		fields
+> 	);
+> 
+> it makes sense as I'd like to know what this @my_cl is about. Here I use
+> "default" CL names, so this kdocs looks like Ctrl-{C,V} explaining
+> obvious things :D
+> 
+> [0]
+> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=5f8e4007c10d
+> 
 
-So you have to program the classify to augment the ALE, and the
-classifier is the one that decides which virtual port a packet goes
-out. But the classifier does not perform learning. You need additional
-mechanisms to program that classifier.
+Yea, I am not asking about "don't document it" but wondering if the doc
+format itself could expand so that from the kdoc it is clear which
+fields belong to which group.
 
-> Host which has registered with that MAC Address "M". This is handled by
-> EthFw. EthFw doesn't/cannot snoop on all traffic on the Host Port, since
-> it doesn't lie in between the Host Port and the other Hosts. Rather, it
-> is quite similar to a Host itself since it also has dedicated TX/RX DMA
-> Channels to exchange traffic with CPSW.
+Anyways, I think the patch is fine as-is.
 
-I did not say snoop. I said trap. There is a difference. Snoop would
-be it sees the packet, as it going by. Trap means it actually gets
-passed the packet, and it needs to deal with it, decide the outgoing
-port.
-
-So i would trap all broadcast and multicast from the virtual ports to
-the EthFW. Let the EthFw deal with that traffic, perform learning, and
-programming the classifier, and flood it out user ports for broadcast,
-or unicast out specific ports for multicast where IGMP snooping
-indicates it should go.
-
-> Since that is not supported, all
-> Broadcast/Multicast traffic directed to the Host Port from the Switch Core
-> is by default placed on the RX DMA Flow corresponding to EthFw. EthFw then
-> creates copies of these in software and shares them with each Host via
-> Shared Memory for example.
-
-Why shared memory? EthFw needs to be able to direct packets out
-specific virtual ports otherwise it cannot do {R}STP, PTP, IGMP
-snooping etc. So it should just pass the packet back to the CPSW,
-which will hairpin the packet, hit the classifier, and then send it
-out the correct virtual port to the correct host.
-
-> Yes, the Shared Memory path is intended for the low-bandwidth
-> Broadcast/Multicast traffic from EthFw while the DMA path is dedicated
-> for high-bandwidth Unicast traffic. The current series implements the
-> DMA path while the other series you have referred to implements the
-> Shared Memory path. Both of them together enable the desired functionality.
-
-So i think we are agreed a new model is not needed. Linux is just a
-host connected to a managed switch. Linux has no roll in managing that
-switch, and has no idea about the ports of that switch. It is just an
-end system, running end system software.
-
-You need a 'MAC' driver in Linux, so Linux sees just a normal network
-interface. And it must see a single MAC driver, so if you really do
-need to use shared memory in parallel to DMA, you will need to combine
-that into one driver.
-
-     Andrew
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
