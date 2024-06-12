@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-103004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 644E2905EF7
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 01:10:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A2A6905EF6
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 01:10:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC110B22401
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 23:10:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E27B1F23AC9
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 23:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD67112C819;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C360A12CD8B;
 	Wed, 12 Jun 2024 23:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eRnCU4cj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iqh/t+tA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961A74597A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961EB12C544;
 	Wed, 12 Jun 2024 23:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718233844; cv=none; b=oPK/JwZaMt61ts4qVUrleCHs94aBG275MCvREMU52GYGz6VoagKPcOZODPzV8fFSNarB54fqQM9GeNEjcXAZ+nlOfGwVdF5pVhxbWW+2cRL0rY1ShmB6reMED/grUbfrv/ZIf1lm+Az96lBl5zmU7NUHZ0CL8y+X8gY7V9v/oJ4=
+	t=1718233844; cv=none; b=p2M8UsM0adA2NG+mhjsWoZdggDmQPKyMQC9PPyvGVHwugfQ7odYzOMd/UXNo6VgTiXATljkfLxFI9bAtTiB5LWM9bXtcuYWk5Z/dosRex5RM4sBLK5V9LHhDjw4JNWwGmN2UQW/A2A+90hbxFI/FIFF5uqoDjbtSb2iAs38bXD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718233844; c=relaxed/simple;
-	bh=7O9hS8SZ1m9W6Ge9OVT1ZjAtj4M7EvpT4X35ACqANtM=;
+	bh=qFB2jQOwUKWKzkcuGZ7mKae6/NHf2syqzBYm0kmw03E=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=el63i7MBa/jM4xqxEoX/bndPtGLa4aPHXCoKvfBMW+HL8sGhCvnpFYuPdMSmF3OQuuUCfiXZbY+i7jbXVIgjQJKC6vvayEaw4kej/jfXZMhebEuHMrXKs9AkmazMHKDS58PW+60nw0fzLdzMEbGihPpmBl9+//kbr9bmdKsAxro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eRnCU4cj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 35E22C4AF1C;
+	 In-Reply-To:To:Cc; b=qBVJcJVty4xvbGKVWI1w1RnkeJW4HsS4l0lkHTjqxxBYUvgyjDnVWHm+NQD9f8YoFQpH1rwjg4x7ypg1tGYanBkUAP7dzPQoIW49JyJ8CzRB7STfyvs4DH0hSEfmjl4G0tVnZUlbYmAbuur3UsdqIrONF8ASYdX/H1wY167RyrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iqh/t+tA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 23BBEC4AF49;
 	Wed, 12 Jun 2024 23:10:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718233844;
-	bh=7O9hS8SZ1m9W6Ge9OVT1ZjAtj4M7EvpT4X35ACqANtM=;
+	bh=qFB2jQOwUKWKzkcuGZ7mKae6/NHf2syqzBYm0kmw03E=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eRnCU4cjcN2eURWVIPVaZji/UPFo1ZkR4lh5zfitUWAjiYFr+gbGPPOL/bTGn5dO1
-	 VxGmTxiBzcAvz2Lwpvt0kGvf2ONpWibWkQ12prroX5YpqM3nMZ2iC2vHYX7GzEuu50
-	 +QG59xun/F3PFA1jkDYaaZ7OvdUX3kVp6hknKeh+ZSLes5O6FLDBl3o90Eto7vWZTr
-	 rxWDY2YSWE09AXcEc9fYMi58KzCBZq73QO+rkzP6yyoyWEv3ez5pNGOcMS00CTwYJn
-	 PIwh5Ivg5WpRiQZA01db0+T8OCyMsIeR/FV3c/anbhdQrOacCNahuRcqDsPb8OzsG2
-	 r4QCZr7nhLRZQ==
+	b=iqh/t+tA+sHxblVopC2SuDgfI/ZNHDjHh7HgK+MTRjybwBstzXZ35+kQmdLEK0rwj
+	 RBZFCWcQcvgSXSK38CEAPJ41tNIldQckI41NN7ZV+OPQxgcqVeFav6SItjxLHWAwqa
+	 IWORVSFOYWqbHLDY9pb8kSSzl4/eaIQWftapHOiE9cfrAIRdtat/oUzfFcyuSkKU9Z
+	 rB85GkesHIdh6mNftKahmF0wJQba9H61NVTbjzoo9VTztjdsAebDRHmBVnmx8ZNvhh
+	 HXVJCaQLm/A/e/glN8SGIVCAhDS2mWTupFqm87Dpg6MvYk18/bvckEsjhy770UChsQ
+	 GfhNMRUGbrjoQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1E28EC43619;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0AE19C43616;
 	Wed, 12 Jun 2024 23:10:44 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: xilinx: axienet: Use NL_SET_ERR_MSG instead
- of netdev_err
+Subject: Re: [PATCH] [net] ravb: RAVB should select PAGE_POOL
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171823384411.4751.4325990307048449401.git-patchwork-notify@kernel.org>
+ <171823384403.4751.5556280902526090414.git-patchwork-notify@kernel.org>
 Date: Wed, 12 Jun 2024 23:10:44 +0000
-References: <20240611154116.2643662-1-sean.anderson@linux.dev>
-In-Reply-To: <20240611154116.2643662-1-sean.anderson@linux.dev>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: radhey.shyam.pandey@amd.com, andrew@lunn.ch, netdev@vger.kernel.org,
- kuba@kernel.org, linux-kernel@vger.kernel.org, linux@armlinux.org.uk,
- michal.simek@amd.com, pabeni@redhat.com, edumazet@google.com,
- davem@davemloft.net, linux-arm-kernel@lists.infradead.org
+References: <fa61b464ae1aa7630e9024f091991937941d49f1.1718113630.git.geert+renesas@glider.be>
+In-Reply-To: <fa61b464ae1aa7630e9024f091991937941d49f1.1718113630.git.geert+renesas@glider.be>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: paul.barker.ct@bp.renesas.com, s.shtylyov@omp.ru, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 11 Jun 2024 11:41:16 -0400 you wrote:
-> This error message can be triggered by userspace. Use NL_SET_ERR_MSG so
-> the message is returned to the user and to avoid polluting the kernel
-> logs. Additionally, change the return value from EFAULT to EBUSY to
-> better reflect the error (which has nothing to do with addressing).
+On Tue, 11 Jun 2024 15:48:48 +0200 you wrote:
+> If CONFIG_PAGE_POOL is not enabled:
 > 
-> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+>     aarch64-linux-gnu-ld: Unexpected GOT/PLT entries detected!
+>     aarch64-linux-gnu-ld: Unexpected run-time procedure linkages detected!
+>     aarch64-linux-gnu-ld: drivers/net/ethernet/renesas/ravb_main.o: in function `ravb_rx_ring_refill':
+>     ravb_main.c:(.text+0x8d8): undefined reference to `page_pool_alloc_pages'
+>     aarch64-linux-gnu-ld: ravb_main.c:(.text+0x944): undefined reference to `page_pool_alloc_frag'
+>     aarch64-linux-gnu-ld: drivers/net/ethernet/renesas/ravb_main.o: in function `ravb_ring_init':
+>     ravb_main.c:(.text+0x1d4c): undefined reference to `page_pool_create'
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] net: xilinx: axienet: Use NL_SET_ERR_MSG instead of netdev_err
-    https://git.kernel.org/netdev/net-next/c/32b06603f879
+  - [net] ravb: RAVB should select PAGE_POOL
+    https://git.kernel.org/netdev/net-next/c/721478fe6a5c
 
 You are awesome, thank you!
 -- 
