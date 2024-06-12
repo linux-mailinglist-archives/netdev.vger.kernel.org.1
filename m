@@ -1,122 +1,102 @@
-Return-Path: <netdev+bounces-103002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-103003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C13C6905ED9
-	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 00:54:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B21F905EE6
+	for <lists+netdev@lfdr.de>; Thu, 13 Jun 2024 01:04:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 759DD1F2242A
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 22:54:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42F121C2147C
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 23:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F041112BEBB;
-	Wed, 12 Jun 2024 22:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A588312C80F;
+	Wed, 12 Jun 2024 23:04:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bOTuQkaY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ajo5INMF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDE628385
-	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 22:53:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4617FA93B;
+	Wed, 12 Jun 2024 23:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718232818; cv=none; b=OGXAdGIONpxBMsRZde63a/W/ew1QPgBQLZ1rwPGviSXiyZq2Oh+f5qOqqcFSDFU5rwEGWozNkPQaRW4BD/9m/GBQg3RHr2qQ3i+B7GoOdJqqmmINP3i0aHbinJZxmqNvA6BP57ozDNU22upY3noHZIuF32h2zQks3u+3zO2r6zs=
+	t=1718233460; cv=none; b=O0Lp+3MhnHfS4pZvAgtd2RW+nnErWNDxRsLGjn0+UTJyHlOfMD65FT2fwnlQRhxfuIDx7prdW/Mv+/DodgX1QmWuDkAFwf1E4RIySenQIt+jqNJ4FPNpK0hKTYxXaj29JYYkf35QoP8MV7y/zaC0U9WoSRJWgA6NV44mf6kCJ0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718232818; c=relaxed/simple;
-	bh=pszCrOuQo1Fik91J9ix5S0BpO+yhZF7qRmzWg7dMzpU=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=syadRMU3pj+1OEKvJdg4QCrek455vcqRxUFV43Fy0o9rjVmj+K/QbXrqNa3GzHrCTqh/xV6dPuQiMdhERfdE/rdPlR+s1pC9NvJUaOKa1kaDD99jY+6DuXA4j/3UZmM155PhbQgiy4t2dgONku3bS7gEMhjtusE/OpUcsJB2tQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bOTuQkaY; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6ea5a4fd129so312706a12.3
-        for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 15:53:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718232816; x=1718837616; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pfjN7rYQ+IFW4/NQWBv0A+y8SOtSIoXaKYSj1kXpulY=;
-        b=bOTuQkaY2QRihUl0v79tmY45D1nhidz11ZEMao1OalpmARBVKrQI2JQApDrocHSU0K
-         IeB4PjpdWMjbAS3yLq9U0CXMdTFau+qs56dRO75CpkXVzQX5NB+Ke456b2+FhlsjuVcI
-         QzrWySLuAmbtLdGQyLu9AYeWHTuSUv+hR27CSf8jr1Dx5Yzd/dRXH4zk/Lh0Jkbzqewb
-         SfH9v5jtwt7bjK2JFc6PL8YYXqQXU5UoA2xxQ6vKl+SL0HCEcwAFm9h8aFCrYjqQNxNm
-         52L3azLqmeXBJwl2NThXHCm1NV/41deTCQYj61YnuSyZ6vWaxkUNUz3DRlaE2kqfe1+U
-         zgxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718232816; x=1718837616;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pfjN7rYQ+IFW4/NQWBv0A+y8SOtSIoXaKYSj1kXpulY=;
-        b=JpKmP3l7G50oBXnT3JMYyXajtfCYvTdFMgSrz9LiUYdPoCvBgWfI99XsA3/CWcAbYG
-         bf3F6vNksrJTnvhP3RxsggnRwVDgAM1BqsbELJDACr0xy9SmsY143ShNrZSOAmuJGdRv
-         g+Bhy8DPIZzlwLUwPA6THN57RDFU4yjs/46YjrnzylxaET5aWFdgkuI4EuQbt8zYxO2L
-         yDldRqDDFWM2uZTJCeG/sPTeD4vPYR88iPozcUFwoBgOJel5pTbfJjahmkFQ+nEbAtBa
-         rXh6jSmTESAsVE2H/hkaUetQIlqHTCDd9ow5ve+nErU4MxKnWkvdE0DQHgiuDnxpB4mN
-         4iVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVgR3fI7Es9kEV9h/kcs0+mSsuIeKkHRfxfTIBL9R0xiNKR0qejJHqMrAHUNnTMH52UbrJ7+zQyWpDnQAUnVxcVHt1Tkthv
-X-Gm-Message-State: AOJu0YznG2Ggd86PlsihQOZXb5N9KMwHkHDVLz4RHrzaEnQ9prRxszQl
-	7sY3GGrDs17XK/RuZdhshpBIdqVf5vif0snhVD4stwzk7Qz3NcVxI5yce6+aMNIbHw==
-X-Google-Smtp-Source: AGHT+IF02DGIaR+GIFi1y2P81ozs1UNwFUk+gYrRQb7B31ZSsg4ekHdJy8EPVLDXr5ZJwQ8ozyOCHDE=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a63:7d51:0:b0:6f2:e267:443b with SMTP id
- 41be03b00d2f7-6fae1059604mr6893a12.1.1718232816470; Wed, 12 Jun 2024 15:53:36
- -0700 (PDT)
-Date: Wed, 12 Jun 2024 15:53:29 -0700
+	s=arc-20240116; t=1718233460; c=relaxed/simple;
+	bh=r4XcvG9Zjydzkd1AmkZAP2xPiok2w/W0tDdIGWsKLlE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dIeR1GSy8Hdu2O2r9D2Qkh/7U02FoBliN9vHB8NdfTCpXVcWbPD3xDXIcj59XWqHJ3YOZF4wG5M6au2U7Sz7tZsIwjre9rENy8ytC+PzmNln1iQoCO7UgfkQnseVFajLZIMluhZDy7b/hf622ykfjKlK0dngkWPeCA4AmuDS6As=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ajo5INMF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C77F8C116B1;
+	Wed, 12 Jun 2024 23:04:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718233459;
+	bh=r4XcvG9Zjydzkd1AmkZAP2xPiok2w/W0tDdIGWsKLlE=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=ajo5INMFOIdUK8bTKJSOMTORqSBUVoTQMoTueScDlw6P7fEKN6L6KudGm8A/f9DV2
+	 vac6aDF6zFHvqVhLnecDeXpTWqKjsgyaGlyYA4jn+sYSI8iPlTZA780P5FZZ2QLokd
+	 TW2/efoa0ILfQDom5zYPZYttH0Zay//A6W3sEm47ScK9OEZvoBo/K4BvF3RIs/Le4w
+	 ckCQrAXr3PM4+Pd067rXKPEm+1PxdYqAXhlaQm4dv5OxvWFhB3hvQnXvNmk7dvAr7L
+	 /vanj8BKtPfnTrKefLFEyaIqF22+2EqJuMoTh97FTwq7ijzvQEu32ydoZbQcPLyXRl
+	 tC6o2QGNB+peQ==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 6C26FCE0DEA; Wed, 12 Jun 2024 16:04:19 -0700 (PDT)
+Date: Wed, 12 Jun 2024 16:04:19 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	Vlastimil Babka <vbabka@suse.cz>
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <fc3fb837-6f3c-4955-899d-1be002d17d70@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
+ <20240612143305.451abf58@kernel.org>
+ <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
+ <7e58e73d-4173-49fe-8f05-38a3699bc2c1@kernel.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
-Message-ID: <20240612225334.41869-1-sdf@google.com>
-Subject: [PATCH bpf-next] MAINTAINERS: mailmap: Update Stanislav's email address
-From: Stanislav Fomichev <sdf@google.com>
-To: bpf@vger.kernel.org, netdev@vger.kernel.org
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	martin.lau@linux.dev, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7e58e73d-4173-49fe-8f05-38a3699bc2c1@kernel.dk>
 
-Moving to personal address for upstream work.
+On Wed, Jun 12, 2024 at 04:52:57PM -0600, Jens Axboe wrote:
+> On 6/12/24 4:37 PM, Paul E. McKenney wrote:
+> > [PATCH 09/14] block: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+> > 	I don't see a kmem_cache_destroy(), but then again, I also don't
+> > 	see the kmem_cache_create().  Unless someone can see what I am
+> > 	not seeing, let's wait.
+> 
+> It's in that same file:
+> 
+> blk_ioc_init()
+> 
+> the cache itself never goes away, as the ioc code is not unloadable. So
+> I think the change there should be fine.
 
-Signed-off-by: Stanislav Fomichev <sdf@google.com>
----
- .mailmap    | 1 +
- MAINTAINERS | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+Thank you, Jens!  (And to Jakub for motivating me to go look.)
 
-diff --git a/.mailmap b/.mailmap
-index efd9fa867a8e..909ed91003b5 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -605,6 +605,7 @@ Simon Kelley <simon@thekelleys.org.uk>
- Sricharan Ramabadhran <quic_srichara@quicinc.com> <sricharan@codeaurora.or=
-g>
- Srinivas Ramana <quic_sramana@quicinc.com> <sramana@codeaurora.org>
- Sriram R <quic_srirrama@quicinc.com> <srirrama@codeaurora.org>
-+Stanislav Fomichev <sdf@fomichev.me> <sdf@google.com>
- Stefan Wahren <wahrenst@gmx.net> <stefan.wahren@i2se.com>
- St=C3=A9phane Witzmann <stephane.witzmann@ubpmes.univ-bpclermont.fr>
- Stephen Hemminger <stephen@networkplumber.org> <shemminger@linux-foundatio=
-n.org>
-diff --git a/MAINTAINERS b/MAINTAINERS
-index cd3277a98cfe..cc38da3510ca 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3980,7 +3980,7 @@ R:	Song Liu <song@kernel.org>
- R:	Yonghong Song <yonghong.song@linux.dev>
- R:	John Fastabend <john.fastabend@gmail.com>
- R:	KP Singh <kpsingh@kernel.org>
--R:	Stanislav Fomichev <sdf@google.com>
-+R:	Stanislav Fomichev <sdf@fomichev.me>
- R:	Hao Luo <haoluo@google.com>
- R:	Jiri Olsa <jolsa@kernel.org>
- L:	bpf@vger.kernel.org
---=20
-2.45.2.505.gda0bf45e8d-goog
+So to update the scorecared, 05/14, 09/14, 11/14 and 12/14 are OK and
+can go ahead.
 
+							Thanx, Paul
 
