@@ -1,226 +1,123 @@
-Return-Path: <netdev+bounces-102846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6D8A905097
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 12:43:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ECEA90510A
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 13:04:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EE12B21591
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 10:43:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A036EB21222
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 11:04:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B01D16EC1B;
-	Wed, 12 Jun 2024 10:42:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBFDF16F0D1;
+	Wed, 12 Jun 2024 11:04:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="IDpjaBA8";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="rkHwJMlc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UszO4po+"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549F916EC0E;
-	Wed, 12 Jun 2024 10:42:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0909016F0F0
+	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 11:04:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718188978; cv=none; b=sKsOo4JXrJjJnJiRXunlqIlY3+rRrx8Hchhu4qtD6WTAfyZ5N/muCU8XTrWQvZ8766r7XJeZ38nOXlVNUEf3UDN0I6oNWM1zpBfx3kL/e4TNrfPg86qei+6FlalA03DFOfJO1xyQwhUX2lPTNXoo81I9ZR80vNFIrcjhx1ebfdo=
+	t=1718190248; cv=none; b=og0AwjBm3tQfu4VJAkdhWtxErqk2THL3p+gOUsr1LvZGjhqNYVfYaKvXxY9K5hSW9ni2GFgIpMcW8xJZlXTPjduHs9ZpBYtQjS+vck9xdMESeBK5KVMQTofCTu6d5EG8jbzpbeCxCFjFDzVGvqF0WAsnQ5dbV/nLXXd6NQqpIPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718188978; c=relaxed/simple;
-	bh=x0irVHea9xJBnbsbAv4Kh560yicrGm3RLgdBbtzUyl0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dX7g4PoJLYy6zgcGsSS4bz6fYm/0vyg1hTi8I7BmRgSJDrKHtjCyzCEI2UVSWaGqRx1QkS+bMe2vA/qZJtxh/kmJQE42cXl0IUk+V2j+Qkz5OiX04aBW+Aq0Hu2swLLgkPJOQgliN91DRAst2gmsIw5KI5Zp9IzEHX4v7DOchKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=IDpjaBA8; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=rkHwJMlc; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 12 Jun 2024 12:42:51 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1718188973;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=btdOPFQFwTkICHYO1/SoS8iTZ/W/Xt2/b1M+VRqmDTM=;
-	b=IDpjaBA81cwQHdCuUa6AsYhHFMJfKS66w1BzngfRChyyzRsuf1C7gUDC1H4T64izBar7Vo
-	3qpLLECGiwGfco+3yOh7lwhloytYJvZ8YjzX26zWCTLsOD6DV4b1ktoIdy4BAPZDM6ZMNM
-	UhJTB26hppPQ3ypcHcSNhwZAwBW0Gj5H4ZNQ66ZLC4MVpG9kwGcE3WL/JgfZ4nkr6B20tj
-	M1J31nbbvSBhD1arW6+O4bAiDmKgIq7durXJ20MUONT9VIkkUWcraDAGUUri2HHn8mr4Mj
-	t27i6+WPxHho/IviSahXeBdnBdrZ2XFMihFVD/BDWbalfCgP91kmCl20RFOv4w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1718188973;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=btdOPFQFwTkICHYO1/SoS8iTZ/W/Xt2/b1M+VRqmDTM=;
-	b=rkHwJMlcGcVjifPlUIsNT1RgwpVmOs1VR/JmIAvZ8a0kz1iIbmBjQ6EguIfz7TD28Ug6DA
-	4BXb03RjqhRAsQAA==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Daniel Bristot de Oliveira <bristot@kernel.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Yonghong Song <yonghong.song@linux.dev>, bpf@vger.kernel.org
-Subject: Re: [PATCH v5 net-next 14/15] net: Reference bpf_redirect_info via
- task_struct on PREEMPT_RT.
-Message-ID: <20240612104251.DDjnpfnq@linutronix.de>
-References: <20240607070427.1379327-1-bigeasy@linutronix.de>
- <20240607070427.1379327-15-bigeasy@linutronix.de>
- <045e3716-3c3a-4238-b38a-3616c8974e2c@kernel.org>
- <20240610165014.uWp_yZuW@linutronix.de>
- <18328cc2-c135-4b69-8c5f-cd45998e970f@kernel.org>
- <20240611083918.fJTJJtBu@linutronix.de>
+	s=arc-20240116; t=1718190248; c=relaxed/simple;
+	bh=pw+RJOP5tBxwzihRkSI6e94yGizrIsoHviIc8xOIVv8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HZGbIbdy44LjJpjs2k41UNebld1mJAmOhLU/24dNinRBbV9DCDsc89lqUkA8F1Y/wHqmTI9ELgJ/qgPCBxt4wMzApZfTQbgtJoGllMfmlxNdzvJTuzxjfIHZuAFtbEvFUQgGt0dOtCL+2kZM73QpwFajPM8yamikgKKpDApFE3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UszO4po+; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718190246; x=1749726246;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=pw+RJOP5tBxwzihRkSI6e94yGizrIsoHviIc8xOIVv8=;
+  b=UszO4po+mmM0972Ekn3K0Ajmegl7GtKbAIWW8vLzvID0u6S+cwhR53+m
+   RFfC1CMv1O7kgnk3tSL2/9AB+iJbYj2SHB7RpBK/4gJLoZjmFdalx/+jB
+   ttjU0NyBNqfzZbx6iqTjmhd0w356J2CkDtRyC6YRmACJxCHCL2DletKfZ
+   BeDt84hpCXzr4susTj1MrKbuZY0nti92IJeiPWYnxKwguYKAr8HRj6Zxg
+   Yj9A9Qy4hBA/zxZ/aiH5Vvt+ICbJtJ3KGX+aJgOG7uf2q2vJPAZN5lQkK
+   bljQiQNDpV2szjKS9XbB3F5alOzIx4wkPBVxXy/T71GLqkP8wTXKDJkNM
+   w==;
+X-CSE-ConnectionGUID: jGtjltniTQyCCa0oYy4h+w==
+X-CSE-MsgGUID: litA2gQOTky7Eh7ClnQBSA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11100"; a="37467999"
+X-IronPort-AV: E=Sophos;i="6.08,233,1712646000"; 
+   d="scan'208";a="37467999"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 04:04:05 -0700
+X-CSE-ConnectionGUID: YhHQvWt6T5yOp7WqOVD85A==
+X-CSE-MsgGUID: yOaMtA6vRryqRzSsyA938A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,233,1712646000"; 
+   d="scan'208";a="44151451"
+Received: from unknown (HELO amlin-019-225.igk.intel.com) ([10.102.19.225])
+  by fmviesa003.fm.intel.com with ESMTP; 12 Jun 2024 04:04:04 -0700
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org,
+	Kelvin Kang <kelvin.kang@intel.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH iwl-net v3] i40e: fix hot issue NVM content is corrupted after nvmupdate
+Date: Wed, 12 Jun 2024 13:04:02 +0200
+Message-Id: <20240612110402.3356700-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240611083918.fJTJJtBu@linutronix.de>
+Content-Transfer-Encoding: 8bit
 
-On 2024-06-11 10:39:20 [+0200], To Jesper Dangaard Brouer wrote:
-> On 2024-06-11 09:55:11 [+0200], Jesper Dangaard Brouer wrote:
-> > >   struct bpf_net_context {
-> > >   	struct bpf_redirect_info ri;
-> > >   	struct list_head cpu_map_flush_list;
-> > >   	struct list_head dev_map_flush_list;
-> > >   	struct list_head xskmap_map_flush_list;
-> > > +	unsigned int flags;
-> > 
-> > Why have yet another flags variable, when we already have two flags in
-> > bpf_redirect_info ?
-> 
-> Ah you want to fold this into ri member including the status for the
-> lists? Could try. It is splitted in order to delay the initialisation of
-> the lists, too. We would need to be careful to not overwrite the
-> flags if `ri' is initialized after the lists. That would be the case
-> with CONFIG_DEBUG_NET=y and not doing redirect (the empty list check
-> initializes that).
+The bug affects users only at the time when they try to update NVM, and
+only F/W versions that generate errors while nvmupdate. For example X710DA2
+with 0x8000ECB7 F/W is affected, but there are probably more...
 
-What about this:
+After 230f3d53a547 patch, which should only replace F/W specific error codes
+with Linux kernel generic, all EIO errors started to be converted into EAGAIN
+which leads nvmupdate to retry until it timeouts and sometimes fails after
+more than 20 minutes in the middle of NVM update, so NVM becomes corrupted.
 
------->8----------
+Remove wrong EIO to EGAIN conversion and pass all errors as is.
 
-diff --git a/include/linux/filter.h b/include/linux/filter.h
-index d2b4260d9d0be..c0349522de8fb 100644
---- a/include/linux/filter.h
-+++ b/include/linux/filter.h
-@@ -733,15 +733,22 @@ struct bpf_nh_params {
+Fixes: 230f3d53a547 ("i40e: remove i40e_status")
+Co-developed-by: Kelvin Kang <kelvin.kang@intel.com>
+Signed-off-by: Kelvin Kang <kelvin.kang@intel.com>
+Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+---
+reproduction:
+./nvmupdate64
+
+v2->v3 commit messege typos
+v1->v2 commit message update
+---
+ drivers/net/ethernet/intel/i40e/i40e_adminq.h | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.h b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
+index ee86d2c..55b5bb8 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_adminq.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
+@@ -109,10 +109,6 @@ static inline int i40e_aq_rc_to_posix(int aq_ret, int aq_rc)
+ 		-EFBIG,      /* I40E_AQ_RC_EFBIG */
  	};
- };
  
-+/* flags for bpf_redirect_info kern_flags */
-+#define BPF_RI_F_RF_NO_DIRECT	BIT(0)	/* no napi_direct on return_frame */
-+#define BPF_RI_F_RI_INIT	BIT(1)
-+#define BPF_RI_F_CPU_MAP_INIT	BIT(2)
-+#define BPF_RI_F_DEV_MAP_INIT	BIT(3)
-+#define BPF_RI_F_XSK_MAP_INIT	BIT(4)
-+
- struct bpf_redirect_info {
- 	u64 tgt_index;
- 	void *tgt_value;
- 	struct bpf_map *map;
- 	u32 flags;
--	u32 kern_flags;
- 	u32 map_id;
- 	enum bpf_map_type map_type;
- 	struct bpf_nh_params nh;
-+	u32 kern_flags;
- };
- 
- struct bpf_net_context {
-@@ -757,14 +764,7 @@ static inline struct bpf_net_context *bpf_net_ctx_set(struct bpf_net_context *bp
- 
- 	if (tsk->bpf_net_context != NULL)
- 		return NULL;
--	memset(&bpf_net_ctx->ri, 0, sizeof(bpf_net_ctx->ri));
+-	/* aq_rc is invalid if AQ timed out */
+-	if (aq_ret == -EIO)
+-		return -EAGAIN;
 -
--	if (IS_ENABLED(CONFIG_BPF_SYSCALL)) {
--		INIT_LIST_HEAD(&bpf_net_ctx->cpu_map_flush_list);
--		INIT_LIST_HEAD(&bpf_net_ctx->dev_map_flush_list);
--	}
--	if (IS_ENABLED(CONFIG_XDP_SOCKETS))
--		INIT_LIST_HEAD(&bpf_net_ctx->xskmap_map_flush_list);
-+	bpf_net_ctx->ri.kern_flags = 0;
+ 	if (!((u32)aq_rc < (sizeof(aq_to_posix) / sizeof((aq_to_posix)[0]))))
+ 		return -ERANGE;
  
- 	tsk->bpf_net_context = bpf_net_ctx;
- 	return bpf_net_ctx;
-@@ -785,6 +785,11 @@ static inline struct bpf_redirect_info *bpf_net_ctx_get_ri(void)
- {
- 	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
- 
-+	if (!(bpf_net_ctx->ri.kern_flags & BPF_RI_F_RI_INIT)) {
-+		memset(&bpf_net_ctx->ri, 0, offsetof(struct bpf_net_context, ri.nh));
-+		bpf_net_ctx->ri.kern_flags |= BPF_RI_F_RI_INIT;
-+	}
-+
- 	return &bpf_net_ctx->ri;
- }
- 
-@@ -792,6 +797,11 @@ static inline struct list_head *bpf_net_ctx_get_cpu_map_flush_list(void)
- {
- 	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
- 
-+	if (!(bpf_net_ctx->ri.kern_flags & BPF_RI_F_CPU_MAP_INIT)) {
-+		INIT_LIST_HEAD(&bpf_net_ctx->cpu_map_flush_list);
-+		bpf_net_ctx->ri.kern_flags |= BPF_RI_F_CPU_MAP_INIT;
-+	}
-+
- 	return &bpf_net_ctx->cpu_map_flush_list;
- }
- 
-@@ -799,6 +809,11 @@ static inline struct list_head *bpf_net_ctx_get_dev_flush_list(void)
- {
- 	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
- 
-+	if (!(bpf_net_ctx->ri.kern_flags & BPF_RI_F_DEV_MAP_INIT)) {
-+		INIT_LIST_HEAD(&bpf_net_ctx->dev_map_flush_list);
-+		bpf_net_ctx->ri.kern_flags |= BPF_RI_F_DEV_MAP_INIT;
-+	}
-+
- 	return &bpf_net_ctx->dev_map_flush_list;
- }
- 
-@@ -806,12 +821,14 @@ static inline struct list_head *bpf_net_ctx_get_xskmap_flush_list(void)
- {
- 	struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
- 
-+	if (!(bpf_net_ctx->ri.kern_flags & BPF_RI_F_XSK_MAP_INIT)) {
-+		INIT_LIST_HEAD(&bpf_net_ctx->xskmap_map_flush_list);
-+		bpf_net_ctx->ri.kern_flags |= BPF_RI_F_XSK_MAP_INIT;
-+	}
-+
- 	return &bpf_net_ctx->xskmap_map_flush_list;
- }
- 
--/* flags for bpf_redirect_info kern_flags */
--#define BPF_RI_F_RF_NO_DIRECT	BIT(0)	/* no napi_direct on return_frame */
--
- /* Compute the linear packet data range [data, data_end) which
-  * will be accessed by various program types (cls_bpf, act_bpf,
-  * lwt, ...). Subsystems allowing direct data access must (!)
+-- 
+2.25.1
 
------->8----------
-
-Moving kern_flags to the end excludes it from the memset() and can be
-re-used for the delayed initialisation.
-
-Sebastian
 
