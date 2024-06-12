@@ -1,127 +1,143 @@
-Return-Path: <netdev+bounces-102768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-102769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 002519047E6
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 02:03:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9D179047F9
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 02:17:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40E491F23906
-	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 00:03:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53C61B21C61
+	for <lists+netdev@lfdr.de>; Wed, 12 Jun 2024 00:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1619419E;
-	Wed, 12 Jun 2024 00:03:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C50B186A;
+	Wed, 12 Jun 2024 00:17:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ERmB5so1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LeMTLkLr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F21517C;
-	Wed, 12 Jun 2024 00:03:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE81631
+	for <netdev@vger.kernel.org>; Wed, 12 Jun 2024 00:17:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718150600; cv=none; b=A8OUlL4HSQfDr9XSeSr3Y4mBkfmJzLrSmiI5nuQfmeh6MEwXj3/UQn3AyyY4qzoRmA04XNkrkS7O88scmF5v5HD4lDRpLnTdKUv8KaUYhE8qKYUK4tDksy65Rm8vRMAG1dGlQecx41eidGnViX5HRPzKizvsbk66x62NHjX+xws=
+	t=1718151432; cv=none; b=dXY8hbw6bsSIiVGcBRTQO6o1INRf/Hc0Ie1OSBnI8GBZbNsgfqQTwKPw57vc3IH6wUC0OyIgW25/s81VkFSQsbfAcAPwzeoYWfWJy3WZCWt6LmBXpzg9ieRXDjzpALtD1fRV5kkI3wLXM+G3ggjkn6eDQ7YKmQeRAjFnsceCP00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718150600; c=relaxed/simple;
-	bh=CfmyTtQtTR+NEjqwxQHjbPbQLc9kh23HqpCVVQcN7s8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JdzhtnfRSvmH5P/nxnzqa5x9ITySJHZ8+emm4Mc9viSSeiB1C2Ofnj+vkTMdLnt9esfCAh3lX7zecc/5ciO1/3yAPouvfd3W1mlsqpfdJCOReDVtIxkW9EVjFKg7zdQZOxnHtAQ3evDoaz/6p8uX2qtFcVVeWG2ZHes/VU0firE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ERmB5so1; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52c8c0d73d3so3382038e87.1;
-        Tue, 11 Jun 2024 17:03:18 -0700 (PDT)
+	s=arc-20240116; t=1718151432; c=relaxed/simple;
+	bh=/5CStUD3+h5vLHrk8rbpKIF6eAbRF4CgImyTE/vqojM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=uk0bD4dQj7TqSz1z/sv1gMQWUa5DIAI9nOZcD9TmWOSBoicAEBjwP/RBTgoP2P+Xcuv3Uw6S9QsSiW8enOhNYfhuo0YBpvpHhdP/zH79lXst473tiONfeOF83CfavKeAolm+xLMBMWiZtwQAJfI+q/+Djo7cTCAXej1rclvRAuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ziweixiao.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LeMTLkLr; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ziweixiao.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-62a0827391aso115853827b3.1
+        for <netdev@vger.kernel.org>; Tue, 11 Jun 2024 17:17:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718150596; x=1718755396; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CfmyTtQtTR+NEjqwxQHjbPbQLc9kh23HqpCVVQcN7s8=;
-        b=ERmB5so1mgkNHOi7TrQgHedrn6UmFfsNudHIvGUkO9GBN9huFn30RiELRhR5ijc1Mq
-         PGtnIpJNxQe7BVgtLkx9CPpi3fPnBD0bxPITFg3TxvyFbkFm8PD0wzd7+99K8vNGILKT
-         ECVP9QpCwlKSBpU/WrfOQvuQTngAHAwYTQqi3VEaCByiFL0TONco2sCTA+GiVIy2isql
-         Aj0ebDxcVDGJSI1szvw+hrJiICnBpAVeRk3aiLgqq/lVYacCDDLZIwXNtCjogdlHDXkB
-         YO3+JYkzC9zHPCF5PThHJ01+4SCJh+sKNTO3y96tw5u3VFx06K8/M1bw/QeW6s7K6NMl
-         hNVg==
+        d=google.com; s=20230601; t=1718151430; x=1718756230; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=NOJsof7BEpZN8Hpp/vHtOuty3r3bM9rd+pyvN7nHOJo=;
+        b=LeMTLkLrlS2BGJ6fDSGvuE0i4N/ryIBgdERTBqXuULoMGFVJMVs8dnEA9fqSRoMdT3
+         ONutiEOYP1oOk6H7Wjooe6DXB9U971D6dG5uie5dKISL313DqKnjrWlqyGBB5ten1bX+
+         VK7YSScu7NKB81ev63jg0ZITKSE4mp01UIeoUDLKSPrNeAaEdPhIcLQvC9IcVOLqeGEG
+         2u78JjqNsSSZ5FBop56ESrkgoRlHYkmwPXW5RFu3kps1RTiNL5IBR2hwp2kBOaNO+BGh
+         Ozy7tDFBokJpSTeVEIZ84vNjuvLqXeDR+n/2IkdyFhLaC7pP+z4EMXnZraQi+nFKGQr2
+         EuQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718150596; x=1718755396;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CfmyTtQtTR+NEjqwxQHjbPbQLc9kh23HqpCVVQcN7s8=;
-        b=Je1dntzzlyqjIvb48gDVyKZ1FLG1YsCxkf3hvKlp4MpEzvrRFuRAYp8UF6YhrgZVIU
-         APDqQFakdybxPM1mepqMwhV5kV7tFfhUdNAFUhO8lB7NidGOhk+4Niay35OL9YLrddOG
-         shtYaETFPclUdzggzp4Hj9siQvrLprksGcBDNtU9Pn8VTk+DxxeTAQHHKlR61w4PhrG+
-         HPkvgd4UkQgn5OvX6bS6RwwVcntWzrp6XcYlASMaZBMdDKuAFNlgOawmAFxtopnfQtlA
-         Ih4GvTHia4gAcGWDK9+PizcxGHbOtZMll2B0PPmpD+DonuQWmLjhGDD3zE3sTi5cWIKh
-         4K8A==
-X-Forwarded-Encrypted: i=1; AJvYcCX0wi8ZTPLETil1XJAaQO9BAI4weiccsGEVkxpwrSB5+K92cVYmP6spzm4LOcpJqk3j9WDkBTDfcVgPqh33kyZ167ybcm2g99yQ0Zmrt3kuCayqyBjp9Csb7sIvi8htjgyn60iY
-X-Gm-Message-State: AOJu0Yz+2BrW+2rh9HNyvXRvP4DcmZDm9qnKWDIYrXIbQ0ijxSukwWLI
-	WpEgJ0t5KEQfSivZjEm1G7xgZmcdHmtQJQhzhwFygnxZ1GwNd64oYZWDrjP7vWecOyumOgZpONK
-	0n+I4CjRWCTaAkrhhR0XW8/KZH4w=
-X-Google-Smtp-Source: AGHT+IEBVVvYLSGYvm4uf1GOSV5JMsYxcpBlNHTVh0/GQvXEgkeNNjR+vtvzEvRhncIOCmt177HI2gV083bAUyjEonY=
-X-Received: by 2002:a05:6512:2004:b0:52b:b8c9:9cd7 with SMTP id
- 2adb3069b0e04-52c9a3d1c0bmr86074e87.18.1718150596124; Tue, 11 Jun 2024
- 17:03:16 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718151430; x=1718756230;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NOJsof7BEpZN8Hpp/vHtOuty3r3bM9rd+pyvN7nHOJo=;
+        b=jS2H502QyRnz/xYbODWaycL8ft4or74smoQY76gQKwbkXDQLos6PHCmpNFgEQps5e7
+         VNIad3TJ7WW2uDrhSrzobWUJL4amwClaFtEtgWUAb2OD5PmryxDZZrOdy9Sq55cfYMUX
+         z6o+stBWwu14KZuKwh5N0DdIimojbUynkX8SbrX7yU69UFIwPOKcdDdsaoH/oRGmiuQB
+         6tzY4LGrdIpus/gGmbDQHPH9VxI0IyDJ4RiAvWZVTsxfMG8tq9A0YWc03MqNEf5g4r5M
+         WMk936enGmDyb/bWFjIwQIrW2+3pikIxvg0mrTQ6r932Z+DUXJgj1dC26oeOKtltZMV1
+         llnQ==
+X-Gm-Message-State: AOJu0YzM6G59GeI53mWzgXCQ8rL+NM/23DJQchrSf6smZBA1DFwJKqYM
+	9PyY0Me1F+FZlJIOGCypHVk0uPXmQ7wYQPj8xoLBYd+j2JoodYq7DS6Vfbc3SXPCIhbcR3yBzRi
+	9/GaR4fvVOodkPprevUpBkmkNHVSxBqJAvORsdQzoS9BRTzMYrIH3OMCJB5ADWYe+pc0tz4oiuD
+	jJOMqXT13NdU2LvGqm79BDLMMMMjDScmeHF6CCn+0UniUZUOUY
+X-Google-Smtp-Source: AGHT+IFj5q7Yo4YsIJsQrLQYOROHj6YJ7et7llRDI8ZMXDiH4h4WLHCf4vHI/re4F+qzmcJAh1iw3DYuY1CbWUQ=
+X-Received: from ziwei-gti.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:9b0])
+ (user=ziweixiao job=sendgmr) by 2002:a25:8702:0:b0:dfa:b352:824c with SMTP id
+ 3f1490d57ef6-dfe66b65314mr59562276.7.1718151428817; Tue, 11 Jun 2024 17:17:08
+ -0700 (PDT)
+Date: Wed, 12 Jun 2024 00:16:54 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240528120424.3353880-1-arnd@kernel.org> <CACRpkdYOb3S8=EffjE8BpP1GTu5SWSEyorJ7i9HA2u7GQexwzg@mail.gmail.com>
-In-Reply-To: <CACRpkdYOb3S8=EffjE8BpP1GTu5SWSEyorJ7i9HA2u7GQexwzg@mail.gmail.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Tue, 11 Jun 2024 21:03:04 -0300
-Message-ID: <CAJq09z7y_Hfnmgtb+0+Fh7cnAL==xoExr2e_GfSk6SMPD7yPig@mail.gmail.com>
-Subject: Re: [PATCH] net: dsa: realtek: add LEDS_CLASS dependency
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Arnd Bergmann <arnd@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Arnd Bergmann <arnd@arndb.de>, 
-	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.627.g7a2c4fd464-goog
+Message-ID: <20240612001654.923887-1-ziweixiao@google.com>
+Subject: [PATCH net] gve: Clear napi->skb before dev_kfree_skb_any()
+From: Ziwei Xiao <ziweixiao@google.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, jeroendb@google.com, pkaligineedi@google.com, 
+	shailend@google.com, hramamurthy@google.com, willemb@google.com, 
+	rushilg@google.com, bcf@google.com, csully@google.com, 
+	linux-kernel@vger.kernel.org, stable@kernel.org, 
+	Ziwei Xiao <ziweixiao@google.com>, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-> On Tue, May 28, 2024 at 2:04=E2=80=AFPM Arnd Bergmann <arnd@kernel.org> w=
-rote:
->
-> > From: Arnd Bergmann <arnd@arndb.de>
-> >
-> > This driver fails to link when LED support is disabled:
-> >
-> > ERROR: modpost: "led_init_default_state_get" [drivers/net/dsa/realtek/r=
-tl8366.ko] undefined!
-> > ERROR: modpost: "devm_led_classdev_register_ext" [drivers/net/dsa/realt=
-ek/rtl8366.ko] undefined!
-> >
-> > Add a dependency that prevents this configuration.
+gve_rx_free_skb incorrectly leaves napi->skb referencing an skb after it
+is freed with dev_kfree_skb_any(). This can result in a subsequent call
+to napi_get_frags returning a dangling pointer.
 
-Thank you, Arnd.
+Fix this by clearing napi->skb before the skb is freed.
 
-> >
-> > Fixes: 32d617005475 ("net: dsa: realtek: add LED drivers for rtl8366rb"=
-)
-> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
->
-> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
->
-> I tried to create a separate .c file for the leds and stubbed functions
-> for the LED stuff, but it ended up having to create a set of headers
-> just to share things between the different parts of the drivers and
-> it was so messy that it's not worth it.
+Fixes: 9b8dd5e5ea48 ("gve: DQO: Add RX path")
+Cc: stable@vger.kernel.org
+Reported-by: Shailend Chand <shailend@google.com>
+Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
+Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Reviewed-by: Shailend Chand <shailend@google.com>
+Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
+---
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Thanks, Linus. I'll give it a try next month. For now, the fixed
-dependency is not a big deal as this switch was designed for small
-routers, which normally have LEDs.
+diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+index c1c912de59c7..1154c1d8f66f 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+@@ -647,11 +647,13 @@ static void gve_rx_skb_hash(struct sk_buff *skb,
+ 	skb_set_hash(skb, le32_to_cpu(compl_desc->hash), hash_type);
+ }
+ 
+-static void gve_rx_free_skb(struct gve_rx_ring *rx)
++static void gve_rx_free_skb(struct napi_struct *napi, struct gve_rx_ring *rx)
+ {
+ 	if (!rx->ctx.skb_head)
+ 		return;
+ 
++	if (rx->ctx.skb_head == napi->skb)
++		napi->skb = NULL;
+ 	dev_kfree_skb_any(rx->ctx.skb_head);
+ 	rx->ctx.skb_head = NULL;
+ 	rx->ctx.skb_tail = NULL;
+@@ -950,7 +952,7 @@ int gve_rx_poll_dqo(struct gve_notify_block *block, int budget)
+ 
+ 		err = gve_rx_dqo(napi, rx, compl_desc, complq->head, rx->q_num);
+ 		if (err < 0) {
+-			gve_rx_free_skb(rx);
++			gve_rx_free_skb(napi, rx);
+ 			u64_stats_update_begin(&rx->statss);
+ 			if (err == -ENOMEM)
+ 				rx->rx_skb_alloc_fail++;
+@@ -993,7 +995,7 @@ int gve_rx_poll_dqo(struct gve_notify_block *block, int budget)
+ 
+ 		/* gve_rx_complete_skb() will consume skb if successful */
+ 		if (gve_rx_complete_skb(rx, napi, compl_desc, feat) != 0) {
+-			gve_rx_free_skb(rx);
++			gve_rx_free_skb(napi, rx);
+ 			u64_stats_update_begin(&rx->statss);
+ 			rx->rx_desc_err_dropped_pkt++;
+ 			u64_stats_update_end(&rx->statss);
+-- 
+2.45.2.505.gda0bf45e8d-goog
 
->
-> Yours,
-> Linus Walleij
-
-Reviewed-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 
